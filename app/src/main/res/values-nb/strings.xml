@@ -967,7 +967,7 @@
     <string name="preOnboardingWidgetPromptSecondaryCta">Hopp over</string>
 
     <!-- Pre-onboarding: add to home screen -->
-    <string name="preOnboardingAddToDockTitle">Legg meg til nederst på skjermen.</string>
+    <string name="preOnboardingDockStepTitle">Legg meg til i favorittraden din.</string>
     <string name="preOnboardingAddToDockBody">Finn DuckDuckGo-ikonet på startskjermen. Trykk på det og dra det dit du vil ha det. Det er det hele!</string>
     <string name="preOnboardingAddToDockPrimaryCta">Skjønner!</string>
 

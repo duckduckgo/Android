@@ -967,7 +967,7 @@
     <string name="preOnboardingWidgetPromptSecondaryCta">Omitir</string>
 
     <!-- Pre-onboarding: add to home screen -->
-    <string name="preOnboardingAddToDockTitle">Añádeme a la parte inferior de tu pantalla.</string>
+    <string name="preOnboardingDockStepTitle">¡Añádeme a tu fila de favoritos!</string>
     <string name="preOnboardingAddToDockBody">Busca el icono de DuckDuckGo en tu pantalla de inicio. A continuación, selecciónalo y arrástralo a su ubicación. ¡Eso es todo!</string>
     <string name="preOnboardingAddToDockPrimaryCta">Entendido</string>
 

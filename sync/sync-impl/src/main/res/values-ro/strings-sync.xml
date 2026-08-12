@@ -277,4 +277,170 @@
     <string name="sync_v2_already_paired_title">Deja sincronizat.</string>
     <string name="sync_v2_already_paired_message">Aceste dispozitive sunt deja conectate la Sync &amp; Backup.</string>
 
+    <!-- Simplified Sync -->
+
+    <!-- Sync settings screen: header -->
+    <string name="sync_simplified_settings_header_headline_disabled">Păstrează DuckDuckGo sincronizat!</string>
+    <string name="sync_simplified_settings_header_headline_enabled">DuckDuckGo este sincronizat.</string>
+    <string name="sync_simplified_settings_header_body_disabled">Sincronizează și efectuează copii de rezervă pentru datele de completare automată și marcajele tale, criptate de la un capăt la altul în aplicațiile tale DuckDuckGo.</string>
+    <string name="sync_simplified_settings_header_body_disabled_with_duck_ai">Sincronizează și efectuează copii de rezervă pentru datele de completare automată, marcajele și chaturile Duck.ai, care vor fi criptate de la un capăt la altul în aplicațiile tale DuckDuckGo.</string>
+    <string name="sync_simplified_settings_header_body_enabled">Marcajele și datele de completare automată sunt sincronizate și beneficiază de copiere de rezervă, cu criptare de la un capăt la altul.</string>
+    <string name="sync_simplified_settings_header_body_enabled_with_duck_ai">Marcajele, datele de completare automată și chaturile Duck.ai sunt sincronizate și beneficiază de copiere de rezervă, cu criptare de la un capăt la altul.</string>
+
+    <!-- Sync settings screen: sync disabled state -->
+    <string name="sync_simplified_settings_sync_this_device_item">Sincronizează acest dispozitiv</string>
+    <string name="sync_simplified_settings_sync_with_another_device_button">Sincronizează cu un alt dispozitiv</string>
+    <string name="sync_simplified_settings_recover_section_header">Recuperează datele sincronizate</string>
+    <string name="sync_simplified_settings_recover_data_item">Am un cod de recuperare</string>
+
+    <!-- Sync settings screen: sync enabled state -->
+    <string name="sync_simplified_settings_devices_section_header">Dispozitivele mele</string>
+    <string name="sync_simplified_settings_local_device_item_hint">Acest dispozitiv</string>
+    <string name="sync_simplified_settings_sync_with_another_device_item">Sincronizează cu un alt dispozitiv</string>
+    <string name="sync_simplified_settings_download_section_header">Descarcă</string>
+    <string name="sync_simplified_settings_bookmarks_section_header">Marcaje</string>
+    <string name="sync_simplified_settings_recovery_section_header">Recuperare</string>
+    <string name="sync_simplified_settings_restore_on_reinstall_item">Restaurează la reinstalarea aplicației</string>
+    <string name="sync_simplified_settings_restore_on_reinstall_item_hint">Dacă reinstalezi aplicația DuckDuckGo, te vom întreba dacă dorești să restaurezi datele pe acest dispozitiv.</string>
+    <string name="sync_simplified_settings_copy_recovery_code_item">Copiază codul de recuperare</string>
+    <string name="sync_simplified_settings_download_recovery_code_item">Descarcă-ți codul de recuperare</string>
+    <string name="sync_simplified_settings_download_recovery_code_item_hint">Folosește acest cod pentru a-ți recupera datele dacă pierzi accesul la acest dispozitiv – păstrează-l în siguranță.</string>
+    <string name="sync_simplified_settings_data_expiration_notice">Datele din Sync &amp; Backup nu pot fi recuperate după 18 luni de inactivitate. <annotation type="learn_more_link">Află mai multe</annotation></string>
+    <string name="sync_simplified_settings_delete_account_item">Oprește și șterge datele serverului</string>
+    <string name="sync_simplified_settings_storage_permission_message">Salvarea PDF-ului de recuperare necesită permisiunea de stocare</string>
+    <string name="sync_simplified_settings_learn_more_screen_title">Sync &amp; Backup</string>
+
+    <!-- Sync settings screen: both states -->
+    <string name="sync_simplified_settings_notify_me_title">Notificările sunt dezactivate</string>
+    <string name="sync_simplified_settings_notify_me_body">Primește o notificare în cazul în care Sync &amp; Backup întâmpină o eroare.</string>
+    <string name="sync_simplified_settings_get_other_devices_item">Obține DuckDuckGo pe alte dispozitive</string>
+    <string name="sync_simplified_settings_get_desktop_browser_item">Obține browserul pentru desktop</string>
+
+    <!-- Sync settings screen: delete server data dialog -->
+    <string name="sync_simplified_settings_delete_server_data_dialog_title">Dorești să oprești Sync &amp; Backup și să ștergi datele de pe server?</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_body">Toate dispozitivele care folosesc Sync &amp; Backup vor fi deconectate, iar datele tale sincronizate vor fi șterse de pe server.</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_primary_button">Șterge datele de pe server</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_secondary_button">Anulează</string>
+
+    <!-- Sync settings screen: require device passcode dialog -->
+    <string name="sync_simplified_settings_require_passcode_dialog_title">Securizează-ți dispozitivul pentru a utiliza Sync &amp; Backup</string>
+    <string name="sync_simplified_settings_require_passcode_dialog_body">Sunt necesare succesiunea de blocare a dispozitivului, codul PIN sau elementele biometrice pentru a utiliza Sync &amp; Backup.</string>
+    <string name="sync_simplified_settings_require_passcode_dialog_primary_button">Mergi la Setări</string>
+
+    <!-- Sync This Device screen -->
+    <string name="sync_simplified_setup_header_headline">Sincronizează acest dispozitiv cu un computer din apropiere.</string>
+    <string name="sync_simplified_setup_header_body">Te vom ajuta să-ți sincronizezi dispozitivele.</string>
+    <string name="sync_simplified_setup_primary_button">Sincronizează cu un alt dispozitiv</string>
+    <string name="sync_simplified_setup_secondary_button">Sincronizează doar acest dispozitiv</string>
+    <string name="sync_simplified_setup_secondary_button_syncing">Se conectează…</string>
+
+    <!-- Recover Synced Data screen -->
+    <string name="sync_simplified_recover_data_headline">Recuperează-ți datele sincronizate</string>
+    <string name="sync_simplified_recover_data_body">Vei avea nevoie de codul de recuperare pe care l-ai primit când ai configurat Sync &amp; Backup. Este posibil să-l fi salvat ca PDF pe dispozitivul pe care l-ai folosit.</string>
+    <string name="sync_simplified_recover_data_primary_button">Recuperează datele sincronizate</string>
+
+    <!-- Previous Session Ready screen -->
+    <string name="sync_simplified_previous_session_headline">Sesiunea anterioară Sync &amp; Backup este gata.</string>
+    <string name="sync_simplified_previous_session_body">Reia sesiunea Sync &amp; Backup pentru a restaura marcajele, parolele și multe altele sau continuă cu o nouă configurare.</string>
+    <string name="sync_simplified_previous_session_primary_button">Reia Sync &amp; Backup</string>
+    <string name="sync_simplified_previous_session_secondary_button">Configurează o nouă sincronizare</string>
+
+    <!-- Scanner screen: toolbar and tabs -->
+    <string name="sync_simplified_scanner_show_qr_code_content_description">Afișează codul QR</string>
+    <string name="sync_simplified_scanner_camera_tab_label">Scanează codul QR</string>
+    <string name="sync_simplified_scanner_manual_entry_tab_label">Completează codul</string>
+
+    <!-- Scanner screen: camera tab -->
+    <string name="sync_simplified_scanner_camera_header_headline">Scanează codul QR pentru sincronizare</string>
+    <string name="sync_simplified_scanner_camera_header_body">Deschide <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo pentru desktop</annotation></b>\n<annotation type="gap">\n</annotation>și accesează <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Sincronizează cu un alt dispozitiv</annotation></string>
+    <string name="sync_simplified_scanner_camera_primary_button">Sunt gata de scanare</string>
+    <string name="sync_simplified_scanner_camera_invalid_code_message">Ne pare rău, codul scanat este incorect.</string>
+    <string name="sync_simplified_scanner_no_permission_headline">Este necesară permisiunea pentru cameră</string>
+    <string name="sync_simplified_scanner_no_permission_body">Accesează setările dispozitivului și acordă permisiunea ca această aplicație să îți acceseze camera.</string>
+    <string name="sync_simplified_scanner_no_permission_primary_button">Mergi la Setări</string>
+    <string name="sync_simplified_scanner_no_hardware_headline">Cameră indisponibilă</string>
+
+    <!-- Scanner screen: manual entry tab -->
+    <string name="sync_simplified_scanner_manual_entry_header_headline">Completează codul de sincronizare</string>
+    <string name="sync_simplified_scanner_manual_entry_header_body">Deschide celălalt <annotation type="icon">￼</annotation> <b><annotation type="highlight">browser DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>Accesează <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Sincronizează cu un alt dispozitiv</annotation> › <annotation type="highlight">Copiază codul text</annotation></string>
+    <string name="sync_simplified_scanner_manual_entry_example_code_label">Exemplu de cod:</string>
+    <string name="sync_simplified_scanner_manual_entry_primary_button">Lipește codul de sincronizare</string>
+    <string name="sync_simplified_scanner_manual_entry_invalid_code_message">Ne pare rău, codul lipit este incorect.</string>
+
+    <!-- QR Code screen -->
+    <string name="sync_simplified_qr_code_screen_title">Cod QR</string>
+    <string name="sync_simplified_qr_code_header_headline">Scanează de pe un alt dispozitiv</string>
+    <string name="sync_simplified_qr_code_header_body">Pe un alt dispozitiv, deschide <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>și accesează <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Sincronizează cu un alt dispozitiv</annotation> și scanează acest cod:</string>
+    <string name="sync_simplified_qr_code_copy_button">Copiază codul text</string>
+    <string name="sync_simplified_qr_code_share_button">Distribuie</string>
+    <string name="sync_simplified_qr_code_copied_message">Codul de recuperare a fost copiat</string>
+
+    <!-- Pairing screen -->
+    <string name="sync_simplified_pairing_headline">Sync &amp; Backup este criptat de la un capăt la altul pe toate dispozitivele tale.</string>
+    <string name="sync_simplified_pairing_headline_recovery">Se recuperează datele</string>
+    <string name="sync_simplified_pairing_body">Se conectează…</string>
+
+    <!-- Pairing dialogs, shown on the QR Code and Pairing screens -->
+    <string name="sync_simplified_pairing_dialog_host_title">Sincronizezi un nou dispozitiv?</string>
+    <string name="sync_simplified_pairing_dialog_host_primary_button">Sincronizează acum</string>
+    <string name="sync_simplified_pairing_dialog_host_secondary_button">Anulează</string>
+    <string name="sync_simplified_pairing_dialog_joiner_title">Sincronizezi un nou dispozitiv?</string>
+    <string name="sync_simplified_pairing_dialog_joiner_primary_button">Sincronizează acum</string>
+    <string name="sync_simplified_pairing_dialog_joiner_secondary_button">Anulează</string>
+    <string name="sync_simplified_pairing_dialog_acknowledgment_title">Confirmă pe celălalt dispozitiv…</string>
+    <string name="sync_simplified_pairing_dialog_acknowledgment_primary_button">Am înțeles</string>
+
+    <!-- Recovery Code screen -->
+    <string name="sync_simplified_recovery_code_headline" instruction="Placeholder is a device name. e.g., Samsung S23">%1$s a fost adăugat la Sync &amp; Backup.</string>
+    <string name="sync_simplified_recovery_code_body">Folosește acest cod pentru a restaura datele dacă pierzi accesul la acest dispozitiv. Păstrează-l în siguranță.</string>
+    <string name="sync_simplified_recovery_code_label">Cod de recuperare</string>
+    <string name="sync_simplified_recovery_code_download_button">Descarcă-ți codul de recuperare</string>
+    <string name="sync_simplified_recovery_code_restore_on_reinstall_item">Restaurează la reinstalarea aplicației</string>
+    <string name="sync_simplified_recovery_code_restore_on_reinstall_item_hint">Dacă reinstalezi aplicația DuckDuckGo, te vom întreba dacă dorești să restaurezi datele pe acest dispozitiv.</string>
+    <string name="sync_simplified_recovery_code_primary_button">Finalizat</string>
+    <string name="sync_simplified_recovery_code_copied_message">Codul de recuperare a fost copiat</string>
+    <string name="sync_simplified_recovery_code_storage_permission_message">Salvarea PDF-ului de recuperare necesită permisiunea de stocare</string>
+
+    <!-- Edit Device screen -->
+    <string name="sync_simplified_edit_device_header_status">Sincronizat</string>
+    <string name="sync_simplified_edit_device_edit_name_item">Editează numele</string>
+    <string name="sync_simplified_edit_device_remove_item">Elimină dispozitivul</string>
+    <string name="sync_simplified_edit_device_sync_this_device_item">Sincronizează acest dispozitiv</string>
+    <string name="sync_simplified_edit_device_remove_notice_this_device">Acest dispozitiv nu va mai putea accesa datele tale sincronizate dacă îl elimini.</string>
+    <string name="sync_simplified_edit_device_remove_notice_another_device">Acest dispozitiv nu va mai putea accesa datele tale sincronizate dacă această opțiune este dezactivată.</string>
+
+    <!-- Edit Device screen: edit name dialog -->
+    <string name="sync_simplified_edit_device_edit_name_dialog_title">Editează numele</string>
+    <string name="sync_simplified_edit_device_edit_name_dialog_primary_button">Finalizat</string>
+    <string name="sync_simplified_edit_device_edit_name_dialog_secondary_button">Anulează</string>
+
+    <!-- Edit Device screen: remove device dialog -->
+    <string name="sync_simplified_edit_device_remove_dialog_title">Elimini dispozitivul?</string>
+    <string name="sync_simplified_edit_device_remove_dialog_body" instruction="Placeholder is a device name. e.g., Samsung S23">„%1$s” nu va mai putea accesa datele tale sincronizate.</string>
+    <string name="sync_simplified_edit_device_remove_dialog_primary_button">Elimină</string>
+    <string name="sync_simplified_edit_device_remove_dialog_secondary_button">Anulează</string>
+
+    <!-- Edit Device screen: turn off sync dialog -->
+    <string name="sync_simplified_edit_device_turn_off_dialog_title">Oprești Sync &amp; Backup?</string>
+    <string name="sync_simplified_edit_device_turn_off_dialog_body">Acest dispozitiv nu va mai putea accesa datele tale sincronizate pe alte dispozitive.</string>
+    <string name="sync_simplified_edit_device_turn_off_dialog_primary_button">Oprește</string>
+    <string name="sync_simplified_edit_device_turn_off_dialog_secondary_button">Anulează</string>
+
+    <!-- Error dialog, shared across Simplified Sync screens -->
+    <string name="sync_simplified_error_dialog_title">Sync &amp; Backup</string>
+    <string name="sync_simplified_error_dialog_primary_button">OK</string>
+    <string name="sync_simplified_error_dialog_generic_body">Ceva nu a funcționat corect</string>
+    <string name="sync_simplified_error_dialog_create_account_body">Nu se poate conecta la server.</string>
+    <string name="sync_simplified_error_dialog_edit_device_body">Nu se poate actualiza numele dispozitivului.</string>
+    <string name="sync_simplified_error_dialog_recovery_pdf_body">Nu se poate crea fișierul PDF de recuperare.</string>
+    <string name="sync_simplified_error_dialog_recovery_code_body">Nu se poate obține codul de recuperare.</string>
+    <string name="sync_simplified_pairing_failed_generic_message">Ceva nu a funcționat.</string>
+
+    <!-- Deep link setup: confirmation dialog and device-auth prompt, shown on the settings screen when an inbound sync pairing link is opened -->
+    <string name="sync_simplified_deep_link_confirmation_dialog_title">Sincronizezi un nou dispozitiv?</string>
+    <string name="sync_simplified_deep_link_confirmation_dialog_body" instruction="Placeholder is a device name. e.g., Samsung S23">\"%1$s\" va putea accesa datele tale sincronizate de pe DuckDuckGo.</string>
+    <string name="sync_simplified_deep_link_confirmation_dialog_primary_button">Sincronizează acum</string>
+    <string name="sync_simplified_deep_link_confirmation_dialog_secondary_button">Anulează</string>
+    <string name="sync_simplified_deep_link_auth_prompt_title">Configurează Sync &amp; Backup</string>
+    <string name="sync_simplified_deep_link_auth_prompt_message">Deblochează dispozitivul pentru a configura Sync &amp; Backup</string>
 </resources>

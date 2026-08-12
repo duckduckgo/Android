@@ -1003,7 +1003,7 @@
     <string name="preOnboardingWidgetPromptSecondaryCta">Přeskočit</string>
 
     <!-- Pre-onboarding: add to home screen -->
-    <string name="preOnboardingAddToDockTitle">Přidej si mě do dolní části obrazovky.</string>
+    <string name="preOnboardingDockStepTitle">Přidej si mě do řádku oblíbených.</string>
     <string name="preOnboardingAddToDockBody">Najdi ikonu DuckDuckGo na ploše. Pak ji podrž a přetáhni na místo. A je to!</string>
     <string name="preOnboardingAddToDockPrimaryCta">Chápu!</string>
 

@@ -18,20 +18,84 @@ package com.duckduckgo.contentscopescripts.impl.features.contentscopeexperiments
 
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.contentscopescripts.api.contentscopeExperiments.ContentScopeExperiments
+import com.duckduckgo.contentscopescripts.impl.ContentScopeScriptsFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesMultibinding
+import dagger.SingleInstanceIn
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 
-@ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
+@ContributesBinding(
+    scope = AppScope::class,
+    boundType = ContentScopeExperiments::class,
+)
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = PrivacyConfigCallbackPlugin::class,
+)
 class RealContentScopeExperiments @Inject constructor(
     private val contentScopeExperimentsFeature: ContentScopeExperimentsFeature,
+    private val contentScopeScriptsFeature: ContentScopeScriptsFeature,
     private val featureTogglesInventory: FeatureTogglesInventory,
     private val dispatcherProvider: DispatcherProvider,
-) : ContentScopeExperiments {
-    override suspend fun getActiveExperiments(): List<Toggle> =
+) : ContentScopeExperiments, PrivacyConfigCallbackPlugin {
+
+    /**
+     * Resolving the active experiments walks every feature toggle in the app and enrols each candidate, which is too
+     * expensive to repeat per navigation: page start awaits it before content scope scripts can be injected. The
+     * result only changes when a new privacy config lands, so it is held until then.
+     */
+    @Volatile
+    private var activeExperiments: List<Toggle>? = null
+
+    private val resolveMutex = Mutex()
+
+    private val invalidationCount = AtomicInteger(0)
+
+    override suspend fun getActiveExperiments(): List<Toggle> {
+        activeExperiments?.let { return it }
+
+        if (!cachingEnabled()) return resolve()
+
+        return resolveMutex.withLock {
+            activeExperiments ?: run {
+                val count = invalidationCount.get()
+                resolve().also {
+                    if (invalidationCount.get() == count) {
+                        activeExperiments = it
+                    }
+                }
+            }
+        }
+    }
+
+    override fun onPrivacyConfigDownloaded() {
+        invalidate()
+    }
+
+    override fun onPrivacyConfigPersisted() {
+        invalidate()
+    }
+
+    private fun invalidate() {
+        invalidationCount.incrementAndGet()
+        activeExperiments = null
+    }
+
+    private suspend fun cachingEnabled(): Boolean =
+        withContext(dispatcherProvider.io()) {
+            contentScopeScriptsFeature.cacheContentScopeExperiments().isEnabled()
+        }
+
+    private suspend fun resolve(): List<Toggle> =
         withContext(dispatcherProvider.io()) {
             val featureName = contentScopeExperimentsFeature.self().featureName().name
             val experiments =

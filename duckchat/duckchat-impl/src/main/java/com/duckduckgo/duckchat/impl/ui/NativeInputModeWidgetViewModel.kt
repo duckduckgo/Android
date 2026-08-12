@@ -48,9 +48,6 @@ import com.duckduckgo.duckchat.impl.feature.maxUrlSuggestions
 import com.duckduckgo.duckchat.impl.helper.PendingNativeFile
 import com.duckduckgo.duckchat.impl.helper.PendingNativeImage
 import com.duckduckgo.duckchat.impl.helper.PendingNativePromptStore
-import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
-import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
-import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsReader
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ReasoningResolver
 import com.duckduckgo.duckchat.impl.models.Tool
@@ -59,6 +56,8 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
+import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.ChatSuggestion
+import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.reader.ChatSuggestionsReader
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.history.api.NavigationHistory
@@ -106,7 +105,6 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     private val autoCompleteSettings: AutoCompleteSettings,
     private val duckAiChatHistoryFeature: DuckAiChatHistoryFeature,
     private val dispatchers: DispatcherProvider,
-    private val inputScreenConfigResolver: InputScreenConfigResolver,
     private val pixel: Pixel,
     private val duckChatPixels: DuckChatPixels,
     private val nativeInputStatePublisher: NativeInputStatePublisher,
@@ -118,7 +116,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val autoComplete: AutoComplete = autoCompleteFactory.create(
-        AutoComplete.Config(showInstalledApps = inputScreenConfigResolver.shouldShowInstalledApps()),
+        AutoComplete.Config(showInstalledApps = false),
         browserMode,
     )
 
@@ -258,9 +256,11 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         }
     }
 
-    fun fireSentPromptInChat() = duckChatPixels.fireSentPromptInChat()
+    fun fireSentPromptInChat() = duckChatPixels.fireSentPromptInChat(currentSurface())
 
-    fun fireVoiceTapped() = duckChatPixels.fireVoiceTapped()
+    fun fireVoiceTapped() = duckChatPixels.fireVoiceTapped(currentSurface())
+
+    fun fireVoiceSearchTapped() = duckChatPixels.fireVoiceSearchTapped(currentSurface())
 
     fun fireStopGenerationTapped() = duckChatPixels.fireStopGenerationTapped(currentSurface())
 

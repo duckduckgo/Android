@@ -53,6 +53,7 @@ dependencies {
 
     implementation "com.airbnb.android:lottie-compose:_"
 
+    implementation AndroidX.activity.compose
     implementation AndroidX.appCompat
     implementation Google.android.material
     implementation AndroidX.constraintLayout

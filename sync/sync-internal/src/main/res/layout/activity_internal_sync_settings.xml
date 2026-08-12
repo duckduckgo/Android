@@ -172,6 +172,133 @@
             android:layout_marginBottom="@dimen/keyline_4"
             app:typography="body2" />
 
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/createAccountInfoKeyButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="Create &amp; Register account_info Key" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/accountInfoKeyResultTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/keyline_4"
+            android:layout_marginEnd="@dimen/keyline_4"
+            android:layout_marginBottom="@dimen/keyline_4"
+            app:typography="body2" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/showCachedAccountInfoKeyButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="Show Cached account_info Key" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/deleteCachedAccountInfoKeyButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="Delete Cached account_info Key" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/cachedAccountInfoKeyTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/keyline_4"
+            android:layout_marginEnd="@dimen/keyline_4"
+            android:layout_marginBottom="@dimen/keyline_4"
+            app:typography="body2" />
+
+        <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="Unified Device List (device_info)" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/renameDeviceButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="Rename device (PATCH device_info)" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/renameDeviceResultTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/keyline_4"
+            android:layout_marginEnd="@dimen/keyline_4"
+            android:layout_marginBottom="@dimen/keyline_4"
+            app:typography="body2" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/fetchDecryptDevicesButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="Fetch &amp; decrypt devices" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/fetchDecryptDevicesResultTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/keyline_4"
+            android:layout_marginEnd="@dimen/keyline_4"
+            android:layout_marginBottom="@dimen/keyline_4"
+            app:typography="body2" />
+
+        <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="Unified Devices Migration" />
+
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/canWriteUnifiedDeviceListToggle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:showSwitch="true"
+            app:primaryText="canWriteUnifiedDeviceList" />
+
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/canReadUnifiedDeviceListToggle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:showSwitch="true"
+            app:primaryText="canReadUnifiedDeviceList" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/migrationStatusTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/keyline_4"
+            android:layout_marginEnd="@dimen/keyline_4"
+            android:layout_marginBottom="@dimen/keyline_4"
+            app:typography="body2" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/runMigrationButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="Run migration now" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/resetMigrationMarkerButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="Reset migration marker" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/migrationResultTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/keyline_4"
+            android:layout_marginEnd="@dimen/keyline_4"
+            android:layout_marginBottom="@dimen/keyline_4"
+            app:typography="body2" />
+
         <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

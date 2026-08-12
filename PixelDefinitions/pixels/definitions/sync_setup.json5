@@ -1,4 +1,37 @@
 {
+    "sync_setup_scan_qr_screen_shown": {
+        "description": "The sync setup scan QR code screen was shown to the user",
+        "owners": ["MiSikora"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "source",
+                "type": "string",
+                "description": "Which sync setup flow the screen belongs to",
+                "enum": ["connect", "exchange"]
+            },
+            {
+                "key": "flow_version",
+                "type": "string",
+                "description": "Which sync setup protocol stack the device is on (v2 when canUseV2ConnectFlow is enabled)",
+                "enum": ["v1", "v2"]
+            },
+            {
+                "key": "ui_version",
+                "type": "string",
+                "description": "Which sync setup UI the user is on: v2 when the simplified sync UI is enabled (useSimplifiedSync), v1 on the legacy setup screens",
+                "enum": ["v1", "v2"]
+            },
+            {
+                "key": "my_kind",
+                "type": "string",
+                "description": "This device's credential kind. Always ddg for the native client",
+                "enum": ["ddg", "3party"]
+            }
+        ]
+    },
     "sync_setup_barcode_screen_shown": {
         "description": "The sync setup barcode (QR) screen was shown to the user",
         "owners": ["CDRussell"],
@@ -16,6 +49,12 @@
                 "key": "flow_version",
                 "type": "string",
                 "description": "Which sync setup protocol stack the device is on (v2 when canUseV2ConnectFlow is enabled)",
+                "enum": ["v1", "v2"]
+            },
+            {
+                "key": "ui_version",
+                "type": "string",
+                "description": "Which sync setup UI the user is on: v2 when the simplified sync UI is enabled (useSimplifiedSync), v1 on the legacy setup screens",
                 "enum": ["v1", "v2"]
             },
             {
@@ -43,6 +82,12 @@
                 "key": "flow_version",
                 "type": "string",
                 "description": "Which sync setup protocol stack the device is on (v2 when canUseV2ConnectFlow is enabled)",
+                "enum": ["v1", "v2"]
+            },
+            {
+                "key": "ui_version",
+                "type": "string",
+                "description": "Which sync setup UI the user is on: v2 when the simplified sync UI is enabled (useSimplifiedSync), v1 on the legacy setup screens",
                 "enum": ["v1", "v2"]
             },
             {
@@ -85,6 +130,12 @@
                 "enum": ["v1", "v2"]
             },
             {
+                "key": "ui_version",
+                "type": "string",
+                "description": "Which sync setup UI the user is on: v2 when the simplified sync UI is enabled (useSimplifiedSync), v1 on the legacy setup screens",
+                "enum": ["v1", "v2"]
+            },
+            {
                 "key": "my_kind",
                 "type": "string",
                 "description": "This device's credential kind. Always ddg for the native client",
@@ -124,6 +175,12 @@
                 "enum": ["v1", "v2"]
             },
             {
+                "key": "ui_version",
+                "type": "string",
+                "description": "Which sync setup UI the user is on: v2 when the simplified sync UI is enabled (useSimplifiedSync), v1 on the legacy setup screens",
+                "enum": ["v1", "v2"]
+            },
+            {
                 "key": "my_kind",
                 "type": "string",
                 "description": "This device's credential kind. Always ddg for the native client",
@@ -148,6 +205,12 @@
                 "key": "flow_version",
                 "type": "string",
                 "description": "Which sync setup protocol stack the device is on (v2 when canUseV2ConnectFlow is enabled)",
+                "enum": ["v1", "v2"]
+            },
+            {
+                "key": "ui_version",
+                "type": "string",
+                "description": "Which sync setup UI the user is on: v2 when the simplified sync UI is enabled (useSimplifiedSync), v1 on the legacy setup screens",
                 "enum": ["v1", "v2"]
             },
             {
@@ -184,6 +247,12 @@
                 "enum": ["v1", "v2"]
             },
             {
+                "key": "ui_version",
+                "type": "string",
+                "description": "Which sync setup UI the user is on: v2 when the simplified sync UI is enabled (useSimplifiedSync), v1 on the legacy setup screens",
+                "enum": ["v1", "v2"]
+            },
+            {
                 "key": "my_kind",
                 "type": "string",
                 "description": "This device's credential kind. Always ddg for the native client",
@@ -214,6 +283,12 @@
                 "key": "flow_version",
                 "type": "string",
                 "description": "Which sync setup protocol stack the device is on (v2 when canUseV2ConnectFlow is enabled)",
+                "enum": ["v1", "v2"]
+            },
+            {
+                "key": "ui_version",
+                "type": "string",
+                "description": "Which sync setup UI the user is on: v2 when the simplified sync UI is enabled (useSimplifiedSync), v1 on the legacy setup screens",
                 "enum": ["v1", "v2"]
             },
             {
@@ -302,6 +377,12 @@
                 "enum": ["v1", "v2"]
             },
             {
+                "key": "ui_version",
+                "type": "string",
+                "description": "Which sync setup UI the user is on: v2 when the simplified sync UI is enabled (useSimplifiedSync), v1 on the legacy setup screens",
+                "enum": ["v1", "v2"]
+            },
+            {
                 "key": "my_kind",
                 "type": "string",
                 "description": "This device's credential kind. Always ddg for the native client",
@@ -350,6 +431,12 @@
                 "key": "flow_version",
                 "type": "string",
                 "description": "Which sync setup protocol stack the device is on (v2 when canUseV2ConnectFlow is enabled)",
+                "enum": ["v1", "v2"]
+            },
+            {
+                "key": "ui_version",
+                "type": "string",
+                "description": "Which sync setup UI the user is on: v2 when the simplified sync UI is enabled (useSimplifiedSync), v1 on the legacy setup screens",
                 "enum": ["v1", "v2"]
             },
             {

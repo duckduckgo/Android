@@ -861,7 +861,45 @@ class SubscriptionWebViewViewModelTest {
             id = "id",
             data = JSONObject("""{"id":"myId"}"""),
         )
-        verify(pixelSender).reportOfferSubscribeClick()
+        verify(pixelSender).reportOfferSubscribeClick(null)
+    }
+
+    @Test
+    fun whenLaunchOriginSeededThenSubscriptionSelectedPixelCarriesOrigin() = runTest {
+        viewModel.setLaunchOrigin("funnel_duckai_android__modelpicker")
+
+        viewModel.processJsCallbackMessage(
+            featureName = "test",
+            method = "subscriptionSelected",
+            id = "id",
+            data = JSONObject("""{"id":"myId"}"""),
+        )
+        verify(pixelSender).reportOfferSubscribeClick("funnel_duckai_android__modelpicker")
+    }
+
+    @Test
+    fun whenLaunchOriginSeededThenSubscriptionChangeSelectedPixelCarriesOrigin() = runTest {
+        viewModel.setLaunchOrigin("funnel_duckai_android__switchmodel")
+
+        viewModel.processJsCallbackMessage(
+            featureName = "test",
+            method = "subscriptionChangeSelected",
+            id = "id",
+            data = JSONObject("""{"id":"myId"}"""),
+        )
+        verify(pixelSender).reportOfferSubscribeClick("funnel_duckai_android__switchmodel")
+    }
+
+    @Test
+    fun whenSubscriptionChangeSelectedWithoutLaunchOriginThenNoSubscribeClickFires() = runTest {
+        // A generic plan change (no funnel launch origin) must not emit a subscribe click.
+        viewModel.processJsCallbackMessage(
+            featureName = "test",
+            method = "subscriptionChangeSelected",
+            id = "id",
+            data = JSONObject("""{"id":"myId"}"""),
+        )
+        verify(pixelSender, never()).reportOfferSubscribeClick(any())
     }
 
     @Test

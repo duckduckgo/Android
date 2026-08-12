@@ -967,7 +967,7 @@
     <string name="preOnboardingWidgetPromptSecondaryCta">Salta</string>
 
     <!-- Pre-onboarding: add to home screen -->
-    <string name="preOnboardingAddToDockTitle">Aggiungimi alla parte inferiore dello schermo.</string>
+    <string name="preOnboardingDockStepTitle">Aggiungimi alla riga dei preferiti.</string>
     <string name="preOnboardingAddToDockBody">Trova l\'icona di DuckDuckGo sulla tua schermata principale. Quindi premi e trascina nella posizione desiderata. Ecco fatto.</string>
     <string name="preOnboardingAddToDockPrimaryCta">Ho capito.</string>
 

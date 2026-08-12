@@ -70,7 +70,7 @@
                 android:layout_height="wrap_content"
                 app:leadingIcon="@drawable/ic_trash_24"
                 app:leadingIconBackground="circular"
-                app:primaryText="@string/sync_setup_v2_remove_device_name_item" />
+                app:primaryText="@string/sync_simplified_edit_device_remove_item" />
 
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/editThisDeviceNameItem"
@@ -78,7 +78,7 @@
                 android:layout_height="wrap_content"
                 app:leadingIcon="@drawable/ic_edit_24"
                 app:leadingIconBackground="circular"
-                app:primaryText="@string/sync_setup_v2_edit_device_name_item" />
+                app:primaryText="@string/sync_simplified_edit_device_edit_name_item" />
 
             <com.facebook.shimmer.ShimmerFrameLayout
                 android:id="@+id/editThisDeviceNameShimmer"
@@ -114,21 +114,12 @@
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="@dimen/keyline_2" />
 
-            <FrameLayout
-                android:id="@+id/syncThisDeviceToggleContainer"
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                android:id="@+id/syncThisDeviceToggle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/keyline_4"
-                android:background="@drawable/background_large_rounded_surface"
-                android:paddingVertical="@dimen/keyline_2">
-
-                <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-                    android:id="@+id/syncThisDeviceToggle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:primaryText="@string/sync_settings_v2_this_device_cta_title"
-                    app:showSwitch="true" />
-            </FrameLayout>
+                app:primaryText="@string/sync_simplified_edit_device_sync_this_device_item"
+                app:showSwitch="true" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/removeNoticeLabel"

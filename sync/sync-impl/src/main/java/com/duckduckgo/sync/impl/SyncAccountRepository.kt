@@ -170,6 +170,7 @@ class AppSyncAccountRepository @Inject constructor(
     private val syncJweCrypto: SyncJweCrypto,
     private val thirdPartyCredentialManager: ThirdPartyCredentialManager,
     private val thirdPartyDeviceListDecryptor: ThirdPartyDeviceListDecryptor,
+    private val loginDeviceInfoWriter: LoginDeviceInfoWriter,
 ) : SyncAccountRepository {
 
     // Bounded backoff for the 3party→ddg upgrade network calls.
@@ -1277,6 +1278,11 @@ class AppSyncAccountRepository @Inject constructor(
                     result.data.keys?.let { keys ->
                         logcat { "Sync-ScopedToken: ${keys.size} protected key(s) in response" }
                     }
+
+                    // Best-effort unified-device-list write; gated internally and never fails the login.
+                    appCoroutineScope.launch(dispatcherProvider.io()) {
+                        loginDeviceInfoWriter.onLogin(result.data.keys)
+                    }
                 }
 
                 appCoroutineScope.launch(dispatcherProvider.io()) {
@@ -1390,6 +1396,9 @@ internal const val CREDENTIAL_ID_3PARTY = "3party"
 // to "sync"). Per Sync API docs (POST /sync/login Notes), "ai_chats" is the canonical scope used
 // when authenticating against a 3party-restricted credential.
 internal const val SYNC_SCOPE_AI_CHATS = "ai_chats"
+
+// Purpose for the account-wide `device_info` protected key (unified cross-credential device list)
+internal const val SYNC_PURPOSE_ACCOUNT_INFO = "account_info"
 
 // Recovery code version emitted in v2 recovery codes per the Recovery Payload Shape RFC
 // (Asana 1214804486778180). Format is "major.minor" — clients in major version 2 accept 2.x

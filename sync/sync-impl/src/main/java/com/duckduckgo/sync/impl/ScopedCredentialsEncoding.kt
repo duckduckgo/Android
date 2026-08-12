@@ -23,9 +23,14 @@ import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
 
+/** HKDF `info` label for deriving the credential main encryption key */
+internal const val HKDF_INFO_MAIN_ENCRYPTION_KEY = "Main Key"
+
+/** Length in bytes of the derived main encryption key (an AES-256 key). */
+internal const val MAIN_ENCRYPTION_KEY_LENGTH_BYTES = 32
+
 /**
  * HKDF-SHA-256 over the decoded `base64Key` bytes, returning raw bytes for direct use as an AES key.
- * Used to derive the credential MEK (info="Main Key") per Encryption Algorithms TD (Asana 1214802412121967).
  */
 internal fun SyncJweCrypto.hkdfDeriveBytes(
     base64Key: String,

@@ -29,70 +29,18 @@ import javax.inject.Inject
 class AppUseMetricPixelsPlugin @Inject constructor(private val inventory: FeatureTogglesInventory) : MetricsPixelPlugin {
 
     override suspend fun getMetrics(): List<MetricsPixel> {
-        return inventory.getAllActiveExperimentToggles().flatMap { toggle ->
-            listOf(
-                MetricsPixel(
-                    metric = "app_use",
-                    type = MetricType.COUNT_WHEN_IN_WINDOW,
-                    value = "1",
-                    toggle = toggle,
-                    conversionWindow = (1..14).map { ConversionWindow(lowerWindow = it, upperWindow = it) } +
-                        listOf(
-                            ConversionWindow(lowerWindow = 5, upperWindow = 7),
-                            ConversionWindow(lowerWindow = 1, upperWindow = 4),
-                            ConversionWindow(lowerWindow = 8, upperWindow = 14),
-                        ),
-                ),
-                MetricsPixel(
-                    metric = "app_use",
-                    type = MetricType.COUNT_WHEN_IN_WINDOW,
-                    value = "4",
-                    toggle = toggle,
-                    conversionWindow = listOf(
+        return inventory.getAllActiveExperimentToggles().map { toggle ->
+            MetricsPixel(
+                metric = "app_use",
+                type = MetricType.COUNT_WHEN_IN_WINDOW,
+                value = "1",
+                toggle = toggle,
+                conversionWindow = (1..14).map { ConversionWindow(lowerWindow = it, upperWindow = it) } +
+                    listOf(
+                        ConversionWindow(lowerWindow = 1, upperWindow = 4),
                         ConversionWindow(lowerWindow = 5, upperWindow = 7),
-                        ConversionWindow(lowerWindow = 8, upperWindow = 15),
+                        ConversionWindow(lowerWindow = 8, upperWindow = 14),
                     ),
-                ),
-                MetricsPixel(
-                    metric = "app_use",
-                    type = MetricType.COUNT_WHEN_IN_WINDOW,
-                    value = "6",
-                    toggle = toggle,
-                    conversionWindow = listOf(
-                        ConversionWindow(lowerWindow = 5, upperWindow = 7),
-                        ConversionWindow(lowerWindow = 8, upperWindow = 15),
-                    ),
-                ),
-                MetricsPixel(
-                    metric = "app_use",
-                    type = MetricType.COUNT_WHEN_IN_WINDOW,
-                    value = "11",
-                    toggle = toggle,
-                    conversionWindow = listOf(
-                        ConversionWindow(lowerWindow = 5, upperWindow = 7),
-                        ConversionWindow(lowerWindow = 8, upperWindow = 15),
-                    ),
-                ),
-                MetricsPixel(
-                    metric = "app_use",
-                    type = MetricType.COUNT_WHEN_IN_WINDOW,
-                    value = "21",
-                    toggle = toggle,
-                    conversionWindow = listOf(
-                        ConversionWindow(lowerWindow = 5, upperWindow = 7),
-                        ConversionWindow(lowerWindow = 8, upperWindow = 15),
-                    ),
-                ),
-                MetricsPixel(
-                    metric = "app_use",
-                    type = MetricType.COUNT_WHEN_IN_WINDOW,
-                    value = "30",
-                    toggle = toggle,
-                    conversionWindow = listOf(
-                        ConversionWindow(lowerWindow = 5, upperWindow = 7),
-                        ConversionWindow(lowerWindow = 8, upperWindow = 15),
-                    ),
-                ),
             )
         }
     }

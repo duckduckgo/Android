@@ -76,6 +76,18 @@ interface SyncApi {
 
     fun getDevices(token: String): Result<DeviceEntries>
 
+    /**
+     * Update this device's `name`, `type` and `info`. All three fields are sent every time — the server clears `info` when it is omitted.
+     *
+     * Returns the server's post-update device list.
+     */
+    fun patchThisDevice(
+        token: String,
+        encryptedName: String,
+        encryptedType: String,
+        deviceInfo: String,
+    ): Result<PatchDevicesResponse>
+
     fun getBookmarks(
         token: String,
         since: String,
@@ -119,6 +131,16 @@ interface SyncApi {
     /** List this account's protected keys across all purposes. */
     fun getProtectedKeys(token: String): Result<List<ProtectedKeyEntry>>
 
+    /** First-writer-wins registration of a purpose-scoped protected key.
+     * If a key already exists the caller must discard its own mint and adopt the server's. If coming from the server, it could be either:
+     *   - the one in [SetKeysIfAbsentResult.Existing],
+     *   - or, for [SetKeysIfAbsentResult.ExistsFetchRequired], fetched via [getProtectedKeys]. */
+    fun setKeysIfAbsent(
+        token: String,
+        purpose: String,
+        keys: List<ProtectedKeyEntry>,
+    ): Result<SetKeysIfAbsentResult>
+
     fun getAccessCredentials(token: String): Result<List<AccessCredentialEntry>>
 
     fun createAccessCredential(
@@ -140,10 +162,37 @@ interface SyncApi {
     fun deleteExchangeChannel(channelId: String): Result<Unit>
 }
 
+/**
+ * Turn a failed response into a [Result.Error] for endpoints whose error body we don't parse,
+ * distinguishing "the server said something we don't understand" from "the server said nothing".
+ * Reading the body consumes the stream, so it happens exactly once here.
+ */
+internal fun Response<*>.toUnparsedError(): Result.Error {
+    val hasErrorBody = runCatching { !errorBody()?.string().isNullOrEmpty() }.getOrDefault(false)
+    return if (hasErrorBody) {
+        Result.Error(code = code(), reason = "unexpected status code")
+    } else {
+        Result.Error(code = code(), reason = "empty response")
+    }
+}
+
+sealed class SetKeysIfAbsentResult {
+    /** Our posted keys won (server returned 201). */
+    data object Created : SetKeysIfAbsentResult()
+
+    /** A key already existed and the server returned it */
+    data class Existing(val kid: String, val publicKey: RsaJwk?) : SetKeysIfAbsentResult()
+
+    /** A key already existed but wasn't returned (409, or a 200 with no body); the caller must fetch and adopt it. */
+    data object ExistsFetchRequired : SetKeysIfAbsentResult()
+}
+
 @ContributesBinding(AppScope::class)
 class SyncServiceRemote @Inject constructor(
     private val syncService: SyncService,
     private val syncStore: SyncStore,
+    private val setKeysIfAbsentCall: SetKeysIfAbsentCall,
+    private val syncFeature: SyncFeature,
 ) : SyncApi {
     override fun createAccount(
         userID: String,
@@ -214,6 +263,29 @@ class SyncServiceRemote @Inject constructor(
         return onSuccess(response) {
             val devices = response.body()?.devices ?: return@onSuccess Result.Error(reason = "getDevices: empty body")
             Result.Success(devices)
+        }
+    }
+
+    override fun patchThisDevice(
+        token: String,
+        encryptedName: String,
+        encryptedType: String,
+        deviceInfo: String,
+    ): Result<PatchDevicesResponse> {
+        val deviceId = syncStore.deviceId.takeUnless { it.isNullOrEmpty() }
+            ?: return Result.Error(reason = "PatchDevices: no device id")
+
+        val response = runCatching {
+            val update = DeviceUpdate(id = deviceId, name = encryptedName, type = encryptedType, info = deviceInfo)
+            syncService.patchDevices("Bearer $token", PatchDevicesRequest(listOf(update))).execute()
+        }.getOrElse { throwable ->
+            return Result.Error(reason = throwable.message.toString())
+        }
+
+        return onSuccess(response) {
+            val body = response.body() ?: return@onSuccess Result.Error(reason = "PatchDevices: empty body")
+            logcat(INFO) { "Sync-UnifiedDevices: patchDevices ok — ${body.devicesV2.size} devices_v2 returned" }
+            Result.Success(body)
         }
     }
 
@@ -493,22 +565,14 @@ class SyncServiceRemote @Inject constructor(
             } else {
                 Result.Error(reason = "internal error")
             }
-            error.removeKeysIfInvalid()
+            error.removeKeysIfInvalid(token)
             error
         }
     }
 
     private fun mapRescopeTokenError(response: Response<TokenRescopeResponse?>): Result<String> {
-        val errorBody = response.errorBody()
-        val hasErrorBody = runCatching {
-            errorBody != null && errorBody.string().isNotEmpty()
-        }.getOrDefault(false)
-        val error = if (hasErrorBody) {
-            Result.Error(code = response.code(), reason = "unexpected status code")
-        } else {
-            Result.Error(code = response.code(), reason = "empty response")
-        }
-        error.removeKeysIfInvalid()
+        val error = response.toUnparsedError()
+        error.removeKeysIfInvalid(response.requestAuthToken())
         return error
     }
 
@@ -526,12 +590,12 @@ class SyncServiceRemote @Inject constructor(
                     val code = if (error.code == -1) response.code() else error.code
                     Result.Error(code, error.error)
                 } ?: Result.Error(code = response.code(), reason = response.message().toString())
-                error.removeKeysIfInvalid()
+                error.removeKeysIfInvalid(response.requestAuthToken())
                 return error
             }
         }.getOrElse {
             val result = Result.Error(response.code(), reason = response.message())
-            result.removeKeysIfInvalid()
+            result.removeKeysIfInvalid(response.requestAuthToken())
             return result
         }
     }
@@ -548,6 +612,16 @@ class SyncServiceRemote @Inject constructor(
             val keys = response.body()?.keys ?: emptyList()
             Result.Success(keys)
         }
+    }
+
+    override fun setKeysIfAbsent(
+        token: String,
+        purpose: String,
+        keys: List<ProtectedKeyEntry>,
+    ): Result<SetKeysIfAbsentResult> {
+        val result = setKeysIfAbsentCall.execute(token, purpose, keys)
+        if (result is Result.Error) result.removeKeysIfInvalid(token)
+        return result
     }
 
     override fun getAccessCredentials(token: String): Result<List<AccessCredentialEntry>> {
@@ -614,10 +688,21 @@ class SyncServiceRemote @Inject constructor(
         return onSuccess(response) { Result.Success(Unit) }
     }
 
-    private fun Result.Error.removeKeysIfInvalid() {
-        if (code == API_CODE.INVALID_LOGIN_CREDENTIALS.code) {
+    private fun Result.Error.removeKeysIfInvalid(requestToken: String?) {
+        if (code != API_CODE.INVALID_LOGIN_CREDENTIALS.code) return
+
+        // A 401 for a token that has since been rotated is stale and must not sign the device out:
+        // renaming a device re-logs in (issuing a fresh token), so a concurrent request that raced the
+        // token swap can 401 on the old token while the account is still valid. Only wipe local state
+        // when the token that failed is still the current one (or unknown, preserving prior behavior).
+        val tokenStillCurrent = requestToken == null || requestToken == syncStore.token
+        if (!syncFeature.preventStaleTokenLogout().isEnabled() || tokenStillCurrent) {
             syncStore.clearAll()
         }
+    }
+
+    private fun Response<*>.requestAuthToken(): String? {
+        return raw().request.header("Authorization")?.removePrefix("Bearer ")
     }
 
     private class Adapters {

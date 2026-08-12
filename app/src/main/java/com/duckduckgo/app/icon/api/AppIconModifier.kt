@@ -40,15 +40,15 @@ interface IconModifier {
 
 enum class AppIcon(
     val componentName: String, // Must correspond to the <activity-alias> `android:name`s in AndroidManifest
-    @DrawableRes val icon: Int = R.mipmap.ic_launcher_red_round,
+    @DrawableRes val icon: Int = R.mipmap.ic_launcher_red,
 ) {
     DEFAULT(
         componentName = "$QUALIFIER.Launcher",
-        icon = R.mipmap.ic_launcher_red_round,
+        icon = R.mipmap.ic_launcher_red,
     ),
     PINK(
         componentName = "$QUALIFIER.LauncherPink",
-        icon = R.mipmap.ic_launcher_pink_round,
+        icon = R.mipmap.ic_launcher_pink,
     ),
     GOLD(
         componentName = "$QUALIFIER.LauncherGold",
@@ -56,23 +56,23 @@ enum class AppIcon(
     ),
     GREEN(
         componentName = "$QUALIFIER.LauncherGreen",
-        icon = R.mipmap.ic_launcher_green_round,
+        icon = R.mipmap.ic_launcher_green,
     ),
     BLUE(
         componentName = "$QUALIFIER.LauncherBlue",
-        icon = R.mipmap.ic_launcher_blue_round,
+        icon = R.mipmap.ic_launcher_blue,
     ),
     PURPLE(
         componentName = "$QUALIFIER.LauncherPurple",
-        icon = R.mipmap.ic_launcher_purple_round,
+        icon = R.mipmap.ic_launcher_purple,
     ),
     BLACK(
         componentName = "$QUALIFIER.LauncherBlack",
-        icon = R.mipmap.ic_launcher_black_round,
+        icon = R.mipmap.ic_launcher_black,
     ),
     SILHOUETTE(
         componentName = "$QUALIFIER.LauncherSilhoutte",
-        icon = R.mipmap.ic_launcher_silhouette_round,
+        icon = R.mipmap.ic_launcher_silhouette,
     ),
     ;
 

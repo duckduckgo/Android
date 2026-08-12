@@ -27,6 +27,7 @@ import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.pixels.SyncPixels.AnotherDevicePromptOption
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -50,7 +51,15 @@ class SyncThisDeviceViewModel @Inject constructor(
     private val _viewState = MutableStateFlow(ViewState())
     val viewState = _viewState.asStateFlow()
 
-    fun syncThisDevice(source: String?) {
+    init {
+        syncPixels.fireSyncAnotherDevicePromptShown()
+        viewModelScope.launch {
+            syncSetupWideEvent.onIntroScreenShown()
+        }
+    }
+
+    fun syncThisDevice(launchSource: String?) {
+        syncPixels.fireSyncAnotherDevicePromptOptionTapped(AnotherDevicePromptOption.THIS_DEVICE_ONLY)
         _viewState.update { it.copy(isSyncing = true) }
 
         viewModelScope.launch(dispatchers.io()) {
@@ -63,7 +72,7 @@ class SyncThisDeviceViewModel @Inject constructor(
                 } else {
                     syncSetupWideEvent.onAccountCreationFailed()
                     _commands.send(
-                        Command.ShowError(R.string.sync_create_account_generic_error),
+                        Command.ShowError(R.string.sync_simplified_error_dialog_create_account_body),
                     )
                 }
             }
@@ -74,7 +83,7 @@ class SyncThisDeviceViewModel @Inject constructor(
                 when (val result = syncAccountRepository.createAccount()) {
                     is Result.Success<*> -> {
                         syncSetupWideEvent.onAccountCreated()
-                        syncPixels.fireSignupDirectPixel(source)
+                        syncPixels.fireSignupDirectPixel(launchSource)
                         getDeviceAndFinish()
                     }
 
@@ -82,7 +91,7 @@ class SyncThisDeviceViewModel @Inject constructor(
                         syncSetupWideEvent.onAccountCreationFailed()
                         _commands.send(
                             Command.ShowError(
-                                R.string.sync_create_account_generic_error,
+                                R.string.sync_simplified_error_dialog_create_account_body,
                                 result.reason,
                             ),
                         )
@@ -94,13 +103,8 @@ class SyncThisDeviceViewModel @Inject constructor(
         }
     }
 
-    fun onScreenShown() {
-        viewModelScope.launch {
-            syncSetupWideEvent.onIntroScreenShown()
-        }
-    }
-
     fun onSyncWithAnotherDeviceClicked() {
+        syncPixels.fireSyncAnotherDevicePromptOptionTapped(AnotherDevicePromptOption.WITH_ANOTHER_DEVICE)
         viewModelScope.launch {
             _commands.send(Command.SyncWithAnotherDevice)
         }

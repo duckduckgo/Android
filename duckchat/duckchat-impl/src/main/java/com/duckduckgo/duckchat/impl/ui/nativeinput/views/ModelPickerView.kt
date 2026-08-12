@@ -240,6 +240,7 @@ class ModelPickerView @JvmOverloads constructor(
         if (state.models.isEmpty()) return
 
         viewModel.menuShowing = true
+        viewModel.onPickerShown(currentSurface())
         onMenuShown?.invoke()
         showPopupWindow(state)
     }

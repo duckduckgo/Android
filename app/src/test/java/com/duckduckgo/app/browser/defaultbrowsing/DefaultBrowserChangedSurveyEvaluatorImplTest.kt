@@ -23,7 +23,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.onboarding.OnboardingFlowChecker
 import com.duckduckgo.app.survey.ui.SurveyActivity
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.modalcoordinator.api.ModalEvaluator
+import com.duckduckgo.promptscoordinator.api.ModalEvaluator
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull

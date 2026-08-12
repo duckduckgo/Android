@@ -24,6 +24,7 @@ import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerState.DISAB
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.UserPreferences
 import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetectorImpl
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
@@ -151,7 +152,14 @@ class DaxDuckAiFireButtonBrandDesignUpdateContextualCtaTest {
         testee = CtaViewModel(
             appInstallStore = mockAppInstallStore,
             pixel = mockPixel,
-            widgetCapabilities = mockWidgetCapabilities,
+            subscriptionPromoModalDecider = RealSubscriptionPromoModalDecider(
+                extendedOnboardingFeatureToggles = mockExtendedOnboardingFeatureToggles,
+                appInstallStore = mockAppInstallStore,
+                settingsDataStore = mockSettingsDataStore,
+                dismissedCtaDao = mockDismissedCtaDao,
+                subscriptions = mockSubscriptions,
+                dispatchers = coroutineRule.testDispatcherProvider,
+            ),
             dismissedCtaDao = mockDismissedCtaDao,
             userAllowListRepository = mockUserAllowListRepository,
             settingsDataStore = mockSettingsDataStore,
@@ -256,9 +264,11 @@ class DaxDuckAiFireButtonBrandDesignUpdateContextualCtaTest {
     }
 
     @Test
-    fun brandDesignCtaSuppressesDismissAndButton() {
+    fun brandDesignCtaShowsTryItButtonAndSuppressesDismiss() {
         val cta = newBrandDesignCta()
 
+        assertEquals(R.string.onboardingFireButtonDaxDialogOkButton, cta.buttonText)
+        assertEquals(R.id.contextualBrandDesignPrimaryCtaContent, cta.activeIncludeId)
         assertFalse(cta.showDismiss)
         assertTrue(cta.showArrow)
         assertTrue(cta is OnboardingDaxDialogCta.ShowsWingBottom)

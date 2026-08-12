@@ -1,0 +1,66 @@
+name: Release Blocking Checks
+
+run-name: 'Release Blocking Checks (${{ inputs.ddg_di || ''AnvilDagger'' }})'
+
+on:
+  workflow_call:
+    inputs:
+      commit:
+        description: 'Commit SHA to check out and test'
+        required: true
+        type: string
+      create_asana_tasks:
+        description: 'Create Asana failure tasks / release blockers on failure (set false for hotfix verification)'
+        required: false
+        type: boolean
+        default: true
+      ddg_di:
+        description: 'DI framework to build with (AnvilDagger or Metro)'
+        required: false
+        type: string
+        default: 'AnvilDagger'
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: 'Commit SHA to check out and test'
+        required: true
+        type: string
+      create_asana_tasks:
+        description: 'Create Asana failure tasks / release blockers on failure'
+        required: false
+        type: boolean
+        default: true
+      ddg_di:
+        description: 'DI framework to build with (AnvilDagger or Metro)'
+        required: false
+        type: string
+        default: 'AnvilDagger'
+
+concurrency:
+  group: ${{ github.workflow_ref }}-${{ github.ref }}-${{ inputs.commit }}
+  cancel-in-progress: true
+
+jobs:
+  nightly:
+    uses: ./.github/workflows/nightly.yml
+    with:
+      commit: ${{ inputs.commit }}
+      ddg_di: ${{ inputs.ddg_di }}
+    secrets: inherit
+
+  end-to-end:
+    needs: nightly
+    uses: ./.github/workflows/e2e-nightly-full-suite.yml
+    with:
+      commit: ${{ inputs.commit }}
+      create_asana_tasks: ${{ inputs.create_asana_tasks }}
+      ddg_di: ${{ inputs.ddg_di }}
+    secrets: inherit
+
+  privacy:
+    needs: end-to-end
+    uses: ./.github/workflows/privacy.yml
+    with:
+      commit: ${{ inputs.commit }}
+      ddg_di: ${{ inputs.ddg_di }}
+    secrets: inherit

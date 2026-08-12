@@ -191,6 +191,22 @@ class ReasoningModePickerViewModelTest {
     }
 
     @Test
+    fun whenPickerShownFromAddressBarThenReasoningEffortPickerShownFiredWithAddressBarOrigin() = runTest {
+        testee.onPickerShown(PickerSurface.REASONING_PICKER_ADDRESS_BAR)
+        runCurrent()
+
+        verify(duckChatPixels).fireReasoningEffortPickerShown("funnel_addressbar_android__reasoningdropdown")
+    }
+
+    @Test
+    fun whenPickerShownFromDuckAiTabThenReasoningEffortPickerShownFiredWithDuckAiOrigin() = runTest {
+        testee.onPickerShown(PickerSurface.REASONING_PICKER_DUCK_AI_TAB)
+        runCurrent()
+
+        verify(duckChatPixels).fireReasoningEffortPickerShown("funnel_duckai_android__reasoningdropdown")
+    }
+
+    @Test
     fun whenAccessibleModeTappedMatchingCurrentThenNoEffortPixel() = runTest {
         modelState.value = ModelState(
             selectedReasoningMode = ReasoningMode.FAST,
@@ -228,6 +244,7 @@ class ReasoningModePickerViewModelTest {
             currentTier = "plus",
             requiredTier = "pro",
             flowType = "upgrade",
+            origin = "funnel_addressbar_android__reasoningdropdown",
         )
         verify(duckChatPixels, never()).fireReasoningEffortSelected(any(), any())
     }
@@ -342,7 +359,7 @@ class ReasoningModePickerViewModelTest {
             expectNoEvents()
             cancelAndConsumeRemainingEvents()
         }
-        verify(duckChatPixels, never()).fireSubscriptionUpsellTriggered(any(), any(), any(), any())
+        verify(duckChatPixels, never()).fireSubscriptionUpsellTriggered(any(), any(), any(), any(), any())
     }
 
     @Test

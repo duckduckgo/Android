@@ -29,13 +29,20 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.persistentstorage.api.PersistentStorage
 import com.duckduckgo.persistentstorage.api.PersistentStorageAvailability
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingStore
+import com.duckduckgo.sync.impl.AccountInfoKeyManager
 import com.duckduckgo.sync.impl.ConnectedDevice
+import com.duckduckgo.sync.impl.DeviceFieldDecryptor
+import com.duckduckgo.sync.impl.DeviceInfoDecryptor
+import com.duckduckgo.sync.impl.DeviceInfoMigrator
+import com.duckduckgo.sync.impl.DeviceInfoUpdater
+import com.duckduckgo.sync.impl.DeviceV2
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncApi
 import com.duckduckgo.sync.impl.SyncAuthCode
+import com.duckduckgo.sync.impl.SyncDeviceIds
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.autorestore.SyncAutoRestoreManager
 import com.duckduckgo.sync.impl.autorestore.SyncRecoveryPersistentStorageKey
@@ -81,6 +88,12 @@ constructor(
     private val appBuildConfig: AppBuildConfig,
     private val syncApi: SyncApi,
     private val testSyncWarningState: TestSyncWarningPlugin.StateHolder,
+    private val accountInfoKeyManager: AccountInfoKeyManager,
+    private val deviceInfoUpdater: DeviceInfoUpdater,
+    private val deviceInfoDecryptor: DeviceInfoDecryptor,
+    private val deviceFieldDecryptor: DeviceFieldDecryptor,
+    private val deviceInfoMigrator: DeviceInfoMigrator,
+    private val syncDeviceIds: SyncDeviceIds,
     @field:SuppressLint("StaticFieldLeak") private val context: Context,
 ) : ViewModel() {
 
@@ -123,6 +136,14 @@ constructor(
         val createThirdPartyResult: String = "",
         val keysText: String = "",
         val isTestSyncWarningEnabled: Boolean = false,
+        val accountInfoKeyResult: String = "",
+        val cachedAccountInfoKeyResult: String = "",
+        val renameDeviceResult: String = "",
+        val fetchDecryptDevicesResult: String = "",
+        val canWriteUnifiedDeviceListEnabled: Boolean = false,
+        val canReadUnifiedDeviceListEnabled: Boolean = false,
+        val migrationStatusText: String = "",
+        val migrationResult: String = "",
     )
 
     sealed class BlockStoreValue {
@@ -139,6 +160,7 @@ constructor(
         data class ShowThirdPartyRecoveryQR(val string: String) : Command()
         data object LoginSuccess : Command()
         data object LaunchRecoverDataScreen : Command()
+        data class ShowRenameDeviceDialog(val currentName: String, val currentType: String) : Command()
     }
 
     init {
@@ -306,8 +328,25 @@ constructor(
                 canUseV2ConnectFlowEnabled = syncFeature.canUseV2ConnectFlow().isEnabled(),
                 canShowV2ConnectCodeEnabled = syncFeature.canShowV2ConnectCode().isEnabled(),
                 v2StoreFieldsText = buildV2StoreFieldsText(),
+                // Clear per-session dev-tool results once signed out so stale keys aren't shown.
+                keysText = if (accountInfo.isSignedIn) viewState.value.keysText else "",
+                accountInfoKeyResult = if (accountInfo.isSignedIn) viewState.value.accountInfoKeyResult else "",
+                cachedAccountInfoKeyResult = if (accountInfo.isSignedIn) viewState.value.cachedAccountInfoKeyResult else "",
+                renameDeviceResult = if (accountInfo.isSignedIn) viewState.value.renameDeviceResult else "",
+                fetchDecryptDevicesResult = if (accountInfo.isSignedIn) viewState.value.fetchDecryptDevicesResult else "",
+                canWriteUnifiedDeviceListEnabled = syncFeature.canWriteUnifiedDeviceList().isEnabled(),
+                canReadUnifiedDeviceListEnabled = syncFeature.canReadUnifiedDeviceList().isEnabled(),
+                migrationStatusText = buildMigrationStatusText(),
+                migrationResult = if (accountInfo.isSignedIn) viewState.value.migrationResult else "",
             ),
         )
+    }
+
+    private fun buildMigrationStatusText(): String {
+        val marker = syncStore.unifiedDeviceListMigratedForUserId
+        val currentUserId = syncStore.userId
+        val doneForThisAccount = marker != null && marker == currentUserId
+        return "migrated: $doneForThisAccount"
     }
 
     fun onReadQRClicked() {
@@ -613,6 +652,181 @@ constructor(
                 viewState.update { it.copy(keysText = text) }
                 command.send(ShowMessage(text))
             }
+        }
+    }
+
+    fun onCreateAccountInfoKeyClicked() {
+        viewModelScope.launch(dispatchers.io()) {
+            logcat { "Sync-UnifiedDevices: creating & registering account_info key from dev screen" }
+            when (val result = accountInfoKeyManager.ensureKeyRegistered()) {
+                is Success -> {
+                    val outcome = if (result.data.created) "created (ours won)" else "adopted existing"
+                    val text = "kid=${result.data.kid}, wraps_sent=${result.data.wrapsSent}, outcome=$outcome"
+                    logcat { "Sync-UnifiedDevices: $text" }
+                    viewState.update { it.copy(accountInfoKeyResult = text) }
+                    command.send(ShowMessage(text))
+                }
+                is Error -> {
+                    val text = "Error: ${result.reason} (code: ${result.code})"
+                    logcat(LogPriority.ERROR) { "Sync-UnifiedDevices: create/register key failed: $text" }
+                    viewState.update { it.copy(accountInfoKeyResult = text) }
+                    command.send(ShowMessage(text))
+                }
+            }
+        }
+    }
+
+    fun onShowCachedAccountInfoKeyClicked() {
+        viewModelScope.launch(dispatchers.io()) {
+            val cached = syncStore.accountInfoPublicKey
+            val text = if (cached == null) {
+                "No cached account_info key"
+            } else {
+                "keyId=${cached.keyId}, modulus=${cached.modulus.take(24)}…, exponent=${cached.exponent}"
+            }
+            logcat { "Sync-UnifiedDevices: cached account_info key: $text" }
+            viewState.update { it.copy(cachedAccountInfoKeyResult = text) }
+        }
+    }
+
+    fun onRenameDeviceClicked() {
+        viewModelScope.launch(dispatchers.io()) {
+            if (syncStore.token.isNullOrEmpty()) {
+                command.send(ShowMessage("Not signed in"))
+                return@launch
+            }
+            if (syncStore.accountInfoPublicKey == null) {
+                command.send(ShowMessage("No cached account_info key — tap 'Create & Register account_info Key' first"))
+                return@launch
+            }
+            command.send(
+                Command.ShowRenameDeviceDialog(
+                    currentName = syncDeviceIds.deviceName(),
+                    currentType = syncDeviceIds.deviceType().deviceFactor,
+                ),
+            )
+        }
+    }
+
+    fun onRenameDeviceConfirmed(newName: String) {
+        viewModelScope.launch(dispatchers.io()) {
+            when (val result = deviceInfoUpdater.updateThisDevice(newName)) {
+                is Success -> {
+                    val text = "PATCH ok — ${result.data.size} devices_v2 returned; name set to \"$newName\""
+                    logcat { "Sync-UnifiedDevices: $text" }
+                    viewState.update { it.copy(renameDeviceResult = text) }
+                    command.send(ShowMessage("Device renamed"))
+                    getConnectedDevices()
+                }
+                is Error -> {
+                    val text = "Error: ${result.reason} (code: ${result.code})"
+                    logcat(LogPriority.ERROR) { "Sync-UnifiedDevices: rename device failed: $text" }
+                    viewState.update { it.copy(renameDeviceResult = text) }
+                    command.send(ShowMessage(text))
+                }
+            }
+        }
+    }
+
+    fun onFetchAndDecryptDevicesClicked() {
+        viewModelScope.launch(dispatchers.io()) {
+            val token = syncStore.token
+            if (token.isNullOrEmpty()) {
+                command.send(ShowMessage("Not signed in"))
+                return@launch
+            }
+            when (val result = syncApi.getDevices(token)) {
+                is Success -> {
+                    val entriesV2 = result.data.entriesV2.orEmpty()
+                    val text = if (entriesV2.isEmpty()) {
+                        "No devices_v2 entries"
+                    } else {
+                        val session = deviceInfoDecryptor.openSession()
+                        entriesV2.joinToString("\n\n") { describeDeviceInfo(it, session) }
+                    }
+                    logcat { "Sync-UnifiedDevices: fetch & decrypt devices:\n$text" }
+                    viewState.update { it.copy(fetchDecryptDevicesResult = text) }
+                }
+                is Error -> {
+                    val text = "Error: ${result.reason} (code: ${result.code})"
+                    logcat(LogPriority.ERROR) { "Sync-UnifiedDevices: fetch & decrypt devices failed: $text" }
+                    viewState.update { it.copy(fetchDecryptDevicesResult = text) }
+                    command.send(ShowMessage(text))
+                }
+            }
+        }
+    }
+
+    private fun describeDeviceInfo(entry: DeviceV2, session: Result<DeviceInfoDecryptor.Session>): String {
+        val id = entry.deviceId ?: "(no id)"
+        val marker = if (entry.deviceId != null && entry.deviceId == syncStore.deviceId) " (this device)" else ""
+
+        val legacy = when (val result = deviceFieldDecryptor.decrypt(entry)) {
+            is Success -> "name=${result.data.name}, type=${result.data.type ?: "(none)"}"
+            is Error -> "(cannot decrypt: ${result.reason})"
+        }
+
+        val info = entry.deviceInfo
+        val deviceInfo = when {
+            info.isNullOrEmpty() -> "(no device_info)"
+            session is Error -> "(cannot decrypt: ${session.reason})"
+            session is Success -> when (val result = session.data.decrypt(info)) {
+                is Success -> "name=${result.data.name}, type=${result.data.type ?: "(none)"}"
+                is Error -> "(cannot decrypt: ${result.reason})"
+            }
+            else -> "(cannot decrypt)"
+        }
+        return "id=$id$marker [credential=${entry.credentialId ?: "ddg"}]\n  legacy:      $legacy\n  device_info: $deviceInfo"
+    }
+
+    fun onDeleteCachedAccountInfoKeyClicked() {
+        viewModelScope.launch(dispatchers.io()) {
+            syncStore.accountInfoPublicKey = null
+            logcat { "Sync-UnifiedDevices: cleared cached account_info key" }
+            viewState.update { it.copy(cachedAccountInfoKeyResult = "Cached account_info key cleared") }
+            command.send(ShowMessage("Cached account_info key cleared"))
+        }
+    }
+
+    fun onCanWriteUnifiedDeviceListFlagChanged(enabled: Boolean) {
+        viewModelScope.launch(dispatchers.io()) {
+            logcat { "Sync-UnifiedDevices: setting canWriteUnifiedDeviceList flag = $enabled" }
+            setRawToggleState(syncFeature.canWriteUnifiedDeviceList(), enabled)
+            updateViewState()
+        }
+    }
+
+    fun onCanReadUnifiedDeviceListFlagChanged(enabled: Boolean) {
+        viewModelScope.launch(dispatchers.io()) {
+            logcat { "Sync-UnifiedDevices: setting canReadUnifiedDeviceList flag = $enabled" }
+            setRawToggleState(syncFeature.canReadUnifiedDeviceList(), enabled)
+            updateViewState()
+        }
+    }
+
+    fun onRunMigrationClicked() {
+        viewModelScope.launch(dispatchers.io()) {
+            if (syncStore.token.isNullOrEmpty()) {
+                command.send(ShowMessage("Not signed in"))
+                return@launch
+            }
+            logcat { "Sync-UnifiedDevices: running migration from dev screen" }
+            val text = when (val result = deviceInfoMigrator.ensureMigrated()) {
+                is Success -> "Migration run: success"
+                is Error -> "Migration run: error — ${result.reason} (code: ${result.code})"
+            }
+            viewState.update { it.copy(migrationResult = text, migrationStatusText = buildMigrationStatusText()) }
+            command.send(ShowMessage(text))
+            getConnectedDevices()
+        }
+    }
+
+    fun onResetMigrationMarkerClicked() {
+        viewModelScope.launch(dispatchers.io()) {
+            syncStore.unifiedDeviceListMigratedForUserId = null
+            logcat { "Sync-UnifiedDevices: reset migration marker from dev screen" }
+            viewState.update { it.copy(migrationResult = "Migration marker reset", migrationStatusText = buildMigrationStatusText()) }
+            command.send(ShowMessage("Migration marker reset"))
         }
     }
 

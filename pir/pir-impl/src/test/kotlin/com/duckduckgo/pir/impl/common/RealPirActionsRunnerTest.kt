@@ -145,7 +145,7 @@ class RealPirActionsRunnerTest {
 
     @Test
     fun whenStartWithBrokerStepsThenCreatesDetachedWebView() = runTest {
-        whenever(mockPirDetachedWebViewProvider.createInstance(any(), any(), any(), any()))
+        whenever(mockPirDetachedWebViewProvider.createInstance(any(), any(), any(), any(), any()))
             .thenReturn(mockWebView)
 
         // Start the runner asynchronously
@@ -167,12 +167,13 @@ class RealPirActionsRunnerTest {
             eq(testPirScript),
             any(),
             any(),
+            any(),
         )
     }
 
     @Test
     fun whenStartWithBrokerStepsThenRegistersBrokerActionProcessor() = runTest {
-        whenever(mockPirDetachedWebViewProvider.createInstance(any(), any(), any(), any()))
+        whenever(mockPirDetachedWebViewProvider.createInstance(any(), any(), any(), any(), any()))
             .thenReturn(mockWebView)
 
         val deferred = async {
@@ -190,7 +191,7 @@ class RealPirActionsRunnerTest {
 
     @Test
     fun whenStartWithBrokerStepsThenCreatesEngineAndDispatchesStarted() = runTest {
-        whenever(mockPirDetachedWebViewProvider.createInstance(any(), any(), any(), any()))
+        whenever(mockPirDetachedWebViewProvider.createInstance(any(), any(), any(), any(), any()))
             .thenReturn(mockWebView)
 
         val deferred = async {
@@ -209,7 +210,7 @@ class RealPirActionsRunnerTest {
 
     @Test
     fun whenStartAndCompleteExecutionReceivedThenReturnsSuccess() = runTest {
-        whenever(mockPirDetachedWebViewProvider.createInstance(any(), any(), any(), any()))
+        whenever(mockPirDetachedWebViewProvider.createInstance(any(), any(), any(), any(), any()))
             .thenReturn(mockWebView)
 
         val deferred = async {
@@ -237,7 +238,7 @@ class RealPirActionsRunnerTest {
 
     @Test
     fun whenStartOnWithBrokerStepsThenSetupsWebView() = runTest {
-        whenever(mockPirDetachedWebViewProvider.setupWebView(any(), any(), any(), any()))
+        whenever(mockPirDetachedWebViewProvider.setupWebView(any(), any(), any(), any(), any()))
             .thenReturn(mockWebView)
 
         val deferred = async {
@@ -255,12 +256,13 @@ class RealPirActionsRunnerTest {
             eq(testPirScript),
             any(),
             any(),
+            any(),
         )
     }
 
     @Test
     fun whenOnSuccessThenDispatchesJsActionSuccessEvent() = runTest {
-        whenever(mockPirDetachedWebViewProvider.createInstance(any(), any(), any(), any()))
+        whenever(mockPirDetachedWebViewProvider.createInstance(any(), any(), any(), any(), any()))
             .thenReturn(mockWebView)
 
         val deferred = async {
@@ -285,7 +287,7 @@ class RealPirActionsRunnerTest {
     @Test
     fun whenOnErrorWithActionFailedThenDispatchesBrokerActionFailedWithRetry() = runTest {
         val testError = PirError.ActionError.JsActionFailed("action-123", "Action execution failed")
-        whenever(mockPirDetachedWebViewProvider.createInstance(any(), any(), any(), any()))
+        whenever(mockPirDetachedWebViewProvider.createInstance(any(), any(), any(), any(), any()))
             .thenReturn(mockWebView)
 
         val deferred = async {
@@ -312,7 +314,7 @@ class RealPirActionsRunnerTest {
     @Test
     fun whenOnErrorWithJsErrorThenDispatchesErrorReceived() = runTest {
         val testError = PirError.JsError.ActionError("Javascript error")
-        whenever(mockPirDetachedWebViewProvider.createInstance(any(), any(), any(), any()))
+        whenever(mockPirDetachedWebViewProvider.createInstance(any(), any(), any(), any(), any()))
             .thenReturn(mockWebView)
 
         val deferred = async {
@@ -337,7 +339,7 @@ class RealPirActionsRunnerTest {
     @Test
     fun whenOnErrorWithCaptchaSolutionFailedThenDispatchesBrokerActionFailedWithoutRetry() = runTest {
         val testError = PirError.ActionError.CaptchaSolutionFailed("action-123", "Captcha solution failed")
-        whenever(mockPirDetachedWebViewProvider.createInstance(any(), any(), any(), any()))
+        whenever(mockPirDetachedWebViewProvider.createInstance(any(), any(), any(), any(), any()))
             .thenReturn(mockWebView)
 
         val deferred = async {
@@ -364,7 +366,7 @@ class RealPirActionsRunnerTest {
     @Test
     fun whenOnErrorWithUnknownErrorThenDoesNotDispatchEvent() = runTest {
         val testError = PirError.Unknown("Unknown error")
-        whenever(mockPirDetachedWebViewProvider.createInstance(any(), any(), any(), any()))
+        whenever(mockPirDetachedWebViewProvider.createInstance(any(), any(), any(), any(), any()))
             .thenReturn(mockWebView)
 
         val deferred = async {
@@ -387,7 +389,7 @@ class RealPirActionsRunnerTest {
 
     @Test
     fun whenStopThenCleansUpWebView() = runTest {
-        whenever(mockPirDetachedWebViewProvider.createInstance(any(), any(), any(), any()))
+        whenever(mockPirDetachedWebViewProvider.createInstance(any(), any(), any(), any(), any()))
             .thenReturn(mockWebView)
 
         val job = async {
@@ -409,7 +411,7 @@ class RealPirActionsRunnerTest {
     @Test
     fun whenOnLoadingCompleteWithUrlThenDispatchesLoadUrlComplete() = runTest {
         val loadedUrl = "https://example.com"
-        whenever(mockPirDetachedWebViewProvider.createInstance(any(), any(), any(), any()))
+        whenever(mockPirDetachedWebViewProvider.createInstance(any(), any(), any(), any(), any()))
             .thenReturn(mockWebView)
 
         val deferred = async {
@@ -419,7 +421,7 @@ class RealPirActionsRunnerTest {
         yield()
 
         val callbackCaptor = argumentCaptor<(String?) -> Unit>()
-        verify(mockPirDetachedWebViewProvider).createInstance(any(), any(), callbackCaptor.capture(), any())
+        verify(mockPirDetachedWebViewProvider).createInstance(any(), any(), callbackCaptor.capture(), any(), any())
         callbackCaptor.firstValue.invoke(loadedUrl)
 
         sideEffectFlow.tryEmit(SideEffect.CompleteExecution)
@@ -435,7 +437,7 @@ class RealPirActionsRunnerTest {
 
     @Test
     fun whenOnLoadingCompleteWithNullUrlThenDoesNotDispatchEvent() = runTest {
-        whenever(mockPirDetachedWebViewProvider.createInstance(any(), any(), any(), any()))
+        whenever(mockPirDetachedWebViewProvider.createInstance(any(), any(), any(), any(), any()))
             .thenReturn(mockWebView)
 
         val deferred = async {
@@ -445,7 +447,7 @@ class RealPirActionsRunnerTest {
         yield()
 
         val callbackCaptor = argumentCaptor<(String?) -> Unit>()
-        verify(mockPirDetachedWebViewProvider).createInstance(any(), any(), callbackCaptor.capture(), any())
+        verify(mockPirDetachedWebViewProvider).createInstance(any(), any(), callbackCaptor.capture(), any(), any())
         callbackCaptor.firstValue.invoke(null)
 
         sideEffectFlow.tryEmit(SideEffect.CompleteExecution)
@@ -461,7 +463,7 @@ class RealPirActionsRunnerTest {
     @Test
     fun whenOnLoadingFailedWithUrlThenDispatchesLoadUrlFailed() = runTest {
         val failedUrl = "https://example.com"
-        whenever(mockPirDetachedWebViewProvider.createInstance(any(), any(), any(), any()))
+        whenever(mockPirDetachedWebViewProvider.createInstance(any(), any(), any(), any(), any()))
             .thenReturn(mockWebView)
 
         val deferred = async {
@@ -471,7 +473,7 @@ class RealPirActionsRunnerTest {
         yield()
 
         val callbackCaptor = argumentCaptor<(String?) -> Unit>()
-        verify(mockPirDetachedWebViewProvider).createInstance(any(), any(), any(), callbackCaptor.capture())
+        verify(mockPirDetachedWebViewProvider).createInstance(any(), any(), any(), callbackCaptor.capture(), any())
         callbackCaptor.firstValue.invoke(failedUrl)
 
         sideEffectFlow.tryEmit(SideEffect.CompleteExecution)
@@ -483,5 +485,102 @@ class RealPirActionsRunnerTest {
 
         assertTrue(eventCaptor.allValues[1] is Event.LoadUrlFailed)
         assertEquals(failedUrl, (eventCaptor.allValues[1] as Event.LoadUrlFailed).url)
+    }
+
+    @Test
+    fun whenRenderProcessGoneThenStartThrowsPirRendererGoneExceptionWithDidCrash() = runTest {
+        val rendererGoneCaptor = argumentCaptor<(Boolean) -> Unit>()
+        whenever(
+            mockPirDetachedWebViewProvider.createInstance(any(), any(), any(), any(), rendererGoneCaptor.capture()),
+        ).thenReturn(mockWebView)
+
+        var thrown: Throwable? = null
+        val deferred = async {
+            try {
+                testee.start(testProfileQuery, testBrokerSteps)
+            } catch (e: Throwable) {
+                thrown = e
+            }
+        }
+
+        // Allow start() to reach awaitResult and register the continuation.
+        yield()
+
+        // Simulate the shared renderer being reclaimed by the system (not a crash).
+        rendererGoneCaptor.firstValue.invoke(false)
+
+        deferred.await()
+
+        assertTrue(thrown is PirRendererGoneException)
+        assertTrue(!(thrown as PirRendererGoneException).didCrash)
+    }
+
+    @Test
+    fun whenRendererGoneAfterCompleteExecutionThenIsSafeNoOp() = runTest {
+        val rendererGoneCaptor = argumentCaptor<(Boolean) -> Unit>()
+        whenever(
+            mockPirDetachedWebViewProvider.createInstance(any(), any(), any(), any(), rendererGoneCaptor.capture()),
+        ).thenReturn(mockWebView)
+
+        val deferred = async {
+            testee.start(testProfileQuery, testBrokerSteps)
+        }
+
+        yield()
+
+        // The run completes successfully first.
+        sideEffectFlow.tryEmit(SideEffect.CompleteExecution)
+
+        val result = deferred.await()
+        assertTrue(result.isSuccess)
+
+        // A renderer-gone signal arriving for this (now-completed) run's WebView must be a no-op:
+        // it must not throw, and must not retroactively affect the already-resolved result.
+        rendererGoneCaptor.firstValue.invoke(true)
+
+        assertTrue(result.isSuccess)
+    }
+
+    @Test
+    fun whenStaleRendererGoneFromPreviousRunThenDoesNotFailCurrentRun() = runTest {
+        // RealPirActionsRunner instances are reused sequentially by production callers
+        // (PirScan/PirOptOut loop start()/stop() on the same instance per broker step). The
+        // previous run's WebView is destroyed asynchronously (see cleanUpRunner), so its
+        // onRendererGone callback can still fire after a new run has become active on the same
+        // instance. This verifies that stale callback cannot resume/fail the new run.
+        val rendererGoneCaptor = argumentCaptor<(Boolean) -> Unit>()
+        whenever(
+            mockPirDetachedWebViewProvider.createInstance(any(), any(), any(), any(), rendererGoneCaptor.capture()),
+        ).thenReturn(mockWebView)
+
+        // Step A: starts and completes successfully.
+        val deferredA = async {
+            testee.start(testProfileQuery, testBrokerSteps)
+        }
+
+        yield()
+
+        sideEffectFlow.tryEmit(SideEffect.CompleteExecution)
+
+        val resultA = deferredA.await()
+        assertTrue(resultA.isSuccess)
+
+        val staleOnRendererGoneFromStepA = rendererGoneCaptor.firstValue
+
+        // Step B: a new run starts on the SAME runner instance.
+        val deferredB = async {
+            testee.start(testProfileQuery, testBrokerSteps)
+        }
+
+        yield()
+
+        // Step A's stale (not-yet-destroyed) WebView reports its renderer gone while step B is
+        // the active run. This must not fail step B.
+        staleOnRendererGoneFromStepA.invoke(false)
+
+        sideEffectFlow.tryEmit(SideEffect.CompleteExecution)
+
+        val resultB = deferredB.await()
+        assertTrue(resultB.isSuccess)
     }
 }

@@ -158,8 +158,12 @@ class ReasoningModePickerView @JvmOverloads constructor(
         }
 
     private fun showMenu() {
+        // Guard against a re-tap opening an already-showing popup.
+        if (popupWindow?.isShowing == true) return
         val state = viewModel.state.value
         if (!state.visible) return
+
+        viewModel.onPickerShown(currentSurface())
 
         val container = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
@@ -204,8 +208,9 @@ class ReasoningModePickerView @JvmOverloads constructor(
 
     private fun showAtPosition(popup: PopupWindow) {
         val loc = IntArray(2).also { button.getLocationOnScreen(it) }
-        val menuWidth = resources.getDimensionPixelSize(R.dimen.reasoningModePickerMenuWidth)
-        popup.showAtLocation(rootView, Gravity.TOP or Gravity.START, loc[0] + button.width - menuWidth, loc[1])
+        val x = resources.displayMetrics.widthPixels - (loc[0] + button.width)
+        val y = resources.displayMetrics.heightPixels - loc[1] + resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_1)
+        popup.showAtLocation(rootView, Gravity.BOTTOM or Gravity.END, x, y)
     }
 
     private fun dismissPopup() {

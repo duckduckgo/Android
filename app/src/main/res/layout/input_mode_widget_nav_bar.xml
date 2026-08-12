@@ -41,62 +41,13 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:tint="?attr/daxColorPrimaryIcon" />
 
-    <FrameLayout
-        android:id="@+id/inputModeWidgetNavFire"
-        android:layout_width="@dimen/toolbarIcon"
+    <!-- Fire/Tabs/Menu trio shared with the search-only inline row; see input_mode_nav_buttons. -->
+    <include
+        layout="@layout/input_mode_nav_buttons"
+        android:layout_width="wrap_content"
         android:layout_height="@dimen/toolbarIcon"
-        android:background="@drawable/selectable_item_rounded_corner_background"
-        android:contentDescription="@string/duckChatFireButtonContentDescription"
-        app:layout_constraintEnd_toStartOf="@id/inputModeWidgetNavTabs"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <ImageView
-            android:id="@+id/inputModeWidgetNavFireIcon"
-            android:layout_width="@dimen/bottomNavIcon"
-            android:layout_height="@dimen/bottomNavIcon"
-            android:layout_gravity="center"
-            android:importantForAccessibility="no"
-            android:scaleType="center"
-            android:src="@drawable/ic_fire_24" />
-    </FrameLayout>
-
-    <com.duckduckgo.browser.ui.tabs.NewTabSwitcherButton
-        android:id="@+id/inputModeWidgetNavTabs"
-        android:layout_width="@dimen/toolbarIcon"
-        android:layout_height="@dimen/toolbarIcon"
-        app:layout_constraintEnd_toStartOf="@id/inputModeWidgetNavMenu"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <FrameLayout
-        android:id="@+id/inputModeWidgetNavMenu"
-        android:layout_width="@dimen/toolbarIcon"
-        android:layout_height="@dimen/toolbarIcon"
-        android:background="@drawable/selectable_item_rounded_corner_background"
-        android:contentDescription="@string/duckChatBrowserMenuContentDescription"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <ImageView
-            android:id="@+id/inputModeWidgetNavMenuIcon"
-            android:layout_width="@dimen/bottomNavIcon"
-            android:layout_height="@dimen/bottomNavIcon"
-            android:layout_gravity="center"
-            android:importantForAccessibility="no"
-            android:scaleType="center"
-            android:src="@drawable/ic_menu_hamburger_24" />
-
-        <View
-            android:id="@+id/inputModeWidgetNavMenuHighlight"
-            android:layout_width="7dp"
-            android:layout_height="7dp"
-            android:layout_gravity="end"
-            android:layout_margin="@dimen/keyline_2"
-            android:background="@drawable/ic_dot_indicator_7"
-            android:visibility="gone" />
-
-    </FrameLayout>
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

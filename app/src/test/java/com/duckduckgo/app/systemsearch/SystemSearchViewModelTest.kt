@@ -21,6 +21,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import app.cash.turbine.test
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.QuickAccessFavorite
+import com.duckduckgo.app.onboarding.OnboardingPromptsExperimentMetrics
 import com.duckduckgo.app.onboarding.store.*
 import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -87,6 +88,7 @@ class SystemSearchViewModelTest {
     private val mockDuckAiFeatureState: DuckAiFeatureState = mock()
     private val mockVoiceSearchAvailability: VoiceSearchAvailability = mock()
     private val fakeAutocompleteHistoryDeleteFeature = FakeFeatureToggleFactory.create(AutocompleteHistoryDeleteFeature::class.java)
+    private val mockOnboardingPromptsExperimentMetrics: OnboardingPromptsExperimentMetrics = mock()
 
     private val commandObserver: Observer<Command> = mock()
     private val commandCaptor = argumentCaptor<Command>()
@@ -120,6 +122,7 @@ class SystemSearchViewModelTest {
             coroutineRule.testDispatcherProvider,
             coroutineRule.testScope,
             fakeAutocompleteHistoryDeleteFeature,
+            mockOnboardingPromptsExperimentMetrics,
         )
         testee.command.observeForever(commandObserver)
     }
@@ -292,6 +295,46 @@ class SystemSearchViewModelTest {
     }
 
     @Test
+    fun whenLaunchedFromWidgetAndUserSubmitsQueryThenWidgetSearchMetricFired() = runTest {
+        testee.setLaunchedFromWidget(true)
+        testee.userSubmittedQuery(QUERY)
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        verifyBlocking(mockOnboardingPromptsExperimentMetrics) { fireWidgetSearchMetric() }
+    }
+
+    @Test
+    fun whenNotLaunchedFromWidgetAndUserSubmitsQueryThenWidgetSearchMetricNotFired() = runTest {
+        testee.setLaunchedFromWidget(false)
+        testee.userSubmittedQuery(QUERY)
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        verifyBlocking(mockOnboardingPromptsExperimentMetrics, never()) { fireWidgetSearchMetric() }
+    }
+
+    @Test
+    fun whenLaunchedFromWidgetAndUserSubmitsBlankQueryThenWidgetSearchMetricNotFired() = runTest {
+        testee.setLaunchedFromWidget(true)
+        testee.userSubmittedQuery(BLANK_QUERY)
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        verifyBlocking(mockOnboardingPromptsExperimentMetrics, never()) { fireWidgetSearchMetric() }
+    }
+
+    @Test
+    fun whenLaunchedFromWidgetAndVoiceSearchResultThenWidgetSearchMetricFired() = runTest {
+        testee.setLaunchedFromWidget(true)
+        testee.onVoiceSearchResult(QUERY)
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        verifyBlocking(mockOnboardingPromptsExperimentMetrics) { fireWidgetSearchMetric() }
+    }
+
+    @Test
+    fun whenLaunchedFromWidgetAndAutocompleteResultSubmittedThenWidgetSearchMetricFired() = runTest {
+        testee.setLaunchedFromWidget(true)
+        testee.userSubmittedAutocompleteResult(AutoCompleteSearchSuggestion(phrase = AUTOCOMPLETE_RESULT, isUrl = false, isAllowedInTopHits = false))
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        verifyBlocking(mockOnboardingPromptsExperimentMetrics) { fireWidgetSearchMetric() }
+    }
+
+    @Test
     fun whenUserSubmitsAutocompleteResultThenBrowserLaunchedAndPixelSent() = runTest {
         testee.userSubmittedAutocompleteResult(AutoCompleteSearchSuggestion(phrase = AUTOCOMPLETE_RESULT, isUrl = false, isAllowedInTopHits = false))
         verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
@@ -438,6 +481,7 @@ class SystemSearchViewModelTest {
             coroutineRule.testDispatcherProvider,
             coroutineRule.testScope,
             fakeAutocompleteHistoryDeleteFeature,
+            mockOnboardingPromptsExperimentMetrics,
         )
         testee.command.observeForever(commandObserver) // Re-observe commands after re-initialization
 
@@ -473,6 +517,7 @@ class SystemSearchViewModelTest {
             coroutineRule.testDispatcherProvider,
             coroutineRule.testScope,
             fakeAutocompleteHistoryDeleteFeature,
+            mockOnboardingPromptsExperimentMetrics,
         )
         testee.command.observeForever(commandObserver) // Re-observe commands after re-initialization
 
@@ -542,6 +587,7 @@ class SystemSearchViewModelTest {
             coroutineRule.testDispatcherProvider,
             coroutineRule.testScope,
             fakeAutocompleteHistoryDeleteFeature,
+            mockOnboardingPromptsExperimentMetrics,
         )
         testee.command.observeForever(commandObserver) // Re-observe commands after re-initialization
 
@@ -888,32 +934,30 @@ class SystemSearchViewModelTest {
         whenever(mockDuckAiFeatureState.allowDuckAiAsDigitalAssistant).thenReturn(MutableStateFlow(true))
         whenever(mockDuckChat.isEnabled()).thenReturn(true)
 
-        testee.onDigitalAssistOpened(mock())
+        testee.onDigitalAssistOpened()
 
         verify(commandObserver).onChanged(Command.LaunchDuckAiVoiceChat)
         verify(mockPixel).fire(AICHAT_VOICE_SESSION_DIGITAL_ASSISTANT_STARTED)
     }
 
     @Test
-    fun `when onDigitalAssistOpened and duck chat disabled then LaunchAssistSearch command sent`() = runTest {
+    fun `when onDigitalAssistOpened and duck chat disabled then voice chat not launched`() = runTest {
         whenever(mockDuckAiFeatureState.allowDuckAiAsDigitalAssistant).thenReturn(MutableStateFlow(true))
         whenever(mockDuckChat.isEnabled()).thenReturn(false)
-        val intent = mock<Intent>()
 
-        testee.onDigitalAssistOpened(intent)
+        testee.onDigitalAssistOpened()
 
-        verify(commandObserver).onChanged(Command.LaunchAssistSearch(intent))
+        assertCommandNotIssued<Command.LaunchDuckAiVoiceChat>()
         verify(mockPixel, never()).fire(AICHAT_VOICE_SESSION_DIGITAL_ASSISTANT_STARTED)
     }
 
     @Test
-    fun `when onDigitalAssistOpened and kill switch disabled then LaunchAssistSearch command sent`() = runTest {
+    fun `when onDigitalAssistOpened and kill switch disabled then voice chat not launched`() = runTest {
         whenever(mockDuckAiFeatureState.allowDuckAiAsDigitalAssistant).thenReturn(MutableStateFlow(false))
-        val intent = mock<Intent>()
 
-        testee.onDigitalAssistOpened(intent)
+        testee.onDigitalAssistOpened()
 
-        verify(commandObserver).onChanged(Command.LaunchAssistSearch(intent))
+        assertCommandNotIssued<Command.LaunchDuckAiVoiceChat>()
         verify(mockPixel, never()).fire(AICHAT_VOICE_SESSION_DIGITAL_ASSISTANT_STARTED)
     }
 

@@ -37,7 +37,6 @@ import com.duckduckgo.app.browser.databinding.BottomSheetNewAddressBarPickerBind
 import com.duckduckgo.app.onboardingquicksetup.ui.BrandDesignInputScreenPicker.Transition
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
 import com.duckduckgo.common.ui.setRoundCorners
-import com.duckduckgo.common.ui.view.TypeAnimationTextView
 import com.duckduckgo.common.utils.extensions.html
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -131,9 +130,8 @@ class NewAddressBarPickerBottomSheetDialog(
 
     private fun revealContent() {
         binding.inputScreen.root.isVisible = true
-        binding.inputScreen.inputScreenTitle.startOnboardingTypingAnimation(
-            getString(context, R.string.preOnboardingInputScreenTitleUpdated),
-        ) {
+        binding.inputScreen.inputScreenTitle.setTitle(getString(context, R.string.preOnboardingInputScreenTitleUpdated))
+        binding.inputScreen.inputScreenTitle.typeTitle {
             contentFadeInAnimatorSet = AnimatorSet().apply {
                 playTogether(
                     ObjectAnimator.ofFloat(
@@ -195,15 +193,6 @@ class NewAddressBarPickerBottomSheetDialog(
         restoreOrientation()
     }
 
-    private fun TypeAnimationTextView.startOnboardingTypingAnimation(
-        text: String,
-        afterAnimation: () -> Unit = {},
-    ) {
-        typingDelayInMs = TYPING_DELAY_MS
-        delayAfterAnimationInMs = TYPING_POST_DELAY_MS
-        startTypingAnimation(text, isCancellable = true, afterAnimation = afterAnimation)
-    }
-
     private fun isWindowValid(): Boolean = (context as? Activity)?.let { activity ->
         !activity.isFinishing && !activity.isDestroyed && activity.window?.decorView?.isAttachedToWindow == true
     } ?: false
@@ -212,8 +201,6 @@ class NewAddressBarPickerBottomSheetDialog(
         private const val WING_STOP_PROGRESS = 0.5f
         private const val WING_START_DELAY = 300L
         private const val WING_FADE_IN_DURATION = 150L
-        private const val TYPING_DELAY_MS = 20L
-        private const val TYPING_POST_DELAY_MS = 20L
         private const val CONTENT_FADE_IN_DURATION = 200L
     }
 }

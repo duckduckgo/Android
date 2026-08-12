@@ -985,7 +985,7 @@
     <string name="preOnboardingWidgetPromptSecondaryCta">Omite</string>
 
     <!-- Pre-onboarding: add to home screen -->
-    <string name="preOnboardingAddToDockTitle">Adaugă-mă în partea de jos a ecranului.</string>
+    <string name="preOnboardingDockStepTitle">Adaugă-mă în șirul tău de preferințe.</string>
     <string name="preOnboardingAddToDockBody">Găsește pictograma DuckDuckGo pe ecranul de pornire. Apoi apasă și trage în poziție. Gata!</string>
     <string name="preOnboardingAddToDockPrimaryCta">Am înțeles!</string>
 

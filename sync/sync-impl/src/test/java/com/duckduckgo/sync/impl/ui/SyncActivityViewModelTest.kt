@@ -43,6 +43,7 @@ import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncAccountRepository.AuthCode
 import com.duckduckgo.sync.impl.SyncAuthCode
+import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.SyncFeatureToggle
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator
 import com.duckduckgo.sync.impl.autorestore.SyncAutoRestoreManager
@@ -60,7 +61,6 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDF
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RequestSetupAuthentication
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowPreviousSessionReady
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.OriginalFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows.CreateAccountFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows.SignInFlow
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.SyncedDevice
@@ -111,6 +111,11 @@ class SyncActivityViewModelTest {
 
     private val fakeSettingsPageFeature = FakeFeatureToggleFactory.create(SettingsPageFeature::class.java)
 
+    private val syncFeature = FakeFeatureToggleFactory.create(
+        SyncFeature::class.java,
+        ioDispatcher = coroutineTestRule.testDispatcher,
+    )
+
     private val stateFlow = MutableStateFlow(SyncState.READY)
 
     private lateinit var testee: SyncActivityViewModel
@@ -132,6 +137,7 @@ class SyncActivityViewModelTest {
             syncAutoRestoreManager = syncAutoRestoreManager,
             syncAutoRestore = syncAutoRestore,
             appCoroutineScope = coroutineTestRule.testScope,
+            syncFeature = syncFeature,
         )
         whenever(deviceAuthenticator.isAuthenticationRequired()).thenReturn(true)
         whenever(syncStateMonitor.syncState()).thenReturn(emptyFlow())
@@ -139,6 +145,7 @@ class SyncActivityViewModelTest {
         whenever(syncAutoRestoreManager.isAutoRestoreAvailable()).thenReturn(false)
         whenever(syncAutoRestoreManager.isRestoreOnReinstallEnabled()).thenReturn(true)
         whenever(syncAutoRestore.canRestore()).thenReturn(false)
+        syncFeature.updateSyncActivityViewStateAtomically().setRawStoredState(State(true))
     }
 
     @Test
@@ -193,6 +200,29 @@ class SyncActivityViewModelTest {
     }
 
     @Test
+    fun whenViewModelCreatedThenSyncSettingsShownPixelFired() = runTest {
+        verify(syncPixels).fireSyncSettingsShown()
+    }
+
+    @Test
+    fun whenSyncThisDeviceThenBackupThisDeviceTappedPixelFired() = runTest {
+        givenUserHasDeviceAuthentication(true)
+
+        testee.onSyncThisDevice()
+
+        verify(syncPixels).fireBackupThisDeviceTapped()
+    }
+
+    @Test
+    fun whenRecoverYourSyncedDataThenRecoverSyncDataTappedPixelFired() = runTest {
+        givenUserHasDeviceAuthentication(true)
+
+        testee.onRecoverYourSyncedData()
+
+        verify(syncPixels).fireRecoverSyncDataTapped()
+    }
+
+    @Test
     fun whenSyncWithAnotherDeviceThenEmitCommandSyncWithAnotherDevice() = runTest {
         givenUserHasDeviceAuthentication(true)
         testee.onSyncWithAnotherDevice()
@@ -223,7 +253,7 @@ class SyncActivityViewModelTest {
         testee.commands().test {
             val command = awaitItem()
             command.assertCommandType(ShowPreviousSessionReady::class)
-            assertEquals(OriginalFlow.SYNC_WITH_ANOTHER, (command as ShowPreviousSessionReady).originalFlow)
+            assertEquals(SyncEntryPoint.ADD_DEVICE, (command as ShowPreviousSessionReady).syncEntryPoint)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -280,7 +310,7 @@ class SyncActivityViewModelTest {
             testee.onSyncThisDevice()
             val command = awaitItem()
             command.assertCommandType(ShowPreviousSessionReady::class)
-            assertEquals(OriginalFlow.SYNC_THIS_DEVICE, (command as ShowPreviousSessionReady).originalFlow)
+            assertEquals(SyncEntryPoint.SYNC_NEW_ACCOUNT, (command as ShowPreviousSessionReady).syncEntryPoint)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -349,6 +379,21 @@ class SyncActivityViewModelTest {
     }
 
     @Test
+    fun whenSkipRestoreClearFailsThenThisDeviceSyncIdle() = runTest {
+        whenever(syncAutoRestoreManager.clearAutoRestoreData()).thenReturn(Result.Error(reason = "error"))
+
+        testee.viewState().test {
+            testee.onSyncThisDevice()
+            assertTrue(expectMostRecentItem().isThisDeviceSyncing)
+
+            testee.onContinueSetupAfterSkipRestore(SyncEntryPoint.SYNC_NEW_ACCOUNT)
+            assertFalse(expectMostRecentItem().isThisDeviceSyncing)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenRecoverDataThenRecoverDataCommandSent() = runTest {
         givenUserHasDeviceAuthentication(true)
         testee.onRecoverYourSyncedData()
@@ -379,7 +424,7 @@ class SyncActivityViewModelTest {
         testee.commands().test {
             val command = awaitItem()
             command.assertCommandType(ShowPreviousSessionReady::class)
-            assertEquals(OriginalFlow.RECOVER_SYNCED_DATA, (command as ShowPreviousSessionReady).originalFlow)
+            assertEquals(SyncEntryPoint.RECOVER_SYNCED_DATA, (command as ShowPreviousSessionReady).syncEntryPoint)
             cancelAndIgnoreRemainingEvents()
         }
     }

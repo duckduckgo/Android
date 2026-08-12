@@ -1,7 +1,7 @@
 {
   "name": "InmatesSearcher",
   "url": "inmatessearcher.com",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "parent": "privatereports.com",
   "optOutUrl": "https://www.inmatessearcher.com/optOut/name/landing",
   "steps": [
@@ -13,6 +13,17 @@
           "actionType": "navigate",
           "url": "https://www.inmatessearcher.com/name/search-result",
           "id": "6465a3f6-3266-47a7-8372-dba02b768092"
+        },
+        {
+          "actionType": "expectation",
+          "_comment": "wait for cloudflare check to pass - we are using a negative xpath selector to ensure the challenge is not being displayed",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//script[contains(@src,'/cdn-cgi/challenge-platform/')] or .//script[contains(., '_cf_chl_opt')] or .//script[contains(@src,'challenges.cloudflare.com/turnstile')] or .//input[@name='cf-turnstile-response'] or .//iframe[contains(@src,'challenges.cloudflare.com')] or .//div[@id='cf-error-details'])]"
+            }
+          ],
+          "id": "cfc-a274586f-bc2f-4176-889c-414c373f4235"
         },
         {
           "actionType": "expectation",

@@ -180,29 +180,6 @@ class DuckAiShortcutSettingsViewModelTest {
     }
 
     @Test
-    fun whenVoiceChatEntryEnabledThenToggleShown() = runTest {
-        whenever(duckChat.isVoiceChatEntryPointEnabled()).thenReturn(true)
-        testee = DuckAiShortcutSettingsViewModel(duckChat)
-
-        testee.viewState.test {
-            val state = awaitItem()
-            assertTrue(state.shouldShowVoiceChatToggle)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenVoiceChatEntryDisabledThenToggleHidden() = runTest {
-        whenever(duckChat.isVoiceChatEntryPointEnabled()).thenReturn(false)
-        testee = DuckAiShortcutSettingsViewModel(duckChat)
-
-        testee.viewState.test {
-            val state = awaitItem()
-            assertFalse(state.shouldShowVoiceChatToggle)
-        }
-    }
-
-    @Test
     fun whenOnShowDuckChatInVoiceChatToggledThenCallDuckChatSetShowInVoiceChat() = runTest {
         testee.onShowDuckChatInVoiceChatToggled(true)
 

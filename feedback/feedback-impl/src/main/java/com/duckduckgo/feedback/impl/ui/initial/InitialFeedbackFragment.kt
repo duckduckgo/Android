@@ -16,13 +16,12 @@
 
 package com.duckduckgo.feedback.impl.ui.initial
 
-import android.app.UiModeManager
 import android.os.Bundle
-import androidx.core.content.ContextCompat.getSystemService
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK
 import com.duckduckgo.common.ui.DuckDuckGoTheme.LIGHT
 import com.duckduckgo.common.ui.DuckDuckGoTheme.SYSTEM_DEFAULT
+import com.duckduckgo.common.ui.isInNightMode
 import com.duckduckgo.common.ui.store.ThemingDataStore
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.FragmentScope
@@ -55,13 +54,7 @@ class InitialFeedbackFragment : FeedbackFragment(R.layout.content_feedback) {
         super.onActivityCreated(savedInstanceState)
 
         when (themingDataStore.theme) {
-            SYSTEM_DEFAULT -> {
-                val uiManager = getSystemService(requireContext(), UiModeManager::class.java)
-                when (uiManager?.nightMode) {
-                    UiModeManager.MODE_NIGHT_YES -> renderDarkButtons()
-                    else -> renderLightButtons()
-                }
-            }
+            SYSTEM_DEFAULT -> if (requireContext().isInNightMode()) renderDarkButtons() else renderLightButtons()
             DARK -> renderDarkButtons()
             LIGHT -> renderLightButtons()
         }

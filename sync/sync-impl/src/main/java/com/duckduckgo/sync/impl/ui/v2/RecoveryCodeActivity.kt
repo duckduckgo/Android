@@ -75,11 +75,13 @@ class RecoveryCodeActivity : DuckDuckGoActivity() {
         viewModel.changeRestoreOnReinstall(isChecked)
     }
 
-    private val downloadPdfPermissionLauncher = registerForActivityResult(RequestPermission()) { isGranted ->
+    private val downloadPdfPermissionLauncher = registerForActivityResult(
+        RequestPermission(),
+    ) { isGranted ->
         if (isGranted) {
             lifecycleScope.launch { viewModel.generateRecoveryCodeSheet(this@RecoveryCodeActivity) }
         } else {
-            viewModel.showMessage(R.string.sync_permission_required_store_recovery_code)
+            viewModel.showMessage(R.string.sync_simplified_recovery_code_storage_permission_message)
         }
     }
 
@@ -166,10 +168,10 @@ class RecoveryCodeActivity : DuckDuckGoActivity() {
     }
 
     private fun configureHeadline() {
-        val deviceName = requireNotNull(intent.getStringExtra(DEVICE_NAME_KEY)) {
-            "Missing intent extra: '$DEVICE_NAME_KEY'"
+        val deviceName = requireNotNull(intent.getStringExtra(DEVICE_NAME_EXTRA_KEY)) {
+            "Missing intent extra: '$DEVICE_NAME_EXTRA_KEY'"
         }
-        binding.headlineText.text = getString(R.string.sync_device_v2_recovery_code_headline, deviceName)
+        binding.headlineText.text = getString(R.string.sync_simplified_recovery_code_headline, deviceName)
     }
 
     private fun configureCopyCodeItem() {
@@ -190,9 +192,9 @@ class RecoveryCodeActivity : DuckDuckGoActivity() {
 
     private fun showError(showError: ShowError) {
         TextAlertDialogBuilder(this)
-            .setTitle(R.string.sync_dialog_error_title)
+            .setTitle(R.string.sync_simplified_error_dialog_title)
             .setMessage(getString(showError.message) + "\n" + showError.reason)
-            .setPositiveButton(R.string.sync_dialog_error_ok)
+            .setPositiveButton(R.string.sync_simplified_error_dialog_primary_button)
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
@@ -219,13 +221,13 @@ class RecoveryCodeActivity : DuckDuckGoActivity() {
     }
 
     companion object {
-        private const val DEVICE_NAME_KEY = "device_name"
+        private const val DEVICE_NAME_EXTRA_KEY = "device_name"
 
         fun intent(
             context: Context,
             deviceName: String,
         ): Intent {
-            return Intent(context, RecoveryCodeActivity::class.java).putExtra(DEVICE_NAME_KEY, deviceName)
+            return Intent(context, RecoveryCodeActivity::class.java).putExtra(DEVICE_NAME_EXTRA_KEY, deviceName)
         }
     }
 }

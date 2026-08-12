@@ -16,18 +16,19 @@
 
 package com.duckduckgo.sync.impl
 
+import androidx.annotation.WorkerThread
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.impl.crypto.SyncJweCrypto
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
 import javax.inject.Inject
 
 /**
- * Decrypts `name` + `type` for a single `entries_v2` entry. 3party uses the scoped MEK; ddg/null
- * uses the local primary key. Stateless — caller handles refresh/retry on [Result.Error].
+ * Decrypts `name` + `type` for a single `entries_v2` entry.
+ * 3party uses the main encryption key derived from the scoped password; ddg/null uses the local primary key.
  */
+@WorkerThread
 interface DeviceFieldDecryptor {
     fun decrypt(entry: DeviceV2): Result<DecryptedDevice>
 }
@@ -38,7 +39,6 @@ data class DecryptedDevice(
     val type: String?,
 )
 
-@SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealDeviceFieldDecryptor @Inject constructor(
     private val syncStore: SyncStore,
@@ -64,7 +64,12 @@ class RealDeviceFieldDecryptor @Inject constructor(
         val userId = syncStore.userId ?: return Result.Error(reason = "DeviceFieldDecryptor: userId missing")
 
         val thirdPartyMainKey = runCatching {
-            syncJweCrypto.hkdfDeriveBytes(scopedPassword, userId.toByteArray(Charsets.UTF_8), "Main Key", 32)
+            syncJweCrypto.hkdfDeriveBytes(
+                base64Key = scopedPassword,
+                salt = userId.toByteArray(Charsets.UTF_8),
+                info = HKDF_INFO_MAIN_ENCRYPTION_KEY,
+                outBytes = MAIN_ENCRYPTION_KEY_LENGTH_BYTES,
+            )
         }.getOrElse {
             return Result.Error(reason = "DeviceFieldDecryptor: 3p key derivation failed: ${it.message}")
         }

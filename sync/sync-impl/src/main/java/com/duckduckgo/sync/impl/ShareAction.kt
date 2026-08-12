@@ -36,6 +36,20 @@ class ShareAction @Inject constructor(private val appBuildConfig: AppBuildConfig
         return if (intent != null) startActivity(applicationContext, intent) else false
     }
 
+    fun shareText(applicationContext: Context, text: String): Boolean {
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, text)
+        }
+        val chooser = Intent.createChooser(
+            intent,
+            applicationContext.getString(R.string.sync_share_title),
+        ).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        }
+        return startActivity(applicationContext, chooser)
+    }
+
     private fun createShareIntent(applicationContext: Context, file: File): Intent? {
         val fileUri = getFilePathUri(applicationContext, file)
         val intent =

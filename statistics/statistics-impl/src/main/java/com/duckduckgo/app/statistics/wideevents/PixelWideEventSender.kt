@@ -48,6 +48,9 @@ class PixelWideEventSender @Inject constructor(
         val parameters =
             mutableMapOf<String, String>().apply {
                 putAll(getCommonPixelParameters())
+                put(PARAM_META_TYPE, event.metaType)
+                put(PARAM_META_VERSION, event.metaVersion)
+                put(PARAM_SAMPLE_RATE, event.samplingProbability.toString())
                 put(PARAM_STATUS, event.status.toParamValue())
 
                 if (event.flowEntryPoint != null) {
@@ -103,7 +106,6 @@ class PixelWideEventSender @Inject constructor(
         return mapOf(
             PARAM_PLATFORM to "Android",
             PARAM_TYPE to "app",
-            PARAM_SAMPLE_RATE to "1",
             PARAM_APP_NAME to "DuckDuckGo Android",
             PARAM_APP_VERSION to appBuildConfig.versionName,
             PARAM_FORM_FACTOR to deviceInfo.formFactor().description,
@@ -119,6 +121,8 @@ class PixelWideEventSender @Inject constructor(
         const val COUNT_PIXEL_SUFFIX = "_c"
         const val DAILY_PIXEL_SUFFIX = "_d"
 
+        const val PARAM_META_TYPE = "meta.type"
+        const val PARAM_META_VERSION = "meta.version"
         const val PARAM_PLATFORM = "global.platform"
         const val PARAM_TYPE = "global.type"
         const val PARAM_SAMPLE_RATE = "global.sample_rate"

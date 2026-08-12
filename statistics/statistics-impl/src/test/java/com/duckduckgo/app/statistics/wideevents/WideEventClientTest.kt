@@ -18,6 +18,7 @@ package com.duckduckgo.app.statistics.wideevents
 
 import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.statistics.wideevents.WideEventClient.Companion.SAMPLED_OUT_FLOW_ID
 import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -32,6 +33,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -52,11 +54,14 @@ class WideEventClientTest {
             .create(WideEventFeature::class.java)
             .apply { self().setRawStoredState(State(true)) }
 
+    private val fakeRandom = FakeRandom()
+
     private val wideEventClient =
         WideEventClientImpl(
             wideEventRepository = wideEventRepository,
             wideEventFeature = { wideEventFeature },
             dispatcherProvider = coroutineRule.testDispatcherProvider,
+            random = fakeRandom,
         )
 
     @Test
@@ -68,7 +73,7 @@ class WideEventClientTest {
             val metadata = mapOf("free_trial_eligible" to "true", "user_type" to "premium")
             val cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = true)
 
-            whenever(wideEventRepository.insertWideEvent(any(), any(), any(), anyOrNull()))
+            whenever(wideEventRepository.insertWideEvent(any(), any(), any(), anyOrNull(), any(), anyOrNull(), any()))
                 .thenReturn(expectedEventId)
 
             val result = wideEventClient.flowStart(name, flowEntryPoint, metadata, cleanupPolicy)
@@ -85,6 +90,9 @@ class WideEventClientTest {
                     status = WideEventRepository.WideEventStatus.UNKNOWN,
                     metadata = emptyMap(),
                 ),
+                samplingProbability = 1.0f,
+                metaType = "android-subscription-purchase",
+                metaVersion = "1.0.0",
             )
         }
 
@@ -94,7 +102,7 @@ class WideEventClientTest {
             val expectedEventId = 456L
             val name = "login_flow"
 
-            whenever(wideEventRepository.insertWideEvent(any(), anyOrNull(), any(), anyOrNull()))
+            whenever(wideEventRepository.insertWideEvent(any(), anyOrNull(), any(), anyOrNull(), any(), anyOrNull(), any()))
                 .thenReturn(expectedEventId)
 
             val result = wideEventClient.flowStart(name)
@@ -111,6 +119,40 @@ class WideEventClientTest {
                     status = WideEventRepository.WideEventStatus.UNKNOWN,
                     metadata = emptyMap(),
                 ),
+                samplingProbability = 1.0f,
+                metaType = "android-login-flow",
+                metaVersion = "1.0.0",
+            )
+        }
+
+    @Test
+    fun `when flowStart called with definition then meta parameters are stored`() =
+        runTest {
+            whenever(wideEventRepository.insertWideEvent(any(), anyOrNull(), any(), anyOrNull(), any(), anyOrNull(), any()))
+                .thenReturn(789L)
+
+            val result = wideEventClient.flowStart(
+                name = "test_flow",
+                definition = WideEventDefinition(
+                    version = WideEventDefinition.Version(minor = 2, patch = 3),
+                    type = "android-custom-definition",
+                ),
+            )
+
+            assertTrue(result.isSuccess)
+
+            verify(wideEventRepository).insertWideEvent(
+                name = "test_flow",
+                flowEntryPoint = null,
+                metadata = emptyMap(),
+                cleanupPolicy = WideEventRepository.CleanupPolicy.OnTimeout(
+                    duration = Duration.ofDays(7),
+                    status = WideEventRepository.WideEventStatus.UNKNOWN,
+                    metadata = emptyMap(),
+                ),
+                samplingProbability = 1.0f,
+                metaType = "android-custom-definition",
+                metaVersion = "1.2.3",
             )
         }
 
@@ -118,7 +160,7 @@ class WideEventClientTest {
     fun `when flowStart encounters repository exception then returns failure`() =
         runTest {
             val exception = RuntimeException("Database error")
-            whenever(wideEventRepository.insertWideEvent(any(), anyOrNull(), any(), anyOrNull()))
+            whenever(wideEventRepository.insertWideEvent(any(), anyOrNull(), any(), anyOrNull(), any(), anyOrNull(), any()))
                 .thenThrow(exception)
 
             val result = wideEventClient.flowStart("test_flow")
@@ -433,7 +475,7 @@ class WideEventClientTest {
                     flowStatus = FlowStatus.Failure("timeout"),
                 )
 
-            whenever(wideEventRepository.insertWideEvent(any(), anyOrNull(), any(), anyOrNull()))
+            whenever(wideEventRepository.insertWideEvent(any(), anyOrNull(), any(), anyOrNull(), any(), anyOrNull(), any()))
                 .thenReturn(wideEventId)
 
             val result =
@@ -454,6 +496,127 @@ class WideEventClientTest {
                     status = WideEventRepository.WideEventStatus.FAILURE,
                     metadata = mapOf("failure_reason" to "timeout"),
                 ),
+                samplingProbability = 1.0f,
+                metaType = "android-timeout-flow",
+                metaVersion = "1.0.0",
             )
         }
+
+    @Test
+    fun `when flowStart called with samplingProbability 0 then returns SAMPLED_OUT_ID without repository interaction`() =
+        runTest {
+            val result = wideEventClient.flowStart("sampled_flow", samplingProbability = 0.0f)
+
+            assertTrue(result.isSuccess)
+            assertEquals(SAMPLED_OUT_FLOW_ID, result.getOrNull())
+            verifyNoInteractions(wideEventRepository)
+        }
+
+    @Test
+    fun `when flowStart called with samplingProbability 1 then always creates event`() =
+        runTest {
+            whenever(wideEventRepository.insertWideEvent(any(), anyOrNull(), any(), anyOrNull(), any(), anyOrNull(), any()))
+                .thenReturn(42L)
+
+            val result = wideEventClient.flowStart("sampled_flow", samplingProbability = 1.0f)
+
+            assertTrue(result.isSuccess)
+            assertEquals(42L, result.getOrNull())
+            verify(wideEventRepository).insertWideEvent(any(), anyOrNull(), any(), anyOrNull(), any(), anyOrNull(), any())
+        }
+
+    @Test
+    fun `when flowStart called with custom samplingProbability then passes it to repository`() =
+        runTest {
+            fakeRandom.nextFloatValue = 0.1f // below 0.5 threshold, so sampled in
+            whenever(wideEventRepository.insertWideEvent(any(), anyOrNull(), any(), anyOrNull(), any(), anyOrNull(), any()))
+                .thenReturn(99L)
+
+            val result = wideEventClient.flowStart("sampled_flow", samplingProbability = 0.5f)
+
+            assertTrue(result.isSuccess)
+            assertEquals(99L, result.getOrNull())
+            verify(wideEventRepository).insertWideEvent(
+                name = "sampled_flow",
+                flowEntryPoint = null,
+                metadata = emptyMap(),
+                cleanupPolicy = WideEventRepository.CleanupPolicy.OnTimeout(
+                    duration = Duration.ofDays(7),
+                    status = WideEventRepository.WideEventStatus.UNKNOWN,
+                    metadata = emptyMap(),
+                ),
+                samplingProbability = 0.5f,
+                metaType = "android-sampled-flow",
+                metaVersion = "1.0.0",
+            )
+        }
+
+    @Test
+    fun `when flowStart called with invalid samplingProbability above 1 then returns failure`() =
+        runTest {
+            val result = wideEventClient.flowStart("invalid_flow", samplingProbability = 1.5f)
+
+            assertTrue(result.isFailure)
+            assertTrue(result.exceptionOrNull() is IllegalArgumentException)
+        }
+
+    @Test
+    fun `when flowStart called with negative samplingProbability then returns failure`() =
+        runTest {
+            val result = wideEventClient.flowStart("invalid_flow", samplingProbability = -0.1f)
+
+            assertTrue(result.isFailure)
+            assertTrue(result.exceptionOrNull() is IllegalArgumentException)
+        }
+
+    @Test
+    fun `when flowStep called with SAMPLED_OUT_ID then returns success without repository interaction`() =
+        runTest {
+            val result = wideEventClient.flowStep(SAMPLED_OUT_FLOW_ID, "step1")
+
+            assertTrue(result.isSuccess)
+            verifyNoInteractions(wideEventRepository)
+        }
+
+    @Test
+    fun `when flowFinish called with SAMPLED_OUT_ID then returns success without repository interaction`() =
+        runTest {
+            val result = wideEventClient.flowFinish(SAMPLED_OUT_FLOW_ID, FlowStatus.Success)
+
+            assertTrue(result.isSuccess)
+            verifyNoInteractions(wideEventRepository)
+        }
+
+    @Test
+    fun `when flowAbort called with SAMPLED_OUT_ID then returns success without repository interaction`() =
+        runTest {
+            val result = wideEventClient.flowAbort(SAMPLED_OUT_FLOW_ID)
+
+            assertTrue(result.isSuccess)
+            verifyNoInteractions(wideEventRepository)
+        }
+
+    @Test
+    fun `when intervalStart called with SAMPLED_OUT_ID then returns success without repository interaction`() =
+        runTest {
+            val result = wideEventClient.intervalStart(SAMPLED_OUT_FLOW_ID, "timer")
+
+            assertTrue(result.isSuccess)
+            verifyNoInteractions(wideEventRepository)
+        }
+
+    @Test
+    fun `when intervalEnd called with SAMPLED_OUT_ID then returns success with zero duration`() =
+        runTest {
+            val result = wideEventClient.intervalEnd(SAMPLED_OUT_FLOW_ID, "timer")
+
+            assertTrue(result.isSuccess)
+            assertEquals(kotlin.time.Duration.ZERO, result.getOrNull())
+            verifyNoInteractions(wideEventRepository)
+        }
+}
+
+private class FakeRandom(var nextFloatValue: Float = 0.0f) : kotlin.random.Random() {
+    override fun nextBits(bitCount: Int): Int = 0
+    override fun nextFloat(): Float = nextFloatValue
 }

@@ -30,6 +30,11 @@ interface WideEventClient {
      * @param flowEntryPoint Optional identifier of the flow entry point (e.g., "app_settings")
      * @param metadata Optional metadata (e.g., "free_trial_eligible=true").
      * @param cleanupPolicy Strategy for dealing with abandoned events, see [CleanupPolicy] for details.
+     * @param samplingProbability Probability in [0.0, 1.0] that this event will be recorded.
+     *   E.g., 0.1 means ~10 % of events are kept and the rest are silently dropped.
+     *   When an event is sampled out, [SAMPLED_OUT_FLOW_ID] is returned and all subsequent
+     *   operations on that ID become no-ops.
+     * @param definition Definition that this event conforms to, see [WideEventDefinition].
      * @return Wide event ID used for subsequent calls.
      */
     suspend fun flowStart(
@@ -37,6 +42,8 @@ interface WideEventClient {
         flowEntryPoint: String? = null,
         metadata: Map<String, String> = emptyMap(),
         cleanupPolicy: CleanupPolicy = OnTimeout(duration = 7.days),
+        samplingProbability: Float = 1.0f,
+        definition: WideEventDefinition = WideEventDefinition(),
     ): Result<Long>
 
     /**
@@ -132,6 +139,37 @@ interface WideEventClient {
             5.minutes,
             10.minutes,
         )
+
+        /**
+         * Sentinel ID returned by [flowStart] when the event is sampled out.
+         * All subsequent operations on this ID are silent no-ops with zero disk I/O.
+         */
+        const val SAMPLED_OUT_FLOW_ID = -1L
+    }
+}
+
+/**
+ * Identifies the wide event definition that a flow conforms to.
+ *
+ * @param version Version of the event definition. Bump it whenever the set of parameters the event sends changes.
+ * @param type Globally unique identifier of the event definition. Defaults to the flow name prefixed with
+ *   the platform, e.g. "android-subscription-purchase".
+ */
+data class WideEventDefinition(
+    val version: Version = Version.INITIAL,
+    val type: String? = null,
+) {
+    /**
+     * MINOR and PATCH components of the definition version, as declared in the definition itself.
+     * MAJOR is shared by all wide events and set automatically.
+     */
+    data class Version(
+        val minor: Int,
+        val patch: Int,
+    ) {
+        companion object {
+            val INITIAL = Version(minor = 0, patch = 0)
+        }
     }
 }
 

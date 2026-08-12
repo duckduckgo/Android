@@ -17,9 +17,7 @@
 package com.duckduckgo.common.ui
 
 import android.annotation.SuppressLint
-import android.app.UiModeManager
 import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.graphics.Color
@@ -111,13 +109,7 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
 
     fun isDarkThemeEnabled(): Boolean {
         return when (themingDataStore.theme) {
-            DuckDuckGoTheme.SYSTEM_DEFAULT -> {
-                val uiManager = getSystemService(Context.UI_MODE_SERVICE) as UiModeManager
-                when (uiManager.nightMode) {
-                    UiModeManager.MODE_NIGHT_YES -> true
-                    else -> false
-                }
-            }
+            DuckDuckGoTheme.SYSTEM_DEFAULT -> isInNightMode()
             DARK -> true
             else -> false
         }

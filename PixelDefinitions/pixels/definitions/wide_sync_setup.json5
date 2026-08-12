@@ -14,6 +14,8 @@
             "widePixelAppName",
             "widePixelFormFactor",
             "widePixelDevMode",
+            "widePixelMetaType",
+            "widePixelMetaVersion",
             {
                 "key": "feature.name",
                 "description": "Feature identifier for this wide pixel",
@@ -28,6 +30,11 @@
                 "key": "feature.data.ext.user_auth_required",
                 "description": "Whether device authentication is required for this Sync setup flow",
                 "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.ui_version",
+                "description": "Which sync setup UI the user is on: v2 when the simplified sync UI is enabled (useSimplifiedSync), v1 on the legacy setup screens",
+                "enum": ["v1", "v2"]
             },
             {
                 "key": "feature.data.ext.account_creation_latency_ms_bucketed",

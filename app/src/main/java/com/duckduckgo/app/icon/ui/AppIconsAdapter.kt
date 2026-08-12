@@ -17,11 +17,17 @@
 package com.duckduckgo.app.icon.ui
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.databinding.ItemAppIconBinding
+import com.duckduckgo.common.ui.view.getColorFromAttr
+import com.duckduckgo.mobile.android.R as CommonR
 
-class AppIconsAdapter(private val onClick: (ChangeIconViewModel.IconViewData) -> Unit) : RecyclerView.Adapter<AppIconsAdapter.IconViewHolder>() {
+class AppIconsAdapter(
+    private val metrics: AppIconCellMetrics,
+    private val onClick: (ChangeIconViewModel.IconViewData) -> Unit,
+) : RecyclerView.Adapter<AppIconsAdapter.IconViewHolder>() {
 
     private var iconViewData: MutableList<ChangeIconViewModel.IconViewData> = mutableListOf()
 
@@ -36,7 +42,16 @@ class AppIconsAdapter(private val onClick: (ChangeIconViewModel.IconViewData) ->
         viewType: Int,
     ): IconViewHolder {
         val binding = ItemAppIconBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        binding.root.applySelectionOutline()
         return IconViewHolder(binding)
+    }
+
+    private fun View.applySelectionOutline() {
+        setPadding(metrics.selectionInset, metrics.selectionInset, metrics.selectionInset, metrics.selectionInset)
+        foreground = AppIconOutlineDrawable(
+            strokeWidthPx = metrics.selectionStrokeWidth,
+            outlineColor = context.getColorFromAttr(CommonR.attr.daxColorControlDecorationTertiary),
+        )
     }
 
     override fun onBindViewHolder(

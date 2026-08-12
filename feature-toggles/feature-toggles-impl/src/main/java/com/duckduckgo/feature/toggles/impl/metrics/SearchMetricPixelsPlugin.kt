@@ -50,7 +50,7 @@ class SearchMetricPixelsPlugin @Inject constructor(private val inventory: Featur
                     toggle = toggle,
                     conversionWindow = listOf(
                         ConversionWindow(lowerWindow = 5, upperWindow = 7),
-                        ConversionWindow(lowerWindow = 8, upperWindow = 15),
+                        ConversionWindow(lowerWindow = 8, upperWindow = 14),
                     ),
                 ),
                 MetricsPixel(
@@ -58,26 +58,20 @@ class SearchMetricPixelsPlugin @Inject constructor(private val inventory: Featur
                     type = MetricType.COUNT_WHEN_IN_WINDOW,
                     value = "6",
                     toggle = toggle,
-                    conversionWindow = (0..14).map { ConversionWindow(lowerWindow = it, upperWindow = it) } +
-                        listOf(
-                            ConversionWindow(lowerWindow = 1, upperWindow = 4),
-                            ConversionWindow(lowerWindow = 5, upperWindow = 7),
-                            ConversionWindow(lowerWindow = 8, upperWindow = 14),
-                            ConversionWindow(lowerWindow = 8, upperWindow = 15),
-                        ),
+                    conversionWindow = listOf(
+                        ConversionWindow(lowerWindow = 5, upperWindow = 7),
+                        ConversionWindow(lowerWindow = 8, upperWindow = 14),
+                    ),
                 ),
                 MetricsPixel(
                     metric = "search",
                     type = MetricType.COUNT_WHEN_IN_WINDOW,
                     value = "11",
                     toggle = toggle,
-                    conversionWindow = (0..14).map { ConversionWindow(lowerWindow = it, upperWindow = it) } +
-                        listOf(
-                            ConversionWindow(lowerWindow = 1, upperWindow = 4),
-                            ConversionWindow(lowerWindow = 5, upperWindow = 7),
-                            ConversionWindow(lowerWindow = 8, upperWindow = 14),
-                            ConversionWindow(lowerWindow = 8, upperWindow = 15),
-                        ),
+                    conversionWindow = listOf(
+                        ConversionWindow(lowerWindow = 5, upperWindow = 7),
+                        ConversionWindow(lowerWindow = 8, upperWindow = 14),
+                    ),
                 ),
                 MetricsPixel(
                     metric = "search",
@@ -86,7 +80,7 @@ class SearchMetricPixelsPlugin @Inject constructor(private val inventory: Featur
                     toggle = toggle,
                     conversionWindow = listOf(
                         ConversionWindow(lowerWindow = 5, upperWindow = 7),
-                        ConversionWindow(lowerWindow = 8, upperWindow = 15),
+                        ConversionWindow(lowerWindow = 8, upperWindow = 14),
                     ),
                 ),
                 MetricsPixel(
@@ -96,7 +90,7 @@ class SearchMetricPixelsPlugin @Inject constructor(private val inventory: Featur
                     toggle = toggle,
                     conversionWindow = listOf(
                         ConversionWindow(lowerWindow = 5, upperWindow = 7),
-                        ConversionWindow(lowerWindow = 8, upperWindow = 15),
+                        ConversionWindow(lowerWindow = 8, upperWindow = 14),
                     ),
                 ),
             )

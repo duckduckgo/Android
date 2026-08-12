@@ -120,7 +120,6 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
     ): BrowserMenuViewState.DuckAi {
         return BrowserMenuViewState.DuckAi(
             canPrintPage = browserViewState.canPrintPage,
-            canReportSite = browserViewState.canReportSite,
             showAutofill = browserViewState.showAutofill,
             showDownloadDot = newDownloadState.hasNewDownload(),
             showDuckChatHistoryOption = browserViewState.showDuckChatHistoryOption,

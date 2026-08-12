@@ -22,7 +22,6 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import java.time.Duration
 import java.time.Instant
 import javax.inject.Inject
@@ -38,6 +37,9 @@ class WideEventRepositoryImpl @Inject constructor(
         flowEntryPoint: String?,
         metadata: Map<String, String?>,
         cleanupPolicy: CleanupPolicy,
+        samplingProbability: Float,
+        metaType: String,
+        metaVersion: String,
     ): Long {
         val entity =
             WideEventEntity(
@@ -49,6 +51,9 @@ class WideEventRepositoryImpl @Inject constructor(
                 createdAt = timeProvider.getCurrentTime(),
                 cleanupPolicy = cleanupPolicy.mapToDbCleanupPolicy(),
                 activeIntervals = emptyList(),
+                samplingProbability = samplingProbability,
+                metaType = metaType,
+                metaVersion = metaVersion,
             )
 
         return wideEventDao.insertWideEvent(entity)

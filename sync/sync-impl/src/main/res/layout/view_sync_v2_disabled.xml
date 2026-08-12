@@ -31,37 +31,47 @@
             android:id="@+id/syncThisDeviceToggle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:primaryText="@string/sync_settings_v2_this_device_cta_title"
+            app:primaryText="@string/sync_simplified_settings_sync_this_device_item"
             app:showSwitch="true" />
     </FrameLayout>
 
     <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
         android:id="@+id/syncWithAnotherDeviceButton"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="@dimen/keyline_5"
-        android:layout_marginBottom="60dp"
-        android:text="@string/sync_setup_with_another_device_cta_title"
+        android:layout_marginHorizontal="@dimen/keyline_4"
+        android:layout_marginVertical="@dimen/keyline_5"
+        android:text="@string/sync_simplified_settings_sync_with_another_device_button"
         app:daxButtonSize="large"
-        app:icon="@drawable/ic_qr2_24" />
+        app:icon="@drawable/ic_qr2_24"
+        app:iconGravity="textStart" />
 
     <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginVertical="@dimen/keyline_4" />
+
+    <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/sync_simplified_settings_recover_section_header" />
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/recoverDataItem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:leadingIcon="@drawable/ic_sync_recovery_24"
-        app:primaryText="@string/sync_setup_single_recover_data_cta_title" />
+        app:primaryText="@string/sync_simplified_settings_recover_data_item" />
 
     <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginVertical="@dimen/keyline_4" />
+
+    <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/sync_simplified_settings_download_section_header" />
 
     <com.duckduckgo.sync.impl.ui.v2.GetOnOtherPlatformsListItem
         android:id="@+id/get_on_other_platforms_item"

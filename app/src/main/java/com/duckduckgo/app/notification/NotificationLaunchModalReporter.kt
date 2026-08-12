@@ -20,7 +20,7 @@ import android.app.Activity
 import android.os.Bundle
 import com.duckduckgo.browser.api.ActivityLifecycleCallbacks
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.modalcoordinator.api.ModalShownReporter
+import com.duckduckgo.promptscoordinator.api.ModalShownReporter
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import logcat.LogPriority.ERROR

@@ -967,7 +967,7 @@
     <string name="preOnboardingWidgetPromptSecondaryCta">Overslaan</string>
 
     <!-- Pre-onboarding: add to home screen -->
-    <string name="preOnboardingAddToDockTitle">Voeg me toe aan de onderkant van je scherm.</string>
+    <string name="preOnboardingDockStepTitle">Voeg me toe aan je favorietenrij.</string>
     <string name="preOnboardingAddToDockBody">Zoek het DuckDuckGo-pictogram op je beginscherm. Houd het vervolgens ingedrukt en sleep het naar zijn plaats. Dat is alles!</string>
     <string name="preOnboardingAddToDockPrimaryCta">Ik snap het!</string>
 

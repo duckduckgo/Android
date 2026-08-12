@@ -22,6 +22,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.sync.impl.SyncFeatureToggle
+import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SYNC_INTRO
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupIntroViewModel.Command.AbortFlow
@@ -45,6 +46,7 @@ class SyncSetupIntroViewModel @Inject constructor(
     private val syncFeatureToggle: SyncFeatureToggle,
     private val dispatchers: DispatcherProvider,
     private val syncSetupWideEvent: SyncSetupWideEvent,
+    private val syncPixels: SyncPixels,
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -88,6 +90,7 @@ class SyncSetupIntroViewModel @Inject constructor(
     }
 
     fun onStartRecoverDataClicked() {
+        syncPixels.fireRecoverSyncDataConfirmed()
         viewModelScope.launch {
             command.send(RecoverDataFlow)
         }

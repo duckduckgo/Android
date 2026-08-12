@@ -967,7 +967,7 @@
     <string name="preOnboardingWidgetPromptSecondaryCta">Ohita</string>
 
     <!-- Pre-onboarding: add to home screen -->
-    <string name="preOnboardingAddToDockTitle">Lisää minut näytön alareunaan.</string>
+    <string name="preOnboardingDockStepTitle">Lisää minut suosikkirivillesi.</string>
     <string name="preOnboardingAddToDockBody">Etsi DuckDuckGo-kuvake aloitusnäytöltäsi. Paina ja vedä se sitten paikalleen. Siinä kaikki!</string>
     <string name="preOnboardingAddToDockPrimaryCta">Selvä!</string>
 

@@ -71,7 +71,6 @@ interface ContextualNativeInputManager {
         // Invoked when the widget submits a prompt, in both INPUT and WEBVIEW modes. Routing every submit
         // through the ViewModel keeps prompt-building (and page-context attachment) in one place.
         onPromptSubmitted: (NativeInputPrompt) -> Unit = {},
-        onAskAboutTab: () -> Unit = {},
         onAskAboutPage: () -> Unit = {},
         onPageContextRemoved: () -> Unit = {},
         onVoiceChatRequested: () -> Unit = {},
@@ -127,7 +126,6 @@ class RealContextualNativeInputManager @Inject constructor(
         onCameraCaptureRequested: (ValueCallback<Array<Uri>>) -> Unit,
         onFilePickerRequested: (ValueCallback<Array<Uri>>, List<String>) -> Unit,
         onPromptSubmitted: (NativeInputPrompt) -> Unit,
-        onAskAboutTab: () -> Unit,
         onAskAboutPage: () -> Unit,
         onPageContextRemoved: () -> Unit,
         onVoiceChatRequested: () -> Unit,
@@ -141,7 +139,7 @@ class RealContextualNativeInputManager @Inject constructor(
         setupWidget(
             tabId, widget, chatIdFlow, onSearchSubmitted,
             onCameraCaptureRequested, onFilePickerRequested,
-            onPromptSubmitted, onAskAboutTab, onAskAboutPage, onPageContextRemoved,
+            onPromptSubmitted, onAskAboutPage, onPageContextRemoved,
             onVoiceChatRequested, onVoiceSearchRequested,
         )
         observeNativeInputSetting(lifecycleOwner)
@@ -215,7 +213,6 @@ class RealContextualNativeInputManager @Inject constructor(
         onCameraCaptureRequested: (ValueCallback<Array<Uri>>) -> Unit,
         onFilePickerRequested: (ValueCallback<Array<Uri>>, List<String>) -> Unit,
         onPromptSubmitted: (NativeInputPrompt) -> Unit,
-        onAskAboutTab: () -> Unit,
         onAskAboutPage: () -> Unit,
         onPageContextRemoved: () -> Unit,
         onVoiceChatRequested: () -> Unit,
@@ -233,7 +230,6 @@ class RealContextualNativeInputManager @Inject constructor(
             onFilePickerRequested = onFilePickerRequested,
         )
         widget.setContextualAttachmentActions(
-            onAskAboutTab = onAskAboutTab,
             onAskAboutPage = onAskAboutPage,
             onPageContextRemoved = onPageContextRemoved,
         )

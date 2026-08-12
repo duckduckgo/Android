@@ -1,0 +1,30 @@
+{
+    "duckplayer_buffering_hold_removed": {
+        "description": "Fires when the Duck Player buffering hold (poster + spinner shown while the YouTube player buffers) stops holding, reporting why and how long it lasted. Used to tune the spinner timeout and to spot holds that never resolve on their own. Fires once per hold, at removal; whether the spinner timeout elapsed first is carried by timed_out rather than by its own report.",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "reason",
+                "type": "string",
+                "description": "What ended the hold: the first video frame arrived, the video errored, the user tapped to dismiss once the spinner had timed out, or the overlay was torn down (e.g. a navigation).",
+                "enum": ["frame", "error", "tap_after_timeout", "torn_down"]
+            },
+            {
+                "key": "timed_out",
+                "type": "string",
+                "description": "Whether the spinner timeout elapsed before the hold was removed, meaning the wait was already being treated as hopeless.",
+                "enum": ["0", "1"]
+            },
+            {
+                "key": "duration",
+                "type": "string",
+                "description": "Bucketed hold lifetime in seconds, coarse enough to see the median and tail without carrying a per-session timing fingerprint. Boundaries are inclusive at the bottom, so a 5.0s hold reports '5-10'. The first bucket sits under the spinner delay, so it isolates holds that cleared before anything was drawn.",
+                "enum": ["0-1", "1-5", "5-10", "10-30", "30+"]
+            }
+        ],
+        "expires": "2027-04-30"
+    }
+}

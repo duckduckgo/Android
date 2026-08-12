@@ -7,10 +7,13 @@ from asana_release_utils import (
     get_public_release_tags,
     get_latest_public_release_tag,
     get_public_release_tag_before,
+    get_latest_release_tag_in_line,
+    get_commits_by_hashes,
     is_ancestor,
     extract_asana_task_links,
     resolve_task_id,
     _build_flexible_prefix_pattern,
+    build_release_includes_html,
     AsanaTaskLink,
 )
 
@@ -92,6 +95,91 @@ class TestGetPublicReleaseTagBefore:
             "5.264.0",
         ])
         assert get_public_release_tag_before(".", "5.264.0") == "5.262.0"
+
+
+# --- get_latest_release_tag_in_line ---
+
+
+class TestGetLatestReleaseTagInLine:
+    @patch("asana_release_utils.subprocess.run")
+    def test_returns_base_normal_when_no_prior_hotfix(self, mock_run):
+        mock_run.return_value = _mock_git_tags_result([
+            "5.283.0",
+            "5.284.0",
+        ])
+        assert get_latest_release_tag_in_line(".", "5.284.1") == "5.284.0"
+
+    @patch("asana_release_utils.subprocess.run")
+    def test_returns_newest_prior_hotfix(self, mock_run):
+        mock_run.return_value = _mock_git_tags_result([
+            "5.284.0",
+            "5.284.1",
+            "5.284.2",
+        ])
+        assert get_latest_release_tag_in_line(".", "5.284.3") == "5.284.2"
+
+    @patch("asana_release_utils.subprocess.run")
+    def test_ignores_patch_greater_or_equal(self, mock_run):
+        mock_run.return_value = _mock_git_tags_result([
+            "5.284.0",
+            "5.284.1",
+            "5.284.5",
+        ])
+        # Only tags with patch < 2 count.
+        assert get_latest_release_tag_in_line(".", "5.284.2") == "5.284.1"
+
+    @patch("asana_release_utils.subprocess.run")
+    def test_ignores_other_minor_lines(self, mock_run):
+        mock_run.return_value = _mock_git_tags_result([
+            "5.283.0",
+            "5.283.9",
+            "5.285.0",
+        ])
+        assert get_latest_release_tag_in_line(".", "5.284.1") is None
+
+    @patch("asana_release_utils.subprocess.run")
+    def test_returns_none_for_malformed_version(self, mock_run):
+        mock_run.return_value = _mock_git_tags_result(["5.284.0"])
+        assert get_latest_release_tag_in_line(".", "5.284.0-internal") is None
+
+
+# --- get_commits_by_hashes ---
+
+
+class TestGetCommitsByHashes:
+    @patch("asana_release_utils.Repo")
+    def test_resolves_each_hash(self, mock_repo_cls):
+        repo = mock_repo_cls.return_value
+        repo.commit.side_effect = lambda sha: _fake_commit(sha, f"msg {sha}")
+
+        commits = get_commits_by_hashes(".", ["aaa", "bbb"])
+
+        assert [c.hexsha for c in commits] == ["aaa", "bbb"]
+
+    @patch("asana_release_utils.Repo")
+    def test_skips_blank_hashes(self, mock_repo_cls):
+        repo = mock_repo_cls.return_value
+        repo.commit.side_effect = lambda sha: _fake_commit(sha, "msg")
+
+        commits = get_commits_by_hashes(".", ["aaa", "", "  "])
+
+        assert [c.hexsha for c in commits] == ["aaa"]
+
+    @patch("asana_release_utils.Repo")
+    def test_skips_unresolvable_hashes(self, mock_repo_cls):
+        repo = mock_repo_cls.return_value
+
+        def resolve(sha):
+            if sha == "bad":
+                raise ValueError("no such commit")
+            return _fake_commit(sha, "msg")
+
+        repo.commit.side_effect = resolve
+
+        commits = get_commits_by_hashes(".", ["aaa", "bad", "ccc"])
+
+        assert [c.hexsha for c in commits] == ["aaa", "ccc"]
+
 
 # --- extract_asana_task_links ---
 
@@ -409,3 +497,147 @@ class TestIsAncestor:
     def test_returns_false_when_exit_code_nonzero(self, mock_run):
         mock_run.return_value = MagicMock(returncode=1)
         assert is_ancestor(".", "5.283.1", "HEAD") is False
+
+
+# --- create-asana-hotfix-release.py pure helpers ---
+
+
+def _load_hotfix_module():
+    """Load create-asana-hotfix-release.py as a module (the hyphenated filename
+    blocks a plain `import`)."""
+    path = os.path.join(os.path.dirname(__file__), "create-asana-hotfix-release.py")
+    spec = importlib.util.spec_from_file_location("create_asana_hotfix_release", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+class TestParseCommitHashes:
+    def test_space_separated(self):
+        module = _load_hotfix_module()
+        assert module.parse_commit_hashes("aaa bbb ccc") == ["aaa", "bbb", "ccc"]
+
+    def test_comma_separated(self):
+        module = _load_hotfix_module()
+        assert module.parse_commit_hashes("aaa,bbb,ccc") == ["aaa", "bbb", "ccc"]
+
+    def test_mixed_and_extra_whitespace(self):
+        module = _load_hotfix_module()
+        assert module.parse_commit_hashes("  aaa,  bbb   ccc, ") == ["aaa", "bbb", "ccc"]
+
+    def test_empty(self):
+        module = _load_hotfix_module()
+        assert module.parse_commit_hashes("   ") == []
+
+
+class TestBaseNormalRelease:
+    def test_derives_base_normal(self):
+        module = _load_hotfix_module()
+        assert module.base_normal_release("5.284.1") == "5.284.0"
+
+    def test_base_normal_of_zero_patch(self):
+        module = _load_hotfix_module()
+        assert module.base_normal_release("5.284.0") == "5.284.0"
+
+    def test_returns_none_for_malformed(self):
+        module = _load_hotfix_module()
+        assert module.base_normal_release("5.284.1-internal") is None
+
+
+class TestDedupeLinksByTaskId:
+    def test_keeps_first_occurrence_and_drops_urlless(self):
+        module = _load_hotfix_module()
+        links = [
+            AsanaTaskLink(url="https://app.asana.com/0/p/111", commit_hash="c1"),
+            AsanaTaskLink(url="https://app.asana.com/0/p/222", commit_hash="c2"),
+            AsanaTaskLink(url="https://app.asana.com/0/p/111", commit_hash="c3"),  # dup task 111
+            AsanaTaskLink(url=None, commit_hash="c4"),  # no url
+        ]
+        result = module.dedupe_links_by_task_id(links)
+        assert [l.commit_hash for l in result] == ["c1", "c2"]
+
+
+class TestBuildReleaseIncludesHtml:
+    def test_single_section_when_no_previous_links(self):
+        links = [AsanaTaskLink(url="https://app.asana.com/1/x/task/111", commit_hash="c1")]
+        html = build_release_includes_html(links)
+        assert html == '<strong>This release includes:</strong><ul><li><a href="https://app.asana.com/1/x/task/111">111</a></li></ul>'
+        assert "Includes from" not in html
+
+    def test_two_sections_when_previous_links_given(self):
+        cherry = [AsanaTaskLink(url="https://app.asana.com/1/x/task/111", commit_hash="c1")]
+        prior = [AsanaTaskLink(url="https://app.asana.com/1/x/task/222", commit_hash="c2")]
+        html = build_release_includes_html(cherry, prior, "Includes from 5.287.1:")
+        assert html == (
+            '<strong>This release includes:</strong><ul><li><a href="https://app.asana.com/1/x/task/111">111</a></li></ul>'
+            '<strong>Includes from 5.287.1:</strong><ul><li><a href="https://app.asana.com/1/x/task/222">222</a></li></ul>'
+        )
+
+    def test_empty_previous_links_stays_single_section(self):
+        cherry = [AsanaTaskLink(url="https://app.asana.com/1/x/task/111", commit_hash="c1")]
+        html = build_release_includes_html(cherry, [], "Includes from 5.287.1:")
+        assert "Includes from" not in html
+
+
+class TestDryRun:
+    def _run_main(self, module, argv):
+        with patch.object(sys, "argv", argv):
+            return module.main()
+
+    def test_dry_run_makes_no_asana_calls(self, capsys):
+        module = _load_hotfix_module()
+        cherry = [AsanaTaskLink(url="https://app.asana.com/0/p/111", commit_hash="c1")]
+        shipped = [AsanaTaskLink(url="https://app.asana.com/0/p/222", commit_hash="c2")]
+
+        with patch.object(module, "collect_cherry_links", return_value=cherry), \
+             patch.object(module, "collect_shipped_links", return_value=shipped), \
+             patch.object(module, "asana") as mock_asana, \
+             patch.object(module, "create_asana_release_task") as mock_create, \
+             patch.object(module, "tag_tasks") as mock_tag, \
+             patch.object(module, "remove_tasks_from_project") as mock_remove:
+            rc = self._run_main(module, [
+                "prog",
+                "--tag", "5.287.2",
+                "--commit-hashes", "abc123",
+                "--trigger-phrase", "Task/Issue URL:",
+                "--dry-run",
+            ])
+
+        assert rc == 0
+        mock_asana.ApiClient.assert_not_called()
+        mock_create.assert_not_called()
+        mock_tag.assert_not_called()
+        mock_remove.assert_not_called()
+        # Dry-run prints nothing to stdout (that channel is reserved for the task URL).
+        assert capsys.readouterr().out == ""
+
+    def test_dry_run_does_not_require_asana_args(self, capsys):
+        module = _load_hotfix_module()
+        with patch.object(module, "collect_cherry_links", return_value=[]), \
+             patch.object(module, "collect_shipped_links", return_value=[]), \
+             patch.object(module, "asana"):
+            rc = self._run_main(module, [
+                "prog",
+                "--tag", "5.287.2",
+                "--commit-hashes", "abc123",
+                "--trigger-phrase", "Task/Issue URL:",
+                "--dry-run",
+            ])
+        assert rc == 0
+
+    def test_real_run_errors_when_asana_args_missing(self, capsys):
+        module = _load_hotfix_module()
+        cherry = [AsanaTaskLink(url="https://app.asana.com/0/p/111", commit_hash="c1")]
+        with patch.object(module, "collect_cherry_links", return_value=cherry), \
+             patch.object(module, "collect_shipped_links", return_value=[]), \
+             patch.object(module, "asana") as mock_asana, \
+             patch.object(module, "create_asana_release_task") as mock_create:
+            rc = self._run_main(module, [
+                "prog",
+                "--tag", "5.287.2",
+                "--commit-hashes", "abc123",
+                "--trigger-phrase", "Task/Issue URL:",
+            ])
+        assert rc == 1
+        mock_asana.ApiClient.assert_not_called()
+        mock_create.assert_not_called()

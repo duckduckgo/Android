@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.systemsearch
 
-import android.content.Intent
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -25,6 +24,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.onboarding.OnboardingPromptsExperimentMetrics
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.store.isNewUser
@@ -93,6 +93,7 @@ class SystemSearchViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val autocompleteHistoryDeleteFeature: AutocompleteHistoryDeleteFeature,
+    private val onboardingPromptsExperimentMetrics: OnboardingPromptsExperimentMetrics,
 ) : ViewModel(),
     EditSavedSiteDialogFragment.EditSavedSiteListener {
 
@@ -173,11 +174,10 @@ class SystemSearchViewModel @Inject constructor(
         data object ExitSearch : Command()
 
         data object LaunchDuckAiVoiceChat : Command()
-
-        data class LaunchAssistSearch(val intent: Intent) : Command()
     }
 
     private val isSearchOnly = MutableStateFlow(false)
+    private var launchedFromWidget = false
 
     val onboardingViewState: MutableLiveData<OnboardingViewState> = MutableLiveData()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
@@ -254,6 +254,15 @@ class SystemSearchViewModel @Inject constructor(
         isSearchOnly.value = launchedFromSearchOnlyWidget
     }
 
+    fun setLaunchedFromWidget(launchedFromWidget: Boolean) {
+        this.launchedFromWidget = launchedFromWidget
+    }
+    private fun fireWidgetSearchMetricIfLaunchedFromWidget(query: String) {
+        if (launchedFromWidget && query.isNotBlank()) {
+            appCoroutineScope.launch { onboardingPromptsExperimentMetrics.fireWidgetSearchMetric() }
+        }
+    }
+
     private fun currentOnboardingState(): OnboardingViewState = onboardingViewState.value!!
 
     fun resetViewState() {
@@ -306,6 +315,7 @@ class SystemSearchViewModel @Inject constructor(
     }
 
     fun onVoiceSearchResult(capturedText: String) {
+        fireWidgetSearchMetricIfLaunchedFromWidget(capturedText)
         command.value = Command.LaunchBrowser(query = capturedText)
     }
 
@@ -318,14 +328,11 @@ class SystemSearchViewModel @Inject constructor(
         command.value = Command.ExitSearch
     }
 
-    fun onDigitalAssistOpened(intent: Intent) {
+    fun onDigitalAssistOpened() {
         viewModelScope.launch {
-            command.value = when {
-                duckAiFeatureState.allowDuckAiAsDigitalAssistant.value && duckChat.isEnabled() -> {
-                    pixel.fire(AICHAT_VOICE_SESSION_DIGITAL_ASSISTANT_STARTED)
-                    Command.LaunchDuckAiVoiceChat
-                }
-                else -> Command.LaunchAssistSearch(intent)
+            if (duckAiFeatureState.allowDuckAiAsDigitalAssistant.value && duckChat.isEnabled()) {
+                pixel.fire(AICHAT_VOICE_SESSION_DIGITAL_ASSISTANT_STARTED)
+                command.value = Command.LaunchDuckAiVoiceChat
             }
         }
     }
@@ -358,6 +365,7 @@ class SystemSearchViewModel @Inject constructor(
             return
         }
 
+        fireWidgetSearchMetricIfLaunchedFromWidget(query)
         viewModelScope.launch {
             userStageStore.stageCompleted(AppStage.NEW)
             command.value = Command.LaunchBrowser(query.trim())
@@ -368,6 +376,7 @@ class SystemSearchViewModel @Inject constructor(
     fun userSubmittedAutocompleteResult(suggestion: AutoCompleteSuggestion) {
         when (suggestion) {
             is AutoCompleteSwitchToTabSuggestion -> {
+                fireWidgetSearchMetricIfLaunchedFromWidget(suggestion.phrase)
                 command.value = Command.LaunchBrowserAndSwitchToTab(suggestion.phrase, suggestion.tabId)
                 pixel.fire(INTERSTITIAL_LAUNCH_BROWSER_QUERY)
             }
@@ -382,6 +391,7 @@ class SystemSearchViewModel @Inject constructor(
             }
 
             else -> {
+                fireWidgetSearchMetricIfLaunchedFromWidget(suggestion.phrase)
                 command.value = Command.LaunchBrowser(suggestion.phrase)
                 pixel.fire(INTERSTITIAL_LAUNCH_BROWSER_QUERY)
             }

@@ -233,9 +233,10 @@ class RealDuckChatJSHelper @Inject constructor(
             REPORT_METRIC -> {
                 val reportMetric = ReportMetric.fromValue(data?.optString("metricName"))
                 val modelTier = ModelTier.fromValue(data?.optString("modelTier"))
+                val source = data?.optString("source")?.takeIf { it.isNotBlank() }
 
                 reportMetric?.let {
-                    duckChatPixels.sendReportMetricPixel(it, modelTier)
+                    duckChatPixels.sendReportMetricPixel(it, modelTier, source)
                 }
                 null
             }
@@ -412,6 +413,11 @@ class RealDuckChatJSHelper @Inject constructor(
                 false
             }
         }
+        val supportsSuggestions = withContext(dispatcherProvider.io()) {
+            duckChat.isDuckChatContextualModeEnabled() &&
+                mode == Mode.CONTEXTUAL &&
+                duckChatFeature.contextualSuggestedPrompts().isEnabled()
+        }
         val jsonPayload =
             JSONObject().apply {
                 put(PLATFORM, ANDROID)
@@ -420,6 +426,7 @@ class RealDuckChatJSHelper @Inject constructor(
                 put(SUPPORTS_OPENING_SETTINGS, true)
                 put(SUPPORTS_NATIVE_CHAT_INPUT, duckChat.isNativeChatInputEnabled())
                 put(SUPPORTS_NATIVE_PROMPT, duckChat.isNativeChatInputEnabled())
+                put(SUPPORTS_NATIVE_PROMPT_EDITING, duckChat.isNativePromptEditingEnabled())
                 put(SUPPORTS_CHAT_ID_RESTORATION, duckChat.isDuckChatFullScreenModeEnabled())
                 put(SUPPORTS_IMAGE_UPLOAD, duckChat.isImageUploadEnabled())
                 put(SUPPORTS_STANDALONE_MIGRATION, duckChat.isStandaloneMigrationEnabled())
@@ -433,6 +440,7 @@ class RealDuckChatJSHelper @Inject constructor(
                     duckChat.isDuckChatContextualModeEnabled() &&
                         duckChat.areMultipleContentAttachmentsEnabled(),
                 )
+                put(SUPPORTS_SUGGESTIONS, supportsSuggestions)
                 put(SUPPORTS_SUBSCRIPTION, supportsSubscription)
                 put(INSTALL_TYPE, if (appBuildConfig.isAppReinstall()) INSTALL_TYPE_RETURNING else INSTALL_TYPE_NEW)
                 getInstallAgeBucket()?.let { put(INSTALL_AGE, it) }
@@ -611,6 +619,7 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val SUPPORTS_OPENING_SETTINGS = "supportsOpeningSettings"
         private const val SUPPORTS_NATIVE_CHAT_INPUT = "supportsNativeChatInput"
         private const val SUPPORTS_NATIVE_PROMPT = "supportsNativePrompt"
+        private const val SUPPORTS_NATIVE_PROMPT_EDITING = "supportsNativePromptEditing"
         private const val SUPPORTS_IMAGE_UPLOAD = "supportsImageUpload"
         private const val SUPPORTS_CHAT_ID_RESTORATION = "supportsURLChatIDRestoration"
         private const val SUPPORTS_STANDALONE_MIGRATION = "supportsStandaloneMigration"
@@ -618,6 +627,7 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val SUPPORTS_CHAT_CONTEXTUAL_MODE = "supportsAIChatContextualMode"
         private const val SUPPORTS_CHAT_SYNC = "supportsAIChatSync"
         private const val SUPPORTS_PAGE_CONTEXT = "supportsPageContext"
+        private const val SUPPORTS_SUGGESTIONS = "supportsSuggestions"
         private const val SUPPORTS_MULTIPLE_PAGE_CONTEXT = "supportsMultipleContexts"
         private const val SUPPORTS_NATIVE_STORAGE = "supportsNativeStorage"
         private const val SUPPORTS_SUBSCRIPTION = "supportsSubscription"

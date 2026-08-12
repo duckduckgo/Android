@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.branddesignupdate.AppBrandDesignUpdateToggles
 import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
 import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.omnibar.OmnibarType
@@ -60,6 +61,7 @@ class AppearanceViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val tabSwitcherDataStore: TabSwitcherDataStore,
     private val addressBarTrackersAnimationManager: AddressBarTrackersAnimationManager,
+    private val appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles,
     omnibarRepository: OmnibarRepository,
 ) : ViewModel() {
     data class ViewState(
@@ -74,6 +76,7 @@ class AppearanceViewModel @Inject constructor(
         val isAddressBarTrackersAnimationEnabled: Boolean = true,
         val shouldShowAddressBarTrackersAnimationItem: Boolean = false,
         val shouldShowSplitOmnibarSettings: Boolean = false,
+        val showAppIconSettingFirst: Boolean = false,
     )
 
     sealed class Command {
@@ -118,6 +121,15 @@ class AppearanceViewModel @Inject constructor(
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
     fun commands(): Flow<Command> = command.receiveAsFlow()
+
+    init {
+        viewModelScope.launch {
+            val showAppIconSettingFirst = withContext(dispatcherProvider.io()) {
+                appBrandDesignUpdateToggles.appIcon().isEnabled()
+            }
+            viewState.update { it.copy(showAppIconSettingFirst = showAppIconSettingFirst) }
+        }
+    }
 
     private fun canForceDarkMode(theme: DuckDuckGoTheme = themingDataStore.theme): Boolean = theme != DuckDuckGoTheme.LIGHT
 

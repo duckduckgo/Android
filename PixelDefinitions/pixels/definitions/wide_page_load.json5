@@ -15,6 +15,8 @@
             "widePixelAppName",
             "widePixelFormFactor",
             "widePixelDevMode",
+            "widePixelMetaType",
+            "widePixelMetaVersion",
             {
                 "key": "feature.name",
                 "description": "Feature identifier for this wide event",
@@ -34,6 +36,31 @@
                 "key": "feature.data.ext.elapsed_time_to_escaped_fixed_progress_ms_bucketed",
                 "description": "Duration from page_start to page_escaped_fixed_progress, bucketed. Uses lower end of the bucket.",
                 "enum": ["0", "1000", "2000", "3000", "4000", "5000", "10000", "30000", "60000"]
+            },
+            {
+                "key": "feature.data.ext.elapsed_time_to_content_scope_experiments_ms_bucketed",
+                "description": "Duration from page_start until the active content scope experiments were resolved, bucketed. Uses lower end of the bucket. Recorded during the page_content_scope_experiments_resolved step, so it is absent when the navigation ended before the experiments resolved.",
+                "enum": ["0", "5", "10", "25", "50", "100", "200", "400", "800", "1600", "3200", "6400"]
+            },
+            {
+                "key": "feature.data.ext.elapsed_time_to_js_injection_complete_ms_bucketed",
+                "description": "Duration from page_start until every JS injector plugin has run for the navigation, content scope scripts among them, bucketed. Also covers resolving the active experiments and the browser tab's own page-started handling, so it is an upper bound on content scope injection rather than a measure of it alone. Uses lower end of the bucket. Recorded during the page_js_injection_complete step, so it is absent when the navigation ended before injection completed.",
+                "enum": ["0", "5", "10", "25", "50", "100", "200", "400", "800", "1600", "3200", "6400"]
+            },
+            {
+                "key": "feature.data.ext.content_scope_injection_optimized",
+                "description": "Whether the optimized content scope script assembly path is enabled. Temporary: recorded to compare the durations above across kill-switch states during rollout of the content scope performance work.",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.content_scope_messaging_optimized",
+                "description": "Whether inbound content scope JS messages are queued off the WebView JavaBridge thread. Temporary: recorded to compare overall page load time across kill-switch states during rollout of the content scope performance work.",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.content_scope_experiments_cached",
+                "description": "Whether resolved content scope experiments are held between privacy config updates. Temporary: recorded to compare the durations above across kill-switch states during rollout of the content scope performance work.",
+                "type": "boolean"
             },
             {
                 "key": "feature.data.ext.webview_version",
@@ -68,6 +95,16 @@
             {
                 "key": "feature.data.ext.step.page_start",
                 "description": "Parameter present when page load begins",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.page_content_scope_experiments_resolved",
+                "description": "Parameter present when the active content scope experiments have been resolved for the navigation",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.page_js_injection_complete",
+                "description": "Parameter present when every JS injector plugin has run for the navigation",
                 "type": "boolean"
             },
             {

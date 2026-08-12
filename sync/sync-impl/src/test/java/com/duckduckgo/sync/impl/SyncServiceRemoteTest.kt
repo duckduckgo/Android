@@ -17,6 +17,8 @@
 package com.duckduckgo.sync.impl
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.TestSyncFixtures.accountCreatedFailDupUser
 import com.duckduckgo.sync.TestSyncFixtures.accountCreatedFailInvalid
 import com.duckduckgo.sync.TestSyncFixtures.accountCreatedSuccess
@@ -72,20 +74,28 @@ import com.duckduckgo.sync.TestSyncFixtures.token
 import com.duckduckgo.sync.TestSyncFixtures.untilTimestamp
 import com.duckduckgo.sync.TestSyncFixtures.userId
 import com.duckduckgo.sync.store.*
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.*
 import retrofit2.Call
 import retrofit2.HttpException
+import retrofit2.Response
 
 @RunWith(AndroidJUnit4::class)
 class SyncServiceRemoteTest {
 
     private val syncService: SyncService = mock()
     private val syncStore: SyncStore = mock()
-    private val syncRemote = SyncServiceRemote(syncService, syncStore)
+    private val setKeysIfAbsentCall: SetKeysIfAbsentCall = mock()
+    private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java).apply {
+        preventStaleTokenLogout().setRawStoredState(State(true))
+    }
+    private val syncRemote = SyncServiceRemote(syncService, syncStore, setKeysIfAbsentCall, syncFeature)
 
     @Test
     fun whenCreateAccountSucceedsThenReturnAccountCreatedSuccess() {
@@ -407,5 +417,87 @@ class SyncServiceRemoteTest {
         val result = syncRemote.getAccessCredentials(token)
 
         assertEquals(Result.Error(reason = "GetAccessCredentials: empty body"), result)
+    }
+
+    @Test
+    fun whenSetKeysIfAbsentReturnsInvalidCredentialsThenClearStore() {
+        whenever(syncStore.token).thenReturn(token)
+        whenever(setKeysIfAbsentCall.execute(any(), any(), any()))
+            .thenReturn(Result.Error(code = API_CODE.INVALID_LOGIN_CREDENTIALS.code, reason = "unexpected status code"))
+
+        syncRemote.setKeysIfAbsent(token, "account_info", emptyList())
+
+        verify(syncStore).clearAll()
+    }
+
+    @Test
+    fun whenSetKeysIfAbsentReturnsInvalidCredentialsForRotatedTokenThenDoNotClearStore() {
+        whenever(syncStore.token).thenReturn("newRotatedToken")
+        whenever(setKeysIfAbsentCall.execute(any(), any(), any()))
+            .thenReturn(Result.Error(code = API_CODE.INVALID_LOGIN_CREDENTIALS.code, reason = "unexpected status code"))
+
+        syncRemote.setKeysIfAbsent(token, "account_info", emptyList())
+
+        verify(syncStore, never()).clearAll()
+    }
+
+    @Test
+    fun whenPreventStaleTokenLogoutDisabledAndInvalidCredentialsForRotatedTokenThenClearStore() {
+        syncFeature.preventStaleTokenLogout().setRawStoredState(State(false))
+        whenever(syncStore.token).thenReturn("newRotatedToken")
+        whenever(setKeysIfAbsentCall.execute(any(), any(), any()))
+            .thenReturn(Result.Error(code = API_CODE.INVALID_LOGIN_CREDENTIALS.code, reason = "unexpected status code"))
+
+        syncRemote.setKeysIfAbsent(token, "account_info", emptyList())
+
+        verify(syncStore).clearAll()
+    }
+
+    @Test
+    fun whenPatchThisDeviceSucceedsThenSendCurrentDeviceIdAndReturnUpdatedDevices() {
+        val body = PatchDevicesResponse(
+            devicesV2 = listOf(DeviceV2(deviceId = deviceId, deviceInfo = "device.info.jwe", credentialId = "ddg")),
+        )
+        val call: Call<PatchDevicesResponse> = mock()
+        whenever(syncStore.deviceId).thenReturn(deviceId)
+        whenever(syncService.patchDevices(anyString(), any())).thenReturn(call)
+        whenever(call.execute()).thenReturn(Response.success(body))
+
+        val result = syncRemote.patchThisDevice(token, "encName", "encType", "device.info.jwe")
+
+        assertEquals(Result.Success(body), result)
+        argumentCaptor<PatchDevicesRequest>().apply {
+            verify(syncService).patchDevices(eq("Bearer $token"), capture())
+            assertEquals(listOf(DeviceUpdate(id = deviceId, name = "encName", type = "encType", info = "device.info.jwe")), firstValue.updates)
+        }
+        verify(syncStore, never()).clearAll()
+    }
+
+    @Test
+    fun whenPatchThisDeviceAndNoDeviceIdThenReturnErrorWithoutCallingService() {
+        whenever(syncStore.deviceId).thenReturn(null)
+
+        val result = syncRemote.patchThisDevice(token, "encName", "encType", "device.info.jwe")
+
+        assertTrue(result is Result.Error)
+        verify(syncService, never()).patchDevices(anyString(), any())
+    }
+
+    @Test
+    fun whenPatchThisDeviceReturnsInvalidCredentialsThenClearStore() {
+        val call: Call<PatchDevicesResponse> = mock()
+        whenever(syncStore.deviceId).thenReturn(deviceId)
+        whenever(syncService.patchDevices(anyString(), any())).thenReturn(call)
+        whenever(call.execute()).thenReturn(
+            Response.error(
+                API_CODE.INVALID_LOGIN_CREDENTIALS.code,
+                """{"code":${API_CODE.INVALID_LOGIN_CREDENTIALS.code},"error":"invalid_login_credentials"}"""
+                    .toResponseBody("application/json".toMediaTypeOrNull()),
+            ),
+        )
+
+        syncRemote.patchThisDevice(token, "encName", "encType", "device.info.jwe")
+
+        verify(syncStore).clearAll()
     }
 }

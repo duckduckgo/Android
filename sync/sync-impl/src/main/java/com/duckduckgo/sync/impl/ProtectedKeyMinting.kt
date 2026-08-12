@@ -25,7 +25,7 @@ import java.util.UUID
 /** A freshly-minted protected key with its ddg-wrap [entry] and the underlying raw private bytes,
  *  so callers can produce additional wrappings (e.g. 3party) under the same `kid` without
  *  decrypting the ddg-wrap a second time. */
-internal data class MintedProtectedKey(
+class MintedProtectedKey(
     val entry: ProtectedKeyEntry,
     val rawPrivateKeyBytes: ByteArray,
 )
@@ -54,12 +54,10 @@ internal fun mintDdgWrappedProtectedKey(
         Base64.decode(rsa.privateKeyBase64, Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING)
     }.getOrElse { return it.asLoggedError("$errorPrefix: failed to decode private key bytes") }
 
-    val ddgEncryptedPrivateKey = runCatching {
-        val result = nativeLib.encryptData(privateKeyBytes, accountSecretKey).also {
-            it.checkResult("$errorPrefix: libsodium encryption of private key failed")
-        }
-        Base64.encodeToString(result.encryptedData, Base64.NO_WRAP).applyUrlSafetyFromB64()
-    }.getOrElse { return it.asErrorResult() }
+    val ddgEncryptedPrivateKey = when (val wrapped = ddgWrapPrivateKey(privateKeyBytes, accountSecretKey, nativeLib, errorPrefix)) {
+        is Success -> wrapped.data
+        is Result.Error -> return wrapped
+    }
 
     val entry = ProtectedKeyEntry(
         kid = UUID.randomUUID().toString(),
@@ -70,3 +68,19 @@ internal fun mintDdgWrappedProtectedKey(
     )
     return Success(MintedProtectedKey(entry = entry, rawPrivateKeyBytes = privateKeyBytes))
 }
+
+/**
+ * Wrap raw private-key bytes for the `ddg` credential: libsodium-secretbox under the account secret key, base64url-encoded for the wire.
+ * The inverse of [ProtectedKeyUnwrapper]'s ddg path, shared by fresh mints and re-wraps of an existing key.
+ */
+internal fun ddgWrapPrivateKey(
+    rawPrivateKeyBytes: ByteArray,
+    accountSecretKey: String,
+    nativeLib: SyncLib,
+    errorPrefix: String,
+): Result<String> = runCatching {
+    val encrypted = nativeLib.encryptData(rawPrivateKeyBytes, accountSecretKey).also {
+        it.checkResult("$errorPrefix: libsodium encryption of private key failed")
+    }
+    Success(Base64.encodeToString(encrypted.encryptedData, Base64.NO_WRAP).applyUrlSafetyFromB64())
+}.getOrElse { it.asErrorResult() }

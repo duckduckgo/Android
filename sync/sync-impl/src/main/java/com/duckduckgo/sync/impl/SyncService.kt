@@ -61,6 +61,12 @@ interface SyncService {
         @Header("Authorization") token: String,
     ): Call<DeviceResponse>
 
+    @PATCH("$SYNC_PROD_ENVIRONMENT_URL/sync/devices")
+    fun patchDevices(
+        @Header("Authorization") token: String,
+        @Body request: PatchDevicesRequest,
+    ): Call<PatchDevicesResponse>
+
     @POST("$SYNC_PROD_ENVIRONMENT_URL/sync/connect")
     fun connect(
         @Header("Authorization") token: String,
@@ -135,6 +141,16 @@ interface SyncService {
     fun getProtectedKeys(
         @Header("Authorization") token: String,
     ): Call<ProtectedKeysResponse>
+
+    /**
+     * First-writer-wins registration for a purpose-scoped protected key.
+     */
+    @POST("$SYNC_PROD_ENVIRONMENT_URL/sync/keys/purpose/{purpose}/set-if-absent")
+    fun setKeysIfAbsent(
+        @Header("Authorization") token: String,
+        @Path("purpose") purpose: String,
+        @Body request: SetKeysIfAbsentRequest,
+    ): Call<SetKeyIfAbsentResponse>
 
     @GET("$SYNC_PROD_ENVIRONMENT_URL/sync/access-credentials")
     fun getAccessCredentials(
@@ -247,13 +263,38 @@ data class Device(
     @field:Json(name = "jw_iat") val jwIat: String,
 )
 
-// `name` and `type` are encrypted with the credential in `credentialId`.
+/**
+ * `name` and `type` are encrypted with the credential in `credentialId`
+ * `info` is the cross-credential `device_info` JWE (encrypted under the account_info key).
+ */
 data class DeviceV2(
     @field:Json(name = "id") val deviceId: String? = null,
     @field:Json(name = "name") val deviceName: String? = null,
     @field:Json(name = "type") val deviceType: String? = null,
+    @field:Json(name = "info") val deviceInfo: String? = null,
     @field:Json(name = "jw_iat") val jwIat: String? = null,
     @field:Json(name = "credential_id") val credentialId: String? = null,
+)
+
+/** Request body for PATCH /sync/devices. Exactly one [DeviceUpdate], targeting the current device. */
+data class PatchDevicesRequest(
+    val updates: List<DeviceUpdate>,
+)
+
+/**
+ * A single device update. [id] must be the current device id.
+ * A null field is left unchanged, except [info], which the server clears when it is omitted, so always send the current value.
+ */
+data class DeviceUpdate(
+    @field:Json(name = "id") val id: String,
+    @field:Json(name = "name") val name: String? = null,
+    @field:Json(name = "type") val type: String? = null,
+    @field:Json(name = "info") val info: String? = null,
+)
+
+data class PatchDevicesResponse(
+    val devices: List<Device> = emptyList(),
+    @field:Json(name = "devices_v2") val devicesV2: List<DeviceV2> = emptyList(),
 )
 
 data class ErrorResponse(
@@ -272,6 +313,24 @@ data class TokenRescopeResponse(
 /** Response from GET /sync/keys — the account's protected keys for all purposes. */
 data class ProtectedKeysResponse(
     val keys: List<ProtectedKeyEntry>,
+)
+
+/**
+ * Request body for POST /sync/keys/purpose/{purpose}/set-if-absent
+ * one entry per credential (ddg/3party) so both wrapped copies are stored atomically.
+ * */
+data class SetKeysIfAbsentRequest(
+    val keys: List<ProtectedKeyEntry>,
+)
+
+data class SetKeyIfAbsentResponse(
+    val keys: List<AccountInfoKeyWire> = emptyList(),
+)
+
+// Response only returns the winning key ID + public key
+data class AccountInfoKeyWire(
+    val kid: String,
+    @field:Json(name = "public_key") val publicKey: RsaJwk? = null,
 )
 
 data class AccessCredentialsResponse(

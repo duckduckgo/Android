@@ -277,4 +277,170 @@
     <string name="sync_v2_already_paired_title">Redan synkroniserat.</string>
     <string name="sync_v2_already_paired_message">Enheterna är redan anslutna till Sync &amp; Backup.</string>
 
+    <!-- Simplified Sync -->
+
+    <!-- Sync settings screen: header -->
+    <string name="sync_simplified_settings_header_headline_disabled">Håll DuckDuckGo synkroniserad!</string>
+    <string name="sync_simplified_settings_header_headline_enabled">DuckDuckGo är synkroniserad.</string>
+    <string name="sync_simplified_settings_header_body_disabled">Synkronisera och säkerhetskopiera dina data för automatisk ifyllning och bokmärken med heltäckande kryptering mellan dina DuckDuckGo-appar.</string>
+    <string name="sync_simplified_settings_header_body_disabled_with_duck_ai">Synkronisera och säkerhetskopiera din data för automatisk ifyllning, bokmärken och Duck.ai chattar med heltäckande kryptering mellan dina DuckDuckGo appar.</string>
+    <string name="sync_simplified_settings_header_body_enabled">Dina bokmärken och data för automatisk ifyllning synkroniseras och säkerhetskopieras med heltäckande kryptering.</string>
+    <string name="sync_simplified_settings_header_body_enabled_with_duck_ai">Dina bokmärken, data för automatisk ifyllning och Duck.ai-chattar synkroniseras och säkerhetskopieras med heltäckande kryptering.</string>
+
+    <!-- Sync settings screen: sync disabled state -->
+    <string name="sync_simplified_settings_sync_this_device_item">Synkronisera den här enheten</string>
+    <string name="sync_simplified_settings_sync_with_another_device_button">Synkronisera med en annan enhet</string>
+    <string name="sync_simplified_settings_recover_section_header">Återställ synkroniserade data</string>
+    <string name="sync_simplified_settings_recover_data_item">Jag har en återställningskod</string>
+
+    <!-- Sync settings screen: sync enabled state -->
+    <string name="sync_simplified_settings_devices_section_header">Mina enheter</string>
+    <string name="sync_simplified_settings_local_device_item_hint">Denna enhet</string>
+    <string name="sync_simplified_settings_sync_with_another_device_item">Synkronisera med en annan enhet</string>
+    <string name="sync_simplified_settings_download_section_header">Nedladdning</string>
+    <string name="sync_simplified_settings_bookmarks_section_header">Bokmärken</string>
+    <string name="sync_simplified_settings_recovery_section_header">Återställning</string>
+    <string name="sync_simplified_settings_restore_on_reinstall_item">Återställ vid ominstallation av appen</string>
+    <string name="sync_simplified_settings_restore_on_reinstall_item_hint">Om du installerar om DuckDuckGo-appen frågar vi dig om du vill återställa dina data på den här enheten.</string>
+    <string name="sync_simplified_settings_copy_recovery_code_item">Kopiera din återställningskod</string>
+    <string name="sync_simplified_settings_download_recovery_code_item">Ladda ner din återställningskod</string>
+    <string name="sync_simplified_settings_download_recovery_code_item_hint">Använd den här koden för att återställa dina data om du förlorar åtkomsten till den här enheten.</string>
+    <string name="sync_simplified_settings_data_expiration_notice">Sync &amp; Backup-data kan inte återställas efter 18 månaders inaktivitet. <annotation type="learn_more_link">Läs mer</annotation></string>
+    <string name="sync_simplified_settings_delete_account_item">Stäng av och radera serverdata</string>
+    <string name="sync_simplified_settings_storage_permission_message">Du måste ha åtkomst till lagring för att spara PDF för återställning</string>
+    <string name="sync_simplified_settings_learn_more_screen_title">Synkronisering och säkerhetskopiering</string>
+
+    <!-- Sync settings screen: both states -->
+    <string name="sync_simplified_settings_notify_me_title">Meddelanden är inaktiverade</string>
+    <string name="sync_simplified_settings_notify_me_body">Få ett meddelande om ett fel uppstår under Sync &amp; Backup.</string>
+    <string name="sync_simplified_settings_get_other_devices_item">Skaffa DuckDuckGo på andra enheter</string>
+    <string name="sync_simplified_settings_get_desktop_browser_item">Hämta webbläsare för dator</string>
+
+    <!-- Sync settings screen: delete server data dialog -->
+    <string name="sync_simplified_settings_delete_server_data_dialog_title">Inaktivera Sync &amp; Backup och radera serverdata?</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_body">Alla enheter som använder Sync &amp; Backup kommer att kopplas bort och dina synkroniserade data raderas från servern.</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_primary_button">Radera serverdata</string>
+    <string name="sync_simplified_settings_delete_server_data_dialog_secondary_button">Avbryt</string>
+
+    <!-- Sync settings screen: require device passcode dialog -->
+    <string name="sync_simplified_settings_require_passcode_dialog_title">Säkra din enhet för att använda Sync &amp; Backup</string>
+    <string name="sync_simplified_settings_require_passcode_dialog_body">Låsmönster, PIN-kod eller biometri för enhet krävs för att använda Sync &amp; Backup.</string>
+    <string name="sync_simplified_settings_require_passcode_dialog_primary_button">Gå till inställningarna</string>
+
+    <!-- Sync This Device screen -->
+    <string name="sync_simplified_setup_header_headline">Synkronisera den här enheten med en dator i närheten.</string>
+    <string name="sync_simplified_setup_header_body">Vi hjälper dig att synkronisera dina enheter.</string>
+    <string name="sync_simplified_setup_primary_button">Synkronisera med en annan enhet</string>
+    <string name="sync_simplified_setup_secondary_button">Synkronisera endast den här enheten</string>
+    <string name="sync_simplified_setup_secondary_button_syncing">Ansluter …</string>
+
+    <!-- Recover Synced Data screen -->
+    <string name="sync_simplified_recover_data_headline">Återställ dina synkroniserade data</string>
+    <string name="sync_simplified_recover_data_body">Du behöver den återställningskod som du fick när du konfigurerade Sync &amp; Backup. Du kan ha sparat koden som en PDF-fil på enheten du använde.</string>
+    <string name="sync_simplified_recover_data_primary_button">Återställ synkroniserade data</string>
+
+    <!-- Previous Session Ready screen -->
+    <string name="sync_simplified_previous_session_headline">Din tidigare Sync &amp; Backup-session är klar.</string>
+    <string name="sync_simplified_previous_session_body">Återuppta din Sync &amp; Backup-session för att återställa dina bokmärken, lösenord med mera, eller fortsätt med en ny installation.</string>
+    <string name="sync_simplified_previous_session_primary_button">Återuppta Sync &amp; Backup</string>
+    <string name="sync_simplified_previous_session_secondary_button">Ställ in ny synk</string>
+
+    <!-- Scanner screen: toolbar and tabs -->
+    <string name="sync_simplified_scanner_show_qr_code_content_description">Visa QR-kod</string>
+    <string name="sync_simplified_scanner_camera_tab_label">Skanna QR-kod</string>
+    <string name="sync_simplified_scanner_manual_entry_tab_label">Ange kod</string>
+
+    <!-- Scanner screen: camera tab -->
+    <string name="sync_simplified_scanner_camera_header_headline">Skanna QR-kod för att synkronisera</string>
+    <string name="sync_simplified_scanner_camera_header_body">Öppna <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo för dator</annotation></b>\n<annotation type="gap">\n</annotation>och gå till <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Synkronisera med en annan enhet</annotation></string>
+    <string name="sync_simplified_scanner_camera_primary_button">Jag är redo att skanna</string>
+    <string name="sync_simplified_scanner_camera_invalid_code_message">Den skannade koden är tyvärr ogiltig.</string>
+    <string name="sync_simplified_scanner_no_permission_headline">Åtkomst till kamera krävs</string>
+    <string name="sync_simplified_scanner_no_permission_body">Gå till enhetens inställningar och ge denna app åtkomst till din kamera.</string>
+    <string name="sync_simplified_scanner_no_permission_primary_button">Gå till inställningarna</string>
+    <string name="sync_simplified_scanner_no_hardware_headline">Kameran är inte tillgänglig</string>
+
+    <!-- Scanner screen: manual entry tab -->
+    <string name="sync_simplified_scanner_manual_entry_header_headline">Ange synkroniseringskod</string>
+    <string name="sync_simplified_scanner_manual_entry_header_body">Öppna din andra <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo-app</annotation></b>\n<annotation type="gap">\n</annotation>Gå till <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Synkronisera med en annan enhet</annotation> › <annotation type="highlight">Kopiera textkod</annotation></string>
+    <string name="sync_simplified_scanner_manual_entry_example_code_label">Exempelkod:</string>
+    <string name="sync_simplified_scanner_manual_entry_primary_button">Klistra in synkroniseringskod</string>
+    <string name="sync_simplified_scanner_manual_entry_invalid_code_message">Den inklistrade koden är tyvärr ogiltig.</string>
+
+    <!-- QR Code screen -->
+    <string name="sync_simplified_qr_code_screen_title">QR-kod</string>
+    <string name="sync_simplified_qr_code_header_headline">Skanna från en annan enhet</string>
+    <string name="sync_simplified_qr_code_header_body">Öppna <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>på en annan enhet och gå till <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Synkronisera med en annan enhet</annotation> och skanna den här koden:</string>
+    <string name="sync_simplified_qr_code_copy_button">Kopiera textkod</string>
+    <string name="sync_simplified_qr_code_share_button">Dela</string>
+    <string name="sync_simplified_qr_code_copied_message">Återställningskod kopierad</string>
+
+    <!-- Pairing screen -->
+    <string name="sync_simplified_pairing_headline">Sync &amp; Backup är krypterad på alla dina enheter.</string>
+    <string name="sync_simplified_pairing_headline_recovery">Återställer data</string>
+    <string name="sync_simplified_pairing_body">Ansluter …</string>
+
+    <!-- Pairing dialogs, shown on the QR Code and Pairing screens -->
+    <string name="sync_simplified_pairing_dialog_host_title">Synkronisera ny enhet?</string>
+    <string name="sync_simplified_pairing_dialog_host_primary_button">Synkronisera nu</string>
+    <string name="sync_simplified_pairing_dialog_host_secondary_button">Avbryt</string>
+    <string name="sync_simplified_pairing_dialog_joiner_title">Synkronisera ny enhet?</string>
+    <string name="sync_simplified_pairing_dialog_joiner_primary_button">Synkronisera nu</string>
+    <string name="sync_simplified_pairing_dialog_joiner_secondary_button">Avbryt</string>
+    <string name="sync_simplified_pairing_dialog_acknowledgment_title">Bekräfta på din andra enhet ...</string>
+    <string name="sync_simplified_pairing_dialog_acknowledgment_primary_button">Jag förstår</string>
+
+    <!-- Recovery Code screen -->
+    <string name="sync_simplified_recovery_code_headline" instruction="Placeholder is a device name. e.g., Samsung S23">%1$s har lagts till i Sync &amp; Backup.</string>
+    <string name="sync_simplified_recovery_code_body">Använd den här koden för att återställa dina data om du förlorar åtkomst till den här enheten. Förvara den säkert.</string>
+    <string name="sync_simplified_recovery_code_label">Återställningskod</string>
+    <string name="sync_simplified_recovery_code_download_button">Ladda ner din återställningskod</string>
+    <string name="sync_simplified_recovery_code_restore_on_reinstall_item">Återställ vid ominstallation av appen</string>
+    <string name="sync_simplified_recovery_code_restore_on_reinstall_item_hint">Om du installerar om DuckDuckGo-appen frågar vi dig om du vill återställa dina data på den här enheten.</string>
+    <string name="sync_simplified_recovery_code_primary_button">Klart</string>
+    <string name="sync_simplified_recovery_code_copied_message">Återställningskod kopierad</string>
+    <string name="sync_simplified_recovery_code_storage_permission_message">Du måste ha åtkomst till lagring för att spara PDF för återställning</string>
+
+    <!-- Edit Device screen -->
+    <string name="sync_simplified_edit_device_header_status">Synkroniserad</string>
+    <string name="sync_simplified_edit_device_edit_name_item">Redigera namn</string>
+    <string name="sync_simplified_edit_device_remove_item">Ta bort enhet</string>
+    <string name="sync_simplified_edit_device_sync_this_device_item">Synkronisera den här enheten</string>
+    <string name="sync_simplified_edit_device_remove_notice_this_device">Den här enheten kommer inte längre att få tillgång till dina synkroniserade data om du tar bort den.</string>
+    <string name="sync_simplified_edit_device_remove_notice_another_device">Den här enheten kommer inte längre att få tillgång till dina synkroniserade data om detta stängs av.</string>
+
+    <!-- Edit Device screen: edit name dialog -->
+    <string name="sync_simplified_edit_device_edit_name_dialog_title">Redigera namn</string>
+    <string name="sync_simplified_edit_device_edit_name_dialog_primary_button">Klart</string>
+    <string name="sync_simplified_edit_device_edit_name_dialog_secondary_button">Avbryt</string>
+
+    <!-- Edit Device screen: remove device dialog -->
+    <string name="sync_simplified_edit_device_remove_dialog_title">Vill du ta bort enheten?</string>
+    <string name="sync_simplified_edit_device_remove_dialog_body" instruction="Placeholder is a device name. e.g., Samsung S23">”%1$s” kommer inte längre att få tillgång till dina synkroniserade data.</string>
+    <string name="sync_simplified_edit_device_remove_dialog_primary_button">Ta bort</string>
+    <string name="sync_simplified_edit_device_remove_dialog_secondary_button">Avbryt</string>
+
+    <!-- Edit Device screen: turn off sync dialog -->
+    <string name="sync_simplified_edit_device_turn_off_dialog_title">Inaktivera Sync &amp; Backup?</string>
+    <string name="sync_simplified_edit_device_turn_off_dialog_body">Den här enheten kommer inte längre att få tillgång till dina synkroniserade data på andra enheter.</string>
+    <string name="sync_simplified_edit_device_turn_off_dialog_primary_button">Inaktivera</string>
+    <string name="sync_simplified_edit_device_turn_off_dialog_secondary_button">Avbryt</string>
+
+    <!-- Error dialog, shared across Simplified Sync screens -->
+    <string name="sync_simplified_error_dialog_title">Sync &amp; Backup</string>
+    <string name="sync_simplified_error_dialog_primary_button">OK</string>
+    <string name="sync_simplified_error_dialog_generic_body">Något gick fel</string>
+    <string name="sync_simplified_error_dialog_create_account_body">Det gick inte att ansluta till servern.</string>
+    <string name="sync_simplified_error_dialog_edit_device_body">Det gick inte att uppdatera enhetens namn.</string>
+    <string name="sync_simplified_error_dialog_recovery_pdf_body">Det gick inte att skapa återställnings-PDF.</string>
+    <string name="sync_simplified_error_dialog_recovery_code_body">Det gick inte att hämta återställningskod.</string>
+    <string name="sync_simplified_pairing_failed_generic_message">Något gick fel.</string>
+
+    <!-- Deep link setup: confirmation dialog and device-auth prompt, shown on the settings screen when an inbound sync pairing link is opened -->
+    <string name="sync_simplified_deep_link_confirmation_dialog_title">Synkronisera ny enhet?</string>
+    <string name="sync_simplified_deep_link_confirmation_dialog_body" instruction="Placeholder is a device name. e.g., Samsung S23">”%1$s” kommer få tillgång till dina synkroniserade DuckDuckGo-data.</string>
+    <string name="sync_simplified_deep_link_confirmation_dialog_primary_button">Synkronisera nu</string>
+    <string name="sync_simplified_deep_link_confirmation_dialog_secondary_button">Avbryt</string>
+    <string name="sync_simplified_deep_link_auth_prompt_title">Ställ in Sync &amp; Backup</string>
+    <string name="sync_simplified_deep_link_auth_prompt_message">Lås upp enheten för att konfigurera Sync &amp; Backup</string>
 </resources>

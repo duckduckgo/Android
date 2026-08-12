@@ -45,7 +45,6 @@ import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeature
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
@@ -103,9 +102,6 @@ class BrowserViewModelTest {
 
     @Mock private lateinit var mockAdditionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts
 
-    @Mock private lateinit var mockDuckAIFeatureState: DuckAiFeatureState
-    private val mockDuckAiFullScreenMode = MutableStateFlow(false)
-
     private val mockNtpAfterIdleManager: NtpAfterIdleManager = mock()
 
     private val browserModeFlow = MutableStateFlow(BrowserMode.REGULAR)
@@ -148,7 +144,6 @@ class BrowserViewModelTest {
         runTest {
             whenever(mockTabRepository.add()).thenReturn(TAB_ID)
             whenever(mockOmnibarEntryConverter.convertQueryToUrl(any(), any(), any(), any())).then { it.arguments.first() }
-            whenever(mockDuckAIFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
         }
     }
 
@@ -679,39 +674,6 @@ class BrowserViewModelTest {
         }
     }
 
-    @Test
-    fun `when openDuckChat called and tabs are null then command is sent with 0 tabs`() = runTest {
-        doReturn(MutableLiveData(null)).whenever(mockTabRepository).liveTabs
-        initTestee()
-
-        testee.openDuckChat(duckChatUrl = "duck://chat", duckChatSessionActive = false, withTransition = false)
-
-        testee.commands.test {
-            val command = awaitItem()
-            assertTrue(command is Command.OpenDuckChat)
-            command as Command.OpenDuckChat
-            assertEquals(0, command.tabs)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun `when openDuckChat called then command is sent with correct tab count`() = runTest {
-        val tabs = listOf(TabEntity("1", "", "", position = 0))
-        doReturn(MutableLiveData(tabs)).whenever(mockTabRepository).liveTabs
-        initTestee()
-
-        testee.openDuckChat(duckChatUrl = "duck://chat", duckChatSessionActive = false, withTransition = false)
-
-        testee.commands.test {
-            val command = awaitItem()
-            assertTrue(command is Command.OpenDuckChat)
-            command as Command.OpenDuckChat
-            assertEquals(tabs.size, command.tabs)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
     // --- Fire mode: switchToMode ---
 
     @Test
@@ -773,7 +735,6 @@ class BrowserViewModelTest {
             skipUrlConversionOnNewTabFeature = skipUrlConversionOnNewTabFeature,
             additionalDefaultBrowserPrompts = mockAdditionalDefaultBrowserPrompts,
             swipingTabsFeature = swipingTabsFeatureProvider,
-            duckAiFeatureState = mockDuckAIFeatureState,
             ntpAfterIdleManager = mockNtpAfterIdleManager,
             androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,
             browserModeStateHolder = mockBrowserModeStateHolder,
@@ -785,7 +746,6 @@ class BrowserViewModelTest {
     private suspend fun initSuspendTestee() {
         whenever(mockTabRepository.add()).thenReturn(TAB_ID)
         whenever(mockOmnibarEntryConverter.convertQueryToUrl(any(), any(), any(), any())).then { it.arguments.first() }
-        whenever(mockDuckAIFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
 
         testee = BrowserViewModel(
             tabRepository = mockTabRepository,
@@ -799,7 +759,6 @@ class BrowserViewModelTest {
             skipUrlConversionOnNewTabFeature = skipUrlConversionOnNewTabFeature,
             additionalDefaultBrowserPrompts = mockAdditionalDefaultBrowserPrompts,
             swipingTabsFeature = swipingTabsFeatureProvider,
-            duckAiFeatureState = mockDuckAIFeatureState,
             ntpAfterIdleManager = mockNtpAfterIdleManager,
             androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,
             browserModeStateHolder = mockBrowserModeStateHolder,

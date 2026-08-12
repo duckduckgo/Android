@@ -47,6 +47,7 @@ import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.AnyThread
 import androidx.core.content.ContextCompat
+import androidx.core.view.doOnNextLayout
 import androidx.core.view.isInvisible
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.setFragmentResult
@@ -113,7 +114,9 @@ import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.cancellable
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -123,6 +126,7 @@ import org.json.JSONObject
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Named
+import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(FragmentScope::class)
 class DuckChatContextualFragment :
@@ -243,6 +247,9 @@ class DuckChatContextualFragment :
                 val imeVisible = heightDiff > threshold
                 if (imeVisible != isKeyboardVisible) {
                     isKeyboardVisible = imeVisible
+                    if (!imeVisible) {
+                        reserveSpaceForSuggestions()
+                    }
                     val composerHasFocus = if (viewModel.viewState.value.contextualNativeInputEnabled) {
                         binding.contextualNativeInputWidget.hasFocus()
                     } else {
@@ -262,6 +269,10 @@ class DuckChatContextualFragment :
             ) {
                 if (newState == BottomSheetBehavior.STATE_HIDDEN) {
                     viewModel.onSheetClosed()
+                    binding.contextualSuggestionsView.clear()
+                }
+                if (newState == BottomSheetBehavior.STATE_HALF_EXPANDED) {
+                    bottomSheet.requestLayout()
                 }
                 backPressedCallback.isEnabled = newState != BottomSheetBehavior.STATE_HIDDEN
                 updateContentAreaHeight()
@@ -512,7 +523,6 @@ class DuckChatContextualFragment :
                     filesJson = submitted.filesJson,
                 )
             },
-            onAskAboutTab = { viewModel.onAskAboutTabClicked() },
             onAskAboutPage = { viewModel.onAskAboutPageClicked() },
             onPageContextRemoved = { viewModel.removePageContext() },
             onVoiceChatRequested = {
@@ -536,6 +546,31 @@ class DuckChatContextualFragment :
 
         configureBehaviour(bottomSheetBehavior)
         configureButtons()
+        configureSuggestions()
+        binding.contextualModeRoot.doOnNextLayout { reserveSpaceForSuggestions() }
+        binding.contextualInputContainer.addOnLayoutChangeListener { _, _, top, _, bottom, _, oldTop, _, oldBottom ->
+            if (bottom - top != oldBottom - oldTop) reserveSpaceForSuggestions()
+        }
+    }
+
+    private fun isSheetVisible(): Boolean = bottomSheetBehavior.state != BottomSheetBehavior.STATE_HIDDEN
+
+    private fun reserveSpaceForSuggestions() {
+        if (!viewModel.viewState.value.contextualSuggestionsEnabled) return
+        if (isKeyboardVisible) return
+        val sheet = binding.contextualModeRoot.parent as? View ?: return
+        val coordinatorHeight = (sheet.parent as? View)?.height?.takeIf { it > 0 } ?: return
+        val prompts = binding.contextualModePrompts.getChildAt(0) ?: return
+        val cardHeight = binding.contextualPromptQuickAction.height + resources.getDimensionPixelSize(CommonR.dimen.keyline_2)
+        val reservedSpace = binding.contextualModeButtons.height + binding.contextualInputContainer.height +
+            prompts.paddingTop + prompts.paddingBottom + MAX_PROMPT_CARDS * cardHeight
+        val ratio = (reservedSpace.toFloat() / coordinatorHeight).coerceIn(HALF_EXPANDED_RATIO, MAX_HALF_EXPANDED_RATIO)
+        if (bottomSheetBehavior.halfExpandedRatio != ratio) {
+            bottomSheetBehavior.halfExpandedRatio = ratio
+            if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_HALF_EXPANDED) {
+                sheet.requestLayout()
+            }
+        }
     }
 
     private fun configureBehaviour(bottomSheetBehavior: BottomSheetBehavior<View>) {
@@ -571,7 +606,8 @@ class DuckChatContextualFragment :
         val sheet = binding.contextualModeRoot.parent as? View ?: return
         val coordinatorHeight = (sheet.parent as? View)?.height ?: return
         if (coordinatorHeight <= 0) return
-        val visibleSheetHeight = (coordinatorHeight - sheet.top).coerceAtLeast(0)
+        val halfExpandedHeight = (coordinatorHeight * bottomSheetBehavior.halfExpandedRatio).toInt()
+        val visibleSheetHeight = (coordinatorHeight - sheet.top).coerceAtLeast(halfExpandedHeight)
         val chromeHeight = binding.contextualModeButtons.height + binding.contextualInputContainer.height
         val contentHeight = (visibleSheetHeight - chromeHeight).coerceAtLeast(0)
         // Size the middle to the visible sheet minus header + input, so the input sits on the visible edge.
@@ -649,11 +685,8 @@ class DuckChatContextualFragment :
         }
 
         binding.duckAiContextualClearText.setOnClickListener {
-            // Clear the field directly: typed text isn't mirrored into viewState.prompt, so relying on
-            // onPromptCleared() alone is a no-op re-render (prompt is usually already empty) and the
-            // visible text would stay. Still notify the ViewModel to keep prompt state consistent.
+            // Typed text lives only in the EditText (it isn't mirrored into the ViewModel), so clear it directly.
             clearInputField()
-            viewModel.onPromptCleared()
         }
 
         binding.contextualFullScreen.setOnClickListener {
@@ -662,16 +695,13 @@ class DuckChatContextualFragment :
         binding.duckAiContextualPageRemove.setOnClickListener {
             viewModel.removePageContext()
         }
-        binding.duckAiAttachContextLayout.setOnClickListener {
-            viewModel.addPageContext(fromPlaceholderTap = true)
-        }
         binding.contextualPromptQuickAction.setOnClickListener {
             val currentInput = if (viewModel.viewState.value.contextualNativeInputEnabled) {
                 binding.contextualNativeInputWidget.text
             } else {
                 binding.legacyInputField.text.toString()
             }
-            viewModel.onQuickActionClicked(currentInput)
+            viewModel.onQuickActionClicked(currentInput, binding.contextualSuggestionsView.currentPageType())
         }
     }
 
@@ -771,6 +801,9 @@ class DuckChatContextualFragment :
                 when (command) {
                     is DuckChatContextualSharedViewModel.Command.PageContextAttached -> {
                         viewModel.onPageContextReceived(command.tabId, command.pageContext, command.isStorePageContextEnabled)
+                        if (isSheetVisible() && viewModel.viewState.value.sheetMode == DuckChatContextualViewModel.SheetMode.INPUT) {
+                            binding.contextualSuggestionsView.onPageContextUpdated(command.pageContext)
+                        }
                     }
 
                     is DuckChatContextualSharedViewModel.Command.MainBrowserPageFinished -> {
@@ -781,6 +814,9 @@ class DuckChatContextualFragment :
                         logcat { "Duck.ai Contextual: OpenSheet" }
                         setupKeyboardVisibilityListener()
                         viewModel.onSheetReopened()
+                        if (viewModel.viewState.value.sheetMode == DuckChatContextualViewModel.SheetMode.INPUT) {
+                            binding.contextualSuggestionsView.load()
+                        }
                     }
 
                     is DuckChatContextualSharedViewModel.Command.OnContextualFireConfirmed -> {
@@ -794,6 +830,16 @@ class DuckChatContextualFragment :
         viewModel.viewState
             .onEach { viewState ->
                 renderViewState(viewState)
+            }.launchIn(lifecycleScope)
+
+        viewModel.viewState
+            .map { it.sheetMode }
+            .distinctUntilChanged()
+            .onEach { sheetMode ->
+                when (sheetMode) {
+                    DuckChatContextualViewModel.SheetMode.INPUT -> binding.contextualSuggestionsView.load()
+                    DuckChatContextualViewModel.SheetMode.WEBVIEW -> binding.contextualSuggestionsView.clear()
+                }
             }.launchIn(lifecycleScope)
 
         observeSubscriptionEventDataChannel()
@@ -812,28 +858,21 @@ class DuckChatContextualFragment :
             binding.contextualFullScreen.gone()
         }
 
-        binding.contextualPromptQuickAction.setText(viewState.quickActionState.labelResId)
-        binding.contextualPromptQuickAction.setCompoundDrawablesRelativeWithIntrinsicBounds(viewState.quickActionState.iconResId, 0, 0, 0)
-        binding.legacyInputField.setHint(viewState.chatHintResId)
+        applyQuickActionVisibility(viewState)
+        binding.legacyInputField.setHint(R.string.contextualSheetImprovedHint)
 
-        if (viewState.showChatsIcon) {
-            binding.contextualNewChat.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_chats_24)
-        }
+        binding.contextualNewChat.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_chats_24)
 
         when (viewState.sheetMode) {
             DuckChatContextualViewModel.SheetMode.INPUT -> {
                 binding.contextualWebviewContainer.gone()
                 binding.contextualModePrompts.show()
                 binding.contextualInputContainer.setBackgroundColor(
-                    requireContext().getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorSurface),
+                    requireContext().getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorBackground),
                 )
                 contextualNativeInputManager.onInputMode()
 
-                if (viewState.showChatsIcon) {
-                    binding.contextualNewChat.show()
-                } else {
-                    binding.contextualNewChat.gone()
-                }
+                binding.contextualNewChat.show()
                 binding.contextualFire.gone()
 
                 if (viewState.contextualNativeInputEnabled) {
@@ -845,26 +884,14 @@ class DuckChatContextualFragment :
 
                     renderPageContext(viewState.contextTitle, viewState.contextUrl, viewState.tabId)
 
-                    when {
-                        viewState.quickActionState == DuckChatContextualViewModel.QuickActionState.ASK_ABOUT_PAGE -> {
-                            binding.duckAiContextualLayout.gone()
-                            binding.duckAiAttachContextLayout.gone()
-                        }
-                        viewState.showContext -> {
-                            binding.duckAiContextualLayout.show()
-                            binding.duckAiAttachContextLayout.gone()
-                        }
-                        else -> {
-                            binding.duckAiContextualLayout.gone()
-                            binding.duckAiAttachContextLayout.show()
-                        }
-                    }
-                    if (viewState.prompt.isNotEmpty()) {
-                        binding.legacyInputField.setText(viewState.prompt)
-                        binding.legacyInputField.setSelection(viewState.prompt.length)
+                    if (viewState.quickActionState != DuckChatContextualViewModel.QuickActionState.ASK_ABOUT_PAGE &&
+                        viewState.showContext
+                    ) {
+                        binding.duckAiContextualLayout.show()
                     } else {
-                        clearInputField()
+                        binding.duckAiContextualLayout.gone()
                     }
+                    clearInputField()
                 }
             }
 
@@ -893,6 +920,37 @@ class DuckChatContextualFragment :
 
     private fun showFireConfirmationDialog() {
         duckChatSharedViewModel.onContextualFireButtonClicked()
+    }
+
+    private fun applyQuickActionVisibility(viewState: DuckChatContextualViewModel.ViewState) {
+        val isSummarizeQuickAction =
+            viewState.quickActionState == DuckChatContextualViewModel.QuickActionState.SUBMIT_SUMMARIZE
+
+        binding.contextualSuggestionsView.setReservedQuickActionSlots(
+            if (viewState.quickActionState == DuckChatContextualViewModel.QuickActionState.ASK_ABOUT_PAGE) 1 else 0,
+        )
+
+        if (isSummarizeQuickAction && binding.contextualSuggestionsView.hasContent()) {
+            binding.contextualPromptQuickAction.gone()
+        } else {
+            binding.contextualPromptQuickAction.show()
+            binding.contextualPromptQuickAction.setText(viewState.quickActionState.labelResId)
+            binding.contextualPromptQuickAction.setCompoundDrawablesRelativeWithIntrinsicBounds(viewState.quickActionState.iconResId, 0, 0, 0)
+        }
+    }
+
+    private fun configureSuggestions() {
+        binding.contextualSuggestionsView.onSuggestionSelected = { suggestion ->
+            val currentInput = if (viewModel.viewState.value.contextualNativeInputEnabled) {
+                binding.contextualNativeInputWidget.text
+            } else {
+                binding.legacyInputField.text.toString()
+            }
+            viewModel.onSuggestionSelected(suggestion, currentInput)
+        }
+        binding.contextualSuggestionsView.onContentChanged = {
+            applyQuickActionVisibility(viewModel.viewState.value)
+        }
     }
 
     private fun showChatsPopup(showNewChatHeader: Boolean, recentChats: List<ChatHistoryItem>) {
@@ -1253,6 +1311,8 @@ class DuckChatContextualFragment :
 
     companion object {
         private const val HALF_EXPANDED_RATIO = 0.5f
+        private const val MAX_HALF_EXPANDED_RATIO = 0.9f
+        private const val MAX_PROMPT_CARDS = 4
         private const val MAX_CHAT_TITLE_LINES = 1
         private const val PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 200
         private const val CUSTOM_UA =

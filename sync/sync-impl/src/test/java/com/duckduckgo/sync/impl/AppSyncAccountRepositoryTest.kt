@@ -18,7 +18,7 @@ package com.duckduckgo.sync.impl
 
 import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.common.utils.DefaultDispatcherProvider
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.TestSyncFixtures.aDevice
@@ -83,13 +83,13 @@ import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import com.duckduckgo.sync.store.ScopedPassword
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.moshi.Moshi
-import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyString
@@ -131,6 +131,10 @@ class AppSyncAccountRepositoryTest {
     private val syncJweCrypto: SyncJweCrypto = mock()
     private val thirdPartyCredentialManager: ThirdPartyCredentialManager = mock()
     private val thirdPartyDeviceListDecryptor: ThirdPartyDeviceListDecryptor = mock()
+    private val loginDeviceInfoWriter: LoginDeviceInfoWriter = mock()
+
+    @get:Rule
+    val coroutineTestRule = CoroutineTestRule()
 
     @Before
     fun before() {
@@ -142,8 +146,8 @@ class AppSyncAccountRepositoryTest {
             syncStore,
             syncEngine,
             syncPixels,
-            TestScope(),
-            DefaultDispatcherProvider(),
+            coroutineTestRule.testScope,
+            coroutineTestRule.testDispatcherProvider,
             syncFeature,
             deviceKeyGenerator,
             syncCodeUrlWrapper = syncCodeUrlWrapper,
@@ -151,6 +155,7 @@ class AppSyncAccountRepositoryTest {
             syncJweCrypto = syncJweCrypto,
             thirdPartyCredentialManager = thirdPartyCredentialManager,
             thirdPartyDeviceListDecryptor = thirdPartyDeviceListDecryptor,
+            loginDeviceInfoWriter = loginDeviceInfoWriter,
         )
         (syncRepo as AppSyncAccountRepository).upgradeRetryDelayMillis = 0L // keep retry-path tests instant
 
@@ -1216,6 +1221,32 @@ class AppSyncAccountRepositoryTest {
         assertEquals(Success(true), result)
         verify(syncStore).credentialId = "ddg"
         verify(syncStore, times(0)).scopedPassword = any()
+    }
+
+    @Test
+    fun whenV2LoginSucceedsThenLoginDeviceInfoWriterIsNotified() = runTest {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+        prepareToProvideDeviceIds()
+        prepareForEncryption()
+        whenever(nativeLib.prepareForLogin(primaryKey)).thenReturn(validLoginKeys)
+        whenever(syncApi.login(anyString(), anyString(), anyString(), anyString(), anyString(), anyOrNull())).thenReturn(loginSuccess)
+
+        syncRepo.processCode(SyncAuthCode.Recovery(RecoveryCode(primaryKey = primaryKey, userId = userId)))
+
+        verify(loginDeviceInfoWriter).onLogin(anyOrNull())
+    }
+
+    @Test
+    fun whenLegacyLoginSucceedsThenLoginDeviceInfoWriterNotNotified() = runTest {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(false))
+        prepareToProvideDeviceIds()
+        prepareForEncryption()
+        whenever(nativeLib.prepareForLogin(primaryKey)).thenReturn(validLoginKeys)
+        whenever(syncApi.login(anyString(), anyString(), anyString(), anyString(), anyString(), anyOrNull())).thenReturn(loginSuccess)
+
+        syncRepo.processCode(SyncAuthCode.Recovery(RecoveryCode(primaryKey = primaryKey, userId = userId)))
+
+        verify(loginDeviceInfoWriter, never()).onLogin(anyOrNull())
     }
 
     // A3: Signup with scoped access credentials flag

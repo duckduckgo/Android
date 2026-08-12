@@ -59,7 +59,7 @@
 
     <!-- Input Screen  -->
     <string name="input_screen_search_hint">Adres ara veya gir</string>
-    <string name="input_screen_chat_hint">Özel olarak sor</string>
+    <string name="input_screen_search_only_hint">Arama yap</string>
     <string name="input_screen_user_pref_without_ai">Yalnızca Arama</string>
     <string name="input_screen_user_pref_with_ai">Arama ve Duck.ai</string>
     <string name="input_screen_user_pref_description">Adres Çubuğundan doğrudan Duck.ai\'a soru sormanızı sağlayan yeni seçeneği deneyin. <annotation type="share_feedback">Geri Bildirim Paylaş</annotation></string>
@@ -73,7 +73,6 @@
 
     <!-- AutoComplete -->
     <string name="autocompleteDuckAiPrompt">Duck.ai\'a sor</string>
-    <string name="autocompleteDeviceAppNotFound">Uygulama bulunamadı</string>
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogTitle">Gizli AI sohbetine daha kolay erişmek ister misiniz?</string>
@@ -121,10 +120,89 @@
     <string name="duckAIContextualPromptSummarize">Bu Sayfayı Özetle</string>
     <string name="duckAIContextualAutomaticContextTitle">Sayfa İçeriğini Otomatik Olarak Gönder</string>
     <string name="duckAIContextualAutomaticContextMessage">Sayfa içeriğini otomatik olarak Duck.ai\'a gönder</string>
-    <string name="duckAIContextualAttachPageContent">Sayfa İçeriğini Ekle</string>
 
     <!-- Contextual sheet quick action -->
     <string name="duckAIContextualPromptAskAboutPage">Sayfa Hakkında Soru Sor</string>
+
+    <!-- Contextual sheet suggested prompts; native copy for PageSuggestionsCatalog.json entries, keyed by catalog id -->
+    <string name="duckAiSuggestionTranslatePageLabel" instruction="Suggested prompt chip: translate the current page">Bu sayfayı çevir</string>
+    <string name="duckAiSuggestionTranslatePagePrompt" instruction="Suggested prompt submitted text: translate the page. %1$s is replaced with the name of the user&apos;s language.">Bu sayfayı %1$s diline çevir.</string>
+    <string name="duckAiSuggestionKeyTakeawaysLabel" instruction="Suggested prompt chip: key takeaways of an article">Temel çıkarımlar nelerdir?</string>
+    <string name="duckAiSuggestionKeyTakeawaysPrompt" instruction="Suggested prompt submitted text: key takeaways of an article">Bu makaledeki temel çıkarımlar nelerdir?</string>
+    <string name="duckAiSuggestionExplainSimplyLabel" instruction="Suggested prompt chip: explain the content simply">Bunu basitçe açıkla</string>
+    <string name="duckAiSuggestionExplainSimplyPrompt" instruction="Suggested prompt submitted text: explain the content simply">Bunu basit ve anlaşılır bir dille açıkla.</string>
+    <string name="duckAiSuggestionCounterargumentsLabel" instruction="Suggested prompt chip: counterarguments">Karşı argümanlar nelerdir?</string>
+    <string name="duckAiSuggestionCounterargumentsPrompt" instruction="Suggested prompt submitted text: counterarguments">Bunun temel karşı argümanları veya eleştirileri nelerdir?</string>
+    <string name="duckAiSuggestionRelatedArticlesLabel" instruction="Suggested prompt chip: related articles">Keşfetmek için ilgili makaleler öner</string>
+    <string name="duckAiSuggestionRelatedArticlesPrompt" instruction="Suggested prompt submitted text: related articles">Sonraki adımda göz atmaya değer ilgili makaleler veya konular öner.</string>
+    <string name="duckAiSuggestionShoppingListLabel" instruction="Suggested prompt chip: shopping list from a recipe">Alışveriş listesi oluştur</string>
+    <string name="duckAiSuggestionShoppingListPrompt" instruction="Suggested prompt submitted text: shopping list from a recipe">Bu tariften miktarlarıyla birlikte bir alışveriş listesi oluştur.</string>
+    <string name="duckAiSuggestionRecipeNutritionLabel" instruction="Suggested prompt chip: recipe nutrition">Besin değerlerini tahmin et</string>
+    <string name="duckAiSuggestionRecipeNutritionPrompt" instruction="Suggested prompt submitted text: recipe nutrition">Bu tarifin besin değerlerini tahmin et.</string>
+    <string name="duckAiSuggestionScaleRecipeLabel" instruction="Suggested prompt chip: scale a recipe">Porsiyonları ayarla</string>
+    <string name="duckAiSuggestionScaleRecipePrompt" instruction="Suggested prompt submitted text: scale a recipe">Bu tarifi farklı bir porsiyon sayısına göre yeniden yaz.</string>
+    <string name="duckAiSuggestionProductProsConsLabel" instruction="Suggested prompt chip: product pros and cons">Artıları ve eksileri nelerdir?</string>
+    <string name="duckAiSuggestionProductProsConsPrompt" instruction="Suggested prompt submitted text: product pros and cons">Bu ürünün artıları ve eksileri nelerdir?</string>
+    <string name="duckAiSuggestionFindAlternativesLabel" instruction="Suggested prompt chip: product alternatives">Bana alternatifler bul</string>
+    <string name="duckAiSuggestionFindAlternativesPrompt" instruction="Suggested prompt submitted text: product alternatives">Bu ürün için bazı alternatifler öner.</string>
+    <string name="duckAiSuggestionSummarizeVideoLabel" instruction="Suggested prompt chip: summarize a video">Bu videoyu özetle</string>
+    <string name="duckAiSuggestionSummarizeVideoPrompt" instruction="Suggested prompt submitted text: summarize a video">Bu videoyu özetle.</string>
+    <string name="duckAiSuggestionVideoKeyPointsLabel" instruction="Suggested prompt chip: video key points">Ana noktalar nelerdir?</string>
+    <string name="duckAiSuggestionVideoKeyPointsPrompt" instruction="Suggested prompt submitted text: video key points">Bu videoda ele alınan ana noktalar nelerdir?</string>
+    <string name="duckAiSuggestionTailorResumeLabel" instruction="Suggested prompt chip: tailor a resume to a job">Özgeçmişimi düzenle</string>
+    <string name="duckAiSuggestionTailorResumePrompt" instruction="Suggested prompt submitted text: tailor a resume to a job">Özgeçmişimi bu pozisyon için uyarlamama yardım et.</string>
+    <string name="duckAiSuggestionInterviewPrepLabel" instruction="Suggested prompt chip: interview prep">Mülakata hazırlanmama yardım et</string>
+    <string name="duckAiSuggestionInterviewPrepPrompt" instruction="Suggested prompt submitted text: interview prep">Bu pozisyon için mülakatta hangi sorular gelebilir?</string>
+    <string name="duckAiSuggestionCoverLetterLabel" instruction="Suggested prompt chip: draft a cover letter">Bir ön yazı taslağı hazırla</string>
+    <string name="duckAiSuggestionCoverLetterPrompt" instruction="Suggested prompt submitted text: draft a cover letter">Bu pozisyon için bir ön yazı taslağı hazırla.</string>
+    <string name="duckAiSuggestionEventDetailsLabel" instruction="Suggested prompt chip: event details">Önemli ayrıntılar nelerdir?</string>
+    <string name="duckAiSuggestionEventDetailsPrompt" instruction="Suggested prompt submitted text: event details">Bu etkinliğin önemli ayrıntılarını özetle.</string>
+    <string name="duckAiSuggestionWorthWatchingLabel" instruction="Suggested prompt chip: is a movie/show worth watching">Bunu izlemeye değer mi?</string>
+    <string name="duckAiSuggestionWorthWatchingPrompt" instruction="Suggested prompt submitted text: is a movie/show worth watching">Bunu izlemeye değer mi? Bana spoiler vermeden özetle.</string>
+    <string name="duckAiSuggestionSimilarTitlesLabel" instruction="Suggested prompt chip: similar movies or shows">Benzer başlıklar öner</string>
+    <string name="duckAiSuggestionSimilarTitlesPrompt" instruction="Suggested prompt submitted text: similar movies or shows">Benzer filmler veya diziler öner.</string>
+    <string name="duckAiSuggestionCastCrewLabel" instruction="Suggested prompt chip: cast and crew">Oyuncular ve Ekip</string>
+    <string name="duckAiSuggestionCastCrewPrompt" instruction="Suggested prompt submitted text: cast and crew">Ana oyuncular ve ekip kimlerden oluşuyor ve başka hangi işlerle tanınıyorlar?</string>
+    <string name="duckAiSuggestionSummarizeBookLabel" instruction="Suggested prompt chip: summarize a book">Bu kitabı özetle</string>
+    <string name="duckAiSuggestionSummarizeBookPrompt" instruction="Suggested prompt submitted text: summarize a book">Bu kitabı özetle.</string>
+    <string name="duckAiSuggestionSimilarBooksLabel" instruction="Suggested prompt chip: similar books">Benzer kitaplar öner</string>
+    <string name="duckAiSuggestionSimilarBooksPrompt" instruction="Suggested prompt submitted text: similar books">Benzer kitaplar öner.</string>
+    <string name="duckAiSuggestionExplainPaperLabel" instruction="Suggested prompt chip: explain a research paper">Bu makaleyi açıkla</string>
+    <string name="duckAiSuggestionExplainPaperPrompt" instruction="Suggested prompt submitted text: explain a research paper">Bu araştırma makalesini sade bir dille açıkla.</string>
+    <string name="duckAiSuggestionPaperContributionsLabel" instruction="Suggested prompt chip: paper contributions">Temel katkılar nelerdir?</string>
+    <string name="duckAiSuggestionPaperContributionsPrompt" instruction="Suggested prompt submitted text: paper contributions">Bu makalenin temel katkıları nelerdir?</string>
+    <string name="duckAiSuggestionMenuHighlightsLabel" instruction="Suggested prompt chip: restaurant menu highlights">Ne sipariş etmeliyim?</string>
+    <string name="duckAiSuggestionMenuHighlightsPrompt" instruction="Suggested prompt submitted text: restaurant menu highlights">Burada mutlaka denemek gereken yemekler neler?</string>
+    <string name="duckAiSuggestionPlaceHoursLabel" instruction="Suggested prompt chip: place hours and location">Çalışma saatleri ve konum nedir?</string>
+    <string name="duckAiSuggestionPlaceHoursPrompt" instruction="Suggested prompt submitted text: place hours and location">Bu yerin çalışma saatleri, konumu ve iletişim bilgileri nelerdir?</string>
+    <string name="duckAiSuggestionPlaceReviewsLabel" instruction="Suggested prompt chip: place reputation">Bu yer iyi mi?</string>
+    <string name="duckAiSuggestionPlaceReviewsPrompt" instruction="Suggested prompt submitted text: place reputation">Bu yer iyi mi? İncelemelere ve puanlara dayanarak itibarını özetle.</string>
+    <string name="duckAiSuggestionSummarizeThreadLabel" instruction="Suggested prompt chip: summarize a discussion thread">Bu tartışmayı özetle</string>
+    <string name="duckAiSuggestionSummarizeThreadPrompt" instruction="Suggested prompt submitted text: summarize a discussion thread">Bu tartışma konusunu özetle.</string>
+    <string name="duckAiSuggestionExplainRepoLabel" instruction="Suggested prompt chip: explain a code repository">Bu depoyu açıkla</string>
+    <string name="duckAiSuggestionExplainRepoPrompt" instruction="Suggested prompt submitted text: explain a code repository">Bu deponun ne işe yaradığını ve nasıl kullanılacağını açıkla.</string>
+    <string name="duckAiSuggestionExplainAnswerLabel" instruction="Suggested prompt chip: explain the top answer">En üstteki yanıtı açıkla</string>
+    <string name="duckAiSuggestionExplainAnswerPrompt" instruction="Suggested prompt submitted text: explain the top answer">Kabul edilen yanıtı basit terimlerle açıkla.</string>
+    <string name="duckAiSuggestionHowtoStepsLabel" instruction="Suggested prompt chip: how-to steps">Adımları bana anlat</string>
+    <string name="duckAiSuggestionHowtoStepsPrompt" instruction="Suggested prompt submitted text: how-to steps">Bunu net, numaralandırılmış adımlara böl.</string>
+    <string name="duckAiSuggestionHowtoMaterialsLabel" instruction="Suggested prompt chip: how-to materials">Nelere ihtiyacım olacak?</string>
+    <string name="duckAiSuggestionHowtoMaterialsPrompt" instruction="Suggested prompt submitted text: how-to materials">Bunun için ihtiyacım olan araçları, malzemeleri veya ön koşulları listele.</string>
+    <string name="duckAiSuggestionCourseLearnLabel" instruction="Suggested prompt chip: course learning outcomes">Neler öğreneceğim?</string>
+    <string name="duckAiSuggestionCourseLearnPrompt" instruction="Suggested prompt submitted text: course learning outcomes">Bu kurstan öğreneceğim temel şeyler nelerdir?</string>
+    <string name="duckAiSuggestionCourseWorthLabel" instruction="Suggested prompt chip: is a course worth taking">Katılmaya değer mi?</string>
+    <string name="duckAiSuggestionCourseWorthPrompt" instruction="Suggested prompt submitted text: is a course worth taking">Bu sayfaya dayalı olarak bu kursa katılmaya değer mi?</string>
+    <string name="duckAiSuggestionFaqAnswerLabel" instruction="Suggested prompt chip: what an FAQ page answers">Bu neyi yanıtlıyor?</string>
+    <string name="duckAiSuggestionFaqAnswerPrompt" instruction="Suggested prompt submitted text: what an FAQ page answers">Bu sayfanın yanıtladığı temel sorular nelerdir?</string>
+    <string name="duckAiSuggestionFaqSummaryLabel" instruction="Suggested prompt chip: summarize FAQ Q&amp;As">Soru-Cevapları özetle</string>
+    <string name="duckAiSuggestionFaqSummaryPrompt" instruction="Suggested prompt submitted text: summarize FAQ Q&amp;As">Bu sayfadaki soru ve cevapları özetle.</string>
+    <string name="duckAiSuggestionReviewVerdictLabel" instruction="Suggested prompt chip: review verdict">Sonuç ne?</string>
+    <string name="duckAiSuggestionReviewVerdictPrompt" instruction="Suggested prompt submitted text: review verdict">Bunun için genel değerlendirme ve puan nedir?</string>
+    <string name="duckAiSuggestionReviewSummaryLabel" instruction="Suggested prompt chip: summarize reviews">İncelemeleri özetle</string>
+    <string name="duckAiSuggestionReviewSummaryPrompt" instruction="Suggested prompt submitted text: summarize reviews">İncelemelerde anlatılanları özetle.</string>
+    <string name="duckAiSuggestionWhoIsThisLabel" instruction="Suggested prompt chip: person background">Bu kişi kim?</string>
+    <string name="duckAiSuggestionWhoIsThisPrompt" instruction="Suggested prompt submitted text: person background">Bu kişinin geçmişi hakkında kısaca bilgi ver.</string>
+    <string name="duckAiSuggestionPersonBackgroundLabel" instruction="Suggested prompt chip: summarize a person&apos;s background">Geçmişini özetle</string>
+    <string name="duckAiSuggestionPersonBackgroundPrompt" instruction="Suggested prompt submitted text: summarize a person&apos;s background">Bu kişinin geçmişini ve önemli çalışmalarını özetle.</string>
 
     <!-- Contextual sheet input hint (contextualSheetImprovements flag) -->
     <string name="contextualSheetImprovedHint">Gizli bir şekilde her şeyi sorabilirsiniz</string>
@@ -154,7 +232,6 @@
     <string name="duckAiEndCtaTitle">İşte bu kadar!</string>
     <string name="duckAiEndCtaDescription"><![CDATA[Siteleri aramak ve ziyaret etmek için adres çubuğunu kullanın veya gizli yapay zeka sohbeti için Duck.ai\'a geçin.<br/><br/>Sohbet simgesini gördüğünüz her yerde Duck.ai kullanabilirsiniz]]></string>
     <string name="duckAiEndCtaButton">Tebrikler!</string>
-    <string name="duckAiEndCtaDescriptionCustomAi"><![CDATA[Duck.ai ile gizli bir yapay zeka sohbeti başlatın veya korumalı gezinme için Arama moduna geçin.<br/><br/>Sohbet simgesini gördüğünüz her yerde Duck.ai kullanabilirsiniz]]></string>
 
     <!-- Native Duck.ai chat history -->
     <string name="duck_ai_chat_history_title">Sohbetler</string>
@@ -265,6 +342,5 @@
     <string name="duckAiSettingsTitle">Duck.ai Ayarları</string>
 
     <!-- File/image attachment menu options -->
-    <string name="duckChatContextualAskAboutTab">Sekme Hakkında Soru Sor</string>
     <string name="duckChatContextualAskAboutPage">Sayfa Hakkında Soru Sor</string>
 </resources>

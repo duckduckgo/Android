@@ -116,11 +116,6 @@ class OnboardingDecorationFitCorrector(
 
         if (target == null) {
             deco.isGone = true
-            dialog.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                verticalBias = 0f
-                bottomToTop = ConstraintLayout.LayoutParams.UNSET
-                bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
-            }
             onDecorationHidden()
             return false
         }

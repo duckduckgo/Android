@@ -19,6 +19,8 @@ package com.duckduckgo.app.onboarding.orchestrator
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.cta.db.DismissedCtaDao
+import com.duckduckgo.app.cta.model.CtaId
+import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.onboarding.CustomAiOnboardingPixelName
 import com.duckduckgo.app.onboarding.CustomAiOnboardingResolver
@@ -52,7 +54,7 @@ import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent
+import com.duckduckgo.duckchat.impl.wideevents.InputScreenOnboardingWideEvent
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.onboarding.api.LinearOnboardingState.Completed
 import com.duckduckgo.onboarding.api.LinearOnboardingState.InProgress
@@ -946,6 +948,25 @@ class NewUserOnboardingPlanProviderTest {
             ids.indexOf(NewUserOnboardingStepIds.DEFAULT_BROWSER_PROMPT) + 1,
             ids.indexOf(NewUserOnboardingStepIds.WIDGET_PROMPT),
         )
+    }
+
+    @Test
+    fun whenWidgetPromptStepPresentedThenLinearPlanWidgetPromptShownStored() = runTest {
+        whenever(homeScreenPromptsExperiment.enroll())
+            .thenReturn(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_WIDGET_ONLY)
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // comparison_chart
+        orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
+        assertStep(NewUserOnboardingStepIds.WIDGET_PROMPT)
+
+        orchestrator.onEvent(NewUserOnboardingEvent.Presented)
+
+        verify(onboardingStore).linearPlanWidgetPromptShown = true
+        verify(dismissedCtaDao, never()).insert(DismissedCta(CtaId.ADD_WIDGET))
+        assertStep(NewUserOnboardingStepIds.WIDGET_PROMPT)
     }
 
     @Test

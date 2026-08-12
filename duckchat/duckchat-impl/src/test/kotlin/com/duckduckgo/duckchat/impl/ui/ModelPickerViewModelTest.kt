@@ -271,8 +271,54 @@ class ModelPickerViewModelTest {
             currentTier = "free",
             requiredTier = "plus",
             flowType = "purchase",
+            origin = "funnel_addressbar_android__modelpicker",
         )
         verify(duckChatPixels, never()).fireModelSelected(any(), any())
+    }
+
+    @Test
+    fun whenPickerShownFromAddressBarThenModelPickerShownFiredWithAddressBarOrigin() = runTest {
+        testee.onPickerShown(PickerSurface.MODEL_PICKER_ADDRESS_BAR)
+        runCurrent()
+
+        verify(duckChatPixels).fireModelPickerShown("funnel_addressbar_android__modelpicker")
+    }
+
+    @Test
+    fun whenPickerShownFromDuckAiTabThenModelPickerShownFiredWithDuckAiOrigin() = runTest {
+        testee.onPickerShown(PickerSurface.MODEL_PICKER_DUCK_AI_TAB)
+        runCurrent()
+
+        verify(duckChatPixels).fireModelPickerShown("funnel_duckai_android__modelpicker")
+    }
+
+    @Test
+    fun whenPickerShownInModelChangeModeThenModelPickerShownFiredWithSwitchModelOrigin() = runTest {
+        nativeInputState.value = nativeInputState.value.copy(chatId = "c1", modelChangeMode = true)
+        advanceUntilIdle()
+
+        testee.onPickerShown(PickerSurface.MODEL_PICKER_DUCK_AI_TAB)
+        runCurrent()
+
+        verify(duckChatPixels).fireModelPickerShown("funnel_duckai_android__switchmodel")
+    }
+
+    @Test
+    fun whenGatedModelTappedInModelChangeModeThenUpsellFiredWithSwitchModelOrigin() = runTest {
+        nativeInputState.value = nativeInputState.value.copy(chatId = "c1", modelChangeMode = true)
+        stateFlow.value = ModelState(userTier = UserTier.FREE, isSubscriptionEligible = true)
+        advanceUntilIdle()
+
+        testee.onModelTapped(plusModel("p"), PickerSurface.MODEL_PICKER_DUCK_AI_TAB)
+        runCurrent()
+
+        verify(duckChatPixels).fireSubscriptionUpsellTriggered(
+            source = "model_picker",
+            currentTier = "free",
+            requiredTier = "plus",
+            flowType = "purchase",
+            origin = "funnel_duckai_android__switchmodel",
+        )
     }
 
     @Test
@@ -398,7 +444,7 @@ class ModelPickerViewModelTest {
             expectNoEvents()
             cancelAndConsumeRemainingEvents()
         }
-        verify(duckChatPixels, never()).fireSubscriptionUpsellTriggered(any(), any(), any(), any())
+        verify(duckChatPixels, never()).fireSubscriptionUpsellTriggered(any(), any(), any(), any(), any())
     }
 
     @Test

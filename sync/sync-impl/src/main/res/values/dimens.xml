@@ -21,5 +21,6 @@
     <dimen name="qrSizeMedium">160dp</dimen>
     <dimen name="qrSizeSmall">96dp</dimen>
     <dimen name="qrBarcodeSize">360dp</dimen>
+    <dimen name="simplifiedSyncQrSize">400dp</dimen>
     <dimen name="syncOtherDevicesMaxItemWidth">600dp</dimen>
 </resources>

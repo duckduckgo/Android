@@ -27,6 +27,9 @@ fun WideEventEntity.mapToRepositoryWideEvent(): WideEventRepository.WideEvent =
         cleanupPolicy = cleanupPolicy.mapToRepositoryCleanupPolicy(),
         activeIntervals = activeIntervals.map { it.mapToRepositoryWideEventInterval() },
         createdAt = createdAt,
+        samplingProbability = samplingProbability,
+        metaType = metaType,
+        metaVersion = metaVersion,
     )
 
 fun WideEventRepository.WideEventStatus.mapToDbWideEventStatus(): WideEventEntity.WideEventStatus =

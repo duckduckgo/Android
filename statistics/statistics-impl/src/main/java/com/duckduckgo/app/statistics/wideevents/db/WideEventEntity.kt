@@ -52,6 +52,12 @@ data class WideEventEntity(
     val cleanupPolicy: CleanupPolicy,
     @ColumnInfo(name = "active_intervals")
     val activeIntervals: List<WideEventInterval>,
+    @ColumnInfo(name = "sampling_probability", defaultValue = "1.0")
+    val samplingProbability: Float = 1.0f,
+    @ColumnInfo(name = "meta_type")
+    val metaType: String,
+    @ColumnInfo(name = "meta_version")
+    val metaVersion: String,
 ) {
     data class MetadataEntry(
         @Json(name = "key")

@@ -59,7 +59,7 @@
 
     <!-- Input Screen  -->
     <string name="input_screen_search_hint">Søg eller indtast adresse</string>
-    <string name="input_screen_chat_hint">Spørg privat</string>
+    <string name="input_screen_search_only_hint">Søg</string>
     <string name="input_screen_user_pref_without_ai">Kun søgning</string>
     <string name="input_screen_user_pref_with_ai">Søg &amp; Duck.ai</string>
     <string name="input_screen_user_pref_description">Prøv den nye mulighed for at spørge Duck.ai direkte fra adresselinjen. <annotation type="share_feedback">Del feedback</annotation></string>
@@ -73,7 +73,6 @@
 
     <!-- AutoComplete -->
     <string name="autocompleteDuckAiPrompt">Spørg Duck.ai</string>
-    <string name="autocompleteDeviceAppNotFound">Appen kunne ikke findes</string>
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogTitle">Vil du have nemmere adgang til privat AI-chat?</string>
@@ -121,10 +120,89 @@
     <string name="duckAIContextualPromptSummarize">Sammenfat denne side</string>
     <string name="duckAIContextualAutomaticContextTitle">Send automatisk sideindhold</string>
     <string name="duckAIContextualAutomaticContextMessage">Send automatisk sideindhold til Duck.ai</string>
-    <string name="duckAIContextualAttachPageContent">Vedhæft sideindhold</string>
 
     <!-- Contextual sheet quick action -->
     <string name="duckAIContextualPromptAskAboutPage">Spørg om siden</string>
+
+    <!-- Contextual sheet suggested prompts; native copy for PageSuggestionsCatalog.json entries, keyed by catalog id -->
+    <string name="duckAiSuggestionTranslatePageLabel" instruction="Suggested prompt chip: translate the current page">Oversæt denne side</string>
+    <string name="duckAiSuggestionTranslatePagePrompt" instruction="Suggested prompt submitted text: translate the page. %1$s is replaced with the name of the user&apos;s language.">Oversæt denne side til %1$s.</string>
+    <string name="duckAiSuggestionKeyTakeawaysLabel" instruction="Suggested prompt chip: key takeaways of an article">Hvad er de vigtigste pointer?</string>
+    <string name="duckAiSuggestionKeyTakeawaysPrompt" instruction="Suggested prompt submitted text: key takeaways of an article">Hvad er de vigtigste pointer fra denne artikel?</string>
+    <string name="duckAiSuggestionExplainSimplyLabel" instruction="Suggested prompt chip: explain the content simply">Forklar dette enkelt</string>
+    <string name="duckAiSuggestionExplainSimplyPrompt" instruction="Suggested prompt submitted text: explain the content simply">Forklar dette i et enkelt og letforståeligt sprog.</string>
+    <string name="duckAiSuggestionCounterargumentsLabel" instruction="Suggested prompt chip: counterarguments">Hvad er modargumenterne?</string>
+    <string name="duckAiSuggestionCounterargumentsPrompt" instruction="Suggested prompt submitted text: counterarguments">Hvad er de vigtigste modargumenter eller kritikpunkter af dette?</string>
+    <string name="duckAiSuggestionRelatedArticlesLabel" instruction="Suggested prompt chip: related articles">Foreslå relaterede artikler at udforske</string>
+    <string name="duckAiSuggestionRelatedArticlesPrompt" instruction="Suggested prompt submitted text: related articles">Foreslå relaterede artikler eller emner, der er værd at udforske som det næste.</string>
+    <string name="duckAiSuggestionShoppingListLabel" instruction="Suggested prompt chip: shopping list from a recipe">Generér en indkøbsliste</string>
+    <string name="duckAiSuggestionShoppingListPrompt" instruction="Suggested prompt submitted text: shopping list from a recipe">Opret en indkøbsliste med mængder fra denne opskrift.</string>
+    <string name="duckAiSuggestionRecipeNutritionLabel" instruction="Suggested prompt chip: recipe nutrition">Vurder ernæringen</string>
+    <string name="duckAiSuggestionRecipeNutritionPrompt" instruction="Suggested prompt submitted text: recipe nutrition">Vurder næringsindholdet for denne opskrift.</string>
+    <string name="duckAiSuggestionScaleRecipeLabel" instruction="Suggested prompt chip: scale a recipe">Tilpas portionerne</string>
+    <string name="duckAiSuggestionScaleRecipePrompt" instruction="Suggested prompt submitted text: scale a recipe">Omskriv denne opskrift, så den passer til et andet antal portioner.</string>
+    <string name="duckAiSuggestionProductProsConsLabel" instruction="Suggested prompt chip: product pros and cons">Hvad er fordelene og ulemperne?</string>
+    <string name="duckAiSuggestionProductProsConsPrompt" instruction="Suggested prompt submitted text: product pros and cons">Hvad er fordelene og ulemperne ved dette produkt?</string>
+    <string name="duckAiSuggestionFindAlternativesLabel" instruction="Suggested prompt chip: product alternatives">Find alternativer til mig</string>
+    <string name="duckAiSuggestionFindAlternativesPrompt" instruction="Suggested prompt submitted text: product alternatives">Foreslå nogle alternativer til dette produkt.</string>
+    <string name="duckAiSuggestionSummarizeVideoLabel" instruction="Suggested prompt chip: summarize a video">Sammenfat denne video</string>
+    <string name="duckAiSuggestionSummarizeVideoPrompt" instruction="Suggested prompt submitted text: summarize a video">Sammenfat denne video.</string>
+    <string name="duckAiSuggestionVideoKeyPointsLabel" instruction="Suggested prompt chip: video key points">Hvad er de vigtigste pointer?</string>
+    <string name="duckAiSuggestionVideoKeyPointsPrompt" instruction="Suggested prompt submitted text: video key points">Hvad er hovedpunkterne i denne video?</string>
+    <string name="duckAiSuggestionTailorResumeLabel" instruction="Suggested prompt chip: tailor a resume to a job">Tilpas mit CV</string>
+    <string name="duckAiSuggestionTailorResumePrompt" instruction="Suggested prompt submitted text: tailor a resume to a job">Hjælp mig med at tilpasse mit CV til dette job.</string>
+    <string name="duckAiSuggestionInterviewPrepLabel" instruction="Suggested prompt chip: interview prep">Hjælp mig med at forberede mig til jobsamtalen</string>
+    <string name="duckAiSuggestionInterviewPrepPrompt" instruction="Suggested prompt submitted text: interview prep">Hvilke spørgsmål kan blive stillet under jobsamtalen til denne stilling?</string>
+    <string name="duckAiSuggestionCoverLetterLabel" instruction="Suggested prompt chip: draft a cover letter">Skriv en ansøgning</string>
+    <string name="duckAiSuggestionCoverLetterPrompt" instruction="Suggested prompt submitted text: draft a cover letter">Lav et udkast til en ansøgning til dette job.</string>
+    <string name="duckAiSuggestionEventDetailsLabel" instruction="Suggested prompt chip: event details">Hvad er de vigtigste detaljer?</string>
+    <string name="duckAiSuggestionEventDetailsPrompt" instruction="Suggested prompt submitted text: event details">Sammenfat de vigtigste detaljer om denne begivenhed.</string>
+    <string name="duckAiSuggestionWorthWatchingLabel" instruction="Suggested prompt chip: is a movie/show worth watching">Er dette værd at se?</string>
+    <string name="duckAiSuggestionWorthWatchingPrompt" instruction="Suggested prompt submitted text: is a movie/show worth watching">Er dette værd at se? Giv mig en vurdering uden spoilere.</string>
+    <string name="duckAiSuggestionSimilarTitlesLabel" instruction="Suggested prompt chip: similar movies or shows">Anbefal lignende titler</string>
+    <string name="duckAiSuggestionSimilarTitlesPrompt" instruction="Suggested prompt submitted text: similar movies or shows">Anbefal lignende film eller serier.</string>
+    <string name="duckAiSuggestionCastCrewLabel" instruction="Suggested prompt chip: cast and crew">Rollebesætning og filmhold</string>
+    <string name="duckAiSuggestionCastCrewPrompt" instruction="Suggested prompt submitted text: cast and crew">Hvem er de vigtigste skuespillere og filmfolk, og hvad er de ellers kendt for?</string>
+    <string name="duckAiSuggestionSummarizeBookLabel" instruction="Suggested prompt chip: summarize a book">Sammenfat denne bog</string>
+    <string name="duckAiSuggestionSummarizeBookPrompt" instruction="Suggested prompt submitted text: summarize a book">Sammenfat denne bog.</string>
+    <string name="duckAiSuggestionSimilarBooksLabel" instruction="Suggested prompt chip: similar books">Anbefal lignende bøger</string>
+    <string name="duckAiSuggestionSimilarBooksPrompt" instruction="Suggested prompt submitted text: similar books">Anbefal lignende bøger.</string>
+    <string name="duckAiSuggestionExplainPaperLabel" instruction="Suggested prompt chip: explain a research paper">Forklar denne artikel</string>
+    <string name="duckAiSuggestionExplainPaperPrompt" instruction="Suggested prompt submitted text: explain a research paper">Forklar denne forskningsartikel i et letforståeligt sprog.</string>
+    <string name="duckAiSuggestionPaperContributionsLabel" instruction="Suggested prompt chip: paper contributions">Hvad er de vigtigste bidrag?</string>
+    <string name="duckAiSuggestionPaperContributionsPrompt" instruction="Suggested prompt submitted text: paper contributions">Hvad er de vigtigste bidrag fra denne artikel?</string>
+    <string name="duckAiSuggestionMenuHighlightsLabel" instruction="Suggested prompt chip: restaurant menu highlights">Hvad skal jeg bestille?</string>
+    <string name="duckAiSuggestionMenuHighlightsPrompt" instruction="Suggested prompt submitted text: restaurant menu highlights">Hvilke retter bør man prøve her?</string>
+    <string name="duckAiSuggestionPlaceHoursLabel" instruction="Suggested prompt chip: place hours and location">Hvad er åbningstiderne og placeringen?</string>
+    <string name="duckAiSuggestionPlaceHoursPrompt" instruction="Suggested prompt submitted text: place hours and location">Hvad er åbningstiderne, placeringen og kontaktoplysningerne for dette sted?</string>
+    <string name="duckAiSuggestionPlaceReviewsLabel" instruction="Suggested prompt chip: place reputation">Er det her sted godt?</string>
+    <string name="duckAiSuggestionPlaceReviewsPrompt" instruction="Suggested prompt submitted text: place reputation">Er det her sted godt? Sammenfat dets omdømme baseret på anmeldelser og vurderinger.</string>
+    <string name="duckAiSuggestionSummarizeThreadLabel" instruction="Suggested prompt chip: summarize a discussion thread">Sammenfat denne diskussion</string>
+    <string name="duckAiSuggestionSummarizeThreadPrompt" instruction="Suggested prompt submitted text: summarize a discussion thread">Sammenfat denne diskussionstråd.</string>
+    <string name="duckAiSuggestionExplainRepoLabel" instruction="Suggested prompt chip: explain a code repository">Forklar dette repo</string>
+    <string name="duckAiSuggestionExplainRepoPrompt" instruction="Suggested prompt submitted text: explain a code repository">Forklar, hvad dette kodelager gør, og hvordan du bruger det.</string>
+    <string name="duckAiSuggestionExplainAnswerLabel" instruction="Suggested prompt chip: explain the top answer">Forklar det øverste svar</string>
+    <string name="duckAiSuggestionExplainAnswerPrompt" instruction="Suggested prompt submitted text: explain the top answer">Forklar det accepterede svar i simple termer.</string>
+    <string name="duckAiSuggestionHowtoStepsLabel" instruction="Suggested prompt chip: how-to steps">Gennemgå trinnene med mig</string>
+    <string name="duckAiSuggestionHowtoStepsPrompt" instruction="Suggested prompt submitted text: how-to steps">Opdel dette i klare, nummererede trin.</string>
+    <string name="duckAiSuggestionHowtoMaterialsLabel" instruction="Suggested prompt chip: how-to materials">Hvad skal jeg bruge?</string>
+    <string name="duckAiSuggestionHowtoMaterialsPrompt" instruction="Suggested prompt submitted text: how-to materials">Angiv de værktøjer, materialer eller forudsætninger, jeg har brug for til dette.</string>
+    <string name="duckAiSuggestionCourseLearnLabel" instruction="Suggested prompt chip: course learning outcomes">Hvad vil jeg lære?</string>
+    <string name="duckAiSuggestionCourseLearnPrompt" instruction="Suggested prompt submitted text: course learning outcomes">Hvad er de vigtigste ting, jeg vil lære på dette kursus?</string>
+    <string name="duckAiSuggestionCourseWorthLabel" instruction="Suggested prompt chip: is a course worth taking">Er det værd at tage?</string>
+    <string name="duckAiSuggestionCourseWorthPrompt" instruction="Suggested prompt submitted text: is a course worth taking">Er dette kursus værd at tage på baggrund af denne side?</string>
+    <string name="duckAiSuggestionFaqAnswerLabel" instruction="Suggested prompt chip: what an FAQ page answers">Hvad svarer dette på?</string>
+    <string name="duckAiSuggestionFaqAnswerPrompt" instruction="Suggested prompt submitted text: what an FAQ page answers">Hvad er de vigtigste spørgsmål, denne side besvarer?</string>
+    <string name="duckAiSuggestionFaqSummaryLabel" instruction="Suggested prompt chip: summarize FAQ Q&amp;As">Sammenfat spørgsmål og svar</string>
+    <string name="duckAiSuggestionFaqSummaryPrompt" instruction="Suggested prompt submitted text: summarize FAQ Q&amp;As">Sammenfat spørgsmålene og svarene på denne side.</string>
+    <string name="duckAiSuggestionReviewVerdictLabel" instruction="Suggested prompt chip: review verdict">Hvad er dommen?</string>
+    <string name="duckAiSuggestionReviewVerdictPrompt" instruction="Suggested prompt submitted text: review verdict">Hvad er den samlede vurdering og bedømmelse af dette?</string>
+    <string name="duckAiSuggestionReviewSummaryLabel" instruction="Suggested prompt chip: summarize reviews">Sammenfat anmeldelserne</string>
+    <string name="duckAiSuggestionReviewSummaryPrompt" instruction="Suggested prompt submitted text: summarize reviews">Sammenfat hvad anmeldelserne siger.</string>
+    <string name="duckAiSuggestionWhoIsThisLabel" instruction="Suggested prompt chip: person background">Hvem er denne person?</string>
+    <string name="duckAiSuggestionWhoIsThisPrompt" instruction="Suggested prompt submitted text: person background">Giv mig en hurtig oversigt om denne persons baggrund.</string>
+    <string name="duckAiSuggestionPersonBackgroundLabel" instruction="Suggested prompt chip: summarize a person&apos;s background">Sammenfat personens baggrund</string>
+    <string name="duckAiSuggestionPersonBackgroundPrompt" instruction="Suggested prompt submitted text: summarize a person&apos;s background">Sammenfat denne persons baggrund og bemærkelsesværdige arbejde.</string>
 
     <!-- Contextual sheet input hint (contextualSheetImprovements flag) -->
     <string name="contextualSheetImprovedHint">Spørg om hvad som helst privat</string>
@@ -154,7 +232,6 @@
     <string name="duckAiEndCtaTitle">Du har forstået det!</string>
     <string name="duckAiEndCtaDescription"><![CDATA[Brug adresselinjen til at søge efter og besøge websteder, eller skift til privat AI-chat med Duck.ai.<br/><br/>Du kan bruge Duck.ai fra alle steder, hvor du ser chatikonet]]></string>
     <string name="duckAiEndCtaButton">High five!</string>
-    <string name="duckAiEndCtaDescriptionCustomAi"><![CDATA[Start en privat AI-chat med Duck.ai, eller vælg Søg efter beskyttet browsing.<br/><br/>Du kan bruge Duck.ai fra alle steder, hvor du ser chatikonet]]></string>
 
     <!-- Native Duck.ai chat history -->
     <string name="duck_ai_chat_history_title">Chats</string>
@@ -265,6 +342,5 @@
     <string name="duckAiSettingsTitle">Duck.ai-indstillinger</string>
 
     <!-- File/image attachment menu options -->
-    <string name="duckChatContextualAskAboutTab">Spørg om fanen</string>
     <string name="duckChatContextualAskAboutPage">Spørg om siden</string>
 </resources>

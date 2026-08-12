@@ -22,33 +22,12 @@
     android:clipToPadding="false"
     android:orientation="vertical">
 
-    <FrameLayout
+    <com.duckduckgo.app.onboarding.ui.view.OnboardingDialogTitleView
+        android:id="@+id/addToDockTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingHorizontal="12dp">
-
-        <com.duckduckgo.common.ui.view.text.DaxTextView
-            android:id="@+id/addToDockTitleHidden"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:includeFontPadding="false"
-            android:text="@string/preOnboardingAddToDockTitle"
-            android:visibility="invisible"
-            app:typography="onboarding_title" />
-
-        <com.duckduckgo.common.ui.view.TypeAnimationTextView
-            android:id="@+id/addToDockTitle"
-            style="@style/Typography.DuckDuckGo.Onboarding.Title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:focusable="true"
-            android:gravity="center"
-            android:includeFontPadding="false"
-            android:textColor="?attr/daxColorPrimaryText" />
-
-    </FrameLayout>
+        android:paddingHorizontal="12dp"
+        android:text="@string/preOnboardingDockStepTitle" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/addToDockBody"
@@ -69,6 +48,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:alpha="0"
+        android:layout_marginTop="@dimen/keyline_6"
         android:gravity="center_horizontal"
         android:orientation="vertical"
         tools:alpha="1">
@@ -77,7 +57,6 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="20dp"
             android:background="?attr/onboardingAccentPrimary"
             android:importantForAccessibility="no"
             tools:ignore="MissingHorizontalDivider" />

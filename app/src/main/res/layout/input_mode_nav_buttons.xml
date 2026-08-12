@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!-- The Fire/Tabs/Menu trio shared by the native input's two host layouts:
+     - the Search & Duck.ai nav-bar strip (input_mode_widget_nav_bar), where it sits after the Back button, and
+     - the search-only inline row (included in the input_mode_widget_card_view wrappers, beside the card),
+     which mirrors the legacy omnibar toolbar.
+     Ids match the nav-bar's original buttons so bindInputModeNavBar stays untouched; bindInlineNavButtons
+     reuses the same ids scoped to the widget. The two hosts are never in the same findViewById scope.
+     Visibility is driven by the manager (bindInlineNavButtons) for the inline row; the nav-bar strip keeps
+     it visible and toggles the whole strip instead. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/inputModeNavButtons"
+    android:layout_width="wrap_content"
+    android:layout_height="@dimen/toolbarIcon"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <FrameLayout
+        android:id="@+id/inputModeWidgetNavFire"
+        android:layout_width="@dimen/toolbarIcon"
+        android:layout_height="@dimen/toolbarIcon"
+        android:background="@drawable/selectable_item_rounded_corner_background"
+        android:contentDescription="@string/duckChatFireButtonContentDescription">
+
+        <ImageView
+            android:id="@+id/inputModeWidgetNavFireIcon"
+            android:layout_width="@dimen/bottomNavIcon"
+            android:layout_height="@dimen/bottomNavIcon"
+            android:layout_gravity="center"
+            android:importantForAccessibility="no"
+            android:scaleType="center"
+            android:src="@drawable/ic_fire_24" />
+    </FrameLayout>
+
+    <com.duckduckgo.browser.ui.tabs.NewTabSwitcherButton
+        android:id="@+id/inputModeWidgetNavTabs"
+        android:layout_width="@dimen/toolbarIcon"
+        android:layout_height="@dimen/toolbarIcon" />
+
+    <FrameLayout
+        android:id="@+id/inputModeWidgetNavMenu"
+        android:layout_width="@dimen/toolbarIcon"
+        android:layout_height="@dimen/toolbarIcon"
+        android:background="@drawable/selectable_item_rounded_corner_background"
+        android:contentDescription="@string/duckChatBrowserMenuContentDescription">
+
+        <ImageView
+            android:id="@+id/inputModeWidgetNavMenuIcon"
+            android:layout_width="@dimen/bottomNavIcon"
+            android:layout_height="@dimen/bottomNavIcon"
+            android:layout_gravity="center"
+            android:importantForAccessibility="no"
+            android:scaleType="center"
+            android:src="@drawable/ic_menu_hamburger_24" />
+
+        <View
+            android:id="@+id/inputModeWidgetNavMenuHighlight"
+            android:layout_width="7dp"
+            android:layout_height="7dp"
+            android:layout_gravity="end"
+            android:layout_margin="@dimen/keyline_2"
+            android:background="@drawable/ic_dot_indicator_7"
+            android:visibility="gone" />
+    </FrameLayout>
+</LinearLayout>

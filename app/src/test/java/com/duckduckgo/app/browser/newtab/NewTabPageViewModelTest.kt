@@ -34,6 +34,8 @@ import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
+import com.duckduckgo.promptscoordinator.api.PromptType
+import com.duckduckgo.promptscoordinator.api.PromptsCoordinator
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.MessageTrigger
@@ -80,6 +82,7 @@ class NewTabPageViewModelTest {
     private val pixel: Pixel = mock()
     private val mockOnboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = mock()
     private val mockCtaViewModel: CtaViewModel = mock()
+    private val mockPromptsCoordinator: PromptsCoordinator = mock()
 
     private lateinit var testee: NewTabPageViewModel
 
@@ -91,6 +94,8 @@ class NewTabPageViewModelTest {
         whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(null))
         whenever(mockAfterIdleMessageTriggerProvider.activeTrigger()).thenReturn(flowOf(null))
         whenever(mockAppTrackingProtection.isEnabled()).thenReturn(false)
+        // Default: the prompt surface is free, so RMF claims are granted.
+        whenever(mockPromptsCoordinator.tryClaim(PromptType.NTP_CARD)).thenReturn(true)
 
         testee = createTestee()
     }
@@ -115,6 +120,7 @@ class NewTabPageViewModelTest {
             pixel = pixel,
             onboardingBrandDesignUpdateToggles = mockOnboardingBrandDesignUpdateToggles,
             ctaViewModel = mockCtaViewModel,
+            promptsCoordinator = mockPromptsCoordinator,
             browserMode = browserMode,
         )
     }
@@ -131,6 +137,117 @@ class NewTabPageViewModelTest {
 
         testee.viewState.test {
             assertEquals(remoteMessage, expectMostRecentItem().message)
+        }
+    }
+
+    @Test
+    fun whenPromptSurfaceClaimRefusedThenActiveMessageIsSuppressed() = runTest {
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
+        whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
+        whenever(mockPromptsCoordinator.tryClaim(PromptType.NTP_CARD)).thenReturn(false)
+
+        testee.onStart(mockLifecycleOwner)
+
+        testee.viewState.test {
+            assertNull(expectMostRecentItem().message)
+        }
+    }
+
+    @Test
+    fun whenPromptSurfaceClaimGrantedThenActiveMessageIsShownAndClaimNotReleased() = runTest {
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
+        whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
+
+        testee.onStart(mockLifecycleOwner)
+
+        testee.viewState.test {
+            assertEquals(remoteMessage, expectMostRecentItem().message)
+        }
+        verify(mockPromptsCoordinator, never()).onClaimDone(PromptType.NTP_CARD)
+        verify(mockPromptsCoordinator, never()).onClaimCancelled(PromptType.NTP_CARD)
+    }
+
+    @Test
+    fun whenShownMessageLeavesTheScreenThenClaimIsDone() = runTest {
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
+        val messages = MutableSharedFlow<RemoteMessage?>(replay = 1)
+        whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(messages)
+
+        testee.onStart(mockLifecycleOwner)
+        messages.emit(remoteMessage)
+        testee.viewState.test {
+            assertEquals(remoteMessage, expectMostRecentItem().message)
+        }
+
+        // The card is dismissed (user action or remote expiry): the active-message flow emits null.
+        messages.emit(null)
+
+        testee.viewState.test {
+            assertNull(expectMostRecentItem().message)
+        }
+        verify(mockPromptsCoordinator).onClaimDone(PromptType.NTP_CARD)
+    }
+
+    @Test
+    fun whenClaimIsRefusedForAShowingCardThenTheSameCardIsNotNewWhenItReturns() = runTest {
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
+        val messages = MutableSharedFlow<RemoteMessage?>(replay = 1)
+        whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(messages)
+
+        testee.onStart(mockLifecycleOwner)
+        messages.emit(remoteMessage)
+        testee.viewState.test {
+            assertTrue(expectMostRecentItem().newMessage)
+        }
+
+        // The surface goes to a modal, so the card is suppressed without RMF ever retracting it.
+        whenever(mockPromptsCoordinator.tryClaim(PromptType.NTP_CARD)).thenReturn(false)
+        messages.emit(remoteMessage)
+        testee.viewState.test {
+            expectMostRecentItem().also {
+                assertNull(it.message)
+                assertFalse(it.newMessage)
+            }
+        }
+
+        whenever(mockPromptsCoordinator.tryClaim(PromptType.NTP_CARD)).thenReturn(true)
+        messages.emit(remoteMessage)
+        testee.viewState.test {
+            expectMostRecentItem().also {
+                assertEquals(remoteMessage, it.message)
+                assertFalse(it.newMessage)
+            }
+        }
+    }
+
+    @Test
+    fun whenCardIsWaitingForTheSurfaceThenLowPriorityMessageDoesNotTakeTheSlot() = runTest {
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
+        val lowPriorityMessage = LowPriorityMessage.DefaultBrowserMessage(
+            message = MessageCta.Message(
+                topIllustration = R.drawable.ic_device_mobile_default,
+                title = "Set as default browser",
+                action = "Set as default",
+                action2 = "Do not ask again",
+            ),
+            onPrimaryAction = {},
+            onSecondaryAction = {},
+            onClose = {},
+            onShown = {},
+        )
+        whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
+        whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
+        whenever(mockLowPriorityMessagingModel.getMessage()).thenReturn(lowPriorityMessage)
+        whenever(mockPromptsCoordinator.tryClaim(PromptType.NTP_CARD)).thenReturn(false)
+
+        testee.onStart(mockLifecycleOwner)
+
+        testee.viewState.test {
+            expectMostRecentItem().also {
+                assertNull(it.message)
+                assertFalse(it.newMessage)
+                assertNull(it.lowPriorityMessage)
+            }
         }
     }
 

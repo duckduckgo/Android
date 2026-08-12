@@ -1,0 +1,8 @@
+{
+    "m_content_scope_scripts_inbound_queue_full": {
+        "description": "The bounded queue of inbound contentScopeScripts JS messages was full, so a message was dropped without being routed to a handler. Reported once per overflow episode, at most once per day, and indicates the optimizeContentScopeMessaging kill-switch may need to be pulled.",
+        "owners": ["anikiki"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count"]
+    }
+}

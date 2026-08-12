@@ -124,6 +124,7 @@ import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
 import com.duckduckgo.app.browser.logindetection.NavigationEvent
 import com.duckduckgo.app.browser.logindetection.NavigationEvent.LoginAttempt
 import com.duckduckgo.app.browser.menu.VpnMenuStateProvider
+import com.duckduckgo.app.browser.modals.NewTabPageModalPresenterRegistry
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
@@ -169,7 +170,6 @@ import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.CtaId.DAX_DIALOG_NETWORK
 import com.duckduckgo.app.cta.model.CtaId.DAX_DIALOG_TRACKERS_FOUND
 import com.duckduckgo.app.cta.model.CtaId.DAX_END
-import com.duckduckgo.app.cta.model.CtaId.DAX_INTRO_PRIVACY_PRO
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.cta.ui.BrokenSitePromptDialogCta
 import com.duckduckgo.app.cta.ui.Cta
@@ -191,7 +191,7 @@ import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta.DaxSerpCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta.DaxTrackersBlockedCta
 import com.duckduckgo.app.cta.ui.SubscriptionPromoFlow
 import com.duckduckgo.app.cta.ui.SubscriptionPromoModalCta
-import com.duckduckgo.app.dispatchers.ExternalIntentProcessingState
+import com.duckduckgo.app.cta.ui.SubscriptionPromoModalDecider
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryImpl
@@ -221,7 +221,6 @@ import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_ALWAYS_DUCK_PL
 import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_ALWAYS_OVERLAY_YOUTUBE
 import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_NEVER_OVERLAY_YOUTUBE
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON
-import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_SEARCH_CUSTOM
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_VISIT_SITE_CUSTOM
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_FIRE_BUTTON
@@ -306,7 +305,6 @@ import com.duckduckgo.downloads.store.DownloadStatus
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckchat.api.inputscreen.DuckAiOnboardingEndCtaVariant
 import com.duckduckgo.duckchat.impl.contextual.PageContextJSHelper
 import com.duckduckgo.duckchat.impl.contextual.RealPageContextJSHelper.Companion.PAGE_CONTEXT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
@@ -336,6 +334,7 @@ import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEA
 import com.duckduckgo.privacy.dashboard.api.PrivacyProtectionTogglePlugin
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin
 import com.duckduckgo.privacy.dashboard.api.ui.ToggleReports
+import com.duckduckgo.promptscoordinator.api.NewTabPageModalTrigger
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
@@ -471,6 +470,8 @@ class BrowserTabViewModelTest {
 
     private val mockNewTabPixels: NewTabPixels = mock()
 
+    private val mockNewTabPageModalTrigger: NewTabPageModalTrigger = mock()
+
     private val mockHttpErrorPixels: HttpErrorPixels = mock()
 
     private val mockAutoconsentPixelManager: AutoconsentPixelManager = mock()
@@ -483,6 +484,8 @@ class BrowserTabViewModelTest {
     private val mockAutoCompleteScorer: AutoCompleteScorer = mock()
 
     private val mockWidgetCapabilities: WidgetCapabilities = mock()
+
+    private val mockSubscriptionPromoModalDecider: SubscriptionPromoModalDecider = mock()
 
     private val mockUserStageStore: UserStageStore = mock()
 
@@ -530,13 +533,7 @@ class BrowserTabViewModelTest {
 
     private val mockDuckAiFeatureStateInputScreenFlow = MutableStateFlow(false)
 
-    private val mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow = MutableStateFlow(false)
-
-    private val mockDuckAiFeatureStateFullScreenModeFlow = MutableStateFlow(false)
-
     private val mockDuckAiContextualModeFlow = MutableStateFlow(false)
-
-    private val mockExternalIntentProcessingState: ExternalIntentProcessingState = mock()
 
     private val mockVpnMenuStateProvider: VpnMenuStateProvider = mock()
 
@@ -714,9 +711,6 @@ class BrowserTabViewModelTest {
 
     private val mockDeviceAppLookup: DeviceAppLookup = mock()
 
-    private val mockDuckAiFullScreenMode = MutableStateFlow(false)
-    private val mockDuckAiFullScreenModeEnabled = MutableStateFlow(true)
-
     private lateinit var fakeContentScopeScriptsSubscriptionEventPluginPoint: FakeContentScopeScriptsSubscriptionEventPluginPoint
     private var serpSettingsFeature = FakeFeatureToggleFactory.create(SerpSettingsFeature::class.java)
     private var fakeBrowserUiLockFeature = FakeFeatureToggleFactory.create(BrowserUiLockFeature::class.java)
@@ -828,6 +822,7 @@ class BrowserTabViewModelTest {
             whenever(mockSitePermissionsManager.hasSitePermanentPermission(any(), any())).thenReturn(false)
             whenever(mockToggleReports.shouldPrompt()).thenReturn(false)
             whenever(subscriptions.isEligible()).thenReturn(false)
+            whenever(mockSubscriptionPromoModalDecider.isSubscriptionCtaAvailable()).thenReturn(false)
             whenever(mockExtendedOnboardingFeatureToggles.subscriptionPromoModalCta()).thenReturn(mockDisabledToggle)
             whenever(mockExtendedOnboardingFeatureToggles.subscriptionPromoModalCtaExistingUsers()).thenReturn(mockDisabledToggle)
             whenever(mockExtendedOnboardingFeatureToggles.freeTrialCopy()).thenReturn(mockDisabledToggle)
@@ -835,11 +830,7 @@ class BrowserTabViewModelTest {
             whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockDisabledToggle)
             whenever(mockDuckAiFeatureState.showPopupMenuShortcut).thenReturn(MutableStateFlow(false))
             whenever(mockDuckAiFeatureState.showInputScreen).thenReturn(mockDuckAiFeatureStateInputScreenFlow)
-            whenever(mockDuckAiFeatureState.showInputScreenAutomaticallyOnNewTab).thenReturn(mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow)
-            whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFeatureStateFullScreenModeFlow)
             whenever(mockDuckAiFeatureState.showContextualMode).thenReturn(mockDuckAiContextualModeFlow)
-            whenever(mockExternalIntentProcessingState.hasPendingTabLaunch).thenReturn(false)
-            whenever(mockExternalIntentProcessingState.hasPendingDuckAiOpen).thenReturn(false)
             whenever(mockVpnMenuStateProvider.getVpnMenuState()).thenReturn(flowOf(VpnMenuState.Hidden))
             whenever(nonHttpAppLinkChecker.isPermitted(anyOrNull())).thenReturn(true)
             runBlocking { whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false) }
@@ -849,7 +840,7 @@ class BrowserTabViewModelTest {
                 CtaViewModel(
                     appInstallStore = mockAppInstallStore,
                     pixel = mockPixel,
-                    widgetCapabilities = mockWidgetCapabilities,
+                    subscriptionPromoModalDecider = mockSubscriptionPromoModalDecider,
                     dismissedCtaDao = mockDismissedCtaDao,
                     userAllowListRepository = mockUserAllowListRepository,
                     settingsDataStore = ctaViewModelMockSettingsStore,
@@ -1030,7 +1021,6 @@ class BrowserTabViewModelTest {
                 addressDisplayFormatter = mockAddressDisplayFormatter,
                 autoCompleteSettings = mockAutoCompleteSettings,
                 nonHttpAppLinkChecker = nonHttpAppLinkChecker,
-                externalIntentProcessingState = mockExternalIntentProcessingState,
                 vpnMenuStateProvider = mockVpnMenuStateProvider,
                 webViewCompatWrapper = mockWebViewCompatWrapper,
                 addressBarTrackersAnimationManager = mockAddressBarTrackersAnimationManager,
@@ -1066,6 +1056,8 @@ class BrowserTabViewModelTest {
                 desktopModeSettings = mockDesktopModeSettings,
                 rememberDesktopModeFeature = fakeRememberDesktopModeFeature,
                 adBlockingOmnibarAnimationProvider = mockAdBlockingOmnibarAnimationProvider,
+                newTabPageModalPresenterRegistry = NewTabPageModalPresenterRegistry(),
+                newTabPageModalTrigger = mockNewTabPageModalTrigger,
             )
 
         testee.loadData("abc", null, false, false)
@@ -2153,24 +2145,33 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun wheneverAutoCompleteIsGoneAndSuggestionsIsNotEmptyFireAutocompleteDisplayed() = runTest {
-        whenever(mockAutoCompleteService.autoComplete("query")).thenReturn(emptyList())
-        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(
-            flowOf(listOf(Bookmark("abc", "query", "https://example.com", lastModified = null))),
-        )
-        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(
-            flowOf(listOf(Favorite("abc", "query", "https://example.com", position = 1, lastModified = null))),
-        )
-        whenever(mockNavigationHistory.getHistory()).thenReturn(
-            flowOf(listOf(VisitedPage("https://foo.com".toUri(), "query", listOf(LocalDateTime.now())))),
-        )
-        whenever(mockTabRepository.flowTabs).thenReturn(
-            flowOf(listOf(TabEntity(tabId = "1", position = 1, url = "https://example.com", title = "query"))),
-        )
-        doReturn(true).whenever(mockAutoCompleteSettings).autoCompleteSuggestionsEnabled
+    fun whenAutoCompleteSuggestionsShownThenFireAutocompleteDisplayed() = runTest {
+        stubAutoCompleteSourcesForQuery()
 
-        whenever(mockAutoCompleteScorer.score("query", "https://foo.com".toUri(), 1, "query")).thenReturn(1)
-        whenever(mockUserStageStore.getUserAppStage()).thenReturn(ESTABLISHED)
+        testee.triggerAutocomplete("query", hasFocus = true, hasQueryChanged = true)
+        delay(500)
+
+        verify(mockPixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_AUTOCOMPLETE_DISPLAYED)
+        verify(mockPixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_AUTOCOMPLETE_DISPLAYED_DAILY, type = Daily())
+    }
+
+    @Test
+    fun whenAutoCompleteSuggestionsShownAndThenSelectedThenAutocompleteDisplayedFiredOnce() = runTest {
+        stubAutoCompleteSourcesForQuery()
+        whenever(mockOmnibarConverter.convertQueryToUrl("query", null)).thenReturn("https://example.com")
+
+        testee.triggerAutocomplete("query", hasFocus = true, hasQueryChanged = true)
+        delay(500)
+        testee.userSelectedAutocomplete(AutoCompleteDefaultSuggestion("query"))
+        delay(500)
+
+        verify(mockPixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_AUTOCOMPLETE_DISPLAYED)
+        verify(mockPixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_AUTOCOMPLETE_DISPLAYED_DAILY, type = Daily())
+    }
+
+    @Test
+    fun whenAutoCompleteSuggestionsShownAndThenGoneThenAutocompleteDisplayedFiredOnce() = runTest {
+        stubAutoCompleteSourcesForQuery()
 
         testee.triggerAutocomplete("query", hasFocus = true, hasQueryChanged = true)
         delay(500)
@@ -2181,12 +2182,26 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun wheneverAutoCompleteIsGoneAndSuggestionsIsEmptyDoNotFireAutocompleteDisplayed() = runTest {
+    fun whenAutoCompleteSuggestionsShownAgainForNewQueryThenFireAutocompleteDisplayedAgain() = runTest {
+        stubAutoCompleteSourcesForQuery()
+
+        testee.triggerAutocomplete("query", hasFocus = true, hasQueryChanged = true)
+        delay(500)
+        testee.triggerAutocomplete("", hasFocus = true, hasQueryChanged = true)
+        testee.triggerAutocomplete("query", hasFocus = true, hasQueryChanged = true)
+        delay(500)
+
+        verify(mockPixel, times(2)).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_AUTOCOMPLETE_DISPLAYED)
+        verify(mockPixel, times(2)).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_AUTOCOMPLETE_DISPLAYED_DAILY, type = Daily())
+    }
+
+    @Test
+    fun whenAutoCompleteSuggestionsAreEmptyThenDoNotFireAutocompleteDisplayed() = runTest {
         doReturn(true).whenever(mockAutoCompleteSettings).autoCompleteSuggestionsEnabled
         whenever(mockAutoCompleteService.autoComplete("query")).thenReturn(emptyList())
 
-        testee.autoCompleteStateFlow.value = "query"
-        testee.autoCompleteSuggestionsGone()
+        testee.triggerAutocomplete("query", hasFocus = true, hasQueryChanged = true)
+        delay(500)
 
         verify(mockPixel, never()).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_AUTOCOMPLETE_DISPLAYED)
         verify(mockPixel, never()).fire(
@@ -2247,8 +2262,7 @@ class BrowserTabViewModelTest {
 
         testee.autoCompleteSuggestionsGone()
 
-        verify(mockPixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_AUTOCOMPLETE_DISPLAYED)
-        verify(mockPixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_AUTOCOMPLETE_DISPLAYED_DAILY, type = Daily())
+        verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_DISPLAYED_LOCAL_HISTORY)
     }
 
     @Test
@@ -2287,13 +2301,8 @@ class BrowserTabViewModelTest {
         assertTrue(testee.omnibarAutocompleteCache.value.suggestions.isEmpty())
     }
 
-    /**
-     * Common setup mirroring [wheneverAutoCompleteIsGoneAndSuggestionsIsNotEmptyFireAutocompleteDisplayed]'s
-     * sources so the AutoCompleteApi produces a non-empty result for "query", then triggers the cache pipeline.
-     * Caller still needs to wait for the debounce.
-     */
-    private suspend fun primeOmnibarAutocompleteCacheForQuery() {
-        nativeInputUserSettingFlow.value = true
+    /** Stubs every autocomplete source so the AutoCompleteApi produces a non-empty result for "query". */
+    private suspend fun stubAutoCompleteSourcesForQuery() {
         doReturn(true).whenever(mockAutoCompleteSettings).autoCompleteSuggestionsEnabled
         whenever(mockAutoCompleteService.autoComplete("query")).thenReturn(emptyList())
         whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(
@@ -2310,6 +2319,15 @@ class BrowserTabViewModelTest {
         )
         whenever(mockAutoCompleteScorer.score("query", "https://foo.com".toUri(), 1, "query")).thenReturn(1)
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(ESTABLISHED)
+    }
+
+    /**
+     * Stubs the autocomplete sources for "query" and triggers the omnibar cache pipeline.
+     * Caller still needs to wait for the debounce.
+     */
+    private suspend fun primeOmnibarAutocompleteCacheForQuery() {
+        nativeInputUserSettingFlow.value = true
+        stubAutoCompleteSourcesForQuery()
 
         testee.onOmnibarTextRendered("query")
     }
@@ -3534,28 +3552,6 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenNewTabMenuItemClickedAndEmptyTabExistsAndInputScreenEnabledThenLaunchInputScreen() =
-        runTest {
-            swipingTabsFeature.self().setRawStoredState(State(enable = true))
-            swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
-            mockDuckAiFeatureStateInputScreenFlow.emit(true)
-
-            val emptyTabId = "EMPTY_TAB"
-            whenever(mockTabRepository.getTabs()).thenReturn(
-                listOf(
-                    TabEntity("1", "https://example.com", position = 0),
-                    TabEntity(emptyTabId, url = "", sourceTabId = null, position = 1),
-                ),
-            )
-
-            testee.onNewTabMenuItemClicked()
-
-            verify(mockTabRepository).select(emptyTabId)
-            assertCommandNotIssued<ShowKeyboard>()
-            assertCommandIssued<Command.LaunchInputScreen>()
-        }
-
-    @Test
     fun whenNewTabMenuItemClickedAndEmptyTabWithBlankUrlButSourceTabIdExistsThenAddNewTab() =
         runTest {
             swipingTabsFeature.self().setRawStoredState(State(enable = true))
@@ -3978,39 +3974,173 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnViewVisibleAndOnDuckAiUrlThenSubscriptionPromoModalNotShown() =
+    fun whenViewVisibleOnNewTabPageAndNoCtaThenModalTriggerNotified() =
         runTest {
-            givenSubscriptionPromoModalCtaEligible()
+            testee.globalLayoutState.value = GlobalLayoutViewState.Browser(isNewTabState = true)
+            testee.browserViewState.value = browserViewState().copy(browserShowing = false, maliciousSiteBlocked = false)
+
+            testee.onViewVisible()
+
+            verify(mockNewTabPageModalTrigger).onNewTabPageShown()
+        }
+
+    @Test
+    fun whenViewVisibleWhileBrowsingThenModalTriggerNotNotified() =
+        runTest {
+            testee.globalLayoutState.value = GlobalLayoutViewState.Browser(isNewTabState = false)
+            testee.browserViewState.value = browserViewState().copy(browserShowing = true, maliciousSiteBlocked = false)
+
+            testee.onViewVisible()
+
+            verify(mockNewTabPageModalTrigger, never()).onNewTabPageShown()
+        }
+
+    @Test
+    fun whenViewVisibleAndMaliciousSiteBlockedThenModalTriggerNotNotified() =
+        runTest {
+            testee.globalLayoutState.value = GlobalLayoutViewState.Browser(isNewTabState = true)
+            testee.browserViewState.value = browserViewState().copy(browserShowing = false, maliciousSiteBlocked = true)
+
+            testee.onViewVisible()
+
+            verify(mockNewTabPageModalTrigger, never()).onNewTabPageShown()
+        }
+
+    @Test
+    fun whenShowSubscriptionPromoModalCtaAndOnDuckAiUrlThenNotShown() =
+        runTest {
             whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
             loadUrl("https://duck.ai/", isBrowserShowing = true)
             testee.globalLayoutState.value = GlobalLayoutViewState.Browser(isNewTabState = false)
 
-            testee.onViewVisible()
+            val shown = testee.showSubscriptionPromo(SubscriptionPromoFlow.NUDGE, isFreeTrialCopy = false)
 
+            assertFalse(shown)
             assertFalse(testee.ctaViewState.value?.cta is SubscriptionPromoModalCta)
         }
 
     @Test
-    fun whenOnViewVisibleAndOnNonDuckAiUrlThenSubscriptionPromoModalShown() =
+    fun whenShowSubscriptionPromoModalCtaAndOnNonDuckAiUrlThenShown() =
         runTest {
-            givenSubscriptionPromoModalCtaEligible()
             whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
             loadUrl(exampleUrl, isBrowserShowing = true)
             testee.globalLayoutState.value = GlobalLayoutViewState.Browser(isNewTabState = false)
 
-            testee.onViewVisible()
+            val shown = testee.showSubscriptionPromo(SubscriptionPromoFlow.NUDGE, isFreeTrialCopy = false)
 
+            assertTrue(shown)
             assertTrue(testee.ctaViewState.value?.cta is SubscriptionPromoModalCta)
         }
 
-    private suspend fun givenSubscriptionPromoModalCtaEligible() {
-        whenever(mockExtendedOnboardingFeatureToggles.subscriptionPromoModalCtaExistingUsers()).thenReturn(mockEnabledToggle)
-        whenever(mockExtendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockEnabledToggle)
-        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - 8 * 24 * 3600 * 1000L)
-        whenever(mockDismissedCtaDao.exists(DAX_INTRO_PRIVACY_PRO)).thenReturn(false)
-        whenever(subscriptions.isEligible()).thenReturn(true)
-        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
-    }
+    @Test
+    fun whenShowSubscriptionPromoModalCtaOnNewTabPageAndSlotFreeThenShown() =
+        runTest {
+            testee.globalLayoutState.value = GlobalLayoutViewState.Browser(isNewTabState = true)
+            setBrowserShowing(false)
+
+            val shown = testee.showSubscriptionPromo(SubscriptionPromoFlow.NUDGE, isFreeTrialCopy = false)
+
+            assertTrue(shown)
+            assertTrue(testee.ctaViewState.value?.cta is SubscriptionPromoModalCta)
+        }
+
+    @Test
+    fun whenShowSubscriptionPromoModalCtaOnNewTabPageButCtaSlotOccupiedThenDeclined() =
+        runTest {
+            testee.globalLayoutState.value = GlobalLayoutViewState.Browser(isNewTabState = true)
+            setBrowserShowing(false)
+            val onboardingCta = DaxBubbleCta.DaxSubscriptionCta(
+                mockOnboardingStore,
+                mockAppInstallStore,
+                isFreeTrialCopy = false,
+            )
+            setCta(onboardingCta)
+
+            val shown = testee.showSubscriptionPromo(SubscriptionPromoFlow.NUDGE, isFreeTrialCopy = false)
+
+            assertFalse(shown)
+            assertEquals(onboardingCta, testee.ctaViewState.value?.cta)
+        }
+
+    @Test
+    fun whenShowSubscriptionPromoModalCtaAndMaliciousSiteWarningShowingThenNotShown() =
+        runTest {
+            testee.globalLayoutState.value = GlobalLayoutViewState.Browser(isNewTabState = false)
+            testee.browserViewState.value = browserViewState().copy(browserShowing = false, maliciousSiteBlocked = true)
+
+            val shown = testee.showSubscriptionPromo(SubscriptionPromoFlow.NUDGE, isFreeTrialCopy = false)
+
+            assertFalse(shown)
+            assertFalse(testee.ctaViewState.value?.cta is SubscriptionPromoModalCta)
+        }
+
+    @Test
+    fun whenShowAddWidgetModalCtaAndMaliciousSiteWarningShowingThenNotShown() =
+        runTest {
+            testee.globalLayoutState.value = GlobalLayoutViewState.Browser(isNewTabState = true)
+            testee.browserViewState.value = browserViewState().copy(browserShowing = false, maliciousSiteBlocked = true)
+
+            val shown = testee.showAddWidgetPromo(supportsAutomaticAdd = true)
+
+            assertFalse(shown)
+            assertNull(testee.ctaViewState.value?.cta)
+        }
+
+    @Test
+    fun whenShowSubscriptionPromoModalCtaWhileBrowsingAndCtaSlotOccupiedThenStillShown() =
+        runTest {
+            whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
+            loadUrl(exampleUrl, isBrowserShowing = true)
+            testee.globalLayoutState.value = GlobalLayoutViewState.Browser(isNewTabState = false)
+            setCta(
+                DaxBubbleCta.DaxSubscriptionCta(
+                    mockOnboardingStore,
+                    mockAppInstallStore,
+                    isFreeTrialCopy = false,
+                ),
+            )
+
+            val shown = testee.showSubscriptionPromo(SubscriptionPromoFlow.NUDGE, isFreeTrialCopy = false)
+
+            assertTrue(shown)
+            assertTrue(testee.ctaViewState.value?.cta is SubscriptionPromoModalCta)
+        }
+
+    @Test
+    fun whenShowAddWidgetModalCtaWhileBrowsingThenNotShown() =
+        runTest {
+            loadUrl(exampleUrl, isBrowserShowing = true)
+            testee.globalLayoutState.value = GlobalLayoutViewState.Browser(isNewTabState = false)
+
+            val shown = testee.showAddWidgetPromo(supportsAutomaticAdd = true)
+
+            assertFalse(shown)
+            assertFalse(testee.ctaViewState.value?.cta is HomePanelCta.AddWidgetAutoOnboarding)
+        }
+
+    @Test
+    fun whenShowAddWidgetModalCtaOnNewTabPageThenAccepted() =
+        runTest {
+            testee.globalLayoutState.value = GlobalLayoutViewState.Browser(isNewTabState = true)
+            setBrowserShowing(false)
+
+            val shown = testee.showAddWidgetPromo(supportsAutomaticAdd = true)
+
+            assertTrue(shown)
+        }
+
+    @Test
+    fun whenShowAddWidgetModalCtaOnNewTabPageButCtaSlotOccupiedThenDeclined() =
+        runTest {
+            testee.globalLayoutState.value = GlobalLayoutViewState.Browser(isNewTabState = true)
+            setBrowserShowing(false)
+            setCta(SubscriptionPromoModalCta(isFreeTrialCopy = false, flow = SubscriptionPromoFlow.NUDGE))
+
+            val shown = testee.showAddWidgetPromo(supportsAutomaticAdd = true)
+
+            assertFalse(shown)
+            assertTrue(testee.ctaViewState.value?.cta is SubscriptionPromoModalCta)
+        }
 
     @Test
     fun whenUserDismissedCtaThenFirePixel() =
@@ -4327,6 +4457,16 @@ class BrowserTabViewModelTest {
     fun whenUserInDuckPlayerThenCannotReportSite() {
         setupNavigation(skipHome = false, isBrowsing = true)
         whenever(mockDuckPlayer.isDuckPlayerUri(anyString())).thenReturn(true)
+        assertFalse(browserViewState().canReportSite)
+    }
+
+    @Test
+    fun whenUserInDuckAiThenCannotReportSite() {
+        val duckAiUrl = "https://duck.ai/"
+        whenever(mockDuckChat.isDuckChatUrl(duckAiUrl.toUri())).thenReturn(true)
+
+        loadUrl(duckAiUrl)
+
         assertFalse(browserViewState().canReportSite)
     }
 
@@ -8238,9 +8378,8 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenUserSelectedAutocompleteDuckAiPromptInFullScreenModeOnBrowserTabThenOpensInNewTab() =
+    fun whenUserSelectedAutocompleteDuckAiPromptOnBrowserTabThenOpensInNewTab() =
         runTest {
-            mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
             setBrowserShowing(true)
             whenever(mockDuckChat.wasOpenedBefore()).thenReturn(true)
             whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(false)
@@ -8257,24 +8396,7 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenUserSelectedAutocompleteDuckAiPromptInLegacyModeThenOpensViaDuckChat() =
-        runTest {
-            mockDuckAiFeatureStateFullScreenModeFlow.emit(false)
-            whenever(mockDuckChat.wasOpenedBefore()).thenReturn(true)
-            whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(false)
-            whenever(mockSavedSitesRepository.hasFavorites()).thenReturn(false)
-            whenever(mockNavigationHistory.hasHistory()).thenReturn(false)
-
-            val duckPrompt = AutoComplete.AutoCompleteSuggestion.AutoCompleteDuckAIPrompt("title")
-            testee.userSelectedAutocomplete(duckPrompt)
-
-            verify(mockDuckChat).openDuckChatWithAutoPrompt("title")
-            assertCommandNotIssued<Command.OpenInNewTab>()
-        }
-
-    @Test
-    fun whenOpenDuckAiQueryInFullScreenModeOnBrowserTabThenOpensInNewTab() = runTest {
-        mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
+    fun whenOpenDuckAiQueryOnBrowserTabThenOpensInNewTab() = runTest {
         setBrowserShowing(true)
 
         testee.openDuckAiQuery(query = "hello", autoPrompt = true)
@@ -8287,8 +8409,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOpenDuckAiQueryInFullScreenModeOnNtpThenStaysInTab() = runTest {
-        mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
+    fun whenOpenDuckAiQueryOnNtpThenStaysInTab() = runTest {
         setBrowserShowing(false)
         whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
 
@@ -8299,30 +8420,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOpenDuckAiQueryInLegacyModeWithAutoPromptThenCallsOpenDuckChatWithAutoPrompt() = runTest {
-        mockDuckAiFeatureStateFullScreenModeFlow.emit(false)
-
-        testee.openDuckAiQuery(query = "hello", autoPrompt = true)
-
-        verify(mockDuckChat).openDuckChatWithAutoPrompt("hello")
-        verify(mockDuckChat, never()).openDuckChatWithPrefill(any())
-        assertCommandNotIssued<Command.OpenInNewTab>()
-    }
-
-    @Test
-    fun whenOpenDuckAiQueryInLegacyModeWithoutAutoPromptThenCallsOpenDuckChatWithPrefill() = runTest {
-        mockDuckAiFeatureStateFullScreenModeFlow.emit(false)
-
-        testee.openDuckAiQuery(query = "hello", autoPrompt = false)
-
-        verify(mockDuckChat).openDuckChatWithPrefill("hello")
-        verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
-        assertCommandNotIssued<Command.OpenInNewTab>()
-    }
-
-    @Test
-    fun whenOpenDuckAiChatByIdInFullScreenModeOnBrowserTabThenOpensInNewTab() = runTest {
-        mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
+    fun whenOpenDuckAiChatByIdOnBrowserTabThenOpensInNewTab() = runTest {
         setBrowserShowing(true)
         val chatUrl = "https://duck.ai/chat?chatId=abc"
 
@@ -8334,20 +8432,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOpenDuckAiChatByIdInFullScreenModeOnNtpThenStaysInTab() = runTest {
-        mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
+    fun whenOpenDuckAiChatByIdOnNtpThenStaysInTab() = runTest {
         setBrowserShowing(false)
-        val chatUrl = "https://duck.ai/chat?chatId=abc"
-        whenever(mockOmnibarConverter.convertQueryToUrl(chatUrl, null)).thenReturn(chatUrl)
-
-        testee.openDuckAiChatById(chatUrl)
-
-        assertCommandNotIssued<Command.OpenInNewTab>()
-    }
-
-    @Test
-    fun whenOpenDuckAiChatByIdInLegacyModeThenFallsThroughToOnUserSubmittedQuery() = runTest {
-        mockDuckAiFeatureStateFullScreenModeFlow.emit(false)
         val chatUrl = "https://duck.ai/chat?chatId=abc"
         whenever(mockOmnibarConverter.convertQueryToUrl(chatUrl, null)).thenReturn(chatUrl)
 
@@ -8360,18 +8446,19 @@ class BrowserTabViewModelTest {
     fun whenOpenDuckAiQueryThenFiresOnInputSubmittedOnBrowserInteractionsPlugins() = runTest {
         val plugin: BrowserInteractionsPlugin = mock()
         whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
-        mockDuckAiFeatureStateFullScreenModeFlow.emit(false)
+        whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
 
         testee.openDuckAiQuery(query = "hello", autoPrompt = true)
 
-        verify(plugin).onInputSubmitted()
+        // Fires once from openDuckAiQuery itself and once more from the onUserSubmittedQuery it
+        // routes through via navigateToDuckAi — pre-existing on this path, not new here.
+        verify(plugin, times(2)).onInputSubmitted()
     }
 
     @Test
     fun whenOpenDuckAiChatByIdThenFiresOnChatSelectedOnBrowserInteractionsPlugins() = runTest {
         val plugin: BrowserInteractionsPlugin = mock()
         whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
-        mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
         setBrowserShowing(true)
 
         testee.openDuckAiChatById("https://duck.ai/chat?chatId=abc")
@@ -8606,73 +8693,52 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenDuckChatMenuItemClickedAndItWasntUsedBeforeThenOpenDuckChatAndSendPixel() =
-        runTest {
-            whenever(mockDuckChat.wasOpenedBefore()).thenReturn(false)
-
-            testee.onDuckChatMenuClicked()
-
-            verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_BROWSER_MENU, mapOf("was_used_before" to "0"))
-            verify(mockDuckChat).openDuckChat()
-        }
-
-    @Test
-    fun whenDuckChatMenuItemClickedAndItWasUsedBeforeThenOpenDuckChatAndSendPixel() =
-        runTest {
-            whenever(mockDuckChat.wasOpenedBefore()).thenReturn(true)
-
-            testee.onDuckChatMenuClicked()
-
-            verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_BROWSER_MENU, mapOf("was_used_before" to "1"))
-            verify(mockDuckChat).openDuckChat()
-        }
-
-    @Test
-    fun whenOnDuckChatOmnibarButtonClickedWithFocusThenOpenDuckChatWithAutoPrompt() {
+    fun whenOnDuckChatOmnibarButtonClickedWithFocusThenGetsDuckChatUrlWithAutoPrompt() {
+        whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
         testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = true, isNtp = false)
-        verify(mockDuckChat).openDuckChatWithAutoPrompt(query = "example")
+        verify(mockDuckChat).getDuckChatUrl(eq("example"), eq(true), any())
     }
 
     @Test
-    fun whenOnDuckChatOmnibarButtonClickedWithoutFocusThenOpenDuckChat() {
+    fun whenOnDuckChatOmnibarButtonClickedWithoutFocusThenGetsDuckChatUrl() {
+        whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
         testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = false)
-        verify(mockDuckChat).openDuckChat()
+        verify(mockDuckChat).getDuckChatUrl(eq("example"), eq(false), any())
     }
 
     @Test
-    fun whenOnDuckChatOmnibarButtonClickedWithNullQueryAndFocusThenOpenDuckChatWithAutoPrompt() {
+    fun whenOnDuckChatOmnibarButtonClickedWithNullQueryAndFocusThenGetsDuckChatUrlWithAutoPrompt() {
+        whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
         testee.onDuckChatOmnibarButtonClicked(query = null, hasFocus = true, isNtp = false)
-        verify(mockDuckChat).openDuckChatWithAutoPrompt(query = "")
+        verify(mockDuckChat).getDuckChatUrl(eq(""), eq(true), any())
     }
 
     @Test
-    fun whenOnDuckChatOmnibarButtonClickedWithNullQueryWithoutFocusThenOpenDuckChat() {
+    fun whenOnDuckChatOmnibarButtonClickedWithNullQueryWithoutFocusThenGetsDuckChatUrl() {
+        whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
         testee.onDuckChatOmnibarButtonClicked(query = null, hasFocus = false, isNtp = false)
-        verify(mockDuckChat).openDuckChat()
+        verify(mockDuckChat).getDuckChatUrl(eq(""), eq(false), any())
     }
 
     @Test
-    fun whenOnDuckChatOmnibarButtonClickedWhenOnNtpWithNullQueryAndWithFocusThenOpenDuckChat() {
+    fun whenOnDuckChatOmnibarButtonClickedWhenOnNtpWithNullQueryAndWithFocusThenGetsDuckChatUrl() {
+        whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
         testee.onDuckChatOmnibarButtonClicked(query = null, hasFocus = true, isNtp = true)
-        verify(mockDuckChat).openDuckChat()
+        verify(mockDuckChat).getDuckChatUrl(eq(""), eq(false), any())
     }
 
     @Test
-    fun whenOnDuckChatOmnibarButtonClickedWhenOnNtpWithBlankQueryAndWithFocusThenOpenDuckChat() {
+    fun whenOnDuckChatOmnibarButtonClickedWhenOnNtpWithBlankQueryAndWithFocusThenGetsDuckChatUrl() {
+        whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
         testee.onDuckChatOmnibarButtonClicked(query = " ", hasFocus = true, isNtp = true)
-        verify(mockDuckChat).openDuckChat()
+        verify(mockDuckChat).getDuckChatUrl(eq(" "), eq(false), any())
     }
 
     @Test
-    fun whenOnDuckChatOmnibarButtonClickedWhenOnNtpWithQueryAndWithFocusThenOpenDuckChatWithAutoPrompt() {
+    fun whenOnDuckChatOmnibarButtonClickedWhenOnNtpWithQueryAndWithFocusThenGetsDuckChatUrlWithAutoPrompt() {
+        whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
         testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = true, isNtp = true)
-        verify(mockDuckChat).openDuckChatWithAutoPrompt(query = "example")
-    }
-
-    @Test
-    fun whenOnDuckChatOmnibarButtonClickedWhenOnNtpWithQueryAndWithoutFocusThenOpenDuckChat() {
-        testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = true)
-        verify(mockDuckChat).openDuckChat()
+        verify(mockDuckChat).getDuckChatUrl(eq("example"), eq(true), any())
     }
 
     @Test
@@ -8688,27 +8754,17 @@ class BrowserTabViewModelTest {
     @Test
     fun whenOnDuckChatOmnibarButtonClickedFocusedWithContextualModeThenOpensDuckChatNotContextualSheet() {
         mockDuckAiContextualModeFlow.value = true
+        whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
 
         testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = true, isNtp = false)
 
-        verify(mockDuckChat).openDuckChatWithAutoPrompt(query = "example")
+        verify(mockDuckChat).getDuckChatUrl(eq("example"), eq(true), any())
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertFalse(commandCaptor.allValues.any { it is Command.ShowDuckAIContextualMode })
     }
 
     @Test
-    fun whenOnDuckChatOmnibarButtonClickedWithFocusAndUrlQueryThenNavigateInsteadOfOpeningDuckChat() {
-        whenever(mockQueryUrlPredictor.isUrl("bbc.com")).thenReturn(true)
-        whenever(mockOmnibarConverter.convertQueryToUrl("bbc.com", null)).thenReturn("https://bbc.com")
-        testee.onDuckChatOmnibarButtonClicked(query = "bbc.com", hasFocus = true, isNtp = false)
-        verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
-        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        assertTrue(commandCaptor.allValues.any { it is Navigate })
-    }
-
-    @Test
-    fun whenOnDuckChatOmnibarButtonClickedWithFocusAndUrlQueryInFullScreenModeThenNavigateInsteadOfOpeningDuckChat() = runTest {
-        mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
+    fun whenOnDuckChatOmnibarButtonClickedWithFocusAndUrlQueryThenNavigateInsteadOfOpeningDuckChat() = runTest {
         whenever(mockQueryUrlPredictor.isUrl("bbc.com")).thenReturn(true)
         whenever(mockOmnibarConverter.convertQueryToUrl("bbc.com", null)).thenReturn("https://bbc.com")
 
@@ -8725,15 +8781,14 @@ class BrowserTabViewModelTest {
         whenever(mockQueryUrlPredictor.isUrl("https://example.com")).thenReturn(true)
         whenever(mockOmnibarConverter.convertQueryToUrl("https://example.com", null)).thenReturn("https://example.com")
         testee.onDuckChatOmnibarButtonClicked(query = "https://example.com", hasFocus = true, isNtp = false)
-        verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
+        verify(mockDuckChat, never()).getDuckChatUrl(any(), any(), any())
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.allValues.any { it is Navigate })
     }
 
     @Test
-    fun whenOnDuckChatOmnibarButtonClickedAndFullScreenModeThenOpenChatNotCalled() = runTest {
+    fun whenOnDuckChatOmnibarButtonClickedOnNtpUnfocusedThenNavigatesToDuckChatUrl() = runTest {
         val duckAIUrl = "https://duckduckgo.com/?q=test"
-        mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
         whenever(mockDuckChat.getDuckChatUrl(any(), any(), any())).thenReturn(duckAIUrl)
         whenever(mockOmnibarConverter.convertQueryToUrl(duckAIUrl, null)).thenReturn(duckAIUrl)
 
@@ -8742,8 +8797,6 @@ class BrowserTabViewModelTest {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val command = commandCaptor.lastValue as Navigate
         assertEquals(duckAIUrl, command.url)
-
-        verify(mockDuckChat, never()).openDuckChat()
     }
 
     @Test
@@ -9535,456 +9588,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenInputScreenEnabledAndSwitchToNewTabThenLaunchInputScreenCommandTriggered() =
-        runTest {
-            val initialTabId = "initial-tab"
-            val initialTab =
-                TabEntity(
-                    tabId = initialTabId,
-                    url = "https://example.com",
-                    title = "EX",
-                    skipHome = false,
-                    viewed = true,
-                    position = 0,
-                )
-            val ntpTabId = "ntp-tab"
-            val ntpTab = TabEntity(tabId = ntpTabId, url = null, title = "", skipHome = false, viewed = true, position = 0)
-            whenever(mockTabRepository.getTab(initialTabId)).thenReturn(initialTab)
-            whenever(mockTabRepository.getTab(ntpTabId)).thenReturn(ntpTab)
-            flowSelectedTab.emit(initialTab)
-
-            testee.loadData(tabId = ntpTabId, initialUrl = null, skipHome = false, isExternal = false)
-            testee.observeSelectedTab(isRestored = false)
-            mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
-
-            flowSelectedTab.emit(ntpTab)
-
-            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-            val commands = commandCaptor.allValues
-            assertTrue(
-                "LaunchInputScreen command should be triggered for null URL tab",
-                commands.any { it is Command.LaunchInputScreen },
-            )
-        }
-
-    @Test
-    fun whenOpenInputScreenOnDuckAiTabArmedAndSwitchToNewTabThenLaunchInputScreenOnChat() =
-        runTest {
-            whenever(mockCustomAiOnboardingStore.consumeOpenInputOnDuckAiTab()).thenReturn(true)
-            val initialTab =
-                TabEntity(tabId = "initial-tab", url = "https://example.com", title = "EX", skipHome = false, viewed = true, position = 0)
-            val ntpTabId = "ntp-tab"
-            val ntpTab = TabEntity(tabId = ntpTabId, url = null, title = "", skipHome = false, viewed = true, position = 0)
-            whenever(mockTabRepository.getTab("initial-tab")).thenReturn(initialTab)
-            whenever(mockTabRepository.getTab(ntpTabId)).thenReturn(ntpTab)
-            flowSelectedTab.emit(initialTab)
-
-            testee.loadData(tabId = ntpTabId, initialUrl = null, skipHome = false, isExternal = false)
-            testee.observeSelectedTab(isRestored = false)
-            mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
-
-            flowSelectedTab.emit(ntpTab)
-
-            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-            val launch = commandCaptor.allValues.filterIsInstance<Command.LaunchInputScreen>().last()
-            assertTrue("expected launchOnChat=true when the one-shot is armed", launch.launchOnChat)
-            // launchOnChat must be decoupled from showDuckAiEndCta (no end CTA shown on this path).
-            assertEquals(DuckAiOnboardingEndCtaVariant.NONE, launch.duckAiEndCtaVariant)
-        }
-
-    @Test
-    fun whenInputScreenDisabledAndSwitchToNewTabThenLaunchInputScreenCommandNotTriggered() =
-        runTest {
-            val initialTabId = "initial-tab"
-            val initialTab =
-                TabEntity(
-                    tabId = initialTabId,
-                    url = "https://example.com",
-                    title = "EX",
-                    skipHome = false,
-                    viewed = true,
-                    position = 0,
-                )
-            val ntpTabId = "ntp-tab"
-            val ntpTab = TabEntity(tabId = ntpTabId, url = null, title = "", skipHome = false, viewed = true, position = 0)
-            whenever(mockTabRepository.getTab(initialTabId)).thenReturn(initialTab)
-            whenever(mockTabRepository.getTab(ntpTabId)).thenReturn(ntpTab)
-            flowSelectedTab.emit(initialTab)
-
-            testee.loadData(tabId = ntpTabId, initialUrl = null, skipHome = false, isExternal = false)
-            testee.observeSelectedTab(isRestored = false)
-            mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(false)
-
-            flowSelectedTab.emit(ntpTab)
-
-            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-            val commands = commandCaptor.allValues
-            assertFalse(
-                "LaunchInputScreen command should NOT be triggered when input screen is disabled",
-                commands.any { it is Command.LaunchInputScreen },
-            )
-        }
-
-    @Test
-    fun whenInputScreenEnabledAndSwitchToTabWithUrlThenLaunchInputScreenCommandNotTriggered() =
-        runTest {
-            val initialTabId = "initial-tab"
-            val initialTab =
-                TabEntity(
-                    tabId = initialTabId,
-                    url = "https://example.com",
-                    title = "EX",
-                    skipHome = false,
-                    viewed = true,
-                    position = 0,
-                )
-            val targetTabId = "target-tab"
-            val targetTab =
-                TabEntity(
-                    tabId = targetTabId,
-                    url = "https://duckduckgo.com",
-                    title = "DDG",
-                    skipHome = false,
-                    viewed = true,
-                    position = 0,
-                )
-            whenever(mockTabRepository.getTab(initialTabId)).thenReturn(initialTab)
-            whenever(mockTabRepository.getTab(targetTabId)).thenReturn(targetTab)
-            flowSelectedTab.emit(initialTab)
-
-            testee.loadData(tabId = targetTabId, initialUrl = null, skipHome = false, isExternal = false)
-            testee.observeSelectedTab(isRestored = false)
-            mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
-
-            flowSelectedTab.emit(targetTab)
-
-            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-            val commands = commandCaptor.allValues
-            assertFalse(
-                "LaunchInputScreen command should NOT be triggered when switching to tab with existing URL",
-                commands.any { it is Command.LaunchInputScreen },
-            )
-        }
-
-    @Test
-    fun whenInputScreenEnabledAndSwitchToNewTabThatManagedByAnotherViewModelThenLaunchInputScreenCommandNotTriggered() =
-        runTest {
-            val initialTabId = "initial-tab"
-            val initialTab =
-                TabEntity(
-                    tabId = initialTabId,
-                    url = "https://example.com",
-                    title = "EX",
-                    skipHome = false,
-                    viewed = true,
-                    position = 0,
-                )
-            val ntpTabId = "ntp-tab"
-            val ntpTab = TabEntity(tabId = ntpTabId, url = null, title = "", skipHome = false, viewed = true, position = 0)
-            whenever(mockTabRepository.getTab(initialTabId)).thenReturn(initialTab)
-            whenever(mockTabRepository.getTab(ntpTabId)).thenReturn(ntpTab)
-            flowSelectedTab.emit(initialTab)
-
-            testee.loadData(tabId = initialTabId, initialUrl = null, skipHome = false, isExternal = false)
-            testee.observeSelectedTab(isRestored = false)
-            mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
-
-            flowSelectedTab.emit(ntpTab)
-
-            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-            val commands = commandCaptor.allValues
-            assertFalse(
-                "LaunchInputScreen command should NOT be triggered when switching to new tab that's managed by another view model",
-                commands.any { it is Command.LaunchInputScreen },
-            )
-        }
-
-    @Test
-    fun whenInputScreenPrefChangesToEnabledThenLaunchInputScreenCommandNotTriggered() =
-        runTest {
-            val initialTabId = "initial-tab"
-            val initialTab =
-                TabEntity(
-                    tabId = initialTabId,
-                    url = "https://example.com",
-                    title = "EX",
-                    skipHome = false,
-                    viewed = true,
-                    position = 0,
-                )
-            val ntpTabId = "ntp-tab"
-            val ntpTab = TabEntity(tabId = ntpTabId, url = null, title = "", skipHome = false, viewed = true, position = 0)
-            whenever(mockTabRepository.getTab(initialTabId)).thenReturn(initialTab)
-            whenever(mockTabRepository.getTab(ntpTabId)).thenReturn(ntpTab)
-            flowSelectedTab.emit(initialTab)
-
-            testee.loadData(tabId = ntpTabId, initialUrl = null, skipHome = false, isExternal = false)
-            testee.observeSelectedTab(isRestored = false)
-            mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(false)
-
-            flowSelectedTab.emit(ntpTab)
-            mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
-
-            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-            val commands = commandCaptor.allValues
-            assertFalse(
-                "LaunchInputScreen command should NOT be triggered when preference is toggled",
-                commands.any { it is Command.LaunchInputScreen },
-            )
-        }
-
-    @Test
-    fun whenInputScreenEnabledAndSwitchToNewTabOpenedFromAnotherTabThenLaunchInputScreenCommandNotTriggered() =
-        runTest {
-            val initialTabId = "initial-tab"
-            val initialTab =
-                TabEntity(
-                    tabId = initialTabId,
-                    url = "https://example.com",
-                    title = "EX",
-                    skipHome = false,
-                    viewed = true,
-                    position = 0,
-                )
-            val sourceTabId = "source-tab"
-            val ntpTabId = "ntp-tab"
-            val ntpTab =
-                TabEntity(
-                    tabId = ntpTabId,
-                    url = null,
-                    title = "",
-                    skipHome = false,
-                    viewed = true,
-                    position = 0,
-                    sourceTabId = sourceTabId,
-                )
-            whenever(mockTabRepository.getTab(initialTabId)).thenReturn(initialTab)
-            whenever(mockTabRepository.getTab(ntpTabId)).thenReturn(ntpTab)
-            flowSelectedTab.emit(initialTab)
-
-            testee.loadData(tabId = ntpTabId, initialUrl = null, skipHome = false, isExternal = false)
-            testee.observeSelectedTab(isRestored = false)
-            mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
-
-            flowSelectedTab.emit(ntpTab)
-
-            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-            val commands = commandCaptor.allValues
-            assertFalse(
-                "LaunchInputScreen command should NOT be triggered when switching to new tab that was opened from another tab",
-                commands.any { it is Command.LaunchInputScreen },
-            )
-        }
-
-    @Test
-    fun whenInputScreenEnabledAndSwitchToNewTabNotOpenedFromAnotherTabThenLaunchInputScreenCommandTriggered() =
-        runTest {
-            val initialTabId = "initial-tab"
-            val initialTab =
-                TabEntity(
-                    tabId = initialTabId,
-                    url = "https://example.com",
-                    title = "EX",
-                    skipHome = false,
-                    viewed = true,
-                    position = 0,
-                )
-            val ntpTabId = "ntp-tab"
-            val ntpTab =
-                TabEntity(
-                    tabId = ntpTabId,
-                    url = null,
-                    title = "",
-                    skipHome = false,
-                    viewed = true,
-                    position = 0,
-                    sourceTabId = null,
-                )
-            whenever(mockTabRepository.getTab(initialTabId)).thenReturn(initialTab)
-            whenever(mockTabRepository.getTab(ntpTabId)).thenReturn(ntpTab)
-            flowSelectedTab.emit(initialTab)
-
-            testee.loadData(tabId = ntpTabId, initialUrl = null, skipHome = false, isExternal = false)
-            testee.observeSelectedTab(isRestored = false)
-            mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
-
-            flowSelectedTab.emit(ntpTab)
-
-            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-            val commands = commandCaptor.allValues
-            assertTrue(
-                "LaunchInputScreen command should be triggered when switching to new tab that was NOT opened from another tab",
-                commands.any { it is Command.LaunchInputScreen },
-            )
-        }
-
-    @Test
-    fun whenInputScreenEnabledAndExternalIntentProcessingThenLaunchInputScreenCommandSuppressed() =
-        runTest {
-            val initialTabId = "initial-tab"
-            val initialTab =
-                TabEntity(
-                    tabId = initialTabId,
-                    url = "https://example.com",
-                    title = "EX",
-                    skipHome = false,
-                    viewed = true,
-                    position = 0,
-                )
-            val ntpTabId = "ntp-tab"
-            val ntpTab = TabEntity(tabId = ntpTabId, url = null, title = "", skipHome = false, viewed = true, position = 0)
-            whenever(mockTabRepository.getTab(initialTabId)).thenReturn(initialTab)
-            whenever(mockTabRepository.getTab(ntpTabId)).thenReturn(ntpTab)
-            flowSelectedTab.emit(initialTab)
-
-            testee.loadData(tabId = ntpTabId, initialUrl = null, skipHome = false, isExternal = false)
-            testee.observeSelectedTab(isRestored = false)
-            mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
-            whenever(mockExternalIntentProcessingState.hasPendingTabLaunch).thenReturn(true)
-
-            flowSelectedTab.emit(ntpTab)
-
-            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-            val commands = commandCaptor.allValues
-            assertFalse(
-                "LaunchInputScreen command should be suppressed when external intent processing is active",
-                commands.any { it is Command.LaunchInputScreen },
-            )
-        }
-
-    @Test
-    fun whenInputScreenEnabledAndDuckAiOpenThenLaunchInputScreenCommandSuppressed() =
-        runTest {
-            val initialTabId = "initial-tab"
-            val initialTab =
-                TabEntity(
-                    tabId = initialTabId,
-                    url = "https://example.com",
-                    title = "EX",
-                    skipHome = false,
-                    viewed = true,
-                    position = 0,
-                )
-            val ntpTabId = "ntp-tab"
-            val ntpTab = TabEntity(tabId = ntpTabId, url = null, title = "", skipHome = false, viewed = true, position = 0)
-            whenever(mockTabRepository.getTab(initialTabId)).thenReturn(initialTab)
-            whenever(mockTabRepository.getTab(ntpTabId)).thenReturn(ntpTab)
-            flowSelectedTab.emit(initialTab)
-
-            testee.loadData(tabId = ntpTabId, initialUrl = null, skipHome = false, isExternal = false)
-            testee.observeSelectedTab(isRestored = false)
-            mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
-            whenever(mockExternalIntentProcessingState.hasPendingDuckAiOpen).thenReturn(true)
-
-            flowSelectedTab.emit(ntpTab)
-
-            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-            val commands = commandCaptor.allValues
-            assertFalse(
-                "LaunchInputScreen command should be suppressed when Duck.ai is opened",
-                commands.any { it is Command.LaunchInputScreen },
-            )
-        }
-
-    @Test
-    fun whenInputScreenEnabledAndSubscriptionSkippedOnboardingDialogShowingThenLaunchInputScreenCommandSuppressed() =
-        runTest {
-            val initialTabId = "initial-tab"
-            val initialTab =
-                TabEntity(
-                    tabId = initialTabId,
-                    url = "https://example.com",
-                    title = "EX",
-                    skipHome = false,
-                    viewed = true,
-                    position = 0,
-                )
-            val ntpTabId = "ntp-tab"
-            val ntpTab = TabEntity(tabId = ntpTabId, url = null, title = "", skipHome = false, viewed = true, position = 0)
-            whenever(mockTabRepository.getTab(initialTabId)).thenReturn(initialTab)
-            whenever(mockTabRepository.getTab(ntpTabId)).thenReturn(ntpTab)
-            flowSelectedTab.emit(initialTab)
-
-            whenever(ctaViewModelMockSettingsStore.hideTips).thenReturn(true)
-            whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - 8 * 24 * 3600 * 1000L)
-            whenever(mockDismissedCtaDao.exists(DAX_INTRO_PRIVACY_PRO)).thenReturn(false)
-            whenever(mockExtendedOnboardingFeatureToggles.subscriptionPromoModalCta()).thenReturn(mockEnabledToggle)
-            whenever(mockExtendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockEnabledToggle)
-            whenever(subscriptions.isEligible()).thenReturn(true)
-            whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
-
-            testee.loadData(tabId = ntpTabId, initialUrl = null, skipHome = false, isExternal = false)
-            testee.observeSelectedTab(isRestored = false)
-            mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
-
-            flowSelectedTab.emit(ntpTab)
-
-            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-            val commands = commandCaptor.allValues
-            assertFalse(
-                "LaunchInputScreen command should be suppressed when Privacy Pro skipped-onboarding dialog is showing",
-                commands.any { it is Command.LaunchInputScreen },
-            )
-        }
-
-    @Test
-    fun whenInputScreenEnabledAndTabRestoredAndRestorationFixEnabledThenLaunchInputScreenCommandSuppressed() =
-        runTest {
-            val ntpTabId = "ntp-tab"
-            val ntpTab = TabEntity(tabId = ntpTabId, url = null, title = "", skipHome = false, viewed = true, position = 0)
-            whenever(mockTabRepository.getTab(ntpTabId)).thenReturn(ntpTab)
-            flowSelectedTab.emit(ntpTab)
-
-            fakeAndroidConfigBrowserFeature.tabStateRestorationFix().setRawStoredState(State(enable = true))
-            mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
-            testee.loadData(tabId = ntpTabId, initialUrl = null, skipHome = false, isExternal = false)
-            testee.observeSelectedTab(isRestored = true)
-
-            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-            val commands = commandCaptor.allValues
-            assertFalse(
-                "LaunchInputScreen command should be suppressed when tab is restored from saved state",
-                commands.any { it is Command.LaunchInputScreen },
-            )
-        }
-
-    @Test
-    fun whenInputScreenEnabledAndTabRestoredAndRestorationFixDisabledThenLaunchInputScreenCommandNotSuppressed() =
-        runTest {
-            val initialTabId = "initial-tab"
-            val initialTab =
-                TabEntity(
-                    tabId = initialTabId,
-                    url = "https://example.com",
-                    title = "EX",
-                    skipHome = false,
-                    viewed = true,
-                    position = 0,
-                )
-            val ntpTabId = "ntp-tab"
-            val ntpTab = TabEntity(tabId = ntpTabId, url = null, title = "", skipHome = false, viewed = true, position = 0)
-            whenever(mockTabRepository.getTab(initialTabId)).thenReturn(initialTab)
-            whenever(mockTabRepository.getTab(ntpTabId)).thenReturn(ntpTab)
-            flowSelectedTab.emit(initialTab)
-
-            fakeAndroidConfigBrowserFeature.tabStateRestorationFix().setRawStoredState(State(enable = false))
-            testee.loadData(tabId = ntpTabId, initialUrl = null, skipHome = false, isExternal = false)
-            testee.observeSelectedTab(isRestored = true)
-            mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
-
-            flowSelectedTab.emit(ntpTab)
-
-            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-            val commands = commandCaptor.allValues
-            assertTrue(
-                "LaunchInputScreen command should not be suppressed when tab restoration fix is disabled",
-                commands.any { it is Command.LaunchInputScreen },
-            )
-        }
-
-    @Test
     fun whenEvaluateSerpLogoStateCalledWithDuckDuckGoUrlThenExtractSerpLogoCommandIssued() {
-        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
         givenCurrentSite("https://duckduckgo.com/?q=test")
         val ddgUrl = "https://duckduckgo.com/?q=test"
         val webViewNavState = WebViewNavigationState(mockStack, 100)
@@ -10001,8 +9605,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenEvaluateSerpLogoStateCalledWithNonDuckDuckGoUrlThenExtractSerpLogoCommandNotIssued() {
-        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
-
         val nonDdgUrl = "https://example.com/search?q=test"
         val webViewNavState = WebViewNavigationState(mockStack, 100)
 
@@ -10017,7 +9619,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenEvaluateSerpLogoStateCalledWithNonDuckDuckGoUrlThenSerpLogoIsCleared() {
-        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
         givenCurrentSite("https://example.com/search?q=test")
         val nonDdgUrl = "https://example.com/search?q=test"
         val webViewNavState = WebViewNavigationState(mockStack, 100)
@@ -10222,7 +9823,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenFavouriteLogoSetAndFeatureEnabledThenExtractSerpLogoNotIssued() = runTest {
-        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
         whenever(mockSetFavouriteToggle.isEnabled()).thenReturn(true)
         setFavouriteEnabledFlow.value = true
         favouriteLogoFlow.value = "https://example.com/favourite-logo.png"
@@ -10242,7 +9842,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenFavouriteLogoSetAndFeatureEnabledThenSerpLogoIsSetToFavourite() = runTest {
-        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
         whenever(mockSetFavouriteToggle.isEnabled()).thenReturn(true)
         setFavouriteEnabledFlow.value = true
         val favouriteUrl = "https://example.com/favourite-logo.png"
@@ -10263,7 +9862,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenFavouriteLogoSetButFeatureDisabledThenExtractSerpLogoIssued() = runTest {
-        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
         whenever(mockSetFavouriteToggle.isEnabled()).thenReturn(false)
         favouriteLogoFlow.value = "https://example.com/favourite-logo.png"
 
@@ -10283,7 +9881,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenNoFavouriteLogoSetAndFeatureEnabledThenExtractSerpLogoIssued() = runTest {
-        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
         whenever(mockSetFavouriteToggle.isEnabled()).thenReturn(true)
         setFavouriteEnabledFlow.value = true
         favouriteLogoFlow.value = null
@@ -10304,7 +9901,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenFavouriteLogoClearedOnSerpPageThenSerpLogoSetToNormal() = runTest {
-        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
         whenever(mockSetFavouriteToggle.isEnabled()).thenReturn(true)
         val ddgUrl = "https://duckduckgo.com/?q=test"
         loadUrl(ddgUrl)
@@ -10337,7 +9933,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenFavouriteLogoClearedOnNonSerpPageThenSerpLogoUnchanged() = runTest {
-        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
         whenever(mockSetFavouriteToggle.isEnabled()).thenReturn(true)
         setFavouriteEnabledFlow.value = true
         val favouriteUrl = "https://example.com/favourite-logo.png"
@@ -10839,9 +10434,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenDuckChatMenuItemClickedAndFullScreenModeDisabledThenDontOpenDuckChatScreen() =
+    fun whenDuckChatMenuItemClickedThenOpenNewDuckChatTab() =
         runTest {
-            mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
             whenever(mockDuckChat.wasOpenedBefore()).thenReturn(false)
             whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
 
@@ -10993,9 +10587,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenNonDuckAiPageFinishedAndFullscreenModeEnabledThenDisabledDuckAiModeCommandSent() = runTest {
+    fun whenNonDuckAiPageFinishedThenDisabledDuckAiModeCommandSent() = runTest {
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
-        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenModeEnabled)
 
         givenCurrentSite("https://example.com/search?q=test")
         val nonDdgUrl = "https://example.com/search?q=test"
@@ -11011,9 +10604,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenDuckAiPageFinishedAndFullscreenModeEnabledThenEnableDuckAiModeCommandSent() = runTest {
+    fun whenDuckAiPageFinishedThenEnableDuckAiModeCommandSent() = runTest {
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
-        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenModeEnabled)
 
         givenCurrentSite("https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5")
         val nonDdgUrl = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
@@ -11029,37 +10621,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenNonDuckAiPageFinishedAndFullscreenModeDisabledThenDuckAiCommandsNotSent() = runTest {
-        mockDuckAiFullScreenMode.emit(false)
-
-        val nonDdgUrl = "https://example.com/search?q=test"
-        val webViewNavState = WebViewNavigationState(mockStack, 100)
-
-        testee.pageFinished(mockWebView, webViewNavState, nonDdgUrl)
-
-        val commands = commandCaptor.allValues
-        assertFalse(commands.any { it is Command.EnableDuckAIFullScreen })
-        assertFalse(commands.any { it is Command.DuckAIFullScreenDisabled })
-    }
-
-    @Test
-    fun whenDuckAiPageFinishedAndFullscreenModeDisabledThenDuckAiCommandsNotSent() = runTest {
-        mockDuckAiFullScreenMode.emit(false)
-
-        val nonDdgUrl = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
-        val webViewNavState = WebViewNavigationState(mockStack, 100)
-
-        testee.pageFinished(mockWebView, webViewNavState, nonDdgUrl)
-
-        val commands = commandCaptor.allValues
-        assertFalse(commands.any { it is Command.DuckAIFullScreenDisabled })
-        assertFalse(commands.any { it is Command.EnableDuckAIFullScreen })
-    }
-
-    @Test
-    fun whenNewPageWithDuckAIUrlAndFullscreenModeEnabledThenEnableDuckAiModeCommandSent() = runTest {
+    fun whenNewPageWithDuckAIUrlThenEnableDuckAiModeCommandSent() = runTest {
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
-        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenModeEnabled)
         testee.browserViewState.value = browserViewState().copy(browserShowing = true)
 
         testee.navigationStateChanged(
@@ -11077,9 +10640,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenNewPageWithNonDuckAIUrlAndFullscreenModeEnabledThenDisableDuckAiModeCommandSent() = runTest {
+    fun whenNewPageWithNonDuckAIUrlThenDisableDuckAiModeCommandSent() = runTest {
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
-        whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenModeEnabled)
         testee.browserViewState.value = browserViewState().copy(browserShowing = true)
 
         testee.navigationStateChanged(
@@ -11093,42 +10655,6 @@ class BrowserTabViewModelTest {
 
         val commands = commandCaptor.allValues
         assertTrue(commands.any { it is Command.DuckAIFullScreenDisabled })
-        assertFalse(commands.any { it is Command.EnableDuckAIFullScreen })
-    }
-
-    @Test
-    fun whenNewPageWithDuckAIUrlAndFullscreenModeDisabledThenNoDuckAICommandsSent() = runTest {
-        testee.browserViewState.value = browserViewState().copy(browserShowing = true)
-
-        testee.navigationStateChanged(
-            buildWebNavigation(
-                currentUrl = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5",
-                originalUrl = "https://www.example.com",
-            ),
-        )
-
-        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-
-        val commands = commandCaptor.allValues
-        assertFalse(commands.any { it is Command.DuckAIFullScreenDisabled })
-        assertFalse(commands.any { it is Command.EnableDuckAIFullScreen })
-    }
-
-    @Test
-    fun whenNewPageWithNonDuckAIUrlAndFullscreenModeDisabledThenNoDuckAICommandsSent() = runTest {
-        testee.browserViewState.value = browserViewState().copy(browserShowing = true)
-
-        testee.navigationStateChanged(
-            buildWebNavigation(
-                currentUrl = "https://test.com",
-                originalUrl = "https://www.example.com",
-            ),
-        )
-
-        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-
-        val commands = commandCaptor.allValues
-        assertFalse(commands.any { it is Command.DuckAIFullScreenDisabled })
         assertFalse(commands.any { it is Command.EnableDuckAIFullScreen })
     }
 
@@ -11264,7 +10790,6 @@ class BrowserTabViewModelTest {
         val duckAIUrl = "https://duckduckgo.com/?q=test"
 
         mockDuckAiContextualModeFlow.emit(true)
-        mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
 
         whenever(mockDuckChat.getDuckChatUrl(any(), any(), any())).thenReturn(duckAIUrl)
         whenever(mockOmnibarConverter.convertQueryToUrl(duckAIUrl, null)).thenReturn(duckAIUrl)
@@ -12424,6 +11949,17 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenBrandDesignDuckAiFireButtonCtaOkClickedThenFireDialogLaunchedAndCtaNotDismissed() = runTest {
+        dismissedCtaDaoChannel.send(emptyList())
+
+        testee.onUserClickCtaOkButton(brandDesignDuckAiFireButtonCta())
+        advanceUntilIdle()
+
+        assertCommandIssued<Command.LaunchDuckAiOnboardingFireDialog>()
+        verify(mockDismissedCtaDao, never()).insert(DismissedCta(CtaId.DAX_DUCK_AI_FIRE_BUTTON))
+    }
+
+    @Test
     fun whenDismissDuckAiFireOnboardingCtaCalledWithDuckAiFireCtaThenCtaDismissed() = runTest {
         dismissedCtaDaoChannel.send(emptyList())
         val cta = DaxDuckAiFireButtonCta(mockOnboardingStore, mockAppInstallStore)
@@ -12470,28 +12006,6 @@ class BrowserTabViewModelTest {
         advanceUntilIdle()
 
         verify(mockDismissedCtaDao, never()).insert(DismissedCta(CtaId.DAX_DUCK_AI_FIRE_BUTTON))
-    }
-
-    @Test
-    fun whenOnDuckAiEndCtaInputScreenResultOkThenOkPixelFired() = runTest {
-        testee.onDuckAiEndCtaInputScreenResult(okClicked = true)
-        advanceUntilIdle()
-
-        verify(mockPixel).fire(
-            ONBOARDING_DAX_CTA_OK_BUTTON,
-            mapOf(PixelParameter.CTA_SHOWN to "duck_ai_end_cta"),
-        )
-    }
-
-    @Test
-    fun whenOnDuckAiEndCtaInputScreenResultDismissThenDismissPixelFired() = runTest {
-        testee.onDuckAiEndCtaInputScreenResult(okClicked = false)
-        advanceUntilIdle()
-
-        verify(mockPixel).fire(
-            ONBOARDING_DAX_CTA_DISMISS_BUTTON,
-            mapOf(PixelParameter.CTA_SHOWN to "duck_ai_end_cta"),
-        )
     }
 
     @Test

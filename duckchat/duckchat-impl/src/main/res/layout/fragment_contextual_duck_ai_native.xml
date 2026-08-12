@@ -22,7 +22,7 @@
     android:id="@+id/contextualModeRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/rounded_top_corners_bottom_sheet_drawable"
+    android:background="@drawable/contextual_sheet_background"
     tools:ignore="Overdraw"
     android:orientation="vertical">
 
@@ -123,28 +123,40 @@
         android:layout_height="0dp"
         android:layout_weight="1">
 
-        <LinearLayout
+        <androidx.core.widget.NestedScrollView
             android:id="@+id/contextualModePrompts"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:paddingHorizontal="@dimen/keyline_4"
-            android:gravity="bottom"
-            android:paddingTop="@dimen/keyline_4"
-            android:paddingBottom="@dimen/keyline_1">
+            android:fillViewport="true">
 
-            <com.duckduckgo.common.ui.view.text.DaxTextView
-                android:id="@+id/contextualPromptQuickAction"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/duck_ai_prompt_background"
-                android:drawableStart="@drawable/ic_arrow_down_right_16"
-                android:drawablePadding="@dimen/keyline_2"
-                android:padding="@dimen/keyline_2"
-                tools:text="@string/duckAIContextualPromptSummarize"
-                app:typography="body2_bold" />
+                android:orientation="vertical"
+                android:paddingHorizontal="@dimen/keyline_4"
+                android:gravity="bottom"
+                android:paddingTop="@dimen/keyline_4"
+                android:paddingBottom="@dimen/keyline_1">
 
-        </LinearLayout>
+                <com.duckduckgo.duckchat.impl.contextual.suggestions.ContextualSuggestionsView
+                    android:id="@+id/contextualSuggestionsView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <com.duckduckgo.common.ui.view.text.DaxTextView
+                    android:id="@+id/contextualPromptQuickAction"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/keyline_2"
+                    android:background="@drawable/duck_ai_prompt_background"
+                    android:drawableStart="@drawable/ic_arrow_down_right_16"
+                    android:drawablePadding="@dimen/keyline_2"
+                    android:padding="@dimen/keyline_2"
+                    tools:text="@string/duckAIContextualPromptSummarize"
+                    app:typography="body2_bold" />
+
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
 
         <FrameLayout
             android:id="@+id/contextualWebviewContainer"
@@ -174,7 +186,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:layout_margin="@dimen/keyline_2"
+            android:layout_marginHorizontal="@dimen/keyline_2"
+            android:layout_marginBottom="@dimen/keyline_2"
             app:cardBackgroundColor="?attr/daxColorWindow"
             app:cardElevation="4dp"
             app:cardUseCompatPadding="false">
@@ -236,7 +249,7 @@
                             android:background="@null"
                             android:fontFamily="sans-serif"
                             android:gravity="start|top"
-                            android:hint="@string/input_screen_chat_hint"
+                            android:hint="@string/contextualSheetImprovedHint"
                             android:lineSpacingMultiplier="1.2"
                             android:minHeight="40dp"
                             android:paddingVertical="@dimen/keyline_2"
@@ -325,41 +338,6 @@
                             app:layout_constraintTop_toTopOf="parent"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:srcCompat="@drawable/ic_close_24_small" />
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:id="@+id/duckAiAttachContextLayout"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:padding="@dimen/keyline_2"
-                        android:layout_marginTop="@dimen/keyline_2"
-                        android:background="@drawable/background_dashed_outline">
-
-                        <com.google.android.material.imageview.ShapeableImageView
-                            android:id="@+id/duckAiContextualAttachContextIcon"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:layout_gravity="center"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            android:src="@drawable/ic_page_content_attach_24"
-                            app:shapeAppearanceOverlay="@style/Widget.DuckDuckGo.DuckChatContextualFavicon"
-                            android:importantForAccessibility="no" />
-
-                        <com.duckduckgo.common.ui.view.text.DaxTextView
-                            android:id="@+id/duckAiContextualAttachContextLabel"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            app:textType="secondary"
-                            android:text="@string/duckAIContextualAttachPageContent"
-                            android:paddingEnd="@dimen/keyline_2"
-                            android:layout_marginStart="@dimen/keyline_2"
-                            app:typography="body2_bold"
-                            app:layout_constraintStart_toEndOf="@+id/duckAiContextualAttachContextIcon"
-                            app:layout_constraintTop_toTopOf="@id/duckAiContextualAttachContextIcon"
-                            app:layout_constraintBottom_toBottomOf="@+id/duckAiContextualAttachContextIcon" />
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 

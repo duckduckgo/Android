@@ -21,6 +21,7 @@ import com.duckduckgo.app.statistics.wideevents.api.ContextSection
 import com.duckduckgo.app.statistics.wideevents.api.FeatureData
 import com.duckduckgo.app.statistics.wideevents.api.FeatureSection
 import com.duckduckgo.app.statistics.wideevents.api.GlobalSection
+import com.duckduckgo.app.statistics.wideevents.api.MetaSection
 import com.duckduckgo.app.statistics.wideevents.api.WideEventRequest
 import com.duckduckgo.app.statistics.wideevents.api.WideEventService
 import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository
@@ -49,10 +50,14 @@ class ApiWideEventSender @Inject constructor(
         requireNotNull(event.status) { "Attempting to send wide event with null status" }
 
         val request = WideEventRequest(
+            meta = MetaSection(
+                type = event.metaType,
+                version = event.metaVersion,
+            ),
             global = GlobalSection(
                 platform = PLATFORM,
                 type = TYPE,
-                sampleRate = SAMPLE_RATE,
+                sampleRate = event.samplingProbability,
             ),
             app = AppSection(
                 name = APP_NAME,
@@ -101,7 +106,6 @@ class ApiWideEventSender @Inject constructor(
     private companion object {
         const val PLATFORM = "Android"
         const val TYPE = "app"
-        const val SAMPLE_RATE = 1
         const val APP_NAME = "DuckDuckGo Android"
     }
 }

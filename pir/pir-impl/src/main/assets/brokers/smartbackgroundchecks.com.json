@@ -1,7 +1,7 @@
 {
   "name": "SmartBackgroundChecks",
   "url": "smartbackgroundchecks.com",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "parent": "peoplefinders.com",
   "addedDatetime": 1678082400000,
   "optOutUrl": "https://www.smartbackgroundchecks.com/optout",
@@ -14,6 +14,28 @@
           "actionType": "navigate",
           "id": "290d3add-c786-4ecf-a528-50b2a240f791",
           "url": "https://www.smartbackgroundchecks.com/people/${firstName|hyphenated}-${lastName|hyphenated}/${city|hyphenated}/${state|hyphenated}"
+        },
+        {
+          "actionType": "expectation",
+          "_comment": "detect Cloudflare challenge page - first gate, blocks the scan",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//script[contains(@src,'/cdn-cgi/challenge-platform/')] or .//script[contains(., '_cf_chl_opt')] or .//script[contains(@src,'challenges.cloudflare.com/turnstile')] or .//input[@name='cf-turnstile-response'] or .//div[@id='cf-error-details'])]"
+            }
+          ],
+          "id": "cfc-4b63420c-3be7-4abe-bb1b-491636360628"
+        },
+        {
+          "actionType": "expectation",
+          "_comment": "detect Datadome interstitial - second gate, only reached after Cloudflare clears",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//iframe[contains(@src,'captcha-delivery.com')])]"
+            }
+          ],
+          "id": "43ff3f91-f08c-460b-86c6-84b29384a72d"
         },
         {
           "actionType": "extract",

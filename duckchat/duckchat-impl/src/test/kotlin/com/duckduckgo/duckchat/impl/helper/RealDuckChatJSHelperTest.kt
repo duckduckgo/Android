@@ -303,6 +303,7 @@ class RealDuckChatJSHelperTest {
             put("supportsOpeningSettings", true)
             put("supportsNativeChatInput", false)
             put("supportsNativePrompt", false)
+            put("supportsNativePromptEditing", false)
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
@@ -312,6 +313,7 @@ class RealDuckChatJSHelperTest {
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
             put("supportsMultipleContexts", false)
+            put("supportsSuggestions", false)
             put("supportsSubscription", false)
             put("installType", "new")
             put("installAge", 0)
@@ -323,6 +325,36 @@ class RealDuckChatJSHelperTest {
         assertEquals(expected.method, result.method)
         assertEquals(expected.featureName, result.featureName)
         assertEquals(expected.params.toString(), result.params.toString())
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndNativePromptEditingEnabledThenCapabilityIsTrue() = runTest {
+        whenever(mockDuckChat.isNativePromptEditingEnabled()).thenReturn(true)
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativeConfigValues",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertTrue(result!!.params.getBoolean("supportsNativePromptEditing"))
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndNativePromptEditingDisabledThenCapabilityIsFalse() = runTest {
+        whenever(mockDuckChat.isNativePromptEditingEnabled()).thenReturn(false)
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativeConfigValues",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertFalse(result!!.params.getBoolean("supportsNativePromptEditing"))
     }
 
     @Test
@@ -644,6 +676,7 @@ class RealDuckChatJSHelperTest {
             put("supportsOpeningSettings", true)
             put("supportsNativeChatInput", false)
             put("supportsNativePrompt", false)
+            put("supportsNativePromptEditing", false)
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
@@ -653,6 +686,7 @@ class RealDuckChatJSHelperTest {
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
             put("supportsMultipleContexts", false)
+            put("supportsSuggestions", false)
             put("supportsSubscription", false)
             put("installType", "new")
             put("installAge", 0)
@@ -741,6 +775,7 @@ class RealDuckChatJSHelperTest {
             put("supportsOpeningSettings", true)
             put("supportsNativeChatInput", false)
             put("supportsNativePrompt", false)
+            put("supportsNativePromptEditing", false)
             put("supportsURLChatIDRestoration", true)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
@@ -750,6 +785,7 @@ class RealDuckChatJSHelperTest {
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
             put("supportsMultipleContexts", false)
+            put("supportsSuggestions", false)
             put("supportsSubscription", false)
             put("installType", "new")
             put("installAge", 0)
@@ -900,6 +936,7 @@ class RealDuckChatJSHelperTest {
             put("supportsOpeningSettings", true)
             put("supportsNativeChatInput", false)
             put("supportsNativePrompt", false)
+            put("supportsNativePromptEditing", false)
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
@@ -909,6 +946,7 @@ class RealDuckChatJSHelperTest {
             put("supportsPageContext", true)
             put("supportsNativeStorage", false)
             put("supportsMultipleContexts", false)
+            put("supportsSuggestions", false)
             put("supportsSubscription", false)
             put("installType", "new")
             put("installAge", 0)
@@ -920,6 +958,60 @@ class RealDuckChatJSHelperTest {
         assertEquals(expected.method, result.method)
         assertEquals(expected.featureName, result.featureName)
         assertEquals(expected.params.toString(), result.params.toString())
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndSuggestedPromptsEnabledInContextualModeThenSupportsSuggestionsTrue() = runTest {
+        whenever(mockDuckChat.isDuckChatFeatureEnabled()).thenReturn(true)
+        whenever(mockDuckChat.isDuckChatContextualModeEnabled()).thenReturn(true)
+        mockDuckChatFeature.contextualSuggestedPrompts().setRawStoredState(Toggle.State(enable = true))
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativeConfigValues",
+            "123",
+            null,
+            Mode.CONTEXTUAL,
+            viewModel.updatedPageContext,
+        )
+
+        assertTrue(result!!.params.getBoolean("supportsSuggestions"))
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndSuggestedPromptsEnabledButModeFullThenSupportsSuggestionsFalse() = runTest {
+        whenever(mockDuckChat.isDuckChatFeatureEnabled()).thenReturn(true)
+        whenever(mockDuckChat.isDuckChatContextualModeEnabled()).thenReturn(true)
+        mockDuckChatFeature.contextualSuggestedPrompts().setRawStoredState(Toggle.State(enable = true))
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativeConfigValues",
+            "123",
+            null,
+            Mode.FULL,
+            viewModel.updatedPageContext,
+        )
+
+        assertFalse(result!!.params.getBoolean("supportsSuggestions"))
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndSuggestedPromptsEnabledButContextualModeDisabledThenSupportsSuggestionsFalse() = runTest {
+        whenever(mockDuckChat.isDuckChatFeatureEnabled()).thenReturn(true)
+        whenever(mockDuckChat.isDuckChatContextualModeEnabled()).thenReturn(false)
+        mockDuckChatFeature.contextualSuggestedPrompts().setRawStoredState(Toggle.State(enable = true))
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativeConfigValues",
+            "123",
+            null,
+            Mode.CONTEXTUAL,
+            viewModel.updatedPageContext,
+        )
+
+        assertFalse(result!!.params.getBoolean("supportsSuggestions"))
     }
 
     @Test
@@ -948,6 +1040,7 @@ class RealDuckChatJSHelperTest {
             put("supportsOpeningSettings", true)
             put("supportsNativeChatInput", false)
             put("supportsNativePrompt", false)
+            put("supportsNativePromptEditing", false)
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
@@ -957,6 +1050,7 @@ class RealDuckChatJSHelperTest {
             put("supportsPageContext", true)
             put("supportsNativeStorage", false)
             put("supportsMultipleContexts", true)
+            put("supportsSuggestions", false)
             put("supportsSubscription", false)
             put("installType", "new")
             put("installAge", 0)
@@ -993,6 +1087,7 @@ class RealDuckChatJSHelperTest {
             put("supportsOpeningSettings", true)
             put("supportsNativeChatInput", false)
             put("supportsNativePrompt", false)
+            put("supportsNativePromptEditing", false)
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", true)
@@ -1002,6 +1097,7 @@ class RealDuckChatJSHelperTest {
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
             put("supportsMultipleContexts", false)
+            put("supportsSuggestions", false)
             put("supportsSubscription", false)
             put("installType", "new")
             put("installAge", 0)
@@ -1038,6 +1134,7 @@ class RealDuckChatJSHelperTest {
             put("supportsOpeningSettings", true)
             put("supportsNativeChatInput", false)
             put("supportsNativePrompt", false)
+            put("supportsNativePromptEditing", false)
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
@@ -1047,6 +1144,7 @@ class RealDuckChatJSHelperTest {
             put("supportsPageContext", false)
             put("supportsNativeStorage", true)
             put("supportsMultipleContexts", false)
+            put("supportsSuggestions", false)
             put("supportsSubscription", false)
             put("installType", "new")
             put("installAge", 0)
@@ -1350,6 +1448,7 @@ class RealDuckChatJSHelperTest {
             put("supportsOpeningSettings", true)
             put("supportsNativeChatInput", false)
             put("supportsNativePrompt", false)
+            put("supportsNativePromptEditing", false)
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", true)
             put("supportsStandaloneMigration", false)
@@ -1359,6 +1458,7 @@ class RealDuckChatJSHelperTest {
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
             put("supportsMultipleContexts", false)
+            put("supportsSuggestions", false)
             put("supportsSubscription", false)
             put("installType", "new")
             put("installAge", 0)
@@ -1392,6 +1492,7 @@ class RealDuckChatJSHelperTest {
             put("supportsOpeningSettings", true)
             put("supportsNativeChatInput", true)
             put("supportsNativePrompt", true)
+            put("supportsNativePromptEditing", false)
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
@@ -1401,6 +1502,7 @@ class RealDuckChatJSHelperTest {
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
             put("supportsMultipleContexts", false)
+            put("supportsSuggestions", false)
             put("supportsSubscription", false)
             put("installType", "new")
             put("installAge", 0)
@@ -1434,6 +1536,7 @@ class RealDuckChatJSHelperTest {
             put("supportsOpeningSettings", true)
             put("supportsNativeChatInput", false)
             put("supportsNativePrompt", false)
+            put("supportsNativePromptEditing", false)
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
@@ -1443,6 +1546,7 @@ class RealDuckChatJSHelperTest {
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
             put("supportsMultipleContexts", false)
+            put("supportsSuggestions", false)
             put("supportsSubscription", false)
             put("installType", "new")
             put("installAge", 0)
@@ -1477,6 +1581,7 @@ class RealDuckChatJSHelperTest {
             put("supportsOpeningSettings", true)
             put("supportsNativeChatInput", false)
             put("supportsNativePrompt", false)
+            put("supportsNativePromptEditing", false)
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
@@ -1486,6 +1591,7 @@ class RealDuckChatJSHelperTest {
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
             put("supportsMultipleContexts", false)
+            put("supportsSuggestions", false)
             put("supportsSubscription", false)
             put("installType", "new")
             put("installAge", 0)
