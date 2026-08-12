@@ -17,23 +17,31 @@
 package com.duckduckgo.duckchat.impl.contextual
 
 import android.view.View
+import com.duckduckgo.app.tabs.BrowserNav
+import com.duckduckgo.duckchat.impl.DuckChatInternal
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.whenever
 
 class RealDuckChatContextualTest {
 
+    private val duckChatInternal: DuckChatInternal = mock()
+    private val browserNav: BrowserNav = mock()
     private val anchor: View = mock()
 
-    private val testee = RealDuckChatContextual()
+    private val testee = RealDuckChatContextual(duckChatInternal, browserNav)
 
     @Test
-    fun whenLaunchedThenRequestsSheet() = runTest {
+    fun whenRedesignDisabledThenLaunchedAndDoesNotOpenNewTab() = runTest {
+        whenever(duckChatInternal.isContextualSheetRedesignEnabled()).thenReturn(false)
         var askAboutPageCount = 0
 
         testee.launch("tabId", anchor) { askAboutPageCount++ }
 
         assertEquals(1, askAboutPageCount)
+        verifyNoInteractions(browserNav)
     }
 }
