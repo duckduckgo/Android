@@ -58,10 +58,10 @@ class RealVoiceSearchAvailability @Inject constructor(
             .map { userEnabled -> isVoiceSearchSupported && userEnabled }
             .distinctUntilChanged()
 
-    // Only users who explicitly turned voice search off keep it off; before the new flow the default was
-    // tied to accepting our own permission rationale, which no longer exists.
+    private val newPermissionFlowEnabled: Boolean by lazy { voiceSearchFeature.newPermissionFlow().isEnabled() }
+
     private val defaultUserEnabled: Boolean
-        get() = if (voiceSearchFeature.newPermissionFlow().isEnabled()) {
+        get() = if (newPermissionFlowEnabled) {
             true
         } else {
             voiceSearchRepository.getHasAcceptedRationaleDialog()

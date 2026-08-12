@@ -74,10 +74,16 @@ class MicrophonePermissionRequest @Inject constructor(
             caller,
             Request.Permission { granted ->
                 when {
-                    granted -> onPermissionsGranted()
-                    // shouldShow() only stays true while the system is still willing to prompt; once it
-                    // flips to false the user has denied twice and the prompt will never appear again.
+                    granted -> {
+                        if (newPermissionFlowEnabled) voiceSearchRepository.setMicPermissionPreviouslyDenied(false)
+                        onPermissionsGranted()
+                    }
                     permissionRationale.shouldShow(activity) -> {
+                        if (newPermissionFlowEnabled) voiceSearchRepository.setMicPermissionPreviouslyDenied(true)
+                        showMicPermissionDeniedSnackbar(activity)
+                        requestAborted()
+                    }
+                    newPermissionFlowEnabled && !voiceSearchRepository.getMicPermissionPreviouslyDenied() -> {
                         showMicPermissionDeniedSnackbar(activity)
                         requestAborted()
                     }

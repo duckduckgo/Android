@@ -79,11 +79,21 @@ class RealVoiceSearchRepositoryTest {
 
         assertEquals(VoiceSearchMode.DUCK_AI, testee.getLastSelectedMode())
     }
+
+    @Test
+    fun whenSetMicPermissionPreviouslyDeniedThenGetReturnsStoredValue() {
+        assertFalse(testee.getMicPermissionPreviouslyDenied())
+
+        testee.setMicPermissionPreviouslyDenied(true)
+
+        assertTrue(testee.getMicPermissionPreviouslyDenied())
+    }
 }
 
 class FakeVoiceSearchDataStore : VoiceSearchDataStore {
     override var userAcceptedRationaleDialog: Boolean = false
     override var availabilityLogged: Boolean = false
+    override var micPermissionPreviouslyDenied: Boolean = false
     override var lastSelectedMode: VoiceSearchMode = VoiceSearchMode.SEARCH
 
     private val _voiceSearchEnabled = MutableStateFlow(false)

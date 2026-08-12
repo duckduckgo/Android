@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.callbackFlow
 interface VoiceSearchDataStore {
     var userAcceptedRationaleDialog: Boolean
     var availabilityLogged: Boolean
+    var micPermissionPreviouslyDenied: Boolean
     var lastSelectedMode: VoiceSearchMode
 
     fun isVoiceSearchEnabled(default: Boolean): Boolean
@@ -44,6 +45,7 @@ class SharedPreferencesVoiceSearchDataStore constructor(
         const val KEY_RATIONALE_DIALOG_ACCEPTED = "KEY_RATIONALE_DIALOG_ACCEPTED"
         const val KEY_VOICE_SEARCH_AVAILABILITY_LOGGED = "KEY_VOICE_SEARCH_AVAILABILITY_LOGGED"
         const val KEY_VOICE_SEARCH_ENABLED = "KEY_VOICE_SEARCH_ENABLED"
+        const val KEY_MIC_PERMISSION_PREVIOUSLY_DENIED = "KEY_MIC_PERMISSION_PREVIOUSLY_DENIED"
         const val KEY_LAST_SELECTED_MODE = "KEY_LAST_SELECTED_MODE"
     }
 
@@ -59,6 +61,12 @@ class SharedPreferencesVoiceSearchDataStore constructor(
         get() = preferences.getBoolean(KEY_VOICE_SEARCH_AVAILABILITY_LOGGED, false)
         set(value) {
             updateValue(KEY_VOICE_SEARCH_AVAILABILITY_LOGGED, value)
+        }
+
+    override var micPermissionPreviouslyDenied: Boolean
+        get() = preferences.getBoolean(KEY_MIC_PERMISSION_PREVIOUSLY_DENIED, false)
+        set(value) {
+            updateValue(KEY_MIC_PERMISSION_PREVIOUSLY_DENIED, value)
         }
 
     override fun isVoiceSearchEnabled(default: Boolean): Boolean {
