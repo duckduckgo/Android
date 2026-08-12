@@ -145,6 +145,14 @@ class RealPirActionsRunner @AssistedInject constructor(
 
     private val runContinuation: AtomicReference<CancellableContinuation<Result<Unit>>?> = AtomicReference(null)
 
+    /**
+     * Identity of the WebView whose callbacks are authoritative. A runner executes step after step,
+     * so a callback message left on the main looper by a finished step can still be delivered once
+     * the next step is running - and the engine, jobs, WebView and continuation it would reach all
+     * belong to that next step by then.
+     */
+    private val activeWebViewToken: AtomicReference<WebViewToken?> = AtomicReference(null)
+
     private var timerJob: ConflatedJob = ConflatedJob()
     private var engineJob: ConflatedJob = ConflatedJob()
 
@@ -152,6 +160,9 @@ class RealPirActionsRunner @AssistedInject constructor(
         profileQuery: ProfileQuery,
         brokerStep: BrokerStep,
     ): Result<Unit> {
+        val token = WebViewToken()
+        activeWebViewToken.set(token)
+
         withContext(dispatcherProvider.main()) {
             logcat { "PIR-RUNNER (${this@RealPirActionsRunner}): ${Thread.currentThread().name} Creating detached WebView" }
             detachedWebView =
@@ -159,13 +170,13 @@ class RealPirActionsRunner @AssistedInject constructor(
                     context,
                     pirScriptToLoad,
                     onPageLoaded = {
-                        onLoadingComplete(it)
+                        onLoadingComplete(token, it)
                     },
                     onPageLoadFailed = {
-                        onLoadingFailed(it)
+                        onLoadingFailed(token, it)
                     },
                     onRendererGone = {
-                        onRendererGone(it)
+                        onRendererGone(token, it)
                     },
                 )
             ownsWebView = true
@@ -181,6 +192,9 @@ class RealPirActionsRunner @AssistedInject constructor(
         profileQuery: ProfileQuery,
         brokerStep: BrokerStep,
     ): Result<Unit> {
+        val token = WebViewToken()
+        activeWebViewToken.set(token)
+
         withContext(dispatcherProvider.main()) {
             logcat { "PIR-RUNNER (${this@RealPirActionsRunner}): ${Thread.currentThread().name} Adopting caller-owned WebView" }
             detachedWebView =
@@ -188,13 +202,13 @@ class RealPirActionsRunner @AssistedInject constructor(
                     webView,
                     pirScriptToLoad,
                     onPageLoaded = {
-                        onLoadingComplete(it)
+                        onLoadingComplete(token, it)
                     },
                     onPageLoadFailed = {
-                        onLoadingFailed(it)
+                        onLoadingFailed(token, it)
                     },
                     onRendererGone = {
-                        onRendererGone(it)
+                        onRendererGone(token, it)
                     },
                 )
             ownsWebView = false
@@ -233,6 +247,7 @@ class RealPirActionsRunner @AssistedInject constructor(
      * the block, and the reference is dropped here, so no later [stop] could destroy the WebView.
      */
     private suspend fun finishStep() {
+        activeWebViewToken.set(null)
         timerJob.cancel()
         engineJob.cancel()
         engine?.close()
@@ -260,7 +275,21 @@ class RealPirActionsRunner @AssistedInject constructor(
         }
     }
 
-    private fun onLoadingComplete(url: String?) {
+    /**
+     * Whether [token] belongs to a WebView this runner has already moved on from, in which case its
+     * callbacks must not touch any of the runner's now step-scoped state.
+     */
+    private fun isStale(token: WebViewToken): Boolean = token !== activeWebViewToken.get()
+
+    private fun onLoadingComplete(
+        token: WebViewToken,
+        url: String?,
+    ) {
+        if (isStale(token)) {
+            logcat { "PIR-RUNNER ($this): finished loading $url on a WebView from a finished step - stale, ignoring" }
+            return
+        }
+
         logcat { "PIR-RUNNER ($this): finished loading $url" }
         if (url == null) {
             return
@@ -273,7 +302,15 @@ class RealPirActionsRunner @AssistedInject constructor(
         )
     }
 
-    private fun onLoadingFailed(url: String?) {
+    private fun onLoadingFailed(
+        token: WebViewToken,
+        url: String?,
+    ) {
+        if (isStale(token)) {
+            logcat { "PIR-RUNNER ($this): loading $url failed on a WebView from a finished step - stale, ignoring" }
+            return
+        }
+
         logcat { "PIR-RUNNER (${this@RealPirActionsRunner}): Recovering from loading $url failure" }
         if (url == null) {
             return
@@ -285,7 +322,22 @@ class RealPirActionsRunner @AssistedInject constructor(
         )
     }
 
-    private fun onRendererGone(didCrash: Boolean) {
+    private fun onRendererGone(
+        token: WebViewToken,
+        didCrash: Boolean,
+    ) {
+        if (isStale(token)) {
+            logcat {
+                "PIR-RUNNER (${this@RealPirActionsRunner}): renderer process gone, didCrash=$didCrash " +
+                    "on a WebView from a finished step - stale, ignoring"
+            }
+            return
+        }
+
+        // No further callback from this WebView can be authoritative, and clearing the token here
+        // keeps a repeated report from tearing down whichever step is running by then.
+        activeWebViewToken.set(null)
+
         val continuation = runContinuation.getAndSet(null)
 
         if (timerJob.isActive) {
@@ -576,6 +628,7 @@ class RealPirActionsRunner @AssistedInject constructor(
         }
 
     private fun cleanUpRunner() {
+        activeWebViewToken.set(null)
         if (timerJob.isActive) {
             timerJob.cancel()
         }
@@ -647,4 +700,6 @@ class RealPirActionsRunner @AssistedInject constructor(
             engine?.dispatch(it)
         }
     }
+
+    private class WebViewToken
 }
