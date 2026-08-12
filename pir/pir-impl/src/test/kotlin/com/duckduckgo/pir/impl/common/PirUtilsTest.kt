@@ -102,6 +102,7 @@ class PirUtilsTest {
             profileQueryId = 123L,
             brokerName = "test-broker",
             name = "John Doe",
+            alternativeNames = listOf("Johnny Doe", "J Doe"),
             profileUrl = "https://example.com/profile",
             email = "john@example.com",
         )
@@ -109,6 +110,7 @@ class PirUtilsTest {
         val result = profile.toParams("John Doe")
 
         assertEquals("John Doe", result.name)
+        assertEquals(listOf("Johnny Doe", "J Doe"), result.alternativeNames)
         assertEquals("https://example.com/profile", result.profileUrl)
         assertEquals("John Doe", result.fullName)
         assertEquals("john@example.com", result.email)

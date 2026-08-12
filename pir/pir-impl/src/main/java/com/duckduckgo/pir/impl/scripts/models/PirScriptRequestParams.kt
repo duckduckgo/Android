@@ -43,6 +43,7 @@ sealed class PirScriptRequestData {
 data class ExtractedProfileParams(
     val id: Int? = null,
     val name: String? = null,
+    val alternativeNames: List<String> = emptyList(),
     val profileUrl: String? = null,
     val email: String? = null,
     val fullName: String? = null,

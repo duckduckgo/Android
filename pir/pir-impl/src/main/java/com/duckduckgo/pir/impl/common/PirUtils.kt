@@ -46,6 +46,7 @@ internal fun <T> List<T>.splitIntoParts(parts: Int): List<List<T>> {
 internal fun ExtractedProfile.toParams(fullName: String): ExtractedProfileParams {
     return ExtractedProfileParams(
         name = this.name.ifEmpty { null },
+        alternativeNames = this.alternativeNames,
         profileUrl = this.profileUrl.ifEmpty { null },
         fullName = fullName.ifEmpty { null },
         email = this.email.ifEmpty { null },
