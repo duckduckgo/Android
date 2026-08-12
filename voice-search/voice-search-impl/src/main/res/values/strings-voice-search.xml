@@ -35,8 +35,5 @@
     <string name="voiceSearchMicAccessDeniedDialogHideVoiceSearch" tools:ignore="MissingTranslation">Hide Voice Search</string>
     <string name="voiceSearchMicPermissionDeniedSnackbarMessage" tools:ignore="MissingTranslation">Microphone permission needed for voice features</string>
     <string name="voiceSearchMicPermissionDeniedSnackbarAction" tools:ignore="MissingTranslation">Allow</string>
-    <string name="voiceSearchRemovePositiveButton">Remove</string>
-    <string name="voiceSearchRemoveTitle">Remove Private Voice Search option from the address bar?</string>
-    <string name="voiceSearchRemoveSubtitle">You can always manage this and other accessibility preferences in Settings.</string>
     <string name="voiceSearchTitle">Voice search</string>
 </resources>

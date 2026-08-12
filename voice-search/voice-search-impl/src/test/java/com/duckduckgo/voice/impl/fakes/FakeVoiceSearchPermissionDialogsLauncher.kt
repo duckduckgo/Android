@@ -28,11 +28,9 @@ class FakeVoiceSearchPermissionDialogsLauncher : VoiceSearchPermissionDialogsLau
     var micAccessDeniedDialogMode: VoiceSearchMode? = null
     var micPermissionDeniedSnackbarShown = false
     var rationaleDialogShown = false
-    var removeVoiceSearchDialogShown = false
     var boundOnRationaleAccepted: () -> Unit = {}
     var boundOnRationaleDeclined: () -> Unit = {}
     var boundNoMicAccessDialogDeclined: () -> Unit = {}
-    var boundRemoveVoiceSearchAccepted: () -> Unit = {}
     var boundChangePermissionsSelected: () -> Unit = {}
     var boundHideVoiceSearchSelected: () -> Unit = {}
     var boundMicAccessDeniedCancelled: () -> Unit = {}
@@ -78,14 +76,5 @@ class FakeVoiceSearchPermissionDialogsLauncher : VoiceSearchPermissionDialogsLau
         rationaleDialogShown = true
         boundOnRationaleAccepted = onRationaleAccepted
         boundOnRationaleDeclined = onRationaleDeclined
-    }
-
-    override fun showRemoveVoiceSearchDialog(
-        context: Context,
-        onRemoveVoiceSearch: () -> Unit,
-        onRemoveVoiceSearchCancelled: () -> Unit,
-    ) {
-        removeVoiceSearchDialogShown = true
-        boundRemoveVoiceSearchAccepted = onRemoveVoiceSearch
     }
 }

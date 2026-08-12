@@ -57,9 +57,6 @@ class RealVoiceSearchActivityLauncherTest {
     private lateinit var voiceSearchRepository: VoiceSearchRepository
 
     @Mock
-    private lateinit var dialogLauncher: VoiceSearchPermissionDialogsLauncher
-
-    @Mock
     private lateinit var duckAiFeatureState: DuckAiFeatureState
 
     private val showVoiceSearchToggleFlow = MutableStateFlow(true)
@@ -74,7 +71,6 @@ class RealVoiceSearchActivityLauncherTest {
             pixel,
             activityResultLauncherWrapper,
             voiceSearchRepository,
-            dialogLauncher,
             duckAiFeatureState,
         )
     }
@@ -146,52 +142,7 @@ class RealVoiceSearchActivityLauncherTest {
         lastKnownRequest.onResult(Activity.RESULT_CANCELED, "Result", VoiceSearchMode.SEARCH)
 
         verify(pixel, never()).fire(VoiceSearchPixelNames.VOICE_SEARCH_DONE, mapOf("source" to "browser"))
-        verify(voiceSearchRepository).dismissVoiceSearch()
         assertEquals(Event.SearchCancelled, lastKnownEvent)
-    }
-
-    @Test
-    fun whenResultFromVoiceSearchIsCancelledSeveralTimesThenShowDialog() {
-        var lastKnownEvent: Event? = null
-        testee.registerResultsCallback(mock(), mock(), BROWSER) {
-            lastKnownEvent = it
-        }
-        whenever(voiceSearchRepository.countVoiceSearchDismissed()).thenReturn(3)
-
-        val lastKnownRequest = activityResultLauncherWrapper.lastKnownRequest as ActivityResultLauncherWrapper.Request.ResultFromVoiceSearch
-        lastKnownRequest.onResult(Activity.RESULT_CANCELED, "Result", VoiceSearchMode.SEARCH)
-
-        verify(pixel, never()).fire(VoiceSearchPixelNames.VOICE_SEARCH_DONE, mapOf("source" to "browser"))
-        verify(dialogLauncher).showRemoveVoiceSearchDialog(any(), any(), any())
-        assertEquals(Event.SearchCancelled, lastKnownEvent)
-    }
-
-    @Test
-    fun whenResultFromVoiceSearchIsCancelledLessThanTwoTimesThenDoNotShowDialog() {
-        var lastKnownEvent: Event? = null
-        testee.registerResultsCallback(mock(), mock(), BROWSER) {
-            lastKnownEvent = it
-        }
-        whenever(voiceSearchRepository.countVoiceSearchDismissed()).thenReturn(1)
-
-        val lastKnownRequest = activityResultLauncherWrapper.lastKnownRequest as ActivityResultLauncherWrapper.Request.ResultFromVoiceSearch
-        lastKnownRequest.onResult(Activity.RESULT_CANCELED, "Result", VoiceSearchMode.SEARCH)
-
-        verify(pixel, never()).fire(VoiceSearchPixelNames.VOICE_SEARCH_DONE, mapOf("source" to "browser"))
-        verify(dialogLauncher, never()).showRemoveVoiceSearchDialog(any(), any(), any())
-        assertEquals(Event.SearchCancelled, lastKnownEvent)
-    }
-
-    @Test
-    fun whenResultFromVoiceSearchIsOkThenResetDismissedCounter() {
-        testee.registerResultsCallback(mock(), mock(), BROWSER) { }
-        whenever(voiceSearchRepository.countVoiceSearchDismissed()).thenReturn(1)
-
-        val lastKnownRequest = activityResultLauncherWrapper.lastKnownRequest as ActivityResultLauncherWrapper.Request.ResultFromVoiceSearch
-        lastKnownRequest.onResult(Activity.RESULT_OK, "Result", VoiceSearchMode.SEARCH)
-
-        verify(voiceSearchRepository).resetVoiceSearchDismissed()
-        verify(voiceSearchRepository, never()).dismissVoiceSearch()
     }
 
     @Test

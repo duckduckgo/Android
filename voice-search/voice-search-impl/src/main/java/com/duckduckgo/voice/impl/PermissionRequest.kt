@@ -17,7 +17,6 @@
 package com.duckduckgo.voice.impl
 
 import android.app.Activity
-import android.content.Context
 import androidx.activity.result.ActivityResultCaller
 import androidx.appcompat.app.AppCompatActivity
 import com.duckduckgo.common.utils.extensions.launchApplicationInfoSettings
@@ -102,7 +101,7 @@ class MicrophonePermissionRequest @Inject constructor(
             voiceSearchPermissionDialogsLauncher.showPermissionRationale(
                 activity,
                 { handleRationaleAccepted() },
-                { showRemoveVoiceSearchDialog(activity) },
+                { requestAborted() },
             )
         }
     }
@@ -133,7 +132,7 @@ class MicrophonePermissionRequest @Inject constructor(
             voiceSearchPermissionDialogsLauncher.showNoMicAccessDialog(
                 activity,
                 { (activity as? AppCompatActivity)?.launchApplicationInfoSettings() },
-                { showRemoveVoiceSearchDialog(activity) },
+                { requestAborted() },
             )
         }
     }
@@ -141,14 +140,6 @@ class MicrophonePermissionRequest @Inject constructor(
     private fun handleRationaleAccepted() {
         voiceSearchRepository.acceptRationaleDialog()
         activityResultLauncherWrapper.launch(LaunchPermissionRequest)
-    }
-
-    private fun showRemoveVoiceSearchDialog(context: Context) {
-        voiceSearchPermissionDialogsLauncher.showRemoveVoiceSearchDialog(
-            context,
-            onRemoveVoiceSearch = { disableVoiceSearch() },
-            onRemoveVoiceSearchCancelled = { requestAborted() },
-        )
     }
 
     private fun disableVoiceSearch() {
