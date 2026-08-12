@@ -92,6 +92,13 @@ sealed interface ContentConfig {
             withAi = initialWithAi,
         )
     }
+
+    data class DownloadReason(
+        override val title: TextConfig,
+        val body: TextConfig,
+    ) : ContentConfig, Stateful<DownloadReasonContentState> {
+        override fun initialState() = DownloadReasonContentState(selection = null)
+    }
 }
 
 data class AddressBarContentState(val position: OmnibarType)
@@ -106,3 +113,12 @@ data class QuickSetupContentState(
     val addressBarPosition: OmnibarType,
     val withAi: Boolean,
 )
+
+data class DownloadReasonContentState(val selection: DownloadReasonSelection?)
+
+enum class DownloadReasonSelection {
+    SEARCH,
+    AI_CHAT,
+    NO_AI,
+    BLOCK_ADS,
+}

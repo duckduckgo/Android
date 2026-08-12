@@ -51,6 +51,7 @@ class OnboardingDialogShownPixels @Inject constructor(private val pixel: Pixel) 
             is NewUserOnboardingActivityDialog.QuickSetup,
             NewUserOnboardingActivityDialog.AddToDock,
             NewUserOnboardingActivityDialog.WidgetPrompt,
+            NewUserOnboardingActivityDialog.DownloadReason,
             is NewUserOnboardingActivityDialog.IntroAnimation,
             NewUserOnboardingActivityDialog.NotificationPermission,
             NewUserOnboardingActivityDialog.DefaultBrowserPrompt,

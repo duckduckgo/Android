@@ -50,6 +50,8 @@ interface CardStage {
 
     fun showCtaButtons(primary: CtaConfig?, secondary: CtaConfig?, onClick: (CtaConfig) -> Unit)
 
+    fun setPrimaryCtaEnabled(enabled: Boolean)
+
     /** Hides [contentTargets] and the visible CTAs so an entrance can fade them in. */
     fun prepareEntrance(contentTargets: List<View>)
 
@@ -146,6 +148,10 @@ class CardStageImpl(private val binding: ContentOnboardingWelcomePageUpdateBindi
             binding.daxDialogCta.primaryCta.takeIf { primary != null },
             binding.daxDialogCta.secondaryCta.takeIf { secondary != null },
         )
+    }
+
+    override fun setPrimaryCtaEnabled(enabled: Boolean) {
+        binding.daxDialogCta.primaryCta.isEnabled = enabled
     }
 
     override fun prepareEntrance(contentTargets: List<View>) {

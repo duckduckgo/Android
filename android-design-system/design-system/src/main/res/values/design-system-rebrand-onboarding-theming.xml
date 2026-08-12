@@ -247,10 +247,10 @@
     </style>
 
     <style name="Widget.DuckDuckGo.DaxButton.TextButton.Onboarding.Primary">
-        <item name="android:textColor">?attr/daxColorButtonPrimaryText</item>
-        <item name="backgroundTint">?attr/daxColorButtonPrimaryContainer</item>
+        <item name="android:textColor">@color/button_onboarding_primary_text_color_selector</item>
+        <item name="backgroundTint">@color/button_onboarding_primary_container_selector</item>
         <item name="rippleColor">?attr/daxColorButtonPrimaryContainerPressed</item>
-        <item name="iconTint">?attr/daxColorButtonPrimaryText</item>
+        <item name="iconTint">@color/button_onboarding_primary_text_color_selector</item>
     </style>
 
     <style name="Widget.DuckDuckGo.DaxButton.TextButton.Onboarding.Secondary">

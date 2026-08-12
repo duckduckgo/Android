@@ -31,6 +31,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 class DialogRenderEngine(
     private val content: ContentController,
@@ -107,7 +109,12 @@ class DialogRenderEngine(
         )
         bound = handle
 
+        cardStage.setPrimaryCtaEnabled(handle.primaryCtaState?.defaultValue ?: true)
+        handle.primaryCtaState?.enabled?.onEach {
+            cardStage.setPrimaryCtaEnabled(it)
+        }?.launchIn(scope)
         cardStage.showCtaButtons(config.primaryCta, config.secondaryCta) { cta -> performCta(cta.action, handle) }
+
         if (animate) cardStage.prepareEntrance(handle.fadeTargets)
 
         // Anchored before the morph below starts its transition, so the card's move to its new anchor is smooth

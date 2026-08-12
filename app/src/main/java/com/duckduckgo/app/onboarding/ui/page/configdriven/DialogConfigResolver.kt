@@ -37,6 +37,20 @@ class DialogConfigResolver @Inject constructor(
 
         NewUserOnboardingActivityDialog.AiComparisonChart -> comparisonChart(ComparisonChartConfig.Ai)
 
+        NewUserOnboardingActivityDialog.DownloadReason -> DialogConfig(
+            background = OnboardingBackgroundStep.DownloadReason,
+            embellishment = Embellishment.BottomWing,
+            cardArrow = CardArrowConfig.AtEnd,
+            content = ContentConfig.DownloadReason(
+                title = TextConfig.Resource(R.string.downloadReasonTitle),
+                body = TextConfig.Resource(R.string.downloadReasonBody),
+            ),
+            primaryCta = CtaConfig(
+                text = TextConfig.Resource(R.string.downloadReasonPrimaryCta),
+                action = CtaAction.Submit,
+            ),
+        )
+
         is NewUserOnboardingActivityDialog.AddressBarPosition -> DialogConfig(
             background = OnboardingBackgroundStep.AddressBar,
             embellishment = Embellishment.BobbingDax,
