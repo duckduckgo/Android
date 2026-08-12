@@ -33,7 +33,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK
-import com.duckduckgo.common.ui.store.AppBrandDesignThemeProvider
+import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.store.ThemingDataStore
 import com.duckduckgo.common.ui.view.isFullScreen
 import com.duckduckgo.mobile.android.R
@@ -49,7 +49,7 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
 
     @Inject lateinit var themingDataStore: ThemingDataStore
 
-    @Inject lateinit var appBrandDesignThemeProvider: AppBrandDesignThemeProvider
+    @Inject lateinit var appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles
 
     /**
      * Override in subclasses whose look should follow the fire-mode theme.
@@ -82,7 +82,7 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
         themeChangeReceiver = applyTheme(
             themingDataStore.theme,
             applyFireTheme,
-            appBrandDesignThemeProvider.isAppBrandDesignUpdateEnabled(),
+            appBrandDesignUpdateToggles.feature().isEnabled(),
         )
         super.onCreate(savedInstanceState)
     }

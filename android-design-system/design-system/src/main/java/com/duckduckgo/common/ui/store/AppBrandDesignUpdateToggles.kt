@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.branddesignupdate
+package com.duckduckgo.common.ui.store
 
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
@@ -22,11 +22,11 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 
 /**
- * App-wide brand design update (rebrand) feature flag, excluding onboarding which is gated via [OnboardingBrandDesignUpdateToggles].
+ * App-wide brand design update (rebrand) feature flag, excluding onboarding which is gated via
+ * `OnboardingBrandDesignUpdateToggles`.
  *
  * Gate rebrand changes on [feature] via `feature().isEnabled()`, never on [self]:
  * self() cannot use the incremental rollout mechanism.
- *
  */
 @ContributesRemoteFeature(
     scope = AppScope::class,

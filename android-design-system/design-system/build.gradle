@@ -62,6 +62,7 @@ dependencies {
     implementation project(path: ':anvil-annotations')
     implementation project(path: ':app-build-config-api')
     implementation project(':internal-features-api')
+    api project(':feature-toggles-api')
     implementation "androidx.datastore:datastore-preferences:_"
 
     implementation AndroidX.appCompat
