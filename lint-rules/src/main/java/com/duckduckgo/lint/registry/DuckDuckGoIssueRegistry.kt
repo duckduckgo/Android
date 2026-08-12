@@ -39,6 +39,7 @@ import com.duckduckgo.lint.NoSystemLoadLibraryDetector.Companion.NO_SYSTEM_LOAD_
 import com.duckduckgo.lint.NonCancellableDetector.Companion.ISSUE_NON_CANCELLABLE
 import com.duckduckgo.lint.NoPostValueOnSingleLiveEventDetector.Companion.NO_POST_VALUE_ON_SINGLE_LIVE_EVENT
 import com.duckduckgo.lint.WebViewCompatApisUsageDetector
+import com.duckduckgo.lint.NoNewBrowserFeatureToggleDetector.Companion.NO_NEW_BROWSER_FEATURE_TOGGLE
 import com.duckduckgo.lint.RemoteFeatureNameDetector.Companion.UNDERSCORE_IN_FEATURE_NAME
 import com.duckduckgo.lint.WrongPluginPointCollectorDetector.Companion.WRONG_PLUGIN_POINT_ISSUE
 import com.duckduckgo.lint.strings.MissingInstructionDetector.Companion.MISSING_INSTRUCTION
@@ -81,6 +82,7 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
         get() = listOf(
             WRONG_PLUGIN_POINT_ISSUE,
             UNDERSCORE_IN_FEATURE_NAME,
+            NO_NEW_BROWSER_FEATURE_TOGGLE,
             NO_SINGLETON_ISSUE,
             NO_LIFECYCLE_OBSERVER_ISSUE,
             NO_FRAGMENT_ISSUE,

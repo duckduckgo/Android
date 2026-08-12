@@ -22,7 +22,7 @@ import com.duckduckgo.app.browser.RequestRewriter
 import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.app.browser.UriString.Companion.extractUrl
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.AppUrl.Url
 import com.duckduckgo.common.utils.DispatcherProvider
