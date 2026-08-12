@@ -26,7 +26,7 @@ import javax.inject.Inject
 
 interface BrokenSiteRefreshesInMemoryStore {
     fun addRefresh(owner: RefreshPatternOwner, url: Uri, localDateTime: LocalDateTime)
-    fun getRefreshPatterns(owner: RefreshPatternOwner): Set<RefreshPattern>
+    fun getRefreshPatterns(owner: RefreshPatternOwner, currentDateTime: LocalDateTime): Set<RefreshPattern>
     fun isRefreshPatternDetectionValid(url: Uri, currentDateTime: LocalDateTime): Boolean
 }
 
@@ -49,13 +49,18 @@ class RealBrokenSiteRefreshesInMemoryStore @Inject constructor() : BrokenSiteRef
         localDateTime: LocalDateTime,
     ) {
         resetIfOwnerOrUrlChanged(owner, url)
+        discardStalePendingDetection(localDateTime)
         doubleRefreshTimes = doubleRefreshTimes.plus(localDateTime)
         tripleRefreshTimes = tripleRefreshTimes.plus(localDateTime)
         detectPatterns(owner, url, localDateTime)
     }
 
     @Synchronized
-    override fun getRefreshPatterns(owner: RefreshPatternOwner): Set<RefreshPattern> {
+    override fun getRefreshPatterns(
+        owner: RefreshPatternOwner,
+        currentDateTime: LocalDateTime,
+    ): Set<RefreshPattern> {
+        discardStalePendingDetection(currentDateTime)
         val detection = pendingDetection ?: return emptySet()
         if (detection.owner !== owner) return emptySet()
         pendingDetection = detection.copy(patterns = emptySet())
@@ -67,9 +72,19 @@ class RealBrokenSiteRefreshesInMemoryStore @Inject constructor() : BrokenSiteRef
         url: Uri,
         currentDateTime: LocalDateTime,
     ): Boolean {
+        discardStalePendingDetection(currentDateTime)
         val detection = pendingDetection ?: return false
-        return detection.url == url && !detection.detectedAt.isBefore(currentDateTime.minusSeconds(DETECTION_STALENESS_IN_SECS))
+        return detection.url == url
     }
+
+    private fun discardStalePendingDetection(currentDateTime: LocalDateTime) {
+        if (pendingDetection?.isStale(currentDateTime) == true) {
+            pendingDetection = null
+        }
+    }
+
+    private fun RefreshPatternDetection.isStale(currentDateTime: LocalDateTime): Boolean =
+        detectedAt.isBefore(currentDateTime.minusSeconds(DETECTION_STALENESS_IN_SECS))
 
     private fun resetIfOwnerOrUrlChanged(
         owner: RefreshPatternOwner,

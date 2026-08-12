@@ -63,7 +63,7 @@ class RealBrokenSitePrompt @Inject constructor(
     }
 
     override fun getUserRefreshPatterns(): Set<RefreshPattern> {
-        return brokenSiteReportRepository.getRefreshPatterns(refreshPatternOwner)
+        return brokenSiteReportRepository.getRefreshPatterns(refreshPatternOwner, currentTimeProvider.localDateTimeNow())
     }
 
     override suspend fun shouldShowBrokenSitePrompt(url: String, refreshPatterns: Set<RefreshPattern>): Boolean {

@@ -59,7 +59,7 @@ interface BrokenSiteReportRepository {
     suspend fun getDismissalCountBetween(t1: LocalDateTime, t2: LocalDateTime): Int
 
     fun addRefresh(owner: RefreshPatternOwner, url: Uri, localDateTime: LocalDateTime)
-    fun getRefreshPatterns(owner: RefreshPatternOwner): Set<RefreshPattern>
+    fun getRefreshPatterns(owner: RefreshPatternOwner, currentDateTime: LocalDateTime): Set<RefreshPattern>
     fun isRefreshPatternDetectionValid(url: Uri, currentDateTime: LocalDateTime): Boolean
 }
 
@@ -161,8 +161,11 @@ class RealBrokenSiteReportRepository(
         brokenSiteRefreshesInMemoryStore.addRefresh(owner, url, localDateTime)
     }
 
-    override fun getRefreshPatterns(owner: RefreshPatternOwner): Set<RefreshPattern> {
-        return brokenSiteRefreshesInMemoryStore.getRefreshPatterns(owner)
+    override fun getRefreshPatterns(
+        owner: RefreshPatternOwner,
+        currentDateTime: LocalDateTime,
+    ): Set<RefreshPattern> {
+        return brokenSiteRefreshesInMemoryStore.getRefreshPatterns(owner, currentDateTime)
     }
 
     override fun isRefreshPatternDetectionValid(

@@ -17,6 +17,7 @@
 package com.duckduckgo.brokensite.impl
 
 import android.net.Uri
+import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.brokensite.api.RefreshPattern.THRICE_IN_20_SECONDS
 import com.duckduckgo.brokensite.api.RefreshPattern.TWICE_IN_12_SECONDS
 import org.junit.Assert.assertEquals
@@ -49,7 +50,7 @@ class BrokenSiteRefreshesInMemoryStoreTest {
 
     @Test
     fun whenStoreInitializedThenNoRefreshPatternsFound() {
-        assertTrue(store.getRefreshPatterns().isEmpty())
+        assertTrue(store.getRefreshPatterns(baseTime).isEmpty())
     }
 
     @Test
@@ -57,7 +58,7 @@ class BrokenSiteRefreshesInMemoryStoreTest {
         store.addRefresh(testUrl, baseTime)
         store.addRefresh(testUrl, baseTime.plusSeconds(11))
 
-        assertEquals(setOf(TWICE_IN_12_SECONDS), store.getRefreshPatterns())
+        assertEquals(setOf(TWICE_IN_12_SECONDS), store.getRefreshPatterns(baseTime.plusSeconds(11)))
     }
 
     @Test
@@ -65,7 +66,7 @@ class BrokenSiteRefreshesInMemoryStoreTest {
         store.addRefresh(testUrl, baseTime)
         store.addRefresh(testUrl, baseTime.plusSeconds(12))
 
-        assertTrue(store.getRefreshPatterns().isEmpty())
+        assertTrue(store.getRefreshPatterns(baseTime.plusSeconds(12)).isEmpty())
     }
 
     @Test
@@ -74,7 +75,7 @@ class BrokenSiteRefreshesInMemoryStoreTest {
         store.addRefresh(testUrl, baseTime.plusSeconds(12))
         store.addRefresh(testUrl, baseTime.plusSeconds(19))
 
-        assertEquals(setOf(TWICE_IN_12_SECONDS, THRICE_IN_20_SECONDS), store.getRefreshPatterns())
+        assertEquals(setOf(TWICE_IN_12_SECONDS, THRICE_IN_20_SECONDS), store.getRefreshPatterns(baseTime.plusSeconds(19)))
     }
 
     @Test
@@ -83,7 +84,7 @@ class BrokenSiteRefreshesInMemoryStoreTest {
         store.addRefresh(testUrl, baseTime.plusSeconds(5))
         store.addRefresh(testUrl, baseTime.plusSeconds(20))
 
-        assertEquals(setOf(TWICE_IN_12_SECONDS), store.getRefreshPatterns())
+        assertEquals(setOf(TWICE_IN_12_SECONDS), store.getRefreshPatterns(baseTime.plusSeconds(20)))
     }
 
     @Test
@@ -92,7 +93,7 @@ class BrokenSiteRefreshesInMemoryStoreTest {
         store.addRefresh(testUrl, baseTime.plusSeconds(6))
         store.addRefresh(testUrl, baseTime.plusSeconds(12))
 
-        assertEquals(setOf(TWICE_IN_12_SECONDS, THRICE_IN_20_SECONDS), store.getRefreshPatterns())
+        assertEquals(setOf(TWICE_IN_12_SECONDS, THRICE_IN_20_SECONDS), store.getRefreshPatterns(baseTime.plusSeconds(40)))
     }
 
     @Test
@@ -101,8 +102,8 @@ class BrokenSiteRefreshesInMemoryStoreTest {
         store.addRefresh(testUrl, baseTime.plusSeconds(6))
         store.addRefresh(testUrl, baseTime.plusSeconds(12))
 
-        assertEquals(setOf(TWICE_IN_12_SECONDS, THRICE_IN_20_SECONDS), store.getRefreshPatterns())
-        assertTrue(store.getRefreshPatterns().isEmpty())
+        assertEquals(setOf(TWICE_IN_12_SECONDS, THRICE_IN_20_SECONDS), store.getRefreshPatterns(baseTime.plusSeconds(12)))
+        assertTrue(store.getRefreshPatterns(baseTime.plusSeconds(12)).isEmpty())
     }
 
     @Test
@@ -111,8 +112,8 @@ class BrokenSiteRefreshesInMemoryStoreTest {
         store.addRefresh(testUrl, baseTime.plusSeconds(6))
         store.addRefresh(testUrl, baseTime.plusSeconds(12))
 
-        assertTrue(store.getRefreshPatterns(RefreshPatternOwner()).isEmpty())
-        assertEquals(setOf(TWICE_IN_12_SECONDS, THRICE_IN_20_SECONDS), store.getRefreshPatterns())
+        assertTrue(store.getRefreshPatterns(RefreshPatternOwner(), baseTime.plusSeconds(12)).isEmpty())
+        assertEquals(setOf(TWICE_IN_12_SECONDS, THRICE_IN_20_SECONDS), store.getRefreshPatterns(baseTime.plusSeconds(12)))
     }
 
     @Test
@@ -125,8 +126,8 @@ class BrokenSiteRefreshesInMemoryStoreTest {
         store.addRefresh(otherOwner, testUrl, baseTime.plusSeconds(13))
         store.addRefresh(otherOwner, testUrl, baseTime.plusSeconds(19))
 
-        assertEquals(setOf(TWICE_IN_12_SECONDS), store.getRefreshPatterns(otherOwner))
-        assertTrue(store.getRefreshPatterns().isEmpty())
+        assertEquals(setOf(TWICE_IN_12_SECONDS), store.getRefreshPatterns(otherOwner, baseTime.plusSeconds(19)))
+        assertTrue(store.getRefreshPatterns(baseTime.plusSeconds(19)).isEmpty())
     }
 
     @Test
@@ -136,7 +137,7 @@ class BrokenSiteRefreshesInMemoryStoreTest {
         store.addRefresh(testUrl, baseTime.plusSeconds(12))
         store.addRefresh(testUrl, baseTime.plusSeconds(18))
 
-        assertEquals(setOf(TWICE_IN_12_SECONDS, THRICE_IN_20_SECONDS), store.getRefreshPatterns())
+        assertEquals(setOf(TWICE_IN_12_SECONDS, THRICE_IN_20_SECONDS), store.getRefreshPatterns(baseTime.plusSeconds(18)))
     }
 
     @Test
@@ -147,7 +148,7 @@ class BrokenSiteRefreshesInMemoryStoreTest {
         store.addRefresh(otherUrl, baseTime.plusSeconds(7))
         store.addRefresh(otherUrl, baseTime.plusSeconds(18))
 
-        assertEquals(setOf(TWICE_IN_12_SECONDS), store.getRefreshPatterns())
+        assertEquals(setOf(TWICE_IN_12_SECONDS), store.getRefreshPatterns(baseTime.plusSeconds(18)))
         assertTrue(store.isRefreshPatternDetectionValid(otherUrl, baseTime.plusSeconds(18)))
         assertFalse(store.isRefreshPatternDetectionValid(testUrl, baseTime.plusSeconds(18)))
     }
@@ -170,7 +171,7 @@ class BrokenSiteRefreshesInMemoryStoreTest {
     fun whenPatternsConsumedThenDetectionMetadataRemainsValid() {
         store.addRefresh(testUrl, baseTime)
         store.addRefresh(testUrl, baseTime.plusSeconds(6))
-        store.getRefreshPatterns()
+        store.getRefreshPatterns(baseTime.plusSeconds(6))
 
         assertTrue(store.isRefreshPatternDetectionValid(testUrl, baseTime.plusSeconds(6)))
     }
@@ -191,6 +192,48 @@ class BrokenSiteRefreshesInMemoryStoreTest {
         assertFalse(store.isRefreshPatternDetectionValid(testUrl, baseTime.plusSeconds(67)))
     }
 
+    @Test
+    fun whenDetectionIsExactly60SecondsOldThenPatternsReported() {
+        store.addRefresh(testUrl, baseTime)
+        store.addRefresh(testUrl, baseTime.plusSeconds(6))
+        store.addRefresh(testUrl, baseTime.plusSeconds(12))
+
+        assertEquals(setOf(TWICE_IN_12_SECONDS, THRICE_IN_20_SECONDS), store.getRefreshPatterns(baseTime.plusSeconds(72)))
+    }
+
+    @Test
+    fun whenDetectionIsOlderThan60SecondsThenPatternsNotReportedAndMetadataCleared() {
+        store.addRefresh(testUrl, baseTime)
+        store.addRefresh(testUrl, baseTime.plusSeconds(6))
+        store.addRefresh(testUrl, baseTime.plusSeconds(12))
+
+        assertTrue(store.getRefreshPatterns(baseTime.plusSeconds(73)).isEmpty())
+        assertFalse(store.isRefreshPatternDetectionValid(testUrl, baseTime.plusSeconds(73)))
+    }
+
+    @Test
+    fun whenForeignOwnerReadsStaleDetectionThenDetectionCleared() {
+        store.addRefresh(testUrl, baseTime)
+        store.addRefresh(testUrl, baseTime.plusSeconds(6))
+        store.addRefresh(testUrl, baseTime.plusSeconds(12))
+
+        assertTrue(store.getRefreshPatterns(RefreshPatternOwner(), baseTime.plusSeconds(73)).isEmpty())
+        assertTrue(store.getRefreshPatterns(baseTime.plusSeconds(73)).isEmpty())
+        assertFalse(store.isRefreshPatternDetectionValid(testUrl, baseTime.plusSeconds(73)))
+    }
+
+    @Test
+    fun whenStaleThricePatternFollowedByFreshTwicePatternThenOnlyTwicePatternReported() {
+        store.addRefresh(testUrl, baseTime)
+        store.addRefresh(testUrl, baseTime.plusSeconds(6))
+        store.addRefresh(testUrl, baseTime.plusSeconds(12))
+
+        store.addRefresh(testUrl, baseTime.plusSeconds(73))
+        store.addRefresh(testUrl, baseTime.plusSeconds(79))
+
+        assertEquals(setOf(TWICE_IN_12_SECONDS), store.getRefreshPatterns(baseTime.plusSeconds(79)))
+    }
+
     private fun RealBrokenSiteRefreshesInMemoryStore.addRefresh(
         url: Uri,
         localDateTime: LocalDateTime,
@@ -198,7 +241,7 @@ class BrokenSiteRefreshesInMemoryStoreTest {
         addRefresh(refreshOwner, url, localDateTime)
     }
 
-    private fun RealBrokenSiteRefreshesInMemoryStore.getRefreshPatterns(): Set<com.duckduckgo.brokensite.api.RefreshPattern> {
-        return getRefreshPatterns(refreshOwner)
+    private fun RealBrokenSiteRefreshesInMemoryStore.getRefreshPatterns(currentDateTime: LocalDateTime): Set<RefreshPattern> {
+        return getRefreshPatterns(refreshOwner, currentDateTime)
     }
 }

@@ -21,6 +21,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
@@ -93,28 +94,31 @@ class RealBrokenSitePromptTest {
     }
 
     @Test
-    fun whenPageRefreshedThenTimestampCapturedOnceAndRefreshAdded() {
-        val now = LocalDateTime.now()
+    fun whenPageRefreshedAndPatternsReadThenSameOwnerAndCurrentTimestampsUsed() {
+        val refreshTime = LocalDateTime.now()
+        val evaluationTime = refreshTime.plusSeconds(12)
         val url: Uri = org.mockito.kotlin.mock()
 
-        whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(now)
+        whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(refreshTime, evaluationTime)
         testee.pageRefreshed(url)
         testee.getUserRefreshPatterns()
 
         val ownerCaptor = argumentCaptor<RefreshPatternOwner>()
-        verify(mockBrokenSiteReportRepository).addRefresh(ownerCaptor.capture(), eq(url), eq(now))
-        verify(mockBrokenSiteReportRepository).getRefreshPatterns(ownerCaptor.firstValue)
-        verify(mockCurrentTimeProvider).localDateTimeNow()
+        verify(mockBrokenSiteReportRepository).addRefresh(ownerCaptor.capture(), eq(url), eq(refreshTime))
+        verify(mockBrokenSiteReportRepository).getRefreshPatterns(ownerCaptor.firstValue, evaluationTime)
+        verify(mockCurrentTimeProvider, times(2)).localDateTimeNow()
     }
 
     @Test
-    fun whenGetUserRefreshPatternsThenStoredPatternsReturnedWithoutReadingClock() {
+    fun whenGetUserRefreshPatternsThenStoredPatternsReturnedAtCurrentTime() {
+        val now = LocalDateTime.now()
         val patterns = setOf(RefreshPattern.TWICE_IN_12_SECONDS, RefreshPattern.THRICE_IN_20_SECONDS)
-        whenever(mockBrokenSiteReportRepository.getRefreshPatterns(any())).thenReturn(patterns)
+        whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(now)
+        whenever(mockBrokenSiteReportRepository.getRefreshPatterns(any(), eq(now))).thenReturn(patterns)
 
         assertEquals(patterns, testee.getUserRefreshPatterns())
 
-        verify(mockCurrentTimeProvider, never()).localDateTimeNow()
+        verify(mockCurrentTimeProvider).localDateTimeNow()
     }
 
     @Test
