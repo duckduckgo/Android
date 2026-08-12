@@ -105,38 +105,19 @@ Key points for Maestro tests:
 
 ## Source Patches
 
-Remote config patches and the test seeder both apply at runtime, so neither can set a flag that is
-read during app launch — config has not landed yet, and any `AppScope` class can read a toggle as
-soon as it is constructed. For those flags, change the default at compile time instead: keep a Git
-patch in the repo and apply it when CI prepares the build.
+A flag read during app launch (any `AppScope` class can read a toggle at construction) cannot be
+set by remote config patches or the test seeder — both apply at runtime. Flip its compile-time
+default with a Git patch instead. This is the heaviest option: use it only when a config patch is
+genuinely too late, and only for flow/arm combinations the unpatched builds leave uncovered.
 
-- Store patches under a `source_patches/` subdirectory next to the tests that need them:
-  ```
-  .maestro/
-    onboarding/
-      source_patches/
-        config_driven_dialogs_disabled.patch
-      onboarding.yaml
-  ```
-- Generate with minimal context so the hunk is pinned by the declaration it targets rather than by
-  its neighbours: `git diff -U1 -- <file>`. Drop the `index` line — it only enables `--3way`, and a
-  patch that needs a merge to apply should fail instead.
-- Start the file with a plain-text header explaining what it flips, which workflow job applies it,
-  and what to do when it stops applying. `git apply` ignores everything before the first
-  `diff --git` line.
-- Apply in CI through the `source_patches` input on `checkout-and-assemble` (newline-separated for
-  more than one). A patch that does not apply fails the build; it is never skipped.
-- Locally, `git apply <patch>` before building, and `git apply -R <patch>` after.
-- Never pass `source_patches` alongside `-PuseUploadSigning` in `gradle_flags` — that is the real
-  distribution signing path, and `checkout-and-assemble` hard-fails the combination so a patched
-  toggle default can never ship.
-
-A source patch stops applying the moment the default it targets changes, and CI fails — the
-`E2E Source Patches` job in `ci.yml` checks every PR, so the breakage surfaces there rather than
-in the next nightly. That is deliberate: whoever changes the default decides what coverage is now
-missing and either rewrites the patch or deletes it together with the job that uses it.
-
-Patching source is the heaviest option: reach for it only when the flag is genuinely read too
-early for a config patch, and only for the flow/arm combinations the unpatched builds leave
-uncovered — a `DefaultFeatureValue.INTERNAL` default already covers both arms across the play and
-internal binaries, but only for the flows each flavour runs.
+- Store patches under a `source_patches/` subdirectory next to the tests that need them.
+- Generate with `git diff -U1 -- <file>` and drop the `index` line, so the hunk is pinned to the
+  declaration it targets and fails instead of falling back to `--3way`.
+- Start the file with a plain-text header (ignored by `git apply`): what it flips, which workflow
+  job applies it, and what to do when it stops applying.
+- In CI, apply through the `source_patches` input on `checkout-and-assemble` (newline-separated for
+  more than one). Never pass it alongside `-PuseUploadSigning` in `gradle_flags` — the job
+  hard-fails that combination.
+- Locally, `git apply <patch>` before building and `git apply -R <patch>` after.
+- When the default a patch targets changes, the `E2E Source Patches` job in `ci.yml` fails the PR;
+  whoever changed the default rewrites the patch or deletes it together with the job that uses it.
