@@ -130,4 +130,9 @@
     <color name="rb_green60">#138356</color>
     <color name="rb_green70">#006B4B</color>
     <color name="rb_green80">#00523F</color>
+
+    <color name="accent_glow_secondary_light">#1F1074CC</color>
+    <color name="accent_glow_secondary_dark">#1F75B6EB</color>
+    <color name="destructive_glow_secondary_light">#33E5244B</color>
+    <color name="destructive_glow_secondary_dark">#1FEE6D87</color>
 </resources>
