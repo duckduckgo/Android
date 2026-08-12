@@ -96,7 +96,30 @@ class DialogConfigResolverTest {
     @Test
     fun `resolves no config for a dialog that has no config-driven screen yet`() {
         assertNull(testee.resolve(NewUserOnboardingActivityDialog.NotificationPermission, isCustomAiFlow = false))
-        assertNull(testee.resolve(NewUserOnboardingActivityDialog.AddToDock, isCustomAiFlow = false))
+    }
+
+    @Test
+    fun `resolves the add to dock dialog with no decoration and no arrow`() {
+        val config = testee.resolve(NewUserOnboardingActivityDialog.AddToDock, isCustomAiFlow = false)!!
+
+        assertEquals(OnboardingBackgroundStep.AddToDock, config.background)
+        assertEquals(Embellishment.None, config.embellishment)
+        assertEquals(CardArrowConfig.Hidden, config.cardArrow)
+        assertEquals(
+            ContentConfig.AddToDock(
+                title = TextConfig.Resource(R.string.preOnboardingDockStepTitle),
+                body = TextConfig.Resource(R.string.preOnboardingAddToDockBody),
+            ),
+            config.content,
+        )
+        assertEquals(
+            CtaConfig(
+                TextConfig.Resource(R.string.preOnboardingAddToDockPrimaryCta),
+                CtaAction.Emit(NewUserOnboardingEvent.ContinueClicked),
+            ),
+            config.primaryCta,
+        )
+        assertNull(config.secondaryCta)
     }
 
     @Test
@@ -263,5 +286,86 @@ class DialogConfigResolverTest {
         assertEquals(TextConfig.Resource(R.string.preOnboardingInputModeDemoTitleCustomAi), content.title)
         assertFalse(content.showModeToggle)
         assertEquals(InputScreenPreviewContentState(isSearchSelected = false), content.initialState())
+    }
+
+    @Test
+    fun `resolves the widget prompt dialog with add and skip ctas`() {
+        val config = testee.resolve(NewUserOnboardingActivityDialog.WidgetPrompt, isCustomAiFlow = false)!!
+
+        assertEquals(OnboardingBackgroundStep.AddWidget, config.background)
+        assertEquals(Embellishment.LeftWing, config.embellishment)
+        assertEquals(CardArrowConfig.AtEnd, config.cardArrow)
+        assertEquals(
+            ContentConfig.WidgetPrompt(
+                title = TextConfig.Resource(R.string.experimentHomeScreenWidgetBottomSheetDialogTitle),
+                body = TextConfig.Resource(R.string.experimentHomeScreenWidgetBottomSheetDialogSubTitle),
+            ),
+            config.content,
+        )
+        assertEquals(
+            CtaConfig(
+                TextConfig.Resource(R.string.preOnboardingWidgetPromptPrimaryCta),
+                CtaAction.Emit(NewUserOnboardingEvent.AddWidgetRequested),
+            ),
+            config.primaryCta,
+        )
+        assertEquals(
+            CtaConfig(
+                TextConfig.Resource(R.string.experimentHomeScreenWidgetBottomSheetDialogGhostButton),
+                CtaAction.Emit(NewUserOnboardingEvent.WidgetPromptSkipped),
+            ),
+            config.secondaryCta,
+        )
+    }
+
+    @Test
+    fun `resolves quick setup with the plan's row visibility and a submitting cta`() {
+        val dialog = NewUserOnboardingActivityDialog.QuickSetup(
+            showSplitOption = true,
+            hideSetDefaultBrowserRow = true,
+            hideAddWidgetRow = false,
+            hideAddressBarRow = true,
+            isReinstallUser = true,
+        )
+
+        val config = testee.resolve(dialog, isCustomAiFlow = false)!!
+
+        assertEquals(OnboardingBackgroundStep.QuickSetup, config.background)
+        assertEquals(Embellishment.BottomWing, config.embellishment)
+        assertEquals(CardArrowConfig.AtEnd, config.cardArrow)
+        assertEquals(
+            ContentConfig.QuickSetup(
+                title = TextConfig.Resource(R.string.preOnboardingReinstallQuickSetupTitle),
+                showSplitOption = true,
+                hideSetDefaultBrowserRow = true,
+                hideAddWidgetRow = false,
+                hideAddressBarRow = true,
+                initialAddressBarPosition = OmnibarType.SINGLE_TOP,
+                initialWithAi = true,
+            ),
+            config.content,
+        )
+        assertEquals(
+            CtaConfig(TextConfig.Resource(R.string.preOnboardingReinstallStartBrowsing), CtaAction.Submit),
+            config.primaryCta,
+        )
+    }
+
+    @Test
+    fun `resolves quick setup with custom ai cta copy in the custom ai flow`() {
+        val dialog = NewUserOnboardingActivityDialog.QuickSetup(
+            showSplitOption = false,
+            hideSetDefaultBrowserRow = false,
+            hideAddWidgetRow = false,
+            hideAddressBarRow = false,
+            isReinstallUser = false,
+        )
+
+        val config = testee.resolve(dialog, isCustomAiFlow = true)!!
+
+        assertEquals(
+            CtaConfig(TextConfig.Resource(R.string.preOnboardingDaxDialog3ButtonCustomAi), CtaAction.Submit),
+            config.primaryCta,
+        )
     }
 }

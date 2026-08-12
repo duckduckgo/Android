@@ -41,6 +41,14 @@ sealed interface ContentInteraction {
         val isChat: Boolean,
         val fromSuggestion: Boolean,
     ) : ContentInteraction
+
+    data object QuickSetupEditAddressBarPosition : ContentInteraction
+
+    data object QuickSetupEditSearchOptions : ContentInteraction
+
+    data class QuickSetupSetDefaultBrowser(val checked: Boolean) : ContentInteraction
+
+    data class QuickSetupAddWidget(val checked: Boolean) : ContentInteraction
 }
 
 /** Binds a stateless [ContentConfig] to its include layout. */
