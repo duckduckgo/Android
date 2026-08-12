@@ -55,8 +55,8 @@ interface PirScan {
         jobRecords: List<ScanJobRecord>,
         context: Context,
         runType: RunType,
-        onJobCompleted: (suspend () -> Unit)? = null,
-        onScanJobsResolved: (suspend (Int) -> Unit)? = null,
+        onJobCompleted: suspend () -> Unit = {},
+        onScanJobsResolved: suspend (Int) -> Unit = {},
     ): Result<Unit>
 
     /**
@@ -130,8 +130,8 @@ class RealPirScan @Inject constructor(
         jobRecords: List<ScanJobRecord>,
         context: Context,
         runType: RunType,
-        onJobCompleted: (suspend () -> Unit)?,
-        onScanJobsResolved: (suspend (Int) -> Unit)?,
+        onJobCompleted: suspend () -> Unit,
+        onScanJobsResolved: suspend (Int) -> Unit,
     ) = withContext(dispatcherProvider.io()) {
         logcat { "PIR-SCAN: Running scan on the following records: $jobRecords on ${Thread.currentThread().name}" }
         onJobStarted()
@@ -142,14 +142,14 @@ class RealPirScan @Inject constructor(
         val activeBrokers = repository.getAllActiveBrokerObjects().associateBy { it.name }
         if (activeBrokers.isEmpty()) {
             logcat { "PIR-SCAN: No active brokers here." }
-            onScanJobsResolved?.invoke(0)
+            onScanJobsResolved(0)
             completeScan(runType)
             return@withContext Result.success(Unit)
         }
 
         if (jobRecords.isEmpty()) {
             logcat { "PIR-SCAN: Nothing to scan here." }
-            onScanJobsResolved?.invoke(0)
+            onScanJobsResolved(0)
             completeScan(runType)
             return@withContext Result.success(Unit)
         }
@@ -158,7 +158,7 @@ class RealPirScan @Inject constructor(
 
         val processedJobRecords = processJobRecords(jobRecords, activeBrokers)
         logcat { "PIR-SCAN: Total processed records ${processedJobRecords.size}" }
-        onScanJobsResolved?.invoke(processedJobRecords.size)
+        onScanJobsResolved(processedJobRecords.size)
 
         if (processedJobRecords.isEmpty()) {
             logcat { "PIR-SCAN: No job records." }

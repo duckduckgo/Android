@@ -77,6 +77,7 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -226,6 +227,10 @@ class RealPirActionsRunner @AssistedInject constructor(
      * Cancelling [timerJob] before the next step matters beyond tidiness: a pushed action arms a
      * local timeout that [CompleteExecution] does not cancel, and it would otherwise fire during
      * this runner's following step and fail it with this step's action id.
+     *
+     * The teardown is [NonCancellable] because it runs from a `finally`: a cancelled step (a stopped
+     * scan worker, or a sibling runner failing the distributor's scope) would otherwise never reach
+     * the block, and the reference is dropped here, so no later [stop] could destroy the WebView.
      */
     private suspend fun finishStep() {
         timerJob.cancel()
@@ -239,7 +244,7 @@ class RealPirActionsRunner @AssistedInject constructor(
         detachedWebView = null
         if (webView == null) return
 
-        withContext(dispatcherProvider.main()) {
+        withContext(NonCancellable + dispatcherProvider.main()) {
             webView.stopLoading()
             if (ownsWebView) {
                 webView.evaluateJavascript("window.stop();", null)
