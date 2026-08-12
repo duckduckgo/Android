@@ -1,0 +1,25 @@
+Pins onboardingBrandDesignUpdate.configDrivenDialogs to FALSE so the nightly E2E suite can run
+the internal-flavour onboarding flows against the legacy renderer — the renderer production
+ships while the flag sits on INTERNAL. The flag is read during app launch, so only a
+compile-time change can pin it.
+
+Applied only by the "Onboarding, legacy renderer on internal" job in
+.github/workflows/e2e-nightly-non-blockers-suite.yml.
+
+This patch is meant to stop applying once the default moves off INTERNAL. CI fails loudly at
+that point, and whoever changes the default decides what coverage is still missing:
+
+  - default becomes TRUE: rewrite this patch to pin FALSE against TRUE and run on the play
+    binary, until the legacy renderer is deleted.
+  - legacy renderer deleted: delete this patch and the job that applies it.
+
+See .claude/rules/maestro-ui-tests.md for the full mechanism.
+
+diff --git a/app/src/main/java/com/duckduckgo/app/onboardingbranddesignupdate/OnboardingBrandDesignUpdateToggles.kt b/app/src/main/java/com/duckduckgo/app/onboardingbranddesignupdate/OnboardingBrandDesignUpdateToggles.kt
+--- a/app/src/main/java/com/duckduckgo/app/onboardingbranddesignupdate/OnboardingBrandDesignUpdateToggles.kt
++++ b/app/src/main/java/com/duckduckgo/app/onboardingbranddesignupdate/OnboardingBrandDesignUpdateToggles.kt
+@@ -60,3 +60,3 @@ interface OnboardingBrandDesignUpdateToggles {
+      */
+-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
++    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+     fun configDrivenDialogs(): Toggle
