@@ -270,6 +270,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
     @Inject
     lateinit var faviconManager: FaviconManager
 
+    private var attachmentChangesEnabled: Boolean = false
+
     private var activeTabId: String? = null
 
     private var tabCountLiveData: LiveData<Int>? = null
@@ -279,6 +281,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var floatingSubmitContainer: ViewGroup? = null
     private var chatStateJob: Job? = null
     private var chatSuggestionsSettingJob: Job? = null
+    private var attachmentChangesJob: Job? = null
     private var chatSuggestionsJob: Job? = null
     private var tierJob: Job? = null
     private var nativeInputStateJob: Job? = null
@@ -639,6 +642,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
+        observeAttachmentChangesEnabled()
         inputModeSwitch.addOnTabSelectedListener(duckChatTabSelectedListener)
         val mode = if (inputModeSwitch.selectedTabPosition == 0) InputMode.SEARCH else InputMode.DUCK_AI
         duckChatInternal.setSelectedMode(mode)
@@ -772,6 +776,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
         chatStateJob = null
         chatSuggestionsSettingJob?.cancel()
         chatSuggestionsSettingJob = null
+        attachmentChangesJob?.cancel()
+        attachmentChangesJob = null
         tierJob?.cancel()
         tierJob = null
         nativeInputStateJob?.cancel()
@@ -954,14 +960,27 @@ class NativeInputModeWidget @JvmOverloads constructor(
         findViewById<View?>(R.id.inputModeSwitchRow)?.visibility = if (effective) VISIBLE else GONE
     }
 
+    private fun applyAttachmentPlacement() {
+        // When enabled, the attachment row sits above the text input instead of below it.
+        if (!attachmentChangesEnabled) return
+        val container = findViewById<ViewGroup>(R.id.inputModeWidgetContentContainer) ?: return
+        val attachments = findViewById<View>(R.id.attachmentsContainer) ?: return
+        val inputRow = findViewById<View>(R.id.inputModeWidgetCardContent) ?: return
+        if (container.indexOfChild(attachments) == container.indexOfChild(inputRow) - 1) return
+        container.removeView(attachments)
+        container.addView(attachments, container.indexOfChild(inputRow))
+    }
+
     private fun applyVerticalPaddingForFocus() {
-        // 4dp when minimized, 8dp when expanded on focus. The browser omnibar with the toggle
-        // disabled stays minimized regardless of focus; everywhere else (duck.ai omnibar,
-        // duck.ai contextual, browser omnibar with toggle enabled) expands on focus.
+        // 4dp when minimized, 8dp when expanded. The browser omnibar with the toggle disabled stays
+        // minimized regardless of focus; the duck.ai omnibar and browser omnibar with toggle enabled
+        // expand on focus; the duck.ai contextual sheet is always expanded when the attachment changes
+        // are enabled.
         val isBrowserOmnibarMinimized = nativeInputState?.let {
             it.inputContext == NativeInputState.InputContext.BROWSER && !it.toggleVisible
         } ?: true
-        val expanded = !isBrowserOmnibarMinimized && (inputField.hasFocus() || previewEnterFocus)
+        val expanded = (attachmentChangesEnabled && isContextualWidget) ||
+            (!isBrowserOmnibarMinimized && (inputField.hasFocus() || previewEnterFocus))
         val verticalPadAttr = if (expanded) {
             com.duckduckgo.mobile.android.R.dimen.keyline_2
         } else {
@@ -1777,6 +1796,17 @@ class NativeInputModeWidget @JvmOverloads constructor(
         chatSuggestionsSettingJob?.cancel()
         chatSuggestionsSettingJob = viewModel.chatSuggestionsUserEnabled
             .onEach { enabled -> chatSuggestionsUserEnabled = enabled }
+            .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope ?: return)
+    }
+
+    private fun observeAttachmentChangesEnabled() {
+        attachmentChangesJob?.cancel()
+        attachmentChangesJob = viewModel.attachmentChangesEnabled
+            .onEach { enabled ->
+                attachmentChangesEnabled = enabled
+                applyAttachmentPlacement()
+                applyVerticalPaddingForFocus()
+            }
             .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope ?: return)
     }
 

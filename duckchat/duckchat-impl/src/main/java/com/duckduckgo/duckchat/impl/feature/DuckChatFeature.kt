@@ -289,4 +289,12 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun contextualNativeInput(): Toggle
+
+    /**
+     * @return `true` when the native input attachment layout changes are enabled: the attachment row is
+     * placed above the text input, and the contextual sheet keeps its expanded padding regardless of focus.
+     * If the remote feature is not present defaults to `internal`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun nativeInputAttachmentChanges(): Toggle
 }

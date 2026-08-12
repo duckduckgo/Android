@@ -44,6 +44,7 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.feature.maxUrlSuggestions
 import com.duckduckgo.duckchat.impl.helper.PendingNativeFile
 import com.duckduckgo.duckchat.impl.helper.PendingNativeImage
@@ -104,6 +105,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     private val browserMode: BrowserMode,
     private val autoCompleteSettings: AutoCompleteSettings,
     private val duckAiChatHistoryFeature: DuckAiChatHistoryFeature,
+    private val duckChatFeature: DuckChatFeature,
     private val dispatchers: DispatcherProvider,
     private val pixel: Pixel,
     private val duckChatPixels: DuckChatPixels,
@@ -145,6 +147,9 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     private val _isHistoryAvailable = MutableStateFlow(false)
     val isHistoryAvailable: StateFlow<Boolean> = _isHistoryAvailable.asStateFlow()
 
+    private val _attachmentChangesEnabled = MutableStateFlow(false)
+    val attachmentChangesEnabled: StateFlow<Boolean> = _attachmentChangesEnabled.asStateFlow()
+
     private val currentChat = MutableStateFlow<DuckAiChat?>(null)
     private var currentChatJob: Job? = null
 
@@ -161,6 +166,11 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         }
         viewModelScope.launch {
             _isHistoryAvailable.value = duckChatInternal.isChatHistoryAvailable()
+        }
+        viewModelScope.launch {
+            _attachmentChangesEnabled.value = withContext(dispatchers.io()) {
+                duckChatFeature.nativeInputAttachmentChanges().isEnabled()
+            }
         }
         viewModelScope.launch {
             // FE recovery "Switch Model": enter the model-change mode, but only when the event

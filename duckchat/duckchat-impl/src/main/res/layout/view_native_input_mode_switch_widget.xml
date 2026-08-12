@@ -53,6 +53,7 @@
             app:layout_goneMarginEnd="@dimen/keyline_empty">
 
             <LinearLayout
+                android:id="@+id/inputModeWidgetContentContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:clipChildren="false"
@@ -177,6 +178,7 @@
                         android:visibility="gone" />
 
                 </LinearLayout>
+
                 <FrameLayout
                     android:id="@id/attachmentsContainer"
                     android:layout_width="match_parent"
