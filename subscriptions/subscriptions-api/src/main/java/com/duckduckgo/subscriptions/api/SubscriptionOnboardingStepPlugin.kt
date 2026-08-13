@@ -33,9 +33,9 @@ interface SubscriptionOnboardingStepPlugin {
     /** Stable id for this step. Also the key used to persist completion. */
     val stepId: String
 
-    /** Title shown in the host's toolbar while this step is on screen. */
+    /** Title shown in the host's toolbar while this step is on screen, or null for no toolbar title. */
     @get:StringRes
-    val titleResId: Int
+    val titleResId: Int? get() = null
 
     /** Whether this step should be shown to the current user (e.g. gated by feature flag / entitlement). Skipped when false. */
     suspend fun shouldShow(): Boolean

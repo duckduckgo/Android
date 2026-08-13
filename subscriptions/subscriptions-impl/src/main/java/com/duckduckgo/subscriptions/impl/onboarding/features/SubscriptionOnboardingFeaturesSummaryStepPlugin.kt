@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.subscriptions.impl.onboarding.welcome
+package com.duckduckgo.subscriptions.impl.onboarding.features
 
 import androidx.fragment.app.Fragment
 import com.duckduckgo.anvil.annotations.PriorityKey
@@ -24,16 +24,16 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
-@PriorityKey(100)
-class SubscriptionOnboardingWelcomeStepPlugin @Inject constructor() : SubscriptionOnboardingStepPlugin {
+@PriorityKey(150)
+class SubscriptionOnboardingFeaturesSummaryStepPlugin @Inject constructor() : SubscriptionOnboardingStepPlugin {
 
-    override val stepId: String = WELCOME_STEP_ID
+    override val stepId: String = FEATURES_SUMMARY_STEP_ID
 
     override suspend fun shouldShow(): Boolean = true
 
-    override fun createFragment(): Fragment = SubscriptionOnboardingWelcomeFragment()
+    override fun createFragment(): Fragment = SubscriptionOnboardingFeaturesSummaryFragment()
 
     companion object {
-        const val WELCOME_STEP_ID = "welcome"
+        const val FEATURES_SUMMARY_STEP_ID = "features_summary"
     }
 }
