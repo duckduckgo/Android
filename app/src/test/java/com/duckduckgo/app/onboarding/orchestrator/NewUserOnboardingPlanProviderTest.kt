@@ -125,7 +125,7 @@ class NewUserOnboardingPlanProviderTest {
                 .thenReturn(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.CONTROL)
             whenever(segmentedOnboardingExperiment.enroll()).thenReturn(null)
         }
-        provider = NewUserOnboardingPlanProvider(
+        val steps = NewUserOnboardingSteps(
             syncAutoRestore = syncAutoRestore,
             appBuildConfig = appBuildConfig,
             defaultRoleBrowserDialog = defaultRoleBrowserDialog,
@@ -133,19 +133,50 @@ class NewUserOnboardingPlanProviderTest {
             onboardingStore = onboardingStore,
             duckChat = duckChat,
             androidBrowserConfigFeature = androidBrowserConfigFeature,
-            duckAiOnboardingAvailability = duckAiAvailability,
             onboardingPixelSender = onboardingPixelSender,
             inputScreenOnboardingWideEvent = inputScreenOnboardingWideEvent,
             defaultBrowserDetector = defaultBrowserDetector,
             widgetCapabilities = widgetCapabilities,
             pixel = pixel,
             dispatchers = coroutineRule.testDispatcherProvider,
-            dismissedCtaDao = dismissedCtaDao,
-            customAiOnboardingStore = customAiOnboardingStore,
+        )
+        val plans = NewUserOnboardingPlans(
+            onboardingPixelSender = onboardingPixelSender,
+            onboardingSteps = steps,
+        )
+        provider = NewUserOnboardingPlanProvider(
+            appBuildConfig = appBuildConfig,
             customAiOnboardingResolver = customAiOnboardingResolver,
-            duckAiOnboardingDemo = duckAiOnboardingDemo,
             onboardingPromptsExperimentManager = homeScreenPromptsExperiment,
             segmentedOnboardingExperimentManager = segmentedOnboardingExperiment,
+            defaultPlanBuilder = DefaultOnboardingPlanBuilder(
+                steps = steps,
+                plans = plans,
+                syncAutoRestore = syncAutoRestore,
+                duckAiOnboardingAvailability = duckAiAvailability,
+                onboardingStore = onboardingStore,
+                onboardingPixelSender = onboardingPixelSender,
+                widgetCapabilities = widgetCapabilities,
+                pixel = pixel,
+                dispatchers = coroutineRule.testDispatcherProvider,
+            ),
+            customAiPlanBuilder = CustomAiOnboardingPlanBuilder(
+                steps = steps,
+                plans = plans,
+                duckChat = duckChat,
+                onboardingStore = onboardingStore,
+                duckAiOnboardingDemo = duckAiOnboardingDemo,
+                customAiOnboardingStore = customAiOnboardingStore,
+                dismissedCtaDao = dismissedCtaDao,
+                onboardingPixelSender = onboardingPixelSender,
+                pixel = pixel,
+                dispatchers = coroutineRule.testDispatcherProvider,
+            ),
+            segmentedPlanBuilder = SegmentedOnboardingPlanBuilder(
+                steps = steps,
+                plans = plans,
+            ),
+            dispatchers = coroutineRule.testDispatcherProvider,
         )
     }
 

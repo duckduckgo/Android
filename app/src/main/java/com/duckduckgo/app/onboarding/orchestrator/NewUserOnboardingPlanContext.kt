@@ -19,9 +19,8 @@ package com.duckduckgo.app.onboarding.orchestrator
 import com.duckduckgo.onboarding.api.LinearOnboardingResult
 
 /**
- * Per-run cross-step state. A fresh instance is created inside
- * [NewUserOnboardingPlanProvider.buildRootPlan]. Holds only cross-step facts — editable
- * selections live in the VM.
+ * Per-run cross-step state. Each plan builder creates a fresh instance inside its build call.
+ * Holds only cross-step facts — editable selections live in the VM.
  */
 class NewUserOnboardingPlanContext {
     /** Raw [com.duckduckgo.appbuildconfig.api.AppBuildConfig.isAppReinstall] result, set by the first-dialog memo. */
