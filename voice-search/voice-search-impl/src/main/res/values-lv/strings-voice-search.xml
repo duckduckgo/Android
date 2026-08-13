@@ -31,5 +31,12 @@
     <string name="voiceSearchRemovePositiveButton">Noņemt</string>
     <string name="voiceSearchRemoveTitle">Vai noņemt opciju \"Privātā meklēšana ar balsi\" no adreses joslas?</string>
     <string name="voiceSearchRemoveSubtitle">Šīs un citas pieejamības preferences vienmēr vari pārvaldīt sadaļā Iestatījumi.</string>
+    <string name="voiceSearchMicAccessDeniedDialogTitle">DuckDuckGo ir nepieciešama piekļuve mikrofonam.</string>
+    <string name="voiceSearchMicAccessDeniedDialogMessage">Ja vēlies izmantot mūsu privāto meklēšanu ar balsi, ir nepieciešamas mikrofona atļaujas.</string>
+    <string name="voiceSearchMicAccessDeniedDialogMessageDuckAi">Mikrofona atļaujas ir nepieciešamas, ja vēlies izmantot balss tērzēšanu vietnē Duck.ai.</string>
+    <string name="voiceSearchMicAccessDeniedDialogChangePermissions">Mainīt atļaujas</string>
+    <string name="voiceSearchMicAccessDeniedDialogHideVoiceSearch">Paslēpt meklēšanu ar balsi</string>
+    <string name="voiceSearchMicPermissionDeniedSnackbarMessage">Balss funkcijām nepieciešama mikrofona atļauja</string>
+    <string name="voiceSearchMicPermissionDeniedSnackbarAction">Atļaut</string>
     <string name="voiceSearchTitle">Balss meklēšana</string>
 </resources>
