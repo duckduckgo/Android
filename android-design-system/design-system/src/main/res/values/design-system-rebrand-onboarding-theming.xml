@@ -246,7 +246,8 @@
         <item name="android:insetBottom">4dp</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.DaxButton.TextButton.Onboarding.Primary">
+    <!-- the color selectors referenced here resolve to ?attr/daxColor* values, so they are theme-friendly -->
+    <style name="Widget.DuckDuckGo.DaxButton.TextButton.Onboarding.Primary" tools:ignore="InvalidColorAttribute">
         <item name="android:textColor">@color/button_onboarding_primary_text_color_selector</item>
         <item name="backgroundTint">@color/button_onboarding_primary_container_selector</item>
         <item name="rippleColor">?attr/daxColorButtonPrimaryContainerPressed</item>
