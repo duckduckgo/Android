@@ -342,4 +342,5 @@
 
     <!-- File/image attachment menu options -->
     <string name="duckChatContextualAskAboutPage">Ask About Page</string>
+
 </resources>

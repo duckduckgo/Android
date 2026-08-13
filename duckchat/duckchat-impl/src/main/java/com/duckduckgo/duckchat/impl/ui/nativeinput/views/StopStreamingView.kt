@@ -54,6 +54,8 @@ class StopStreamingView @JvmOverloads constructor(
 
     var onStopClicked: (() -> Unit)? = null
 
+    var isEditMode: Boolean = false
+
     init {
         inflate(context, R.layout.view_stop_streaming, this)
     }
@@ -75,10 +77,22 @@ class StopStreamingView @JvmOverloads constructor(
         val scope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
         visibilityJob?.cancel()
         visibilityJob = viewModel.isVisible
-            .onEach { visible ->
-                isVisible = visible
-                (parent as? View)?.isVisible = visible
+            .onEach { streaming ->
+                val show = shouldShowStopStreaming(streaming, isEditMode)
+                isVisible = show
+                (parent as? View)?.isVisible = show
             }
             .launchIn(scope)
     }
 }
+
+/**
+ * Unlike the other plugin controls, this button is visible only while a chat is actively streaming
+ * (the opposite of [shouldShowPluginControls]'s "no chat streaming" rule) — but it is still suppressed
+ * in edit mode: the edit widget's Stop button must never reflect or interrupt a different, unrelated
+ * chat's stream. Derived purely from booleans so it is unit-testable without Robolectric.
+ */
+internal fun shouldShowStopStreaming(
+    streaming: Boolean,
+    isEditMode: Boolean,
+): Boolean = streaming && !isEditMode
