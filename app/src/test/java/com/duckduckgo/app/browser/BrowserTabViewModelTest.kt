@@ -3850,10 +3850,7 @@ class BrowserTabViewModelTest {
             testee.refreshCta()
 
             verify(refreshPixelSender).onRefreshPatternDetected(refreshPatterns)
-            verify(mockBrokenSitePrompt).shouldShowBrokenSitePrompt(
-                currentUrl,
-                refreshPatterns,
-            )
+            verify(mockBrokenSitePrompt, never()).shouldShowBrokenSitePrompt(any(), any())
         }
 
     @Test

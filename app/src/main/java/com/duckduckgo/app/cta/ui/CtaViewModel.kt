@@ -337,7 +337,7 @@ class CtaViewModel @Inject constructor(
         site: Site? = null,
         detectedRefreshPatterns: Set<RefreshPattern>,
         suppressDuckAiOnboardingCta: Boolean = false,
-        brokenSitePromptUrl: String? = site?.url,
+        brokenSitePromptUrl: String?,
     ): Cta? {
         return withContext(dispatcher) {
             if (isBrowserShowing) {
@@ -567,6 +567,8 @@ class CtaViewModel @Inject constructor(
 
             if (areInContextDaxDialogsCompleted()) {
                 val promptUrl = brokenSitePromptUrl ?: return null
+                // Reports are built from Site, so reject stale state before showing the prompt.
+                if (nonNullSite.url != promptUrl) return null
                 return if (brokenSitePrompt.shouldShowBrokenSitePrompt(promptUrl, detectedRefreshPatterns)) {
                     BrokenSitePromptDialogCta()
                 } else {
