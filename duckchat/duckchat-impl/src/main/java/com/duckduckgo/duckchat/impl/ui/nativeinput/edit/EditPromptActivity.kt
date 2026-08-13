@@ -131,8 +131,20 @@ class EditPromptActivity : DuckDuckGoActivity() {
         finish()
     }
 
+    /**
+     * Every way out of this screen — toolbar close, system back, predictive back — routes through
+     * finish(), so resolving here gets the cancel across the JS bridge while the edit screen still
+     * covers the web view. Waiting for onDestroy() would land the reply after the exit animation,
+     * making the frontend's leave-edit re-render visible on the transcript the user is back on.
+     */
+    override fun finish() {
+        params?.sessionId?.let { editPromptSessionStore.resolve(it, EditPromptResult.Cancelled) }
+        super.finish()
+    }
+
     override fun onDestroy() {
         params?.sessionId?.let { sessionId ->
+            // Backstop for teardowns that never went through a cancel gesture.
             if (!submitted && !isChangingConfigurations) editPromptSessionStore.resolve(sessionId, EditPromptResult.Cancelled)
             nativeInputStatePublisher.clearTab(NativeInputModeWidgetViewModel.editStateKey(sessionId))
         }
