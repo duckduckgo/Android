@@ -43,6 +43,7 @@ import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -143,6 +144,59 @@ class RealBrokerActionProcessorTest {
         assertEquals(PIRScriptConstants.SCRIPT_FEATURE_NAME, eventCaptor.firstValue.featureName)
         assertEquals(PIRScriptConstants.SUBSCRIBED_METHOD_NAME_RECEIVED, eventCaptor.firstValue.subscriptionName)
         assertNotNull(eventCaptor.firstValue.params)
+    }
+
+    @Test
+    fun whenPushExtractActionThenProfileSelectorsAreForwardedVerbatim() = runTest {
+        val actionJson = """
+            {
+                "actionType": "extract",
+                "id": "extract-1",
+                "selector": ".search-item",
+                "profile": {
+                    "name": {
+                        "selector": ".title"
+                    },
+                    "addressCityStateList": {
+                        "selector": ".//li",
+                        "findElements": true,
+                        "city": {
+                            "selector": ".city"
+                        },
+                        "state": {
+                            "selector": ".state"
+                        }
+                    },
+                    "profileUrl": {
+                        "selector": "a",
+                        "attribute": "href"
+                    },
+                    "shoeSize": {
+                        "selector": ".shoe"
+                    }
+                }
+            }
+        """.trimIndent()
+        val action = moshi.adapter(BrokerAction::class.java).fromJson(actionJson)!!
+
+        testee.pushAction(action, UserProfile())
+
+        val eventCaptor = argumentCaptor<SubscriptionEventData>()
+        verify(mockJsMessaging).sendSubscriptionEvent(eventCaptor.capture())
+
+        val pushedProfile = eventCaptor.firstValue.params
+            .getJSONObject("state")
+            .getJSONObject("action")
+            .getJSONObject("profile")
+        assertEquals(".title", pushedProfile.getJSONObject("name").getString("selector"))
+        assertEquals(".shoe", pushedProfile.getJSONObject("shoeSize").getString("selector"))
+        assertEquals("href", pushedProfile.getJSONObject("profileUrl").getString("attribute"))
+        pushedProfile.getJSONObject("addressCityStateList").also {
+            assertEquals(".//li", it.getString("selector"))
+            assertTrue(it.getBoolean("findElements"))
+            assertEquals(".city", it.getJSONObject("city").getString("selector"))
+            assertEquals(".state", it.getJSONObject("state").getString("selector"))
+        }
     }
 
     @Test

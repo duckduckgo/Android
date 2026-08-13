@@ -18,6 +18,7 @@ package com.duckduckgo.pir.impl.scheduling
 
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.pir.impl.models.AddressCityState
 import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord.EmailData
@@ -456,6 +457,42 @@ class RealJobRecordUpdaterTest {
 
             verify(mockRepository).getExtractedProfiles(testBrokerName, testProfileQueryId)
             // Should not call getValidOptOutJobRecord or saveOptOutJobRecord since no profiles were removed
+            verify(mockSchedulingRepository, never()).getValidOptOutJobRecord(any(), any())
+            verify(mockSchedulingRepository, never()).saveOptOutJobRecord(any())
+        }
+
+    @Test
+    fun whenMarkRemovedProfilesWithOnlyScrapedDetailChangedThenDoesNotMarkAsRemoved() =
+        runTest {
+            // The broker re-lists the same record with a bumped age and an extra address. This is the
+            // same profile as far as storage is concerned, so it must not count as a removal.
+            val storedProfiles =
+                listOf(
+                    testExtractedProfile1.copy(
+                        age = "35",
+                        addresses = listOf(AddressCityState(city = "Springfield", state = "IL")),
+                        relatives = listOf("Jane Doe"),
+                    ),
+                )
+
+            val newProfiles =
+                listOf(
+                    testExtractedProfile1.copy(
+                        dbId = 0L,
+                        age = "36",
+                        addresses = listOf(
+                            AddressCityState(city = "Springfield", state = "IL"),
+                            AddressCityState(city = "Boston", state = "MA"),
+                        ),
+                        relatives = emptyList(),
+                    ),
+                )
+
+            whenever(mockRepository.getExtractedProfiles(testBrokerName, testProfileQueryId))
+                .thenReturn(storedProfiles)
+
+            toTest.markRemovedOptOutJobRecords(newProfiles, testBrokerName, testProfileQueryId)
+
             verify(mockSchedulingRepository, never()).getValidOptOutJobRecord(any(), any())
             verify(mockSchedulingRepository, never()).saveOptOutJobRecord(any())
         }

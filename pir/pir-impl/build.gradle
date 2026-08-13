@@ -69,6 +69,7 @@ dependencies {
     implementation AndroidX.security.crypto
 
     testImplementation Testing.junit4
+    testImplementation AndroidX.room.testing
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation project(path: ':common-test')
     testImplementation project(path: ':feature-toggles-test')
@@ -98,6 +99,9 @@ dependencies {
 
 android {
     namespace "com.duckduckgo.pir.impl"
+    sourceSets {
+        test.assets.srcDirs += files("$projectDir/schemas")
+    }
     anvil {
         generateDaggerFactories = true // default is false
     }
