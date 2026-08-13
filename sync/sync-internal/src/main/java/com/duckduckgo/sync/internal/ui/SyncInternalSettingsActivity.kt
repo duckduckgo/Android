@@ -382,6 +382,11 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         binding.canReadUnifiedDeviceListToggle.quietlySetIsChecked(viewState.canReadUnifiedDeviceListEnabled) { _, enabled ->
             viewModel.onCanReadUnifiedDeviceListFlagChanged(enabled)
         }
+        binding.canUsePatchEndpointForLegacyDeviceRenameToggle.quietlySetIsChecked(
+            viewState.canUsePatchEndpointForLegacyDeviceRenameEnabled,
+        ) { _, enabled ->
+            viewModel.onCanUsePatchEndpointForLegacyDeviceRenameFlagChanged(enabled)
+        }
         binding.migrationStatusTextView.text = viewState.migrationStatusText
         binding.migrationResultTextView.text = viewState.migrationResult
         if (viewState.isSignedIn) {

@@ -76,6 +76,7 @@ import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository.AuthCode
 import com.duckduckgo.sync.impl.crypto.SyncJweCrypto
 import com.duckduckgo.sync.impl.metrics.ConnectedDevicesObserver
+import com.duckduckgo.sync.impl.pixels.SyncAccountOperation
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrlWrapper
@@ -135,6 +136,7 @@ class AppSyncAccountRepositoryTest {
     private val thirdPartyDeviceListDecryptor: ThirdPartyDeviceListDecryptor = mock()
     private val loginDeviceInfoWriter: LoginDeviceInfoWriter = mock()
     private val signupAccountInfoBuilder: SignupAccountInfoBuilder = mock()
+    private val deviceInfoUpdater: DeviceInfoUpdater = mock()
 
     @get:Rule
     val coroutineTestRule = CoroutineTestRule()
@@ -160,6 +162,7 @@ class AppSyncAccountRepositoryTest {
             thirdPartyDeviceListDecryptor = thirdPartyDeviceListDecryptor,
             loginDeviceInfoWriter = loginDeviceInfoWriter,
             signupAccountInfoBuilder = signupAccountInfoBuilder,
+            deviceInfoUpdater = deviceInfoUpdater,
         )
         (syncRepo as AppSyncAccountRepository).upgradeRetryDelayMillis = 0L // keep retry-path tests instant
 
@@ -948,21 +951,93 @@ class AppSyncAccountRepositoryTest {
     }
 
     @Test
-    fun whenRenameDeviceUnAuthenticatedThenReturnError() {
+    fun whenRenameDeviceUnAuthenticatedThenReturnError() = runTest {
         val result = syncRepo.renameDevice(connectedDevice)
 
         assertTrue(result is Error)
     }
 
     @Test
-    fun whenRenameDeviceSuccessThenReturnSuccess() {
+    fun whenPatchEndpointForLegacyRenameIsKillSwitchedThenReRegisterViaLogin() = runTest {
         givenAuthenticatedDevice()
         prepareForLoginSuccess()
+        syncFeature.canUsePatchEndpointForLegacyDeviceRename().setRawStoredState(State(enable = false))
 
         val result = syncRepo.renameDevice(connectedDevice)
 
         verify(syncApi).login(anyString(), anyString(), eq(connectedDevice.deviceId), anyString(), anyString(), anyOrNull())
+        verifyNoInteractions(deviceInfoUpdater)
         assertTrue(result is Success)
+    }
+
+    @Test
+    fun whenRenameThisDeviceAndCanWriteUnifiedDeviceListThenRenamesViaUnifiedPath() = runTest {
+        givenAuthenticatedDevice()
+        prepareForLoginSuccess()
+        syncFeature.canWriteUnifiedDeviceList().setRawStoredState(State(enable = true))
+        whenever(deviceInfoUpdater.setThisDeviceName(any())).thenReturn(Success(emptyList()))
+
+        val result = syncRepo.renameDevice(connectedDevice.copy(deviceName = "New Name"))
+
+        assertTrue(result is Success)
+        verify(deviceInfoUpdater).setThisDeviceName("New Name")
+        verify(syncApi, never()).login(anyString(), anyString(), anyString(), anyString(), anyString(), anyOrNull())
+    }
+
+    @Test
+    fun whenUnifiedRenameFailsThenReturnErrorAndFireUpdateDevicePixel() = runTest {
+        givenAuthenticatedDevice()
+        prepareForLoginSuccess()
+        syncFeature.canWriteUnifiedDeviceList().setRawStoredState(State(enable = true))
+        whenever(deviceInfoUpdater.setThisDeviceName(any())).thenReturn(Error(reason = "patch failed"))
+
+        val result = syncRepo.renameDevice(connectedDevice)
+
+        assertTrue(result is Error)
+        verify(syncPixels).fireSyncAccountErrorPixel(any(), eq(SyncAccountOperation.UPDATE_DEVICE))
+        verify(syncApi, never()).login(anyString(), anyString(), anyString(), anyString(), anyString(), anyOrNull())
+    }
+
+    @Test
+    fun whenRenameAnotherDeviceThenReturnErrorWithoutWritingAnything() = runTest {
+        givenAuthenticatedDevice()
+        prepareForLoginSuccess()
+        syncFeature.canWriteUnifiedDeviceList().setRawStoredState(State(enable = true))
+        val anotherDevice = connectedDevice.copy(thisDevice = false, deviceId = "anotherDeviceId")
+
+        val result = syncRepo.renameDevice(anotherDevice)
+
+        assertTrue(result is Error)
+        verifyNoInteractions(deviceInfoUpdater)
+        verify(syncApi, never()).login(anyString(), anyString(), anyString(), anyString(), anyString(), anyOrNull())
+    }
+
+    @Test
+    fun whenRenameThisDeviceAndCannotWriteUnifiedDeviceListThenStillPatchViaTheUpdater() = runTest {
+        givenAuthenticatedDevice()
+        prepareForLoginSuccess()
+        syncFeature.canWriteUnifiedDeviceList().setRawStoredState(State(enable = false))
+        whenever(deviceInfoUpdater.setThisDeviceName(any())).thenReturn(Success(emptyList()))
+
+        val result = syncRepo.renameDevice(connectedDevice.copy(deviceName = "New Name"))
+
+        assertTrue(result is Success)
+        verify(deviceInfoUpdater).setThisDeviceName("New Name")
+        verify(syncApi, never()).login(anyString(), anyString(), anyString(), anyString(), anyString(), anyOrNull())
+    }
+
+    @Test
+    fun whenLegacyOnlyRenameFailsThenReturnErrorAndFireUpdateDevicePixel() = runTest {
+        givenAuthenticatedDevice()
+        prepareForLoginSuccess()
+        syncFeature.canWriteUnifiedDeviceList().setRawStoredState(State(enable = false))
+        whenever(deviceInfoUpdater.setThisDeviceName(any())).thenReturn(Error(reason = "patch failed"))
+
+        val result = syncRepo.renameDevice(connectedDevice)
+
+        assertTrue(result is Error)
+        verify(syncPixels).fireSyncAccountErrorPixel(any(), eq(SyncAccountOperation.UPDATE_DEVICE))
+        verify(syncApi, never()).login(anyString(), anyString(), anyString(), anyString(), anyString(), anyOrNull())
     }
 
     @Test
