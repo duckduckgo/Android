@@ -29,10 +29,21 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.duckduckgo.mobile.android.R as CommonR
 
+internal fun resolveWidgetPromoAsset(
+    isPictogramsEnabled: Boolean,
+    isLightModeEnabled: Boolean,
+): Int = when {
+    isPictogramsEnabled && isLightModeEnabled -> R.drawable.widget_promo_light_brand_update
+    isPictogramsEnabled -> R.drawable.widget_promo_dark_brand_update
+    isLightModeEnabled -> R.drawable.widget_promo_light
+    else -> R.drawable.widget_promo_dark
+}
+
 @SuppressLint("NoBottomSheetDialog")
 class HomeScreenWidgetBottomSheetDialog(
     context: Context,
     isLightModeEnabled: Boolean,
+    isPictogramsEnabled: Boolean,
     edgeToEdgeProvider: EdgeToEdgeProvider,
 ) : BottomSheetDialog(
     context,
@@ -68,11 +79,7 @@ class HomeScreenWidgetBottomSheetDialog(
             dismiss()
         }
         binding.homeScreenWidgetBottomSheetDialogImage.setImageResource(
-            if (isLightModeEnabled) {
-                R.drawable.widget_promo_light
-            } else {
-                R.drawable.widget_promo_dark
-            },
+            resolveWidgetPromoAsset(isPictogramsEnabled, isLightModeEnabled),
         )
         binding.homeScreenWidgetBottomSheetDialogPrimaryButton.setOnClickListener {
             eventListener?.onAddWidgetButtonClicked()

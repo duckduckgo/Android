@@ -293,6 +293,7 @@ import com.duckduckgo.browsermode.api.WebViewModeInitializer
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.menu.PopupMenu
+import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.store.BrowserAppTheme
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.ui.view.DaxDialog
@@ -552,6 +553,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var appTheme: BrowserAppTheme
+
+    @Inject
+    lateinit var appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles
 
     @Inject
     lateinit var accessibilitySettingsDataStore: AccessibilitySettingsDataStore
@@ -6518,12 +6522,14 @@ class BrowserTabFragment :
 
         private fun showHomeWidgetPrompt(configuration: HomePanelCta) {
             hideDaxCta()
+            val isPictogramsEnabled = appBrandDesignUpdateToggles.pictograms().isEnabled()
 
             if (!::widgetBottomSheetDialog.isInitialized) {
                 widgetBottomSheetDialog =
                     HomeScreenWidgetBottomSheetDialog(
                         context = requireContext(),
                         isLightModeEnabled = appTheme.isLightModeEnabled(),
+                        isPictogramsEnabled = isPictogramsEnabled,
                         edgeToEdgeProvider = edgeToEdgeProvider,
                     )
                 widgetBottomSheetDialog.eventListener =
