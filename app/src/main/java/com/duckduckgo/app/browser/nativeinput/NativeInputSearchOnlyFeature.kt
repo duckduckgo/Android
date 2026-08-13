@@ -31,6 +31,6 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 )
 interface NativeInputSearchOnlyFeature {
 
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun self(): Toggle
 }
