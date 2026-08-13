@@ -19,13 +19,9 @@ package com.duckduckgo.app.onboarding
 import com.duckduckgo.app.onboarding.OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.withTimeoutOrNull
 import javax.inject.Inject
 
 interface OnboardingPromptsExperimentManager {
@@ -41,17 +37,15 @@ interface OnboardingPromptsExperimentManager {
 }
 
 @ContributesBinding(AppScope::class, boundType = OnboardingPromptsExperimentManager::class)
-@ContributesMultibinding(AppScope::class, boundType = PrivacyConfigCallbackPlugin::class)
 @SingleInstanceIn(AppScope::class)
 class OnboardingPromptsExperimentManagerImpl @Inject constructor(
     private val toggles: OnboardingPromptsToggles,
     private val dispatcherProvider: DispatcherProvider,
-) : OnboardingPromptsExperimentManager, PrivacyConfigCallbackPlugin {
-
-    private val privacyPersisted = CompletableDeferred<Unit>()
+    private val onboardingPrivacyConfigPersistedGate: OnboardingPrivacyConfigPersistedGate,
+) : OnboardingPromptsExperimentManager {
 
     override suspend fun enroll(): OnboardingPromptExperimentVariant? = withContext(dispatcherProvider.io()) {
-        if (waitForPrivacyConfig()) {
+        if (onboardingPrivacyConfigPersistedGate.awaitPersisted()) {
             val toggle = toggles.addToDockAndWidgetExperimentJul25()
             toggle.enroll()
             when {
@@ -76,21 +70,5 @@ class OnboardingPromptsExperimentManagerImpl @Inject constructor(
         } else {
             null
         }
-    }
-
-    private suspend fun waitForPrivacyConfig(): Boolean =
-        withTimeoutOrNull(PRIVACY_CONFIG_WAIT_TIMEOUT_MS) {
-            privacyPersisted.await()
-        } != null
-
-    override fun onPrivacyConfigPersisted() {
-        super.onPrivacyConfigPersisted()
-        privacyPersisted.complete(Unit)
-    }
-
-    override fun onPrivacyConfigDownloaded() = Unit
-
-    companion object {
-        private const val PRIVACY_CONFIG_WAIT_TIMEOUT_MS = 2000L
     }
 }

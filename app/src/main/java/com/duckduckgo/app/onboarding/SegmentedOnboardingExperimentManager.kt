@@ -21,15 +21,10 @@ import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdat
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.withTimeoutOrNull
 import javax.inject.Inject
-import kotlin.time.Duration.Companion.seconds
 
 interface SegmentedOnboardingExperimentManager {
     suspend fun enroll(): SegmentedOnboardingExperimentVariant?
@@ -41,18 +36,16 @@ interface SegmentedOnboardingExperimentManager {
 }
 
 @ContributesBinding(AppScope::class, boundType = SegmentedOnboardingExperimentManager::class)
-@ContributesMultibinding(AppScope::class, boundType = PrivacyConfigCallbackPlugin::class)
 @SingleInstanceIn(AppScope::class)
 class SegmentedOnboardingExperimentManagerImpl @Inject constructor(
     private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
     private val dispatcherProvider: DispatcherProvider,
     private val appBuildConfig: AppBuildConfig,
-) : SegmentedOnboardingExperimentManager, PrivacyConfigCallbackPlugin {
-
-    private val privacyPersisted = CompletableDeferred<Unit>()
+    private val onboardingPrivacyConfigPersistedGate: OnboardingPrivacyConfigPersistedGate,
+) : SegmentedOnboardingExperimentManager {
 
     override suspend fun enroll(): SegmentedOnboardingExperimentVariant? = withContext(dispatcherProvider.io()) {
-        if (waitForLocalPrivacyConfig() && checkPrerequisites()) {
+        if (onboardingPrivacyConfigPersistedGate.awaitPersisted() && checkPrerequisites()) {
             // scaffolding for future experiment enrollment logic
             return@withContext null
         } else {
@@ -63,20 +56,4 @@ class SegmentedOnboardingExperimentManagerImpl @Inject constructor(
     private suspend fun checkPrerequisites() =
         onboardingBrandDesignUpdateToggles.configDrivenDialogs().isEnabled() &&
             !appBuildConfig.isAppReinstall()
-
-    private suspend fun waitForLocalPrivacyConfig(): Boolean =
-        withTimeoutOrNull(PRIVACY_CONFIG_WAIT_TIMEOUT) {
-            privacyPersisted.await()
-        } != null
-
-    override fun onPrivacyConfigPersisted() {
-        super.onPrivacyConfigPersisted()
-        privacyPersisted.complete(Unit)
-    }
-
-    override fun onPrivacyConfigDownloaded() = Unit
-
-    companion object {
-        private val PRIVACY_CONFIG_WAIT_TIMEOUT = 2.seconds
-    }
 }
