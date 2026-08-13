@@ -32,7 +32,7 @@ import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityDialo
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityStep
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanBootstrapper
-import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanProvider
+import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlans
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.OnboardingBackgroundStep
 import com.duckduckgo.app.onboarding.ui.page.configdriven.ConfigDrivenOnboardingPageViewModel.Command
@@ -136,7 +136,7 @@ class ConfigDrivenOnboardingPageViewModelTest {
         transition: suspend (LinearOnboardingEvent) -> LinearOnboardingTransition = recordAndStay,
         result: suspend () -> LinearOnboardingResult? = { null },
     ): LinearOnboardingPlan = LinearOnboardingPlan(
-        id = NewUserOnboardingPlanProvider.ROOT_PLAN_ID,
+        id = NewUserOnboardingPlans.ROOT_PLAN_ID,
         steps = listOf(NewUserOnboardingActivityStep(id = id, pixelName = null, transition = transition, resolveDialog = { dialog })),
         result = result,
     )
@@ -175,7 +175,7 @@ class ConfigDrivenOnboardingPageViewModelTest {
             transition = { LinearOnboardingTransition.Stay },
             resolveAction = { NewUserBrowserActivityAction.RunDuckAiOnboardingDemo("x") },
         )
-        realOrchestrator.startPlan(LinearOnboardingPlan(id = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, steps = listOf(browserStep)))
+        realOrchestrator.startPlan(LinearOnboardingPlan(id = NewUserOnboardingPlans.ROOT_PLAN_ID, steps = listOf(browserStep)))
         return createViewModel(realOrchestrator)
     }
 
@@ -305,7 +305,7 @@ class ConfigDrivenOnboardingPageViewModelTest {
             resolveDialog = { NewUserOnboardingActivityDialog.DefaultBrowserPrompt },
         )
         realOrchestrator.startPlan(
-            LinearOnboardingPlan(id = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, steps = listOf(introStep, promptStep)),
+            LinearOnboardingPlan(id = NewUserOnboardingPlans.ROOT_PLAN_ID, steps = listOf(introStep, promptStep)),
         )
         val testee = createViewModel(realOrchestrator)
         advanceUntilIdle()
@@ -338,7 +338,7 @@ class ConfigDrivenOnboardingPageViewModelTest {
             resolveDialog = { NewUserOnboardingActivityDialog.DefaultBrowserPrompt },
         )
         realOrchestrator.startPlan(
-            LinearOnboardingPlan(id = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, steps = listOf(comparisonStep, promptStep)),
+            LinearOnboardingPlan(id = NewUserOnboardingPlans.ROOT_PLAN_ID, steps = listOf(comparisonStep, promptStep)),
         )
         val testee = createViewModel(realOrchestrator)
         advanceUntilIdle()
@@ -386,7 +386,7 @@ class ConfigDrivenOnboardingPageViewModelTest {
             resolveDialog = { NewUserOnboardingActivityDialog.ComparisonChart },
         )
         realOrchestrator.startPlan(
-            LinearOnboardingPlan(id = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, steps = listOf(introStep, comparisonStep)),
+            LinearOnboardingPlan(id = NewUserOnboardingPlans.ROOT_PLAN_ID, steps = listOf(introStep, comparisonStep)),
         )
         val testee = createViewModel(realOrchestrator)
         advanceUntilIdle()

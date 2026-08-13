@@ -69,10 +69,4 @@ class NewUserOnboardingPlanProvider @Inject internal constructor(
                 else -> defaultPlanBuilder.build(onCompleted, onSkipped)
             }
         }
-
-    companion object {
-
-        const val ROOT_PLAN_ID = NewUserOnboardingPlans.ROOT_PLAN_ID
-        const val QUICK_SETUP_PLAN_ID = NewUserOnboardingPlans.QUICK_SETUP_PLAN_ID
-    }
 }

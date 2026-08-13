@@ -58,7 +58,7 @@ class NewUserBrowserOnboardingViewModel @Inject constructor(
 
     init {
         orchestrator.state
-            .forPlan(NewUserOnboardingPlanProvider.ROOT_PLAN_ID)
+            .forPlan(NewUserOnboardingPlans.ROOT_PLAN_ID)
             .filterIsInstance<LinearOnboardingState.InProgress>()
             .onEach { handleState(it) }
             .launchIn(viewModelScope)

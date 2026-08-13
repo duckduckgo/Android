@@ -33,7 +33,7 @@ import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityDialo
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityStep
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanBootstrapper
-import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanProvider
+import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlans
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingResult
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingStepIds
 import com.duckduckgo.app.onboarding.orchestrator.StepProgress
@@ -457,7 +457,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
 
     private fun observeOrchestratorState() {
         orchestrator.state
-            .forPlan(NewUserOnboardingPlanProvider.ROOT_PLAN_ID)
+            .forPlan(NewUserOnboardingPlans.ROOT_PLAN_ID)
             .onEach { state ->
                 when (state) {
                     is LinearOnboardingState.InProgress -> {

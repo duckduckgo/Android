@@ -33,7 +33,7 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
-import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanProvider
+import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlans
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
@@ -129,7 +129,7 @@ class CtaViewModel @Inject constructor(
 
     init {
         linearOnboardingOrchestrator.state
-            .forPlan(NewUserOnboardingPlanProvider.ROOT_PLAN_ID)
+            .forPlan(NewUserOnboardingPlans.ROOT_PLAN_ID)
             .filterIsInstance<LinearOnboardingState.Completed>()
             .onEach { completeStageIfDaxOnboardingCompleted() }
             .launchIn(coroutineScope)

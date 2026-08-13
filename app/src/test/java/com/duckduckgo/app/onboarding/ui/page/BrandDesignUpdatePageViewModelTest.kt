@@ -32,7 +32,7 @@ import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityDialo
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityStep
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanBootstrapper
-import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanProvider
+import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlans
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingResult
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingStepIds
 import com.duckduckgo.app.onboarding.orchestrator.StepProgress
@@ -152,7 +152,7 @@ class BrandDesignUpdatePageViewModelTest {
         result: suspend () -> LinearOnboardingResult? = { null },
     ): LinearOnboardingPlan =
         LinearOnboardingPlan(
-            id = NewUserOnboardingPlanProvider.ROOT_PLAN_ID,
+            id = NewUserOnboardingPlans.ROOT_PLAN_ID,
             steps = listOf(NewUserOnboardingActivityStep(id = id, pixelName = null, transition = transition, resolveDialog = { dialog })),
             result = result,
         )
@@ -172,7 +172,7 @@ class BrandDesignUpdatePageViewModelTest {
     // Starts the real orchestrator on a single QUICK_SETUP step so the view model actually renders QUICK_SETUP.
     private suspend fun createViewModelAtQuickSetup(hideAddressBarRow: Boolean = false): BrandDesignUpdatePageViewModel {
         val plan = LinearOnboardingPlan(
-            id = NewUserOnboardingPlanProvider.ROOT_PLAN_ID,
+            id = NewUserOnboardingPlans.ROOT_PLAN_ID,
             steps = listOf(
                 NewUserOnboardingActivityStep(
                     id = "quick_setup",
@@ -203,7 +203,7 @@ class BrandDesignUpdatePageViewModelTest {
             transition = { LinearOnboardingTransition.Stay },
             resolveAction = { NewUserBrowserActivityAction.RunDuckAiOnboardingDemo("x") },
         )
-        realOrchestrator.startPlan(LinearOnboardingPlan(id = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, steps = listOf(browserStep)))
+        realOrchestrator.startPlan(LinearOnboardingPlan(id = NewUserOnboardingPlans.ROOT_PLAN_ID, steps = listOf(browserStep)))
         return createViewModel(realOrchestrator)
     }
 
@@ -703,7 +703,7 @@ class BrandDesignUpdatePageViewModelTest {
         // Two indicator steps with the preview 2nd. The run starts on the AI comparison chart and advances to the
         // preview, so the VM derives "2 of 2" from plan position (not the dialog).
         val plan = LinearOnboardingPlan(
-            id = NewUserOnboardingPlanProvider.ROOT_PLAN_ID,
+            id = NewUserOnboardingPlans.ROOT_PLAN_ID,
             steps = listOf(
                 NewUserOnboardingActivityStep(
                     id = "ai_comparison_chart",
@@ -967,8 +967,8 @@ class BrandDesignUpdatePageViewModelTest {
 
     private fun inProgressOn(step: NewUserOnboardingActivityStep) =
         LinearOnboardingState.InProgress(
-            rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID,
-            currentPlan = LinearOnboardingPlan(id = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, steps = listOf(step)),
+            rootPlanId = NewUserOnboardingPlans.ROOT_PLAN_ID,
+            currentPlan = LinearOnboardingPlan(id = NewUserOnboardingPlans.ROOT_PLAN_ID, steps = listOf(step)),
             currentStepIndex = 0,
         )
 

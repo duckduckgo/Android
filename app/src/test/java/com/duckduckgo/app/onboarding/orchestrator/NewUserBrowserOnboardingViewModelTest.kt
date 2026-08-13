@@ -80,9 +80,9 @@ class NewUserBrowserOnboardingViewModelTest {
 
     @Test
     fun `when current step hosted by onboarding activity then hands off`() = runTest {
-        val plan = LinearOnboardingPlan(id = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, steps = listOf(onboardingActivityStep()))
+        val plan = LinearOnboardingPlan(id = NewUserOnboardingPlans.ROOT_PLAN_ID, steps = listOf(onboardingActivityStep()))
         fakeOrchestrator.stateFlow.value =
-            InProgress(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, currentPlan = plan, currentStepIndex = 0)
+            InProgress(rootPlanId = NewUserOnboardingPlans.ROOT_PLAN_ID, currentPlan = plan, currentStepIndex = 0)
         val testee = createViewModel()
 
         testee.commands.test {
@@ -93,9 +93,9 @@ class NewUserBrowserOnboardingViewModelTest {
     @Test
     fun `when duck ai demo step then opens duck chat`() = runTest {
         whenever(duckChat.getDuckChatUrl("hello", autoPrompt = true)).thenReturn("https://duck.ai?q=hello")
-        val demoPlan = LinearOnboardingPlan(id = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, steps = listOf(duckAiDemoStep("hello")))
+        val demoPlan = LinearOnboardingPlan(id = NewUserOnboardingPlans.ROOT_PLAN_ID, steps = listOf(duckAiDemoStep("hello")))
         fakeOrchestrator.stateFlow.value =
-            InProgress(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, currentPlan = demoPlan, currentStepIndex = 0)
+            InProgress(rootPlanId = NewUserOnboardingPlans.ROOT_PLAN_ID, currentPlan = demoPlan, currentStepIndex = 0)
         val testee = createViewModel()
 
         testee.commands.test {
@@ -111,9 +111,9 @@ class NewUserBrowserOnboardingViewModelTest {
     @Test
     fun `when duck ai demo step presented then emits Presented event`() = runTest {
         whenever(duckChat.getDuckChatUrl("hello", autoPrompt = true)).thenReturn("https://duck.ai?q=hello")
-        val demoPlan = LinearOnboardingPlan(id = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, steps = listOf(duckAiDemoStep("hello")))
+        val demoPlan = LinearOnboardingPlan(id = NewUserOnboardingPlans.ROOT_PLAN_ID, steps = listOf(duckAiDemoStep("hello")))
         fakeOrchestrator.stateFlow.value =
-            InProgress(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, currentPlan = demoPlan, currentStepIndex = 0)
+            InProgress(rootPlanId = NewUserOnboardingPlans.ROOT_PLAN_ID, currentPlan = demoPlan, currentStepIndex = 0)
         val testee = createViewModel()
         advanceUntilIdle()
 
@@ -123,9 +123,9 @@ class NewUserBrowserOnboardingViewModelTest {
     @Test
     fun `when fire completed on demo step then forwards event`() = runTest {
         whenever(duckChat.getDuckChatUrl("hello", autoPrompt = true)).thenReturn("https://duck.ai?q=hello")
-        val demoPlan = LinearOnboardingPlan(id = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, steps = listOf(duckAiDemoStep("hello")))
+        val demoPlan = LinearOnboardingPlan(id = NewUserOnboardingPlans.ROOT_PLAN_ID, steps = listOf(duckAiDemoStep("hello")))
         fakeOrchestrator.stateFlow.value =
-            InProgress(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, currentPlan = demoPlan, currentStepIndex = 0)
+            InProgress(rootPlanId = NewUserOnboardingPlans.ROOT_PLAN_ID, currentPlan = demoPlan, currentStepIndex = 0)
         val testee = createViewModel()
         advanceUntilIdle()
 
