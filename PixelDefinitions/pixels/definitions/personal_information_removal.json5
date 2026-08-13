@@ -2454,58 +2454,59 @@
             },
             {
                 "key": "feature.data.ext.decile_0_10_duration_ms_bucketed",
-                "description": "Time from run start to crossing 10% of scan jobs, bucketed using the lower bucket boundary",
-                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                "description": "Time from run start to crossing 10% of scan jobs, bucketed using the lower bucket boundary. A value of -1 means the device clock moved backwards during the interval, so the duration could not be measured",
+                "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
             },
             {
                 "key": "feature.data.ext.decile_10_20_duration_ms_bucketed",
-                "description": "Time from crossing 10% to crossing 20% of scan jobs, bucketed using the lower bucket boundary",
-                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                "description": "Time from crossing 10% to crossing 20% of scan jobs, bucketed using the lower bucket boundary. A value of -1 means the device clock moved backwards during the interval, so the duration could not be measured",
+                "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
             },
             {
                 "key": "feature.data.ext.decile_20_30_duration_ms_bucketed",
-                "description": "Time from crossing 20% to crossing 30% of scan jobs, bucketed using the lower bucket boundary",
-                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                "description": "Time from crossing 20% to crossing 30% of scan jobs, bucketed using the lower bucket boundary. A value of -1 means the device clock moved backwards during the interval, so the duration could not be measured",
+                "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
             },
             {
                 "key": "feature.data.ext.decile_30_40_duration_ms_bucketed",
-                "description": "Time from crossing 30% to crossing 40% of scan jobs, bucketed using the lower bucket boundary",
-                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                "description": "Time from crossing 30% to crossing 40% of scan jobs, bucketed using the lower bucket boundary. A value of -1 means the device clock moved backwards during the interval, so the duration could not be measured",
+                "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
             },
             {
                 "key": "feature.data.ext.decile_40_50_duration_ms_bucketed",
-                "description": "Time from crossing 40% to crossing 50% of scan jobs, bucketed using the lower bucket boundary",
-                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                "description": "Time from crossing 40% to crossing 50% of scan jobs, bucketed using the lower bucket boundary. A value of -1 means the device clock moved backwards during the interval, so the duration could not be measured",
+                "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
             },
             {
                 "key": "feature.data.ext.decile_50_60_duration_ms_bucketed",
-                "description": "Time from crossing 50% to crossing 60% of scan jobs, bucketed using the lower bucket boundary",
-                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                "description": "Time from crossing 50% to crossing 60% of scan jobs, bucketed using the lower bucket boundary. A value of -1 means the device clock moved backwards during the interval, so the duration could not be measured",
+                "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
             },
             {
                 "key": "feature.data.ext.decile_60_70_duration_ms_bucketed",
-                "description": "Time from crossing 60% to crossing 70% of scan jobs, bucketed using the lower bucket boundary",
-                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                "description": "Time from crossing 60% to crossing 70% of scan jobs, bucketed using the lower bucket boundary. A value of -1 means the device clock moved backwards during the interval, so the duration could not be measured",
+                "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
             },
             {
                 "key": "feature.data.ext.decile_70_80_duration_ms_bucketed",
-                "description": "Time from crossing 70% to crossing 80% of scan jobs, bucketed using the lower bucket boundary",
-                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                "description": "Time from crossing 70% to crossing 80% of scan jobs, bucketed using the lower bucket boundary. A value of -1 means the device clock moved backwards during the interval, so the duration could not be measured",
+                "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
             },
             {
                 "key": "feature.data.ext.decile_80_90_duration_ms_bucketed",
-                "description": "Time from crossing 80% to crossing 90% of scan jobs, bucketed using the lower bucket boundary",
-                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                "description": "Time from crossing 80% to crossing 90% of scan jobs, bucketed using the lower bucket boundary. A value of -1 means the device clock moved backwards during the interval, so the duration could not be measured",
+                "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
             },
             {
                 "key": "feature.data.ext.opt_out_duration_ms_bucketed",
-                "description": "Time spent in the opt-out scheduling phase from opt_out_started to opt_out_completed, bucketed using the lower bucket boundary",
-                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                "description": "Time spent in the opt-out scheduling phase from opt_out_started to opt_out_completed, bucketed using the lower bucket boundary. A value of -1 means the device clock moved backwards during the interval, so the duration could not be measured",
+                "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
             },
             {
                 "key": "feature.data.ext.total_scan_duration_ms_bucketed",
-                "description": "Time from run start to scan_completed — the full scan phase, including the final 90-100% band that the per-decile intervals don't cover — bucketed using the lower bucket boundary. Absent on runs that never reach scan_completed (e.g. UNKNOWN/killed runs).",
+                "description": "Time from run start to scan_completed — the full scan phase, including the final 90-100% band that the per-decile intervals don't cover — bucketed using the lower bucket boundary. Absent on runs that never reach scan_completed (e.g. UNKNOWN/killed runs). A value of -1 means the device clock moved backwards during the interval, so the duration could not be measured.",
                 "enum": [
+                    "-1",
                     "0",
                     "10000",
                     "30000",
@@ -2523,8 +2524,9 @@
             },
             {
                 "key": "feature.data.ext.total_flow_duration_ms_bucketed",
-                "description": "Time from run start to flow finish — end-to-end, including the opt-out scheduling phase — bucketed using the lower bucket boundary. Absent on runs finalized by the cleanup timeout (e.g. UNKNOWN/killed runs).",
+                "description": "Time from run start to flow finish — end-to-end, including the opt-out scheduling phase — bucketed using the lower bucket boundary. Absent on runs finalized by the cleanup timeout (e.g. UNKNOWN/killed runs). A value of -1 means the device clock moved backwards during the interval, so the duration could not be measured.",
                 "enum": [
+                    "-1",
                     "0",
                     "10000",
                     "30000",
@@ -2778,58 +2780,59 @@
             },
             {
                 "key": "feature.data.ext.decile_0_10_duration_ms_bucketed",
-                "description": "Time from run start to crossing 10% of scan jobs, bucketed using the lower bucket boundary",
-                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                "description": "Time from run start to crossing 10% of scan jobs, bucketed using the lower bucket boundary. A value of -1 means the device clock moved backwards during the interval, so the duration could not be measured",
+                "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
             },
             {
                 "key": "feature.data.ext.decile_10_20_duration_ms_bucketed",
-                "description": "Time from crossing 10% to crossing 20% of scan jobs, bucketed using the lower bucket boundary",
-                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                "description": "Time from crossing 10% to crossing 20% of scan jobs, bucketed using the lower bucket boundary. A value of -1 means the device clock moved backwards during the interval, so the duration could not be measured",
+                "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
             },
             {
                 "key": "feature.data.ext.decile_20_30_duration_ms_bucketed",
-                "description": "Time from crossing 20% to crossing 30% of scan jobs, bucketed using the lower bucket boundary",
-                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                "description": "Time from crossing 20% to crossing 30% of scan jobs, bucketed using the lower bucket boundary. A value of -1 means the device clock moved backwards during the interval, so the duration could not be measured",
+                "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
             },
             {
                 "key": "feature.data.ext.decile_30_40_duration_ms_bucketed",
-                "description": "Time from crossing 30% to crossing 40% of scan jobs, bucketed using the lower bucket boundary",
-                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                "description": "Time from crossing 30% to crossing 40% of scan jobs, bucketed using the lower bucket boundary. A value of -1 means the device clock moved backwards during the interval, so the duration could not be measured",
+                "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
             },
             {
                 "key": "feature.data.ext.decile_40_50_duration_ms_bucketed",
-                "description": "Time from crossing 40% to crossing 50% of scan jobs, bucketed using the lower bucket boundary",
-                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                "description": "Time from crossing 40% to crossing 50% of scan jobs, bucketed using the lower bucket boundary. A value of -1 means the device clock moved backwards during the interval, so the duration could not be measured",
+                "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
             },
             {
                 "key": "feature.data.ext.decile_50_60_duration_ms_bucketed",
-                "description": "Time from crossing 50% to crossing 60% of scan jobs, bucketed using the lower bucket boundary",
-                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                "description": "Time from crossing 50% to crossing 60% of scan jobs, bucketed using the lower bucket boundary. A value of -1 means the device clock moved backwards during the interval, so the duration could not be measured",
+                "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
             },
             {
                 "key": "feature.data.ext.decile_60_70_duration_ms_bucketed",
-                "description": "Time from crossing 60% to crossing 70% of scan jobs, bucketed using the lower bucket boundary",
-                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                "description": "Time from crossing 60% to crossing 70% of scan jobs, bucketed using the lower bucket boundary. A value of -1 means the device clock moved backwards during the interval, so the duration could not be measured",
+                "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
             },
             {
                 "key": "feature.data.ext.decile_70_80_duration_ms_bucketed",
-                "description": "Time from crossing 70% to crossing 80% of scan jobs, bucketed using the lower bucket boundary",
-                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                "description": "Time from crossing 70% to crossing 80% of scan jobs, bucketed using the lower bucket boundary. A value of -1 means the device clock moved backwards during the interval, so the duration could not be measured",
+                "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
             },
             {
                 "key": "feature.data.ext.decile_80_90_duration_ms_bucketed",
-                "description": "Time from crossing 80% to crossing 90% of scan jobs, bucketed using the lower bucket boundary",
-                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                "description": "Time from crossing 80% to crossing 90% of scan jobs, bucketed using the lower bucket boundary. A value of -1 means the device clock moved backwards during the interval, so the duration could not be measured",
+                "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
             },
             {
                 "key": "feature.data.ext.opt_out_duration_ms_bucketed",
-                "description": "Time spent in the opt-out scheduling phase from opt_out_started to opt_out_completed, bucketed using the lower bucket boundary",
-                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                "description": "Time spent in the opt-out scheduling phase from opt_out_started to opt_out_completed, bucketed using the lower bucket boundary. A value of -1 means the device clock moved backwards during the interval, so the duration could not be measured",
+                "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
             },
             {
                 "key": "feature.data.ext.total_scan_duration_ms_bucketed",
-                "description": "Time from run start to scan_completed — the full scan phase, including the final 90-100% band that the per-decile intervals don't cover — bucketed using the lower bucket boundary. Absent on runs that never reach scan_completed (e.g. UNKNOWN/killed runs).",
+                "description": "Time from run start to scan_completed — the full scan phase, including the final 90-100% band that the per-decile intervals don't cover — bucketed using the lower bucket boundary. Absent on runs that never reach scan_completed (e.g. UNKNOWN/killed runs). A value of -1 means the device clock moved backwards during the interval, so the duration could not be measured.",
                 "enum": [
+                    "-1",
                     "0",
                     "10000",
                     "30000",
@@ -2847,8 +2850,9 @@
             },
             {
                 "key": "feature.data.ext.total_flow_duration_ms_bucketed",
-                "description": "Time from run start to flow finish — end-to-end, including the opt-out scheduling phase — bucketed using the lower bucket boundary. Absent on runs finalized by the cleanup timeout (e.g. UNKNOWN/killed runs).",
+                "description": "Time from run start to flow finish — end-to-end, including the opt-out scheduling phase — bucketed using the lower bucket boundary. Absent on runs finalized by the cleanup timeout (e.g. UNKNOWN/killed runs). A value of -1 means the device clock moved backwards during the interval, so the duration could not be measured.",
                 "enum": [
+                    "-1",
                     "0",
                     "10000",
                     "30000",
@@ -2977,8 +2981,9 @@
             },
             {
                 "key": "feature.data.ext.total_duration_ms_bucketed",
-                "description": "Total wall-clock duration from the first MANUAL_INITIAL run starting to the moment every broker had a completed scan job. Bucketed using the lower bucket boundary. Only present on Success events.",
+                "description": "Total wall-clock duration from the first MANUAL_INITIAL run starting to the moment every broker had a completed scan job. Bucketed using the lower bucket boundary. Only present on Success events. A value of -1 means the device clock moved backwards during the interval, so the duration could not be measured.",
                 "enum": [
+                    "-1",
                     "0",
                     "60000",
                     "300000",
