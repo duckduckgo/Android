@@ -92,49 +92,49 @@
         <item name="android:textColor">@color/button_brand_text_color_selector</item>
         <item name="backgroundTint">@color/button_brand_container_selector</item>
         <item name="iconTint">@color/button_brand_text_color_selector</item>
-        <item name="rippleColor">?attr/daxColorButtonBrandContainerPressed</item>
+        <item name="rippleColor">@color/button_brand_ripple_selector</item>
     </style>
 
     <style name="Widget.DuckDuckGo.DaxButton.Rebrand.Primary">
         <item name="android:textColor">@color/rebrand_button_primary_text_selector</item>
         <item name="backgroundTint">@color/rebrand_button_primary_container_selector</item>
         <item name="iconTint">@color/rebrand_button_primary_text_selector</item>
-        <item name="rippleColor">?attr/daxColorRebrandButtonPrimaryContainerPressed</item>
+        <item name="rippleColor">@color/rebrand_button_primary_ripple_selector</item>
     </style>
 
     <style name="Widget.DuckDuckGo.DaxButton.Rebrand.SecondaryFill">
         <item name="android:textColor">@color/rebrand_button_secondary_fill_text_selector</item>
         <item name="backgroundTint">@color/rebrand_button_secondary_fill_container_selector</item>
         <item name="iconTint">@color/rebrand_button_secondary_fill_text_selector</item>
-        <item name="rippleColor">?attr/daxColorRebrandButtonSecondaryFillContainerPressed</item>
+        <item name="rippleColor">@color/rebrand_button_secondary_fill_ripple_selector</item>
     </style>
 
     <style name="Widget.DuckDuckGo.DaxButton.Rebrand.Ghost">
         <item name="android:textColor">@color/rebrand_button_ghost_text_selector</item>
         <item name="backgroundTint">@color/rebrand_button_ghost_container_selector</item>
         <item name="iconTint">@color/rebrand_button_ghost_text_selector</item>
-        <item name="rippleColor">?attr/daxColorRebrandButtonGhostContainerPressed</item>
+        <item name="rippleColor">@color/rebrand_button_ghost_ripple_selector</item>
     </style>
 
     <style name="Widget.DuckDuckGo.DaxButton.Rebrand.DestructivePrimary">
         <item name="android:textColor">@color/rebrand_button_destructive_primary_text_selector</item>
         <item name="backgroundTint">@color/rebrand_button_destructive_primary_container_selector</item>
         <item name="iconTint">@color/rebrand_button_destructive_primary_text_selector</item>
-        <item name="rippleColor">?attr/daxColorRebrandButtonDestructiveContainerPressed</item>
+        <item name="rippleColor">@color/rebrand_button_destructive_primary_ripple_selector</item>
     </style>
 
     <style name="Widget.DuckDuckGo.DaxButton.Rebrand.DestructiveSecondary">
         <item name="android:textColor">@color/rebrand_button_destructive_secondary_text_selector</item>
         <item name="backgroundTint">@color/rebrand_button_secondary_fill_container_selector</item>
         <item name="iconTint">@color/rebrand_button_destructive_secondary_text_selector</item>
-        <item name="rippleColor">?attr/daxColorRebrandButtonSecondaryFillContainerPressed</item>
+        <item name="rippleColor">@color/rebrand_button_secondary_fill_ripple_selector</item>
     </style>
 
     <style name="Widget.DuckDuckGo.DaxButton.Rebrand.DestructiveGhost">
         <item name="android:textColor">@color/rebrand_button_destructive_ghost_text_selector</item>
         <item name="backgroundTint">@color/rebrand_button_destructive_ghost_container_selector</item>
         <item name="iconTint">@color/rebrand_button_destructive_ghost_text_selector</item>
-        <item name="rippleColor">?attr/daxColorRebrandButtonDestructiveGhostContainerPressed</item>
+        <item name="rippleColor">@color/rebrand_button_destructive_ghost_ripple_selector</item>
     </style>
 
     <style name="ThemeOverlay.Rebrand" parent="">

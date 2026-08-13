@@ -17,6 +17,5 @@
 
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:color="@android:color/transparent" android:state_enabled="false"/>
-    <item android:color="?attr/daxColorRebrandButtonDestructiveGhostContainerPressed" android:state_pressed="true"/>
     <item android:color="@android:color/transparent"/>
 </selector>

@@ -17,7 +17,9 @@
 package com.duckduckgo.common.ui.view.button
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.util.TypedValue
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.mobile.android.R
@@ -86,5 +88,68 @@ class RebrandButtonsOverlayTest {
         assertEquals(R.style.Widget_DuckDuckGo_DaxButton_Rebrand_Brand, context.resolveStyleAttr(R.attr.daxButtonBrand))
         val value = TypedValue()
         assertTrue(context.theme.resolveAttribute(R.attr.daxColorButtonBrandContainer, value, true))
+    }
+
+    private fun Context.colorStateList(colorRes: Int): ColorStateList =
+        AppCompatResources.getColorStateList(this, colorRes)
+
+    private fun ColorStateList.pressedColor(): Int =
+        getColorForState(intArrayOf(android.R.attr.state_enabled, android.R.attr.state_pressed), defaultColor)
+
+    private fun Context.resolveRippleColorRes(styleRes: Int): Int {
+        val typedArray = obtainStyledAttributes(styleRes, intArrayOf(MaterialR.attr.rippleColor))
+        val resourceId = typedArray.getResourceId(0, 0)
+        typedArray.recycle()
+        return resourceId
+    }
+
+    @Test
+    fun whenRebrandContainerSelectorsThenPressedStateMatchesRestingColor() {
+        val context = themedContext(overlay = true)
+        val containers = listOf(
+            R.color.button_brand_container_selector,
+            R.color.rebrand_button_primary_container_selector,
+            R.color.rebrand_button_secondary_fill_container_selector,
+            R.color.rebrand_button_ghost_container_selector,
+            R.color.rebrand_button_destructive_primary_container_selector,
+            R.color.rebrand_button_destructive_ghost_container_selector,
+        )
+        containers.forEach { colorRes ->
+            val stateList = context.colorStateList(colorRes)
+            assertEquals(stateList.defaultColor, stateList.pressedColor())
+        }
+    }
+
+    @Test
+    fun whenRebrandStylesThenRippleColorResolvesToARippleSelector() {
+        val context = themedContext(overlay = true)
+        assertEquals(
+            R.color.rebrand_button_primary_ripple_selector,
+            context.resolveRippleColorRes(R.style.Widget_DuckDuckGo_DaxButton_Rebrand_Primary),
+        )
+        assertEquals(
+            R.color.rebrand_button_secondary_fill_ripple_selector,
+            context.resolveRippleColorRes(R.style.Widget_DuckDuckGo_DaxButton_Rebrand_SecondaryFill),
+        )
+        assertEquals(
+            R.color.rebrand_button_ghost_ripple_selector,
+            context.resolveRippleColorRes(R.style.Widget_DuckDuckGo_DaxButton_Rebrand_Ghost),
+        )
+        assertEquals(
+            R.color.rebrand_button_destructive_primary_ripple_selector,
+            context.resolveRippleColorRes(R.style.Widget_DuckDuckGo_DaxButton_Rebrand_DestructivePrimary),
+        )
+        assertEquals(
+            R.color.rebrand_button_secondary_fill_ripple_selector,
+            context.resolveRippleColorRes(R.style.Widget_DuckDuckGo_DaxButton_Rebrand_DestructiveSecondary),
+        )
+        assertEquals(
+            R.color.rebrand_button_destructive_ghost_ripple_selector,
+            context.resolveRippleColorRes(R.style.Widget_DuckDuckGo_DaxButton_Rebrand_DestructiveGhost),
+        )
+        assertEquals(
+            R.color.button_brand_ripple_selector,
+            context.resolveRippleColorRes(R.style.Widget_DuckDuckGo_DaxButton_Rebrand_Brand),
+        )
     }
 }
