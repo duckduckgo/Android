@@ -30,6 +30,10 @@ interface BrokenSiteRefreshesInMemoryStore {
     fun isRefreshPatternDetectionValid(url: Uri, currentDateTime: LocalDateTime): Boolean
 }
 
+/**
+ * Ties refresh patterns to the BrowserTabViewModel's prompt instance.
+ * Recording and consumption must use the same instance, which must not be shared across tabs.
+ */
 class RefreshPatternOwner
 
 @ContributesBinding(AppScope::class)

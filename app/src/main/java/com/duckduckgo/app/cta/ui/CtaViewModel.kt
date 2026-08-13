@@ -337,10 +337,11 @@ class CtaViewModel @Inject constructor(
         site: Site? = null,
         detectedRefreshPatterns: Set<RefreshPattern>,
         suppressDuckAiOnboardingCta: Boolean = false,
+        brokenSitePromptUrl: String? = site?.url,
     ): Cta? {
         return withContext(dispatcher) {
             if (isBrowserShowing) {
-                getBrowserCta(site, detectedRefreshPatterns, suppressDuckAiOnboardingCta)
+                getBrowserCta(site, detectedRefreshPatterns, suppressDuckAiOnboardingCta, brokenSitePromptUrl)
             } else {
                 getHomeCta()
             }
@@ -524,6 +525,7 @@ class CtaViewModel @Inject constructor(
         site: Site?,
         detectedRefreshPatterns: Set<RefreshPattern>,
         suppressDuckAiOnboardingCta: Boolean,
+        brokenSitePromptUrl: String?,
     ): Cta? {
         val nonNullSite = site ?: return null
 
@@ -564,7 +566,8 @@ class CtaViewModel @Inject constructor(
             }
 
             if (areInContextDaxDialogsCompleted()) {
-                return if (brokenSitePrompt.shouldShowBrokenSitePrompt(nonNullSite.url, detectedRefreshPatterns)) {
+                val promptUrl = brokenSitePromptUrl ?: return null
+                return if (brokenSitePrompt.shouldShowBrokenSitePrompt(promptUrl, detectedRefreshPatterns)) {
                     BrokenSitePromptDialogCta()
                 } else {
                     null

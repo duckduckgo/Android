@@ -3851,8 +3851,8 @@ class BrowserTabViewModelTest {
 
             verify(refreshPixelSender).onRefreshPatternDetected(refreshPatterns)
             verify(mockBrokenSitePrompt).shouldShowBrokenSitePrompt(
-                previousUrl,
-                emptySet(),
+                currentUrl,
+                refreshPatterns,
             )
         }
 
@@ -3899,10 +3899,7 @@ class BrowserTabViewModelTest {
 
             testee.refreshCta()
 
-            verify(mockBrokenSitePrompt).shouldShowBrokenSitePrompt(
-                siteUrl,
-                emptySet(),
-            )
+            verify(mockBrokenSitePrompt, never()).shouldShowBrokenSitePrompt(any(), any())
         }
 
     @Test
@@ -7433,6 +7430,24 @@ class BrowserTabViewModelTest {
 
             testee.onRefreshRequested(triggeredByUser = true)
             verify(mockBrokenSitePrompt).pageRefreshed(url.toUri())
+        }
+
+    @Test
+    fun whenUserRefreshesAndNavigationUrlAvailableThenRecordNavigationUrl() =
+        runTest {
+            val siteUrl = "https://previous.example"
+            val currentUrl = "https://current.example"
+            givenCurrentSite(siteUrl)
+            testee.navigationStateChanged(
+                buildWebNavigation(
+                    originalUrl = currentUrl,
+                    currentUrl = currentUrl,
+                ),
+            )
+
+            testee.onRefreshRequested(triggeredByUser = true)
+
+            verify(mockBrokenSitePrompt).pageRefreshed(currentUrl.toUri())
         }
 
     @Test
