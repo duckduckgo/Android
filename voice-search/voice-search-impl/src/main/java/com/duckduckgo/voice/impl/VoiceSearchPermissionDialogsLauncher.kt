@@ -59,8 +59,6 @@ class RealVoiceSearchPermissionDialogsLauncher @Inject constructor() : VoiceSear
         onHideVoiceSearchSelected: () -> Unit,
         onCancelled: () -> Unit,
     ) {
-        // Duck.ai has no microphone in the address bar to hide, and its own wording for what the
-        // permission unlocks.
         val isDuckAiMode = mode == VoiceSearchMode.DUCK_AI
         val message = if (isDuckAiMode) {
             R.string.voiceSearchMicAccessDeniedDialogMessageDuckAi

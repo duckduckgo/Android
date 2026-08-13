@@ -53,8 +53,6 @@ class MicrophonePermissionRequest @Inject constructor(
     private lateinit var voiceSearchDisabled: () -> Unit
     private var requestAborted: () -> Unit = {}
 
-    // Remembered from launch(): the permission result arrives long after, and the denial dialog's copy
-    // and options differ for Duck.ai.
     private var pendingMode: VoiceSearchMode? = null
 
     override fun registerResultsCallback(

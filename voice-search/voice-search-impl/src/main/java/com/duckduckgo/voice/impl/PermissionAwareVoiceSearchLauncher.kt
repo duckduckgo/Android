@@ -52,8 +52,6 @@ class PermissionAwareVoiceSearchLauncher @Inject constructor(
             caller,
             activity,
             onPermissionsGranted = { voiceSearchActivityLauncher.launch(activity, pendingInitialMode) },
-            // Voice search never opened, so callers get the same event as a cancelled recognition and can
-            // undo whatever they paused for it.
             onRequestAborted = { onEvent(SearchCancelled) },
             onVoiceSearchDisabled = { onEvent(VoiceSearchDisabled) },
         )
