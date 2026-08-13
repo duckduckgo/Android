@@ -31,5 +31,12 @@
     <string name="voiceSearchRemovePositiveButton">Usuń</string>
     <string name="voiceSearchRemoveTitle">Usunąć opcję prywatnego wyszukiwania głosowego z paska adresu?</string>
     <string name="voiceSearchRemoveSubtitle">Tymi i innymi preferencjami dostępności możesz zarządzać w Ustawieniach.</string>
+    <string name="voiceSearchMicAccessDeniedDialogTitle">DuckDuckGo potrzebuje dostępu do Twojego mikrofonu</string>
+    <string name="voiceSearchMicAccessDeniedDialogMessage">Uprawnienia do mikrofonu są potrzebne, jeśli chcesz korzystać z naszego prywatnego wyszukiwania głosowego.</string>
+    <string name="voiceSearchMicAccessDeniedDialogMessageDuckAi">Uprawnienia do mikrofonu są potrzebne, jeśli chcesz korzystać z czatu głosowego w Duck.ai.</string>
+    <string name="voiceSearchMicAccessDeniedDialogChangePermissions">Zmień uprawnienia</string>
+    <string name="voiceSearchMicAccessDeniedDialogHideVoiceSearch">Ukryj wyszukiwanie głosowe</string>
+    <string name="voiceSearchMicPermissionDeniedSnackbarMessage">Do obsługi funkcji głosowych wymagane jest uprawnienie do korzystania z mikrofonu</string>
+    <string name="voiceSearchMicPermissionDeniedSnackbarAction">Zezwól</string>
     <string name="voiceSearchTitle">Wyszukiwanie głosowe</string>
 </resources>
