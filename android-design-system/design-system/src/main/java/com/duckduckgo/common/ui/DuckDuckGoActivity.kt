@@ -82,7 +82,7 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
         themeChangeReceiver = applyTheme(
             themingDataStore.theme,
             applyFireTheme,
-            appBrandDesignUpdateToggles.feature().isEnabled(),
+            appBrandDesignUpdateToggles.theme().isEnabled(),
         )
         super.onCreate(savedInstanceState)
     }
