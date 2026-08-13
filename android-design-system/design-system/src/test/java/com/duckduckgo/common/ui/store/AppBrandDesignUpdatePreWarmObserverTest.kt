@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.branddesignupdate
+package com.duckduckgo.common.ui.store
 
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
