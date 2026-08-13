@@ -22,5 +22,14 @@
     <string name="voiceSearchListening">Govori sad</string>
     <string name="voiceSearchListeningFooter">Zvuk se obrađuje na uređaju. Ne pohranjuje se i ne dijeli ni s kim, uključujući DuckDuckGo.</string>
     <string name="voiceSearchNegativeAction">Odustani</string>
+    <string name="voiceSearchPermissionRationaleDescription">DuckDuckGo nikad ne prisluškuje što govoriš. Zvuk se obrađuje na uređaju. Ne pohranjuje se i ne dijeli ni s kim.</string>
+    <string name="voiceSearchPermissionRationaleTitle">Potreban je pristup mikrofonu za Privatno glasovno pretraživanje</string>
+    <string name="voiceSearchPermissionRationalePositiveAction">U redu</string>
+    <string name="voiceSearchPermissionRejectedDialogMessage">Za korištenje glasovnog pretraživanja u DuckDuckGou, moraš omogućiti pristup mikrofonu u postavkama sustava.</string>
+    <string name="voiceSearchPermissionRejectedDialogPositiveAction">Postavke</string>
+    <string name="voiceSearchPermissionRejectedDialogTitle">Potreban je pristup mikrofonu</string>
+    <string name="voiceSearchRemovePositiveButton">Ukloni</string>
+    <string name="voiceSearchRemoveTitle">Ukloniti opciju privatnog glasovnog pretraživanja iz adresne trake?</string>
+    <string name="voiceSearchRemoveSubtitle">Ovim i drugim postavkama pristupačnosti uvijek možeš upravljati putem Postavki.</string>
     <string name="voiceSearchTitle">Glasovno pretraživanje</string>
 </resources>

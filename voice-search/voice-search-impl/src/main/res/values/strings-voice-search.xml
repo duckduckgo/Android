@@ -22,6 +22,12 @@
     <string name="voiceSearchListening">Speak Now</string>
     <string name="voiceSearchListeningFooter">Audio is processed on-device. It\'s not stored or shared with anyone, including DuckDuckGo.</string>
     <string name="voiceSearchNegativeAction">Cancel</string>
+    <string name="voiceSearchPermissionRationaleDescription">DuckDuckGo never listens to what you say. Audio is processed on-device. It isn’t stored or shared with anyone.</string>
+    <string name="voiceSearchPermissionRationaleTitle">Microphone Access Required for Private Voice Search</string>
+    <string name="voiceSearchPermissionRationalePositiveAction">OK</string>
+    <string name="voiceSearchPermissionRejectedDialogMessage">To use Voice Search in DuckDuckGo you need to enable Microphone access in the system settings.</string>
+    <string name="voiceSearchPermissionRejectedDialogPositiveAction">Settings</string>
+    <string name="voiceSearchPermissionRejectedDialogTitle">Microphone Access Required</string>
     <string name="voiceSearchMicAccessDeniedDialogTitle" tools:ignore="MissingTranslation">DuckDuckGo needs to access your microphone</string>
     <string name="voiceSearchMicAccessDeniedDialogMessage" tools:ignore="MissingTranslation">Microphone permissions are needed if you want to use our Private Voice Search.</string>
     <string name="voiceSearchMicAccessDeniedDialogMessageDuckAi" tools:ignore="MissingTranslation">Microphone permissions are needed if you want to use Voice Chat in Duck.ai.</string>
@@ -29,5 +35,8 @@
     <string name="voiceSearchMicAccessDeniedDialogHideVoiceSearch" tools:ignore="MissingTranslation">Hide Voice Search</string>
     <string name="voiceSearchMicPermissionDeniedSnackbarMessage" tools:ignore="MissingTranslation">Microphone permission needed for voice features</string>
     <string name="voiceSearchMicPermissionDeniedSnackbarAction" tools:ignore="MissingTranslation">Allow</string>
+    <string name="voiceSearchRemovePositiveButton">Remove</string>
+    <string name="voiceSearchRemoveTitle">Remove Private Voice Search option from the address bar?</string>
+    <string name="voiceSearchRemoveSubtitle">You can always manage this and other accessibility preferences in Settings.</string>
     <string name="voiceSearchTitle">Voice search</string>
 </resources>

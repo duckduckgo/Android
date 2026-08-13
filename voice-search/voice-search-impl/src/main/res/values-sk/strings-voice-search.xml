@@ -22,5 +22,14 @@
     <string name="voiceSearchListening">Hovorte teraz</string>
     <string name="voiceSearchListeningFooter">Zvuk sa spracováva v zariadení. Neukladá sa nikde a s nikým, vrátane DuckDuckGo, sa nezdieľa.</string>
     <string name="voiceSearchNegativeAction">Zrušiť</string>
+    <string name="voiceSearchPermissionRationaleDescription">DuckDuckGo nikdy nepočúva, čo hovoríte. Zvuk sa spracováva v zariadení. Neukladá sa a nezdieľa sa s nikým.</string>
+    <string name="voiceSearchPermissionRationaleTitle">Na používanie funkcie súkromného hlasového vyhľadávania sa vyžaduje prístup k mikrofónu.</string>
+    <string name="voiceSearchPermissionRationalePositiveAction">OK</string>
+    <string name="voiceSearchPermissionRejectedDialogMessage">Ak chcete používať hlasové vyhľadávanie v službe DuckDuckGo, musíte v nastaveniach systému povoliť prístup k mikrofónu.</string>
+    <string name="voiceSearchPermissionRejectedDialogPositiveAction">Nastavenia</string>
+    <string name="voiceSearchPermissionRejectedDialogTitle">Vyžaduje sa prístup k mikrofónu</string>
+    <string name="voiceSearchRemovePositiveButton">Odstrániť</string>
+    <string name="voiceSearchRemoveTitle">Odstrániť možnosť Súkromné hlasové vyhľadávanie z panela s adresou?</string>
+    <string name="voiceSearchRemoveSubtitle">Tieto a ďalšie nastavenia prístupnosti môžete vždy spravovať v Nastaveniach.</string>
     <string name="voiceSearchTitle">Hlasové vyhľadávanie</string>
 </resources>

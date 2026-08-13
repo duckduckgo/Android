@@ -22,5 +22,14 @@
     <string name="voiceSearchListening">Kalbėkite dabar</string>
     <string name="voiceSearchListeningFooter">Garsas apdorojamas įrenginyje. Jis nesaugomas ir su niekuo, įskaitant „DuckDuckGo“, nebendrinamas.</string>
     <string name="voiceSearchNegativeAction">Atšaukti</string>
+    <string name="voiceSearchPermissionRationaleDescription">„DuckDuckGo“ niekada nesiklauso jūsų pokalbių. Garsas apdorojamas įrenginyje. Jis nesaugomas ir su niekuo nesidalijamas.</string>
+    <string name="voiceSearchPermissionRationaleTitle">Privačiai balsu atliekamai paieškai reikalinga prieiga prie mikrofono</string>
+    <string name="voiceSearchPermissionRationalePositiveAction">Gerai</string>
+    <string name="voiceSearchPermissionRejectedDialogMessage">Jei norite naudoti „DuckDuckGo“ paiešką balsu, sistemos nustatymuose turite įjungti prieigą prie mikrofono.</string>
+    <string name="voiceSearchPermissionRejectedDialogPositiveAction">Nustatymai</string>
+    <string name="voiceSearchPermissionRejectedDialogTitle">Būtina prieiga prie mikrofono</string>
+    <string name="voiceSearchRemovePositiveButton">Pašalinti</string>
+    <string name="voiceSearchRemoveTitle">Pašalinti privačios paieškos balsu parinktį iš adreso juostos?</string>
+    <string name="voiceSearchRemoveSubtitle">Šias ir kitas pritaikymo neįgaliesiems nuostatas visada galite tvarkyti nustatymuose.</string>
     <string name="voiceSearchTitle">Paieška balsu</string>
 </resources>
