@@ -28,6 +28,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChatContextual
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
@@ -35,6 +36,9 @@ import javax.inject.Inject
 class RealDuckChatContextual @Inject constructor(
     private val duckChatInternal: DuckChatInternal,
     private val browserNav: BrowserNav,
+    private val contextualDataStore: DuckChatContextualDataStore,
+    private val sessionTimeoutProvider: DuckChatContextualSessionTimeoutProvider,
+    private val timeProvider: DuckChatContextualTimeProvider,
 ) : DuckChatContextual {
 
     override suspend fun launch(
@@ -42,11 +46,28 @@ class RealDuckChatContextual @Inject constructor(
         anchor: View?,
         onAskAboutPage: () -> Unit,
     ) {
-        if (anchor != null && duckChatInternal.isContextualSheetRedesignEnabled()) {
-            showMenu(sourceTabId, anchor, onAskAboutPage)
-        } else {
+        if (anchor == null || !duckChatInternal.isContextualSheetRedesignEnabled()) {
             onAskAboutPage()
+            return
         }
+        if (hasChatInProgress(sourceTabId)) {
+            // The sheet would reopen the existing chat for this tab, so skip the entry menu and open it directly.
+            onAskAboutPage()
+        } else {
+            showMenu(sourceTabId, anchor, onAskAboutPage)
+        }
+    }
+
+    private suspend fun hasChatInProgress(tabId: String): Boolean {
+        if (contextualDataStore.getTabChatUrl(tabId).isNullOrBlank()) return false
+        return shouldReuseStoredChatUrl(tabId)
+    }
+
+    private suspend fun shouldReuseStoredChatUrl(tabId: String): Boolean {
+        val lastClosedTimestamp = contextualDataStore.getTabClosedTimestamp(tabId) ?: return true
+        val timeoutMs = sessionTimeoutProvider.sessionTimeoutMillis()
+        if (timeoutMs <= 0) return false
+        return timeProvider.currentTimeMillis() - lastClosedTimestamp <= timeoutMs
     }
 
     override fun createSheet(tabId: String): Fragment {
