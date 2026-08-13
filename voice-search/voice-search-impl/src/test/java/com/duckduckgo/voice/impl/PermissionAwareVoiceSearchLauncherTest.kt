@@ -17,6 +17,7 @@
 package com.duckduckgo.voice.impl
 
 import android.app.Activity
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source
 import com.duckduckgo.voice.api.VoiceSearchLauncher.VoiceSearchMode
@@ -45,13 +46,21 @@ class PermissionAwareVoiceSearchLauncherTest {
     @Mock
     private lateinit var voiceSearchAvailability: VoiceSearchAvailability
 
+    @Mock
+    private lateinit var pixel: Pixel
+
     private lateinit var testee: PermissionAwareVoiceSearchLauncher
 
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
-        testee =
-            PermissionAwareVoiceSearchLauncher(permissionRequest, voiceSearchActivityLauncher, voiceSearchPermissionCheck, voiceSearchAvailability)
+        testee = PermissionAwareVoiceSearchLauncher(
+            permissionRequest,
+            voiceSearchActivityLauncher,
+            voiceSearchPermissionCheck,
+            voiceSearchAvailability,
+            pixel,
+        )
     }
 
     @Test
@@ -180,5 +189,26 @@ class PermissionAwareVoiceSearchLauncherTest {
         onPermissionsGrantedCaptor.firstValue.invoke()
 
         verify(voiceSearchActivityLauncher).launch(activity, null)
+    }
+
+    @Test
+    fun whenLaunchAndVoiceSearchAvailableThenFireIconClickedPixelWithSource() {
+        val activity = mock<Activity>()
+        whenever(voiceSearchPermissionCheck.hasRequiredPermissionsGranted()).thenReturn(true)
+        whenever(voiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
+
+        testee.registerResultsCallback(mock(), activity, Source.WIDGET) {}
+        testee.launch(activity, null)
+
+        verify(pixel).fire(VoiceSearchPixelNames.VOICE_SEARCH_ICON_CLICKED, mapOf("source" to "widget"))
+    }
+
+    @Test
+    fun whenLaunchAndVoiceSearchNotAvailableThenDoNotFireIconClickedPixel() {
+        whenever(voiceSearchAvailability.isVoiceSearchAvailable).thenReturn(false)
+
+        testee.launch(mock(), null)
+
+        verify(pixel, never()).fire(VoiceSearchPixelNames.VOICE_SEARCH_ICON_CLICKED, mapOf("source" to ""))
     }
 }
