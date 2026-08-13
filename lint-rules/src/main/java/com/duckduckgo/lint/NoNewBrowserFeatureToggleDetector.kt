@@ -33,8 +33,8 @@ import java.util.EnumSet
 /**
  * Freezes the toggle surface of the `browser-feature-toggles` module.
  *
- * [com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature] accumulated 51 unrelated
- * toggles because it was the path of least resistance for anything browser-shaped. Every toggle
+ * [com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature] accumulated dozens of
+ * unrelated toggles because it was the path of least resistance for anything browser-shaped. Every toggle
  * declared here forces `:app` (and any other consumer) to depend on the whole module, and leaves
  * the flag far away from the code it gates. New toggles belong to the feature that owns them.
  *
@@ -90,6 +90,7 @@ class NoNewBrowserFeatureToggleDetector : Detector(), SourceCodeScanner {
             "AndroidBrowserConfigFeature#optimizeTrackerEvaluationV3",
             "AndroidBrowserConfigFeature#precompileTdsRegex",
             "AndroidBrowserConfigFeature#cachedEntityLookup",
+            "AndroidBrowserConfigFeature#stripWebViewImeInsets",
             "AndroidBrowserConfigFeature#errorPagePixel",
             "AndroidBrowserConfigFeature#errorCodePixel",
             "AndroidBrowserConfigFeature#featuresRequestHeader",
@@ -142,7 +143,7 @@ class NoNewBrowserFeatureToggleDetector : Detector(), SourceCodeScanner {
             briefDescription = "Do not add new feature toggles to the browser-feature-toggles module",
             explanation = """
                 The `browser-feature-toggles` module is frozen. `AndroidBrowserConfigFeature` is a \
-                catch-all that grew to 51 unrelated toggles, and it is not accepting more.
+                catch-all that grew to dozens of unrelated toggles, and it is not accepting more.
 
                 A toggle declared here forces every consumer to depend on the whole module and \
                 puts the flag far away from the code it gates.
