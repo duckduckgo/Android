@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.generalsettings.showonapplaunch.rmf
 
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.newtabpage.api.EscapeHatchTargetResolver
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import com.duckduckgo.remote.messaging.api.MessageTrigger
