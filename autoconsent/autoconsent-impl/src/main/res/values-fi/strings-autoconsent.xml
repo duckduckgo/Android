@@ -20,9 +20,9 @@
     <string name="autoconsentTitle">Evästeiden ponnahdusikkuna -suojaus</string>
     <string name="autoconsentDescription"><![CDATA[DuckDuckGo yrittää valita valittavissa olevista asetuksista yksityisimmät ja piilottaa nämä ponnahdusikkunat puolestasi.\n<a href=\"\">Lue lisää</a>]]></string>
     <string name="autoconsentToggle">Anna DuckDuckGo hoitaa evästeiden ponnahdusikkunat</string>
-    <string name="autoconsentAutoManageToggle">Evästeponnahdusikkunoiden automaattinen hallinta</string>
-    <string name="autoconsentAutoManageDescription">Pyrimme valitsemaan sinulle vain yksityisyyttä parhaiten suojaavat evästeasetukset ja sulkemaan sitten nämä ponnahdusikkunat.</string>
-    <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[DuckDuckGo voi hallinnoida evästeasetuksia automaattisesti yksityisyyden maksimoimiseksi, evästeiden minimoimiseksi ja näiden ponnahdusikkunoiden sulkemiseksi.\n<a href=\"\">Lue lisää</a>]]></string>
-    <string name="autoconsentPopUpsWithoutOptOutsToggle">Ponnahdusikkunat ilman kieltäytymismahdollisuutta</string>
-    <string name="autoconsentPopUpsWithoutOptOutsDescription">Anna myös DuckDuckGon säästää sinulta yhden klikkauksen hyväksymällä evästeet puolestasi, jotta se voi sulkea ponnahdusikkunat, joissa ei voi kieltäytyä evästeistä.</string>
+    <string name="autoconsentAutoManageToggle">Hylkää valinnaiset evästeet</string>
+    <string name="autoconsentAutoManageDescription">Pyrimme hylkäämään puolestasi mahdollisimman monta evästettä ja sulkemaan sitten ponnahdusikkunat.</string>
+    <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[DuckDuckGo voi hallinnoida evästeponnahdusikkunoita automaattisesti yksityisyyden maksimoimiseksi ja evästeiden minimoimiseksi ennen kuin edes näet niitä.\n<a href=\"\">Lue lisää</a>]]></string>
+    <string name="autoconsentPopUpsWithoutOptOutsToggle">Hyväksy evästeet, joita ei voi hylätä</string>
+    <string name="autoconsentPopUpsWithoutOptOutsDescription">Jos hylkäämisvaihtoehtoa ei ole, säästämme sinulta yhden klikkauksen, hyväksymme nämä evästeet puolestasi ja suljemme ponnahdusikkunat.</string>
 </resources>
