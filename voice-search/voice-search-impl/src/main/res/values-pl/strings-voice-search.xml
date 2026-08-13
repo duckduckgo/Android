@@ -22,15 +22,6 @@
     <string name="voiceSearchListening">Mów teraz</string>
     <string name="voiceSearchListeningFooter">Dźwięk jest przetwarzany na urządzeniu. Dane nie są przechowywane ani udostępniane żadnym podmiotom, w tym DuckDuckGo.</string>
     <string name="voiceSearchNegativeAction">Anuluj</string>
-    <string name="voiceSearchPermissionRationaleDescription">DuckDuckGo nigdy nie rejestruje tego, co mówisz. Dźwięk jest przetwarzany na urządzeniu. Nie jest przechowywany ani nikomu udostępniany.</string>
-    <string name="voiceSearchPermissionRationaleTitle">Wymagany dostęp do mikrofonu na potrzeby prywatnego wyszukiwania głosowego</string>
-    <string name="voiceSearchPermissionRationalePositiveAction">OK</string>
-    <string name="voiceSearchPermissionRejectedDialogMessage">Aby korzystać z wyszukiwania głosowego w DuckDuckGo, musisz włączyć dostęp do mikrofonu w ustawieniach systemu.</string>
-    <string name="voiceSearchPermissionRejectedDialogPositiveAction">Ustawienia</string>
-    <string name="voiceSearchPermissionRejectedDialogTitle">Wymagany dostęp do mikrofonu</string>
-    <string name="voiceSearchRemovePositiveButton">Usuń</string>
-    <string name="voiceSearchRemoveTitle">Usunąć opcję prywatnego wyszukiwania głosowego z paska adresu?</string>
-    <string name="voiceSearchRemoveSubtitle">Tymi i innymi preferencjami dostępności możesz zarządzać w Ustawieniach.</string>
     <string name="voiceSearchMicAccessDeniedDialogTitle">DuckDuckGo potrzebuje dostępu do Twojego mikrofonu</string>
     <string name="voiceSearchMicAccessDeniedDialogMessage">Uprawnienia do mikrofonu są potrzebne, jeśli chcesz korzystać z naszego prywatnego wyszukiwania głosowego.</string>
     <string name="voiceSearchMicAccessDeniedDialogMessageDuckAi">Uprawnienia do mikrofonu są potrzebne, jeśli chcesz korzystać z czatu głosowego w Duck.ai.</string>

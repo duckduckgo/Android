@@ -22,15 +22,6 @@
     <string name="voiceSearchListening">Habla ahora</string>
     <string name="voiceSearchListeningFooter">El audio se procesa en el dispositivo. No se almacena ni comparte con nadie, incluyendo DuckDuckGo.</string>
     <string name="voiceSearchNegativeAction">Cancelar</string>
-    <string name="voiceSearchPermissionRationaleDescription">DuckDuckGo nunca escucha lo que dices. El audio se procesa en el dispositivo. No se almacena ni se comparte con nadie.</string>
-    <string name="voiceSearchPermissionRationaleTitle">Se requiere acceso al micrófono para la búsqueda por voz privada</string>
-    <string name="voiceSearchPermissionRationalePositiveAction">De acuerdo</string>
-    <string name="voiceSearchPermissionRejectedDialogMessage">Para usar la búsqueda por voz en DuckDuckGo, debes habilitar el acceso al micrófono en la configuración del sistema.</string>
-    <string name="voiceSearchPermissionRejectedDialogPositiveAction">Ajustes</string>
-    <string name="voiceSearchPermissionRejectedDialogTitle">Se requiere acceso al micrófono</string>
-    <string name="voiceSearchRemovePositiveButton">Eliminar</string>
-    <string name="voiceSearchRemoveTitle">¿Eliminar la opción de búsqueda privada por voz de la barra de direcciones?</string>
-    <string name="voiceSearchRemoveSubtitle">Siempre puedes gestionar estas y otras preferencias de accesibilidad en Configuración.</string>
     <string name="voiceSearchMicAccessDeniedDialogTitle">DuckDuckGo necesita acceder a tu micrófono</string>
     <string name="voiceSearchMicAccessDeniedDialogMessage">Se necesitan permisos de micrófono si quieres usar nuestra búsqueda por voz privada.</string>
     <string name="voiceSearchMicAccessDeniedDialogMessageDuckAi">Se necesitan permisos de micrófono si quieres usar el chat de voz en Duck.ai.</string>

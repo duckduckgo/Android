@@ -22,14 +22,5 @@
     <string name="voiceSearchListening">Govori zdaj</string>
     <string name="voiceSearchListeningFooter">Zvok bo obdelan v napravi. Zvok ne bo shranjen in ne bo deljen z drugimi, niti z brskalnikom DuckDuckGo.</string>
     <string name="voiceSearchNegativeAction">Preklic</string>
-    <string name="voiceSearchPermissionRationaleDescription">DuckDuckGo nikoli ne posluša vašega govora. Zvok bo obdelan v napravi. Nismo ga shranili ali delili z nikomer.</string>
-    <string name="voiceSearchPermissionRationaleTitle">Za zasebno glasovno iskanje je potreben dostop do mikrofona</string>
-    <string name="voiceSearchPermissionRationalePositiveAction">V redu</string>
-    <string name="voiceSearchPermissionRejectedDialogMessage">Če želite uporabljati glasovno iskanje v DuckDuckGo, morate v sistemskih nastavitvah omogočiti dostop do mikrofona.</string>
-    <string name="voiceSearchPermissionRejectedDialogPositiveAction">Nastavitve</string>
-    <string name="voiceSearchPermissionRejectedDialogTitle">Potreben je dostop do mikrofona</string>
-    <string name="voiceSearchRemovePositiveButton">Odstrani</string>
-    <string name="voiceSearchRemoveTitle">Želite odstraniti možnost zasebnega glasovnega iskanja iz naslovne vrstice?</string>
-    <string name="voiceSearchRemoveSubtitle">Te in druge nastavitve dostopnosti lahko vedno urejate v nastavitvah.</string>
     <string name="voiceSearchTitle">Glasovno iskanje</string>
 </resources>

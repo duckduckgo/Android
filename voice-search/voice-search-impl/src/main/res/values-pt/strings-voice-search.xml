@@ -22,14 +22,5 @@
     <string name="voiceSearchListening">Fala agora</string>
     <string name="voiceSearchListeningFooter">O áudio é processado no dispositivo. Não foi armazenado ou partilhado com ninguém, incluindo o DuckDuckGo.</string>
     <string name="voiceSearchNegativeAction">Cancelar</string>
-    <string name="voiceSearchPermissionRationaleDescription">O DuckDuckGo nunca ouve o que dizes. O áudio é processado no dentro do teu dispositivo. Não é armazenado nem partilhado com ninguém.</string>
-    <string name="voiceSearchPermissionRationaleTitle">É necessário o acesso ao microfone para pesquisar por voz privada</string>
-    <string name="voiceSearchPermissionRationalePositiveAction">OK</string>
-    <string name="voiceSearchPermissionRejectedDialogMessage">Para usar a Pesquisa por voz no DuckDuckGo, tens de autorizar o acesso ao microfone nas definições do sistema.</string>
-    <string name="voiceSearchPermissionRejectedDialogPositiveAction">Definições</string>
-    <string name="voiceSearchPermissionRejectedDialogTitle">É necessário o acesso ao microfone</string>
-    <string name="voiceSearchRemovePositiveButton">Remover</string>
-    <string name="voiceSearchRemoveTitle">Remover opção de pesquisa por voz privada da barra de endereços?</string>
-    <string name="voiceSearchRemoveSubtitle">Podes sempre gerir esta e outras preferências de acessibilidade nas Definições.</string>
     <string name="voiceSearchTitle">Pesquisa por voz</string>
 </resources>
