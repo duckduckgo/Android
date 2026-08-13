@@ -158,6 +158,10 @@ interface DuckChatDataStore {
 
     suspend fun setSelectedReasoningMode(rawValue: String?)
 
+    suspend fun hasClearedPinnedDefaultModel(): Boolean
+
+    suspend fun setClearedPinnedDefaultModel()
+
     suspend fun storeAddressBarPickerSelectedAt(timestampMillis: Long)
 
     suspend fun getAddressBarPickerSelectedAt(): Long?
@@ -201,6 +205,7 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
         val DUCK_AI_SELECTED_MODEL_ID = stringPreferencesKey(name = "DUCK_AI_SELECTED_MODEL_ID")
         val DUCK_AI_SELECTED_MODEL_SHORT_NAME = stringPreferencesKey(name = "DUCK_AI_SELECTED_MODEL_SHORT_NAME")
         val DUCK_AI_SELECTED_MODEL_REASONING_MODE = stringPreferencesKey(name = "DUCK_AI_SELECTED_MODEL_REASONING_MODE")
+        val DUCK_AI_CLEARED_PINNED_DEFAULT_MODEL = booleanPreferencesKey(name = "DUCK_AI_CLEARED_PINNED_DEFAULT_MODEL")
         val DUCK_AI_ADDRESS_BAR_PICKER_SELECTED_AT = longPreferencesKey(name = "DUCK_AI_ADDRESS_BAR_PICKER_SELECTED_AT")
     }
 
@@ -486,6 +491,13 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
                 prefs[Keys.DUCK_AI_SELECTED_MODEL_REASONING_MODE] = rawValue
             }
         }
+    }
+
+    override suspend fun hasClearedPinnedDefaultModel(): Boolean =
+        store.data.firstOrNull()?.get(Keys.DUCK_AI_CLEARED_PINNED_DEFAULT_MODEL) ?: false
+
+    override suspend fun setClearedPinnedDefaultModel() {
+        store.edit { prefs -> prefs[Keys.DUCK_AI_CLEARED_PINNED_DEFAULT_MODEL] = true }
     }
 
     override suspend fun storeAddressBarPickerSelectedAt(timestampMillis: Long) {
