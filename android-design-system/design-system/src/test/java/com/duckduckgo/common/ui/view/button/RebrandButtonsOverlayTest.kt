@@ -121,6 +121,20 @@ class RebrandButtonsOverlayTest {
     }
 
     @Test
+    fun whenRebrandTextSelectorsThenPressedStateMatchesRestingColor() {
+        val context = themedContext(overlay = true)
+        val textSelectors = listOf(
+            R.color.rebrand_button_ghost_text_selector,
+            R.color.rebrand_button_destructive_secondary_text_selector,
+            R.color.rebrand_button_destructive_ghost_text_selector,
+        )
+        textSelectors.forEach { colorRes ->
+            val stateList = context.colorStateList(colorRes)
+            assertEquals(stateList.defaultColor, stateList.pressedColor())
+        }
+    }
+
+    @Test
     fun whenRebrandStylesThenRippleColorResolvesToARippleSelector() {
         val context = themedContext(overlay = true)
         assertEquals(

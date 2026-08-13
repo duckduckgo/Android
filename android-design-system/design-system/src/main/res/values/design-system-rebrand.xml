@@ -35,15 +35,12 @@
     <attr name="daxColorRebrandButtonSecondaryFillText" format="color" />
     <attr name="daxColorRebrandButtonGhostContainerPressed" format="color" />
     <attr name="daxColorRebrandButtonGhostText" format="color" />
-    <attr name="daxColorRebrandButtonGhostTextPressed" format="color" />
     <attr name="daxColorRebrandButtonDestructiveContainer" format="color" />
     <attr name="daxColorRebrandButtonDestructiveContainerPressed" format="color" />
     <attr name="daxColorRebrandButtonDestructiveText" format="color" />
     <attr name="daxColorRebrandButtonDestructiveSecondaryText" format="color" />
-    <attr name="daxColorRebrandButtonDestructiveSecondaryTextPressed" format="color" />
     <attr name="daxColorRebrandButtonDestructiveGhostContainerPressed" format="color" />
     <attr name="daxColorRebrandButtonDestructiveGhostText" format="color" />
-    <attr name="daxColorRebrandButtonDestructiveGhostTextPressed" format="color" />
 
     <dimen name="rebrandButtonSmallHeight">48dp</dimen>
     <dimen name="rebrandButtonLargeHeight">56dp</dimen>

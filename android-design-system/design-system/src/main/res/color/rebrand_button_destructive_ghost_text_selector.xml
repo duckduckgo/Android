@@ -17,6 +17,5 @@
 
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:color="?attr/daxColorRebrandButtonDestructiveGhostText" android:alpha="0.38" android:state_enabled="false"/>
-    <item android:color="?attr/daxColorRebrandButtonDestructiveGhostTextPressed" android:state_pressed="true"/>
     <item android:color="?attr/daxColorRebrandButtonDestructiveGhostText"/>
 </selector>
