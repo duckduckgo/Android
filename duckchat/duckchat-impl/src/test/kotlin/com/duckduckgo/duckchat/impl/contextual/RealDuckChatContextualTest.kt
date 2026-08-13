@@ -17,6 +17,7 @@
 package com.duckduckgo.duckchat.impl.contextual
 
 import android.view.View
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -28,7 +29,7 @@ class RealDuckChatContextualTest {
     private val testee = RealDuckChatContextual()
 
     @Test
-    fun whenLaunchedThenRequestsSheet() {
+    fun whenLaunchedThenRequestsSheet() = runTest {
         var askAboutPageCount = 0
 
         testee.launch("tabId", anchor) { askAboutPageCount++ }

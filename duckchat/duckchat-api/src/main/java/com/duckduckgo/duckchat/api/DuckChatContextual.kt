@@ -35,7 +35,7 @@ interface DuckChatContextual {
      * sheet should be shown. A null [anchor] (no entry-point view, e.g. from native input) always
      * opens the sheet directly.
      */
-    fun launch(
+    suspend fun launch(
         sourceTabId: String,
         anchor: View?,
         onAskAboutPage: () -> Unit,

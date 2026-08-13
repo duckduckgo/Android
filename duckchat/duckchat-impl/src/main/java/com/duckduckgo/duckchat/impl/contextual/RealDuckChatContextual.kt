@@ -27,7 +27,7 @@ import javax.inject.Inject
 @ContributesBinding(AppScope::class)
 class RealDuckChatContextual @Inject constructor() : DuckChatContextual {
 
-    override fun launch(
+    override suspend fun launch(
         sourceTabId: String,
         anchor: View?,
         onAskAboutPage: () -> Unit,
