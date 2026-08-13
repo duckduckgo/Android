@@ -110,17 +110,6 @@ class MicrophonePermissionRequestTest {
     }
 
     @Test
-    fun whenFirstDenialThenRecordPreviouslyDenied() {
-        whenever(permissionRationale.shouldShow(any())).thenReturn(true)
-
-        testee.registerResultsCallback(mock(), mock(), mock()) { }
-        val lastKnownRequest = activityResultLauncherWrapper.lastKnownRequest as ActivityResultLauncherWrapper.Request.Permission
-        lastKnownRequest.onResult(false)
-
-        verify(voiceSearchRepository).setMicPermissionPreviouslyDenied(eq(true))
-    }
-
-    @Test
     fun whenFirstDenialThenRequestReportedAsAborted() {
         // The caller pauses the WebView before launching, so it needs to hear that nothing will open.
         whenever(permissionRationale.shouldShow(any())).thenReturn(true)
@@ -134,35 +123,8 @@ class MicrophonePermissionRequestTest {
     }
 
     @Test
-    fun whenPromptDismissedWithoutPriorDenialThenShowSnackbarNotDialog() {
-        whenever(permissionRationale.shouldShow(any())).thenReturn(false)
-        whenever(voiceSearchRepository.getMicPermissionPreviouslyDenied()).thenReturn(false)
-
-        testee.registerResultsCallback(mock(), mock(), mock()) { }
-        val lastKnownRequest = activityResultLauncherWrapper.lastKnownRequest as ActivityResultLauncherWrapper.Request.Permission
-        lastKnownRequest.onResult(false)
-
-        assertTrue(voiceSearchPermissionDialogsLauncher.micPermissionDeniedSnackbarShown)
-        assertFalse(voiceSearchPermissionDialogsLauncher.micAccessDeniedDialogShown)
-    }
-
-    @Test
-    fun whenPromptDismissedWithoutPriorDenialThenRequestReportedAsAborted() {
-        whenever(permissionRationale.shouldShow(any())).thenReturn(false)
-        whenever(voiceSearchRepository.getMicPermissionPreviouslyDenied()).thenReturn(false)
-        var aborted = false
-
-        testee.registerResultsCallback(mock(), mock(), mock(), onRequestAborted = { aborted = true })
-        val lastKnownRequest = activityResultLauncherWrapper.lastKnownRequest as ActivityResultLauncherWrapper.Request.Permission
-        lastKnownRequest.onResult(false)
-
-        assertTrue(aborted)
-    }
-
-    @Test
     fun whenDeniedForeverThenShowMicAccessDeniedDialog() {
         whenever(permissionRationale.shouldShow(any())).thenReturn(false)
-        whenever(voiceSearchRepository.getMicPermissionPreviouslyDenied()).thenReturn(true)
 
         testee.registerResultsCallback(mock(), mock(), mock()) { }
         val lastKnownRequest = activityResultLauncherWrapper.lastKnownRequest as ActivityResultLauncherWrapper.Request.Permission
@@ -175,7 +137,6 @@ class MicrophonePermissionRequestTest {
     @Test
     fun whenDeniedForeverAndHideVoiceSearchSelectedThenDisableVoiceSearch() {
         whenever(permissionRationale.shouldShow(any())).thenReturn(false)
-        whenever(voiceSearchRepository.getMicPermissionPreviouslyDenied()).thenReturn(true)
         var disableVoiceSearch = false
 
         testee.registerResultsCallback(mock(), mock(), mock()) { disableVoiceSearch = true }
@@ -190,7 +151,6 @@ class MicrophonePermissionRequestTest {
     @Test
     fun whenDeniedForeverAndActivityIsGoneThenDoNotShowMicAccessDeniedDialog() {
         whenever(permissionRationale.shouldShow(any())).thenReturn(false)
-        whenever(voiceSearchRepository.getMicPermissionPreviouslyDenied()).thenReturn(true)
         val goneActivity = mock<Activity>()
         whenever(goneActivity.isDestroyed).thenReturn(true)
 
@@ -204,7 +164,6 @@ class MicrophonePermissionRequestTest {
     @Test
     fun whenDeniedForeverInDuckAiModeThenDialogDoesNotOfferToHideVoiceSearch() {
         whenever(permissionRationale.shouldShow(any())).thenReturn(false)
-        whenever(voiceSearchRepository.getMicPermissionPreviouslyDenied()).thenReturn(true)
 
         testee.registerResultsCallback(mock(), mock(), mock()) { }
         testee.launch(mock(), VoiceSearchMode.DUCK_AI)
@@ -218,7 +177,6 @@ class MicrophonePermissionRequestTest {
     @Test
     fun whenDeniedForeverInSearchModeThenDialogOffersToHideVoiceSearch() {
         whenever(permissionRationale.shouldShow(any())).thenReturn(false)
-        whenever(voiceSearchRepository.getMicPermissionPreviouslyDenied()).thenReturn(true)
 
         testee.registerResultsCallback(mock(), mock(), mock()) { }
         testee.launch(mock(), VoiceSearchMode.SEARCH)
@@ -231,7 +189,6 @@ class MicrophonePermissionRequestTest {
     @Test
     fun whenDeniedForeverDialogCancelledThenRequestReportedAsAborted() {
         whenever(permissionRationale.shouldShow(any())).thenReturn(false)
-        whenever(voiceSearchRepository.getMicPermissionPreviouslyDenied()).thenReturn(true)
         var aborted = false
 
         testee.registerResultsCallback(mock(), mock(), mock(), onRequestAborted = { aborted = true })
@@ -253,14 +210,5 @@ class MicrophonePermissionRequestTest {
         lastKnownRequest.onResult(true)
 
         assertFalse(aborted)
-    }
-
-    @Test
-    fun whenPermissionGrantedThenClearPreviouslyDenied() {
-        testee.registerResultsCallback(mock(), mock(), mock()) { }
-        val lastKnownRequest = activityResultLauncherWrapper.lastKnownRequest as ActivityResultLauncherWrapper.Request.Permission
-        lastKnownRequest.onResult(true)
-
-        verify(voiceSearchRepository).setMicPermissionPreviouslyDenied(eq(false))
     }
 }

@@ -23,8 +23,6 @@ import kotlinx.coroutines.flow.Flow
 interface VoiceSearchRepository {
     fun saveLoggedAvailability()
     fun getHasLoggedAvailability(): Boolean
-    fun getMicPermissionPreviouslyDenied(): Boolean
-    fun setMicPermissionPreviouslyDenied(denied: Boolean)
     fun isVoiceSearchUserEnabled(default: Boolean): Boolean
     fun voiceSearchUserEnabledFlow(default: Boolean): Flow<Boolean>
     fun setVoiceSearchUserEnabled(enabled: Boolean)
@@ -41,12 +39,6 @@ class RealVoiceSearchRepository constructor(
     }
 
     override fun getHasLoggedAvailability(): Boolean = dataStore.availabilityLogged
-
-    override fun getMicPermissionPreviouslyDenied(): Boolean = dataStore.micPermissionPreviouslyDenied
-
-    override fun setMicPermissionPreviouslyDenied(denied: Boolean) {
-        dataStore.micPermissionPreviouslyDenied = denied
-    }
 
     override fun isVoiceSearchUserEnabled(default: Boolean): Boolean = dataStore.isVoiceSearchEnabled(default)
 

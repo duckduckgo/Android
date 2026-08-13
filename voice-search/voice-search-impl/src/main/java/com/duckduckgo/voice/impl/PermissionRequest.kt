@@ -66,20 +66,11 @@ class MicrophonePermissionRequest @Inject constructor(
             caller,
             Request.Permission { granted ->
                 when {
-                    granted -> {
-                        voiceSearchRepository.setMicPermissionPreviouslyDenied(false)
-                        onPermissionsGranted()
-                    }
+                    granted -> onPermissionsGranted()
                     permissionRationale.shouldShow(activity) -> {
-                        voiceSearchRepository.setMicPermissionPreviouslyDenied(true)
                         showMicPermissionDeniedSnackbar(activity)
                         requestAborted()
                     }
-                    !voiceSearchRepository.getMicPermissionPreviouslyDenied() -> {
-                        showMicPermissionDeniedSnackbar(activity)
-                        requestAborted()
-                    }
-
                     else -> showMicAccessDeniedDialog(activity)
                 }
             },
