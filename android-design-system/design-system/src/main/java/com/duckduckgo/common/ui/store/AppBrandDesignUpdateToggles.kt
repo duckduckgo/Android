@@ -53,4 +53,8 @@ interface AppBrandDesignUpdateToggles {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun addressBar(): Toggle
+
+    /** Only the pictogram swaps that change drawable type or call-site behaviour; the rest are flavour-gated. */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun pictograms(): Toggle
 }
