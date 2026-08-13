@@ -463,6 +463,7 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
             is NewUserOnboardingActivityDialog.IntroAnimation,
             NewUserOnboardingActivityDialog.ComparisonChart,
             NewUserOnboardingActivityDialog.AiComparisonChart,
+            NewUserOnboardingActivityDialog.DownloadReason,
             NewUserOnboardingActivityDialog.AddToDock,
             NewUserOnboardingActivityDialog.WidgetPrompt,
             is NewUserOnboardingActivityDialog.AddressBarPosition,

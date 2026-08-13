@@ -35,6 +35,16 @@ class ContentConfigTest {
     }
 
     @Test
+    fun `download reason seeds its state with no selection`() {
+        val content = ContentConfig.DownloadReason(
+            title = TextConfig.Literal("title"),
+            body = TextConfig.Literal("body"),
+        )
+
+        assertEquals(DownloadReasonContentState(selection = null), content.initialState())
+    }
+
+    @Test
     fun `configs with the same values are equal`() {
         val config = ComparisonChartConfig.Browser(isCustomAiCopy = false)
         val first = ContentConfig.ComparisonChart(title = TextConfig.Resource(1), config = config)

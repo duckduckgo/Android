@@ -28,6 +28,8 @@ import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.onboarding.DuckAiOnboardingAvailability
 import com.duckduckgo.app.onboarding.DuckAiOnboardingDemo
 import com.duckduckgo.app.onboarding.OnboardingPromptsExperimentManager
+import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager
+import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager.SegmentedOnboardingExperimentVariant
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
@@ -95,6 +97,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     private val customAiOnboardingResolver: CustomAiOnboardingResolver,
     private val duckAiOnboardingDemo: DuckAiOnboardingDemo,
     private val onboardingPromptsExperimentManager: OnboardingPromptsExperimentManager,
+    private val segmentedOnboardingExperimentManager: SegmentedOnboardingExperimentManager,
 ) {
 
     suspend fun buildRootPlan(
@@ -114,18 +117,23 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             buildCustomAiPlan(onCompleted, onSkipped)
         } else {
             val isReinstall = withContext(dispatchers.io()) { appBuildConfig.isAppReinstall() }
-            val variant = if (isReinstall) {
+            val onboardingPromptExperimentVariant = if (isReinstall) {
                 null
             } else {
                 onboardingPromptsExperimentManager.enroll()
             }
-            buildDefaultPlan(onCompleted, onSkipped, variant)
+            when {
+                onboardingPromptExperimentVariant != null -> buildDefaultPlan(onCompleted, onSkipped, onboardingPromptExperimentVariant)
+                segmentedOnboardingExperimentManager.enroll() == SegmentedOnboardingExperimentVariant.TREATMENT ->
+                    buildSegmentedPlan(onCompleted, onSkipped)
+                else -> buildDefaultPlan(onCompleted, onSkipped)
+            }
         }
 
     private suspend fun buildDefaultPlan(
         onCompleted: suspend () -> Unit,
         onSkipped: suspend () -> Unit,
-        onboardingPromptExperimentVariant: OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant?,
+        onboardingPromptExperimentVariant: OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant? = null,
     ): LinearOnboardingPlan {
         val ctx = NewUserOnboardingPlanContext()
 
@@ -216,6 +224,25 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 defaultBrowserPromptStep(),
                 addressBarPositionStep(),
             ),
+        )
+    }
+
+    private fun buildSegmentedPlan(
+        onCompleted: suspend () -> Unit,
+        onSkipped: suspend () -> Unit,
+    ): LinearOnboardingPlan {
+        val ctx = NewUserOnboardingPlanContext()
+        val firstDialog = SuspendMemo { FirstDialog.INITIAL }
+        return rootPlan(
+            ctx = ctx,
+            onCompleted = onCompleted,
+            onSkipped = onSkipped,
+            steps = buildList {
+                add(introAnimationStep())
+                add(notificationPermissionStep())
+                add(initialStep(firstDialog))
+                add(downloadReasonStep())
+            },
         )
     }
 
@@ -423,6 +450,23 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                     event is NewUserOnboardingEvent.ContinueClicked -> {
                         onboardingPixelSender.fire(pixelName, OnboardingPixelAction.Clicked(engaged = true))
                         Advance
+                    }
+                    else -> Stay
+                }
+            },
+        )
+    }
+
+    private fun downloadReasonStep(): NewUserOnboardingActivityStep {
+        return NewUserOnboardingActivityStep(
+            id = NewUserOnboardingStepIds.DOWNLOAD_REASON,
+            pixelName = null,
+            resolveDialog = { NewUserOnboardingActivityDialog.DownloadReason },
+            transition = { event ->
+                when {
+                    event is NewUserOnboardingEvent.DownloadReasonConfirmed -> {
+                        logcat { "Download reason confirmed: ${event.selection}" }
+                        Stay // navigation to next steps to be implemented in following PRs
                     }
                     else -> Stay
                 }

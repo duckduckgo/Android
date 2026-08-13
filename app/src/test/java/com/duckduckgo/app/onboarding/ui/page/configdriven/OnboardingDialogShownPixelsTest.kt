@@ -85,6 +85,7 @@ class OnboardingDialogShownPixelsTest {
         testee.fireFor(NewUserOnboardingActivityDialog.AddToDock)
         testee.fireFor(NewUserOnboardingActivityDialog.WidgetPrompt)
         testee.fireFor(NewUserOnboardingActivityDialog.InputScreenPreview(isSearchDefault = true))
+        testee.fireFor(NewUserOnboardingActivityDialog.DownloadReason)
         testee.fireFor(
             NewUserOnboardingActivityDialog.QuickSetup(
                 showSplitOption = true,

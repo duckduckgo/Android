@@ -28,6 +28,8 @@ import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.onboarding.DuckAiOnboardingAvailability
 import com.duckduckgo.app.onboarding.DuckAiOnboardingDemo
 import com.duckduckgo.app.onboarding.OnboardingPromptsExperimentManager
+import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager
+import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager.SegmentedOnboardingExperimentVariant
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
@@ -100,6 +102,7 @@ class NewUserOnboardingPlanProviderTest {
     private val customAiOnboardingResolver: CustomAiOnboardingResolver = mock()
     private val duckAiOnboardingDemo: DuckAiOnboardingDemo = mock()
     private val homeScreenPromptsExperiment: OnboardingPromptsExperimentManager = mock()
+    private val segmentedOnboardingExperiment: SegmentedOnboardingExperimentManager = mock()
 
     private lateinit var provider: NewUserOnboardingPlanProvider
     private val orchestrator = LinearOnboardingOrchestratorImpl()
@@ -120,6 +123,7 @@ class NewUserOnboardingPlanProviderTest {
             whenever(customAiOnboardingResolver.resolve()).thenReturn(false)
             whenever(homeScreenPromptsExperiment.enroll())
                 .thenReturn(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.CONTROL)
+            whenever(segmentedOnboardingExperiment.enroll()).thenReturn(null)
         }
         provider = NewUserOnboardingPlanProvider(
             syncAutoRestore = syncAutoRestore,
@@ -141,6 +145,7 @@ class NewUserOnboardingPlanProviderTest {
             customAiOnboardingResolver = customAiOnboardingResolver,
             duckAiOnboardingDemo = duckAiOnboardingDemo,
             onboardingPromptsExperimentManager = homeScreenPromptsExperiment,
+            segmentedOnboardingExperimentManager = segmentedOnboardingExperiment,
         )
     }
 
@@ -180,6 +185,53 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.InputModeConfirmed(withAi = false))
         // input_screen_preview precondition is false (not AI) -> plan exhausts.
         assertEquals(Completed(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID), orchestrator.state.value)
+    }
+
+    @Test
+    fun `when enrolled in the segmented treatment then reaches the download reason step`() = runTest {
+        whenever(homeScreenPromptsExperiment.enroll()).thenReturn(null)
+        whenever(segmentedOnboardingExperiment.enroll()).thenReturn(SegmentedOnboardingExperimentVariant.TREATMENT)
+        start()
+        assertStep(NewUserOnboardingStepIds.INTRO_ANIMATION)
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        assertStep(NewUserOnboardingStepIds.NOTIFICATION_PERMISSION)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        assertStep(NewUserOnboardingStepIds.INITIAL)
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
+        assertStep(NewUserOnboardingStepIds.DOWNLOAD_REASON)
+    }
+
+    @Test
+    fun `when the segmented control variant then builds the default plan`() = runTest {
+        whenever(homeScreenPromptsExperiment.enroll()).thenReturn(null)
+        whenever(segmentedOnboardingExperiment.enroll()).thenReturn(SegmentedOnboardingExperimentVariant.CONTROL)
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
+        assertStep(NewUserOnboardingStepIds.COMPARISON_CHART)
+    }
+
+    @Test
+    fun `when custom ai path wins then the segmented experiment is never enrolled`() = runTest {
+        whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
+        start()
+
+        verify(segmentedOnboardingExperiment, never()).enroll()
+    }
+
+    @Test
+    fun `when enrolled in the home screen prompts experiment then the segmented experiment is never enrolled`() = runTest {
+        whenever(homeScreenPromptsExperiment.enroll())
+            .thenReturn(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.CONTROL)
+        whenever(segmentedOnboardingExperiment.enroll()).thenReturn(SegmentedOnboardingExperimentVariant.TREATMENT)
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
+
+        assertStep(NewUserOnboardingStepIds.COMPARISON_CHART)
+        verify(segmentedOnboardingExperiment, never()).enroll()
     }
 
     @Test

@@ -514,6 +514,9 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                 setCurrentDialog(INITIAL_REINSTALL_USER)
             }
             NewUserOnboardingActivityDialog.Initial -> setCurrentDialog(INITIAL)
+            NewUserOnboardingActivityDialog.DownloadReason -> {
+                // no-op in this VM
+            }
             NewUserOnboardingActivityDialog.ComparisonChart ->
                 setCurrentDialog(COMPARISON_CHART, stepIndicator = progress)
             NewUserOnboardingActivityDialog.AiComparisonChart ->

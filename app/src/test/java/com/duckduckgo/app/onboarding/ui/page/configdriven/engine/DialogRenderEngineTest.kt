@@ -31,11 +31,13 @@ import com.duckduckgo.app.onboarding.ui.page.configdriven.ContentConfig
 import com.duckduckgo.app.onboarding.ui.page.configdriven.ContentHandle
 import com.duckduckgo.app.onboarding.ui.page.configdriven.CtaAction
 import com.duckduckgo.app.onboarding.ui.page.configdriven.CtaConfig
+import com.duckduckgo.app.onboarding.ui.page.configdriven.CtaState
 import com.duckduckgo.app.onboarding.ui.page.configdriven.DialogConfig
 import com.duckduckgo.app.onboarding.ui.page.configdriven.Embellishment
 import com.duckduckgo.app.onboarding.ui.page.configdriven.TextConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.onboarding.api.LinearOnboardingStepId
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -191,6 +193,46 @@ class DialogRenderEngineTest {
         testee.render(ADDRESS_BAR_STEP, addressBarConfig(), animate = false)
         cardStage.clickPrimary()
 
+        assertEquals(listOf(NewUserOnboardingEvent.AddressBarConfirmed(OmnibarType.SPLIT)), emitted)
+    }
+
+    @Test
+    fun `the primary cta enabled flow drives the card stage`() = runTest {
+        val enabled = MutableStateFlow(false)
+        content.primaryCtaState = CtaState(enabled = enabled, defaultValue = false)
+
+        testee.render(COMPARISON_STEP, comparisonConfig(), animate = false)
+        assertEquals(false, cardStage.primaryCtaEnabled)
+
+        enabled.value = true
+
+        assertEquals(true, cardStage.primaryCtaEnabled)
+    }
+
+    @Test
+    fun `a submit cta fires once the primary cta becomes enabled`() = runTest {
+        val enabled = MutableStateFlow(false)
+        content.primaryCtaState = CtaState(enabled = enabled, defaultValue = false)
+        content.handleResult = { NewUserOnboardingEvent.AddressBarConfirmed(OmnibarType.SPLIT) }
+
+        testee.render(ADDRESS_BAR_STEP, addressBarConfig(), animate = false)
+        enabled.value = true
+        cardStage.clickPrimary()
+
+        assertEquals(listOf(NewUserOnboardingEvent.AddressBarConfirmed(OmnibarType.SPLIT)), emitted)
+    }
+
+    @Test
+    fun `the primary cta resets to enabled on the next render`() = runTest {
+        content.primaryCtaState = CtaState(enabled = MutableStateFlow(false), defaultValue = false)
+        testee.render(COMPARISON_STEP, comparisonConfig(), animate = false)
+
+        content.primaryCtaState = null
+        content.handleResult = { NewUserOnboardingEvent.AddressBarConfirmed(OmnibarType.SPLIT) }
+        testee.render(ADDRESS_BAR_STEP, addressBarConfig(), animate = false)
+        cardStage.clickPrimary()
+
+        assertEquals(true, cardStage.primaryCtaEnabled)
         assertEquals(listOf(NewUserOnboardingEvent.AddressBarConfirmed(OmnibarType.SPLIT)), emitted)
     }
 
@@ -434,6 +476,7 @@ private class FakeContentController : ContentController {
     var afterFade: (() -> Animator)? = null
     var onContentReady: (() -> Unit)? = null
     var handleResult: (() -> NewUserOnboardingEvent)? = null
+    var primaryCtaState: CtaState? = null
     var unbindCount = 0
     var boundScope: BindScope? = null
 
@@ -450,6 +493,7 @@ private class FakeContentController : ContentController {
             afterFade = afterFade,
             onContentReady = onContentReady,
             result = handleResult,
+            primaryCtaState = primaryCtaState,
             unbind = { unbindCount++ },
         )
     }
@@ -469,6 +513,10 @@ private class FakeCardStage(private val record: (String) -> Unit = {}) : CardSta
     val animateFlags = mutableListOf<Boolean>()
     val revealDelaysMs = mutableListOf<Long>()
     val boundsTransitionsMs = mutableListOf<Long>()
+    val primaryCtaEnabledCalls = mutableListOf<Boolean>()
+
+    val primaryCtaEnabled: Boolean?
+        get() = primaryCtaEnabledCalls.lastOrNull()
 
     private val pending = mutableListOf<() -> Unit>()
     private var primary: CtaConfig? = null
@@ -496,6 +544,10 @@ private class FakeCardStage(private val record: (String) -> Unit = {}) : CardSta
     override fun showCtaButtons(primary: CtaConfig?, secondary: CtaConfig?, onClick: (CtaConfig) -> Unit) {
         this.primary = primary
         onCtaClick = onClick
+    }
+
+    override fun setPrimaryCtaEnabled(enabled: Boolean) {
+        primaryCtaEnabledCalls += enabled
     }
 
     override fun prepareEntrance(contentTargets: List<View>) = Unit

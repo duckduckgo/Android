@@ -26,6 +26,7 @@ sealed interface NewUserOnboardingActivityDialog {
     data object InitialReinstallUser : NewUserOnboardingActivityDialog
     data object Initial : NewUserOnboardingActivityDialog
     data object ComparisonChart : NewUserOnboardingActivityDialog
+    data object DownloadReason : NewUserOnboardingActivityDialog
     data object AiComparisonChart : NewUserOnboardingActivityDialog
     data object DefaultBrowserPrompt : NewUserOnboardingActivityDialog
     data object AddToDock : NewUserOnboardingActivityDialog

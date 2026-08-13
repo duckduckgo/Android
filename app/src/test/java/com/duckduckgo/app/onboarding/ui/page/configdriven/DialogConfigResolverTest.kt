@@ -94,6 +94,27 @@ class DialogConfigResolverTest {
     }
 
     @Test
+    fun `resolves the download reason with a submitting cta`() {
+        val config = testee.resolve(NewUserOnboardingActivityDialog.DownloadReason, isCustomAiFlow = false)!!
+
+        assertEquals(OnboardingBackgroundStep.DownloadReason, config.background)
+        assertEquals(Embellishment.BottomWing, config.embellishment)
+        assertEquals(CardArrowConfig.AtEnd, config.cardArrow)
+        assertEquals(
+            ContentConfig.DownloadReason(
+                title = TextConfig.Resource(R.string.downloadReasonTitle),
+                body = TextConfig.Resource(R.string.downloadReasonBody),
+            ),
+            config.content,
+        )
+        assertEquals(
+            CtaConfig(TextConfig.Resource(R.string.downloadReasonPrimaryCta), CtaAction.Submit),
+            config.primaryCta,
+        )
+        assertNull(config.secondaryCta)
+    }
+
+    @Test
     fun `resolves no config for a dialog that has no config-driven screen yet`() {
         assertNull(testee.resolve(NewUserOnboardingActivityDialog.NotificationPermission, isCustomAiFlow = false))
     }
