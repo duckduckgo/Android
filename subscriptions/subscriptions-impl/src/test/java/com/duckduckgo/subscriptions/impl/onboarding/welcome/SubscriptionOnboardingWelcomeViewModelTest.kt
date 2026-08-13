@@ -77,11 +77,11 @@ class SubscriptionOnboardingWelcomeViewModelTest {
     }
 
     @Test
-    fun whenBuiltThenFormattedStartDateIsTheStartDay() {
+    fun whenBuiltThenBillingDateIsSevenDaysAfterStart() {
         val date = LocalDate.of(2026, 5, 7)
-        val expected = date.format(DateTimeFormatter.ofPattern("MMMM d, yyyy"))
+        val expected = date.plusDays(7).format(DateTimeFormatter.ofPattern("MMMM d, yyyy"))
 
-        assertEquals(expected, viewModelStartingOn(date).viewState.value.formattedStartDate)
+        assertEquals(expected, viewModelStartingOn(date).viewState.value.formattedBillingDate)
     }
 
     @Test

@@ -188,17 +188,15 @@
             android:id="@+id/subscriptionOnboardingProgressBar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/onboarding_welcome_progress_bar"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_gravity="center"
+            android:src="@drawable/onboarding_welcome_progress_bar" />
 
     </LinearLayout>
 
     <ImageView
         android:id="@+id/subscriptionOnboardingWelcomeDax"
         android:layout_width="wrap_content"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_5"
         android:layout_marginBottom="@dimen/keyline_2"
         android:src="@drawable/onboarding_dax_thumbs_up"

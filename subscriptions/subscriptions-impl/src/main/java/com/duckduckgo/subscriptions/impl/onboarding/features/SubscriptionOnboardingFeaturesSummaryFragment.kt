@@ -69,6 +69,9 @@ class SubscriptionOnboardingFeaturesSummaryFragment :
     }
 
     private fun render(viewState: ViewState) = with(binding) {
+        subscriptionOnboardingFeaturesContainer.isVisible =
+            viewState.vpnVisible || viewState.itrVisible || viewState.aiVisible || viewState.pirVisible
+
         subscriptionOnboardingFeaturesVPN.isVisible = viewState.vpnVisible
         subscriptionOnboardingFeaturesITR.isVisible = viewState.itrVisible
         subscriptionOnboardingFeaturesAi.isVisible = viewState.aiVisible

@@ -59,6 +59,7 @@
                 app:typography="body1" />
 
             <LinearLayout
+                android:id="@+id/subscriptionOnboardingFeaturesContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/keyline_5"

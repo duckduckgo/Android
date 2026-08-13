@@ -36,7 +36,7 @@ class SubscriptionOnboardingWelcomeViewModel @Inject constructor(
 ) : ViewModel() {
 
     data class ViewState(
-        val formattedStartDate: String = "",
+        val formattedBillingDate: String = "",
         val freeTrialDayLabels: List<String> = emptyList(),
     )
 
@@ -46,7 +46,7 @@ class SubscriptionOnboardingWelcomeViewModel @Inject constructor(
     private fun buildViewState(): ViewState {
         val startDate = currentTimeProvider.localDateTimeNow().toLocalDate()
         return ViewState(
-            formattedStartDate = startDate.format(DATE_FORMATTER),
+            formattedBillingDate = startDate.plusDays(FREE_TRIAL_DAYS.toLong()).format(DATE_FORMATTER),
             freeTrialDayLabels = (0 until FREE_TRIAL_DAYS).map { startDate.plusDays(it.toLong()).dayOfMonth.toString() },
         )
     }

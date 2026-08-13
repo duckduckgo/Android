@@ -56,7 +56,12 @@ class SubscriptionOnboardingFeatureInfoActivity : DuckDuckGoActivity() {
     private val feature: OnboardingFeature by lazy {
         val screenFeature = intent.getActivityParams(SubscriptionOnboardingFeatureInfoScreen::class.java)?.feature
             ?: SubscriptionOnboardingFeature.VPN
-        OnboardingFeature.valueOf(screenFeature.name)
+        when (screenFeature) {
+            SubscriptionOnboardingFeature.VPN -> OnboardingFeature.VPN
+            SubscriptionOnboardingFeature.ITR -> OnboardingFeature.ITR
+            SubscriptionOnboardingFeature.DUCK_AI -> OnboardingFeature.DUCK_AI
+            SubscriptionOnboardingFeature.PIR -> OnboardingFeature.PIR
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

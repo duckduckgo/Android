@@ -58,7 +58,7 @@ class SubscriptionOnboardingWelcomeFragment : DuckDuckGoFragment(R.layout.fragme
 
     private fun render(viewState: ViewState) {
         binding.subscriptionOnboardingWelcomeBannerDescription.text =
-            getString(R.string.subscriptionOnboardingWelcomeBannerDescription, viewState.formattedStartDate)
+            getString(R.string.subscriptionOnboardingWelcomeBannerDescription, viewState.formattedBillingDate)
 
         val dayViews = with(binding) {
             listOf(
