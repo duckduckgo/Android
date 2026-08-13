@@ -955,6 +955,7 @@ class RealDuckChatPixels @Inject constructor(
     override fun fireOmnibarShown() = fireCountAndDaily(
         DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SHOWN_COUNT,
         DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SHOWN_DAILY,
+        mapOf(DuckChatPixelParameters.TOGGLE_VISIBLE to (duckChatInternal.resolvedTogglePosition() != null).toString()),
     )
 
     override fun fireOmnibarTextAreaFocused(landscape: Boolean) {

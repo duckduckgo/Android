@@ -454,13 +454,37 @@ class RealDuckChatPixelsTest {
     }
 
     @Test
-    fun whenFireOmnibarShownThenCountAndDailyFired() = runTest {
+    fun whenFireOmnibarShownWithToggleVisibleThenParamsReflectIt() = runTest {
+        whenever(mockDuckChatInternal.resolvedTogglePosition()).thenReturn(ToggleSelection.SEARCH)
+
         testee.fireOmnibarShown()
 
         advanceUntilIdle()
 
-        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SHOWN_COUNT)
-        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SHOWN_DAILY, type = Pixel.PixelType.Daily())
+        val params = mapOf(DuckChatPixelParameters.TOGGLE_VISIBLE to "true")
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SHOWN_COUNT, parameters = params)
+        verify(mockPixel).fire(
+            DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SHOWN_DAILY,
+            parameters = params,
+            type = Pixel.PixelType.Daily(),
+        )
+    }
+
+    @Test
+    fun whenFireOmnibarShownWithNoToggleThenParamsReflectIt() = runTest {
+        whenever(mockDuckChatInternal.resolvedTogglePosition()).thenReturn(null)
+
+        testee.fireOmnibarShown()
+
+        advanceUntilIdle()
+
+        val params = mapOf(DuckChatPixelParameters.TOGGLE_VISIBLE to "false")
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SHOWN_COUNT, parameters = params)
+        verify(mockPixel).fire(
+            DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SHOWN_DAILY,
+            parameters = params,
+            type = Pixel.PixelType.Daily(),
+        )
     }
 
     @Test
