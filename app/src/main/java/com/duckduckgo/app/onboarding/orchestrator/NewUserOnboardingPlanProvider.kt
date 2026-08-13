@@ -104,37 +104,36 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         onCompleted: suspend () -> Unit,
         onSkipped: suspend () -> Unit,
     ): LinearOnboardingPlan =
-        when {
-            customAiOnboardingResolver.resolve() -> {
-                // in custom AI onboarding path, the input toggle is enabled by default
-                duckChat.setCosmeticInputScreenUserSetting(enabled = true)
-                onboardingStore.storeInputScreenSelection(selected = true)
+        if (customAiOnboardingResolver.resolve()) {
+            // in custom AI onboarding path, the input toggle is enabled by default
+            duckChat.setCosmeticInputScreenUserSetting(enabled = true)
+            onboardingStore.storeInputScreenSelection(selected = true)
 
-                // prepare in-context CTAs
-                duckAiOnboardingDemo.arm()
+            // prepare in-context CTAs
+            duckAiOnboardingDemo.arm()
 
-                pixel.fire(CustomAiOnboardingPixelName.PLAN_STARTED, type = Unique())
+            pixel.fire(CustomAiOnboardingPixelName.PLAN_STARTED, type = Unique())
 
-                buildCustomAiPlan(onCompleted, onSkipped)
+            buildCustomAiPlan(onCompleted, onSkipped)
+        } else {
+            val isReinstall = withContext(dispatchers.io()) { appBuildConfig.isAppReinstall() }
+            val onboardingPromptExperimentVariant = if (isReinstall) {
+                null
+            } else {
+                onboardingPromptsExperimentManager.enroll()
             }
-            segmentedOnboardingExperimentManager.enroll() == SegmentedOnboardingExperimentVariant.TREATMENT -> {
-                buildSegmentedPlan(onCompleted, onSkipped)
-            }
-            else -> {
-                val isReinstall = withContext(dispatchers.io()) { appBuildConfig.isAppReinstall() }
-                val variant = if (isReinstall) {
-                    null
-                } else {
-                    onboardingPromptsExperimentManager.enroll()
-                }
-                buildDefaultPlan(onCompleted, onSkipped, variant)
+            when {
+                onboardingPromptExperimentVariant != null -> buildDefaultPlan(onCompleted, onSkipped, onboardingPromptExperimentVariant)
+                segmentedOnboardingExperimentManager.enroll() == SegmentedOnboardingExperimentVariant.TREATMENT ->
+                    buildSegmentedPlan(onCompleted, onSkipped)
+                else -> buildDefaultPlan(onCompleted, onSkipped)
             }
         }
 
     private suspend fun buildDefaultPlan(
         onCompleted: suspend () -> Unit,
         onSkipped: suspend () -> Unit,
-        onboardingPromptExperimentVariant: OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant?,
+        onboardingPromptExperimentVariant: OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant? = null,
     ): LinearOnboardingPlan {
         val ctx = NewUserOnboardingPlanContext()
 

@@ -189,6 +189,7 @@ class NewUserOnboardingPlanProviderTest {
 
     @Test
     fun `when enrolled in the segmented treatment then reaches the download reason step`() = runTest {
+        whenever(homeScreenPromptsExperiment.enroll()).thenReturn(null)
         whenever(segmentedOnboardingExperiment.enroll()).thenReturn(SegmentedOnboardingExperimentVariant.TREATMENT)
         start()
         assertStep(NewUserOnboardingStepIds.INTRO_ANIMATION)
@@ -202,6 +203,7 @@ class NewUserOnboardingPlanProviderTest {
 
     @Test
     fun `when the segmented control variant then builds the default plan`() = runTest {
+        whenever(homeScreenPromptsExperiment.enroll()).thenReturn(null)
         whenever(segmentedOnboardingExperiment.enroll()).thenReturn(SegmentedOnboardingExperimentVariant.CONTROL)
         start()
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
@@ -215,6 +217,20 @@ class NewUserOnboardingPlanProviderTest {
         whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
         start()
 
+        verify(segmentedOnboardingExperiment, never()).enroll()
+    }
+
+    @Test
+    fun `when enrolled in the home screen prompts experiment then the segmented experiment is never enrolled`() = runTest {
+        whenever(homeScreenPromptsExperiment.enroll())
+            .thenReturn(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.CONTROL)
+        whenever(segmentedOnboardingExperiment.enroll()).thenReturn(SegmentedOnboardingExperimentVariant.TREATMENT)
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
+
+        assertStep(NewUserOnboardingStepIds.COMPARISON_CHART)
         verify(segmentedOnboardingExperiment, never()).enroll()
     }
 
