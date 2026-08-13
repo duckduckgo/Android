@@ -478,6 +478,21 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
+    fun whenEditRequestTargetsThisTabAndSurfaceMatchesThenTheContextualWidgetEmitsIt() = runTest {
+        testee.configureContextual(tabId = "tab-1")
+
+        val emissions = mutableListOf<EditPromptRequest>()
+        val job = launch { testee.editPromptRequests.toList(emissions) }
+        advanceUntilIdle()
+        editPromptRequestsFlow.tryEmit(EditPromptRequest("session-1", "tab-1", contextual = true))
+        advanceUntilIdle()
+
+        assertEquals(1, emissions.size)
+        assertEquals("session-1", emissions.single().sessionId)
+        job.cancel()
+    }
+
+    @Test
     fun whenSetDuckAiModeThenInputModeUnchanged() = runTest {
         setIsEnabled(true)
         inputScreenUserSettingFlow.value = true
