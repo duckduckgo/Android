@@ -1823,7 +1823,8 @@ class BrowserTabViewModel @Inject constructor(
 
         if (triggeredByUser) {
             site?.realBrokenSiteContext?.onUserTriggeredRefresh()
-            site?.uri?.let {
+            val refreshedUrl = webNavigationState?.currentUrl?.toUri() ?: site?.uri
+            refreshedUrl?.let {
                 brokenSitePrompt.pageRefreshed(it)
             }
         }
@@ -3703,14 +3704,17 @@ class BrowserTabViewModel @Inject constructor(
             if (hasCtaBeenShownForCurrentPage.get() && isBrowserShowing) return null
             val detectedRefreshPatterns = brokenSitePrompt.getUserRefreshPatterns()
             handleBreakageRefreshPatterns(detectedRefreshPatterns)
+            val currentSite = siteLiveData.value
+            val currentNavigationUrl = webNavigationState?.currentUrl
             val cta =
                 withContext(dispatchers.io()) {
                     ctaViewModel.refreshCta(
                         dispatchers.io(),
                         isBrowserShowing && !isErrorShowing,
-                        siteLiveData.value,
+                        currentSite,
                         detectedRefreshPatterns,
                         suppressDuckAiOnboardingCta,
+                        brokenSitePromptUrl = currentNavigationUrl,
                     )
                 }
             val contextDaxDialogsShown =

@@ -201,6 +201,7 @@ class DaxNoTrackersBrandDesignUpdateContextualCtaTest {
             isBrowserShowing = true,
             site = site(url = "http://www.wikipedia.com"),
             detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
         )
 
         assertTrue(value is DaxNoTrackersBrandDesignUpdateContextualCta)
@@ -216,6 +217,7 @@ class DaxNoTrackersBrandDesignUpdateContextualCtaTest {
             isBrowserShowing = true,
             site = site(url = "http://www.wikipedia.com"),
             detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
         )
 
         assertTrue(value is OnboardingDaxDialogCta.DaxNoTrackersCta)

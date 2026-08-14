@@ -188,6 +188,7 @@ class DaxTrackersBlockedBrandDesignUpdateContextualCtaTest {
             isBrowserShowing = true,
             site = siteWithBlockedTrackers(),
             detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
         )
 
         assertTrue(value is DaxTrackersBlockedBrandDesignUpdateContextualCta)
@@ -203,6 +204,7 @@ class DaxTrackersBlockedBrandDesignUpdateContextualCtaTest {
             isBrowserShowing = true,
             site = siteWithBlockedTrackers(),
             detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
         )
 
         assertTrue(value is OnboardingDaxDialogCta.DaxTrackersBlockedCta)
