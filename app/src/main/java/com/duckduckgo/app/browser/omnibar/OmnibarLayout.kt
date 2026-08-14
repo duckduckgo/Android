@@ -592,7 +592,7 @@ class OmnibarLayout @JvmOverloads constructor(
         }
         aiChatMenu?.setOnClickListener {
             viewModel.onDuckChatButtonPressed()
-            omnibarItemPressedListener?.onDuckChatButtonPressed()
+            omnibarItemPressedListener?.onDuckChatButtonPressed(it)
         }
         shieldIcon.setOnClickListener {
             if (isAttachedToWindow) {
