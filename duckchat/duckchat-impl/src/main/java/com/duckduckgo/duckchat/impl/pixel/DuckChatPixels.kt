@@ -229,14 +229,8 @@ interface DuckChatPixels {
     fun fireVoiceTapped(surface: DuckChatPixelSurface)
     fun fireVoiceSearchTapped(surface: DuckChatPixelSurface)
     fun fireStopGenerationTapped(surface: DuckChatPixelSurface)
-
-    /** The fullscreen Edit Message screen was opened for a sent prompt. */
     fun fireEditPromptOpened()
-
-    /** The Edit Message screen was left without submitting (toolbar close, system/predictive back). */
     fun fireEditPromptCancelled()
-
-    /** The edited prompt was submitted, replacing the original message. */
     fun fireEditPromptSubmitted()
     fun fireEditPromptImageRemoved(surface: DuckChatPixelSurface)
     fun fireEditPromptFileRemoved(surface: DuckChatPixelSurface)
