@@ -20,7 +20,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.branddesignupdate.AppBrandDesignUpdateToggles
 import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
 import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.omnibar.OmnibarType
@@ -34,6 +33,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
 import com.duckduckgo.common.ui.DuckDuckGoTheme
+import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.store.ThemingDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope

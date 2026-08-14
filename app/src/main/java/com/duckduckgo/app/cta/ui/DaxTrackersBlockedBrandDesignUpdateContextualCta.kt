@@ -27,7 +27,6 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.trackerdetection.model.Entity
-import com.duckduckgo.common.ui.view.button.DaxButtonPrimary
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.extensions.html
@@ -71,7 +70,7 @@ data class DaxTrackersBlockedBrandDesignUpdateContextualCta(
     }
 
     override fun setOnPrimaryCtaClicked(onButtonClicked: () -> Unit) {
-        ctaView?.findViewById<DaxButtonPrimary>(R.id.contextualBrandDesignPrimaryCta)?.setOnClickListener {
+        ctaView?.findViewById<View>(R.id.contextualBrandDesignPrimaryCta)?.setOnClickListener {
             onButtonClicked.invoke()
         }
     }

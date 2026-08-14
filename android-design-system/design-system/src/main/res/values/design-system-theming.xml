@@ -82,6 +82,13 @@
         <item name="daxButtonGhost">@style/Widget.DuckDuckGo.DaxButton.Ghost</item>
         <item name="daxButtonGhostDestructive">@style/Widget.DuckDuckGo.DaxButton.DestructiveGhost</item>
         <item name="daxButtonGhostAlt">@style/Widget.DuckDuckGo.DaxButton.DestructiveGhostAlt</item>
+        <item name="daxButtonBrand">@style/Widget.DuckDuckGo.DaxButton.Rebrand.Brand</item>
+        <item name="daxButtonSmallHeight">@dimen/buttonSmallHeight</item>
+        <item name="daxButtonLargeHeight">@dimen/buttonLargeHeight</item>
+        <item name="daxButtonSmallSidePadding">@dimen/buttonSmallSidePadding</item>
+        <item name="daxButtonLargeSidePadding">@dimen/buttonLargeSidePadding</item>
+        <item name="daxButtonSmallTopPadding">@dimen/buttonSmallTopPadding</item>
+        <item name="daxButtonLargeTopPadding">@dimen/buttonLargeTopPadding</item>
 
         <item name="twoLineListItemStyle">@style/Widget.DuckDuckGo.TwoLineListItem</item>
         <item name="oneLineListItemStyle">@style/Widget.DuckDuckGo.OneLineListItem</item>
@@ -260,6 +267,23 @@
         <item name="daxColorButtonGhostAltTextPressed">@color/white84</item>
         <item name="daxColorButtonDestructiveGhostText">@color/alertRedOnDarkDefault</item>
         <item name="daxColorButtonDestructiveGhostTextPressed">@color/alertRedOnDarkDefault</item>
+        <item name="daxColorButtonBrandContainer">@color/pollen40</item>
+        <item name="daxColorButtonBrandContainerPressed">@color/pollen60</item>
+        <item name="daxColorButtonBrandText">@color/pollen100</item>
+        <item name="daxColorRebrandButtonPrimaryContainer">@color/pondwater40</item>
+        <item name="daxColorRebrandButtonPrimaryContainerPressed">@color/pondwater60</item>
+        <item name="daxColorRebrandButtonPrimaryText">@color/eggshell90</item>
+        <item name="daxColorRebrandButtonSecondaryFillContainer">@color/white4</item>
+        <item name="daxColorRebrandButtonSecondaryFillContainerPressed">@color/white8</item>
+        <item name="daxColorRebrandButtonSecondaryFillText">@color/white</item>
+        <item name="daxColorRebrandButtonGhostContainerPressed">@color/accent_glow_secondary_dark</item>
+        <item name="daxColorRebrandButtonGhostText">@color/pondwater40</item>
+        <item name="daxColorRebrandButtonDestructiveContainer">@color/rb_red40</item>
+        <item name="daxColorRebrandButtonDestructiveContainerPressed">@color/rb_red60</item>
+        <item name="daxColorRebrandButtonDestructiveText">@color/black</item>
+        <item name="daxColorRebrandButtonDestructiveSecondaryText">@color/rb_red20</item>
+        <item name="daxColorRebrandButtonDestructiveGhostContainerPressed">@color/destructive_glow_secondary_dark</item>
+        <item name="daxColorRebrandButtonDestructiveGhostText">@color/rb_red20</item>
 
         <!-- Fab -->
         <item name="daxColorFabPrimaryContainer">@color/blue20</item>
@@ -403,6 +427,23 @@
         <item name="daxColorButtonGhostAltTextPressed">@color/black60</item>
         <item name="daxColorButtonDestructiveGhostText">@color/alertRedOnLightDefault</item>
         <item name="daxColorButtonDestructiveGhostTextPressed">@color/alertRedOnLightPressed</item>
+        <item name="daxColorButtonBrandContainer">@color/mandarin50</item>
+        <item name="daxColorButtonBrandContainerPressed">@color/mandarin70</item>
+        <item name="daxColorButtonBrandText">@color/white</item>
+        <item name="daxColorRebrandButtonPrimaryContainer">@color/pondwater60</item>
+        <item name="daxColorRebrandButtonPrimaryContainerPressed">@color/pondwater80</item>
+        <item name="daxColorRebrandButtonPrimaryText">@color/white</item>
+        <item name="daxColorRebrandButtonSecondaryFillContainer">@color/black6</item>
+        <item name="daxColorRebrandButtonSecondaryFillContainerPressed">@color/black12</item>
+        <item name="daxColorRebrandButtonSecondaryFillText">@color/black96</item>
+        <item name="daxColorRebrandButtonGhostContainerPressed">@color/accent_glow_secondary_light</item>
+        <item name="daxColorRebrandButtonGhostText">@color/pondwater60</item>
+        <item name="daxColorRebrandButtonDestructiveContainer">@color/rb_red50</item>
+        <item name="daxColorRebrandButtonDestructiveContainerPressed">@color/rb_red70</item>
+        <item name="daxColorRebrandButtonDestructiveText">@color/white</item>
+        <item name="daxColorRebrandButtonDestructiveSecondaryText">@color/rb_red60</item>
+        <item name="daxColorRebrandButtonDestructiveGhostContainerPressed">@color/destructive_glow_secondary_light</item>
+        <item name="daxColorRebrandButtonDestructiveGhostText">@color/rb_red60</item>
 
         <!-- Fab -->
         <item name="daxColorFabPrimaryContainer">@color/blue50</item>

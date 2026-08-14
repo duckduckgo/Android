@@ -69,7 +69,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_FIRE_DIALOG_CT
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.view.TypeAnimationTextView
 import com.duckduckgo.common.ui.view.button.DaxButton
-import com.duckduckgo.common.ui.view.button.DaxButtonPrimary
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleBrandDesignUpdateCardView
@@ -1117,7 +1116,7 @@ sealed class OnboardingDaxDialogCta(
 
         private fun applyPrimaryCtaText(container: View) {
             val text = buttonText ?: return
-            container.findViewById<DaxButtonPrimary>(R.id.contextualBrandDesignPrimaryCta)?.setText(text)
+            container.findViewById<DaxButton>(R.id.contextualBrandDesignPrimaryCta)?.setText(text)
         }
 
         private fun applyDismissButtonVisibility(container: View) {
