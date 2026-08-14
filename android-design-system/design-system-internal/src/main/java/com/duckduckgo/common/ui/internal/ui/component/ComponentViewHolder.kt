@@ -73,13 +73,13 @@ import com.duckduckgo.common.ui.compose.cards.DaxSurface
 import com.duckduckgo.common.ui.compose.checkbox.DaxCheckbox
 import com.duckduckgo.common.ui.compose.divider.DaxHorizontalDivider
 import com.duckduckgo.common.ui.compose.divider.DaxVerticalDivider
+import com.duckduckgo.common.ui.compose.layout.DaxScaffold
 import com.duckduckgo.common.ui.compose.listitem.DaxListItemIconBackground
 import com.duckduckgo.common.ui.compose.listitem.DaxListItemIconSize
 import com.duckduckgo.common.ui.compose.listitem.DaxListItemTrailingIconSize
 import com.duckduckgo.common.ui.compose.listitem.DaxOneLineListItem
 import com.duckduckgo.common.ui.compose.listitem.DaxSettingsListItem
 import com.duckduckgo.common.ui.compose.listitem.DaxTwoLineListItem
-import com.duckduckgo.common.ui.compose.layout.DaxScaffold
 import com.duckduckgo.common.ui.compose.message.remote.DaxBigSingleActionMessage
 import com.duckduckgo.common.ui.compose.message.remote.DaxBigTwoActionsMessage
 import com.duckduckgo.common.ui.compose.message.remote.DaxMediumMessage
