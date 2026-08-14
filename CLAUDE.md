@@ -52,6 +52,7 @@ what you remember of it.
 | `.claude/docs/navigation.md` | adding a screen or navigating to one — `ActivityParams`, `@ContributeToActivityStarter`, deeplinks, and which `GlobalActivityStarter` overload to use |
 | `.claude/docs/url-classification.md` | routing typed input to navigation vs search — use `QueryUrlPredictor`, not `UriString.isWebUrl()` |
 | `.claude/docs/icons.md` | the change needs an icon the project doesn't have yet — it must be fetched from the internal Icons repository, never invented |
+| `.claude/docs/translations.md` | adding or changing any user-facing string — `donottranslate.xml` vs `strings-<module>.xml`, placeholder/`instruction` rules, how to change or remove already-translated copy |
 
 ---
 
