@@ -55,7 +55,6 @@ sealed class ModuleType {
                 ApiPureKotlin -> "api"
                 Impl -> "impl"
                 Internal -> "internal"
-                else -> throw IllegalArgumentException("Module type [${javaClass.simpleName} does not have a destination directory")
             }
         }
 
@@ -65,7 +64,6 @@ sealed class ModuleType {
                 ApiPureKotlin -> "api"
                 Impl -> "impl"
                 Internal -> "internal"
-                else -> throw IllegalArgumentException("Module type [${javaClass.simpleName} does not have a template")
             }
         }
 
