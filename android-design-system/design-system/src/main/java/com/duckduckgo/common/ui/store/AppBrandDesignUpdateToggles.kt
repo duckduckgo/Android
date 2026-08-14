@@ -22,11 +22,8 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 
 /**
- * App-wide brand design update (rebrand) feature flag, excluding onboarding which is gated via
+ * App-wide, theme-related design changes feature flag, excluding onboarding which is gated via
  * `OnboardingBrandDesignUpdateToggles`.
- *
- * Gate rebrand changes on [feature] via `feature().isEnabled()`, never on [self]:
- * self() cannot use the incremental rollout mechanism.
  */
 @ContributesRemoteFeature(
     scope = AppScope::class,
@@ -37,10 +34,16 @@ interface AppBrandDesignUpdateToggles {
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun self(): Toggle
 
-    /** Off leaves Change app icon below the theme and night mode settings on the Appearance screen. */
+    /**
+     * Off leaves Change app icon below the theme and night mode settings on the Appearance screen.
+     * */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun appIcon(): Toggle
 
+    /**
+     * Gates theme-level design changes. This currently includes the rebrand button styling and
+     * theme-specific accent blue; future theme-controlled changes should use this sub-toggle.
+     */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun feature(): Toggle
+    fun theme(): Toggle
 }

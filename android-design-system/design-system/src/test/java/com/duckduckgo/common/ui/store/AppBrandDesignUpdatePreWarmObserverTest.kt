@@ -47,7 +47,7 @@ class AppBrandDesignUpdatePreWarmObserverTest {
     @Before
     fun setup() {
         whenever(dispatcherProvider.io()).thenReturn(coroutineRule.testDispatcher)
-        whenever(toggles.feature()).thenReturn(feature)
+        whenever(toggles.theme()).thenReturn(feature)
     }
 
     @Test

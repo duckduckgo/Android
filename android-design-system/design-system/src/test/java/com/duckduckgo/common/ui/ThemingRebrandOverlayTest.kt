@@ -62,6 +62,21 @@ class ThemingRebrandOverlayTest {
             setTheme(themeResId)
         }
 
+    private fun resolveColor(
+        activity: AppCompatActivity,
+        attr: Int,
+    ): Int {
+        val value = TypedValue()
+        activity.theme.resolveAttribute(attr, value, true)
+        return value.data
+    }
+
+    private fun colorOf(colorRes: Int): Int =
+        RuntimeEnvironment.getApplication().resources.getColor(colorRes, null)
+
+    private fun themedActivity(): AppCompatActivity =
+        Robolectric.buildActivity(AppCompatActivity::class.java).get()
+
     @Test
     fun whenFixedThemeActivityWithBrandDesignUpdateThenRebrandStyleResolves() {
         val activity = fixedThemeActivity()
@@ -117,5 +132,43 @@ class ThemingRebrandOverlayTest {
     @Test
     fun whenThemeIsAppCompatTransparentThenRebrandOverlayIsNotSupported() {
         assertFalse(themeFor(R.style.Theme_AppCompat_Transparent_NoActionBar).supportsRebrandOverlay())
+    }
+
+    @Test
+    fun whenLightThemeWithBrandDesignUpdateThenAccentBlueIsPondwater60() {
+        val activity = themedActivity()
+        activity.applyTheme(DuckDuckGoTheme.LIGHT, applyBrandDesignUpdate = true)
+        assertEquals(colorOf(R.color.pondwater60), resolveColor(activity, R.attr.daxColorAccentBlue))
+    }
+
+    @Test
+    fun whenDarkThemeWithBrandDesignUpdateThenAccentBlueIsPondwater40() {
+        val activity = themedActivity()
+        activity.applyTheme(DuckDuckGoTheme.DARK, applyBrandDesignUpdate = true)
+        assertEquals(colorOf(R.color.pondwater40), resolveColor(activity, R.attr.daxColorAccentBlue))
+    }
+
+    @Test
+    fun whenLightThemeWithoutBrandDesignUpdateThenAccentBlueIsUnchanged() {
+        val activity = themedActivity()
+        activity.applyTheme(DuckDuckGoTheme.LIGHT)
+        assertEquals(colorOf(R.color.blue50), resolveColor(activity, R.attr.daxColorAccentBlue))
+    }
+
+    @Test
+    fun whenDarkThemeWithoutBrandDesignUpdateThenAccentBlueIsUnchanged() {
+        val activity = themedActivity()
+        activity.applyTheme(DuckDuckGoTheme.DARK)
+        assertEquals(colorOf(R.color.blue30), resolveColor(activity, R.attr.daxColorAccentBlue))
+    }
+
+    @Test
+    fun whenBrandDesignUpdateThenSwitchTrackFollowsAccentBlue() {
+        val activity = themedActivity()
+        activity.applyTheme(DuckDuckGoTheme.LIGHT, applyBrandDesignUpdate = true)
+        assertEquals(
+            resolveColor(activity, R.attr.daxColorAccentBlue),
+            resolveColor(activity, R.attr.daxColorSwitchTrackOn),
+        )
     }
 }

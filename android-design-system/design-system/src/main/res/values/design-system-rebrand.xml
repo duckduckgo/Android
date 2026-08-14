@@ -41,6 +41,7 @@
     <attr name="daxColorRebrandButtonDestructiveSecondaryText" format="color" />
     <attr name="daxColorRebrandButtonDestructiveGhostContainerPressed" format="color" />
     <attr name="daxColorRebrandButtonDestructiveGhostText" format="color" />
+    <attr name="daxColorRebrandAccentBlue" format="color" />
 
     <dimen name="rebrandButtonSmallHeight">48dp</dimen>
     <dimen name="rebrandButtonLargeHeight">56dp</dimen>
@@ -135,6 +136,7 @@
     </style>
 
     <style name="ThemeOverlay.Rebrand" parent="">
+        <item name="daxColorAccentBlue">?attr/daxColorRebrandAccentBlue</item>
         <item name="daxButtonPrimary">@style/Widget.DuckDuckGo.DaxButton.Rebrand.Primary</item>
         <item name="daxButtonSecondary">@style/Widget.DuckDuckGo.DaxButton.Rebrand.SecondaryFill</item>
         <item name="daxButtonGhost">@style/Widget.DuckDuckGo.DaxButton.Rebrand.Ghost</item>
