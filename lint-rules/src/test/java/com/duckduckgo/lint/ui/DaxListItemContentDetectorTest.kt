@@ -25,9 +25,11 @@ class DaxListItemContentDetectorTest {
     private val scopeStubs = kotlin(
         """
         package com.duckduckgo.common.ui.compose.listitem
-        object DaxListItemTrailingScope { fun Switch() {}; fun Icon() {} }
+        object DaxListItemTrailingScope { fun Switch() {}; fun Icon(painter: Int = 0) {} }
         object DaxListItemLeadingScope { fun Icon() {} }
         object DaxListItemInlineScope { fun Pill() {} }
+        fun painterResource(id: Int): Int = id
+        object Theme { val accentBlue: Int get() = 0 }
         fun DaxOneLineListItem(
             text: String,
             leadingContent: (DaxListItemLeadingScope.() -> Unit)? = null,
@@ -54,6 +56,7 @@ class DaxListItemContentDetectorTest {
         fun BadSwitch() {}
         fun BadIcon() {}
         fun BadPill() {}
+        fun Column(content: () -> Unit) {}
         fun screen() { $body }
         """,
     ).indented()
@@ -111,5 +114,20 @@ class DaxListItemContentDetectorTest {
             .allowCompilationErrors()
             .run()
             .expectClean()
+    }
+
+    @Test
+    fun whenScopeMemberTakesNonScopeValueArgumentsThenNoWarning() {
+        run("""DaxOneLineListItem(text = "x", trailingContent = { Icon(painterResource(1)) })""").expectClean()
+    }
+
+    @Test
+    fun whenScopeMemberTakesThemePropertyArgumentThenNoWarning() {
+        run("""DaxOneLineListItem(text = "x", trailingContent = { Icon(Theme.accentBlue) })""").expectClean()
+    }
+
+    @Test
+    fun whenSlotWrapsScopeMemberInLayoutThenWarning() {
+        run("""DaxOneLineListItem(text = "x", trailingContent = { Column { Icon() } })""").expectWarningCount(1)
     }
 }

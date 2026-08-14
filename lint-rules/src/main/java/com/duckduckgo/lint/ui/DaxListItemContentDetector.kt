@@ -41,33 +41,26 @@ class DaxListItemContentDetector : Detector(), SourceCodeScanner {
 
     internal class Handler(private val context: JavaContext) : UElementHandler() {
 
-        private val leadingMembers by lazy { membersOf(LEADING_SCOPE) }
-        private val trailingMembers by lazy { membersOf(TRAILING_SCOPE) }
-        private val inlineMembers by lazy { membersOf(INLINE_SCOPE) }
-
         override fun visitCallExpression(node: UCallExpression) {
             if (node.methodName !in LIST_ITEM_COMPOSABLES) return
-            check(node, "leadingContent", leadingMembers)
-            check(node, "trailingContent", trailingMembers)
-            check(node, "inlineContent", inlineMembers)
+            check(node, "leadingContent", LEADING_SCOPE)
+            check(node, "trailingContent", TRAILING_SCOPE)
+            check(node, "inlineContent", INLINE_SCOPE)
         }
 
-        private fun check(node: UCallExpression, paramName: String, allowed: List<String>) {
-            if (allowed.isEmpty()) return
+        private fun check(node: UCallExpression, paramName: String, scope: String) {
             val arg = node.valueArguments.find { node.getParameterForArgument(it)?.name == paramName } ?: return
-            val violations = mutableListOf<String>()
+            var violation = false
             arg.accept(object : AbstractUastVisitor() {
                 override fun visitCallExpression(node: UCallExpression): Boolean {
-                    val name = node.methodName
-                    if (name != null && name.firstOrNull()?.isUpperCase() == true && name !in allowed) violations += name
-                    return super.visitCallExpression(node)
+                    val owner = node.resolve()?.containingClass?.qualifiedName
+                    if (owner != null && owner != scope) violation = true
+                    // Judge only what the slot emits, so a call's own arguments are left unvisited.
+                    return true
                 }
             })
-            if (violations.isNotEmpty()) report(arg)
+            if (violation) report(arg)
         }
-
-        private fun membersOf(fqcn: String): List<String> =
-            context.evaluator.findClass(fqcn)?.methods?.filterNot { it.isConstructor }?.mapNotNull { it.name } ?: emptyList()
 
         private fun report(arg: UExpression) {
             context.report(
