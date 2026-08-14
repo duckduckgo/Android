@@ -96,7 +96,7 @@ class RealPostIdleSessionWideEventTest {
                     flowStatus = FlowStatus.Unknown,
                 ),
             ),
-            samplingProbability = any(),
+            samplingProbability = eq(0.05f),
             definition = any(),
         )
         verify(wideEventClient).intervalStart(eq(123L), eq("session_duration_ms_bucketed"), anyOrNull(), anyOrNull())
@@ -121,7 +121,7 @@ class RealPostIdleSessionWideEventTest {
             flowEntryPoint = isNull(),
             metadata = eq(mapOf("surface" to "lut")),
             cleanupPolicy = any(),
-            samplingProbability = any(),
+            samplingProbability = eq(0.05f),
             definition = any(),
         )
     }
