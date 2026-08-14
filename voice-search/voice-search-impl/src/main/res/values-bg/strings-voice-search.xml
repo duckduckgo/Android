@@ -24,7 +24,6 @@
     <string name="voiceSearchNegativeAction">Отмени</string>
     <string name="voiceSearchMicAccessDeniedDialogTitle">DuckDuckGo има нужда от достъп до микрофона</string>
     <string name="voiceSearchMicAccessDeniedDialogMessage">Ако искате да използвате нашето поверително гласово търсене, трябва да разрешите достъп до микрофона.</string>
-    <string name="voiceSearchMicAccessDeniedDialogMessageDuckAi">Ако искате да използвате гласов чат в Duck.ai, трябва да разрешите достъп до микрофона.</string>
     <string name="voiceSearchMicAccessDeniedDialogChangePermissions">Промяна на разрешенията</string>
     <string name="voiceSearchMicAccessDeniedDialogHideVoiceSearch">Скриване на гласово търсене</string>
     <string name="voiceSearchMicPermissionDeniedSnackbarMessage">За гласовите функции е необходимо разрешение за достъп до микрофона</string>

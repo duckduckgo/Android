@@ -24,7 +24,7 @@
     <string name="voiceSearchNegativeAction">Cancel</string>
     <string name="voiceSearchMicAccessDeniedDialogTitle">DuckDuckGo needs to access your microphone</string>
     <string name="voiceSearchMicAccessDeniedDialogMessage">Microphone permissions are needed if you want to use our Private Voice Search.</string>
-    <string name="voiceSearchMicAccessDeniedDialogMessageDuckAi">Microphone permissions are needed if you want to use Voice Chat in Duck.ai.</string>
+    <string name="voiceSearchMicAccessDeniedDialogMessageDuckAi">Microphone permissions are needed if you want to use our private voice features.</string>
     <string name="voiceSearchMicAccessDeniedDialogChangePermissions">Change Permissions</string>
     <string name="voiceSearchMicAccessDeniedDialogHideVoiceSearch">Hide Voice Search</string>
     <string name="voiceSearchMicPermissionDeniedSnackbarMessage">Microphone permission needed for voice features</string>
