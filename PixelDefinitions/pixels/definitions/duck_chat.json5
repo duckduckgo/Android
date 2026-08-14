@@ -1246,6 +1246,41 @@
         "suffixes": ["form_factor"],
         "parameters": ["appVersion", "unifiedInputSurface"]
     },
+    "m_aichat_edit_prompt_opened": {
+        "description": "User opened the fullscreen Edit Message screen for a sent prompt",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_edit_prompt_cancelled": {
+        "description": "User left the Edit Message screen without submitting (toolbar close, system or predictive back)",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_edit_prompt_submitted": {
+        "description": "User submitted the edited prompt from the Edit Message screen, replacing the original message",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_edit_prompt_image_removed": {
+        "description": "User removed an attached image while on the Edit Message screen",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion", "unifiedInputSurface"]
+    },
+    "m_aichat_edit_prompt_file_removed": {
+        "description": "User removed an attached file while on the Edit Message screen",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion", "unifiedInputSurface"]
+    },
     "m_aichat_unified_input_model_selected": {
         "description": "User selected a model in the Unified Input model picker",
         "owners": ["malmstein"],
