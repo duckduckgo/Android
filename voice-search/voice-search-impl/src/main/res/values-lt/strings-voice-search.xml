@@ -22,5 +22,12 @@
     <string name="voiceSearchListening">Kalbėkite dabar</string>
     <string name="voiceSearchListeningFooter">Garsas apdorojamas įrenginyje. Jis nesaugomas ir su niekuo, įskaitant „DuckDuckGo“, nebendrinamas.</string>
     <string name="voiceSearchNegativeAction">Atšaukti</string>
+    <string name="voiceSearchMicAccessDeniedDialogTitle">„DuckDuckGo“ reikia prieigos prie tavo mikrofono</string>
+    <string name="voiceSearchMicAccessDeniedDialogMessage">Jei nori naudotis mūsų privačia paieška balsu, reikia leidimo naudoti mikrofoną.</string>
+    <string name="voiceSearchMicAccessDeniedDialogMessageDuckAi">Norint naudotis mūsų privačiomis balso funkcijomis, reikia leidimo naudoti mikrofoną.</string>
+    <string name="voiceSearchMicAccessDeniedDialogChangePermissions">Keisti leidimus</string>
+    <string name="voiceSearchMicAccessDeniedDialogHideVoiceSearch">Slėpti paiešką balsu</string>
+    <string name="voiceSearchMicPermissionDeniedSnackbarMessage">Balso funkcijoms reikia leidimo naudoti mikrofoną</string>
+    <string name="voiceSearchMicPermissionDeniedSnackbarAction">Leisti</string>
     <string name="voiceSearchTitle">Paieška balsu</string>
 </resources>
