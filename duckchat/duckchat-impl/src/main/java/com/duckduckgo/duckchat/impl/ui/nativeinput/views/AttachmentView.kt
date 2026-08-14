@@ -196,13 +196,13 @@ class AttachmentView(
         pageContextContainer = pageContext
 
         val imagesContainer = ImageAttachmentsContainerView(context).also {
-            it.onAttachmentRemoved = { id -> vm.removeImageAttachment(id) }
+            it.onAttachmentRemoved = { id -> vm.removeImageAttachment(id, isEditMode) }
         }
         row.addView(imagesContainer)
         imageAttachmentsContainer = imagesContainer
 
         val filesContainer = FileAttachmentsContainerView(context).also {
-            it.onAttachmentRemoved = { attachment -> vm.removeFileAttachment(attachment.id) }
+            it.onAttachmentRemoved = { attachment -> vm.removeFileAttachment(attachment.id, isEditMode) }
         }
         row.addView(filesContainer)
         fileAttachmentsContainer = filesContainer

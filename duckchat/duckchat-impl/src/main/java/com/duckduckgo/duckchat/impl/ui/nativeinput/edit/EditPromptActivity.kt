@@ -32,6 +32,7 @@ import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.ActivityEditPromptBinding
 import com.duckduckgo.duckchat.impl.helper.EditPromptResult
 import com.duckduckgo.duckchat.impl.helper.EditPromptSessionStore
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.ui.NativeInputModeWidgetViewModel
 import com.duckduckgo.navigation.api.getActivityParams
 import kotlinx.coroutines.launch
@@ -54,11 +55,15 @@ class EditPromptActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
+    @Inject
+    lateinit var duckChatPixels: DuckChatPixels
+
     private val binding: ActivityEditPromptBinding by viewBinding()
 
     private val params by lazy { intent.getActivityParams(EditPromptScreenParams::class.java) }
 
     private var submitted = false
+    private var opened = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -99,6 +104,8 @@ class EditPromptActivity : DuckDuckGoActivity() {
             // field not yet focusable. Queuing after it (registered later, so it runs after) fixes it.
             asView().doOnAttach { focusInput(this@EditPromptActivity) }
         }
+        opened = true
+        duckChatPixels.fireEditPromptOpened()
 
         // The store's CompletableDeferred fans out to any number of awaiters, so this doesn't race
         // submit()/onDestroy()'s own resolve() calls — it just closes the screen if the session gets
@@ -128,6 +135,7 @@ class EditPromptActivity : DuckDuckGoActivity() {
                 files = binding.editPromptInput.getFileAttachmentsJson().toSubmittedFiles(),
             ),
         )
+        duckChatPixels.fireEditPromptSubmitted()
         finish()
     }
 
@@ -139,6 +147,9 @@ class EditPromptActivity : DuckDuckGoActivity() {
      */
     override fun finish() {
         params?.sessionId?.let { editPromptSessionStore.resolve(it, EditPromptResult.Cancelled) }
+        // Only a real cancel from an already-shown screen, not the early bail-out for a dead/stale
+        // session (params/payload missing) or the tail end of submit()'s own finish() call.
+        if (opened && !submitted) duckChatPixels.fireEditPromptCancelled()
         super.finish()
     }
 

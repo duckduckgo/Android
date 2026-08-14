@@ -229,6 +229,17 @@ interface DuckChatPixels {
     fun fireVoiceTapped(surface: DuckChatPixelSurface)
     fun fireVoiceSearchTapped(surface: DuckChatPixelSurface)
     fun fireStopGenerationTapped(surface: DuckChatPixelSurface)
+
+    /** The fullscreen Edit Message screen was opened for a sent prompt. */
+    fun fireEditPromptOpened()
+
+    /** The Edit Message screen was left without submitting (toolbar close, system/predictive back). */
+    fun fireEditPromptCancelled()
+
+    /** The edited prompt was submitted, replacing the original message. */
+    fun fireEditPromptSubmitted()
+    fun fireEditPromptImageRemoved(surface: DuckChatPixelSurface)
+    fun fireEditPromptFileRemoved(surface: DuckChatPixelSurface)
     fun fireDuckAiChatHistorySuggestionClicked()
     fun fireDuckAiSearchDuckDuckGoSuggestionClicked()
     fun fireRecentChatDeleteButtonTapped()
@@ -857,6 +868,33 @@ class RealDuckChatPixels @Inject constructor(
         surfaceParams(surface),
     )
 
+    override fun fireEditPromptOpened() = fireCountAndDaily(
+        DuckChatPixelName.DUCK_CHAT_EDIT_PROMPT_OPENED_COUNT,
+        DuckChatPixelName.DUCK_CHAT_EDIT_PROMPT_OPENED_DAILY,
+    )
+
+    override fun fireEditPromptCancelled() = fireCountAndDaily(
+        DuckChatPixelName.DUCK_CHAT_EDIT_PROMPT_CANCELLED_COUNT,
+        DuckChatPixelName.DUCK_CHAT_EDIT_PROMPT_CANCELLED_DAILY,
+    )
+
+    override fun fireEditPromptSubmitted() = fireCountAndDaily(
+        DuckChatPixelName.DUCK_CHAT_EDIT_PROMPT_SUBMITTED_COUNT,
+        DuckChatPixelName.DUCK_CHAT_EDIT_PROMPT_SUBMITTED_DAILY,
+    )
+
+    override fun fireEditPromptImageRemoved(surface: DuckChatPixelSurface) = fireCountAndDaily(
+        DuckChatPixelName.DUCK_CHAT_EDIT_PROMPT_IMAGE_REMOVED_COUNT,
+        DuckChatPixelName.DUCK_CHAT_EDIT_PROMPT_IMAGE_REMOVED_DAILY,
+        surfaceParams(surface),
+    )
+
+    override fun fireEditPromptFileRemoved(surface: DuckChatPixelSurface) = fireCountAndDaily(
+        DuckChatPixelName.DUCK_CHAT_EDIT_PROMPT_FILE_REMOVED_COUNT,
+        DuckChatPixelName.DUCK_CHAT_EDIT_PROMPT_FILE_REMOVED_DAILY,
+        surfaceParams(surface),
+    )
+
     override fun fireFileValidationFailed(reason: String, surface: DuckChatPixelSurface) = fireCountAndDaily(
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_FILE_VALIDATION_FAILED_COUNT,
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_FILE_VALIDATION_FAILED_DAILY,
@@ -1260,6 +1298,18 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_UNIFIED_INPUT_VOICE_SEARCH_TAPPED_COUNT("m_aichat_unified_input_voice_search_tapped_count"),
     DUCK_CHAT_UNIFIED_INPUT_VOICE_SEARCH_TAPPED_DAILY("m_aichat_unified_input_voice_search_tapped_daily"),
     DUCK_CHAT_UNIFIED_INPUT_STOP_GENERATION_TAPPED("m_aichat_unified_input_stop_generation_tapped"),
+
+    // Edit Message screen (fullscreen prompt editor)
+    DUCK_CHAT_EDIT_PROMPT_OPENED_COUNT("m_aichat_edit_prompt_opened_count"),
+    DUCK_CHAT_EDIT_PROMPT_OPENED_DAILY("m_aichat_edit_prompt_opened_daily"),
+    DUCK_CHAT_EDIT_PROMPT_CANCELLED_COUNT("m_aichat_edit_prompt_cancelled_count"),
+    DUCK_CHAT_EDIT_PROMPT_CANCELLED_DAILY("m_aichat_edit_prompt_cancelled_daily"),
+    DUCK_CHAT_EDIT_PROMPT_SUBMITTED_COUNT("m_aichat_edit_prompt_submitted_count"),
+    DUCK_CHAT_EDIT_PROMPT_SUBMITTED_DAILY("m_aichat_edit_prompt_submitted_daily"),
+    DUCK_CHAT_EDIT_PROMPT_IMAGE_REMOVED_COUNT("m_aichat_edit_prompt_image_removed_count"),
+    DUCK_CHAT_EDIT_PROMPT_IMAGE_REMOVED_DAILY("m_aichat_edit_prompt_image_removed_daily"),
+    DUCK_CHAT_EDIT_PROMPT_FILE_REMOVED_COUNT("m_aichat_edit_prompt_file_removed_count"),
+    DUCK_CHAT_EDIT_PROMPT_FILE_REMOVED_DAILY("m_aichat_edit_prompt_file_removed_daily"),
 
     // Subscription-funnel impressions. The matching "click" is DUCK_CHAT_UNIFIED_INPUT_SUBSCRIPTION_UPSELL_TRIGGERED.
     DUCK_CHAT_UNIFIED_INPUT_MODEL_PICKER_SHOWN("m_aichat_unified_input_model_picker_shown"),
