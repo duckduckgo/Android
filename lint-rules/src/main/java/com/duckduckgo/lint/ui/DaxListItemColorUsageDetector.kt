@@ -27,13 +27,17 @@ import com.android.tools.lint.detector.api.Severity
 import com.android.tools.lint.detector.api.SourceCodeScanner
 import com.android.tools.lint.detector.api.TextFormat
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiField
-import com.intellij.psi.PsiMethod
+import com.intellij.psi.PsiParameter
+import org.jetbrains.uast.UBlockExpression
 import org.jetbrains.uast.UCallExpression
 import org.jetbrains.uast.UExpression
+import org.jetbrains.uast.UMethod
 import org.jetbrains.uast.UQualifiedReferenceExpression
 import org.jetbrains.uast.UReferenceExpression
+import org.jetbrains.uast.UReturnExpression
+import org.jetbrains.uast.UVariable
 import org.jetbrains.uast.getParameterForArgument
+import org.jetbrains.uast.toUElement
 import java.util.EnumSet
 
 @Suppress("UnstableApiUsage")
@@ -72,6 +76,10 @@ class DaxListItemColorUsageDetector : Detector(), SourceCodeScanner {
             // Direct reference to static colors in compose theme package.
             if (resolvesToThemePackageElement(argument)) return true
 
+            // A colour forwarded from the enclosing composable's own parameter is the caller's to justify,
+            // and the parameter's default is invisible once the declaration is resolved from bytecode.
+            if (resolveExpression(argument) is PsiParameter) return true
+
             // Reference via defaults object/property: validate declaration implementation.
             return resolvesToValidatedColorDeclaration(
                 expression = argument,
@@ -100,13 +108,10 @@ class DaxListItemColorUsageDetector : Detector(), SourceCodeScanner {
         }
 
         private fun isThemePackageElement(element: PsiElement): Boolean {
-            val qualifiedName = when (element) {
-                is PsiMethod -> element.containingClass?.qualifiedName
-                is PsiField -> element.containingClass?.qualifiedName
-                else -> null
-            } ?: return false
-
-            return qualifiedName.startsWith(COLOR_THEME_PACKAGE)
+            // Resolve the package rather than a containing class: a theme colour declared as a data-class
+            // constructor `val` resolves to a parameter, which has no containing class.
+            val packageName = context.evaluator.getPackage(element)?.qualifiedName ?: return false
+            return packageName == COLOR_THEME_PACKAGE || packageName.startsWith("$COLOR_THEME_PACKAGE.")
         }
 
         private fun resolvesToValidatedColorDeclaration(
@@ -129,41 +134,34 @@ class DaxListItemColorUsageDetector : Detector(), SourceCodeScanner {
             if (declarationText.contains(COLOR_THEME_PACKAGE)) return true
             if (containsArbitraryComposeColorLiteral(declarationText)) return false
 
-            val referencedIdentifier = extractSimpleReturnedIdentifier(declarationText) ?: return false
-            return isImportedFromThemePackage(
-                fileText = declaration.containingFile?.text.orEmpty(),
-                identifier = referencedIdentifier,
-            )
+            val body = bodyExpressionOf(resolved) ?: return false
+            return resolvesToValidatedColorDeclaration(body, depth + 1, visited)
+        }
+
+        private fun bodyExpressionOf(element: PsiElement): UExpression? {
+            return when (val u = element.toUElement()) {
+                is UVariable -> u.uastInitializer
+                is UMethod -> singleExpressionBody(u.uastBody)
+                else -> null
+            }
+        }
+
+        private fun singleExpressionBody(body: UExpression?): UExpression? {
+            return when (body) {
+                null -> null
+                is UReturnExpression -> body.returnExpression
+                is UBlockExpression -> {
+                    val single = body.expressions.singleOrNull() ?: return null
+                    if (single is UReturnExpression) single.returnExpression else single
+                }
+                else -> body
+            }
         }
 
         private fun containsArbitraryComposeColorLiteral(declarationText: String): Boolean {
             // e.g. Color.Red, Color(0xFF123456)
             return declarationText.contains(ARBITRARY_COLOR_ACCESS_REGEX) ||
                 declarationText.contains(ARBITRARY_COLOR_CONSTRUCTOR_REGEX)
-        }
-
-        private fun extractSimpleReturnedIdentifier(declarationText: String): String? {
-            val getterMatch = GETTER_IDENTIFIER_REGEX.find(declarationText)
-            if (getterMatch != null) return getterMatch.groupValues[1]
-
-            val initializerMatch = INITIALIZER_IDENTIFIER_REGEX.find(declarationText)
-            if (initializerMatch != null) return initializerMatch.groupValues[1]
-
-            val returnMatch = RETURN_IDENTIFIER_REGEX.find(declarationText)
-            if (returnMatch != null) return returnMatch.groupValues[1]
-
-            return null
-        }
-
-        private fun isImportedFromThemePackage(
-            fileText: String,
-            identifier: String,
-        ): Boolean {
-            if (fileText.isBlank()) return false
-            val escapedThemePackage = Regex.escape(COLOR_THEME_PACKAGE)
-            val escapedIdentifier = Regex.escape(identifier)
-            val importRegex = Regex("""import\s+$escapedThemePackage\.$escapedIdentifier(\s+as\s+\w+)?""")
-            return importRegex.containsMatchIn(fileText)
         }
 
         private fun reportInvalidColorUsage(colorArgument: UExpression) {
@@ -181,10 +179,6 @@ class DaxListItemColorUsageDetector : Detector(), SourceCodeScanner {
 
         private val ARBITRARY_COLOR_ACCESS_REGEX = Regex("""\bColor\.[A-Za-z_][A-Za-z0-9_]*""")
         private val ARBITRARY_COLOR_CONSTRUCTOR_REGEX = Regex("""\bColor\s*\(""")
-
-        private val GETTER_IDENTIFIER_REGEX = Regex("""get\s*\(\s*\)\s*=\s*([A-Za-z_][A-Za-z0-9_]*)""")
-        private val INITIALIZER_IDENTIFIER_REGEX = Regex("""=\s*([A-Za-z_][A-Za-z0-9_]*)\s*${'$'}""")
-        private val RETURN_IDENTIFIER_REGEX = Regex("""return\s+([A-Za-z_][A-Za-z0-9_]*)""")
 
         val INVALID_DAX_LIST_ITEM_COLOR_USAGE = Issue
             .create(

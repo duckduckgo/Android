@@ -132,4 +132,23 @@ class DaxListItemColorUsageDetectorTest {
             .run()
             .expectClean()
     }
+
+    @Test
+    fun whenColorIsForwardedParameterThenClean() {
+        lint().files(
+            stubs,
+            kotlin(
+                """
+                package com.test
+                import androidx.compose.ui.graphics.Color
+                import com.duckduckgo.common.ui.compose.listitem.DaxOneLineListItem
+                fun wrapper(textColor: Color) { DaxOneLineListItem(text = "x", primaryTextColor = textColor) }
+                """,
+            ).indented(),
+        ).allowCompilationErrors()
+            .issues(DaxListItemColorUsageDetector.INVALID_DAX_LIST_ITEM_COLOR_USAGE)
+            .skipTestModes(TestMode.WHITESPACE)
+            .run()
+            .expectClean()
+    }
 }
