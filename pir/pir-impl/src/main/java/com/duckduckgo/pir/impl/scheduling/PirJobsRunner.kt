@@ -401,8 +401,8 @@ class RealPirJobsRunner @Inject constructor(
         context: Context,
         executionType: PirExecutionType,
         eligibleJobs: List<ScanJobRecord>,
-        onJobCompleted: (suspend () -> Unit)? = null,
-        onScanJobsResolved: (suspend (Int) -> Unit)? = null,
+        onJobCompleted: suspend () -> Unit = {},
+        onScanJobsResolved: suspend (Int) -> Unit = {},
     ): Int {
         val runType = if (executionType.isManual) {
             RunType.MANUAL
@@ -414,7 +414,7 @@ class RealPirJobsRunner @Inject constructor(
             pirScan.executeScanForJobs(eligibleJobs, context, runType, onJobCompleted, onScanJobsResolved)
         } else {
             logcat { "PIR-JOB-RUNNER: No eligible scan jobs to execute." }
-            onScanJobsResolved?.invoke(0)
+            onScanJobsResolved(0)
         }
         return eligibleJobs.size
     }

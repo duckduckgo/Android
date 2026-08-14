@@ -28,7 +28,7 @@ import javax.inject.Inject
 interface PirActionsRunnerStateEngineFactory {
     fun create(
         runType: PirJob.RunType,
-        brokerSteps: List<BrokerStep>,
+        brokerStep: BrokerStep,
         profileQuery: ProfileQuery,
     ): PirActionsRunnerStateEngine
 }
@@ -40,7 +40,7 @@ class RealPirActionsRunnerStateEngineFactory @Inject constructor(
 ) : PirActionsRunnerStateEngineFactory {
     override fun create(
         runType: PirJob.RunType,
-        brokerSteps: List<BrokerStep>,
+        brokerStep: BrokerStep,
         profileQuery: ProfileQuery,
     ): PirActionsRunnerStateEngine {
         return RealPirActionsRunnerStateEngine(
@@ -48,7 +48,7 @@ class RealPirActionsRunnerStateEngineFactory @Inject constructor(
             dispatcherProvider = dispatcherProvider,
             coroutineScope = coroutineScope,
             runType = runType,
-            brokerSteps = brokerSteps,
+            brokerStep = brokerStep,
             profileQuery = profileQuery,
         )
     }
