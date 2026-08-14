@@ -1,0 +1,49 @@
+name: Nightly E2E orchestrator
+
+# Schedules the standalone nightly E2E suites — the non release blocker suite and the Sync
+# critical path — once per DI framework. This wrapper exists because a `schedule` trigger
+# cannot pass inputs and a workflow cannot call itself, so each suite could otherwise only
+# ever be scheduled for one DI. Neither suite is release blocking: a failure reddens this run
+# and files an Asana task, but never blocks a release or LGC tagging. The release blocking
+# E2E suite is scheduled separately by nightly-orchestrator.yml.
+
+on:
+  schedule:
+    - cron: '0 5 * * *' # run at 5 AM UTC
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: 'Specific commit SHA to checkout (optional, defaults to latest)'
+        required: false
+        type: string
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Both DI frameworks are pinned explicitly: an omitted `ddg_di` means "whatever
+  # gradle.properties says", which would collapse both legs onto the same DI once the repo
+  # default flips.
+  call-non-blockers-suite:
+    name: Non release blockers (${{ matrix.di }})
+    strategy:
+      fail-fast: false
+      matrix:
+        di: [AnvilDagger, Metro]
+    uses: ./.github/workflows/e2e-nightly-non-blockers-suite.yml
+    with:
+      commit: ${{ inputs.commit || github.sha }}
+      ddg_di: ${{ matrix.di }}
+    secrets: inherit
+
+  call-sync-critical-path:
+    name: Sync critical path (${{ matrix.di }})
+    strategy:
+      fail-fast: false
+      matrix:
+        di: [AnvilDagger, Metro]
+    uses: ./.github/workflows/e2e-nightly-sync-critical-path.yml
+    with:
+      ddg_di: ${{ matrix.di }}
+    secrets: inherit

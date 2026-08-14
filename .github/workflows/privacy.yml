@@ -1,15 +1,10 @@
 name: Privacy Tests
 
-run-name: 'Privacy Tests (${{ inputs.ddg_di || ''AnvilDagger'' }})'
+run-name: 'Privacy Tests (${{ inputs.ddg_di || ''default DI'' }})'
 
+# The pull_request trigger lives in privacy-pr-content-scope-changed.yml, which runs this
+# workflow once per DI framework — a trigger here could only ever run one DI.
 on:
-  pull_request:
-    types:
-      - opened
-      - synchronize
-      - reopened
-    paths:
-      - 'node_modules/@duckduckgo/content-scope-scripts/**'
   workflow_call:
     inputs:
       commit:
@@ -17,10 +12,10 @@ on:
         required: true
         type: string
       ddg_di:
-        description: 'DI framework to build with (AnvilDagger or Metro)'
+        description: 'DI framework to build with. Leave empty to use ddg.di from gradle.properties; set AnvilDagger or Metro to pin one.'
         required: false
         type: string
-        default: 'AnvilDagger'
+        default: ''
   workflow_dispatch:
     inputs:
       commit:
@@ -28,22 +23,23 @@ on:
         required: false
         type: string
       ddg_di:
-        description: 'DI framework to build with (AnvilDagger or Metro)'
+        description: 'DI framework to build with. Leave empty to use ddg.di from gradle.properties; set AnvilDagger or Metro to pin one.'
         required: false
         type: string
-        default: 'AnvilDagger'
+        default: ''
 
+# The DI framework is part of the group because a single caller runs this workflow once per DI
 concurrency:
-  group: ${{ github.workflow_ref }}-${{ github.ref }}
+  group: ${{ github.workflow_ref }}-${{ github.ref }}-${{ inputs.ddg_di || 'default' }}
   cancel-in-progress: true
 
-# Workflow-level env: compute DI-variant suffixes once. Empty when AnvilDagger
-# (or input missing — pull_request triggers don't populate inputs) so
-# artifact/task names stay byte-identical to pre-change for the default Anvil path.
-# Pattern uses truthy-first ternary because `A && '' || X` is broken in GHA
-# expressions (empty string is falsy).
+# An empty `ddg_di` omits the flag so Gradle uses ddg.di from gradle.properties; `-Pddg.di=`
+# with an empty value would instead hit build.gradle's AnvilDagger fallback. Suffixes stay
+# empty for the default and AnvilDagger paths so artifact/task names are unchanged. Pattern
+# uses truthy-first ternary because `A && '' || X` is broken in GHA expressions (empty string
+# is falsy).
 env:
-  DDG_DI: ${{ inputs.ddg_di || 'AnvilDagger' }}
+  DI_FLAG: ${{ inputs.ddg_di != '' && format('-Pddg.di={0}', inputs.ddg_di) || '' }}
   DI_HYPHEN_SUFFIX: ${{ (inputs.ddg_di || 'AnvilDagger') != 'AnvilDagger' && format('-{0}', inputs.ddg_di) || '' }}
   DI_PAREN_SUFFIX: ${{ (inputs.ddg_di || 'AnvilDagger') != 'AnvilDagger' && format(' ({0})', inputs.ddg_di) || '' }}
 
@@ -122,11 +118,11 @@ jobs:
 
       - name: Build
         if: ${{ steps.tests-exist.outputs.run == 'true' }}
-        run: ./gradlew ${{ matrix.build-task }} -Pddg.di=${{ env.DDG_DI }}
+        run: ./gradlew ${{ matrix.build-task }} ${{ env.DI_FLAG }}
 
       - name: Run Android Tests
         if: ${{ steps.tests-exist.outputs.run == 'true' }}
-        run: ./gradlew ${{ matrix.flank-task }} --no-configuration-cache -Pddg.di=${{ env.DDG_DI }}
+        run: ./gradlew ${{ matrix.flank-task }} --no-configuration-cache ${{ env.DI_FLAG }}
 
       - name: Bundle the Android CI tests report
         if: ${{ always() && steps.tests-exist.outputs.run == 'true' }}
@@ -161,8 +157,7 @@ jobs:
           action: 'create-asana-task'
 
       - name: Adding as a release blocker
-        # Only block releases for the default Anvil path. Metro is informational.
-        if: ${{ failure() && env.DDG_DI == 'AnvilDagger' && steps.create-failure-task.outputs.taskId != '' }}
+        if: ${{ failure() && steps.create-failure-task.outputs.taskId != '' }}
         uses: duckduckgo/native-github-asana-sync@v2.6.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
