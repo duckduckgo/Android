@@ -1788,19 +1788,10 @@ class RealDuckChatTest {
     }
 
     @Test
-    fun whenHistoryScreenOffThenIsChatHistoryAvailableFalse() = runTest {
-        enableChatHistoryFlags()
-        duckChatFeature.historyScreen().setRawStoredState(State(enable = false))
-
-        assertFalse(testee.isChatHistoryAvailable())
-    }
-
-    @Test
     fun whenAllChatHistoryFlagsOffThenIsChatHistoryAvailableFalse() = runTest {
         duckChatFeature.self().setRawStoredState(State(enable = false))
         whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(false)
         duckChatFeature.useNativeStorageChatData().setRawStoredState(State(enable = false))
-        duckChatFeature.historyScreen().setRawStoredState(State(enable = false))
         testee.onPrivacyConfigDownloaded()
         coroutineRule.testScope.advanceUntilIdle()
 
@@ -1836,7 +1827,6 @@ class RealDuckChatTest {
     private suspend fun enableChatHistoryFlags() {
         duckChatFeature.self().setRawStoredState(State(enable = true))
         duckChatFeature.useNativeStorageChatData().setRawStoredState(State(enable = true))
-        duckChatFeature.historyScreen().setRawStoredState(State(enable = true))
         whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
         testee.onPrivacyConfigDownloaded()
         coroutineRule.testScope.advanceUntilIdle()
