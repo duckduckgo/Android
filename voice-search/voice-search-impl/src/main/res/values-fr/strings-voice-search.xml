@@ -22,5 +22,12 @@
     <string name="voiceSearchListening">Parlez maintenant</string>
     <string name="voiceSearchListeningFooter">L\'audio est traité directement sur l\'appareil. Il n\'est ni stocké ni partagé avec qui que ce soit, y compris DuckDuckGo.</string>
     <string name="voiceSearchNegativeAction">Annuler</string>
+    <string name="voiceSearchMicAccessDeniedDialogTitle">DuckDuckGo a besoin d’accéder à votre micro</string>
+    <string name="voiceSearchMicAccessDeniedDialogMessage">Les autorisations d’accès au micro sont nécessaires si vous souhaitez utiliser notre fonction de recherche vocale privée.</string>
+    <string name="voiceSearchMicAccessDeniedDialogMessageDuckAi">Les autorisations d’accès au micro sont nécessaires si vous souhaitez utiliser nos fonctionnalités vocales privées.</string>
+    <string name="voiceSearchMicAccessDeniedDialogChangePermissions">Modifier les autorisations</string>
+    <string name="voiceSearchMicAccessDeniedDialogHideVoiceSearch">Masquer la recherche vocale</string>
+    <string name="voiceSearchMicPermissionDeniedSnackbarMessage">Autorisation d’accès au micro requise pour les fonctionnalités vocales</string>
+    <string name="voiceSearchMicPermissionDeniedSnackbarAction">Autoriser</string>
     <string name="voiceSearchTitle">Recherche vocale</string>
 </resources>

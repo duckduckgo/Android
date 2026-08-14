@@ -22,5 +22,12 @@
     <string name="voiceSearchListening">Tal nu</string>
     <string name="voiceSearchListeningFooter">Lyden behandles på enheden. Den hverken gemmes eller deles med nogen, inklusive DuckDuckGo.</string>
     <string name="voiceSearchNegativeAction">Afbestil</string>
+    <string name="voiceSearchMicAccessDeniedDialogTitle">DuckDuckGo skal have adgang til din mikrofon</string>
+    <string name="voiceSearchMicAccessDeniedDialogMessage">Mikrofontilladelser er påkrævet, hvis du vil bruge vores private stemmesøgning.</string>
+    <string name="voiceSearchMicAccessDeniedDialogMessageDuckAi">Mikrofontilladelser er nødvendige, hvis du vil bruge vores private stemmefunktioner.</string>
+    <string name="voiceSearchMicAccessDeniedDialogChangePermissions">Skift tilladelser</string>
+    <string name="voiceSearchMicAccessDeniedDialogHideVoiceSearch">Skjul stemmesøgning</string>
+    <string name="voiceSearchMicPermissionDeniedSnackbarMessage">Mikrofontilladelse er nødvendig for stemmefunktioner</string>
+    <string name="voiceSearchMicPermissionDeniedSnackbarAction">Tillad</string>
     <string name="voiceSearchTitle">Stemmesøgning</string>
 </resources>

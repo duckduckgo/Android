@@ -22,5 +22,12 @@
     <string name="voiceSearchListening">Puhu nyt</string>
     <string name="voiceSearchListeningFooter">Ääni käsitellään laitteella. Sitä ei tallenneta eikä jaeta kenellekään, edes DuckDuckGolle.</string>
     <string name="voiceSearchNegativeAction">Peruuta</string>
+    <string name="voiceSearchMicAccessDeniedDialogTitle">DuckDuckGo tarvitsee mikrofonisi käyttöoikeuden</string>
+    <string name="voiceSearchMicAccessDeniedDialogMessage">Mikrofonin käyttöoikeudet tarvitaan, jos haluat käyttää yksityistä äänihakuamme.</string>
+    <string name="voiceSearchMicAccessDeniedDialogMessageDuckAi">Mikrofonin käyttöoikeudet tarvitaan, jos haluat käyttää yksityisiä äänitoimintojamme.</string>
+    <string name="voiceSearchMicAccessDeniedDialogChangePermissions">Muuta käyttöoikeuksia</string>
+    <string name="voiceSearchMicAccessDeniedDialogHideVoiceSearch">Piilota äänihaku</string>
+    <string name="voiceSearchMicPermissionDeniedSnackbarMessage">Mikrofonin käyttöoikeus tarvitaan äänitoimintoja varten</string>
+    <string name="voiceSearchMicPermissionDeniedSnackbarAction">Salli</string>
     <string name="voiceSearchTitle">Äänihaku</string>
 </resources>
