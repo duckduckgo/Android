@@ -519,4 +519,78 @@ class RealPirActionsRunnerTest {
 
         assertTrue(result.isSuccess)
     }
+
+    @Test
+    fun whenStaleRendererGoneFromPreviousStepThenDoesNotFailCurrentStep() = runTest {
+        // A runner executes step after step (see PirWorkDistributor), and the finished step's
+        // renderer-gone message can be delivered on the main looper once the next step is already
+        // running on the same runner. That stale callback must not fail the new step, which would
+        // abort the rest of the queue and report the whole run as renderer-gone.
+        val rendererGoneCaptor = argumentCaptor<(Boolean) -> Unit>()
+        whenever(
+            mockPirDetachedWebViewProvider.createInstance(any(), any(), any(), any(), rendererGoneCaptor.capture()),
+        ).thenReturn(mockWebView)
+
+        val stepA = async {
+            testee.execute(testProfileQuery, testScanStep)
+        }
+
+        yield()
+
+        sideEffectFlow.tryEmit(SideEffect.CompleteExecution)
+
+        assertTrue(stepA.await().isSuccess)
+
+        val staleRendererGoneFromStepA = rendererGoneCaptor.firstValue
+
+        val stepB = async {
+            testee.execute(testProfileQuery, testScanStep)
+        }
+
+        yield()
+
+        staleRendererGoneFromStepA.invoke(false)
+
+        sideEffectFlow.tryEmit(SideEffect.CompleteExecution)
+
+        assertTrue(stepB.await().isSuccess)
+    }
+
+    @Test
+    fun whenStalePageLoadedFromPreviousStepThenIsNotDispatchedToCurrentStep() = runTest {
+        val onPageLoadedCaptor = argumentCaptor<(String?) -> Unit>()
+        whenever(
+            mockPirDetachedWebViewProvider.createInstance(any(), any(), onPageLoadedCaptor.capture(), any(), any()),
+        ).thenReturn(mockWebView)
+
+        val stepA = async {
+            testee.execute(testProfileQuery, testScanStep)
+        }
+
+        yield()
+
+        sideEffectFlow.tryEmit(SideEffect.CompleteExecution)
+
+        assertTrue(stepA.await().isSuccess)
+
+        val stalePageLoadedFromStepA = onPageLoadedCaptor.firstValue
+
+        val stepB = async {
+            testee.execute(testProfileQuery, testScanStep)
+        }
+
+        yield()
+
+        stalePageLoadedFromStepA.invoke(testUrl)
+
+        sideEffectFlow.tryEmit(SideEffect.CompleteExecution)
+
+        assertTrue(stepB.await().isSuccess)
+
+        // Only the two Started events, one per step: the finished step's load must not advance the
+        // engine the new step is driving.
+        val eventCaptor = argumentCaptor<Event>()
+        verify(mockEngine, times(2)).dispatch(eventCaptor.capture())
+        assertTrue(eventCaptor.allValues.none { it is Event.LoadUrlComplete })
+    }
 }
