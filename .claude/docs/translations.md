@@ -24,8 +24,8 @@ lint rule fails the build otherwise:
 ```
 
 **During development, add new strings to `donottranslate.xml`.** Move them into the real strings file
-only when the copy is final and you're ready to request translations — see
-`.claude/skills/request-translations/SKILL.md` for that flow.
+only when the copy is final and you're ready to request translations: pushing half-finished copy costs
+days, since each round trip through Smartling takes a few.
 
 ## Rules for translatable strings
 
