@@ -5647,10 +5647,6 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun openDuckAIContextualMode() {
-        command.value = Command.ShowDuckAIContextualMode(tabId)
-    }
-
     fun onDuckChatOmnibarButtonClicked(
         query: String?,
         hasFocus: Boolean,

@@ -337,12 +337,10 @@ import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatContextual
 import com.duckduckgo.duckchat.api.DuckChatHistoryNoParams
 import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InteractionLock
-import com.duckduckgo.duckchat.impl.contextual.DuckChatContextualFragment
-import com.duckduckgo.duckchat.impl.contextual.DuckChatContextualFragment.Companion.KEY_DUCK_AI_CONTEXTUAL_RESULT
-import com.duckduckgo.duckchat.impl.contextual.DuckChatContextualFragment.Companion.KEY_DUCK_AI_URL
 import com.duckduckgo.duckchat.impl.contextual.DuckChatContextualSharedViewModel
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -427,7 +425,8 @@ class BrowserTabFragment :
     EmailProtectionUserPromptListener {
     private val supervisorJob = SupervisorJob()
 
-    private var duckAiContextualFragment: DuckChatContextualFragment? = null
+    private var duckAiContextualFragment: Fragment? = null
+    private var duckChatButtonAnchor: View? = null
     private var contextualSheetLayoutChangeListener: View.OnLayoutChangeListener? = null
     private var contextualSheetBottomSheetCallback: BottomSheetBehavior.BottomSheetCallback? = null
 
@@ -649,6 +648,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var duckChat: DuckChat
+
+    @Inject
+    lateinit var duckChatContextual: DuckChatContextual
 
     @Inject
     lateinit var newAddressBarPickerManager: NewAddressBarPickerManager
@@ -1486,9 +1488,6 @@ class BrowserTabFragment :
                     launchFilePicker(callback, mimeTypes)
                 },
                 restoreOmnibarAutocomplete = { forQuery -> restoreOmnibarAutocomplete(forQuery) },
-                onContextualSheetRequested = {
-                    viewModel.openDuckAIContextualMode()
-                },
             ),
         )
     }
@@ -2073,6 +2072,7 @@ class BrowserTabFragment :
             BottomSheetBehavior.from(binding.duckAiContextualFragmentContainer).removeBottomSheetCallback(it)
         }
         contextualSheetBottomSheetCallback = null
+        duckChatButtonAnchor = null
         browserNavigationBarIntegration.onDestroyView()
         renderer.removeBrandDesignFitListener()
         super.onDestroyView()
@@ -3062,7 +3062,14 @@ class BrowserTabFragment :
                 sharedContextualViewModel.onMainBrowserPageFinished(it.url, androidBrowserConfigFeature.storePageContext().isEnabled())
             }
 
-            is Command.ShowDuckAIContextualMode -> showDuckChatContextualSheet(it.tabId)
+            is Command.ShowDuckAIContextualMode -> {
+                val tabId = it.tabId
+                val anchor = duckChatButtonAnchor
+                duckChatButtonAnchor = null
+                viewLifecycleOwner.lifecycleScope.launch(dispatchers.main()) {
+                    duckChatContextual.launch(tabId, anchor) { showDuckChatContextualSheet(tabId) }
+                }
+            }
             is Command.StartAddressBarTrackersAnimation -> {
                 omnibar.startTrackersAnimation(it.trackerEntities)
             }
@@ -3916,7 +3923,8 @@ class BrowserTabFragment :
                     onOmnibarVoiceSearchPressed()
                 }
 
-                override fun onDuckChatButtonPressed() {
+                override fun onDuckChatButtonPressed(anchor: View) {
+                    duckChatButtonAnchor = anchor
                     val hasFocus = omnibar.omnibarTextInput.hasFocus()
                     val isNtp = omnibar.viewMode == ViewMode.NewTab
                     onOmnibarDuckChatPressed(query = omnibar.getText(), hasFocus = hasFocus, isNtp = isNtp)
@@ -3957,10 +3965,7 @@ class BrowserTabFragment :
 
     private fun createNewContextualFragment(tabId: String) {
         logcat { "Duck.ai Contextual: createNewContextualFragment" }
-        val fragment = DuckChatContextualFragment()
-        val args = Bundle()
-        args.putString(DuckChatContextualFragment.KEY_DUCK_AI_CONTEXTUAL_TAB_ID, tabId)
-        fragment.arguments = args
+        val fragment = duckChatContextual.createSheet(tabId)
 
         duckAiContextualFragment = fragment
         val transaction = childFragmentManager.beginTransaction()
@@ -3971,7 +3976,7 @@ class BrowserTabFragment :
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
     }
 
-    private fun openExistingContextualFragment(fragment: DuckChatContextualFragment) {
+    private fun openExistingContextualFragment(fragment: Fragment) {
         logcat { "Duck.ai Contextual: openExistingContextualFragment" }
         val transaction = childFragmentManager.beginTransaction()
         transaction.show(fragment)
@@ -3981,8 +3986,8 @@ class BrowserTabFragment :
     }
 
     private fun reactToDuckChatContextualSheetResult() {
-        childFragmentManager.setFragmentResultListener(KEY_DUCK_AI_CONTEXTUAL_RESULT, viewLifecycleOwner) { _, bundle ->
-            val contextualChatUrl = bundle.getString(KEY_DUCK_AI_URL)
+        childFragmentManager.setFragmentResultListener(DuckChatContextual.RESULT_KEY, viewLifecycleOwner) { _, bundle ->
+            val contextualChatUrl = bundle.getString(DuckChatContextual.RESULT_URL)
             contextualChatUrl?.let {
                 viewModel.openLinkInNewTab(contextualChatUrl.toUri())
                 removeDuckChatContextualSheet()

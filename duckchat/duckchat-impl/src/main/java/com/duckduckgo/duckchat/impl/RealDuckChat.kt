@@ -268,6 +268,12 @@ interface DuckChatInternal : DuckChat {
     fun isDuckChatContextualModeEnabled(): Boolean
 
     /**
+     * Returns whether the redesigned Duck.ai contextual entry (anchored menu) is enabled. Only
+     * meaningful when contextual mode is also enabled.
+     */
+    fun isContextualSheetRedesignEnabled(): Boolean
+
+    /**
      * Checks whether DuckChat is enabled based on remote config flag.
      */
     fun isDuckChatFeatureEnabled(): Boolean
@@ -503,6 +509,7 @@ class RealDuckChat @Inject constructor(
     private var keepSessionAliveInMinutes: Int = DEFAULT_SESSION_ALIVE
     private var clearChatHistory: Boolean = true
     private var isContextualModeEnabled: Boolean = false
+    private var contextualSheetRedesignEnabled: Boolean = false
     private var isAutomaticContextAttachmentEnabled: Boolean = false
     private var duckAiNativeStorage: Boolean = false
     private var areMultipleContentAttachmentsEnabled: Boolean = false
@@ -581,6 +588,8 @@ class RealDuckChat @Inject constructor(
     override fun isDuckChatFullScreenModeEnabled(): Boolean = isDuckChatFeatureEnabled
 
     override fun isDuckChatContextualModeEnabled(): Boolean = isContextualModeEnabled
+
+    override fun isContextualSheetRedesignEnabled(): Boolean = contextualSheetRedesignEnabled
 
     override fun isAutomaticContextAttachmentEnabled(): Boolean = isAutomaticContextAttachmentEnabled
     override fun isNativeStorageEnabled(): Boolean = duckAiNativeStorage
@@ -1049,6 +1058,8 @@ class RealDuckChat @Inject constructor(
 
             isContextualModeEnabled = showContextualMode && isContextualModeKillSwitch
             _showContextualMode.emit(isContextualModeEnabled)
+
+            contextualSheetRedesignEnabled = isContextualModeEnabled && duckChatFeature.contextualSheetRedesign().isEnabled()
 
             isAutomaticContextAttachmentEnabled = isContextualModeEnabled &&
                 duckChatFeature.automaticContextAttachment()

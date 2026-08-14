@@ -198,6 +198,8 @@ class FakeDuckChatInternal(
 
     override fun isDuckChatContextualModeEnabled(): Boolean = false
 
+    override fun isContextualSheetRedesignEnabled(): Boolean = false
+
     override fun isDuckChatFeatureEnabled(): Boolean = true
 
     override fun isChatSyncFeatureEnabled(): Boolean = true

@@ -112,7 +112,6 @@ class NativeInputCallbacks(
      * the caller uses the return value to decide whether to re-show the suggestions list.
      */
     val restoreOmnibarAutocomplete: (forQuery: String) -> Boolean = { _ -> false },
-    val onContextualSheetRequested: () -> Unit = {},
 )
 
 interface NativeInputManager {
