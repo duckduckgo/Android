@@ -365,18 +365,8 @@ interface AndroidBrowserConfigFeature {
     fun tabStateRestorationFix(): Toggle
 
     /**
-     * @return `true` when the remote config has the global "pdfViewer" androidBrowserConfig
-     * sub-feature flag enabled
-     * If the remote feature is not present defaults to `false`
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun pdfViewer(): Toggle
-
-    /**
      * Controls whether DuckDuckGo registers as a system handler for already-downloaded PDFs
-     * (system "Open with" sheet). Independent of [pdfViewer] so the external-handler rollout
-     * can be staged separately from the inline PDF viewer rollout; both must be enabled for
-     * DuckDuckGo to open an externally-delivered PDF.
+     * (system "Open with" sheet).
      * @return `true` when the remote config has the global "externalPdfHandler" androidBrowserConfig
      * sub-feature flag enabled
      * If the remote feature is not present defaults to `false`

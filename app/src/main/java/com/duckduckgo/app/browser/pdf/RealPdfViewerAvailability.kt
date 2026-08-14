@@ -18,7 +18,6 @@ package com.duckduckgo.app.browser.pdf
 
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.pdf.PdfViewerAvailability
-import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -26,7 +25,6 @@ import javax.inject.Inject
 @ContributesBinding(AppScope::class)
 class RealPdfViewerAvailability @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
-    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
 ) : PdfViewerAvailability {
-    override fun isAvailable(): Boolean = appBuildConfig.sdkInt >= 31 && androidBrowserConfigFeature.pdfViewer().isEnabled()
+    override fun isAvailable(): Boolean = appBuildConfig.sdkInt >= 31
 }

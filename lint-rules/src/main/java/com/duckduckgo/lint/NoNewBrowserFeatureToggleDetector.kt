@@ -128,7 +128,6 @@ class NoNewBrowserFeatureToggleDetector : Detector(), SourceCodeScanner {
             "AndroidBrowserConfigFeature#sendPostIdleSessionWideEvent",
             "AndroidBrowserConfigFeature#storePageContext",
             "AndroidBrowserConfigFeature#tabStateRestorationFix",
-            "AndroidBrowserConfigFeature#pdfViewer",
             "AndroidBrowserConfigFeature#externalPdfHandler",
             "AndroidBrowserConfigFeature#redirectDuckAiLinksFromCustomTab",
             "AndroidBrowserConfigFeature#webViewSessionPersistence",

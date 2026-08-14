@@ -155,7 +155,6 @@ class IntentDispatcherViewModel @Inject constructor(
     private fun localPdfUriOrNull(intent: Intent?): Uri? {
         if (intent?.action != Intent.ACTION_VIEW) return null
         if (appBuildConfig.sdkInt < 31) return null
-        if (!androidBrowserConfigFeature.pdfViewer().isEnabled()) return null
         if (!androidBrowserConfigFeature.externalPdfHandler().isEnabled()) return null
         val data = intent.data ?: return null
         val scheme = data.scheme?.lowercase()
