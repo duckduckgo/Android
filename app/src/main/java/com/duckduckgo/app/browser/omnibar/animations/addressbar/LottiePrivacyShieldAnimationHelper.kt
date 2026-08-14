@@ -63,7 +63,10 @@ class LottiePrivacyShieldAnimationHelper @Inject constructor(
             trackersAnimationEnabled,
         )
             ?: return false
-        val isStatic = isAddressBarRebrandEnabled && privacyShield == MALICIOUS
+        val isStatic = when (privacyShield) {
+            UNPROTECTED, MALICIOUS -> isAddressBarRebrandEnabled
+            PROTECTED, UNKNOWN -> false
+        }
 
         val currentAsset = holder.tag as? Pair<*, *>
         if (currentAsset != assetRes to isStatic) {

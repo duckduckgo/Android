@@ -449,7 +449,7 @@ class OmnibarLayout @JvmOverloads constructor(
     private val conflatedStateJob = ConflatedJob()
     private val conflatedCommandJob = ConflatedJob()
 
-    private var lastSeenPrivacyShield: PrivacyShieldState? = null
+    private var lastSeenPrivacyShield: Pair<PrivacyShieldState, Boolean>? = null
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
@@ -1286,8 +1286,9 @@ class OmnibarLayout @JvmOverloads constructor(
         viewMode: ViewMode,
         isAddressBarRebrandEnabled: Boolean,
     ) {
-        renderIfChanged(privacyShieldState, lastSeenPrivacyShield) {
-            lastSeenPrivacyShield = privacyShieldState
+        val renderState = privacyShieldState to isAddressBarRebrandEnabled
+        renderIfChanged(renderState, lastSeenPrivacyShield) {
+            lastSeenPrivacyShield = renderState
             val shieldIconView =
                 if (viewMode is ViewMode.Browser || viewMode is ViewMode.Pdf) {
                     shieldIcon
@@ -1321,6 +1322,24 @@ class OmnibarLayout @JvmOverloads constructor(
                     marginStart = 2.toPx(context)
                 }
                 shieldIconView.scaleType = ImageView.ScaleType.CENTER_INSIDE
+            } else if (privacyShieldState != PrivacyShieldState.UNKNOWN) {
+                val isNewCustomTab =
+                    viewMode is ViewMode.CustomTab && omnibarRepository.isNewCustomTabEnabled
+                shieldIconView.updateLayoutParams<MarginLayoutParams> {
+                    width = if (isNewCustomTab) {
+                        shieldIconBoxSize
+                    } else {
+                        LayoutParams.WRAP_CONTENT
+                    }
+                    height = LayoutParams.MATCH_PARENT
+                    marginStart = 0
+                }
+                shieldIconView.scaleType =
+                    if (isNewCustomTab) {
+                        ImageView.ScaleType.MATRIX
+                    } else {
+                        ImageView.ScaleType.FIT_CENTER
+                    }
             }
         }
     }

@@ -138,6 +138,23 @@ class LottiePrivacyShieldAnimationHelperTest {
         assertTrue(boxed)
     }
 
+    @Test
+    fun whenAddressBarRebrandEnabledAndPrivacyShieldUnprotectedThenUseAlertDrawable() = runTest {
+        val holder: LottieAnimationView = mock()
+        val appTheme: AppTheme = mock()
+        whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
+        val testee = LottiePrivacyShieldAnimationHelper(appTheme, mockAddressBarTrackersAnimationManager, omnibarRepository)
+
+        testee.setAnimationView(
+            holder,
+            UNPROTECTED,
+            browserViewMode,
+            isAddressBarRebrandEnabled = true,
+        )
+
+        verify(holder).setImageResource(R.drawable.shield_alert_24)
+    }
+
     @SuppressLint("DenyListedApi")
     @Test
     fun whenLightModeAndProtectedAndCustomTabViewModeThenUseCustomTabAssets() = runTest {
