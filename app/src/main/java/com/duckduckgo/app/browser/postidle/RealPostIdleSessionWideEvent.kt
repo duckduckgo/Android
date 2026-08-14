@@ -95,6 +95,7 @@ class RealPostIdleSessionWideEvent @Inject constructor(
                         flowStatus = FlowStatus.Unknown,
                     ),
                     metadata = mapOf(KEY_SURFACE to surface.value),
+                    samplingProbability = SAMPLING_PROBABILITY,
                 )
 
                 result.onSuccess { flowId ->
@@ -222,6 +223,7 @@ class RealPostIdleSessionWideEvent @Inject constructor(
     private companion object {
         const val TAG = "RealPostIdleSessionWideEvent"
         const val FEATURE_NAME = "post_idle_session"
+        const val SAMPLING_PROBABILITY = 0.05f
 
         const val REASON_BAR_USED = "bar_used"
         const val REASON_CHAT_SELECTED = "chat_selected"
