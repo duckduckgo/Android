@@ -64,6 +64,7 @@ class EditPromptActivity : DuckDuckGoActivity() {
 
     private var submitted = false
     private var opened = false
+    private var finishHandled = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -144,12 +145,19 @@ class EditPromptActivity : DuckDuckGoActivity() {
      * finish(), so resolving here gets the cancel across the JS bridge while the edit screen still
      * covers the web view. Waiting for onDestroy() would land the reply after the exit animation,
      * making the frontend's leave-edit re-render visible on the transcript the user is back on.
+     *
+     * resolve()'s CompletableDeferred resumes the onCreate() awaiter synchronously (Main.immediate,
+     * already on the main thread), which itself calls finish() again before isFinishing flips —
+     * finishHandled guards that re-entrant call so the cancel only resolves/fires once.
      */
     override fun finish() {
-        params?.sessionId?.let { editPromptSessionStore.resolve(it, EditPromptResult.Cancelled) }
-        // Only a real cancel from an already-shown screen, not the early bail-out for a dead/stale
-        // session (params/payload missing) or the tail end of submit()'s own finish() call.
-        if (opened && !submitted) duckChatPixels.fireEditPromptCancelled()
+        if (!finishHandled) {
+            finishHandled = true
+            params?.sessionId?.let { editPromptSessionStore.resolve(it, EditPromptResult.Cancelled) }
+            // Only a real cancel from an already-shown screen, not the early bail-out for a dead/stale
+            // session (params/payload missing) or the tail end of submit()'s own finish() call.
+            if (opened && !submitted) duckChatPixels.fireEditPromptCancelled()
+        }
         super.finish()
     }
 
