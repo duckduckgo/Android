@@ -24,6 +24,7 @@
     <string name="voiceSearchNegativeAction">Cancelar</string>
     <string name="voiceSearchMicAccessDeniedDialogTitle">DuckDuckGo necesita acceder a tu micrófono</string>
     <string name="voiceSearchMicAccessDeniedDialogMessage">Se necesitan permisos de micrófono si quieres usar nuestra búsqueda por voz privada.</string>
+    <string name="voiceSearchMicAccessDeniedDialogMessageDuckAi">Se necesitan permisos de micrófono si quieres usar nuestra búsqueda por voz privada.</string>
     <string name="voiceSearchMicAccessDeniedDialogChangePermissions">Cambiar permisos</string>
     <string name="voiceSearchMicAccessDeniedDialogHideVoiceSearch">Ocultar búsqueda por voz</string>
     <string name="voiceSearchMicPermissionDeniedSnackbarMessage">Se necesita permiso de micrófono para las funciones de voz</string>

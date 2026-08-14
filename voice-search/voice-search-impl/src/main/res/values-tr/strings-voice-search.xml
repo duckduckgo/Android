@@ -22,5 +22,12 @@
     <string name="voiceSearchListening">Şimdi Konuşun</string>
     <string name="voiceSearchListeningFooter">Ses cihazda işlenir. Saklanmaz ve DuckDuckGo da dâhil olmak üzere kimseyle paylaşılmaz.</string>
     <string name="voiceSearchNegativeAction">Vazgeç</string>
+    <string name="voiceSearchMicAccessDeniedDialogTitle">DuckDuckGo\'nun mikrofonunuza erişmesi gerekiyor</string>
+    <string name="voiceSearchMicAccessDeniedDialogMessage">Gizli Sesli Arama özelliğimizi kullanmak istiyorsanız mikrofon izinleri gereklidir.</string>
+    <string name="voiceSearchMicAccessDeniedDialogMessageDuckAi">Gizli sesli arama özelliğimizi kullanmak istiyorsanız mikrofon izinleri gereklidir.</string>
+    <string name="voiceSearchMicAccessDeniedDialogChangePermissions">İzinleri Değiştir</string>
+    <string name="voiceSearchMicAccessDeniedDialogHideVoiceSearch">Sesli Aramayı Gizle</string>
+    <string name="voiceSearchMicPermissionDeniedSnackbarMessage">Ses özellikleri için mikrofon izni gerekiyor</string>
+    <string name="voiceSearchMicPermissionDeniedSnackbarAction">İzin ver</string>
     <string name="voiceSearchTitle">Sesli arama</string>
 </resources>
