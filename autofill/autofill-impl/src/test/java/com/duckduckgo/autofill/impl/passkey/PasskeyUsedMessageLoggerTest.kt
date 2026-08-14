@@ -16,6 +16,7 @@
 
 package com.duckduckgo.autofill.impl.passkey
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import logcat.LogPriority
 import logcat.LogcatLogger
 import org.json.JSONObject
@@ -24,7 +25,10 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 
+// Robolectric so the temporary android.util.Log diagnostic in PasskeyUsedMessageLogger resolves.
+@RunWith(AndroidJUnit4::class)
 class PasskeyUsedMessageLoggerTest {
 
     private val logged = mutableListOf<String>()

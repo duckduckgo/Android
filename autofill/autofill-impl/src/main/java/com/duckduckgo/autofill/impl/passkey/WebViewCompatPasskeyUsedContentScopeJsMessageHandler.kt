@@ -38,6 +38,8 @@ class WebViewCompatPasskeyUsedContentScopeJsMessageHandler @Inject constructor(
 
     override fun getJsMessageHandler(): WebViewCompatMessageHandler = object : WebViewCompatMessageHandler {
         override fun process(jsMessage: JsMessage): ProcessResult? {
+            // TEMP diagnostic: proves the WebMessageListener transport routed to this handler.
+            android.util.Log.i("PasskeyUsedDbg", "webviewcompat handler process() reached: ${jsMessage.featureName}/${jsMessage.method}")
             logger.log(jsMessage.params)
             return null
         }

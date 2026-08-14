@@ -16,6 +16,7 @@
 
 package com.duckduckgo.autofill.impl.passkey
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessaging
 import org.json.JSONObject
@@ -23,9 +24,12 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
+// Robolectric so the temporary android.util.Log diagnostic in the handlers resolves.
+@RunWith(AndroidJUnit4::class)
 class PasskeyUsedContentScopeJsMessageHandlerTest {
 
     private val logger: PasskeyUsedMessageLogger = mock()

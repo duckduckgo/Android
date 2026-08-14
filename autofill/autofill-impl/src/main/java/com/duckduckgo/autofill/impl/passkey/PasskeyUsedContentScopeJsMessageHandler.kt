@@ -43,6 +43,8 @@ class PasskeyUsedContentScopeJsMessageHandler @Inject constructor(
             jsMessaging: JsMessaging,
             jsMessageCallback: JsMessageCallback?,
         ) {
+            // TEMP diagnostic: proves the classic transport routed the message to this handler.
+            android.util.Log.i("PasskeyUsedDbg", "classic handler process() reached: ${jsMessage.featureName}/${jsMessage.method}")
             logger.log(jsMessage.params)
         }
 

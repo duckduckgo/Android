@@ -16,6 +16,7 @@
 
 package com.duckduckgo.autofill.impl.passkey
 
+import android.util.Log
 import logcat.LogPriority.INFO
 import logcat.LogPriority.WARN
 import logcat.logcat
@@ -37,6 +38,10 @@ import javax.inject.Inject
 class PasskeyUsedMessageLogger @Inject constructor() {
 
     fun log(params: JSONObject) {
+        // TEMP diagnostic: android.util.Log writes regardless of the debuggable flag or the
+        // logcat{} logger being installed. Remove once the message flow is confirmed on device.
+        Log.i(DIAG_TAG, "log() reached with params=$params")
+
         val type = params.optString(PARAM_TYPE)
         if (type != TYPE_GET && type != TYPE_CREATE) {
             logcat(WARN) { "Passkey: ignoring message with unsupported type '$type'" }
@@ -58,6 +63,7 @@ class PasskeyUsedMessageLogger @Inject constructor() {
     }
 
     private companion object {
+        const val DIAG_TAG = "PasskeyUsedDbg"
         const val PARAM_TYPE = "type"
         const val PARAM_SUCCESS = "success"
         const val PARAM_ERROR = "error"
