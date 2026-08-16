@@ -24,6 +24,7 @@
     <string name="voiceSearchNegativeAction">Atcelt</string>
     <string name="voiceSearchMicAccessDeniedDialogTitle">DuckDuckGo ir nepieciešama piekļuve mikrofonam.</string>
     <string name="voiceSearchMicAccessDeniedDialogMessage">Ja vēlies izmantot mūsu privāto meklēšanu ar balsi, ir nepieciešamas mikrofona atļaujas.</string>
+    <string name="voiceSearchMicAccessDeniedDialogMessageDuckAi">Ja vēlies izmantot mūsu privātās balss funkcijas, ir nepieciešamas mikrofona atļaujas.</string>
     <string name="voiceSearchMicAccessDeniedDialogChangePermissions">Mainīt atļaujas</string>
     <string name="voiceSearchMicAccessDeniedDialogHideVoiceSearch">Paslēpt meklēšanu ar balsi</string>
     <string name="voiceSearchMicPermissionDeniedSnackbarMessage">Balss funkcijām nepieciešama mikrofona atļauja</string>
