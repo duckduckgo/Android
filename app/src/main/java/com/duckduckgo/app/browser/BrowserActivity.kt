@@ -85,7 +85,10 @@ import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CANCEL
+import com.duckduckgo.app.pixels.AppReturnPixelSender
 import com.duckduckgo.app.pixels.BrowserModeSwitchSource
+import com.duckduckgo.app.pixels.LaunchSourceValues
+import com.duckduckgo.app.pixels.toPixelLaunchSourceValue
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
@@ -171,6 +174,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var dataClearerForegroundAppRestartPixel: DataClearerForegroundAppRestartPixel
+
+    @Inject
+    lateinit var appReturnPixelSender: AppReturnPixelSender
 
     @Inject
     lateinit var serviceWorkerClientCompat: ServiceWorkerClientCompat
@@ -577,6 +583,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        appReturnPixelSender.fireIfNeeded(intent?.getStringExtra(LAUNCH_SOURCE_PIXEL_VALUE) ?: LaunchSourceValues.STANDARD)
+        // Consume launch extra so a later resume with no new Intent doesn't replay this.
+        intent?.removeExtra(LAUNCH_SOURCE_PIXEL_VALUE)
+    }
+
     override fun onStop() {
         openMessageInNewTabJob?.cancel()
 
@@ -604,6 +617,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         logcat(INFO) { "onNewIntent: $intent" }
 
         intent.sanitize()
+        setIntent(intent)
 
         intent.getStringExtra(LAUNCH_FROM_NOTIFICATION_PIXEL_NAME)?.let {
             viewModel.onLaunchedFromNotification(it)
@@ -1230,6 +1244,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             intent.putExtra(DUCK_CHAT_SESSION_ACTIVE, duckChatSessionActive)
             intent.putExtra(DELETED_TAB_COUNT_EXTRA, deletedTabCount)
             intent.putExtra(LAUNCH_REQUIRES_REGULAR_MODE, launchSource.requiresRegularMode)
+            intent.putExtra(LAUNCH_SOURCE_PIXEL_VALUE, launchSource.toPixelLaunchSourceValue())
             return intent
         }
 
@@ -1251,6 +1266,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
          * Stamped by entry points that must reach BrowserActivity in [BrowserMode.REGULAR].
          */
         const val LAUNCH_REQUIRES_REGULAR_MODE = "LAUNCH_REQUIRES_REGULAR_MODE"
+
+        /**
+         * The [BrowserLaunchSource], pre-mapped to its [LaunchSourceValues] pixel string. Read by
+         * [AppReturnPixelSender] for the `m_app_return` pixel's `launch_source` param.
+         */
+        const val LAUNCH_SOURCE_PIXEL_VALUE = "LAUNCH_SOURCE_PIXEL_VALUE"
 
         private const val OPEN_DUCK_CHAT = "OPEN_DUCK_CHAT_EXTRA"
         private const val CLOSE_DUCK_CHAT = "CLOSE_DUCK_CHAT_EXTRA"

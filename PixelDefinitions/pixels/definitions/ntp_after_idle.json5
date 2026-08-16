@@ -402,5 +402,59 @@
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
+    },
+
+    // App-return pixel: fired on every foreground transition, ungated by any feature flag
+    "m_app_return": {
+        "description": "Fires on every foreground transition, ungated and launch-action-independent. Reports how long the user was away, the resolved idle threshold, and which Duck.ai capabilities are available. This is the denominator for every \"% of app opens\" panel.",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "time_away_bucket",
+                "type": "string",
+                "description": "Time away before reopening",
+                "enum": ["cold_start", "lt_1m", "1_5m", "5_15m", "15_30m", "30_60m", "gt_60m"]
+            },
+            {
+                "key": "exceeded_idle_threshold",
+                "type": "boolean",
+                "description": "Whether the time away exceeded the resolved idle threshold, reported even when the after-inactivity feature is ineligible"
+            },
+            {
+                "key": "idle_threshold_seconds",
+                "type": "integer",
+                "description": "The resolved idle threshold in seconds (user preference, remote-config default, or hardcoded default), e.g. 1800"
+            },
+            {
+                "key": "after_inactivity_option",
+                "type": "string",
+                "description": "The effective after-inactivity opening setting",
+                "enum": ["new_tab_page", "last_opened_tab", "specific_page"]
+            },
+            {
+                "key": "feature_eligible",
+                "type": "boolean",
+                "description": "Whether the NTP-after-idle feature is available (remote flag on)"
+            },
+            {
+                "key": "unified_input_available",
+                "type": "boolean",
+                "description": "Whether the native input field capability is enabled for this user"
+            },
+            {
+                "key": "toggle_visible",
+                "type": "boolean",
+                "description": "Whether the resolved input-mode capability currently offers the Search/Duck.ai toggle"
+            },
+            {
+                "key": "launch_source",
+                "type": "string",
+                "description": "What triggered this foreground transition",
+                "enum": ["standard", "url", "shortcut", "widget", "other"]
+            }
+        ]
     }
 }

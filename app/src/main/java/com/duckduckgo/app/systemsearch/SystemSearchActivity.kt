@@ -53,6 +53,8 @@ import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.Companion.Q
 import com.duckduckgo.app.browser.newtab.QuickAccessDragTouchItemListener
 import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.pixels.AppReturnPixelSender
+import com.duckduckgo.app.pixels.LaunchSourceValues
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.AutocompleteItemRemoved
@@ -110,6 +112,9 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var dataClearerForegroundAppRestartPixel: DataClearerForegroundAppRestartPixel
+
+    @Inject
+    lateinit var appReturnPixelSender: AppReturnPixelSender
 
     @Inject
     lateinit var faviconManager: FaviconManager
@@ -247,6 +252,8 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     override fun onResume() {
         super.onResume()
 
+        appReturnPixelSender.fireIfNeeded(if (launchedFromAnyWidget(intent)) LaunchSourceValues.WIDGET else LaunchSourceValues.OTHER)
+
         if (viewModel.hasOmnibarTypeChanged) {
             recreate()
         }
@@ -254,6 +261,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        setIntent(intent)
         dataClearerForegroundAppRestartPixel.registerIntent(intent)
         viewModel.resetViewState()
         viewModel.setLaunchedFromSearchOnlyWidget(launchedFromSearchOnlyWidget(intent))

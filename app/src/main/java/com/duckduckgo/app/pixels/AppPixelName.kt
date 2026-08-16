@@ -20,6 +20,8 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 
 enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     APP_LAUNCH("ml"),
+    APP_RETURN_COUNT("m_app_return_count"),
+    APP_RETURN_DAILY("m_app_return_daily"),
     PROCESS_CREATED_MAIN("m_process_created_main"),
     PROCESS_CREATED_VPN("m_process_created_vpn"),
 
