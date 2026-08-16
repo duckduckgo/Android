@@ -22,5 +22,12 @@
     <string name="voiceSearchListening">Hovorte teraz</string>
     <string name="voiceSearchListeningFooter">Zvuk sa spracováva v zariadení. Neukladá sa nikde a s nikým, vrátane DuckDuckGo, sa nezdieľa.</string>
     <string name="voiceSearchNegativeAction">Zrušiť</string>
+    <string name="voiceSearchMicAccessDeniedDialogTitle">DuckDuckGo potrebuje prístup k tvojmu mikrofónu</string>
+    <string name="voiceSearchMicAccessDeniedDialogMessage">Ak chceš používať naše súkromné hlasové vyhľadávanie, je potrebné povolenie pre mikrofón.</string>
+    <string name="voiceSearchMicAccessDeniedDialogMessageDuckAi">Ak chceš používať naše súkromné hlasové funkcie, je potrebné povolenie pre mikrofón.</string>
+    <string name="voiceSearchMicAccessDeniedDialogChangePermissions">Zmeniť oprávnenia</string>
+    <string name="voiceSearchMicAccessDeniedDialogHideVoiceSearch">Skryť hlasové vyhľadávanie</string>
+    <string name="voiceSearchMicPermissionDeniedSnackbarMessage">Na používanie hlasových funkcií je potrebný prístup k mikrofónu</string>
+    <string name="voiceSearchMicPermissionDeniedSnackbarAction">Povoliť</string>
     <string name="voiceSearchTitle">Hlasové vyhľadávanie</string>
 </resources>
