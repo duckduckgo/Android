@@ -1655,6 +1655,31 @@ class NativeInputModeWidgetViewModelTest {
     // region fireSubmissionPixels
 
     @Test
+    fun whenSearchSubmittedWithVisibleToggleThenResolvedDefaultModeIsPassedToPixels() = runTest {
+        setIsEnabled(true)
+        inputScreenUserSettingFlow.value = true
+        whenever(duckChatInternal.resolvedTogglePosition()).thenReturn(NativeInputState.ToggleSelection.SEARCH)
+        advanceUntilIdle()
+
+        testee.fireOmnibarQuerySubmitted("query")
+
+        verify(duckChatPixels).fireOmnibarQuerySubmitted("query", NativeInputState.ToggleSelection.SEARCH)
+    }
+
+    @Test
+    fun whenSearchSubmittedOutsideBrowserContextThenDefaultModeIsOmitted() = runTest {
+        setIsEnabled(true)
+        inputScreenUserSettingFlow.value = true
+        whenever(duckChatInternal.resolvedTogglePosition()).thenReturn(NativeInputState.ToggleSelection.SEARCH)
+        testee.configure(tabId = "test-tab", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+
+        testee.fireOmnibarQuerySubmitted("query")
+
+        verify(duckChatPixels).fireOmnibarQuerySubmitted("query", null)
+    }
+
+    @Test
     fun whenImageGenerationToolSelectedThenFiresPromptSubmittedAndImageGenerationSubmitted() = runTest {
         val tabId = "tab-A"
         whenever(modelManager.getSelectedModelId()).thenReturn("model-1")
@@ -1707,6 +1732,8 @@ class NativeInputModeWidgetViewModelTest {
 
     @Test
     fun whenPromptSubmittedFromAddressBarThenResolvedDefaultModeIsPassedToPixels() = runTest {
+        setIsEnabled(true)
+        inputScreenUserSettingFlow.value = true
         whenever(duckChatInternal.resolvedTogglePosition()).thenReturn(NativeInputState.ToggleSelection.SEARCH)
         val viewModel = createViewModel()
         viewModel.configure(tabId = "tab-A", isDuckAiMode = false, isBottom = false)
@@ -1723,6 +1750,25 @@ class NativeInputModeWidgetViewModelTest {
             hasText = true,
             surface = DuckChatPixelSurface.ADDRESS_BAR,
             defaultMode = NativeInputState.ToggleSelection.SEARCH,
+        )
+    }
+
+    @Test
+    fun whenPromptSubmittedFromAddressBarWithHiddenToggleThenDefaultModeIsOmitted() = runTest {
+        whenever(duckChatInternal.resolvedTogglePosition()).thenReturn(NativeInputState.ToggleSelection.SEARCH)
+        advanceUntilIdle()
+
+        testee.fireSubmissionPixels(hasText = true, hasImageAttachment = false, hasFileAttachment = false)
+
+        verify(duckChatPixels).firePromptSubmitted(
+            selectedTool = "none",
+            modelId = null,
+            reasoningEffort = null,
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            hasText = true,
+            surface = DuckChatPixelSurface.ADDRESS_BAR,
+            defaultMode = null,
         )
     }
 
@@ -1852,14 +1898,18 @@ class NativeInputModeWidgetViewModelTest {
 
     @Test
     fun whenResolvedTogglePositionThenDelegatesToDuckChat() = runTest {
+        setIsEnabled(true)
+        inputScreenUserSettingFlow.value = true
         whenever(duckChatInternal.resolvedTogglePosition()).thenReturn(NativeInputState.ToggleSelection.DUCK_AI)
+        advanceUntilIdle()
 
         assertEquals(NativeInputState.ToggleSelection.DUCK_AI, testee.resolvedTogglePosition())
     }
 
     @Test
     fun whenNoToggleOfferedThenResolvedTogglePositionIsNull() = runTest {
-        whenever(duckChatInternal.resolvedTogglePosition()).thenReturn(null)
+        whenever(duckChatInternal.resolvedTogglePosition()).thenReturn(NativeInputState.ToggleSelection.DUCK_AI)
+        advanceUntilIdle()
 
         assertNull(testee.resolvedTogglePosition())
     }

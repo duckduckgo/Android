@@ -16,36 +16,32 @@
 
 package com.duckduckgo.duckchat.impl.metric.nativeinput
 
-import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.ToggleSelection
-import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.metric.nativeinput.discovery.InputScreenDiscoveryFunnel
 import com.duckduckgo.duckchat.impl.metric.nativeinput.usage.InputScreenSessionUsageMetric
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
+import org.mockito.kotlin.verifyNoInteractions
 
 class MetricsNativeInputEventListenerTest {
 
     private val duckChatPixels: DuckChatPixels = mock()
     private val sessionUsageMetric: InputScreenSessionUsageMetric = mock()
     private val discoveryFunnel: InputScreenDiscoveryFunnel = mock()
-    private val duckChatInternal: DuckChatInternal = mock()
 
     private val testee = MetricsNativeInputEventListener(
         duckChatPixels = duckChatPixels,
         sessionUsageMetric = sessionUsageMetric,
         discoveryFunnel = discoveryFunnel,
-        duckChatInternal = duckChatInternal,
     )
 
     @Test
-    fun whenSearchSubmittedThenResolvedDefaultModeIsPassedToPixels() {
-        whenever(duckChatInternal.resolvedTogglePosition()).thenReturn(ToggleSelection.SEARCH)
-
+    fun whenSearchSubmittedThenUsageAndDiscoveryMetricsAreUpdated() {
         testee.onSearchSubmitted("query")
 
-        verify(duckChatPixels).fireOmnibarQuerySubmitted("query", ToggleSelection.SEARCH)
+        verify(sessionUsageMetric).onSearchSubmitted()
+        verify(discoveryFunnel).onSearchSubmitted()
+        verifyNoInteractions(duckChatPixels)
     }
 }

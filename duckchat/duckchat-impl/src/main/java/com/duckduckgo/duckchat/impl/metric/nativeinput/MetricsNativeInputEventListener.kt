@@ -18,7 +18,6 @@ package com.duckduckgo.duckchat.impl.metric.nativeinput
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.NativeInputEventListener
-import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.metric.nativeinput.discovery.InputScreenDiscoveryFunnel
 import com.duckduckgo.duckchat.impl.metric.nativeinput.usage.InputScreenSessionUsageMetric
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
@@ -30,7 +29,6 @@ class MetricsNativeInputEventListener @Inject constructor(
     private val duckChatPixels: DuckChatPixels,
     private val sessionUsageMetric: InputScreenSessionUsageMetric,
     private val discoveryFunnel: InputScreenDiscoveryFunnel,
-    private val duckChatInternal: DuckChatInternal,
 ) : NativeInputEventListener {
 
     override fun onNativeInputShown(landscape: Boolean) {
@@ -41,7 +39,6 @@ class MetricsNativeInputEventListener @Inject constructor(
     }
 
     override fun onSearchSubmitted(query: String) {
-        duckChatPixels.fireOmnibarQuerySubmitted(query, duckChatInternal.resolvedTogglePosition())
         sessionUsageMetric.onSearchSubmitted()
         discoveryFunnel.onSearchSubmitted()
     }

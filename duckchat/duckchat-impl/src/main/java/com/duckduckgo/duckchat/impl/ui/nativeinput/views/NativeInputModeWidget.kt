@@ -1357,6 +1357,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
             val textToSubmit = text.getTextToSubmit()?.toString()
             if (textToSubmit != null) {
                 if (inputModeSwitch.selectedTabPosition == 0) {
+                    viewModel.fireOmnibarQuerySubmitted(textToSubmit)
                     onSearchSent?.invoke(textToSubmit)
                 } else {
                     onChatSent?.invoke(textToSubmit)
