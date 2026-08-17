@@ -135,7 +135,7 @@ class AppRemoteMessagingRepository(
     }
 
     private fun dismissMessageSilently(id: String) {
-        //TODO add pixel for dismiss silently
+        // TODO add pixel for dismiss silently
         remoteMessagesDao.updateState(id, Status.DISMISSED)
         remoteMessagingConfigRepository.invalidate()
     }
