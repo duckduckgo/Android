@@ -22,6 +22,17 @@
     android:theme="@style/ThemeOverlay.DuckDuckGo.Onboarding">
 
     <ImageView
+        android:id="@+id/backgroundIllustration"
+        android:layout_width="0dp"
+        android:layout_height="180dp"
+        android:importantForAccessibility="no"
+        android:scaleType="centerCrop"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/onboarding_input_type_background" />
+
+    <ImageView
         android:id="@+id/duckAiLogo"
         android:layout_width="48dp"
         android:layout_height="48dp"
@@ -44,67 +55,68 @@
         app:textType="secondary"
         app:typography="caption_allCaps" />
 
-    <com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleBrandDesignUpdateCardView
-        android:id="@+id/daxBubble"
+    <!--
+      The card wraps its content but must never grow past the bottom edge. ConstraintLayout measures a
+      wrap_content child without applying its constraints, and layout_constrainedHeight resolves the
+      available height incorrectly here, so the bound comes from this fixed-height container instead:
+      it hands the card AT_MOST(available), which is exactly wrap-until-it-no-longer-fits.
+    -->
+    <FrameLayout
+        android:id="@+id/daxBubbleContainer"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_marginHorizontal="@dimen/keyline_5"
-        android:layout_marginTop="@dimen/keyline_4"
-        android:layout_marginBottom="@dimen/keyline_5"
-        app:showArrow="false"
-        app:arrowOffsetStart="96dp"
-        app:layout_constrainedHeight="true"
+        android:layout_marginVertical="@dimen/keyline_4"
+        android:clipChildren="false"
+        android:clipToPadding="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/eyebrow"
-        app:layout_constraintVertical_bias="0"
         app:layout_constraintWidth_max="600dp">
 
-        <ScrollView
+        <com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleBrandDesignUpdateCardView
+            android:id="@+id/daxBubble"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fadeScrollbars="false">
+            android:layout_gravity="top"
+            app:showArrow="false">
 
-            <LinearLayout
+            <ScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="@dimen/keyline_5">
+                android:fadeScrollbars="false">
 
-                <include
-                    android:id="@+id/inputScreen"
-                    layout="@layout/include_brand_design_input_screen"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:visibility="gone"
-                    tools:visibility="visible" />
+                    android:orientation="vertical"
+                    android:padding="@dimen/keyline_5">
 
-                <com.duckduckgo.common.ui.view.button.DaxButtonBrand
-                    android:id="@+id/confirmButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/keyline_5"
-                    android:alpha="0"
-                    android:text="@string/newAddressBarPickerConfirm"
-                    app:daxButtonBrandTypography="duckSans" />
+                    <include
+                        android:id="@+id/inputScreen"
+                        layout="@layout/include_brand_design_input_screen"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        tools:visibility="visible" />
 
-            </LinearLayout>
+                    <com.duckduckgo.common.ui.view.button.DaxButtonBrand
+                        android:id="@+id/confirmButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/keyline_5"
+                        android:alpha="0"
+                        android:text="@string/newAddressBarPickerConfirm"
+                        app:daxButtonBrandTypography="duckSans" />
 
-        </ScrollView>
+                </LinearLayout>
 
-    </com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleBrandDesignUpdateCardView>
+            </ScrollView>
 
-    <ImageView
-        android:id="@+id/backgroundIllustration"
-        android:layout_width="0dp"
-        android:layout_height="180dp"
-        android:importantForAccessibility="no"
-        android:scaleType="centerCrop"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/onboarding_input_type_background" />
+        </com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleBrandDesignUpdateCardView>
+
+    </FrameLayout>
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/leftWing"
