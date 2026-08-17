@@ -240,6 +240,13 @@ interface SubscriptionsFeature {
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun sendAuthTokenRefreshWideEvent(): Toggle
 
+    /**
+     * Kill switch for serializing auth token refresh with a cross-process lock.
+     * When disabled, concurrent refreshes are possible (previous behavior).
+     */
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.INTERNAL)
+    fun serializeTokenRefresh(): Toggle
+
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun sendSubscriptionSwitchWideEvent(): Toggle
 
