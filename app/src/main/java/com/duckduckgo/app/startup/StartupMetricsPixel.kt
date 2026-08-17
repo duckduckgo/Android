@@ -65,7 +65,7 @@ object StartupMetricsPixelParameters {
      * Android API level of device.
      * Type: Integer
      * Required: Yes
-     * Valid range: >= 26
+     * Valid range: >= 28
      */
     const val API_LEVEL = "api_level"
 }

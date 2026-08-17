@@ -16,11 +16,8 @@
 
 package com.duckduckgo.app.global
 
-import android.app.ActivityManager
 import android.app.Application
 import android.content.Context
-import android.content.Context.ACTIVITY_SERVICE
-import android.os.Build
 import android.os.Process
 
 abstract class MultiProcessApplication : Application() {
@@ -64,30 +61,7 @@ inline fun Context.runInSecondaryProcessNamed(
 }
 
 val Context.isIsolatedProcess: Boolean
-    get() {
-        if (Build.VERSION.SDK_INT >= 28) {
-            // Android P+ has a public API to check if we're in an isolated process
-            return Process.isIsolated()
-        }
-        return try {
-            // Older Android versions don't have a public API, but isolated processes have no permissions,
-            // so trying to access any system service will throw a SecurityException.
-            val activityManager = getSystemService(ACTIVITY_SERVICE) as ActivityManager
-            activityManager.runningAppProcesses
-            false
-        } catch (_: SecurityException) {
-            true
-        }
-    }
+    get() = Process.isIsolated()
 
 val Context.currentProcessName: String?
-    get() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-        Application.getProcessName()
-    } else {
-        processNameFromSystemService()
-    }
-
-private fun Context.processNameFromSystemService(): String {
-    val am = this.getSystemService(Application.ACTIVITY_SERVICE) as ActivityManager?
-    return am?.runningAppProcesses?.firstOrNull { it.pid == Process.myPid() }?.processName.orEmpty()
-}
+    get() = Application.getProcessName()
