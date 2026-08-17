@@ -20,12 +20,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
-import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.InputMode
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -40,7 +37,6 @@ import org.mockito.kotlin.isNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import org.robolectric.annotation.Config
 import kotlin.time.Duration.Companion.milliseconds
@@ -55,15 +51,12 @@ class RealPostIdleSessionWideEventTest {
     private val wideEventClient: WideEventClient = mock()
     private val displayedModeFlow = MutableStateFlow(InputMode.SEARCH)
     private val duckChatInputModeState: DuckChatInputModeState = mock()
-    private val androidBrowserConfigFeature =
-        FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
 
     private lateinit var testee: RealPostIdleSessionWideEvent
 
     @Before
     fun setup() = runTest {
         whenever(duckChatInputModeState.displayedMode).thenReturn(displayedModeFlow)
-        androidBrowserConfigFeature.sendPostIdleSessionWideEvent().setRawStoredState(Toggle.State(true))
 
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any())).thenReturn(Result.success(123L))
         whenever(wideEventClient.flowStep(any(), any(), any(), any())).thenReturn(Result.success(Unit))
@@ -75,7 +68,6 @@ class RealPostIdleSessionWideEventTest {
         testee = RealPostIdleSessionWideEvent(
             wideEventClient = wideEventClient,
             duckChatInputModeState = duckChatInputModeState,
-            androidBrowserConfigFeature = { androidBrowserConfigFeature },
             dispatchers = coroutineRule.testDispatcherProvider,
             appCoroutineScope = coroutineRule.testScope,
         )
@@ -124,17 +116,6 @@ class RealPostIdleSessionWideEventTest {
             samplingProbability = eq(0.05f),
             definition = any(),
         )
-    }
-
-    @Test
-    fun `when feature flag disabled then no flow operations occur`() = runTest {
-        androidBrowserConfigFeature.sendPostIdleSessionWideEvent().setRawStoredState(Toggle.State(false))
-
-        testee.onHatchShownAfterIdle()
-        testee.onInputSubmitted()
-        coroutineRule.testScope.testScheduler.advanceUntilIdle()
-
-        verifyNoInteractions(wideEventClient)
     }
 
     @Test
