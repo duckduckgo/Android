@@ -11,7 +11,7 @@ import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.menu.BrowserMenuHighlight
 import com.duckduckgo.app.browser.menu.BrowserViewMode
-import com.duckduckgo.app.browser.nativeinput.NativeInputSearchOnlyFeature
+import com.duckduckgo.app.browser.nativeinput.NativeInputOmnibarFeature
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.LaunchNativeInput
@@ -108,7 +108,7 @@ class OmnibarLayoutViewModelTest {
     private val duckAiShowOmnibarShortcutInAllStatesFlow = MutableStateFlow(true)
     private val nativeInputFieldSettingFlow = MutableStateFlow(false)
     private val nativeChatInputEnabledFlow = MutableStateFlow(false)
-    private val fakeNativeInputSearchOnlyFeature = FakeFeatureToggleFactory.create(NativeInputSearchOnlyFeature::class.java)
+    private val fakeNativeInputOmnibarFeature = FakeFeatureToggleFactory.create(NativeInputOmnibarFeature::class.java)
     private val inputScreenUserSettingFlow = MutableStateFlow(false)
     private val activeVoiceSessionsFlow = MutableStateFlow<Set<String>>(emptySet())
     private val selectedTabFlow = MutableStateFlow<TabEntity?>(null)
@@ -156,7 +156,8 @@ class OmnibarLayoutViewModelTest {
         whenever(urlDisplayRepository.isFullUrlEnabled).then { isFullUrlEnabledFlow }
         whenever(duckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(nativeInputFieldSettingFlow)
         whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(nativeChatInputEnabledFlow)
-        fakeNativeInputSearchOnlyFeature.self().setRawStoredState(State(enable = false))
+        fakeNativeInputOmnibarFeature.self().setRawStoredState(State(enable = false))
+        fakeNativeInputOmnibarFeature.nativeInputSearchOnly().setRawStoredState(State(enable = false))
         whenever(duckChatInputModeState.inputModeCapability).thenReturn(inputModeCapabilityFlow)
         whenever(duckChat.activeVoiceChatSessions).thenReturn(activeVoiceSessionsFlow)
         whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(inputScreenUserSettingFlow)
@@ -217,7 +218,7 @@ class OmnibarLayoutViewModelTest {
             addressBarTrackersAnimationManager = addressBarTrackersAnimationManager,
             standardizedLeadingIconToggle = fakeStandardizedLeadingIconToggle,
             progressBarUpgradeFeature = fakeProgressBarUpgradeFeature,
-            nativeInputSearchOnlyFeature = fakeNativeInputSearchOnlyFeature,
+            nativeInputOmnibarFeature = fakeNativeInputOmnibarFeature,
             browserMode = browserMode,
         )
     }
@@ -1652,7 +1653,8 @@ class OmnibarLayoutViewModelTest {
 
     @Test
     fun whenSearchOnlyAndRestoreFlagEnabledThenShowClickCatcherTrue() = runTest {
-        fakeNativeInputSearchOnlyFeature.self().setRawStoredState(State(enable = true))
+        fakeNativeInputOmnibarFeature.self().setRawStoredState(State(enable = true))
+        fakeNativeInputOmnibarFeature.nativeInputSearchOnly().setRawStoredState(State(enable = true))
         nativeInputFieldSettingFlow.value = true
         inputModeCapabilityFlow.value = NativeInputState.InputMode.SEARCH_ONLY
         initializeViewModel()

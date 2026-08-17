@@ -22,15 +22,23 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 
 /**
- * Gates using the native input field for the browser omnibar while the address bar is in search-only
- * mode (Duck.ai off in the address bar). When disabled, search-only falls back to the legacy omnibar
+ * Feature flags for the native input field in the browser omnibar.
  */
 @ContributesRemoteFeature(
     scope = AppScope::class,
-    featureName = "nativeInputSearchOnly",
+    featureName = "nativeInputOmnibar",
 )
-interface NativeInputSearchOnlyFeature {
+interface NativeInputOmnibarFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun self(): Toggle
+
+    /**
+     * @return `true` when the native input field should be used for the browser omnibar while the
+     * address bar is in search-only mode (Duck.ai off in the address bar). When disabled, search-only
+     * falls back to the legacy omnibar.
+     * If the remote feature is not present defaults to `internal`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun nativeInputSearchOnly(): Toggle
 }
