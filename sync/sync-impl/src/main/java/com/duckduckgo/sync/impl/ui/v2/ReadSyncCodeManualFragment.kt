@@ -20,12 +20,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.BundleCompat
+import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
-import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.sync.impl.databinding.FragmentSyncV2ReadSyncCodeManualBinding
+import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
@@ -36,10 +38,17 @@ class ReadSyncCodeManualFragment : DuckDuckGoFragment() {
             "Fragment $this tried to access ViewBinding outside of View's lifecycle."
         }
 
-    @Inject
-    lateinit var viewModelFactory: FragmentViewModelFactory
+    private val entryPoint: SyncEntryPoint
+        get() = requireNotNull(BundleCompat.getSerializable(requireArguments(), ENTRY_POINT_ARG, SyncEntryPoint::class.java)) {
+            "Missing fragment argument: '$ENTRY_POINT_ARG'"
+        }
 
-    private val viewModel by activityViewModels<ReadSyncCodeViewModel> { viewModelFactory }
+    @Inject
+    lateinit var syncCodeViewModelFactory: ReadSyncCodeViewModel.Factory
+
+    private val viewModel by activityViewModels<ReadSyncCodeViewModel> {
+        ReadSyncCodeViewModel.Factory.Provider(syncCodeViewModelFactory, entryPoint)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -66,5 +75,13 @@ class ReadSyncCodeManualFragment : DuckDuckGoFragment() {
     override fun onDestroyView() {
         _binding = null
         super.onDestroyView()
+    }
+
+    companion object {
+        private const val ENTRY_POINT_ARG = "entry_point"
+
+        fun instance(entryPoint: SyncEntryPoint) = ReadSyncCodeManualFragment().apply {
+            arguments = bundleOf(ENTRY_POINT_ARG to entryPoint)
+        }
     }
 }

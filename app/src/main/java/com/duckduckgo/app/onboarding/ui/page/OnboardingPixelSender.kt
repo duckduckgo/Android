@@ -237,10 +237,16 @@ class RealOnboardingPixelSender @Inject constructor(
             PIXEL_PARAM_PIXEL_SOURCE to deviceInfo.formFactor().description,
         )
         variant?.let { params[PIXEL_PARAM_VARIANT] = it }
-        if (days in 0..MAX_DAYS_SINCE_INSTALL_REPORTED) {
-            params[PIXEL_PARAM_DAYS_SINCE_INSTALL] = days.toString()
-        }
+        params[PIXEL_PARAM_DAYS_SINCE_INSTALL] = daysSinceInstallBucket(days)
         return params
+    }
+
+    private fun daysSinceInstallBucket(days: Long): String = when {
+        days <= 0L -> DAYS_SINCE_INSTALL_0
+        days <= 3L -> DAYS_SINCE_INSTALL_1_3
+        days <= 10L -> DAYS_SINCE_INSTALL_4_10
+        days <= 28L -> DAYS_SINCE_INSTALL_11_28
+        else -> DAYS_SINCE_INSTALL_OVER_28
     }
 
     private fun engageOrDismiss(engaged: Boolean): String = if (engaged) VALUE_ENGAGE else VALUE_DISMISS
@@ -260,11 +266,10 @@ class RealOnboardingPixelSender @Inject constructor(
     private fun onOff(value: Boolean): String = if (value) "on" else "off"
 
     private companion object {
-        private const val PIXEL_PARAM_EVENT = "e"
+        private const val PIXEL_PARAM_EVENT = "event"
         private const val PIXEL_PARAM_VALUE = "value"
-        private const val PIXEL_PARAM_INSTALL_TYPE = "it"
-        private const val PIXEL_PARAM_DAYS_SINCE_INSTALL = "d"
-        private const val PIXEL_PARAM_SOURCE = "source"
+        private const val PIXEL_PARAM_INSTALL_TYPE = "installType"
+        private const val PIXEL_PARAM_DAYS_SINCE_INSTALL = "daysSinceInstall"
         private const val PIXEL_PARAM_FLOW = "flow"
         private const val PIXEL_PARAM_VARIANT = "variant"
         private const val PIXEL_PARAM_PIXEL_SOURCE = "pixelSource"
@@ -316,6 +321,10 @@ class RealOnboardingPixelSender @Inject constructor(
         private const val INPUT_TYPE_SEARCH = "search"
         private const val INPUT_TYPE_SEARCH_AND_DUCKAI = "search_and_duckai"
 
-        private const val MAX_DAYS_SINCE_INSTALL_REPORTED = 28L
+        private const val DAYS_SINCE_INSTALL_0 = "0"
+        private const val DAYS_SINCE_INSTALL_1_3 = "1-3"
+        private const val DAYS_SINCE_INSTALL_4_10 = "4-10"
+        private const val DAYS_SINCE_INSTALL_11_28 = "11-28"
+        private const val DAYS_SINCE_INSTALL_OVER_28 = "28+"
     }
 }

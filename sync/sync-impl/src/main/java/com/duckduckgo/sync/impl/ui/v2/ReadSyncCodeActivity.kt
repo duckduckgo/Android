@@ -22,11 +22,16 @@ import android.graphics.Outline
 import android.os.Bundle
 import android.view.View
 import android.view.ViewOutlineProvider
+import androidx.activity.addCallback
+import androidx.activity.viewModels
+import androidx.core.content.IntentCompat
+import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import androidx.viewpager2.widget.ViewPager2
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.toPx
@@ -37,8 +42,11 @@ import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ActivitySyncV2ReadSyncCodeBinding
+import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeViewModel.Command
+import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeViewModel.Command.StartSyncProcess
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -48,7 +56,12 @@ import javax.inject.Inject
 class ReadSyncCodeActivity : DuckDuckGoActivity() {
     private val binding by viewBinding<ActivitySyncV2ReadSyncCodeBinding>()
 
-    private val viewModel by bindViewModel<ReadSyncCodeViewModel>()
+    private val launchSource get() = intent.getStringExtra(LAUNCH_SOURCE_EXTRA_KEY)
+
+    private val syncEntryPoint
+        get() = requireNotNull(IntentCompat.getSerializableExtra(intent, ORIGINAL_FLOW_EXTRA_KEY, SyncEntryPoint::class.java)) {
+            "Missing intent extra: '$ORIGINAL_FLOW_EXTRA_KEY'"
+        }
 
     @Inject
     lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
@@ -56,18 +69,31 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
-    private val launchSource get() = intent.getStringExtra(LAUNCH_SOURCE_EXTRA_KEY)
+    @Inject
+    lateinit var vmFactory: ReadSyncCodeViewModel.Factory
 
-    private val qrCodeLauncher = registerForActivityResult(DisplayQrCodeContract()) { result ->
-        when (result) {
-            is DisplayQrCodeContract.Output.Success -> finish()
-            is DisplayQrCodeContract.Output.Failure -> finish()
-            is DisplayQrCodeContract.Output.NoOp -> Unit
+    private val viewModel by viewModels<ReadSyncCodeViewModel> {
+        ReadSyncCodeViewModel.Factory.Provider(vmFactory, syncEntryPoint)
+    }
+
+    private val isRecoveryFlow get() = syncEntryPoint == SyncEntryPoint.RECOVER_SYNCED_DATA
+
+    private val showQrCodeLauncher = registerForActivityResult(
+        DisplayQrCodeContract(),
+    ) { output ->
+        when (output) {
+            is DisplayQrCodeContract.Output.SyncCompleted -> finishWithResult(output.result)
+            is DisplayQrCodeContract.Output.Dismissed -> Unit
         }
     }
 
-    private val exchangeSyncCodeLauncher = registerForActivityResult(ExchangeSyncCodeContract()) {
-        finish()
+    private val processSyncCodeLauncher = registerForActivityResult(
+        ProcessSyncCodeContract(),
+    ) { output ->
+        when (output) {
+            is ProcessSyncCodeContract.Output.SyncCompleted -> finishWithResult(output.result)
+            is ProcessSyncCodeContract.Output.Dismissed -> Unit
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -85,6 +111,7 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
         configureToolbar()
         configureContentAdapter()
         configureContentCorners()
+        configureBackHandling()
 
         observeViewModel()
     }
@@ -100,13 +127,22 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
     private fun processCommand(command: Command) {
         when (command) {
             is StartSyncProcess -> {
-                val input = ExchangeSyncCodeContract.Input(
-                    syncUrl = command.syncCode,
-                    launchSource = launchSource,
+                processSyncCodeLauncher.launch(
+                    ProcessSyncCodeContract.Input(
+                        source = command.source,
+                    ),
                 )
-                exchangeSyncCodeLauncher.launch(input)
+            }
+
+            is ShowMessage -> {
+                Snackbar.make(binding.root, command.message, Snackbar.LENGTH_LONG).show()
             }
         }
+    }
+
+    private fun finishWithResult(result: SyncPairingResult) {
+        setResult(SyncPairingResult.RESULT_SYNC_COMPLETED, SyncPairingResult.resultIntent(result))
+        finish()
     }
 
     private fun configureEdgeToEdgeInsets() {
@@ -115,12 +151,26 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
         edgeToEdgeHandler.applyNavigationBarInsets(binding.contentPager, drawBehindGestureNav = false)
     }
 
-    private fun configureToolbar() {
-        binding.closeButton.setOnClickListener {
+    private fun configureBackHandling() {
+        onBackPressedDispatcher.addCallback(this) {
+            viewModel.onUserCanceled()
             finish()
         }
+    }
+
+    private fun configureToolbar() {
+        binding.closeButton.setOnClickListener {
+            viewModel.onUserCanceled()
+            finish()
+        }
+        binding.showQrCodeButton.isGone = isRecoveryFlow
         binding.showQrCodeButton.setOnClickListener {
-            qrCodeLauncher.launch(DisplayQrCodeContract.Input(launchSource))
+            showQrCodeLauncher.launch(
+                DisplayQrCodeContract.Input(
+                    syncEntryPoint = syncEntryPoint,
+                    launchSource = launchSource,
+                ),
+            )
         }
     }
 
@@ -131,20 +181,36 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
 
             override fun createFragment(position: Int): Fragment {
                 return when (position) {
-                    SCANNER_POSITION -> ReadSyncCodeCameraFragment()
-                    MANUAL_CODE_ENTRY_POSITION -> ReadSyncCodeManualFragment()
+                    SCANNER_POSITION -> ReadSyncCodeCameraFragment.instance(syncEntryPoint)
+                    MANUAL_CODE_ENTRY_POSITION -> ReadSyncCodeManualFragment.instance(syncEntryPoint)
                     else -> error("Unknown position: $position")
                 }
             }
         }
         val mediator = TabLayoutMediator(binding.tabContainer, binding.contentPager) { tab, position ->
             tab.text = when (position) {
-                SCANNER_POSITION -> getString(R.string.sync_scanner_v2_scan_qr_code_tab_item_label)
-                MANUAL_CODE_ENTRY_POSITION -> getString(R.string.sync_scanner_v2_enter_code_manually_tab_item_label)
+                SCANNER_POSITION -> getString(R.string.sync_simplified_scanner_camera_tab_label)
+                MANUAL_CODE_ENTRY_POSITION -> getString(R.string.sync_simplified_scanner_manual_entry_tab_label)
                 else -> error("Unknown position: $position")
             }
         }
         mediator.attach()
+
+        binding.contentPager.registerOnPageChangeCallback(
+            object : ViewPager2.OnPageChangeCallback() {
+                override fun onPageSelected(position: Int) {
+                    when (position) {
+                        SCANNER_POSITION -> {
+                            viewModel.onScannerScreenShown()
+                        }
+
+                        MANUAL_CODE_ENTRY_POSITION -> {
+                            viewModel.onManualEntryScreenShown()
+                        }
+                    }
+                }
+            },
+        )
     }
 
     private fun configureContentCorners() {
@@ -165,13 +231,16 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
         private const val SCANNER_POSITION = 0
         private const val MANUAL_CODE_ENTRY_POSITION = 1
         private const val LAUNCH_SOURCE_EXTRA_KEY = "launch_source"
+        private const val ORIGINAL_FLOW_EXTRA_KEY = "original_flow"
 
         fun intent(
             context: Context,
-            source: String?,
+            syncEntryPoint: SyncEntryPoint,
+            launchSource: String?,
         ): Intent {
             return Intent(context, ReadSyncCodeActivity::class.java).apply {
-                putExtra(LAUNCH_SOURCE_EXTRA_KEY, source)
+                putExtra(ORIGINAL_FLOW_EXTRA_KEY, syncEntryPoint)
+                putExtra(LAUNCH_SOURCE_EXTRA_KEY, launchSource)
             }
         }
     }

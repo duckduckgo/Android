@@ -37,6 +37,9 @@ import com.duckduckgo.browser.api.ui.BrowserScreens.PdfViewerActivityParams
 import com.duckduckgo.browser.api.ui.BrowserScreens.PdfViewerSource
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.getActivityParams
 import javax.inject.Inject
@@ -48,14 +51,27 @@ class PdfViewerActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var pixel: Pixel
 
+    @Inject
+    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
     private val binding: ActivityPdfViewerBinding by viewBinding()
 
     private lateinit var source: PdfViewerSource
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.MISC)
+        if (edgeToEdgeEnabled) {
+            enableTransparentEdgeToEdge()
+        }
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
+        if (edgeToEdgeEnabled) {
+            configureEdgeToEdgeInsets()
+        }
         // Default inset is too wide between the back arrow and title on this screen.
         binding.includeToolbar.toolbar.contentInsetStartWithNavigation =
             TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16f, resources.displayMetrics).toInt()
@@ -106,6 +122,12 @@ class PdfViewerActivity : DuckDuckGoActivity() {
                 }
             },
         )
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
+        edgeToEdgeHandler.applyNavigationBarInsets(binding.pdfViewerContainer)
     }
 
     private fun showFullFileNameOnTitleTap(toolbar: Toolbar, fileName: String) {

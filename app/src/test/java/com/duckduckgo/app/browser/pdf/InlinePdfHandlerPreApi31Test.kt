@@ -19,7 +19,7 @@ package com.duckduckgo.app.browser.pdf
 import android.webkit.CookieManager
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.cookies.api.CookieManagerProvider

@@ -69,12 +69,14 @@ sealed class PirSuccessResponse(
             val email: String? = null,
             val removedDate: String? = null,
             val fullName: String? = null,
+            val extras: Map<String, String>? = null,
         )
 
         data class ScriptAddressCityState(
             val city: String,
             val state: String,
             val fullAddress: String? = null,
+            val extras: Map<String, String>? = null,
         )
     }
 

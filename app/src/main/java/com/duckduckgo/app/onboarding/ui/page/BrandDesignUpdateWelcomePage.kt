@@ -547,7 +547,14 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             root = binding.root,
             dialog = binding.daxDialogCta.root,
             cardContainer = binding.daxDialogCta.cardContainer,
-            onDecorationHidden = { binding.daxDialogCta.cardView.setArrowDepthFraction(0f) },
+            onDecorationHidden = {
+                binding.daxDialogCta.cardView.setArrowDepthFraction(0f)
+                binding.daxDialogCta.root.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                    verticalBias = 0f
+                    bottomToTop = ConstraintLayout.LayoutParams.UNSET
+                    bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+                }
+            },
             cardBottomInsetPx = { cardBottomInsetPx },
         ).also { it.attach() }
 

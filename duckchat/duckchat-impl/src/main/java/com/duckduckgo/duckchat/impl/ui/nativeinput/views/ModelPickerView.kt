@@ -133,6 +133,8 @@ class ModelPickerView @JvmOverloads constructor(
 
     private var pickerEnabled = false
 
+    var isEditMode: Boolean = false
+
     override fun setPickerEnabled(enabled: Boolean) {
         this.pickerEnabled = enabled
         if (isAttachedToWindow) updateVisibility()
@@ -143,10 +145,12 @@ class ModelPickerView @JvmOverloads constructor(
     }
 
     private fun updateVisibility() {
-        val nativeState = lastNativeInputState
-        val show = pickerEnabled &&
-            viewModel.state.value.models.isNotEmpty() &&
-            nativeState?.shouldShowPluginControls() == true
+        val show = shouldShowModelPicker(
+            nativeInputState = lastNativeInputState,
+            pickerEnabled = pickerEnabled,
+            hasModels = viewModel.state.value.models.isNotEmpty(),
+            isEditMode = isEditMode,
+        )
         isVisible = show
         (parent as? View)?.isVisible = show
     }
@@ -240,6 +244,7 @@ class ModelPickerView @JvmOverloads constructor(
         if (state.models.isEmpty()) return
 
         viewModel.menuShowing = true
+        viewModel.onPickerShown(currentSurface())
         onMenuShown?.invoke()
         showPopupWindow(state)
     }
@@ -372,3 +377,15 @@ class ModelPickerView @JvmOverloads constructor(
         addView(HorizontalDivider(context))
     }
 }
+
+/**
+ * The model picker follows the same visibility rule as the other plugin controls: derived purely
+ * from [NativeInputState] plus its own enabled/model-availability flags, so it is unit-testable
+ * without Robolectric.
+ */
+internal fun shouldShowModelPicker(
+    nativeInputState: NativeInputState?,
+    pickerEnabled: Boolean,
+    hasModels: Boolean,
+    isEditMode: Boolean,
+): Boolean = pickerEnabled && hasModels && nativeInputState?.shouldShowPluginControls(isEditing = isEditMode) == true

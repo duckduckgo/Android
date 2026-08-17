@@ -43,7 +43,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ActivitySyncV2EditDeviceBinding
 import com.duckduckgo.sync.impl.databinding.DialogEditDeviceBinding
-import com.duckduckgo.sync.impl.ui.v2.EditDeviceContract.Companion.DEVICE_KEY
+import com.duckduckgo.sync.impl.ui.v2.EditDeviceContract.Companion.DEVICE_EXTRA_KEY
 import com.duckduckgo.sync.impl.ui.v2.EditDeviceContract.Companion.RESULT_DEVICE_EDITED
 import com.duckduckgo.sync.impl.ui.v2.EditDeviceContract.Companion.RESULT_DEVICE_REMOVED
 import com.duckduckgo.sync.impl.ui.v2.EditDeviceContract.Companion.RESULT_SYNC_TURNED_OFF
@@ -79,8 +79,8 @@ class EditDeviceActivity : DuckDuckGoActivity() {
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     private val viewModel by viewModels<EditDeviceViewModel> {
-        val device = requireNotNull(IntentCompat.getParcelableExtra(intent, DEVICE_KEY, ParcelableDevice::class.java)) {
-            "Missing intent extra: '$DEVICE_KEY'"
+        val device = requireNotNull(IntentCompat.getParcelableExtra(intent, DEVICE_EXTRA_KEY, ParcelableDevice::class.java)) {
+            "Missing intent extra: '$DEVICE_EXTRA_KEY'"
         }
 
         Provider(vmFactory, device.toConnectedDevice())
@@ -115,7 +115,7 @@ class EditDeviceActivity : DuckDuckGoActivity() {
     private fun configureEdgeToEdgeInsets() {
         edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
         edgeToEdgeHandler.applyStatusBarInsets(binding.toolbar)
-        edgeToEdgeHandler.applyNavigationBarInsets(binding.contentScrollView, drawBehindGestureNav = true)
+        edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.contentScrollView)
     }
 
     private fun observeViewModel() {
@@ -145,13 +145,13 @@ class EditDeviceActivity : DuckDuckGoActivity() {
             if (showShimmer) startShimmer() else stopShimmer()
         }
         binding.editThisDeviceNameDivider.isVisible = viewState.device.thisDevice
-        binding.syncThisDeviceToggleContainer.isVisible = viewState.device.thisDevice
+        binding.syncThisDeviceToggle.isVisible = viewState.device.thisDevice
 
         binding.removeNoticeLabel.setText(
             if (viewState.device.thisDevice) {
-                R.string.sync_setup_v2_remove_this_device_notice
+                R.string.sync_simplified_edit_device_remove_notice_this_device
             } else {
-                R.string.sync_setup_v2_remove_another_device_notice
+                R.string.sync_simplified_edit_device_remove_notice_another_device
             },
         )
     }
@@ -201,9 +201,9 @@ class EditDeviceActivity : DuckDuckGoActivity() {
             customDialogTextInput.text = currentDevice.deviceName
         }
         CustomAlertDialogBuilder(this)
-            .setTitle(R.string.sync_device_v2_edit_device_dialog_title)
-            .setPositiveButton(R.string.sync_device_v2_edit_device_dialog_primary_button)
-            .setNegativeButton(R.string.sync_device_v2_edit_device_dialog_secondary_button)
+            .setTitle(R.string.sync_simplified_edit_device_edit_name_dialog_title)
+            .setPositiveButton(R.string.sync_simplified_edit_device_edit_name_dialog_primary_button)
+            .setNegativeButton(R.string.sync_simplified_edit_device_edit_name_dialog_secondary_button)
             .setView(inputBinding)
             .addEventListener(
                 object : CustomAlertDialogBuilder.EventListener() {
@@ -217,10 +217,10 @@ class EditDeviceActivity : DuckDuckGoActivity() {
 
     private fun askRemoveDevice() {
         TextAlertDialogBuilder(this)
-            .setTitle(R.string.sync_device_v2_remove_device_dialog_title)
-            .setMessage(getString(R.string.sync_device_v2_remove_device_dialog_body, currentDevice.deviceName))
-            .setPositiveButton(R.string.sync_device_v2_remove_device_dialog_primary_button, DESTRUCTIVE)
-            .setNegativeButton(R.string.sync_device_v2_remove_device_dialog_secondary_button, GHOST_ALT)
+            .setTitle(R.string.sync_simplified_edit_device_remove_dialog_title)
+            .setMessage(getString(R.string.sync_simplified_edit_device_remove_dialog_body, currentDevice.deviceName))
+            .setPositiveButton(R.string.sync_simplified_edit_device_remove_dialog_primary_button, DESTRUCTIVE)
+            .setNegativeButton(R.string.sync_simplified_edit_device_remove_dialog_secondary_button, GHOST_ALT)
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
@@ -234,10 +234,10 @@ class EditDeviceActivity : DuckDuckGoActivity() {
 
     private fun askTurnOffSync() {
         TextAlertDialogBuilder(this)
-            .setTitle(R.string.sync_device_v2_turn_off_sync_dialog_title)
-            .setMessage(getString(R.string.sync_device_v2_turn_off_sync_dialog_body))
-            .setPositiveButton(R.string.sync_device_v2_turn_off_sync_dialog_primary_button)
-            .setNegativeButton(R.string.sync_device_v2_turn_off_sync_dialog_secondary_button)
+            .setTitle(R.string.sync_simplified_edit_device_turn_off_dialog_title)
+            .setMessage(getString(R.string.sync_simplified_edit_device_turn_off_dialog_body))
+            .setPositiveButton(R.string.sync_simplified_edit_device_turn_off_dialog_primary_button)
+            .setNegativeButton(R.string.sync_simplified_edit_device_turn_off_dialog_secondary_button)
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
@@ -259,9 +259,9 @@ class EditDeviceActivity : DuckDuckGoActivity() {
 
     private fun showError(command: ShowError) {
         TextAlertDialogBuilder(this)
-            .setTitle(R.string.sync_dialog_error_title)
+            .setTitle(R.string.sync_simplified_error_dialog_title)
             .setMessage(getString(command.message) + "\n" + command.reason)
-            .setPositiveButton(R.string.sync_dialog_error_ok)
+            .setPositiveButton(R.string.sync_simplified_error_dialog_primary_button)
             .show()
     }
 
@@ -298,7 +298,7 @@ class EditDeviceActivity : DuckDuckGoActivity() {
             context: Context,
             device: ParcelableDevice,
         ): Intent {
-            return Intent(context, EditDeviceActivity::class.java).putExtra(DEVICE_KEY, device)
+            return Intent(context, EditDeviceActivity::class.java).putExtra(DEVICE_EXTRA_KEY, device)
         }
     }
 }

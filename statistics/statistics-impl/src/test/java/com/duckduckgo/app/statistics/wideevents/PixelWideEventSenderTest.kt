@@ -32,6 +32,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.any
+import org.mockito.kotlin.argThat
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -52,14 +53,13 @@ class PixelWideEventSenderTest {
         .create(WideEventFeature::class.java)
         .also { it.enqueueWideEventPixels().setRawStoredState(Toggle.State(enable = true)) }
 
-    private val pixelWideEventSender =
-        PixelWideEventSender(
-            pixelSender = pixel,
-            appBuildConfig = appBuildConfig,
-            deviceInfo = deviceInfo,
-            wideEventFeature = wideEventFeature,
-            dispatchers = coroutineRule.testDispatcherProvider,
-        )
+    private val pixelWideEventSender = PixelWideEventSender(
+        pixelSender = pixel,
+        appBuildConfig = appBuildConfig,
+        deviceInfo = deviceInfo,
+        wideEventFeature = wideEventFeature,
+        dispatchers = coroutineRule.testDispatcherProvider,
+    )
 
     @Before
     fun setUp() {
@@ -69,55 +69,130 @@ class PixelWideEventSenderTest {
     }
 
     @Test
-    fun `when sendWideEvent called with completed event then sends count and daily pixels`() =
-        runTest {
-            val eventName = "subscription-purchase"
+    fun `when sendWideEvent called with completed event then sends count and daily pixels`() = runTest {
+        val eventName = "subscription-purchase"
 
-            val event =
-                createWideEvent(
-                    id = 123L,
-                    name = eventName,
-                    status = WideEventRepository.WideEventStatus.SUCCESS,
-                    flowEntryPoint = "app_settings",
-                    metadata = mapOf("plan_type" to "premium"),
-                    steps = listOf(
-                        WideEventRepository.WideEventStep(name = "init", success = true),
-                        WideEventRepository.WideEventStep(name = "refresh_data", success = false),
-                    ),
-                )
+        val event = createWideEvent(
+            id = 123L,
+            name = eventName,
+            status = WideEventRepository.WideEventStatus.SUCCESS,
+            flowEntryPoint = "app_settings",
+            metadata = mapOf("plan_type" to "premium"),
+            steps = listOf(
+                WideEventRepository.WideEventStep(name = "init", success = true),
+                WideEventRepository.WideEventStep(name = "refresh_data", success = false),
+            ),
+        )
 
-            pixelWideEventSender.sendWideEvent(event)
+        pixelWideEventSender.sendWideEvent(event)
 
-            val expectedParameters =
-                mapOf(
-                    "global.platform" to "Android",
-                    "global.type" to "app",
-                    "global.sample_rate" to "1.0",
-                    "app.name" to "DuckDuckGo Android",
-                    "app.version" to "5.123.0",
-                    "app.form_factor" to "phone",
-                    "context.name" to "app_settings",
-                    "feature.status" to "SUCCESS",
-                    "app.dev_mode" to "false",
-                    "feature.data.ext.step.init" to "true",
-                    "feature.data.ext.step.refresh_data" to "false",
-                )
-            val expectedEncodedParameters = mapOf("feature.data.ext.plan_type" to "premium")
+        val expectedParameters = mapOf(
+            "meta.type" to "android-subscription-purchase",
+            "meta.version" to "1.0.0",
+            "global.platform" to "Android",
+            "global.type" to "app",
+            "global.sample_rate" to "1.0",
+            "global.is_first_daily_occurrence" to "false",
+            "app.name" to "DuckDuckGo Android",
+            "app.version" to "5.123.0",
+            "app.form_factor" to "phone",
+            "context.name" to "app_settings",
+            "feature.status" to "SUCCESS",
+            "app.dev_mode" to "false",
+            "feature.data.ext.step.init" to "true",
+            "feature.data.ext.step.refresh_data" to "false",
+        )
 
-            verify(pixel).enqueueFire(
-                pixelName = eq("wide_${eventName}_c"),
-                parameters = eq(expectedParameters),
-                encodedParameters = eq(expectedEncodedParameters),
-                type = any(),
-            )
+        val expectedEncodedParameters = mapOf("feature.data.ext.plan_type" to "premium")
 
-            verify(pixel).enqueueFire(
-                pixelName = eq("wide_${eventName}_d"),
-                parameters = eq(expectedParameters),
-                encodedParameters = eq(expectedEncodedParameters),
-                type = any<Pixel.PixelType.Daily>(),
-            )
-        }
+        verify(pixel).enqueueFire(
+            pixelName = eq("wide_${eventName}_c"),
+            parameters = eq(expectedParameters),
+            encodedParameters = eq(expectedEncodedParameters),
+            type = any(),
+        )
+
+        verify(pixel).enqueueFire(
+            pixelName = eq("wide_${eventName}_d"),
+            parameters = eq(expectedParameters),
+            encodedParameters = eq(expectedEncodedParameters),
+            type = any<Pixel.PixelType.Daily>(),
+        )
+    }
+
+    @Test
+    fun `when event has stored meta type and version then stored values are sent`() = runTest {
+        val event = createWideEvent(
+            id = 789L,
+            name = "some-event",
+            status = WideEventRepository.WideEventStatus.SUCCESS,
+            metaType = "android-some-other-event",
+            metaVersion = "2.1.3",
+        )
+
+        pixelWideEventSender.sendWideEvent(event)
+
+        verify(pixel).enqueueFire(
+            pixelName = eq("wide_some-event_c"),
+            parameters = argThat {
+                get("meta.type") == "android-some-other-event" && get("meta.version") == "2.1.3"
+            },
+            encodedParameters = any(),
+            type = any(),
+        )
+    }
+
+    @Test
+    fun `when event is the first daily occurrence then count and daily pixels report it`() = runTest {
+        val event = createWideEvent(
+            id = 456L,
+            name = "some-event",
+            status = WideEventRepository.WideEventStatus.SUCCESS,
+            isFirstDailyOccurrence = true,
+        )
+
+        pixelWideEventSender.sendWideEvent(event)
+
+        verify(pixel).enqueueFire(
+            pixelName = eq("wide_some-event_c"),
+            parameters = argThat { get("global.is_first_daily_occurrence") == "true" },
+            encodedParameters = any(),
+            type = any(),
+        )
+
+        verify(pixel).enqueueFire(
+            pixelName = eq("wide_some-event_d"),
+            parameters = argThat { get("global.is_first_daily_occurrence") == "true" },
+            encodedParameters = any(),
+            type = any<Pixel.PixelType.Daily>(),
+        )
+    }
+
+    @Test
+    fun `when event is not the first daily occurrence then count and daily pixels report it`() = runTest {
+        val event = createWideEvent(
+            id = 456L,
+            name = "some-event",
+            status = WideEventRepository.WideEventStatus.SUCCESS,
+            isFirstDailyOccurrence = false,
+        )
+
+        pixelWideEventSender.sendWideEvent(event)
+
+        verify(pixel).enqueueFire(
+            pixelName = eq("wide_some-event_c"),
+            parameters = argThat { get("global.is_first_daily_occurrence") == "false" },
+            encodedParameters = any(),
+            type = any(),
+        )
+
+        verify(pixel).enqueueFire(
+            pixelName = eq("wide_some-event_d"),
+            parameters = argThat { get("global.is_first_daily_occurrence") == "false" },
+            encodedParameters = any(),
+            type = any<Pixel.PixelType.Daily>(),
+        )
+    }
 
     private fun createWideEvent(
         id: Long,
@@ -127,6 +202,9 @@ class PixelWideEventSenderTest {
         metadata: Map<String, String?> = emptyMap(),
         flowEntryPoint: String? = null,
         samplingProbability: Float = 1.0f,
+        metaType: String = "android-$name",
+        metaVersion: String = "1.0.0",
+        isFirstDailyOccurrence: Boolean = false,
     ) = WideEventRepository.WideEvent(
         id = id,
         name = name,
@@ -143,5 +221,8 @@ class PixelWideEventSenderTest {
         ),
         createdAt = Instant.parse("2025-12-03T10:15:30.00Z"),
         samplingProbability = samplingProbability,
+        metaType = metaType,
+        metaVersion = metaVersion,
+        isFirstDailyOccurrence = isFirstDailyOccurrence,
     )
 }

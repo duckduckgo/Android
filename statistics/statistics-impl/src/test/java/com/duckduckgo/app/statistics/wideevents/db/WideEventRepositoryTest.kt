@@ -87,6 +87,8 @@ class WideEventRepositoryTest {
                     flowEntryPoint = null,
                     metadata = emptyMap(),
                     cleanupPolicy = DEFAULT_CLEANUP_POLICY,
+                    metaType = "android-test-event",
+                    metaVersion = "1.0.0",
                 )
 
             assertTrue(eventId > 0)
@@ -105,6 +107,8 @@ class WideEventRepositoryTest {
                         "key2" to null,
                     ),
                     cleanupPolicy = DEFAULT_CLEANUP_POLICY,
+                    metaType = "android-test-event",
+                    metaVersion = "1.0.0",
                 )
 
             assertTrue(eventId > 0)
@@ -124,6 +128,8 @@ class WideEventRepositoryTest {
                     flowEntryPoint = null,
                     metadata = emptyMap(),
                     cleanupPolicy = DEFAULT_CLEANUP_POLICY,
+                    metaType = "android-test-event",
+                    metaVersion = "1.0.0",
                 )
 
             val activeEventId =
@@ -132,6 +138,8 @@ class WideEventRepositoryTest {
                     flowEntryPoint = null,
                     metadata = emptyMap(),
                     cleanupPolicy = DEFAULT_CLEANUP_POLICY,
+                    metaType = "android-test-event",
+                    metaVersion = "1.0.0",
                 )
 
             // complete wide event
@@ -156,6 +164,8 @@ class WideEventRepositoryTest {
                     flowEntryPoint = null,
                     metadata = emptyMap(),
                     cleanupPolicy = DEFAULT_CLEANUP_POLICY,
+                    metaType = "android-test-event",
+                    metaVersion = "1.0.0",
                 )
 
             val eventId2 =
@@ -164,6 +174,8 @@ class WideEventRepositoryTest {
                     flowEntryPoint = null,
                     metadata = emptyMap(),
                     cleanupPolicy = DEFAULT_CLEANUP_POLICY,
+                    metaType = "android-test-event",
+                    metaVersion = "1.0.0",
                 )
 
             val eventId3 =
@@ -172,6 +184,8 @@ class WideEventRepositoryTest {
                     flowEntryPoint = null,
                     metadata = emptyMap(),
                     cleanupPolicy = DEFAULT_CLEANUP_POLICY,
+                    metaType = "android-test-event",
+                    metaVersion = "1.0.0",
                 )
 
             val eventId4 =
@@ -180,6 +194,8 @@ class WideEventRepositoryTest {
                     flowEntryPoint = null,
                     metadata = emptyMap(),
                     cleanupPolicy = DEFAULT_CLEANUP_POLICY,
+                    metaType = "android-test-event",
+                    metaVersion = "1.0.0",
                 )
 
             wideEventRepository.setWideEventStatus(
@@ -211,6 +227,8 @@ class WideEventRepositoryTest {
                         "key2" to null,
                     ),
                     cleanupPolicy = DEFAULT_CLEANUP_POLICY,
+                    metaType = "android-test-event",
+                    metaVersion = "1.0.0",
                 )
 
             wideEventRepository.addWideEventStep(
@@ -259,6 +277,25 @@ class WideEventRepositoryTest {
         }
 
     @Test
+    fun `when meta parameters are stored, then they are returned with the event`() =
+        runTest {
+            val eventId =
+                wideEventRepository.insertWideEvent(
+                    name = "test_event",
+                    flowEntryPoint = null,
+                    metadata = emptyMap(),
+                    cleanupPolicy = DEFAULT_CLEANUP_POLICY,
+                    metaType = "android-test-event",
+                    metaVersion = "2.1.3",
+                )
+
+            with(wideEventRepository.getWideEvents(setOf(eventId)).single()) {
+                assertTrue(metaType == "android-test-event")
+                assertTrue(metaVersion == "2.1.3")
+            }
+        }
+
+    @Test
     fun `when delete event then it is no longer accessible`() =
         runTest {
             val completedEventId =
@@ -267,6 +304,8 @@ class WideEventRepositoryTest {
                     flowEntryPoint = null,
                     metadata = emptyMap(),
                     cleanupPolicy = DEFAULT_CLEANUP_POLICY,
+                    metaType = "android-test-event",
+                    metaVersion = "1.0.0",
                 )
 
             val activeEventId =
@@ -275,6 +314,8 @@ class WideEventRepositoryTest {
                     flowEntryPoint = null,
                     metadata = emptyMap(),
                     cleanupPolicy = DEFAULT_CLEANUP_POLICY,
+                    metaType = "android-test-event",
+                    metaVersion = "1.0.0",
                 )
 
             // complete wide event
@@ -306,6 +347,8 @@ class WideEventRepositoryTest {
                         "key2" to null,
                     ),
                     cleanupPolicy = DEFAULT_CLEANUP_POLICY,
+                    metaType = "android-test-event",
+                    metaVersion = "1.0.0",
                 )
 
             assertTrue(eventId > 0)
@@ -331,6 +374,8 @@ class WideEventRepositoryTest {
                     flowEntryPoint = null,
                     metadata = emptyMap(),
                     cleanupPolicy = policy,
+                    metaType = "android-test-event",
+                    metaVersion = "1.0.0",
                 )
 
             val event = wideEventRepository.getWideEvents(setOf(eventId)).single()
@@ -346,6 +391,8 @@ class WideEventRepositoryTest {
                     flowEntryPoint = null,
                     metadata = emptyMap(),
                     cleanupPolicy = DEFAULT_CLEANUP_POLICY,
+                    metaType = "android-test-event",
+                    metaVersion = "1.0.0",
                 )
 
             wideEventRepository.startInterval(
@@ -368,6 +415,8 @@ class WideEventRepositoryTest {
                     flowEntryPoint = null,
                     metadata = emptyMap(),
                     cleanupPolicy = DEFAULT_CLEANUP_POLICY,
+                    metaType = "android-test-event",
+                    metaVersion = "1.0.0",
                 )
 
             wideEventRepository.startInterval(
@@ -394,6 +443,8 @@ class WideEventRepositoryTest {
             flowEntryPoint = null,
             metadata = emptyMap(),
             cleanupPolicy = DEFAULT_CLEANUP_POLICY,
+            metaType = "android-test-event",
+            metaVersion = "1.0.0",
         )
 
         wideEventRepository.startInterval(
@@ -417,6 +468,8 @@ class WideEventRepositoryTest {
             flowEntryPoint = null,
             metadata = emptyMap(),
             cleanupPolicy = DEFAULT_CLEANUP_POLICY,
+            metaType = "android-test-event",
+            metaVersion = "1.0.0",
         )
 
         wideEventRepository.startInterval(
@@ -440,6 +493,8 @@ class WideEventRepositoryTest {
             flowEntryPoint = null,
             metadata = emptyMap(),
             cleanupPolicy = DEFAULT_CLEANUP_POLICY,
+            metaType = "android-test-event",
+            metaVersion = "1.0.0",
         )
 
         wideEventRepository.startInterval(
@@ -464,6 +519,8 @@ class WideEventRepositoryTest {
             flowEntryPoint = null,
             metadata = emptyMap(),
             cleanupPolicy = DEFAULT_CLEANUP_POLICY,
+            metaType = "android-test-event",
+            metaVersion = "1.0.0",
         )
 
         wideEventRepository.startInterval(
@@ -488,6 +545,8 @@ class WideEventRepositoryTest {
             flowEntryPoint = null,
             metadata = emptyMap(),
             cleanupPolicy = DEFAULT_CLEANUP_POLICY,
+            metaType = "android-test-event",
+            metaVersion = "1.0.0",
         )
 
         wideEventRepository.startInterval(
@@ -511,6 +570,8 @@ class WideEventRepositoryTest {
             flowEntryPoint = null,
             metadata = emptyMap(),
             cleanupPolicy = DEFAULT_CLEANUP_POLICY,
+            metaType = "android-test-event",
+            metaVersion = "1.0.0",
         )
 
         wideEventRepository.startInterval(
@@ -534,6 +595,8 @@ class WideEventRepositoryTest {
             flowEntryPoint = null,
             metadata = emptyMap(),
             cleanupPolicy = DEFAULT_CLEANUP_POLICY,
+            metaType = "android-test-event",
+            metaVersion = "1.0.0",
         )
 
         wideEventRepository.startInterval(
@@ -557,6 +620,8 @@ class WideEventRepositoryTest {
             flowEntryPoint = null,
             metadata = emptyMap(),
             cleanupPolicy = DEFAULT_CLEANUP_POLICY,
+            metaType = "android-test-event",
+            metaVersion = "1.0.0",
         )
 
         wideEventRepository.startInterval(
@@ -580,6 +645,8 @@ class WideEventRepositoryTest {
             flowEntryPoint = null,
             metadata = emptyMap(),
             cleanupPolicy = DEFAULT_CLEANUP_POLICY,
+            metaType = "android-test-event",
+            metaVersion = "1.0.0",
         )
         val customBuckets = listOf(Duration.ofMillis(100), Duration.ofMillis(500), Duration.ofSeconds(2))
 
@@ -602,6 +669,8 @@ class WideEventRepositoryTest {
             flowEntryPoint = null,
             metadata = emptyMap(),
             cleanupPolicy = DEFAULT_CLEANUP_POLICY,
+            metaType = "android-test-event",
+            metaVersion = "1.0.0",
         )
         val unorderedBuckets = listOf(Duration.ofSeconds(2), Duration.ofMillis(100), Duration.ofMillis(500))
 
@@ -627,6 +696,8 @@ class WideEventRepositoryTest {
             flowEntryPoint = null,
             metadata = emptyMap(),
             cleanupPolicy = DEFAULT_CLEANUP_POLICY,
+            metaType = "android-test-event",
+            metaVersion = "1.0.0",
         )
 
         assertThrows(IllegalArgumentException::class.java) {
@@ -648,6 +719,8 @@ class WideEventRepositoryTest {
             flowEntryPoint = null,
             metadata = emptyMap(),
             cleanupPolicy = DEFAULT_CLEANUP_POLICY,
+            metaType = "android-test-event",
+            metaVersion = "1.0.0",
         )
 
         wideEventRepository.startInterval(
@@ -664,6 +737,106 @@ class WideEventRepositoryTest {
         assertEquals(Duration.ofMillis(-5), duration)
         assertEquals("-1", event.metadata["interval_1"])
     }
+
+    @Test
+    fun `when an event is the first completed today for its name and status, it is marked as the first daily occurrence`() = runTest {
+        val eventId = insertEvent(name = "test_event")
+
+        wideEventRepository.setWideEventStatus(eventId = eventId, status = SUCCESS, metadata = emptyMap())
+
+        assertTrue(isFirstDailyOccurrence(eventId))
+    }
+
+    @Test
+    fun `when an event with the same name and status already completed today, it is not the first daily occurrence`() = runTest {
+        val firstEventId = insertEvent(name = "test_event")
+        val secondEventId = insertEvent(name = "test_event")
+
+        wideEventRepository.setWideEventStatus(eventId = firstEventId, status = SUCCESS, metadata = emptyMap())
+        wideEventRepository.setWideEventStatus(eventId = secondEventId, status = SUCCESS, metadata = emptyMap())
+
+        assertTrue(isFirstDailyOccurrence(firstEventId))
+        assertFalse(isFirstDailyOccurrence(secondEventId))
+    }
+
+    @Test
+    fun `when events share a name but differ in status, each is the first daily occurrence`() = runTest {
+        val successEventId = insertEvent(name = "test_event")
+        val failureEventId = insertEvent(name = "test_event")
+
+        wideEventRepository.setWideEventStatus(eventId = successEventId, status = SUCCESS, metadata = emptyMap())
+        wideEventRepository.setWideEventStatus(eventId = failureEventId, status = FAILURE, metadata = emptyMap())
+
+        assertTrue(isFirstDailyOccurrence(successEventId))
+        assertTrue(isFirstDailyOccurrence(failureEventId))
+    }
+
+    @Test
+    fun `when events share a status but differ in name, each is the first daily occurrence`() = runTest {
+        val firstEventId = insertEvent(name = "test_event_1")
+        val secondEventId = insertEvent(name = "test_event_2")
+
+        wideEventRepository.setWideEventStatus(eventId = firstEventId, status = SUCCESS, metadata = emptyMap())
+        wideEventRepository.setWideEventStatus(eventId = secondEventId, status = SUCCESS, metadata = emptyMap())
+
+        assertTrue(isFirstDailyOccurrence(firstEventId))
+        assertTrue(isFirstDailyOccurrence(secondEventId))
+    }
+
+    @Test
+    fun `when the same name and status completes later on the same UTC day, it is not the first daily occurrence`() = runTest {
+        val firstEventId = insertEvent(name = "test_event")
+        val secondEventId = insertEvent(name = "test_event")
+
+        wideEventRepository.setWideEventStatus(eventId = firstEventId, status = SUCCESS, metadata = emptyMap())
+        timeProvider.currentTime = Instant.parse("2025-12-03T23:59:59.00Z")
+        wideEventRepository.setWideEventStatus(eventId = secondEventId, status = SUCCESS, metadata = emptyMap())
+
+        assertFalse(isFirstDailyOccurrence(secondEventId))
+    }
+
+    @Test
+    fun `when the same name and status completes on the next UTC day, it is the first daily occurrence again`() = runTest {
+        val firstEventId = insertEvent(name = "test_event")
+        val secondEventId = insertEvent(name = "test_event")
+
+        wideEventRepository.setWideEventStatus(eventId = firstEventId, status = SUCCESS, metadata = emptyMap())
+        timeProvider.currentTime = Instant.parse("2025-12-04T00:00:00.00Z")
+        wideEventRepository.setWideEventStatus(eventId = secondEventId, status = SUCCESS, metadata = emptyMap())
+
+        assertTrue(isFirstDailyOccurrence(secondEventId))
+    }
+
+    @Test
+    fun `when an event is still active, it is not marked as the first daily occurrence`() = runTest {
+        val eventId = insertEvent(name = "test_event")
+
+        assertFalse(isFirstDailyOccurrence(eventId))
+    }
+
+    @Test
+    fun `when an event completes, it does not affect the daily occurrence of an event completed earlier`() = runTest {
+        val firstEventId = insertEvent(name = "test_event")
+        val secondEventId = insertEvent(name = "test_event")
+
+        wideEventRepository.setWideEventStatus(eventId = firstEventId, status = SUCCESS, metadata = emptyMap())
+        wideEventRepository.setWideEventStatus(eventId = secondEventId, status = SUCCESS, metadata = emptyMap())
+
+        assertTrue(isFirstDailyOccurrence(firstEventId))
+    }
+
+    private suspend fun insertEvent(name: String): Long =
+        wideEventRepository.insertWideEvent(
+            name = name,
+            flowEntryPoint = null,
+            metadata = emptyMap(),
+            cleanupPolicy = DEFAULT_CLEANUP_POLICY,
+            metaType = "android-${name.replace('_', '-')}",
+            metaVersion = "1.0.0",
+        )
+
+    private suspend fun isFirstDailyOccurrence(eventId: Long): Boolean =
+        wideEventRepository.getWideEvents(setOf(eventId)).single().isFirstDailyOccurrence
 
     companion object {
         val DEFAULT_CLEANUP_POLICY =

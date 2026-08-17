@@ -212,6 +212,31 @@ class RealContentScopeScriptsTest {
     }
 
     @Test
+    fun whenOptimizeEnabledAndUnprotectedTemporaryIsANewInstanceWithEqualContentsThenScriptIsNotReassembled() {
+        contentScopeScriptsFeature.optimizeContentScopeInjection().setRawStoredState(State(enable = true))
+        testee.getScript(null, listOf())
+
+        // The repository publishes a new list instance on every reload, even when the contents are unchanged,
+        // so the identity fast path misses and the equals fallback has to stop a pointless reassembly.
+        whenever(mockUnprotectedTemporary.unprotectedTemporaryExceptions)
+            .thenReturn(listOf(unprotectedTemporaryException, unprotectedTemporaryException2))
+        testee.getScript(null, listOf())
+
+        verify(mockContentScopeJsReader).getContentScopeJS()
+    }
+
+    @Test
+    fun whenOptimizeEnabledAndAllowListIsANewInstanceWithEqualContentsThenScriptIsNotReassembled() {
+        contentScopeScriptsFeature.optimizeContentScopeInjection().setRawStoredState(State(enable = true))
+        testee.getScript(null, listOf())
+
+        whenever(mockUserAllowListRepository.domainsInUserAllowList()).thenReturn(listOf(exampleUrl))
+        testee.getScript(null, listOf())
+
+        verify(mockContentScopeJsReader).getContentScopeJS()
+    }
+
+    @Test
     fun whenOptimizeEnabledThenPluginConfigIsSweptOnEveryCall() {
         contentScopeScriptsFeature.optimizeContentScopeInjection().setRawStoredState(State(enable = true))
 
@@ -259,6 +284,142 @@ class RealContentScopeScriptsTest {
 
         assertFalse("config dropped while on the legacy path must not be resurrected", js.contains(config2))
         assertTrue(js.contains("\"features\":{$config1}"))
+    }
+
+    @Test
+    fun whenFlagFlipsBackToOptimizedThenExceptionsRestoredToTheirPreFlipValueAreStillReflected() {
+        val optimizeFlag = contentScopeScriptsFeature.optimizeContentScopeInjection()
+
+        // Record the full exception list on the optimized path.
+        optimizeFlag.setRawStoredState(State(enable = true))
+        testee.getScript(null, listOf())
+
+        // The legacy path takes over, the list shrinks, and legacy rewrites the shared exceptions JSON.
+        optimizeFlag.setRawStoredState(State(enable = false))
+        whenever(mockUnprotectedTemporary.unprotectedTemporaryExceptions).thenReturn(listOf(unprotectedTemporaryException))
+        assertTrue(testee.getScript(null, listOf()).contains("\"unprotectedTemporary\":[{\"domain\":\"example.com\",\"reason\":\"reason\"}]"))
+
+        // Back on the optimized path with the list restored to its pre-flip value. Comparing against a baseline
+        // captured before the flip would find no change and keep serving the JSON legacy wrote.
+        optimizeFlag.setRawStoredState(State(enable = true))
+        whenever(mockUnprotectedTemporary.unprotectedTemporaryExceptions)
+            .thenReturn(listOf(unprotectedTemporaryException, unprotectedTemporaryException2))
+        val js = testee.getScript(null, listOf())
+
+        assertTrue(
+            "the restored exception list must be reflected",
+            js.contains(
+                "\"unprotectedTemporary\":[{\"domain\":\"example.com\",\"reason\":\"reason\"}," +
+                    "{\"domain\":\"foo.com\",\"reason\":\"reason2\"}]",
+            ),
+        )
+    }
+
+    @Test
+    fun whenFlagFlipsBackToOptimizedThenAnAllowListRestoredToItsPreFlipValueIsStillReflected() {
+        val optimizeFlag = contentScopeScriptsFeature.optimizeContentScopeInjection()
+
+        optimizeFlag.setRawStoredState(State(enable = true))
+        testee.getScript(null, listOf())
+
+        optimizeFlag.setRawStoredState(State(enable = false))
+        whenever(mockUserAllowListRepository.domainsInUserAllowList()).thenReturn(listOf(exampleUrl2))
+        assertTrue(testee.getScript(null, listOf()).contains("[\"$exampleUrl2\"]"))
+
+        optimizeFlag.setRawStoredState(State(enable = true))
+        whenever(mockUserAllowListRepository.domainsInUserAllowList()).thenReturn(listOf(exampleUrl))
+        val js = testee.getScript(null, listOf())
+
+        assertTrue("the restored allow list must be reflected", js.contains("[\"$exampleUrl\"]"))
+    }
+
+    @Test
+    fun whenFlagFlipsToOptimizedAndTheAllowListEmptiedWhileOnLegacyThenTheEmptyListIsReflected() {
+        val optimizeFlag = contentScopeScriptsFeature.optimizeContentScopeInjection()
+
+        optimizeFlag.setRawStoredState(State(enable = false))
+        assertTrue(testee.getScript(null, listOf()).contains("[\"$exampleUrl\"]"))
+
+        // Emptying is the one value a baseline reset cannot be told apart from, so the JSON legacy wrote
+        // must not survive on the strength of the baseline alone.
+        optimizeFlag.setRawStoredState(State(enable = true))
+        whenever(mockUserAllowListRepository.domainsInUserAllowList()).thenReturn(emptyList())
+        val js = testee.getScript(null, listOf())
+
+        assertTrue("the emptied allow list must be reflected", js.contains(", [], "))
+    }
+
+    @Test
+    fun whenFlagFlipsToOptimizedAndExceptionsEmptiedWhileOnLegacyThenTheEmptyListIsReflected() {
+        val optimizeFlag = contentScopeScriptsFeature.optimizeContentScopeInjection()
+
+        optimizeFlag.setRawStoredState(State(enable = false))
+        assertTrue(testee.getScript(null, listOf()).contains("\"domain\":\"example.com\""))
+
+        optimizeFlag.setRawStoredState(State(enable = true))
+        whenever(mockUnprotectedTemporary.unprotectedTemporaryExceptions).thenReturn(emptyList())
+        val js = testee.getScript(null, listOf())
+
+        assertTrue("the emptied exception list must be reflected", js.contains("\"unprotectedTemporary\":[]"))
+    }
+
+    @Test
+    fun whenFlagFlipsOnOffOnWithUnchangedInputsThenEveryScriptIsIdentical() {
+        val optimizeFlag = contentScopeScriptsFeature.optimizeContentScopeInjection()
+
+        optimizeFlag.setRawStoredState(State(enable = true))
+        val optimizedJs = testee.getScript(null, listOf())
+
+        optimizeFlag.setRawStoredState(State(enable = false))
+        val legacyJs = testee.getScript(null, listOf())
+
+        optimizeFlag.setRawStoredState(State(enable = true))
+        val optimizedAgainJs = testee.getScript(null, listOf())
+
+        verifyJsScript(optimizedJs)
+        verifyJsScript(legacyJs)
+        verifyJsScript(optimizedAgainJs)
+        assertEquals(optimizedJs, legacyJs)
+        assertEquals(optimizedJs, optimizedAgainJs)
+    }
+
+    @Test
+    fun whenFlagFlipsAndEveryInputIsEmptiedThenTheEmptyStateIsReflected() {
+        val optimizeFlag = contentScopeScriptsFeature.optimizeContentScopeInjection()
+
+        optimizeFlag.setRawStoredState(State(enable = false))
+        assertTrue(testee.getScript(null, listOf()).contains("\"features\":{$config1,$config2}"))
+
+        // Every input now coincides with the value the caches are dropped to, so nothing downstream is
+        // recomputed and the dropped state has to be coherent on its own.
+        optimizeFlag.setRawStoredState(State(enable = true))
+        whenever(mockPluginPoint.getPlugins()).thenReturn(emptyList())
+        whenever(mockUnprotectedTemporary.unprotectedTemporaryExceptions).thenReturn(emptyList())
+        whenever(mockUserAllowListRepository.domainsInUserAllowList()).thenReturn(emptyList())
+        val js = testee.getScript(null, listOf())
+
+        assertTrue("the emptied content scope must be reflected", js.contains("{\"features\":{},\"unprotectedTemporary\":[]}"))
+        assertTrue("the emptied allow list must be reflected", js.contains(", [], "))
+    }
+
+    @Test
+    fun whenFlagFlipsBackToLegacyThenAnAllowListRestoredToItsPreFlipValueIsStillReflected() {
+        val optimizeFlag = contentScopeScriptsFeature.optimizeContentScopeInjection()
+
+        optimizeFlag.setRawStoredState(State(enable = false))
+        assertTrue(testee.getScript(null, listOf()).contains("[\"$exampleUrl\"]"))
+
+        // The optimized path rewrites the shared allow list JSON, so legacy cannot rely on a baseline
+        // recorded before the flip either.
+        optimizeFlag.setRawStoredState(State(enable = true))
+        whenever(mockUserAllowListRepository.domainsInUserAllowList()).thenReturn(listOf(exampleUrl2))
+        assertTrue(testee.getScript(null, listOf()).contains("[\"$exampleUrl2\"]"))
+
+        optimizeFlag.setRawStoredState(State(enable = false))
+        whenever(mockUserAllowListRepository.domainsInUserAllowList()).thenReturn(listOf(exampleUrl))
+        val js = testee.getScript(null, listOf())
+
+        assertTrue("the restored allow list must be reflected", js.contains("[\"$exampleUrl\"]"))
     }
 
     @Test

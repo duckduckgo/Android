@@ -28,6 +28,9 @@ fun WideEventEntity.mapToRepositoryWideEvent(): WideEventRepository.WideEvent =
         activeIntervals = activeIntervals.map { it.mapToRepositoryWideEventInterval() },
         createdAt = createdAt,
         samplingProbability = samplingProbability,
+        metaType = metaType,
+        metaVersion = metaVersion,
+        isFirstDailyOccurrence = isFirstDailyOccurrence,
     )
 
 fun WideEventRepository.WideEventStatus.mapToDbWideEventStatus(): WideEventEntity.WideEventStatus =

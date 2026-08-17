@@ -128,7 +128,7 @@ jobs:
               '- add the approved API Proposal link(s) in the `API Proposals` field (one per line), or',
               '- write `None` there if this PR does not change the public API (e.g. KDoc, comments, tests).',
               '',
-              'See the *API Proposals* section in `.cursor/rules/contributions.mdc` for details.',
+              'See the *API Proposals* section in `.claude/docs/contributions.md` for details.',
             ].join('\n');
 
             await upsertSticky(comment);

@@ -4,14 +4,30 @@
         "owners": ["CDRussell"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": [
+            "appVersion",
+            {
+                "key": "ui_version",
+                "type": "string",
+                "description": "Which sync setup UI the user is on: v2 when the simplified sync UI is enabled (useSimplifiedSync), v1 on the legacy setup screens",
+                "enum": ["v1", "v2"]
+            }
+        ]
     },
     "sync-auto-restore_toggle_opted_out": {
         "description": "User taps Next on the Save Recovery Key screen with the auto-restore toggle OFF",
         "owners": ["CDRussell"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": [
+            "appVersion",
+            {
+                "key": "ui_version",
+                "type": "string",
+                "description": "Which sync setup UI the user is on: v2 when the simplified sync UI is enabled (useSimplifiedSync), v1 on the legacy setup screens",
+                "enum": ["v1", "v2"]
+            }
+        ]
     },
     "sync-auto-restore_settings_ready_shown": {
         "description": "Previous Session Ready screen shown in Settings when auto-restore data is available",
@@ -25,6 +41,12 @@
                 "type": "string",
                 "description": "Which sync setup flow the user chose before seeing the restore prompt",
                 "enum": ["sync_pairing", "sync_backup", "sync_recover"]
+            },
+            {
+                "key": "ui_version",
+                "type": "string",
+                "description": "Which sync setup UI the user is on: v2 when the simplified sync UI is enabled (useSimplifiedSync), v1 on the legacy setup screens",
+                "enum": ["v1", "v2"]
             }
         ]
     },
@@ -40,6 +62,12 @@
                 "type": "string",
                 "description": "Which sync setup flow the user chose before seeing the restore prompt",
                 "enum": ["sync_pairing", "sync_backup", "sync_recover"]
+            },
+            {
+                "key": "ui_version",
+                "type": "string",
+                "description": "Which sync setup UI the user is on: v2 when the simplified sync UI is enabled (useSimplifiedSync), v1 on the legacy setup screens",
+                "enum": ["v1", "v2"]
             }
         ]
     },
@@ -55,6 +83,12 @@
                 "type": "string",
                 "description": "Which sync setup flow the user chose before seeing the restore prompt",
                 "enum": ["sync_pairing", "sync_backup", "sync_recover"]
+            },
+            {
+                "key": "ui_version",
+                "type": "string",
+                "description": "Which sync setup UI the user is on: v2 when the simplified sync UI is enabled (useSimplifiedSync), v1 on the legacy setup screens",
+                "enum": ["v1", "v2"]
             }
         ]
     },
@@ -70,6 +104,12 @@
                 "type": "string",
                 "description": "Which sync setup flow the user chose before seeing the restore prompt",
                 "enum": ["sync_pairing", "sync_backup", "sync_recover"]
+            },
+            {
+                "key": "ui_version",
+                "type": "string",
+                "description": "Which sync setup UI the user is on: v2 when the simplified sync UI is enabled (useSimplifiedSync), v1 on the legacy setup screens",
+                "enum": ["v1", "v2"]
             }
         ]
     },
@@ -78,28 +118,60 @@
         "owners": ["CDRussell"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": [
+            "appVersion",
+            {
+                "key": "ui_version",
+                "type": "string",
+                "description": "Which sync setup UI the user is on: v2 when the simplified sync UI is enabled (useSimplifiedSync), v1 on the legacy setup screens",
+                "enum": ["v1", "v2"]
+            }
+        ]
     },
     "sync-auto-restore_settings_page_shown": {
         "description": "Sync settings page opened with the auto-restore toggle visible",
         "owners": ["CDRussell"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": [
+            "appVersion",
+            {
+                "key": "ui_version",
+                "type": "string",
+                "description": "Which sync setup UI the user is on: v2 when the simplified sync UI is enabled (useSimplifiedSync), v1 on the legacy setup screens",
+                "enum": ["v1", "v2"]
+            }
+        ]
     },
     "sync-auto-restore_settings_page_toggle_enabled": {
         "description": "User turns the auto-restore toggle ON in Sync settings",
         "owners": ["CDRussell"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": [
+            "appVersion",
+            {
+                "key": "ui_version",
+                "type": "string",
+                "description": "Which sync setup UI the user is on: v2 when the simplified sync UI is enabled (useSimplifiedSync), v1 on the legacy setup screens",
+                "enum": ["v1", "v2"]
+            }
+        ]
     },
     "sync-auto-restore_settings_page_toggle_disabled": {
         "description": "User turns the auto-restore toggle OFF in Sync settings",
         "owners": ["CDRussell"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": [
+            "appVersion",
+            {
+                "key": "ui_version",
+                "type": "string",
+                "description": "Which sync setup UI the user is on: v2 when the simplified sync UI is enabled (useSimplifiedSync), v1 on the legacy setup screens",
+                "enum": ["v1", "v2"]
+            }
+        ]
     },
     "sync-auto-restore_success": {
         "description": "Auto-restore completed successfully",
@@ -113,6 +185,12 @@
                 "type": "string",
                 "description": "Whether the restore was triggered from onboarding or settings",
                 "enum": ["onboarding", "settings"]
+            },
+            {
+                "key": "ui_version",
+                "type": "string",
+                "description": "Which sync setup UI the user is on: v2 when the simplified sync UI is enabled (useSimplifiedSync), v1 on the legacy setup screens",
+                "enum": ["v1", "v2"]
             }
         ]
     },
@@ -138,6 +216,12 @@
                 "key": "errorMessage",
                 "type": "string",
                 "description": "Error message describing the failure"
+            },
+            {
+                "key": "ui_version",
+                "type": "string",
+                "description": "Which sync setup UI the user is on: v2 when the simplified sync UI is enabled (useSimplifiedSync), v1 on the legacy setup screens",
+                "enum": ["v1", "v2"]
             }
         ]
     },
@@ -153,6 +237,12 @@
                 "type": "string",
                 "description": "Which sync setup flow the user chose after skipping restore",
                 "enum": ["sync_pairing", "sync_backup", "sync_recover"]
+            },
+            {
+                "key": "ui_version",
+                "type": "string",
+                "description": "Which sync setup UI the user is on: v2 when the simplified sync UI is enabled (useSimplifiedSync), v1 on the legacy setup screens",
+                "enum": ["v1", "v2"]
             }
         ]
     },
@@ -178,6 +268,12 @@
                 "key": "errorMessage",
                 "type": "string",
                 "description": "Error message describing the failure"
+            },
+            {
+                "key": "ui_version",
+                "type": "string",
+                "description": "Which sync setup UI the user is on: v2 when the simplified sync UI is enabled (useSimplifiedSync), v1 on the legacy setup screens",
+                "enum": ["v1", "v2"]
             }
         ]
     }

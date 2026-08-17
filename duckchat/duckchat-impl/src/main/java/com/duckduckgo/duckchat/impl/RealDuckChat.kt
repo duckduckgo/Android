@@ -44,10 +44,10 @@ import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
-import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestionsStore
 import com.duckduckgo.duckchat.impl.repository.AddressBarPickerAttributionRepository
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
+import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.ChatSuggestionsStore
 import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
@@ -70,6 +70,12 @@ import kotlinx.coroutines.withContext
 import logcat.logcat
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import javax.inject.Inject
+
+data class EditPromptRequest(
+    val sessionId: String,
+    val tabId: String,
+    val contextual: Boolean,
+)
 
 interface DuckChatInternal : DuckChat {
     /**
@@ -123,14 +129,14 @@ interface DuckChatInternal : DuckChat {
     fun observeLastUsedTogglePosition(): Flow<String?>
 
     /**
-     * Updates the live input-mode selection. Called by [InputModeWidget] when its tab
+     * Updates the live input-mode selection. Called by [NativeInputModeWidget] when its tab
      * selection changes, and on attach/detach to keep [DuckChatInputModeState.displayedMode]
      * in sync with the actual widget state.
      */
     fun setSelectedMode(mode: InputMode)
 
     /**
-     * Updates the live input query. Called by [InputModeWidget] as the user types (on either tab) and
+     * Updates the live input query. Called by [NativeInputModeWidget] as the user types (on either tab) and
      * on attach/detach, to keep [DuckChatInputModeState.inputQuery] in sync with the shared input field.
      */
     fun setInputQuery(query: String)
@@ -222,6 +228,16 @@ interface DuckChatInternal : DuckChat {
     val showModelPickerEvents: Flow<String>
 
     /**
+     * Asks the native input on [EditPromptRequest.tabId] to open the edit screen for a pending session.
+     */
+    fun requestEditPrompt(request: EditPromptRequest)
+
+    /**
+     * Events asking the native input to open the edit screen.
+     */
+    val editPromptRequests: Flow<EditPromptRequest>
+
+    /**
      * Returns whether image upload is enabled or not.
      */
     fun isImageUploadEnabled(): Boolean
@@ -250,6 +266,12 @@ interface DuckChatInternal : DuckChat {
      * Returns whether dedicated Duck.ai contextual mode is enabled (its feature flag is enabled).
      */
     fun isDuckChatContextualModeEnabled(): Boolean
+
+    /**
+     * Returns whether the redesigned Duck.ai contextual entry (anchored menu) is enabled. Only
+     * meaningful when contextual mode is also enabled.
+     */
+    fun isContextualSheetRedesignEnabled(): Boolean
 
     /**
      * Checks whether DuckChat is enabled based on remote config flag.
@@ -285,6 +307,11 @@ interface DuckChatInternal : DuckChat {
     fun isContextualNativeInputEnabled(): Boolean
 
     /**
+     * True when editing a sent prompt is handled by the native input. Requires the native chat input.
+     */
+    fun isNativePromptEditingEnabled(): Boolean
+
+    /**
      * Returns whether Duck.ai in contextual mode should attach more than one content
      */
     fun areMultipleContentAttachmentsEnabled(): Boolean
@@ -294,17 +321,6 @@ interface DuckChatInternal : DuckChat {
      * @return `true` if the given [url] can be handled in the duck ai webview and `false` otherwise.
      */
     fun canHandleOnAiWebView(url: String): Boolean
-
-    /**
-     * Indicates whether Input Screen will present the input box at the bottom, if user has the omnibar also set to the bottom position.
-     * Otherwise, the input box will be at the top.
-     */
-    val inputScreenBottomBarEnabled: StateFlow<Boolean>
-
-    /**
-     * Indicates whether the three main button should be shown in the Input Screen
-     */
-    val showMainButtonsInInputScreen: StateFlow<Boolean>
 }
 
 enum class ChatState(
@@ -335,6 +351,37 @@ enum class ReportMetric(
     USER_DID_CREATE_NEW_CHAT("userDidCreateNewChat"),
     USER_DID_TAP_KEYBOARD_RETURN_KEY("userDidTapKeyboardReturnKey"),
     USER_DID_ACCEPT_TERMS_AND_CONDITIONS("userDidAcceptTermsAndConditions"),
+
+    // Subscription-funnel impression/click events from the Duck.ai website (FE).
+    USER_DID_VIEW_AI_SIDEBAR_UPGRADE_BUTTON("userDidViewAiSidebarUpgradeButton"),
+    USER_DID_CLICK_AI_SIDEBAR_UPGRADE_BUTTON("userDidClickAiSidebarUpgradeButton"),
+    USER_DID_VIEW_ACTIVATE_SUBSCRIPTION_BANNER("userDidViewActivateSubscriptionBanner"),
+    USER_DID_CLICK_ACTIVATE_SUBSCRIPTION_BUTTON("userDidClickActivateSubscriptionButton"),
+    USER_DID_VIEW_FREE_PLAN_BADGE("userDidViewFreePlanBadge"),
+    USER_DID_CLICK_FREE_PLAN_UPGRADE_BUTTON("userDidClickFreePlanUpgradeButton"),
+    USER_DID_VIEW_FREE_LIMIT_MESSAGE("userDidViewFreeLimitMessage"),
+    USER_DID_CLICK_FREE_LIMIT_SUBSCRIBE_LINK("userDidClickFreeLimitSubscribeLink"),
+    USER_DID_VIEW_IMAGE_GENERATION_LIMIT_MESSAGE("userDidViewImageGenerationLimitMessage"),
+    USER_DID_CLICK_IMAGE_GENERATION_LIMIT_SUBSCRIBE_BUTTON("userDidClickImageGenerationLimitSubscribeButton"),
+    USER_DID_VIEW_PLUS_LIMIT_MESSAGE("userDidViewPlusLimitMessage"),
+    USER_DID_CLICK_PLUS_LIMIT_UPGRADE_LINK("userDidClickPlusLimitUpgradeLink"),
+    USER_DID_VIEW_PROMOTION_CARD("userDidViewPromotionCard"),
+    USER_DID_CLICK_PROMOTION_CARD_BUTTON("userDidClickPromotionCardButton"),
+    USER_DID_VIEW_SETTINGS_SUBSCRIBE_BUTTON("userDidViewSettingsSubscribeButton"),
+    USER_DID_CLICK_SETTINGS_SUBSCRIBE_BUTTON("userDidClickSettingsSubscribeButton"),
+    USER_DID_VIEW_VOICE_CHAT_DURATION_LIMIT_MODAL("userDidViewVoiceChatDurationLimitModal"),
+    USER_DID_CLICK_VOICE_CHAT_DURATION_LIMIT_MODAL_SUBSCRIBE_BUTTON("userDidClickVoiceChatDurationLimitModalSubscribeButton"),
+    USER_DID_VIEW_VOICE_CHAT_LIMIT_MODAL("userDidViewVoiceChatLimitModal"),
+    USER_DID_CLICK_VOICE_CHAT_LIMIT_MODAL_SUBSCRIBE_BUTTON("userDidClickVoiceChatLimitModalSubscribeButton"),
+    USER_DID_VIEW_PRO_UPGRADE_DISCLAIMER_BANNER("userDidViewProUpgradeDisclaimerBanner"),
+    USER_DID_CLICK_PRO_UPGRADE_DISCLAIMER_BANNER_BUTTON("userDidClickProUpgradeDisclaimerBannerButton"),
+
+    // Subscribe / upgrade modal events. FE sends the funnel entry point as `source`, which forms the origin.
+    USER_DID_OPEN_SUBSCRIBE_MODAL("userDidOpenSubscribeModal"),
+    USER_DID_CLICK_SUBSCRIBE_ON_SUBSCRIBE_MODAL("userDidClickSubscribeOnSubscribeModal"),
+    USER_DID_CLICK_ACTIVATE_ON_SUBSCRIBE_MODAL("userDidClickActivateOnSubscribeModal"),
+    USER_DID_OPEN_UPGRADE_TO_PRO_MODAL("userDidOpenUpgradeToProModal"),
+    USER_DID_CLICK_UPGRADE_ON_UPGRADE_TO_PRO_MODAL("userDidClickUpgradeOnUpgradeToProModal"),
     ;
 
     companion object {
@@ -352,6 +399,34 @@ enum class ModelTier(val model: String) {
 
     companion object {
         fun fromValue(v: String?): ModelTier? = entries.firstOrNull { it.model.equals(v, ignoreCase = true) }
+    }
+}
+
+// Funnel entry point supplied by the FE as `source` on the subscribe/upgrade modal events. Parsed from
+// the raw value and falls back to [UNKNOWN].
+enum class SubscriptionFunnelSource(val value: String) {
+    MODEL_PICKER("modelpicker"),
+    REASONING_PICKER("reasoningpicker"),
+    REASONING_DROPDOWN("reasoningdropdown"),
+    AI_SIDEBAR("aisidebar"),
+    ACTIVATE_SUBSCRIPTION("activatesubscription"),
+    FREE_LABEL("freelabel"),
+    FREE_LIMIT("freelimit"),
+    IMAGE_GENERATION_LIMIT("imagegenerationlimit"),
+    PLUS_LIMIT("pluslimit"),
+    PROMOTION_CARD("promotioncard"),
+    SETTINGS("settings"),
+    SWITCH_MODEL("switchmodel"),
+    VOICE_CHAT_DURATION_LIMIT("voicechatdurationlimit"),
+    VOICE_CHAT_LIMIT("voicechatlimit"),
+    DISCLAIMER_BANNER("disclaimerbanner"),
+    UNKNOWN("unknown"),
+    ;
+
+    val origin: String get() = "funnel_duckai_android__$value"
+
+    companion object {
+        fun fromValue(v: String?): SubscriptionFunnelSource = entries.firstOrNull { it.value == v } ?: UNKNOWN
     }
 }
 
@@ -395,25 +470,20 @@ class RealDuckChat @Inject constructor(
     private val closeChatFlow = MutableSharedFlow<Unit>(replay = 0)
     private val _showSettings = MutableStateFlow(false)
     private val _showInputScreen = MutableStateFlow(false)
-    private val _showInputScreenAutomaticallyOnNewTab = MutableStateFlow(false)
-    private val _inputScreenBottomBarEnabled = MutableStateFlow(false)
     private val _showPopupMenuShortcut = MutableStateFlow(false)
     private val _showOmnibarShortcutOnNtpAndOnFocus = MutableStateFlow(false)
     private val _showOmnibarShortcutInAllStates = MutableStateFlow(false)
     private val _showAIChatAddressBarOptionChoiceScreen = MutableStateFlow(false)
     private val _showClearDuckAIChatHistory = MutableStateFlow(true)
-    private val _showMainButtonsInInputScreen = MutableStateFlow(false)
 
     private val _chatState = MutableStateFlow(ChatState.HIDE)
     private val _showModelPickerEvents = MutableSharedFlow<String>(extraBufferCapacity = 1)
+    private val _editPromptRequests = MutableSharedFlow<EditPromptRequest>(extraBufferCapacity = 1)
     private val _nativeInputFieldEnabled = MutableStateFlow(false)
     private val _nativeChatInputEnabled = MutableStateFlow(false)
     private val _nativeInputNavBarEnabled = MutableStateFlow(false)
-    private val _showInputScreenOnSystemSearchLaunch = MutableStateFlow(false)
     private val _showVoiceSearchToggle = MutableStateFlow(false)
     private val _showVoiceChatEntry = MutableStateFlow(false)
-    private val _showFullScreenMode = MutableStateFlow(false)
-    private val _showFullScreenModeToggle = MutableStateFlow(false)
     private val _showContextualMode = MutableStateFlow(false)
     private val _allowDuckAiAsDigitalAssistant = MutableStateFlow(false)
     private val _displayedMode = MutableStateFlow(InputMode.SEARCH)
@@ -426,9 +496,7 @@ class RealDuckChat @Inject constructor(
 
     private var isDuckChatFeatureEnabled = false
     private var isDuckAiInBrowserEnabled = false
-    private var duckAiInputScreenOpenAutomaticallyEnabled = false
     private var duckAiInputScreen = false
-    private var duckAiInputScreenBottomBarEnabled = false
     private var showNewAddressBarPickerScreen = false
     private var isDuckChatUserEnabled = false
     private var isChatSyncFeatureEnabled = false
@@ -440,16 +508,15 @@ class RealDuckChat @Inject constructor(
     private var isStandaloneMigrationEnabled: Boolean = false
     private var keepSessionAliveInMinutes: Int = DEFAULT_SESSION_ALIVE
     private var clearChatHistory: Boolean = true
-    private var inputScreenMainButtonsEnabled = false
-    private var showInputScreenOnSystemSearchLaunchEnabled: Boolean = true
-    private var isFullscreenModeEnabled: Boolean = false
     private var isContextualModeEnabled: Boolean = false
+    private var contextualSheetRedesignEnabled: Boolean = false
     private var isAutomaticContextAttachmentEnabled: Boolean = false
     private var duckAiNativeStorage: Boolean = false
     private var areMultipleContentAttachmentsEnabled: Boolean = false
     private var isNativeInputFieldEnabled: Boolean = false
     private var isNativeChatInputEnabled: Boolean = false
     private var isContextualNativeInputEnabled: Boolean = false
+    private var isNativePromptEditingEnabled: Boolean = false
 
     init {
         if (isMainProcess) {
@@ -516,9 +583,13 @@ class RealDuckChat @Inject constructor(
 
     override fun isChatSyncFeatureEnabled(): Boolean = isChatSyncFeatureEnabled
 
-    override fun isDuckChatFullScreenModeEnabled(): Boolean = isFullscreenModeEnabled
+    // Fullscreen mode is now the only Duck.ai tab experience (the fragment-overlay alternative is
+    // gone), so this tracks Duck.ai feature availability rather than the retired rollout flag.
+    override fun isDuckChatFullScreenModeEnabled(): Boolean = isDuckChatFeatureEnabled
 
     override fun isDuckChatContextualModeEnabled(): Boolean = isContextualModeEnabled
+
+    override fun isContextualSheetRedesignEnabled(): Boolean = contextualSheetRedesignEnabled
 
     override fun isAutomaticContextAttachmentEnabled(): Boolean = isAutomaticContextAttachmentEnabled
     override fun isNativeStorageEnabled(): Boolean = duckAiNativeStorage
@@ -526,6 +597,8 @@ class RealDuckChat @Inject constructor(
     override fun isNativeChatInputEnabled(): Boolean = isNativeChatInputEnabled
 
     override fun isContextualNativeInputEnabled(): Boolean = isContextualNativeInputEnabled
+
+    override fun isNativePromptEditingEnabled(): Boolean = isNativePromptEditingEnabled
 
     override fun areMultipleContentAttachmentsEnabled(): Boolean = areMultipleContentAttachmentsEnabled
 
@@ -601,13 +674,15 @@ class RealDuckChat @Inject constructor(
 
     override val showModelPickerEvents: Flow<String> = _showModelPickerEvents.asSharedFlow()
 
+    override fun requestEditPrompt(request: EditPromptRequest) {
+        _editPromptRequests.tryEmit(request)
+    }
+
+    override val editPromptRequests: Flow<EditPromptRequest> = _editPromptRequests.asSharedFlow()
+
     override val showSettings: StateFlow<Boolean> = _showSettings.asStateFlow()
 
     override val showInputScreen: StateFlow<Boolean> = _showInputScreen.asStateFlow()
-
-    override val showInputScreenAutomaticallyOnNewTab: StateFlow<Boolean> = _showInputScreenAutomaticallyOnNewTab.asStateFlow()
-
-    override val inputScreenBottomBarEnabled: StateFlow<Boolean> = _inputScreenBottomBarEnabled.asStateFlow()
 
     override val showPopupMenuShortcut: StateFlow<Boolean> = _showPopupMenuShortcut.asStateFlow()
 
@@ -617,19 +692,11 @@ class RealDuckChat @Inject constructor(
 
     override val showAIChatAddressBarOptionChoiceScreen: StateFlow<Boolean> = _showAIChatAddressBarOptionChoiceScreen.asStateFlow()
 
-    override val showMainButtonsInInputScreen: StateFlow<Boolean> = _showMainButtonsInInputScreen.asStateFlow()
-
     override val showClearDuckAIChatHistory: StateFlow<Boolean> = _showClearDuckAIChatHistory.asStateFlow()
-
-    override val showInputScreenOnSystemSearchLaunch: StateFlow<Boolean> = _showInputScreenOnSystemSearchLaunch.asStateFlow()
 
     override val showVoiceSearchToggle: StateFlow<Boolean> = _showVoiceSearchToggle.asStateFlow()
 
     override val showVoiceChatEntry: StateFlow<Boolean> = _showVoiceChatEntry.asStateFlow()
-
-    override val showFullScreenMode: StateFlow<Boolean> = _showFullScreenMode.asStateFlow()
-
-    override val showFullScreenModeToggle: StateFlow<Boolean> = _showFullScreenModeToggle.asStateFlow()
 
     override val showContextualMode: StateFlow<Boolean> = _showContextualMode.asStateFlow()
 
@@ -894,16 +961,9 @@ class RealDuckChat @Inject constructor(
             _showSettings.value = featureEnabled
             isDuckAiInBrowserEnabled = duckChatFeature.duckAiButtonInBrowser().isEnabled()
             duckAiInputScreen = duckChatFeature.duckAiInputScreen().isEnabled()
-            duckAiInputScreenOpenAutomaticallyEnabled = duckChatFeature.showInputScreenAutomaticallyOnNewTab().isEnabled()
-            duckAiInputScreenBottomBarEnabled = duckChatFeature.inputScreenBottomBarSupport().isEnabled()
             clearChatHistory = duckChatFeature.clearHistory().isEnabled()
             showNewAddressBarPickerScreen = duckChatFeature.showNewAddressBarPickerScreen().isEnabled()
-            showInputScreenOnSystemSearchLaunchEnabled = duckChatFeature.showInputScreenOnSystemSearchLaunch().isEnabled()
-            inputScreenMainButtonsEnabled = duckChatFeature.showMainButtonsInInputScreen().isEnabled()
             isChatSyncFeatureEnabled = deviceSyncState.isDuckChatSyncFeatureEnabled()
-
-            val showMainButtons = duckChatFeature.showMainButtonsInInputScreen().isEnabled()
-            _showMainButtonsInInputScreen.emit(showMainButtons)
 
             val settingsString = duckChatFeature.self().getSettings()
             val settingsJson =
@@ -944,6 +1004,7 @@ class RealDuckChat @Inject constructor(
             // Contextual native INPUT mode is gated by nativeChatInput AND the contextualNativeInput flag.
             // Read synchronously via isContextualNativeInputEnabled() — no flow needed (static per session).
             isContextualNativeInputEnabled = isNativeChatInputEnabled && duckChatFeature.contextualNativeInput().isEnabled()
+            isNativePromptEditingEnabled = isNativeChatInputEnabled && duckChatFeature.nativePromptEditing().isEnabled()
             _nativeInputNavBarEnabled.value = duckChatFeature.nativeInputNavBar().isEnabled()
             val inputScreenUserSettingEnabled = duckChatFeatureRepository.isInputScreenUserSettingEnabled()
 
@@ -960,12 +1021,6 @@ class RealDuckChat @Inject constructor(
                 isInputScreenFeatureAvailable() && isDuckChatFeatureEnabled && isDuckChatUserEnabled &&
                     inputScreenUserSettingEnabled && !isNativeInputFieldEnabled
             _showInputScreen.emit(showInputScreen)
-
-            _showInputScreenAutomaticallyOnNewTab.value = showInputScreen && duckAiInputScreenOpenAutomaticallyEnabled
-
-            _inputScreenBottomBarEnabled.value = showInputScreen && duckAiInputScreenBottomBarEnabled
-
-            _showInputScreenOnSystemSearchLaunch.value = showInputScreen && showInputScreenOnSystemSearchLaunchEnabled
 
             val showInBrowserMenu =
                 duckChatFeatureRepository.shouldShowInBrowserMenu() &&
@@ -995,14 +1050,6 @@ class RealDuckChat @Inject constructor(
                     isDuckChatFeatureEnabled && isDuckChatUserEnabled
             _showVoiceChatEntry.emit(showVoiceChatEntry)
 
-            // Full screen mode (new Duck.ai header, unified input, hamburger menu) is intentionally NOT gated on
-            // isDuckChatUserEnabled: users who disabled Duck.ai still get the new UX when navigating directly to a
-            // duck.ai tab. It remains gated on the feature rollout flag/setting only.
-            val showFullScreenMode = isDuckChatFeatureEnabled &&
-                (duckChatFeature.fullscreenMode().isEnabled() || duckChatFeatureRepository.isFullScreenModeUserSettingEnabled())
-            isFullscreenModeEnabled = showFullScreenMode
-            _showFullScreenMode.emit(showFullScreenMode)
-
             val isContextualModeKillSwitch = duckChatFeature.contextualModeKillSwitch().isEnabled()
 
             val showContextualMode = (isDuckChatFeatureEnabled && isDuckChatUserEnabled && isStandaloneMigrationCompleted()) || (
@@ -1011,6 +1058,8 @@ class RealDuckChat @Inject constructor(
 
             isContextualModeEnabled = showContextualMode && isContextualModeKillSwitch
             _showContextualMode.emit(isContextualModeEnabled)
+
+            contextualSheetRedesignEnabled = isContextualModeEnabled && duckChatFeature.contextualSheetRedesign().isEnabled()
 
             isAutomaticContextAttachmentEnabled = isContextualModeEnabled &&
                 duckChatFeature.automaticContextAttachment()

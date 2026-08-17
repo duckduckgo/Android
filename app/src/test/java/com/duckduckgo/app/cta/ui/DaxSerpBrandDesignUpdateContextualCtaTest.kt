@@ -204,6 +204,7 @@ class DaxSerpBrandDesignUpdateContextualCtaTest {
             isBrowserShowing = true,
             site = site(url = "http://www.duckduckgo.com"),
             detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
         )
 
         assertTrue(value is DaxSerpBrandDesignUpdateContextualCta)
@@ -219,6 +220,7 @@ class DaxSerpBrandDesignUpdateContextualCtaTest {
             isBrowserShowing = true,
             site = site(url = "http://www.duckduckgo.com"),
             detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
         )
 
         assertTrue(value is OnboardingDaxDialogCta.DaxSerpCta)

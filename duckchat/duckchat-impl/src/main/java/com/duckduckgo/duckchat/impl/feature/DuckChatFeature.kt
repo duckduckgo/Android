@@ -62,28 +62,6 @@ interface DuckChatFeature {
     fun duckAiInputScreen(): Toggle
 
     /**
-     * @return `true` when the Input Screen should open automatically when user creates a New Tab
-     * If the remote feature is not present defaults to `enabled`
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun showInputScreenAutomaticallyOnNewTab(): Toggle
-
-    /**
-     * @return `true` when the Input Screen should be shown when user open the app from system widgets
-     * If the remote feature is not present defaults to `disabled`
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun showInputScreenOnSystemSearchLaunch(): Toggle
-
-    /**
-     * @return `true` when the Input Screen can present a bottom input box, if user has the omnibar also set to the bottom position.
-     * If disabled, the Input Screen should always show the input box at the top of the screen.
-     * If the remote feature is not present defaults to `enabled`
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun inputScreenBottomBarSupport(): Toggle
-
-    /**
      * @return `true` when the new address bar option choice screen should be shown.
      * If the remote feature is not present defaults to `internal`.
      */
@@ -96,18 +74,6 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun clearHistory(): Toggle
-
-    /**
-     * @return `true` when the new input screen should show the three main buttons (fire, tabs, menu)
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun showMainButtonsInInputScreen(): Toggle
-
-    /**
-     * @return `true` when the new fullscreen mode is enabled
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun fullscreenMode(): Toggle
 
     /**
      * @return `true` when the remote config has the "duckAiVoiceSearch"
@@ -132,9 +98,10 @@ interface DuckChatFeature {
 
     /**
      * @return `true` when the Native Input Field should be used instead of the web-based input.
+     * If the remote feature is not present defaults to `true`.
      */
     @InternalAlwaysEnabled
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun nativeInputField(): Toggle
 
     /**
@@ -150,9 +117,16 @@ interface DuckChatFeature {
      * `supportsNativePrompt` JS flags). Has no effect unless [nativeInputField]
      * is also enabled. When disabled, Duck.ai contextual and full modes fall
      * back to the web input.
+     * If the remote feature is not present defaults to `true`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun nativeChatInput(): Toggle
+
+    /**
+     * Delegates editing an already-sent prompt to the native input instead of the Duck.ai inline editor.
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun nativeChatInput(): Toggle
+    fun nativePromptEditing(): Toggle
 
     /**
      * @return `true` when the native input top nav bar (fire / tabs / menu) may be shown. This is a
@@ -279,11 +253,11 @@ interface DuckChatFeature {
     fun duckAiVoiceChatService(): Toggle
 
     /**
-     * @return `true` when the contextual Duck.ai sheet improvements are enabled.
-     * If the remote feature is not present defaults to `true`
+     * @return `true` when context-aware suggested prompts are shown on the contextual Duck.ai start surface.
+     * If the remote feature is not present defaults to `internal`.
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun contextualSheetImprovements(): Toggle
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun contextualSuggestedPrompts(): Toggle
 
     /**
      * @return `true` when the native controls for AI Features are enabled in the app.
@@ -315,4 +289,19 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun contextualNativeInput(): Toggle
+
+    /**
+     * @return `true` when the native input attachment layout changes are enabled: the attachment row is
+     * placed above the text input, and the contextual sheet keeps its expanded padding regardless of focus.
+     * If the remote feature is not present defaults to `internal`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun nativeInputAttachmentChanges(): Toggle
+
+    /**
+     * @return `true` when the redesigned Duck.ai contextual sheet UI and flow are enabled.
+     * If the remote feature is not present defaults to `false`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun contextualSheetRedesign(): Toggle
 }

@@ -61,6 +61,13 @@ interface PirRemoteFeatures {
      */
     @DefaultValue(DefaultFeatureValue.TRUE)
     fun resumeInitialScanOnDashboardOpen(): Toggle
+
+    /**
+     * Kill-switch for the work queue. When disabled, runner work distribution falls
+     * back to static equal-count partitioning.
+     */
+    @DefaultValue(DefaultFeatureValue.TRUE)
+    fun workQueueScheduling(): Toggle
 }
 
 @SingleInstanceIn(AppScope::class)

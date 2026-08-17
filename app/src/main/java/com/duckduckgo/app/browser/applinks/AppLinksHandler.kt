@@ -18,7 +18,7 @@ package com.duckduckgo.app.browser.applinks
 
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
 import com.duckduckgo.app.browser.UriString
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -48,6 +48,9 @@ class DuckDuckGoAppLinksHandler @Inject constructor(
     var previousUrl: String? = null
     var isAUserQuery = false
     var hasTriggeredForDomain = false
+
+    // Domains exempt from every suppression rule below  as they launch on repeat navigations to the same
+    // domain, and without a user gesture.
     private val alwaysTriggerList = listOf("app.digid.nl")
 
     override fun handleAppLink(
@@ -63,10 +66,13 @@ class DuckDuckGoAppLinksHandler @Inject constructor(
             return false
         }
 
+        val urlString = appLink.uriString
+        val isAlwaysTriggerDomain = alwaysTriggerList.contains(urlString.extractDomain())
+
         // HTTP navigations shouldn't launch apps unless started with a user gesture. That is unless
         // the "trusted-caller" carve-out applies - if an app opens a Custom Tab, App Links that
         // point back to that same app should be allowed even without user interaction.
-        if (androidBrowserConfigFeature.customTabEndlessLoopFix().isEnabled()) {
+        if (!isAlwaysTriggerDomain && androidBrowserConfigFeature.customTabEndlessLoopFix().isEnabled()) {
             val targetPackage = appLink.appIntent?.component?.packageName ?: appLink.appIntent?.`package`
             val isTrustedCaller = targetPackage != null && clientPackage == targetPackage
             if (!hasGesture && !isTrustedCaller) {
@@ -74,15 +80,13 @@ class DuckDuckGoAppLinksHandler @Inject constructor(
             }
         }
 
-        val urlString = appLink.uriString
         previousUrl?.let {
             if (isSameOrSubdomain(it, urlString)) {
-                val shouldTrigger = alwaysTriggerList.contains(urlString.extractDomain())
-                if (isAUserQuery || !hasTriggeredForDomain || shouldTrigger) {
+                if (isAUserQuery || !hasTriggeredForDomain || isAlwaysTriggerDomain) {
                     previousUrl = urlString
                     launchAppLink()
                     hasTriggeredForDomain = true
-                    if (shouldTrigger) return true
+                    if (isAlwaysTriggerDomain) return true
                 }
                 return false
             }

@@ -97,6 +97,12 @@ class RealDuckAiModelManager @Inject constructor(
     init {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             try {
+                // Separate from the restore below so a failed migration cannot cost the user their selection.
+                stateMutex.withLock { clearPinnedDefaultModel() }
+            } catch (e: Exception) {
+                logcat { "Duck.ai Model Manager: failed to clear pinned default model: ${e.message}" }
+            }
+            try {
                 stateMutex.withLock { restoreCachedSelection() }
             } catch (e: Exception) {
                 logcat { "Duck.ai Model Manager: failed to restore cached selection: ${e.message}" }
@@ -108,6 +114,21 @@ class RealDuckAiModelManager @Inject constructor(
                     fetchModels()
                 }
         }
+    }
+
+    /**
+     * Earlier versions persisted the inferred default as if the user had picked it, which pinned most
+     * of the install base to [PINNED_DEFAULT_MODEL_ID] and stopped later server-side default changes
+     * from reaching them. Clearing that one id lets [resolveSelection] derive the current default
+     * again. Users who deliberately picked it are reset too, as the stored value records no intent.
+     */
+    private suspend fun clearPinnedDefaultModel() {
+        if (dataStore.hasClearedPinnedDefaultModel()) return
+        if (dataStore.getSelectedModel()?.id == PINNED_DEFAULT_MODEL_ID) {
+            dataStore.setSelectedModel(null)
+            logcat { "Duck.ai Model Manager: cleared pinned default model" }
+        }
+        dataStore.setClearedPinnedDefaultModel()
     }
 
     private suspend fun restoreCachedSelection() {
@@ -149,7 +170,7 @@ class RealDuckAiModelManager @Inject constructor(
                     }
                 val attachmentLimits = resolveAttachmentLimits(response.attachmentLimits, userTier)
                 stateMutex.withLock {
-                    val selectedModelId = validateAndPersistSelection(models)
+                    val selectedModelId = resolveSelection(models)
                     val selectedModel = models.find { it.id == selectedModelId }
                     val available = ReasoningResolver.availableModes(
                         supported = selectedModel?.supportedReasoningEfforts.orEmpty(),
@@ -181,19 +202,24 @@ class RealDuckAiModelManager @Inject constructor(
         return modelsService.getModels(url)
     }
 
-    private suspend fun validateAndPersistSelection(models: List<AIChatModel>): String? {
-        val currentSelectedId = dataStore.getSelectedModel()?.id
-        val validatedSelectedId = validateSelection(currentSelectedId, models)
-
-        if (validatedSelectedId != currentSelectedId) {
-            val validatedModel = models.find { it.id == validatedSelectedId }
-            if (validatedModel != null) {
-                dataStore.setSelectedModel(SelectedModel(validatedModel.id, validatedModel.shortName))
-            } else {
-                dataStore.setSelectedModel(null)
-            }
+    /**
+     * Only an explicit pick in [selectModel] is persisted. The default is re-derived from every
+     * response so that reordering the list, or promoting a new default, reaches users who never
+     * picked a model. A persisted pick that is gone from the response, or no longer accessible, is
+     * dropped rather than replaced, so we don't turn our fallback into a pick the user never made.
+     */
+    private suspend fun resolveSelection(models: List<AIChatModel>): String? {
+        val persistedId = dataStore.getSelectedModel()?.id
+        if (persistedId != null) {
+            val persisted = models.find { it.id == persistedId }
+            if (persisted != null && persisted.isAccessible) return persistedId
+            dataStore.setSelectedModel(null)
         }
-        return validatedSelectedId
+        return models.firstOrNull { it.isAccessible }?.id
+    }
+
+    private companion object {
+        const val PINNED_DEFAULT_MODEL_ID = "gpt-5.4-mini"
     }
 
     override suspend fun selectModel(model: AIChatModel) {
@@ -326,19 +352,6 @@ class RealDuckAiModelManager @Inject constructor(
             },
             supportedTools = remote.supportedTools.orEmpty().mapNotNull(Tool::from),
         )
-    }
-
-    private fun validateSelection(
-        currentSelectedId: String?,
-        models: List<AIChatModel>,
-    ): String? {
-        if (currentSelectedId == null) return models.firstOrNull { it.isAccessible }?.id
-
-        val selectedModel = models.find { it.id == currentSelectedId }
-        if (selectedModel == null || !selectedModel.isAccessible) {
-            return models.firstOrNull { it.isAccessible }?.id
-        }
-        return currentSelectedId
     }
 }
 

@@ -22,6 +22,7 @@ import com.duckduckgo.app.statistics.wideevents.api.ContextSection
 import com.duckduckgo.app.statistics.wideevents.api.FeatureData
 import com.duckduckgo.app.statistics.wideevents.api.FeatureSection
 import com.duckduckgo.app.statistics.wideevents.api.GlobalSection
+import com.duckduckgo.app.statistics.wideevents.api.MetaSection
 import com.duckduckgo.app.statistics.wideevents.api.WideEventRequest
 import com.duckduckgo.app.statistics.wideevents.api.WideEventService
 import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository
@@ -85,10 +86,15 @@ class ApiWideEventSenderTest {
         apiWideEventSender.sendWideEvent(event)
 
         val expectedRequest = WideEventRequest(
+            meta = MetaSection(
+                type = "android-subscription-purchase",
+                version = "1.0.0",
+            ),
             global = GlobalSection(
                 platform = "Android",
                 type = "app",
                 sampleRate = 1.0f,
+                isFirstDailyOccurrence = false,
             ),
             app = AppSection(
                 name = "DuckDuckGo Android",
@@ -125,10 +131,15 @@ class ApiWideEventSenderTest {
         apiWideEventSender.sendWideEvent(event)
 
         val expectedRequest = WideEventRequest(
+            meta = MetaSection(
+                type = "android-feature-event",
+                version = "1.0.0",
+            ),
             global = GlobalSection(
                 platform = "Android",
                 type = "app",
                 sampleRate = 1.0f,
+                isFirstDailyOccurrence = false,
             ),
             app = AppSection(
                 name = "DuckDuckGo Android",
@@ -160,10 +171,15 @@ class ApiWideEventSenderTest {
         apiWideEventSender.sendWideEvent(event)
 
         val expectedRequest = WideEventRequest(
+            meta = MetaSection(
+                type = "android-simple-event",
+                version = "1.0.0",
+            ),
             global = GlobalSection(
                 platform = "Android",
                 type = "app",
                 sampleRate = 1.0f,
+                isFirstDailyOccurrence = false,
             ),
             app = AppSection(
                 name = "DuckDuckGo Android",
@@ -195,10 +211,15 @@ class ApiWideEventSenderTest {
         apiWideEventSender.sendWideEvent(event)
 
         val expectedRequest = WideEventRequest(
+            meta = MetaSection(
+                type = "android-debug-event",
+                version = "1.0.0",
+            ),
             global = GlobalSection(
                 platform = "Android",
                 type = "app",
                 sampleRate = 1.0f,
+                isFirstDailyOccurrence = false,
             ),
             app = AppSection(
                 name = "DuckDuckGo Android",
@@ -230,10 +251,15 @@ class ApiWideEventSenderTest {
         apiWideEventSender.sendWideEvent(event)
 
         val expectedRequest = WideEventRequest(
+            meta = MetaSection(
+                type = "android-tablet-event",
+                version = "1.0.0",
+            ),
             global = GlobalSection(
                 platform = "Android",
                 type = "app",
                 sampleRate = 1.0f,
+                isFirstDailyOccurrence = false,
             ),
             app = AppSection(
                 name = "DuckDuckGo Android",
@@ -263,10 +289,15 @@ class ApiWideEventSenderTest {
         apiWideEventSender.sendWideEvent(event)
 
         val expectedRequest = WideEventRequest(
+            meta = MetaSection(
+                type = "android-unknown-event",
+                version = "1.0.0",
+            ),
             global = GlobalSection(
                 platform = "Android",
                 type = "app",
                 sampleRate = 1.0f,
+                isFirstDailyOccurrence = false,
             ),
             app = AppSection(
                 name = "DuckDuckGo Android",
@@ -301,10 +332,15 @@ class ApiWideEventSenderTest {
         apiWideEventSender.sendWideEvent(event)
 
         val expectedRequest = WideEventRequest(
+            meta = MetaSection(
+                type = "android-filtered-event",
+                version = "1.0.0",
+            ),
             global = GlobalSection(
                 platform = "Android",
                 type = "app",
                 sampleRate = 1.0f,
+                isFirstDailyOccurrence = false,
             ),
             app = AppSection(
                 name = "DuckDuckGo Android",
@@ -368,10 +404,15 @@ class ApiWideEventSenderTest {
         apiWideEventSender.sendWideEvent(event)
 
         val expectedRequest = WideEventRequest(
+            meta = MetaSection(
+                type = "android-sampled-event",
+                version = "1.0.0",
+            ),
             global = GlobalSection(
                 platform = "Android",
                 type = "app",
                 sampleRate = 0.1f,
+                isFirstDailyOccurrence = false,
             ),
             app = AppSection(
                 name = "DuckDuckGo Android",
@@ -381,6 +422,85 @@ class ApiWideEventSenderTest {
             ),
             feature = FeatureSection(
                 name = "sampled-event",
+                status = "SUCCESS",
+                data = null,
+            ),
+            context = null,
+        )
+
+        verify(wideEventService).sendWideEvent(eq(expectedRequest))
+    }
+
+    @Test
+    fun `when event has stored meta type and version then stored values are sent`() = runTest {
+        val event = createWideEvent(
+            id = 700L,
+            name = "some-event",
+            status = WideEventRepository.WideEventStatus.SUCCESS,
+            metaType = "android-some-other-event",
+            metaVersion = "2.1.3",
+        )
+
+        apiWideEventSender.sendWideEvent(event)
+
+        val expectedRequest = WideEventRequest(
+            meta = MetaSection(
+                type = "android-some-other-event",
+                version = "2.1.3",
+            ),
+            global = GlobalSection(
+                platform = "Android",
+                type = "app",
+                sampleRate = 1.0f,
+                isFirstDailyOccurrence = false,
+            ),
+            app = AppSection(
+                name = "DuckDuckGo Android",
+                version = "5.123.0",
+                formFactor = "phone",
+                devMode = false,
+            ),
+            feature = FeatureSection(
+                name = "some-event",
+                status = "SUCCESS",
+                data = null,
+            ),
+            context = null,
+        )
+
+        verify(wideEventService).sendWideEvent(eq(expectedRequest))
+    }
+
+    @Test
+    fun `when event is the first daily occurrence then it is included in request`() = runTest {
+        val event = createWideEvent(
+            id = 800L,
+            name = "first-occurrence-event",
+            status = WideEventRepository.WideEventStatus.SUCCESS,
+            isFirstDailyOccurrence = true,
+        )
+
+        apiWideEventSender.sendWideEvent(event)
+
+        val expectedRequest = WideEventRequest(
+            meta = MetaSection(
+                type = "android-first-occurrence-event",
+                version = "1.0.0",
+            ),
+            global = GlobalSection(
+                platform = "Android",
+                type = "app",
+                sampleRate = 1.0f,
+                isFirstDailyOccurrence = true,
+            ),
+            app = AppSection(
+                name = "DuckDuckGo Android",
+                version = "5.123.0",
+                formFactor = "phone",
+                devMode = false,
+            ),
+            feature = FeatureSection(
+                name = "first-occurrence-event",
                 status = "SUCCESS",
                 data = null,
             ),
@@ -414,6 +534,9 @@ class ApiWideEventSenderTest {
         metadata: Map<String, String?> = emptyMap(),
         flowEntryPoint: String? = null,
         samplingProbability: Float = 1.0f,
+        metaType: String = "android-$name",
+        metaVersion: String = "1.0.0",
+        isFirstDailyOccurrence: Boolean = false,
     ) = WideEventRepository.WideEvent(
         id = id,
         name = name,
@@ -429,5 +552,8 @@ class ApiWideEventSenderTest {
         ),
         createdAt = Instant.parse("2025-12-03T10:15:30.00Z"),
         samplingProbability = samplingProbability,
+        metaType = metaType,
+        metaVersion = metaVersion,
+        isFirstDailyOccurrence = isFirstDailyOccurrence,
     )
 }

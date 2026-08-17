@@ -56,21 +56,22 @@
         "parameters": [
             "appVersion",
             {
-                "key": "e",
+                "key": "event",
                 "type": "string",
                 "description": "Event type for the onboarding instrumentation standard",
                 "enum": ["shown", "clicked"]
             },
             {
-                "key": "it",
+                "key": "installType",
                 "type": "string",
                 "description": "Install type",
                 "enum": ["new", "reinstall"]
             },
             {
-                "key": "d",
-                "type": "integer",
-                "description": "Days since install (0-28). Omitted when more than 28 days have passed since install."
+                "key": "daysSinceInstall",
+                "type": "string",
+                "description": "Days since install, bucketed.",
+                "enum": ["0", "1-3", "4-10", "11-28", "28+"]
             },
             {
                 "key": "flow",
@@ -87,7 +88,7 @@
             {
                 "key": "value",
                 "type": "string",
-                "description": "Only set when e=clicked. Composite encoding of the user's Quick Setup selections, formatted as 'set_as_default:on|off,widget:on|off,address_bar:top|bottom|split,input_type:search|search_and_duckai'."
+                "description": "Only set when event=clicked. Composite encoding of the user's Quick Setup selections, formatted as 'set_as_default:on|off,widget:on|off,address_bar:top|bottom|split,input_type:search|search_and_duckai'."
             }
         ]
     },
@@ -127,20 +128,21 @@
         "parameters": [
             "appVersion",
             {
-                "key": "e",
+                "key": "event",
                 "type": "string",
                 "description": "Event type for the onboarding instrumentation standard",
                 "enum": ["shown", "clicked"]
             },
-            { "key": "it", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
+            { "key": "installType", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
             {
-                "key": "d",
-                "type": "integer",
-                "description": "Days since install (0-28). Omitted when more than 28 days have passed since install."
+                "key": "daysSinceInstall",
+                "type": "string",
+                "description": "Days since install, bucketed.",
+                "enum": ["0", "1-3", "4-10", "11-28", "28+"]
             },
             { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
             { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
-            { "key": "value", "type": "string", "description": "Only set when e=clicked.", "enum": ["engage", "dismiss"] }
+            { "key": "value", "type": "string", "description": "Only set when event=clicked.", "enum": ["engage", "dismiss"] }
         ]
     },
     "onboarding_set-default": {
@@ -151,23 +153,24 @@
         "parameters": [
             "appVersion",
             {
-                "key": "e",
+                "key": "event",
                 "type": "string",
                 "description": "Event type for the onboarding instrumentation standard",
                 "enum": ["shown", "clicked", "confirmed"]
             },
-            { "key": "it", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
+            { "key": "installType", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
             {
-                "key": "d",
-                "type": "integer",
-                "description": "Days since install (0-28). Omitted when more than 28 days have passed since install."
+                "key": "daysSinceInstall",
+                "type": "string",
+                "description": "Days since install, bucketed.",
+                "enum": ["0", "1-3", "4-10", "11-28", "28+"]
             },
             { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
             { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
             {
                 "key": "value",
                 "type": "string",
-                "description": "Set to engage when e=clicked. When e=confirmed, the resulting default browser. Absent for shown.",
+                "description": "Set to engage when event=clicked. When event=confirmed, the resulting default browser. Absent for shown.",
                 "enum": ["engage", "ddg", "other"]
             }
         ]
@@ -180,16 +183,17 @@
         "parameters": [
             "appVersion",
             {
-                "key": "e",
+                "key": "event",
                 "type": "string",
                 "description": "Event type for the onboarding instrumentation standard",
                 "enum": ["shown", "clicked"]
             },
-            { "key": "it", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
+            { "key": "installType", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
             {
-                "key": "d",
-                "type": "integer",
-                "description": "Days since install (0-28). Omitted when more than 28 days have passed since install."
+                "key": "daysSinceInstall",
+                "type": "string",
+                "description": "Days since install, bucketed.",
+                "enum": ["0", "1-3", "4-10", "11-28", "28+"]
             },
             { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
             { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] }
@@ -203,23 +207,24 @@
         "parameters": [
             "appVersion",
             {
-                "key": "e",
+                "key": "event",
                 "type": "string",
                 "description": "Event type for the onboarding instrumentation standard",
                 "enum": ["shown", "clicked", "confirmed"]
             },
-            { "key": "it", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
+            { "key": "installType", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
             {
-                "key": "d",
-                "type": "integer",
-                "description": "Days since install (0-28). Omitted when more than 28 days have passed since install."
+                "key": "daysSinceInstall",
+                "type": "string",
+                "description": "Days since install, bucketed.",
+                "enum": ["0", "1-3", "4-10", "11-28", "28+"]
             },
             { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
             { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
             {
                 "key": "value",
                 "type": "string",
-                "description": "For e=clicked: engage|dismiss. For e=confirmed: added|not_added.",
+                "description": "For event=clicked: engage|dismiss. For event=confirmed: added|not_added.",
                 "enum": ["engage", "dismiss", "added", "not_added"]
             }
         ]
@@ -232,23 +237,24 @@
         "parameters": [
             "appVersion",
             {
-                "key": "e",
+                "key": "event",
                 "type": "string",
                 "description": "Event type for the onboarding instrumentation standard",
                 "enum": ["shown", "clicked"]
             },
-            { "key": "it", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
+            { "key": "installType", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
             {
-                "key": "d",
-                "type": "integer",
-                "description": "Days since install (0-28). Omitted when more than 28 days have passed since install."
+                "key": "daysSinceInstall",
+                "type": "string",
+                "description": "Days since install, bucketed.",
+                "enum": ["0", "1-3", "4-10", "11-28", "28+"]
             },
             { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
             { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
             {
                 "key": "value",
                 "type": "string",
-                "description": "Only set when e=clicked. Chosen address bar position.",
+                "description": "Only set when event=clicked. Chosen address bar position.",
                 "enum": ["top", "bottom", "split"]
             }
         ]
@@ -261,23 +267,24 @@
         "parameters": [
             "appVersion",
             {
-                "key": "e",
+                "key": "event",
                 "type": "string",
                 "description": "Event type for the onboarding instrumentation standard",
                 "enum": ["shown", "clicked"]
             },
-            { "key": "it", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
+            { "key": "installType", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
             {
-                "key": "d",
-                "type": "integer",
-                "description": "Days since install (0-28). Omitted when more than 28 days have passed since install."
+                "key": "daysSinceInstall",
+                "type": "string",
+                "description": "Days since install, bucketed.",
+                "enum": ["0", "1-3", "4-10", "11-28", "28+"]
             },
             { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
             { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
             {
                 "key": "value",
                 "type": "string",
-                "description": "Only set when e=clicked. Chosen search experience.",
+                "description": "Only set when event=clicked. Chosen search experience.",
                 "enum": ["search_only", "search_plus_duckai"]
             }
         ]
@@ -290,20 +297,21 @@
         "parameters": [
             "appVersion",
             {
-                "key": "e",
+                "key": "event",
                 "type": "string",
                 "description": "Event type for the onboarding instrumentation standard",
                 "enum": ["shown", "clicked"]
             },
-            { "key": "it", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
+            { "key": "installType", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
             {
-                "key": "d",
-                "type": "integer",
-                "description": "Days since install (0-28). Omitted when more than 28 days have passed since install."
+                "key": "daysSinceInstall",
+                "type": "string",
+                "description": "Days since install, bucketed.",
+                "enum": ["0", "1-3", "4-10", "11-28", "28+"]
             },
             { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
             { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
-            { "key": "value", "type": "string", "description": "Only set when e=clicked.", "enum": ["engage", "dismiss"] }
+            { "key": "value", "type": "string", "description": "Only set when event=clicked.", "enum": ["engage", "dismiss"] }
         ]
     },
     "onboarding_notifications": {
@@ -314,23 +322,24 @@
         "parameters": [
             "appVersion",
             {
-                "key": "e",
+                "key": "event",
                 "type": "string",
                 "description": "Event type for the onboarding instrumentation standard",
                 "enum": ["shown", "confirmed"]
             },
-            { "key": "it", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
+            { "key": "installType", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
             {
-                "key": "d",
-                "type": "integer",
-                "description": "Days since install (0-28). Omitted when more than 28 days have passed since install."
+                "key": "daysSinceInstall",
+                "type": "string",
+                "description": "Days since install, bucketed.",
+                "enum": ["0", "1-3", "4-10", "11-28", "28+"]
             },
             { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
             { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
             {
                 "key": "value",
                 "type": "string",
-                "description": "Only set when e=confirmed. Permission result.",
+                "description": "Only set when event=confirmed. Permission result.",
                 "enum": ["granted", "denied"]
             }
         ]
@@ -343,16 +352,17 @@
         "parameters": [
             "appVersion",
             {
-                "key": "e",
+                "key": "event",
                 "type": "string",
                 "description": "Event type for the onboarding instrumentation standard",
                 "enum": ["shown", "clicked"]
             },
-            { "key": "it", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
+            { "key": "installType", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
             {
-                "key": "d",
-                "type": "integer",
-                "description": "Days since install (0-28). Omitted when more than 28 days have passed since install."
+                "key": "daysSinceInstall",
+                "type": "string",
+                "description": "Days since install, bucketed.",
+                "enum": ["0", "1-3", "4-10", "11-28", "28+"]
             },
             { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
             { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
@@ -365,7 +375,7 @@
             {
                 "key": "value",
                 "type": "string",
-                "description": "Only set when e=clicked. The tried query's source (suggested/custom) and mode (search/chat).",
+                "description": "Only set when event=clicked. The tried query's source (suggested/custom) and mode (search/chat).",
                 "enum": ["suggested_search", "suggested_chat", "custom_search", "custom_chat"]
             }
         ]
@@ -378,20 +388,21 @@
         "parameters": [
             "appVersion",
             {
-                "key": "e",
+                "key": "event",
                 "type": "string",
                 "description": "Event type for the onboarding instrumentation standard",
                 "enum": ["shown", "clicked"]
             },
-            { "key": "it", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
+            { "key": "installType", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
             {
-                "key": "d",
-                "type": "integer",
-                "description": "Days since install (0-28). Omitted when more than 28 days have passed since install."
+                "key": "daysSinceInstall",
+                "type": "string",
+                "description": "Days since install, bucketed.",
+                "enum": ["0", "1-3", "4-10", "11-28", "28+"]
             },
             { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
             { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
-            { "key": "value", "type": "string", "description": "Only set when e=clicked.", "enum": ["engage"] }
+            { "key": "value", "type": "string", "description": "Only set when event=clicked.", "enum": ["engage"] }
         ]
     },
     "onboarding_fire-button": {
@@ -402,16 +413,17 @@
         "parameters": [
             "appVersion",
             {
-                "key": "e",
+                "key": "event",
                 "type": "string",
                 "description": "Event type for the onboarding instrumentation standard",
                 "enum": ["shown", "clicked"]
             },
-            { "key": "it", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
+            { "key": "installType", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
             {
-                "key": "d",
-                "type": "integer",
-                "description": "Days since install (0-28). Omitted when more than 28 days have passed since install."
+                "key": "daysSinceInstall",
+                "type": "string",
+                "description": "Days since install, bucketed.",
+                "enum": ["0", "1-3", "4-10", "11-28", "28+"]
             },
             { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
             { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
@@ -421,7 +433,7 @@
                 "description": "Duck.ai search/chat branch. Set only in the custom Duck.ai flow.",
                 "enum": ["search_plus_duckai-search", "search_plus_duckai-chat"]
             },
-            { "key": "value", "type": "string", "description": "Only set when e=clicked.", "enum": ["engage"] }
+            { "key": "value", "type": "string", "description": "Only set when event=clicked.", "enum": ["engage"] }
         ]
     },
     "onboarding_search": {
@@ -432,23 +444,24 @@
         "parameters": [
             "appVersion",
             {
-                "key": "e",
+                "key": "event",
                 "type": "string",
                 "description": "Event type for the onboarding instrumentation standard",
                 "enum": ["shown", "clicked"]
             },
-            { "key": "it", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
+            { "key": "installType", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
             {
-                "key": "d",
-                "type": "integer",
-                "description": "Days since install (0-28). Omitted when more than 28 days have passed since install."
+                "key": "daysSinceInstall",
+                "type": "string",
+                "description": "Days since install, bucketed.",
+                "enum": ["0", "1-3", "4-10", "11-28", "28+"]
             },
             { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
             { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
             {
                 "key": "value",
                 "type": "string",
-                "description": "Only set when e=clicked. Whether the query came from a suggestion or was typed, or dismiss if closed via the close button.",
+                "description": "Only set when event=clicked. Whether the query came from a suggestion or was typed, or dismiss if closed via the close button.",
                 "enum": ["suggested", "custom", "dismiss"]
             }
         ]
@@ -461,20 +474,21 @@
         "parameters": [
             "appVersion",
             {
-                "key": "e",
+                "key": "event",
                 "type": "string",
                 "description": "Event type for the onboarding instrumentation standard",
                 "enum": ["shown", "clicked"]
             },
-            { "key": "it", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
+            { "key": "installType", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
             {
-                "key": "d",
-                "type": "integer",
-                "description": "Days since install (0-28). Omitted when more than 28 days have passed since install."
+                "key": "daysSinceInstall",
+                "type": "string",
+                "description": "Days since install, bucketed.",
+                "enum": ["0", "1-3", "4-10", "11-28", "28+"]
             },
             { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
             { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
-            { "key": "value", "type": "string", "description": "Only set when e=clicked.", "enum": ["engage", "dismiss"] }
+            { "key": "value", "type": "string", "description": "Only set when event=clicked.", "enum": ["engage", "dismiss"] }
         ]
     },
     "onboarding_visit-site": {
@@ -485,23 +499,24 @@
         "parameters": [
             "appVersion",
             {
-                "key": "e",
+                "key": "event",
                 "type": "string",
                 "description": "Event type for the onboarding instrumentation standard",
                 "enum": ["shown", "clicked"]
             },
-            { "key": "it", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
+            { "key": "installType", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
             {
-                "key": "d",
-                "type": "integer",
-                "description": "Days since install (0-28). Omitted when more than 28 days have passed since install."
+                "key": "daysSinceInstall",
+                "type": "string",
+                "description": "Days since install, bucketed.",
+                "enum": ["0", "1-3", "4-10", "11-28", "28+"]
             },
             { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
             { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
             {
                 "key": "value",
                 "type": "string",
-                "description": "Only set when e=clicked. Whether the query came from a suggestion or was typed, or dismiss if closed via the close button.",
+                "description": "Only set when event=clicked. Whether the query came from a suggestion or was typed, or dismiss if closed via the close button.",
                 "enum": ["suggested", "custom", "dismiss"]
             }
         ]
@@ -514,20 +529,21 @@
         "parameters": [
             "appVersion",
             {
-                "key": "e",
+                "key": "event",
                 "type": "string",
                 "description": "Event type for the onboarding instrumentation standard",
                 "enum": ["shown", "clicked"]
             },
-            { "key": "it", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
+            { "key": "installType", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
             {
-                "key": "d",
-                "type": "integer",
-                "description": "Days since install (0-28). Omitted when more than 28 days have passed since install."
+                "key": "daysSinceInstall",
+                "type": "string",
+                "description": "Days since install, bucketed.",
+                "enum": ["0", "1-3", "4-10", "11-28", "28+"]
             },
             { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
             { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
-            { "key": "value", "type": "string", "description": "Only set when e=clicked.", "enum": ["engage", "dismiss"] }
+            { "key": "value", "type": "string", "description": "Only set when event=clicked.", "enum": ["engage", "dismiss"] }
         ]
     },
     "onboarding_fire-button": {
@@ -538,20 +554,21 @@
         "parameters": [
             "appVersion",
             {
-                "key": "e",
+                "key": "event",
                 "type": "string",
                 "description": "Event type for the onboarding instrumentation standard",
                 "enum": ["shown", "clicked"]
             },
-            { "key": "it", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
+            { "key": "installType", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
             {
-                "key": "d",
-                "type": "integer",
-                "description": "Days since install (0-28). Omitted when more than 28 days have passed since install."
+                "key": "daysSinceInstall",
+                "type": "string",
+                "description": "Days since install, bucketed.",
+                "enum": ["0", "1-3", "4-10", "11-28", "28+"]
             },
             { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
             { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
-            { "key": "value", "type": "string", "description": "Only set when e=clicked.", "enum": ["engage", "dismiss"] }
+            { "key": "value", "type": "string", "description": "Only set when event=clicked.", "enum": ["engage", "dismiss"] }
         ]
     },
     "onboarding_end": {
@@ -562,20 +579,21 @@
         "parameters": [
             "appVersion",
             {
-                "key": "e",
+                "key": "event",
                 "type": "string",
                 "description": "Event type for the onboarding instrumentation standard",
                 "enum": ["shown", "clicked"]
             },
-            { "key": "it", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
+            { "key": "installType", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
             {
-                "key": "d",
-                "type": "integer",
-                "description": "Days since install (0-28). Omitted when more than 28 days have passed since install."
+                "key": "daysSinceInstall",
+                "type": "string",
+                "description": "Days since install, bucketed.",
+                "enum": ["0", "1-3", "4-10", "11-28", "28+"]
             },
             { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
             { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
-            { "key": "value", "type": "string", "description": "Only set when e=clicked.", "enum": ["engage", "dismiss"] }
+            { "key": "value", "type": "string", "description": "Only set when event=clicked.", "enum": ["engage", "dismiss"] }
         ]
     },
     "onboarding_subscription-promo": {
@@ -586,20 +604,21 @@
         "parameters": [
             "appVersion",
             {
-                "key": "e",
+                "key": "event",
                 "type": "string",
                 "description": "Event type for the onboarding instrumentation standard",
                 "enum": ["shown", "clicked"]
             },
-            { "key": "it", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
+            { "key": "installType", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
             {
-                "key": "d",
-                "type": "integer",
-                "description": "Days since install (0-28). Omitted when more than 28 days have passed since install."
+                "key": "daysSinceInstall",
+                "type": "string",
+                "description": "Days since install, bucketed.",
+                "enum": ["0", "1-3", "4-10", "11-28", "28+"]
             },
             { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
             { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
-            { "key": "value", "type": "string", "description": "Only set when e=clicked.", "enum": ["engage", "dismiss"] }
+            { "key": "value", "type": "string", "description": "Only set when event=clicked.", "enum": ["engage", "dismiss"] }
         ]
     }
 }

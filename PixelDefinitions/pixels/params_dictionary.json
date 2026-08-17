@@ -15,6 +15,29 @@
         "description": "The Unified Input surface the pixel was fired from, distinguishing the contextual chat sheet from the Duck.ai tab and the address bar",
         "enum": ["address_bar", "duck_ai", "contextual_chat"]
     },
+    "contextualSuggestionsPageType": {
+        "key": "pageType",
+        "type": "string",
+        "description": "Coarse page-type bucket computed natively from page-type signals. Never a URL, domain or page content.",
+        "enum": [
+            "recipe",
+            "product",
+            "article",
+            "video",
+            "job",
+            "book",
+            "event",
+            "place",
+            "forum",
+            "code",
+            "course",
+            "review",
+            "person",
+            "howto",
+            "faq",
+            "none"
+        ]
+    },
     "osVersion": {
         "key": "os_version",
         "type": "integer",
@@ -76,6 +99,21 @@
         "key": "global.sample_rate",
         "type": "number",
         "description": "Sample rate for this pixel, between 0 and 1"
+    },
+    "widePixelIsFirstDailyOccurrence": {
+        "key": "global.is_first_daily_occurrence",
+        "type": "boolean",
+        "description": "Whether this is the first wide event completed with this feature name and status in the current UTC calendar day"
+    },
+    "widePixelMetaType": {
+        "key": "meta.type",
+        "type": "string",
+        "description": "Company unique wide event type identifier"
+    },
+    "widePixelMetaVersion": {
+        "key": "meta.version",
+        "type": "string",
+        "description": "Composed semver of the wide event schema: <base_major>.<event_minor>.<event_patch>"
     },
     "widePixelFeatureStatus": {
         "key": "feature.status",
@@ -161,6 +199,29 @@
             "repository_unavailable",
             "foreground_start_failed",
             "work_stopped"
+        ]
+    },
+    "duckAiSubscriptionFunnelOrigin": {
+        "key": "origin",
+        "type": "string",
+        "description": "Duck.ai Android subscription-funnel entry-point origin. Bounded set; unknown or unrecognised sources collapse to funnel_duckai_android__unknown.",
+        "enum": [
+            "funnel_duckai_android__modelpicker",
+            "funnel_duckai_android__reasoningpicker",
+            "funnel_duckai_android__reasoningdropdown",
+            "funnel_duckai_android__aisidebar",
+            "funnel_duckai_android__activatesubscription",
+            "funnel_duckai_android__freelabel",
+            "funnel_duckai_android__freelimit",
+            "funnel_duckai_android__imagegenerationlimit",
+            "funnel_duckai_android__pluslimit",
+            "funnel_duckai_android__promotioncard",
+            "funnel_duckai_android__settings",
+            "funnel_duckai_android__switchmodel",
+            "funnel_duckai_android__voicechatdurationlimit",
+            "funnel_duckai_android__voicechatlimit",
+            "funnel_duckai_android__disclaimerbanner",
+            "funnel_duckai_android__unknown"
         ]
     }
 }

@@ -251,6 +251,57 @@
         <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:primaryText="Unified Devices Migration" />
+
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/canWriteUnifiedDeviceListToggle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:showSwitch="true"
+            app:primaryText="canWriteUnifiedDeviceList" />
+
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/canReadUnifiedDeviceListToggle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:showSwitch="true"
+            app:primaryText="canReadUnifiedDeviceList" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/migrationStatusTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/keyline_4"
+            android:layout_marginEnd="@dimen/keyline_4"
+            android:layout_marginBottom="@dimen/keyline_4"
+            app:typography="body2" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/runMigrationButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="Run migration now" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/resetMigrationMarkerButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="Reset migration marker" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/migrationResultTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/keyline_4"
+            android:layout_marginEnd="@dimen/keyline_4"
+            android:layout_marginBottom="@dimen/keyline_4"
+            app:typography="body2" />
+
+        <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             app:primaryText="3party Credential Management" />
 
         <com.duckduckgo.common.ui.view.button.DaxButtonPrimary

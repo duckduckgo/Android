@@ -16,7 +16,6 @@
 
 package com.duckduckgo.common.ui.internal.ui
 
-import android.app.UiModeManager
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
@@ -44,6 +43,7 @@ import com.duckduckgo.common.ui.applyTheme
 import com.duckduckgo.common.ui.internal.R
 import com.duckduckgo.common.ui.internal.ui.store.AppComponentsPrefsDataStore
 import com.duckduckgo.common.ui.internal.ui.store.appComponentsDataStore
+import com.duckduckgo.common.ui.isInNightMode
 import com.duckduckgo.common.ui.store.ThemingSharedPreferences
 import com.duckduckgo.common.ui.view.listitem.OneLineListItem
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
@@ -78,14 +78,16 @@ class AppComponentsActivity : AppCompatActivity() {
     private lateinit var viewPager: ViewPager
     private lateinit var tabLayout: TabLayout
     private lateinit var darkThemeSwitch: OneLineListItem
+    private lateinit var brandDesignSwitch: OneLineListItem
     private val edgeToEdgeHandler = EdgeToEdgeHandler()
 
     @Suppress("DenyListedApi")
     override fun onCreate(savedInstanceState: Bundle?) {
-        val selectedTheme = runBlocking {
+        val (selectedTheme, brandDesignUpdateEnabled) = runBlocking {
             val selectedTheme = appComponentsViewModel.themeFlow.first()
-            applyTheme(selectedTheme)
-            selectedTheme
+            val brandDesignUpdateEnabled = appComponentsViewModel.brandDesignUpdateFlow.first()
+            applyTheme(selectedTheme, applyBrandDesignUpdate = brandDesignUpdateEnabled)
+            selectedTheme to brandDesignUpdateEnabled
         }
         super.onCreate(savedInstanceState)
         enableTransparentEdgeToEdge(isDarkTheme = isDarkThemeEnabled(selectedTheme))
@@ -93,6 +95,7 @@ class AppComponentsActivity : AppCompatActivity() {
         viewPager = findViewById(R.id.view_pager)
         tabLayout = findViewById(R.id.tab_layout)
         darkThemeSwitch = findViewById(R.id.dark_theme_switch)
+        brandDesignSwitch = findViewById(R.id.brand_design_switch)
 
         configureEdgeToEdgeInsets()
 
@@ -113,14 +116,19 @@ class AppComponentsActivity : AppCompatActivity() {
                 finish()
             }
         }
+
+        brandDesignSwitch.quietlySetIsChecked(brandDesignUpdateEnabled) { _, enabled ->
+            lifecycleScope.launch {
+                appComponentsViewModel.setBrandDesignUpdate(enabled)
+                startActivity(intent(this@AppComponentsActivity))
+                finish()
+            }
+        }
     }
 
     private fun isDarkThemeEnabled(selectedTheme: DuckDuckGoTheme): Boolean {
         return when (selectedTheme) {
-            DuckDuckGoTheme.SYSTEM_DEFAULT -> {
-                val uiManager = getSystemService(Context.UI_MODE_SERVICE) as UiModeManager
-                uiManager.nightMode == UiModeManager.MODE_NIGHT_YES
-            }
+            DuckDuckGoTheme.SYSTEM_DEFAULT -> isInNightMode()
             DuckDuckGoTheme.DARK -> true
             else -> false
         }

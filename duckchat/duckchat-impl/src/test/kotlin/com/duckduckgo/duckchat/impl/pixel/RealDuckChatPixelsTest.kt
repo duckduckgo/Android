@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.pixel
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.impl.ReportMetric
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_ACCEPT_TERMS_AND_CONDITIONS
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_CREATE_NEW_CHAT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_OPEN_HISTORY
@@ -36,10 +37,6 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_CONTEXTUAL
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_MANUALLY_ATTACHED_FRONTEND_DAILY
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_MANUALLY_ATTACHED_NATIVE_COUNT
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_MANUALLY_ATTACHED_NATIVE_DAILY
-import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_PLACEHOLDER_SHOWN_COUNT
-import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_PLACEHOLDER_SHOWN_DAILY
-import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_PLACEHOLDER_TAPPED_COUNT
-import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_PLACEHOLDER_TAPPED_DAILY
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_REMOVED_FRONTEND_COUNT
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_REMOVED_FRONTEND_DAILY
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_REMOVED_NATIVE_COUNT
@@ -318,26 +315,6 @@ class RealDuckChatPixelsTest {
     }
 
     @Test
-    fun `when reportContextualPlaceholderContextTapped then fires count and daily`() = runTest {
-        testee.reportContextualPlaceholderContextTapped()
-
-        advanceUntilIdle()
-
-        verify(mockPixel).fire(DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_PLACEHOLDER_TAPPED_COUNT)
-        verify(mockPixel).fire(DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_PLACEHOLDER_TAPPED_DAILY, type = Pixel.PixelType.Daily())
-    }
-
-    @Test
-    fun `when reportContextualPlaceholderContextShown then fires count and daily`() = runTest {
-        testee.reportContextualPlaceholderContextShown()
-
-        advanceUntilIdle()
-
-        verify(mockPixel).fire(DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_PLACEHOLDER_SHOWN_COUNT)
-        verify(mockPixel).fire(DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_PLACEHOLDER_SHOWN_DAILY, type = Pixel.PixelType.Daily())
-    }
-
-    @Test
     fun `when reportContextualAskAboutPageShown then fires count and daily`() = runTest {
         testee.reportContextualAskAboutPageShown()
 
@@ -345,6 +322,59 @@ class RealDuckChatPixelsTest {
 
         verify(mockPixel).fire(DUCK_CHAT_CONTEXTUAL_QUICK_ACTION_ASK_ABOUT_PAGE_SHOWN_COUNT)
         verify(mockPixel).fire(DUCK_CHAT_CONTEXTUAL_QUICK_ACTION_ASK_ABOUT_PAGE_SHOWN_DAILY, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun `when reportContextualAskAboutPageSuggestionSelected then fires selected pixel with the reserved id`() = runTest {
+        testee.reportContextualAskAboutPageSuggestionSelected("article")
+
+        advanceUntilIdle()
+
+        val params = mapOf("suggestionId" to "ask-about-page", "pageType" to "article")
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SUGGESTION_SELECTED_COUNT, params)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SUGGESTION_SELECTED_DAILY, params, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun `when reportContextualSuggestionSelected then fires count and daily with suggestion id and page type`() = runTest {
+        testee.reportContextualSuggestionSelected("summarize-video", "video")
+
+        advanceUntilIdle()
+
+        val params = mapOf("suggestionId" to "summarize-video", "pageType" to "video")
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SUGGESTION_SELECTED_COUNT, params)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SUGGESTION_SELECTED_DAILY, params, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun `when reportContextualSuggestionsViewed then fires count and daily with smartness and page type`() = runTest {
+        testee.reportContextualSuggestionsViewed(isSmart = true, pageType = "recipe")
+
+        advanceUntilIdle()
+
+        val params = mapOf("isSmart" to "true", "pageType" to "recipe")
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SUGGESTIONS_VIEWED_COUNT, params)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SUGGESTIONS_VIEWED_DAILY, params, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun `when reportContextualSuggestionsContextCollectionTimedOut then fires count and daily`() = runTest {
+        testee.reportContextualSuggestionsContextCollectionTimedOut()
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SUGGESTIONS_TIMED_OUT_COUNT)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SUGGESTIONS_TIMED_OUT_DAILY, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun `when reportContextualSuggestionsCatalogLoadFailed then fires count and daily`() = runTest {
+        testee.reportContextualSuggestionsCatalogLoadFailed()
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SUGGESTIONS_CATALOG_LOAD_FAILED_COUNT)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SUGGESTIONS_CATALOG_LOAD_FAILED_DAILY, type = Pixel.PixelType.Daily())
     }
 
     @Test
@@ -463,13 +493,18 @@ class RealDuckChatPixelsTest {
     }
 
     @Test
-    fun whenFireSentPromptInChatThenCountAndDailyFired() = runTest {
-        testee.fireSentPromptInChat()
+    fun whenFireSentPromptInChatThenCountAndDailyFiredWithSurface() = runTest {
+        testee.fireSentPromptInChat(DuckChatPixelSurface.CONTEXTUAL_CHAT)
 
         advanceUntilIdle()
 
-        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SENT_PROMPT_IN_CHAT_COUNT)
-        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SENT_PROMPT_IN_CHAT_DAILY, type = Pixel.PixelType.Daily())
+        val params = mapOf(DuckChatPixelParameters.SURFACE to "contextual_chat")
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SENT_PROMPT_IN_CHAT_COUNT, parameters = params)
+        verify(mockPixel).fire(
+            DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SENT_PROMPT_IN_CHAT_DAILY,
+            parameters = params,
+            type = Pixel.PixelType.Daily(),
+        )
     }
 
     @Test
@@ -511,6 +546,114 @@ class RealDuckChatPixelsTest {
         verify(mockPixel).fire(
             pixel = DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_BACK_BUTTON_PRESSED,
             parameters = mapOf(DuckChatPixelParameters.INPUT_SCREEN_MODE to "search"),
+        )
+    }
+
+    @Test
+    fun `when sendReportMetricPixel with website impression event then fires funnel impression pixel with android origin`() = runTest {
+        testee.sendReportMetricPixel(ReportMetric.USER_DID_VIEW_FREE_LIMIT_MESSAGE)
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(
+            DuckChatPixelName.DUCK_CHAT_SUBSCRIPTION_FUNNEL_IMPRESSION,
+            parameters = mapOf(DuckChatPixelParameters.ORIGIN to "funnel_duckai_android__freelimit"),
+        )
+    }
+
+    @Test
+    fun `when sendReportMetricPixel with website click event then fires funnel click pixel with android origin`() = runTest {
+        testee.sendReportMetricPixel(ReportMetric.USER_DID_CLICK_FREE_LIMIT_SUBSCRIBE_LINK)
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(
+            DuckChatPixelName.DUCK_CHAT_SUBSCRIPTION_FUNNEL_CLICK,
+            parameters = mapOf(DuckChatPixelParameters.ORIGIN to "funnel_duckai_android__freelimit"),
+        )
+    }
+
+    @Test
+    fun `when open subscribe modal with source then fires subscribe-modal impression with source origin`() = runTest {
+        testee.sendReportMetricPixel(ReportMetric.USER_DID_OPEN_SUBSCRIBE_MODAL, source = "disclaimerbanner")
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(
+            DuckChatPixelName.DUCK_CHAT_SUBSCRIPTION_FUNNEL_SUBSCRIBE_MODAL_IMPRESSION,
+            parameters = mapOf(DuckChatPixelParameters.ORIGIN to "funnel_duckai_android__disclaimerbanner"),
+        )
+    }
+
+    @Test
+    fun `when subscribe click on subscribe modal with source then fires subscribe-modal subscribe click`() = runTest {
+        testee.sendReportMetricPixel(ReportMetric.USER_DID_CLICK_SUBSCRIBE_ON_SUBSCRIBE_MODAL, source = "freelimit")
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(
+            DuckChatPixelName.DUCK_CHAT_SUBSCRIPTION_FUNNEL_SUBSCRIBE_MODAL_SUBSCRIBE_CLICK,
+            parameters = mapOf(DuckChatPixelParameters.ORIGIN to "funnel_duckai_android__freelimit"),
+        )
+    }
+
+    @Test
+    fun `when activate click on subscribe modal with source then fires subscribe-modal activate click`() = runTest {
+        testee.sendReportMetricPixel(ReportMetric.USER_DID_CLICK_ACTIVATE_ON_SUBSCRIBE_MODAL, source = "aisidebar")
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(
+            DuckChatPixelName.DUCK_CHAT_SUBSCRIPTION_FUNNEL_SUBSCRIBE_MODAL_ACTIVATE_CLICK,
+            parameters = mapOf(DuckChatPixelParameters.ORIGIN to "funnel_duckai_android__aisidebar"),
+        )
+    }
+
+    @Test
+    fun `when open upgrade modal with source then fires upgrade-to-pro-modal impression with source origin`() = runTest {
+        testee.sendReportMetricPixel(ReportMetric.USER_DID_OPEN_UPGRADE_TO_PRO_MODAL, source = "pluslimit")
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(
+            DuckChatPixelName.DUCK_CHAT_SUBSCRIPTION_FUNNEL_UPGRADE_TO_PRO_MODAL_IMPRESSION,
+            parameters = mapOf(DuckChatPixelParameters.ORIGIN to "funnel_duckai_android__pluslimit"),
+        )
+    }
+
+    @Test
+    fun `when upgrade click on upgrade modal with source then fires upgrade-to-pro-modal upgrade click`() = runTest {
+        testee.sendReportMetricPixel(ReportMetric.USER_DID_CLICK_UPGRADE_ON_UPGRADE_TO_PRO_MODAL, source = "disclaimerbanner")
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(
+            DuckChatPixelName.DUCK_CHAT_SUBSCRIPTION_FUNNEL_UPGRADE_TO_PRO_MODAL_UPGRADE_CLICK,
+            parameters = mapOf(DuckChatPixelParameters.ORIGIN to "funnel_duckai_android__disclaimerbanner"),
+        )
+    }
+
+    @Test
+    fun `when modal event with unrecognised source then origin falls back to unknown`() = runTest {
+        testee.sendReportMetricPixel(ReportMetric.USER_DID_OPEN_SUBSCRIBE_MODAL, source = "somethingnotinthelist")
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(
+            DuckChatPixelName.DUCK_CHAT_SUBSCRIPTION_FUNNEL_SUBSCRIBE_MODAL_IMPRESSION,
+            parameters = mapOf(DuckChatPixelParameters.ORIGIN to "funnel_duckai_android__unknown"),
+        )
+    }
+
+    @Test
+    fun `when modal event with no source then origin falls back to unknown`() = runTest {
+        testee.sendReportMetricPixel(ReportMetric.USER_DID_OPEN_SUBSCRIBE_MODAL)
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(
+            DuckChatPixelName.DUCK_CHAT_SUBSCRIPTION_FUNNEL_SUBSCRIBE_MODAL_IMPRESSION,
+            parameters = mapOf(DuckChatPixelParameters.ORIGIN to "funnel_duckai_android__unknown"),
         )
     }
 }

@@ -17,9 +17,7 @@
 package com.duckduckgo.common.ui
 
 import android.annotation.SuppressLint
-import android.app.UiModeManager
 import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.graphics.Color
@@ -35,6 +33,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK
+import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.store.ThemingDataStore
 import com.duckduckgo.common.ui.view.isFullScreen
 import com.duckduckgo.mobile.android.R
@@ -49,6 +48,8 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
     @Inject lateinit var viewModelFactory: ViewModelProvider.NewInstanceFactory
 
     @Inject lateinit var themingDataStore: ThemingDataStore
+
+    @Inject lateinit var appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles
 
     /**
      * Override in subclasses whose look should follow the fire-mode theme.
@@ -78,7 +79,11 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
         daggerInject: Boolean = true,
     ) {
         if (daggerInject) daggerInject()
-        themeChangeReceiver = applyTheme(themingDataStore.theme, applyFireTheme)
+        themeChangeReceiver = applyTheme(
+            themingDataStore.theme,
+            applyFireTheme,
+            appBrandDesignUpdateToggles.theme().isEnabled(),
+        )
         super.onCreate(savedInstanceState)
     }
 
@@ -111,13 +116,7 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
 
     fun isDarkThemeEnabled(): Boolean {
         return when (themingDataStore.theme) {
-            DuckDuckGoTheme.SYSTEM_DEFAULT -> {
-                val uiManager = getSystemService(Context.UI_MODE_SERVICE) as UiModeManager
-                when (uiManager.nightMode) {
-                    UiModeManager.MODE_NIGHT_YES -> true
-                    else -> false
-                }
-            }
+            DuckDuckGoTheme.SYSTEM_DEFAULT -> isInNightMode()
             DARK -> true
             else -> false
         }

@@ -17,10 +17,10 @@
 package com.duckduckgo.app.browser.postidle
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
+import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.InputMode
@@ -65,7 +65,7 @@ class RealPostIdleSessionWideEventTest {
         whenever(duckChatInputModeState.displayedMode).thenReturn(displayedModeFlow)
         androidBrowserConfigFeature.sendPostIdleSessionWideEvent().setRawStoredState(Toggle.State(true))
 
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any())).thenReturn(Result.success(123L))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any())).thenReturn(Result.success(123L))
         whenever(wideEventClient.flowStep(any(), any(), any(), any())).thenReturn(Result.success(Unit))
         whenever(wideEventClient.intervalStart(any(), any(), anyOrNull(), anyOrNull())).thenReturn(Result.success(Unit))
         whenever(wideEventClient.intervalEnd(any(), any())).thenReturn(Result.success(100.milliseconds))
@@ -96,7 +96,8 @@ class RealPostIdleSessionWideEventTest {
                     flowStatus = FlowStatus.Unknown,
                 ),
             ),
-            samplingProbability = any(),
+            samplingProbability = eq(0.05f),
+            definition = any(),
         )
         verify(wideEventClient).intervalStart(eq(123L), eq("session_duration_ms_bucketed"), anyOrNull(), anyOrNull())
         verify(wideEventClient).intervalStart(eq(123L), eq("time_to_first_interaction_ms_bucketed"), anyOrNull(), anyOrNull())
@@ -105,7 +106,7 @@ class RealPostIdleSessionWideEventTest {
 
     @Test
     fun `when onSurfaceShown called twice then prior flow is aborted before new flowStart`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(1L))
             .thenReturn(Result.success(2L))
 
@@ -120,7 +121,8 @@ class RealPostIdleSessionWideEventTest {
             flowEntryPoint = isNull(),
             metadata = eq(mapOf("surface" to "lut")),
             cleanupPolicy = any(),
-            samplingProbability = any(),
+            samplingProbability = eq(0.05f),
+            definition = any(),
         )
     }
 

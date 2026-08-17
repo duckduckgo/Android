@@ -73,7 +73,7 @@ class WideEventClientTest {
             val metadata = mapOf("free_trial_eligible" to "true", "user_type" to "premium")
             val cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = true)
 
-            whenever(wideEventRepository.insertWideEvent(any(), any(), any(), anyOrNull(), any()))
+            whenever(wideEventRepository.insertWideEvent(any(), any(), any(), anyOrNull(), any(), anyOrNull(), any()))
                 .thenReturn(expectedEventId)
 
             val result = wideEventClient.flowStart(name, flowEntryPoint, metadata, cleanupPolicy)
@@ -91,6 +91,8 @@ class WideEventClientTest {
                     metadata = emptyMap(),
                 ),
                 samplingProbability = 1.0f,
+                metaType = "android-subscription-purchase",
+                metaVersion = "1.0.0",
             )
         }
 
@@ -100,7 +102,7 @@ class WideEventClientTest {
             val expectedEventId = 456L
             val name = "login_flow"
 
-            whenever(wideEventRepository.insertWideEvent(any(), anyOrNull(), any(), anyOrNull(), any()))
+            whenever(wideEventRepository.insertWideEvent(any(), anyOrNull(), any(), anyOrNull(), any(), anyOrNull(), any()))
                 .thenReturn(expectedEventId)
 
             val result = wideEventClient.flowStart(name)
@@ -118,6 +120,39 @@ class WideEventClientTest {
                     metadata = emptyMap(),
                 ),
                 samplingProbability = 1.0f,
+                metaType = "android-login-flow",
+                metaVersion = "1.0.0",
+            )
+        }
+
+    @Test
+    fun `when flowStart called with definition then meta parameters are stored`() =
+        runTest {
+            whenever(wideEventRepository.insertWideEvent(any(), anyOrNull(), any(), anyOrNull(), any(), anyOrNull(), any()))
+                .thenReturn(789L)
+
+            val result = wideEventClient.flowStart(
+                name = "test_flow",
+                definition = WideEventDefinition(
+                    version = WideEventDefinition.Version(minor = 2, patch = 3),
+                    type = "android-custom-definition",
+                ),
+            )
+
+            assertTrue(result.isSuccess)
+
+            verify(wideEventRepository).insertWideEvent(
+                name = "test_flow",
+                flowEntryPoint = null,
+                metadata = emptyMap(),
+                cleanupPolicy = WideEventRepository.CleanupPolicy.OnTimeout(
+                    duration = Duration.ofDays(7),
+                    status = WideEventRepository.WideEventStatus.UNKNOWN,
+                    metadata = emptyMap(),
+                ),
+                samplingProbability = 1.0f,
+                metaType = "android-custom-definition",
+                metaVersion = "1.2.3",
             )
         }
 
@@ -125,7 +160,7 @@ class WideEventClientTest {
     fun `when flowStart encounters repository exception then returns failure`() =
         runTest {
             val exception = RuntimeException("Database error")
-            whenever(wideEventRepository.insertWideEvent(any(), anyOrNull(), any(), anyOrNull(), any()))
+            whenever(wideEventRepository.insertWideEvent(any(), anyOrNull(), any(), anyOrNull(), any(), anyOrNull(), any()))
                 .thenThrow(exception)
 
             val result = wideEventClient.flowStart("test_flow")
@@ -440,7 +475,7 @@ class WideEventClientTest {
                     flowStatus = FlowStatus.Failure("timeout"),
                 )
 
-            whenever(wideEventRepository.insertWideEvent(any(), anyOrNull(), any(), anyOrNull(), any()))
+            whenever(wideEventRepository.insertWideEvent(any(), anyOrNull(), any(), anyOrNull(), any(), anyOrNull(), any()))
                 .thenReturn(wideEventId)
 
             val result =
@@ -462,6 +497,8 @@ class WideEventClientTest {
                     metadata = mapOf("failure_reason" to "timeout"),
                 ),
                 samplingProbability = 1.0f,
+                metaType = "android-timeout-flow",
+                metaVersion = "1.0.0",
             )
         }
 
@@ -478,21 +515,21 @@ class WideEventClientTest {
     @Test
     fun `when flowStart called with samplingProbability 1 then always creates event`() =
         runTest {
-            whenever(wideEventRepository.insertWideEvent(any(), anyOrNull(), any(), anyOrNull(), any()))
+            whenever(wideEventRepository.insertWideEvent(any(), anyOrNull(), any(), anyOrNull(), any(), anyOrNull(), any()))
                 .thenReturn(42L)
 
             val result = wideEventClient.flowStart("sampled_flow", samplingProbability = 1.0f)
 
             assertTrue(result.isSuccess)
             assertEquals(42L, result.getOrNull())
-            verify(wideEventRepository).insertWideEvent(any(), anyOrNull(), any(), anyOrNull(), any())
+            verify(wideEventRepository).insertWideEvent(any(), anyOrNull(), any(), anyOrNull(), any(), anyOrNull(), any())
         }
 
     @Test
     fun `when flowStart called with custom samplingProbability then passes it to repository`() =
         runTest {
             fakeRandom.nextFloatValue = 0.1f // below 0.5 threshold, so sampled in
-            whenever(wideEventRepository.insertWideEvent(any(), anyOrNull(), any(), anyOrNull(), any()))
+            whenever(wideEventRepository.insertWideEvent(any(), anyOrNull(), any(), anyOrNull(), any(), anyOrNull(), any()))
                 .thenReturn(99L)
 
             val result = wideEventClient.flowStart("sampled_flow", samplingProbability = 0.5f)
@@ -509,6 +546,8 @@ class WideEventClientTest {
                     metadata = emptyMap(),
                 ),
                 samplingProbability = 0.5f,
+                metaType = "android-sampled-flow",
+                metaVersion = "1.0.0",
             )
         }
 

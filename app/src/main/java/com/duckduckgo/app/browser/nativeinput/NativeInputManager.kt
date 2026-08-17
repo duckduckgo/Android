@@ -51,6 +51,9 @@ import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
@@ -109,7 +112,6 @@ class NativeInputCallbacks(
      * the caller uses the return value to decide whether to re-show the suggestions list.
      */
     val restoreOmnibarAutocomplete: (forQuery: String) -> Boolean = { _ -> false },
-    val onContextualSheetRequested: () -> Unit = {},
 )
 
 interface NativeInputManager {
@@ -188,6 +190,8 @@ class RealNativeInputManager @Inject constructor(
     private val nativeInputStateBugKillSwitch: NativeInputStateBugKillSwitch,
     private val nativeInputSearchOnlyFeature: NativeInputSearchOnlyFeature,
     private val nativeInputEventListener: NativeInputEventListener,
+    private val edgeToEdgeProvider: EdgeToEdgeProvider,
+    private val edgeToEdgeHandler: EdgeToEdgeHandler,
 ) : NativeInputManager {
     private lateinit var omnibarController: NativeInputOmnibarController
     private lateinit var rootView: ViewGroup
@@ -881,10 +885,14 @@ class RealNativeInputManager @Inject constructor(
                     isSubscriptionEligible -> DuckAiTier.Free
                     else -> DuckAiTier.FreeNoUpgrade
                 }
-                omnibarController.updateTierTitle(tier) {
-                    fireChatHeaderUpgradeTapped(tier)
-                    launchPurchase()
-                }
+                omnibarController.updateTierTitle(
+                    tier,
+                    onUpgradeClicked = {
+                        fireChatHeaderUpgradeTapped(tier)
+                        launchPurchase()
+                    },
+                    onUpgradeShown = { fireFreeLabelShown() },
+                )
             }
             if (!isBottom) {
                 setFloatingSubmitContainer(createFloatingSubmitContainer())
@@ -1270,7 +1278,7 @@ class RealNativeInputManager @Inject constructor(
         val omnibarCard = omnibarController.getCardView() ?: return false
         // Apply focused-state layout so the widget is measured at its final size; otherwise
         // padding/bottom-row/toggle-row visibility land after the 200ms enter as a second step.
-        widgetFrom(widgetView)?.beginEnterAnimationPreview(isBottom)
+        widgetFrom(widgetView)?.beginEnterAnimationPreview(isBottom, inputModeCapability)
         val margins = animator.init(widgetCard, omnibarCard, omnibarCard.width, omnibarCard.height, isBottom)
             ?: return false
 
@@ -1411,6 +1419,11 @@ class RealNativeInputManager @Inject constructor(
             elevation = WIDGET_ELEVATION_DP.toPx()
         }.also {
             contentView.addView(it)
+            // The container hangs off android.R.id.content, which no longer resizes for the keyboard now that
+            // the browser is edge-to-edge, so it needs the IME (and nav bar) inset applied as bottom margin.
+            if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BROWSER)) {
+                edgeToEdgeHandler.applyNavigationBarInsetsAsMargin(it)
+            }
             floatingSubmitContainer = it
         }
     }
@@ -1428,7 +1441,17 @@ class RealNativeInputManager @Inject constructor(
      */
     internal fun fireChatHeaderUpgradeTapped(tier: DuckAiTier) {
         val userTier = if (tier is DuckAiTier.Paid) "plus" else "free"
-        pixel.fire(AppPixelName.AI_CHAT_UNIFIED_INPUT_CHAT_HEADER_UPGRADE_TAPPED, mapOf("user_tier" to userTier))
+        pixel.fire(
+            AppPixelName.AI_CHAT_UNIFIED_INPUT_CHAT_HEADER_UPGRADE_TAPPED,
+            mapOf("user_tier" to userTier, "origin" to PURCHASE_ORIGIN),
+        )
+    }
+
+    /**
+     * Invoked by the omnibar controller when the upgradeable free pill becomes visible.
+     */
+    private fun fireFreeLabelShown() {
+        pixel.fire(AppPixelName.AI_CHAT_UNIFIED_INPUT_FREE_LABEL_SHOWN, mapOf("origin" to PURCHASE_ORIGIN))
     }
 
     /** True if [rawUrl] points at an in-progress Duck.ai chat (Duck.ai URL with a non-blank `chatID`). */

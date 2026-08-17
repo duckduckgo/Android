@@ -1,1 +1,0 @@
-../../../.claude/skills/prepare-sbt-repro/SKILL.md

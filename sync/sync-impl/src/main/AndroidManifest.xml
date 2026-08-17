@@ -121,16 +121,30 @@
         <activity
             android:name=".ui.v2.DisplayQrCodeActivity"
             android:exported="false"
-            android:label="@string/sync_scanner_v2_qr_code_screen_title"
+            android:label="@string/sync_simplified_qr_code_screen_title"
             android:parentActivityName=".ui.v2.ReadSyncCodeActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.DuckDuckGo.Dark" />
 
         <activity
-            android:name=".ui.v2.ExchangeSyncCodeActivity"
+            android:name=".ui.v2.ProcessSyncCodeActivity"
             android:exported="false"
-            android:label="@string/sync_scanner_v2_qr_code_screen_title"
+            android:label="@string/sync_screen_title"
             android:parentActivityName=".ui.v2.ReadSyncCodeActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".ui.v2.RecoverSyncedDataActivity"
+            android:exported="false"
+            android:label="@string/sync_screen_title"
+            android:parentActivityName=".ui.v2.SyncActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".ui.v2.PreviousSessionReadyActivity"
+            android:exported="false"
+            android:label="@string/sync_screen_title"
+            android:parentActivityName=".ui.v2.SyncActivity"
             android:screenOrientation="portrait" />
     </application>
 </manifest>

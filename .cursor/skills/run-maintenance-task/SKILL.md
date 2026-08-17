@@ -1,1 +1,0 @@
-../../../.claude/skills/run-maintenance-task/SKILL.md

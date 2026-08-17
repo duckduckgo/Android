@@ -60,7 +60,6 @@
     <!-- Input Screen  -->
     <string name="input_screen_search_hint">Poišči ali vnesi naslov</string>
     <string name="input_screen_search_only_hint">Iskanje</string>
-    <string name="input_screen_chat_hint">Vprašaj zasebno</string>
     <string name="input_screen_user_pref_without_ai">Samo iskanje</string>
     <string name="input_screen_user_pref_with_ai">Iskanje in Duck.ai</string>
     <string name="input_screen_user_pref_description">Preizkusite novo možnost, da vprašate Duck.ai neposredno iz naslovne vrstice. <annotation type="share_feedback">Podajte povratne informacije</annotation></string>
@@ -74,7 +73,6 @@
 
     <!-- AutoComplete -->
     <string name="autocompleteDuckAiPrompt">Vprašajte Duck.ai</string>
-    <string name="autocompleteDeviceAppNotFound">Prošnje ni bilo mogoče najti</string>
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogTitle">Želite lažji dostop do zasebnega klepeta z umetno inteligenco?</string>
@@ -122,10 +120,89 @@
     <string name="duckAIContextualPromptSummarize">Povzemi to stran</string>
     <string name="duckAIContextualAutomaticContextTitle">Samodejno pošiljanje vsebine strani</string>
     <string name="duckAIContextualAutomaticContextMessage">Vsebino strani samodejno pošljite Duck.ai</string>
-    <string name="duckAIContextualAttachPageContent">Priloži vsebino strani</string>
 
     <!-- Contextual sheet quick action -->
     <string name="duckAIContextualPromptAskAboutPage">Vprašajte o strani</string>
+
+    <!-- Contextual sheet suggested prompts; native copy for PageSuggestionsCatalog.json entries, keyed by catalog id -->
+    <string name="duckAiSuggestionTranslatePageLabel" instruction="Suggested prompt chip: translate the current page">Prevedi to stran</string>
+    <string name="duckAiSuggestionTranslatePagePrompt" instruction="Suggested prompt submitted text: translate the page. %1$s is replaced with the name of the user&apos;s language.">Prevedi to stran v jezik %1$s.</string>
+    <string name="duckAiSuggestionKeyTakeawaysLabel" instruction="Suggested prompt chip: key takeaways of an article">Katere so ključne ugotovitve?</string>
+    <string name="duckAiSuggestionKeyTakeawaysPrompt" instruction="Suggested prompt submitted text: key takeaways of an article">Katere so ključne ugotovitve tega članka?</string>
+    <string name="duckAiSuggestionExplainSimplyLabel" instruction="Suggested prompt chip: explain the content simply">Razloži preprosto</string>
+    <string name="duckAiSuggestionExplainSimplyPrompt" instruction="Suggested prompt submitted text: explain the content simply">Razloži to s preprostim, razumljivim jezikom.</string>
+    <string name="duckAiSuggestionCounterargumentsLabel" instruction="Suggested prompt chip: counterarguments">Kateri so protiargumenti?</string>
+    <string name="duckAiSuggestionCounterargumentsPrompt" instruction="Suggested prompt submitted text: counterarguments">Kateri so glavni protiargumenti ali kritike tega?</string>
+    <string name="duckAiSuggestionRelatedArticlesLabel" instruction="Suggested prompt chip: related articles">Predlagaj sorodne članke za raziskovanje</string>
+    <string name="duckAiSuggestionRelatedArticlesPrompt" instruction="Suggested prompt submitted text: related articles">Predlagaj sorodne članke ali teme, ki jih je vredno raziskati.</string>
+    <string name="duckAiSuggestionShoppingListLabel" instruction="Suggested prompt chip: shopping list from a recipe">Ustvari nakupovalni seznam</string>
+    <string name="duckAiSuggestionShoppingListPrompt" instruction="Suggested prompt submitted text: shopping list from a recipe">Ustvari nakupovalni seznam s količinami iz tega recepta.</string>
+    <string name="duckAiSuggestionRecipeNutritionLabel" instruction="Suggested prompt chip: recipe nutrition">Oceni hranilne vrednosti</string>
+    <string name="duckAiSuggestionRecipeNutritionPrompt" instruction="Suggested prompt submitted text: recipe nutrition">Oceni hranilne vrednosti za ta recept.</string>
+    <string name="duckAiSuggestionScaleRecipeLabel" instruction="Suggested prompt chip: scale a recipe">Prilagodi porcije</string>
+    <string name="duckAiSuggestionScaleRecipePrompt" instruction="Suggested prompt submitted text: scale a recipe">Prepiši ta recept, prilagojen za drugo število porcij.</string>
+    <string name="duckAiSuggestionProductProsConsLabel" instruction="Suggested prompt chip: product pros and cons">Katere so prednosti in slabosti?</string>
+    <string name="duckAiSuggestionProductProsConsPrompt" instruction="Suggested prompt submitted text: product pros and cons">Katere so prednosti in slabosti tega izdelka?</string>
+    <string name="duckAiSuggestionFindAlternativesLabel" instruction="Suggested prompt chip: product alternatives">Poišči druge možnosti</string>
+    <string name="duckAiSuggestionFindAlternativesPrompt" instruction="Suggested prompt submitted text: product alternatives">Predlagaj nekaj alternativ za ta izdelek.</string>
+    <string name="duckAiSuggestionSummarizeVideoLabel" instruction="Suggested prompt chip: summarize a video">Povzemi ta videoposnetek</string>
+    <string name="duckAiSuggestionSummarizeVideoPrompt" instruction="Suggested prompt submitted text: summarize a video">Povzemi ta videoposnetek.</string>
+    <string name="duckAiSuggestionVideoKeyPointsLabel" instruction="Suggested prompt chip: video key points">Katere so ključne točke?</string>
+    <string name="duckAiSuggestionVideoKeyPointsPrompt" instruction="Suggested prompt submitted text: video key points">Katere so ključne točke, zajete v tem videoposnetku?</string>
+    <string name="duckAiSuggestionTailorResumeLabel" instruction="Suggested prompt chip: tailor a resume to a job">Prilagodi moj življenjepis</string>
+    <string name="duckAiSuggestionTailorResumePrompt" instruction="Suggested prompt submitted text: tailor a resume to a job">Pomagaj mi prilagoditi življenjepis za to delovno mesto.</string>
+    <string name="duckAiSuggestionInterviewPrepLabel" instruction="Suggested prompt chip: interview prep">Pomagaj mi pri pripravi na razgovor</string>
+    <string name="duckAiSuggestionInterviewPrepPrompt" instruction="Suggested prompt submitted text: interview prep">Katera vprašanja za razgovor se lahko pojavijo za to delovno mesto?</string>
+    <string name="duckAiSuggestionCoverLetterLabel" instruction="Suggested prompt chip: draft a cover letter">Pripravi spremno pismo</string>
+    <string name="duckAiSuggestionCoverLetterPrompt" instruction="Suggested prompt submitted text: draft a cover letter">Pripravi spremno pismo za to delovno mesto.</string>
+    <string name="duckAiSuggestionEventDetailsLabel" instruction="Suggested prompt chip: event details">Katere so ključne podrobnosti?</string>
+    <string name="duckAiSuggestionEventDetailsPrompt" instruction="Suggested prompt submitted text: event details">Povzemi ključne podrobnosti tega dogodka.</string>
+    <string name="duckAiSuggestionWorthWatchingLabel" instruction="Suggested prompt chip: is a movie/show worth watching">Se splača gledati?</string>
+    <string name="duckAiSuggestionWorthWatchingPrompt" instruction="Suggested prompt submitted text: is a movie/show worth watching">Se splača gledati? Podaj mi mnenje brez razkritja vsebine.</string>
+    <string name="duckAiSuggestionSimilarTitlesLabel" instruction="Suggested prompt chip: similar movies or shows">Priporoči podobne naslove</string>
+    <string name="duckAiSuggestionSimilarTitlesPrompt" instruction="Suggested prompt submitted text: similar movies or shows">Priporoči podobne filme ali TV-oddaje.</string>
+    <string name="duckAiSuggestionCastCrewLabel" instruction="Suggested prompt chip: cast and crew">Igralska zasedba in ekipa</string>
+    <string name="duckAiSuggestionCastCrewPrompt" instruction="Suggested prompt submitted text: cast and crew">Kdo so glavni igralci in člani ekipe ter po čem so še znani?</string>
+    <string name="duckAiSuggestionSummarizeBookLabel" instruction="Suggested prompt chip: summarize a book">Povzemi to knjigo</string>
+    <string name="duckAiSuggestionSummarizeBookPrompt" instruction="Suggested prompt submitted text: summarize a book">Povzemi to knjigo.</string>
+    <string name="duckAiSuggestionSimilarBooksLabel" instruction="Suggested prompt chip: similar books">Priporoči podobne knjige</string>
+    <string name="duckAiSuggestionSimilarBooksPrompt" instruction="Suggested prompt submitted text: similar books">Priporoči podobne knjige.</string>
+    <string name="duckAiSuggestionExplainPaperLabel" instruction="Suggested prompt chip: explain a research paper">Razloži mi ta članek</string>
+    <string name="duckAiSuggestionExplainPaperPrompt" instruction="Suggested prompt submitted text: explain a research paper">Razloži ta raziskovalni članek v preprostem jeziku.</string>
+    <string name="duckAiSuggestionPaperContributionsLabel" instruction="Suggested prompt chip: paper contributions">Kateri so ključni prispevki?</string>
+    <string name="duckAiSuggestionPaperContributionsPrompt" instruction="Suggested prompt submitted text: paper contributions">Kateri so ključni prispevki tega članka?</string>
+    <string name="duckAiSuggestionMenuHighlightsLabel" instruction="Suggested prompt chip: restaurant menu highlights">Kaj naj naročim?</string>
+    <string name="duckAiSuggestionMenuHighlightsPrompt" instruction="Suggested prompt submitted text: restaurant menu highlights">Katere jedi moraš tukaj poskusiti?</string>
+    <string name="duckAiSuggestionPlaceHoursLabel" instruction="Suggested prompt chip: place hours and location">Kakšen je delovni čas in lokacija?</string>
+    <string name="duckAiSuggestionPlaceHoursPrompt" instruction="Suggested prompt submitted text: place hours and location">Kakšen je delovni čas, lokacija in kontaktni podatki za ta kraj?</string>
+    <string name="duckAiSuggestionPlaceReviewsLabel" instruction="Suggested prompt chip: place reputation">Je ta kraj v redu?</string>
+    <string name="duckAiSuggestionPlaceReviewsPrompt" instruction="Suggested prompt submitted text: place reputation">Je ta kraj vreden obiska? Povzemi njegov ugled na podlagi ocen in mnenj.</string>
+    <string name="duckAiSuggestionSummarizeThreadLabel" instruction="Suggested prompt chip: summarize a discussion thread">Povzemi to razpravo</string>
+    <string name="duckAiSuggestionSummarizeThreadPrompt" instruction="Suggested prompt submitted text: summarize a discussion thread">Povzemi to nit razprave.</string>
+    <string name="duckAiSuggestionExplainRepoLabel" instruction="Suggested prompt chip: explain a code repository">Razloži mi ta repozitorij</string>
+    <string name="duckAiSuggestionExplainRepoPrompt" instruction="Suggested prompt submitted text: explain a code repository">Pojasni, kaj počne ta repozitorij in kako ga uporabljati.</string>
+    <string name="duckAiSuggestionExplainAnswerLabel" instruction="Suggested prompt chip: explain the top answer">Razloži najboljši odgovor</string>
+    <string name="duckAiSuggestionExplainAnswerPrompt" instruction="Suggested prompt submitted text: explain the top answer">Razloži sprejeti odgovor s preprostimi besedami.</string>
+    <string name="duckAiSuggestionHowtoStepsLabel" instruction="Suggested prompt chip: how-to steps">Vodi me skozi korake</string>
+    <string name="duckAiSuggestionHowtoStepsPrompt" instruction="Suggested prompt submitted text: how-to steps">Razdeli to na jasne, oštevilčene korake.</string>
+    <string name="duckAiSuggestionHowtoMaterialsLabel" instruction="Suggested prompt chip: how-to materials">Kaj potrebujem?</string>
+    <string name="duckAiSuggestionHowtoMaterialsPrompt" instruction="Suggested prompt submitted text: how-to materials">Naštej orodja, materiale ali pogoje, ki jih potrebujem za to.</string>
+    <string name="duckAiSuggestionCourseLearnLabel" instruction="Suggested prompt chip: course learning outcomes">Kaj se bom naučil/-a?</string>
+    <string name="duckAiSuggestionCourseLearnPrompt" instruction="Suggested prompt submitted text: course learning outcomes">Katere so ključne stvari, ki se jih bom naučil/-a v tem tečaju?</string>
+    <string name="duckAiSuggestionCourseWorthLabel" instruction="Suggested prompt chip: is a course worth taking">Se splača udeležiti?</string>
+    <string name="duckAiSuggestionCourseWorthPrompt" instruction="Suggested prompt submitted text: is a course worth taking">Glede na to stran se ta tečaj splača opraviti?</string>
+    <string name="duckAiSuggestionFaqAnswerLabel" instruction="Suggested prompt chip: what an FAQ page answers">Na kaj to odgovarja?</string>
+    <string name="duckAiSuggestionFaqAnswerPrompt" instruction="Suggested prompt submitted text: what an FAQ page answers">Na katera glavna vprašanja odgovarja ta stran?</string>
+    <string name="duckAiSuggestionFaqSummaryLabel" instruction="Suggested prompt chip: summarize FAQ Q&amp;As">Povzemi vprašanja in odgovore</string>
+    <string name="duckAiSuggestionFaqSummaryPrompt" instruction="Suggested prompt submitted text: summarize FAQ Q&amp;As">Povzemi vprašanja in odgovore na tej strani.</string>
+    <string name="duckAiSuggestionReviewVerdictLabel" instruction="Suggested prompt chip: review verdict">Kakšna je razsodba?</string>
+    <string name="duckAiSuggestionReviewVerdictPrompt" instruction="Suggested prompt submitted text: review verdict">Kakšna je skupna razsodba in ocena za to?</string>
+    <string name="duckAiSuggestionReviewSummaryLabel" instruction="Suggested prompt chip: summarize reviews">Povzemi mnenja</string>
+    <string name="duckAiSuggestionReviewSummaryPrompt" instruction="Suggested prompt submitted text: summarize reviews">Povzemi, kaj pravijo ocene.</string>
+    <string name="duckAiSuggestionWhoIsThisLabel" instruction="Suggested prompt chip: person background">Kdo je ta oseba?</string>
+    <string name="duckAiSuggestionWhoIsThisPrompt" instruction="Suggested prompt submitted text: person background">Na kratko mi opiši to osebo.</string>
+    <string name="duckAiSuggestionPersonBackgroundLabel" instruction="Suggested prompt chip: summarize a person&apos;s background">Povzemi ozadje</string>
+    <string name="duckAiSuggestionPersonBackgroundPrompt" instruction="Suggested prompt submitted text: summarize a person&apos;s background">Povzemi ozadje in pomembnejše delo te osebe.</string>
 
     <!-- Contextual sheet input hint (contextualSheetImprovements flag) -->
     <string name="contextualSheetImprovedHint">Vprašajte kar koli zasebno</string>
@@ -155,7 +232,6 @@
     <string name="duckAiEndCtaTitle">Uspelo vam bo!</string>
     <string name="duckAiEndCtaDescription"><![CDATA[Za iskanje in obisk spletnih mest uporabite naslovno vrstico ali preklopite na Duck.ai za zasebni klepet z umetno inteligenco.<br/><br/>Duck.ai lahko uporabljate kjer koli, kjer vidite ikono klepeta]]></string>
     <string name="duckAiEndCtaButton">Petka!</string>
-    <string name="duckAiEndCtaDescriptionCustomAi"><![CDATA[Začnite zasebni klepet z umetno inteligenco z Duck.ai ali preklopite na iskanje za zaščiteno brskanje.<br/><br/>Duck.ai lahko uporabljate kjer koli, kjer vidite ikono klepeta]]></string>
 
     <!-- Native Duck.ai chat history -->
     <string name="duck_ai_chat_history_title">Klepeti</string>
@@ -268,6 +344,5 @@
     <string name="duckAiSettingsTitle">Nastavitve Duck.ai</string>
 
     <!-- File/image attachment menu options -->
-    <string name="duckChatContextualAskAboutTab">Vprašajte o zavihku</string>
     <string name="duckChatContextualAskAboutPage">Vprašajte o strani</string>
 </resources>

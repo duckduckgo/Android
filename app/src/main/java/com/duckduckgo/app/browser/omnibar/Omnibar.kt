@@ -81,7 +81,7 @@ class Omnibar(
 
         fun onVoiceSearchPressed()
 
-        fun onDuckChatButtonPressed()
+        fun onDuckChatButtonPressed(anchor: View)
 
         fun onBackButtonPressed()
 
@@ -126,8 +126,8 @@ class Omnibar(
         fun onAdBlockingAnimationSuppressed()
     }
 
-    fun interface InputScreenLaunchListener {
-        fun launchInputScreen(query: String)
+    fun interface NativeInputLaunchListener {
+        fun launchNativeInput(query: String)
     }
 
     interface LogoClickListener {
@@ -307,8 +307,8 @@ class Omnibar(
         omnibarView.setLogoClickListener(logoClickListener)
     }
 
-    fun configureInputScreenLaunchListener(listener: InputScreenLaunchListener) {
-        omnibarView.setInputScreenLaunchListener(listener)
+    fun configureNativeInputLaunchListener(listener: NativeInputLaunchListener) {
+        omnibarView.setNativeInputLaunchListener(listener)
     }
 
     fun addTextListener(listener: TextListener) {

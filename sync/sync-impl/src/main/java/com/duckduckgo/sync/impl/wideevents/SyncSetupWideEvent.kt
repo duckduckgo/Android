@@ -23,6 +23,9 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator
+import com.duckduckgo.sync.impl.pixels.RealSyncPixels.Companion.UI_VERSION_V1
+import com.duckduckgo.sync.impl.pixels.RealSyncPixels.Companion.UI_VERSION_V2
+import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_UI_VERSION
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
 import dagger.SingleInstanceIn
@@ -88,9 +91,10 @@ class SyncSetupWideEventImpl @Inject constructor(
         cachedFlowId = wideEventClient.flowStart(
             name = FLOW_NAME,
             flowEntryPoint = source,
-            metadata = mapOf(
-                KEY_USER_AUTH_REQUIRED to deviceAuthenticator.isAuthenticationRequired().toString(),
-            ),
+            metadata = buildMap {
+                put(KEY_USER_AUTH_REQUIRED, deviceAuthenticator.isAuthenticationRequired().toString())
+                putAll(uiMetadata())
+            },
             cleanupPolicy = OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
         ).getOrNull()
     }
@@ -237,6 +241,13 @@ class SyncSetupWideEventImpl @Inject constructor(
 
         wideEventClient.flowAbort(wideEventId = id)
         cachedFlowId = null
+    }
+
+    private suspend fun uiMetadata(): Map<String, String> = withContext(dispatchers.io()) {
+        buildMap {
+            val version = if (syncFeature.get().useSimplifiedSync().isEnabled()) UI_VERSION_V2 else UI_VERSION_V1
+            put(SYNC_SETUP_UI_VERSION, version)
+        }
     }
 
     private companion object {

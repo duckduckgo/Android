@@ -39,10 +39,10 @@ import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
-import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestionsStore
 import com.duckduckgo.duckchat.impl.repository.AddressBarPickerAttributionRepository
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
+import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.ChatSuggestionsStore
 import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
@@ -112,7 +112,6 @@ class RealDuckChatTest {
         whenever(mockDuckChatFeatureRepository.shouldShowInVoiceChat()).thenReturn(true)
         whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
         whenever(mockDuckChatFeatureRepository.isInputScreenUserSettingEnabled()).thenReturn(true)
-        whenever(mockDuckChatFeatureRepository.isFullScreenModeUserSettingEnabled()).thenReturn(true)
         whenever(mockDuckChatFeatureRepository.sessionDeltaInMinutes()).thenReturn(10L)
         whenever(mockDuckChatFeatureRepository.lastSessionTimestamp()).thenReturn(0L)
         whenever(mockContext.getString(any())).thenReturn("Duck.ai")
@@ -120,6 +119,9 @@ class RealDuckChatTest {
         duckChatFeature.self().setRawStoredState(State(enable = true))
         duckChatFeature.duckAiInputScreen().setRawStoredState(State(enable = true))
         duckChatFeature.duckAiVoiceSearch().setRawStoredState(State(enable = false))
+        // Both default to true in DuckChatFeature; pinned off here so each test opts in explicitly.
+        duckChatFeature.nativeInputField().setRawStoredState(State(enable = false))
+        duckChatFeature.nativeChatInput().setRawStoredState(State(enable = false))
         imageUploadFeature.self().setRawStoredState(State(enable = true))
 
         testee = spy(
@@ -271,30 +273,6 @@ class RealDuckChatTest {
     }
 
     @Test
-    fun whenFeatureEnabledAndUserDisabledThenShowFullScreenModeIsTrue() = runTest {
-        duckChatFeature.self().setRawStoredState(State(true))
-        duckChatFeature.fullscreenMode().setRawStoredState(State(true))
-        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(false)
-
-        testee.onPrivacyConfigDownloaded()
-        advanceUntilIdle()
-
-        assertTrue(testee.showFullScreenMode.value)
-    }
-
-    @Test
-    fun whenFeatureDisabledThenShowFullScreenModeIsFalse() = runTest {
-        duckChatFeature.self().setRawStoredState(State(false))
-        duckChatFeature.fullscreenMode().setRawStoredState(State(true))
-        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
-
-        testee.onPrivacyConfigDownloaded()
-        advanceUntilIdle()
-
-        assertFalse(testee.showFullScreenMode.value)
-    }
-
-    @Test
     fun whenObserveShowInBrowserMenuUserSettingThenEmitCorrectValues() = runTest {
         whenever(mockDuckChatFeatureRepository.observeShowInBrowserMenu()).thenReturn(flowOf(true, false))
 
@@ -344,6 +322,14 @@ class RealDuckChatTest {
         advanceUntilIdle()
 
         assertFalse(testee.observeNativeInputFieldUserSettingEnabled().first())
+    }
+
+    @Test
+    fun whenNoRemoteConfigThenNativeInputFlagsDefaultToEnabled() {
+        val freshFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
+
+        assertTrue(freshFeature.nativeInputField().isEnabled())
+        assertTrue(freshFeature.nativeChatInput().isEnabled())
     }
 
     @Test
@@ -515,6 +501,30 @@ class RealDuckChatTest {
         coroutineRule.testScope.advanceUntilIdle()
 
         assertFalse(testee.showVoiceChatEntry.value)
+    }
+
+    @Test
+    fun whenNativePromptEditingToggleEnabledAndNativeChatInputEnabledThenNativePromptEditingEnabled() = runTest {
+        duckChatFeature.nativeInputField().setRawStoredState(State(enable = true))
+        duckChatFeature.nativeChatInput().setRawStoredState(State(enable = true))
+        duckChatFeature.nativePromptEditing().setRawStoredState(State(enable = true))
+
+        testee.onPrivacyConfigDownloaded()
+        advanceUntilIdle()
+
+        assertTrue(testee.isNativePromptEditingEnabled())
+    }
+
+    @Test
+    fun whenNativeChatInputDisabledThenNativePromptEditingDisabled() = runTest {
+        duckChatFeature.nativeInputField().setRawStoredState(State(enable = false))
+        duckChatFeature.nativeChatInput().setRawStoredState(State(enable = false))
+        duckChatFeature.nativePromptEditing().setRawStoredState(State(enable = true))
+
+        testee.onPrivacyConfigDownloaded()
+        advanceUntilIdle()
+
+        assertFalse(testee.isNativePromptEditingEnabled())
     }
 
     @Test
@@ -1296,89 +1306,6 @@ class RealDuckChatTest {
         testee.onPrivacyConfigDownloaded()
 
         assertTrue(testee.showSettings.value)
-    }
-
-    @Test
-    fun `when input screen disabled then don't show input screen automatically`() = runTest {
-        duckChatFeature.duckAiInputScreen().setRawStoredState(State(false))
-        duckChatFeature.showInputScreenAutomaticallyOnNewTab().setRawStoredState(State(true))
-
-        testee.onPrivacyConfigDownloaded()
-
-        assertFalse(testee.showInputScreenAutomaticallyOnNewTab.value)
-    }
-
-    @Test
-    fun `when input screen enabled but feature disabled then don't show input screen automatically`() = runTest {
-        duckChatFeature.duckAiInputScreen().setRawStoredState(State(true))
-        whenever(mockDuckChatFeatureRepository.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(true))
-        duckChatFeature.showInputScreenAutomaticallyOnNewTab().setRawStoredState(State(false))
-
-        testee.onPrivacyConfigDownloaded()
-
-        assertFalse(testee.showInputScreenAutomaticallyOnNewTab.value)
-    }
-
-    @Test
-    fun `when input screen enabled and feature flag enabled then show input screen automatically`() = runTest {
-        duckChatFeature.duckAiInputScreen().setRawStoredState(State(true))
-        whenever(mockDuckChatFeatureRepository.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(true))
-        duckChatFeature.showInputScreenAutomaticallyOnNewTab().setRawStoredState(State(true))
-
-        testee.onPrivacyConfigDownloaded()
-
-        assertTrue(testee.showInputScreenAutomaticallyOnNewTab.value)
-    }
-
-    @Test
-    fun `when showMainButtonsInInputScreen enabled then showMainButtonsInInputScreen emits true`() = runTest {
-        duckChatFeature.showMainButtonsInInputScreen().setRawStoredState(State(enable = true))
-
-        testee.onPrivacyConfigDownloaded()
-
-        assertTrue(testee.showMainButtonsInInputScreen.value)
-    }
-
-    @Test
-    fun `when showMainButtonsInInputScreen disabled then showMainButtonsInInputScreen emits false`() = runTest {
-        duckChatFeature.showMainButtonsInInputScreen().setRawStoredState(State(enable = false))
-
-        testee.onPrivacyConfigDownloaded()
-
-        assertFalse(testee.showMainButtonsInInputScreen.value)
-    }
-
-    @Test
-    fun `when input screen disabled then don't show input screen when launched from system search`() = runTest {
-        duckChatFeature.duckAiInputScreen().setRawStoredState(State(false))
-        whenever(mockDuckChatFeatureRepository.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(true))
-        duckChatFeature.showInputScreenOnSystemSearchLaunch().setRawStoredState(State(true))
-
-        testee.onPrivacyConfigDownloaded()
-
-        assertFalse(testee.showInputScreenOnSystemSearchLaunch.value)
-    }
-
-    @Test
-    fun `when input screen enabled but feature disabled then don't show input screen when launched from system search`() = runTest {
-        duckChatFeature.duckAiInputScreen().setRawStoredState(State(true))
-        whenever(mockDuckChatFeatureRepository.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(true))
-        duckChatFeature.showInputScreenOnSystemSearchLaunch().setRawStoredState(State(false))
-
-        testee.onPrivacyConfigDownloaded()
-
-        assertFalse(testee.showInputScreenOnSystemSearchLaunch.value)
-    }
-
-    @Test
-    fun `when input screen enabled and feature flag enabled then show input screen when launched from system search`() = runTest {
-        duckChatFeature.duckAiInputScreen().setRawStoredState(State(true))
-        whenever(mockDuckChatFeatureRepository.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(true))
-        duckChatFeature.showInputScreenOnSystemSearchLaunch().setRawStoredState(State(true))
-
-        testee.onPrivacyConfigDownloaded()
-
-        assertTrue(testee.showInputScreenOnSystemSearchLaunch.value)
     }
 
     @Test

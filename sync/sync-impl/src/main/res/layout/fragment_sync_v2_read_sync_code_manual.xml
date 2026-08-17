@@ -36,8 +36,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/keyline_4"
                 android:layout_marginTop="@dimen/keyline_5"
-                app:bodyText="@string/sync_scanner_v2_manual_entry_screen_body"
-                app:headlineText="@string/sync_scanner_v2_manual_entry_screen_headline" />
+                app:bodyText="@string/sync_simplified_scanner_manual_entry_header_body"
+                app:headlineText="@string/sync_simplified_scanner_manual_entry_header_headline" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/entryContainer"
@@ -53,7 +53,7 @@
                     android:id="@+id/exampleCodeLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/sync_scanner_v2_manual_entry_example_code_label"
+                    android:text="@string/sync_simplified_scanner_manual_entry_example_code_label"
                     app:layout_constraintBottom_toTopOf="@id/exampleCode"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -70,7 +70,7 @@
                     android:ellipsize="end"
                     android:gravity="center_horizontal"
                     android:maxLines="2"
-                    android:text="@string/sync_scanner_v2_manual_entry_example_code"
+                    android:text="@string/sync_simplified_scanner_manual_entry_example_code"
                     app:layout_constraintBottom_toTopOf="@id/pasteCodeButton"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -83,7 +83,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/keyline_5"
-                    android:text="@string/sync_scanner_v2_manual_entry_paste_button"
+                    android:text="@string/sync_simplified_scanner_manual_entry_primary_button"
                     app:daxButtonSize="large"
                     app:icon="@drawable/ic_copy_24"
                     app:iconGravity="textStart"

@@ -23,6 +23,13 @@ inputs:
     description: 'Additional flags to pass to the gradlew command'
     required: false
     default: ''
+  source_patches:
+    description: >
+      Newline-separated Git patch files applied to the checkout before assembling, for E2E test
+      builds that need a compile-time change. A patch that does not apply fails the build. Never
+      combine with -PuseUploadSigning in gradle_flags — enforced below.
+    required: false
+    default: ''
   develocity_access_key:
     description: 'Develocity access key for Gradle remote caching'
     required: false
@@ -52,6 +59,40 @@ runs:
       with:
         ref: ${{ inputs.commit }}
         submodules: recursive
+
+    - name: Refuse source patches on a signed shipping build
+      # A patched compile-time default must never reach a build signed for real distribution.
+      if: ${{ inputs.source_patches != '' }}
+      shell: bash
+      env:
+        GRADLE_FLAGS: ${{ inputs.gradle_flags }}
+      run: |
+        set -euo pipefail
+        if [[ "$GRADLE_FLAGS" == *"useUploadSigning"* ]]; then
+          echo "::error::source_patches is set together with -PuseUploadSigning. source_patches changes a compile-time default and must never be applied to a build signed for real distribution."
+          exit 1
+        fi
+
+    - name: Apply source patches
+      if: ${{ inputs.source_patches != '' }}
+      shell: bash
+      env:
+        SOURCE_PATCHES: ${{ inputs.source_patches }}
+      run: |
+        set -euo pipefail
+        while IFS= read -r patch; do
+          if [ -z "$patch" ]; then continue; fi
+          if [ ! -f "$patch" ]; then
+            echo "::error::Source patch not found: $patch"
+            exit 1
+          fi
+          if ! git apply --check "$patch"; then
+            echo "::error file=$patch::Source patch does not apply. The code it targets changed — update the patch, or delete it if the behaviour it covers has been retired."
+            exit 1
+          fi
+          git apply "$patch"
+          echo "Applied source patch: $patch"
+        done <<< "$SOURCE_PATCHES"
 
     - name: Set up JDK version
       uses: actions/setup-java@v4

@@ -46,6 +46,7 @@
     <attr name="daxColorBackground" format="color"/>
     <attr name="daxColorBackgroundInverted" format="color"/>
     <attr name="daxColorSurface" format="color"/>
+    <attr name="daxColorSurfaceTertiary" format="color"/>
     <attr name="daxColorContainer" format="color"/>
     <attr name="daxColorWindow" format="color"/>
     <attr name="daxColorDuckAiBackground" format="color"/>
@@ -88,6 +89,9 @@
 
     <attr name="daxColorButtonPrimaryContainer" format="color"/>
     <attr name="daxColorButtonPrimaryContainerPressed" format="color"/>
+    <attr name="daxColorButtonBrandContainer" format="color"/>
+    <attr name="daxColorButtonBrandContainerPressed" format="color"/>
+    <attr name="daxColorButtonBrandText" format="color"/>
     <attr name="daxColorButtonSecondaryContainer" format="color"/>
     <attr name="daxColorButtonSecondaryContainerPressed" format="color"/>
     <attr name="daxColorButtonGhostAltContainerPressed" format="color"/>
@@ -209,6 +213,7 @@
     <color name="blue70">#1E42A4</color>
     <color name="blue80">#14307E</color>
 
+    <color name="black96">#F5000000</color>
     <color name="black84">#D6000000</color>
     <color name="black60">#99000000</color>
     <color name="black50">#80000000</color>
@@ -235,7 +240,9 @@
     <color name="white18">#2EFFFFFF</color>
     <color name="white12">#1FFFFFFF</color>
     <color name="white9">#17FFFFFF</color>
+    <color name="white8">#14FFFFFF</color>
     <color name="white6">#0FFFFFFF</color>
+    <color name="white4">#0AFFFFFF</color>
     <color name="white3">#08FFFFFF</color>
     <color name="white">#FFFFFF</color>
     <color name="white_60">#F2F5F9</color>
@@ -281,6 +288,7 @@
     <!-- Backgrounds -->
     <color name="background_background_dark">#282828</color>
     <color name="background_surface_dark">#373737</color>
+    <color name="background_surface_tertiary_dark">@color/gray85</color>
     <color name="background_window_dark">#3D3D3D</color>
     <color name="background_duck_ai_dark">#111111</color>
     <color name="background_canvas_dark">#1F1F1F</color>
@@ -316,6 +324,7 @@
     <!-- Backgrounds -->
     <color name="background_background_light">#F2F2F2</color>
     <color name="background_surface_light">#F9F9F9</color>
+    <color name="background_surface_tertiary_light">@color/white</color>
     <color name="background_window_light">#FFFFFF</color>
     <color name="background_duck_ai_light">#FFFFFF</color>
     <color name="background_canvas_light">#FFFFFF</color>

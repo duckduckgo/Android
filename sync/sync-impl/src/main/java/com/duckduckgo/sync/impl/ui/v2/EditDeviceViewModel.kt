@@ -71,7 +71,7 @@ class EditDeviceViewModel @AssistedInject constructor(
                 }
 
                 is Error -> {
-                    _commands.send(Command.ShowError(R.string.sync_edit_device_error, result.reason))
+                    _commands.send(Command.ShowError(R.string.sync_simplified_error_dialog_edit_device_body, result.reason))
                 }
             }
             _viewState.update { it.copy(isEditingName = false) }

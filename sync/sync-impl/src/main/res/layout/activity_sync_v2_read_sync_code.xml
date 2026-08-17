@@ -46,7 +46,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="?selectableItemBackground"
-            android:contentDescription="@string/sync_scanner_v2_show_qr_code_content_description"
+            android:contentDescription="@string/sync_simplified_scanner_show_qr_code_content_description"
             android:padding="@dimen/keyline_4"
             app:srcCompat="@drawable/ic_qr_24" />
 

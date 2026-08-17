@@ -34,8 +34,8 @@ import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ActivitySyncV2ThisDeviceBinding
+import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import com.duckduckgo.sync.impl.ui.v2.SyncThisDeviceContract.Companion.RESULT_DEVICE_BACKED_UP
-import com.duckduckgo.sync.impl.ui.v2.SyncThisDeviceContract.Companion.RESULT_SYNC_WITH_ANOTHER_DEVICE
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import com.google.android.material.progressindicator.CircularProgressIndicatorSpec
 import com.google.android.material.progressindicator.IndeterminateDrawable
@@ -63,6 +63,19 @@ class SyncThisDeviceActivity : DuckDuckGoActivity() {
 
     private lateinit var progressDrawable: IndeterminateDrawable<CircularProgressIndicatorSpec>
 
+    private val readSyncCodeLauncher = registerForActivityResult(
+        ReadSyncCodeContract(),
+    ) { output ->
+        when (output) {
+            is ReadSyncCodeContract.Output.SyncCompleted -> {
+                setResult(SyncPairingResult.RESULT_SYNC_COMPLETED, SyncPairingResult.resultIntent(output.result))
+                finish()
+            }
+
+            is ReadSyncCodeContract.Output.Dismissed -> Unit
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -80,10 +93,6 @@ class SyncThisDeviceActivity : DuckDuckGoActivity() {
         configureSyncWithThisCta()
 
         observeViewModel()
-
-        if (savedInstanceState == null) {
-            viewModel.onScreenShown()
-        }
     }
 
     private fun configureEdgeToEdgeInsets() {
@@ -107,7 +116,9 @@ class SyncThisDeviceActivity : DuckDuckGoActivity() {
     private fun renderViewState(viewState: SyncThisDeviceViewModel.ViewState) {
         binding.syncThisDeviceButton.apply {
             icon = if (viewState.isSyncing) progressDrawable else null
-            setText(if (viewState.isSyncing) R.string.sync_enable_connecting else R.string.sync_setup_v2_this_device_cta_title)
+            setText(
+                if (viewState.isSyncing) R.string.sync_simplified_setup_secondary_button_syncing else R.string.sync_simplified_setup_secondary_button,
+            )
         }
     }
 
@@ -128,8 +139,12 @@ class SyncThisDeviceActivity : DuckDuckGoActivity() {
             }
 
             is SyncThisDeviceViewModel.Command.SyncWithAnotherDevice -> {
-                setResult(RESULT_SYNC_WITH_ANOTHER_DEVICE)
-                finish()
+                readSyncCodeLauncher.launch(
+                    ReadSyncCodeContract.Input(
+                        syncEntryPoint = SyncEntryPoint.SYNC_NEW_ACCOUNT,
+                        launchSource = launchSource,
+                    ),
+                )
             }
         }
     }
@@ -164,9 +179,9 @@ class SyncThisDeviceActivity : DuckDuckGoActivity() {
 
     private fun showError(error: SyncThisDeviceViewModel.Command.ShowError) {
         TextAlertDialogBuilder(this)
-            .setTitle(R.string.sync_dialog_error_title)
+            .setTitle(R.string.sync_simplified_error_dialog_title)
             .setMessage(getString(error.message) + "\n" + error.reason)
-            .setPositiveButton(R.string.sync_dialog_error_ok)
+            .setPositiveButton(R.string.sync_simplified_error_dialog_primary_button)
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
@@ -182,10 +197,10 @@ class SyncThisDeviceActivity : DuckDuckGoActivity() {
 
         fun intent(
             context: Context,
-            source: String?,
+            launchSource: String?,
         ): Intent {
             return Intent(context, SyncThisDeviceActivity::class.java).apply {
-                putExtra(LAUNCH_SOURCE_EXTRA_KEY, source)
+                putExtra(LAUNCH_SOURCE_EXTRA_KEY, launchSource)
             }
         }
     }

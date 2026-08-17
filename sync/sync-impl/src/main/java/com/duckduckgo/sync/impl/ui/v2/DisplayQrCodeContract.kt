@@ -19,18 +19,16 @@ package com.duckduckgo.sync.impl.ui.v2
 import android.content.Context
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
+import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeContract.Input
 import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeContract.Output
-import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeContract.Output.Failure
-import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeContract.Output.NoOp
-import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeContract.Output.Success
 
 class DisplayQrCodeContract : ActivityResultContract<Input, Output>() {
     override fun createIntent(
         context: Context,
         input: Input,
     ): Intent {
-        return DisplayQrCodeActivity.intent(context, input.source)
+        return DisplayQrCodeActivity.intent(context, input.syncEntryPoint, input.launchSource)
     }
 
     override fun parseResult(
@@ -38,26 +36,27 @@ class DisplayQrCodeContract : ActivityResultContract<Input, Output>() {
         intent: Intent?,
     ): Output {
         return when (resultCode) {
-            RESULT_SYNC_SUCCESS -> Success
-            RESULT_SYNC_FAILURE -> Failure
-            else -> NoOp
+            SyncPairingResult.RESULT_SYNC_COMPLETED -> {
+                intent
+                    ?.let(SyncPairingResult::fromIntent)
+                    ?.let(Output::SyncCompleted)
+                    ?: Output.Dismissed
+            }
+
+            else -> Output.Dismissed
         }
     }
 
     data class Input(
-        val source: String?,
+        val syncEntryPoint: SyncEntryPoint,
+        val launchSource: String?,
     )
 
     sealed interface Output {
-        data object Success : Output
+        data class SyncCompleted(
+            val result: SyncPairingResult,
+        ) : Output
 
-        data object Failure : Output
-
-        data object NoOp : Output
-    }
-
-    companion object {
-        const val RESULT_SYNC_SUCCESS = 200
-        const val RESULT_SYNC_FAILURE = 201
+        data object Dismissed : Output
     }
 }

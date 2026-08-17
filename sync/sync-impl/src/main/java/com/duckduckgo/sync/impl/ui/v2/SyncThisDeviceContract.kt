@@ -24,15 +24,15 @@ import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.ui.v2.SyncThisDeviceContract.Input
 import com.duckduckgo.sync.impl.ui.v2.SyncThisDeviceContract.Output
 import com.duckduckgo.sync.impl.ui.v2.SyncThisDeviceContract.Output.BackedUp
-import com.duckduckgo.sync.impl.ui.v2.SyncThisDeviceContract.Output.Canceled
-import com.duckduckgo.sync.impl.ui.v2.SyncThisDeviceContract.Output.RequestSyncWithAnotherDevice
+import com.duckduckgo.sync.impl.ui.v2.SyncThisDeviceContract.Output.Dismissed
+import com.duckduckgo.sync.impl.ui.v2.SyncThisDeviceContract.Output.SyncedWithAnotherDevice
 
 class SyncThisDeviceContract : ActivityResultContract<Input, Output>() {
     override fun createIntent(
         context: Context,
         input: Input,
     ): Intent {
-        return SyncThisDeviceActivity.intent(context, input.source)
+        return SyncThisDeviceActivity.intent(context, input.launchSource)
     }
 
     override fun parseResult(
@@ -42,19 +42,20 @@ class SyncThisDeviceContract : ActivityResultContract<Input, Output>() {
         return when (resultCode) {
             RESULT_DEVICE_BACKED_UP -> {
                 val device = intent
-                    ?.let { IntentCompat.getParcelableExtra(it, DEVICE_KEY, ParcelableDevice::class.java) }
+                    ?.let { IntentCompat.getParcelableExtra(it, DEVICE_EXTRA_KEY, ParcelableDevice::class.java) }
                     ?.toConnectedDevice()
-                if (device != null) BackedUp(device) else Canceled
+                if (device != null) BackedUp(device) else Dismissed
             }
 
-            RESULT_SYNC_WITH_ANOTHER_DEVICE -> RequestSyncWithAnotherDevice
+            SyncPairingResult.RESULT_SYNC_COMPLETED ->
+                intent?.let(SyncPairingResult::fromIntent)?.let(::SyncedWithAnotherDevice) ?: Dismissed
 
-            else -> Canceled
+            else -> Dismissed
         }
     }
 
     data class Input(
-        val source: String?,
+        val launchSource: String?,
     )
 
     sealed interface Output {
@@ -62,16 +63,17 @@ class SyncThisDeviceContract : ActivityResultContract<Input, Output>() {
             val device: ConnectedDevice,
         ) : Output
 
-        data object Canceled : Output
+        data class SyncedWithAnotherDevice(
+            val result: SyncPairingResult,
+        ) : Output
 
-        data object RequestSyncWithAnotherDevice : Output
+        data object Dismissed : Output
     }
 
     companion object {
-        const val DEVICE_KEY = "device"
+        const val DEVICE_EXTRA_KEY = "device"
         const val RESULT_DEVICE_BACKED_UP = 200
-        const val RESULT_SYNC_WITH_ANOTHER_DEVICE = 201
 
-        fun resultIntent(device: ConnectedDevice) = Intent().putExtra(DEVICE_KEY, ParcelableDevice.fromConnectedDevice(device))
+        fun resultIntent(device: ConnectedDevice) = Intent().putExtra(DEVICE_EXTRA_KEY, ParcelableDevice.fromConnectedDevice(device))
     }
 }

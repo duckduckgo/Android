@@ -18,6 +18,7 @@ package com.duckduckgo.sync.impl
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.sync.TestSyncFixtures.token
+import com.duckduckgo.sync.TestSyncFixtures.userId
 import com.duckduckgo.sync.store.SyncStore
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -26,6 +27,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -82,8 +84,53 @@ class AccountInfoPrivateKeyProviderTest {
         assertTrue(provider.privateKey() is Result.Error)
     }
 
+    @Test
+    fun whenCalledTwiceForSameAccountThenWrappedKeyFetchedOnceButUnwrappedEachCall() {
+        stubSignedIn()
+        whenever(syncApi.getProtectedKeys(token)).thenReturn(Result.Success(listOf(ddgKey)))
+        whenever(protectedKeyUnwrapper.unwrap(ddgKey)).thenReturn(Result.Success(byteArrayOf(-5, -16, 0)))
+
+        val first = provider.privateKey()
+        val second = provider.privateKey()
+
+        assertEquals(Result.Success("-_AA"), first)
+        assertEquals(Result.Success("-_AA"), second)
+        // the wrapped entry is cached (one network fetch), but we unwrap per call so the plaintext key is never cached
+        verify(syncApi, times(1)).getProtectedKeys(token)
+        verify(protectedKeyUnwrapper, times(2)).unwrap(ddgKey)
+    }
+
+    @Test
+    fun whenFetchFailsThenNotCachedAndRetriedNextCall() {
+        stubSignedIn()
+        whenever(syncApi.getProtectedKeys(token))
+            .thenReturn(Result.Error(code = 418, reason = ""))
+            .thenReturn(Result.Success(listOf(ddgKey)))
+        whenever(protectedKeyUnwrapper.unwrap(ddgKey)).thenReturn(Result.Success(byteArrayOf(-5, -16, 0)))
+
+        val first = provider.privateKey()
+        val second = provider.privateKey()
+
+        assertTrue(first is Result.Error)
+        assertEquals(Result.Success("-_AA"), second)
+        verify(syncApi, times(2)).getProtectedKeys(token)
+    }
+
+    @Test
+    fun whenSignedOutAfterCachingThenCacheClearedAndErrorOnNextCall() {
+        stubSignedIn()
+        whenever(syncApi.getProtectedKeys(token)).thenReturn(Result.Success(listOf(ddgKey)))
+        whenever(protectedKeyUnwrapper.unwrap(ddgKey)).thenReturn(Result.Success(byteArrayOf(-5, -16, 0)))
+        provider.privateKey()
+
+        whenever(syncStore.token).thenReturn(null)
+
+        assertTrue(provider.privateKey() is Result.Error)
+    }
+
     private fun stubSignedIn() {
         whenever(syncStore.token).thenReturn(token)
+        whenever(syncStore.userId).thenReturn(userId)
         whenever(syncStore.credentialId).thenReturn("ddg")
     }
 }

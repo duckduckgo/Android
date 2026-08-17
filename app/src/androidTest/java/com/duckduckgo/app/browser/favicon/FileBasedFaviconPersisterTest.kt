@@ -23,7 +23,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.global.file.FileDeleter
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.sha256
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory

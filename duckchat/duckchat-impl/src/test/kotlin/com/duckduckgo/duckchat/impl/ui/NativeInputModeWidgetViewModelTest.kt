@@ -43,11 +43,10 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.EditPromptRequest
 import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.PendingNativePromptStore
-import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
-import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
-import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsReader
 import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ModelState
@@ -61,8 +60,11 @@ import com.duckduckgo.duckchat.impl.nativeinput.RealNativeInputStateStore
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
+import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.ChatSuggestion
+import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.reader.ChatSuggestionsReader
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -73,6 +75,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -114,7 +118,7 @@ class NativeInputModeWidgetViewModelTest {
     private val autoComplete: AutoComplete = mock()
     private val autoCompleteSettings: AutoCompleteSettings = mock()
     private val duckAiChatHistoryFeature: DuckAiChatHistoryFeature = mock()
-    private val inputScreenConfigResolver: InputScreenConfigResolver = mock()
+    private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
     private val pixel: Pixel = mock()
     private val duckChatPixels: DuckChatPixels = mock()
     private val modelManager: DuckAiModelManager = mock()
@@ -146,6 +150,7 @@ class NativeInputModeWidgetViewModelTest {
     private val entitlementsFlow = MutableStateFlow<List<Product>>(emptyList())
     private val modelStateFlow = MutableStateFlow(ModelState())
     private val showModelPickerEvents = MutableSharedFlow<String>(extraBufferCapacity = 1)
+    private val editPromptRequestsFlow = MutableSharedFlow<EditPromptRequest>(extraBufferCapacity = 1)
 
     private var fakePlugins: List<NativeInputPlugin> = emptyList()
     private val fakePluginPoint = object : ActivePluginPoint<NativeInputPlugin> {
@@ -162,11 +167,11 @@ class NativeInputModeWidgetViewModelTest {
         whenever(duckChatInternal.observeChatSuggestionsUserSettingEnabled()).thenReturn(chatSuggestionsUserEnabledFlow)
         whenever(duckChatInternal.chatState).thenReturn(chatStateFlow)
         whenever(duckChatInternal.showModelPickerEvents).thenReturn(showModelPickerEvents)
+        whenever(duckChatInternal.editPromptRequests).thenReturn(editPromptRequestsFlow)
         whenever(subscriptions.getEntitlementStatus()).thenReturn(entitlementsFlow)
         whenever(modelManager.modelState).thenReturn(modelStateFlow)
         whenever(autoCompleteFactory.create(any(), any())).thenReturn(autoComplete)
         whenever(autoCompleteSettings.autoCompleteSuggestionsEnabled).thenReturn(false)
-        whenever(inputScreenConfigResolver.shouldShowInstalledApps()).thenReturn(false)
 
         testee = createViewModel()
         testee.configure(tabId = "test-tab", isDuckAiMode = false, isBottom = false)
@@ -185,8 +190,8 @@ class NativeInputModeWidgetViewModelTest {
             browserMode = BrowserMode.REGULAR,
             autoCompleteSettings = autoCompleteSettings,
             duckAiChatHistoryFeature = duckAiChatHistoryFeature,
+            duckChatFeature = duckChatFeature,
             dispatchers = coroutineRule.testDispatcherProvider,
-            inputScreenConfigResolver = inputScreenConfigResolver,
             pixel = pixel,
             duckChatPixels = duckChatPixels,
             nativeInputStatePublisher = nativeInputStatePublisher,
@@ -403,6 +408,91 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
+    fun whenConfiguredForEditThenPublishesUnderTheSyntheticKeyOnly() = runTest {
+        testee.configureForEdit(sessionId = "session-1")
+        advanceUntilIdle()
+
+        val editKey = NativeInputModeWidgetViewModel.editStateKey("session-1")
+        assertEquals(
+            NativeInputState.InputContext.DUCK_AI,
+            nativeInputStateProvider.stateForTab(editKey).value.inputContext,
+        )
+        assertEquals(
+            NativeInputState.InputContext.BROWSER,
+            nativeInputStateProvider.stateForTab("test-tab").value.inputContext,
+        )
+    }
+
+    @Test
+    fun whenConfiguredForEditThenContextIsDuckAiAndToggleIsDuckAi() = runTest {
+        testee.configureForEdit(sessionId = "session-1")
+
+        val state = testee.state.first()
+        assertEquals(NativeInputState.InputContext.DUCK_AI, state.inputContext)
+        assertEquals(NativeInputState.ToggleSelection.DUCK_AI, state.toggleSelection)
+    }
+
+    @Test
+    fun whenEditRequestTargetsThisTabThenItIsEmitted() = runTest {
+        testee.configure(tabId = "tab-1", isDuckAiMode = true, isBottom = false)
+
+        val emissions = mutableListOf<EditPromptRequest>()
+        // Advance once to establish the collector's subscription before emitting — tryEmit on a
+        // replay=0 SharedFlow is lost if no subscriber has started collecting yet.
+        val job = launch { testee.editPromptRequests.toList(emissions) }
+        advanceUntilIdle()
+        editPromptRequestsFlow.tryEmit(EditPromptRequest("session-1", "tab-1", contextual = false))
+        advanceUntilIdle()
+
+        assertEquals(1, emissions.size)
+        assertEquals("session-1", emissions.single().sessionId)
+        job.cancel()
+    }
+
+    @Test
+    fun whenEditRequestTargetsAnotherTabThenItIsIgnored() = runTest {
+        testee.configure(tabId = "tab-1", isDuckAiMode = true, isBottom = false)
+
+        val emissions = mutableListOf<EditPromptRequest>()
+        val job = launch { testee.editPromptRequests.toList(emissions) }
+        advanceUntilIdle()
+        editPromptRequestsFlow.tryEmit(EditPromptRequest("session-1", "tab-2", contextual = false))
+        advanceUntilIdle()
+
+        assertTrue(emissions.isEmpty())
+        job.cancel()
+    }
+
+    @Test
+    fun whenEditRequestTargetsThisTabButWrongSurfaceThenItIsIgnored() = runTest {
+        testee.configureContextual(tabId = "tab-1")
+
+        val emissions = mutableListOf<EditPromptRequest>()
+        val job = launch { testee.editPromptRequests.toList(emissions) }
+        advanceUntilIdle()
+        editPromptRequestsFlow.tryEmit(EditPromptRequest("session-2", "tab-1", contextual = false))
+        advanceUntilIdle()
+
+        assertTrue(emissions.isEmpty())
+        job.cancel()
+    }
+
+    @Test
+    fun whenEditRequestTargetsThisTabAndSurfaceMatchesThenTheContextualWidgetEmitsIt() = runTest {
+        testee.configureContextual(tabId = "tab-1")
+
+        val emissions = mutableListOf<EditPromptRequest>()
+        val job = launch { testee.editPromptRequests.toList(emissions) }
+        advanceUntilIdle()
+        editPromptRequestsFlow.tryEmit(EditPromptRequest("session-1", "tab-1", contextual = true))
+        advanceUntilIdle()
+
+        assertEquals(1, emissions.size)
+        assertEquals("session-1", emissions.single().sessionId)
+        job.cancel()
+    }
+
+    @Test
     fun whenSetDuckAiModeThenInputModeUnchanged() = runTest {
         setIsEnabled(true)
         inputScreenUserSettingFlow.value = true
@@ -537,6 +627,16 @@ class NativeInputModeWidgetViewModelTest {
     @Test
     fun `state isChatStreaming is false when chatState is HIDE`() = runTest {
         chatStateFlow.value = ChatState.HIDE
+        assertFalse(testee.state.firstOrNull()!!.isChatStreaming)
+    }
+
+    @Test
+    fun `state isChatStreaming is false for the edit widget even when chatState is STREAMING`() = runTest {
+        // chatState is global, not scoped to a tab — a real chat streaming on another tab must not
+        // leak into the edit widget's own synthetic-key state.
+        chatStateFlow.value = ChatState.STREAMING
+        testee.configureForEdit(sessionId = "session-1")
+
         assertFalse(testee.state.firstOrNull()!!.isChatStreaming)
     }
 
@@ -1628,6 +1728,28 @@ class NativeInputModeWidgetViewModelTest {
         verify(duckChatPixels, never()).fireImageGenerationSubmitted(any())
     }
 
+    @Test
+    fun whenSentPromptInChatFromDuckAiTabThenDuckAiSurface() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+
+        viewModel.fireSentPromptInChat()
+
+        verify(duckChatPixels).fireSentPromptInChat(DuckChatPixelSurface.DUCK_AI)
+    }
+
+    @Test
+    fun whenSentPromptInChatFromContextualSheetThenContextualSurface() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configureContextual(tabId = "tab-A")
+        advanceUntilIdle()
+
+        viewModel.fireSentPromptInChat()
+
+        verify(duckChatPixels).fireSentPromptInChat(DuckChatPixelSurface.CONTEXTUAL_CHAT)
+    }
+
     // endregion
 
     // region voice / stop pixels
@@ -1635,7 +1757,13 @@ class NativeInputModeWidgetViewModelTest {
     @Test
     fun whenVoiceTappedThenVoicePixel() {
         testee.fireVoiceTapped()
-        verify(duckChatPixels).fireVoiceTapped()
+        verify(duckChatPixels).fireVoiceTapped(any())
+    }
+
+    @Test
+    fun whenVoiceSearchTappedThenVoiceSearchPixel() {
+        testee.fireVoiceSearchTapped()
+        verify(duckChatPixels).fireVoiceSearchTapped(any())
     }
 
     @Test

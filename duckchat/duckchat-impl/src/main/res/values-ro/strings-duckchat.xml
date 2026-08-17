@@ -59,8 +59,7 @@
 
     <!-- Input Screen  -->
     <string name="input_screen_search_hint">Caută sau introdu adresa</string>
-    <string name="input_screen_search_only_hint">Căutare</string>
-    <string name="input_screen_chat_hint">Întreabă în mod privat</string>
+    <string name="input_screen_search_only_hint">Caută</string>
     <string name="input_screen_user_pref_without_ai">Doar căutare</string>
     <string name="input_screen_user_pref_with_ai">Caută pe Duck.ai</string>
     <string name="input_screen_user_pref_description">Încearcă noua opțiune de a adresa o întrebare către Duck.ai direct din bara de adrese. <annotation type="share_feedback">Trimite feedback</annotation></string>
@@ -74,7 +73,6 @@
 
     <!-- AutoComplete -->
     <string name="autocompleteDuckAiPrompt">Întreabă Duck.ai</string>
-    <string name="autocompleteDeviceAppNotFound">Aplicația nu a fost găsită</string>
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogTitle">Dorești un acces mai ușor\nla chatul privat cu IA?</string>
@@ -122,10 +120,89 @@
     <string name="duckAIContextualPromptSummarize">Rezumă această pagină</string>
     <string name="duckAIContextualAutomaticContextTitle">Trimite automat conținutul paginii</string>
     <string name="duckAIContextualAutomaticContextMessage">Trimite automat conținutul paginii către Duck.ai</string>
-    <string name="duckAIContextualAttachPageContent">Atașează conținutul paginii</string>
 
     <!-- Contextual sheet quick action -->
     <string name="duckAIContextualPromptAskAboutPage">Întreabă despre pagină</string>
+
+    <!-- Contextual sheet suggested prompts; native copy for PageSuggestionsCatalog.json entries, keyed by catalog id -->
+    <string name="duckAiSuggestionTranslatePageLabel" instruction="Suggested prompt chip: translate the current page">Tradu această pagină</string>
+    <string name="duckAiSuggestionTranslatePagePrompt" instruction="Suggested prompt submitted text: translate the page. %1$s is replaced with the name of the user&apos;s language.">Tradu această pagină în %1$s.</string>
+    <string name="duckAiSuggestionKeyTakeawaysLabel" instruction="Suggested prompt chip: key takeaways of an article">Care sunt ideile principale?</string>
+    <string name="duckAiSuggestionKeyTakeawaysPrompt" instruction="Suggested prompt submitted text: key takeaways of an article">Care sunt principalele idei ale acestui articol?</string>
+    <string name="duckAiSuggestionExplainSimplyLabel" instruction="Suggested prompt chip: explain the content simply">Explică simplu</string>
+    <string name="duckAiSuggestionExplainSimplyPrompt" instruction="Suggested prompt submitted text: explain the content simply">Explică asta pe înțelesul tuturor.</string>
+    <string name="duckAiSuggestionCounterargumentsLabel" instruction="Suggested prompt chip: counterarguments">Care sunt contraargumentele?</string>
+    <string name="duckAiSuggestionCounterargumentsPrompt" instruction="Suggested prompt submitted text: counterarguments">Care sunt principalele contraargumente sau critici la adresa acestui lucru?</string>
+    <string name="duckAiSuggestionRelatedArticlesLabel" instruction="Suggested prompt chip: related articles">Sugerează articole conexe de explorat</string>
+    <string name="duckAiSuggestionRelatedArticlesPrompt" instruction="Suggested prompt submitted text: related articles">Sugerează articole sau subiecte similare care merită explorate în continuare.</string>
+    <string name="duckAiSuggestionShoppingListLabel" instruction="Suggested prompt chip: shopping list from a recipe">Generează o listă de cumpărături</string>
+    <string name="duckAiSuggestionShoppingListPrompt" instruction="Suggested prompt submitted text: shopping list from a recipe">Creează o listă de cumpărături cu cantități din această rețetă.</string>
+    <string name="duckAiSuggestionRecipeNutritionLabel" instruction="Suggested prompt chip: recipe nutrition">Estimează nutriția</string>
+    <string name="duckAiSuggestionRecipeNutritionPrompt" instruction="Suggested prompt submitted text: recipe nutrition">Estimează informațiile nutriționale pentru această rețetă.</string>
+    <string name="duckAiSuggestionScaleRecipeLabel" instruction="Suggested prompt chip: scale a recipe">Ajustează porțiile</string>
+    <string name="duckAiSuggestionScaleRecipePrompt" instruction="Suggested prompt submitted text: scale a recipe">Rescrie această rețetă adaptată pentru un număr diferit de porții.</string>
+    <string name="duckAiSuggestionProductProsConsLabel" instruction="Suggested prompt chip: product pros and cons">Care sunt argumentele pro și contra?</string>
+    <string name="duckAiSuggestionProductProsConsPrompt" instruction="Suggested prompt submitted text: product pros and cons">Care sunt argumentele pro și contra pentru acest produs?</string>
+    <string name="duckAiSuggestionFindAlternativesLabel" instruction="Suggested prompt chip: product alternatives">Găsește-mi alternative</string>
+    <string name="duckAiSuggestionFindAlternativesPrompt" instruction="Suggested prompt submitted text: product alternatives">Sugerează câteva alternative pentru acest produs.</string>
+    <string name="duckAiSuggestionSummarizeVideoLabel" instruction="Suggested prompt chip: summarize a video">Rezumă acest videoclip</string>
+    <string name="duckAiSuggestionSummarizeVideoPrompt" instruction="Suggested prompt submitted text: summarize a video">Rezumă acest videoclip.</string>
+    <string name="duckAiSuggestionVideoKeyPointsLabel" instruction="Suggested prompt chip: video key points">Care sunt punctele principale?</string>
+    <string name="duckAiSuggestionVideoKeyPointsPrompt" instruction="Suggested prompt submitted text: video key points">Care sunt punctele principale acoperite în acest videoclip?</string>
+    <string name="duckAiSuggestionTailorResumeLabel" instruction="Suggested prompt chip: tailor a resume to a job">Adaptează-mi CV-ul</string>
+    <string name="duckAiSuggestionTailorResumePrompt" instruction="Suggested prompt submitted text: tailor a resume to a job">Ajută-mă să-mi adaptez CV-ul pentru acest post.</string>
+    <string name="duckAiSuggestionInterviewPrepLabel" instruction="Suggested prompt chip: interview prep">Ajută-mă să mă pregătesc pentru interviu</string>
+    <string name="duckAiSuggestionInterviewPrepPrompt" instruction="Suggested prompt submitted text: interview prep">Ce întrebări din interviu ar putea apărea pentru acest post?</string>
+    <string name="duckAiSuggestionCoverLetterLabel" instruction="Suggested prompt chip: draft a cover letter">Redactează o scrisoare de intenție</string>
+    <string name="duckAiSuggestionCoverLetterPrompt" instruction="Suggested prompt submitted text: draft a cover letter">Redactează o scrisoare de intenție pentru acest post.</string>
+    <string name="duckAiSuggestionEventDetailsLabel" instruction="Suggested prompt chip: event details">Care sunt detaliile principale?</string>
+    <string name="duckAiSuggestionEventDetailsPrompt" instruction="Suggested prompt submitted text: event details">Rezumă principalele detalii ale acestui eveniment.</string>
+    <string name="duckAiSuggestionWorthWatchingLabel" instruction="Suggested prompt chip: is a movie/show worth watching">Merită vizionat?</string>
+    <string name="duckAiSuggestionWorthWatchingPrompt" instruction="Suggested prompt submitted text: is a movie/show worth watching">Merită vizionat? Oferă-mi o părere fără spoilere.</string>
+    <string name="duckAiSuggestionSimilarTitlesLabel" instruction="Suggested prompt chip: similar movies or shows">Recomandă titluri similare</string>
+    <string name="duckAiSuggestionSimilarTitlesPrompt" instruction="Suggested prompt submitted text: similar movies or shows">Recomandă filme sau emisiuni similare.</string>
+    <string name="duckAiSuggestionCastCrewLabel" instruction="Suggested prompt chip: cast and crew">Distribuție și echipă</string>
+    <string name="duckAiSuggestionCastCrewPrompt" instruction="Suggested prompt submitted text: cast and crew">Cine sunt principalii actori și membri ai echipei de producție și pentru ce altceva mai sunt cunoscuți?</string>
+    <string name="duckAiSuggestionSummarizeBookLabel" instruction="Suggested prompt chip: summarize a book">Rezumă această carte</string>
+    <string name="duckAiSuggestionSummarizeBookPrompt" instruction="Suggested prompt submitted text: summarize a book">Rezumă această carte.</string>
+    <string name="duckAiSuggestionSimilarBooksLabel" instruction="Suggested prompt chip: similar books">Recomandă cărți similare</string>
+    <string name="duckAiSuggestionSimilarBooksPrompt" instruction="Suggested prompt submitted text: similar books">Recomandă cărți similare.</string>
+    <string name="duckAiSuggestionExplainPaperLabel" instruction="Suggested prompt chip: explain a research paper">Explică această lucrare</string>
+    <string name="duckAiSuggestionExplainPaperPrompt" instruction="Suggested prompt submitted text: explain a research paper">Explică această lucrare de cercetare pe înțelesul tuturor.</string>
+    <string name="duckAiSuggestionPaperContributionsLabel" instruction="Suggested prompt chip: paper contributions">Care sunt principalele contribuții?</string>
+    <string name="duckAiSuggestionPaperContributionsPrompt" instruction="Suggested prompt submitted text: paper contributions">Care sunt contribuțiile principale ale acestei lucrări?</string>
+    <string name="duckAiSuggestionMenuHighlightsLabel" instruction="Suggested prompt chip: restaurant menu highlights">Ce ar trebui să comand?</string>
+    <string name="duckAiSuggestionMenuHighlightsPrompt" instruction="Suggested prompt submitted text: restaurant menu highlights">Care sunt preparatele pe care trebuie neapărat să le încerc aici?</string>
+    <string name="duckAiSuggestionPlaceHoursLabel" instruction="Suggested prompt chip: place hours and location">Care sunt programul de funcționare și locația?</string>
+    <string name="duckAiSuggestionPlaceHoursPrompt" instruction="Suggested prompt submitted text: place hours and location">Care sunt programul de funcționare, locația și detaliile de contact pentru acest loc?</string>
+    <string name="duckAiSuggestionPlaceReviewsLabel" instruction="Suggested prompt chip: place reputation">E bun acest loc?</string>
+    <string name="duckAiSuggestionPlaceReviewsPrompt" instruction="Suggested prompt submitted text: place reputation">E bun acest loc? Rezumă-i reputația pe baza recenziilor și a evaluărilor.</string>
+    <string name="duckAiSuggestionSummarizeThreadLabel" instruction="Suggested prompt chip: summarize a discussion thread">Rezumă această discuție</string>
+    <string name="duckAiSuggestionSummarizeThreadPrompt" instruction="Suggested prompt submitted text: summarize a discussion thread">Rezumă acest fir de discuție.</string>
+    <string name="duckAiSuggestionExplainRepoLabel" instruction="Suggested prompt chip: explain a code repository">Explică acest depozit</string>
+    <string name="duckAiSuggestionExplainRepoPrompt" instruction="Suggested prompt submitted text: explain a code repository">Explică ce face acest depozit și cum să-l folosești.</string>
+    <string name="duckAiSuggestionExplainAnswerLabel" instruction="Suggested prompt chip: explain the top answer">Explică răspunsul de sus</string>
+    <string name="duckAiSuggestionExplainAnswerPrompt" instruction="Suggested prompt submitted text: explain the top answer">Explică răspunsul acceptat în termeni simpli.</string>
+    <string name="duckAiSuggestionHowtoStepsLabel" instruction="Suggested prompt chip: how-to steps">Ghidează-mă prin pași</string>
+    <string name="duckAiSuggestionHowtoStepsPrompt" instruction="Suggested prompt submitted text: how-to steps">Împarte acest lucru în pași clari, numerotați.</string>
+    <string name="duckAiSuggestionHowtoMaterialsLabel" instruction="Suggested prompt chip: how-to materials">De ce am nevoie?</string>
+    <string name="duckAiSuggestionHowtoMaterialsPrompt" instruction="Suggested prompt submitted text: how-to materials">Enumeră instrumentele, materialele sau condițiile prealabile de care am nevoie pentru asta.</string>
+    <string name="duckAiSuggestionCourseLearnLabel" instruction="Suggested prompt chip: course learning outcomes">Ce voi învăța?</string>
+    <string name="duckAiSuggestionCourseLearnPrompt" instruction="Suggested prompt submitted text: course learning outcomes">Care sunt principalele lucruri pe care le voi învăța din acest curs?</string>
+    <string name="duckAiSuggestionCourseWorthLabel" instruction="Suggested prompt chip: is a course worth taking">Merită să-l urmez?</string>
+    <string name="duckAiSuggestionCourseWorthPrompt" instruction="Suggested prompt submitted text: is a course worth taking">Pe baza acestei pagini, merită să urmez acest curs?</string>
+    <string name="duckAiSuggestionFaqAnswerLabel" instruction="Suggested prompt chip: what an FAQ page answers">La ce răspunde aceasta?</string>
+    <string name="duckAiSuggestionFaqAnswerPrompt" instruction="Suggested prompt submitted text: what an FAQ page answers">Care sunt principalele întrebări la care răspunde această pagină?</string>
+    <string name="duckAiSuggestionFaqSummaryLabel" instruction="Suggested prompt chip: summarize FAQ Q&amp;As">Rezumă întrebările și răspunsurile</string>
+    <string name="duckAiSuggestionFaqSummaryPrompt" instruction="Suggested prompt submitted text: summarize FAQ Q&amp;As">Rezumă întrebările și răspunsurile de pe această pagină.</string>
+    <string name="duckAiSuggestionReviewVerdictLabel" instruction="Suggested prompt chip: review verdict">Care este verdictul?</string>
+    <string name="duckAiSuggestionReviewVerdictPrompt" instruction="Suggested prompt submitted text: review verdict">Care este verdictul și evaluarea generală pentru acest lucru?</string>
+    <string name="duckAiSuggestionReviewSummaryLabel" instruction="Suggested prompt chip: summarize reviews">Rezumă recenziile</string>
+    <string name="duckAiSuggestionReviewSummaryPrompt" instruction="Suggested prompt submitted text: summarize reviews">Rezumă ce spun recenziile.</string>
+    <string name="duckAiSuggestionWhoIsThisLabel" instruction="Suggested prompt chip: person background">Cine este această persoană?</string>
+    <string name="duckAiSuggestionWhoIsThisPrompt" instruction="Suggested prompt submitted text: person background">Dă-mi rapid câteva informații despre parcursul acestei persoane.</string>
+    <string name="duckAiSuggestionPersonBackgroundLabel" instruction="Suggested prompt chip: summarize a person&apos;s background">Rezumă parcursul său</string>
+    <string name="duckAiSuggestionPersonBackgroundPrompt" instruction="Suggested prompt submitted text: summarize a person&apos;s background">Rezumă parcursul și activitatea notabilă a acestei persoane.</string>
 
     <!-- Contextual sheet input hint (contextualSheetImprovements flag) -->
     <string name="contextualSheetImprovedHint">Întreabă orice în mod privat</string>
@@ -155,7 +232,6 @@
     <string name="duckAiEndCtaTitle">Te descurci!</string>
     <string name="duckAiEndCtaDescription"><![CDATA[Folosește bara de adrese pentru a căuta și vizita site-uri sau comută la Duck.ai pentru chat privat cu IA.<br/><br/>Poți folosi Duck.ai de oriunde vezi pictograma de chat]]></string>
     <string name="duckAiEndCtaButton">Bate palma!</string>
-    <string name="duckAiEndCtaDescriptionCustomAi"><![CDATA[Începe o conversație privată cu IA cu Duck.ai sau comută la Căutare pentru navigare protejată.<br/><br/>Poți folosi Duck.ai de oriunde vezi pictograma de chat]]></string>
 
     <!-- Native Duck.ai chat history -->
     <string name="duck_ai_chat_history_title">Chaturi</string>
@@ -267,6 +343,5 @@
     <string name="duckAiSettingsTitle">Setări Duck.ai</string>
 
     <!-- File/image attachment menu options -->
-    <string name="duckChatContextualAskAboutTab">Întreabă despre filă</string>
     <string name="duckChatContextualAskAboutPage">Întreabă despre pagină</string>
 </resources>

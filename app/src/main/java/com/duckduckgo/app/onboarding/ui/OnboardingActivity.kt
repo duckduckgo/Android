@@ -34,6 +34,7 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
 import kotlinx.coroutines.flow.launchIn
@@ -46,6 +47,9 @@ class OnboardingActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var duckChat: DuckChat
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     private lateinit var viewPageAdapter: PagerAdapter
 
@@ -150,6 +154,9 @@ class OnboardingActivity : DuckDuckGoActivity() {
     }
 
     private fun configureSkipButton() {
+        binding.skipOnboardingButton.background.mutate().alpha = 180
+        edgeToEdgeHandler.applyStatusBarInsetsAsMargin(binding.skipOnboardingButton)
+
         binding.skipOnboardingButton.setOnClickListener {
             lifecycleScope.launch {
                 val shouldNavigate = viewModel.devOnlyFullyCompleteAllOnboarding()

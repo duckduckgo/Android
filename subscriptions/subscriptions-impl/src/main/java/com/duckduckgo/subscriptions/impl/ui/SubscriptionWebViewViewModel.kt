@@ -122,6 +122,10 @@ class SubscriptionWebViewViewModel @Inject constructor(
 
     private var pendingScheduleNotificationDaysBeforeCancel: Int? = null
 
+    // Origin the offer webview was launched with, captured when the paywall is shown, so the subscribe
+    // (primary CTA) click can be attributed to the same subscription-funnel entry point.
+    private var launchOrigin: String? = null
+
     fun start() {
         subscriptionsManager.currentPurchaseState.onEach {
             val state = when (it) {
@@ -315,7 +319,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
     private fun hasPurchasedSubscription() = currentPurchaseViewState.value.purchaseState is Success
 
     private fun subscriptionSelected(data: JSONObject?) {
-        pixelSender.reportOfferSubscribeClick()
+        pixelSender.reportOfferSubscribeClick(launchOrigin)
 
         viewModelScope.launch(dispatcherProvider.io()) {
             val id = runCatching { data?.getString("id") }.getOrNull()
@@ -339,6 +343,10 @@ class SubscriptionWebViewViewModel @Inject constructor(
     }
 
     private fun subscriptionChangeSelected(data: JSONObject?) {
+        // Plus->Pro upgrade CTA comes through subscriptionChangeSelected with a launch origin set;
+        // It must still fire the subscribe click so the offer_screen_impression it followed has a matching click for the upgrade origin.
+        launchOrigin?.let { pixelSender.reportOfferSubscribeClick(it) }
+
         viewModelScope.launch(dispatcherProvider.io()) {
             val targetPlanId = runCatching { data?.getString("id") }.getOrNull()
             val change = runCatching { data?.getString("change") }.getOrNull()
@@ -722,8 +730,13 @@ class SubscriptionWebViewViewModel @Inject constructor(
         }
     }
 
+    /** Captures the offer's launch origin so the subscribe-CTA click can be attributed even after process death. */
+    fun setLaunchOrigin(origin: String?) {
+        launchOrigin = origin
+    }
+
     fun paywallShown() {
-        pixelSender.reportOfferScreenShown()
+        pixelSender.reportOfferScreenShown(launchOrigin)
     }
 
     data class SubscriptionOptionsJson(

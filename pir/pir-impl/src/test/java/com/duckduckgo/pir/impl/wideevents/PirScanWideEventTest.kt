@@ -50,12 +50,15 @@ import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_LAS
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_NOTIFICATIONS_PERMISSION_GRANTED
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_POWER_SAVING
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_PROFILE_QUERIES_COUNT
+import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_SCHEDULING
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_TOTAL_OPT_OUT_JOBS
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_TOTAL_SCAN_JOBS
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_TRACKER_BLOCKING_STATE
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_VPN_CONNECTION_STATE
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_WEB_VIEW_COUNT
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.PER_RUN_DURATION_BUCKETS
+import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.SCHEDULING_QUEUE
+import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.SCHEDULING_STATIC
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.STEP_OPT_OUT_COMPLETED
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.STEP_OPT_OUT_SKIPPED
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.STEP_OPT_OUT_STARTED
@@ -68,6 +71,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.argThat
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
@@ -157,7 +161,7 @@ class PirScanWideEventTest {
     @Test
     fun whenScheduledRunStartedAndSampledInThenFlowStartedWithScheduledName() = runTest {
         // Given
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(50L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(50L))
 
         // When
         runStarted(PirExecutionType.SCHEDULED, 2, 5, 10)
@@ -177,8 +181,49 @@ class PirScanWideEventTest {
                 KEY_VPN_CONNECTION_STATE to "disconnected",
                 KEY_NOTIFICATIONS_PERMISSION_GRANTED to "true",
                 KEY_TRACKER_BLOCKING_STATE to "disabled",
+                KEY_SCHEDULING to SCHEDULING_QUEUE,
             ),
             cleanupPolicy = CleanupPolicy.OnTimeout(duration = 8.hours, flowStatus = FlowStatus.Unknown),
+        )
+    }
+
+    @Test
+    fun whenRunStartedWithWorkQueueEnabledThenSchedulingMetadataIsQueue() = runTest {
+        // Given
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(11L))
+
+        // When
+        runStarted(PirExecutionType.MANUAL_INITIAL, 1, 5, 5)
+
+        // Then
+        verify(wideEventClient).flowStart(
+            name = any(),
+            flowEntryPoint = any(),
+            metadata = argThat { this[KEY_SCHEDULING] == SCHEDULING_QUEUE },
+            cleanupPolicy = any(),
+            samplingProbability = any(),
+            definition = any(),
+        )
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenRunStartedWithWorkQueueDisabledThenSchedulingMetadataIsStatic() = runTest {
+        // Given
+        pirRemoteFeatures.workQueueScheduling().setRawStoredState(Toggle.State(false))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(12L))
+
+        // When
+        runStarted(PirExecutionType.MANUAL_INITIAL, 1, 5, 5)
+
+        // Then
+        verify(wideEventClient).flowStart(
+            name = any(),
+            flowEntryPoint = any(),
+            metadata = argThat { this[KEY_SCHEDULING] == SCHEDULING_STATIC },
+            cleanupPolicy = any(),
+            samplingProbability = any(),
+            definition = any(),
         )
     }
 
@@ -204,7 +249,7 @@ class PirScanWideEventTest {
             hookInvocations++
             true
         }
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(1L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(1L))
 
         // When
         runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 1)
@@ -216,7 +261,7 @@ class PirScanWideEventTest {
     @Test
     fun whenManualInitialRunStartedThenFlowStartedWithExpectedParameters() = runTest {
         // Given
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(123L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(123L))
 
         // When
         testee.onRunStarted(
@@ -247,6 +292,7 @@ class PirScanWideEventTest {
                 KEY_VPN_CONNECTION_STATE to "connected",
                 KEY_NOTIFICATIONS_PERMISSION_GRANTED to "true",
                 KEY_TRACKER_BLOCKING_STATE to "enabled",
+                KEY_SCHEDULING to SCHEDULING_QUEUE,
             ),
             cleanupPolicy = CleanupPolicy.OnTimeout(duration = 8.hours, flowStatus = FlowStatus.Unknown),
         )
@@ -276,7 +322,7 @@ class PirScanWideEventTest {
     @Test
     fun whenManualEditProfileRunStartedThenEntryPointAndExecutionTypeReflectThat() = runTest {
         // Given
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(456L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(456L))
 
         // When
         runStarted(PirExecutionType.MANUAL_EDIT_PROFILE, 1, 3, 6)
@@ -296,6 +342,7 @@ class PirScanWideEventTest {
                 KEY_VPN_CONNECTION_STATE to "disconnected",
                 KEY_NOTIFICATIONS_PERMISSION_GRANTED to "true",
                 KEY_TRACKER_BLOCKING_STATE to "disabled",
+                KEY_SCHEDULING to SCHEDULING_QUEUE,
             ),
             cleanupPolicy = CleanupPolicy.OnTimeout(duration = 8.hours, flowStatus = FlowStatus.Unknown),
         )
@@ -304,7 +351,7 @@ class PirScanWideEventTest {
     @Test
     fun whenManualInitialResumeRunStartedThenEntryPointAndExecutionTypeReflectThat() = runTest {
         // Given
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(789L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(789L))
 
         // When
         runStarted(PirExecutionType.MANUAL_INITIAL_RESUME, 1, 3, 6)
@@ -324,6 +371,7 @@ class PirScanWideEventTest {
                 KEY_VPN_CONNECTION_STATE to "disconnected",
                 KEY_NOTIFICATIONS_PERMISSION_GRANTED to "true",
                 KEY_TRACKER_BLOCKING_STATE to "disabled",
+                KEY_SCHEDULING to SCHEDULING_QUEUE,
             ),
             cleanupPolicy = CleanupPolicy.OnTimeout(duration = 8.hours, flowStatus = FlowStatus.Unknown),
         )
@@ -332,7 +380,7 @@ class PirScanWideEventTest {
     @Test
     fun whenManualAndScheduledFlowsBothActiveThenTheyDoNotInterfere() = runTest {
         // Given
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any()))
             .thenReturn(Result.success(11L)) // manual flow id
             .thenReturn(Result.success(22L)) // scheduled flow id
 
@@ -376,7 +424,7 @@ class PirScanWideEventTest {
     @Test
     fun whenScanJobsResolvedToLowerCountThenDecileMathUsesActualCount() = runTest {
         // Given - PirJobsRunner says 100 eligible jobs, but PirScan filters down to 5.
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(42L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(42L))
         runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 100)
 
         // When - PirScan reports the resolved count, then runs only 5 jobs.
@@ -398,7 +446,7 @@ class PirScanWideEventTest {
     fun whenScanJobsResolvedToZeroThenOpenDecileIntervalIsClosed() = runTest {
         // Given - PirJobsRunner says 10 eligible jobs (so onRunStarted opened decile_0_10),
         // but PirScan filters all of them out.
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(43L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(43L))
         runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 10)
 
         // When
@@ -412,7 +460,7 @@ class PirScanWideEventTest {
     @Test
     fun whenScanJobsResolvedToSameCountThenNoStateChange() = runTest {
         // Given - resolved count matches the pre-filter estimate (the common case).
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(44L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(44L))
         runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 10)
 
         // When
@@ -434,7 +482,7 @@ class PirScanWideEventTest {
     @Test
     fun whenRunStartedWithZeroTotalScanJobsThenTotalIntervalsStartButNoDecileInterval() = runTest {
         // Given
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(789L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(789L))
 
         // When
         runStarted(PirExecutionType.MANUAL_INITIAL, 1, 0, 0)
@@ -468,7 +516,7 @@ class PirScanWideEventTest {
     @Test
     fun whenSecondRunStartedWhileFlowOpenThenStaleFlowFinishedWithCancelled() = runTest {
         // Given
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any()))
             .thenReturn(Result.success(100L))
             .thenReturn(Result.success(200L))
 
@@ -493,7 +541,7 @@ class PirScanWideEventTest {
     @Test
     fun whenManualFlowOpenAndProfileEditRunStartsThenStaleFlowFinishedWithSupersededByProfileEdit() = runTest {
         // Given an open manual flow (the initial scan)
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any()))
             .thenReturn(Result.success(101L))
             .thenReturn(Result.success(201L))
         runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 1)
@@ -516,7 +564,7 @@ class PirScanWideEventTest {
     @Test
     fun whenManualFlowOpenAndInitialResumeRunStartsThenStaleFlowFinishedWithSupersededByNewRun() = runTest {
         // Given an open manual flow (the interrupted initial scan)
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any()))
             .thenReturn(Result.success(102L))
             .thenReturn(Result.success(202L))
         runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 1)
@@ -542,7 +590,7 @@ class PirScanWideEventTest {
         // 8h cleanup-on-timeout policy, which never calls flowFinish. Attaching last_step as metadata on
         // every step persists it incrementally (flowStep metadata is merged + stored immediately), so an
         // Unknown event still reports how far the scan got.
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(70L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(70L))
         runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 10)
 
         // When - complete 5 of 10 jobs (crosses 50%)
@@ -566,7 +614,7 @@ class PirScanWideEventTest {
     @Test
     fun whenTenJobsCompleteOneAtATimeThenAllNineProgressStepsFire() = runTest {
         // Given
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(1L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(1L))
         runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 10)
 
         // When
@@ -586,7 +634,7 @@ class PirScanWideEventTest {
     @Test
     fun whenFiveJobsCompleteThenDecilesAreJumpedAndOnlyHighestCrossedFires() = runTest {
         // Given
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(1L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(1L))
         runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 5)
 
         // When
@@ -633,7 +681,7 @@ class PirScanWideEventTest {
     @Test
     fun whenSingleJobScanThenOnlyProgress90FiresAndIntervalsClose() = runTest {
         // Given
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(7L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(7L))
         runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 1)
 
         // When
@@ -662,7 +710,7 @@ class PirScanWideEventTest {
     @Test
     fun whenTenJobsCompleteThenDecileIntervalsOpenAndCloseInOrder() = runTest {
         // Given
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(11L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(11L))
         runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 10)
 
         // When
@@ -696,7 +744,7 @@ class PirScanWideEventTest {
     @Test
     fun whenScanCompletedThenScanCompletedStepEmitted() = runTest {
         // Given
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(2L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(2L))
         runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 0) // zero scan jobs path
 
         // When
@@ -714,7 +762,7 @@ class PirScanWideEventTest {
     @Test
     fun whenOptOutStartedThenStepAndIntervalEmitted() = runTest {
         // Given
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(3L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(3L))
         runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 0)
 
         // When
@@ -737,7 +785,7 @@ class PirScanWideEventTest {
     @Test
     fun whenOptOutCompletedThenIntervalClosedAndFlowFinishedWithSuccess() = runTest {
         // Given
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(4L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(4L))
         runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 0)
         testee.onOptOutStarted(PirExecutionType.MANUAL_INITIAL)
 
@@ -762,7 +810,7 @@ class PirScanWideEventTest {
     @Test
     fun whenOptOutSkippedThenStepEmittedAndFlowFinishedWithSuccess() = runTest {
         // Given
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(5L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(5L))
         runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 0)
 
         // When
@@ -789,7 +837,7 @@ class PirScanWideEventTest {
     @Test
     fun whenScanCompletedThenOptOutCompletedThenTotalScanEndsAtScanAndTotalFlowEndsAtFinish() = runTest {
         // Given
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(70L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(70L))
         runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 0) // zero scan jobs, no decile interval
 
         // When
@@ -813,7 +861,7 @@ class PirScanWideEventTest {
     @Test
     fun whenOptOutSkippedThenTotalFlowIntervalEndedBeforeFlowFinish() = runTest {
         // Given
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(71L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(71L))
         runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 0)
         testee.onScanCompleted(PirExecutionType.MANUAL_INITIAL) // ends the scan-phase total
 
@@ -834,7 +882,7 @@ class PirScanWideEventTest {
     @Test
     fun whenRunFailedMidScanThenBothTotalIntervalsEndedBeforeFlowFinish() = runTest {
         // Given - failure fires before scan_completed, so the scan-phase total is still open.
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(72L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(72L))
         runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 10) // decile_0_10 + both totals open
 
         // When
@@ -855,7 +903,7 @@ class PirScanWideEventTest {
     @Test
     fun whenRunFailedThenFlowFinishedWithFailure() = runTest {
         // Given
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(6L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(6L))
         runStarted(PirExecutionType.MANUAL_INITIAL, 1, 0, 0)
 
         // When
@@ -871,7 +919,7 @@ class PirScanWideEventTest {
     @Test
     fun whenRunCancelledThenFlowFinishedWithCancelled() = runTest {
         // Given
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(8L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(8L))
         runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 1)
         testee.onScanJobCompleted(PirExecutionType.MANUAL_INITIAL) // emits progress_90 (which persists last_step = progress_90)
 
@@ -889,7 +937,7 @@ class PirScanWideEventTest {
     @Test
     fun whenRunFailedDuringScanThenOpenDecileIntervalIsClosedBeforeFlowFinish() = runTest {
         // Given - 10 jobs total, only 2 completed -> still inside decile_20_30 when failure fires.
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(60L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(60L))
         runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 10)
         repeat(2) { testee.onScanJobCompleted(PirExecutionType.MANUAL_INITIAL) } // progress_20 fires, decile_20_30 opens
 
@@ -908,7 +956,7 @@ class PirScanWideEventTest {
     @Test
     fun whenRunFailedDuringOptOutThenOpenOptOutIntervalIsClosedBeforeFlowFinish() = runTest {
         // Given
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(61L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(61L))
         runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 0) // zero scan jobs, no decile interval
         testee.onScanCompleted(PirExecutionType.MANUAL_INITIAL)
         testee.onOptOutStarted(PirExecutionType.MANUAL_INITIAL) // opens INTERVAL_OPT_OUT_DURATION
@@ -928,7 +976,7 @@ class PirScanWideEventTest {
     @Test
     fun whenRunCancelledDuringScanThenOpenDecileIntervalIsClosedBeforeFlowFinish() = runTest {
         // Given - cancellation fires while scan is in progress (decile_0_10 still open).
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(62L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(62L))
         runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 10)
 
         // When
@@ -947,7 +995,7 @@ class PirScanWideEventTest {
     @Test
     fun whenRunCancelledDuringOptOutThenOpenOptOutIntervalIsClosedBeforeFlowFinish() = runTest {
         // Given
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(63L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(63L))
         runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 0)
         testee.onScanCompleted(PirExecutionType.MANUAL_INITIAL)
         testee.onOptOutStarted(PirExecutionType.MANUAL_INITIAL)
@@ -968,7 +1016,7 @@ class PirScanWideEventTest {
     @Test
     fun whenOnWorkCancelledThenOpenFlowFinishedWithCancelledAndReason() = runTest {
         // Given an open manual flow with no scan jobs (so no decile interval is opened)
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(80L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(80L))
         runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 0)
 
         // When work is cancelled externally (e.g. via PirWorkHandler.cancelWork)
@@ -1010,7 +1058,7 @@ class PirScanWideEventTest {
 
     @Test
     fun whenRunCancelledBeforeStartThenOneShotFlowEmittedWithZeroedCountsAndReason() = runTest {
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(90L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(90L))
 
         testee.onRunCancelledBeforeStart(PirExecutionType.MANUAL_INITIAL, CancellationReason.FOREGROUND_START_FAILED)
 
@@ -1024,6 +1072,7 @@ class PirScanWideEventTest {
                 KEY_BROKER_COUNT to "0",
                 KEY_TOTAL_SCAN_JOBS to "0",
                 KEY_WEB_VIEW_COUNT to "0",
+                KEY_SCHEDULING to SCHEDULING_QUEUE,
             ),
             cleanupPolicy = CleanupPolicy.OnTimeout(duration = 8.hours, flowStatus = FlowStatus.Unknown),
         )
@@ -1047,7 +1096,7 @@ class PirScanWideEventTest {
         // (-> onWorkCancelled). The before-start hook must reuse the already-open flow instead of
         // synthesizing a second one, otherwise the follow-on onWorkCancelled produces a duplicate
         // cancelled wide event for a single user action.
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any()))
             .thenReturn(Result.success(300L)) // onRunStarted
             .thenReturn(Result.success(301L)) // any (unwanted) synthetic one-shot would get this id
         runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 0) // opens manual flow 300L
@@ -1056,7 +1105,7 @@ class PirScanWideEventTest {
         testee.onWorkCancelled(CancellationReason.SUBSCRIPTION_EXPIRED)
 
         // No synthetic one-shot was started (only the original onRunStarted flowStart)...
-        verify(wideEventClient, times(1)).flowStart(any(), any(), any(), any(), any())
+        verify(wideEventClient, times(1)).flowStart(any(), any(), any(), any(), any(), any())
         // ...and the run is finished as Cancelled exactly once, reusing the open flow.
         verify(wideEventClient, times(1)).flowFinish(any(), eq(FlowStatus.Cancelled), any())
         verify(wideEventClient).flowFinish(
@@ -1122,7 +1171,7 @@ class PirScanWideEventTest {
     @Test
     fun whenRunFailedWithMappedExceptionThenFlowFinishedWithMappedReasonValue() = runTest {
         // Given
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(99L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(99L))
         runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 1)
 
         // When - simulating PirJobsRunner mapping an IOException via fromException.
@@ -1158,7 +1207,7 @@ class PirScanWideEventTest {
 
     @Test
     fun whenOnUserResetCalledAndManualFlowOpenThenManualFlowAborted() = runTest {
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(11L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(11L))
         whenever(wideEventClient.flowAbort(any())).thenReturn(Result.success(Unit))
         runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 1)
 
@@ -1169,7 +1218,7 @@ class PirScanWideEventTest {
 
     @Test
     fun whenOnUserResetCalledAndScheduledFlowOpenThenScheduledFlowAborted() = runTest {
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(22L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(22L))
         whenever(wideEventClient.flowAbort(any())).thenReturn(Result.success(Unit))
         runStarted(PirExecutionType.SCHEDULED, 1, 1, 1)
 
@@ -1180,9 +1229,9 @@ class PirScanWideEventTest {
 
     @Test
     fun whenOnUserResetCalledAndBothFlowsOpenThenBothAreAborted() = runTest {
-        whenever(wideEventClient.flowStart(any(), eq(ENTRY_POINT_MANUAL_INITIAL), any(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), eq(ENTRY_POINT_MANUAL_INITIAL), any(), any(), any(), any()))
             .thenReturn(Result.success(11L))
-        whenever(wideEventClient.flowStart(any(), eq(ENTRY_POINT_SCHEDULED), any(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), eq(ENTRY_POINT_SCHEDULED), any(), any(), any(), any()))
             .thenReturn(Result.success(22L))
         whenever(wideEventClient.flowAbort(any())).thenReturn(Result.success(Unit))
         runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 1)
@@ -1196,7 +1245,7 @@ class PirScanWideEventTest {
 
     @Test
     fun whenOnUserResetCalledAndManualFlowOpenThenStateClearedSoNextRunStartsFresh() = runTest {
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any()))
             .thenReturn(Result.success(11L), Result.success(33L))
         whenever(wideEventClient.flowAbort(any())).thenReturn(Result.success(Unit))
         runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 1)
@@ -1214,7 +1263,7 @@ class PirScanWideEventTest {
     fun whenOnUserResetCalledAndFeatureFlagDisabledMidFlightThenInFlightFlowStillAborted() = runTest {
         // Flow opens while flag is ON, then flag flips OFF before user reset. We must still abort
         // the in-flight flow so it doesn't get auto-finished as Unknown by the cleanup timeout.
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(11L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(11L))
         whenever(wideEventClient.flowAbort(any())).thenReturn(Result.success(Unit))
         runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 1)
         pirRemoteFeatures.sendScanWideEvent().setRawStoredState(Toggle.State(false))
@@ -1227,7 +1276,7 @@ class PirScanWideEventTest {
     @Test
     fun whenStepReachedAfterTimeElapsedThenLastStepElapsedIsBucketedSinceRunStart() = runTest {
         // Given - the run starts at t=1s; a 10-job scan.
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(73L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(73L))
         timeProvider.elapsed = 1_000
         runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 10)
 
@@ -1255,7 +1304,7 @@ class PirScanWideEventTest {
     @Test
     fun whenRunFailedWithRendererGoneAndSystemKillThenFlowFinishedAsFailureWithDidCrashFalse() = runTest {
         // Given
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(50L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(50L))
         runStarted(PirExecutionType.MANUAL_INITIAL, profileQueriesCount = 1, brokerCount = 1, totalScanJobs = 1)
 
         // When
@@ -1276,7 +1325,7 @@ class PirScanWideEventTest {
     @Test
     fun whenRunFailedWithoutDidCrashThenFlowFinishedWithEmptyMetadata() = runTest {
         // Given
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(51L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(51L))
         runStarted(PirExecutionType.MANUAL_INITIAL, profileQueriesCount = 1, brokerCount = 1, totalScanJobs = 1)
 
         // When (existing callers pass no didCrash)

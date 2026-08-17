@@ -19,7 +19,7 @@ package com.duckduckgo.pir.impl.scheduling
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.pir.impl.models.AddressCityState
+import com.duckduckgo.pir.impl.common.toKey
 import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord
@@ -591,39 +591,6 @@ class RealJobRecordUpdater @Inject constructor(
             }
         }
     }
-
-    private data class ExtractedProfileComparisonKey(
-        val profileQueryId: Long,
-        val brokerName: String,
-        val name: String,
-        val alternativeNames: List<String>,
-        val age: String,
-        val addresses: List<AddressCityState>,
-        val phoneNumbers: List<String>,
-        val relatives: List<String>,
-        val reportId: String,
-        val email: String,
-        val fullName: String,
-        val profileUrl: String,
-        val identifier: String,
-    )
-
-    private fun ExtractedProfile.toKey(): ExtractedProfileComparisonKey =
-        ExtractedProfileComparisonKey(
-            profileQueryId = profileQueryId,
-            brokerName = brokerName,
-            name = name,
-            alternativeNames = alternativeNames,
-            age = age,
-            addresses = addresses,
-            phoneNumbers = phoneNumbers,
-            relatives = relatives,
-            reportId = reportId,
-            email = email,
-            fullName = fullName,
-            profileUrl = profileUrl,
-            identifier = identifier,
-        )
 
     override suspend fun markEmailConfirmationLinkFetchFailed(extractedProfileId: Long) {
         schedulingRepository.deleteEmailConfirmationJobRecord(extractedProfileId)

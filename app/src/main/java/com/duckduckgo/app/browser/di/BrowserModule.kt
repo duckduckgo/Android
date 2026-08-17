@@ -38,7 +38,6 @@ import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsRepository
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserObserver
 import com.duckduckgo.app.browser.downloader.*
-import com.duckduckgo.app.browser.duckchat.AIChatQueryDetectionFeature
 import com.duckduckgo.app.browser.favicon.FaviconPersister
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister
 import com.duckduckgo.app.browser.httperrors.HttpCodeSiteErrorHandler
@@ -66,7 +65,6 @@ import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -76,11 +74,11 @@ import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.trackerdetection.CloakedCnameDetector
 import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
+import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.cookies.api.ThirdPartyCookieNames
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.experiments.api.VariantManager
@@ -165,8 +163,6 @@ class BrowserModule {
         externalAppIntentFlagsFeature: ExternalAppIntentFlagsFeature,
         duckPlayer: DuckPlayer,
         duckChat: DuckChat,
-        duckChaFeatureState: DuckAiFeatureState,
-        aiChatQueryDetectionFeature: AIChatQueryDetectionFeature,
         androidBrowserConfigFeature: AndroidBrowserConfigFeature,
         appSchemeInterceptionFeature: AppSchemeInterceptionFeature,
     ): SpecialUrlDetector = SpecialUrlDetectorImpl(
@@ -177,8 +173,6 @@ class BrowserModule {
         externalAppIntentFlagsFeature,
         duckPlayer,
         duckChat,
-        duckChaFeatureState,
-        aiChatQueryDetectionFeature,
         androidBrowserConfigFeature,
         appSchemeInterceptionFeature,
     )

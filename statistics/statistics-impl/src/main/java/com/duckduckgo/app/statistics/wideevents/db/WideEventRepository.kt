@@ -27,6 +27,8 @@ interface WideEventRepository {
         metadata: Map<String, String?>,
         cleanupPolicy: CleanupPolicy,
         samplingProbability: Float = 1.0f,
+        metaType: String,
+        metaVersion: String,
     ): Long
 
     suspend fun addWideEventStep(
@@ -76,6 +78,9 @@ interface WideEventRepository {
         val activeIntervals: List<WideEventInterval>,
         val createdAt: Instant,
         val samplingProbability: Float = 1.0f,
+        val metaType: String,
+        val metaVersion: String,
+        val isFirstDailyOccurrence: Boolean = false,
     )
 
     data class WideEventStep(

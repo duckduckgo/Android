@@ -214,12 +214,6 @@ class DuckChatFeatureRepositoryTest {
     }
 
     @Test
-    fun `when isFullScreenModeUserSettingEnabled called, then get from data store`() = runTest {
-        whenever(mockDataStore.isFullScreenUserSettingEnabled()).thenReturn(true)
-        assertTrue(testee.isFullScreenModeUserSettingEnabled())
-    }
-
-    @Test
     fun whenRegisterDuckChatOpenedThenDataStoreCalled() = runTest {
         whenever(mockDataStore.wasOpenedBefore()).thenReturn(false)
         testee.registerOpened()

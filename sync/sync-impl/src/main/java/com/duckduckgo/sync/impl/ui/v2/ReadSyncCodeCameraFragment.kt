@@ -29,21 +29,28 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
+import androidx.core.os.BundleCompat
+import androidx.core.os.bundleOf
 import androidx.core.view.OneShotPreDrawListener
 import androidx.core.view.doOnLayout
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.view.toPx
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.databinding.FragmentSyncV2ReadSyncCodeCameraBinding
+import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeCameraIntroViewModel.Command
 import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeCameraIntroViewModel.Command.ExpandScannerCutout
 import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeCameraIntroViewModel.Command.PlayIntroAnimation
@@ -51,8 +58,13 @@ import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeCameraIntroViewModel.Command.R
 import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeCameraIntroViewModel.Command.ResumeCamera
 import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeCameraIntroViewModel.ViewMode
 import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeCameraIntroViewModel.ViewState
+import com.google.zxing.BarcodeFormat.QR_CODE
+import com.journeyapps.barcodescanner.DefaultDecoderFactory
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
@@ -63,12 +75,32 @@ class ReadSyncCodeCameraFragment : DuckDuckGoFragment() {
             "Fragment $this tried to access ViewBinding outside of View's lifecycle."
         }
 
+    private val entryPoint: SyncEntryPoint
+        get() = requireNotNull(BundleCompat.getSerializable(requireArguments(), ENTRY_POINT_ARG, SyncEntryPoint::class.java)) {
+            "Missing fragment argument: '$ENTRY_POINT_ARG'"
+        }
+
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
 
+    @Inject
+    lateinit var syncCodeViewModelFactory: ReadSyncCodeViewModel.Factory
+
+    @Inject
+    lateinit var syncFeature: SyncFeature
+
+    @Inject
+    lateinit var dispatchers: DispatcherProvider
+
     private val animationViewModel by viewModels<ReadSyncCodeCameraIntroViewModel> { viewModelFactory }
 
-    private val cameraPermissionLauncher = registerForActivityResult(RequestPermission()) {
+    private val syncCodeViewModel by activityViewModels<ReadSyncCodeViewModel> {
+        ReadSyncCodeViewModel.Factory.Provider(syncCodeViewModelFactory, entryPoint)
+    }
+
+    private val cameraPermissionLauncher = registerForActivityResult(
+        RequestPermission(),
+    ) {
         animationViewModel.onCameraPermissionResult()
     }
 
@@ -93,6 +125,7 @@ class ReadSyncCodeCameraFragment : DuckDuckGoFragment() {
         configureIntroAnimation()
         configureReadyToScanButtons()
         configureGoToSettingsButton()
+        configureScanner()
         configureCutout()
 
         observeUiEvents()
@@ -233,6 +266,28 @@ class ReadSyncCodeCameraFragment : DuckDuckGoFragment() {
         }
     }
 
+    private fun configureScanner() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val restrictToQr = withContext(dispatchers.io()) {
+                syncFeature.restrictScannedBarcodesToQrTypes().isEnabled()
+            }
+            if (restrictToQr) {
+                binding.includeCamera.barcodeView.decoderFactory = DefaultDecoderFactory(listOf(QR_CODE))
+            }
+
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                binding.includeCamera.barcodeView.decodeSingle { barcode ->
+                    syncCodeViewModel.processScannedCode(barcode.text)
+                }
+                try {
+                    awaitCancellation()
+                } finally {
+                    binding.includeCamera.barcodeView.stopDecoding()
+                }
+            }
+        }
+    }
+
     private fun configureCutout() {
         binding.includeCamera.scannerOverlay.cutoutSizeFraction = CUTOUT_FRACTION_START
     }
@@ -275,6 +330,12 @@ class ReadSyncCodeCameraFragment : DuckDuckGoFragment() {
     }
 
     companion object {
+        private const val ENTRY_POINT_ARG = "entry_point"
+
+        fun instance(entryPoint: SyncEntryPoint) = ReadSyncCodeCameraFragment().apply {
+            arguments = bundleOf(ENTRY_POINT_ARG to entryPoint)
+        }
+
         private const val CUTOUT_FRACTION_START = 0.53f
         private const val CUTOUT_FRACTION_END = 0.72f
         private const val CUTOUT_HEADER_GAP_DP = 16

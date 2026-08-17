@@ -18,11 +18,11 @@ package com.duckduckgo.app.fire.wideevents
 
 import android.annotation.SuppressLint
 import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent.EntryPoint
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy.OnProcessStart
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
+import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -59,7 +59,7 @@ class DataClearingWideEventTest {
 
     @Test
     fun `start starts a new flow with entry point and clear options`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(123L))
 
         val clearOptions = setOf(FireClearOption.TABS, FireClearOption.DATA)
@@ -77,7 +77,7 @@ class DataClearingWideEventTest {
 
     @Test
     fun `start with browserMode includes browser_mode in metadata`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(125L))
 
         dataClearingWideEvent.start(EntryPoint.APP_SHORTCUT, setOf(FireClearOption.TABS), browserMode = BrowserMode.FIRE)
@@ -93,7 +93,7 @@ class DataClearingWideEventTest {
 
     @Test
     fun `start with tabType and tabCount includes bucketed values in metadata`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(127L))
 
         dataClearingWideEvent.start(
@@ -120,7 +120,7 @@ class DataClearingWideEventTest {
 
     @Test
     fun `start buckets tab counts using the shared tab_count boundaries`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(128L))
 
         listOf(0 to "1", 1 to "1", 2 to "2-5", 10 to "6-10", 81 to "81+", 200 to "81+").forEach { (count, bucket) ->
@@ -143,7 +143,7 @@ class DataClearingWideEventTest {
 
     @Test
     fun `start with empty clear options sets empty metadata value`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(456L))
 
         dataClearingWideEvent.start(EntryPoint.APP_SHORTCUT, emptySet(), browserMode = BrowserMode.REGULAR)
@@ -159,7 +159,7 @@ class DataClearingWideEventTest {
 
     @Test
     fun `start with duckai chats option includes duckai_chats in metadata`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(789L))
 
         val clearOptions = setOf(FireClearOption.DUCKAI_CHATS)
@@ -176,7 +176,7 @@ class DataClearingWideEventTest {
 
     @Test
     fun `start with single tab fire dialog entry point sends correct flow entry point`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(124L))
 
         val clearOptions = setOf(FireClearOption.TABS, FireClearOption.DATA, FireClearOption.DUCKAI_CHATS)
@@ -194,7 +194,7 @@ class DataClearingWideEventTest {
 
     @Test
     fun `start resets existing flow before starting new one`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(1L))
             .thenReturn(Result.success(2L))
 
@@ -206,7 +206,7 @@ class DataClearingWideEventTest {
 
     @Test
     fun `stepSuccess sends successful step`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(500L))
 
         dataClearingWideEvent.start(EntryPoint.SINGLE_TAB_FIRE_DIALOG, setOf(FireClearOption.TABS), browserMode = BrowserMode.REGULAR)
@@ -221,7 +221,7 @@ class DataClearingWideEventTest {
 
     @Test
     fun `stepSuccess with different steps sends correct step names`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(501L))
 
         dataClearingWideEvent.start(EntryPoint.SINGLE_TAB_FIRE_DIALOG, setOf(FireClearOption.TABS), browserMode = BrowserMode.REGULAR)
@@ -236,7 +236,7 @@ class DataClearingWideEventTest {
 
     @Test
     fun `stepFailure sends failed step with error class`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(600L))
 
         dataClearingWideEvent.start(EntryPoint.SINGLE_TAB_FIRE_DIALOG, setOf(FireClearOption.DATA), browserMode = BrowserMode.REGULAR)
@@ -252,7 +252,7 @@ class DataClearingWideEventTest {
 
     @Test
     fun `finishSuccess ends interval and finishes flow with success`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(700L))
 
         dataClearingWideEvent.start(EntryPoint.SINGLE_TAB_FIRE_DIALOG, setOf(FireClearOption.TABS), browserMode = BrowserMode.REGULAR)
@@ -264,7 +264,7 @@ class DataClearingWideEventTest {
 
     @Test
     fun `finishSuccess clears cached flow id`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(701L))
 
         dataClearingWideEvent.start(EntryPoint.SINGLE_TAB_FIRE_DIALOG, setOf(FireClearOption.TABS), browserMode = BrowserMode.REGULAR)
@@ -282,7 +282,7 @@ class DataClearingWideEventTest {
 
     @Test
     fun `finishFailure ends interval and finishes flow with failure`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(800L))
 
         dataClearingWideEvent.start(EntryPoint.SINGLE_TAB_FIRE_DIALOG, setOf(FireClearOption.TABS), browserMode = BrowserMode.REGULAR)
@@ -297,7 +297,7 @@ class DataClearingWideEventTest {
 
     @Test
     fun `finishFailure clears cached flow id`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(801L))
 
         dataClearingWideEvent.start(EntryPoint.SINGLE_TAB_FIRE_DIALOG, setOf(FireClearOption.TABS), browserMode = BrowserMode.REGULAR)
@@ -315,7 +315,7 @@ class DataClearingWideEventTest {
 
     @Test
     fun `getCurrentFlowId returns cached flow id`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(900L))
 
         dataClearingWideEvent.start(EntryPoint.SINGLE_TAB_FIRE_DIALOG, setOf(FireClearOption.TABS), browserMode = BrowserMode.REGULAR)

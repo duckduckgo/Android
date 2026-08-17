@@ -23,8 +23,12 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.TestSyncFixtures
+import com.duckduckgo.sync.impl.AccountErrorCodes.EXCHANGE_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_CANCELLED
+import com.duckduckgo.sync.impl.AccountInfo
+import com.duckduckgo.sync.impl.ConnectedDevice
+import com.duckduckgo.sync.impl.DeviceType
 import com.duckduckgo.sync.impl.DispatchOutcome
 import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.R
@@ -36,19 +40,21 @@ import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.pixels.SyncPixels.CancellationReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_CONNECT
+import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_EXCHANGE
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupFailureReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
+import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl.ProtocolVersion.V2
 import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.BitmapWithCode
 import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.AskHostConfirmation
 import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.AskJoinerConfirmation
 import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.Close
-import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.SetFailureResult
-import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.SetSuccessResult
+import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.SetPairingResult
 import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.ShareCode
-import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.ShowMessage
+import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.ShowV1Error
 import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.ShowV2Error
 import com.duckduckgo.sync.impl.ui.v2AlreadyPairedError
 import com.duckduckgo.sync.impl.ui.v2UpgradeRequiredError
@@ -68,6 +74,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
@@ -84,6 +91,14 @@ class DisplayQrCodeViewModelTest {
         protocolVersion = V2,
     ).asUrl()
 
+    private val thisDevice = ConnectedDevice(
+        thisDevice = true,
+        deviceName = "This Device",
+        deviceId = "this-device-id",
+        deviceType = DeviceType(),
+    )
+    private val thisParcelableDevice = ParcelableDevice.fromConnectedDevice(thisDevice)
+
     private val accountRepository = mock<SyncAccountRepository>()
     private val codeDispatcher = mock<SyncCodeDispatcher>()
     private val pixels = mock<SyncPixels>()
@@ -96,10 +111,12 @@ class DisplayQrCodeViewModelTest {
         whenever(codeDispatcher.presentV2()).thenReturn(emptyFlow())
         whenever(qrEncoder.encodeAsBitmap(any(), any(), any())).thenReturn(bitmap)
         whenever(accountRepository.pollConnectionKeys()).thenReturn(Result.Success(true))
+        whenever(accountRepository.getAccountInfo()).thenReturn(AccountInfo(isSignedIn = false))
     }
 
     private fun createTestee(source: String? = null) = DisplayQrCodeViewModel(
-        source = source,
+        syncEntryPoint = SyncEntryPoint.SYNC_NEW_ACCOUNT,
+        launchSource = source,
         accountRepository = accountRepository,
         codeDispatcher = codeDispatcher,
         pixels = pixels,
@@ -134,9 +151,9 @@ class DisplayQrCodeViewModelTest {
 
         testee.commands.test {
             val command = awaitItem()
-            assertIs<ShowError>(command)
-            assertEquals(R.string.sync_connect_generic_error, command.message)
-            assertEquals("boom", command.reason)
+            assertIs<ShowV1Error>(command)
+            assertEquals(R.string.sync_connect_generic_error, command.content.message)
+            assertEquals("boom", command.content.reason)
 
             cancel()
         }
@@ -144,15 +161,21 @@ class DisplayQrCodeViewModelTest {
     }
 
     @Test
-    fun `when v2 is disabled and the connection keys are synced then the success result is set and the screen closes`() = runTest {
+    fun `when v2 is disabled and the connection keys are synced then a success result with no role is set and the screen closes`() = runTest {
         givenV2Disabled()
+        givenThisConnectedDevice()
         whenever(accountRepository.getConnectQR()).thenReturn(Result.Success(AuthCode(qrCode = "raw-code", rawCode = "b64-code")))
         whenever(accountRepository.pollConnectionKeys()).thenReturn(Result.Success(true))
 
         val testee = createTestee(source = "foo")
 
         testee.commands.test {
-            assertIs<SetSuccessResult>(awaitItem())
+            val command = awaitItem()
+            assertIs<SetPairingResult>(command)
+            assertEquals(
+                SyncPairingResult.Success(thisParcelableDevice, SyncEntryPoint.SYNC_NEW_ACCOUNT),
+                command.result,
+            )
             assertIs<Close>(awaitItem())
 
             cancel()
@@ -171,9 +194,9 @@ class DisplayQrCodeViewModelTest {
 
         testee.commands.test {
             val command = awaitItem()
-            assertIs<ShowError>(command)
-            assertEquals(R.string.sync_connect_login_error, command.message)
-            assertEquals("boom", command.reason)
+            assertIs<ShowV1Error>(command)
+            assertEquals(R.string.sync_connect_login_error, command.content.message)
+            assertEquals("boom", command.content.reason)
 
             cancel()
         }
@@ -189,6 +212,129 @@ class DisplayQrCodeViewModelTest {
 
         verify(accountRepository).getConnectQR()
         verify(codeDispatcher, never()).presentV2()
+    }
+
+    @Test
+    fun `when v2 is disabled and this device is signed in then the exchange invitation code is shown as a QR code`() = runTest {
+        givenV2Disabled()
+        givenSignedIn()
+        givenExchangeKeysEnabled()
+        whenever(accountRepository.generateExchangeInvitationCode())
+            .thenReturn(Result.Success(AuthCode(qrCode = "invitation-code", rawCode = "b64-code")))
+        whenever(accountRepository.pollSecondDeviceExchangeAcknowledgement()).thenReturn(Result.Success(true))
+
+        val testee = createTestee()
+
+        testee.viewState.test {
+            assertEquals(BitmapWithCode(bitmap, "invitation-code", "invitation-code"), awaitItem().bitmap)
+            verify(qrEncoder).encodeAsBitmap(eq("invitation-code"), any(), any())
+            verify(accountRepository, never()).getConnectQR()
+            verify(codeDispatcher, never()).presentV2()
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when v2 is disabled and this device is signed in and the peer acknowledges then a success result is set and the screen closes`() = runTest {
+        givenV2Disabled()
+        givenSignedIn()
+        givenExchangeKeysEnabled()
+        givenThisConnectedDevice()
+        whenever(accountRepository.generateExchangeInvitationCode())
+            .thenReturn(Result.Success(AuthCode(qrCode = "invitation-code", rawCode = "b64-code")))
+        whenever(accountRepository.pollSecondDeviceExchangeAcknowledgement()).thenReturn(Result.Success(true))
+
+        val testee = createTestee()
+
+        testee.commands.test {
+            val command = awaitItem()
+            assertIs<SetPairingResult>(command)
+            assertEquals(
+                SyncPairingResult.Success(thisParcelableDevice, SyncEntryPoint.SYNC_NEW_ACCOUNT),
+                command.result,
+            )
+            assertIs<Close>(awaitItem())
+
+            cancel()
+        }
+        verify(pixels).fireSyncSetupFinishedSuccessfully(SYNC_EXCHANGE, null, null, null)
+        verify(pixels, never()).fireLoginPixel()
+        verify(pixels, never()).fireSignupConnectPixel(anyOrNull())
+    }
+
+    @Test
+    fun `when v2 is disabled and this device is signed in and the invitation code cannot be generated then an error is shown`() = runTest {
+        givenV2Disabled()
+        givenSignedIn()
+        givenExchangeKeysEnabled()
+        whenever(accountRepository.generateExchangeInvitationCode()).thenReturn(Result.Error(reason = "boom"))
+
+        val testee = createTestee()
+
+        testee.commands.test {
+            val command = awaitItem()
+            assertIs<ShowV1Error>(command)
+            assertEquals(R.string.sync_connect_generic_error, command.content.message)
+            assertEquals("boom", command.content.reason)
+
+            cancel()
+        }
+        verify(accountRepository, never()).pollSecondDeviceExchangeAcknowledgement()
+    }
+
+    @Test
+    fun `when v2 is disabled and this device is signed in and polling fails then an error is shown`() = runTest {
+        givenV2Disabled()
+        givenSignedIn()
+        givenExchangeKeysEnabled()
+        whenever(accountRepository.generateExchangeInvitationCode())
+            .thenReturn(Result.Success(AuthCode(qrCode = "invitation-code", rawCode = "b64-code")))
+        whenever(accountRepository.pollSecondDeviceExchangeAcknowledgement())
+            .thenReturn(Result.Error(code = EXCHANGE_FAILED.code, reason = "boom"))
+
+        val testee = createTestee()
+
+        testee.commands.test {
+            val command = awaitItem()
+            assertIs<ShowV1Error>(command)
+            assertEquals(R.string.sync_simplified_pairing_failed_generic_message, command.content.message)
+            assertEquals("boom", command.content.reason)
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when v2 and exchange keys are disabled and this device is signed in then the recovery code is shown without polling`() = runTest {
+        givenV2Disabled()
+        givenSignedIn()
+        syncFeature.exchangeKeysToSyncWithAnotherDevice().setRawStoredState(State(false))
+        whenever(accountRepository.getRecoveryCode())
+            .thenReturn(Result.Success(AuthCode(qrCode = "recovery-code", rawCode = "recovery-code")))
+
+        val testee = createTestee()
+
+        testee.viewState.test {
+            assertEquals(BitmapWithCode(bitmap, "recovery-code", "recovery-code"), awaitItem().bitmap)
+
+            cancel()
+        }
+        verify(accountRepository, never()).pollSecondDeviceExchangeAcknowledgement()
+        verify(accountRepository, never()).generateExchangeInvitationCode()
+        verify(accountRepository, never()).getConnectQR()
+    }
+
+    @Test
+    fun `when this device is signed in then v2 pixels report the exchange screen`() = runTest {
+        givenV2Enabled()
+        givenSignedIn()
+        givenThisConnectedDevice()
+        whenever(codeDispatcher.presentV2()).thenReturn(flowOf(DispatchOutcome.LoggedIn(path = SetupPath.PAIRING)))
+
+        createTestee()
+
+        verify(pixels).fireSyncSetupFinishedSuccessfully(SYNC_EXCHANGE, SetupPath.PAIRING, null, null)
     }
 
     @Test
@@ -278,18 +424,59 @@ class DisplayQrCodeViewModelTest {
     @Test
     fun `when the login completes then the success result is set and the screen closes`() = runTest {
         givenV2Enabled()
+        givenThisConnectedDevice()
         whenever(codeDispatcher.presentV2()).thenReturn(flowOf(DispatchOutcome.LoggedIn(path = SetupPath.PAIRING)))
 
         val testee = createTestee()
 
         testee.commands.test {
-            assertIs<SetSuccessResult>(awaitItem())
+            val command = awaitItem()
+            assertIs<SetPairingResult>(command)
+            assertEquals(
+                SyncPairingResult.Success(thisParcelableDevice, SyncEntryPoint.SYNC_NEW_ACCOUNT),
+                command.result,
+            )
             assertIs<Close>(awaitItem())
 
             cancel()
         }
         verify(pixels).fireLoginPixel()
         verify(pixels).fireSyncSetupFinishedSuccessfully(SYNC_CONNECT, SetupPath.PAIRING, null, null)
+    }
+
+    @Test
+    fun `when the login completes as the elected host then a host success result is set`() = runTest {
+        givenV2Enabled()
+        givenThisConnectedDevice()
+        whenever(codeDispatcher.presentV2()).thenReturn(flowOf(DispatchOutcome.LoggedIn(path = SetupPath.PAIRING, myRole = SetupRole.HOST)))
+
+        val testee = createTestee()
+
+        testee.commands.test {
+            val command = awaitItem()
+            assertIs<SetPairingResult>(command)
+            assertEquals(SyncPairingResult.Success(thisParcelableDevice, SyncEntryPoint.SYNC_NEW_ACCOUNT), command.result)
+            assertIs<Close>(awaitItem())
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when the login completes but this connected device is missing then a failure result is set`() = runTest {
+        givenV2Enabled()
+        whenever(codeDispatcher.presentV2()).thenReturn(flowOf(DispatchOutcome.LoggedIn(path = SetupPath.PAIRING, myRole = SetupRole.HOST)))
+
+        val testee = createTestee()
+
+        testee.commands.test {
+            val command = awaitItem()
+            assertIs<SetPairingResult>(command)
+            assertEquals(SyncPairingResult.Failure, command.result)
+            assertIs<Close>(awaitItem())
+
+            cancel()
+        }
     }
 
     @Test
@@ -378,7 +565,8 @@ class DisplayQrCodeViewModelTest {
 
         createTestee()
 
-        verifyNoInteractions(pixels)
+        verify(pixels).fireSyncBarcodeScreenShown(SYNC_CONNECT)
+        verifyNoMoreInteractions(pixels)
     }
 
     @Test
@@ -403,7 +591,7 @@ class DisplayQrCodeViewModelTest {
 
         testee.commands.test {
             testee.onCopyCodeClicked()
-            assertEquals(ShowMessage(R.string.sync_code_copied_message), awaitItem())
+            assertEquals(ShowMessage(R.string.sync_simplified_qr_code_copied_message), awaitItem())
 
             cancel()
         }
@@ -433,7 +621,8 @@ class DisplayQrCodeViewModelTest {
         testee.onCopyCodeClicked()
 
         verifyNoInteractions(clipboard)
-        verifyNoInteractions(pixels)
+        verify(pixels).fireSyncBarcodeScreenShown(SYNC_CONNECT)
+        verifyNoMoreInteractions(pixels)
     }
 
     @Test
@@ -473,11 +662,25 @@ class DisplayQrCodeViewModelTest {
 
         testee.commands.test {
             testee.onErrorDialogDismissed()
-            assertIs<SetFailureResult>(awaitItem())
+            val command = awaitItem()
+            assertIs<SetPairingResult>(command)
+            assertEquals(SyncPairingResult.Failure, command.result)
             assertIs<Close>(awaitItem())
 
             cancel()
         }
+    }
+
+    private fun givenThisConnectedDevice() {
+        whenever(accountRepository.getThisConnectedDevice()).thenReturn(thisDevice)
+    }
+
+    private fun givenSignedIn() {
+        whenever(accountRepository.getAccountInfo()).thenReturn(AccountInfo(isSignedIn = true))
+    }
+
+    private fun givenExchangeKeysEnabled() {
+        syncFeature.exchangeKeysToSyncWithAnotherDevice().setRawStoredState(State(true))
     }
 
     private fun givenV2Enabled() {

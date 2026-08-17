@@ -134,34 +134,6 @@
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
-    "m_aichat_contextual_page_context_placeholder_shown_count": {
-        "description": "User has seen the page context placeholder presented in the Contextual sheet",
-        "owners": ["malmstein"],
-        "triggers": ["other"],
-        "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
-    },
-    "m_aichat_contextual_page_context_placeholder_shown_daily": {
-        "description": "(Daily Pixel) User has seen the page context placeholder presented in the Contextual sheet",
-        "owners": ["malmstein"],
-        "triggers": ["other"],
-        "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
-    },
-    "m_aichat_contextual_page_context_placeholder_tapped_count": {
-        "description": "User has added the page context via the placeholder shown in the native side of the Contextual sheet",
-        "owners": ["malmstein"],
-        "triggers": ["other"],
-        "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
-    },
-    "m_aichat_contextual_page_context_placeholder_tapped_daily": {
-        "description": "(Daily Pixel) User has added the page context via the placeholder shown in the native side of the Contextual sheet",
-        "owners": ["malmstein"],
-        "triggers": ["other"],
-        "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
-    },
     "m_aichat_contextual_page_context_invalid_empty": {
         "description": "User attempted to attach page context but the context string was empty",
         "owners": ["malmstein"],
@@ -1042,18 +1014,32 @@
         "parameters": ["appVersion", "unifiedInputSurface"]
     },
     "m_aichat_unified_input_voice_tapped_count": {
-        "description": "User tapped the voice button in the Unified Input",
+        "description": "User tapped the voice chat button in the Unified Input",
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "unifiedInputSurface"]
     },
     "m_aichat_unified_input_voice_tapped_daily": {
-        "description": "(Daily Pixel) User tapped the voice button in the Unified Input",
+        "description": "(Daily Pixel) User tapped the voice chat button in the Unified Input",
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "unifiedInputSurface"]
+    },
+    "m_aichat_unified_input_voice_search_tapped_count": {
+        "description": "User tapped the in-field microphone for voice search in the Unified Input",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "unifiedInputSurface"]
+    },
+    "m_aichat_unified_input_voice_search_tapped_daily": {
+        "description": "(Daily Pixel) User tapped the in-field microphone for voice search in the Unified Input",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "unifiedInputSurface"]
     },
     "m_aichat_unified_input_image_attached_count": {
         "description": "User attached an image in the Unified Input",
@@ -1099,6 +1085,27 @@
                 "type": "string",
                 "description": "The tapper's current tier",
                 "enum": ["free", "plus"]
+            },
+            {
+                "key": "origin",
+                "type": "string",
+                "description": "Subscription-funnel entry point",
+                "enum": ["funnel_duckai_android__freelabel"]
+            }
+        ]
+    },
+    "m_aichat_unified_input_free_label_shown": {
+        "description": "Subscription-funnel impression: the upgradeable 'Free' pill in the Duck.ai omnibar header became visible",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "origin",
+                "type": "string",
+                "description": "Subscription-funnel entry point",
+                "enum": ["funnel_duckai_android__freelabel"]
             }
         ]
     },
@@ -1223,20 +1230,55 @@
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "unifiedInputSurface"]
     },
     "m_aichat_unified_input_sent_prompt_in_chat_daily": {
         "description": "(Daily Pixel) User submitted a prompt from the Unified Input while in a Duck.ai chat context. Fires alongside m_aichat_unified_input_prompt_submitted_daily.",
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "unifiedInputSurface"]
     },
     "m_aichat_unified_input_stop_generation_tapped": {
         "description": "User tapped the stop generation button in the Unified Input",
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "unifiedInputSurface"]
+    },
+    "m_aichat_edit_prompt_opened": {
+        "description": "User opened the fullscreen Edit Message screen for a sent prompt",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_edit_prompt_cancelled": {
+        "description": "User left the Edit Message screen without submitting (toolbar close, system or predictive back)",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_edit_prompt_submitted": {
+        "description": "User submitted the edited prompt from the Edit Message screen, replacing the original message",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_edit_prompt_image_removed": {
+        "description": "User removed an attached image while on the Edit Message screen",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion", "unifiedInputSurface"]
+    },
+    "m_aichat_edit_prompt_file_removed": {
+        "description": "User removed an attached file while on the Edit Message screen",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
         "parameters": ["appVersion", "unifiedInputSurface"]
     },
     "m_aichat_unified_input_model_selected": {
@@ -1291,6 +1333,101 @@
                 "type": "string",
                 "description": "The type of subscription flow offered",
                 "enum": ["purchase", "upgrade"]
+            },
+            {
+                "key": "origin",
+                "type": "string",
+                "description": "Subscription-funnel entry point (the gated picker) the upsell was triggered from",
+                "enum": [
+                    "funnel_addressbar_android__modelpicker",
+                    "funnel_addressbar_android__reasoningdropdown",
+                    "funnel_duckai_android__modelpicker",
+                    "funnel_duckai_android__reasoningdropdown",
+                    "funnel_duckai_android__switchmodel"
+                ]
+            }
+        ]
+    },
+    "m_aichat_subscription-funnel_subscribe-modal_impression": {
+        "description": "Subscription-funnel impression: the subscribe modal was shown. Origin is the FE-supplied entry point (source).",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "duckAiSubscriptionFunnelOrigin"]
+    },
+    "m_aichat_subscription-funnel_subscribe-modal_subscribe_click": {
+        "description": "Subscription-funnel click: the user tapped Subscribe on the subscribe modal. Origin is the FE-supplied entry point (source).",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "duckAiSubscriptionFunnelOrigin"]
+    },
+    "m_aichat_subscription-funnel_subscribe-modal_activate_click": {
+        "description": "Subscription-funnel click: the user tapped Activate on the subscribe modal. Origin is the FE-supplied entry point (source).",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "duckAiSubscriptionFunnelOrigin"]
+    },
+    "m_aichat_subscription-funnel_upgrade-to-pro-modal_impression": {
+        "description": "Subscription-funnel impression: the upgrade-to-Pro modal was shown. Origin is the FE-supplied entry point (source).",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "duckAiSubscriptionFunnelOrigin"]
+    },
+    "m_aichat_subscription-funnel_upgrade-to-pro-modal_upgrade_click": {
+        "description": "Subscription-funnel click: the user tapped Upgrade on the upgrade-to-Pro modal. Origin is the FE-supplied entry point (source).",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "duckAiSubscriptionFunnelOrigin"]
+    },
+    "m_aichat_subscription-funnel_impression": {
+        "description": "Subscription-funnel impression relayed from the Duck.ai website (FE reportMetric). Carries the funnel entry-point origin.",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "duckAiSubscriptionFunnelOrigin"]
+    },
+    "m_aichat_subscription-funnel_click": {
+        "description": "Subscription-funnel click relayed from the Duck.ai website (FE reportMetric). Carries the funnel entry-point origin.",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "duckAiSubscriptionFunnelOrigin"]
+    },
+    "m_aichat_unified_input_model_picker_shown": {
+        "description": "Subscription-funnel impression: the Unified Input model picker was shown to the user",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "origin",
+                "type": "string",
+                "description": "Entry point where the picker was shown",
+                "enum": [
+                    "funnel_addressbar_android__modelpicker",
+                    "funnel_duckai_android__modelpicker",
+                    "funnel_duckai_android__switchmodel"
+                ]
+            }
+        ]
+    },
+    "m_aichat_unified_input_reasoning_effort_picker_shown": {
+        "description": "Subscription-funnel impression: the Unified Input reasoning effort picker was shown to the user",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "origin",
+                "type": "string",
+                "description": "Entry point where the picker was shown (also the subscription-purchase attribution origin)",
+                "enum": ["funnel_addressbar_android__reasoningdropdown", "funnel_duckai_android__reasoningdropdown"]
             }
         ]
     },
@@ -1476,6 +1613,51 @@
         "description": "The Ask About Page quick action pill was shown in the Contextual sheet",
         "owners": ["karlenDimla"],
         "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "aichat_contextual_suggestion_selected": {
+        "description": "User tapped a suggested prompt on the contextual Duck.ai sheet start surface. The Ask About Page quick action reports as suggestionId=ask-about-page and also fires m_aichat_contextual_quick_action_ask_about_page_selected.",
+        "owners": ["joshliebe"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "suggestionId",
+                "type": "string",
+                "description": "Catalog key of the selected suggestion (e.g. summarize-page, translate-page, key-takeaways) or ask-about-page for the quick action. Bounded by the bundled PageSuggestionsCatalog ids.",
+                "examples": ["summarize-page", "translate-page", "key-takeaways", "ask-about-page"]
+            },
+            "contextualSuggestionsPageType"
+        ]
+    },
+    "aichat_contextual_suggestions_viewed": {
+        "description": "Suggested prompts became visible on the contextual Duck.ai sheet start surface. Fires once per display; only a reload (sheet reopened, or returning from an open chat) counts a fresh impression.",
+        "owners": ["joshliebe"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "isSmart",
+                "type": "boolean",
+                "description": "Whether the displayed suggestions were contextually matched to the page (JSON-LD, og:type or domain) rather than generic defaults."
+            },
+            "contextualSuggestionsPageType"
+        ]
+    },
+    "debug_aichat_contextual_suggestions_catalog_load_failed": {
+        "description": "The bundled PageSuggestionsCatalog.json could not be loaded or decoded when resolving contextual suggestions; the start surface falls back to no suggestions.",
+        "owners": ["joshliebe"],
+        "triggers": ["exception"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "debug_aichat_contextual_suggestions_context_collection_timed_out": {
+        "description": "Page context collection did not complete within the timeout while contextual suggestions were loading; suggestions fall back to generic defaults.",
+        "owners": ["joshliebe"],
+        "triggers": ["exception"],
         "suffixes": ["first_daily_count", "form_factor"],
         "parameters": ["appVersion"]
     }

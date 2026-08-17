@@ -101,6 +101,20 @@ class UserAllowListRepositoryTest {
     }
 
     @Test
+    fun whenAllowListChangesThenAPreviouslyReturnedListIsUnaffected() {
+        dao.insert("example.com")
+        val held = repository.domainsInUserAllowList()
+        assertEquals(listOf("example.com"), held)
+
+        dao.insert("foo.com")
+
+        // Callers may cache the reference and detect a change by comparing it, so a published list must never
+        // be mutated afterwards.
+        assertEquals(listOf("example.com"), held)
+        assertEquals(2, repository.domainsInUserAllowList().size)
+    }
+
+    @Test
     fun whenAllowlistIsModifiedThenFlowEmitsEvent() = runTest {
         repository.domainsInUserAllowListFlow()
             .test {

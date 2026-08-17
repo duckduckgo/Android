@@ -21,17 +21,21 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import java.time.Instant
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @Database(
     exportSchema = true,
-    version = 3,
+    version = 5,
     entities = [
         WideEventEntity::class,
+        WideEventDailyOccurrenceEntity::class,
     ],
 )
 @TypeConverters(
     WideEventEntityTypeConverters::class,
     InstantTypeConverter::class,
+    LocalDateTypeConverter::class,
 )
 abstract class WideEventDatabase : RoomDatabase() {
     abstract fun wideEventDao(): WideEventDao
@@ -43,4 +47,12 @@ class InstantTypeConverter {
 
     @TypeConverter
     fun toInstant(value: Long?): Instant? = value?.let { Instant.ofEpochMilli(it) }
+}
+
+class LocalDateTypeConverter {
+    @TypeConverter
+    fun fromLocalDate(localDate: LocalDate?): String? = localDate?.format(DateTimeFormatter.ISO_LOCAL_DATE)
+
+    @TypeConverter
+    fun toLocalDate(value: String?): LocalDate? = value?.let { LocalDate.parse(it, DateTimeFormatter.ISO_LOCAL_DATE) }
 }

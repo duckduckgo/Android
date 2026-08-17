@@ -212,6 +212,7 @@ class DaxMainNetworkBrandDesignUpdateContextualCtaTest {
             isBrowserShowing = true,
             site = site,
             detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
         )
 
         assertTrue(value is DaxMainNetworkBrandDesignUpdateContextualCta)
@@ -271,6 +272,7 @@ class DaxMainNetworkBrandDesignUpdateContextualCtaTest {
             isBrowserShowing = true,
             site = site,
             detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
         )
 
         assertTrue(value is OnboardingDaxDialogCta.DaxMainNetworkCta)

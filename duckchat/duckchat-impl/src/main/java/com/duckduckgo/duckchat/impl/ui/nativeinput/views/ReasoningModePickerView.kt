@@ -78,6 +78,8 @@ class ReasoningModePickerView @JvmOverloads constructor(
     private var lastInputContext: InputContext = InputContext.BROWSER
     private var lastNativeInputState: NativeInputState? = null
 
+    var isEditMode: Boolean = false
+
     init {
         inflate(context, R.layout.view_reasoning_mode_picker, this)
     }
@@ -115,8 +117,7 @@ class ReasoningModePickerView @JvmOverloads constructor(
     }
 
     private fun applyVisibility(pickerVisible: Boolean) {
-        val nativeState = lastNativeInputState
-        val show = pickerVisible && nativeState?.shouldShowPluginControls() == true
+        val show = shouldShowReasoningPicker(lastNativeInputState, pickerVisible, isEditMode)
         isVisible = show
         (parent as? View)?.isVisible = show
         // Popup is positioned by screen coordinates, not parented to the button. Dismiss
@@ -158,8 +159,12 @@ class ReasoningModePickerView @JvmOverloads constructor(
         }
 
     private fun showMenu() {
+        // Guard against a re-tap opening an already-showing popup.
+        if (popupWindow?.isShowing == true) return
         val state = viewModel.state.value
         if (!state.visible) return
+
+        viewModel.onPickerShown(currentSurface())
 
         val container = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
@@ -217,3 +222,14 @@ class ReasoningModePickerView @JvmOverloads constructor(
         popupWindow = null
     }
 }
+
+/**
+ * The reasoning mode picker follows the same visibility rule as the other plugin controls:
+ * derived purely from [NativeInputState] plus its own visibility flag, so it is unit-testable
+ * without Robolectric.
+ */
+internal fun shouldShowReasoningPicker(
+    nativeInputState: NativeInputState?,
+    pickerVisible: Boolean,
+    isEditMode: Boolean,
+): Boolean = pickerVisible && nativeInputState?.shouldShowPluginControls(isEditing = isEditMode) == true

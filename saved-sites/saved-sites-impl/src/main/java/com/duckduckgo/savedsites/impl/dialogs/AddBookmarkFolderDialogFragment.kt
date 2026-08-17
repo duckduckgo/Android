@@ -18,10 +18,13 @@ package com.duckduckgo.savedsites.impl.dialogs
 
 import android.os.Bundle
 import android.view.View
+import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.saved.sites.impl.R
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import java.util.*
 
+@InjectWith(FragmentScope::class)
 class AddBookmarkFolderDialogFragment : SavedSiteDialogFragment() {
 
     interface AddBookmarkFolderListener {

@@ -50,6 +50,11 @@ interface AccountInfoKeyManager {
      * The winning public key is returned in [AccountInfoKeyResult] and cached in [SyncStore.accountInfoPublicKey].
      */
     suspend fun ensureKeyRegistered(): Result<AccountInfoKeyResult>
+
+    /**
+     * Mint a new `account_info` keypair wrapped for `ddg` only (a brand-new account has no scoped password yet) without registering it on the server
+     */
+    fun mintUnregistered(accountSecretKey: String): Result<MintedProtectedKey>
 }
 
 data class AccountInfoKeyResult(
@@ -76,7 +81,7 @@ class RealAccountInfoKeyManager @Inject constructor(
         val accountSecretKey = syncStore.secretKey
             ?: return@withContext Error(reason = "CreateAccountInfoKey: no account secret key")
 
-        val minted = when (val result = mintKeypair(accountSecretKey)) {
+        val minted = when (val result = mintUnregistered(accountSecretKey)) {
             is Success -> result.data
             is Error -> return@withContext result
         }
@@ -101,7 +106,7 @@ class RealAccountInfoKeyManager @Inject constructor(
         registration
     }
 
-    private fun mintKeypair(accountSecretKey: String): Result<MintedProtectedKey> =
+    override fun mintUnregistered(accountSecretKey: String): Result<MintedProtectedKey> =
         mintDdgWrappedProtectedKey(
             purpose = SYNC_PURPOSE_ACCOUNT_INFO,
             accountSecretKey = accountSecretKey,

@@ -19,22 +19,44 @@ package com.duckduckgo.sync.impl.ui.v2
 import android.content.Context
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
+import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeContract.Input
+import com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeContract.Output
 
-class ReadSyncCodeContract : ActivityResultContract<Input, Unit>() {
+class ReadSyncCodeContract : ActivityResultContract<Input, Output>() {
     override fun createIntent(
         context: Context,
         input: Input,
     ): Intent {
-        return ReadSyncCodeActivity.intent(context, input.source)
+        return ReadSyncCodeActivity.intent(context, input.syncEntryPoint, input.launchSource)
     }
 
     override fun parseResult(
         resultCode: Int,
         intent: Intent?,
-    ) = Unit
+    ): Output {
+        return when (resultCode) {
+            SyncPairingResult.RESULT_SYNC_COMPLETED -> {
+                intent
+                    ?.let(SyncPairingResult::fromIntent)
+                    ?.let(Output::SyncCompleted)
+                    ?: Output.Dismissed
+            }
+
+            else -> Output.Dismissed
+        }
+    }
 
     data class Input(
-        val source: String?,
+        val syncEntryPoint: SyncEntryPoint,
+        val launchSource: String?,
     )
+
+    sealed interface Output {
+        data class SyncCompleted(
+            val result: SyncPairingResult,
+        ) : Output
+
+        data object Dismissed : Output
+    }
 }

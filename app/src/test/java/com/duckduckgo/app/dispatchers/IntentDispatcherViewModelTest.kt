@@ -28,12 +28,12 @@ import com.duckduckgo.app.browser.pdf.InlinePdfHandler
 import com.duckduckgo.app.browser.pdf.LocalPdfResult
 import com.duckduckgo.app.browser.pdf.PdfErrorType
 import com.duckduckgo.app.global.intentText
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
 import com.duckduckgo.browser.api.ui.BrowserScreens.PdfViewerActivityParams
 import com.duckduckgo.browser.api.ui.BrowserScreens.PdfViewerSource
+import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.feature.toggles.api.Toggle

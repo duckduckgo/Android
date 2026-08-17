@@ -21,6 +21,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
+import androidx.core.content.IntentCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
@@ -38,17 +39,18 @@ import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.ShareAction
 import com.duckduckgo.sync.impl.databinding.ActivitySyncV2DisplayQrCodeBinding
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
+import com.duckduckgo.sync.impl.ui.SyncEntryPoint
+import com.duckduckgo.sync.impl.ui.showV1PairingError
 import com.duckduckgo.sync.impl.ui.showV2PairingError
 import com.duckduckgo.sync.impl.ui.syncV2ConfirmationMessage
 import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command
 import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.AskHostConfirmation
 import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.AskJoinerConfirmation
 import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.Close
-import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.SetFailureResult
-import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.SetSuccessResult
+import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.SetPairingResult
 import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.ShareCode
-import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.ShowMessage
+import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.ShowV1Error
 import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Command.ShowV2Error
 import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Factory
 import com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeViewModel.Factory.Provider
@@ -77,8 +79,13 @@ class DisplayQrCodeActivity : DuckDuckGoActivity() {
 
     private val launchSource get() = intent.getStringExtra(LAUNCH_SOURCE_EXTRA_KEY)
 
+    private val syncEntryPoint
+        get() = requireNotNull(IntentCompat.getSerializableExtra(intent, ORIGINAL_FLOW_EXTRA_KEY, SyncEntryPoint::class.java)) {
+            "Missing intent extra: '$ORIGINAL_FLOW_EXTRA_KEY'"
+        }
+
     private val viewModel by viewModels<DisplayQrCodeViewModel> {
-        Provider(vmFactory, launchSource)
+        Provider(vmFactory, syncEntryPoint, launchSource)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -134,9 +141,8 @@ class DisplayQrCodeActivity : DuckDuckGoActivity() {
             is AskJoinerConfirmation -> showJoinerConfirmationDialog(command.peerName, command.peerKind)
             is ShowMessage -> showMessage(command.message)
             is ShareCode -> shareText(command.code)
-            is SetSuccessResult -> setResult(DisplayQrCodeContract.RESULT_SYNC_SUCCESS)
-            is SetFailureResult -> setResult(DisplayQrCodeContract.RESULT_SYNC_FAILURE)
-            is ShowError -> showError(command)
+            is SetPairingResult -> setResult(SyncPairingResult.RESULT_SYNC_COMPLETED, SyncPairingResult.resultIntent(command.result))
+            is ShowV1Error -> showV1Error(command)
             is ShowV2Error -> showV2Error(command)
             is Close -> finish()
         }
@@ -144,10 +150,10 @@ class DisplayQrCodeActivity : DuckDuckGoActivity() {
 
     private fun showHostConfirmationDialog(peerName: String?, peerKind: PeerKind?) {
         TextAlertDialogBuilder(this)
-            .setTitle(R.string.sync_v2_host_confirmation_title)
+            .setTitle(R.string.sync_simplified_pairing_dialog_host_title)
             .setMessage(syncV2ConfirmationMessage(peerName, peerKind))
-            .setPositiveButton(R.string.sync_v2_host_confirmation_positive)
-            .setNegativeButton(R.string.sync_v2_host_confirmation_negative)
+            .setPositiveButton(R.string.sync_simplified_pairing_dialog_host_primary_button)
+            .setNegativeButton(R.string.sync_simplified_pairing_dialog_host_secondary_button)
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
@@ -164,10 +170,10 @@ class DisplayQrCodeActivity : DuckDuckGoActivity() {
 
     private fun showJoinerConfirmationDialog(peerName: String?, peerKind: PeerKind?) {
         TextAlertDialogBuilder(this)
-            .setTitle(R.string.sync_v2_joiner_confirmation_title)
+            .setTitle(R.string.sync_simplified_pairing_dialog_joiner_title)
             .setMessage(syncV2ConfirmationMessage(peerName, peerKind))
-            .setPositiveButton(R.string.sync_v2_joiner_confirmation_positive)
-            .setNegativeButton(R.string.sync_v2_joiner_confirmation_negative)
+            .setPositiveButton(R.string.sync_simplified_pairing_dialog_joiner_primary_button)
+            .setNegativeButton(R.string.sync_simplified_pairing_dialog_joiner_secondary_button)
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
@@ -190,19 +196,10 @@ class DisplayQrCodeActivity : DuckDuckGoActivity() {
         shareAction.shareText(this, text)
     }
 
-    private fun showError(error: ShowError) {
-        TextAlertDialogBuilder(this)
-            .setTitle(R.string.sync_dialog_error_title)
-            .setMessage(getString(error.message) + "\n" + error.reason)
-            .setPositiveButton(R.string.sync_dialog_error_ok)
-            .addEventListener(
-                object : TextAlertDialogBuilder.EventListener() {
-                    override fun onPositiveButtonClicked() {
-                        viewModel.onErrorDialogDismissed()
-                    }
-                },
-            )
-            .show()
+    private fun showV1Error(error: ShowV1Error) {
+        showV1PairingError(error.content) {
+            viewModel.onErrorDialogDismissed()
+        }
     }
 
     private fun showV2Error(error: ShowV2Error) {
@@ -220,18 +217,21 @@ class DisplayQrCodeActivity : DuckDuckGoActivity() {
     private fun configureEdgeToEdgeInsets() {
         edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
         edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
-        edgeToEdgeHandler.applyNavigationBarInsets(binding.contentScrollView, drawBehindGestureNav = true)
+        edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.contentScrollView)
     }
 
     companion object {
         private const val LAUNCH_SOURCE_EXTRA_KEY = "launch_source"
+        private const val ORIGINAL_FLOW_EXTRA_KEY = "original_flow"
 
         fun intent(
             context: Context,
-            source: String?,
+            syncEntryPoint: SyncEntryPoint,
+            launchSource: String?,
         ): Intent {
             return Intent(context, DisplayQrCodeActivity::class.java).apply {
-                putExtra(LAUNCH_SOURCE_EXTRA_KEY, source)
+                putExtra(ORIGINAL_FLOW_EXTRA_KEY, syncEntryPoint)
+                putExtra(LAUNCH_SOURCE_EXTRA_KEY, launchSource)
             }
         }
     }

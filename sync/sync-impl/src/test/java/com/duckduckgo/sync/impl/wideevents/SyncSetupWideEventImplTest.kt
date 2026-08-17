@@ -20,7 +20,8 @@ import com.duckduckgo.app.statistics.wideevents.CleanupPolicy
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator
 import kotlinx.coroutines.test.runTest
@@ -40,16 +41,15 @@ class SyncSetupWideEventImplTest {
     val coroutineRule = CoroutineTestRule()
 
     private val wideEventClient: WideEventClient = mock()
-    private val syncFeature: SyncFeature = mock()
-    private val toggle: Toggle = mock()
+    private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
     private val deviceAuthenticator: DeviceAuthenticator = mock()
 
     private lateinit var wideEvent: SyncSetupWideEventImpl
 
     @Before
     fun setup() {
-        whenever(syncFeature.sendSyncSetupWideEvent()).thenReturn(toggle)
-        whenever(toggle.isEnabled()).thenReturn(true)
+        syncFeature.sendSyncSetupWideEvent().setRawStoredState(State(true))
+        syncFeature.useSimplifiedSync().setRawStoredState(State(false))
         whenever(deviceAuthenticator.isAuthenticationRequired()).thenReturn(true)
 
         wideEvent = SyncSetupWideEventImpl(
@@ -61,22 +61,37 @@ class SyncSetupWideEventImplTest {
     }
 
     @Test
-    fun `onFlowStarted starts a new flow with correct parameters`() = runTest {
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any()))
+    fun `onFlowStarted starts a new flow with correct ui v1 parameters`() = runTest {
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any()))
             .thenReturn(Result.success(1L))
 
         wideEvent.onFlowStarted()
 
         verify(wideEventClient).flowStart(
             name = "sync-setup",
-            metadata = mapOf("user_auth_required" to "true"),
+            metadata = mapOf("user_auth_required" to "true", "ui_version" to "v1"),
+            cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
+        )
+    }
+
+    @Test
+    fun `onFlowStarted starts a new flow with correct ui v2 parameters`() = runTest {
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any()))
+            .thenReturn(Result.success(1L))
+        syncFeature.useSimplifiedSync().setRawStoredState(State(true))
+
+        wideEvent.onFlowStarted()
+
+        verify(wideEventClient).flowStart(
+            name = "sync-setup",
+            metadata = mapOf("user_auth_required" to "true", "ui_version" to "v2"),
             cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
         )
     }
 
     @Test
     fun `onFlowStarted passes source as flowEntryPoint`() = runTest {
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any()))
             .thenReturn(Result.success(1L))
 
         wideEvent.onFlowStarted(source = "settings")
@@ -84,7 +99,7 @@ class SyncSetupWideEventImplTest {
         verify(wideEventClient).flowStart(
             name = "sync-setup",
             flowEntryPoint = "settings",
-            metadata = mapOf("user_auth_required" to "true"),
+            metadata = mapOf("user_auth_required" to "true", "ui_version" to "v1"),
             cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
         )
     }
@@ -104,7 +119,7 @@ class SyncSetupWideEventImplTest {
 
     @Test
     fun `feature disabled results in no interactions`() = runTest {
-        whenever(toggle.isEnabled()).thenReturn(false)
+        syncFeature.sendSyncSetupWideEvent().setRawStoredState(State(false))
 
         wideEvent.onFlowStarted()
         wideEvent.onIntroScreenShown()

@@ -114,6 +114,7 @@ class AppSyncDeviceIdsTest {
             override var credentialId: String? = null
             override var scopedPassword: ScopedPassword? = null
             override var accountInfoPublicKey: AccountInfoPublicKey? = null
+            override var unifiedDeviceListMigratedForUserId: String? = null
             override fun isEncryptionSupported() = true
 
             override fun isSignedInFlow() = emptyFlow<Boolean>()
@@ -149,6 +150,7 @@ class AppSyncDeviceIdsTest {
             override var credentialId: String? = null
             override var scopedPassword: ScopedPassword? = null
             override var accountInfoPublicKey: AccountInfoPublicKey? = null
+            override var unifiedDeviceListMigratedForUserId: String? = null
             override fun isEncryptionSupported() = true
 
             override fun isSignedInFlow() = emptyFlow<Boolean>()

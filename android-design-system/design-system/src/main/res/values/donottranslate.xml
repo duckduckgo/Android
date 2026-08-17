@@ -23,6 +23,7 @@
     <string name="tab_title_text_input" translatable="false">Text Input</string>
     <string name="tab_title_dialogs" translatable="false">Dialogs</string>
     <string name="tab_title_layouts" translatable="false">Layouts</string>
+    <string name="tab_title_component_navigation" translatable="false">Navigation</string>
     <string name="tab_title_templates" translatable="false">Templates</string>
     <string name="tab_title_component_interactive" translatable="false">Interactive</string>
     <string name="tab_title_component_messaging" translatable="false">Messaging</string>
@@ -66,5 +67,11 @@
     <!-- Duck.ai updates - O-A -->
     <string name="duckAIUpdateTitle">Duck.ai PoC</string>
     <string name="duckAIUpdateMessage">This feature is in active development, intended for feedback purposes.</string>
+
+    <!-- Top App Bars -->
+    <string name="dax_top_app_bar_back_content_description">Back</string>
+    <string name="dax_top_app_bar_close_content_description">Close</string>
+    <string name="dax_top_app_bar_clear_search_content_description">Clear search</string>
+    <string name="dax_top_app_bar_exit_search_content_description">Exit search</string>
 
 </resources>

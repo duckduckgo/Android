@@ -30,11 +30,6 @@ interface DuckAiFeatureState {
     val showInputScreen: StateFlow<Boolean>
 
     /**
-     * Indicates whether opening a New Tab should automatically open the Input Screen. This will only be enabled if [showInputScreen] is also enabled.
-     */
-    val showInputScreenAutomaticallyOnNewTab: StateFlow<Boolean>
-
-    /**
      * Indicates whether the Duck AI shortcut should be shown in the popup menus in the main browser tabs as well as on the tab switcher screen.
      */
     val showPopupMenuShortcut: StateFlow<Boolean>
@@ -60,11 +55,6 @@ interface DuckAiFeatureState {
     val showClearDuckAIChatHistory: StateFlow<Boolean>
 
     /**
-     * Indicates whether the Input Screen should be shown when user open the app from system widgets
-     */
-    val showInputScreenOnSystemSearchLaunch: StateFlow<Boolean>
-
-    /**
      * Indicates whether the Input Mode toggle should be shown in the voice search screen.
      */
     val showVoiceSearchToggle: StateFlow<Boolean>
@@ -74,16 +64,6 @@ interface DuckAiFeatureState {
      * should be shown.
      */
     val showVoiceChatEntry: StateFlow<Boolean>
-
-    /**
-     * Indicates whether Duck.ai should be open in FullScreen mode
-     */
-    val showFullScreenMode: StateFlow<Boolean>
-
-    /**
-     * Indicates whether the FullScreen mode toggle is visible or not
-     */
-    val showFullScreenModeToggle: StateFlow<Boolean>
 
     /**
      * Indicates whether Duck.ai should be open in Contextual mode

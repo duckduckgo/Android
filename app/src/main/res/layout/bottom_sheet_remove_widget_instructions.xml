@@ -139,14 +139,13 @@
                     app:typography="body1" />
             </LinearLayout>
 
-            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary xmlns:tools="http://schemas.android.com/tools"
+            <com.duckduckgo.common.ui.view.button.DaxButtonBrand
                 android:id="@+id/removeWidgetInstructionsDoneButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/keyline_5"
                 android:text="@string/quickSetupBottomSheetDone"
-                android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.Button"
-                tools:ignore="InvalidDaxButtonProperty" />
+                app:daxButtonBrandTypography="duckSans" />
 
         </LinearLayout>
 

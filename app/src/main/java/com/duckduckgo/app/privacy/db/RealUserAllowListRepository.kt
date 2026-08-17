@@ -31,7 +31,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
@@ -43,7 +42,9 @@ class RealUserAllowListRepository @Inject constructor(
     @IsMainProcess isMainProcess: Boolean,
 ) : UserAllowListRepository {
 
-    private val userAllowList = CopyOnWriteArrayList<String>()
+    @Volatile
+    private var userAllowList: List<String> = emptyList()
+
     override fun isUrlInUserAllowList(url: String): Boolean {
         return isUriInUserAllowList(url.toUri())
     }
@@ -62,7 +63,7 @@ class RealUserAllowListRepository @Inject constructor(
 
     override fun domainsInUserAllowListFlow(): Flow<List<String>> {
         return all()
-            .onStart { emit(userAllowList.toList()) }
+            .onStart { emit(userAllowList) }
             .distinctUntilChanged()
     }
 
@@ -81,10 +82,7 @@ class RealUserAllowListRepository @Inject constructor(
     init {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             if (isMainProcess) {
-                all().collect { list ->
-                    userAllowList.clear()
-                    userAllowList.addAll(list)
-                }
+                all().collect { list -> userAllowList = list }
             }
         }
     }

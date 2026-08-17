@@ -62,6 +62,7 @@ class RealDuckAiModelManagerTest {
         whenever(subscriptions.getEntitlements()).thenReturn(entitlementFlow)
         whenever(duckAiHostProvider.getHost()).thenReturn("duck.ai")
         subscriptions.stub { onBlocking { isEligible() }.thenReturn(true) }
+        dataStore.stub { onBlocking { hasClearedPinnedDefaultModel() }.thenReturn(true) }
     }
 
     private fun createManager(): RealDuckAiModelManager {
@@ -93,6 +94,42 @@ class RealDuckAiModelManagerTest {
 
         assertNull(testee.modelState.value.selectedModelId)
         assertNull(testee.modelState.value.selectedModelShortName)
+    }
+
+    @Test
+    fun whenPinnedDefaultModelPersistedThenClearedOnceAndNotRestored() = runTest {
+        whenever(dataStore.hasClearedPinnedDefaultModel()).thenReturn(false)
+        // Second value stands in for the store having been cleared by the migration.
+        whenever(dataStore.getSelectedModel()).thenReturn(SelectedModel("gpt-5.4-mini", "5.4-mini"), null)
+
+        testee = createManager()
+
+        verify(dataStore).setSelectedModel(null)
+        verify(dataStore).setClearedPinnedDefaultModel()
+        assertNull(testee.modelState.value.selectedModelId)
+    }
+
+    @Test
+    fun whenPersistedModelIsNotThePinnedDefaultThenSelectionKept() = runTest {
+        whenever(dataStore.hasClearedPinnedDefaultModel()).thenReturn(false)
+        whenever(dataStore.getSelectedModel()).thenReturn(SelectedModel("claude-haiku-4-5", "Haiku 4.5"))
+
+        testee = createManager()
+
+        verify(dataStore, never()).setSelectedModel(null)
+        verify(dataStore).setClearedPinnedDefaultModel()
+        assertEquals("claude-haiku-4-5", testee.modelState.value.selectedModelId)
+    }
+
+    @Test
+    fun whenPinnedDefaultAlreadyClearedThenLaterPickOfThatModelSurvives() = runTest {
+        whenever(dataStore.hasClearedPinnedDefaultModel()).thenReturn(true)
+        whenever(dataStore.getSelectedModel()).thenReturn(SelectedModel("gpt-5.4-mini", "5.4-mini"))
+
+        testee = createManager()
+
+        verify(dataStore, never()).setSelectedModel(any())
+        assertEquals("gpt-5.4-mini", testee.modelState.value.selectedModelId)
     }
 
     @Test
@@ -202,6 +239,60 @@ class RealDuckAiModelManagerTest {
         testee.fetchModels()
 
         assertEquals("id2", testee.modelState.value.selectedModelId)
+        verify(dataStore, never()).setSelectedModel(any())
+    }
+
+    @Test
+    fun whenNoSelectionPersistedAndListReorderedThenDefaultFollowsNewFirstAccessible() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any())).thenReturn(
+            AIChatModelsResponse(
+                listOf(
+                    remoteModel("id1", accessTier = listOf("free"), entityHasAccess = true),
+                    remoteModel("id2", accessTier = listOf("free"), entityHasAccess = true),
+                ),
+            ),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        assertEquals("id1", testee.modelState.value.selectedModelId)
+
+        whenever(modelsService.getModels(any())).thenReturn(
+            AIChatModelsResponse(
+                listOf(
+                    remoteModel("id2", accessTier = listOf("free"), entityHasAccess = true),
+                    remoteModel("id1", accessTier = listOf("free"), entityHasAccess = true),
+                ),
+            ),
+        )
+
+        testee.fetchModels()
+
+        assertEquals("id2", testee.modelState.value.selectedModelId)
+        verify(dataStore, never()).setSelectedModel(any())
+    }
+
+    @Test
+    fun whenUserPickedModelAndListReorderedThenPickPreserved() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(SelectedModel("id2", "model2"))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any())).thenReturn(
+            AIChatModelsResponse(
+                listOf(
+                    remoteModel("id1", accessTier = listOf("free"), entityHasAccess = true),
+                    remoteModel("id2", accessTier = listOf("free"), entityHasAccess = true),
+                ),
+            ),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        assertEquals("id2", testee.modelState.value.selectedModelId)
+        verify(dataStore, never()).setSelectedModel(any())
     }
 
     @Test
@@ -239,7 +330,7 @@ class RealDuckAiModelManagerTest {
         testee.fetchModels()
 
         assertEquals("id2", testee.modelState.value.selectedModelId)
-        verify(dataStore).setSelectedModel(SelectedModel("id2", "id2"))
+        verify(dataStore).setSelectedModel(null)
     }
 
     @Test
@@ -256,7 +347,7 @@ class RealDuckAiModelManagerTest {
         testee.fetchModels()
 
         assertEquals("id", testee.modelState.value.selectedModelId)
-        verify(dataStore).setSelectedModel(SelectedModel("id", "id"))
+        verify(dataStore).setSelectedModel(null)
     }
 
     @Test

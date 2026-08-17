@@ -1,0 +1,98 @@
+{
+    "m_settings_sync_open": {
+        "description": "The Sync settings screen was opened",
+        "owners": ["MiSikora"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "ui_version",
+                "type": "string",
+                "description": "Which sync setup UI the user is on: v2 when the simplified sync UI is enabled (useSimplifiedSync), v1 on the legacy setup screens",
+                "enum": ["v1", "v2"]
+            }
+        ]
+    },
+    "m_settings_sync_back_up_this_device_tapped": {
+        "description": "User tapped Sync and Back Up This Device on the Sync settings screen",
+        "owners": ["MiSikora"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "ui_version",
+                "type": "string",
+                "description": "Which sync setup UI the user is on: v2 when the simplified sync UI is enabled (useSimplifiedSync), v1 on the legacy setup screens",
+                "enum": ["v1", "v2"]
+            }
+        ]
+    },
+    "m_settings_sync_recover_synced_data_tapped": {
+        "description": "User tapped Recover Your Synced Data on the Sync settings screen",
+        "owners": ["MiSikora"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "ui_version",
+                "type": "string",
+                "description": "Which sync setup UI the user is on: v2 when the simplified sync UI is enabled (useSimplifiedSync), v1 on the legacy setup screens",
+                "enum": ["v1", "v2"]
+            }
+        ]
+    },
+    "m_settings_sync_recovery_confirmed_tapped": {
+        "description": "User confirmed recovering synced data from the recovery flow",
+        "owners": ["MiSikora"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "ui_version",
+                "type": "string",
+                "description": "Which sync setup UI the user is on: v2 when the simplified sync UI is enabled (useSimplifiedSync), v1 on the legacy setup screens",
+                "enum": ["v1", "v2"]
+            }
+        ]
+    },
+    "m_settings_sync_another_device_prompt_shown": {
+        "description": "The prompt asking whether to sync this device only or sync with another device was shown",
+        "owners": ["MiSikora"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "ui_version",
+                "type": "string",
+                "description": "Which sync setup UI the user is on: v2 when the simplified sync UI is enabled (useSimplifiedSync), v1 on the legacy setup screens",
+                "enum": ["v1", "v2"]
+            }
+        ]
+    },
+    "m_settings_sync_another_device_prompt_option_tapped": {
+        "description": "User tapped an option on the sync another device prompt",
+        "owners": ["MiSikora"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "option",
+                "type": "string",
+                "description": "Which option the user chose on the prompt",
+                "enum": ["this_device_only", "sync_another_device"]
+            },
+            {
+                "key": "ui_version",
+                "type": "string",
+                "description": "Which sync setup UI the user is on: v2 when the simplified sync UI is enabled (useSimplifiedSync), v1 on the legacy setup screens",
+                "enum": ["v1", "v2"]
+            }
+        ]
+    }
+}

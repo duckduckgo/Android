@@ -20,7 +20,7 @@ import android.content.ComponentName
 import android.content.Intent
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import junit.framework.TestCase.assertEquals
@@ -418,6 +418,63 @@ class DuckDuckGoAppLinksHandlerTest {
                 appLink = AppLink(uriString = "example.com", appIntent = appIntent),
                 hasGesture = false,
                 clientPackage = "com.different.app",
+                launchAppLink = mockCallback,
+                shouldHaltWebNavigation = true,
+                appLinksEnabled = true,
+            ),
+        )
+        verifyNoInteractions(mockCallback)
+    }
+
+    @Test
+    fun whenNoGestureAndNotTrustedCallerButIsInAlwaysTriggerListThenLaunchAppLink() {
+        testee.isAUserQuery = false
+        testee.previousUrl = "foo.com"
+        assertTrue(
+            testee.handleAppLink(
+                isForMainFrame = true,
+                appLink = AppLink(uriString = "app.digid.nl/something"),
+                hasGesture = false,
+                clientPackage = null,
+                launchAppLink = mockCallback,
+                shouldHaltWebNavigation = true,
+                appLinksEnabled = true,
+            ),
+        )
+        assertEquals("app.digid.nl/something", testee.previousUrl)
+        verify(mockCallback).invoke()
+    }
+
+    @Test
+    fun whenNoGestureAndSameDomainAndHasTriggeredButIsInAlwaysTriggerListThenLaunchAppLink() {
+        testee.isAUserQuery = false
+        testee.hasTriggeredForDomain = true
+        testee.previousUrl = "digid.nl/something"
+        assertTrue(
+            testee.handleAppLink(
+                isForMainFrame = true,
+                appLink = AppLink(uriString = "app.digid.nl/something"),
+                hasGesture = false,
+                clientPackage = null,
+                launchAppLink = mockCallback,
+                shouldHaltWebNavigation = true,
+                appLinksEnabled = true,
+            ),
+        )
+        assertEquals("app.digid.nl/something", testee.previousUrl)
+        verify(mockCallback).invoke()
+    }
+
+    @Test
+    fun whenNoGestureAndNotTrustedCallerAndParentOfAlwaysTriggerDomainThenReturnFalseAndDoNotLaunch() {
+        testee.isAUserQuery = false
+        testee.previousUrl = "foo.com"
+        assertFalse(
+            testee.handleAppLink(
+                isForMainFrame = true,
+                appLink = AppLink(uriString = "digid.nl/something"),
+                hasGesture = false,
+                clientPackage = null,
                 launchAppLink = mockCallback,
                 shouldHaltWebNavigation = true,
                 appLinksEnabled = true,

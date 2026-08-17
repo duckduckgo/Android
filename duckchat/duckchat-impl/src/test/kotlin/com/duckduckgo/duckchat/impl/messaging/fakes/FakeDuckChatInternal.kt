@@ -23,6 +23,7 @@ import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.EditPromptRequest
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -46,8 +47,6 @@ class FakeDuckChatInternal(
     private val showInVoiceSearchUserSetting = MutableStateFlow(false)
     private val showInVoiceChatUserSetting = MutableStateFlow(false)
     private val _chatState = MutableStateFlow(ChatState.READY)
-    private val _inputScreenBottomBarEnabled = MutableStateFlow(false)
-    private val _showMainButtonsInInputScreen = MutableStateFlow(false)
     private val inputScreenUserSettingEnabled = MutableStateFlow(false)
     private val cosmeticInputScreenUserSettingEnabled = MutableStateFlow<Boolean?>(null)
     private val nativeInputFieldUserSettingEnabled = MutableStateFlow(false)
@@ -173,6 +172,14 @@ class FakeDuckChatInternal(
 
     override val showModelPickerEvents: Flow<String> = _showModelPickerEvents.asSharedFlow()
 
+    private val _editPromptRequests = MutableSharedFlow<EditPromptRequest>(extraBufferCapacity = 1)
+
+    override fun requestEditPrompt(request: EditPromptRequest) {
+        _editPromptRequests.tryEmit(request)
+    }
+
+    override val editPromptRequests: Flow<EditPromptRequest> = _editPromptRequests.asSharedFlow()
+
     override fun isImageUploadEnabled(): Boolean = false
 
     override fun isStandaloneMigrationEnabled(): Boolean = false
@@ -180,6 +187,8 @@ class FakeDuckChatInternal(
     override fun isNativeChatInputEnabled(): Boolean = false
 
     override fun isContextualNativeInputEnabled(): Boolean = false
+
+    override fun isNativePromptEditingEnabled(): Boolean = false
 
     override fun keepSessionIntervalInMinutes(): Int = 30
 
@@ -189,15 +198,13 @@ class FakeDuckChatInternal(
 
     override fun isDuckChatContextualModeEnabled(): Boolean = false
 
+    override fun isContextualSheetRedesignEnabled(): Boolean = false
+
     override fun isDuckChatFeatureEnabled(): Boolean = true
 
     override fun isChatSyncFeatureEnabled(): Boolean = true
 
     override fun canHandleOnAiWebView(url: String): Boolean = false
-
-    override val inputScreenBottomBarEnabled: StateFlow<Boolean> = _inputScreenBottomBarEnabled
-
-    override val showMainButtonsInInputScreen: StateFlow<Boolean> = _showMainButtonsInInputScreen
 
     override suspend fun setChatSuggestionsUserSetting(enabled: Boolean) {
         chatSuggestionsUserSettingEnabled.value = enabled

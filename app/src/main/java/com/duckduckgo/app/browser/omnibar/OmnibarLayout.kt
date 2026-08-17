@@ -72,14 +72,14 @@ import com.duckduckgo.app.browser.databinding.IncludeCustomTabToolbarBinding
 import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
 import com.duckduckgo.app.browser.databinding.IncludeNewCustomTabToolbarBinding
 import com.duckduckgo.app.browser.nativeinput.applyDuckAiIconStyling
-import com.duckduckgo.app.browser.omnibar.Omnibar.InputScreenLaunchListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.ItemPressedListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.LogoClickListener
+import com.duckduckgo.app.browser.omnibar.Omnibar.NativeInputLaunchListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
 import com.duckduckgo.app.browser.omnibar.Omnibar.TextListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command
-import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.LaunchInputScreen
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.LaunchNativeInput
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.MoveCaretToFront
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartAdBlockingAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartCookiesAnimation
@@ -234,7 +234,7 @@ class OmnibarLayout @JvmOverloads constructor(
 
     private var omnibarTextListener: TextListener? = null
     private var omnibarItemPressedListener: ItemPressedListener? = null
-    private var omnibarInputScreenLaunchListener: InputScreenLaunchListener? = null
+    private var omnibarNativeInputLaunchListener: NativeInputLaunchListener? = null
     private var omnibarLogoClickedListener: LogoClickListener? = null
 
     private var decoration: Decoration? = null
@@ -592,7 +592,7 @@ class OmnibarLayout @JvmOverloads constructor(
         }
         aiChatMenu?.setOnClickListener {
             viewModel.onDuckChatButtonPressed()
-            omnibarItemPressedListener?.onDuckChatButtonPressed()
+            omnibarItemPressedListener?.onDuckChatButtonPressed(it)
         }
         shieldIcon.setOnClickListener {
             if (isAttachedToWindow) {
@@ -746,8 +746,8 @@ class OmnibarLayout @JvmOverloads constructor(
                 )
             }
 
-            is LaunchInputScreen -> {
-                omnibarInputScreenLaunchListener?.launchInputScreen(query = command.query)
+            is LaunchNativeInput -> {
+                omnibarNativeInputLaunchListener?.launchNativeInput(query = command.query)
             }
 
             is Command.EasterEggLogoClicked -> {
@@ -1636,7 +1636,7 @@ class OmnibarLayout @JvmOverloads constructor(
         // When locked, the click catcher should not launch the input screen.
         if (isLocked) {
             omnibarTextInputClickCatcher.setOnClickListener(null)
-        } else if (omnibarInputScreenLaunchListener != null) {
+        } else if (omnibarNativeInputLaunchListener != null) {
             omnibarTextInputClickCatcher.setOnClickListener {
                 viewModel.onTextInputClickCatcherClicked()
             }
@@ -1657,8 +1657,8 @@ class OmnibarLayout @JvmOverloads constructor(
         (aiChatMenu as? android.widget.ImageView)?.applyDuckAiIconStyling(showContextualSheetIcon)
     }
 
-    override fun setInputScreenLaunchListener(listener: InputScreenLaunchListener) {
-        omnibarInputScreenLaunchListener = listener
+    override fun setNativeInputLaunchListener(listener: NativeInputLaunchListener) {
+        omnibarNativeInputLaunchListener = listener
         omnibarTextInputClickCatcher.setOnClickListener {
             viewModel.onTextInputClickCatcherClicked()
         }

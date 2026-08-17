@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.pixels.remoteconfig
 
+import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject

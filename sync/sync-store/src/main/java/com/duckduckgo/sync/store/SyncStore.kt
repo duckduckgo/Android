@@ -38,6 +38,12 @@ interface SyncStore {
     /** Cached public key for the account's `account_info` protected key, once registered. */
     var accountInfoPublicKey: AccountInfoPublicKey?
 
+    /**
+     * The `userId` this device last completed the unified-device-list migration for, or null if it never has.
+     * Keyed by user so a different account (via switch or re-signin) migrates afresh; [clearAll] wipes it on sign-out.
+     */
+    var unifiedDeviceListMigratedForUserId: String?
+
     fun isEncryptionSupported(): Boolean
     fun isSignedInFlow(): Flow<Boolean>
     fun isSignedIn(): Boolean
@@ -192,6 +198,18 @@ constructor(
             }
         }
 
+    override var unifiedDeviceListMigratedForUserId: String?
+        get() = encryptedPreferences?.getString(KEY_UNIFIED_DEVICE_LIST_MIGRATED_USER_ID, null)
+        set(value) {
+            encryptedPreferences?.edit(commit = true) {
+                if (value == null) {
+                    remove(KEY_UNIFIED_DEVICE_LIST_MIGRATED_USER_ID)
+                } else {
+                    putString(KEY_UNIFIED_DEVICE_LIST_MIGRATED_USER_ID, value)
+                }
+            }
+        }
+
     override fun isEncryptionSupported(): Boolean = encryptedPreferences != null
 
     override fun isSignedInFlow(): Flow<Boolean> = isSignedInStateFlow
@@ -239,5 +257,6 @@ constructor(
         private const val KEY_ACCOUNT_INFO_KID = "KEY_ACCOUNT_INFO_KID"
         private const val KEY_ACCOUNT_INFO_MODULUS = "KEY_ACCOUNT_INFO_MODULUS"
         private const val KEY_ACCOUNT_INFO_EXPONENT = "KEY_ACCOUNT_INFO_EXPONENT"
+        private const val KEY_UNIFIED_DEVICE_LIST_MIGRATED_USER_ID = "KEY_UNIFIED_DEVICE_LIST_MIGRATED_USER_ID"
     }
 }

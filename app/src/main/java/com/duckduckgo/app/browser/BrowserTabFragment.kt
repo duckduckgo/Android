@@ -19,7 +19,6 @@ package com.duckduckgo.app.browser
 import android.Manifest
 import android.animation.LayoutTransition
 import android.annotation.SuppressLint
-import android.app.Activity.RESULT_CANCELED
 import android.app.Activity.RESULT_OK
 import android.content.ActivityNotFoundException
 import android.content.ClipData
@@ -228,7 +227,6 @@ import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.BrowserModeSwitchSource
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
@@ -281,6 +279,7 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_TH
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
+import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.browser.ui.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.browser.ui.browsermenu.BrowserMenuBottomSheet
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
@@ -337,20 +336,11 @@ import com.duckduckgo.downloads.api.DownloadConfirmationDialogListener
 import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatContextual
 import com.duckduckgo.duckchat.api.DuckChatHistoryNoParams
 import com.duckduckgo.duckchat.api.InputMode
-import com.duckduckgo.duckchat.api.inputscreen.BrowserAndInputScreenTransitionProvider
-import com.duckduckgo.duckchat.api.inputscreen.DuckAiOnboardingEndCtaVariant
-import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityParams
-import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultCodes
-import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultParams
-import com.duckduckgo.duckchat.api.inputscreen.InputScreenBrowserButtonsConfig
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InteractionLock
-import com.duckduckgo.duckchat.impl.contextual.DuckChatContextualFragment
-import com.duckduckgo.duckchat.impl.contextual.DuckChatContextualFragment.Companion.KEY_DUCK_AI_CONTEXTUAL_RESULT
-import com.duckduckgo.duckchat.impl.contextual.DuckChatContextualFragment.Companion.KEY_DUCK_AI_URL
 import com.duckduckgo.duckchat.impl.contextual.DuckChatContextualSharedViewModel
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -435,7 +425,8 @@ class BrowserTabFragment :
     EmailProtectionUserPromptListener {
     private val supervisorJob = SupervisorJob()
 
-    private var duckAiContextualFragment: DuckChatContextualFragment? = null
+    private var duckAiContextualFragment: Fragment? = null
+    private var duckChatButtonAnchor: View? = null
     private var contextualSheetLayoutChangeListener: View.OnLayoutChangeListener? = null
     private var contextualSheetBottomSheetCallback: BottomSheetBehavior.BottomSheetCallback? = null
 
@@ -659,22 +650,19 @@ class BrowserTabFragment :
     lateinit var duckChat: DuckChat
 
     @Inject
+    lateinit var duckChatContextual: DuckChatContextual
+
+    @Inject
     lateinit var newAddressBarPickerManager: NewAddressBarPickerManager
 
     @Inject
     lateinit var fireModeAvailability: FireModeAvailability
 
     @Inject
-    lateinit var duckAiFeatureState: DuckAiFeatureState
-
-    @Inject
     lateinit var webViewCapabilityChecker: WebViewCapabilityChecker
 
     @Inject
     lateinit var swipingTabsFeature: SwipingTabsFeatureProvider
-
-    @Inject
-    lateinit var browserAndInputScreenTransitionProvider: BrowserAndInputScreenTransitionProvider
 
     @Inject
     lateinit var androidBrowserConfigFeature: AndroidBrowserConfigFeature
@@ -1070,58 +1058,6 @@ class BrowserTabFragment :
     // see discussion in https://github.com/duckduckgo/Android/pull/4027#discussion_r1433373625
     private val jsOrientationHandler = JsOrientationHandler()
 
-    private val inputScreenLauncher =
-        registerForActivityResult(StartActivityForResult()) { result ->
-            val data = result.data
-            when (result.resultCode) {
-                InputScreenActivityResultCodes.NEW_SEARCH_REQUESTED -> {
-                    data?.getStringExtra(InputScreenActivityResultParams.SEARCH_QUERY_PARAM)?.let { query ->
-                        submitQuery(query)
-                    }
-                }
-
-                InputScreenActivityResultCodes.SWITCH_TO_TAB_REQUESTED -> {
-                    data?.getStringExtra(InputScreenActivityResultParams.TAB_ID_PARAM)?.let { tabId ->
-                        val mode = data.getStringExtra(InputScreenActivityResultParams.TAB_MODE_PARAM)
-                            ?.let { runCatching { BrowserMode.valueOf(it) }.getOrNull() }
-                            ?: browserMode
-                        browserActivity?.openExistingTabInMode(mode, tabId, BrowserModeSwitchSource.ESCAPE_HATCH)
-                    }
-                }
-
-                InputScreenActivityResultCodes.MENU_REQUESTED -> {
-                    val isSplitOmnibarEnabled = omnibarRepository.omnibarType == OmnibarType.SPLIT
-                    launchBrowserMenu(addExtraDelay = isSplitOmnibarEnabled)
-                }
-
-                InputScreenActivityResultCodes.TAB_SWITCHER_REQUESTED -> {
-                    launchTabSwitcher()
-                }
-
-                InputScreenActivityResultCodes.FIRE_BUTTON_REQUESTED -> {
-                    onFireButtonPressed()
-                }
-
-                InputScreenActivityResultCodes.AFTER_INACTIVITY_REQUESTED -> {
-                    globalActivityStarter.start(requireContext(), ShowOnAppLaunchScreenNoParams, requireContext().fadeTransitionConfig())
-                }
-
-                RESULT_CANCELED -> {
-                    data?.getStringExtra(InputScreenActivityResultParams.CANCELED_DRAFT_PARAM)?.let { query ->
-                        omnibar.setDraftTextIfNtpOrSerp(query)
-                    }
-                }
-            }
-
-            // Handle duck.ai end CTA result from InputScreen
-            data?.let { resultData ->
-                if (resultData.hasExtra(InputScreenActivityResultParams.DUCK_AI_ONBOARDING_END_CTA_OK_CLICKED)) {
-                    val okClicked = resultData.getBooleanExtra(InputScreenActivityResultParams.DUCK_AI_ONBOARDING_END_CTA_OK_CLICKED, false)
-                    viewModel.onDuckAiEndCtaInputScreenResult(okClicked)
-                }
-            }
-        }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         logcat { "onCreate called for tabId=$tabId" }
@@ -1177,14 +1113,22 @@ class BrowserTabFragment :
         }
         viewModel.handleExternalLaunch(isLaunchedFromExternalApp)
 
-        viewModel.observeSelectedTab(savedInstanceState != null)
-
         observeSubscriptionEventDataChannel()
+        observeDuckChatJsResponseChannel()
     }
 
     private fun observeSubscriptionEventDataChannel() {
         viewModel.subscriptionEventDataFlow.onEach { subscriptionEventData ->
             contentScopeScripts.sendSubscriptionEvent(subscriptionEventData)
+        }.launchIn(lifecycleScope)
+    }
+
+    // On the Fragment's own lifecycleScope (not viewLifecycleOwner's), so a DuckChat reply held open
+    // while this fragment is stopped (e.g. EditPromptActivity in front) is still delivered rather than
+    // dropped or delayed until the view is recreated.
+    private fun observeDuckChatJsResponseChannel() {
+        viewModel.duckChatJsResponseFlow.onEach { response ->
+            contentScopeScripts.onResponse(response)
         }.launchIn(lifecycleScope)
     }
 
@@ -1262,6 +1206,15 @@ class BrowserTabFragment :
 
         if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BROWSER)) {
             edgeToEdgeHandler.applyNavigationBarInsetsAsMargin(binding.rootView)
+            val hasBottomBar = !tabDisplayedInCustomTabScreen &&
+                (omnibar.omnibarType == OmnibarType.SPLIT || omnibar.omnibarType == OmnibarType.SINGLE_BOTTOM)
+            if (hasBottomBar) {
+                edgeToEdgeHandler.applyNavigationBarScrim(
+                    binding.rootView,
+                    requireContext().getColorFromAttr(com.duckduckgo.mobile.android.R.attr.preferredNavigationBarColor),
+                    coverGestureNav = true,
+                )
+            }
         }
 
         if (savedInstanceState == null) {
@@ -1406,7 +1359,7 @@ class BrowserTabFragment :
         configureItemPressedListener()
         configureCustomTab()
         configureEditModeChangeDetection()
-        configureInputScreenLauncher()
+        configureNativeInputLauncher()
         configureLogoClickListener()
     }
 
@@ -1420,14 +1373,10 @@ class BrowserTabFragment :
         )
     }
 
-    private fun configureInputScreenLauncher() {
-        omnibar.configureInputScreenLaunchListener { query ->
-            if (!nativeInputManager.isNativeInputEnabled()) {
-                launchInputScreen(query, isNewTab = omnibar.viewMode == NewTab, launchOnChat = omnibar.viewMode == ViewMode.DuckAI)
-            } else {
-                removeDuckChatContextualSheet()
-                showNativeInput(query)
-            }
+    private fun configureNativeInputLauncher() {
+        omnibar.configureNativeInputLaunchListener { query ->
+            removeDuckChatContextualSheet()
+            showNativeInput(query)
         }
     }
 
@@ -1539,47 +1488,8 @@ class BrowserTabFragment :
                     launchFilePicker(callback, mimeTypes)
                 },
                 restoreOmnibarAutocomplete = { forQuery -> restoreOmnibarAutocomplete(forQuery) },
-                onContextualSheetRequested = {
-                    viewModel.openDuckAIContextualMode()
-                },
             ),
         )
-    }
-
-    private fun launchInputScreen(
-        query: String,
-        isNewTab: Boolean = false,
-        duckAiEndCtaVariant: DuckAiOnboardingEndCtaVariant = DuckAiOnboardingEndCtaVariant.NONE,
-        launchOnChat: Boolean = false,
-    ) {
-        logcat { "Duck.ai: launchInputScreen" }
-        val isTopOmnibar = omnibar.omnibarType != OmnibarType.SINGLE_BOTTOM
-        val intent =
-            globalActivityStarter.startIntent(
-                requireContext(),
-                InputScreenActivityParams(
-                    query = query,
-                    isTopOmnibar = isTopOmnibar,
-                    browserButtonsConfig = InputScreenBrowserButtonsConfig.Enabled(tabs = viewModel.tabs.value?.size ?: 0),
-                    initialInputMode = if (launchOnChat) {
-                        InputMode.DUCK_AI
-                    } else {
-                        null
-                    },
-                    isNewTab = isNewTab,
-                    showReturnHatch = androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled(),
-                    duckAiOnboardingEndCta = duckAiEndCtaVariant,
-                ),
-            )
-        val enterTransition = browserAndInputScreenTransitionProvider.getInputScreenEnterAnimation(isTopOmnibar)
-        val exitTransition = browserAndInputScreenTransitionProvider.getBrowserExitAnimation(isTopOmnibar)
-        val options =
-            ActivityOptionsCompat.makeCustomAnimation(
-                requireActivity(),
-                enterTransition,
-                exitTransition,
-            )
-        inputScreenLauncher.launch(intent, options)
     }
 
     private fun configureNavigationBar() {
@@ -1949,11 +1859,7 @@ class BrowserTabFragment :
                     it.hideKeyboard()
                     it.clearFocus()
                 }
-                if (duckAiFeatureState.showFullScreenMode.value) {
-                    viewModel.openNewDuckChat(omnibar.viewMode)
-                } else {
-                    viewModel.onDuckChatMenuClicked()
-                }
+                viewModel.openNewDuckChat(omnibar.viewMode)
             }
             onMenuItemClicked(duckAiNewChatMenuItem) {
                 pixel.fire(AppPixelName.SHEET_MENU_AICHAT)
@@ -2166,6 +2072,7 @@ class BrowserTabFragment :
             BottomSheetBehavior.from(binding.duckAiContextualFragmentContainer).removeBottomSheetCallback(it)
         }
         contextualSheetBottomSheetCallback = null
+        duckChatButtonAnchor = null
         browserNavigationBarIntegration.onDestroyView()
         renderer.removeBrandDesignFitListener()
         super.onDestroyView()
@@ -3136,13 +3043,6 @@ class BrowserTabFragment :
             }
 
             is Command.RefreshOmnibar -> renderer.refreshOmnibar()
-            is Command.LaunchInputScreen -> {
-                // if the fire button is used, prevent automatically launching the input screen until the process reloads
-                if ((requireActivity() as? BrowserActivity)?.isDataClearingInProgress == false) {
-                    launchInputScreen(query = "", isNewTab = true, duckAiEndCtaVariant = it.duckAiEndCtaVariant, launchOnChat = it.launchOnChat)
-                }
-            }
-
             is Command.LaunchDuckChatHistory -> globalActivityStarter.start(requireContext(), DuckChatHistoryNoParams)
 
             is Command.ExtractSerpLogo -> extractSerpLogo(webView, it.currentUrl)
@@ -3162,7 +3062,14 @@ class BrowserTabFragment :
                 sharedContextualViewModel.onMainBrowserPageFinished(it.url, androidBrowserConfigFeature.storePageContext().isEnabled())
             }
 
-            is Command.ShowDuckAIContextualMode -> showDuckChatContextualSheet(it.tabId)
+            is Command.ShowDuckAIContextualMode -> {
+                val tabId = it.tabId
+                val anchor = duckChatButtonAnchor
+                duckChatButtonAnchor = null
+                viewLifecycleOwner.lifecycleScope.launch(dispatchers.main()) {
+                    duckChatContextual.launch(tabId, anchor) { showDuckChatContextualSheet(tabId) }
+                }
+            }
             is Command.StartAddressBarTrackersAnimation -> {
                 omnibar.startTrackersAnimation(it.trackerEntities)
             }
@@ -4016,7 +3923,8 @@ class BrowserTabFragment :
                     onOmnibarVoiceSearchPressed()
                 }
 
-                override fun onDuckChatButtonPressed() {
+                override fun onDuckChatButtonPressed(anchor: View) {
+                    duckChatButtonAnchor = anchor
                     val hasFocus = omnibar.omnibarTextInput.hasFocus()
                     val isNtp = omnibar.viewMode == ViewMode.NewTab
                     onOmnibarDuckChatPressed(query = omnibar.getText(), hasFocus = hasFocus, isNtp = isNtp)
@@ -4057,10 +3965,7 @@ class BrowserTabFragment :
 
     private fun createNewContextualFragment(tabId: String) {
         logcat { "Duck.ai Contextual: createNewContextualFragment" }
-        val fragment = DuckChatContextualFragment()
-        val args = Bundle()
-        args.putString(DuckChatContextualFragment.KEY_DUCK_AI_CONTEXTUAL_TAB_ID, tabId)
-        fragment.arguments = args
+        val fragment = duckChatContextual.createSheet(tabId)
 
         duckAiContextualFragment = fragment
         val transaction = childFragmentManager.beginTransaction()
@@ -4071,7 +3976,7 @@ class BrowserTabFragment :
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
     }
 
-    private fun openExistingContextualFragment(fragment: DuckChatContextualFragment) {
+    private fun openExistingContextualFragment(fragment: Fragment) {
         logcat { "Duck.ai Contextual: openExistingContextualFragment" }
         val transaction = childFragmentManager.beginTransaction()
         transaction.show(fragment)
@@ -4081,8 +3986,8 @@ class BrowserTabFragment :
     }
 
     private fun reactToDuckChatContextualSheetResult() {
-        childFragmentManager.setFragmentResultListener(KEY_DUCK_AI_CONTEXTUAL_RESULT, viewLifecycleOwner) { _, bundle ->
-            val contextualChatUrl = bundle.getString(KEY_DUCK_AI_URL)
+        childFragmentManager.setFragmentResultListener(DuckChatContextual.RESULT_KEY, viewLifecycleOwner) { _, bundle ->
+            val contextualChatUrl = bundle.getString(DuckChatContextual.RESULT_URL)
             contextualChatUrl?.let {
                 viewModel.openLinkInNewTab(contextualChatUrl.toUri())
                 removeDuckChatContextualSheet()
@@ -4275,6 +4180,11 @@ class BrowserTabFragment :
                     textZoom = accessibilitySettingsDataStore.fontSize.toInt()
                 }
                 setAlgorithmicDarkeningAllowed(this)
+            }
+
+            lifecycleScope.launch {
+                val stripImeInsets = withContext(dispatchers.io()) { androidBrowserConfigFeature.stripWebViewImeInsets().isEnabled() }
+                it.setStripImeInsetsEnabled(stripImeInsets)
             }
 
             it.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
@@ -6457,14 +6367,12 @@ class BrowserTabFragment :
                         dialog.dismiss()
                         showNewTab()
                         viewModel.onUserClickCtaSecondaryButton(configuration)
-                        viewModel.onPrivacyProSkippedOnboardingDismissed()
                     }
 
                     override fun onCanceled() {
                         dialog.dismiss()
                         showNewTab()
                         viewModel.onUserClickCtaDismissButton(configuration)
-                        viewModel.onPrivacyProSkippedOnboardingDismissed()
                     }
                 }
                 dialog.show()
@@ -6661,6 +6569,8 @@ class BrowserTabFragment :
             addNewTabPageContent()
             newBrowserTab.newTabRootLayout.show()
             newBrowserTab.newTabLayout.show()
+            binding.browserLayout.gone()
+            webViewContainer.gone()
 
             omnibar.setViewMode(ViewMode.NewTab)
             omnibar.isScrollingEnabled = false

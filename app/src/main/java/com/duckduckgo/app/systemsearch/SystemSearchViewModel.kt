@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.systemsearch
 
-import android.content.Intent
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -175,8 +174,6 @@ class SystemSearchViewModel @Inject constructor(
         data object ExitSearch : Command()
 
         data object LaunchDuckAiVoiceChat : Command()
-
-        data class LaunchAssistSearch(val intent: Intent) : Command()
     }
 
     private val isSearchOnly = MutableStateFlow(false)
@@ -260,10 +257,6 @@ class SystemSearchViewModel @Inject constructor(
     fun setLaunchedFromWidget(launchedFromWidget: Boolean) {
         this.launchedFromWidget = launchedFromWidget
     }
-    fun onInputScreenQuerySubmitted(query: String) {
-        fireWidgetSearchMetricIfLaunchedFromWidget(query)
-    }
-
     private fun fireWidgetSearchMetricIfLaunchedFromWidget(query: String) {
         if (launchedFromWidget && query.isNotBlank()) {
             appCoroutineScope.launch { onboardingPromptsExperimentMetrics.fireWidgetSearchMetric() }
@@ -335,14 +328,11 @@ class SystemSearchViewModel @Inject constructor(
         command.value = Command.ExitSearch
     }
 
-    fun onDigitalAssistOpened(intent: Intent) {
+    fun onDigitalAssistOpened() {
         viewModelScope.launch {
-            command.value = when {
-                duckAiFeatureState.allowDuckAiAsDigitalAssistant.value && duckChat.isEnabled() -> {
-                    pixel.fire(AICHAT_VOICE_SESSION_DIGITAL_ASSISTANT_STARTED)
-                    Command.LaunchDuckAiVoiceChat
-                }
-                else -> Command.LaunchAssistSearch(intent)
+            if (duckAiFeatureState.allowDuckAiAsDigitalAssistant.value && duckChat.isEnabled()) {
+                pixel.fire(AICHAT_VOICE_SESSION_DIGITAL_ASSISTANT_STARTED)
+                command.value = Command.LaunchDuckAiVoiceChat
             }
         }
     }

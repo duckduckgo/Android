@@ -18,12 +18,12 @@ package com.duckduckgo.app.browser.postidle
 
 import android.annotation.SuppressLint
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
 import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
+import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
@@ -95,6 +95,7 @@ class RealPostIdleSessionWideEvent @Inject constructor(
                         flowStatus = FlowStatus.Unknown,
                     ),
                     metadata = mapOf(KEY_SURFACE to surface.value),
+                    samplingProbability = SAMPLING_PROBABILITY,
                 )
 
                 result.onSuccess { flowId ->
@@ -222,6 +223,7 @@ class RealPostIdleSessionWideEvent @Inject constructor(
     private companion object {
         const val TAG = "RealPostIdleSessionWideEvent"
         const val FEATURE_NAME = "post_idle_session"
+        const val SAMPLING_PROBABILITY = 0.05f
 
         const val REASON_BAR_USED = "bar_used"
         const val REASON_CHAT_SELECTED = "chat_selected"
