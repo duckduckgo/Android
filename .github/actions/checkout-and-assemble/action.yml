@@ -125,8 +125,6 @@ runs:
         # Two Gradle builds run per job: cleanup evicts the deps the play build never touched,
         # then the internal build reuses its config cache and fails instead of re-downloading them.
         cache-cleanup: never
-        # TEMP: verification only, revert before merge.
-        cache-write-only: true
 
     - name: Assemble release APK
       if: ${{ inputs.flavours == 'all' || inputs.flavours == 'play' }}
