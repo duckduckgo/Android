@@ -145,6 +145,9 @@ class BrowserWebViewClient @Inject constructor(
     var webViewClientListener: WebViewClientListener? = null
     var clientProvider: ClientBrandHintProvider? = null
     private var lastPageStarted: String? = null
+
+    // WebView clears hasGesture() on redirect hops, but the App Link rules assume Chromium's per-navigation gesture flag.
+    private var mainFrameNavigationHadGesture = false
     private var start: Long? = null
     private var lastInterceptedAppSchemeUrl: String? = null
     private var pageCommitVisibleFired: Boolean = false
@@ -238,6 +241,10 @@ class BrowserWebViewClient @Inject constructor(
     ): Boolean {
         try {
             logcat(VERBOSE) { "shouldOverride webViewUrl: ${webView.url} URL: $url" }
+            if (isForMainFrame && !isRedirect) {
+                mainFrameNavigationHadGesture = hasGesture
+            }
+            val hasGestureInNavigation = hasGesture || (isForMainFrame && isRedirect && mainFrameNavigationHadGesture)
             webViewClientListener?.onShouldOverride()
             if (requestInterceptor.shouldOverrideUrlLoading(webViewClientListener, url, webView.url?.toUri(), isForMainFrame)) {
                 return true
@@ -279,7 +286,7 @@ class BrowserWebViewClient @Inject constructor(
                 is SpecialUrlDetector.UrlType.AppLink -> {
                     logcat(INFO) { "Found app link for ${urlType.uriString}" }
                     webViewClientListener?.let { listener ->
-                        return listener.handleAppLink(urlType, isForMainFrame, hasGesture)
+                        return listener.handleAppLink(urlType, isForMainFrame, hasGestureInNavigation)
                     }
                     false
                 }
@@ -374,7 +381,7 @@ class BrowserWebViewClient @Inject constructor(
                             ) {
                                 is SpecialUrlDetector.UrlType.AppLink -> {
                                     loadUrl(listener, webView, urlType.cleanedUrl)
-                                    listener.handleAppLink(parameterStrippedType, isForMainFrame, hasGesture)
+                                    listener.handleAppLink(parameterStrippedType, isForMainFrame, hasGestureInNavigation)
                                 }
 
                                 is SpecialUrlDetector.UrlType.ExtractedAmpLink -> {
