@@ -22,5 +22,12 @@
     <string name="voiceSearchListening">Слушаем вас!</string>
     <string name="voiceSearchListeningFooter">Аудио обрабатывается непосредственно на устройстве, не хранится и не передается никому, даже DuckDuckGo.</string>
     <string name="voiceSearchNegativeAction">Отменить</string>
+    <string name="voiceSearchMicAccessDeniedDialogTitle">DuckDuckGo требуется доступ к вашему микрофону</string>
+    <string name="voiceSearchMicAccessDeniedDialogMessage">Для использования приватного голосового поиска требуется доступ к микрофону.</string>
+    <string name="voiceSearchMicAccessDeniedDialogMessageDuckAi">Для использования приватных голосовых функций требуется доступ к микрофону.</string>
+    <string name="voiceSearchMicAccessDeniedDialogChangePermissions">Изменить разрешения</string>
+    <string name="voiceSearchMicAccessDeniedDialogHideVoiceSearch">Скрыть голосовой поиск</string>
+    <string name="voiceSearchMicPermissionDeniedSnackbarMessage">Для голосовых функций требуется разрешение на доступ к микрофону</string>
+    <string name="voiceSearchMicPermissionDeniedSnackbarAction">Разрешить</string>
     <string name="voiceSearchTitle">Голосовой поиск</string>
 </resources>
