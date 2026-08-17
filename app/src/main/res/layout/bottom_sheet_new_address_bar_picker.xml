@@ -118,16 +118,4 @@
 
     </FrameLayout>
 
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/leftWing"
-        android:layout_width="wrap_content"
-        android:layout_height="160dp"
-        android:adjustViewBounds="true"
-        android:importantForAccessibility="no"
-        app:layout_constrainedWidth="true"
-        app:layout_constraintBottom_toBottomOf="@id/backgroundIllustration"
-        app:layout_constraintStart_toStartOf="parent"
-        app:lottie_loop="false"
-        app:lottie_rawRes="@raw/onboarding_wing_left" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>
