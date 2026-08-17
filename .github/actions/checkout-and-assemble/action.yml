@@ -122,8 +122,9 @@ runs:
       uses: gradle/actions/setup-gradle@v5
       with:
         cache-encryption-key: ${{ inputs.gradle_encryption_key }}
-        # Two Gradle builds run per job: cleanup evicts the deps the play build never touched,
-        # then the internal build reuses its config cache and fails instead of re-downloading them.
+        # Cleanup prunes dependencies a job did not use before saving the cache, which can drop the
+        # internal-only artifacts while the saved configuration cache still points at them. The
+        # restored pair then fails assembleInternalRelease instead of re-downloading.
         cache-cleanup: never
 
     - name: Assemble release APK
