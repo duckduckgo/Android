@@ -27,7 +27,7 @@ import com.duckduckgo.remote.messaging.store.RemoteMessageEntity.Status.SCHEDULE
 import com.duckduckgo.remote.messaging.store.RemoteMessagesDao
 import com.duckduckgo.remote.messaging.store.RemoteMessagingConfigRepository
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.map
 import java.util.concurrent.TimeUnit
 
@@ -90,32 +90,37 @@ class AppRemoteMessagingRepository(
         if (messageEntity == null || messageEntity.message.isEmpty()) return null
 
         val remoteMessage = messageMapper.fromMessage(messageEntity.message) ?: return null
-        if (remoteMessage.isExpired(messageEntity.firstShownDate)) {
-            dismissExpiredMessage(messageEntity.id)
+        if (remoteMessage.shouldBeDismissed(messageEntity)) {
+            dismissMessageSilently(messageEntity.id)
             return null
         }
         return remoteMessage
     }
 
     override fun messageFlow(): Flow<RemoteMessage?> {
-        return remoteMessagesDao.messagesFlow().distinctUntilChanged().map { messageEntity ->
-            if (messageEntity == null || messageEntity.message.isEmpty()) return@map null
+        return remoteMessagesDao.messagesFlow()
+            .distinctUntilChangedBy { it?.id to it?.message }
+            .map { messageEntity ->
+                if (messageEntity == null || messageEntity.message.isEmpty()) return@map null
 
-            val remoteMessage = messageMapper.fromMessage(messageEntity.message) ?: return@map null
-            if (remoteMessage.isExpired(messageEntity.firstShownDate)) {
-                dismissExpiredMessage(messageEntity.id)
-                return@map null
+                val remoteMessage = messageMapper.fromMessage(messageEntity.message) ?: return@map null
+                if (remoteMessage.shouldBeDismissed(messageEntity)) {
+                    dismissMessageSilently(messageEntity.id)
+                    return@map null
+                }
+                RemoteMessage(
+                    id = messageEntity.id,
+                    content = remoteMessage.content,
+                    emptyList(),
+                    emptyList(),
+                    remoteMessage.surfaces,
+                    remoteMessage.displayConditions,
+                )
             }
-            RemoteMessage(
-                id = messageEntity.id,
-                content = remoteMessage.content,
-                emptyList(),
-                emptyList(),
-                remoteMessage.surfaces,
-                remoteMessage.displayConditions,
-            )
-        }
     }
+
+    private fun RemoteMessage.shouldBeDismissed(entity: RemoteMessageEntity): Boolean =
+        isExpired(entity.firstShownDate) || hasReachedImpressionCap(entity.impressions)
 
     private fun RemoteMessage.isExpired(firstShownDate: Long?): Boolean {
         val threshold = displayConditions?.dismissAfterDaysShown?.takeIf { it > 0 } ?: return false
@@ -124,7 +129,13 @@ class AppRemoteMessagingRepository(
         return elapsedDays >= threshold
     }
 
-    private fun dismissExpiredMessage(id: String) {
+    private fun RemoteMessage.hasReachedImpressionCap(impressions: Int): Boolean {
+        val cap = displayConditions?.maxImpressions?.takeIf { it > 0 } ?: return false
+        return impressions >= cap
+    }
+
+    private fun dismissMessageSilently(id: String) {
+        //TODO add pixel for dismiss silently
         remoteMessagesDao.updateState(id, Status.DISMISSED)
         remoteMessagingConfigRepository.invalidate()
     }
