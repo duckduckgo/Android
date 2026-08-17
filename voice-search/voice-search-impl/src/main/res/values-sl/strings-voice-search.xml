@@ -22,5 +22,12 @@
     <string name="voiceSearchListening">Govori zdaj</string>
     <string name="voiceSearchListeningFooter">Zvok bo obdelan v napravi. Zvok ne bo shranjen in ne bo deljen z drugimi, niti z brskalnikom DuckDuckGo.</string>
     <string name="voiceSearchNegativeAction">Preklic</string>
+    <string name="voiceSearchMicAccessDeniedDialogTitle">DuckDuckGo potrebuje dostop do mikrofona</string>
+    <string name="voiceSearchMicAccessDeniedDialogMessage">Dovoljenja za mikrofon so potrebna, če želite uporabljati naše zasebno glasovno iskanje.</string>
+    <string name="voiceSearchMicAccessDeniedDialogMessageDuckAi">Če želite uporabljati naše zasebne glasovne funkcije, so potrebna dovoljenja za mikrofon.</string>
+    <string name="voiceSearchMicAccessDeniedDialogChangePermissions">Sprememba dovoljenj</string>
+    <string name="voiceSearchMicAccessDeniedDialogHideVoiceSearch">Skrij glasovno iskanje</string>
+    <string name="voiceSearchMicPermissionDeniedSnackbarMessage">Za glasovne funkcije je potrebno dovoljenje za mikrofon</string>
+    <string name="voiceSearchMicPermissionDeniedSnackbarAction">Dovoli</string>
     <string name="voiceSearchTitle">Glasovno iskanje</string>
 </resources>
