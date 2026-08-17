@@ -65,6 +65,7 @@ class TrackerDataLoaderTest {
     private val mockAppDatabase: AppDatabase = mock()
     private val mockUrlToTypeMapper: UrlToTypeMapper = mock()
     private val mockEntityLookupRefresher: EntityLookupRefresher = mock()
+    private val mockCloakedCnameRefresher: CloakedCnameRefresher = mock()
 
     private val runnableCaptor = argumentCaptor<Runnable>()
     private val tdsMetaDataCaptor = argumentCaptor<TdsMetadata>()
@@ -84,6 +85,7 @@ class TrackerDataLoaderTest {
             moshi = Moshi.Builder().build(),
             urlToTypeMapper = mockUrlToTypeMapper,
             entityLookupRefresher = mockEntityLookupRefresher,
+            cloakedCnameRefresher = mockCloakedCnameRefresher,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             optimizeTrackerEvaluationRCWrapper = object : OptimizeTrackerEvaluationRCWrapper {
                 override val enabled: Boolean
@@ -116,5 +118,12 @@ class TrackerDataLoaderTest {
         verify(mockTdsDomainEntityDao).updateAll(tdsJson.jsonToDomainEntities())
         verify(mockTdsTrackerDao).updateAll(tdsJson.jsonToTrackers().values)
         verify(mockTdsCnameEntityDao).updateAll(tdsJson.jsonToCnameEntities())
+    }
+
+    @Test
+    fun whenLoadTrackersThenCnameCacheIsRefreshed() {
+        testee.loadTrackers()
+
+        verify(mockCloakedCnameRefresher).refresh()
     }
 }
