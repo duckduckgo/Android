@@ -147,7 +147,7 @@ class BrowserWebViewClient @Inject constructor(
     private var lastPageStarted: String? = null
 
     // WebView clears hasGesture() on redirect hops, but the App Link rules assume Chromium's per-navigation gesture flag.
-    private var mainFrameNavigationHadGesture = false
+    private var mainFrameGestureOriginUrl: String? = null
     private var start: Long? = null
     private var lastInterceptedAppSchemeUrl: String? = null
     private var pageCommitVisibleFired: Boolean = false
@@ -242,9 +242,12 @@ class BrowserWebViewClient @Inject constructor(
         try {
             logcat(VERBOSE) { "shouldOverride webViewUrl: ${webView.url} URL: $url" }
             if (isForMainFrame && !isRedirect) {
-                mainFrameNavigationHadGesture = hasGesture
+                // Anchored to originalUrl, not the request's own URL, so both comparison sides share one source,
+                // stable across a chain's redirects, changes once an unrelated navigation commits.
+                mainFrameGestureOriginUrl = webView.originalUrl.takeIf { hasGesture }
             }
-            val hasGestureInNavigation = hasGesture || (isForMainFrame && isRedirect && mainFrameNavigationHadGesture)
+            val hasGestureInNavigation = hasGesture ||
+                (isForMainFrame && isRedirect && mainFrameGestureOriginUrl != null && mainFrameGestureOriginUrl == webView.originalUrl)
             webViewClientListener?.onShouldOverride()
             if (requestInterceptor.shouldOverrideUrlLoading(webViewClientListener, url, webView.url?.toUri(), isForMainFrame)) {
                 return true
@@ -285,6 +288,10 @@ class BrowserWebViewClient @Inject constructor(
 
                 is SpecialUrlDetector.UrlType.AppLink -> {
                     logcat(INFO) { "Found app link for ${urlType.uriString}" }
+                    if (hasGestureInNavigation) {
+                        // Re-anchor here so a further redirect (e.g. app-not-installed fallback) still carries the gesture, not the stale first hop.
+                        mainFrameGestureOriginUrl = webView.originalUrl
+                    }
                     webViewClientListener?.let { listener ->
                         return listener.handleAppLink(urlType, isForMainFrame, hasGestureInNavigation)
                     }

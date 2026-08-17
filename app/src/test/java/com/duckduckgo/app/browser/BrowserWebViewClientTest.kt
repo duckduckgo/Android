@@ -813,6 +813,33 @@ class BrowserWebViewClientTest {
     }
 
     @Test
+    fun whenRedirectFollowsANavigationDispatchedOutsideShouldOverrideThenStaleGestureIsNotReused() {
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = DDG_URL)
+        whenever(listener.handleAppLink(any(), any(), any())).thenReturn(true)
+
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any()))
+            .thenReturn(SpecialUrlDetector.UrlType.Web(EXAMPLE_URL))
+        val userInitiated = mock<WebResourceRequest>()
+        whenever(userInitiated.url).thenReturn(EXAMPLE_URL.toUri())
+        whenever(userInitiated.isForMainFrame).thenReturn(true)
+        whenever(userInitiated.isRedirect).thenReturn(false)
+        whenever(userInitiated.hasGesture()).thenReturn(true)
+        testee.shouldOverrideUrlLoading(webView, userInitiated)
+
+        // Simulates loadUrl() (omnibar, restore, rewrite): originalUrl advances though shouldOverride is never called for it.
+        (webView as TestWebView).originalUrlOverride = DDG_URL
+
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
+        whenever(webResourceRequest.url).thenReturn(DDG_URL.toUri())
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        whenever(webResourceRequest.isRedirect).thenReturn(true)
+        whenever(webResourceRequest.hasGesture()).thenReturn(false)
+        testee.shouldOverrideUrlLoading(webView, webResourceRequest)
+
+        verify(listener).handleAppLink(urlType, isForMainFrame = true, hasGesture = false)
+    }
+
+    @Test
     fun whenGestureCarriesAcrossMultipleRedirectHopsInSameChainThenHasGestureStaysTrue() {
         val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
         whenever(listener.handleAppLink(any(), any(), any())).thenReturn(true)
@@ -2089,10 +2116,11 @@ class BrowserWebViewClientTest {
         context: Context,
     ) : WebView(context) {
         var webViewUrl: String? = null
+        var originalUrlOverride: String? = EXAMPLE_URL
 
         override fun getUrl(): String? = webViewUrl
 
-        override fun getOriginalUrl(): String = EXAMPLE_URL
+        override fun getOriginalUrl(): String? = originalUrlOverride
 
         override fun getProgress(): Int = 100
     }
