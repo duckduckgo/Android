@@ -56,32 +56,38 @@ class RealCrossProcessLock @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
 ) : CrossProcessLock {
 
-    override suspend fun acquire(key: String, timeout: Duration): Result<Closeable> = try {
-        withTimeout(timeout) {
-            withContext(dispatcherProvider.io()) {
-                val channel = RandomAccessFile(File(context.filesDir, "$key.lock"), "rw").channel
-                try {
-                    var lock = channel.tryLock()
-                    while (lock == null) {
-                        delay(POLL_INTERVAL)
-                        lock = channel.tryLock()
+    override suspend fun acquire(key: String, timeout: Duration): Result<Closeable> {
+        var handle: FileLockHandle? = null
+        return try {
+            withTimeout(timeout) {
+                withContext(dispatcherProvider.io()) {
+                    val channel = RandomAccessFile(File(context.filesDir, "$key.lock"), "rw").channel
+                    try {
+                        var lock = channel.tryLock()
+                        while (lock == null) {
+                            delay(POLL_INTERVAL)
+                            lock = channel.tryLock()
+                        }
+                        logcat(tag = LOG_TAG) { "Lock acquired: $key" }
+                        Result.success(FileLockHandle(key, channel, lock).also { handle = it })
+                    } catch (e: Throwable) {
+                        runCatching { channel.close() }
+                        throw e
                     }
-                    logcat(tag = LOG_TAG) { "Lock acquired: $key" }
-                    Result.success(FileLockHandle(key, channel, lock))
-                } catch (e: Throwable) {
-                    runCatching { channel.close() }
-                    throw e
                 }
             }
+        } catch (e: TimeoutCancellationException) {
+            handle?.close()
+            logcat(tag = LOG_TAG, priority = WARN) { "Timed out acquiring lock: $key" }
+            Result.failure(e)
+        } catch (e: CancellationException) {
+            handle?.close()
+            throw e
+        } catch (e: Exception) {
+            handle?.close()
+            logcat(tag = LOG_TAG, priority = WARN) { "Lock acquisition failed: $key ${e.asLog()}" }
+            Result.failure(e)
         }
-    } catch (e: TimeoutCancellationException) {
-        logcat(tag = LOG_TAG, priority = WARN) { "Timed out acquiring lock: $key" }
-        Result.failure(e)
-    } catch (e: CancellationException) {
-        throw e
-    } catch (e: Exception) {
-        logcat(tag = LOG_TAG, priority = WARN) { "Lock acquisition failed: $key ${e.asLog()}" }
-        Result.failure(e)
     }
 
     private class FileLockHandle(

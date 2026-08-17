@@ -18,7 +18,14 @@ package com.duckduckgo.subscriptions.impl.auth2
 
 import android.content.Context
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.DispatcherProvider
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -26,6 +33,7 @@ import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import java.io.Closeable
 import java.io.File
 import java.io.RandomAccessFile
 
@@ -112,5 +120,38 @@ class RealCrossProcessLockTest {
 
         handle.close()
         handle.close()
+    }
+
+    @Test
+    fun `when cancellation races successful acquisition then lock is released`() = runTest {
+        val ioDispatcher = StandardTestDispatcher(testScheduler)
+        val lock = RealCrossProcessLock(
+            context,
+            object : DispatcherProvider {
+                override fun computation(): CoroutineDispatcher = ioDispatcher
+                override fun io(): CoroutineDispatcher = ioDispatcher
+                override fun main(): CoroutineDispatcher = ioDispatcher
+                override fun unconfined(): CoroutineDispatcher = ioDispatcher
+            },
+        )
+
+        // UNDISPATCHED runs acquire() up to the withContext(io) dispatch, queueing lock acquisition;
+        // the canceller is queued behind it, so cancellation lands after the lock is acquired but
+        // before the result crosses the withContext boundary, where prompt cancellation discards it.
+        var result: Result<Closeable>? = null
+        val job = launch(start = CoroutineStart.UNDISPATCHED) {
+            result = lock.acquire("test_key")
+        }
+        launch { job.cancel() }
+        testScheduler.runCurrent()
+
+        assertTrue(File(temporaryFolder.root, "test_key.lock").exists())
+        assertNull(result)
+        assertTrue(job.isCancelled)
+
+        // A leaked lock would make this same-JVM tryLock throw OverlappingFileLockException
+        RandomAccessFile(File(temporaryFolder.root, "test_key.lock"), "rw").channel.use { channel ->
+            assertNotNull(runCatching { channel.tryLock() }.getOrNull())
+        }
     }
 }
