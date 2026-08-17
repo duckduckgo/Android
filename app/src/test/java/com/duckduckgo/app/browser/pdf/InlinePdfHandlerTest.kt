@@ -21,13 +21,10 @@ import android.net.Uri
 import android.webkit.CookieManager
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.CookieManagerProvider
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.async
@@ -68,7 +65,6 @@ class InlinePdfHandlerTest {
 
     private lateinit var inlinePdfHandler: RealInlinePdfHandler
     private lateinit var server: MockWebServer
-    private val androidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
 
     private val cookieManagerProvider = object : CookieManagerProvider {
         override fun forMode(mode: BrowserMode): CookieManager? = null
@@ -82,9 +78,7 @@ class InlinePdfHandlerTest {
             okHttpClient = OkHttpClient(),
             cookieManagerProvider = cookieManagerProvider,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
-            androidBrowserConfigFeature = androidBrowserConfigFeature,
         )
-        androidBrowserConfigFeature.pdfViewer().setRawStoredState(State(enable = true))
         server = MockWebServer()
         server.start()
     }
@@ -255,18 +249,6 @@ class InlinePdfHandlerTest {
 
     // endregion
 
-    // region feature flag tests
-
-    @Test
-    fun whenFeatureDisabledThenDecisionIsNotApplicable() {
-        androidBrowserConfigFeature.pdfViewer().setRawStoredState(State(enable = false))
-
-        assertEquals(
-            PdfRenderDecision.NotApplicable,
-            inlinePdfHandler.classifyPdfRequest("https://example.com/doc.pdf", null, "application/pdf"),
-        )
-    }
-
     @Test
     fun whenPdfAlreadyCachedThenReturnsWithoutNetworkRequest() = runTest {
         val pdfBytes = "%PDF-1.4 test content".toByteArray()
@@ -402,7 +384,6 @@ class InlinePdfHandlerTest {
             okHttpClient = OkHttpClient(),
             cookieManagerProvider = cookieAwareProvider,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
-            androidBrowserConfigFeature = androidBrowserConfigFeature,
         )
 
         val pdfBytes = "%PDF-1.4 test content".toByteArray()
@@ -444,7 +425,6 @@ class InlinePdfHandlerTest {
             okHttpClient = OkHttpClient(),
             cookieManagerProvider = mainThreadOnlyProvider,
             dispatcherProvider = dispatchers,
-            androidBrowserConfigFeature = androidBrowserConfigFeature,
         )
 
         val pdfBytes = "%PDF-1.4 test content".toByteArray()
@@ -514,7 +494,6 @@ class InlinePdfHandlerTest {
             okHttpClient = throwingClient,
             cookieManagerProvider = cookieManagerProvider,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
-            androidBrowserConfigFeature = androidBrowserConfigFeature,
         )
 
         val result = handlerWithFailingDns.downloadToCache("https://example.com/test.pdf", browserMode = BrowserMode.REGULAR)
@@ -713,7 +692,6 @@ class InlinePdfHandlerTest {
             okHttpClient = OkHttpClient(),
             cookieManagerProvider = cookieManagerProvider,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
-            androidBrowserConfigFeature = androidBrowserConfigFeature,
         )
 
         val result = handler.cacheLocalPdf(source)
@@ -740,7 +718,6 @@ class InlinePdfHandlerTest {
             okHttpClient = OkHttpClient(),
             cookieManagerProvider = cookieManagerProvider,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
-            androidBrowserConfigFeature = androidBrowserConfigFeature,
         )
 
         val result = handler.cacheLocalPdf(source)
@@ -765,7 +742,6 @@ class InlinePdfHandlerTest {
             okHttpClient = OkHttpClient(),
             cookieManagerProvider = cookieManagerProvider,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
-            androidBrowserConfigFeature = androidBrowserConfigFeature,
         )
 
         val result = handler.cacheLocalPdf(source)
@@ -790,7 +766,6 @@ class InlinePdfHandlerTest {
             okHttpClient = OkHttpClient(),
             cookieManagerProvider = cookieManagerProvider,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
-            androidBrowserConfigFeature = androidBrowserConfigFeature,
         )
 
         val result = handler.cacheLocalPdf(sourceUri)
@@ -819,7 +794,6 @@ class InlinePdfHandlerTest {
             okHttpClient = OkHttpClient(),
             cookieManagerProvider = cookieManagerProvider,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
-            androidBrowserConfigFeature = androidBrowserConfigFeature,
         )
 
         val result = handler.cacheLocalPdf(source)
