@@ -82,7 +82,7 @@ class RealNativeInputManagerTest {
     private val edgeToEdgeProvider: EdgeToEdgeProvider = mock()
     private val edgeToEdgeHandler = EdgeToEdgeHandler()
     private val nativeInputStateBugKillSwitch = FakeFeatureToggleFactory.create(NativeInputStateBugKillSwitch::class.java)
-    private val nativeInputSearchOnlyFeature = FakeFeatureToggleFactory.create(NativeInputSearchOnlyFeature::class.java)
+    private val nativeInputOmnibarFeature = FakeFeatureToggleFactory.create(NativeInputOmnibarFeature::class.java)
 
     private val context: Context = ApplicationProvider.getApplicationContext()
     private val rootView: ViewGroup = FrameLayout(context)
@@ -97,7 +97,7 @@ class RealNativeInputManagerTest {
     fun setUp() {
         whenever(duckChatInputModeState.inputModeCapability).thenReturn(inputModeCapabilityFlow)
         whenever(duckChat.observeNativeInputNavBarEnabled()).thenReturn(MutableStateFlow(false))
-        nativeInputSearchOnlyFeature.self().setRawStoredState(State(enable = false))
+        nativeInputOmnibarFeature.self().setRawStoredState(State(enable = false))
         testee = RealNativeInputManager(
             duckChat,
             animator,
@@ -108,7 +108,7 @@ class RealNativeInputManagerTest {
             duckChatInputModeState,
             pixel,
             nativeInputStateBugKillSwitch,
-            nativeInputSearchOnlyFeature,
+            nativeInputOmnibarFeature,
             nativeInputEventListener,
             edgeToEdgeProvider,
             edgeToEdgeHandler,

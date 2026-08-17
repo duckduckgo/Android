@@ -31,7 +31,7 @@ import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.menu.BrowserMenuHighlight
 import com.duckduckgo.app.browser.menu.BrowserViewMode
-import com.duckduckgo.app.browser.nativeinput.NativeInputSearchOnlyFeature
+import com.duckduckgo.app.browser.nativeinput.NativeInputOmnibarFeature
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Browser
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.CustomTab
@@ -126,7 +126,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val addressBarTrackersAnimationManager: AddressBarTrackersAnimationManager,
     private val standardizedLeadingIconToggle: StandardizedLeadingIconFeatureToggle,
     private val progressBarUpgradeFeature: ProgressBarUpgradeFeature,
-    private val nativeInputSearchOnlyFeature: NativeInputSearchOnlyFeature,
+    private val nativeInputOmnibarFeature: NativeInputOmnibarFeature,
     private val browserMode: BrowserMode,
 ) : ViewModel() {
 
@@ -358,7 +358,10 @@ class OmnibarLayoutViewModel @Inject constructor(
             duckChat.observeNativeInputFieldUserSettingEnabled(),
             duckChat.observeNativeChatInputEnabled(),
             duckChatInputModeState.inputModeCapability,
-            nativeInputSearchOnlyFeature.self().enabled(),
+            combine(
+                nativeInputOmnibarFeature.self().enabled(),
+                nativeInputOmnibarFeature.nativeInputSearchOnly().enabled(),
+            ) { self, searchOnly -> self && searchOnly },
         ) { nativeInputEnabled, nativeChatInputEnabled, inputModeCapability, searchOnlyRestoreEnabled ->
             _viewState.update {
                 it.copy(

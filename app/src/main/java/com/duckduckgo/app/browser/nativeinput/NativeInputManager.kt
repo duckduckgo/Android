@@ -188,7 +188,7 @@ class RealNativeInputManager @Inject constructor(
     private val duckChatInputModeState: DuckChatInputModeState,
     private val pixel: Pixel,
     private val nativeInputStateBugKillSwitch: NativeInputStateBugKillSwitch,
-    private val nativeInputSearchOnlyFeature: NativeInputSearchOnlyFeature,
+    private val nativeInputOmnibarFeature: NativeInputOmnibarFeature,
     private val nativeInputEventListener: NativeInputEventListener,
     private val edgeToEdgeProvider: EdgeToEdgeProvider,
     private val edgeToEdgeHandler: EdgeToEdgeHandler,
@@ -277,7 +277,7 @@ class RealNativeInputManager @Inject constructor(
                 // the browser omnibar, whose two search layouts differ. An active Duck.ai input is unaffected,
                 // so just refresh its nav bar.
                 val rebuildOnRefocus = !isNativeInputActive() ||
-                    (nativeInputSearchOnlyFeature.self().isEnabled() && !omnibarController.isDuckAiMode())
+                    (isSearchOnlyRestoreEnabled() && !omnibarController.isDuckAiMode())
                 if (rebuildOnRefocus) {
                     hideNativeInput(animate = false)
                 } else {
@@ -302,8 +302,11 @@ class RealNativeInputManager @Inject constructor(
         val inDuckAi = ::omnibarController.isInitialized && omnibarController.isDuckAiMode()
         return inDuckAi ||
             inputModeCapability == NativeInputState.InputMode.SEARCH_AND_DUCK_AI ||
-            (nativeInputSearchOnlyFeature.self().isEnabled() && inputModeCapability == NativeInputState.InputMode.SEARCH_ONLY)
+            (isSearchOnlyRestoreEnabled() && inputModeCapability == NativeInputState.InputMode.SEARCH_ONLY)
     }
+
+    private fun isSearchOnlyRestoreEnabled(): Boolean =
+        nativeInputOmnibarFeature.self().isEnabled() && nativeInputOmnibarFeature.nativeInputSearchOnly().isEnabled()
 
     override fun isNativeInputShown(): Boolean {
         if (!::rootView.isInitialized) return false
