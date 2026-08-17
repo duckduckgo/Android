@@ -1,8 +1,8 @@
 {
   "name": "People Search Now",
   "url": "peoplesearchnow.com",
-  "version": "0.7.0",
-  "parent": "peoplefinders.com",
+  "version": "0.8.0",
+  "parent": "cyberbackgroundchecks.com",
   "addedDatetime": 1705989600000,
   "optOutUrl": "https://www.peoplesearchnow.com/opt-out",
   "steps": [

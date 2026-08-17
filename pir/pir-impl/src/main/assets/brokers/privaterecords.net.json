@@ -1,7 +1,7 @@
 {
   "name": "PrivateRecords",
   "url": "privaterecords.net",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "parent": "privatereports.com",
   "optOutUrl": "https://www.privaterecords.net/optOut/name/landing",
   "steps": [
@@ -13,17 +13,6 @@
           "actionType": "navigate",
           "url": "https://www.privaterecords.net/name/search-result",
           "id": "4ccf82e4-9cce-439a-8f37-7371cf762c2a"
-        },
-        {
-          "actionType": "expectation",
-          "_comment": "wait for cloudflare check to pass - we are using a negative xpath selector to ensure the challenge is not being displayed",
-          "expectations": [
-            {
-              "type": "element",
-              "selector": "//body[not(.//script[contains(@src,'/cdn-cgi/challenge-platform/')] or .//script[contains(., '_cf_chl_opt')] or .//script[contains(@src,'challenges.cloudflare.com/turnstile')] or .//input[@name='cf-turnstile-response'] or .//iframe[contains(@src,'challenges.cloudflare.com')] or .//div[@id='cf-error-details'])]"
-            }
-          ],
-          "id": "cfc-c1a79f04-38ed-43db-88c0-b3b49db6fea0"
         },
         {
           "actionType": "expectation",
@@ -72,6 +61,17 @@
             }
           ],
           "id": "cdba1374-4bdd-41c3-b1fb-a135c6accd37"
+        },
+        {
+          "actionType": "expectation",
+          "_comment": "wait for cloudflare check to pass - we are using a negative xpath selector to ensure the challenge is not being displayed",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//script[contains(@src,'/cdn-cgi/challenge-platform/')] or .//script[contains(., '_cf_chl_opt')] or .//script[contains(@src,'challenges.cloudflare.com/turnstile')] or .//input[@name='cf-turnstile-response'] or .//iframe[contains(@src,'challenges.cloudflare.com')] or .//div[@id='cf-error-details'])]"
+            }
+          ],
+          "id": "cfc-c1a79f04-38ed-43db-88c0-b3b49db6fea0"
         },
         {
           "_comment": "Turnstile auto-completes. This one should disappear after clicking, so we'll use a negative selector to ensure it's not present.",
