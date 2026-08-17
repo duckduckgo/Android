@@ -426,7 +426,8 @@
             {
                 "key": "idle_threshold_seconds",
                 "type": "integer",
-                "description": "The resolved idle threshold in seconds (user preference, remote-config default, or hardcoded default), e.g. 1800"
+                "description": "The resolved idle threshold in seconds (user preference, remote-config default, or hardcoded default)",
+                "enum": [0, 60, 300, 600, 1800, 3600, 43200, 86400]
             },
             {
                 "key": "after_inactivity_option",
