@@ -441,6 +441,8 @@ class DuckChatContextualFragment :
                                             if (method == RealDuckChatJSHelper.METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA) {
                                                 logcat { "Duck.ai: requesting page context after chat fully loaded" }
                                                 sharedContextualViewModel.requestPageContext()
+                                                // Submit any prompt handed over from the entry dialog now that the web app is ready.
+                                                viewModel.onWebAppReady()
                                             }
                                         }
                                     }

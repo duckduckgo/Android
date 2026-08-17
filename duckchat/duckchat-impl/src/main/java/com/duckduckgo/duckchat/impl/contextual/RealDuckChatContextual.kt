@@ -22,6 +22,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.findFragment
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.di.scopes.AppScope
@@ -88,8 +89,28 @@ class RealDuckChatContextual @Inject constructor(
         val popup = PopupMenu(LayoutInflater.from(activity), R.layout.popup_contextual_chat_menu)
         val content = popup.contentView
         popup.onMenuItemClicked(content.findViewById(R.id.contextualChatMenuNewChat)) { openNewChatTab(activity, sourceTabId) }
-        popup.onMenuItemClicked(content.findViewById(R.id.contextualChatMenuAskAboutPage)) { onAskAboutPage() }
+        popup.onMenuItemClicked(content.findViewById(R.id.contextualChatMenuAskAboutPage)) {
+            showEntryDialog(anchor, sourceTabId, onAskAboutPage)
+        }
         popup.showAnchoredView(activity, anchor.rootView, anchor)
+    }
+
+    private fun showEntryDialog(
+        anchor: View,
+        sourceTabId: String,
+        onAskAboutPage: () -> Unit,
+    ) {
+        // Attach the dialog to the host fragment (the one owning the anchor) so it shares the host's
+        // DuckChatContextualSharedViewModel — the same page-context plumbing the sheet uses.
+        val hostFragment = runCatching { anchor.findFragment<Fragment>() }.getOrNull()
+        val fragmentManager = hostFragment?.childFragmentManager
+        if (fragmentManager == null || fragmentManager.isStateSaved) {
+            // No fragment host to attach to; fall back to showing the sheet directly.
+            onAskAboutPage()
+            return
+        }
+        DuckChatContextualEntryDialog.newInstance(sourceTabId, onAskAboutPage)
+            .show(fragmentManager, DuckChatContextualEntryDialog.TAG)
     }
 
     private fun openNewChatTab(activity: Activity, sourceTabId: String) {

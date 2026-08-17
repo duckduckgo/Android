@@ -60,6 +60,10 @@ class ContextualSuggestionsView @JvmOverloads constructor(
 
     var onContentChanged: (() -> Unit)? = null
 
+    /** Optional per-instance override for the suggestion chip background; null keeps the item layout's default. */
+    @DrawableRes
+    var chipBackgroundRes: Int? = null
+
     private val loadingView = ContextualSuggestionsLoadingView(context)
     private val cardsContainer = LinearLayout(context).apply { orientation = VERTICAL }
 
@@ -121,7 +125,12 @@ class ContextualSuggestionsView @JvmOverloads constructor(
     fun hasContent(): Boolean = loadingView.isVisible || cardsContainer.isNotEmpty()
 
     private fun render(viewState: ContextualSuggestionsViewModel.ViewState) {
-        if (viewState.loading) loadingView.show() else loadingView.gone()
+        if (viewState.loading) {
+            chipBackgroundRes?.let { loadingView.setBackgroundResource(it) }
+            loadingView.show()
+        } else {
+            loadingView.gone()
+        }
 
         cardsContainer.removeAllViews()
         if (!viewState.loading && viewState.suggestions.isNotEmpty()) {
@@ -130,6 +139,7 @@ class ContextualSuggestionsView @JvmOverloads constructor(
                 val itemBinding = ItemContextualSuggestionBinding.inflate(inflater, cardsContainer, false)
                 itemBinding.suggestionLabel.text = suggestion.label
                 itemBinding.suggestionLabel.setCompoundDrawablesRelativeWithIntrinsicBounds(iconResFor(suggestion.icon), 0, 0, 0)
+                chipBackgroundRes?.let { itemBinding.suggestionLabel.setBackgroundResource(it) }
                 itemBinding.root.setOnClickListener {
                     viewModel.onSuggestionSelected(suggestion.id)
                     onSuggestionSelected?.invoke(suggestion)

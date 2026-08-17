@@ -83,6 +83,7 @@ class DuckChatContextualViewModelTest {
     private val modelManager: com.duckduckgo.duckchat.impl.models.DuckAiModelManager = mock()
     private val contextualNativeInputManager: ContextualNativeInputManager = mock()
     private val chatHistoryRepository: ChatHistoryRepository = mock()
+    private val contextualEntryPromptStore: ContextualEntryPromptStore = mock()
     private val recentChatsFlow = MutableStateFlow<List<ChatHistoryItem>>(emptyList())
     private val context: Context = ApplicationProvider.getApplicationContext()
 
@@ -441,6 +442,7 @@ class DuckChatContextualViewModelTest {
                     modelManager = modelManager,
                     contextualNativeInputManager = contextualNativeInputManager,
                     chatHistoryRepository = chatHistoryRepository,
+                    contextualEntryPromptStore = contextualEntryPromptStore,
                     context = context,
                 )
 
@@ -848,6 +850,7 @@ class DuckChatContextualViewModelTest {
                     modelManager = modelManager,
                     contextualNativeInputManager = contextualNativeInputManager,
                     chatHistoryRepository = chatHistoryRepository,
+                    contextualEntryPromptStore = contextualEntryPromptStore,
                     context = context,
                 )
 
@@ -889,6 +892,7 @@ class DuckChatContextualViewModelTest {
                     modelManager = modelManager,
                     contextualNativeInputManager = contextualNativeInputManager,
                     chatHistoryRepository = chatHistoryRepository,
+                    contextualEntryPromptStore = contextualEntryPromptStore,
                     context = context,
                 )
 
@@ -2618,6 +2622,7 @@ class DuckChatContextualViewModelTest {
         modelManager = modelManager,
         contextualNativeInputManager = contextualNativeInputManager,
         chatHistoryRepository = chatHistoryRepository,
+        contextualEntryPromptStore = contextualEntryPromptStore,
         context = context,
     )
 
