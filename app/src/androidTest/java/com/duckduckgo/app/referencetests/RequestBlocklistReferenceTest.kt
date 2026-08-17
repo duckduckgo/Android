@@ -54,6 +54,7 @@ import com.duckduckgo.app.trackerdetection.db.TdsCnameEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
 import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
+import com.duckduckgo.app.trackerdetection.flags.OptimizeCnameDetectionRCWrapper
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.FileUtilities
@@ -117,6 +118,9 @@ class RequestBlocklistReferenceTest(private val testCase: TestCase) {
     private lateinit var testee: WebViewRequestInterceptor
 
     private val resourceSurrogates = ResourceSurrogatesImpl()
+    private val cachedCnameLookupEnabled = object : OptimizeCnameDetectionRCWrapper {
+        override val enabled: Boolean = true
+    }
     private var webView: WebView = mock()
     private val userAllowlistDao: UserAllowListDao = mock()
     private val contentBlockingRepository: ContentBlockingRepository = mock()
@@ -220,7 +224,12 @@ class RequestBlocklistReferenceTest(private val testCase: TestCase) {
             gpc = mockGpc,
             userAgentProvider = userAgentProvider,
             adClickManager = mockAdClickManager,
-            cloakedCnameDetector = CloakedCnameDetectorImpl(tdsCnameEntityDao, trackerAllowlist, userAllowListRepository),
+            cloakedCnameDetector = CloakedCnameDetectorImpl(
+                tdsCnameEntityDao,
+                trackerAllowlist,
+                userAllowListRepository,
+                cachedCnameLookupEnabled,
+            ),
             requestFilterer = mockRequestFilterer,
             requestBlocklist = requestBlocklist,
             contentBlocking = contentBlocking,
