@@ -85,7 +85,7 @@ val Uri.isLocalUrl: Boolean
         if (host == "localhost") return true
 
         // Use InetAddresses.parseNumericAddress (API 29+) which only parses numeric IPs
-        // and never performs DNS resolution. On API 26-28, fall back to strict IPv4-only
+        // and never performs DNS resolution. On API 28, fall back to strict IPv4-only
         // validation to avoid InetAddress.getByName() which can trigger DNS lookups.
         val addr = if (Build.VERSION.SDK_INT >= 29) {
             runCatching { android.net.InetAddresses.parseNumericAddress(host) }.getOrNull()
