@@ -22,5 +22,12 @@
     <string name="voiceSearchListening">Vorbește acum</string>
     <string name="voiceSearchListeningFooter">Componenta audio este prelucrată pe dispozitiv. Nu este stocată sau distribuită nimănui, nici DuckDuckGo.</string>
     <string name="voiceSearchNegativeAction">Anulează</string>
+    <string name="voiceSearchMicAccessDeniedDialogTitle">DuckDuckGo are nevoie de acces la microfon</string>
+    <string name="voiceSearchMicAccessDeniedDialogMessage">Sunt necesare permisiunile pentru microfon dacă vrei să folosești căutarea vocală privată.</string>
+    <string name="voiceSearchMicAccessDeniedDialogMessageDuckAi">Sunt necesare permisiunile pentru microfon dacă vrei să folosești funcțiile vocale private.</string>
+    <string name="voiceSearchMicAccessDeniedDialogChangePermissions">Modifică permisiunile</string>
+    <string name="voiceSearchMicAccessDeniedDialogHideVoiceSearch">Ascunde căutarea vocală</string>
+    <string name="voiceSearchMicPermissionDeniedSnackbarMessage">Este necesară permisiunea pentru microfon în scopul de a utiliza funcțiile vocale</string>
+    <string name="voiceSearchMicPermissionDeniedSnackbarAction">Permite</string>
     <string name="voiceSearchTitle">Căutare vocală</string>
 </resources>
