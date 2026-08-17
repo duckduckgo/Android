@@ -20,7 +20,6 @@ import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.ToggleSelection
-import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.helper.DuckChatTermsOfServiceHandler
 import com.duckduckgo.duckchat.impl.metric.DuckAiMetricCollector
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
@@ -29,7 +28,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 
 class RealDuckChatPixelsToolsTest {
 
@@ -37,14 +35,12 @@ class RealDuckChatPixelsToolsTest {
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val pixel: Pixel = mock()
-    private val duckChatInternal: DuckChatInternal = mock()
     private val duckChatFeatureRepository: DuckChatFeatureRepository = mock()
     private val statisticsUpdater: StatisticsUpdater = mock()
     private val duckAiMetricCollector: DuckAiMetricCollector = mock()
     private val termsOfServiceHandler: DuckChatTermsOfServiceHandler = mock()
 
     private val testee = RealDuckChatPixels(
-        duckChatInternal = duckChatInternal,
         pixel = pixel,
         duckChatFeatureRepository = duckChatFeatureRepository,
         appCoroutineScope = coroutineTestRule.testScope,
@@ -150,6 +146,7 @@ class RealDuckChatPixelsToolsTest {
             hasFileAttachment = false,
             hasText = true,
             surface = DuckChatPixelSurface.CONTEXTUAL_CHAT,
+            defaultMode = null,
         )
 
         val params = mapOf(
@@ -179,6 +176,7 @@ class RealDuckChatPixelsToolsTest {
             hasFileAttachment = false,
             hasText = true,
             surface = DuckChatPixelSurface.ADDRESS_BAR,
+            defaultMode = null,
         )
 
         val params = mapOf(
@@ -198,8 +196,6 @@ class RealDuckChatPixelsToolsTest {
 
     @Test
     fun whenPromptSubmittedFromAddressBarThenDefaultModeIsIncluded() = runTest {
-        whenever(duckChatInternal.resolvedTogglePosition()).thenReturn(ToggleSelection.DUCK_AI)
-
         testee.firePromptSubmitted(
             selectedTool = "none",
             modelId = null,
@@ -208,6 +204,7 @@ class RealDuckChatPixelsToolsTest {
             hasFileAttachment = false,
             hasText = true,
             surface = DuckChatPixelSurface.ADDRESS_BAR,
+            defaultMode = ToggleSelection.DUCK_AI,
         )
 
         val params = mapOf(
@@ -227,11 +224,9 @@ class RealDuckChatPixelsToolsTest {
     }
 
     @Test
-    fun whenPromptSubmittedFromNonAddressBarSurfaceThenDefaultModeIsOmittedEvenIfResolved() = runTest {
+    fun whenPromptSubmittedFromNonAddressBarSurfaceThenDefaultModeIsOmittedEvenIfProvided() = runTest {
         // The Search/Duck.ai toggle only ever shows in the address-bar surface, so default_mode
         // must not leak in from surfaces where no toggle was on screen.
-        whenever(duckChatInternal.resolvedTogglePosition()).thenReturn(ToggleSelection.DUCK_AI)
-
         testee.firePromptSubmitted(
             selectedTool = "none",
             modelId = null,
@@ -240,6 +235,7 @@ class RealDuckChatPixelsToolsTest {
             hasFileAttachment = false,
             hasText = true,
             surface = DuckChatPixelSurface.CONTEXTUAL_CHAT,
+            defaultMode = ToggleSelection.DUCK_AI,
         )
 
         val params = mapOf(

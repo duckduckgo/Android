@@ -260,6 +260,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
             null -> "none"
         }
         val surface = currentSurface()
+        val defaultMode = duckChatInternal.resolvedTogglePosition().takeIf { surface == DuckChatPixelSurface.ADDRESS_BAR }
         duckChatPixels.firePromptSubmitted(
             selectedTool = selectedToolParam,
             modelId = getSelectedModelId(),
@@ -268,6 +269,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
             hasFileAttachment = hasFileAttachment,
             hasText = hasText,
             surface = surface,
+            defaultMode = defaultMode,
         )
         when (tool) {
             Tool.IMAGE_GENERATION -> duckChatPixels.fireImageGenerationSubmitted(surface)

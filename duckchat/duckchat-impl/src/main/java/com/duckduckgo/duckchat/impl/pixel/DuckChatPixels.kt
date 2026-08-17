@@ -25,7 +25,6 @@ import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelPa
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.ToggleSelection
-import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.ModelTier
 import com.duckduckgo.duckchat.impl.ReportMetric
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_CREATE_NEW_CHAT
@@ -198,6 +197,7 @@ interface DuckChatPixels {
         hasFileAttachment: Boolean,
         hasText: Boolean,
         surface: DuckChatPixelSurface,
+        defaultMode: ToggleSelection?,
     )
 
     /** Prompt submitted while the unified input is in a Duck.ai chat context. Fires alongside [firePromptSubmitted]. */
@@ -244,7 +244,7 @@ interface DuckChatPixels {
     fun fireCustomizeResponsesSelected(surface: DuckChatPixelSurface)
     fun fireOmnibarShown()
     fun fireOmnibarTextAreaFocused(landscape: Boolean)
-    fun fireOmnibarQuerySubmitted(query: String)
+    fun fireOmnibarQuerySubmitted(query: String, defaultMode: ToggleSelection?)
     fun fireOmnibarModeSwitched(directionToSearch: Boolean, hadText: Boolean)
     fun fireOmnibarClearButtonPressed(isSearchMode: Boolean)
     fun fireOmnibarBackButtonPressed(isSearchMode: Boolean)
@@ -258,7 +258,6 @@ interface DuckChatPixels {
 class RealDuckChatPixels @Inject constructor(
     private val pixel: Pixel,
     private val duckChatFeatureRepository: DuckChatFeatureRepository,
-    private val duckChatInternal: DuckChatInternal,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val statisticsUpdater: StatisticsUpdater,
@@ -714,8 +713,8 @@ class RealDuckChatPixels @Inject constructor(
         hasFileAttachment: Boolean,
         hasText: Boolean,
         surface: DuckChatPixelSurface,
+        defaultMode: ToggleSelection?,
     ) {
-        val defaultMode = duckChatInternal.resolvedTogglePosition().takeIf { surface == DuckChatPixelSurface.ADDRESS_BAR }
         val params = buildMap {
             put(DuckChatPixelParameters.SELECTED_TOOL, selectedTool)
             modelId?.let { put(DuckChatPixelParameters.MODEL_ID, it) }
@@ -724,7 +723,9 @@ class RealDuckChatPixels @Inject constructor(
             put(DuckChatPixelParameters.HAS_FILE_ATTACHMENT, hasFileAttachment.toString())
             put(DuckChatPixelParameters.HAS_TEXT, hasText.toString())
             put(DuckChatPixelParameters.SURFACE, surface.value)
-            defaultMode?.let { put(DuckChatPixelParameters.DEFAULT_MODE, it.pixelValue()) }
+            defaultMode
+                ?.takeIf { surface == DuckChatPixelSurface.ADDRESS_BAR }
+                ?.let { put(DuckChatPixelParameters.DEFAULT_MODE, it.pixelValue()) }
         }
         fireCountAndDaily(
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_COUNT,
@@ -965,9 +966,10 @@ class RealDuckChatPixels @Inject constructor(
         }
     }
 
-    override fun fireOmnibarQuerySubmitted(query: String) {
-        // Read before navigation handling writes the new  last-used position.
-        val defaultMode = duckChatInternal.resolvedTogglePosition()
+    override fun fireOmnibarQuerySubmitted(
+        query: String,
+        defaultMode: ToggleSelection?,
+    ) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             val params = buildMap {
                 put(DuckChatPixelParameters.TEXT_LENGTH_BUCKET, toQueryLengthBucket(query.length))

@@ -1674,6 +1674,7 @@ class NativeInputModeWidgetViewModelTest {
             hasFileAttachment = false,
             hasText = true,
             surface = DuckChatPixelSurface.DUCK_AI,
+            defaultMode = null,
         )
         verify(duckChatPixels).fireImageGenerationSubmitted(any())
         verify(duckChatPixels, never()).fireWebSearchSubmitted(any())
@@ -1698,9 +1699,31 @@ class NativeInputModeWidgetViewModelTest {
             hasFileAttachment = false,
             hasText = true,
             surface = DuckChatPixelSurface.DUCK_AI,
+            defaultMode = null,
         )
         verify(duckChatPixels, never()).fireImageGenerationSubmitted(any())
         verify(duckChatPixels, never()).fireWebSearchSubmitted(any())
+    }
+
+    @Test
+    fun whenPromptSubmittedFromAddressBarThenResolvedDefaultModeIsPassedToPixels() = runTest {
+        whenever(duckChatInternal.resolvedTogglePosition()).thenReturn(NativeInputState.ToggleSelection.SEARCH)
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = false, isBottom = false)
+        advanceUntilIdle()
+
+        viewModel.fireSubmissionPixels(hasText = true, hasImageAttachment = false, hasFileAttachment = false)
+
+        verify(duckChatPixels).firePromptSubmitted(
+            selectedTool = "none",
+            modelId = null,
+            reasoningEffort = null,
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            hasText = true,
+            surface = DuckChatPixelSurface.ADDRESS_BAR,
+            defaultMode = NativeInputState.ToggleSelection.SEARCH,
+        )
     }
 
     @Test
@@ -1723,6 +1746,7 @@ class NativeInputModeWidgetViewModelTest {
             hasFileAttachment = false,
             hasText = true,
             surface = DuckChatPixelSurface.DUCK_AI,
+            defaultMode = null,
         )
         verify(duckChatPixels).fireWebSearchSubmitted(any())
         verify(duckChatPixels, never()).fireImageGenerationSubmitted(any())
