@@ -22,5 +22,12 @@
     <string name="voiceSearchListening">Praat nu</string>
     <string name="voiceSearchListeningFooter">Audio wordt op het apparaat verwerkt. Het wordt niet opgeslagen of met iemand gedeeld, ook niet met DuckDuckGo.</string>
     <string name="voiceSearchNegativeAction">Annuleren</string>
+    <string name="voiceSearchMicAccessDeniedDialogTitle">DuckDuckGo heeft toegang tot je microfoon nodig</string>
+    <string name="voiceSearchMicAccessDeniedDialogMessage">Microfoontoegang is nodig als je onze Spraakgestuurd zoeken wilt gebruiken.</string>
+    <string name="voiceSearchMicAccessDeniedDialogMessageDuckAi">Microfoontoegang is nodig als je onze privé-spraakfuncties wilt gebruiken.</string>
+    <string name="voiceSearchMicAccessDeniedDialogChangePermissions">Toestemmingen wijzigen</string>
+    <string name="voiceSearchMicAccessDeniedDialogHideVoiceSearch">Zoeken via spraak verbergen</string>
+    <string name="voiceSearchMicPermissionDeniedSnackbarMessage">Microfoonmachtiging nodig voor spraakfuncties</string>
+    <string name="voiceSearchMicPermissionDeniedSnackbarAction">Toestaan</string>
     <string name="voiceSearchTitle">Zoeken via spraak</string>
 </resources>
