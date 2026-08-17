@@ -897,8 +897,7 @@ class RealDuckChat @Inject constructor(
 
     override suspend fun isChatHistoryAvailable(): Boolean = withContext(dispatchers.io()) {
         isEnabled() &&
-            duckChatFeature.useNativeStorageChatData().isEnabled() &&
-            duckChatFeature.historyScreen().isEnabled()
+            duckChatFeature.useNativeStorageChatData().isEnabled()
     }
 
     override suspend fun hasUserEnabledChatHistory(): Boolean {
