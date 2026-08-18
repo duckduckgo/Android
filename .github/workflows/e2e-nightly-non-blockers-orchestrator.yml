@@ -1,11 +1,10 @@
-name: Nightly E2E orchestrator
+name: Nightly non release blockers orchestrator
 
-# Schedules the standalone nightly E2E suites — the non release blocker suite and the Sync
-# critical path — once per DI framework. This wrapper exists because a `schedule` trigger
-# cannot pass inputs and a workflow cannot call itself, so each suite could otherwise only
-# ever be scheduled for one DI. Neither suite is release blocking: a failure reddens this run
-# and files an Asana task, but never blocks a release or LGC tagging. The release blocking
-# E2E suite is scheduled separately by nightly-orchestrator.yml.
+# Runs the non release blocker E2E suite once per DI framework. This scheduling wrapper exists
+# because a `schedule` trigger cannot pass inputs and a workflow cannot call itself, so the
+# suite could otherwise only ever be scheduled for one DI. These tests are not release
+# blockers: a failure reddens this run and files an Asana task, but never blocks a release or
+# LGC tagging. The release blocking E2E suite is scheduled by nightly-orchestrator.yml.
 
 on:
   schedule:
@@ -34,16 +33,5 @@ jobs:
     uses: ./.github/workflows/e2e-nightly-non-blockers-suite.yml
     with:
       commit: ${{ inputs.commit || github.sha }}
-      ddg_di: ${{ matrix.di }}
-    secrets: inherit
-
-  call-sync-critical-path:
-    name: Sync critical path (${{ matrix.di }})
-    strategy:
-      fail-fast: false
-      matrix:
-        di: [AnvilDagger, Metro]
-    uses: ./.github/workflows/e2e-nightly-sync-critical-path.yml
-    with:
       ddg_di: ${{ matrix.di }}
     secrets: inherit

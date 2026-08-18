@@ -1,39 +1,13 @@
 name: 'End to End Tests - Sync Critical Path (Nightly)'
 
-run-name: 'End to End Tests - Sync Critical Path (${{ inputs.ddg_di || ''default DI'' }} Nightly)'
-
-# Scheduling lives in e2e-nightly-orchestrator.yml, which runs this suite once per DI
-# framework — a `schedule` trigger here could only ever run the default DI.
 on:
-  workflow_call:
-    inputs:
-      ddg_di:
-        description: 'DI framework to build with. Leave empty to use ddg.di from gradle.properties; set AnvilDagger or Metro to pin one.'
-        required: false
-        type: string
-        default: ''
+  schedule:
+    - cron: '0 5 * * *' # run at 5 AM UTC
   workflow_dispatch:
-    inputs:
-      ddg_di:
-        description: 'DI framework to build with. Leave empty to use ddg.di from gradle.properties; set AnvilDagger or Metro to pin one.'
-        required: false
-        type: string
-        default: ''
 
-# The DI framework is part of the group because a single caller runs this workflow once per DI
 concurrency:
-  group: ${{ github.workflow_ref }}-${{ github.ref }}-${{ inputs.ddg_di || 'default' }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
-
-# An empty `ddg_di` omits the flag so Gradle uses ddg.di from gradle.properties; `-Pddg.di=`
-# with an empty value would instead hit build.gradle's AnvilDagger fallback. Suffixes stay
-# empty for the default and AnvilDagger paths so maestro test names and Asana task names are
-# unchanged. Pattern uses truthy-first ternary because `A && '' || X` is broken in GHA
-# expressions (empty string is falsy).
-env:
-  DI_FLAG: ${{ inputs.ddg_di != '' && format('-Pddg.di={0}', inputs.ddg_di) || '' }}
-  DI_UNDERSCORE_SUFFIX: ${{ (inputs.ddg_di || 'AnvilDagger') != 'AnvilDagger' && format('_{0}', inputs.ddg_di) || '' }}
-  DI_PAREN_SUFFIX: ${{ (inputs.ddg_di || 'AnvilDagger') != 'AnvilDagger' && format(' ({0})', inputs.ddg_di) || '' }}
 
 jobs:
   instrumentation_tests:
@@ -61,7 +35,7 @@ jobs:
           release_properties: ${{ secrets.FAKE_RELEASE_PROPERTIES }}
           release_key: ${{ secrets.FAKE_RELEASE_KEY }}
           gradle_encryption_key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
-          gradle_flags: '-Psync-disable-auth-requirement ${{ env.DI_FLAG }}'
+          gradle_flags: '-Psync-disable-auth-requirement'
           develocity_access_key: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
           ducksans_package_auth_user: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION_USER }}
           ducksans_package_auth_token: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION }}
@@ -73,11 +47,11 @@ jobs:
         with:
           maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
           maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          maestro_test_name: sync${{ env.DI_UNDERSCORE_SUFFIX }}_${{ github.sha }}
+          maestro_test_name: sync_${{ github.sha }}
           maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
           maestro_app_file: ${{ steps.assemble.outputs.internal_apk_path }}
           maestro_include_tags: syncCriticalPathTest
-          test_suite_name: Sync Critical Path${{ env.DI_PAREN_SUFFIX }}
+          test_suite_name: Sync Critical Path
           maestro_api_level: 34
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
@@ -102,6 +76,6 @@ jobs:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          asana-task-name: GH Workflow Failure - Sync Critical Path End to End Tests${{ env.DI_PAREN_SUFFIX }}
-          asana-task-description: The Sync Critical Path End to End Tests${{ env.DI_PAREN_SUFFIX }} workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          asana-task-name: GH Workflow Failure - Sync Critical Path End to End Tests
+          asana-task-description: The Sync Critical Path End to End Testsworkflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
           action: 'create-asana-task'

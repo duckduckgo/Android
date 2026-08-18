@@ -2,8 +2,8 @@ name: 'End to End Tests - Full Suite of non release blocker tests (Nightly)'
 
 run-name: 'End to End Tests - Full Suite of non release blocker tests (${{ inputs.ddg_di || ''default DI'' }} Nightly)'
 
-# Scheduling lives in e2e-nightly-orchestrator.yml, which runs this suite once per DI
-# framework — a `schedule` trigger here could only ever run the default DI.
+# Scheduling lives in e2e-nightly-non-blockers-orchestrator.yml, which runs this suite once
+# per DI framework — a `schedule` trigger here could only ever run the default DI.
 on:
   workflow_call:
     inputs:
