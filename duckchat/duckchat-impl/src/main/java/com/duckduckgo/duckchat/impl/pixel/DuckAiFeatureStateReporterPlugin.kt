@@ -17,13 +17,16 @@
 package com.duckduckgo.duckchat.impl.pixel
 
 import com.duckduckgo.app.statistics.api.BrowserFeatureStateReporterPlugin
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
-import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 /**
@@ -33,14 +36,33 @@ import javax.inject.Inject
 @SingleInstanceIn(AppScope::class)
 class DuckAiFeatureStateReporterPlugin @Inject constructor(
     private val duckAiFeatureState: DuckAiFeatureState,
-    private val duckChatInputModeState: DuckChatInputModeState,
+    private val duckChatFeature: DuckChatFeature,
+    private val duckChatFeatureRepository: DuckChatFeatureRepository,
+    private val dispatcherProvider: DispatcherProvider,
 ) : BrowserFeatureStateReporterPlugin {
 
-    override fun featureStateParams(): Map<String, String> = mapOf(
-        DUCK_AI_INPUT_MODE to duckChatInputModeState.inputModeCapability.value.pixelValue(),
-        DUCK_AI_NATIVE_INPUT to duckAiFeatureState.nativeInputFieldEnabled.value.toBinaryString(),
-        DUCK_AI_CONTEXTUAL to duckAiFeatureState.showContextualMode.value.toBinaryString(),
-    )
+    override fun featureStateParams(): Map<String, String> {
+        val inputMode = runBlocking(dispatcherProvider.io()) {
+            resolveInputModeCapability()
+        }
+        return mapOf(
+            DUCK_AI_INPUT_MODE to inputMode.pixelValue(),
+            DUCK_AI_NATIVE_INPUT to duckAiFeatureState.nativeInputFieldEnabled.value.toBinaryString(),
+            DUCK_AI_CONTEXTUAL to duckAiFeatureState.showContextualMode.value.toBinaryString(),
+        )
+    }
+
+    private suspend fun resolveInputModeCapability(): NativeInputState.InputMode {
+        return if (
+            duckChatFeature.self().isEnabled() &&
+            duckChatFeatureRepository.isDuckChatUserEnabled() &&
+            duckChatFeatureRepository.isInputScreenUserSettingEnabled()
+        ) {
+            NativeInputState.InputMode.SEARCH_AND_DUCK_AI
+        } else {
+            NativeInputState.InputMode.SEARCH_ONLY
+        }
+    }
 
     private fun NativeInputState.InputMode.pixelValue(): String = when (this) {
         NativeInputState.InputMode.SEARCH_AND_DUCK_AI -> "search_and_duck_ai"
