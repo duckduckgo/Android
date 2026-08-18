@@ -21,7 +21,6 @@ import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.graphics.Outline
 import android.graphics.RectF
-import android.os.Build
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.ContextThemeWrapper
@@ -121,10 +120,8 @@ constructor(
         )
         cardViewAttr.recycle()
 
-        if (Build.VERSION.SDK_INT >= 28) {
-            outlineAmbientShadowColor = ContextCompat.getColor(context, R.color.onboardingBubbleShadowColor)
-            outlineSpotShadowColor = ContextCompat.getColor(context, R.color.onboardingBubbleShadowColor)
-        }
+        outlineAmbientShadowColor = ContextCompat.getColor(context, R.color.onboardingBubbleShadowColor)
+        outlineSpotShadowColor = ContextCompat.getColor(context, R.color.onboardingBubbleShadowColor)
     }
 
     /**
