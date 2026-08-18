@@ -71,8 +71,8 @@ class RealPrivacyConfigDownloader @Inject constructor(
             response.body()?.let {
                 runCatching {
                     privacyConfigPersister.persistPrivacyConfig(it, eTag)
-                    privacyConfigCallbacks.getPlugins().forEach { callback -> callback.onPrivacyConfigDownloaded() }
                     telemetry.onProcessFinished()
+                    privacyConfigCallbacks.getPlugins().forEach { callback -> callback.onPrivacyConfigDownloaded() }
                 }.onFailure {
                     // error parsing remote config
                     notifyErrorToCallbacks(STORE_ERROR)
