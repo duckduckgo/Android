@@ -3,6 +3,10 @@ name: 'Pull Request opened -> Comment on task and add it to Android Release Boar
 on:
   pull_request:
     types: [opened, reopened, edited, synchronize, ready_for_review]
+  # `process-internal-pr` is a required status check, so it has to report on the merge queue's
+  # temporary branch too. There is no pull request context there, so every step below no-ops and
+  # the job reports success without repeating the Asana bookkeeping.
+  merge_group:
 
 jobs:
   process-internal-pr:
@@ -11,7 +15,7 @@ jobs:
       issues: write
     steps:
       - name: Find Asana Task ID
-        if: ${{ github.event.pull_request.base.ref == github.event.repository.default_branch }}
+        if: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.ref == github.event.repository.default_branch }}
         id: find-asana-task
         uses: duckduckgo/native-github-asana-sync@v2.6.0
         with:
