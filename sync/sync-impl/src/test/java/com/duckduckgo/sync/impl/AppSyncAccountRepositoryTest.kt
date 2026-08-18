@@ -690,7 +690,7 @@ class AppSyncAccountRepositoryTest {
         whenever(syncApi.getDevices(anyString())).thenReturn(
             Success(DeviceEntries(entries = emptyList(), entriesV2 = listOf(v2Entry))),
         )
-        whenever(thirdPartyDeviceListDecryptor.decryptAll(listOf(v2Entry))).thenReturn(
+        whenever(thirdPartyDeviceListDecryptor.decryptAll(listOf(v2Entry), deviceId)).thenReturn(
             DecryptAllResult(
                 decrypted = listOf(DecryptedDevice(deviceId = "d1", name = "Chrome/148", type = "Browser")),
                 undecryptable = emptyList(),
@@ -701,7 +701,7 @@ class AppSyncAccountRepositoryTest {
 
         assertEquals(1, result.data.size)
         assertEquals("Chrome/148", result.data[0].deviceName)
-        verify(thirdPartyDeviceListDecryptor).decryptAll(listOf(v2Entry))
+        verify(thirdPartyDeviceListDecryptor).decryptAll(listOf(v2Entry), deviceId)
         verify(syncApi, never()).logout(anyString(), anyString())
     }
 
@@ -719,7 +719,7 @@ class AppSyncAccountRepositoryTest {
 
         // Fell back to legacy decrypt — same library path as the legacy `entries`-only response.
         assertEquals(1, result.data.size)
-        verify(thirdPartyDeviceListDecryptor, never()).decryptAll(any())
+        verify(thirdPartyDeviceListDecryptor, never()).decryptAll(any(), anyOrNull())
     }
 
     @Test
@@ -744,7 +744,7 @@ class AppSyncAccountRepositoryTest {
         whenever(syncApi.getDevices(anyString())).thenReturn(
             Success(DeviceEntries(entries = emptyList(), entriesV2 = listOf(v2Entry))),
         )
-        whenever(thirdPartyDeviceListDecryptor.decryptAll(any())).thenReturn(
+        whenever(thirdPartyDeviceListDecryptor.decryptAll(any(), anyOrNull())).thenReturn(
             DecryptAllResult(decrypted = emptyList(), undecryptable = listOf("d-other")),
         )
         whenever(syncApi.logout(eq(token), eq("d-other"))).thenReturn(Success(Logout("d-other")))
@@ -766,7 +766,7 @@ class AppSyncAccountRepositoryTest {
         whenever(syncApi.getDevices(anyString())).thenReturn(
             Success(DeviceEntries(entries = emptyList(), entriesV2 = listOf(v2Entry))),
         )
-        whenever(thirdPartyDeviceListDecryptor.decryptAll(any())).thenReturn(
+        whenever(thirdPartyDeviceListDecryptor.decryptAll(any(), anyOrNull())).thenReturn(
             DecryptAllResult(decrypted = emptyList(), undecryptable = listOf(deviceId)),
         )
 
@@ -786,7 +786,107 @@ class AppSyncAccountRepositoryTest {
 
         syncRepo.getConnectedDevices()
 
-        verify(thirdPartyDeviceListDecryptor, never()).decryptAll(any())
+        verify(thirdPartyDeviceListDecryptor, never()).decryptAll(any(), anyOrNull())
+    }
+
+    @Test
+    fun whenThisDeviceInfoUnresolvedThenRepublishesItWithTheCurrentName() = runTest {
+        givenThisDeviceInfoUnresolvedOnRead()
+        syncFeature.canWriteUnifiedDeviceList().setRawStoredState(State(enable = true))
+        whenever(deviceInfoUpdater.setThisDeviceName(any())).thenReturn(Success(emptyList()))
+
+        syncRepo.getConnectedDevices()
+
+        verify(deviceInfoUpdater).setThisDeviceName(deviceName)
+    }
+
+    @Test
+    fun whenThisDeviceInfoUnresolvedOnEveryRenderThenRepublishesOnlyOncePerProcess() = runTest {
+        givenThisDeviceInfoUnresolvedOnRead()
+        syncFeature.canWriteUnifiedDeviceList().setRawStoredState(State(enable = true))
+        whenever(deviceInfoUpdater.setThisDeviceName(any())).thenReturn(Success(emptyList()))
+
+        syncRepo.getConnectedDevices()
+        syncRepo.getConnectedDevices()
+
+        verify(deviceInfoUpdater, times(1)).setThisDeviceName(anyString())
+    }
+
+    @Test
+    fun whenRepublishFailsThenRetriesOnTheNextRender() = runTest {
+        givenThisDeviceInfoUnresolvedOnRead()
+        syncFeature.canWriteUnifiedDeviceList().setRawStoredState(State(enable = true))
+        whenever(deviceInfoUpdater.setThisDeviceName(any())).thenReturn(Error(reason = "no network"))
+
+        syncRepo.getConnectedDevices()
+        syncRepo.getConnectedDevices()
+
+        verify(deviceInfoUpdater, times(2)).setThisDeviceName(anyString())
+    }
+
+    @Test
+    fun whenSignedIntoAnotherAccountInTheSameProcessThenRepublishesAgain() = runTest {
+        givenThisDeviceInfoUnresolvedOnRead()
+        syncFeature.canWriteUnifiedDeviceList().setRawStoredState(State(enable = true))
+        whenever(deviceInfoUpdater.setThisDeviceName(any())).thenReturn(Success(emptyList()))
+
+        syncRepo.getConnectedDevices()
+        whenever(syncStore.userId).thenReturn("anotherUserId")
+        syncRepo.getConnectedDevices()
+
+        verify(deviceInfoUpdater, times(2)).setThisDeviceName(anyString())
+    }
+
+    @Test
+    fun whenNotSignedInThenDoesNotRepublish() = runTest {
+        givenThisDeviceInfoUnresolvedOnRead()
+        syncFeature.canWriteUnifiedDeviceList().setRawStoredState(State(enable = true))
+        whenever(syncStore.userId).thenReturn(null)
+
+        syncRepo.getConnectedDevices()
+
+        verifyNoInteractions(deviceInfoUpdater)
+    }
+
+    @Test
+    fun whenThisDeviceInfoUnresolvedButWritingDeviceInfoDisabledThenDoesNotRepublish() = runTest {
+        // the PATCH would omit device_info and the backend would clear it, deleting the blob we're repairing
+        givenThisDeviceInfoUnresolvedOnRead()
+        syncFeature.canWriteUnifiedDeviceList().setRawStoredState(State(enable = false))
+
+        syncRepo.getConnectedDevices()
+
+        verifyNoInteractions(deviceInfoUpdater)
+    }
+
+    @Test
+    fun whenThisDeviceInfoResolvedThenDoesNotRepublish() = runTest {
+        givenThisDeviceInfoUnresolvedOnRead(unresolved = false)
+        syncFeature.canWriteUnifiedDeviceList().setRawStoredState(State(enable = true))
+
+        syncRepo.getConnectedDevices()
+
+        verifyNoInteractions(deviceInfoUpdater)
+    }
+
+    private fun givenThisDeviceInfoUnresolvedOnRead(unresolved: Boolean = true) {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+        whenever(syncStore.token).thenReturn(token)
+        whenever(syncStore.primaryKey).thenReturn(primaryKey)
+        whenever(syncStore.deviceId).thenReturn(deviceId)
+        whenever(syncStore.userId).thenReturn(userId)
+        whenever(syncDeviceIds.deviceName()).thenReturn(deviceName)
+        val ownEntry = DeviceV2(deviceId = deviceId, deviceName = "ENC", credentialId = "ddg")
+        whenever(syncApi.getDevices(anyString())).thenReturn(
+            Success(DeviceEntries(entries = emptyList(), entriesV2 = listOf(ownEntry))),
+        )
+        whenever(thirdPartyDeviceListDecryptor.decryptAll(any(), anyOrNull())).thenReturn(
+            DecryptAllResult(
+                decrypted = listOf(DecryptedDevice(deviceId = deviceId, name = deviceName, type = "phone")),
+                undecryptable = emptyList(),
+                thisDeviceInfoUnresolved = unresolved,
+            ),
+        )
     }
 
     @Test

@@ -88,6 +88,17 @@ class DeviceInfoMigratorTest {
     }
 
     @Test
+    fun whenV2ConnectFlowDisabledThenNoOpAndNotMarked() = runTest {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(enable = false))
+
+        val result = migrator.ensureMigrated()
+
+        assertTrue(result is Result.Success)
+        verify(syncApi, never()).getDevices(any())
+        verify(syncStore, never()).unifiedDeviceListMigratedForUserId = any()
+    }
+
+    @Test
     fun whenNotSignedInThenErrorWithoutNetwork() = runTest {
         whenever(syncStore.userId).thenReturn(null)
 

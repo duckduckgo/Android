@@ -36,7 +36,10 @@ import javax.inject.Inject
  */
 @WorkerThread
 interface ThirdPartyDeviceListDecryptor {
-    fun decryptAll(entries: List<DeviceV2>): DecryptAllResult
+    /**
+     * @param thisDeviceId this device's sync id, used to report back whether our own `device_info` resolved
+     */
+    fun decryptAll(entries: List<DeviceV2>, thisDeviceId: String?): DecryptAllResult
 
     companion object {
         const val FALLBACK_TYPE_3PARTY = "Browser"
@@ -44,9 +47,14 @@ interface ThirdPartyDeviceListDecryptor {
     }
 }
 
+/**
+ * @param thisDeviceInfoUnresolved this device's own row was in the batch but did not resolve via `device_info` — either the server holds no blob
+ *   for us or the one it holds can't be decrypted. Only ever set when the read flag is on, since with it off no blob is read at all.
+ */
 data class DecryptAllResult(
     val decrypted: List<DecryptedDevice>,
     val undecryptable: List<String>,
+    val thisDeviceInfoUnresolved: Boolean = false,
 )
 
 @ContributesBinding(AppScope::class)
@@ -57,7 +65,7 @@ class RealThirdPartyDeviceListDecryptor @Inject constructor(
     private val syncFeature: SyncFeature,
 ) : ThirdPartyDeviceListDecryptor {
 
-    override fun decryptAll(entries: List<DeviceV2>): DecryptAllResult {
+    override fun decryptAll(entries: List<DeviceV2>, thisDeviceId: String?): DecryptAllResult {
         if (entries.isEmpty()) return DecryptAllResult(emptyList(), emptyList())
 
         val readEnabled = syncFeature.canReadUnifiedDeviceList().isEnabled()
@@ -89,6 +97,10 @@ class RealThirdPartyDeviceListDecryptor @Inject constructor(
         return DecryptAllResult(
             decrypted = viaDeviceInfo + legacy.viaLegacy + legacy.fallbacks,
             undecryptable = legacy.undecryptable,
+            thisDeviceInfoUnresolved = readEnabled &&
+                thisDeviceId != null &&
+                entries.any { it.deviceId == thisDeviceId } &&
+                viaDeviceInfo.none { it.deviceId == thisDeviceId },
         )
     }
 

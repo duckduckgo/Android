@@ -112,9 +112,15 @@ interface SyncFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun preventStaleTokenLogout(): Toggle
 
+    /**
+     * Gates writing `device_info`
+     */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun canWriteUnifiedDeviceList(): Toggle
 
+    /**
+     * Gates reading from `device_info`
+     */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun canReadUnifiedDeviceList(): Toggle
 
@@ -128,3 +134,11 @@ interface SyncFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun canUsePatchEndpointForLegacyDeviceRename(): Toggle
 }
+
+/**
+ * `device_info` is read only on the v2 device-list path, and the `account_info` key backing it must be wrapped for every credential on the
+ * account, which needs the scoped credentials [SyncFeature.canUseV2ConnectFlow] governs. Writing it with v2 disabled would publish a blob
+ * nobody on this device reads, off a key we can only wrap for `ddg`.
+ */
+internal fun SyncFeature.canWriteDeviceInfo(): Boolean =
+    canUseV2ConnectFlow().isEnabled() && canWriteUnifiedDeviceList().isEnabled()
