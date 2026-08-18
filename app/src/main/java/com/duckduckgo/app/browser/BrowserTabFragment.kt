@@ -1409,6 +1409,7 @@ class BrowserTabFragment :
                 },
                 onSearchSubmitted = { query -> onUserSubmittedText(query) },
                 onDuckAiChatSubmitted = { query, modelId, reasoningEffort, selectedTool, imagesJson, filesJson ->
+                    viewModel.onDuckAiChatPromptSubmitted()
                     contentScopeScripts.sendSubscriptionEvent(
                         SubscriptionEventData(
                             featureName = "aiChat",
@@ -5170,7 +5171,10 @@ class BrowserTabFragment :
         // During the locked Duck.ai onboarding demo, don't navigate within the app — returning false
         // lets BrowserActivity exit (close the app). The user progresses by tapping the fire button.
         if (viewModel.isOmnibarLockedForOnboarding()) return false
-        if (nativeInputManager.hideNativeInput()) return true
+        if (nativeInputManager.hideNativeInput()) {
+            viewModel.onBackInteraction()
+            return true
+        }
         if (isPdfVisible()) {
             hidePdf()
             val currentUrl = webView?.url
@@ -5178,6 +5182,7 @@ class BrowserTabFragment :
             if (currentUrl.isNullOrBlank() || currentUrl == "about:blank") {
                 viewModel.onUserPressedBack(isCustomTab)
             } else {
+                viewModel.onBackInteraction()
                 showBrowser()
             }
             return true

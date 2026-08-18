@@ -1,0 +1,102 @@
+{
+    "wide_return_session": {
+        "description": "Captures every return to the app, from foreground to terminal user action or app background/termination.",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "widePixelPlatform",
+            "widePixelType",
+            "widePixelSampleRate",
+            "widePixelFeatureStatus",
+            "widePixelAppVersion",
+            "widePixelAppName",
+            "widePixelFormFactor",
+            "widePixelDevMode",
+            "widePixelMetaType",
+            "widePixelMetaVersion",
+            "widePixelIsFirstDailyOccurrence",
+            {
+                "key": "feature.name",
+                "type": "string",
+                "description": "Feature identifier for this wide event",
+                "enum": ["return_session"]
+            },
+            {
+                "key": "feature.data.ext.after_idle",
+                "type": "boolean",
+                "description": "True when an after-idle treatment started the session; filtering true gives the population wide_post_idle_session reports on"
+            },
+            {
+                "key": "feature.data.ext.landed_on",
+                "type": "string",
+                "description": "Surface the user landed on. A resumed tab is reported as web, serp or duck_ai depending on its content; there is no lut value",
+                "enum": ["ntp", "ntp_user_initiated", "web", "serp", "duck_ai"]
+            },
+            {
+                "key": "feature.data.ext.time_away_ms_bucketed",
+                "type": "string",
+                "description": "Time away before this return, bucketed (lower end of bucket, in ms). Absent when there was no prior background timestamp/date",
+                "enum": ["0", "60000", "300000", "900000", "1800000", "3600000"]
+            },
+            {
+                "key": "feature.data.ext.status_reason",
+                "type": "string",
+                "description": "Reason the session ended",
+                "enum": [
+                    "search_submitted",
+                    "ai_prompt_submitted",
+                    "url_submitted",
+                    "return_to_page_tapped",
+                    "tab_switcher_selected",
+                    "favorite_selected",
+                    "chat_selected",
+                    "app_backgrounded",
+                    "app_terminated"
+                ]
+            },
+            {
+                "key": "feature.data.ext.session_duration_ms_bucketed",
+                "type": "string",
+                "description": "Duration from foreground to session end, bucketed (lower end of bucket, in ms)",
+                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+            },
+            {
+                "key": "feature.data.ext.time_to_first_interaction_ms_bucketed",
+                "type": "string",
+                "description": "Time from session start to the first user interaction with the landing surface, including a successful terminal action; absent if the session ends without interaction. Bucketed (lower end of bucket, in ms)",
+                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+            },
+            {
+                "key": "feature.data.ext.focused",
+                "type": "boolean",
+                "description": "Whether the landing surface appeared with the address bar/native input focused"
+            },
+            {
+                "key": "feature.data.ext.page_engaged",
+                "type": "boolean",
+                "description": "Whether the user touched the page content during the session (NTP body or WebView)"
+            },
+            {
+                "key": "feature.data.ext.back_pressed",
+                "type": "boolean",
+                "description": "Whether the user pressed back at least once during the session"
+            },
+            {
+                "key": "feature.data.ext.opening_screen_changed",
+                "type": "boolean",
+                "description": "Whether the user changed the app-launch opening screen setting during the session"
+            },
+            {
+                "key": "feature.data.ext.close_tab_tapped",
+                "type": "boolean",
+                "description": "Whether the user tapped the close-tab action on the escape hatch during the session"
+            },
+            {
+                "key": "feature.data.ext.burn_tab_tapped",
+                "type": "boolean",
+                "description": "Whether the user tapped the burn-tab action on the escape hatch during the session"
+            }
+        ]
+    }
+}

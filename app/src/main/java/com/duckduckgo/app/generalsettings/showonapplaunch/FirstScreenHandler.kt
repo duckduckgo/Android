@@ -16,7 +16,12 @@
 
 package com.duckduckgo.app.generalsettings.showonapplaunch
 
+import androidx.core.net.toUri
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.autofill.SystemAutofillEngagement
+import com.duckduckgo.app.browser.returnsession.ReturnSessionLanding
+import com.duckduckgo.app.browser.returnsession.ReturnSessionLandingListener
+import com.duckduckgo.app.browser.returnsession.ReturnSessionLandingResult
 import com.duckduckgo.app.browser.state.ModeSwitchRecreateSignal
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
@@ -26,6 +31,7 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -54,6 +60,7 @@ class FirstScreenHandlerImpl @Inject constructor(
     private val showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore,
     private val appBuildConfig: AppBuildConfig,
     private val dispatcherProvider: DispatcherProvider,
+    private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val duckChat: DuckChat,
     private val tabRepositoryProvider: BrowserModeDataProvider<TabRepository>,
     private val ntpAfterIdleManager: NtpAfterIdleManager,
@@ -61,6 +68,7 @@ class FirstScreenHandlerImpl @Inject constructor(
     private val customTabDetector: CustomTabDetector,
     private val browserModeStateHolder: BrowserModeStateHolder,
     private val modeSwitchRecreateSignal: ModeSwitchRecreateSignal,
+    private val returnSessionLandingListener: ReturnSessionLandingListener,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val idleThresholdResolver: IdleThresholdResolver,
 ) : BrowserLifecycleObserver {
@@ -86,12 +94,15 @@ class FirstScreenHandlerImpl @Inject constructor(
         // is correct without a fresh trigger. Setting pendingAfterIdle here would leak — no
         // onNtpShown fires (same NTP tab), and the next user action that DOES show an NTP
         // (e.g. opening a new tab manually) would incorrectly consume the stale pending flag.
-        if (isFreshLaunch &&
+        val preAppliedFreshNtpTreatment = if (isFreshLaunch &&
             androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled() &&
             computeWasIdle() &&
             isCurrentSelectedTabNtp()
         ) {
             ntpAfterIdleManager.onIdleReturnTriggered()
+            AfterIdleTreatment.NTP
+        } else {
+            null
         }
         appCoroutineScope.launch {
             logcat { "FirstScreen: onOpen isFreshLaunch $isFreshLaunch" }
@@ -99,7 +110,8 @@ class FirstScreenHandlerImpl @Inject constructor(
             // (e.g. GeneralSettings) don't fall back to LastOpenedTab before the
             // after-inactivity flow has had a chance to run.
             ensureNewUserDefault()
-            handleFirstScreen(isFreshLaunch)
+            val resolvedLanding = handleFirstScreen(isFreshLaunch, preAppliedFreshNtpTreatment)
+            returnSessionLandingListener.onReturnLandingResolved(resolvedLanding)
         }
     }
 
@@ -124,22 +136,57 @@ class FirstScreenHandlerImpl @Inject constructor(
 
     // Launch boundary: process-lifecycle callback, no activity graph exists to provide a frozen mode.
     @Suppress("DenyListedApi")
-    private suspend fun handleFirstScreen(isFreshLaunch: Boolean) {
+    private suspend fun handleFirstScreen(
+        isFreshLaunch: Boolean,
+        preAppliedFreshNtpTreatment: AfterIdleTreatment?,
+    ): ReturnSessionLandingResult {
         val currentMode = browserModeStateHolder.currentMode.value
         if (androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled()) {
             val lastBackgrounded = settingsDataStore.lastSessionBackgroundTimestamp
             val wasIdle = computeWasIdle()
             if (lastBackgrounded == 0L || wasIdle) {
-                if (!isVoiceSessionActiveOnCurrentTab() && !isActiveTabCustomTab()) {
-                    showOnAppLaunchOptionHandler.handleAfterInactivityOption(wasIdle = wasIdle, currentMode = currentMode)
+                if (isVoiceSessionActiveOnCurrentTab() || isActiveTabCustomTab()) {
+                    return resolveCurrentLanding(currentMode)
                 }
-                return
+                val result = showOnAppLaunchOptionHandler.handleAfterInactivityOption(wasIdle = wasIdle, currentMode = currentMode)
+                return resolveReturnLanding(
+                    result = result,
+                    fallbackTreatment = preAppliedFreshNtpTreatment.takeIf {
+                        currentMode == BrowserMode.REGULAR && result.destinationUrl.isNullOrBlank()
+                    },
+                )
             }
         } else if (isFreshLaunch && showOnAppLaunchFeature.self().isEnabled()) {
-            if (!isVoiceSessionActiveOnCurrentTab()) {
-                showOnAppLaunchOptionHandler.handleAppLaunchOption(currentMode)
+            if (isVoiceSessionActiveOnCurrentTab()) {
+                return resolveCurrentLanding(currentMode)
             }
+            return resolveReturnLanding(showOnAppLaunchOptionHandler.handleAppLaunchOption(currentMode))
         }
+        return resolveCurrentLanding(currentMode)
+    }
+
+    private suspend fun resolveCurrentLanding(currentMode: BrowserMode): ReturnSessionLandingResult {
+        val destinationUrl = tabRepositoryProvider.forMode(currentMode).getSelectedTab()?.url
+        return resolveReturnLanding(
+            ShowOnAppLaunchResult(
+                destinationUrl = destinationUrl,
+                treatment = null,
+            ),
+        )
+    }
+
+    private fun resolveReturnLanding(
+        result: ShowOnAppLaunchResult,
+        fallbackTreatment: AfterIdleTreatment? = null,
+    ): ReturnSessionLandingResult {
+        val afterIdle = (result.treatment ?: fallbackTreatment) != null
+        val landing = when {
+            result.destinationUrl.isNullOrBlank() -> if (afterIdle) ReturnSessionLanding.NTP else ReturnSessionLanding.NTP_USER_INITIATED
+            duckChat.isDuckChatUrl(result.destinationUrl.toUri()) -> ReturnSessionLanding.DUCK_AI
+            duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(result.destinationUrl) -> ReturnSessionLanding.SERP
+            else -> ReturnSessionLanding.WEB
+        }
+        return ReturnSessionLandingResult(afterIdle = afterIdle, landing = landing)
     }
 
     private suspend fun isVoiceSessionActiveOnCurrentTab(): Boolean = withContext(dispatcherProvider.io()) {
@@ -154,6 +201,7 @@ class FirstScreenHandlerImpl @Inject constructor(
     }
 
     override fun onClose() {
+        returnSessionLandingListener.onReturnClosed()
         systemAutofillEngagement.clearIdleReturnTriggered()
         appCoroutineScope.launch(dispatcherProvider.io()) {
             settingsDataStore.lastSessionBackgroundTimestamp = System.currentTimeMillis()
