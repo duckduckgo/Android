@@ -51,7 +51,10 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 import javax.inject.Named
@@ -261,10 +264,15 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
         sharedContextualViewModel.commands
             .onEach { command ->
                 if (command is DuckChatContextualSharedViewModel.Command.PageContextAttached) {
-                    binding.entrySuggestionsView.onPageContextUpdated(command.pageContext)
                     viewModel.onPageContextReceived(command.pageContext)
                 }
             }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+        viewModel.viewState
+            .map { it.attachedContext?.serialized }
+            .filterNotNull()
+            .distinctUntilChanged()
+            .onEach { binding.entrySuggestionsView.onPageContextUpdated(it) }
             .launchIn(viewLifecycleOwner.lifecycleScope)
         binding.entrySuggestionsView.load()
         sharedContextualViewModel.requestPageContext()
