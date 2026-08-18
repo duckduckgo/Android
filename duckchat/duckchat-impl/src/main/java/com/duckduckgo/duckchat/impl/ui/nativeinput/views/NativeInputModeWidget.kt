@@ -65,6 +65,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.ui.PulseAnimation
 import com.duckduckgo.browser.ui.tabs.TabSwitcherButton
 import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.view.addBottomShadow
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
@@ -90,6 +91,7 @@ import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedFile
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedImage
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.google.android.material.card.MaterialCardView
+import com.google.android.material.shape.ShapeAppearanceModel
 import com.google.android.material.tabs.TabLayout
 import dagger.android.support.AndroidSupportInjection
 import dev.zacsweers.metro.HasMemberInjections
@@ -272,6 +274,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     @Inject
     lateinit var browserMode: BrowserMode
+
+    @Inject
+    lateinit var appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles
 
     @Inject
     lateinit var faviconManager: FaviconManager
@@ -1698,10 +1703,17 @@ class NativeInputModeWidget @JvmOverloads constructor(
         // Only the top browser search-only omnibar takes the wide-omnibar shape; isBottom is part of this
         // condition (not an early return) so a bottom Duck.ai frame still reaches the reset below.
         val isBrowserSearchOnly = state.inputContext == NativeInputState.InputContext.BROWSER && !state.toggleVisible
+        if (state.isBottom) {
+            card.radius = card.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.largeShapeCornerRadius)
+        }
         if (isBrowserSearchOnly && !state.isBottom) {
             val targetTopMargin = card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.omnibarCardMarginTop)
             val targetHorizontalMargin = card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.omnibarCardMarginHorizontal)
-            card.radius = card.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.largeShapeCornerRadius)
+            if (appBrandDesignUpdateToggles.addressBar().isEnabled()) {
+                card.shapeAppearanceModel = card.shapeAppearanceModel.withCornerSize(ShapeAppearanceModel.PILL)
+            } else {
+                card.radius = card.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.largeShapeCornerRadius)
+            }
             lp.topMargin = targetTopMargin - card.paddingTop
             lp.marginStart = targetHorizontalMargin - card.paddingLeft
             lp.marginEnd = targetHorizontalMargin - card.paddingRight
