@@ -274,9 +274,9 @@ interface DuckChatInternal : DuckChat {
     fun isContextualSheetRedesignEnabled(): Boolean
 
     /**
-     * Returns the side the Search/Duck.ai toggle is defaulted to. Null if toggle is disabled.
+     * Returns the side the Search/Duck.ai toggle is defaulted to.
      */
-    fun resolvedTogglePosition(): NativeInputState.ToggleSelection?
+    fun resolvedTogglePosition(): NativeInputState.ToggleSelection
 
     /**
      * Checks whether DuckChat is enabled based on remote config flag.
@@ -929,8 +929,7 @@ class RealDuckChat @Inject constructor(
         duckChatFeatureRepository.setLastUsedTogglePosition(position)
     }
 
-    override fun resolvedTogglePosition(): NativeInputState.ToggleSelection? {
-        if (_inputModeCapability.value != NativeInputState.InputMode.SEARCH_AND_DUCK_AI) return null
+    override fun resolvedTogglePosition(): NativeInputState.ToggleSelection {
         val defaultPosition = DefaultTogglePosition.fromName(duckChatFeatureRepository.observeDefaultTogglePosition().value)
         val configured = if (defaultPosition == DefaultTogglePosition.LAST_USED) {
             DefaultTogglePosition.fromName(duckChatFeatureRepository.observeLastUsedTogglePosition().value)

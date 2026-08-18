@@ -1677,11 +1677,13 @@ class RealDuckChatTest {
     }
 
     @Test
-    fun `when no toggle is offered then there is no resolved position`() = runTest {
+    fun `resolved toggle position does not depend on cached input mode capability`() = runTest {
+        whenever(mockDuckChatFeatureRepository.observeDefaultTogglePosition()).thenReturn(MutableStateFlow("DUCK_AI"))
         whenever(mockDuckChatFeatureRepository.isInputScreenUserSettingEnabled()).thenReturn(false)
         testee.onPrivacyConfigDownloaded()
+        advanceUntilIdle()
 
-        assertNull(testee.resolvedTogglePosition())
+        assertEquals(NativeInputState.ToggleSelection.DUCK_AI, testee.resolvedTogglePosition())
     }
 
     @Test
