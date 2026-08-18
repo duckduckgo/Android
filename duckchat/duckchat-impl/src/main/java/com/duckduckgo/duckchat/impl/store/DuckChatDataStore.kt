@@ -144,11 +144,11 @@ interface DuckChatDataStore {
 
     suspend fun getDefaultTogglePosition(): String?
 
-    fun observeDefaultTogglePosition(): Flow<String?>
+    fun observeDefaultTogglePosition(): StateFlow<String?>
 
     suspend fun setLastUsedTogglePosition(position: String)
 
-    fun observeLastUsedTogglePosition(): Flow<String?>
+    fun observeLastUsedTogglePosition(): StateFlow<String?>
 
     suspend fun getSelectedModel(): SelectedModel?
 
@@ -453,13 +453,13 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
     override suspend fun getDefaultTogglePosition(): String? =
         store.data.firstOrNull()?.let { it[DUCK_AI_DEFAULT_TOGGLE_POSITION] }
 
-    override fun observeDefaultTogglePosition(): Flow<String?> = defaultTogglePositionFlow
+    override fun observeDefaultTogglePosition(): StateFlow<String?> = defaultTogglePositionFlow
 
     override suspend fun setLastUsedTogglePosition(position: String) {
         store.edit { prefs -> prefs[DUCK_AI_LAST_USED_TOGGLE_POSITION] = position }
     }
 
-    override fun observeLastUsedTogglePosition(): Flow<String?> = lastUsedTogglePositionFlow
+    override fun observeLastUsedTogglePosition(): StateFlow<String?> = lastUsedTogglePositionFlow
 
     override suspend fun getSelectedModel(): SelectedModel? {
         val prefs = store.data.firstOrNull() ?: return null
