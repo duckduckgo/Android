@@ -17,7 +17,6 @@
 package com.duckduckgo.privacy.config.impl
 
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -73,8 +72,7 @@ class RealPrivacyConfigDownloadTelemetry @Inject constructor(
             PARAM_PERSIST_DURATION to lowerBoundBucket(persistDuration),
             PARAM_TOTAL_DURATION to lowerBoundBucket(totalDuration),
         )
-        pixel.fire("${PRIVACY_CONFIG_DOWNLOADED_PIXEL}_count", params)
-        pixel.fire("${PRIVACY_CONFIG_DOWNLOADED_PIXEL}_daily", params, type = Daily())
+        pixel.fire(PRIVACY_CONFIG_DOWNLOADED_PIXEL, params)
     }
 
     override fun onDownloadFailed(code: String) {

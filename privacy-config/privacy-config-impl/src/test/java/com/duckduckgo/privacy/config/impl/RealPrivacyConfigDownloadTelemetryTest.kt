@@ -18,7 +18,6 @@ package com.duckduckgo.privacy.config.impl
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -35,20 +34,21 @@ class RealPrivacyConfigDownloadTelemetryTest {
     private val testee = RealPrivacyConfigDownloadTelemetry(pixel, currentTimeProvider)
 
     @Test
-    fun whenDownloadCompletesThenFireCountAndDailyPixelsWithBucketedDurations() {
+    fun whenDownloadCompletesThenFirePixelWithBucketedDurations() {
         givenElapsedRealtimes(1_000L, 1_313L, 1_800L)
 
         testee.onDownloadStarted()
         testee.onDownloadFinished()
         testee.onProcessFinished()
 
-        val expectedParams = mapOf(
-            "fetch_duration_ms_bucketed" to "300",
-            "persist_duration_ms_bucketed" to "400",
-            "total_duration_ms_bucketed" to "800",
+        verify(pixel).fire(
+            "privacy_config_downloaded",
+            mapOf(
+                "fetch_duration_ms_bucketed" to "300",
+                "persist_duration_ms_bucketed" to "400",
+                "total_duration_ms_bucketed" to "800",
+            ),
         )
-        verify(pixel).fire("privacy_config_downloaded_count", expectedParams)
-        verify(pixel).fire("privacy_config_downloaded_daily", expectedParams, emptyMap(), Daily())
     }
 
     @Test
@@ -60,7 +60,7 @@ class RealPrivacyConfigDownloadTelemetryTest {
         testee.onProcessFinished()
 
         verify(pixel).fire(
-            "privacy_config_downloaded_count",
+            "privacy_config_downloaded",
             mapOf(
                 "fetch_duration_ms_bucketed" to "300",
                 "persist_duration_ms_bucketed" to "500",
@@ -78,7 +78,7 @@ class RealPrivacyConfigDownloadTelemetryTest {
         testee.onProcessFinished()
 
         verify(pixel).fire(
-            "privacy_config_downloaded_count",
+            "privacy_config_downloaded",
             mapOf(
                 "fetch_duration_ms_bucketed" to "0",
                 "persist_duration_ms_bucketed" to "0",
@@ -96,7 +96,7 @@ class RealPrivacyConfigDownloadTelemetryTest {
         testee.onProcessFinished()
 
         verify(pixel).fire(
-            "privacy_config_downloaded_count",
+            "privacy_config_downloaded",
             mapOf(
                 "fetch_duration_ms_bucketed" to "10000",
                 "persist_duration_ms_bucketed" to "10000",

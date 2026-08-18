@@ -2,9 +2,8 @@
     "privacy_config_downloaded": {
         "description": "Fired when the remote privacy config has been downloaded and stored successfully, reporting how long each stage took. Durations are bucketed; no URLs, identifiers or exact timings are sent.",
         "owners": ["catalinradoiu"],
-        "triggers": ["scheduled"],
-        "suffixes": ["first_daily_count"],
-        "expires": "2027-02-28",
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
             {
