@@ -79,7 +79,7 @@ class EditPromptActivity : DuckDuckGoActivity() {
             setupToolbar(this)
             title = getString(R.string.duck_ai_edit_prompt_title)
             setNavigationIcon(com.duckduckgo.mobile.android.R.drawable.ic_close_24)
-            navigationContentDescription = getString(R.string.duck_ai_edit_prompt_cancel)
+            navigationContentDescription = getString(com.duckduckgo.mobile.android.R.string.cancel)
             setNavigationOnClickListener { finish() }
         }
 
