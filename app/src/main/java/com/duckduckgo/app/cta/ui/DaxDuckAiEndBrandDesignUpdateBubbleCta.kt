@@ -55,7 +55,7 @@ data class DaxDuckAiEndBrandDesignUpdateBubbleCta(
     onboardingImprovementsV2Enabled = onboardingImprovementsV2Enabled,
 ),
     DaxBubbleCta.ShowsWavingDax {
-    override val activeIncludeId: Int = R.id.primaryCta
+    override val activeIncludeIds: List<Int> = listOf(R.id.primaryCta)
     override val showArrow: Boolean = true
     override val wavingDaxSpec = WavingDaxSpec(
         rotationDegrees = 0f,

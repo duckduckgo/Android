@@ -30,6 +30,7 @@ import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.ComparisonChar
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.DownloadReasonBinder
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.InputScreenBinder
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.InputScreenPreviewBinder
+import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.PreferenceSelectorBinder
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.QuickSetupBinder
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.WelcomeBinder
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.WidgetPromptBinder
@@ -62,6 +63,7 @@ class ContentControllerImpl(
     private val addToDock = AddToDockBinder(binding.addToDockContent)
     private val widgetPrompt = WidgetPromptBinder(binding.widgetPromptContent)
     private val downloadReason = DownloadReasonBinder(binding.downloadReasonContent)
+    private val preferenceSelector = PreferenceSelectorBinder(binding.preferenceSelectorContent)
 
     private var boundView: View? = null
 
@@ -117,6 +119,10 @@ class ContentControllerImpl(
             is ContentConfig.DownloadReason -> {
                 boundView = downloadReason.view
                 downloadReason.bind(content, contentValues.contentState(stepId, content), scope)
+            }
+            is ContentConfig.PreferenceSelector -> {
+                boundView = preferenceSelector.view
+                preferenceSelector.bind(content, contentValues.contentState(stepId, content), scope)
             }
         }
         boundView?.isVisible = true

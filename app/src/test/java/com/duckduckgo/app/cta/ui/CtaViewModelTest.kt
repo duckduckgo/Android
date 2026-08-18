@@ -1430,6 +1430,46 @@ class CtaViewModelTest {
     }
 
     @Test
+    fun whenEndCtaConditionsMetAndSegmentedSearchToggleFlagSetThenSegmentedVariantReturnedAndInputScreenSettingApplied() = runTest {
+        givenDaxOnboardingActive()
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO_VISIT_SITE)).thenReturn(true)
+        givenAtLeastOneDaxDialogCtaShown()
+        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
+        whenever(mockOnboardingStore.isSegmentedSearchPathWithToggleEnabled()).thenReturn(true)
+
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = false,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
+
+        assertTrue((value as DaxEndBrandDesignUpdateBubbleCta).isSegmentedSearchPathWithToggleEnabled)
+        verify(mockDuckChat).setInputScreenUserSetting(true)
+    }
+
+    @Test
+    fun whenEndCtaConditionsMetAndSegmentedSearchToggleFlagNotSetThenInputScreenSettingNotApplied() = runTest {
+        givenDaxOnboardingActive()
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO_VISIT_SITE)).thenReturn(true)
+        givenAtLeastOneDaxDialogCtaShown()
+        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
+        whenever(mockOnboardingStore.isSegmentedSearchPathWithToggleEnabled()).thenReturn(false)
+
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = false,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
+
+        assertFalse((value as DaxEndBrandDesignUpdateBubbleCta).isSegmentedSearchPathWithToggleEnabled)
+        verify(mockDuckChat, never()).setInputScreenUserSetting(any())
+    }
+
+    @Test
     fun whenBrandDesignUpdateToggleDisabledAndEndCtaConditionsMetThenReturnLegacyEndCta() = runTest {
         givenDaxOnboardingActive()
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
@@ -2319,6 +2359,7 @@ class CtaViewModelTest {
         onboardingImprovementsEnabled = false,
         onboardingImprovementsV2Enabled = true,
         isOmnibarBottom = false,
+        isSegmentedSearchPathWithToggleEnabled = false,
     )
 
     private fun daxDuckAiEndBrandDesignUpdateBubbleCta() = DaxDuckAiEndBrandDesignUpdateBubbleCta(

@@ -40,9 +40,8 @@
                 android:layout_marginBottom="@dimen/keyline_4"
                 android:contentDescription="@null"
                 android:importantForAccessibility="no"
-                android:padding="16dp"
                 android:visibility="gone"
-                app:srcCompat="@drawable/ic_onboarding_subscription_shield"
+                app:srcCompat="@drawable/ic_subscription_96"
                 tools:visibility="visible" />
 
             <FrameLayout
@@ -102,6 +101,18 @@
                 android:visibility="gone"
                 app:daxButtonBrandTypography="duckSans"
                 tools:text="High Five!"
+                tools:visibility="gone" />
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+                android:id="@+id/secondaryCta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="8dp"
+                android:textAppearance="@style/Typography.DuckDuckGo.Rebrand.ButtonDuckSans"
+                android:visibility="gone"
+                tools:ignore="DeprecatedWidgetInXml,InvalidDaxButtonDuckSans,InvalidDaxButtonProperty"
+                tools:text="Skip"
                 tools:visibility="gone" />
 
         </com.duckduckgo.app.onboarding.ui.view.TouchInterceptingLinearLayout>

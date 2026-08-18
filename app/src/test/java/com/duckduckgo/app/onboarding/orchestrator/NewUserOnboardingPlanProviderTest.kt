@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.onboarding.orchestrator
 
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.cta.db.DismissedCtaDao
@@ -27,12 +28,16 @@ import com.duckduckgo.app.onboarding.CustomAiOnboardingResolver
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.onboarding.DuckAiOnboardingAvailability
 import com.duckduckgo.app.onboarding.DuckAiOnboardingDemo
+import com.duckduckgo.app.onboarding.OnboardingPreference
+import com.duckduckgo.app.onboarding.OnboardingPreferenceApplier
 import com.duckduckgo.app.onboarding.OnboardingPromptsExperimentManager
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager.SegmentedOnboardingExperimentVariant
 import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
+import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_AICHAT_SELECTED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CHOOSE_BROWSER_PRESSED
@@ -71,6 +76,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -103,6 +109,7 @@ class NewUserOnboardingPlanProviderTest {
     private val duckAiOnboardingDemo: DuckAiOnboardingDemo = mock()
     private val homeScreenPromptsExperiment: OnboardingPromptsExperimentManager = mock()
     private val segmentedOnboardingExperiment: SegmentedOnboardingExperimentManager = mock()
+    private val onboardingPreferenceApplier: OnboardingPreferenceApplier = mock()
 
     private lateinit var provider: NewUserOnboardingPlanProvider
     private val orchestrator = LinearOnboardingOrchestratorImpl()
@@ -146,6 +153,7 @@ class NewUserOnboardingPlanProviderTest {
             duckAiOnboardingDemo = duckAiOnboardingDemo,
             onboardingPromptsExperimentManager = homeScreenPromptsExperiment,
             segmentedOnboardingExperimentManager = segmentedOnboardingExperiment,
+            onboardingPreferenceApplier = onboardingPreferenceApplier,
         )
     }
 
@@ -201,6 +209,141 @@ class NewUserOnboardingPlanProviderTest {
         assertStep(NewUserOnboardingStepIds.DOWNLOAD_REASON)
     }
 
+    private suspend fun startSegmentedAtDownloadReason() {
+        whenever(homeScreenPromptsExperiment.enroll()).thenReturn(null)
+        whenever(segmentedOnboardingExperiment.enroll()).thenReturn(SegmentedOnboardingExperimentVariant.TREATMENT)
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
+        assertStep(NewUserOnboardingStepIds.DOWNLOAD_REASON)
+    }
+
+    @Test
+    fun `when the search download reason is confirmed then switches to the segmented search plan`() = runTest {
+        startSegmentedAtDownloadReason()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.SEARCH))
+
+        assertStep(NewUserOnboardingStepIds.COMPARISON_CHART)
+        val step = (orchestrator.state.value as InProgress).currentStep as NewUserOnboardingActivityStep
+        assertEquals(
+            NewUserOnboardingActivityDialog.SegmentedComparisonChart(ComparisonChartConfig.SegmentedSearchPath),
+            step.resolveDialog(),
+        )
+    }
+
+    @Test
+    fun `when a not yet implemented download reason is confirmed then stays`() = runTest {
+        startSegmentedAtDownloadReason()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.AI_CHAT))
+
+        assertStep(NewUserOnboardingStepIds.DOWNLOAD_REASON)
+    }
+
+    @Test
+    fun `when a null download reason is confirmed then falls back to the search plan`() = runTest {
+        startSegmentedAtDownloadReason()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(selection = null))
+
+        assertStep(NewUserOnboardingStepIds.COMPARISON_CHART)
+    }
+
+    @Test
+    fun `when on the segmented search path then walks the full plan to completed`() = runTest {
+        whenever(duckAiAvailability.isDuckAiOnboardingEnabled()).thenReturn(true)
+        whenever(onboardingPreferenceApplier.isAvailable(OnboardingPreference.SEARCH_HISTORY)).thenReturn(true)
+        whenever(onboardingPreferenceApplier.isAvailable(OnboardingPreference.SAFE_SEARCH)).thenReturn(true)
+        whenever(onboardingPreferenceApplier.isEnabled(OnboardingPreference.SEARCH_HISTORY)).thenReturn(false)
+        whenever(onboardingPreferenceApplier.isEnabled(OnboardingPreference.SAFE_SEARCH)).thenReturn(true)
+        startSegmentedAtDownloadReason()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.SEARCH))
+        assertStep(NewUserOnboardingStepIds.COMPARISON_CHART)
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
+        assertStep(NewUserOnboardingStepIds.DEFAULT_BROWSER_PROMPT)
+        orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
+        assertStep(NewUserOnboardingStepIds.PREFERENCE_SELECTOR)
+        val selectorStep = (orchestrator.state.value as InProgress).currentStep as NewUserOnboardingActivityStep
+        assertEquals(
+            NewUserOnboardingActivityDialog.PreferenceSelector(
+                mapOf(
+                    OnboardingPreference.SEARCH_HISTORY to false,
+                    OnboardingPreference.SAFE_SEARCH to true,
+                ),
+            ),
+            selectorStep.resolveDialog(),
+        )
+        orchestrator.onEvent(
+            NewUserOnboardingEvent.PreferenceSelectorConfirmed(
+                mapOf(
+                    OnboardingPreference.SEARCH_HISTORY to true,
+                    OnboardingPreference.SAFE_SEARCH to true,
+                ),
+            ),
+        )
+        verify(onboardingPreferenceApplier).apply(OnboardingPreference.SEARCH_HISTORY, true)
+        verify(onboardingPreferenceApplier).apply(OnboardingPreference.SAFE_SEARCH, true)
+        assertStep(NewUserOnboardingStepIds.INPUT_SCREEN)
+        orchestrator.onEvent(NewUserOnboardingEvent.InputModeConfirmed(withAi = false))
+        verify(onboardingStore).setSegmentedSearchPathWithToggleEnabled(false)
+        assertStep(NewUserOnboardingStepIds.ADDRESS_BAR_POSITION)
+        orchestrator.onEvent(NewUserOnboardingEvent.AddressBarConfirmed(OmnibarType.SINGLE_TOP))
+        assertStep(NewUserOnboardingStepIds.INPUT_SCREEN_PREVIEW)
+        val previewStep = (orchestrator.state.value as InProgress).currentStep as NewUserOnboardingActivityStep
+        assertEquals(
+            NewUserOnboardingActivityDialog.InputScreenPreview(
+                isSearchDefault = true,
+                showModeToggle = false,
+                titleRes = R.string.searchPathInputPreviewTitle,
+            ),
+            previewStep.resolveDialog(),
+        )
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
+        assertEquals(Completed(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID), orchestrator.state.value)
+    }
+
+    @Test
+    fun `when no preference is available then the selector is skipped and an ai selection persists the toggle flag`() = runTest {
+        whenever(onboardingPreferenceApplier.isAvailable(any())).thenReturn(false)
+        startSegmentedAtDownloadReason()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.SEARCH))
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
+        orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
+        assertStep(NewUserOnboardingStepIds.INPUT_SCREEN)
+        orchestrator.onEvent(NewUserOnboardingEvent.InputModeConfirmed(withAi = true))
+
+        verify(onboardingStore).setSegmentedSearchPathWithToggleEnabled(true)
+        assertStep(NewUserOnboardingStepIds.ADDRESS_BAR_POSITION)
+    }
+
+    @Test
+    fun `when the ai toggle was enabled on the search path then the preview keeps the mode toggle and default title`() = runTest {
+        whenever(duckAiAvailability.isDuckAiOnboardingEnabled()).thenReturn(true)
+        whenever(onboardingPreferenceApplier.isAvailable(any())).thenReturn(false)
+        startSegmentedAtDownloadReason()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.SEARCH))
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
+        orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
+        orchestrator.onEvent(NewUserOnboardingEvent.InputModeConfirmed(withAi = true))
+        orchestrator.onEvent(NewUserOnboardingEvent.AddressBarConfirmed(OmnibarType.SINGLE_TOP))
+
+        assertStep(NewUserOnboardingStepIds.INPUT_SCREEN_PREVIEW)
+        val previewStep = (orchestrator.state.value as InProgress).currentStep as NewUserOnboardingActivityStep
+        assertEquals(
+            NewUserOnboardingActivityDialog.InputScreenPreview(
+                isSearchDefault = true,
+                showModeToggle = true,
+                titleRes = R.string.preOnboardingInputModeDemoTitle,
+            ),
+            previewStep.resolveDialog(),
+        )
+    }
+
     @Test
     fun `when the segmented control variant then builds the default plan`() = runTest {
         whenever(homeScreenPromptsExperiment.enroll()).thenReturn(null)
@@ -251,9 +394,8 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
         orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
         assertStep(NewUserOnboardingStepIds.SYNC_RESTORE)
-        // isAppReinstall must run even when Sync Restore wins (side-effecting): once eagerly to gate
-        // enrollment in the home-screen-prompts experiment, once via the first-dialog memo.
-        verify(appBuildConfig, times(2)).isAppReinstall()
+        // isAppReinstall must run even when Sync Restore wins, because it is side-effecting.
+        verify(appBuildConfig, times(1)).isAppReinstall()
         orchestrator.onEvent(NewUserOnboardingEvent.RestoreRequested)
         verify(pixel).fire(PREONBOARDING_SYNC_RESTORE_TAPPED_UNIQUE, type = Unique())
         verify(syncAutoRestore).restoreSyncAccount()
@@ -325,7 +467,11 @@ class NewUserOnboardingPlanProviderTest {
         assertStep(NewUserOnboardingStepIds.INPUT_SCREEN_PREVIEW)
         val step = (orchestrator.state.value as InProgress).currentStep as NewUserOnboardingActivityStep
         assertEquals(
-            NewUserOnboardingActivityDialog.InputScreenPreview(isSearchDefault = true),
+            NewUserOnboardingActivityDialog.InputScreenPreview(
+                isSearchDefault = true,
+                showModeToggle = true,
+                titleRes = R.string.preOnboardingInputModeDemoTitle,
+            ),
             step.resolveDialog(),
         )
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)

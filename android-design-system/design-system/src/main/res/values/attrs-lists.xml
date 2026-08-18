@@ -21,6 +21,7 @@
     <attr name="twoLineListItemStyle" format="reference"/>
 
     <attr name="primaryText" format="string"/>
+    <attr name="primaryTextAppearance" format="reference"/>
     <attr name="primaryTextColorOverlay" format="color"/>
     <attr name="primaryTextTruncated" format="boolean"/>
     <attr name="primaryTextType">
@@ -30,6 +31,7 @@
         <enum name="destructive" value="1" />
     </attr>
     <attr name="secondaryText" format="string"/>
+    <attr name="secondaryTextAppearance" format="reference"/>
     <attr name="secondaryTextColorOverlay" format="color"/>
     <attr name="leadingIcon" format="integer"/>
     <attr name="leadingIconTint" format="reference|color"/>
@@ -91,9 +93,11 @@
     <!--Two Line Item view-->
     <declare-styleable name="TwoLineListItem">
         <attr name="primaryText"/>
+        <attr name="primaryTextAppearance"/>
         <attr name="primaryTextColorOverlay"/>
         <attr name="primaryTextTruncated"/>
         <attr name="secondaryText"/>
+        <attr name="secondaryTextAppearance"/>
         <attr name="secondaryTextColorOverlay"/>
         <attr name="leadingIcon"/>
         <attr name="leadingIconBackground"/>

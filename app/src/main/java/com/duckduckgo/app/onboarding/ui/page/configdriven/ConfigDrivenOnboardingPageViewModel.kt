@@ -463,6 +463,7 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
             is NewUserOnboardingActivityDialog.IntroAnimation,
             NewUserOnboardingActivityDialog.ComparisonChart,
             NewUserOnboardingActivityDialog.AiComparisonChart,
+            is NewUserOnboardingActivityDialog.SegmentedComparisonChart,
             NewUserOnboardingActivityDialog.DownloadReason,
             NewUserOnboardingActivityDialog.AddToDock,
             NewUserOnboardingActivityDialog.WidgetPrompt,
@@ -470,6 +471,7 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
             NewUserOnboardingActivityDialog.InputScreen,
             is NewUserOnboardingActivityDialog.InputScreenPreview,
             is NewUserOnboardingActivityDialog.QuickSetup,
+            is NewUserOnboardingActivityDialog.PreferenceSelector,
             -> Unit
         }
     }

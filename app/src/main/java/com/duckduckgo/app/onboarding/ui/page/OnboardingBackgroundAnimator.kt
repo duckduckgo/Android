@@ -44,10 +44,6 @@ sealed class OnboardingBackgroundStep(
         backgroundRes = R.drawable.onboarding_welcome_screen_background,
         maxHeightDp = 404,
     )
-    data object DownloadReason : OnboardingBackgroundStep(
-        backgroundRes = R.drawable.onboarding_browser_comparison_background,
-        maxHeightDp = 216,
-    )
     data object ComparisonChart : OnboardingBackgroundStep(
         backgroundRes = R.drawable.onboarding_browser_comparison_background,
         maxHeightDp = 216,
@@ -71,6 +67,10 @@ sealed class OnboardingBackgroundStep(
     data object InputType : OnboardingBackgroundStep(
         backgroundRes = R.drawable.onboarding_input_type_background,
         maxHeightDp = 166,
+    )
+    data object PreferenceSelector : OnboardingBackgroundStep(
+        backgroundRes = R.drawable.onboarding_preference_selector_background,
+        maxHeightDp = 286,
     )
 }
 

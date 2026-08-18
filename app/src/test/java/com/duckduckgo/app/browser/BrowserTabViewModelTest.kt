@@ -179,6 +179,7 @@ import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxIntroSearchOptionsCta
 import com.duckduckgo.app.cta.ui.DaxDuckAiEndBrandDesignUpdateBubbleCta
 import com.duckduckgo.app.cta.ui.DaxDuckAiEndBubbleCta
 import com.duckduckgo.app.cta.ui.DaxDuckAiFireButtonBrandDesignUpdateContextualCta
+import com.duckduckgo.app.cta.ui.DaxEndBrandDesignUpdateBubbleCta
 import com.duckduckgo.app.cta.ui.DaxFireButtonBrandDesignUpdateContextualCta
 import com.duckduckgo.app.cta.ui.DaxSerpBrandDesignUpdateContextualCta
 import com.duckduckgo.app.cta.ui.DaxSiteSuggestionsBrandDesignUpdateContextualCta
@@ -3966,6 +3967,55 @@ class BrowserTabViewModelTest {
 
         assertNotEquals(cta, testee.ctaViewState.value?.cta)
     }
+
+    @Test
+    fun whenUserClickedSegmentedSearchEndCtaOkButtonThenBubbleHiddenAndInputOpensOnDuckAiTab() = runTest {
+        val cta = daxEndBrandDesignUpdateBubbleCta(isSegmentedSearchPathWithToggleEnabled = true)
+        setCta(cta)
+
+        testee.onUserClickCtaOkButton(cta)
+        advanceUntilIdle()
+
+        assertNull(testee.ctaViewState.value?.cta)
+        assertCommandIssued<HideOnboardingDaxBubbleCta>()
+        verify(mockCustomAiOnboardingStore).setOpenInputOnDuckAiTab()
+        assertCommandIssued<ShowKeyboard>()
+    }
+
+    @Test
+    fun whenUserClickedEndCtaOkButtonOutsideSegmentedSearchPathThenCtaIsRefreshedAway() = runTest {
+        val cta = daxEndBrandDesignUpdateBubbleCta(isSegmentedSearchPathWithToggleEnabled = false)
+        setCta(cta)
+
+        testee.onUserClickCtaOkButton(cta)
+        advanceUntilIdle()
+
+        assertNotEquals(cta, testee.ctaViewState.value?.cta)
+        verify(mockCustomAiOnboardingStore, never()).setOpenInputOnDuckAiTab()
+    }
+
+    @Test
+    fun whenUserClickedSegmentedSearchEndCtaSecondaryButtonThenCtaIsRefreshedAway() = runTest {
+        val cta = daxEndBrandDesignUpdateBubbleCta(isSegmentedSearchPathWithToggleEnabled = true)
+        setCta(cta)
+
+        testee.onUserClickCtaSecondaryButton(cta)
+        advanceUntilIdle()
+
+        assertNotEquals(cta, testee.ctaViewState.value?.cta)
+        verify(mockCustomAiOnboardingStore, never()).setOpenInputOnDuckAiTab()
+    }
+
+    private fun daxEndBrandDesignUpdateBubbleCta(isSegmentedSearchPathWithToggleEnabled: Boolean) = DaxEndBrandDesignUpdateBubbleCta(
+        onboardingStore = mockOnboardingStore,
+        appInstallStore = mockAppInstallStore,
+        isLightTheme = true,
+        deviceInfo = mockDeviceInfo,
+        onboardingImprovementsEnabled = true,
+        onboardingImprovementsV2Enabled = true,
+        isOmnibarBottom = false,
+        isSegmentedSearchPathWithToggleEnabled = isSegmentedSearchPathWithToggleEnabled,
+    )
 
     @Test
     fun whenUserClickedAddWidgetCtaButtonThenLaunchAddWidgetCommand() {

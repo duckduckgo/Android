@@ -19,6 +19,7 @@ package com.duckduckgo.app.onboarding.ui.page.configdriven
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
+import com.duckduckgo.app.onboarding.OnboardingPreference
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityDialog
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
 import com.duckduckgo.app.onboarding.store.OnboardingStore
@@ -77,6 +78,60 @@ class DialogConfigResolverTest {
     }
 
     @Test
+    fun `resolves the segmented comparison chart without an embellishment or card arrow`() {
+        val config = testee.resolve(
+            NewUserOnboardingActivityDialog.SegmentedComparisonChart(ComparisonChartConfig.SegmentedSearchPath),
+            isCustomAiFlow = false,
+        )!!
+
+        assertEquals(OnboardingBackgroundStep.ComparisonChart, config.background)
+        assertEquals(Embellishment.None, config.embellishment)
+        assertEquals(CardArrowConfig.Hidden, config.cardArrow)
+        val expectedChart = ComparisonChartConfig.SegmentedSearchPath
+        assertEquals(ContentConfig.ComparisonChart(TextConfig.Resource(expectedChart.titleRes), expectedChart), config.content)
+        assertEquals(
+            CtaConfig(TextConfig.Resource(expectedChart.primaryCtaTextRes), CtaAction.Emit(NewUserOnboardingEvent.ContinueClicked)),
+            config.primaryCta,
+        )
+    }
+
+    @Test
+    fun `resolves the preference selector with a row per offered preference and a submitting cta`() {
+        val config = testee.resolve(
+            NewUserOnboardingActivityDialog.PreferenceSelector(
+                mapOf(
+                    OnboardingPreference.SEARCH_HISTORY to true,
+                    OnboardingPreference.SAFE_SEARCH to false,
+                ),
+            ),
+            isCustomAiFlow = false,
+        )!!
+
+        assertEquals(OnboardingBackgroundStep.PreferenceSelector, config.background)
+        assertEquals(Embellishment.LeftWing, config.embellishment)
+        assertEquals(CardArrowConfig.AtEnd, config.cardArrow)
+        val content = config.content as ContentConfig.PreferenceSelector
+        assertEquals(TextConfig.Resource(R.string.searchPathPreferenceSelectorTitle), content.title)
+        assertEquals(
+            listOf(
+                OnboardingPreference.SEARCH_HISTORY to true,
+                OnboardingPreference.SAFE_SEARCH to false,
+            ),
+            content.rows.map { it.preference to it.initiallyEnabled },
+        )
+        assertEquals(
+            PreferenceSelectorContentState(
+                mapOf(
+                    OnboardingPreference.SEARCH_HISTORY to true,
+                    OnboardingPreference.SAFE_SEARCH to false,
+                ),
+            ),
+            content.initialState(),
+        )
+        assertEquals(CtaAction.Submit, config.primaryCta!!.action)
+    }
+
+    @Test
     fun `resolves the address bar position with a submitting cta`() {
         val config = testee.resolve(NewUserOnboardingActivityDialog.AddressBarPosition(showSplitOption = true), isCustomAiFlow = false)!!
 
@@ -97,7 +152,7 @@ class DialogConfigResolverTest {
     fun `resolves the download reason with a submitting cta`() {
         val config = testee.resolve(NewUserOnboardingActivityDialog.DownloadReason, isCustomAiFlow = false)!!
 
-        assertEquals(OnboardingBackgroundStep.DownloadReason, config.background)
+        assertEquals(OnboardingBackgroundStep.ComparisonChart, config.background)
         assertEquals(Embellishment.BottomWing, config.embellishment)
         assertEquals(CardArrowConfig.AtEnd, config.cardArrow)
         assertEquals(
@@ -280,7 +335,14 @@ class DialogConfigResolverTest {
 
     @Test
     fun `resolves the input screen preview with store suggestions and no cta`() {
-        val config = testee.resolve(NewUserOnboardingActivityDialog.InputScreenPreview(isSearchDefault = true), isCustomAiFlow = false)!!
+        val config = testee.resolve(
+            NewUserOnboardingActivityDialog.InputScreenPreview(
+                isSearchDefault = true,
+                showModeToggle = true,
+                titleRes = R.string.preOnboardingInputModeDemoTitle,
+            ),
+            isCustomAiFlow = false,
+        )!!
 
         assertEquals(OnboardingBackgroundStep.InputType, config.background)
         assertEquals(Embellishment.None, config.embellishment)
@@ -300,8 +362,15 @@ class DialogConfigResolverTest {
     }
 
     @Test
-    fun `resolves the input screen preview without a mode toggle in the custom ai flow`() {
-        val config = testee.resolve(NewUserOnboardingActivityDialog.InputScreenPreview(isSearchDefault = false), isCustomAiFlow = true)!!
+    fun `resolves the input screen preview title and mode toggle from the dialog`() {
+        val config = testee.resolve(
+            NewUserOnboardingActivityDialog.InputScreenPreview(
+                isSearchDefault = false,
+                showModeToggle = false,
+                titleRes = R.string.preOnboardingInputModeDemoTitleCustomAi,
+            ),
+            isCustomAiFlow = true,
+        )!!
 
         val content = config.content as ContentConfig.InputScreenPreview
         assertEquals(TextConfig.Resource(R.string.preOnboardingInputModeDemoTitleCustomAi), content.title)
