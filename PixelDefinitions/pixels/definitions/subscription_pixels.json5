@@ -259,5 +259,12 @@
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
+    },
+    "m_privacy-pro_app-settings_non-subscriber_impression": {
+        "description": "Fired each time the app settings screen is opened by a user who is eligible for subscription purchase",
+        "owners": ["nalcalag"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
     }
 }
