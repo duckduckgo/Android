@@ -79,7 +79,10 @@ interface SyncApi {
     fun getDevices(token: String): Result<DeviceEntries>
 
     /**
-     * Update this device's `name`, `type` and `info`. All three fields are sent every time — the server clears `info` when it is omitted.
+     * Update this device's `name`, `type` and `info`.
+     *
+     * A null [deviceInfo] is omitted from the request, which makes the server **clear** this device's stored `info` — the intended
+     * behaviour for a legacy-only rename, so nobody reads a name we've stopped keeping up to date.
      *
      * Returns the server's post-update device list.
      */
@@ -87,7 +90,7 @@ interface SyncApi {
         token: String,
         encryptedName: String,
         encryptedType: String,
-        deviceInfo: String,
+        deviceInfo: String?,
     ): Result<PatchDevicesResponse>
 
     fun getBookmarks(
@@ -276,7 +279,7 @@ class SyncServiceRemote @Inject constructor(
         token: String,
         encryptedName: String,
         encryptedType: String,
-        deviceInfo: String,
+        deviceInfo: String?,
     ): Result<PatchDevicesResponse> {
         val deviceId = syncStore.deviceId.takeUnless { it.isNullOrEmpty() }
             ?: return Result.Error(reason = "PatchDevices: no device id")

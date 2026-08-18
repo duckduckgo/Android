@@ -56,6 +56,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
@@ -86,7 +87,11 @@ interface SyncAccountRepository {
     fun generateExchangeInvitationCode(): Result<AuthCode>
     fun pollSecondDeviceExchangeAcknowledgement(): Result<Boolean>
     fun pollForRecoveryCodeAndLogin(): Result<ExchangeResult>
-    fun renameDevice(device: ConnectedDevice): Result<Boolean>
+
+    /**
+     * Renames [device] to its current [ConnectedDevice.deviceName]. Only this device can be renamed: [Result.Error] for any other device.
+     */
+    suspend fun renameDevice(device: ConnectedDevice): Result<Boolean>
     fun logoutAndJoinNewAccount(stringCode: String): Result<Boolean>
 
     /**
@@ -172,6 +177,7 @@ class AppSyncAccountRepository @Inject constructor(
     private val thirdPartyDeviceListDecryptor: ThirdPartyDeviceListDecryptor,
     private val loginDeviceInfoWriter: LoginDeviceInfoWriter,
     private val signupAccountInfoBuilder: SignupAccountInfoBuilder,
+    private val deviceInfoUpdater: DeviceInfoUpdater,
 ) : SyncAccountRepository {
 
     // Bounded backoff for the 3party→ddg upgrade network calls.
@@ -406,12 +412,30 @@ class AppSyncAccountRepository @Inject constructor(
         }
     }
 
-    override fun renameDevice(device: ConnectedDevice): Result<Boolean> {
-        val userId = syncStore.userId ?: return Error(reason = "Rename Device: Not existing userId").alsoFireUpdateDeviceErrorPixel()
-        val primaryKey = syncStore.primaryKey ?: return Error(reason = "Rename Device: Not existing primaryKey").alsoFireUpdateDeviceErrorPixel()
-        return performLogin(userId, device.deviceId, device.deviceName, primaryKey).onFailure {
+    override suspend fun renameDevice(device: ConnectedDevice): Result<Boolean> = withContext(dispatcherProvider.io()) {
+        // A device can only rename itself
+        if (device.deviceId != syncStore.deviceId) {
+            return@withContext Error(reason = "Rename Device: only this device can be renamed").alsoFireUpdateDeviceErrorPixel()
+        }
+
+        val withDeviceInfo = syncFeature.canWriteUnifiedDeviceList().isEnabled()
+        val canPatchDevice = withDeviceInfo || syncFeature.canUsePatchEndpointForLegacyDeviceRename().isEnabled()
+        logcat { "Sync-UnifiedDevices: rename via ${if (canPatchDevice) "PATCH" else "login"}, withDeviceInfo=$withDeviceInfo" }
+        if (canPatchDevice) {
+            return@withContext when (val result = deviceInfoUpdater.setThisDeviceName(device.deviceName)) {
+                is Success -> Success(true)
+                is Error -> result.alsoFireUpdateDeviceErrorPixel()
+            }
+        }
+
+        // Legacy re-registration, which leaves device_info untouched
+        val userId = syncStore.userId
+            ?: return@withContext Error(reason = "Rename Device: Not existing userId").alsoFireUpdateDeviceErrorPixel()
+        val primaryKey = syncStore.primaryKey
+            ?: return@withContext Error(reason = "Rename Device: Not existing primaryKey").alsoFireUpdateDeviceErrorPixel()
+        performLogin(userId, device.deviceId, device.deviceName, primaryKey).onFailure {
             it.alsoFireUpdateDeviceErrorPixel()
-            return it.copy(code = LOGIN_FAILED.code)
+            return@withContext it.copy(code = LOGIN_FAILED.code)
         }
     }
 
