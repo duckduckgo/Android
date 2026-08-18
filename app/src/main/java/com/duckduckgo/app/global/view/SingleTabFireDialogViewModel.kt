@@ -163,7 +163,7 @@ class SingleTabFireDialogViewModel @Inject constructor(
                 val clearOptions = fireDataStore.getManualClearOptions()
                 val stateData = (viewState.value as? ViewState.Loaded)?.stateData
                 dataClearingWideEvent.start(
-                    entryPoint = DataClearingWideEvent.EntryPoint.SINGLE_TAB_FIRE_DIALOG,
+                    entryPoint = DataClearingWideEvent.EntryPoint.ALL_TABS_BURN,
                     clearOptions = clearOptions,
                     browserMode = browserMode,
                     tabType = stateData?.let { if (it.isDuckAiTab) TabType.AI else TabType.WEB },
@@ -198,7 +198,21 @@ class SingleTabFireDialogViewModel @Inject constructor(
             }
 
             withContext(dispatcherProvider.io()) {
-                dataClearing.clearDataUsingManualFireOptions(browserMode = browserMode)
+                val stateData = (viewState.value as? ViewState.Loaded)?.stateData
+                dataClearingWideEvent.start(
+                    entryPoint = DataClearingWideEvent.EntryPoint.ALL_TABS_BURN,
+                    clearOptions = setOf(FireClearOption.TABS, FireClearOption.DATA, FireClearOption.DUCKAI_CHATS),
+                    browserMode = browserMode,
+                    tabType = stateData?.let { if (it.isDuckAiTab) TabType.AI else TabType.WEB },
+                    tabCount = stateData?.tabCount,
+                )
+                try {
+                    dataClearing.clearDataUsingManualFireOptions(browserMode = browserMode)
+                    dataClearingWideEvent.finishSuccess()
+                } catch (e: Exception) {
+                    dataClearingWideEvent.finishFailure(e)
+                    throw e
+                }
             }
 
             command.send(Command.OnFireTabsClearComplete)
@@ -229,7 +243,18 @@ class SingleTabFireDialogViewModel @Inject constructor(
             }
 
             withContext(dispatcherProvider.io()) {
-                dataClearing.clearSelectedDuckAiChats(chatUrls, browserMode)
+                dataClearingWideEvent.start(
+                    entryPoint = DataClearingWideEvent.EntryPoint.DUCKAI_CHAT_DELETION,
+                    clearOptions = setOf(FireClearOption.DUCKAI_CHATS),
+                    browserMode = browserMode,
+                )
+                try {
+                    dataClearing.clearSelectedDuckAiChats(chatUrls, browserMode)
+                    dataClearingWideEvent.finishSuccess()
+                } catch (e: Exception) {
+                    dataClearingWideEvent.finishFailure(e)
+                    throw e
+                }
             }
 
             // Distinct from ClearingComplete (which the restart paths use): this carries the origin
@@ -267,9 +292,34 @@ class SingleTabFireDialogViewModel @Inject constructor(
                 resolveTargetTabId(origin.value)
             }
 
+            val isContextualChatClear = origin.value == DuckAiContextualChat
+            val stateData = (viewState.value as? ViewState.Loaded)?.stateData
+            val entryPoint = if (isContextualChatClear) {
+                DataClearingWideEvent.EntryPoint.DUCKAI_CHAT_DELETION
+            } else {
+                DataClearingWideEvent.EntryPoint.SINGLE_TAB_BURN
+            }
+            val clearOptions = if (isContextualChatClear) {
+                setOf(FireClearOption.DUCKAI_CHATS)
+            } else {
+                // Burning a tab always takes the tab, its site data and its chat
+                setOf(
+                    FireClearOption.TABS,
+                    FireClearOption.DATA,
+                    FireClearOption.DUCKAI_CHATS
+                )
+            }
+
             val result = withContext(dispatcherProvider.io()) {
+                dataClearingWideEvent.start(
+                    entryPoint = entryPoint,
+                    clearOptions = clearOptions,
+                    browserMode = browserMode,
+                    tabType = stateData?.let { if (it.isDuckAiTab) TabType.AI else TabType.WEB },
+                    tabCount = stateData?.tabCount,
+                )
                 if (originalTabId != null) {
-                    if (origin.value == DuckAiContextualChat) {
+                    if (isContextualChatClear) {
                         dataClearing.clearTabContextualChat(originalTabId, browserMode)
                     } else {
                         dataClearing.clearSingleTabData(
@@ -284,15 +334,27 @@ class SingleTabFireDialogViewModel @Inject constructor(
             }
 
             when (result) {
-                is ClearDataResult.FeatureNotSupported -> command.send(Command.OnSingleTabClearFeatureNotSupported)
+                is ClearDataResult.FeatureNotSupported -> {
+                    dataClearingWideEvent.finishFailure("feature_not_supported")
+                    command.send(Command.OnSingleTabClearFeatureNotSupported)
+                }
                 is ClearDataResult.Success -> {
-                    if (origin.value != DuckAiContextualChat) {
+                    dataClearingWideEvent.finishSuccess()
+                    if (!isContextualChatClear) {
                         // in case of contextual chat the origin tab is never closed, don't need this
                         waitForTabsToUpdate(originalTabId)
                     }
                     command.send(Command.OnSingleTabClearComplete)
                 }
-                else -> command.send(Command.OnSingleTabClearError)
+                else -> {
+                    val error = (result as? ClearDataResult.Error)?.exception
+                    if (error != null) {
+                        dataClearingWideEvent.finishFailure(error)
+                    } else {
+                        dataClearingWideEvent.finishFailure("tab_not_found")
+                    }
+                    command.send(Command.OnSingleTabClearError)
+                }
             }
         }
     }

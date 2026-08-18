@@ -36,7 +36,7 @@ interface DataClearingWideEvent {
      * that's the mode context it always runs in.
      * @param tabType The type of the active tab when the burn was confirmed. Only meaningful for
      * dialog-driven flows; omit where there is no active-tab context (app shortcut, auto clears,
-     * fire tabs emptied).
+     * fire tabs emptied, chat deletions).
      * @param tabCount The number of open tabs when the burn was confirmed (bucketed before sending).
      */
     suspend fun start(
@@ -55,8 +55,12 @@ interface DataClearingWideEvent {
 
     suspend fun finishFailure(error: Throwable)
 
+    suspend fun finishFailure(reason: String)
+
     enum class EntryPoint(val value: String) {
-        SINGLE_TAB_FIRE_DIALOG("single_tab_fire_dialog"),
+        ALL_TABS_BURN("single_tab_fire_dialog"),
+        SINGLE_TAB_BURN("single_tab_burn"),
+        DUCKAI_CHAT_DELETION("duckai_chat_deletion"),
         APP_SHORTCUT("app_shortcut"),
         FIRE_TABS_EMPTIED("fire_tabs_emptied"),
         AUTO_FOREGROUND("auto_foreground"),
@@ -162,10 +166,11 @@ class DataClearingWideEventImpl @Inject constructor(
         cachedFlowId = null
     }
 
-    override suspend fun finishFailure(error: Throwable) {
+    override suspend fun finishFailure(error: Throwable) = finishFailure(error.toErrorClass())
+
+    override suspend fun finishFailure(reason: String) {
         if (!isFeatureEnabled()) return
         val flowId = getCurrentFlowId() ?: return
-        val errorClass = error.toErrorClass()
 
         wideEventClient.intervalEnd(
             wideEventId = flowId,
@@ -174,7 +179,7 @@ class DataClearingWideEventImpl @Inject constructor(
 
         wideEventClient.flowFinish(
             wideEventId = flowId,
-            status = FlowStatus.Failure(reason = errorClass),
+            status = FlowStatus.Failure(reason = reason),
         )
 
         cachedFlowId = null

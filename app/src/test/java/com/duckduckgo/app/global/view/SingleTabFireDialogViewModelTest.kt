@@ -1182,6 +1182,24 @@ class SingleTabFireDialogViewModelTest {
     }
 
     @Test
+    fun `when in fire mode delete all clicked then wide event is started for fire mode and finished`() = runTest {
+        testee = createViewModel(browserMode = BrowserMode.FIRE)
+
+        testee.onDeleteAllClicked()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockDataClearingWideEvent).start(
+            entryPoint = eq(DataClearingWideEvent.EntryPoint.ALL_TABS_BURN),
+            clearOptions = eq(setOf(FireClearOption.TABS, FireClearOption.DATA, FireClearOption.DUCKAI_CHATS)),
+            browserMode = eq(BrowserMode.FIRE),
+            tabType = anyOrNull(),
+            tabCount = anyOrNull(),
+        )
+        verify(mockDataClearingWideEvent).finishSuccess()
+    }
+
+    @Test
     fun `when in fire mode delete all clicked then data clearing surface pixels are fired`() = runTest {
         testee = createViewModel(browserMode = BrowserMode.FIRE)
 
@@ -1281,7 +1299,7 @@ class SingleTabFireDialogViewModelTest {
     }
 
     @Test
-    fun `when delete selected chats clicked then data clearing wide event is not started`() = runTest {
+    fun `when delete selected chats clicked then chat deletion wide event is started and finished`() = runTest {
         testee = createViewModel()
         testee.setOrigin(FireDialogOrigin.ChatHistory(selectedChatUrls = setOf("https://duck.ai?chatID=a")))
 
@@ -1289,8 +1307,14 @@ class SingleTabFireDialogViewModelTest {
 
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
-        verify(mockDataClearingWideEvent, never()).start(any(), any(), anyOrNull(), anyOrNull(), anyOrNull())
-        verify(mockDataClearingWideEvent, never()).finishSuccess()
+        verify(mockDataClearingWideEvent).start(
+            entryPoint = eq(DataClearingWideEvent.EntryPoint.DUCKAI_CHAT_DELETION),
+            clearOptions = eq(setOf(FireClearOption.DUCKAI_CHATS)),
+            browserMode = eq(BrowserMode.REGULAR),
+            tabType = anyOrNull(),
+            tabCount = anyOrNull(),
+        )
+        verify(mockDataClearingWideEvent).finishSuccess()
     }
 
     @Test
@@ -1653,6 +1677,71 @@ class SingleTabFireDialogViewModelTest {
     }
 
     @Test
+    fun `when delete this tab clicked then single tab burn wide event is started and finished`() = runTest {
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(
+            TabEntity(tabId = "tab1", url = "https://example.com", title = "Example"),
+        )
+        testee = createViewModel()
+
+        testee.onDeleteThisTabClicked()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockDataClearingWideEvent).start(
+            entryPoint = eq(DataClearingWideEvent.EntryPoint.SINGLE_TAB_BURN),
+            clearOptions = eq(setOf(FireClearOption.TABS, FireClearOption.DATA, FireClearOption.DUCKAI_CHATS)),
+            browserMode = eq(BrowserMode.REGULAR),
+            tabType = anyOrNull(),
+            tabCount = anyOrNull(),
+        )
+        verify(mockDataClearingWideEvent).finishSuccess()
+    }
+
+    @Test
+    fun `when delete this tab returns feature not supported then wide event fails with feature_not_supported`() = runTest {
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(
+            TabEntity(tabId = "tab1", url = "https://example.com", title = "Example"),
+        )
+        whenever(mockDataClearing.clearSingleTabData(any(), any(), any())).thenReturn(ClearDataResult.FeatureNotSupported)
+        testee = createViewModel()
+
+        testee.onDeleteThisTabClicked()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockDataClearingWideEvent).finishFailure("feature_not_supported")
+        verify(mockDataClearingWideEvent, never()).finishSuccess()
+    }
+
+    @Test
+    fun `when delete this tab returns error then wide event fails with the exception`() = runTest {
+        val exception = RuntimeException("test")
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(
+            TabEntity(tabId = "tab1", url = "https://example.com", title = "Example"),
+        )
+        whenever(mockDataClearing.clearSingleTabData(any(), any(), any())).thenReturn(ClearDataResult.Error(exception))
+        testee = createViewModel()
+
+        testee.onDeleteThisTabClicked()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockDataClearingWideEvent).finishFailure(exception)
+    }
+
+    @Test
+    fun `when delete this tab clicked without selected tab then wide event fails with tab_not_found`() = runTest {
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(null)
+        testee = createViewModel()
+
+        testee.onDeleteThisTabClicked()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockDataClearingWideEvent).finishFailure("tab_not_found")
+    }
+
+    @Test
     fun `when delete this tab returns feature not supported then OnSingleTabClearComplete is not sent`() = runTest {
         whenever(mockTabRepository.getSelectedTab()).thenReturn(
             TabEntity(tabId = "tab1", url = "https://example.com", title = "Example"),
@@ -1811,6 +1900,28 @@ class SingleTabFireDialogViewModelTest {
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
         verify(mockDataClearing).clearTabContextualChat("tab1", BrowserMode.REGULAR)
+    }
+
+    @Test
+    fun `when delete this tab clicked with duck ai contextual chat origin then chat deletion wide event is started`() = runTest {
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(
+            TabEntity(tabId = "tab1", url = "https://example.com", title = "Example"),
+        )
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.DuckAiContextualChat)
+
+        testee.onDeleteThisTabClicked()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockDataClearingWideEvent).start(
+            entryPoint = eq(DataClearingWideEvent.EntryPoint.DUCKAI_CHAT_DELETION),
+            clearOptions = eq(setOf(FireClearOption.DUCKAI_CHATS)),
+            browserMode = eq(BrowserMode.REGULAR),
+            tabType = anyOrNull(),
+            tabCount = anyOrNull(),
+        )
+        verify(mockDataClearingWideEvent).finishSuccess()
     }
 
     @Test

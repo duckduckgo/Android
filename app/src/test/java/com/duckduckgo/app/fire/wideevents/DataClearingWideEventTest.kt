@@ -63,7 +63,7 @@ class DataClearingWideEventTest {
             .thenReturn(Result.success(123L))
 
         val clearOptions = setOf(FireClearOption.TABS, FireClearOption.DATA)
-        dataClearingWideEvent.start(EntryPoint.SINGLE_TAB_FIRE_DIALOG, clearOptions, browserMode = BrowserMode.REGULAR)
+        dataClearingWideEvent.start(EntryPoint.ALL_TABS_BURN, clearOptions, browserMode = BrowserMode.REGULAR)
 
         verify(wideEventClient).flowStart(
             name = "data-clearing",
@@ -97,7 +97,7 @@ class DataClearingWideEventTest {
             .thenReturn(Result.success(127L))
 
         dataClearingWideEvent.start(
-            EntryPoint.SINGLE_TAB_FIRE_DIALOG,
+            EntryPoint.ALL_TABS_BURN,
             setOf(FireClearOption.TABS),
             browserMode = BrowserMode.REGULAR,
             tabType = DataClearingWideEvent.TabType.AI,
@@ -125,7 +125,7 @@ class DataClearingWideEventTest {
 
         listOf(0 to "1", 1 to "1", 2 to "2-5", 10 to "6-10", 81 to "81+", 200 to "81+").forEach { (count, bucket) ->
             dataClearingWideEvent.start(
-                EntryPoint.SINGLE_TAB_FIRE_DIALOG,
+                EntryPoint.ALL_TABS_BURN,
                 emptySet(),
                 browserMode = BrowserMode.REGULAR,
                 tabCount = count,
@@ -163,7 +163,7 @@ class DataClearingWideEventTest {
             .thenReturn(Result.success(789L))
 
         val clearOptions = setOf(FireClearOption.DUCKAI_CHATS)
-        dataClearingWideEvent.start(EntryPoint.SINGLE_TAB_FIRE_DIALOG, clearOptions, browserMode = BrowserMode.REGULAR)
+        dataClearingWideEvent.start(EntryPoint.ALL_TABS_BURN, clearOptions, browserMode = BrowserMode.REGULAR)
 
         verify(wideEventClient).flowStart(
             name = "data-clearing",
@@ -180,7 +180,7 @@ class DataClearingWideEventTest {
             .thenReturn(Result.success(124L))
 
         val clearOptions = setOf(FireClearOption.TABS, FireClearOption.DATA, FireClearOption.DUCKAI_CHATS)
-        dataClearingWideEvent.start(EntryPoint.SINGLE_TAB_FIRE_DIALOG, clearOptions, browserMode = BrowserMode.REGULAR)
+        dataClearingWideEvent.start(EntryPoint.ALL_TABS_BURN, clearOptions, browserMode = BrowserMode.REGULAR)
 
         verify(wideEventClient).flowStart(
             name = "data-clearing",
@@ -198,7 +198,7 @@ class DataClearingWideEventTest {
             .thenReturn(Result.success(1L))
             .thenReturn(Result.success(2L))
 
-        dataClearingWideEvent.start(EntryPoint.SINGLE_TAB_FIRE_DIALOG, setOf(FireClearOption.TABS), browserMode = BrowserMode.REGULAR)
+        dataClearingWideEvent.start(EntryPoint.ALL_TABS_BURN, setOf(FireClearOption.TABS), browserMode = BrowserMode.REGULAR)
         dataClearingWideEvent.start(EntryPoint.APP_SHORTCUT, setOf(FireClearOption.DATA), browserMode = BrowserMode.REGULAR)
 
         verify(wideEventClient).flowFinish(wideEventId = 1L, status = FlowStatus.Unknown)
@@ -209,7 +209,7 @@ class DataClearingWideEventTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(500L))
 
-        dataClearingWideEvent.start(EntryPoint.SINGLE_TAB_FIRE_DIALOG, setOf(FireClearOption.TABS), browserMode = BrowserMode.REGULAR)
+        dataClearingWideEvent.start(EntryPoint.ALL_TABS_BURN, setOf(FireClearOption.TABS), browserMode = BrowserMode.REGULAR)
         dataClearingWideEvent.stepSuccess(DataClearingFlowStep.WEB_STORAGE_CLEAR)
 
         verify(wideEventClient).flowStep(
@@ -224,7 +224,7 @@ class DataClearingWideEventTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(501L))
 
-        dataClearingWideEvent.start(EntryPoint.SINGLE_TAB_FIRE_DIALOG, setOf(FireClearOption.TABS), browserMode = BrowserMode.REGULAR)
+        dataClearingWideEvent.start(EntryPoint.ALL_TABS_BURN, setOf(FireClearOption.TABS), browserMode = BrowserMode.REGULAR)
         dataClearingWideEvent.stepSuccess(DataClearingFlowStep.WEBVIEW_DEFAULT_CLEAR)
 
         verify(wideEventClient).flowStep(
@@ -239,7 +239,7 @@ class DataClearingWideEventTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(600L))
 
-        dataClearingWideEvent.start(EntryPoint.SINGLE_TAB_FIRE_DIALOG, setOf(FireClearOption.DATA), browserMode = BrowserMode.REGULAR)
+        dataClearingWideEvent.start(EntryPoint.ALL_TABS_BURN, setOf(FireClearOption.DATA), browserMode = BrowserMode.REGULAR)
         dataClearingWideEvent.stepFailure(DataClearingFlowStep.APP_CACHE_CLEAR, IllegalStateException("error"))
 
         verify(wideEventClient).flowStep(
@@ -255,7 +255,7 @@ class DataClearingWideEventTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(700L))
 
-        dataClearingWideEvent.start(EntryPoint.SINGLE_TAB_FIRE_DIALOG, setOf(FireClearOption.TABS), browserMode = BrowserMode.REGULAR)
+        dataClearingWideEvent.start(EntryPoint.ALL_TABS_BURN, setOf(FireClearOption.TABS), browserMode = BrowserMode.REGULAR)
         dataClearingWideEvent.finishSuccess()
 
         verify(wideEventClient).intervalEnd(wideEventId = 700L, key = "total_duration_ms_bucketed")
@@ -267,7 +267,7 @@ class DataClearingWideEventTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(701L))
 
-        dataClearingWideEvent.start(EntryPoint.SINGLE_TAB_FIRE_DIALOG, setOf(FireClearOption.TABS), browserMode = BrowserMode.REGULAR)
+        dataClearingWideEvent.start(EntryPoint.ALL_TABS_BURN, setOf(FireClearOption.TABS), browserMode = BrowserMode.REGULAR)
         dataClearingWideEvent.finishSuccess()
 
         reset(wideEventClient)
@@ -285,7 +285,7 @@ class DataClearingWideEventTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(800L))
 
-        dataClearingWideEvent.start(EntryPoint.SINGLE_TAB_FIRE_DIALOG, setOf(FireClearOption.TABS), browserMode = BrowserMode.REGULAR)
+        dataClearingWideEvent.start(EntryPoint.ALL_TABS_BURN, setOf(FireClearOption.TABS), browserMode = BrowserMode.REGULAR)
         dataClearingWideEvent.finishFailure(RuntimeException("failure"))
 
         verify(wideEventClient).intervalEnd(wideEventId = 800L, key = "total_duration_ms_bucketed")
@@ -296,11 +296,26 @@ class DataClearingWideEventTest {
     }
 
     @Test
+    fun `finishFailure with a reason finishes flow with that reason`() = runTest {
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
+            .thenReturn(Result.success(802L))
+
+        dataClearingWideEvent.start(EntryPoint.SINGLE_TAB_BURN, setOf(FireClearOption.TABS), browserMode = BrowserMode.REGULAR)
+        dataClearingWideEvent.finishFailure("feature_not_supported")
+
+        verify(wideEventClient).intervalEnd(wideEventId = 802L, key = "total_duration_ms_bucketed")
+        verify(wideEventClient).flowFinish(
+            wideEventId = 802L,
+            status = FlowStatus.Failure(reason = "feature_not_supported"),
+        )
+    }
+
+    @Test
     fun `finishFailure clears cached flow id`() = runTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(801L))
 
-        dataClearingWideEvent.start(EntryPoint.SINGLE_TAB_FIRE_DIALOG, setOf(FireClearOption.TABS), browserMode = BrowserMode.REGULAR)
+        dataClearingWideEvent.start(EntryPoint.ALL_TABS_BURN, setOf(FireClearOption.TABS), browserMode = BrowserMode.REGULAR)
         dataClearingWideEvent.finishFailure(IllegalArgumentException("error"))
 
         reset(wideEventClient)
@@ -318,7 +333,7 @@ class DataClearingWideEventTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(900L))
 
-        dataClearingWideEvent.start(EntryPoint.SINGLE_TAB_FIRE_DIALOG, setOf(FireClearOption.TABS), browserMode = BrowserMode.REGULAR)
+        dataClearingWideEvent.start(EntryPoint.ALL_TABS_BURN, setOf(FireClearOption.TABS), browserMode = BrowserMode.REGULAR)
         verify(wideEventClient).getFlowIds(any())
         Mockito.clearInvocations(wideEventClient)
 
@@ -385,7 +400,7 @@ class DataClearingWideEventTest {
     fun `feature disabled results in no interactions`() = runTest {
         androidBrowserConfigFeature.sendDataClearingWideEvent().setRawStoredState(Toggle.State(false))
 
-        dataClearingWideEvent.start(EntryPoint.SINGLE_TAB_FIRE_DIALOG, setOf(FireClearOption.TABS), browserMode = BrowserMode.REGULAR)
+        dataClearingWideEvent.start(EntryPoint.ALL_TABS_BURN, setOf(FireClearOption.TABS), browserMode = BrowserMode.REGULAR)
         dataClearingWideEvent.stepSuccess(DataClearingFlowStep.WEB_STORAGE_CLEAR)
         dataClearingWideEvent.stepFailure(DataClearingFlowStep.WEB_STORAGE_CLEAR, RuntimeException("error"))
         dataClearingWideEvent.finishSuccess()
