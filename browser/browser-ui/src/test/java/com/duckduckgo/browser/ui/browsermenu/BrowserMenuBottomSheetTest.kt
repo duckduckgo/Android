@@ -224,12 +224,12 @@ class BrowserMenuBottomSheetTest {
 
         dialog.render(viewState)
 
-        assertTrue(dialog.backMenuItem.isVisible)
-        assertTrue(dialog.forwardMenuItem.isVisible)
+        assertFalse(dialog.backMenuItem.isVisible)
+        assertFalse(dialog.forwardMenuItem.isVisible)
         assertTrue(dialog.newTabMenuItem.isVisible)
         assertFalse(dialog.newDuckChatMenuItem.isVisible)
         assertTrue(dialog.settingsMenuItem.isVisible)
-        assertTrue(dialog.refreshMenuItem.isVisible)
+        assertFalse(dialog.refreshMenuItem.isVisible)
         assertFalse(dialog.refreshActionMenuItem.isVisible)
     }
 
