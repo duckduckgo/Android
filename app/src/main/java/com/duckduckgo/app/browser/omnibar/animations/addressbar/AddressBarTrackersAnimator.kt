@@ -137,6 +137,7 @@ class AddressBarTrackersAnimator @Inject constructor(
 
         // Apply custom background color if provided
         customBackgroundColor?.let { bgColor ->
+            applyCustomBackground(animatedIconBackgroundView, bgColor)
             applyCustomBackground(scene1Layout, bgColor)
             applyCustomBackground(scene2Layout, bgColor)
 
