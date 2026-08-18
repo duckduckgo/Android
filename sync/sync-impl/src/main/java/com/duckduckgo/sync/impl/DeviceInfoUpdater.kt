@@ -59,19 +59,18 @@ class RealDeviceInfoUpdater @Inject constructor(
     private val mutex = Mutex()
 
     override suspend fun setThisDeviceName(name: String): Result<List<DeviceV2>> = withContext(dispatchers.io()) {
-        mutex.withLock { setName(name, includeDeviceInfo = syncFeature.canWriteUnifiedDeviceList().isEnabled()) }
+        mutex.withLock { setName(name) }
     }
 
     /**
      * Sets this device's name
      *
      * @param name The new device name
-     * @param includeDeviceInfo Whether to attach `device_info` to the network request or not.
-     *   * If true, it will ensure the account's `account_info` key exists first since encrypting needs its public key
-     *   * If false, `device_info` will be omitted from the request
      * @return the server's device list as it stands after the update
      */
-    private suspend fun setName(name: String, includeDeviceInfo: Boolean): Result<List<DeviceV2>> {
+    private suspend fun setName(name: String): Result<List<DeviceV2>> {
+        val includeDeviceInfo = syncFeature.canWriteUnifiedDeviceList().isEnabled()
+
         val token = syncStore.token.takeUnless { it.isNullOrEmpty() }
             ?: return Error(reason = "UpdateDeviceInfo: not signed in")
         val type = syncDeviceIds.deviceType().deviceFactor
