@@ -1359,6 +1359,46 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
+    fun `onNewChatRequestedFromPopup with redesign enabled hands off to entry dialog and reports popup pixel`() = runTest {
+        whenever(duckChatInternal.isContextualSheetRedesignEnabled()).thenReturn(true)
+
+        testee.commands.test {
+            testee.onNewChatRequestedFromPopup()
+
+            assertTrue(awaitItem() is DuckChatContextualViewModel.Command.ShowNewChatEntryDialog)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        verify(duckChatPixels).reportContextualSheetNewChatFromPopup()
+    }
+
+    @Test
+    fun `onNewChatFromEntryDialog consumes parked prompt and starts a new chat`() = runTest {
+        val tabId = "tab-1"
+        testee.onSheetOpened(tabId)
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        val prompt = NativeInputPrompt("hello", "model-1", "high", null, null, null)
+        whenever(contextualEntryPromptStore.consume(tabId)).thenReturn(ContextualEntryPrompt(tabId, prompt, null))
+
+        testee.onNewChatFromEntryDialog()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals(DuckChatContextualViewModel.SheetMode.WEBVIEW, testee.viewState.value.sheetMode)
+    }
+
+    @Test
+    fun `onNewChatFromEntryDialog with nothing parked does not start a chat`() = runTest {
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        testee.onNewChatFromEntryDialog()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals(DuckChatContextualViewModel.SheetMode.INPUT, testee.viewState.value.sheetMode)
+    }
+
+    @Test
     fun `onChatPageLoaded in Input Mode doesn't store url`() = runTest {
         val tabId = "tab-1"
         val url = "https://duck.ai/chat?chatID=123"

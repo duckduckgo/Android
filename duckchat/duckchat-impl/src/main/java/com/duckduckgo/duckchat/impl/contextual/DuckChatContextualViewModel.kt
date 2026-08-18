@@ -155,6 +155,7 @@ class DuckChatContextualViewModel @Inject constructor(
             val showNewChatHeader: Boolean,
             val recentChats: List<ChatHistoryItem>,
         ) : Command()
+        data class ShowNewChatEntryDialog(val tabId: String) : Command()
         data class OpenChatUrl(
             val url: String,
             val sourceTabId: String,
@@ -953,8 +954,29 @@ class DuckChatContextualViewModel @Inject constructor(
     }
 
     fun onNewChatRequestedFromPopup() {
-        renderNewChatState()
         duckChatPixels.reportContextualSheetNewChatFromPopup()
+        if (duckChatInternal.isContextualSheetRedesignEnabled()) {
+            // Hand New Chat off to the transparent entry dialog: clear the current chat's stored status
+            // now so it isn't resumed, then let the dialog command hide the sheet. sheetState = null so
+            // renderNewChatState emits no ChangeSheetState of its own — a second command would race this
+            // one on the capacity-1 channel and one would be dropped.
+            renderNewChatState(sheetState = null)
+            commandChannel.trySend(Command.ShowNewChatEntryDialog(_viewState.value.tabId))
+        } else {
+            renderNewChatState()
+        }
+    }
+
+    /**
+     * The entry dialog opened from New Chat has parked a composed prompt, so consume it and start a fresh
+     * chat from it (same delivery path as the initial entry hand-off).
+     */
+    fun onNewChatFromEntryDialog() {
+        viewModelScope.launch(dispatchers.io()) {
+            val tabId = _viewState.value.tabId
+            val pendingEntry = contextualEntryPromptStore.consume(tabId) ?: return@launch
+            startChatFromEntryPrompt(tabId, pendingEntry)
+        }
     }
 
     fun onChatsIconClicked() {
