@@ -57,7 +57,6 @@
     <string name="systemPermissionDialogCameraAndAudioDeniedContent">Los sitios solo pueden usar tu cámara y tu micrófono si permites que DuckDuckGo solicite acceso.</string>
     <string name="systemPermissionsDeniedDialogPositiveButton">Abrir configuración</string>
     <string name="systemPermissionsDeniedDialogNegativeButton">Cancelar</string>
-    <string name="duckAiMicDeniedSnackBarMessage">Se necesita permiso de micrófono para las funciones de voz</string>
     <string name="duckAiMicPermissionDeniedDialogTitle">DuckDuckGo necesita acceder a tu micrófono</string>
     <string name="duckAiMicPermissionDeniedDialogContent">Se necesitan permisos de micrófono si quieres usar el chat de voz en Duck.ai</string>
     <string name="duckAiMicPermissionDeniedDialogPositiveButton">Cambiar permisos</string>

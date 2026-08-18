@@ -57,7 +57,6 @@
     <string name="systemPermissionDialogCameraAndAudioDeniedContent">Stranice mogu koristiti tvoju kameru i mikrofon samo ako dopustiš DuckDuckGou da zatraži pristup.</string>
     <string name="systemPermissionsDeniedDialogPositiveButton">Otvori postavke</string>
     <string name="systemPermissionsDeniedDialogNegativeButton">Otkaži</string>
-    <string name="duckAiMicDeniedSnackBarMessage">Za glasovne funkcije potrebno je dopuštenje za mikrofon</string>
     <string name="duckAiMicPermissionDeniedDialogTitle">DuckDuckGo treba pristupiti tvom mikrofonu</string>
     <string name="duckAiMicPermissionDeniedDialogContent">Dozvole za mikrofon potrebne su ako želiš koristiti Glasovno čavrljanje u Duck.ai</string>
     <string name="duckAiMicPermissionDeniedDialogPositiveButton">Promijeni dozvole</string>

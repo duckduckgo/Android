@@ -557,7 +557,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                         askForMicPermissions(rememberChoice)
                     }
                     if (isDuckAiAudioCapture) {
-                        R.string.duckAiMicDeniedSnackBarMessage
+                        R.string.duckAiMicPermissionDeniedSnackBarMessage
                     } else {
                         R.string.sitePermissionsMicDeniedSnackBarMessage
                     }

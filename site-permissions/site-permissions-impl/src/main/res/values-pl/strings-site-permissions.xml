@@ -57,7 +57,6 @@
     <string name="systemPermissionDialogCameraAndAudioDeniedContent">Witryny mogą korzystać z Twojej kamery i mikrofonu tylko wtedy, gdy pozwolisz DuckDuckGo poprosić o dostęp.</string>
     <string name="systemPermissionsDeniedDialogPositiveButton">Otwórz ustawienia</string>
     <string name="systemPermissionsDeniedDialogNegativeButton">Anuluj</string>
-    <string name="duckAiMicDeniedSnackBarMessage">Do obsługi funkcji głosowych wymagane jest uprawnienie do korzystania z mikrofonu</string>
     <string name="duckAiMicPermissionDeniedDialogTitle">DuckDuckGo potrzebuje dostępu do Twojego mikrofonu</string>
     <string name="duckAiMicPermissionDeniedDialogContent">Uprawnienia do mikrofonu są potrzebne, jeśli chcesz korzystać z czatu głosowego w Duck.ai</string>
     <string name="duckAiMicPermissionDeniedDialogPositiveButton">Zmień uprawnienia</string>

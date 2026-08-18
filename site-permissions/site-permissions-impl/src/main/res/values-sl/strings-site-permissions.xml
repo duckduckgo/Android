@@ -57,7 +57,6 @@
     <string name="systemPermissionDialogCameraAndAudioDeniedContent">Spletna mesta lahko uporabljajo vašo kamero in mikrofon le, če dovolite, da DuckDuckGo zaprosi za dostop.</string>
     <string name="systemPermissionsDeniedDialogPositiveButton">Odpri nastavitve</string>
     <string name="systemPermissionsDeniedDialogNegativeButton">Preklic</string>
-    <string name="duckAiMicDeniedSnackBarMessage">Za glasovne funkcije je potrebno dovoljenje za mikrofon</string>
     <string name="duckAiMicPermissionDeniedDialogTitle">DuckDuckGo potrebuje dostop do mikrofona</string>
     <string name="duckAiMicPermissionDeniedDialogContent">Dovoljenja za mikrofon so potrebna, če želite uporabljati glasovni klepet v Duck.ai</string>
     <string name="duckAiMicPermissionDeniedDialogPositiveButton">Sprememba dovoljenj</string>
