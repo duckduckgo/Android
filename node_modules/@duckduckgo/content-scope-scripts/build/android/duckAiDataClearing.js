@@ -530,8 +530,9 @@
     "webEvents",
     "pageObserver",
     "hover",
-    "trackerProtection"
+    "trackerProtection",
     // only enabled on apple platforms
+    "textSelection"
   ];
   var selfGatingFeatures = ["trackerProtection"];
   function isPlatformSpecificFeature(featureName) {
@@ -605,7 +606,8 @@
       "browserUiLock",
       "trackerProtection",
       "tabSuspension",
-      "autofillPasskeys"
+      "autofillPasskeys",
+      "textSelection"
     ]
   );
   var platformSupport = {
@@ -626,7 +628,8 @@
       "webTelemetry",
       "pageObserver",
       "hover",
-      "tabSuspension"
+      "tabSuspension",
+      "textSelection"
     ],
     "apple-ai-clear": ["duckAiDataClearing"],
     "apple-ai-history": ["duckAiChatHistory"],
