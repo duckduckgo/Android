@@ -22,6 +22,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
 import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.omnibar.Omnibar
+import com.duckduckgo.app.browser.omnibar.animations.addressbar.CustomTabShieldDrawableFactory
 import com.duckduckgo.app.browser.omnibar.animations.addressbar.LottiePrivacyShieldAnimationHelper
 import com.duckduckgo.app.global.model.PrivacyShield.MALICIOUS
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
@@ -39,6 +40,7 @@ class LottiePrivacyShieldAnimationHelperTest {
     private val browserViewMode = Omnibar.ViewMode.Browser("cnn.com")
     private val customTabViewMode = Omnibar.ViewMode.CustomTab(0, "cnn.com", "cnn.com")
     private val mockAddressBarTrackersAnimationManager: AddressBarTrackersAnimationManager = mock()
+    private val customTabShieldDrawableFactory: CustomTabShieldDrawableFactory = mock()
     private val omnibarRepository: OmnibarRepository = mock<OmnibarRepository>().apply {
         whenever(isNewCustomTabEnabled).thenReturn(false)
     }
@@ -49,7 +51,7 @@ class LottiePrivacyShieldAnimationHelperTest {
         val appTheme: AppTheme = mock()
         whenever(appTheme.isLightModeEnabled()).thenReturn(true)
         whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, mockAddressBarTrackersAnimationManager, omnibarRepository)
+        val testee = createTestee(appTheme)
 
         testee.setAnimationView(holder, PROTECTED, browserViewMode, isAddressBarRebrandEnabled = false)
         verify(holder).setAnimation(R.raw.protected_shield)
@@ -61,7 +63,7 @@ class LottiePrivacyShieldAnimationHelperTest {
         val appTheme: AppTheme = mock()
         whenever(appTheme.isLightModeEnabled()).thenReturn(false)
         whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, mockAddressBarTrackersAnimationManager, omnibarRepository)
+        val testee = createTestee(appTheme)
 
         testee.setAnimationView(holder, PROTECTED, browserViewMode, isAddressBarRebrandEnabled = false)
         verify(holder).setAnimation(R.raw.dark_protected_shield)
@@ -73,7 +75,7 @@ class LottiePrivacyShieldAnimationHelperTest {
         val appTheme: AppTheme = mock()
         whenever(appTheme.isLightModeEnabled()).thenReturn(true)
         whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, mockAddressBarTrackersAnimationManager, omnibarRepository)
+        val testee = createTestee(appTheme)
 
         testee.setAnimationView(holder, UNPROTECTED, browserViewMode, isAddressBarRebrandEnabled = false)
         verify(holder).setAnimation(R.raw.unprotected_shield)
@@ -86,7 +88,7 @@ class LottiePrivacyShieldAnimationHelperTest {
         val appTheme: AppTheme = mock()
         whenever(appTheme.isLightModeEnabled()).thenReturn(false)
         whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, mockAddressBarTrackersAnimationManager, omnibarRepository)
+        val testee = createTestee(appTheme)
 
         testee.setAnimationView(holder, UNPROTECTED, browserViewMode, isAddressBarRebrandEnabled = false)
         verify(holder).setAnimation(R.raw.dark_unprotected_shield)
@@ -99,7 +101,7 @@ class LottiePrivacyShieldAnimationHelperTest {
         val appTheme: AppTheme = mock()
         whenever(appTheme.isLightModeEnabled()).thenReturn(true)
         whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, mockAddressBarTrackersAnimationManager, omnibarRepository)
+        val testee = createTestee(appTheme)
 
         testee.setAnimationView(holder, MALICIOUS, browserViewMode, isAddressBarRebrandEnabled = false)
         verify(holder).setAnimation(R.raw.alert_red)
@@ -112,7 +114,7 @@ class LottiePrivacyShieldAnimationHelperTest {
         val appTheme: AppTheme = mock()
         whenever(appTheme.isLightModeEnabled()).thenReturn(false)
         whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, mockAddressBarTrackersAnimationManager, omnibarRepository)
+        val testee = createTestee(appTheme)
 
         testee.setAnimationView(holder, MALICIOUS, browserViewMode, isAddressBarRebrandEnabled = false)
         verify(holder).setAnimation(R.raw.alert_red_dark)
@@ -125,7 +127,7 @@ class LottiePrivacyShieldAnimationHelperTest {
         val appTheme: AppTheme = mock()
         whenever(appTheme.isLightModeEnabled()).thenReturn(true)
         whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, mockAddressBarTrackersAnimationManager, omnibarRepository)
+        val testee = createTestee(appTheme)
 
         val boxed = testee.setAnimationView(
             holder,
@@ -143,7 +145,7 @@ class LottiePrivacyShieldAnimationHelperTest {
         val holder: LottieAnimationView = mock()
         val appTheme: AppTheme = mock()
         whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, mockAddressBarTrackersAnimationManager, omnibarRepository)
+        val testee = createTestee(appTheme)
 
         testee.setAnimationView(
             holder,
@@ -163,7 +165,7 @@ class LottiePrivacyShieldAnimationHelperTest {
         whenever(appTheme.isLightModeEnabled()).thenReturn(true)
         whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
 
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, mockAddressBarTrackersAnimationManager, omnibarRepository)
+        val testee = createTestee(appTheme)
 
         testee.setAnimationView(holder, PROTECTED, customTabViewMode, isAddressBarRebrandEnabled = false)
         verify(holder).setAnimation(R.raw.protected_shield_custom_tab)
@@ -177,7 +179,7 @@ class LottiePrivacyShieldAnimationHelperTest {
         whenever(appTheme.isLightModeEnabled()).thenReturn(false)
         whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
 
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, mockAddressBarTrackersAnimationManager, omnibarRepository)
+        val testee = createTestee(appTheme)
 
         testee.setAnimationView(holder, PROTECTED, customTabViewMode, isAddressBarRebrandEnabled = false)
         verify(holder).setAnimation(R.raw.dark_protected_shield_custom_tab)
@@ -191,7 +193,7 @@ class LottiePrivacyShieldAnimationHelperTest {
         whenever(appTheme.isLightModeEnabled()).thenReturn(true)
         whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
 
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, mockAddressBarTrackersAnimationManager, omnibarRepository)
+        val testee = createTestee(appTheme)
 
         testee.setAnimationView(holder, UNPROTECTED, customTabViewMode, isAddressBarRebrandEnabled = false)
         verify(holder).setAnimation(R.raw.unprotected_shield)
@@ -205,7 +207,7 @@ class LottiePrivacyShieldAnimationHelperTest {
         whenever(appTheme.isLightModeEnabled()).thenReturn(false)
         whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
 
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, mockAddressBarTrackersAnimationManager, omnibarRepository)
+        val testee = createTestee(appTheme)
 
         testee.setAnimationView(holder, UNPROTECTED, customTabViewMode, isAddressBarRebrandEnabled = false)
         verify(holder).setAnimation(R.raw.dark_unprotected_shield)
@@ -219,7 +221,7 @@ class LottiePrivacyShieldAnimationHelperTest {
         whenever(appTheme.isLightModeEnabled()).thenReturn(true)
         whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
 
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, mockAddressBarTrackersAnimationManager, omnibarRepository)
+        val testee = createTestee(appTheme)
 
         testee.setAnimationView(holder, PROTECTED, customTabViewMode, isAddressBarRebrandEnabled = false)
         verify(holder).setAnimation(R.raw.protected_shield_custom_tab)
@@ -233,7 +235,7 @@ class LottiePrivacyShieldAnimationHelperTest {
         whenever(appTheme.isLightModeEnabled()).thenReturn(false)
         whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
 
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, mockAddressBarTrackersAnimationManager, omnibarRepository)
+        val testee = createTestee(appTheme)
 
         testee.setAnimationView(holder, PROTECTED, customTabViewMode, isAddressBarRebrandEnabled = false)
         verify(holder).setAnimation(R.raw.dark_protected_shield_custom_tab)
@@ -247,7 +249,7 @@ class LottiePrivacyShieldAnimationHelperTest {
         whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true)
         whenever(appTheme.isLightModeEnabled()).thenReturn(true)
 
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, mockAddressBarTrackersAnimationManager, omnibarRepository)
+        val testee = createTestee(appTheme)
 
         testee.setAnimationView(holder, PROTECTED, browserViewMode, isAddressBarRebrandEnabled = false)
         verify(holder).setAnimation(R.raw.address_bar_trackers_animation_shield)
@@ -261,7 +263,7 @@ class LottiePrivacyShieldAnimationHelperTest {
         whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true)
         whenever(appTheme.isLightModeEnabled()).thenReturn(false)
 
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, mockAddressBarTrackersAnimationManager, omnibarRepository)
+        val testee = createTestee(appTheme)
 
         testee.setAnimationView(holder, PROTECTED, browserViewMode, isAddressBarRebrandEnabled = false)
         verify(holder).setAnimation(R.raw.address_bar_trackers_animation_shield)
@@ -273,7 +275,7 @@ class LottiePrivacyShieldAnimationHelperTest {
         val appTheme: AppTheme = mock()
         whenever(appTheme.isLightModeEnabled()).thenReturn(false)
         whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, mockAddressBarTrackersAnimationManager, omnibarRepository)
+        val testee = createTestee(appTheme)
 
         testee.setAnimationView(holder, PROTECTED, browserViewMode, useLightAnimation = true, isAddressBarRebrandEnabled = false)
         verify(holder).setAnimation(R.raw.protected_shield)
@@ -285,7 +287,7 @@ class LottiePrivacyShieldAnimationHelperTest {
         val appTheme: AppTheme = mock()
         whenever(appTheme.isLightModeEnabled()).thenReturn(true)
         whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, mockAddressBarTrackersAnimationManager, omnibarRepository)
+        val testee = createTestee(appTheme)
 
         testee.setAnimationView(holder, PROTECTED, browserViewMode, useLightAnimation = false, isAddressBarRebrandEnabled = false)
         verify(holder).setAnimation(R.raw.dark_protected_shield)
@@ -297,7 +299,7 @@ class LottiePrivacyShieldAnimationHelperTest {
         val appTheme: AppTheme = mock()
         whenever(appTheme.isLightModeEnabled()).thenReturn(false)
         whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, mockAddressBarTrackersAnimationManager, omnibarRepository)
+        val testee = createTestee(appTheme)
 
         testee.setAnimationView(holder, UNPROTECTED, browserViewMode, useLightAnimation = true, isAddressBarRebrandEnabled = false)
         verify(holder).setAnimation(R.raw.unprotected_shield)
@@ -310,7 +312,7 @@ class LottiePrivacyShieldAnimationHelperTest {
         val appTheme: AppTheme = mock()
         whenever(appTheme.isLightModeEnabled()).thenReturn(true)
         whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, mockAddressBarTrackersAnimationManager, omnibarRepository)
+        val testee = createTestee(appTheme)
 
         testee.setAnimationView(holder, UNPROTECTED, browserViewMode, useLightAnimation = false, isAddressBarRebrandEnabled = false)
         verify(holder).setAnimation(R.raw.dark_unprotected_shield)
@@ -323,7 +325,7 @@ class LottiePrivacyShieldAnimationHelperTest {
         val appTheme: AppTheme = mock()
         whenever(appTheme.isLightModeEnabled()).thenReturn(false)
         whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, mockAddressBarTrackersAnimationManager, omnibarRepository)
+        val testee = createTestee(appTheme)
 
         testee.setAnimationView(holder, MALICIOUS, browserViewMode, useLightAnimation = true, isAddressBarRebrandEnabled = false)
         verify(holder).setAnimation(R.raw.alert_red)
@@ -336,7 +338,7 @@ class LottiePrivacyShieldAnimationHelperTest {
         val appTheme: AppTheme = mock()
         whenever(appTheme.isLightModeEnabled()).thenReturn(true)
         whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, mockAddressBarTrackersAnimationManager, omnibarRepository)
+        val testee = createTestee(appTheme)
 
         testee.setAnimationView(holder, MALICIOUS, browserViewMode, useLightAnimation = false, isAddressBarRebrandEnabled = false)
         verify(holder).setAnimation(R.raw.alert_red_dark)
@@ -349,7 +351,7 @@ class LottiePrivacyShieldAnimationHelperTest {
         val appTheme: AppTheme = mock()
         whenever(appTheme.isLightModeEnabled()).thenReturn(false)
         whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, mockAddressBarTrackersAnimationManager, omnibarRepository)
+        val testee = createTestee(appTheme)
 
         testee.setAnimationView(holder, PROTECTED, customTabViewMode, useLightAnimation = true, isAddressBarRebrandEnabled = false)
         verify(holder).setAnimation(R.raw.protected_shield_custom_tab)
@@ -361,7 +363,7 @@ class LottiePrivacyShieldAnimationHelperTest {
         val appTheme: AppTheme = mock()
         whenever(appTheme.isLightModeEnabled()).thenReturn(true)
         whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, mockAddressBarTrackersAnimationManager, omnibarRepository)
+        val testee = createTestee(appTheme)
 
         testee.setAnimationView(holder, PROTECTED, customTabViewMode, useLightAnimation = false, isAddressBarRebrandEnabled = false)
         verify(holder).setAnimation(R.raw.dark_protected_shield_custom_tab)
@@ -376,7 +378,7 @@ class LottiePrivacyShieldAnimationHelperTest {
         }
         whenever(appTheme.isLightModeEnabled()).thenReturn(true)
         whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, mockAddressBarTrackersAnimationManager, newCustomTabRepository)
+        val testee = createTestee(appTheme, newCustomTabRepository)
 
         testee.setAnimationView(holder, PROTECTED, customTabViewMode, isAddressBarRebrandEnabled = false)
         verify(holder).setAnimation(R.raw.protected_shield)
@@ -391,7 +393,7 @@ class LottiePrivacyShieldAnimationHelperTest {
         }
         whenever(appTheme.isLightModeEnabled()).thenReturn(false)
         whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, mockAddressBarTrackersAnimationManager, newCustomTabRepository)
+        val testee = createTestee(appTheme, newCustomTabRepository)
 
         testee.setAnimationView(holder, PROTECTED, customTabViewMode, isAddressBarRebrandEnabled = false)
         verify(holder).setAnimation(R.raw.dark_protected_shield)
@@ -406,7 +408,7 @@ class LottiePrivacyShieldAnimationHelperTest {
         }
         whenever(appTheme.isLightModeEnabled()).thenReturn(true)
         whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, mockAddressBarTrackersAnimationManager, newCustomTabRepository)
+        val testee = createTestee(appTheme, newCustomTabRepository)
 
         testee.setAnimationView(holder, UNPROTECTED, customTabViewMode, isAddressBarRebrandEnabled = false)
         verify(holder).setAnimation(R.raw.unprotected_shield)
@@ -422,7 +424,7 @@ class LottiePrivacyShieldAnimationHelperTest {
         }
         whenever(appTheme.isLightModeEnabled()).thenReturn(false)
         whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, mockAddressBarTrackersAnimationManager, newCustomTabRepository)
+        val testee = createTestee(appTheme, newCustomTabRepository)
 
         testee.setAnimationView(holder, UNPROTECTED, customTabViewMode, isAddressBarRebrandEnabled = false)
         verify(holder).setAnimation(R.raw.dark_unprotected_shield)
@@ -438,7 +440,7 @@ class LottiePrivacyShieldAnimationHelperTest {
         }
         whenever(appTheme.isLightModeEnabled()).thenReturn(false)
         whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, mockAddressBarTrackersAnimationManager, newCustomTabRepository)
+        val testee = createTestee(appTheme, newCustomTabRepository)
 
         testee.setAnimationView(holder, PROTECTED, customTabViewMode, useLightAnimation = true, isAddressBarRebrandEnabled = false)
         verify(holder).setAnimation(R.raw.protected_shield)
@@ -453,7 +455,7 @@ class LottiePrivacyShieldAnimationHelperTest {
         }
         whenever(appTheme.isLightModeEnabled()).thenReturn(true)
         whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, mockAddressBarTrackersAnimationManager, newCustomTabRepository)
+        val testee = createTestee(appTheme, newCustomTabRepository)
 
         testee.setAnimationView(holder, PROTECTED, customTabViewMode, useLightAnimation = false, isAddressBarRebrandEnabled = false)
         verify(holder).setAnimation(R.raw.dark_protected_shield)
@@ -469,7 +471,7 @@ class LottiePrivacyShieldAnimationHelperTest {
         }
         whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true)
         whenever(appTheme.isLightModeEnabled()).thenReturn(true)
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, mockAddressBarTrackersAnimationManager, newCustomTabRepository)
+        val testee = createTestee(appTheme, newCustomTabRepository)
 
         testee.setAnimationView(holder, PROTECTED, customTabViewMode, isAddressBarRebrandEnabled = false)
         verify(holder).setAnimation(R.raw.address_bar_trackers_animation_shield)
@@ -485,9 +487,19 @@ class LottiePrivacyShieldAnimationHelperTest {
         }
         whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true)
         whenever(appTheme.isLightModeEnabled()).thenReturn(false)
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, mockAddressBarTrackersAnimationManager, newCustomTabRepository)
+        val testee = createTestee(appTheme, newCustomTabRepository)
 
         testee.setAnimationView(holder, PROTECTED, customTabViewMode, isAddressBarRebrandEnabled = false)
         verify(holder).setAnimation(R.raw.address_bar_trackers_animation_shield)
     }
+
+    private fun createTestee(
+        appTheme: AppTheme,
+        repository: OmnibarRepository = omnibarRepository,
+    ): LottiePrivacyShieldAnimationHelper = LottiePrivacyShieldAnimationHelper(
+        appTheme,
+        mockAddressBarTrackersAnimationManager,
+        repository,
+        customTabShieldDrawableFactory,
+    )
 }

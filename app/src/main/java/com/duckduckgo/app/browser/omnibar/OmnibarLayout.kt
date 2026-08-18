@@ -1301,10 +1301,12 @@ class OmnibarLayout @JvmOverloads constructor(
             val useLightAnimation = when {
                 // Fire mode forces a dark omnibar even in light app theme — use the dark shield
                 browserMode == BrowserMode.FIRE -> false
-                // For new custom tabs, determine light/dark variant based on container color
                 viewMode is ViewMode.CustomTab &&
-                    omnibarRepository.isNewCustomTabEnabled &&
-                    !isDefaultToolbarColor(customTabToolbarColor) -> isColorLight(customTabToolbarColor)
+                    shouldUseCustomTabToolbarColorForShield(
+                        isAddressBarRebrandEnabled = isAddressBarRebrandEnabled,
+                        isNewCustomTabEnabled = omnibarRepository.isNewCustomTabEnabled,
+                        isDefaultToolbarColor = isDefaultToolbarColor(viewMode.toolbarColor),
+                    ) -> isColorLight(viewMode.toolbarColor)
                 else -> null // Use default theme-based selection
             }
 
@@ -1814,6 +1816,16 @@ class OmnibarLayout @JvmOverloads constructor(
         private const val EASTER_EGG_ANIMATION_DELAY_MS = 1000L
         private const val LOCKED_INPUT_ALPHA = 0.4f
     }
+}
+
+internal fun shouldUseCustomTabToolbarColorForShield(
+    isAddressBarRebrandEnabled: Boolean,
+    isNewCustomTabEnabled: Boolean,
+    isDefaultToolbarColor: Boolean,
+): Boolean = if (isAddressBarRebrandEnabled) {
+    !isNewCustomTabEnabled || !isDefaultToolbarColor
+} else {
+    isNewCustomTabEnabled && !isDefaultToolbarColor
 }
 
 /**

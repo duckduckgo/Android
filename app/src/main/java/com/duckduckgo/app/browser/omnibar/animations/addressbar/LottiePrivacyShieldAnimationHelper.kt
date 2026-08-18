@@ -38,10 +38,11 @@ import kotlin.to
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
-class LottiePrivacyShieldAnimationHelper @Inject constructor(
+class LottiePrivacyShieldAnimationHelper @Inject internal constructor(
     private val appTheme: AppTheme,
     private val addressBarTrackersAnimationManager: AddressBarTrackersAnimationManager,
     private val omnibarRepository: OmnibarRepository,
+    private val customTabShieldDrawableFactory: CustomTabShieldDrawableFactory,
 ) : PrivacyShieldAnimationHelper {
 
     override fun setAnimationView(
@@ -67,18 +68,34 @@ class LottiePrivacyShieldAnimationHelper @Inject constructor(
             UNPROTECTED, MALICIOUS -> isAddressBarRebrandEnabled
             PROTECTED, UNKNOWN -> false
         }
+        val customTabIsLightTheme = if (
+            isStatic &&
+            privacyShield == UNPROTECTED &&
+            viewMode is ViewMode.CustomTab &&
+            useLightAnimation != null
+        ) {
+            isLightMode
+        } else {
+            null
+        }
 
-        val currentAsset = holder.tag as? Pair<*, *>
-        if (currentAsset != assetRes to isStatic) {
+        val assetKey = Triple(assetRes, isStatic, customTabIsLightTheme)
+        if (holder.tag != assetKey) {
             if (isStatic) {
                 holder.cancelAnimation()
-                holder.setImageResource(assetRes)
+                if (customTabIsLightTheme == null) {
+                    holder.setImageResource(assetRes)
+                } else {
+                    holder.setImageDrawable(
+                        customTabShieldDrawableFactory.create(holder.context, assetRes, customTabIsLightTheme),
+                    )
+                }
             } else {
                 holder.setImageDrawable(null)
                 holder.setAnimation(assetRes)
                 holder.progress = if (privacyShield == UNPROTECTED) 1.0f else 0.0f
             }
-            holder.tag = assetRes to isStatic
+            holder.tag = assetKey
             logcat { "Shield: $privacyShield" }
         } else {
             logcat { "Shield: $privacyShield - no change" }

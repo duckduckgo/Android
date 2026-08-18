@@ -16,26 +16,38 @@
 
 package com.duckduckgo.app.browser.omnibar.animations.addressbar
 
+import android.content.Context
+import android.graphics.drawable.Drawable
+import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
 import com.duckduckgo.app.browser.api.OmnibarRepository
+import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.global.model.PrivacyShield.MALICIOUS
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
 import com.duckduckgo.app.global.model.PrivacyShield.UNKNOWN
 import com.duckduckgo.app.global.model.PrivacyShield.UNPROTECTED
 import com.duckduckgo.common.ui.store.AppTheme
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 class LottiePrivacyShieldAnimationHelperResolveShieldAssetTest {
 
+    private val addressBarTrackersAnimationManager = mock<AddressBarTrackersAnimationManager>()
+    private val customTabShieldDrawableFactory = mock<CustomTabShieldDrawableFactory>()
     private val testee = LottiePrivacyShieldAnimationHelper(
         appTheme = mock<AppTheme>(),
-        addressBarTrackersAnimationManager = mock<AddressBarTrackersAnimationManager>(),
+        addressBarTrackersAnimationManager = addressBarTrackersAnimationManager,
         omnibarRepository = mock<OmnibarRepository>(),
+        customTabShieldDrawableFactory = customTabShieldDrawableFactory,
     )
 
     @Test
@@ -52,6 +64,90 @@ class LottiePrivacyShieldAnimationHelperResolveShieldAssetTest {
     @Test
     fun whenBrandIconsEnabledAndMaliciousThenBoxedStaticExclamation() {
         assertEquals(R.drawable.exclamation_recolorable_24 to true, resolve(MALICIOUS))
+    }
+
+    @Test
+    fun whenBrandIconsEnabledAndLightCustomTabThenDoNotTintWholeStaticShield() = runTest {
+        val holder: LottieAnimationView = mock()
+        val context: Context = mock()
+        val drawable: Drawable = mock()
+        whenever(addressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
+        whenever(holder.context).thenReturn(context)
+        whenever(customTabShieldDrawableFactory.create(any(), eq(R.drawable.shield_alert_24), eq(true))).thenReturn(drawable)
+
+        testee.setAnimationView(
+            holder = holder,
+            privacyShield = UNPROTECTED,
+            viewMode = ViewMode.CustomTab(0, "example.com", "example.com"),
+            useLightAnimation = true,
+            isAddressBarRebrandEnabled = true,
+        )
+
+        verify(holder).setImageDrawable(drawable)
+    }
+
+    @Test
+    fun whenBrandIconsEnabledAndDarkCustomTabThenDoNotTintWholeStaticShield() = runTest {
+        val holder: LottieAnimationView = mock()
+        val context: Context = mock()
+        val drawable: Drawable = mock()
+        whenever(addressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
+        whenever(holder.context).thenReturn(context)
+        whenever(customTabShieldDrawableFactory.create(any(), eq(R.drawable.shield_alert_24), eq(false))).thenReturn(drawable)
+
+        testee.setAnimationView(
+            holder = holder,
+            privacyShield = UNPROTECTED,
+            viewMode = ViewMode.CustomTab(0, "example.com", "example.com"),
+            useLightAnimation = false,
+            isAddressBarRebrandEnabled = true,
+        )
+
+        verify(holder).setImageDrawable(drawable)
+    }
+
+    @Test
+    fun whenBrandIconsEnabledAndNormalBrowserThenUseStaticShieldWithoutCustomTabTint() = runTest {
+        val holder: LottieAnimationView = mock()
+        whenever(addressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
+
+        testee.setAnimationView(
+            holder = holder,
+            privacyShield = UNPROTECTED,
+            viewMode = ViewMode.Browser("example.com"),
+            useLightAnimation = false,
+            isAddressBarRebrandEnabled = true,
+        )
+
+        verify(holder).setImageResource(R.drawable.shield_alert_24)
+    }
+
+    @Test
+    fun whenBrandIconsDisabledAfterEnabledThenRestoreLegacyShield() = runTest {
+        val holder: LottieAnimationView = mock()
+        val context: Context = mock()
+        val drawable: Drawable = mock()
+        val customTab = ViewMode.CustomTab(0, "example.com", "example.com")
+        whenever(addressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
+        whenever(holder.context).thenReturn(context)
+        whenever(customTabShieldDrawableFactory.create(any(), eq(R.drawable.shield_alert_24), eq(false))).thenReturn(drawable)
+
+        testee.setAnimationView(
+            holder = holder,
+            privacyShield = UNPROTECTED,
+            viewMode = customTab,
+            useLightAnimation = false,
+            isAddressBarRebrandEnabled = true,
+        )
+        testee.setAnimationView(
+            holder = holder,
+            privacyShield = UNPROTECTED,
+            viewMode = customTab,
+            useLightAnimation = false,
+            isAddressBarRebrandEnabled = false,
+        )
+
+        verify(holder).setAnimation(R.raw.dark_unprotected_shield)
     }
 
     @Test
