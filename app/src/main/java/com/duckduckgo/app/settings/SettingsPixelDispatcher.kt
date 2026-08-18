@@ -17,15 +17,19 @@
 package com.duckduckgo.app.settings
 
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.pixels.AppPixelName.PRIVACY_PRO_APP_SETTINGS_NON_SUBSCRIBER_IMPRESSION
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_EMAIL_PROTECTION_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_SYNC_PRESSED
 import com.duckduckgo.app.pixels.duckchat.createWasUsedBeforePixelParams
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.email.EmailManager
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_SETTINGS_PRESSED
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
+import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.sync.api.SyncState.OFF
 import com.duckduckgo.sync.api.SyncStateMonitor
 import com.squareup.anvil.annotations.ContributesBinding
@@ -42,6 +46,7 @@ interface SettingsPixelDispatcher {
     fun fireSyncPressed()
     fun fireDuckChatPressed()
     fun fireEmailPressed()
+    fun fireSettingsOpenedWithSubscriptionPurchaseAvailable()
 }
 
 @ContributesBinding(scope = AppScope::class)
@@ -52,6 +57,8 @@ class SettingsPixelDispatcherImpl @Inject constructor(
     private val syncStateMonitor: SyncStateMonitor,
     private val duckChat: DuckChat,
     private val emailManager: EmailManager,
+    private val subscriptions: Subscriptions,
+    private val dispatcherProvider: DispatcherProvider,
 ) : SettingsPixelDispatcher {
 
     override fun fireSyncPressed() {
@@ -86,6 +93,14 @@ class SettingsPixelDispatcherImpl @Inject constructor(
                     PARAM_EMAIL_IS_SIGNED_IN to isSignedIn.toBinaryString(),
                 ),
             )
+        }
+    }
+
+    override fun fireSettingsOpenedWithSubscriptionPurchaseAvailable() {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            if (subscriptions.isEligible() && subscriptions.getSubscriptionStatus() == UNKNOWN) {
+                pixel.fire(PRIVACY_PRO_APP_SETTINGS_NON_SUBSCRIBER_IMPRESSION)
+            }
         }
     }
 
