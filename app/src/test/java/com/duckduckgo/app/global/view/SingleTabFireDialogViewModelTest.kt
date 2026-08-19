@@ -1740,6 +1740,24 @@ class SingleTabFireDialogViewModelTest {
     }
 
     @Test
+    fun `when delete this tab throws then wide event fails with the exception`() = runTest {
+        val exception = RuntimeException("boom")
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(
+            TabEntity(tabId = "tab1", url = "https://example.com", title = "Example"),
+        )
+        whenever(mockDataClearing.clearSingleTabData(any(), any(), any())).thenThrow(exception)
+        testee = createViewModel()
+
+        testee.onDeleteThisTabClicked()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockDataClearingWideEvent).finishFailure(exception)
+        verify(mockDataClearingWideEvent, never()).finishSuccess()
+        verify(mockDataClearingWideEvent, never()).finishFailure("tab_not_found")
+    }
+
+    @Test
     fun `when delete this tab clicked without selected tab then wide event fails with tab_not_found`() = runTest {
         whenever(mockTabRepository.getSelectedTab()).thenReturn(null)
         testee = createViewModel()

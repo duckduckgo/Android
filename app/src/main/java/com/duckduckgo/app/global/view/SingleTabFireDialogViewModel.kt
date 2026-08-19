@@ -324,14 +324,18 @@ class SingleTabFireDialogViewModel @Inject constructor(
                         tabCount = stateData?.tabCount,
                     )
 
-                    if (origin.value == DuckAiContextualChat) {
-                        dataClearing.clearTabContextualChat(tabId, mode)
-                    } else {
-                        dataClearing.clearSingleTabData(
-                            tabId = tabId,
-                            replaceCurrentTab = origin.value !is Hatch,
-                            browserMode = mode,
-                        )
+                    try {
+                        if (origin.value == DuckAiContextualChat) {
+                            dataClearing.clearTabContextualChat(tabId, mode)
+                        } else {
+                            dataClearing.clearSingleTabData(
+                                tabId = tabId,
+                                replaceCurrentTab = origin.value !is Hatch,
+                                browserMode = mode,
+                            )
+                        }
+                    } catch (e: Exception) {
+                        ClearDataResult.Error(e)
                     }
                 } else {
                     null
