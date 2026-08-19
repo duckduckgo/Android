@@ -3775,6 +3775,7 @@ class BrowserTabFragment :
                     viewModel.onUserSelectedToEditQuery(it.phrase)
                 },
                 autoCompleteDeleteClickListener = {
+                    storeAutocompletePosition()
                     viewModel.onUserRequestedToDeleteAutocompleteItem(it)
                 },
                 omnibarType = settingsDataStore.omnibarType,
