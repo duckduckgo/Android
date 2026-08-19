@@ -3975,7 +3975,7 @@ class BrowserTabFragment :
 
     private fun createNewContextualFragment(tabId: String) {
         logcat { "Duck.ai Contextual: createNewContextualFragment" }
-        val fragment = duckChatContextual.createSheet(tabId)
+        val fragment = duckChatContextual.createChatSurface(tabId)
 
         duckAiContextualFragment = fragment
         val transaction = childFragmentManager.beginTransaction()

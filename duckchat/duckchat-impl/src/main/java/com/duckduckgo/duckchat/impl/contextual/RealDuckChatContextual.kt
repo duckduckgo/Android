@@ -46,17 +46,17 @@ class RealDuckChatContextual @Inject constructor(
     override suspend fun launch(
         sourceTabId: String,
         anchor: View?,
-        onAskAboutPage: () -> Unit,
+        showChatSurface: () -> Unit,
     ) {
         if (anchor == null || !duckChatInternal.isContextualSheetRedesignEnabled()) {
-            onAskAboutPage()
+            showChatSurface()
             return
         }
         if (hasChatInProgress(sourceTabId)) {
             // The sheet would reopen the existing chat for this tab, so skip the entry menu and open it directly.
-            onAskAboutPage()
+            showChatSurface()
         } else {
-            showMenu(sourceTabId, anchor, onAskAboutPage)
+            showMenu(sourceTabId, anchor, showChatSurface)
         }
     }
 
@@ -72,7 +72,7 @@ class RealDuckChatContextual @Inject constructor(
         return timeProvider.currentTimeMillis() - lastClosedTimestamp <= timeoutMs
     }
 
-    override fun createSheet(tabId: String): Fragment {
+    override fun createChatSurface(tabId: String): Fragment {
         return DuckChatContextualFragment().apply {
             arguments = Bundle().apply {
                 putString(DuckChatContextualFragment.KEY_DUCK_AI_CONTEXTUAL_TAB_ID, tabId)
