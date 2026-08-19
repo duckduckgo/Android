@@ -514,9 +514,6 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                 setCurrentDialog(INITIAL_REINSTALL_USER)
             }
             NewUserOnboardingActivityDialog.Initial -> setCurrentDialog(INITIAL)
-            NewUserOnboardingActivityDialog.DownloadReason -> {
-                // no-op in this VM
-            }
             NewUserOnboardingActivityDialog.ComparisonChart ->
                 setCurrentDialog(COMPARISON_CHART, stepIndicator = progress)
             NewUserOnboardingActivityDialog.AiComparisonChart ->
@@ -557,6 +554,13 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                     )
                 }
                 setCurrentDialog(QUICK_SETUP)
+            }
+
+            NewUserOnboardingActivityDialog.DownloadReason,
+            is NewUserOnboardingActivityDialog.SegmentedComparisonChart,
+            is NewUserOnboardingActivityDialog.PreferenceSelector,
+            -> {
+                // These views are only presented in the config-driven onboarding flow, which is not driven by this VM.
             }
         }
     }

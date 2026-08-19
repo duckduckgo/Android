@@ -620,7 +620,6 @@ class BrowserTabViewModel @Inject constructor(
     val ctaViewState: MutableLiveData<CtaViewState> = MutableLiveData()
     var siteLiveData: MutableLiveData<Site> = MutableLiveData()
     val privacyShieldViewState: MutableLiveData<PrivacyShieldViewState> = MutableLiveData()
-    val buckTryASearchAnimationEnabled: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val areFavoritesDisplayed =
         savedSitesRepository
             .getFavorites()
@@ -3767,12 +3766,10 @@ class BrowserTabViewModel @Inject constructor(
         currentGlobalLayoutState() is Browser && !currentBrowserViewState().maliciousSiteBlocked
 
     private fun showOrHideKeyboard(cta: Cta?) {
-        // we hide the keyboard when showing a DialogCta and HomeCta type in the home screen otherwise we show it
-        val shouldHideKeyboard =
-            cta is HomePanelCta || cta is DaxBubbleCta.DaxSubscriptionCta ||
-                cta is DaxSubscriptionBrandDesignUpdateBubbleCta || cta is SubscriptionPromoModalCta ||
-                duckAiFeatureState.showInputScreen.value || currentBrowserViewState().lastQueryOrigin == QueryOrigin.FromBookmark ||
-                (settingsDataStore.omnibarType == OmnibarType.SPLIT && alreadyShownKeyboard)
+        val shouldHideKeyboard = cta?.shouldDropAddressBarFocusWhenShown() == true ||
+            duckAiFeatureState.showInputScreen.value ||
+            currentBrowserViewState().lastQueryOrigin == QueryOrigin.FromBookmark ||
+            (settingsDataStore.omnibarType == OmnibarType.SPLIT && alreadyShownKeyboard)
 
         logcat { "shouldHideKeyboard: $shouldHideKeyboard" }
 
@@ -3817,6 +3814,15 @@ class BrowserTabViewModel @Inject constructor(
             ctaViewModel.onUserDismissedCta(cta)
             if (cta is BrokenSitePromptDialogCta) {
                 onBrokenSiteCtaDismissButtonClicked(cta)
+            }
+
+            if (cta is DaxEndBrandDesignUpdateBubbleCta) {
+                val updatedCta = refreshCta()
+                if (updatedCta != null) {
+                    showOrHideKeyboard(updatedCta)
+                } else {
+                    command.value = HideOnboardingDaxBubbleCta(cta)
+                }
             }
         }
     }
@@ -5340,6 +5346,12 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun onDaxBubbleCtaOkButtonClicked(cta: DaxBubbleCta) {
         onUserDismissedCta(cta)
+        val refresh: () -> Unit = {
+            viewModelScope.launch {
+                val updatedCta = refreshCta()
+                showOrHideKeyboard(updatedCta)
+            }
+        }
         when (cta) {
             is DaxBubbleCta.DaxSubscriptionCta,
             is DaxSubscriptionBrandDesignUpdateBubbleCta,
@@ -5357,14 +5369,21 @@ class BrowserTabViewModel @Inject constructor(
                 }
             }
             is DaxBubbleCta.DaxEndCta,
-            is DaxEndBrandDesignUpdateBubbleCta,
             is DaxDuckAiEndBubbleCta,
             is DaxDuckAiEndBrandDesignUpdateBubbleCta,
             -> {
-                viewModelScope.launch {
-                    val updatedCta = refreshCta()
-                    ctaViewState.value = currentCtaViewState().copy(cta = updatedCta)
-                    showOrHideKeyboard(updatedCta)
+                refresh()
+            }
+            is DaxEndBrandDesignUpdateBubbleCta -> {
+                if (cta.isSegmentedSearchPathWithToggleEnabled) {
+                    viewModelScope.launch {
+                        ctaViewState.value = currentCtaViewState().copy(cta = null)
+                        command.value = HideOnboardingDaxBubbleCta(cta)
+                        customAiOnboardingStore.setOpenInputOnDuckAiTab()
+                        command.value = ShowKeyboard
+                    }
+                } else {
+                    refresh()
                 }
             }
             else -> { }

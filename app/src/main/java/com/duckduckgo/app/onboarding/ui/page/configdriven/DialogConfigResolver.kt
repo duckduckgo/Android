@@ -18,12 +18,14 @@ package com.duckduckgo.app.onboarding.ui.page.configdriven
 
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.omnibar.OmnibarType
+import com.duckduckgo.app.onboarding.OnboardingPreference
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityDialog
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
 import com.duckduckgo.app.onboarding.ui.page.OnboardingBackgroundStep
 import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 class DialogConfigResolver @Inject constructor(
     private val onboardingStore: OnboardingStore,
@@ -37,8 +39,13 @@ class DialogConfigResolver @Inject constructor(
 
         NewUserOnboardingActivityDialog.AiComparisonChart -> comparisonChart(ComparisonChartConfig.Ai)
 
+        is NewUserOnboardingActivityDialog.SegmentedComparisonChart -> comparisonChart(
+            chart = dialog.chart,
+            showEmbellishment = false,
+        )
+
         NewUserOnboardingActivityDialog.DownloadReason -> DialogConfig(
-            background = OnboardingBackgroundStep.DownloadReason,
+            background = OnboardingBackgroundStep.ComparisonChart,
             embellishment = Embellishment.BottomWing,
             cardArrow = CardArrowConfig.AtEnd,
             content = ContentConfig.DownloadReason(
@@ -154,11 +161,9 @@ class DialogConfigResolver @Inject constructor(
             embellishment = Embellishment.None,
             cardArrow = CardArrowConfig.Hidden,
             content = ContentConfig.InputScreenPreview(
-                title = TextConfig.Resource(
-                    if (isCustomAiFlow) R.string.preOnboardingInputModeDemoTitleCustomAi else R.string.preOnboardingInputModeDemoTitle,
-                ),
+                title = TextConfig.Resource(dialog.titleRes),
                 isSearchDefault = dialog.isSearchDefault,
-                showModeToggle = !isCustomAiFlow,
+                showModeToggle = dialog.showModeToggle,
                 searchSuggestions = onboardingStore.getSearchOptions(),
                 chatSuggestions = onboardingStore.getChatSuggestions(),
             ),
@@ -185,6 +190,20 @@ class DialogConfigResolver @Inject constructor(
             ),
         )
 
+        is NewUserOnboardingActivityDialog.PreferenceSelector -> DialogConfig(
+            background = OnboardingBackgroundStep.PreferenceSelector,
+            embellishment = Embellishment.LeftWing,
+            cardArrow = CardArrowConfig.AtEnd,
+            content = ContentConfig.PreferenceSelector(
+                title = TextConfig.Resource(R.string.searchPathPreferenceSelectorTitle),
+                rows = dialog.initialSelections.map { (preference, enabled) -> preferenceRow(preference, enabled) },
+            ),
+            primaryCta = CtaConfig(
+                text = TextConfig.Resource(R.string.preOnboardingInputScreenButton),
+                action = CtaAction.Submit,
+            ),
+        )
+
         is NewUserOnboardingActivityDialog.IntroAnimation,
         NewUserOnboardingActivityDialog.NotificationPermission,
         NewUserOnboardingActivityDialog.DefaultBrowserPrompt,
@@ -192,10 +211,28 @@ class DialogConfigResolver @Inject constructor(
         -> null // command-only: no card to render
     }
 
-    private fun comparisonChart(chart: ComparisonChartConfig) = DialogConfig(
+    private fun preferenceRow(preference: OnboardingPreference, initiallyEnabled: Boolean) = when (preference) {
+        OnboardingPreference.SEARCH_HISTORY -> ContentConfig.PreferenceSelector.Row(
+            preference = preference,
+            iconRes = CommonR.drawable.history_color_24,
+            primaryText = TextConfig.Resource(R.string.searchPathPreferenceHistoryPrimary),
+            secondaryText = TextConfig.Resource(R.string.searchPathPreferenceHistorySecondary),
+            initiallyEnabled = initiallyEnabled,
+        )
+
+        OnboardingPreference.SAFE_SEARCH -> ContentConfig.PreferenceSelector.Row(
+            preference = preference,
+            iconRes = CommonR.drawable.exclamation_color_24,
+            primaryText = TextConfig.Resource(R.string.searchPathPreferenceSafePrimary),
+            secondaryText = TextConfig.Resource(R.string.searchPathPreferenceSafeSecondary),
+            initiallyEnabled = initiallyEnabled,
+        )
+    }
+
+    private fun comparisonChart(chart: ComparisonChartConfig, showEmbellishment: Boolean = true) = DialogConfig(
         background = OnboardingBackgroundStep.ComparisonChart,
-        embellishment = Embellishment.BottomWing,
-        cardArrow = CardArrowConfig.AtEnd,
+        embellishment = if (showEmbellishment) Embellishment.BottomWing else Embellishment.None,
+        cardArrow = if (showEmbellishment) CardArrowConfig.AtEnd else CardArrowConfig.Hidden,
         content = ContentConfig.ComparisonChart(title = TextConfig.Resource(chart.titleRes), config = chart),
         primaryCta = CtaConfig(
             text = TextConfig.Resource(chart.primaryCtaTextRes),
