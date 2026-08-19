@@ -3237,6 +3237,7 @@ class BrowserTabFragment :
         position: Int,
         offset: Int,
     ) {
+        if (!isAdded || view == null) return
         val layoutManager = binding.autoCompleteSuggestionsList.layoutManager as LinearLayoutManager
         layoutManager.scrollToPositionWithOffset(position, offset - AUTOCOMPLETE_PADDING_DP.toPx())
     }
