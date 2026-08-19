@@ -63,13 +63,9 @@ import javax.inject.Inject
 interface ModelPicker {
     var onMenuShown: (() -> Unit)?
     var onMenuDismissed: (() -> Unit)?
-    var onModelSelected: (() -> Unit)?
 
     /** Invoked when the user picks a model during the FE recovery model-change flow. */
     var onChangeModelSubmitted: ((modelId: String) -> Unit)?
-    fun getSelectedModelId(): String?
-    fun isImageGenerationSupported(): Boolean
-    fun isWebSearchSupported(): Boolean
     fun setPickerEnabled(enabled: Boolean)
     fun setHost(host: NativeInputHost)
 
@@ -102,7 +98,6 @@ class ModelPickerView @JvmOverloads constructor(
     private var inputContextJob: Job? = null
     private var commandJob: Job? = null
     private var modelChangeJob: Job? = null
-    private var effectiveModelJob: Job? = null
     private var popupWindow: PopupWindow? = null
     private var lastNativeInputState: NativeInputState? = null
 
@@ -112,23 +107,10 @@ class ModelPickerView @JvmOverloads constructor(
     private lateinit var host: NativeInputHost
     override var onMenuShown: (() -> Unit)? = null
     override var onMenuDismissed: (() -> Unit)? = null
-    override var onModelSelected: (() -> Unit)? = null
     override var onChangeModelSubmitted: ((modelId: String) -> Unit)? = null
 
     init {
         inflate(context, R.layout.view_model_picker, this)
-    }
-
-    override fun getSelectedModelId(): String? = viewModel.getSelectedModelId()
-
-    override fun isImageGenerationSupported(): Boolean {
-        if (!isAttachedToWindow) return true
-        return viewModel.isImageGenerationSupported()
-    }
-
-    override fun isWebSearchSupported(): Boolean {
-        if (!isAttachedToWindow) return true
-        return viewModel.isWebSearchSupported()
     }
 
     private var pickerEnabled = false
@@ -184,13 +166,6 @@ class ModelPickerView @JvmOverloads constructor(
         stateJob?.cancel()
         stateJob = viewModel.state
             .onEach { updateVisibility() }
-            .launchIn(scope)
-
-        // Refresh option tool-visibility whenever the effective (chat-aware / recovery) model
-        // changes, not only on global model changes — otherwise options reflect the wrong model.
-        effectiveModelJob?.cancel()
-        effectiveModelJob = viewModel.effectiveModelId
-            .onEach { onModelSelected?.invoke() }
             .launchIn(scope)
 
         chipLabelJob?.cancel()
@@ -308,8 +283,6 @@ class ModelPickerView @JvmOverloads constructor(
         commandJob = null
         modelChangeJob?.cancel()
         modelChangeJob = null
-        effectiveModelJob?.cancel()
-        effectiveModelJob = null
         lastNativeInputState = null
         dismissPopup()
     }
