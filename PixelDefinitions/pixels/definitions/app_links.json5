@@ -26,5 +26,37 @@
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
+    },
+    "app_links_snackbar_youtube_shown": {
+        "description": "Fired when the 'open in app' snackbar is shown for a link whose destination app is YouTube. Gated by the 'sendPixelForYouTubeAppLinks' androidBrowserConfig remote config flag.",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-09-15"
+    },
+    "app_links_snackbar_youtube_shown_daily": {
+        "description": "Fired at most once per day when the 'open in app' snackbar is shown for a link whose destination app is YouTube. Gated by the 'sendPixelForYouTubeAppLinks' androidBrowserConfig remote config flag.",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-09-15"
+    },
+    "app_links_snackbar_youtube_open_action_pressed": {
+        "description": "Fired when the user taps the open action on the 'open in app' snackbar for a link whose destination app is YouTube. Gated by the 'sendPixelForYouTubeAppLinks' androidBrowserConfig remote config flag.",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-09-15"
+    },
+    "app_links_snackbar_youtube_open_action_pressed_daily": {
+        "description": "Fired at most once per day when the user taps the open action on the 'open in app' snackbar for a link whose destination app is YouTube. Gated by the 'sendPixelForYouTubeAppLinks' androidBrowserConfig remote config flag.",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-09-15"
     }
 }
