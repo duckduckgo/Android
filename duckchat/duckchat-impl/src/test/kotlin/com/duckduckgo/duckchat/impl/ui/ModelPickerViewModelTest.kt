@@ -25,6 +25,7 @@ import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ModelProvider
 import com.duckduckgo.duckchat.impl.models.ModelState
+import com.duckduckgo.duckchat.impl.nativeinput.RealEffectiveModelProvider
 import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.models.UserTier
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
@@ -79,6 +80,7 @@ class ModelPickerViewModelTest {
             duckChatPixels = duckChatPixels,
             nativeInputStateProvider = nativeInputStateProvider,
             duckAiChatStore = duckAiChatStore,
+            effectiveModelProvider = RealEffectiveModelProvider(modelManager, nativeInputStateProvider, duckAiChatStore),
         )
     }
 
