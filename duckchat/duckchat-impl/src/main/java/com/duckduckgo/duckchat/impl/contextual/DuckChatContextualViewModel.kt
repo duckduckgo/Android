@@ -78,7 +78,6 @@ class DuckChatContextualViewModel @Inject constructor(
     private val modelManager: DuckAiModelManager,
     private val contextualNativeInputManager: ContextualNativeInputManager,
     private val chatHistoryRepository: ChatHistoryRepository,
-    private val contextualEntryPromptStore: ContextualEntryPromptStore,
     private val context: Context,
 ) : ViewModel() {
 
@@ -133,10 +132,6 @@ class DuckChatContextualViewModel @Inject constructor(
     @VisibleForTesting
     internal var isPageContextRequested: Boolean = false
 
-    // A prompt handed over from the contextual entry dialog, submitted once the chat web app signals it
-    // is ready (onWebAppReady). Held between opening the sheet in WEBVIEW and that ready signal.
-    private var pendingEntryPrompt: NativeInputPrompt? = null
-
     sealed class Command {
         data class LoadUrl(val url: String) : Command()
         data object SendSubscriptionAuthUpdateEvent : Command()
@@ -155,7 +150,6 @@ class DuckChatContextualViewModel @Inject constructor(
             val showNewChatHeader: Boolean,
             val recentChats: List<ChatHistoryItem>,
         ) : Command()
-        data class ShowNewChatEntryDialog(val tabId: String) : Command()
         data class OpenChatUrl(
             val url: String,
             val sourceTabId: String,
@@ -243,15 +237,6 @@ class DuckChatContextualViewModel @Inject constructor(
         contextualNativeInputManager.onContextualReopened(_viewState.value.tabId)
 
         viewModelScope.launch(dispatchers.io()) {
-            val tabId = _viewState.value.tabId
-            val pendingEntry = contextualEntryPromptStore.consume(tabId)
-            if (pendingEntry != null) {
-                // Composed in the entry dialog while the (persisted) sheet was hidden: reload into a fresh
-                // chat and auto-submit. The reload makes the web app re-request its hand-off data, so
-                // onWebAppReady fires again — the same delivery path as the first open.
-                startChatFromEntryPrompt(tabId, pendingEntry)
-                return@launch
-            }
             withContext(dispatchers.main()) {
                 logcat { "Duck.ai: requesting page context after sheet reopened" }
                 isPageContextRequested = true
@@ -324,14 +309,6 @@ class DuckChatContextualViewModel @Inject constructor(
     fun onSheetOpened(tabId: String) {
         _viewState.update { it.copy(tabId = tabId) }
         viewModelScope.launch(dispatchers.io()) {
-            val pendingEntry = contextualEntryPromptStore.consume(tabId)
-            if (pendingEntry != null) {
-                // Composed in the entry dialog: open straight into the chat and auto-submit, rather than
-                // reopening the initial input state. Page context came over with the prompt, so there's no
-                // need to request it again here.
-                startChatFromEntryPrompt(tabId, pendingEntry)
-                return@launch
-            }
             logcat { "Duck.ai: onSheetOpened for tab=$tabId" }
             withContext(dispatchers.main()) {
                 isPageContextRequested = true
@@ -390,60 +367,6 @@ class DuckChatContextualViewModel @Inject constructor(
             }
         }
         duckChatPixels.reportContextualSheetOpened()
-    }
-
-    private suspend fun startChatFromEntryPrompt(
-        tabId: String,
-        entry: ContextualEntryPrompt,
-    ) {
-        pendingEntryPrompt = entry.prompt
-        val chatUrl = duckChat.getDuckChatUrl("", false, sidebar = true)
-        withContext(dispatchers.main()) {
-            entry.serializedPageContext?.let { attachProvidedPageContext(it) }
-            _viewState.update {
-                it.copy(
-                    sheetMode = SheetMode.WEBVIEW,
-                    showFullscreen = hasChatId(chatUrl),
-                    tabId = tabId,
-                    allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled(),
-                )
-            }
-            commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_EXPANDED))
-            commandChannel.trySend(Command.LoadUrl(chatUrl))
-        }
-    }
-
-    private fun attachProvidedPageContext(serializedPageContext: String) {
-        if (!isContextValid(serializedPageContext)) return
-        currentPageContext = serializedPageContext
-        pageContextState = pageContextState.copy(attachedPage = serializedPageContext)
-        val json = JSONObject(serializedPageContext)
-        _viewState.update {
-            it.copy(
-                showContext = true,
-                userRemovedContext = false,
-                contextTitle = json.optString("title"),
-                contextUrl = json.optString("url"),
-            )
-        }
-    }
-
-    /**
-     * Signalled by the fragment when the chat web app has requested its hand-off data (i.e. it is loaded
-     * and subscribed). Submitting the entry-dialog prompt here — rather than at page-finished — avoids a
-     * race where the prompt event is emitted before the web app can receive it.
-     */
-    fun onWebAppReady() {
-        val entry = pendingEntryPrompt ?: return
-        pendingEntryPrompt = null
-        onPromptSent(
-            prompt = entry.prompt,
-            modelId = entry.modelId,
-            reasoningEffort = entry.reasoningEffort,
-            selectedTool = entry.selectedTool,
-            imagesJson = entry.imagesJson,
-            filesJson = entry.filesJson,
-        )
     }
 
     fun onPromptSent(
@@ -955,28 +878,7 @@ class DuckChatContextualViewModel @Inject constructor(
 
     fun onNewChatRequestedFromPopup() {
         duckChatPixels.reportContextualSheetNewChatFromPopup()
-        if (duckChatInternal.isContextualSheetRedesignEnabled()) {
-            // Hand New Chat off to the transparent entry dialog: clear the current chat's stored status
-            // now so it isn't resumed, then let the dialog command hide the sheet. sheetState = null so
-            // renderNewChatState emits no ChangeSheetState of its own — a second command would race this
-            // one on the capacity-1 channel and one would be dropped.
-            renderNewChatState(sheetState = null)
-            commandChannel.trySend(Command.ShowNewChatEntryDialog(_viewState.value.tabId))
-        } else {
-            renderNewChatState()
-        }
-    }
-
-    /**
-     * The entry dialog opened from New Chat has parked a composed prompt, so consume it and start a fresh
-     * chat from it (same delivery path as the initial entry hand-off).
-     */
-    fun onNewChatFromEntryDialog() {
-        viewModelScope.launch(dispatchers.io()) {
-            val tabId = _viewState.value.tabId
-            val pendingEntry = contextualEntryPromptStore.consume(tabId) ?: return@launch
-            startChatFromEntryPrompt(tabId, pendingEntry)
-        }
+        renderNewChatState()
     }
 
     fun onChatsIconClicked() {

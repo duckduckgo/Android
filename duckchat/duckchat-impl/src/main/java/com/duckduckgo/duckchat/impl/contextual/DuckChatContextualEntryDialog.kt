@@ -263,8 +263,19 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
         binding.entrySuggestionsView.onContentChanged = { updateQuickActionVisibility() }
         sharedContextualViewModel.commands
             .onEach { command ->
-                if (command is DuckChatContextualSharedViewModel.Command.PageContextAttached) {
-                    viewModel.onPageContextReceived(command.pageContext)
+                when (command) {
+                    is DuckChatContextualSharedViewModel.Command.PageContextAttached ->
+                        viewModel.onPageContextReceived(command.pageContext)
+
+                    is DuckChatContextualSharedViewModel.Command.MainBrowserPageFinished ->
+                        // The dialog may have opened while the page was still loading, so the initial
+                        // collection returned no usable context and the suggestions fell back to generic.
+                        // Re-collect now that the page finished so the page-specific prompts can resolve.
+                        // When storePageContext is enabled the browser re-collects and pushes context on
+                        // page finish itself, so only re-request when it isn't.
+                        if (!command.isStorePageContextEnabled) sharedContextualViewModel.requestPageContext()
+
+                    else -> {}
                 }
             }
             .launchIn(viewLifecycleOwner.lifecycleScope)
@@ -297,6 +308,7 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
             onPageContextRemoved = { viewModel.onContextRemoved() },
         )
         contextualNativeInputManager.onInputMode()
+        contextualNativeInputManager.onContextualReopened(tabId)
     }
 
     private fun updateQuickActionVisibility() {
