@@ -28,22 +28,29 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.core.animation.addListener
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.core.transition.addListener
+import androidx.core.view.updateLayoutParams
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.RenderMode
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.text.DaxTextView
+import com.duckduckgo.common.ui.view.toPx
 import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 class AddressBarTrackersAnimator @Inject constructor(
     private val trackerCountAnimator: TrackerCountAnimator,
     private val commonAddressBarAnimationHelper: CommonAddressBarAnimationHelper,
+    private val appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles,
 ) {
     var isAnimationRunning = false
         private set
@@ -82,10 +89,24 @@ class AddressBarTrackersAnimator @Inject constructor(
         this.onAnimationComplete = onAnimationComplete
         this.customBackgroundColor = customBackgroundColor
 
+        val addressBarRebrandEnabled = appBrandDesignUpdateToggles.addressBar().isEnabled()
+        val sceneContext = addressBarAnimationContext(sceneRoot.context, addressBarRebrandEnabled)
+        animatedIconBackgroundView.background = ContextCompat.getDrawable(sceneContext, CommonR.drawable.animated_icon_dummy_background)
+
         addressBarTrackersBlockedAnimationShieldIcon.renderMode = if (useSoftwareRenderingMode) {
             RenderMode.SOFTWARE
         } else {
             RenderMode.AUTOMATIC
+        }
+        if (addressBarRebrandEnabled) {
+            val boxSize = addressBarTrackersBlockedAnimationShieldIcon.resources.getDimensionPixelSize(CommonR.dimen.toolbarIcon)
+            addressBarTrackersBlockedAnimationShieldIcon.setAnimation(R.raw.shield_color_24)
+            addressBarTrackersBlockedAnimationShieldIcon.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                width = boxSize
+                height = boxSize
+                marginStart = 2.toPx(context)
+            }
+            addressBarTrackersBlockedAnimationShieldIcon.scaleType = ImageView.ScaleType.FIT_CENTER
         }
         addressBarTrackersBlockedAnimationShieldIcon.show()
         addressBarTrackersBlockedAnimationShieldIcon.progress = 0F
@@ -93,7 +114,7 @@ class AddressBarTrackersAnimator @Inject constructor(
         val slideInTrackersTransition: Transition = createSlideTransition()
         val slideOutTrackersTransition: Transition = createSlideTransition()
 
-        val inflater = LayoutInflater.from(sceneRoot.context)
+        val inflater = LayoutInflater.from(sceneContext)
         val scene1Layout = inflater.inflate(R.layout.address_bar_trackers_animation_scene_1, sceneRoot, false)
         val scene2Layout = inflater.inflate(R.layout.address_bar_trackers_animation_scene_2, sceneRoot, false)
 
@@ -116,6 +137,7 @@ class AddressBarTrackersAnimator @Inject constructor(
 
         // Apply custom background color if provided
         customBackgroundColor?.let { bgColor ->
+            applyCustomBackground(animatedIconBackgroundView, bgColor)
             applyCustomBackground(scene1Layout, bgColor)
             applyCustomBackground(scene2Layout, bgColor)
 

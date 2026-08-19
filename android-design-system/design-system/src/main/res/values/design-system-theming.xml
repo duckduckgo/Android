@@ -336,6 +336,9 @@
         <item name="daxColorBackdrop">@color/daxColorBackdropDark</item>
         <item name="daxColorInputModeIndicator">@color/white18</item>
         <item name="daxColorInputModeIndicatorShadow">@color/black</item>
+
+        <!--Rebrand Status-->
+        <item name="daxColorStatusRed">@color/alertRedOnDarkDefault</item>
     </style>
 
     <style name="Theme.DuckDuckGo.Light" parent="Theme.DuckDuckGo">
@@ -497,6 +500,9 @@
         <item name="daxColorBackdrop">@color/controls_fill_primary_light</item>
         <item name="daxColorInputModeIndicator">@color/white84</item>
         <item name="daxColorInputModeIndicatorShadow">@color/gray60</item>
+
+        <!--Rebrand Status-->
+        <item name="daxColorStatusRed">@color/rb_red50</item>
     </style>
 
     <style name="Theme.DuckDuckGo.Survey" parent="Theme.DuckDuckGo.Light">

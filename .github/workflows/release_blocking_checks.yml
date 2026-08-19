@@ -1,6 +1,6 @@
 name: Release Blocking Checks
 
-run-name: 'Release Blocking Checks (${{ inputs.ddg_di || ''AnvilDagger'' }})'
+run-name: 'Release Blocking Checks (${{ inputs.ddg_di || ''default DI'' }})'
 
 on:
   workflow_call:
@@ -15,10 +15,10 @@ on:
         type: boolean
         default: true
       ddg_di:
-        description: 'DI framework to build with (AnvilDagger or Metro)'
+        description: 'DI framework to build with. Leave empty to use ddg.di from gradle.properties; set AnvilDagger or Metro to pin one.'
         required: false
         type: string
-        default: 'AnvilDagger'
+        default: ''
   workflow_dispatch:
     inputs:
       commit:
@@ -31,13 +31,14 @@ on:
         type: boolean
         default: true
       ddg_di:
-        description: 'DI framework to build with (AnvilDagger or Metro)'
+        description: 'DI framework to build with. Leave empty to use ddg.di from gradle.properties; set AnvilDagger or Metro to pin one.'
         required: false
         type: string
-        default: 'AnvilDagger'
+        default: ''
 
+# The DI framework is part of the group because a single caller runs this workflow once per DI
 concurrency:
-  group: ${{ github.workflow_ref }}-${{ github.ref }}-${{ inputs.commit }}
+  group: ${{ github.workflow_ref }}-${{ github.ref }}-${{ inputs.commit }}-${{ inputs.ddg_di || 'default' }}
   cancel-in-progress: true
 
 jobs:

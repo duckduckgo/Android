@@ -145,6 +145,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     BROWSER_MODE_SWITCHED("m_browser_mode_switched"),
 
     SETTINGS_OPENED("ms"),
+    SETTINGS_OPENED_WITH_SUBSCRIPTION_AVAILABLE("m_subscription_settings_impression"),
     SETTINGS_THEME_OPENED("ms_t_o"),
     SETTINGS_THEME_TOGGLED_LIGHT("ms_tl"),
     SETTINGS_THEME_TOGGLED_DARK("ms_td"),

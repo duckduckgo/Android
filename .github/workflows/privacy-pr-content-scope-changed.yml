@@ -1,0 +1,34 @@
+name: 'Privacy Tests - Content Scope Changed'
+
+# Runs the privacy reference tests once per DI framework when a PR bumps content scope
+# scripts. This wrapper exists because privacy.yml builds one DI per run, so a trigger there
+# could only ever cover one of them. These tests are the only place @PrivacyTest and
+# @InternalPrivacyTest coverage runs on a PR — ci.yml's Flank run excludes both annotations.
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+    paths:
+      - 'node_modules/@duckduckgo/content-scope-scripts/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Both DI frameworks are pinned explicitly: an omitted `ddg_di` means "whatever
+  # gradle.properties says", which would collapse both legs onto the same DI once the repo
+  # default flips.
+  call-privacy:
+    strategy:
+      fail-fast: false
+      matrix:
+        di: [AnvilDagger, Metro]
+    uses: ./.github/workflows/privacy.yml
+    with:
+      commit: ${{ github.sha }}
+      ddg_di: ${{ matrix.di }}
+    secrets: inherit

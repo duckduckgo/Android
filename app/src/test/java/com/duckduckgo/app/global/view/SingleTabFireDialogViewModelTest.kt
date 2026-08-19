@@ -46,6 +46,8 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.BrowserModeDataProvider
+import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.dataclearing.api.fire.FireDialogProvider.FireDialogOrigin
@@ -90,6 +92,9 @@ class SingleTabFireDialogViewModelTest {
     private val mockFireButtonStore: FireButtonStore = mock()
     private val mockDispatcherProvider: DispatcherProvider = mock()
     private val mockTabRepository: TabRepository = mock()
+    private val mockFireTabRepository: TabRepository = mock()
+    private val mockTabRepositoryProvider: BrowserModeDataProvider<TabRepository> = mock()
+    private val mockFireModeAvailability: FireModeAvailability = mock()
     private val mockWebViewCapabilityChecker: WebViewCapabilityChecker = mock()
     private val mockDownloadsRepository: DownloadsRepository = mock()
     private val mockDuckChat: DuckChat = mock()
@@ -102,6 +107,9 @@ class SingleTabFireDialogViewModelTest {
     @Before
     fun setup() {
         whenever(mockTabRepository.flowSelectedTab).thenReturn(selectedTabFlow)
+        whenever(mockFireModeAvailability.isAvailable()).thenReturn(true)
+        whenever(mockTabRepositoryProvider.forMode(BrowserMode.REGULAR)).thenReturn(mockTabRepository)
+        whenever(mockTabRepositoryProvider.forMode(BrowserMode.FIRE)).thenReturn(mockFireTabRepository)
         whenever(mockDispatcherProvider.io()).thenReturn(coroutineTestRule.testDispatcherProvider.io())
         whenever(mockSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.HeroFire)
         whenever(mockSettingsDataStore.fireAnimationEnabled).thenReturn(true)
@@ -130,6 +138,8 @@ class SingleTabFireDialogViewModelTest {
         fireButtonStore = mockFireButtonStore,
         dispatcherProvider = mockDispatcherProvider,
         tabRepository = mockTabRepository,
+        tabRepositoryProvider = mockTabRepositoryProvider,
+        fireModeAvailability = mockFireModeAvailability,
         webViewCapabilityChecker = mockWebViewCapabilityChecker,
         downloadsRepository = mockDownloadsRepository,
         duckChat = mockDuckChat,
@@ -2105,6 +2115,47 @@ class SingleTabFireDialogViewModelTest {
 
         verify(mockDataClearing).clearSingleTabData(tabId = "hatch-tab", replaceCurrentTab = false, browserMode = BrowserMode.REGULAR)
         verify(mockDataClearing, never()).clearSingleTabData(eq("selected-tab"), any(), any())
+    }
+
+    @Test
+    fun `when delete this tab clicked with fire hatch origin in regular mode then clears in fire mode`() = runTest {
+        whenever(mockSettingsDataStore.fireAnimationEnabled).thenReturn(false)
+        whenever(mockFireTabRepository.getTab("fire-tab")).thenReturn(
+            TabEntity(tabId = "fire-tab", url = "https://news.example.com", title = "News"),
+        )
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
+        testee = createViewModel(browserMode = BrowserMode.REGULAR)
+
+        testee.commands().test {
+            testee.setOrigin(FireDialogOrigin.Hatch("fire-tab"))
+            awaitItem() // OnShow
+
+            testee.onDeleteThisTabClicked()
+
+            cancelAndConsumeRemainingEvents()
+        }
+
+        verify(mockDataClearing).clearSingleTabData(tabId = "fire-tab", replaceCurrentTab = false, browserMode = BrowserMode.FIRE)
+    }
+
+    @Test
+    fun `when delete this tab clicked with hatch origin and tab is gone then clears nothing and reports error`() = runTest {
+        whenever(mockSettingsDataStore.fireAnimationEnabled).thenReturn(false)
+        whenever(mockTabRepository.getTab("gone-tab")).thenReturn(null)
+        whenever(mockFireTabRepository.getTab("gone-tab")).thenReturn(null)
+        testee = createViewModel(browserMode = BrowserMode.REGULAR)
+
+        testee.commands().test {
+            testee.setOrigin(FireDialogOrigin.Hatch("gone-tab"))
+            awaitItem() // OnShow
+
+            testee.onDeleteThisTabClicked()
+
+            assertTrue(expectMostRecentItem() is SingleTabFireDialogViewModel.Command.OnSingleTabClearError)
+            cancelAndConsumeRemainingEvents()
+        }
+
+        verify(mockDataClearing, never()).clearSingleTabData(any(), any(), any())
     }
 
     // endregion

@@ -46,4 +46,11 @@ interface AppBrandDesignUpdateToggles {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun theme(): Toggle
+
+    /**
+     * Gates the address bar radius, Lotties: shield, cookies, ad-blocking and Duck Player
+     * assets, and the 40dp shield icon box.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun addressBar(): Toggle
 }

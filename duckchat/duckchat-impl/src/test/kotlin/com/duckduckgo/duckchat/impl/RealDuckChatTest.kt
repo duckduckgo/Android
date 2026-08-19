@@ -52,6 +52,7 @@ import com.duckduckgo.sync.api.DeviceSyncState
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.take
@@ -61,6 +62,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -1639,8 +1641,54 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun `when default toggle position is duck ai then resolved position is duck ai`() = runTest {
+        whenever(mockDuckChatFeatureRepository.observeDefaultTogglePosition()).thenReturn(MutableStateFlow("DUCK_AI"))
+        testee.onPrivacyConfigDownloaded()
+
+        assertEquals(NativeInputState.ToggleSelection.DUCK_AI, testee.resolvedTogglePosition())
+    }
+
+    @Test
+    fun `when default toggle position is last used then resolved position follows the last used side`() = runTest {
+        whenever(mockDuckChatFeatureRepository.observeDefaultTogglePosition()).thenReturn(MutableStateFlow("LAST_USED"))
+        whenever(mockDuckChatFeatureRepository.observeLastUsedTogglePosition()).thenReturn(MutableStateFlow("DUCK_AI"))
+        testee.onPrivacyConfigDownloaded()
+
+        assertEquals(NativeInputState.ToggleSelection.DUCK_AI, testee.resolvedTogglePosition())
+    }
+
+    @Test
+    fun `when default toggle position is last used and nothing used yet then resolved position is search`() = runTest {
+        whenever(mockDuckChatFeatureRepository.observeDefaultTogglePosition()).thenReturn(MutableStateFlow("LAST_USED"))
+        whenever(mockDuckChatFeatureRepository.observeLastUsedTogglePosition()).thenReturn(MutableStateFlow(null))
+        testee.onPrivacyConfigDownloaded()
+
+        assertEquals(NativeInputState.ToggleSelection.SEARCH, testee.resolvedTogglePosition())
+    }
+
+    @Test
+    fun `resolved toggle position is always a concrete side, never the unresolved setting`() = runTest {
+        // It is reported as a pixel value, so the unresolved setting must never escape.
+        whenever(mockDuckChatFeatureRepository.observeDefaultTogglePosition()).thenReturn(MutableStateFlow("LAST_USED"))
+        whenever(mockDuckChatFeatureRepository.observeLastUsedTogglePosition()).thenReturn(MutableStateFlow("SEARCH"))
+        testee.onPrivacyConfigDownloaded()
+
+        assertNotNull(testee.resolvedTogglePosition())
+    }
+
+    @Test
+    fun `resolved toggle position does not depend on cached input mode capability`() = runTest {
+        whenever(mockDuckChatFeatureRepository.observeDefaultTogglePosition()).thenReturn(MutableStateFlow("DUCK_AI"))
+        whenever(mockDuckChatFeatureRepository.isInputScreenUserSettingEnabled()).thenReturn(false)
+        testee.onPrivacyConfigDownloaded()
+        advanceUntilIdle()
+
+        assertEquals(NativeInputState.ToggleSelection.DUCK_AI, testee.resolvedTogglePosition())
+    }
+
+    @Test
     fun `when observeDefaultTogglePosition then maps string to enum`() = runTest {
-        whenever(mockDuckChatFeatureRepository.observeDefaultTogglePosition()).thenReturn(flowOf("DUCK_AI"))
+        whenever(mockDuckChatFeatureRepository.observeDefaultTogglePosition()).thenReturn(MutableStateFlow("DUCK_AI"))
 
         val result = testee.observeDefaultTogglePosition().first()
 
@@ -1649,7 +1697,7 @@ class RealDuckChatTest {
 
     @Test
     fun `when observeDefaultTogglePosition with null then maps to SEARCH`() = runTest {
-        whenever(mockDuckChatFeatureRepository.observeDefaultTogglePosition()).thenReturn(flowOf(null))
+        whenever(mockDuckChatFeatureRepository.observeDefaultTogglePosition()).thenReturn(MutableStateFlow(null))
 
         val result = testee.observeDefaultTogglePosition().first()
 
@@ -1665,7 +1713,7 @@ class RealDuckChatTest {
 
     @Test
     fun `when observeLastUsedTogglePosition then delegates to repository`() = runTest {
-        whenever(mockDuckChatFeatureRepository.observeLastUsedTogglePosition()).thenReturn(flowOf("SEARCH"))
+        whenever(mockDuckChatFeatureRepository.observeLastUsedTogglePosition()).thenReturn(MutableStateFlow("SEARCH"))
 
         val result = testee.observeLastUsedTogglePosition().first()
 
