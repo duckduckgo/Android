@@ -24,6 +24,7 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.clear.AppLinkSettingType
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -105,6 +106,7 @@ class PermissionsViewModelTest {
         verify(mockAppSettingsDataStore).appLinksEnabled = true
         verify(mockAppSettingsDataStore).showAppLinksPrompt = true
         verify(mockPixel).fire(AppPixelName.SETTINGS_APP_LINKS_ASK_EVERY_TIME_SELECTED)
+        verify(mockPixel).fire(AppPixelName.SETTINGS_APP_LINKS_ASK_EVERY_TIME_SELECTED_DAILY, type = Daily())
     }
 
     @Test
@@ -114,6 +116,7 @@ class PermissionsViewModelTest {
         verify(mockAppSettingsDataStore).appLinksEnabled = true
         verify(mockAppSettingsDataStore).showAppLinksPrompt = false
         verify(mockPixel).fire(AppPixelName.SETTINGS_APP_LINKS_ALWAYS_SELECTED)
+        verify(mockPixel).fire(AppPixelName.SETTINGS_APP_LINKS_ALWAYS_SELECTED_DAILY, type = Daily())
     }
 
     @Test
@@ -123,6 +126,7 @@ class PermissionsViewModelTest {
         verify(mockAppSettingsDataStore).appLinksEnabled = false
         verify(mockAppSettingsDataStore).showAppLinksPrompt = false
         verify(mockPixel).fire(AppPixelName.SETTINGS_APP_LINKS_NEVER_SELECTED)
+        verify(mockPixel).fire(AppPixelName.SETTINGS_APP_LINKS_NEVER_SELECTED_DAILY, type = Daily())
     }
 
     @Test
@@ -156,6 +160,7 @@ class PermissionsViewModelTest {
 
             assertEquals(Command.LaunchAppLinkSettings(AppLinkSettingType.ASK_EVERYTIME), awaitItem())
             verify(mockPixel).fire(AppPixelName.SETTINGS_APP_LINKS_PRESSED)
+            verify(mockPixel).fire(AppPixelName.SETTINGS_APP_LINKS_PRESSED_DAILY, type = Daily())
 
             cancelAndConsumeRemainingEvents()
         }
