@@ -378,7 +378,7 @@ class SingleTabFireDialogViewModel @Inject constructor(
 
     private suspend fun findTabAcrossModes(tabId: String): Pair<BrowserMode, TabEntity>? {
         val modes = if (fireModeAvailability.isAvailable()) BrowserMode.entries else listOf(BrowserMode.REGULAR)
-        
+
         // The Hatch renders in Regular mode but can offer a Fire tab, so its tab must be looked up
         // across all repositories. Tab ids are unique across both, so at most one match exists.
         return modes.firstNotNullOfOrNull { mode ->
