@@ -41,8 +41,11 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.BrowserModeDataProvider
+import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.dataclearing.api.fire.FireDialogProvider.FireDialogOrigin
 import com.duckduckgo.dataclearing.api.fire.FireDialogProvider.FireDialogOrigin.Browser
@@ -83,6 +86,8 @@ class SingleTabFireDialogViewModel @Inject constructor(
     private val fireButtonStore: FireButtonStore,
     private val dispatcherProvider: DispatcherProvider,
     private val tabRepository: TabRepository,
+    private val tabRepositoryProvider: BrowserModeDataProvider<TabRepository>,
+    private val fireModeAvailability: FireModeAvailability,
     private val webViewCapabilityChecker: WebViewCapabilityChecker,
     private val downloadsRepository: DownloadsRepository,
     private val duckChat: DuckChat,
@@ -243,7 +248,9 @@ class SingleTabFireDialogViewModel @Inject constructor(
         viewModelScope.launch {
             shouldRestartAfterClearing = false
 
-            val browserModeParams = mapOf(Pixel.PixelParameter.BROWSER_MODE to browserMode.name.lowercase())
+            val target = withContext(dispatcherProvider.io()) { resolveTarget(origin.value) }
+
+            val browserModeParams = mapOf(Pixel.PixelParameter.BROWSER_MODE to (target?.second ?: browserMode).name.lowercase())
             pixel.enqueueFire(AppPixelName.FIRE_DIALOG_CLEAR_SINGLE_TAB_PRESSED, browserModeParams)
             pixel.enqueueFire(AppPixelName.FIRE_DIALOG_CLEAR_SINGLE_TAB_PRESSED_DAILY, browserModeParams, type = Daily())
             fireDataClearingSurfacePixels()
@@ -263,19 +270,16 @@ class SingleTabFireDialogViewModel @Inject constructor(
                 command.send(Command.PlayAnimation)
             }
 
-            val originalTabId = withContext(dispatcherProvider.io()) {
-                resolveTargetTabId(origin.value)
-            }
-
             val result = withContext(dispatcherProvider.io()) {
-                if (originalTabId != null) {
+                if (target != null) {
+                    val (tabId, mode) = target
                     if (origin.value == DuckAiContextualChat) {
-                        dataClearing.clearTabContextualChat(originalTabId, browserMode)
+                        dataClearing.clearTabContextualChat(tabId, mode)
                     } else {
                         dataClearing.clearSingleTabData(
-                            tabId = originalTabId,
+                            tabId = tabId,
                             replaceCurrentTab = origin.value !is Hatch,
-                            browserMode = browserMode,
+                            browserMode = mode,
                         )
                     }
                 } else {
@@ -288,7 +292,7 @@ class SingleTabFireDialogViewModel @Inject constructor(
                 is ClearDataResult.Success -> {
                     if (origin.value != DuckAiContextualChat) {
                         // in case of contextual chat the origin tab is never closed, don't need this
-                        waitForTabsToUpdate(originalTabId)
+                        waitForTabsToUpdate(target?.first)
                     }
                     command.send(Command.OnSingleTabClearComplete)
                 }
@@ -362,14 +366,24 @@ class SingleTabFireDialogViewModel @Inject constructor(
         )
     }
 
-    private suspend fun resolveTargetTabId(dialogOrigin: FireDialogOrigin?): String? = when (dialogOrigin) {
-        is Hatch -> dialogOrigin.tabId
-        else -> tabRepository.getSelectedTab()?.tabId
+    private suspend fun resolveTarget(dialogOrigin: FireDialogOrigin?): Pair<String, BrowserMode>? = when (dialogOrigin) {
+        is Hatch -> findTabAcrossModes(dialogOrigin.tabId)?.let { (mode, tab) -> tab.tabId to mode }
+        else -> tabRepository.getSelectedTab()?.let { it.tabId to browserMode }
     }
 
     private suspend fun resolveTargetTabUrl(dialogOrigin: FireDialogOrigin): String? = when (dialogOrigin) {
-        is Hatch -> tabRepository.getTab(dialogOrigin.tabId)?.url
+        is Hatch -> findTabAcrossModes(dialogOrigin.tabId)?.second?.url
         else -> tabRepository.getSelectedTab()?.url
+    }
+
+    private suspend fun findTabAcrossModes(tabId: String): Pair<BrowserMode, TabEntity>? {
+        val modes = if (fireModeAvailability.isAvailable()) BrowserMode.entries else listOf(BrowserMode.REGULAR)
+        
+        // The Hatch renders in Regular mode but can offer a Fire tab, so its tab must be looked up
+        // across all repositories. Tab ids are unique across both, so at most one match exists.
+        return modes.firstNotNullOfOrNull { mode ->
+            tabRepositoryProvider.forMode(mode).getTab(tabId)?.let { mode to it }
+        }
     }
 
     private suspend fun waitForTabsToUpdate(originalTabId: String?) {
