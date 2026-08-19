@@ -29,19 +29,25 @@ days, since each round trip through Smartling takes a few.
 
 ## Rules for translatable strings
 
-1. **Every placeholder needs an `instruction`** explaining what it stands for. Translators see the
-   `instruction` attribute and nothing else — not the surrounding code, not the screen.
+1. **Add an `instruction` only where the string isn't self-evident** — always for a string with a
+   placeholder, and for copy whose meaning depends on the screen around it. Translators see the
+   `instruction` attribute and nothing else, not the surrounding code and not the screen. Plain
+   unambiguous copy ("Settings", "Done") needs none; don't add one for its own sake.
 
    ```xml
    <string name="authenticationDialogMessage" instruction="Placeholder is the name of a website">%1$s requires a username and password.</string>
    ```
 
-2. **Use positional placeholders** — `%1$s`, `%2$s`, never bare `%s`. Word order differs by language, so
+2. **Reuse copy that is already translated** instead of adding a key for it. Common words like "Cancel"
+   or "Done" live in the design system's `strings-common-ui.xml` and are translated in all 24 locales,
+   so point at the existing string. A duplicate key means paying for a translation we already have.
+
+3. **Use positional placeholders** — `%1$s`, `%2$s`, never bare `%s`. Word order differs by language, so
    translators need to be able to reorder them.
 
-3. **Don't skip plurals.** Use `<plurals>` where the English has a count; quantity sets differ per language.
+4. **Don't skip plurals.** Use `<plurals>` where the English has a count; quantity sets differ per language.
 
-4. **Entity escaping is off globally.** A string that needs escaping has to flip the directive around
+5. **Entity escaping is off globally.** A string that needs escaping has to flip the directive around
    itself, and flip it back afterwards:
 
    ```xml
@@ -50,13 +56,13 @@ days, since each round trip through Smartling takes a few.
    <!-- smartling.entity_escaping = false -->
    ```
 
-5. **Constrained UI takes a character limit**, declared above the string:
+6. **Constrained UI takes a character limit**, declared above the string:
 
    ```xml
    <!-- smartling.character_limit = 42 -->
    ```
 
-6. **Never put lint annotations inside a translated string** — the next translation job overwrites the
+7. **Never put lint annotations inside a translated string** — the next translation job overwrites the
    file and deletes them. Fix the underlying issue, or record the check in the lint baseline instead.
 
 Prefer whole sentences with placeholders over sentence fragments concatenated in code: languages
@@ -69,15 +75,25 @@ reorder and inflect, and a fragment gives the translator nothing to work with.
 | Add a string | Add the English string to the strings file |
 | Change English copy | Delete the old key, add a **new key** with the new copy, update references. Leave the other languages alone — Smartling prunes them |
 | Remove a string | Delete the English string only. Smartling removes the translations |
-| Fix a bad translation | Edit it in the Smartling dashboard (DuckDuckGo Android project → language → search the key → Edit Translation). It lands with the next job; to ship sooner, also edit the `values-<locale>` file directly |
+| Fix a bad translation | A developer edits it in the Smartling dashboard (DuckDuckGo Android project → language → search the key → Edit Translation). It lands with the next job; to ship sooner, also edit the `values-<locale>` file directly |
 
 Reusing a key with different copy leaves every locale holding a stale translation of the old text,
 which is why an English change is delete-plus-new-key rather than an edit in place.
 
+Fixing a translation is the one job that happens outside the repo — it needs a Smartling login, so an
+agent cannot do it and should hand it to the developer.
+
 ## Reference
 
-- [Android Smartling Translation Guide](https://app.asana.com/1/137249556945/project/1202561462274611/task/1203224618541800)
-- [Typical Development Flow and FAQs](https://app.asana.com/1/137249556945/project/1202561462274611/task/1211223880022672)
-- [How to Use Smartling for Translations](https://app.asana.com/1/137249556945/project/904401899170/task/1185688234072009) — account setup
-- [Tips for better translation tokens](https://app.asana.com/1/137249556945/project/904401899170/task/1200205345312078)
-- [Translation/Localization AOR](https://app.asana.com/1/137249556945/project/904401899170) — ask here when something looks wrong
+This file is the working reference — enough to add a string or request a translation without opening
+anything else. The Asana sources are the authority behind it; read one only when this file is silent or
+looks wrong, not up front:
+
+- [Android Smartling Translation Guide](https://app.asana.com/1/137249556945/project/1202561462274611/task/1203224618541800) — the connector, branch naming, the Smartling rules
+- [Typical Development Flow and FAQs](https://app.asana.com/1/137249556945/project/1202561462274611/task/1211223880022672) — an add/change/remove case this file doesn't cover
+- [Tips for better translation tokens](https://app.asana.com/1/137249556945/project/904401899170/task/1200205345312078) — writing copy translators can work with
+- [How to Use Smartling for Translations](https://app.asana.com/1/137249556945/project/904401899170/task/1185688234072009) — Smartling account setup, for a developer who needs dashboard access
+
+When translations stall or a translation looks wrong, ask the
+[Translation/Localization AOR](https://app.asana.com/1/137249556945/project/904401899170) — people to
+talk to, not a document to read.
