@@ -17,8 +17,11 @@
 package com.duckduckgo.app.onboarding
 
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.settings.api.SerpSettingsDataProvider
+import com.duckduckgo.settings.api.SerpSettingsFeature
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
@@ -27,6 +30,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -40,12 +44,19 @@ class OnboardingPreferenceApplierImplTest {
 
     private val navigationHistory: NavigationHistory = mock()
     private val serpSettingsDataProvider: SerpSettingsDataProvider = mock()
+    private val serpSettingsFeature: SerpSettingsFeature = FakeFeatureToggleFactory.create(SerpSettingsFeature::class.java)
 
     private val testee = OnboardingPreferenceApplierImpl(
         navigationHistory = navigationHistory,
         serpSettingsDataProvider = serpSettingsDataProvider,
+        serpSettingsFeature = serpSettingsFeature,
         dispatcherProvider = coroutineRule.testDispatcherProvider,
     )
+
+    @Before
+    fun setup() {
+        serpSettingsFeature.storeSerpSettings().setRawStoredState(Toggle.State(enable = true))
+    }
 
     @Test
     fun whenHistoryFeatureUnavailableThenSearchHistoryIsNotAvailable() = runTest {
@@ -62,8 +73,17 @@ class OnboardingPreferenceApplierImplTest {
     }
 
     @Test
-    fun whenSafeSearchQueriedThenAlwaysAvailable() = runTest {
+    fun whenSerpSettingsStorageEnabledThenSafeSearchIsAvailable() = runTest {
+        serpSettingsFeature.storeSerpSettings().setRawStoredState(Toggle.State(enable = true))
+
         assertTrue(testee.isAvailable(OnboardingPreference.SAFE_SEARCH))
+    }
+
+    @Test
+    fun whenSerpSettingsStorageDisabledThenSafeSearchIsNotAvailable() = runTest {
+        serpSettingsFeature.storeSerpSettings().setRawStoredState(Toggle.State(enable = false))
+
+        assertFalse(testee.isAvailable(OnboardingPreference.SAFE_SEARCH))
     }
 
     @Test

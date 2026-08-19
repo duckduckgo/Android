@@ -41,7 +41,7 @@
                 android:contentDescription="@null"
                 android:importantForAccessibility="no"
                 android:visibility="gone"
-                app:srcCompat="@drawable/ic_subscription_96"
+                app:srcCompat="@drawable/subscription_96"
                 tools:visibility="visible" />
 
             <FrameLayout

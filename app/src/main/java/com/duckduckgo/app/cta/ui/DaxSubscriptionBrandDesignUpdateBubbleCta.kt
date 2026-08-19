@@ -76,7 +76,7 @@ data class DaxSubscriptionBrandDesignUpdateBubbleCta(
 
     override fun configureContentViews(view: View) {
         view.findViewById<ImageView>(R.id.brandDesignHeaderImage)?.apply {
-            setImageResource(CommonR.drawable.ic_subscription_96)
+            setImageResource(CommonR.drawable.subscription_96)
             isVisible = true
         }
 

@@ -20,6 +20,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.settings.api.SerpSettingsDataProvider
+import com.duckduckgo.settings.api.SerpSettingsFeature
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.firstOrNull
@@ -48,13 +49,14 @@ interface OnboardingPreferenceApplier {
 class OnboardingPreferenceApplierImpl @Inject constructor(
     private val navigationHistory: NavigationHistory,
     private val serpSettingsDataProvider: SerpSettingsDataProvider,
+    private val serpSettingsFeature: SerpSettingsFeature,
     private val dispatcherProvider: DispatcherProvider,
 ) : OnboardingPreferenceApplier {
 
     override suspend fun isAvailable(preference: OnboardingPreference): Boolean = withContext(dispatcherProvider.io()) {
         when (preference) {
             OnboardingPreference.SEARCH_HISTORY -> navigationHistory.isHistoryFeatureAvailable()
-            OnboardingPreference.SAFE_SEARCH -> true
+            OnboardingPreference.SAFE_SEARCH -> serpSettingsFeature.storeSerpSettings().isEnabled()
         }
     }
 

@@ -560,7 +560,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             is NewUserOnboardingActivityDialog.SegmentedComparisonChart,
             is NewUserOnboardingActivityDialog.PreferenceSelector,
             -> {
-                // no-op in this VM
+                // These views are only presented in the config-driven onboarding flow, which is not driven by this VM.
             }
         }
     }

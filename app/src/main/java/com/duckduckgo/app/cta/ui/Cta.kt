@@ -1821,7 +1821,6 @@ sealed class DaxBubbleCta(
             cardContainer = container.findViewById<TouchInterceptingLinearLayout>(R.id.brandDesignCardContainer)
             isAnimating = true
 
-            // The active content includes for THIS CTA
             val activeIncludes = activeIncludeIds.map {
                 container.findViewById<View>(it)
             }

@@ -487,12 +487,10 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
                         when (selection) {
                             DownloadReasonSelection.SEARCH -> SwitchTo(segmentedSearchPlan(ctx))
-
                             DownloadReasonSelection.AI_CHAT,
                             DownloadReasonSelection.NO_AI,
                             DownloadReasonSelection.BLOCK_ADS,
                             -> {
-                                // to be implemented in a future PR
                                 Stay
                             }
                         }
@@ -730,13 +728,14 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             id = NewUserOnboardingStepIds.INPUT_SCREEN_PREVIEW,
             pixelName = pixelName,
             precondition = {
-                (ctx.inputModeWasAi || allowSearchPreviewOnly) && duckAiEnabled()
+                (ctx.inputModeWasAi && duckAiEnabled()) || allowSearchPreviewOnly
             },
             resolveDialog = {
+                val demoIncludesAi = ctx.inputModeWasAi && duckAiEnabled()
                 NewUserOnboardingActivityDialog.InputScreenPreview(
                     isSearchDefault = true,
-                    showModeToggle = ctx.inputModeWasAi,
-                    titleRes = if (ctx.inputModeWasAi) {
+                    showModeToggle = demoIncludesAi,
+                    titleRes = if (demoIncludesAi) {
                         R.string.preOnboardingInputModeDemoTitle
                     } else {
                         R.string.searchPathInputPreviewTitle
