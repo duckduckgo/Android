@@ -21,6 +21,8 @@ import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.utils.AppUrl.ParamKey
 import com.duckduckgo.common.utils.AppUrl.ParamValue
+import com.duckduckgo.common.utils.device.DeviceInfo
+import com.duckduckgo.common.utils.device.isTablet
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.referral.api.AppReferrer
@@ -41,6 +43,7 @@ class DuckDuckGoRequestRewriter(
     private val duckChat: DuckChat,
     private val androidConfigFeatures: AndroidBrowserConfigFeature,
     private val serpSettingsFeature: SerpSettingsFeature,
+    private val deviceInfo: DeviceInfo,
 ) : RequestRewriter {
 
     private val hideDuckAiSerpKillSwitch by lazy { androidConfigFeatures.hideDuckAiInSerpKillSwitch().isEnabled() }
@@ -79,7 +82,11 @@ class DuckDuckGoRequestRewriter(
             builder.appendQueryParameter(ParamKey.ATB, atb.formatWithVariant(variantManager.getVariantKey()))
         }
 
-        val sourceValue = if (appReferrer.isInstalledFromEuAuction()) ParamValue.SOURCE_EU_AUCTION else ParamValue.SOURCE
+        val sourceValue = if (appReferrer.isInstalledFromEuAuction()) {
+            ParamValue.SOURCE_EU_AUCTION
+        } else {
+            if (deviceInfo.isTablet()) ParamValue.SOURCE_TABLET else ParamValue.SOURCE
+        }
 
         builder.appendQueryParameter(ParamKey.HIDE_SERP, ParamValue.HIDE_SERP)
         if (!serpSettingsFeature.storeSerpSettings().isEnabled()) {
