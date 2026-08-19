@@ -24,8 +24,6 @@
         android:id="@+id/preferenceRowItem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryTextAppearance="@style/Typography.DuckDuckGo.Onboarding.PreferencePrimary"
-        app:secondaryTextAppearance="@style/Typography.DuckDuckGo.Onboarding.PreferenceSecondary"
         app:showSwitch="true"
         tools:leadingIcon="@drawable/ic_history_24"
         tools:primaryText="Search History"
