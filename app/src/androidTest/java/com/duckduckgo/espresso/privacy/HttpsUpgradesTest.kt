@@ -16,6 +16,7 @@
 
 package com.duckduckgo.espresso.privacy
 
+import android.view.View
 import android.webkit.WebView
 import androidx.core.net.toUri
 import androidx.test.espresso.IdlingRegistry
@@ -39,6 +40,7 @@ import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import org.hamcrest.CoreMatchers.containsString
+import org.hamcrest.CoreMatchers.sameInstance
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -64,18 +66,24 @@ class HttpsUpgradesTest {
             webView = it.findViewById(R.id.browserWebView)
         }
 
-        val idlingResourceForDisableProtections = WebViewIdlingResource(webView!!)
+        val testWebView = webView!!
+
+        // The upgrade-navigation test calls window.open, so a second tab (and WebView) exists while the
+        // test runs; match this tab's WebView explicitly instead of relying on there being only one.
+        val testWebViewMatcher = sameInstance<View>(testWebView)
+
+        val idlingResourceForDisableProtections = WebViewIdlingResource(testWebView)
         IdlingRegistry.getInstance().register(idlingResourceForDisableProtections)
 
-        onWebView()
+        onWebView(testWebViewMatcher)
             .withElement(findElement(ID, "start"))
             .check(webMatches(getText(), containsString("Start test")))
             .perform(webClick())
 
-        val idlingResourceForScript = WebViewIdlingResource(webView!!)
+        val idlingResourceForScript = WebViewIdlingResource(testWebView)
         IdlingRegistry.getInstance().register(idlingResourceForScript)
 
-        val results = onWebView()
+        val results = onWebView(testWebViewMatcher)
             .perform(script(SCRIPT))
             .get()
 
