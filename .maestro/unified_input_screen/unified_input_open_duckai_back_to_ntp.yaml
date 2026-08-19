@@ -16,7 +16,7 @@ tags:
             inputWithAiToggle: "false"
             omnibarPosition: "top"
             addFavorites: "example.com;duckduckgo.com;privacytest.com"
-      - runFlow: shared/launch_and_skip_onboarding.yaml
+      - runFlow: shared/launch_and_skip_onboarding_search_only.yaml
       - runFlow: shared/flow_open_duckai_back_to_ntp.yaml
 
 # 2/3 — omnibar bottom
@@ -32,7 +32,7 @@ tags:
             inputWithAiToggle: "false"
             omnibarPosition: "bottom"
             addFavorites: "example.com;duckduckgo.com;privacytest.com"
-      - runFlow: shared/launch_and_skip_onboarding.yaml
+      - runFlow: shared/launch_and_skip_onboarding_search_only.yaml
       - runFlow: shared/flow_open_duckai_back_to_ntp.yaml
 
 # 3/3 — omnibar split
@@ -48,5 +48,5 @@ tags:
             inputWithAiToggle: "false"
             omnibarPosition: "split"
             addFavorites: "example.com;duckduckgo.com;privacytest.com"
-      - runFlow: shared/launch_and_skip_onboarding.yaml
+      - runFlow: shared/launch_and_skip_onboarding_search_only.yaml
       - runFlow: shared/flow_open_duckai_back_to_ntp.yaml
