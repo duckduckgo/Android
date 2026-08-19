@@ -21,6 +21,7 @@ import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
+import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.experiments.api.VariantManager
 import io.reactivex.Observable
@@ -43,6 +44,7 @@ class StatisticsRequesterTest {
     private var mockResponseBody: ResponseBody = mock()
     private var mockVariantManager: VariantManager = mock()
     private val mockEmailManager: EmailManager = mock()
+    private val mockDeviceInfo: DeviceInfo = mock()
 
     private val plugins = object : PluginPoint<AtbLifecyclePlugin> {
         override fun getPlugins(): Collection<AtbLifecyclePlugin> {
@@ -64,22 +66,24 @@ class StatisticsRequesterTest {
         mockEmailManager,
         TestScope(),
         coroutineTestRule.testDispatcherProvider,
+        mockDeviceInfo,
     )
 
     @Before
     fun before() {
         whenever(mockVariantManager.getVariantKey()).thenReturn("ma")
         whenever(mockVariantManager.defaultVariantKey()).thenReturn("")
-        whenever(mockService.atb(any(), any())).thenReturn(Observable.just(ATB))
-        whenever(mockService.updateSearchAtb(any(), any(), any(), any())).thenReturn(Observable.just(Atb(NEW_ATB)))
-        whenever(mockService.updateDuckAiAtb(any(), any(), any(), any())).thenReturn(Observable.just(Atb(NEW_ATB)))
-        whenever(mockService.exti(any(), any())).thenReturn(Observable.just(mockResponseBody))
+        whenever(mockDeviceInfo.formFactor()).thenReturn(DeviceInfo.FormFactor.PHONE)
+        whenever(mockService.atb(any(), any(), any())).thenReturn(Observable.just(ATB))
+        whenever(mockService.updateSearchAtb(any(), any(), any(), any(), any())).thenReturn(Observable.just(Atb(NEW_ATB)))
+        whenever(mockService.updateDuckAiAtb(any(), any(), any(), any(), any())).thenReturn(Observable.just(Atb(NEW_ATB)))
+        whenever(mockService.exti(any(), any(), any())).thenReturn(Observable.just(mockResponseBody))
     }
 
     @Test
     fun whenUpdateVersionPresentDuringRefreshSearchRetentionThenPreviousAtbIsReplacedWithUpdateVersion() {
         configureStoredStatistics()
-        whenever(mockService.updateSearchAtb(any(), any(), any(), eq(0))).thenReturn(Observable.just(UPDATE_ATB))
+        whenever(mockService.updateSearchAtb(any(), any(), any(), any(), eq(0))).thenReturn(Observable.just(UPDATE_ATB))
         testee.refreshSearchRetentionAtb()
         verify(mockStatisticsStore).atb = Atb(UPDATE_ATB.updateVersion!!)
     }
@@ -87,7 +91,7 @@ class StatisticsRequesterTest {
     @Test
     fun whenUpdateVersionPresentDuringRefreshSearchRetentionThenPreviousVariantIsReplacedWithDefaultVariant() {
         configureStoredStatistics()
-        whenever(mockService.updateSearchAtb(any(), any(), any(), eq(0))).thenReturn(Observable.just(UPDATE_ATB))
+        whenever(mockService.updateSearchAtb(any(), any(), any(), any(), eq(0))).thenReturn(Observable.just(UPDATE_ATB))
         testee.refreshSearchRetentionAtb()
         verify(mockStatisticsStore).variant = ""
     }
@@ -95,7 +99,7 @@ class StatisticsRequesterTest {
     @Test
     fun whenUpdateVersionPresentDuringRefreshAppRetentionThenPreviousAtbIsReplacedWithUpdateVersion() {
         configureStoredStatistics()
-        whenever(mockService.updateAppAtb(any(), any(), any(), eq(0))).thenReturn(Observable.just(UPDATE_ATB))
+        whenever(mockService.updateAppAtb(any(), any(), any(), any(), eq(0))).thenReturn(Observable.just(UPDATE_ATB))
         testee.refreshAppRetentionAtb()
         verify(mockStatisticsStore).atb = Atb(UPDATE_ATB.updateVersion!!)
     }
@@ -103,7 +107,7 @@ class StatisticsRequesterTest {
     @Test
     fun whenUpdateVersionPresentDuringRefreshAppRetentionThenPreviousVariantIsReplacedWithDefaultVariant() {
         configureStoredStatistics()
-        whenever(mockService.updateAppAtb(any(), any(), any(), eq(0))).thenReturn(Observable.just(UPDATE_ATB))
+        whenever(mockService.updateAppAtb(any(), any(), any(), any(), eq(0))).thenReturn(Observable.just(UPDATE_ATB))
         testee.refreshAppRetentionAtb()
         verify(mockStatisticsStore).variant = ""
     }
@@ -112,8 +116,8 @@ class StatisticsRequesterTest {
     fun whenNoStatisticsStoredThenInitializeAtbInvokesExti() {
         configureNoStoredStatistics()
         testee.initializeAtb()
-        verify(mockService).atb(any(), eq(0))
-        verify(mockService).exti(eq(ATB_WITH_VARIANT), any())
+        verify(mockService).atb(any(), any(), eq(0))
+        verify(mockService).exti(eq(ATB_WITH_VARIANT), any(), any())
         verify(mockStatisticsStore).saveAtb(ATB)
     }
 
@@ -121,16 +125,16 @@ class StatisticsRequesterTest {
     fun whenStatisticsStoredThenInitializeAtbDoesNothing() {
         configureStoredStatistics()
         testee.initializeAtb()
-        verify(mockService, never()).atb(any(), any())
-        verify(mockService, never()).exti(eq(ATB.version), any())
+        verify(mockService, never()).atb(any(), any(), any())
+        verify(mockService, never()).exti(eq(ATB.version), any(), any())
     }
 
     @Test
     fun whenNoStatisticsStoredThenRefreshSearchRetentionRetrievesAtbAndInvokesExti() {
         configureNoStoredStatistics()
         testee.refreshSearchRetentionAtb()
-        verify(mockService).atb(any(), any())
-        verify(mockService).exti(eq(ATB_WITH_VARIANT), any())
+        verify(mockService).atb(any(), any(), any())
+        verify(mockService).exti(eq(ATB_WITH_VARIANT), any(), any())
         verify(mockStatisticsStore).saveAtb(ATB)
     }
 
@@ -138,14 +142,14 @@ class StatisticsRequesterTest {
     fun whenNoStatisticsStoredThenRefreshAppRetentionRetrievesAtbAndInvokesExti() {
         configureNoStoredStatistics()
         testee.refreshAppRetentionAtb()
-        verify(mockService).atb(any(), any())
-        verify(mockService).exti(eq(ATB_WITH_VARIANT), any())
+        verify(mockService).atb(any(), any(), any())
+        verify(mockService).exti(eq(ATB_WITH_VARIANT), any(), any())
         verify(mockStatisticsStore).saveAtb(ATB)
     }
 
     @Test
     fun whenExtiFailsThenAtbCleared() {
-        whenever(mockService.exti(any(), any())).thenReturn(Observable.error(Throwable()))
+        whenever(mockService.exti(any(), any(), any())).thenReturn(Observable.error(Throwable()))
         configureNoStoredStatistics()
         testee.initializeAtb()
         verify(mockStatisticsStore).saveAtb(ATB)
@@ -158,14 +162,14 @@ class StatisticsRequesterTest {
         val retentionAtb = "foo"
         whenever(mockStatisticsStore.searchRetentionAtb).thenReturn(retentionAtb)
         testee.refreshSearchRetentionAtb()
-        verify(mockService).updateSearchAtb(eq(ATB_WITH_VARIANT), eq(retentionAtb), any(), any())
+        verify(mockService).updateSearchAtb(eq(ATB_WITH_VARIANT), eq(retentionAtb), any(), any(), any())
     }
 
     @Test
     fun whenStatisticsStoredThenRefreshUpdatesAtb() {
         configureStoredStatistics()
         testee.refreshSearchRetentionAtb()
-        verify(mockService).updateSearchAtb(eq(ATB_WITH_VARIANT), eq(ATB.version), any(), any())
+        verify(mockService).updateSearchAtb(eq(ATB_WITH_VARIANT), eq(ATB.version), any(), any(), any())
         verify(mockStatisticsStore).searchRetentionAtb = NEW_ATB
         verify(mockStatisticsStore, never()).atb = any()
         verify(mockStatisticsStore, never()).appRetentionAtb = any()
@@ -188,7 +192,7 @@ class StatisticsRequesterTest {
     fun whenStatisticsStoredThenRefreshDuckAiUpdatesAtb() {
         configureStoredStatistics()
         testee.refreshDuckAiRetentionAtb()
-        verify(mockService).updateDuckAiAtb(eq(ATB_WITH_VARIANT), eq(ATB.version), any(), any())
+        verify(mockService).updateDuckAiAtb(eq(ATB_WITH_VARIANT), eq(ATB.version), any(), any(), any())
         verify(mockStatisticsStore).duckaiRetentionAtb = NEW_ATB
         verify(mockStatisticsStore, never()).atb = any()
         verify(mockStatisticsStore, never()).searchRetentionAtb = any()
@@ -212,29 +216,49 @@ class StatisticsRequesterTest {
 
         testee.initializeAtb()
 
-        verify(mockService).atb(any(), eq(1))
+        verify(mockService).atb(any(), any(), eq(1))
     }
 
     @Test
     fun whenRefreshSearchAtbAndEmailEnabledThenEmailSignalToTrue() {
         whenever(mockEmailManager.isSignedIn()).thenReturn(true)
         configureStoredStatistics()
-        whenever(mockService.updateSearchAtb(any(), any(), any(), eq(1))).thenReturn(Observable.just(UPDATE_ATB))
+        whenever(mockService.updateSearchAtb(any(), any(), any(), any(), eq(1))).thenReturn(Observable.just(UPDATE_ATB))
 
         testee.refreshSearchRetentionAtb()
 
-        verify(mockService).updateSearchAtb(any(), any(), any(), eq(1))
+        verify(mockService).updateSearchAtb(any(), any(), any(), any(), eq(1))
     }
 
     @Test
     fun whenRefreshAppRetentionAndEmailEnabledThenEmailSignalToTrue() {
         whenever(mockEmailManager.isSignedIn()).thenReturn(true)
         configureStoredStatistics()
-        whenever(mockService.updateAppAtb(any(), any(), any(), eq(1))).thenReturn(Observable.just(UPDATE_ATB))
+        whenever(mockService.updateAppAtb(any(), any(), any(), any(), eq(1))).thenReturn(Observable.just(UPDATE_ATB))
 
         testee.refreshAppRetentionAtb()
 
-        verify(mockService).updateAppAtb(any(), any(), any(), eq(1))
+        verify(mockService).updateAppAtb(any(), any(), any(), any(), eq(1))
+    }
+
+    @Test
+    fun whenInitializeAtbAndDeviceIsTabletThenTabletSignalToTrue() {
+        whenever(mockDeviceInfo.formFactor()).thenReturn(DeviceInfo.FormFactor.TABLET)
+        configureNoStoredStatistics()
+
+        testee.initializeAtb()
+
+        verify(mockService).atb(eq(1), any(), any())
+    }
+
+    @Test
+    fun whenInitializeAtbAndDeviceIsPhoneThenTabletSignalToFalse() {
+        whenever(mockDeviceInfo.formFactor()).thenReturn(DeviceInfo.FormFactor.PHONE)
+        configureNoStoredStatistics()
+
+        testee.initializeAtb()
+
+        verify(mockService).atb(eq(0), any(), any())
     }
 
     private fun configureNoStoredStatistics() {

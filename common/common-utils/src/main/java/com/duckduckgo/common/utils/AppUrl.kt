@@ -34,6 +34,7 @@ class AppUrl {
         const val SOURCE = "t"
         const val ATB = "atb"
         const val RETENTION_ATB = "set_atb"
+        const val IS_TABLET = "is_tablet"
         const val DEV_MODE = "test"
         const val LANGUAGE = "lg"
         const val EMAIL = "email"

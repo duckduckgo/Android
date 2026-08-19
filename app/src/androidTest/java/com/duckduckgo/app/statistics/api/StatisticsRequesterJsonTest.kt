@@ -27,6 +27,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.FileUtilities.loadText
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.utils.AppUrl.ParamKey
+import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.experiments.api.VariantManager
 import com.squareup.moshi.Moshi
@@ -58,6 +59,7 @@ class StatisticsRequesterJsonTest {
     private lateinit var statisticsStore: StatisticsDataStore
     private lateinit var testee: StatisticsRequester
     private var mockEmailManager: EmailManager = mock()
+    private var mockDeviceInfo: DeviceInfo = mock()
 
     private val server = MockWebServer()
 
@@ -91,8 +93,10 @@ class StatisticsRequesterJsonTest {
             mockEmailManager,
             TestScope(),
             coroutineTestRule.testDispatcherProvider,
+            mockDeviceInfo,
         )
         whenever(mockVariantManager.getVariantKey()).thenReturn("ma")
+        whenever(mockDeviceInfo.formFactor()).thenReturn(DeviceInfo.FormFactor.PHONE)
     }
 
     @After
@@ -213,6 +217,16 @@ class StatisticsRequesterJsonTest {
         val extiRequest = takeRequestImmediately()
         val testParam = extiRequest?.extractQueryParam(ParamKey.DEV_MODE)
         assertTestParameterSent(testParam)
+    }
+
+    @Test
+    fun whenNotYetInitializedAtbInitializationSendsTabletSignal() {
+        queueResponseFromFile(VALID_JSON)
+        queueResponseFromString("", 200)
+        testee.initializeAtb()
+        val atbRequest = takeRequestImmediately()
+        val isTabletParam = atbRequest?.extractQueryParam(ParamKey.IS_TABLET)
+        assertEquals("0", isTabletParam)
     }
 
     @Test
