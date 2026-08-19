@@ -25,14 +25,19 @@ import android.transition.Slide
 import android.transition.Transition
 import android.transition.Transition.TransitionListener
 import android.transition.TransitionManager
+import android.view.ContextThemeWrapper
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.DrawableRes
+import androidx.annotation.RawRes
 import androidx.core.animation.addListener
 import androidx.core.animation.doOnEnd
+import androidx.core.content.ContextCompat
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.trackerdetection.model.Entity
+import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -48,6 +53,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import androidx.core.transition.doOnEnd as doOnTransitionEnd
+import com.duckduckgo.mobile.android.R as DesignSystemR
 
 @ContributesBinding(FragmentScope::class)
 class BrowserLottieTrackersAnimatorHelper @Inject constructor(
@@ -55,6 +61,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
     private val theme: AppTheme,
     private val addressBarTrackersAnimator: AddressBarTrackersAnimator,
     private val commonAddressBarAnimationHelper: CommonAddressBarAnimationHelper,
+    private val appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles,
 ) : BrowserTrackersAnimatorHelper {
 
     private var listener: TrackersAnimatorListener? = null
@@ -236,14 +243,17 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         if (omnibarViews.any { it.id == R.id.customTabDomain }) return // not shown in custom tabs
         isAdBlockingAnimationRunning = true
 
-        adBlockingFirstScene = Scene.getSceneForLayout(adBlockingScene, R.layout.ad_blocking_scene_1, context)
-        adBlockingSecondScene = Scene.getSceneForLayout(adBlockingScene, R.layout.ad_blocking_scene_2, context)
+        val addressBarRebrandEnabled = appBrandDesignUpdateToggles.addressBar().isEnabled()
+        val sceneContext = addressBarAnimationContext(adBlockingScene.context, addressBarRebrandEnabled)
+        adBlockingViewBackground.background = ContextCompat.getDrawable(sceneContext, DesignSystemR.drawable.animated_icon_dummy_background)
+        adBlockingFirstScene = Scene.getSceneForLayout(adBlockingScene, R.layout.ad_blocking_scene_1, sceneContext)
+        adBlockingSecondScene = Scene.getSceneForLayout(adBlockingScene, R.layout.ad_blocking_scene_2, sceneContext)
 
         hasAdBlockingAnimationBeenCanceled = false
         val allOmnibarViews: List<View> = omnibarViews.filterNotNull().toList()
         adBlockingView.show()
         adBlockingView.alpha = 0F
-        adBlockingView.setImageResource(iconRes)
+        adBlockingView.setImageResource(resolveAdBlockingIcon(iconRes, addressBarRebrandEnabled))
         // The static player icon has no built-in inset (unlike the cookie/tracker Lottie compositions,
         // whose artwork fills the badge chip), so pad it to center the glyph in the chip and match their
         // spacing to the text.
@@ -350,9 +360,9 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         if (omnibarViews.any { it.id == R.id.customTabDomain }) return // Do not show cookies animation in custom tabs
         isCookiesAnimationRunning = true
 
-        // Inflate the scene with the scene root's own themed context so the animation follows the
-        // omnibar theme overlay (e.g. the dark omnibar island used in light Fire mode).
-        val sceneContext = cookieScene.context
+        val addressBarRebrandEnabled = appBrandDesignUpdateToggles.addressBar().isEnabled()
+        val sceneContext = addressBarAnimationContext(cookieScene.context, addressBarRebrandEnabled)
+        cookieViewBackground.background = ContextCompat.getDrawable(sceneContext, DesignSystemR.drawable.animated_icon_dummy_background)
         if (cookieCosmeticHide) {
             firstScene = Scene.getSceneForLayout(cookieScene, R.layout.cookie_cosmetic_scene_1, sceneContext)
             secondScene = Scene.getSceneForLayout(cookieScene, R.layout.cookie_cosmetic_scene_2, sceneContext)
@@ -365,11 +375,12 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         val allOmnibarViews: List<View> = (omnibarViews).filterNotNull().toList()
         cookieView.show()
         cookieView.alpha = 0F
-        if (cookieUseLightAnimation ?: theme.isLightModeEnabled()) {
-            cookieView.setAnimation(R.raw.cookie_icon_animated_light)
-        } else {
-            cookieView.setAnimation(R.raw.cookie_icon_animated_dark)
-        }
+        cookieView.setAnimation(
+            resolveCookieAnimation(
+                isLightMode = cookieUseLightAnimation ?: theme.isLightModeEnabled(),
+                brandIconsEnabled = addressBarRebrandEnabled,
+            ),
+        )
         cookieView.progress = 0F
 
         val slideInCookiesTransition: Transition = createSlideTransition()
@@ -564,6 +575,27 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         return sortedWith(compareBy { "AEIOU".contains(it.displayName.take(1)) })
     }
 
+    @RawRes
+    internal fun resolveCookieAnimation(
+        isLightMode: Boolean,
+        brandIconsEnabled: Boolean,
+    ): Int = when {
+        brandIconsEnabled && isLightMode -> R.raw.cookie_icon_animated_light_brand_update
+        brandIconsEnabled -> R.raw.cookie_icon_animated_dark_brand_update
+        isLightMode -> R.raw.cookie_icon_animated_light
+        else -> R.raw.cookie_icon_animated_dark
+    }
+
+    @DrawableRes
+    internal fun resolveAdBlockingIcon(
+        @DrawableRes legacyRes: Int,
+        rebrandIconsEnabled: Boolean,
+    ): Int = if (rebrandIconsEnabled) {
+        R.drawable.video_player_color_24_brand_update
+    } else {
+        legacyRes
+    }
+
     companion object {
         private const val MAX_LOGOS_SHOWN = 3
         private const val COOKIES_ANIMATION_DELAY = 1000L
@@ -576,6 +608,15 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
 
         private const val AD_BLOCKING_ICON_START_PADDING_DP = 9
     }
+}
+
+internal fun addressBarAnimationContext(
+    context: Context,
+    addressBarRebrandEnabled: Boolean,
+): Context = if (addressBarRebrandEnabled) {
+    ContextThemeWrapper(context, DesignSystemR.style.ThemeOverlay_Rebrand_AddressBarAnimation)
+} else {
+    context
 }
 
 sealed class TrackerLogo() {

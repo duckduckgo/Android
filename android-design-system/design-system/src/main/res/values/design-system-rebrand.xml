@@ -42,6 +42,7 @@
     <attr name="daxColorRebrandButtonDestructiveGhostContainerPressed" format="color" />
     <attr name="daxColorRebrandButtonDestructiveGhostText" format="color" />
     <attr name="daxColorRebrandAccentBlue" format="color" />
+    <attr name="daxColorStatusRed" format="color" />
 
     <dimen name="rebrandButtonSmallHeight">48dp</dimen>
     <dimen name="rebrandButtonLargeHeight">56dp</dimen>
@@ -49,6 +50,7 @@
     <dimen name="rebrandButtonLargeTopPadding">18dp</dimen>
     <dimen name="rebrandButtonSmallVerticalInset">4dp</dimen>
     <dimen name="rebrandButtonLargeVerticalInset">6dp</dimen>
+    <dimen name="rebrandInputRadius">48dp</dimen>
 
     <style name="Typography.DuckDuckGo.Rebrand.Button" parent="Typography.DuckDuckGo">
         <item name="android:textSize">15sp</item>
@@ -154,6 +156,10 @@
         <item name="daxButtonLargeTopPadding">@dimen/rebrandButtonLargeTopPadding</item>
         <item name="daxButtonSmallVerticalInset">@dimen/rebrandButtonSmallVerticalInset</item>
         <item name="daxButtonLargeVerticalInset">@dimen/rebrandButtonLargeVerticalInset</item>
+    </style>
+
+    <style name="ThemeOverlay.Rebrand.AddressBarAnimation" parent="">
+        <item name="cookiesAnimationRadius">@dimen/rebrandInputRadius</item>
     </style>
 
 </resources>
