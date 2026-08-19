@@ -92,7 +92,7 @@
     <string name="subscriptionOnboardingFeatureInfoItrTitle">Identity Theft Restoration</string>
     <string name="subscriptionOnboardingFeatureInfoItrDescription">If your identity is stolen in the future, we\'ll help restore it. A personal case manager handles calls and paperwork so you don\'t have to.</string>
     <string name="subscriptionOnboardingFeatureInfoItrItem1Title">Recover financial losses</string>
-    <string name="subscriptionOnboardingFeatureInfoItrItem1Description">We\'ll work with financial institutions to help reverse any fraudulent transactions, and we\'ll reimburse certain out-of-pocket expenses*** in the event that you become a victim of identity theft or fraud.</string>
+    <string name="subscriptionOnboardingFeatureInfoItrItem1Description">We\'ll work with financial institutions to help reverse any fraudulent transactions, and we\'ll reimburse certain out-of-pocket expenses* in the event that you become a victim of identity theft or fraud.</string>
     <string name="subscriptionOnboardingFeatureInfoItrItem2Title">Fix your credit report</string>
     <string name="subscriptionOnboardingFeatureInfoItrItem2Description">We\'ll help fix errors in your credit report that result from fraudulent activity, and assist you in freezing your credit report until your identity is restored.</string>
     <string name="subscriptionOnboardingFeatureInfoItrItem3Title">Replace and cancel lost wallet items</string>
@@ -107,7 +107,7 @@
     <string name="subscriptionOnboardingFeatureInfoItrItem7Description">We\'ll help you report fraudulent activity to police and legal authorities.</string>
     <string name="subscriptionOnboardingFeatureInfoItrItem8Title">Medical ID theft assistance</string>
     <string name="subscriptionOnboardingFeatureInfoItrItem8Description">If fraudulent medical claims occur, we\'ll help inform healthcare and insurance providers, and help ensure medical records are corrected — with in-house medical staff if required.</string>
-    <string name="subscriptionOnboardingFeatureInfoItrLegalFooter">The Identity Expense Reimbursement and the Unauthorized Electronic Fund Transfer Reimbursement benefits are underwritten and administered by American Bankers Insurance Company of Florida, an Assurant company, under group or blanket policies issued to Generali Global Assistance, Inc., dba Iris® Powered by Generali for the benefit of its Members. Please refer to the actual policies for terms, conditions, and exclusions of coverage. Coverage may not be available in all jurisdictions. Review the Summary of Benefits.</string>
+    <string name="subscriptionOnboardingFeatureInfoItrLegalFooter">*The Identity Expense Reimbursement and the Unauthorized Electronic Fund Transfer Reimbursement benefits are underwritten and administered by American Bankers Insurance Company of Florida, an Assurant company, under group or blanket policies issued to Generali Global Assistance, Inc., dba Iris® Powered by Generali for the benefit of its Members. Please refer to the actual policies for terms, conditions, and exclusions of coverage. Coverage may not be available in all jurisdictions. Review the Summary of Benefits.</string>
 
     <!-- Feature detail: Duck.ai -->
     <string name="subscriptionOnboardingFeatureInfoDuckAiTitle">Chat privately with advanced AI models</string>
