@@ -57,6 +57,10 @@
     <string name="systemPermissionDialogCameraAndAudioDeniedContent">Site-urile îți pot utiliza camera și microfonul numai dacă permiți ca DuckDuckGo să solicite accesul.</string>
     <string name="systemPermissionsDeniedDialogPositiveButton">Deschide Setări</string>
     <string name="systemPermissionsDeniedDialogNegativeButton">Anulează</string>
+    <string name="duckAiMicPermissionDeniedSnackBarMessage">Este necesară permisiunea pentru microfon în scopul de a utiliza funcțiile vocale</string>
+    <string name="duckAiMicPermissionDeniedDialogTitle">DuckDuckGo are nevoie de acces la microfon</string>
+    <string name="duckAiMicPermissionDeniedDialogContent">Sunt necesare permisiunile pentru microfon dacă vrei să folosești chatul vocal în Duck.ai</string>
+    <string name="duckAiMicPermissionDeniedDialogPositiveButton">Modifică permisiunile</string>
 
     <string name="sitePermissionsSettingsDescription">Site-urile pe care le accesezi îți pot solicita accesul la locația dispozitivului, la camera foto, la microfon sau la software-ul DRM (Digital Rights Management). Acestea nu vor putea accesa aceste date decât dacă le oferi în mod explicit permisiunea.</string>
     <string name="sitePermissionsSettingsEnablePermissionTitle">Permite tuturor site-urilor să solicite:</string>
