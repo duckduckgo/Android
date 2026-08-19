@@ -314,15 +314,16 @@ class SingleTabFireDialogViewModel @Inject constructor(
             }
 
             val result = withContext(dispatcherProvider.io()) {
-                dataClearingWideEvent.start(
-                    entryPoint = entryPoint,
-                    clearOptions = clearOptions,
-                    browserMode = browserMode,
-                    tabType = stateData?.let { if (it.isDuckAiTab) TabType.AI else TabType.WEB },
-                    tabCount = stateData?.tabCount,
-                )
                 if (target != null) {
                     val (tabId, mode) = target
+                    dataClearingWideEvent.start(
+                        entryPoint = entryPoint,
+                        clearOptions = clearOptions,
+                        browserMode = mode,
+                        tabType = stateData?.let { if (it.isDuckAiTab) TabType.AI else TabType.WEB },
+                        tabCount = stateData?.tabCount,
+                    )
+
                     if (origin.value == DuckAiContextualChat) {
                         dataClearing.clearTabContextualChat(tabId, mode)
                     } else {
