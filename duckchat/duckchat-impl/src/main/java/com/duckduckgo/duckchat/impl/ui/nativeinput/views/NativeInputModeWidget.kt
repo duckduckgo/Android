@@ -2052,6 +2052,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun isEditSurface(): Boolean = isEditWidget
 
+    override fun isContextualSurface(): Boolean = isContextualWidget
+
     override fun toolSelected(tool: String?) {
         viewModel.setSelectedTool(tool)
     }

@@ -76,6 +76,13 @@ interface NativeInputHost {
 
     /** True when the host is the fullscreen edit-message surface, which offers a reduced control set. */
     fun isEditSurface(): Boolean
+
+    /**
+     * True when the host is the contextual Duck.ai sheet. Asked of the host rather than read from
+     * `inputContext`, because the sheet shares its per-tab state slot with the omnibar widget and that
+     * slot can briefly carry BROWSER state.
+     */
+    fun isContextualSurface(): Boolean
 }
 
 interface NativeInputPlugin : ActivePlugin {

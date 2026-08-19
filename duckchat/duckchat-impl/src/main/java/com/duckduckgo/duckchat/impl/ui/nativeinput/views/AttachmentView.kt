@@ -75,9 +75,10 @@ class AttachmentView(
 
     /** The contextual sheet is the only surface that offers page context. */
     private val isContextual: Boolean
-        get() = lastNativeInputState?.inputContext == NativeInputState.InputContext.DUCK_AI_CONTEXTUAL
+        get() = host?.isContextualSurface() == true
     private var supportsUpload: Boolean = false
     private var nativeInputStateJob: Job? = null
+    private var attachmentStateJob: Job? = null
     private var lastNativeInputState: NativeInputState? = null
     private var popupWindow: PopupWindow? = null
     private var thumbnailsLayout: LinearLayout? = null
@@ -100,7 +101,8 @@ class AttachmentView(
         viewModel = vm
         val container = rootView?.findViewById<FrameLayout>(R.id.attachmentsContainer) ?: return
         setupContainerViews(container, vm)
-        scope.launch {
+        attachmentStateJob?.cancel()
+        attachmentStateJob = scope.launch {
             vm.attachmentState.collect { state -> applyState(state, container) }
         }
         nativeInputStateJob = nativeInputStateProvider.state
@@ -279,6 +281,8 @@ class AttachmentView(
         super.onDetachedFromWindow()
         nativeInputStateJob?.cancel()
         nativeInputStateJob = null
+        attachmentStateJob?.cancel()
+        attachmentStateJob = null
         lastNativeInputState = null
         dismissPopup()
     }
