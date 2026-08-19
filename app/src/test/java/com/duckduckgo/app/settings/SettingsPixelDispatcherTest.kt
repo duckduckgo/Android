@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.settings
 
-import com.duckduckgo.app.pixels.AppPixelName.PRIVACY_PRO_APP_SETTINGS_NON_SUBSCRIBER_IMPRESSION
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_EMAIL_PROTECTION_PRESSED
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_OPENED_WITH_SUBSCRIPTION_AVAILABLE
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_SYNC_PRESSED
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.email.EmailManager
@@ -187,7 +187,7 @@ class SettingsPixelDispatcherTest {
         val testee = createTestee()
         testee.fireSettingsOpenedWithSubscriptionPurchaseAvailable()
 
-        verify(pixelMock).fire(PRIVACY_PRO_APP_SETTINGS_NON_SUBSCRIBER_IMPRESSION)
+        verify(pixelMock).fire(SETTINGS_OPENED_WITH_SUBSCRIPTION_AVAILABLE)
     }
 
     @Test
@@ -198,7 +198,7 @@ class SettingsPixelDispatcherTest {
         val testee = createTestee()
         testee.fireSettingsOpenedWithSubscriptionPurchaseAvailable()
 
-        verify(pixelMock, never()).fire(PRIVACY_PRO_APP_SETTINGS_NON_SUBSCRIBER_IMPRESSION)
+        verify(pixelMock, never()).fire(SETTINGS_OPENED_WITH_SUBSCRIPTION_AVAILABLE)
     }
 
     @Test
@@ -209,7 +209,7 @@ class SettingsPixelDispatcherTest {
         val testee = createTestee()
         testee.fireSettingsOpenedWithSubscriptionPurchaseAvailable()
 
-        verify(pixelMock, never()).fire(PRIVACY_PRO_APP_SETTINGS_NON_SUBSCRIBER_IMPRESSION)
+        verify(pixelMock, never()).fire(SETTINGS_OPENED_WITH_SUBSCRIPTION_AVAILABLE)
     }
 
     @Test
@@ -220,7 +220,7 @@ class SettingsPixelDispatcherTest {
         val testee = createTestee()
         testee.fireSettingsOpenedWithSubscriptionPurchaseAvailable()
 
-        verify(pixelMock, never()).fire(PRIVACY_PRO_APP_SETTINGS_NON_SUBSCRIBER_IMPRESSION)
+        verify(pixelMock, never()).fire(SETTINGS_OPENED_WITH_SUBSCRIPTION_AVAILABLE)
     }
 
     private fun createTestee() = SettingsPixelDispatcherImpl(
