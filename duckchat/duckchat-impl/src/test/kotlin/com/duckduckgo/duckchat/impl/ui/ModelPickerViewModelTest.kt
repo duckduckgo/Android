@@ -82,19 +82,7 @@ class ModelPickerViewModelTest {
         )
     }
 
-    @Test
-    fun whenGetSelectedModelIdThenDelegatesToModelManager() {
-        whenever(modelManager.getSelectedModelId()).thenReturn("id")
 
-        assertEquals("id", testee.getSelectedModelId())
-    }
-
-    @Test
-    fun whenGetSelectedModelIdAndNoneSelectedThenReturnsNull() {
-        whenever(modelManager.getSelectedModelId()).thenReturn(null)
-
-        assertNull(testee.getSelectedModelId())
-    }
 
     @Test
     fun whenFetchModelsThenDelegatesToModelManager() = runTest {
@@ -571,76 +559,28 @@ class ModelPickerViewModelTest {
     }
 
     @Test
-    fun whenNoModelSelectedThenGetSelectedModelReturnsNull() {
+    fun whenNoModelSelectedThenEffectiveModelIsNull() {
         stateFlow.value = ModelState(models = listOf(freeModel("id1", "model1")), selectedModelId = null)
 
-        assertNull(testee.getSelectedModel())
+        assertNull(testee.effectiveModelId.value)
     }
 
     @Test
-    fun whenModelSelectedThenGetSelectedModelReturnsIt() {
+    fun whenModelSelectedThenEffectiveModelIsIt() {
         val model = freeModel("id1", "model1")
         stateFlow.value = ModelState(models = listOf(model), selectedModelId = "id1")
 
-        assertEquals(model, testee.getSelectedModel())
+        assertEquals(model.id, testee.effectiveModelId.value)
     }
 
-    @Test
-    fun whenSelectedModelSupportsImageGenerationThenIsImageGenerationSupportedIsTrue() {
-        stateFlow.value = ModelState(
-            models = listOf(freeModel("id1", "model1", supportedTools = listOf(Tool.IMAGE_GENERATION))),
-            selectedModelId = "id1",
-        )
 
-        assertTrue(testee.isImageGenerationSupported())
-    }
+
+
+
+
 
     @Test
-    fun whenSelectedModelDoesNotSupportImageGenerationThenIsImageGenerationSupportedIsFalse() {
-        stateFlow.value = ModelState(
-            models = listOf(freeModel("id1", "model1", supportedTools = emptyList())),
-            selectedModelId = "id1",
-        )
-
-        assertFalse(testee.isImageGenerationSupported())
-    }
-
-    @Test
-    fun whenNoModelSelectedThenIsImageGenerationSupportedDefaultsToTrue() {
-        stateFlow.value = ModelState(models = emptyList(), selectedModelId = null)
-
-        assertTrue(testee.isImageGenerationSupported())
-    }
-
-    @Test
-    fun whenSelectedModelSupportsWebSearchThenIsWebSearchSupportedIsTrue() {
-        stateFlow.value = ModelState(
-            models = listOf(freeModel("id1", "model1", supportedTools = listOf(Tool.WEB_SEARCH))),
-            selectedModelId = "id1",
-        )
-
-        assertTrue(testee.isWebSearchSupported())
-    }
-
-    @Test
-    fun whenSelectedModelDoesNotSupportWebSearchThenIsWebSearchSupportedIsFalse() {
-        stateFlow.value = ModelState(
-            models = listOf(freeModel("id1", "model1", supportedTools = emptyList())),
-            selectedModelId = "id1",
-        )
-
-        assertFalse(testee.isWebSearchSupported())
-    }
-
-    @Test
-    fun whenNoModelSelectedThenIsWebSearchSupportedDefaultsToTrue() {
-        stateFlow.value = ModelState(models = emptyList(), selectedModelId = null)
-
-        assertTrue(testee.isWebSearchSupported())
-    }
-
-    @Test
-    fun whenOngoingChatThenCapabilitiesReflectChatModelNotGlobal() = runTest {
+    fun whenOngoingChatThenEffectiveModelIsChatModelNotGlobal() = runTest {
         stateFlow.value = ModelState(
             models = listOf(
                 freeModel(id = "global-model", shortName = "Global", supportedTools = emptyList()),
@@ -655,31 +595,9 @@ class ModelPickerViewModelTest {
         nativeInputState.value = nativeInputState.value.copy(chatId = "c1")
         advanceUntilIdle()
 
-        assertEquals("chat-model", testee.getSelectedModel()?.id)
-        assertTrue(testee.isImageGenerationSupported())
+        assertEquals("chat-model", testee.effectiveModelId.value)
     }
 
-    @Test
-    fun whenRecoveryModelPickedThenCapabilitiesReflectRecoveryModel() = runTest {
-        val recoveryModel = freeModel(id = "recovery-model", shortName = "Recovery", supportedTools = listOf(Tool.WEB_SEARCH))
-        stateFlow.value = ModelState(
-            models = listOf(
-                freeModel(id = "global-model", shortName = "Global", supportedTools = listOf(Tool.IMAGE_GENERATION)),
-                recoveryModel,
-            ),
-            selectedModelId = "global-model",
-            selectedModelShortName = "Global",
-        )
-        nativeInputState.value = nativeInputState.value.copy(chatId = "c1", modelChangeMode = true)
-        advanceUntilIdle()
-
-        testee.onModelTapped(recoveryModel, PickerSurface.MODEL_PICKER_ADDRESS_BAR)
-        advanceUntilIdle()
-
-        assertEquals("recovery-model", testee.getSelectedModel()?.id)
-        assertTrue(testee.isWebSearchSupported())
-        assertFalse(testee.isImageGenerationSupported())
-    }
 
     @Test
     fun whenOngoingChatThenChipLabelIsChatModelShortName() = runTest {

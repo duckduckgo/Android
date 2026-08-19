@@ -21,10 +21,14 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
+import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.Tool
+import com.duckduckgo.duckchat.impl.nativeinput.EffectiveModelProvider
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -36,6 +40,8 @@ import javax.inject.Inject
 class OptionsViewModel @Inject constructor(
     nativeInputStateProvider: NativeInputStateProvider,
     private val duckChatPixels: DuckChatPixels,
+    modelManager: DuckAiModelManager,
+    effectiveModelProvider: EffectiveModelProvider,
 ) : ViewModel() {
 
     val selectedTool: StateFlow<Tool?> = nativeInputStateProvider.state
@@ -46,21 +52,28 @@ class OptionsViewModel @Inject constructor(
         .map { DuckChatPixelSurface.from(it.inputContext) }
         .stateIn(viewModelScope, SharingStarted.Eagerly, DuckChatPixelSurface.ADDRESS_BAR)
 
-    private val _visibleTools = MutableStateFlow(Tool.entries.toSet())
-    val visibleTools: StateFlow<Set<Tool>> = _visibleTools.asStateFlow()
+    /**
+     * Tools the effective model supports. An unknown model means every tool is offered, which is the
+     * behaviour the pre-plugin code fell back to when it could not resolve a model.
+     */
+    val visibleTools: StateFlow<Set<Tool>> = combine(
+        modelManager.modelState,
+        effectiveModelProvider.effectiveModelId,
+    ) { modelState, modelId ->
+        modelState.models.firstOrNull { it.id == modelId }
+            ?.let { model -> Tool.entries.filterTo(mutableSetOf()) { model.supportsTool(it) } }
+            ?: Tool.entries.toSet()
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, Tool.entries.toSet())
 
     val shouldShowPickers: Boolean get() = selectedTool.value != Tool.IMAGE_GENERATION
 
     /**
-     * Update the set of tools the menu should display. Returns true if the currently selected tool
-     * is no longer in the visible set (caller is responsible for pushing the cleared selection
-     * through [com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost.toolSelected]).
+     * Emits when the selected tool is no longer supported by the effective model. Deliberately not a
+     * pixel: the user did not deselect it, the model change did.
      */
-    fun updateVisibleTools(tools: Set<Tool>): Boolean {
-        _visibleTools.value = tools
-        val current = selectedTool.value
-        return current != null && current !in tools
-    }
+    val toolSelectionCleared: Flow<Unit> = combine(selectedTool, visibleTools) { selected, visible ->
+        selected != null && selected !in visible
+    }.filter { it }.map { }
 
     fun onToolSelectedByUser(tool: Tool) {
         when (tool) {

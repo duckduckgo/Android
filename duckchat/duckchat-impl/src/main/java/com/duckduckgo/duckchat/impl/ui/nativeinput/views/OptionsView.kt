@@ -42,6 +42,7 @@ import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
@@ -88,6 +89,7 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
     private var optionsButton: ImageView
     private var selectedToolJob: Job? = null
     private var nativeInputStateJob: Job? = null
+    private var visibleToolsJob: Job? = null
     private var lastNativeInputState: NativeInputState? = null
 
     init {
@@ -102,6 +104,7 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
         super.onAttachedToWindow()
         observeSelectedTool()
         observeNativeInputState()
+        observeVisibleTools()
     }
 
     override fun onDetachedFromWindow() {
@@ -110,6 +113,8 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
         selectedToolJob = null
         nativeInputStateJob?.cancel()
         nativeInputStateJob = null
+        visibleToolsJob?.cancel()
+        visibleToolsJob = null
         lastNativeInputState = null
         dismissPopup()
     }
@@ -120,6 +125,16 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
         selectedToolJob = viewModel.selectedTool
             .onEach { tool -> renderSelection(tool) }
             .launchIn(lifecycleOwner.lifecycleScope)
+    }
+
+    private fun observeVisibleTools() {
+        val scope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
+        visibleToolsJob?.cancel()
+        visibleToolsJob = scope.launch {
+            launch { viewModel.visibleTools.collect { tools -> refreshOptionsButtonVisibility(tools) } }
+            // The model stopped supporting the selected tool, so drop it. The host owns the write.
+            launch { viewModel.toolSelectionCleared.collect { host.toolSelected(null) } }
+        }
     }
 
     private fun observeNativeInputState() {
@@ -170,20 +185,6 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
                 host.showReasoningPicker(false)
             }
         }
-    }
-
-    fun updateCapabilitiesFrom(picker: ModelPicker?) {
-        val visibleTools = buildSet {
-            if (picker?.isImageGenerationSupported() ?: true) add(Tool.IMAGE_GENERATION)
-            if (picker?.isWebSearchSupported() ?: true) add(Tool.WEB_SEARCH)
-        }
-
-        if (isAttachedToWindow) {
-            val selectionCleared = viewModel.updateVisibleTools(visibleTools)
-            if (selectionCleared) host.toolSelected(null)
-        }
-
-        refreshOptionsButtonVisibility(visibleTools)
     }
 
     private fun buildOptionsButton(): ImageView {
