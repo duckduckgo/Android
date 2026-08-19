@@ -260,7 +260,7 @@ class RealNativeInputManagerTest {
     }
 
     @Test
-    fun whenUrlCachingKillSwitchDisabledThenInputLeftAlone() {
+    fun whenUrlCachingKillSwitchDisabledThenInputNotCleared() {
         nativeInputUrlCachingKillSwitch.self().setRawStoredState(State(enable = false))
         val input = givenUrlCachingBound(text = URL)
         input.switchToDuckAi()
@@ -269,7 +269,7 @@ class RealNativeInputManagerTest {
     }
 
     @Test
-    fun whenInDuckAiModeThenNoCaching() {
+    fun whenInDuckAiModeThenInputNotCleared() {
         val input = givenUrlCachingBound(text = URL, duckAiMode = true)
         input.switchToDuckAi()
 
