@@ -72,6 +72,10 @@ class ModelPickerViewModel @Inject constructor(
 
     private var modelChangeMode: Boolean = false
 
+    // The published chatId, which is the key for the recovery pick. Read from state rather than
+    // currentChat, which can still be resolving when the user picks.
+    private var publishedChatId: String? = null
+
     // The pixel surface for the active tab, tracked from the published input context.
     // Named distinctly from the [PickerSurface] param on [onModelTapped] to avoid shadowing.
     private var pixelSurface: DuckChatPixelSurface = DuckChatPixelSurface.ADDRESS_BAR
@@ -94,10 +98,11 @@ class ModelPickerViewModel @Inject constructor(
         viewModelScope.launch {
             nativeInputStateProvider.state.collect { state ->
                 modelChangeMode = state.modelChangeMode
+                publishedChatId = state.chatId
                 pixelSurface = DuckChatPixelSurface.from(state.inputContext)
                 if (!state.modelChangeMode) {
                     recoverySelectedModelId.value = null
-                    effectiveModelProvider.clearRecoveryModelPick()
+                    effectiveModelProvider.clearRecoveryModelPick(state.chatId)
                 }
             }
         }
@@ -175,7 +180,7 @@ class ModelPickerViewModel @Inject constructor(
                 }
                 duckChatPixels.fireSubmitChangeModel(model.id, pixelSurface)
                 recoverySelectedModelId.value = model.id
-                effectiveModelProvider.onRecoveryModelPicked(model.id)
+                effectiveModelProvider.onRecoveryModelPicked(chatId = publishedChatId, modelId = model.id)
                 modelChangeChannel.trySend(PickerModelChange.ChangeModel(model.id))
             } else {
                 if (model.id != modelManager.getSelectedModelId()) {
