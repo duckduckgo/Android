@@ -61,11 +61,7 @@ import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 interface ModelPicker {
-    var onMenuShown: (() -> Unit)?
-    var onMenuDismissed: (() -> Unit)?
 
-    /** Invoked when the user picks a model during the FE recovery model-change flow. */
-    var onChangeModelSubmitted: ((modelId: String) -> Unit)?
     fun setPickerEnabled(enabled: Boolean)
     fun setHost(host: NativeInputHost)
 
@@ -105,9 +101,6 @@ class ModelPickerView @JvmOverloads constructor(
     // read synchronously from popup callbacks. Updated by observeInputContext().
     private var lastInputContext: InputContext = InputContext.BROWSER
     private lateinit var host: NativeInputHost
-    override var onMenuShown: (() -> Unit)? = null
-    override var onMenuDismissed: (() -> Unit)? = null
-    override var onChangeModelSubmitted: ((modelId: String) -> Unit)? = null
 
     init {
         inflate(context, R.layout.view_model_picker, this)
@@ -183,7 +176,7 @@ class ModelPickerView @JvmOverloads constructor(
             .onEach { change ->
                 when (change) {
                     is PickerModelChange.ChangeModel -> {
-                        onChangeModelSubmitted?.invoke(change.modelId)
+                        host?.changeModelSubmitted(change.modelId)
                         dismissPopup()
                     }
                 }
@@ -220,7 +213,7 @@ class ModelPickerView @JvmOverloads constructor(
 
         viewModel.menuShowing = true
         viewModel.onPickerShown(currentSurface())
-        onMenuShown?.invoke()
+        host?.modelMenuShown()
         showPopupWindow(state)
     }
 
@@ -268,7 +261,7 @@ class ModelPickerView @JvmOverloads constructor(
     private fun onPopupDismissed() {
         viewModel.menuShowing = false
         popupWindow = null
-        onMenuDismissed?.invoke()
+        host?.modelMenuDismissed(viewModel.hasPendingRecoverySelection())
     }
 
     override fun onDetachedFromWindow() {

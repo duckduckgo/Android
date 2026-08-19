@@ -314,7 +314,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var editPromptJob: Job? = null
     private var submitAllowed: Boolean = true
     private var modelPickerView: ModelPicker? = null
-    private var optionsView: OptionsView? = null
     private var chatSuggestionsUserEnabled: Boolean = true
     private var isStreaming: Boolean = false
     private var attachmentLimitExceeded: Boolean = false
@@ -745,9 +744,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
                             // before plugins were created.
                             pluginView.setPickerEnabled(viewModel.modelPickerEnabled.value)
                         }
-                        if (pluginView is OptionsView) {
-                            optionsView = pluginView
-                        }
                         wirePluginView(pluginView, scope)
                     }
                 }
@@ -791,16 +787,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
         if (pluginView is StopStreamingView) {
             pluginView.isEditMode = isEditWidget
-        }
-        (pluginView as? ModelPicker)?.let { picker ->
-            picker.onMenuShown = { isModelMenuVisible = true }
-            picker.onMenuDismissed = {
-                isModelMenuVisible = false
-                // FE recovery: dismissing without picking a model reverts the change window so the
-                // chip hides again (nothing changed). A selection keeps the chip until submit.
-                if (!picker.hasPendingRecoverySelection()) viewModel.exitModelChangeMode()
-            }
-            picker.onChangeModelSubmitted = { modelId -> onChangeModelSubmitted?.invoke(modelId) }
         }
     }
 
@@ -851,7 +837,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         editPromptJob?.cancel()
         editPromptJob = null
         modelPickerView = null
-        optionsView = null
         widgetRoot = null
         tearDownChatSuggestions()
     }
@@ -1524,7 +1509,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     override fun getSelectedTool(): String? = viewModel.getSelectedTool()
 
     override fun clearSelectedTool() {
-        optionsView?.clearSelection()
+        viewModel.setSelectedTool(null)
     }
 
     override fun onPromptSubmitted() {
@@ -1635,7 +1620,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         } ?: emptyList()
         viewModel.storePendingPrompt(query, getSelectedModelId(), getResolvedReasoningEffort(), getSelectedTool(), images, files)
         attachmentView?.clearAttachmentsForNewChat()
-        optionsView?.clearSelection()
+        viewModel.setSelectedTool(null)
     }
 
     override fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean) {
@@ -2053,6 +2038,21 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
         updateSendButtonVisibility()
         updateVoiceButtonVisibility()
+    }
+
+    override fun modelMenuShown() {
+        isModelMenuVisible = true
+    }
+
+    override fun modelMenuDismissed(hasPendingRecoverySelection: Boolean) {
+        isModelMenuVisible = false
+        // FE recovery: dismissing without picking a model reverts the change window so the chip hides
+        // again (nothing changed). A selection keeps the chip until submit.
+        if (!hasPendingRecoverySelection) viewModel.exitModelChangeMode()
+    }
+
+    override fun changeModelSubmitted(modelId: String) {
+        onChangeModelSubmitted?.invoke(modelId)
     }
 
     override fun toolSelected(tool: String?) {

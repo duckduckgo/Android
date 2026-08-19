@@ -175,11 +175,6 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
         host.showReasoningPicker(show)
     }
 
-    fun clearSelection() {
-        if (!isAttachedToWindow) return
-        host.toolSelected(null)
-    }
-
     override fun onVisibilityChanged(changedView: View, visibility: Int) {
         super.onVisibilityChanged(changedView, visibility)
         if (!isAttachedToWindow) return
