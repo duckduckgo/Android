@@ -24,6 +24,8 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
 import com.duckduckgo.di.scopes.AppScope
 import com.google.android.material.snackbar.BaseTransientBottomBar
@@ -42,16 +44,23 @@ interface AppLinksSnackBarConfigurator {
 class DuckDuckGoAppLinksSnackBarConfigurator @Inject constructor(
     private val appLinksLauncher: AppLinksLauncher,
     private val pixel: Pixel,
+    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
 ) : AppLinksSnackBarConfigurator {
 
     override fun configureAppLinkSnackBar(view: View?, appLink: AppLink, viewModel: BrowserTabViewModel): Snackbar? {
         return view?.let {
             val context = it.context
             val (message, action) = getSnackBarContent(context, appLink) ?: return null
+            val sendPixelForYouTube = appLink.appIntent?.component?.packageName == YOUTUBE_PACKAGE &&
+                androidBrowserConfigFeature.sendPixelForYouTubeAppLinks().isEnabled()
 
             it.makeSnackbarWithNoBottomInset(message, Snackbar.LENGTH_LONG).apply {
                 setAction(action) {
                     pixel.fire(AppPixelName.APP_LINKS_SNACKBAR_OPEN_ACTION_PRESSED)
+                    if (sendPixelForYouTube) {
+                        pixel.fire(AppPixelName.APP_LINKS_SNACKBAR_YOUTUBE_OPEN_ACTION_PRESSED)
+                        pixel.fire(AppPixelName.APP_LINKS_SNACKBAR_YOUTUBE_OPEN_ACTION_PRESSED_DAILY, type = Daily())
+                    }
                     appLinksLauncher.openAppLink(context, appLink, viewModel)
                 }
                 addCallback(
@@ -59,6 +68,10 @@ class DuckDuckGoAppLinksSnackBarConfigurator @Inject constructor(
                         override fun onShown(transientBottomBar: Snackbar?) {
                             super.onShown(transientBottomBar)
                             pixel.fire(AppPixelName.APP_LINKS_SNACKBAR_SHOWN)
+                            if (sendPixelForYouTube) {
+                                pixel.fire(AppPixelName.APP_LINKS_SNACKBAR_YOUTUBE_SHOWN)
+                                pixel.fire(AppPixelName.APP_LINKS_SNACKBAR_YOUTUBE_SHOWN_DAILY, type = Daily())
+                            }
                         }
                     },
                 )
@@ -94,5 +107,6 @@ class DuckDuckGoAppLinksSnackBarConfigurator @Inject constructor(
 
     companion object {
         const val DURATION = 6000
+        private const val YOUTUBE_PACKAGE = "com.google.android.youtube"
     }
 }

@@ -248,6 +248,10 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
 
     APP_LINKS_SNACKBAR_SHOWN("m_app_links_snackbar_shown"),
     APP_LINKS_SNACKBAR_OPEN_ACTION_PRESSED("m_app_links_snackbar_open_action_pressed"),
+    APP_LINKS_SNACKBAR_YOUTUBE_SHOWN("app_links_snackbar_youtube_shown"),
+    APP_LINKS_SNACKBAR_YOUTUBE_SHOWN_DAILY("app_links_snackbar_youtube_shown_daily"),
+    APP_LINKS_SNACKBAR_YOUTUBE_OPEN_ACTION_PRESSED("app_links_snackbar_youtube_open_action_pressed"),
+    APP_LINKS_SNACKBAR_YOUTUBE_OPEN_ACTION_PRESSED_DAILY("app_links_snackbar_youtube_open_action_pressed_daily"),
 
     AUTOCOMPLETE_TOGGLED_OFF("m_autocomplete_recent_sites_toggled_off"),
     AUTOCOMPLETE_TOGGLED_ON("m_autocomplete_recent_sites_toggled_on"),

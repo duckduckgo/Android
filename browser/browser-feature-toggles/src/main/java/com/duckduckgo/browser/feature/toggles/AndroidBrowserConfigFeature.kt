@@ -422,4 +422,13 @@ interface AndroidBrowserConfigFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun preserveCertificateOnSameOrigin(): Toggle
+
+    /**
+     * Controls whether the YouTube-specific "open in app" snackbar pixels are sent.
+     * @return `true` when the remote config has the global "sendPixelForYouTubeAppLinks" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun sendPixelForYouTubeAppLinks(): Toggle
 }
