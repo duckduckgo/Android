@@ -44,6 +44,12 @@ interface EffectiveModelProvider {
      * model while that window is open, because the FE syncs the new model back to us asynchronously.
      */
     fun onRecoveryModelPicked(modelId: String)
+
+    /**
+     * Drops the recorded recovery pick when the model-change window closes. Without this the next
+     * window would reapply the previous pick, and the picker's own menu tick would disagree with it.
+     */
+    fun clearRecoveryModelPick()
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -92,5 +98,9 @@ class RealEffectiveModelProvider @Inject constructor(
 
     override fun onRecoveryModelPicked(modelId: String) {
         recoveryModelId.value = modelId
+    }
+
+    override fun clearRecoveryModelPick() {
+        recoveryModelId.value = null
     }
 }

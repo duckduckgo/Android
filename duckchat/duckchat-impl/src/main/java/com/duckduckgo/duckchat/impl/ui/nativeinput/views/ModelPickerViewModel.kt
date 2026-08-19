@@ -95,7 +95,10 @@ class ModelPickerViewModel @Inject constructor(
             nativeInputStateProvider.state.collect { state ->
                 modelChangeMode = state.modelChangeMode
                 pixelSurface = DuckChatPixelSurface.from(state.inputContext)
-                if (!state.modelChangeMode) recoverySelectedModelId.value = null
+                if (!state.modelChangeMode) {
+                    recoverySelectedModelId.value = null
+                    effectiveModelProvider.clearRecoveryModelPick()
+                }
             }
         }
     }

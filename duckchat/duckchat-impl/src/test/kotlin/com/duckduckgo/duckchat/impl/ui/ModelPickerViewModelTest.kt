@@ -671,6 +671,25 @@ class ModelPickerViewModelTest {
     }
 
     @Test
+    fun whenANewRecoveryWindowOpensThenTheChipDoesNotShowThePreviousPick() = runTest {
+        stateFlow.value = ModelState(
+            models = listOf(freeModel(id = "new-model", shortName = "New Model")),
+            selectedModelShortName = "Global Model",
+        )
+        nativeInputState.value = nativeInputState.value.copy(chatId = null, modelChangeMode = true)
+        advanceUntilIdle()
+        testee.onModelTapped(freeModel(id = "new-model", shortName = "New Model"), PickerSurface.MODEL_PICKER_ADDRESS_BAR)
+        advanceUntilIdle()
+        nativeInputState.value = nativeInputState.value.copy(modelChangeMode = false)
+        advanceUntilIdle()
+
+        nativeInputState.value = nativeInputState.value.copy(modelChangeMode = true)
+        advanceUntilIdle()
+
+        assertEquals("Global Model", testee.chipLabel.value)
+    }
+
+    @Test
     fun whenNoRecoveryPickThenHasPendingRecoverySelectionFalse() = runTest {
         nativeInputState.value = nativeInputState.value.copy(chatId = "c1", modelChangeMode = true)
         advanceUntilIdle()

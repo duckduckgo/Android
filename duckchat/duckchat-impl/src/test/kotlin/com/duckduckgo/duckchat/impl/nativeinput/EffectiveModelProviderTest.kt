@@ -126,6 +126,21 @@ class EffectiveModelProviderTest {
         assertEquals("chat-model", testee.effectiveModelId.first())
     }
 
+    @Test
+    fun whenANewModelChangeWindowOpensThenThePreviousRecoveryPickIsNotReused() = runTest {
+        whenever(duckAiChatStore.getChatById("chat-1")).thenReturn(chat("chat-1", "chat-model"))
+        publish(NativeInputState.zero().copy(chatId = "chat-1", modelChangeMode = true))
+        testee.onRecoveryModelPicked("recovery-model")
+        advanceUntilIdle()
+        publish(NativeInputState.zero().copy(chatId = "chat-1", modelChangeMode = false))
+        testee.clearRecoveryModelPick()
+        advanceUntilIdle()
+
+        publish(NativeInputState.zero().copy(chatId = "chat-1", modelChangeMode = true))
+
+        assertEquals("chat-model", testee.effectiveModelId.first())
+    }
+
     private fun TestScope.publish(state: NativeInputState) {
         store.publish(TAB_ID, state)
         selectedTabFlow.value = TabEntity(tabId = TAB_ID, position = 0)

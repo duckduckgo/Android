@@ -77,6 +77,7 @@ class OptionsViewModelTest {
     private val effectiveModelProvider = object : EffectiveModelProvider {
         override val effectiveModelId: Flow<String?> = this@OptionsViewModelTest.effectiveModelId
         override fun onRecoveryModelPicked(modelId: String) = Unit
+        override fun clearRecoveryModelPick() = Unit
     }
     private lateinit var testee: OptionsViewModel
 
