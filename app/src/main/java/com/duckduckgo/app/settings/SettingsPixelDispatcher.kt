@@ -17,7 +17,7 @@
 package com.duckduckgo.app.settings
 
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.pixels.AppPixelName.PRIVACY_PRO_APP_SETTINGS_NON_SUBSCRIBER_IMPRESSION
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_EMAIL_PROTECTION_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_SYNC_PRESSED
 import com.duckduckgo.app.pixels.duckchat.createWasUsedBeforePixelParams
@@ -99,7 +99,7 @@ class SettingsPixelDispatcherImpl @Inject constructor(
     override fun fireSettingsOpenedWithSubscriptionPurchaseAvailable() {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             if (subscriptions.isEligible() && subscriptions.getSubscriptionStatus() == UNKNOWN) {
-                pixel.fire(PRIVACY_PRO_APP_SETTINGS_NON_SUBSCRIBER_IMPRESSION)
+                pixel.fire(AppPixelName.SETTINGS_OPENED_WITH_SUBSCRIPTION_AVAILABLE)
             }
         }
     }
