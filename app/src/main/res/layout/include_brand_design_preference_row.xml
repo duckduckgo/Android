@@ -15,24 +15,21 @@
   -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:paddingHorizontal="@dimen/keyline_1">
 
-    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+    <com.duckduckgo.app.onboardingquicksetup.ui.QuickSetupTwoLineSwitchRow
         android:id="@+id/preferenceRowItem"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:showSwitch="true"
-        tools:leadingIcon="@drawable/ic_history_24"
-        tools:primaryText="Search History"
-        tools:secondaryText="Show recently visited sites in search suggestions. Private, only on your device." />
+        android:layout_height="wrap_content" />
 
     <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_4"
         app:defaultPadding="false"
-        app:fullWidth="false" />
+        app:fullWidth="true" />
 
 </LinearLayout>

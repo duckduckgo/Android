@@ -69,7 +69,7 @@ class TwoLineListItem @JvmOverloads constructor(
         context.obtainStyledAttributes(
             attrs,
             R.styleable.TwoLineListItem,
-            defStyleAttr,
+            0,
             R.style.Widget_DuckDuckGo_TwoLineListItem,
         ).apply {
             setPrimaryText(getString(R.styleable.TwoLineListItem_primaryText))

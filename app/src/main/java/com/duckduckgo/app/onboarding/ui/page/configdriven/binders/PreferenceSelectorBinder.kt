@@ -18,6 +18,8 @@ package com.duckduckgo.app.onboarding.ui.page.configdriven.binders
 
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup.MarginLayoutParams
+import androidx.core.view.updateLayoutParams
 import com.duckduckgo.app.browser.databinding.IncludeBrandDesignPreferenceRowBinding
 import com.duckduckgo.app.browser.databinding.IncludeBrandDesignPreferenceSelectorBinding
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
@@ -68,20 +70,21 @@ class PreferenceSelectorBinder(
         val context = binding.root.context
         binding.preferenceRows.removeAllViews()
         val inflater = LayoutInflater.from(context)
-        content.rows.forEach { row ->
+        content.rows.forEachIndexed { index, row ->
             val rowBinding = IncludeBrandDesignPreferenceRowBinding.inflate(inflater, binding.preferenceRows, false)
+            if (index > 0) {
+                rowBinding.root.updateLayoutParams<MarginLayoutParams> {
+                    topMargin = context.resources.getDimensionPixelSize(CommonR.dimen.keyline_4)
+                }
+            }
             with(rowBinding.preferenceRowItem) {
-                setLeadingIconResource(row.iconRes)
+                setIcon(row.iconRes)
                 setPrimaryText(row.primaryText.resolve(context))
                 setSecondaryText(row.secondaryText.resolve(context))
-                setIsChecked(state.value.enabled.getValue(row.preference))
-                setOnCheckedChangeListener { _, checked ->
+                isChecked = state.value.enabled.getValue(row.preference)
+                setOnCheckedChangeListener { checked ->
                     state.update { it.copy(enabled = it.enabled + (row.preference to checked)) }
                 }
-
-                // The card container is clickable for tap-to-skip, and pressed state propagates to every non-clickable
-                // descendant, so the list item's selectableItemBackground would ripple on a tap anywhere in the dialog.
-                findViewById<View>(CommonR.id.item_container).background = null
             }
             binding.preferenceRows.addView(rowBinding.root)
         }
