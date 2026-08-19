@@ -23,9 +23,9 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 
 @ContributesRemoteFeature(
     scope = AppScope::class,
-    featureName = "nativeInputUrlCachingKillSwitch",
+    featureName = "nativeInputUrlClearingKillSwitch",
 )
-interface NativeInputUrlCachingKillSwitch {
+interface NativeInputUrlClearingKillSwitch {
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun self(): Toggle
