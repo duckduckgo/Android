@@ -29,6 +29,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 /**
@@ -40,16 +41,16 @@ interface EffectiveModelProvider {
     val effectiveModelId: Flow<String?>
 
     /**
-     * Records the model picked during the FE model-change recovery flow. It wins over the chat's stored
-     * model while that window is open, because the FE syncs the new model back to us asynchronously.
+     * Records the model picked during [chatId]'s FE model-change window. It wins over that chat's stored
+     * model while the window is open, because the FE syncs the new model back to us asynchronously.
      */
-    fun onRecoveryModelPicked(modelId: String)
+    fun onRecoveryModelPicked(chatId: String?, modelId: String)
 
     /**
-     * Drops the recorded recovery pick when the model-change window closes. Without this the next
-     * window would reapply the previous pick, and the picker's own menu tick would disagree with it.
+     * Drops the pick when [chatId]'s window closes. Keyed by chat for two reasons: the next window on the
+     * same chat must not reapply the old pick, and closing one tab's window must not wipe another tab's.
      */
-    fun clearRecoveryModelPick()
+    fun clearRecoveryModelPick(chatId: String?)
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -69,7 +70,9 @@ class RealEffectiveModelProvider @Inject constructor(
         val chatModel: String?,
     )
 
-    private val recoveryModelId = MutableStateFlow<String?>(null)
+    private data class RecoveryPick(val chatId: String?, val modelId: String)
+
+    private val recoveryPick = MutableStateFlow<RecoveryPick?>(null)
 
     // mapLatest: a chatId flip cancels an in-flight lookup, so a slow read can't resolve into a stale chat.
     private val activeChat: Flow<ActiveChat> = nativeInputStateProvider.state
@@ -86,21 +89,22 @@ class RealEffectiveModelProvider @Inject constructor(
     override val effectiveModelId: Flow<String?> = combine(
         modelManager.modelState,
         activeChat,
-        recoveryModelId,
+        recoveryPick,
     ) { modelState, chat, recovery ->
         val modelIds = modelState.models.mapTo(HashSet()) { it.id }
-        // Honoured only while the model-change window is open; it closes per tab, so a stale pick cannot leak.
+        // Honoured only for the chat whose window is open, so a pick cannot leak across tabs.
         val recovered = recovery
-            ?.takeIf { chat.modelChangeMode }
+            ?.takeIf { chat.modelChangeMode && it.chatId == chat.chatId }
+            ?.modelId
             ?.takeIf { it in modelIds }
         recovered ?: chat.chatModel?.takeIf { it in modelIds } ?: modelState.selectedModelId
     }.distinctUntilChanged()
 
-    override fun onRecoveryModelPicked(modelId: String) {
-        recoveryModelId.value = modelId
+    override fun onRecoveryModelPicked(chatId: String?, modelId: String) {
+        recoveryPick.value = RecoveryPick(chatId, modelId)
     }
 
-    override fun clearRecoveryModelPick() {
-        recoveryModelId.value = null
+    override fun clearRecoveryModelPick(chatId: String?) {
+        recoveryPick.update { current -> current?.takeIf { it.chatId != chatId } }
     }
 }
