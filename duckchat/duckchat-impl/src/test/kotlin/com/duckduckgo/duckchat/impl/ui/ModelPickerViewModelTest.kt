@@ -25,9 +25,9 @@ import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ModelProvider
 import com.duckduckgo.duckchat.impl.models.ModelState
-import com.duckduckgo.duckchat.impl.nativeinput.RealEffectiveModelProvider
 import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.models.UserTier
+import com.duckduckgo.duckchat.impl.nativeinput.RealEffectiveModelProvider
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.ModelPickerViewModel
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.PickerModelChange
@@ -83,8 +83,6 @@ class ModelPickerViewModelTest {
             effectiveModelProvider = RealEffectiveModelProvider(modelManager, nativeInputStateProvider, duckAiChatStore),
         )
     }
-
-
 
     @Test
     fun whenFetchModelsThenDelegatesToModelManager() = runTest {
@@ -575,12 +573,6 @@ class ModelPickerViewModelTest {
         assertEquals(model.id, testee.effectiveModelId.value)
     }
 
-
-
-
-
-
-
     @Test
     fun whenOngoingChatThenEffectiveModelIsChatModelNotGlobal() = runTest {
         stateFlow.value = ModelState(
@@ -599,7 +591,6 @@ class ModelPickerViewModelTest {
 
         assertEquals("chat-model", testee.effectiveModelId.value)
     }
-
 
     @Test
     fun whenOngoingChatThenChipLabelIsChatModelShortName() = runTest {
