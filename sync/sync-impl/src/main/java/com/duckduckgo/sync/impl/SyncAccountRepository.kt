@@ -64,6 +64,7 @@ import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
 import java.util.UUID
+import java.util.concurrent.atomic.AtomicReference
 import javax.inject.*
 
 interface SyncAccountRepository {
@@ -182,6 +183,9 @@ class AppSyncAccountRepository @Inject constructor(
 
     // Bounded backoff for the 3party→ddg upgrade network calls.
     internal var upgradeRetryDelayMillis: Long = DEFAULT_UPGRADE_RETRY_DELAY_MILLIS
+
+    // The user id we've already re-published device_info for. Stops us repairing again every time the device list is shown.
+    private val republishedDeviceInfoForUserId = AtomicReference<String?>(null)
 
     /**
      * If there is a key-exchange flow in progress, we need to keep a reference to them
@@ -418,7 +422,7 @@ class AppSyncAccountRepository @Inject constructor(
             return@withContext Error(reason = "Rename Device: only this device can be renamed").alsoFireUpdateDeviceErrorPixel()
         }
 
-        val withDeviceInfo = syncFeature.canWriteUnifiedDeviceList().isEnabled()
+        val withDeviceInfo = syncFeature.canWriteDeviceInfo()
         val canPatchDevice = withDeviceInfo || syncFeature.canUsePatchEndpointForLegacyDeviceRename().isEnabled()
         logcat { "Sync-UnifiedDevices: rename via ${if (canPatchDevice) "PATCH" else "login"}, withDeviceInfo=$withDeviceInfo" }
         if (canPatchDevice) {
@@ -980,14 +984,42 @@ class AppSyncAccountRepository @Inject constructor(
         is Success -> {
             val entriesV2 = result.data.entriesV2
             val devices = if (entriesV2 != null) {
-                val decryptResult = thirdPartyDeviceListDecryptor.decryptAll(entriesV2)
+                val decryptResult = thirdPartyDeviceListDecryptor.decryptAll(entriesV2, syncStore.deviceId)
                 logoutFailedV2Devices(decryptResult.undecryptable)
+                if (decryptResult.thisDeviceInfoUnresolved) republishThisDeviceInfo()
                 decryptResult.decrypted.map { it.toConnectedDevice() }
             } else {
                 // entries_v2 missing
                 decryptLegacyEntries(result.data.entries, primaryKey)
             }
             finishWith(devices)
+        }
+    }
+
+    /**
+     * Re-writes this device's `device_info` with the name it already has, after rendering the device list showed that our own blob is missing or
+     * undecryptable. A flag-off rename is the expected cause: it omits `device_info`, so the server clears it, and migration's done-marker is a
+     * latch that won't put it back.
+     *
+     * Best-effort, so a failure never affects the list the caller is building; a failed attempt is retried on the next load.
+     */
+    private fun republishThisDeviceInfo() {
+        // an ungated repair would omit device_info and so delete the blob it is trying to restore
+        if (!syncFeature.canWriteDeviceInfo()) return
+        val userId = syncStore.userId ?: return
+        // keyed by account rather than latched outright, so signing into a different account in the same process can still repair
+        if (republishedDeviceInfoForUserId.getAndSet(userId) == userId) return
+
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            logcat { "Sync-UnifiedDevices: this device's device_info did not resolve on read; re-publishing it" }
+            when (val result = deviceInfoUpdater.setThisDeviceName(syncDeviceIds.deviceName())) {
+                is Success -> logcat { "Sync-UnifiedDevices: device_info re-published" }
+                is Error -> {
+                    logcat(WARN) { "Sync-UnifiedDevices: device_info re-publish failed: ${result.reason}" }
+                    // release the slot so the next device list load can try again, without clobbering a claim another account has since made
+                    republishedDeviceInfoForUserId.compareAndSet(userId, null)
+                }
+            }
         }
     }
 
