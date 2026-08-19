@@ -129,7 +129,7 @@ class ExecuteBrokerStepEventHandler @Inject constructor(
                     BrokerRecordEmailConfirmationStarted(
                         broker = currentBrokerStep.broker,
                         extractedProfileId = (currentBrokerStep as EmailConfirmationStep).emailConfirmationJob.extractedProfileId,
-                        firstActionId = currentBrokerStep.step.actions[state.currentActionIndex].id,
+                        firstActionId = currentBrokerStep.step.actions.getOrNull(state.currentActionIndex)?.id.orEmpty(),
                     ),
                 )
             }
