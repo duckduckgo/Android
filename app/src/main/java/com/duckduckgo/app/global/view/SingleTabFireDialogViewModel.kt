@@ -306,7 +306,7 @@ class SingleTabFireDialogViewModel @Inject constructor(
                 setOf(
                     FireClearOption.TABS,
                     FireClearOption.DATA,
-                    FireClearOption.DUCKAI_CHATS
+                    FireClearOption.DUCKAI_CHATS,
                 )
             }
 
