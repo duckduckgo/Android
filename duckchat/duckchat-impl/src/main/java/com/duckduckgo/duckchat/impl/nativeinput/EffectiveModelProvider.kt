@@ -41,9 +41,9 @@ interface EffectiveModelProvider {
 
     /**
      * Records the model picked during the FE model-change recovery flow. It wins over the chat's stored
-     * model until that window closes, because the FE syncs the new model back to us asynchronously.
+     * model while that window is open, because the FE syncs the new model back to us asynchronously.
      */
-    fun onRecoveryModelPicked(chatId: String?, modelId: String)
+    fun onRecoveryModelPicked(modelId: String)
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -55,15 +55,13 @@ class RealEffectiveModelProvider @Inject constructor(
     private val duckAiChatStore: DuckAiChatStore,
 ) : EffectiveModelProvider {
 
-    private data class RecoverySelection(val chatId: String?, val modelId: String)
-
     private data class ActiveChat(
         val chatId: String?,
         val modelChangeMode: Boolean,
         val chatModel: String?,
     )
 
-    private val recoverySelection = MutableStateFlow<RecoverySelection?>(null)
+    private val recoveryModelId = MutableStateFlow<String?>(null)
 
     // mapLatest: a chatId flip cancels an in-flight lookup, so a slow read can't resolve into a stale chat.
     private val activeChat: Flow<ActiveChat> = nativeInputStateProvider.state
@@ -80,17 +78,17 @@ class RealEffectiveModelProvider @Inject constructor(
     override val effectiveModelId: Flow<String?> = combine(
         modelManager.modelState,
         activeChat,
-        recoverySelection,
+        recoveryModelId,
     ) { modelState, chat, recovery ->
         val modelIds = modelState.models.mapTo(HashSet()) { it.id }
+        // Honoured only while the model-change window is open; it closes per tab, so a stale pick cannot leak.
         val recovered = recovery
-            ?.takeIf { chat.modelChangeMode && it.chatId == chat.chatId }
-            ?.modelId
+            ?.takeIf { chat.modelChangeMode }
             ?.takeIf { it in modelIds }
         recovered ?: chat.chatModel?.takeIf { it in modelIds } ?: modelState.selectedModelId
     }.distinctUntilChanged()
 
-    override fun onRecoveryModelPicked(chatId: String?, modelId: String) {
-        recoverySelection.value = RecoverySelection(chatId, modelId)
+    override fun onRecoveryModelPicked(modelId: String) {
+        recoveryModelId.value = modelId
     }
 }

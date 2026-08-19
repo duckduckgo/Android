@@ -77,7 +77,7 @@ class OptionsViewModelTest {
     private val effectiveModelId = MutableStateFlow<String?>(null)
     private val effectiveModelProvider = object : EffectiveModelProvider {
         override val effectiveModelId: Flow<String?> = this@OptionsViewModelTest.effectiveModelId
-        override fun onRecoveryModelPicked(chatId: String?, modelId: String) = Unit
+        override fun onRecoveryModelPicked(modelId: String) = Unit
     }
     private lateinit var testee: OptionsViewModel
 
