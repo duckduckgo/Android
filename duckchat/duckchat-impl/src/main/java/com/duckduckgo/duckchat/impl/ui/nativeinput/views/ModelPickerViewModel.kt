@@ -150,14 +150,6 @@ class ModelPickerViewModel @Inject constructor(
 
     var menuShowing = false
 
-    fun getSelectedModelId(): String? = modelManager.getSelectedModelId()
-
-    fun getSelectedModel(): AIChatModel? = state.value.models.firstOrNull { it.id == effectiveModelId.value }
-
-    fun isImageGenerationSupported(): Boolean = getSelectedModel()?.supportsTool(Tool.IMAGE_GENERATION) ?: true
-
-    fun isWebSearchSupported(): Boolean = getSelectedModel()?.supportsTool(Tool.WEB_SEARCH) ?: true
-
     fun fetchModels() {
         viewModelScope.launch {
             modelManager.fetchModels()

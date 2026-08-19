@@ -763,7 +763,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
                         }
                         wirePluginView(pluginView, scope)
                     }
-                    optionsView?.updateCapabilitiesFrom(modelPickerView)
                 }
             }
             launch {
@@ -813,9 +812,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
                 // FE recovery: dismissing without picking a model reverts the change window so the
                 // chip hides again (nothing changed). A selection keeps the chip until submit.
                 if (!picker.hasPendingRecoverySelection()) viewModel.exitModelChangeMode()
-            }
-            picker.onModelSelected = {
-                optionsView?.updateCapabilitiesFrom(picker)
             }
             picker.onChangeModelSubmitted = { modelId -> onChangeModelSubmitted?.invoke(modelId) }
         }

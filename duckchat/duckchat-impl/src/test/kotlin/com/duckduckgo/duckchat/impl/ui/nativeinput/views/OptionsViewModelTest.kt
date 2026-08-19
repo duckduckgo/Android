@@ -23,11 +23,17 @@ import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
+import com.duckduckgo.duckchat.impl.models.AIChatModel
+import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
+import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.models.Tool
+import com.duckduckgo.duckchat.impl.nativeinput.EffectiveModelProvider
 import com.duckduckgo.duckchat.impl.nativeinput.RealNativeInputStateStore
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -64,11 +70,20 @@ class OptionsViewModelTest {
         browserModeStateHolder,
     )
     private val duckChatPixels: DuckChatPixels = mock()
+    private val modelStateFlow = MutableStateFlow(ModelState())
+    private val modelManager: DuckAiModelManager = mock<DuckAiModelManager>().also {
+        whenever(it.modelState).thenReturn(modelStateFlow)
+    }
+    private val effectiveModelId = MutableStateFlow<String?>(null)
+    private val effectiveModelProvider = object : EffectiveModelProvider {
+        override val effectiveModelId: Flow<String?> = this@OptionsViewModelTest.effectiveModelId
+        override fun onRecoveryModelPicked(chatId: String?, modelId: String) = Unit
+    }
     private lateinit var testee: OptionsViewModel
 
     @Before
     fun setUp() {
-        testee = OptionsViewModel(store, duckChatPixels)
+        testee = OptionsViewModel(store, duckChatPixels, modelManager, effectiveModelProvider)
     }
 
     @Test
@@ -145,20 +160,69 @@ class OptionsViewModelTest {
     }
 
     @Test
-    fun whenVisibleToolsAutoClearsSelectedToolThenNoPixel() = runTest {
+    fun whenSelectedToolStopsBeingSupportedThenSelectionClearedEmitsWithoutPixel() = runTest {
         val tabId = "tab-E"
         store.publish(tabId, NativeInputState.zero().copy(selectedTool = Tool.WEB_SEARCH.rawValue))
         selectedTabFlow.value = tabEntity(tabId)
+        givenModels(model("m1", supportedTools = listOf(Tool.WEB_SEARCH)))
+        effectiveModelId.value = "m1"
         advanceUntilIdle()
         assertEquals(Tool.WEB_SEARCH, testee.selectedTool.value)
 
-        // A model-capability change that removes the selected tool must auto-clear it
-        // (updateVisibleTools returns true) WITHOUT firing a deselect pixel.
-        val selectionCleared = testee.updateVisibleTools(emptySet())
+        givenModels(model("m1", supportedTools = listOf(Tool.IMAGE_GENERATION)))
+        advanceUntilIdle()
 
-        assertTrue(selectionCleared)
+        assertEquals(Unit, testee.toolSelectionCleared.first())
         verifyNoInteractions(duckChatPixels)
     }
+
+    @Test
+    fun whenEffectiveModelSupportsOneToolThenOnlyThatToolIsVisible() = runTest {
+        givenModels(model("m1", supportedTools = listOf(Tool.WEB_SEARCH)))
+        effectiveModelId.value = "m1"
+        advanceUntilIdle()
+
+        assertEquals(setOf(Tool.WEB_SEARCH), testee.visibleTools.value)
+    }
+
+    @Test
+    fun whenEffectiveModelIsUnknownThenAllToolsAreVisible() = runTest {
+        givenModels(model("m1", supportedTools = listOf(Tool.WEB_SEARCH)))
+        effectiveModelId.value = "not-in-the-list"
+        advanceUntilIdle()
+
+        assertEquals(Tool.entries.toSet(), testee.visibleTools.value)
+    }
+
+    @Test
+    fun whenEffectiveModelChangesThenVisibleToolsFollowIt() = runTest {
+        givenModels(
+            model("m1", supportedTools = listOf(Tool.WEB_SEARCH)),
+            model("m2", supportedTools = Tool.entries),
+        )
+        effectiveModelId.value = "m1"
+        advanceUntilIdle()
+        assertEquals(setOf(Tool.WEB_SEARCH), testee.visibleTools.value)
+
+        effectiveModelId.value = "m2"
+        advanceUntilIdle()
+
+        assertEquals(Tool.entries.toSet(), testee.visibleTools.value)
+    }
+
+    private fun givenModels(vararg models: AIChatModel) {
+        modelStateFlow.value = ModelState(models = models.toList(), selectedModelId = models.firstOrNull()?.id)
+    }
+
+    private fun model(id: String, supportedTools: List<Tool>): AIChatModel = AIChatModel(
+        id = id,
+        name = id,
+        displayName = id,
+        shortName = id,
+        accessTier = emptyList(),
+        isAccessible = true,
+        supportedTools = supportedTools,
+    )
 
     private fun tabEntity(tabId: String): TabEntity = TabEntity(tabId = tabId, position = 0)
 }
