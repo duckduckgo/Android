@@ -40,7 +40,7 @@ class LottiePrivacyShieldAnimationHelperTest {
     private val browserViewMode = Omnibar.ViewMode.Browser("cnn.com")
     private val customTabViewMode = Omnibar.ViewMode.CustomTab(0, "cnn.com", "cnn.com")
     private val mockAddressBarTrackersAnimationManager: AddressBarTrackersAnimationManager = mock()
-    private val customTabShieldDrawableFactory: CustomTabShieldDrawableFactory = mock()
+    private val customTabShieldDrawableFactory = CustomTabShieldDrawableFactory()
     private val omnibarRepository: OmnibarRepository = mock<OmnibarRepository>().apply {
         whenever(isNewCustomTabEnabled).thenReturn(false)
     }
