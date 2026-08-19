@@ -183,7 +183,11 @@ class AuthTokenRefreshWideEventImpl @Inject constructor(
                 metadata = mapOf(KEY_PLAY_LOGIN_ERROR to loginError),
             )
             wideEventClient.intervalEnd(wideEventId = wideEventId, key = INTERVAL_TOTAL_DURATION)
-            wideEventClient.flowFinish(wideEventId = wideEventId, status = FlowStatus.Failure(reason = refreshException.toErrorString()))
+            wideEventClient.flowFinish(
+                wideEventId = wideEventId,
+                status = FlowStatus.Failure(reason = refreshException.toErrorString()),
+                metadata = mapOf(KEY_SIGNED_OUT to signedOut.toString()),
+            )
             ongoingTokenRefreshWideEventId = null
         }
     }
@@ -244,6 +248,7 @@ class AuthTokenRefreshWideEventImpl @Inject constructor(
         const val KEY_SUBSCRIPTION_STATUS = "subscription_status"
         const val KEY_BACKEND_ERROR_RESPONSE = "backend_error_response"
         const val KEY_PLAY_LOGIN_ERROR = "play_login_error"
+        const val KEY_SIGNED_OUT = "signed_out"
         const val KEY_NETP_IS_ENABLED = "netp_is_enabled"
         const val KEY_NETP_IS_RUNNING = "netp_is_running"
         const val KEY_PROCESS_NAME = "process_name"
