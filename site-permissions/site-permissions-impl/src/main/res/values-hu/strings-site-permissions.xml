@@ -57,6 +57,10 @@
     <string name="systemPermissionDialogCameraAndAudioDeniedContent">A webhelyek csak akkor használhatják a kamerát és a mikrofont, ha engedélyezed, hogy a DuckDuckGo hozzáférést kérjen.</string>
     <string name="systemPermissionsDeniedDialogPositiveButton">Beállítások megnyitása</string>
     <string name="systemPermissionsDeniedDialogNegativeButton">Mégsem</string>
+    <string name="duckAiMicPermissionDeniedSnackBarMessage">A beszédhangfunkciókhoz mikrofonengedély szükséges</string>
+    <string name="duckAiMicPermissionDeniedDialogTitle">A DuckDuckGónak hozzá kell férnie a mikrofonhoz</string>
+    <string name="duckAiMicPermissionDeniedDialogContent">Mikrofonengedélyre van szükség, ha a Duck.ai-ban szeretnél hangcsevegést használni</string>
+    <string name="duckAiMicPermissionDeniedDialogPositiveButton">Engedélyek módosítása</string>
 
     <string name="sitePermissionsSettingsDescription">A meglátogatott webhelyek hozzáférést kérhetnek az eszköz helyéhez, kamerájához, mikrofonjához vagy a digitális jogosultságokat kezelő (DRM) szoftveréhez. Ezekhez nem férhetnek hozzá, hacsak nem adsz rá kifejezett engedélyt.</string>
     <string name="sitePermissionsSettingsEnablePermissionTitle">Minden webhely kérheti a következőket:</string>
