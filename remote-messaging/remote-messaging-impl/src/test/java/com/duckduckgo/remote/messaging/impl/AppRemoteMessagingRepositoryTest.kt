@@ -36,6 +36,7 @@ import com.duckduckgo.remote.messaging.api.MessageTrigger
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.Surface
 import com.duckduckgo.remote.messaging.fixtures.getMessageMapper
+import com.duckduckgo.remote.messaging.impl.pixels.RemoteMessagingPixels
 import com.duckduckgo.remote.messaging.impl.store.RemoteMessageImageStore
 import com.duckduckgo.remote.messaging.store.RemoteMessageEntity
 import com.duckduckgo.remote.messaging.store.RemoteMessageEntity.Status
@@ -51,7 +52,10 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.argThat
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.util.concurrent.TimeUnit
@@ -74,6 +78,7 @@ class AppRemoteMessagingRepositoryTest {
     private val remoteMessagingConfigRepository: RemoteMessagingConfigRepository = mock()
     private val remoteMessageImageStore: RemoteMessageImageStore = mock()
     private val currentTimeProvider: CurrentTimeProvider = mock()
+    private val remoteMessagingPixels: RemoteMessagingPixels = mock()
 
     private val testee = AppRemoteMessagingRepository(
         remoteMessagingConfigRepository,
@@ -81,6 +86,7 @@ class AppRemoteMessagingRepositoryTest {
         getMessageMapper(),
         remoteMessageImageStore,
         currentTimeProvider,
+        remoteMessagingPixels,
     )
 
     @After
@@ -731,7 +737,66 @@ class AppRemoteMessagingRepositoryTest {
             getMessageMapper(),
             remoteMessageImageStore,
             currentTimeProvider,
+            remoteMessagingPixels,
         )
+    }
+
+    @Test
+    fun whenImpressionCapReachedThenAutoDismissedPixelFired() = runTest {
+        whenever(currentTimeProvider.currentTimeMillis()).thenReturn(1000L)
+        testee.activeMessage(aRemoteMessageWithDisplayConditions("id", displayConditions(maxImpressions = 1)))
+        testee.markAsShown(aRemoteMessage("id"))
+
+        assertNull(testee.message())
+
+        verify(remoteMessagingPixels).fireRemoteMessageAutoDismissedPixel(argThat { id == "id" })
+    }
+
+    @Test
+    fun whenExpiryReachedThenAutoDismissedPixelFired() = runTest {
+        whenever(currentTimeProvider.currentTimeMillis()).thenReturn(0L, TimeUnit.DAYS.toMillis(5))
+        testee.activeMessage(
+            aRemoteMessageWithDisplayConditions("id", DisplayConditions(trigger = null, dismissAfterDaysShown = 5, maxImpressions = null)),
+        )
+        testee.markAsShown(aRemoteMessage("id"))
+
+        assertNull(testee.message())
+
+        verify(remoteMessagingPixels).fireRemoteMessageAutoDismissedPixel(argThat { id == "id" })
+    }
+
+    @Test
+    fun whenBothExpiredAndCappedThenAutoDismissedPixelFiredOnce() = runTest {
+        whenever(currentTimeProvider.currentTimeMillis()).thenReturn(0L, TimeUnit.DAYS.toMillis(5))
+        testee.activeMessage(
+            aRemoteMessageWithDisplayConditions("id", DisplayConditions(trigger = null, dismissAfterDaysShown = 5, maxImpressions = 1)),
+        )
+        testee.markAsShown(aRemoteMessage("id"))
+
+        assertNull(testee.message())
+
+        verify(remoteMessagingPixels).fireRemoteMessageAutoDismissedPixel(argThat { id == "id" })
+    }
+
+    @Test
+    fun whenMessageStillWithinItsConditionsThenAutoDismissedPixelNotFired() = runTest {
+        whenever(currentTimeProvider.currentTimeMillis()).thenReturn(1000L)
+        testee.activeMessage(aRemoteMessageWithDisplayConditions("id", displayConditions(maxImpressions = 3)))
+        testee.markAsShown(aRemoteMessage("id"))
+
+        assertEquals("id", testee.message()?.id)
+
+        verify(remoteMessagingPixels, never()).fireRemoteMessageAutoDismissedPixel(any())
+    }
+
+    @Test
+    fun whenUserDismissesMessageThenAutoDismissedPixelNotFired() = runTest {
+        whenever(currentTimeProvider.currentTimeMillis()).thenReturn(1000L)
+        testee.activeMessage(aRemoteMessage("id"))
+
+        testee.dismissMessage("id")
+
+        verify(remoteMessagingPixels, never()).fireRemoteMessageAutoDismissedPixel(any())
     }
 
     @Test
