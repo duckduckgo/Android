@@ -193,8 +193,10 @@ private fun List<String>?.toSurfaceList(): List<Surface> {
     } ?: listOf(Surface.NEW_TAB_PAGE)
 }
 
-// Returns null when a trigger string is present but unrecognized, so the caller can drop the
-// message (forward-compat). A null trigger is valid and means "no trigger" (unrestricted).
+// An unrecognized trigger is the only condition that drops the message, because it means the
+// message targets a context this client version doesn't understand. Every other condition fails
+// open: only one message is scheduled at a time, so a bad value must not hold that slot with
+// something permanently invisible.
 private fun JsonDisplayConditions.toDisplayConditionsOrNull(): DisplayConditions? {
     val resolvedTrigger = if (trigger == null) {
         null
@@ -204,6 +206,7 @@ private fun JsonDisplayConditions.toDisplayConditionsOrNull(): DisplayConditions
     return DisplayConditions(
         trigger = resolvedTrigger,
         dismissAfterDaysShown = dismissAfterDaysShown,
+        maxImpressions = maxImpressions?.takeIf { it > 0 },
     )
 }
 
