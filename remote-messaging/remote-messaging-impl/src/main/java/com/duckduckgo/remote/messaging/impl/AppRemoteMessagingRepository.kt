@@ -20,6 +20,7 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.Surface
 import com.duckduckgo.remote.messaging.impl.mappers.MessageMapper
+import com.duckduckgo.remote.messaging.impl.pixels.RemoteMessagingPixels
 import com.duckduckgo.remote.messaging.impl.store.RemoteMessageImageStore
 import com.duckduckgo.remote.messaging.store.RemoteMessageEntity
 import com.duckduckgo.remote.messaging.store.RemoteMessageEntity.Status
@@ -54,6 +55,7 @@ class AppRemoteMessagingRepository(
     private val messageMapper: MessageMapper,
     private val remoteMessageImageStore: RemoteMessageImageStore,
     private val currentTimeProvider: CurrentTimeProvider,
+    private val remoteMessagingPixels: RemoteMessagingPixels,
 ) : RemoteMessagingRepository {
 
     override fun getMessageById(id: String): RemoteMessage? {
@@ -91,7 +93,7 @@ class AppRemoteMessagingRepository(
 
         val remoteMessage = messageMapper.fromMessage(messageEntity.message) ?: return null
         if (remoteMessage.shouldBeDismissed(messageEntity)) {
-            dismissMessageSilently(messageEntity.id)
+            dismissMessageSilently(remoteMessage)
             return null
         }
         return remoteMessage
@@ -105,7 +107,7 @@ class AppRemoteMessagingRepository(
 
                 val remoteMessage = messageMapper.fromMessage(messageEntity.message) ?: return@map null
                 if (remoteMessage.shouldBeDismissed(messageEntity)) {
-                    dismissMessageSilently(messageEntity.id)
+                    dismissMessageSilently(remoteMessage)
                     return@map null
                 }
                 RemoteMessage(
@@ -134,10 +136,10 @@ class AppRemoteMessagingRepository(
         return impressions >= cap
     }
 
-    private fun dismissMessageSilently(id: String) {
-        // TODO add pixel for dismiss silently
-        remoteMessagesDao.updateState(id, Status.DISMISSED)
+    private fun dismissMessageSilently(remoteMessage: RemoteMessage) {
+        remoteMessagesDao.updateState(remoteMessage.id, Status.DISMISSED)
         remoteMessagingConfigRepository.invalidate()
+        remoteMessagingPixels.fireRemoteMessageAutoDismissedPixel(remoteMessage)
     }
 
     override suspend fun dismissMessage(id: String) {
