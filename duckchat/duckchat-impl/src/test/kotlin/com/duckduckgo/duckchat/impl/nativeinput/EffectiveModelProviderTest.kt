@@ -108,7 +108,7 @@ class EffectiveModelProviderTest {
         whenever(duckAiChatStore.getChatById("chat-1")).thenReturn(chat("chat-1", "chat-model"))
         publish(NativeInputState.zero().copy(chatId = "chat-1", modelChangeMode = true))
 
-        testee.onRecoveryModelPicked("recovery-model")
+        testee.onRecoveryModelPicked(chatId = "chat-1", modelId = "recovery-model")
         advanceUntilIdle()
 
         assertEquals("recovery-model", testee.effectiveModelId.first())
@@ -118,7 +118,7 @@ class EffectiveModelProviderTest {
     fun whenModelChangeModeEndsThenRecoveryModelIsIgnored() = runTest {
         whenever(duckAiChatStore.getChatById("chat-1")).thenReturn(chat("chat-1", "chat-model"))
         publish(NativeInputState.zero().copy(chatId = "chat-1", modelChangeMode = true))
-        testee.onRecoveryModelPicked("recovery-model")
+        testee.onRecoveryModelPicked(chatId = "chat-1", modelId = "recovery-model")
         advanceUntilIdle()
 
         publish(NativeInputState.zero().copy(chatId = "chat-1", modelChangeMode = false))
@@ -130,13 +130,43 @@ class EffectiveModelProviderTest {
     fun whenANewModelChangeWindowOpensThenThePreviousRecoveryPickIsNotReused() = runTest {
         whenever(duckAiChatStore.getChatById("chat-1")).thenReturn(chat("chat-1", "chat-model"))
         publish(NativeInputState.zero().copy(chatId = "chat-1", modelChangeMode = true))
-        testee.onRecoveryModelPicked("recovery-model")
+        testee.onRecoveryModelPicked(chatId = "chat-1", modelId = "recovery-model")
         advanceUntilIdle()
         publish(NativeInputState.zero().copy(chatId = "chat-1", modelChangeMode = false))
-        testee.clearRecoveryModelPick()
+        testee.clearRecoveryModelPick(chatId = "chat-1")
         advanceUntilIdle()
 
         publish(NativeInputState.zero().copy(chatId = "chat-1", modelChangeMode = true))
+
+        assertEquals("chat-model", testee.effectiveModelId.first())
+    }
+
+    @Test
+    fun whenAnotherTabWithoutAnOpenWindowIsSelectedThenThePickSurvives() = runTest {
+        whenever(duckAiChatStore.getChatById("chat-1")).thenReturn(chat("chat-1", "chat-model"))
+        whenever(duckAiChatStore.getChatById("chat-2")).thenReturn(chat("chat-2", "global-model"))
+        publish(NativeInputState.zero().copy(chatId = "chat-1", modelChangeMode = true))
+        testee.onRecoveryModelPicked(chatId = "chat-1", modelId = "recovery-model")
+        advanceUntilIdle()
+
+        // The other tab's window is closed, so its clear must not touch chat-1's pick.
+        publish(NativeInputState.zero().copy(chatId = "chat-2", modelChangeMode = false))
+        testee.clearRecoveryModelPick(chatId = "chat-2")
+        advanceUntilIdle()
+        publish(NativeInputState.zero().copy(chatId = "chat-1", modelChangeMode = true))
+
+        assertEquals("recovery-model", testee.effectiveModelId.first())
+    }
+
+    @Test
+    fun whenTheWindowBelongsToAnotherChatThenThePickIsNotApplied() = runTest {
+        whenever(duckAiChatStore.getChatById("chat-1")).thenReturn(chat("chat-1", "chat-model"))
+        whenever(duckAiChatStore.getChatById("chat-2")).thenReturn(chat("chat-2", "chat-model"))
+        publish(NativeInputState.zero().copy(chatId = "chat-1", modelChangeMode = true))
+        testee.onRecoveryModelPicked(chatId = "chat-1", modelId = "recovery-model")
+        advanceUntilIdle()
+
+        publish(NativeInputState.zero().copy(chatId = "chat-2", modelChangeMode = true))
 
         assertEquals("chat-model", testee.effectiveModelId.first())
     }
