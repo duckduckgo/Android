@@ -1766,6 +1766,14 @@ class SingleTabFireDialogViewModelTest {
 
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
+        // The flow must be started even with no tab, so the failure closes this attempt's own flow
+        verify(mockDataClearingWideEvent).start(
+            entryPoint = eq(DataClearingWideEvent.EntryPoint.SINGLE_TAB_BURN),
+            clearOptions = any(),
+            browserMode = eq(BrowserMode.REGULAR),
+            tabType = anyOrNull(),
+            tabCount = anyOrNull(),
+        )
         verify(mockDataClearingWideEvent).finishFailure("tab_not_found")
     }
 
