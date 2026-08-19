@@ -598,7 +598,7 @@ class DuckChatContextualWebViewFragment :
                         binding.contextualNativeInputWidget.focusInput(activity)
                     }
                 }
-            }.launchIn(lifecycleScope)
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
 
         sharedContextualViewModel.commands
             .onEach { command ->
@@ -618,12 +618,12 @@ class DuckChatContextualWebViewFragment :
 
                     else -> {}
                 }
-            }.launchIn(lifecycleScope)
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
 
         viewModel.viewState
             .onEach { viewState ->
                 renderViewState(viewState)
-            }.launchIn(lifecycleScope)
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
 
         observeSubscriptionEventDataChannel()
     }
@@ -657,10 +657,10 @@ class DuckChatContextualWebViewFragment :
     private fun showContextualEntryDialogForNewChat(tabId: String) {
         val fragmentManager = parentFragment?.childFragmentManager ?: return
         if (fragmentManager.isStateSaved) return
+        // The dialog asks the host to re-show the sheet container (hidden when New Chat opened it) itself;
+        // the reopened sheet then consumes the parked prompt in onSheetReopened.
         DuckChatContextualEntryDialog
-            // Route the hand-off through the host so it re-shows the sheet container (hidden when New Chat
-            // opened this dialog); the reopened sheet then consumes the parked prompt in onSheetReopened.
-            .newInstance(tabId) { sharedContextualViewModel.requestShowSheet(tabId) }
+            .newInstance(tabId)
             .show(fragmentManager, DuckChatContextualEntryDialog.TAG)
     }
 
@@ -714,7 +714,7 @@ class DuckChatContextualWebViewFragment :
     private fun observeSubscriptionEventDataChannel() {
         viewModel.subscriptionEventDataFlow.onEach { subscriptionEventData ->
             contentScopeScripts.sendSubscriptionEvent(subscriptionEventData)
-        }.launchIn(lifecycleScope)
+        }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
     private fun launchCameraCapture(callback: ValueCallback<Array<Uri>>) {

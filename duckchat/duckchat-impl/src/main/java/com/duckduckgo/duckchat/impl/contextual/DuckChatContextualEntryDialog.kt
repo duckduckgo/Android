@@ -18,6 +18,7 @@ package com.duckduckgo.duckchat.impl.contextual
 
 import android.app.Activity
 import android.app.Dialog
+import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -58,7 +59,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 import javax.inject.Named
-import com.duckduckgo.mobile.android.R as CommonR
 import com.google.android.material.R as MaterialR
 
 /**
@@ -66,8 +66,9 @@ import com.google.android.material.R as MaterialR
  *
  * Presented as a scrimmed dialog (same scrim as the fire dialog) with a transparent background so
  * only the suggested prompts and the native input float over the page. It owns the INPUT stage: when
- * the user submits a prompt or picks a suggestion, it hands control back to the host via
- * [onAskAboutPage], which embeds and shows the contextual sheet.
+ * the user submits a prompt or picks a suggestion, it parks the prompt and asks the host to show the
+ * contextual sheet (via the shared view model), which consumes the prompt. The hand-off is derived
+ * from the retained tab id, so it survives configuration changes.
  */
 @InjectWith(FragmentScope::class)
 class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
@@ -97,7 +98,10 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
 
     private val sharedContextualViewModel: DuckChatContextualSharedViewModel by viewModels({ requireParentFragment() })
     private lateinit var tabId: String
-    private var onAskAboutPage: (() -> Unit)? = null
+
+    // Set once when the dialog hands off to the sheet, so onDismiss knows the sheet now owns the
+    // contextual input state and must not revert it. Read once on dismiss; the dialog is single-use.
+    private var handedOffToSheet = false
 
     // No running chat in the entry stage; the widget's chat-id-driven affordances stay collapsed.
     private val chatIdFlow = MutableStateFlow<String?>(null)
@@ -143,10 +147,6 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        if (onAskAboutPage == null) {
-            dismiss()
-            return
-        }
         tabId = requireNotNull(requireArguments().getString(ARG_TAB_ID)) {
             "DuckChatContextualEntryDialog requires $ARG_TAB_ID argument"
         }
@@ -184,7 +184,8 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
     private fun handleCommand(command: DuckChatContextualEntryViewModel.Command) {
         when (command) {
             DuckChatContextualEntryViewModel.Command.HandOffToSheet -> {
-                onAskAboutPage?.invoke()
+                handedOffToSheet = true
+                sharedContextualViewModel.requestShowSheet(tabId)
                 dismiss()
             }
         }
@@ -253,9 +254,6 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
     }
 
     private fun configureSuggestions() {
-        // On the transparent dialog the chips sit over the dimmed page, so give them a solid surface
-        // background (rather than the sheet's default) for legibility.
-        binding.entrySuggestionsView.chipBackgroundRes = CommonR.drawable.background_large_rounded_surface
         binding.entrySuggestionsView.onSuggestionSelected = { suggestion ->
             viewModel.onSuggestionSubmitted(NativeInputPrompt(suggestion.prompt, null, null, null, null, null))
         }
@@ -353,6 +351,13 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
         uploadTask?.onReceiveValue(fileChooserIntentBuilder.extractSelectedFileUris(data))
     }
 
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+        if (!handedOffToSheet && ::tabId.isInitialized && activity?.isChangingConfigurations != true) {
+            contextualNativeInputManager.onContextualClosed(tabId)
+        }
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
@@ -363,13 +368,9 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
         private const val ARG_TAB_ID = "tabId"
         private const val REQUEST_CODE_CHOOSE_FILE = 100
 
-        fun newInstance(
-            tabId: String,
-            onAskAboutPage: () -> Unit,
-        ): DuckChatContextualEntryDialog =
+        fun newInstance(tabId: String): DuckChatContextualEntryDialog =
             DuckChatContextualEntryDialog().apply {
                 arguments = bundleOf(ARG_TAB_ID to tabId)
-                this.onAskAboutPage = onAskAboutPage
             }
     }
 }

@@ -117,7 +117,7 @@ class RealDuckChatContextual @Inject constructor(
             onAskAboutPage()
             return
         }
-        DuckChatContextualEntryDialog.newInstance(sourceTabId, onAskAboutPage)
+        DuckChatContextualEntryDialog.newInstance(sourceTabId)
             .show(fragmentManager, DuckChatContextualEntryDialog.TAG)
     }
 

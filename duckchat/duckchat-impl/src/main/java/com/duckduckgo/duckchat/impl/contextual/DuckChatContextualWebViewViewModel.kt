@@ -286,6 +286,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
         pendingEntryPrompt = entry.prompt
         val chatUrl = duckChat.getDuckChatUrl("", false, sidebar = true)
         withContext(dispatchers.main()) {
+            setSheetUrl(chatUrl)
             entry.serializedPageContext?.let { attachProvidedPageContext(it) }
             _viewState.update {
                 it.copy(showFullscreen = hasChatId(chatUrl), tabId = tabId)
