@@ -84,6 +84,7 @@ import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.inputScreenPixelsModeParam
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
+import com.duckduckgo.duckchat.impl.ui.AttachmentViewModel
 import com.duckduckgo.duckchat.impl.ui.NativeInputModeWidgetViewModel
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.PageContextAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.EditPromptScreenParams
@@ -374,16 +375,15 @@ class NativeInputModeWidget @JvmOverloads constructor(
     override var isModelMenuVisible: Boolean = false
         private set
 
-    private var pendingCameraCaptureCallback: ((ValueCallback<Array<Uri>>) -> Unit)? = null
-    private var pendingFilePickerCallback: ((ValueCallback<Array<Uri>>, List<String>) -> Unit)? = null
-    private var pendingIsContextual: Boolean = false
-    private var pendingAskAboutPage: (() -> Unit)? = null
-    private var pendingOnPageContextRemoved: (() -> Unit)? = null
+    private var cameraCaptureCallback: ((ValueCallback<Array<Uri>>) -> Unit)? = null
+    private var filePickerCallback: ((ValueCallback<Array<Uri>>, List<String>) -> Unit)? = null
+    private var askAboutPageAction: (() -> Unit)? = null
+    private var pageContextRemovedAction: (() -> Unit)? = null
     private var pendingPageContext: PageContextAttachment? = null
 
     // adoptEditAttachments() can be called (from EditPromptActivity.onCreate) before the widget is
-    // attached and the AttachmentView plugin exists, so the values are held here and applied once
-    // wirePluginView() runs.
+    // attached, when the attachment ViewModel cannot be resolved yet, so the values are held here and
+    // applied by applyPendingAttachmentState().
     private var pendingAdoptedImages: List<SubmittedImage> = emptyList()
     private var pendingAdoptedFiles: List<SubmittedFile> = emptyList()
 
@@ -403,7 +403,13 @@ class NativeInputModeWidget @JvmOverloads constructor(
     // it they'd flip from 4dp→8dp after focusInput and look like a second step.
     private var previewEnterFocus = false
 
-    private var attachmentView: AttachmentView? = null
+    // The attachment plugin's ViewModel, shared through this widget's ViewModelStoreOwner. Submission
+    // needs the staged attachments, and reading them from the ViewModel keeps the widget out of the
+    // plugin's view.
+    private val attachmentViewModel: AttachmentViewModel?
+        get() = findViewTreeViewModelStoreOwner()?.let { owner ->
+            ViewModelProvider(owner, viewModelFactory)[AttachmentViewModel::class.java]
+        }
 
     val inputField: EditText
     private val inputFieldClearText: View
@@ -681,6 +687,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
             duckChatInternal.setInputQuery(currentInputQuery())
         }
         setupPlugins()
+        applyPendingAttachmentState()
         observeModelPickerEnabledSource()
         observeChatIdSource()
         observeInteractionLockSource()
@@ -744,7 +751,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
                             // before plugins were created.
                             pluginView.setPickerEnabled(viewModel.modelPickerEnabled.value)
                         }
-                        wirePluginView(pluginView, scope)
                     }
                 }
             }
@@ -760,44 +766,12 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
     }
 
-    // This function will be removed with the new plugin architecture
-    private fun wirePluginView(pluginView: View, scope: CoroutineScope) {
-        if (pluginView is AttachmentView) {
-            attachmentView = pluginView
-            pluginView.onCameraCaptureRequested = pendingCameraCaptureCallback
-            pluginView.onFilePickerRequested = pendingFilePickerCallback
-            pluginView.isContextual = pendingIsContextual
-            pluginView.isEditMode = isEditWidget
-            pluginView.onAskAboutPage = pendingAskAboutPage
-            pluginView.onPageContextRemoved = pendingOnPageContextRemoved
-            pluginView.bind(scope, viewModelFactory, nativeInputStateProvider, faviconManager)
-            pendingPageContext?.let { pluginView.setPageContext(it) }
-            if (hasPendingAdoptedAttachments(pendingAdoptedImages, pendingAdoptedFiles)) {
-                pluginView.adoptAttachments(pendingAdoptedImages, pendingAdoptedFiles)
-            }
-        }
-        if (pluginView is OptionsView) {
-            pluginView.isEditMode = isEditWidget
-        }
-        if (pluginView is ModelPickerView) {
-            pluginView.isEditMode = isEditWidget
-        }
-        if (pluginView is ReasoningModePickerView) {
-            pluginView.isEditMode = isEditWidget
-        }
-        if (pluginView is StopStreamingView) {
-            pluginView.isEditMode = isEditWidget
-        }
-    }
-
     override fun bindAttachmentCallbacks(
         onCameraCaptureRequested: (ValueCallback<Array<Uri>>) -> Unit,
         onFilePickerRequested: (ValueCallback<Array<Uri>>, List<String>) -> Unit,
     ) {
-        pendingCameraCaptureCallback = onCameraCaptureRequested
-        pendingFilePickerCallback = onFilePickerRequested
-        attachmentView?.onCameraCaptureRequested = onCameraCaptureRequested
-        attachmentView?.onFilePickerRequested = onFilePickerRequested
+        cameraCaptureCallback = onCameraCaptureRequested
+        filePickerCallback = onFilePickerRequested
     }
 
     override fun onDetachedFromWindow() {
@@ -1355,8 +1329,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     private fun fireSubmissionPixels(hasText: Boolean) {
-        val hasImageAttachment = attachmentView?.getImageAttachments()?.isNotEmpty() == true
-        val hasFileAttachment = attachmentView?.getFileAttachments()?.isNotEmpty() == true
+        val hasImageAttachment = attachmentViewModel?.getImageAttachments()?.isNotEmpty() == true
+        val hasFileAttachment = attachmentViewModel?.getFileAttachments()?.isNotEmpty() == true
         viewModel.fireSubmissionPixels(
             hasText = hasText,
             hasImageAttachment = hasImageAttachment,
@@ -1576,50 +1550,44 @@ class NativeInputModeWidget @JvmOverloads constructor(
             .launchIn(scope)
     }
 
-    override fun getImageAttachmentsJson(): JSONArray? = attachmentView?.getImageAttachmentsJson()
+    override fun getImageAttachmentsJson(): JSONArray? = attachmentViewModel?.getImageAttachmentsJson()
 
-    override fun getFileAttachmentsJson(): JSONArray? = attachmentView?.getFileAttachmentsJson()
+    override fun getFileAttachmentsJson(): JSONArray? = attachmentViewModel?.getFileAttachmentsJson()
 
     override fun setPageContext(title: String, url: String) {
         val attachment = PageContextAttachment(title = title, url = url, tabId = activeTabId)
         pendingPageContext = attachment
-        attachmentView?.setPageContext(attachment)
+        attachmentViewModel?.setPageContext(attachment)
     }
 
     override fun clearPageContext() {
         pendingPageContext = null
-        attachmentView?.clearPageContext()
+        attachmentViewModel?.removePageContext()
     }
 
-    override fun getPageContext(): PageContextAttachment? = attachmentView?.getPageContext()
+    override fun getPageContext(): PageContextAttachment? = attachmentViewModel?.getPageContext()
 
     override fun setContextualAttachmentActions(
         onAskAboutPage: () -> Unit,
         onPageContextRemoved: () -> Unit,
     ) {
-        pendingIsContextual = true
-        pendingAskAboutPage = onAskAboutPage
-        pendingOnPageContextRemoved = onPageContextRemoved
-        attachmentView?.let { view ->
-            view.isContextual = true
-            view.onAskAboutPage = onAskAboutPage
-            view.onPageContextRemoved = onPageContextRemoved
-        }
+        askAboutPageAction = onAskAboutPage
+        pageContextRemovedAction = onPageContextRemoved
     }
 
     override fun clearAttachments() {
-        attachmentView?.clearAttachments()
+        attachmentViewModel?.clearAttachments()
     }
 
     override fun storePendingPrompt(query: String) {
-        val images = attachmentView?.getImageAttachments()?.map {
+        val images = attachmentViewModel?.getImageAttachments()?.map {
             PendingNativeImage(base64Data = it.base64Data, format = it.format)
         } ?: emptyList()
-        val files = attachmentView?.getFileAttachments()?.map {
+        val files = attachmentViewModel?.getFileAttachments()?.map {
             PendingNativeFile(base64Data = it.base64Data, fileName = it.fileName, mimeType = it.mimeType)
         } ?: emptyList()
         viewModel.storePendingPrompt(query, getSelectedModelId(), getResolvedReasoningEffort(), getSelectedTool(), images, files)
-        attachmentView?.clearAttachmentsForNewChat()
+        attachmentViewModel?.clearAttachmentsForNewChat()
         viewModel.setSelectedTool(null)
     }
 
@@ -1642,7 +1610,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun configureForEdit(sessionId: String) {
         isEditWidget = true
-        attachmentView?.isEditMode = true
         doOnAttach {
             viewModel.configureForEdit(sessionId)
             selectChatTab()
@@ -1655,7 +1622,19 @@ class NativeInputModeWidget @JvmOverloads constructor(
     ) {
         pendingAdoptedImages = images
         pendingAdoptedFiles = files
-        attachmentView?.adoptAttachments(images, files)
+        attachmentViewModel?.adopt(images, files)
+    }
+
+    /**
+     * setPageContext / adoptEditAttachments can be called before this widget is attached, when the
+     * ViewModel cannot be resolved yet. Replay whatever was stashed once it can.
+     */
+    private fun applyPendingAttachmentState() {
+        val viewModel = attachmentViewModel ?: return
+        pendingPageContext?.let { viewModel.setPageContext(it) }
+        if (hasPendingAdoptedAttachments(pendingAdoptedImages, pendingAdoptedFiles)) {
+            viewModel.adopt(pendingAdoptedImages, pendingAdoptedFiles)
+        }
     }
 
     override fun isWidgetBottom(): Boolean = nativeInputState?.isBottom ?: false
@@ -2054,6 +2033,24 @@ class NativeInputModeWidget @JvmOverloads constructor(
     override fun changeModelSubmitted(modelId: String) {
         onChangeModelSubmitted?.invoke(modelId)
     }
+
+    override fun requestCameraCapture(callback: ValueCallback<Array<Uri>>) {
+        cameraCaptureCallback?.invoke(callback)
+    }
+
+    override fun requestFilePicker(callback: ValueCallback<Array<Uri>>, mimeTypes: List<String>) {
+        filePickerCallback?.invoke(callback, mimeTypes)
+    }
+
+    override fun askAboutPage() {
+        askAboutPageAction?.invoke()
+    }
+
+    override fun pageContextRemoved() {
+        pageContextRemovedAction?.invoke()
+    }
+
+    override fun isEditSurface(): Boolean = isEditWidget
 
     override fun toolSelected(tool: String?) {
         viewModel.setSelectedTool(tool)

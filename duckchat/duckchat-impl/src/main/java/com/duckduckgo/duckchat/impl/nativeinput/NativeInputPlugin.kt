@@ -17,7 +17,9 @@
 package com.duckduckgo.duckchat.impl.nativeinput
 
 import android.content.Context
+import android.net.Uri
 import android.view.View
+import android.webkit.ValueCallback
 import com.duckduckgo.anvil.annotations.ContributesActivePluginPoint
 import com.duckduckgo.common.utils.plugins.ActivePlugin
 import com.duckduckgo.di.scopes.AppScope
@@ -59,6 +61,21 @@ interface NativeInputHost {
 
     /** The user picked a model during the FE model-change recovery flow. */
     fun changeModelSubmitted(modelId: String)
+
+    /** Ask the host to run the camera capture flow; the activity owns the result plumbing. */
+    fun requestCameraCapture(callback: ValueCallback<Array<Uri>>)
+
+    /** Ask the host to run the file picker for [mimeTypes]. */
+    fun requestFilePicker(callback: ValueCallback<Array<Uri>>, mimeTypes: List<String>)
+
+    /** The user chose to ask about the current page, offered only on the contextual surface. */
+    fun askAboutPage()
+
+    /** The user removed the page-context attachment. */
+    fun pageContextRemoved()
+
+    /** True when the host is the fullscreen edit-message surface, which offers a reduced control set. */
+    fun isEditSurface(): Boolean
 }
 
 interface NativeInputPlugin : ActivePlugin {

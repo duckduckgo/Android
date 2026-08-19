@@ -36,5 +36,5 @@ class OptionsNativeInputPlugin @Inject constructor() : NativeInputPlugin {
 
     override val containerId: Int = R.id.optionsButtonContainer
 
-    override fun createView(context: Context, host: NativeInputHost): View = OptionsView(context, host)
+    override fun createView(context: Context, host: NativeInputHost): View = OptionsView(context, host).also { it.isEditMode = host.isEditSurface() }
 }

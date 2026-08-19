@@ -33,45 +33,49 @@ import android.widget.ScrollView
 import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.ViewViewModelFactory
+import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.ui.AttachmentViewModel
-import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ImageAttachment
-import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.PageContextAttachment
-import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedFile
-import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedImage
-import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachmentsContainerView
-import kotlinx.coroutines.CoroutineScope
+import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import org.json.JSONArray
+import javax.inject.Inject
 
 @SuppressLint("ViewConstructor")
+@InjectWith(ViewScope::class)
 class AttachmentView(
     context: Context,
 ) : FrameLayout(context) {
 
+    @Inject lateinit var viewModelFactory: ViewViewModelFactory
+
+    @Inject lateinit var nativeInputStateProvider: NativeInputStateProvider
+
+    @Inject lateinit var faviconManager: FaviconManager
+
     var host: NativeInputHost? = null
-    var onCameraCaptureRequested: ((ValueCallback<Array<Uri>>) -> Unit)? = null
-    var onFilePickerRequested: ((ValueCallback<Array<Uri>>, List<String>) -> Unit)? = null
-    var isContextual: Boolean = false
     var isEditMode: Boolean = false
-    var onAskAboutPage: (() -> Unit)? = null
-    var onPageContextRemoved: (() -> Unit)? = null
 
     private var viewModel: AttachmentViewModel? = null
-    private var faviconManager: FaviconManager? = null
+
+    /** The contextual sheet is the only surface that offers page context. */
+    private val isContextual: Boolean
+        get() = lastNativeInputState?.inputContext == NativeInputState.InputContext.DUCK_AI_CONTEXTUAL
     private var supportsUpload: Boolean = false
     private var nativeInputStateJob: Job? = null
     private var lastNativeInputState: NativeInputState? = null
@@ -87,16 +91,13 @@ class AttachmentView(
         setOnClickListener { showPopupMenu() }
     }
 
-    fun bind(
-        scope: CoroutineScope,
-        factory: ViewViewModelFactory,
-        nativeInputStateProvider: NativeInputStateProvider,
-        faviconManager: FaviconManager,
-    ) {
+    override fun onAttachedToWindow() {
+        AndroidSupportInjection.inject(this)
+        super.onAttachedToWindow()
         val owner = findViewTreeViewModelStoreOwner() ?: return
-        val vm = ViewModelProvider(owner, factory)[AttachmentViewModel::class.java]
+        val scope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
+        val vm = ViewModelProvider(owner, viewModelFactory)[AttachmentViewModel::class.java]
         viewModel = vm
-        this.faviconManager = faviconManager
         val container = rootView?.findViewById<FrameLayout>(R.id.attachmentsContainer) ?: return
         setupContainerViews(container, vm)
         scope.launch {
@@ -120,29 +121,6 @@ class AttachmentView(
         isVisible = show
         (parent as? View)?.isVisible = show
     }
-
-    fun getImageAttachments(): List<ImageAttachment> = viewModel?.getImageAttachments() ?: emptyList()
-
-    fun getFileAttachments(): List<FileAttachment> = viewModel?.getFileAttachments() ?: emptyList()
-
-    fun getImageAttachmentsJson(): JSONArray? = viewModel?.getImageAttachmentsJson()
-
-    fun getFileAttachmentsJson(): JSONArray? = viewModel?.getFileAttachmentsJson()
-
-    fun clearAttachments() = viewModel?.clearAttachments()
-
-    fun adoptAttachments(
-        images: List<SubmittedImage>,
-        files: List<SubmittedFile>,
-    ) = viewModel?.adopt(images, files)
-
-    fun clearAttachmentsForNewChat() = viewModel?.clearAttachmentsForNewChat()
-
-    fun setPageContext(attachment: PageContextAttachment) = viewModel?.setPageContext(attachment)
-
-    fun clearPageContext() = viewModel?.removePageContext()
-
-    fun getPageContext(): PageContextAttachment? = viewModel?.getPageContext()
 
     private fun buildAttachButton(): ImageView {
         val iconSize = context.resources.getDimensionPixelSize(R.dimen.nativeInputButtonSize)
@@ -266,11 +244,11 @@ class AttachmentView(
         } else if (view.current() != next) {
             view.show(next) {
                 viewModel?.removePageContext()
-                onPageContextRemoved?.invoke()
+                host?.pageContextRemoved()
             }
             view.faviconView()?.let { faviconView ->
                 viewModel?.viewModelScope?.launch {
-                    faviconManager?.loadToViewFromLocalWithRetry(tabId = next.tabId, url = next.url, view = faviconView)
+                    faviconManager.loadToViewFromLocalWithRetry(tabId = next.tabId, url = next.url, view = faviconView)
                 }
             }
         }
@@ -339,7 +317,7 @@ class AttachmentView(
             ) {
                 popup.dismiss()
                 host?.showAttachmentChooser(true)
-                onCameraCaptureRequested?.invoke(buildImagePickerCallback(AttachmentViewModel.ImageSource.CAMERA))
+                host?.requestCameraCapture(buildImagePickerCallback(AttachmentViewModel.ImageSource.CAMERA))
             }
 
             addMenuItem(
@@ -349,7 +327,7 @@ class AttachmentView(
             ) {
                 popup.dismiss()
                 host?.showAttachmentChooser(true)
-                onFilePickerRequested?.invoke(buildImagePickerCallback(AttachmentViewModel.ImageSource.PHOTO_LIBRARY), listOf("image/*"))
+                host?.requestFilePicker(buildImagePickerCallback(AttachmentViewModel.ImageSource.PHOTO_LIBRARY), listOf("image/*"))
             }
         }
 
@@ -361,7 +339,7 @@ class AttachmentView(
             ) {
                 popup.dismiss()
                 host?.showAttachmentChooser(true)
-                onFilePickerRequested?.invoke(buildFilePickerCallback(), supportedFileTypes)
+                host?.requestFilePicker(buildFilePickerCallback(), supportedFileTypes)
             }
         }
 
@@ -372,7 +350,7 @@ class AttachmentView(
                 titleRes = R.string.duckChatContextualAskAboutPage,
             ) {
                 popup.dismiss()
-                onAskAboutPage?.invoke()
+                host?.askAboutPage()
             }
         }
 

@@ -38,5 +38,6 @@ class StopStreamingNativeInputPlugin @Inject constructor() : NativeInputPlugin {
 
     override fun createView(context: Context, host: NativeInputHost): View = StopStreamingView(context).apply {
         onStopClicked = { host.stop() }
+        isEditMode = host.isEditSurface()
     }
 }
