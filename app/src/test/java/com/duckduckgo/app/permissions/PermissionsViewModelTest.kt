@@ -104,6 +104,7 @@ class PermissionsViewModelTest {
     @Test
     fun whenAppLinksSetToAskEverytimeThenDataStoreIsUpdatedAndPixelIsSent() {
         whenever(mockAppSettingsDataStore.appLinksEnabled).thenReturn(false)
+        whenever(mockAppSettingsDataStore.showAppLinksPrompt).thenReturn(false)
         testee.start()
 
         testee.onAppLinksSettingChanged(AppLinkSettingType.ASK_EVERYTIME)
@@ -117,6 +118,7 @@ class PermissionsViewModelTest {
     @Test
     fun whenAppLinksSetToAlwaysThenDataStoreIsUpdatedAndPixelIsSent() {
         whenever(mockAppSettingsDataStore.appLinksEnabled).thenReturn(false)
+        whenever(mockAppSettingsDataStore.showAppLinksPrompt).thenReturn(false)
         testee.start()
 
         testee.onAppLinksSettingChanged(AppLinkSettingType.ALWAYS)
@@ -130,6 +132,7 @@ class PermissionsViewModelTest {
     @Test
     fun whenAppLinksSetToNeverThenDataStoreIsUpdatedAndPixelIsSent() {
         whenever(mockAppSettingsDataStore.appLinksEnabled).thenReturn(true)
+        whenever(mockAppSettingsDataStore.showAppLinksPrompt).thenReturn(false)
         testee.start()
 
         testee.onAppLinksSettingChanged(AppLinkSettingType.NEVER)
