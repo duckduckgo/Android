@@ -16,7 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.nativeinput
 
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
@@ -47,8 +47,10 @@ interface EffectiveModelProvider {
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class)
+// ActivityScope, not AppScope: the unqualified DuckAiChatStore is bound per activity so it can resolve
+// the browser mode. One instance per activity is what the plugins sharing a widget need anyway.
+@SingleInstanceIn(ActivityScope::class)
+@ContributesBinding(ActivityScope::class)
 class RealEffectiveModelProvider @Inject constructor(
     private val modelManager: DuckAiModelManager,
     private val nativeInputStateProvider: NativeInputStateProvider,

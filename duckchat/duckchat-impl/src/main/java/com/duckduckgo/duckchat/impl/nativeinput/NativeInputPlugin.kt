@@ -47,6 +47,18 @@ interface NativeInputHost {
      */
     fun toolSelected(tool: String?)
     fun customizeResponsesClicked()
+
+    /** The model menu opened. The host suppresses input teardown while it is up. */
+    fun modelMenuShown()
+
+    /**
+     * The model menu closed. [hasPendingRecoverySelection] is false when the user dismissed it without
+     * picking, which ends the FE model-change window.
+     */
+    fun modelMenuDismissed(hasPendingRecoverySelection: Boolean)
+
+    /** The user picked a model during the FE model-change recovery flow. */
+    fun changeModelSubmitted(modelId: String)
 }
 
 interface NativeInputPlugin : ActivePlugin {
