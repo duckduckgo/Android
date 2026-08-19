@@ -108,7 +108,7 @@ class EffectiveModelProviderTest {
         whenever(duckAiChatStore.getChatById("chat-1")).thenReturn(chat("chat-1", "chat-model"))
         publish(NativeInputState.zero().copy(chatId = "chat-1", modelChangeMode = true))
 
-        testee.onRecoveryModelPicked(chatId = "chat-1", modelId = "recovery-model")
+        testee.onRecoveryModelPicked("recovery-model")
         advanceUntilIdle()
 
         assertEquals("recovery-model", testee.effectiveModelId.first())
@@ -118,7 +118,7 @@ class EffectiveModelProviderTest {
     fun whenModelChangeModeEndsThenRecoveryModelIsIgnored() = runTest {
         whenever(duckAiChatStore.getChatById("chat-1")).thenReturn(chat("chat-1", "chat-model"))
         publish(NativeInputState.zero().copy(chatId = "chat-1", modelChangeMode = true))
-        testee.onRecoveryModelPicked(chatId = "chat-1", modelId = "recovery-model")
+        testee.onRecoveryModelPicked("recovery-model")
         advanceUntilIdle()
 
         publish(NativeInputState.zero().copy(chatId = "chat-1", modelChangeMode = false))
