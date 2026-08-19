@@ -58,6 +58,12 @@
                 "type": "string",
                 "description": "Whether Duck.ai contextual mode is enabled for this user",
                 "enum": ["0", "1"]
+            },
+            {
+                "key": "app_links",
+                "type": "string",
+                "description": "How the user has configured opening links in native apps",
+                "enum": ["ask_everytime", "always", "never"]
             }
         ]
     }

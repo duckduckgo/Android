@@ -27,6 +27,7 @@ import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -77,7 +78,7 @@ class PermissionsViewModel @Inject constructor(
         viewModelScope.launch {
             viewState.emit(
                 currentViewState().copy(
-                    appLinksSettingType = getAppLinksSettingsState(settingsDataStore.appLinksEnabled, settingsDataStore.showAppLinksPrompt),
+                    appLinksSettingType = AppLinkSettingType.getForState(settingsDataStore.appLinksEnabled, settingsDataStore.showAppLinksPrompt),
                     notificationsSettingSubtitleId = getNotificationsSettingSubtitleId(notificationsEnabled),
                 ),
             )
@@ -105,47 +106,34 @@ class PermissionsViewModel @Inject constructor(
     fun userRequestedToChangeAppLinkSetting() {
         viewModelScope.launch { command.send(Command.LaunchAppLinkSettings(viewState.value.appLinksSettingType)) }
         pixel.fire(AppPixelName.SETTINGS_APP_LINKS_PRESSED)
+        pixel.fire(AppPixelName.SETTINGS_APP_LINKS_PRESSED_DAILY, type = Daily())
     }
 
     fun onAppLinksSettingChanged(appLinkSettingType: AppLinkSettingType) {
         logcat(INFO) { "User changed app links setting, is now: ${appLinkSettingType.name}" }
 
-        val pixelName =
+        val (pixelName, dailyPixelName) =
             when (appLinkSettingType) {
                 AppLinkSettingType.ASK_EVERYTIME -> {
                     settingsDataStore.appLinksEnabled = true
                     settingsDataStore.showAppLinksPrompt = true
-                    AppPixelName.SETTINGS_APP_LINKS_ASK_EVERY_TIME_SELECTED
+                    AppPixelName.SETTINGS_APP_LINKS_ASK_EVERY_TIME_SELECTED to AppPixelName.SETTINGS_APP_LINKS_ASK_EVERY_TIME_SELECTED_DAILY
                 }
                 AppLinkSettingType.ALWAYS -> {
                     settingsDataStore.appLinksEnabled = true
                     settingsDataStore.showAppLinksPrompt = false
-                    AppPixelName.SETTINGS_APP_LINKS_ALWAYS_SELECTED
+                    AppPixelName.SETTINGS_APP_LINKS_ALWAYS_SELECTED to AppPixelName.SETTINGS_APP_LINKS_ALWAYS_SELECTED_DAILY
                 }
                 AppLinkSettingType.NEVER -> {
                     settingsDataStore.appLinksEnabled = false
                     settingsDataStore.showAppLinksPrompt = false
-                    AppPixelName.SETTINGS_APP_LINKS_NEVER_SELECTED
+                    AppPixelName.SETTINGS_APP_LINKS_NEVER_SELECTED to AppPixelName.SETTINGS_APP_LINKS_NEVER_SELECTED_DAILY
                 }
             }
         viewModelScope.launch { viewState.emit(currentViewState().copy(appLinksSettingType = appLinkSettingType)) }
 
         pixel.fire(pixelName)
-    }
-
-    private fun getAppLinksSettingsState(
-        appLinksEnabled: Boolean,
-        showAppLinksPrompt: Boolean,
-    ): AppLinkSettingType {
-        return if (appLinksEnabled) {
-            if (showAppLinksPrompt) {
-                AppLinkSettingType.ASK_EVERYTIME
-            } else {
-                AppLinkSettingType.ALWAYS
-            }
-        } else {
-            AppLinkSettingType.NEVER
-        }
+        pixel.fire(dailyPixelName, type = Daily())
     }
 
     private fun getNotificationsSettingSubtitleId(notificationsEnabled: Boolean): Int {
