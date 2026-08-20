@@ -198,6 +198,25 @@ class RealDrmPolicyManagerTest {
     }
 
     @Test
+    fun whenAnotherPermissionIsSavedOnOneSpellingThenDrmChoiceOnTheOtherStillApplies() = runTest {
+        val cameraOnly = SitePermissionsEntity(domain = domain, askCameraSetting = SitePermissionAskSettingType.ALLOW_ALWAYS.name)
+        val drmDenied = SitePermissionsEntity(domain = "netflix.com", askDrmSetting = SitePermissionAskSettingType.DENY_ALWAYS.name)
+        whenever(mockSitePermissionsRepository.getSitePermissionsForWebsite(domain)).thenReturn(cameraOnly)
+        whenever(mockSitePermissionsRepository.getSitePermissionsForWebsite("netflix.com")).thenReturn(drmDenied)
+        whenever(mockDrm.isDrmAllowedForUrl(url)).thenReturn(true)
+
+        assertEquals(DrmPolicyDecision(DENY, USER_DENY_ALWAYS), testee.decide(url, tabId))
+    }
+
+    @Test
+    fun whenOnlyAskEveryTimeIsStoredThenNoUserRuleApplies() = runTest {
+        val askEveryTime = SitePermissionsEntity(domain = domain)
+        whenever(mockSitePermissionsRepository.getSitePermissionsForWebsite(domain)).thenReturn(askEveryTime)
+
+        assertEquals(DrmPolicyDecision(PROMPT, NO_RULE), testee.decide(url, tabId))
+    }
+
+    @Test
     fun whenUrlIsMalformedThenPromptWithNoRule() = runTest {
         assertEquals(DrmPolicyDecision(PROMPT, NO_RULE), testee.decide("not a url", tabId))
     }

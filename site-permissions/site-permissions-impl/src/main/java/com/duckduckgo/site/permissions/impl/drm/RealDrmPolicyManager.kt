@@ -47,8 +47,7 @@ class RealDrmPolicyManager @Inject constructor(
         // spelling plus the parent domain: missing the row would let remote config override a user's choice
         val siteSetting = listOfNotNull(domain, uri.baseHost, uri.baseHost?.let { "www.$it" }, domain.toTldPlusOneOrSelf())
             .distinct()
-            .firstNotNullOfOrNull { sitePermissionsRepository.getSitePermissionsForWebsite(it)?.askDrmSetting }
-            ?.let { setting -> runCatching { SitePermissionAskSettingType.valueOf(setting) }.getOrNull() }
+            .firstNotNullOfOrNull { host -> sitePermissionsRepository.getSitePermissionsForWebsite(host)?.askDrmSetting?.toDrmSetting() }
 
         return DrmPolicyContext(
             isGlobalAskEnabled = sitePermissionsRepository.askDrmEnabled,
@@ -59,4 +58,10 @@ class RealDrmPolicyManager @Inject constructor(
             isAllowedByAllowList = drm.isDrmAllowedForUrl(url),
         ).evaluate()
     }
+
+    // Every row carries a DRM value defaulting to ASK_EVERY_TIME, so a row saved for another permission
+    // must not stop the scan before an explicit choice on one of the other spellings.
+    private fun String.toDrmSetting(): SitePermissionAskSettingType? =
+        runCatching { SitePermissionAskSettingType.valueOf(this) }.getOrNull()
+            ?.takeIf { it != SitePermissionAskSettingType.ASK_EVERY_TIME }
 }
