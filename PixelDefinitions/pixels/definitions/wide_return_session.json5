@@ -1,7 +1,7 @@
 {
     "wide_return_session": {
         "description": "Captures every return to the app, from foreground to terminal user action or app background/termination.",
-        "owners": ["GerardPaligot"],
+        "owners": ["YoussefKeyrouz"],
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [

@@ -551,6 +551,44 @@ class RealReturnSessionWideEventTest {
     }
 
     @Test
+    fun `when ntp engagement is captured before landing resolves then page_engaged metadata is true on terminal`() = runTest {
+        testee.onNtpEngaged()
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+
+        startSession()
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+
+        testee.onSearchSubmitted()
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(wideEventClient).flowFinish(
+            wideEventId = eq(123L),
+            status = eq<FlowStatus>(FlowStatus.Success),
+            metadata = argThat { this["page_engaged"] == "true" },
+        )
+        verify(wideEventClient).intervalEnd(123L, "time_to_first_interaction_ms_bucketed")
+    }
+
+    @Test
+    fun `when return closes before landing resolves then pending engagement is cleared`() = runTest {
+        testee.onNtpEngaged()
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+        testee.onReturnClosed()
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+
+        startSession()
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+        testee.onSearchSubmitted()
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(wideEventClient).flowFinish(
+            wideEventId = eq(123L),
+            status = eq<FlowStatus>(FlowStatus.Success),
+            metadata = argThat { this["page_engaged"] == "false" },
+        )
+    }
+
+    @Test
     fun `when return closes with active session then flowFinish is Cancelled with app_backgrounded reason`() = runTest {
         startSession()
         coroutineRule.testScope.testScheduler.advanceUntilIdle()

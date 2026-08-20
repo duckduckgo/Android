@@ -1283,7 +1283,7 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun onViewVisible() {
+    fun onViewVisible(reportLandingFocus: Boolean = true) {
         newTabPageModalPresenterRegistry.register(this)
         setAdClickActiveTabData(url)
 
@@ -1291,7 +1291,7 @@ class BrowserTabViewModel @Inject constructor(
         if (!currentBrowserViewState().browserShowing && !currentBrowserViewState().maliciousSiteBlocked) {
             viewModelScope.launch {
                 val cta = refreshCta()
-                showOrHideKeyboard(cta)
+                showOrHideKeyboard(cta, reportLandingFocus)
                 if (cta == null) {
                     newTabPageModalTrigger.onNewTabPageShown()
                 }
@@ -3804,7 +3804,7 @@ class BrowserTabViewModel @Inject constructor(
     private fun canShowPromo(): Boolean =
         currentGlobalLayoutState() is Browser && !currentBrowserViewState().maliciousSiteBlocked
 
-    private fun showOrHideKeyboard(cta: Cta?) {
+    private fun showOrHideKeyboard(cta: Cta?, reportLandingFocus: Boolean = true) {
         val shouldHideKeyboard = cta?.shouldDropAddressBarFocusWhenShown() == true ||
             duckAiFeatureState.showInputScreen.value ||
             currentBrowserViewState().lastQueryOrigin == QueryOrigin.FromBookmark ||
@@ -3819,7 +3819,9 @@ class BrowserTabViewModel @Inject constructor(
         } else {
             Command.DropAddressBarFocus
         }
-        returnSessionLandingListener.onLandingFocusCaptured(focused)
+        if (reportLandingFocus) {
+            returnSessionLandingListener.onLandingFocusCaptured(focused)
+        }
     }
 
     fun onUserClickCtaOkButton(cta: Cta) {

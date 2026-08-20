@@ -5134,7 +5134,7 @@ class BrowserTabFragment :
         // away on a previous visit isn't left as an icons-only strip.
         omnibar.setExpanded(true)
         launchDownloadMessagesJob()
-        viewModel.onViewVisible()
+        viewModel.onViewVisible(reportLandingFocus = false)
     }
 
     private fun launchDownloadMessagesJob() {

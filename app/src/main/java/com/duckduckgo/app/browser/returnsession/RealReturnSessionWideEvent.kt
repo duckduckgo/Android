@@ -76,6 +76,7 @@ class RealReturnSessionWideEvent @Inject constructor(
     private val mutex = Mutex()
     private var activeSession: SessionState? = null
     private var pendingLandingFocus: Boolean? = null
+    private var pendingEngagement: Boolean = false
 
     init {
         showOnAppLaunchOptionDataStore.optionFlow
@@ -103,6 +104,8 @@ class RealReturnSessionWideEvent @Inject constructor(
 
                 val landingFocus = pendingLandingFocus
                 pendingLandingFocus = null
+                val landingEngagement = pendingEngagement
+                pendingEngagement = false
                 val startResult = wideEventClient.flowStart(
                     name = FEATURE_NAME,
                     cleanupPolicy = CleanupPolicy.OnProcessStart(
@@ -121,16 +124,22 @@ class RealReturnSessionWideEvent @Inject constructor(
                 )
 
                 startResult.onSuccess { flowId ->
-                    activeSession = SessionState(
+                    val session = SessionState(
                         flowId = flowId,
                         afterIdle = result.afterIdle,
                         landedOn = result.landing,
                         focused = landingFocus,
+                        pageEngaged = landingEngagement,
                     )
+                    activeSession = session
                     logcat(tag = TAG) { "Return session started: landedOn=${result.landing.value}" }
 
                     wideEventClient.intervalStart(flowId, KEY_SESSION_DURATION, buckets = DURATION_BUCKETS)
                     wideEventClient.intervalStart(flowId, KEY_TIME_TO_FIRST_INTERACTION, buckets = DURATION_BUCKETS)
+                    if (landingEngagement) {
+                        wideEventClient.intervalEnd(flowId, KEY_TIME_TO_FIRST_INTERACTION)
+                        session.firstInteractionRecorded = true
+                    }
                 }.onFailure { error ->
                     logcat(tag = TAG) { "Failed to start return session: ${error.message}" }
                 }
@@ -156,7 +165,10 @@ class RealReturnSessionWideEvent @Inject constructor(
         coroutineScope.launch {
             mutex.withLock {
                 if (abortIfDisabled()) return@launch
-                if (activeSession == null) pendingLandingFocus = null
+                if (activeSession == null) {
+                    pendingLandingFocus = null
+                    pendingEngagement = false
+                }
                 finishSessionLocked(
                     statusReason = REASON_APP_BACKGROUNDED,
                     status = FlowStatus.Cancelled,
@@ -216,7 +228,24 @@ class RealReturnSessionWideEvent @Inject constructor(
     }
 
     override fun onNtpEngaged() {
-        recordNonTerminal(action = "page_engaged", isAlreadyRecorded = { it.pageEngaged }) { it.pageEngaged = true }
+        coroutineScope.launch {
+            mutex.withLock {
+                if (abortIfDisabled()) return@launch
+                val session = activeSession
+                if (session == null) {
+                    pendingEngagement = true
+                    return@launch
+                }
+                if (session.pageEngaged) return@launch
+
+                session.pageEngaged = true
+                if (!session.firstInteractionRecorded) {
+                    wideEventClient.intervalEnd(session.flowId, KEY_TIME_TO_FIRST_INTERACTION)
+                    session.firstInteractionRecorded = true
+                }
+                logcat(tag = TAG) { "Return session: page_engaged recorded" }
+            }
+        }
     }
 
     override fun onCloseTabTapped() {
@@ -294,6 +323,7 @@ class RealReturnSessionWideEvent @Inject constructor(
     private suspend fun abortIfDisabled(): Boolean {
         if (isFeatureEnabled()) return false
         pendingLandingFocus = null
+        pendingEngagement = false
         activeSession?.let { session ->
             wideEventClient.flowAbort(session.flowId)
             activeSession = null
