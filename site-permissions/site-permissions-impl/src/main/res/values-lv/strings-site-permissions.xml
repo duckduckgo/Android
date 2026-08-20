@@ -57,6 +57,7 @@
     <string name="systemPermissionDialogCameraAndAudioDeniedContent">Vietnes var izmantot tavu kameru un mikrofonu tikai tad, ja tu atļauj DuckDuckGo prasīt piekļuvi.</string>
     <string name="systemPermissionsDeniedDialogPositiveButton">Atvērt iestatījumus</string>
     <string name="systemPermissionsDeniedDialogNegativeButton">Atcelt</string>
+    <string name="duckAiMicPermissionDeniedSnackBarMessage">Balss funkcijām nepieciešama mikrofona atļauja</string>
     <string name="duckAiMicPermissionDeniedDialogTitle">DuckDuckGo ir nepieciešama piekļuve tavam mikrofonam</string>
     <string name="duckAiMicPermissionDeniedDialogContent">Ja vēlies izmantot balss tērzēšanu vietnē Duck.ai, ir nepieciešamas mikrofona atļaujas</string>
     <string name="duckAiMicPermissionDeniedDialogPositiveButton">Mainīt atļaujas</string>

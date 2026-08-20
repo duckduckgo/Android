@@ -57,6 +57,7 @@
     <string name="systemPermissionDialogCameraAndAudioDeniedContent">Сайтовете могат да използват камерата и микрофона, само ако разрешите на DuckDuckGo да поиска достъп.</string>
     <string name="systemPermissionsDeniedDialogPositiveButton">Отвори Настройки</string>
     <string name="systemPermissionsDeniedDialogNegativeButton">Отмени</string>
+    <string name="duckAiMicPermissionDeniedSnackBarMessage">За гласовите функции е необходимо разрешение за достъп до микрофона</string>
     <string name="duckAiMicPermissionDeniedDialogTitle">DuckDuckGo има нужда от достъп до микрофона</string>
     <string name="duckAiMicPermissionDeniedDialogContent">Ако искате да използвате гласов чат в Duck.ai, трябва да разрешите достъп до микрофона.</string>
     <string name="duckAiMicPermissionDeniedDialogPositiveButton">Промяна на разрешенията</string>
