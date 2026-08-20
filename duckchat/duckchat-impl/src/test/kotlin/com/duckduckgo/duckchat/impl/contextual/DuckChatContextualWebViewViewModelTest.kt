@@ -133,6 +133,27 @@ class DuckChatContextualWebViewViewModelTest {
     }
 
     @Test
+    fun `entry prompt aborted before web app ready is not auto-submitted on a later reopen`() = runTest {
+        val prompt = NativeInputPrompt("stale", "model-1", "high", null, null, null)
+        // Consumed once on open; nothing parked on the subsequent reopen.
+        whenever(contextualEntryPromptStore.consume("tab-1")).thenReturn(ContextualEntryPrompt("tab-1", prompt, null), null)
+        (duckChat as FakeDuckChat).nextUrl = "https://duckduckgo.com/?ia=chat"
+
+        // Open with a parked prompt, but dismiss before the web app is ready (no onWebAppReady).
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        // Reopen with nothing parked; the leftover prompt must be dropped.
+        testee.onSheetReopened()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        testee.subscriptionEventDataFlow.test {
+            testee.onWebAppReady()
+            expectNoEvents()
+        }
+    }
+
+    @Test
     fun `onPromptSent with attached page context includes it in the event`() = runTest {
         testee.onSheetOpened("tab-1")
         testee.onPageContextReceived("tab-1", serializedPageData)

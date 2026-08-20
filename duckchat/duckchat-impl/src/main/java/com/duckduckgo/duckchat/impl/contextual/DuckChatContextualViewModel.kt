@@ -877,8 +877,8 @@ class DuckChatContextualViewModel @Inject constructor(
     }
 
     fun onNewChatRequestedFromPopup() {
-        duckChatPixels.reportContextualSheetNewChatFromPopup()
         renderNewChatState()
+        duckChatPixels.reportContextualSheetNewChatFromPopup()
     }
 
     fun onChatsIconClicked() {

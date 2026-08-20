@@ -186,6 +186,9 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
                 startChatFromEntryPrompt(tabId, pendingEntry)
                 return@launch
             }
+            // No fresh prompt for this open — drop any leftover from an aborted hand-off (sheet dismissed
+            // before onWebAppReady) so this load's onWebAppReady doesn't auto-submit a stale prompt.
+            pendingEntryPrompt = null
             logcat { "Duck.ai: onSheetOpened for tab=$tabId" }
             withContext(dispatchers.main()) {
                 commandChannel.trySend(Command.RequestPageContext)
@@ -220,6 +223,9 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
                 startChatFromEntryPrompt(tabId, pendingEntry)
                 return@launch
             }
+            // No fresh prompt for this reopen — drop any leftover from an aborted hand-off (sheet dismissed
+            // before onWebAppReady) so this load's onWebAppReady doesn't auto-submit a stale prompt.
+            pendingEntryPrompt = null
             withContext(dispatchers.main()) {
                 logcat { "Duck.ai: requesting page context after sheet reopened" }
                 commandChannel.trySend(Command.RequestPageContext)

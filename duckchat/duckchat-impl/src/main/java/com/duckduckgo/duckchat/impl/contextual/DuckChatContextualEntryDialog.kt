@@ -42,12 +42,17 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.common.ui.DuckDuckGoBottomSheetDialogFragment
 import com.duckduckgo.common.utils.FragmentViewModelFactory
+import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.DialogContextualDuckAiEntryBinding
 import com.duckduckgo.duckchat.impl.ui.filechooser.FileChooserIntentBuilder
 import com.duckduckgo.duckchat.impl.ui.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher
 import com.duckduckgo.js.messaging.api.JsMessaging
+import com.duckduckgo.voice.api.VoiceSearchLauncher
+import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
+import com.duckduckgo.voice.api.VoiceSearchLauncher.VoiceSearchMode
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
@@ -84,6 +89,12 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
     lateinit var browserNav: BrowserNav
 
     @Inject
+    lateinit var duckChat: DuckChatInternal
+
+    @Inject
+    lateinit var voiceSearchLauncher: VoiceSearchLauncher
+
+    @Inject
     lateinit var fileChooserIntentBuilder: FileChooserIntentBuilder
 
     @Inject
@@ -117,6 +128,19 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
     ) {
         if (fragmentManager.isStateSaved) return
         super.show(fragmentManager, tag)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        voiceSearchLauncher.registerResultsCallback(this, requireActivity(), BROWSER) { event ->
+            if (event is VoiceSearchLauncher.Event.VoiceRecognitionSuccess) {
+                val result = event.result
+                onVoiceRecognitionSuccess(
+                    query = result.query,
+                    isDuckAiResult = result is VoiceSearchLauncher.VoiceRecognitionResult.DuckAiResult,
+                )
+            }
+        }
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -304,9 +328,30 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
             onFilePickerRequested = { callback, mimeTypes -> launchFilePicker(callback, mimeTypes) },
             onAskAboutPage = { viewModel.onAttachContextRequested() },
             onPageContextRemoved = { viewModel.onContextRemoved() },
+            onVoiceChatRequested = {
+                duckChat.openVoiceDuckChat()
+                dismiss()
+            },
+            onVoiceSearchRequested = {
+                activity?.hideKeyboard()
+                voiceSearchLauncher.launch(requireActivity(), VoiceSearchMode.DUCK_AI)
+            },
         )
         contextualNativeInputManager.onInputMode()
         contextualNativeInputManager.onContextualReopened(tabId)
+    }
+
+    private fun onVoiceRecognitionSuccess(
+        query: String,
+        isDuckAiResult: Boolean,
+    ) {
+        if (query.isBlank()) return
+        if (isDuckAiResult) {
+            viewModel.onPromptSubmitted(NativeInputPrompt(query, null, null, null, null, null))
+        } else {
+            startActivity(browserNav.openInNewTab(requireContext(), query))
+            dismiss()
+        }
     }
 
     private fun updateQuickActionVisibility() {

@@ -121,11 +121,7 @@ class ContextualSuggestionsView @JvmOverloads constructor(
     fun hasContent(): Boolean = loadingView.isVisible || cardsContainer.isNotEmpty()
 
     private fun render(viewState: ContextualSuggestionsViewModel.ViewState) {
-        if (viewState.loading) {
-            loadingView.show()
-        } else {
-            loadingView.gone()
-        }
+        if (viewState.loading) loadingView.show() else loadingView.gone()
 
         cardsContainer.removeAllViews()
         if (!viewState.loading && viewState.suggestions.isNotEmpty()) {
