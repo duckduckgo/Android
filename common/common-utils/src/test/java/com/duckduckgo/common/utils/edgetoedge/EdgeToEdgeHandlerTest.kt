@@ -95,6 +95,75 @@ class EdgeToEdgeHandlerTest {
         assertEquals(1, scrims)
     }
 
+    @Test
+    fun whenNotFullScreenThenReservesStatusBarAndHorizontalInsetsAsPadding() {
+        testee.applyStatusBarAndHorizontalInsets(anchor, installScrim = false, isFullScreen = { false })
+
+        dispatchStatusBarAndCutout(statusBarTop = 63, cutoutLeft = 48, cutoutRight = 24)
+
+        assertEquals(48, anchor.paddingLeft)
+        assertEquals(63, anchor.paddingTop)
+        assertEquals(24, anchor.paddingRight)
+    }
+
+    @Test
+    fun whenFullScreenThenReservesNoPadding() {
+        testee.applyStatusBarAndHorizontalInsets(anchor, installScrim = false, isFullScreen = { true })
+
+        dispatchStatusBarAndCutout(statusBarTop = 63, cutoutLeft = 48, cutoutRight = 24)
+
+        assertEquals(0, anchor.paddingLeft)
+        assertEquals(0, anchor.paddingTop)
+        assertEquals(0, anchor.paddingRight)
+    }
+
+    @Test
+    fun whenFullScreenDefaultThenReservesInsets() {
+        testee.applyStatusBarAndHorizontalInsets(anchor, installScrim = false)
+
+        dispatchStatusBarAndCutout(statusBarTop = 63, cutoutLeft = 48)
+
+        assertEquals(48, anchor.paddingLeft)
+        assertEquals(63, anchor.paddingTop)
+    }
+
+    @Test
+    fun whenFullScreenTogglesThenPaddingDropsAndRestoresWithoutAccumulating() {
+        var fullScreen = false
+        testee.applyStatusBarAndHorizontalInsets(anchor, installScrim = false, isFullScreen = { fullScreen })
+
+        dispatchStatusBarAndCutout(statusBarTop = 63, cutoutLeft = 48, cutoutRight = 24)
+        assertEquals(48, anchor.paddingLeft)
+        assertEquals(63, anchor.paddingTop)
+        assertEquals(24, anchor.paddingRight)
+
+        // Entering fullscreen: the caller flips its state and re-dispatches insets.
+        fullScreen = true
+        dispatchStatusBarAndCutout(statusBarTop = 63, cutoutLeft = 48, cutoutRight = 24)
+        assertEquals(0, anchor.paddingLeft)
+        assertEquals(0, anchor.paddingTop)
+        assertEquals(0, anchor.paddingRight)
+
+        // Exiting fullscreen restores the original insets, not double them.
+        fullScreen = false
+        dispatchStatusBarAndCutout(statusBarTop = 63, cutoutLeft = 48, cutoutRight = 24)
+        assertEquals(48, anchor.paddingLeft)
+        assertEquals(63, anchor.paddingTop)
+        assertEquals(24, anchor.paddingRight)
+    }
+
+    private fun dispatchStatusBarAndCutout(
+        statusBarTop: Int,
+        cutoutLeft: Int = 0,
+        cutoutRight: Int = 0,
+    ) {
+        val insets = WindowInsetsCompat.Builder()
+            .setInsets(WindowInsetsCompat.Type.statusBars(), Insets.of(0, statusBarTop, 0, 0))
+            .setInsets(WindowInsetsCompat.Type.displayCutout(), Insets.of(cutoutLeft, 0, cutoutRight, 0))
+            .build()
+        ViewCompat.dispatchApplyWindowInsets(anchor, insets)
+    }
+
     private fun scrim(): View = content.findViewWithTag(NAVIGATION_BAR_SCRIM_TAG)
 
     private fun dispatchInsets(

@@ -41,6 +41,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.viewModels
 import androidx.annotation.VisibleForTesting
+import androidx.core.view.ViewCompat
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.lifecycle.Lifecycle
@@ -890,7 +891,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 SystemBarStyle.light(toolbarColor, toolbarColor)
             }
             enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
-            edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.root, installScrim = false)
+            edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(
+                binding.root,
+                installScrim = false,
+                isFullScreen = { isFullScreen() },
+            )
             edgeToEdgeHandler.applyNavigationBarInsets(binding.navigationBarMockup.root)
             edgeToEdgeHandler.applyNavigationBarInsets(binding.bottomMockupToolbar.appBarLayoutMockup)
             applyDisplayCutoutMode(resources.configuration.orientation)
@@ -1216,6 +1221,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     override fun toggleFullScreen() {
         super.toggleFullScreen()
+
+        // Fullscreen state is owned here, so re-apply insets to pick up the new state.
+        ViewCompat.requestApplyInsets(binding.root)
 
         if (swipingTabsFeature.isEnabled) {
             viewModel.onFullScreenModeChanged(isFullScreen())
