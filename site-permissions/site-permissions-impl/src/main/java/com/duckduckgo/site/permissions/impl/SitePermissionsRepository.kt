@@ -102,12 +102,17 @@ class SitePermissionsRepositoryImpl @Inject constructor(
             sitePermissionsPreferences.askLocationEnabled = value
         }
 
+    // Kept for the flag-off path only; the shared DrmSessionStore replaces it once drmPolicy is fully rolled out.
+    private val drmSessions = mutableMapOf<String, Boolean>()
+
     override suspend fun isDrmEnabledForSite(url: String): Boolean {
         if (drmPolicyFeature.centralPolicy().isEnabled()) {
             // "Permitted or promptable" rather than "granted" — this feeds the breakage report's drmEnabled field.
             return drmPolicyManager.get().decide(url).action != DrmPolicyAction.DENY
         }
 
+        val domain = url.extractDomain() ?: url
+        drmSessions[domain]?.let { return it }
         if (isDrmBlockedForUrlByConfig(url)) return false
 
         return isDomainAllowedToAsk(url, PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID) ||
@@ -210,11 +215,19 @@ class SitePermissionsRepositoryImpl @Inject constructor(
     }
 
     override fun getDrmForSession(tabId: String, domain: String): Boolean? {
-        return drmSessionStore.get(tabId, domain)
+        return if (drmPolicyFeature.centralPolicy().isEnabled()) {
+            drmSessionStore.get(tabId, domain)
+        } else {
+            drmSessions[domain]
+        }
     }
 
     override fun saveDrmForSession(tabId: String, domain: String, allowed: Boolean) {
-        drmSessionStore.save(tabId, domain, allowed)
+        if (drmPolicyFeature.centralPolicy().isEnabled()) {
+            drmSessionStore.save(tabId, domain, allowed)
+        } else {
+            drmSessions[domain] = allowed
+        }
     }
 
     override fun isDrmBlockedForUrlByConfig(url: String): Boolean {

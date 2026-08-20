@@ -150,6 +150,8 @@ class SitePermissionsRepositoryTest {
 
     @Test
     fun whenDrmSessionSavedThenGetDrmForSessionReturnsIt() {
+        drmPolicyFeature.centralPolicy().setRawStoredState(Toggle.State(true))
+
         repository.saveDrmForSession(tabId, domain, true)
 
         assertTrue(repository.getDrmForSession(tabId, domain) == true)
@@ -157,9 +159,25 @@ class SitePermissionsRepositoryTest {
 
     @Test
     fun whenDrmSessionSavedForOneTabThenAnotherTabOnSameDomainHasNoSessionChoice() {
+        drmPolicyFeature.centralPolicy().setRawStoredState(Toggle.State(true))
+
         repository.saveDrmForSession(tabId, domain, true)
 
         assertNull(repository.getDrmForSession("anotherTabId", domain))
+    }
+
+    @Test
+    fun whenPolicyDisabledAndDrmSessionSavedThenGetDrmForSessionReturnsItForAnyTab() {
+        repository.saveDrmForSession(tabId, domain, true)
+
+        assertTrue(repository.getDrmForSession("anotherTabId", domain) == true)
+    }
+
+    @Test
+    fun whenPolicyDisabledAndDrmSessionSavedThenDrmEnabledForSiteFollowsIt() = runTest {
+        repository.saveDrmForSession(tabId, domain, false)
+
+        assertFalse(repository.isDrmEnabledForSite(url))
     }
 
     @Test
