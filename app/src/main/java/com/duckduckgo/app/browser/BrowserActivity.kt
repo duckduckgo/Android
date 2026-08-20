@@ -253,6 +253,14 @@ open class BrowserActivity : DuckDuckGoActivity() {
     private var instanceStateBundles: CombinedInstanceState? = null
 
     /**
+     * The launch source extra from a genuinely new [Intent] delivery (fresh launch or [onNewIntent]),
+     * consumed by the next [onResume]. Not read off [getIntent] directly, since after process death the
+     * system replays the original Intent extras on recreation and a mutated (extra-removed) copy is never
+     * persisted for that replay.
+     */
+    private var pendingLaunchSource: String? = null
+
+    /**
      * Holds an [Intent] that arrived in [onNewIntent] while [dataClearer] was still clearing,
      * deferred until it finishes. Read once by [BrowserStateRenderer.showWebContent] and cleared.
      */
@@ -362,6 +370,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         intent?.sanitize()
         logcat(INFO) { "onCreate called. freshAppLaunch: ${dataClearer.isFreshAppLaunch}, savedInstanceState: $savedInstanceState" }
+        if (savedInstanceState == null) {
+            pendingLaunchSource = intent?.getStringExtra(LAUNCH_SOURCE_PIXEL_VALUE)
+        }
         dataClearerForegroundAppRestartPixel.registerIntent(intent)
         renderer = BrowserStateRenderer()
         val newInstanceState = if (dataClearer.isFreshAppLaunch) null else savedInstanceState
@@ -585,9 +596,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     override fun onResume() {
         super.onResume()
-        appReturnPixelSender.fireIfNeeded(intent?.getStringExtra(LAUNCH_SOURCE_PIXEL_VALUE) ?: LaunchSourceValues.STANDARD)
-        // Consume launch extra so a later resume with no new Intent doesn't replay this.
-        intent?.removeExtra(LAUNCH_SOURCE_PIXEL_VALUE)
+        appReturnPixelSender.fireIfNeeded(pendingLaunchSource ?: LaunchSourceValues.STANDARD)
+        pendingLaunchSource = null
     }
 
     override fun onStop() {
@@ -618,6 +628,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         intent.sanitize()
         setIntent(intent)
+        pendingLaunchSource = intent.getStringExtra(LAUNCH_SOURCE_PIXEL_VALUE)
 
         intent.getStringExtra(LAUNCH_FROM_NOTIFICATION_PIXEL_NAME)?.let {
             viewModel.onLaunchedFromNotification(it)
