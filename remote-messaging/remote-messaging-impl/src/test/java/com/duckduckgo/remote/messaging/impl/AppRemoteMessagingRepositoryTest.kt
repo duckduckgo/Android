@@ -79,6 +79,7 @@ class AppRemoteMessagingRepositoryTest {
     private val remoteMessageImageStore: RemoteMessageImageStore = mock()
     private val currentTimeProvider: CurrentTimeProvider = mock()
     private val remoteMessagingPixels: RemoteMessagingPixels = mock()
+    private val autoDismissEvaluator = RealRemoteMessageAutoDismissEvaluator(remoteMessagingPixels, currentTimeProvider)
 
     private val testee = AppRemoteMessagingRepository(
         remoteMessagingConfigRepository,
@@ -86,7 +87,7 @@ class AppRemoteMessagingRepositoryTest {
         getMessageMapper(),
         remoteMessageImageStore,
         currentTimeProvider,
-        remoteMessagingPixels,
+        autoDismissEvaluator,
     )
 
     @After
@@ -737,7 +738,7 @@ class AppRemoteMessagingRepositoryTest {
             getMessageMapper(),
             remoteMessageImageStore,
             currentTimeProvider,
-            remoteMessagingPixels,
+            autoDismissEvaluator,
         )
     }
 
