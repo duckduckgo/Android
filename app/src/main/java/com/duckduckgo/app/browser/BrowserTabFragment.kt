@@ -40,6 +40,8 @@ import android.print.PrintDocumentAdapter
 import android.print.PrintManager
 import android.provider.MediaStore
 import android.text.Spanned
+import android.text.SpannedString
+import android.text.TextUtils
 import android.view.ContextMenu
 import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
@@ -179,6 +181,7 @@ import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
+import com.duckduckgo.app.browser.suggestredirect.RedirectSuggestion
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.ui.dialogs.AutomaticFireproofDialogOptions
@@ -293,6 +296,7 @@ import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.store.BrowserAppTheme
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.ui.view.DaxDialog
+import com.duckduckgo.common.ui.view.addClickableLink
 import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
 import com.duckduckgo.common.ui.view.dialog.CustomAlertDialogBuilder
 import com.duckduckgo.common.ui.view.dialog.DaxAlertDialog
@@ -2374,6 +2378,7 @@ class BrowserTabFragment :
         newBrowserTab.newTabRootLayout.gone()
         sslErrorView.gone()
         maliciousWarningView.gone()
+        renderRedirectSuggestion(viewModel.browserViewState.value?.redirectSuggestion)
         hidePdf()
         omnibar.setViewMode(ViewMode.Error)
         webView?.onPause()
@@ -2387,6 +2392,21 @@ class BrowserTabFragment :
         errorView.errorLayout.show()
 
         browserNavigationBarIntegration.configureBrowserViewMode()
+    }
+
+    private fun renderRedirectSuggestion(suggestion: RedirectSuggestion?) {
+        if (suggestion == null) {
+            errorView.redirectSuggestionMessage.gone()
+            return
+        }
+        // Use expandTemplate(), getString() would otherwise strip the annotation altogether
+        val message = SpannedString(TextUtils.expandTemplate(getText(R.string.webViewErrorRedirectSuggestionMessage), suggestion.domain))
+        with(errorView.redirectSuggestionMessage) {
+            addClickableLink("redirect_link", message) {
+                viewModel.onRedirectSuggestionClicked(suggestion.url)
+            }
+            show()
+        }
     }
 
     private fun showDuckAI(browserViewState: BrowserViewState) {
@@ -6105,6 +6125,7 @@ class BrowserTabFragment :
                 val browserShowing = viewState.browserShowing
                 val browserShowingChanged = viewState.browserShowing != lastSeenBrowserViewState?.browserShowing
                 val errorChanged = viewState.browserError != lastSeenBrowserViewState?.browserError
+                val redirectSuggestionChanged = viewState.redirectSuggestion != lastSeenBrowserViewState?.redirectSuggestion
                 val sslErrorChanged = viewState.sslError != lastSeenBrowserViewState?.sslError
 
                 lastSeenBrowserViewState = viewState
@@ -6132,6 +6153,8 @@ class BrowserTabFragment :
                             showHome()
                         }
                     }
+                } else if (redirectSuggestionChanged) {
+                    renderRedirectSuggestion(viewState.redirectSuggestion)
                 }
 
                 omnibar.renderBrowserViewState(viewState)
