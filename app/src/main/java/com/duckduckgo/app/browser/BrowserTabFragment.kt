@@ -2866,7 +2866,10 @@ class BrowserTabFragment :
             }
 
             is Command.OpenAppLink -> {
-                openAppLink(it.appLink)
+                val launched = openAppLink(it.appLink)
+                if (it.finishCustomTabOnLaunch && launched) {
+                    finishCustomTab()
+                }
             }
 
             is Command.HandleNonHttpAppLink -> {
@@ -3421,8 +3424,8 @@ class BrowserTabFragment :
         appLinksSnackBar?.show()
     }
 
-    private fun openAppLink(appLink: SpecialUrlDetector.UrlType.AppLink) {
-        appLinksLauncher.openAppLink(context = context, appLink = appLink, viewModel = viewModel)
+    private fun openAppLink(appLink: SpecialUrlDetector.UrlType.AppLink): Boolean {
+        return appLinksLauncher.openAppLink(context = context, appLink = appLink, viewModel = viewModel)
     }
 
     private fun dismissAppLinkSnackBar() {

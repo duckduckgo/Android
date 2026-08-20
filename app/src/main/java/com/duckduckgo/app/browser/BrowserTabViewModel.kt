@@ -778,8 +778,10 @@ class BrowserTabViewModel @Inject constructor(
     private var refreshTriggerJob: Job? = null
     private var brokenSiteReportTriggerJob: Job? = null
 
-    /** Non-null while this tab is displayed inside a Custom Tab. Captures the verified
-     * calling package (when known) used by [handleAppLink]'s trusted-caller carve-out. */
+    /** Non-null while this tab is displayed inside a Custom Tab. [clientPackage] is the verified
+     * calling package (when known), used by [handleAppLink]'s trusted-caller launch carve-out.
+     * [referrerPackage] is the best-effort, non-verified android-app:// referrer, used only for the
+     * lower-stakes prompt-skip decision in [appLinkClicked], never the launch carve-out. */
     private data class CustomTabContext(val clientPackage: String?, val referrerPackage: String?)
     private var customTab: CustomTabContext? = null
 
@@ -3919,11 +3921,12 @@ class BrowserTabViewModel @Inject constructor(
         when {
             inCustomTab && !customTabsFeature.handleTrustedCallers().isEnabled() -> command.value = OpenAppLink(appLink)
             inCustomTab && appLinksHandler.isTrustedCaller(appLink, callerPackage) -> {
-                command.value = OpenAppLink(appLink)
-                // The handoff opened another app, leaving a stale custom tab behind; finish it.
-                if (customTabsFeature.closeTabAfterTrustedCallerNavigation().isEnabled()) {
-                    command.value = FinishCustomTab
-                }
+                // The handoff opens another app, leaving a stale custom tab behind; close it, but only once
+                // the app has actually launched, so a failed launch doesn't strand the user on a closed tab.
+                command.value = OpenAppLink(
+                    appLink,
+                    finishCustomTabOnLaunch = customTabsFeature.closeTabAfterTrustedCallerNavigation().isEnabled(),
+                )
             }
             inCustomTab && appLinksHandler.isAlwaysTriggerDomain(appLink) -> command.value = OpenAppLink(appLink)
             appSettingsPreferencesStore.showAppLinksPrompt -> command.value = ShowAppLinkPrompt(appLink)

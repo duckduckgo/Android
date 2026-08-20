@@ -5450,9 +5450,10 @@ class BrowserTabViewModelTest {
         testee.handleAppLink(urlType, isForMainFrame = true, hasGesture = true)
         verify(mockAppLinksHandler).handleAppLink(any(), eq(urlType), any(), any(), any(), any(), appLinkCaptor.capture())
         appLinkCaptor.lastValue.invoke()
-        assertCommandIssued<Command.OpenAppLink>()
+        assertCommandIssued<Command.OpenAppLink> {
+            assertFalse(finishCustomTabOnLaunch)
+        }
         assertCommandNotIssued<Command.ShowAppLinkPrompt>()
-        assertCommandNotIssued<Command.FinishCustomTab>()
     }
 
     @Test
@@ -5499,12 +5500,13 @@ class BrowserTabViewModelTest {
         testee.handleAppLink(urlType, isForMainFrame = true, hasGesture = true)
         verify(mockAppLinksHandler).handleAppLink(any(), eq(urlType), any(), any(), any(), any(), appLinkCaptor.capture())
         appLinkCaptor.lastValue.invoke()
-        assertCommandIssued<Command.OpenAppLink>()
-        assertCommandNotIssued<Command.FinishCustomTab>()
+        assertCommandIssued<Command.OpenAppLink> {
+            assertFalse(finishCustomTabOnLaunch)
+        }
     }
 
     @Test
-    fun whenAppLinkClickedInCustomTabAndTrustedCallerAndCloseTabFeatureEnabledThenFinishCustomTabAfterOpen() {
+    fun whenAppLinkClickedInCustomTabAndTrustedCallerAndCloseTabFeatureEnabledThenOpenAppLinkRequestsFinishOnLaunch() {
         fakeCustomTabsFeature.closeTabAfterTrustedCallerNavigation().setRawStoredState(State(enable = true))
         val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = exampleUrl)
         whenever(mockAppLinksHandler.isTrustedCaller(eq(urlType), eq("com.example.app"))).thenReturn(true)
@@ -5512,12 +5514,13 @@ class BrowserTabViewModelTest {
         testee.handleAppLink(urlType, isForMainFrame = true, hasGesture = true)
         verify(mockAppLinksHandler).handleAppLink(any(), eq(urlType), any(), any(), any(), any(), appLinkCaptor.capture())
         appLinkCaptor.lastValue.invoke()
-        assertCommandIssued<Command.OpenAppLink>()
-        assertCommandIssued<Command.FinishCustomTab>()
+        assertCommandIssued<Command.OpenAppLink> {
+            assertTrue(finishCustomTabOnLaunch)
+        }
     }
 
     @Test
-    fun whenAppLinkClickedInCustomTabAndTrustedCallerButCloseTabFeatureDisabledThenDoNotFinishCustomTab() {
+    fun whenAppLinkClickedInCustomTabAndTrustedCallerButCloseTabFeatureDisabledThenOpenAppLinkDoesNotRequestFinish() {
         fakeCustomTabsFeature.closeTabAfterTrustedCallerNavigation().setRawStoredState(State(enable = false))
         val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = exampleUrl)
         whenever(mockAppLinksHandler.isTrustedCaller(eq(urlType), eq("com.example.app"))).thenReturn(true)
@@ -5525,12 +5528,13 @@ class BrowserTabViewModelTest {
         testee.handleAppLink(urlType, isForMainFrame = true, hasGesture = true)
         verify(mockAppLinksHandler).handleAppLink(any(), eq(urlType), any(), any(), any(), any(), appLinkCaptor.capture())
         appLinkCaptor.lastValue.invoke()
-        assertCommandIssued<Command.OpenAppLink>()
-        assertCommandNotIssued<Command.FinishCustomTab>()
+        assertCommandIssued<Command.OpenAppLink> {
+            assertFalse(finishCustomTabOnLaunch)
+        }
     }
 
     @Test
-    fun whenAppLinkClickedInCustomTabAndAlwaysTriggerDomainAndCloseTabFeatureEnabledThenDoNotFinishCustomTab() {
+    fun whenAppLinkClickedInCustomTabAndAlwaysTriggerDomainAndCloseTabFeatureEnabledThenOpenAppLinkDoesNotRequestFinish() {
         fakeCustomTabsFeature.closeTabAfterTrustedCallerNavigation().setRawStoredState(State(enable = true))
         val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = exampleUrl)
         whenever(mockAppLinksHandler.isTrustedCaller(eq(urlType), eq("com.example.app"))).thenReturn(false)
@@ -5539,8 +5543,9 @@ class BrowserTabViewModelTest {
         testee.handleAppLink(urlType, isForMainFrame = true, hasGesture = true)
         verify(mockAppLinksHandler).handleAppLink(any(), eq(urlType), any(), any(), any(), any(), appLinkCaptor.capture())
         appLinkCaptor.lastValue.invoke()
-        assertCommandIssued<Command.OpenAppLink>()
-        assertCommandNotIssued<Command.FinishCustomTab>()
+        assertCommandIssued<Command.OpenAppLink> {
+            assertFalse(finishCustomTabOnLaunch)
+        }
     }
 
     @Test
