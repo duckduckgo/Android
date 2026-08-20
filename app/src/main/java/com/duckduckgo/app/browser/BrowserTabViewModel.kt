@@ -5797,6 +5797,11 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    fun onRedirectSuggestionClicked(url: String) {
+        resetBrowserError()
+        command.value = NavigationCommand.Navigate(url, getUrlHeaders(url))
+    }
+
     private fun trackersCount(): String =
         siteLiveData.value?.trackerCount?.takeIf { it > 0 }?.toString() ?: ""
 

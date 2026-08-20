@@ -8452,6 +8452,26 @@ class BrowserTabViewModelTest {
         }
 
     @Test
+    fun whenRedirectSuggestionClickedThenResetsBrowserErrorResetAndNavigateCommandIssuedWithSuggestedUrl() =
+        runTest {
+            testee.onReceivedError(BAD_URL, "http://example.com", "ERROR_HOST_LOOKUP")
+
+            testee.onRedirectSuggestionClicked("http://www.example.com")
+
+            assertEquals(OMITTED, browserViewState().browserError)
+            assertCommandIssued<Navigate> {
+                assertEquals("http://www.example.com", url)
+            }
+        }
+
+    @Test
+    fun whenRedirectSuggestionClickedThenSearchCountNotIncremented() =
+        runTest {
+            testee.onRedirectSuggestionClicked("http://www.example.com")
+
+            verify(mockSearchCountDao, never()).incrementSearchCount()
+        }
+    @Test
     fun whenUserSelectedAutocompleteWithAutoCompleteSwitchToTabSuggestionThenSwitchToTabCommandSentWithTabId() =
         runTest {
             val tabId = "tabId"
