@@ -781,7 +781,7 @@ class BrowserTabViewModel @Inject constructor(
     /** Non-null while this tab is displayed inside a Custom Tab. [clientPackage] is the verified
      * calling package (when known), used by [handleAppLink]'s trusted-caller launch carve-out.
      * [referrerPackage] is the best-effort, non-verified android-app:// referrer, used only for the
-     * lower-stakes prompt-skip decision in [appLinkClicked], never the launch carve-out. */
+     * prompt-skip decision in [appLinkClicked], never the launch carve-out. */
     private data class CustomTabContext(val clientPackage: String?, val referrerPackage: String?)
     private var customTab: CustomTabContext? = null
 
@@ -3915,8 +3915,6 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun appLinkClicked(appLink: AppLink) {
         val inCustomTab = customTab != null
-        // Falls back to the referrer, which is acceptable here (prompt-skip only) but must never reach the
-        // launch carve-out in handleAppLink, which requires the verified session package.
         val callerPackage = customTab?.clientPackage ?: customTab?.referrerPackage
         when {
             inCustomTab && !customTabsFeature.handleTrustedCallers().isEnabled() -> command.value = OpenAppLink(appLink)

@@ -88,8 +88,9 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
     }
 
     private fun showCustomTab(intentText: String?, toolbarColor: Int?, isExternal: Boolean) {
-        // The verified calling package: non-null only when the launcher bound the CustomTabsService, so it is
-        // safe to gate security-sensitive behavior (the gesture-less app-link launch carve-out) on it.
+        // The verified calling package (non-null only when the launcher bound the
+        // CustomTabsService). Carried forward as an intent extra so BrowserTabViewModel can
+        // apply the trusted-caller carve-out in handleAppLink.
         val clientPackage = CustomTabsSessionToken.getSessionTokenFromIntent(intent)
             ?.let { customTabsSessionRegistry.lookupClientPackage(it) }
         // Best-effort caller identity from the android-app:// referrer, available even when the launcher never

@@ -39,13 +39,19 @@ interface AppLinksHandler {
     fun setUserQueryState(state: Boolean)
     fun isUserQuery(): Boolean
 
-    // True when the app link resolves back to the app that opened the custom tab (e.g. an OAuth/login flow
-    // returning to its host app). [callerPackage] may be the verified Custom Tabs client package (safe to
-    // gate the launch carve-out on) or a best-effort, spoofable referrer fallback (prompt-skip decisions
-    // only). This is a plain equality check, so the caller must pass a verified value for any security-
-    // sensitive gate.
+    /**
+     * True when the app link resolves back to the app that opened the custom tab
+     *
+     * @param appLink the app link being evaluated.
+     * @param callerPackage package that launched the custom tab (if any).
+     */
     fun isTrustedCaller(appLink: AppLink, callerPackage: String?): Boolean
 
+    /**
+     * True when the app link's domain always launches its app, bypassing the usual user-gesture and prompt requirements.
+     *
+     * @param appLink the app link being evaluated.
+     */
     fun isAlwaysTriggerDomain(appLink: AppLink): Boolean
 }
 
