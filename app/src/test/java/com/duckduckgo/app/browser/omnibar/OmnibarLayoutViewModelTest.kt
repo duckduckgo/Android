@@ -1795,7 +1795,7 @@ class OmnibarLayoutViewModelTest {
         initializeViewModel()
         fakeOmnibarPreFillKillSwitch.self().setRawStoredState(State(enable = false))
         givenSiteLoaded(RANDOM_URL)
-        val submitted = OmnibarViewState(omnibarText = "bbc.com", queryOrFullUrl = "bbc.com", isEditing = false)
+        val submitted = OmnibarViewState(omnibarText = "example.com", queryOrFullUrl = "example.com", isEditing = false)
         testee.onExternalStateChange(StateChange.OmnibarStateChange(submitted))
 
         testee.onTextInputClickCatcherClicked()
