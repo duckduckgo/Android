@@ -101,8 +101,6 @@ class AutofillManagementDisabledMode : DuckDuckGoFragment() {
                 Intent(ACTION_FINGERPRINT_ENROLL).safeLaunchSettingsActivity(tryFallback = true)
             }
         }
-
-        requireActivity().finish()
     }
 
     /**
