@@ -190,7 +190,7 @@ Append this to `$GITHUB_STEP_SUMMARY` (via a Bash heredoc). One report per run.
 
     ## 🤖 Failure classifier
 
-    **Likely cause:** <one of: flaky test | feature-flag rollout | recent change | infrastructure | unclear> — <≤12 words>
+    **Likely cause:** <one of: flaky test | feature-flag rollout | recent change | infrastructure | unclear>, <≤12 words>
     **What failed:** <suite/step> → <test#method or flow> (<n> of <m>; <other DI variant passed | both variants>)
     ```
     <verbatim error line, 1-3 lines>
@@ -198,7 +198,7 @@ Append this to `$GITHUB_STEP_SUMMARY` (via a Bash heredoc). One report per run.
     **Why:** <the one fact that supports the cause, with a PR or file reference>
     **Changes in range:** <PR # touching the failing area, or "none in <n> commits">
     **Seen before:** <e.g. "2nd consecutive night, first was <run>">
-    **Confidence:** high | medium | low — <what would raise it, ≤10 words>
+    **Confidence:** high | medium | low, <what would raise it, ≤10 words>
 
 **Omit any line that adds nothing.** No "Changes in range: moot", no "Seen before" on a first
 occurrence, no "Confidence: high" without a reason to doubt. A 5-line report is a good report.
@@ -215,6 +215,9 @@ test, the flag on a percentage rollout, the PR that changed the failing area.
 Write the report so it stands alone as a comment on the single `GH Workflow Failure - <workflow>`
 task. The per-suite `E2E Tests Failure - <suite>` tasks are being retired to cut noise, so never
 assume a reader has a suite-specific task open, and never split one run across several reports.
+
+Separate clauses in the report with commas or separate sentences, never an em dash or a dash as a
+connector. That is a house style thing for anything posted where the team reads it.
 
 Always write a report, even when the outcome is "could not diagnose". State what you could not
 establish and what you would need, inside the same budget.
