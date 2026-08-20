@@ -50,6 +50,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -196,6 +197,47 @@ class RealBrokerActionProcessorTest {
             assertTrue(it.getBoolean("findElements"))
             assertEquals(".city", it.getJSONObject("city").getString("selector"))
             assertEquals(".state", it.getJSONObject("state").getString("selector"))
+        }
+    }
+
+    @Test
+    fun whenPushCaptchaActionsThenProfileMatchParentIsForwarded() = runTest {
+        val actions = listOf("getCaptchaInfo", "solveCaptcha")
+
+        actions.forEach { actionType ->
+            val actionJson = """
+                {
+                    "actionType": "$actionType",
+                    "id": "$actionType-1",
+                    "selector": ".g-recaptcha",
+                    "parent": {
+                        "profileMatch": {
+                            "selector": "li",
+                            "profile": {
+                                "name": {
+                                    "selector": ".name"
+                                }
+                            }
+                        }
+                    }
+                }
+            """.trimIndent()
+            val action = moshi.adapter(BrokerAction::class.java).fromJson(actionJson)!!
+
+            testee.pushAction(action, UserProfile())
+        }
+
+        val eventCaptor = argumentCaptor<SubscriptionEventData>()
+        verify(mockJsMessaging, times(actions.size)).sendSubscriptionEvent(eventCaptor.capture())
+
+        eventCaptor.allValues.forEach { event ->
+            val profileMatch = event.params
+                .getJSONObject("state")
+                .getJSONObject("action")
+                .getJSONObject("parent")
+                .getJSONObject("profileMatch")
+            assertEquals("li", profileMatch.getString("selector"))
+            assertEquals(".name", profileMatch.getJSONObject("profile").getJSONObject("name").getString("selector"))
         }
     }
 
