@@ -33,8 +33,10 @@ import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermission
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.duckduckgo.site.permissions.impl.drm.DrmPolicyAction
 import com.duckduckgo.site.permissions.impl.drm.DrmPolicyManager
+import com.duckduckgo.site.permissions.impl.drm.DrmSessionStore
 import com.duckduckgo.site.permissions.impl.feature.DrmPolicyFeature
 import com.duckduckgo.site.permissions.impl.feature.MicrophoneSitePermissionsDomainRecoveryFeature
+import com.duckduckgo.site.permissions.impl.feature.isCentralPolicyEnabled
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.withContext
 import logcat.logcat
@@ -51,6 +53,7 @@ class SitePermissionsManagerImpl @Inject constructor(
     private val microphoneSitePermissionsDomainRecoveryFeature: MicrophoneSitePermissionsDomainRecoveryFeature,
     private val drmPolicyFeature: DrmPolicyFeature,
     private val drmPolicyManager: DrmPolicyManager,
+    private val drmSessionStore: DrmSessionStore,
     duckAiHostProvider: DuckAiHostProvider,
 ) : SitePermissionsManager {
 
@@ -73,7 +76,7 @@ class SitePermissionsManagerImpl @Inject constructor(
         val drmDecision = withContext(dispatcherProvider.io()) {
             drmPolicyManager
                 .takeIf {
-                    drmPolicyFeature.centralPolicy().isEnabled() &&
+                    drmPolicyFeature.isCentralPolicyEnabled() &&
                         request.resources.contains(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)
                 }
                 ?.decide(url, tabId)
@@ -138,6 +141,7 @@ class SitePermissionsManagerImpl @Inject constructor(
     }
 
     override suspend fun clearAllButFireproof(fireproofDomains: List<String>) {
+        drmSessionStore.clear()
         sitePermissionsRepository.sitePermissionsForAllWebsites().forEach { permission ->
             if (!fireproofDomains.contains(permission.domain)) {
                 sitePermissionsRepository.deletePermissionsForSite(permission.domain)

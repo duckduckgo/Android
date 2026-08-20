@@ -27,6 +27,7 @@ import com.duckduckgo.site.permissions.impl.drm.DrmPolicyManager
 import com.duckduckgo.site.permissions.impl.drm.DrmSessionStore
 import com.duckduckgo.site.permissions.impl.drmblock.DrmBlock
 import com.duckduckgo.site.permissions.impl.feature.DrmPolicyFeature
+import com.duckduckgo.site.permissions.impl.feature.isCentralPolicyEnabled
 import com.duckduckgo.site.permissions.store.SitePermissionsPreferences
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsDao
@@ -106,7 +107,7 @@ class SitePermissionsRepositoryImpl @Inject constructor(
     private val drmSessions = mutableMapOf<String, Boolean>()
 
     override suspend fun isDrmEnabledForSite(url: String): Boolean {
-        if (withContext(dispatcherProvider.io()) { drmPolicyFeature.centralPolicy().isEnabled() }) {
+        if (withContext(dispatcherProvider.io()) { drmPolicyFeature.isCentralPolicyEnabled() }) {
             // "Permitted or promptable" rather than "granted" — this feeds the breakage report's drmEnabled field.
             return drmPolicyManager.get().decide(url).action != DrmPolicyAction.DENY
         }
@@ -215,7 +216,7 @@ class SitePermissionsRepositoryImpl @Inject constructor(
     }
 
     override fun getDrmForSession(tabId: String, domain: String): Boolean? {
-        return if (drmPolicyFeature.centralPolicy().isEnabled()) {
+        return if (drmPolicyFeature.isCentralPolicyEnabled()) {
             drmSessionStore.get(tabId, domain)
         } else {
             drmSessions[domain]
@@ -223,7 +224,7 @@ class SitePermissionsRepositoryImpl @Inject constructor(
     }
 
     override fun saveDrmForSession(tabId: String, domain: String, allowed: Boolean) {
-        if (drmPolicyFeature.centralPolicy().isEnabled()) {
+        if (drmPolicyFeature.isCentralPolicyEnabled()) {
             drmSessionStore.save(tabId, domain, allowed)
         } else {
             drmSessions[domain] = allowed

@@ -17,8 +17,8 @@
 package com.duckduckgo.privacy.config.impl.features.drm
 
 import androidx.core.net.toUri
+import com.duckduckgo.app.browser.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
-import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Drm
@@ -41,15 +41,12 @@ class RealDrm @Inject constructor(
     override fun isDrmAllowedForUrl(url: String): Boolean {
         val uri = url.toUri()
         val isFeatureEnabled = featureToggle.isFeatureEnabled(PrivacyFeatureName.DrmFeatureName.value, defaultValue = true)
-        return (isFeatureEnabled && domainsThatAllowDrm(uri.baseHost)) ||
+        return (isFeatureEnabled && domainsThatAllowDrm(url)) ||
             userAllowListRepository.isUriInUserAllowList(uri) ||
             unprotectedTemporary.isAnException(uri.toString())
     }
 
-    private fun domainsThatAllowDrm(host: String?): Boolean {
-        host ?: return false
-        return drmRepository.exceptions.any { exception ->
-            host == exception.domain || host.endsWith(".${exception.domain}")
-        }
+    private fun domainsThatAllowDrm(url: String): Boolean {
+        return drmRepository.exceptions.any { exception -> sameOrSubdomain(url, exception.domain) }
     }
 }

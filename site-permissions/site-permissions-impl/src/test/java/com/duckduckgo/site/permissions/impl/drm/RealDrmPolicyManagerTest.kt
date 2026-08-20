@@ -163,14 +163,21 @@ class RealDrmPolicyManagerTest {
     }
 
     @Test
-    fun whenDenyAlwaysStoredOnWwwDomainAndRequestIsForBareDomainThenAllowListGrants() = runTest {
-        // Settings key on extractDomain() (keeps www.) while the allow list keys on baseHost (strips it),
-        // so a bare-domain request misses the www-keyed setting. Pins current behaviour until keying is unified.
+    fun whenDenyAlwaysStoredOnWwwDomainAndRequestIsForBareDomainThenDenyWithUserDenyAlways() = runTest {
         val entity = SitePermissionsEntity(domain = domain, askDrmSetting = SitePermissionAskSettingType.DENY_ALWAYS.name)
         whenever(mockSitePermissionsRepository.getSitePermissionsForWebsite(domain)).thenReturn(entity)
         whenever(mockDrm.isDrmAllowedForUrl("https://netflix.com")).thenReturn(true)
 
-        assertEquals(DrmPolicyDecision(GRANT, ALLOW_LIST), testee.decide("https://netflix.com", tabId))
+        assertEquals(DrmPolicyDecision(DENY, USER_DENY_ALWAYS), testee.decide("https://netflix.com", tabId))
+    }
+
+    @Test
+    fun whenDenyAlwaysStoredOnBareDomainAndRequestIsForWwwDomainThenDenyWithUserDenyAlways() = runTest {
+        val entity = SitePermissionsEntity(domain = "netflix.com", askDrmSetting = SitePermissionAskSettingType.DENY_ALWAYS.name)
+        whenever(mockSitePermissionsRepository.getSitePermissionsForWebsite("netflix.com")).thenReturn(entity)
+        whenever(mockDrm.isDrmAllowedForUrl(url)).thenReturn(true)
+
+        assertEquals(DrmPolicyDecision(DENY, USER_DENY_ALWAYS), testee.decide(url, tabId))
     }
 
     @Test

@@ -31,5 +31,9 @@ class DrmSessionStore @Inject constructor() {
         sessions[key(tabId, domain)] = allowed
     }
 
+    fun clear() {
+        sessions.clear()
+    }
+
     private fun key(tabId: String, domain: String) = "$tabId/$domain"
 }

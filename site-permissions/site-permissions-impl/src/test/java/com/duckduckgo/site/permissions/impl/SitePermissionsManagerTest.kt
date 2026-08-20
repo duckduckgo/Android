@@ -32,6 +32,7 @@ import com.duckduckgo.site.permissions.impl.drm.DrmPolicyAction
 import com.duckduckgo.site.permissions.impl.drm.DrmPolicyDecision
 import com.duckduckgo.site.permissions.impl.drm.DrmPolicyManager
 import com.duckduckgo.site.permissions.impl.drm.DrmPolicyReason
+import com.duckduckgo.site.permissions.impl.drm.DrmSessionStore
 import com.duckduckgo.site.permissions.impl.feature.DrmPolicyFeature
 import com.duckduckgo.site.permissions.impl.feature.MicrophoneSitePermissionsDomainRecoveryFeature
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
@@ -43,6 +44,7 @@ import com.nhaarman.mockitokotlin2.verifyZeroInteractions
 import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -65,6 +67,7 @@ class SitePermissionsManagerTest {
     )
     private val drmPolicyFeature = FakeFeatureToggleFactory.create(DrmPolicyFeature::class.java)
     private val mockDrmPolicyManager: DrmPolicyManager = mock()
+    private val drmSessionStore = DrmSessionStore()
 
     private val testee by lazy {
         SitePermissionsManagerImpl(
@@ -76,6 +79,7 @@ class SitePermissionsManagerTest {
             fakeMicrophoneSitePermissionsDomainRecoveryFeature,
             drmPolicyFeature,
             mockDrmPolicyManager,
+            drmSessionStore,
             mockDuckAiHostProvider,
         )
     }
@@ -278,6 +282,16 @@ class SitePermissionsManagerTest {
 
         testee.clearAllButFireproof(testFireproofList)
         verify(mockSitePermissionsRepository).deletePermissionsForSite(domain)
+    }
+
+    @Test
+    fun whenClearAllButFireproofThenDrmSessionChoicesAreCleared() = runTest {
+        drmSessionStore.save(tabId, "domain.com", true)
+        whenever(mockSitePermissionsRepository.sitePermissionsForAllWebsites()).thenReturn(emptyList())
+
+        testee.clearAllButFireproof(listOf("domain.com"))
+
+        assertNull(drmSessionStore.get(tabId, "domain.com"))
     }
 
     @Test

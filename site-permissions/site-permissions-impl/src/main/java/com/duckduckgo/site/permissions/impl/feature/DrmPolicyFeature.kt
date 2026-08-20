@@ -32,3 +32,5 @@ interface DrmPolicyFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun centralPolicy(): Toggle
 }
+
+fun DrmPolicyFeature.isCentralPolicyEnabled(): Boolean = self().isEnabled() && centralPolicy().isEnabled()
