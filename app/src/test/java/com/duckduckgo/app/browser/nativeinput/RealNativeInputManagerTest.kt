@@ -83,7 +83,7 @@ class RealNativeInputManagerTest {
     private val edgeToEdgeProvider: EdgeToEdgeProvider = mock()
     private val edgeToEdgeHandler = EdgeToEdgeHandler()
     private val nativeInputStateBugKillSwitch = FakeFeatureToggleFactory.create(NativeInputStateBugKillSwitch::class.java)
-    private val nativeInputUrlClearingKillSwitch = FakeFeatureToggleFactory.create(NativeInputUrlClearingKillSwitch::class.java)
+    private val nativeInputUrlClearingFeature = FakeFeatureToggleFactory.create(NativeInputUrlClearingFeature::class.java)
     private val nativeInputOmnibarFeature = FakeFeatureToggleFactory.create(NativeInputOmnibarFeature::class.java)
 
     private val context: Context = ApplicationProvider.getApplicationContext()
@@ -100,7 +100,7 @@ class RealNativeInputManagerTest {
         whenever(duckChatInputModeState.inputModeCapability).thenReturn(inputModeCapabilityFlow)
         whenever(duckChat.observeNativeInputNavBarEnabled()).thenReturn(MutableStateFlow(false))
         nativeInputOmnibarFeature.self().setRawStoredState(State(enable = false))
-        nativeInputUrlClearingKillSwitch.self().setRawStoredState(State(enable = true))
+        nativeInputUrlClearingFeature.self().setRawStoredState(State(enable = true))
         testee = RealNativeInputManager(
             duckChat,
             animator,
@@ -111,7 +111,7 @@ class RealNativeInputManagerTest {
             duckChatInputModeState,
             pixel,
             nativeInputStateBugKillSwitch,
-            nativeInputUrlClearingKillSwitch,
+            nativeInputUrlClearingFeature,
             nativeInputOmnibarFeature,
             nativeInputEventListener,
             edgeToEdgeProvider,
@@ -289,7 +289,7 @@ class RealNativeInputManagerTest {
 
     @Test
     fun whenUrlClearingKillSwitchDisabledThenInputNotCleared() {
-        nativeInputUrlClearingKillSwitch.self().setRawStoredState(State(enable = false))
+        nativeInputUrlClearingFeature.self().setRawStoredState(State(enable = false))
         val input = givenUrlCachingBound(text = URL)
         input.switchToDuckAi()
 
