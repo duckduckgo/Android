@@ -188,6 +188,7 @@ class RealNativeInputManager @Inject constructor(
     private val duckChatInputModeState: DuckChatInputModeState,
     private val pixel: Pixel,
     private val nativeInputStateBugKillSwitch: NativeInputStateBugKillSwitch,
+    private val nativeInputUrlClearingFeature: NativeInputUrlClearingFeature,
     private val nativeInputOmnibarFeature: NativeInputOmnibarFeature,
     private val nativeInputEventListener: NativeInputEventListener,
     private val edgeToEdgeProvider: EdgeToEdgeProvider,
@@ -226,6 +227,8 @@ class RealNativeInputManager @Inject constructor(
     // The NTP top stroke is driven by hasFavorites, so we save its visibility on attach and restore it
     // on detach rather than re-showing unconditionally (which would show it with no favorites present).
     private var savedTopNtpStrokeVisibility: Int? = null
+
+    private var cachedUrl: String? = null
 
     private val interactionLockSource = MutableStateFlow(InteractionLock.Unlocked)
     private val duckAiFireButtonHighlightSource = MutableStateFlow(false)
@@ -642,6 +645,7 @@ class RealNativeInputManager @Inject constructor(
                 }
             }
         }
+        bindUrlCaching(widgetView)
         attachWidget(widgetView, navBarView, isBottom, tabId)
         // Bottom omnibar: slide the nav bar in with open. Top omnibar: snap the bar so the enter
         // morph can run from the omnibar while the buttons appear without animating — a concurrent
@@ -801,6 +805,7 @@ class RealNativeInputManager @Inject constructor(
             savedTopNtpStrokeVisibility = null
         }
         duckAiToolbarHidden = false
+        cachedUrl = null
         // Drop Fragment-scoped callback closures so they don't outlive the widget.
         lastCallbacks = null
         return removed
@@ -969,6 +974,41 @@ class RealNativeInputManager @Inject constructor(
             }
             previousOnSearchSelected?.invoke(animate)
         }
+    }
+
+    internal fun bindUrlCaching(widgetView: View) {
+        if (!nativeInputUrlClearingFeature.self().isEnabled() || omnibarController.isDuckAiMode()) return
+        val widget = widgetFrom(widgetView) ?: return
+        val text = widget.text
+
+        val onChatSelected = widget.onChatSelected
+        widget.onChatSelected = { animate ->
+            val isDirty = widget.text != text
+            if (!isDirty) cacheUrl(widget)
+            onChatSelected?.invoke(animate)
+        }
+
+        val onSearchSelected = widget.onSearchSelected
+        widget.onSearchSelected = { animate ->
+            restoreUrl(widget)
+            onSearchSelected?.invoke(animate)
+        }
+    }
+
+    private fun cacheUrl(widget: NativeInputWidget) {
+        val text = widget.text
+        if (text.isNotBlank() && queryUrlPredictor.isUrl(text)) {
+            cachedUrl = text
+            widget.text = ""
+        }
+    }
+
+    private fun restoreUrl(widget: NativeInputWidget) {
+        cachedUrl?.takeIf { widget.text.isEmpty() }?.let { url ->
+            widget.text = url
+            widget.selectAllText()
+        }
+        cachedUrl = null
     }
 
     private fun applyInitialTabSelection(widgetView: View, isNewTab: Boolean, initialInputMode: InputMode?) {
