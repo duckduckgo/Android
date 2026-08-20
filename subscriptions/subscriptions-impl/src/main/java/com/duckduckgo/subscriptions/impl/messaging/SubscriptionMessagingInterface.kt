@@ -383,12 +383,11 @@ class SubscriptionMessagingInterface @Inject constructor(
         ) {
             val jsMessageId = jsMessage.id ?: return
 
-            val authV2Enabled = subscriptionsFeature.enableSubscriptionFlowsV2().isEnabled()
             val duckAiSubscriberModelsEnabled = subscriptionsFeature.duckAiPlus().isEnabled()
             val supportsAlternateStripePaymentFlow = subscriptionsFeature.supportsAlternateStripePaymentFlow().isEnabled()
             val useGetSubscriptionTierOptions = subscriptionsFeature.tierMessagingEnabled().isEnabled()
             val resultJson = JSONObject().apply {
-                put("useSubscriptionsAuthV2", authV2Enabled)
+                put("useSubscriptionsAuthV2", true)
                 put("usePaidDuckAi", duckAiSubscriberModelsEnabled)
                 put("useAlternateStripePaymentFlow", supportsAlternateStripePaymentFlow)
                 put("useGetSubscriptionTierOptions", useGetSubscriptionTierOptions)

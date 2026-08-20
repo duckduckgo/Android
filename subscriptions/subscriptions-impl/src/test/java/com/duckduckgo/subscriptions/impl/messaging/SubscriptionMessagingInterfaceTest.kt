@@ -833,7 +833,6 @@ class SubscriptionMessagingInterfaceTest {
     @Test
     fun `when process and get feature config and messaging enabled then return response with feature flags`() = runTest {
         givenInterfaceIsRegistered()
-        givenAuthV2(enabled = true)
         givenDuckAiPlus(enabled = true)
         givenStripeSupported(enabled = true)
         givenUseGetSubscriptionTierOptions(enabled = false)
@@ -863,43 +862,8 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
-    fun `when process and get feature config and messaging enabled but auth v2 disabled then return response with auth v2 false`() = runTest {
-        givenInterfaceIsRegistered()
-        givenAuthV2(enabled = false)
-        givenDuckAiPlus(enabled = true)
-        givenStripeSupported(enabled = true)
-        givenUseGetSubscriptionTierOptions(enabled = false)
-
-        val expected = JsRequestResponse.Success(
-            context = "subscriptionPages",
-            featureName = "useSubscription",
-            method = "getFeatureConfig",
-            id = "myId",
-            result = JSONObject(
-                """
-                {"useSubscriptionsAuthV2":false,"usePaidDuckAi":true,"useAlternateStripePaymentFlow":true,"useGetSubscriptionTierOptions":false}
-                """.trimIndent(),
-            ),
-        )
-
-        val message = """
-            {"context":"subscriptionPages","featureName":"useSubscription","method":"getFeatureConfig","id":"myId","params":{}}
-        """.trimIndent()
-
-        messagingInterface.process(message, "duckduckgo-android-messaging-secret")
-
-        val captor = argumentCaptor<JsRequestResponse>()
-        verify(jsMessageHelper).sendJsResponse(captor.capture(), eq(CALLBACK_NAME), eq(SECRET), eq(webView))
-        val jsMessage = captor.firstValue
-
-        assertTrue(jsMessage is JsRequestResponse.Success)
-        checkEquals(expected, jsMessage)
-    }
-
-    @Test
     fun `when process and get feature config and messaging enabled but duck ai plus disabled then return response with duck ai false`() = runTest {
         givenInterfaceIsRegistered()
-        givenAuthV2(enabled = true)
         givenDuckAiPlus(enabled = false)
         givenStripeSupported(enabled = true)
         givenUseGetSubscriptionTierOptions(enabled = false)
@@ -933,7 +897,6 @@ class SubscriptionMessagingInterfaceTest {
     @Test
     fun `when process and get feature config and tier options enabled then return response with tier options true`() = runTest {
         givenInterfaceIsRegistered()
-        givenAuthV2(enabled = true)
         givenDuckAiPlus(enabled = true)
         givenStripeSupported(enabled = true)
         givenUseGetSubscriptionTierOptions(enabled = true)
@@ -1014,12 +977,6 @@ class SubscriptionMessagingInterfaceTest {
 
     private suspend fun givenAccessTokenIsFailure() {
         whenever(subscriptionsManager.getAccessToken()).thenReturn(AccessTokenResult.Failure(message = "something happened"))
-    }
-
-    private fun givenAuthV2(enabled: Boolean) {
-        val v2SubscriptionFlow = mock<com.duckduckgo.feature.toggles.api.Toggle>()
-        whenever(v2SubscriptionFlow.isEnabled()).thenReturn(enabled)
-        whenever(subscriptionsFeature.enableSubscriptionFlowsV2()).thenReturn(v2SubscriptionFlow)
     }
 
     private fun givenDuckAiPlus(enabled: Boolean) {
