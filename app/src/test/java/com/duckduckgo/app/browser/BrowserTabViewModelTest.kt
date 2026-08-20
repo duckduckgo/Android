@@ -1916,6 +1916,37 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenWillOverrideUrlAfterCompletionThenProgressEventsFlowWithoutWaitingForCommit() {
+        fakeProgressBarUpgradeFeature.behaviourUpdate().setRawStoredState(State(enable = true))
+        setBrowserShowing(true)
+        testee.progressChanged(50, WebViewNavigationState(mockStack, 50))
+        testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
+        assertEquals(false, loadingViewState().isLoading)
+
+        // willOverrideUrl fires from shouldOverrideUrlLoading, well before pageStarted (commit)
+        testee.willOverrideUrl("http://example.com/next")
+
+        testee.progressChanged(10, WebViewNavigationState(mockStack, 10))
+        assertEquals(true, loadingViewState().isLoading)
+    }
+
+    @Test
+    fun whenUserSubmittedQueryAfterCompletionThenProgressEventsFlowWithoutWaitingForCommit() {
+        fakeProgressBarUpgradeFeature.behaviourUpdate().setRawStoredState(State(enable = true))
+        setBrowserShowing(true)
+        testee.progressChanged(50, WebViewNavigationState(mockStack, 50))
+        testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
+        assertEquals(false, loadingViewState().isLoading)
+
+        // App-initiated loads never reach shouldOverrideUrlLoading, so willOverrideUrl never fires
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
+        testee.onUserSubmittedQuery("foo")
+
+        testee.progressChanged(10, WebViewNavigationState(mockStack, 10))
+        assertEquals(true, loadingViewState().isLoading)
+    }
+
+    @Test
     fun whenProgressBarUpgradeEnabledThenRawProgressPassedThrough() {
         fakeProgressBarUpgradeFeature.behaviourUpdate().setRawStoredState(State(enable = true))
         setBrowserShowing(true)
