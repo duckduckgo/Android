@@ -147,6 +147,7 @@ import com.duckduckgo.app.browser.pdf.PdfPixelName
 import com.duckduckgo.app.browser.pdf.PdfRenderDecision
 import com.duckduckgo.app.browser.progressbar.ProgressBarUpgradeFeature
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
+import com.duckduckgo.app.browser.returnsession.ReturnSessionLandingListener
 import com.duckduckgo.app.browser.santize.NonHttpAppLinkChecker
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabs.TabManager
@@ -637,6 +638,7 @@ class BrowserTabViewModelTest {
     private val mockBrokenSitePrompt: BrokenSitePrompt = mock()
     private val mockTabStatsBucketing: TabStatsBucketing = mock()
     private val mockNtpAfterIdleManager: NtpAfterIdleManager = mock()
+    private val mockReturnSessionLandingListener: ReturnSessionLandingListener = mock()
     private val mockBrowserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin> = mock()
     private val browserRefreshTriggerFlow = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     private val browserRefreshTriggerPlugin: BrowserRefreshTriggerPlugin = mock {
@@ -1041,6 +1043,7 @@ class BrowserTabViewModelTest {
                 progressBarUpgradeFeature = fakeProgressBarUpgradeFeature,
                 faviconFetchingFixFeature = fakeFaviconFetchingFixFeature,
                 ntpAfterIdleManager = mockNtpAfterIdleManager,
+                returnSessionLandingListener = mockReturnSessionLandingListener,
                 browserInteractionsPlugins = mockBrowserInteractionsPlugins,
                 browserRefreshTriggerPlugins = mockBrowserRefreshTriggerPlugins,
                 brokenSiteReportTriggerPlugins = mockBrokenSiteReportTriggerPlugins,
@@ -1127,6 +1130,7 @@ class BrowserTabViewModelTest {
             testee.onViewVisible()
             verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
             assertTrue(commandCaptor.allValues.contains(Command.ShowKeyboard))
+            verify(mockReturnSessionLandingListener).onLandingFocusCaptured(focused = true)
         }
 
     @Test
@@ -1154,6 +1158,7 @@ class BrowserTabViewModelTest {
             testee.onViewVisible()
 
             assertCommandIssued<Command.DropAddressBarFocus>()
+            verify(mockReturnSessionLandingListener).onLandingFocusCaptured(focused = false)
         }
 
     @Test
@@ -1649,6 +1654,68 @@ class BrowserTabViewModelTest {
         runTest {
             verify(mockTabRepository).deleteTabAndSelectSource(selectedTabLiveData.value!!.tabId)
         }
+    }
+
+    @Test
+    fun whenUserSubmitsSearchFromInvalidatedTabThenOnlyReturnSessionSpecificClassifierFires() {
+        givenOneActiveTabSelected()
+        givenInvalidatedGlobalLayout()
+        val plugin: BrowserInteractionsPlugin = mock()
+        whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
+        whenever(mockQueryUrlPredictor.isUrl("foo")).thenReturn(false)
+
+        testee.onUserSubmittedQuery("foo")
+
+        verify(plugin, never()).onInputSubmitted()
+        verify(plugin, times(1)).onSearchSubmitted()
+        verify(plugin, never()).onUrlSubmitted()
+    }
+
+    @Test
+    fun whenUserSubmitsCurrentUrlThenOnlyReturnSessionSpecificUrlClassifierFires() {
+        val currentUrl = "https://example.com/"
+        val plugin: BrowserInteractionsPlugin = mock()
+        whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
+        whenever(mockQueryUrlPredictor.isUrl(currentUrl)).thenReturn(true)
+        whenever(mockOmnibarConverter.convertQueryToUrl(currentUrl, null)).thenReturn(currentUrl)
+        loadUrl(currentUrl, isBrowserShowing = true)
+
+        testee.onUserSubmittedQuery(currentUrl)
+
+        // The generic callback deliberately retains its pre-return-session query != url guard;
+        // only the new specific classifier distinguishes this genuine user submission from restoration.
+        verify(plugin, never()).onInputSubmitted()
+        verify(plugin, times(1)).onUrlSubmitted()
+        verify(plugin, never()).onSearchSubmitted()
+    }
+
+    @Test
+    fun whenUserSubmitsSearchThenGenericAndSpecificClassifiersEachFireOnce() {
+        val plugin: BrowserInteractionsPlugin = mock()
+        whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
+        whenever(mockQueryUrlPredictor.isUrl("cats")).thenReturn(false)
+        whenever(mockOmnibarConverter.convertQueryToUrl("cats", null)).thenReturn("https://duckduckgo.com/?q=cats")
+
+        testee.onUserSubmittedQuery("cats")
+
+        verify(plugin, times(1)).onInputSubmitted()
+        verify(plugin, times(1)).onSearchSubmitted()
+        verify(plugin, never()).onUrlSubmitted()
+    }
+
+    @Test
+    fun whenUserSubmitsUrlThenGenericAndSpecificClassifiersEachFireOnce() {
+        val submittedUrl = "https://duckduckgo.com/"
+        val plugin: BrowserInteractionsPlugin = mock()
+        whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
+        whenever(mockQueryUrlPredictor.isUrl(submittedUrl)).thenReturn(true)
+        whenever(mockOmnibarConverter.convertQueryToUrl(submittedUrl, null)).thenReturn(submittedUrl)
+
+        testee.onUserSubmittedQuery(submittedUrl)
+
+        verify(plugin, times(1)).onInputSubmitted()
+        verify(plugin, times(1)).onUrlSubmitted()
+        verify(plugin, never()).onSearchSubmitted()
     }
 
     @Test
@@ -3161,6 +3228,38 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenRestoringCurrentUrlThenNoBrowserInteractionClassifierFires() = runTest {
+        val currentUrl = "https://example.com/"
+        val plugin: BrowserInteractionsPlugin = mock()
+        whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
+        whenever(mockOmnibarConverter.convertQueryToUrl(currentUrl)).thenReturn(currentUrl)
+        loadUrl(currentUrl, isBrowserShowing = true)
+        webViewSessionStorage.stub { onBlocking { restoreSession(anyOrNull(), anyString()) }.thenReturn(false) }
+
+        testee.restoreWebViewState(null, currentUrl)
+
+        verifyNoInteractions(plugin)
+    }
+
+    @Test
+    fun whenRestoringDifferentFallbackUrlThenOldGenericClassifierStillFiresButSpecificClassifiersDoNot() = runTest {
+        val currentUrl = "https://example.com/current"
+        val fallbackUrl = "https://example.com/restored"
+        val plugin: BrowserInteractionsPlugin = mock()
+        whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
+        whenever(mockOmnibarConverter.convertQueryToUrl(fallbackUrl)).thenReturn(fallbackUrl)
+        loadUrl(currentUrl, isBrowserShowing = true)
+        webViewSessionStorage.stub { onBlocking { restoreSession(anyOrNull(), anyString()) }.thenReturn(false) }
+
+        testee.restoreWebViewState(null, fallbackUrl)
+
+        // The generic callback is intentionally unchanged: historically query != url fired it.
+        verify(plugin, times(1)).onInputSubmitted()
+        verify(plugin, never()).onSearchSubmitted()
+        verify(plugin, never()).onUrlSubmitted()
+    }
+
+    @Test
     fun whenRestoringWebViewSessionNotRestorableAndNoPreviousUrlThenNoUrlLoaded() = runTest {
         webViewSessionStorage.stub { onBlocking { restoreSession(anyOrNull(), anyString()) }.thenReturn(false) }
         testee.restoreWebViewState(null, "")
@@ -3245,6 +3344,20 @@ class BrowserTabViewModelTest {
         runTest {
             verify(mockTabRepository).deleteTabAndSelectSource(selectedTabLiveData.value!!.tabId)
         }
+    }
+
+    @Test
+    fun whenUserClicksOnErrorRecoveryActionThenNoBrowserInteractionClassifierFires() {
+        val plugin: BrowserInteractionsPlugin = mock()
+        whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
+        givenOneActiveTabSelected()
+        testee.recoverFromRenderProcessGone()
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val showErrorWithAction = commandCaptor.lastValue as Command.ShowErrorWithAction
+
+        showErrorWithAction.action()
+
+        verifyNoInteractions(plugin)
     }
 
     @Test
@@ -3701,6 +3814,16 @@ class BrowserTabViewModelTest {
             testee.closeAndSelectSourceTab()
             verify(mockTabRepository).deleteTabAndSelectSource(selectedTabLiveData.value!!.tabId)
         }
+
+    @Test
+    fun whenBackInteractionThenBrowserInteractionPluginFiresOnce() {
+        val plugin: BrowserInteractionsPlugin = mock()
+        whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
+
+        testee.onBackInteraction()
+
+        verify(plugin, times(1)).onBackPressed()
+    }
 
     @Test
     fun whenUserPressesBackAndSkippingHomeThenWebViewPreviewGenerated() {
@@ -8592,9 +8715,48 @@ class BrowserTabViewModelTest {
 
         testee.openDuckAiQuery(query = "hello", autoPrompt = true)
 
-        // Fires once from openDuckAiQuery itself and once more from the onUserSubmittedQuery it
-        // routes through via navigateToDuckAi — pre-existing on this path, not new here.
+        // Preserve the pre-return-session behavior: one callback is explicit and one comes from
+        // reusing the NTP tab. The new AI classifier must still fire exactly once without a URL.
         verify(plugin, times(2)).onInputSubmitted()
+        verify(plugin, times(1)).onAiPromptSubmitted()
+        verify(plugin, never()).onUrlSubmitted()
+        verify(plugin, never()).onSearchSubmitted()
+    }
+
+    @Test
+    fun whenOpenDuckAiWithoutQueryThenDoesNotFireOnAiPromptSubmitted() = runTest {
+        val plugin: BrowserInteractionsPlugin = mock()
+        whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
+        setBrowserShowing(true)
+
+        testee.openDuckAiQuery(query = "", autoPrompt = false)
+
+        verify(plugin).onInputSubmitted()
+        verify(plugin, never()).onAiPromptSubmitted()
+    }
+
+    @Test
+    fun whenOpenDuckAiWithPrefillThenDoesNotFireOnAiPromptSubmitted() = runTest {
+        val plugin: BrowserInteractionsPlugin = mock()
+        whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
+        setBrowserShowing(true)
+
+        testee.openDuckAiQuery(query = "prefill", autoPrompt = false)
+
+        verify(plugin).onInputSubmitted()
+        verify(plugin, never()).onAiPromptSubmitted()
+    }
+
+    @Test
+    fun whenOpenDuckAiWithAutoPromptThenFiresOnAiPromptSubmitted() = runTest {
+        val plugin: BrowserInteractionsPlugin = mock()
+        whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
+        setBrowserShowing(true)
+
+        testee.openDuckAiQuery(query = "hello", autoPrompt = true)
+
+        verify(plugin).onInputSubmitted()
+        verify(plugin).onAiPromptSubmitted()
     }
 
     @Test
@@ -8606,6 +8768,33 @@ class BrowserTabViewModelTest {
         testee.openDuckAiChatById("https://duck.ai/chat?chatId=abc")
 
         verify(plugin).onChatSelected()
+    }
+
+    @Test
+    fun whenOpenDuckAiChatByIdReusesNtpTabThenPreservesGenericCallbackWithoutUrlClassification() = runTest {
+        val plugin: BrowserInteractionsPlugin = mock()
+        whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
+        setBrowserShowing(false)
+        whenever(mockOmnibarConverter.convertQueryToUrl("https://duck.ai/chat?chatId=abc", null))
+            .thenReturn("https://duck.ai/chat?chatId=abc")
+
+        testee.openDuckAiChatById("https://duck.ai/chat?chatId=abc")
+
+        verify(plugin, times(1)).onChatSelected()
+        verify(plugin, times(1)).onInputSubmitted()
+        verify(plugin, never()).onSearchSubmitted()
+        verify(plugin, never()).onUrlSubmitted()
+    }
+
+    @Test
+    fun whenDuckAiChatPromptSubmittedThenFiresOnInputSubmittedAndOnAiPromptSubmitted() = runTest {
+        val plugin: BrowserInteractionsPlugin = mock()
+        whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
+
+        testee.onDuckAiChatPromptSubmitted()
+
+        verify(plugin).onInputSubmitted()
+        verify(plugin).onAiPromptSubmitted()
     }
 
     @Test
@@ -8852,17 +9041,45 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenOnDuckChatOmnibarButtonClickedResolvesToDuckChatUrlThenFiresOnAiPromptSubmitted() {
+        whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+        val plugin: BrowserInteractionsPlugin = mock()
+        whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
+
+        testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = true, isNtp = false)
+
+        verify(plugin).onInputSubmitted()
+        verify(plugin).onAiPromptSubmitted()
+        verify(plugin, never()).onUrlSubmitted()
+    }
+
+    @Test
     fun whenOnDuckChatOmnibarButtonClickedWithoutFocusThenGetsDuckChatUrl() {
         whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+        val plugin: BrowserInteractionsPlugin = mock()
+        whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
+
         testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = false)
+
         verify(mockDuckChat).getDuckChatUrl(eq("example"), eq(false), any())
+        verify(plugin).onInputSubmitted()
+        verify(plugin, never()).onAiPromptSubmitted()
     }
 
     @Test
     fun whenOnDuckChatOmnibarButtonClickedWithNullQueryAndFocusThenGetsDuckChatUrlWithAutoPrompt() {
         whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+        val plugin: BrowserInteractionsPlugin = mock()
+        whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
+
         testee.onDuckChatOmnibarButtonClicked(query = null, hasFocus = true, isNtp = false)
+
         verify(mockDuckChat).getDuckChatUrl(eq(""), eq(true), any())
+        verify(plugin).onInputSubmitted()
+        verify(plugin, never()).onAiPromptSubmitted()
     }
 
     @Test
