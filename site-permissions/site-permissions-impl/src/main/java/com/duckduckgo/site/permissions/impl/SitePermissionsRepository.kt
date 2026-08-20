@@ -106,7 +106,7 @@ class SitePermissionsRepositoryImpl @Inject constructor(
     private val drmSessions = mutableMapOf<String, Boolean>()
 
     override suspend fun isDrmEnabledForSite(url: String): Boolean {
-        if (drmPolicyFeature.centralPolicy().isEnabled()) {
+        if (withContext(dispatcherProvider.io()) { drmPolicyFeature.centralPolicy().isEnabled() }) {
             // "Permitted or promptable" rather than "granted" — this feeds the breakage report's drmEnabled field.
             return drmPolicyManager.get().decide(url).action != DrmPolicyAction.DENY
         }
