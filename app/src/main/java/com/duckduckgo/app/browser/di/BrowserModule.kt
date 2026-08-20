@@ -367,7 +367,7 @@ class BrowserModule {
     ): HostnameResolver {
         val lookupTimeout = HostnameResolver.LOOKUP_TIMEOUT_MS.milliseconds
         val dnsLookup = if (appBuildConfig.sdkInt >= 29) {
-            @Suppress("NewApi")
+            @Suppress("NewApi") // we use appBuildConfig
             DnsLookupApi29Impl(dispatcherProvider, DnsResolver.getInstance())
         } else {
             DnsLookupPreApi29Impl(dispatcherProvider)
