@@ -23,6 +23,7 @@ import android.location.LocationManager
 import android.webkit.PermissionRequest
 import androidx.core.content.ContextCompat
 import androidx.core.location.LocationManagerCompat
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.AppScope
@@ -32,7 +33,9 @@ import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermis
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.duckduckgo.site.permissions.impl.drm.DrmPolicyAction
+import com.duckduckgo.site.permissions.impl.drm.DrmPolicyDecision
 import com.duckduckgo.site.permissions.impl.drm.DrmPolicyManager
+import com.duckduckgo.site.permissions.impl.drm.DrmPolicyReason
 import com.duckduckgo.site.permissions.impl.drm.DrmSessionStore
 import com.duckduckgo.site.permissions.impl.feature.DrmPolicyFeature
 import com.duckduckgo.site.permissions.impl.feature.MicrophoneSitePermissionsDomainRecoveryFeature
@@ -54,6 +57,7 @@ class SitePermissionsManagerImpl @Inject constructor(
     private val drmPolicyFeature: DrmPolicyFeature,
     private val drmPolicyManager: DrmPolicyManager,
     private val drmSessionStore: DrmSessionStore,
+    private val pixel: Pixel,
     duckAiHostProvider: DuckAiHostProvider,
 ) : SitePermissionsManager {
 
@@ -83,6 +87,7 @@ class SitePermissionsManagerImpl @Inject constructor(
                     ?.also { logcat { "Permissions: drm policy decision for $url is $it" } }
             }
         }
+        drmDecision?.let { fireDrmAutoGrantedPixel(it) }
 
         val sitePermissionsAllowedToAsk = request.resources
             .filter { drmDecision == null || it != PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID }
@@ -172,6 +177,22 @@ class SitePermissionsManagerImpl @Inject constructor(
         request: String,
     ): Boolean {
         return sitePermissionsRepository.isDomainGranted(url, "", LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION)
+    }
+
+    private fun fireDrmAutoGrantedPixel(decision: DrmPolicyDecision) {
+        if (decision.action != DrmPolicyAction.GRANT) return
+        val reason = when (decision.reason) {
+            DrmPolicyReason.ALLOW_LIST -> SitePermissionsPixelValues.ALLOW_LIST
+            DrmPolicyReason.PROTECTIONS_OFF -> SitePermissionsPixelValues.PROTECTIONS_OFF
+            else -> return
+        }
+        pixel.fire(
+            SitePermissionsPixelName.PERMISSION_AUTO_GRANTED,
+            mapOf(
+                SitePermissionsPixelParameters.PERMISSION_TYPE to SitePermissionsPixelValues.DRM,
+                SitePermissionsPixelParameters.REASON to reason,
+            ),
+        )
     }
 
     private fun isPermissionSupported(permission: String): Boolean =
