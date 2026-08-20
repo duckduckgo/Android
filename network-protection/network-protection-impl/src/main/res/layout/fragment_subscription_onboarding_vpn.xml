@@ -16,36 +16,218 @@
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/daxColorSurface"
-    android:padding="@dimen/keyline_4">
+    android:background="?attr/daxColorSurface">
 
-    <com.duckduckgo.common.ui.view.text.DaxTextView
-        android:id="@+id/subscriptionOnboardingVpnText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="@string/subscriptionOnboardingVpnText"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:typography="h1" />
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/subscriptionOnboardingVpnScrollView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintBottom_toTopOf="@id/subscriptionOnboardingVpnNextButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/keyline_4"
+            android:paddingTop="@dimen/keyline_6"
+            android:paddingBottom="@dimen/keyline_4">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:importantForAccessibility="no"
+                android:src="@drawable/vpn_disabled_feature_128" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/subscriptionOnboardingVpnHeaderTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_5"
+                android:gravity="center"
+                android:text="@string/subscriptionOnboardingVpnHeaderTitle"
+                app:typography="h1" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/subscriptionOnboardingVpnHeaderText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_2"
+                android:gravity="center"
+                android:text="@string/subscriptionOnboardingVpnHeaderText"
+                app:textType="secondary"
+                app:typography="body1" />
+
+            <LinearLayout
+                android:id="@+id/subscriptionOnboardingVpnIpAddressContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_5"
+                android:background="@drawable/subscription_onboarding_vpn_item_background"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="@dimen/keyline_4">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/vpn_grayscale_color_24" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/keyline_4"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <com.duckduckgo.common.ui.view.text.DaxTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/subscriptionOnboardingVpnIpAddressTitle"
+                        app:textType="secondary"
+                        app:typography="caption" />
+
+                    <com.duckduckgo.common.ui.view.text.DaxTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/subscriptionOnboardingVpnIpAddressValue"
+                        app:typography="h4"
+                        tools:ignore="HardcodedText" />
+
+                    <com.duckduckgo.common.ui.view.text.DaxTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/subscriptionOnboardingVpnIpAddressLocation"
+                        app:textType="secondary"
+                        app:typography="caption" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/subscriptionOnboardingVpnIpAddressInfo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:text="@string/subscriptionOnboardingVpnIpAddressInfo"
+                app:textType="secondary"
+                app:typography="body2" />
+
+            <LinearLayout
+                android:id="@+id/subscriptionOnboardingVpnBenefitShielding"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_5"
+                android:background="@drawable/subscription_onboarding_vpn_item_background"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="@dimen/keyline_4">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/alert_recolorable_24" />
+
+                <com.duckduckgo.common.ui.view.text.DaxTextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/keyline_4"
+                    android:layout_weight="1"
+                    android:text="@string/subscriptionOnboardingVpnBenefitShielding"
+                    app:typography="body1" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/subscriptionOnboardingVpnBenefitLocation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_2"
+                android:background="@drawable/subscription_onboarding_vpn_item_background"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="@dimen/keyline_4">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/alert_recolorable_24" />
+
+                <com.duckduckgo.common.ui.view.text.DaxTextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/keyline_4"
+                    android:layout_weight="1"
+                    android:text="@string/subscriptionOnboardingVpnBenefitLocation"
+                    app:typography="body1" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/subscriptionOnboardingVpnBenefitHarmful"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_2"
+                android:background="@drawable/subscription_onboarding_vpn_item_background"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="@dimen/keyline_4">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/alert_recolorable_24" />
+
+                <com.duckduckgo.common.ui.view.text.DaxTextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/keyline_4"
+                    android:layout_weight="1"
+                    android:text="@string/subscriptionOnboardingVpnBenefitHarmful"
+                    app:typography="body1" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
 
     <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
         android:id="@+id/subscriptionOnboardingVpnNextButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/subscriptionOnboardingVpnNext"
+        android:layout_marginHorizontal="@dimen/keyline_4"
+        android:text="@string/subscriptionOnboardingVpnTurnOn"
         app:daxButtonSize="large"
-        app:layout_constraintBottom_toTopOf="@id/subscriptionOnboardingVpnSkipButton" />
+        app:layout_constraintBottom_toTopOf="@id/subscriptionOnboardingVpnSkipButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_goneMarginBottom="@dimen/keyline_4" />
 
     <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
         android:id="@+id/subscriptionOnboardingVpnSkipButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/keyline_2"
+        android:layout_marginHorizontal="@dimen/keyline_4"
+        android:layout_marginTop="@dimen/keyline_1"
+        android:layout_marginBottom="@dimen/keyline_4"
         android:text="@string/subscriptionOnboardingVpnSkip"
+        android:visibility="gone"
         app:daxButtonSize="large"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

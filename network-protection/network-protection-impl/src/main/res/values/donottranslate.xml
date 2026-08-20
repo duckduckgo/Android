@@ -18,8 +18,16 @@
 
     <!-- Subscription onboarding - VPN step (placeholder copy) -->
     <string name="subscriptionOnboardingVpnTitle">VPN step</string>
-    <string name="subscriptionOnboardingVpnText">VPN onboarding setup</string>
-    <string name="subscriptionOnboardingVpnNext">Next</string>
+    <string name="subscriptionOnboardingVpnHeaderTitle">DuckDuckGo VPN is Off</string>
+    <string name="subscriptionOnboardingVpnHeaderText">Connect to secure all of your device\'s internet traffic. <annotation type="learn_more_link">Learn More</annotation></string>
+    <string name="subscriptionOnboardingVpnIpAddressTitle">Your IP Address is Visible</string>
+    <string name="subscriptionOnboardingVpnIpAddressValue">31.120.130.50</string>
+    <string name="subscriptionOnboardingVpnIpAddressLocation">🇪🇸 Madrid, Spain</string>
+    <string name="subscriptionOnboardingVpnIpAddressInfo">When the VPN is off, sites and apps can see this info and use it to connect your activity across sessions.</string>
+    <string name="subscriptionOnboardingVpnBenefitShielding">Shielding your online activity</string>
+    <string name="subscriptionOnboardingVpnBenefitLocation">Hiding your location &amp; IP address</string>
+    <string name="subscriptionOnboardingVpnBenefitHarmful">Blocking harmful sites</string>
+    <string name="subscriptionOnboardingVpnTurnOn">Turn On VPN</string>
     <string name="subscriptionOnboardingVpnSkip">Not now</string>
 
 </resources>
