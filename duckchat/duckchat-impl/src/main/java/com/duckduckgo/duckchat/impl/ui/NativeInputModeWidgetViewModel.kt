@@ -262,6 +262,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         hasText: Boolean,
         hasImageAttachment: Boolean,
         hasFileAttachment: Boolean,
+        addressBarEntryPoint: DuckChatEntryPoint,
     ) {
         val tool = getSelectedTool()?.let { Tool.from(it) }
         val selectedToolParam = when (tool) {
@@ -280,6 +281,8 @@ class NativeInputModeWidgetViewModel @Inject constructor(
             hasText = hasText,
             surface = surface,
             defaultMode = resolvedTogglePositionIfVisible(inputState),
+            tabId = activeTabId.value,
+            addressBarEntryPoint = addressBarEntryPoint,
         )
         when (tool) {
             Tool.IMAGE_GENERATION -> duckChatPixels.fireImageGenerationSubmitted(surface)

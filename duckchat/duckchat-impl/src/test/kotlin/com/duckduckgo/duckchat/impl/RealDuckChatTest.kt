@@ -27,6 +27,7 @@ import androidx.lifecycle.testing.TestLifecycleOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.tabs.BrowserNav
+import com.duckduckgo.app.tabs.model.DuckAiTabSessionRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -107,6 +108,7 @@ class RealDuckChatTest {
     private val mockAppBuildConfig: AppBuildConfig = mock()
     private val mockVoiceSessionStateManager: VoiceSessionStateManager = mock()
     private val chatSuggestionsStore: ChatSuggestionsStore = mock()
+    private val mockDuckAiTabSessionRepository: DuckAiTabSessionRepository = mock()
 
     private lateinit var testee: RealDuckChat
 
@@ -150,6 +152,7 @@ class RealDuckChatTest {
                 mockAppBuildConfig,
                 mockVoiceSessionStateManager,
                 chatSuggestionsStore,
+                mockDuckAiTabSessionRepository,
             ),
         )
         coroutineRule.testScope.advanceUntilIdle()

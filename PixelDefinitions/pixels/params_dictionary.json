@@ -38,6 +38,41 @@
             "none"
         ]
     },
+    "duckAiPromptPageType": {
+        "key": "page_type",
+        "type": "string",
+        "description": "What the user was looking at when the prompt was submitted.",
+        "enum": ["ntp", "serp", "website", "duck_ai", "contextual", "unknown"]
+    },
+    "duckAiEntrySource": {
+        "key": "source",
+        "type": "string",
+        "description": "The Duck.ai entry point: the surface that initiated the entry or prompt submission. Omitted when unknown.",
+        "enum": [
+            "address_bar_prompt",
+            "address_bar_icon",
+            "address_bar_shortcut_chip",
+            "address_bar_editing_state",
+            "suggestion_ask_ai",
+            "browsing_menu_ntp",
+            "browsing_menu_webpage",
+            "tab_switcher",
+            "chat_history_new_chat",
+            "chat_history_open_chat",
+            "voice",
+            "onboarding",
+            "direct_url",
+            "serp",
+            "icon_shortcut",
+            "contextual_chat",
+            "widget_quick_actions",
+            "widget_favorite",
+            "system_search",
+            "digital_assistant",
+            "deep_link_other",
+            "paid_settings"
+        ]
+    },
     "osVersion": {
         "key": "os_version",
         "type": "integer",

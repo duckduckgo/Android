@@ -221,7 +221,6 @@ class RealNativeInputManager @Inject constructor(
     private var navBarTabCountLiveData: LiveData<Int>? = null
     private var navBarTabCountObserver: Observer<Int>? = null
     private var lastCallbacks: NativeInputCallbacks? = null
-    private var nextDuckAiEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT
 
     /** True while an enter morph from [attachWidget] still owns [NativeInputLayoutCoordinator]'s animating flag. */
     private var pendingEnterOwnsAnimating = false
@@ -357,14 +356,14 @@ class RealNativeInputManager @Inject constructor(
     override fun handleDuckAiVoiceResult(query: String) {
         val widget = widgetFrom(rootView)
         if (widget != null) {
-            nextDuckAiEntryPoint = DuckChatEntryPoint.VOICE
+            widget.nextDuckAiEntryPoint = DuckChatEntryPoint.VOICE
             try {
                 if (!widget.isChatTabSelected()) {
                     widget.selectChatTab()
                 }
                 widget.submitMessage(query)
             } finally {
-                nextDuckAiEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT
+                widget.nextDuckAiEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT
             }
         } else {
             duckChat.openDuckChatWithAutoPrompt(query, DuckChatEntryPoint.VOICE)
@@ -750,8 +749,8 @@ class RealNativeInputManager @Inject constructor(
                     }
                     isExiting = false
                     nativeInputEventListener.onChatPromptSubmitted()
-                    val entryPoint = nextDuckAiEntryPoint
-                    nextDuckAiEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT
+                    val entryPoint = widget.nextDuckAiEntryPoint
+                    widget.nextDuckAiEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT
                     callbacks.onDuckAiQuerySubmitted(query, entryPoint)
                 }
             },

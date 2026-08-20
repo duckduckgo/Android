@@ -16,11 +16,17 @@
 
 package com.duckduckgo.duckchat.impl.pixel
 
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.tabs.model.DuckAiTabSessionRepository
+import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.ToggleSelection
+import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.ReportMetric
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_ACCEPT_TERMS_AND_CONDITIONS
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_CREATE_NEW_CHAT
@@ -94,12 +100,20 @@ class RealDuckChatPixelsTest {
     private val statisticsUpdater: StatisticsUpdater = mock()
     private val duckAiMetricCollector: DuckAiMetricCollector = mock()
     private val mockTermsOfServiceHandler: DuckChatTermsOfServiceHandler = mock()
+    private val mockDuckChatInternal: DuckChatInternal = mock()
+    private val mockRegularTabRepository: TabRepository = mock()
+    private val mockFireTabRepository: TabRepository = mock()
+    private val mockTabRepositoryProvider: BrowserModeDataProvider<TabRepository> = mock()
+    private val mockDuckAiTabSessionRepository: DuckAiTabSessionRepository = mock()
+    private val mockDuckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
 
     private lateinit var testee: RealDuckChatPixels
 
     @Before
     fun setup() = runTest {
         whenever(mockDuckChatFeatureRepository.sessionDeltaInMinutes()).thenReturn(1)
+        whenever(mockTabRepositoryProvider.forMode(BrowserMode.REGULAR)).thenReturn(mockRegularTabRepository)
+        whenever(mockTabRepositoryProvider.forMode(BrowserMode.FIRE)).thenReturn(mockFireTabRepository)
 
         testee = RealDuckChatPixels(
             pixel = mockPixel,
@@ -109,6 +123,10 @@ class RealDuckChatPixelsTest {
             statisticsUpdater = statisticsUpdater,
             duckAiMetricCollector = duckAiMetricCollector,
             termsOfServiceHandler = mockTermsOfServiceHandler,
+            tabRepositoryProvider = mockTabRepositoryProvider,
+            duckAiTabSessionRepository = mockDuckAiTabSessionRepository,
+            duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
+            duckChatInternal = mockDuckChatInternal,
         )
     }
 
@@ -267,23 +285,35 @@ class RealDuckChatPixelsTest {
     }
 
     @Test
-    fun `when reportContextualPromptSubmittedWithContextNative then fires count and daily`() = runTest {
+    fun `when reportContextualPromptSubmittedWithContextNative then fires count and daily with page type and source`() = runTest {
         testee.reportContextualPromptSubmittedWithContextNative()
 
         advanceUntilIdle()
 
-        verify(mockPixel).fire(DUCK_CHAT_CONTEXTUAL_PROMPT_SUBMITTED_WITH_CONTEXT_NATIVE_COUNT)
-        verify(mockPixel).fire(DUCK_CHAT_CONTEXTUAL_PROMPT_SUBMITTED_WITH_CONTEXT_NATIVE_DAILY, type = Pixel.PixelType.Daily())
+        // The contextual sheet is always entered by using it, so page_type and source are constants —
+        // no tab lookup involved.
+        val expectedParams = mapOf("page_type" to "contextual", "source" to "contextual_chat")
+        verify(mockPixel).fire(DUCK_CHAT_CONTEXTUAL_PROMPT_SUBMITTED_WITH_CONTEXT_NATIVE_COUNT, parameters = expectedParams)
+        verify(mockPixel).fire(
+            DUCK_CHAT_CONTEXTUAL_PROMPT_SUBMITTED_WITH_CONTEXT_NATIVE_DAILY,
+            parameters = expectedParams,
+            type = Pixel.PixelType.Daily(),
+        )
     }
 
     @Test
-    fun `when reportContextualPromptSubmittedWithoutContextNative then fires count and daily`() = runTest {
+    fun `when reportContextualPromptSubmittedWithoutContextNative then fires count and daily with page type and source`() = runTest {
         testee.reportContextualPromptSubmittedWithoutContextNative()
 
         advanceUntilIdle()
 
-        verify(mockPixel).fire(DUCK_CHAT_CONTEXTUAL_PROMPT_SUBMITTED_WITHOUT_CONTEXT_NATIVE_COUNT)
-        verify(mockPixel).fire(DUCK_CHAT_CONTEXTUAL_PROMPT_SUBMITTED_WITHOUT_CONTEXT_NATIVE_DAILY, type = Pixel.PixelType.Daily())
+        val expectedParams = mapOf("page_type" to "contextual", "source" to "contextual_chat")
+        verify(mockPixel).fire(DUCK_CHAT_CONTEXTUAL_PROMPT_SUBMITTED_WITHOUT_CONTEXT_NATIVE_COUNT, parameters = expectedParams)
+        verify(mockPixel).fire(
+            DUCK_CHAT_CONTEXTUAL_PROMPT_SUBMITTED_WITHOUT_CONTEXT_NATIVE_DAILY,
+            parameters = expectedParams,
+            type = Pixel.PixelType.Daily(),
+        )
     }
 
     @Test

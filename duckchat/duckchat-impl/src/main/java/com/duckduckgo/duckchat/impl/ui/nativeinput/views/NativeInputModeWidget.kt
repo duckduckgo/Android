@@ -71,6 +71,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InteractionLock
@@ -131,6 +132,11 @@ interface NativeInputWidget {
 
     var onCustomizeResponsesClicked: (() -> Unit)?
     val isModelMenuVisible: Boolean
+
+    /**
+     * The entry point that will be reported when Duck.ai is opened or a prompt is submitted
+     */
+    var nextDuckAiEntryPoint: DuckChatEntryPoint
 
     fun onBackPressed()
     fun focusInput(activity: Activity?)
@@ -430,6 +436,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     override var onBack: (() -> Unit)? = null
     var onSearchSent: ((String) -> Unit)? = null
     var onChatSent: ((String) -> Unit)? = null
+    override var nextDuckAiEntryPoint: DuckChatEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT
     override var onSearchSelected: ((animate: Boolean) -> Unit)? = null
     override var onChatSelected: ((animate: Boolean) -> Unit)? = null
     var onSearchTextChanged: ((String) -> Unit)? = null
@@ -1380,6 +1387,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
             hasText = hasText,
             hasImageAttachment = hasImageAttachment,
             hasFileAttachment = hasFileAttachment,
+            addressBarEntryPoint = nextDuckAiEntryPoint,
         )
         // Fires alongside prompt_submitted, but only when the input is in a Duck.ai chat context
         // (a prompt sent from within an active chat) — not omnibar submissions that start a new chat.

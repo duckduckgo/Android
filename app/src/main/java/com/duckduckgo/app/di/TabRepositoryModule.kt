@@ -27,6 +27,7 @@ import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.tabs.TabManagerFeatureFlags
 import com.duckduckgo.app.tabs.db.TabsDao
+import com.duckduckgo.app.tabs.model.DuckAiTabSessionRepository
 import com.duckduckgo.app.tabs.model.TabAtomicOperations
 import com.duckduckgo.app.tabs.model.TabDataRepository
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -80,6 +81,7 @@ abstract class TabRepositoryModule {
             duckChatContextualDataStore: DuckChatContextualDataStore,
             tabVisitedSitesRepository: TabVisitedSitesRepository,
             nativeInputStatePublisher: NativeInputStatePublisher,
+            duckAiTabSessionRepository: DuckAiTabSessionRepository,
         ): TabDataRepository = TabDataRepository(
             tabsDao = tabsDao,
             siteFactory = siteFactory,
@@ -95,6 +97,7 @@ abstract class TabRepositoryModule {
             duckChatContextualDataStore = duckChatContextualDataStore,
             tabVisitedSitesRepository = tabVisitedSitesRepository,
             nativeInputStatePublisher = nativeInputStatePublisher,
+            duckAiTabSessionRepository = duckAiTabSessionRepository,
         )
 
         @Provides
@@ -115,6 +118,7 @@ abstract class TabRepositoryModule {
             duckChatContextualDataStore: DuckChatContextualDataStore,
             tabVisitedSitesRepository: TabVisitedSitesRepository,
             nativeInputStatePublisher: NativeInputStatePublisher,
+            duckAiTabSessionRepository: DuckAiTabSessionRepository,
         ): TabDataRepository = TabDataRepository(
             tabsDao = tabsDao,
             siteFactory = siteFactory,
@@ -130,6 +134,7 @@ abstract class TabRepositoryModule {
             duckChatContextualDataStore = duckChatContextualDataStore,
             tabVisitedSitesRepository = tabVisitedSitesRepository,
             nativeInputStatePublisher = nativeInputStatePublisher,
+            duckAiTabSessionRepository = duckAiTabSessionRepository,
         )
     }
 }

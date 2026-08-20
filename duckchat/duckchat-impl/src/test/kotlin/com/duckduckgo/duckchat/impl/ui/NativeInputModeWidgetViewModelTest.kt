@@ -38,6 +38,7 @@ import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
@@ -1689,7 +1690,12 @@ class NativeInputModeWidgetViewModelTest {
         advanceUntilIdle()
         viewModel.setSelectedTool(Tool.IMAGE_GENERATION.rawValue)
 
-        viewModel.fireSubmissionPixels(hasText = true, hasImageAttachment = true, hasFileAttachment = false)
+        viewModel.fireSubmissionPixels(
+            hasText = true,
+            hasImageAttachment = true,
+            hasFileAttachment = false,
+            addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
+        )
 
         verify(duckChatPixels).firePromptSubmitted(
             selectedTool = "image_generation",
@@ -1700,6 +1706,8 @@ class NativeInputModeWidgetViewModelTest {
             hasText = true,
             surface = DuckChatPixelSurface.DUCK_AI,
             defaultMode = null,
+            tabId = tabId,
+            addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
         )
         verify(duckChatPixels).fireImageGenerationSubmitted(any())
         verify(duckChatPixels, never()).fireWebSearchSubmitted(any())
@@ -1714,7 +1722,12 @@ class NativeInputModeWidgetViewModelTest {
         viewModel.configure(tabId = tabId, isDuckAiMode = true, isBottom = false)
         advanceUntilIdle()
 
-        viewModel.fireSubmissionPixels(hasText = true, hasImageAttachment = false, hasFileAttachment = false)
+        viewModel.fireSubmissionPixels(
+            hasText = true,
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
+        )
 
         verify(duckChatPixels).firePromptSubmitted(
             selectedTool = "none",
@@ -1725,6 +1738,8 @@ class NativeInputModeWidgetViewModelTest {
             hasText = true,
             surface = DuckChatPixelSurface.DUCK_AI,
             defaultMode = null,
+            tabId = tabId,
+            addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
         )
         verify(duckChatPixels, never()).fireImageGenerationSubmitted(any())
         verify(duckChatPixels, never()).fireWebSearchSubmitted(any())
@@ -1739,7 +1754,12 @@ class NativeInputModeWidgetViewModelTest {
         viewModel.configure(tabId = "tab-A", isDuckAiMode = false, isBottom = false)
         advanceUntilIdle()
 
-        viewModel.fireSubmissionPixels(hasText = true, hasImageAttachment = false, hasFileAttachment = false)
+        viewModel.fireSubmissionPixels(
+            hasText = true,
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
+        )
 
         verify(duckChatPixels).firePromptSubmitted(
             selectedTool = "none",
@@ -1750,6 +1770,8 @@ class NativeInputModeWidgetViewModelTest {
             hasText = true,
             surface = DuckChatPixelSurface.ADDRESS_BAR,
             defaultMode = NativeInputState.ToggleSelection.SEARCH,
+            tabId = "tab-A",
+            addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
         )
     }
 
@@ -1758,7 +1780,12 @@ class NativeInputModeWidgetViewModelTest {
         whenever(duckChatInternal.resolvedTogglePosition()).thenReturn(NativeInputState.ToggleSelection.SEARCH)
         advanceUntilIdle()
 
-        testee.fireSubmissionPixels(hasText = true, hasImageAttachment = false, hasFileAttachment = false)
+        testee.fireSubmissionPixels(
+            hasText = true,
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
+        )
 
         verify(duckChatPixels).firePromptSubmitted(
             selectedTool = "none",
@@ -1769,6 +1796,8 @@ class NativeInputModeWidgetViewModelTest {
             hasText = true,
             surface = DuckChatPixelSurface.ADDRESS_BAR,
             defaultMode = null,
+            tabId = "test-tab",
+            addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
         )
     }
 
@@ -1782,7 +1811,12 @@ class NativeInputModeWidgetViewModelTest {
         advanceUntilIdle()
         viewModel.setSelectedTool(Tool.WEB_SEARCH.rawValue)
 
-        viewModel.fireSubmissionPixels(hasText = true, hasImageAttachment = false, hasFileAttachment = false)
+        viewModel.fireSubmissionPixels(
+            hasText = true,
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
+        )
 
         verify(duckChatPixels).firePromptSubmitted(
             selectedTool = "web_search",
@@ -1793,6 +1827,8 @@ class NativeInputModeWidgetViewModelTest {
             hasText = true,
             surface = DuckChatPixelSurface.DUCK_AI,
             defaultMode = null,
+            tabId = tabId,
+            addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
         )
         verify(duckChatPixels).fireWebSearchSubmitted(any())
         verify(duckChatPixels, never()).fireImageGenerationSubmitted(any())

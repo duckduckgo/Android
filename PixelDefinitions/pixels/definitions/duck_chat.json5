@@ -230,28 +230,28 @@
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "duckAiPromptPageType", "duckAiEntrySource"]
     },
     "m_aichat_contextual_prompt_submitted_with_context_native_daily": {
         "description": "(Daily Pixel) The user has submitted a prompt to Contextual Duck.ai with the page context attached",
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "duckAiPromptPageType", "duckAiEntrySource"]
     },
     "m_aichat_contextual_prompt_submitted_without_context_native_count": {
         "description": "The user has submitted a prompt to Contextual Duck.ai without the page context attached",
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "duckAiPromptPageType", "duckAiEntrySource"]
     },
     "m_aichat_contextual_prompt_submitted_without_context_native_daily": {
         "description": "(Daily Pixel) The user has submitted a prompt to Contextual Duck.ai without the page context attached",
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "duckAiPromptPageType", "duckAiEntrySource"]
     },
     "m_aichat_contextual_page_context_collection_empty": {
         "description": "The page context collected via content scripts is not valid / is empty",
@@ -446,35 +446,7 @@
         "suffixes": ["first_daily_count", "form_factor"],
         "parameters": [
             "appVersion",
-            {
-                "key": "source",
-                "type": "string",
-                "description": "The surface that initiated the Duck.ai entry.",
-                "enum": [
-                    "address_bar_prompt",
-                    "address_bar_icon",
-                    "address_bar_shortcut_chip",
-                    "address_bar_editing_state",
-                    "suggestion_ask_ai",
-                    "browsing_menu_ntp",
-                    "browsing_menu_webpage",
-                    "tab_switcher",
-                    "chat_history_new_chat",
-                    "chat_history_open_chat",
-                    "voice",
-                    "onboarding",
-                    "direct_url",
-                    "serp",
-                    "icon_shortcut",
-                    "contextual_chat",
-                    "widget_quick_actions",
-                    "widget_favorite",
-                    "system_search",
-                    "digital_assistant",
-                    "deep_link_other",
-                    "paid_settings"
-                ]
-            },
+            "duckAiEntrySource",
             { "key": "duck_ai_enabled", "type": "boolean", "description": "Whether Duck.ai is enabled by feature and user settings." },
             {
                 "key": "input_screen_enabled",
@@ -1288,7 +1260,9 @@
             },
             { "key": "has_image_attachment", "type": "boolean", "description": "Whether the prompt included an image attachment" },
             { "key": "has_file_attachment", "type": "boolean", "description": "Whether the prompt included a file attachment" },
-            { "key": "has_text", "type": "boolean", "description": "Whether the prompt included text" }
+            { "key": "has_text", "type": "boolean", "description": "Whether the prompt included text" },
+            "duckAiPromptPageType",
+            "duckAiEntrySource"
         ]
     },
     "m_aichat_unified_input_prompt_submitted_daily": {
@@ -1320,7 +1294,9 @@
             },
             { "key": "has_image_attachment", "type": "boolean", "description": "Whether the prompt included an image attachment" },
             { "key": "has_file_attachment", "type": "boolean", "description": "Whether the prompt included a file attachment" },
-            { "key": "has_text", "type": "boolean", "description": "Whether the prompt included text" }
+            { "key": "has_text", "type": "boolean", "description": "Whether the prompt included text" },
+            "duckAiPromptPageType",
+            "duckAiEntrySource"
         ]
     },
     "m_aichat_unified_input_sent_prompt_in_chat_count": {

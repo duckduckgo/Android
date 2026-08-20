@@ -16,9 +16,15 @@
 
 package com.duckduckgo.duckchat.impl.pixel
 
+import androidx.core.net.toUri
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.tabs.model.DuckAiTabSessionRepository
+import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
@@ -26,6 +32,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.ToggleSelection
+import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.ModelTier
 import com.duckduckgo.duckchat.impl.ReportMetric
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_CREATE_NEW_CHAT
@@ -208,6 +215,8 @@ interface DuckChatPixels {
         hasText: Boolean,
         surface: DuckChatPixelSurface,
         defaultMode: ToggleSelection?,
+        tabId: String?,
+        addressBarEntryPoint: DuckChatEntryPoint?,
     )
 
     /** Prompt submitted while the unified input is in a Duck.ai chat context. Fires alongside [firePromptSubmitted]. */
@@ -273,6 +282,10 @@ class RealDuckChatPixels @Inject constructor(
     private val statisticsUpdater: StatisticsUpdater,
     private val duckAiMetricCollector: DuckAiMetricCollector,
     private val termsOfServiceHandler: DuckChatTermsOfServiceHandler,
+    private val tabRepositoryProvider: BrowserModeDataProvider<TabRepository>,
+    private val duckAiTabSessionRepository: DuckAiTabSessionRepository,
+    private val duckChatInternal: DuckChatInternal,
+    private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
 ) : DuckChatPixels {
 
     private fun fireCountAndDaily(
@@ -307,6 +320,45 @@ class RealDuckChatPixels @Inject constructor(
                 DuckChatPixelParameters.HAS_PROMPT to hasPrompt.toString(),
             ),
         )
+    }
+
+    /** What the user was looking at when a prompt was submitted. See [DuckChatPixelParameters.PROMPT_PAGE_TYPE]. */
+    private suspend fun resolvePromptPageType(
+        surface: DuckChatPixelSurface,
+        tabId: String?,
+    ): String = when (surface) {
+        DuckChatPixelSurface.DUCK_AI -> "duck_ai"
+        DuckChatPixelSurface.CONTEXTUAL_CHAT -> "contextual"
+        DuckChatPixelSurface.ADDRESS_BAR -> {
+            val tab = tabId?.let { findTab(it) }
+            val url = tab?.url
+            when {
+                tab == null -> "unknown"
+                url.isNullOrBlank() -> "ntp"
+                duckChatInternal.isDuckChatUrl(url.toUri()) -> "duck_ai"
+                duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url) -> "serp"
+                else -> "website"
+            }
+        }
+    }
+
+    /** [tabId] may belong to either browsing modes Regular or Fire mode (They are backed by separate databases). */
+    private suspend fun findTab(tabId: String) =
+        tabRepositoryProvider.forMode(BrowserMode.REGULAR).getTab(tabId)
+            ?: tabRepositoryProvider.forMode(BrowserMode.FIRE).getTab(tabId)
+
+    /**
+     * The `source` for a prompt submission. Inside an existing Duck.ai chat, the entry point is carried forward
+     * from whatever was recorded for [tabId] when that chat was entered.
+     */
+    private suspend fun resolveEntrySource(
+        surface: DuckChatPixelSurface,
+        tabId: String?,
+        addressBarEntryPoint: DuckChatEntryPoint?,
+    ): String? = when (surface) {
+        DuckChatPixelSurface.DUCK_AI -> tabId?.let { duckAiTabSessionRepository.getEntryPointSource(it) }
+        DuckChatPixelSurface.CONTEXTUAL_CHAT -> DuckChatEntryPoint.CONTEXTUAL_CHAT.toPixelValue()
+        DuckChatPixelSurface.ADDRESS_BAR -> addressBarEntryPoint?.toPixelValue()
     }
 
     override fun reportContextualSuggestionSelected(
@@ -538,10 +590,21 @@ class RealDuckChatPixels @Inject constructor(
 
     override fun reportContextualPromptSubmittedWithContextNative() {
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PROMPT_SUBMITTED_WITH_CONTEXT_NATIVE_COUNT)
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PROMPT_SUBMITTED_WITH_CONTEXT_NATIVE_DAILY, type = Pixel.PixelType.Daily())
+            val params = contextualPromptSubmittedParams()
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PROMPT_SUBMITTED_WITH_CONTEXT_NATIVE_COUNT, parameters = params)
+            pixel.fire(
+                DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PROMPT_SUBMITTED_WITH_CONTEXT_NATIVE_DAILY,
+                parameters = params,
+                type = Pixel.PixelType.Daily(),
+            )
         }
     }
+
+    /** The contextual sheet is always entered by using it, so both params are constants — no lookup needed. */
+    private fun contextualPromptSubmittedParams(): Map<String, String> = mapOf(
+        DuckChatPixelParameters.PROMPT_PAGE_TYPE to "contextual",
+        DuckChatPixelParameters.ENTRY_SOURCE to DuckChatEntryPoint.CONTEXTUAL_CHAT.toPixelValue(),
+    )
 
     override fun reportContextualPageContextAutoAttached() {
         appCoroutineScope.launch(dispatcherProvider.io()) {
@@ -552,8 +615,13 @@ class RealDuckChatPixels @Inject constructor(
 
     override fun reportContextualPromptSubmittedWithoutContextNative() {
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PROMPT_SUBMITTED_WITHOUT_CONTEXT_NATIVE_COUNT)
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PROMPT_SUBMITTED_WITHOUT_CONTEXT_NATIVE_DAILY, type = Pixel.PixelType.Daily())
+            val params = contextualPromptSubmittedParams()
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PROMPT_SUBMITTED_WITHOUT_CONTEXT_NATIVE_COUNT, parameters = params)
+            pixel.fire(
+                DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PROMPT_SUBMITTED_WITHOUT_CONTEXT_NATIVE_DAILY,
+                parameters = params,
+                type = Pixel.PixelType.Daily(),
+            )
         }
     }
 
@@ -751,24 +819,29 @@ class RealDuckChatPixels @Inject constructor(
         hasText: Boolean,
         surface: DuckChatPixelSurface,
         defaultMode: ToggleSelection?,
+        tabId: String?,
+        addressBarEntryPoint: DuckChatEntryPoint?,
     ) {
-        val params = buildMap {
-            put(DuckChatPixelParameters.SELECTED_TOOL, selectedTool)
-            modelId?.let { put(DuckChatPixelParameters.MODEL_ID, it) }
-            reasoningEffort?.let { put(DuckChatPixelParameters.REASONING_EFFORT, it) }
-            put(DuckChatPixelParameters.HAS_IMAGE_ATTACHMENT, hasImageAttachment.toString())
-            put(DuckChatPixelParameters.HAS_FILE_ATTACHMENT, hasFileAttachment.toString())
-            put(DuckChatPixelParameters.HAS_TEXT, hasText.toString())
-            put(DuckChatPixelParameters.SURFACE, surface.value)
-            defaultMode
-                ?.takeIf { surface == DuckChatPixelSurface.ADDRESS_BAR }
-                ?.let { put(DuckChatPixelParameters.DEFAULT_MODE, it.pixelValue()) }
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            val pageType = resolvePromptPageType(surface, tabId)
+            val source = resolveEntrySource(surface, tabId, addressBarEntryPoint)
+            val params = buildMap {
+                put(DuckChatPixelParameters.SELECTED_TOOL, selectedTool)
+                modelId?.let { put(DuckChatPixelParameters.MODEL_ID, it) }
+                reasoningEffort?.let { put(DuckChatPixelParameters.REASONING_EFFORT, it) }
+                put(DuckChatPixelParameters.HAS_IMAGE_ATTACHMENT, hasImageAttachment.toString())
+                put(DuckChatPixelParameters.HAS_FILE_ATTACHMENT, hasFileAttachment.toString())
+                put(DuckChatPixelParameters.HAS_TEXT, hasText.toString())
+                put(DuckChatPixelParameters.SURFACE, surface.value)
+                defaultMode
+                    ?.takeIf { surface == DuckChatPixelSurface.ADDRESS_BAR }
+                    ?.let { put(DuckChatPixelParameters.DEFAULT_MODE, it.pixelValue()) }
+                put(DuckChatPixelParameters.PROMPT_PAGE_TYPE, pageType)
+                source?.let { put(DuckChatPixelParameters.ENTRY_SOURCE, it) }
+            }
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_COUNT, parameters = params)
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_DAILY, parameters = params, type = Pixel.PixelType.Daily())
         }
-        fireCountAndDaily(
-            DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_COUNT,
-            DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_DAILY,
-            params,
-        )
     }
 
     override fun fireSentPromptInChat(surface: DuckChatPixelSurface) = fireCountAndDaily(
@@ -1375,6 +1448,9 @@ object DuckChatPixelParameters {
     const val WAS_USED_BEFORE = "was_used_before"
     const val SUGGESTION_ID = "suggestionId"
     const val PAGE_TYPE = "pageType"
+
+    /** What the user was looking at when a prompt was submitted. Distinct from [PAGE_TYPE], which classifies contextual suggestions. */
+    const val PROMPT_PAGE_TYPE = "page_type"
     const val IS_SMART = "isSmart"
     const val DELTA_TIMESTAMP_PARAMETERS = "delta-timestamp-minutes"
     const val INPUT_SCREEN_MODE = "mode"
@@ -1664,5 +1740,3 @@ internal fun ToggleSelection.pixelValue(): String = when (this) {
     ToggleSelection.SEARCH -> "search"
     ToggleSelection.DUCK_AI -> "duck_ai"
 }
-
-private fun DuckChatEntryPoint.toPixelValue(): String = name.lowercase()

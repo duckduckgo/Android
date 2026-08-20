@@ -70,6 +70,7 @@ class TabDataRepository(
     private val duckChatContextualDataStore: DuckChatContextualDataStore,
     private val tabVisitedSitesRepository: TabVisitedSitesRepository,
     private val nativeInputStatePublisher: NativeInputStatePublisher,
+    private val duckAiTabSessionRepository: DuckAiTabSessionRepository,
 ) : TabRepository, TabAtomicOperations {
 
     override val liveTabs: LiveData<List<TabEntity>> = tabsDao.liveTabs().distinctUntilChanged()
@@ -227,6 +228,7 @@ class TabDataRepository(
                 ),
                 updateIfBlankParent = updateIfBlankParent,
             )
+            duckAiTabSessionRepository.tryClaimEntryPointSource(tabId, data.value?.url)
         }
     }
 
@@ -299,6 +301,7 @@ class TabDataRepository(
     ) {
         databaseExecutor().scheduleDirect {
             tabsDao.updateUrlAndTitle(tabId, site?.url, site?.title, viewed = true)
+            duckAiTabSessionRepository.tryClaimEntryPointSource(tabId, site?.url)
         }
     }
 
