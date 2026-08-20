@@ -1142,27 +1142,6 @@ class RealSubscriptionsManagerTest {
     }
 
     @Test
-    fun whenGetAuthTokenIfUserSignedInAndValidTokenThenReturnSuccess() = runTest {
-        givenUserIsSignedIn()
-
-        val result = subscriptionsManager.getAuthToken()
-
-        assertTrue(result is AuthTokenResult.Success)
-
-        val actualAuthToken = (result as AuthTokenResult.Success).authToken
-        assertEquals(FAKE_ACCESS_TOKEN_V2, actualAuthToken)
-    }
-
-    @Test
-    fun whenGetAuthTokenIfUserNotSignedInThenReturnFailure() = runTest {
-        givenUserIsNotSignedIn()
-
-        val result = subscriptionsManager.getAuthToken()
-
-        assertTrue(result is AuthTokenResult.Failure)
-    }
-
-    @Test
     fun whenGetPortalAndUserSignedInReturnUrl() = runTest {
         givenUserIsSignedIn()
         givenUrlPortalSucceeds()

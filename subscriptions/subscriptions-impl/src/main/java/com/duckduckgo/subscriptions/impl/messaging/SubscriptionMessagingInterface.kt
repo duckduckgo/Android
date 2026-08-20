@@ -34,7 +34,6 @@ import com.duckduckgo.js.messaging.api.JsRequestResponse
 import com.duckduckgo.js.messaging.api.SubscriptionEvent
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.subscriptions.impl.AccessTokenResult
-import com.duckduckgo.subscriptions.impl.AuthTokenResult
 import com.duckduckgo.subscriptions.impl.JSONObjectAdapter
 import com.duckduckgo.subscriptions.impl.SubscriptionsChecker
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
@@ -168,22 +167,20 @@ class SubscriptionMessagingInterface @Inject constructor(
         override fun process(jsMessage: JsMessage, jsMessaging: JsMessaging, jsMessageCallback: JsMessageCallback?) {
             if (jsMessage.id == null) return
 
-            val authToken: String? = runBlocking(dispatcherProvider.io()) {
-                val pat = subscriptionsManager.getAuthToken()
-                when (pat) {
-                    is AuthTokenResult.Success -> pat.authToken
-                    is AuthTokenResult.Failure.TokenExpired -> pat.authToken
-                    else -> null
+            val accessToken: String? = runBlocking(dispatcherProvider.io()) {
+                when (val result = subscriptionsManager.getAccessToken()) {
+                    is AccessTokenResult.Success -> result.accessToken
+                    is AccessTokenResult.Failure -> null
                 }
             }
 
-            val data = if (authToken != null) {
+            val data = if (accessToken != null) {
                 JsRequestResponse.Success(
                     context = jsMessage.context,
                     featureName = featureName,
                     method = jsMessage.method,
                     id = jsMessage.id!!,
-                    result = JSONObject("""{ "token":"$authToken"}"""),
+                    result = JSONObject("""{ "token":"$accessToken"}"""),
                 )
             } else {
                 JsRequestResponse.Success(

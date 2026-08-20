@@ -158,12 +158,6 @@ interface SubscriptionsManager {
     suspend fun getAccount(): Account?
 
     /**
-     * Returns the auth token and if expired, tries to refresh irt
-     */
-    @Deprecated("This method will be removed after migrating to auth v2")
-    suspend fun getAuthToken(): AuthTokenResult
-
-    /**
      * Returns the access token from store
      */
     suspend fun getAccessToken(): AccessTokenResult
@@ -1137,17 +1131,6 @@ class RealSubscriptionsManager @Inject constructor(
         }
     }
 
-    @Deprecated("This method will be removed after migrating to auth v2")
-    override suspend fun getAuthToken(): AuthTokenResult {
-        if (isSignedInV2()) {
-            return when (val accessToken = getAccessToken()) {
-                is AccessTokenResult.Failure -> AuthTokenResult.Failure.UnknownError
-                is AccessTokenResult.Success -> AuthTokenResult.Success(accessToken.accessToken)
-            }
-        }
-        return AuthTokenResult.Failure.UnknownError
-    }
-
     override suspend fun getAccessToken(): AccessTokenResult {
         return if (isSignedIn()) {
             try {
@@ -1276,14 +1259,6 @@ class RealSubscriptionsManager @Inject constructor(
 sealed class AccessTokenResult {
     data class Success(val accessToken: String) : AccessTokenResult()
     data class Failure(val message: String) : AccessTokenResult()
-}
-
-sealed class AuthTokenResult {
-    data class Success(val authToken: String) : AuthTokenResult()
-    sealed class Failure : AuthTokenResult() {
-        data class TokenExpired(val authToken: String) : Failure()
-        data object UnknownError : Failure()
-    }
 }
 
 fun String.toStatus(): SubscriptionStatus {
