@@ -18,6 +18,7 @@ package com.duckduckgo.subscriptions.impl.onboarding.welcome
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.view.doOnLayout
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
@@ -54,6 +55,12 @@ class SubscriptionOnboardingWelcomeFragment : DuckDuckGoFragment(R.layout.fragme
             .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
             .onEach { render(it) }
             .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        if (savedInstanceState == null) {
+            binding.subscriptionOnboardingWelcomeKonfetti.doOnLayout {
+                binding.subscriptionOnboardingWelcomeKonfetti.launchOnboardingConfetti()
+            }
+        }
     }
 
     private fun render(viewState: ViewState) {
