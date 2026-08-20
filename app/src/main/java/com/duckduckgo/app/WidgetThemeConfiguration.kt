@@ -30,6 +30,7 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
@@ -38,6 +39,10 @@ import com.duckduckgo.widget.SearchAndFavoritesWidget
 import com.duckduckgo.widget.WidgetPreferences
 import com.duckduckgo.widget.WidgetTheme
 import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
+
+internal fun resolveWidgetConfigurationBackgroundAttr(isPictogramsEnabled: Boolean): Int =
+    if (isPictogramsEnabled) CommonR.attr.daxColorSurfaceTertiary else CommonR.attr.daxColorSurface
 
 @InjectWith(ActivityScope::class)
 class WidgetThemeConfiguration : DuckDuckGoActivity() {
@@ -68,6 +73,13 @@ class WidgetThemeConfiguration : DuckDuckGoActivity() {
             enableTransparentEdgeToEdge()
         }
         setContentView(binding.root)
+        binding.widgetConfigPanel.setBackgroundColor(
+            getColorFromAttr(
+                resolveWidgetConfigurationBackgroundAttr(
+                    isPictogramsEnabled = appBrandDesignUpdateToggles.pictograms().isEnabled(),
+                ),
+            ),
+        )
         if (edgeToEdgeEnabled) {
             edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.root)
             edgeToEdgeHandler.applyNavigationBarInsets(binding.widgetConfigPanel, drawBehindGestureNav = false)

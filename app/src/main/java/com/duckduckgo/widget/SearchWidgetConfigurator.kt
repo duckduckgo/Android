@@ -25,6 +25,7 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.mode.SearchWidgetDuckAi
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
+import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.voice.api.VoiceSearchAvailability
@@ -32,10 +33,32 @@ import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject
 
+internal fun resolveSearchBarBackground(
+    widgetTheme: WidgetTheme,
+    isPictogramsEnabled: Boolean,
+): Int = when (widgetTheme) {
+    WidgetTheme.LIGHT -> if (isPictogramsEnabled) {
+        R.drawable.search_widget_background_rebrand_light
+    } else {
+        R.drawable.search_widget_background_light
+    }
+    WidgetTheme.DARK -> if (isPictogramsEnabled) {
+        R.drawable.search_widget_background_rebrand_dark
+    } else {
+        R.drawable.search_widget_background_dark
+    }
+    WidgetTheme.SYSTEM_DEFAULT -> if (isPictogramsEnabled) {
+        R.drawable.search_widget_background_rebrand_daynight
+    } else {
+        R.drawable.search_widget_background_daynight
+    }
+}
+
 class SearchWidgetConfigurator @Inject constructor(
     private val voiceSearchAvailability: VoiceSearchAvailability,
     private val duckChat: DuckChat,
     private val dispatcherProvider: DispatcherProvider,
+    private val appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles,
 ) {
 
     suspend fun populateRemoteViews(
@@ -43,6 +66,7 @@ class SearchWidgetConfigurator @Inject constructor(
         remoteViews: RemoteViews,
         fromFavWidget: Boolean,
         fromSearchOnlyWidget: Boolean = false,
+        widgetTheme: WidgetTheme,
     ) {
         val (voiceSearchEnabled, duckAiEnabled) = withContext(dispatcherProvider.io()) {
             voiceSearchAvailability.isVoiceSearchAvailable to (duckChat.isEnabled() && duckChat.wasOpenedBefore())
@@ -52,6 +76,14 @@ class SearchWidgetConfigurator @Inject constructor(
 
         val showDuckAi = !fromSearchOnlyWidget && duckAiEnabled
         withContext(dispatcherProvider.main()) {
+            remoteViews.setInt(
+                if (fromFavWidget) R.id.widgetSearchBarContainer else R.id.widgetContainer,
+                "setBackgroundResource",
+                resolveSearchBarBackground(
+                    widgetTheme = widgetTheme,
+                    isPictogramsEnabled = appBrandDesignUpdateToggles.pictograms().isEnabled(),
+                ),
+            )
             remoteViews.setViewVisibility(R.id.voiceSearch, if (voiceSearchEnabled) View.VISIBLE else View.GONE)
             remoteViews.setViewVisibility(R.id.duckAi, if (showDuckAi) View.VISIBLE else View.GONE)
             remoteViews.setViewVisibility(R.id.separator, if (voiceSearchEnabled && showDuckAi) View.VISIBLE else View.GONE)

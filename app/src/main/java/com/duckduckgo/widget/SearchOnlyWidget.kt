@@ -106,6 +106,7 @@ class SearchOnlyWidget : AppWidgetProvider() {
                 remoteViews = views,
                 fromFavWidget = false,
                 fromSearchOnlyWidget = true,
+                widgetTheme = WidgetTheme.SYSTEM_DEFAULT,
             )
             appWidgetManager.updateAppWidget(appWidgetId, views)
             logcat { "SearchOnlyWidget updateAppWidget completed for widget id = $appWidgetId" }
