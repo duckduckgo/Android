@@ -68,7 +68,7 @@ class SitePermissionsDialogActivityLauncherTest {
 
     @Test
     fun whenDrmAlreadyAllowedForSessionThenDialogNotShownAndNoImpressionPixelFired() {
-        whenever(sitePermissionsRepository.getDrmForSession("example.com")).thenReturn(true)
+        whenever(sitePermissionsRepository.getDrmForSession("tabId", "example.com")).thenReturn(true)
 
         val activity: Activity = mock()
         val request: PermissionRequest = mock()
@@ -91,7 +91,7 @@ class SitePermissionsDialogActivityLauncherTest {
 
     @Test
     fun whenDrmBlockedByConfigThenDialogNotShownAndNoImpressionPixelFired() {
-        whenever(sitePermissionsRepository.getDrmForSession("example.com")).thenReturn(null)
+        whenever(sitePermissionsRepository.getDrmForSession("tabId", "example.com")).thenReturn(null)
         whenever(sitePermissionsRepository.isDrmBlockedForUrlByConfig("https://example.com")).thenReturn(true)
 
         val activity: Activity = mock()

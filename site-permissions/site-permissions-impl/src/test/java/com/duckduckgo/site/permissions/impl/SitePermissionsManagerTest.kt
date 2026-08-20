@@ -28,12 +28,18 @@ import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
+import com.duckduckgo.site.permissions.impl.drm.DrmPolicyAction
+import com.duckduckgo.site.permissions.impl.drm.DrmPolicyDecision
+import com.duckduckgo.site.permissions.impl.drm.DrmPolicyManager
+import com.duckduckgo.site.permissions.impl.drm.DrmPolicyReason
+import com.duckduckgo.site.permissions.impl.feature.DrmPolicyFeature
 import com.duckduckgo.site.permissions.impl.feature.MicrophoneSitePermissionsDomainRecoveryFeature
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.verifyZeroInteractions
 import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -57,6 +63,8 @@ class SitePermissionsManagerTest {
     private val fakeMicrophoneSitePermissionsDomainRecoveryFeature = FakeFeatureToggleFactory.create(
         MicrophoneSitePermissionsDomainRecoveryFeature::class.java,
     )
+    private val drmPolicyFeature = FakeFeatureToggleFactory.create(DrmPolicyFeature::class.java)
+    private val mockDrmPolicyManager: DrmPolicyManager = mock()
 
     private val testee by lazy {
         SitePermissionsManagerImpl(
@@ -66,6 +74,8 @@ class SitePermissionsManagerTest {
             coroutineRule.testDispatcherProvider,
             mockContext,
             fakeMicrophoneSitePermissionsDomainRecoveryFeature,
+            drmPolicyFeature,
+            mockDrmPolicyManager,
             mockDuckAiHostProvider,
         )
     }
@@ -78,6 +88,8 @@ class SitePermissionsManagerTest {
         whenever(mockDuckAiHostProvider.getHost()).thenReturn("duck.ai")
         whenever(mockPackageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)).thenReturn(true)
         fakeMicrophoneSitePermissionsDomainRecoveryFeature.self().setRawStoredState(Toggle.State(false))
+        drmPolicyFeature.self().setRawStoredState(Toggle.State(true))
+        drmPolicyFeature.centralPolicy().setRawStoredState(Toggle.State(false))
     }
 
     @Test
@@ -115,6 +127,81 @@ class SitePermissionsManagerTest {
         assertEquals(0, permissions.autoAccept.size)
         assertEquals(0, permissions.userHandled.size)
         verify(permissionRequest).grant(arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE, PermissionRequest.RESOURCE_VIDEO_CAPTURE))
+    }
+
+    @Test
+    fun whenCentralPolicyEnabledAndPolicyGrantsThenDrmAutoAccepted() = runTest {
+        drmPolicyFeature.centralPolicy().setRawStoredState(Toggle.State(true))
+        val resources = arrayOf(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)
+        whenever(mockDrmPolicyManager.decide(url, tabId))
+            .thenReturn(DrmPolicyDecision(DrmPolicyAction.GRANT, DrmPolicyReason.ALLOW_LIST))
+
+        val permissionRequest: PermissionRequest = mock()
+        whenever(permissionRequest.origin).thenReturn(url.toUri())
+        whenever(permissionRequest.resources).thenReturn(resources)
+
+        val permissions = testee.getSitePermissions(tabId, permissionRequest)
+
+        assertEquals(0, permissions.userHandled.size)
+        verify(permissionRequest).grant(resources)
+        verify(permissionRequest, never()).deny()
+        verify(mockSitePermissionsRepository, never()).isDomainAllowedToAsk(url, PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)
+        verify(mockSitePermissionsRepository, never()).isDomainGranted(url, tabId, PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)
+    }
+
+    @Test
+    fun whenCentralPolicyEnabledAndPolicyDeniesThenRequestDenied() = runTest {
+        drmPolicyFeature.centralPolicy().setRawStoredState(Toggle.State(true))
+        val resources = arrayOf(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)
+        whenever(mockDrmPolicyManager.decide(url, tabId))
+            .thenReturn(DrmPolicyDecision(DrmPolicyAction.DENY, DrmPolicyReason.BLOCK_LIST))
+
+        val permissionRequest: PermissionRequest = mock()
+        whenever(permissionRequest.origin).thenReturn(url.toUri())
+        whenever(permissionRequest.resources).thenReturn(resources)
+
+        val permissions = testee.getSitePermissions(tabId, permissionRequest)
+
+        assertEquals(0, permissions.autoAccept.size)
+        assertEquals(0, permissions.userHandled.size)
+        verify(permissionRequest).deny()
+        verify(permissionRequest, never()).grant(any())
+    }
+
+    @Test
+    fun whenCentralPolicyEnabledAndPolicyPromptsThenDrmUserHandled() = runTest {
+        drmPolicyFeature.centralPolicy().setRawStoredState(Toggle.State(true))
+        val resources = arrayOf(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)
+        whenever(mockDrmPolicyManager.decide(url, tabId))
+            .thenReturn(DrmPolicyDecision(DrmPolicyAction.PROMPT, DrmPolicyReason.NO_RULE))
+
+        val permissionRequest: PermissionRequest = mock()
+        whenever(permissionRequest.origin).thenReturn(url.toUri())
+        whenever(permissionRequest.resources).thenReturn(resources)
+
+        val permissions = testee.getSitePermissions(tabId, permissionRequest)
+
+        assertEquals(0, permissions.autoAccept.size)
+        assertEquals(listOf(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID), permissions.userHandled)
+        verify(permissionRequest, never()).grant(any())
+        verify(permissionRequest, never()).deny()
+    }
+
+    @Test
+    fun whenCentralPolicyDisabledThenDrmFollowsExistingPath() = runTest {
+        val resources = arrayOf(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)
+        whenever(mockSitePermissionsRepository.isDomainAllowedToAsk(url, PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)).thenReturn(true)
+        whenever(mockSitePermissionsRepository.isDomainGranted(url, tabId, PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)).thenReturn(false)
+
+        val permissionRequest: PermissionRequest = mock()
+        whenever(permissionRequest.origin).thenReturn(url.toUri())
+        whenever(permissionRequest.resources).thenReturn(resources)
+
+        val permissions = testee.getSitePermissions(tabId, permissionRequest)
+
+        assertEquals(0, permissions.autoAccept.size)
+        assertEquals(listOf(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID), permissions.userHandled)
+        verifyZeroInteractions(mockDrmPolicyManager)
     }
 
     @Test

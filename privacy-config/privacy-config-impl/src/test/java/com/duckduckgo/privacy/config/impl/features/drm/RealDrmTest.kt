@@ -52,6 +52,38 @@ class RealDrmTest {
     }
 
     @Test
+    fun whenIsDrmAllowedForUrlIfSubdomainOfExceptionThenTrueIsReturned() {
+        giveFeatureIsEnabled()
+        givenUrlIsInExceptionList("foxnews.com")
+
+        assertTrue(testee.isDrmAllowedForUrl("https://static.foxnews.com"))
+    }
+
+    @Test
+    fun whenIsDrmAllowedForUrlIfNestedSubdomainOfExceptionThenTrueIsReturned() {
+        giveFeatureIsEnabled()
+        givenUrlIsInExceptionList("foxnews.com")
+
+        assertTrue(testee.isDrmAllowedForUrl("https://a.b.foxnews.com"))
+    }
+
+    @Test
+    fun whenIsDrmAllowedForUrlIfParentDomainOfExceptionThenFalseIsReturned() {
+        giveFeatureIsEnabled()
+        givenUrlIsInExceptionList("open.spotify.com")
+
+        assertFalse(testee.isDrmAllowedForUrl("https://spotify.com"))
+    }
+
+    @Test
+    fun whenIsDrmAllowedForUrlIfUnrelatedDomainSharesSuffixThenFalseIsReturned() {
+        giveFeatureIsEnabled()
+        givenUrlIsInExceptionList("foxnews.com")
+
+        assertFalse(testee.isDrmAllowedForUrl("https://notfoxnews.com"))
+    }
+
+    @Test
     fun whenIsDrmAllowedForUrlIfFeatureIsEnabledAndDomainIsNotInExceptionsListThenFalseIsReturned() {
         giveFeatureIsEnabled()
         givenUrlIsNotInExceptionList()
@@ -91,8 +123,8 @@ class RealDrmTest {
         whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.DrmFeatureName.value), any())).thenReturn(true)
     }
 
-    private fun givenUrlIsInExceptionList() {
-        val exceptions = CopyOnWriteArrayList<FeatureException>().apply { add(FeatureException("open.spotify.com", "my reason here")) }
+    private fun givenUrlIsInExceptionList(domain: String = "open.spotify.com") {
+        val exceptions = CopyOnWriteArrayList<FeatureException>().apply { add(FeatureException(domain, "my reason here")) }
         whenever(mockDrmRepository.exceptions).thenReturn(exceptions)
     }
 

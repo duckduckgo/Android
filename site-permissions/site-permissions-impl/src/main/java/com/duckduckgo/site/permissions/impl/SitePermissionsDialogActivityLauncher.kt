@@ -253,7 +253,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         val domain = url.extractDomain() ?: url
 
         // Check if user allowed or denied per session
-        val sessionSetting = sitePermissionsRepository.getDrmForSession(domain)
+        val sessionSetting = sitePermissionsRepository.getDrmForSession(tabId, domain)
         if (sessionSetting != null) {
             if (sessionSetting) {
                 grantPermissions()
@@ -305,7 +305,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                             // Fire mode grants the in-session WebView permission below but must not write the
                             // choice into the shared (app-wide, in-memory) DRM session map that regular tabs read.
                             if (browserMode != BrowserMode.FIRE) {
-                                sitePermissionsRepository.saveDrmForSession(domain, true)
+                                sitePermissionsRepository.saveDrmForSession(tabId, domain, true)
                             }
                             grantPermissions()
                         }
@@ -320,7 +320,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                         } else if (browserMode != BrowserMode.FIRE) {
                             // Fire mode denied the in-session permission above but must not write the
                             // choice into the shared (app-wide, in-memory) DRM session map that regular tabs read.
-                            sitePermissionsRepository.saveDrmForSession(domain, false)
+                            sitePermissionsRepository.saveDrmForSession(tabId, domain, false)
                         }
                         sendNegativeDialogClickPixel(SitePermissionsPixelValues.DRM, rememberChoice)
                     }

@@ -31,6 +31,9 @@ import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
+import com.duckduckgo.site.permissions.impl.drm.DrmPolicyAction
+import com.duckduckgo.site.permissions.impl.drm.DrmPolicyManager
+import com.duckduckgo.site.permissions.impl.feature.DrmPolicyFeature
 import com.duckduckgo.site.permissions.impl.feature.MicrophoneSitePermissionsDomainRecoveryFeature
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.withContext
@@ -46,6 +49,8 @@ class SitePermissionsManagerImpl @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val context: Context,
     private val microphoneSitePermissionsDomainRecoveryFeature: MicrophoneSitePermissionsDomainRecoveryFeature,
+    private val drmPolicyFeature: DrmPolicyFeature,
+    private val drmPolicyManager: DrmPolicyManager,
     duckAiHostProvider: DuckAiHostProvider,
 ) : SitePermissionsManager {
 
@@ -65,14 +70,25 @@ class SitePermissionsManagerImpl @Inject constructor(
         val autoAccept = mutableListOf<String>()
         val url = request.origin.toString()
 
+        val drmDecision = if (
+            request.resources.contains(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID) &&
+            drmPolicyFeature.centralPolicy().isEnabled()
+        ) {
+            drmPolicyManager.decide(url, tabId)
+        } else {
+            null
+        }
+        logcat { "Permissions: drm policy decision for $url is $drmDecision" }
+
         val sitePermissionsAllowedToAsk = request.resources
+            .filter { drmDecision == null || it != PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID }
             .filter { isPermissionSupported(it) && isHardwareSupported(it) }
             .filter { sitePermissionsRepository.isDomainAllowedToAsk(url, it) }
             .toTypedArray()
 
         logcat { "Permissions: sitePermissionsAllowedToAsk in $url ${sitePermissionsAllowedToAsk.asList()}" }
 
-        val sitePermissionsGranted = if (microphoneSitePermissionsDomainRecoveryFeature.self().isEnabled()) {
+        val filteredPermissionsGranted = if (microphoneSitePermissionsDomainRecoveryFeature.self().isEnabled()) {
             getSitePermissionsGranted(url, tabId, sitePermissionsAllowedToAsk).filter { permission ->
                 if (permission == PermissionRequest.RESOURCE_AUDIO_CAPTURE && audioCapturePermissionDomains.contains(url.extractDomain())) {
                     ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED &&
@@ -85,6 +101,12 @@ class SitePermissionsManagerImpl @Inject constructor(
             getSitePermissionsGranted(url, tabId, sitePermissionsAllowedToAsk)
         }
 
+        val sitePermissionsGranted = if (drmDecision?.action == DrmPolicyAction.GRANT) {
+            filteredPermissionsGranted + PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID
+        } else {
+            filteredPermissionsGranted
+        }
+
         if (sitePermissionsGranted.isNotEmpty()) {
             withContext(dispatcherProvider.main()) {
                 logcat { "Permissions: site permission granted" }
@@ -94,7 +116,8 @@ class SitePermissionsManagerImpl @Inject constructor(
 
         logcat { "Permissions: sitePermissionsGranted for $url are ${sitePermissionsGranted.asList()}" }
 
-        val userList = sitePermissionsAllowedToAsk.filter { !sitePermissionsGranted.contains(it) }
+        val userList = sitePermissionsAllowedToAsk.filter { !sitePermissionsGranted.contains(it) } +
+            listOfNotNull(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID.takeIf { drmDecision?.action == DrmPolicyAction.PROMPT })
         if (userList.isEmpty() && sitePermissionsGranted.isEmpty()) {
             withContext(dispatcherProvider.main()) {
                 logcat { "Permissions: site permission not granted, deny" }

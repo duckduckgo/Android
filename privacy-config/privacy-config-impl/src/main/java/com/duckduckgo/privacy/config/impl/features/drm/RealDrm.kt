@@ -47,6 +47,9 @@ class RealDrm @Inject constructor(
     }
 
     private fun domainsThatAllowDrm(host: String?): Boolean {
-        return drmRepository.exceptions.firstOrNull { it.domain == host } != null
+        host ?: return false
+        return drmRepository.exceptions.any { exception ->
+            host == exception.domain || host.endsWith(".${exception.domain}")
+        }
     }
 }
