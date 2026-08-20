@@ -88,11 +88,14 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
     }
 
     private fun showCustomTab(intentText: String?, toolbarColor: Int?, isExternal: Boolean) {
-        // The verified calling package (non-null only when the launcher bound the
-        // CustomTabsService). Carried forward as an intent extra so BrowserTabViewModel can
-        // apply the trusted-caller carve-out in handleAppLink.
+        // The verified calling package: non-null only when the launcher bound the CustomTabsService, so it is
+        // safe to gate security-sensitive behavior (the gesture-less app-link launch carve-out) on it.
         val clientPackage = CustomTabsSessionToken.getSessionTokenFromIntent(intent)
             ?.let { customTabsSessionRegistry.lookupClientPackage(it) }
+        // Best-effort caller identity from the android-app:// referrer, available even when the launcher never
+        // bound the service (e.g. apps that open a login Custom Tab without a session). The launcher can set the
+        // referrer, so this is used only for the low-stakes prompt-skip decision, never the launch carve-out.
+        val referrerPackage = referrer?.takeIf { it.scheme == "android-app" }?.host
 
         // As customizations we only support the toolbar color at the moment.
         startActivity(
@@ -103,6 +106,7 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
                 toolbarColor = toolbarColor,
                 isExternal = isExternal,
                 clientPackage = clientPackage,
+                referrerPackage = referrerPackage,
             ),
         )
 

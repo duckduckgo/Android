@@ -38,6 +38,12 @@ interface AppLinksHandler {
     fun updatePreviousUrl(urlString: String?)
     fun setUserQueryState(state: Boolean)
     fun isUserQuery(): Boolean
+
+    // True when the app link resolves back to the app that opened the custom tab (e.g. an OAuth/login flow
+    // returning to its host app).
+    fun isTrustedCaller(appLink: AppLink, clientPackage: String?): Boolean
+
+    fun isAlwaysTriggerDomain(appLink: AppLink): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -67,15 +73,13 @@ class DuckDuckGoAppLinksHandler @Inject constructor(
         }
 
         val urlString = appLink.uriString
-        val isAlwaysTriggerDomain = alwaysTriggerList.contains(urlString.extractDomain())
+        val isAlwaysTriggerDomain = isAlwaysTriggerDomain(appLink)
 
         // HTTP navigations shouldn't launch apps unless started with a user gesture. That is unless
         // the "trusted-caller" carve-out applies - if an app opens a Custom Tab, App Links that
         // point back to that same app should be allowed even without user interaction.
         if (!isAlwaysTriggerDomain && androidBrowserConfigFeature.customTabEndlessLoopFix().isEnabled()) {
-            val targetPackage = appLink.appIntent?.component?.packageName ?: appLink.appIntent?.`package`
-            val isTrustedCaller = targetPackage != null && clientPackage == targetPackage
-            if (!hasGesture && !isTrustedCaller) {
+            if (!hasGesture && !isTrustedCaller(appLink, clientPackage)) {
                 return false
             }
         }
@@ -116,5 +120,14 @@ class DuckDuckGoAppLinksHandler @Inject constructor(
 
     override fun isUserQuery(): Boolean {
         return isAUserQuery
+    }
+
+    override fun isTrustedCaller(appLink: AppLink, clientPackage: String?): Boolean {
+        val targetPackage = appLink.appIntent?.component?.packageName ?: appLink.appIntent?.`package`
+        return targetPackage != null && clientPackage == targetPackage
+    }
+
+    override fun isAlwaysTriggerDomain(appLink: AppLink): Boolean {
+        return alwaysTriggerList.contains(appLink.uriString.extractDomain())
     }
 }
