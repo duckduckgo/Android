@@ -18,7 +18,6 @@ package com.duckduckgo.subscriptions.impl.services
 
 import com.duckduckgo.anvil.annotations.ContributesNonCachingServiceApi
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.subscriptions.api.model.Entitlement
 import com.squareup.moshi.Json
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -29,12 +28,6 @@ import retrofit2.http.POST
 interface AuthService {
     @POST("https://quack.duckduckgo.com/api/auth/store-login")
     suspend fun storeLogin(@Body storeLoginBody: StoreLoginBody): StoreLoginResponse
-
-    /**
-     * Validate token takes either an access token or an auth token
-     */
-    @GET("https://quack.duckduckgo.com/api/auth/validate-token")
-    suspend fun validateToken(@Header("Authorization") authorization: String): ValidateTokenResponse
 
     /**
      * Exchanges an auth token for an access token
@@ -60,26 +53,6 @@ data class StoreLoginResponse(
     val email: String?,
     val status: String,
 )
-
-data class ValidateTokenResponse(
-    val account: AccountResponse,
-)
-
-data class AccountResponse(
-    val email: String,
-    @field:Json(name = "external_id") val externalId: String,
-    val entitlements: List<EntitlementResponse>,
-)
-
-data class EntitlementResponse(
-    val id: String,
-    val name: String,
-    val product: String,
-)
-
-fun List<EntitlementResponse>.toEntitlements(): List<Entitlement> {
-    return this.map { Entitlement(it.name, it.product) }
-}
 
 data class ResponseError(
     val error: String,

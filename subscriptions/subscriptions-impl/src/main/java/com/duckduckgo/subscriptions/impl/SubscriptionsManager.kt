@@ -73,8 +73,6 @@ import com.duckduckgo.subscriptions.impl.services.AuthService
 import com.duckduckgo.subscriptions.impl.services.ConfirmationBody
 import com.duckduckgo.subscriptions.impl.services.ResponseError
 import com.duckduckgo.subscriptions.impl.services.SubscriptionsService
-import com.duckduckgo.subscriptions.impl.services.ValidateTokenResponse
-import com.duckduckgo.subscriptions.impl.services.toEntitlements
 import com.duckduckgo.subscriptions.impl.wideevents.AuthTokenRefreshWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.FreeTrialConversionWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionPurchaseWideEvent
@@ -139,14 +137,6 @@ interface SubscriptionsManager {
      * Recovers a subscription from the store
      */
     suspend fun recoverSubscriptionFromStore(externalId: String? = null): RecoverSubscriptionResult
-
-    /**
-     * Fetches subscription and account data from the BE and stores it
-     *
-     * @return [true] if successful, [false] otherwise
-     */
-    @Deprecated("This method will be removed after migrating to auth v2")
-    suspend fun fetchAndStoreAllData(): Boolean
 
     /**
      * Gets the subscription details from internal storage
@@ -704,51 +694,6 @@ class RealSubscriptionsManager @Inject constructor(
         return accessToken
     }
 
-    @Deprecated("This method will be removed after migrating to auth v2")
-    override suspend fun fetchAndStoreAllData(): Boolean {
-        try {
-            if (!isSignedInV1()) return false
-
-            val subscription = try {
-                subscriptionsService.subscription()
-            } catch (e: HttpException) {
-                if (e.code() == 401) {
-                    logcat { "Token invalid, signing out" }
-                    signOut()
-                    return false
-                }
-                throw e
-            }
-            val token = checkNotNull(authRepository.getAccessToken()) { "Access token should not be null when user is authenticated." }
-            val accountData = validateToken(token).account
-            authRepository.setAccount(
-                Account(
-                    email = accountData.email,
-                    externalId = accountData.externalId,
-                ),
-            )
-            authRepository.setSubscription(
-                Subscription(
-                    productId = subscription.productId,
-                    billingPeriod = subscription.billingPeriod,
-                    startedAt = subscription.startedAt,
-                    expiresOrRenewsAt = subscription.expiresOrRenewsAt,
-                    status = subscription.status.toStatus(),
-                    platform = subscription.platform,
-                    activeOffers = subscription.activeOffers.map { it.type.toActiveOfferType() },
-                ),
-            )
-            authRepository.setEntitlements(accountData.entitlements.toEntitlements())
-            emitEntitlementsValues()
-            _subscriptionStatus.emit(authRepository.getStatus())
-            _isSignedIn.emit(isSignedIn())
-            return true
-        } catch (e: Exception) {
-            logcat { "Failed to fetch subscriptions data: ${e.stackTraceToString()}" }
-            return false
-        }
-    }
-
     override suspend fun refreshAccessToken() {
         val serializeRefresh = withContext(dispatcherProvider.io()) {
             subscriptionsFeature.get().serializeTokenRefresh().isEnabled()
@@ -1145,8 +1090,8 @@ class RealSubscriptionsManager @Inject constructor(
             )
 
             // refresh any existing account / subscription data
-            when {
-                isSignedInV2() -> try {
+            if (isSignedIn()) {
+                try {
                     refreshSubscriptionData()
                 } catch (e: HttpException) {
                     when (e.code()) {
@@ -1161,8 +1106,6 @@ class RealSubscriptionsManager @Inject constructor(
                     subscriptionPurchaseWideEvent.onSubscriptionRefreshFailure(e)
                     throw e
                 }
-
-                isSignedInV1() -> fetchAndStoreAllData()
             }
 
             subscriptionPurchaseWideEvent.onSubscriptionRefreshSuccess()
@@ -1304,10 +1247,6 @@ class RealSubscriptionsManager @Inject constructor(
     private fun isAccessTokenUsable(accessToken: AccessToken): Boolean {
         val currentTime = Instant.ofEpochMilli(timeProvider.currentTimeMillis())
         return accessToken.expiresAt > currentTime + Duration.ofMinutes(1)
-    }
-
-    private suspend fun validateToken(token: String): ValidateTokenResponse {
-        return authService.validateToken("Bearer $token")
     }
 
     private suspend fun createAccount() {

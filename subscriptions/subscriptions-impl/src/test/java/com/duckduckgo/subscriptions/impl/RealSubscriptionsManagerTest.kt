@@ -55,18 +55,15 @@ import com.duckduckgo.subscriptions.impl.repository.RealAuthRepository
 import com.duckduckgo.subscriptions.impl.repository.Subscription
 import com.duckduckgo.subscriptions.impl.serp_promo.FakeSerpPromo
 import com.duckduckgo.subscriptions.impl.services.AccessTokenResponse
-import com.duckduckgo.subscriptions.impl.services.AccountResponse
 import com.duckduckgo.subscriptions.impl.services.ActiveOfferResponse
 import com.duckduckgo.subscriptions.impl.services.AuthService
 import com.duckduckgo.subscriptions.impl.services.ConfirmationEntitlement
 import com.duckduckgo.subscriptions.impl.services.ConfirmationResponse
-import com.duckduckgo.subscriptions.impl.services.EntitlementResponse
 import com.duckduckgo.subscriptions.impl.services.PendingPlanResponse
 import com.duckduckgo.subscriptions.impl.services.PortalResponse
 import com.duckduckgo.subscriptions.impl.services.StoreLoginResponse
 import com.duckduckgo.subscriptions.impl.services.SubscriptionResponse
 import com.duckduckgo.subscriptions.impl.services.SubscriptionsService
-import com.duckduckgo.subscriptions.impl.services.ValidateTokenResponse
 import com.duckduckgo.subscriptions.impl.store.SubscriptionsDataStore
 import com.duckduckgo.subscriptions.impl.wideevents.AuthTokenRefreshWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.FreeTrialConversionWideEvent
@@ -233,7 +230,7 @@ class RealSubscriptionsManagerTest {
     }
 
     @Test
-    fun whenRecoverSubscriptionFromStoreIfValidateTokenSucceedsThenReturnExternalId() = runTest {
+    fun whenRecoverSubscriptionFromStoreIfStoreLoginSucceedsThenReturnExternalId() = runTest {
         givenPurchaseStored()
         givenStoreLoginSucceeds()
         givenSubscriptionSucceedsWithEntitlements()
@@ -275,9 +272,8 @@ class RealSubscriptionsManagerTest {
     }
 
     @Test
-    fun whenRecoverSubscriptionFromStoreIfValidateTokenFailsReturnFailure() = runTest {
+    fun whenRecoverSubscriptionFromStoreIfNoPurchaseStoredThenReturnFailure() = runTest {
         givenUserIsSignedIn()
-        givenValidateTokenFails("failure")
 
         val result = subscriptionsManager.recoverSubscriptionFromStore()
 
@@ -400,23 +396,6 @@ class RealSubscriptionsManagerTest {
     }
 
     @Test
-    fun whenFetchAndStoreAllDataIfUserNotSignedInThenReturnFalse() = runTest {
-        givenUserIsNotSignedIn()
-
-        val value = subscriptionsManager.fetchAndStoreAllData()
-
-        assertFalse(value)
-    }
-
-    @Test
-    fun whenFetchAndStoreAllDataIfSubscriptionFailsThenReturnNull() = runTest {
-        givenUserIsSignedIn()
-        givenSubscriptionFails()
-
-        assertFalse(subscriptionsManager.fetchAndStoreAllData())
-    }
-
-    @Test
     fun whenPurchaseFlowIfUserIsSignedInAndSubscriptionFailsWith401ThenSignOutAndCreateNewAccount() = runTest {
         givenUserIsSignedIn(accountExternalId = "5678")
         givenSubscriptionFails(httpResponseCode = 401)
@@ -461,7 +440,6 @@ class RealSubscriptionsManagerTest {
     fun whenPurchaseFlowIfCreateAccountSucceedsThenBillingFlowUsesCorrectExternalId() = runTest {
         givenUserIsNotSignedIn()
         givenCreateAccountSucceeds()
-        givenValidateTokenSucceedsNoEntitlements()
         givenAccessTokenSucceeds()
 
         purchase()
@@ -515,7 +493,7 @@ class RealSubscriptionsManagerTest {
     }
 
     @Test
-    fun whenPurchaseFlowIfValidateTokenSucceedsThenBillingFlowUsesCorrectExternalIdAndEmitStates() = runTest {
+    fun whenPurchaseFlowIfUserSignedInThenBillingFlowUsesCorrectExternalIdAndEmitStates() = runTest {
         givenUserIsSignedIn()
         givenSubscriptionSucceedsWithoutEntitlements(status = "Expired")
 
@@ -544,7 +522,6 @@ class RealSubscriptionsManagerTest {
     @Test
     fun whenPurchaseFlowIfNullSubscriptionAndSignedInThenDoNotCreateAccount() = runTest {
         givenUserIsSignedIn()
-        givenValidateTokenFails("failure")
 
         purchase()
 
@@ -794,7 +771,6 @@ class RealSubscriptionsManagerTest {
     @Test
     fun whenPurchaseFailedThenPurchaseCheckedAndWaitingEmit() = runTest {
         givenUserIsSignedIn()
-        givenValidateTokenFails("failure")
         givenConfirmPurchaseFails()
 
         val flowTest: MutableSharedFlow<PurchaseState> = MutableSharedFlow()
@@ -1180,7 +1156,6 @@ class RealSubscriptionsManagerTest {
     @Test
     fun whenGetAuthTokenIfUserSignedInAndValidTokenThenReturnSuccess() = runTest {
         givenUserIsSignedIn()
-        givenValidateTokenSucceedsWithEntitlements()
 
         val result = subscriptionsManager.getAuthToken()
 
@@ -1326,7 +1301,6 @@ class RealSubscriptionsManagerTest {
     @Test
     fun whenPurchaseIsSuccessfulThenPixelIsSent() = runTest {
         givenUserIsSignedIn()
-        givenValidateTokenSucceedsWithEntitlements()
         givenConfirmPurchaseSucceeds()
         givenV2AccessTokenRefreshSucceeds()
 
@@ -1347,7 +1321,6 @@ class RealSubscriptionsManagerTest {
     @Test
     fun whenPurchaseIsSuccessfulWithFreeTrialThenPixelIsSentWithFreeTrialTrue() = runTest {
         givenUserIsSignedIn()
-        givenValidateTokenSucceedsWithEntitlements()
         givenConfirmPurchaseSucceedsWithFreeTrial()
         givenV2AccessTokenRefreshSucceeds()
 
@@ -1388,7 +1361,6 @@ class RealSubscriptionsManagerTest {
     @Test
     fun whenPurchaseFailsThenPixelIsSent() = runTest {
         givenUserIsSignedIn()
-        givenValidateTokenFails("failure")
         givenConfirmPurchaseFails()
 
         whenever(playBillingManager.purchaseState).thenReturn(flowOf(Purchased("validateToken", "packageName")))
@@ -1674,10 +1646,7 @@ class RealSubscriptionsManagerTest {
 
     @Test
     fun whenEntitlementsExistAndSubscriptionIsInactiveThenEntitlementsReturnsEmptyList() = runTest {
-        givenUserIsSignedIn()
-        givenSubscriptionSucceedsWithEntitlements(status = INACTIVE.statusName)
-
-        subscriptionsManager.fetchAndStoreAllData()
+        givenSubscriptionExists(status = INACTIVE)
 
         subscriptionsManager.entitlements.test {
             val entitlements = expectMostRecentItem()
@@ -1743,7 +1712,6 @@ class RealSubscriptionsManagerTest {
     @Test
     fun whenSignInV1ThenExchangesAuthTokenAndLoadsSubscription() = runTest {
         givenAccessTokenSucceeds()
-        givenValidateTokenSucceedsWithEntitlements()
         givenV1AccessTokenExchangeSuccess()
         givenV2AccessTokenRefreshSucceeds()
 
@@ -1826,7 +1794,6 @@ class RealSubscriptionsManagerTest {
     }
 
     private suspend fun givenSubscriptionSucceedsWithoutEntitlements(status: String = "Auto-Renewable") {
-        givenValidateTokenSucceedsNoEntitlements()
         whenever(subscriptionsService.subscription()).thenReturn(
             SubscriptionResponse(
                 productId = MONTHLY_PLAN_US,
@@ -1841,7 +1808,6 @@ class RealSubscriptionsManagerTest {
     }
 
     private suspend fun givenSubscriptionSucceedsWithEntitlements(status: String = "Auto-Renewable") {
-        givenValidateTokenSucceedsWithEntitlements()
         whenever(subscriptionsService.subscription()).thenReturn(
             SubscriptionResponse(
                 productId = MONTHLY_PLAN_US,
@@ -1902,75 +1868,12 @@ class RealSubscriptionsManagerTest {
         authDataStore.expiresOrRenewsAt = 1000L
     }
 
-    private suspend fun givenValidateTokenFailsAndThenSucceeds(failure: String) {
-        val exception = failure.toResponseBody("text/json".toMediaTypeOrNull())
-        whenever(authService.validateToken(any()))
-            .thenThrow(HttpException(Response.error<String>(400, exception)))
-            .thenReturn(
-                ValidateTokenResponse(
-                    account = AccountResponse(
-                        email = "accessToken",
-                        externalId = "1234",
-                        entitlements = listOf(
-                            EntitlementResponse("id", "name", "testProduct"),
-                        ),
-                    ),
-                ),
-            )
-    }
-
-    private suspend fun givenValidateTokenFailsAndThenSucceedsWithNoEntitlements(failure: String) {
-        val exception = failure.toResponseBody("text/json".toMediaTypeOrNull())
-        whenever(authService.validateToken(any()))
-            .thenThrow(HttpException(Response.error<String>(400, exception)))
-            .thenReturn(
-                ValidateTokenResponse(
-                    account = AccountResponse(
-                        email = "accessToken",
-                        externalId = "1234",
-                        entitlements = listOf(),
-                    ),
-                ),
-            )
-    }
-
     private suspend fun givenStoreLoginFails() {
         val exception = "failure".toResponseBody("text/json".toMediaTypeOrNull())
         whenever(authService.storeLogin(any())).thenThrow(HttpException(Response.error<String>(400, exception)))
 
         whenever(authClient.authorize(any())).thenThrow(HttpException(Response.error<String>(400, exception)))
         whenever(authClient.storeLogin(any(), any(), any())).thenThrow(HttpException(Response.error<String>(400, exception)))
-    }
-
-    private suspend fun givenValidateTokenSucceedsWithEntitlements() {
-        whenever(authService.validateToken(any())).thenReturn(
-            ValidateTokenResponse(
-                account = AccountResponse(
-                    email = "email",
-                    externalId = "1234",
-                    entitlements = listOf(
-                        EntitlementResponse("id", NetP.value, NetP.value),
-                    ),
-                ),
-            ),
-        )
-    }
-
-    private suspend fun givenValidateTokenSucceedsNoEntitlements() {
-        whenever(authService.validateToken(any())).thenReturn(
-            ValidateTokenResponse(
-                account = AccountResponse(
-                    email = "accessToken",
-                    externalId = "1234",
-                    entitlements = emptyList(),
-                ),
-            ),
-        )
-    }
-
-    private suspend fun givenValidateTokenFails(failure: String) {
-        val exception = failure.toResponseBody("text/json".toMediaTypeOrNull())
-        whenever(authService.validateToken(any())).thenThrow(HttpException(Response.error<String>(400, exception)))
     }
 
     private suspend fun givenPurchaseStored() {
