@@ -40,8 +40,11 @@ interface AppLinksHandler {
     fun isUserQuery(): Boolean
 
     // True when the app link resolves back to the app that opened the custom tab (e.g. an OAuth/login flow
-    // returning to its host app).
-    fun isTrustedCaller(appLink: AppLink, clientPackage: String?): Boolean
+    // returning to its host app). [callerPackage] may be the verified Custom Tabs client package (safe to
+    // gate the launch carve-out on) or a best-effort, spoofable referrer fallback (prompt-skip decisions
+    // only). This is a plain equality check, so the caller must pass a verified value for any security-
+    // sensitive gate.
+    fun isTrustedCaller(appLink: AppLink, callerPackage: String?): Boolean
 
     fun isAlwaysTriggerDomain(appLink: AppLink): Boolean
 }
@@ -122,9 +125,9 @@ class DuckDuckGoAppLinksHandler @Inject constructor(
         return isAUserQuery
     }
 
-    override fun isTrustedCaller(appLink: AppLink, clientPackage: String?): Boolean {
+    override fun isTrustedCaller(appLink: AppLink, callerPackage: String?): Boolean {
         val targetPackage = appLink.appIntent?.component?.packageName ?: appLink.appIntent?.`package`
-        return targetPackage != null && clientPackage == targetPackage
+        return targetPackage != null && callerPackage == targetPackage
     }
 
     override fun isAlwaysTriggerDomain(appLink: AppLink): Boolean {
