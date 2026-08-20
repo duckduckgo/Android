@@ -353,10 +353,6 @@ class RealSubscriptionsManager @Inject constructor(
         return authRepository.getRefreshTokenV2() != null
     }
 
-    private suspend fun shouldUseAuthV2(): Boolean = withContext(dispatcherProvider.io()) {
-        subscriptionsFeature.get().authApiV2().isEnabled() || isSignedInV2()
-    }
-
     private fun emitEntitlementsValues() {
         coroutineScope.launch(dispatcherProvider.io()) {
             val active = authRepository.getSubscription()?.status?.isActiveOrWaiting() == true
@@ -527,15 +523,11 @@ class RealSubscriptionsManager @Inject constructor(
 
     override suspend fun signInV1(authToken: String) {
         exchangeAuthToken(authToken)
-        if (shouldUseAuthV2()) {
-            authRepository.purchaseToWaitingStatus()
-            try {
-                refreshSubscriptionData()
-            } catch (e: Exception) {
-                logcat { "Subs: error when refreshing subscription on v1 sign in" }
-            }
-        } else {
-            fetchAndStoreAllData()
+        authRepository.purchaseToWaitingStatus()
+        try {
+            refreshSubscriptionData()
+        } catch (e: Exception) {
+            logcat { "Subs: error when refreshing subscription on v1 sign in" }
         }
     }
 
@@ -648,17 +640,9 @@ class RealSubscriptionsManager @Inject constructor(
 
             authRepository.setSubscription(subscription)
 
-            if (shouldUseAuthV2()) {
-                // existing access token has to be invalidated after the purchase, because it doesn't have up-to-date entitlements
-                authRepository.setAccessTokenV2(null)
-                refreshAccessToken()
-            } else {
-                authRepository.getAccount()
-                    ?.copy(email = confirmationResponse.email)
-                    ?.let { authRepository.setAccount(it) }
-
-                authRepository.setEntitlements(confirmationResponse.entitlements.toEntitlements())
-            }
+            // existing access token has to be invalidated after the purchase, because it doesn't have up-to-date entitlements
+            authRepository.setAccessTokenV2(null)
+            refreshAccessToken()
 
             if (subscription.isActive()) {
                 val isFreeTrial = subscription.activeOffers.contains(ActiveOfferType.TRIAL)
@@ -1214,9 +1198,6 @@ class RealSubscriptionsManager @Inject constructor(
 
             if (subscription == null && !isSignedIn()) {
                 createAccount()
-                if (!shouldUseAuthV2()) {
-                    exchangeAuthToken(authRepository.getAuthToken()!!)
-                }
             }
 
             experimentAssigned = if (experimentCohort.isNullOrEmpty() || experimentName.isNullOrEmpty()) {
@@ -1254,20 +1235,19 @@ class RealSubscriptionsManager @Inject constructor(
     }
 
     override suspend fun getAccessToken(): AccessTokenResult {
-        return when {
-            isSignedIn() && shouldUseAuthV2() -> try {
+        return if (isSignedIn()) {
+            try {
                 AccessTokenResult.Success(getValidAccessTokenV2())
             } catch (e: Exception) {
                 AccessTokenResult.Failure("Token not found")
             }
-            isSignedInV1() -> AccessTokenResult.Success(authRepository.getAccessToken()!!)
-            else -> AccessTokenResult.Failure("Token not found")
+        } else {
+            AccessTokenResult.Failure("Token not found")
         }
     }
 
     private suspend fun getValidAccessTokenV2(): String {
         check(isSignedIn())
-        check(shouldUseAuthV2())
 
         if (!isSignedInV2() && isSignedInV1()) {
             migrateToAuthV2()
@@ -1334,25 +1314,15 @@ class RealSubscriptionsManager @Inject constructor(
 
     private suspend fun createAccount() {
         try {
-            if (shouldUseAuthV2()) {
-                subscriptionPurchaseWideEvent.onAccountCreationStarted()
-                val codeVerifier = pkceGenerator.generateCodeVerifier()
-                val codeChallenge = pkceGenerator.generateCodeChallenge(codeVerifier)
-                val jwks = authClient.getJwks()
-                val sessionId = authClient.authorize(codeChallenge)
-                val authorizationCode = authClient.createAccount(sessionId)
-                val tokens = authClient.getTokens(sessionId, authorizationCode, codeVerifier)
-                saveTokens(validateTokens(tokens, jwks))
-                subscriptionPurchaseWideEvent.onAccountCreationSuccess()
-            } else {
-                val account = authService.createAccount("Bearer ${emailManager.getToken()}")
-                if (account.authToken.isEmpty()) {
-                    pixelSender.reportPurchaseFailureAccountCreation()
-                } else {
-                    authRepository.setAccount(Account(externalId = account.externalId, email = null))
-                    authRepository.setAuthToken(account.authToken)
-                }
-            }
+            subscriptionPurchaseWideEvent.onAccountCreationStarted()
+            val codeVerifier = pkceGenerator.generateCodeVerifier()
+            val codeChallenge = pkceGenerator.generateCodeChallenge(codeVerifier)
+            val jwks = authClient.getJwks()
+            val sessionId = authClient.authorize(codeChallenge)
+            val authorizationCode = authClient.createAccount(sessionId)
+            val tokens = authClient.getTokens(sessionId, authorizationCode, codeVerifier)
+            saveTokens(validateTokens(tokens, jwks))
+            subscriptionPurchaseWideEvent.onAccountCreationSuccess()
         } catch (e: Exception) {
             subscriptionPurchaseWideEvent.onAccountCreationFailure(e)
             when (e) {

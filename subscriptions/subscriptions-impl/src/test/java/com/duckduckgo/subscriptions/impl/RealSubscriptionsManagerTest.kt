@@ -18,9 +18,7 @@ import com.duckduckgo.subscriptions.api.Product.NetP
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
-import com.duckduckgo.subscriptions.api.SubscriptionStatus.GRACE_PERIOD
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
-import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
 import com.duckduckgo.subscriptions.api.model.Entitlement
@@ -63,7 +61,6 @@ import com.duckduckgo.subscriptions.impl.services.ActiveOfferResponse
 import com.duckduckgo.subscriptions.impl.services.AuthService
 import com.duckduckgo.subscriptions.impl.services.ConfirmationEntitlement
 import com.duckduckgo.subscriptions.impl.services.ConfirmationResponse
-import com.duckduckgo.subscriptions.impl.services.CreateAccountResponse
 import com.duckduckgo.subscriptions.impl.services.EntitlementResponse
 import com.duckduckgo.subscriptions.impl.services.PendingPlanResponse
 import com.duckduckgo.subscriptions.impl.services.PortalResponse
@@ -99,13 +96,9 @@ import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
-import org.junit.Assume.assumeFalse
-import org.junit.Assume.assumeTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.runners.Parameterized
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
@@ -125,8 +118,7 @@ import java.time.Duration
 import java.time.Instant
 import java.time.LocalDateTime
 
-@RunWith(Parameterized::class)
-class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
+class RealSubscriptionsManagerTest {
 
     @get:Rule
     val coroutineRule = CoroutineTestRule()
@@ -142,7 +134,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     @SuppressLint("DenyListedApi")
     private val subscriptionsFeature: SubscriptionsFeature = FakeFeatureToggleFactory.create(SubscriptionsFeature::class.java)
         .apply {
-            authApiV2().setRawStoredState(State(authApiV2Enabled))
             serializeTokenRefresh().setRawStoredState(State(true))
         }
     private val authRepository = RealAuthRepository(authDataStore, coroutineRule.testDispatcherProvider, serpPromo, { subscriptionsFeature })
@@ -361,7 +352,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
     @Test
     fun whenRefreshTokenWithUseQueryPurchasesAndNoActivePurchaseThenSignsOut() = runTest {
-        assumeTrue(authApiV2Enabled)
         givenUserIsSignedIn()
         givenSubscriptionExists()
         givenAccessTokenIsExpired()
@@ -381,7 +371,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
     @Test
     fun whenRefreshTokenWithUseQueryPurchasesAndPurchaseInfoUnknownThenDoesNotSignOut() = runTest {
-        assumeTrue(authApiV2Enabled)
         givenUserIsSignedIn()
         givenSubscriptionExists()
         givenAccessTokenIsExpired()
@@ -400,7 +389,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
     @Test
     fun whenRefreshTokenWithUseQueryPurchasesAndActivePurchaseThenRecoversTokens() = runTest {
-        assumeTrue(authApiV2Enabled)
         givenUserIsSignedIn()
         givenAccessTokenIsExpired()
         givenV2AccessTokenRefreshFails(errorCode = "invalid_token")
@@ -425,54 +413,11 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     }
 
     @Test
-    fun whenFetchAndStoreAllDataIfTokenIsValidThenReturnSubscription() = runTest {
-        assumeFalse(authApiV2Enabled) // fetchAndStoreAllData() is deprecated and won't be used with auth v2 enabled
-
-        givenUserIsSignedIn()
-        givenSubscriptionSucceedsWithEntitlements()
-
-        subscriptionsManager.fetchAndStoreAllData()
-        assertEquals("1234", authDataStore.externalId)
-        assertTrue(authRepository.getEntitlements().firstOrNull { it.product == NetP.value } != null)
-    }
-
-    @Test
-    fun whenFetchAndStoreAllDataIfTokenIsValidThenReturnEmitEntitlements() = runTest {
-        assumeFalse(authApiV2Enabled) // fetchAndStoreAllData() is deprecated and won't be used with auth v2 enabled
-
-        givenUserIsSignedIn()
-        givenSubscriptionSucceedsWithEntitlements()
-
-        subscriptionsManager.fetchAndStoreAllData()
-        subscriptionsManager.entitlements.test {
-            assertTrue(awaitItem().size == 1)
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
     fun whenFetchAndStoreAllDataIfSubscriptionFailsThenReturnNull() = runTest {
         givenUserIsSignedIn()
         givenSubscriptionFails()
 
         assertFalse(subscriptionsManager.fetchAndStoreAllData())
-    }
-
-    @Test
-    fun whenFetchAndStoreAllDataIfSubscriptionFailsWith401ThenSignOutAndReturnNull() = runTest {
-        assumeFalse(authApiV2Enabled) // fetchAndStoreAllData() is deprecated and won't be used with auth v2 enabled
-
-        givenUserIsSignedIn()
-        givenSubscriptionFails(httpResponseCode = 401)
-
-        val dataFetched = subscriptionsManager.fetchAndStoreAllData()
-
-        assertFalse(dataFetched)
-        assertFalse(subscriptionsManager.isSignedIn.first())
-        assertNull(subscriptionsManager.getSubscription())
-        assertNull(subscriptionsManager.getAccount())
-        assertNull(authRepository.getAuthToken())
-        assertNull(authRepository.getAccessToken())
     }
 
     @Test
@@ -484,13 +429,9 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
         purchase()
 
-        if (authApiV2Enabled) {
-            verify(authClient).authorize(any())
-            verify(authClient).createAccount(any())
-            verify(authClient).getTokens(any(), any(), any())
-        } else {
-            verify(authService).createAccount(any())
-        }
+        verify(authClient).authorize(any())
+        verify(authClient).createAccount(any())
+        verify(authClient).getTokens(any(), any(), any())
 
         assertNotEquals(accountExternalId, authDataStore.externalId)
     }
@@ -502,25 +443,9 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
         purchase()
 
-        if (authApiV2Enabled) {
-            verify(authClient).authorize(any())
-            verify(authClient).createAccount(any())
-            verify(authClient).getTokens(any(), any(), any())
-        } else {
-            verify(authService).createAccount(any())
-        }
-    }
-
-    @Test
-    fun whenPurchaseFlowIfUserNotSignedInAndNotPurchaseStoredAndSignedInEmailThenCreateAccountWithEmailToken() = runTest {
-        assumeFalse(authApiV2Enabled) // passing email token when creating account is no longer a thing in api v2
-
-        whenever(emailManager.getToken()).thenReturn("emailToken")
-        givenUserIsNotSignedIn()
-
-        purchase()
-
-        verify(authService).createAccount("Bearer emailToken")
+        verify(authClient).authorize(any())
+        verify(authClient).createAccount(any())
+        verify(authClient).getTokens(any(), any(), any())
     }
 
     @Test
@@ -594,17 +519,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     }
 
     @Test
-    fun whenPurchaseFlowIfUserSignedInThenValidateToken() = runTest {
-        assumeFalse(authApiV2Enabled) // there is no /validate-token endpoint in v2 API
-
-        givenUserIsSignedIn()
-
-        purchase()
-
-        verify(authService).validateToken(any())
-    }
-
-    @Test
     fun whenPurchaseFlowIfValidateTokenSucceedsThenBillingFlowUsesCorrectExternalIdAndEmitStates() = runTest {
         givenUserIsSignedIn()
         givenSubscriptionSucceedsWithoutEntitlements(status = "Expired")
@@ -638,7 +552,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
         purchase()
 
-        verify(authService, never()).createAccount(any())
+        verify(authClient, never()).createAccount(any())
     }
 
     @Test
@@ -649,17 +563,10 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         givenAccessTokenSucceeds()
 
         purchase()
-        if (authApiV2Enabled) {
-            assertEquals(FAKE_ACCESS_TOKEN_V2, authDataStore.accessTokenV2)
-            assertEquals(FAKE_REFRESH_TOKEN_V2, authDataStore.refreshTokenV2)
-            assertNull(authDataStore.accessToken)
-            assertNull(authDataStore.authToken)
-        } else {
-            assertNull(authDataStore.accessTokenV2)
-            assertNull(authDataStore.refreshTokenV2)
-            assertEquals("accessToken", authDataStore.accessToken)
-            assertEquals("authToken", authDataStore.authToken)
-        }
+        assertEquals(FAKE_ACCESS_TOKEN_V2, authDataStore.accessTokenV2)
+        assertEquals(FAKE_REFRESH_TOKEN_V2, authDataStore.refreshTokenV2)
+        assertNull(authDataStore.accessToken)
+        assertNull(authDataStore.authToken)
     }
 
     @Test
@@ -1024,8 +931,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
         assertTrue(result is AccessTokenResult.Success)
         val actualAccessToken = (result as AccessTokenResult.Success).accessToken
-        val expectedAccessToken = if (authApiV2Enabled) FAKE_ACCESS_TOKEN_V2 else "accessToken"
-        assertEquals(expectedAccessToken, actualAccessToken)
+        assertEquals(FAKE_ACCESS_TOKEN_V2, actualAccessToken)
     }
 
     @Test
@@ -1039,8 +945,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
     @Test
     fun whenGetAccessTokenIfAccessTokenIsExpiredThenGetNewTokenAndReturnSuccess() = runTest {
-        assumeTrue(authApiV2Enabled)
-
         givenUserIsSignedIn()
         givenAccessTokenIsExpired()
         givenV2AccessTokenRefreshSucceeds(newAccessToken = "new access token")
@@ -1053,8 +957,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
     @Test
     fun whenGetAccessTokenIfAccessTokenIsExpiredAndRefreshFailsThenGetNewTokenAndReturnFailure() = runTest {
-        assumeTrue(authApiV2Enabled)
-
         givenUserIsSignedIn()
         givenAccessTokenIsExpired()
         givenV2AccessTokenRefreshFails()
@@ -1066,8 +968,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
     @Test
     fun whenGetAccessTokenIfAccessTokenIsExpiredAndRefreshFailsWithAuthErrorThenGetNewTokenUsingStoreLoginAndReturnSuccess() = runTest {
-        assumeTrue(authApiV2Enabled)
-
         givenUserIsSignedIn()
         givenAccessTokenIsExpired()
         givenV2AccessTokenRefreshFails(errorCode = "invalid_token")
@@ -1084,8 +984,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
     @Test
     fun whenGetAccessTokenIfAccessTokenIsExpiredAndRefreshFailsWithAuthErrorAndStoreRecoveryNotPossibleThenSignOutAndReturnFailure() = runTest {
-        assumeTrue(authApiV2Enabled)
-
         givenUserIsSignedIn()
         givenSubscriptionExists()
         givenAccessTokenIsExpired()
@@ -1107,8 +1005,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
     @Test
     fun whenGetAccessTokenIfAccessTokenIsExpiredAndRefreshFailsWithUnknownAccountErrorThenSignOutAndReturnFailure() = runTest {
-        assumeTrue(authApiV2Enabled)
-
         givenUserIsSignedIn()
         givenSubscriptionExists()
         givenAccessTokenIsExpired()
@@ -1140,8 +1036,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     @Test
     @SuppressLint("DenyListedApi")
     fun whenSerializeTokenRefreshDisabledThenRefreshDoesNotUseCrossProcessLock() = runTest {
-        assumeTrue(authApiV2Enabled)
-
         subscriptionsFeature.serializeTokenRefresh().setRawStoredState(State(false))
         givenUserIsSignedIn()
         givenAccessTokenIsExpired()
@@ -1157,8 +1051,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
     @Test
     fun whenRefreshSucceedsThenCrossProcessLockIsReleased() = runTest {
-        assumeTrue(authApiV2Enabled)
-
         val lockHandle = FakeLockHandle()
         val acquireResult = Result.success(lockHandle)
         whenever(crossProcessLock.acquire(any(), any())).thenReturn(acquireResult)
@@ -1175,8 +1067,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
     @Test
     fun whenRefreshFailsThenCrossProcessLockIsReleased() = runTest {
-        assumeTrue(authApiV2Enabled)
-
         val lockHandle = FakeLockHandle()
         whenever(crossProcessLock.acquire(any(), any())).thenReturn(Result.success(lockHandle))
         givenUserIsSignedIn()
@@ -1191,8 +1081,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
     @Test
     fun whenCrossProcessLockAcquisitionTimesOutThenRefreshStillRuns() = runTest {
-        assumeTrue(authApiV2Enabled)
-
         val acquireResult = Result.failure<Closeable>(timeoutCancellationException())
         whenever(crossProcessLock.acquire(any(), any())).thenReturn(acquireResult)
         givenUserIsSignedIn()
@@ -1207,8 +1095,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
     @Test
     fun whenCrossProcessLockAcquisitionFailsThenRefreshStillRuns() = runTest {
-        assumeTrue(authApiV2Enabled)
-
         val acquireResult = Result.failure<Closeable>(IOException())
         whenever(crossProcessLock.acquire(any(), any())).thenReturn(acquireResult)
         givenUserIsSignedIn()
@@ -1223,8 +1109,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
     @Test
     fun whenTokenRefreshesRunConcurrentlyThenTheyDoNotOverlap() = runTest {
-        assumeTrue(authApiV2Enabled)
-
         givenUserIsSignedIn()
         givenValidateV2TokensSucceeds()
         whenever(authClient.getJwks()).thenReturn("fake jwks")
@@ -1249,8 +1133,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
     @Test
     fun whenCallerIsCancelledMidRefreshThenRefreshCompletes() = runTest {
-        assumeTrue(authApiV2Enabled)
-
         givenUserIsSignedIn()
         givenValidateV2TokensSucceeds()
         whenever(authClient.getJwks()).thenReturn("fake jwks")
@@ -1276,8 +1158,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
     @Test
     fun whenGetAccessTokenIfSignedInWithV1ThenExchangesTokenForV2AndReturnsTrue() = runTest {
-        assumeTrue(authApiV2Enabled)
-
         givenUserIsSignedIn(useAuthV2 = false)
         givenV1AccessTokenExchangeSuccess()
 
@@ -1294,8 +1174,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
     @Test
     fun whenGetAccessTokenIfSignedInWithV1AndMigrationToV2FailsOnUnknownAccountErrorThenSignsOut() = runTest {
-        assumeTrue(authApiV2Enabled)
-
         givenUserIsSignedIn(useAuthV2 = false)
         givenV1AccessTokenExchangeFailsWithInvalidTokenError()
 
@@ -1312,7 +1190,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
     @Test
     fun whenGetAuthTokenIfUserSignedInAndValidTokenThenReturnSuccess() = runTest {
-        assumeTrue(authApiV2Enabled) // getAuthToken() now only returns a token for auth v2 signed-in users
         givenUserIsSignedIn()
         givenValidateTokenSucceedsWithEntitlements()
 
@@ -1331,38 +1208,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         val result = subscriptionsManager.getAuthToken()
 
         assertTrue(result is AuthTokenResult.Failure)
-    }
-
-    @Test
-    fun whenGetSubscriptionThenReturnCorrectStatus() = runTest {
-        assumeFalse(authApiV2Enabled) // fetchAndStoreAllData() is deprecated and won't be used with auth v2 enabled
-
-        givenUserIsSignedIn()
-        givenValidateTokenSucceedsWithEntitlements()
-
-        givenSubscriptionSucceedsWithEntitlements("Auto-Renewable")
-        subscriptionsManager.fetchAndStoreAllData()
-        assertEquals(AUTO_RENEWABLE, subscriptionsManager.getSubscription()?.status)
-
-        givenSubscriptionSucceedsWithEntitlements("Not Auto-Renewable")
-        subscriptionsManager.fetchAndStoreAllData()
-        assertEquals(NOT_AUTO_RENEWABLE, subscriptionsManager.getSubscription()?.status)
-
-        givenSubscriptionSucceedsWithEntitlements("Grace Period")
-        subscriptionsManager.fetchAndStoreAllData()
-        assertEquals(GRACE_PERIOD, subscriptionsManager.getSubscription()?.status)
-
-        givenSubscriptionSucceedsWithEntitlements("Inactive")
-        subscriptionsManager.fetchAndStoreAllData()
-        assertEquals(INACTIVE, subscriptionsManager.getSubscription()?.status)
-
-        givenSubscriptionSucceedsWithEntitlements("Expired")
-        subscriptionsManager.fetchAndStoreAllData()
-        assertEquals(EXPIRED, subscriptionsManager.getSubscription()?.status)
-
-        givenSubscriptionSucceedsWithEntitlements("test")
-        subscriptionsManager.fetchAndStoreAllData()
-        assertEquals(UNKNOWN, subscriptionsManager.getSubscription()?.status)
     }
 
     @Test
@@ -1938,7 +1783,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
     @Test
     fun whenSignInV1AndLoadingSubscriptionFailsThenSetsStatusToWaiting() = runTest {
-        assumeTrue(authApiV2Enabled)
         givenAccessTokenSucceeds()
         givenV1AccessTokenExchangeSuccess()
         givenV2AccessTokenRefreshSucceeds()
@@ -1953,8 +1797,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
     @Test
     fun whenValidateTokenFailsThenPixelIsSent() = runTest {
-        assumeTrue(authApiV2Enabled)
-
         givenUserIsSignedIn()
         givenAccessTokenIsExpired()
 
@@ -1972,8 +1814,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
     @Test
     fun whenStoringTokenFailsThenPixelIsSent() = runTest {
-        assumeTrue(authApiV2Enabled)
-
         givenUserIsSignedIn()
         givenAccessTokenIsExpired()
         givenV2AccessTokenRefreshSucceeds()
@@ -2038,7 +1878,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         authDataStore.refreshTokenV2ExpiresAt = null
     }
 
-    private fun givenUserIsSignedIn(useAuthV2: Boolean = authApiV2Enabled, accountExternalId: String = "1234") {
+    private fun givenUserIsSignedIn(useAuthV2: Boolean = true, accountExternalId: String = "1234") {
         if (useAuthV2) {
             authDataStore.accessTokenV2 = FAKE_ACCESS_TOKEN_V2
             authDataStore.accessTokenV2ExpiresAt = timeProvider.currentTime + Duration.ofHours(4)
@@ -2053,21 +1893,11 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
     private suspend fun givenCreateAccountFails() {
         val exception = "account_failure".toResponseBody("text/json".toMediaTypeOrNull())
-        whenever(authService.createAccount(any())).thenThrow(HttpException(Response.error<String>(400, exception)))
-
         whenever(authClient.authorize(any())).thenThrow(HttpException(Response.error<String>(400, exception)))
         whenever(authClient.createAccount(any())).thenThrow(HttpException(Response.error<String>(400, exception)))
     }
 
     private suspend fun givenCreateAccountSucceeds() {
-        whenever(authService.createAccount(any())).thenReturn(
-            CreateAccountResponse(
-                authToken = "authToken",
-                externalId = "1234",
-                status = "ok",
-            ),
-        )
-
         whenever(authClient.authorize(any())).thenReturn("fake session id")
         whenever(authClient.createAccount(any())).thenReturn("fake authorization code")
         whenever(authClient.getTokens(any(), any(), any()))
@@ -2717,10 +2547,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     }
 
     private companion object {
-        @JvmStatic
-        @Parameterized.Parameters(name = "authApiV2Enabled={0}")
-        fun data(): Collection<Array<Boolean>> = listOf(arrayOf(true), arrayOf(false))
-
         const val FAKE_ACCESS_TOKEN_V2 = "fake access token"
         const val FAKE_REFRESH_TOKEN_V2 = "fake refresh token"
     }

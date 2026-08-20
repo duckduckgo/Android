@@ -27,9 +27,6 @@ import retrofit2.http.POST
 
 @ContributesNonCachingServiceApi(AppScope::class)
 interface AuthService {
-    @POST("https://quack.duckduckgo.com/api/auth/account/create")
-    suspend fun createAccount(@Header("Authorization") authorization: String?): CreateAccountResponse
-
     @POST("https://quack.duckduckgo.com/api/auth/store-login")
     suspend fun storeLogin(@Body storeLoginBody: StoreLoginBody): StoreLoginResponse
 
@@ -61,12 +58,6 @@ data class StoreLoginResponse(
     @field:Json(name = "auth_token") val authToken: String,
     @field:Json(name = "external_id") val externalId: String,
     val email: String?,
-    val status: String,
-)
-
-data class CreateAccountResponse(
-    @field:Json(name = "auth_token") val authToken: String,
-    @field:Json(name = "external_id") val externalId: String,
     val status: String,
 )
 
