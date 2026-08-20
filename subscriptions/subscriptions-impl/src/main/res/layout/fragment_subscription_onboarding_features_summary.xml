@@ -75,7 +75,8 @@
                     app:leadingIcon="@drawable/vpn_color_24"
                     app:primaryText="@string/subscriptionOnboardingFeature1Title"
                     app:secondaryText="@string/subscriptionOnboardingFeature1Description"
-                    app:trailingIcon="@drawable/ic_chevron_right_24" />
+                    app:trailingIcon="@drawable/ic_chevron_right_24"
+                    app:trailingIconSize="small" />
 
                 <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                     android:id="@+id/onboardingSubscriptionFeaturesDivider1"
@@ -89,7 +90,8 @@
                     app:leadingIcon="@drawable/identity_theft_restoration_color_24"
                     app:primaryText="@string/subscriptionOnboardingFeature2Title"
                     app:secondaryText="@string/subscriptionOnboardingFeature2Description"
-                    app:trailingIcon="@drawable/ic_chevron_right_24" />
+                    app:trailingIcon="@drawable/ic_chevron_right_24"
+                    app:trailingIconSize="small" />
 
                 <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                     android:id="@+id/onboardingSubscriptionFeaturesDivider2"
@@ -103,7 +105,8 @@
                     app:leadingIcon="@drawable/ai_general_color_24"
                     app:primaryText="@string/subscriptionOnboardingFeature3Title"
                     app:secondaryText="@string/subscriptionOnboardingFeature3Description"
-                    app:trailingIcon="@drawable/ic_chevron_right_24" />
+                    app:trailingIcon="@drawable/ic_chevron_right_24"
+                    app:trailingIconSize="small" />
 
                 <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                     android:id="@+id/onboardingSubscriptionFeaturesDivider3"
@@ -117,7 +120,8 @@
                     app:leadingIcon="@drawable/identity_blocked_pir_color_24"
                     app:primaryText="@string/subscriptionOnboardingFeature4Title"
                     app:secondaryText="@string/subscriptionOnboardingFeature4Description"
-                    app:trailingIcon="@drawable/ic_chevron_right_24" />
+                    app:trailingIcon="@drawable/ic_chevron_right_24"
+                    app:trailingIconSize="small" />
 
             </LinearLayout>
 
