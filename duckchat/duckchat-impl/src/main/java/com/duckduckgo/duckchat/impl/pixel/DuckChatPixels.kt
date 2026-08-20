@@ -183,6 +183,7 @@ interface DuckChatPixels {
     fun reportVoiceNotificationEndChatTapped()
     fun reportVoiceServiceStarted()
     fun reportVoiceServiceKilled()
+    fun reportVoiceServiceStartFailed()
 
     fun fireImageGenerationSelected(surface: DuckChatPixelSurface)
     fun fireImageGenerationDeselected(surface: DuckChatPixelSurface)
@@ -669,6 +670,13 @@ class RealDuckChatPixels @Inject constructor(
 
     override fun reportVoiceServiceKilled() {
         pixel.fire(DuckChatPixelName.DUCK_CHAT_VOICE_SERVICE_KILLED)
+    }
+
+    override fun reportVoiceServiceStartFailed() {
+        fireCountAndDaily(
+            DuckChatPixelName.DUCK_CHAT_VOICE_SERVICE_START_FAILED_COUNT,
+            DuckChatPixelName.DUCK_CHAT_VOICE_SERVICE_START_FAILED_DAILY,
+        )
     }
 
     override fun fireImageGenerationSelected(surface: DuckChatPixelSurface) = fireCountAndDaily(
@@ -1214,6 +1222,8 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_VOICE_NOTIFICATION_END_CHAT_TAPPED("m_aichat_voice_notification_end_chat_tapped"),
     DUCK_CHAT_VOICE_SERVICE_STARTED("m_aichat_voice_service_started"),
     DUCK_CHAT_VOICE_SERVICE_KILLED("m_aichat_voice_service_killed"),
+    DUCK_CHAT_VOICE_SERVICE_START_FAILED_COUNT("m_aichat_voice_service_start_failed_count"),
+    DUCK_CHAT_VOICE_SERVICE_START_FAILED_DAILY("m_aichat_voice_service_start_failed_daily"),
     DUCK_CHAT_CONTEXTUAL_FIRE_BUTTON_TAPPED_FIRST("m_aichat_contextual_fire_button_tapped_first"),
     DUCK_CHAT_CONTEXTUAL_FIRE_BUTTON_TAPPED_DAILY("m_aichat_contextual_fire_button_tapped_daily"),
     DUCK_CHAT_CONTEXTUAL_FIRE_BUTTON_TAPPED_COUNT("m_aichat_contextual_fire_button_tapped_count"),
@@ -1532,6 +1542,8 @@ class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
             DuckChatPixelName.DUCK_CHAT_VOICE_NOTIFICATION_END_CHAT_TAPPED.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_VOICE_SERVICE_STARTED.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_VOICE_SERVICE_KILLED.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_VOICE_SERVICE_START_FAILED_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_VOICE_SERVICE_START_FAILED_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_SETTINGS_DEFAULT_TOGGLE_POSITION_CHANGED_COUNT.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_SETTINGS_DEFAULT_TOGGLE_POSITION_CHANGED_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_FIRE_BUTTON_TAPPED_FIRST.pixelName to PixelParameter.removeAtb(),

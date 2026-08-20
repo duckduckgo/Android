@@ -898,6 +898,13 @@
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
+    "m_aichat_voice_service_start_failed": {
+        "description": "The Duck.ai voice microphone foreground service could not enter the foreground because the system rejected the microphone service type (e.g. RECORD_AUDIO not granted at start time); the service was stopped instead of crashing",
+        "owners": ["karlenDimla"],
+        "triggers": ["exception"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
     "m_aichat_unified_input_image_generation_selected_count": {
         "description": "User selected the image generation tool in the Unified Input",
         "owners": ["malmstein"],
