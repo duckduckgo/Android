@@ -202,7 +202,6 @@
     <string name="autofillManagementHowToSyncDesktopPasswordsTitle">Masaüstü Şifreleri Nasıl Senkronize Edilir</string>
     <string name="autofillManagementImportPasswordsHowToInstruction">DuckDuckGo tarayıcısının masaüstü sürümünde şifreleri içe aktarın, ardından cihazlar arasında senkronize edin.</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Masaüstü Tarayıcısını Edinin</string>
-    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Bağlantı kopyalandı</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Mac veya Windows için DuckDuckGo Tarayıcısını edinin</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">DuckDuckGo masaüstü tarayıcısı ile gizli arama yapın ve izleyicileri engelleyin. Bugün indirmek için bilgisayarınızda bu bağlantıyı ziyaret edin.\n\n%1$s</string>
     <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Masaüstü ile Senkronize Et</string>
@@ -215,8 +214,6 @@
     <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Masaüstü Uygulamasını İndirin</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">Mac veya Windows için DuckDuckGo\'yu edinin</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">Bilgisayarınızda şu adrese gidin:</string>
-    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
-    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">İndirme Bağlantısını Paylaş</string>
 
     <string name="autofillManagementReportBreakagePromptTitle">Otomatik Doldurmayla ilgili bir sorunu bildirin</string>
     <string name="autofillManagementReportBreakagePromptSubtitle">Otomatik doldurmanın bu sitede çalışmadığını anonim olarak bildirin. Şifreler asla paylaşılmaz.</string>

@@ -202,7 +202,6 @@
     <string name="autofillManagementHowToSyncDesktopPasswordsTitle">Synchroniseren van desktopwachtwoorden</string>
     <string name="autofillManagementImportPasswordsHowToInstruction">Importeer wachtwoorden in de desktopversie van de DuckDuckGo-browser en synchroniseer ze vervolgens tussen apparaten.</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Download de desktopbrowser</string>
-    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Link gekopieerd</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">DuckDuckGo-browser downloaden voor Mac of Windows</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Zoek privé en blokkeer trackers met de DuckDuckGo-desktopbrowser. Bezoek deze link op je computer en download de browser vandaag nog.\n\n%1$s</string>
     <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Synchroniseren met de desktop</string>
@@ -215,8 +214,6 @@
     <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Desktop-app downloaden</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">DuckDuckGo downloaden voor Mac of Windows</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">Ga op je computer naar:</string>
-    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
-    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Downloadlink delen</string>
 
     <string name="autofillManagementReportBreakagePromptTitle">Meld een probleem met automatisch invullen</string>
     <string name="autofillManagementReportBreakagePromptSubtitle">Anoniem melden dat automatisch invullen niet werkt op deze site. Wachtwoorden worden nooit gedeeld.</string>

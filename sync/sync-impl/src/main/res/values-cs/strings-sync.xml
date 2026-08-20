@@ -221,7 +221,6 @@
     <!-- Get Desktop Browser -->
     <string name="getDesktopBrowserSettingItemTitle">Nainstalovat prohlížeč pro počítač</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo pro Mac a Windows</string>
-    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
 
     <!-- Sync Settings Recovery Section -->
     <string name="sync_settings_recovery_section_header">Obnova</string>

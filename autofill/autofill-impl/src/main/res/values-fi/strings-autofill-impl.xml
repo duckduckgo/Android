@@ -202,7 +202,6 @@
     <string name="autofillManagementHowToSyncDesktopPasswordsTitle">Tietokoneen salasanojen synkronointi</string>
     <string name="autofillManagementImportPasswordsHowToInstruction">Tuo DuckDuckGo-selaimen pöytäkoneversiossa olevat salasanat ja synkronoi eri laitteiden kanssa.</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Hanki pöytäkoneselain</string>
-    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Linkki kopioitu</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Hanki DuckDuckGo-selain Macille tai Windowsille</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Tee yksityisiä hakuja ja estä seuranta DuckDuckGo-selaimen tietokoneversiolla. Mene tietokoneella tähän linkkiin ja lataa selain jo tänään.\n\n%1$s</string>
     <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Synkronointi pöytäkoneen kanssa</string>
@@ -215,8 +214,6 @@
     <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Hanki sovelluksen tietokoneversio</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">Hanki DuckDuckGo Macille tai Windowsille</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">Siirry tietokoneellasi kohtaan:</string>
-    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
-    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Jaa latauslinkki</string>
 
     <string name="autofillManagementReportBreakagePromptTitle">Ilmoita automaattisen täytön ongelmasta</string>
     <string name="autofillManagementReportBreakagePromptSubtitle">Tee nimetön ilmoitus automaattisen täytön ongelmista tällä sivustolla. Salasanoja ei koskaan jaeta.</string>

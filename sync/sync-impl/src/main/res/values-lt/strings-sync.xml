@@ -221,7 +221,6 @@
     <!-- Get Desktop Browser -->
     <string name="getDesktopBrowserSettingItemTitle">Gaukite kompiuterio naršyklę</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">„DuckDuckGo“, skirta „Mac“ ir „Windows“</string>
-    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
 
     <!-- Sync Settings Recovery Section -->
     <string name="sync_settings_recovery_section_header">Atkūrimas</string>

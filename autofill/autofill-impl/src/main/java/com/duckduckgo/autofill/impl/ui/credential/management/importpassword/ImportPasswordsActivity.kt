@@ -24,7 +24,6 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ActivityImportPasswordsBinding
-import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.desktopapp.GetDesktopAppParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -91,7 +90,7 @@ class ImportPasswordsActivity : DuckDuckGoActivity() {
 
     private fun configureEventHandlers() {
         binding.getDesktopBrowserButton.setOnClickListener {
-            globalActivityStarter.start(this, GetDesktopAppParams)
+            globalActivityStarter.start(this, ImportPasswordsDesktopAppPromotionParams.create(this))
             viewModel.onUserClickedGetDesktopAppButton()
         }
         binding.syncWithDesktopButton.setOnClickListener {

@@ -214,7 +214,6 @@
     <string name="autofillManagementHowToSyncDesktopPasswordsTitle">Как синхронизировать пароли из настольного браузера</string>
     <string name="autofillManagementImportPasswordsHowToInstruction">Импортируйте пароли в настольную версию браузера DuckDuckGo, а затем синхронизируйте их между устройствами.</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Скачать настольный браузер</string>
-    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Ссылка скопирована</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Браузер DuckDuckGo для Mac и Windows</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Браузер DuckDuckGo для настольных компьютеров — это конфиденциальный поиск плюс блокировка трекеров. Скачивайте по ссылке.\n\n%1$s</string>
     <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Синхронизировать с компьютером</string>
@@ -227,8 +226,6 @@
     <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Наше настольное приложение</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">DuckDuckGo для Mac и Windows</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">На компьютере откройте ссылку:</string>
-    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
-    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Поделиться ссылкой для загрузки</string>
 
     <string name="autofillManagementReportBreakagePromptTitle">Сообщить о сбое автозаполнения</string>
     <string name="autofillManagementReportBreakagePromptSubtitle">Анонимный отчет о сбое в работе функции автозаполнения на этом сайте. Ни в коем случае не включает пароли.</string>

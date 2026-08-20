@@ -511,6 +511,9 @@ dependencies {
     implementation project(':settings-api')
     implementation project(':settings-impl')
 
+    implementation project(':desktop-app-promotion-api')
+    implementation project(':desktop-app-promotion-impl')
+
     implementation project(':broken-site-api')
     implementation project(':broken-site-impl')
     implementation project(':broken-site-store')

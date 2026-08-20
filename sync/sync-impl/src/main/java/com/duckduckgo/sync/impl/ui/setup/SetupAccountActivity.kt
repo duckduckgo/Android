@@ -35,8 +35,8 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.sync.impl.R.id
 import com.duckduckgo.sync.impl.databinding.ActivitySyncSetupAccountBinding
+import com.duckduckgo.sync.impl.promotion.SyncDesktopAppPromotionLauncher
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource
-import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsParams
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.PREVIOUS_SESSION_READY
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_CODE
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_INTRO
@@ -59,6 +59,7 @@ import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.SyncSetu
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewState
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
@@ -68,6 +69,9 @@ class SetupAccountActivity : DuckDuckGoActivity(), SyncSetupNavigationFlowListen
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject
+    lateinit var syncDesktopAppPromotionLauncher: SyncDesktopAppPromotionLauncher
 
     @Inject
     lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
@@ -249,7 +253,7 @@ class SetupAccountActivity : DuckDuckGoActivity(), SyncSetupNavigationFlowListen
     }
 
     private fun launchSyncGetOnOtherPlatforms(source: SyncGetOnOtherPlatformsLaunchSource) {
-        globalActivityStarter.start(this, SyncGetOnOtherPlatformsParams(source))
+        lifecycleScope.launch { syncDesktopAppPromotionLauncher.launch(this@SetupAccountActivity, source) }
     }
 
     private fun extractSource(): String? {

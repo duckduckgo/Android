@@ -214,7 +214,6 @@
     <string name="autofillManagementHowToSyncDesktopPasswordsTitle">Kako sinhronizirati gesla za namizje</string>
     <string name="autofillManagementImportPasswordsHowToInstruction">V namizni različici brskalnika DuckDuckGo uvozite gesla in jih nato sinhronizirajte med napravami.</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Namesti namizni brskalnik</string>
-    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Povezava je kopirana</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Prenesite brskalnik DuckDuckGo za računalnike Mac ali Windows</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Brskajte zasebno in blokirajte sledilnike z namiznim brskalnikom DuckDuckGo. Za prenos obiščite to povezavo v računalniku.\n\n%1$s</string>
     <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Sinhronizacija z namizjem</string>
@@ -227,8 +226,6 @@
     <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Pridobite namizno aplikacijo</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">Prenesite DuckDuckGo za računalnike Mac ali Windows</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">V računalniku odprite:</string>
-    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
-    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Deli povezavo za prenos</string>
 
     <string name="autofillManagementReportBreakagePromptTitle">Prijavite težavo s samodejnim izpolnjevanjem</string>
     <string name="autofillManagementReportBreakagePromptSubtitle">Anonimno prijavite, da samodejno izpolnjevanje ne deluje na tem spletnem mestu. Gesla niso nikoli deljena.</string>

@@ -45,6 +45,7 @@ dependencies {
     implementation project(path: ':saved-sites-api')
     implementation project(':feature-toggles-api')
     implementation project(':navigation-api')
+    implementation project(':desktop-app-promotion-api')
     implementation project(':remote-messaging-api')
     implementation project(path: ':autofill-api')
     implementation project(path: ':settings-api') // temporary until we release new settings

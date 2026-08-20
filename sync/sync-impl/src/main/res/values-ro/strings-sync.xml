@@ -221,7 +221,6 @@
     <!-- Get Desktop Browser -->
     <string name="getDesktopBrowserSettingItemTitle">Obține browserul pentru desktop</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo pentru Mac și Windows</string>
-    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
 
     <!-- Sync Settings Recovery Section -->
     <string name="sync_settings_recovery_section_header">Recuperare</string>

@@ -202,7 +202,6 @@
     <string name="autofillManagementHowToSyncDesktopPasswordsTitle">Como sincronizar palavras-passe com o computador</string>
     <string name="autofillManagementImportPasswordsHowToInstruction">Importa palavras-passe na versão para computadores do navegador DuckDuckGo e sincroniza-as entre dispositivos.</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Obter navegador para computador</string>
-    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Link copiado</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Obtém o navegador DuckDuckGo para Mac ou Windows</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Pesquisa em privado e bloqueia rastreadores com o navegador para computadores DuckDuckGo. Visita este link no teu computador para transferires hoje.\n\n%1$s</string>
     <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Sincronizar com computador</string>
@@ -215,8 +214,6 @@
     <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Obter aplicação para computador</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">Obtém o DuckDuckGo para Mac ou Windows</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">No teu computador, acede a:</string>
-    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
-    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Partilhar link de transferência</string>
 
     <string name="autofillManagementReportBreakagePromptTitle">Comunicar um problema com o preenchimento automático</string>
     <string name="autofillManagementReportBreakagePromptSubtitle">Denuncia anonimamente que o preenchimento automático não está a funcionar neste site. As palavras-passe nunca são partilhadas.</string>

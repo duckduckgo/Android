@@ -221,7 +221,6 @@
     <!-- Get Desktop Browser -->
     <string name="getDesktopBrowserSettingItemTitle">Hämta webbläsare för dator</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo för Mac och Windows</string>
-    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
 
     <!-- Sync Settings Recovery Section -->
     <string name="sync_settings_recovery_section_header">Återställning</string>

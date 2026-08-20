@@ -61,7 +61,7 @@ import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthResult.Error
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthResult.Success
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthResult.UserCancelled
 import com.duckduckgo.sync.impl.databinding.ActivitySyncV2Binding
-import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsParams
+import com.duckduckgo.sync.impl.promotion.SyncDesktopAppPromotionLauncher
 import com.duckduckgo.sync.impl.ui.DeviceUnsupportedActivity
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
@@ -109,6 +109,9 @@ class SyncActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var syncSettingsPlugin: DaggerMap<Int, SyncSettingsPlugin>
+
+    @Inject
+    lateinit var syncDesktopAppPromotionLauncher: SyncDesktopAppPromotionLauncher
 
     @Inject
     lateinit var syncMessagesPlugin: DaggerSet<SyncMessagePlugin>
@@ -528,7 +531,7 @@ class SyncActivity : DuckDuckGoActivity() {
             }
 
             is LaunchSyncGetOnOtherPlatforms -> {
-                globalActivityStarter.start(this, SyncGetOnOtherPlatformsParams(command.source))
+                lifecycleScope.launch { syncDesktopAppPromotionLauncher.launch(this@SyncActivity, command.source) }
             }
 
             is RecoveryCodePDFSuccess -> {
