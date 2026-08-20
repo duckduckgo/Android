@@ -43,6 +43,7 @@ class RealDrmPolicyManager @Inject constructor(
         val uri = url.toUri()
         val siteSetting = sitePermissionsRepository.getSitePermissionsForWebsite(domain)?.askDrmSetting
             ?.let { setting -> SitePermissionAskSettingType.entries.firstOrNull { it.name == setting } }
+
         return DrmPolicyContext(
             isGlobalAskEnabled = sitePermissionsRepository.askDrmEnabled,
             siteSetting = siteSetting,

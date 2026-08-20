@@ -23,8 +23,6 @@ import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
 class DrmSessionStore @Inject constructor() {
-
-    // Entries for closed tabs are never reclaimed — one Boolean per (tab, domain) that saw a prompt.
     private val sessions = ConcurrentHashMap<String, Boolean>()
 
     fun get(tabId: String, domain: String): Boolean? = sessions[key(tabId, domain)]
