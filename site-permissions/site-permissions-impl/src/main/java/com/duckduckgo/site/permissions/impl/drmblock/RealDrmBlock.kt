@@ -21,6 +21,7 @@ import com.duckduckgo.app.browser.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
+import com.duckduckgo.site.permissions.impl.isSiteUnprotectedByUser
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
@@ -36,7 +37,7 @@ class RealDrmBlock @Inject constructor(
         val uri = url.toUri()
         return drmBlockFeature.self().isEnabled() &&
             domainsThatBlockDrm(url) &&
-            !userAllowListRepository.isUriInUserAllowList(uri) &&
+            !userAllowListRepository.isSiteUnprotectedByUser(uri) &&
             !unprotectedTemporary.isAnException(uri.toString())
     }
 

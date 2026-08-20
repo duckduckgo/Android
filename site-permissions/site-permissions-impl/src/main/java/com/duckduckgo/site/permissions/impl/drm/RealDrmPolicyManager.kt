@@ -26,6 +26,7 @@ import com.duckduckgo.privacy.config.api.Drm
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.site.permissions.impl.SitePermissionsRepository
 import com.duckduckgo.site.permissions.impl.drmblock.DrmBlock
+import com.duckduckgo.site.permissions.impl.isSiteUnprotectedByUser
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -54,7 +55,7 @@ class RealDrmPolicyManager @Inject constructor(
             siteSetting = siteSetting,
             sessionChoice = tabId?.let { drmSessionStore.get(it, domain) },
             isBlockedByBlockList = drmBlock.isDrmBlockedForUrl(url),
-            isSiteUnprotected = userAllowListRepository.isUriInUserAllowList(uri) || unprotectedTemporary.isAnException(url),
+            isSiteUnprotected = userAllowListRepository.isSiteUnprotectedByUser(uri) || unprotectedTemporary.isAnException(url),
             isAllowedByAllowList = drm.isDrmAllowedForUrl(url),
         ).evaluate()
     }
