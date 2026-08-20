@@ -38,12 +38,15 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
 import com.duckduckgo.duckchat.impl.repository.AddressBarPickerAttributionRepository
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
@@ -179,7 +182,7 @@ interface DuckChatInternal : DuckChat {
     /**
      * Opens DuckChat with a new session.
      */
-    fun openNewDuckChatSession()
+    fun openNewDuckChatSession(entryPoint: DuckChatEntryPoint)
 
     /** Single source of truth for the Duck.ai chat URL shape. */
     fun buildChatUrl(chatId: String): String
@@ -717,13 +720,15 @@ class RealDuckChat @Inject constructor(
 
     override fun keepSessionIntervalInMinutes() = keepSessionAliveInMinutes
 
-    override fun openDuckChat() {
+    override fun openDuckChat(entryPoint: DuckChatEntryPoint) {
         logcat { "Duck.ai: openDuckChat" }
+        reportDuckChatEntry(entryPoint, opensNewTab = true, hasPrompt = false)
         openDuckChat(emptyMap())
     }
 
-    override fun openDuckChatWithAutoPrompt(query: String) {
+    override fun openDuckChatWithAutoPrompt(query: String, entryPoint: DuckChatEntryPoint) {
         logcat { "Duck.ai: openDuckChatWithAutoPrompt query $query" }
+        reportDuckChatEntry(entryPoint, opensNewTab = true, hasPrompt = stripBang(query).isNotEmpty())
         val parameters = addChatParameters(query, autoPrompt = true, sidebar = false)
         openDuckChat(parameters, forceNewSession = true)
     }
@@ -732,8 +737,9 @@ class RealDuckChat @Inject constructor(
         addressBarPickerAttributionRepository.onPickerDuckAiSelected()
     }
 
-    override fun openDuckChatWithPrefill(query: String) {
+    override fun openDuckChatWithPrefill(query: String, entryPoint: DuckChatEntryPoint) {
         logcat { "Duck.ai: openDuckChatWithPrefill query $query" }
+        reportDuckChatEntry(entryPoint, opensNewTab = true, hasPrompt = false)
         val parameters = addChatParameters(query, autoPrompt = false, sidebar = false)
         openDuckChat(parameters, forceNewSession = true)
     }
@@ -777,14 +783,37 @@ class RealDuckChat @Inject constructor(
         return query.replace(bangPattern, "").trim()
     }
 
-    override fun openVoiceDuckChat() {
+    override fun openVoiceDuckChat(entryPoint: DuckChatEntryPoint) {
         logcat { "Duck.ai: openVoiceDuckChat" }
+        reportDuckChatEntry(entryPoint, opensNewTab = true, hasPrompt = false)
         val parameters = mapOf(MODE_QUERY_NAME to VOICE_MODE_QUERY_VALUE)
         openDuckChat(parameters, forceNewSession = true)
     }
 
-    override fun openNewDuckChatSession() {
+    override fun openNewDuckChatSession(entryPoint: DuckChatEntryPoint) {
+        reportDuckChatEntry(entryPoint, opensNewTab = true, hasPrompt = false)
         openDuckChat(emptyMap(), forceNewSession = true)
+    }
+
+    override fun reportDuckChatEntry(
+        entryPoint: DuckChatEntryPoint,
+        opensNewTab: Boolean,
+        hasPrompt: Boolean,
+    ) {
+        val parameters = mapOf(
+            DuckChatPixelParameters.ENTRY_SOURCE to entryPoint.toPixelValue(),
+            DuckChatPixelParameters.DUCK_AI_ENABLED to isEnabled().toString(),
+            DuckChatPixelParameters.INPUT_SCREEN_ENABLED to
+                (inputModeCapability.value == NativeInputState.InputMode.SEARCH_AND_DUCK_AI).toString(),
+            DuckChatPixelParameters.OPENS_NEW_TAB to opensNewTab.toString(),
+            DuckChatPixelParameters.HAS_PROMPT to hasPrompt.toString(),
+        )
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_ENTRY_POINT_COUNT, parameters = parameters)
+        pixel.fire(
+            DuckChatPixelName.DUCK_CHAT_ENTRY_POINT_DAILY,
+            parameters = parameters,
+            type = Pixel.PixelType.Daily(),
+        )
     }
 
     private fun openDuckChat(
@@ -1112,4 +1141,29 @@ class RealDuckChat @Inject constructor(
         private const val ORIGIN_QUERY_NAME = "origin"
         private const val ORIGIN_VALUE_ADDRESS_BAR_PICKER = "funnel_addressbar_android__aitoggle"
     }
+}
+
+private fun DuckChatEntryPoint.toPixelValue(): String = when (this) {
+    DuckChatEntryPoint.ADDRESS_BAR_PROMPT -> "address_bar_prompt"
+    DuckChatEntryPoint.ADDRESS_BAR_ICON -> "address_bar_icon"
+    DuckChatEntryPoint.ADDRESS_BAR_SHORTCUT_CHIP -> "address_bar_shortcut_chip"
+    DuckChatEntryPoint.ADDRESS_BAR_EDITING_STATE -> "address_bar_editing_state"
+    DuckChatEntryPoint.SUGGESTION_ASK_AI -> "suggestion_ask_ai"
+    DuckChatEntryPoint.BROWSING_MENU_NTP -> "browsing_menu_ntp"
+    DuckChatEntryPoint.BROWSING_MENU_WEBPAGE -> "browsing_menu_webpage"
+    DuckChatEntryPoint.TAB_SWITCHER -> "tab_switcher"
+    DuckChatEntryPoint.CHAT_HISTORY_NEW_CHAT -> "chat_history_new_chat"
+    DuckChatEntryPoint.CHAT_HISTORY_OPEN_CHAT -> "chat_history_open_chat"
+    DuckChatEntryPoint.VOICE -> "voice"
+    DuckChatEntryPoint.ONBOARDING -> "onboarding"
+    DuckChatEntryPoint.DIRECT_URL -> "direct_url"
+    DuckChatEntryPoint.SERP -> "serp"
+    DuckChatEntryPoint.ICON_SHORTCUT -> "icon_shortcut"
+    DuckChatEntryPoint.CONTEXTUAL_CHAT -> "contextual_chat"
+    DuckChatEntryPoint.WIDGET_QUICK_ACTIONS -> "widget_quick_actions"
+    DuckChatEntryPoint.WIDGET_FAVORITE -> "widget_favorite"
+    DuckChatEntryPoint.SYSTEM_SEARCH -> "system_search"
+    DuckChatEntryPoint.DIGITAL_ASSISTANT -> "digital_assistant"
+    DuckChatEntryPoint.DEEP_LINK_OTHER -> "deep_link_other"
+    DuckChatEntryPoint.PAID_SETTINGS -> "paid_settings"
 }

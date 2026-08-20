@@ -888,7 +888,7 @@
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/app/browser/nativeinput/RealNativeInputManagerTest.kt"
-            line="45"
+            line="46"
             column="1"/>
     </issue>
 

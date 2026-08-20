@@ -34,11 +34,13 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.repository.AddressBarPickerAttributionRepository
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
@@ -74,7 +76,9 @@ import org.mockito.Mockito.spy
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.clearInvocations
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -610,7 +614,7 @@ class RealDuckChatTest {
 
     @Test
     fun whenOpenDuckChatCalledThenOpenDuckChat() = runTest {
-        testee.openDuckChat()
+        testee.openDuckChat(DuckChatEntryPoint.PAID_SETTINGS)
 
         verify(mockBrowserNav).openDuckChat(
             mockContext,
@@ -621,10 +625,104 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun whenDuckChatEntryReportedThenCountAndDailyCarryBoundedContext() = runTest {
+        testee.reportDuckChatEntry(
+            entryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
+            opensNewTab = false,
+            hasPrompt = true,
+        )
+
+        val parameters = mapOf(
+            "source" to "address_bar_prompt",
+            "duck_ai_enabled" to "true",
+            "input_screen_enabled" to "true",
+            "opens_new_tab" to "false",
+            "has_prompt" to "true",
+        )
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_ENTRY_POINT_COUNT, parameters = parameters)
+        verify(mockPixel).fire(
+            DuckChatPixelName.DUCK_CHAT_ENTRY_POINT_DAILY,
+            parameters = parameters,
+            type = Pixel.PixelType.Daily(),
+        )
+    }
+
+    @Test
+    fun whenContextualPromptOpensFullscreenThenContextualEntryIsReportedExactlyOnce() = runTest {
+        testee.openDuckChatWithAutoPrompt("contextual prompt", DuckChatEntryPoint.CONTEXTUAL_CHAT)
+
+        val parameters = mapOf(
+            "source" to "contextual_chat",
+            "duck_ai_enabled" to "true",
+            "input_screen_enabled" to "true",
+            "opens_new_tab" to "true",
+            "has_prompt" to "true",
+        )
+        verify(mockPixel, times(1)).fire(DuckChatPixelName.DUCK_CHAT_ENTRY_POINT_COUNT, parameters = parameters)
+        verify(mockPixel, times(1)).fire(
+            DuckChatPixelName.DUCK_CHAT_ENTRY_POINT_DAILY,
+            parameters = parameters,
+            type = Pixel.PixelType.Daily(),
+        )
+    }
+
+    @Test
+    fun everyDuckChatEntryPointMapsToItsLowerSnakeCaseWireValue() = runTest {
+        DuckChatEntryPoint.entries.forEach { entryPoint ->
+            clearInvocations(mockPixel)
+
+            testee.reportDuckChatEntry(entryPoint, opensNewTab = true, hasPrompt = false)
+
+            val parameters = argumentCaptor<Map<String, String>>()
+            verify(mockPixel).fire(
+                eq(DuckChatPixelName.DUCK_CHAT_ENTRY_POINT_COUNT),
+                parameters.capture(),
+                eq(emptyMap()),
+                eq(Pixel.PixelType.Count),
+            )
+            assertEquals(entryPoint.name.lowercase(), parameters.firstValue["source"])
+        }
+    }
+
+    @Test
+    fun publicOpenMethodsReportTheirNavigationAndPromptTruthTable() = runTest {
+        testee.openDuckChat(DuckChatEntryPoint.CHAT_HISTORY_NEW_CHAT)
+        testee.openDuckChatWithAutoPrompt("prompt", DuckChatEntryPoint.SUGGESTION_ASK_AI)
+        testee.openDuckChatWithAutoPrompt("", DuckChatEntryPoint.SYSTEM_SEARCH)
+        testee.openDuckChatWithAutoPrompt("  ", DuckChatEntryPoint.DIGITAL_ASSISTANT)
+        testee.openDuckChatWithAutoPrompt("!ai", DuckChatEntryPoint.DIRECT_URL)
+        testee.openDuckChatWithAutoPrompt("!ai prompt", DuckChatEntryPoint.ADDRESS_BAR_PROMPT)
+        testee.openDuckChatWithPrefill("prefill", DuckChatEntryPoint.DIRECT_URL)
+        testee.openVoiceDuckChat(DuckChatEntryPoint.VOICE)
+
+        val parameters = argumentCaptor<Map<String, String>>()
+        verify(mockPixel, times(8)).fire(
+            eq(DuckChatPixelName.DUCK_CHAT_ENTRY_POINT_COUNT),
+            parameters.capture(),
+            eq(emptyMap()),
+            eq(Pixel.PixelType.Count),
+        )
+        assertEquals(
+            listOf(
+                "chat_history_new_chat" to "false",
+                "suggestion_ask_ai" to "true",
+                "system_search" to "false",
+                "digital_assistant" to "false",
+                "direct_url" to "false",
+                "address_bar_prompt" to "true",
+                "direct_url" to "false",
+                "voice" to "false",
+            ),
+            parameters.allValues.map { it.getValue("source") to it.getValue("has_prompt") },
+        )
+        assertTrue(parameters.allValues.all { it["opens_new_tab"] == "true" })
+    }
+
+    @Test
     fun whenOpenDuckChatCalledWithCustomHostThenUrlUsesCustomHost() = runTest {
         whenever(mockDuckAiHostProvider.getHost()).thenReturn("staging.duck.ai")
 
-        testee.openDuckChat()
+        testee.openDuckChat(DuckChatEntryPoint.PAID_SETTINGS)
 
         verify(mockBrowserNav).openDuckChat(
             mockContext,
@@ -639,7 +737,7 @@ class RealDuckChatTest {
         val thirtyMinutesAgo = System.currentTimeMillis() - (30 * 60 * 1000L)
         whenever(mockDuckChatFeatureRepository.lastSessionTimestamp()).thenReturn(thirtyMinutesAgo)
 
-        testee.openDuckChat()
+        testee.openDuckChat(DuckChatEntryPoint.PAID_SETTINGS)
 
         verify(mockBrowserNav).openDuckChat(
             mockContext,
@@ -651,7 +749,7 @@ class RealDuckChatTest {
 
     @Test
     fun whenOpenVoiceDuckChatCalledThenOpenDuckChatWithVoiceModeUrl() = runTest {
-        testee.openVoiceDuckChat()
+        testee.openVoiceDuckChat(DuckChatEntryPoint.VOICE)
 
         verify(mockBrowserNav).openDuckChat(
             mockContext,
@@ -666,7 +764,7 @@ class RealDuckChatTest {
         val thirtyMinutesAgo = System.currentTimeMillis() - (30 * 60 * 1000L)
         whenever(mockDuckChatFeatureRepository.lastSessionTimestamp()).thenReturn(thirtyMinutesAgo)
 
-        testee.openVoiceDuckChat()
+        testee.openVoiceDuckChat(DuckChatEntryPoint.VOICE)
 
         verify(mockBrowserNav).openDuckChat(
             mockContext,
@@ -678,7 +776,7 @@ class RealDuckChatTest {
 
     @Test
     fun whenOpenDuckChatCalledWithQueryThenDuckChatOpenedWithQuery() = runTest {
-        testee.openDuckChatWithPrefill(query = "example")
+        testee.openDuckChatWithPrefill(query = "example", entryPoint = DuckChatEntryPoint.DIRECT_URL)
 
         verify(mockBrowserNav).openDuckChat(
             mockContext,
@@ -694,7 +792,7 @@ class RealDuckChatTest {
         duckChatFeature.keepSession().setRawStoredState(State(enable = false))
         testee.onPrivacyConfigDownloaded()
 
-        testee.openDuckChatWithPrefill(query = "example !ai")
+        testee.openDuckChatWithPrefill(query = "example !ai", entryPoint = DuckChatEntryPoint.DIRECT_URL)
 
         verify(mockBrowserNav).openDuckChat(
             mockContext,
@@ -710,7 +808,7 @@ class RealDuckChatTest {
         duckChatFeature.keepSession().setRawStoredState(State(enable = false))
         testee.onPrivacyConfigDownloaded()
 
-        testee.openDuckChatWithPrefill(query = "example !g")
+        testee.openDuckChatWithPrefill(query = "example !g", entryPoint = DuckChatEntryPoint.DIRECT_URL)
 
         verify(mockBrowserNav).openDuckChat(
             mockContext,
@@ -725,7 +823,7 @@ class RealDuckChatTest {
         duckChatFeature.self().setRawStoredState(State(enable = true, settings = SETTINGS_JSON))
         testee.onPrivacyConfigDownloaded()
 
-        testee.openDuckChatWithPrefill(query = "!ai !image")
+        testee.openDuckChatWithPrefill(query = "!ai !image", entryPoint = DuckChatEntryPoint.DIRECT_URL)
 
         verify(mockBrowserNav).openDuckChat(
             mockContext,
@@ -769,7 +867,7 @@ class RealDuckChatTest {
 
     @Test
     fun whenOpenDuckChatCalledWithQueryAndAutoPromptThenDuckChatOpenedWithQueryAndAutoPrompt() = runTest {
-        testee.openDuckChatWithAutoPrompt(query = "example")
+        testee.openDuckChatWithAutoPrompt(query = "example", entryPoint = DuckChatEntryPoint.SUGGESTION_ASK_AI)
 
         verify(mockBrowserNav).openDuckChat(
             mockContext,
@@ -857,7 +955,7 @@ class RealDuckChatTest {
         testee.onPrivacyConfigDownloaded()
         coroutineRule.testScope.advanceUntilIdle()
 
-        testee.openDuckChat()
+        testee.openDuckChat(DuckChatEntryPoint.PAID_SETTINGS)
 
         verify(mockBrowserNav).openDuckChat(
             mockContext,
@@ -873,7 +971,7 @@ class RealDuckChatTest {
         testee.onPrivacyConfigDownloaded()
         coroutineRule.testScope.advanceUntilIdle()
 
-        testee.openDuckChatWithPrefill(query = "example")
+        testee.openDuckChatWithPrefill(query = "example", entryPoint = DuckChatEntryPoint.DIRECT_URL)
 
         verify(mockBrowserNav).openDuckChat(
             mockContext,
@@ -889,7 +987,7 @@ class RealDuckChatTest {
         testee.onPrivacyConfigDownloaded()
         coroutineRule.testScope.advanceUntilIdle()
 
-        testee.openVoiceDuckChat()
+        testee.openVoiceDuckChat(DuckChatEntryPoint.VOICE)
 
         verify(mockBrowserNav).openDuckChat(
             mockContext,

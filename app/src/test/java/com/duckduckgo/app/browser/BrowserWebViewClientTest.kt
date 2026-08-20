@@ -85,6 +85,7 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.contentscopeExperiments.ContentScopeExperiments
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -574,7 +575,7 @@ class BrowserWebViewClientTest {
         whenever(webResourceRequest.url).thenReturn("https://duckduckgo.com/?q=example&ia=chat&duckai=5".toUri())
         assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
 
-        verify(mockDuckChat).openDuckChatWithPrefill("example")
+        verify(mockDuckChat).openDuckChatWithPrefill("example", DuckChatEntryPoint.DIRECT_URL)
     }
 
     @Test
@@ -583,7 +584,38 @@ class BrowserWebViewClientTest {
         whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
         whenever(webResourceRequest.url).thenReturn("https://duckduckgo.com/?ia=chat".toUri())
         assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
-        verify(mockDuckChat).openDuckChat()
+        verify(mockDuckChat).openDuckChat(DuckChatEntryPoint.DIRECT_URL)
+    }
+
+    @Test
+    fun whenDuckChatLinkIsLaunchedFromSerpThenSourceIsSerp() {
+        val serpWebView: WebView = mock()
+        whenever(serpWebView.originalUrl).thenReturn("https://duckduckgo.com/?q=privacy")
+        whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoQueryUrl(any())).thenReturn(true)
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any()))
+            .thenReturn(SpecialUrlDetector.UrlType.ShouldLaunchDuckChatLink)
+        whenever(webResourceRequest.url).thenReturn("https://duck.ai/".toUri())
+
+        testee.shouldOverrideUrlLoading(serpWebView, webResourceRequest)
+
+        verify(mockDuckChat).openDuckChat(DuckChatEntryPoint.SERP)
+    }
+
+    @Test
+    fun whenInPageDuckChatLinkNavigatesInPlaceThenDirectUrlEntryIsReported() {
+        val pageWebView: WebView = mock()
+        whenever(pageWebView.originalUrl).thenReturn("https://example.com/page")
+        whenever(pageWebView.url).thenReturn("https://example.com/page")
+        whenever(webResourceRequest.url).thenReturn("https://duck.ai/?q=prefill".toUri())
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        whenever(webResourceRequest.hasGesture()).thenReturn(true)
+        whenever(mockDuckChat.isDuckChatUrl("https://duck.ai/?q=prefill".toUri())).thenReturn(true)
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any()))
+            .thenReturn(SpecialUrlDetector.UrlType.Web("https://duck.ai/?q=prefill"))
+
+        testee.shouldOverrideUrlLoading(pageWebView, webResourceRequest)
+
+        verify(mockDuckChat).reportDuckChatEntry(DuckChatEntryPoint.DIRECT_URL, opensNewTab = false, hasPrompt = false)
     }
 
     @Test

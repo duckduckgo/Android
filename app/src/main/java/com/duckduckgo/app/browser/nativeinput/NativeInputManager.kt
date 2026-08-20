@@ -57,6 +57,7 @@ import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.NativeInputEventListener
@@ -91,7 +92,7 @@ class NativeInputCallbacks(
         filesJson: JSONArray?,
     ) -> Unit,
     val onChatSuggestionSelected: (String) -> Unit,
-    val onDuckAiQuerySubmitted: (query: String) -> Unit = {},
+    val onDuckAiQuerySubmitted: (query: String, entryPoint: DuckChatEntryPoint) -> Unit = { _, _ -> },
     /** User picked a model in the native picker (→ submitChangeModelAction). */
     val onChangeModelSubmitted: (modelId: String) -> Unit = {},
     val onCustomizeResponsesClicked: () -> Unit = {},
@@ -220,6 +221,7 @@ class RealNativeInputManager @Inject constructor(
     private var navBarTabCountLiveData: LiveData<Int>? = null
     private var navBarTabCountObserver: Observer<Int>? = null
     private var lastCallbacks: NativeInputCallbacks? = null
+    private var nextDuckAiEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT
 
     /** True while an enter morph from [attachWidget] still owns [NativeInputLayoutCoordinator]'s animating flag. */
     private var pendingEnterOwnsAnimating = false
@@ -355,12 +357,17 @@ class RealNativeInputManager @Inject constructor(
     override fun handleDuckAiVoiceResult(query: String) {
         val widget = widgetFrom(rootView)
         if (widget != null) {
-            if (!widget.isChatTabSelected()) {
-                widget.selectChatTab()
+            nextDuckAiEntryPoint = DuckChatEntryPoint.VOICE
+            try {
+                if (!widget.isChatTabSelected()) {
+                    widget.selectChatTab()
+                }
+                widget.submitMessage(query)
+            } finally {
+                nextDuckAiEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT
             }
-            widget.submitMessage(query)
         } else {
-            duckChat.openDuckChatWithAutoPrompt(query)
+            duckChat.openDuckChatWithAutoPrompt(query, DuckChatEntryPoint.VOICE)
         }
     }
 
@@ -743,7 +750,9 @@ class RealNativeInputManager @Inject constructor(
                     }
                     isExiting = false
                     nativeInputEventListener.onChatPromptSubmitted()
-                    callbacks.onDuckAiQuerySubmitted(query)
+                    val entryPoint = nextDuckAiEntryPoint
+                    nextDuckAiEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT
+                    callbacks.onDuckAiQuerySubmitted(query, entryPoint)
                 }
             },
         )
@@ -943,7 +952,7 @@ class RealNativeInputManager @Inject constructor(
         }
         widget.onVoiceChatClick = {
             hideNativeInput(animate = false)
-            duckChat.openVoiceDuckChat()
+            duckChat.openVoiceDuckChat(DuckChatEntryPoint.VOICE)
         }
     }
 

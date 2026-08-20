@@ -1047,6 +1047,8 @@ class RealDuckChatPixels @Inject constructor(
 
 enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_OPEN("aichat_open"),
+    DUCK_CHAT_ENTRY_POINT_COUNT("m_aichat_entry_point_count"),
+    DUCK_CHAT_ENTRY_POINT_DAILY("m_aichat_entry_point_daily"),
     DUCK_CHAT_OPEN_BROWSER_MENU("aichat_open_browser_menu"),
     DUCK_CHAT_OPEN_NEW_TAB_MENU("aichat_open_new_tab_menu"),
     DUCK_CHAT_OPEN_TAB_SWITCHER_FAB("aichat_open_tab_switcher_fab"),
@@ -1338,6 +1340,11 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
 }
 
 object DuckChatPixelParameters {
+    const val ENTRY_SOURCE = "source"
+    const val DUCK_AI_ENABLED = "duck_ai_enabled"
+    const val INPUT_SCREEN_ENABLED = "input_screen_enabled"
+    const val OPENS_NEW_TAB = "opens_new_tab"
+    const val HAS_PROMPT = "has_prompt"
     const val WAS_USED_BEFORE = "was_used_before"
     const val SUGGESTION_ID = "suggestionId"
     const val PAGE_TYPE = "pageType"
@@ -1382,6 +1389,8 @@ class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
     override fun names(): List<Pair<String, Set<PixelParameter>>> {
         return listOf(
             DUCK_CHAT_OPEN.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_ENTRY_POINT_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_ENTRY_POINT_DAILY.pixelName to PixelParameter.removeAtb(),
             DUCK_CHAT_OPEN_BROWSER_MENU.pixelName to PixelParameter.removeAtb(),
             DUCK_CHAT_OPEN_NEW_TAB_MENU.pixelName to PixelParameter.removeAtb(),
             DUCK_CHAT_OPEN_TAB_SWITCHER_FAB.pixelName to PixelParameter.removeAtb(),

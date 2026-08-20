@@ -376,6 +376,9 @@ import com.duckduckgo.downloads.store.DownloadStatus
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
+import com.duckduckgo.duckchat.api.DuckChatInputModeState
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.contextual.PageContextJSHelper
 import com.duckduckgo.duckchat.impl.contextual.RealPageContextJSHelper.Companion.PAGE_CONTEXT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
@@ -540,6 +543,7 @@ class BrowserTabViewModel @Inject constructor(
     private val duckChat: DuckChat,
     private val duckAiHostProvider: DuckAiHostProvider,
     private val duckAiFeatureState: DuckAiFeatureState,
+    private val duckChatInputModeState: DuckChatInputModeState,
     private val duckPlayerJSHelper: DuckPlayerJSHelper,
     private val refreshPixelSender: RefreshPixelSender,
     private val privacyProtectionTogglePlugin: PluginPoint<PrivacyProtectionTogglePlugin>,
@@ -1532,7 +1536,9 @@ class BrowserTabViewModel @Inject constructor(
         val verticalParameter = extractVerticalParameter(url)
         var urlToNavigate = queryUrlConverter.convertQueryToUrl(trimmedInput, verticalParameter, queryOrigin)
 
-        if (queryOrigin is QueryOrigin.FromUser && isTypedDuckAiUrl(urlToNavigate)) {
+        val isDuckAiDirectNavigation =
+            submissionSource == QuerySubmissionSource.USER && queryOrigin is QueryOrigin.FromUser && isTypedDuckAiUrl(urlToNavigate)
+        if (isDuckAiDirectNavigation) {
             fireDuckAiDirectNavigationPixel()
         }
 
@@ -1562,6 +1568,13 @@ class BrowserTabViewModel @Inject constructor(
             }
 
             else -> {
+                if (isDuckAiDirectNavigation) {
+                    duckChat.reportDuckChatEntry(
+                        DuckChatEntryPoint.DIRECT_URL,
+                        opensNewTab = false,
+                        hasPrompt = hasAutoSubmittedPrompt(urlToNavigate),
+                    )
+                }
                 if (type is SpecialUrlDetector.UrlType.ExtractedAmpLink) {
                     logcat { "AMP link detection: Using extracted URL: ${type.extractedUrl}" }
                     urlToNavigate = type.extractedUrl
@@ -1645,8 +1658,17 @@ class BrowserTabViewModel @Inject constructor(
         return host == duckAiHost || host == "www.$duckAiHost"
     }
 
+    private fun hasAutoSubmittedPrompt(url: String): Boolean = runCatching {
+        val uri = url.toUri()
+        uri.getQueryParameter("prompt") == "1" && !uri.getQueryParameter(QUERY).isNullOrBlank()
+    }.getOrDefault(false)
+
     private fun fireDuckAiDirectNavigationPixel() {
-        val params = mapOf("duck_ai_enabled" to duckChat.isEnabled().toString())
+        val inputScreenEnabled = duckChatInputModeState.inputModeCapability.value == NativeInputState.InputMode.SEARCH_AND_DUCK_AI
+        val params = mapOf(
+            "duck_ai_enabled" to duckChat.isEnabled().toString(),
+            "input_screen_enabled" to inputScreenEnabled.toString(),
+        )
         pixel.fire(AppPixelName.AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_COUNT, parameters = params)
         pixel.fire(AppPixelName.AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_DAILY, parameters = params, type = Daily())
     }
@@ -4036,9 +4058,9 @@ class BrowserTabViewModel @Inject constructor(
     private fun openDuckChatForUrl(uri: Uri) {
         val queryParameter = uri.getQueryParameter(QUERY)
         if (queryParameter != null) {
-            duckChat.openDuckChatWithPrefill(queryParameter)
+            duckChat.openDuckChatWithPrefill(queryParameter, DuckChatEntryPoint.DIRECT_URL)
         } else {
-            duckChat.openDuckChat()
+            duckChat.openDuckChat(DuckChatEntryPoint.DIRECT_URL)
         }
     }
 
@@ -5625,7 +5647,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun onUserTappedDuckAiPromptAutocomplete(prompt: String) {
-        openDuckAiQuery(prompt, autoPrompt = true)
+        openDuckAiQuery(prompt, autoPrompt = true, entryPoint = DuckChatEntryPoint.SUGGESTION_ASK_AI)
 
         viewModelScope.launch {
             val params = duckChat.createWasUsedBeforePixelParams()
@@ -5639,12 +5661,22 @@ class BrowserTabViewModel @Inject constructor(
      * selected. The query opens in a new tab so the current tab is preserved; on the NTP we
      * reuse the empty tab instead of spawning another.
      */
-    fun openDuckAiQuery(query: String, autoPrompt: Boolean) {
+    fun openDuckAiQuery(
+        query: String,
+        autoPrompt: Boolean,
+        entryPoint: DuckChatEntryPoint,
+    ) {
+        val duckAiUrl = duckChat.getDuckChatUrl(query, autoPrompt)
+        val hasPrompt = hasAutoSubmittedPrompt(duckAiUrl)
         browserInteractionsPlugins.getPlugins().forEach { it.onInputSubmitted() }
-        if (autoPrompt && query.isNotBlank()) {
+        if (hasPrompt) {
             browserInteractionsPlugins.getPlugins().forEach { it.onAiPromptSubmitted() }
         }
-        navigateToDuckAi(duckChat.getDuckChatUrl(query, autoPrompt))
+        navigateToDuckAi(
+            url = duckAiUrl,
+            entryPoint = entryPoint,
+            hasPrompt = hasPrompt,
+        )
     }
 
     /**
@@ -5654,7 +5686,7 @@ class BrowserTabViewModel @Inject constructor(
      */
     fun openDuckAiChatById(chatUrl: String) {
         browserInteractionsPlugins.getPlugins().forEach { it.onChatSelected() }
-        navigateToDuckAi(chatUrl)
+        navigateToDuckAi(chatUrl, DuckChatEntryPoint.CHAT_HISTORY_OPEN_CHAT, hasPrompt = false)
     }
 
     /**
@@ -5668,8 +5700,14 @@ class BrowserTabViewModel @Inject constructor(
         browserInteractionsPlugins.getPlugins().forEach { it.onAiPromptSubmitted() }
     }
 
-    private fun navigateToDuckAi(url: String) {
-        if (!currentBrowserViewState().browserShowing) {
+    private fun navigateToDuckAi(
+        url: String,
+        entryPoint: DuckChatEntryPoint,
+        hasPrompt: Boolean,
+    ) {
+        val opensNewTab = currentBrowserViewState().browserShowing
+        duckChat.reportDuckChatEntry(entryPoint, opensNewTab = opensNewTab, hasPrompt = hasPrompt)
+        if (!opensNewTab) {
             submitQuery(url, QueryOrigin.FromUser, QuerySubmissionSource.INTERNAL_NAVIGATION)
         } else {
             command.value = OpenInNewTab(query = url, sourceTabId = tabId)
@@ -5685,6 +5723,12 @@ class BrowserTabViewModel @Inject constructor(
             }
         } else {
             val url = duckChat.getDuckChatUrl("", false)
+            val entryPoint = if (viewMode == ViewMode.NewTab) {
+                DuckChatEntryPoint.BROWSING_MENU_NTP
+            } else {
+                DuckChatEntryPoint.BROWSING_MENU_WEBPAGE
+            }
+            duckChat.reportDuckChatEntry(entryPoint, opensNewTab = true, hasPrompt = false)
             command.value = OpenInNewTab(url, tabId)
             pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_NEW_CHAT_TAB_TAPPED)
         }
@@ -5776,6 +5820,11 @@ class BrowserTabViewModel @Inject constructor(
                     if (submittedAiPrompt) {
                         browserInteractionsPlugins.getPlugins().forEach { it.onAiPromptSubmitted() }
                     }
+                    duckChat.reportDuckChatEntry(
+                        DuckChatEntryPoint.ADDRESS_BAR_ICON,
+                        opensNewTab = false,
+                        hasPrompt = submittedAiPrompt,
+                    )
                     submitQuery(url, QueryOrigin.FromUser, QuerySubmissionSource.INTERNAL_NAVIGATION)
                 } else {
                     // The typed-URL branch above: genuinely a URL submission, not a Duck.ai one.

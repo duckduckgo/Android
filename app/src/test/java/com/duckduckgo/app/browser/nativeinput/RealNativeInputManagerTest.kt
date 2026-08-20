@@ -39,6 +39,7 @@ import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.NativeInputEventListener
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
@@ -348,6 +349,90 @@ class RealNativeInputManagerTest {
         }
     }
 
+    @Test
+    fun whenBlankDuckAiVoiceResultFollowedByTypedSubmissionThenTypedSubmissionUsesAddressBarPromptEntryPoint() {
+        val entryPoints = mutableListOf<DuckChatEntryPoint>()
+        val widget = showVoiceTestWidget { _, entryPoint -> entryPoints += entryPoint }
+
+        testee.handleDuckAiVoiceResult("")
+        widget.submitMessage("typed query")
+
+        assertEquals(listOf(DuckChatEntryPoint.ADDRESS_BAR_PROMPT), entryPoints)
+    }
+
+    @Test
+    fun whenWhitespaceDuckAiVoiceResultFollowedByTypedSubmissionThenTypedSubmissionUsesAddressBarPromptEntryPoint() {
+        val entryPoints = mutableListOf<DuckChatEntryPoint>()
+        val widget = showVoiceTestWidget { _, entryPoint -> entryPoints += entryPoint }
+
+        testee.handleDuckAiVoiceResult("   ")
+        widget.submitMessage("typed query")
+
+        assertEquals(listOf(DuckChatEntryPoint.ADDRESS_BAR_PROMPT), entryPoints)
+    }
+
+    @Test
+    fun whenNonBlankDuckAiVoiceResultThenSubmissionUsesVoiceEntryPoint() {
+        val entryPoints = mutableListOf<DuckChatEntryPoint>()
+        showVoiceTestWidget { _, entryPoint -> entryPoints += entryPoint }
+
+        testee.handleDuckAiVoiceResult("voice query")
+
+        assertEquals(listOf(DuckChatEntryPoint.VOICE), entryPoints)
+    }
+
+    @Test
+    fun whenTypedSubmissionFollowsSuccessfulDuckAiVoiceSubmissionThenTypedSubmissionUsesAddressBarPromptEntryPoint() {
+        val entryPoints = mutableListOf<DuckChatEntryPoint>()
+        val onSubmitted = { _: String, entryPoint: DuckChatEntryPoint -> entryPoints += entryPoint }
+        showVoiceTestWidget(onSubmitted)
+        testee.handleDuckAiVoiceResult("voice query")
+
+        val widget = showVoiceTestWidget(onSubmitted)
+        widget.selectChatTab()
+        widget.submitMessage("typed query")
+
+        assertEquals(
+            listOf(DuckChatEntryPoint.VOICE, DuckChatEntryPoint.ADDRESS_BAR_PROMPT),
+            entryPoints,
+        )
+    }
+
+    private fun showVoiceTestWidget(onDuckAiQuerySubmitted: (String, DuckChatEntryPoint) -> Unit): TestNativeInputWidget {
+        whenever(duckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(MutableStateFlow(true))
+        whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(MutableStateFlow(true))
+        whenever(duckAiFeatureState.showVoiceSearchToggle).thenReturn(MutableStateFlow(false))
+        whenever(duckAiFeatureState.showVoiceChatEntry).thenReturn(MutableStateFlow(false))
+        whenever(omnibar.viewMode).thenReturn(Omnibar.ViewMode.NewTab)
+        whenever(omnibar.getText()).thenReturn("")
+        testee.init(omnibar, rootView, lifecycleOwner)
+        if (rootView.findViewById<View?>(R.id.includeNewBrowserTab) == null) {
+            rootView.addView(FrameLayout(context).apply { id = R.id.includeNewBrowserTab })
+        }
+
+        val widget = TestNativeInputWidget(context).apply { id = R.id.inputModeWidget }
+        val widgetView = FrameLayout(context).apply { addView(widget) }
+        val layoutInflater: LayoutInflater = mock()
+        whenever(layoutInflater.inflate(any<Int>(), any<ViewGroup>(), any<Boolean>())).thenReturn(widgetView)
+        testee.showNativeInput(
+            tabId = "tab",
+            layoutInflater = layoutInflater,
+            lifecycleOwner = lifecycleOwner,
+            tabs = mock<LiveData<List<TabEntity>>>(),
+            currentTabUrl = emptyFlow(),
+            callbacks = NativeInputCallbacks(
+                onSearchTextChanged = {},
+                onSearchSubmitted = {},
+                onDuckAiChatSubmitted = { _, _, _, _, _, _ -> },
+                onChatSuggestionSelected = {},
+                onDuckAiQuerySubmitted = onDuckAiQuerySubmitted,
+                onClearAutocomplete = {},
+                onStopTapped = {},
+            ),
+        )
+        return widget
+    }
+
     private fun showNativeInput() {
         testee.showNativeInput(
             tabId = "tab",
@@ -369,6 +454,37 @@ class RealNativeInputManagerTest {
     private class FakeLifecycleOwner : LifecycleOwner {
         private val registry = LifecycleRegistry(this).apply { currentState = Lifecycle.State.RESUMED }
         override val lifecycle: Lifecycle get() = registry
+    }
+
+    private class TestNativeInputWidget(
+        context: Context,
+        delegate: NativeInputWidget = mock(),
+    ) : View(context), NativeInputWidget by delegate {
+        private var chatTabSelected = false
+        private var onChatSubmitted: ((String) -> Unit)? = null
+
+        override var text: String = ""
+
+        override fun bindInputEvents(
+            onSearchTextChanged: (String) -> Unit,
+            onSearchSubmitted: (String) -> Unit,
+            onChatSubmitted: (String) -> Unit,
+            onInputTextEmptyChanged: (isEmpty: Boolean) -> Unit,
+        ) {
+            this.onChatSubmitted = onChatSubmitted
+        }
+
+        override fun selectChatTab() {
+            chatTabSelected = true
+        }
+
+        override fun isChatTabSelected(): Boolean = chatTabSelected
+
+        override fun submitMessage(message: String?) {
+            message?.trim()?.takeIf { it.isNotEmpty() }?.let { onChatSubmitted?.invoke(it) }
+        }
+
+        override fun asView(): View = this
     }
 
     @Test

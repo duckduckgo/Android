@@ -84,6 +84,7 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.contentscopeExperiments.ContentScopeExperiments
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -300,11 +301,12 @@ class BrowserWebViewClient @Inject constructor(
 
                 is SpecialUrlDetector.UrlType.ShouldLaunchDuckChatLink -> {
                     runCatching {
+                        val entryPoint = duckChatEntryPointFor(webView.originalUrl)
                         val query = url.getQueryParameter(QUERY)
                         if (query != null) {
-                            duckChat.openDuckChatWithPrefill(query)
+                            duckChat.openDuckChatWithPrefill(query, entryPoint)
                         } else {
-                            duckChat.openDuckChat()
+                            duckChat.openDuckChat(entryPoint)
                         }
                     }.isSuccess
                 }
@@ -350,6 +352,18 @@ class BrowserWebViewClient @Inject constructor(
 
                 is SpecialUrlDetector.UrlType.SearchQuery -> false
                 is SpecialUrlDetector.UrlType.Web -> {
+                    if (
+                        isForMainFrame &&
+                        hasGestureInNavigation &&
+                        duckChat.isDuckChatUrl(url) &&
+                        webView.originalUrl?.toUri()?.let(duckChat::isDuckChatUrl) != true
+                    ) {
+                        duckChat.reportDuckChatEntry(
+                            entryPoint = duckChatEntryPointFor(webView.originalUrl),
+                            opensNewTab = false,
+                            hasPrompt = url.getQueryParameter("prompt") == "1" && !url.getQueryParameter(QUERY).isNullOrBlank(),
+                        )
+                    }
                     shouldOverrideWebRequest(url, webView, isForMainFrame)
                 }
 
@@ -428,6 +442,13 @@ class BrowserWebViewClient @Inject constructor(
             return false
         }
     }
+
+    private fun duckChatEntryPointFor(initiatingUrl: String?): DuckChatEntryPoint =
+        if (initiatingUrl?.let(duckDuckGoUrlDetector::isDuckDuckGoQueryUrl) == true) {
+            DuckChatEntryPoint.SERP
+        } else {
+            DuckChatEntryPoint.DIRECT_URL
+        }
 
     private fun shouldOverrideWebRequest(
         url: Uri,

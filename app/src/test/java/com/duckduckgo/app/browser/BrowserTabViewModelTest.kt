@@ -308,6 +308,9 @@ import com.duckduckgo.downloads.store.DownloadStatus
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
+import com.duckduckgo.duckchat.api.DuckChatInputModeState
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.contextual.PageContextJSHelper
 import com.duckduckgo.duckchat.impl.contextual.RealPageContextJSHelper.Companion.PAGE_CONTEXT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
@@ -533,8 +536,10 @@ class BrowserTabViewModelTest {
     private val mockStandardizedLeadingIconToggle: StandardizedLeadingIconFeatureToggle = mock()
 
     private val mockDuckAiFeatureState: DuckAiFeatureState = mock()
+    private val mockDuckChatInputModeState: DuckChatInputModeState = mock()
 
     private val mockDuckAiFeatureStateInputScreenFlow = MutableStateFlow(false)
+    private val mockInputModeCapability = MutableStateFlow(NativeInputState.InputMode.SEARCH_ONLY)
 
     private val mockDuckAiContextualModeFlow = MutableStateFlow(false)
 
@@ -705,6 +710,7 @@ class BrowserTabViewModelTest {
     private val exampleUrl = "http://example.com"
     private val shortExampleUrl = "example.com"
     private val duckChatURL = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
+    private val duckChatAutoPromptURL = "$duckChatURL&prompt=1"
 
     private val selectedTab = TabEntity("TAB_ID", exampleUrl, position = 0, sourceTabId = "TAB_ID_SOURCE")
     private val flowSelectedTab = MutableStateFlow(selectedTab)
@@ -838,6 +844,7 @@ class BrowserTabViewModelTest {
             whenever(mockDuckAiFeatureState.showPopupMenuShortcut).thenReturn(MutableStateFlow(false))
             whenever(mockDuckAiFeatureState.showInputScreen).thenReturn(mockDuckAiFeatureStateInputScreenFlow)
             whenever(mockDuckAiFeatureState.showContextualMode).thenReturn(mockDuckAiContextualModeFlow)
+            whenever(mockDuckChatInputModeState.inputModeCapability).thenReturn(mockInputModeCapability)
             whenever(mockVpnMenuStateProvider.getVpnMenuState()).thenReturn(flowOf(VpnMenuState.Hidden))
             whenever(nonHttpAppLinkChecker.isPermitted(anyOrNull())).thenReturn(true)
             runBlocking { whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false) }
@@ -1004,6 +1011,7 @@ class BrowserTabViewModelTest {
                 duckChat = mockDuckChat,
                 duckAiHostProvider = mockDuckAiHostProvider,
                 duckAiFeatureState = mockDuckAiFeatureState,
+                duckChatInputModeState = mockDuckChatInputModeState,
                 duckPlayerJSHelper =
                 DuckPlayerJSHelper(
                     mockDuckPlayer,
@@ -6494,7 +6502,7 @@ class BrowserTabViewModelTest {
         val handled = testee.handleDuckChatUrlInCustomTab("https://duck.ai/?q=hello".toUri())
 
         assertTrue(handled)
-        verify(mockDuckChat).openDuckChatWithPrefill("hello")
+        verify(mockDuckChat).openDuckChatWithPrefill("hello", DuckChatEntryPoint.DIRECT_URL)
         assertTrue(captureCommands().allValues.contains(Command.FinishCustomTab))
     }
 
@@ -6506,7 +6514,7 @@ class BrowserTabViewModelTest {
         val handled = testee.handleDuckChatUrlInCustomTab("https://duck.ai/".toUri())
 
         assertTrue(handled)
-        verify(mockDuckChat).openDuckChat()
+        verify(mockDuckChat).openDuckChat(DuckChatEntryPoint.DIRECT_URL)
         assertTrue(captureCommands().allValues.contains(Command.FinishCustomTab))
     }
 
@@ -6518,8 +6526,8 @@ class BrowserTabViewModelTest {
         val handled = testee.handleDuckChatUrlInCustomTab("https://duck.ai/?q=hello".toUri())
 
         assertFalse(handled)
-        verify(mockDuckChat, never()).openDuckChat()
-        verify(mockDuckChat, never()).openDuckChatWithPrefill(any())
+        verify(mockDuckChat, never()).openDuckChat(any())
+        verify(mockDuckChat, never()).openDuckChatWithPrefill(any(), any())
     }
 
     @Test
@@ -6530,8 +6538,8 @@ class BrowserTabViewModelTest {
         val handled = testee.handleDuckChatUrlInCustomTab("https://duck.ai/?q=hello".toUri())
 
         assertFalse(handled)
-        verify(mockDuckChat, never()).openDuckChat()
-        verify(mockDuckChat, never()).openDuckChatWithPrefill(any())
+        verify(mockDuckChat, never()).openDuckChat(any())
+        verify(mockDuckChat, never()).openDuckChatWithPrefill(any(), any())
     }
 
     @Test
@@ -8274,12 +8282,57 @@ class BrowserTabViewModelTest {
 
         verify(mockPixel).fire(
             AppPixelName.AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_COUNT,
-            parameters = mapOf("duck_ai_enabled" to "true"),
+            parameters = mapOf("duck_ai_enabled" to "true", "input_screen_enabled" to "false"),
         )
         verify(mockPixel).fire(
             AppPixelName.AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_DAILY,
-            parameters = mapOf("duck_ai_enabled" to "true"),
+            parameters = mapOf("duck_ai_enabled" to "true", "input_screen_enabled" to "false"),
             type = Daily(),
+        )
+        verify(mockDuckChat).reportDuckChatEntry(DuckChatEntryPoint.DIRECT_URL, opensNewTab = false, hasPrompt = false)
+    }
+
+    @Test
+    fun whenTypedDuckAiUrlWithNonBlankQueryAndPromptSubmittedThenReportsDirectUrlEntryWithPrompt() {
+        val typedUrl = "https://duck.ai/chat?duckai=5&q=Hello&prompt=1"
+        whenever(mockOmnibarConverter.convertQueryToUrl(typedUrl, null, FromUser)).thenReturn(typedUrl)
+
+        testee.onUserSubmittedQuery(typedUrl, queryOrigin = FromUser)
+
+        verify(mockDuckChat).reportDuckChatEntry(DuckChatEntryPoint.DIRECT_URL, opensNewTab = false, hasPrompt = true)
+    }
+
+    @Test
+    fun whenTypedDuckAiUrlWithPromptButNoQuerySubmittedThenReportsDirectUrlEntryWithoutPrompt() {
+        val typedUrl = "https://duck.ai/chat?duckai=5&prompt=1"
+        whenever(mockOmnibarConverter.convertQueryToUrl(typedUrl, null, FromUser)).thenReturn(typedUrl)
+
+        testee.onUserSubmittedQuery(typedUrl, queryOrigin = FromUser)
+
+        verify(mockDuckChat).reportDuckChatEntry(DuckChatEntryPoint.DIRECT_URL, opensNewTab = false, hasPrompt = false)
+    }
+
+    @Test
+    fun whenTypedDuckAiUrlWithQueryButNoPromptParameterSubmittedThenReportsDirectUrlEntryWithoutPrompt() {
+        val typedUrl = "https://duck.ai/chat?duckai=5&q=Hello"
+        whenever(mockOmnibarConverter.convertQueryToUrl(typedUrl, null, FromUser)).thenReturn(typedUrl)
+
+        testee.onUserSubmittedQuery(typedUrl, queryOrigin = FromUser)
+
+        verify(mockDuckChat).reportDuckChatEntry(DuckChatEntryPoint.DIRECT_URL, opensNewTab = false, hasPrompt = false)
+    }
+
+    @Test
+    fun whenTypedDuckAiUrlSubmittedWithInputScreenEnabledThenDirectNavigationPixelCarriesCapability() {
+        mockInputModeCapability.value = NativeInputState.InputMode.SEARCH_AND_DUCK_AI
+        whenever(mockOmnibarConverter.convertQueryToUrl("duck.ai", null, FromUser)).thenReturn("https://duck.ai/")
+        whenever(mockDuckChat.isEnabled()).thenReturn(true)
+
+        testee.onUserSubmittedQuery("duck.ai", queryOrigin = FromUser)
+
+        verify(mockPixel).fire(
+            AppPixelName.AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_COUNT,
+            parameters = mapOf("duck_ai_enabled" to "true", "input_screen_enabled" to "true"),
         )
     }
 
@@ -8292,7 +8345,7 @@ class BrowserTabViewModelTest {
 
         verify(mockPixel).fire(
             AppPixelName.AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_COUNT,
-            parameters = mapOf("duck_ai_enabled" to "true"),
+            parameters = mapOf("duck_ai_enabled" to "true", "input_screen_enabled" to "false"),
         )
     }
 
@@ -8305,11 +8358,11 @@ class BrowserTabViewModelTest {
 
         verify(mockPixel).fire(
             AppPixelName.AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_COUNT,
-            parameters = mapOf("duck_ai_enabled" to "false"),
+            parameters = mapOf("duck_ai_enabled" to "false", "input_screen_enabled" to "false"),
         )
         verify(mockPixel).fire(
             AppPixelName.AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_DAILY,
-            parameters = mapOf("duck_ai_enabled" to "false"),
+            parameters = mapOf("duck_ai_enabled" to "false", "input_screen_enabled" to "false"),
             type = Daily(),
         )
     }
@@ -8819,31 +8872,50 @@ class BrowserTabViewModelTest {
             assertCommandIssued<Command.OpenInNewTab> {
                 assertEquals(duckChatURL, query)
             }
-            verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
+            verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any(), any())
         }
 
     @Test
     fun whenOpenDuckAiQueryOnBrowserTabThenOpensInNewTab() = runTest {
         setBrowserShowing(true)
+        whenever(mockDuckChat.getDuckChatUrl(eq("hello"), eq(true), any())).thenReturn(duckChatAutoPromptURL)
 
-        testee.openDuckAiQuery(query = "hello", autoPrompt = true)
+        testee.openDuckAiQuery(query = "hello", autoPrompt = true, entryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT)
 
         assertCommandIssued<Command.OpenInNewTab> {
-            assertEquals(duckChatURL, query)
+            assertEquals(duckChatAutoPromptURL, query)
         }
         verify(mockDuckChat).getDuckChatUrl(eq("hello"), eq(true), any())
-        verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
+        verify(mockDuckChat).reportDuckChatEntry(DuckChatEntryPoint.ADDRESS_BAR_PROMPT, opensNewTab = true, hasPrompt = true)
+        verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any(), any())
     }
 
     @Test
     fun whenOpenDuckAiQueryOnNtpThenStaysInTab() = runTest {
         setBrowserShowing(false)
-        whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
+        whenever(mockDuckChat.getDuckChatUrl(eq("hello"), eq(true), any())).thenReturn(duckChatAutoPromptURL)
+        whenever(mockOmnibarConverter.convertQueryToUrl(duckChatAutoPromptURL, null)).thenReturn(duckChatAutoPromptURL)
 
-        testee.openDuckAiQuery(query = "hello", autoPrompt = true)
+        testee.openDuckAiQuery(query = "hello", autoPrompt = true, entryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT)
 
         assertCommandNotIssued<Command.OpenInNewTab>()
         verify(mockDuckChat).getDuckChatUrl(eq("hello"), eq(true), any())
+        verify(mockDuckChat).reportDuckChatEntry(DuckChatEntryPoint.ADDRESS_BAR_PROMPT, opensNewTab = false, hasPrompt = true)
+    }
+
+    @Test
+    fun whenOpenDuckAiQueryWithBangOnlyThenReportsNoPrompt() = runTest {
+        setBrowserShowing(true)
+        val bangOnlyUrl = "https://duck.ai/chat"
+        whenever(mockDuckChat.getDuckChatUrl(eq("!ai"), eq(true), any())).thenReturn(bangOnlyUrl)
+
+        testee.openDuckAiQuery(query = "!ai", autoPrompt = true, entryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT)
+
+        verify(mockDuckChat).reportDuckChatEntry(
+            DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
+            opensNewTab = true,
+            hasPrompt = false,
+        )
     }
 
     @Test
@@ -8856,6 +8928,7 @@ class BrowserTabViewModelTest {
         assertCommandIssued<Command.OpenInNewTab> {
             assertEquals(chatUrl, query)
         }
+        verify(mockDuckChat).reportDuckChatEntry(DuckChatEntryPoint.CHAT_HISTORY_OPEN_CHAT, opensNewTab = true, hasPrompt = false)
     }
 
     @Test
@@ -8873,9 +8946,10 @@ class BrowserTabViewModelTest {
     fun whenOpenDuckAiQueryThenFiresOnInputSubmittedOnBrowserInteractionsPlugins() = runTest {
         val plugin: BrowserInteractionsPlugin = mock()
         whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
-        whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
+        whenever(mockDuckChat.getDuckChatUrl(eq("hello"), eq(true), any())).thenReturn(duckChatAutoPromptURL)
+        whenever(mockOmnibarConverter.convertQueryToUrl(duckChatAutoPromptURL, null)).thenReturn(duckChatAutoPromptURL)
 
-        testee.openDuckAiQuery(query = "hello", autoPrompt = true)
+        testee.openDuckAiQuery(query = "hello", autoPrompt = true, entryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT)
 
         // Preserve the pre-return-session behavior: one callback is explicit and one comes from
         // reusing the NTP tab. The new AI classifier must still fire exactly once without a URL.
@@ -8891,7 +8965,7 @@ class BrowserTabViewModelTest {
         whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
         setBrowserShowing(true)
 
-        testee.openDuckAiQuery(query = "", autoPrompt = false)
+        testee.openDuckAiQuery(query = "", autoPrompt = false, entryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT)
 
         verify(plugin).onInputSubmitted()
         verify(plugin, never()).onAiPromptSubmitted()
@@ -8903,7 +8977,7 @@ class BrowserTabViewModelTest {
         whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
         setBrowserShowing(true)
 
-        testee.openDuckAiQuery(query = "prefill", autoPrompt = false)
+        testee.openDuckAiQuery(query = "prefill", autoPrompt = false, entryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT)
 
         verify(plugin).onInputSubmitted()
         verify(plugin, never()).onAiPromptSubmitted()
@@ -8914,8 +8988,9 @@ class BrowserTabViewModelTest {
         val plugin: BrowserInteractionsPlugin = mock()
         whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
         setBrowserShowing(true)
+        whenever(mockDuckChat.getDuckChatUrl(eq("hello"), eq(true), any())).thenReturn(duckChatAutoPromptURL)
 
-        testee.openDuckAiQuery(query = "hello", autoPrompt = true)
+        testee.openDuckAiQuery(query = "hello", autoPrompt = true, entryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT)
 
         verify(plugin).onInputSubmitted()
         verify(plugin).onAiPromptSubmitted()
@@ -9101,7 +9176,7 @@ class BrowserTabViewModelTest {
             "https://duckduckgo.com/?q=example&ia=chat&duckai=5",
         )
         testee.onUserSubmittedQuery("https://duckduckgo.com/?q=example&ia=chat&duckai=5")
-        mockDuckChat.openDuckChatWithPrefill("example")
+        mockDuckChat.openDuckChatWithPrefill("example", DuckChatEntryPoint.DIRECT_URL)
     }
 
     @Test
@@ -9109,7 +9184,7 @@ class BrowserTabViewModelTest {
         whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.ShouldLaunchDuckChatLink)
         whenever(mockOmnibarConverter.convertQueryToUrl("https://duckduckgo.com/?ia=chat", null)).thenReturn("https://duckduckgo.com/?ia=chat")
         testee.onUserSubmittedQuery("https://duckduckgo.com/?ia=chat")
-        mockDuckChat.openDuckChat()
+        mockDuckChat.openDuckChat(DuckChatEntryPoint.DIRECT_URL)
     }
 
     @Test
@@ -10977,7 +11052,7 @@ class BrowserTabViewModelTest {
             val command = commandCaptor.lastValue as Command.OpenInNewTab
             assertTrue(command.query == duckChatURL)
 
-            verify(mockDuckChat, never()).openDuckChat()
+            verify(mockDuckChat, never()).openDuckChat(any())
             verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_NEW_CHAT_TAB_TAPPED)
         }
 
@@ -11323,7 +11398,7 @@ class BrowserTabViewModelTest {
         val command = commandCaptor.lastValue as Navigate
         assertEquals(duckAIUrl, command.url)
 
-        verify(mockDuckChat, never()).openDuckChat()
+        verify(mockDuckChat, never()).openDuckChat(any())
     }
 
     @Test

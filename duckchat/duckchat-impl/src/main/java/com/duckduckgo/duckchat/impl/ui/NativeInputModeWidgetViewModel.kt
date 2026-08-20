@@ -37,6 +37,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InteractionLock
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
@@ -434,7 +435,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     }
 
     fun openNewChat() {
-        duckChatInternal.openNewDuckChatSession()
+        duckChatInternal.openNewDuckChatSession(DuckChatEntryPoint.ADDRESS_BAR_EDITING_STATE)
     }
 
     fun setDuckAiMode(isDuckAiMode: Boolean) {
