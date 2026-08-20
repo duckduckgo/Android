@@ -91,6 +91,11 @@ tests, no touching feature flags, no reverting.
    suite with its individual status, which tells you whether the whole suite broke or only specific
    flows. "2 of 6 flows failed, both asserting the same element" is a much stronger signal than the
    error line alone. Include the Maestro console URL too.
+6. For instrumentation-test failures (Privacy Tests, Android CI checks), the log contains a jq'd
+   block of `Test:` / `Failure:` / `URL:` triples produced from `results.json`, plus a matrix line
+   reading `N test cases failed, M passed`. Use those for the test-to-error pairing and the pass/fail
+   ratio rather than reading exception traces in isolation — a trace on its own does not tell you
+   which test raised it. The `URL:` value is a Firebase Test Lab link worth carrying into the report.
 
 ## Step 2: Ours, or infrastructure
 
@@ -155,6 +160,22 @@ a separate search, not an extension of it.
 If a fix has landed, say so at the top of the report, name the PR, and point at the first run of the
 workflow whose head SHA includes it — that is the verification run, and it is the only thing the
 reader needs. Do not send someone to investigate a failure that is already fixed.
+
+**Check the direction before claiming this.** A fix only explains the failure away if it is *not*
+already an ancestor of the failing SHA. When the candidate fix is already in the failing SHA, the
+opposite is true: this is a recurrence or a new symptom of the same underlying problem, and that is a
+more serious finding than a first occurrence, not a lesser one. Say which it is explicitly, and if
+the same test has now failed with more than one error signature across recent runs, list the
+signatures in order — that progression is the most useful thing in the report.
+
+## Step 4c: Was a known fix applied too narrowly
+
+When a previous PR fixed this exact error signature in one test or one file, check whether sibling
+tests still carry the unfixed pattern. Read the fixing diff to learn the pattern, then grep the
+sibling tests for the old one and name the files that still have it.
+
+A failure that is the same known defect resurfacing in an unfixed sibling is the cheapest kind of
+finding to act on, and the reader cannot see it from the failure alone.
 
 ## Step 5: Write the report
 
