@@ -36,6 +36,7 @@ import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord.EmailData
+import com.duckduckgo.pir.impl.scheduling.JobRecordUpdater
 import com.duckduckgo.pir.impl.scripts.PirCssScriptLoader
 import com.duckduckgo.pir.impl.store.PirRepository
 import kotlinx.coroutines.test.runTest
@@ -69,6 +70,7 @@ class RealPirEmailConfirmationTest {
     private val mockPirActionsRunner: RealPirActionsRunner = mock()
     private val mockWebViewDataCleaner: PirWebViewDataCleaner = mock()
     private val mockPirWebViewCountProvider: PirWebViewCountProvider = mock()
+    private val mockJobRecordUpdater: JobRecordUpdater = mock()
 
     @Before
     fun setUp() {
@@ -89,6 +91,7 @@ class RealPirEmailConfirmationTest {
             callbacks = mockCallbacks,
             webViewDataCleaner = mockWebViewDataCleaner,
             pirWebViewCountProvider = mockPirWebViewCountProvider,
+            jobRecordUpdater = mockJobRecordUpdater,
         )
     }
 
@@ -706,5 +709,30 @@ class RealPirEmailConfirmationTest {
         assert(result.isSuccess)
         verify(mockPirActionsRunner).execute(deprecatedProfile, testEmailConfirmationStep)
         verify(mockWebViewDataCleaner).cleanWebViewData()
+    }
+
+    @Test
+    fun whenBrokerStepsParsingReturnsNullThenRecordsAttemptSoJobCanAgeOut() = runTest {
+        whenever(mockRepository.getBrokerOptOutSteps(testBrokerName)).thenReturn(testStepsJson)
+        whenever(mockRepository.getAllActiveBrokerObjects()).thenReturn(listOf(testBroker1))
+        whenever(mockRepository.getAllUserProfileQueries()).thenReturn(testUserProfileQueries)
+        whenever(
+            mockBrokerStepsParser.parseEmailConfirmationStep(
+                testBroker1,
+                testStepsJson,
+                testEmailConfirmationJobRecord,
+            ),
+        ).thenReturn(null)
+
+        val result = testee.executeForEmailConfirmationJobs(
+            listOf(testEmailConfirmationJobRecord),
+            mockContext,
+            RunType.MANUAL,
+        )
+
+        assert(result.isSuccess)
+        verify(mockJobRecordUpdater).recordEmailConfirmationAttempt(
+            testEmailConfirmationJobRecord.extractedProfileId,
+        )
     }
 }

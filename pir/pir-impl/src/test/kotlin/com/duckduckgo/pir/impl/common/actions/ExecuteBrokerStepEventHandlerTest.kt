@@ -504,4 +504,35 @@ class ExecuteBrokerStepEventHandlerTest {
 
         assertEquals(false, result.nextState.preseeding)
     }
+
+    @Test
+    fun whenEmailConfirmationStepHasNoActionsThenDoesNotCrash() = runTest {
+        val emailConfirmationStep = EmailConfirmationStep(
+            broker = testBroker,
+            step = OptOutStepActions(
+                stepType = "optout",
+                actions = emptyList(),
+                optOutType = "form",
+            ),
+            emailConfirmationJob = testEmailConfirmationJob,
+            profileToOptOut = testExtractedProfile,
+        )
+        val state = State(
+            runType = RunType.EMAIL_CONFIRMATION,
+            brokerStep = emailConfirmationStep,
+            profileQuery = testProfileQuery,
+            currentActionIndex = 0,
+            stageStatus = PirStageStatus(
+                currentStage = PirStage.OTHER,
+                stageStartMs = 0,
+            ),
+        )
+        val event = ExecuteBrokerStep
+
+        testee.invoke(state, event)
+
+        val capturedPixel = argumentCaptor<BrokerRecordEmailConfirmationStarted>()
+        verify(mockPirRunStateHandler).handleState(capturedPixel.capture())
+        assertEquals("", capturedPixel.firstValue.firstActionId)
+    }
 }
