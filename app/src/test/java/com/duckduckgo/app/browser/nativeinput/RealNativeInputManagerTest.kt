@@ -260,6 +260,34 @@ class RealNativeInputManagerTest {
     }
 
     @Test
+    fun whenUserTypedUrlIntoEmptyInputThenSwitchingToDuckAiDoesNotClearIt() {
+        val input = givenUrlCachingBound(text = "")
+        input.text = URL
+        input.switchToDuckAi()
+
+        assertEquals(URL, input.text)
+    }
+
+    @Test
+    fun whenUserEditedPrefilledUrlThenSwitchingToDuckAiDoesNotClearIt() {
+        val input = givenUrlCachingBound(text = URL)
+        input.text = OTHER_URL
+        input.switchToDuckAi()
+
+        assertEquals(OTHER_URL, input.text)
+    }
+
+    @Test
+    fun whenRestoredUrlIsUnchangedThenSwitchingToDuckAiClearsIt() {
+        val input = givenUrlCachingBound(text = URL)
+        input.switchToDuckAi()
+        input.switchToSearch()
+        input.switchToDuckAi()
+
+        assertEquals("", input.text)
+    }
+
+    @Test
     fun whenUrlClearingKillSwitchDisabledThenInputNotCleared() {
         nativeInputUrlClearingKillSwitch.self().setRawStoredState(State(enable = false))
         val input = givenUrlCachingBound(text = URL)
@@ -285,6 +313,7 @@ class RealNativeInputManagerTest {
         whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(MutableStateFlow(true))
         whenever(omnibar.viewMode).thenReturn(if (duckAiMode) Omnibar.ViewMode.DuckAI else Omnibar.ViewMode.Browser(null))
         whenever(queryUrlPredictor.isUrl(URL)).thenReturn(true)
+        whenever(queryUrlPredictor.isUrl(OTHER_URL)).thenReturn(true)
         whenever(queryUrlPredictor.isUrl(QUERY)).thenReturn(false)
         testee.init(omnibar, rootView, lifecycleOwner)
 
@@ -333,6 +362,7 @@ class RealNativeInputManagerTest {
 
     private companion object {
         private const val URL = "https://example.com"
+        private const val OTHER_URL = "https://foo.com"
         private const val QUERY = "query"
     }
 

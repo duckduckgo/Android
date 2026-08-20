@@ -645,6 +645,7 @@ class RealNativeInputManager @Inject constructor(
                 }
             }
         }
+        bindUrlCaching(widgetView)
         attachWidget(widgetView, navBarView, isBottom, tabId)
         // Bottom omnibar: slide the nav bar in with open. Top omnibar: snap the bar so the enter
         // morph can run from the omnibar while the buttons appear without animating — a concurrent
@@ -919,7 +920,6 @@ class RealNativeInputManager @Inject constructor(
         bindSearchTabAutocompleteClearing(widgetView, callbacks.onClearAutocomplete)
         bindVoiceButtons(widgetView, callbacks)
         bindInlineNavButtons(widgetView, lifecycleOwner, tabs, callbacks, showInlineNavButtons)
-        bindUrlCaching(widgetView)
     }
 
     private fun bindVoiceButtons(
@@ -979,10 +979,12 @@ class RealNativeInputManager @Inject constructor(
     internal fun bindUrlCaching(widgetView: View) {
         if (!nativeInputUrlClearingKillSwitch.self().isEnabled() || omnibarController.isDuckAiMode()) return
         val widget = widgetFrom(widgetView) ?: return
+        val text = widget.text
 
         val onChatSelected = widget.onChatSelected
         widget.onChatSelected = { animate ->
-            cacheUrl(widget)
+            val isDirty = widget.text != text
+            if (!isDirty) cacheUrl(widget)
             onChatSelected?.invoke(animate)
         }
 
