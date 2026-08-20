@@ -22,6 +22,8 @@ import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy.OnProcessStart
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
+import com.duckduckgo.app.statistics.wideevents.WideEventDefinition
+import com.duckduckgo.app.statistics.wideevents.WideEventDefinition.Version
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -33,12 +35,28 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito
 import org.mockito.kotlin.*
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 class DataClearingWideEventTest {
     @get:Rule
     val coroutineRule = CoroutineTestRule()
 
     private val wideEventClient: WideEventClient = mock()
+
+    // Spelled out rather than referencing the production constant, so a wrong constant still fails.
+    private val expectedDurationBuckets = setOf(
+        1.seconds,
+        2.seconds,
+        3.seconds,
+        4.seconds,
+        5.seconds,
+        10.seconds,
+        30.seconds,
+        1.minutes,
+        5.minutes,
+        10.minutes,
+    )
 
     @SuppressLint("DenyListedApi")
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature =
@@ -71,8 +89,13 @@ class DataClearingWideEventTest {
             metadata = mapOf("clear_options" to "tabs,data", "browser_mode" to "regular"),
             cleanupPolicy = OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
             samplingProbability = 0.05f,
+            definition = WideEventDefinition(version = Version(minor = 1, patch = 0)),
         )
-        verify(wideEventClient).intervalStart(wideEventId = 123L, key = "total_duration_ms_bucketed")
+        verify(wideEventClient).intervalStart(
+            wideEventId = 123L,
+            key = "total_duration_ms_bucketed",
+            buckets = expectedDurationBuckets,
+        )
     }
 
     @Test
@@ -88,6 +111,7 @@ class DataClearingWideEventTest {
             metadata = mapOf("clear_options" to "tabs", "browser_mode" to "fire"),
             cleanupPolicy = OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
             samplingProbability = 0.05f,
+            definition = WideEventDefinition(version = Version(minor = 1, patch = 0)),
         )
     }
 
@@ -115,6 +139,7 @@ class DataClearingWideEventTest {
             ),
             cleanupPolicy = OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
             samplingProbability = 0.05f,
+            definition = WideEventDefinition(version = Version(minor = 1, patch = 0)),
         )
     }
 
@@ -137,6 +162,7 @@ class DataClearingWideEventTest {
                 metadata = mapOf("clear_options" to "", "browser_mode" to "regular", "tab_count" to bucket),
                 cleanupPolicy = OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
                 samplingProbability = 0.05f,
+                definition = WideEventDefinition(version = Version(minor = 1, patch = 0)),
             )
         }
     }
@@ -154,6 +180,7 @@ class DataClearingWideEventTest {
             metadata = mapOf("clear_options" to "", "browser_mode" to "regular"),
             cleanupPolicy = OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
             samplingProbability = 0.05f,
+            definition = WideEventDefinition(version = Version(minor = 1, patch = 0)),
         )
     }
 
@@ -171,6 +198,7 @@ class DataClearingWideEventTest {
             metadata = mapOf("clear_options" to "duckai_chats", "browser_mode" to "regular"),
             cleanupPolicy = OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
             samplingProbability = 0.05f,
+            definition = WideEventDefinition(version = Version(minor = 1, patch = 0)),
         )
     }
 
@@ -188,8 +216,13 @@ class DataClearingWideEventTest {
             metadata = mapOf("clear_options" to "tabs,data,duckai_chats", "browser_mode" to "regular"),
             cleanupPolicy = OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
             samplingProbability = 0.05f,
+            definition = WideEventDefinition(version = Version(minor = 1, patch = 0)),
         )
-        verify(wideEventClient).intervalStart(wideEventId = 124L, key = "total_duration_ms_bucketed")
+        verify(wideEventClient).intervalStart(
+            wideEventId = 124L,
+            key = "total_duration_ms_bucketed",
+            buckets = expectedDurationBuckets,
+        )
     }
 
     @Test
