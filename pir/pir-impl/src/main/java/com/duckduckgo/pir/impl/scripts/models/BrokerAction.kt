@@ -64,12 +64,14 @@ sealed class BrokerAction(
         override val id: String,
         val selector: String,
         val captchaType: String? = null,
+        val parent: ParentElement? = null,
     ) : BrokerAction(id)
 
     data class SolveCaptcha(
         override val id: String,
         val selector: String,
         val captchaType: String? = null,
+        val parent: ParentElement? = null,
     ) : BrokerAction(id)
 
     data class Click(
