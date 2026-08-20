@@ -179,34 +179,45 @@ finding to act on, and the reader cannot see it from the failure alone.
 
 ## Step 5: Write the report
 
-Append exactly this shape to `$GITHUB_STEP_SUMMARY` (via a Bash heredoc). One report per run.
+The report is read by the engineer on maintenance rotation, in a hurry, alongside everything else
+that arrived that day. It answers one question — **what probably caused this** — and gives them the
+thread to pull. Everything else is noise, and noise gets the report ignored.
 
-    ## 🤖 Workflow Failure Classifier
+**Hard budget: 12 lines and 120 words.** One fenced block, at most 3 lines in it. If you are over,
+cut, do not compress into denser prose.
 
-    **Run:** <workflow name> — <run URL>
-    **Classification:** release-blocking | not release-blocking
-    **Verdict:** likely ours | likely infra/flake | unclear
+Append this to `$GITHUB_STEP_SUMMARY` (via a Bash heredoc). One report per run.
 
-    **Failed:** <job> → <test class#method or Maestro flow>
+    ## 🤖 Failure classifier
+
+    **Likely cause:** <one of: flaky test | feature-flag rollout | recent change | infrastructure | unclear> — <≤12 words>
+    **What failed:** <suite/step> → <test#method or flow> (<n> of <m>; <other DI variant passed | both variants>)
     ```
-    <verbatim error line(s)>
+    <verbatim error line, 1-3 lines>
     ```
+    **Why:** <the one fact that supports the cause, with a PR or file reference>
+    **Changes in range:** <PR # touching the failing area, or "none in <n> commits">
+    **Seen before:** <e.g. "2nd consecutive night, first was <run>">
+    **Confidence:** high | medium | low — <what would raise it, ≤10 words>
 
-    **Evidence:** <what in the logs/artifacts supports the verdict, with links>
+**Omit any line that adds nothing.** No "Changes in range: moot", no "Seen before" on a first
+occurrence, no "Confidence: high" without a reason to doubt. A 5-line report is a good report.
 
-    **History:** failed <n> of the last <m> runs since <date>; same test: yes/no
+Never state the run URL, the workflow name, or whether the failure is release-blocking: the task the
+reader is looking at already carries all three, and repeating them is the main thing that made
+earlier drafts too long to read. Link a run only when it is a *different* run than this one (the
+previous failure, the last green, the verification run).
 
-    **Candidate changes:** <PR #, commit SHA, author> touching <module> since last green (<SHA>)
+`Likely cause` leads because it is the only line the reader needs to route the work. Pick from the
+five values, never invent a sixth, and put the actionable specifics in `Why` — the unfixed sibling
+test, the flag on a percentage rollout, the PR that changed the failing area.
 
-    **Playbook next step:** <for release-blocking: treat with Minor Incident urgency, loop in the
-    project DRI and, if LGC is blocked, the release DRI. For non-release-blocking: ping the feature
-    owner and open a fix task. For chronic flakiness: note the failure rate so the disable-with-
-    tracked-follow-up decision can be made by a human.>
-
-    **Confidence:** high | medium | low — <one line on what would raise it>
+Write the report so it stands alone as a comment on the single `GH Workflow Failure - <workflow>`
+task. The per-suite `E2E Tests Failure - <suite>` tasks are being retired to cut noise, so never
+assume a reader has a suite-specific task open, and never split one run across several reports.
 
 Always write a report, even when the outcome is "could not diagnose". State what you could not
-establish and what you would need. Never finish a run without writing something to the summary.
+establish and what you would need, inside the same budget.
 
 ## Guidelines
 
