@@ -53,6 +53,8 @@ import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.Companion.Q
 import com.duckduckgo.app.browser.newtab.QuickAccessDragTouchItemListener
 import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.pixels.AppReturnPixelSender
+import com.duckduckgo.app.pixels.LaunchSourceValues
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.AutocompleteItemRemoved
@@ -112,6 +114,9 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     lateinit var dataClearerForegroundAppRestartPixel: DataClearerForegroundAppRestartPixel
 
     @Inject
+    lateinit var appReturnPixelSender: AppReturnPixelSender
+
+    @Inject
     lateinit var faviconManager: FaviconManager
 
     @Inject
@@ -140,6 +145,14 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     private var nestedScrollViewPosition: Int = 0
     private var nestedScrollViewRestorePosition: Int = 0
+
+    /**
+     * The launch source resolved from a genuinely new [Intent] delivery (fresh launch or [onNewIntent]),
+     * consumed by the next [onResume]. Not re-derived from [getIntent] on every resume, since the widget
+     * extras it carries are sticky and would otherwise be misread as a fresh widget open on a plain
+     * Recents return.
+     */
+    private var pendingLaunchSource: String? = null
 
     private val systemSearchOnboarding
         get() = binding.includeSystemSearchOnboarding
@@ -222,6 +235,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
         if (savedInstanceState == null) {
             intent?.let {
+                pendingLaunchSource = resolveLaunchSource(it)
                 sendLaunchPixels(it)
                 if (launchedFromAssist(it)) {
                     handleDigitalAssistIntent()
@@ -247,13 +261,21 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     override fun onResume() {
         super.onResume()
 
+        appReturnPixelSender.fireIfNeeded(pendingLaunchSource ?: LaunchSourceValues.OTHER)
+        pendingLaunchSource = null
+
         if (viewModel.hasOmnibarTypeChanged) {
             recreate()
         }
     }
 
+    private fun resolveLaunchSource(intent: Intent): String =
+        if (launchedFromAnyWidget(intent)) LaunchSourceValues.WIDGET else LaunchSourceValues.OTHER
+
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        setIntent(intent)
+        pendingLaunchSource = resolveLaunchSource(intent)
         dataClearerForegroundAppRestartPixel.registerIntent(intent)
         viewModel.resetViewState()
         viewModel.setLaunchedFromSearchOnlyWidget(launchedFromSearchOnlyWidget(intent))
