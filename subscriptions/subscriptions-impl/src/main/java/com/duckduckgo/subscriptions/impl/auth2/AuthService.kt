@@ -82,3 +82,7 @@ data class StoreLoginBody(
     @field:Json(name = "google_signed_data") val googleSignedData: String,
     @field:Json(name = "google_package_name") val googlePackageName: String,
 )
+
+data class ResponseError(
+    val error: String,
+)

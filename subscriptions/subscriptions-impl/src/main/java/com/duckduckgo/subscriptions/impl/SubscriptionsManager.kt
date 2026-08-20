@@ -18,7 +18,6 @@ package com.duckduckgo.subscriptions.impl
 
 import android.app.Activity
 import android.content.Context
-import androidx.annotation.VisibleForTesting
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -49,6 +48,7 @@ import com.duckduckgo.subscriptions.impl.auth2.BackgroundTokenRefresh
 import com.duckduckgo.subscriptions.impl.auth2.CrossProcessLock
 import com.duckduckgo.subscriptions.impl.auth2.PkceGenerator
 import com.duckduckgo.subscriptions.impl.auth2.RefreshTokenClaims
+import com.duckduckgo.subscriptions.impl.auth2.ResponseError
 import com.duckduckgo.subscriptions.impl.auth2.TokenPair
 import com.duckduckgo.subscriptions.impl.billing.LatestPurchaseResult
 import com.duckduckgo.subscriptions.impl.billing.PlayBillingManager
@@ -69,9 +69,7 @@ import com.duckduckgo.subscriptions.impl.repository.isActive
 import com.duckduckgo.subscriptions.impl.repository.isActiveOrWaiting
 import com.duckduckgo.subscriptions.impl.repository.isExpired
 import com.duckduckgo.subscriptions.impl.repository.toProductList
-import com.duckduckgo.subscriptions.impl.services.AuthService
 import com.duckduckgo.subscriptions.impl.services.ConfirmationBody
-import com.duckduckgo.subscriptions.impl.services.ResponseError
 import com.duckduckgo.subscriptions.impl.services.SubscriptionsService
 import com.duckduckgo.subscriptions.impl.wideevents.AuthTokenRefreshWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.FreeTrialConversionWideEvent
@@ -217,11 +215,6 @@ interface SubscriptionsManager {
     val currentPurchaseState: Flow<CurrentPurchase>
 
     /**
-     * Signs the user in using the provided v1 auth token
-     */
-    suspend fun signInV1(authToken: String)
-
-    /**
      * Signs the user in using the provided v2 access and refresh tokens
      */
     suspend fun signInV2(accessToken: String, refreshToken: String)
@@ -270,7 +263,6 @@ interface SubscriptionsManager {
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealSubscriptionsManager @Inject constructor(
-    private val authService: AuthService,
     private val subscriptionsService: SubscriptionsService,
     private val authRepository: AuthRepository,
     private val playBillingManager: PlayBillingManager,
@@ -509,16 +501,6 @@ class RealSubscriptionsManager @Inject constructor(
         return authRepository.getSubscription()
     }
 
-    override suspend fun signInV1(authToken: String) {
-        exchangeAuthToken(authToken)
-        authRepository.purchaseToWaitingStatus()
-        try {
-            refreshSubscriptionData()
-        } catch (e: Exception) {
-            logcat { "Subs: error when refreshing subscription on v1 sign in" }
-        }
-    }
-
     override suspend fun signInV2(
         accessToken: String,
         refreshToken: String,
@@ -683,15 +665,6 @@ class RealSubscriptionsManager @Inject constructor(
         } else {
             emptySet()
         }
-    }
-
-    @VisibleForTesting
-    @Deprecated("This method will be removed after migrating to auth v2")
-    suspend fun exchangeAuthToken(authToken: String): String {
-        val accessToken = authService.accessToken("Bearer $authToken").accessToken
-        authRepository.setAccessToken(accessToken)
-        authRepository.setAuthToken(authToken)
-        return accessToken
     }
 
     override suspend fun refreshAccessToken() {
