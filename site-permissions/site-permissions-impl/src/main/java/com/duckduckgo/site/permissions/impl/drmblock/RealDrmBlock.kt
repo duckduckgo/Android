@@ -17,8 +17,8 @@
 package com.duckduckgo.site.permissions.impl.drmblock
 
 import androidx.core.net.toUri
+import com.duckduckgo.app.browser.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
-import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.squareup.anvil.annotations.ContributesBinding
@@ -35,12 +35,12 @@ class RealDrmBlock @Inject constructor(
     override fun isDrmBlockedForUrl(url: String): Boolean {
         val uri = url.toUri()
         return drmBlockFeature.self().isEnabled() &&
-            domainsThatBlockDrm(uri.baseHost) &&
+            domainsThatBlockDrm(url) &&
             !userAllowListRepository.isUriInUserAllowList(uri) &&
             !unprotectedTemporary.isAnException(uri.toString())
     }
 
-    private fun domainsThatBlockDrm(host: String?): Boolean {
-        return drmBlockRepository.exceptions.firstOrNull { it.domain == host } != null
+    private fun domainsThatBlockDrm(url: String): Boolean {
+        return drmBlockRepository.exceptions.any { sameOrSubdomain(url, it.domain) }
     }
 }

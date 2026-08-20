@@ -181,6 +181,23 @@ class RealDrmPolicyManagerTest {
     }
 
     @Test
+    fun whenDenyAlwaysStoredOnParentDomainAndRequestIsFromSubdomainThenDenyWithUserDenyAlways() = runTest {
+        val entity = SitePermissionsEntity(domain = "foxnews.com", askDrmSetting = SitePermissionAskSettingType.DENY_ALWAYS.name)
+        whenever(mockSitePermissionsRepository.getSitePermissionsForWebsite("foxnews.com")).thenReturn(entity)
+        whenever(mockDrm.isDrmAllowedForUrl("https://static.foxnews.com/")).thenReturn(true)
+
+        assertEquals(DrmPolicyDecision(DENY, USER_DENY_ALWAYS), testee.decide("https://static.foxnews.com/", tabId))
+    }
+
+    @Test
+    fun whenSettingStoredOnSubdomainThenParentDomainRequestIsUnaffected() = runTest {
+        val entity = SitePermissionsEntity(domain = "static.foxnews.com", askDrmSetting = SitePermissionAskSettingType.DENY_ALWAYS.name)
+        whenever(mockSitePermissionsRepository.getSitePermissionsForWebsite("static.foxnews.com")).thenReturn(entity)
+
+        assertEquals(DrmPolicyDecision(PROMPT, NO_RULE), testee.decide("https://foxnews.com/", tabId))
+    }
+
+    @Test
     fun whenUrlIsMalformedThenPromptWithNoRule() = runTest {
         assertEquals(DrmPolicyDecision(PROMPT, NO_RULE), testee.decide("not a url", tabId))
     }

@@ -19,6 +19,7 @@ package com.duckduckgo.site.permissions.impl.drm
 import androidx.core.net.toUri
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.common.utils.baseHost
+import com.duckduckgo.common.utils.extensions.toTldPlusOneOrSelf
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.Drm
@@ -42,9 +43,9 @@ class RealDrmPolicyManager @Inject constructor(
     override suspend fun decide(url: String, tabId: String?): DrmPolicyDecision {
         val domain = url.extractDomain() ?: url
         val uri = url.toUri()
-        // Settings are keyed on the host as typed, so example.com and www.example.com are separate
-        // rows, while the allow list matches both
-        val siteSetting = listOfNotNull(domain, uri.baseHost, uri.baseHost?.let { "www.$it" })
+        // Settings are keyed on the host as typed, while both config lists match subdomains. Check every
+        // spelling plus the parent domain: missing the row would let remote config override a user's choice
+        val siteSetting = listOfNotNull(domain, uri.baseHost, uri.baseHost?.let { "www.$it" }, domain.toTldPlusOneOrSelf())
             .distinct()
             .firstNotNullOfOrNull { sitePermissionsRepository.getSitePermissionsForWebsite(it)?.askDrmSetting }
             ?.let { setting -> runCatching { SitePermissionAskSettingType.valueOf(setting) }.getOrNull() }
