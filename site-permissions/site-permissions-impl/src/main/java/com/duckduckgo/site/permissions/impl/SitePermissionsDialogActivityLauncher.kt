@@ -536,11 +536,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
 
     private fun systemPermissionDenied() {
         when (systemPermissionsHelper.isPermissionsRejectedForever(activity)) {
-            true -> when {
-                isDuckAiAudioCapture -> showDuckAiMicPermissionsDeniedDialog()
-                else -> showSystemPermissionsDeniedDialog()
-            }
-
+            true -> showSystemPermissionsDeniedDialog()
             false -> showPermissionsDeniedSnackBar()
         }
     }
@@ -634,55 +630,56 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
 
     private fun showSystemPermissionsDeniedDialog() {
         denyPermissions(permissionPermanent)
-        val titleRes = when (permissionRequested) {
-            SitePermissionsRequestedType.CAMERA -> R.string.systemPermissionDialogCameraDeniedTitle
-            SitePermissionsRequestedType.AUDIO -> R.string.systemPermissionDialogAudioDeniedTitle
-            SitePermissionsRequestedType.CAMERA_AND_AUDIO -> R.string.systemPermissionDialogCameraAndAudioDeniedTitle
-            SitePermissionsRequestedType.LOCATION -> R.string.systemPermissionDialogLocationDeniedTitle
-        }
-        val contentRes = when (permissionRequested) {
-            SitePermissionsRequestedType.CAMERA -> R.string.systemPermissionDialogCameraDeniedContent
-            SitePermissionsRequestedType.AUDIO -> R.string.systemPermissionDialogAudioDeniedContent
-            SitePermissionsRequestedType.CAMERA_AND_AUDIO -> R.string.systemPermissionDialogCameraAndAudioDeniedContent
-            SitePermissionsRequestedType.LOCATION -> R.string.systemPermissionDialogLocationDeniedContent
-        }
-        TextAlertDialogBuilder(activity)
-            .setTitle(titleRes)
-            .setMessage(contentRes)
-            .setPositiveButton(R.string.systemPermissionsDeniedDialogPositiveButton)
-            .setNegativeButton(R.string.systemPermissionsDeniedDialogNegativeButton)
-            .addEventListener(
-                object : TextAlertDialogBuilder.EventListener() {
-                    override fun onPositiveButtonClicked() {
-                        activity.launchApplicationInfoSettings()
-                    }
-                },
-            )
-            .show()
-    }
+        val openAppSettings = { activity.launchApplicationInfoSettings() }
 
-    private fun showDuckAiMicPermissionsDeniedDialog() {
-        denyPermissions(permissionPermanent)
-        StackedAlertDialogBuilder(activity)
-            .setHeaderImageResource(CommonR.drawable.ic_microphone_24)
-            .setTitle(R.string.duckAiMicPermissionDeniedDialogTitle)
-            .setMessage(R.string.duckAiMicPermissionDeniedDialogContent)
-            .setStackedButtons(
-                listOf(
-                    R.string.duckAiMicPermissionDeniedDialogPositiveButton,
-                    R.string.systemPermissionsDeniedDialogNegativeButton,
-                ),
-            )
-            .addEventListener(
-                object : StackedAlertDialogBuilder.EventListener() {
-                    override fun onButtonClicked(position: Int) {
-                        if (position == CHANGE_PERMISSIONS_BUTTON) {
-                            activity.launchApplicationInfoSettings()
+        if (isDuckAiAudioCapture) {
+            StackedAlertDialogBuilder(activity)
+                .setHeaderImageResource(CommonR.drawable.ic_microphone_24)
+                .setTitle(R.string.duckAiMicPermissionDeniedDialogTitle)
+                .setMessage(R.string.duckAiMicPermissionDeniedDialogContent)
+                .setStackedButtons(
+                    listOf(
+                        R.string.duckAiMicPermissionDeniedDialogPositiveButton,
+                        R.string.systemPermissionsDeniedDialogNegativeButton,
+                    ),
+                )
+                .addEventListener(
+                    object : StackedAlertDialogBuilder.EventListener() {
+                        override fun onButtonClicked(position: Int) {
+                            if (position == CHANGE_PERMISSIONS_BUTTON) {
+                                openAppSettings()
+                            }
                         }
-                    }
-                },
-            )
-            .show()
+                    },
+                )
+                .show()
+        } else {
+            val titleRes = when (permissionRequested) {
+                SitePermissionsRequestedType.CAMERA -> R.string.systemPermissionDialogCameraDeniedTitle
+                SitePermissionsRequestedType.AUDIO -> R.string.systemPermissionDialogAudioDeniedTitle
+                SitePermissionsRequestedType.CAMERA_AND_AUDIO -> R.string.systemPermissionDialogCameraAndAudioDeniedTitle
+                SitePermissionsRequestedType.LOCATION -> R.string.systemPermissionDialogLocationDeniedTitle
+            }
+            val contentRes = when (permissionRequested) {
+                SitePermissionsRequestedType.CAMERA -> R.string.systemPermissionDialogCameraDeniedContent
+                SitePermissionsRequestedType.AUDIO -> R.string.systemPermissionDialogAudioDeniedContent
+                SitePermissionsRequestedType.CAMERA_AND_AUDIO -> R.string.systemPermissionDialogCameraAndAudioDeniedContent
+                SitePermissionsRequestedType.LOCATION -> R.string.systemPermissionDialogLocationDeniedContent
+            }
+            TextAlertDialogBuilder(activity)
+                .setTitle(titleRes)
+                .setMessage(contentRes)
+                .setPositiveButton(R.string.systemPermissionsDeniedDialogPositiveButton)
+                .setNegativeButton(R.string.systemPermissionsDeniedDialogNegativeButton)
+                .addEventListener(
+                    object : TextAlertDialogBuilder.EventListener() {
+                        override fun onPositiveButtonClicked() {
+                            openAppSettings()
+                        }
+                    },
+                )
+                .show()
+        }
     }
 
     private fun storeFavicon(url: String) {

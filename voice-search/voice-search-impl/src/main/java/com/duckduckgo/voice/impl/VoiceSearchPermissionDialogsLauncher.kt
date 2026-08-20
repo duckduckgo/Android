@@ -32,7 +32,7 @@ import com.duckduckgo.mobile.android.R as CommonR
 interface VoiceSearchPermissionDialogsLauncher {
     fun showMicAccessDeniedDialog(
         context: Context,
-        mode: VoiceSearchMode?,
+        mode: VoiceSearchMode,
         onChangePermissionsSelected: () -> Unit = {},
         onHideVoiceSearchSelected: () -> Unit = {},
         onCancelled: () -> Unit = {},
@@ -54,7 +54,7 @@ class RealVoiceSearchPermissionDialogsLauncher @Inject constructor() : VoiceSear
 
     override fun showMicAccessDeniedDialog(
         context: Context,
-        mode: VoiceSearchMode?,
+        mode: VoiceSearchMode,
         onChangePermissionsSelected: () -> Unit,
         onHideVoiceSearchSelected: () -> Unit,
         onCancelled: () -> Unit,

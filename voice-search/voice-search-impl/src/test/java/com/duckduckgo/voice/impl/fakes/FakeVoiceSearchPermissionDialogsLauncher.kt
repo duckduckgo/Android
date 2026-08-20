@@ -33,7 +33,7 @@ class FakeVoiceSearchPermissionDialogsLauncher : VoiceSearchPermissionDialogsLau
 
     override fun showMicAccessDeniedDialog(
         context: Context,
-        mode: VoiceSearchMode?,
+        mode: VoiceSearchMode,
         onChangePermissionsSelected: () -> Unit,
         onHideVoiceSearchSelected: () -> Unit,
         onCancelled: () -> Unit,

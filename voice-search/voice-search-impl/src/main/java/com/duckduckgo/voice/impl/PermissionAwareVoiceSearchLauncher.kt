@@ -64,7 +64,7 @@ class PermissionAwareVoiceSearchLauncher @Inject constructor(
         if (voiceSearchPermissionCheck.hasRequiredPermissionsGranted()) {
             voiceSearchActivityLauncher.launch(activity, mode)
         } else {
-            permissionRequest.launch(activity, mode)
+            permissionRequest.launch(activity, mode ?: VoiceSearchMode.SEARCH)
         }
     }
 }

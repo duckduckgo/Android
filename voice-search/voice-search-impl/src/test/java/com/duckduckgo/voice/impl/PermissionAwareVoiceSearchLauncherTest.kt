@@ -61,7 +61,7 @@ class PermissionAwareVoiceSearchLauncherTest {
 
         testee.launch(mock())
 
-        verify(permissionRequest).launch(any(), anyOrNull())
+        verify(permissionRequest).launch(any(), any())
         verify(voiceSearchActivityLauncher, never()).launch(any(), anyOrNull())
     }
 
@@ -72,7 +72,7 @@ class PermissionAwareVoiceSearchLauncherTest {
 
         testee.launch(mock())
 
-        verify(permissionRequest, never()).launch(any(), anyOrNull())
+        verify(permissionRequest, never()).launch(any(), any())
         verify(voiceSearchActivityLauncher, never()).launch(any(), anyOrNull())
     }
 
@@ -84,7 +84,7 @@ class PermissionAwareVoiceSearchLauncherTest {
         testee.launch(mock())
 
         verify(voiceSearchActivityLauncher).launch(any(), anyOrNull())
-        verify(permissionRequest, never()).launch(any(), anyOrNull())
+        verify(permissionRequest, never()).launch(any(), any())
     }
 
     @Test
@@ -95,7 +95,7 @@ class PermissionAwareVoiceSearchLauncherTest {
         testee.launch(mock())
 
         verify(voiceSearchActivityLauncher, never()).launch(any(), anyOrNull())
-        verify(permissionRequest, never()).launch(any(), anyOrNull())
+        verify(permissionRequest, never()).launch(any(), any())
     }
 
     @Test
@@ -119,18 +119,18 @@ class PermissionAwareVoiceSearchLauncherTest {
         testee.launch(activity, VoiceSearchMode.DUCK_AI)
 
         verify(voiceSearchActivityLauncher).launch(activity, VoiceSearchMode.DUCK_AI)
-        verify(permissionRequest, never()).launch(any(), anyOrNull())
+        verify(permissionRequest, never()).launch(any(), any())
     }
 
     @Test
-    fun whenLaunchWithNullModeAndPermissionsNotGrantedThenPendingInitialModeIsNull() {
+    fun whenLaunchWithNullModeAndPermissionsNotGrantedThenPermissionRequestDefaultsToSearch() {
         val activity = mock<Activity>()
         whenever(voiceSearchPermissionCheck.hasRequiredPermissionsGranted()).thenReturn(false)
         whenever(voiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
 
         testee.launch(activity, null)
 
-        verify(permissionRequest).launch(activity, null)
+        verify(permissionRequest).launch(activity, VoiceSearchMode.SEARCH)
         verify(voiceSearchActivityLauncher, never()).launch(any(), anyOrNull())
     }
 

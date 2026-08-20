@@ -80,7 +80,7 @@ class MicrophonePermissionRequestTest {
     @Test
     fun whenLaunchThenGoStraightToSystemPrompt() {
         testee.registerResultsCallback(mock(), mock(), mock()) { }
-        testee.launch(mock(), null)
+        testee.launch(mock(), VoiceSearchMode.SEARCH)
 
         assertEquals(LaunchPermissionRequest, activityResultLauncherWrapper.lastKnownAction)
     }

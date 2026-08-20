@@ -39,7 +39,7 @@ interface PermissionRequest {
 
     fun launch(
         activity: Activity,
-        mode: VoiceSearchMode?,
+        mode: VoiceSearchMode,
     )
 }
 
@@ -53,7 +53,7 @@ class MicrophonePermissionRequest @Inject constructor(
     private lateinit var voiceSearchDisabled: () -> Unit
     private var requestAborted: () -> Unit = {}
 
-    private var pendingMode: VoiceSearchMode? = null
+    private var pendingMode: VoiceSearchMode = VoiceSearchMode.SEARCH
 
     override fun registerResultsCallback(
         caller: ActivityResultCaller,
@@ -81,7 +81,7 @@ class MicrophonePermissionRequest @Inject constructor(
 
     override fun launch(
         activity: Activity,
-        mode: VoiceSearchMode?,
+        mode: VoiceSearchMode,
     ) {
         pendingMode = mode
         activityResultLauncherWrapper.launch(LaunchPermissionRequest)
