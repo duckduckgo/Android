@@ -24,6 +24,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.browser.customtabs.CustomTabsIntent
+import androidx.core.view.ViewCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -35,6 +36,7 @@ import com.duckduckgo.app.browser.databinding.ActivityCustomTabBinding
 import com.duckduckgo.app.global.intentText
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.getColorFromAttr
+import com.duckduckgo.common.ui.view.isFullScreen
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
@@ -73,7 +75,11 @@ class CustomTabActivity : DuckDuckGoActivity() {
                 SystemBarStyle.light(toolbarColor, toolbarColor)
             }
             enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
-            edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.root, installScrim = false)
+            edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(
+                binding.root,
+                installScrim = false,
+                isFullScreen = { isFullScreen() },
+            )
             applyDisplayCutoutMode(resources.configuration.orientation)
         }
 
@@ -110,6 +116,13 @@ class CustomTabActivity : DuckDuckGoActivity() {
         transaction.addToBackStack(tabId)
         transaction.commit()
         newFragment.messageFromPreviousTab = message
+    }
+
+    override fun toggleFullScreen() {
+        super.toggleFullScreen()
+
+        // Fullscreen state is owned here, so re-apply insets to pick up the new state.
+        ViewCompat.requestApplyInsets(binding.root)
     }
 
     override fun onStart() {
