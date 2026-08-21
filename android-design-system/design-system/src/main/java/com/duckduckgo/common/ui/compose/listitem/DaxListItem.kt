@@ -21,6 +21,7 @@ package com.duckduckgo.common.ui.compose.listitem
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -40,6 +41,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.unit.dp
 import com.duckduckgo.common.ui.compose.DaxStatusIndicator
 import com.duckduckgo.common.ui.compose.Status
 import com.duckduckgo.common.ui.compose.button.DaxGhostButton
@@ -125,7 +127,8 @@ internal fun DaxListItem(
         }
 
         Column(
-            Modifier
+            verticalArrangement = Arrangement.spacedBy(2.dp),
+            modifier = Modifier
                 .weight(1f)
                 .alpha(if (enabled) 1f else DaxListItemDefaults.DisabledAlpha),
         ) {
