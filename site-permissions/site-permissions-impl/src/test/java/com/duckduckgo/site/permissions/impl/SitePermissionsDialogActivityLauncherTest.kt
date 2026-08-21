@@ -18,7 +18,13 @@ package com.duckduckgo.site.permissions.impl
 
 import android.app.Activity
 import android.net.Uri
+import android.os.Bundle
+import android.text.Spanned
+import android.text.style.ClickableSpan
 import android.webkit.PermissionRequest
+import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -37,9 +43,13 @@ import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions
 import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertFalse
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.Robolectric
+import org.robolectric.shadows.ShadowDialog
+import com.duckduckgo.mobile.android.R as CommonR
 
 @RunWith(AndroidJUnit4::class)
 class SitePermissionsDialogActivityLauncherTest {
@@ -261,5 +271,42 @@ class SitePermissionsDialogActivityLauncherTest {
         verify(sitePermissionsRepository, never()).sitePermissionGranted(any(), any(), any())
         verify(sitePermissionsRepository, never()).sitePermissionPermanentlySaved(any(), any(), any())
         verify(sitePermissionsRepository, never()).savePermission(any())
+    }
+
+    @Test
+    fun whenDrmLearnMoreClickedThenDialogDismissed() {
+        whenever(sitePermissionsRepository.getDrmForSession("tabId", "example.com")).thenReturn(null)
+        whenever(sitePermissionsRepository.isDrmBlockedForUrlByConfig(any())).thenReturn(false)
+
+        val activity = Robolectric.buildActivity(ThemedActivity::class.java).setup().get()
+        val request: PermissionRequest = mock()
+        whenever(request.resources).thenReturn(arrayOf(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID))
+
+        testee.askForSitePermission(
+            activity = activity,
+            url = "https://example.com",
+            tabId = "tabId",
+            permissionsRequested = SitePermissions(
+                autoAccept = emptyList(),
+                userHandled = listOf(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID),
+            ),
+            request = request,
+            permissionsGrantedListener = permissionsGrantedListener,
+        )
+
+        val dialog = ShadowDialog.getLatestDialog() as AlertDialog
+        val message = dialog.findViewById<TextView>(CommonR.id.textAlertDialogMessage)!!
+        val learnMore = (message.text as Spanned).getSpans(0, message.text.length, ClickableSpan::class.java).first()
+
+        learnMore.onClick(message)
+
+        assertFalse(dialog.isShowing)
+    }
+
+    class ThemedActivity : AppCompatActivity() {
+        override fun onCreate(savedInstanceState: Bundle?) {
+            setTheme(CommonR.style.Theme_DuckDuckGo_Light)
+            super.onCreate(savedInstanceState)
+        }
     }
 }
