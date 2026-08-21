@@ -1148,6 +1148,7 @@ private fun ComposeOneLineSwitch() {
     DaxOneLineListItem(
         primaryText = "Item with Switch Item",
         trailingContent = { Switch(checked = checked, onCheckedChange = { checked = it }) },
+        onClick = {},
     )
 }
 
@@ -1166,6 +1167,7 @@ private fun ComposeOneLineSwitchRounded() {
             )
         },
         trailingContent = { Switch(checked = checked, onCheckedChange = { checked = it }) },
+        onClick = {},
     )
 }
 
@@ -1414,6 +1416,7 @@ private fun ComposeTwoLineSwitch() {
         primaryText = "Two Line Item",
         secondaryText = "With Switch",
         trailingContent = { Switch(checked = checked, onCheckedChange = { checked = it }) },
+        onClick = {},
     )
 }
 
@@ -1426,6 +1429,7 @@ private fun ComposeTwoLineSwitchImage() {
         secondaryText = "With Leading Image and Switch",
         leadingContent = { Icon(painterResource(CommonR.drawable.ic_globe_24), null, size = DaxListItemIconSize.Small) },
         trailingContent = { Switch(checked = checked, onCheckedChange = { checked = it }) },
+        onClick = {},
     )
 }
 
@@ -1438,6 +1442,7 @@ private fun ComposeTwoLineSwitchPill() {
         secondaryText = "With Beta Pill and Switch",
         inlineContent = { Pill("Beta") },
         trailingContent = { Switch(checked = checked, onCheckedChange = { checked = it }) },
+        onClick = {},
     )
 }
 
@@ -1452,6 +1457,7 @@ private fun ComposeTwoLineSwitchTruncated() {
         leadingContent = { Icon(painterResource(CommonR.drawable.ic_globe_24), null, size = DaxListItemIconSize.Small) },
         trailingContent = { Switch(checked = checked, onCheckedChange = { checked = it }) },
         primaryMaxLines = 1,
+        onClick = {},
     )
 }
 
@@ -1465,6 +1471,7 @@ private fun ComposeTwoLineDisabled() {
         leadingContent = { Icon(painterResource(CommonR.drawable.ic_globe_24), null, size = DaxListItemIconSize.Small) },
         trailingContent = { Switch(checked = false, onCheckedChange = {}) },
         enabled = false,
+        onClick = {},
     )
 }
 
@@ -1478,6 +1485,7 @@ private fun ComposeTwoLineSwitchChecked() {
         leadingContent = { Icon(painterResource(CommonR.drawable.ic_globe_24), null, size = DaxListItemIconSize.Small) },
         trailingContent = { Switch(checked = true, onCheckedChange = {}) },
         enabled = false,
+        onClick = {},
     )
 }
 
@@ -1490,6 +1498,7 @@ private fun ComposeTwoLineSwitchDisabledChecked() {
         inlineContent = { Pill("Beta") },
         leadingContent = { Icon(painterResource(CommonR.drawable.ic_globe_24), null, size = DaxListItemIconSize.Small) },
         trailingContent = { Switch(checked = true, onCheckedChange = {}, enabled = false) },
+        onClick = {},
     )
 }
 
