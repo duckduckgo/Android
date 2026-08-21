@@ -37,6 +37,7 @@ internal object DaxListItemDefaults {
 
     val TrailingIconMedium: Dp = 24.dp
     val TrailingIconSmall: Dp = 16.dp
+    val TrailingIconFrame: Dp = 24.dp
     val TrailingIconTouchTarget: Dp = 48.dp
 
     const val DisabledAlpha: Float = 0.4f

@@ -355,16 +355,25 @@ class DaxListItemTrailingScope internal constructor(private val parentEnabled: B
                     modifier = modifier.size(DaxListItemDefaults.TrailingIconTouchTarget),
                 )
 
-                Spacer(Modifier.width(HorizontalPadding - (DaxListItemDefaults.TrailingIconTouchTarget - iconDp) / 2))
-            } else {
-                M3Icon(
-                    painter = painter,
-                    contentDescription = contentDescription,
-                    tint = tint ?: Color.Unspecified,
-                    modifier = modifier
-                        .size(iconDp)
-                        .alpha(if (parentEnabled) 1f else DaxListItemDefaults.DisabledAlpha),
+                Spacer(
+                    Modifier.width(
+                        HorizontalPadding - (DaxListItemDefaults.TrailingIconTouchTarget - DaxListItemDefaults.TrailingIconFrame) / 2,
+                    ),
                 )
+            } else {
+                Box(
+                    modifier = Modifier.size(DaxListItemDefaults.TrailingIconFrame),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    M3Icon(
+                        painter = painter,
+                        contentDescription = contentDescription,
+                        tint = tint ?: Color.Unspecified,
+                        modifier = modifier
+                            .size(iconDp)
+                            .alpha(if (parentEnabled) 1f else DaxListItemDefaults.DisabledAlpha),
+                    )
+                }
 
                 Spacer(Modifier.width(HorizontalPadding))
             }
