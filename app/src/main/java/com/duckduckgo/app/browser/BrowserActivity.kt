@@ -1123,6 +1123,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
                         is NewUserBrowserOnboardingViewModel.Command.OpenDuckAiOnboardingDemo -> {
                             launchDuckAi(url = command.url)
                         }
+                        NewUserBrowserOnboardingViewModel.Command.OpenEmptyNewTab -> {
+                            launchNewTab()
+                        }
                     }
                 }
             }

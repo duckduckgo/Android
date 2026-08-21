@@ -19,6 +19,7 @@ package com.duckduckgo.app.onboarding.orchestrator
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.onboarding.DuckAiOnboardingDemo
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.onboarding.api.LinearOnboardingHost
@@ -41,6 +42,7 @@ import javax.inject.Inject
 class NewUserBrowserOnboardingViewModel @Inject constructor(
     private val orchestrator: LinearOnboardingOrchestrator,
     private val duckChat: DuckChat,
+    private val duckAiOnboardingDemo: DuckAiOnboardingDemo,
 ) : ViewModel() {
 
     sealed interface Command {
@@ -49,10 +51,12 @@ class NewUserBrowserOnboardingViewModel @Inject constructor(
 
         /** Open Duck.ai at [url] to run the onboarding demo. */
         data class OpenDuckAiOnboardingDemo(val url: String) : Command
+
+        data object OpenEmptyNewTab : Command
     }
 
-    // Buffered (not conflated): HandOffToOnboardingActivity and OpenDuckAiOnboardingDemo are navigation
-    // commands that must each be delivered, even if BrowserActivity is briefly STOPPED when one is sent.
+    // Buffered (not conflated): every command is a navigation command that must be delivered, even if
+    // BrowserActivity is briefly STOPPED when one is sent.
     private val _commands = Channel<Command>(capacity = Channel.BUFFERED)
     val commands: Flow<Command> = _commands.receiveAsFlow()
 
@@ -82,6 +86,14 @@ class NewUserBrowserOnboardingViewModel @Inject constructor(
         if (step is NewUserBrowserActivityStep) {
             when (val action = step.resolveAction()) {
                 is NewUserBrowserActivityAction.RunDuckAiOnboardingDemo -> {
+                    if (duckAiOnboardingDemo.wasShown()) {
+                        // The demo ran in an earlier BrowserActivity instance, so replaying it would repeat a step the
+                        // user already completed. Land them on a clean tab instead and advance the plan.
+                        _commands.send(Command.OpenEmptyNewTab)
+                        orchestrator.onEvent(NewUserOnboardingEvent.DuckAiFireCompleted)
+                        return
+                    }
+                    duckAiOnboardingDemo.markShown()
                     val url = duckChat.getDuckChatUrl(action.prompt, autoPrompt = true) + "&flow=mobile-app-onboarding"
                     _commands.send(Command.OpenDuckAiOnboardingDemo(url))
                     orchestrator.onEvent(NewUserOnboardingEvent.Presented)

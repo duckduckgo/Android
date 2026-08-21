@@ -59,6 +59,10 @@ interface DuckAiOnboardingDemo {
 
     /** End the flow and dismiss the Duck.ai fire-button CTA. Safe to call more than once. */
     suspend fun finish()
+
+    fun markShown()
+
+    fun wasShown(): Boolean
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -87,6 +91,7 @@ class DuckAiOnboardingDemoImpl @Inject constructor(
             preferences.edit {
                 putBoolean(KEY_ACTIVE, false)
                 putBoolean(KEY_CENTRAL_TO_FLOW, false)
+                putBoolean(KEY_WAS_SHOWN, false)
             }
             PRE_DISMISSED_CTAS.forEach { dismissedCtaDao.delete(it) }
         }
@@ -95,6 +100,14 @@ class DuckAiOnboardingDemoImpl @Inject constructor(
     override fun isActive(): Boolean = preferences.getBoolean(KEY_ACTIVE, legacyActive())
 
     override fun wasCentralToOnboarding(): Boolean = preferences.getBoolean(KEY_CENTRAL_TO_FLOW, false)
+
+    override fun markShown() {
+        preferences.edit {
+            putBoolean(KEY_WAS_SHOWN, true)
+        }
+    }
+
+    override fun wasShown(): Boolean = preferences.getBoolean(KEY_WAS_SHOWN, false)
 
     /**
      * The state of the flow before this class owned it, so an instance that armed the demo pre-upgrade
@@ -114,6 +127,7 @@ class DuckAiOnboardingDemoImpl @Inject constructor(
         private const val FILENAME = "com.duckduckgo.app.onboarding.duckaidemo"
         private const val KEY_ACTIVE = "active"
         private const val KEY_CENTRAL_TO_FLOW = "centralToFlow"
+        private const val KEY_WAS_SHOWN = "wasShown"
 
         /**
          * Standard DAX onboarding CTAs the Duck.ai flow pre-dismisses when armed, so only the Duck.ai

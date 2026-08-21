@@ -17,6 +17,7 @@
 package com.duckduckgo.app.onboarding.orchestrator
 
 import app.cash.turbine.test
+import com.duckduckgo.app.onboarding.DuckAiOnboardingDemo
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.onboarding.api.LinearOnboardingEvent
@@ -34,6 +35,8 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 class NewUserBrowserOnboardingViewModelTest {
@@ -42,6 +45,7 @@ class NewUserBrowserOnboardingViewModelTest {
     val coroutineRule = CoroutineTestRule()
 
     private val duckChat: DuckChat = mock()
+    private val duckAiOnboardingDemo: DuckAiOnboardingDemo = mock()
     private val fakeOrchestrator = FakeOrchestrator()
 
     private class FakeOrchestrator : LinearOnboardingOrchestrator {
@@ -76,6 +80,7 @@ class NewUserBrowserOnboardingViewModelTest {
     private fun createViewModel() = NewUserBrowserOnboardingViewModel(
         orchestrator = fakeOrchestrator,
         duckChat = duckChat,
+        duckAiOnboardingDemo = duckAiOnboardingDemo,
     )
 
     @Test
@@ -133,6 +138,45 @@ class NewUserBrowserOnboardingViewModelTest {
         advanceUntilIdle()
 
         assertTrue(fakeOrchestrator.events.contains(NewUserOnboardingEvent.DuckAiFireCompleted))
+    }
+
+    @Test
+    fun `when duck ai demo step then marks demo shown`() = runTest {
+        whenever(duckChat.getDuckChatUrl("hello", autoPrompt = true)).thenReturn("https://duck.ai?q=hello")
+        val demoPlan = LinearOnboardingPlan(id = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, steps = listOf(duckAiDemoStep("hello")))
+        fakeOrchestrator.stateFlow.value =
+            InProgress(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, currentPlan = demoPlan, currentStepIndex = 0)
+        createViewModel()
+        advanceUntilIdle()
+
+        verify(duckAiOnboardingDemo).markShown()
+    }
+
+    @Test
+    fun `when duck ai demo already shown then opens empty new tab instead of the demo`() = runTest {
+        whenever(duckAiOnboardingDemo.wasShown()).thenReturn(true)
+        val demoPlan = LinearOnboardingPlan(id = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, steps = listOf(duckAiDemoStep("hello")))
+        fakeOrchestrator.stateFlow.value =
+            InProgress(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, currentPlan = demoPlan, currentStepIndex = 0)
+        val testee = createViewModel()
+
+        testee.commands.test {
+            assertEquals(NewUserBrowserOnboardingViewModel.Command.OpenEmptyNewTab, awaitItem())
+            expectNoEvents()
+        }
+        verify(duckAiOnboardingDemo, never()).markShown()
+    }
+
+    @Test
+    fun `when duck ai demo already shown then advances the plan`() = runTest {
+        whenever(duckAiOnboardingDemo.wasShown()).thenReturn(true)
+        val demoPlan = LinearOnboardingPlan(id = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, steps = listOf(duckAiDemoStep("hello")))
+        fakeOrchestrator.stateFlow.value =
+            InProgress(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, currentPlan = demoPlan, currentStepIndex = 0)
+        createViewModel()
+        advanceUntilIdle()
+
+        assertEquals(listOf(NewUserOnboardingEvent.DuckAiFireCompleted), fakeOrchestrator.events)
     }
 
     @Test
