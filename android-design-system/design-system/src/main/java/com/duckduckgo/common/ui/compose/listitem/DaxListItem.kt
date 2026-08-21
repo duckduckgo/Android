@@ -311,10 +311,11 @@ class DaxListItemTrailingScope internal constructor(private val parentEnabled: B
                     iconPainter = painter,
                     contentDescription = contentDescription,
                     enabled = effectiveEnabled,
+                    iconSize = iconDp,
                     modifier = modifier.size(DaxListItemDefaults.TrailingIconTouchTarget),
                 )
 
-                Spacer(Modifier.width(DaxListItemDefaults.TrailingIconButtonEndPadding))
+                Spacer(Modifier.width(HorizontalPadding - (DaxListItemDefaults.TrailingIconTouchTarget - iconDp) / 2))
             } else {
                 M3Icon(
                     painter = painter,
