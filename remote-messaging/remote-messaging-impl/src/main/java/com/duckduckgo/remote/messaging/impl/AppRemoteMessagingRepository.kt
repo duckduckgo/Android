@@ -29,7 +29,6 @@ import com.duckduckgo.remote.messaging.store.RemoteMessagingConfigRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.map
-import java.util.concurrent.TimeUnit
 
 interface RemoteMessagingRepository {
     fun getMessageById(id: String): RemoteMessage?
@@ -54,6 +53,7 @@ class AppRemoteMessagingRepository(
     private val messageMapper: MessageMapper,
     private val remoteMessageImageStore: RemoteMessageImageStore,
     private val currentTimeProvider: CurrentTimeProvider,
+    private val autoDismissEvaluator: RemoteMessageAutoDismissEvaluator,
 ) : RemoteMessagingRepository {
 
     override fun getMessageById(id: String): RemoteMessage? {
@@ -90,8 +90,8 @@ class AppRemoteMessagingRepository(
         if (messageEntity == null || messageEntity.message.isEmpty()) return null
 
         val remoteMessage = messageMapper.fromMessage(messageEntity.message) ?: return null
-        if (remoteMessage.shouldBeDismissed(messageEntity)) {
-            dismissMessageSilently(messageEntity.id)
+        if (autoDismissEvaluator.shouldAutoDismiss(remoteMessage, messageEntity)) {
+            markDismissed(messageEntity.id)
             return null
         }
         return remoteMessage
@@ -104,8 +104,8 @@ class AppRemoteMessagingRepository(
                 if (messageEntity == null || messageEntity.message.isEmpty()) return@map null
 
                 val remoteMessage = messageMapper.fromMessage(messageEntity.message) ?: return@map null
-                if (remoteMessage.shouldBeDismissed(messageEntity)) {
-                    dismissMessageSilently(messageEntity.id)
+                if (autoDismissEvaluator.shouldAutoDismiss(remoteMessage, messageEntity)) {
+                    markDismissed(messageEntity.id)
                     return@map null
                 }
                 RemoteMessage(
@@ -119,28 +119,9 @@ class AppRemoteMessagingRepository(
             }
     }
 
-    private fun RemoteMessage.shouldBeDismissed(entity: RemoteMessageEntity): Boolean =
-        isExpired(entity.firstShownDate) || hasReachedImpressionCap(entity.impressions)
+    override suspend fun dismissMessage(id: String) = markDismissed(id)
 
-    private fun RemoteMessage.isExpired(firstShownDate: Long?): Boolean {
-        val threshold = displayConditions?.dismissAfterDaysShown?.takeIf { it > 0 } ?: return false
-        val firstShown = firstShownDate ?: return false
-        val elapsedDays = TimeUnit.MILLISECONDS.toDays(currentTimeProvider.currentTimeMillis() - firstShown)
-        return elapsedDays >= threshold
-    }
-
-    private fun RemoteMessage.hasReachedImpressionCap(impressions: Int): Boolean {
-        val cap = displayConditions?.maxImpressions?.takeIf { it > 0 } ?: return false
-        return impressions >= cap
-    }
-
-    private fun dismissMessageSilently(id: String) {
-        // TODO add pixel for dismiss silently
-        remoteMessagesDao.updateState(id, Status.DISMISSED)
-        remoteMessagingConfigRepository.invalidate()
-    }
-
-    override suspend fun dismissMessage(id: String) {
+    private fun markDismissed(id: String) {
         remoteMessagesDao.updateState(id, Status.DISMISSED)
         remoteMessagingConfigRepository.invalidate()
     }
