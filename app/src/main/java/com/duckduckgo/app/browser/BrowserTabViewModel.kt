@@ -770,6 +770,9 @@ class BrowserTabViewModel @Inject constructor(
     private var accessibilityObserver: Job? = null
     private var isProcessingTrackingLink = false
     private var isLinkOpenedInNewTab = false
+
+    // Needed for PageLoadWideEvent: it identifies which page load the progress events belong to.
+    private var pageLoadNavigationId: Long? = null
     private var hasExitedFixedProgress = false
     private var hasCompletedPageLoad = false
 
@@ -2285,7 +2288,6 @@ class BrowserTabViewModel @Inject constructor(
 
         isProcessingTrackingLink = false
         isLinkOpenedInNewTab = false
-        hasExitedFixedProgress = false
         hasCompletedPageLoad = false
 
         automaticSavedLoginsMonitor.clearAutoSavedLoginId(tabId)
@@ -2528,6 +2530,11 @@ class BrowserTabViewModel @Inject constructor(
         logcat { "showPrivacyShield=false, showSearchIcon=true, showClearButton=true" }
     }
 
+    override fun onMainFrameLoadStarted(navigationId: Long) {
+        pageLoadNavigationId = navigationId
+        hasExitedFixedProgress = false
+    }
+
     override fun pageRefreshed(refreshedUrl: String) {
         logcat { "pageRefreshed URL: $url refreshedUrl $refreshedUrl" }
         if (url == null || refreshedUrl == url) {
@@ -2570,11 +2577,10 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         // Track the first time we escape from max progress threshold for Wide Events
-        val currentUrl = webViewNavigationState.currentUrl
         val progressThreshold = if (progressBarUpgradeFeature.behaviourUpdate().isEnabled()) UPGRADED_PROGRESS_THRESHOLD else FIXED_PROGRESS
-        if (!hasExitedFixedProgress && currentUrl != null && newProgress > progressThreshold) {
+        if (!hasExitedFixedProgress && newProgress > progressThreshold) {
             hasExitedFixedProgress = true
-            pageLoadWideEvent.onProgressChanged(tabId, currentUrl)
+            pageLoadNavigationId?.let { pageLoadWideEvent.onProgressChanged(tabId, it) }
         }
 
         loadingViewState.value = progress.copy(isLoading = isLoading, progress = reportedProgress, url = site?.url ?: "")

@@ -49,38 +49,40 @@ import kotlin.time.Duration.Companion.seconds
 /**
  * Tracks page load events as Wide Event flows with multi-phase tracking.
  * Manages flow lifecycle: page_start → page_visible → page_escaped_max_progress → page_finish
+ *
+ * A flow is identified by the navigationId it was started with, never by url: callers report against a load after the
+ * point where its url can still change under them (redirects) or where the load can already have been replaced, so a
+ * url-keyed flow both loses the events of its own load and can be claimed by a later one.
  */
 interface PageLoadWideEvent {
     /**
      * Called when a page starts loading.
+     * Starting a load ends whatever load was previously tracked for this tab, whether or not [url] is tracked: the
+     * previous flow can no longer receive events, so leaving it open would only emit an abandoned event on cleanup.
      * @param tabId The unique identifier for the tab
      * @param url The URL of the page being loaded
-     * @param navigationId Identifies this navigation for the measurements that are reported against it later. Must be
-     * unique for the lifetime of the process, and the same value must be passed to [onContentScopeExperimentsResolved]
-     * and [onJsInjectionComplete] for this navigation.
+     * @param navigationId Identifies this load for every measurement reported against it later. Must be unique for the
+     * lifetime of the process, and the same value must be passed to every other callback for this load.
      */
     fun onPageStarted(tabId: String, url: String, navigationId: Long)
 
     /**
      * Called when a page becomes visible to the user.
      * @param tabId The unique identifier for the tab
-     * @param url The URL of the page being loaded
+     * @param navigationId The id given to [onPageStarted] for the load this belongs to
      * @param progress The current page load progress (0-100)
      */
-    fun onPageVisible(tabId: String, url: String, progress: Int)
+    fun onPageVisible(tabId: String, navigationId: Long, progress: Int)
 
     /**
      * Called when page progress changes and escapes the max progress threshold state.
      * @param tabId The unique identifier for the tab
-     * @param url The URL of the page being loaded
+     * @param navigationId The id given to [onPageStarted] for the load this belongs to
      */
-    fun onProgressChanged(tabId: String, url: String)
+    fun onProgressChanged(tabId: String, navigationId: Long)
 
     /**
      * Called once the active content scope experiments have been resolved, which page start awaits before it can inject.
-     *
-     * Attributed by [navigationId] rather than by url, because callers defer this past the point where their navigation
-     * can end: a later load of the same url in the same tab would otherwise be able to claim the measurement.
      * @param tabId The unique identifier for the tab
      * @param navigationId The id given to [onPageStarted] for the navigation that triggered the injection
      */
@@ -97,7 +99,7 @@ interface PageLoadWideEvent {
     /**
      * Called when a page finishes loading (either successfully or with an error).
      * @param tabId The unique identifier for the tab
-     * @param url The URL of the page that finished loading
+     * @param navigationId The id given to [onPageStarted] for the load that finished
      * @param errorDescription Optional error description. If null, indicates successful load.
      * @param isTabInForegroundOnFinish Whether the tab was in the foreground when finished
      * @param activeRequestsOnLoadStart Number of parallel requests when page load started
@@ -105,7 +107,7 @@ interface PageLoadWideEvent {
      */
     fun onPageLoadFinished(
         tabId: String,
-        url: String,
+        navigationId: Long,
         errorDescription: String? = null,
         isTabInForegroundOnFinish: Boolean,
         activeRequestsOnLoadStart: Int,
@@ -138,19 +140,17 @@ class RealPageLoadWideEvent @Inject constructor(
     private val activeFlows = ConcurrentHashMap<String, PageLoadState>()
 
     override fun onPageStarted(tabId: String, url: String, navigationId: Long) {
-        if (!shouldTrackUrl(url)) return
         val startedAt = currentTimeProvider.elapsedRealtime()
         coroutineScope.launch {
             mutex.withLock {
                 if (!isFeatureEnabled()) return@launch
-                if (isInProgress(tabId, url)) return@launch
 
-                val existingState = activeFlows[tabId]
-                if (existingState != null && existingState.url != url) {
-                    logcat { "Cancelling previous flow for tabId=$tabId (${existingState.url} → $url)" }
-                    activeFlows.remove(tabId)
-                    wideEventClient.flowAbort(existingState.flowId)
+                activeFlows.remove(tabId)?.let { previous ->
+                    logcat { "Cancelling previous flow for tabId=$tabId, flowId=${previous.flowId} (${previous.url} → $url)" }
+                    wideEventClient.flowAbort(previous.flowId)
                 }
+
+                if (!shouldTrackUrl(url)) return@launch
 
                 val result = wideEventClient.flowStart(
                     name = PAGE_LOAD_FEATURE_NAME,
@@ -190,22 +190,22 @@ class RealPageLoadWideEvent @Inject constructor(
         }
     }
 
-    override fun onPageVisible(tabId: String, url: String, progress: Int) {
-        updateWideEventAsync(tabId, url) { flowId ->
+    override fun onPageVisible(tabId: String, navigationId: Long, progress: Int) {
+        updateWideEventAsync(tabId, navigationId, onceForStep = STEP_PAGE_VISIBLE) { state ->
             wideEventClient.intervalEnd(
-                wideEventId = flowId,
+                wideEventId = state.flowId,
                 key = KEY_ELAPSED_TIME_TO_VISIBLE,
             )
 
             wideEventClient.flowStep(
-                wideEventId = flowId,
+                wideEventId = state.flowId,
                 stepName = STEP_PAGE_VISIBLE,
                 metadata = mapOf(
                     KEY_PROGRESS to (progress >= FIXED_PROGRESS_THRESHOLD).toString(),
                 ),
             )
 
-            logcat { "Page visible recorded: flowId=$flowId, progress=$progress" }
+            logcat { "Page visible recorded: flowId=${state.flowId}, progress=$progress" }
         }
     }
 
@@ -227,30 +227,31 @@ class RealPageLoadWideEvent @Inject constructor(
         )
     }
 
-    override fun onProgressChanged(tabId: String, url: String) {
-        updateWideEventAsync(tabId, url) { flowId ->
+    override fun onProgressChanged(tabId: String, navigationId: Long) {
+        updateWideEventAsync(tabId, navigationId, onceForStep = STEP_PAGE_ESCAPED_FIXED_PROGRESS) { state ->
             wideEventClient.intervalEnd(
-                wideEventId = flowId,
+                wideEventId = state.flowId,
                 key = KEY_ELAPSED_TIME_TO_ESCAPED_FIXED_PROGRESS,
             )
             wideEventClient.flowStep(
-                wideEventId = flowId,
+                wideEventId = state.flowId,
                 stepName = STEP_PAGE_ESCAPED_FIXED_PROGRESS,
             )
-            logcat { "Exited max progress threshold: flowId=$flowId" }
+            logcat { "Exited max progress threshold: flowId=${state.flowId}" }
         }
     }
 
     override fun onPageLoadFinished(
         tabId: String,
-        url: String,
+        navigationId: Long,
         errorDescription: String?,
         isTabInForegroundOnFinish: Boolean,
         activeRequestsOnLoadStart: Int,
         concurrentRequestsOnFinish: Int,
     ) {
-        updateWideEventAsync(tabId, url) { flowId ->
-            popActiveFlowId(tabId)
+        updateWideEventAsync(tabId, navigationId) { state ->
+            val flowId = state.flowId
+            activeFlows.remove(tabId)
             val isSuccess = errorDescription == null
             val outcome = if (isSuccess) "success" else "error"
 
@@ -296,11 +297,6 @@ class RealPageLoadWideEvent @Inject constructor(
         }
     }
 
-    private fun isInProgress(tabId: String, url: String): Boolean {
-        val state = activeFlows[tabId] ?: return false
-        return state.url == url && !state.isStale()
-    }
-
     private fun shouldTrackUrl(url: String): Boolean {
         if (url.isBlank()) return false
         if (url == ABOUT_BLANK) return false
@@ -320,31 +316,14 @@ class RealPageLoadWideEvent @Inject constructor(
         key: String,
     ) {
         val measuredAt = currentTimeProvider.elapsedRealtime()
-        coroutineScope.launch {
-            mutex.withLock {
-                if (!isFeatureEnabled()) return@withLock
-                val state = activeFlows[tabId] ?: return@withLock
-                // Matched on the navigation rather than the url: callers defer these measurements past the point where
-                // their navigation can end, and a later load of the same url in this tab must not claim them.
-                if (state.navigationId != navigationId) {
-                    logcat { "Dropping $key from navigation $navigationId, tabId=$tabId is on ${state.navigationId}" }
-                    return@withLock
-                }
-                if (state.isStale()) return@withLock
-                // First value wins, so a callback repeated for this navigation cannot overwrite the measurement already
-                // taken for it.
-                if (!state.recordedMeasurementKeys.add(key)) {
-                    logcat { "Ignoring repeat $key measurement for flowId=${state.flowId}" }
-                    return@withLock
-                }
-                val bucket = lowerBoundBucket(measuredAt - state.startedAt)
-                wideEventClient.flowStep(
-                    wideEventId = state.flowId,
-                    stepName = stepName,
-                    metadata = mapOf(key to bucket),
-                )
-                logcat { "Recorded $key=$bucket for flowId=${state.flowId}" }
-            }
+        updateWideEventAsync(tabId, navigationId, onceForStep = stepName) { state ->
+            val bucket = lowerBoundBucket(measuredAt - state.startedAt)
+            wideEventClient.flowStep(
+                wideEventId = state.flowId,
+                stepName = stepName,
+                metadata = mapOf(key to bucket),
+            )
+            logcat { "Recorded $key=$bucket for flowId=${state.flowId}" }
         }
     }
 
@@ -353,36 +332,39 @@ class RealPageLoadWideEvent @Inject constructor(
 
     private fun updateWideEventAsync(
         tabId: String,
-        url: String,
-        operation: suspend (Long) -> Unit,
+        navigationId: Long,
+        onceForStep: String? = null,
+        operation: suspend (PageLoadState) -> Unit,
     ) {
         coroutineScope.launch {
             mutex.withLock {
-                if (isFeatureEnabled() && isInProgress(tabId, url)) {
-                    getActiveFlowId(tabId)?.let { flowId -> operation(flowId) }
+                if (!isFeatureEnabled()) return@withLock
+                val state = activeFlowFor(tabId, navigationId) ?: return@withLock
+                if (onceForStep != null && !state.recordedSteps.add(onceForStep)) {
+                    logcat { "Ignoring repeat $onceForStep for flowId=${state.flowId}" }
+                    return@withLock
                 }
+                operation(state)
             }
         }
     }
 
-    private suspend fun isFeatureEnabled(): Boolean = withContext(dispatchers.io()) {
-        androidBrowserConfigFeature.get().sendPageLoadWideEvent().isEnabled()
-    }
-
-    private fun getActiveFlowId(tabId: String): Long? {
+    private fun activeFlowFor(tabId: String, navigationId: Long): PageLoadState? {
         val state = activeFlows[tabId]
         if (state == null) {
             logcat { "No active flow found for tabId=$tabId" }
+            return null
         }
-        return state?.flowId
+        if (state.navigationId != navigationId) {
+            logcat { "Dropping event from navigation $navigationId, tabId=$tabId is on ${state.navigationId}" }
+            return null
+        }
+        if (state.isStale()) return null
+        return state
     }
 
-    private fun popActiveFlowId(tabId: String): Long? {
-        val state = activeFlows.remove(tabId)
-        if (state == null) {
-            logcat { "No active flow found to pop for tabId=$tabId" }
-        }
-        return state?.flowId
+    private suspend fun isFeatureEnabled(): Boolean = withContext(dispatchers.io()) {
+        androidBrowserConfigFeature.get().sendPageLoadWideEvent().isEnabled()
     }
 
     private inner class PageLoadState(
@@ -392,7 +374,7 @@ class RealPageLoadWideEvent @Inject constructor(
         val startedAt: Long,
         val createdAt: Long = currentTimeProvider.currentTimeMillis(),
     ) {
-        val recordedMeasurementKeys: MutableSet<String> = mutableSetOf()
+        val recordedSteps: MutableSet<String> = mutableSetOf()
 
         fun isStale(): Boolean =
             currentTimeProvider.currentTimeMillis() - createdAt > CLEANUP_TIMEOUT.inWholeMilliseconds

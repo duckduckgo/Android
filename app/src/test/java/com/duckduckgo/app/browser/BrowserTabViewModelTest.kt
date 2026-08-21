@@ -11370,19 +11370,34 @@ class BrowserTabViewModelTest {
         whenever(mockStack.currentItem).thenReturn(mockWebHistoryItem)
         setBrowserShowing(true)
         loadUrl(testUrl)
+        testee.onMainFrameLoadStarted(11L)
 
         testee.progressChanged(60, WebViewNavigationState(mockStack, 60))
 
         val tabIdCaptor = argumentCaptor<String>()
-        val urlCaptor = argumentCaptor<String>()
+        val navigationIdCaptor = argumentCaptor<Long>()
 
         verify(mockPageLoadWideEvent).onProgressChanged(
             tabIdCaptor.capture(),
-            urlCaptor.capture(),
+            navigationIdCaptor.capture(),
         )
 
         assertNotNull(tabIdCaptor.firstValue)
-        assertEquals(testUrl, urlCaptor.firstValue)
+        assertEquals(11L, navigationIdCaptor.firstValue)
+    }
+
+    @Test
+    fun whenProgressExceedsFixedProgressBeforeAPageLoadStartedThenManagerNotCalled() {
+        val testUrl = "https://example.com"
+        val mockWebHistoryItem: WebHistoryItem = mock()
+        whenever(mockWebHistoryItem.url).thenReturn(testUrl)
+        whenever(mockStack.currentItem).thenReturn(mockWebHistoryItem)
+        setBrowserShowing(true)
+        loadUrl(testUrl)
+
+        testee.progressChanged(60, WebViewNavigationState(mockStack, 60))
+
+        verify(mockPageLoadWideEvent, never()).onProgressChanged(any(), any())
     }
 
     @Test
@@ -11393,6 +11408,7 @@ class BrowserTabViewModelTest {
         whenever(mockStack.currentItem).thenReturn(mockWebHistoryItem)
         setBrowserShowing(true)
         loadUrl(testUrl)
+        testee.onMainFrameLoadStarted(11L)
 
         // First time - should trigger call
         testee.progressChanged(60, WebViewNavigationState(mockStack, 60))
@@ -11414,6 +11430,7 @@ class BrowserTabViewModelTest {
         whenever(mockStack.currentItem).thenReturn(mockWebHistoryItem)
         setBrowserShowing(true)
         loadUrl(testUrl)
+        testee.onMainFrameLoadStarted(11L)
 
         // Progress below FIXED_PROGRESS (50) - should NOT call manager
         testee.progressChanged(30, WebViewNavigationState(mockStack, 30))
@@ -11434,16 +11451,41 @@ class BrowserTabViewModelTest {
         // First page load
         whenever(mockStack.currentItem).thenReturn(mockWebHistoryItem1)
         loadUrl(firstUrl)
+        testee.onMainFrameLoadStarted(11L)
         testee.progressChanged(60, WebViewNavigationState(mockStack, 60))
-        verify(mockPageLoadWideEvent).onProgressChanged(any(), eq(firstUrl))
+        verify(mockPageLoadWideEvent).onProgressChanged(any(), eq(11L))
 
-        // New page load - resets hasExitedFixedProgress flag
+        // New page load
         whenever(mockStack.currentItem).thenReturn(mockWebHistoryItem2)
         loadUrl(secondUrl)
+        testee.onMainFrameLoadStarted(12L)
         testee.progressChanged(70, WebViewNavigationState(mockStack, 70))
 
-        // Verify second call with new URL
-        verify(mockPageLoadWideEvent).onProgressChanged(any(), eq(secondUrl))
+        // Verify the second load is reported against its own navigation, not the one before it
+        verify(mockPageLoadWideEvent).onProgressChanged(any(), eq(12L))
+    }
+
+    @Test
+    fun whenProgressExceedsFixedProgressAfterSameHostRedirectThenReportedAgainstTheNewLoad() {
+        val firstUrl = "https://example.com/first"
+        val redirectedUrl = "https://example.com/second"
+        val mockWebHistoryItem: WebHistoryItem = mock()
+        whenever(mockWebHistoryItem.url).thenReturn(firstUrl)
+        whenever(mockStack.currentItem).thenReturn(mockWebHistoryItem)
+        setBrowserShowing(true)
+        loadUrl(firstUrl)
+
+        testee.onMainFrameLoadStarted(11L)
+        testee.progressChanged(60, WebViewNavigationState(mockStack, 60))
+        verify(mockPageLoadWideEvent).onProgressChanged(any(), eq(11L))
+
+        // A redirect within the same host compares as UrlUpdated rather than NewPage, so nothing url-driven runs
+        // between the two loads: the page start is the only signal that a new flow is being measured.
+        whenever(mockWebHistoryItem.url).thenReturn(redirectedUrl)
+        testee.onMainFrameLoadStarted(12L)
+        testee.progressChanged(70, WebViewNavigationState(mockStack, 70))
+
+        verify(mockPageLoadWideEvent).onProgressChanged(any(), eq(12L))
     }
 
     @Test
@@ -11454,6 +11496,7 @@ class BrowserTabViewModelTest {
         whenever(mockStack.currentItem).thenReturn(mockWebHistoryItem)
         setBrowserShowing(true)
         loadUrl(testUrl)
+        testee.onMainFrameLoadStarted(11L)
 
         testee.progressChanged(50, WebViewNavigationState(mockStack, 50))
 
