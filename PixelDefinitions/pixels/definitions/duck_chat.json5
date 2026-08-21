@@ -494,9 +494,8 @@
             "appVersion",
             {
                 "key": "duck_ai_enabled",
-                "type": "string",
-                "description": "Whether the Duck.ai global setting is enabled",
-                "enum": ["true", "false"]
+                "type": "boolean",
+                "description": "Whether the Duck.ai global setting is enabled"
             },
             {
                 "key": "input_screen_enabled",
@@ -514,9 +513,8 @@
             "appVersion",
             {
                 "key": "duck_ai_enabled",
-                "type": "string",
-                "description": "Whether the Duck.ai global setting is enabled",
-                "enum": ["true", "false"]
+                "type": "boolean",
+                "description": "Whether the Duck.ai global setting is enabled"
             },
             {
                 "key": "input_screen_enabled",

@@ -19,8 +19,8 @@ package com.duckduckgo.duckchat.impl.pixel
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.ToggleSelection
-import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.ReportMetric
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_ACCEPT_TERMS_AND_CONDITIONS
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_CREATE_NEW_CHAT
@@ -55,6 +55,8 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_CONTEXTUAL
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SETTING_AUTOMATIC_PAGE_CONTENT_DISABLED_DAILY
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SETTING_AUTOMATIC_PAGE_CONTENT_ENABLED_COUNT
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SETTING_AUTOMATIC_PAGE_CONTENT_ENABLED_DAILY
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_ENTRY_POINT_COUNT
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_ENTRY_POINT_DAILY
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_KEYBOARD_RETURN_PRESSED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_OPEN
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_OPEN_HISTORY
@@ -68,9 +70,13 @@ import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.clearInvocations
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -88,7 +94,6 @@ class RealDuckChatPixelsTest {
     private val statisticsUpdater: StatisticsUpdater = mock()
     private val duckAiMetricCollector: DuckAiMetricCollector = mock()
     private val mockTermsOfServiceHandler: DuckChatTermsOfServiceHandler = mock()
-    private val mockDuckChatInternal: DuckChatInternal = mock()
 
     private lateinit var testee: RealDuckChatPixels
 
@@ -99,7 +104,6 @@ class RealDuckChatPixelsTest {
         testee = RealDuckChatPixels(
             pixel = mockPixel,
             duckChatFeatureRepository = mockDuckChatFeatureRepository,
-            duckChatInternal = mockDuckChatInternal,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             statisticsUpdater = statisticsUpdater,
@@ -372,6 +376,48 @@ class RealDuckChatPixelsTest {
     }
 
     @Test
+    fun `when reportDuckChatEntry then fires count and daily with bounded entry context`() = runTest {
+        testee.reportDuckChatEntry(
+            entryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
+            opensNewTab = false,
+            hasPrompt = true,
+            duckAiEnabled = true,
+            inputScreenEnabled = true,
+        )
+
+        advanceUntilIdle()
+
+        val params = mapOf(
+            "source" to "address_bar_prompt",
+            "duck_ai_enabled" to "true",
+            "input_screen_enabled" to "true",
+            "opens_new_tab" to "false",
+            "has_prompt" to "true",
+        )
+        verify(mockPixel).fire(DUCK_CHAT_ENTRY_POINT_COUNT, params)
+        verify(mockPixel).fire(DUCK_CHAT_ENTRY_POINT_DAILY, params, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun `every DuckChatEntryPoint maps to its lower snake case wire value`() = runTest {
+        DuckChatEntryPoint.entries.forEach { entryPoint ->
+            clearInvocations(mockPixel)
+
+            testee.reportDuckChatEntry(entryPoint, opensNewTab = true, hasPrompt = false, duckAiEnabled = true, inputScreenEnabled = true)
+            advanceUntilIdle()
+
+            val parameters = argumentCaptor<Map<String, String>>()
+            verify(mockPixel).fire(
+                eq(DUCK_CHAT_ENTRY_POINT_COUNT),
+                parameters.capture(),
+                eq(emptyMap()),
+                eq(Pixel.PixelType.Count),
+            )
+            assertEquals(entryPoint.name.lowercase(), parameters.firstValue["source"])
+        }
+    }
+
+    @Test
     fun `when reportContextualSuggestionsCatalogLoadFailed then fires count and daily`() = runTest {
         testee.reportContextualSuggestionsCatalogLoadFailed()
 
@@ -458,9 +504,7 @@ class RealDuckChatPixelsTest {
 
     @Test
     fun whenFireOmnibarShownWithToggleVisibleThenParamsReflectIt() = runTest {
-        whenever(mockDuckChatInternal.resolvedTogglePosition()).thenReturn(ToggleSelection.SEARCH)
-
-        testee.fireOmnibarShown()
+        testee.fireOmnibarShown(toggleVisible = true)
 
         advanceUntilIdle()
 
@@ -475,9 +519,7 @@ class RealDuckChatPixelsTest {
 
     @Test
     fun whenFireOmnibarShownWithNoToggleThenParamsReflectIt() = runTest {
-        whenever(mockDuckChatInternal.resolvedTogglePosition()).thenReturn(null)
-
-        testee.fireOmnibarShown()
+        testee.fireOmnibarShown(toggleVisible = false)
 
         advanceUntilIdle()
 

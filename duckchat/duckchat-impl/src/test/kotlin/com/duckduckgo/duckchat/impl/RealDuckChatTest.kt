@@ -26,7 +26,6 @@ import androidx.lifecycle.Lifecycle.State.CREATED
 import androidx.lifecycle.testing.TestLifecycleOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browsermode.api.BrowserMode
@@ -40,7 +39,7 @@ import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
-import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.repository.AddressBarPickerAttributionRepository
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
@@ -52,6 +51,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.sync.api.DeviceSyncState
 import com.squareup.moshi.Moshi
+import dagger.Lazy
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -97,7 +97,7 @@ class RealDuckChatTest {
     private val dispatcherProvider = coroutineRule.testDispatcherProvider
     private val mockGlobalActivityStarter: GlobalActivityStarter = mock()
     private val mockContext: Context = mock()
-    private val mockPixel: Pixel = mock()
+    private val mockDuckChatPixels: DuckChatPixels = mock()
     private val mockIntent: Intent = mock()
     private val mockBrowserNav: BrowserNav = mock()
     private val imageUploadFeature: AIChatImageUploadFeature = FakeFeatureToggleFactory.create(AIChatImageUploadFeature::class.java)
@@ -141,7 +141,7 @@ class RealDuckChatTest {
                 mockContext,
                 true,
                 coroutineRule.testScope,
-                mockPixel,
+                Lazy { mockDuckChatPixels },
                 imageUploadFeature,
                 mockBrowserNav,
                 mockDeviceSyncState,
@@ -625,25 +625,19 @@ class RealDuckChatTest {
     }
 
     @Test
-    fun whenDuckChatEntryReportedThenCountAndDailyCarryBoundedContext() = runTest {
+    fun whenDuckChatEntryReportedThenDelegatesBoundedContextToDuckChatPixels() = runTest {
         testee.reportDuckChatEntry(
             entryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
             opensNewTab = false,
             hasPrompt = true,
         )
 
-        val parameters = mapOf(
-            "source" to "address_bar_prompt",
-            "duck_ai_enabled" to "true",
-            "input_screen_enabled" to "true",
-            "opens_new_tab" to "false",
-            "has_prompt" to "true",
-        )
-        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_ENTRY_POINT_COUNT, parameters = parameters)
-        verify(mockPixel).fire(
-            DuckChatPixelName.DUCK_CHAT_ENTRY_POINT_DAILY,
-            parameters = parameters,
-            type = Pixel.PixelType.Daily(),
+        verify(mockDuckChatPixels).reportDuckChatEntry(
+            entryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
+            opensNewTab = false,
+            hasPrompt = true,
+            duckAiEnabled = true,
+            inputScreenEnabled = true,
         )
     }
 
@@ -651,37 +645,13 @@ class RealDuckChatTest {
     fun whenContextualPromptOpensFullscreenThenContextualEntryIsReportedExactlyOnce() = runTest {
         testee.openDuckChatWithAutoPrompt("contextual prompt", DuckChatEntryPoint.CONTEXTUAL_CHAT)
 
-        val parameters = mapOf(
-            "source" to "contextual_chat",
-            "duck_ai_enabled" to "true",
-            "input_screen_enabled" to "true",
-            "opens_new_tab" to "true",
-            "has_prompt" to "true",
+        verify(mockDuckChatPixels, times(1)).reportDuckChatEntry(
+            entryPoint = DuckChatEntryPoint.CONTEXTUAL_CHAT,
+            opensNewTab = true,
+            hasPrompt = true,
+            duckAiEnabled = true,
+            inputScreenEnabled = true,
         )
-        verify(mockPixel, times(1)).fire(DuckChatPixelName.DUCK_CHAT_ENTRY_POINT_COUNT, parameters = parameters)
-        verify(mockPixel, times(1)).fire(
-            DuckChatPixelName.DUCK_CHAT_ENTRY_POINT_DAILY,
-            parameters = parameters,
-            type = Pixel.PixelType.Daily(),
-        )
-    }
-
-    @Test
-    fun everyDuckChatEntryPointMapsToItsLowerSnakeCaseWireValue() = runTest {
-        DuckChatEntryPoint.entries.forEach { entryPoint ->
-            clearInvocations(mockPixel)
-
-            testee.reportDuckChatEntry(entryPoint, opensNewTab = true, hasPrompt = false)
-
-            val parameters = argumentCaptor<Map<String, String>>()
-            verify(mockPixel).fire(
-                eq(DuckChatPixelName.DUCK_CHAT_ENTRY_POINT_COUNT),
-                parameters.capture(),
-                eq(emptyMap()),
-                eq(Pixel.PixelType.Count),
-            )
-            assertEquals(entryPoint.name.lowercase(), parameters.firstValue["source"])
-        }
     }
 
     @Test
@@ -695,27 +665,28 @@ class RealDuckChatTest {
         testee.openDuckChatWithPrefill("prefill", DuckChatEntryPoint.DIRECT_URL)
         testee.openVoiceDuckChat(DuckChatEntryPoint.VOICE)
 
-        val parameters = argumentCaptor<Map<String, String>>()
-        verify(mockPixel, times(8)).fire(
-            eq(DuckChatPixelName.DUCK_CHAT_ENTRY_POINT_COUNT),
-            parameters.capture(),
-            eq(emptyMap()),
-            eq(Pixel.PixelType.Count),
+        val entryPoints = argumentCaptor<DuckChatEntryPoint>()
+        val hasPrompts = argumentCaptor<Boolean>()
+        verify(mockDuckChatPixels, times(8)).reportDuckChatEntry(
+            entryPoint = entryPoints.capture(),
+            opensNewTab = eq(true),
+            hasPrompt = hasPrompts.capture(),
+            duckAiEnabled = eq(true),
+            inputScreenEnabled = eq(true),
         )
         assertEquals(
             listOf(
-                "chat_history_new_chat" to "false",
-                "suggestion_ask_ai" to "true",
-                "system_search" to "false",
-                "digital_assistant" to "false",
-                "direct_url" to "false",
-                "address_bar_prompt" to "true",
-                "direct_url" to "false",
-                "voice" to "false",
+                DuckChatEntryPoint.CHAT_HISTORY_NEW_CHAT to false,
+                DuckChatEntryPoint.SUGGESTION_ASK_AI to true,
+                DuckChatEntryPoint.SYSTEM_SEARCH to false,
+                DuckChatEntryPoint.DIGITAL_ASSISTANT to false,
+                DuckChatEntryPoint.DIRECT_URL to false,
+                DuckChatEntryPoint.ADDRESS_BAR_PROMPT to true,
+                DuckChatEntryPoint.DIRECT_URL to false,
+                DuckChatEntryPoint.VOICE to false,
             ),
-            parameters.allValues.map { it.getValue("source") to it.getValue("has_prompt") },
+            entryPoints.allValues.zip(hasPrompts.allValues),
         )
-        assertTrue(parameters.allValues.all { it["opens_new_tab"] == "true" })
     }
 
     @Test

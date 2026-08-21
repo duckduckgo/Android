@@ -26,7 +26,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browsermode.api.BrowserMode
@@ -45,8 +44,7 @@ import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
-import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
-import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.repository.AddressBarPickerAttributionRepository
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
@@ -59,6 +57,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import dagger.Lazy
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -462,7 +461,7 @@ class RealDuckChat @Inject constructor(
     private val context: Context,
     @IsMainProcess private val isMainProcess: Boolean,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val pixel: Pixel,
+    private val duckChatPixels: Lazy<DuckChatPixels>,
     private val imageUploadFeature: AIChatImageUploadFeature,
     private val browserNav: BrowserNav,
     private val deviceSyncState: DeviceSyncState,
@@ -800,19 +799,12 @@ class RealDuckChat @Inject constructor(
         opensNewTab: Boolean,
         hasPrompt: Boolean,
     ) {
-        val parameters = mapOf(
-            DuckChatPixelParameters.ENTRY_SOURCE to entryPoint.toPixelValue(),
-            DuckChatPixelParameters.DUCK_AI_ENABLED to isEnabled().toString(),
-            DuckChatPixelParameters.INPUT_SCREEN_ENABLED to
-                (inputModeCapability.value == NativeInputState.InputMode.SEARCH_AND_DUCK_AI).toString(),
-            DuckChatPixelParameters.OPENS_NEW_TAB to opensNewTab.toString(),
-            DuckChatPixelParameters.HAS_PROMPT to hasPrompt.toString(),
-        )
-        pixel.fire(DuckChatPixelName.DUCK_CHAT_ENTRY_POINT_COUNT, parameters = parameters)
-        pixel.fire(
-            DuckChatPixelName.DUCK_CHAT_ENTRY_POINT_DAILY,
-            parameters = parameters,
-            type = Pixel.PixelType.Daily(),
+        duckChatPixels.get().reportDuckChatEntry(
+            entryPoint = entryPoint,
+            opensNewTab = opensNewTab,
+            hasPrompt = hasPrompt,
+            duckAiEnabled = isEnabled(),
+            inputScreenEnabled = inputModeCapability.value == NativeInputState.InputMode.SEARCH_AND_DUCK_AI,
         )
     }
 
@@ -1141,29 +1133,4 @@ class RealDuckChat @Inject constructor(
         private const val ORIGIN_QUERY_NAME = "origin"
         private const val ORIGIN_VALUE_ADDRESS_BAR_PICKER = "funnel_addressbar_android__aitoggle"
     }
-}
-
-private fun DuckChatEntryPoint.toPixelValue(): String = when (this) {
-    DuckChatEntryPoint.ADDRESS_BAR_PROMPT -> "address_bar_prompt"
-    DuckChatEntryPoint.ADDRESS_BAR_ICON -> "address_bar_icon"
-    DuckChatEntryPoint.ADDRESS_BAR_SHORTCUT_CHIP -> "address_bar_shortcut_chip"
-    DuckChatEntryPoint.ADDRESS_BAR_EDITING_STATE -> "address_bar_editing_state"
-    DuckChatEntryPoint.SUGGESTION_ASK_AI -> "suggestion_ask_ai"
-    DuckChatEntryPoint.BROWSING_MENU_NTP -> "browsing_menu_ntp"
-    DuckChatEntryPoint.BROWSING_MENU_WEBPAGE -> "browsing_menu_webpage"
-    DuckChatEntryPoint.TAB_SWITCHER -> "tab_switcher"
-    DuckChatEntryPoint.CHAT_HISTORY_NEW_CHAT -> "chat_history_new_chat"
-    DuckChatEntryPoint.CHAT_HISTORY_OPEN_CHAT -> "chat_history_open_chat"
-    DuckChatEntryPoint.VOICE -> "voice"
-    DuckChatEntryPoint.ONBOARDING -> "onboarding"
-    DuckChatEntryPoint.DIRECT_URL -> "direct_url"
-    DuckChatEntryPoint.SERP -> "serp"
-    DuckChatEntryPoint.ICON_SHORTCUT -> "icon_shortcut"
-    DuckChatEntryPoint.CONTEXTUAL_CHAT -> "contextual_chat"
-    DuckChatEntryPoint.WIDGET_QUICK_ACTIONS -> "widget_quick_actions"
-    DuckChatEntryPoint.WIDGET_FAVORITE -> "widget_favorite"
-    DuckChatEntryPoint.SYSTEM_SEARCH -> "system_search"
-    DuckChatEntryPoint.DIGITAL_ASSISTANT -> "digital_assistant"
-    DuckChatEntryPoint.DEEP_LINK_OTHER -> "deep_link_other"
-    DuckChatEntryPoint.PAID_SETTINGS -> "paid_settings"
 }
