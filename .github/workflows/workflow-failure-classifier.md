@@ -21,6 +21,13 @@ on:
         description: "ID of the failed workflow run to diagnose"
         required: true
         type: string
+  # Started by a scheduled nightly rather than by a person, so the inherited actor cannot be relied
+  # on to carry a repo role. This reads only same-repo, non-fork runs on develop and writes nothing,
+  # so the membership gate would only ever skip legitimate diagnoses.
+  roles: all
+
+# Only diagnose runs that actually failed; a completed green nightly must not start the agent.
+if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'failure'
 
 concurrency:
   group: workflow-failure-classifier-${{ github.event.workflow_run.id || inputs.run_id }}

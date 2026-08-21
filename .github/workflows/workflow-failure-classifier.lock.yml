@@ -26,10 +26,11 @@
 # occurred recently, and names candidate changes. v0 is read-only: the diagnosis is
 # written to the workflow run summary only.
 #
-# gh-aw-metadata: {"schema_version":"v3","frontmatter_hash":"16761a40ac95a2918c263399f5cf09910136f6ba455c30b4f23a52e58885942f","compiler_version":"v0.64.4","strict":true,"agent_id":"claude"}
+# gh-aw-metadata: {"schema_version":"v3","frontmatter_hash":"7d56a5dbfb81a248e8bb95c70cc6b25ebb7c05c8dee071d1aa9495aecaf5a68e","compiler_version":"v0.64.4","strict":true,"agent_id":"claude"}
 
 name: "Workflow Failure Classifier"
 "on":
+  # roles: all # Roles processed as role check in pre-activation job
   workflow_dispatch:
     inputs:
       aw_context:
@@ -63,11 +64,11 @@ run-name: "Workflow Failure Classifier"
 
 jobs:
   activation:
-    needs: pre_activation
     # zizmor: ignore[dangerous-triggers] - workflow_run trigger is secured with role and fork validation
     if: >
-      (needs.pre_activation.outputs.activated == 'true') && (github.event_name != 'workflow_run' || github.event.workflow_run.repository.id == github.repository_id &&
-      (!(github.event.workflow_run.repository.fork)))
+      (github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'failure') &&
+      (github.event_name != 'workflow_run' ||
+      github.event.workflow_run.repository.id == github.repository_id && (!(github.event.workflow_run.repository.fork)))
     runs-on: ubuntu-slim
     permissions:
       contents: read
@@ -151,13 +152,13 @@ jobs:
         run: |
           bash ${RUNNER_TEMP}/gh-aw/actions/create_prompt_first.sh
           {
-          cat << 'GH_AW_PROMPT_0bdd3f23afa30327_EOF'
+          cat << 'GH_AW_PROMPT_683ee656e16b8d22_EOF'
           <system>
-          GH_AW_PROMPT_0bdd3f23afa30327_EOF
+          GH_AW_PROMPT_683ee656e16b8d22_EOF
           cat "${RUNNER_TEMP}/gh-aw/prompts/xpia.md"
           cat "${RUNNER_TEMP}/gh-aw/prompts/temp_folder_prompt.md"
           cat "${RUNNER_TEMP}/gh-aw/prompts/markdown.md"
-          cat << 'GH_AW_PROMPT_0bdd3f23afa30327_EOF'
+          cat << 'GH_AW_PROMPT_683ee656e16b8d22_EOF'
           <github-context>
           The following GitHub context information is available for this workflow:
           {{#if __GH_AW_GITHUB_ACTOR__ }}
@@ -186,14 +187,14 @@ jobs:
           {{/if}}
           </github-context>
           
-          GH_AW_PROMPT_0bdd3f23afa30327_EOF
+          GH_AW_PROMPT_683ee656e16b8d22_EOF
           cat "${RUNNER_TEMP}/gh-aw/prompts/github_mcp_tools_prompt.md"
-          cat << 'GH_AW_PROMPT_0bdd3f23afa30327_EOF'
+          cat << 'GH_AW_PROMPT_683ee656e16b8d22_EOF'
           </system>
-          GH_AW_PROMPT_0bdd3f23afa30327_EOF
-          cat << 'GH_AW_PROMPT_0bdd3f23afa30327_EOF'
+          GH_AW_PROMPT_683ee656e16b8d22_EOF
+          cat << 'GH_AW_PROMPT_683ee656e16b8d22_EOF'
           {{#runtime-import .github/workflows/workflow-failure-classifier.md}}
-          GH_AW_PROMPT_0bdd3f23afa30327_EOF
+          GH_AW_PROMPT_683ee656e16b8d22_EOF
           } > "$GH_AW_PROMPT"
       - name: Interpolate variables and render templates
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
@@ -225,7 +226,6 @@ jobs:
           GH_AW_GITHUB_RUN_ID: ${{ github.run_id }}
           GH_AW_GITHUB_WORKSPACE: ${{ github.workspace }}
           GH_AW_INPUTS_RUN_ID: ${{ inputs.run_id }}
-          GH_AW_NEEDS_PRE_ACTIVATION_OUTPUTS_ACTIVATED: ${{ needs.pre_activation.outputs.activated }}
         with:
           script: |
             const { setupGlobals } = require('${{ runner.temp }}/gh-aw/actions/setup_globals.cjs');
@@ -248,8 +248,7 @@ jobs:
                 GH_AW_GITHUB_REPOSITORY: process.env.GH_AW_GITHUB_REPOSITORY,
                 GH_AW_GITHUB_RUN_ID: process.env.GH_AW_GITHUB_RUN_ID,
                 GH_AW_GITHUB_WORKSPACE: process.env.GH_AW_GITHUB_WORKSPACE,
-                GH_AW_INPUTS_RUN_ID: process.env.GH_AW_INPUTS_RUN_ID,
-                GH_AW_NEEDS_PRE_ACTIVATION_OUTPUTS_ACTIVATED: process.env.GH_AW_NEEDS_PRE_ACTIVATION_OUTPUTS_ACTIVATED
+                GH_AW_INPUTS_RUN_ID: process.env.GH_AW_INPUTS_RUN_ID
               }
             });
       - name: Validate prompt placeholders
@@ -372,7 +371,7 @@ jobs:
           export GH_AW_ENGINE="claude"
           export MCP_GATEWAY_DOCKER_COMMAND='docker run -i --rm --network host -v /var/run/docker.sock:/var/run/docker.sock -e MCP_GATEWAY_PORT -e MCP_GATEWAY_DOMAIN -e MCP_GATEWAY_API_KEY -e MCP_GATEWAY_PAYLOAD_DIR -e MCP_GATEWAY_PAYLOAD_SIZE_THRESHOLD -e DEBUG -e MCP_GATEWAY_LOG_DIR -e GH_AW_MCP_LOG_DIR -e GH_AW_SAFE_OUTPUTS -e GH_AW_SAFE_OUTPUTS_CONFIG_PATH -e GH_AW_SAFE_OUTPUTS_TOOLS_PATH -e GH_AW_ASSETS_BRANCH -e GH_AW_ASSETS_MAX_SIZE_KB -e GH_AW_ASSETS_ALLOWED_EXTS -e DEFAULT_BRANCH -e GITHUB_MCP_SERVER_TOKEN -e GITHUB_MCP_GUARD_MIN_INTEGRITY -e GITHUB_MCP_GUARD_REPOS -e GITHUB_REPOSITORY -e GITHUB_SERVER_URL -e GITHUB_SHA -e GITHUB_WORKSPACE -e GITHUB_TOKEN -e GITHUB_RUN_ID -e GITHUB_RUN_NUMBER -e GITHUB_RUN_ATTEMPT -e GITHUB_JOB -e GITHUB_ACTION -e GITHUB_EVENT_NAME -e GITHUB_EVENT_PATH -e GITHUB_ACTOR -e GITHUB_ACTOR_ID -e GITHUB_TRIGGERING_ACTOR -e GITHUB_WORKFLOW -e GITHUB_WORKFLOW_REF -e GITHUB_WORKFLOW_SHA -e GITHUB_REF -e GITHUB_REF_NAME -e GITHUB_REF_TYPE -e GITHUB_HEAD_REF -e GITHUB_BASE_REF -v /tmp/gh-aw/mcp-payloads:/tmp/gh-aw/mcp-payloads:rw -v /opt:/opt:ro -v /tmp:/tmp:rw -v '"${GITHUB_WORKSPACE}"':'"${GITHUB_WORKSPACE}"':rw ghcr.io/github/gh-aw-mcpg:v0.2.9'
           
-          cat << GH_AW_MCP_CONFIG_0364e3f73af17318_EOF | bash ${RUNNER_TEMP}/gh-aw/actions/start_mcp_gateway.sh
+          cat << GH_AW_MCP_CONFIG_3b2da678bbdc4a17_EOF | bash ${RUNNER_TEMP}/gh-aw/actions/start_mcp_gateway.sh
           {
             "mcpServers": {
               "github": {
@@ -398,7 +397,7 @@ jobs:
               "payloadDir": "${MCP_GATEWAY_PAYLOAD_DIR}"
             }
           }
-          GH_AW_MCP_CONFIG_0364e3f73af17318_EOF
+          GH_AW_MCP_CONFIG_3b2da678bbdc4a17_EOF
       - name: Download activation artifact
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
@@ -601,27 +600,4 @@ jobs:
             /tmp/gh-aw/sandbox/firewall/logs/
             /tmp/gh-aw/sandbox/firewall/audit/
           if-no-files-found: ignore
-
-  pre_activation:
-    runs-on: ubuntu-slim
-    outputs:
-      activated: ${{ steps.check_membership.outputs.is_team_member == 'true' }}
-      matched_command: ''
-    steps:
-      - name: Setup Scripts
-        uses: github/gh-aw-actions/setup@7cae8cd356c7905aeda72eb08e1d0b4501310c23 # v0.64.4
-        with:
-          destination: ${{ runner.temp }}/gh-aw/actions
-      - name: Check team membership for workflow
-        id: check_membership
-        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
-        env:
-          GH_AW_REQUIRED_ROLES: "admin,maintainer,write"
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const { setupGlobals } = require('${{ runner.temp }}/gh-aw/actions/setup_globals.cjs');
-            setupGlobals(core, github, context, exec, io);
-            const { main } = require('${{ runner.temp }}/gh-aw/actions/check_membership.cjs');
-            await main();
 
