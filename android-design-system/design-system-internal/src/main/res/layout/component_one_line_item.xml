@@ -258,7 +258,7 @@
         android:id="@+id/oneLineListItemWithLeadingAndTrailingIcons"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:leadingIcon="@drawable/ic_globe_16"
+        app:leadingIcon="@drawable/ic_globe_24"
         app:leadingIconBackground="circular"
         app:primaryText="Item With Leading and Trailing Icons"
         app:trailingIcon="@drawable/ic_menu_vertical_24" />
@@ -302,7 +302,7 @@
         android:id="@+id/oneLineListSwitchItemWithLeadingIcon"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:leadingIcon="@drawable/ic_globe_16"
+        app:leadingIcon="@drawable/ic_globe_24"
         app:leadingIconBackground="rounded"
         app:primaryText="Item With Switch and Leading Icon"
         app:showSwitch="true" />
