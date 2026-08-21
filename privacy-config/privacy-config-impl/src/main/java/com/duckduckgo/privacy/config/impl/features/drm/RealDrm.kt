@@ -40,7 +40,10 @@ class RealDrm @Inject constructor(
 
     override fun isDrmAllowedForUrl(url: String): Boolean {
         val uri = url.toUri()
-        val isFeatureEnabled = featureToggle.isFeatureEnabled(PrivacyFeatureName.DrmFeatureName.value, defaultValue = true)
+        // Defaults to false: the persister clears every privacy config toggle before applying a new config and
+        // only reinserts the features it contained, so an unset value means eme was dropped from the config. The
+        // stored exceptions outlive it, and they must not keep granting DRM once the feature is gone.
+        val isFeatureEnabled = featureToggle.isFeatureEnabled(PrivacyFeatureName.DrmFeatureName.value, defaultValue = false)
         return (isFeatureEnabled && domainsThatAllowDrm(url)) ||
             userAllowListRepository.isUriInUserAllowList(uri) ||
             unprotectedTemporary.isAnException(uri.toString())

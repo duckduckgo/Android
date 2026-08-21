@@ -29,6 +29,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.util.concurrent.CopyOnWriteArrayList
 
@@ -117,6 +118,16 @@ class RealDrmTest {
 
         val url = "https://open.spotify.com"
         assertTrue(testee.isDrmAllowedForUrl(url))
+    }
+
+    @Test
+    fun whenIsDrmAllowedForUrlThenEmeFeatureDefaultsToDisabled() {
+        givenUrlIsInExceptionList()
+
+        testee.isDrmAllowedForUrl("https://open.spotify.com")
+
+        // An unset toggle means eme was dropped from the config, so the stored exceptions must stop granting
+        verify(mockFeatureToggle).isFeatureEnabled(PrivacyFeatureName.DrmFeatureName.value, false)
     }
 
     private fun giveFeatureIsEnabled() {
