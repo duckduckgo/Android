@@ -1314,6 +1314,7 @@ class BrowserTabFragment :
                 errorView.yetiIcon.isSaveEnabled = false
                 errorView.errorTitle.isSaveEnabled = false
                 errorView.errorMessage.isSaveEnabled = false
+                errorView.redirectSuggestionMessage.isSaveEnabled = false
 
                 omnibar.disableViewStateSaving()
                 sslErrorView.disableViewStateSaving()
