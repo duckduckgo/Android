@@ -118,7 +118,7 @@ class EdgeToEdgeHandlerTest {
     }
 
     @Test
-    fun whenFullScreenDefaultThenReservesInsets() {
+    fun whenFullScreenCallbackIsOmittedThenReservesInsets() {
         testee.applyStatusBarAndHorizontalInsets(anchor, installScrim = false)
 
         dispatchStatusBarAndCutout(statusBarTop = 63, cutoutLeft = 48)
@@ -137,14 +137,12 @@ class EdgeToEdgeHandlerTest {
         assertEquals(63, anchor.paddingTop)
         assertEquals(24, anchor.paddingRight)
 
-        // Entering fullscreen: the caller flips its state and re-dispatches insets.
         fullScreen = true
         dispatchStatusBarAndCutout(statusBarTop = 63, cutoutLeft = 48, cutoutRight = 24)
         assertEquals(0, anchor.paddingLeft)
         assertEquals(0, anchor.paddingTop)
         assertEquals(0, anchor.paddingRight)
 
-        // Exiting fullscreen restores the original insets, not double them.
         fullScreen = false
         dispatchStatusBarAndCutout(statusBarTop = 63, cutoutLeft = 48, cutoutRight = 24)
         assertEquals(48, anchor.paddingLeft)
