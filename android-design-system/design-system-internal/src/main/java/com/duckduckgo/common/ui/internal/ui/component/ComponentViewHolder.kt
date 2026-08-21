@@ -1228,15 +1228,6 @@ private fun ComposeOneLineExtras() {
         onClick = {},
     )
     DaxOneLineListItem(
-        primaryText = "Decorative trailing icon",
-        trailingContent = { Icon(painterResource(CommonR.drawable.ic_globe_24), null) },
-    )
-    DaxOneLineListItem(
-        primaryText = "Trailing button",
-        trailingContent = { Button(text = "Action", onClick = {}) },
-    )
-    DaxOneLineListItem(primaryText = "With Beta pill", inlineContent = { Pill("Beta") }, onClick = {})
-    DaxOneLineListItem(
         primaryText = "Disabled with checked switch",
         enabled = false,
         trailingContent = { Switch(checked = true, onCheckedChange = {}) },

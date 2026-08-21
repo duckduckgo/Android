@@ -267,10 +267,6 @@ private fun DaxOneLineListItemTrailingVariantsPreview() {
                     Icon(painterResource(R.drawable.ic_globe_24), null, tint = DuckDuckGoTheme.colors.brand.accentBlue)
                 },
             )
-            DaxOneLineListItem(
-                primaryText = "Trailing button",
-                trailingContent = { Button(text = "Action", onClick = {}) },
-            )
         }
     }
 }

@@ -48,7 +48,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.takeOrElse
 import com.duckduckgo.common.ui.compose.DaxStatusIndicator
 import com.duckduckgo.common.ui.compose.Status
-import com.duckduckgo.common.ui.compose.button.DaxGhostButton
 import com.duckduckgo.common.ui.compose.button.DaxIconButton
 import com.duckduckgo.common.ui.compose.button.DaxIconButtonDefaults
 import com.duckduckgo.common.ui.compose.listitem.DaxListItemDefaults.HorizontalPadding
@@ -384,24 +383,6 @@ class DaxListItemTrailingScope internal constructor(private val parentEnabled: B
                 Spacer(Modifier.width(HorizontalPadding))
             }
         }
-    }
-
-    /**
-     * Trailing ghost button.
-     *
-     * @param text Button label.
-     * @param onClick Called when the button is tapped.
-     * @param modifier Modifier applied to the button.
-     * @param enabled Whether the button itself is enabled, on top of the row's enabled state.
-     */
-    @Composable
-    fun Button(
-        text: String,
-        onClick: () -> Unit,
-        modifier: Modifier = Modifier,
-        enabled: Boolean = true,
-    ) {
-        DaxGhostButton(text = text, onClick = onClick, modifier = modifier, enabled = enabled && parentEnabled)
     }
 
     /**
