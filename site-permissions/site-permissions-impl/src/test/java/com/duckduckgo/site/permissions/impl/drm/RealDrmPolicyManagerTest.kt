@@ -226,6 +226,15 @@ class RealDrmPolicyManagerTest {
     }
 
     @Test
+    fun whenDenyAlwaysStoredOnIntermediateParentThenSubdomainRequestIsDenied() = runTest {
+        val entity = SitePermissionsEntity(domain = "open.spotify.com", askDrmSetting = SitePermissionAskSettingType.DENY_ALWAYS.name)
+        whenever(mockSitePermissionsRepository.getSitePermissionsForWebsite("open.spotify.com")).thenReturn(entity)
+        whenever(mockDrm.isDrmAllowedForUrl("https://static.open.spotify.com/")).thenReturn(true)
+
+        assertEquals(DrmPolicyDecision(DENY, USER_DENY_ALWAYS), testee.decide("https://static.open.spotify.com/", tabId))
+    }
+
+    @Test
     fun whenUrlIsMalformedThenPromptWithNoRule() = runTest {
         assertEquals(DrmPolicyDecision(PROMPT, NO_RULE), testee.decide("not a url", tabId))
     }

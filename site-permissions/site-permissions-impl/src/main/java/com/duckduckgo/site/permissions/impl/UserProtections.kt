@@ -29,6 +29,26 @@ import com.duckduckgo.common.utils.extensions.toTldPlusOneOrSelf
  */
 internal fun UserAllowListRepository.isSiteUnprotectedByUser(uri: Uri): Boolean {
     if (isUriInUserAllowList(uri)) return true
-    val registrableDomain = uri.host?.toTldPlusOneOrSelf() ?: return false
-    return listOf(registrableDomain, "www.$registrableDomain").any { isDomainInUserAllowList(it) }
+    val host = uri.host ?: return false
+    return host.hostAndParentCandidates().any { isDomainInUserAllowList(it) }
+}
+
+/**
+ * This host and every parent up to its registrable domain, each with its `www.` spelling.
+ *
+ * The eme and emeBlock lists match subdomains, so a value the user stored against any parent of the
+ * request origin has to be found as well, or remote config would override an explicit choice.
+ */
+internal fun String.hostAndParentCandidates(): List<String> {
+    val registrableDomain = toTldPlusOneOrSelf()
+    val chain = mutableListOf<String>()
+    var current = this
+    while (true) {
+        chain.add(current)
+        if (current == registrableDomain) break
+        val parent = current.substringAfter('.', "")
+        if (parent.isEmpty() || parent.length < registrableDomain.length) break
+        current = parent
+    }
+    return chain.flatMap { listOf(it, "www.$it") }.distinct()
 }

@@ -18,14 +18,13 @@ package com.duckduckgo.site.permissions.impl.drm
 
 import androidx.core.net.toUri
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
-import com.duckduckgo.common.utils.baseHost
-import com.duckduckgo.common.utils.extensions.toTldPlusOneOrSelf
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.Drm
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.site.permissions.impl.SitePermissionsRepository
 import com.duckduckgo.site.permissions.impl.drmblock.DrmBlock
+import com.duckduckgo.site.permissions.impl.hostAndParentCandidates
 import com.duckduckgo.site.permissions.impl.isSiteUnprotectedByUser
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType
 import com.squareup.anvil.annotations.ContributesBinding
@@ -44,11 +43,9 @@ class RealDrmPolicyManager @Inject constructor(
     override suspend fun decide(url: String, tabId: String?): DrmPolicyDecision {
         val domain = url.extractDomain() ?: url
         val uri = url.toUri()
-        // Settings are keyed on the host as typed, while both config lists match subdomains. Check every
-        // spelling plus the parent domain: missing the row would let remote config override a user's choice
-        val registrableDomain = domain.toTldPlusOneOrSelf()
-        val siteSetting = listOfNotNull(domain, uri.baseHost, uri.baseHost?.let { "www.$it" }, registrableDomain, "www.$registrableDomain")
-            .distinct()
+        // Settings are keyed on the host as typed, while both config lists match subdomains, so a choice
+        // stored against any parent of the request origin has to be found too. Most specific wins.
+        val siteSetting = domain.hostAndParentCandidates()
             .firstNotNullOfOrNull { host -> sitePermissionsRepository.getSitePermissionsForWebsite(host)?.askDrmSetting?.toDrmSetting() }
 
         return DrmPolicyContext(

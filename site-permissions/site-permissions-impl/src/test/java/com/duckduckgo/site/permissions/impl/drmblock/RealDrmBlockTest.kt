@@ -131,6 +131,15 @@ class RealDrmBlockTest {
         assertTrue(testee.isDrmBlockedForUrl("https://static.open.spotify.com/player"))
     }
 
+    @Test
+    fun whenProtectionsAreOffForAnIntermediateParentThenSubdomainIsNotBlocked() {
+        givenFeatureIsEnabled()
+        givenUrlIsInExceptionList()
+        whenever(mockUserAllowListRepository.isDomainInUserAllowList("open.spotify.com")).thenReturn(true)
+
+        assertFalse(testee.isDrmBlockedForUrl("https://static.open.spotify.com/player"))
+    }
+
     private fun givenFeatureIsEnabled() {
         whenever(mockDrmBlockFeature.self().isEnabled()).thenReturn(true)
     }
