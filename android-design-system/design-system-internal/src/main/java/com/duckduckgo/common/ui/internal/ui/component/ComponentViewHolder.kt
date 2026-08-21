@@ -626,6 +626,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 R.id.composeOneLineTrailingTinted to { ComposeOneLineTrailingTinted() },
                 R.id.composeOneLineLeadingTrailing to { ComposeOneLineLeadingTrailing() },
                 R.id.composeOneLineSwitch to { ComposeOneLineSwitch() },
+                R.id.composeOneLineSwitchRounded to { ComposeOneLineSwitchRounded() },
                 R.id.composeOneLineDisabled to { ComposeOneLineDisabled() },
                 R.id.composeOneLineDestructive to { ComposeOneLineDestructive() },
                 R.id.composeOneLineLongText to { ComposeOneLineLongText() },
@@ -735,6 +736,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 R.id.composeTwoLineMediumTrailingOnly to { ComposeTwoLineMediumTrailingOnly() },
                 R.id.composeTwoLineBetaPill to { ComposeTwoLineBetaPill() },
                 R.id.composeTwoLineCircular to { ComposeTwoLineCircular() },
+                R.id.composeTwoLineRounded to { ComposeTwoLineRounded() },
                 R.id.composeTwoLineSwitch to { ComposeTwoLineSwitch() },
                 R.id.composeTwoLineSwitchImage to { ComposeTwoLineSwitchImage() },
                 R.id.composeTwoLineSwitchPill to { ComposeTwoLineSwitchPill() },
@@ -1150,6 +1152,24 @@ private fun ComposeOneLineSwitch() {
 }
 
 @Composable
+private fun ComposeOneLineSwitchRounded() {
+    ComposeCaption()
+    var checked by remember { mutableStateOf(false) }
+    DaxOneLineListItem(
+        primaryText = "Item With Switch and Leading Icon",
+        leadingContent = {
+            Icon(
+                painterResource(CommonR.drawable.ic_globe_24),
+                null,
+                size = DaxListItemIconSize.Small,
+                background = DaxListItemIconBackground.Rounded,
+            )
+        },
+        trailingContent = { Switch(checked = checked, onCheckedChange = { checked = it }) },
+    )
+}
+
+@Composable
 private fun ComposeOneLineDisabled() {
     ComposeCaption()
     DaxOneLineListItem(primaryText = "Item disabled", enabled = false, onClick = {})
@@ -1360,6 +1380,25 @@ private fun ComposeTwoLineCircular() {
                 null,
                 size = DaxListItemIconSize.Small,
                 background = DaxListItemIconBackground.Circular,
+            )
+        },
+        trailingContent = { Icon(painterResource(CommonR.drawable.ic_menu_vertical_24), "Overflow", onClick = {}) },
+        onClick = {},
+    )
+}
+
+@Composable
+private fun ComposeTwoLineRounded() {
+    ComposeCaption()
+    DaxTwoLineListItem(
+        primaryText = "Two Line Item",
+        secondaryText = "With Leading Image over Rounded Background",
+        leadingContent = {
+            Icon(
+                painterResource(CommonR.drawable.ic_globe_24),
+                null,
+                size = DaxListItemIconSize.Small,
+                background = DaxListItemIconBackground.Rounded,
             )
         },
         trailingContent = { Icon(painterResource(CommonR.drawable.ic_menu_vertical_24), "Overflow", onClick = {}) },

@@ -295,7 +295,7 @@
         android:layout_height="wrap_content"
         android:paddingStart="16dp"
         android:paddingTop="8dp"
-        android:text="@string/dsShowcaseCaptionNoCompose"
+        android:text="@string/dsShowcaseCaptionView"
         app:typography="caption" />
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
@@ -306,6 +306,12 @@
         app:leadingIconBackground="rounded"
         app:primaryText="Item With Switch and Leading Icon"
         app:showSwitch="true" />
+
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/composeOneLineSwitchRounded"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/keyline_5" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:layout_width="wrap_content"

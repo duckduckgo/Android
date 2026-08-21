@@ -363,7 +363,7 @@
         android:layout_height="wrap_content"
         android:paddingStart="16dp"
         android:paddingTop="8dp"
-        android:text="@string/dsShowcaseCaptionNoCompose"
+        android:text="@string/dsShowcaseCaptionView"
         app:typography="caption" />
 
     <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
@@ -375,6 +375,12 @@
         app:primaryText="Two Line Item"
         app:secondaryText="With Leading Image over Rounded Background"
         app:trailingIcon="@drawable/ic_menu_vertical_24" />
+
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/composeTwoLineRounded"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/keyline_5" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:layout_width="wrap_content"

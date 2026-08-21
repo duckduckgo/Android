@@ -225,6 +225,18 @@ private fun DaxOneLineListItemLeadingIconsPreview() {
                 onClick = {},
             )
             DaxOneLineListItem(
+                primaryText = "Small rounded icon",
+                leadingContent = {
+                    Icon(
+                        painterResource(R.drawable.ic_globe_24),
+                        null,
+                        size = DaxListItemIconSize.Small,
+                        background = DaxListItemIconBackground.Rounded,
+                    )
+                },
+                onClick = {},
+            )
+            DaxOneLineListItem(
                 primaryText = "Favicon (untinted image)",
                 leadingContent = {
                     Image(painterResource(R.drawable.ic_ddg_logo), null, size = DaxListItemIconSize.Large)

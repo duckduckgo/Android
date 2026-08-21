@@ -33,6 +33,7 @@ internal object DaxListItemDefaults {
     val LeadingIconSmall: Dp = 24.dp
     val LeadingIconLarge: Dp = 32.dp
     val LeadingBackgroundSize: Dp = 40.dp
+    val LeadingRoundedBackgroundRadius: Dp = 8.dp
 
     val TrailingIconMedium: Dp = 24.dp
     val TrailingIconSmall: Dp = 16.dp
@@ -42,7 +43,7 @@ internal object DaxListItemDefaults {
 }
 
 @Stable
-enum class DaxListItemIconBackground { None, Circular }
+enum class DaxListItemIconBackground { None, Circular, Rounded }
 
 @Stable
 enum class DaxListItemIconSize { Small, Large }

@@ -32,6 +32,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
@@ -39,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
@@ -233,11 +235,9 @@ class DaxListItemLeadingScope internal constructor(private val parentEnabled: Bo
         }
         val containerModifier = when (background) {
             DaxListItemIconBackground.None -> modifier.size(iconDp)
-            DaxListItemIconBackground.Circular ->
-                modifier
-                    .size(DaxListItemDefaults.LeadingBackgroundSize)
-                    .clip(CircleShape)
-                    .background(DuckDuckGoTheme.colors.backgrounds.container)
+            DaxListItemIconBackground.Circular -> modifier.leadingBackground(CircleShape)
+            DaxListItemIconBackground.Rounded ->
+                modifier.leadingBackground(RoundedCornerShape(DaxListItemDefaults.LeadingRoundedBackgroundRadius))
         }
 
         Box(
@@ -253,6 +253,12 @@ class DaxListItemLeadingScope internal constructor(private val parentEnabled: Bo
         }
     }
 }
+
+@Composable
+private fun Modifier.leadingBackground(shape: Shape): Modifier =
+    size(DaxListItemDefaults.LeadingBackgroundSize)
+        .clip(shape)
+        .background(DuckDuckGoTheme.colors.backgrounds.container)
 
 /**
  * Receiver scope for the slot rendered inline after a list item's primary text.
