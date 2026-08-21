@@ -23,7 +23,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.LocalRippleConfiguration
 import androidx.compose.material3.RippleConfiguration
@@ -34,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.Dp
@@ -84,10 +85,10 @@ fun DaxIconButton(
         IconButton(
             onClick = onClick,
             modifier = modifier,
-            colors = IconButtonDefaults.iconButtonColors(
-                containerColor = colors.containerColor,
+            colors = IconButtonColors(
+                containerColor = colors.containerColor.takeOrElse { Color.Transparent },
                 contentColor = colors.contentColor,
-                disabledContainerColor = colors.disabledContainerColor,
+                disabledContainerColor = colors.disabledContainerColor.takeOrElse { Color.Transparent },
                 disabledContentColor = colors.disabledContentColor,
             ),
             enabled = enabled,
