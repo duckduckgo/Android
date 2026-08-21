@@ -40,7 +40,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.unit.dp
 import com.duckduckgo.common.ui.compose.DaxStatusIndicator
 import com.duckduckgo.common.ui.compose.Status
 import com.duckduckgo.common.ui.compose.button.DaxGhostButton
@@ -312,11 +311,10 @@ class DaxListItemTrailingScope internal constructor(private val parentEnabled: B
                     iconPainter = painter,
                     contentDescription = contentDescription,
                     enabled = effectiveEnabled,
-                    modifier = modifier
-                        .alpha(if (effectiveEnabled) 1f else DaxListItemDefaults.DisabledAlpha),
+                    modifier = modifier.size(DaxListItemDefaults.TrailingIconTouchTarget),
                 )
 
-                Spacer(Modifier.width(6.dp))
+                Spacer(Modifier.width(DaxListItemDefaults.TrailingIconButtonEndPadding))
             } else {
                 M3Icon(
                     painter = painter,
@@ -361,6 +359,10 @@ class DaxListItemTrailingScope internal constructor(private val parentEnabled: B
         status: Status,
         modifier: Modifier = Modifier,
     ) {
-        DaxStatusIndicator(status = status, modifier = modifier.alpha(if (parentEnabled) 1f else DaxListItemDefaults.DisabledAlpha))
+        Row {
+            DaxStatusIndicator(status = status, modifier = modifier.alpha(if (parentEnabled) 1f else DaxListItemDefaults.DisabledAlpha))
+
+            Spacer(Modifier.width(HorizontalPadding))
+        }
     }
 }
