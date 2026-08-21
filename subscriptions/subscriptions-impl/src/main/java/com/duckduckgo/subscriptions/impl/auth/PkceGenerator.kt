@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.subscriptions.impl.auth2
+package com.duckduckgo.subscriptions.impl.auth
 
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding

@@ -1,4 +1,4 @@
-package com.duckduckgo.subscriptions.impl.auth2
+package com.duckduckgo.subscriptions.impl.auth
 
 import org.junit.Assert.*
 import org.junit.Test

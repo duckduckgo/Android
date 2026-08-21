@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.subscriptions.impl.auth2
+package com.duckduckgo.subscriptions.impl.auth
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.utils.CurrentTimeProvider

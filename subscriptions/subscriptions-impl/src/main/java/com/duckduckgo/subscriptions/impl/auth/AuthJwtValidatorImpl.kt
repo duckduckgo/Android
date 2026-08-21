@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.subscriptions.impl.auth2
+package com.duckduckgo.subscriptions.impl.auth
 
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
