@@ -616,19 +616,20 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 setPrimaryText(context.getString(CommonR.string.dax_one_line_list_item_html_primary_text).html(context))
             }
 
+            val snackbar = ShowcaseSnackbar(view, component.name)
             val composeContent: List<Pair<Int, @Composable () -> Unit>> = listOf(
-                R.id.composeOneLineSimple to { ComposeOneLineSimple() },
-                R.id.composeOneLineMediumImage to { ComposeOneLineMediumImage() },
+                R.id.composeOneLineSimple to { ComposeOneLineSimple(snackbar) },
+                R.id.composeOneLineMediumImage to { ComposeOneLineMediumImage(snackbar) },
                 R.id.composeOneLineMediumImageBg to { ComposeOneLineMediumImageBg() },
-                R.id.composeOneLineLargeImage to { ComposeOneLineLargeImage() },
+                R.id.composeOneLineLargeImage to { ComposeOneLineLargeImage(snackbar) },
                 R.id.composeOneLineLargeImageBg to { ComposeOneLineLargeImageBg() },
-                R.id.composeOneLineTrailingIcon to { ComposeOneLineTrailingIcon() },
+                R.id.composeOneLineTrailingIcon to { ComposeOneLineTrailingIcon(snackbar) },
                 R.id.composeOneLineTrailingTinted to { ComposeOneLineTrailingTinted() },
-                R.id.composeOneLineLeadingTrailing to { ComposeOneLineLeadingTrailing() },
-                R.id.composeOneLineSwitch to { ComposeOneLineSwitch() },
-                R.id.composeOneLineSwitchRounded to { ComposeOneLineSwitchRounded() },
-                R.id.composeOneLineDisabled to { ComposeOneLineDisabled() },
-                R.id.composeOneLineDestructive to { ComposeOneLineDestructive() },
+                R.id.composeOneLineLeadingTrailing to { ComposeOneLineLeadingTrailing(snackbar) },
+                R.id.composeOneLineSwitch to { ComposeOneLineSwitch(snackbar) },
+                R.id.composeOneLineSwitchRounded to { ComposeOneLineSwitchRounded(snackbar) },
+                R.id.composeOneLineDisabled to { ComposeOneLineDisabled(snackbar) },
+                R.id.composeOneLineDestructive to { ComposeOneLineDestructive(snackbar) },
                 R.id.composeOneLineLongText to { ComposeOneLineLongText() },
                 R.id.composeOneLineLongTextTruncated to { ComposeOneLineLongTextTruncated() },
                 R.id.composeOneLineNewPill to { ComposeOneLineNewPill() },
@@ -724,25 +725,26 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 setSecondaryText(context.getString(CommonR.string.dax_list_item_html_secondary_text).html(context))
             }
 
+            val snackbar = ShowcaseSnackbar(view, component.name)
             val composeContent: List<Pair<Int, @Composable () -> Unit>> = listOf(
-                R.id.composeTwoLinePlain to { ComposeTwoLinePlain() },
-                R.id.composeTwoLineImage to { ComposeTwoLineImage() },
-                R.id.composeTwoLineMediumTrailing to { ComposeTwoLineMediumTrailing() },
+                R.id.composeTwoLinePlain to { ComposeTwoLinePlain(snackbar) },
+                R.id.composeTwoLineImage to { ComposeTwoLineImage(snackbar) },
+                R.id.composeTwoLineMediumTrailing to { ComposeTwoLineMediumTrailing(snackbar) },
                 R.id.composeTwoLineMediumTrailingBg to { ComposeTwoLineMediumTrailingBg() },
-                R.id.composeTwoLineLargeTrailing to { ComposeTwoLineLargeTrailing() },
+                R.id.composeTwoLineLargeTrailing to { ComposeTwoLineLargeTrailing(snackbar) },
                 R.id.composeTwoLineLargeTrailingBg to { ComposeTwoLineLargeTrailingBg() },
-                R.id.composeTwoLineTrailing to { ComposeTwoLineTrailing() },
+                R.id.composeTwoLineTrailing to { ComposeTwoLineTrailing(snackbar) },
                 R.id.composeTwoLineSmallTrailing to { ComposeTwoLineSmallTrailing() },
                 R.id.composeTwoLineMediumTrailingOnly to { ComposeTwoLineMediumTrailingOnly() },
-                R.id.composeTwoLineBetaPill to { ComposeTwoLineBetaPill() },
+                R.id.composeTwoLineBetaPill to { ComposeTwoLineBetaPill(snackbar) },
                 R.id.composeTwoLineCircular to { ComposeTwoLineCircular() },
                 R.id.composeTwoLineRounded to { ComposeTwoLineRounded() },
-                R.id.composeTwoLineSwitch to { ComposeTwoLineSwitch() },
-                R.id.composeTwoLineSwitchImage to { ComposeTwoLineSwitchImage() },
-                R.id.composeTwoLineSwitchPill to { ComposeTwoLineSwitchPill() },
+                R.id.composeTwoLineSwitch to { ComposeTwoLineSwitch(snackbar) },
+                R.id.composeTwoLineSwitchImage to { ComposeTwoLineSwitchImage(snackbar) },
+                R.id.composeTwoLineSwitchPill to { ComposeTwoLineSwitchPill(snackbar) },
                 R.id.composeTwoLineSwitchTruncated to { ComposeTwoLineSwitchTruncated() },
-                R.id.composeTwoLineDisabled to { ComposeTwoLineDisabled() },
-                R.id.composeTwoLineSwitchChecked to { ComposeTwoLineSwitchChecked() },
+                R.id.composeTwoLineDisabled to { ComposeTwoLineDisabled(snackbar) },
+                R.id.composeTwoLineSwitchChecked to { ComposeTwoLineSwitchChecked(snackbar) },
                 R.id.composeTwoLineSwitchDisabledChecked to { ComposeTwoLineSwitchDisabledChecked() },
                 R.id.composeTwoLinePrimaryColor to { ComposeTwoLinePrimaryColor() },
                 R.id.composeTwoLineSecondaryColor to { ComposeTwoLineSecondaryColor() },
@@ -1042,19 +1044,32 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
     }
 }
 
-@Composable
-private fun ComposeOneLineSimple() {
-    ComposeCaption()
-    DaxOneLineListItem(primaryText = "This is a simple item", onClick = {})
+private class ShowcaseSnackbar(
+    private val view: View,
+    private val componentName: String,
+) {
+    fun row() = show(componentName)
+
+    fun trailingIcon() = show("Overflow menu clicked")
+
+    fun switch(checked: Boolean) = show("Switch checked: $checked")
+
+    private fun show(message: String) = Snackbar.make(view, message, Snackbar.LENGTH_SHORT).show()
 }
 
 @Composable
-private fun ComposeOneLineMediumImage() {
+private fun ComposeOneLineSimple(snackbar: ShowcaseSnackbar) {
+    ComposeCaption()
+    DaxOneLineListItem(primaryText = "This is a simple item", onClick = { snackbar.row() })
+}
+
+@Composable
+private fun ComposeOneLineMediumImage(snackbar: ShowcaseSnackbar) {
     ComposeCaption()
     DaxOneLineListItem(
         primaryText = "Item with Medium Leading Image",
         leadingContent = { Image(painterResource(CommonR.drawable.ic_dax_icon), null, size = DaxListItemIconSize.Small) },
-        onClick = {},
+        onClick = { snackbar.row() },
     )
 }
 
@@ -1076,12 +1091,12 @@ private fun ComposeOneLineMediumImageBg() {
 }
 
 @Composable
-private fun ComposeOneLineLargeImage() {
+private fun ComposeOneLineLargeImage(snackbar: ShowcaseSnackbar) {
     ComposeCaption()
     DaxOneLineListItem(
         primaryText = "Item with Large Leading Image",
         leadingContent = { Image(painterResource(CommonR.drawable.ic_dax_icon), null, size = DaxListItemIconSize.Large) },
-        onClick = {},
+        onClick = { snackbar.row() },
     )
 }
 
@@ -1103,12 +1118,12 @@ private fun ComposeOneLineLargeImageBg() {
 }
 
 @Composable
-private fun ComposeOneLineTrailingIcon() {
+private fun ComposeOneLineTrailingIcon(snackbar: ShowcaseSnackbar) {
     ComposeCaption()
     DaxOneLineListItem(
         primaryText = "Item With Trailing Icon",
-        trailingContent = { Icon(painterResource(CommonR.drawable.ic_menu_vertical_24), "Overflow", onClick = {}) },
-        onClick = {},
+        trailingContent = { Icon(painterResource(CommonR.drawable.ic_menu_vertical_24), "Overflow", onClick = { snackbar.trailingIcon() }) },
+        onClick = { snackbar.row() },
     )
 }
 
@@ -1124,7 +1139,7 @@ private fun ComposeOneLineTrailingTinted() {
 }
 
 @Composable
-private fun ComposeOneLineLeadingTrailing() {
+private fun ComposeOneLineLeadingTrailing(snackbar: ShowcaseSnackbar) {
     ComposeCaption()
     DaxOneLineListItem(
         primaryText = "Item With Leading and Trailing Icons",
@@ -1136,24 +1151,32 @@ private fun ComposeOneLineLeadingTrailing() {
                 background = DaxListItemIconBackground.Circular,
             )
         },
-        trailingContent = { Icon(painterResource(CommonR.drawable.ic_menu_vertical_24), "Overflow", onClick = {}) },
-        onClick = {},
+        trailingContent = { Icon(painterResource(CommonR.drawable.ic_menu_vertical_24), "Overflow", onClick = { snackbar.trailingIcon() }) },
+        onClick = { snackbar.row() },
     )
 }
 
 @Composable
-private fun ComposeOneLineSwitch() {
+private fun ComposeOneLineSwitch(snackbar: ShowcaseSnackbar) {
     ComposeCaption()
     var checked by remember { mutableStateOf(false) }
     DaxOneLineListItem(
         primaryText = "Item with Switch Item",
-        trailingContent = { Switch(checked = checked, onCheckedChange = { checked = it }) },
-        onClick = {},
+        trailingContent = {
+            Switch(
+                checked = checked,
+                onCheckedChange = {
+                    checked = it
+                    snackbar.switch(it)
+                },
+            )
+        },
+        onClick = { snackbar.row() },
     )
 }
 
 @Composable
-private fun ComposeOneLineSwitchRounded() {
+private fun ComposeOneLineSwitchRounded(snackbar: ShowcaseSnackbar) {
     ComposeCaption()
     var checked by remember { mutableStateOf(false) }
     DaxOneLineListItem(
@@ -1166,24 +1189,32 @@ private fun ComposeOneLineSwitchRounded() {
                 background = DaxListItemIconBackground.Rounded,
             )
         },
-        trailingContent = { Switch(checked = checked, onCheckedChange = { checked = it }) },
-        onClick = {},
+        trailingContent = {
+            Switch(
+                checked = checked,
+                onCheckedChange = {
+                    checked = it
+                    snackbar.switch(it)
+                },
+            )
+        },
+        onClick = { snackbar.row() },
     )
 }
 
 @Composable
-private fun ComposeOneLineDisabled() {
+private fun ComposeOneLineDisabled(snackbar: ShowcaseSnackbar) {
     ComposeCaption()
-    DaxOneLineListItem(primaryText = "Item disabled", enabled = false, onClick = {})
+    DaxOneLineListItem(primaryText = "Item disabled", enabled = false, onClick = { snackbar.row() })
 }
 
 @Composable
-private fun ComposeOneLineDestructive() {
+private fun ComposeOneLineDestructive(snackbar: ShowcaseSnackbar) {
     ComposeCaption()
     DaxOneLineListItem(
         primaryText = "Item with custom text color",
         primaryTextColor = DuckDuckGoTheme.textColors.destructive,
-        onClick = {},
+        onClick = { snackbar.row() },
     )
 }
 
@@ -1240,31 +1271,31 @@ private fun ComposeOneLineExtras() {
 }
 
 @Composable
-private fun ComposeTwoLinePlain() {
+private fun ComposeTwoLinePlain(snackbar: ShowcaseSnackbar) {
     ComposeCaption()
-    DaxTwoLineListItem(primaryText = "Two Line Item", secondaryText = "Without Image", onClick = {})
+    DaxTwoLineListItem(primaryText = "Two Line Item", secondaryText = "Without Image", onClick = { snackbar.row() })
 }
 
 @Composable
-private fun ComposeTwoLineImage() {
+private fun ComposeTwoLineImage(snackbar: ShowcaseSnackbar) {
     ComposeCaption()
     DaxTwoLineListItem(
         primaryText = "Two Line Item",
         secondaryText = "With Leading Image",
         leadingContent = { Icon(painterResource(CommonR.drawable.ic_globe_24), null, size = DaxListItemIconSize.Small) },
-        onClick = {},
+        onClick = { snackbar.row() },
     )
 }
 
 @Composable
-private fun ComposeTwoLineMediumTrailing() {
+private fun ComposeTwoLineMediumTrailing(snackbar: ShowcaseSnackbar) {
     ComposeCaption()
     DaxTwoLineListItem(
         primaryText = "Two Line Item",
         secondaryText = "With Medium Leading and Trailing Image",
         leadingContent = { Image(painterResource(CommonR.drawable.ic_dax_icon), null, size = DaxListItemIconSize.Small) },
-        trailingContent = { Icon(painterResource(CommonR.drawable.ic_menu_vertical_24), "Overflow", onClick = {}) },
-        onClick = {},
+        trailingContent = { Icon(painterResource(CommonR.drawable.ic_menu_vertical_24), "Overflow", onClick = { snackbar.trailingIcon() }) },
+        onClick = { snackbar.row() },
     )
 }
 
@@ -1288,14 +1319,14 @@ private fun ComposeTwoLineMediumTrailingBg() {
 }
 
 @Composable
-private fun ComposeTwoLineLargeTrailing() {
+private fun ComposeTwoLineLargeTrailing(snackbar: ShowcaseSnackbar) {
     ComposeCaption()
     DaxTwoLineListItem(
         primaryText = "Two Line Item",
         secondaryText = "With Large Leading and Trailing Image",
         leadingContent = { Image(painterResource(CommonR.drawable.ic_dax_icon), null, size = DaxListItemIconSize.Large) },
-        trailingContent = { Icon(painterResource(CommonR.drawable.ic_menu_vertical_24), "Overflow", onClick = {}) },
-        onClick = {},
+        trailingContent = { Icon(painterResource(CommonR.drawable.ic_menu_vertical_24), "Overflow", onClick = { snackbar.trailingIcon() }) },
+        onClick = { snackbar.row() },
     )
 }
 
@@ -1319,13 +1350,13 @@ private fun ComposeTwoLineLargeTrailingBg() {
 }
 
 @Composable
-private fun ComposeTwoLineTrailing() {
+private fun ComposeTwoLineTrailing(snackbar: ShowcaseSnackbar) {
     ComposeCaption()
     DaxTwoLineListItem(
         primaryText = "Two Line Item",
         secondaryText = "With Trailing Image",
-        trailingContent = { Icon(painterResource(CommonR.drawable.ic_menu_vertical_24), "Overflow", onClick = {}) },
-        onClick = {},
+        trailingContent = { Icon(painterResource(CommonR.drawable.ic_menu_vertical_24), "Overflow", onClick = { snackbar.trailingIcon() }) },
+        onClick = { snackbar.row() },
     )
 }
 
@@ -1356,9 +1387,14 @@ private fun ComposeTwoLineMediumTrailingOnly() {
 }
 
 @Composable
-private fun ComposeTwoLineBetaPill() {
+private fun ComposeTwoLineBetaPill(snackbar: ShowcaseSnackbar) {
     ComposeCaption()
-    DaxTwoLineListItem(primaryText = "Two Line Item", secondaryText = "With Beta Pill", inlineContent = { Pill("Beta") }, onClick = {})
+    DaxTwoLineListItem(
+        primaryText = "Two Line Item",
+        secondaryText = "With Beta Pill",
+        inlineContent = { Pill("Beta") },
+        onClick = { snackbar.row() },
+    )
 }
 
 @Composable
@@ -1400,40 +1436,64 @@ private fun ComposeTwoLineRounded() {
 }
 
 @Composable
-private fun ComposeTwoLineSwitch() {
+private fun ComposeTwoLineSwitch(snackbar: ShowcaseSnackbar) {
     ComposeCaption()
     var checked by remember { mutableStateOf(false) }
     DaxTwoLineListItem(
         primaryText = "Two Line Item",
         secondaryText = "With Switch",
-        trailingContent = { Switch(checked = checked, onCheckedChange = { checked = it }) },
-        onClick = {},
+        trailingContent = {
+            Switch(
+                checked = checked,
+                onCheckedChange = {
+                    checked = it
+                    snackbar.switch(it)
+                },
+            )
+        },
+        onClick = { snackbar.row() },
     )
 }
 
 @Composable
-private fun ComposeTwoLineSwitchImage() {
+private fun ComposeTwoLineSwitchImage(snackbar: ShowcaseSnackbar) {
     ComposeCaption()
     var checked by remember { mutableStateOf(false) }
     DaxTwoLineListItem(
         primaryText = "Two Line Item",
         secondaryText = "With Leading Image and Switch",
         leadingContent = { Icon(painterResource(CommonR.drawable.ic_globe_24), null, size = DaxListItemIconSize.Small) },
-        trailingContent = { Switch(checked = checked, onCheckedChange = { checked = it }) },
-        onClick = {},
+        trailingContent = {
+            Switch(
+                checked = checked,
+                onCheckedChange = {
+                    checked = it
+                    snackbar.switch(it)
+                },
+            )
+        },
+        onClick = { snackbar.row() },
     )
 }
 
 @Composable
-private fun ComposeTwoLineSwitchPill() {
+private fun ComposeTwoLineSwitchPill(snackbar: ShowcaseSnackbar) {
     ComposeCaption()
     var checked by remember { mutableStateOf(false) }
     DaxTwoLineListItem(
         primaryText = "Two Line Item",
         secondaryText = "With Beta Pill and Switch",
         inlineContent = { Pill("Beta") },
-        trailingContent = { Switch(checked = checked, onCheckedChange = { checked = it }) },
-        onClick = {},
+        trailingContent = {
+            Switch(
+                checked = checked,
+                onCheckedChange = {
+                    checked = it
+                    snackbar.switch(it)
+                },
+            )
+        },
+        onClick = { snackbar.row() },
     )
 }
 
@@ -1453,7 +1513,7 @@ private fun ComposeTwoLineSwitchTruncated() {
 }
 
 @Composable
-private fun ComposeTwoLineDisabled() {
+private fun ComposeTwoLineDisabled(snackbar: ShowcaseSnackbar) {
     ComposeCaption()
     DaxTwoLineListItem(
         primaryText = "Two Line Item Two Line Item Two Line Item Two Line Item",
@@ -1462,12 +1522,12 @@ private fun ComposeTwoLineDisabled() {
         leadingContent = { Icon(painterResource(CommonR.drawable.ic_globe_24), null, size = DaxListItemIconSize.Small) },
         trailingContent = { Switch(checked = false, onCheckedChange = {}) },
         enabled = false,
-        onClick = {},
+        onClick = { snackbar.row() },
     )
 }
 
 @Composable
-private fun ComposeTwoLineSwitchChecked() {
+private fun ComposeTwoLineSwitchChecked(snackbar: ShowcaseSnackbar) {
     ComposeCaption()
     DaxTwoLineListItem(
         primaryText = "Two Line Item Two",
@@ -1476,7 +1536,7 @@ private fun ComposeTwoLineSwitchChecked() {
         leadingContent = { Icon(painterResource(CommonR.drawable.ic_globe_24), null, size = DaxListItemIconSize.Small) },
         trailingContent = { Switch(checked = true, onCheckedChange = {}) },
         enabled = false,
-        onClick = {},
+        onClick = { snackbar.row() },
     )
 }
 
