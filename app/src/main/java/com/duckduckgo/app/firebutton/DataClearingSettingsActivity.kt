@@ -48,7 +48,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(DataClearingSettingsScreenNoParams::class)
+@ContributeToActivityStarter(DataClearingSettingsScreenNoParams::class, deeplinkScreenName = "dataClearing")
 class DataClearingSettingsActivity : DuckDuckGoActivity() {
 
     @Inject

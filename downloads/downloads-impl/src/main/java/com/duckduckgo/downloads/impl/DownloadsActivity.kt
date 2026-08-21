@@ -63,7 +63,7 @@ import java.io.File
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(DownloadsScreenNoParams::class)
+@ContributeToActivityStarter(DownloadsScreenNoParams::class, deeplinkScreenName = "downloads")
 class DownloadsActivity : DuckDuckGoActivity() {
 
     private val viewModel: DownloadsViewModel by bindViewModel()

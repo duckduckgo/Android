@@ -58,7 +58,7 @@ import com.duckduckgo.mobile.android.R as CommonR
 object DuckAiPaidSettingsNoParams : GlobalActivityStarter.ActivityParams
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(DuckAiPaidSettingsNoParams::class)
+@ContributeToActivityStarter(DuckAiPaidSettingsNoParams::class, deeplinkScreenName = "duckai.paidSettings")
 class DuckAiPaidSettingsActivity : DuckDuckGoActivity() {
 
     @Inject lateinit var globalActivityStarter: GlobalActivityStarter

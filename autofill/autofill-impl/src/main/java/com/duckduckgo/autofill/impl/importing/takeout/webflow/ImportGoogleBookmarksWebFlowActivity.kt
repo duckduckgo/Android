@@ -45,7 +45,7 @@ import javax.inject.Inject
 data class ImportBookmarksViaGoogleTakeoutScreen(val launchSource: String) : GlobalActivityStarter.ActivityParams
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(ImportBookmarksViaGoogleTakeoutScreen::class, screenName = "importGoogleBookmarks")
+@ContributeToActivityStarter(ImportBookmarksViaGoogleTakeoutScreen::class, deeplinkScreenName = "importGoogleBookmarks")
 class ImportGoogleBookmarksWebFlowActivity :
     DuckDuckGoActivity(),
     ImportGoogleBookmarksWebFlowFragment.WebViewVisibilityListener {

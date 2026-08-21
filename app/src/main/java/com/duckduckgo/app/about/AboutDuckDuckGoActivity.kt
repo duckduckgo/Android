@@ -58,7 +58,7 @@ import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(AboutScreenNoParams::class)
+@ContributeToActivityStarter(AboutScreenNoParams::class, deeplinkScreenName = "about")
 class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
 
     private val viewModel: AboutDuckDuckGoViewModel by bindViewModel()

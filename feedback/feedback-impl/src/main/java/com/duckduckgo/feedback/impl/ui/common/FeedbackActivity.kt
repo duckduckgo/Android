@@ -46,7 +46,7 @@ import logcat.logcat
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(FeedbackScreenNoParams::class, screenName = "feedback")
+@ContributeToActivityStarter(FeedbackScreenNoParams::class, deeplinkScreenName = "feedback")
 class FeedbackActivity :
     DuckDuckGoActivity(),
     InitialFeedbackFragment.InitialFeedbackListener,

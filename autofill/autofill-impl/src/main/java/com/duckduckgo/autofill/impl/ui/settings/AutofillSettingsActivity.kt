@@ -61,7 +61,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(AutofillSettingsScreen::class)
+@ContributeToActivityStarter(AutofillSettingsScreen::class, deeplinkScreenName = "autofill.settings")
 class AutofillSettingsActivity : DuckDuckGoActivity() {
 
     @Inject

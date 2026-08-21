@@ -20,15 +20,19 @@ import kotlin.reflect.KClass
 
 /**
  * Anvil annotation to generate and contribute the Map<ActivityParams, Class<ActivityParams>> to the activity starter.
- * It is also possible to define a [screenName], that can be used to deeplink to a screen from RMF.
+ * It is also possible to define a [deeplinkScreenName], that can be used to deeplink to a screen from RMF.
  *
- * The [screenName] should be named as [feature].<screenName>. For instance, for the VPN feature has many sub-screens, eg. main, settings and so
- * they could be named "vpn.main", "vpn.settings" etc.
- * Not all screens will have a parent feature, for instance the main settings screen would be named just "settings"
+ * The [deeplinkScreenName] should be named as <feature>.<subScreen>, each segment camelCase. For instance the VPN feature has many
+ * sub-screens, eg. "vpn.main", "vpn.settings", "vpn.geoswitching". Not all screens will have a parent feature, for instance the main
+ * settings screen is named just "settings".
+ * The name must be unique across the app: several mappers claiming the same name are resolved in an undefined order.
+ *
+ * Only screens that make sense as a deeplink entry point should declare one. Screens in the middle of a flow, screens that need caller
+ * context, screens loading a caller-provided URL, and screens in internal/dev modules must not be deeplinkable.
  *
  * Usage:
  * ```kotlin
- * @ContributeToActivityStarter(ExampleActivityParams::class, screenName = "example")
+ * @ContributeToActivityStarter(ExampleActivityParams::class, deeplinkScreenName = "example")
  * class MyActivity {
  *
  * }
@@ -43,5 +47,5 @@ annotation class ContributeToActivityStarter(
     /** The type of the input parameters received by the Activity */
     val paramsType: KClass<*>,
     /** Declares the deeplink name for the Activity */
-    val screenName: String = "",
+    val deeplinkScreenName: String = "",
 )

@@ -55,7 +55,7 @@ import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(ThreatProtectionSettingsNoParams::class)
+@ContributeToActivityStarter(ThreatProtectionSettingsNoParams::class, deeplinkScreenName = "threatProtection")
 class ThreatProtectionSettingsActivity : DuckDuckGoActivity() {
 
     private val viewModel: ThreatProtectionSettingsViewModel by bindViewModel()

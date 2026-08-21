@@ -70,7 +70,13 @@ class SyncActivityParamMapper @Inject constructor(
         }
     }
 
-    override fun map(deeplinkActivityParams: DeeplinkActivityParams): ActivityParams? = null
+    override fun map(deeplinkActivityParams: DeeplinkActivityParams): ActivityParams? {
+        return if (deeplinkActivityParams.screenName == SYNC_DEEPLINK_SCREEN_NAME) {
+            SyncActivityWithEmptyParams
+        } else {
+            null
+        }
+    }
 
     override fun onCreate(owner: LifecycleOwner) {
         // We don't read useSimplifiedSync().isEnabled() directly when mapping Activity params
@@ -81,5 +87,11 @@ class SyncActivityParamMapper @Inject constructor(
                 .enabled()
                 .collect { useSimplifiedSync = it }
         }
+    }
+
+    companion object {
+        // Declared here rather than via @ContributeToActivityStarter's deeplinkScreenName because this mapper is handwritten.
+        // It must stay unique against every annotated screen name.
+        private const val SYNC_DEEPLINK_SCREEN_NAME = "sync"
     }
 }

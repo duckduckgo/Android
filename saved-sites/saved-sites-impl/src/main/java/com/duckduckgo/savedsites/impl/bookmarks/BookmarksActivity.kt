@@ -112,7 +112,7 @@ import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as commonR
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(BookmarksScreenNoParams::class, screenName = "bookmarks")
+@ContributeToActivityStarter(BookmarksScreenNoParams::class, deeplinkScreenName = "bookmarks")
 class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.Callback {
 
     @Inject

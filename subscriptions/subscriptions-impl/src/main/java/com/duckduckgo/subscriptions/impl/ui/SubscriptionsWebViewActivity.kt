@@ -148,8 +148,8 @@ data class SubscriptionsWebViewActivityWithParams(
     scope = ActivityScope::class,
     delayGeneration = true, // Delayed because it has a dependency on DownloadConfirmationFragment from another module
 )
-@ContributeToActivityStarter(SubscriptionPurchase::class, screenName = "subscriptions.purchase")
-@ContributeToActivityStarter(SubscriptionUpgrade::class, screenName = "subscriptions.upgrade")
+@ContributeToActivityStarter(SubscriptionPurchase::class, deeplinkScreenName = "subscriptions.purchase")
+@ContributeToActivityStarter(SubscriptionUpgrade::class, deeplinkScreenName = "subscriptions.upgrade")
 @ContributeToActivityStarter(SubscriptionsWebViewActivityWithParams::class)
 class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationDialogListener {
 

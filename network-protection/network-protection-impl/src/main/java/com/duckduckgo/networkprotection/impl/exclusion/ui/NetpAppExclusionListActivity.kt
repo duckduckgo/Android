@@ -60,7 +60,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(NetPAppExclusionListNoParams::class)
+@ContributeToActivityStarter(NetPAppExclusionListNoParams::class, deeplinkScreenName = "vpn.exclusions")
 class NetpAppExclusionListActivity :
     DuckDuckGoActivity(),
     ManuallyDisableAppProtectionDialog.ManuallyDisableAppProtectionDialogListener,

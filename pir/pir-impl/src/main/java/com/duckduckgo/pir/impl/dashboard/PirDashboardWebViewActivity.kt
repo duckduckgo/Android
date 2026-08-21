@@ -52,7 +52,7 @@ import javax.inject.Inject
 import javax.inject.Named
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(PirDashboardWebViewScreen::class)
+@ContributeToActivityStarter(PirDashboardWebViewScreen::class, deeplinkScreenName = "pir.dashboard")
 class PirDashboardWebViewActivity : DuckDuckGoActivity() {
 
     @Inject

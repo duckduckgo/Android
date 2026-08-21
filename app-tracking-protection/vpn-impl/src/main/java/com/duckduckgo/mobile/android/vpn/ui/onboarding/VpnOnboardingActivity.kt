@@ -58,7 +58,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(AppTrackerOnboardingActivityWithEmptyParamsParams::class)
+@ContributeToActivityStarter(AppTrackerOnboardingActivityWithEmptyParamsParams::class, deeplinkScreenName = "apptp.onboarding")
 class VpnOnboardingActivity : DuckDuckGoActivity() {
 
     @Inject

@@ -122,7 +122,7 @@ class ContributeToActivityStarterProcessor(
                 return
             }
             val paramsClassName = paramsType.toClassName()
-            val screenName = annotation.getArgumentString("screenName").orEmpty()
+            val deeplinkScreenName = annotation.getArgumentString("deeplinkScreenName").orEmpty()
 
             val mapperClassName = "${className}_${paramsClassName.simpleName}_Mapper"
 
@@ -130,7 +130,7 @@ class ContributeToActivityStarterProcessor(
                 mapperClassName = mapperClassName,
                 activityClassName = activityClassName,
                 paramsClassName = paramsClassName,
-                screenName = screenName,
+                deeplinkScreenName = deeplinkScreenName,
             )
 
             fileSpecBuilder.addType(typeSpec)
@@ -152,7 +152,7 @@ class ContributeToActivityStarterProcessor(
         mapperClassName: String,
         activityClassName: ClassName,
         paramsClassName: ClassName,
-        screenName: String,
+        deeplinkScreenName: String,
     ): TypeSpec {
         val constructor = FunSpec.constructorBuilder()
             .addAnnotation(INJECT_CLASS)
@@ -194,11 +194,12 @@ class ContributeToActivityStarterProcessor(
             .addProperty(moshiProperty)
             .addFunction(mapActivityParamsFun)
             .apply {
-                if (screenName.isBlank()) {
+                if (deeplinkScreenName.isBlank()) {
                     addFunction(emptyDeeplinkMapper())
                 } else {
-                    addFunction(createDeeplinkMapper(paramsClassName, screenName))
+                    addFunction(createDeeplinkMapper(paramsClassName, deeplinkScreenName))
                     addFunction(createTryCreateObjectInstance())
+                    addFunction(createTryCreateDefaultParams())
                     addFunction(createTryCreateActivityParams())
                 }
             }
@@ -214,7 +215,7 @@ class ContributeToActivityStarterProcessor(
             .build()
     }
 
-    private fun createDeeplinkMapper(paramsClassName: ClassName, screenName: String): FunSpec {
+    private fun createDeeplinkMapper(paramsClassName: ClassName, deeplinkScreenName: String): FunSpec {
         return FunSpec.builder("map")
             .addModifiers(KModifier.OVERRIDE)
             .addParameter("deeplinkActivityParams", DEEPLINK_ACTIVITY_PARAMS_CLASS)
@@ -237,13 +238,16 @@ class ContributeToActivityStarterProcessor(
                             if (instance != null) {
                                 return instance
                             }
+                            val defaultParams = tryCreateDefaultParams(%T::class.java)
+                            return defaultParams
                         }
                         tryCreateActivityParams(%T::class.java, deeplinkActivityParams)
                     } else {
                         null
                     }
                 """.trimIndent(),
-                screenName,
+                deeplinkScreenName,
+                paramsClassName,
                 paramsClassName,
                 paramsClassName,
             )
@@ -270,6 +274,30 @@ class ContributeToActivityStarterProcessor(
                         """.trimIndent(),
                         MOSHI_TYPES_CLASS,
                         ACTIVITY_PARAMS_CLASS,
+                    ).build(),
+            )
+            .build()
+    }
+
+    private fun createTryCreateDefaultParams(): FunSpec {
+        // Lets params types whose values all have defaults be deeplinked without a payload
+        return FunSpec.builder("tryCreateDefaultParams")
+            .addModifiers(KModifier.PRIVATE)
+            .addParameter(
+                "clazz",
+                Class::class.asClassName().parameterizedBy(
+                    WildcardTypeName.producerOf(ACTIVITY_PARAMS_CLASS),
+                ),
+            )
+            .returns(ACTIVITY_PARAMS_CLASS.copy(nullable = true))
+            .addCode(
+                CodeBlock.builder()
+                    .add(
+                        """
+                            return kotlin.runCatching {
+                                moshi.adapter(clazz).fromJson("{}")
+                            }.getOrNull()
+                        """.trimIndent(),
                     ).build(),
             )
             .build()

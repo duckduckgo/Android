@@ -81,9 +81,9 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(NetworkProtectionManagementScreenNoParams::class, screenName = "vpn.main")
-@ContributeToActivityStarter(NetworkProtectionManagementScreenAndEnable::class, screenName = "vpn.main")
-@ContributeToActivityStarter(NetworkProtectionManagementScreenWithLaunchPixel::class, screenName = "vpn.main")
+@ContributeToActivityStarter(NetworkProtectionManagementScreenNoParams::class, deeplinkScreenName = "vpn.main")
+@ContributeToActivityStarter(NetworkProtectionManagementScreenAndEnable::class, deeplinkScreenName = "vpn.main")
+@ContributeToActivityStarter(NetworkProtectionManagementScreenWithLaunchPixel::class, deeplinkScreenName = "vpn.main")
 class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
 
     @Inject

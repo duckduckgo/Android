@@ -50,7 +50,7 @@ import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(DuckPlayerSettingsNoParams::class)
+@ContributeToActivityStarter(DuckPlayerSettingsNoParams::class, deeplinkScreenName = "duckplayer.settings")
 class DuckPlayerSettingsActivity : DuckDuckGoActivity() {
 
     private val viewModel: DuckPlayerSettingsViewModel by bindViewModel()

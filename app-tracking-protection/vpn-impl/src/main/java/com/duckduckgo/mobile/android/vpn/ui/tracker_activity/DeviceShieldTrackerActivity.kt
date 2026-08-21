@@ -93,7 +93,7 @@ import javax.inject.Inject
 import javax.inject.Provider
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(AppTrackerActivityWithEmptyParams::class, screenName = "apptp.main")
+@ContributeToActivityStarter(AppTrackerActivityWithEmptyParams::class, deeplinkScreenName = "apptp.main")
 class DeviceShieldTrackerActivity :
     DuckDuckGoActivity(),
     DeviceShieldActivityFeedFragment.DeviceShieldActivityFeedListener {

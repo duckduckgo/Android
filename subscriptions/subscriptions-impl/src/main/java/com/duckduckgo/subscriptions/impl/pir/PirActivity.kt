@@ -35,7 +35,7 @@ import com.duckduckgo.windows.api.ui.WindowsScreenWithEmptyParams
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(PirScreenWithEmptyParams::class)
+@ContributeToActivityStarter(PirScreenWithEmptyParams::class, deeplinkScreenName = "pir")
 class PirActivity : DuckDuckGoActivity() {
 
     @Inject

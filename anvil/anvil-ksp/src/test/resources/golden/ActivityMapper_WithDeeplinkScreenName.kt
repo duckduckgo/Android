@@ -40,6 +40,8 @@ public class TestActivity_TestParams_Mapper @Inject constructor() :
             if (instance != null) {
                 return instance
             }
+            val defaultParams = tryCreateDefaultParams(TestParams::class.java)
+            return defaultParams
         }
         tryCreateActivityParams(TestParams::class.java, deeplinkActivityParams)
     } else {
@@ -50,6 +52,11 @@ public class TestActivity_TestParams_Mapper @Inject constructor() :
   private fun tryCreateObjectInstance(clazz: Class<out GlobalActivityStarter.ActivityParams>):
       GlobalActivityStarter.ActivityParams? = kotlin.runCatching {
       Types.getRawType(clazz).kotlin.objectInstance as GlobalActivityStarter.ActivityParams
+  }.getOrNull()
+
+  private fun tryCreateDefaultParams(clazz: Class<out GlobalActivityStarter.ActivityParams>):
+      GlobalActivityStarter.ActivityParams? = kotlin.runCatching {
+      moshi.adapter(clazz).fromJson("{}")
   }.getOrNull()
 
   private fun tryCreateActivityParams(clazz: Class<out GlobalActivityStarter.ActivityParams>,

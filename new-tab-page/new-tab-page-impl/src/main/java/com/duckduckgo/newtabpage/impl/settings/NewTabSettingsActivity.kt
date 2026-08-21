@@ -46,7 +46,7 @@ import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(NewTabSettingsScreenNoParams::class, screenName = "newtabsettings")
+@ContributeToActivityStarter(NewTabSettingsScreenNoParams::class, deeplinkScreenName = "newtabsettings")
 class NewTabSettingsActivity : DuckDuckGoActivity() {
 
     private val viewModel: NewTabSettingsViewModel by bindViewModel()

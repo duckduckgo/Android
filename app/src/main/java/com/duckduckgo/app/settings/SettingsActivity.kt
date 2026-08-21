@@ -119,7 +119,7 @@ import javax.inject.Inject
 private const val OTHER_PLATFORMS_URL = "https://duckduckgo.com/app"
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(SettingsScreenNoParams::class, screenName = "settings")
+@ContributeToActivityStarter(SettingsScreenNoParams::class, deeplinkScreenName = "settings")
 class SettingsActivity : DuckDuckGoActivity() {
 
     private val viewModel: SettingsViewModel by bindViewModel()

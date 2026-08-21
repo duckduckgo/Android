@@ -44,7 +44,7 @@ import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(NetpGeoswitchingScreenNoParams::class)
+@ContributeToActivityStarter(NetpGeoswitchingScreenNoParams::class, deeplinkScreenName = "vpn.geoswitching")
 class NetpGeoswitchingActivity : DuckDuckGoActivity() {
 
     @Inject
