@@ -1051,7 +1051,7 @@ private fun ComposeOneLineMediumImage() {
     ComposeCaption()
     DaxOneLineListItem(
         primaryText = "Item with Medium Leading Image",
-        leadingContent = { Icon(painterResource(CommonR.drawable.ic_dax_icon), null, size = DaxListItemIconSize.Small, tint = null) },
+        leadingContent = { Image(painterResource(CommonR.drawable.ic_dax_icon), null, size = DaxListItemIconSize.Small) },
         onClick = {},
     )
 }
@@ -1062,12 +1062,11 @@ private fun ComposeOneLineMediumImageBg() {
     DaxOneLineListItem(
         primaryText = "Item with Medium Leading Image",
         leadingContent = {
-            Icon(
+            Image(
                 painterResource(CommonR.drawable.ic_dax_icon),
                 null,
                 size = DaxListItemIconSize.Small,
                 background = DaxListItemIconBackground.Circular,
-                tint = null,
             )
         },
         onClick = {},
@@ -1079,7 +1078,7 @@ private fun ComposeOneLineLargeImage() {
     ComposeCaption()
     DaxOneLineListItem(
         primaryText = "Item with Large Leading Image",
-        leadingContent = { Icon(painterResource(CommonR.drawable.ic_dax_icon), null, size = DaxListItemIconSize.Large, tint = null) },
+        leadingContent = { Image(painterResource(CommonR.drawable.ic_dax_icon), null, size = DaxListItemIconSize.Large) },
         onClick = {},
     )
 }
@@ -1090,12 +1089,11 @@ private fun ComposeOneLineLargeImageBg() {
     DaxOneLineListItem(
         primaryText = "Item with Large Leading Image",
         leadingContent = {
-            Icon(
+            Image(
                 painterResource(CommonR.drawable.ic_dax_icon),
                 null,
                 size = DaxListItemIconSize.Large,
                 background = DaxListItemIconBackground.Circular,
-                tint = null,
             )
         },
         onClick = {},
@@ -1204,7 +1202,7 @@ private fun ComposeOneLineExtras() {
     ComposeCaption(stringResource(R.string.dsShowcaseCaptionComposeOnly))
     DaxOneLineListItem(
         primaryText = "Favicon (untinted image)",
-        leadingContent = { Icon(painterResource(CommonR.drawable.ic_ddg_logo), null, size = DaxListItemIconSize.Large, tint = null) },
+        leadingContent = { Image(painterResource(CommonR.drawable.ic_ddg_logo), null, size = DaxListItemIconSize.Large) },
         onClick = {},
     )
     DaxOneLineListItem(
@@ -1251,7 +1249,7 @@ private fun ComposeTwoLineMediumTrailing() {
     DaxTwoLineListItem(
         primaryText = "Two Line Item",
         secondaryText = "With Medium Leading and Trailing Image",
-        leadingContent = { Icon(painterResource(CommonR.drawable.ic_globe_24), null, size = DaxListItemIconSize.Small) },
+        leadingContent = { Image(painterResource(CommonR.drawable.ic_dax_icon), null, size = DaxListItemIconSize.Small) },
         trailingContent = { Icon(painterResource(CommonR.drawable.ic_menu_vertical_24), "Overflow", onClick = {}) },
         onClick = {},
     )
@@ -1264,8 +1262,8 @@ private fun ComposeTwoLineMediumTrailingBg() {
         primaryText = "Two Line Item",
         secondaryText = "With Medium Leading Background and Trailing Image",
         leadingContent = {
-            Icon(
-                painterResource(CommonR.drawable.ic_globe_24),
+            Image(
+                painterResource(CommonR.drawable.ic_dax_icon),
                 null,
                 size = DaxListItemIconSize.Small,
                 background = DaxListItemIconBackground.Circular,
@@ -1282,7 +1280,7 @@ private fun ComposeTwoLineLargeTrailing() {
     DaxTwoLineListItem(
         primaryText = "Two Line Item",
         secondaryText = "With Large Leading and Trailing Image",
-        leadingContent = { Icon(painterResource(CommonR.drawable.ic_globe_24), null, size = DaxListItemIconSize.Large) },
+        leadingContent = { Image(painterResource(CommonR.drawable.ic_dax_icon), null, size = DaxListItemIconSize.Large) },
         trailingContent = { Icon(painterResource(CommonR.drawable.ic_menu_vertical_24), "Overflow", onClick = {}) },
         onClick = {},
     )
@@ -1295,8 +1293,8 @@ private fun ComposeTwoLineLargeTrailingBg() {
         primaryText = "Two Line Item",
         secondaryText = "With Large Leading Background and Trailing Image",
         leadingContent = {
-            Icon(
-                painterResource(CommonR.drawable.ic_globe_24),
+            Image(
+                painterResource(CommonR.drawable.ic_dax_icon),
                 null,
                 size = DaxListItemIconSize.Large,
                 background = DaxListItemIconBackground.Circular,
@@ -1520,7 +1518,7 @@ private fun ComposeSettingsWithIcon() {
     DaxSettingsListItem(
         primaryText = "Settings List Item",
         status = Status.Off,
-        leadingContent = { Icon(painterResource(CommonR.drawable.ic_dax_icon), null, size = DaxListItemIconSize.Small, tint = null) },
+        leadingContent = { Image(painterResource(CommonR.drawable.ic_dax_icon), null, size = DaxListItemIconSize.Small) },
         onClick = {},
     )
 }
@@ -1531,7 +1529,7 @@ private fun ComposeSettingsAlwaysOn() {
     DaxSettingsListItem(
         primaryText = "Settings List Item Always On",
         status = Status.AlwaysOn,
-        leadingContent = { Icon(painterResource(CommonR.drawable.ic_dax_icon), null, size = DaxListItemIconSize.Small, tint = null) },
+        leadingContent = { Image(painterResource(CommonR.drawable.ic_dax_icon), null, size = DaxListItemIconSize.Small) },
         onClick = {},
     )
 }
@@ -1542,7 +1540,7 @@ private fun ComposeSettingsOn() {
     DaxSettingsListItem(
         primaryText = "Settings List Item on",
         status = Status.On,
-        leadingContent = { Icon(painterResource(CommonR.drawable.ic_dax_icon), null, size = DaxListItemIconSize.Small, tint = null) },
+        leadingContent = { Image(painterResource(CommonR.drawable.ic_dax_icon), null, size = DaxListItemIconSize.Small) },
         onClick = {},
     )
 }
@@ -1553,7 +1551,7 @@ private fun ComposeSettingsOff() {
     DaxSettingsListItem(
         primaryText = "Settings List Item Off",
         status = Status.Off,
-        leadingContent = { Icon(painterResource(CommonR.drawable.ic_dax_icon), null, size = DaxListItemIconSize.Small, tint = null) },
+        leadingContent = { Image(painterResource(CommonR.drawable.ic_dax_icon), null, size = DaxListItemIconSize.Small) },
         onClick = {},
     )
 }
@@ -1565,7 +1563,7 @@ private fun ComposeSettingsBeta() {
         primaryText = "Settings List Item with Beta Pill",
         status = Status.On,
         inlineContent = { Pill("Beta") },
-        leadingContent = { Icon(painterResource(CommonR.drawable.ic_dax_icon), null, size = DaxListItemIconSize.Small, tint = null) },
+        leadingContent = { Image(painterResource(CommonR.drawable.ic_dax_icon), null, size = DaxListItemIconSize.Small) },
         onClick = {},
     )
 }
@@ -1577,7 +1575,7 @@ private fun ComposeSettingsBetaLongText() {
         primaryText = "Settings List Item with Beta Pill and a very long piece of text that should hopefully wrap",
         status = Status.On,
         inlineContent = { Pill("Beta") },
-        leadingContent = { Icon(painterResource(CommonR.drawable.ic_dax_icon), null, size = DaxListItemIconSize.Small, tint = null) },
+        leadingContent = { Image(painterResource(CommonR.drawable.ic_dax_icon), null, size = DaxListItemIconSize.Small) },
         onClick = {},
     )
 }
@@ -1589,7 +1587,7 @@ private fun ComposeSettingsNew() {
         primaryText = "Settings List Item with New Pill",
         status = Status.On,
         inlineContent = { Pill("New") },
-        leadingContent = { Icon(painterResource(CommonR.drawable.ic_dax_icon), null, size = DaxListItemIconSize.Small, tint = null) },
+        leadingContent = { Image(painterResource(CommonR.drawable.ic_dax_icon), null, size = DaxListItemIconSize.Small) },
         onClick = {},
     )
 }
@@ -1601,12 +1599,11 @@ private fun ComposeSettingsExtras() {
         primaryText = "Leading icon over circular background",
         status = Status.On,
         leadingContent = {
-            Icon(
+            Image(
                 painterResource(CommonR.drawable.ic_dax_icon),
                 null,
                 size = DaxListItemIconSize.Small,
                 background = DaxListItemIconBackground.Circular,
-                tint = null,
             )
         },
         onClick = {},

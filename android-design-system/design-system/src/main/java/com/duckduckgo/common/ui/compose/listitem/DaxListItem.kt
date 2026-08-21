@@ -179,15 +179,17 @@ internal fun DaxListItem(
 class DaxListItemLeadingScope internal constructor(private val parentEnabled: Boolean) {
 
     /**
-     * Leading icon.
+     * Leading icon: single-colour artwork the design system colours. Artwork carrying its own
+     * colours belongs in [Image].
      *
      * @param painter Icon artwork.
      * @param contentDescription Accessibility description; `null` for a decorative icon.
      * @param modifier Modifier applied to the icon container.
      * @param size Icon size; independent of [background].
      * @param background Container drawn behind the icon; independent of [size].
-     * @param tint Icon tint; `null` renders the painter's own colours, for artwork that carries
-     * them already (e.g. a favicon).
+     * @param tint Icon tint. Defaults to untinted as an interim: around half the icon set bakes the
+     * translucent `daxColorPrimaryIcon` into its artwork, and tinting that again multiplies the two
+     * alphas. Restore a theme tint once the artwork is opaque masks.
      */
     @Composable
     fun Icon(
@@ -196,7 +198,34 @@ class DaxListItemLeadingScope internal constructor(private val parentEnabled: Bo
         modifier: Modifier = Modifier,
         size: DaxListItemIconSize = DaxListItemIconSize.Small,
         background: DaxListItemIconBackground = DaxListItemIconBackground.None,
-        tint: Color? = null,
+        tint: Color = Color.Unspecified,
+    ) {
+        Artwork(painter, contentDescription, modifier, size, background, tint)
+    }
+
+    /**
+     * Leading image: artwork carrying its own colours, never tinted. Single-colour artwork the
+     * design system should colour belongs in [Icon].
+     */
+    @Composable
+    fun Image(
+        painter: Painter,
+        contentDescription: String?,
+        modifier: Modifier = Modifier,
+        size: DaxListItemIconSize = DaxListItemIconSize.Small,
+        background: DaxListItemIconBackground = DaxListItemIconBackground.None,
+    ) {
+        Artwork(painter, contentDescription, modifier, size, background, tint = Color.Unspecified)
+    }
+
+    @Composable
+    private fun Artwork(
+        painter: Painter,
+        contentDescription: String?,
+        modifier: Modifier,
+        size: DaxListItemIconSize,
+        background: DaxListItemIconBackground,
+        tint: Color,
     ) {
         val iconDp = when (size) {
             DaxListItemIconSize.Small -> DaxListItemDefaults.LeadingIconSmall
@@ -218,7 +247,7 @@ class DaxListItemLeadingScope internal constructor(private val parentEnabled: Bo
             M3Icon(
                 painter = painter,
                 contentDescription = contentDescription,
-                tint = tint ?: Color.Unspecified,
+                tint = tint,
                 modifier = Modifier.size(iconDp),
             )
         }

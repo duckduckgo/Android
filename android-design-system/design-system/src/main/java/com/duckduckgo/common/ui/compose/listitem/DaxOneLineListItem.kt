@@ -227,7 +227,7 @@ private fun DaxOneLineListItemLeadingIconsPreview() {
             DaxOneLineListItem(
                 primaryText = "Favicon (untinted image)",
                 leadingContent = {
-                    Icon(painterResource(R.drawable.ic_ddg_logo), null, size = DaxListItemIconSize.Large, tint = null)
+                    Image(painterResource(R.drawable.ic_ddg_logo), null, size = DaxListItemIconSize.Large)
                 },
                 onClick = {},
             )
