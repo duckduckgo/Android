@@ -44,7 +44,8 @@
     <androidx.compose.ui.platform.ComposeView
         android:id="@+id/composeOneLineSimple"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/keyline_5" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:layout_width="wrap_content"
@@ -98,7 +99,8 @@
     <androidx.compose.ui.platform.ComposeView
         android:id="@+id/composeOneLineMediumImage"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/keyline_5" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:layout_width="wrap_content"
@@ -120,7 +122,8 @@
     <androidx.compose.ui.platform.ComposeView
         android:id="@+id/composeOneLineMediumImageBg"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/keyline_5" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:layout_width="wrap_content"
@@ -141,7 +144,8 @@
     <androidx.compose.ui.platform.ComposeView
         android:id="@+id/composeOneLineLargeImage"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/keyline_5" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:layout_width="wrap_content"
@@ -163,7 +167,8 @@
     <androidx.compose.ui.platform.ComposeView
         android:id="@+id/composeOneLineLargeImageBg"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/keyline_5" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:layout_width="wrap_content"
@@ -216,7 +221,8 @@
     <androidx.compose.ui.platform.ComposeView
         android:id="@+id/composeOneLineTrailingIcon"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/keyline_5" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:layout_width="wrap_content"
@@ -237,7 +243,8 @@
     <androidx.compose.ui.platform.ComposeView
         android:id="@+id/composeOneLineTrailingTinted"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/keyline_5" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:layout_width="wrap_content"
@@ -259,7 +266,8 @@
     <androidx.compose.ui.platform.ComposeView
         android:id="@+id/composeOneLineLeadingTrailing"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/keyline_5" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:layout_width="wrap_content"
@@ -279,7 +287,8 @@
     <androidx.compose.ui.platform.ComposeView
         android:id="@+id/composeOneLineSwitch"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/keyline_5" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:layout_width="wrap_content"
@@ -330,7 +339,8 @@
     <androidx.compose.ui.platform.ComposeView
         android:id="@+id/composeOneLineDisabled"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/keyline_5" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:layout_width="wrap_content"
@@ -350,7 +360,8 @@
     <androidx.compose.ui.platform.ComposeView
         android:id="@+id/composeOneLineDestructive"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/keyline_5" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:layout_width="wrap_content"
@@ -369,7 +380,8 @@
     <androidx.compose.ui.platform.ComposeView
         android:id="@+id/composeOneLineLongText"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/keyline_5" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:layout_width="wrap_content"
@@ -388,7 +400,8 @@
     <androidx.compose.ui.platform.ComposeView
         android:id="@+id/composeOneLineLongTextTruncated"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/keyline_5" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:layout_width="wrap_content"
@@ -409,11 +422,13 @@
     <androidx.compose.ui.platform.ComposeView
         android:id="@+id/composeOneLineNewPill"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/keyline_5" />
 
     <androidx.compose.ui.platform.ComposeView
         android:id="@+id/composeOneLineExtras"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/keyline_5" />
 
 </LinearLayout>
