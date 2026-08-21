@@ -30,6 +30,7 @@ import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.databinding.FragmentSubscriptionOnboardingWelcomeBinding
+import com.duckduckgo.subscriptions.impl.onboarding.welcome.SubscriptionOnboardingWelcomeViewModel.Command
 import com.duckduckgo.subscriptions.impl.onboarding.welcome.SubscriptionOnboardingWelcomeViewModel.ViewState
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -56,8 +57,17 @@ class SubscriptionOnboardingWelcomeFragment : DuckDuckGoFragment(R.layout.fragme
             .onEach { render(it) }
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
-        if (savedInstanceState == null) {
-            binding.subscriptionOnboardingWelcomeKonfetti.doOnLayout {
+        viewModel.commands
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { processCommand(it) }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        viewModel.onScreenShown()
+    }
+
+    private fun processCommand(command: Command) {
+        when (command) {
+            Command.LaunchConfetti -> binding.subscriptionOnboardingWelcomeKonfetti.doOnLayout {
                 binding.subscriptionOnboardingWelcomeKonfetti.launchOnboardingConfetti()
             }
         }

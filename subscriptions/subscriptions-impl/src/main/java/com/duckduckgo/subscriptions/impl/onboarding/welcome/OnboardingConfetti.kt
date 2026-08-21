@@ -22,11 +22,6 @@ import nl.dionsegijn.konfetti.models.Shape
 import nl.dionsegijn.konfetti.models.Size
 import com.duckduckgo.mobile.android.R as CommonR
 
-/**
- * Streams a short burst of brand-coloured confetti from the top centre of this view. The parameters
- * mirror the celebration used in App Tracking Protection's `DeviceShieldTrackerActivity` so both
- * celebrations look identical.
- */
 fun KonfettiView.launchOnboardingConfetti() {
     val resources = context.resources
     val magenta = ResourcesCompat.getColor(resources, CommonR.color.magenta, null)
