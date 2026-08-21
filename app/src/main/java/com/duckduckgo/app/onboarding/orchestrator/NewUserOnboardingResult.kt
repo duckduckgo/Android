@@ -25,9 +25,4 @@ import com.duckduckgo.onboarding.api.LinearOnboardingResult
 sealed interface NewUserOnboardingResult : LinearOnboardingResult {
     /** Finish onboarding and run [query] as a search. */
     data class LaunchSearch(val query: String) : NewUserOnboardingResult
-
-    /**
-     * Finish onboarding and submit [prompt] to Duck.ai.
-     */
-    data class LaunchChat(val prompt: String) : NewUserOnboardingResult
 }

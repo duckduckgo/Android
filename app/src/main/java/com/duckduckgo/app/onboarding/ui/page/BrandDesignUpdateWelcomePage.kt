@@ -651,9 +651,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     is BrandDesignUpdatePageViewModel.Command.FinishAndSubmitSearchQuery -> {
                         (activity as? OnboardingActivity)?.finishAndSubmitSearchQuery(command.query)
                     }
-                    is BrandDesignUpdatePageViewModel.Command.FinishAndSubmitChatPrompt -> {
-                        (activity as? OnboardingActivity)?.finishAndSubmitChatPrompt(command.prompt)
-                    }
                     is BrandDesignUpdatePageViewModel.Command.OnboardingSkipped -> onSkipPressed()
                     BrandDesignUpdatePageViewModel.Command.SkipDialogAnimation -> skipCurrentDialogAnimation()
                     is BrandDesignUpdatePageViewModel.Command.ShowQuickSetupAddressBarPositionBottomSheet -> {

@@ -29,8 +29,16 @@ interface OnboardingStore {
     fun getInputScreenSelection(): Boolean?
     fun isInputScreenSelectionOverriddenByUser(): Boolean
     fun setInputScreenSelectionOverriddenByUser()
-    fun setDuckAiOnboardingFlow()
+
+    @Deprecated(
+        message = "Migration only: the Duck.ai demo owns this state now.",
+        replaceWith = ReplaceWith(
+            expression = "DuckAiOnboardingDemo.isActive()",
+            imports = ["com.duckduckgo.app.onboarding.DuckAiOnboardingDemo"],
+        ),
+    )
     fun isDuckAiOnboardingFlow(): Boolean
+
     fun setSegmentedSearchPathWithToggleEnabled(enabled: Boolean)
     fun isSegmentedSearchPathWithToggleEnabled(): Boolean
 }

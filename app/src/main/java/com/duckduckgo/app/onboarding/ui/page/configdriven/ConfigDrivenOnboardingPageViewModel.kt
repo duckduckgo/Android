@@ -114,7 +114,6 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
         data object LaunchAddWidgetPrompt : Command
         data object Finish : Command
         data class FinishAndSubmitSearchQuery(val query: String) : Command
-        data class FinishAndSubmitChatPrompt(val prompt: String) : Command
         data object OnboardingSkipped : Command
         data object HandOffToBrowserActivity : Command
         data class ShowQuickSetupDefaultBrowserDialog(val intent: Intent) : Command
@@ -375,7 +374,6 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
                     }
                     is LinearOnboardingState.Completed -> {
                         when (val result = state.result as? NewUserOnboardingResult) {
-                            is NewUserOnboardingResult.LaunchChat -> _commands.send(Command.FinishAndSubmitChatPrompt(prompt = result.prompt))
                             is NewUserOnboardingResult.LaunchSearch -> _commands.send(Command.FinishAndSubmitSearchQuery(query = result.query))
                             null -> _commands.send(Command.Finish)
                         }

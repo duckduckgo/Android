@@ -892,25 +892,6 @@ class BrandDesignUpdatePageViewModelTest {
     }
 
     @Test
-    fun `when run completes with launch chat result then submits chat prompt`() = runTest {
-        val testee = startAt(
-            NewUserOnboardingActivityDialog.InputScreenPreview(
-                isSearchDefault = false,
-                showModeToggle = false,
-                titleRes = R.string.preOnboardingInputModeDemoTitleCustomAi,
-            ),
-            transition = { LinearOnboardingTransition.Advance },
-            result = { NewUserOnboardingResult.LaunchChat(prompt = "cats") },
-        )
-        testee.commands.test {
-            advanceUntilIdle()
-            realOrchestrator.onEvent(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "cats", isChat = true, fromSuggestion = false))
-            advanceUntilIdle()
-            assertEquals(Command.FinishAndSubmitChatPrompt(prompt = "cats"), awaitItem())
-        }
-    }
-
-    @Test
     fun `when run aborted then sends onboarding skipped`() = runTest {
         val testee = startAt(
             NewUserOnboardingActivityDialog.QuickSetup(

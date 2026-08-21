@@ -48,7 +48,7 @@ class CustomAiOnboardingStoreImplTest {
 
     private val enabledToggle: Toggle = mock { on { isEnabled() } doReturn true }
     private val disabledToggle: Toggle = mock { on { isEnabled() } doReturn false }
-    private val customAiOnboardingFeature: CustomAiOnboardingFeature = mock()
+    private val customDuckAiOnboardingFeature: CustomAiOnboardingFeature = mock()
     private val brandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = mock()
 
     private val resolvedListener = object : AppInstallationReferrerStateListener {
@@ -65,13 +65,13 @@ class CustomAiOnboardingStoreImplTest {
             sharedPreferencesProvider = sharedPreferencesProvider,
             referrerStateListener = Lazy { listener },
             dispatcherProvider = coroutineRule.testDispatcherProvider,
-            customAiOnboardingFeature = customAiOnboardingFeature,
+            customAiOnboardingFeature = customDuckAiOnboardingFeature,
             brandDesignUpdateToggles = brandDesignUpdateToggles,
         )
 
     @Before
     fun setup() {
-        whenever(customAiOnboardingFeature.self()).thenReturn(enabledToggle)
+        whenever(customDuckAiOnboardingFeature.self()).thenReturn(enabledToggle)
         whenever(brandDesignUpdateToggles.brandDesignUpdate()).thenReturn(enabledToggle)
     }
 
@@ -84,7 +84,7 @@ class CustomAiOnboardingStoreImplTest {
 
     @Test
     fun `when referrer ai but custom ai feature disabled then resolves false`() = runTest {
-        whenever(customAiOnboardingFeature.self()).thenReturn(disabledToggle)
+        whenever(customDuckAiOnboardingFeature.self()).thenReturn(disabledToggle)
         val store = store()
         store.process(mapOf("origin" to "funnel_playstore", "onboarding" to "ai"))
         assertFalse(store.resolve())
@@ -151,6 +151,16 @@ class CustomAiOnboardingStoreImplTest {
     }
 
     @Test
+    fun `when the referral resolved false on preconditions then isEnabled stays false`() = runTest {
+        whenever(customDuckAiOnboardingFeature.self()).thenReturn(disabledToggle)
+        val store = store()
+        store.process(mapOf("origin" to "funnel_playstore", "onboarding" to "ai"))
+        store.resolve()
+
+        assertFalse(store.isEnabled())
+    }
+
+    @Test
     fun `when referral arrives after resolve then isEnabled stays frozen`() = runTest {
         // Reviewer scenario: the run is chosen once by resolve(). A late-arriving referral signal must
         // NOT flip isEnabled(), or end-of-journey CTAs would show custom-AI copy during the default plan.
@@ -167,7 +177,7 @@ class CustomAiOnboardingStoreImplTest {
         store.resolve()
         assertTrue(store.isEnabled())
 
-        whenever(customAiOnboardingFeature.self()).thenReturn(disabledToggle) // flips after the decision
+        whenever(customDuckAiOnboardingFeature.self()).thenReturn(disabledToggle) // flips after the decision
         assertTrue(store.isEnabled()) // read does not re-evaluate preconditions
     }
 
@@ -179,19 +189,5 @@ class CustomAiOnboardingStoreImplTest {
         }
         // a fresh instance backed by the same storage reads the persisted decision
         assertTrue(store().isEnabled())
-    }
-
-    @Test
-    fun `when not armed then consume open input returns false`() {
-        assertFalse(store().consumeOpenInputOnDuckAiTab())
-    }
-
-    @Test
-    fun `when armed then consume open input returns true once and self clears`() {
-        val store = store()
-        store.setOpenInputOnDuckAiTab()
-
-        assertTrue(store.consumeOpenInputOnDuckAiTab())
-        assertFalse(store.consumeOpenInputOnDuckAiTab())
     }
 }

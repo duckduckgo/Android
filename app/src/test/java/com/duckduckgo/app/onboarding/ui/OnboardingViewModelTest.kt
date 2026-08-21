@@ -121,14 +121,14 @@ class OnboardingViewModelTest {
         testee.onOnboardingDone()
 
         verifyNoInteractions(dismissedCtaDao)
-        verify(duckAiOnboardingDemo, never()).arm()
+        verify(duckAiOnboardingDemo, never()).arm(any())
     }
 
     @Test
     fun whenOnboardingDoneWithDuckAiFocusedFlowThenDemoIsArmed() = runTest {
         testee.onOnboardingDone(extendedOnboardingFlow = DUCK_AI_FOCUSED)
 
-        verify(duckAiOnboardingDemo).arm()
+        verify(duckAiOnboardingDemo).arm(isCentralToFlow = false)
     }
 
     @Test
@@ -137,7 +137,7 @@ class OnboardingViewModelTest {
 
         verify(dismissedCtaDao).insert(DismissedCta(CtaId.DAX_INTRO))
         verifyNoMoreInteractions(dismissedCtaDao)
-        verify(duckAiOnboardingDemo, never()).arm()
+        verify(duckAiOnboardingDemo, never()).arm(any())
     }
 
     @Test

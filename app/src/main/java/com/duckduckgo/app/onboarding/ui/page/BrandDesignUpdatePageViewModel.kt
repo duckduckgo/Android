@@ -141,7 +141,6 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         data class ShowDefaultBrowserDialog(val intent: Intent) : Command
         data object Finish : Command
         data class FinishAndSubmitSearchQuery(val query: String) : Command
-        data class FinishAndSubmitChatPrompt(val prompt: String) : Command
         data object OnboardingSkipped : Command
         data object SkipDialogAnimation : Command
         data class ShowQuickSetupAddressBarPositionBottomSheet(
@@ -481,7 +480,6 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                     }
                     is LinearOnboardingState.Completed -> {
                         when (val result = state.result as? NewUserOnboardingResult) {
-                            is NewUserOnboardingResult.LaunchChat -> _commands.send(Command.FinishAndSubmitChatPrompt(prompt = result.prompt))
                             is NewUserOnboardingResult.LaunchSearch -> _commands.send(Command.FinishAndSubmitSearchQuery(query = result.query))
                             null -> _commands.send(Command.Finish)
                         }

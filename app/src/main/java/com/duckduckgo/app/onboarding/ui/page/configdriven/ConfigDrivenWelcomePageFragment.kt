@@ -317,8 +317,6 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
             ConfigDrivenOnboardingPageViewModel.Command.Finish -> onContinuePressed()
             is ConfigDrivenOnboardingPageViewModel.Command.FinishAndSubmitSearchQuery ->
                 (activity as? OnboardingActivity)?.finishAndSubmitSearchQuery(command.query)
-            is ConfigDrivenOnboardingPageViewModel.Command.FinishAndSubmitChatPrompt ->
-                (activity as? OnboardingActivity)?.finishAndSubmitChatPrompt(command.prompt)
             ConfigDrivenOnboardingPageViewModel.Command.OnboardingSkipped -> onSkipPressed()
             ConfigDrivenOnboardingPageViewModel.Command.HandOffToBrowserActivity ->
                 (activity as? OnboardingActivity)?.handOffToBrowserActivity()

@@ -43,6 +43,7 @@ class OnboardingInputScreenSelectionObserverTest {
     private val mockOnboardingStore: OnboardingStore = mock()
     private val mockDuckChat: DuckChat = mock()
     private val mockInputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent = mock()
+    private val mockDuckAiOnboardingDemo: DuckAiOnboardingDemo = mock()
     private val dispatcherProvider: DispatcherProvider = coroutineRule.testDispatcherProvider
     private val userAppStageFlow = MutableStateFlow(AppStage.NEW)
     private val inputScreenSettingFlow = MutableStateFlow(false)
@@ -64,6 +65,7 @@ class OnboardingInputScreenSelectionObserverTest {
                 mockOnboardingStore,
                 mockDuckChat,
                 mockInputScreenOnboardingWideEvent,
+                mockDuckAiOnboardingDemo,
             )
 
             userAppStageFlow.value = AppStage.ESTABLISHED
@@ -87,6 +89,7 @@ class OnboardingInputScreenSelectionObserverTest {
                 mockOnboardingStore,
                 mockDuckChat,
                 mockInputScreenOnboardingWideEvent,
+                mockDuckAiOnboardingDemo,
             )
 
             userAppStageFlow.value = AppStage.ESTABLISHED
@@ -110,6 +113,7 @@ class OnboardingInputScreenSelectionObserverTest {
                 mockOnboardingStore,
                 mockDuckChat,
                 mockInputScreenOnboardingWideEvent,
+                mockDuckAiOnboardingDemo,
             )
 
             userAppStageFlow.value = AppStage.ESTABLISHED
@@ -133,6 +137,7 @@ class OnboardingInputScreenSelectionObserverTest {
                 mockOnboardingStore,
                 mockDuckChat,
                 mockInputScreenOnboardingWideEvent,
+                mockDuckAiOnboardingDemo,
             )
 
             userAppStageFlow.value = AppStage.DAX_ONBOARDING
@@ -157,6 +162,7 @@ class OnboardingInputScreenSelectionObserverTest {
                 mockOnboardingStore,
                 mockDuckChat,
                 mockInputScreenOnboardingWideEvent,
+                mockDuckAiOnboardingDemo,
             )
 
             verify(mockDuckChat, never()).setInputScreenUserSetting(any())
@@ -179,6 +185,7 @@ class OnboardingInputScreenSelectionObserverTest {
                 mockOnboardingStore,
                 mockDuckChat,
                 mockInputScreenOnboardingWideEvent,
+                mockDuckAiOnboardingDemo,
             )
 
             cosmeticInputScreenSettingFlow.value = true
@@ -195,7 +202,7 @@ class OnboardingInputScreenSelectionObserverTest {
     @Test
     fun whenDuckAiOnboardingFlowAndSettingEnabledBeforeEstablishedThenDoNotMarkAsOverriddenByUser() =
         runTest {
-            whenever(mockOnboardingStore.isDuckAiOnboardingFlow()).thenReturn(true)
+            whenever(mockDuckAiOnboardingDemo.isActive()).thenReturn(true)
             whenever(mockUserStageStore.userAppStageFlow()).thenReturn(userAppStageFlow)
             whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
             whenever(mockOnboardingStore.getInputScreenSelection()).thenReturn(true)
@@ -209,6 +216,7 @@ class OnboardingInputScreenSelectionObserverTest {
                 mockOnboardingStore,
                 mockDuckChat,
                 mockInputScreenOnboardingWideEvent,
+                mockDuckAiOnboardingDemo,
             )
 
             // AI flows enable the toggle themselves just-in-time before the End CTA, so an early match
@@ -223,7 +231,7 @@ class OnboardingInputScreenSelectionObserverTest {
     @Test
     fun whenDuckAiOnboardingFlowAndUserStageIsEstablishedThenDoNotSetInputScreenUserSetting() =
         runTest {
-            whenever(mockOnboardingStore.isDuckAiOnboardingFlow()).thenReturn(true)
+            whenever(mockDuckAiOnboardingDemo.isActive()).thenReturn(true)
             whenever(mockUserStageStore.userAppStageFlow()).thenReturn(userAppStageFlow)
             whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
             whenever(mockOnboardingStore.getInputScreenSelection()).thenReturn(true)
@@ -237,6 +245,7 @@ class OnboardingInputScreenSelectionObserverTest {
                 mockOnboardingStore,
                 mockDuckChat,
                 mockInputScreenOnboardingWideEvent,
+                mockDuckAiOnboardingDemo,
             )
 
             userAppStageFlow.value = AppStage.ESTABLISHED
@@ -262,6 +271,7 @@ class OnboardingInputScreenSelectionObserverTest {
                 mockOnboardingStore,
                 mockDuckChat,
                 mockInputScreenOnboardingWideEvent,
+                mockDuckAiOnboardingDemo,
             )
 
             // This flow enables the toggle itself just-in-time before the End CTA renders, so an early
@@ -290,6 +300,7 @@ class OnboardingInputScreenSelectionObserverTest {
                 mockOnboardingStore,
                 mockDuckChat,
                 mockInputScreenOnboardingWideEvent,
+                mockDuckAiOnboardingDemo,
             )
 
             userAppStageFlow.value = AppStage.ESTABLISHED

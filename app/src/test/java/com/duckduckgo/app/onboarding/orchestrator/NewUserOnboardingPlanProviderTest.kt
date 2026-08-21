@@ -25,9 +25,9 @@ import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.onboarding.CustomAiOnboardingPixelName
 import com.duckduckgo.app.onboarding.CustomAiOnboardingResolver
-import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.onboarding.DuckAiOnboardingAvailability
 import com.duckduckgo.app.onboarding.DuckAiOnboardingDemo
+import com.duckduckgo.app.onboarding.OnboardingInputScreenLaunchTarget
 import com.duckduckgo.app.onboarding.OnboardingPreference
 import com.duckduckgo.app.onboarding.OnboardingPreferenceApplier
 import com.duckduckgo.app.onboarding.OnboardingPromptsExperimentManager
@@ -77,6 +77,8 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.atLeastOnce
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -104,7 +106,7 @@ class NewUserOnboardingPlanProviderTest {
     private val splitOmnibarToggle: Toggle = mock()
     private val splitOmnibarWelcomeToggle: Toggle = mock()
     private val dismissedCtaDao: DismissedCtaDao = mock()
-    private val customAiOnboardingStore: CustomAiOnboardingStore = mock()
+    private val onboardingInputScreenLaunchTarget: OnboardingInputScreenLaunchTarget = mock()
     private val customAiOnboardingResolver: CustomAiOnboardingResolver = mock()
     private val duckAiOnboardingDemo: DuckAiOnboardingDemo = mock()
     private val homeScreenPromptsExperiment: OnboardingPromptsExperimentManager = mock()
@@ -147,8 +149,7 @@ class NewUserOnboardingPlanProviderTest {
             widgetCapabilities = widgetCapabilities,
             pixel = pixel,
             dispatchers = coroutineRule.testDispatcherProvider,
-            dismissedCtaDao = dismissedCtaDao,
-            customAiOnboardingStore = customAiOnboardingStore,
+            onboardingInputScreenLaunchTarget = onboardingInputScreenLaunchTarget,
             customAiOnboardingResolver = customAiOnboardingResolver,
             duckAiOnboardingDemo = duckAiOnboardingDemo,
             onboardingPromptsExperimentManager = homeScreenPromptsExperiment,
@@ -234,12 +235,12 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
-    fun `when a not yet implemented download reason is confirmed then stays`() = runTest {
+    fun `when the ai download reason is confirmed then switches to the segmented ai plan`() = runTest {
         startSegmentedAtDownloadReason()
 
         orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.AI_CHAT))
 
-        assertStep(NewUserOnboardingStepIds.DOWNLOAD_REASON)
+        assertStep(NewUserOnboardingStepIds.COMPARISON_CHART)
     }
 
     @Test
@@ -501,6 +502,36 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
+    fun `when custom ai path and quick setup confirmed without ai then the recorded selection still matches the forced setting`() = runTest {
+        whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
+        whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        orchestrator.onEvent(NewUserOnboardingEvent.SkipRequested)
+        assertStep(NewUserOnboardingStepIds.QUICK_SETUP)
+
+        orchestrator.onEvent(NewUserOnboardingEvent.QuickSetupConfirmed(OmnibarType.SINGLE_TOP, withAi = false))
+
+        // The flow forces the input screen on regardless of the toggle, so the cosmetic setting and the
+        // recorded selection have to agree with it instead of with the toggle.
+        verify(duckChat).setInputScreenUserSetting(true)
+        verify(duckChat, atLeastOnce()).setCosmeticInputScreenUserSetting(true)
+        verify(duckChat, never()).setCosmeticInputScreenUserSetting(false)
+        verify(onboardingStore, atLeastOnce()).storeInputScreenSelection(true)
+        verify(onboardingStore, never()).storeInputScreenSelection(false)
+        // The pixel still reports what the user actually chose.
+        verify(onboardingPixelSender).fire(
+            ONBOARDING_QUICK_SETUP,
+            OnboardingPixelAction.QuickSetupClicked(
+                addressBarPosition = OmnibarType.SINGLE_TOP,
+                inputScreenSelected = false,
+            ),
+        )
+        assertEquals(Skipped(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID), orchestrator.state.value)
+    }
+
+    @Test
     fun `when input mode ai and duck ai onboarding enabled then shows preview with search default`() = runTest {
         whenever(duckAiAvailability.isDuckAiOnboardingEnabled()).thenReturn(true)
         start()
@@ -564,7 +595,7 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
-    fun `when demo chat query submitted on preview then completes with launch chat result`() = runTest {
+    fun `when demo chat query submitted on preview then continues into the duck ai demo`() = runTest {
         whenever(duckAiAvailability.isDuckAiOnboardingEnabled()).thenReturn(true)
         start()
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
@@ -574,16 +605,73 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
         orchestrator.onEvent(NewUserOnboardingEvent.AddressBarConfirmed(OmnibarType.SINGLE_TOP))
         orchestrator.onEvent(NewUserOnboardingEvent.InputModeConfirmed(withAi = true))
+        assertStep(NewUserOnboardingStepIds.INPUT_SCREEN_PREVIEW)
 
         orchestrator.onEvent(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "why is the sky blue", isChat = true, fromSuggestion = false))
 
+        assertStep(NewUserOnboardingStepIds.DUCK_AI_DEMO)
+        val demoStep = (orchestrator.state.value as InProgress).currentStep as NewUserBrowserActivityStep
         assertEquals(
-            Completed(
-                rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID,
-                result = NewUserOnboardingResult.LaunchChat(prompt = "why is the sky blue"),
-            ),
-            orchestrator.state.value,
+            NewUserBrowserActivityAction.RunDuckAiOnboardingDemo(prompt = "why is the sky blue"),
+            demoStep.resolveAction(),
         )
+        // A search-shaped plan that merely ended on a chat query did not lead with Duck.ai.
+        verify(duckAiOnboardingDemo).arm(isCentralToFlow = false)
+
+        orchestrator.onEvent(NewUserOnboardingEvent.DuckAiFireCompleted)
+
+        assertEquals(Completed(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID), orchestrator.state.value)
+        verify(duckAiOnboardingDemo).finish()
+        // The user chose search, so the input screen must not be redirected to the Duck.ai tab.
+        verify(onboardingInputScreenLaunchTarget, never()).setOpenOnDuckAi()
+    }
+
+    @Test
+    fun `when a chat query is submitted on the segmented search path then continues into the duck ai demo`() = runTest {
+        whenever(duckAiAvailability.isDuckAiOnboardingEnabled()).thenReturn(true)
+        whenever(onboardingPreferenceApplier.isAvailable(OnboardingPreference.SEARCH_HISTORY)).thenReturn(false)
+        whenever(onboardingPreferenceApplier.isAvailable(OnboardingPreference.SAFE_SEARCH)).thenReturn(false)
+        startSegmentedAtDownloadReason()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.SEARCH))
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // comparison_chart
+        orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
+        orchestrator.onEvent(NewUserOnboardingEvent.InputModeConfirmed(withAi = true))
+        orchestrator.onEvent(NewUserOnboardingEvent.AddressBarConfirmed(OmnibarType.SINGLE_TOP))
+        assertStep(NewUserOnboardingStepIds.INPUT_SCREEN_PREVIEW)
+
+        orchestrator.onEvent(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "who owns my data", isChat = true, fromSuggestion = false))
+
+        assertStep(NewUserOnboardingStepIds.DUCK_AI_DEMO)
+        verify(duckAiOnboardingDemo).arm(isCentralToFlow = false)
+        // The toggle was written once by inputScreenStep. The folded path must not write it again — the
+        // user chose it, and this path did not.
+        verify(duckChat, times(1)).setCosmeticInputScreenUserSetting(true)
+
+        orchestrator.onEvent(NewUserOnboardingEvent.DuckAiFireCompleted)
+
+        assertEquals(Completed(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID), orchestrator.state.value)
+        verify(duckAiOnboardingDemo).finish()
+        verify(onboardingInputScreenLaunchTarget, never()).setOpenOnDuckAi()
+    }
+
+    @Test
+    fun `when the preview is continued past instead of submitted then the demo step is skipped`() = runTest {
+        whenever(duckAiAvailability.isDuckAiOnboardingEnabled()).thenReturn(true)
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // comparison_chart
+        orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
+        orchestrator.onEvent(NewUserOnboardingEvent.AddressBarConfirmed(OmnibarType.SINGLE_TOP))
+        orchestrator.onEvent(NewUserOnboardingEvent.InputModeConfirmed(withAi = true))
+        assertStep(NewUserOnboardingStepIds.INPUT_SCREEN_PREVIEW)
+
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
+
+        assertEquals(Completed(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID), orchestrator.state.value)
+        verify(duckAiOnboardingDemo, never()).arm(any())
     }
 
     @Test
@@ -645,11 +733,11 @@ class NewUserOnboardingPlanProviderTest {
 
     @Test
     fun `when onboarding path then custom ai plan walks to completed`() = runTest {
+        whenever(duckAiAvailability.isDuckAiOnboardingEnabled()).thenReturn(true)
         whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
         start()
 
-        // Custom-AI plan arms the in-context Duck.ai demo up front (in buildRootPlan).
-        verify(duckAiOnboardingDemo).arm()
+        verify(duckAiOnboardingDemo, never()).arm(any())
         assertStep(NewUserOnboardingStepIds.INTRO_ANIMATION)
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
         assertStep(NewUserOnboardingStepIds.NOTIFICATION_PERMISSION)
@@ -663,6 +751,8 @@ class NewUserOnboardingPlanProviderTest {
         assertStepProgress(current = 2, total = 4)
         orchestrator.onEvent(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "best privacy tips", isChat = true, fromSuggestion = false))
         assertStep(NewUserOnboardingStepIds.DUCK_AI_DEMO)
+        // Armed as the step is committed, before BrowserActivity is handed it.
+        verify(duckAiOnboardingDemo).arm(isCentralToFlow = true)
 
         val step = (orchestrator.state.value as InProgress).currentStep as NewUserBrowserActivityStep
         assertEquals(NewUserBrowserActivityAction.RunDuckAiOnboardingDemo("best privacy tips"), step.resolveAction())
@@ -694,6 +784,7 @@ class NewUserOnboardingPlanProviderTest {
 
     @Test
     fun `when onboarding path then input screen preview is chat only`() = runTest {
+        whenever(duckAiAvailability.isDuckAiOnboardingEnabled()).thenReturn(true)
         whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
         start()
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
@@ -711,6 +802,7 @@ class NewUserOnboardingPlanProviderTest {
 
     @Test
     fun `when custom ai onboarding completed then arms open input on duck ai tab`() = runTest {
+        whenever(duckAiAvailability.isDuckAiOnboardingEnabled()).thenReturn(true)
         whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
         start()
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
@@ -724,23 +816,8 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.AddressBarConfirmed(OmnibarType.SINGLE_TOP))
 
         assertEquals(Completed(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID), orchestrator.state.value)
-        verify(customAiOnboardingStore).setOpenInputOnDuckAiTab()
-    }
-
-    @Test
-    fun `when custom ai onboarding skipped then arms open input on duck ai tab`() = runTest {
-        whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
-        whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
-        start()
-        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
-        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
-        assertStep(NewUserOnboardingStepIds.INITIAL_REINSTALL_USER)
-        orchestrator.onEvent(NewUserOnboardingEvent.SkipRequested)
-        assertStep(NewUserOnboardingStepIds.QUICK_SETUP)
-        orchestrator.onEvent(NewUserOnboardingEvent.QuickSetupConfirmed(OmnibarType.SINGLE_TOP, withAi = true))
-
-        assertEquals(Skipped(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID), orchestrator.state.value)
-        verify(customAiOnboardingStore).setOpenInputOnDuckAiTab()
+        verify(duckAiOnboardingDemo).finish()
+        verify(onboardingInputScreenLaunchTarget).setOpenOnDuckAi()
     }
 
     @Test
@@ -755,8 +832,102 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.InputModeConfirmed(withAi = false))
 
         assertEquals(Completed(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID), orchestrator.state.value)
-        verify(customAiOnboardingStore, never()).setOpenInputOnDuckAiTab()
-        verify(duckAiOnboardingDemo, never()).arm()
+        verify(onboardingInputScreenLaunchTarget, never()).setOpenOnDuckAi()
+        verify(duckAiOnboardingDemo, never()).finish()
+        verify(duckAiOnboardingDemo, never()).arm(any())
+    }
+
+    @Test
+    fun `when the segmented ai path completes then the demo is finished and the input target armed`() = runTest {
+        whenever(duckAiAvailability.isDuckAiOnboardingEnabled()).thenReturn(true)
+        startSegmentedAtDownloadReason()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.AI_CHAT))
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // comparison_chart
+        orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
+        orchestrator.onEvent(NewUserOnboardingEvent.AddressBarConfirmed(OmnibarType.SINGLE_TOP))
+        orchestrator.onEvent(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "why is privacy hard", isChat = true, fromSuggestion = false))
+        orchestrator.onEvent(NewUserOnboardingEvent.DuckAiFireCompleted)
+
+        assertEquals(Completed(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID), orchestrator.state.value)
+        verify(duckAiOnboardingDemo).finish()
+        verify(onboardingInputScreenLaunchTarget).setOpenOnDuckAi()
+    }
+
+    @Test
+    fun `when duck ai onboarding is disabled then the ai path does not arm a demo it cannot run`() = runTest {
+        whenever(duckAiAvailability.isDuckAiOnboardingEnabled()).thenReturn(false)
+        startSegmentedAtDownloadReason()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.AI_CHAT))
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // comparison_chart
+        orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
+        orchestrator.onEvent(NewUserOnboardingEvent.AddressBarConfirmed(OmnibarType.SINGLE_TOP))
+
+        assertEquals(Completed(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID), orchestrator.state.value)
+        verify(duckAiOnboardingDemo, never()).arm(any())
+        verify(duckAiOnboardingDemo, never()).finish()
+        verify(onboardingInputScreenLaunchTarget, never()).setOpenOnDuckAi()
+    }
+
+    @Test
+    fun `when the segmented search path completes then no demo teardown runs`() = runTest {
+        // Preference selector is skipped when nothing it offers is available, keeping the walk-through short.
+        whenever(onboardingPreferenceApplier.isAvailable(OnboardingPreference.SEARCH_HISTORY)).thenReturn(false)
+        whenever(onboardingPreferenceApplier.isAvailable(OnboardingPreference.SAFE_SEARCH)).thenReturn(false)
+        startSegmentedAtDownloadReason()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.SEARCH))
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // comparison_chart
+        orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
+        orchestrator.onEvent(NewUserOnboardingEvent.InputModeConfirmed(withAi = false))
+        orchestrator.onEvent(NewUserOnboardingEvent.AddressBarConfirmed(OmnibarType.SINGLE_TOP))
+
+        verify(duckAiOnboardingDemo, never()).finish()
+        verify(onboardingInputScreenLaunchTarget, never()).setOpenOnDuckAi()
+    }
+
+    @Test
+    fun `when a plan carrying the demo segment is skipped then the demo is still finished`() = runTest {
+        whenever(duckAiAvailability.isDuckAiOnboardingEnabled()).thenReturn(true)
+        whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
+        whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        orchestrator.onEvent(NewUserOnboardingEvent.SkipRequested)
+        orchestrator.onEvent(NewUserOnboardingEvent.QuickSetupConfirmed(OmnibarType.SINGLE_TOP, withAi = true))
+
+        assertEquals(Skipped(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID), orchestrator.state.value)
+        // Quick setup shortcuts the Duck.ai-led plan, and still arms the episode it stands in for.
+        verify(duckAiOnboardingDemo).arm(isCentralToFlow = true)
+        verify(duckAiOnboardingDemo).finish()
+        verify(onboardingInputScreenLaunchTarget).setOpenOnDuckAi()
+    }
+
+    @Test
+    fun `when a root plan is built then stale demo state is disarmed`() = runTest {
+        start()
+
+        verify(duckAiOnboardingDemo).disarm()
+    }
+
+    @Test
+    fun `when the plan arms the demo then it was disarmed before arming`() = runTest {
+        whenever(duckAiAvailability.isDuckAiOnboardingEnabled()).thenReturn(true)
+        whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // initial
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // ai_comparison_chart
+
+        orchestrator.onEvent(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "best privacy tips", isChat = true, fromSuggestion = false))
+
+        assertStep(NewUserOnboardingStepIds.DUCK_AI_DEMO)
+        val inOrder = inOrder(duckAiOnboardingDemo)
+        inOrder.verify(duckAiOnboardingDemo).disarm()
+        inOrder.verify(duckAiOnboardingDemo).arm(isCentralToFlow = true)
     }
 
     @Test
@@ -916,6 +1087,7 @@ class NewUserOnboardingPlanProviderTest {
 
     @Test
     fun `when custom ai input screen preview step presented then fires SearchChatToggleShown pixel`() = runTest {
+        whenever(duckAiAvailability.isDuckAiOnboardingEnabled()).thenReturn(true)
         whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
         start()
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
@@ -929,6 +1101,7 @@ class NewUserOnboardingPlanProviderTest {
 
     @Test
     fun `when duck ai demo step presented then fires AiChatShown pixel`() = runTest {
+        whenever(duckAiAvailability.isDuckAiOnboardingEnabled()).thenReturn(true)
         whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
         start()
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
@@ -1121,6 +1294,7 @@ class NewUserOnboardingPlanProviderTest {
 
     @Test
     fun `when custom ai input screen preview demo submitted then sets chat variant and fires TryInputClicked`() = runTest {
+        whenever(duckAiAvailability.isDuckAiOnboardingEnabled()).thenReturn(true)
         whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
         start()
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
@@ -1139,6 +1313,7 @@ class NewUserOnboardingPlanProviderTest {
 
     @Test
     fun `when duck ai demo fire completed then fires AiChatClicked`() = runTest {
+        whenever(duckAiAvailability.isDuckAiOnboardingEnabled()).thenReturn(true)
         whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
         start()
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)

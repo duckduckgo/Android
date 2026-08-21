@@ -47,6 +47,7 @@ class OnboardingInputScreenSelectionObserver @Inject constructor(
     private val onboardingStore: OnboardingStore,
     private val duckChat: DuckChat,
     private val inputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent,
+    private val duckAiOnboardingDemo: DuckAiOnboardingDemo,
 ) : MainProcessLifecycleObserver {
 
     init {
@@ -66,7 +67,7 @@ class OnboardingInputScreenSelectionObserver @Inject constructor(
             .filter {
                 // Flows that enable the real setting themselves, just-in-time before the End CTA, produce a
                 // pre-ESTABLISHED cosmetic/real match that is not a user override.
-                !onboardingStore.isDuckAiOnboardingFlow() &&
+                !duckAiOnboardingDemo.isActive() &&
                     !onboardingStore.isSegmentedSearchPathWithToggleEnabled()
             }
             .onEach { (isInputScreenCosmeticallyEnabled, isInputScreenEnabled) ->
@@ -87,7 +88,7 @@ class OnboardingInputScreenSelectionObserver @Inject constructor(
             .drop(1)
             .filter {
                 // AI flows force the setting on, so we can skip changes in those cases.
-                !onboardingStore.isDuckAiOnboardingFlow() && it == AppStage.ESTABLISHED
+                !duckAiOnboardingDemo.isActive() && it == AppStage.ESTABLISHED
             }
             .onEach {
                 val selection = onboardingStore.getInputScreenSelection()

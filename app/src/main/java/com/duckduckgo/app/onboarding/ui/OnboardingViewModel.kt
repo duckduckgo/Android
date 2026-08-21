@@ -95,9 +95,7 @@ class OnboardingViewModel @Inject constructor(
                 }
 
                 DUCK_AI_FOCUSED -> {
-                    // Arm the in-browser Duck.ai demo (sets the flow + silences the standard DAX CTAs).
-                    // Shared with the linear-onboarding duck_ai_demo step so both paths arm identically.
-                    duckAiOnboardingDemo.arm()
+                    duckAiOnboardingDemo.arm(isCentralToFlow = false)
                 }
 
                 DEFAULT_WITHOUT_INTRO_CTA -> {

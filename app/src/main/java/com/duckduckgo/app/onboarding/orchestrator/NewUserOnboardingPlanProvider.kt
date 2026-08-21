@@ -19,15 +19,12 @@ package com.duckduckgo.app.onboarding.orchestrator
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.omnibar.OmnibarType
-import com.duckduckgo.app.cta.db.DismissedCtaDao
-import com.duckduckgo.app.cta.model.CtaId
-import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.onboarding.CustomAiOnboardingPixelName
 import com.duckduckgo.app.onboarding.CustomAiOnboardingResolver
-import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.onboarding.DuckAiOnboardingAvailability
 import com.duckduckgo.app.onboarding.DuckAiOnboardingDemo
+import com.duckduckgo.app.onboarding.OnboardingInputScreenLaunchTarget
 import com.duckduckgo.app.onboarding.OnboardingPreference
 import com.duckduckgo.app.onboarding.OnboardingPreferenceApplier
 import com.duckduckgo.app.onboarding.OnboardingPromptsExperimentManager
@@ -98,8 +95,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     private val widgetCapabilities: WidgetCapabilities,
     private val pixel: Pixel,
     private val dispatchers: DispatcherProvider,
-    private val dismissedCtaDao: DismissedCtaDao,
-    private val customAiOnboardingStore: CustomAiOnboardingStore,
+    private val onboardingInputScreenLaunchTarget: OnboardingInputScreenLaunchTarget,
     private val customAiOnboardingResolver: CustomAiOnboardingResolver,
     private val duckAiOnboardingDemo: DuckAiOnboardingDemo,
     private val onboardingPromptsExperimentManager: OnboardingPromptsExperimentManager,
@@ -115,14 +111,9 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         // Side-effecting (creates the DDG downloads dir, persists reinstall state) and must always run
         ctx.isReinstall = appBuildConfig.isAppReinstall()
 
+        duckAiOnboardingDemo.disarm()
+
         return if (customAiOnboardingResolver.resolve()) {
-            // in custom AI onboarding path, the input toggle is enabled by default
-            duckChat.setCosmeticInputScreenUserSetting(enabled = true)
-            onboardingStore.storeInputScreenSelection(selected = true)
-
-            // prepare in-context CTAs
-            duckAiOnboardingDemo.arm()
-
             pixel.fire(CustomAiOnboardingPixelName.PLAN_STARTED, type = Unique())
 
             buildCustomAiPlan(ctx, onCompleted, onSkipped)
@@ -183,40 +174,20 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 add(addressBarPositionStep())
                 add(inputScreenStep(ctx))
                 add(inputScreenPreviewStep(ctx, duckAiEnabled, allowSearchPreviewOnly = false))
+                add(duckAiDemoStep(ctx, duckAiEnabled, isCentralToFlow = false))
             },
         )
     }
 
     private fun buildCustomAiPlan(
         ctx: NewUserOnboardingPlanContext,
-        rootOnCompleted: suspend () -> Unit,
-        rootOnSkipped: suspend () -> Unit,
+        onCompleted: suspend () -> Unit,
+        onSkipped: suspend () -> Unit,
     ): LinearOnboardingPlan {
         val firstDialog = SuspendMemo { resolveFirstDialog(ctx.isReinstall) }
+        val duckAiEnabled = SuspendMemo { duckAiOnboardingAvailability.isDuckAiOnboardingEnabled() }
 
         val quickSetupPlan = quickSetupPlan(ctx, forceWithAiInput = true)
-
-        val dismissDuckAiFireCta = suspend {
-            // End-of-plan dismissal for Duck AI Fire CTA — deferred to here (vs. on user interaction)
-            // so the CTA survives an app kill and re-runs correctly on next launch, if linear onboarding wasn't finished yet.
-            withContext(dispatchers.io()) {
-                dismissedCtaDao.insert(DismissedCta(CtaId.DAX_DUCK_AI_FIRE_BUTTON))
-            }
-        }
-        val markInputToLaunchOnChat = {
-            // The custom-AI flow always finishes on the Duck.ai (chat) tab
-            customAiOnboardingStore.setOpenInputOnDuckAiTab()
-        }
-        val onCompleted = suspend {
-            dismissDuckAiFireCta()
-            markInputToLaunchOnChat()
-            rootOnCompleted()
-        }
-        val onSkipped = suspend {
-            dismissDuckAiFireCta()
-            markInputToLaunchOnChat()
-            rootOnSkipped()
-        }
 
         return rootPlan(
             ctx = ctx,
@@ -228,8 +199,8 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 initialReinstallUserStep(firstDialog, quickSetupPlan, isCustomAiPlan = true),
                 initialStep(firstDialog),
                 aiComparisonChartStep(),
-                customAiInputScreenPreviewStep(ctx),
-                duckAiDemoStep(ctx),
+                customAiInputScreenPreviewStep(ctx, duckAiEnabled, showsStepIndicator = true),
+                duckAiDemoStep(ctx, duckAiEnabled, isCentralToFlow = true),
                 comparisonChartStep(),
                 defaultBrowserPromptStep(),
                 addressBarPositionStep(),
@@ -243,6 +214,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         onSkipped: suspend () -> Unit,
     ): LinearOnboardingPlan {
         val firstDialog = SuspendMemo { FirstDialog.INITIAL }
+
         return rootPlan(
             ctx = ctx,
             onCompleted = onCompleted,
@@ -265,8 +237,14 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         LinearOnboardingPlan(
             id = ROOT_PLAN_ID,
             steps = steps.firingShownPixels().abortingOnDevSkip(),
-            onCompleted = onCompleted,
-            onSkipped = onSkipped,
+            onCompleted = {
+                ctx.runFinalizers()
+                onCompleted()
+            },
+            onSkipped = {
+                ctx.runFinalizers()
+                onSkipped()
+            },
             result = { ctx.completionResult },
         )
 
@@ -487,7 +465,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
                         when (selection) {
                             DownloadReasonSelection.SEARCH -> SwitchTo(segmentedSearchPlan(ctx))
-                            DownloadReasonSelection.AI_CHAT,
+                            DownloadReasonSelection.AI_CHAT -> SwitchTo(segmentedAiPlan(ctx))
                             DownloadReasonSelection.NO_AI,
                             DownloadReasonSelection.BLOCK_ADS,
                             -> {
@@ -519,6 +497,24 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 },
                 addressBarPositionStep(),
                 inputScreenPreviewStep(ctx, duckAiEnabled, allowSearchPreviewOnly = true),
+                duckAiDemoStep(ctx, duckAiEnabled, isCentralToFlow = false),
+            ),
+        )
+    }
+
+    private fun segmentedAiPlan(ctx: NewUserOnboardingPlanContext): LinearOnboardingPlan {
+        val duckAiEnabled = SuspendMemo { duckAiOnboardingAvailability.isDuckAiOnboardingEnabled() }
+
+        return sidePlan(
+            id = SEGMENTED_AI_PLAN_ID,
+            steps = listOf(
+                // todo - comparison chart for segmented ai path,
+                // defaultBrowserPromptStep(),
+                // todo - model picker
+                // todo - tab default
+                addressBarPositionStep(),
+                customAiInputScreenPreviewStep(ctx, duckAiEnabled, showsStepIndicator = false),
+                duckAiDemoStep(ctx, duckAiEnabled, isCentralToFlow = true),
             ),
         )
     }
@@ -754,10 +750,10 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                             pixelName,
                             OnboardingPixelAction.TryInputClicked(fromSuggestion = event.fromSuggestion, isChat = event.isChat),
                         )
-                        ctx.completionResult = if (event.isChat) {
-                            NewUserOnboardingResult.LaunchChat(prompt = event.query)
+                        if (event.isChat && duckAiEnabled()) {
+                            ctx.pendingDuckAiPrompt = event.query
                         } else {
-                            NewUserOnboardingResult.LaunchSearch(query = event.query)
+                            ctx.completionResult = NewUserOnboardingResult.LaunchSearch(query = event.query)
                         }
                         Advance
                     }
@@ -790,12 +786,17 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
     // Chat-only preview: the toggle is hidden and the demo defaults to chat. Captures the prompt for the
     // duck_ai_demo step.
-    private fun customAiInputScreenPreviewStep(ctx: NewUserOnboardingPlanContext): NewUserOnboardingActivityStep {
+    private fun customAiInputScreenPreviewStep(
+        ctx: NewUserOnboardingPlanContext,
+        duckAiEnabled: SuspendMemo<Boolean>,
+        showsStepIndicator: Boolean,
+    ): NewUserOnboardingActivityStep {
         val pixelName = OnboardingPixelName.ONBOARDING_SEARCH_CHAT_TOGGLE
         return NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.INPUT_SCREEN_PREVIEW,
             pixelName = pixelName,
-            showsStepIndicator = true,
+            showsStepIndicator = showsStepIndicator,
+            precondition = { duckAiEnabled() },
             resolveDialog = {
                 NewUserOnboardingActivityDialog.InputScreenPreview(
                     isSearchDefault = false,
@@ -820,11 +821,43 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         )
     }
 
-    private fun duckAiDemoStep(ctx: NewUserOnboardingPlanContext): NewUserBrowserActivityStep {
+    private suspend fun armDuckAiDemoEpisode(
+        ctx: NewUserOnboardingPlanContext,
+        isCentralToFlow: Boolean,
+    ) {
+        duckAiOnboardingDemo.arm(isCentralToFlow)
+
+        // Duck.ai demo flows always expect the toggle to be enabled
+        duckChat.setCosmeticInputScreenUserSetting(enabled = true)
+        onboardingStore.storeInputScreenSelection(selected = true)
+
+        ctx.onFinish {
+            if (isCentralToFlow) {
+                onboardingInputScreenLaunchTarget.setOpenOnDuckAi()
+            }
+            // Deferred to the end of the run (vs. on user interaction) so the fire-button CTA survives an
+            // app kill and re-runs correctly on next launch, if linear onboarding wasn't finished yet.
+            duckAiOnboardingDemo.finish()
+        }
+    }
+
+    private fun duckAiDemoStep(
+        ctx: NewUserOnboardingPlanContext,
+        duckAiEnabled: SuspendMemo<Boolean>,
+        isCentralToFlow: Boolean,
+    ): NewUserBrowserActivityStep {
         val pixelName = OnboardingPixelName.ONBOARDING_FIRE_BUTTON
         return NewUserBrowserActivityStep(
             id = NewUserOnboardingStepIds.DUCK_AI_DEMO,
             pixelName = pixelName,
+            precondition = {
+                if (ctx.pendingDuckAiPrompt == null || !duckAiEnabled()) {
+                    false
+                } else {
+                    armDuckAiDemoEpisode(ctx, isCentralToFlow = isCentralToFlow)
+                    true
+                }
+            },
             resolveAction = { NewUserBrowserActivityAction.RunDuckAiOnboardingDemo(prompt = ctx.pendingDuckAiPrompt.orEmpty()) },
             transition = { event ->
                 when {
@@ -860,10 +893,13 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                     event is NewUserOnboardingEvent.QuickSetupConfirmed -> {
                         val resolved = resolveOmnibarType(event.type)
                         settingsDataStore.omnibarType = resolved
-                        applyInputModeSelection(ctx, event.withAi, fireTelemetry = false)
                         if (forceWithAiInput) {
+                            // Armed before the setting writes below, because the armed flag is what marks them as
+                            // flow-driven rather than a user override, which keeps them out of telemetry.
+                            armDuckAiDemoEpisode(ctx, isCentralToFlow = true)
                             duckChat.setInputScreenUserSetting(true)
                         }
+                        applyInputModeSelection(ctx, forceWithAiInput || event.withAi, fireTelemetry = false)
                         onboardingPixelSender.fire(
                             pixelName,
                             OnboardingPixelAction.QuickSetupClicked(
@@ -920,6 +956,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         const val ROOT_PLAN_ID = "new-user_onboarding"
         const val QUICK_SETUP_PLAN_ID = "new-user_quick-setup"
         const val SEGMENTED_SEARCH_PLAN_ID = "new-user_segmented_search"
+        const val SEGMENTED_AI_PLAN_ID = "new-user_segmented_ai"
 
         private const val BLOCK_STORE_TIMEOUT_MS = 3_000L
     }

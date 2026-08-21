@@ -36,7 +36,7 @@ abstract class DismissedCtaDao {
     @Query("select count(1) > 0 from dismissed_cta where ctaId = :ctaId")
     abstract fun exists(ctaId: CtaId): Boolean
 
-    // Only used by onboarding dev settings
+    // Used by onboarding dev settings or to clean up invalid state
     @Query("DELETE FROM dismissed_cta WHERE ctaId = :ctaId")
     abstract fun delete(ctaId: CtaId)
 }
