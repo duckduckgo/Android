@@ -17,10 +17,10 @@
 package com.duckduckgo.app.browser.suggestredirect
 
 import android.net.ConnectivityManager
+import androidx.core.util.PatternsCompat
 import com.duckduckgo.app.browser.suggestredirect.DnsLookup.LookupResult.Failure
 import com.duckduckgo.app.browser.suggestredirect.DnsLookup.LookupResult.Success
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.wireguard.config.InetAddresses
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.time.Duration
@@ -47,8 +47,12 @@ class HostnameResolverImpl(
     private val dnsLookup: DnsLookup,
 ) : HostnameResolver {
     override suspend fun resolves(hostname: String): Boolean {
-        // isHostname() accepts all-numeric labels, so IPv4 literals must be rejected separately.
-        if (!InetAddresses.isHostname(hostname) || IPV4_LITERAL.matches(hostname)) {
+        if (PatternsCompat.IP_ADDRESS.toRegex().matches(hostname)) {
+            // An IP address is already resolved, so it's not resolvable
+            return false
+        }
+
+        if (!PatternsCompat.DOMAIN_NAME.toRegex().matches(hostname)) {
             return false
         }
 
@@ -64,9 +68,5 @@ class HostnameResolverImpl(
             is Success -> result.addresses.isNotEmpty()
             is Failure -> false
         }
-    }
-
-    private companion object {
-        val IPV4_LITERAL = Regex("""\d{1,3}(\.\d{1,3}){3}""")
     }
 }

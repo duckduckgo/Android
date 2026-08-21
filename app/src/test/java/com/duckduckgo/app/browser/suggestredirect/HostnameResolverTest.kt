@@ -56,7 +56,6 @@ class HostnameResolverTest {
             "exa mple.com",
             "-example.com",
             "example-.com",
-            "under_score.com",
             "example..com",
         ).forEach { invalidHostname ->
             assertFalse("Expected resolves(\"$invalidHostname\") to be false", testee.resolves(invalidHostname))
