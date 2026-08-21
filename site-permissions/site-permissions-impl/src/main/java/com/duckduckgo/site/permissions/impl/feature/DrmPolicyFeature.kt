@@ -20,16 +20,19 @@ import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
+import com.duckduckgo.feature.toggles.api.Toggle.InternalAlwaysEnabled
 
 @ContributesRemoteFeature(
     scope = AppScope::class,
     featureName = "drmPolicy",
 )
 interface DrmPolicyFeature {
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @InternalAlwaysEnabled
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun self(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @InternalAlwaysEnabled
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun centralPolicy(): Toggle
 }
 
