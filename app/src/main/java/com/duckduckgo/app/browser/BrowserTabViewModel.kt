@@ -63,6 +63,7 @@ import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.NonHttpAppLink
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.ShouldLaunchDuckChatLink
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.ShouldLaunchSubscriptionLink
+import com.duckduckgo.app.browser.WebViewErrorResponse.BAD_URL
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
@@ -222,6 +223,8 @@ import com.duckduckgo.app.browser.progressbar.ProgressBarUpgradeFeature
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.santize.NonHttpAppLinkChecker
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
+import com.duckduckgo.app.browser.suggestredirect.SuggestRedirectEvaluator
+import com.duckduckgo.app.browser.suggestredirect.SuggestRedirectOnUnresolvedErrorFeature
 import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.browser.uilock.BROWSER_UI_LOCK_FEATURE_NAME
 import com.duckduckgo.app.browser.uilock.BrowserUiLockFeature
@@ -591,6 +594,8 @@ class BrowserTabViewModel @Inject constructor(
     private val adBlockingOmnibarAnimationProvider: AdBlockingOmnibarAnimationProvider,
     private val newTabPageModalPresenterRegistry: NewTabPageModalPresenterRegistry,
     private val newTabPageModalTrigger: NewTabPageModalTrigger,
+    private val suggestRedirectOnUnresolvedErrorFeature: SuggestRedirectOnUnresolvedErrorFeature,
+    private val suggestRedirectEvaluator: SuggestRedirectEvaluator,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -742,6 +747,7 @@ class BrowserTabViewModel @Inject constructor(
     private var autoCompleteJob = ConflatedJob()
     private var serpLogoJob = ConflatedJob()
     private var pdfDownloadJob = ConflatedJob()
+    private var suggestRedirectJob = ConflatedJob()
 
     private var site: Site? = null
         set(value) {
@@ -1588,10 +1594,12 @@ class BrowserTabViewModel @Inject constructor(
                 queryOrFullUrl = if (isDuckChatUrl) "" else trimmedInput,
                 forceExpand = true,
             )
+        suggestRedirectJob.cancel()
         browserViewState.value =
             currentBrowserViewState().copy(
                 browserShowing = true,
                 browserError = OMITTED,
+                redirectSuggestion = null,
                 sslError = NONE,
                 maliciousSiteBlocked = false,
                 maliciousSiteStatus = null,
@@ -1943,6 +1951,7 @@ class BrowserTabViewModel @Inject constructor(
             duckChat.endVoiceChatSession(tabId)
         }
         pdfDownloadJob.cancel()
+        suggestRedirectJob.cancel()
         site = null
         onSiteChanged()
         webNavigationState = null
@@ -4451,14 +4460,16 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun resetBrowserError() {
-        browserViewState.value = currentBrowserViewState().copy(browserError = OMITTED)
+        suggestRedirectJob.cancel()
+        browserViewState.value = currentBrowserViewState().copy(browserError = OMITTED, redirectSuggestion = null)
         // Catches the race where pageFinished fired while browserError was still LOADING.
         onDuckAiOnboardingPageFinishedIfApplicable()
     }
 
     fun refreshBrowserError() {
+        suggestRedirectJob.cancel()
         if (currentBrowserViewState().browserError != OMITTED && currentBrowserViewState().browserError != LOADING) {
-            browserViewState.value = currentBrowserViewState().copy(browserError = LOADING)
+            browserViewState.value = currentBrowserViewState().copy(browserError = LOADING, redirectSuggestion = null)
         }
         if (currentBrowserViewState().sslError != NONE) {
             browserViewState.value = currentBrowserViewState().copy(browserShowing = true, sslError = NONE)
@@ -4548,12 +4559,21 @@ class BrowserTabViewModel @Inject constructor(
             browserViewState.value =
                 currentBrowserViewState().copy(
                     browserError = errorType,
+                    redirectSuggestion = null,
                     showPrivacyShield = HighlightableButton.Visible(enabled = false),
                 )
             if (androidBrowserConfig.errorPagePixel().isEnabled()) {
                 pixel.enqueueFire(AppPixelName.ERROR_PAGE_SHOWN)
             }
             command.value = WebViewError(errorType, url)
+            suggestRedirectJob.cancel() // Cancel previous in-flight job as the new errorType might not be BAD_URL
+        }
+        if (errorType == BAD_URL && suggestRedirectOnUnresolvedErrorFeature.suggestRedirect().isEnabled()) {
+            suggestRedirectJob += viewModelScope.launch {
+                suggestRedirectEvaluator.suggestRedirect(url)?.let { suggestion ->
+                    browserViewState.value = currentBrowserViewState().copy(redirectSuggestion = suggestion)
+                }
+            }
         }
         if (androidBrowserConfig.errorCodePixel().isEnabled()) {
             pixel.enqueueFire(AppPixelName.ERROR_CODE_PIXEL, mapOf("error_code" to errorCode))
