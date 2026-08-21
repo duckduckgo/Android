@@ -274,7 +274,7 @@ class SitePermissionsDialogActivityLauncherTest {
     }
 
     @Test
-    fun whenDrmLearnMoreClickedThenDialogDismissed() {
+    fun whenDrmLearnMoreClickedThenDialogDismissedAndPermissionDenied() {
         whenever(sitePermissionsRepository.getDrmForSession("tabId", "example.com")).thenReturn(null)
         whenever(sitePermissionsRepository.isDrmBlockedForUrlByConfig(any())).thenReturn(false)
 
@@ -301,6 +301,7 @@ class SitePermissionsDialogActivityLauncherTest {
         learnMore.onClick(message)
 
         assertFalse(dialog.isShowing)
+        verify(request).deny()
     }
 
     class ThemedActivity : AppCompatActivity() {

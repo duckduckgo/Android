@@ -292,8 +292,9 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                 DRM_LEARN_MORE_ANNOTATION,
             ) {
                 // When we are the default browser the link opens in a new tab of this same activity,
-                // so the dialog would otherwise stay on top of it.
+                // so the dialog would otherwise stay on top of it with the request left unanswered.
                 dialog.dismiss()
+                denyPermissions()
                 activity.startActivity(Intent(Intent.ACTION_VIEW, DRM_LEARN_MORE_URL))
             }
             .setPositiveButton(R.string.sitePermissionsDialogAllowButton, GHOST)
