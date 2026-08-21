@@ -178,6 +178,7 @@ import com.duckduckgo.app.browser.commands.Command.WebViewCompatWebShareRequest
 import com.duckduckgo.app.browser.commands.Command.WebViewError
 import com.duckduckgo.app.browser.commands.NavigationCommand
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
+import com.duckduckgo.app.browser.customtabs.CustomTabsFeature
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_PAGE_FEATURE_NAME
@@ -526,6 +527,7 @@ class BrowserTabViewModel @Inject constructor(
     private val sitePermissionsManager: SitePermissionsManager,
     private val cameraHardwareChecker: CameraHardwareChecker,
     private val androidBrowserConfig: AndroidBrowserConfigFeature,
+    private val customTabsFeature: CustomTabsFeature,
     private val faviconsFetchingPrompt: FaviconsFetchingPrompt,
     private val subscriptions: Subscriptions,
     private val sslCertificatesFeature: SSLCertificatesFeature,
@@ -777,9 +779,11 @@ class BrowserTabViewModel @Inject constructor(
     private var refreshTriggerJob: Job? = null
     private var brokenSiteReportTriggerJob: Job? = null
 
-    /** Non-null while this tab is displayed inside a Custom Tab. Captures the verified
-     * calling package (when known) used by [handleAppLink]'s trusted-caller carve-out. */
-    private data class CustomTabContext(val clientPackage: String?)
+    /** Non-null while this tab is displayed inside a Custom Tab. [clientPackage] is the verified
+     * calling package (when known), used by [handleAppLink]'s trusted-caller launch carve-out.
+     * [referrerPackage] is the best-effort, non-verified android-app:// referrer, used only for the
+     * prompt-skip decision in [appLinkClicked], never the launch carve-out. */
+    private data class CustomTabContext(val clientPackage: String?, val referrerPackage: String?)
     private var customTab: CustomTabContext? = null
 
     private var alreadyShownKeyboard: Boolean = false
@@ -1023,8 +1027,8 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun setIsCustomTab(isCustomTab: Boolean, clientPackage: String? = null) {
-        this.customTab = if (isCustomTab) CustomTabContext(clientPackage) else null
+    fun setIsCustomTab(isCustomTab: Boolean, clientPackage: String? = null, referrerPackage: String? = null) {
+        this.customTab = if (isCustomTab) CustomTabContext(clientPackage, referrerPackage) else null
     }
 
     fun onViewReady() {
@@ -3959,11 +3963,21 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun appLinkClicked(appLink: AppLink) {
-        command.value = when {
-            // When in custom tab, always open the app link directly, without prompting.
-            customTab != null -> OpenAppLink(appLink)
-            appSettingsPreferencesStore.showAppLinksPrompt -> ShowAppLinkPrompt(appLink)
-            else -> OpenAppLink(appLink)
+        val inCustomTab = customTab != null
+        val callerPackage = customTab?.clientPackage ?: customTab?.referrerPackage
+        when {
+            inCustomTab && !customTabsFeature.handleTrustedCallers().isEnabled() -> command.value = OpenAppLink(appLink)
+            inCustomTab && appLinksHandler.isTrustedCaller(appLink, callerPackage) -> {
+                // The handoff opens another app, leaving a stale custom tab behind; close it, but only once
+                // the app has actually launched, so a failed launch doesn't strand the user on a closed tab.
+                command.value = OpenAppLink(
+                    appLink,
+                    finishCustomTabOnLaunch = customTabsFeature.closeTabAfterTrustedCallerNavigation().isEnabled(),
+                )
+            }
+            inCustomTab && appLinksHandler.isAlwaysTriggerDomain(appLink) -> command.value = OpenAppLink(appLink)
+            appSettingsPreferencesStore.showAppLinksPrompt -> command.value = ShowAppLinkPrompt(appLink)
+            else -> command.value = OpenAppLink(appLink)
         }
         appLinksHandler.setUserQueryState(false)
     }

@@ -102,7 +102,8 @@ class CustomTabActivity : DuckDuckGoActivity() {
     ) {
         val tabId = "${CustomTabViewModel.CUSTOM_TAB_NAME_PREFIX}${UUID.randomUUID()}"
         val clientPackage = intent.getStringExtra(CLIENT_PACKAGE_EXTRA)
-        val newFragment = BrowserTabFragment.newInstanceForCustomTab(tabId, null, true, toolbarColor, isExternal, clientPackage)
+        val referrerPackage = intent.getStringExtra(REFERRER_PACKAGE_EXTRA)
+        val newFragment = BrowserTabFragment.newInstanceForCustomTab(tabId, null, true, toolbarColor, isExternal, clientPackage, referrerPackage)
         val transaction = supportFragmentManager.beginTransaction()
         transaction.hide(currentFragment)
         transaction.add(R.id.fragmentTabContainer, newFragment, tabId)
@@ -129,6 +130,7 @@ class CustomTabActivity : DuckDuckGoActivity() {
             toolbarColor = viewState.toolbarColor,
             isExternal = intent.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false),
             clientPackage = intent.getStringExtra(CLIENT_PACKAGE_EXTRA),
+            referrerPackage = intent.getStringExtra(REFERRER_PACKAGE_EXTRA),
         )
         val transaction = supportFragmentManager.beginTransaction()
         transaction.replace(R.id.fragmentTabContainer, fragment, viewState.tabId)
@@ -143,6 +145,7 @@ class CustomTabActivity : DuckDuckGoActivity() {
             toolbarColor: Int?,
             isExternal: Boolean,
             clientPackage: String? = null,
+            referrerPackage: String? = null,
         ): Intent {
             return Intent(context, CustomTabActivity::class.java).apply {
                 addFlags(flags)
@@ -154,10 +157,14 @@ class CustomTabActivity : DuckDuckGoActivity() {
                 if (clientPackage != null) {
                     putExtra(CLIENT_PACKAGE_EXTRA, clientPackage)
                 }
+                if (referrerPackage != null) {
+                    putExtra(REFERRER_PACKAGE_EXTRA, referrerPackage)
+                }
             }
         }
         private const val LAUNCH_FROM_EXTERNAL_EXTRA = "LAUNCH_FROM_EXTERNAL_EXTRA"
         private const val CLIENT_PACKAGE_EXTRA = "CLIENT_PACKAGE_EXTRA"
+        private const val REFERRER_PACKAGE_EXTRA = "REFERRER_PACKAGE_EXTRA"
     }
 
     private fun configureOnBackPressedListener() {
