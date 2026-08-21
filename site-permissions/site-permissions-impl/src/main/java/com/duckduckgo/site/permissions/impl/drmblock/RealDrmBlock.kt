@@ -19,8 +19,11 @@ package com.duckduckgo.site.permissions.impl.drmblock
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
+import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
+import com.duckduckgo.site.permissions.impl.feature.DrmPolicyFeature
+import com.duckduckgo.site.permissions.impl.feature.isCentralPolicyEnabled
 import com.duckduckgo.site.permissions.impl.isSiteUnprotectedByUser
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -31,17 +34,23 @@ class RealDrmBlock @Inject constructor(
     private val drmBlockRepository: DrmBlockRepository,
     private val userAllowListRepository: UserAllowListRepository,
     private val unprotectedTemporary: UnprotectedTemporary,
+    private val drmPolicyFeature: DrmPolicyFeature,
 ) : DrmBlock {
 
     override fun isDrmBlockedForUrl(url: String): Boolean {
         val uri = url.toUri()
-        return drmBlockFeature.self().isEnabled() &&
-            domainsThatBlockDrm(url) &&
-            !userAllowListRepository.isSiteUnprotectedByUser(uri) &&
-            !unprotectedTemporary.isAnException(uri.toString())
-    }
+        if (!drmBlockFeature.self().isEnabled()) return false
 
-    private fun domainsThatBlockDrm(url: String): Boolean {
-        return drmBlockRepository.exceptions.any { sameOrSubdomain(url, it.domain) }
+        // The central policy widens both the list match and the protections-off check. The legacy path has to
+        // stay as it is on develop, so that turning the flag off during the rollout restores today's behaviour.
+        return if (drmPolicyFeature.isCentralPolicyEnabled()) {
+            drmBlockRepository.exceptions.any { sameOrSubdomain(url, it.domain) } &&
+                !userAllowListRepository.isSiteUnprotectedByUser(uri) &&
+                !unprotectedTemporary.isAnException(uri.toString())
+        } else {
+            drmBlockRepository.exceptions.firstOrNull { it.domain == uri.baseHost } != null &&
+                !userAllowListRepository.isUriInUserAllowList(uri) &&
+                !unprotectedTemporary.isAnException(uri.toString())
+        }
     }
 }

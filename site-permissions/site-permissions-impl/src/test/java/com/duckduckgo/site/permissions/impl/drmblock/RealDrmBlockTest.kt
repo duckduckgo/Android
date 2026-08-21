@@ -18,9 +18,11 @@ package com.duckduckgo.site.permissions.impl.drmblock
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
+import com.duckduckgo.site.permissions.impl.feature.DrmPolicyFeature
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
@@ -39,14 +41,23 @@ class RealDrmBlockTest {
     private val mockDrmBlockRepository: DrmBlockRepository = mock()
     private val mockUserAllowListRepository: UserAllowListRepository = mock()
     private val mockUnprotectedTemporary: UnprotectedTemporary = mock()
+    private val drmPolicyFeature = FakeFeatureToggleFactory.create(DrmPolicyFeature::class.java)
 
-    val testee: RealDrmBlock = RealDrmBlock(mockDrmBlockFeature, mockDrmBlockRepository, mockUserAllowListRepository, mockUnprotectedTemporary)
+    val testee: RealDrmBlock = RealDrmBlock(
+        mockDrmBlockFeature,
+        mockDrmBlockRepository,
+        mockUserAllowListRepository,
+        mockUnprotectedTemporary,
+        drmPolicyFeature,
+    )
 
     val url = "https://open.spotify.com"
 
     @Before
     fun before() {
         whenever(mockDrmBlockFeature.self()).thenReturn(mockToggle)
+        drmPolicyFeature.self().setRawStoredState(Toggle.State(true))
+        drmPolicyFeature.centralPolicy().setRawStoredState(Toggle.State(false))
     }
 
     @Test
@@ -90,6 +101,7 @@ class RealDrmBlockTest {
 
     @Test
     fun whenSubdomainOfBlockedDomainThenTrueIsReturned() {
+        givenCentralPolicyIsEnabled()
         givenFeatureIsEnabled()
         givenUrlIsInExceptionList()
 
@@ -98,6 +110,7 @@ class RealDrmBlockTest {
 
     @Test
     fun whenParentOfBlockedDomainThenFalseIsReturned() {
+        givenCentralPolicyIsEnabled()
         givenFeatureIsEnabled()
         givenUrlIsInExceptionList()
 
@@ -106,6 +119,7 @@ class RealDrmBlockTest {
 
     @Test
     fun whenProtectionsAreOffForThePageHostThenSubresourceOriginIsNotBlocked() {
+        givenCentralPolicyIsEnabled()
         givenFeatureIsEnabled()
         givenUrlIsInExceptionList()
         whenever(mockUserAllowListRepository.isDomainInUserAllowList("www.spotify.com")).thenReturn(true)
@@ -115,6 +129,7 @@ class RealDrmBlockTest {
 
     @Test
     fun whenProtectionsAreOffForTheRegistrableDomainThenSubresourceOriginIsNotBlocked() {
+        givenCentralPolicyIsEnabled()
         givenFeatureIsEnabled()
         givenUrlIsInExceptionList()
         whenever(mockUserAllowListRepository.isDomainInUserAllowList("spotify.com")).thenReturn(true)
@@ -124,6 +139,7 @@ class RealDrmBlockTest {
 
     @Test
     fun whenProtectionsAreOffForAnUnrelatedDomainThenBlockStands() {
+        givenCentralPolicyIsEnabled()
         givenFeatureIsEnabled()
         givenUrlIsInExceptionList()
         whenever(mockUserAllowListRepository.isDomainInUserAllowList("example.com")).thenReturn(true)
@@ -133,11 +149,33 @@ class RealDrmBlockTest {
 
     @Test
     fun whenProtectionsAreOffForAnIntermediateParentThenSubdomainIsNotBlocked() {
+        givenCentralPolicyIsEnabled()
         givenFeatureIsEnabled()
         givenUrlIsInExceptionList()
         whenever(mockUserAllowListRepository.isDomainInUserAllowList("open.spotify.com")).thenReturn(true)
 
         assertFalse(testee.isDrmBlockedForUrl("https://static.open.spotify.com/player"))
+    }
+
+    @Test
+    fun whenCentralPolicyDisabledThenSubdomainOfBlockedDomainIsNotBlocked() {
+        givenFeatureIsEnabled()
+        givenUrlIsInExceptionList()
+
+        assertFalse(testee.isDrmBlockedForUrl("https://static.open.spotify.com/player"))
+    }
+
+    @Test
+    fun whenCentralPolicyDisabledThenProtectionsOffForAParentDoesNotUnblock() {
+        givenFeatureIsEnabled()
+        givenUrlIsInExceptionList()
+        whenever(mockUserAllowListRepository.isDomainInUserAllowList("spotify.com")).thenReturn(true)
+
+        assertTrue(testee.isDrmBlockedForUrl(url))
+    }
+
+    private fun givenCentralPolicyIsEnabled() {
+        drmPolicyFeature.centralPolicy().setRawStoredState(Toggle.State(true))
     }
 
     private fun givenFeatureIsEnabled() {

@@ -73,14 +73,15 @@ class SitePermissionsManagerImpl @Inject constructor(
         val autoAccept = mutableListOf<String>()
         val url = request.origin.toString()
 
-        val drmDecision = withContext(dispatcherProvider.io()) {
-            drmPolicyManager
-                .takeIf {
-                    drmPolicyFeature.isCentralPolicyEnabled() &&
-                        request.resources.contains(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)
-                }
-                ?.decide(url, tabId)
-                ?.also { logcat { "Permissions: drm policy decision for $url is $it" } }
+        val drmDecision = if (!request.resources.contains(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)) {
+            null
+        } else {
+            withContext(dispatcherProvider.io()) {
+                drmPolicyManager
+                    .takeIf { drmPolicyFeature.isCentralPolicyEnabled() }
+                    ?.decide(url, tabId)
+                    ?.also { logcat { "Permissions: drm policy decision for $url is $it" } }
+            }
         }
 
         val sitePermissionsAllowedToAsk = request.resources
