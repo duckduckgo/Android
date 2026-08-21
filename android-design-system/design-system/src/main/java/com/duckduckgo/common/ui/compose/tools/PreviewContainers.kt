@@ -50,24 +50,13 @@ fun PreviewBox(
     color: @Composable () -> Color = { DuckDuckGoTheme.colors.backgrounds.background },
     content: @Composable BoxScope.() -> Unit,
 ) {
-    val isDarkTheme = isSystemInDarkTheme()
-    val baseContext = LocalContext.current
-    // Previews lack the View theme that painterResource uses to resolve drawable `?attr/daxColor*` fills, so without it icons render transparent.
-    val themedContext = remember(baseContext, isDarkTheme) {
-        ContextThemeWrapper(
-            baseContext,
-            if (isDarkTheme) R.style.Theme_DuckDuckGo_Dark else R.style.Theme_DuckDuckGo_Light,
+    ThemedPreview {
+        Box(
+            modifier = modifier
+                .background(color())
+                .padding(all = 16.dp),
+            content = content,
         )
-    }
-    CompositionLocalProvider(LocalContext provides themedContext) {
-        DuckDuckGoTheme(isDarkTheme = isDarkTheme) {
-            Box(
-                modifier = modifier
-                    .background(color())
-                    .padding(all = 16.dp),
-                content = content,
-            )
-        }
     }
 }
 
@@ -81,11 +70,30 @@ fun PreviewSurface(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
-    DuckDuckGoTheme {
+    ThemedPreview {
         DaxSurface(
             modifier = modifier,
             shadowElevation = 0.dp,
             content = content,
         )
+    }
+}
+
+@Composable
+private fun ThemedPreview(content: @Composable () -> Unit) {
+    val isDarkTheme = isSystemInDarkTheme()
+    val baseContext = LocalContext.current
+    // Previews lack the View theme that painterResource uses to resolve drawable `?attr/daxColor*` fills, so without it icons render transparent.
+    // Droppable once the icons stop being theme-attribute drawables.
+    val themedContext = remember(baseContext, isDarkTheme) {
+        ContextThemeWrapper(
+            baseContext,
+            if (isDarkTheme) R.style.Theme_DuckDuckGo_Dark else R.style.Theme_DuckDuckGo_Light,
+        )
+    }
+    CompositionLocalProvider(LocalContext provides themedContext) {
+        DuckDuckGoTheme(isDarkTheme = isDarkTheme) {
+            content()
+        }
     }
 }
