@@ -33,13 +33,24 @@ import com.duckduckgo.app.onboarding.ui.page.configdriven.CtaConfig
 import com.duckduckgo.common.ui.view.button.DaxButton
 
 interface CardStage {
-    /** Fades the card root in. Nothing to do once the card is on stage, so only the first render of a run fades. */
-    fun reveal(animate: Boolean, onEnd: () -> Unit)
+    /**
+     * Fades the card root in, after [extraStartDelayMs] on top of the stage's own lead-in. Nothing to do once the
+     * card is on stage, so only the first render of a run fades.
+     */
+    fun reveal(animate: Boolean, extraStartDelayMs: Long = 0L, onEnd: () -> Unit)
 
     /** Tweens the card's bounds from the outgoing screen's size to the newly bound one's. */
     fun morph(animate: Boolean, onEnd: () -> Unit)
 
+    /**
+     * Tweens the card's bounds over [durationMs] into the layout change its caller makes next, for a resize a
+     * bound screen drives itself rather than one that comes with a new screen.
+     */
+    fun beginBoundsTransition(durationMs: Long)
+
     fun showCtaButtons(primary: CtaConfig?, secondary: CtaConfig?, onClick: (CtaConfig) -> Unit)
+
+    fun setPrimaryCtaEnabled(enabled: Boolean)
 
     /** Hides [contentTargets] and the visible CTAs so an entrance can fade them in. */
     fun prepareEntrance(contentTargets: List<View>)
@@ -67,7 +78,11 @@ class CardStageImpl(private val binding: ContentOnboardingWelcomePageUpdateBindi
 
     private var ctaViews = emptyList<View>()
 
-    override fun reveal(animate: Boolean, onEnd: () -> Unit) {
+    override fun reveal(
+        animate: Boolean,
+        extraStartDelayMs: Long,
+        onEnd: () -> Unit,
+    ) {
         val card = binding.daxDialogCta.root
         card.isVisible = true
         // Alpha already 1 means the card is on stage from an earlier render, so there is nothing to fade.
@@ -81,7 +96,7 @@ class CardStageImpl(private val binding: ContentOnboardingWelcomePageUpdateBindi
             return
         }
         val reveal = ObjectAnimator.ofFloat(card, View.ALPHA, 1f).apply {
-            startDelay = CARD_FADE_IN_START_DELAY_MS
+            startDelay = CARD_FADE_IN_START_DELAY_MS + extraStartDelayMs
             duration = CARD_FADE_IN_DURATION_MS
             addListener(
                 object : AnimatorListenerAdapter() {
@@ -116,6 +131,12 @@ class CardStageImpl(private val binding: ContentOnboardingWelcomePageUpdateBindi
         morphScene.requestLayout()
     }
 
+    override fun beginBoundsTransition(durationMs: Long) {
+        // A view that has never been laid out has zero bounds, which the transition would tween the card out of.
+        if (!morphScene.isLaidOut) return
+        TransitionManager.beginDelayedTransition(morphScene, ChangeBounds().setDuration(durationMs))
+    }
+
     override fun showCtaButtons(
         primary: CtaConfig?,
         secondary: CtaConfig?,
@@ -127,6 +148,10 @@ class CardStageImpl(private val binding: ContentOnboardingWelcomePageUpdateBindi
             binding.daxDialogCta.primaryCta.takeIf { primary != null },
             binding.daxDialogCta.secondaryCta.takeIf { secondary != null },
         )
+    }
+
+    override fun setPrimaryCtaEnabled(enabled: Boolean) {
+        binding.daxDialogCta.primaryCta.isEnabled = enabled
     }
 
     override fun prepareEntrance(contentTargets: List<View>) {

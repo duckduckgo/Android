@@ -62,10 +62,11 @@
         android:layout_width="@dimen/nativeInputButtonSize"
         android:layout_height="@dimen/nativeInputButtonSize"
         android:layout_marginStart="@dimen/keyline_1"
-        android:background="@drawable/selectable_circular_container_ripple"
+        android:background="@drawable/background_duck_ai_send_button"
         android:importantForAccessibility="no"
         android:scaleType="centerInside"
         android:src="@drawable/ic_arrow_right_24"
+        app:tint="?attr/daxColorButtonPrimaryText"
         android:visibility="gone" />
 
 </LinearLayout>

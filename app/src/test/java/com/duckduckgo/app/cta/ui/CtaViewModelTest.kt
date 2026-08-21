@@ -417,6 +417,7 @@ class CtaViewModelTest {
             isBrowserShowing = true,
             site = null,
             detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
         )
         assertNull(value)
     }
@@ -431,6 +432,7 @@ class CtaViewModelTest {
             isBrowserShowing = true,
             site = site,
             detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
         )
         assertNull(value)
     }
@@ -447,6 +449,7 @@ class CtaViewModelTest {
             isBrowserShowing = true,
             site = site,
             detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = site.url,
         )
         assertTrue(value is BrokenSitePromptDialogCta)
     }
@@ -464,6 +467,7 @@ class CtaViewModelTest {
             isBrowserShowing = true,
             site = site,
             detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = site.url,
         )
 
         assertTrue(value is BrokenSitePromptDialogCta)
@@ -482,6 +486,7 @@ class CtaViewModelTest {
             isBrowserShowing = true,
             site = site,
             detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = site.url,
         )
         assertTrue(value is BrokenSitePromptDialogCta)
     }
@@ -497,6 +502,7 @@ class CtaViewModelTest {
             isBrowserShowing = true,
             site = site,
             detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
         )
         assertNull(value)
     }
@@ -510,7 +516,8 @@ class CtaViewModelTest {
             coroutineRule.testDispatcher,
             isBrowserShowing = true,
             site = site,
-            detectedRefreshPatterns,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
         ) as OnboardingDaxDialogCta
 
         assertTrue(value is OnboardingDaxDialogCta.DaxMainNetworkCta)
@@ -525,6 +532,7 @@ class CtaViewModelTest {
             isBrowserShowing = true,
             site = site,
             detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
         ) as OnboardingDaxDialogCta
 
         assertTrue(value is OnboardingDaxDialogCta.DaxMainNetworkCta)
@@ -548,6 +556,7 @@ class CtaViewModelTest {
             isBrowserShowing = true,
             site = site,
             detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
         )
 
         assertTrue(value is OnboardingDaxDialogCta.DaxTrackersBlockedCta)
@@ -571,6 +580,7 @@ class CtaViewModelTest {
             isBrowserShowing = true,
             site = site,
             detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
         )
 
         assertTrue(value is OnboardingDaxDialogCta.DaxTrackersBlockedCta)
@@ -585,6 +595,7 @@ class CtaViewModelTest {
             isBrowserShowing = true,
             site = site,
             detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
         )
 
         assertTrue(value is OnboardingDaxDialogCta.DaxNoTrackersCta)
@@ -599,6 +610,7 @@ class CtaViewModelTest {
             isBrowserShowing = true,
             site = site,
             detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
         )
 
         assertTrue(value is OnboardingDaxDialogCta.DaxSerpCta)
@@ -613,6 +625,7 @@ class CtaViewModelTest {
             isBrowserShowing = true,
             site = site,
             detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
         )
 
         assertTrue(value is OnboardingDaxDialogCta.DaxNoTrackersCta)
@@ -627,6 +640,7 @@ class CtaViewModelTest {
             isBrowserShowing = true,
             site = site,
             detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
         )
 
         assertTrue(value is OnboardingDaxDialogCta.DaxNoTrackersCta)
@@ -641,6 +655,7 @@ class CtaViewModelTest {
             isBrowserShowing = false,
             site = site,
             detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
         )
 
         assertFalse(value is OnboardingDaxDialogCta)
@@ -658,6 +673,7 @@ class CtaViewModelTest {
             isBrowserShowing = true,
             site = site,
             detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
         )
         assertFalse(value is OnboardingDaxDialogCta.DaxEndCta)
     }
@@ -675,6 +691,7 @@ class CtaViewModelTest {
             isBrowserShowing = true,
             site = site,
             detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
         )
         assertTrue(value is OnboardingDaxDialogCta.DaxEndCta)
     }
@@ -685,7 +702,12 @@ class CtaViewModelTest {
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(false)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_DIALOG_SERP)).thenReturn(true)
 
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = false,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
         assertTrue(value is DaxBubbleCta.DaxIntroSearchOptionsCta)
     }
 
@@ -694,7 +716,12 @@ class CtaViewModelTest {
         givenDaxOnboardingActive()
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
 
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = false,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
         assertTrue(value is DaxBubbleCta.DaxIntroVisitSiteOptionsCta)
     }
 
@@ -705,7 +732,12 @@ class CtaViewModelTest {
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO_VISIT_SITE)).thenReturn(true)
         givenAtLeastOneDaxDialogCtaShown()
 
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = false,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
         assertTrue(value is DaxBubbleCta.DaxEndCta)
     }
 
@@ -714,7 +746,12 @@ class CtaViewModelTest {
         givenShownDaxOnboardingCtas(listOf(CtaId.DAX_INTRO))
         givenUserIsEstablished()
 
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, detectedRefreshPatterns = detectedRefreshPatterns)
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = true,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
         assertNull(value)
     }
 
@@ -727,6 +764,7 @@ class CtaViewModelTest {
             isBrowserShowing = true,
             site = site,
             detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
         )
         assertNull(value)
     }
@@ -864,7 +902,12 @@ class CtaViewModelTest {
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(false)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_DIALOG_SERP)).thenReturn(true)
 
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = false,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
         assertTrue(value is DaxBubbleCta.DaxIntroSearchOptionsCta)
     }
 
@@ -885,7 +928,12 @@ class CtaViewModelTest {
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_DIALOG_TRACKERS_FOUND)).thenReturn(false)
 
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = false,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
         assertTrue(value is DaxBubbleCta.DaxIntroVisitSiteOptionsCta)
     }
 
@@ -895,7 +943,12 @@ class CtaViewModelTest {
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_DIALOG_TRACKERS_FOUND)).thenReturn(true)
 
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = false,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
         assertFalse(value is DaxBubbleCta.DaxIntroVisitSiteOptionsCta)
     }
 
@@ -925,7 +978,12 @@ class CtaViewModelTest {
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_END)).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
 
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = false,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
         assertTrue(value is DaxBubbleCta.DaxSubscriptionCta)
     }
 
@@ -942,7 +1000,12 @@ class CtaViewModelTest {
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_END)).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
 
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = false,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
         assertTrue(value is DaxBubbleCta.DaxSubscriptionCta)
         assertTrue((value as DaxBubbleCta.DaxSubscriptionCta).isFreeTrialCopy)
     }
@@ -1007,7 +1070,12 @@ class CtaViewModelTest {
         whenever(mockOnboardingBrandDesignUpdateToggles.self()).thenReturn(mockDisabledToggle)
         whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockDisabledToggle)
 
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = false,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
         assertTrue(value is DaxBubbleCta.DaxSubscriptionCta)
     }
 
@@ -1021,7 +1089,12 @@ class CtaViewModelTest {
         whenever(mockSubscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
         whenever(mockExtendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockEnabledToggle)
 
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = false,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
         assertNull(value)
     }
 
@@ -1036,7 +1109,12 @@ class CtaViewModelTest {
         whenever(mockSubscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
         whenever(mockExtendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockEnabledToggle)
 
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = false,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
         assertFalse(value is DaxBubbleCta.DaxSubscriptionCta)
         assertFalse(value is DaxSubscriptionBrandDesignUpdateBubbleCta)
     }
@@ -1065,7 +1143,12 @@ class CtaViewModelTest {
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_END)).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
 
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = false,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
         assertFalse(value is DaxBubbleCta.DaxSubscriptionCta)
     }
 
@@ -1081,6 +1164,7 @@ class CtaViewModelTest {
             isBrowserShowing = true,
             site = site,
             detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
         )
         assertNull(value)
     }
@@ -1101,6 +1185,7 @@ class CtaViewModelTest {
             isBrowserShowing = true,
             site = site,
             detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
         )
         assertNull(value)
     }
@@ -1116,6 +1201,7 @@ class CtaViewModelTest {
             isBrowserShowing = true,
             site = site,
             detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
         )
         assertNull(value)
     }
@@ -1131,6 +1217,7 @@ class CtaViewModelTest {
             isBrowserShowing = true,
             site = site,
             detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
         ) as OnboardingDaxDialogCta
 
         assertTrue(value is OnboardingDaxDialogCta.DaxMainNetworkCta)
@@ -1147,6 +1234,7 @@ class CtaViewModelTest {
             isBrowserShowing = true,
             site = site,
             detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
         )
         assertNull(value)
     }
@@ -1220,7 +1308,12 @@ class CtaViewModelTest {
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_DIALOG_SERP)).thenReturn(true)
         whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
 
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = false,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
         assertTrue(value is DaxTryASearchBrandDesignUpdateBubbleCta)
     }
 
@@ -1231,7 +1324,12 @@ class CtaViewModelTest {
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_DIALOG_SERP)).thenReturn(true)
         whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockDisabledToggle)
 
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = false,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
         assertTrue(value is DaxBubbleCta.DaxIntroSearchOptionsCta)
     }
 
@@ -1241,7 +1339,12 @@ class CtaViewModelTest {
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
         whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
 
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = false,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
         assertTrue(value is DaxVisitSiteOptionsBrandDesignUpdateBubbleCta)
     }
 
@@ -1252,7 +1355,12 @@ class CtaViewModelTest {
         whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
         whenever(mockOnboardingBrandDesignUpdateToggles.onboardingImprovements()).thenReturn(mockDisabledToggle)
 
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = false,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
         assertTrue(value is DaxVisitSiteOptionsBrandDesignUpdateBubbleCta)
         assertFalse((value as DaxVisitSiteOptionsBrandDesignUpdateBubbleCta).onboardingImprovementsEnabled)
     }
@@ -1264,7 +1372,12 @@ class CtaViewModelTest {
         whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
         whenever(mockOnboardingBrandDesignUpdateToggles.onboardingImprovements()).thenReturn(mockEnabledToggle)
 
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = false,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
         assertTrue(value is DaxVisitSiteOptionsBrandDesignUpdateBubbleCta)
         assertTrue((value as DaxVisitSiteOptionsBrandDesignUpdateBubbleCta).onboardingImprovementsEnabled)
     }
@@ -1276,7 +1389,12 @@ class CtaViewModelTest {
         whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
         whenever(mockOnboardingBrandDesignUpdateToggles.onboardingImprovementsV2()).thenReturn(mockDisabledToggle)
 
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = false,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
         assertTrue(value is DaxVisitSiteOptionsBrandDesignUpdateBubbleCta)
         assertFalse((value as DaxVisitSiteOptionsBrandDesignUpdateBubbleCta).onboardingImprovementsV2Enabled)
     }
@@ -1288,7 +1406,12 @@ class CtaViewModelTest {
         whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
         whenever(mockOnboardingBrandDesignUpdateToggles.onboardingImprovementsV2()).thenReturn(mockEnabledToggle)
 
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = false,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
         assertTrue(value is DaxVisitSiteOptionsBrandDesignUpdateBubbleCta)
         assertTrue((value as DaxVisitSiteOptionsBrandDesignUpdateBubbleCta).onboardingImprovementsV2Enabled)
     }
@@ -1299,7 +1422,12 @@ class CtaViewModelTest {
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
         whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockDisabledToggle)
 
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = false,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
         assertTrue(value is DaxBubbleCta.DaxIntroVisitSiteOptionsCta)
     }
 
@@ -1311,8 +1439,53 @@ class CtaViewModelTest {
         givenAtLeastOneDaxDialogCtaShown()
         whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
 
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = false,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
         assertTrue(value is DaxEndBrandDesignUpdateBubbleCta)
+    }
+
+    @Test
+    fun whenEndCtaConditionsMetAndSegmentedSearchToggleFlagSetThenSegmentedVariantReturnedAndInputScreenSettingApplied() = runTest {
+        givenDaxOnboardingActive()
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO_VISIT_SITE)).thenReturn(true)
+        givenAtLeastOneDaxDialogCtaShown()
+        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
+        whenever(mockOnboardingStore.isSegmentedSearchPathWithToggleEnabled()).thenReturn(true)
+
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = false,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
+
+        assertTrue((value as DaxEndBrandDesignUpdateBubbleCta).isSegmentedSearchPathWithToggleEnabled)
+        verify(mockDuckChat).setInputScreenUserSetting(true)
+    }
+
+    @Test
+    fun whenEndCtaConditionsMetAndSegmentedSearchToggleFlagNotSetThenInputScreenSettingNotApplied() = runTest {
+        givenDaxOnboardingActive()
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO_VISIT_SITE)).thenReturn(true)
+        givenAtLeastOneDaxDialogCtaShown()
+        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
+        whenever(mockOnboardingStore.isSegmentedSearchPathWithToggleEnabled()).thenReturn(false)
+
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = false,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
+
+        assertFalse((value as DaxEndBrandDesignUpdateBubbleCta).isSegmentedSearchPathWithToggleEnabled)
+        verify(mockDuckChat, never()).setInputScreenUserSetting(any())
     }
 
     @Test
@@ -1323,7 +1496,12 @@ class CtaViewModelTest {
         givenAtLeastOneDaxDialogCtaShown()
         whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockDisabledToggle)
 
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = false,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
         assertTrue(value is DaxBubbleCta.DaxEndCta)
     }
 
@@ -1340,7 +1518,12 @@ class CtaViewModelTest {
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
         whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
 
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = false,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
         assertTrue(value is DaxSubscriptionBrandDesignUpdateBubbleCta)
     }
 
@@ -1357,7 +1540,12 @@ class CtaViewModelTest {
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
         whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockDisabledToggle)
 
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = false,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
         assertTrue(value is DaxBubbleCta.DaxSubscriptionCta)
     }
 
@@ -1386,6 +1574,7 @@ class CtaViewModelTest {
             isBrowserShowing = true,
             site = site,
             detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
         )
         assertFalse(value is SubscriptionPromoModalCta)
     }
@@ -1403,6 +1592,7 @@ class CtaViewModelTest {
             isBrowserShowing = true,
             site = site,
             detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
         )
         assertFalse(value is SubscriptionPromoModalCta)
     }
@@ -1422,6 +1612,7 @@ class CtaViewModelTest {
             isBrowserShowing = true,
             site = site,
             detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
         )
         assertFalse(value is SubscriptionPromoModalCta)
     }
@@ -1437,6 +1628,7 @@ class CtaViewModelTest {
             isBrowserShowing = true,
             site = site,
             detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
         )
         assertFalse(value is SubscriptionPromoModalCta)
     }
@@ -1454,6 +1646,7 @@ class CtaViewModelTest {
             isBrowserShowing = true,
             site = site,
             detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
         )
         assertFalse(value is SubscriptionPromoModalCta)
     }
@@ -1469,7 +1662,12 @@ class CtaViewModelTest {
 
         // After modal is shown, DAX_INTRO_PRIVACY_PRO is in dismissed_cta, so bubble must not show
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO_PRIVACY_PRO)).thenReturn(true)
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = false,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
         assertFalse(value is DaxBubbleCta.DaxSubscriptionCta)
     }
 
@@ -1579,7 +1777,12 @@ class CtaViewModelTest {
         givenCanShowDuckAiEndCta()
         showInputScreenFlow.value = false
 
-        val cta = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
+        val cta = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = false,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
 
         assertTrue(cta is DaxDuckAiEndBubbleCta)
     }
@@ -1591,7 +1794,12 @@ class CtaViewModelTest {
         showInputScreenFlow.value = false
         whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
 
-        val cta = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
+        val cta = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = false,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
 
         assertTrue(cta is DaxDuckAiEndBrandDesignUpdateBubbleCta)
     }
@@ -1602,7 +1810,12 @@ class CtaViewModelTest {
         givenCanShowDuckAiEndCta()
         showInputScreenFlow.value = true
 
-        val cta = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
+        val cta = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = false,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
 
         assertNull(cta)
     }
@@ -1613,7 +1826,12 @@ class CtaViewModelTest {
         givenCanShowDuckAiEndCta()
         showInputScreenFlow.value = false
 
-        testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
+        testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = false,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
 
         verify(mockDuckChat).setInputScreenUserSetting(true)
     }
@@ -1624,7 +1842,12 @@ class CtaViewModelTest {
         givenCanShowDuckAiEndCta()
         showInputScreenFlow.value = true
 
-        testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
+        testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = false,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
 
         // The legacy input-screen path applies the toggle in prepareAndMarkDuckAiEndCtaForInputScreen, not here.
         verify(mockDuckChat, never()).setInputScreenUserSetting(any())
@@ -2155,6 +2378,7 @@ class CtaViewModelTest {
         onboardingImprovementsEnabled = false,
         onboardingImprovementsV2Enabled = true,
         isOmnibarBottom = false,
+        isSegmentedSearchPathWithToggleEnabled = false,
     )
 
     private fun daxDuckAiEndBrandDesignUpdateBubbleCta() = DaxDuckAiEndBrandDesignUpdateBubbleCta(

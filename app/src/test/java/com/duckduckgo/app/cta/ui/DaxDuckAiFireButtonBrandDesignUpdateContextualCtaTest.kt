@@ -197,6 +197,7 @@ class DaxDuckAiFireButtonBrandDesignUpdateContextualCtaTest {
             isBrowserShowing = true,
             site = duckAiSite(),
             detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
         )
 
         assertTrue(cta is DaxDuckAiFireButtonBrandDesignUpdateContextualCta)
@@ -209,6 +210,7 @@ class DaxDuckAiFireButtonBrandDesignUpdateContextualCtaTest {
             isBrowserShowing = true,
             site = duckAiSite(),
             detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
         )
 
         assertTrue(cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta)

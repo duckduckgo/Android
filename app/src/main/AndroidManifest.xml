@@ -25,7 +25,7 @@
     <uses-feature android:name="android.hardware.camera.flash" android:required="false" />
 
     <!--
-    androidx.pdf library is defining a min version to 31, but our app supports 21 and above.
+    androidx.pdf library is defining a min version to 31, but our app supports 28 and above.
     This allows us to use the library while still supporting older versions of Android
     -->
     <uses-sdk tools:overrideLibrary="androidx.pdf,androidx.pdf.document.service,androidx.pdf.viewer.fragment" />

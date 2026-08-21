@@ -345,6 +345,7 @@ dependencies {
 
     implementation project(':app-build-config-api')
     implementation project(':browser-api')
+    implementation project(':browser-feature-toggles')
     implementation project(':browser-ui')
     implementation project(":statistics-api")
     implementation project(':statistics-impl')

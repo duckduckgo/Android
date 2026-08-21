@@ -1,0 +1,26 @@
+<!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="16dp"
+    android:height="16dp"
+    android:viewportWidth="16"
+    android:viewportHeight="16">
+    <path
+        android:fillColor="?attr/daxColorPrimaryIcon"
+        android:fillType="evenOdd"
+        android:pathData="M0.017,7.482C0.283,3.305 3.756,0 8,0C12.245,0 15.717,3.305 15.984,7.482C16.001,7.558 16.005,7.634 15.995,7.707C15.998,7.804 16,7.902 16,8C16,12.418 12.418,16 8,16C3.582,16 0,12.418 0,8C0,7.902 0.002,7.804 0.005,7.707C-0.004,7.634 -0.001,7.558 0.017,7.482ZM1.264,8.433C1.431,11.075 3.118,13.304 5.461,14.256C5.308,14.009 5.17,13.747 5.045,13.475C4.49,12.262 4.126,10.688 4.027,8.957C3.1,8.828 2.178,8.653 1.264,8.433ZM4.003,7.691C3.097,7.558 2.195,7.38 1.302,7.156C1.609,4.695 3.241,2.646 5.461,1.744C5.308,1.991 5.17,2.253 5.045,2.525C4.422,3.888 4.039,5.706 4.003,7.691ZM5.289,9.104C5.398,10.62 5.725,11.956 6.182,12.955C6.773,14.246 7.462,14.75 8,14.75C8.539,14.75 9.228,14.246 9.818,12.955C10.276,11.956 10.603,10.62 10.711,9.104C8.908,9.275 7.092,9.275 5.289,9.104ZM10.749,7.845C8.921,8.028 7.079,8.028 5.251,7.845C5.27,5.94 5.631,4.248 6.182,3.045C6.773,1.754 7.462,1.25 8,1.25C8.539,1.25 9.228,1.754 9.818,3.045C10.369,4.248 10.731,5.94 10.749,7.845ZM11.973,8.957C11.874,10.688 11.51,12.262 10.955,13.475C10.831,13.747 10.692,14.009 10.539,14.256C12.882,13.304 14.569,11.075 14.736,8.433C13.822,8.653 12.9,8.828 11.973,8.957ZM14.698,7.156C13.805,7.38 12.904,7.558 11.997,7.691C11.961,5.706 11.579,3.888 10.955,2.525C10.831,2.253 10.692,1.991 10.539,1.744C12.759,2.646 14.391,4.695 14.698,7.156Z" />
+</vector>

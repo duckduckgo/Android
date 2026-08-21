@@ -75,6 +75,14 @@ class TwoLineListItem @JvmOverloads constructor(
             setPrimaryText(getString(R.styleable.TwoLineListItem_primaryText))
             setSecondaryText(getString(R.styleable.TwoLineListItem_secondaryText))
 
+            if (hasValue(R.styleable.TwoLineListItem_primaryTextAppearance)) {
+                primaryText.setTextAppearance(getResourceId(R.styleable.TwoLineListItem_primaryTextAppearance, 0))
+            }
+
+            if (hasValue(R.styleable.TwoLineListItem_secondaryTextAppearance)) {
+                secondaryText.setTextAppearance(getResourceId(R.styleable.TwoLineListItem_secondaryTextAppearance, 0))
+            }
+
             if (hasValue(R.styleable.TwoLineListItem_primaryTextColorOverlay)) {
                 setPrimaryTextColorStateList(getColorStateList(R.styleable.TwoLineListItem_primaryTextColorOverlay))
             }

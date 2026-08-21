@@ -85,6 +85,7 @@ import com.duckduckgo.downloads.api.DownloadConfirmationDialogListener
 import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.FileDownloader
+import com.duckduckgo.duckchat.api.DuckChatContextual
 import com.duckduckgo.duckchat.api.DuckChatHistoryNoParams
 import com.duckduckgo.duckchat.api.viewmodel.DuckChatSharedViewModel
 import com.duckduckgo.duckchat.impl.DuckChatInternal
@@ -269,6 +270,7 @@ class DuckChatContextualFragment :
             ) {
                 if (newState == BottomSheetBehavior.STATE_HIDDEN) {
                     viewModel.onSheetClosed()
+                    binding.contextualSuggestionsView.clear()
                 }
                 if (newState == BottomSheetBehavior.STATE_HALF_EXPANDED) {
                     bottomSheet.requestLayout()
@@ -552,6 +554,8 @@ class DuckChatContextualFragment :
         }
     }
 
+    private fun isSheetVisible(): Boolean = bottomSheetBehavior.state != BottomSheetBehavior.STATE_HIDDEN
+
     private fun reserveSpaceForSuggestions() {
         if (!viewModel.viewState.value.contextualSuggestionsEnabled) return
         if (isKeyboardVisible) return
@@ -698,7 +702,7 @@ class DuckChatContextualFragment :
             } else {
                 binding.legacyInputField.text.toString()
             }
-            viewModel.onQuickActionClicked(currentInput)
+            viewModel.onQuickActionClicked(currentInput, binding.contextualSuggestionsView.currentPageType())
         }
     }
 
@@ -737,10 +741,10 @@ class DuckChatContextualFragment :
                     is DuckChatContextualViewModel.Command.OpenFullscreenMode -> {
                         binding.root.viewTreeObserver.removeOnGlobalLayoutListener(keyboardVisibilityListener)
                         val result = Bundle().apply {
-                            putString(KEY_DUCK_AI_URL, command.url)
+                            putString(DuckChatContextual.RESULT_URL, command.url)
                         }
 
-                        setFragmentResult(KEY_DUCK_AI_CONTEXTUAL_RESULT, result)
+                        setFragmentResult(DuckChatContextual.RESULT_KEY, result)
                     }
 
                     is DuckChatContextualViewModel.Command.ChangeSheetState -> {
@@ -798,7 +802,9 @@ class DuckChatContextualFragment :
                 when (command) {
                     is DuckChatContextualSharedViewModel.Command.PageContextAttached -> {
                         viewModel.onPageContextReceived(command.tabId, command.pageContext, command.isStorePageContextEnabled)
-                        binding.contextualSuggestionsView.onPageContextUpdated(command.pageContext)
+                        if (isSheetVisible() && viewModel.viewState.value.sheetMode == DuckChatContextualViewModel.SheetMode.INPUT) {
+                            binding.contextualSuggestionsView.onPageContextUpdated(command.pageContext)
+                        }
                     }
 
                     is DuckChatContextualSharedViewModel.Command.MainBrowserPageFinished -> {
@@ -1314,8 +1320,6 @@ class DuckChatContextualFragment :
             "Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/124.0.0.0 Mobile DuckDuckGo/5 Safari/537.36"
         const val REQUEST_CODE_CHOOSE_FILE = 100
 
-        const val KEY_DUCK_AI_URL: String = "KEY_DUCK_AI_URL"
-        const val KEY_DUCK_AI_CONTEXTUAL_RESULT: String = "KEY_DUCK_AI_CONTEXTUAL_RESULT"
         const val KEY_DUCK_AI_CONTEXTUAL_TAB_ID: String = "KEY_DUCK_AI_CONTEXTUAL_TAB_ID"
     }
 }

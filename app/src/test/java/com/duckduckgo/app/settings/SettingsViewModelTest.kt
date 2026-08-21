@@ -24,7 +24,6 @@ import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAddHomeScreenWidget
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAutofillPasswordsManagement
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAutofillSettings
@@ -38,6 +37,7 @@ import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.email.EmailManager
+import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
@@ -161,6 +161,7 @@ class SettingsViewModelTest {
         verify(pixelMock).fire(AppPixelName.SETTINGS_OPENED)
         verify(pixelMock).fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_SETTINGS_OPENED)
         verify(pixelMock).fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_SETTINGS_OPENED_DAILY, type = Pixel.PixelType.Daily())
+        verify(settingsPixelDispatcherMock).fireSettingsOpenedWithSubscriptionPurchaseAvailable()
     }
 
     @Test

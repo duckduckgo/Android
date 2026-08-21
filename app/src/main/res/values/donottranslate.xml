@@ -51,7 +51,31 @@
     <string name="newTabPageIndonesiaMessageCta">Okay</string>
 
     <!-- Skip Onboarding (not user-facing) -->
-    <string name="skipOnboarding">Skip Onboarding</string>"
+    <string name="skipOnboarding">Skip Onboarding</string>
+
+    <!-- Segmented onboarding -->
+    <string name="downloadReasonTitle">Set things up your way</string>
+    <string name="downloadReasonBody">Choose one option that interests you most, and we’ll set you up quickly.</string>
+    <string name="downloadReasonOptionSearch">Search and browse privately</string>
+    <string name="downloadReasonOptionAiChat">Chat with AI privately</string>
+    <string name="downloadReasonOptionNoAi">Remove AI from search results</string>
+    <string name="downloadReasonOptionBlockAds">Block ads and pop-ups</string>
+    <string name="downloadReasonPrimaryCta">Next</string>
+
+    <string name="searchPathComparisonChartTitle"><![CDATA[You\'re in the right place!<br/>Protections activated.]]></string>
+
+    <string name="searchPathPreferenceSelectorTitle">Your search, your way.</string>
+    <string name="searchPathPreferenceHistoryPrimary">Search History</string>
+    <string name="searchPathPreferenceHistorySecondary">Show recently visited sites in search suggestions. Private, only on your device.</string>
+    <string name="searchPathPreferenceSafePrimary">Safe Search</string>
+    <string name="searchPathPreferenceSafeSecondary">Omit questionable (mostly adult) material in results.</string>
+
+    <string name="searchPathInputPreviewTitle">Now, try a private search!</string>
+
+    <string name="searchPathWithToggleEnabledContextualEndTitle">Chat privately with popular AIs in Duck.ai</string>
+    <string name="searchPathWithToggleEnabledContextualEndDescription">Chats are anonymized, no account required. And it’s free!</string>
+    <string name="searchPathWithToggleEnabledContextualEndPrimaryCta">Try Duck.ai</string>
+    <string name="searchPathWithToggleEnabledContextualEndSecondaryCta">Skip</string>
 
     <!-- Browser tab -->
     <string name="browserDuckPlayerShortUrl">Duck Player</string>

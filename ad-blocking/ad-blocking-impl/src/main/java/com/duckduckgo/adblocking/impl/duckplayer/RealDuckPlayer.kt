@@ -384,14 +384,16 @@ class RealDuckPlayer @Inject constructor(
             return processDuckPlayerUri(url, webView)
         } else {
             if (!isFeatureEnabled) return null
-            val webViewUrl = withContext(dispatchers.main()) { webView.url }
             if (isYoutubeWatchUrl(url)) {
                 return processYouTubeWatchUri(request, url, webView)
             } else if (isSimulatedYoutubeNoCookie(url)) {
                 return processSimulatedYouTubeNoCookieUri(url, webView)
-            } else if (duckPlayerFeature.addCustomEmbedReferer().isEnabled() && isYouTubeNoCookieEmbedUri(url, webViewUrl)) {
-                return getEmbedWithReferer(request)?.let { inputStream ->
-                    WebResourceResponse("text/html", "UTF-8", inputStream)
+            } else if (isYouTubeNoCookieUri(url) && duckPlayerFeature.addCustomEmbedReferer().isEnabled()) {
+                val webViewUrl = withContext(dispatchers.main()) { webView.url }
+                if (isYouTubeNoCookieEmbedUri(url, webViewUrl)) {
+                    return getEmbedWithReferer(request)?.let { inputStream ->
+                        WebResourceResponse("text/html", "UTF-8", inputStream)
+                    }
                 }
             }
         }

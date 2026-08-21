@@ -30,6 +30,7 @@ import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobR
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord.EmailData
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord.LinkFetchData
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction
+import com.duckduckgo.pir.impl.scripts.models.ElementSelector
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
@@ -153,7 +154,17 @@ class RealBrokerStepsParserTest {
                         "actionType": "fillForm",
                         "id": "fill-1",
                         "selector": "#optout-form",
-                        "elements": []
+                        "elements": [
+                            {
+                                "type": "elementType",
+                                "selector": "#element",
+                                "multiple": true,
+                                "min": "1",
+                                "max": "10",
+                                "failSilently": true,
+                                "format": "elementFormat"
+                            }
+                        ]
                     }
                 ]
             }
@@ -175,6 +186,23 @@ class RealBrokerStepsParserTest {
         assertEquals("optOut", optOutStep1.step.stepType)
         assertEquals("form", optOutStep1.step.optOutType)
         assertEquals(2, optOutStep1.step.actions.size)
+
+        val fillForm = optOutStep1.step.actions[1] as BrokerAction.FillForm
+        assertEquals(
+            listOf(
+                ElementSelector(
+                    type = "elementType",
+                    selector = "#element",
+                    parent = null,
+                    multiple = true,
+                    min = "1",
+                    max = "10",
+                    failSilently = true,
+                    format = "elementFormat",
+                ),
+            ),
+            fillForm.elements,
+        )
 
         val optOutStep2 = result[1] as OptOutStep
         assertEquals(testProfile2, optOutStep2.profileToOptOut)
@@ -291,44 +319,6 @@ class RealBrokerStepsParserTest {
     }
 
     @Test
-    fun whenParseEmailConfirmationStepWithNoEmailConfirmationActionThenReturnStepWithEmptyActions() = runTest {
-        val optOutJson = """
-            {
-                "stepType": "optOut",
-                "optOutType": "form",
-                "actions": [
-                    {
-                        "actionType": "navigate",
-                        "id": "nav-1",
-                        "url": "https://testbroker.com/optout"
-                    },
-                    {
-                        "actionType": "navigate",
-                        "id": "nav-2",
-                        "url": "https://testbroker.com/submit"
-                    }
-                ]
-            }
-        """.trimIndent()
-
-        val emailConfirmationJob = EmailConfirmationJobRecord(
-            brokerName = "testBroker",
-            userProfileId = 100L,
-            extractedProfileId = 1L,
-            emailData = EmailData(email = "test@example.com", attemptId = "attempt-123"),
-        )
-
-        whenever(mockRepository.getExtractedProfile(eq(1L))).thenReturn(testProfile1)
-
-        val result = testee.parseEmailConfirmationStep(testBroker, optOutJson, emailConfirmationJob)
-
-        assertTrue(result is EmailConfirmationStep)
-        val emailConfStep = result as? EmailConfirmationStep
-        assertTrue(emailConfStep != null)
-        assertTrue(emailConfStep!!.step.actions.isEmpty())
-    }
-
-    @Test
     fun whenParseEmailConfirmationStepWithMissingProfileThenReturnNull() = runTest {
         val optOutJson = """
             {
@@ -404,5 +394,60 @@ class RealBrokerStepsParserTest {
         assertEquals(2, scanStep.step.actions.size)
         assertTrue(scanStep.step.actions[0] is BrokerAction.Navigate)
         assertTrue(scanStep.step.actions[1] is BrokerAction.EmailConfirmation)
+    }
+
+    @Test
+    fun whenParseEmailConfirmationStepWithNoEmailConfirmationActionThenReturnNull() = runTest {
+        val optOutJson = """
+            {
+                "stepType": "optOut",
+                "optOutType": "form",
+                "actions": [
+                    {
+                        "actionType": "navigate",
+                        "id": "nav-1",
+                        "url": "https://testbroker.com/optout"
+                    }
+                ]
+            }
+        """.trimIndent()
+
+        val emailConfirmationJob = EmailConfirmationJobRecord(
+            brokerName = "testBroker",
+            userProfileId = 100L,
+            extractedProfileId = 1L,
+            emailData = EmailData(email = "test@example.com", attemptId = "attempt-123"),
+        )
+
+        whenever(mockRepository.getExtractedProfile(eq(1L))).thenReturn(testProfile1)
+
+        val result = testee.parseEmailConfirmationStep(testBroker, optOutJson, emailConfirmationJob)
+
+        assertNull(result)
+    }
+
+    @Test
+    fun whenParseEmailConfirmationStepWithEmptyActionsThenReturnNull() = runTest {
+        // Mirrors a broker that became a parentSiteOptOut mirror while a confirmation job was pending
+        val optOutJson = """
+            {
+                "stepType": "optOut",
+                "optOutType": "parentSiteOptOut",
+                "actions": []
+            }
+        """.trimIndent()
+
+        val emailConfirmationJob = EmailConfirmationJobRecord(
+            brokerName = "testBroker",
+            userProfileId = 100L,
+            extractedProfileId = 1L,
+            emailData = EmailData(email = "test@example.com", attemptId = "attempt-123"),
+        )
+
+        whenever(mockRepository.getExtractedProfile(eq(1L))).thenReturn(testProfile1)
+
+        val result = testee.parseEmailConfirmationStep(testBroker, optOutJson, emailConfirmationJob)
+
+        assertNull(result)
     }
 }

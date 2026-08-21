@@ -21,6 +21,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.crypto.SyncJweCrypto
+import com.duckduckgo.sync.store.AccountInfoPublicKey
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Json
@@ -35,7 +36,15 @@ import javax.inject.Inject
  */
 @WorkerThread
 interface DeviceInfoEncryptor {
+    /**
+     * Encrypt against the account's cached `account_info` public key.
+     * */
     fun encrypt(name: String, type: String): Result<String>
+
+    /**
+     * Encrypt against an explicitly-provided `account_info` public key
+     */
+    fun encrypt(name: String, type: String, publicKey: AccountInfoPublicKey): Result<String>
 }
 
 /**
@@ -65,7 +74,10 @@ class RealDeviceInfoEncryptor @Inject constructor(
     override fun encrypt(name: String, type: String): Result<String> {
         val publicKey = syncStore.accountInfoPublicKey
             ?: return Error(reason = "DeviceInfoEncryptor: no cached account_info key")
+        return encrypt(name, type, publicKey)
+    }
 
+    override fun encrypt(name: String, type: String, publicKey: AccountInfoPublicKey): Result<String> {
         return runCatching {
             val plaintext = DeviceInfoPayload.toJson(DeviceInfoPayload(name = name, type = type)).toByteArray(Charsets.UTF_8)
 

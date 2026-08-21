@@ -21,7 +21,7 @@ import com.duckduckgo.app.generalsettings.showonapplaunch.rmf.NtpAfterIdleState.
 import com.duckduckgo.app.generalsettings.showonapplaunch.rmf.NtpAfterIdleState.ELIGIBLE_CARD_SHOWN
 import com.duckduckgo.app.generalsettings.showonapplaunch.rmf.NtpAfterIdleState.NOT_ELIGIBLE
 import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchOptionDataStore
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import com.duckduckgo.remote.messaging.api.AttributeMatcherPlugin

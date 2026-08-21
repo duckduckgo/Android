@@ -486,5 +486,5 @@ val RbRed100
 val Green40
     @Composable
     @ReadOnlyComposable
-    get() = colorResource(R.color.green40)
+    get() = colorResource(R.color.rb_green40)
 // endregion

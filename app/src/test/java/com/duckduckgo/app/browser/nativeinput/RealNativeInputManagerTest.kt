@@ -35,11 +35,14 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.NativeInputEventListener
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
+import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputWidget
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -77,8 +80,11 @@ class RealNativeInputManagerTest {
     private val duckChatInputModeState: DuckChatInputModeState = mock()
     private val pixel: Pixel = mock()
     private val nativeInputEventListener: NativeInputEventListener = mock()
+    private val edgeToEdgeProvider: EdgeToEdgeProvider = mock()
+    private val edgeToEdgeHandler = EdgeToEdgeHandler()
     private val nativeInputStateBugKillSwitch = FakeFeatureToggleFactory.create(NativeInputStateBugKillSwitch::class.java)
-    private val nativeInputSearchOnlyFeature = FakeFeatureToggleFactory.create(NativeInputSearchOnlyFeature::class.java)
+    private val nativeInputUrlClearingFeature = FakeFeatureToggleFactory.create(NativeInputUrlClearingFeature::class.java)
+    private val nativeInputOmnibarFeature = FakeFeatureToggleFactory.create(NativeInputOmnibarFeature::class.java)
 
     private val context: Context = ApplicationProvider.getApplicationContext()
     private val rootView: ViewGroup = FrameLayout(context)
@@ -93,7 +99,8 @@ class RealNativeInputManagerTest {
     fun setUp() {
         whenever(duckChatInputModeState.inputModeCapability).thenReturn(inputModeCapabilityFlow)
         whenever(duckChat.observeNativeInputNavBarEnabled()).thenReturn(MutableStateFlow(false))
-        nativeInputSearchOnlyFeature.self().setRawStoredState(State(enable = false))
+        nativeInputOmnibarFeature.self().setRawStoredState(State(enable = false))
+        nativeInputUrlClearingFeature.self().setRawStoredState(State(enable = true))
         testee = RealNativeInputManager(
             duckChat,
             animator,
@@ -104,8 +111,11 @@ class RealNativeInputManagerTest {
             duckChatInputModeState,
             pixel,
             nativeInputStateBugKillSwitch,
-            nativeInputSearchOnlyFeature,
+            nativeInputUrlClearingFeature,
+            nativeInputOmnibarFeature,
             nativeInputEventListener,
+            edgeToEdgeProvider,
+            edgeToEdgeHandler,
         )
     }
 
@@ -174,6 +184,170 @@ class RealNativeInputManagerTest {
         assertNull(rootView.findViewById<View?>(R.id.inputModeWidgetNavLayout))
     }
 
+    @Test
+    fun whenChatSelectedWithUrlThenInputCleared() {
+        val input = givenUrlCachingBound(text = URL)
+        input.switchToDuckAi()
+        assertEquals("", input.text)
+    }
+
+    @Test
+    fun whenSearchSelectedThenCachedUrlRestored() {
+        val input = givenUrlCachingBound(text = URL)
+        input.switchToDuckAi()
+        input.switchToSearch()
+
+        assertEquals(URL, input.text)
+        assertEquals(1, input.selectAllTextCalls)
+    }
+
+    @Test
+    fun whenInputContainsSearchQueryThenSwitchingModesDoesNotClearInput() {
+        val input = givenUrlCachingBound(text = QUERY)
+        input.switchToDuckAi()
+        input.switchToSearch()
+
+        assertEquals(QUERY, input.text)
+        assertEquals(0, input.selectAllTextCalls)
+    }
+
+    @Test
+    fun whenPromptTypedInDuckAiThenCachedUrlNotRestored() {
+        val input = givenUrlCachingBound(text = URL)
+        input.switchToDuckAi()
+        input.text = QUERY
+        input.switchToSearch()
+
+        assertEquals(QUERY, input.text)
+    }
+
+    @Test
+    fun whenUrlRestoredAndClearedThenCachedUrlCleared() {
+        val input = givenUrlCachingBound(text = URL)
+        input.switchToDuckAi()
+        input.switchToSearch()
+        input.text = ""
+        input.switchToDuckAi()
+        input.switchToSearch()
+
+        assertEquals("", input.text)
+    }
+
+    @Test
+    fun whenSwitchingModesThenExistingListenersStillFire() {
+        var duckAiListenerFired = false
+        var searchListenerFired = false
+        val input = givenUrlCachingBound(text = URL) {
+            onChatSelected = { duckAiListenerFired = true }
+            onSearchSelected = { searchListenerFired = true }
+        }
+        input.switchToDuckAi()
+        input.switchToSearch()
+
+        assertTrue(duckAiListenerFired)
+        assertTrue(searchListenerFired)
+    }
+
+    @Test
+    fun whenSwitchingToDuckAiThenListenerTextCleared() {
+        var listenerText: String? = null
+        val input = givenUrlCachingBound(text = URL) {
+            onChatSelected = { listenerText = text }
+        }
+        input.switchToDuckAi()
+
+        assertEquals("", listenerText)
+    }
+
+    @Test
+    fun whenUserTypedUrlIntoEmptyInputThenSwitchingToDuckAiDoesNotClearIt() {
+        val input = givenUrlCachingBound(text = "")
+        input.text = URL
+        input.switchToDuckAi()
+
+        assertEquals(URL, input.text)
+    }
+
+    @Test
+    fun whenUserEditedPrefilledUrlThenSwitchingToDuckAiDoesNotClearIt() {
+        val input = givenUrlCachingBound(text = URL)
+        input.text = OTHER_URL
+        input.switchToDuckAi()
+
+        assertEquals(OTHER_URL, input.text)
+    }
+
+    @Test
+    fun whenRestoredUrlIsUnchangedThenSwitchingToDuckAiClearsIt() {
+        val input = givenUrlCachingBound(text = URL)
+        input.switchToDuckAi()
+        input.switchToSearch()
+        input.switchToDuckAi()
+
+        assertEquals("", input.text)
+    }
+
+    @Test
+    fun whenUrlClearingKillSwitchDisabledThenInputNotCleared() {
+        nativeInputUrlClearingFeature.self().setRawStoredState(State(enable = false))
+        val input = givenUrlCachingBound(text = URL)
+        input.switchToDuckAi()
+
+        assertEquals(URL, input.text)
+    }
+
+    @Test
+    fun whenInDuckAiModeThenInputNotCleared() {
+        val input = givenUrlCachingBound(text = URL, duckAiMode = true)
+        input.switchToDuckAi()
+
+        assertEquals(URL, input.text)
+    }
+
+    private fun givenUrlCachingBound(
+        text: String,
+        duckAiMode: Boolean = false,
+        existingListeners: FakeInput.() -> Unit = {},
+    ): FakeInput {
+        whenever(duckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(MutableStateFlow(true))
+        whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(MutableStateFlow(true))
+        whenever(omnibar.viewMode).thenReturn(if (duckAiMode) Omnibar.ViewMode.DuckAI else Omnibar.ViewMode.Browser(null))
+        whenever(queryUrlPredictor.isUrl(URL)).thenReturn(true)
+        whenever(queryUrlPredictor.isUrl(OTHER_URL)).thenReturn(true)
+        whenever(queryUrlPredictor.isUrl(QUERY)).thenReturn(false)
+        testee.init(omnibar, rootView, lifecycleOwner)
+
+        val input = FakeInput(context).apply {
+            id = R.id.inputModeWidget
+            this.text = text
+            existingListeners()
+        }
+        testee.bindUrlCaching(FrameLayout(context).apply { addView(input) })
+        return input
+    }
+
+    private class FakeInput(
+        context: Context,
+        delegate: NativeInputWidget = mock(),
+    ) : FrameLayout(context), NativeInputWidget by delegate {
+        override var text: String = ""
+        override var onSearchSelected: ((animate: Boolean) -> Unit)? = null
+        override var onChatSelected: ((animate: Boolean) -> Unit)? = null
+        var selectAllTextCalls = 0
+
+        fun switchToDuckAi() {
+            onChatSelected?.invoke(true)
+        }
+
+        fun switchToSearch() {
+            onSearchSelected?.invoke(true)
+        }
+
+        override fun selectAllText() {
+            selectAllTextCalls++
+        }
+    }
+
     private fun showNativeInput() {
         testee.showNativeInput(
             tabId = "tab",
@@ -184,6 +358,12 @@ class RealNativeInputManagerTest {
             query = "",
             callbacks = mock<NativeInputCallbacks>(),
         )
+    }
+
+    private companion object {
+        private const val URL = "https://example.com"
+        private const val OTHER_URL = "https://foo.com"
+        private const val QUERY = "query"
     }
 
     private class FakeLifecycleOwner : LifecycleOwner {

@@ -31,8 +31,8 @@ import com.duckduckgo.pir.impl.common.PirJob
 import com.duckduckgo.pir.impl.common.PirJob.RunType
 import com.duckduckgo.pir.impl.common.PirWebViewCountProvider
 import com.duckduckgo.pir.impl.common.PirWebViewDataCleaner
+import com.duckduckgo.pir.impl.common.PirWorkDistributor
 import com.duckduckgo.pir.impl.common.RealPirActionsRunner
-import com.duckduckgo.pir.impl.common.splitIntoParts
 import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord
@@ -43,8 +43,6 @@ import com.duckduckgo.pir.impl.store.db.EventType
 import com.duckduckgo.pir.impl.store.db.PirEventLog
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject
@@ -57,8 +55,8 @@ interface PirScan {
         jobRecords: List<ScanJobRecord>,
         context: Context,
         runType: RunType,
-        onJobCompleted: (suspend () -> Unit)? = null,
-        onScanJobsResolved: (suspend (Int) -> Unit)? = null,
+        onJobCompleted: suspend () -> Unit = {},
+        onScanJobsResolved: suspend (Int) -> Unit = {},
     ): Result<Unit>
 
     /**
@@ -121,6 +119,7 @@ class RealPirScan @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val webViewDataCleaner: PirWebViewDataCleaner,
     private val pirWebViewCountProvider: PirWebViewCountProvider,
+    private val pirWorkDistributor: PirWorkDistributor,
     callbacks: PluginPoint<PirCallbacks>,
 ) : PirScan, PirJob(callbacks) {
 
@@ -131,8 +130,8 @@ class RealPirScan @Inject constructor(
         jobRecords: List<ScanJobRecord>,
         context: Context,
         runType: RunType,
-        onJobCompleted: (suspend () -> Unit)?,
-        onScanJobsResolved: (suspend (Int) -> Unit)?,
+        onJobCompleted: suspend () -> Unit,
+        onScanJobsResolved: suspend (Int) -> Unit,
     ) = withContext(dispatcherProvider.io()) {
         logcat { "PIR-SCAN: Running scan on the following records: $jobRecords on ${Thread.currentThread().name}" }
         onJobStarted()
@@ -143,14 +142,14 @@ class RealPirScan @Inject constructor(
         val activeBrokers = repository.getAllActiveBrokerObjects().associateBy { it.name }
         if (activeBrokers.isEmpty()) {
             logcat { "PIR-SCAN: No active brokers here." }
-            onScanJobsResolved?.invoke(0)
+            onScanJobsResolved(0)
             completeScan(runType)
             return@withContext Result.success(Unit)
         }
 
         if (jobRecords.isEmpty()) {
             logcat { "PIR-SCAN: Nothing to scan here." }
-            onScanJobsResolved?.invoke(0)
+            onScanJobsResolved(0)
             completeScan(runType)
             return@withContext Result.success(Unit)
         }
@@ -159,7 +158,7 @@ class RealPirScan @Inject constructor(
 
         val processedJobRecords = processJobRecords(jobRecords, activeBrokers)
         logcat { "PIR-SCAN: Total processed records ${processedJobRecords.size}" }
-        onScanJobsResolved?.invoke(processedJobRecords.size)
+        onScanJobsResolved(processedJobRecords.size)
 
         if (processedJobRecords.isEmpty()) {
             logcat { "PIR-SCAN: No job records." }
@@ -176,25 +175,11 @@ class RealPirScan @Inject constructor(
             runners.add(pirActionsRunnerFactory.create(context, script, runType))
         }
 
-        val jobRecordsParts = processedJobRecords.splitIntoParts(maxWebViewCount)
-
-        logcat { "PIR-SCAN: Total parts ${jobRecordsParts.size}" }
-
-        // Execute the steps in parallel
-        jobRecordsParts.mapIndexed { index, partSteps ->
-            logcat { "PIR-SCAN: Record part [$index] -> ${partSteps.size}" }
-            logcat { "PIR-SCAN: Record part [$index] breakdown -> ${partSteps.map { it.first.id to it.second.broker.name }}" }
-            // We want to run the runners in parallel but wait for everything to complete before we proceed
-            async {
-                partSteps.forEach { (profile, step) ->
-                    logcat { "PIR-SCAN: Start scan on runner=$index for profile=$profile with step=$step" }
-                    runners[index].start(profile, listOf(step))
-                    runners[index].stop()
-                    onJobCompleted?.invoke()
-                    logcat { "PIR-SCAN: Finish scan on runner=$index for profile=$profile with step=$step" }
-                }
-            }
-        }.awaitAll()
+        pirWorkDistributor.executeAll(
+            runners = runners,
+            work = processedJobRecords,
+            onStepCompleted = onJobCompleted,
+        )
 
         completeScan(runType)
         return@withContext Result.success(Unit)
@@ -243,8 +228,7 @@ class RealPirScan @Inject constructor(
         // Execute each step sequentially on the single runner
         allSteps.forEach { (profileQuery, step) ->
             logcat { "PIR-SCAN: Start thread=${Thread.currentThread().name}, profile=$profileQuery and step=$step" }
-            runners[0].startOn(webView, profileQuery, listOf(step))
-            // don't call stop() here to avoid destroying the WebView as it's reused for all steps
+            runners[0].executeOn(webView, profileQuery, step)
             logcat { "PIR-SCAN: Finish thread=${Thread.currentThread().name}, profile=$profileQuery and step=$step" }
         }
 
@@ -354,26 +338,14 @@ class RealPirScan @Inject constructor(
             it.isNotEmpty()
         }.flatten()
 
-        // Combine the broker steps with each profile and split into equal parts
-        val stepsPerRunner = profileQueries.map { profileQuery ->
+        // Combine the broker steps with each profile
+        val work = profileQueries.flatMap { profileQuery ->
             brokerScanSteps.map { scanStep ->
                 profileQuery to scanStep
             }
-        }.flatten()
-            .splitIntoParts(maxWebViewCount)
+        }
 
-        // Execute the steps in parallel
-        stepsPerRunner.mapIndexed { index, partSteps ->
-            // We want to run the runners in parallel but wait for everything to complete before we proceed
-            async {
-                partSteps.forEach { (profile, step) ->
-                    logcat { "PIR-SCAN: Start scan on runner=$index for profile=$profile with step=$step" }
-                    runners[index].start(profile, listOf(step))
-                    runners[index].stop()
-                    logcat { "PIR-SCAN: Finish scan on runner=$index for profile=$profile with step=$step" }
-                }
-            }
-        }.awaitAll()
+        pirWorkDistributor.executeAll(runners = runners, work = work)
 
         completeScan(runType)
         return@withContext Result.success(Unit)

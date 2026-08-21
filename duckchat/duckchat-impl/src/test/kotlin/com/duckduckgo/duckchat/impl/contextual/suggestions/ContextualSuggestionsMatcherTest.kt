@@ -80,14 +80,14 @@ class ContextualSuggestionsMatcherTest {
 
     @Test
     fun whenJsonLdTypeMatchesThenReturnsThoseSuggestionsFirst() {
-        val result = ContextualSuggestionsMatcher.resolve(input(jsonLdType = listOf("Recipe")), catalog)
+        val result = ContextualSuggestionsMatcher.resolve(input(jsonLdType = listOf("Recipe")), catalog).suggestions
 
         assertEquals(listOf("shopping-list", "recipe-nutrition", "scale-recipe"), result.map { it.id })
     }
 
     @Test
     fun whenPageSpecificMatchThenSummarizePageDroppedFromDefaults() {
-        val result = ContextualSuggestionsMatcher.resolve(input(jsonLdType = listOf("Product")), catalog)
+        val result = ContextualSuggestionsMatcher.resolve(input(jsonLdType = listOf("Product")), catalog).suggestions
 
         assertEquals(listOf("product-pros-cons", "find-alternatives"), result.map { it.id })
         assertFalse(result.any { it.id == "summarize-page" })
@@ -95,28 +95,28 @@ class ContextualSuggestionsMatcherTest {
 
     @Test
     fun whenJsonLdTypeMatchIsCaseInsensitiveThenMatches() {
-        val result = ContextualSuggestionsMatcher.resolve(input(jsonLdType = listOf("  rEcIpE ")), catalog)
+        val result = ContextualSuggestionsMatcher.resolve(input(jsonLdType = listOf("  rEcIpE ")), catalog).suggestions
 
         assertEquals(listOf("shopping-list", "recipe-nutrition", "scale-recipe"), result.map { it.id })
     }
 
     @Test
     fun whenMultipleJsonLdTypesPresentThenFirstCatalogMappingWins() {
-        val result = ContextualSuggestionsMatcher.resolve(input(jsonLdType = listOf("Product", "Recipe")), catalog)
+        val result = ContextualSuggestionsMatcher.resolve(input(jsonLdType = listOf("Product", "Recipe")), catalog).suggestions
 
         assertEquals(listOf("shopping-list", "recipe-nutrition", "scale-recipe"), result.map { it.id })
     }
 
     @Test
     fun whenNoJsonLdMatchButOgTypeMatchesThenUsesOgType() {
-        val result = ContextualSuggestionsMatcher.resolve(input(jsonLdType = listOf("Unknown"), ogType = "product"), catalog)
+        val result = ContextualSuggestionsMatcher.resolve(input(jsonLdType = listOf("Unknown"), ogType = "product"), catalog).suggestions
 
         assertEquals(listOf("product-pros-cons", "find-alternatives"), result.map { it.id })
     }
 
     @Test
     fun whenOgTypeHasWhitespaceAndCaseThenNormalisedBeforeLookup() {
-        val result = ContextualSuggestionsMatcher.resolve(input(ogType = " VIDEO "), catalog)
+        val result = ContextualSuggestionsMatcher.resolve(input(ogType = " VIDEO "), catalog).suggestions
 
         assertEquals(listOf("summarize-video", "video-key-points"), result.map { it.id })
     }
@@ -126,14 +126,14 @@ class ContextualSuggestionsMatcherTest {
         val result = ContextualSuggestionsMatcher.resolve(
             input(noSignals = true, url = "https://www.youtube.com/watch?v=abc"),
             catalog,
-        )
+        ).suggestions
 
         assertEquals(listOf("summarize-video", "video-key-points"), result.map { it.id })
     }
 
     @Test
     fun whenDomainIsExactHostThenMatches() {
-        val result = ContextualSuggestionsMatcher.resolve(input(noSignals = true, url = "https://github.com/duckduckgo"), catalog)
+        val result = ContextualSuggestionsMatcher.resolve(input(noSignals = true, url = "https://github.com/duckduckgo"), catalog).suggestions
 
         assertEquals(listOf("explain-repo"), result.map { it.id })
     }
@@ -143,7 +143,7 @@ class ContextualSuggestionsMatcherTest {
         val result = ContextualSuggestionsMatcher.resolve(
             input(jsonLdType = listOf("Recipe"), url = "https://www.youtube.com/watch?v=abc"),
             catalog,
-        )
+        ).suggestions
 
         assertEquals(listOf("shopping-list", "recipe-nutrition", "scale-recipe"), result.map { it.id })
     }
@@ -153,14 +153,14 @@ class ContextualSuggestionsMatcherTest {
         val result = ContextualSuggestionsMatcher.resolve(
             input(jsonLdType = listOf("Unknown"), url = "https://example.com"),
             catalog,
-        )
+        ).suggestions
 
         assertEquals(listOf("summarize-page"), result.map { it.id })
     }
 
     @Test
     fun whenNoSignalsAndNoUrlThenReturnsDefaults() {
-        val result = ContextualSuggestionsMatcher.resolve(input(noSignals = true, url = null), catalog)
+        val result = ContextualSuggestionsMatcher.resolve(input(noSignals = true, url = null), catalog).suggestions
 
         assertEquals(listOf("summarize-page"), result.map { it.id })
     }
@@ -169,7 +169,7 @@ class ContextualSuggestionsMatcherTest {
     fun whenCandidateAlsoInDefaultsThenDeduplicated() {
         val recipeThenSummarizeCatalog = catalog.copy(defaults = listOf("shopping-list", "summarize-page"))
 
-        val result = ContextualSuggestionsMatcher.resolve(input(jsonLdType = listOf("Recipe")), recipeThenSummarizeCatalog)
+        val result = ContextualSuggestionsMatcher.resolve(input(jsonLdType = listOf("Recipe")), recipeThenSummarizeCatalog).suggestions
 
         assertEquals(1, result.count { it.id == "shopping-list" })
     }
@@ -178,7 +178,7 @@ class ContextualSuggestionsMatcherTest {
     fun whenMoreCandidatesThanMaxThenCappedAtMax() {
         val cappedCatalog = catalog.copy(maxSuggestedPrompts = 2)
 
-        val result = ContextualSuggestionsMatcher.resolve(input(jsonLdType = listOf("Recipe")), cappedCatalog)
+        val result = ContextualSuggestionsMatcher.resolve(input(jsonLdType = listOf("Recipe")), cappedCatalog).suggestions
 
         assertEquals(2, result.size)
         assertEquals(listOf("shopping-list", "recipe-nutrition"), result.map { it.id })
@@ -189,7 +189,7 @@ class ContextualSuggestionsMatcherTest {
         val result = ContextualSuggestionsMatcher.resolve(
             input(noSignals = false, jsonLdType = listOf("Unknown"), lang = "fr", uiLocale = "en-US"),
             catalog,
-        )
+        ).suggestions
 
         assertTrue(result.any { it.id == "translate-page" })
     }
@@ -199,7 +199,7 @@ class ContextualSuggestionsMatcherTest {
         val result = ContextualSuggestionsMatcher.resolve(
             input(jsonLdType = listOf("Unknown"), lang = "en", uiLocale = "en-US"),
             catalog,
-        )
+        ).suggestions
 
         assertFalse(result.any { it.id == "translate-page" })
     }
@@ -209,7 +209,7 @@ class ContextualSuggestionsMatcherTest {
         val result = ContextualSuggestionsMatcher.resolve(
             input(jsonLdType = listOf("Unknown"), lang = "en-GB", uiLocale = "en_US"),
             catalog,
-        )
+        ).suggestions
 
         assertFalse(result.any { it.id == "translate-page" })
     }
@@ -219,7 +219,7 @@ class ContextualSuggestionsMatcherTest {
         val result = ContextualSuggestionsMatcher.resolve(
             input(jsonLdType = listOf("Unknown"), lang = "", uiLocale = "en-US"),
             catalog,
-        )
+        ).suggestions
 
         assertFalse(result.any { it.id == "translate-page" })
     }
@@ -240,7 +240,7 @@ class ContextualSuggestionsMatcherTest {
         val result = ContextualSuggestionsMatcher.resolve(
             input(jsonLdType = listOf("Article"), lang = "fr", uiLocale = "en-US"),
             articleCatalog,
-        )
+        ).suggestions
 
         assertEquals(listOf("a1", "a2", "a3", "translate-page"), result.map { it.id })
     }
@@ -250,7 +250,7 @@ class ContextualSuggestionsMatcherTest {
         val result = ContextualSuggestionsMatcher.resolve(
             input(jsonLdType = listOf("Unknown"), lang = "de", uiLocale = "en-US"),
             catalog,
-        )
+        ).suggestions
 
         val translate = result.first { it.id == "translate-page" }
         assertEquals("Translate this page into English.", translate.prompt)
@@ -266,14 +266,14 @@ class ContextualSuggestionsMatcherTest {
 
     @Test
     fun whenPromptHasNoPlaceholderThenLeftUnchanged() {
-        val result = ContextualSuggestionsMatcher.resolve(input(jsonLdType = listOf("Recipe")), catalog)
+        val result = ContextualSuggestionsMatcher.resolve(input(jsonLdType = listOf("Recipe")), catalog).suggestions
 
         assertEquals("Create a shopping list.", result.first { it.id == "shopping-list" }.prompt)
     }
 
     @Test
     fun whenEntryResolvedThenLabelAndIconCarriedThrough() {
-        val result = ContextualSuggestionsMatcher.resolve(input(jsonLdType = listOf("VideoObject")), catalog)
+        val result = ContextualSuggestionsMatcher.resolve(input(jsonLdType = listOf("VideoObject")), catalog).suggestions
 
         val video = result.first { it.id == "summarize-video" }
         assertEquals("Summarize this video", video.label)
@@ -282,7 +282,7 @@ class ContextualSuggestionsMatcherTest {
 
     @Test
     fun whenHostnameMerelyEndsWithDomainTextThenDoesNotMatch() {
-        val result = ContextualSuggestionsMatcher.resolve(input(noSignals = true, url = "https://notgithub.com/duckduckgo"), catalog)
+        val result = ContextualSuggestionsMatcher.resolve(input(noSignals = true, url = "https://notgithub.com/duckduckgo"), catalog).suggestions
 
         assertEquals(listOf("summarize-page"), result.map { it.id })
     }
@@ -294,7 +294,7 @@ class ContextualSuggestionsMatcherTest {
             byJsonLdType = listOf(SuggestionCatalog.JsonLdMapping("Recipe", listOf("future", "shopping-list"))),
         )
 
-        val result = ContextualSuggestionsMatcher.resolve(input(jsonLdType = listOf("Recipe")), futureCatalog)
+        val result = ContextualSuggestionsMatcher.resolve(input(jsonLdType = listOf("Recipe")), futureCatalog).suggestions
 
         assertFalse(result.any { it.id == "future" })
         assertTrue(result.any { it.id == "shopping-list" })
@@ -306,7 +306,7 @@ class ContextualSuggestionsMatcherTest {
             byJsonLdType = listOf(SuggestionCatalog.JsonLdMapping("Recipe", listOf("missing-id", "shopping-list"))),
         )
 
-        val result = ContextualSuggestionsMatcher.resolve(input(jsonLdType = listOf("Recipe")), danglingCatalog)
+        val result = ContextualSuggestionsMatcher.resolve(input(jsonLdType = listOf("Recipe")), danglingCatalog).suggestions
 
         assertFalse(result.any { it.id == "missing-id" })
         assertTrue(result.any { it.id == "shopping-list" })
@@ -314,7 +314,7 @@ class ContextualSuggestionsMatcherTest {
 
     @Test
     fun whenUrlIsMalformedThenFallsBackToDefaults() {
-        val result = ContextualSuggestionsMatcher.resolve(input(noSignals = true, url = "not a url ://"), catalog)
+        val result = ContextualSuggestionsMatcher.resolve(input(noSignals = true, url = "not a url ://"), catalog).suggestions
 
         assertEquals(listOf("summarize-page"), result.map { it.id })
     }
@@ -324,7 +324,7 @@ class ContextualSuggestionsMatcherTest {
         val result = ContextualSuggestionsMatcher.resolve(
             input(jsonLdType = listOf("Unknown"), ogType = "", url = "https://github.com/duckduckgo"),
             catalog,
-        )
+        ).suggestions
 
         assertEquals(listOf("explain-repo"), result.map { it.id })
     }
@@ -333,7 +333,7 @@ class ContextualSuggestionsMatcherTest {
     fun whenMaxSuggestedPromptsIsZeroThenAtLeastOneSuggestionIsReturned() {
         val zeroCapCatalog = catalog.copy(maxSuggestedPrompts = 0)
 
-        val result = ContextualSuggestionsMatcher.resolve(input(jsonLdType = listOf("Recipe")), zeroCapCatalog)
+        val result = ContextualSuggestionsMatcher.resolve(input(jsonLdType = listOf("Recipe")), zeroCapCatalog).suggestions
 
         assertEquals(listOf("shopping-list"), result.map { it.id })
     }
@@ -343,7 +343,7 @@ class ContextualSuggestionsMatcherTest {
         val result = ContextualSuggestionsMatcher.resolve(
             input(jsonLdType = listOf("Unknown"), lang = "fr", uiLocale = "en-US"),
             catalog,
-        )
+        ).suggestions
 
         assertEquals(listOf("summarize-page", "translate-page"), result.map { it.id })
     }
@@ -353,9 +353,49 @@ class ContextualSuggestionsMatcherTest {
         val result = ContextualSuggestionsMatcher.resolve(
             input(jsonLdType = listOf("Unknown"), lang = "en", uiLocale = "de-DE"),
             catalog,
-        )
+        ).suggestions
 
         val translate = result.first { it.id == "translate-page" }
         assertEquals("Translate this page into Deutsch.", translate.prompt)
+    }
+
+    @Test
+    fun whenContextualMatchThenResultIsSmart() {
+        assertTrue(ContextualSuggestionsMatcher.resolve(input(jsonLdType = listOf("Recipe")), catalog).isSmart)
+        assertTrue(ContextualSuggestionsMatcher.resolve(input(ogType = "product"), catalog).isSmart)
+        assertTrue(ContextualSuggestionsMatcher.resolve(input(noSignals = true, url = "https://github.com/duckduckgo"), catalog).isSmart)
+    }
+
+    @Test
+    fun whenOnlyDefaultsMatchThenResultIsNotSmart() {
+        assertFalse(ContextualSuggestionsMatcher.resolve(input(jsonLdType = listOf("Unknown"), url = "https://example.com"), catalog).isSmart)
+        assertFalse(ContextualSuggestionsMatcher.resolve(input(noSignals = true, url = null), catalog).isSmart)
+    }
+
+    @Test
+    fun whenJsonLdTypeKnownThenPageTypeClassifiedInSignalOrder() {
+        val result = ContextualSuggestionsMatcher.resolve(input(jsonLdType = listOf("Unknown", " NewsArticle ", "Recipe")), catalog)
+
+        assertEquals(SuggestionsPageType.ARTICLE, result.pageType)
+    }
+
+    @Test
+    fun whenNoJsonLdMatchThenPageTypeFallsBackToOgType() {
+        val result = ContextualSuggestionsMatcher.resolve(input(jsonLdType = listOf("Unknown"), ogType = "video.movie"), catalog)
+
+        assertEquals(SuggestionsPageType.VIDEO, result.pageType)
+    }
+
+    @Test
+    fun whenDomainOnlyMatchThenPageTypeIsNone() {
+        val result = ContextualSuggestionsMatcher.resolve(input(noSignals = true, url = "https://www.youtube.com/watch?v=abc"), catalog)
+
+        assertTrue(result.isSmart)
+        assertEquals(SuggestionsPageType.NONE, result.pageType)
+    }
+
+    @Test
+    fun whenNoSignalsThenPageTypeIsNone() {
+        assertEquals(SuggestionsPageType.NONE, ContextualSuggestionsMatcher.resolve(input(noSignals = true, url = null), catalog).pageType)
     }
 }

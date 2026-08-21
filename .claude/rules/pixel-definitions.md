@@ -74,6 +74,15 @@ inline an object supporting `description`, `enum`, and optionally `key`, `type`,
 "suffixes": ["first_daily_count"]
 ```
 
+**Prefer `first_daily_count` for count+daily pairs.** When a pixel simply fires a count variant and a
+daily variant with the same parameters, define **one** entry (base pixel name, no `_count`/`_daily` in
+the key) with `"suffixes": ["first_daily_count", ...]`, instead of two separate `_count`/`_daily`
+entries. This is the default going forward — only fall back to separate entries when the count and
+daily variants genuinely need different parameters or descriptions. The Kotlin code is unaffected: it
+still fires two distinct wire-string pixels (`..._count`, `..._daily`) via `fireCountAndDaily` or
+equivalent; only the JSON5 registration collapses to one entry. See the `m_aichat_recent_chat_delete_*`
+pixels in `duck_chat.json5` for a worked example.
+
 - Suffixes are **order-sensitive and required**. Enums must not contain `null` or `""`.
 - Define suffixes as `enum` unless the type is bounded (e.g. `boolean`). Unbounded numeric and string
   values belong in `parameters` instead.

@@ -109,12 +109,36 @@ interface SyncFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun updateSyncActivityViewStateAtomically(): Toggle
 
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun preventStaleTokenLogout(): Toggle
+
+    /**
+     * Gates writing `device_info`
+     */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun canWriteUnifiedDeviceList(): Toggle
 
+    /**
+     * Gates reading from `device_info`
+     */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun canReadUnifiedDeviceList(): Toggle
 
+    /**
+     * Whether to rename this device using new `PATCH /sync/devices` or legacy `login` endpoint
+     * Applies only when [canWriteUnifiedDeviceList] is disabled.
+     *
+     * If this flag is enabled, it will use the `PATCH /sync/devices` endpoint and omit `device_info`
+     * If this flag is disabled, it will fallback to the previous renaming endpoint using `POST /sync/login`
+     */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun preventStaleTokenLogout(): Toggle
+    fun canUsePatchEndpointForLegacyDeviceRename(): Toggle
 }
+
+/**
+ * `device_info` is read only on the v2 device-list path, and the `account_info` key backing it must be wrapped for every credential on the
+ * account, which needs the scoped credentials [SyncFeature.canUseV2ConnectFlow] governs. Writing it with v2 disabled would publish a blob
+ * nobody on this device reads, off a key we can only wrap for `ddg`.
+ */
+internal fun SyncFeature.canWriteDeviceInfo(): Boolean =
+    canUseV2ConnectFlow().isEnabled() && canWriteUnifiedDeviceList().isEnabled()

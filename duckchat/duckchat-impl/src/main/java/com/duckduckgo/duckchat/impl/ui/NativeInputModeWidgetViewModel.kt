@@ -43,7 +43,9 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.EditPromptRequest
 import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.feature.maxUrlSuggestions
 import com.duckduckgo.duckchat.impl.helper.PendingNativeFile
 import com.duckduckgo.duckchat.impl.helper.PendingNativeImage
@@ -55,7 +57,6 @@ import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
-import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.reader.ChatSuggestionsReader
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
@@ -104,6 +105,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     private val browserMode: BrowserMode,
     private val autoCompleteSettings: AutoCompleteSettings,
     private val duckAiChatHistoryFeature: DuckAiChatHistoryFeature,
+    private val duckChatFeature: DuckChatFeature,
     private val dispatchers: DispatcherProvider,
     private val pixel: Pixel,
     private val duckChatPixels: DuckChatPixels,
@@ -145,6 +147,9 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     private val _isHistoryAvailable = MutableStateFlow(false)
     val isHistoryAvailable: StateFlow<Boolean> = _isHistoryAvailable.asStateFlow()
 
+    private val _attachmentChangesEnabled = MutableStateFlow(false)
+    val attachmentChangesEnabled: StateFlow<Boolean> = _attachmentChangesEnabled.asStateFlow()
+
     private val currentChat = MutableStateFlow<DuckAiChat?>(null)
     private var currentChatJob: Job? = null
 
@@ -163,6 +168,11 @@ class NativeInputModeWidgetViewModel @Inject constructor(
             _isHistoryAvailable.value = duckChatInternal.isChatHistoryAvailable()
         }
         viewModelScope.launch {
+            _attachmentChangesEnabled.value = withContext(dispatchers.io()) {
+                duckChatFeature.nativeInputAttachmentChanges().isEnabled()
+            }
+        }
+        viewModelScope.launch {
             // FE recovery "Switch Model": enter the model-change mode, but only when the event
             // targets this widget's tab. The event carries a tabId, so other tabs' VMs ignore it.
             duckChatInternal.showModelPickerEvents.collect { eventTabId ->
@@ -179,6 +189,16 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     val showModelPickerEvents: Flow<Unit> = duckChatInternal.showModelPickerEvents
         .filter { it == activeTabId.value }
         .map { }
+
+    /**
+     * Edit-screen requests for this widget's tab. Both the omnibar and the contextual sheet widget can
+     * be configured with the same tabId, so the surface has to match too or both would launch.
+     */
+    val editPromptRequests: Flow<EditPromptRequest> = duckChatInternal.editPromptRequests
+        .filter { it.tabId == activeTabId.value && it.contextual == isContextualSurface() }
+
+    private fun isContextualSurface(): Boolean =
+        widgetConfig.value.inputContext == NativeInputState.InputContext.DUCK_AI_CONTEXTUAL
 
     fun setModelPickerEnabled(enabled: Boolean) {
         _modelPickerEnabled.value = enabled
@@ -216,11 +236,20 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         return nativeInputStateProvider.stateForTab(tabId).value.selectedTool
     }
 
+    private fun currentInputState(): NativeInputState? =
+        activeTabId.value?.let { nativeInputStateProvider.stateForTab(it).value }
+
+    private fun resolvedTogglePositionIfVisible(state: NativeInputState? = currentInputState()): NativeInputState.ToggleSelection? =
+        if (state?.toggleVisible == true) duckChatInternal.resolvedTogglePosition() else null
+
     /** The pixel surface for the active tab, derived from its published input context. */
-    private fun currentSurface(): DuckChatPixelSurface {
-        val inputContext = activeTabId.value?.let { nativeInputStateProvider.stateForTab(it).value.inputContext }
-            ?: NativeInputState.InputContext.BROWSER
+    private fun currentSurface(state: NativeInputState? = currentInputState()): DuckChatPixelSurface {
+        val inputContext = state?.inputContext ?: NativeInputState.InputContext.BROWSER
         return DuckChatPixelSurface.from(inputContext)
+    }
+
+    fun fireOmnibarQuerySubmitted(query: String) {
+        duckChatPixels.fireOmnibarQuerySubmitted(query, resolvedTogglePositionIfVisible(currentInputState()))
     }
 
     /**
@@ -239,7 +268,8 @@ class NativeInputModeWidgetViewModel @Inject constructor(
             Tool.WEB_SEARCH -> "web_search"
             null -> "none"
         }
-        val surface = currentSurface()
+        val inputState = currentInputState()
+        val surface = currentSurface(inputState)
         duckChatPixels.firePromptSubmitted(
             selectedTool = selectedToolParam,
             modelId = getSelectedModelId(),
@@ -248,6 +278,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
             hasFileAttachment = hasFileAttachment,
             hasText = hasText,
             surface = surface,
+            defaultMode = resolvedTogglePositionIfVisible(inputState),
         )
         when (tool) {
             Tool.IMAGE_GENERATION -> duckChatPixels.fireImageGenerationSubmitted(surface)
@@ -334,25 +365,21 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         .map { it.duckAiFireButtonHighlighted }
         .distinctUntilChanged()
 
-    // chatState is a global signal, not scoped to any one tab — the edit widget has no chat of its
-    // own streaming, so it must never inherit whatever the real tab is doing.
-    private val isChatStreamingForThisWidget: Flow<Boolean> = combine(
-        duckChatInternal.chatState,
-        activeTabId,
-    ) { chatState, tabId ->
-        val isEditWidget = tabId?.startsWith(EDIT_STATE_KEY_PREFIX) == true
-        !isEditWidget && (chatState == ChatState.STREAMING || chatState == ChatState.LOADING)
-    }
-
     val state: SharedFlow<NativeInputState> = combine(
         baseState,
-        isChatStreamingForThisWidget,
+        duckChatInternal.chatState,
         activeChatId,
         interactionLock,
         duckAiFireButtonHighlighted,
-    ) { state, isStreaming, chatId, lock, fireHighlighted ->
+    ) { state, chatState, chatId, lock, fireHighlighted ->
+        // chatState is a global signal, not scoped to any one tab — the edit widget has no chat of
+        // its own streaming, so it must never inherit whatever the real tab is doing. Read
+        // synchronously rather than folded into the combine's inputs, so this Flow's shape is
+        // otherwise identical to the pre-edit-mode code (a prior version spliced a derived Flow in
+        // here instead and shipped a regression in the real, non-edit composer's toggle state).
+        val isEditWidget = activeTabId.value?.startsWith(EDIT_STATE_KEY_PREFIX) == true
         state.copy(
-            isChatStreaming = isStreaming,
+            isChatStreaming = !isEditWidget && (chatState == ChatState.STREAMING || chatState == ChatState.LOADING),
             chatId = chatId,
             interactionLock = lock,
             duckAiFireButtonHighlighted = fireHighlighted,
@@ -400,9 +427,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
 
     val chatSuggestionsUserEnabled: Flow<Boolean> = duckChatInternal.observeChatSuggestionsUserSettingEnabled()
 
-    val defaultTogglePosition: Flow<DefaultTogglePosition> = duckChatInternal.observeDefaultTogglePosition()
-
-    val lastUsedTogglePosition: Flow<String?> = duckChatInternal.observeLastUsedTogglePosition()
+    fun resolvedTogglePosition(): NativeInputState.ToggleSelection? = resolvedTogglePositionIfVisible()
 
     suspend fun saveLastUsedTogglePosition(position: String) {
         duckChatInternal.saveLastUsedTogglePosition(position)

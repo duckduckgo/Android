@@ -337,10 +337,11 @@ class CtaViewModel @Inject constructor(
         site: Site? = null,
         detectedRefreshPatterns: Set<RefreshPattern>,
         suppressDuckAiOnboardingCta: Boolean = false,
+        brokenSitePromptUrl: String?,
     ): Cta? {
         return withContext(dispatcher) {
             if (isBrowserShowing) {
-                getBrowserCta(site, detectedRefreshPatterns, suppressDuckAiOnboardingCta)
+                getBrowserCta(site, detectedRefreshPatterns, suppressDuckAiOnboardingCta, brokenSitePromptUrl)
             } else {
                 getHomeCta()
             }
@@ -455,6 +456,10 @@ class CtaViewModel @Inject constructor(
             // End
             canShowDaxCtaEndOfJourney() -> {
                 if (isBrandDesignUpdateEnabled()) {
+                    val isSegmentedSearchPathWithToggleEnabled = onboardingStore.isSegmentedSearchPathWithToggleEnabled()
+                    if (isSegmentedSearchPathWithToggleEnabled) {
+                        setInputToggleStateForDuckAiEndCta()
+                    }
                     DaxEndBrandDesignUpdateBubbleCta(
                         onboardingStore,
                         appInstallStore,
@@ -463,6 +468,7 @@ class CtaViewModel @Inject constructor(
                         onboardingImprovementsEnabled = isOnboardingImprovementsEnabled(),
                         onboardingImprovementsV2Enabled = isOnboardingImprovementsV2Enabled(),
                         isOmnibarBottom = settingsDataStore.omnibarType == OmnibarType.SINGLE_BOTTOM,
+                        isSegmentedSearchPathWithToggleEnabled = isSegmentedSearchPathWithToggleEnabled,
                     )
                 } else {
                     DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
@@ -524,6 +530,7 @@ class CtaViewModel @Inject constructor(
         site: Site?,
         detectedRefreshPatterns: Set<RefreshPattern>,
         suppressDuckAiOnboardingCta: Boolean,
+        brokenSitePromptUrl: String?,
     ): Cta? {
         val nonNullSite = site ?: return null
 
@@ -567,7 +574,10 @@ class CtaViewModel @Inject constructor(
             }
 
             if (inContextDaxDialogsCompleted) {
-                return if (brokenSitePrompt.shouldShowBrokenSitePrompt(nonNullSite.url, detectedRefreshPatterns)) {
+                val promptUrl = brokenSitePromptUrl ?: return null
+                // Reports are built from Site, so reject stale state before showing the prompt.
+                if (nonNullSite.url != promptUrl) return null
+                return if (brokenSitePrompt.shouldShowBrokenSitePrompt(promptUrl, detectedRefreshPatterns)) {
                     BrokenSitePromptDialogCta()
                 } else {
                     null

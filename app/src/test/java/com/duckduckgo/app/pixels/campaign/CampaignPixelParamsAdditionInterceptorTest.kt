@@ -120,6 +120,24 @@ class CampaignPixelParamsAdditionInterceptorTest {
     }
 
     @Test
+    fun whenFeatureIsEnabledAndPixelIsRMFAutoDismissedWithValidMessageThenAppendAdditionalParamsToPixel() = runTest {
+        additionalPixelParamsFeature.self().setRawStoredState(Toggle.State(enable = true))
+        val startUrl = URL_PIXEL_BASE + "m_remote_message_auto_dismissed_android_phone?message=valid_test_origin1"
+        val resultUrl = interceptor.intercept(FakeChain(startUrl)).request.url
+
+        assertEquals("$startUrl&test1=value1&test2=value2&test3=value3&test4=value4", resultUrl.toString())
+    }
+
+    @Test
+    fun whenFeatureIsEnabledAndPixelIsRMFAutoDismissedWithInvalidMessageThenNoChangesInPixel() = runTest {
+        additionalPixelParamsFeature.self().setRawStoredState(Toggle.State(enable = true))
+        val startUrl = URL_PIXEL_BASE + "m_remote_message_auto_dismissed_android_phone?message=invalid"
+        val resultUrl = interceptor.intercept(FakeChain(startUrl)).request.url
+
+        assertEquals(startUrl, resultUrl.toString())
+    }
+
+    @Test
     fun whenFeatureIsEnabledAndPixelIsRMFPrimaryClickedWithValidMessageThenAppendAdditionalParamsToPixel() = runTest {
         additionalPixelParamsFeature.self().setRawStoredState(Toggle.State(enable = true))
         val startUrl = URL_PIXEL_BASE + "m_remote_message_primary_action_clicked_android_phone?message=valid_test_origin1"

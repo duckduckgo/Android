@@ -1,6 +1,6 @@
 name: Nightly
 
-run-name: 'Nightly (${{ inputs.ddg_di || ''AnvilDagger'' }})'
+run-name: 'Nightly (${{ inputs.ddg_di || ''default DI'' }})'
 
 on:
   workflow_call:
@@ -10,10 +10,10 @@ on:
         required: true
         type: string
       ddg_di:
-        description: 'DI framework to build with (AnvilDagger or Metro)'
+        description: 'DI framework to build with. Leave empty to use ddg.di from gradle.properties; set AnvilDagger or Metro to pin one.'
         required: false
         type: string
-        default: 'AnvilDagger'
+        default: ''
   workflow_dispatch:
     inputs:
       commit:
@@ -21,21 +21,23 @@ on:
         required: false
         type: string
       ddg_di:
-        description: 'DI framework to build with (AnvilDagger or Metro)'
+        description: 'DI framework to build with. Leave empty to use ddg.di from gradle.properties; set AnvilDagger or Metro to pin one.'
         required: false
         type: string
-        default: 'AnvilDagger'
+        default: ''
 
+# The DI framework is part of the group because a single caller runs this workflow once per DI
 concurrency:
-  group: ${{ github.workflow_ref }}-${{ github.ref }}
+  group: ${{ github.workflow_ref }}-${{ github.ref }}-${{ inputs.ddg_di || 'default' }}
   cancel-in-progress: true
 
-# Workflow-level env: compute DI-variant suffixes once. Empty when AnvilDagger
-# (or input missing) so artifact/task names stay byte-identical to pre-change
-# for the default Anvil path. Pattern uses truthy-first ternary because
-# `A && '' || X` is broken in GHA expressions (empty string is falsy).
+# An empty `ddg_di` omits the flag so Gradle uses ddg.di from gradle.properties; `-Pddg.di=`
+# with an empty value would instead hit build.gradle's AnvilDagger fallback. Suffixes stay
+# empty for the default and AnvilDagger paths so artifact/task names are unchanged. Pattern
+# uses truthy-first ternary because `A && '' || X` is broken in GHA expressions (empty string
+# is falsy).
 env:
-  DDG_DI: ${{ inputs.ddg_di || 'AnvilDagger' }}
+  DI_FLAG: ${{ inputs.ddg_di != '' && format('-Pddg.di={0}', inputs.ddg_di) || '' }}
   DI_HYPHEN_SUFFIX: ${{ (inputs.ddg_di || 'AnvilDagger') != 'AnvilDagger' && format('-{0}', inputs.ddg_di) || '' }}
   DI_PAREN_SUFFIX: ${{ (inputs.ddg_di || 'AnvilDagger') != 'AnvilDagger' && format(' ({0})', inputs.ddg_di) || '' }}
 
@@ -94,7 +96,7 @@ jobs:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
       - name: JVM tests
-        run: ./gradlew jvm_tests -Dpts.enabled=false -Pddg.di=${{ env.DDG_DI }}
+        run: ./gradlew jvm_tests -Dpts.enabled=false ${{ env.DI_FLAG }}
 
       - name: Bundle the JVM checks report
         if: always()
@@ -137,7 +139,7 @@ jobs:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
       - name: Lint
-        run: ./gradlew lint -Pddg.di=${{ env.DDG_DI }}
+        run: ./gradlew lint ${{ env.DI_FLAG }}
 
       - name: Bundle the lint report
         if: always()
@@ -190,10 +192,10 @@ jobs:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
       - name: Build
-        run: ./gradlew androidTestsBuild -Pddg.di=${{ env.DDG_DI }}
+        run: ./gradlew androidTestsBuild ${{ env.DI_FLAG }}
 
       - name: Run Android Tests
-        run: ./gradlew runFlankAndroidTests --no-configuration-cache -Pddg.di=${{ env.DDG_DI }}
+        run: ./gradlew runFlankAndroidTests --no-configuration-cache ${{ env.DI_FLAG }}
 
       - name: Bundle the Android CI tests report
         if: always()
@@ -233,8 +235,7 @@ jobs:
           action: 'create-asana-task'
 
       - name: Adding as a release blocker
-        # Only block releases for the default Anvil path. Metro is informational.
-        if: ${{ env.DDG_DI == 'AnvilDagger' && steps.create-failure-task.outputs.taskId != '' }}
+        if: ${{ steps.create-failure-task.outputs.taskId != '' }}
         uses: duckduckgo/native-github-asana-sync@v2.6.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}

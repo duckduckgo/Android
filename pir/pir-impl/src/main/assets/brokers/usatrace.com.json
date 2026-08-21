@@ -1,8 +1,8 @@
 {
   "name": "USA Trace",
   "url": "usatrace.com",
-  "version": "0.7.0",
-  "parent": "peoplefinders.com",
+  "version": "0.8.0",
+  "parent": "cyberbackgroundchecks.com",
   "addedDatetime": 1674540000000,
   "optOutUrl": "https://www.usatrace.com/contact-us/",
   "steps": [

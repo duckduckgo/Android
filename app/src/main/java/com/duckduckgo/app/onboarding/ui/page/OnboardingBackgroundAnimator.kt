@@ -68,6 +68,10 @@ sealed class OnboardingBackgroundStep(
         backgroundRes = R.drawable.onboarding_input_type_background,
         maxHeightDp = 166,
     )
+    data object PreferenceSelector : OnboardingBackgroundStep(
+        backgroundRes = R.drawable.onboarding_preference_selector_background,
+        maxHeightDp = 286,
+    )
 }
 
 /**

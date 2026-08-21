@@ -25,7 +25,6 @@ import android.os.Parcel
 import android.provider.OpenableColumns
 import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.CookieManagerProvider
@@ -57,12 +56,11 @@ interface InlinePdfHandler {
     /**
      * Decides how a download response should be handled for PDF rendering.
      *
-     * - [PdfRenderDecision.Inline]: feature flag on, SDK >= Android 12, MIME or
-     *   `.pdf` URL extension matches, and `Content-Disposition: attachment` not set.
+     * - [PdfRenderDecision.Inline]: SDK >= Android 12, MIME or `.pdf` URL extension
+     *   matches, and `Content-Disposition: attachment` not set.
      * - [PdfRenderDecision.Fallback]: same eligibility but the device is below
      *   Android 12 — caller should fall back to the standard file download.
-     * - [PdfRenderDecision.NotApplicable]: response is not an inline-eligible PDF
-     *   (or the feature flag is off).
+     * - [PdfRenderDecision.NotApplicable]: response is not an inline-eligible PDF.
      */
     fun classifyPdfRequest(url: String, contentDisposition: String?, mimeType: String): PdfRenderDecision
 
@@ -74,9 +72,8 @@ interface InlinePdfHandler {
      * success.
      *
      * Returns [PdfDownloadResult.Failure] with an error category when the network,
-     * server, or file content prevents inline rendering. The feature flag and SDK
-     * gate live in [classifyPdfRequest] so callers shouldn't reach this method when the
-     * feature is off.
+     * server, or file content prevents inline rendering. The SDK gate lives in
+     * [classifyPdfRequest] so callers shouldn't reach this method when ineligible.
      *
      * Cancellation-safe: if the calling coroutine is cancelled (e.g. the user
      * navigates away), the in-flight HTTP request is aborted and any partial
@@ -139,11 +136,9 @@ class RealInlinePdfHandler @Inject constructor(
     @PdfOkHttpClient private val okHttpClient: OkHttpClient,
     private val cookieManagerProvider: CookieManagerProvider,
     private val dispatcherProvider: DispatcherProvider,
-    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
 ) : InlinePdfHandler {
 
     override fun classifyPdfRequest(url: String, contentDisposition: String?, mimeType: String): PdfRenderDecision {
-        if (!androidBrowserConfigFeature.pdfViewer().isEnabled()) return PdfRenderDecision.NotApplicable
         // downloadToCache fetches via OkHttp, which rejects any scheme other than http/https.
         // Let data:/file:/content: PDFs fall through to the standard download flow.
         val scheme = url.toUri().scheme?.lowercase()

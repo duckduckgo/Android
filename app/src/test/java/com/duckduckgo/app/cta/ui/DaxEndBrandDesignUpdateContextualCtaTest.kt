@@ -208,6 +208,7 @@ class DaxEndBrandDesignUpdateContextualCtaTest {
             isBrowserShowing = true,
             site = siteStub(),
             detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
         )
 
         assertTrue(value is DaxEndBrandDesignUpdateContextualCta)

@@ -18,6 +18,7 @@ package com.duckduckgo.duckchat.impl.repository
 
 import android.content.Context
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
@@ -342,11 +343,9 @@ class DuckChatFeatureRepositoryTest {
 
     @Test
     fun `when observeDefaultTogglePosition then observe data store`() = runTest {
-        whenever(mockDataStore.observeDefaultTogglePosition()).thenReturn(flowOf(null, "DUCK_AI"))
+        whenever(mockDataStore.observeDefaultTogglePosition()).thenReturn(MutableStateFlow("DUCK_AI"))
 
-        val results = testee.observeDefaultTogglePosition().take(2).toList()
-        assertNull(results[0])
-        assertEquals("DUCK_AI", results[1])
+        assertEquals("DUCK_AI", testee.observeDefaultTogglePosition().value)
     }
 
     @Test
@@ -358,10 +357,8 @@ class DuckChatFeatureRepositoryTest {
 
     @Test
     fun `when observeLastUsedTogglePosition then observe data store`() = runTest {
-        whenever(mockDataStore.observeLastUsedTogglePosition()).thenReturn(flowOf(null, "DUCK_AI"))
+        whenever(mockDataStore.observeLastUsedTogglePosition()).thenReturn(MutableStateFlow("DUCK_AI"))
 
-        val results = testee.observeLastUsedTogglePosition().take(2).toList()
-        assertNull(results[0])
-        assertEquals("DUCK_AI", results[1])
+        assertEquals("DUCK_AI", testee.observeLastUsedTogglePosition().value)
     }
 }

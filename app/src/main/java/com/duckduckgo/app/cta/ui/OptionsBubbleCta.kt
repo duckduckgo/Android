@@ -67,7 +67,7 @@ abstract class OptionsBubbleCta(
     onboardingImprovementsEnabled = onboardingImprovementsEnabled,
     onboardingImprovementsV2Enabled = onboardingImprovementsV2Enabled,
 ) {
-    override val activeIncludeId: Int = R.id.optionsContent
+    override val activeIncludeIds: List<Int> = listOf(R.id.optionsContent)
     override val showArrow: Boolean = showArrow
 
     override fun configureContentViews(view: View) {

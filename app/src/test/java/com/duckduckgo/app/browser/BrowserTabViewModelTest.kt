@@ -106,6 +106,7 @@ import com.duckduckgo.app.browser.commands.Command.ShowKeyboard
 import com.duckduckgo.app.browser.commands.NavigationCommand
 import com.duckduckgo.app.browser.commands.NavigationCommand.Navigate
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
+import com.duckduckgo.app.browser.customtabs.CustomTabsFeature
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_PAGE_FEATURE_NAME
@@ -147,6 +148,7 @@ import com.duckduckgo.app.browser.pdf.PdfPixelName
 import com.duckduckgo.app.browser.pdf.PdfRenderDecision
 import com.duckduckgo.app.browser.progressbar.ProgressBarUpgradeFeature
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
+import com.duckduckgo.app.browser.returnsession.ReturnSessionLandingListener
 import com.duckduckgo.app.browser.santize.NonHttpAppLinkChecker
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabs.TabManager
@@ -179,6 +181,7 @@ import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxIntroSearchOptionsCta
 import com.duckduckgo.app.cta.ui.DaxDuckAiEndBrandDesignUpdateBubbleCta
 import com.duckduckgo.app.cta.ui.DaxDuckAiEndBubbleCta
 import com.duckduckgo.app.cta.ui.DaxDuckAiFireButtonBrandDesignUpdateContextualCta
+import com.duckduckgo.app.cta.ui.DaxEndBrandDesignUpdateBubbleCta
 import com.duckduckgo.app.cta.ui.DaxFireButtonBrandDesignUpdateContextualCta
 import com.duckduckgo.app.cta.ui.DaxSerpBrandDesignUpdateContextualCta
 import com.duckduckgo.app.cta.ui.DaxSiteSuggestionsBrandDesignUpdateContextualCta
@@ -228,7 +231,6 @@ import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SEARCH
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SEARCH_RESULTS
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_TRACKERS_BLOCKED
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_VISIT_SITE
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -279,6 +281,7 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteReportTriggerPlugin
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
+import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.browser.ui.autocomplete.AutocompleteHistoryDeleteFeature
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
 import com.duckduckgo.browsermode.api.BrowserMode
@@ -630,12 +633,14 @@ class BrowserTabViewModelTest {
     private val protectionTogglePlugin = FakePrivacyProtectionTogglePlugin()
     private val protectionTogglePluginPoint = FakePluginPoint(protectionTogglePlugin)
     private var fakeAndroidConfigBrowserFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
+    private val fakeCustomTabsFeature = FakeFeatureToggleFactory.create(CustomTabsFeature::class.java)
     private val mockAutocompleteTabsFeature: AutocompleteTabsFeature = mock()
     private val fakeCustomHeadersPlugin = FakeCustomHeadersProvider(emptyMap())
     private val mockToggleReports: ToggleReports = mock()
     private val mockBrokenSitePrompt: BrokenSitePrompt = mock()
     private val mockTabStatsBucketing: TabStatsBucketing = mock()
     private val mockNtpAfterIdleManager: NtpAfterIdleManager = mock()
+    private val mockReturnSessionLandingListener: ReturnSessionLandingListener = mock()
     private val mockBrowserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin> = mock()
     private val browserRefreshTriggerFlow = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     private val browserRefreshTriggerPlugin: BrowserRefreshTriggerPlugin = mock {
@@ -752,6 +757,8 @@ class BrowserTabViewModelTest {
             fakeAutocompleteHistoryDeleteFeature.self().setRawStoredState(State(enable = true))
 
             fakeRememberDesktopModeFeature.self().setRawStoredState(State(enable = true))
+
+            fakeCustomTabsFeature.handleTrustedCallers().setRawStoredState(State(enable = true))
 
             whenever(mockDuckChatJSHelper.enrichPageContextIfPossible(any(), any())).thenAnswer { it.getArgument<String>(1) }
             whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.NotApplicable)
@@ -984,6 +991,7 @@ class BrowserTabViewModelTest {
                 sitePermissionsManager = mockSitePermissionsManager,
                 cameraHardwareChecker = cameraHardwareChecker,
                 androidBrowserConfig = fakeAndroidConfigBrowserFeature,
+                customTabsFeature = fakeCustomTabsFeature,
                 faviconsFetchingPrompt = mockFaviconFetchingPrompt,
                 subscriptions = subscriptions,
                 sslCertificatesFeature = mockSSLCertificatesFeature,
@@ -1040,6 +1048,7 @@ class BrowserTabViewModelTest {
                 progressBarUpgradeFeature = fakeProgressBarUpgradeFeature,
                 faviconFetchingFixFeature = fakeFaviconFetchingFixFeature,
                 ntpAfterIdleManager = mockNtpAfterIdleManager,
+                returnSessionLandingListener = mockReturnSessionLandingListener,
                 browserInteractionsPlugins = mockBrowserInteractionsPlugins,
                 browserRefreshTriggerPlugins = mockBrowserRefreshTriggerPlugins,
                 brokenSiteReportTriggerPlugins = mockBrokenSiteReportTriggerPlugins,
@@ -1126,6 +1135,7 @@ class BrowserTabViewModelTest {
             testee.onViewVisible()
             verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
             assertTrue(commandCaptor.allValues.contains(Command.ShowKeyboard))
+            verify(mockReturnSessionLandingListener).onLandingFocusCaptured(focused = true)
         }
 
     @Test
@@ -1153,6 +1163,7 @@ class BrowserTabViewModelTest {
             testee.onViewVisible()
 
             assertCommandIssued<Command.DropAddressBarFocus>()
+            verify(mockReturnSessionLandingListener).onLandingFocusCaptured(focused = false)
         }
 
     @Test
@@ -1648,6 +1659,68 @@ class BrowserTabViewModelTest {
         runTest {
             verify(mockTabRepository).deleteTabAndSelectSource(selectedTabLiveData.value!!.tabId)
         }
+    }
+
+    @Test
+    fun whenUserSubmitsSearchFromInvalidatedTabThenOnlyReturnSessionSpecificClassifierFires() {
+        givenOneActiveTabSelected()
+        givenInvalidatedGlobalLayout()
+        val plugin: BrowserInteractionsPlugin = mock()
+        whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
+        whenever(mockQueryUrlPredictor.isUrl("foo")).thenReturn(false)
+
+        testee.onUserSubmittedQuery("foo")
+
+        verify(plugin, never()).onInputSubmitted()
+        verify(plugin, times(1)).onSearchSubmitted()
+        verify(plugin, never()).onUrlSubmitted()
+    }
+
+    @Test
+    fun whenUserSubmitsCurrentUrlThenOnlyReturnSessionSpecificUrlClassifierFires() {
+        val currentUrl = "https://example.com/"
+        val plugin: BrowserInteractionsPlugin = mock()
+        whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
+        whenever(mockQueryUrlPredictor.isUrl(currentUrl)).thenReturn(true)
+        whenever(mockOmnibarConverter.convertQueryToUrl(currentUrl, null)).thenReturn(currentUrl)
+        loadUrl(currentUrl, isBrowserShowing = true)
+
+        testee.onUserSubmittedQuery(currentUrl)
+
+        // The generic callback deliberately retains its pre-return-session query != url guard;
+        // only the new specific classifier distinguishes this genuine user submission from restoration.
+        verify(plugin, never()).onInputSubmitted()
+        verify(plugin, times(1)).onUrlSubmitted()
+        verify(plugin, never()).onSearchSubmitted()
+    }
+
+    @Test
+    fun whenUserSubmitsSearchThenGenericAndSpecificClassifiersEachFireOnce() {
+        val plugin: BrowserInteractionsPlugin = mock()
+        whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
+        whenever(mockQueryUrlPredictor.isUrl("cats")).thenReturn(false)
+        whenever(mockOmnibarConverter.convertQueryToUrl("cats", null)).thenReturn("https://duckduckgo.com/?q=cats")
+
+        testee.onUserSubmittedQuery("cats")
+
+        verify(plugin, times(1)).onInputSubmitted()
+        verify(plugin, times(1)).onSearchSubmitted()
+        verify(plugin, never()).onUrlSubmitted()
+    }
+
+    @Test
+    fun whenUserSubmitsUrlThenGenericAndSpecificClassifiersEachFireOnce() {
+        val submittedUrl = "https://duckduckgo.com/"
+        val plugin: BrowserInteractionsPlugin = mock()
+        whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
+        whenever(mockQueryUrlPredictor.isUrl(submittedUrl)).thenReturn(true)
+        whenever(mockOmnibarConverter.convertQueryToUrl(submittedUrl, null)).thenReturn(submittedUrl)
+
+        testee.onUserSubmittedQuery(submittedUrl)
+
+        verify(plugin, times(1)).onInputSubmitted()
+        verify(plugin, times(1)).onUrlSubmitted()
+        verify(plugin, never()).onSearchSubmitted()
     }
 
     @Test
@@ -3160,6 +3233,38 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenRestoringCurrentUrlThenNoBrowserInteractionClassifierFires() = runTest {
+        val currentUrl = "https://example.com/"
+        val plugin: BrowserInteractionsPlugin = mock()
+        whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
+        whenever(mockOmnibarConverter.convertQueryToUrl(currentUrl)).thenReturn(currentUrl)
+        loadUrl(currentUrl, isBrowserShowing = true)
+        webViewSessionStorage.stub { onBlocking { restoreSession(anyOrNull(), anyString()) }.thenReturn(false) }
+
+        testee.restoreWebViewState(null, currentUrl)
+
+        verifyNoInteractions(plugin)
+    }
+
+    @Test
+    fun whenRestoringDifferentFallbackUrlThenOldGenericClassifierStillFiresButSpecificClassifiersDoNot() = runTest {
+        val currentUrl = "https://example.com/current"
+        val fallbackUrl = "https://example.com/restored"
+        val plugin: BrowserInteractionsPlugin = mock()
+        whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
+        whenever(mockOmnibarConverter.convertQueryToUrl(fallbackUrl)).thenReturn(fallbackUrl)
+        loadUrl(currentUrl, isBrowserShowing = true)
+        webViewSessionStorage.stub { onBlocking { restoreSession(anyOrNull(), anyString()) }.thenReturn(false) }
+
+        testee.restoreWebViewState(null, fallbackUrl)
+
+        // The generic callback is intentionally unchanged: historically query != url fired it.
+        verify(plugin, times(1)).onInputSubmitted()
+        verify(plugin, never()).onSearchSubmitted()
+        verify(plugin, never()).onUrlSubmitted()
+    }
+
+    @Test
     fun whenRestoringWebViewSessionNotRestorableAndNoPreviousUrlThenNoUrlLoaded() = runTest {
         webViewSessionStorage.stub { onBlocking { restoreSession(anyOrNull(), anyString()) }.thenReturn(false) }
         testee.restoreWebViewState(null, "")
@@ -3244,6 +3349,20 @@ class BrowserTabViewModelTest {
         runTest {
             verify(mockTabRepository).deleteTabAndSelectSource(selectedTabLiveData.value!!.tabId)
         }
+    }
+
+    @Test
+    fun whenUserClicksOnErrorRecoveryActionThenNoBrowserInteractionClassifierFires() {
+        val plugin: BrowserInteractionsPlugin = mock()
+        whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
+        givenOneActiveTabSelected()
+        testee.recoverFromRenderProcessGone()
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val showErrorWithAction = commandCaptor.lastValue as Command.ShowErrorWithAction
+
+        showErrorWithAction.action()
+
+        verifyNoInteractions(plugin)
     }
 
     @Test
@@ -3702,6 +3821,16 @@ class BrowserTabViewModelTest {
         }
 
     @Test
+    fun whenBackInteractionThenBrowserInteractionPluginFiresOnce() {
+        val plugin: BrowserInteractionsPlugin = mock()
+        whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
+
+        testee.onBackInteraction()
+
+        verify(plugin, times(1)).onBackPressed()
+    }
+
+    @Test
     fun whenUserPressesBackAndSkippingHomeThenWebViewPreviewGenerated() {
         setupNavigation(isBrowsing = true, canGoBack = false, skipHome = true)
         testee.onUserPressedBack()
@@ -3826,6 +3955,80 @@ class BrowserTabViewModelTest {
         }
 
     @Test
+    fun whenRefreshPatternsBelongToPreviousNavigationThenCtaReceivesNoPatterns() =
+        runTest {
+            val previousUrl = "https://previous.example"
+            val currentUrl = "https://current.example"
+            val refreshPatterns = setOf(RefreshPattern.THRICE_IN_20_SECONDS)
+            val staleSite = givenCurrentSite(previousUrl)
+            whenever(ctaViewModelMockSettingsStore.hideTips).thenReturn(true)
+            whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(false, Disabled))
+            whenever(mockBrokenSitePrompt.getUserRefreshPatterns()).thenReturn(refreshPatterns)
+            whenever(mockBrokenSitePrompt.shouldShowBrokenSitePrompt(any(), any())).thenReturn(false)
+            setBrowserShowing(true)
+
+            testee.navigationStateChanged(
+                buildWebNavigation(
+                    originalUrl = currentUrl,
+                    currentUrl = currentUrl,
+                ),
+            )
+            advanceUntilIdle()
+            testee.siteLiveData.value = staleSite
+
+            testee.refreshCta()
+
+            verify(refreshPixelSender).onRefreshPatternDetected(refreshPatterns)
+            verify(mockBrokenSitePrompt, never()).shouldShowBrokenSitePrompt(any(), any())
+        }
+
+    @Test
+    fun whenRefreshPatternsBelongToCurrentNavigationThenCtaReceivesPatterns() =
+        runTest {
+            val currentUrl = "https://current.example"
+            val refreshPatterns = setOf(RefreshPattern.THRICE_IN_20_SECONDS)
+            val currentSite = givenCurrentSite(currentUrl)
+            whenever(ctaViewModelMockSettingsStore.hideTips).thenReturn(true)
+            whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(false, Disabled))
+            whenever(mockBrokenSitePrompt.getUserRefreshPatterns()).thenReturn(refreshPatterns)
+            whenever(mockBrokenSitePrompt.shouldShowBrokenSitePrompt(any(), any())).thenReturn(false)
+            setBrowserShowing(true)
+
+            testee.navigationStateChanged(
+                buildWebNavigation(
+                    originalUrl = currentUrl,
+                    currentUrl = currentUrl,
+                ),
+            )
+            advanceUntilIdle()
+            testee.siteLiveData.value = currentSite
+
+            testee.refreshCta()
+
+            verify(mockBrokenSitePrompt).shouldShowBrokenSitePrompt(
+                currentUrl,
+                refreshPatterns,
+            )
+        }
+
+    @Test
+    fun whenCurrentNavigationUrlMissingThenCtaReceivesNoPatterns() =
+        runTest {
+            val siteUrl = "https://current.example"
+            val refreshPatterns = setOf(RefreshPattern.THRICE_IN_20_SECONDS)
+            givenCurrentSite(siteUrl)
+            whenever(ctaViewModelMockSettingsStore.hideTips).thenReturn(true)
+            whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(false, Disabled))
+            whenever(mockBrokenSitePrompt.getUserRefreshPatterns()).thenReturn(refreshPatterns)
+            whenever(mockBrokenSitePrompt.shouldShowBrokenSitePrompt(any(), any())).thenReturn(false)
+            setBrowserShowing(true)
+
+            testee.refreshCta()
+
+            verify(mockBrokenSitePrompt, never()).shouldShowBrokenSitePrompt(any(), any())
+        }
+
+    @Test
     fun whenCtaShownThenFirePixel() =
         runTest {
             val cta = HomePanelCta.AddWidgetAutoOnboarding
@@ -3892,6 +4095,55 @@ class BrowserTabViewModelTest {
 
         assertNotEquals(cta, testee.ctaViewState.value?.cta)
     }
+
+    @Test
+    fun whenUserClickedSegmentedSearchEndCtaOkButtonThenBubbleHiddenAndInputOpensOnDuckAiTab() = runTest {
+        val cta = daxEndBrandDesignUpdateBubbleCta(isSegmentedSearchPathWithToggleEnabled = true)
+        setCta(cta)
+
+        testee.onUserClickCtaOkButton(cta)
+        advanceUntilIdle()
+
+        assertNull(testee.ctaViewState.value?.cta)
+        assertCommandIssued<HideOnboardingDaxBubbleCta>()
+        verify(mockCustomAiOnboardingStore).setOpenInputOnDuckAiTab()
+        assertCommandIssued<ShowKeyboard>()
+    }
+
+    @Test
+    fun whenUserClickedEndCtaOkButtonOutsideSegmentedSearchPathThenCtaIsRefreshedAway() = runTest {
+        val cta = daxEndBrandDesignUpdateBubbleCta(isSegmentedSearchPathWithToggleEnabled = false)
+        setCta(cta)
+
+        testee.onUserClickCtaOkButton(cta)
+        advanceUntilIdle()
+
+        assertNotEquals(cta, testee.ctaViewState.value?.cta)
+        verify(mockCustomAiOnboardingStore, never()).setOpenInputOnDuckAiTab()
+    }
+
+    @Test
+    fun whenUserClickedSegmentedSearchEndCtaSecondaryButtonThenCtaIsRefreshedAway() = runTest {
+        val cta = daxEndBrandDesignUpdateBubbleCta(isSegmentedSearchPathWithToggleEnabled = true)
+        setCta(cta)
+
+        testee.onUserClickCtaSecondaryButton(cta)
+        advanceUntilIdle()
+
+        assertNotEquals(cta, testee.ctaViewState.value?.cta)
+        verify(mockCustomAiOnboardingStore, never()).setOpenInputOnDuckAiTab()
+    }
+
+    private fun daxEndBrandDesignUpdateBubbleCta(isSegmentedSearchPathWithToggleEnabled: Boolean) = DaxEndBrandDesignUpdateBubbleCta(
+        onboardingStore = mockOnboardingStore,
+        appInstallStore = mockAppInstallStore,
+        isLightTheme = true,
+        deviceInfo = mockDeviceInfo,
+        onboardingImprovementsEnabled = true,
+        onboardingImprovementsV2Enabled = true,
+        isOmnibarBottom = false,
+        isSegmentedSearchPathWithToggleEnabled = isSegmentedSearchPathWithToggleEnabled,
+    )
 
     @Test
     fun whenUserClickedAddWidgetCtaButtonThenLaunchAddWidgetCommand() {
@@ -4457,6 +4709,16 @@ class BrowserTabViewModelTest {
     fun whenUserInDuckPlayerThenCannotReportSite() {
         setupNavigation(skipHome = false, isBrowsing = true)
         whenever(mockDuckPlayer.isDuckPlayerUri(anyString())).thenReturn(true)
+        assertFalse(browserViewState().canReportSite)
+    }
+
+    @Test
+    fun whenUserInDuckAiThenCannotReportSite() {
+        val duckAiUrl = "https://duck.ai/"
+        whenever(mockDuckChat.isDuckChatUrl(duckAiUrl.toUri())).thenReturn(true)
+
+        loadUrl(duckAiUrl)
+
         assertFalse(browserViewState().canReportSite)
     }
 
@@ -5325,6 +5587,163 @@ class BrowserTabViewModelTest {
         appLinkCaptor.lastValue.invoke()
         assertCommandIssued<Command.OpenAppLink>()
         verify(mockAppLinksHandler).setUserQueryState(false)
+    }
+
+    @Test
+    fun whenAppLinkClickedInCustomTabAndTrustedCallerThenOpenAppLinkDirectlyEvenWhenPromptEnabled() {
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = exampleUrl)
+        whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(true)
+        whenever(mockAppLinksHandler.isTrustedCaller(eq(urlType), eq("com.example.app"))).thenReturn(true)
+        testee.setIsCustomTab(isCustomTab = true, clientPackage = "com.example.app")
+        testee.handleAppLink(urlType, isForMainFrame = true, hasGesture = true)
+        verify(mockAppLinksHandler).handleAppLink(any(), eq(urlType), any(), any(), any(), any(), appLinkCaptor.capture())
+        appLinkCaptor.lastValue.invoke()
+        assertCommandIssued<Command.OpenAppLink>()
+    }
+
+    @Test
+    fun whenAppLinkClickedInCustomTabAndNotTrustedCallerAndPromptEnabledThenShowAppLinkPrompt() {
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = exampleUrl)
+        whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(true)
+        whenever(mockAppLinksHandler.isTrustedCaller(eq(urlType), eq("com.example.app"))).thenReturn(false)
+        testee.setIsCustomTab(isCustomTab = true, clientPackage = "com.example.app")
+        testee.handleAppLink(urlType, isForMainFrame = true, hasGesture = true)
+        verify(mockAppLinksHandler).handleAppLink(any(), eq(urlType), any(), any(), any(), any(), appLinkCaptor.capture())
+        appLinkCaptor.lastValue.invoke()
+        assertCommandIssued<Command.ShowAppLinkPrompt>()
+    }
+
+    @Test
+    fun whenAppLinkClickedInCustomTabAndHandleTrustedCallersDisabledThenAlwaysOpenDirectlyEvenWhenPromptEnabled() {
+        fakeCustomTabsFeature.handleTrustedCallers().setRawStoredState(State(enable = false))
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = exampleUrl)
+        whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(true)
+        whenever(mockAppLinksHandler.isTrustedCaller(eq(urlType), eq("com.example.app"))).thenReturn(false)
+        testee.setIsCustomTab(isCustomTab = true, clientPackage = "com.example.app")
+        testee.handleAppLink(urlType, isForMainFrame = true, hasGesture = true)
+        verify(mockAppLinksHandler).handleAppLink(any(), eq(urlType), any(), any(), any(), any(), appLinkCaptor.capture())
+        appLinkCaptor.lastValue.invoke()
+        assertCommandIssued<Command.OpenAppLink> {
+            assertFalse(finishCustomTabOnLaunch)
+        }
+        assertCommandNotIssued<Command.ShowAppLinkPrompt>()
+    }
+
+    @Test
+    fun whenAppLinkClickedInCustomTabWithNoSessionButMatchingReferrerThenOpenDirectlyWithoutPrompt() {
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = exampleUrl)
+        whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(true)
+        whenever(mockAppLinksHandler.isTrustedCaller(eq(urlType), eq("com.example.app"))).thenReturn(true)
+        testee.setIsCustomTab(isCustomTab = true, clientPackage = null, referrerPackage = "com.example.app")
+        testee.handleAppLink(urlType, isForMainFrame = true, hasGesture = true)
+        verify(mockAppLinksHandler).handleAppLink(any(), eq(urlType), any(), anyOrNull(), any(), any(), appLinkCaptor.capture())
+        appLinkCaptor.lastValue.invoke()
+        assertCommandIssued<Command.OpenAppLink>()
+        assertCommandNotIssued<Command.ShowAppLinkPrompt>()
+    }
+
+    @Test
+    fun whenAppLinkClickedInCustomTabWithNoSessionAndNoReferrerThenHonorPromptSetting() {
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = exampleUrl)
+        whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(true)
+        whenever(mockAppLinksHandler.isTrustedCaller(eq(urlType), anyOrNull())).thenReturn(false)
+        testee.setIsCustomTab(isCustomTab = true, clientPackage = null, referrerPackage = null)
+        testee.handleAppLink(urlType, isForMainFrame = true, hasGesture = true)
+        verify(mockAppLinksHandler).handleAppLink(any(), eq(urlType), any(), anyOrNull(), any(), any(), appLinkCaptor.capture())
+        appLinkCaptor.lastValue.invoke()
+        assertCommandIssued<Command.ShowAppLinkPrompt>()
+    }
+
+    @Test
+    fun whenHandleAppLinkCalledInCustomTabThenVerifiedClientPackageForwardedToHandlerNotReferrer() {
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = exampleUrl)
+        testee.setIsCustomTab(isCustomTab = true, clientPackage = null, referrerPackage = "com.example.app")
+        testee.handleAppLink(urlType, isForMainFrame = true, hasGesture = false)
+        // The launch carve-out must receive only the verified (session) package, never the referrer fallback.
+        verify(mockAppLinksHandler).handleAppLink(eq(true), eq(urlType), eq(false), eq(null), any(), any(), appLinkCaptor.capture())
+    }
+
+    @Test
+    fun whenAppLinkClickedInCustomTabAndHandleTrustedCallersDisabledThenCloseTabFeatureIsInertEvenForTrustedCaller() {
+        fakeCustomTabsFeature.handleTrustedCallers().setRawStoredState(State(enable = false))
+        fakeCustomTabsFeature.closeTabAfterTrustedCallerNavigation().setRawStoredState(State(enable = true))
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = exampleUrl)
+        whenever(mockAppLinksHandler.isTrustedCaller(eq(urlType), eq("com.example.app"))).thenReturn(true)
+        testee.setIsCustomTab(isCustomTab = true, clientPackage = "com.example.app")
+        testee.handleAppLink(urlType, isForMainFrame = true, hasGesture = true)
+        verify(mockAppLinksHandler).handleAppLink(any(), eq(urlType), any(), any(), any(), any(), appLinkCaptor.capture())
+        appLinkCaptor.lastValue.invoke()
+        assertCommandIssued<Command.OpenAppLink> {
+            assertFalse(finishCustomTabOnLaunch)
+        }
+    }
+
+    @Test
+    fun whenAppLinkClickedInCustomTabAndTrustedCallerAndCloseTabFeatureEnabledThenOpenAppLinkRequestsFinishOnLaunch() {
+        fakeCustomTabsFeature.closeTabAfterTrustedCallerNavigation().setRawStoredState(State(enable = true))
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = exampleUrl)
+        whenever(mockAppLinksHandler.isTrustedCaller(eq(urlType), eq("com.example.app"))).thenReturn(true)
+        testee.setIsCustomTab(isCustomTab = true, clientPackage = "com.example.app")
+        testee.handleAppLink(urlType, isForMainFrame = true, hasGesture = true)
+        verify(mockAppLinksHandler).handleAppLink(any(), eq(urlType), any(), any(), any(), any(), appLinkCaptor.capture())
+        appLinkCaptor.lastValue.invoke()
+        assertCommandIssued<Command.OpenAppLink> {
+            assertTrue(finishCustomTabOnLaunch)
+        }
+    }
+
+    @Test
+    fun whenAppLinkClickedInCustomTabAndTrustedCallerButCloseTabFeatureDisabledThenOpenAppLinkDoesNotRequestFinish() {
+        fakeCustomTabsFeature.closeTabAfterTrustedCallerNavigation().setRawStoredState(State(enable = false))
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = exampleUrl)
+        whenever(mockAppLinksHandler.isTrustedCaller(eq(urlType), eq("com.example.app"))).thenReturn(true)
+        testee.setIsCustomTab(isCustomTab = true, clientPackage = "com.example.app")
+        testee.handleAppLink(urlType, isForMainFrame = true, hasGesture = true)
+        verify(mockAppLinksHandler).handleAppLink(any(), eq(urlType), any(), any(), any(), any(), appLinkCaptor.capture())
+        appLinkCaptor.lastValue.invoke()
+        assertCommandIssued<Command.OpenAppLink> {
+            assertFalse(finishCustomTabOnLaunch)
+        }
+    }
+
+    @Test
+    fun whenAppLinkClickedInCustomTabAndAlwaysTriggerDomainAndCloseTabFeatureEnabledThenOpenAppLinkDoesNotRequestFinish() {
+        fakeCustomTabsFeature.closeTabAfterTrustedCallerNavigation().setRawStoredState(State(enable = true))
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = exampleUrl)
+        whenever(mockAppLinksHandler.isTrustedCaller(eq(urlType), eq("com.example.app"))).thenReturn(false)
+        whenever(mockAppLinksHandler.isAlwaysTriggerDomain(eq(urlType))).thenReturn(true)
+        testee.setIsCustomTab(isCustomTab = true, clientPackage = "com.example.app")
+        testee.handleAppLink(urlType, isForMainFrame = true, hasGesture = true)
+        verify(mockAppLinksHandler).handleAppLink(any(), eq(urlType), any(), any(), any(), any(), appLinkCaptor.capture())
+        appLinkCaptor.lastValue.invoke()
+        assertCommandIssued<Command.OpenAppLink> {
+            assertFalse(finishCustomTabOnLaunch)
+        }
+    }
+
+    @Test
+    fun whenAppLinkClickedInCustomTabAndAlwaysTriggerDomainThenOpenAppLinkDirectlyEvenWhenPromptEnabled() {
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = exampleUrl)
+        whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(true)
+        whenever(mockAppLinksHandler.isTrustedCaller(eq(urlType), eq("com.example.app"))).thenReturn(false)
+        whenever(mockAppLinksHandler.isAlwaysTriggerDomain(eq(urlType))).thenReturn(true)
+        testee.setIsCustomTab(isCustomTab = true, clientPackage = "com.example.app")
+        testee.handleAppLink(urlType, isForMainFrame = true, hasGesture = true)
+        verify(mockAppLinksHandler).handleAppLink(any(), eq(urlType), any(), any(), any(), any(), appLinkCaptor.capture())
+        appLinkCaptor.lastValue.invoke()
+        assertCommandIssued<Command.OpenAppLink>()
+    }
+
+    @Test
+    fun whenAppLinkClickedInCustomTabAndNotTrustedCallerAndPromptDisabledThenOpenAppLink() {
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = exampleUrl)
+        whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(false)
+        whenever(mockAppLinksHandler.isTrustedCaller(eq(urlType), eq("com.example.app"))).thenReturn(false)
+        testee.setIsCustomTab(isCustomTab = true, clientPackage = "com.example.app")
+        testee.handleAppLink(urlType, isForMainFrame = true, hasGesture = true)
+        verify(mockAppLinksHandler).handleAppLink(any(), eq(urlType), any(), any(), any(), any(), appLinkCaptor.capture())
+        appLinkCaptor.lastValue.invoke()
+        assertCommandIssued<Command.OpenAppLink>()
     }
 
     @Test
@@ -7356,6 +7775,24 @@ class BrowserTabViewModelTest {
         }
 
     @Test
+    fun whenUserRefreshesAndNavigationUrlAvailableThenRecordNavigationUrl() =
+        runTest {
+            val siteUrl = "https://previous.example"
+            val currentUrl = "https://current.example"
+            givenCurrentSite(siteUrl)
+            testee.navigationStateChanged(
+                buildWebNavigation(
+                    originalUrl = currentUrl,
+                    currentUrl = currentUrl,
+                ),
+            )
+
+            testee.onRefreshRequested(triggeredByUser = true)
+
+            verify(mockBrokenSitePrompt).pageRefreshed(currentUrl.toUri())
+        }
+
+    @Test
     fun whenOnlyChangeInUrlIsHttpsUpgradeNakedDomainRedirectOrTrailingSlashThenConsiderSameForExternalLaunch() =
         runTest {
             val urlA = "https://example.com"
@@ -8440,9 +8877,48 @@ class BrowserTabViewModelTest {
 
         testee.openDuckAiQuery(query = "hello", autoPrompt = true)
 
-        // Fires once from openDuckAiQuery itself and once more from the onUserSubmittedQuery it
-        // routes through via navigateToDuckAi — pre-existing on this path, not new here.
+        // Preserve the pre-return-session behavior: one callback is explicit and one comes from
+        // reusing the NTP tab. The new AI classifier must still fire exactly once without a URL.
         verify(plugin, times(2)).onInputSubmitted()
+        verify(plugin, times(1)).onAiPromptSubmitted()
+        verify(plugin, never()).onUrlSubmitted()
+        verify(plugin, never()).onSearchSubmitted()
+    }
+
+    @Test
+    fun whenOpenDuckAiWithoutQueryThenDoesNotFireOnAiPromptSubmitted() = runTest {
+        val plugin: BrowserInteractionsPlugin = mock()
+        whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
+        setBrowserShowing(true)
+
+        testee.openDuckAiQuery(query = "", autoPrompt = false)
+
+        verify(plugin).onInputSubmitted()
+        verify(plugin, never()).onAiPromptSubmitted()
+    }
+
+    @Test
+    fun whenOpenDuckAiWithPrefillThenDoesNotFireOnAiPromptSubmitted() = runTest {
+        val plugin: BrowserInteractionsPlugin = mock()
+        whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
+        setBrowserShowing(true)
+
+        testee.openDuckAiQuery(query = "prefill", autoPrompt = false)
+
+        verify(plugin).onInputSubmitted()
+        verify(plugin, never()).onAiPromptSubmitted()
+    }
+
+    @Test
+    fun whenOpenDuckAiWithAutoPromptThenFiresOnAiPromptSubmitted() = runTest {
+        val plugin: BrowserInteractionsPlugin = mock()
+        whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
+        setBrowserShowing(true)
+
+        testee.openDuckAiQuery(query = "hello", autoPrompt = true)
+
+        verify(plugin).onInputSubmitted()
+        verify(plugin).onAiPromptSubmitted()
     }
 
     @Test
@@ -8454,6 +8930,33 @@ class BrowserTabViewModelTest {
         testee.openDuckAiChatById("https://duck.ai/chat?chatId=abc")
 
         verify(plugin).onChatSelected()
+    }
+
+    @Test
+    fun whenOpenDuckAiChatByIdReusesNtpTabThenPreservesGenericCallbackWithoutUrlClassification() = runTest {
+        val plugin: BrowserInteractionsPlugin = mock()
+        whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
+        setBrowserShowing(false)
+        whenever(mockOmnibarConverter.convertQueryToUrl("https://duck.ai/chat?chatId=abc", null))
+            .thenReturn("https://duck.ai/chat?chatId=abc")
+
+        testee.openDuckAiChatById("https://duck.ai/chat?chatId=abc")
+
+        verify(plugin, times(1)).onChatSelected()
+        verify(plugin, times(1)).onInputSubmitted()
+        verify(plugin, never()).onSearchSubmitted()
+        verify(plugin, never()).onUrlSubmitted()
+    }
+
+    @Test
+    fun whenDuckAiChatPromptSubmittedThenFiresOnInputSubmittedAndOnAiPromptSubmitted() = runTest {
+        val plugin: BrowserInteractionsPlugin = mock()
+        whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
+
+        testee.onDuckAiChatPromptSubmitted()
+
+        verify(plugin).onInputSubmitted()
+        verify(plugin).onAiPromptSubmitted()
     }
 
     @Test
@@ -8610,7 +9113,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenProcessJsCallbackMessageForDuckChatThenSendCommand() =
+    fun whenProcessJsCallbackMessageForDuckChatThenEmitOnDuckChatJsResponseFlow() =
         runTest {
             whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
             val jsCallbackData = JsCallbackData(JSONObject(), "", "", "")
@@ -8643,11 +9146,17 @@ class BrowserTabViewModelTest {
                 any(),
                 any(),
             )
-            assertCommandIssued<Command.SendResponseToJs>()
+            // Not the single-slot command LiveData: a DuckChat reply can be held open for minutes
+            // (the edit screen) while the fragment is stopped, so it goes on its own buffered channel.
+            testee.duckChatJsResponseFlow.test {
+                assertEquals(jsCallbackData, awaitItem())
+                cancelAndIgnoreRemainingEvents()
+            }
+            assertCommandNotIssued<Command.SendResponseToJs>()
         }
 
     @Test
-    fun whenProcessJsCallbackMessageForDuckChatAndResponseIsNullThenDoNotSendCommand() =
+    fun whenProcessJsCallbackMessageForDuckChatAndResponseIsNullThenNoResponseEmitted() =
         runTest {
             whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
             whenever(
@@ -8679,6 +9188,10 @@ class BrowserTabViewModelTest {
                 any(),
                 any(),
             )
+            testee.duckChatJsResponseFlow.test {
+                expectNoEvents()
+                cancelAndIgnoreRemainingEvents()
+            }
             assertCommandNotIssued<Command.SendResponseToJs>()
         }
 
@@ -8690,17 +9203,45 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenOnDuckChatOmnibarButtonClickedResolvesToDuckChatUrlThenFiresOnAiPromptSubmitted() {
+        whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+        val plugin: BrowserInteractionsPlugin = mock()
+        whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
+
+        testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = true, isNtp = false)
+
+        verify(plugin).onInputSubmitted()
+        verify(plugin).onAiPromptSubmitted()
+        verify(plugin, never()).onUrlSubmitted()
+    }
+
+    @Test
     fun whenOnDuckChatOmnibarButtonClickedWithoutFocusThenGetsDuckChatUrl() {
         whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+        val plugin: BrowserInteractionsPlugin = mock()
+        whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
+
         testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = false)
+
         verify(mockDuckChat).getDuckChatUrl(eq("example"), eq(false), any())
+        verify(plugin).onInputSubmitted()
+        verify(plugin, never()).onAiPromptSubmitted()
     }
 
     @Test
     fun whenOnDuckChatOmnibarButtonClickedWithNullQueryAndFocusThenGetsDuckChatUrlWithAutoPrompt() {
         whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+        val plugin: BrowserInteractionsPlugin = mock()
+        whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
+
         testee.onDuckChatOmnibarButtonClicked(query = null, hasFocus = true, isNtp = false)
+
         verify(mockDuckChat).getDuckChatUrl(eq(""), eq(true), any())
+        verify(plugin).onInputSubmitted()
+        verify(plugin, never()).onAiPromptSubmitted()
     }
 
     @Test
@@ -10762,14 +11303,6 @@ class BrowserTabViewModelTest {
         mockDuckAiContextualModeFlow.emit(true)
 
         testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = false)
-
-        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        assertTrue(commandCaptor.lastValue is Command.ShowDuckAIContextualMode)
-    }
-
-    @Test
-    fun whenOpenDuckAIContextualModeThenShowDuckAIContextualModeCommandSent() = runTest {
-        testee.openDuckAIContextualMode()
 
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.lastValue is Command.ShowDuckAIContextualMode)

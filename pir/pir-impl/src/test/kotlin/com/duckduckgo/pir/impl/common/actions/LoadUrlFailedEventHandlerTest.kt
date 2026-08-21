@@ -21,7 +21,7 @@ import com.duckduckgo.pir.impl.common.PirJob.RunType
 import com.duckduckgo.pir.impl.common.PirJobConstants.RECOVERY_URL
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted.StepStatus.Failure
-import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerStep
+import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStep
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.LoadUrlFailed
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.PirStageStatus
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.LoadUrl
@@ -71,7 +71,7 @@ class LoadUrlFailedEventHandlerTest {
         val state =
             State(
                 runType = RunType.MANUAL,
-                brokerStepsToExecute = emptyList(),
+                brokerStep = testScanStep(),
                 profileQuery = testProfileQuery,
                 pendingUrl = null,
                 stageStatus = PirStageStatus(
@@ -93,7 +93,7 @@ class LoadUrlFailedEventHandlerTest {
         val state =
             State(
                 runType = RunType.MANUAL,
-                brokerStepsToExecute = emptyList(),
+                brokerStep = testScanStep(),
                 profileQuery = testProfileQuery,
                 pendingUrl = RECOVERY_URL,
                 stageStatus = PirStageStatus(
@@ -121,7 +121,7 @@ class LoadUrlFailedEventHandlerTest {
         val state =
             State(
                 runType = RunType.MANUAL,
-                brokerStepsToExecute = emptyList(),
+                brokerStep = testScanStep(),
                 profileQuery = testProfileQuery,
                 pendingUrl = "https://broker.com",
                 stageStatus = PirStageStatus(
@@ -144,10 +144,9 @@ class LoadUrlFailedEventHandlerTest {
         val state =
             State(
                 runType = RunType.OPTOUT,
-                brokerStepsToExecute = emptyList(),
+                brokerStep = testScanStep(),
                 profileQuery = testProfileQuery,
                 pendingUrl = failedUrl,
-                currentBrokerStepIndex = 2,
                 currentActionIndex = 5,
                 stageStatus = PirStageStatus(
                     currentStage = PirStage.FILL_FORM,
@@ -161,7 +160,6 @@ class LoadUrlFailedEventHandlerTest {
         assertEquals(RECOVERY_URL, result.nextState.pendingUrl)
         assertEquals(LoadUrl(RECOVERY_URL), result.sideEffect)
         assertNull(result.nextEvent)
-        assertEquals(2, result.nextState.currentBrokerStepIndex)
         assertEquals(5, result.nextState.currentActionIndex)
     }
 
@@ -170,10 +168,9 @@ class LoadUrlFailedEventHandlerTest {
         val state =
             State(
                 runType = RunType.SCHEDULED,
-                brokerStepsToExecute = emptyList(),
+                brokerStep = testScanStep(),
                 profileQuery = testProfileQuery,
                 pendingUrl = RECOVERY_URL,
-                currentBrokerStepIndex = 1,
                 currentActionIndex = 3,
                 stageStatus = PirStageStatus(
                     currentStage = PirStage.START,
@@ -190,7 +187,6 @@ class LoadUrlFailedEventHandlerTest {
         val stepStatus = nextEvent.stepStatus as Failure
         assertEquals(PirError.UnableToLoadBrokerUrl, stepStatus.error)
         assertNull(result.sideEffect)
-        assertEquals(1, result.nextState.currentBrokerStepIndex)
         assertEquals(3, result.nextState.currentActionIndex)
     }
 
@@ -199,7 +195,7 @@ class LoadUrlFailedEventHandlerTest {
         val state =
             State(
                 runType = RunType.MANUAL,
-                brokerStepsToExecute = emptyList(),
+                brokerStep = testScanStep(),
                 profileQuery = testProfileQuery,
                 pendingUrl = "https://original.com",
                 stageStatus = PirStageStatus(
@@ -217,11 +213,11 @@ class LoadUrlFailedEventHandlerTest {
     }
 
     @Test
-    fun whenLoadUrlFailedWhilePreseedingThenClearsPendingUrlAndReturnsExecuteNextBrokerStep() = runTest {
+    fun whenLoadUrlFailedWhilePreseedingThenClearsPendingUrlAndReturnsExecuteBrokerStep() = runTest {
         val state =
             State(
                 runType = RunType.MANUAL,
-                brokerStepsToExecute = emptyList(),
+                brokerStep = testScanStep(),
                 profileQuery = testProfileQuery,
                 pendingUrl = "https://broker.com",
                 preseeding = true,
@@ -235,7 +231,7 @@ class LoadUrlFailedEventHandlerTest {
         val result = testee.invoke(state, event)
 
         assertNull(result.nextState.pendingUrl)
-        assertEquals(ExecuteNextBrokerStep, result.nextEvent)
+        assertEquals(ExecuteBrokerStep, result.nextEvent)
         assertNull(result.sideEffect)
     }
 
@@ -244,10 +240,9 @@ class LoadUrlFailedEventHandlerTest {
         val state =
             State(
                 runType = RunType.MANUAL,
-                brokerStepsToExecute = emptyList(),
+                brokerStep = testScanStep(),
                 profileQuery = testProfileQuery,
                 pendingUrl = "https://broker.com",
-                currentBrokerStepIndex = 2,
                 currentActionIndex = 0,
                 preseeding = true,
                 stageStatus = PirStageStatus(
@@ -264,9 +259,8 @@ class LoadUrlFailedEventHandlerTest {
         // Should not return LoadUrl side effect
         assertNull(result.sideEffect)
         // Should proceed to next broker step
-        assertEquals(ExecuteNextBrokerStep, result.nextEvent)
+        assertEquals(ExecuteBrokerStep, result.nextEvent)
         // Should preserve other state fields
-        assertEquals(2, result.nextState.currentBrokerStepIndex)
         assertEquals(0, result.nextState.currentActionIndex)
     }
 
@@ -275,7 +269,7 @@ class LoadUrlFailedEventHandlerTest {
         val state =
             State(
                 runType = RunType.MANUAL,
-                brokerStepsToExecute = emptyList(),
+                brokerStep = testScanStep(),
                 profileQuery = testProfileQuery,
                 pendingUrl = "https://broker.com",
                 preseeding = false,
@@ -298,7 +292,7 @@ class LoadUrlFailedEventHandlerTest {
         val state =
             State(
                 runType = RunType.MANUAL,
-                brokerStepsToExecute = emptyList(),
+                brokerStep = testScanStep(),
                 profileQuery = testProfileQuery,
                 pendingUrl = RECOVERY_URL,
                 preseeding = true,
@@ -311,9 +305,9 @@ class LoadUrlFailedEventHandlerTest {
 
         val result = testee.invoke(state, event)
 
-        // Preseeding check happens before recovery URL check, so this will return ExecuteNextBrokerStep
+        // Preseeding check happens before recovery URL check, so this will return ExecuteBrokerStep
         assertNull(result.nextState.pendingUrl)
-        assertEquals(ExecuteNextBrokerStep, result.nextEvent)
+        assertEquals(ExecuteBrokerStep, result.nextEvent)
     }
 
     @Test
@@ -321,10 +315,9 @@ class LoadUrlFailedEventHandlerTest {
         val state =
             State(
                 runType = RunType.SCHEDULED,
-                brokerStepsToExecute = emptyList(),
+                brokerStep = testScanStep(),
                 profileQuery = testProfileQuery,
                 pendingUrl = "https://broker.com",
-                currentBrokerStepIndex = 3,
                 currentActionIndex = 1,
                 actionRetryCount = 2,
                 transactionID = "txn-123",
@@ -341,7 +334,6 @@ class LoadUrlFailedEventHandlerTest {
 
         assertEquals(RunType.SCHEDULED, result.nextState.runType)
         assertEquals(testProfileQuery, result.nextState.profileQuery)
-        assertEquals(3, result.nextState.currentBrokerStepIndex)
         assertEquals(1, result.nextState.currentActionIndex)
         assertEquals(2, result.nextState.actionRetryCount)
         assertEquals("txn-123", result.nextState.transactionID)

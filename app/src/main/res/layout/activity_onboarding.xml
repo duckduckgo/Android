@@ -41,17 +41,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+    <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
         android:id="@+id/skipOnboardingButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:layout_marginHorizontal="30dp"
-        android:layout_marginTop="60dp"
-        app:daxButtonSize="large"
-        app:layout_constraintTop_toTopOf="parent"
         android:text="@string/skipOnboarding"
+        android:visibility="gone"
+        app:daxButtonSize="small"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

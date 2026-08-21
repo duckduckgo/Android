@@ -31,7 +31,7 @@ import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.menu.BrowserMenuHighlight
 import com.duckduckgo.app.browser.menu.BrowserViewMode
-import com.duckduckgo.app.browser.nativeinput.NativeInputSearchOnlyFeature
+import com.duckduckgo.app.browser.nativeinput.NativeInputOmnibarFeature
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Browser
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.CustomTab
@@ -68,6 +68,7 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.common.utils.isLocalUrl
@@ -125,15 +126,18 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles,
     private val addressBarTrackersAnimationManager: AddressBarTrackersAnimationManager,
     private val standardizedLeadingIconToggle: StandardizedLeadingIconFeatureToggle,
+    private val omnibarPreFillKillSwitch: OmnibarPreFillKillSwitch,
     private val progressBarUpgradeFeature: ProgressBarUpgradeFeature,
-    private val nativeInputSearchOnlyFeature: NativeInputSearchOnlyFeature,
+    private val nativeInputOmnibarFeature: NativeInputOmnibarFeature,
     private val browserMode: BrowserMode,
+    appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles,
 ) : ViewModel() {
 
     private val isSplitOmnibarEnabled = settingsDataStore.omnibarType == OmnibarType.SPLIT
     private val isProgressBarUpgradeEnabled = progressBarUpgradeFeature.behaviourUpdate().isEnabled()
     private val isProgressBarIndeterminateEnabled =
         isProgressBarUpgradeEnabled && progressBarUpgradeFeature.indeterminateFallback().isEnabled()
+    private val addressBarRebrandToggle = appBrandDesignUpdateToggles.addressBar()
     private var isSetFavouriteEasterEggLogoFeatureEnabled: Boolean = false
 
     // Tracked separately from ViewState so the derived enabledState can be recomputed
@@ -148,6 +152,7 @@ class OmnibarLayoutViewModel @Inject constructor(
             showBrowserMenu = !isSplitOmnibarEnabled,
             isProgressBarUpgradeEnabled = isProgressBarUpgradeEnabled,
             isProgressBarIndeterminateEnabled = isProgressBarIndeterminateEnabled,
+            isAddressBarRebrandEnabled = addressBarRebrandToggle.isEnabled(),
         ),
     )
 
@@ -278,6 +283,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         val isProgressBarUpgradeEnabled: Boolean = false,
         val isProgressBarIndeterminateEnabled: Boolean = false,
         val enabledState: EnabledState = EnabledState.ALL,
+        val isAddressBarRebrandEnabled: Boolean = false,
     ) {
         /**
          * The Duck.ai entry icon shows the chevron-down (contextual sheet) variant when the native
@@ -314,7 +320,11 @@ class OmnibarLayoutViewModel @Inject constructor(
      * - [NONE]: every button/input is disabled (omnibar locked).
      * - [FIRE_BUTTON_ONLY]: only the fire button is enabled; everything else disabled.
      */
-    enum class EnabledState { ALL, NONE, FIRE_BUTTON_ONLY }
+    enum class EnabledState {
+        ALL,
+        NONE,
+        FIRE_BUTTON_ONLY,
+    }
 
     sealed class Command {
         data object CancelAnimations : Command()
@@ -330,6 +340,7 @@ class OmnibarLayoutViewModel @Inject constructor(
             @field:DrawableRes val icon: Int,
             @field:StringRes val text: Int,
         ) : Command()
+
         data object AdBlockingAnimationSuppressed : Command()
         data object MoveCaretToFront : Command()
         data class LaunchNativeInput(val query: String) : Command()
@@ -358,7 +369,10 @@ class OmnibarLayoutViewModel @Inject constructor(
             duckChat.observeNativeInputFieldUserSettingEnabled(),
             duckChat.observeNativeChatInputEnabled(),
             duckChatInputModeState.inputModeCapability,
-            nativeInputSearchOnlyFeature.self().enabled(),
+            combine(
+                nativeInputOmnibarFeature.self().enabled(),
+                nativeInputOmnibarFeature.nativeInputSearchOnly().enabled(),
+            ) { self, searchOnly -> self && searchOnly },
         ) { nativeInputEnabled, nativeChatInputEnabled, inputModeCapability, searchOnlyRestoreEnabled ->
             _viewState.update {
                 it.copy(
@@ -422,6 +436,15 @@ class OmnibarLayoutViewModel @Inject constructor(
 
         serpEasterEggLogosToggles.setFavourite().enabled().onEach { isSetFavouriteEasterEggLogoFeatureEnabled ->
             this.isSetFavouriteEasterEggLogoFeatureEnabled = isSetFavouriteEasterEggLogoFeatureEnabled
+        }.flowOn(dispatcherProvider.io())
+            .launchIn(viewModelScope)
+
+        addressBarRebrandToggle.enabled().onEach { isAddressBarRebrandEnabled ->
+            _viewState.update {
+                it.copy(
+                    isAddressBarRebrandEnabled = isAddressBarRebrandEnabled,
+                )
+            }
         }.flowOn(dispatcherProvider.io())
             .launchIn(viewModelScope)
     }
@@ -903,7 +926,10 @@ class OmnibarLayoutViewModel @Inject constructor(
         }
     }
 
-    private fun enabledStateFor(locked: Boolean, fireButtonHighlighted: Boolean): EnabledState = when {
+    private fun enabledStateFor(
+        locked: Boolean,
+        fireButtonHighlighted: Boolean,
+    ): EnabledState = when {
         !locked -> EnabledState.ALL
         fireButtonHighlighted -> EnabledState.FIRE_BUTTON_ONLY
         else -> EnabledState.NONE
@@ -1272,16 +1298,17 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     fun onTextInputClickCatcherClicked() {
         viewModelScope.launch {
-            val omnibarText = viewState.value.omnibarText
-            val url = viewState.value.url
-            val isDuckDuckGoQueryUrl = duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)
-            val textToPreFill = if (omnibarText.isNotEmpty() && url.isNotEmpty() && !isDuckDuckGoQueryUrl) {
-                url
-            } else {
-                omnibarText
-            }
-            command.send(Command.LaunchNativeInput(query = textToPreFill))
+            command.send(Command.LaunchNativeInput(query = getPreFillText()))
         }
+    }
+
+    private fun getPreFillText(): String {
+        val omnibarText = viewState.value.omnibarText
+        val url = viewState.value.url
+        if (omnibarText.isEmpty() || url.isEmpty() || duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) return omnibarText
+        if (!omnibarPreFillKillSwitch.self().isEnabled()) return url
+        val displayedUrl = if (isFullUrlEnabled.value) url else addressDisplayFormatter.getShortUrl(url)
+        return if (omnibarText == displayedUrl) url else omnibarText
     }
 
     fun onLogoClicked() {

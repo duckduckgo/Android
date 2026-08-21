@@ -48,6 +48,20 @@
             }
         ]
     },
+    "m_remote_message_auto_dismissed": {
+        "description": "Triggered when RMF dismisses a remote message because one of its display conditions was met",
+        "owners": ["nalcalag"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "message",
+                "description": "The identifier for the message, sourced from the remote message configuration",
+                "type": "string"
+            }
+        ]
+    },
     "m_remote_message_action_clicked": {
         "description": "Triggered when the user clicks the action button on the remote message",
         "owners": ["cmonfortep"],

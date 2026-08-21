@@ -15,6 +15,7 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:clipToPadding="false"
@@ -36,10 +37,11 @@
         android:layout_width="36dp"
         android:layout_height="36dp"
         android:layout_marginStart="8dp"
-        android:background="@drawable/selectable_circular_container_ripple"
+        android:background="@drawable/background_duck_ai_send_button"
         android:importantForAccessibility="no"
         android:scaleType="centerInside"
         android:src="@drawable/ic_arrow_right_24"
-        android:visibility="gone" />
+        android:visibility="gone"
+        app:tint="?attr/daxColorButtonPrimaryText" />
 
 </LinearLayout>

@@ -71,6 +71,12 @@ import logcat.logcat
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import javax.inject.Inject
 
+data class EditPromptRequest(
+    val sessionId: String,
+    val tabId: String,
+    val contextual: Boolean,
+)
+
 interface DuckChatInternal : DuckChat {
     /**
      * Set user setting to determine whether DuckChat should be enabled or disabled.
@@ -222,6 +228,16 @@ interface DuckChatInternal : DuckChat {
     val showModelPickerEvents: Flow<String>
 
     /**
+     * Asks the native input on [EditPromptRequest.tabId] to open the edit screen for a pending session.
+     */
+    fun requestEditPrompt(request: EditPromptRequest)
+
+    /**
+     * Events asking the native input to open the edit screen.
+     */
+    val editPromptRequests: Flow<EditPromptRequest>
+
+    /**
      * Returns whether image upload is enabled or not.
      */
     fun isImageUploadEnabled(): Boolean
@@ -250,6 +266,17 @@ interface DuckChatInternal : DuckChat {
      * Returns whether dedicated Duck.ai contextual mode is enabled (its feature flag is enabled).
      */
     fun isDuckChatContextualModeEnabled(): Boolean
+
+    /**
+     * Returns whether the redesigned Duck.ai contextual entry (anchored menu) is enabled. Only
+     * meaningful when contextual mode is also enabled.
+     */
+    fun isContextualSheetRedesignEnabled(): Boolean
+
+    /**
+     * Returns the side the Search/Duck.ai toggle is defaulted to.
+     */
+    fun resolvedTogglePosition(): NativeInputState.ToggleSelection
 
     /**
      * Checks whether DuckChat is enabled based on remote config flag.
@@ -456,6 +483,7 @@ class RealDuckChat @Inject constructor(
 
     private val _chatState = MutableStateFlow(ChatState.HIDE)
     private val _showModelPickerEvents = MutableSharedFlow<String>(extraBufferCapacity = 1)
+    private val _editPromptRequests = MutableSharedFlow<EditPromptRequest>(extraBufferCapacity = 1)
     private val _nativeInputFieldEnabled = MutableStateFlow(false)
     private val _nativeChatInputEnabled = MutableStateFlow(false)
     private val _nativeInputNavBarEnabled = MutableStateFlow(false)
@@ -486,6 +514,7 @@ class RealDuckChat @Inject constructor(
     private var keepSessionAliveInMinutes: Int = DEFAULT_SESSION_ALIVE
     private var clearChatHistory: Boolean = true
     private var isContextualModeEnabled: Boolean = false
+    private var contextualSheetRedesignEnabled: Boolean = false
     private var isAutomaticContextAttachmentEnabled: Boolean = false
     private var duckAiNativeStorage: Boolean = false
     private var areMultipleContentAttachmentsEnabled: Boolean = false
@@ -564,6 +593,8 @@ class RealDuckChat @Inject constructor(
     override fun isDuckChatFullScreenModeEnabled(): Boolean = isDuckChatFeatureEnabled
 
     override fun isDuckChatContextualModeEnabled(): Boolean = isContextualModeEnabled
+
+    override fun isContextualSheetRedesignEnabled(): Boolean = contextualSheetRedesignEnabled
 
     override fun isAutomaticContextAttachmentEnabled(): Boolean = isAutomaticContextAttachmentEnabled
     override fun isNativeStorageEnabled(): Boolean = duckAiNativeStorage
@@ -647,6 +678,12 @@ class RealDuckChat @Inject constructor(
     }
 
     override val showModelPickerEvents: Flow<String> = _showModelPickerEvents.asSharedFlow()
+
+    override fun requestEditPrompt(request: EditPromptRequest) {
+        _editPromptRequests.tryEmit(request)
+    }
+
+    override val editPromptRequests: Flow<EditPromptRequest> = _editPromptRequests.asSharedFlow()
 
     override val showSettings: StateFlow<Boolean> = _showSettings.asStateFlow()
 
@@ -865,8 +902,7 @@ class RealDuckChat @Inject constructor(
 
     override suspend fun isChatHistoryAvailable(): Boolean = withContext(dispatchers.io()) {
         isEnabled() &&
-            duckChatFeature.useNativeStorageChatData().isEnabled() &&
-            duckChatFeature.historyScreen().isEnabled()
+            duckChatFeature.useNativeStorageChatData().isEnabled()
     }
 
     override suspend fun hasUserEnabledChatHistory(): Boolean {
@@ -891,6 +927,19 @@ class RealDuckChat @Inject constructor(
 
     override suspend fun saveLastUsedTogglePosition(position: String) {
         duckChatFeatureRepository.setLastUsedTogglePosition(position)
+    }
+
+    override fun resolvedTogglePosition(): NativeInputState.ToggleSelection {
+        val defaultPosition = DefaultTogglePosition.fromName(duckChatFeatureRepository.observeDefaultTogglePosition().value)
+        val configured = if (defaultPosition == DefaultTogglePosition.LAST_USED) {
+            DefaultTogglePosition.fromName(duckChatFeatureRepository.observeLastUsedTogglePosition().value)
+        } else {
+            defaultPosition
+        }
+        return when (configured) {
+            DefaultTogglePosition.DUCK_AI -> NativeInputState.ToggleSelection.DUCK_AI
+            else -> NativeInputState.ToggleSelection.SEARCH
+        }
     }
 
     override fun observeLastUsedTogglePosition(): Flow<String?> =
@@ -1026,6 +1075,8 @@ class RealDuckChat @Inject constructor(
 
             isContextualModeEnabled = showContextualMode && isContextualModeKillSwitch
             _showContextualMode.emit(isContextualModeEnabled)
+
+            contextualSheetRedesignEnabled = isContextualModeEnabled && duckChatFeature.contextualSheetRedesign().isEnabled()
 
             isAutomaticContextAttachmentEnabled = isContextualModeEnabled &&
                 duckChatFeature.automaticContextAttachment()

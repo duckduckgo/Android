@@ -23,13 +23,13 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.model.CtaId
-import com.duckduckgo.app.cta.ui.DaxBubbleCta.WavingDaxSpec
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.google.android.material.button.MaterialButton
+import com.duckduckgo.mobile.android.R as CommonR
 
 data class DaxSubscriptionBrandDesignUpdateBubbleCta(
     override val onboardingStore: OnboardingStore,
@@ -61,7 +61,7 @@ data class DaxSubscriptionBrandDesignUpdateBubbleCta(
 ),
     DaxBubbleCta.ShowsWavingDax {
     override val backgroundFillSpec = BackgroundFillSpec(fillHeightDp = 190f, tabletFillHeightDp = 280f, maxHeightFraction = 0.4f)
-    override val activeIncludeId: Int = R.id.primaryCta
+    override val activeIncludeIds: List<Int> = listOf(R.id.primaryCta)
     override val showArrow: Boolean = true
     override val restartWavingDax: Boolean = true
 
@@ -75,7 +75,10 @@ data class DaxSubscriptionBrandDesignUpdateBubbleCta(
     )
 
     override fun configureContentViews(view: View) {
-        view.findViewById<ImageView>(R.id.brandDesignHeaderImage)?.isVisible = true
+        view.findViewById<ImageView>(R.id.brandDesignHeaderImage)?.apply {
+            setImageResource(CommonR.drawable.subscription_96)
+            isVisible = true
+        }
 
         val buttonTextRes = if (isFreeTrialCopy) {
             R.string.onboardingPrivacyProDaxDialogFreeTrialOkButtonBrandDesign
@@ -90,4 +93,6 @@ data class DaxSubscriptionBrandDesignUpdateBubbleCta(
 
         view.findViewById<MaterialButton>(R.id.primaryCta)?.setText(buttonTextRes)
     }
+
+    override fun shouldDropAddressBarFocusWhenShown(): Boolean = true
 }

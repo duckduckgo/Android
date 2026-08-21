@@ -17,6 +17,8 @@
 package com.duckduckgo.app.onboarding.orchestrator
 
 import com.duckduckgo.app.browser.omnibar.OmnibarType
+import com.duckduckgo.app.onboarding.OnboardingPreference
+import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection
 import com.duckduckgo.onboarding.api.LinearOnboardingEvent
 
 /**
@@ -29,6 +31,7 @@ sealed interface NewUserOnboardingEvent : LinearOnboardingEvent {
     data object ContinueClicked : NewUserOnboardingEvent
     data object RestoreRequested : NewUserOnboardingEvent
     data object SkipRequested : NewUserOnboardingEvent
+    data class DownloadReasonConfirmed(val selection: DownloadReasonSelection?) : NewUserOnboardingEvent
     data class DefaultBrowserPromptFinished(val isDefaultBrowser: Boolean) : NewUserOnboardingEvent
     data class AddressBarConfirmed(val type: OmnibarType) : NewUserOnboardingEvent
     data class InputModeConfirmed(val withAi: Boolean) : NewUserOnboardingEvent
@@ -51,4 +54,6 @@ sealed interface NewUserOnboardingEvent : LinearOnboardingEvent {
     data object WidgetPromptSkipped : NewUserOnboardingEvent
 
     data class AddWidgetFinished(val widgetAdded: Boolean) : NewUserOnboardingEvent
+
+    data class PreferenceSelectorConfirmed(val selections: Map<OnboardingPreference, Boolean>) : NewUserOnboardingEvent
 }

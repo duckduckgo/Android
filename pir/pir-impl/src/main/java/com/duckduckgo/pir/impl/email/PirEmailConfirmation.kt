@@ -30,16 +30,15 @@ import com.duckduckgo.pir.impl.common.PirJob
 import com.duckduckgo.pir.impl.common.PirJob.RunType
 import com.duckduckgo.pir.impl.common.PirWebViewCountProvider
 import com.duckduckgo.pir.impl.common.PirWebViewDataCleaner
+import com.duckduckgo.pir.impl.common.PirWorkDistributor
 import com.duckduckgo.pir.impl.common.RealPirActionsRunner
-import com.duckduckgo.pir.impl.common.splitIntoParts
 import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.EmailConfirmationJobRecord
+import com.duckduckgo.pir.impl.scheduling.JobRecordUpdater
 import com.duckduckgo.pir.impl.scripts.PirCssScriptLoader
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject
@@ -81,6 +80,8 @@ class RealPirEmailConfirmation @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val webViewDataCleaner: PirWebViewDataCleaner,
     private val pirWebViewCountProvider: PirWebViewCountProvider,
+    private val pirWorkDistributor: PirWorkDistributor,
+    private val jobRecordUpdater: JobRecordUpdater,
     callbacks: PluginPoint<PirCallbacks>,
 ) : PirJob(callbacks),
     PirEmailConfirmation {
@@ -115,23 +116,8 @@ class RealPirEmailConfirmation @Inject constructor(
             runners.add(pirActionsRunnerFactory.create(context, script, runType))
         }
 
-        val jobRecordsParts = processedJobRecords.splitIntoParts(maxWebViewCount)
+        pirWorkDistributor.executeAll(runners = runners, work = processedJobRecords)
 
-        logcat { "PIR-EMAIL-CONFIRMATION: Total parts ${jobRecordsParts.size}" }
-
-        jobRecordsParts.mapIndexed { index, partSteps ->
-            logcat { "PIR-EMAIL-CONFIRMATION:: Record part [$index] -> ${partSteps.size}" }
-            logcat { "PIR-EMAIL-CONFIRMATION: Record part [$index] breakdown -> ${partSteps.map { it.first.id to it.second.broker.name }}" }
-            // We want to run the runners in parallel but wait for everything to complete before we proceed
-            async {
-                partSteps.forEach { (profile, step) ->
-                    logcat { "PIR-EMAIL-CONFIRMATION: Resuming opt-out on runner=$index for profile=$profile with step=$step" }
-                    runners[index].start(profile, listOf(step))
-                    runners[index].stop()
-                    logcat { "PIR-EMAIL-CONFIRMATION: Finished resuming opt-out on runner=$index for profile=$profile with step=$step" }
-                }
-            }
-        }.awaitAll()
         webViewDataCleaner.cleanWebViewData()
         return@withContext Result.success(Unit)
     }
@@ -185,6 +171,9 @@ class RealPirEmailConfirmation @Inject constructor(
             if (profileQuery != null && brokerStep != null) {
                 profileQuery to brokerStep
             } else {
+                // Count the skipped job as an attempt, otherwise a record we can never run is retried on every
+                // execution instead of ageing out through the max-attempt cleanup.
+                jobRecordUpdater.recordEmailConfirmationAttempt(it.extractedProfileId)
                 null
             }
         }
@@ -244,7 +233,7 @@ class RealPirEmailConfirmation @Inject constructor(
         )
 
         logcat { "PIR-EMAIL-CONFIRMATION: Starting debug execution on visible WebView" }
-        runners[0].startOn(webView, profileQuery, listOf(brokerStep))
+        runners[0].executeOn(webView, profileQuery, brokerStep)
         runners[0].stop()
         logcat { "PIR-EMAIL-CONFIRMATION: Debug execution completed" }
 

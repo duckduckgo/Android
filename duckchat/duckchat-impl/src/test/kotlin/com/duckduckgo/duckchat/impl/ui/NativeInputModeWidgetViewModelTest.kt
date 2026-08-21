@@ -43,7 +43,9 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.EditPromptRequest
 import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.PendingNativePromptStore
 import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
@@ -62,6 +64,7 @@ import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.reader.ChatSuggestionsReader
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -72,6 +75,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -113,6 +118,7 @@ class NativeInputModeWidgetViewModelTest {
     private val autoComplete: AutoComplete = mock()
     private val autoCompleteSettings: AutoCompleteSettings = mock()
     private val duckAiChatHistoryFeature: DuckAiChatHistoryFeature = mock()
+    private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
     private val pixel: Pixel = mock()
     private val duckChatPixels: DuckChatPixels = mock()
     private val modelManager: DuckAiModelManager = mock()
@@ -144,6 +150,7 @@ class NativeInputModeWidgetViewModelTest {
     private val entitlementsFlow = MutableStateFlow<List<Product>>(emptyList())
     private val modelStateFlow = MutableStateFlow(ModelState())
     private val showModelPickerEvents = MutableSharedFlow<String>(extraBufferCapacity = 1)
+    private val editPromptRequestsFlow = MutableSharedFlow<EditPromptRequest>(extraBufferCapacity = 1)
 
     private var fakePlugins: List<NativeInputPlugin> = emptyList()
     private val fakePluginPoint = object : ActivePluginPoint<NativeInputPlugin> {
@@ -160,6 +167,7 @@ class NativeInputModeWidgetViewModelTest {
         whenever(duckChatInternal.observeChatSuggestionsUserSettingEnabled()).thenReturn(chatSuggestionsUserEnabledFlow)
         whenever(duckChatInternal.chatState).thenReturn(chatStateFlow)
         whenever(duckChatInternal.showModelPickerEvents).thenReturn(showModelPickerEvents)
+        whenever(duckChatInternal.editPromptRequests).thenReturn(editPromptRequestsFlow)
         whenever(subscriptions.getEntitlementStatus()).thenReturn(entitlementsFlow)
         whenever(modelManager.modelState).thenReturn(modelStateFlow)
         whenever(autoCompleteFactory.create(any(), any())).thenReturn(autoComplete)
@@ -182,6 +190,7 @@ class NativeInputModeWidgetViewModelTest {
             browserMode = BrowserMode.REGULAR,
             autoCompleteSettings = autoCompleteSettings,
             duckAiChatHistoryFeature = duckAiChatHistoryFeature,
+            duckChatFeature = duckChatFeature,
             dispatchers = coroutineRule.testDispatcherProvider,
             pixel = pixel,
             duckChatPixels = duckChatPixels,
@@ -421,6 +430,66 @@ class NativeInputModeWidgetViewModelTest {
         val state = testee.state.first()
         assertEquals(NativeInputState.InputContext.DUCK_AI, state.inputContext)
         assertEquals(NativeInputState.ToggleSelection.DUCK_AI, state.toggleSelection)
+    }
+
+    @Test
+    fun whenEditRequestTargetsThisTabThenItIsEmitted() = runTest {
+        testee.configure(tabId = "tab-1", isDuckAiMode = true, isBottom = false)
+
+        val emissions = mutableListOf<EditPromptRequest>()
+        // Advance once to establish the collector's subscription before emitting — tryEmit on a
+        // replay=0 SharedFlow is lost if no subscriber has started collecting yet.
+        val job = launch { testee.editPromptRequests.toList(emissions) }
+        advanceUntilIdle()
+        editPromptRequestsFlow.tryEmit(EditPromptRequest("session-1", "tab-1", contextual = false))
+        advanceUntilIdle()
+
+        assertEquals(1, emissions.size)
+        assertEquals("session-1", emissions.single().sessionId)
+        job.cancel()
+    }
+
+    @Test
+    fun whenEditRequestTargetsAnotherTabThenItIsIgnored() = runTest {
+        testee.configure(tabId = "tab-1", isDuckAiMode = true, isBottom = false)
+
+        val emissions = mutableListOf<EditPromptRequest>()
+        val job = launch { testee.editPromptRequests.toList(emissions) }
+        advanceUntilIdle()
+        editPromptRequestsFlow.tryEmit(EditPromptRequest("session-1", "tab-2", contextual = false))
+        advanceUntilIdle()
+
+        assertTrue(emissions.isEmpty())
+        job.cancel()
+    }
+
+    @Test
+    fun whenEditRequestTargetsThisTabButWrongSurfaceThenItIsIgnored() = runTest {
+        testee.configureContextual(tabId = "tab-1")
+
+        val emissions = mutableListOf<EditPromptRequest>()
+        val job = launch { testee.editPromptRequests.toList(emissions) }
+        advanceUntilIdle()
+        editPromptRequestsFlow.tryEmit(EditPromptRequest("session-2", "tab-1", contextual = false))
+        advanceUntilIdle()
+
+        assertTrue(emissions.isEmpty())
+        job.cancel()
+    }
+
+    @Test
+    fun whenEditRequestTargetsThisTabAndSurfaceMatchesThenTheContextualWidgetEmitsIt() = runTest {
+        testee.configureContextual(tabId = "tab-1")
+
+        val emissions = mutableListOf<EditPromptRequest>()
+        val job = launch { testee.editPromptRequests.toList(emissions) }
+        advanceUntilIdle()
+        editPromptRequestsFlow.tryEmit(EditPromptRequest("session-1", "tab-1", contextual = true))
+        advanceUntilIdle()
+
+        assertEquals(1, emissions.size)
+        assertEquals("session-1", emissions.single().sessionId)
+        job.cancel()
     }
 
     @Test
@@ -1586,6 +1655,31 @@ class NativeInputModeWidgetViewModelTest {
     // region fireSubmissionPixels
 
     @Test
+    fun whenSearchSubmittedWithVisibleToggleThenResolvedDefaultModeIsPassedToPixels() = runTest {
+        setIsEnabled(true)
+        inputScreenUserSettingFlow.value = true
+        whenever(duckChatInternal.resolvedTogglePosition()).thenReturn(NativeInputState.ToggleSelection.SEARCH)
+        advanceUntilIdle()
+
+        testee.fireOmnibarQuerySubmitted("query")
+
+        verify(duckChatPixels).fireOmnibarQuerySubmitted("query", NativeInputState.ToggleSelection.SEARCH)
+    }
+
+    @Test
+    fun whenSearchSubmittedOutsideBrowserContextThenDefaultModeIsOmitted() = runTest {
+        setIsEnabled(true)
+        inputScreenUserSettingFlow.value = true
+        whenever(duckChatInternal.resolvedTogglePosition()).thenReturn(NativeInputState.ToggleSelection.SEARCH)
+        testee.configure(tabId = "test-tab", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+
+        testee.fireOmnibarQuerySubmitted("query")
+
+        verify(duckChatPixels).fireOmnibarQuerySubmitted("query", null)
+    }
+
+    @Test
     fun whenImageGenerationToolSelectedThenFiresPromptSubmittedAndImageGenerationSubmitted() = runTest {
         val tabId = "tab-A"
         whenever(modelManager.getSelectedModelId()).thenReturn("model-1")
@@ -1605,6 +1699,7 @@ class NativeInputModeWidgetViewModelTest {
             hasFileAttachment = false,
             hasText = true,
             surface = DuckChatPixelSurface.DUCK_AI,
+            defaultMode = null,
         )
         verify(duckChatPixels).fireImageGenerationSubmitted(any())
         verify(duckChatPixels, never()).fireWebSearchSubmitted(any())
@@ -1629,9 +1724,52 @@ class NativeInputModeWidgetViewModelTest {
             hasFileAttachment = false,
             hasText = true,
             surface = DuckChatPixelSurface.DUCK_AI,
+            defaultMode = null,
         )
         verify(duckChatPixels, never()).fireImageGenerationSubmitted(any())
         verify(duckChatPixels, never()).fireWebSearchSubmitted(any())
+    }
+
+    @Test
+    fun whenPromptSubmittedFromAddressBarThenResolvedDefaultModeIsPassedToPixels() = runTest {
+        setIsEnabled(true)
+        inputScreenUserSettingFlow.value = true
+        whenever(duckChatInternal.resolvedTogglePosition()).thenReturn(NativeInputState.ToggleSelection.SEARCH)
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = false, isBottom = false)
+        advanceUntilIdle()
+
+        viewModel.fireSubmissionPixels(hasText = true, hasImageAttachment = false, hasFileAttachment = false)
+
+        verify(duckChatPixels).firePromptSubmitted(
+            selectedTool = "none",
+            modelId = null,
+            reasoningEffort = null,
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            hasText = true,
+            surface = DuckChatPixelSurface.ADDRESS_BAR,
+            defaultMode = NativeInputState.ToggleSelection.SEARCH,
+        )
+    }
+
+    @Test
+    fun whenPromptSubmittedFromAddressBarWithHiddenToggleThenDefaultModeIsOmitted() = runTest {
+        whenever(duckChatInternal.resolvedTogglePosition()).thenReturn(NativeInputState.ToggleSelection.SEARCH)
+        advanceUntilIdle()
+
+        testee.fireSubmissionPixels(hasText = true, hasImageAttachment = false, hasFileAttachment = false)
+
+        verify(duckChatPixels).firePromptSubmitted(
+            selectedTool = "none",
+            modelId = null,
+            reasoningEffort = null,
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            hasText = true,
+            surface = DuckChatPixelSurface.ADDRESS_BAR,
+            defaultMode = null,
+        )
     }
 
     @Test
@@ -1654,6 +1792,7 @@ class NativeInputModeWidgetViewModelTest {
             hasFileAttachment = false,
             hasText = true,
             surface = DuckChatPixelSurface.DUCK_AI,
+            defaultMode = null,
         )
         verify(duckChatPixels).fireWebSearchSubmitted(any())
         verify(duckChatPixels, never()).fireImageGenerationSubmitted(any())
@@ -1756,4 +1895,22 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     // endregion
+
+    @Test
+    fun whenResolvedTogglePositionThenDelegatesToDuckChat() = runTest {
+        setIsEnabled(true)
+        inputScreenUserSettingFlow.value = true
+        whenever(duckChatInternal.resolvedTogglePosition()).thenReturn(NativeInputState.ToggleSelection.DUCK_AI)
+        advanceUntilIdle()
+
+        assertEquals(NativeInputState.ToggleSelection.DUCK_AI, testee.resolvedTogglePosition())
+    }
+
+    @Test
+    fun whenNoToggleOfferedThenResolvedTogglePositionIsNull() = runTest {
+        whenever(duckChatInternal.resolvedTogglePosition()).thenReturn(NativeInputState.ToggleSelection.DUCK_AI)
+        advanceUntilIdle()
+
+        assertNull(testee.resolvedTogglePosition())
+    }
 }

@@ -66,6 +66,13 @@
                     app:primaryText="Enable Dark Theme"
                     app:showSwitch="true"/>
 
+                <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                    android:id="@+id/brand_design_switch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryText="Brand design update"
+                    app:showSwitch="true"/>
+
             </LinearLayout>
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>

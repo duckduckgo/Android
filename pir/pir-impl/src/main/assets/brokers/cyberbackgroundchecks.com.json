@@ -1,10 +1,9 @@
 {
   "name": "Cyber Background Checks",
   "url": "cyberbackgroundchecks.com",
-  "version": "0.8.0",
-  "parent": "peoplefinders.com",
+  "version": "0.9.0",
   "addedDatetime": 1705644000000,
-  "optOutUrl": "https://cyberbackgroundchecks.com/donotsellmyinfo",
+  "optOutUrl": "https://www.cyberbackgroundchecks.com/removal",
   "steps": [
     {
       "stepType": "scan",
@@ -37,6 +36,7 @@
           "id": "131315c4-a434-480e-a5d4-27f73bfafc7a"
         },
         {
+          "_comment": "addressFull/addressFullList retain the street and zip of each parsed address as address extras (C-S-S #2907). The opt-out form fills a street from those extras, so this extraction must stay in place. Note parse-address drops any address it can't read a street from, current or previous.",
           "actionType": "extract",
           "id": "d6c07b68-7a33-45a4-9e8e-ae6f9262ef29",
           "selector": ".card",
@@ -74,8 +74,192 @@
     },
     {
       "stepType": "optOut",
-      "optOutType": "parentSiteOptOut",
-      "actions": []
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://www.cyberbackgroundchecks.com/removal",
+          "id": "5e78e1f8-7e99-466f-99f0-9ea8bb5feec9"
+        },
+        {
+          "actionType": "expectation",
+          "_comment": "wait for cloudflare check to pass - we are using a negative xpath selector to ensure the challenge is not being displayed",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//script[contains(@src, '/cdn-cgi/challenge-platform/')]) and not(.//script[contains(., '_cf_chl_opt')])]"
+            }
+          ],
+          "id": "cfc-2edeb6a2-4108-4acc-b957-04300fbc64c8"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "CyberBackgroundChecks Opt-Out Form"
+            }
+          ],
+          "id": "37662209-3966-4cbd-810b-b39975018b14"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": "//form[.//input[@id='chk-agree-to-terms']]",
+          "dataSource": "userProfile",
+          "elements": [
+            {
+              "type": "firstName",
+              "selector": ".//input[@id='FirstName']"
+            },
+            {
+              "type": "middleName",
+              "selector": ".//input[@id='MiddleName']"
+            },
+            {
+              "type": "lastName",
+              "selector": ".//input[@id='LastName']"
+            }
+          ],
+          "id": "b2bc6f6b-cf8d-4a71-917b-35d57c8ad4fe"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": "//form[.//input[@id='chk-agree-to-terms']]",
+          "elements": [
+            {
+              "type": "email",
+              "selector": ".//input[@id='Email']"
+            }
+          ],
+          "id": "6fea94b2-5a0a-4284-b5a5-ca14f4638dcf"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "//input[@id='chk-agree-to-terms']"
+            }
+          ],
+          "id": "8849659f-e933-4675-b44a-ecfce314764c"
+        },
+        {
+          "actionType": "getCaptchaInfo",
+          "selector": ".g-recaptcha",
+          "id": "7eb64802-9932-42b6-a168-f7ba99e2ad36"
+        },
+        {
+          "actionType": "solveCaptcha",
+          "selector": ".g-recaptcha",
+          "id": "f917ed01-dc20-4659-9459-9199e3010d49"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "//form[.//input[@id='chk-agree-to-terms']]//button[@type='submit']"
+            }
+          ],
+          "id": "e818d1f7-2ed8-45f8-b4f9-c140d3606c0a"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Email Sent"
+            }
+          ],
+          "id": "19b19939-5579-4790-944f-3a18c03019bb"
+        },
+        {
+          "actionType": "emailConfirmation",
+          "pollingTime": 30,
+          "id": "a2873b49-942f-4ef8-b0ca-2dd1d3509bb9"
+        },
+        {
+          "actionType": "expectation",
+          "_comment": "wait for cloudflare check to pass - we are using a negative xpath selector to ensure the challenge is not being displayed",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//script[contains(@src, '/cdn-cgi/challenge-platform/')]) and not(.//script[contains(., '_cf_chl_opt')])]"
+            }
+          ],
+          "id": "cfc-050935e2-af10-4d36-8354-400321d773b9"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Record Suppression Form"
+            }
+          ],
+          "id": "4c462039-aa57-4cf2-b97d-cec42ecdd46c"
+        },
+        {
+          "_comment": "CBC verifies the submitted address against the record it holds, so street/city/state come from the address extracted during the scan rather than from generated values, which this cluster rejects. fillForm resolves them from whichever extracted address matches the user profile's city/state, which is not necessarily the record's current address. Date of Birth is required and is a single date input, so it uses $generated_dob$, which derives a date from the extracted age (or the profile's age when the record shows none).",
+          "actionType": "fillForm",
+          "selector": "#contact-form",
+          "dataSource": "extractedProfile",
+          "elements": [
+            {
+              "type": "$generated_dob$",
+              "selector": ".//input[@id='Dob']"
+            },
+            {
+              "type": "street",
+              "selector": ".//input[@id='StreetAddress']"
+            },
+            {
+              "type": "city",
+              "selector": ".//input[@id='City']"
+            },
+            {
+              "type": "state",
+              "selector": ".//input[@id='State']"
+            }
+          ],
+          "id": "6a54b508-9f50-4a0c-9e0c-0674621075c2"
+        },
+        {
+          "actionType": "getCaptchaInfo",
+          "selector": ".g-recaptcha",
+          "id": "8573a11e-b931-4b1b-a92a-b652344945bb"
+        },
+        {
+          "actionType": "solveCaptcha",
+          "selector": ".g-recaptcha",
+          "id": "daa1b0f7-ebbb-4588-9357-d70fcfd553fa"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "//form[@id='contact-form']//button[@type='submit']"
+            }
+          ],
+          "id": "3d61d592-dee7-499f-a028-3da00c7de071"
+        },
+        {
+          "_comment": "Assert on the success copy specifically: CBC renders rejections as in-page messages rather than errors, so a weaker check would false-positive.",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Opt-Out Request Received"
+            }
+          ],
+          "id": "dafcee39-4fa6-41a5-b958-9de0a53ebf5b"
+        }
+      ]
     }
   ],
   "schedulingConfig": {

@@ -555,6 +555,13 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                 }
                 setCurrentDialog(QUICK_SETUP)
             }
+
+            NewUserOnboardingActivityDialog.DownloadReason,
+            is NewUserOnboardingActivityDialog.SegmentedComparisonChart,
+            is NewUserOnboardingActivityDialog.PreferenceSelector,
+            -> {
+                // These views are only presented in the config-driven onboarding flow, which is not driven by this VM.
+            }
         }
     }
 

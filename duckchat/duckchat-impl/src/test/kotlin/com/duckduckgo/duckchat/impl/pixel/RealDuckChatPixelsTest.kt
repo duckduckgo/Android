@@ -19,6 +19,8 @@ package com.duckduckgo.duckchat.impl.pixel
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.ToggleSelection
+import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.ReportMetric
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_ACCEPT_TERMS_AND_CONDITIONS
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_CREATE_NEW_CHAT
@@ -86,6 +88,7 @@ class RealDuckChatPixelsTest {
     private val statisticsUpdater: StatisticsUpdater = mock()
     private val duckAiMetricCollector: DuckAiMetricCollector = mock()
     private val mockTermsOfServiceHandler: DuckChatTermsOfServiceHandler = mock()
+    private val mockDuckChatInternal: DuckChatInternal = mock()
 
     private lateinit var testee: RealDuckChatPixels
 
@@ -96,6 +99,7 @@ class RealDuckChatPixelsTest {
         testee = RealDuckChatPixels(
             pixel = mockPixel,
             duckChatFeatureRepository = mockDuckChatFeatureRepository,
+            duckChatInternal = mockDuckChatInternal,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             statisticsUpdater = statisticsUpdater,
@@ -325,6 +329,59 @@ class RealDuckChatPixelsTest {
     }
 
     @Test
+    fun `when reportContextualAskAboutPageSuggestionSelected then fires selected pixel with the reserved id`() = runTest {
+        testee.reportContextualAskAboutPageSuggestionSelected("article")
+
+        advanceUntilIdle()
+
+        val params = mapOf("suggestionId" to "ask-about-page", "pageType" to "article")
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SUGGESTION_SELECTED_COUNT, params)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SUGGESTION_SELECTED_DAILY, params, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun `when reportContextualSuggestionSelected then fires count and daily with suggestion id and page type`() = runTest {
+        testee.reportContextualSuggestionSelected("summarize-video", "video")
+
+        advanceUntilIdle()
+
+        val params = mapOf("suggestionId" to "summarize-video", "pageType" to "video")
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SUGGESTION_SELECTED_COUNT, params)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SUGGESTION_SELECTED_DAILY, params, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun `when reportContextualSuggestionsViewed then fires count and daily with smartness and page type`() = runTest {
+        testee.reportContextualSuggestionsViewed(isSmart = true, pageType = "recipe")
+
+        advanceUntilIdle()
+
+        val params = mapOf("isSmart" to "true", "pageType" to "recipe")
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SUGGESTIONS_VIEWED_COUNT, params)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SUGGESTIONS_VIEWED_DAILY, params, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun `when reportContextualSuggestionsContextCollectionTimedOut then fires count and daily`() = runTest {
+        testee.reportContextualSuggestionsContextCollectionTimedOut()
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SUGGESTIONS_TIMED_OUT_COUNT)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SUGGESTIONS_TIMED_OUT_DAILY, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun `when reportContextualSuggestionsCatalogLoadFailed then fires count and daily`() = runTest {
+        testee.reportContextualSuggestionsCatalogLoadFailed()
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SUGGESTIONS_CATALOG_LOAD_FAILED_COUNT)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SUGGESTIONS_CATALOG_LOAD_FAILED_DAILY, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
     fun `when reportChatSyncActive then fires daily pixel`() {
         testee.reportChatSyncActive()
 
@@ -400,13 +457,37 @@ class RealDuckChatPixelsTest {
     }
 
     @Test
-    fun whenFireOmnibarShownThenCountAndDailyFired() = runTest {
+    fun whenFireOmnibarShownWithToggleVisibleThenParamsReflectIt() = runTest {
+        whenever(mockDuckChatInternal.resolvedTogglePosition()).thenReturn(ToggleSelection.SEARCH)
+
         testee.fireOmnibarShown()
 
         advanceUntilIdle()
 
-        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SHOWN_COUNT)
-        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SHOWN_DAILY, type = Pixel.PixelType.Daily())
+        val params = mapOf(DuckChatPixelParameters.TOGGLE_VISIBLE to "true")
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SHOWN_COUNT, parameters = params)
+        verify(mockPixel).fire(
+            DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SHOWN_DAILY,
+            parameters = params,
+            type = Pixel.PixelType.Daily(),
+        )
+    }
+
+    @Test
+    fun whenFireOmnibarShownWithNoToggleThenParamsReflectIt() = runTest {
+        whenever(mockDuckChatInternal.resolvedTogglePosition()).thenReturn(null)
+
+        testee.fireOmnibarShown()
+
+        advanceUntilIdle()
+
+        val params = mapOf(DuckChatPixelParameters.TOGGLE_VISIBLE to "false")
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SHOWN_COUNT, parameters = params)
+        verify(mockPixel).fire(
+            DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SHOWN_DAILY,
+            parameters = params,
+            type = Pixel.PixelType.Daily(),
+        )
     }
 
     @Test
@@ -456,19 +537,70 @@ class RealDuckChatPixelsTest {
 
     @Test
     fun whenFireOmnibarQuerySubmittedThenCountCarriesLengthBucketAndDailyHasNoParams() = runTest {
-        testee.fireOmnibarQuerySubmitted("hi") // 2 chars -> "short"
+        testee.fireOmnibarQuerySubmitted("hi", defaultMode = null) // 2 chars -> "short"
 
         advanceUntilIdle()
 
         verify(mockPixel).fire(
             pixel = DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_QUERY_SUBMITTED,
-            parameters = mapOf(DuckChatPixelParameters.TEXT_LENGTH_BUCKET to "short"),
+            parameters = mapOf(
+                DuckChatPixelParameters.TEXT_LENGTH_BUCKET to "short",
+                DuckChatPixelParameters.TOGGLE_VISIBLE to "false",
+            ),
         )
         verify(mockPixel).fire(
             pixel = DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_QUERY_SUBMITTED_DAILY,
             parameters = emptyMap(),
             encodedParameters = emptyMap(),
             type = Pixel.PixelType.Daily(),
+        )
+    }
+
+    @Test
+    fun whenQuerySubmittedWithNoToggleOfferedThenDefaultModeIsOmittedAndToggleVisibleIsFalse() = runTest {
+        testee.fireOmnibarQuerySubmitted("hi", defaultMode = null)
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(
+            pixel = DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_QUERY_SUBMITTED,
+            parameters = mapOf(
+                DuckChatPixelParameters.TEXT_LENGTH_BUCKET to "short",
+                DuckChatPixelParameters.TOGGLE_VISIBLE to "false",
+            ),
+        )
+    }
+
+    @Test
+    fun whenQuerySubmittedAfterSearchDefaultThenDefaultModeIsSearch() = runTest {
+        testee.fireOmnibarQuerySubmitted("hi", defaultMode = ToggleSelection.SEARCH)
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(
+            pixel = DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_QUERY_SUBMITTED,
+            parameters = mapOf(
+                DuckChatPixelParameters.TEXT_LENGTH_BUCKET to "short",
+                DuckChatPixelParameters.TOGGLE_VISIBLE to "true",
+                DuckChatPixelParameters.DEFAULT_MODE to "search",
+            ),
+        )
+    }
+
+    @Test
+    fun whenQuerySubmittedAfterDuckAiDefaultThenDefaultModeIsDuckAi() = runTest {
+        // Search submitted while the toggle opened on Duck.ai: the user switched away from the default.
+        testee.fireOmnibarQuerySubmitted("hi", defaultMode = ToggleSelection.DUCK_AI)
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(
+            pixel = DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_QUERY_SUBMITTED,
+            parameters = mapOf(
+                DuckChatPixelParameters.TEXT_LENGTH_BUCKET to "short",
+                DuckChatPixelParameters.TOGGLE_VISIBLE to "true",
+                DuckChatPixelParameters.DEFAULT_MODE to "duck_ai",
+            ),
         )
     }
 

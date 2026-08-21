@@ -47,6 +47,7 @@ import com.duckduckgo.subscriptions.impl.auth2.AccessTokenClaims
 import com.duckduckgo.subscriptions.impl.auth2.AuthClient
 import com.duckduckgo.subscriptions.impl.auth2.AuthJwtValidator
 import com.duckduckgo.subscriptions.impl.auth2.BackgroundTokenRefresh
+import com.duckduckgo.subscriptions.impl.auth2.CrossProcessLock
 import com.duckduckgo.subscriptions.impl.auth2.PkceGenerator
 import com.duckduckgo.subscriptions.impl.auth2.RefreshTokenClaims
 import com.duckduckgo.subscriptions.impl.auth2.TokenPair
@@ -88,6 +89,7 @@ import dagger.Lazy
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -96,6 +98,8 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.asLog
@@ -292,6 +296,7 @@ class RealSubscriptionsManager @Inject constructor(
     private val pkceGenerator: PkceGenerator,
     private val timeProvider: CurrentTimeProvider,
     private val backgroundTokenRefresh: BackgroundTokenRefresh,
+    private val crossProcessLock: CrossProcessLock,
     private val subscriptionPurchaseWideEvent: SubscriptionPurchaseWideEvent,
     private val tokenRefreshWideEvent: AuthTokenRefreshWideEvent,
     private val subscriptionSwitchWideEvent: SubscriptionSwitchWideEvent,
@@ -328,6 +333,8 @@ class RealSubscriptionsManager @Inject constructor(
     override val entitlementSet = _entitlementSet.onSubscription { emitEntitlementsValues() }
 
     private var purchaseStateJob: Job? = null
+
+    private val tokenRefreshMutex = Mutex()
 
     private var removeExpiredSubscriptionOnCancelledPurchase: Boolean = false
 
@@ -761,91 +768,127 @@ class RealSubscriptionsManager @Inject constructor(
     }
 
     override suspend fun refreshAccessToken() {
-        try {
-            tokenRefreshWideEvent.onStart(subscriptionStatus())
-            val refreshToken = checkNotNull(authRepository.getRefreshTokenV2())
-            tokenRefreshWideEvent.onTokenRead()
+        val serializeRefresh = withContext(dispatcherProvider.io()) {
+            subscriptionsFeature.get().serializeTokenRefresh().isEnabled()
+        }
 
-            /*
-                Get jwks before refreshing the token, just in case getting jwks fails. We don't want to end up in a situation where
-                a new token has been fetched (potentially invalidating the old one), but we can't validate and store it.
-             */
-            val jwks = authClient.getJwks()
-            tokenRefreshWideEvent.onJwksFetched()
+        if (!serializeRefresh) {
+            try {
+                tokenRefreshWideEvent.onStart(subscriptionStatus(), serializationEnabled = false)
+                doRefreshAccessToken()
+                tokenRefreshWideEvent.onSuccess()
+            } catch (e: Exception) {
+                tokenRefreshWideEvent.onFailure(e)
+                throw e
+            }
+            return
+        }
 
-            val newTokens = try {
-                val tokens = authClient.getTokens(refreshToken.jwt)
-                tokenRefreshWideEvent.onTokensFetched()
-                validateTokens(tokens, jwks)
-                    .also { tokenRefreshWideEvent.onTokensValidated() }
-            } catch (e: HttpException) {
-                val backendErrorResponse = parseError(e)?.error
-                    ?.also { tokenRefreshWideEvent.onBackendErrorResponse(backendErrorResponse = it) }
+        // Moving token refresh to app-scoped coroutine to ensure it's not interrupted by caller cancellation.
+        coroutineScope.async {
+            tokenRefreshMutex.withLock {
+                try {
+                    tokenRefreshWideEvent.onStart(subscriptionStatus(), serializationEnabled = true)
 
-                if (e.code() == 400) {
-                    if (backendErrorResponse == "unknown_account") {
-                        /*
-                        Refresh token appears to be valid, but the related account doesn't exist in BE.
-                        After the subscription expires, BE eventually deletes the account, so this is expected.
-                         */
-                        tokenRefreshWideEvent.onUnknownAccountError()
+                    val lockResult = crossProcessLock.acquire(TOKEN_REFRESH_LOCK_KEY)
+                    tokenRefreshWideEvent.onCrossProcessLockAcquired(lockResult)
+
+                    try {
+                        doRefreshAccessToken()
+                    } finally {
+                        lockResult.getOrNull()?.let { lockHandle ->
+                            withContext(dispatcherProvider.io()) { lockHandle.close() }
+                        }
+                    }
+
+                    tokenRefreshWideEvent.onSuccess()
+                } catch (e: Exception) {
+                    tokenRefreshWideEvent.onFailure(e)
+                    throw e
+                }
+            }
+        }.await()
+    }
+
+    private suspend fun doRefreshAccessToken() {
+        val refreshToken = checkNotNull(authRepository.getRefreshTokenV2())
+        tokenRefreshWideEvent.onTokenRead()
+
+        /*
+            Get jwks before refreshing the token, just in case getting jwks fails. We don't want to end up in a situation where
+            a new token has been fetched (potentially invalidating the old one), but we can't validate and store it.
+         */
+        val jwks = authClient.getJwks()
+        tokenRefreshWideEvent.onJwksFetched()
+
+        val newTokens = try {
+            val tokens = authClient.getTokens(refreshToken.jwt)
+            tokenRefreshWideEvent.onTokensFetched()
+            validateTokens(tokens, jwks)
+                .also { tokenRefreshWideEvent.onTokensValidated() }
+        } catch (e: HttpException) {
+            val backendErrorResponse = parseError(e)?.error
+                ?.also { tokenRefreshWideEvent.onBackendErrorResponse(backendErrorResponse = it) }
+
+            if (e.code() == 400) {
+                if (backendErrorResponse == "unknown_account") {
+                    /*
+                    Refresh token appears to be valid, but the related account doesn't exist in BE.
+                    After the subscription expires, BE eventually deletes the account, so this is expected.
+                     */
+                    tokenRefreshWideEvent.onUnknownAccountError()
+                    signOut()
+                    throw e
+                }
+
+                // refresh token is invalid / expired -> try to get a new pair of tokens using store login
+                pixelSender.reportAuthV2InvalidRefreshTokenDetected()
+                val account = checkNotNull(authRepository.getAccount()) { "Missing account info when refreshing access token" }
+
+                when (val storeLoginResult = storeLogin(account.externalId)) {
+                    is StoreLoginResult.Success -> {
+                        tokenRefreshWideEvent.onPlayLoginSuccess()
+                        pixelSender.reportAuthV2InvalidRefreshTokenRecovered()
+                        storeLoginResult.tokens
+                    }
+
+                    StoreLoginResult.Failure.AccountExternalIdMismatch,
+                    StoreLoginResult.Failure.AuthenticationError,
+                    StoreLoginResult.Failure.NoActivePurchase,
+                    -> {
+                        tokenRefreshWideEvent.onPlayLoginFailure(
+                            signedOut = true,
+                            refreshException = e,
+                            loginError = storeLoginResult.javaClass.simpleName,
+                        )
+                        pixelSender.reportAuthV2InvalidRefreshTokenSignedOut()
                         signOut()
                         throw e
                     }
 
-                    // refresh token is invalid / expired -> try to get a new pair of tokens using store login
-                    pixelSender.reportAuthV2InvalidRefreshTokenDetected()
-                    val account = checkNotNull(authRepository.getAccount()) { "Missing account info when refreshing access token" }
-
-                    when (val storeLoginResult = storeLogin(account.externalId)) {
-                        is StoreLoginResult.Success -> {
-                            tokenRefreshWideEvent.onPlayLoginSuccess()
-                            pixelSender.reportAuthV2InvalidRefreshTokenRecovered()
-                            storeLoginResult.tokens
+                    is StoreLoginResult.Failure.TokenValidationFailed,
+                    is StoreLoginResult.Failure.PurchaseInfoNotAvailable,
+                    is StoreLoginResult.Failure.UnknownError,
+                    -> {
+                        val loginError = when (storeLoginResult) {
+                            is StoreLoginResult.Failure.PurchaseInfoNotAvailable ->
+                                "${storeLoginResult.javaClass.simpleName} - ${storeLoginResult.cause}"
+                            else -> storeLoginResult.javaClass.simpleName
                         }
-
-                        StoreLoginResult.Failure.AccountExternalIdMismatch,
-                        StoreLoginResult.Failure.AuthenticationError,
-                        StoreLoginResult.Failure.NoActivePurchase,
-                        -> {
-                            tokenRefreshWideEvent.onPlayLoginFailure(
-                                signedOut = true,
-                                refreshException = e,
-                                loginError = storeLoginResult.javaClass.simpleName,
-                            )
-                            pixelSender.reportAuthV2InvalidRefreshTokenSignedOut()
-                            signOut()
-                            throw e
-                        }
-
-                        is StoreLoginResult.Failure.TokenValidationFailed,
-                        is StoreLoginResult.Failure.PurchaseInfoNotAvailable,
-                        is StoreLoginResult.Failure.UnknownError,
-                        -> {
-                            val loginError = when (storeLoginResult) {
-                                is StoreLoginResult.Failure.PurchaseInfoNotAvailable ->
-                                    "${storeLoginResult.javaClass.simpleName} - ${storeLoginResult.cause}"
-                                else -> storeLoginResult.javaClass.simpleName
-                            }
-                            tokenRefreshWideEvent.onPlayLoginFailure(
-                                signedOut = false,
-                                refreshException = e,
-                                loginError = loginError,
-                            )
-                            throw e
-                        }
+                        tokenRefreshWideEvent.onPlayLoginFailure(
+                            signedOut = false,
+                            refreshException = e,
+                            loginError = loginError,
+                        )
+                        throw e
                     }
-                } else {
-                    throw e
                 }
+            } else {
+                throw e
             }
-
-            saveTokens(newTokens)
-            tokenRefreshWideEvent.onSuccess()
-        } catch (e: Exception) {
-            tokenRefreshWideEvent.onFailure(e)
-            throw e
         }
+
+        saveTokens(newTokens)
     }
 
     override suspend fun refreshSubscriptionData() {
@@ -1346,6 +1389,7 @@ class RealSubscriptionsManager @Inject constructor(
 
     companion object {
         const val SUBSCRIPTION_NOT_FOUND_ERROR = "SubscriptionNotFound"
+        private const val TOKEN_REFRESH_LOCK_KEY = "auth_token_refresh"
     }
 }
 

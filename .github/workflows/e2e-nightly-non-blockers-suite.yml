@@ -1,8 +1,10 @@
 name: 'End to End Tests - Full Suite of non release blocker tests (Nightly)'
 
+run-name: 'End to End Tests - Full Suite of non release blocker tests (${{ inputs.ddg_di || ''default DI'' }} Nightly)'
+
+# Scheduling lives in e2e-nightly-non-blockers-orchestrator.yml, which runs this suite once
+# per DI framework — a `schedule` trigger here could only ever run the default DI.
 on:
-  schedule:
-    - cron: '0 5 * * *' # run at 5 AM UTC
   workflow_call:
     inputs:
       commit:
@@ -10,10 +12,10 @@ on:
         required: true
         type: string
       ddg_di:
-        description: 'DI framework to build with (AnvilDagger or Metro)'
+        description: 'DI framework to build with. Leave empty to use ddg.di from gradle.properties; set AnvilDagger or Metro to pin one.'
         required: false
         type: string
-        default: 'AnvilDagger'
+        default: ''
   workflow_dispatch:
     inputs:
       commit:
@@ -21,23 +23,26 @@ on:
         required: false
         type: string
       ddg_di:
-        description: 'DI framework to build with (AnvilDagger or Metro)'
+        description: 'DI framework to build with. Leave empty to use ddg.di from gradle.properties; set AnvilDagger or Metro to pin one.'
         required: false
         type: string
-        default: 'AnvilDagger'
+        default: ''
 
+# The DI framework is part of the group because a single caller runs this workflow once per DI
 concurrency:
-  group: ${{ github.workflow_ref }}-${{ github.ref }}
+  group: ${{ github.workflow_ref }}-${{ github.ref }}-${{ inputs.ddg_di || 'default' }}
   cancel-in-progress: true
 
-# Compute DI-variant suffixes once. Empty when AnvilDagger (or input missing) so
-# maestro test names and Asana task names stay byte-identical to pre-change for
-# the default Anvil path. Pattern uses truthy-first ternary because `A && '' || X`
-# is broken in GHA expressions (empty string is falsy).
+# An empty `ddg_di` omits the flag so Gradle uses ddg.di from gradle.properties; `-Pddg.di=`
+# with an empty value would instead hit build.gradle's AnvilDagger fallback. Suffixes and
+# labels stay empty/unsuffixed for the default and AnvilDagger paths so maestro test names
+# and Asana task names are unchanged. Pattern uses truthy-first ternary because
+# `A && '' || X` is broken in GHA expressions (empty string is falsy).
 env:
-  DDG_DI: ${{ inputs.ddg_di || 'AnvilDagger' }}
+  DI_FLAG: ${{ inputs.ddg_di != '' && format('-Pddg.di={0}', inputs.ddg_di) || '' }}
   DI_UNDERSCORE_SUFFIX: ${{ (inputs.ddg_di || 'AnvilDagger') != 'AnvilDagger' && format('_{0}', inputs.ddg_di) || '' }}
   DI_PAREN_SUFFIX: ${{ (inputs.ddg_di || 'AnvilDagger') != 'AnvilDagger' && format(' ({0})', inputs.ddg_di) || '' }}
+  DI_NIGHTLY_LABEL: ${{ (inputs.ddg_di || 'AnvilDagger') != 'AnvilDagger' && format('{0} Nightly', inputs.ddg_di) || 'Nightly' }}
 
 jobs:
   instrumentation_tests:
@@ -58,7 +63,7 @@ jobs:
           release_properties: ${{ secrets.FAKE_RELEASE_PROPERTIES }}
           release_key: ${{ secrets.FAKE_RELEASE_KEY }}
           gradle_encryption_key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
-          gradle_flags: '-Pautofill-disable-auth-requirement -Pconfig_patches=.maestro/duckplayer/patches/ad_blocking_enabled_patch.json -Pddg.di=${{ env.DDG_DI }}'
+          gradle_flags: '-Pautofill-disable-auth-requirement -Pconfig_patches=.maestro/duckplayer/patches/ad_blocking_enabled_patch.json ${{ env.DI_FLAG }}'
           develocity_access_key: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
           ducksans_package_auth_user: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION_USER }}
           ducksans_package_auth_token: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION }}
@@ -152,7 +157,7 @@ jobs:
           maestro_api_level: 34
           asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          test_suite_name: Android Design System (${{ env.DDG_DI == 'AnvilDagger' && 'Nightly' || format('{0} Nightly', env.DDG_DI) }})
+          test_suite_name: Android Design System (${{ env.DI_NIGHTLY_LABEL }})
 
       - name: Onboarding
         id: maestro-onboarding-non-release-blocking
@@ -200,6 +205,84 @@ jobs:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ secrets.GH_ASANA_AOR_PROJECT_ID }}
           asana-section: ${{ secrets.GH_ASANA_INCOMING_ID }}
-          asana-task-name: GH Workflow Failure - End to End tests${{ env.DDG_DI == 'AnvilDagger' && ' (Non Release Blockers)' || format(' ({0})', env.DDG_DI) }}
+          asana-task-name: GH Workflow Failure - End to End tests${{ env.DI_PAREN_SUFFIX != '' && env.DI_PAREN_SUFFIX || ' (Non Release Blockers)' }}
           asana-task-description: The end to end workflow${{ env.DI_PAREN_SUFFIX }} has failed. These are non release blocking tests, follow the steps in [Maintenance Playbook](https://app.asana.com/1/137249556945/project/1210669871036405/task/1210684104726187?focus=true). See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          action: 'create-asana-task'
+
+  # configDrivenDialogs now defaults to TRUE, so every build renders the config-driven
+  # dialogs and the legacy renderer — still the fallback when the flag is remotely disabled — is
+  # otherwise untested. The flag is read at launch, so a source patch pins it to FALSE at compile
+  # time (see the patch header).
+  onboarding_legacy_renderer_on_internal:
+    runs-on: ubuntu-latest
+    name: Onboarding, legacy renderer on internal
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Assemble internal APK with configDrivenDialogs pinned to FALSE
+        id: assemble
+        uses: ./.github/actions/checkout-and-assemble
+        with:
+          commit: ${{ inputs.commit }}
+          flavours: 'internal'
+          release_properties: ${{ secrets.FAKE_RELEASE_PROPERTIES }}
+          release_key: ${{ secrets.FAKE_RELEASE_KEY }}
+          gradle_encryption_key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+          gradle_flags: '${{ env.DI_FLAG }}'
+          source_patches: .maestro/onboarding/source_patches/config_driven_dialogs_disabled.patch
+          develocity_access_key: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
+          ducksans_package_auth_user: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION_USER }}
+          ducksans_package_auth_token: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION }}
+
+      - name: Upload Internal Binary to Maestro
+        id: maestro-upload-internal-binary
+        uses: ./.github/actions/maestro-cloud-asana-reporter
+        timeout-minutes: 120
+        with:
+          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
+          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
+          maestro_test_name: binary_internal_upload_legacy_renderer${{ env.DI_UNDERSCORE_SUFFIX }}_${{ github.sha }}
+          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
+          maestro_app_file: ${{ steps.assemble.outputs.internal_apk_path }}
+          maestro_api_level: 34
+          maestro_include_tags: binaryUpload
+          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
+          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
+          test_suite_name: Internal Binary Upload, legacy renderer${{ env.DI_PAREN_SUFFIX }}
+
+      # API level 36 because the custom AI flows require it.
+      - name: Internal Onboarding Flows
+        id: maestro-internal-onboarding-legacy-renderer
+        # Run regardless of earlier suite failures, but only if the internal binary uploaded.
+        if: ${{ !cancelled() && steps.maestro-upload-internal-binary.outcome == 'success' }}
+        uses: ./.github/actions/maestro-cloud-asana-reporter
+        timeout-minutes: 120
+        with:
+          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
+          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
+          maestro_test_name: internalOnboardingLegacyRenderer${{ env.DI_UNDERSCORE_SUFFIX }}_${{ github.sha }}
+          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
+          maestro_app_binary_id: ${{ steps.maestro-upload-internal-binary.outputs.maestro_app_binary_id }}
+          maestro_api_level: 36
+          maestro_include_tags: onboardingTest,onboardingInternalTest,onboardingNonReleaseBlockingTest
+          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
+          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
+          test_suite_name: Internal Onboarding, legacy renderer${{ env.DI_PAREN_SUFFIX }}
+
+      - name: Create Asana task when workflow failed
+        if: ${{ failure() && github.event_name != 'workflow_dispatch' }}
+        id: create-failure-task
+        uses: duckduckgo/native-github-asana-sync@v2.6.0
+        with:
+          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana-project: ${{ secrets.GH_ASANA_AOR_PROJECT_ID }}
+          asana-section: ${{ secrets.GH_ASANA_INCOMING_ID }}
+          asana-task-name: GH Workflow Failure - End to End tests, legacy onboarding renderer${{ env.DI_PAREN_SUFFIX != '' && env.DI_PAREN_SUFFIX || ' (Non Release Blockers)' }}
+          asana-task-description: The end to end workflow${{ env.DI_PAREN_SUFFIX }} for the legacy onboarding renderer has failed. These are non release blocking tests, follow the steps in [Maintenance Playbook](https://app.asana.com/1/137249556945/project/1210669871036405/task/1210684104726187?focus=true). If the failure is `Source patch does not apply`, the flag's compile-time default changed — see the header of `.maestro/onboarding/source_patches/config_driven_dialogs_disabled.patch` for what to do. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
           action: 'create-asana-task'

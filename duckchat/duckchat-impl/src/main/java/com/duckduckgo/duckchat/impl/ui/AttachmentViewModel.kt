@@ -310,7 +310,7 @@ class AttachmentViewModel @Inject constructor(
         }
     }
 
-    fun removeImageAttachment(id: String) {
+    fun removeImageAttachment(id: String, isEditMode: Boolean = false) {
         var toRecycle: Bitmap? = null
         var removed = false
         imageAttachments.update { list ->
@@ -319,17 +319,23 @@ class AttachmentViewModel @Inject constructor(
             removed = match != null
             list.filter { it.id != id }
         }
-        if (removed) duckChatPixels.fireImageRemoved(surface.value)
+        if (removed) {
+            duckChatPixels.fireImageRemoved(surface.value)
+            if (isEditMode) duckChatPixels.fireEditPromptImageRemoved(surface.value)
+        }
         viewModelScope.launch { toRecycle?.recycle() }
     }
 
-    fun removeFileAttachment(id: String) {
+    fun removeFileAttachment(id: String, isEditMode: Boolean = false) {
         var removed = false
         _fileAttachments.update { list ->
             removed = list.any { it.id == id }
             list.filter { it.id != id }
         }
-        if (removed) duckChatPixels.fireFileRemoved(surface.value)
+        if (removed) {
+            duckChatPixels.fireFileRemoved(surface.value)
+            if (isEditMode) duckChatPixels.fireEditPromptFileRemoved(surface.value)
+        }
     }
 
     fun setPageContext(attachment: PageContextAttachment) {

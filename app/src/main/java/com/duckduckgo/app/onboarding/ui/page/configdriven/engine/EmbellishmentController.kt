@@ -18,7 +18,6 @@ package com.duckduckgo.app.onboarding.ui.page.configdriven.engine
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
-import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.view.View
@@ -36,6 +35,12 @@ import com.duckduckgo.app.onboarding.ui.page.configdriven.Embellishment
 import com.duckduckgo.common.ui.view.toPx
 
 interface EmbellishmentController {
+    /**
+     * Clears every decoration, so a render with no predecessor to exit does not inherit the footprint of whichever
+     * decorations the XML leaves visible.
+     */
+    fun resetStage()
+
     /**
      * Returns what the fit check settled on, synchronously: the caller anchors the card to it in the same frame,
      * so the card's reposition is picked up by the render's card morph instead of snapping into place later.
@@ -93,7 +98,12 @@ class EmbellishmentControllerImpl(
 
     init {
         fitCorrector.enabled = true
+        fitCorrector.reservesInsetAboveDecoration = true
         fitCorrector.attach()
+    }
+
+    override fun resetStage() {
+        decorations.values.forEach { it.hide() }
     }
 
     override fun transition(
@@ -234,18 +244,10 @@ class EmbellishmentControllerImpl(
             enter = {
                 view.isVisible = true
                 view.alpha = 0f
-                val fade = ObjectAnimator.ofFloat(view, View.ALPHA, 0f, 1f)
-                    .setDuration(WALKING_DAX_FADE_DURATION)
-                val slide = ObjectAnimator.ofFloat(
-                    view,
-                    View.TRANSLATION_X,
-                    -WALKING_DAX_START_X_DP.toPx().toFloat(),
-                    -WALKING_DAX_FINAL_X_DP.toPx().toFloat(),
-                ).setDuration(WALKING_DAX_SLIDE_DURATION)
-                val set = AnimatorSet().apply {
+                val fade = ObjectAnimator.ofFloat(view, View.ALPHA, 0f, 1f).apply {
                     interpolator = WALKING_DAX_INTERPOLATOR
                     startDelay = WALKING_DAX_DELAY
-                    playTogether(fade, slide)
+                    duration = WALKING_DAX_FADE_DURATION
                     addListener(
                         object : AnimatorListenerAdapter() {
                             override fun onAnimationStart(animation: Animator) {
@@ -254,8 +256,19 @@ class EmbellishmentControllerImpl(
                         },
                     )
                 }
-                set.start()
-                listOf(set)
+                val slide = ObjectAnimator.ofFloat(
+                    view,
+                    View.TRANSLATION_X,
+                    -WALKING_DAX_START_X_DP.toPx().toFloat(),
+                    -WALKING_DAX_FINAL_X_DP.toPx().toFloat(),
+                ).apply {
+                    interpolator = WALKING_DAX_INTERPOLATOR
+                    startDelay = WALKING_DAX_DELAY
+                    duration = WALKING_DAX_SLIDE_DURATION
+                }
+                fade.start()
+                slide.start()
+                listOf(fade, slide)
             },
             exit = {
                 hide()
@@ -280,8 +293,9 @@ class EmbellishmentControllerImpl(
 
     /**
      * A screen with no decoration still reserves the room one would have taken, so its card sits at a
-     * comparable height rather than dropping to the parent bottom. The floor is the card's bottom inset,
-     * because the card anchors above the band and so never reserves that inset itself.
+     * comparable height rather than dropping to the parent bottom. The floor is the card's bottom inset, so that a
+     * band shrunk by a tall card still covers the bottom bar; the card reserves whatever the band cannot cover,
+     * via [OnboardingDecorationFitCorrector.reservesInsetAboveDecoration].
      */
     private fun buildUndecoratedBand(): Decoration {
         val view = binding.undecoratedBand

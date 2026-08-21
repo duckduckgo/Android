@@ -38,6 +38,7 @@ data class JsonRemoteMessage(
 data class JsonDisplayConditions(
     val trigger: String? = null,
     val dismissAfterDaysShown: Int? = null,
+    val maxImpressions: Int? = null,
 )
 
 data class JsonContent(

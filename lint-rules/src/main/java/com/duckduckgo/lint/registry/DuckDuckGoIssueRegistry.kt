@@ -39,12 +39,14 @@ import com.duckduckgo.lint.NoSystemLoadLibraryDetector.Companion.NO_SYSTEM_LOAD_
 import com.duckduckgo.lint.NonCancellableDetector.Companion.ISSUE_NON_CANCELLABLE
 import com.duckduckgo.lint.NoPostValueOnSingleLiveEventDetector.Companion.NO_POST_VALUE_ON_SINGLE_LIVE_EVENT
 import com.duckduckgo.lint.WebViewCompatApisUsageDetector
+import com.duckduckgo.lint.NoNewBrowserFeatureToggleDetector.Companion.NO_NEW_BROWSER_FEATURE_TOGGLE
 import com.duckduckgo.lint.RemoteFeatureNameDetector.Companion.UNDERSCORE_IN_FEATURE_NAME
 import com.duckduckgo.lint.WrongPluginPointCollectorDetector.Companion.WRONG_PLUGIN_POINT_ISSUE
 import com.duckduckgo.lint.strings.MissingInstructionDetector.Companion.MISSING_INSTRUCTION
 import com.duckduckgo.lint.strings.MissingSmartlingRequiredDirectivesDetector.Companion.MISSING_SMARTLING_REQUIRED_DIRECTIVES
 import com.duckduckgo.lint.strings.PlaceholderDetector.Companion.PLACEHOLDER_MISSING_POSITION
 import com.duckduckgo.lint.ui.ColorAttributeInXmlDetector.Companion.INVALID_COLOR_ATTRIBUTE
+import com.duckduckgo.lint.ui.DaxButtonStylingDetector.Companion.INVALID_DAX_BUTTON_DUCK_SANS
 import com.duckduckgo.lint.ui.DaxButtonStylingDetector.Companion.INVALID_DAX_BUTTON_PROPERTY
 import com.duckduckgo.lint.ui.DaxDividerColorUsageDetector.Companion.INVALID_DAX_DIVIDER_COLOR_USAGE
 import com.duckduckgo.lint.ui.DaxTextColorUsageDetector.Companion.INVALID_DAX_TEXT_COLOR_USAGE
@@ -81,6 +83,7 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
         get() = listOf(
             WRONG_PLUGIN_POINT_ISSUE,
             UNDERSCORE_IN_FEATURE_NAME,
+            NO_NEW_BROWSER_FEATURE_TOGGLE,
             NO_SINGLETON_ISSUE,
             NO_LIFECYCLE_OBSERVER_ISSUE,
             NO_FRAGMENT_ISSUE,
@@ -112,6 +115,7 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
             NO_BOTTOM_SHEET,
             INVALID_DAX_TEXT_VIEW_PROPERTY,
             INVALID_DAX_BUTTON_PROPERTY,
+            INVALID_DAX_BUTTON_DUCK_SANS,
             INVALID_SKELETON_VIEW_BACKGROUND,
             WRONG_STYLE_PARAMETER,
             WRONG_STYLE_NAME,

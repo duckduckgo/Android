@@ -210,6 +210,8 @@ data class Signup(
     @field:Json(name = "device_name") val deviceName: String,
     @field:Json(name = "device_type") val deviceType: String,
     @field:Json(name = "credential_id") val credentialId: String? = null,
+    @field:Json(name = "device_info") val deviceInfo: String? = null,
+    @field:Json(name = "keys") val keys: List<ProtectedKeyEntry>? = null,
 )
 
 data class Logout(

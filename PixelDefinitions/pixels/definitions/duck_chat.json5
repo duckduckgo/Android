@@ -491,14 +491,28 @@
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": [
+            "appVersion",
+            {
+                "key": "toggle_visible",
+                "type": "boolean",
+                "description": "Whether the Search+Duck.ai toggle was shown."
+            }
+        ]
     },
     "m_aichat_experimental_omnibar_shown_count": {
         "description": "Native input field shown to the user",
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": [
+            "appVersion",
+            {
+                "key": "toggle_visible",
+                "type": "boolean",
+                "description": "Whether the Search+Duck.ai toggle was shown."
+            }
+        ]
     },
     "m_aichat_experimental_omnibar_query_submitted_count": {
         "description": "User submitted a search query from the native input field",
@@ -512,6 +526,17 @@
                 "type": "string",
                 "description": "Bucketed length of the submitted query",
                 "enum": ["short", "medium", "long", "very_long"]
+            },
+            {
+                "key": "default_mode",
+                "type": "string",
+                "description": "Which side the Search/Duck.ai toggle was showing by default.",
+                "enum": ["search", "duck_ai"]
+            },
+            {
+                "key": "toggle_visible",
+                "type": "boolean",
+                "description": "Whether the Search+Duck.ai toggle was shown."
             }
         ]
     },
@@ -873,6 +898,13 @@
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
+    "m_aichat_voice_service_start_failed": {
+        "description": "The Duck.ai voice microphone foreground service could not enter the foreground because the system rejected the microphone service type (e.g. RECORD_AUDIO not granted at start time); the service was stopped instead of crashing",
+        "owners": ["karlenDimla"],
+        "triggers": ["exception"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
     "m_aichat_unified_input_image_generation_selected_count": {
         "description": "User selected the image generation tool in the Unified Input",
         "owners": ["malmstein"],
@@ -1187,6 +1219,12 @@
                 "description": "Which tool was selected when the prompt was submitted",
                 "enum": ["none", "image_generation", "web_search"]
             },
+            {
+                "key": "default_mode",
+                "type": "string",
+                "description": "Which side the Search/Duck.ai toggle was showing by default.",
+                "enum": ["search", "duck_ai"]
+            },
             { "key": "model_id", "type": "string", "description": "Identifier of the model used for the prompt" },
             {
                 "key": "reasoning_effort",
@@ -1212,6 +1250,12 @@
                 "type": "string",
                 "description": "Which tool was selected when the prompt was submitted",
                 "enum": ["none", "image_generation", "web_search"]
+            },
+            {
+                "key": "default_mode",
+                "type": "string",
+                "description": "Which side the Search/Duck.ai toggle was showing by default.",
+                "enum": ["search", "duck_ai"]
             },
             { "key": "model_id", "type": "string", "description": "Identifier of the model used for the prompt" },
             {
@@ -1244,6 +1288,41 @@
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "unifiedInputSurface"]
+    },
+    "m_aichat_edit_prompt_opened": {
+        "description": "User opened the fullscreen Edit Message screen for a sent prompt",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_edit_prompt_cancelled": {
+        "description": "User left the Edit Message screen without submitting (toolbar close, system or predictive back)",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_edit_prompt_submitted": {
+        "description": "User submitted the edited prompt from the Edit Message screen, replacing the original message",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_edit_prompt_image_removed": {
+        "description": "User removed an attached image while on the Edit Message screen",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion", "unifiedInputSurface"]
+    },
+    "m_aichat_edit_prompt_file_removed": {
+        "description": "User removed an attached file while on the Edit Message screen",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
         "parameters": ["appVersion", "unifiedInputSurface"]
     },
     "m_aichat_unified_input_model_selected": {
@@ -1578,6 +1657,51 @@
         "description": "The Ask About Page quick action pill was shown in the Contextual sheet",
         "owners": ["karlenDimla"],
         "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "aichat_contextual_suggestion_selected": {
+        "description": "User tapped a suggested prompt on the contextual Duck.ai sheet start surface. The Ask About Page quick action reports as suggestionId=ask-about-page and also fires m_aichat_contextual_quick_action_ask_about_page_selected.",
+        "owners": ["joshliebe"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "suggestionId",
+                "type": "string",
+                "description": "Catalog key of the selected suggestion (e.g. summarize-page, translate-page, key-takeaways) or ask-about-page for the quick action. Bounded by the bundled PageSuggestionsCatalog ids.",
+                "examples": ["summarize-page", "translate-page", "key-takeaways", "ask-about-page"]
+            },
+            "contextualSuggestionsPageType"
+        ]
+    },
+    "aichat_contextual_suggestions_viewed": {
+        "description": "Suggested prompts became visible on the contextual Duck.ai sheet start surface. Fires once per display; only a reload (sheet reopened, or returning from an open chat) counts a fresh impression.",
+        "owners": ["joshliebe"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "isSmart",
+                "type": "boolean",
+                "description": "Whether the displayed suggestions were contextually matched to the page (JSON-LD, og:type or domain) rather than generic defaults."
+            },
+            "contextualSuggestionsPageType"
+        ]
+    },
+    "debug_aichat_contextual_suggestions_catalog_load_failed": {
+        "description": "The bundled PageSuggestionsCatalog.json could not be loaded or decoded when resolving contextual suggestions; the start surface falls back to no suggestions.",
+        "owners": ["joshliebe"],
+        "triggers": ["exception"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "debug_aichat_contextual_suggestions_context_collection_timed_out": {
+        "description": "Page context collection did not complete within the timeout while contextual suggestions were loading; suggestions fall back to generic defaults.",
+        "owners": ["joshliebe"],
+        "triggers": ["exception"],
         "suffixes": ["first_daily_count", "form_factor"],
         "parameters": ["appVersion"]
     }

@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import com.duckduckgo.common.ui.compose.button.DaxButtonSize
 import com.duckduckgo.common.ui.compose.button.DaxDestructiveGhostAltButton
@@ -67,7 +68,39 @@ class ComponentButtonsFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
         val isDarkTheme = runBlocking { appComponentsViewModel.themeFlow.first() } == AppTheme.DARK
+        val isBrandDesignUpdate = runBlocking { appComponentsViewModel.brandDesignUpdateFlow.first() }
         setupComposeViews(view, isDarkTheme)
+        applyBrandDesignSpacing(isBrandDesignUpdate)
+    }
+
+    private fun applyBrandDesignSpacing(isBrandDesignUpdate: Boolean) {
+        if (!isBrandDesignUpdate) return
+
+        val largeButtons = listOf(
+            binding.daxButtonBrandLarge,
+            binding.daxButtonBrandLargeIcon,
+            binding.daxButtonPrimaryLarge,
+            binding.daxButtonPrimaryLargeIcon,
+            binding.daxButtonSecondaryLarge,
+            binding.daxButtonSecondaryLargeIcon,
+            binding.daxButtonDestructiveLarge,
+            binding.daxButtonDestructiveLargeIcon,
+            binding.daxButtonGhostLarge,
+            binding.daxButtonGhostLargeIcon,
+            binding.daxButtonDestructiveSecondaryLarge,
+            binding.daxButtonDestructiveSecondaryLargeIcon,
+            binding.daxButtonGhostDestructiveLarge,
+            binding.daxButtonGhostDestructiveLargeIcon,
+            binding.daxButtonGhostAltLarge,
+            binding.daxButtonGhostAltLargeIcon,
+        )
+        val verticalInsetPx = resources.getDimensionPixelSize(R.dimen.rebrandButtonLargeVerticalInset)
+        largeButtons.forEach { button ->
+            button.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                topMargin = verticalInsetPx
+                bottomMargin = verticalInsetPx
+            }
+        }
     }
 
     @Suppress("LongMethod")

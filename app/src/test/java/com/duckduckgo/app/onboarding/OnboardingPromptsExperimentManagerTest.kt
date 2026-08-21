@@ -36,9 +36,12 @@ class OnboardingPromptsExperimentManagerTest {
 
     private val toggles: OnboardingPromptsToggles = FakeFeatureToggleFactory.create(OnboardingPromptsToggles::class.java)
 
+    private val privacyConfigPersistedGate = OnboardingPrivacyConfigPersistedGateImpl()
+
     private val testee = OnboardingPromptsExperimentManagerImpl(
         toggles = toggles,
         dispatcherProvider = coroutineRule.testDispatcherProvider,
+        onboardingPrivacyConfigPersistedGate = privacyConfigPersistedGate,
     )
 
     @Test
@@ -52,7 +55,7 @@ class OnboardingPromptsExperimentManagerTest {
     fun whenExperimentDisabledThenEnrollReturnsNull() = runTest {
         givenCohortEnabled(winner = null)
 
-        testee.onPrivacyConfigPersisted()
+        privacyConfigPersistedGate.onPrivacyConfigPersisted()
 
         assertNull(testee.enroll())
     }
@@ -61,7 +64,7 @@ class OnboardingPromptsExperimentManagerTest {
     fun whenEnrolledInControlThenEnrollReturnsControl() = runTest {
         givenCohortEnabled(OnboardingPromptsCohorts.CONTROL)
 
-        testee.onPrivacyConfigPersisted()
+        privacyConfigPersistedGate.onPrivacyConfigPersisted()
 
         assertEquals(OnboardingPromptExperimentVariant.CONTROL, testee.enroll())
     }
@@ -70,7 +73,7 @@ class OnboardingPromptsExperimentManagerTest {
     fun whenEnrolledInTreatmentDockOnlyThenEnrollReturnsTreatmentDockOnly() = runTest {
         givenCohortEnabled(OnboardingPromptsCohorts.TREATMENT_DOCK_ONLY)
 
-        testee.onPrivacyConfigPersisted()
+        privacyConfigPersistedGate.onPrivacyConfigPersisted()
 
         assertEquals(OnboardingPromptExperimentVariant.TREATMENT_DOCK_ONLY, testee.enroll())
     }
@@ -79,7 +82,7 @@ class OnboardingPromptsExperimentManagerTest {
     fun whenEnrolledInTreatmentWidgetOnlyThenEnrollReturnsTreatmentWidgetOnly() = runTest {
         givenCohortEnabled(OnboardingPromptsCohorts.TREATMENT_WIDGET_ONLY)
 
-        testee.onPrivacyConfigPersisted()
+        privacyConfigPersistedGate.onPrivacyConfigPersisted()
 
         assertEquals(OnboardingPromptExperimentVariant.TREATMENT_WIDGET_ONLY, testee.enroll())
     }
@@ -88,7 +91,7 @@ class OnboardingPromptsExperimentManagerTest {
     fun whenEnrolledInTreatmentDockAndWidgetThenEnrollReturnsTreatmentDockAndWidget() = runTest {
         givenCohortEnabled(OnboardingPromptsCohorts.TREATMENT_DOCK_AND_WIDGET)
 
-        testee.onPrivacyConfigPersisted()
+        privacyConfigPersistedGate.onPrivacyConfigPersisted()
 
         assertEquals(OnboardingPromptExperimentVariant.TREATMENT_DOCK_AND_WIDGET, testee.enroll())
     }
@@ -97,7 +100,7 @@ class OnboardingPromptsExperimentManagerTest {
     fun whenEnrollCalledTwiceThenSameCohortIsReturnedBothTimes() = runTest {
         givenCohortEnabled(OnboardingPromptsCohorts.TREATMENT_WIDGET_ONLY)
 
-        testee.onPrivacyConfigPersisted()
+        privacyConfigPersistedGate.onPrivacyConfigPersisted()
 
         val first = testee.enroll()
         val second = testee.enroll()

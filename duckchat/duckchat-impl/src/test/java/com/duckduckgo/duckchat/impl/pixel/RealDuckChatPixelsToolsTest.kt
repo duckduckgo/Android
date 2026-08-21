@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.pixel
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.ToggleSelection
 import com.duckduckgo.duckchat.impl.helper.DuckChatTermsOfServiceHandler
 import com.duckduckgo.duckchat.impl.metric.DuckAiMetricCollector
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
@@ -42,6 +43,7 @@ class RealDuckChatPixelsToolsTest {
     private val testee = RealDuckChatPixels(
         pixel = pixel,
         duckChatFeatureRepository = duckChatFeatureRepository,
+        duckChatInternal = mock(),
         appCoroutineScope = coroutineTestRule.testScope,
         dispatcherProvider = coroutineTestRule.testDispatcherProvider,
         statisticsUpdater = statisticsUpdater,
@@ -145,6 +147,7 @@ class RealDuckChatPixelsToolsTest {
             hasFileAttachment = false,
             hasText = true,
             surface = DuckChatPixelSurface.CONTEXTUAL_CHAT,
+            defaultMode = null,
         )
 
         val params = mapOf(
@@ -174,6 +177,7 @@ class RealDuckChatPixelsToolsTest {
             hasFileAttachment = false,
             hasText = true,
             surface = DuckChatPixelSurface.ADDRESS_BAR,
+            defaultMode = null,
         )
 
         val params = mapOf(
@@ -182,6 +186,65 @@ class RealDuckChatPixelsToolsTest {
             DuckChatPixelParameters.HAS_FILE_ATTACHMENT to "false",
             DuckChatPixelParameters.HAS_TEXT to "true",
             DuckChatPixelParameters.SURFACE to "address_bar",
+        )
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_COUNT, parameters = params)
+        verify(pixel).fire(
+            DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_DAILY,
+            parameters = params,
+            type = Pixel.PixelType.Daily(),
+        )
+    }
+
+    @Test
+    fun whenPromptSubmittedFromAddressBarThenDefaultModeIsIncluded() = runTest {
+        testee.firePromptSubmitted(
+            selectedTool = "none",
+            modelId = null,
+            reasoningEffort = null,
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            hasText = true,
+            surface = DuckChatPixelSurface.ADDRESS_BAR,
+            defaultMode = ToggleSelection.DUCK_AI,
+        )
+
+        val params = mapOf(
+            DuckChatPixelParameters.SELECTED_TOOL to "none",
+            DuckChatPixelParameters.HAS_IMAGE_ATTACHMENT to "false",
+            DuckChatPixelParameters.HAS_FILE_ATTACHMENT to "false",
+            DuckChatPixelParameters.HAS_TEXT to "true",
+            DuckChatPixelParameters.SURFACE to "address_bar",
+            DuckChatPixelParameters.DEFAULT_MODE to "duck_ai",
+        )
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_COUNT, parameters = params)
+        verify(pixel).fire(
+            DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_DAILY,
+            parameters = params,
+            type = Pixel.PixelType.Daily(),
+        )
+    }
+
+    @Test
+    fun whenPromptSubmittedFromNonAddressBarSurfaceThenDefaultModeIsOmittedEvenIfProvided() = runTest {
+        // The Search/Duck.ai toggle only ever shows in the address-bar surface, so default_mode
+        // must not leak in from surfaces where no toggle was on screen.
+        testee.firePromptSubmitted(
+            selectedTool = "none",
+            modelId = null,
+            reasoningEffort = null,
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            hasText = true,
+            surface = DuckChatPixelSurface.CONTEXTUAL_CHAT,
+            defaultMode = ToggleSelection.DUCK_AI,
+        )
+
+        val params = mapOf(
+            DuckChatPixelParameters.SELECTED_TOOL to "none",
+            DuckChatPixelParameters.HAS_IMAGE_ATTACHMENT to "false",
+            DuckChatPixelParameters.HAS_FILE_ATTACHMENT to "false",
+            DuckChatPixelParameters.HAS_TEXT to "true",
+            DuckChatPixelParameters.SURFACE to "contextual_chat",
         )
         verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_COUNT, parameters = params)
         verify(pixel).fire(

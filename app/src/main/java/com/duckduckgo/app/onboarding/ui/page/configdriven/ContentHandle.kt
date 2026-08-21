@@ -20,6 +20,7 @@ import android.animation.Animator
 import android.view.View
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
 import com.duckduckgo.app.onboarding.ui.view.OnboardingDialogTitleView
+import kotlinx.coroutines.flow.Flow
 
 /** What a binder hands back to the render engine after binding a screen. */
 class ContentHandle(
@@ -44,6 +45,21 @@ class ContentHandle(
      * [afterFade] applies here too.
      */
     val onContentReady: (() -> Unit)? = null,
+    /**
+     * Null means the primary CTA is always enabled. When set, the engine collects it for the lifetime of the
+     * binding and applies it to the primary CTA button.
+     */
+    val primaryCtaState: CtaState? = null,
+    /**
+     * Called when the CTA button is tapped, if it was configured with [CtaAction.Submit], to build the
+     * resulting event from dialog's live data. Never called for [CtaAction.Emit].
+     */
     val result: (() -> NewUserOnboardingEvent)? = null,
     val unbind: () -> Unit = {},
+)
+
+class CtaState(
+    val enabled: Flow<Boolean>,
+    /** Gates the button until [enabled] emits its first value. */
+    val defaultValue: Boolean,
 )

@@ -16,6 +16,7 @@
 
 package com.duckduckgo.espresso.privacy
 
+import android.view.View
 import android.webkit.WebView
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.IdlingResource
@@ -38,6 +39,7 @@ import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import org.hamcrest.CoreMatchers.containsString
+import org.hamcrest.CoreMatchers.sameInstance
 import org.junit.After
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -66,19 +68,25 @@ class GpcTest {
             webView = it.findViewById(R.id.browserWebView)
         }
 
-        WebViewIdlingResource(webView!!).track()
+        val testWebView = webView!!
+
+        // The top frame header test calls window.open, so a second tab (and WebView) exists while the
+        // test runs; match this tab's WebView explicitly instead of relying on there being only one.
+        val testWebViewMatcher = sameInstance<View>(testWebView)
+
+        WebViewIdlingResource(testWebView).track()
 
         // asserts we have injected css by querying the duckduckgo object
-        JsObjectIdlingResource(webView!!, "window.navigator.duckduckgo").track()
+        JsObjectIdlingResource(testWebView, "window.navigator.duckduckgo").track()
 
-        onWebView()
+        onWebView(testWebViewMatcher)
             .withElement(findElement(ID, "start"))
             .check(webMatches(getText(), containsString("Start test")))
             .perform(webClick())
 
-        WebViewIdlingResource(webView!!).track()
+        WebViewIdlingResource(testWebView).track()
 
-        val results = onWebView()
+        val results = onWebView(testWebViewMatcher)
             .perform(script(SCRIPT))
             .get()
 

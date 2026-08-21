@@ -27,12 +27,16 @@ import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEf
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.State
 import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.pixels.PirStage
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import logcat.LogPriority.ERROR
 import logcat.logcat
 
 class RealPirActionsRunnerStateEngine(
@@ -40,12 +44,12 @@ class RealPirActionsRunnerStateEngine(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     dispatcherProvider: DispatcherProvider,
     runType: RunType,
-    brokerSteps: List<BrokerStep>,
+    brokerStep: BrokerStep,
     profileQuery: ProfileQuery,
 ) : PirActionsRunnerStateEngine {
     private var engineState: State = State(
         runType = runType,
-        brokerStepsToExecute = brokerSteps,
+        brokerStep = brokerStep,
         profileQuery = profileQuery,
         stageStatus = PirStageStatus(
             currentStage = PirStage.OTHER,
@@ -61,8 +65,10 @@ class RealPirActionsRunnerStateEngine(
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
     )
 
+    private val engineScope = CoroutineScope(coroutineScope.coroutineContext + Job())
+
     init {
-        coroutineScope.launch(dispatcherProvider.io()) {
+        engineScope.launch(dispatcherProvider.io()) {
             eventsFlow.collect {
                 handleEvent(it)
             }
@@ -72,9 +78,13 @@ class RealPirActionsRunnerStateEngine(
     override val sideEffect: Flow<SideEffect> = sideEffectFlow.asSharedFlow()
 
     override fun dispatch(event: Event) {
-        coroutineScope.launch {
+        engineScope.launch {
             eventsFlow.emit(event)
         }
+    }
+
+    override fun close() {
+        engineScope.cancel()
     }
 
     private suspend fun handleEvent(newEvent: Event) {
@@ -86,7 +96,17 @@ class RealPirActionsRunnerStateEngine(
 
         logcat { "PIR-ENGINE($this): $newEvent dispatched to $eventHandler" }
 
-        val next = eventHandler.invoke(engineState, newEvent)
+        val next = try {
+            eventHandler.invoke(engineState, newEvent)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Throwable) {
+            // A failing handler must not escape the collector, as that cancels the engine scope and takes down
+            // the whole process. End the run instead so the runner and its WebView are released.
+            logcat(ERROR) { "PIR-ENGINE($this): $eventHandler failed to handle $newEvent: $e" }
+            sideEffectFlow.emit(SideEffect.CompleteExecution)
+            return
+        }
 
         logcat { "PIR-ENGINE($this): Event resulted to state: ${next.nextState}" }
         logcat { "PIR-ENGINE($this): Event resulted to event: ${next.nextEvent}" }

@@ -204,7 +204,7 @@
     <string name="duckAiSuggestionPersonBackgroundLabel" instruction="Suggested prompt chip: summarize a person&apos;s background">Háttér összefoglalása</string>
     <string name="duckAiSuggestionPersonBackgroundPrompt" instruction="Suggested prompt submitted text: summarize a person&apos;s background">Foglald össze ennek a személynek a hátterét és jelentősebb munkáit.</string>
 
-    <!-- Contextual sheet input hint (contextualSheetImprovements flag) -->
+    <!-- Contextual sheet input hint -->
     <string name="contextualSheetImprovedHint">Kérdezz bármit privátban</string>
     <string name="contextualSheetChatsPopupRecentSection" instruction="Section header above the list of recent Duck.ai chats in the contextual sheet overflow menu.">Legutóbbi csevegések</string>
 
@@ -343,4 +343,9 @@
 
     <!-- File/image attachment menu options -->
     <string name="duckChatContextualAskAboutPage">Kérdés az oldalról</string>
+
+    <!-- Editing a message already sent to Duck.ai -->
+    <string name="duck_ai_edit_prompt_title" instruction="Screen title: the user is editing a message they already sent to Duck.ai">Üzenet szerkesztése</string>
+    <string name="duck_ai_edit_prompt_lose_responses_warning" instruction="Warning shown while editing a sent message: the answer Duck.ai already gave will be discarded and answered again">A szerkesztés lecseréli a választ egy újra.</string>
+
 </resources>

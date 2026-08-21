@@ -20,6 +20,8 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 
 enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     APP_LAUNCH("ml"),
+    APP_RETURN_COUNT("m_app_return_count"),
+    APP_RETURN_DAILY("m_app_return_daily"),
     PROCESS_CREATED_MAIN("m_process_created_main"),
     PROCESS_CREATED_VPN("m_process_created_vpn"),
 
@@ -145,6 +147,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     BROWSER_MODE_SWITCHED("m_browser_mode_switched"),
 
     SETTINGS_OPENED("ms"),
+    SETTINGS_OPENED_WITH_SUBSCRIPTION_AVAILABLE("m_subscription_settings_impression"),
     SETTINGS_THEME_OPENED("ms_t_o"),
     SETTINGS_THEME_TOGGLED_LIGHT("ms_tl"),
     SETTINGS_THEME_TOGGLED_DARK("ms_td"),
@@ -158,6 +161,10 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     SETTINGS_APP_LINKS_ASK_EVERY_TIME_SELECTED("ms_app_links_ask_every_time_setting_selected"),
     SETTINGS_APP_LINKS_ALWAYS_SELECTED("ms_app_links_always_setting_selected"),
     SETTINGS_APP_LINKS_NEVER_SELECTED("ms_app_links_never_setting_selected"),
+    SETTINGS_APP_LINKS_PRESSED_DAILY("ms_app_links_setting_pressed_daily"),
+    SETTINGS_APP_LINKS_ASK_EVERY_TIME_SELECTED_DAILY("ms_app_links_ask_every_time_setting_selected_daily"),
+    SETTINGS_APP_LINKS_ALWAYS_SELECTED_DAILY("ms_app_links_always_setting_selected_daily"),
+    SETTINGS_APP_LINKS_NEVER_SELECTED_DAILY("ms_app_links_never_setting_selected_daily"),
     SETTINGS_ADD_HOME_SCREEN_WIDGET_CLICKED("ms_add_home_screen_widget_clicked"),
     SETTINGS_DEFAULT_BROWSER_PRESSED("ms_default_browser_pressed"),
     SETTINGS_PRIVATE_SEARCH_PRESSED("ms_private_search_setting_pressed"),
@@ -242,7 +249,9 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     APP_FEEDBACK_DIALOG_USER_CANCELLED("mrp_f_d%d_c"),
 
     APP_LINKS_SNACKBAR_SHOWN("m_app_links_snackbar_shown"),
+    APP_LINKS_SNACKBAR_SHOWN_DAILY("app_links_snackbar_shown_daily"),
     APP_LINKS_SNACKBAR_OPEN_ACTION_PRESSED("m_app_links_snackbar_open_action_pressed"),
+    APP_LINKS_SNACKBAR_OPEN_ACTION_PRESSED_DAILY("app_links_snackbar_open_action_pressed_daily"),
 
     AUTOCOMPLETE_TOGGLED_OFF("m_autocomplete_recent_sites_toggled_off"),
     AUTOCOMPLETE_TOGGLED_ON("m_autocomplete_recent_sites_toggled_on"),

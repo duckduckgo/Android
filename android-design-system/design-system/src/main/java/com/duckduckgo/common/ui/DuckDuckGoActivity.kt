@@ -21,7 +21,6 @@ import android.content.BroadcastReceiver
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.graphics.Color
-import android.os.Build
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -33,6 +32,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK
+import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.store.ThemingDataStore
 import com.duckduckgo.common.ui.view.isFullScreen
 import com.duckduckgo.mobile.android.R
@@ -47,6 +47,8 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
     @Inject lateinit var viewModelFactory: ViewModelProvider.NewInstanceFactory
 
     @Inject lateinit var themingDataStore: ThemingDataStore
+
+    @Inject lateinit var appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles
 
     /**
      * Override in subclasses whose look should follow the fire-mode theme.
@@ -76,7 +78,11 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
         daggerInject: Boolean = true,
     ) {
         if (daggerInject) daggerInject()
-        themeChangeReceiver = applyTheme(themingDataStore.theme, applyFireTheme)
+        themeChangeReceiver = applyTheme(
+            themingDataStore.theme,
+            applyFireTheme,
+            appBrandDesignUpdateToggles.theme().isEnabled(),
+        )
         super.onCreate(savedInstanceState)
     }
 
@@ -140,13 +146,11 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
      */
     protected fun applyDisplayCutoutMode(orientation: Int) {
         displayCutoutModeManaged = true
-        if (Build.VERSION.SDK_INT >= 28) {
-            window.attributes = window.attributes.apply {
-                layoutInDisplayCutoutMode = if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_NEVER
-                } else {
-                    WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT
-                }
+        window.attributes = window.attributes.apply {
+            layoutInDisplayCutoutMode = if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_NEVER
+            } else {
+                WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT
             }
         }
     }

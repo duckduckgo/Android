@@ -19,13 +19,16 @@ package com.duckduckgo.app.onboarding.ui.page.configdriven
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.os.Bundle
 import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.ViewGroupCompat
 import androidx.core.view.WindowInsetsCompat
@@ -38,6 +41,8 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentOnboardingWelcomePageUpdateBinding
+import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserSystemSettings
+import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.app.onboarding.ui.page.OnboardingBackgroundAnimator
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
@@ -50,7 +55,12 @@ import com.duckduckgo.app.onboarding.ui.page.configdriven.engine.ContentControll
 import com.duckduckgo.app.onboarding.ui.page.configdriven.engine.DialogRenderEngine
 import com.duckduckgo.app.onboarding.ui.page.configdriven.engine.EmbellishmentControllerImpl
 import com.duckduckgo.app.onboarding.ui.page.configdriven.engine.StepIndicatorControllerImpl
+import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
+import com.duckduckgo.app.onboardingquicksetup.ui.QuickSetupAddressBarPositionBottomSheet
+import com.duckduckgo.app.onboardingquicksetup.ui.QuickSetupSearchOptionsBottomSheet
+import com.duckduckgo.app.onboardingquicksetup.ui.RemoveWidgetInstructionsBottomSheet
 import com.duckduckgo.app.widget.AddWidgetLauncher
+import com.duckduckgo.app.widget.AddWidgetSource
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.toPx
@@ -61,6 +71,9 @@ import com.duckduckgo.common.utils.device.isTablet
 import com.duckduckgo.di.scopes.FragmentScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import logcat.LogPriority.WARN
+import logcat.asLog
+import logcat.logcat
 import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 
@@ -105,6 +118,14 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
         }
     }
 
+    private val quickSetupDefaultBrowserRoleManagerDialog = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            viewModel.onQuickSetupDefaultBrowserSet()
+        } else {
+            viewModel.onQuickSetupDefaultBrowserNotSet()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requireActivity().enableEdgeToEdge()
@@ -123,6 +144,8 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        applyLayoutOverrides()
+
         ViewGroupCompat.installCompatInsetsDispatch(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(binding.daxDialogCta.root) { v, windowInsets ->
             val insets = windowInsets.getInsets(
@@ -132,8 +155,10 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
                 topMargin = insets.top
             }
             // Under adjustResize, systemBars().bottom already includes the keyboard height while the IME shows,
-            // which would leave the card measuring against a gap that is about to disappear.
-            if (!windowInsets.isVisible(WindowInsetsCompat.Type.ime())) {
+            // which would leave the card measuring against a gap that is about to disappear. Unless the focus is
+            // inside the card: reserving the keyboard's height is then what keeps the card's content scrollable.
+            val cardOwnsTheKeyboard = v.findFocus() != null
+            if (!windowInsets.isVisible(WindowInsetsCompat.Type.ime()) || cardOwnsTheKeyboard) {
                 cardBottomInsetPx = insets.bottom + DIALOG_BOTTOM_INSET_GAP_DP.toPx()
             }
             windowInsets
@@ -192,6 +217,50 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
             .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
             .onEach { command -> handleCommand(command) }
             .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        registerQuickSetupBottomSheetResultListeners()
+    }
+
+    private fun registerQuickSetupBottomSheetResultListeners() {
+        childFragmentManager.setFragmentResultListener(
+            QuickSetupAddressBarPositionBottomSheet.REQUEST_KEY,
+            viewLifecycleOwner,
+        ) { _, bundle ->
+            val selectedName = bundle.getString(QuickSetupAddressBarPositionBottomSheet.RESULT_KEY_SELECTED_POSITION)
+                ?: return@setFragmentResultListener
+            viewModel.onAddressBarBottomSheetResult(OmnibarType.valueOf(selectedName))
+        }
+        childFragmentManager.setFragmentResultListener(
+            QuickSetupSearchOptionsBottomSheet.REQUEST_KEY,
+            viewLifecycleOwner,
+        ) { _, bundle ->
+            viewModel.onSearchOptionsBottomSheetResult(withAi = bundle.getBoolean(QuickSetupSearchOptionsBottomSheet.RESULT_KEY_WITH_AI))
+        }
+        childFragmentManager.setFragmentResultListener(
+            RemoveWidgetInstructionsBottomSheet.REQUEST_KEY,
+            viewLifecycleOwner,
+        ) { _, _ ->
+            viewModel.syncQuickSetupSwitches()
+        }
+    }
+
+    /**
+     * The shared layout holds the values from before [OnboardingBrandDesignUpdateToggles.onboardingImprovementsV2],
+     * which that flag flips at runtime. This renderer only ever runs with those improvements on.
+     *
+     * Both [ConstraintLayout.LayoutParams.constrainedHeight] flags have to go: the card wraps a `ScrollView`, and
+     * inside a wrap_content parent ConstraintLayout resolves the wrap before `constraintWidth_max` narrows the
+     * card, so the card keeps a height measured for text that will wrap and scrolls with room to spare. The
+     * corrector puts the flag back on the card root once the card genuinely overflows.
+     */
+    private fun applyLayoutOverrides() {
+        binding.bottomWingAnimation.adjustViewBounds = true
+        binding.daxDialogCta.cardView.updateLayoutParams<ConstraintLayout.LayoutParams> {
+            constrainedHeight = false
+        }
+        binding.daxDialogCta.root.updateLayoutParams<ConstraintLayout.LayoutParams> {
+            constrainedHeight = false
+        }
     }
 
     private fun showIntro(screen: ConfigDrivenOnboardingPageViewModel.Screen.Intro) {
@@ -227,18 +296,13 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
         engine: DialogRenderEngine,
         screen: ConfigDrivenOnboardingPageViewModel.Screen.Dialog,
     ) {
-        // We assume that if intro is played, it's always done so before any dialog is rendered.
-        // Once the first dialog arrives, if:
-        // - intro visuals on screen: clear them and the background cross-fades from them
-        // - no intro visual on screen (like a mid-flow re-entry from another activity): nothing to animate from, snap new background
-        // Later renders always animate the background. The handover is unconditional so that a render which does not
-        // animate still takes the background off the choreographer.
-        val canCrossFadeBackground = intro?.clearForDialog() == true
+        // Not gated on animateEntry: a render that does not animate must still take the background over
+        // from the choreographer, or the intro visuals stay behind the dialog.
+        intro?.clearForDialog()
         engine.render(
             screen.stepId,
             screen.config,
             animate = screen.animateEntry,
-            animateBackground = canCrossFadeBackground && screen.animateEntry,
         )
         viewModel.onDialogRendered(screen.stepId)
     }
@@ -249,7 +313,7 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
             is ConfigDrivenOnboardingPageViewModel.Command.ShowDefaultBrowserDialog ->
                 defaultBrowserRoleManagerDialog.launch(command.intent)
             ConfigDrivenOnboardingPageViewModel.Command.LaunchAddWidgetPrompt ->
-                addWidgetLauncher.launchAddWidget(activity, simpleWidgetPrompt = true)
+                addWidgetLauncher.launchAddWidget(activity, simpleWidgetPrompt = true, source = AddWidgetSource.ONBOARDING)
             ConfigDrivenOnboardingPageViewModel.Command.Finish -> onContinuePressed()
             is ConfigDrivenOnboardingPageViewModel.Command.FinishAndSubmitSearchQuery ->
                 (activity as? OnboardingActivity)?.finishAndSubmitSearchQuery(command.query)
@@ -258,6 +322,31 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
             ConfigDrivenOnboardingPageViewModel.Command.OnboardingSkipped -> onSkipPressed()
             ConfigDrivenOnboardingPageViewModel.Command.HandOffToBrowserActivity ->
                 (activity as? OnboardingActivity)?.handOffToBrowserActivity()
+            is ConfigDrivenOnboardingPageViewModel.Command.ShowQuickSetupDefaultBrowserDialog ->
+                quickSetupDefaultBrowserRoleManagerDialog.launch(command.intent)
+            ConfigDrivenOnboardingPageViewModel.Command.OpenDefaultBrowserSystemSettings -> openDefaultBrowserSystemSettings()
+            ConfigDrivenOnboardingPageViewModel.Command.ShowRemoveWidgetBottomSheet ->
+                RemoveWidgetInstructionsBottomSheet().show(childFragmentManager, RemoveWidgetInstructionsBottomSheet.TAG)
+            is ConfigDrivenOnboardingPageViewModel.Command.ShowQuickSetupAddressBarPositionBottomSheet ->
+                QuickSetupAddressBarPositionBottomSheet
+                    .newInstance(initialSelection = command.initialSelection, showSplitOption = command.showSplitOption)
+                    .show(childFragmentManager, QuickSetupAddressBarPositionBottomSheet.TAG)
+            is ConfigDrivenOnboardingPageViewModel.Command.ShowQuickSetupSearchOptionsBottomSheet ->
+                QuickSetupSearchOptionsBottomSheet
+                    .newInstance(initialWithAi = command.initialWithAi)
+                    .show(childFragmentManager, QuickSetupSearchOptionsBottomSheet.TAG)
+        }
+    }
+
+    private fun openDefaultBrowserSystemSettings() {
+        try {
+            startActivity(DefaultBrowserSystemSettings.intent())
+        } catch (e: ActivityNotFoundException) {
+            val errorMessage = getString(R.string.cannotLaunchDefaultAppSettings)
+            logcat(WARN) { "$errorMessage: ${e.asLog()}" }
+            Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show()
+            // No activity launches, so the resume-driven resync never arrives for this attempt.
+            viewModel.syncQuickSetupSwitches()
         }
     }
 

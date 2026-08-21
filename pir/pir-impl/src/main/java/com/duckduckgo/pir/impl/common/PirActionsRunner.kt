@@ -77,6 +77,7 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -88,32 +89,30 @@ import kotlin.coroutines.resumeWithException
 
 interface PirActionsRunner {
     /**
-     * This function is responsible for executing the [BrokerStep] passed on its own detached WebView
+     * Executes [brokerStep] for [profileQuery] on a freshly created detached WebView, which is
+     * destroyed when the step completes.
      *
-     * @param profileQuery - Profile to be passed along actions in [BrokerStep]
-     * @param brokerSteps - List of [BrokerStep] each containing a broker + actions to be executed.
+     * @param profileQuery - Profile to be passed along actions in [brokerStep]
+     * @param brokerStep - A broker + the actions to be executed for it.
      */
-    suspend fun start(
+    suspend fun execute(
         profileQuery: ProfileQuery,
-        brokerSteps: List<BrokerStep>,
+        brokerStep: BrokerStep,
     ): Result<Unit>
 
     /**
-     * This function is responsible for executing the [BrokerStep] passed on the passed [webView].
-     * This initializes everything necessary on the [webView].
-     *
-     * @param webView - WebView in which we want to execute the actions on
-     * @param profileQuery - Profile to be passed along actions in [BrokerStep]
-     * @param brokerSteps - List of [BrokerStep] each containing a broker + actions to be executed.
+     * Executes [brokerStep] for [profileQuery] on the caller-owned [webView], which is configured
+     * for the step and left alive afterwards. Debug / visible runs only.
      */
-    suspend fun startOn(
+    suspend fun executeOn(
         webView: WebView,
         profileQuery: ProfileQuery,
-        brokerSteps: List<BrokerStep>,
+        brokerStep: BrokerStep,
     ): Result<Unit>
 
     /**
-     * Forcefully stops / aborts a runner if it is running.
+     * Forcefully stops / aborts a runner if it is running, and destroys the WebView if this
+     * runner owns it.
      */
     fun stop()
 }
@@ -142,92 +141,155 @@ class RealPirActionsRunner @AssistedInject constructor(
 
     private var engine: PirActionsRunnerStateEngine? = null
     private var detachedWebView: WebView? = null
+    private var ownsWebView: Boolean = false
+
+    private val runContinuation: AtomicReference<CancellableContinuation<Result<Unit>>?> = AtomicReference(null)
+
+    /**
+     * Identity of the WebView whose callbacks are authoritative. A runner executes step after step,
+     * so a callback message left on the main looper by a finished step can still be delivered once
+     * the next step is running - and the engine, jobs, WebView and continuation it would reach all
+     * belong to that next step by then.
+     */
+    private val activeWebViewToken: AtomicReference<WebViewToken?> = AtomicReference(null)
 
     private var timerJob: ConflatedJob = ConflatedJob()
     private var engineJob: ConflatedJob = ConflatedJob()
 
-    override suspend fun start(
+    override suspend fun execute(
         profileQuery: ProfileQuery,
-        brokerSteps: List<BrokerStep>,
+        brokerStep: BrokerStep,
     ): Result<Unit> {
-        if (brokerSteps.isEmpty()) {
-            logcat { "PIR-RUNNER ($this): No broker steps to execute ${Thread.currentThread().name}" }
-            return Result.success(Unit)
-        }
-
-        val runContinuationHolder = RunContinuationHolder()
+        val token = WebViewToken()
+        activeWebViewToken.set(token)
 
         withContext(dispatcherProvider.main()) {
-            logcat {
-                "PIR-RUNNER (${this@RealPirActionsRunner}): ${Thread.currentThread().name} " +
-                    "Brokers size: ${brokerSteps.size} " +
-                    "profile=$profileQuery " +
-                    "Brokers to execute $brokerSteps"
-            }
+            logcat { "PIR-RUNNER (${this@RealPirActionsRunner}): ${Thread.currentThread().name} Creating detached WebView" }
             detachedWebView =
                 pirDetachedWebViewProvider.createInstance(
                     context,
                     pirScriptToLoad,
                     onPageLoaded = {
-                        onLoadingComplete(it)
+                        onLoadingComplete(token, it)
                     },
                     onPageLoadFailed = {
-                        onLoadingFailed(it)
+                        onLoadingFailed(token, it)
                     },
                     onRendererGone = {
-                        onRendererGone(runContinuationHolder, it)
+                        onRendererGone(token, it)
                     },
                 )
+            ownsWebView = true
 
             brokerActionProcessor.register(detachedWebView!!, this@RealPirActionsRunner)
         }
 
-        engine = engineFactory.create(runType, brokerSteps, profileQuery)
-        engine!!.dispatch(Started)
-
-        return awaitResult(runContinuationHolder)
+        return runStep(profileQuery, brokerStep)
     }
 
-    override suspend fun startOn(
+    override suspend fun executeOn(
         webView: WebView,
         profileQuery: ProfileQuery,
-        brokerSteps: List<BrokerStep>,
+        brokerStep: BrokerStep,
     ): Result<Unit> {
-        if (brokerSteps.isEmpty()) {
-            logcat { "PIR-RUNNER ($this): No broker steps to execute ${Thread.currentThread().name}" }
-            return Result.success(Unit)
-        }
-
-        val runContinuationHolder = RunContinuationHolder()
+        val token = WebViewToken()
+        activeWebViewToken.set(token)
 
         withContext(dispatcherProvider.main()) {
-            logcat { "PIR-RUNNER (${this@RealPirActionsRunner}): ${Thread.currentThread().name} Brokers to execute $brokerSteps" }
-            logcat { "PIR-RUNNER (${this@RealPirActionsRunner}): ${Thread.currentThread().name} Brokers size: ${brokerSteps.size}" }
+            logcat { "PIR-RUNNER (${this@RealPirActionsRunner}): ${Thread.currentThread().name} Adopting caller-owned WebView" }
             detachedWebView =
                 pirDetachedWebViewProvider.setupWebView(
                     webView,
                     pirScriptToLoad,
                     onPageLoaded = {
-                        onLoadingComplete(it)
+                        onLoadingComplete(token, it)
                     },
                     onPageLoadFailed = {
-                        onLoadingFailed(it)
+                        onLoadingFailed(token, it)
                     },
                     onRendererGone = {
-                        onRendererGone(runContinuationHolder, it)
+                        onRendererGone(token, it)
                     },
                 )
+            ownsWebView = false
 
             brokerActionProcessor.register(detachedWebView!!, this@RealPirActionsRunner)
         }
 
-        engine = engineFactory.create(runType, brokerSteps, profileQuery)
-        engine!!.dispatch(Started)
-
-        return awaitResult(runContinuationHolder)
+        return runStep(profileQuery, brokerStep)
     }
 
-    private fun onLoadingComplete(url: String?) {
+    private suspend fun runStep(
+        profileQuery: ProfileQuery,
+        brokerStep: BrokerStep,
+    ): Result<Unit> {
+        logcat {
+            "PIR-RUNNER (${this@RealPirActionsRunner}): ${Thread.currentThread().name} " +
+                "profile=$profileQuery broker to execute $brokerStep"
+        }
+
+        return try {
+            engine = engineFactory.create(runType, brokerStep, profileQuery)
+            awaitResult()
+        } finally {
+            finishStep()
+        }
+    }
+
+    /**
+     * Releases everything tied to the step, destroying the WebView if this runner created it.
+     * Cancelling [timerJob] before the next step matters beyond tidiness: a pushed action arms a
+     * local timeout that [CompleteExecution] does not cancel, and it would otherwise fire during
+     * this runner's following step and fail it with this step's action id.
+     *
+     * The teardown is [NonCancellable] because it runs from a `finally`: a cancelled step (a stopped
+     * scan worker, or a sibling runner failing the distributor's scope) would otherwise never reach
+     * the block, and the reference is dropped here, so no later [stop] could destroy the WebView.
+     */
+    private suspend fun finishStep() {
+        activeWebViewToken.set(null)
+        timerJob.cancel()
+        engineJob.cancel()
+        engine?.close()
+        engine = null
+
+        // Captured and cleared synchronously so this step's teardown cannot race the next step's
+        // WebView creation and transiently hold two WebViews.
+        val webView = detachedWebView
+        detachedWebView = null
+        if (webView == null) return
+
+        withContext(NonCancellable + dispatcherProvider.main()) {
+            webView.stopLoading()
+            if (ownsWebView) {
+                webView.evaluateJavascript("window.stop();", null)
+                webView.clearFormData()
+                webView.clearHistory()
+                webView.clearCache(true)
+                webView.destroy()
+                logcat { "PIR-RUNNER: Destroyed webview" }
+            } else {
+                webView.clearFormData()
+                webView.clearHistory()
+            }
+        }
+    }
+
+    /**
+     * Whether [token] belongs to a WebView this runner has already moved on from, in which case its
+     * callbacks must not touch any of the runner's now step-scoped state.
+     */
+    private fun isStale(token: WebViewToken): Boolean = token !== activeWebViewToken.get()
+
+    private fun onLoadingComplete(
+        token: WebViewToken,
+        url: String?,
+    ) {
+        if (isStale(token)) {
+            logcat { "PIR-RUNNER ($this): finished loading $url on a WebView from a finished step - stale, ignoring" }
+            return
+        }
+
         logcat { "PIR-RUNNER ($this): finished loading $url" }
         if (url == null) {
             return
@@ -240,7 +302,15 @@ class RealPirActionsRunner @AssistedInject constructor(
         )
     }
 
-    private fun onLoadingFailed(url: String?) {
+    private fun onLoadingFailed(
+        token: WebViewToken,
+        url: String?,
+    ) {
+        if (isStale(token)) {
+            logcat { "PIR-RUNNER ($this): loading $url failed on a WebView from a finished step - stale, ignoring" }
+            return
+        }
+
         logcat { "PIR-RUNNER (${this@RealPirActionsRunner}): Recovering from loading $url failure" }
         if (url == null) {
             return
@@ -253,16 +323,22 @@ class RealPirActionsRunner @AssistedInject constructor(
     }
 
     private fun onRendererGone(
-        runContinuationHolder: RunContinuationHolder,
+        token: WebViewToken,
         didCrash: Boolean,
     ) {
-        val continuation = runContinuationHolder.continuation.getAndSet(null)
-        if (continuation == null || !continuation.isActive) {
+        if (isStale(token)) {
             logcat {
-                "PIR-RUNNER (${this@RealPirActionsRunner}): renderer process gone, didCrash=$didCrash - stale/no-op, ignoring"
+                "PIR-RUNNER (${this@RealPirActionsRunner}): renderer process gone, didCrash=$didCrash " +
+                    "on a WebView from a finished step - stale, ignoring"
             }
             return
         }
+
+        // No further callback from this WebView can be authoritative, and clearing the token here
+        // keeps a repeated report from tearing down whichever step is running by then.
+        activeWebViewToken.set(null)
+
+        val continuation = runContinuation.getAndSet(null)
 
         if (timerJob.isActive) {
             timerJob.cancel()
@@ -270,26 +346,47 @@ class RealPirActionsRunner @AssistedInject constructor(
         if (engineJob.isActive) {
             engineJob.cancel()
         }
+
+        // A WebView whose renderer died cannot run anything further, so drop it now rather than
+        // letting the step teardown touch a dead instance.
+        val deadWebView = detachedWebView
+        detachedWebView = null
+        if (ownsWebView && deadWebView != null) {
+            coroutineScope.launch(dispatcherProvider.main()) {
+                deadWebView.destroy()
+            }
+        }
+
+        if (continuation == null || !continuation.isActive) {
+            logcat {
+                "PIR-RUNNER (${this@RealPirActionsRunner}): renderer process gone, didCrash=$didCrash - stale/no-op, ignoring"
+            }
+            return
+        }
+
         logcat { "PIR-RUNNER (${this@RealPirActionsRunner}): renderer process gone, didCrash=$didCrash - failing current run" }
         continuation.resumeWithException(PirRendererGoneException(didCrash))
     }
 
-    private suspend fun awaitResult(runContinuationHolder: RunContinuationHolder): Result<Unit> =
+    private suspend fun awaitResult(): Result<Unit> =
         suspendCancellableCoroutine { continuation ->
-            runContinuationHolder.continuation.set(continuation)
+            runContinuation.set(continuation)
             engineJob +=
                 coroutineScope.launch {
                     engine!!.sideEffect.collect { effect ->
                         if (effect is CompleteExecution) {
-                            runContinuationHolder.continuation.getAndSet(null)?.resume(Result.success(Unit))
+                            runContinuation.getAndSet(null)?.resume(Result.success(Unit))
                         } else {
                             handleEffect(effect)
                         }
                     }
                 }
 
+            // Subscribed above before dispatching, so the outcome does not depend on replay.
+            engine!!.dispatch(Started)
+
             continuation.invokeOnCancellation {
-                runContinuationHolder.continuation.getAndSet(null)
+                runContinuation.getAndSet(null)
                 engineJob.cancel()
             }
         }
@@ -531,22 +628,30 @@ class RealPirActionsRunner @AssistedInject constructor(
         }
 
     private fun cleanUpRunner() {
+        activeWebViewToken.set(null)
         if (timerJob.isActive) {
             timerJob.cancel()
         }
         if (engineJob.isActive) {
             engineJob.cancel()
         }
+        runContinuation.getAndSet(null)
+        engine?.close()
+        engine = null
+
+        // Captured and cleared synchronously so teardown cannot race a later execute().
+        val webView = detachedWebView
+        detachedWebView = null
+        if (!ownsWebView || webView == null) return
+
         coroutineScope.launch(dispatcherProvider.main()) {
-            detachedWebView?.stopLoading()
-            detachedWebView?.loadUrl("about:blank")
-            detachedWebView?.evaluateJavascript("window.stop();", null)
-            detachedWebView?.clearFormData()
-            detachedWebView?.clearHistory()
-            detachedWebView?.clearCache(true)
-            detachedWebView?.destroy()
-            detachedWebView = null
-            logcat { "PIR-RUNNER ($this): Destroyed webview" }
+            webView.stopLoading()
+            webView.evaluateJavascript("window.stop();", null)
+            webView.clearFormData()
+            webView.clearHistory()
+            webView.clearCache(true)
+            webView.destroy()
+            logcat { "PIR-RUNNER: Destroyed webview" }
         }
     }
 
@@ -596,7 +701,5 @@ class RealPirActionsRunner @AssistedInject constructor(
         }
     }
 
-    private class RunContinuationHolder {
-        val continuation: AtomicReference<CancellableContinuation<Result<Unit>>?> = AtomicReference(null)
-    }
+    private class WebViewToken
 }

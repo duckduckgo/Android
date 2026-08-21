@@ -54,6 +54,7 @@ class AccountInfoKeyManagerTest {
     private val syncApi: SyncApi = mock()
     private val syncJweCrypto: SyncJweCrypto = mock()
     private val nativeLib: SyncLib = mock()
+    private val thirdPartyCredentialManager: ThirdPartyCredentialManager = mock()
 
     @get:Rule
     val coroutineTestRule = CoroutineTestRule()
@@ -68,12 +69,14 @@ class AccountInfoKeyManagerTest {
             syncJweCrypto = syncJweCrypto,
             nativeLib = nativeLib,
             thirdPartyKeyWrapper = RealThirdPartyKeyWrapper(syncJweCrypto),
+            thirdPartyCredentialManager = thirdPartyCredentialManager,
             dispatchers = coroutineTestRule.testDispatcherProvider,
         )
         configureForSuccessfulKeypairMint()
     }
 
     private fun configureForSuccessfulKeypairMint() {
+        whenever(thirdPartyCredentialManager.refresh()).thenReturn(Success(false))
         whenever(syncStore.token).thenReturn(token)
         whenever(syncStore.secretKey).thenReturn(secretKey)
         whenever(syncJweCrypto.generateRsaKeyPair(any())).thenReturn(RsaKeyPair("pubKey", "cHJpdktleQ"))
@@ -139,6 +142,50 @@ class AccountInfoKeyManagerTest {
     }
 
     @Test
+    fun whenNoScopedPasswordCachedThenAsksServerWhetherAccountHasThirdPartyCredential() = runTest {
+        whenever(syncStore.scopedPassword).thenReturn(null)
+        whenever(syncApi.setKeysIfAbsent(eq(token), eq("account_info"), any())).thenReturn(Success(SetKeysIfAbsentResult.Created))
+
+        manager.ensureKeyRegistered()
+
+        verify(thirdPartyCredentialManager).refresh()
+    }
+
+    @Test
+    fun whenScopedPasswordRecoveredFromServerThenBothWrapsAreSent() = runTest {
+        whenever(syncStore.scopedPassword).thenReturn(null)
+        whenever(syncStore.userId).thenReturn(userId)
+        // a successful refresh stores the recovered scoped password
+        whenever(thirdPartyCredentialManager.refresh()).thenAnswer {
+            whenever(syncStore.scopedPassword).thenReturn(ScopedPassword("c3BSYXc="))
+            Success(true)
+        }
+        whenever(syncJweCrypto.hkdfSha256SingleBlock(any(), any(), any(), any())).thenReturn(ByteArray(32))
+        whenever(syncJweCrypto.jweEncryptSymmetric(any(), any(), anyOrNull())).thenReturn("3party_wrapped")
+        whenever(syncApi.setKeysIfAbsent(eq(token), eq("account_info"), any())).thenReturn(Success(SetKeysIfAbsentResult.Created))
+
+        val result = manager.ensureKeyRegistered() as Success
+
+        assertEquals(2, result.data.wrapsSent)
+        verify(syncApi).setKeysIfAbsent(
+            eq(token),
+            eq("account_info"),
+            check { keys -> assertEquals(setOf("ddg", "3party"), keys.map { it.encryptedWith }.toSet()) },
+        )
+    }
+
+    @Test
+    fun whenScopedPasswordRecoveryFailsThenKeyIsStillRegisteredForDdgOnly() = runTest {
+        whenever(syncStore.scopedPassword).thenReturn(null)
+        whenever(thirdPartyCredentialManager.refresh()).thenReturn(Error(reason = "no network"))
+        whenever(syncApi.setKeysIfAbsent(eq(token), eq("account_info"), any())).thenReturn(Success(SetKeysIfAbsentResult.Created))
+
+        val result = manager.ensureKeyRegistered() as Success
+
+        assertEquals(1, result.data.wrapsSent)
+    }
+
+    @Test
     fun whenScopedPasswordPresentThenBothWrapsAreSentSharingOneKid() = runTest {
         whenever(syncStore.scopedPassword).thenReturn(ScopedPassword("c3BSYXc="))
         whenever(syncStore.userId).thenReturn(userId)
@@ -150,6 +197,7 @@ class AccountInfoKeyManagerTest {
 
         assertTrue(result is Success)
         assertEquals(2, (result as Success).data.wrapsSent)
+        verify(thirdPartyCredentialManager, never()).refresh()
         verify(syncApi).setKeysIfAbsent(
             eq(token),
             eq("account_info"),

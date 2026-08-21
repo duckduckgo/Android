@@ -28,6 +28,8 @@ import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.ANNOUNCE
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.APP_UPDATE
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.CRITICAL_UPDATE
+import com.duckduckgo.remote.messaging.api.DisplayConditions
+import com.duckduckgo.remote.messaging.api.MessageTrigger.AFTER_IDLE
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.Surface.MODAL
 import com.duckduckgo.remote.messaging.api.Surface.NEW_TAB_PAGE
@@ -350,6 +352,26 @@ class RemoteMessagingConfigJsonMapperTest {
             surfaces = listOf(NEW_TAB_PAGE),
         )
         assertEquals(bigSingleActionMessage, config.messages[0])
+    }
+
+    @Test
+    fun whenJsonHasDisplayConditionsThenMappedIntoRemoteConfig() = runTest {
+        fakeFeatureToggles.remoteMessageModalSurface().setRawStoredState(State(enable = false))
+        val result = getConfigFromJson("json/remote_messaging_config_display_conditions.json")
+
+        val testee = RemoteMessagingConfigJsonMapper(appBuildConfig, jsonMatchingAttributeMappers, messageActionPlugins, fakeFeatureToggles)
+
+        val config = testee.map(result)
+
+        assertEquals(2, config.messages.size)
+        assertEquals(
+            DisplayConditions(trigger = AFTER_IDLE, dismissAfterDaysShown = 5, maxImpressions = 3),
+            config.messages[0].displayConditions,
+        )
+        assertEquals(
+            DisplayConditions(trigger = null, dismissAfterDaysShown = null, maxImpressions = 1),
+            config.messages[1].displayConditions,
+        )
     }
 
     private fun getConfigFromJson(resourceName: String): JsonRemoteMessagingConfig {

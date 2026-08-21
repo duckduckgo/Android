@@ -20,7 +20,7 @@ import android.content.ComponentName
 import android.content.Intent
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import junit.framework.TestCase.assertEquals
@@ -520,5 +520,38 @@ class DuckDuckGoAppLinksHandlerTest {
             ),
         )
         verify(mockCallback).invoke()
+    }
+
+    @Test
+    fun whenTrustedCallerViaComponentPackageMatchesClientThenReturnTrue() {
+        val appIntent = Intent().setComponent(ComponentName("com.example.app", "com.example.app.MainActivity"))
+        assertTrue(testee.isTrustedCaller(AppLink(uriString = "example.com", appIntent = appIntent), "com.example.app"))
+    }
+
+    @Test
+    fun whenTrustedCallerViaIntentPackageMatchesClientThenReturnTrue() {
+        val appIntent = Intent().setPackage("com.example.app")
+        assertTrue(testee.isTrustedCaller(AppLink(uriString = "example.com", appIntent = appIntent), "com.example.app"))
+    }
+
+    @Test
+    fun whenTargetPackageDoesNotMatchClientThenReturnFalse() {
+        val appIntent = Intent().setPackage("com.example.app")
+        assertFalse(testee.isTrustedCaller(AppLink(uriString = "example.com", appIntent = appIntent), "com.different.app"))
+    }
+
+    @Test
+    fun whenTargetPackageIsNullThenReturnFalse() {
+        assertFalse(testee.isTrustedCaller(AppLink(uriString = "example.com", appIntent = null), "com.example.app"))
+    }
+
+    @Test
+    fun whenDomainInAlwaysTriggerListThenIsAlwaysTriggerDomainReturnsTrue() {
+        assertTrue(testee.isAlwaysTriggerDomain(AppLink(uriString = "https://app.digid.nl/path")))
+    }
+
+    @Test
+    fun whenDomainNotInAlwaysTriggerListThenIsAlwaysTriggerDomainReturnsFalse() {
+        assertFalse(testee.isAlwaysTriggerDomain(AppLink(uriString = "https://example.com/path")))
     }
 }

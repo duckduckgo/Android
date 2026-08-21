@@ -447,14 +447,16 @@ class BrowserMenuBottomSheet(
     }
 
     private fun renderDuckAiMenu(viewState: BrowserMenuViewState.DuckAi) {
-        forwardMenuItem.isEnabled = false
+        backMenuItem.isVisible = false
+        forwardMenuItem.isVisible = false
         newTabMenuItem.isEnabled = true
         newDuckChatMenuItem.isEnabled = false
         newDuckChatMenuItem.isVisible = false
         settingsMenuItem.isEnabled = true
 
-        refreshMenuItem.isVisible = true
-        brokenSiteMenuItem.isVisible = viewState.canReportSite
+        refreshMenuItem.isVisible = false
+        // Duck.ai issues aren't site breakage, they go through the feedback flow instead
+        brokenSiteMenuItem.isVisible = false
         printPageMenuItem.isVisible = viewState.canPrintPage
         autofillMenuItem.isVisible = viewState.showAutofill
         downloadsMenuItem.isVisible = true
@@ -469,7 +471,7 @@ class BrowserMenuBottomSheet(
         )
 
         binding.urlPageActionsSectionDivider.isVisible = true
-        binding.librarySectionDivider.isVisible = true
+        binding.librarySectionDivider.isVisible = false
         binding.privacyToolsSectionDivider.isVisible = false
         binding.utilitiesSectionDivider.isVisible = true
         binding.customTabsMenuDivider.isVisible = false

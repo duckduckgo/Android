@@ -16,7 +16,10 @@
 
 package com.duckduckgo.app.onboarding.ui.page.configdriven
 
+import androidx.annotation.DrawableRes
 import com.duckduckgo.app.browser.omnibar.OmnibarType
+import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
+import com.duckduckgo.app.onboarding.OnboardingPreference
 import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
 
 /** A screen with working state the user edits before submitting. */
@@ -27,6 +30,12 @@ interface Stateful<S : Any> {
 sealed interface ContentConfig {
 
     val title: TextConfig
+
+    data class Welcome(
+        override val title: TextConfig,
+        val body1: TextConfig,
+        val body2: TextConfig?,
+    ) : ContentConfig
 
     data class ComparisonChart(
         override val title: TextConfig,
@@ -40,6 +49,96 @@ sealed interface ContentConfig {
     ) : ContentConfig, Stateful<AddressBarContentState> {
         override fun initialState() = AddressBarContentState(position = initialPosition)
     }
+
+    data class InputScreen(
+        override val title: TextConfig,
+        val description: TextConfig,
+        val initialWithAi: Boolean,
+    ) : ContentConfig, Stateful<InputScreenContentState> {
+        override fun initialState() = InputScreenContentState(withAi = initialWithAi)
+    }
+
+    data class AddToDock(
+        override val title: TextConfig,
+        val body: TextConfig,
+    ) : ContentConfig
+
+    data class WidgetPrompt(
+        override val title: TextConfig,
+        val body: TextConfig,
+    ) : ContentConfig
+
+    data class InputScreenPreview(
+        override val title: TextConfig,
+        val isSearchDefault: Boolean,
+        val showModeToggle: Boolean,
+        val searchSuggestions: List<DaxDialogIntroOption>,
+        val chatSuggestions: List<DaxDialogIntroOption>,
+    ) : ContentConfig, Stateful<InputScreenPreviewContentState> {
+        override fun initialState() = InputScreenPreviewContentState(isSearchSelected = isSearchDefault)
+    }
+
+    data class QuickSetup(
+        override val title: TextConfig,
+        val showSplitOption: Boolean,
+        val hideSetDefaultBrowserRow: Boolean,
+        val hideAddWidgetRow: Boolean,
+        val hideAddressBarRow: Boolean,
+        val initialAddressBarPosition: OmnibarType,
+        val initialWithAi: Boolean,
+    ) : ContentConfig, Stateful<QuickSetupContentState> {
+        override fun initialState() = QuickSetupContentState(
+            defaultBrowserChecked = false,
+            widgetChecked = false,
+            addressBarPosition = initialAddressBarPosition,
+            withAi = initialWithAi,
+        )
+    }
+
+    data class DownloadReason(
+        override val title: TextConfig,
+        val body: TextConfig,
+    ) : ContentConfig, Stateful<DownloadReasonContentState> {
+        override fun initialState() = DownloadReasonContentState(selection = null)
+    }
+
+    data class PreferenceSelector(
+        override val title: TextConfig,
+        val rows: List<Row>,
+    ) : ContentConfig, Stateful<PreferenceSelectorContentState> {
+
+        data class Row(
+            val preference: OnboardingPreference,
+            @DrawableRes val iconRes: Int,
+            val primaryText: TextConfig,
+            val secondaryText: TextConfig,
+            val initiallyEnabled: Boolean,
+        )
+
+        override fun initialState() = PreferenceSelectorContentState(rows.associate { it.preference to it.initiallyEnabled })
+    }
 }
 
 data class AddressBarContentState(val position: OmnibarType)
+
+data class InputScreenContentState(val withAi: Boolean)
+
+data class InputScreenPreviewContentState(val isSearchSelected: Boolean)
+
+data class QuickSetupContentState(
+    val defaultBrowserChecked: Boolean,
+    val widgetChecked: Boolean,
+    val addressBarPosition: OmnibarType,
+    val withAi: Boolean,
+)
+
+data class DownloadReasonContentState(val selection: DownloadReasonSelection?)
+
+data class PreferenceSelectorContentState(val enabled: Map<OnboardingPreference, Boolean>)
+
+enum class DownloadReasonSelection {
+    SEARCH,
+    AI_CHAT,
+    NO_AI,
+    BLOCK_ADS,
+}

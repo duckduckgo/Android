@@ -38,6 +38,11 @@
                 android:screenOrientation="portrait" />
 
         <activity
+                android:name=".onboarding.features.SubscriptionOnboardingFeatureInfoActivity"
+                android:exported="false"
+                android:screenOrientation="portrait" />
+
+        <activity
                 android:name=".ui.RestoreSubscriptionActivity"
                 android:exported="false"
                 android:label="@string/activityActivateSubscription"
