@@ -20,9 +20,9 @@
     <string name="autoconsentTitle">Protezione pop-up dei cookie</string>
     <string name="autoconsentDescription"><![CDATA[DuckDuckGo cercherà di selezionare le impostazioni con la massima privacy e nasconderà questi popup per te.<a href=\"\">Ulteriori informazioni</a>]]></string>
     <string name="autoconsentToggle">Lascia che DuckDuckGo gestisca i pop-up cookie</string>
-    <string name="autoconsentAutoManageToggle">Gestione automatica dei popup dei cookie</string>
-    <string name="autoconsentAutoManageDescription">Cercheremo di selezionare solo le opzioni dei cookie più private disponibili per te, quindi di chiudere questi popup.</string>
-    <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[DuckDuckGo può gestire automaticamente le preferenze sui cookie per massimizzare la privacy, ridurre al minimo i cookie e chiudere questi popup.\n<a href=\"\">Ulteriori informazioni</a>]]></string>
-    <string name="autoconsentPopUpsWithoutOptOutsToggle">Popup senza possibilità di rifiutare</string>
-    <string name="autoconsentPopUpsWithoutOptOutsDescription">Lascia inoltre che DuckDuckGo ti faccia risparmiare un clic accettando i cookie per tuo conto, per chiudere i pop-up che non ti permettono di rifiutare.</string>
+    <string name="autoconsentAutoManageToggle">Rifiuta i cookie opzionali</string>
+    <string name="autoconsentAutoManageDescription">Cercheremo di rifiutare il maggior numero possibile di cookie per te, quindi di chiudere i pop-up.</string>
+    <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[DuckDuckGo può gestire automaticamente i popup sui cookie per massimizzare la privacy e ridurre al minimo i cookie prima ancora che tu li veda.\n<a href=\"\">Ulteriori informazioni</a>]]></string>
+    <string name="autoconsentPopUpsWithoutOptOutsToggle">Accetta i cookie che non prevedono il rifiuto</string>
+    <string name="autoconsentPopUpsWithoutOptOutsDescription">Se non è prevista un\'opzione di rifiuto, ti risparmieremo un clic, accetteremo questi cookie per te e chiuderemo i popup.</string>
 </resources>
