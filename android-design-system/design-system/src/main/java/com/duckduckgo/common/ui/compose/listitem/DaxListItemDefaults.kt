@@ -24,6 +24,7 @@ internal object DaxListItemDefaults {
     val OneLineMinHeight: Dp = 48.dp
     val OneLineWithIconMinHeight: Dp = 56.dp
     val TwoLineMinHeight: Dp = 64.dp
+    val SettingsMinHeight: Dp = 48.dp
 
     val HorizontalPadding: Dp = 16.dp
     val LeadingGap: Dp = 16.dp

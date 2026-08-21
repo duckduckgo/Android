@@ -43,7 +43,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.takeOrElse
 import com.duckduckgo.common.ui.compose.DaxStatusIndicator
 import com.duckduckgo.common.ui.compose.Status
 import com.duckduckgo.common.ui.compose.button.DaxGhostButton
@@ -79,6 +81,7 @@ import androidx.compose.material3.Icon as M3Icon
  * @param trailingContent Optional trailing slot — use [DaxListItemTrailingScope] members.
  * @param onClick Optional click handler; when non-null the row becomes clickable.
  * @param onLongClick Optional long-click handler; when non-null the row becomes long-clickable.
+ * @param minHeight Overrides the row's minimum height, which otherwise follows the text and leading content.
  * @param enabled Whether the row is enabled and interactive. Disabled rows are dimmed, and the
  * leading and trailing scopes pass the state on to their members so slot content is disabled rather
  * than only dimmed.
@@ -98,11 +101,14 @@ internal fun DaxListItem(
     onClick: (() -> Unit)? = null,
     onLongClick: (() -> Unit)? = null,
     enabled: Boolean = true,
+    minHeight: Dp = Dp.Unspecified,
 ) {
-    val minHeight = when {
-        secondaryText != null -> DaxListItemDefaults.TwoLineMinHeight
-        leadingContent != null -> DaxListItemDefaults.OneLineWithIconMinHeight
-        else -> DaxListItemDefaults.OneLineMinHeight
+    val rowMinHeight = minHeight.takeOrElse {
+        when {
+            secondaryText != null -> DaxListItemDefaults.TwoLineMinHeight
+            leadingContent != null -> DaxListItemDefaults.OneLineWithIconMinHeight
+            else -> DaxListItemDefaults.OneLineMinHeight
+        }
     }
     val interaction = if (onClick != null || onLongClick != null) {
         Modifier.combinedClickable(
@@ -120,7 +126,7 @@ internal fun DaxListItem(
         modifier = modifier
             .fillMaxWidth()
             .then(interaction)
-            .heightIn(min = minHeight)
+            .heightIn(min = rowMinHeight)
             .padding(start = HorizontalPadding),
         verticalAlignment = Alignment.CenterVertically,
     ) {

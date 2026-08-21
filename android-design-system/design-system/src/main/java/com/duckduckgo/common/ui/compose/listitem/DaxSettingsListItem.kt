@@ -23,46 +23,52 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.duckduckgo.common.ui.compose.Status
 import com.duckduckgo.common.ui.compose.tools.PreviewSurface
 import com.duckduckgo.mobile.android.R
 
 /**
- * Settings row: one-line list item whose trailing element is a status indicator.
+ * Settings row: the list item used throughout the settings screens.
  *
- * The trailing slot is fixed to a [DaxListItemTrailingScope.StatusIndicator] driven by [status]; it is not a free slot like the other variants.
+ * Its trailing element is either a [DaxListItemTrailingScope.StatusIndicator] or a
+ * [DaxListItemTrailingScope.Icon], so the slot is open like the other variants.
  *
  * Asana task: https://app.asana.com/1/137249556945/project/1202857801505092/task/1217018486992588
- * Figma reference: https://www.figma.com/design/BOHDESHODUXK7wSRNBOHdu/%F0%9F%A4%96-Android-Components?node-id=13115-55051
+ * Figma reference: https://www.figma.com/design/BOHDESHODUXK7wSRNBOHdu/%F0%9F%A4%96-Android-Components?node-id=12994-10026
  *
  * @param primaryText Primary label.
- * @param status Status to display in the trailing slot — one of [Status.AlwaysOn], [Status.On], [Status.Off].
  * @param modifier Modifier applied to the list item row.
+ * @param secondaryText Secondary caption shown beneath the primary label; `null` = one-line layout.
  * @param inlineContent Optional slot rendered inline after the primary text — use [DaxListItemInlineScope] members.
  * @param leadingContent Optional leading slot — use [DaxListItemLeadingScope] members.
+ * @param trailingContent Optional trailing slot — use [DaxListItemTrailingScope] members.
  * @param onClick Optional click handler; when non-null the row becomes clickable.
  * @param enabled Whether the row is enabled; disabled rows are dimmed and non-interactive.
  */
 @Composable
 fun DaxSettingsListItem(
     primaryText: String,
-    status: Status,
     modifier: Modifier = Modifier,
+    secondaryText: String? = null,
     inlineContent: (@Composable DaxListItemInlineScope.() -> Unit)? = null,
     leadingContent: (@Composable DaxListItemLeadingScope.() -> Unit)? = null,
+    trailingContent: (@Composable DaxListItemTrailingScope.() -> Unit)? = null,
     onClick: (() -> Unit)? = null,
     enabled: Boolean = true,
 ) {
     DaxListItem(
         primaryText = AnnotatedString(primaryText),
         modifier = modifier,
+        secondaryText = secondaryText?.let { AnnotatedString(it) },
         inlineContent = inlineContent,
         primaryMaxLines = Int.MAX_VALUE,
         leadingContent = leadingContent,
-        trailingContent = { StatusIndicator(status) },
+        trailingContent = trailingContent,
         onClick = onClick,
         enabled = enabled,
+        minHeight = if (secondaryText == null) DaxListItemDefaults.SettingsMinHeight else Dp.Unspecified,
     )
 }
 
@@ -70,7 +76,7 @@ fun DaxSettingsListItem(
 @Composable
 private fun DaxSettingsListItemPreview() {
     PreviewSurface {
-        DaxSettingsListItem(primaryText = "VPN", status = Status.On, onClick = {})
+        DaxSettingsListItem(primaryText = "VPN", trailingContent = { StatusIndicator(Status.On) }, onClick = {})
     }
 }
 
@@ -78,7 +84,12 @@ private fun DaxSettingsListItemPreview() {
 @Composable
 private fun DaxSettingsListItemWithPillPreview() {
     PreviewSurface {
-        DaxSettingsListItem(primaryText = "VPN", status = Status.On, inlineContent = { Pill("Beta") }, onClick = {})
+        DaxSettingsListItem(
+            primaryText = "VPN",
+            inlineContent = { Pill("Beta") },
+            trailingContent = { StatusIndicator(Status.On) },
+            onClick = {},
+        )
     }
 }
 
@@ -87,9 +98,35 @@ private fun DaxSettingsListItemWithPillPreview() {
 private fun DaxSettingsListItemStatusesPreview() {
     PreviewSurface {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            DaxSettingsListItem(primaryText = "On", status = Status.On, onClick = {})
-            DaxSettingsListItem(primaryText = "Always on", status = Status.AlwaysOn, onClick = {})
-            DaxSettingsListItem(primaryText = "Off", status = Status.Off, onClick = {})
+            DaxSettingsListItem(primaryText = "On", trailingContent = { StatusIndicator(Status.On) }, onClick = {})
+            DaxSettingsListItem(primaryText = "Always on", trailingContent = { StatusIndicator(Status.AlwaysOn) }, onClick = {})
+            DaxSettingsListItem(primaryText = "Off", trailingContent = { StatusIndicator(Status.Off) }, onClick = {})
+        }
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun DaxSettingsListItemTrailingIconPreview() {
+    PreviewSurface {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            DaxSettingsListItem(
+                primaryText = "DuckDuckGo on Other Platforms",
+                leadingContent = { Icon(painterResource(R.drawable.ic_globe_24), null) },
+                trailingContent = {
+                    Icon(painterResource(R.drawable.ic_open_in_16), "Open", size = DaxListItemTrailingIconSize.Small)
+                },
+                onClick = {},
+            )
+            DaxSettingsListItem(
+                primaryText = "Subscription",
+                secondaryText = "Your Privacy Pro subscription expired",
+                leadingContent = { Icon(painterResource(R.drawable.ic_globe_24), null) },
+                trailingContent = {
+                    Icon(painterResource(R.drawable.ic_exclamation_recolorable_16), "Expired", size = DaxListItemTrailingIconSize.Small)
+                },
+                onClick = {},
+            )
         }
     }
 }
@@ -101,13 +138,18 @@ private fun DaxSettingsListItemLeadingIconAndDisabledPreview() {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             DaxSettingsListItem(
                 primaryText = "With leading icon",
-                status = Status.On,
                 leadingContent = {
                     Icon(painterResource(R.drawable.ic_globe_24), null, background = DaxListItemIconBackground.Circular)
                 },
+                trailingContent = { StatusIndicator(Status.On) },
                 onClick = {},
             )
-            DaxSettingsListItem(primaryText = "Disabled", status = Status.Off, enabled = false, onClick = {})
+            DaxSettingsListItem(
+                primaryText = "Disabled",
+                trailingContent = { StatusIndicator(Status.Off) },
+                enabled = false,
+                onClick = {},
+            )
         }
     }
 }

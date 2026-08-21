@@ -1565,7 +1565,7 @@ private fun ComposeSettingsWithIcon() {
     ComposeCaption()
     DaxSettingsListItem(
         primaryText = "Settings List Item",
-        status = Status.Off,
+        trailingContent = { StatusIndicator(Status.Off) },
         leadingContent = { Image(painterResource(CommonR.drawable.ic_dax_icon), null, size = DaxListItemIconSize.Small) },
         onClick = {},
     )
@@ -1576,7 +1576,7 @@ private fun ComposeSettingsAlwaysOn() {
     ComposeCaption()
     DaxSettingsListItem(
         primaryText = "Settings List Item Always On",
-        status = Status.AlwaysOn,
+        trailingContent = { StatusIndicator(Status.AlwaysOn) },
         leadingContent = { Image(painterResource(CommonR.drawable.ic_dax_icon), null, size = DaxListItemIconSize.Small) },
         onClick = {},
     )
@@ -1587,7 +1587,7 @@ private fun ComposeSettingsOn() {
     ComposeCaption()
     DaxSettingsListItem(
         primaryText = "Settings List Item on",
-        status = Status.On,
+        trailingContent = { StatusIndicator(Status.On) },
         leadingContent = { Image(painterResource(CommonR.drawable.ic_dax_icon), null, size = DaxListItemIconSize.Small) },
         onClick = {},
     )
@@ -1598,7 +1598,7 @@ private fun ComposeSettingsOff() {
     ComposeCaption()
     DaxSettingsListItem(
         primaryText = "Settings List Item Off",
-        status = Status.Off,
+        trailingContent = { StatusIndicator(Status.Off) },
         leadingContent = { Image(painterResource(CommonR.drawable.ic_dax_icon), null, size = DaxListItemIconSize.Small) },
         onClick = {},
     )
@@ -1609,7 +1609,7 @@ private fun ComposeSettingsBeta() {
     ComposeCaption()
     DaxSettingsListItem(
         primaryText = "Settings List Item with Beta Pill",
-        status = Status.On,
+        trailingContent = { StatusIndicator(Status.On) },
         inlineContent = { Pill("Beta") },
         leadingContent = { Image(painterResource(CommonR.drawable.ic_dax_icon), null, size = DaxListItemIconSize.Small) },
         onClick = {},
@@ -1621,7 +1621,7 @@ private fun ComposeSettingsBetaLongText() {
     ComposeCaption()
     DaxSettingsListItem(
         primaryText = "Settings List Item with Beta Pill and a very long piece of text that should hopefully wrap",
-        status = Status.On,
+        trailingContent = { StatusIndicator(Status.On) },
         inlineContent = { Pill("Beta") },
         leadingContent = { Image(painterResource(CommonR.drawable.ic_dax_icon), null, size = DaxListItemIconSize.Small) },
         onClick = {},
@@ -1633,7 +1633,7 @@ private fun ComposeSettingsNew() {
     ComposeCaption()
     DaxSettingsListItem(
         primaryText = "Settings List Item with New Pill",
-        status = Status.On,
+        trailingContent = { StatusIndicator(Status.On) },
         inlineContent = { Pill("New") },
         leadingContent = { Image(painterResource(CommonR.drawable.ic_dax_icon), null, size = DaxListItemIconSize.Small) },
         onClick = {},
@@ -1645,7 +1645,7 @@ private fun ComposeSettingsExtras() {
     ComposeCaption(stringResource(R.string.dsShowcaseCaptionComposeOnly))
     DaxSettingsListItem(
         primaryText = "Leading icon over circular background",
-        status = Status.On,
+        trailingContent = { StatusIndicator(Status.On) },
         leadingContent = {
             Image(
                 painterResource(CommonR.drawable.ic_dax_icon),
@@ -1656,5 +1656,27 @@ private fun ComposeSettingsExtras() {
         },
         onClick = {},
     )
-    DaxSettingsListItem(primaryText = "Disabled", status = Status.Off, enabled = false, onClick = {})
+    DaxSettingsListItem(primaryText = "Disabled", trailingContent = { StatusIndicator(Status.Off) }, enabled = false, onClick = {})
+    DaxSettingsListItem(
+        primaryText = "Trailing icon instead of a status",
+        leadingContent = { Icon(painterResource(CommonR.drawable.ic_globe_24), null) },
+        trailingContent = {
+            Icon(painterResource(CommonR.drawable.ic_open_in_16), "Open", onClick = {}, size = DaxListItemTrailingIconSize.Small)
+        },
+        onClick = {},
+    )
+    DaxSettingsListItem(
+        primaryText = "Two line settings row",
+        secondaryText = "Your Privacy Pro subscription expired",
+        leadingContent = { Icon(painterResource(CommonR.drawable.ic_globe_24), null) },
+        trailingContent = {
+            Icon(
+                painterResource(CommonR.drawable.ic_exclamation_recolorable_16),
+                "Expired",
+                onClick = {},
+                size = DaxListItemTrailingIconSize.Small,
+            )
+        },
+        onClick = {},
+    )
 }
