@@ -30,6 +30,8 @@ data class ActionRequest(
 sealed class PirScriptRequestData {
     data class SolveCaptcha(
         val token: String,
+        val userProfile: ProfileQuery? = null,
+        val extractedProfile: ExtractedProfileParams? = null,
     ) : PirScriptRequestData()
 
     data class UserProfile(
