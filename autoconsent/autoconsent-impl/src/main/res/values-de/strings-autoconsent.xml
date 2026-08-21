@@ -22,7 +22,7 @@
     <string name="autoconsentToggle">Lass Cookie-Pop-ups von DuckDuckGo verwalten</string>
     <string name="autoconsentAutoManageToggle">Optionale Cookies ablehnen</string>
     <string name="autoconsentAutoManageDescription">Wir werden versuchen, so viele Cookies wie möglich für dich abzulehnen und dann die Pop-ups zu schließen.</string>
-    <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[DuckDuckGo kann Cookie-Pop-ups automatisch verwalten, um die Privatsphäre zu maximieren und Cookies zu minimieren, bevor du sie überhaupt siehst.<a href=\"\">Mehr erfahren</a>]]></string>
+    <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[DuckDuckGo kann Cookie-Pop-ups automatisch verwalten, um die Privatsphäre zu maximieren und Cookies zu minimieren, bevor du sie überhaupt siehst.\n<a href=\"\">Mehr erfahren</a>]]></string>
     <string name="autoconsentPopUpsWithoutOptOutsToggle">Cookies akzeptieren, die nicht abgelehnt werden können</string>
     <string name="autoconsentPopUpsWithoutOptOutsDescription">Falls es keine Option zum Ablehnen gibt, ersparen wir dir einen Klick, akzeptieren diese Cookies für dich und schließen die Pop-ups.</string>
 </resources>
