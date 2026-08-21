@@ -156,6 +156,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
         val contextUrl: String = "",
         val contextTitle: String = "",
         val tabId: String = "",
+        val userRemovedContext: Boolean = false,
         val isFireButtonEnabled: Boolean = false,
         val recentChats: List<ChatHistoryItem> = emptyList(),
     )
@@ -314,6 +315,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
         _viewState.update {
             it.copy(
                 showContext = true,
+                userRemovedContext = false,
                 contextTitle = json.optString("title"),
                 contextUrl = json.optString("url"),
             )
@@ -550,7 +552,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
     fun removePageContext() {
         logcat { "Duck.ai Contextual: removePageContext" }
         _viewState.update { current ->
-            current.copy(showContext = false)
+            current.copy(showContext = false, userRemovedContext = true)
         }
         duckChatPixels.reportContextualPageContextRemovedNative()
     }
@@ -571,6 +573,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
         _viewState.update { current ->
             current.copy(
                 showContext = true,
+                userRemovedContext = false,
                 contextTitle = json.optString("title"),
                 contextUrl = json.optString("url"),
             )
@@ -635,14 +638,35 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
             val url = json.optString("url")
 
             logcat { "Duck.ai: onPageContextReceived for url $url" }
-            _viewState.update { current ->
-                current.copy(
+            val current = _viewState.value
+            val allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled()
+
+            val urlChanged = current.contextUrl.isNotEmpty() && url != current.contextUrl
+            val remainsUserRemoved = current.userRemovedContext && !urlChanged
+            val dropStaleAttachment = !allowsAutomaticContextAttachment && current.showContext && urlChanged
+
+            val showContext = when {
+                allowsAutomaticContextAttachment -> !remainsUserRemoved
+                dropStaleAttachment -> false
+                else -> current.showContext
+            }
+            val newlyAutoAttached = showContext && !current.showContext
+            if (showContext) {
+                pageContextState = pageContextState.copy(attachedPage = pageContext)
+            }
+            _viewState.update {
+                it.copy(
                     contextTitle = title,
                     contextUrl = url,
                     tabId = tabId,
+                    showContext = showContext,
+                    userRemovedContext = remainsUserRemoved,
                 )
             }
-            if (duckChatInternal.isAutomaticContextAttachmentEnabled() || duckChatInternal.areMultipleContentAttachmentsEnabled()) {
+            if (newlyAutoAttached) {
+                duckChatPixels.reportContextualPageContextAutoAttached()
+            }
+            if (allowsAutomaticContextAttachment || duckChatInternal.areMultipleContentAttachmentsEnabled()) {
                 val pageContextEvent = generatePageContextEventData()
                 viewModelScope.launch(dispatchers.main()) {
                     _subscriptionEventDataChannel.trySend(pageContextEvent)
@@ -727,6 +751,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
                     it.copy(
                         showFullscreen = true,
                         showContext = false,
+                        userRemovedContext = false,
                     )
                 }
                 val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT)

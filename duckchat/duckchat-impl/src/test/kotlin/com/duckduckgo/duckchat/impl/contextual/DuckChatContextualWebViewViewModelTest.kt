@@ -183,6 +183,38 @@ class DuckChatContextualWebViewViewModelTest {
     }
 
     @Test
+    fun `onPageContextReceived auto-attaches the current context when automatic attachment is enabled`() = runTest {
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(true)
+
+        testee.onPageContextReceived("tab-1", serializedPageData)
+
+        assertTrue(testee.viewState.value.showContext)
+        assertEquals("Page Title", testee.viewState.value.contextTitle)
+        verify(duckChatPixels).reportContextualPageContextAutoAttached()
+    }
+
+    @Test
+    fun `onPageContextReceived does not auto-attach when automatic attachment is disabled`() = runTest {
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
+
+        testee.onPageContextReceived("tab-1", serializedPageData)
+
+        assertFalse(testee.viewState.value.showContext)
+        verify(duckChatPixels, never()).reportContextualPageContextAutoAttached()
+    }
+
+    @Test
+    fun `onPageContextReceived does not re-attach context the user removed`() = runTest {
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(true)
+
+        testee.onPageContextReceived("tab-1", serializedPageData)
+        testee.removePageContext()
+        testee.onPageContextReceived("tab-1", serializedPageData)
+
+        assertFalse(testee.viewState.value.showContext)
+    }
+
+    @Test
     fun `onNewChatRequestedFromPopup resets chat and hands off to the entry dialog`() = runTest {
         testee.onSheetOpened("tab-1")
 
