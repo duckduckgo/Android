@@ -207,7 +207,7 @@ class DaxListItemLeadingScope internal constructor(private val parentEnabled: Bo
         background: DaxListItemIconBackground = DaxListItemIconBackground.None,
         tint: Color = Color.Unspecified,
     ) {
-        Artwork(painter, contentDescription, modifier, size, background, tint)
+        Artwork(painter, contentDescription, size, background, tint, modifier)
     }
 
     /**
@@ -222,17 +222,17 @@ class DaxListItemLeadingScope internal constructor(private val parentEnabled: Bo
         size: DaxListItemIconSize = DaxListItemIconSize.Small,
         background: DaxListItemIconBackground = DaxListItemIconBackground.None,
     ) {
-        Artwork(painter, contentDescription, modifier, size, background, tint = Color.Unspecified)
+        Artwork(painter, contentDescription, size, background, tint = Color.Unspecified, modifier = modifier)
     }
 
     @Composable
     private fun Artwork(
         painter: Painter,
         contentDescription: String?,
-        modifier: Modifier,
         size: DaxListItemIconSize,
         background: DaxListItemIconBackground,
         tint: Color,
+        modifier: Modifier = Modifier,
     ) {
         val iconDp = when (size) {
             DaxListItemIconSize.Small -> DaxListItemDefaults.LeadingIconSmall
