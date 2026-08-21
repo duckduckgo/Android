@@ -3,5 +3,6 @@
     <string name="dsShowcaseCaptionView">View</string>
     <string name="dsShowcaseCaptionCompose">Compose</string>
     <string name="dsShowcaseCaptionComposeOnly">Compose-only</string>
-    <string name="dsShowcaseCaptionNoCompose">View (no Compose equivalent)</string>
+    <string name="dsShowcaseCaptionNoComposeSmallIcon">View only (16dp leading icon is no longer in the design system and nothing in the app uses it, so Compose stops at 24dp)</string>
+    <string name="dsShowcaseCaptionNoComposeExtraLargeIcon">View only (40dp leading icon is no longer in the design system and nothing in the app uses it, Compose covers the intent with a full-bleed Image instead)</string>
 </resources>

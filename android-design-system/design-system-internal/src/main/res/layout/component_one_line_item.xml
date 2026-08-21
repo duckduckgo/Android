@@ -52,7 +52,7 @@
         android:layout_height="wrap_content"
         android:paddingStart="16dp"
         android:paddingTop="8dp"
-        android:text="@string/dsShowcaseCaptionNoCompose"
+        android:text="@string/dsShowcaseCaptionNoComposeSmallIcon"
         app:typography="caption" />
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
@@ -68,7 +68,7 @@
         android:layout_height="wrap_content"
         android:paddingStart="16dp"
         android:paddingTop="8dp"
-        android:text="@string/dsShowcaseCaptionNoCompose"
+        android:text="@string/dsShowcaseCaptionNoComposeSmallIcon"
         app:typography="caption" />
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
@@ -175,7 +175,7 @@
         android:layout_height="wrap_content"
         android:paddingStart="16dp"
         android:paddingTop="8dp"
-        android:text="@string/dsShowcaseCaptionNoCompose"
+        android:text="@string/dsShowcaseCaptionNoComposeExtraLargeIcon"
         app:typography="caption" />
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
@@ -191,7 +191,7 @@
         android:layout_height="wrap_content"
         android:paddingStart="16dp"
         android:paddingTop="8dp"
-        android:text="@string/dsShowcaseCaptionNoCompose"
+        android:text="@string/dsShowcaseCaptionNoComposeExtraLargeIcon"
         app:typography="caption" />
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
