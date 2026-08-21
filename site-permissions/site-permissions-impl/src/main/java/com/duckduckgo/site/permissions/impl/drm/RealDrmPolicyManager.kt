@@ -46,7 +46,8 @@ class RealDrmPolicyManager @Inject constructor(
         val uri = url.toUri()
         // Settings are keyed on the host as typed, while both config lists match subdomains. Check every
         // spelling plus the parent domain: missing the row would let remote config override a user's choice
-        val siteSetting = listOfNotNull(domain, uri.baseHost, uri.baseHost?.let { "www.$it" }, domain.toTldPlusOneOrSelf())
+        val registrableDomain = domain.toTldPlusOneOrSelf()
+        val siteSetting = listOfNotNull(domain, uri.baseHost, uri.baseHost?.let { "www.$it" }, registrableDomain, "www.$registrableDomain")
             .distinct()
             .firstNotNullOfOrNull { host -> sitePermissionsRepository.getSitePermissionsForWebsite(host)?.askDrmSetting?.toDrmSetting() }
 
