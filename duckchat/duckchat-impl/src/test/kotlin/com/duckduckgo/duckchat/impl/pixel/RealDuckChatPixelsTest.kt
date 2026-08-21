@@ -376,8 +376,8 @@ class RealDuckChatPixelsTest {
     }
 
     @Test
-    fun `when reportDuckChatEntry then fires count and daily with bounded entry context`() = runTest {
-        testee.reportDuckChatEntry(
+    fun `when sendDuckChatEntryPixel then fires count and daily with bounded entry context`() = runTest {
+        testee.sendDuckChatEntryPixel(
             entryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
             opensNewTab = false,
             hasPrompt = true,
@@ -403,7 +403,7 @@ class RealDuckChatPixelsTest {
         DuckChatEntryPoint.entries.forEach { entryPoint ->
             clearInvocations(mockPixel)
 
-            testee.reportDuckChatEntry(entryPoint, opensNewTab = true, hasPrompt = false, duckAiEnabled = true, inputScreenEnabled = true)
+            testee.sendDuckChatEntryPixel(entryPoint, opensNewTab = true, hasPrompt = false, duckAiEnabled = true, inputScreenEnabled = true)
             advanceUntilIdle()
 
             val parameters = argumentCaptor<Map<String, String>>()

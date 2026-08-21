@@ -141,7 +141,7 @@ interface DuckChatPixels {
     fun sendReportMetricPixel(reportMetric: ReportMetric, modelTier: ModelTier? = null, source: String? = null)
     fun reportOpen()
 
-    fun reportDuckChatEntry(
+    fun sendDuckChatEntryPixel(
         entryPoint: DuckChatEntryPoint,
         opensNewTab: Boolean,
         hasPrompt: Boolean,
@@ -289,7 +289,7 @@ class RealDuckChatPixels @Inject constructor(
     private fun surfaceParams(surface: DuckChatPixelSurface): Map<String, String> =
         mapOf(DuckChatPixelParameters.SURFACE to surface.value)
 
-    override fun reportDuckChatEntry(
+    override fun sendDuckChatEntryPixel(
         entryPoint: DuckChatEntryPoint,
         opensNewTab: Boolean,
         hasPrompt: Boolean,

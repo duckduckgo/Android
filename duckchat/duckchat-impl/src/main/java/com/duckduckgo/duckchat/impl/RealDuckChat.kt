@@ -799,7 +799,7 @@ class RealDuckChat @Inject constructor(
         opensNewTab: Boolean,
         hasPrompt: Boolean,
     ) {
-        duckChatPixels.get().reportDuckChatEntry(
+        duckChatPixels.get().sendDuckChatEntryPixel(
             entryPoint = entryPoint,
             opensNewTab = opensNewTab,
             hasPrompt = hasPrompt,

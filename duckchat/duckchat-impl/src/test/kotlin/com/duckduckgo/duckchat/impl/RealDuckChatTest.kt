@@ -632,7 +632,7 @@ class RealDuckChatTest {
             hasPrompt = true,
         )
 
-        verify(mockDuckChatPixels).reportDuckChatEntry(
+        verify(mockDuckChatPixels).sendDuckChatEntryPixel(
             entryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
             opensNewTab = false,
             hasPrompt = true,
@@ -645,7 +645,7 @@ class RealDuckChatTest {
     fun whenContextualPromptOpensFullscreenThenContextualEntryIsReportedExactlyOnce() = runTest {
         testee.openDuckChatWithAutoPrompt("contextual prompt", DuckChatEntryPoint.CONTEXTUAL_CHAT)
 
-        verify(mockDuckChatPixels, times(1)).reportDuckChatEntry(
+        verify(mockDuckChatPixels, times(1)).sendDuckChatEntryPixel(
             entryPoint = DuckChatEntryPoint.CONTEXTUAL_CHAT,
             opensNewTab = true,
             hasPrompt = true,
@@ -667,7 +667,7 @@ class RealDuckChatTest {
 
         val entryPoints = argumentCaptor<DuckChatEntryPoint>()
         val hasPrompts = argumentCaptor<Boolean>()
-        verify(mockDuckChatPixels, times(8)).reportDuckChatEntry(
+        verify(mockDuckChatPixels, times(8)).sendDuckChatEntryPixel(
             entryPoint = entryPoints.capture(),
             opensNewTab = eq(true),
             hasPrompt = hasPrompts.capture(),
