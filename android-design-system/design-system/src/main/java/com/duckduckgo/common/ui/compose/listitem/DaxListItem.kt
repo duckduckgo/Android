@@ -46,6 +46,7 @@ import com.duckduckgo.common.ui.compose.DaxStatusIndicator
 import com.duckduckgo.common.ui.compose.Status
 import com.duckduckgo.common.ui.compose.button.DaxGhostButton
 import com.duckduckgo.common.ui.compose.button.DaxIconButton
+import com.duckduckgo.common.ui.compose.button.DaxIconButtonDefaults
 import com.duckduckgo.common.ui.compose.listitem.DaxListItemDefaults.HorizontalPadding
 import com.duckduckgo.common.ui.compose.pill.DaxPill
 import com.duckduckgo.common.ui.compose.switch.DaxSwitch
@@ -195,7 +196,7 @@ class DaxListItemLeadingScope internal constructor(private val parentEnabled: Bo
         modifier: Modifier = Modifier,
         size: DaxListItemIconSize = DaxListItemIconSize.Small,
         background: DaxListItemIconBackground = DaxListItemIconBackground.None,
-        tint: Color? = DuckDuckGoTheme.colors.icons.primary,
+        tint: Color? = null,
     ) {
         val iconDp = when (size) {
             DaxListItemIconSize.Small -> DaxListItemDefaults.LeadingIconSmall
@@ -315,6 +316,7 @@ class DaxListItemTrailingScope internal constructor(private val parentEnabled: B
                     contentDescription = contentDescription,
                     enabled = effectiveEnabled,
                     iconSize = iconDp,
+                    colors = DaxIconButtonDefaults.iconButtonColors.copy(contentColor = Color.Unspecified),
                     modifier = modifier.size(DaxListItemDefaults.TrailingIconTouchTarget),
                 )
 
