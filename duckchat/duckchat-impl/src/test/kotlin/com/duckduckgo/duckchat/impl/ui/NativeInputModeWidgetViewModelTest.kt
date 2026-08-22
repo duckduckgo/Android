@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.ui
 import android.content.Context
 import android.view.View
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -59,6 +60,7 @@ import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.RealNativeInputStateStore
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelPageType
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.ChatSuggestion
@@ -111,6 +113,7 @@ class NativeInputModeWidgetViewModelTest {
     val coroutineRule = CoroutineTestRule()
 
     private val duckChatInternal: DuckChatInternal = mock()
+    private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
     private val duckAiFeatureState: DuckAiFeatureState = mock()
     private val subscriptions: Subscriptions = mock()
     private val pendingNativePromptStore: PendingNativePromptStore = mock()
@@ -182,6 +185,7 @@ class NativeInputModeWidgetViewModelTest {
         fakePlugins = plugins
         return NativeInputModeWidgetViewModel(
             duckChatInternal = duckChatInternal,
+            duckDuckGoUrlDetector = duckDuckGoUrlDetector,
             duckAiFeatureState = duckAiFeatureState,
             subscriptions = subscriptions,
             pendingNativePromptStore = pendingNativePromptStore,
@@ -1707,6 +1711,7 @@ class NativeInputModeWidgetViewModelTest {
             surface = DuckChatPixelSurface.DUCK_AI,
             defaultMode = null,
             tabId = tabId,
+            pageType = DuckChatPixelPageType.DUCK_AI,
             addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
         )
         verify(duckChatPixels).fireImageGenerationSubmitted(any())
@@ -1739,6 +1744,7 @@ class NativeInputModeWidgetViewModelTest {
             surface = DuckChatPixelSurface.DUCK_AI,
             defaultMode = null,
             tabId = tabId,
+            pageType = DuckChatPixelPageType.DUCK_AI,
             addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
         )
         verify(duckChatPixels, never()).fireImageGenerationSubmitted(any())
@@ -1771,6 +1777,7 @@ class NativeInputModeWidgetViewModelTest {
             surface = DuckChatPixelSurface.ADDRESS_BAR,
             defaultMode = NativeInputState.ToggleSelection.SEARCH,
             tabId = "tab-A",
+            pageType = DuckChatPixelPageType.NTP,
             addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
         )
     }
@@ -1797,6 +1804,7 @@ class NativeInputModeWidgetViewModelTest {
             surface = DuckChatPixelSurface.ADDRESS_BAR,
             defaultMode = null,
             tabId = "test-tab",
+            pageType = DuckChatPixelPageType.NTP,
             addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
         )
     }
@@ -1828,6 +1836,7 @@ class NativeInputModeWidgetViewModelTest {
             surface = DuckChatPixelSurface.DUCK_AI,
             defaultMode = null,
             tabId = tabId,
+            pageType = DuckChatPixelPageType.DUCK_AI,
             addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
         )
         verify(duckChatPixels).fireWebSearchSubmitted(any())

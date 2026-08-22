@@ -16,15 +16,10 @@
 
 package com.duckduckgo.duckchat.impl.pixel
 
-import androidx.core.net.toUri
-import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.DuckAiTabSessionRepository
-import com.duckduckgo.app.tabs.model.TabRepository
-import com.duckduckgo.browsermode.api.BrowserMode
-import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
@@ -32,7 +27,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.ToggleSelection
-import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.ModelTier
 import com.duckduckgo.duckchat.impl.ReportMetric
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_CREATE_NEW_CHAT
@@ -144,6 +138,14 @@ enum class DuckChatPixelSurface(val value: String) {
     }
 }
 
+enum class DuckChatPixelPageType(val value: String) {
+    NTP("ntp"),
+    SERP("serp"),
+    WEBSITE("website"),
+    DUCK_AI("duck_ai"),
+    CONTEXTUAL("contextual"),
+}
+
 interface DuckChatPixels {
     fun sendReportMetricPixel(reportMetric: ReportMetric, modelTier: ModelTier? = null, source: String? = null)
     fun reportOpen()
@@ -216,6 +218,7 @@ interface DuckChatPixels {
         surface: DuckChatPixelSurface,
         defaultMode: ToggleSelection?,
         tabId: String?,
+        pageType: DuckChatPixelPageType,
         addressBarEntryPoint: DuckChatEntryPoint?,
     )
 
@@ -282,10 +285,7 @@ class RealDuckChatPixels @Inject constructor(
     private val statisticsUpdater: StatisticsUpdater,
     private val duckAiMetricCollector: DuckAiMetricCollector,
     private val termsOfServiceHandler: DuckChatTermsOfServiceHandler,
-    private val tabRepositoryProvider: BrowserModeDataProvider<TabRepository>,
     private val duckAiTabSessionRepository: DuckAiTabSessionRepository,
-    private val duckChatInternal: DuckChatInternal,
-    private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
 ) : DuckChatPixels {
 
     private fun fireCountAndDaily(
@@ -296,6 +296,19 @@ class RealDuckChatPixels @Inject constructor(
         appCoroutineScope.launch(dispatcherProvider.io()) {
             pixel.fire(count, parameters = parameters)
             pixel.fire(daily, parameters = parameters, type = Pixel.PixelType.Daily())
+        }
+    }
+
+    /** For params that need a suspend lookup before they can be built. */
+    private fun fireCountAndDaily(
+        count: DuckChatPixelName,
+        daily: DuckChatPixelName,
+        parameters: suspend () -> Map<String, String>,
+    ) {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            val params = parameters()
+            pixel.fire(count, parameters = params)
+            pixel.fire(daily, parameters = params, type = Pixel.PixelType.Daily())
         }
     }
 
@@ -321,31 +334,6 @@ class RealDuckChatPixels @Inject constructor(
             ),
         )
     }
-
-    /** What the user was looking at when a prompt was submitted. See [DuckChatPixelParameters.PROMPT_PAGE_TYPE]. */
-    private suspend fun resolvePromptPageType(
-        surface: DuckChatPixelSurface,
-        tabId: String?,
-    ): String = when (surface) {
-        DuckChatPixelSurface.DUCK_AI -> "duck_ai"
-        DuckChatPixelSurface.CONTEXTUAL_CHAT -> "contextual"
-        DuckChatPixelSurface.ADDRESS_BAR -> {
-            val tab = tabId?.let { findTab(it) }
-            val url = tab?.url
-            when {
-                tab == null -> "unknown"
-                url.isNullOrBlank() -> "ntp"
-                duckChatInternal.isDuckChatUrl(url.toUri()) -> "duck_ai"
-                duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url) -> "serp"
-                else -> "website"
-            }
-        }
-    }
-
-    /** [tabId] may belong to either browsing modes Regular or Fire mode (They are backed by separate databases). */
-    private suspend fun findTab(tabId: String) =
-        tabRepositoryProvider.forMode(BrowserMode.REGULAR).getTab(tabId)
-            ?: tabRepositoryProvider.forMode(BrowserMode.FIRE).getTab(tabId)
 
     /**
      * The `source` for a prompt submission. Inside an existing Duck.ai chat, the entry point is carried forward
@@ -820,12 +808,15 @@ class RealDuckChatPixels @Inject constructor(
         surface: DuckChatPixelSurface,
         defaultMode: ToggleSelection?,
         tabId: String?,
+        pageType: DuckChatPixelPageType,
         addressBarEntryPoint: DuckChatEntryPoint?,
     ) {
-        appCoroutineScope.launch(dispatcherProvider.io()) {
-            val pageType = resolvePromptPageType(surface, tabId)
+        fireCountAndDaily(
+            DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_COUNT,
+            DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_DAILY,
+        ) {
             val source = resolveEntrySource(surface, tabId, addressBarEntryPoint)
-            val params = buildMap {
+            buildMap {
                 put(DuckChatPixelParameters.SELECTED_TOOL, selectedTool)
                 modelId?.let { put(DuckChatPixelParameters.MODEL_ID, it) }
                 reasoningEffort?.let { put(DuckChatPixelParameters.REASONING_EFFORT, it) }
@@ -836,11 +827,9 @@ class RealDuckChatPixels @Inject constructor(
                 defaultMode
                     ?.takeIf { surface == DuckChatPixelSurface.ADDRESS_BAR }
                     ?.let { put(DuckChatPixelParameters.DEFAULT_MODE, it.pixelValue()) }
-                put(DuckChatPixelParameters.PROMPT_PAGE_TYPE, pageType)
+                put(DuckChatPixelParameters.PROMPT_PAGE_TYPE, pageType.value)
                 source?.let { put(DuckChatPixelParameters.ENTRY_SOURCE, it) }
             }
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_COUNT, parameters = params)
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_DAILY, parameters = params, type = Pixel.PixelType.Daily())
         }
     }
 

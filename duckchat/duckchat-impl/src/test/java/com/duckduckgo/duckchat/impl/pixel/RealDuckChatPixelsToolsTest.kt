@@ -17,26 +17,19 @@
 package com.duckduckgo.duckchat.impl.pixel
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.tabs.model.TabEntity
-import com.duckduckgo.app.tabs.model.TabRepository
-import com.duckduckgo.browsermode.api.BrowserMode
-import com.duckduckgo.browsermode.api.BrowserModeDataProvider
+import com.duckduckgo.app.tabs.model.DuckAiTabSessionRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.ToggleSelection
-import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.helper.DuckChatTermsOfServiceHandler
 import com.duckduckgo.duckchat.impl.metric.DuckAiMetricCollector
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import kotlinx.coroutines.test.runTest
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -52,17 +45,7 @@ class RealDuckChatPixelsToolsTest {
     private val statisticsUpdater: StatisticsUpdater = mock()
     private val duckAiMetricCollector: DuckAiMetricCollector = mock()
     private val termsOfServiceHandler: DuckChatTermsOfServiceHandler = mock()
-    private val duckChatInternal: DuckChatInternal = mock()
-    private val regularTabRepository: TabRepository = mock()
-    private val fireTabRepository: TabRepository = mock()
-    private val tabRepositoryProvider: BrowserModeDataProvider<TabRepository> = mock()
-    private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
-
-    @Before
-    fun setup() {
-        whenever(tabRepositoryProvider.forMode(BrowserMode.REGULAR)).thenReturn(regularTabRepository)
-        whenever(tabRepositoryProvider.forMode(BrowserMode.FIRE)).thenReturn(fireTabRepository)
-    }
+    private val duckAiTabSessionRepository: DuckAiTabSessionRepository = mock()
 
     private val testee = RealDuckChatPixels(
         pixel = pixel,
@@ -72,10 +55,7 @@ class RealDuckChatPixelsToolsTest {
         statisticsUpdater = statisticsUpdater,
         duckAiMetricCollector = duckAiMetricCollector,
         termsOfServiceHandler = termsOfServiceHandler,
-        tabRepositoryProvider = tabRepositoryProvider,
-        duckAiTabSessionRepository = mock(),
-        duckDuckGoUrlDetector = duckDuckGoUrlDetector,
-        duckChatInternal = duckChatInternal,
+        duckAiTabSessionRepository = duckAiTabSessionRepository,
     )
 
     private val surfaceParams = mapOf(DuckChatPixelParameters.SURFACE to "contextual_chat")
@@ -176,6 +156,7 @@ class RealDuckChatPixelsToolsTest {
             surface = DuckChatPixelSurface.CONTEXTUAL_CHAT,
             defaultMode = null,
             tabId = null,
+            pageType = DuckChatPixelPageType.CONTEXTUAL,
             addressBarEntryPoint = null,
         )
 
@@ -199,6 +180,75 @@ class RealDuckChatPixelsToolsTest {
     }
 
     @Test
+    fun whenPromptSubmittedFromDuckAiChatWithStoredEntryThenSourceIsTheStoredValue() = runTest {
+        whenever(duckAiTabSessionRepository.getEntryPointSource("tab1")).thenReturn("chat_history_open_chat")
+
+        testee.firePromptSubmitted(
+            selectedTool = "none",
+            modelId = null,
+            reasoningEffort = null,
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            hasText = true,
+            surface = DuckChatPixelSurface.DUCK_AI,
+            defaultMode = null,
+            tabId = "tab1",
+            pageType = DuckChatPixelPageType.DUCK_AI,
+            addressBarEntryPoint = null,
+        )
+
+        val params = mapOf(
+            DuckChatPixelParameters.SELECTED_TOOL to "none",
+            DuckChatPixelParameters.HAS_IMAGE_ATTACHMENT to "false",
+            DuckChatPixelParameters.HAS_FILE_ATTACHMENT to "false",
+            DuckChatPixelParameters.HAS_TEXT to "true",
+            DuckChatPixelParameters.SURFACE to "duck_ai",
+            DuckChatPixelParameters.PROMPT_PAGE_TYPE to "duck_ai",
+            DuckChatPixelParameters.ENTRY_SOURCE to "chat_history_open_chat",
+        )
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_COUNT, parameters = params)
+        verify(pixel).fire(
+            DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_DAILY,
+            parameters = params,
+            type = Pixel.PixelType.Daily(),
+        )
+    }
+
+    @Test
+    fun whenPromptSubmittedFromDuckAiChatWithNothingStoredThenSourceIsOmitted() = runTest {
+        whenever(duckAiTabSessionRepository.getEntryPointSource("tab1")).thenReturn(null)
+
+        testee.firePromptSubmitted(
+            selectedTool = "none",
+            modelId = null,
+            reasoningEffort = null,
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            hasText = true,
+            surface = DuckChatPixelSurface.DUCK_AI,
+            defaultMode = null,
+            tabId = "tab1",
+            pageType = DuckChatPixelPageType.DUCK_AI,
+            addressBarEntryPoint = null,
+        )
+
+        val params = mapOf(
+            DuckChatPixelParameters.SELECTED_TOOL to "none",
+            DuckChatPixelParameters.HAS_IMAGE_ATTACHMENT to "false",
+            DuckChatPixelParameters.HAS_FILE_ATTACHMENT to "false",
+            DuckChatPixelParameters.HAS_TEXT to "true",
+            DuckChatPixelParameters.SURFACE to "duck_ai",
+            DuckChatPixelParameters.PROMPT_PAGE_TYPE to "duck_ai",
+        )
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_COUNT, parameters = params)
+        verify(pixel).fire(
+            DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_DAILY,
+            parameters = params,
+            type = Pixel.PixelType.Daily(),
+        )
+    }
+
+    @Test
     fun whenPromptSubmittedWithNullModelAndReasoningThenOmitsThoseParams() = runTest {
         testee.firePromptSubmitted(
             selectedTool = "none",
@@ -210,6 +260,7 @@ class RealDuckChatPixelsToolsTest {
             surface = DuckChatPixelSurface.ADDRESS_BAR,
             defaultMode = null,
             tabId = null,
+            pageType = DuckChatPixelPageType.NTP,
             addressBarEntryPoint = null,
         )
 
@@ -219,7 +270,7 @@ class RealDuckChatPixelsToolsTest {
             DuckChatPixelParameters.HAS_FILE_ATTACHMENT to "false",
             DuckChatPixelParameters.HAS_TEXT to "true",
             DuckChatPixelParameters.SURFACE to "address_bar",
-            DuckChatPixelParameters.PROMPT_PAGE_TYPE to "unknown",
+            DuckChatPixelParameters.PROMPT_PAGE_TYPE to "ntp",
         )
         verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_COUNT, parameters = params)
         verify(pixel).fire(
@@ -230,9 +281,7 @@ class RealDuckChatPixelsToolsTest {
     }
 
     @Test
-    fun whenPromptSubmittedFromAddressBarOnBlankTabThenPageTypeIsNtp() = runTest {
-        whenever(regularTabRepository.getTab("tab1")).thenReturn(TabEntity(tabId = "tab1", url = null))
-
+    fun whenPromptSubmittedFromAddressBarThenPageTypeValueIsForwardedAsIs() = runTest {
         testee.firePromptSubmitted(
             selectedTool = "none",
             modelId = null,
@@ -243,122 +292,18 @@ class RealDuckChatPixelsToolsTest {
             surface = DuckChatPixelSurface.ADDRESS_BAR,
             defaultMode = null,
             tabId = "tab1",
-            addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
-        )
-
-        verify(pixel).fire(
-            DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_COUNT,
-            parameters = promptSubmittedAddressBarParams(pageType = "ntp"),
-        )
-    }
-
-    @Test
-    fun whenPromptSubmittedFromAddressBarOnWebsiteThenPageTypeIsWebsite() = runTest {
-        whenever(regularTabRepository.getTab("tab1")).thenReturn(TabEntity(tabId = "tab1", url = "https://example.com"))
-        whenever(duckChatInternal.isDuckChatUrl(any())).thenReturn(false)
-        whenever(duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(any())).thenReturn(false)
-
-        testee.firePromptSubmitted(
-            selectedTool = "none",
-            modelId = null,
-            reasoningEffort = null,
-            hasImageAttachment = false,
-            hasFileAttachment = false,
-            hasText = true,
-            surface = DuckChatPixelSurface.ADDRESS_BAR,
-            defaultMode = null,
-            tabId = "tab1",
+            pageType = DuckChatPixelPageType.WEBSITE,
             addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
         )
 
         verify(pixel).fire(
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_COUNT,
             parameters = promptSubmittedAddressBarParams(pageType = "website"),
-        )
-    }
-
-    @Test
-    fun whenPromptSubmittedFromAddressBarOnSerpThenPageTypeIsSerp() = runTest {
-        whenever(regularTabRepository.getTab("tab1")).thenReturn(TabEntity(tabId = "tab1", url = "https://duckduckgo.com/?q=test"))
-        whenever(duckChatInternal.isDuckChatUrl(any())).thenReturn(false)
-        whenever(duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(any())).thenReturn(true)
-
-        testee.firePromptSubmitted(
-            selectedTool = "none",
-            modelId = null,
-            reasoningEffort = null,
-            hasImageAttachment = false,
-            hasFileAttachment = false,
-            hasText = true,
-            surface = DuckChatPixelSurface.ADDRESS_BAR,
-            defaultMode = null,
-            tabId = "tab1",
-            addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
-        )
-
-        verify(pixel).fire(
-            DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_COUNT,
-            parameters = promptSubmittedAddressBarParams(pageType = "serp"),
-        )
-    }
-
-    @Test
-    fun whenPromptSubmittedFromAddressBarAndTabExistsOnlyInFireModeThenPageTypeIsResolvedFromFireRepository() = runTest {
-        // The tab isn't in the Regular-mode tabs table at all — it lives in Fire mode's own database.
-        whenever(regularTabRepository.getTab("fire-tab")).thenReturn(null)
-        whenever(fireTabRepository.getTab("fire-tab")).thenReturn(TabEntity(tabId = "fire-tab", url = "https://example.com"))
-        whenever(duckChatInternal.isDuckChatUrl(any())).thenReturn(false)
-        whenever(duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(any())).thenReturn(false)
-
-        testee.firePromptSubmitted(
-            selectedTool = "none",
-            modelId = null,
-            reasoningEffort = null,
-            hasImageAttachment = false,
-            hasFileAttachment = false,
-            hasText = true,
-            surface = DuckChatPixelSurface.ADDRESS_BAR,
-            defaultMode = null,
-            tabId = "fire-tab",
-            addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
-        )
-
-        // Must resolve to the tab's real page type, not fall back to "ntp" just because it was
-        // missing from the Regular-mode repository.
-        verify(pixel).fire(
-            DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_COUNT,
-            parameters = promptSubmittedAddressBarParams(pageType = "website"),
-        )
-    }
-
-    @Test
-    fun whenPromptSubmittedFromAddressBarAndTabIsNotFoundInEitherModeThenPageTypeIsUnknown() = runTest {
-        whenever(regularTabRepository.getTab("missing-tab")).thenReturn(null)
-        whenever(fireTabRepository.getTab("missing-tab")).thenReturn(null)
-
-        testee.firePromptSubmitted(
-            selectedTool = "none",
-            modelId = null,
-            reasoningEffort = null,
-            hasImageAttachment = false,
-            hasFileAttachment = false,
-            hasText = true,
-            surface = DuckChatPixelSurface.ADDRESS_BAR,
-            defaultMode = null,
-            tabId = "missing-tab",
-            addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
-        )
-
-        verify(pixel).fire(
-            DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_COUNT,
-            parameters = promptSubmittedAddressBarParams(pageType = "unknown"),
         )
     }
 
     @Test
     fun whenPromptSubmittedFromAddressBarWithVoiceEntryPointThenSourceIsVoice() = runTest {
-        whenever(regularTabRepository.getTab("tab1")).thenReturn(TabEntity(tabId = "tab1", url = null))
-
         testee.firePromptSubmitted(
             selectedTool = "none",
             modelId = null,
@@ -369,6 +314,7 @@ class RealDuckChatPixelsToolsTest {
             surface = DuckChatPixelSurface.ADDRESS_BAR,
             defaultMode = null,
             tabId = "tab1",
+            pageType = DuckChatPixelPageType.NTP,
             addressBarEntryPoint = DuckChatEntryPoint.VOICE,
         )
 
@@ -380,8 +326,6 @@ class RealDuckChatPixelsToolsTest {
 
     @Test
     fun whenPromptSubmittedFromAddressBarWithNoEntryPointThenSourceIsOmitted() = runTest {
-        whenever(regularTabRepository.getTab("tab1")).thenReturn(TabEntity(tabId = "tab1", url = null))
-
         testee.firePromptSubmitted(
             selectedTool = "none",
             modelId = null,
@@ -392,6 +336,7 @@ class RealDuckChatPixelsToolsTest {
             surface = DuckChatPixelSurface.ADDRESS_BAR,
             defaultMode = null,
             tabId = "tab1",
+            pageType = DuckChatPixelPageType.NTP,
             addressBarEntryPoint = null,
         )
 
@@ -423,6 +368,7 @@ class RealDuckChatPixelsToolsTest {
             surface = DuckChatPixelSurface.ADDRESS_BAR,
             defaultMode = ToggleSelection.DUCK_AI,
             tabId = null,
+            pageType = DuckChatPixelPageType.NTP,
             addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
         )
 
@@ -433,7 +379,7 @@ class RealDuckChatPixelsToolsTest {
             DuckChatPixelParameters.HAS_TEXT to "true",
             DuckChatPixelParameters.SURFACE to "address_bar",
             DuckChatPixelParameters.DEFAULT_MODE to "duck_ai",
-            DuckChatPixelParameters.PROMPT_PAGE_TYPE to "unknown",
+            DuckChatPixelParameters.PROMPT_PAGE_TYPE to "ntp",
             DuckChatPixelParameters.ENTRY_SOURCE to "address_bar_prompt",
         )
         verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_COUNT, parameters = params)
@@ -458,6 +404,7 @@ class RealDuckChatPixelsToolsTest {
             surface = DuckChatPixelSurface.CONTEXTUAL_CHAT,
             defaultMode = ToggleSelection.DUCK_AI,
             tabId = null,
+            pageType = DuckChatPixelPageType.CONTEXTUAL,
             addressBarEntryPoint = null,
         )
 

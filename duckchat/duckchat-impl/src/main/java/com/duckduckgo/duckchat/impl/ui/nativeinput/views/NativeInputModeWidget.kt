@@ -199,6 +199,9 @@ interface NativeInputWidget {
      */
     fun bindChatIdSource(source: Flow<String?>)
 
+    /** Binds a reactive source of the underlying tab's current URL. */
+    fun bindCurrentUrlSource(source: Flow<String?>)
+
     /** Binds a reactive source for the onboarding interaction lock (see [InteractionLock]). */
     fun bindInteractionLockSource(source: Flow<InteractionLock>)
 
@@ -310,6 +313,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var modelPickerEnabledSource: Flow<Boolean>? = null
     private var chatIdJob: Job? = null
     private var chatIdSource: Flow<String?>? = null
+    private var currentUrlJob: Job? = null
+    private var currentUrlSource: Flow<String?>? = null
     private var interactionLockJob: Job? = null
     private var interactionLockSource: Flow<InteractionLock>? = null
     private var duckAiFireButtonHighlightJob: Job? = null
@@ -691,6 +696,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         setupPlugins()
         observeModelPickerEnabledSource()
         observeChatIdSource()
+        observeCurrentUrlSource()
         observeInteractionLockSource()
         observeDuckAiFireButtonHighlightSource()
         applyNativeStyling()
@@ -850,6 +856,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
         modelPickerEnabledJob = null
         chatIdJob?.cancel()
         chatIdJob = null
+        currentUrlJob?.cancel()
+        currentUrlJob = null
         interactionLockJob?.cancel()
         interactionLockJob = null
         duckAiFireButtonHighlightJob?.cancel()
@@ -1570,6 +1578,21 @@ class NativeInputModeWidget @JvmOverloads constructor(
         chatIdJob = source
             .distinctUntilChanged()
             .onEach { viewModel.setActiveChatId(it) }
+            .launchIn(scope)
+    }
+
+    override fun bindCurrentUrlSource(source: Flow<String?>) {
+        currentUrlSource = source
+        if (isAttachedToWindow) observeCurrentUrlSource()
+    }
+
+    private fun observeCurrentUrlSource() {
+        val source = currentUrlSource ?: return
+        val scope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
+        currentUrlJob?.cancel()
+        currentUrlJob = source
+            .distinctUntilChanged()
+            .onEach { viewModel.setActiveTabUrl(it) }
             .launchIn(scope)
     }
 

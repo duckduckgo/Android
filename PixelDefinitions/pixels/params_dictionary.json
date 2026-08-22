@@ -42,7 +42,7 @@
         "key": "page_type",
         "type": "string",
         "description": "What the user was looking at when the prompt was submitted.",
-        "enum": ["ntp", "serp", "website", "duck_ai", "contextual", "unknown"]
+        "enum": ["ntp", "serp", "website", "duck_ai", "contextual"]
     },
     "duckAiEntrySource": {
         "key": "source",

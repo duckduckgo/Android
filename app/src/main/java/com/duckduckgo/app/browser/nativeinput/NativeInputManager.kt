@@ -919,6 +919,7 @@ class RealNativeInputManager @Inject constructor(
             // Picker tied to whether the current tab is a Duck.ai page that already has a chatId (existing chat) or new chat.
             bindModelPickerEnabledSource(chatIdFlow.map { it == null })
             bindChatIdSource(chatIdFlow)
+            bindCurrentUrlSource(currentTabUrl)
             bindInteractionLockSource(interactionLockSource)
             bindDuckAiFireButtonHighlightSource(duckAiFireButtonHighlightSource)
         }
