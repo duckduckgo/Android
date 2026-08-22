@@ -17,8 +17,8 @@
 package com.duckduckgo.privacy.config.impl.features.drm
 
 import androidx.core.net.toUri
+import com.duckduckgo.app.browser.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
-import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Drm
@@ -40,13 +40,16 @@ class RealDrm @Inject constructor(
 
     override fun isDrmAllowedForUrl(url: String): Boolean {
         val uri = url.toUri()
-        val isFeatureEnabled = featureToggle.isFeatureEnabled(PrivacyFeatureName.DrmFeatureName.value, defaultValue = true)
-        return (isFeatureEnabled && domainsThatAllowDrm(uri.baseHost)) ||
+        // Defaults to false: the persister clears every privacy config toggle before applying a new config and
+        // only reinserts the features it contained, so an unset value means eme was dropped from the config. The
+        // stored exceptions outlive it, and they must not keep granting DRM once the feature is gone.
+        val isFeatureEnabled = featureToggle.isFeatureEnabled(PrivacyFeatureName.DrmFeatureName.value, defaultValue = false)
+        return (isFeatureEnabled && domainsThatAllowDrm(url)) ||
             userAllowListRepository.isUriInUserAllowList(uri) ||
             unprotectedTemporary.isAnException(uri.toString())
     }
 
-    private fun domainsThatAllowDrm(host: String?): Boolean {
-        return drmRepository.exceptions.firstOrNull { it.domain == host } != null
+    private fun domainsThatAllowDrm(url: String): Boolean {
+        return drmRepository.exceptions.any { exception -> sameOrSubdomain(url, exception.domain) }
     }
 }
