@@ -535,11 +535,14 @@ class CtaViewModel @Inject constructor(
         val nonNullSite = site ?: return null
 
         val host = nonNullSite.domain
-        if (host == null || userAllowListRepository.isDomainInUserAllowList(host) || isSiteNotAllowedForOnboarding(nonNullSite)) {
+        val inContextDaxDialogsCompleted = areInContextDaxDialogsCompleted()
+        if (host == null || (!inContextDaxDialogsCompleted && userAllowListRepository.isDomainInUserAllowList(host)) ||
+            isSiteNotAllowedForOnboarding(nonNullSite)
+        ) {
             return null
         }
 
-        if (!areInContextDaxDialogsCompleted()) {
+        if (!inContextDaxDialogsCompleted) {
             nonNullSite.uri?.let { uri ->
                 if (contextualCtaSuppressorPlugins.getPlugins().any { !it.canShowCta(uri) }) {
                     return null
@@ -570,7 +573,7 @@ class CtaViewModel @Inject constructor(
                 return null
             }
 
-            if (areInContextDaxDialogsCompleted()) {
+            if (inContextDaxDialogsCompleted) {
                 val promptUrl = brokenSitePromptUrl ?: return null
                 // Reports are built from Site, so reject stale state before showing the prompt.
                 if (nonNullSite.url != promptUrl) return null
