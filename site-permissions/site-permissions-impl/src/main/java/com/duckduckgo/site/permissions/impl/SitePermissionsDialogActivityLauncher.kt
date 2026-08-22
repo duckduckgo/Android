@@ -279,7 +279,8 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
 
         // No session-based setting and no config --> proceed to show dialog
         val title = url.websiteFromGeoLocationsApiOrigin()
-        TextAlertDialogBuilder(activity)
+        val dialog = TextAlertDialogBuilder(activity)
+        dialog
             .setTitle(
                 String.format(
                     activity.getString(R.string.drmSitePermissionDialogTitle),
@@ -290,6 +291,10 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                 activity.getText(R.string.drmSitePermissionDialogSubtitle).formatWithSpans(title),
                 DRM_LEARN_MORE_ANNOTATION,
             ) {
+                // When we are the default browser the link opens in a new tab of this same activity,
+                // so the dialog would otherwise stay on top of it with the request left unanswered.
+                dialog.dismiss()
+                denyPermissions()
                 activity.startActivity(Intent(Intent.ACTION_VIEW, DRM_LEARN_MORE_URL))
             }
             .setPositiveButton(R.string.sitePermissionsDialogAllowButton, GHOST)
