@@ -23,6 +23,7 @@ import android.location.LocationManager
 import android.webkit.PermissionRequest
 import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -37,8 +38,10 @@ import com.duckduckgo.site.permissions.impl.feature.DrmPolicyFeature
 import com.duckduckgo.site.permissions.impl.feature.MicrophoneSitePermissionsDomainRecoveryFeature
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
 import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.never
+import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.verifyZeroInteractions
 import com.nhaarman.mockitokotlin2.whenever
@@ -68,6 +71,7 @@ class SitePermissionsManagerTest {
     private val drmPolicyFeature = FakeFeatureToggleFactory.create(DrmPolicyFeature::class.java)
     private val mockDrmPolicyManager: DrmPolicyManager = mock()
     private val drmSessionStore = DrmSessionStore()
+    private val mockPixel: Pixel = mock()
 
     private val testee by lazy {
         SitePermissionsManagerImpl(
@@ -80,6 +84,7 @@ class SitePermissionsManagerTest {
             drmPolicyFeature,
             mockDrmPolicyManager,
             drmSessionStore,
+            mockPixel,
             mockDuckAiHostProvider,
         )
     }
@@ -151,6 +156,83 @@ class SitePermissionsManagerTest {
         verify(permissionRequest, never()).deny()
         verify(mockSitePermissionsRepository, never()).isDomainAllowedToAsk(url, PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)
         verify(mockSitePermissionsRepository, never()).isDomainGranted(url, tabId, PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)
+        verify(mockPixel).fire(
+            SitePermissionsPixelName.PERMISSION_AUTO_GRANTED,
+            mapOf(
+                SitePermissionsPixelParameters.PERMISSION_TYPE to SitePermissionsPixelValues.DRM,
+                SitePermissionsPixelParameters.REASON to SitePermissionsPixelValues.ALLOW_LIST,
+            ),
+        )
+    }
+
+    @Test
+    fun whenCentralPolicyGrantsBecauseProtectionsOffThenAutoGrantedPixelFiredWithProtectionsOffReason() = runTest {
+        drmPolicyFeature.centralPolicy().setRawStoredState(Toggle.State(true))
+        val resources = arrayOf(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)
+        whenever(mockDrmPolicyManager.decide(url, tabId))
+            .thenReturn(DrmPolicyDecision(DrmPolicyAction.GRANT, DrmPolicyReason.PROTECTIONS_OFF))
+
+        val permissionRequest: PermissionRequest = mock()
+        whenever(permissionRequest.origin).thenReturn(url.toUri())
+        whenever(permissionRequest.resources).thenReturn(resources)
+
+        testee.getSitePermissions(tabId, permissionRequest)
+
+        verify(mockPixel).fire(
+            SitePermissionsPixelName.PERMISSION_AUTO_GRANTED,
+            mapOf(
+                SitePermissionsPixelParameters.PERMISSION_TYPE to SitePermissionsPixelValues.DRM,
+                SitePermissionsPixelParameters.REASON to SitePermissionsPixelValues.PROTECTIONS_OFF,
+            ),
+        )
+    }
+
+    @Test
+    fun whenTheSamePageRequestsDrmTwiceThenAutoGrantedPixelIsFiredOnce() = runTest {
+        drmPolicyFeature.centralPolicy().setRawStoredState(Toggle.State(true))
+        whenever(mockDrmPolicyManager.decide(url, tabId))
+            .thenReturn(DrmPolicyDecision(DrmPolicyAction.GRANT, DrmPolicyReason.ALLOW_LIST))
+        val permissionRequest = givenDrmPermissionRequest()
+
+        testee.getSitePermissions(tabId, permissionRequest)
+        testee.getSitePermissions(tabId, permissionRequest)
+
+        verify(mockPixel).fire(eq(SitePermissionsPixelName.PERMISSION_AUTO_GRANTED), any(), any(), any())
+    }
+
+    @Test
+    fun whenAnotherTabAutoGrantsTheSameDomainThenAutoGrantedPixelIsFiredAgain() = runTest {
+        drmPolicyFeature.centralPolicy().setRawStoredState(Toggle.State(true))
+        val otherTabId = "otherTabId"
+        whenever(mockDrmPolicyManager.decide(eq(url), any()))
+            .thenReturn(DrmPolicyDecision(DrmPolicyAction.GRANT, DrmPolicyReason.ALLOW_LIST))
+        val permissionRequest = givenDrmPermissionRequest()
+
+        testee.getSitePermissions(tabId, permissionRequest)
+        testee.getSitePermissions(otherTabId, permissionRequest)
+
+        verify(mockPixel, times(2)).fire(eq(SitePermissionsPixelName.PERMISSION_AUTO_GRANTED), any(), any(), any())
+    }
+
+    private fun givenDrmPermissionRequest(): PermissionRequest = mock<PermissionRequest>().apply {
+        whenever(origin).thenReturn(url.toUri())
+        whenever(resources).thenReturn(arrayOf(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID))
+    }
+
+    @Test
+    fun whenCentralPolicyGrantsBecauseOfUserChoiceThenAutoGrantedPixelNotFired() = runTest {
+        drmPolicyFeature.centralPolicy().setRawStoredState(Toggle.State(true))
+        val resources = arrayOf(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)
+        whenever(mockDrmPolicyManager.decide(url, tabId))
+            .thenReturn(DrmPolicyDecision(DrmPolicyAction.GRANT, DrmPolicyReason.USER_ALLOW_ALWAYS))
+
+        val permissionRequest: PermissionRequest = mock()
+        whenever(permissionRequest.origin).thenReturn(url.toUri())
+        whenever(permissionRequest.resources).thenReturn(resources)
+
+        testee.getSitePermissions(tabId, permissionRequest)
+
+        verifyZeroInteractions(mockPixel)
     }
 
     @Test
@@ -189,6 +271,7 @@ class SitePermissionsManagerTest {
         assertEquals(listOf(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID), permissions.userHandled)
         verify(permissionRequest, never()).grant(any())
         verify(permissionRequest, never()).deny()
+        verifyZeroInteractions(mockPixel)
     }
 
     @Test
