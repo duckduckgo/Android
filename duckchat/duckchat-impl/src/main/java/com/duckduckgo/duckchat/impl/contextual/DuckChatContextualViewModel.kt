@@ -27,6 +27,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.toChatIdOrNull
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
@@ -748,6 +749,7 @@ class DuckChatContextualViewModel @Inject constructor(
     fun onFullModeRequested() {
         logcat { "Duck.ai: request fullmode url $fullModeUrl" }
         val currentState = _viewState.value
+        val hasPrompt = currentState.sheetMode != SheetMode.INPUT
         val chatUrl = if (currentState.sheetMode == SheetMode.INPUT) {
             duckChat.getDuckChatUrl("", false, sidebar = false)
         } else {
@@ -758,6 +760,7 @@ class DuckChatContextualViewModel @Inject constructor(
         viewModelScope.launch {
             commandChannel.trySend(Command.OpenFullscreenMode(chatUrl))
         }
+        duckChatInternal.reportDuckChatEntry(DuckChatEntryPoint.CONTEXTUAL_CHAT, opensNewTab = true, hasPrompt = hasPrompt)
         duckChatPixels.reportContextualSheetExpanded()
     }
 
@@ -903,6 +906,7 @@ class DuckChatContextualViewModel @Inject constructor(
         duckChatPixels.reportContextualRecentChatSelected()
         val url = duckChatInternal.buildChatUrl(chatId)
         val sourceTabId = _viewState.value.tabId
+        duckChatInternal.reportDuckChatEntry(DuckChatEntryPoint.CHAT_HISTORY_OPEN_CHAT, opensNewTab = true, hasPrompt = false)
         commandChannel.trySend(Command.OpenChatUrl(url = url, sourceTabId = sourceTabId))
     }
 

@@ -48,6 +48,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.history.api.NavigationHistory
@@ -691,8 +692,8 @@ class SystemSearchViewModelTest {
     @Test
     fun onDuckAiTappedThenDuckChatOpenedWithQuery() {
         val query = "What is DuckDuckGo?"
-        testee.onDuckAiRequested(query)
-        verify(mockDuckChat).openDuckChatWithAutoPrompt(query)
+        testee.onDuckAiRequested(query, DuckChatEntryPoint.SYSTEM_SEARCH)
+        verify(mockDuckChat).openDuckChatWithAutoPrompt(query, DuckChatEntryPoint.SYSTEM_SEARCH)
     }
 
     @Test

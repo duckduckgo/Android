@@ -71,6 +71,7 @@ import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
@@ -606,7 +607,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     }
 
     private fun goToDuckAI() {
-        duckChat.openDuckChat()
+        duckChat.openDuckChat(DuckChatEntryPoint.PAID_SETTINGS)
     }
 
     private fun computeUserSettings(id: String) {

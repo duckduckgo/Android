@@ -26,6 +26,7 @@ import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChatContextual
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
@@ -93,6 +94,7 @@ class RealDuckChatContextual @Inject constructor(
 
     private fun openNewChatTab(activity: Activity, sourceTabId: String) {
         val url = duckChatInternal.getDuckChatUrl(query = "", autoPrompt = false)
+        duckChatInternal.reportDuckChatEntry(DuckChatEntryPoint.CONTEXTUAL_CHAT, opensNewTab = true, hasPrompt = false)
         browserNav.openInNewTab(activity, url, sourceTabId).also { activity.startActivity(it) }
     }
 

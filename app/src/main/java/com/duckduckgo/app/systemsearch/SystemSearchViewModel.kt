@@ -47,6 +47,7 @@ import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite
@@ -323,8 +324,8 @@ class SystemSearchViewModel @Inject constructor(
         voiceSearchState.tryEmit(Unit)
     }
 
-    fun onDuckAiRequested(query: String) {
-        duckChat.openDuckChatWithAutoPrompt(query)
+    fun onDuckAiRequested(query: String, entryPoint: DuckChatEntryPoint) {
+        duckChat.openDuckChatWithAutoPrompt(query, entryPoint)
         command.value = Command.ExitSearch
     }
 
@@ -382,7 +383,7 @@ class SystemSearchViewModel @Inject constructor(
             }
 
             is AutoCompleteSuggestion.AutoCompleteDuckAIPrompt -> {
-                onDuckAiRequested(suggestion.phrase)
+                onDuckAiRequested(suggestion.phrase, DuckChatEntryPoint.SUGGESTION_ASK_AI)
             }
 
             is AutoCompleteSuggestion.AutoCompleteDeviceAppSuggestion -> {

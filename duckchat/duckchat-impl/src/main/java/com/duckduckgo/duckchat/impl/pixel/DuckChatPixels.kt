@@ -23,9 +23,9 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.ToggleSelection
-import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.ModelTier
 import com.duckduckgo.duckchat.impl.ReportMetric
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_CREATE_NEW_CHAT
@@ -140,6 +140,14 @@ enum class DuckChatPixelSurface(val value: String) {
 interface DuckChatPixels {
     fun sendReportMetricPixel(reportMetric: ReportMetric, modelTier: ModelTier? = null, source: String? = null)
     fun reportOpen()
+
+    fun sendDuckChatEntryPixel(
+        entryPoint: DuckChatEntryPoint,
+        opensNewTab: Boolean,
+        hasPrompt: Boolean,
+        duckAiEnabled: Boolean,
+        inputScreenEnabled: Boolean,
+    )
     fun reportContextualSheetOpened()
     fun reportContextualSheetDismissed()
     fun reportContextualSheetSessionRestored()
@@ -244,7 +252,7 @@ interface DuckChatPixels {
     fun fireRecentChatDeleteConfirmed()
     fun fireRecentChatDeleteCancelled()
     fun fireCustomizeResponsesSelected(surface: DuckChatPixelSurface)
-    fun fireOmnibarShown()
+    fun fireOmnibarShown(toggleVisible: Boolean)
     fun fireOmnibarTextAreaFocused(landscape: Boolean)
     fun fireOmnibarQuerySubmitted(query: String, defaultMode: ToggleSelection?)
     fun fireOmnibarModeSwitched(directionToSearch: Boolean, hadText: Boolean)
@@ -260,7 +268,6 @@ interface DuckChatPixels {
 class RealDuckChatPixels @Inject constructor(
     private val pixel: Pixel,
     private val duckChatFeatureRepository: DuckChatFeatureRepository,
-    private val duckChatInternal: DuckChatInternal,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val statisticsUpdater: StatisticsUpdater,
@@ -281,6 +288,26 @@ class RealDuckChatPixels @Inject constructor(
 
     private fun surfaceParams(surface: DuckChatPixelSurface): Map<String, String> =
         mapOf(DuckChatPixelParameters.SURFACE to surface.value)
+
+    override fun sendDuckChatEntryPixel(
+        entryPoint: DuckChatEntryPoint,
+        opensNewTab: Boolean,
+        hasPrompt: Boolean,
+        duckAiEnabled: Boolean,
+        inputScreenEnabled: Boolean,
+    ) {
+        fireCountAndDaily(
+            DuckChatPixelName.DUCK_CHAT_ENTRY_POINT_COUNT,
+            DuckChatPixelName.DUCK_CHAT_ENTRY_POINT_DAILY,
+            mapOf(
+                DuckChatPixelParameters.ENTRY_SOURCE to entryPoint.toPixelValue(),
+                DuckChatPixelParameters.DUCK_AI_ENABLED to duckAiEnabled.toString(),
+                DuckChatPixelParameters.INPUT_SCREEN_ENABLED to inputScreenEnabled.toString(),
+                DuckChatPixelParameters.OPENS_NEW_TAB to opensNewTab.toString(),
+                DuckChatPixelParameters.HAS_PROMPT to hasPrompt.toString(),
+            ),
+        )
+    }
 
     override fun reportContextualSuggestionSelected(
         suggestionId: String,
@@ -962,10 +989,10 @@ class RealDuckChatPixels @Inject constructor(
         DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_DELETE_CANCELLED_DAILY,
     )
 
-    override fun fireOmnibarShown() = fireCountAndDaily(
+    override fun fireOmnibarShown(toggleVisible: Boolean) = fireCountAndDaily(
         DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SHOWN_COUNT,
         DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SHOWN_DAILY,
-        mapOf(DuckChatPixelParameters.TOGGLE_VISIBLE to (duckChatInternal.resolvedTogglePosition() != null).toString()),
+        mapOf(DuckChatPixelParameters.TOGGLE_VISIBLE to toggleVisible.toString()),
     )
 
     override fun fireOmnibarTextAreaFocused(landscape: Boolean) {
@@ -1047,6 +1074,8 @@ class RealDuckChatPixels @Inject constructor(
 
 enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_OPEN("aichat_open"),
+    DUCK_CHAT_ENTRY_POINT_COUNT("m_aichat_entry_point_count"),
+    DUCK_CHAT_ENTRY_POINT_DAILY("m_aichat_entry_point_daily"),
     DUCK_CHAT_OPEN_BROWSER_MENU("aichat_open_browser_menu"),
     DUCK_CHAT_OPEN_NEW_TAB_MENU("aichat_open_new_tab_menu"),
     DUCK_CHAT_OPEN_TAB_SWITCHER_FAB("aichat_open_tab_switcher_fab"),
@@ -1338,6 +1367,11 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
 }
 
 object DuckChatPixelParameters {
+    const val ENTRY_SOURCE = "source"
+    const val DUCK_AI_ENABLED = "duck_ai_enabled"
+    const val INPUT_SCREEN_ENABLED = "input_screen_enabled"
+    const val OPENS_NEW_TAB = "opens_new_tab"
+    const val HAS_PROMPT = "has_prompt"
     const val WAS_USED_BEFORE = "was_used_before"
     const val SUGGESTION_ID = "suggestionId"
     const val PAGE_TYPE = "pageType"
@@ -1382,6 +1416,8 @@ class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
     override fun names(): List<Pair<String, Set<PixelParameter>>> {
         return listOf(
             DUCK_CHAT_OPEN.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_ENTRY_POINT_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_ENTRY_POINT_DAILY.pixelName to PixelParameter.removeAtb(),
             DUCK_CHAT_OPEN_BROWSER_MENU.pixelName to PixelParameter.removeAtb(),
             DUCK_CHAT_OPEN_NEW_TAB_MENU.pixelName to PixelParameter.removeAtb(),
             DUCK_CHAT_OPEN_TAB_SWITCHER_FAB.pixelName to PixelParameter.removeAtb(),
@@ -1628,3 +1664,5 @@ internal fun ToggleSelection.pixelValue(): String = when (this) {
     ToggleSelection.SEARCH -> "search"
     ToggleSelection.DUCK_AI -> "duck_ai"
 }
+
+private fun DuckChatEntryPoint.toPixelValue(): String = name.lowercase()

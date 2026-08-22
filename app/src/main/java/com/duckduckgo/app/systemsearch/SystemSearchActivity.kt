@@ -90,6 +90,7 @@ import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.common.utils.text.TextChangedWatcher
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment
 import com.duckduckgo.voice.api.VoiceSearchAvailability
@@ -436,7 +437,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
                     }
 
                     is VoiceSearchLauncher.VoiceRecognitionResult.DuckAiResult -> {
-                        viewModel.onDuckAiRequested(result.query)
+                        viewModel.onDuckAiRequested(result.query, DuckChatEntryPoint.VOICE)
                     }
                 }
             } else if (it is VoiceSearchLauncher.Event.VoiceSearchDisabled) {
@@ -451,7 +452,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     fun configureDuckAi() {
         duckAi.setOnClickListener {
-            viewModel.onDuckAiRequested(omnibarTextInput.text.toString())
+            viewModel.onDuckAiRequested(omnibarTextInput.text.toString(), DuckChatEntryPoint.SYSTEM_SEARCH)
         }
     }
 
@@ -572,7 +573,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             SystemSearchViewModel.Command.ExitSearch -> finish()
 
             LaunchDuckAiVoiceChat -> {
-                duckChat.openVoiceDuckChat()
+                duckChat.openVoiceDuckChat(DuckChatEntryPoint.DIGITAL_ASSISTANT)
                 finish()
             }
         }

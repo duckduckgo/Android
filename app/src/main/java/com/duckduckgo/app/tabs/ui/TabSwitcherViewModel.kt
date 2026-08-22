@@ -70,6 +70,7 @@ import com.duckduckgo.common.utils.extensions.combine
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.remote.messaging.api.RemoteMessageModel
 import com.duckduckgo.savedsites.api.SavedSitesRepository
@@ -702,6 +703,7 @@ class TabSwitcherViewModel @Inject constructor(
             pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_TAB_SWITCHER_FAB, parameters = params)
 
             val url = duckChat.getDuckChatUrl("", false)
+            duckChat.reportDuckChatEntry(DuckChatEntryPoint.TAB_SWITCHER, opensNewTab = true, hasPrompt = false)
             tabRepository.add(url, true)
             command.value = Command.Close
         }

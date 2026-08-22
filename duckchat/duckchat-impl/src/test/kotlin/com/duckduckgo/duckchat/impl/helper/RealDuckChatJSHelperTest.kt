@@ -25,6 +25,7 @@ import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
@@ -1192,12 +1193,13 @@ class RealDuckChatJSHelperTest {
                 method,
                 id,
                 data,
+                mode = Mode.CONTEXTUAL,
                 pageContext = viewModel.updatedPageContext,
             ),
         )
 
         verify(mockDataStore).updateUserPreferences(payloadString)
-        verify(mockDuckChat).openNewDuckChatSession()
+        verify(mockDuckChat).openNewDuckChatSession(DuckChatEntryPoint.CONTEXTUAL_CHAT)
     }
 
     @Test
@@ -1212,11 +1214,12 @@ class RealDuckChatJSHelperTest {
                 method,
                 id,
                 null,
+                mode = Mode.CONTEXTUAL,
                 pageContext = viewModel.updatedPageContext,
             ),
         )
         verify(mockDataStore).updateUserPreferences(null)
-        verify(mockDuckChat).openNewDuckChatSession()
+        verify(mockDuckChat).openNewDuckChatSession(DuckChatEntryPoint.CONTEXTUAL_CHAT)
     }
 
     @Test
@@ -1232,11 +1235,42 @@ class RealDuckChatJSHelperTest {
                 method,
                 id,
                 data,
+                mode = Mode.CONTEXTUAL,
                 pageContext = viewModel.updatedPageContext,
             ),
         )
         verify(mockDataStore).updateUserPreferences(null)
-        verify(mockDuckChat).openNewDuckChatSession()
+        verify(mockDuckChat).openNewDuckChatSession(DuckChatEntryPoint.CONTEXTUAL_CHAT)
+    }
+
+    @Test
+    fun whenOpenAIChatFromOtherWebpageThenOpenDuckChatWithDirectUrlEntryPoint() = runTest {
+        assertNull(
+            testee.processJsCallbackMessage(
+                "aiChat",
+                "openAIChat",
+                "123",
+                null,
+                mode = Mode.FULL,
+            ),
+        )
+
+        verify(mockDuckChat).openNewDuckChatSession(DuckChatEntryPoint.DIRECT_URL)
+    }
+
+    @Test
+    fun whenOpenAIChatFromContextualThenOpenDuckChatWithContextualEntryPoint() = runTest {
+        assertNull(
+            testee.processJsCallbackMessage(
+                "aiChat",
+                "openAIChat",
+                "123",
+                null,
+                mode = Mode.CONTEXTUAL,
+            ),
+        )
+
+        verify(mockDuckChat).openNewDuckChatSession(DuckChatEntryPoint.CONTEXTUAL_CHAT)
     }
 
     @Test

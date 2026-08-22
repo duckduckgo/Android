@@ -27,6 +27,7 @@ import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.ChatState
@@ -176,7 +177,11 @@ class RealDuckChatJSHelper @Inject constructor(
             METHOD_OPEN_AI_CHAT -> {
                 val payload = extractPayload(data)
                 dataStore.updateUserPreferences(payload)
-                duckChat.openNewDuckChatSession()
+                val entryPoint = when {
+                    mode == Mode.CONTEXTUAL -> DuckChatEntryPoint.CONTEXTUAL_CHAT
+                    else -> DuckChatEntryPoint.DIRECT_URL
+                }
+                duckChat.openNewDuckChatSession(entryPoint)
                 null
             }
 

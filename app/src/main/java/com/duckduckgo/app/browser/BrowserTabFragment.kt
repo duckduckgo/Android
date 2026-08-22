@@ -338,6 +338,7 @@ import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatContextual
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.DuckChatHistoryNoParams
 import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InteractionLock
@@ -824,7 +825,7 @@ class BrowserTabFragment :
                 viewModel.openNewDuckChat(omnibar.viewMode)
             }
             onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewVoiceChat)) {
-                duckChat.openVoiceDuckChat()
+                duckChat.openVoiceDuckChat(DuckChatEntryPoint.VOICE)
             }
             onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewTab)) {
                 browserActivity?.launchNewTab(browserMode = BrowserMode.REGULAR)
@@ -1080,7 +1081,7 @@ class BrowserTabFragment :
                             if (nativeInputManager.isNativeInputEnabled()) {
                                 nativeInputManager.handleDuckAiVoiceResult(result.query)
                             } else {
-                                duckChat.openDuckChatWithAutoPrompt(result.query)
+                                duckChat.openDuckChatWithAutoPrompt(result.query, DuckChatEntryPoint.VOICE)
                             }
                         }
                     }
@@ -1445,7 +1446,9 @@ class BrowserTabFragment :
                     )
                 },
                 onChatSuggestionSelected = { chatUrl -> viewModel.openDuckAiChatById(chatUrl) },
-                onDuckAiQuerySubmitted = { query -> viewModel.openDuckAiQuery(query, autoPrompt = true) },
+                onDuckAiQuerySubmitted = { query, entryPoint ->
+                    viewModel.openDuckAiQuery(query, autoPrompt = true, entryPoint = entryPoint)
+                },
                 onChatUrlSuggestionClicked = { suggestion -> viewModel.userSelectedAutocomplete(suggestion, firePixel = false) },
                 onChatHistoryShortcutClicked = {
                     pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_SIDEBAR_TAPPED)
@@ -1870,7 +1873,7 @@ class BrowserTabFragment :
             onMenuItemClicked(duckAiNewVoiceChatMenuItem) {
                 pixel.fire(DuckChatPixelName.DUCK_CHAT_VOICE_ENTRY_TAPPED_COUNT)
                 pixel.fire(DuckChatPixelName.DUCK_CHAT_VOICE_ENTRY_TAPPED_DAILY, type = Daily())
-                duckChat.openVoiceDuckChat()
+                duckChat.openVoiceDuckChat(DuckChatEntryPoint.VOICE)
             }
             onMenuItemClicked(duckChatHistoryMenuItem) {
                 pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_SIDEBAR_TAPPED)

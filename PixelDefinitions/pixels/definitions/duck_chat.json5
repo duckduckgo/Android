@@ -439,6 +439,52 @@
             }
         ]
     },
+    "m_aichat_entry_point": {
+        "description": "Fires when an active user action enters Duck.ai, with the initiating surface and navigation context.",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "source",
+                "type": "string",
+                "description": "The surface that initiated the Duck.ai entry.",
+                "enum": [
+                    "address_bar_prompt",
+                    "address_bar_icon",
+                    "address_bar_shortcut_chip",
+                    "address_bar_editing_state",
+                    "suggestion_ask_ai",
+                    "browsing_menu_ntp",
+                    "browsing_menu_webpage",
+                    "tab_switcher",
+                    "chat_history_new_chat",
+                    "chat_history_open_chat",
+                    "voice",
+                    "onboarding",
+                    "direct_url",
+                    "serp",
+                    "icon_shortcut",
+                    "contextual_chat",
+                    "widget_quick_actions",
+                    "widget_favorite",
+                    "system_search",
+                    "digital_assistant",
+                    "deep_link_other",
+                    "paid_settings"
+                ]
+            },
+            { "key": "duck_ai_enabled", "type": "boolean", "description": "Whether Duck.ai is enabled by feature and user settings." },
+            {
+                "key": "input_screen_enabled",
+                "type": "boolean",
+                "description": "Whether the Search and Duck.ai input capability is enabled."
+            },
+            { "key": "opens_new_tab", "type": "boolean", "description": "Whether this entry opens a new browser tab." },
+            { "key": "has_prompt", "type": "boolean", "description": "Whether a non-blank prompt is automatically submitted on entry." }
+        ]
+    },
     "m_aichat_duck_ai_direct_navigation_count": {
         "description": "User navigated directly to the Duck.ai URL by typing it in the omnibar",
         "owners": ["malmstein"],
@@ -448,9 +494,13 @@
             "appVersion",
             {
                 "key": "duck_ai_enabled",
-                "type": "string",
-                "description": "Whether the Duck.ai global setting is enabled",
-                "enum": ["true", "false"]
+                "type": "boolean",
+                "description": "Whether the Duck.ai global setting is enabled"
+            },
+            {
+                "key": "input_screen_enabled",
+                "type": "boolean",
+                "description": "Whether the Search and Duck.ai input capability is enabled."
             }
         ]
     },
@@ -463,9 +513,13 @@
             "appVersion",
             {
                 "key": "duck_ai_enabled",
-                "type": "string",
-                "description": "Whether the Duck.ai global setting is enabled",
-                "enum": ["true", "false"]
+                "type": "boolean",
+                "description": "Whether the Duck.ai global setting is enabled"
+            },
+            {
+                "key": "input_screen_enabled",
+                "type": "boolean",
+                "description": "Whether the Search and Duck.ai input capability is enabled."
             }
         ]
     },
