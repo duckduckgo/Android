@@ -38,8 +38,10 @@ import com.duckduckgo.site.permissions.impl.feature.DrmPolicyFeature
 import com.duckduckgo.site.permissions.impl.feature.MicrophoneSitePermissionsDomainRecoveryFeature
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
 import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.never
+import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.verifyZeroInteractions
 import com.nhaarman.mockitokotlin2.whenever
@@ -183,6 +185,38 @@ class SitePermissionsManagerTest {
                 SitePermissionsPixelParameters.REASON to SitePermissionsPixelValues.PROTECTIONS_OFF,
             ),
         )
+    }
+
+    @Test
+    fun whenTheSamePageRequestsDrmTwiceThenAutoGrantedPixelIsFiredOnce() = runTest {
+        drmPolicyFeature.centralPolicy().setRawStoredState(Toggle.State(true))
+        whenever(mockDrmPolicyManager.decide(url, tabId))
+            .thenReturn(DrmPolicyDecision(DrmPolicyAction.GRANT, DrmPolicyReason.ALLOW_LIST))
+        val permissionRequest = givenDrmPermissionRequest()
+
+        testee.getSitePermissions(tabId, permissionRequest)
+        testee.getSitePermissions(tabId, permissionRequest)
+
+        verify(mockPixel).fire(eq(SitePermissionsPixelName.PERMISSION_AUTO_GRANTED), any(), any(), any())
+    }
+
+    @Test
+    fun whenAnotherTabAutoGrantsTheSameDomainThenAutoGrantedPixelIsFiredAgain() = runTest {
+        drmPolicyFeature.centralPolicy().setRawStoredState(Toggle.State(true))
+        val otherTabId = "otherTabId"
+        whenever(mockDrmPolicyManager.decide(eq(url), any()))
+            .thenReturn(DrmPolicyDecision(DrmPolicyAction.GRANT, DrmPolicyReason.ALLOW_LIST))
+        val permissionRequest = givenDrmPermissionRequest()
+
+        testee.getSitePermissions(tabId, permissionRequest)
+        testee.getSitePermissions(otherTabId, permissionRequest)
+
+        verify(mockPixel, times(2)).fire(eq(SitePermissionsPixelName.PERMISSION_AUTO_GRANTED), any(), any(), any())
+    }
+
+    private fun givenDrmPermissionRequest(): PermissionRequest = mock<PermissionRequest>().apply {
+        whenever(origin).thenReturn(url.toUri())
+        whenever(resources).thenReturn(arrayOf(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID))
     }
 
     @Test

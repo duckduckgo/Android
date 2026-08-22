@@ -24,6 +24,7 @@ import javax.inject.Inject
 @SingleInstanceIn(AppScope::class)
 class DrmSessionStore @Inject constructor() {
     private val sessions = ConcurrentHashMap<String, Boolean>()
+    private val autoGrantsReported = ConcurrentHashMap<String, Boolean>()
 
     fun get(tabId: String, domain: String): Boolean? = sessions[key(tabId, domain)]
 
@@ -31,8 +32,15 @@ class DrmSessionStore @Inject constructor() {
         sessions[key(tabId, domain)] = allowed
     }
 
+    /**
+     * True the first time this tab and domain are auto-granted. A page can issue several DRM requests, and
+     * an automatic grant records no session choice to short-circuit them, so the caller has to count once.
+     */
+    fun markAutoGrantReported(tabId: String, domain: String): Boolean = autoGrantsReported.putIfAbsent(key(tabId, domain), true) == null
+
     fun clear() {
         sessions.clear()
+        autoGrantsReported.clear()
     }
 
     private fun key(tabId: String, domain: String) = "$tabId/$domain"

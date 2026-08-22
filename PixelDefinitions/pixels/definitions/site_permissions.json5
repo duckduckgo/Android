@@ -1,7 +1,7 @@
 // Site permissions pixels
 {
     "m_site_permissions_auto_granted": {
-        "description": "Fires when a DRM site permission request is granted automatically by the central DRM policy, without showing the permission dialog",
+        "description": "Fires the first time a tab auto-grants DRM for a domain, when the central DRM policy grants the request without showing the permission dialog. A page can issue several DRM requests; only the first is counted, so this is comparable with m_site_permissions_dialog_impresssion",
         "owners": ["0nko"],
         "triggers": ["page_load"],
         "suffixes": ["form_factor"],

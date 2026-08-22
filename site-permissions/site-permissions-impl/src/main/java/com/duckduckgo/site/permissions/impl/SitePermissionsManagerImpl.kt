@@ -87,7 +87,7 @@ class SitePermissionsManagerImpl @Inject constructor(
                     ?.also { logcat { "Permissions: drm policy decision for $url is $it" } }
             }
         }
-        drmDecision?.let { fireDrmAutoGrantedPixel(it) }
+        drmDecision?.let { fireDrmAutoGrantedPixel(it, tabId, url) }
 
         val sitePermissionsAllowedToAsk = request.resources
             .filter { drmDecision == null || it != PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID }
@@ -179,13 +179,19 @@ class SitePermissionsManagerImpl @Inject constructor(
         return sitePermissionsRepository.isDomainGranted(url, "", LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION)
     }
 
-    private fun fireDrmAutoGrantedPixel(decision: DrmPolicyDecision) {
+    private fun fireDrmAutoGrantedPixel(
+        decision: DrmPolicyDecision,
+        tabId: String,
+        url: String,
+    ) {
         if (decision.action != DrmPolicyAction.GRANT) return
         val reason = when (decision.reason) {
             DrmPolicyReason.ALLOW_LIST -> SitePermissionsPixelValues.ALLOW_LIST
             DrmPolicyReason.PROTECTIONS_OFF -> SitePermissionsPixelValues.PROTECTIONS_OFF
             else -> return
         }
+        if (!drmSessionStore.markAutoGrantReported(tabId, url.extractDomain() ?: url)) return
+
         pixel.fire(
             SitePermissionsPixelName.PERMISSION_AUTO_GRANTED,
             mapOf(
