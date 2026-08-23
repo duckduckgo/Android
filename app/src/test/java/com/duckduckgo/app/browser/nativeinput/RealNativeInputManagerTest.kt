@@ -464,6 +464,7 @@ class RealNativeInputManagerTest {
         private var onChatSubmitted: ((String) -> Unit)? = null
 
         override var text: String = ""
+        override var nextDuckAiEntryPoint: DuckChatEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT
 
         override fun bindInputEvents(
             onSearchTextChanged: (String) -> Unit,

@@ -47,6 +47,7 @@ class RealDuckChatPixelsAttachmentsTest {
         statisticsUpdater = statisticsUpdater,
         duckAiMetricCollector = duckAiMetricCollector,
         termsOfServiceHandler = termsOfServiceHandler,
+        duckAiTabSessionRepository = mock(),
     )
 
     @Test

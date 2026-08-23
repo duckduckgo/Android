@@ -71,6 +71,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InteractionLock
@@ -132,6 +133,11 @@ interface NativeInputWidget {
     var onCustomizeResponsesClicked: (() -> Unit)?
     val isModelMenuVisible: Boolean
 
+    /**
+     * The entry point that will be reported when Duck.ai is opened or a prompt is submitted
+     */
+    var nextDuckAiEntryPoint: DuckChatEntryPoint
+
     fun onBackPressed()
     fun focusInput(activity: Activity?)
     fun hasInputFocus(): Boolean
@@ -192,6 +198,9 @@ interface NativeInputWidget {
      * The widget forwards changes into the [NativeInputState] so observers can react.
      */
     fun bindChatIdSource(source: Flow<String?>)
+
+    /** Binds a reactive source of the underlying tab's current URL. */
+    fun bindCurrentUrlSource(source: Flow<String?>)
 
     /** Binds a reactive source for the onboarding interaction lock (see [InteractionLock]). */
     fun bindInteractionLockSource(source: Flow<InteractionLock>)
@@ -304,6 +313,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var modelPickerEnabledSource: Flow<Boolean>? = null
     private var chatIdJob: Job? = null
     private var chatIdSource: Flow<String?>? = null
+    private var currentUrlJob: Job? = null
+    private var currentUrlSource: Flow<String?>? = null
     private var interactionLockJob: Job? = null
     private var interactionLockSource: Flow<InteractionLock>? = null
     private var duckAiFireButtonHighlightJob: Job? = null
@@ -430,6 +441,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     override var onBack: (() -> Unit)? = null
     var onSearchSent: ((String) -> Unit)? = null
     var onChatSent: ((String) -> Unit)? = null
+    override var nextDuckAiEntryPoint: DuckChatEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT
     override var onSearchSelected: ((animate: Boolean) -> Unit)? = null
     override var onChatSelected: ((animate: Boolean) -> Unit)? = null
     var onSearchTextChanged: ((String) -> Unit)? = null
@@ -684,6 +696,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         setupPlugins()
         observeModelPickerEnabledSource()
         observeChatIdSource()
+        observeCurrentUrlSource()
         observeInteractionLockSource()
         observeDuckAiFireButtonHighlightSource()
         applyNativeStyling()
@@ -843,6 +856,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
         modelPickerEnabledJob = null
         chatIdJob?.cancel()
         chatIdJob = null
+        currentUrlJob?.cancel()
+        currentUrlJob = null
         interactionLockJob?.cancel()
         interactionLockJob = null
         duckAiFireButtonHighlightJob?.cancel()
@@ -1380,6 +1395,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
             hasText = hasText,
             hasImageAttachment = hasImageAttachment,
             hasFileAttachment = hasFileAttachment,
+            addressBarEntryPoint = nextDuckAiEntryPoint,
         )
         // Fires alongside prompt_submitted, but only when the input is in a Duck.ai chat context
         // (a prompt sent from within an active chat) — not omnibar submissions that start a new chat.
@@ -1562,6 +1578,21 @@ class NativeInputModeWidget @JvmOverloads constructor(
         chatIdJob = source
             .distinctUntilChanged()
             .onEach { viewModel.setActiveChatId(it) }
+            .launchIn(scope)
+    }
+
+    override fun bindCurrentUrlSource(source: Flow<String?>) {
+        currentUrlSource = source
+        if (isAttachedToWindow) observeCurrentUrlSource()
+    }
+
+    private fun observeCurrentUrlSource() {
+        val source = currentUrlSource ?: return
+        val scope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
+        currentUrlJob?.cancel()
+        currentUrlJob = source
+            .distinctUntilChanged()
+            .onEach { viewModel.setActiveTabUrl(it) }
             .launchIn(scope)
     }
 

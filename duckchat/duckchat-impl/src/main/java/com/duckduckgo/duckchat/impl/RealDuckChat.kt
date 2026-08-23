@@ -27,6 +27,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.tabs.BrowserNav
+import com.duckduckgo.app.tabs.model.DuckAiTabSessionRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.AppUrl
@@ -45,6 +46,7 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
+import com.duckduckgo.duckchat.impl.pixel.toPixelValue
 import com.duckduckgo.duckchat.impl.repository.AddressBarPickerAttributionRepository
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
@@ -470,6 +472,7 @@ class RealDuckChat @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val voiceSessionStateManager: VoiceSessionStateManager,
     private val chatSuggestionsStore: ChatSuggestionsStore,
+    private val duckAiTabSessionRepository: DuckAiTabSessionRepository,
 ) : DuckChatInternal,
     DuckAiFeatureState,
     DuckChatInputModeState,
@@ -799,6 +802,9 @@ class RealDuckChat @Inject constructor(
         opensNewTab: Boolean,
         hasPrompt: Boolean,
     ) {
+        // Lets the tab that ends up hosting this entry attribute itself once it's created/navigated,
+        // so a later prompt submission in it can carry this same entry point as its `source`.
+        duckAiTabSessionRepository.setPendingEntryPointSource(entryPoint.toPixelValue())
         duckChatPixels.get().sendDuckChatEntryPixel(
             entryPoint = entryPoint,
             opensNewTab = opensNewTab,
