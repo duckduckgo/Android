@@ -267,6 +267,17 @@ interface SubscriptionsFeature {
     fun allowProTierPurchase(): Toggle
 
     /**
+     * Gates the server-rendered first paywall: `/subscriptions/new/mobile/<emphasis>` in place of
+     * `/subscriptions` with a `featurePage` query item.
+     *
+     * Wired only. Nothing reads this yet — see `RealSubscriptionsTest` for the URLs it has to
+     * produce once something does. Remote-releasable under the existing `privacyPro` feature, under
+     * the same subfeature name the Apple clients use, so one config entry covers all three.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun performanceOptimizedPaywalls(): Toggle
+
+    /**
      * When enabled, pending plan hint is displayed to users.
      * When disabled, pending plans hint is not shown (kill switch for pending plans UI).
      */

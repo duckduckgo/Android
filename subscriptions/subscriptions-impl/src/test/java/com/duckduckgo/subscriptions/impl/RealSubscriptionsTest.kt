@@ -44,7 +44,9 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import org.junit.Assert.fail
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -285,6 +287,79 @@ class RealSubscriptionsTest {
         verify(globalActivityStarter, times(1)).startIntent(eq(context), captor.capture())
         assertEquals("test", (captor.lastValue as SubscriptionsWebViewActivityWithParams).origin)
     }
+
+    // region First paywall, performance-optimized (not implemented)
+
+    // The `performanceOptimizedPaywalls` toggle is wired but unread. When it is on, the two
+    // first-paywall entry points this app opens itself have to be opened at a URL that names the page
+    // and states what the page would otherwise resolve after mount, instead of `/subscriptions` plus
+    // a `featurePage` item.
+    //
+    //     entry point                     URL
+    //     ---------------------------------------------------------------------------------
+    //     VPN      (no featurePage)       /subscriptions/new/mobile/vpn
+    //     Duck.ai  (featurePage=duckai)   /subscriptions/new/mobile/duckai
+    //
+    //     query item   values                when
+    //     ---------------------------------------------------------------------------------
+    //     trial        true | false          always, whichever it is
+    //     pir          false                 only when the offering excludes Personal Information
+    //                                        Removal; the page shows PIR unless told otherwise
+    //     origin       unchanged             carried as it is today
+    //
+    // `trial` is whether the offering includes a free trial; `pir` is whether it includes Personal
+    // Information Removal, which is sold in the USA storefront and not in the rest of the world. Both
+    // have to be settled before the URL is opened — that is the whole point, since the page ships both
+    // CTA labels and both feature lists and reveals one from the URL. Where they are read from,
+    // whether the store may be waited on first, and what happens if it never answers are open
+    // questions, deliberately not answered here.
+    //
+    // What must not move: `pir`, `stripe` and `winback` featurePages, and intercepted `/pro` links
+    // like the ones the tests below cover, stay on the URL they use today. The first two create or
+    // refresh a cart account on mount, which would make a load-time comparison measure the network.
+
+    /**
+     * Pending until something produces the URLs above. Remove the `@Ignore` to see it fail, then
+     * replace the `fail` with assertions against whatever ends up building them.
+     */
+    @Test
+    @Ignore("Pending: the server-rendered first paywall is not implemented")
+    fun whenPerformanceOptimizedPaywallsIsOnThenFirstPaywallOpensTheServerRenderedUrl() = runTest {
+        val required = listOf(
+            "https://duckduckgo.com/subscriptions/new/mobile/vpn?trial=false",
+            "https://duckduckgo.com/subscriptions/new/mobile/vpn?trial=true",
+            "https://duckduckgo.com/subscriptions/new/mobile/vpn?trial=false&pir=false",
+            "https://duckduckgo.com/subscriptions/new/mobile/vpn?trial=true&pir=false",
+            "https://duckduckgo.com/subscriptions/new/mobile/duckai?trial=false",
+            "https://duckduckgo.com/subscriptions/new/mobile/duckai?trial=true",
+            "https://duckduckgo.com/subscriptions/new/mobile/duckai?trial=false&pir=false",
+            "https://duckduckgo.com/subscriptions/new/mobile/duckai?trial=true&pir=false",
+        )
+
+        fail("Nothing produces the server-rendered first paywall URLs yet: ${required.joinToString()}")
+    }
+
+    /**
+     * Fails until the offer-screen impression fires for the URLs above. It is the denominator of the
+     * whole comparison, and today it is gated on [Subscriptions.isSubscriptionUrl], which matches only
+     * a single-segment `/subscriptions` — so as things stand the treatment arm would report no
+     * impressions at all. Whether that gate widens or the impression is decided somewhere else is
+     * open; `trial` and `pir` must not affect it either way, since they choose what the page reveals
+     * rather than which page it is.
+     */
+    @Test
+    @Ignore("Pending: nothing reports an impression for the server-rendered first paywall")
+    fun whenPerformanceOptimizedPaywallIsShownThenOfferScreenImpressionStillFires() = runTest {
+        assertFalse(
+            "isSubscriptionUrl now matches the server-rendered paywall, so this test needs replacing " +
+                "with one that asserts the impression fires",
+            subscriptions.isSubscriptionUrl("https://duckduckgo.com/subscriptions/new/mobile/vpn?trial=true".toUri()),
+        )
+
+        fail("Nothing fires m_privacy-pro_offer_screen_impression for the server-rendered first paywall yet")
+    }
+
+    // endregion
 
     @Test
     fun whenLaunchProUrlWithFeaturePageThenIncludeInSubscriptionURLToActivity() = runTest {
