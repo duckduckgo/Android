@@ -25,4 +25,12 @@
     <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[DuckDuckGo poate gestiona automat ferestrele pop-up aferente modulelor cookie pentru a maximiza confidențialitatea și a minimiza modulele cookie chiar înainte să le vezi.\n<a href=\"\">Află mai multe</a>]]></string>
     <string name="autoconsentPopUpsWithoutOptOutsToggle">Acceptă modulele cookie care nu pot fi respinse</string>
     <string name="autoconsentPopUpsWithoutOptOutsDescription">Dacă nu există o opțiune de respingere, te vom scuti de un click, vom accepta aceste module cookie pentru tine și vom închide ferestrele pop-up.</string>
+    <string name="autoconsentPromptTitle">Te-ai săturat de ferestrele pop-up cu module cookie?</string>
+    <string name="autoconsentPromptFootnote">Poți oricând să modifici ulterior din Setări.</string>
+    <string name="autoconsentPromptCpmOnMessage">Unele module cookie nu pot fi respinse. Le putem accepta pentru tine.</string>
+    <string name="autoconsentPromptCpmOnPrimaryButton">Acceptați modulele cookie pentru mine</string>
+    <string name="autoconsentPromptCpmOnSecondaryButton">Le voi accepta personal</string>
+    <string name="autoconsentPromptCpmOffMessage">Ne vom ocupa noi de ele pentru tine. Vom respinge modulele cookie când este posibil și le vom accepta pe cele care nu pot fi respinse.</string>
+    <string name="autoconsentPromptCpmOffPrimaryButton">Respingeți dacă este posibil sau acceptați pentru mine</string>
+    <string name="autoconsentPromptCpmOffSecondaryButton">Mă voi ocupa personal de ele</string>
 </resources>
