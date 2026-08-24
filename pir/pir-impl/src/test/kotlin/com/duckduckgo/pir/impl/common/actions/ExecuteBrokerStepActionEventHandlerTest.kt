@@ -475,7 +475,43 @@ class ExecuteBrokerStepActionEventHandlerTest {
         val sideEffect = result.sideEffect as PushJsAction
         assertEquals("action-captcha", sideEffect.actionId)
         assertEquals(action, sideEffect.action)
+        val captchaData = sideEffect.requestParamsData as PirScriptRequestData.SolveCaptcha
+        assertEquals("captcha-token", captchaData.token)
+        assertEquals(testProfileQuery, captchaData.userProfile)
+        assertEquals("John Doe", captchaData.extractedProfile?.name)
         assertNull(result.nextEvent)
+    }
+
+    @Test
+    fun whenScanStepSolveCaptchaActionWithSolutionThenSendsProfileWithoutExtractedProfile() = runTest {
+        val action = BrokerAction.SolveCaptcha(id = "action-captcha", selector = "captcha-input")
+        val scanStep = ScanStep(
+            broker = testBroker,
+            step = ScanStepActions(
+                stepType = "scan",
+                actions = listOf(action),
+                scanType = "initial",
+            ),
+        )
+        val state = State(
+            runType = RunType.MANUAL,
+            brokerStep = scanStep,
+            profileQuery = testProfileQuery,
+            currentActionIndex = 0,
+            stageStatus = PirStageStatus(
+                currentStage = PirStage.CAPTCHA_SOLVE,
+                stageStartMs = testStageStartMs,
+            ),
+        )
+        val event = ExecuteBrokerStepAction(PirScriptRequestData.SolveCaptcha(token = "captcha-token"))
+
+        val result = testee.invoke(state, event)
+
+        val sideEffect = result.sideEffect as PushJsAction
+        val captchaData = sideEffect.requestParamsData as PirScriptRequestData.SolveCaptcha
+        assertEquals("captcha-token", captchaData.token)
+        assertEquals(testProfileQuery, captchaData.userProfile)
+        assertNull(captchaData.extractedProfile)
     }
 
     @Test

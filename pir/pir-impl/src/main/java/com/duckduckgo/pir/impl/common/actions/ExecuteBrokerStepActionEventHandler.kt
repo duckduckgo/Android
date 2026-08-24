@@ -301,6 +301,16 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor(
         state: State,
         requestData: PirScriptRequestData,
     ): PirScriptRequestData {
+        if (requestData is PirScriptRequestData.SolveCaptcha) {
+            return requestData.copy(
+                userProfile = state.profileQuery,
+                extractedProfile = when (brokerStep) {
+                    is OptOutStep -> brokerStep.profileToOptOut.toParams(state.profileQuery.fullName)
+                    is EmailConfirmationStep -> brokerStep.profileToOptOut.toParams(state.profileQuery.fullName)
+                    is ScanStep -> null
+                },
+            )
+        }
         if (requestData !is UserProfile) {
             return requestData
         }
