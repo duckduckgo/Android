@@ -64,6 +64,12 @@ interface DuckAiModelManager {
 
     suspend fun selectModel(model: AIChatModel)
 
+    /**
+     * Pins the user to a provider rather than to one of its models, so they keep following the
+     * server-side default within it. Replaces any earlier [selectModel] pick.
+     */
+    suspend fun selectProvider(provider: ModelProvider)
+
     suspend fun selectReasoningMode(mode: ReasoningMode)
 
     suspend fun setChatScopedReasoningMode(mode: ReasoningMode?)
@@ -203,10 +209,12 @@ class RealDuckAiModelManager @Inject constructor(
     }
 
     /**
-     * Only an explicit pick in [selectModel] is persisted. The default is re-derived from every
-     * response so that reordering the list, or promoting a new default, reaches users who never
-     * picked a model. A persisted pick that is gone from the response, or no longer accessible, is
-     * dropped rather than replaced, so we don't turn our fallback into a pick the user never made.
+     * Only an explicit pick in [selectModel] or [selectProvider] is persisted. The default is
+     * re-derived from every response so that reordering the list, or promoting a new default,
+     * reaches users who never picked a model. A persisted model pick that is gone from the response,
+     * or no longer accessible, is dropped rather than replaced, so we don't turn our fallback into a
+     * pick the user never made. A persisted provider is kept even when nothing matches, since the
+     * provider may return to the response later.
      */
     private suspend fun resolveSelection(models: List<AIChatModel>): String? {
         val persistedId = dataStore.getSelectedModel()?.id
@@ -215,6 +223,13 @@ class RealDuckAiModelManager @Inject constructor(
             if (persisted != null && persisted.isAccessible) return persistedId
             dataStore.setSelectedModel(null)
         }
+
+        val persistedProvider = ModelProvider.fromNameOrNull(dataStore.getSelectedProvider())
+        if (persistedProvider != null) {
+            val model = models.firstOrNull { it.provider == persistedProvider && it.isAccessible }
+            if (model != null) return model.id
+        }
+
         return models.firstOrNull { it.isAccessible }?.id
     }
 
@@ -226,6 +241,7 @@ class RealDuckAiModelManager @Inject constructor(
         withContext(dispatcherProvider.io()) {
             stateMutex.withLock {
                 dataStore.setSelectedModel(SelectedModel(model.id, model.shortName))
+                dataStore.setSelectedProvider(null)
                 val available = ReasoningResolver.availableModes(
                     supported = model.supportedReasoningEfforts,
                     effortAccess = model.reasoningEffortAccess,
@@ -239,6 +255,32 @@ class RealDuckAiModelManager @Inject constructor(
                     availableReasoningModes = available,
                 )
                 logcat { "Duck.ai Model Manager: selected model ${model.id} (${model.shortName})" }
+            }
+        }
+    }
+
+    override suspend fun selectProvider(provider: ModelProvider) {
+        withContext(dispatcherProvider.io()) {
+            stateMutex.withLock {
+                dataStore.setSelectedModel(null)
+                dataStore.setSelectedProvider(provider.name)
+
+                val models = _modelState.value.models
+                val selectedModelId = resolveSelection(models)
+                val selectedModel = models.find { it.id == selectedModelId }
+                val available = ReasoningResolver.availableModes(
+                    supported = selectedModel?.supportedReasoningEfforts.orEmpty(),
+                    effortAccess = selectedModel?.reasoningEffortAccess.orEmpty(),
+                    isEligible = _modelState.value.isSubscriptionEligible,
+                )
+                val nextReasoningMode = validateAndPersistReasoningMode(_modelState.value.selectedReasoningMode, available)
+                _modelState.value = _modelState.value.copy(
+                    selectedModelId = selectedModelId,
+                    selectedModelShortName = selectedModel?.shortName,
+                    selectedReasoningMode = nextReasoningMode,
+                    availableReasoningModes = available,
+                )
+                logcat { "Duck.ai Model Manager: selected provider ${provider.name}, resolved model $selectedModelId" }
             }
         }
     }

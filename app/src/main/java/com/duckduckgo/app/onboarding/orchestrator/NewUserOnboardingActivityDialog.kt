@@ -18,8 +18,8 @@ package com.duckduckgo.app.onboarding.orchestrator
 
 import androidx.annotation.StringRes
 import com.duckduckgo.app.onboarding.OnboardingPreference
-import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanProvider.OnboardingSingleChoiceDataPlugin.Option
 import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
+import com.duckduckgo.onboarding.api.OnboardingSingleChoiceDataPlugin.Option
 
 /**
  * What the [com.duckduckgo.app.onboarding.ui.OnboardingActivity] renderer should present for the current step.

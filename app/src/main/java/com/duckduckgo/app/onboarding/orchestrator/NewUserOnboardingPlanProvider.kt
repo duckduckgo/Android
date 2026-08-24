@@ -16,13 +16,14 @@
 
 package com.duckduckgo.app.onboarding.orchestrator
 
-import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.onboarding.CustomAiOnboardingPixelName
 import com.duckduckgo.app.onboarding.CustomAiOnboardingResolver
@@ -34,7 +35,6 @@ import com.duckduckgo.app.onboarding.OnboardingPreferenceApplier
 import com.duckduckgo.app.onboarding.OnboardingPromptsExperimentManager
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager.SegmentedOnboardingExperimentVariant
-import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanProvider.OnboardingSingleChoiceDataPlugin.Option
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
@@ -57,7 +57,7 @@ import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.plugins.ActivePlugin
+import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.wideevents.InputScreenOnboardingWideEvent
@@ -70,15 +70,17 @@ import com.duckduckgo.onboarding.api.LinearOnboardingTransition.AbortPlan
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition.Advance
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition.Stay
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition.SwitchTo
+import com.duckduckgo.onboarding.api.OnboardingSingleChoiceDataPlugin
 import com.duckduckgo.sync.api.SyncAutoRestore
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import logcat.LogPriority
 import logcat.logcat
 import javax.inject.Inject
-import com.duckduckgo.mobile.android.R as AndroidDesignSystemR
 
 /**
  * Composes the linear-onboarding plan for the new user.
@@ -109,6 +111,8 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     private val onboardingPromptsExperimentManager: OnboardingPromptsExperimentManager,
     private val segmentedOnboardingExperimentManager: SegmentedOnboardingExperimentManager,
     private val onboardingPreferenceApplier: OnboardingPreferenceApplier,
+    private val singleChoiceDataPlugins: ActivePluginPoint<OnboardingSingleChoiceDataPlugin>,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) {
 
     suspend fun buildRootPlan(
@@ -259,6 +263,11 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         onSkipped: suspend () -> Unit,
     ): LinearOnboardingPlan {
         val firstDialog = SuspendMemo { FirstDialog.INITIAL }
+        val modelProviderChoice = SuspendMemo { singleChoiceDataPlugin(OnboardingSingleChoiceDataPlugin.Id.DuckAiModelProvider) }
+
+        // Warms the options up while the user is still several screens away from the step that renders them.
+        appCoroutineScope.launch(dispatchers.io()) { modelProviderChoice()?.prefetch() }
+
         return rootPlan(
             ctx = ctx,
             onCompleted = onCompleted,
@@ -267,7 +276,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 add(introAnimationStep())
                 add(notificationPermissionStep())
                 add(initialStep(firstDialog))
-                add(downloadReasonStep(ctx))
+                add(downloadReasonStep(ctx, modelProviderChoice))
             },
         )
     }
@@ -484,7 +493,10 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         )
     }
 
-    private fun downloadReasonStep(ctx: NewUserOnboardingPlanContext): NewUserOnboardingActivityStep {
+    private fun downloadReasonStep(
+        ctx: NewUserOnboardingPlanContext,
+        modelProviderChoice: SuspendMemo<OnboardingSingleChoiceDataPlugin?>,
+    ): NewUserOnboardingActivityStep {
         return NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.DOWNLOAD_REASON,
             pixelName = null,
@@ -503,7 +515,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
                         when (selection) {
                             DownloadReasonSelection.SEARCH -> SwitchTo(segmentedSearchPlan(ctx))
-                            DownloadReasonSelection.AI_CHAT -> SwitchTo(segmentedAiPlan(ctx))
+                            DownloadReasonSelection.AI_CHAT -> SwitchTo(segmentedAiPlan(ctx, modelProviderChoice))
                             DownloadReasonSelection.NO_AI,
                             DownloadReasonSelection.BLOCK_ADS,
                             -> {
@@ -543,32 +555,19 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         )
     }
 
-    private fun segmentedAiPlan(ctx: NewUserOnboardingPlanContext): LinearOnboardingPlan =
+    private fun segmentedAiPlan(
+        ctx: NewUserOnboardingPlanContext,
+        modelProviderChoice: SuspendMemo<OnboardingSingleChoiceDataPlugin?>,
+    ): LinearOnboardingPlan =
         sidePlan(
             id = SEGMENTED_AI_PLAN_ID,
             steps = listOf(
                 comparisonChartStep(NewUserOnboardingActivityDialog.SegmentedComparisonChart(ComparisonChartConfig.SegmentedAiPath)),
                 defaultBrowserPromptStep(),
                 singleChoiceStep(
-                    SuspendMemo {
-                        listOf(
-                            Option(
-                                id = "openai",
-                                label = "ChatGPT",
-                                iconRes = AndroidDesignSystemR.drawable.ai_model_openai_24,
-                            ),
-                            Option(
-                                id = "anthropic",
-                                label = "Claude",
-                                iconRes = AndroidDesignSystemR.drawable.ai_model_claude_24,
-                            ),
-                            Option(
-                                id = "mistral",
-                                label = "Mistral",
-                                iconRes = AndroidDesignSystemR.drawable.ai_model_mistral_24,
-                            ),
-                        )
-                    },
+                    plugin = modelProviderChoice,
+                    title = R.string.aiPathModelChoiceTitle,
+                    body = R.string.aiPathModelChoiceBody,
                 ),
                 togglePositionStep(),
                 addressBarPositionStep(),
@@ -607,32 +606,19 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         )
     }
 
-    interface OnboardingSingleChoiceDataPlugin : ActivePlugin {
-        val id: Id
+    private suspend fun singleChoiceDataPlugin(id: OnboardingSingleChoiceDataPlugin.Id): OnboardingSingleChoiceDataPlugin? =
+        singleChoiceDataPlugins.getPlugins().firstOrNull { it.id == id }
 
-        suspend fun prefetch()
-
-        /** Display order, first entry is the default. Empty when the choice is unavailable. */
-        suspend fun options(): List<Option>
-
-        suspend fun apply(optionId: String)
-
-        enum class Id {
-            DuckAiModelProvider,
-        }
-
-        data class Option(
-            /**
-             * Stable identifier. Used to apply the selection and as the pixel value
-             * for the step, so it must not change once shipped and must be safe to send.
-             */
-            val id: String,
-            val label: String,
-            @field:DrawableRes val iconRes: Int,
-        )
-    }
-
-    private fun singleChoiceStep(options: SuspendMemo<List<Option>>): NewUserOnboardingActivityStep {
+    /**
+     * A single option is not a choice, so the step is skipped rather than rendered as a
+     * one-row list the user can only confirm.
+     */
+    private fun singleChoiceStep(
+        plugin: SuspendMemo<OnboardingSingleChoiceDataPlugin?>,
+        @StringRes title: Int,
+        @StringRes body: Int,
+    ): NewUserOnboardingActivityStep {
+        val options = SuspendMemo { plugin()?.options().orEmpty() }
         return NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.SINGLE_CHOICE,
             pixelName = null,
@@ -640,15 +626,16 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             precondition = { options().size > 1 },
             resolveDialog = {
                 NewUserOnboardingActivityDialog.SingleChoice(
-                    title = R.string.aiPathModelChoiceTitle,
-                    body = R.string.aiPathModelChoiceBody,
+                    title = title,
+                    body = body,
                     options(),
                 )
             },
             transition = { event ->
                 when (event) {
                     is NewUserOnboardingEvent.SingleChoiceConfirmed -> {
-                        logcat { "Single choice confirmed: ${event.selectedId}" }
+                        logcat { "Single choice confirmed: ${event.option.id}" }
+                        plugin()?.apply(event.option)
                         Advance
                     }
 

@@ -27,12 +27,14 @@ import com.duckduckgo.app.onboarding.CustomAiOnboardingPixelName
 import com.duckduckgo.app.onboarding.CustomAiOnboardingResolver
 import com.duckduckgo.app.onboarding.DuckAiOnboardingAvailability
 import com.duckduckgo.app.onboarding.DuckAiOnboardingDemo
+import com.duckduckgo.app.onboarding.FakeOnboardingSingleChoiceDataPlugin
 import com.duckduckgo.app.onboarding.OnboardingInputScreenLaunchTarget
 import com.duckduckgo.app.onboarding.OnboardingPreference
 import com.duckduckgo.app.onboarding.OnboardingPreferenceApplier
 import com.duckduckgo.app.onboarding.OnboardingPromptsExperimentManager
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager.SegmentedOnboardingExperimentVariant
+import com.duckduckgo.app.onboarding.TestOption
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
@@ -60,12 +62,14 @@ import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.wideevents.InputScreenOnboardingWideEvent
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.onboarding.api.LinearOnboardingState.Completed
 import com.duckduckgo.onboarding.api.LinearOnboardingState.InProgress
 import com.duckduckgo.onboarding.api.LinearOnboardingState.Skipped
+import com.duckduckgo.onboarding.api.OnboardingSingleChoiceDataPlugin
 import com.duckduckgo.onboarding.impl.LinearOnboardingOrchestratorImpl
 import com.duckduckgo.sync.api.SyncAutoRestore
 import kotlinx.coroutines.runBlocking
@@ -111,6 +115,12 @@ class NewUserOnboardingPlanProviderTest {
     private val homeScreenPromptsExperiment: OnboardingPromptsExperimentManager = mock()
     private val segmentedOnboardingExperiment: SegmentedOnboardingExperimentManager = mock()
     private val onboardingPreferenceApplier: OnboardingPreferenceApplier = mock()
+    private val providerOptions = listOf(TestOption("openai"), TestOption("anthropic"), TestOption("mistral"))
+    private val modelProviderPlugin = FakeOnboardingSingleChoiceDataPlugin(options = providerOptions)
+    private var singleChoicePlugins: List<OnboardingSingleChoiceDataPlugin> = listOf(modelProviderPlugin)
+    private val singleChoiceDataPlugins = object : ActivePluginPoint<OnboardingSingleChoiceDataPlugin> {
+        override suspend fun getPlugins(): Collection<OnboardingSingleChoiceDataPlugin> = singleChoicePlugins
+    }
 
     private lateinit var provider: NewUserOnboardingPlanProvider
     private val orchestrator = LinearOnboardingOrchestratorImpl()
@@ -155,6 +165,8 @@ class NewUserOnboardingPlanProviderTest {
             onboardingPromptsExperimentManager = homeScreenPromptsExperiment,
             segmentedOnboardingExperimentManager = segmentedOnboardingExperiment,
             onboardingPreferenceApplier = onboardingPreferenceApplier,
+            singleChoiceDataPlugins = singleChoiceDataPlugins,
+            appCoroutineScope = coroutineRule.testScope,
         )
     }
 
@@ -210,6 +222,13 @@ class NewUserOnboardingPlanProviderTest {
         assertStep(NewUserOnboardingStepIds.DOWNLOAD_REASON)
     }
 
+    private suspend fun startSegmentedAtAiProviderChoice() {
+        startSegmentedAtDownloadReason()
+        orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.AI_CHAT))
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
+        orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
+    }
+
     private suspend fun startSegmentedAtDownloadReason() {
         whenever(homeScreenPromptsExperiment.enroll()).thenReturn(null)
         whenever(segmentedOnboardingExperiment.enroll()).thenReturn(SegmentedOnboardingExperimentVariant.TREATMENT)
@@ -244,13 +263,66 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
+    fun `when the segmented plan is built then the provider options are prefetched`() = runTest {
+        whenever(homeScreenPromptsExperiment.enroll()).thenReturn(null)
+        whenever(segmentedOnboardingExperiment.enroll()).thenReturn(SegmentedOnboardingExperimentVariant.TREATMENT)
+
+        start()
+
+        assertEquals(1, modelProviderPlugin.prefetchCount)
+    }
+
+    @Test
+    fun `when the provider step is reached then it offers the plugin options`() = runTest {
+        startSegmentedAtAiProviderChoice()
+
+        val step = (orchestrator.state.value as InProgress).currentStep as NewUserOnboardingActivityStep
+        assertEquals(
+            NewUserOnboardingActivityDialog.SingleChoice(
+                title = R.string.aiPathModelChoiceTitle,
+                body = R.string.aiPathModelChoiceBody,
+                options = providerOptions,
+            ),
+            step.resolveDialog(),
+        )
+    }
+
+    @Test
+    fun `when a provider is confirmed then it is applied to the plugin that offered it`() = runTest {
+        startSegmentedAtAiProviderChoice()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.SingleChoiceConfirmed(providerOptions[1]))
+
+        assertEquals(listOf(providerOptions[1]), modelProviderPlugin.applied)
+        assertStep(NewUserOnboardingStepIds.TOGGLE_POSITION)
+    }
+
+    @Test
+    fun `when no plugin offers the provider choice then the step is skipped`() = runTest {
+        singleChoicePlugins = emptyList()
+
+        startSegmentedAtAiProviderChoice()
+
+        assertStep(NewUserOnboardingStepIds.TOGGLE_POSITION)
+    }
+
+    @Test
+    fun `when only one provider is offered then the step is skipped`() = runTest {
+        singleChoicePlugins = listOf(FakeOnboardingSingleChoiceDataPlugin(options = listOf(TestOption("openai"))))
+
+        startSegmentedAtAiProviderChoice()
+
+        assertStep(NewUserOnboardingStepIds.TOGGLE_POSITION)
+    }
+
+    @Test
     fun `when the segmented ai path preview is submitted then completes with the chat prompt`() = runTest {
         startSegmentedAtDownloadReason()
 
         orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.AI_CHAT))
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // comparison_chart
         orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
-        orchestrator.onEvent(NewUserOnboardingEvent.SingleChoiceConfirmed(selectedId = "openai"))
+        orchestrator.onEvent(NewUserOnboardingEvent.SingleChoiceConfirmed(providerOptions.first()))
         orchestrator.onEvent(NewUserOnboardingEvent.TogglePositionOpenDuckAiConfirmed)
         orchestrator.onEvent(NewUserOnboardingEvent.AddressBarConfirmed(OmnibarType.SINGLE_TOP))
         assertStep(NewUserOnboardingStepIds.INPUT_SCREEN_PREVIEW)

@@ -211,14 +211,7 @@ class DialogConfigResolver @Inject constructor(
             content = ContentConfig.SingleChoice(
                 title = TextConfig.Resource(dialog.title),
                 body = TextConfig.Resource(dialog.body),
-                rows = dialog.options.map { option ->
-                    ContentConfig.SingleChoice.Row(
-                        id = option.id,
-                        iconRes = option.iconRes,
-                        primaryText = TextConfig.Literal(option.label),
-                    )
-                },
-                initialSelectionId = dialog.options.firstOrNull()?.id ?: "",
+                rows = dialog.options.map { ContentConfig.SingleChoice.Row(it) },
             ),
             primaryCta = CtaConfig(
                 text = TextConfig.Resource(R.string.preOnboardingInputScreenButton),

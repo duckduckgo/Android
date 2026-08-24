@@ -14,19 +14,16 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-}
+package com.duckduckgo.app.plugins
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+import com.duckduckgo.anvil.annotations.ContributesActivePluginPoint
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.onboarding.api.OnboardingSingleChoiceDataPlugin
 
-android {
-    namespace "com.duckduckgo.onboarding.api"
-}
-
-dependencies {
-    implementation KotlinX.coroutines.core
-    implementation project(':common-utils')
-    implementation AndroidX.core.ktx
-}
+@ContributesActivePluginPoint(
+    scope = AppScope::class,
+    boundType = OnboardingSingleChoiceDataPlugin::class,
+    featureName = "pluginPointOnboardingSingleChoiceData",
+)
+@Suppress("unused")
+private interface UnusedOnboardingSingleChoiceDataPluginPoint

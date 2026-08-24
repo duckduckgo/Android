@@ -21,6 +21,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.onboarding.OnboardingPreference
 import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
+import com.duckduckgo.onboarding.api.OnboardingSingleChoiceDataPlugin.Option
 
 /** A screen with working state the user edits before submitting. */
 interface Stateful<S : Any> {
@@ -119,23 +120,22 @@ sealed interface ContentConfig {
     }
 
     /**
-     * A row is keyed by an opaque id rather than an enum because no caller owns this screen's options yet.
-     * Swap the id type for that enum once one does.
+     * Rows carry the [Option] they were built from, so the confirmed pick travels back to the plugin
+     * that supplied it without anyone re-deriving it from an id.
      */
     data class SingleChoice(
         override val title: TextConfig,
         val body: TextConfig,
         val rows: List<Row>,
-        val initialSelectionId: String,
     ) : ContentConfig, Stateful<SinglePreferenceContentState> {
 
-        data class Row(
-            val id: String,
-            @field:DrawableRes val iconRes: Int,
-            val primaryText: TextConfig,
-        )
+        init {
+            require(rows.isNotEmpty()) { "A single-choice screen needs at least one row" }
+        }
 
-        override fun initialState() = SinglePreferenceContentState(selectedId = initialSelectionId)
+        data class Row(val option: Option)
+
+        override fun initialState() = SinglePreferenceContentState(selected = rows.first().option)
     }
 
     data class TogglePosition(
@@ -163,7 +163,7 @@ data class DownloadReasonContentState(val selection: DownloadReasonSelection?)
 
 data class PreferenceSelectorContentState(val enabled: Map<OnboardingPreference, Boolean>)
 
-data class SinglePreferenceContentState(val selectedId: String)
+data class SinglePreferenceContentState(val selected: Option)
 
 enum class DownloadReasonSelection {
     SEARCH,

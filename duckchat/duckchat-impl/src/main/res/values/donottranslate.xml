@@ -27,4 +27,9 @@
     <!-- Page context attachment -->
     <string name="duckChatPageContextRemoveContentDescription">Remove page context</string>
 
+    <!-- Model provider names, shown in the onboarding provider choice -->
+    <string name="duckChatModelProviderOpenAi">ChatGPT</string>
+    <string name="duckChatModelProviderAnthropic">Claude</string>
+    <string name="duckChatModelProviderMistral">Mistral</string>
+
 </resources>

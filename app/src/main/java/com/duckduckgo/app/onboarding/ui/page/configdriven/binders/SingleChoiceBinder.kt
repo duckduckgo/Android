@@ -29,6 +29,7 @@ import com.duckduckgo.app.onboarding.ui.page.configdriven.ContentHandle
 import com.duckduckgo.app.onboarding.ui.page.configdriven.SinglePreferenceContentState
 import com.duckduckgo.app.onboarding.ui.page.configdriven.StatefulDialogBinder
 import com.duckduckgo.common.utils.extensions.preventWidows
+import com.duckduckgo.onboarding.api.OnboardingSingleChoiceDataPlugin.Option
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -53,10 +54,10 @@ class SingleChoiceBinder(
 
         val rows = populateRows(content, state)
 
-        // Every row renders off the one selected id, so a pick deselects the others without them knowing about each other.
+        // Every row renders off the one selected option, so a pick deselects the others without them knowing about each other.
         state.onEach { current ->
-            rows.forEach { (id, rowBinding) ->
-                val selected = id == current.selectedId
+            rows.forEach { (option, rowBinding) ->
+                val selected = option == current.selected
                 rowBinding.root.isSelected = selected
                 rowBinding.singleChoiceRowRadioButton.isChecked = selected
             }
@@ -66,7 +67,7 @@ class SingleChoiceBinder(
             title = binding.singleChoiceTitle,
             fadeTargets = listOf(binding.singleChoiceContentContainer, binding.singleChoiceBody),
             result = {
-                NewUserOnboardingEvent.SingleChoiceConfirmed(state.value.selectedId)
+                NewUserOnboardingEvent.SingleChoiceConfirmed(state.value.selected)
             },
             unbind = {
                 rows.forEach { (_, rowBinding) -> rowBinding.root.setOnClickListener(null) }
@@ -78,7 +79,7 @@ class SingleChoiceBinder(
     private fun populateRows(
         content: ContentConfig.SingleChoice,
         state: MutableStateFlow<SinglePreferenceContentState>,
-    ): List<Pair<String, IncludeBrandDesignSingleChoiceRowBinding>> {
+    ): List<Pair<Option, IncludeBrandDesignSingleChoiceRowBinding>> {
         val context = binding.root.context
         binding.radioButtonRows.removeAllViews()
         val inflater = LayoutInflater.from(context)
@@ -89,13 +90,13 @@ class SingleChoiceBinder(
                     topMargin = context.resources.getDimensionPixelSize(CommonR.dimen.keyline_4)
                 }
             }
-            rowBinding.singleChoiceRowIcon.setImageResource(row.iconRes)
-            rowBinding.singleChoiceRowPrimaryText.text = row.primaryText.resolve(context)
+            rowBinding.singleChoiceRowIcon.setImageResource(row.option.iconRes)
+            rowBinding.singleChoiceRowPrimaryText.text = row.option.label
             rowBinding.root.setOnClickListener {
-                state.update { it.copy(selectedId = row.id) }
+                state.update { it.copy(selected = row.option) }
             }
             binding.radioButtonRows.addView(rowBinding.root)
-            row.id to rowBinding
+            row.option to rowBinding
         }
     }
 }
