@@ -20,6 +20,7 @@ import android.app.Application
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.onboarding.OnboardingFlowChecker
 import com.duckduckgo.autoconsent.api.Autoconsent
+import com.duckduckgo.autoconsent.impl.FakeSettingsRepository
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -52,6 +53,7 @@ class CookiePopupOptInEvaluatorTest {
     private val onboardingFlowChecker: OnboardingFlowChecker = mock {
         onBlocking { isOnboardingComplete() } doReturn true
     }
+    private val settingsRepository = FakeSettingsRepository()
 
     private val testee by lazy {
         CookiePopupOptInEvaluator(
@@ -61,6 +63,7 @@ class CookiePopupOptInEvaluatorTest {
             dispatchers = coroutineRule.testDispatcherProvider,
             autoconsent = autoconsent,
             onboardingFlowChecker = onboardingFlowChecker,
+            settingsRepository = settingsRepository,
         )
     }
 
@@ -122,5 +125,42 @@ class CookiePopupOptInEvaluatorTest {
         whenever(autoconsent.isClickAcceptEnabled()).thenReturn(false)
 
         assertEquals(ModalEvaluator.EvaluationResult.ModalShown, testee.evaluate())
+    }
+
+    @Test
+    fun whenModalShownThenShownCountIncremented() = runTest {
+        feature.cookiePopUpOptInPrompt().setRawStoredState(Toggle.State(enable = true))
+
+        testee.evaluate()
+
+        assertEquals(1, settingsRepository.optInPromptShownCount)
+    }
+
+    @Test
+    fun whenSkippedThenShownCountNotIncremented() = runTest {
+        feature.cookiePopUpOptInPrompt().setRawStoredState(Toggle.State(enable = false))
+
+        testee.evaluate()
+
+        assertEquals(0, settingsRepository.optInPromptShownCount)
+    }
+
+    @Test
+    fun whenShownFewerThanThreeTimesThenModalShown() = runTest {
+        feature.cookiePopUpOptInPrompt().setRawStoredState(Toggle.State(enable = true))
+        settingsRepository.optInPromptShownCount = 2
+
+        assertEquals(ModalEvaluator.EvaluationResult.ModalShown, testee.evaluate())
+        assertEquals(3, settingsRepository.optInPromptShownCount)
+    }
+
+    @Test
+    fun whenAlreadyShownThreeTimesThenSkippedAndNothingLaunched() = runTest {
+        feature.cookiePopUpOptInPrompt().setRawStoredState(Toggle.State(enable = true))
+        settingsRepository.optInPromptShownCount = 3
+
+        assertEquals(ModalEvaluator.EvaluationResult.Skipped, testee.evaluate())
+        assertNull(shadowOf(application).nextStartedActivity)
+        assertEquals(3, settingsRepository.optInPromptShownCount)
     }
 }

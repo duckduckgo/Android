@@ -55,6 +55,7 @@ class FakeSettingsRepository : AutoconsentSettingsRepository {
     override var userSetting: Boolean = false
     override var clickAcceptEnabled: Boolean = false
     override var firstPopupHandled: Boolean = false
+    override var optInPromptShownCount: Int = 0
     override fun invalidateCache() {}
 }
 

@@ -24,6 +24,7 @@ import com.duckduckgo.app.onboarding.OnboardingFlowChecker
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autoconsent.impl.R
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
+import com.duckduckgo.autoconsent.impl.store.AutoconsentSettingsRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.promptscoordinator.api.ModalEvaluator
@@ -47,6 +48,7 @@ class CookiePopupOptInEvaluator @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val autoconsent: Autoconsent,
     private val onboardingFlowChecker: OnboardingFlowChecker,
+    private val settingsRepository: AutoconsentSettingsRepository,
 ) : ModalEvaluator {
 
     override val priority: Int = 6
@@ -67,6 +69,12 @@ class CookiePopupOptInEvaluator @Inject constructor(
             return@withContext ModalEvaluator.EvaluationResult.Skipped
         }
 
+        if (settingsRepository.optInPromptShownCount >= MAX_PROMPT_DISPLAYS) {
+            return@withContext ModalEvaluator.EvaluationResult.Skipped
+        }
+
+        settingsRepository.optInPromptShownCount++
+
         delay(MODAL_DISPLAY_DELAY)
         appCoroutineScope.launch(dispatchers.main()) {
             val intent = CookiePopupOptInActivity.intent(applicationContext).apply {
@@ -81,5 +89,6 @@ class CookiePopupOptInEvaluator @Inject constructor(
 
     companion object {
         private const val MODAL_DISPLAY_DELAY = 250L
+        private const val MAX_PROMPT_DISPLAYS = 3
     }
 }
