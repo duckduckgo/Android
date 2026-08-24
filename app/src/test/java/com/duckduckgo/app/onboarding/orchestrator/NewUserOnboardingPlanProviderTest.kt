@@ -274,6 +274,16 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
+    fun `when the ai download reason is confirmed then selects the input screen with ai`() = runTest {
+        startSegmentedAtDownloadReason()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.AI_CHAT))
+
+        verify(duckChat).setCosmeticInputScreenUserSetting(true)
+        verify(onboardingStore).storeInputScreenSelection(true)
+    }
+
+    @Test
     fun `when the ai download reason is confirmed then defers arming open input on duck ai tab`() = runTest {
         startSegmentedAtDownloadReason()
 

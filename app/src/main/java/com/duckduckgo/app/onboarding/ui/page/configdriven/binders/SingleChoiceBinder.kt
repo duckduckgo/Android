@@ -67,7 +67,7 @@ class SingleChoiceBinder(
 
         return ContentHandle(
             title = binding.singleChoiceTitle,
-            fadeTargets = listOf(binding.singleChoiceContentContainer, binding.singleChoiceBody),
+            fadeTargets = listOf(binding.singleChoiceContentContainer),
             result = {
                 NewUserOnboardingEvent.SingleChoiceConfirmed(state.value.selected)
             },

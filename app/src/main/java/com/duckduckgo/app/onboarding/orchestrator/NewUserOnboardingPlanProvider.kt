@@ -563,11 +563,12 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         )
     }
 
-    private fun segmentedAiPlan(
+    private suspend fun segmentedAiPlan(
         ctx: NewUserOnboardingPlanContext,
         modelProviderChoice: OnboardingSingleChoiceDataPlugin?,
         togglePositionChoice: OnboardingSingleChoiceDataPlugin?,
     ): LinearOnboardingPlan {
+        applyInputModeSelection(ctx, withAi = true, fireTelemetry = false)
         ctx.onFinish { onboardingInputScreenLaunchTarget.setOpenOnDuckAi() }
         return sidePlan(
             id = SEGMENTED_AI_PLAN_ID,
