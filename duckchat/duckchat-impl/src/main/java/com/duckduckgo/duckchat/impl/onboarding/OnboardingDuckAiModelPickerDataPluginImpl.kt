@@ -40,10 +40,10 @@ import com.duckduckgo.mobile.android.R as CommonR
 @ContributesActivePlugin(
     scope = AppScope::class,
     boundType = OnboardingSingleChoiceDataPlugin::class,
-    featureName = "pluginOnboardingSingleChoiceDataPluginImpl",
+    featureName = "pluginOnboardingDuckAiModelPickerDataPluginImpl",
     parentFeatureName = "pluginPointOnboardingSingleChoiceData",
 )
-class OnboardingSingleChoiceDataPluginImpl @Inject constructor(
+class OnboardingDuckAiModelPickerDataPluginImpl @Inject constructor(
     private val context: Context,
     private val duckAiModelManager: DuckAiModelManager,
     private val duckAiModelProviderFeature: DuckAiModelProviderFeature,

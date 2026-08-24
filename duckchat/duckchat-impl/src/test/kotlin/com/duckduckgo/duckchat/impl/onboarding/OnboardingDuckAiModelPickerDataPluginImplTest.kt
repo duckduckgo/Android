@@ -38,13 +38,13 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
-class OnboardingSingleChoiceDataPluginImplTest {
+class OnboardingDuckAiModelPickerDataPluginImplTest {
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private val duckAiModelManager: DuckAiModelManager = mock()
     private val duckAiModelProviderFeature = FakeFeatureToggleFactory.create(DuckAiModelProviderFeature::class.java)
 
-    private val testee = OnboardingSingleChoiceDataPluginImpl(
+    private val testee = OnboardingDuckAiModelPickerDataPluginImpl(
         context = context,
         duckAiModelManager = duckAiModelManager,
         duckAiModelProviderFeature = duckAiModelProviderFeature,
