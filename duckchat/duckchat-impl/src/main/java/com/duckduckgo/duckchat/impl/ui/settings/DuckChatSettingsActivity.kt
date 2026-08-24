@@ -56,13 +56,13 @@ import com.duckduckgo.duckchat.impl.databinding.IncludeDuckAiInputScreenSettings
 import com.duckduckgo.duckchat.impl.metric.nativeinput.discovery.InputScreenDiscoveryFunnel
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_SETTINGS_DISPLAYED
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
-import com.duckduckgo.duckchat.impl.store.HideAiGeneratedImages
 import com.duckduckgo.duckchat.impl.store.getDefaultTogglePositionForIndex
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.DuckChatSettingsViewModelFactory
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.ViewState
 import com.duckduckgo.feedback.api.FeedbackScreenNoParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
+import com.duckduckgo.settings.api.HideAiGeneratedImages
 import com.duckduckgo.settings.api.SearchAssistVisibility
 import com.duckduckgo.settings.api.SettingsPageFeature
 import com.duckduckgo.settings.api.SettingsWebViewScreenWithParams
