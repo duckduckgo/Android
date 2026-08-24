@@ -256,20 +256,18 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         )
     }
 
-    private fun buildSegmentedPlan(
+    private suspend fun buildSegmentedPlan(
         ctx: NewUserOnboardingPlanContext,
         onCompleted: suspend () -> Unit,
         onSkipped: suspend () -> Unit,
     ): LinearOnboardingPlan {
         val firstDialog = SuspendMemo { FirstDialog.INITIAL }
-        val modelProviderChoice = SuspendMemo { singleChoiceDataPlugin(OnboardingSingleChoiceDataPlugin.Id.DuckAiModelProvider) }
-        val togglePositionChoice = SuspendMemo {
-            singleChoiceDataPlugin(OnboardingSingleChoiceDataPlugin.Id.DuckAiNewTabTogglePosition)
-        }
+        val modelProviderChoice = singleChoiceDataPlugin(OnboardingSingleChoiceDataPlugin.Id.DuckAiModelProvider)
+        val togglePositionChoice = singleChoiceDataPlugin(OnboardingSingleChoiceDataPlugin.Id.DuckAiNewTabTogglePosition)
 
         // Warms the options up while the user is still several screens away from the step that renders them.
-        appCoroutineScope.launch(dispatchers.io()) { modelProviderChoice()?.prefetch() }
-        appCoroutineScope.launch(dispatchers.io()) { togglePositionChoice()?.prefetch() }
+        appCoroutineScope.launch(dispatchers.io()) { modelProviderChoice?.prefetch() }
+        appCoroutineScope.launch(dispatchers.io()) { togglePositionChoice?.prefetch() }
 
         return rootPlan(
             ctx = ctx,
@@ -504,8 +502,8 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
     private fun downloadReasonStep(
         ctx: NewUserOnboardingPlanContext,
-        modelProviderChoice: SuspendMemo<OnboardingSingleChoiceDataPlugin?>,
-        togglePositionChoice: SuspendMemo<OnboardingSingleChoiceDataPlugin?>,
+        modelProviderChoice: OnboardingSingleChoiceDataPlugin?,
+        togglePositionChoice: OnboardingSingleChoiceDataPlugin?,
     ): NewUserOnboardingActivityStep {
         return NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.DOWNLOAD_REASON,
@@ -567,8 +565,8 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
     private fun segmentedAiPlan(
         ctx: NewUserOnboardingPlanContext,
-        modelProviderChoice: SuspendMemo<OnboardingSingleChoiceDataPlugin?>,
-        togglePositionChoice: SuspendMemo<OnboardingSingleChoiceDataPlugin?>,
+        modelProviderChoice: OnboardingSingleChoiceDataPlugin?,
+        togglePositionChoice: OnboardingSingleChoiceDataPlugin?,
     ): LinearOnboardingPlan {
         // The AI path always finishes on the Duck.ai (chat) tab. Registered rather than written here so
         // building the plan stays free of side effects, and so it lands at the same point in the run the
@@ -579,7 +577,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             steps = listOf(
                 comparisonChartStep(NewUserOnboardingActivityDialog.SegmentedComparisonChart(ComparisonChartConfig.SegmentedAiPath)),
                 defaultBrowserPromptStep(),
-                modelProviderStep(plugin = modelProviderChoice),
+                modelProviderStep(modelProviderChoice),
                 togglePositionStep(togglePositionChoice),
                 addressBarPositionStep(),
                 inputScreenPreviewStep(ctx = ctx, isSearchDefault = false),
@@ -625,10 +623,8 @@ class NewUserOnboardingPlanProvider @Inject constructor(
      * A single option is not a choice, so the step is skipped rather than rendered as a
      * one-row list the user can only confirm.
      */
-    private fun modelProviderStep(
-        plugin: SuspendMemo<OnboardingSingleChoiceDataPlugin?>,
-    ): NewUserOnboardingActivityStep {
-        val options = SuspendMemo { plugin()?.options().orEmpty() }
+    private fun modelProviderStep(plugin: OnboardingSingleChoiceDataPlugin?): NewUserOnboardingActivityStep {
+        val options = SuspendMemo { plugin?.options().orEmpty() }
         return NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.MODEL_PROVIDER,
             pixelName = null,
@@ -645,7 +641,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 when (event) {
                     is NewUserOnboardingEvent.SingleChoiceConfirmed -> {
                         logcat { "Model provider confirmed: ${event.option.id}" }
-                        plugin()?.apply(event.option)
+                        plugin?.apply(event.option)
                         Advance
                     }
 
@@ -659,8 +655,8 @@ class NewUserOnboardingPlanProvider @Inject constructor(
      * The options are the screen's buttons, so a single option would leave the user with nothing to
      * decline and the step is skipped rather than rendered.
      */
-    private fun togglePositionStep(plugin: SuspendMemo<OnboardingSingleChoiceDataPlugin?>): NewUserOnboardingActivityStep {
-        val options = SuspendMemo { plugin()?.options().orEmpty() }
+    private fun togglePositionStep(plugin: OnboardingSingleChoiceDataPlugin?): NewUserOnboardingActivityStep {
+        val options = SuspendMemo { plugin?.options().orEmpty() }
         return NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.TOGGLE_POSITION,
             pixelName = null,
@@ -671,7 +667,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 when (event) {
                     is NewUserOnboardingEvent.SingleChoiceConfirmed -> {
                         logcat { "Toggle position confirmed: ${event.option.id}" }
-                        plugin()?.apply(event.option)
+                        plugin?.apply(event.option)
                         Advance
                     }
 
