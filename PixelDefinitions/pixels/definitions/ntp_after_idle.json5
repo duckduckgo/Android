@@ -410,6 +410,7 @@
         "owners": ["YoussefKeyrouz"],
         "triggers": ["other"],
         "suffixes": ["first_daily_count", "form_factor"],
+        "petal": "randomize",
         "parameters": [
             "appVersion",
             {
