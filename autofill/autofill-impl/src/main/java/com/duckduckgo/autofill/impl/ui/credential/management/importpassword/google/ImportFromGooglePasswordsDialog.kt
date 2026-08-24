@@ -63,8 +63,6 @@ import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.prependIconToText
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.FragmentViewModelFactory
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -93,11 +91,7 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
      */
     private var ignoreCancellationEvents = false
 
-    override fun getTheme(): Int = if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS)) {
-        R.style.AutofillBottomSheetDialogThemeEdgeToEdge
-    } else {
-        R.style.AutofillBottomSheetDialogTheme
-    }
+    override fun getTheme(): Int = R.style.AutofillBottomSheetDialogThemeEdgeToEdge
 
     @Inject
     lateinit var faviconManager: FaviconManager
@@ -107,9 +101,6 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
 
     @Inject
     lateinit var authorizationGracePeriod: AutofillAuthorizationGracePeriod
-
-    @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
 
     private var _binding: ContentImportFromGooglePasswordDialogBinding? = null
 
@@ -281,9 +272,7 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
     ): View {
         _binding = ContentImportFromGooglePasswordDialogBinding.inflate(inflater, container, false)
         configureViews(binding)
-        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS)) {
-            binding.dialogRootView.applyBottomSystemBarInsetPadding()
-        }
+        binding.dialogRootView.applyBottomSystemBarInsetPadding()
         observeViewModel()
         logcat { "Creating ImportFromGooglePasswordsDialog with launch source: ${getLaunchSource()}" }
         return binding.root

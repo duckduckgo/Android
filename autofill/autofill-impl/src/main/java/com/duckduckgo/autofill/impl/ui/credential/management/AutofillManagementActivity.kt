@@ -72,9 +72,7 @@ import com.duckduckgo.common.ui.view.hideKeyboard
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.showKeyboard
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.getActivityParams
 import com.google.android.material.snackbar.Snackbar
@@ -99,9 +97,6 @@ class AutofillManagementActivity : DuckDuckGoActivity(), PasswordsScreenPromotio
     lateinit var pixel: Pixel
 
     @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
-
-    @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -111,17 +106,12 @@ class AutofillManagementActivity : DuckDuckGoActivity(), PasswordsScreenPromotio
             window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         }
 
-        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.AUTOFILL)
-        if (edgeToEdgeEnabled) {
-            enableTransparentEdgeToEdge()
-        }
+        enableTransparentEdgeToEdge()
 
         setContentView(binding.root)
         setupToolbar(binding.toolbar)
 
-        if (edgeToEdgeEnabled) {
-            configureEdgeToEdgeInsets()
-        }
+        configureEdgeToEdgeInsets()
 
         observeViewModel()
         sendLaunchPixel(savedInstanceState)

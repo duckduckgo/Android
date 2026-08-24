@@ -101,9 +101,7 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.dataclearing.api.fire.FireDialogProvider
 import com.duckduckgo.dataclearing.api.fire.FireDialogProvider.FireDialogOrigin.TabSwitcher
 import com.duckduckgo.di.scopes.ActivityScope
@@ -167,9 +165,6 @@ class TabSwitcherActivity :
 
     override val applyFireTheme: Boolean
         get() = currentBrowserMode == BrowserMode.FIRE
-
-    @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
 
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
@@ -296,15 +291,12 @@ class TabSwitcherActivity :
 
         if (switchToRequestedModeIfNeeded(savedInstanceState)) return
 
-        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BROWSER)
-        if (edgeToEdgeEnabled) {
-            val barStyle = if (isDarkThemeEnabled()) {
-                SystemBarStyle.dark(Color.TRANSPARENT)
-            } else {
-                SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
-            }
-            enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
+        val barStyle = if (isDarkThemeEnabled()) {
+            SystemBarStyle.dark(Color.TRANSPARENT)
+        } else {
+            SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
         }
+        enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
 
         setContentView(binding.root)
 
@@ -329,9 +321,7 @@ class TabSwitcherActivity :
         configureNavigationBar()
         configureFireTabsEmptyState()
 
-        if (edgeToEdgeEnabled) {
-            configureEdgeToEdgeInsets()
-        }
+        configureEdgeToEdgeInsets()
 
         configureObservers()
         observeBrowserModeChanges()

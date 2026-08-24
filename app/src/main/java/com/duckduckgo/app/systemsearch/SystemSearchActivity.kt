@@ -82,9 +82,7 @@ import com.duckduckgo.common.ui.view.hideKeyboard
 import com.duckduckgo.common.ui.view.showKeyboard
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.KeyboardVisibilityUtil
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.common.utils.text.TextChangedWatcher
@@ -131,9 +129,6 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var settingsDataStore: SettingsDataStore
-
-    @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
 
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
@@ -213,17 +208,12 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         dataClearerForegroundAppRestartPixel.registerIntent(intent)
-        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.ONBOARDING)
-        if (edgeToEdgeEnabled) {
-            enableTransparentEdgeToEdge()
-        }
+        enableTransparentEdgeToEdge()
         setContentView(binding.root)
 
         configureViewReferences(viewModel.isOmnibarAtTop)
         configureOmnibar(viewModel.isOmnibarAtTop)
-        if (edgeToEdgeEnabled) {
-            configureEdgeToEdgeInsets(viewModel.isOmnibarAtTop)
-        }
+        configureEdgeToEdgeInsets(viewModel.isOmnibarAtTop)
         configureObservers()
         configureFlowCollectors()
         configureOnboarding()

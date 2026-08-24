@@ -51,9 +51,7 @@ import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
@@ -192,7 +190,6 @@ class RealNativeInputManager @Inject constructor(
     private val nativeInputUrlClearingFeature: NativeInputUrlClearingFeature,
     private val nativeInputOmnibarFeature: NativeInputOmnibarFeature,
     private val nativeInputEventListener: NativeInputEventListener,
-    private val edgeToEdgeProvider: EdgeToEdgeProvider,
     private val edgeToEdgeHandler: EdgeToEdgeHandler,
 ) : NativeInputManager {
     private lateinit var omnibarController: NativeInputOmnibarController
@@ -1473,9 +1470,7 @@ class RealNativeInputManager @Inject constructor(
             contentView.addView(it)
             // The container hangs off android.R.id.content, which no longer resizes for the keyboard now that
             // the browser is edge-to-edge, so it needs the IME (and nav bar) inset applied as bottom margin.
-            if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BROWSER)) {
-                edgeToEdgeHandler.applyNavigationBarInsetsAsMargin(it)
-            }
+            edgeToEdgeHandler.applyNavigationBarInsetsAsMargin(it)
             floatingSubmitContainer = it
         }
     }

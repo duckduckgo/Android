@@ -18,8 +18,6 @@ package com.duckduckgo.app.bookmarks.dialog
 
 import android.content.Context
 import com.duckduckgo.app.bookmarks.BookmarkAddedDialogPlugin
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
@@ -34,14 +32,12 @@ interface BookmarkAddedConfirmationDialogFactory {
 @ContributesBinding(AppScope::class)
 class ReadyBookmarkAddedConfirmationDialogFactory @Inject constructor(
     private val plugins: PluginPoint<BookmarkAddedDialogPlugin>,
-    private val edgeToEdgeProvider: EdgeToEdgeProvider,
 ) : BookmarkAddedConfirmationDialogFactory {
     override fun create(context: Context, bookmarkFolder: BookmarkFolder?): BookmarkAddedConfirmationDialog {
         return BookmarkAddedConfirmationDialog(
             context,
             bookmarkFolder,
             plugins,
-            edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS),
         )
     }
 }

@@ -25,9 +25,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingFeature
@@ -44,9 +42,6 @@ import javax.inject.Inject
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(SubscriptionOnboardingFeatureInfoScreen::class)
 class SubscriptionOnboardingFeatureInfoActivity : DuckDuckGoActivity() {
-
-    @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
 
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
@@ -67,10 +62,7 @@ class SubscriptionOnboardingFeatureInfoActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.MISC)
-        if (edgeToEdgeEnabled) {
-            enableTransparentEdgeToEdge()
-        }
+        enableTransparentEdgeToEdge()
 
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
@@ -85,11 +77,9 @@ class SubscriptionOnboardingFeatureInfoActivity : DuckDuckGoActivity() {
         binding.subscriptionOnboardingFeatureInfoDescription.setText(feature.descriptionRes)
         layoutInflater.inflate(feature.contentRes, binding.subscriptionOnboardingFeatureInfoContent, true)
 
-        if (edgeToEdgeEnabled) {
-            edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
-            edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout, installScrim = false)
-            edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.subscriptionOnboardingFeatureInfoScrollView)
-        }
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout, installScrim = false)
+        edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.subscriptionOnboardingFeatureInfoScrollView)
     }
 }
 

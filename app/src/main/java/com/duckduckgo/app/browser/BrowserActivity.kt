@@ -119,9 +119,7 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.dataclearing.api.fire.FireDialog
 import com.duckduckgo.dataclearing.api.fire.FireDialogProvider
@@ -232,9 +230,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var currentBrowserMode: BrowserMode
-
-    @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
 
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
@@ -913,23 +908,21 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun configureEdgeToEdge() {
-        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BROWSER)) {
-            val toolbarColor = getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorToolbar)
-            val barStyle = if (isDarkThemeEnabled()) {
-                SystemBarStyle.dark(toolbarColor)
-            } else {
-                SystemBarStyle.light(toolbarColor, toolbarColor)
-            }
-            enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
-            edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(
-                binding.root,
-                installScrim = false,
-                isFullScreen = { isFullScreen() },
-            )
-            edgeToEdgeHandler.applyNavigationBarInsets(binding.navigationBarMockup.root)
-            edgeToEdgeHandler.applyNavigationBarInsets(binding.bottomMockupToolbar.appBarLayoutMockup)
-            applyDisplayCutoutMode(resources.configuration.orientation)
+        val toolbarColor = getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorToolbar)
+        val barStyle = if (isDarkThemeEnabled()) {
+            SystemBarStyle.dark(toolbarColor)
+        } else {
+            SystemBarStyle.light(toolbarColor, toolbarColor)
         }
+        enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
+        edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(
+            binding.root,
+            installScrim = false,
+            isFullScreen = { isFullScreen() },
+        )
+        edgeToEdgeHandler.applyNavigationBarInsets(binding.navigationBarMockup.root)
+        edgeToEdgeHandler.applyNavigationBarInsets(binding.bottomMockupToolbar.appBarLayoutMockup)
+        applyDisplayCutoutMode(resources.configuration.orientation)
     }
 
     private fun configureObservers() {
@@ -1732,7 +1725,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     )
 
     private fun showSetAsDefaultBrowserDialog() {
-        val dialog = DefaultBrowserBottomSheetDialog(context = this, edgeToEdgeProvider = edgeToEdgeProvider)
+        val dialog = DefaultBrowserBottomSheetDialog(context = this)
         dialog.eventListener =
             object : EventListener {
                 override fun onShown() {

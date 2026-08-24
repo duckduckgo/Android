@@ -23,8 +23,6 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.BottomSheetHomeScreenWidgetBinding
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
 import com.duckduckgo.common.ui.setRoundCorners
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.duckduckgo.mobile.android.R as CommonR
@@ -33,14 +31,9 @@ import com.duckduckgo.mobile.android.R as CommonR
 class HomeScreenWidgetBottomSheetDialog(
     context: Context,
     isLightModeEnabled: Boolean,
-    edgeToEdgeProvider: EdgeToEdgeProvider,
 ) : BottomSheetDialog(
     context,
-    if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS)) {
-        CommonR.style.Widget_DuckDuckGo_BottomSheetDialog_EdgeToEdge
-    } else {
-        0
-    },
+    CommonR.style.Widget_DuckDuckGo_BottomSheetDialog_EdgeToEdge,
 ) {
 
     private val binding: BottomSheetHomeScreenWidgetBinding =
@@ -55,9 +48,7 @@ class HomeScreenWidgetBottomSheetDialog(
         this.behavior.state = BottomSheetBehavior.STATE_EXPANDED
         this.behavior.isDraggable = false
 
-        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS)) {
-            binding.dialogRootView.applyBottomSystemBarInsetPadding()
-        }
+        binding.dialogRootView.applyBottomSystemBarInsetPadding()
 
         setOnShowListener { dialogInterface ->
             (dialogInterface as BottomSheetDialog).setRoundCorners()

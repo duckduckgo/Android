@@ -27,8 +27,6 @@ import androidx.fragment.app.setFragmentResult
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.databinding.BottomSheetRemoveWidgetInstructionsBinding
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.R
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -37,14 +35,10 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.MaterialShapeDrawable
 import dagger.android.support.AndroidSupportInjection
-import javax.inject.Inject
 import com.duckduckgo.app.browser.R as BrowserR
 
 @InjectWith(FragmentScope::class)
 class RemoveWidgetInstructionsBottomSheet : BottomSheetDialogFragment() {
-
-    @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -59,17 +53,11 @@ class RemoveWidgetInstructionsBottomSheet : BottomSheetDialogFragment() {
         val binding = BottomSheetRemoveWidgetInstructionsBinding.inflate(inflater, container, false)
         binding.removeWidgetInstructionsDoneButton.setOnClickListener { dismiss() }
         binding.removeWidgetInstructionsCloseButton.setOnClickListener { dismiss() }
-        if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS)) {
-            binding.root.applyBottomSystemBarInsetPadding()
-        }
+        binding.root.applyBottomSystemBarInsetPadding()
         return binding.root
     }
 
-    override fun getTheme(): Int = if (edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS)) {
-        com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_BottomSheetDialog_EdgeToEdge
-    } else {
-        com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_BottomSheetDialog
-    }
+    override fun getTheme(): Int = com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_BottomSheetDialog_EdgeToEdge
 
     override fun onCreateDialog(savedInstanceState: Bundle?): android.app.Dialog {
         val dialog = super.onCreateDialog(savedInstanceState) as BottomSheetDialog

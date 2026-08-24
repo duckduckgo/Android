@@ -57,9 +57,7 @@ import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_DELAY
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_LENGTH
@@ -208,9 +206,6 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     lateinit var subscriptionRestoreWideEvent: SubscriptionRestoreWideEvent
 
     @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
-
-    @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     private val viewModel: SubscriptionWebViewViewModel by bindViewModel()
@@ -241,10 +236,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             logcat { "Subscription Flow: entering with params $it" }
         }
 
-        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.WEBVIEW)
-        if (edgeToEdgeEnabled) {
-            enableTransparentEdgeToEdge()
-        }
+        enableTransparentEdgeToEdge()
 
         if (savedInstanceState == null) {
             params.launchPixel?.let { pixel.fire(it) }
@@ -253,9 +245,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
         setContentView(binding.root)
         setupInternalToolbar(toolbar)
 
-        if (edgeToEdgeEnabled) {
-            configureEdgeToEdgeInsets()
-        }
+        configureEdgeToEdgeInsets()
 
         binding.webview.let {
             subscriptionJsMessaging.register(

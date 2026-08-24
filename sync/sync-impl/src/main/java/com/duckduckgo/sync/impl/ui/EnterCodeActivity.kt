@@ -29,9 +29,7 @@ import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ActivityEnterCodeBinding
@@ -55,9 +53,6 @@ class EnterCodeActivity : DuckDuckGoActivity() {
     private val viewModel: EnterCodeViewModel by bindViewModel()
 
     @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
-
-    @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     private lateinit var codeType: Code
@@ -66,17 +61,12 @@ class EnterCodeActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
         codeType = intent.getSerializableExtra(EXTRA_CODE_TYPE) as? Code ?: Code.RECOVERY_CODE
 
-        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.SYNC)
-        if (edgeToEdgeEnabled) {
-            enableTransparentEdgeToEdge()
-        }
+        enableTransparentEdgeToEdge()
 
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
 
-        if (edgeToEdgeEnabled) {
-            configureEdgeToEdgeInsets()
-        }
+        configureEdgeToEdgeInsets()
 
         observeUiEvents()
         configureListeners()
