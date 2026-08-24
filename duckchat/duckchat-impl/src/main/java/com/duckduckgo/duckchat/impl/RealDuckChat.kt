@@ -495,7 +495,6 @@ class RealDuckChat @Inject constructor(
     private val _showPopupMenuShortcut = MutableStateFlow(false)
     private val _showOmnibarShortcutOnNtpAndOnFocus = MutableStateFlow(false)
     private val _showOmnibarShortcutInAllStates = MutableStateFlow(false)
-    private val _showAIChatAddressBarOptionChoiceScreen = MutableStateFlow(false)
     private val _showClearDuckAIChatHistory = MutableStateFlow(true)
 
     private val _chatState = MutableStateFlow(ChatState.HIDE)
@@ -520,7 +519,6 @@ class RealDuckChat @Inject constructor(
     private var isDuckChatFeatureEnabled = false
     private var isDuckAiInBrowserEnabled = false
     private var duckAiInputScreen = false
-    private var showNewAddressBarPickerScreen = false
     private var isDuckChatUserEnabled = false
     private var isChatSyncFeatureEnabled = false
     private var duckChatLink = DUCK_CHAT_WEB_LINK
@@ -715,8 +713,6 @@ class RealDuckChat @Inject constructor(
     override val showOmnibarShortcutOnNtpAndOnFocus: StateFlow<Boolean> = _showOmnibarShortcutOnNtpAndOnFocus.asStateFlow()
 
     override val showOmnibarShortcutInAllStates: StateFlow<Boolean> = _showOmnibarShortcutInAllStates.asStateFlow()
-
-    override val showAIChatAddressBarOptionChoiceScreen: StateFlow<Boolean> = _showAIChatAddressBarOptionChoiceScreen.asStateFlow()
 
     override val showClearDuckAIChatHistory: StateFlow<Boolean> = _showClearDuckAIChatHistory.asStateFlow()
 
@@ -1053,7 +1049,6 @@ class RealDuckChat @Inject constructor(
             isDuckAiInBrowserEnabled = duckChatFeature.duckAiButtonInBrowser().isEnabled()
             duckAiInputScreen = duckChatFeature.duckAiInputScreen().isEnabled()
             clearChatHistory = duckChatFeature.clearHistory().isEnabled()
-            showNewAddressBarPickerScreen = duckChatFeature.showNewAddressBarPickerScreen().isEnabled()
             isChatSyncFeatureEnabled = deviceSyncState.isDuckChatSyncFeatureEnabled()
 
             val settingsString = duckChatFeature.self().getSettings()
@@ -1126,8 +1121,6 @@ class RealDuckChat @Inject constructor(
 
             val showOmnibarShortcutInAllStates = showInAddressBar && isDuckAiInBrowserEnabled
             _showOmnibarShortcutInAllStates.emit(showOmnibarShortcutInAllStates)
-
-            _showAIChatAddressBarOptionChoiceScreen.emit(showNewAddressBarPickerScreen)
 
             val showClearChatHistory = clearChatHistory
             _showClearDuckAIChatHistory.emit(showClearChatHistory)
