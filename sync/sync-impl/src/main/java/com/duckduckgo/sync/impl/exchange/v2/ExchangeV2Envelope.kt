@@ -19,6 +19,7 @@ package com.duckduckgo.sync.impl.exchange.v2
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.ExchangeEnvelope
 import com.duckduckgo.sync.impl.crypto.SyncJweCrypto
+import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
@@ -35,10 +36,10 @@ import javax.inject.Inject
 interface ExchangeV2Envelope {
 
     /**
-     * Build an outbound envelope encrypting [messageJson] to the recipient's [peerPublicKeyBase64].
+     * Build an outbound envelope encrypting [message] to the recipient's [peerPublicKeyBase64].
      * [senderChannelId] is written as the JWE `kid` header so the recipient knows the sender.
      */
-    fun seal(messageJson: String, peerPublicKeyBase64: String, senderChannelId: String): ExchangeEnvelope
+    fun seal(message: ExchangeV2Message, peerPublicKeyBase64: String, senderChannelId: String): ExchangeEnvelope
 
     /**
      * Decrypt an inbound envelope with our ephemeral private key, returning the inner message JSON.
@@ -49,8 +50,8 @@ interface ExchangeV2Envelope {
 }
 
 /** Thrown when an envelope requires a protocol version we don't support. */
-class EnvelopeVersionTooNew(val version: String) : RuntimeException(
-    "Envelope requires protocol v$version; we only support v$OUR_MAJOR",
+class EnvelopeVersionTooNew(val version: ExchangeProtocolVersion) : RuntimeException(
+    "Envelope requires protocol v$version; we only support up to v${ExchangeProtocolVersion.V2.MAJOR}",
 )
 
 /**
@@ -62,34 +63,37 @@ class EnvelopeDecryptFailure(val seq: Int, cause: Throwable) : RuntimeException(
     cause,
 )
 
-const val OUR_MAJOR: Int = 2
-const val OUR_VERSION_STRING: String = "2"
-
 @ContributesBinding(AppScope::class)
 class RealExchangeV2Envelope @Inject constructor(
     private val jweCrypto: SyncJweCrypto,
 ) : ExchangeV2Envelope {
 
-    override fun seal(messageJson: String, peerPublicKeyBase64: String, senderChannelId: String): ExchangeEnvelope {
+    override fun seal(message: ExchangeV2Message, peerPublicKeyBase64: String, senderChannelId: String): ExchangeEnvelope {
         val jwe = jweCrypto.jweEncryptRsaOaep(
-            plaintext = messageJson.toByteArray(Charsets.UTF_8),
+            plaintext = message.rawJson.toByteArray(Charsets.UTF_8),
             recipientPublicKeyBase64 = peerPublicKeyBase64,
             kid = senderChannelId,
         )
-        return ExchangeEnvelope(version = OUR_VERSION_STRING, payload = jwe)
+        return ExchangeEnvelope(version = message.protocolVersion.toString(), payload = jwe)
     }
 
     override fun open(envelope: ExchangeEnvelope, ownPrivateKeyBase64: String): String {
-        val major = parseMajor(envelope.version)
-        if (major > OUR_MAJOR) throw EnvelopeVersionTooNew(envelope.version)
-        if (major < OUR_MAJOR) throw IllegalArgumentException("Obsolete envelope version ${envelope.version}")
-        val decrypted = jweCrypto.jweDecryptRsaOaep(envelope.payload, ownPrivateKeyBase64)
-        return String(decrypted, Charsets.UTF_8)
-    }
+        val protocol = ExchangeProtocolVersion.parse(envelope.version).getOrElse {
+            throw IllegalArgumentException("Malformed envelope version: ${envelope.version}")
+        }
+        return when (protocol) {
+            is ExchangeProtocolVersion.V2 -> {
+                val decrypted = jweCrypto.jweDecryptRsaOaep(envelope.payload, ownPrivateKeyBase64)
+                String(decrypted, Charsets.UTF_8)
+            }
 
-    private fun parseMajor(version: String): Int {
-        val majorPart = version.substringBefore('.')
-        return majorPart.toIntOrNull()
-            ?: throw IllegalArgumentException("Malformed envelope version: $version")
+            is ExchangeProtocolVersion.V1 -> {
+                throw IllegalArgumentException("Obsolete envelope version $protocol")
+            }
+
+            else -> {
+                throw EnvelopeVersionTooNew(protocol)
+            }
+        }
     }
 }

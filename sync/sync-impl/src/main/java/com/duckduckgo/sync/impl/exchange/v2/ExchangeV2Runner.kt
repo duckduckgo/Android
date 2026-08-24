@@ -789,7 +789,7 @@ class RealExchangeV2Runner @Inject constructor(
         peerKey: String,
     ): Boolean {
         val own = ownChannelId ?: return false
-        return when (val r = channel.sendMessage(outboundMessage.rawJson, peerChannel, peerKey, own)) {
+        return when (val r = channel.sendMessage(outboundMessage, peerChannel, peerKey, own)) {
             is Result.Success -> {
                 recordSentMessage(outboundMessage)
                 true
