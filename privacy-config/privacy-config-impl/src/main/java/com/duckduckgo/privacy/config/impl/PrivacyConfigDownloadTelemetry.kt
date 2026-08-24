@@ -30,6 +30,7 @@ import javax.inject.Inject
  */
 interface PrivacyConfigDownloadTelemetry {
 
+    /** Starts the clock for a new download. Must be called before any other method on this instance. */
     fun onDownloadStarted()
 
     /** The remote config has been fetched and parsed. */
@@ -38,6 +39,10 @@ interface PrivacyConfigDownloadTelemetry {
     /** The fetched config has been stored and its callbacks notified. */
     fun onProcessFinished()
 
+    /**
+     * The download failed before a config could be fetched.
+     * @param code the HTTP status code as a string, or "unknown" if the failure wasn't an HTTP error.
+     */
     fun onDownloadFailed(code: String)
 }
 
