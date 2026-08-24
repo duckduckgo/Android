@@ -525,7 +525,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                         when (selection) {
                             DownloadReasonSelection.SEARCH -> SwitchTo(segmentedSearchPlan(ctx))
                             DownloadReasonSelection.AI_CHAT -> SwitchTo(segmentedAiPlan(ctx, modelProviderChoice, togglePositionChoice))
-                            DownloadReasonSelection.NO_AI,
+                            DownloadReasonSelection.NO_AI -> SwitchTo(segmentedNoAiPlan(ctx))
                             DownloadReasonSelection.BLOCK_ADS,
                             -> {
                                 Stay
@@ -580,6 +580,23 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 togglePositionStep(togglePositionChoice),
                 addressBarPositionStep(),
                 inputScreenPreviewStep(ctx = ctx, isSearchDefault = false),
+            ),
+        )
+    }
+
+    private fun segmentedNoAiPlan(ctx: NewUserOnboardingPlanContext): LinearOnboardingPlan {
+        return sidePlan(
+            id = SEGMENTED_NO_AI_PLAN_ID,
+            steps = listOf(
+                comparisonChartStep(NewUserOnboardingActivityDialog.SegmentedComparisonChart(ComparisonChartConfig.SegmentedNoAiPath)),
+                defaultBrowserPromptStep(),
+                preferenceSelectorStep(
+                    listOf(
+                        OnboardingPreference.SEARCH_ASSIST,
+                        OnboardingPreference.HIDE_AI_GENERATED_IMAGES,
+                    ),
+                ),
+                addressBarPositionStep(),
             ),
         )
     }
@@ -1013,6 +1030,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         const val QUICK_SETUP_PLAN_ID = "new-user_quick-setup"
         const val SEGMENTED_SEARCH_PLAN_ID = "new-user_segmented_search"
         const val SEGMENTED_AI_PLAN_ID = "new-user_segmented_ai"
+        const val SEGMENTED_NO_AI_PLAN_ID = "new-user_segmented_no-ai"
 
         private const val BLOCK_STORE_TIMEOUT_MS = 3_000L
     }

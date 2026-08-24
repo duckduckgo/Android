@@ -22,4 +22,6 @@ package com.duckduckgo.app.onboarding
 enum class OnboardingPreference {
     SEARCH_HISTORY,
     SAFE_SEARCH,
+    SEARCH_ASSIST,
+    HIDE_AI_GENERATED_IMAGES,
 }

@@ -255,6 +255,22 @@ class DialogConfigResolver @Inject constructor(
             secondaryText = TextConfig.Resource(R.string.searchPathPreferenceSafeSecondary),
             initiallyEnabled = initiallyEnabled,
         )
+
+        OnboardingPreference.SEARCH_ASSIST -> ContentConfig.PreferenceSelector.Row(
+            preference = preference,
+            iconRes = CommonR.drawable.search_assist_color_24,
+            primaryText = TextConfig.Resource(R.string.noAiPathPreferenceSearchAssistPrimary),
+            secondaryText = TextConfig.Resource(R.string.noAiPathPreferenceSearchAssistSecondary),
+            initiallyEnabled = initiallyEnabled,
+        )
+
+        OnboardingPreference.HIDE_AI_GENERATED_IMAGES -> ContentConfig.PreferenceSelector.Row(
+            preference = preference,
+            iconRes = CommonR.drawable.ai_images_strikethrough_color_24,
+            primaryText = TextConfig.Resource(R.string.noAiPathPreferenceHideAiGeneratedImagesPrimary),
+            secondaryText = TextConfig.Resource(R.string.noAiPathPreferenceHideAiGeneratedImagesSecondary),
+            initiallyEnabled = initiallyEnabled,
+        )
     }
 
     private fun comparisonChart(chart: ComparisonChartConfig, showEmbellishment: Boolean = true) = DialogConfig(

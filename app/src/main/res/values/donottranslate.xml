@@ -86,6 +86,14 @@
     <string name="aiPathTogglePositionPictogramCaption">You can switch to Search with one tap</string>
     <string name="aiPathWithToggleEnabledContextualEndDescription">Start a private AI chat with Duck.ai or toggle to Search for protected browsing.</string>
 
+    <string name="noAiPathComparisonChartTitle"><![CDATA[You\'re in the right place!<br/>AI features disabled.]]></string>
+    <string name="noAiPathComparisonChartNoSearchAssist">No AI-assisted answers in search</string>
+    <string name="noAiPathComparisonChartNoAiImages">Hide AI-generated images in search</string>
+    <string name="noAiPathPreferenceSearchAssistPrimary">Search Assist</string>
+    <string name="noAiPathPreferenceSearchAssistSecondary">Include AI-generated answers with search results</string>
+    <string name="noAiPathPreferenceHideAiGeneratedImagesPrimary">Safe Search</string>
+    <string name="noAiPathPreferenceHideAiGeneratedImagesSecondary">Filter out known AI spam sites from image search results</string>
+
     <!-- Browser tab -->
     <string name="browserDuckPlayerShortUrl">Duck Player</string>
 

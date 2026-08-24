@@ -96,4 +96,19 @@ sealed class ComparisonChartConfig(
             Row(CommonR.drawable.shield_color_24, R.string.aiPathComparisonChartItem5),
         ),
     )
+
+    data object SegmentedNoAiPath : ComparisonChartConfig(
+        titleRes = R.string.noAiPathComparisonChartTitle,
+        primaryCtaTextRes = R.string.preOnboardingDaxDialog2Button,
+        headerLeftIconRes = CommonR.drawable.ic_chrome,
+        headerLeftIconSizeDp = 32f, // the target size is 31.5dp but the icon already has some padding
+        headerLeftLabelRes = null,
+        rows = listOf(
+            Row(CommonR.drawable.search_find_color_24, R.string.preOnboardingComparisonChartItem1),
+            Row(CommonR.drawable.search_assist_strikethrough_color_24, R.string.noAiPathComparisonChartNoSearchAssist),
+            Row(CommonR.drawable.ai_images_strikethrough_color_24, R.string.noAiPathComparisonChartNoAiImages),
+            Row(CommonR.drawable.shield_color_24, R.string.preOnboardingComparisonChartItem2),
+            Row(CommonR.drawable.ads_blocked_color_24, R.string.preOnboardingComparisonChartAdAndCookiePopupBlocker),
+        ),
+    )
 }
