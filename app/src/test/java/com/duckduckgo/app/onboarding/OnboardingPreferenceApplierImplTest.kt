@@ -152,7 +152,12 @@ class OnboardingPreferenceApplierImplTest {
     @Test
     fun whenPreferencesEnumeratedThenSearchHistoryComesFirst() {
         assertEquals(
-            listOf(OnboardingPreference.SEARCH_HISTORY, OnboardingPreference.SAFE_SEARCH),
+            listOf(
+                OnboardingPreference.SEARCH_HISTORY,
+                OnboardingPreference.SAFE_SEARCH,
+                OnboardingPreference.SEARCH_ASSIST,
+                OnboardingPreference.HIDE_AI_GENERATED_IMAGES,
+            ),
             OnboardingPreference.entries,
         )
     }
