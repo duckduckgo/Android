@@ -19,8 +19,11 @@ package com.duckduckgo.app.onboarding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.history.api.NavigationHistory
+import com.duckduckgo.settings.api.SafeSearch
 import com.duckduckgo.settings.api.SerpSettingsDataProvider
 import com.duckduckgo.settings.api.SerpSettingsFeature
+import com.duckduckgo.settings.api.observeSetting
+import com.duckduckgo.settings.api.setSetting
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.firstOrNull
@@ -57,6 +60,8 @@ class OnboardingPreferenceApplierImpl @Inject constructor(
         when (preference) {
             OnboardingPreference.SEARCH_HISTORY -> navigationHistory.isHistoryFeatureAvailable()
             OnboardingPreference.SAFE_SEARCH -> serpSettingsFeature.storeSerpSettings().isEnabled()
+            OnboardingPreference.SEARCH_ASSIST -> TODO()
+            OnboardingPreference.HIDE_AI_GENERATED_IMAGES -> TODO()
         }
     }
 
@@ -64,13 +69,17 @@ class OnboardingPreferenceApplierImpl @Inject constructor(
         when (preference) {
             OnboardingPreference.SEARCH_HISTORY -> navigationHistory.isHistoryUserEnabled()
             OnboardingPreference.SAFE_SEARCH -> safeSearchEnabled()
+            OnboardingPreference.SEARCH_ASSIST -> TODO()
+            OnboardingPreference.HIDE_AI_GENERATED_IMAGES -> TODO()
         }
     }
 
     override suspend fun apply(preference: OnboardingPreference, enabled: Boolean) = withContext(dispatcherProvider.io()) {
         when (preference) {
             OnboardingPreference.SEARCH_HISTORY -> navigationHistory.setHistoryUserEnabled(enabled)
-            OnboardingPreference.SAFE_SEARCH -> serpSettingsDataProvider.setSetting(KP_KEY, if (enabled) KP_ON else KP_OFF)
+            OnboardingPreference.SAFE_SEARCH -> serpSettingsDataProvider.setSetting(if (enabled) SafeSearch.ON else SafeSearch.OFF)
+            OnboardingPreference.SEARCH_ASSIST -> TODO()
+            OnboardingPreference.HIDE_AI_GENERATED_IMAGES -> TODO()
         }
     }
 
@@ -81,15 +90,12 @@ class OnboardingPreferenceApplierImpl @Inject constructor(
      */
     private suspend fun safeSearchEnabled(): Boolean {
         val stored = withTimeoutOrNull(SERP_SETTING_READ_TIMEOUT) {
-            serpSettingsDataProvider.observeSetting(KP_KEY).firstOrNull()
+            serpSettingsDataProvider.observeSetting(SafeSearch.ON).firstOrNull()
         }
-        return stored != KP_OFF
+        return stored != SafeSearch.OFF
     }
 
     private companion object {
-        const val KP_KEY = "kp"
-        const val KP_ON = "-1"
-        const val KP_OFF = "-2"
         val SERP_SETTING_READ_TIMEOUT = 500.milliseconds
     }
 }
