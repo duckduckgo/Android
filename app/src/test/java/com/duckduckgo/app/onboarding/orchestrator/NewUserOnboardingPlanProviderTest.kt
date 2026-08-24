@@ -117,7 +117,12 @@ class NewUserOnboardingPlanProviderTest {
     private val onboardingPreferenceApplier: OnboardingPreferenceApplier = mock()
     private val providerOptions = listOf(TestOption("openai"), TestOption("anthropic"), TestOption("mistral"))
     private val modelProviderPlugin = FakeOnboardingSingleChoiceDataPlugin(options = providerOptions)
-    private var singleChoicePlugins: List<OnboardingSingleChoiceDataPlugin> = listOf(modelProviderPlugin)
+    private val togglePositionOptions = listOf(TestOption("duckAI"), TestOption("lastUsed"))
+    private val togglePositionPlugin = FakeOnboardingSingleChoiceDataPlugin(
+        id = OnboardingSingleChoiceDataPlugin.Id.DuckAiNewTabTogglePositionProvider,
+        options = togglePositionOptions,
+    )
+    private var singleChoicePlugins: List<OnboardingSingleChoiceDataPlugin> = listOf(modelProviderPlugin, togglePositionPlugin)
     private val singleChoiceDataPlugins = object : ActivePluginPoint<OnboardingSingleChoiceDataPlugin> {
         override suspend fun getPlugins(): Collection<OnboardingSingleChoiceDataPlugin> = singleChoicePlugins
     }
@@ -229,6 +234,12 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
     }
 
+    private suspend fun startSegmentedAtTogglePosition() {
+        startSegmentedAtAiProviderChoice()
+        orchestrator.onEvent(NewUserOnboardingEvent.SingleChoiceConfirmed(providerOptions.first()))
+        assertStep(NewUserOnboardingStepIds.TOGGLE_POSITION)
+    }
+
     private suspend fun startSegmentedAtDownloadReason() {
         whenever(homeScreenPromptsExperiment.enroll()).thenReturn(null)
         whenever(segmentedOnboardingExperiment.enroll()).thenReturn(SegmentedOnboardingExperimentVariant.TREATMENT)
@@ -299,7 +310,7 @@ class NewUserOnboardingPlanProviderTest {
 
     @Test
     fun `when no plugin offers the provider choice then the step is skipped`() = runTest {
-        singleChoicePlugins = emptyList()
+        singleChoicePlugins = listOf(togglePositionPlugin)
 
         startSegmentedAtAiProviderChoice()
 
@@ -308,11 +319,45 @@ class NewUserOnboardingPlanProviderTest {
 
     @Test
     fun `when only one provider is offered then the step is skipped`() = runTest {
-        singleChoicePlugins = listOf(FakeOnboardingSingleChoiceDataPlugin(options = listOf(TestOption("openai"))))
+        singleChoicePlugins = listOf(
+            FakeOnboardingSingleChoiceDataPlugin(options = listOf(TestOption("openai"))),
+            togglePositionPlugin,
+        )
 
         startSegmentedAtAiProviderChoice()
 
         assertStep(NewUserOnboardingStepIds.TOGGLE_POSITION)
+    }
+
+    @Test
+    fun `when the toggle position step is reached then it offers the plugin options`() = runTest {
+        startSegmentedAtTogglePosition()
+
+        val step = (orchestrator.state.value as InProgress).currentStep as NewUserOnboardingActivityStep
+        assertEquals(
+            NewUserOnboardingActivityDialog.TogglePosition(options = togglePositionOptions),
+            step.resolveDialog(),
+        )
+    }
+
+    @Test
+    fun `when a toggle position is confirmed then it is applied to the plugin that offered it`() = runTest {
+        startSegmentedAtTogglePosition()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.SingleChoiceConfirmed(togglePositionOptions[1]))
+
+        assertEquals(listOf(togglePositionOptions[1]), togglePositionPlugin.applied)
+        assertStep(NewUserOnboardingStepIds.ADDRESS_BAR_POSITION)
+    }
+
+    @Test
+    fun `when no plugin offers the toggle position choice then the step is skipped`() = runTest {
+        singleChoicePlugins = listOf(modelProviderPlugin)
+
+        startSegmentedAtAiProviderChoice()
+        orchestrator.onEvent(NewUserOnboardingEvent.SingleChoiceConfirmed(providerOptions.first()))
+
+        assertStep(NewUserOnboardingStepIds.ADDRESS_BAR_POSITION)
     }
 
     @Test
@@ -323,7 +368,7 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // comparison_chart
         orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
         orchestrator.onEvent(NewUserOnboardingEvent.SingleChoiceConfirmed(providerOptions.first()))
-        orchestrator.onEvent(NewUserOnboardingEvent.TogglePositionOpenDuckAiConfirmed)
+        orchestrator.onEvent(NewUserOnboardingEvent.SingleChoiceConfirmed(togglePositionOptions.first()))
         orchestrator.onEvent(NewUserOnboardingEvent.AddressBarConfirmed(OmnibarType.SINGLE_TOP))
         assertStep(NewUserOnboardingStepIds.INPUT_SCREEN_PREVIEW)
 

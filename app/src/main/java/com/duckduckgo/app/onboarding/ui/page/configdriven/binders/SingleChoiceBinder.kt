@@ -19,6 +19,7 @@ package com.duckduckgo.app.onboarding.ui.page.configdriven.binders
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup.MarginLayoutParams
+import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import com.duckduckgo.app.browser.databinding.IncludeBrandDesignSingleChoiceBinding
 import com.duckduckgo.app.browser.databinding.IncludeBrandDesignSingleChoiceRowBinding
@@ -90,7 +91,8 @@ class SingleChoiceBinder(
                     topMargin = context.resources.getDimensionPixelSize(CommonR.dimen.keyline_4)
                 }
             }
-            rowBinding.singleChoiceRowIcon.setImageResource(row.option.iconRes)
+            row.option.iconRes?.let { rowBinding.singleChoiceRowIcon.setImageResource(it) }
+            rowBinding.singleChoiceRowIcon.isVisible = row.option.iconRes != null
             rowBinding.singleChoiceRowPrimaryText.text = row.option.label
             rowBinding.root.setOnClickListener {
                 state.update { it.copy(selected = row.option) }

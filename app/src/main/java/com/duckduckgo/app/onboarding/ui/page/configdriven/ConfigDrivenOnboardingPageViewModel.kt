@@ -194,6 +194,8 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
                     _commands.send(if (interaction.checked) Command.LaunchAddWidgetPrompt else Command.ShowRemoveWidgetBottomSheet)
                 }
             }
+
+            is ContentInteraction.SelectSingleChoiceOption -> emit(NewUserOnboardingEvent.SingleChoiceConfirmed(interaction.option))
         }
     }
 

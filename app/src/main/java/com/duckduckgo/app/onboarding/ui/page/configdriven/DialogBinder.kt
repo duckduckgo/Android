@@ -17,6 +17,7 @@
 package com.duckduckgo.app.onboarding.ui.page.configdriven
 
 import android.view.View
+import com.duckduckgo.onboarding.api.OnboardingSingleChoiceDataPlugin.Option
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -49,6 +50,9 @@ sealed interface ContentInteraction {
     data class QuickSetupSetDefaultBrowser(val checked: Boolean) : ContentInteraction
 
     data class QuickSetupAddWidget(val checked: Boolean) : ContentInteraction
+
+    /** A single-choice screen whose options are their own buttons, so the pick arrives without a CTA. */
+    data class SelectSingleChoiceOption(val option: Option) : ContentInteraction
 }
 
 /** Binds a stateless [ContentConfig] to its include layout. */

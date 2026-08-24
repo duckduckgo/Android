@@ -26,6 +26,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
+import com.duckduckgo.app.onboarding.TestOption
 import com.duckduckgo.app.onboarding.orchestrator.NewUserBrowserActivityAction
 import com.duckduckgo.app.onboarding.orchestrator.NewUserBrowserActivityStep
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityDialog
@@ -421,6 +422,18 @@ class ConfigDrivenOnboardingPageViewModelTest {
             listOf(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "cats", isChat = true, fromSuggestion = true)),
             recordedEvents,
         )
+    }
+
+    @Test
+    fun `forwards a single choice option picked in the content to the orchestrator`() = runTest {
+        val option = TestOption("duckAI")
+        val testee = startAt(NewUserOnboardingActivityDialog.TogglePosition(options = listOf(option)))
+        advanceUntilIdle()
+
+        testee.onContentInteraction(ContentInteraction.SelectSingleChoiceOption(option))
+        advanceUntilIdle()
+
+        assertEquals(listOf(NewUserOnboardingEvent.SingleChoiceConfirmed(option)), recordedEvents)
     }
 
     @Test

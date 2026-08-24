@@ -264,6 +264,9 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     ): LinearOnboardingPlan {
         val firstDialog = SuspendMemo { FirstDialog.INITIAL }
         val modelProviderChoice = SuspendMemo { singleChoiceDataPlugin(OnboardingSingleChoiceDataPlugin.Id.DuckAiModelProvider) }
+        val togglePositionChoice = SuspendMemo {
+            singleChoiceDataPlugin(OnboardingSingleChoiceDataPlugin.Id.DuckAiNewTabTogglePositionProvider)
+        }
 
         // Warms the options up while the user is still several screens away from the step that renders them.
         appCoroutineScope.launch(dispatchers.io()) { modelProviderChoice()?.prefetch() }
@@ -276,7 +279,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 add(introAnimationStep())
                 add(notificationPermissionStep())
                 add(initialStep(firstDialog))
-                add(downloadReasonStep(ctx, modelProviderChoice))
+                add(downloadReasonStep(ctx, modelProviderChoice, togglePositionChoice))
             },
         )
     }
@@ -496,6 +499,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     private fun downloadReasonStep(
         ctx: NewUserOnboardingPlanContext,
         modelProviderChoice: SuspendMemo<OnboardingSingleChoiceDataPlugin?>,
+        togglePositionChoice: SuspendMemo<OnboardingSingleChoiceDataPlugin?>,
     ): NewUserOnboardingActivityStep {
         return NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.DOWNLOAD_REASON,
@@ -515,7 +519,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
                         when (selection) {
                             DownloadReasonSelection.SEARCH -> SwitchTo(segmentedSearchPlan(ctx))
-                            DownloadReasonSelection.AI_CHAT -> SwitchTo(segmentedAiPlan(ctx, modelProviderChoice))
+                            DownloadReasonSelection.AI_CHAT -> SwitchTo(segmentedAiPlan(ctx, modelProviderChoice, togglePositionChoice))
                             DownloadReasonSelection.NO_AI,
                             DownloadReasonSelection.BLOCK_ADS,
                             -> {
@@ -558,6 +562,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     private fun segmentedAiPlan(
         ctx: NewUserOnboardingPlanContext,
         modelProviderChoice: SuspendMemo<OnboardingSingleChoiceDataPlugin?>,
+        togglePositionChoice: SuspendMemo<OnboardingSingleChoiceDataPlugin?>,
     ): LinearOnboardingPlan =
         sidePlan(
             id = SEGMENTED_AI_PLAN_ID,
@@ -569,7 +574,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                     title = R.string.aiPathModelChoiceTitle,
                     body = R.string.aiPathModelChoiceBody,
                 ),
-                togglePositionStep(),
+                togglePositionStep(togglePositionChoice),
                 addressBarPositionStep(),
                 inputScreenPreviewStep(ctx = ctx, isSearchDefault = false),
             ),
@@ -645,20 +650,23 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         )
     }
 
-    private fun togglePositionStep(): NewUserOnboardingActivityStep {
+    /**
+     * The options are the screen's buttons, so a single option would leave the user with nothing to
+     * decline and the step is skipped rather than rendered.
+     */
+    private fun togglePositionStep(plugin: SuspendMemo<OnboardingSingleChoiceDataPlugin?>): NewUserOnboardingActivityStep {
+        val options = SuspendMemo { plugin()?.options().orEmpty() }
         return NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.TOGGLE_POSITION,
             pixelName = null,
             showsStepIndicator = true,
-            resolveDialog = { NewUserOnboardingActivityDialog.TogglePosition },
+            precondition = { options().size > 1 },
+            resolveDialog = { NewUserOnboardingActivityDialog.TogglePosition(options()) },
             transition = { event ->
                 when (event) {
-                    is NewUserOnboardingEvent.TogglePositionOpenDuckAiConfirmed -> {
-                        logcat { "Toggle position confirmed" }
-                        Advance
-                    }
-                    is NewUserOnboardingEvent.TogglePositionNotNowClicked -> {
-                        logcat { "Toggle position skipped" }
+                    is NewUserOnboardingEvent.SingleChoiceConfirmed -> {
+                        logcat { "Toggle position confirmed: ${event.option.id}" }
+                        plugin()?.apply(event.option)
                         Advance
                     }
 

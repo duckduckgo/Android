@@ -59,7 +59,4 @@ sealed interface NewUserOnboardingEvent : LinearOnboardingEvent {
     data class PreferenceSelectorConfirmed(val selections: Map<OnboardingPreference, Boolean>) : NewUserOnboardingEvent
 
     data class SingleChoiceConfirmed(val option: Option) : NewUserOnboardingEvent
-
-    data object TogglePositionOpenDuckAiConfirmed : NewUserOnboardingEvent
-    data object TogglePositionNotNowClicked : NewUserOnboardingEvent
 }

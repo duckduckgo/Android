@@ -69,5 +69,5 @@ sealed interface NewUserOnboardingActivityDialog {
         val options: List<Option>,
     ) : NewUserOnboardingActivityDialog
 
-    data object TogglePosition : NewUserOnboardingActivityDialog
+    data class TogglePosition(val options: List<Option>) : NewUserOnboardingActivityDialog
 }

@@ -20,6 +20,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.onboarding.OnboardingPreference
+import com.duckduckgo.app.onboarding.TestOption
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityDialog
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
 import com.duckduckgo.app.onboarding.store.OnboardingStore
@@ -31,6 +32,7 @@ import org.junit.Assert.assertNull
 import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import com.duckduckgo.mobile.android.R as CommonR
 
 class DialogConfigResolverTest {
 
@@ -457,5 +459,25 @@ class DialogConfigResolverTest {
             CtaConfig(TextConfig.Resource(R.string.preOnboardingDaxDialog3ButtonCustomAi), CtaAction.Submit),
             config.primaryCta,
         )
+    }
+
+    @Test
+    fun `resolves the toggle position dialog with the plan's options and no ctas`() {
+        val options = listOf(TestOption("duckAI", label = "Open tabs with AI chat"), TestOption("lastUsed", label = "Not Now"))
+
+        val config = testee.resolve(NewUserOnboardingActivityDialog.TogglePosition(options), isCustomAiFlow = true)!!
+
+        assertEquals(
+            ContentConfig.TogglePosition(
+                title = TextConfig.Resource(R.string.aiPathTogglePositionTitle),
+                pictogramLightRes = CommonR.drawable.toggle_ai_chat_default_lighttheme,
+                pictogramDarkRes = CommonR.drawable.toggle_ai_chat_default_darktheme,
+                pictogramCaption = TextConfig.Resource(R.string.aiPathTogglePositionPictogramCaption),
+                options = options,
+            ),
+            config.content,
+        )
+        assertNull(config.primaryCta)
+        assertNull(config.secondaryCta)
     }
 }

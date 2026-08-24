@@ -32,4 +32,8 @@
     <string name="duckChatModelProviderAnthropic">Claude</string>
     <string name="duckChatModelProviderMistral">Mistral</string>
 
+    <!-- New tab toggle positions, shown in the onboarding toggle position choice -->
+    <string name="duckChatOnboardingNewTabTogglePositionDuckAi">Open tabs with AI chat</string>
+    <string name="duckChatOnboardingNewTabTogglePositionLastUsed">Not Now</string>
+
 </resources>

@@ -80,8 +80,6 @@
     <string name="aiPathModelChoiceBody">Change your default AI now, or anytime during chat.</string>
     <string name="aiPathTogglePositionTitle">Want new tabs to open with AI chat?</string>
     <string name="aiPathTogglePositionPictogramCaption">You can switch to Search with one tap</string>
-    <string name="aiPathTogglePositionPictogramPrimaryCta">Open tabs with AI chat</string>
-    <string name="aiPathTogglePositionPictogramSecondaryCta">Not Now</string>
 
     <!-- Browser tab -->
     <string name="browserDuckPlayerShortUrl">Duck Player</string>

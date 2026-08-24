@@ -39,6 +39,7 @@ interface OnboardingSingleChoiceDataPlugin : ActivePlugin {
 
     enum class Id {
         DuckAiModelProvider,
+        DuckAiNewTabTogglePositionProvider,
     }
 
     /**
@@ -53,7 +54,8 @@ interface OnboardingSingleChoiceDataPlugin : ActivePlugin {
         val id: String
         val label: String
 
+        /** Null when the option is rendered without an icon. */
         @get:DrawableRes
-        val iconRes: Int
+        val iconRes: Int?
     }
 }

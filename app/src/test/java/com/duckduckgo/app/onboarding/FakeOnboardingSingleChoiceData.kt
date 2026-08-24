@@ -23,7 +23,7 @@ import com.duckduckgo.onboarding.api.OnboardingSingleChoiceDataPlugin.Option
 data class TestOption(
     override val id: String,
     override val label: String = id,
-    override val iconRes: Int = 0,
+    override val iconRes: Int? = null,
 ) : Option
 
 class FakeOnboardingSingleChoiceDataPlugin(

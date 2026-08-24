@@ -138,12 +138,22 @@ sealed interface ContentConfig {
         override fun initialState() = SinglePreferenceContentState(selected = rows.first().option)
     }
 
+    /**
+     * The options are rendered as buttons rather than a list the user confirms, so picking one both
+     * answers the screen and moves it on. First option gets the primary button.
+     */
     data class TogglePosition(
         override val title: TextConfig,
         @field:DrawableRes val pictogramLightRes: Int,
         @field:DrawableRes val pictogramDarkRes: Int,
         val pictogramCaption: TextConfig,
-    ) : ContentConfig
+        val options: List<Option>,
+    ) : ContentConfig {
+
+        init {
+            require(options.isNotEmpty()) { "A toggle position screen needs at least one option" }
+        }
+    }
 }
 
 data class AddressBarContentState(val position: OmnibarType)

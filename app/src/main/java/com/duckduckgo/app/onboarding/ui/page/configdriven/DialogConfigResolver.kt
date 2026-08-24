@@ -228,14 +228,7 @@ class DialogConfigResolver @Inject constructor(
                 pictogramLightRes = CommonR.drawable.toggle_ai_chat_default_lighttheme,
                 pictogramDarkRes = CommonR.drawable.toggle_ai_chat_default_darktheme,
                 pictogramCaption = TextConfig.Resource(R.string.aiPathTogglePositionPictogramCaption),
-            ),
-            primaryCta = CtaConfig(
-                text = TextConfig.Resource(R.string.aiPathTogglePositionPictogramPrimaryCta),
-                action = CtaAction.Emit(NewUserOnboardingEvent.TogglePositionOpenDuckAiConfirmed),
-            ),
-            secondaryCta = CtaConfig(
-                text = TextConfig.Resource(R.string.aiPathTogglePositionPictogramSecondaryCta),
-                action = CtaAction.Emit(NewUserOnboardingEvent.TogglePositionNotNowClicked),
+                options = dialog.options,
             ),
         )
 

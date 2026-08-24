@@ -16,13 +16,19 @@
 
 package com.duckduckgo.app.onboarding.ui.page.configdriven.binders
 
+import android.view.LayoutInflater
 import android.view.View
+import com.duckduckgo.app.browser.databinding.IncludeBrandDesignOptionButtonPrimaryBinding
+import com.duckduckgo.app.browser.databinding.IncludeBrandDesignOptionButtonSecondaryBinding
 import com.duckduckgo.app.browser.databinding.IncludeBrandDesignTogglePositionBinding
 import com.duckduckgo.app.onboarding.ui.page.configdriven.BindScope
 import com.duckduckgo.app.onboarding.ui.page.configdriven.ContentConfig
 import com.duckduckgo.app.onboarding.ui.page.configdriven.ContentHandle
+import com.duckduckgo.app.onboarding.ui.page.configdriven.ContentInteraction
 import com.duckduckgo.app.onboarding.ui.page.configdriven.DialogBinder
+import com.duckduckgo.common.ui.view.button.DaxButton
 import com.duckduckgo.common.utils.extensions.preventWidows
+import com.duckduckgo.onboarding.api.OnboardingSingleChoiceDataPlugin.Option
 
 class TogglePositionBinder(
     private val binding: IncludeBrandDesignTogglePositionBinding,
@@ -50,9 +56,35 @@ class TogglePositionBinder(
 
         binding.togglePositionPictogramCaption.text = content.pictogramCaption.resolve(context).preventWidows()
 
+        val buttons = populateOptions(content.options, scope)
+
         return ContentHandle(
             title = binding.togglePositionTitle,
             fadeTargets = listOf(binding.togglePositionContentContainer),
+            unbind = {
+                buttons.forEach { it.setOnClickListener(null) }
+                binding.togglePositionOptions.removeAllViews()
+            },
         )
+    }
+
+    private fun populateOptions(
+        options: List<Option>,
+        scope: BindScope,
+    ): List<DaxButton> {
+        val container = binding.togglePositionOptions
+        container.removeAllViews()
+        val inflater = LayoutInflater.from(container.context)
+        return options.mapIndexed { index, option ->
+            val button = if (index == 0) {
+                IncludeBrandDesignOptionButtonPrimaryBinding.inflate(inflater, container, false).root
+            } else {
+                IncludeBrandDesignOptionButtonSecondaryBinding.inflate(inflater, container, false).root
+            }
+            button.text = option.label
+            button.setOnClickListener { scope.execute(ContentInteraction.SelectSingleChoiceOption(option)) }
+            container.addView(button)
+            button
+        }
     }
 }
