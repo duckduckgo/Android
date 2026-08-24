@@ -20,6 +20,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.DuckAiTabSessionRepository
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
@@ -286,7 +287,12 @@ class RealDuckChatPixels @Inject constructor(
     private val duckAiMetricCollector: DuckAiMetricCollector,
     private val termsOfServiceHandler: DuckChatTermsOfServiceHandler,
     private val duckAiTabSessionRepository: DuckAiTabSessionRepository,
+    private val appBuildConfig: AppBuildConfig,
 ) : DuckChatPixels {
+
+    /** `first_prompt_new_install` must be attributable to a fresh install, never to an existing user who just updated. */
+    private suspend fun isFirstPromptForNewInstall(): Boolean =
+        appBuildConfig.isNewInstall() && duckChatFeatureRepository.checkAndMarkFirstPromptSubmission()
 
     private fun fireCountAndDaily(
         count: DuckChatPixelName,
@@ -404,12 +410,20 @@ class RealDuckChatPixels @Inject constructor(
             val (pixelName, params) = when (reportMetric) {
                 USER_DID_SUBMIT_PROMPT -> {
                     refreshAtb = true
-                    DUCK_CHAT_SEND_PROMPT_ONGOING_CHAT to sessionParams
+                    val isFirstPrompt = isFirstPromptForNewInstall()
+                    DUCK_CHAT_SEND_PROMPT_ONGOING_CHAT to buildMap {
+                        putAll(sessionParams)
+                        if (isFirstPrompt) put(DuckChatPixelParameters.FIRST_PROMPT_NEW_INSTALL, "true")
+                    }
                 }
 
                 USER_DID_SUBMIT_FIRST_PROMPT -> {
                     refreshAtb = true
-                    DUCK_CHAT_START_NEW_CONVERSATION to sessionParams
+                    val isFirstPrompt = isFirstPromptForNewInstall()
+                    DUCK_CHAT_START_NEW_CONVERSATION to buildMap {
+                        putAll(sessionParams)
+                        if (isFirstPrompt) put(DuckChatPixelParameters.FIRST_PROMPT_NEW_INSTALL, "true")
+                    }
                 }
 
                 USER_DID_OPEN_HISTORY -> DUCK_CHAT_OPEN_HISTORY to sessionParams
@@ -816,6 +830,7 @@ class RealDuckChatPixels @Inject constructor(
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_DAILY,
         ) {
             val source = resolveEntrySource(surface, tabId, addressBarEntryPoint)
+            val isFirstPrompt = isFirstPromptForNewInstall()
             buildMap {
                 put(DuckChatPixelParameters.SELECTED_TOOL, selectedTool)
                 modelId?.let { put(DuckChatPixelParameters.MODEL_ID, it) }
@@ -829,6 +844,7 @@ class RealDuckChatPixels @Inject constructor(
                     ?.let { put(DuckChatPixelParameters.DEFAULT_MODE, it.pixelValue()) }
                 put(DuckChatPixelParameters.PROMPT_PAGE_TYPE, pageType.value)
                 source?.let { put(DuckChatPixelParameters.ENTRY_SOURCE, it) }
+                if (isFirstPrompt) put(DuckChatPixelParameters.FIRST_PROMPT_NEW_INSTALL, "true")
             }
         }
     }
@@ -1440,6 +1456,7 @@ object DuckChatPixelParameters {
 
     /** What the user was looking at when a prompt was submitted. Distinct from [PAGE_TYPE], which classifies contextual suggestions. */
     const val PROMPT_PAGE_TYPE = "page_type"
+    const val FIRST_PROMPT_NEW_INSTALL = "first_prompt_new_install"
     const val IS_SMART = "isSmart"
     const val DELTA_TIMESTAMP_PARAMETERS = "delta-timestamp-minutes"
     const val INPUT_SCREEN_MODE = "mode"

@@ -20,12 +20,14 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.DuckAiTabSessionRepository
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.ToggleSelection
 import com.duckduckgo.duckchat.impl.helper.DuckChatTermsOfServiceHandler
 import com.duckduckgo.duckchat.impl.metric.DuckAiMetricCollector
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
@@ -46,6 +48,7 @@ class RealDuckChatPixelsToolsTest {
     private val duckAiMetricCollector: DuckAiMetricCollector = mock()
     private val termsOfServiceHandler: DuckChatTermsOfServiceHandler = mock()
     private val duckAiTabSessionRepository: DuckAiTabSessionRepository = mock()
+    private val appBuildConfig: AppBuildConfig = mock()
 
     private val testee = RealDuckChatPixels(
         pixel = pixel,
@@ -56,9 +59,15 @@ class RealDuckChatPixelsToolsTest {
         duckAiMetricCollector = duckAiMetricCollector,
         termsOfServiceHandler = termsOfServiceHandler,
         duckAiTabSessionRepository = duckAiTabSessionRepository,
+        appBuildConfig = appBuildConfig,
     )
 
     private val surfaceParams = mapOf(DuckChatPixelParameters.SURFACE to "contextual_chat")
+
+    init {
+        runBlocking { whenever(duckChatFeatureRepository.checkAndMarkFirstPromptSubmission()).thenReturn(false) }
+        whenever(appBuildConfig.isNewInstall()).thenReturn(false)
+    }
 
     @Test
     fun whenImageGenerationSelectedThenFiresCountAndDaily() = runTest {
@@ -165,6 +174,79 @@ class RealDuckChatPixelsToolsTest {
             DuckChatPixelParameters.MODEL_ID to "gpt-5",
             DuckChatPixelParameters.REASONING_EFFORT to "fast",
             DuckChatPixelParameters.HAS_IMAGE_ATTACHMENT to "true",
+            DuckChatPixelParameters.HAS_FILE_ATTACHMENT to "false",
+            DuckChatPixelParameters.HAS_TEXT to "true",
+            DuckChatPixelParameters.SURFACE to "contextual_chat",
+            DuckChatPixelParameters.PROMPT_PAGE_TYPE to "contextual",
+            DuckChatPixelParameters.ENTRY_SOURCE to "contextual_chat",
+        )
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_COUNT, parameters = params)
+        verify(pixel).fire(
+            DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_DAILY,
+            parameters = params,
+            type = Pixel.PixelType.Daily(),
+        )
+    }
+
+    @Test
+    fun whenPromptSubmittedAsFirstPromptOnNewInstallThenParamsIncludeFirstPromptNewInstall() = runTest {
+        whenever(appBuildConfig.isNewInstall()).thenReturn(true)
+        whenever(duckChatFeatureRepository.checkAndMarkFirstPromptSubmission()).thenReturn(true)
+
+        testee.firePromptSubmitted(
+            selectedTool = "none",
+            modelId = null,
+            reasoningEffort = null,
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            hasText = true,
+            surface = DuckChatPixelSurface.CONTEXTUAL_CHAT,
+            defaultMode = null,
+            tabId = null,
+            pageType = DuckChatPixelPageType.CONTEXTUAL,
+            addressBarEntryPoint = null,
+        )
+
+        val params = mapOf(
+            DuckChatPixelParameters.SELECTED_TOOL to "none",
+            DuckChatPixelParameters.HAS_IMAGE_ATTACHMENT to "false",
+            DuckChatPixelParameters.HAS_FILE_ATTACHMENT to "false",
+            DuckChatPixelParameters.HAS_TEXT to "true",
+            DuckChatPixelParameters.SURFACE to "contextual_chat",
+            DuckChatPixelParameters.PROMPT_PAGE_TYPE to "contextual",
+            DuckChatPixelParameters.ENTRY_SOURCE to "contextual_chat",
+            DuckChatPixelParameters.FIRST_PROMPT_NEW_INSTALL to "true",
+        )
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_COUNT, parameters = params)
+        verify(pixel).fire(
+            DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_DAILY,
+            parameters = params,
+            type = Pixel.PixelType.Daily(),
+        )
+    }
+
+    @Test
+    fun whenPromptSubmittedAsFirstPromptOnExistingInstallThenParamsOmitFirstPromptNewInstall() = runTest {
+        whenever(appBuildConfig.isNewInstall()).thenReturn(false)
+        whenever(duckChatFeatureRepository.checkAndMarkFirstPromptSubmission()).thenReturn(true)
+
+        testee.firePromptSubmitted(
+            selectedTool = "none",
+            modelId = null,
+            reasoningEffort = null,
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            hasText = true,
+            surface = DuckChatPixelSurface.CONTEXTUAL_CHAT,
+            defaultMode = null,
+            tabId = null,
+            pageType = DuckChatPixelPageType.CONTEXTUAL,
+            addressBarEntryPoint = null,
+        )
+
+        val params = mapOf(
+            DuckChatPixelParameters.SELECTED_TOOL to "none",
+            DuckChatPixelParameters.HAS_IMAGE_ATTACHMENT to "false",
             DuckChatPixelParameters.HAS_FILE_ATTACHMENT to "false",
             DuckChatPixelParameters.HAS_TEXT to "true",
             DuckChatPixelParameters.SURFACE to "contextual_chat",

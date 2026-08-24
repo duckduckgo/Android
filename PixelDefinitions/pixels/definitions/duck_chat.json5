@@ -1262,7 +1262,8 @@
             { "key": "has_file_attachment", "type": "boolean", "description": "Whether the prompt included a file attachment" },
             { "key": "has_text", "type": "boolean", "description": "Whether the prompt included text" },
             "duckAiPromptPageType",
-            "duckAiEntrySource"
+            "duckAiEntrySource",
+            "firstPromptNewInstall"
         ]
     },
     "m_aichat_unified_input_prompt_submitted_daily": {
@@ -1296,7 +1297,8 @@
             { "key": "has_file_attachment", "type": "boolean", "description": "Whether the prompt included a file attachment" },
             { "key": "has_text", "type": "boolean", "description": "Whether the prompt included text" },
             "duckAiPromptPageType",
-            "duckAiEntrySource"
+            "duckAiEntrySource",
+            "firstPromptNewInstall"
         ]
     },
     "m_aichat_unified_input_sent_prompt_in_chat_count": {
