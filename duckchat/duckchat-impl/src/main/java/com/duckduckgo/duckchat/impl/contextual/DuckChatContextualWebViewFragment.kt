@@ -72,6 +72,7 @@ import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.duckchat.api.DuckChatContextual
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.DuckChatHistoryNoParams
 import com.duckduckgo.duckchat.api.viewmodel.DuckChatSharedViewModel
 import com.duckduckgo.duckchat.impl.DuckChatInternal
@@ -480,7 +481,7 @@ class DuckChatContextualWebViewFragment :
             onPageContextRemoved = { viewModel.removePageContext() },
             onVoiceChatRequested = {
                 viewModel.onContextualClose()
-                duckChat.openVoiceDuckChat()
+                duckChat.openVoiceDuckChat(DuckChatEntryPoint.VOICE)
             },
             onVoiceSearchRequested = {
                 activity?.hideKeyboard()
@@ -596,6 +597,14 @@ class DuckChatContextualWebViewFragment :
 
                     is DuckChatContextualWebViewViewModel.Command.FocusInput -> {
                         binding.contextualNativeInputWidget.focusInput(activity)
+                    }
+
+                    is DuckChatContextualWebViewViewModel.Command.ApplyContextualReopened -> {
+                        contextualNativeInputManager.onContextualReopened(command.tabId)
+                    }
+
+                    is DuckChatContextualWebViewViewModel.Command.ApplyContextualClosed -> {
+                        contextualNativeInputManager.onContextualClosed(command.tabId)
                     }
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)

@@ -46,7 +46,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -71,7 +70,6 @@ class DuckChatContextualWebViewViewModelTest {
     private val duckChatFeature: DuckChatFeature = mock()
     private val contextualFireButtonToggle: Toggle = mock()
     private val modelManager: com.duckduckgo.duckchat.impl.models.DuckAiModelManager = mock()
-    private val contextualNativeInputManager: ContextualNativeInputManager = mock()
     private val chatHistoryRepository: ChatHistoryRepository = mock()
     private val contextualEntryPromptStore: ContextualEntryPromptStore = mock()
     private val recentChatsFlow = MutableStateFlow<List<ChatHistoryItem>>(emptyList())
@@ -201,10 +199,13 @@ class DuckChatContextualWebViewViewModelTest {
         testee.onSheetOpened("tab-1")
         testee.onNewChatRequestedFromPopup()
 
-        // The STATE_HIDDEN that follows the New Chat handoff must not be treated as a dismissal.
-        testee.onSheetClosed()
+        testee.commands.test {
+            // The STATE_HIDDEN that follows the New Chat handoff must not be treated as a dismissal.
+            testee.onSheetClosed()
 
-        verify(contextualNativeInputManager, never()).onContextualClosed(any())
+            assertFalse(expectMostRecentItem() is DuckChatContextualWebViewViewModel.Command.ApplyContextualClosed)
+            cancelAndIgnoreRemainingEvents()
+        }
         verify(duckChatPixels, never()).reportContextualSheetDismissed()
     }
 
@@ -212,9 +213,14 @@ class DuckChatContextualWebViewViewModelTest {
     fun `sheet closed by the user reverts the contextual input state`() = runTest {
         testee.onSheetOpened("tab-1")
 
-        testee.onSheetClosed()
+        testee.commands.test {
+            testee.onSheetClosed()
 
-        verify(contextualNativeInputManager).onContextualClosed("tab-1")
+            val command = expectMostRecentItem()
+            assertTrue(command is DuckChatContextualWebViewViewModel.Command.ApplyContextualClosed)
+            assertEquals("tab-1", (command as DuckChatContextualWebViewViewModel.Command.ApplyContextualClosed).tabId)
+            cancelAndIgnoreRemainingEvents()
+        }
         verify(duckChatPixels).reportContextualSheetDismissed()
     }
 
@@ -329,7 +335,6 @@ class DuckChatContextualWebViewViewModelTest {
         duckChatPixels = duckChatPixels,
         duckChatFeature = duckChatFeature,
         modelManager = modelManager,
-        contextualNativeInputManager = contextualNativeInputManager,
         chatHistoryRepository = chatHistoryRepository,
         contextualEntryPromptStore = contextualEntryPromptStore,
     )
@@ -339,9 +344,14 @@ class DuckChatContextualWebViewViewModelTest {
         private val nativeChatInputEnabled = MutableStateFlow(false)
 
         override fun isEnabled(): Boolean = true
-        override fun openDuckChat() = Unit
-        override fun openDuckChatWithAutoPrompt(query: String) = Unit
-        override fun openDuckChatWithPrefill(query: String) = Unit
+        override fun openDuckChat(entryPoint: com.duckduckgo.duckchat.api.DuckChatEntryPoint) = Unit
+        override fun openDuckChatWithAutoPrompt(query: String, entryPoint: com.duckduckgo.duckchat.api.DuckChatEntryPoint) = Unit
+        override fun openDuckChatWithPrefill(query: String, entryPoint: com.duckduckgo.duckchat.api.DuckChatEntryPoint) = Unit
+        override fun reportDuckChatEntry(
+            entryPoint: com.duckduckgo.duckchat.api.DuckChatEntryPoint,
+            opensNewTab: Boolean,
+            hasPrompt: Boolean,
+        ) = Unit
         override fun getDuckChatUrl(
             query: String,
             autoPrompt: Boolean,
@@ -366,7 +376,7 @@ class DuckChatContextualWebViewViewModelTest {
         override suspend fun isStandaloneMigrationCompleted(): Boolean = true
         override suspend fun setChatSuggestionsUserSetting(enabled: Boolean) = Unit
         override fun observeChatSuggestionsUserSettingEnabled(): Flow<Boolean> = flowOf(true)
-        override fun openVoiceDuckChat() { }
+        override fun openVoiceDuckChat(entryPoint: com.duckduckgo.duckchat.api.DuckChatEntryPoint) { }
         override fun isVoiceChatSessionActive(tabId: String): Boolean = false
         override val activeVoiceChatSessions: Flow<Set<String>> = flowOf(emptySet())
         override fun observeTriggerVoiceChatSessionEnd(): Flow<String> = emptyFlow()

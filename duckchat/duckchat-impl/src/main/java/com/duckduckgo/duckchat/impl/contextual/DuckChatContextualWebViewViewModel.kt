@@ -74,7 +74,6 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
     private val duckChatPixels: DuckChatPixels,
     private val duckChatFeature: DuckChatFeature,
     private val modelManager: DuckAiModelManager,
-    private val contextualNativeInputManager: ContextualNativeInputManager,
     private val chatHistoryRepository: ChatHistoryRepository,
     private val contextualEntryPromptStore: ContextualEntryPromptStore,
 ) : ViewModel() {
@@ -132,6 +131,8 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
         data object LaunchChatHistory : Command()
         data object FocusInput : Command()
         data class OpenSearchInNewTab(val query: String) : Command()
+        data class ApplyContextualReopened(val tabId: String) : Command()
+        data class ApplyContextualClosed(val tabId: String) : Command()
     }
 
     private val _viewState: MutableStateFlow<ViewState> = MutableStateFlow(ViewState())
@@ -211,7 +212,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
 
     fun onSheetReopened() {
         logcat { "Duck.ai: onSheetReopened" }
-        contextualNativeInputManager.onContextualReopened(_viewState.value.tabId)
+        commandChannel.trySend(Command.ApplyContextualReopened(_viewState.value.tabId))
 
         viewModelScope.launch(dispatchers.io()) {
             val tabId = _viewState.value.tabId
@@ -531,7 +532,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
         }
         persistTabClosed()
         duckChatPixels.reportContextualSheetDismissed()
-        contextualNativeInputManager.onContextualClosed(_viewState.value.tabId)
+        commandChannel.trySend(Command.ApplyContextualClosed(_viewState.value.tabId))
     }
 
     private fun persistTabClosed() {
