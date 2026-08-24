@@ -72,7 +72,11 @@ class StatisticsRequesterJsonTest {
         configureStubNetworking()
 
         statisticsStore = StatisticsSharedPreferences(InstrumentationRegistry.getInstrumentation().targetContext)
+        // clearAtb() only clears the installation ATB, so retention values would otherwise leak between tests
         statisticsStore.clearAtb()
+        statisticsStore.searchRetentionAtb = null
+        statisticsStore.appRetentionAtb = null
+        statisticsStore.duckaiRetentionAtb = null
 
         val plugins = object : PluginPoint<AtbLifecyclePlugin> {
             override fun getPlugins(): Collection<AtbLifecyclePlugin> {
@@ -259,6 +263,9 @@ class StatisticsRequesterJsonTest {
         queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
         testee.refreshSearchRetentionAtb()
         assertEquals("v107-7", statisticsStore.searchRetentionAtb)
+        assertEquals("100-1", statisticsStore.atb?.version)
+        assertNull(statisticsStore.appRetentionAtb)
+        assertNull(statisticsStore.duckaiRetentionAtb)
     }
 
     @Test
@@ -267,14 +274,20 @@ class StatisticsRequesterJsonTest {
         queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
         testee.refreshAppRetentionAtb()
         assertEquals("v107-7", statisticsStore.appRetentionAtb)
+        assertEquals("100-1", statisticsStore.atb?.version)
+        assertNull(statisticsStore.searchRetentionAtb)
+        assertNull(statisticsStore.duckaiRetentionAtb)
     }
 
     @Test
-    fun whenAlreadyInitializedRefreshDuckAiCallUpdatesAppRetentionAtb() {
+    fun whenAlreadyInitializedRefreshDuckAiCallUpdatesDuckAiRetentionAtb() {
         statisticsStore.saveAtb(Atb("100-1"))
         queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
         testee.refreshDuckAiRetentionAtb()
         assertEquals("v107-7", statisticsStore.duckaiRetentionAtb)
+        assertEquals("100-1", statisticsStore.atb?.version)
+        assertNull(statisticsStore.searchRetentionAtb)
+        assertNull(statisticsStore.appRetentionAtb)
     }
 
     @Test
