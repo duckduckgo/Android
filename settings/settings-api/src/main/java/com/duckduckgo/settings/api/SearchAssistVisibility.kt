@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.store
+package com.duckduckgo.settings.api
 
 /**
  * Search Assist visibility options.
@@ -24,20 +24,20 @@ package com.duckduckgo.duckchat.impl.store
  * settings dialog — the dialog drives pre-selection and the chosen result off the order it actually
  * displays options in, so reordering them can never silently map to the wrong option.
  */
-enum class SearchAssistVisibility(val serpCode: String) {
+enum class SearchAssistVisibility(override val serpCode: String) : SerpSetting {
     NEVER("0"),
     ON_DEMAND("1"),
     SOMETIMES("2"),
     OFTEN("3"),
     ;
 
+    // A getter, not an initializer: enum entries are constructed before the companion object, so reading
+    // SERP_SETTINGS_KEY eagerly does not compile.
+    override val serpKey get() = SERP_SETTINGS_KEY
+
     companion object {
         // The SERP key carrying the search-assist visibility value in the serpSettings blob.
         const val SERP_SETTINGS_KEY = "kbe"
-
-        // Returns null when nothing has been stored yet, so callers can distinguish "no selection" from a chosen option.
-        fun fromName(name: String?): SearchAssistVisibility? =
-            entries.firstOrNull { it.name == name }
 
         // Maps the SERP-provided code ("0".."3") to its option. Returns null for unknown/absent values.
         fun fromSerpCode(serpCode: String?): SearchAssistVisibility? =
