@@ -29,52 +29,20 @@ interface ExchangeV2MessageParser {
 class JsonExchangeV2MessageParser @Inject constructor() : ExchangeV2MessageParser {
 
     override fun parse(rawJson: String): ExchangeV2Message {
-        val json = runCatching { JSONObject(rawJson) }.getOrNull()
-            ?: return ExchangeV2Message.Unknown(rawJson = rawJson, messageType = "")
-        return when (val type = json.optString(FIELD_TYPE, "")) {
-            ExchangeV2Message.Hello.TYPE -> ExchangeV2Message.Hello(
-                rawJson = rawJson,
-                channelId = json.optString(FIELD_CHANNEL_ID, ""),
-                publicKey = json.optString(FIELD_PUBLIC_KEY, ""),
-                version = json.optString(FIELD_VERSION, DEFAULT_VERSION),
-            )
-            // NOTE: a recovery_code_available semantically must carry a user_id (the sender has
-            // an account), but we currently accept a missing/blank one as userId="" rather than
-            // rejecting it — downstream this affects same-account detection and role election.
-            // Hardening (reject or drop as malformed) is tracked separately in Asana
-            // 1215414930715623; left lenient here for forward-compat.
-            ExchangeV2Message.RecoveryCodeAvailable.TYPE -> ExchangeV2Message.RecoveryCodeAvailable(
-                rawJson = rawJson,
-                userId = json.optString(FIELD_USER_ID, ""),
-                name = json.optString(FIELD_NAME, ""),
-                kind = json.optString(FIELD_KIND, ""),
-            )
-            ExchangeV2Message.RecoveryCodeRequest.TYPE -> ExchangeV2Message.RecoveryCodeRequest(
-                rawJson = rawJson,
-                name = json.optString(FIELD_NAME, ""),
-                kind = json.optString(FIELD_KIND, ""),
-            )
-            ExchangeV2Message.RecoveryCodeAwaitingConfirmation.TYPE -> ExchangeV2Message.RecoveryCodeAwaitingConfirmation(rawJson)
-            ExchangeV2Message.RecoveryCodeConfirmed.TYPE -> ExchangeV2Message.RecoveryCodeConfirmed(rawJson)
-            ExchangeV2Message.RecoveryCodeDenied.TYPE -> ExchangeV2Message.RecoveryCodeDenied(rawJson)
-            ExchangeV2Message.RecoveryCodeUnavailable.TYPE -> ExchangeV2Message.RecoveryCodeUnavailable(rawJson)
-            ExchangeV2Message.RecoveryCodeResponse.TYPE -> ExchangeV2Message.RecoveryCodeResponse(
-                rawJson = rawJson,
-                recoveryCode = json.optString(FIELD_RECOVERY_CODE, ""),
-            )
-            else -> ExchangeV2Message.Unknown(rawJson = rawJson, messageType = type)
-        }
-    }
-
-    companion object {
-        private const val FIELD_TYPE = "type"
-        private const val FIELD_USER_ID = "user_id"
-        private const val FIELD_NAME = "name"
-        private const val FIELD_KIND = "kind"
-        private const val FIELD_CHANNEL_ID = "channel_id"
-        private const val FIELD_PUBLIC_KEY = "public_key"
-        private const val FIELD_VERSION = "version"
-        private const val FIELD_RECOVERY_CODE = "recovery_code"
-        private const val DEFAULT_VERSION = "2"
+        val type = runCatching { JSONObject(rawJson).optString(ExchangeV2Message.FIELD_TYPE, "") }
+            .getOrElse { return ExchangeV2Message.Unknown.fromJson(rawJson, messageType = "") }
+        return runCatching {
+            when (type) {
+                ExchangeV2Message.Hello.TYPE -> ExchangeV2Message.Hello.fromJson(rawJson)
+                ExchangeV2Message.RecoveryCodeAvailable.TYPE -> ExchangeV2Message.RecoveryCodeAvailable.fromJson(rawJson)
+                ExchangeV2Message.RecoveryCodeRequest.TYPE -> ExchangeV2Message.RecoveryCodeRequest.fromJson(rawJson)
+                ExchangeV2Message.RecoveryCodeAwaitingConfirmation.TYPE -> ExchangeV2Message.RecoveryCodeAwaitingConfirmation.fromJson(rawJson)
+                ExchangeV2Message.RecoveryCodeConfirmed.TYPE -> ExchangeV2Message.RecoveryCodeConfirmed.fromJson(rawJson)
+                ExchangeV2Message.RecoveryCodeDenied.TYPE -> ExchangeV2Message.RecoveryCodeDenied.fromJson(rawJson)
+                ExchangeV2Message.RecoveryCodeUnavailable.TYPE -> ExchangeV2Message.RecoveryCodeUnavailable.fromJson(rawJson)
+                ExchangeV2Message.RecoveryCodeResponse.TYPE -> ExchangeV2Message.RecoveryCodeResponse.fromJson(rawJson)
+                else -> ExchangeV2Message.Unknown.fromJson(rawJson, messageType = type)
+            }
+        }.getOrElse { ExchangeV2Message.Unknown.fromJson(rawJson, messageType = type) }
     }
 }
