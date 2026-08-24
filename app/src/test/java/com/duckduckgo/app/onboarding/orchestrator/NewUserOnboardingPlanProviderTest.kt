@@ -327,8 +327,11 @@ class NewUserOnboardingPlanProviderTest {
             ),
             previewStep.resolveDialog(),
         )
-        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
-        assertEquals(Completed(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID), orchestrator.state.value)
+        orchestrator.onEvent(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "weather", isChat = false, fromSuggestion = false))
+        assertEquals(
+            Completed(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, result = NewUserOnboardingResult.LaunchSearch(query = "weather")),
+            orchestrator.state.value,
+        )
     }
 
     @Test
@@ -392,8 +395,11 @@ class NewUserOnboardingPlanProviderTest {
             ),
             previewStep.resolveDialog(),
         )
-        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
-        assertEquals(Completed(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID), orchestrator.state.value)
+        orchestrator.onEvent(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "weather", isChat = false, fromSuggestion = false))
+        assertEquals(
+            Completed(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, result = NewUserOnboardingResult.LaunchSearch(query = "weather")),
+            orchestrator.state.value,
+        )
     }
 
     @Test
@@ -580,8 +586,11 @@ class NewUserOnboardingPlanProviderTest {
             ),
             step.resolveDialog(),
         )
-        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
-        assertEquals(Completed(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID), orchestrator.state.value)
+        orchestrator.onEvent(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "weather", isChat = false, fromSuggestion = false))
+        assertEquals(
+            Completed(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, result = NewUserOnboardingResult.LaunchSearch(query = "weather")),
+            orchestrator.state.value,
+        )
     }
 
     @Test
@@ -1185,7 +1194,7 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // ai_comparison_chart
         assertStep(NewUserOnboardingStepIds.INPUT_SCREEN_PREVIEW)
         orchestrator.onEvent(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "hello", isChat = true, fromSuggestion = false))
-        // Chat-only preview always records the chat branch, regardless of the submitted mode.
+        // The chat-only preview hides the mode toggle, so submissions always report the chat branch.
         verify(onboardingPixelSender).chatBranchSelected()
         verify(onboardingPixelSender).fire(
             ONBOARDING_SEARCH_CHAT_TOGGLE,
