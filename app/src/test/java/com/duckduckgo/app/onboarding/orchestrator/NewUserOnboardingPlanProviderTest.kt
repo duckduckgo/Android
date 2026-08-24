@@ -36,6 +36,7 @@ import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager.SegmentedOnboardingExperimentVariant
 import com.duckduckgo.app.onboarding.TestOption
 import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.onboarding.store.SegmentedOnboardingPath
 import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
@@ -225,6 +226,15 @@ class NewUserOnboardingPlanProviderTest {
         assertStep(NewUserOnboardingStepIds.INITIAL)
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
         assertStep(NewUserOnboardingStepIds.DOWNLOAD_REASON)
+    }
+
+    @Test
+    fun `when the ai download reason is picked then the ai path is persisted`() = runTest {
+        startSegmentedAtDownloadReason()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.AI_CHAT))
+
+        verify(onboardingStore).setSegmentedOnboardingPath(SegmentedOnboardingPath.AI)
     }
 
     private suspend fun startSegmentedAtAiProviderChoice() {
@@ -500,7 +510,7 @@ class NewUserOnboardingPlanProviderTest {
         verify(onboardingPreferenceApplier).apply(OnboardingPreference.SAFE_SEARCH, true)
         assertStep(NewUserOnboardingStepIds.INPUT_SCREEN)
         orchestrator.onEvent(NewUserOnboardingEvent.InputModeConfirmed(withAi = false))
-        verify(onboardingStore).setSegmentedSearchPathWithToggleEnabled(false)
+        verify(onboardingStore).setSegmentedOnboardingPath(SegmentedOnboardingPath.SEARCH)
         assertStep(NewUserOnboardingStepIds.ADDRESS_BAR_POSITION)
         orchestrator.onEvent(NewUserOnboardingEvent.AddressBarConfirmed(OmnibarType.SINGLE_TOP))
         assertStep(NewUserOnboardingStepIds.INPUT_SCREEN_PREVIEW)
@@ -521,7 +531,7 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
-    fun `when no preference is available then the selector is skipped and an ai selection persists the toggle flag`() = runTest {
+    fun `when no preference is available then the selector is skipped and the search path is persisted`() = runTest {
         whenever(onboardingPreferenceApplier.isAvailable(any())).thenReturn(false)
         startSegmentedAtDownloadReason()
 
@@ -531,7 +541,7 @@ class NewUserOnboardingPlanProviderTest {
         assertStep(NewUserOnboardingStepIds.INPUT_SCREEN)
         orchestrator.onEvent(NewUserOnboardingEvent.InputModeConfirmed(withAi = true))
 
-        verify(onboardingStore).setSegmentedSearchPathWithToggleEnabled(true)
+        verify(onboardingStore).setSegmentedOnboardingPath(SegmentedOnboardingPath.SEARCH)
         assertStep(NewUserOnboardingStepIds.ADDRESS_BAR_POSITION)
     }
 

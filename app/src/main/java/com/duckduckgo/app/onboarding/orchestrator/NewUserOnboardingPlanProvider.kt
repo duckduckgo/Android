@@ -35,6 +35,7 @@ import com.duckduckgo.app.onboarding.OnboardingPromptsExperimentManager
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager.SegmentedOnboardingExperimentVariant
 import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.onboarding.store.SegmentedOnboardingPath
 import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
@@ -539,6 +540,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
     private fun segmentedSearchPlan(ctx: NewUserOnboardingPlanContext): LinearOnboardingPlan {
         val duckAiEnabled = SuspendMemo { duckAiOnboardingAvailability.isDuckAiOnboardingEnabled() }
+        onboardingStore.setSegmentedOnboardingPath(SegmentedOnboardingPath.SEARCH)
         return sidePlan(
             id = SEGMENTED_SEARCH_PLAN_ID,
             steps = listOf(
@@ -550,9 +552,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                         OnboardingPreference.SAFE_SEARCH,
                     ),
                 ),
-                inputScreenStep(ctx) { withAi ->
-                    onboardingStore.setSegmentedSearchPathWithToggleEnabled(withAi)
-                },
+                inputScreenStep(ctx),
                 addressBarPositionStep(),
                 inputScreenPreviewStep(
                     ctx = ctx,
@@ -568,6 +568,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         modelProviderChoice: OnboardingSingleChoiceDataPlugin?,
         togglePositionChoice: OnboardingSingleChoiceDataPlugin?,
     ): LinearOnboardingPlan {
+        onboardingStore.setSegmentedOnboardingPath(SegmentedOnboardingPath.AI)
         applyInputModeSelection(ctx, withAi = true, fireTelemetry = false)
         ctx.onFinish { onboardingInputScreenLaunchTarget.setOpenOnDuckAi() }
         return sidePlan(
@@ -807,7 +808,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         )
     }
 
-    private fun inputScreenStep(ctx: NewUserOnboardingPlanContext, onConfirmed: (withAi: Boolean) -> Unit = {}): NewUserOnboardingActivityStep {
+    private fun inputScreenStep(ctx: NewUserOnboardingPlanContext): NewUserOnboardingActivityStep {
         val pixelName = OnboardingPixelName.ONBOARDING_SEARCH_EXPERIENCE
         return NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.INPUT_SCREEN,
@@ -820,9 +821,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                         applyInputModeSelection(ctx, event.withAi, fireTelemetry = true)
                         ctx.inputModeWasAi = event.withAi
                         onboardingPixelSender.fire(pixelName, OnboardingPixelAction.SearchExperienceClicked(withAi = event.withAi))
-
-                        onConfirmed(event.withAi)
-
                         Advance
                     }
                     else -> Stay

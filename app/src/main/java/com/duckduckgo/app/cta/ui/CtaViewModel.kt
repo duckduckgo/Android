@@ -398,8 +398,8 @@ class CtaViewModel @Inject constructor(
     }
 
     private suspend fun setInputToggleStateForDuckAiEndCta() {
-        // AI flows always default the toggle on and offer no choice, so we apply the real setting here,
-        // just before the End CTA renders.
+        // Flows that end with the input screen enabled only set it cosmetically while onboarding runs, so we
+        // apply the real setting here, just before the End CTA renders.
         duckChat.setInputScreenUserSetting(true)
     }
 
@@ -420,6 +420,7 @@ class CtaViewModel @Inject constructor(
                             isLightTheme = appTheme.isLightModeEnabled(),
                             deviceInfo = deviceInfo,
                             isCustomAiOnboardingFlow = customAiOnboarding.isEnabled(),
+                            segmentedPath = onboardingStore.getSegmentedPathWithAiInput(),
                             onboardingImprovementsV2Enabled = isOnboardingImprovementsV2Enabled(),
                         )
                     } else {
@@ -456,8 +457,8 @@ class CtaViewModel @Inject constructor(
             // End
             canShowDaxCtaEndOfJourney() -> {
                 if (isBrandDesignUpdateEnabled()) {
-                    val isSegmentedSearchPathWithToggleEnabled = onboardingStore.isSegmentedSearchPathWithToggleEnabled()
-                    if (isSegmentedSearchPathWithToggleEnabled) {
+                    val segmentedPath = onboardingStore.getSegmentedPathWithAiInput()
+                    if (segmentedPath != null) {
                         setInputToggleStateForDuckAiEndCta()
                     }
                     DaxEndBrandDesignUpdateBubbleCta(
@@ -468,7 +469,7 @@ class CtaViewModel @Inject constructor(
                         onboardingImprovementsEnabled = isOnboardingImprovementsEnabled(),
                         onboardingImprovementsV2Enabled = isOnboardingImprovementsV2Enabled(),
                         isOmnibarBottom = settingsDataStore.omnibarType == OmnibarType.SINGLE_BOTTOM,
-                        isSegmentedSearchPathWithToggleEnabled = isSegmentedSearchPathWithToggleEnabled,
+                        segmentedPath = segmentedPath,
                     )
                 } else {
                     DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
@@ -485,6 +486,7 @@ class CtaViewModel @Inject constructor(
                         deviceInfo,
                         isCustomAiOnboardingFlow = customAiOnboarding.isEnabled(),
                         isFreeTrialCopy = freeTrialCopyAvailable(),
+                        segmentedPath = onboardingStore.getSegmentedPathWithAiInput(),
                         onboardingImprovementsEnabled = isOnboardingImprovementsEnabled(),
                         onboardingImprovementsV2Enabled = isOnboardingImprovementsV2Enabled(),
                     )
