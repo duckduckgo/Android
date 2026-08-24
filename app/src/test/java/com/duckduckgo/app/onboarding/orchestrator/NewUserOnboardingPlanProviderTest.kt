@@ -274,6 +274,53 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
+    fun `when the ai download reason is confirmed then arms open input on duck ai tab`() = runTest {
+        startSegmentedAtDownloadReason()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.AI_CHAT))
+
+        verify(onboardingInputScreenLaunchTarget).setOpenOnDuckAi()
+    }
+
+    @Test
+    fun `when on the segmented download reason step then does not arm open input on duck ai tab yet`() = runTest {
+        startSegmentedAtDownloadReason()
+
+        verify(onboardingInputScreenLaunchTarget, never()).setOpenOnDuckAi()
+    }
+
+    @Test
+    fun `when the search download reason is confirmed then does not arm open input on duck ai tab`() = runTest {
+        startSegmentedAtDownloadReason()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.SEARCH))
+
+        verify(onboardingInputScreenLaunchTarget, never()).setOpenOnDuckAi()
+    }
+
+    @Test
+    fun `when the segmented ai path is walked to completion then arms open input on duck ai tab once`() = runTest {
+        startSegmentedAtDownloadReason()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.AI_CHAT))
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // comparison_chart
+        orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
+        orchestrator.onEvent(NewUserOnboardingEvent.SingleChoiceConfirmed(providerOptions.first()))
+        orchestrator.onEvent(NewUserOnboardingEvent.SingleChoiceConfirmed(togglePositionOptions.first()))
+        orchestrator.onEvent(NewUserOnboardingEvent.AddressBarConfirmed(OmnibarType.SINGLE_TOP))
+        orchestrator.onEvent(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "why is privacy hard", isChat = true, fromSuggestion = false))
+
+        assertEquals(
+            Completed(
+                rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID,
+                result = NewUserOnboardingResult.LaunchChat(prompt = "why is privacy hard"),
+            ),
+            orchestrator.state.value,
+        )
+        verify(onboardingInputScreenLaunchTarget, times(1)).setOpenOnDuckAi()
+    }
+
+    @Test
     fun `when the segmented plan is built then the provider options are prefetched`() = runTest {
         whenever(homeScreenPromptsExperiment.enroll()).thenReturn(null)
         whenever(segmentedOnboardingExperiment.enroll()).thenReturn(SegmentedOnboardingExperimentVariant.TREATMENT)

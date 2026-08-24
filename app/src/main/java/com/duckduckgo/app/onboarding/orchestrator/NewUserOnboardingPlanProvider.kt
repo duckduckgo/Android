@@ -563,8 +563,9 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         ctx: NewUserOnboardingPlanContext,
         modelProviderChoice: SuspendMemo<OnboardingSingleChoiceDataPlugin?>,
         togglePositionChoice: SuspendMemo<OnboardingSingleChoiceDataPlugin?>,
-    ): LinearOnboardingPlan =
-        sidePlan(
+    ): LinearOnboardingPlan {
+        onboardingInputScreenLaunchTarget.setOpenOnDuckAi()
+        return sidePlan(
             id = SEGMENTED_AI_PLAN_ID,
             steps = listOf(
                 comparisonChartStep(NewUserOnboardingActivityDialog.SegmentedComparisonChart(ComparisonChartConfig.SegmentedAiPath)),
@@ -579,6 +580,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 inputScreenPreviewStep(ctx = ctx, isSearchDefault = false),
             ),
         )
+    }
 
     /**
      * Filters unavailable preferences and assigns the default value.
