@@ -25,4 +25,12 @@
     <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[DuckDuckGo peut gérer automatiquement les fenêtres contextuelles de cookies afin de maximiser la confidentialité et de minimiser les cookies avant même qu’ils ne soient visibles.\n<a href=\"\">En savoir plus</a>]]></string>
     <string name="autoconsentPopUpsWithoutOptOutsToggle">Accepter les cookies qui ne peuvent pas être refusés</string>
     <string name="autoconsentPopUpsWithoutOptOutsDescription">Si aucune option de refus n’est proposée, nous vous épargnerons un clic, accepterons ces cookies à votre place et fermerons les fenêtres contextuelles.</string>
+    <string name="autoconsentPromptTitle">Vous en avez assez des fenêtres contextuelles de cookies ?</string>
+    <string name="autoconsentPromptFootnote">Vous pourrez toujours modifier cela plus tard dans Paramètres.</string>
+    <string name="autoconsentPromptCpmOnMessage">Certains cookies ne peuvent pas être refusés. Nous pouvons les accepter pour vous.</string>
+    <string name="autoconsentPromptCpmOnPrimaryButton">Accepter les cookies pour moi</string>
+    <string name="autoconsentPromptCpmOnSecondaryButton">Je les accepterai moi-même</string>
+    <string name="autoconsentPromptCpmOffMessage">Laissez-nous nous en occuper pour vous. Nous rejetterons les cookies lorsque cela sera possible et nous accepterons ceux qui ne peuvent pas être refusés.</string>
+    <string name="autoconsentPromptCpmOffPrimaryButton">Rejeter si possible ou accepter pour moi</string>
+    <string name="autoconsentPromptCpmOffSecondaryButton">Je les gérerai moi-même</string>
 </resources>
