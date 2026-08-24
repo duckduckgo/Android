@@ -23,6 +23,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.toChatIdOrNull
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
@@ -120,6 +121,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
             val prefillNativeInput: String? = null,
             val hideKeyboard: Boolean = false,
         ) : Command()
+
         data object RequestPageContext : Command()
         data object ShowFireConfirmation : Command()
         data class ShowChatsPopup(val recentChats: List<ChatHistoryItem>) : Command()
@@ -128,6 +130,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
             val url: String,
             val sourceTabId: String,
         ) : Command()
+
         data object LaunchChatHistory : Command()
         data object FocusInput : Command()
         data class OpenSearchInNewTab(val query: String) : Command()
@@ -610,10 +613,12 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
 
     fun onFullModeRequested() {
         logcat { "Duck.ai: request fullmode url $fullModeUrl" }
+        val hasPrompt = fullModeUrl.isNotEmpty()
         val chatUrl = fullModeUrl.ifEmpty { duckChat.getDuckChatUrl("", false, sidebar = false) }
         viewModelScope.launch {
             commandChannel.trySend(Command.OpenFullscreenMode(chatUrl))
         }
+        duckChatInternal.reportDuckChatEntry(DuckChatEntryPoint.CONTEXTUAL_CHAT, opensNewTab = true, hasPrompt = hasPrompt)
         duckChatPixels.reportContextualSheetExpanded()
     }
 
@@ -685,6 +690,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
         duckChatPixels.reportContextualRecentChatSelected()
         val url = duckChatInternal.buildChatUrl(chatId)
         val sourceTabId = _viewState.value.tabId
+        duckChatInternal.reportDuckChatEntry(DuckChatEntryPoint.CHAT_HISTORY_OPEN_CHAT, opensNewTab = true, hasPrompt = false)
         commandChannel.trySend(Command.OpenChatUrl(url = url, sourceTabId = sourceTabId))
     }
 

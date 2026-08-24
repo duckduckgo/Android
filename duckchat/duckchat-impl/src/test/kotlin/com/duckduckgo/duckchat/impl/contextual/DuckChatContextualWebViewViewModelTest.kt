@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.contextual
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
@@ -250,6 +251,25 @@ class DuckChatContextualWebViewViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
         verify(duckChatPixels).reportContextualSheetExpanded()
+    }
+
+    @Test
+    fun `onFullModeRequested with no existing chat reports entry without a prompt`() = runTest {
+        (duckChat as FakeDuckChat).nextUrl = "https://duckduckgo.com/?ia=chat"
+
+        testee.onFullModeRequested()
+
+        verify(duckChatInternal).reportDuckChatEntry(DuckChatEntryPoint.CONTEXTUAL_CHAT, opensNewTab = true, hasPrompt = false)
+    }
+
+    @Test
+    fun `onFullModeRequested with an existing chat reports entry with a prompt`() = runTest {
+        testee.onChatPageLoaded("https://duckduckgo.com/?chatID=abc")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        testee.onFullModeRequested()
+
+        verify(duckChatInternal).reportDuckChatEntry(DuckChatEntryPoint.CONTEXTUAL_CHAT, opensNewTab = true, hasPrompt = true)
     }
 
     @Test
