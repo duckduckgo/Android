@@ -48,7 +48,6 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.logcat
-import org.json.JSONObject
 import java.util.UUID
 import javax.inject.Inject
 
@@ -223,7 +222,7 @@ class RealExchangeV2Runner @Inject constructor(
                 _linkingCode = qrCode.buildLinkingCode(
                     channelId = ownChannelId!!,
                     publicKeyBase64Url = keyPair.publicKeyBase64,
-                    version = if (syncFeature.canUseExchangeV2Point1().isEnabled()) ExchangeProtocolVersion.V2_1 else ExchangeProtocolVersion.V2_0,
+                    version = ourProtocolVersion(),
                 )
                 // Presenter waits to receive hello before transitioning out of Bootstrapped.
                 session = smFactory.create(
@@ -666,14 +665,16 @@ class RealExchangeV2Runner @Inject constructor(
             emitSessionError("Cannot send hello — pairing session state is incomplete", SessionErrorKind.PairingSessionNotReady)
             return false
         }
-        val json = JSONObject().apply {
-            put("type", "hello")
-            put("channel_id", own)
-            put("public_key", ourKey.publicKeyBase64)
-            put("version", OUR_VERSION_STRING)
-        }.toString()
-        return sendOnWireAndRecord(json, peer, peerKey, ExchangeV2Message.Hello(json, own, ourKey.publicKeyBase64, OUR_VERSION_STRING))
+        val hello = ExchangeV2Message.Hello.create(
+            channelId = own,
+            publicKey = ourKey.publicKeyBase64,
+            version = ourProtocolVersion(),
+        )
+        return sendOnWireAndRecord(hello, peer, peerKey)
     }
+
+    private fun ourProtocolVersion(): ExchangeProtocolVersion.V2 =
+        if (syncFeature.canUseExchangeV2Point1().isEnabled()) ExchangeProtocolVersion.V2_1 else ExchangeProtocolVersion.V2_0
 
     private fun sendOwnAvailability() {
         if (sentOwnAvailability) return
@@ -683,20 +684,18 @@ class RealExchangeV2Runner @Inject constructor(
         val userId = syncStore.userId
         val deviceName = syncDeviceIds.deviceName()
         if (userId != null) {
-            val json = JSONObject().apply {
-                put("type", "recovery_code_available")
-                put("name", deviceName)
-                put("kind", OWN_DEVICE_KIND)
-                put("user_id", userId)
-            }.toString()
-            sendOnWireAndRecord(json, peer, peerKey, ExchangeV2Message.RecoveryCodeAvailable(json, userId, deviceName, OWN_DEVICE_KIND))
+            val available = ExchangeV2Message.RecoveryCodeAvailable.create(
+                userId = userId,
+                name = deviceName,
+                kind = OWN_DEVICE_KIND,
+            )
+            sendOnWireAndRecord(available, peer, peerKey)
         } else {
-            val json = JSONObject().apply {
-                put("type", "recovery_code_request")
-                put("name", deviceName)
-                put("kind", OWN_DEVICE_KIND)
-            }.toString()
-            sendOnWireAndRecord(json, peer, peerKey, ExchangeV2Message.RecoveryCodeRequest(json, deviceName, OWN_DEVICE_KIND))
+            val request = ExchangeV2Message.RecoveryCodeRequest.create(
+                name = deviceName,
+                kind = OWN_DEVICE_KIND,
+            )
+            sendOnWireAndRecord(request, peer, peerKey)
         }
         sentOwnAvailability = true
         // Re-elect in case the peer's availability arrived before we sent ours.
@@ -731,17 +730,12 @@ class RealExchangeV2Runner @Inject constructor(
         return when (codeResult) {
             is Result.Success -> {
                 val recoveryCode = codeResult.data
-                val json = JSONObject().apply {
-                    put("type", "recovery_code_response")
-                    put("recovery_code", recoveryCode)
-                }.toString()
                 // Propagate the send result
-                sendOnWireAndRecord(json, peer, peerKey, ExchangeV2Message.RecoveryCodeResponse(json, recoveryCode))
+                sendOnWireAndRecord(ExchangeV2Message.RecoveryCodeResponse.create(recoveryCode), peer, peerKey)
             }
             is Result.Error -> {
                 logcat(ERROR) { "Sync-ExchangeV2: recovery code unavailable for peerKind=$_peerKind: ${codeResult.reason}" }
-                val json = """{"type":"recovery_code_unavailable"}"""
-                sendOnWireAndRecord(json, peer, peerKey, ExchangeV2Message.RecoveryCodeUnavailable(json))
+                sendOnWireAndRecord(ExchangeV2Message.RecoveryCodeUnavailable.create(), peer, peerKey)
                 emitSessionError(
                     "Couldn't generate a recovery code: ${codeResult.reason}",
                     SessionErrorKind.RecoveryCodePreparationFailed,
@@ -785,19 +779,17 @@ class RealExchangeV2Runner @Inject constructor(
     private fun sendMessageJson(json: String) {
         val peer = peerChannelId ?: return
         val peerKey = peerPublicKey ?: return
-        val parsed = messageParser.parse(json)
-        sendOnWireAndRecord(json, peer, peerKey, parsed)
+        sendOnWireAndRecord(messageParser.parse(json), peer, peerKey)
     }
 
     /** Returns true on successful POST, false on transport error (caller decides if fatal). */
     private fun sendOnWireAndRecord(
-        messageJson: String,
+        outboundMessage: ExchangeV2Message,
         peerChannel: String,
         peerKey: String,
-        outboundMessage: ExchangeV2Message,
     ): Boolean {
         val own = ownChannelId ?: return false
-        return when (val r = channel.sendMessage(messageJson, peerChannel, peerKey, own)) {
+        return when (val r = channel.sendMessage(outboundMessage.rawJson, peerChannel, peerKey, own)) {
             is Result.Success -> {
                 recordSentMessage(outboundMessage)
                 true

@@ -549,7 +549,7 @@ class SyncConnectViewModelTest {
                 transition(
                     from = ExchangeV2State.Joiner.Waiting,
                     to = ExchangeV2State.Joiner.Done,
-                    trigger = ExchangeV2Message.RecoveryCodeResponse(rawJson = "{}", recoveryCode = b64),
+                    trigger = ExchangeV2Message.RecoveryCodeResponse.create(recoveryCode = b64),
                 ),
             )
             cancelAndIgnoreRemainingEvents()
@@ -592,7 +592,7 @@ class SyncConnectViewModelTest {
                 transition(
                     from = ExchangeV2State.Joiner.Waiting,
                     to = ExchangeV2State.Joiner.Done,
-                    trigger = ExchangeV2Message.RecoveryCodeResponse(rawJson = "{}", recoveryCode = b64),
+                    trigger = ExchangeV2Message.RecoveryCodeResponse.create(recoveryCode = b64),
                 ),
             )
             cancelAndIgnoreRemainingEvents()
@@ -640,7 +640,7 @@ class SyncConnectViewModelTest {
                 transition(
                     from = ExchangeV2State.Joiner.Waiting,
                     to = ExchangeV2State.Joiner.Done,
-                    trigger = ExchangeV2Message.RecoveryCodeResponse(rawJson = "{}", recoveryCode = recoveryB64),
+                    trigger = ExchangeV2Message.RecoveryCodeResponse.create(recoveryCode = recoveryB64),
                 ),
             )
             val command = awaitItem()
@@ -840,7 +840,7 @@ class SyncConnectViewModelTest {
                     timestampMs = 0L,
                     from = ExchangeV2State.Joiner.Confirming,
                     to = ExchangeV2State.Joiner.AbortedByHost,
-                    trigger = ExchangeV2Message.RecoveryCodeDenied(rawJson = "{}"),
+                    trigger = ExchangeV2Message.RecoveryCodeDenied.fromJson("{}"),
                     localTrigger = null,
                 ),
             ),

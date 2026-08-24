@@ -483,10 +483,7 @@ class RealSyncCodeDispatcherTest {
             timestampMs = 1L,
             from = ExchangeV2State.Joiner.Waiting,
             to = ExchangeV2State.Joiner.Done,
-            trigger = ExchangeV2Message.RecoveryCodeResponse(
-                rawJson = "{}",
-                recoveryCode = "stale-code-from-prior-session",
-            ),
+            trigger = ExchangeV2Message.RecoveryCodeResponse.create(recoveryCode = "stale-code-from-prior-session"),
             localTrigger = null,
         )
         val staleFlow = MutableSharedFlow<ExchangeV2Event>(replay = 10)
@@ -548,10 +545,7 @@ class RealSyncCodeDispatcherTest {
                     timestampMs = System.currentTimeMillis(),
                     from = ExchangeV2State.Joiner.Waiting,
                     to = ExchangeV2State.Joiner.Done,
-                    trigger = ExchangeV2Message.RecoveryCodeResponse(
-                        rawJson = payloadJson,
-                        recoveryCode = recoveryCodeB64,
-                    ),
+                    trigger = ExchangeV2Message.RecoveryCodeResponse.create(recoveryCode = recoveryCodeB64),
                     localTrigger = null,
                 ),
             )
@@ -850,10 +844,7 @@ class RealSyncCodeDispatcherTest {
             recoveryJson.toByteArray(Charsets.UTF_8),
             android.util.Base64.URL_SAFE or android.util.Base64.NO_PADDING or android.util.Base64.NO_WRAP,
         )
-        val responseMessage = ExchangeV2Message.RecoveryCodeResponse(
-            rawJson = "{}",
-            recoveryCode = b64,
-        )
+        val responseMessage = ExchangeV2Message.RecoveryCodeResponse.create(recoveryCode = b64)
         whenever(syncAccountRepository.processCode(any(), anyOrNull())).thenReturn(Result.Success(true))
         whenever(runner.peerKind).thenReturn("ddg")
 
@@ -890,10 +881,7 @@ class RealSyncCodeDispatcherTest {
             recoveryJson.toByteArray(Charsets.UTF_8),
             android.util.Base64.URL_SAFE or android.util.Base64.NO_PADDING or android.util.Base64.NO_WRAP,
         )
-        val responseMessage = ExchangeV2Message.RecoveryCodeResponse(
-            rawJson = "{}",
-            recoveryCode = b64,
-        )
+        val responseMessage = ExchangeV2Message.RecoveryCodeResponse.create(recoveryCode = b64)
         whenever(syncAccountRepository.joinAccountFromThirdPartyRecoveryCode(any())).thenReturn(Result.Success(true))
 
         dispatcher.presentV2().test {
@@ -941,7 +929,7 @@ class RealSyncCodeDispatcherTest {
                 transition(
                     from = ExchangeV2State.Joiner.Waiting,
                     to = ExchangeV2State.Joiner.AbortedLocal,
-                    trigger = ExchangeV2Message.Hello(rawJson = "{}"),
+                    trigger = ExchangeV2Message.Hello.fromJson("{}"),
                 ),
             )
             assertEquals(UNEXPECTED_EVENT.code, (awaitItem() as DispatchOutcome.Failed).code)
@@ -955,7 +943,7 @@ class RealSyncCodeDispatcherTest {
                 transition(
                     from = ExchangeV2State.Host.Confirming,
                     to = ExchangeV2State.Host.Aborted,
-                    trigger = ExchangeV2Message.RecoveryCodeResponse(rawJson = "{}"),
+                    trigger = ExchangeV2Message.RecoveryCodeResponse.fromJson("{}"),
                 ),
             )
             assertEquals(UNEXPECTED_EVENT.code, (awaitItem() as DispatchOutcome.Failed).code)
@@ -1113,7 +1101,7 @@ class RealSyncCodeDispatcherTest {
                 transition(
                     from = ExchangeV2State.Joiner.Confirming,
                     to = ExchangeV2State.Joiner.AbortedByHost,
-                    trigger = ExchangeV2Message.RecoveryCodeDenied(rawJson = "{}"),
+                    trigger = ExchangeV2Message.RecoveryCodeDenied.fromJson("{}"),
                 ),
             )
             val outcome = awaitItem()
@@ -1129,7 +1117,7 @@ class RealSyncCodeDispatcherTest {
                 transition(
                     from = ExchangeV2State.Joiner.Confirming,
                     to = ExchangeV2State.Joiner.AbortedByHost,
-                    trigger = ExchangeV2Message.RecoveryCodeUnavailable(rawJson = "{}"),
+                    trigger = ExchangeV2Message.RecoveryCodeUnavailable.fromJson("{}"),
                 ),
             )
             assertEquals(PEER_RECOVERY_CODE_UNAVAILABLE.code, (awaitItem() as DispatchOutcome.Failed).code)
@@ -1157,7 +1145,7 @@ class RealSyncCodeDispatcherTest {
                 transition(
                     from = ExchangeV2State.Joiner.Waiting,
                     to = ExchangeV2State.Joiner.AbortedLocal,
-                    trigger = ExchangeV2Message.Hello(rawJson = "{}"),
+                    trigger = ExchangeV2Message.Hello.fromJson("{}"),
                 ),
             )
             assertEquals(UNEXPECTED_EVENT.code, (awaitItem() as DispatchOutcome.Failed).code)
@@ -1171,7 +1159,7 @@ class RealSyncCodeDispatcherTest {
                 transition(
                     from = ExchangeV2State.Host.Confirming,
                     to = ExchangeV2State.Host.Aborted,
-                    trigger = ExchangeV2Message.Hello(rawJson = "{}"),
+                    trigger = ExchangeV2Message.Hello.fromJson("{}"),
                 ),
             )
             assertEquals(UNEXPECTED_EVENT.code, (awaitItem() as DispatchOutcome.Failed).code)
@@ -1217,7 +1205,7 @@ class RealSyncCodeDispatcherTest {
                 transition(
                     from = ExchangeV2State.Joiner.Confirming,
                     to = ExchangeV2State.Joiner.AbortedByHost,
-                    trigger = ExchangeV2Message.RecoveryCodeDenied(rawJson = "{}"),
+                    trigger = ExchangeV2Message.RecoveryCodeDenied.fromJson("{}"),
                 ),
             )
             assertEquals(PAIRING_REJECTED.code, (awaitItem() as DispatchOutcome.Failed).code)
@@ -1239,7 +1227,7 @@ class RealSyncCodeDispatcherTest {
                 transition(
                     from = ExchangeV2State.Joiner.Confirming,
                     to = ExchangeV2State.Joiner.AbortedByHost,
-                    trigger = ExchangeV2Message.Hello(rawJson = "{}"),
+                    trigger = ExchangeV2Message.Hello.fromJson("{}"),
                 ),
             )
             val outcome = awaitItem() as DispatchOutcome.Failed
@@ -1277,7 +1265,7 @@ class RealSyncCodeDispatcherTest {
             recoveryJson.toByteArray(Charsets.UTF_8),
             android.util.Base64.URL_SAFE or android.util.Base64.NO_PADDING or android.util.Base64.NO_WRAP,
         )
-        val responseMessage = ExchangeV2Message.RecoveryCodeResponse(rawJson = "{}", recoveryCode = b64)
+        val responseMessage = ExchangeV2Message.RecoveryCodeResponse.create(recoveryCode = b64)
 
         dispatcher.presentV2().test {
             runnerEventsFlow.emit(
