@@ -41,17 +41,17 @@ import com.duckduckgo.settings.api.HideAiGeneratedImages
 import com.duckduckgo.settings.api.SearchAssistVisibility
 import com.duckduckgo.settings.api.SerpSettingsDataProvider
 import com.duckduckgo.settings.api.SettingsPageFeature
+import com.duckduckgo.settings.api.observeSetting
+import com.duckduckgo.settings.api.setSetting
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -131,16 +131,15 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
             featureState,
             featureVisibility,
             duckChat.observeDefaultTogglePosition(),
-            observeSearchAssistVisibility(),
-            observeHideAiGeneratedImages(),
+            serpSettingsDataProvider.observeSetting(DEFAULT_SEARCH_ASSIST_VISIBILITY),
+            serpSettingsDataProvider.observeSetting(HideAiGeneratedImages.OFF),
         ) { featureState, featureVisibility, defaultTogglePosition, searchAssistVisibility, hideAiGeneratedImages ->
             val isDuckChatUserEnabled = featureState.isDuckChatUserEnabled
             val isInputScreenEnabled = featureState.isCosmeticInputScreenEnabled ?: featureState.isInputScreenEnabled
-            val resolvedSearchAssistVisibility = searchAssistVisibility ?: DEFAULT_SEARCH_ASSIST_VISIBILITY
             // The "Use DuckDuckGo Without AI" action turns everything off at once; once Duck.ai is off,
             // Search Assist is Never and AI-generated images are hidden, there's nothing left to do.
             val isAlreadyWithoutAi = !isDuckChatUserEnabled &&
-                resolvedSearchAssistVisibility == SearchAssistVisibility.NEVER &&
+                searchAssistVisibility == SearchAssistVisibility.NEVER &&
                 hideAiGeneratedImages == HideAiGeneratedImages.ON
             ViewState(
                 isDuckChatUserEnabled = isDuckChatUserEnabled,
@@ -155,7 +154,7 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
                     duckChat.isInputScreenFeatureAvailable(),
                 defaultTogglePosition = defaultTogglePosition,
                 isNativeControlsEnabled = featureVisibility.isNativeControlsEnabled,
-                searchAssistVisibility = resolvedSearchAssistVisibility,
+                searchAssistVisibility = searchAssistVisibility,
                 hideAiGeneratedImages = hideAiGeneratedImages,
                 isUseWithoutAiActionEnabled = !isAlreadyWithoutAi,
                 isDuckAiWebSettingsVisible = isDuckChatUserEnabled && duckChatFeature.duckAiSettings().isEnabled(),
@@ -317,14 +316,9 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
         }
         viewModelScope.launch {
             // The SERP blob is the single source of truth, so the web reflects this on its next getNativeSettings.
-            serpSettingsDataProvider.setSetting(HideAiGeneratedImages.SERP_SETTINGS_KEY, option.serpCode)
+            serpSettingsDataProvider.setSetting(option)
         }
     }
-
-    // Defaults to OFF (show) until the user (or SERP) has provided a value.
-    private fun observeHideAiGeneratedImages(): Flow<HideAiGeneratedImages> =
-        serpSettingsDataProvider.observeSetting(HideAiGeneratedImages.SERP_SETTINGS_KEY)
-            .map { HideAiGeneratedImages.fromSerpCode(it) }
 
     fun onDuckAiShortcutsClicked() {
         viewModelScope.launch {
@@ -383,7 +377,7 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
         }
         viewModelScope.launch {
             // The SERP blob is the single source of truth, so the web reflects this on its next getNativeSettings.
-            serpSettingsDataProvider.setSetting(SearchAssistVisibility.SERP_SETTINGS_KEY, visibility.serpCode)
+            serpSettingsDataProvider.setSetting(visibility)
         }
     }
 
@@ -398,11 +392,6 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
             SearchAssistVisibility.OFTEN ->
                 DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_OFTEN_COUNT to DuckChatPixelName.AI_FEATURES_SEARCH_ASSIST_OFTEN_DAILY
         }
-
-    // Emits null until the user (or SERP) has provided a value; callers default it.
-    private fun observeSearchAssistVisibility(): Flow<SearchAssistVisibility?> =
-        serpSettingsDataProvider.observeSetting(SearchAssistVisibility.SERP_SETTINGS_KEY)
-            .map { SearchAssistVisibility.fromSerpCode(it) }
 
     fun duckAiInputScreenShareFeedbackClicked() {
         viewModelScope.launch {
