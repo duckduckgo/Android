@@ -154,7 +154,6 @@ interface DuckChatDataStore {
 
     suspend fun setSelectedModel(model: SelectedModel?)
 
-    /** Raw [com.duckduckgo.duckchat.impl.models.ModelProvider] name, set when the user picks a provider rather than a model. */
     suspend fun getSelectedProvider(): String?
 
     suspend fun setSelectedProvider(rawValue: String?)

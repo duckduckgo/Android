@@ -51,7 +51,6 @@ sealed interface ContentInteraction {
 
     data class QuickSetupAddWidget(val checked: Boolean) : ContentInteraction
 
-    /** A single-choice screen whose options are their own buttons, so the pick arrives without a CTA. */
     data class SelectSingleChoiceOption(val option: Option) : ContentInteraction
 }
 

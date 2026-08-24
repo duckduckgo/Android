@@ -568,9 +568,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         modelProviderChoice: OnboardingSingleChoiceDataPlugin?,
         togglePositionChoice: OnboardingSingleChoiceDataPlugin?,
     ): LinearOnboardingPlan {
-        // The AI path always finishes on the Duck.ai (chat) tab. Registered rather than written here so
-        // building the plan stays free of side effects, and so it lands at the same point in the run the
-        // custom-AI path writes it.
         ctx.onFinish { onboardingInputScreenLaunchTarget.setOpenOnDuckAi() }
         return sidePlan(
             id = SEGMENTED_AI_PLAN_ID,
@@ -619,10 +616,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     private suspend fun singleChoiceDataPlugin(id: OnboardingSingleChoiceDataPlugin.Id): OnboardingSingleChoiceDataPlugin? =
         singleChoiceDataPlugins.getPlugins().firstOrNull { it.id == id }
 
-    /**
-     * A single option is not a choice, so the step is skipped rather than rendered as a
-     * one-row list the user can only confirm.
-     */
     private fun modelProviderStep(plugin: OnboardingSingleChoiceDataPlugin?): NewUserOnboardingActivityStep {
         val options = SuspendMemo { plugin?.options().orEmpty() }
         return NewUserOnboardingActivityStep(
@@ -651,10 +644,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         )
     }
 
-    /**
-     * The options are the screen's buttons, so a single option would leave the user with nothing to
-     * decline and the step is skipped rather than rendered.
-     */
     private fun togglePositionStep(plugin: OnboardingSingleChoiceDataPlugin?): NewUserOnboardingActivityStep {
         val options = SuspendMemo { plugin?.options().orEmpty() }
         return NewUserOnboardingActivityStep(

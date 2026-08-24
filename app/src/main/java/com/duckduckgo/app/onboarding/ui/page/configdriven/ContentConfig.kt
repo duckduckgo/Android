@@ -119,10 +119,6 @@ sealed interface ContentConfig {
         override fun initialState() = PreferenceSelectorContentState(rows.associate { it.preference to it.initiallyEnabled })
     }
 
-    /**
-     * Rows carry the [Option] they were built from, so the confirmed pick travels back to the plugin
-     * that supplied it without anyone re-deriving it from an id.
-     */
     data class SingleChoice(
         override val title: TextConfig,
         val body: TextConfig,
@@ -136,10 +132,6 @@ sealed interface ContentConfig {
         override fun initialState() = SingleChoiceContentState(selected = rows.first())
     }
 
-    /**
-     * The options are rendered as buttons rather than a list the user confirms, so picking one both
-     * answers the screen and moves it on. First option gets the primary button.
-     */
     data class TogglePosition(
         override val title: TextConfig,
         @field:DrawableRes val pictogramLightRes: Int,
