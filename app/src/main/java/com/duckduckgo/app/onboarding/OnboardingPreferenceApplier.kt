@@ -19,7 +19,9 @@ package com.duckduckgo.app.onboarding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.history.api.NavigationHistory
+import com.duckduckgo.settings.api.HideAiGeneratedImages
 import com.duckduckgo.settings.api.SafeSearch
+import com.duckduckgo.settings.api.SearchAssistVisibility
 import com.duckduckgo.settings.api.SerpSettingsDataProvider
 import com.duckduckgo.settings.api.SerpSettingsFeature
 import com.duckduckgo.settings.api.observeSetting
@@ -59,9 +61,10 @@ class OnboardingPreferenceApplierImpl @Inject constructor(
     override suspend fun isAvailable(preference: OnboardingPreference): Boolean = withContext(dispatcherProvider.io()) {
         when (preference) {
             OnboardingPreference.SEARCH_HISTORY -> navigationHistory.isHistoryFeatureAvailable()
-            OnboardingPreference.SAFE_SEARCH -> serpSettingsFeature.storeSerpSettings().isEnabled()
-            OnboardingPreference.SEARCH_ASSIST -> TODO()
-            OnboardingPreference.HIDE_AI_GENERATED_IMAGES -> TODO()
+            OnboardingPreference.SAFE_SEARCH,
+            OnboardingPreference.SEARCH_ASSIST,
+            OnboardingPreference.HIDE_AI_GENERATED_IMAGES,
+            -> serpSettingsFeature.storeSerpSettings().isEnabled()
         }
     }
 
@@ -69,8 +72,10 @@ class OnboardingPreferenceApplierImpl @Inject constructor(
         when (preference) {
             OnboardingPreference.SEARCH_HISTORY -> navigationHistory.isHistoryUserEnabled()
             OnboardingPreference.SAFE_SEARCH -> safeSearchEnabled()
-            OnboardingPreference.SEARCH_ASSIST -> TODO()
-            OnboardingPreference.HIDE_AI_GENERATED_IMAGES -> TODO()
+            // The no-AI path opens with both AI surfaces switched off, whatever the app or the SERP would
+            // otherwise default them to; the End CTA persists these even when the user never touches them.
+            OnboardingPreference.SEARCH_ASSIST -> false
+            OnboardingPreference.HIDE_AI_GENERATED_IMAGES -> true
         }
     }
 
@@ -78,8 +83,12 @@ class OnboardingPreferenceApplierImpl @Inject constructor(
         when (preference) {
             OnboardingPreference.SEARCH_HISTORY -> navigationHistory.setHistoryUserEnabled(enabled)
             OnboardingPreference.SAFE_SEARCH -> serpSettingsDataProvider.setSetting(if (enabled) SafeSearch.ON else SafeSearch.OFF)
-            OnboardingPreference.SEARCH_ASSIST -> TODO()
-            OnboardingPreference.HIDE_AI_GENERATED_IMAGES -> TODO()
+            OnboardingPreference.SEARCH_ASSIST -> serpSettingsDataProvider.setSetting(
+                if (enabled) SearchAssistVisibility.SOMETIMES else SearchAssistVisibility.NEVER,
+            )
+            OnboardingPreference.HIDE_AI_GENERATED_IMAGES -> serpSettingsDataProvider.setSetting(
+                if (enabled) HideAiGeneratedImages.ON else HideAiGeneratedImages.OFF,
+            )
         }
     }
 
