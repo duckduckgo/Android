@@ -10,7 +10,7 @@ tags:
                 clearState: true
             - runFlow: ../shared/skip_all_onboarding.yaml
             - tapOn:
-                id: "omnibarTextInput"
+                id: "omnibarTextInput|inputField"
             # Test 1 - using line-separator (U+2028) character
             - inputText: "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-basicauth-2028.html"
             - pressKey: Enter
@@ -18,10 +18,10 @@ tags:
             - tapOn: "run"
             - assertVisible: "Example Domain"
             - copyTextFrom:
-                id: "omnibarTextInput"
+                id: "omnibarTextInput|inputField"
             - assertTrue: ${maestro.copiedText.indexOf("https://www.google.com") != 0}
             - tapOn:
-                id: "omnibarTextInput"
+                id: "omnibarTextInput|inputField"
             - eraseText
             # Test 2 - using paragraph-separator (U+2029) character
             - inputText: "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-basicauth-2029.html"
@@ -29,10 +29,10 @@ tags:
             - tapOn: "run"
             - assertVisible: "Example Domain"
             - copyTextFrom:
-                id: "omnibarTextInput"
+                id: "omnibarTextInput|inputField"
             - assertTrue: ${maestro.copiedText.indexOf("https://www.google.com") != 0}
             - tapOn:
-                id: "omnibarTextInput"
+                id: "omnibarTextInput|inputField"
             - eraseText
             # Test 3 - using repeated space character
             - inputText: "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-basicauth-whitespace.html"
@@ -40,5 +40,5 @@ tags:
             - tapOn: "run"
             - assertVisible: "Example Domain"
             - copyTextFrom:
-                id: "omnibarTextInput"
+                id: "omnibarTextInput|inputField"
             - assertTrue: ${maestro.copiedText.indexOf("https://www.google.com") != 0}
