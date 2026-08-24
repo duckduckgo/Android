@@ -29,7 +29,9 @@ import com.duckduckgo.promptscoordinator.api.ModalEvaluator
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -39,6 +41,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.Shadows.shadowOf
+import java.util.concurrent.TimeUnit
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
@@ -54,6 +57,9 @@ class CookiePopupOptInEvaluatorTest {
         onBlocking { isOnboardingComplete() } doReturn true
     }
     private val settingsRepository = FakeSettingsRepository()
+    private val onboardingFlowChecker: OnboardingFlowChecker = mock {
+        onBlocking { isOnboardingComplete() } doReturn true
+    }
 
     private val testee by lazy {
         CookiePopupOptInEvaluator(
@@ -64,6 +70,7 @@ class CookiePopupOptInEvaluatorTest {
             autoconsent = autoconsent,
             onboardingFlowChecker = onboardingFlowChecker,
             settingsRepository = settingsRepository,
+            onboardingFlowChecker = onboardingFlowChecker,
         )
     }
 
@@ -116,6 +123,28 @@ class CookiePopupOptInEvaluatorTest {
 
         assertEquals(ModalEvaluator.EvaluationResult.Skipped, testee.evaluate())
         assertNull(shadowOf(application).nextStartedActivity)
+    }
+
+    @Test
+    fun whenNothingLeftToOptInToThenChoiceRecorded() = runTest {
+        feature.cookiePopUpOptInPrompt().setRawStoredState(Toggle.State(enable = true))
+        whenever(autoconsent.isSettingEnabled()).thenReturn(true)
+        whenever(autoconsent.isClickAcceptEnabled()).thenReturn(true)
+
+        testee.evaluate()
+
+        assertTrue(settingsRepository.optInPromptChoiceMade)
+    }
+
+    @Test
+    fun whenProtectionOnButClickAcceptOffThenChoiceNotRecorded() = runTest {
+        feature.cookiePopUpOptInPrompt().setRawStoredState(Toggle.State(enable = true))
+        whenever(autoconsent.isSettingEnabled()).thenReturn(true)
+        whenever(autoconsent.isClickAcceptEnabled()).thenReturn(false)
+
+        testee.evaluate()
+
+        assertFalse(settingsRepository.optInPromptChoiceMade)
     }
 
     @Test
@@ -175,6 +204,32 @@ class CookiePopupOptInEvaluatorTest {
     }
 
     @Test
+    fun whenOnboardingNotCompleteThenSkippedAndNothingLaunched() = runTest {
+        feature.cookiePopUpOptInPrompt().setRawStoredState(Toggle.State(enable = true))
+        whenever(onboardingFlowChecker.isOnboardingComplete()).thenReturn(false)
+
+        assertEquals(ModalEvaluator.EvaluationResult.Skipped, testee.evaluate())
+        assertNull(shadowOf(application).nextStartedActivity)
+    }
+
+    @Test
+    fun whenInstalledLessThanTwoDaysAgoThenSkippedAndNothingLaunched() = runTest {
+        feature.cookiePopUpOptInPrompt().setRawStoredState(Toggle.State(enable = true))
+        setDaysSinceInstall(1)
+
+        assertEquals(ModalEvaluator.EvaluationResult.Skipped, testee.evaluate())
+        assertNull(shadowOf(application).nextStartedActivity)
+    }
+
+    @Test
+    fun whenInstalledTwoDaysAgoThenModalShown() = runTest {
+        feature.cookiePopUpOptInPrompt().setRawStoredState(Toggle.State(enable = true))
+        setDaysSinceInstall(2)
+
+        assertEquals(ModalEvaluator.EvaluationResult.ModalShown, testee.evaluate())
+    }
+
+    @Test
     fun whenAlreadyShownThreeTimesThenSkippedAndNothingLaunched() = runTest {
         feature.cookiePopUpOptInPrompt().setRawStoredState(Toggle.State(enable = true))
         settingsRepository.optInPromptShownCount = 3
@@ -182,5 +237,11 @@ class CookiePopupOptInEvaluatorTest {
         assertEquals(ModalEvaluator.EvaluationResult.Skipped, testee.evaluate())
         assertNull(shadowOf(application).nextStartedActivity)
         assertEquals(3, settingsRepository.optInPromptShownCount)
+    }
+
+    private fun setDaysSinceInstall(days: Long) {
+        shadowOf(application.packageManager)
+            .getInternalMutablePackageInfo(application.packageName)
+            .firstInstallTime = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(days)
     }
 }

@@ -34,6 +34,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @ContributesMultibinding(
@@ -64,8 +65,12 @@ class CookiePopupOptInEvaluator @Inject constructor(
             return@withContext ModalEvaluator.EvaluationResult.Skipped
         }
 
+        if (daysSinceInstall() < MIN_DAYS_SINCE_INSTALL) {
+            return@withContext ModalEvaluator.EvaluationResult.Skipped
+        }
+
         if (autoconsent.isSettingEnabled() && autoconsent.isClickAcceptEnabled()) {
-            // TODO: (cbarreiro) mark not show again
+            settingsRepository.optInPromptChoiceMade = true
             return@withContext ModalEvaluator.EvaluationResult.Skipped
         }
 
@@ -91,8 +96,16 @@ class CookiePopupOptInEvaluator @Inject constructor(
         return@withContext ModalEvaluator.EvaluationResult.ModalShown
     }
 
+    private fun daysSinceInstall(): Long {
+        val firstInstallTime = applicationContext.packageManager
+            .getPackageInfo(applicationContext.packageName, 0)
+            .firstInstallTime
+        return TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis() - firstInstallTime)
+    }
+
     companion object {
         private const val MODAL_DISPLAY_DELAY = 250L
+        private const val MIN_DAYS_SINCE_INSTALL = 2
         private const val MAX_PROMPT_DISPLAYS = 3
     }
 }
