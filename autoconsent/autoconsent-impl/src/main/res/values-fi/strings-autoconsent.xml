@@ -25,4 +25,12 @@
     <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[DuckDuckGo voi hallinnoida evästeponnahdusikkunoita automaattisesti yksityisyyden maksimoimiseksi ja evästeiden minimoimiseksi ennen kuin edes näet niitä.\n<a href=\"\">Lue lisää</a>]]></string>
     <string name="autoconsentPopUpsWithoutOptOutsToggle">Hyväksy evästeet, joita ei voi hylätä</string>
     <string name="autoconsentPopUpsWithoutOptOutsDescription">Jos hylkäämisvaihtoehtoa ei ole, säästämme sinulta yhden klikkauksen, hyväksymme nämä evästeet puolestasi ja suljemme ponnahdusikkunat.</string>
+    <string name="autoconsentPromptTitle">Oletko kyllästynyt evästeiden ponnahdusikkunoihin?</string>
+    <string name="autoconsentPromptFootnote">Voit muuttaa tätä myöhemmin asetuksissa.</string>
+    <string name="autoconsentPromptCpmOnMessage">Joitakin evästeitä ei voi hylätä. Voimme hyväksyä nämä puolestasi.</string>
+    <string name="autoconsentPromptCpmOnPrimaryButton">Hyväksy evästeet puolestani</string>
+    <string name="autoconsentPromptCpmOnSecondaryButton">Hyväksyn ne itse</string>
+    <string name="autoconsentPromptCpmOffMessage">Hoidamme ne puolestasi. Hylkäämme evästeet mahdollisuuksien mukaan ja hyväksymme ne, joita ei voi hylätä.</string>
+    <string name="autoconsentPromptCpmOffPrimaryButton">Hylkää, jos mahdollista, tai hyväksy puolestani</string>
+    <string name="autoconsentPromptCpmOffSecondaryButton">Hoidan ne itse</string>
 </resources>

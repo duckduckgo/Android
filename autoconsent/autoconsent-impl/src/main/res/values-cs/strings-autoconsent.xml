@@ -25,4 +25,12 @@
     <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[DuckDuckGo může automaticky spravovat vyskakovací okna ohledně souborů cookie tak, aby zajistilo maximální ochranu soukromí a co nejméně souborů cookie, ještě než je vůbec uvidíš.\n<a href=\"\">Další informace</a>]]></string>
     <string name="autoconsentPopUpsWithoutOptOutsToggle">Přijímat cookies, které nelze odmítnout</string>
     <string name="autoconsentPopUpsWithoutOptOutsDescription">Pokud možnost odmítnutí není k dispozici, ušetříme ti klikání, tyto cookies za tebe přijmeme a vyskakovací okna zavřeme.</string>
+    <string name="autoconsentPromptTitle">Už tě nebaví vyskakovací okna o cookies?</string>
+    <string name="autoconsentPromptFootnote">Později to můžeš kdykoli upravit v Nastavení.</string>
+    <string name="autoconsentPromptCpmOnMessage">Některé cookies nelze odmítnout. Můžeme je přijmout za tebe.</string>
+    <string name="autoconsentPromptCpmOnPrimaryButton">Přijímat cookies za mě</string>
+    <string name="autoconsentPromptCpmOnSecondaryButton">Budu je přijímat já</string>
+    <string name="autoconsentPromptCpmOffMessage">Postaráme se o ně za tebe. Cookies budeme odmítat, kdykoli to půjde, a když to nepůjde, přijmeme je.</string>
+    <string name="autoconsentPromptCpmOffPrimaryButton">Pokud možno odmítat, případně odsouhlasovat za mě</string>
+    <string name="autoconsentPromptCpmOffSecondaryButton">Budu je řešit já</string>
 </resources>
