@@ -39,6 +39,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import logcat.logcat
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
@@ -381,10 +382,10 @@ class RealPageLoadWideEvent @Inject constructor(
         if (state.isStale()) return null
         return state
     }
-    private suspend fun isFeatureEnabled(): Boolean = true
-    //     private suspend fun isFeatureEnabled(): Boolean = withContext(dispatchers.io()) {
-    //     androidBrowserConfigFeature.get().sendPageLoadWideEvent().isEnabled()
-    // }
+
+    private suspend fun isFeatureEnabled(): Boolean = withContext(dispatchers.io()) {
+        androidBrowserConfigFeature.get().sendPageLoadWideEvent().isEnabled()
+    }
 
     private inner class PageLoadState(
         val flowId: Long,
