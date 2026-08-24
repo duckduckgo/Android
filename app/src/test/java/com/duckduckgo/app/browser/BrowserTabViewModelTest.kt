@@ -154,7 +154,6 @@ import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.browser.trafficquality.AndroidFeaturesHeaderPlugin.Companion.X_DUCKDUCKGO_ANDROID_HEADER
 import com.duckduckgo.app.browser.uilock.BROWSER_UI_LOCK_FEATURE_NAME
-import com.duckduckgo.app.browser.uilock.BrowserUiLockFeature
 import com.duckduckgo.app.browser.urldisplay.UrlDisplayRepository
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.app.browser.viewstate.CtaViewState
@@ -724,7 +723,6 @@ class BrowserTabViewModelTest {
 
     private lateinit var fakeContentScopeScriptsSubscriptionEventPluginPoint: FakeContentScopeScriptsSubscriptionEventPluginPoint
     private var serpSettingsFeature = FakeFeatureToggleFactory.create(SerpSettingsFeature::class.java)
-    private var fakeBrowserUiLockFeature = FakeFeatureToggleFactory.create(BrowserUiLockFeature::class.java)
     private var fakeFaviconFetchingFixFeature = FakeFeatureToggleFactory.create(FaviconFetchingFixFeature::class.java)
     private var fakeProgressBarUpgradeFeature = FakeFeatureToggleFactory.create(ProgressBarUpgradeFeature::class.java)
     private val fakeAutocompleteHistoryDeleteFeature = FakeFeatureToggleFactory.create(AutocompleteHistoryDeleteFeature::class.java)
@@ -1052,7 +1050,6 @@ class BrowserTabViewModelTest {
                 tabVisitedSitesRepository = mockTabVisitedSitesRepository,
                 pageLoadWideEvent = mockPageLoadWideEvent,
                 queryUrlPredictor = mockQueryUrlPredictor,
-                browserUiLockFeature = fakeBrowserUiLockFeature,
                 progressBarUpgradeFeature = fakeProgressBarUpgradeFeature,
                 faviconFetchingFixFeature = fakeFaviconFetchingFixFeature,
                 ntpAfterIdleManager = mockNtpAfterIdleManager,
@@ -7363,9 +7360,8 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenProcessJsCallbackMessageUiLockChangedAndFeatureEnabledThenSendCommand() =
+    fun whenProcessJsCallbackMessageUiLockChangedThenSendCommand() =
         runTest {
-            fakeBrowserUiLockFeature.self().setRawStoredState(State(enable = true))
             testee.processJsCallbackMessage(
                 BROWSER_UI_LOCK_FEATURE_NAME,
                 "uiLockChanged",
@@ -7381,9 +7377,8 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenProcessJsCallbackMessageUiLockChangedUnlockedAndFeatureEnabledThenSendCommand() =
+    fun whenProcessJsCallbackMessageUiLockChangedUnlockedThenSendCommand() =
         runTest {
-            fakeBrowserUiLockFeature.self().setRawStoredState(State(enable = true))
             testee.processJsCallbackMessage(
                 BROWSER_UI_LOCK_FEATURE_NAME,
                 "uiLockChanged",
@@ -7399,25 +7394,8 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenProcessJsCallbackMessageUiLockChangedAndFeatureDisabledThenDoNotSendCommand() =
-        runTest {
-            fakeBrowserUiLockFeature.self().setRawStoredState(State(enable = false))
-            testee.processJsCallbackMessage(
-                BROWSER_UI_LOCK_FEATURE_NAME,
-                "uiLockChanged",
-                null,
-                JSONObject("""{ "locked": true }"""),
-                false,
-                null,
-                { "someUrl" },
-            )
-            assertCommandNotIssued<Command.UiLockChanged>()
-        }
-
-    @Test
     fun whenProcessJsCallbackMessageUiLockChangedWithNullDataThenDefaultsToUnlocked() =
         runTest {
-            fakeBrowserUiLockFeature.self().setRawStoredState(State(enable = true))
             testee.processJsCallbackMessage(
                 BROWSER_UI_LOCK_FEATURE_NAME,
                 "uiLockChanged",
@@ -7435,7 +7413,6 @@ class BrowserTabViewModelTest {
     @Test
     fun whenProcessJsCallbackMessageUiLockChangedWithMissingLockedFieldThenDefaultsToUnlocked() =
         runTest {
-            fakeBrowserUiLockFeature.self().setRawStoredState(State(enable = true))
             testee.processJsCallbackMessage(
                 BROWSER_UI_LOCK_FEATURE_NAME,
                 "uiLockChanged",
@@ -7453,7 +7430,6 @@ class BrowserTabViewModelTest {
     @Test
     fun whenProcessJsCallbackMessageWithUnknownMethodForUiLockThenDoNotSendCommand() =
         runTest {
-            fakeBrowserUiLockFeature.self().setRawStoredState(State(enable = true))
             testee.processJsCallbackMessage(
                 BROWSER_UI_LOCK_FEATURE_NAME,
                 "unknownMethod",

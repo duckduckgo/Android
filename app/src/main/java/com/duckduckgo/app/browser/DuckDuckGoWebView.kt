@@ -44,7 +44,6 @@ import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewCompat.WebMessageListener
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
-import com.duckduckgo.app.browser.uilock.BrowserUiLockFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import dagger.android.support.AndroidSupportInjection
@@ -87,9 +86,6 @@ class DuckDuckGoWebView :
 
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
-
-    @Inject
-    lateinit var browserUiLockFeature: BrowserUiLockFeature
 
     constructor(context: Context) : this(context, null)
     constructor(
@@ -479,9 +475,7 @@ class DuckDuckGoWebView :
 
     internal fun setContentAllowsSwipeToRefresh(allowed: Boolean) {
         contentAllowsSwipeToRefresh = allowed
-        if (!allowed || (::browserUiLockFeature.isInitialized && browserUiLockFeature.self().isEnabled())) {
-            enableSwipeRefresh(allowed)
-        }
+        enableSwipeRefresh(allowed)
     }
 
     fun isDestroyed(): Boolean = isDestroyed

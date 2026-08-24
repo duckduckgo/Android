@@ -226,7 +226,6 @@ import com.duckduckgo.app.browser.santize.NonHttpAppLinkChecker
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.browser.uilock.BROWSER_UI_LOCK_FEATURE_NAME
-import com.duckduckgo.app.browser.uilock.BrowserUiLockFeature
 import com.duckduckgo.app.browser.urldisplay.UrlDisplayRepository
 import com.duckduckgo.app.browser.urlextraction.UrlExtractionListener
 import com.duckduckgo.app.browser.viewstate.AccessibilityViewState
@@ -576,7 +575,6 @@ class BrowserTabViewModel @Inject constructor(
     private val tabVisitedSitesRepository: TabVisitedSitesRepository,
     private val pageLoadWideEvent: PageLoadWideEvent,
     private val queryUrlPredictor: QueryUrlPredictor,
-    private val browserUiLockFeature: BrowserUiLockFeature,
     private val progressBarUpgradeFeature: ProgressBarUpgradeFeature,
     private val faviconFetchingFixFeature: FaviconFetchingFixFeature,
     private val ntpAfterIdleManager: NtpAfterIdleManager,
@@ -5247,10 +5245,8 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun uiLockChanged(locked: Boolean) {
-        if (browserUiLockFeature.self().isEnabled()) {
-            viewModelScope.launch(dispatchers.main()) {
-                command.value = UiLockChanged(locked)
-            }
+        viewModelScope.launch(dispatchers.main()) {
+            command.value = UiLockChanged(locked)
         }
     }
 
