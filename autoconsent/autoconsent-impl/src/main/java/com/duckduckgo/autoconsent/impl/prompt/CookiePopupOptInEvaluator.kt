@@ -69,6 +69,10 @@ class CookiePopupOptInEvaluator @Inject constructor(
             return@withContext ModalEvaluator.EvaluationResult.Skipped
         }
 
+        if (settingsRepository.optInPromptChoiceMade) {
+            return@withContext ModalEvaluator.EvaluationResult.Skipped
+        }
+
         if (settingsRepository.optInPromptShownCount >= MAX_PROMPT_DISPLAYS) {
             return@withContext ModalEvaluator.EvaluationResult.Skipped
         }

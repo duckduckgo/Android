@@ -20,6 +20,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.autoconsent.api.Autoconsent
+import com.duckduckgo.autoconsent.impl.store.AutoconsentSettingsRepository
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -28,11 +30,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class CookiePopupOptInViewModel @Inject constructor(
     private val autoconsent: Autoconsent,
+    private val settingsRepository: AutoconsentSettingsRepository,
+    private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
 
     /**
@@ -60,15 +65,24 @@ class CookiePopupOptInViewModel @Inject constructor(
 
     fun onAcceptClicked() {
         viewModelScope.launch {
-            if (viewStateFlow.value.variant == Variant.PROTECTION_OFF) {
-                autoconsent.changeSetting(true)
+            // All three land in SharedPreferences with a synchronous commit, so they stay off the main thread.
+            withContext(dispatchers.io()) {
+                if (viewStateFlow.value.variant == Variant.PROTECTION_OFF) {
+                    autoconsent.changeSetting(true)
+                }
+                autoconsent.changeClickAcceptEnabled(true)
+                settingsRepository.optInPromptChoiceMade = true
             }
-            autoconsent.changeClickAcceptEnabled(true)
             command.send(Command.Close)
         }
     }
 
     fun onDeclineClicked() {
-        viewModelScope.launch { command.send(Command.Close) }
+        viewModelScope.launch {
+            withContext(dispatchers.io()) {
+                settingsRepository.optInPromptChoiceMade = true
+            }
+            command.send(Command.Close)
+        }
     }
 }

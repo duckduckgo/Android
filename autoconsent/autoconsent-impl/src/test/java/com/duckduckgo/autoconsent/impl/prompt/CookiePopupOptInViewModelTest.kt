@@ -18,12 +18,15 @@ package com.duckduckgo.autoconsent.impl.prompt
 
 import app.cash.turbine.test
 import com.duckduckgo.autoconsent.api.Autoconsent
+import com.duckduckgo.autoconsent.impl.FakeSettingsRepository
 import com.duckduckgo.autoconsent.impl.prompt.CookiePopupOptInViewModel.Command
 import com.duckduckgo.autoconsent.impl.prompt.CookiePopupOptInViewModel.Variant
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -38,8 +41,11 @@ class CookiePopupOptInViewModelTest {
     val coroutineRule = CoroutineTestRule()
 
     private val autoconsent: Autoconsent = mock()
+    private val settingsRepository = FakeSettingsRepository()
 
-    private val testee by lazy { CookiePopupOptInViewModel(autoconsent) }
+    private val testee by lazy {
+        CookiePopupOptInViewModel(autoconsent, settingsRepository, coroutineRule.testDispatcherProvider)
+    }
 
     @Test
     fun whenProtectionAlreadyEnabledThenProtectionOnVariant() {
@@ -101,5 +107,24 @@ class CookiePopupOptInViewModelTest {
             assertEquals(Command.Close, awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenAcceptedThenChoiceRecorded() = runTest {
+        testee.onAcceptClicked()
+
+        assertTrue(settingsRepository.optInPromptChoiceMade)
+    }
+
+    @Test
+    fun whenDeclinedThenChoiceRecorded() = runTest {
+        testee.onDeclineClicked()
+
+        assertTrue(settingsRepository.optInPromptChoiceMade)
+    }
+
+    @Test
+    fun whenNoChoiceMadeYetThenNotRecorded() {
+        assertFalse(settingsRepository.optInPromptChoiceMade)
     }
 }

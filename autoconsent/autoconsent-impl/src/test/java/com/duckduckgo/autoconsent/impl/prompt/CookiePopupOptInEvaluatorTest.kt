@@ -155,6 +155,26 @@ class CookiePopupOptInEvaluatorTest {
     }
 
     @Test
+    fun whenChoiceAlreadyMadeThenSkippedAndNothingLaunched() = runTest {
+        feature.cookiePopUpOptInPrompt().setRawStoredState(Toggle.State(enable = true))
+        settingsRepository.optInPromptChoiceMade = true
+
+        assertEquals(ModalEvaluator.EvaluationResult.Skipped, testee.evaluate())
+        assertNull(shadowOf(application).nextStartedActivity)
+    }
+
+    @Test
+    fun whenChoiceAlreadyMadeThenShownCountNotIncremented() = runTest {
+        feature.cookiePopUpOptInPrompt().setRawStoredState(Toggle.State(enable = true))
+        settingsRepository.optInPromptChoiceMade = true
+        settingsRepository.optInPromptShownCount = 1
+
+        testee.evaluate()
+
+        assertEquals(1, settingsRepository.optInPromptShownCount)
+    }
+
+    @Test
     fun whenAlreadyShownThreeTimesThenSkippedAndNothingLaunched() = runTest {
         feature.cookiePopUpOptInPrompt().setRawStoredState(Toggle.State(enable = true))
         settingsRepository.optInPromptShownCount = 3
