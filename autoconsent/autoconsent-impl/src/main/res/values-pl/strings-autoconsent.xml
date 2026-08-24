@@ -25,4 +25,12 @@
     <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[DuckDuckGo może automatycznie zarządzać wyskakującymi okienkami dotyczącymi plików cookie, aby lepiej chronić Twoją prywatność i ograniczyć liczbę plików cookie, zanim okienka w ogóle się wyświetlą.\n<a href=\"\">Dowiedz się więcej</a>]]></string>
     <string name="autoconsentPopUpsWithoutOptOutsToggle">Akceptuj pliki cookie, których nie można odrzucić</string>
     <string name="autoconsentPopUpsWithoutOptOutsDescription">Jeśli nie będzie opcji odrzucenia plików cookie, zaoszczędzimy Ci klikania, akceptując je za Ciebie i zamykając wyskakujące okienka.</string>
+    <string name="autoconsentPromptTitle">Masz dość wyskakujących okienek z informacją o plikach cookie?</string>
+    <string name="autoconsentPromptFootnote">Możesz to zawsze później zmienić w Ustawieniach.</string>
+    <string name="autoconsentPromptCpmOnMessage">Niektórych plików cookie nie można odrzucić. Możemy zaakceptować je za Ciebie.</string>
+    <string name="autoconsentPromptCpmOnPrimaryButton">Akceptuj za mnie pliki cookie</string>
+    <string name="autoconsentPromptCpmOnSecondaryButton">Będę je akceptować samodzielnie</string>
+    <string name="autoconsentPromptCpmOffMessage">Zajmiemy się nimi za Ciebie. Odrzucimy pliki cookie, gdy będzie to możliwe, a zaakceptujemy te, których nie można odrzucić.</string>
+    <string name="autoconsentPromptCpmOffPrimaryButton">Odrzucaj, gdy to możliwe, lub akceptuj za mnie</string>
+    <string name="autoconsentPromptCpmOffSecondaryButton">Zajmę się nimi samodzielnie</string>
 </resources>
