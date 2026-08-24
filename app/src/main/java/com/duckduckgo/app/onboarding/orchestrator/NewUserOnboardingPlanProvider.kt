@@ -860,10 +860,10 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                     event is NewUserOnboardingEvent.QuickSetupConfirmed -> {
                         val resolved = resolveOmnibarType(event.type)
                         settingsDataStore.omnibarType = resolved
-                        applyInputModeSelection(ctx, event.withAi, fireTelemetry = false)
                         if (forceWithAiInput) {
                             duckChat.setInputScreenUserSetting(true)
                         }
+                        applyInputModeSelection(ctx, forceWithAiInput || event.withAi, fireTelemetry = false)
                         onboardingPixelSender.fire(
                             pixelName,
                             OnboardingPixelAction.QuickSetupClicked(

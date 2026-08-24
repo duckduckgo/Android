@@ -77,6 +77,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -495,6 +496,36 @@ class NewUserOnboardingPlanProviderTest {
             OnboardingPixelAction.QuickSetupClicked(
                 addressBarPosition = OmnibarType.SINGLE_TOP,
                 inputScreenSelected = true,
+            ),
+        )
+        assertEquals(Skipped(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID), orchestrator.state.value)
+    }
+
+    @Test
+    fun `when custom ai path and quick setup confirmed without ai then the recorded selection still matches the forced setting`() = runTest {
+        whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
+        whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        orchestrator.onEvent(NewUserOnboardingEvent.SkipRequested)
+        assertStep(NewUserOnboardingStepIds.QUICK_SETUP)
+
+        orchestrator.onEvent(NewUserOnboardingEvent.QuickSetupConfirmed(OmnibarType.SINGLE_TOP, withAi = false))
+
+        // The flow forces the input screen on regardless of the toggle, so the cosmetic setting and the
+        // recorded selection have to agree with it instead of with the toggle.
+        verify(duckChat).setInputScreenUserSetting(true)
+        verify(duckChat, atLeastOnce()).setCosmeticInputScreenUserSetting(true)
+        verify(duckChat, never()).setCosmeticInputScreenUserSetting(false)
+        verify(onboardingStore, atLeastOnce()).storeInputScreenSelection(true)
+        verify(onboardingStore, never()).storeInputScreenSelection(false)
+        // The pixel still reports what the user actually chose.
+        verify(onboardingPixelSender).fire(
+            ONBOARDING_QUICK_SETUP,
+            OnboardingPixelAction.QuickSetupClicked(
+                addressBarPosition = OmnibarType.SINGLE_TOP,
+                inputScreenSelected = false,
             ),
         )
         assertEquals(Skipped(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID), orchestrator.state.value)
