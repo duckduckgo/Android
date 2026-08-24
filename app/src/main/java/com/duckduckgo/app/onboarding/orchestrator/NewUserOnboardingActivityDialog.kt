@@ -18,6 +18,7 @@ package com.duckduckgo.app.onboarding.orchestrator
 
 import androidx.annotation.StringRes
 import com.duckduckgo.app.onboarding.OnboardingPreference
+import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanProvider.OnboardingSingleChoiceDataPlugin.Option
 import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
 
 /**
@@ -61,4 +62,12 @@ sealed interface NewUserOnboardingActivityDialog {
 
     /** [initialSelections] holds only the preferences to offer, in row order, each against the value to start from. */
     data class PreferenceSelector(val initialSelections: Map<OnboardingPreference, Boolean>) : NewUserOnboardingActivityDialog
+
+    data class SingleChoice(
+        @field:StringRes val title: Int,
+        @field:StringRes val body: Int,
+        val options: List<Option>,
+    ) : NewUserOnboardingActivityDialog
+
+    data object TogglePosition : NewUserOnboardingActivityDialog
 }

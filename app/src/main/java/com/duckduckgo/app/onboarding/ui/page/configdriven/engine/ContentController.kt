@@ -32,6 +32,8 @@ import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.InputScreenBin
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.InputScreenPreviewBinder
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.PreferenceSelectorBinder
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.QuickSetupBinder
+import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.SingleChoiceBinder
+import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.TogglePositionBinder
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.WelcomeBinder
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.WidgetPromptBinder
 import com.duckduckgo.onboarding.api.LinearOnboardingStepId
@@ -64,6 +66,8 @@ class ContentControllerImpl(
     private val widgetPrompt = WidgetPromptBinder(binding.widgetPromptContent)
     private val downloadReason = DownloadReasonBinder(binding.downloadReasonContent)
     private val preferenceSelector = PreferenceSelectorBinder(binding.preferenceSelectorContent)
+    private val singlePreference = SingleChoiceBinder(binding.singleChoiceContent)
+    private val togglePosition = TogglePositionBinder(binding.togglePositionContent, isLightMode)
 
     private var boundView: View? = null
 
@@ -123,6 +127,14 @@ class ContentControllerImpl(
             is ContentConfig.PreferenceSelector -> {
                 boundView = preferenceSelector.view
                 preferenceSelector.bind(content, contentValues.contentState(stepId, content), scope)
+            }
+            is ContentConfig.SingleChoice -> {
+                boundView = singlePreference.view
+                singlePreference.bind(content, contentValues.contentState(stepId, content), scope)
+            }
+            is ContentConfig.TogglePosition -> {
+                boundView = togglePosition.view
+                togglePosition.bind(content, scope)
             }
         }
         boundView?.isVisible = true

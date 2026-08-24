@@ -56,4 +56,9 @@ sealed interface NewUserOnboardingEvent : LinearOnboardingEvent {
     data class AddWidgetFinished(val widgetAdded: Boolean) : NewUserOnboardingEvent
 
     data class PreferenceSelectorConfirmed(val selections: Map<OnboardingPreference, Boolean>) : NewUserOnboardingEvent
+
+    data class SingleChoiceConfirmed(val selectedId: String) : NewUserOnboardingEvent
+
+    data object TogglePositionOpenDuckAiConfirmed : NewUserOnboardingEvent
+    data object TogglePositionNotNowClicked : NewUserOnboardingEvent
 }

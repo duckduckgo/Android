@@ -63,19 +63,25 @@
     <string name="downloadReasonPrimaryCta">Next</string>
 
     <string name="searchPathComparisonChartTitle"><![CDATA[You\'re in the right place!<br/>Protections activated.]]></string>
-
     <string name="searchPathPreferenceSelectorTitle">Your search, your way.</string>
     <string name="searchPathPreferenceHistoryPrimary">Search History</string>
     <string name="searchPathPreferenceHistorySecondary">Show recently visited sites in search suggestions. Private, only on your device.</string>
     <string name="searchPathPreferenceSafePrimary">Safe Search</string>
     <string name="searchPathPreferenceSafeSecondary">Omit questionable (mostly adult) material in results.</string>
-
     <string name="searchPathInputPreviewTitle">Now, try a private search!</string>
-
     <string name="searchPathWithToggleEnabledContextualEndTitle">Chat privately with popular AIs in Duck.ai</string>
     <string name="searchPathWithToggleEnabledContextualEndDescription">Chats are anonymized, no account required. And it’s free!</string>
     <string name="searchPathWithToggleEnabledContextualEndPrimaryCta">Try Duck.ai</string>
     <string name="searchPathWithToggleEnabledContextualEndSecondaryCta">Skip</string>
+
+    <string name="aiPathComparisonChartTitle"><![CDATA[You\'re in the right place!<br/>Protections activated.]]></string>
+    <string name="aiPathComparisonChartItem5">Search the web privately with trackers blocked</string>
+    <string name="aiPathModelChoiceTitle">Your chats, your way.</string>
+    <string name="aiPathModelChoiceBody">Change your default AI now, or anytime during chat.</string>
+    <string name="aiPathTogglePositionTitle">Want new tabs to open with AI chat?</string>
+    <string name="aiPathTogglePositionPictogramCaption">You can switch to Search with one tap</string>
+    <string name="aiPathTogglePositionPictogramPrimaryCta">Open tabs with AI chat</string>
+    <string name="aiPathTogglePositionPictogramSecondaryCta">Not Now</string>
 
     <!-- Browser tab -->
     <string name="browserDuckPlayerShortUrl">Duck Player</string>

@@ -472,6 +472,8 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
             is NewUserOnboardingActivityDialog.InputScreenPreview,
             is NewUserOnboardingActivityDialog.QuickSetup,
             is NewUserOnboardingActivityDialog.PreferenceSelector,
+            is NewUserOnboardingActivityDialog.SingleChoice,
+            is NewUserOnboardingActivityDialog.TogglePosition,
             -> Unit
         }
     }

@@ -45,6 +45,21 @@ class ContentConfigTest {
     }
 
     @Test
+    fun `single preference seeds its state from the configured initial selection`() {
+        val content = ContentConfig.SingleChoice(
+            title = TextConfig.Literal("title"),
+            body = TextConfig.Literal("body"),
+            rows = listOf(
+                ContentConfig.SingleChoice.Row(id = "first", iconRes = 1, primaryText = TextConfig.Literal("first")),
+                ContentConfig.SingleChoice.Row(id = "second", iconRes = 2, primaryText = TextConfig.Literal("second")),
+            ),
+            initialSelectionId = "second",
+        )
+
+        assertEquals(SinglePreferenceContentState(selectedId = "second"), content.initialState())
+    }
+
+    @Test
     fun `configs with the same values are equal`() {
         val config = ComparisonChartConfig.Browser(isCustomAiCopy = false)
         val first = ContentConfig.ComparisonChart(title = TextConfig.Resource(1), config = config)

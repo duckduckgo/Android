@@ -235,12 +235,37 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
-    fun `when a not yet implemented download reason is confirmed then stays`() = runTest {
+    fun `when the ai download reason is confirmed then switches to the segmented ai plan`() = runTest {
         startSegmentedAtDownloadReason()
 
         orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.AI_CHAT))
 
-        assertStep(NewUserOnboardingStepIds.DOWNLOAD_REASON)
+        assertStep(NewUserOnboardingStepIds.COMPARISON_CHART)
+    }
+
+    @Test
+    fun `when the segmented ai path preview is submitted then completes with the chat prompt`() = runTest {
+        startSegmentedAtDownloadReason()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.AI_CHAT))
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked) // comparison_chart
+        orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
+        orchestrator.onEvent(NewUserOnboardingEvent.SingleChoiceConfirmed(selectedId = "openai"))
+        orchestrator.onEvent(NewUserOnboardingEvent.TogglePositionOpenDuckAiConfirmed)
+        orchestrator.onEvent(NewUserOnboardingEvent.AddressBarConfirmed(OmnibarType.SINGLE_TOP))
+        assertStep(NewUserOnboardingStepIds.INPUT_SCREEN_PREVIEW)
+
+        orchestrator.onEvent(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "why is privacy hard", isChat = true, fromSuggestion = false))
+
+        // The AI path has no duck_ai_demo step yet, so it ends the same way the default plan does on a chat
+        // query: onboarding finishes and the prompt is handed to Duck.ai.
+        assertEquals(
+            Completed(
+                rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID,
+                result = NewUserOnboardingResult.LaunchChat(prompt = "why is privacy hard"),
+            ),
+            orchestrator.state.value,
+        )
     }
 
     @Test

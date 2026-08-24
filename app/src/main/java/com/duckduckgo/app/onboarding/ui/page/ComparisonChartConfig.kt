@@ -62,7 +62,7 @@ sealed class ComparisonChartConfig(
         rows = listOf(
             Row(CommonR.drawable.ic_shield_color_24_rebrand, R.string.preOnboardingAiComparisonChartItem1),
             Row(CommonR.drawable.ic_duck_ai_color_24_rebrand, R.string.preOnboardingAiComparisonChartItem2),
-            Row(CommonR.drawable.ic_lock_color_24_rebrand, R.string.preOnboardingAiComparisonChartItem3),
+            Row(CommonR.drawable.lock_color_24, R.string.preOnboardingAiComparisonChartItem3),
             Row(CommonR.drawable.ic_ai_general_color_24, R.string.preOnboardingAiComparisonChartItem4),
         ),
     )
@@ -79,6 +79,21 @@ sealed class ComparisonChartConfig(
             Row(CommonR.drawable.fire_color_24, R.string.preOnboardingComparisonChartItem5),
             Row(CommonR.drawable.ai_chat_color_24, R.string.preOnboardingComparisonChartDuckAi),
             Row(CommonR.drawable.ads_blocked_color_24, R.string.preOnboardingComparisonChartAdAndCookiePopupBlocker),
+        ),
+    )
+
+    data object SegmentedAiPath : ComparisonChartConfig(
+        titleRes = R.string.aiPathComparisonChartTitle,
+        primaryCtaTextRes = R.string.preOnboardingDaxDialog2Button,
+        headerLeftIconRes = CommonR.drawable.ic_ai_general_16,
+        headerLeftIconSizeDp = 18f,
+        headerLeftLabelRes = R.string.preOnboardingAiComparisonChartPopularAis,
+        rows = listOf(
+            Row(CommonR.drawable.mask_color_24, R.string.preOnboardingAiComparisonChartItem1),
+            Row(CommonR.drawable.ai_chat_color_24, R.string.preOnboardingAiComparisonChartItem2),
+            Row(CommonR.drawable.lock_color_24, R.string.preOnboardingAiComparisonChartItem3),
+            Row(CommonR.drawable.ai_general_color_24, R.string.preOnboardingAiComparisonChartItem4),
+            Row(CommonR.drawable.shield_color_24, R.string.aiPathComparisonChartItem5),
         ),
     )
 }

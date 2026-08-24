@@ -117,6 +117,33 @@ sealed interface ContentConfig {
 
         override fun initialState() = PreferenceSelectorContentState(rows.associate { it.preference to it.initiallyEnabled })
     }
+
+    /**
+     * A row is keyed by an opaque id rather than an enum because no caller owns this screen's options yet.
+     * Swap the id type for that enum once one does.
+     */
+    data class SingleChoice(
+        override val title: TextConfig,
+        val body: TextConfig,
+        val rows: List<Row>,
+        val initialSelectionId: String,
+    ) : ContentConfig, Stateful<SinglePreferenceContentState> {
+
+        data class Row(
+            val id: String,
+            @field:DrawableRes val iconRes: Int,
+            val primaryText: TextConfig,
+        )
+
+        override fun initialState() = SinglePreferenceContentState(selectedId = initialSelectionId)
+    }
+
+    data class TogglePosition(
+        override val title: TextConfig,
+        @field:DrawableRes val pictogramLightRes: Int,
+        @field:DrawableRes val pictogramDarkRes: Int,
+        val pictogramCaption: TextConfig,
+    ) : ContentConfig
 }
 
 data class AddressBarContentState(val position: OmnibarType)
@@ -135,6 +162,8 @@ data class QuickSetupContentState(
 data class DownloadReasonContentState(val selection: DownloadReasonSelection?)
 
 data class PreferenceSelectorContentState(val enabled: Map<OnboardingPreference, Boolean>)
+
+data class SinglePreferenceContentState(val selectedId: String)
 
 enum class DownloadReasonSelection {
     SEARCH,
