@@ -65,4 +65,10 @@ interface AutoconsentFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun cookiePopUpPreferenceSetting(): Toggle
+
+    /**
+     * Gate for the Cookie Pop-up Protection opt-in prompt shown through the prompts coordinator.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun cookiePopUpOptInPrompt(): Toggle
 }

@@ -22,5 +22,9 @@
             android:exported="false"
             android:label="@string/autoconsentTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
+        <activity
+            android:name=".prompt.CookiePopupOptInActivity"
+            android:exported="false"
+            android:theme="@style/Theme.DuckDuckGo.CookiePopupOptIn" />
     </application>
 </manifest>
