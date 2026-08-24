@@ -215,6 +215,52 @@ class DuckChatContextualWebViewViewModelTest {
     }
 
     @Test
+    fun `native input auto-attach during hand-off does not add context to the first prompt`() = runTest {
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(true)
+        val prompt = NativeInputPrompt("hello", "model-1", "high", null, null, null)
+        whenever(contextualEntryPromptStore.consume("tab-1"))
+            .thenReturn(ContextualEntryPrompt("tab-1", prompt, serializedPageContext = null))
+        (duckChat as FakeDuckChat).nextUrl = "https://duckduckgo.com/?ia=chat"
+
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        testee.subscriptionEventDataFlow.test {
+            // The sheet's native input auto-attaches the page before the web app is ready...
+            testee.onPageContextReceived("tab-1", serializedPageData)
+            assertEquals("submitAIChatPageContext", awaitItem().subscriptionName)
+            assertTrue(testee.viewState.value.showContext)
+
+            // ...but the first prompt is frozen to the entry dialog's (empty) attachment, so it carries none.
+            testee.onWebAppReady()
+            val promptEvent = awaitItem()
+            assertEquals("submitAIChatNativePrompt", promptEvent.subscriptionName)
+            assertTrue(promptEvent.params.isNull("pageContext"))
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `first prompt from a with-context entry hand-off carries the entry page context`() = runTest {
+        val prompt = NativeInputPrompt("hello", "model-1", "high", null, null, null)
+        whenever(contextualEntryPromptStore.consume("tab-1"))
+            .thenReturn(ContextualEntryPrompt("tab-1", prompt, serializedPageContext = serializedPageData))
+        (duckChat as FakeDuckChat).nextUrl = "https://duckduckgo.com/?ia=chat"
+
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        testee.subscriptionEventDataFlow.test {
+            testee.onWebAppReady()
+
+            val promptEvent = awaitItem()
+            assertEquals("submitAIChatNativePrompt", promptEvent.subscriptionName)
+            assertEquals("Page Title", promptEvent.params.getJSONObject("pageContext").getString("title"))
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun `onNewChatRequestedFromPopup resets chat and hands off to the entry dialog`() = runTest {
         testee.onSheetOpened("tab-1")
 
