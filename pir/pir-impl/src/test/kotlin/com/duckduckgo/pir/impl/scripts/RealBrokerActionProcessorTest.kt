@@ -21,24 +21,14 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
+import com.duckduckgo.pir.impl.di.PirModule
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction
 import com.duckduckgo.pir.impl.scripts.models.PirError
 import com.duckduckgo.pir.impl.scripts.models.PirError.ActionError.JsActionFailed
-import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData
-import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData.SolveCaptcha
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData.UserProfile
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse
-import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ClickResponse
-import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ConditionResponse
-import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ExpectationResponse
-import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ExtractedResponse
-import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.FillFormResponse
-import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.GetCaptchaInfoResponse
-import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.NavigateResponse
-import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.SolveCaptchaResponse
+import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ExecuteScriptResponse
 import com.squareup.moshi.Moshi
-import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
@@ -57,37 +47,7 @@ import org.mockito.kotlin.whenever
 class RealBrokerActionProcessorTest {
     private lateinit var testee: RealBrokerActionProcessor
     private val mockJsMessaging: JsMessaging = mock()
-    private val moshi = Moshi.Builder()
-        .add(
-            PolymorphicJsonAdapterFactory.of(PirScriptRequestData::class.java, "data")
-                .withSubtype(SolveCaptcha::class.java, "solveCaptcha")
-                .withSubtype(UserProfile::class.java, "userProfile"),
-        )
-        .add(
-            PolymorphicJsonAdapterFactory.of(BrokerAction::class.java, "actionType")
-                .withSubtype(BrokerAction.Extract::class.java, "extract")
-                .withSubtype(BrokerAction.Expectation::class.java, "expectation")
-                .withSubtype(BrokerAction.Click::class.java, "click")
-                .withSubtype(BrokerAction.FillForm::class.java, "fillForm")
-                .withSubtype(BrokerAction.Navigate::class.java, "navigate")
-                .withSubtype(BrokerAction.GetCaptchaInfo::class.java, "getCaptchaInfo")
-                .withSubtype(BrokerAction.SolveCaptcha::class.java, "solveCaptcha")
-                .withSubtype(BrokerAction.EmailConfirmation::class.java, "emailConfirmation")
-                .withSubtype(BrokerAction.Condition::class.java, "condition"),
-        )
-        .add(
-            PolymorphicJsonAdapterFactory.of(PirSuccessResponse::class.java, "actionType")
-                .withSubtype(NavigateResponse::class.java, "navigate")
-                .withSubtype(ExtractedResponse::class.java, "extract")
-                .withSubtype(GetCaptchaInfoResponse::class.java, "getCaptchaInfo")
-                .withSubtype(SolveCaptchaResponse::class.java, "solveCaptcha")
-                .withSubtype(ClickResponse::class.java, "click")
-                .withSubtype(ExpectationResponse::class.java, "expectation")
-                .withSubtype(FillFormResponse::class.java, "fillForm")
-                .withSubtype(ConditionResponse::class.java, "condition"),
-        )
-        .add(KotlinJsonAdapterFactory())
-        .build()
+    private val moshi = PirModule().providePirMoshi(Moshi.Builder().build())
     private val mockWebView: WebView = mock()
     private val mockActionResultListener: BrokerActionProcessor.ActionResultListener = mock()
 
@@ -197,6 +157,36 @@ class RealBrokerActionProcessorTest {
             assertEquals(".city", it.getJSONObject("city").getString("selector"))
             assertEquals(".state", it.getJSONObject("state").getString("selector"))
         }
+    }
+
+    @Test
+    fun whenProcessJsCallbackWithExecuteScriptSuccessThenCallsOnSuccess() = runTest {
+        val callback = registerAndGetCallback()
+
+        val successJson = """
+            {
+                "result": {
+                    "success": {
+                        "actionID": "action-1",
+                        "actionType": "executeScript",
+                        "response": null
+                    }
+                }
+            }
+        """.trimIndent()
+
+        callback.process(
+            featureName = PIRScriptConstants.SCRIPT_FEATURE_NAME,
+            method = PIRScriptConstants.RECEIVED_METHOD_NAME_COMPLETED,
+            id = null,
+            data = JSONObject(successJson),
+        )
+
+        val successCaptor = argumentCaptor<PirSuccessResponse>()
+        verify(mockActionResultListener).onSuccess(successCaptor.capture())
+        assertTrue(successCaptor.firstValue is ExecuteScriptResponse)
+        assertEquals("action-1", successCaptor.firstValue.actionID)
+        assertEquals("executeScript", successCaptor.firstValue.actionType)
     }
 
     @Test

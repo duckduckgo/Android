@@ -19,6 +19,7 @@ package com.duckduckgo.pir.impl.scripts.models
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction.Click
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction.Condition
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction.EmailConfirmation
+import com.duckduckgo.pir.impl.scripts.models.BrokerAction.ExecuteScript
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction.Expectation
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction.Expectation.ExpectationSelector
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction.Extract
@@ -89,6 +90,11 @@ sealed class BrokerAction(
             val right: String,
         )
     }
+
+    data class ExecuteScript(
+        override val id: String,
+        val script: String,
+    ) : BrokerAction(id)
 
     data class Expectation(
         override val id: String,
@@ -178,6 +184,7 @@ fun BrokerAction.asActionType(): String {
         is Extract -> "extract"
         is Expectation -> "expectation"
         is Click -> "click"
+        is ExecuteScript -> "executeScript"
         is FillForm -> "fillForm"
         is GetCaptchaInfo -> "getCaptchaInfo"
         is SolveCaptcha -> "solveCaptcha"

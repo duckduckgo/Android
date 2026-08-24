@@ -42,6 +42,7 @@ import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData.UserProfile
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ClickResponse
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ConditionResponse
+import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ExecuteScriptResponse
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ExpectationResponse
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ExtractedResponse
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.FillFormResponse
@@ -146,6 +147,7 @@ class PirModule {
                     .withSubtype(BrokerAction.Extract::class.java, "extract")
                     .withSubtype(BrokerAction.Expectation::class.java, "expectation")
                     .withSubtype(BrokerAction.Click::class.java, "click")
+                    .withSubtype(BrokerAction.ExecuteScript::class.java, "executeScript")
                     .withSubtype(BrokerAction.FillForm::class.java, "fillForm")
                     .withSubtype(BrokerAction.Navigate::class.java, "navigate")
                     .withSubtype(BrokerAction.GetCaptchaInfo::class.java, "getCaptchaInfo")
@@ -165,6 +167,7 @@ class PirModule {
                     .withSubtype(GetCaptchaInfoResponse::class.java, "getCaptchaInfo")
                     .withSubtype(SolveCaptchaResponse::class.java, "solveCaptcha")
                     .withSubtype(ClickResponse::class.java, "click")
+                    .withSubtype(ExecuteScriptResponse::class.java, "executeScript")
                     .withSubtype(ExpectationResponse::class.java, "expectation")
                     .withSubtype(FillFormResponse::class.java, "fillForm")
                     .withSubtype(ConditionResponse::class.java, "condition"),
