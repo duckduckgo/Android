@@ -52,7 +52,7 @@ class CookiePopupOptInEvaluator @Inject constructor(
     override val evaluatorId: String = "cookie_popup_opt_in"
 
     override suspend fun evaluate(): ModalEvaluator.EvaluationResult = withContext(dispatchers.io()) {
-        if (!autoconsentFeature.cookiePopUpOptInPrompt().isEnabled()) {
+        if (!autoconsentFeature.cookiePopUpOptInPrompt().isEnabled() || !autoconsentFeature.cookiePopUpPreferenceSetting().isEnabled()) {
             return@withContext ModalEvaluator.EvaluationResult.Skipped
         }
 
@@ -63,7 +63,6 @@ class CookiePopupOptInEvaluator @Inject constructor(
 
         delay(MODAL_DISPLAY_DELAY)
         appCoroutineScope.launch(dispatchers.main()) {
-            // TODO: (cbarreiro) Store and check #times shown
             val intent = CookiePopupOptInActivity.intent(applicationContext).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
             }

@@ -28,6 +28,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -55,6 +56,20 @@ class CookiePopupOptInEvaluatorTest {
             dispatchers = coroutineRule.testDispatcherProvider,
             autoconsent = autoconsent,
         )
+    }
+
+    @Before
+    fun setup() {
+        feature.cookiePopUpPreferenceSetting().setRawStoredState(Toggle.State(enable = true))
+    }
+
+    @Test
+    fun whenPreferenceSettingDisabledThenSkippedAndNothingLaunched() = runTest {
+        feature.cookiePopUpOptInPrompt().setRawStoredState(Toggle.State(enable = true))
+        feature.cookiePopUpPreferenceSetting().setRawStoredState(Toggle.State(enable = false))
+
+        assertEquals(ModalEvaluator.EvaluationResult.Skipped, testee.evaluate())
+        assertNull(shadowOf(application).nextStartedActivity)
     }
 
     @Test
