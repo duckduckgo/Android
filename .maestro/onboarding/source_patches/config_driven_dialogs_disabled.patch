@@ -1,17 +1,18 @@
-Pins onboardingBrandDesignUpdate.configDrivenDialogs to FALSE so the nightly E2E suite can run
-the internal-flavour onboarding flows against the legacy renderer — the renderer production
-ships while the flag sits on INTERNAL. The flag is read during app launch, so only a
+Pins onboardingBrandDesignUpdate.configDrivenDialogs to FALSE so the nightly E2E suite still covers
+the legacy onboarding renderer. The config-driven renderer is now the compile-time default (TRUE), so
+every unpatched build renders it — the legacy renderer only appears when the flag is remotely
+disabled, and no unpatched binary can reproduce that. The flag is read during app launch, so only a
 compile-time change can pin it.
 
 Applied only by the "Onboarding, legacy renderer on internal" job in
 .github/workflows/e2e-nightly-non-blockers-suite.yml.
 
-This patch is meant to stop applying once the default moves off INTERNAL. CI fails loudly at
-that point, and whoever changes the default decides what coverage is still missing:
+This patch is meant to stop applying once the legacy renderer is deleted. CI fails loudly if the
+default changes again, and whoever changes it decides what coverage is still missing:
 
-  - default becomes TRUE: rewrite this patch to pin FALSE against TRUE and run on the play
-    binary, until the legacy renderer is deleted.
   - legacy renderer deleted: delete this patch and the job that applies it.
+  - default moves back off TRUE: rewrite this patch to pin FALSE against the new default, or drop it
+    if an unpatched binary already covers the legacy renderer.
 
 See .claude/rules/maestro-ui-tests.md for the full mechanism.
 
@@ -20,6 +21,6 @@ diff --git a/app/src/main/java/com/duckduckgo/app/onboardingbranddesignupdate/On
 +++ b/app/src/main/java/com/duckduckgo/app/onboardingbranddesignupdate/OnboardingBrandDesignUpdateToggles.kt
 @@ -60,3 +60,3 @@ interface OnboardingBrandDesignUpdateToggles {
       */
--    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
 +    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
      fun configDrivenDialogs(): Toggle

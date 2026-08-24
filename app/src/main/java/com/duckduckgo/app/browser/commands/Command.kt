@@ -229,6 +229,7 @@ sealed class Command {
 
     class OpenAppLink(
         val appLink: AppLink,
+        val finishCustomTabOnLaunch: Boolean = false,
     ) : Command()
 
     class ExtractUrlFromCloakedAmpLink(

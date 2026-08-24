@@ -39,7 +39,6 @@ class MetricsNativeInputEventListener @Inject constructor(
     }
 
     override fun onSearchSubmitted(query: String) {
-        duckChatPixels.fireOmnibarQuerySubmitted(query)
         sessionUsageMetric.onSearchSubmitted()
         discoveryFunnel.onSearchSubmitted()
     }

@@ -16,12 +16,10 @@
 
 package com.duckduckgo.autofill.impl.service
 
-import android.annotation.SuppressLint
 import android.app.assist.AssistStructure
 import android.app.assist.AssistStructure.ViewNode
 import android.app.assist.AssistStructure.WindowNode
 import android.view.autofill.AutofillId
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -62,7 +60,6 @@ enum class AutofillFieldType {
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealAutofillParser @Inject constructor(
-    private val appBuildConfig: AppBuildConfig,
     private val viewNodeClassifier: ViewNodeClassifier,
 ) : AutofillParser {
 
@@ -134,15 +131,10 @@ class RealAutofillParser @Inject constructor(
             ?.takeUnless { it in INVALID_PACKAGE_ID }
     }
 
-    @SuppressLint("NewApi")
     private fun ViewNode.website(): String? {
         return this.webDomain?.takeUnless { it.isBlank() }
             ?.let { nonEmptyDomain ->
-                val scheme = if (appBuildConfig.sdkInt >= 28) {
-                    this.webScheme.takeUnless { it.isNullOrBlank() } ?: "http"
-                } else {
-                    "http"
-                }
+                val scheme = this.webScheme.takeUnless { it.isNullOrBlank() } ?: "http"
                 "$scheme://$nonEmptyDomain"
             }
     }

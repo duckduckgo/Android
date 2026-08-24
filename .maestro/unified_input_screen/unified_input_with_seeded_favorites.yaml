@@ -64,7 +64,7 @@ tags:
             inputWithAiToggle: "false"
             omnibarPosition: "top"
             addFavorites: "example.com;duckduckgo.com;privacytest.com"
-      - runFlow: shared/launch_and_skip_onboarding.yaml
+      - runFlow: shared/launch_and_skip_onboarding_search_only.yaml
       - runFlow: shared/assert_seeded_favorites_visible.yaml
 
 # 5/6 — AI off, omnibar bottom
@@ -80,7 +80,7 @@ tags:
             inputWithAiToggle: "false"
             omnibarPosition: "bottom"
             addFavorites: "example.com;duckduckgo.com;privacytest.com"
-      - runFlow: shared/launch_and_skip_onboarding.yaml
+      - runFlow: shared/launch_and_skip_onboarding_search_only.yaml
       - runFlow: shared/assert_seeded_favorites_visible.yaml
 
 # 6/6 — AI off, omnibar split
@@ -96,5 +96,5 @@ tags:
             inputWithAiToggle: "false"
             omnibarPosition: "split"
             addFavorites: "example.com;duckduckgo.com;privacytest.com"
-      - runFlow: shared/launch_and_skip_onboarding.yaml
+      - runFlow: shared/launch_and_skip_onboarding_search_only.yaml
       - runFlow: shared/assert_seeded_favorites_visible.yaml

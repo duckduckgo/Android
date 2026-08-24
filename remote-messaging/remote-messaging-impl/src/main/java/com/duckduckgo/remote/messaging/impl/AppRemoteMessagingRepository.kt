@@ -27,9 +27,8 @@ import com.duckduckgo.remote.messaging.store.RemoteMessageEntity.Status.SCHEDULE
 import com.duckduckgo.remote.messaging.store.RemoteMessagesDao
 import com.duckduckgo.remote.messaging.store.RemoteMessagingConfigRepository
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.map
-import java.util.concurrent.TimeUnit
 
 interface RemoteMessagingRepository {
     fun getMessageById(id: String): RemoteMessage?
@@ -54,6 +53,7 @@ class AppRemoteMessagingRepository(
     private val messageMapper: MessageMapper,
     private val remoteMessageImageStore: RemoteMessageImageStore,
     private val currentTimeProvider: CurrentTimeProvider,
+    private val autoDismissEvaluator: RemoteMessageAutoDismissEvaluator,
 ) : RemoteMessagingRepository {
 
     override fun getMessageById(id: String): RemoteMessage? {
@@ -80,6 +80,7 @@ class AppRemoteMessagingRepository(
             messageEntity.copy(
                 shown = true,
                 firstShownDate = messageEntity.firstShownDate ?: currentTimeProvider.currentTimeMillis(),
+                impressions = messageEntity.impressions + 1,
             ),
         )
     }
@@ -89,46 +90,38 @@ class AppRemoteMessagingRepository(
         if (messageEntity == null || messageEntity.message.isEmpty()) return null
 
         val remoteMessage = messageMapper.fromMessage(messageEntity.message) ?: return null
-        if (remoteMessage.isExpired(messageEntity.firstShownDate)) {
-            dismissExpiredMessage(messageEntity.id)
+        if (autoDismissEvaluator.shouldAutoDismiss(remoteMessage, messageEntity)) {
+            markDismissed(messageEntity.id)
             return null
         }
         return remoteMessage
     }
 
     override fun messageFlow(): Flow<RemoteMessage?> {
-        return remoteMessagesDao.messagesFlow().distinctUntilChanged().map { messageEntity ->
-            if (messageEntity == null || messageEntity.message.isEmpty()) return@map null
+        return remoteMessagesDao.messagesFlow()
+            .distinctUntilChangedBy { it?.id to it?.message }
+            .map { messageEntity ->
+                if (messageEntity == null || messageEntity.message.isEmpty()) return@map null
 
-            val remoteMessage = messageMapper.fromMessage(messageEntity.message) ?: return@map null
-            if (remoteMessage.isExpired(messageEntity.firstShownDate)) {
-                dismissExpiredMessage(messageEntity.id)
-                return@map null
+                val remoteMessage = messageMapper.fromMessage(messageEntity.message) ?: return@map null
+                if (autoDismissEvaluator.shouldAutoDismiss(remoteMessage, messageEntity)) {
+                    markDismissed(messageEntity.id)
+                    return@map null
+                }
+                RemoteMessage(
+                    id = messageEntity.id,
+                    content = remoteMessage.content,
+                    emptyList(),
+                    emptyList(),
+                    remoteMessage.surfaces,
+                    remoteMessage.displayConditions,
+                )
             }
-            RemoteMessage(
-                id = messageEntity.id,
-                content = remoteMessage.content,
-                emptyList(),
-                emptyList(),
-                remoteMessage.surfaces,
-                remoteMessage.displayConditions,
-            )
-        }
     }
 
-    private fun RemoteMessage.isExpired(firstShownDate: Long?): Boolean {
-        val threshold = displayConditions?.dismissAfterDaysShown?.takeIf { it > 0 } ?: return false
-        val firstShown = firstShownDate ?: return false
-        val elapsedDays = TimeUnit.MILLISECONDS.toDays(currentTimeProvider.currentTimeMillis() - firstShown)
-        return elapsedDays >= threshold
-    }
+    override suspend fun dismissMessage(id: String) = markDismissed(id)
 
-    private fun dismissExpiredMessage(id: String) {
-        remoteMessagesDao.updateState(id, Status.DISMISSED)
-        remoteMessagingConfigRepository.invalidate()
-    }
-
-    override suspend fun dismissMessage(id: String) {
+    private fun markDismissed(id: String) {
         remoteMessagesDao.updateState(id, Status.DISMISSED)
         remoteMessagingConfigRepository.invalidate()
     }

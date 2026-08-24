@@ -86,8 +86,6 @@ class IntentDispatcherViewModelTest {
 
         whenever(syncUrlIdentifier.shouldDelegateToSyncSetup(anyOrNull())).thenReturn(false)
         whenever(mockAppBuildConfig.sdkInt).thenReturn(31)
-        val pdfViewerToggle = mockToggle(enabled = false)
-        whenever(androidBrowserConfigFeature.pdfViewer()).thenReturn(pdfViewerToggle)
         val externalPdfHandlerToggle = mockToggle(enabled = false)
         whenever(androidBrowserConfigFeature.externalPdfHandler()).thenReturn(externalPdfHandlerToggle)
     }
@@ -328,7 +326,6 @@ class IntentDispatcherViewModelTest {
         whenever(mockIntent.action).thenReturn(Intent.ACTION_VIEW)
         whenever(mockIntent.data).thenReturn(contentUri)
         whenever(mockIntent.type).thenReturn("application/pdf")
-        whenever(androidBrowserConfigFeature.pdfViewer()).thenReturn(enabledToggle)
         whenever(androidBrowserConfigFeature.externalPdfHandler()).thenReturn(enabledToggle)
         whenever(inlinePdfHandler.cacheLocalPdf(contentUri)).thenReturn(LocalPdfResult.Success(cachedUri, "doc.pdf"))
 
@@ -349,7 +346,6 @@ class IntentDispatcherViewModelTest {
         whenever(mockIntent.action).thenReturn(Intent.ACTION_VIEW)
         whenever(mockIntent.data).thenReturn(contentUri)
         whenever(mockIntent.type).thenReturn(null)
-        whenever(androidBrowserConfigFeature.pdfViewer()).thenReturn(enabledToggle)
         whenever(androidBrowserConfigFeature.externalPdfHandler()).thenReturn(enabledToggle)
         whenever(inlinePdfHandler.cacheLocalPdf(contentUri)).thenReturn(LocalPdfResult.Success(cachedUri, "report.pdf"))
 
@@ -368,7 +364,6 @@ class IntentDispatcherViewModelTest {
         whenever(mockIntent.action).thenReturn(Intent.ACTION_VIEW)
         whenever(mockIntent.data).thenReturn(contentUri)
         whenever(mockIntent.type).thenReturn("application/pdf")
-        whenever(androidBrowserConfigFeature.pdfViewer()).thenReturn(enabledToggle)
         whenever(androidBrowserConfigFeature.externalPdfHandler()).thenReturn(enabledToggle)
         whenever(inlinePdfHandler.cacheLocalPdf(contentUri)).thenReturn(LocalPdfResult.Failure(PdfErrorType.UNKNOWN))
 
@@ -382,32 +377,12 @@ class IntentDispatcherViewModelTest {
     }
 
     @Test
-    fun `when VIEW intent with application pdf type and pdfViewer flag disabled then not treated as local PDF`() = runTest {
-        val contentUri = Uri.parse("content://com.example.provider/files/doc.pdf")
-        val disabledToggle = mockToggle(enabled = false)
-        whenever(mockIntent.action).thenReturn(Intent.ACTION_VIEW)
-        whenever(mockIntent.data).thenReturn(contentUri)
-        whenever(mockIntent.type).thenReturn("application/pdf")
-        whenever(androidBrowserConfigFeature.pdfViewer()).thenReturn(disabledToggle)
-
-        testee.onIntentReceived(mockIntent, isExternal = true)
-
-        testee.viewState.test {
-            val state = awaitItem()
-            assertNull(state.activityParams)
-        }
-        verify(inlinePdfHandler, never()).cacheLocalPdf(any())
-    }
-
-    @Test
     fun `when VIEW intent with application pdf type and externalPdfHandler flag disabled then not treated as local PDF`() = runTest {
         val contentUri = Uri.parse("content://com.example.provider/files/doc.pdf")
-        val enabledToggle = mockToggle(enabled = true)
         val disabledToggle = mockToggle(enabled = false)
         whenever(mockIntent.action).thenReturn(Intent.ACTION_VIEW)
         whenever(mockIntent.data).thenReturn(contentUri)
         whenever(mockIntent.type).thenReturn("application/pdf")
-        whenever(androidBrowserConfigFeature.pdfViewer()).thenReturn(enabledToggle)
         whenever(androidBrowserConfigFeature.externalPdfHandler()).thenReturn(disabledToggle)
 
         testee.onIntentReceived(mockIntent, isExternal = true)

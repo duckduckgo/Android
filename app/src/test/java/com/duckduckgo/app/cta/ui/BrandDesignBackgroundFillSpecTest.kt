@@ -48,6 +48,7 @@ class BrandDesignBackgroundFillSpecTest {
                 onboardingImprovementsEnabled = true,
                 onboardingImprovementsV2Enabled = true,
                 isOmnibarBottom = false,
+                isSegmentedSearchPathWithToggleEnabled = false,
             )
         assertEquals(280f, cta.backgroundFillSpec?.fillHeightDp)
     }

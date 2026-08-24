@@ -198,6 +198,7 @@ class SettingsViewModel @Inject constructor(
         pixel.fire(SETTINGS_OPENED)
         pixel.fire(PRODUCT_TELEMETRY_SURFACE_SETTINGS_OPENED)
         pixel.fire(PRODUCT_TELEMETRY_SURFACE_SETTINGS_OPENED_DAILY, type = Pixel.PixelType.Daily())
+        settingsPixelDispatcher.fireSettingsOpenedWithSubscriptionPurchaseAvailable()
 
         duckAiFeatureState.showSettings.onEach { showDuckAiSettings ->
             viewState.update { it.copy(isDuckChatEnabled = showDuckAiSettings) }

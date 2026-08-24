@@ -16,8 +16,11 @@
 
 package com.duckduckgo.app.onboarding.ui.page.configdriven
 
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.onboarding.CustomAiOnboardingPixelName
+import com.duckduckgo.app.onboarding.OnboardingPreference
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityDialog
+import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
@@ -84,8 +87,16 @@ class OnboardingDialogShownPixelsTest {
     fun `fires nothing for the dialogs legacy had no shown pixel for`() {
         testee.fireFor(NewUserOnboardingActivityDialog.AddToDock)
         testee.fireFor(NewUserOnboardingActivityDialog.WidgetPrompt)
-        testee.fireFor(NewUserOnboardingActivityDialog.InputScreenPreview(isSearchDefault = true))
+        testee.fireFor(
+            NewUserOnboardingActivityDialog.InputScreenPreview(
+                isSearchDefault = true,
+                showModeToggle = true,
+                titleRes = R.string.preOnboardingInputModeDemoTitle,
+            ),
+        )
         testee.fireFor(NewUserOnboardingActivityDialog.DownloadReason)
+        testee.fireFor(NewUserOnboardingActivityDialog.SegmentedComparisonChart(ComparisonChartConfig.SegmentedSearchPath))
+        testee.fireFor(NewUserOnboardingActivityDialog.PreferenceSelector(mapOf(OnboardingPreference.SEARCH_HISTORY to true)))
         testee.fireFor(
             NewUserOnboardingActivityDialog.QuickSetup(
                 showSplitOption = true,

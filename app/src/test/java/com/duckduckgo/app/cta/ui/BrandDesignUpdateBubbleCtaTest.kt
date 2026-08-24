@@ -365,7 +365,7 @@ class BrandDesignUpdateBubbleCtaTest {
         onboardingImprovementsEnabled = onboardingImprovementsEnabled,
         onboardingImprovementsV2Enabled = onboardingImprovementsV2Enabled,
     ) {
-        override val activeIncludeId: Int = R.id.primaryCta
+        override val activeIncludeIds: List<Int> = listOf(R.id.primaryCta)
         override val showArrow: Boolean = false
 
         override fun configureContentViews(view: View) {}
@@ -387,7 +387,7 @@ class BrandDesignUpdateBubbleCtaTest {
         onboardingImprovementsEnabled = onboardingImprovementsEnabled,
     ),
         DaxBubbleCta.ShowsWavingDax {
-        override val activeIncludeId: Int = R.id.primaryCta
+        override val activeIncludeIds: List<Int> = listOf(R.id.primaryCta)
         override val showArrow: Boolean = false
         override val wavingDaxSpec = DaxBubbleCta.WavingDaxSpec(
             rotationDegrees = 0f,

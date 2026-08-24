@@ -211,6 +211,18 @@
         <item name="android:fontFamily">@font/ducksansproduct_regular</item>
     </style>
 
+    <style name="Typography.DuckDuckGo.Onboarding.PreferencePrimary">
+        <item name="android:textSize">16sp</item>
+        <item name="android:lineHeight">16sp</item>
+        <item name="android:fontFamily">@font/ducksansproduct_regular</item>
+    </style>
+
+    <style name="Typography.DuckDuckGo.Onboarding.PreferenceSecondary">
+        <item name="android:textSize">14sp</item>
+        <item name="android:lineHeight">18sp</item>
+        <item name="android:fontFamily">@font/ducksansproduct_regular</item>
+    </style>
+
     <style name="Typography.DuckDuckGo.Onboarding.Label">
         <item name="android:textSize">12sp</item>
         <item name="android:lineSpacingExtra">-3sp</item>

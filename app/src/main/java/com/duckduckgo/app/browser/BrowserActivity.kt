@@ -23,7 +23,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.Intent.EXTRA_TEXT
 import android.content.res.Configuration
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -64,6 +63,7 @@ import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.DefaultBrowserBotto
 import com.duckduckgo.app.browser.mode.BrowserLaunchSource
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.OmnibarType
+import com.duckduckgo.app.browser.omnibar.applyAddressBarRebrandRadius
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.state.ModeSwitchRecreateSignal
 import com.duckduckgo.app.browser.tabs.TabManager
@@ -86,7 +86,10 @@ import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CANCEL
+import com.duckduckgo.app.pixels.AppReturnPixelSender
 import com.duckduckgo.app.pixels.BrowserModeSwitchSource
+import com.duckduckgo.app.pixels.LaunchSourceValues
+import com.duckduckgo.app.pixels.toPixelLaunchSourceValue
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
@@ -146,6 +149,7 @@ import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
 import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 // open class so that we can test BrowserApplicationStateInfo
 @HasMemberInjections
@@ -172,6 +176,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var dataClearerForegroundAppRestartPixel: DataClearerForegroundAppRestartPixel
+
+    @Inject
+    lateinit var appReturnPixelSender: AppReturnPixelSender
 
     @Inject
     lateinit var serviceWorkerClientCompat: ServiceWorkerClientCompat
@@ -246,6 +253,14 @@ open class BrowserActivity : DuckDuckGoActivity() {
     private val duckChatViewModel: DuckChatSharedViewModel by viewModels()
 
     private var instanceStateBundles: CombinedInstanceState? = null
+
+    /**
+     * The launch source extra from a genuinely new [Intent] delivery (fresh launch or [onNewIntent]),
+     * consumed by the next [onResume]. Not read off [getIntent] directly, since after process death the
+     * system replays the original Intent extras on recreation and a mutated (extra-removed) copy is never
+     * persisted for that replay.
+     */
+    private var pendingLaunchSource: String? = null
 
     /**
      * Holds an [Intent] that arrived in [onNewIntent] while [dataClearer] was still clearing,
@@ -357,6 +372,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         intent?.sanitize()
         logcat(INFO) { "onCreate called. freshAppLaunch: ${dataClearer.isFreshAppLaunch}, savedInstanceState: $savedInstanceState" }
+        if (savedInstanceState == null) {
+            pendingLaunchSource = intent?.getStringExtra(LAUNCH_SOURCE_PIXEL_VALUE)
+        }
         dataClearerForegroundAppRestartPixel.registerIntent(intent)
         renderer = BrowserStateRenderer()
         val newInstanceState = if (dataClearer.isFreshAppLaunch) null else savedInstanceState
@@ -578,6 +596,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        appReturnPixelSender.fireIfNeeded(pendingLaunchSource ?: LaunchSourceValues.STANDARD)
+        pendingLaunchSource = null
+    }
+
     override fun onStop() {
         openMessageInNewTabJob?.cancel()
 
@@ -605,6 +629,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
         logcat(INFO) { "onNewIntent: $intent" }
 
         intent.sanitize()
+        setIntent(intent)
+        pendingLaunchSource = intent.getStringExtra(LAUNCH_SOURCE_PIXEL_VALUE)
 
         intent.getStringExtra(LAUNCH_FROM_NOTIFICATION_PIXEL_NAME)?.let {
             viewModel.onLaunchedFromNotification(it)
@@ -1231,6 +1257,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             intent.putExtra(DUCK_CHAT_SESSION_ACTIVE, duckChatSessionActive)
             intent.putExtra(DELETED_TAB_COUNT_EXTRA, deletedTabCount)
             intent.putExtra(LAUNCH_REQUIRES_REGULAR_MODE, launchSource.requiresRegularMode)
+            intent.putExtra(LAUNCH_SOURCE_PIXEL_VALUE, launchSource.toPixelLaunchSourceValue())
             return intent
         }
 
@@ -1252,6 +1279,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
          * Stamped by entry points that must reach BrowserActivity in [BrowserMode.REGULAR].
          */
         const val LAUNCH_REQUIRES_REGULAR_MODE = "LAUNCH_REQUIRES_REGULAR_MODE"
+
+        /**
+         * The [BrowserLaunchSource], pre-mapped to its [LaunchSourceValues] pixel string. Read by
+         * [AppReturnPixelSender] for the `m_app_return` pixel's `launch_source` param.
+         */
+        const val LAUNCH_SOURCE_PIXEL_VALUE = "LAUNCH_SOURCE_PIXEL_VALUE"
 
         private const val OPEN_DUCK_CHAT = "OPEN_DUCK_CHAT_EXTRA"
         private const val CLOSE_DUCK_CHAT = "CLOSE_DUCK_CHAT_EXTRA"
@@ -1696,26 +1729,30 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     private fun bindMockupToolbars() {
         val mockupBrowserMenuIcon = com.duckduckgo.mobile.android.R.drawable.ic_menu_hamburger_24
+        val isAddressBarRebrandEnabled = appBrandDesignUpdateToggles.addressBar().isEnabled()
+        val rebrandInputRadius = resources.getDimension(CommonR.dimen.rebrandInputRadius)
+        val legacyInputRadius = resources.getDimension(CommonR.dimen.largeShapeCornerRadius)
         binding.topMockupToolbar.browserMenuImageView.setImageResource(mockupBrowserMenuIcon)
         binding.bottomMockupToolbar.browserMenuImageView.setImageResource(mockupBrowserMenuIcon)
         binding.navigationBarMockup.browserMenuImageView.setImageResource(mockupBrowserMenuIcon)
 
         when (settingsDataStore.omnibarType) {
             OmnibarType.SINGLE_TOP, OmnibarType.SPLIT -> {
-                if (Build.VERSION.SDK_INT < 28) {
-                    binding.topMockupToolbar.mockOmniBarContainerShadow.cardElevation = 2f.toPx(this)
-                }
-
                 binding.bottomMockupToolbar.appBarLayoutMockup.gone()
                 omnibarToolbarMockupBinding = binding.topMockupToolbar
+                applyAddressBarRebrandRadius(
+                    isAddressBarRebrandEnabled,
+                    rebrandInputRadius,
+                    legacyInputRadius,
+                    omnibarToolbarMockupBinding.mockOmniBarContainerShadow,
+                    omnibarToolbarMockupBinding.omniBarContainerMockup,
+                )
 
                 if (!duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus.value) {
                     omnibarToolbarMockupBinding.aiChatIconMockup.isVisible = false
                 }
 
-                if (Build.VERSION.SDK_INT >= 28) {
-                    omnibarToolbarMockupBinding.mockOmniBarContainerShadow.addBottomShadow()
-                }
+                omnibarToolbarMockupBinding.mockOmniBarContainerShadow.addBottomShadow()
 
                 if (settingsDataStore.omnibarType == OmnibarType.SPLIT) {
                     binding.topMockupToolbar.tabsMenu.gone()
@@ -1726,20 +1763,21 @@ open class BrowserActivity : DuckDuckGoActivity() {
             }
 
             OmnibarType.SINGLE_BOTTOM -> {
-                if (Build.VERSION.SDK_INT < 28) {
-                    binding.bottomMockupToolbar.mockOmniBarContainerShadow.cardElevation = 0.5f.toPx(this)
-                }
-
                 binding.topMockupToolbar.appBarLayoutMockup.gone()
                 omnibarToolbarMockupBottomBinding = binding.bottomMockupToolbar
+                applyAddressBarRebrandRadius(
+                    isAddressBarRebrandEnabled,
+                    rebrandInputRadius,
+                    legacyInputRadius,
+                    omnibarToolbarMockupBottomBinding.mockOmniBarContainerShadow,
+                    omnibarToolbarMockupBottomBinding.omniBarContainerMockup,
+                )
 
                 if (!duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus.value) {
                     omnibarToolbarMockupBottomBinding.aiChatIconMockup.isVisible = false
                 }
 
-                if (Build.VERSION.SDK_INT >= 28) {
-                    omnibarToolbarMockupBottomBinding.mockOmniBarContainerShadow.addBottomShadow()
-                }
+                omnibarToolbarMockupBottomBinding.mockOmniBarContainerShadow.addBottomShadow()
             }
         }
     }

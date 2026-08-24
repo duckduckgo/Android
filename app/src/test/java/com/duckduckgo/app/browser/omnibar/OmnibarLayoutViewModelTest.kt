@@ -11,7 +11,7 @@ import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.menu.BrowserMenuHighlight
 import com.duckduckgo.app.browser.menu.BrowserViewMode
-import com.duckduckgo.app.browser.nativeinput.NativeInputSearchOnlyFeature
+import com.duckduckgo.app.browser.nativeinput.NativeInputOmnibarFeature
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.LaunchNativeInput
@@ -41,6 +41,7 @@ import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
@@ -108,7 +109,7 @@ class OmnibarLayoutViewModelTest {
     private val duckAiShowOmnibarShortcutInAllStatesFlow = MutableStateFlow(true)
     private val nativeInputFieldSettingFlow = MutableStateFlow(false)
     private val nativeChatInputEnabledFlow = MutableStateFlow(false)
-    private val fakeNativeInputSearchOnlyFeature = FakeFeatureToggleFactory.create(NativeInputSearchOnlyFeature::class.java)
+    private val fakeNativeInputOmnibarFeature = FakeFeatureToggleFactory.create(NativeInputOmnibarFeature::class.java)
     private val inputScreenUserSettingFlow = MutableStateFlow(false)
     private val activeVoiceSessionsFlow = MutableStateFlow<Set<String>>(emptySet())
     private val selectedTabFlow = MutableStateFlow<TabEntity?>(null)
@@ -132,9 +133,11 @@ class OmnibarLayoutViewModelTest {
         on { softwareRenderingModeEnabled } doReturn softwareRenderingModeEnabledFlow
     }
     private val fakeProgressBarUpgradeFeature = FakeFeatureToggleFactory.create(ProgressBarUpgradeFeature::class.java)
+    private val fakeAppBrandDesignUpdateToggles = FakeFeatureToggleFactory.create(AppBrandDesignUpdateToggles::class.java)
     private val browserMode: BrowserMode = BrowserMode.REGULAR
 
     private lateinit var fakeStandardizedLeadingIconToggle: StandardizedLeadingIconFeatureToggle
+    private lateinit var fakeOmnibarPreFillKillSwitch: OmnibarPreFillKillSwitch
     private lateinit var testee: OmnibarLayoutViewModel
 
     private val EMPTY_URL = ""
@@ -156,7 +159,9 @@ class OmnibarLayoutViewModelTest {
         whenever(urlDisplayRepository.isFullUrlEnabled).then { isFullUrlEnabledFlow }
         whenever(duckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(nativeInputFieldSettingFlow)
         whenever(duckChat.observeNativeChatInputEnabled()).thenReturn(nativeChatInputEnabledFlow)
-        fakeNativeInputSearchOnlyFeature.self().setRawStoredState(State(enable = false))
+        fakeNativeInputOmnibarFeature.self().setRawStoredState(State(enable = false))
+        fakeNativeInputOmnibarFeature.nativeInputSearchOnly().setRawStoredState(State(enable = false))
+        fakeAppBrandDesignUpdateToggles.addressBar().setRawStoredState(State(enable = false))
         whenever(duckChatInputModeState.inputModeCapability).thenReturn(inputModeCapabilityFlow)
         whenever(duckChat.activeVoiceChatSessions).thenReturn(activeVoiceSessionsFlow)
         whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(inputScreenUserSettingFlow)
@@ -171,6 +176,12 @@ class OmnibarLayoutViewModelTest {
             FakeToggleStore(),
             featureName = "standardizedLeadingIcon",
         ).build().create(StandardizedLeadingIconFeatureToggle::class.java)
+
+        fakeOmnibarPreFillKillSwitch = FeatureToggles.Builder(
+            FakeToggleStore(),
+            featureName = "omnibarPreFillKillSwitch",
+        ).build().create(OmnibarPreFillKillSwitch::class.java)
+        fakeOmnibarPreFillKillSwitch.self().setRawStoredState(State(enable = true))
 
         initializeViewModel()
     }
@@ -216,10 +227,32 @@ class OmnibarLayoutViewModelTest {
             serpEasterEggLogosToggles = serpEasterEggLogosToggles,
             addressBarTrackersAnimationManager = addressBarTrackersAnimationManager,
             standardizedLeadingIconToggle = fakeStandardizedLeadingIconToggle,
+            omnibarPreFillKillSwitch = fakeOmnibarPreFillKillSwitch,
             progressBarUpgradeFeature = fakeProgressBarUpgradeFeature,
-            nativeInputSearchOnlyFeature = fakeNativeInputSearchOnlyFeature,
+            nativeInputOmnibarFeature = fakeNativeInputOmnibarFeature,
             browserMode = browserMode,
+            appBrandDesignUpdateToggles = fakeAppBrandDesignUpdateToggles,
         )
+    }
+
+    @Test
+    fun whenAddressBarRebrandToggleChangesThenViewStateIsUpdated() = runTest {
+        testee.viewState.test {
+            assertFalse(awaitItem().isAddressBarRebrandEnabled)
+
+            fakeAppBrandDesignUpdateToggles.addressBar().setRawStoredState(State(enable = true))
+
+            assertTrue(awaitItem().isAddressBarRebrandEnabled)
+        }
+    }
+
+    @Test
+    fun whenAddressBarRebrandEnabledBeforeViewModelCreatedThenInitialViewStateIsEnabled() = runTest {
+        fakeAppBrandDesignUpdateToggles.addressBar().setRawStoredState(State(enable = true))
+
+        initializeViewModel()
+
+        assertTrue(testee.viewState.value.isAddressBarRebrandEnabled)
     }
 
     @Test
@@ -1652,7 +1685,8 @@ class OmnibarLayoutViewModelTest {
 
     @Test
     fun whenSearchOnlyAndRestoreFlagEnabledThenShowClickCatcherTrue() = runTest {
-        fakeNativeInputSearchOnlyFeature.self().setRawStoredState(State(enable = true))
+        fakeNativeInputOmnibarFeature.self().setRawStoredState(State(enable = true))
+        fakeNativeInputOmnibarFeature.nativeInputSearchOnly().setRawStoredState(State(enable = true))
         nativeInputFieldSettingFlow.value = true
         inputModeCapabilityFlow.value = NativeInputState.InputMode.SEARCH_ONLY
         initializeViewModel()
@@ -1723,9 +1757,46 @@ class OmnibarLayoutViewModelTest {
     fun `when input text click catcher clicked and random URL then input screen launched with full URL`() = runTest {
         isFullUrlEnabledFlow.emit(false)
         initializeViewModel()
-        val omnibarViewState = OmnibarViewState(omnibarText = "test", queryOrFullUrl = "test", isEditing = false)
-        testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState))
         givenSiteLoaded(RANDOM_URL)
+        val omnibarViewState = OmnibarViewState(omnibarText = RANDOM_URL.toUri().baseHost!!, queryOrFullUrl = RANDOM_URL, isEditing = false)
+        testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState))
+
+        testee.onTextInputClickCatcherClicked()
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue(command is LaunchNativeInput)
+            assertEquals(RANDOM_URL, (command as LaunchNativeInput).query)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when input text click catcher clicked before a submitted URL is loaded then input screen shows submitted URL`() = runTest {
+        isFullUrlEnabledFlow.emit(false)
+        initializeViewModel()
+        givenSiteLoaded(RANDOM_URL)
+        val submitted = OmnibarViewState(omnibarText = "example.com", queryOrFullUrl = "example.com", isEditing = false)
+        testee.onExternalStateChange(StateChange.OmnibarStateChange(submitted))
+
+        testee.onTextInputClickCatcherClicked()
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue(command is LaunchNativeInput)
+            assertEquals("example.com", (command as LaunchNativeInput).query)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when pre-fill kill switch disabled then a submitted URL still pre-fills the loaded URL`() = runTest {
+        isFullUrlEnabledFlow.emit(false)
+        initializeViewModel()
+        fakeOmnibarPreFillKillSwitch.self().setRawStoredState(State(enable = false))
+        givenSiteLoaded(RANDOM_URL)
+        val submitted = OmnibarViewState(omnibarText = "example.com", queryOrFullUrl = "example.com", isEditing = false)
+        testee.onExternalStateChange(StateChange.OmnibarStateChange(submitted))
 
         testee.onTextInputClickCatcherClicked()
 

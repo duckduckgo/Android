@@ -274,6 +274,11 @@ interface DuckChatInternal : DuckChat {
     fun isContextualSheetRedesignEnabled(): Boolean
 
     /**
+     * Returns the side the Search/Duck.ai toggle is defaulted to.
+     */
+    fun resolvedTogglePosition(): NativeInputState.ToggleSelection
+
+    /**
      * Checks whether DuckChat is enabled based on remote config flag.
      */
     fun isDuckChatFeatureEnabled(): Boolean
@@ -897,8 +902,7 @@ class RealDuckChat @Inject constructor(
 
     override suspend fun isChatHistoryAvailable(): Boolean = withContext(dispatchers.io()) {
         isEnabled() &&
-            duckChatFeature.useNativeStorageChatData().isEnabled() &&
-            duckChatFeature.historyScreen().isEnabled()
+            duckChatFeature.useNativeStorageChatData().isEnabled()
     }
 
     override suspend fun hasUserEnabledChatHistory(): Boolean {
@@ -923,6 +927,19 @@ class RealDuckChat @Inject constructor(
 
     override suspend fun saveLastUsedTogglePosition(position: String) {
         duckChatFeatureRepository.setLastUsedTogglePosition(position)
+    }
+
+    override fun resolvedTogglePosition(): NativeInputState.ToggleSelection {
+        val defaultPosition = DefaultTogglePosition.fromName(duckChatFeatureRepository.observeDefaultTogglePosition().value)
+        val configured = if (defaultPosition == DefaultTogglePosition.LAST_USED) {
+            DefaultTogglePosition.fromName(duckChatFeatureRepository.observeLastUsedTogglePosition().value)
+        } else {
+            defaultPosition
+        }
+        return when (configured) {
+            DefaultTogglePosition.DUCK_AI -> NativeInputState.ToggleSelection.DUCK_AI
+            else -> NativeInputState.ToggleSelection.SEARCH
+        }
     }
 
     override fun observeLastUsedTogglePosition(): Flow<String?> =

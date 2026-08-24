@@ -1,5 +1,63 @@
 // Settings screen pixels
 {
+    // Open Links in Apps settings pixels
+    "ms_app_links_setting_pressed": {
+        "description": "Fired when the user opens the 'Open Links in Apps' setting dialog.",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "ms_app_links_setting_pressed_daily": {
+        "description": "Fired at most once per day when the user opens the 'Open Links in Apps' setting dialog.",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "ms_app_links_ask_every_time_setting_selected": {
+        "description": "Fired when the user selects 'Ask every time' in the 'Open Links in Apps' setting.",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "ms_app_links_ask_every_time_setting_selected_daily": {
+        "description": "Fired at most once per day when the user selects 'Ask every time' in the 'Open Links in Apps' setting.",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "ms_app_links_always_setting_selected": {
+        "description": "Fired when the user selects 'Always' in the 'Open Links in Apps' setting.",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "ms_app_links_always_setting_selected_daily": {
+        "description": "Fired at most once per day when the user selects 'Always' in the 'Open Links in Apps' setting.",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "ms_app_links_never_setting_selected": {
+        "description": "Fired when the user selects 'Never' in the 'Open Links in Apps' setting.",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "ms_app_links_never_setting_selected_daily": {
+        "description": "Fired at most once per day when the user selects 'Never' in the 'Open Links in Apps' setting.",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+
     "ms_whats_new_setting_pressed": {
         "description": "Fired when the user clicks the 'What's New' option in settings.",
         "owners": ["catalinradoiu"],

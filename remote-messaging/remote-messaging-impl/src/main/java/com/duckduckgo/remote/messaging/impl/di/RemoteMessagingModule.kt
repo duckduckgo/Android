@@ -104,6 +104,7 @@ object DataSourceModule {
         messageMapper: MessageMapper,
         remoteMessageImageStore: RemoteMessageImageStore,
         currentTimeProvider: CurrentTimeProvider,
+        autoDismissEvaluator: RemoteMessageAutoDismissEvaluator,
     ): RemoteMessagingRepository {
         return AppRemoteMessagingRepository(
             remoteMessagingConfigRepository,
@@ -111,6 +112,7 @@ object DataSourceModule {
             messageMapper,
             remoteMessageImageStore,
             currentTimeProvider,
+            autoDismissEvaluator,
         )
     }
 

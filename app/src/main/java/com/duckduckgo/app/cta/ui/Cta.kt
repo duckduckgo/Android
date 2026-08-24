@@ -118,6 +118,8 @@ interface Cta {
     fun pixelCancelParameters(): Map<String, String>
 
     fun pixelOkParameters(): Map<String, String>
+
+    fun shouldDropAddressBarFocusWhenShown(): Boolean = false
 }
 
 interface OnboardingDaxCta {
@@ -1676,7 +1678,7 @@ sealed class DaxBubbleCta(
             private const val DISMISS_BORDER_WIDTH_DP = 1.5f
         }
 
-        abstract val activeIncludeId: Int
+        abstract val activeIncludeIds: List<Int>
 
         abstract val showArrow: Boolean
 
@@ -1730,6 +1732,7 @@ sealed class DaxBubbleCta(
         private fun getAllContentIncludes(view: View): List<View> = listOfNotNull(
             view.findViewById<View>(R.id.optionsContent),
             view.findViewById<View>(R.id.primaryCta),
+            view.findViewById<View>(R.id.secondaryCta),
         )
 
         internal fun applyWavingDaxState(container: View, showsWavingDax: ShowsWavingDax?) {
@@ -1782,9 +1785,9 @@ sealed class DaxBubbleCta(
             container.post { applyFit() }
         }
 
-        private fun resetAllIncludesExcept(view: View, active: View) {
+        private fun resetAllIncludesExcept(view: View, active: List<View>) {
             getAllContentIncludes(view).forEach { include ->
-                if (include == active) {
+                if (active.contains(include)) {
                     include.show()
                     include.alpha = 0f
                 } else {
@@ -1818,8 +1821,9 @@ sealed class DaxBubbleCta(
             cardContainer = container.findViewById<TouchInterceptingLinearLayout>(R.id.brandDesignCardContainer)
             isAnimating = true
 
-            // The active content include for THIS CTA
-            val activeInclude = container.findViewById<View>(activeIncludeId)
+            val activeIncludes = activeIncludeIds.map {
+                container.findViewById<View>(it)
+            }
 
             // Hides the header between CTAs; subclasses that use it re-enable
             // visibility inside configureContentViews().
@@ -1853,9 +1857,13 @@ sealed class DaxBubbleCta(
                                 .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
                             ObjectAnimator.ofFloat(dismissButton, View.ALPHA, 1f)
                                 .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
-                            ObjectAnimator.ofFloat(activeInclude, View.ALPHA, 1f)
-                                .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
                         )
+                        activeIncludes.forEach {
+                            animators.add(
+                                ObjectAnimator.ofFloat(it, View.ALPHA, 1f)
+                                    .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
+                            )
+                        }
                         // Read depth live: the first-show arm synchronously sets it before this lambda runs,
                         // so a value captured at function entry would animate from a stale snapshot.
                         val targetDepth = showCtaFinTarget(container)
@@ -1910,7 +1918,9 @@ sealed class DaxBubbleCta(
                 titleView.alpha = 1f
                 descriptionView.alpha = 1f
                 dismissButton.alpha = 1f
-                activeInclude.alpha = 1f
+                activeIncludes.forEach {
+                    it.alpha = 1f
+                }
                 if (headerImage?.isVisible == true) {
                     headerImage.alpha = 1f
                 }
@@ -1946,7 +1956,7 @@ sealed class DaxBubbleCta(
                             // After fade-out: hide old includes, show new one.
                             // Note: do NOT call clearDialog() here — it would re-zero the dismiss
                             // button alpha causing a flicker. Instead, selectively reset content only.
-                            resetAllIncludesExcept(container, activeInclude)
+                            resetAllIncludesExcept(container, activeIncludes)
                             resetHeaderState()
                             resetTextAlignment()
                             configureContentViews(container)
@@ -1964,7 +1974,7 @@ sealed class DaxBubbleCta(
                 }
             } else {
                 clearDialog()
-                resetAllIncludesExcept(container, activeInclude)
+                resetAllIncludesExcept(container, activeIncludes)
                 hiddenTitle.text = daxTitle.html(container.context)
                 descriptionView.text = descriptionText
                 resetHeaderState()
@@ -2102,7 +2112,9 @@ sealed class DaxBubbleCta(
         ctaPixelParam = Pixel.PixelValues.DAX_SUBSCRIPTION,
         onboardingStore = onboardingStore,
         appInstallStore = appInstallStore,
-    )
+    ) {
+        override fun shouldDropAddressBarFocusWhenShown(): Boolean = true
+    }
 
     data class DaxDialogIntroOption(
         val optionText: String,
@@ -2144,6 +2156,8 @@ sealed class HomePanelCta(
     override fun pixelOkParameters(): Map<String, String> = emptyMap()
 
     override fun pixelShownParameters(): Map<String, String> = emptyMap()
+
+    override fun shouldDropAddressBarFocusWhenShown(): Boolean = true
 
     data object AddWidgetAutoOnboarding :
         HomePanelCta(
@@ -2238,6 +2252,8 @@ class SubscriptionPromoModalCta(
     override fun pixelShownParameters(): Map<String, String> = pixelParams()
     override fun pixelOkParameters(): Map<String, String> = pixelParams()
     override fun pixelCancelParameters(): Map<String, String> = pixelParams()
+
+    override fun shouldDropAddressBarFocusWhenShown(): Boolean = true
 }
 
 fun addCtaToHistory(

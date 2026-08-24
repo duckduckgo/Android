@@ -16,8 +16,10 @@
 
 package com.duckduckgo.app.onboarding.ui.page.configdriven
 
+import androidx.annotation.DrawableRes
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
+import com.duckduckgo.app.onboarding.OnboardingPreference
 import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
 
 /** A screen with working state the user edits before submitting. */
@@ -99,6 +101,22 @@ sealed interface ContentConfig {
     ) : ContentConfig, Stateful<DownloadReasonContentState> {
         override fun initialState() = DownloadReasonContentState(selection = null)
     }
+
+    data class PreferenceSelector(
+        override val title: TextConfig,
+        val rows: List<Row>,
+    ) : ContentConfig, Stateful<PreferenceSelectorContentState> {
+
+        data class Row(
+            val preference: OnboardingPreference,
+            @DrawableRes val iconRes: Int,
+            val primaryText: TextConfig,
+            val secondaryText: TextConfig,
+            val initiallyEnabled: Boolean,
+        )
+
+        override fun initialState() = PreferenceSelectorContentState(rows.associate { it.preference to it.initiallyEnabled })
+    }
 }
 
 data class AddressBarContentState(val position: OmnibarType)
@@ -115,6 +133,8 @@ data class QuickSetupContentState(
 )
 
 data class DownloadReasonContentState(val selection: DownloadReasonSelection?)
+
+data class PreferenceSelectorContentState(val enabled: Map<OnboardingPreference, Boolean>)
 
 enum class DownloadReasonSelection {
     SEARCH,

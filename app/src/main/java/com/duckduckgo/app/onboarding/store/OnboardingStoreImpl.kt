@@ -230,6 +230,14 @@ class OnboardingStoreImpl @Inject constructor(
         return preferences.getBoolean(KEY_DUCK_AI_ONBOARDING_FLOW, false)
     }
 
+    override fun setSegmentedSearchPathWithToggleEnabled(enabled: Boolean) {
+        preferences.edit { putBoolean(KEY_SEGMENTED_SEARCH_PATH_WITH_TOGGLE_ENABLED, enabled) }
+    }
+
+    override fun isSegmentedSearchPathWithToggleEnabled(): Boolean {
+        return preferences.getBoolean(KEY_SEGMENTED_SEARCH_PATH_WITH_TOGGLE_ENABLED, false)
+    }
+
     companion object {
         const val FILENAME = "com.duckduckgo.app.onboarding.settings"
         const val ONBOARDING_JOURNEY = "onboardingJourney"
@@ -237,5 +245,6 @@ class OnboardingStoreImpl @Inject constructor(
         private const val KEY_INPUT_SCREEN_SELECTION_OVERRIDDEN_BY_USER = "inputScreenSelectionOverriddenByUser"
         private const val KEY_DUCK_AI_ONBOARDING_FLOW = "duckAiOnboardingFlow"
         private const val KEY_LINEAR_PLAN_WIDGET_PROMPT_SHOWN = "linearPlanWidgetPromptShown"
+        private const val KEY_SEGMENTED_SEARCH_PATH_WITH_TOGGLE_ENABLED = "segmentedSearchPathWithToggleEnabled"
     }
 }

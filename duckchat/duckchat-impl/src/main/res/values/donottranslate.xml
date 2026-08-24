@@ -27,9 +27,4 @@
     <!-- Page context attachment -->
     <string name="duckChatPageContextRemoveContentDescription">Remove page context</string>
 
-    <!-- Edit message (placeholder copy pending translation) -->
-    <string name="duck_ai_edit_prompt_title">Edit message</string>
-    <string name="duck_ai_edit_prompt_cancel">Cancel</string>
-    <string name="duck_ai_edit_prompt_lose_responses_warning">Editing will replace the response with a new one.</string>
-
 </resources>

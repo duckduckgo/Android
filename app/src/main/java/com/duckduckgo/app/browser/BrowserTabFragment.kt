@@ -511,6 +511,7 @@ class BrowserTabFragment :
     private val customTabToolbarColor get() = requireArguments().getInt(CUSTOM_TAB_TOOLBAR_COLOR_ARG)
     private val tabDisplayedInCustomTabScreen get() = requireArguments().getBoolean(TAB_DISPLAYED_IN_CUSTOM_TAB_SCREEN_ARG)
     private val customTabClientPackage get() = requireArguments().getString(CLIENT_PACKAGE_ARG)
+    private val customTabReferrerPackage get() = requireArguments().getString(REFERRER_PACKAGE_ARG)
 
     private val isLaunchedFromExternalApp get() = requireArguments().getBoolean(LAUNCH_FROM_EXTERNAL_EXTRA)
 
@@ -1218,7 +1219,7 @@ class BrowserTabFragment :
         }
 
         if (savedInstanceState == null) {
-            viewModel.setIsCustomTab(tabDisplayedInCustomTabScreen, customTabClientPackage)
+            viewModel.setIsCustomTab(tabDisplayedInCustomTabScreen, customTabClientPackage, customTabReferrerPackage)
             messageFromPreviousTab?.let {
                 processMessage(it)
             }
@@ -1409,6 +1410,7 @@ class BrowserTabFragment :
                 },
                 onSearchSubmitted = { query -> onUserSubmittedText(query) },
                 onDuckAiChatSubmitted = { query, modelId, reasoningEffort, selectedTool, imagesJson, filesJson ->
+                    viewModel.onDuckAiChatPromptSubmitted()
                     contentScopeScripts.sendSubscriptionEvent(
                         SubscriptionEventData(
                             featureName = "aiChat",
@@ -2865,7 +2867,10 @@ class BrowserTabFragment :
             }
 
             is Command.OpenAppLink -> {
-                openAppLink(it.appLink)
+                val launched = openAppLink(it.appLink)
+                if (it.finishCustomTabOnLaunch && launched) {
+                    finishCustomTab()
+                }
             }
 
             is Command.HandleNonHttpAppLink -> {
@@ -3237,6 +3242,7 @@ class BrowserTabFragment :
         position: Int,
         offset: Int,
     ) {
+        if (!isAdded || view == null) return
         val layoutManager = binding.autoCompleteSuggestionsList.layoutManager as LinearLayoutManager
         layoutManager.scrollToPositionWithOffset(position, offset - AUTOCOMPLETE_PADDING_DP.toPx())
     }
@@ -3420,8 +3426,8 @@ class BrowserTabFragment :
         appLinksSnackBar?.show()
     }
 
-    private fun openAppLink(appLink: SpecialUrlDetector.UrlType.AppLink) {
-        appLinksLauncher.openAppLink(context = context, appLink = appLink, viewModel = viewModel)
+    private fun openAppLink(appLink: SpecialUrlDetector.UrlType.AppLink): Boolean {
+        return appLinksLauncher.openAppLink(context = context, appLink = appLink, viewModel = viewModel)
     }
 
     private fun dismissAppLinkSnackBar() {
@@ -3774,6 +3780,7 @@ class BrowserTabFragment :
                     viewModel.onUserSelectedToEditQuery(it.phrase)
                 },
                 autoCompleteDeleteClickListener = {
+                    storeAutocompletePosition()
                     viewModel.onUserRequestedToDeleteAutocompleteItem(it)
                 },
                 omnibarType = settingsDataStore.omnibarType,
@@ -5131,7 +5138,7 @@ class BrowserTabFragment :
         // away on a previous visit isn't left as an icons-only strip.
         omnibar.setExpanded(true)
         launchDownloadMessagesJob()
-        viewModel.onViewVisible()
+        viewModel.onViewVisible(reportLandingFocus = false)
     }
 
     private fun launchDownloadMessagesJob() {
@@ -5168,7 +5175,10 @@ class BrowserTabFragment :
         // During the locked Duck.ai onboarding demo, don't navigate within the app — returning false
         // lets BrowserActivity exit (close the app). The user progresses by tapping the fire button.
         if (viewModel.isOmnibarLockedForOnboarding()) return false
-        if (nativeInputManager.hideNativeInput()) return true
+        if (nativeInputManager.hideNativeInput()) {
+            viewModel.onBackInteraction()
+            return true
+        }
         if (isPdfVisible()) {
             hidePdf()
             val currentUrl = webView?.url
@@ -5176,6 +5186,7 @@ class BrowserTabFragment :
             if (currentUrl.isNullOrBlank() || currentUrl == "about:blank") {
                 viewModel.onUserPressedBack(isCustomTab)
             } else {
+                viewModel.onBackInteraction()
                 showBrowser()
             }
             return true
@@ -5496,6 +5507,7 @@ class BrowserTabFragment :
         private const val SKIP_HOME_ARG = "SKIP_HOME_ARG"
         private const val LAUNCH_FROM_EXTERNAL_EXTRA = "LAUNCH_FROM_EXTERNAL_EXTRA"
         private const val CLIENT_PACKAGE_ARG = "CLIENT_PACKAGE_ARG"
+        private const val REFERRER_PACKAGE_ARG = "REFERRER_PACKAGE_ARG"
 
         const val ADD_SAVED_SITE_FRAGMENT_TAG = "ADD_SAVED_SITE"
         private const val PDF_VIEWER_FRAGMENT_TAG = "PDF_VIEWER"
@@ -5909,6 +5921,7 @@ class BrowserTabFragment :
             toolbarColor: Int,
             isExternal: Boolean,
             clientPackage: String? = null,
+            referrerPackage: String? = null,
         ): BrowserTabFragment {
             val fragment = BrowserTabFragment()
             val args = Bundle()
@@ -5919,6 +5932,9 @@ class BrowserTabFragment :
             args.putBoolean(LAUNCH_FROM_EXTERNAL_EXTRA, isExternal)
             clientPackage?.let {
                 args.putString(CLIENT_PACKAGE_ARG, it)
+            }
+            referrerPackage?.let {
+                args.putString(REFERRER_PACKAGE_ARG, it)
             }
             query.let {
                 args.putString(URL_EXTRA_ARG, query)

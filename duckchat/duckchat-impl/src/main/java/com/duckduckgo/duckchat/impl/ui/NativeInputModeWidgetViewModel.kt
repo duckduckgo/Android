@@ -57,7 +57,6 @@ import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
-import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.reader.ChatSuggestionsReader
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
@@ -237,11 +236,20 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         return nativeInputStateProvider.stateForTab(tabId).value.selectedTool
     }
 
+    private fun currentInputState(): NativeInputState? =
+        activeTabId.value?.let { nativeInputStateProvider.stateForTab(it).value }
+
+    private fun resolvedTogglePositionIfVisible(state: NativeInputState? = currentInputState()): NativeInputState.ToggleSelection? =
+        if (state?.toggleVisible == true) duckChatInternal.resolvedTogglePosition() else null
+
     /** The pixel surface for the active tab, derived from its published input context. */
-    private fun currentSurface(): DuckChatPixelSurface {
-        val inputContext = activeTabId.value?.let { nativeInputStateProvider.stateForTab(it).value.inputContext }
-            ?: NativeInputState.InputContext.BROWSER
+    private fun currentSurface(state: NativeInputState? = currentInputState()): DuckChatPixelSurface {
+        val inputContext = state?.inputContext ?: NativeInputState.InputContext.BROWSER
         return DuckChatPixelSurface.from(inputContext)
+    }
+
+    fun fireOmnibarQuerySubmitted(query: String) {
+        duckChatPixels.fireOmnibarQuerySubmitted(query, resolvedTogglePositionIfVisible(currentInputState()))
     }
 
     /**
@@ -260,7 +268,8 @@ class NativeInputModeWidgetViewModel @Inject constructor(
             Tool.WEB_SEARCH -> "web_search"
             null -> "none"
         }
-        val surface = currentSurface()
+        val inputState = currentInputState()
+        val surface = currentSurface(inputState)
         duckChatPixels.firePromptSubmitted(
             selectedTool = selectedToolParam,
             modelId = getSelectedModelId(),
@@ -269,6 +278,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
             hasFileAttachment = hasFileAttachment,
             hasText = hasText,
             surface = surface,
+            defaultMode = resolvedTogglePositionIfVisible(inputState),
         )
         when (tool) {
             Tool.IMAGE_GENERATION -> duckChatPixels.fireImageGenerationSubmitted(surface)
@@ -417,9 +427,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
 
     val chatSuggestionsUserEnabled: Flow<Boolean> = duckChatInternal.observeChatSuggestionsUserSettingEnabled()
 
-    val defaultTogglePosition: Flow<DefaultTogglePosition> = duckChatInternal.observeDefaultTogglePosition()
-
-    val lastUsedTogglePosition: Flow<String?> = duckChatInternal.observeLastUsedTogglePosition()
+    fun resolvedTogglePosition(): NativeInputState.ToggleSelection? = resolvedTogglePositionIfVisible()
 
     suspend fun saveLastUsedTogglePosition(position: String) {
         duckChatInternal.saveLastUsedTogglePosition(position)

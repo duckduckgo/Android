@@ -21,8 +21,10 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.install.AppInstall
+import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
@@ -112,6 +114,10 @@ class RealDuckChatJSHelperTest {
         onBlocking { isEligible() } doReturn false
     }
     private val mockEditPromptSessionStore: EditPromptSessionStore = mock()
+    private val mockBrowserInteractionsPlugin: BrowserInteractionsPlugin = mock()
+    private val mockBrowserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin> = mock {
+        on { getPlugins() } doReturn listOf(mockBrowserInteractionsPlugin)
+    }
     private val testee = RealDuckChatJSHelper(
         duckChat = mockDuckChat,
         duckChatPixels = mockDuckChatPixels,
@@ -130,6 +136,7 @@ class RealDuckChatJSHelperTest {
         appBuildConfig = mockAppBuildConfig,
         subscriptions = mockSubscriptions,
         editPromptSessionStore = mockEditPromptSessionStore,
+        browserInteractionsPlugins = mockBrowserInteractionsPlugins,
     )
     private val viewModel =
         object {
@@ -1863,6 +1870,50 @@ class RealDuckChatJSHelperTest {
         )
 
         verify(mockDuckChatPixels).sendReportMetricPixel(USER_DID_SUBMIT_FIRST_PROMPT)
+    }
+
+    @Test
+    fun whenReportMetricWithSubmittedPromptThenNotifiesAiPromptSubmittedOnly() = runTest {
+        val data = JSONObject(mapOf("metricName" to "userDidSubmitPrompt"))
+
+        testee.processJsCallbackMessage(
+            featureName = "aiChat",
+            method = "reportMetric",
+            id = "123",
+            data = data,
+        )
+
+        verify(mockBrowserInteractionsPlugin).onAiPromptSubmitted()
+        verify(mockBrowserInteractionsPlugin, never()).onInputSubmitted()
+    }
+
+    @Test
+    fun whenReportMetricWithFirstSubmittedPromptThenNotifiesAiPromptSubmittedOnly() = runTest {
+        val data = JSONObject(mapOf("metricName" to "userDidSubmitFirstPrompt"))
+
+        testee.processJsCallbackMessage(
+            featureName = "aiChat",
+            method = "reportMetric",
+            id = "123",
+            data = data,
+        )
+
+        verify(mockBrowserInteractionsPlugin).onAiPromptSubmitted()
+        verify(mockBrowserInteractionsPlugin, never()).onInputSubmitted()
+    }
+
+    @Test
+    fun whenReportMetricIsUnrelatedThenDoesNotNotifyBrowserInteractions() = runTest {
+        val data = JSONObject(mapOf("metricName" to "userDidOpenHistory"))
+
+        testee.processJsCallbackMessage(
+            featureName = "aiChat",
+            method = "reportMetric",
+            id = "123",
+            data = data,
+        )
+
+        verifyNoInteractions(mockBrowserInteractionsPlugin)
     }
 
     @Test

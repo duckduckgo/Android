@@ -26,12 +26,18 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
+import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withTimeout
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.*
+import java.io.Closeable
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 class AuthTokenRefreshWideEventTest {
     @get:Rule
@@ -67,7 +73,7 @@ class AuthTokenRefreshWideEventTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(123L))
 
-        authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
+        authWideEvent.onStart(SubscriptionStatus.UNKNOWN, serializationEnabled = true)
 
         verify(wideEventClient).flowStart(
             name = "auth-token-refresh",
@@ -77,11 +83,42 @@ class AuthTokenRefreshWideEventTest {
                 "netp_is_enabled" to "false",
                 "netp_is_running" to "false",
                 "process_name" to "main",
+                "serialization_enabled" to "true",
             ),
             cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
         )
 
         verify(wideEventClient).intervalStart(123L, "total_duration_ms_bucketed", null)
+        verify(wideEventClient).intervalStart(
+            wideEventId = 123L,
+            key = "token_refresh_lock_wait_ms_bucketed",
+            timeout = null,
+            buckets = setOf(100.milliseconds, 500.milliseconds, 1.seconds, 3.seconds, 10.seconds, 30.seconds, 60.seconds),
+        )
+    }
+
+    @Test
+    fun `onStart with serialization disabled does not start lock wait interval`() = runTest {
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
+            .thenReturn(Result.success(123L))
+
+        authWideEvent.onStart(SubscriptionStatus.UNKNOWN, serializationEnabled = false)
+
+        verify(wideEventClient).flowStart(
+            name = "auth-token-refresh",
+            flowEntryPoint = null,
+            metadata = mapOf(
+                "subscription_status" to SubscriptionStatus.UNKNOWN.statusName,
+                "netp_is_enabled" to "false",
+                "netp_is_running" to "false",
+                "process_name" to "main",
+                "serialization_enabled" to "false",
+            ),
+            cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
+        )
+
+        verify(wideEventClient).intervalStart(123L, "total_duration_ms_bucketed", null)
+        verify(wideEventClient, never()).intervalStart(any(), eq("token_refresh_lock_wait_ms_bucketed"), anyOrNull(), anyOrNull())
     }
 
     @Test
@@ -89,22 +126,56 @@ class AuthTokenRefreshWideEventTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(1L))
 
-        authWideEvent.onStart(SubscriptionStatus.WAITING)
+        authWideEvent.onStart(SubscriptionStatus.WAITING, serializationEnabled = true)
 
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(2L))
 
-        authWideEvent.onStart(SubscriptionStatus.AUTO_RENEWABLE)
+        authWideEvent.onStart(SubscriptionStatus.AUTO_RENEWABLE, serializationEnabled = true)
 
         verify(wideEventClient).intervalEnd(1L, "total_duration_ms_bucketed")
         verify(wideEventClient).flowFinish(1L, FlowStatus.Unknown, emptyMap())
     }
 
     @Test
+    fun `onCrossProcessLockAcquired ends lock wait interval and sends successful step with outcome`() = runTest {
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
+            .thenReturn(Result.success(21L))
+        authWideEvent.onStart(SubscriptionStatus.UNKNOWN, serializationEnabled = true)
+
+        authWideEvent.onCrossProcessLockAcquired(Result.success(Closeable {}))
+
+        verify(wideEventClient).intervalEnd(21L, "token_refresh_lock_wait_ms_bucketed")
+        verify(wideEventClient).flowStep(21L, "lock_acquire", true, mapOf("lock_outcome" to "acquired"))
+    }
+
+    @Test
+    fun `onCrossProcessLockAcquired with fallback timeout outcome sends failed step`() = runTest {
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
+            .thenReturn(Result.success(23L))
+        authWideEvent.onStart(SubscriptionStatus.UNKNOWN, serializationEnabled = true)
+
+        authWideEvent.onCrossProcessLockAcquired(Result.failure(timeoutCancellationException()))
+
+        verify(wideEventClient).flowStep(23L, "lock_acquire", false, mapOf("lock_outcome" to "timeout"))
+    }
+
+    @Test
+    fun `onCrossProcessLockAcquired with fallback error outcome sends failed step`() = runTest {
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
+            .thenReturn(Result.success(24L))
+        authWideEvent.onStart(SubscriptionStatus.UNKNOWN, serializationEnabled = true)
+
+        authWideEvent.onCrossProcessLockAcquired(Result.failure(RuntimeException()))
+
+        verify(wideEventClient).flowStep(24L, "lock_acquire", false, mapOf("lock_outcome" to "error"))
+    }
+
+    @Test
     fun `onTokenRead sends step and starts jwks interval`() = runTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(10L))
-        authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
+        authWideEvent.onStart(SubscriptionStatus.UNKNOWN, serializationEnabled = true)
 
         authWideEvent.onTokenRead()
 
@@ -116,7 +187,7 @@ class AuthTokenRefreshWideEventTest {
     fun `onJwksFetched ends jwks interval and starts tokens interval`() = runTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(11L))
-        authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
+        authWideEvent.onStart(SubscriptionStatus.UNKNOWN, serializationEnabled = true)
 
         authWideEvent.onJwksFetched()
 
@@ -129,7 +200,7 @@ class AuthTokenRefreshWideEventTest {
     fun `onTokensFetched ends tokens interval and sends step`() = runTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(12L))
-        authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
+        authWideEvent.onStart(SubscriptionStatus.UNKNOWN, serializationEnabled = true)
 
         authWideEvent.onTokensFetched()
 
@@ -141,7 +212,7 @@ class AuthTokenRefreshWideEventTest {
     fun `onTokensValidated sends validation step`() = runTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(13L))
-        authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
+        authWideEvent.onStart(SubscriptionStatus.UNKNOWN, serializationEnabled = true)
 
         authWideEvent.onTokensValidated()
 
@@ -152,7 +223,7 @@ class AuthTokenRefreshWideEventTest {
     fun `onBackendErrorResponse sends token_request failure with metadata`() = runTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(14L))
-        authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
+        authWideEvent.onStart(SubscriptionStatus.UNKNOWN, serializationEnabled = true)
 
         authWideEvent.onBackendErrorResponse("backend-err")
 
@@ -168,7 +239,7 @@ class AuthTokenRefreshWideEventTest {
     fun `onPlayLoginSuccess sends step`() = runTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(15L))
-        authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
+        authWideEvent.onStart(SubscriptionStatus.UNKNOWN, serializationEnabled = true)
 
         authWideEvent.onPlayLoginSuccess()
 
@@ -179,7 +250,7 @@ class AuthTokenRefreshWideEventTest {
     fun `onPlayLoginFailure sends failure step, finishes flow and clears id`() = runTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(16L))
-        authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
+        authWideEvent.onStart(SubscriptionStatus.UNKNOWN, serializationEnabled = true)
 
         val ex = IllegalStateException("boom")
         authWideEvent.onPlayLoginFailure(signedOut = true, refreshException = ex, loginError = "sign-in-required")
@@ -191,7 +262,7 @@ class AuthTokenRefreshWideEventTest {
             metadata = mapOf("play_login_error" to "sign-in-required"),
         )
         verify(wideEventClient).intervalEnd(16L, "total_duration_ms_bucketed")
-        verify(wideEventClient).flowFinish(16L, FlowStatus.Failure("IllegalStateException"), emptyMap())
+        verify(wideEventClient).flowFinish(16L, FlowStatus.Failure("IllegalStateException"), mapOf("signed_out" to "true"))
 
         reset(wideEventClient)
 
@@ -201,10 +272,27 @@ class AuthTokenRefreshWideEventTest {
     }
 
     @Test
+    fun `onPlayLoginFailure without signing the user out logs signedOut as false`() = runTest {
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
+            .thenReturn(Result.success(20L))
+        authWideEvent.onStart(SubscriptionStatus.UNKNOWN, serializationEnabled = true)
+
+        authWideEvent.onPlayLoginFailure(signedOut = false, refreshException = IllegalStateException("boom"), loginError = "UnknownError")
+
+        verify(wideEventClient).flowStep(
+            wideEventId = 20L,
+            stepName = "play_login",
+            success = false,
+            metadata = mapOf("play_login_error" to "UnknownError"),
+        )
+        verify(wideEventClient).flowFinish(20L, FlowStatus.Failure("IllegalStateException"), mapOf("signed_out" to "false"))
+    }
+
+    @Test
     fun `onUnknownAccountError cancels flow and clears id`() = runTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(17L))
-        authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
+        authWideEvent.onStart(SubscriptionStatus.UNKNOWN, serializationEnabled = true)
 
         authWideEvent.onUnknownAccountError()
 
@@ -220,7 +308,7 @@ class AuthTokenRefreshWideEventTest {
     fun `onSuccess finishes with Success and clears id`() = runTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(18L))
-        authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
+        authWideEvent.onStart(SubscriptionStatus.UNKNOWN, serializationEnabled = true)
 
         authWideEvent.onSuccess()
 
@@ -236,7 +324,7 @@ class AuthTokenRefreshWideEventTest {
     fun `onFailure finishes with Failure and clears id`() = runTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(19L))
-        authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
+        authWideEvent.onStart(SubscriptionStatus.UNKNOWN, serializationEnabled = true)
 
         authWideEvent.onFailure(IllegalArgumentException("nope"))
 
@@ -244,12 +332,19 @@ class AuthTokenRefreshWideEventTest {
         verify(wideEventClient).flowFinish(19L, FlowStatus.Failure("IllegalArgumentException"), emptyMap())
     }
 
+    // TimeoutCancellationException has an internal constructor, so a real instance is obtained via withTimeout
+    private suspend fun timeoutCancellationException(): TimeoutCancellationException = try {
+        withTimeout(1) { awaitCancellation() }
+    } catch (e: TimeoutCancellationException) {
+        e
+    }
+
     @SuppressLint("DenyListedApi")
     @Test
     fun `feature disabled results in no interactions`() = runTest {
         subscriptionsFeature.sendAuthTokenRefreshWideEvent().setRawStoredState(Toggle.State(false))
 
-        authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
+        authWideEvent.onStart(SubscriptionStatus.UNKNOWN, serializationEnabled = true)
         authWideEvent.onTokensFetched()
 
         verifyNoInteractions(wideEventClient)
