@@ -21,6 +21,7 @@ import com.duckduckgo.app.pixels.remoteconfig.OptimizeTrackerEvaluationRCWrapper
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
+import com.duckduckgo.app.statistics.wideevents.WideEventDefinition
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
@@ -100,6 +101,7 @@ class PageLoadWideEventTest {
             flowEntryPoint = null,
             metadata = emptyMap(),
             cleanupPolicy = CleanupPolicy.OnTimeout(5.minutes),
+            definition = WideEventDefinition(version = WideEventDefinition.Version(minor = 0, patch = 1)),
         )
         verify(wideEventClient).flowStep(
             wideEventId = 123L,
@@ -576,7 +578,7 @@ class PageLoadWideEventTest {
     }
 
     @Test
-    fun `when onPageStarted called with different url then aborts previous flow`() = runTest {
+    fun `when onPageStarted called with different url then cancels previous flow`() = runTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(800L))
             .thenReturn(Result.success(900L))
@@ -585,15 +587,63 @@ class PageLoadWideEventTest {
         pageLoadWideEvent.onPageStarted("tab_8", "https://espn.com", 1L)
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
-        // Start second page load with different URL - should abort first flow
+        // Start second page load with different URL - should cancel first flow
         pageLoadWideEvent.onPageStarted("tab_8", "https://twitter.com", 2L)
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
-        // Verify first flow was aborted
-        verify(wideEventClient).flowAbort(800L)
+        verify(wideEventClient).flowFinish(
+            wideEventId = 800L,
+            status = FlowStatus.Cancelled,
+            metadata = mapOf(
+                "webview_version" to "120",
+                "cpm_enabled" to "true",
+                "tracker_optimization_enabled_v3" to "true",
+                "content_scope_injection_optimized" to "true",
+                "content_scope_messaging_optimized" to "true",
+                "content_scope_experiments_cached" to "true",
+                "cancellation_reason" to "superseded_different_url",
+            ),
+        )
 
         // Verify second flow was started
         verify(wideEventClient, times(2)).flowStart(any(), anyOrNull(), any(), any(), any(), any())
+    }
+
+    @Test
+    fun `when a load is replaced by one of the same url then it is cancelled as a restart`() = runTest {
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
+            .thenReturn(Result.success(801L))
+            .thenReturn(Result.success(802L))
+
+        pageLoadWideEvent.onPageStarted("tab_same", "https://reddit.com", 1L)
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+        // A restart of the load rather than a navigation away from it, which the reason has to keep apart.
+        pageLoadWideEvent.onPageStarted("tab_same", "https://reddit.com", 2L)
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(wideEventClient).flowFinish(eq(801L), eq(FlowStatus.Cancelled), any())
+        assertEquals("superseded_same_url", capturedFlowFinishMetadata(801L)["cancellation_reason"])
+    }
+
+    @Test
+    fun `when the load being replaced is already past the cleanup timeout then it is left to the cleanup policy`() = runTest {
+        whenever(currentTimeProvider.currentTimeMillis())
+            .thenReturn(1000L)
+            .thenReturn(1000L + 6.minutes.inWholeMilliseconds)
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
+            .thenReturn(Result.success(910L))
+            .thenReturn(Result.success(911L))
+
+        pageLoadWideEvent.onPageStarted("tab_stale", "https://reddit.com", 1L)
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+        pageLoadWideEvent.onPageStarted("tab_stale", "https://ebay.com", 2L)
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+
+        // Cancelled means superseded while it was still being measured. A load this old was not, so its outcome is
+        // genuinely unaccounted for and the cleanup policy owns it.
+        verify(wideEventClient, times(2)).flowStart(any(), anyOrNull(), any(), any(), any(), any())
+        verify(wideEventClient, never()).flowFinish(eq(910L), any(), any())
+        verify(wideEventClient, never()).flowAbort(any())
     }
 
     @Test
@@ -648,6 +698,7 @@ class PageLoadWideEventTest {
             flowEntryPoint = null,
             metadata = emptyMap(),
             cleanupPolicy = CleanupPolicy.OnTimeout(5.minutes),
+            definition = WideEventDefinition(version = WideEventDefinition.Version(minor = 0, patch = 1)),
         )
     }
 
@@ -709,7 +760,7 @@ class PageLoadWideEventTest {
     }
 
     @Test
-    fun `when a new load starts in a tab then the previous flow is aborted even if untracked`() = runTest {
+    fun `when a new load starts in a tab then the previous flow is cancelled even if untracked`() = runTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(123L))
 
@@ -719,7 +770,8 @@ class PageLoadWideEventTest {
         pageLoadWideEvent.onPageStarted("tab_1", "https://untracked-site.com", 2L)
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
-        verify(wideEventClient).flowAbort(123L)
+        assertEquals("superseded_different_url", capturedFlowFinishMetadata(123L)["cancellation_reason"])
+        verify(wideEventClient).flowFinish(eq(123L), eq(FlowStatus.Cancelled), any())
         verify(wideEventClient, times(1)).flowStart(any(), anyOrNull(), any(), any(), any(), any())
     }
 
@@ -740,7 +792,7 @@ class PageLoadWideEventTest {
     }
 
     @Test
-    fun `when an untracked load starts before the flow it replaces exists then that flow is still aborted`() = runTest {
+    fun `when an untracked load starts before the flow it replaces exists then that flow is still cancelled`() = runTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(123L))
 
@@ -750,7 +802,7 @@ class PageLoadWideEventTest {
         pageLoadWideEvent.onPageStarted("tab_race", "https://untracked-site.com", 2L)
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
-        verify(wideEventClient).flowAbort(123L)
+        verify(wideEventClient).flowFinish(eq(123L), eq(FlowStatus.Cancelled), any())
     }
 
     @Test
@@ -774,8 +826,10 @@ class PageLoadWideEventTest {
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
         finishPageLoad("tab_r", 3L)
 
-        // The abandoned reddit load sends nothing, rather than an event whose duration spans it and ebay together.
-        verify(wideEventClient).flowAbort(73L)
+        // The abandoned reddit load is reported as superseded, rather than as an event whose duration spans it and
+        // ebay together, or as nothing at all.
+        verify(wideEventClient).flowFinish(eq(73L), eq(FlowStatus.Cancelled), any())
+        verify(wideEventClient, never()).intervalEnd(eq(73L), eq("elapsed_time_to_finish_ms_bucketed"))
         verify(wideEventClient).intervalEnd(74L, "elapsed_time_to_finish_ms_bucketed")
         verify(wideEventClient).flowFinish(eq(74L), eq(FlowStatus.Success), any())
 

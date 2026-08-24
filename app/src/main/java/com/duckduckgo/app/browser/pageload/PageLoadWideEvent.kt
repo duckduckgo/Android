@@ -24,6 +24,7 @@ import com.duckduckgo.app.pixels.remoteconfig.OptimizeTrackerEvaluationRCWrapper
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
+import com.duckduckgo.app.statistics.wideevents.WideEventDefinition
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
@@ -38,7 +39,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withContext
 import logcat.logcat
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
@@ -58,7 +58,8 @@ interface PageLoadWideEvent {
     /**
      * Called when a page starts loading.
      * Starting a load ends whatever load was previously tracked for this tab, whether or not [url] is tracked: the
-     * previous flow can no longer receive events, so leaving it open would only emit an abandoned event on cleanup.
+     * previous flow can no longer receive events, and is completed as cancelled so the load it was measuring stays
+     * countable as one that was superseded, rather than being dropped or left to age into an unaccounted outcome.
      * @param tabId The unique identifier for the tab
      * @param url The URL of the page being loaded
      * @param navigationId Identifies this load for every measurement reported against it later. Must be unique for the
@@ -146,8 +147,7 @@ class RealPageLoadWideEvent @Inject constructor(
                 if (!isFeatureEnabled()) return@launch
 
                 activeFlows.remove(tabId)?.let { previous ->
-                    logcat { "Cancelling previous flow for tabId=$tabId, flowId=${previous.flowId} (${previous.url} → $url)" }
-                    wideEventClient.flowAbort(previous.flowId)
+                    reportSupersededLoad(tabId, previous, supersedingUrl = url)
                 }
 
                 if (!shouldTrackUrl(url)) return@launch
@@ -155,6 +155,7 @@ class RealPageLoadWideEvent @Inject constructor(
                 val result = wideEventClient.flowStart(
                     name = PAGE_LOAD_FEATURE_NAME,
                     cleanupPolicy = CleanupPolicy.OnTimeout(CLEANUP_TIMEOUT),
+                    definition = WideEventDefinition(version = DEFINITION_VERSION),
                 )
 
                 result.onSuccess { flowId ->
@@ -270,8 +271,6 @@ class RealPageLoadWideEvent @Inject constructor(
                 },
             )
 
-            val optimizations = contentScopeOptimizations.current()
-
             val flowStatus = if (isSuccess) {
                 FlowStatus.Success
             } else {
@@ -280,21 +279,41 @@ class RealPageLoadWideEvent @Inject constructor(
             wideEventClient.flowFinish(
                 wideEventId = flowId,
                 status = flowStatus,
-                metadata = mapOf(
-                    KEY_WEBVIEW_VERSION to webViewVersionProvider.getMajorVersion(),
-                    KEY_CPM_ENABLED to autoconsent.isAutoconsentEnabled().toString(),
-                    KEY_TRACKER_OPTIMIZATION_ENABLED to optimizeTrackerEvaluationRCWrapper.enabled.toString(),
+                metadata = loadConditions() + mapOf(
                     KEY_IS_TAB_IN_FOREGROUND_ON_FINISH to isTabInForegroundOnFinish.toString(),
                     KEY_ACTIVE_REQUESTS_ON_LOAD_START to activeRequestsOnLoadStart.toString(),
                     KEY_CONCURRENT_REQUESTS_ON_FINISH to concurrentRequestsOnFinish.toString(),
-                    KEY_CONTENT_SCOPE_INJECTION_OPTIMIZED to optimizations.injectionOptimized.toString(),
-                    KEY_CONTENT_SCOPE_MESSAGING_OPTIMIZED to optimizations.messagingOptimized.toString(),
-                    KEY_CONTENT_SCOPE_EXPERIMENTS_CACHED to optimizations.experimentsCached.toString(),
                 ),
             )
 
             logcat { "Page load finished: tabId=$tabId, flowId=$flowId, outcome=$outcome" }
         }
+    }
+
+    private suspend fun reportSupersededLoad(tabId: String, previous: PageLoadState, supersedingUrl: String) {
+        if (previous.isStale()) {
+            logcat { "Leaving stale flow ${previous.flowId} for tabId=$tabId to the cleanup policy" }
+            return
+        }
+        val reason = if (previous.url == supersedingUrl) REASON_SUPERSEDED_SAME_URL else REASON_SUPERSEDED_DIFFERENT_URL
+        logcat { "Cancelling flow ${previous.flowId} for tabId=$tabId as $reason (${previous.url} → $supersedingUrl)" }
+        wideEventClient.flowFinish(
+            wideEventId = previous.flowId,
+            status = FlowStatus.Cancelled,
+            metadata = loadConditions() + mapOf(KEY_CANCELLATION_REASON to reason),
+        )
+    }
+
+    private suspend fun loadConditions(): Map<String, String> {
+        val optimizations = contentScopeOptimizations.current()
+        return mapOf(
+            KEY_WEBVIEW_VERSION to webViewVersionProvider.getMajorVersion(),
+            KEY_CPM_ENABLED to autoconsent.isAutoconsentEnabled().toString(),
+            KEY_TRACKER_OPTIMIZATION_ENABLED to optimizeTrackerEvaluationRCWrapper.enabled.toString(),
+            KEY_CONTENT_SCOPE_INJECTION_OPTIMIZED to optimizations.injectionOptimized.toString(),
+            KEY_CONTENT_SCOPE_MESSAGING_OPTIMIZED to optimizations.messagingOptimized.toString(),
+            KEY_CONTENT_SCOPE_EXPERIMENTS_CACHED to optimizations.experimentsCached.toString(),
+        )
     }
 
     private fun shouldTrackUrl(url: String): Boolean {
@@ -362,10 +381,10 @@ class RealPageLoadWideEvent @Inject constructor(
         if (state.isStale()) return null
         return state
     }
-
-    private suspend fun isFeatureEnabled(): Boolean = withContext(dispatchers.io()) {
-        androidBrowserConfigFeature.get().sendPageLoadWideEvent().isEnabled()
-    }
+    private suspend fun isFeatureEnabled(): Boolean = true
+    //     private suspend fun isFeatureEnabled(): Boolean = withContext(dispatchers.io()) {
+    //     androidBrowserConfigFeature.get().sendPageLoadWideEvent().isEnabled()
+    // }
 
     private inner class PageLoadState(
         val flowId: Long,
@@ -396,6 +415,7 @@ class RealPageLoadWideEvent @Inject constructor(
 
         val CONTENT_SCOPE_BUCKETS_MS: List<Long> = listOf(5, 10, 25, 50, 100, 200, 400, 800, 1600, 3200, 6400)
         const val PAGE_LOAD_FEATURE_NAME = "page-load"
+        val DEFINITION_VERSION = WideEventDefinition.Version(minor = 0, patch = 1)
         const val STEP_PAGE_START = "page_start"
         const val STEP_PAGE_VISIBLE = "page_visible"
         const val STEP_PAGE_ESCAPED_FIXED_PROGRESS = "page_escaped_fixed_progress"
@@ -419,6 +439,9 @@ class RealPageLoadWideEvent @Inject constructor(
         const val KEY_IS_TAB_IN_FOREGROUND_ON_FINISH = "is_tab_in_foreground_on_finish"
         const val KEY_ACTIVE_REQUESTS_ON_LOAD_START = "active_requests_on_load_start"
         const val KEY_CONCURRENT_REQUESTS_ON_FINISH = "concurrent_requests_on_finish"
+        const val KEY_CANCELLATION_REASON = "cancellation_reason"
+        const val REASON_SUPERSEDED_SAME_URL = "superseded_same_url"
+        const val REASON_SUPERSEDED_DIFFERENT_URL = "superseded_different_url"
         const val FIXED_PROGRESS_THRESHOLD = 50
     }
 }
