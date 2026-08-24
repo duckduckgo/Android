@@ -186,7 +186,14 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 }
                 add(addressBarPositionStep())
                 add(inputScreenStep(ctx))
-                add(inputScreenPreviewStep(ctx, duckAiEnabled, allowSearchPreviewOnly = false))
+                add(
+                    inputScreenPreviewStep(
+                        ctx = ctx,
+                        isSearchDefault = true,
+                        showModeToggle = { ctx.inputModeWasAi && duckAiEnabled() },
+                        shownOnlyWithModeToggle = true,
+                    ),
+                )
             },
         )
     }
@@ -232,7 +239,12 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 initialReinstallUserStep(firstDialog, quickSetupPlan, isCustomAiPlan = true),
                 initialStep(firstDialog),
                 aiComparisonChartStep(),
-                customAiInputScreenPreviewStep(ctx),
+                inputScreenPreviewStep(
+                    ctx = ctx,
+                    isSearchDefault = false,
+                    showsStepIndicator = true,
+                    handsPromptToDemoStep = true,
+                ),
                 duckAiDemoStep(ctx),
                 comparisonChartStep(),
                 defaultBrowserPromptStep(),
@@ -522,7 +534,11 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                     onboardingStore.setSegmentedSearchPathWithToggleEnabled(withAi)
                 },
                 addressBarPositionStep(),
-                inputScreenPreviewStep(ctx, duckAiEnabled, allowSearchPreviewOnly = true),
+                inputScreenPreviewStep(
+                    ctx = ctx,
+                    isSearchDefault = true,
+                    showModeToggle = { ctx.inputModeWasAi && duckAiEnabled() },
+                ),
             ),
         )
     }
@@ -556,7 +572,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 ),
                 togglePositionStep(),
                 addressBarPositionStep(),
-                customAiInputScreenPreviewStep(ctx, showsStepIndicator = false, handsPromptToDemoStep = false),
+                inputScreenPreviewStep(ctx = ctx, isSearchDefault = false),
             ),
         )
 
@@ -829,27 +845,36 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         )
     }
 
+    /**
+     * Preview of the input screen the user just configured. [isSearchDefault] picks the pre-selected mode and
+     * [showModeToggle] resolves whether the search/Duck.ai toggle is offered; the title follows from the two.
+     * [shownOnlyWithModeToggle] skips the step entirely when the toggle wouldn't show.
+     */
     private fun inputScreenPreviewStep(
         ctx: NewUserOnboardingPlanContext,
-        duckAiEnabled: SuspendMemo<Boolean>,
-        allowSearchPreviewOnly: Boolean,
+        isSearchDefault: Boolean,
+        showModeToggle: suspend () -> Boolean = { false },
+        shownOnlyWithModeToggle: Boolean = false,
+        showsStepIndicator: Boolean = false,
+        // The custom-AI plan hands the prompt to its duck_ai_demo step. Paths with no demo step after the
+        // preview finish onboarding on the prompt instead, so it isn't dropped.
+        handsPromptToDemoStep: Boolean = false,
     ): NewUserOnboardingActivityStep {
         val pixelName = OnboardingPixelName.ONBOARDING_SEARCH_CHAT_TOGGLE
         return NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.INPUT_SCREEN_PREVIEW,
             pixelName = pixelName,
-            precondition = {
-                (ctx.inputModeWasAi && duckAiEnabled()) || allowSearchPreviewOnly
-            },
+            showsStepIndicator = showsStepIndicator,
+            precondition = { !shownOnlyWithModeToggle || showModeToggle() },
             resolveDialog = {
-                val demoIncludesAi = ctx.inputModeWasAi && duckAiEnabled()
+                val modeToggleShown = showModeToggle()
                 NewUserOnboardingActivityDialog.InputScreenPreview(
-                    isSearchDefault = true,
-                    showModeToggle = demoIncludesAi,
-                    titleRes = if (demoIncludesAi) {
-                        R.string.preOnboardingInputModeDemoTitle
-                    } else {
-                        R.string.searchPathInputPreviewTitle
+                    isSearchDefault = isSearchDefault,
+                    showModeToggle = modeToggleShown,
+                    titleRes = when {
+                        !isSearchDefault -> R.string.preOnboardingInputModeDemoTitleCustomAi
+                        modeToggleShown -> R.string.preOnboardingInputModeDemoTitle
+                        else -> R.string.searchPathInputPreviewTitle
                     },
                 )
             },
@@ -865,10 +890,14 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                             pixelName,
                             OnboardingPixelAction.TryInputClicked(fromSuggestion = event.fromSuggestion, isChat = event.isChat),
                         )
-                        ctx.completionResult = if (event.isChat) {
-                            NewUserOnboardingResult.LaunchChat(prompt = event.query)
+                        if (handsPromptToDemoStep) {
+                            ctx.pendingDuckAiPrompt = event.query
                         } else {
-                            NewUserOnboardingResult.LaunchSearch(query = event.query)
+                            ctx.completionResult = if (event.isChat) {
+                                NewUserOnboardingResult.LaunchChat(prompt = event.query)
+                            } else {
+                                NewUserOnboardingResult.LaunchSearch(query = event.query)
+                            }
                         }
                         Advance
                     }
@@ -891,47 +920,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 when {
                     event is NewUserOnboardingEvent.ContinueClicked -> {
                         onboardingPixelSender.fire(pixelName, OnboardingPixelAction.Clicked(engaged = true))
-                        Advance
-                    }
-                    else -> Stay
-                }
-            },
-        )
-    }
-
-    // Chat-only preview: the toggle is hidden and the demo defaults to chat.
-    private fun customAiInputScreenPreviewStep(
-        ctx: NewUserOnboardingPlanContext,
-        showsStepIndicator: Boolean = true,
-        // The custom-AI plan hands the prompt to its duck_ai_demo step. Paths with no demo step after the
-        // preview finish onboarding on the prompt instead, so it isn't dropped.
-        handsPromptToDemoStep: Boolean = true,
-    ): NewUserOnboardingActivityStep {
-        val pixelName = OnboardingPixelName.ONBOARDING_SEARCH_CHAT_TOGGLE
-        return NewUserOnboardingActivityStep(
-            id = NewUserOnboardingStepIds.INPUT_SCREEN_PREVIEW,
-            pixelName = pixelName,
-            showsStepIndicator = showsStepIndicator,
-            resolveDialog = {
-                NewUserOnboardingActivityDialog.InputScreenPreview(
-                    isSearchDefault = false,
-                    showModeToggle = false,
-                    titleRes = R.string.preOnboardingInputModeDemoTitleCustomAi,
-                )
-            },
-            transition = { event ->
-                when {
-                    event is NewUserOnboardingEvent.InputDemoQuerySubmitted -> {
-                        onboardingPixelSender.chatBranchSelected()
-                        onboardingPixelSender.fire(
-                            pixelName,
-                            OnboardingPixelAction.TryInputClicked(fromSuggestion = event.fromSuggestion, isChat = event.isChat),
-                        )
-                        if (handsPromptToDemoStep) {
-                            ctx.pendingDuckAiPrompt = event.query
-                        } else {
-                            ctx.completionResult = NewUserOnboardingResult.LaunchChat(prompt = event.query)
-                        }
                         Advance
                     }
                     else -> Stay
