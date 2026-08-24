@@ -867,8 +867,8 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                     isSearchDefault = isSearchDefault,
                     showModeToggle = modeToggleShown,
                     titleRes = when {
-                        !isSearchDefault -> R.string.preOnboardingInputModeDemoTitleCustomAi
                         modeToggleShown -> R.string.preOnboardingInputModeDemoTitle
+                        !isSearchDefault -> R.string.preOnboardingInputModeDemoTitleCustomAi
                         else -> R.string.searchPathInputPreviewTitle
                     },
                 )
