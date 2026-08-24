@@ -20,7 +20,7 @@ tags:
             - assertVisible: "Open in another app"
             - tapOn: "Cancel"
             - tapOn:
-                id: "omnibarTextInput"
+                id: "omnibarTextInput|inputField"
             - copyTextFrom:
-                id: "omnibarTextInput"
+                id: "omnibarTextInput|inputField"
             - assertTrue: ${maestro.copiedText.indexOf("duckduckgo.com") == -1}

@@ -22,7 +22,7 @@ tags:
       - assertVisible:
           text: ".*Privacy Test Pages.*"
       - tapOn:
-          id: "omnibarTextInput"
+          id: "omnibarTextInput|inputField"
       - eraseText
       - assertVisible:
           text: "Search"

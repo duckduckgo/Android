@@ -20,7 +20,7 @@ tags:
       - assertVisible:
             text: "Search engine"
       - tapOn:
-            id: "omnibarTextInput"
+            id: "omnibarTextInput|inputField"
       - inputText: "https://privacy-test-pages.site"
       - pressKey: Enter
       - assertVisible:

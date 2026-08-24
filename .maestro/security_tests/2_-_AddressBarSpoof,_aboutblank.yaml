@@ -20,7 +20,7 @@ tags:
                 notVisible: "Not DDG."  # Spoofed content not visible
                 timeout: 10000
             - tapOn:
-                id: "omnibarTextInput"
+                id: "omnibarTextInput|inputField"
             - copyTextFrom:
-                id: "omnibarTextInput"
+                id: "omnibarTextInput|inputField"
             - assertTrue: ${maestro.copiedText == "about:blank" || maestro.copiedText == "https://duckduckgo.com/"}

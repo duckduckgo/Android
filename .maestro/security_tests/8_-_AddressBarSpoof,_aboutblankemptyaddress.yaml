@@ -19,6 +19,6 @@ tags:
       - tapOn: "run"
 
       - copyTextFrom:
-          id: "omnibarTextInput"
+          id: "omnibarTextInput|inputField"
 
       - assertTrue: ${maestro.copiedText == "about:blank" }

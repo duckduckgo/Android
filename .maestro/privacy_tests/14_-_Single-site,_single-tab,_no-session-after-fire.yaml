@@ -54,9 +54,9 @@ tags:
             - action: back
             - action: back
             - tapOn:
-                id: "omnibarTextInput"
+                id: "omnibarTextInput|inputField"
             - copyTextFrom:
-                id: "omnibarTextInput"
+                id: "omnibarTextInput|inputField"
             - action: back
             - runFlow: ../shared/browser_screen/click_on_fire_button.yaml
             - runFlow: ../shared/browser_screen/confirm_fire_dialog.yaml
