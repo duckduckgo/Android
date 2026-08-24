@@ -51,13 +51,10 @@ class ContentConfigTest {
         val content = ContentConfig.SingleChoice(
             title = TextConfig.Literal("title"),
             body = TextConfig.Literal("body"),
-            rows = listOf(
-                ContentConfig.SingleChoice.Row(first),
-                ContentConfig.SingleChoice.Row(TestOption(id = "second")),
-            ),
+            rows = listOf(first, TestOption(id = "second")),
         )
 
-        assertEquals(SinglePreferenceContentState(selected = first), content.initialState())
+        assertEquals(SingleChoiceContentState(selected = first), content.initialState())
     }
 
     @Test(expected = IllegalArgumentException::class)

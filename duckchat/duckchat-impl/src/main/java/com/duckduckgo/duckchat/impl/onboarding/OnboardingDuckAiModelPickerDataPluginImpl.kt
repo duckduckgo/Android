@@ -29,6 +29,8 @@ import com.duckduckgo.duckchat.impl.models.UserTier
 import com.duckduckgo.onboarding.api.OnboardingSingleChoiceDataPlugin
 import com.duckduckgo.onboarding.api.OnboardingSingleChoiceDataPlugin.Id
 import com.duckduckgo.onboarding.api.OnboardingSingleChoiceDataPlugin.Option
+import logcat.LogPriority.WARN
+import logcat.logcat
 import org.json.JSONObject
 import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
@@ -66,7 +68,11 @@ class OnboardingDuckAiModelPickerDataPluginImpl @Inject constructor(
     }
 
     override suspend fun apply(option: Option) {
-        val provider = (option as? ProviderOption)?.provider ?: return
+        val provider = (option as? ProviderOption)?.provider
+        if (provider == null) {
+            logcat(WARN) { "Duck.ai onboarding: ignoring provider pick from a foreign option ${option.id}" }
+            return
+        }
         duckAiModelManager.selectProvider(provider)
     }
 

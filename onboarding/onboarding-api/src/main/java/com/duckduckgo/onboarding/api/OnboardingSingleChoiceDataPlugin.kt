@@ -30,7 +30,7 @@ interface OnboardingSingleChoiceDataPlugin : ActivePlugin {
     val id: Id
 
     /** Warms up whatever [options] reads. Called while the step is still several screens away. */
-    suspend fun prefetch()
+    suspend fun prefetch() {}
 
     /** Display order, first entry is the default. Empty when the choice is unavailable. */
     suspend fun options(): List<Option>
@@ -39,7 +39,7 @@ interface OnboardingSingleChoiceDataPlugin : ActivePlugin {
 
     enum class Id {
         DuckAiModelProvider,
-        DuckAiNewTabTogglePositionProvider,
+        DuckAiNewTabTogglePosition,
     }
 
     /**

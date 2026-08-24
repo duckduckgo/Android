@@ -242,18 +242,7 @@ class RealDuckAiModelManager @Inject constructor(
             stateMutex.withLock {
                 dataStore.setSelectedModel(SelectedModel(model.id, model.shortName))
                 dataStore.setSelectedProvider(null)
-                val available = ReasoningResolver.availableModes(
-                    supported = model.supportedReasoningEfforts,
-                    effortAccess = model.reasoningEffortAccess,
-                    isEligible = _modelState.value.isSubscriptionEligible,
-                )
-                val nextReasoningMode = validateAndPersistReasoningMode(_modelState.value.selectedReasoningMode, available)
-                _modelState.value = _modelState.value.copy(
-                    selectedModelId = model.id,
-                    selectedModelShortName = model.shortName,
-                    selectedReasoningMode = nextReasoningMode,
-                    availableReasoningModes = available,
-                )
+                publishSelection(modelId = model.id, model = model)
                 logcat { "Duck.ai Model Manager: selected model ${model.id} (${model.shortName})" }
             }
         }
@@ -267,22 +256,32 @@ class RealDuckAiModelManager @Inject constructor(
 
                 val models = _modelState.value.models
                 val selectedModelId = resolveSelection(models)
-                val selectedModel = models.find { it.id == selectedModelId }
-                val available = ReasoningResolver.availableModes(
-                    supported = selectedModel?.supportedReasoningEfforts.orEmpty(),
-                    effortAccess = selectedModel?.reasoningEffortAccess.orEmpty(),
-                    isEligible = _modelState.value.isSubscriptionEligible,
-                )
-                val nextReasoningMode = validateAndPersistReasoningMode(_modelState.value.selectedReasoningMode, available)
-                _modelState.value = _modelState.value.copy(
-                    selectedModelId = selectedModelId,
-                    selectedModelShortName = selectedModel?.shortName,
-                    selectedReasoningMode = nextReasoningMode,
-                    availableReasoningModes = available,
-                )
+                publishSelection(modelId = selectedModelId, model = models.find { it.id == selectedModelId })
                 logcat { "Duck.ai Model Manager: selected provider ${provider.name}, resolved model $selectedModelId" }
             }
         }
+    }
+
+    /**
+     * Publishes [modelId] as the current selection, re-deriving the reasoning modes [model] supports and
+     * keeping the persisted mode only while it stays available. Callers hold [stateMutex].
+     */
+    private suspend fun publishSelection(
+        modelId: String?,
+        model: AIChatModel?,
+    ) {
+        val available = ReasoningResolver.availableModes(
+            supported = model?.supportedReasoningEfforts.orEmpty(),
+            effortAccess = model?.reasoningEffortAccess.orEmpty(),
+            isEligible = _modelState.value.isSubscriptionEligible,
+        )
+        val nextReasoningMode = validateAndPersistReasoningMode(_modelState.value.selectedReasoningMode, available)
+        _modelState.value = _modelState.value.copy(
+            selectedModelId = modelId,
+            selectedModelShortName = model?.shortName,
+            selectedReasoningMode = nextReasoningMode,
+            availableReasoningModes = available,
+        )
     }
 
     override suspend fun selectReasoningMode(mode: ReasoningMode) {

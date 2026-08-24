@@ -126,16 +126,14 @@ sealed interface ContentConfig {
     data class SingleChoice(
         override val title: TextConfig,
         val body: TextConfig,
-        val rows: List<Row>,
-    ) : ContentConfig, Stateful<SinglePreferenceContentState> {
+        val rows: List<Option>,
+    ) : ContentConfig, Stateful<SingleChoiceContentState> {
 
         init {
             require(rows.isNotEmpty()) { "A single-choice screen needs at least one row" }
         }
 
-        data class Row(val option: Option)
-
-        override fun initialState() = SinglePreferenceContentState(selected = rows.first().option)
+        override fun initialState() = SingleChoiceContentState(selected = rows.first())
     }
 
     /**
@@ -173,7 +171,7 @@ data class DownloadReasonContentState(val selection: DownloadReasonSelection?)
 
 data class PreferenceSelectorContentState(val enabled: Map<OnboardingPreference, Boolean>)
 
-data class SinglePreferenceContentState(val selected: Option)
+data class SingleChoiceContentState(val selected: Option)
 
 enum class DownloadReasonSelection {
     SEARCH,

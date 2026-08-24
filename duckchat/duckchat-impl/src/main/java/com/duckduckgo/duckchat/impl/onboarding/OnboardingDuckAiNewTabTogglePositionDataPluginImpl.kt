@@ -26,6 +26,8 @@ import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.duckduckgo.onboarding.api.OnboardingSingleChoiceDataPlugin
 import com.duckduckgo.onboarding.api.OnboardingSingleChoiceDataPlugin.Id
 import com.duckduckgo.onboarding.api.OnboardingSingleChoiceDataPlugin.Option
+import logcat.LogPriority.WARN
+import logcat.logcat
 import javax.inject.Inject
 
 /**
@@ -43,16 +45,16 @@ class OnboardingDuckAiNewTabTogglePositionDataPluginImpl @Inject constructor(
     private val duckChat: DuckChatInternal,
 ) : OnboardingSingleChoiceDataPlugin {
 
-    override val id: Id = Id.DuckAiNewTabTogglePositionProvider
-
-    override suspend fun prefetch() {
-        // The options are static, so there is nothing to warm up.
-    }
+    override val id: Id = Id.DuckAiNewTabTogglePosition
 
     override suspend fun options(): List<Option> = OFFERED.map { it.toOption() }
 
     override suspend fun apply(option: Option) {
-        val position = (option as? PositionOption)?.position ?: return
+        val position = (option as? PositionOption)?.position
+        if (position == null) {
+            logcat(WARN) { "Duck.ai onboarding: ignoring toggle position pick from a foreign option ${option.id}" }
+            return
+        }
         duckChat.setDefaultTogglePosition(position)
     }
 

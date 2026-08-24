@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.onboarding.orchestrator
 
-import androidx.annotation.StringRes
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.omnibar.OmnibarType
@@ -265,11 +264,12 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         val firstDialog = SuspendMemo { FirstDialog.INITIAL }
         val modelProviderChoice = SuspendMemo { singleChoiceDataPlugin(OnboardingSingleChoiceDataPlugin.Id.DuckAiModelProvider) }
         val togglePositionChoice = SuspendMemo {
-            singleChoiceDataPlugin(OnboardingSingleChoiceDataPlugin.Id.DuckAiNewTabTogglePositionProvider)
+            singleChoiceDataPlugin(OnboardingSingleChoiceDataPlugin.Id.DuckAiNewTabTogglePosition)
         }
 
         // Warms the options up while the user is still several screens away from the step that renders them.
         appCoroutineScope.launch(dispatchers.io()) { modelProviderChoice()?.prefetch() }
+        appCoroutineScope.launch(dispatchers.io()) { togglePositionChoice()?.prefetch() }
 
         return rootPlan(
             ctx = ctx,
@@ -293,8 +293,14 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         LinearOnboardingPlan(
             id = ROOT_PLAN_ID,
             steps = steps.firingShownPixels().abortingOnDevSkip(),
-            onCompleted = onCompleted,
-            onSkipped = onSkipped,
+            onCompleted = {
+                ctx.runFinalizers()
+                onCompleted()
+            },
+            onSkipped = {
+                ctx.runFinalizers()
+                onSkipped()
+            },
             result = { ctx.completionResult },
         )
 
@@ -564,17 +570,16 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         modelProviderChoice: SuspendMemo<OnboardingSingleChoiceDataPlugin?>,
         togglePositionChoice: SuspendMemo<OnboardingSingleChoiceDataPlugin?>,
     ): LinearOnboardingPlan {
-        onboardingInputScreenLaunchTarget.setOpenOnDuckAi()
+        // The AI path always finishes on the Duck.ai (chat) tab. Registered rather than written here so
+        // building the plan stays free of side effects, and so it lands at the same point in the run the
+        // custom-AI path writes it.
+        ctx.onFinish { onboardingInputScreenLaunchTarget.setOpenOnDuckAi() }
         return sidePlan(
             id = SEGMENTED_AI_PLAN_ID,
             steps = listOf(
                 comparisonChartStep(NewUserOnboardingActivityDialog.SegmentedComparisonChart(ComparisonChartConfig.SegmentedAiPath)),
                 defaultBrowserPromptStep(),
-                singleChoiceStep(
-                    plugin = modelProviderChoice,
-                    title = R.string.aiPathModelChoiceTitle,
-                    body = R.string.aiPathModelChoiceBody,
-                ),
+                modelProviderStep(plugin = modelProviderChoice),
                 togglePositionStep(togglePositionChoice),
                 addressBarPositionStep(),
                 inputScreenPreviewStep(ctx = ctx, isSearchDefault = false),
@@ -620,28 +625,26 @@ class NewUserOnboardingPlanProvider @Inject constructor(
      * A single option is not a choice, so the step is skipped rather than rendered as a
      * one-row list the user can only confirm.
      */
-    private fun singleChoiceStep(
+    private fun modelProviderStep(
         plugin: SuspendMemo<OnboardingSingleChoiceDataPlugin?>,
-        @StringRes title: Int,
-        @StringRes body: Int,
     ): NewUserOnboardingActivityStep {
         val options = SuspendMemo { plugin()?.options().orEmpty() }
         return NewUserOnboardingActivityStep(
-            id = NewUserOnboardingStepIds.SINGLE_CHOICE,
+            id = NewUserOnboardingStepIds.MODEL_PROVIDER,
             pixelName = null,
             showsStepIndicator = true,
             precondition = { options().size > 1 },
             resolveDialog = {
                 NewUserOnboardingActivityDialog.SingleChoice(
-                    title = title,
-                    body = body,
+                    title = R.string.aiPathModelChoiceTitle,
+                    body = R.string.aiPathModelChoiceBody,
                     options(),
                 )
             },
             transition = { event ->
                 when (event) {
                     is NewUserOnboardingEvent.SingleChoiceConfirmed -> {
-                        logcat { "Single choice confirmed: ${event.option.id}" }
+                        logcat { "Model provider confirmed: ${event.option.id}" }
                         plugin()?.apply(event.option)
                         Advance
                     }

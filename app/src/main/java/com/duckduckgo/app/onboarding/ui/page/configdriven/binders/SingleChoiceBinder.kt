@@ -18,16 +18,18 @@ package com.duckduckgo.app.onboarding.ui.page.configdriven.binders
 
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup.MarginLayoutParams
+import android.widget.RadioButton
+import androidx.core.view.AccessibilityDelegateCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.core.view.isVisible
-import androidx.core.view.updateLayoutParams
 import com.duckduckgo.app.browser.databinding.IncludeBrandDesignSingleChoiceBinding
 import com.duckduckgo.app.browser.databinding.IncludeBrandDesignSingleChoiceRowBinding
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
 import com.duckduckgo.app.onboarding.ui.page.configdriven.BindScope
 import com.duckduckgo.app.onboarding.ui.page.configdriven.ContentConfig
 import com.duckduckgo.app.onboarding.ui.page.configdriven.ContentHandle
-import com.duckduckgo.app.onboarding.ui.page.configdriven.SinglePreferenceContentState
+import com.duckduckgo.app.onboarding.ui.page.configdriven.SingleChoiceContentState
 import com.duckduckgo.app.onboarding.ui.page.configdriven.StatefulDialogBinder
 import com.duckduckgo.common.utils.extensions.preventWidows
 import com.duckduckgo.onboarding.api.OnboardingSingleChoiceDataPlugin.Option
@@ -35,17 +37,16 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
-import com.duckduckgo.mobile.android.R as CommonR
 
 class SingleChoiceBinder(
     private val binding: IncludeBrandDesignSingleChoiceBinding,
-) : StatefulDialogBinder<ContentConfig.SingleChoice, SinglePreferenceContentState> {
+) : StatefulDialogBinder<ContentConfig.SingleChoice, SingleChoiceContentState> {
 
     override val view: View = binding.root
 
     override fun bind(
         content: ContentConfig.SingleChoice,
-        state: MutableStateFlow<SinglePreferenceContentState>,
+        state: MutableStateFlow<SingleChoiceContentState>,
         scope: BindScope,
     ): ContentHandle {
         val context = binding.root.context
@@ -79,26 +80,36 @@ class SingleChoiceBinder(
 
     private fun populateRows(
         content: ContentConfig.SingleChoice,
-        state: MutableStateFlow<SinglePreferenceContentState>,
+        state: MutableStateFlow<SingleChoiceContentState>,
     ): List<Pair<Option, IncludeBrandDesignSingleChoiceRowBinding>> {
-        val context = binding.root.context
         binding.radioButtonRows.removeAllViews()
-        val inflater = LayoutInflater.from(context)
-        return content.rows.mapIndexed { index, row ->
+        val inflater = LayoutInflater.from(binding.root.context)
+        return content.rows.map { row ->
             val rowBinding = IncludeBrandDesignSingleChoiceRowBinding.inflate(inflater, binding.radioButtonRows, false)
-            if (index > 0) {
-                rowBinding.root.updateLayoutParams<MarginLayoutParams> {
-                    topMargin = context.resources.getDimensionPixelSize(CommonR.dimen.keyline_4)
-                }
-            }
-            row.option.iconRes?.let { rowBinding.singleChoiceRowIcon.setImageResource(it) }
-            rowBinding.singleChoiceRowIcon.isVisible = row.option.iconRes != null
-            rowBinding.singleChoiceRowPrimaryText.text = row.option.label
+            row.iconRes?.let { rowBinding.singleChoiceRowIcon.setImageResource(it) }
+            rowBinding.singleChoiceRowIcon.isVisible = row.iconRes != null
+            rowBinding.singleChoiceRowPrimaryText.text = row.label
             rowBinding.root.setOnClickListener {
-                state.update { it.copy(selected = row.option) }
+                state.update { it.copy(selected = row) }
             }
+            // The row, not the radio button, carries the click, so it also has to carry the radio semantics —
+            // otherwise the label is announced with no indication of what is currently picked.
+            ViewCompat.setAccessibilityDelegate(
+                rowBinding.root,
+                object : AccessibilityDelegateCompat() {
+                    override fun onInitializeAccessibilityNodeInfo(
+                        host: View,
+                        info: AccessibilityNodeInfoCompat,
+                    ) {
+                        super.onInitializeAccessibilityNodeInfo(host, info)
+                        info.className = RadioButton::class.java.name
+                        info.isCheckable = true
+                        info.isChecked = host.isSelected
+                    }
+                },
+            )
             binding.radioButtonRows.addView(rowBinding.root)
-            row.option to rowBinding
+            row to rowBinding
         }
     }
 }

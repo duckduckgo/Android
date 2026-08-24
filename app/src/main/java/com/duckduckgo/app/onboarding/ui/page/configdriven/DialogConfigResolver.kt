@@ -211,7 +211,7 @@ class DialogConfigResolver @Inject constructor(
             content = ContentConfig.SingleChoice(
                 title = TextConfig.Resource(dialog.title),
                 body = TextConfig.Resource(dialog.body),
-                rows = dialog.options.map { ContentConfig.SingleChoice.Row(it) },
+                rows = dialog.options,
             ),
             primaryCta = CtaConfig(
                 text = TextConfig.Resource(R.string.preOnboardingInputScreenButton),

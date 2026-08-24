@@ -45,14 +45,9 @@ class TogglePositionBinder(
 
         binding.togglePositionTitle.setTitle(content.title.resolve(context))
 
-        val pictogramDrawable = if (isLightMode()) {
-            content.pictogramLightRes
-        } else {
-            content.pictogramDarkRes
-        }.let { drawableRes ->
-            binding.root.context.getDrawable(drawableRes)
-        }
-        binding.togglePositionPictogram.setImageDrawable(pictogramDrawable)
+        binding.togglePositionPictogram.setImageResource(
+            if (isLightMode()) content.pictogramLightRes else content.pictogramDarkRes,
+        )
 
         binding.togglePositionPictogramCaption.text = content.pictogramCaption.resolve(context).preventWidows()
 

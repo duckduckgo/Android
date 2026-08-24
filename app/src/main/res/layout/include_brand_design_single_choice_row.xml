@@ -44,7 +44,6 @@
         app:layout_constraintEnd_toStartOf="@id/singleChoiceRowRadioButton"
         app:layout_constraintStart_toEndOf="@id/singleChoiceRowIcon"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed"
         app:typography="body1"
         tools:text="Primary text" />
 

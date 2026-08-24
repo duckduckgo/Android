@@ -66,7 +66,7 @@ class ContentControllerImpl(
     private val widgetPrompt = WidgetPromptBinder(binding.widgetPromptContent)
     private val downloadReason = DownloadReasonBinder(binding.downloadReasonContent)
     private val preferenceSelector = PreferenceSelectorBinder(binding.preferenceSelectorContent)
-    private val singlePreference = SingleChoiceBinder(binding.singleChoiceContent)
+    private val singleChoice = SingleChoiceBinder(binding.singleChoiceContent)
     private val togglePosition = TogglePositionBinder(binding.togglePositionContent, isLightMode)
 
     private var boundView: View? = null
@@ -129,8 +129,8 @@ class ContentControllerImpl(
                 preferenceSelector.bind(content, contentValues.contentState(stepId, content), scope)
             }
             is ContentConfig.SingleChoice -> {
-                boundView = singlePreference.view
-                singlePreference.bind(content, contentValues.contentState(stepId, content), scope)
+                boundView = singleChoice.view
+                singleChoice.bind(content, contentValues.contentState(stepId, content), scope)
             }
             is ContentConfig.TogglePosition -> {
                 boundView = togglePosition.view

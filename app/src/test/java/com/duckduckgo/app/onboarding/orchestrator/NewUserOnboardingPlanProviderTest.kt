@@ -119,7 +119,7 @@ class NewUserOnboardingPlanProviderTest {
     private val modelProviderPlugin = FakeOnboardingSingleChoiceDataPlugin(options = providerOptions)
     private val togglePositionOptions = listOf(TestOption("duckAI"), TestOption("lastUsed"))
     private val togglePositionPlugin = FakeOnboardingSingleChoiceDataPlugin(
-        id = OnboardingSingleChoiceDataPlugin.Id.DuckAiNewTabTogglePositionProvider,
+        id = OnboardingSingleChoiceDataPlugin.Id.DuckAiNewTabTogglePosition,
         options = togglePositionOptions,
     )
     private var singleChoicePlugins: List<OnboardingSingleChoiceDataPlugin> = listOf(modelProviderPlugin, togglePositionPlugin)
@@ -274,11 +274,22 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
-    fun `when the ai download reason is confirmed then arms open input on duck ai tab`() = runTest {
+    fun `when the ai download reason is confirmed then defers arming open input on duck ai tab`() = runTest {
         startSegmentedAtDownloadReason()
 
         orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.AI_CHAT))
 
+        // Registered as a finalizer when the plan is built, so it only lands once the run ends.
+        verify(onboardingInputScreenLaunchTarget, never()).setOpenOnDuckAi()
+    }
+
+    @Test
+    fun `when the segmented ai path is aborted then the deferred arming still runs`() = runTest {
+        startSegmentedAtAiProviderChoice()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.SkipNewUserOnboardingDevOptionClicked)
+
+        assertEquals(Skipped(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID), orchestrator.state.value)
         verify(onboardingInputScreenLaunchTarget).setOpenOnDuckAi()
     }
 
@@ -321,13 +332,14 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
-    fun `when the segmented plan is built then the provider options are prefetched`() = runTest {
+    fun `when the segmented plan is built then the single choice options are prefetched`() = runTest {
         whenever(homeScreenPromptsExperiment.enroll()).thenReturn(null)
         whenever(segmentedOnboardingExperiment.enroll()).thenReturn(SegmentedOnboardingExperimentVariant.TREATMENT)
 
         start()
 
         assertEquals(1, modelProviderPlugin.prefetchCount)
+        assertEquals(1, togglePositionPlugin.prefetchCount)
     }
 
     @Test

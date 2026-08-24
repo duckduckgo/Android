@@ -48,8 +48,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
+            android:divider="@drawable/spacer_brand_design_single_choice_row"
             android:padding="4dp"
-            android:orientation="vertical" />
+            android:orientation="vertical"
+            android:showDividers="middle" />
 
     </LinearLayout>
 

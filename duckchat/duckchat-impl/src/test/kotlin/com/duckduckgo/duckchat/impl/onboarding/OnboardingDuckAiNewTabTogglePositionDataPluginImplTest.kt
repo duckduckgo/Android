@@ -44,7 +44,7 @@ class OnboardingDuckAiNewTabTogglePositionDataPluginImplTest {
 
     @Test
     fun whenIdRequestedThenItIsTheNewTabTogglePositionChoice() {
-        assertEquals(Id.DuckAiNewTabTogglePositionProvider, testee.id)
+        assertEquals(Id.DuckAiNewTabTogglePosition, testee.id)
     }
 
     /**
