@@ -90,8 +90,8 @@ internal fun DaxListItem(
     modifier: Modifier = Modifier,
     secondaryText: AnnotatedString? = null,
     inlineContent: (@Composable DaxListItemInlineScope.() -> Unit)? = null,
-    primaryTextColor: Color = DuckDuckGoTheme.textColors.primary,
-    secondaryTextColor: Color = DuckDuckGoTheme.textColors.secondary,
+    primaryTextColor: Color = DaxListItemDefaults.colors.primaryText,
+    secondaryTextColor: Color = DaxListItemDefaults.colors.secondaryText,
     primaryMaxLines: Int = 1,
     secondaryMaxLines: Int = Int.MAX_VALUE,
     leadingContent: (@Composable DaxListItemLeadingScope.() -> Unit)? = null,
@@ -262,7 +262,7 @@ class DaxListItemLeadingScope internal constructor(private val parentEnabled: Bo
 private fun Modifier.leadingBackground(shape: Shape): Modifier =
     size(DaxListItemDefaults.LeadingBackgroundSize)
         .clip(shape)
-        .background(DuckDuckGoTheme.colors.backgrounds.container)
+        .background(DaxListItemDefaults.colors.leadingIconBackground)
 
 /**
  * Receiver scope for the slot rendered inline after a list item's primary text.

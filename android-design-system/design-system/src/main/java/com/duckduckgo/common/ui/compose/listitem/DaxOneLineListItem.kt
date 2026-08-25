@@ -57,7 +57,7 @@ import com.duckduckgo.mobile.android.R
 fun DaxOneLineListItem(
     primaryText: String,
     modifier: Modifier = Modifier,
-    primaryTextColor: Color = DuckDuckGoTheme.textColors.primary,
+    primaryTextColor: Color = DaxListItemDefaults.colors.primaryText,
     inlineContent: (@Composable DaxListItemInlineScope.() -> Unit)? = null,
     leadingContent: (@Composable DaxListItemLeadingScope.() -> Unit)? = null,
     trailingContent: (@Composable DaxListItemTrailingScope.() -> Unit)? = null,
@@ -90,7 +90,7 @@ fun DaxOneLineListItem(
 fun DaxOneLineListItem(
     primaryText: AnnotatedString,
     modifier: Modifier = Modifier,
-    primaryTextColor: Color = DuckDuckGoTheme.textColors.primary,
+    primaryTextColor: Color = DaxListItemDefaults.colors.primaryText,
     inlineContent: (@Composable DaxListItemInlineScope.() -> Unit)? = null,
     leadingContent: (@Composable DaxListItemLeadingScope.() -> Unit)? = null,
     trailingContent: (@Composable DaxListItemTrailingScope.() -> Unit)? = null,

@@ -16,9 +16,13 @@
 
 package com.duckduckgo.common.ui.compose.listitem
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 
 internal object DaxListItemDefaults {
     val OneLineMinHeight: Dp = 48.dp
@@ -43,7 +47,22 @@ internal object DaxListItemDefaults {
     val TrailingIconTouchTarget: Dp = 48.dp
 
     const val DisabledAlpha: Float = 0.4f
+
+    val colors: DaxListItemColors
+        @Composable
+        get() = DaxListItemColors(
+            primaryText = DuckDuckGoTheme.textColors.primary,
+            secondaryText = DuckDuckGoTheme.textColors.secondary,
+            leadingIconBackground = DuckDuckGoTheme.colors.backgrounds.container,
+        )
 }
+
+@Immutable
+internal data class DaxListItemColors(
+    val primaryText: Color,
+    val secondaryText: Color,
+    val leadingIconBackground: Color,
+)
 
 @Stable
 enum class DaxListItemIconBackground { None, Circular, Rounded }
