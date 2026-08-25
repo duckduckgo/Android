@@ -16,7 +16,7 @@ tags:
       # pre_onboarding ends on a search result page; type the test URL into the omnibar
       # (the native input field only exists on the new-tab page).
       - tapOn:
-          id: "omnibarTextInput"
+          id: "omnibarTextInput|inputField"
       - inputText: "https://privacy-test-pages.site"
       - pressKey: Enter
       - assertVisible:
