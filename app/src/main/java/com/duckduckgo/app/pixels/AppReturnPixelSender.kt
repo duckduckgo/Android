@@ -119,6 +119,7 @@ class RealAppReturnPixelSender @Inject constructor(
                 put(AppReturnPixelParameters.UNIFIED_INPUT_AVAILABLE, duckAiFeatureState.nativeInputFieldEnabled.value.toString())
                 put(AppReturnPixelParameters.TOGGLE_VISIBLE, toggleVisible.toString())
                 put(AppReturnPixelParameters.LAUNCH_SOURCE, launchSource)
+                put(AppReturnPixelParameters.PETAL, PetalValues.RANDOMIZE)
             }
 
             pixel.get().fire(pixel = AppPixelName.APP_RETURN_COUNT, parameters = params)
@@ -155,6 +156,12 @@ object AppReturnPixelParameters {
     const val UNIFIED_INPUT_AVAILABLE = "unified_input_available"
     const val TOGGLE_VISIBLE = "toggle_visible"
     const val LAUNCH_SOURCE = "launch_source"
+    const val PETAL = "petal"
+}
+
+object PetalValues {
+    const val RANDOMIZE = "randomize"
+    const val KANON = "kanon"
 }
 
 object LaunchSourceValues {

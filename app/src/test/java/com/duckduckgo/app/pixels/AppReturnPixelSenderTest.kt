@@ -101,6 +101,7 @@ class AppReturnPixelSenderTest {
             AppReturnPixelParameters.UNIFIED_INPUT_AVAILABLE to "false",
             AppReturnPixelParameters.TOGGLE_VISIBLE to "false",
             AppReturnPixelParameters.LAUNCH_SOURCE to "standard",
+            AppReturnPixelParameters.PETAL to "randomize",
         )
         verify(pixel).fire(pixel = AppPixelName.APP_RETURN_COUNT, parameters = params)
         verify(pixel).fire(pixel = AppPixelName.APP_RETURN_DAILY, parameters = params, type = Pixel.PixelType.Daily())
