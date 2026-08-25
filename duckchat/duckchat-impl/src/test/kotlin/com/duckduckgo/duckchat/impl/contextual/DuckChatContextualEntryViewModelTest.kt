@@ -107,4 +107,20 @@ class DuckChatContextualEntryViewModelTest {
         verify(store).store(captor.capture())
         assertNull(captor.firstValue.serializedPageContext)
     }
+
+    @Test
+    fun whenContextRemovedThenPromptStoredWithNullContext() = runTest {
+        viewModel.start("tab-1")
+        viewModel.onPageContextReceived(validContext)
+        viewModel.onContextRemoved()
+
+        viewModel.commands.test {
+            viewModel.onPromptSubmitted(samplePrompt)
+            assertEquals(DuckChatContextualEntryViewModel.Command.HandOffToSheet, awaitItem())
+        }
+
+        val captor = argumentCaptor<ContextualEntryPrompt>()
+        verify(store).store(captor.capture())
+        assertNull(captor.firstValue.serializedPageContext)
+    }
 }

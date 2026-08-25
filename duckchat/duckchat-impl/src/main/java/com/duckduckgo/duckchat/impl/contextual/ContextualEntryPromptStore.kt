@@ -27,7 +27,8 @@ import javax.inject.Inject
  * straight into the chat (WEBVIEW) and auto-submit it, rather than reopening the initial input state.
  *
  * [serializedPageContext] is the page context the dialog had attached at submit time, so "Ask about
- * page" keeps its context across the hand-off.
+ * page" keeps its context across the hand-off. When it is null the dialog had no context attached
+ * (never available, or the user removed it), and the sheet must not auto-attach one on hand-off.
  */
 data class ContextualEntryPrompt(
     val tabId: String,
