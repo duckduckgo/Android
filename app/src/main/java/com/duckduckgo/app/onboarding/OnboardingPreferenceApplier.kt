@@ -72,8 +72,6 @@ class OnboardingPreferenceApplierImpl @Inject constructor(
         when (preference) {
             OnboardingPreference.SEARCH_HISTORY -> navigationHistory.isHistoryUserEnabled()
             OnboardingPreference.SAFE_SEARCH -> safeSearchEnabled()
-            // The no-AI path opens with both AI surfaces switched off, whatever the app or the SERP would
-            // otherwise default them to; the End CTA persists these even when the user never touches them.
             OnboardingPreference.SEARCH_ASSIST -> false
             OnboardingPreference.HIDE_AI_GENERATED_IMAGES -> true
         }

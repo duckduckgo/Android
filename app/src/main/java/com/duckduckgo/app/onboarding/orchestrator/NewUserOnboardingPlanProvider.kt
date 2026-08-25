@@ -692,10 +692,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         )
     }
 
-    /**
-     * The options are the screen's buttons, so a single option would leave the user with nothing to
-     * decline and the step is skipped rather than rendered.
-     */
     private fun duckAiStateStep(plugin: OnboardingSingleChoiceDataPlugin?): NewUserOnboardingActivityStep {
         val options = SuspendMemo { plugin?.options().orEmpty() }
         return NewUserOnboardingActivityStep(

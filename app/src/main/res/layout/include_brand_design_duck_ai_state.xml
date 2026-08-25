@@ -22,19 +22,19 @@
 
     <ImageView
         android:id="@+id/duckAiStatePictogram"
-        android:layout_width="128dp"
-        android:layout_height="80dp"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
         android:layout_gravity="center_horizontal"
         android:alpha="0"
         android:importantForAccessibility="no"
-        android:src="@drawable/duckai_64" />
+        android:src="@drawable/duckduckgo_duckai_96" />
 
     <com.duckduckgo.app.onboarding.ui.view.OnboardingDialogTitleView
         android:id="@+id/duckAiStateTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/keyline_6"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="@dimen/keyline_6" />
 
     <LinearLayout
