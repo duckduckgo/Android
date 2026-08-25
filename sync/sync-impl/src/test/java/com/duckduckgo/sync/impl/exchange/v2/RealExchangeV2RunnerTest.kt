@@ -67,7 +67,6 @@ class RealExchangeV2RunnerTest {
     @get:Rule val coroutineTestRule = CoroutineTestRule()
 
     private val clock = ExchangeV2Clock { 42L }
-    private val parser = JsonExchangeV2MessageParser()
     private val factory = ExchangeV2StateMachineFactory(clock)
     private val syncStore: SyncStore = mock()
     private val jweCrypto: SyncJweCrypto = mock()
@@ -80,7 +79,6 @@ class RealExchangeV2RunnerTest {
     private fun newRunner(): RealExchangeV2Runner =
         RealExchangeV2Runner(
             smFactory = factory,
-            messageParser = parser,
             clock = clock,
             syncStore = syncStore,
             jweCrypto = jweCrypto,
@@ -167,7 +165,7 @@ class RealExchangeV2RunnerTest {
         runner.startPresent()
 
         runner.events.filterIsInstance<ExchangeV2Event.Transition>().test {
-            runner.deliverIncomingMessageJson("""{"type":"hello"}""")
+            runner.deliverHello(ExchangeProtocolVersion.V2_0)
             val event = awaitItem()
             assertSame(ExchangeV2State.Negotiating, event.to)
             assertTrue(event.trigger is Hello)
@@ -180,7 +178,7 @@ class RealExchangeV2RunnerTest {
         runner.startPresent()
 
         runner.events.filterIsInstance<ExchangeV2Event.MessageRejected>().test {
-            runner.deliverIncomingMessageJson("""{"type":"future_msg"}""")
+            runner.deliverIncomingMessage(ExchangeV2Message.Unknown.fromJson("{}", "future_msg"))
             val event = awaitItem()
             assertSame(RejectReason.UnknownMessageDropped, event.reason)
         }
@@ -714,7 +712,7 @@ class RealExchangeV2RunnerTest {
         )
     }
 
-    private suspend fun ExchangeV2Runner.deliverHello(version: ExchangeProtocolVersion) {
+    private suspend fun RealExchangeV2Runner.deliverHello(version: ExchangeProtocolVersion) {
         deliverIncomingMessage(Hello.create(channelId = "peer-channel", publicKey = "peer-pubkey", version = version))
     }
 
