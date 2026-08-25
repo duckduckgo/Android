@@ -102,3 +102,22 @@ Key points for Maestro tests:
   maestro test .maestro/my-feature/my_test.yaml
   ```
 - In CI, pass the flag via `gradle_flags` on `checkout-and-assemble` with `flavours: 'internal'` — see the README for the full workflow snippet
+
+## Source Patches
+
+A flag read during app launch (any `AppScope` class can read a toggle at construction) cannot be
+set by remote config patches or the test seeder — both apply at runtime. Flip its compile-time
+default with a Git patch instead. This is the heaviest option: use it only when a config patch is
+genuinely too late, and only for flow/arm combinations the unpatched builds leave uncovered.
+
+- Store patches under a `source_patches/` subdirectory next to the tests that need them.
+- Generate with `git diff -U1 -- <file>` and drop the `index` line, so the hunk is pinned to the
+  declaration it targets and fails instead of falling back to `--3way`.
+- Start the file with a plain-text header (ignored by `git apply`): what it flips, which workflow
+  job applies it, and what to do when it stops applying.
+- In CI, apply through the `source_patches` input on `checkout-and-assemble` (newline-separated for
+  more than one). Never pass it alongside `-PuseUploadSigning` in `gradle_flags` — the job
+  hard-fails that combination.
+- Locally, `git apply <patch>` before building and `git apply -R <patch>` after.
+- When the default a patch targets changes, the `E2E Source Patches` job in `ci.yml` fails the PR;
+  whoever changed the default rewrites the patch or deletes it together with the job that uses it.

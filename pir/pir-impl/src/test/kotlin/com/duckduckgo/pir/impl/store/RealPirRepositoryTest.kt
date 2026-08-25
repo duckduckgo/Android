@@ -29,10 +29,13 @@ import com.duckduckgo.pir.impl.store.PirRepository.EmailConfirmationLinkFetchSta
 import com.duckduckgo.pir.impl.store.db.BrokerDao
 import com.duckduckgo.pir.impl.store.db.BrokerJsonDao
 import com.duckduckgo.pir.impl.store.db.ExtractedProfileDao
+import com.duckduckgo.pir.impl.store.db.StoredExtractedProfile
 import com.duckduckgo.pir.impl.store.db.UserName
 import com.duckduckgo.pir.impl.store.db.UserProfile
 import com.duckduckgo.pir.impl.store.db.UserProfileDao
 import com.duckduckgo.pir.impl.store.secure.PirSecureStorageDatabaseFactory
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -42,6 +45,8 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -66,6 +71,8 @@ class RealPirRepositoryTest {
     private val mockDatabase: PirDatabase = mock()
     private val mockPixelSender: PirPixelSender = mock()
 
+    private val addressAdapter = Moshi.Builder().add(KotlinJsonAdapterFactory()).build().adapter(AddressCityState::class.java)
+
     @Before
     fun setUp() {
         runBlocking {
@@ -76,6 +83,9 @@ class RealPirRepositoryTest {
         whenever(mockDatabase.userProfileDao()).thenReturn(mockUserProfileDao)
         whenever(mockDatabase.extractedProfileDao()).thenReturn(mockExtractedProfileDao)
         whenever(mockBrokerJsonDao.getAllBrokersCount()).thenReturn(0)
+        doAnswer { it.getArgument<Runnable>(0).run() }
+            .whenever(mockDatabase)
+            .runInTransaction(any<Runnable>())
 
         testee = RealPirRepository(
             dispatcherProvider = coroutineRule.testDispatcherProvider,
@@ -632,9 +642,9 @@ class RealPirRepositoryTest {
         assertEquals(false, result[0].deprecated)
     }
 
-    // Tests for saveNewExtractedProfiles
+    // Tests for saveExtractedProfiles
     @Test
-    fun whenSaveNewExtractedProfilesWithValidProfilesThenInsertThem() = runTest {
+    fun whenSaveExtractedProfilesWithValidProfilesThenInsertThem() = runTest {
         // Given
         val currentTime = 1000000L
         val profileQueryId = 1L
@@ -669,7 +679,7 @@ class RealPirRepositoryTest {
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(currentTime)
 
         // When
-        testee.saveNewExtractedProfiles(extractedProfiles)
+        testee.saveExtractedProfiles(extractedProfiles)
 
         // Then
         verify(mockUserProfileDao).getUserProfile(profileQueryId)
@@ -677,7 +687,7 @@ class RealPirRepositoryTest {
     }
 
     @Test
-    fun whenSaveNewExtractedProfilesWithDeprecatedProfileThenDoNotInsert() = runTest {
+    fun whenSaveExtractedProfilesWithDeprecatedProfileThenDoNotInsert() = runTest {
         // Given
         val profileQueryId = 1L
         val extractedProfiles = listOf(
@@ -698,7 +708,7 @@ class RealPirRepositoryTest {
         whenever(mockUserProfileDao.getUserProfile(profileQueryId)).thenReturn(deprecatedUserProfile)
 
         // When
-        testee.saveNewExtractedProfiles(extractedProfiles)
+        testee.saveExtractedProfiles(extractedProfiles)
 
         // Then
         verify(mockUserProfileDao).getUserProfile(profileQueryId)
@@ -706,12 +716,12 @@ class RealPirRepositoryTest {
     }
 
     @Test
-    fun whenSaveNewExtractedProfilesWithEmptyListThenDoNothing() = runTest {
+    fun whenSaveExtractedProfilesWithEmptyListThenDoNothing() = runTest {
         // Given
         val extractedProfiles = emptyList<ExtractedProfile>()
 
         // When
-        testee.saveNewExtractedProfiles(extractedProfiles)
+        testee.saveExtractedProfiles(extractedProfiles)
 
         // Then
         verifyNoInteractions(mockUserProfileDao)
@@ -719,7 +729,7 @@ class RealPirRepositoryTest {
     }
 
     @Test
-    fun whenSaveNewExtractedProfilesWithNonExistentProfileThenStillInsertsProfiles() = runTest {
+    fun whenSaveExtractedProfilesWithNonExistentProfileThenStillInsertsProfiles() = runTest {
         // Given - When profile doesn't exist, the deprecated check (profileQuery?.deprecated == true)
         // evaluates to false, so profiles still get inserted
         val currentTime = 1000000L
@@ -736,7 +746,7 @@ class RealPirRepositoryTest {
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(currentTime)
 
         // When
-        testee.saveNewExtractedProfiles(extractedProfiles)
+        testee.saveExtractedProfiles(extractedProfiles)
 
         // Then
         verify(mockUserProfileDao).getUserProfile(profileQueryId)
@@ -744,7 +754,7 @@ class RealPirRepositoryTest {
     }
 
     @Test
-    fun whenSaveNewExtractedProfilesWithZeroDateThenUseCurrentTime() = runTest {
+    fun whenSaveExtractedProfilesWithZeroDateThenUseCurrentTime() = runTest {
         // Given
         val currentTime = 5000000L
         val profileQueryId = 1L
@@ -768,7 +778,7 @@ class RealPirRepositoryTest {
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(currentTime)
 
         // When
-        testee.saveNewExtractedProfiles(extractedProfiles)
+        testee.saveExtractedProfiles(extractedProfiles)
 
         // Then
         verify(mockCurrentTimeProvider).currentTimeMillis()
@@ -776,7 +786,7 @@ class RealPirRepositoryTest {
     }
 
     @Test
-    fun whenSaveNewExtractedProfilesWithExistingDateThenKeepOriginalDate() = runTest {
+    fun whenSaveExtractedProfilesWithExistingDateThenKeepOriginalDate() = runTest {
         // Given
         val existingDate = 2000000L
         val currentTime = 5000000L
@@ -801,14 +811,14 @@ class RealPirRepositoryTest {
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(currentTime)
 
         // When
-        testee.saveNewExtractedProfiles(extractedProfiles)
+        testee.saveExtractedProfiles(extractedProfiles)
 
         // Then
         verify(mockExtractedProfileDao).insertNewExtractedProfiles(any())
     }
 
     @Test
-    fun whenSaveNewExtractedProfilesWithCompleteDataThenMapAllFields() = runTest {
+    fun whenSaveExtractedProfilesWithCompleteDataThenMapAllFields() = runTest {
         // Given
         val currentTime = 1000000L
         val profileQueryId = 1L
@@ -846,11 +856,127 @@ class RealPirRepositoryTest {
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(currentTime)
 
         // When
-        testee.saveNewExtractedProfiles(extractedProfiles)
+        testee.saveExtractedProfiles(extractedProfiles)
 
         // Then
         verify(mockUserProfileDao).getUserProfile(profileQueryId)
         verify(mockExtractedProfileDao).insertNewExtractedProfiles(any())
+    }
+
+    @Test
+    fun whenSaveExtractedProfilesWithExtrasThenPersistsProfileAndAddressExtras() = runTest {
+        // Given
+        val profileQueryId = 1L
+        val extractedProfiles = listOf(
+            ExtractedProfile(
+                profileQueryId = profileQueryId,
+                brokerName = "TestBroker",
+                name = "John Doe",
+                addresses = listOf(
+                    AddressCityState(city = "Springfield", state = "IL", extras = mapOf("street" to "100 Sample Dr", "zip" to "62701")),
+                ),
+                dateAddedInMillis = 999999L,
+                extras = mapOf("county" to "Sangamon"),
+            ),
+        )
+        whenever(mockUserProfileDao.getUserProfile(profileQueryId)).thenReturn(null)
+
+        // When
+        testee.saveExtractedProfiles(extractedProfiles)
+
+        // Then
+        val captor = argumentCaptor<List<StoredExtractedProfile>>()
+        verify(mockExtractedProfileDao).insertNewExtractedProfiles(captor.capture())
+        val inserted = captor.firstValue.single()
+        assertEquals(mapOf("county" to "Sangamon"), inserted.extras)
+        assertEquals(
+            AddressCityState(city = "Springfield", state = "IL", extras = mapOf("street" to "100 Sample Dr", "zip" to "62701")),
+            addressAdapter.fromJson(inserted.addresses.single()),
+        )
+    }
+
+    @Test
+    fun whenSaveExtractedProfilesWithAlreadyStoredProfileThenRefreshesItInsteadOfInserting() = runTest {
+        // Given
+        val profileQueryId = 1L
+        val stored = StoredExtractedProfile(
+            id = 7L,
+            profileQueryId = profileQueryId,
+            brokerName = "TestBroker",
+            name = "John Doe",
+            age = "35",
+            addresses = listOf(
+                addressAdapter.toJson(AddressCityState(city = "Springfield", state = "IL", extras = mapOf("street" to "100 Sample Dr"))),
+            ),
+            profileUrl = "https://example.com/profile",
+            identifier = "identifier-123",
+            dateAddedInMillis = 111L,
+            extras = mapOf("county" to "Sangamon", "middleName" to "Michael"),
+        )
+        val scraped = ExtractedProfile(
+            profileQueryId = profileQueryId,
+            brokerName = "TestBroker",
+            name = "John Doe",
+            age = "36",
+            addresses = listOf(AddressCityState(city = "Springfield", state = "IL", extras = mapOf("zip" to "62701"))),
+            profileUrl = "https://example.com/profile",
+            identifier = "identifier-123",
+            extras = mapOf("county" to "Cook"),
+        )
+        whenever(mockUserProfileDao.getUserProfile(profileQueryId)).thenReturn(null)
+        whenever(mockExtractedProfileDao.getExtractedProfilesForBrokerAndProfile("TestBroker", profileQueryId)).thenReturn(listOf(stored))
+
+        // When
+        testee.saveExtractedProfiles(listOf(scraped))
+
+        // Then
+        verify(mockExtractedProfileDao).insertNewExtractedProfiles(emptyList())
+        val captor = argumentCaptor<List<StoredExtractedProfile>>()
+        verify(mockExtractedProfileDao).updateExtractedProfiles(captor.capture())
+        val updated = captor.firstValue.single()
+        assertEquals(7L, updated.id)
+        assertEquals(111L, updated.dateAddedInMillis)
+        assertEquals("36", updated.age)
+        assertEquals(mapOf("county" to "Cook", "middleName" to "Michael"), updated.extras)
+        assertEquals(
+            AddressCityState(city = "Springfield", state = "IL", extras = mapOf("street" to "100 Sample Dr", "zip" to "62701")),
+            addressAdapter.fromJson(updated.addresses.single()),
+        )
+    }
+
+    @Test
+    fun whenSaveExtractedProfilesWithAddressStoredBeforeExtrasExistedThenParsesItAsEmptyExtras() = runTest {
+        // Given
+        val profileQueryId = 1L
+        val stored = StoredExtractedProfile(
+            id = 7L,
+            profileQueryId = profileQueryId,
+            brokerName = "TestBroker",
+            name = "John Doe",
+            addresses = listOf("""{"city":"Springfield","state":"IL"}"""),
+            identifier = "identifier-123",
+            dateAddedInMillis = 111L,
+        )
+        val scraped = ExtractedProfile(
+            profileQueryId = profileQueryId,
+            brokerName = "TestBroker",
+            name = "John Doe",
+            addresses = listOf(AddressCityState(city = "Springfield", state = "IL", extras = mapOf("zip" to "62701"))),
+            identifier = "identifier-123",
+        )
+        whenever(mockUserProfileDao.getUserProfile(profileQueryId)).thenReturn(null)
+        whenever(mockExtractedProfileDao.getExtractedProfilesForBrokerAndProfile("TestBroker", profileQueryId)).thenReturn(listOf(stored))
+
+        // When
+        testee.saveExtractedProfiles(listOf(scraped))
+
+        // Then
+        val captor = argumentCaptor<List<StoredExtractedProfile>>()
+        verify(mockExtractedProfileDao).updateExtractedProfiles(captor.capture())
+        assertEquals(
+            AddressCityState(city = "Springfield", state = "IL", extras = mapOf("zip" to "62701")),
+            addressAdapter.fromJson(captor.firstValue.single().addresses.single()),
+        )
     }
 
     @Test

@@ -1,0 +1,30 @@
+{
+    "m_app_links_snackbar_shown": {
+        "description": "Fired when the 'open in app' snackbar is shown.",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "app_links_snackbar_shown_daily": {
+        "description": "Fired at most once per day when the 'open in app' snackbar is shown.",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_app_links_snackbar_open_action_pressed": {
+        "description": "Fired when the user taps the open action on the 'open in app' snackbar.",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "app_links_snackbar_open_action_pressed_daily": {
+        "description": "Fired at most once per day when the user taps the open action on the 'open in app' snackbar.",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    }
+}

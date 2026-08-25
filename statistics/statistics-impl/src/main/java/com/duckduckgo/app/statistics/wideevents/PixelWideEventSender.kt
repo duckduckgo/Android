@@ -51,6 +51,7 @@ class PixelWideEventSender @Inject constructor(
                 put(PARAM_META_TYPE, event.metaType)
                 put(PARAM_META_VERSION, event.metaVersion)
                 put(PARAM_SAMPLE_RATE, event.samplingProbability.toString())
+                put(PARAM_IS_FIRST_DAILY_OCCURRENCE, event.isFirstDailyOccurrence.toString())
                 put(PARAM_STATUS, event.status.toParamValue())
 
                 if (event.flowEntryPoint != null) {
@@ -126,6 +127,7 @@ class PixelWideEventSender @Inject constructor(
         const val PARAM_PLATFORM = "global.platform"
         const val PARAM_TYPE = "global.type"
         const val PARAM_SAMPLE_RATE = "global.sample_rate"
+        const val PARAM_IS_FIRST_DAILY_OCCURRENCE = "global.is_first_daily_occurrence"
         const val PARAM_CONTEXT_NAME = "context.name"
         const val PARAM_STATUS = "feature.status"
         const val PARAM_APP_NAME = "app.name"

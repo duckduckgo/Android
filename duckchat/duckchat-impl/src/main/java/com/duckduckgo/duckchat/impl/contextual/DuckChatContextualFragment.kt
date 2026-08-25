@@ -85,6 +85,8 @@ import com.duckduckgo.downloads.api.DownloadConfirmationDialogListener
 import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.FileDownloader
+import com.duckduckgo.duckchat.api.DuckChatContextual
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.DuckChatHistoryNoParams
 import com.duckduckgo.duckchat.api.viewmodel.DuckChatSharedViewModel
 import com.duckduckgo.duckchat.impl.DuckChatInternal
@@ -527,7 +529,7 @@ class DuckChatContextualFragment :
             onPageContextRemoved = { viewModel.removePageContext() },
             onVoiceChatRequested = {
                 viewModel.onContextualClose()
-                duckChat.openVoiceDuckChat()
+                duckChat.openVoiceDuckChat(DuckChatEntryPoint.VOICE)
             },
             onVoiceSearchRequested = {
                 activity?.hideKeyboard()
@@ -720,6 +722,10 @@ class DuckChatContextualFragment :
         }
     }
 
+    private fun openDuckAiWithPrompt(query: String) {
+        duckChat.openDuckChatWithAutoPrompt(query, DuckChatEntryPoint.CONTEXTUAL_CHAT)
+    }
+
     private fun observeViewModel() {
         viewModel.commands
             .onEach { command ->
@@ -740,10 +746,10 @@ class DuckChatContextualFragment :
                     is DuckChatContextualViewModel.Command.OpenFullscreenMode -> {
                         binding.root.viewTreeObserver.removeOnGlobalLayoutListener(keyboardVisibilityListener)
                         val result = Bundle().apply {
-                            putString(KEY_DUCK_AI_URL, command.url)
+                            putString(DuckChatContextual.RESULT_URL, command.url)
                         }
 
-                        setFragmentResult(KEY_DUCK_AI_CONTEXTUAL_RESULT, result)
+                        setFragmentResult(DuckChatContextual.RESULT_KEY, result)
                     }
 
                     is DuckChatContextualViewModel.Command.ChangeSheetState -> {
@@ -780,7 +786,7 @@ class DuckChatContextualFragment :
 
                     is DuckChatContextualViewModel.Command.OpenDuckAiWithPrompt -> {
                         viewModel.onContextualClose()
-                        duckChat.openDuckChatWithAutoPrompt(command.query)
+                        openDuckAiWithPrompt(command.query)
                     }
 
                     is DuckChatContextualViewModel.Command.FocusInput -> {
@@ -1319,8 +1325,6 @@ class DuckChatContextualFragment :
             "Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/124.0.0.0 Mobile DuckDuckGo/5 Safari/537.36"
         const val REQUEST_CODE_CHOOSE_FILE = 100
 
-        const val KEY_DUCK_AI_URL: String = "KEY_DUCK_AI_URL"
-        const val KEY_DUCK_AI_CONTEXTUAL_RESULT: String = "KEY_DUCK_AI_CONTEXTUAL_RESULT"
         const val KEY_DUCK_AI_CONTEXTUAL_TAB_ID: String = "KEY_DUCK_AI_CONTEXTUAL_TAB_ID"
     }
 }

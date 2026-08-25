@@ -16,6 +16,7 @@
             "widePixelDevMode",
             "widePixelMetaType",
             "widePixelMetaVersion",
+            "widePixelIsFirstDailyOccurrence",
             {
                 "key": "feature.name",
                 "description": "Feature identifier for this wide event",
@@ -49,7 +50,7 @@
             {
                 "key": "feature.data.ext.total_duration_ms_bucketed",
                 "description": "Duration of the data clearing operation, bucketed using the lower bucket boundary. Does not include process restart duration.",
-                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                "enum": ["0", "1000", "2000", "3000", "4000", "5000", "10000", "30000", "60000", "300000", "600000"]
             },
             {
                 "key": "feature.data.ext.failure_reason",

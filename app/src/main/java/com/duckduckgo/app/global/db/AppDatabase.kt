@@ -57,6 +57,8 @@ import com.duckduckgo.app.statistics.model.QueryParamsTypeConverter
 import com.duckduckgo.app.statistics.store.PendingPixelDao
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
+import com.duckduckgo.app.tabs.db.DuckAiTabSessionDao
+import com.duckduckgo.app.tabs.db.DuckAiTabSessionEntity
 import com.duckduckgo.app.tabs.db.TabPageContextDao
 import com.duckduckgo.app.tabs.db.TabPageContextEntity
 import com.duckduckgo.app.tabs.db.TabsDao
@@ -85,7 +87,7 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
  */
 @Database(
     exportSchema = true,
-    version = 62,
+    version = 63,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
@@ -121,6 +123,7 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
         Entity::class,
         Relation::class,
         DefaultBrowserPromptsAppUsageEntity::class,
+        DuckAiTabSessionEntity::class,
     ],
 )
 @TypeConverters(
@@ -148,6 +151,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun networkLeaderboardDao(): NetworkLeaderboardDao
     abstract fun tabsDao(): TabsDao
     abstract fun tabPageContextDao(): TabPageContextDao
+    abstract fun duckAiTabSessionDao(): DuckAiTabSessionDao
     abstract fun webViewSessionDao(): WebViewSessionDao
     abstract fun bookmarksDao(): BookmarksDao
     abstract fun favoritesDao(): FavoritesDao
@@ -753,6 +757,19 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         }
     }
 
+    private val MIGRATION_62_TO_63: Migration = object : Migration(62, 63) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL(
+                "CREATE TABLE IF NOT EXISTS `duck_ai_tab_session` (" +
+                    "`tabId` TEXT NOT NULL, " +
+                    "`entryPointSource` TEXT NOT NULL, " +
+                    "PRIMARY KEY(`tabId`), " +
+                    "FOREIGN KEY(`tabId`) REFERENCES `tabs`(`tabId`) ON UPDATE NO ACTION ON DELETE CASCADE" +
+                    ")",
+            )
+        }
+    }
+
     /**
      * WARNING ⚠️
      * This needs to happen because Room doesn't support UNIQUE (...) ON CONFLICT REPLACE when creating the bookmarks table.
@@ -840,6 +857,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
             MIGRATION_59_TO_60,
             MIGRATION_60_TO_61,
             MIGRATION_61_TO_62,
+            MIGRATION_62_TO_63,
         )
 
     @Deprecated(

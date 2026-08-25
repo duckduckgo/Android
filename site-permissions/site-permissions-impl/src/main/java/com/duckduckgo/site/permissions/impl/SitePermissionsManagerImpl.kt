@@ -23,6 +23,7 @@ import android.location.LocationManager
 import android.webkit.PermissionRequest
 import androidx.core.content.ContextCompat
 import androidx.core.location.LocationManagerCompat
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.AppScope
@@ -31,7 +32,14 @@ import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
+import com.duckduckgo.site.permissions.impl.drm.DrmPolicyAction
+import com.duckduckgo.site.permissions.impl.drm.DrmPolicyDecision
+import com.duckduckgo.site.permissions.impl.drm.DrmPolicyManager
+import com.duckduckgo.site.permissions.impl.drm.DrmPolicyReason
+import com.duckduckgo.site.permissions.impl.drm.DrmSessionStore
+import com.duckduckgo.site.permissions.impl.feature.DrmPolicyFeature
 import com.duckduckgo.site.permissions.impl.feature.MicrophoneSitePermissionsDomainRecoveryFeature
+import com.duckduckgo.site.permissions.impl.feature.isCentralPolicyEnabled
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.withContext
 import logcat.logcat
@@ -46,6 +54,10 @@ class SitePermissionsManagerImpl @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val context: Context,
     private val microphoneSitePermissionsDomainRecoveryFeature: MicrophoneSitePermissionsDomainRecoveryFeature,
+    private val drmPolicyFeature: DrmPolicyFeature,
+    private val drmPolicyManager: DrmPolicyManager,
+    private val drmSessionStore: DrmSessionStore,
+    private val pixel: Pixel,
     duckAiHostProvider: DuckAiHostProvider,
 ) : SitePermissionsManager {
 
@@ -65,14 +77,27 @@ class SitePermissionsManagerImpl @Inject constructor(
         val autoAccept = mutableListOf<String>()
         val url = request.origin.toString()
 
+        val drmDecision = if (!request.resources.contains(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)) {
+            null
+        } else {
+            withContext(dispatcherProvider.io()) {
+                drmPolicyManager
+                    .takeIf { drmPolicyFeature.isCentralPolicyEnabled() }
+                    ?.decide(url, tabId)
+                    ?.also { logcat { "Permissions: drm policy decision for $url is $it" } }
+            }
+        }
+        drmDecision?.let { fireDrmAutoGrantedPixel(it, tabId, url) }
+
         val sitePermissionsAllowedToAsk = request.resources
+            .filter { drmDecision == null || it != PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID }
             .filter { isPermissionSupported(it) && isHardwareSupported(it) }
             .filter { sitePermissionsRepository.isDomainAllowedToAsk(url, it) }
             .toTypedArray()
 
         logcat { "Permissions: sitePermissionsAllowedToAsk in $url ${sitePermissionsAllowedToAsk.asList()}" }
 
-        val sitePermissionsGranted = if (microphoneSitePermissionsDomainRecoveryFeature.self().isEnabled()) {
+        val filteredPermissionsGranted = if (microphoneSitePermissionsDomainRecoveryFeature.self().isEnabled()) {
             getSitePermissionsGranted(url, tabId, sitePermissionsAllowedToAsk).filter { permission ->
                 if (permission == PermissionRequest.RESOURCE_AUDIO_CAPTURE && audioCapturePermissionDomains.contains(url.extractDomain())) {
                     ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED &&
@@ -85,6 +110,12 @@ class SitePermissionsManagerImpl @Inject constructor(
             getSitePermissionsGranted(url, tabId, sitePermissionsAllowedToAsk)
         }
 
+        val sitePermissionsGranted = if (drmDecision?.action == DrmPolicyAction.GRANT) {
+            filteredPermissionsGranted + PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID
+        } else {
+            filteredPermissionsGranted
+        }
+
         if (sitePermissionsGranted.isNotEmpty()) {
             withContext(dispatcherProvider.main()) {
                 logcat { "Permissions: site permission granted" }
@@ -94,7 +125,8 @@ class SitePermissionsManagerImpl @Inject constructor(
 
         logcat { "Permissions: sitePermissionsGranted for $url are ${sitePermissionsGranted.asList()}" }
 
-        val userList = sitePermissionsAllowedToAsk.filter { !sitePermissionsGranted.contains(it) }
+        val userList = sitePermissionsAllowedToAsk.filter { !sitePermissionsGranted.contains(it) } +
+            listOfNotNull(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID.takeIf { drmDecision?.action == DrmPolicyAction.PROMPT })
         if (userList.isEmpty() && sitePermissionsGranted.isEmpty()) {
             withContext(dispatcherProvider.main()) {
                 logcat { "Permissions: site permission not granted, deny" }
@@ -115,6 +147,7 @@ class SitePermissionsManagerImpl @Inject constructor(
     }
 
     override suspend fun clearAllButFireproof(fireproofDomains: List<String>) {
+        drmSessionStore.clear()
         sitePermissionsRepository.sitePermissionsForAllWebsites().forEach { permission ->
             if (!fireproofDomains.contains(permission.domain)) {
                 sitePermissionsRepository.deletePermissionsForSite(permission.domain)
@@ -144,6 +177,28 @@ class SitePermissionsManagerImpl @Inject constructor(
         request: String,
     ): Boolean {
         return sitePermissionsRepository.isDomainGranted(url, "", LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION)
+    }
+
+    private fun fireDrmAutoGrantedPixel(
+        decision: DrmPolicyDecision,
+        tabId: String,
+        url: String,
+    ) {
+        if (decision.action != DrmPolicyAction.GRANT) return
+        val reason = when (decision.reason) {
+            DrmPolicyReason.ALLOW_LIST -> SitePermissionsPixelValues.ALLOW_LIST
+            DrmPolicyReason.PROTECTIONS_OFF -> SitePermissionsPixelValues.PROTECTIONS_OFF
+            else -> return
+        }
+        if (!drmSessionStore.markAutoGrantReported(tabId, url.extractDomain() ?: url)) return
+
+        pixel.fire(
+            SitePermissionsPixelName.PERMISSION_AUTO_GRANTED,
+            mapOf(
+                SitePermissionsPixelParameters.PERMISSION_TYPE to SitePermissionsPixelValues.DRM,
+                SitePermissionsPixelParameters.REASON to reason,
+            ),
+        )
     }
 
     private fun isPermissionSupported(permission: String): Boolean =

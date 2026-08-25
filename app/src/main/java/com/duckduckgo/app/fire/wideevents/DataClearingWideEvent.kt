@@ -16,11 +16,13 @@
 
 package com.duckduckgo.app.fire.wideevents
 
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy.OnProcessStart
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
+import com.duckduckgo.app.statistics.wideevents.WideEventDefinition
+import com.duckduckgo.app.statistics.wideevents.WideEventDefinition.Version
+import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -28,6 +30,8 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 interface DataClearingWideEvent {
     /**
@@ -111,12 +115,14 @@ class DataClearingWideEventImpl @Inject constructor(
             metadata = metadata,
             cleanupPolicy = OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
             samplingProbability = SAMPLING_PROBABILITY,
+            definition = WideEventDefinition(version = Version(minor = 1, patch = 0)),
         ).getOrNull()
 
         cachedFlowId?.let { flowId ->
             wideEventClient.intervalStart(
                 wideEventId = flowId,
                 key = KEY_TOTAL_DURATION_MS_BUCKETED,
+                buckets = DURATION_BUCKETS,
             )
         }
     }
@@ -230,6 +236,18 @@ class DataClearingWideEventImpl @Inject constructor(
     }
 
     private companion object {
+        val DURATION_BUCKETS = setOf(
+            1.seconds,
+            2.seconds,
+            3.seconds,
+            4.seconds,
+            5.seconds,
+            10.seconds,
+            30.seconds,
+            1.minutes,
+            5.minutes,
+            10.minutes,
+        )
         const val FLOW_NAME = "data-clearing"
         const val SAMPLING_PROBABILITY = 0.05f
         const val KEY_CLEAR_OPTIONS = "clear_options"

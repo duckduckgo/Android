@@ -16,7 +16,6 @@
 
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
@@ -109,11 +108,6 @@
 
             </LinearLayout>
 
-            <!-- TEMPORARY: restyle the design-system secondary button into a "filled secondary"
-                 (neutral-grey fill, no stroke) to match the Fire Tabs design. Uses existing control
-                 tokens. Remove these overrides (and the lint suppression) once the design system
-                 ships a first-class filled-secondary button. The textColor override is what trips
-                 the DaxButton styling lint rule, hence the suppression. -->
             <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
                 android:id="@+id/newFireTabButton"
                 android:layout_width="wrap_content"
@@ -121,14 +115,9 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="@dimen/keyline_5"
                 android:text="@string/fireTabsNewTabButton"
-                android:textColor="?attr/daxColorPrimaryText"
-                app:backgroundTint="?attr/daxColorContainer"
+                android:theme="@style/ThemeOverlay.Rebrand"
                 app:daxButtonSize="small"
-                app:icon="@drawable/ic_add_16"
-                app:iconTint="?attr/daxColorPrimaryText"
-                app:rippleColor="?attr/daxColorRipple"
-                app:strokeWidth="0dp"
-                tools:ignore="InvalidDaxButtonProperty" />
+                app:icon="@drawable/ic_add_16" />
 
         </LinearLayout>
 

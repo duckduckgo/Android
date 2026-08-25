@@ -19,6 +19,11 @@ Sent every time the event occurs. Use for events where per-occurrence volume mat
 
 Sent at most once per calendar day per event. Use to measure the number of unique users affected by something (e.g., how many users hit a particular error per day). Most daily pixel implementations also support a "count" variant that fires every time.
 
+When a pixel fires as a plain count+daily pair with identical parameters, register it as **one**
+definition entry using the `first_daily_count` suffix rather than two separate `_count`/`_daily`
+entries — see `.claude/rules/pixel-definitions.md`. The firing code is unchanged either way: it still
+calls `pixel.fire()` twice with the explicit `_count`/`_daily` wire-string names.
+
 ### Unique Pixels
 
 Sent once per install for the lifetime of the install. Use for one-time lifecycle events (e.g., first activation, first use of a feature).

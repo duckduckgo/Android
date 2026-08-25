@@ -20,8 +20,8 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.pm.PackageManager
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle
 import org.junit.Assert.assertEquals
@@ -46,7 +46,6 @@ class PdfHandlerComponentTogglerTest {
     private val context: Context = mock()
     private val packageManager: PackageManager = mock()
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature = mock()
-    private val pdfViewerToggle: Toggle = mock()
     private val externalPdfHandlerToggle: Toggle = mock()
     private val appBuildConfig: AppBuildConfig = mock()
 
@@ -58,7 +57,6 @@ class PdfHandlerComponentTogglerTest {
     fun setUp() {
         whenever(context.packageManager).thenReturn(packageManager)
         whenever(appBuildConfig.applicationId).thenReturn(appId)
-        whenever(androidBrowserConfigFeature.pdfViewer()).thenReturn(pdfViewerToggle)
         whenever(androidBrowserConfigFeature.externalPdfHandler()).thenReturn(externalPdfHandlerToggle)
         whenever(externalPdfHandlerToggle.isEnabled()).thenReturn(true)
 
@@ -72,9 +70,8 @@ class PdfHandlerComponentTogglerTest {
     }
 
     @Test
-    fun `when sdk is 31 and flag is on then enables alias`() {
+    fun `when sdk is 31 and externalPdfHandler is on then enables alias`() {
         whenever(appBuildConfig.sdkInt).thenReturn(31)
-        whenever(pdfViewerToggle.isEnabled()).thenReturn(true)
 
         testee.sync()
 
@@ -89,9 +86,8 @@ class PdfHandlerComponentTogglerTest {
     }
 
     @Test
-    fun `when sdk is 30 and flag is on then disables alias`() {
+    fun `when sdk is 30 and externalPdfHandler is on then disables alias`() {
         whenever(appBuildConfig.sdkInt).thenReturn(30)
-        whenever(pdfViewerToggle.isEnabled()).thenReturn(true)
 
         testee.sync()
 
@@ -106,26 +102,8 @@ class PdfHandlerComponentTogglerTest {
     }
 
     @Test
-    fun `when sdk is 33 and flag is off then disables alias`() {
+    fun `when sdk is 33 and externalPdfHandler is off then disables alias`() {
         whenever(appBuildConfig.sdkInt).thenReturn(33)
-        whenever(pdfViewerToggle.isEnabled()).thenReturn(false)
-
-        testee.sync()
-
-        val componentCaptor = argumentCaptor<ComponentName>()
-        val stateCaptor = argumentCaptor<Int>()
-        val flagsCaptor = argumentCaptor<Int>()
-        verify(packageManager).setComponentEnabledSetting(componentCaptor.capture(), stateCaptor.capture(), flagsCaptor.capture())
-        assertEquals(appId, componentCaptor.firstValue.packageName)
-        assertEquals("com.duckduckgo.app.dispatchers.PdfViewerHandler", componentCaptor.firstValue.className)
-        assertEquals(PackageManager.COMPONENT_ENABLED_STATE_DISABLED, stateCaptor.firstValue)
-        assertEquals(PackageManager.DONT_KILL_APP, flagsCaptor.firstValue)
-    }
-
-    @Test
-    fun `when sdk is 33 and pdfViewer is on but externalPdfHandler is off then disables alias`() {
-        whenever(appBuildConfig.sdkInt).thenReturn(33)
-        whenever(pdfViewerToggle.isEnabled()).thenReturn(true)
         whenever(externalPdfHandlerToggle.isEnabled()).thenReturn(false)
 
         testee.sync()

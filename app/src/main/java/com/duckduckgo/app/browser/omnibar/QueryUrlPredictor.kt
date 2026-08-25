@@ -18,7 +18,7 @@ package com.duckduckgo.app.browser.omnibar
 
 import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.urlpredictor.Decision

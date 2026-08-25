@@ -668,6 +668,7 @@ class RealPirRunStateHandler @Inject constructor(
                                     city = item.city,
                                     state = item.state,
                                     fullAddress = item.fullAddress,
+                                    extras = item.extras.orEmpty(),
                                 )
                             },
                             phoneNumbers = it.phoneNumbers,
@@ -676,13 +677,14 @@ class RealPirRunStateHandler @Inject constructor(
                             reportId = it.reportId.orEmpty(),
                             email = it.email.orEmpty(),
                             fullName = it.fullName.orEmpty(),
+                            extras = it.extras.orEmpty(),
                         )
                     }.also {
                         /**
                          * For every locally stored extractedProfile for the broker x profile that is not part of the newly received
                          * extracted Profiles, or no extracted Profiles were found on the broker:
                          * - We update the optOut status to REMOVED
-                         * - We store the new extracted profiles (if profile query is not deprecated). We ignore the ones that already exist.
+                         * - We store the new extracted profiles (if profile query is not deprecated) and refresh the ones we already have.
                          * - Update the corresponding ScanJobRecord
                          * For every stored extractedProfile that reappears in the results and whose opt-out was previously
                          * REMOVED, we revert it back to REQUESTED and report a reappearance pixel.
@@ -695,7 +697,7 @@ class RealPirRunStateHandler @Inject constructor(
                                     pixelSender.reportBrokerOptOutProfileReappeared(state.broker.url)
                                 }
                             jobRecordUpdater.updateScanMatchesFound(it, brokerName, state.profileQueryId)
-                            repository.saveNewExtractedProfiles(it)
+                            repository.saveExtractedProfiles(it)
                         } else {
                             jobRecordUpdater.updateScanNoMatchFound(brokerName, state.profileQueryId)
                         }

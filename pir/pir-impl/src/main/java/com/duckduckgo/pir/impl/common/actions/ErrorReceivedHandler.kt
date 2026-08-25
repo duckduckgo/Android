@@ -24,7 +24,6 @@ import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerActionFailed
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ErrorReceived
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.State
-import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.scripts.models.PirError
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
@@ -54,11 +53,7 @@ class ErrorReceivedHandler @Inject constructor(
          */
         if (!isEventValid(state, event as ErrorReceived)) {
             // Nothing to do here, the event is outdated
-            val broker = if (state.brokerStepsToExecute.size <= state.currentBrokerStepIndex) {
-                Broker.unknown()
-            } else {
-                state.brokerStepsToExecute[state.currentBrokerStepIndex].broker
-            }
+            val broker = state.brokerStep.broker
 
             pirRunStateHandler.handleState(
                 BrokerStepInvalidEvent(
@@ -82,13 +77,10 @@ class ErrorReceivedHandler @Inject constructor(
         state: State,
         event: ErrorReceived,
     ): Boolean {
-        // Broker steps has probably been considered completed before the js response arrived
-        if (state.brokerStepsToExecute.size <= state.currentBrokerStepIndex) return false
-
         // Broker step actions has probably been considered completed before the js response arrived
-        if (state.brokerStepsToExecute[state.currentBrokerStepIndex].step.actions.size <= state.currentActionIndex) return false
+        if (state.brokerStep.step.actions.size <= state.currentActionIndex) return false
 
-        val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex]
+        val currentBrokerStep = state.brokerStep
         val currentBrokerStepAction = currentBrokerStep.step.actions[state.currentActionIndex]
 
         // The action IDs don't match, the js response is probably for an outdated / old action

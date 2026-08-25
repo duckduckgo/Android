@@ -34,8 +34,10 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -46,6 +48,9 @@ class OnboardingActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var duckChat: DuckChat
+
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     private lateinit var viewPageAdapter: PagerAdapter
 
@@ -105,6 +110,7 @@ class OnboardingActivity : DuckDuckGoActivity() {
         lifecycleScope.launch {
             viewModel.onOnboardingDone(extendedOnboardingFlow = DUCK_AI_FOCUSED)
             val duckChatUrl = duckChat.getDuckChatUrl(prompt, autoPrompt = true) + "&flow=mobile-app-onboarding"
+            duckChat.reportDuckChatEntry(DuckChatEntryPoint.ONBOARDING, opensNewTab = true, hasPrompt = prompt.isNotBlank())
             startActivity(BrowserActivity.intent(this@OnboardingActivity, launchSource = Onboarding, duckChatUrl = duckChatUrl, openDuckChat = true))
             finish()
         }
@@ -150,6 +156,9 @@ class OnboardingActivity : DuckDuckGoActivity() {
     }
 
     private fun configureSkipButton() {
+        binding.skipOnboardingButton.background.mutate().alpha = 180
+        edgeToEdgeHandler.applyStatusBarInsetsAsMargin(binding.skipOnboardingButton)
+
         binding.skipOnboardingButton.setOnClickListener {
             lifecycleScope.launch {
                 val shouldNavigate = viewModel.devOnlyFullyCompleteAllOnboarding()

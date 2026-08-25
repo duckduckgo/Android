@@ -40,6 +40,7 @@ import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.impl.R.string
 import com.duckduckgo.duckchat.impl.databinding.ActivityDuckAiPaidSettingsBinding
@@ -168,7 +169,7 @@ class DuckAiPaidSettingsActivity : DuckDuckGoActivity() {
             }
 
             OpenDuckAi -> {
-                duckChat.openDuckChat()
+                duckChat.openDuckChat(DuckChatEntryPoint.PAID_SETTINGS)
             }
 
             OpenDuckChatSettings -> {

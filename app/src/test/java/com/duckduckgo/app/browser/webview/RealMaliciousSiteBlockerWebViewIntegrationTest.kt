@@ -9,9 +9,9 @@ import com.duckduckgo.app.browser.webview.RealMaliciousSiteBlockerWebViewIntegra
 import com.duckduckgo.app.browser.webview.RealMaliciousSiteBlockerWebViewIntegration.IsMaliciousViewData.Safe
 import com.duckduckgo.app.browser.webview.RealMaliciousSiteBlockerWebViewIntegration.ProcessedUrlStatus
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State

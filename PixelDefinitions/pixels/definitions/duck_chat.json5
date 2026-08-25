@@ -230,28 +230,28 @@
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "duckAiPromptPageType", "duckAiEntrySource"]
     },
     "m_aichat_contextual_prompt_submitted_with_context_native_daily": {
         "description": "(Daily Pixel) The user has submitted a prompt to Contextual Duck.ai with the page context attached",
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "duckAiPromptPageType", "duckAiEntrySource"]
     },
     "m_aichat_contextual_prompt_submitted_without_context_native_count": {
         "description": "The user has submitted a prompt to Contextual Duck.ai without the page context attached",
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "duckAiPromptPageType", "duckAiEntrySource"]
     },
     "m_aichat_contextual_prompt_submitted_without_context_native_daily": {
         "description": "(Daily Pixel) The user has submitted a prompt to Contextual Duck.ai without the page context attached",
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "duckAiPromptPageType", "duckAiEntrySource"]
     },
     "m_aichat_contextual_page_context_collection_empty": {
         "description": "The page context collected via content scripts is not valid / is empty",
@@ -439,6 +439,24 @@
             }
         ]
     },
+    "m_aichat_entry_point": {
+        "description": "Fires when an active user action enters Duck.ai, with the initiating surface and navigation context.",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": [
+            "appVersion",
+            "duckAiEntrySource",
+            { "key": "duck_ai_enabled", "type": "boolean", "description": "Whether Duck.ai is enabled by feature and user settings." },
+            {
+                "key": "input_screen_enabled",
+                "type": "boolean",
+                "description": "Whether the Search and Duck.ai input capability is enabled."
+            },
+            { "key": "opens_new_tab", "type": "boolean", "description": "Whether this entry opens a new browser tab." },
+            { "key": "has_prompt", "type": "boolean", "description": "Whether a non-blank prompt is automatically submitted on entry." }
+        ]
+    },
     "m_aichat_duck_ai_direct_navigation_count": {
         "description": "User navigated directly to the Duck.ai URL by typing it in the omnibar",
         "owners": ["malmstein"],
@@ -448,9 +466,13 @@
             "appVersion",
             {
                 "key": "duck_ai_enabled",
-                "type": "string",
-                "description": "Whether the Duck.ai global setting is enabled",
-                "enum": ["true", "false"]
+                "type": "boolean",
+                "description": "Whether the Duck.ai global setting is enabled"
+            },
+            {
+                "key": "input_screen_enabled",
+                "type": "boolean",
+                "description": "Whether the Search and Duck.ai input capability is enabled."
             }
         ]
     },
@@ -463,9 +485,13 @@
             "appVersion",
             {
                 "key": "duck_ai_enabled",
-                "type": "string",
-                "description": "Whether the Duck.ai global setting is enabled",
-                "enum": ["true", "false"]
+                "type": "boolean",
+                "description": "Whether the Duck.ai global setting is enabled"
+            },
+            {
+                "key": "input_screen_enabled",
+                "type": "boolean",
+                "description": "Whether the Search and Duck.ai input capability is enabled."
             }
         ]
     },
@@ -491,14 +517,28 @@
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": [
+            "appVersion",
+            {
+                "key": "toggle_visible",
+                "type": "boolean",
+                "description": "Whether the Search+Duck.ai toggle was shown."
+            }
+        ]
     },
     "m_aichat_experimental_omnibar_shown_count": {
         "description": "Native input field shown to the user",
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": [
+            "appVersion",
+            {
+                "key": "toggle_visible",
+                "type": "boolean",
+                "description": "Whether the Search+Duck.ai toggle was shown."
+            }
+        ]
     },
     "m_aichat_experimental_omnibar_query_submitted_count": {
         "description": "User submitted a search query from the native input field",
@@ -512,6 +552,17 @@
                 "type": "string",
                 "description": "Bucketed length of the submitted query",
                 "enum": ["short", "medium", "long", "very_long"]
+            },
+            {
+                "key": "default_mode",
+                "type": "string",
+                "description": "Which side the Search/Duck.ai toggle was showing by default.",
+                "enum": ["search", "duck_ai"]
+            },
+            {
+                "key": "toggle_visible",
+                "type": "boolean",
+                "description": "Whether the Search+Duck.ai toggle was shown."
             }
         ]
     },
@@ -873,6 +924,13 @@
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
+    "m_aichat_voice_service_start_failed": {
+        "description": "The Duck.ai voice microphone foreground service could not enter the foreground because the system rejected the microphone service type (e.g. RECORD_AUDIO not granted at start time); the service was stopped instead of crashing",
+        "owners": ["karlenDimla"],
+        "triggers": ["exception"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
     "m_aichat_unified_input_image_generation_selected_count": {
         "description": "User selected the image generation tool in the Unified Input",
         "owners": ["malmstein"],
@@ -1187,6 +1245,12 @@
                 "description": "Which tool was selected when the prompt was submitted",
                 "enum": ["none", "image_generation", "web_search"]
             },
+            {
+                "key": "default_mode",
+                "type": "string",
+                "description": "Which side the Search/Duck.ai toggle was showing by default.",
+                "enum": ["search", "duck_ai"]
+            },
             { "key": "model_id", "type": "string", "description": "Identifier of the model used for the prompt" },
             {
                 "key": "reasoning_effort",
@@ -1196,7 +1260,9 @@
             },
             { "key": "has_image_attachment", "type": "boolean", "description": "Whether the prompt included an image attachment" },
             { "key": "has_file_attachment", "type": "boolean", "description": "Whether the prompt included a file attachment" },
-            { "key": "has_text", "type": "boolean", "description": "Whether the prompt included text" }
+            { "key": "has_text", "type": "boolean", "description": "Whether the prompt included text" },
+            "duckAiPromptPageType",
+            "duckAiEntrySource"
         ]
     },
     "m_aichat_unified_input_prompt_submitted_daily": {
@@ -1213,6 +1279,12 @@
                 "description": "Which tool was selected when the prompt was submitted",
                 "enum": ["none", "image_generation", "web_search"]
             },
+            {
+                "key": "default_mode",
+                "type": "string",
+                "description": "Which side the Search/Duck.ai toggle was showing by default.",
+                "enum": ["search", "duck_ai"]
+            },
             { "key": "model_id", "type": "string", "description": "Identifier of the model used for the prompt" },
             {
                 "key": "reasoning_effort",
@@ -1222,7 +1294,9 @@
             },
             { "key": "has_image_attachment", "type": "boolean", "description": "Whether the prompt included an image attachment" },
             { "key": "has_file_attachment", "type": "boolean", "description": "Whether the prompt included a file attachment" },
-            { "key": "has_text", "type": "boolean", "description": "Whether the prompt included text" }
+            { "key": "has_text", "type": "boolean", "description": "Whether the prompt included text" },
+            "duckAiPromptPageType",
+            "duckAiEntrySource"
         ]
     },
     "m_aichat_unified_input_sent_prompt_in_chat_count": {
@@ -1244,6 +1318,41 @@
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "unifiedInputSurface"]
+    },
+    "m_aichat_edit_prompt_opened": {
+        "description": "User opened the fullscreen Edit Message screen for a sent prompt",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_edit_prompt_cancelled": {
+        "description": "User left the Edit Message screen without submitting (toolbar close, system or predictive back)",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_edit_prompt_submitted": {
+        "description": "User submitted the edited prompt from the Edit Message screen, replacing the original message",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_edit_prompt_image_removed": {
+        "description": "User removed an attached image while on the Edit Message screen",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion", "unifiedInputSurface"]
+    },
+    "m_aichat_edit_prompt_file_removed": {
+        "description": "User removed an attached file while on the Edit Message screen",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
         "parameters": ["appVersion", "unifiedInputSurface"]
     },
     "m_aichat_unified_input_model_selected": {

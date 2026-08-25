@@ -16,15 +16,15 @@
 
 <resources>
     <!-- Grayscale -->
-    <color name="rb_gray0">#FCFCFC</color>
+    <color name="rb_gray0">#FAFAFA</color>
     <color name="rb_gray10">#F5F5F5</color>
-    <color name="rb_gray20">#E5E5E5</color>
-    <color name="rb_gray30">#C5C5C5</color>
+    <color name="rb_gray20">#EEEEEE</color>
+    <color name="rb_gray30">#CCCCCC</color>
     <color name="rb_gray40">#AAAAAA</color>
     <color name="rb_gray50">#888888</color>
     <color name="rb_gray60">#686868</color>
     <color name="rb_gray70">#484848</color>
-    <color name="rb_gray80">#383838</color>
+    <color name="rb_gray80">#333333</color>
     <color name="rb_gray90">#222222</color>
     <color name="rb_gray100">#181818</color>
     <color name="rb_gray111">#111111</color>
@@ -40,13 +40,13 @@
     <color name="eggshell70">#454443</color>
     <color name="eggshell80">#30302F</color>
     <color name="eggshell90">#242323</color>
-    <color name="eggshell100">#171716</color>
+    <color name="eggshell100">#181817</color>
 
     <!-- Mandarin -->
-    <color name="mandarin0">#FFFAF9</color>
-    <color name="mandarin10">#FFEBE5</color>
-    <color name="mandarin20">#FFDACC</color>
-    <color name="mandarin30">#FFB294</color>
+    <color name="mandarin0">#FFF7F0</color>
+    <color name="mandarin10">#FFECDB</color>
+    <color name="mandarin20">#FFE4CC</color>
+    <color name="mandarin30">#FFB694</color>
     <color name="mandarin40">#FF8D5C</color>
     <color name="mandarin50">#F05F2B</color>
     <color name="mandarin60">#CC3B0A</color>
@@ -110,12 +110,12 @@
     <color name="pollen100">#240F04</color>
 
     <!-- Red -->
-    <color name="rb_red0">#FEF9FA</color>
-    <color name="rb_red10">#FCECF0</color>
-    <color name="rb_red20">#FAD8DC</color>
-    <color name="rb_red30">#F7AAAD</color>
-    <color name="rb_red40">#F06565</color>
-    <color name="rb_red50">#EC434F</color>
+    <color name="rb_red0">#FCECF0</color>
+    <color name="rb_red10">#FAD8DC</color>
+    <color name="rb_red20">#F7AAAD</color>
+    <color name="rb_red30">#F06565</color>
+    <color name="rb_red40">#E44D55</color>
+    <color name="rb_red50">#D83544</color>
     <color name="rb_red60">#CA2B3D</color>
     <color name="rb_red70">#A02231</color>
     <color name="rb_red80">#671421</color>
@@ -123,5 +123,16 @@
     <color name="rb_red100">#2A0C14</color>
 
     <!-- Other -->
-    <color name="green40">#39B25E</color>
+    <color name="rb_green20">#81D59E</color>
+    <color name="rb_green30">#5EC987</color>
+    <color name="rb_green40">#38B26A</color>
+    <color name="rb_green50">#269B61</color>
+    <color name="rb_green60">#138356</color>
+    <color name="rb_green70">#006B4B</color>
+    <color name="rb_green80">#00523F</color>
+
+    <color name="accent_glow_secondary_light">#1F1074CC</color>
+    <color name="accent_glow_secondary_dark">#1F75B6EB</color>
+    <color name="destructive_glow_secondary_light">#33E5244B</color>
+    <color name="destructive_glow_secondary_dark">#1FEE6D87</color>
 </resources>

@@ -37,6 +37,7 @@ import com.duckduckgo.subscriptions.impl.auth2.AccessTokenClaims
 import com.duckduckgo.subscriptions.impl.auth2.AuthClient
 import com.duckduckgo.subscriptions.impl.auth2.AuthJwtValidator
 import com.duckduckgo.subscriptions.impl.auth2.BackgroundTokenRefresh
+import com.duckduckgo.subscriptions.impl.auth2.CrossProcessLock
 import com.duckduckgo.subscriptions.impl.auth2.PkceGenerator
 import com.duckduckgo.subscriptions.impl.auth2.PkceGeneratorImpl
 import com.duckduckgo.subscriptions.impl.auth2.RefreshTokenClaims
@@ -76,12 +77,20 @@ import com.duckduckgo.subscriptions.impl.wideevents.FreeTrialConversionWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionPurchaseWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionRestoreWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionSwitchWideEvent
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.yield
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
@@ -99,15 +108,19 @@ import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.isNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 import retrofit2.HttpException
 import retrofit2.Response
+import java.io.Closeable
+import java.io.IOException
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDateTime
@@ -128,7 +141,10 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
     @SuppressLint("DenyListedApi")
     private val subscriptionsFeature: SubscriptionsFeature = FakeFeatureToggleFactory.create(SubscriptionsFeature::class.java)
-        .apply { authApiV2().setRawStoredState(State(authApiV2Enabled)) }
+        .apply {
+            authApiV2().setRawStoredState(State(authApiV2Enabled))
+            serializeTokenRefresh().setRawStoredState(State(true))
+        }
     private val authRepository = RealAuthRepository(authDataStore, coroutineRule.testDispatcherProvider, serpPromo, { subscriptionsFeature })
     private val emailManager: EmailManager = mock()
     private val playBillingManager: PlayBillingManager = mock()
@@ -146,6 +162,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     private val authJwtValidator: AuthJwtValidator = mock()
     private val timeProvider = FakeTimeProvider()
     private val backgroundTokenRefresh: BackgroundTokenRefresh = mock()
+    private val crossProcessLock: CrossProcessLock = mock()
     private lateinit var subscriptionsManager: RealSubscriptionsManager
 
     @Before
@@ -153,6 +170,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         whenever(emailManager.getToken()).thenReturn(null)
         whenever(context.packageName).thenReturn("packageName")
         whenever(playBillingManager.purchaseState).thenReturn(flowOf())
+        whenever(crossProcessLock.acquire(any(), any())).thenReturn(Result.success(FakeLockHandle()))
         subscriptionsManager = RealSubscriptionsManager(
             authService,
             subscriptionsService,
@@ -169,6 +187,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             pkceGenerator,
             timeProvider,
             backgroundTokenRefresh,
+            crossProcessLock,
             subscriptionPurchaseWideEvent,
             tokenRefreshWideEvent,
             subscriptionSwitchWideEvent,
@@ -718,6 +737,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             pkceGenerator,
             timeProvider,
             backgroundTokenRefresh,
+            crossProcessLock,
             subscriptionPurchaseWideEvent,
             tokenRefreshWideEvent,
             subscriptionSwitchWideEvent,
@@ -753,6 +773,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             pkceGenerator,
             timeProvider,
             backgroundTokenRefresh,
+            crossProcessLock,
             subscriptionPurchaseWideEvent,
             tokenRefreshWideEvent,
             subscriptionSwitchWideEvent,
@@ -792,6 +813,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             pkceGenerator,
             timeProvider,
             backgroundTokenRefresh,
+            crossProcessLock,
             subscriptionPurchaseWideEvent,
             tokenRefreshWideEvent,
             subscriptionSwitchWideEvent,
@@ -845,6 +867,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             pkceGenerator,
             timeProvider,
             backgroundTokenRefresh,
+            crossProcessLock,
             subscriptionPurchaseWideEvent,
             tokenRefreshWideEvent,
             subscriptionSwitchWideEvent,
@@ -894,6 +917,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             pkceGenerator,
             timeProvider,
             backgroundTokenRefresh,
+            crossProcessLock,
             subscriptionPurchaseWideEvent,
             tokenRefreshWideEvent,
             subscriptionSwitchWideEvent,
@@ -937,6 +961,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             pkceGenerator,
             timeProvider,
             backgroundTokenRefresh,
+            crossProcessLock,
             subscriptionPurchaseWideEvent,
             tokenRefreshWideEvent,
             subscriptionSwitchWideEvent,
@@ -973,6 +998,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             pkceGenerator,
             timeProvider,
             backgroundTokenRefresh,
+            crossProcessLock,
             subscriptionPurchaseWideEvent,
             tokenRefreshWideEvent,
             subscriptionSwitchWideEvent,
@@ -1112,6 +1138,143 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     }
 
     @Test
+    @SuppressLint("DenyListedApi")
+    fun whenSerializeTokenRefreshDisabledThenRefreshDoesNotUseCrossProcessLock() = runTest {
+        assumeTrue(authApiV2Enabled)
+
+        subscriptionsFeature.serializeTokenRefresh().setRawStoredState(State(false))
+        givenUserIsSignedIn()
+        givenAccessTokenIsExpired()
+        givenV2AccessTokenRefreshSucceeds(newAccessToken = "new access token")
+
+        val result = subscriptionsManager.getAccessToken()
+
+        assertTrue(result is AccessTokenResult.Success)
+        verifyNoInteractions(crossProcessLock)
+        verify(tokenRefreshWideEvent).onStart(any(), eq(false))
+        verify(tokenRefreshWideEvent, never()).onCrossProcessLockAcquired(any())
+    }
+
+    @Test
+    fun whenRefreshSucceedsThenCrossProcessLockIsReleased() = runTest {
+        assumeTrue(authApiV2Enabled)
+
+        val lockHandle = FakeLockHandle()
+        val acquireResult = Result.success(lockHandle)
+        whenever(crossProcessLock.acquire(any(), any())).thenReturn(acquireResult)
+        givenUserIsSignedIn()
+        givenAccessTokenIsExpired()
+        givenV2AccessTokenRefreshSucceeds(newAccessToken = "new access token")
+
+        val result = subscriptionsManager.getAccessToken()
+
+        assertTrue(result is AccessTokenResult.Success)
+        assertTrue(lockHandle.closed)
+        verify(tokenRefreshWideEvent).onCrossProcessLockAcquired(acquireResult)
+    }
+
+    @Test
+    fun whenRefreshFailsThenCrossProcessLockIsReleased() = runTest {
+        assumeTrue(authApiV2Enabled)
+
+        val lockHandle = FakeLockHandle()
+        whenever(crossProcessLock.acquire(any(), any())).thenReturn(Result.success(lockHandle))
+        givenUserIsSignedIn()
+        givenAccessTokenIsExpired()
+        givenV2AccessTokenRefreshFails()
+
+        val result = subscriptionsManager.getAccessToken()
+
+        assertTrue(result is AccessTokenResult.Failure)
+        assertTrue(lockHandle.closed)
+    }
+
+    @Test
+    fun whenCrossProcessLockAcquisitionTimesOutThenRefreshStillRuns() = runTest {
+        assumeTrue(authApiV2Enabled)
+
+        val acquireResult = Result.failure<Closeable>(timeoutCancellationException())
+        whenever(crossProcessLock.acquire(any(), any())).thenReturn(acquireResult)
+        givenUserIsSignedIn()
+        givenAccessTokenIsExpired()
+        givenV2AccessTokenRefreshSucceeds(newAccessToken = "new access token")
+
+        val result = subscriptionsManager.getAccessToken()
+
+        assertTrue(result is AccessTokenResult.Success)
+        verify(tokenRefreshWideEvent).onCrossProcessLockAcquired(acquireResult)
+    }
+
+    @Test
+    fun whenCrossProcessLockAcquisitionFailsThenRefreshStillRuns() = runTest {
+        assumeTrue(authApiV2Enabled)
+
+        val acquireResult = Result.failure<Closeable>(IOException())
+        whenever(crossProcessLock.acquire(any(), any())).thenReturn(acquireResult)
+        givenUserIsSignedIn()
+        givenAccessTokenIsExpired()
+        givenV2AccessTokenRefreshSucceeds(newAccessToken = "new access token")
+
+        val result = subscriptionsManager.getAccessToken()
+
+        assertTrue(result is AccessTokenResult.Success)
+        verify(tokenRefreshWideEvent).onCrossProcessLockAcquired(acquireResult)
+    }
+
+    @Test
+    fun whenTokenRefreshesRunConcurrentlyThenTheyDoNotOverlap() = runTest {
+        assumeTrue(authApiV2Enabled)
+
+        givenUserIsSignedIn()
+        givenValidateV2TokensSucceeds()
+        whenever(authClient.getJwks()).thenReturn("fake jwks")
+
+        var concurrentCalls = 0
+        var maxConcurrentCalls = 0
+        whenever(authClient.getTokens(any())).doSuspendableAnswer {
+            concurrentCalls++
+            maxConcurrentCalls = maxOf(maxConcurrentCalls, concurrentCalls)
+            yield()
+            concurrentCalls--
+            TokenPair(FAKE_ACCESS_TOKEN_V2, FAKE_REFRESH_TOKEN_V2)
+        }
+
+        listOf(
+            launch { subscriptionsManager.refreshAccessToken() },
+            launch { subscriptionsManager.refreshAccessToken() },
+        ).joinAll()
+
+        assertEquals(1, maxConcurrentCalls)
+    }
+
+    @Test
+    fun whenCallerIsCancelledMidRefreshThenRefreshCompletes() = runTest {
+        assumeTrue(authApiV2Enabled)
+
+        givenUserIsSignedIn()
+        givenValidateV2TokensSucceeds()
+        whenever(authClient.getJwks()).thenReturn("fake jwks")
+
+        val tokenRequestStarted = CompletableDeferred<Unit>()
+        val tokenRequestBlocker = CompletableDeferred<Unit>()
+        whenever(authClient.getTokens(any())).doSuspendableAnswer {
+            tokenRequestStarted.complete(Unit)
+            tokenRequestBlocker.await()
+            TokenPair("refreshed access token", "refreshed refresh token")
+        }
+
+        val job = launch { subscriptionsManager.refreshAccessToken() }
+        tokenRequestStarted.await()
+        job.cancel()
+        tokenRequestBlocker.complete(Unit)
+        job.join()
+        advanceUntilIdle() // the refresh continues in the app scope after the caller is cancelled
+
+        assertEquals("refreshed access token", authRepository.getAccessTokenV2()?.jwt)
+        verify(tokenRefreshWideEvent).onSuccess()
+    }
+
+    @Test
     fun whenGetAccessTokenIfSignedInWithV1ThenExchangesTokenForV2AndReturnsTrue() = runTest {
         assumeTrue(authApiV2Enabled)
 
@@ -1245,6 +1408,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             pkceGenerator,
             timeProvider,
             backgroundTokenRefresh,
+            crossProcessLock,
             subscriptionPurchaseWideEvent,
             tokenRefreshWideEvent,
             subscriptionSwitchWideEvent,
@@ -1297,6 +1461,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             pkceGenerator,
             timeProvider,
             backgroundTokenRefresh,
+            crossProcessLock,
             subscriptionPurchaseWideEvent,
             tokenRefreshWideEvent,
             subscriptionSwitchWideEvent,
@@ -1652,6 +1817,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             pkceGenerator,
             timeProvider,
             backgroundTokenRefresh,
+            crossProcessLock,
             subscriptionPurchaseWideEvent,
             tokenRefreshWideEvent,
             subscriptionSwitchWideEvent,
@@ -2543,6 +2709,13 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         override fun localDateTimeNow(): LocalDateTime = throw UnsupportedOperationException()
     }
 
+    // TimeoutCancellationException has an internal constructor, so a real instance is obtained via withTimeout
+    private suspend fun timeoutCancellationException(): TimeoutCancellationException = try {
+        withTimeout(1) { awaitCancellation() }
+    } catch (e: TimeoutCancellationException) {
+        e
+    }
+
     private companion object {
         @JvmStatic
         @Parameterized.Parameters(name = "authApiV2Enabled={0}")
@@ -2550,5 +2723,12 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
         const val FAKE_ACCESS_TOKEN_V2 = "fake access token"
         const val FAKE_REFRESH_TOKEN_V2 = "fake refresh token"
+    }
+}
+
+private class FakeLockHandle : Closeable {
+    var closed = false
+    override fun close() {
+        closed = true
     }
 }

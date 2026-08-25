@@ -1,0 +1,138 @@
+// Wide event pixel for auth v2 access token refresh monitoring
+{
+    "wide_auth-token-refresh": {
+        "description": "App refreshes the auth v2 token pair, from reading the stored refresh token through fetching, validating and saving the new tokens. CANCELLED means the account no longer exists in the backend and the user was signed out.",
+        "owners": ["lmac012"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "widePixelPlatform",
+            "widePixelType",
+            "widePixelSampleRate",
+            "widePixelFeatureStatus",
+            "widePixelAppVersion",
+            "widePixelAppName",
+            "widePixelFormFactor",
+            "widePixelDevMode",
+            "widePixelMetaType",
+            "widePixelMetaVersion",
+            "widePixelIsFirstDailyOccurrence",
+            {
+                "key": "feature.name",
+                "description": "Feature identifier for this wide pixel",
+                "enum": ["auth-token-refresh"]
+            },
+            {
+                "key": "feature.data.ext.subscription_status",
+                "description": "User's subscription status when the refresh started",
+                "enum": ["Auto-Renewable", "Not Auto-Renewable", "Grace Period", "Inactive", "Expired", "Unknown", "Waiting"]
+            },
+            {
+                "key": "feature.data.ext.process_name",
+                "description": "App process the refresh ran in. 'main' is the browser process, the others are the app's secondary processes. 'UNKNOWN'/'ERROR' mean the process name could not be resolved.",
+                "enum": ["main", ":vpn", ":pir", ":autofill", ":fire", "UNKNOWN", "ERROR"]
+            },
+            {
+                "key": "feature.data.ext.netp_is_enabled",
+                "description": "Whether the VPN was enabled when the refresh started. Empty string if the value could not be read.",
+                "type": "string",
+                "enum": ["true", "false", ""]
+            },
+            {
+                "key": "feature.data.ext.netp_is_running",
+                "description": "Whether the VPN was running when the refresh started. Empty string if the value could not be read.",
+                "type": "string",
+                "enum": ["true", "false", ""]
+            },
+            {
+                "key": "feature.data.ext.serialization_enabled",
+                "description": "Whether refreshes were being serialized across processes with a cross-process lock, i.e. the value of the serializeTokenRefresh flag when the refresh started.",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.lock_outcome",
+                "description": "Outcome of acquiring the cross-process refresh lock. 'timeout' means another process held it for longer than the wait limit; the refresh then proceeds unserialized.",
+                "enum": ["acquired", "timeout", "error"]
+            },
+            {
+                "key": "feature.data.ext.token_refresh_lock_wait_ms_bucketed",
+                "description": "Time spent waiting for the cross-process refresh lock in milliseconds",
+                "enum": ["-1", "0", "100", "500", "1000", "3000", "10000", "30000", "60000"]
+            },
+            {
+                "key": "feature.data.ext.fetch_jwks_latency_ms_bucketed",
+                "description": "Duration of the JWKS fetch in milliseconds",
+                "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+            },
+            {
+                "key": "feature.data.ext.refresh_access_token_latency_ms_bucketed",
+                "description": "Duration of the token request in milliseconds",
+                "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+            },
+            {
+                "key": "feature.data.ext.total_duration_ms_bucketed",
+                "description": "Duration of the whole refresh in milliseconds, including any lock wait",
+                "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+            },
+            {
+                "key": "feature.data.ext.backend_error_response",
+                "description": "Backend-supplied error code from the `error` field of the token endpoint's error body. Free-form as far as the app is concerned - the app only special-cases 'unknown_account'.",
+                "type": "string",
+                "examples": ["unknown_account", "invalid_token_request"]
+            },
+            {
+                "key": "feature.data.ext.play_login_error",
+                "description": "Why the Play store login fallback failed. PurchaseInfoNotAvailable carries the reason Play could not be queried.",
+                "type": "string",
+                "pattern": "^(NoActivePurchase|AccountExternalIdMismatch|AuthenticationError|TokenValidationFailed|UnknownError|PurchaseInfoNotAvailable - .+)$",
+                "examples": [
+                    "NoActivePurchase",
+                    "AuthenticationError",
+                    "PurchaseInfoNotAvailable - billing_client_not_ready",
+                    "PurchaseInfoNotAvailable - query_purchases_failed:BILLING_UNAVAILABLE"
+                ]
+            },
+            {
+                "key": "feature.data.ext.failure_reason",
+                "description": "Exception class name of the failure. Only present on FAILURE events.",
+                "type": "string",
+                "examples": ["HttpException", "SocketTimeoutException", "IllegalStateException"]
+            },
+            {
+                "key": "feature.data.ext.signed_out",
+                "description": "Whether the user was signed out after an irrecoverable error was encountered, such as an invalid refresh token.",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.lock_acquire",
+                "description": "true if the cross-process refresh lock was acquired, false if it timed out or errored. A false value does not fail the refresh - see lock_outcome.",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.token_read",
+                "description": "Parameter present if the stored refresh token was read successfully",
+                "enum": ["true"]
+            },
+            {
+                "key": "feature.data.ext.step.jwks_fetch",
+                "description": "Parameter present if the JWKS needed to validate the new tokens was fetched successfully",
+                "enum": ["true"]
+            },
+            {
+                "key": "feature.data.ext.step.token_request",
+                "description": "true if the token endpoint returned a new token pair, false if it returned an error. A false value can still end in SUCCESS when the Play store login fallback recovers the session.",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.token_validation",
+                "description": "Parameter present if the newly fetched tokens passed validation",
+                "enum": ["true"]
+            },
+            {
+                "key": "feature.data.ext.step.play_login",
+                "description": "true if the Play store login fallback recovered the session, false if it failed",
+                "type": "boolean"
+            }
+        ]
+    }
+}

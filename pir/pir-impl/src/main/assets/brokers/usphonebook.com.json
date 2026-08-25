@@ -1,8 +1,8 @@
 {
   "name": "USPhoneBook",
   "url": "usphonebook.com",
-  "version": "0.7.0",
-  "parent": "peoplefinders.com",
+  "version": "0.8.0",
+  "parent": "cyberbackgroundchecks.com",
   "addedDatetime": 1678082400000,
   "optOutUrl": "https://www.usphonebook.com/opt-out",
   "steps": [

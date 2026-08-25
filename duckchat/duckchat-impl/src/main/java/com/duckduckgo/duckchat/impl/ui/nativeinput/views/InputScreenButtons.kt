@@ -17,6 +17,7 @@
 package com.duckduckgo.duckchat.impl.ui.nativeinput.views
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.ImageView
@@ -25,6 +26,7 @@ import androidx.annotation.LayoutRes
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.duckchat.impl.R
@@ -151,13 +153,13 @@ class InputScreenButtons @JvmOverloads constructor(
         // because it needs the styling in both top-bar and bottom modes. The other
         // three buttons only need it when floating, so we apply it here.
         val backgroundRes = R.drawable.background_input_screen_button
-        actionNewLine.setBackgroundResource(backgroundRes)
-        actionVoiceChat?.setBackgroundResource(backgroundRes)
-        actionVoiceSearch?.setBackgroundResource(backgroundRes)
+        val backgroundTint = ColorStateList.valueOf(context.getColorFromAttr(CommonR.attr.daxColorControlFillPrimary))
         val circularRippleDrawable = ContextCompat.getDrawable(context, CommonR.drawable.selectable_circular_ripple)
-        actionNewLine.foreground = circularRippleDrawable
-        actionVoiceSearch?.foreground = circularRippleDrawable
-        actionVoiceChat?.foreground = circularRippleDrawable
+        listOfNotNull(actionNewLine, actionVoiceChat, actionVoiceSearch).forEach { button ->
+            button.setBackgroundResource(backgroundRes)
+            button.backgroundTintList = backgroundTint
+            button.foreground = circularRippleDrawable
+        }
     }
 
     companion object {

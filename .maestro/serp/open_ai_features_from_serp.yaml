@@ -15,8 +15,10 @@ tags:
 
       - assertVisible:
           text: "Search"
+      # Tap whichever field is live: the legacy omnibar (native input search-only off)
+      # or the native input widget's field (native input search-only on).
       - tapOn:
-          id: "omnibarTextInput"
+          id: "omnibarTextInput|inputField"
       - inputText: "https://duckduckgo.com"
       - pressKey: Enter
 

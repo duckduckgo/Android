@@ -43,12 +43,14 @@ import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -143,6 +145,100 @@ class RealBrokerActionProcessorTest {
         assertEquals(PIRScriptConstants.SCRIPT_FEATURE_NAME, eventCaptor.firstValue.featureName)
         assertEquals(PIRScriptConstants.SUBSCRIBED_METHOD_NAME_RECEIVED, eventCaptor.firstValue.subscriptionName)
         assertNotNull(eventCaptor.firstValue.params)
+    }
+
+    @Test
+    fun whenPushExtractActionThenProfileSelectorsAreForwardedVerbatim() = runTest {
+        val actionJson = """
+            {
+                "actionType": "extract",
+                "id": "extract-1",
+                "selector": ".search-item",
+                "profile": {
+                    "name": {
+                        "selector": ".title"
+                    },
+                    "addressCityStateList": {
+                        "selector": ".//li",
+                        "findElements": true,
+                        "city": {
+                            "selector": ".city"
+                        },
+                        "state": {
+                            "selector": ".state"
+                        }
+                    },
+                    "profileUrl": {
+                        "selector": "a",
+                        "attribute": "href"
+                    },
+                    "shoeSize": {
+                        "selector": ".shoe"
+                    }
+                }
+            }
+        """.trimIndent()
+        val action = moshi.adapter(BrokerAction::class.java).fromJson(actionJson)!!
+
+        testee.pushAction(action, UserProfile())
+
+        val eventCaptor = argumentCaptor<SubscriptionEventData>()
+        verify(mockJsMessaging).sendSubscriptionEvent(eventCaptor.capture())
+
+        val pushedProfile = eventCaptor.firstValue.params
+            .getJSONObject("state")
+            .getJSONObject("action")
+            .getJSONObject("profile")
+        assertEquals(".title", pushedProfile.getJSONObject("name").getString("selector"))
+        assertEquals(".shoe", pushedProfile.getJSONObject("shoeSize").getString("selector"))
+        assertEquals("href", pushedProfile.getJSONObject("profileUrl").getString("attribute"))
+        pushedProfile.getJSONObject("addressCityStateList").also {
+            assertEquals(".//li", it.getString("selector"))
+            assertTrue(it.getBoolean("findElements"))
+            assertEquals(".city", it.getJSONObject("city").getString("selector"))
+            assertEquals(".state", it.getJSONObject("state").getString("selector"))
+        }
+    }
+
+    @Test
+    fun whenPushCaptchaActionsThenProfileMatchParentIsForwarded() = runTest {
+        val actions = listOf("getCaptchaInfo", "solveCaptcha")
+
+        actions.forEach { actionType ->
+            val actionJson = """
+                {
+                    "actionType": "$actionType",
+                    "id": "$actionType-1",
+                    "selector": ".g-recaptcha",
+                    "parent": {
+                        "profileMatch": {
+                            "selector": "li",
+                            "profile": {
+                                "name": {
+                                    "selector": ".name"
+                                }
+                            }
+                        }
+                    }
+                }
+            """.trimIndent()
+            val action = moshi.adapter(BrokerAction::class.java).fromJson(actionJson)!!
+
+            testee.pushAction(action, UserProfile())
+        }
+
+        val eventCaptor = argumentCaptor<SubscriptionEventData>()
+        verify(mockJsMessaging, times(actions.size)).sendSubscriptionEvent(eventCaptor.capture())
+
+        eventCaptor.allValues.forEach { event ->
+            val profileMatch = event.params
+                .getJSONObject("state")
+                .getJSONObject("action")
+                .getJSONObject("parent")
+                .getJSONObject("profileMatch")
+            assertEquals("li", profileMatch.getString("selector"))
+            assertEquals(".name", profileMatch.getJSONObject("profile").getJSONObject("name").getString("selector"))
+        }
     }
 
     @Test

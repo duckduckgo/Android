@@ -25,6 +25,7 @@ import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.ThirdPartyDeviceListDecryptor.Companion.FALLBACK_NAME
 import com.duckduckgo.sync.impl.ThirdPartyDeviceListDecryptor.Companion.FALLBACK_TYPE_3PARTY
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -60,7 +61,7 @@ class ThirdPartyDeviceListDecryptorTest {
 
     @Test
     fun whenInputIsEmptyThenReturnsEmptyAndNoRefreshCall() {
-        val result = decryptor.decryptAll(emptyList())
+        val result = decryptor.decryptAll(emptyList(), thisDeviceId = null)
 
         assertTrue(result.decrypted.isEmpty())
         assertTrue(result.undecryptable.isEmpty())
@@ -74,7 +75,7 @@ class ThirdPartyDeviceListDecryptorTest {
         whenever(fieldDecryptor.decrypt(ddg)).thenReturn(Success(DecryptedDevice("d1", "Pixel 7", "phone")))
         whenever(fieldDecryptor.decrypt(tp)).thenReturn(Success(DecryptedDevice("d2", "Chrome", "Browser")))
 
-        val result = decryptor.decryptAll(listOf(ddg, tp))
+        val result = decryptor.decryptAll(listOf(ddg, tp), thisDeviceId = null)
 
         assertEquals(2, result.decrypted.size)
         assertTrue(result.undecryptable.isEmpty())
@@ -89,7 +90,7 @@ class ThirdPartyDeviceListDecryptorTest {
             .thenReturn(Success(DecryptedDevice("d1", "Chrome", "Browser")))
         whenever(thirdPartyCredentialManager.refresh()).thenReturn(Success(true))
 
-        val result = decryptor.decryptAll(listOf(tp))
+        val result = decryptor.decryptAll(listOf(tp), thisDeviceId = null)
 
         assertEquals(listOf(DecryptedDevice("d1", "Chrome", "Browser")), result.decrypted)
         assertTrue(result.undecryptable.isEmpty())
@@ -103,7 +104,7 @@ class ThirdPartyDeviceListDecryptorTest {
         whenever(fieldDecryptor.decrypt(tp)).thenReturn(Error(reason = "still bad"))
         whenever(thirdPartyCredentialManager.refresh()).thenReturn(Success(true))
 
-        val result = decryptor.decryptAll(listOf(tp))
+        val result = decryptor.decryptAll(listOf(tp), thisDeviceId = null)
 
         assertTrue(result.decrypted.isEmpty())
         assertEquals(listOf("d1"), result.undecryptable)
@@ -116,7 +117,7 @@ class ThirdPartyDeviceListDecryptorTest {
         whenever(fieldDecryptor.decrypt(tp)).thenReturn(Error(reason = "still bad"))
         whenever(thirdPartyCredentialManager.refresh()).thenReturn(Error(reason = "server down"))
 
-        val result = decryptor.decryptAll(listOf(tp))
+        val result = decryptor.decryptAll(listOf(tp), thisDeviceId = null)
 
         assertEquals(listOf(DecryptedDevice("d1", FALLBACK_NAME, FALLBACK_TYPE_3PARTY)), result.decrypted)
         assertTrue(result.undecryptable.isEmpty())
@@ -129,7 +130,7 @@ class ThirdPartyDeviceListDecryptorTest {
         whenever(fieldDecryptor.decrypt(tp)).thenReturn(Error(reason = "still bad"))
         whenever(thirdPartyCredentialManager.refresh()).thenReturn(Success(false))
 
-        val result = decryptor.decryptAll(listOf(tp))
+        val result = decryptor.decryptAll(listOf(tp), thisDeviceId = null)
 
         assertEquals(listOf(DecryptedDevice("d1", FALLBACK_NAME, FALLBACK_TYPE_3PARTY)), result.decrypted)
         assertTrue(result.undecryptable.isEmpty())
@@ -144,7 +145,7 @@ class ThirdPartyDeviceListDecryptorTest {
         whenever(fieldDecryptor.decrypt(tp2)).thenReturn(Error(reason = "bad"))
         whenever(thirdPartyCredentialManager.refresh()).thenReturn(Success(true))
 
-        val result = decryptor.decryptAll(listOf(tp1, tp2))
+        val result = decryptor.decryptAll(listOf(tp1, tp2), thisDeviceId = null)
 
         assertEquals(listOf("d1", "d2"), result.undecryptable)
         verify(thirdPartyCredentialManager, times(1)).refresh()
@@ -155,7 +156,7 @@ class ThirdPartyDeviceListDecryptorTest {
         val ddg = DeviceV2(deviceId = "d1", credentialId = "ddg", deviceName = "ENC")
         whenever(fieldDecryptor.decrypt(ddg)).thenReturn(Error(reason = "primaryKey rotated?"))
 
-        val result = decryptor.decryptAll(listOf(ddg))
+        val result = decryptor.decryptAll(listOf(ddg), thisDeviceId = null)
 
         assertTrue(result.decrypted.isEmpty())
         assertEquals(listOf("d1"), result.undecryptable)
@@ -170,7 +171,7 @@ class ThirdPartyDeviceListDecryptorTest {
         whenever(fieldDecryptor.decrypt(tp)).thenReturn(Error(reason = "3p bad"))
         whenever(thirdPartyCredentialManager.refresh()).thenReturn(Error(reason = "network"))
 
-        val result = decryptor.decryptAll(listOf(ddg, tp))
+        val result = decryptor.decryptAll(listOf(ddg, tp), thisDeviceId = null)
 
         assertEquals(listOf(DecryptedDevice("d2", FALLBACK_NAME, FALLBACK_TYPE_3PARTY)), result.decrypted)
         assertEquals(listOf("d1"), result.undecryptable)
@@ -182,7 +183,7 @@ class ThirdPartyDeviceListDecryptorTest {
         val orphan = DeviceV2(deviceId = null, credentialId = "ddg", deviceName = "ENC")
         whenever(fieldDecryptor.decrypt(orphan)).thenReturn(Error(reason = "no id"))
 
-        val result = decryptor.decryptAll(listOf(orphan))
+        val result = decryptor.decryptAll(listOf(orphan), thisDeviceId = null)
 
         assertTrue(result.decrypted.isEmpty())
         assertTrue(result.undecryptable.isEmpty())
@@ -200,7 +201,7 @@ class ThirdPartyDeviceListDecryptorTest {
         whenever(fieldDecryptor.decrypt(tpOk)).thenReturn(Success(DecryptedDevice("d3", "Edge", "Browser")))
         whenever(thirdPartyCredentialManager.refresh()).thenReturn(Success(true))
 
-        val result = decryptor.decryptAll(listOf(ddgOk, tpFail, tpOk))
+        val result = decryptor.decryptAll(listOf(ddgOk, tpFail, tpOk), thisDeviceId = null)
 
         assertEquals(3, result.decrypted.size)
         assertTrue(result.undecryptable.isEmpty())
@@ -216,7 +217,7 @@ class ThirdPartyDeviceListDecryptorTest {
         val ddg2 = DeviceV2(deviceId = "d2", credentialId = null, deviceName = "n")
         whenever(fieldDecryptor.decrypt(any())).thenReturn(Error(reason = "bad"))
 
-        val result = decryptor.decryptAll(listOf(ddg1, ddg2))
+        val result = decryptor.decryptAll(listOf(ddg1, ddg2), thisDeviceId = null)
 
         assertEquals(listOf("d1", "d2"), result.undecryptable)
         verify(thirdPartyCredentialManager, never()).refresh()
@@ -227,7 +228,7 @@ class ThirdPartyDeviceListDecryptorTest {
         val ddg = DeviceV2(deviceId = "d1", credentialId = "ddg", deviceName = "ENC", deviceInfo = "info.jwe")
         whenever(fieldDecryptor.decrypt(ddg)).thenReturn(Success(DecryptedDevice("d1", "Legacy Pixel", "phone")))
 
-        val result = decryptor.decryptAll(listOf(ddg))
+        val result = decryptor.decryptAll(listOf(ddg), thisDeviceId = null)
 
         assertEquals(listOf(DecryptedDevice("d1", "Legacy Pixel", "phone")), result.decrypted)
         verify(deviceInfoDecryptor, never()).openSession()
@@ -241,7 +242,7 @@ class ThirdPartyDeviceListDecryptorTest {
         whenever(fieldDecryptor.decrypt(ddg)).thenReturn(Success(DecryptedDevice("d1", "Pixel", "phone")))
         whenever(fieldDecryptor.decrypt(tp)).thenReturn(Success(DecryptedDevice("d2", "Chrome", "Browser")))
 
-        val result = decryptor.decryptAll(listOf(ddg, tp))
+        val result = decryptor.decryptAll(listOf(ddg, tp), thisDeviceId = null)
 
         assertEquals(2, result.decrypted.size)
         verify(deviceInfoDecryptor, never()).openSession()
@@ -253,7 +254,7 @@ class ThirdPartyDeviceListDecryptorTest {
         val ddg = DeviceV2(deviceId = "d1", credentialId = "ddg", deviceName = "ENC", deviceInfo = "info.jwe")
         whenever(session.decrypt("info.jwe")).thenReturn(Success(DeviceInfoPayload(name = "Unified Pixel", type = "phone")))
 
-        val result = decryptor.decryptAll(listOf(ddg))
+        val result = decryptor.decryptAll(listOf(ddg), thisDeviceId = null)
 
         assertEquals(listOf(DecryptedDevice("d1", "Unified Pixel", "phone")), result.decrypted)
         assertTrue(result.undecryptable.isEmpty())
@@ -269,7 +270,7 @@ class ThirdPartyDeviceListDecryptorTest {
         whenever(session.decrypt("ddg.info.jwe")).thenReturn(Success(DeviceInfoPayload(name = "Pixel", type = "phone")))
         whenever(session.decrypt("3p.info.jwe")).thenReturn(Success(DeviceInfoPayload(name = "Chrome", type = "Browser")))
 
-        val result = decryptor.decryptAll(listOf(ddg, tp))
+        val result = decryptor.decryptAll(listOf(ddg, tp), thisDeviceId = null)
 
         assertEquals(
             listOf(DecryptedDevice("d1", "Pixel", "phone"), DecryptedDevice("d2", "Chrome", "Browser")),
@@ -286,7 +287,7 @@ class ThirdPartyDeviceListDecryptorTest {
         val ddg = DeviceV2(deviceId = "d1", credentialId = "ddg", deviceName = "ENC", deviceInfo = null)
         whenever(fieldDecryptor.decrypt(ddg)).thenReturn(Success(DecryptedDevice("d1", "Legacy Pixel", "phone")))
 
-        val result = decryptor.decryptAll(listOf(ddg))
+        val result = decryptor.decryptAll(listOf(ddg), thisDeviceId = null)
 
         assertEquals(listOf(DecryptedDevice("d1", "Legacy Pixel", "phone")), result.decrypted)
         verify(session, never()).decrypt(any())
@@ -299,7 +300,7 @@ class ThirdPartyDeviceListDecryptorTest {
         whenever(session.decrypt("corrupt.jwe")).thenReturn(Error(reason = "bad device_info"))
         whenever(fieldDecryptor.decrypt(ddg)).thenReturn(Success(DecryptedDevice("d1", "Legacy Pixel", "phone")))
 
-        val result = decryptor.decryptAll(listOf(ddg))
+        val result = decryptor.decryptAll(listOf(ddg), thisDeviceId = null)
 
         assertEquals(listOf(DecryptedDevice("d1", "Legacy Pixel", "phone")), result.decrypted)
         assertTrue(result.undecryptable.isEmpty())
@@ -312,7 +313,7 @@ class ThirdPartyDeviceListDecryptorTest {
         val ddg = DeviceV2(deviceId = "d1", credentialId = "ddg", deviceName = "ENC", deviceInfo = "info.jwe")
         whenever(fieldDecryptor.decrypt(ddg)).thenReturn(Success(DecryptedDevice("d1", "Legacy Pixel", "phone")))
 
-        val result = decryptor.decryptAll(listOf(ddg))
+        val result = decryptor.decryptAll(listOf(ddg), thisDeviceId = null)
 
         assertEquals(listOf(DecryptedDevice("d1", "Legacy Pixel", "phone")), result.decrypted)
         verify(session, never()).decrypt(any())
@@ -326,7 +327,7 @@ class ThirdPartyDeviceListDecryptorTest {
         whenever(session.decrypt("info.jwe")).thenReturn(Success(DeviceInfoPayload(name = "Pixel", type = "phone")))
         whenever(fieldDecryptor.decrypt(viaLegacy)).thenReturn(Success(DecryptedDevice("d2", "Chrome", "Browser")))
 
-        val result = decryptor.decryptAll(listOf(viaInfo, viaLegacy))
+        val result = decryptor.decryptAll(listOf(viaInfo, viaLegacy), thisDeviceId = null)
 
         assertEquals(2, result.decrypted.size)
         assertTrue(result.decrypted.contains(DecryptedDevice("d1", "Pixel", "phone")))
@@ -341,7 +342,7 @@ class ThirdPartyDeviceListDecryptorTest {
         val ddg = DeviceV2(deviceId = "d1", credentialId = "ddg", deviceName = "ENC", deviceInfo = null)
         whenever(fieldDecryptor.decrypt(ddg)).thenReturn(Error(reason = "primaryKey rotated?"))
 
-        val result = decryptor.decryptAll(listOf(ddg))
+        val result = decryptor.decryptAll(listOf(ddg), thisDeviceId = null)
 
         assertEquals(listOf(DecryptedDevice("d1", FALLBACK_NAME, null)), result.decrypted)
         assertTrue(result.undecryptable.isEmpty())
@@ -355,10 +356,81 @@ class ThirdPartyDeviceListDecryptorTest {
         whenever(fieldDecryptor.decrypt(tp)).thenReturn(Error(reason = "still bad"))
         whenever(thirdPartyCredentialManager.refresh()).thenReturn(Success(true))
 
-        val result = decryptor.decryptAll(listOf(tp))
+        val result = decryptor.decryptAll(listOf(tp), thisDeviceId = null)
 
         assertEquals(listOf(DecryptedDevice("d1", FALLBACK_NAME, FALLBACK_TYPE_3PARTY)), result.decrypted)
         assertTrue(result.undecryptable.isEmpty())
+    }
+
+    @Test
+    fun whenOwnDeviceInfoDecryptsThenNotReportedAsUnresolved() {
+        enableReadFlag()
+        val own = DeviceV2(deviceId = "d1", credentialId = "ddg", deviceName = "ENC", deviceInfo = "info.jwe")
+        whenever(session.decrypt("info.jwe")).thenReturn(Success(DeviceInfoPayload(name = "Pixel", type = "phone")))
+
+        val result = decryptor.decryptAll(listOf(own), thisDeviceId = "d1")
+
+        assertFalse(result.thisDeviceInfoUnresolved)
+    }
+
+    @Test
+    fun whenOwnDeviceInfoIsAbsentThenReportedAsUnresolved() {
+        enableReadFlag()
+        val own = DeviceV2(deviceId = "d1", credentialId = "ddg", deviceName = "ENC", deviceInfo = null)
+        val other = DeviceV2(deviceId = "d2", credentialId = "ddg", deviceName = "ENC", deviceInfo = "info.jwe")
+        whenever(session.decrypt("info.jwe")).thenReturn(Success(DeviceInfoPayload(name = "Chrome", type = "Browser")))
+        whenever(fieldDecryptor.decrypt(own)).thenReturn(Success(DecryptedDevice("d1", "Legacy Pixel", "phone")))
+
+        val result = decryptor.decryptAll(listOf(own, other), thisDeviceId = "d1")
+
+        assertTrue(result.thisDeviceInfoUnresolved)
+    }
+
+    @Test
+    fun whenOwnDeviceInfoIsUndecryptableThenReportedAsUnresolved() {
+        enableReadFlag()
+        val own = DeviceV2(deviceId = "d1", credentialId = "ddg", deviceName = "ENC", deviceInfo = "corrupt.jwe")
+        whenever(session.decrypt("corrupt.jwe")).thenReturn(Error(reason = "bad device_info"))
+        whenever(fieldDecryptor.decrypt(own)).thenReturn(Success(DecryptedDevice("d1", "Legacy Pixel", "phone")))
+
+        val result = decryptor.decryptAll(listOf(own), thisDeviceId = "d1")
+
+        assertTrue(result.thisDeviceInfoUnresolved)
+    }
+
+    @Test
+    fun whenOnlyAnotherDeviceInfoIsUnresolvedThenNotReported() {
+        enableReadFlag()
+        val own = DeviceV2(deviceId = "d1", credentialId = "ddg", deviceName = "ENC", deviceInfo = "info.jwe")
+        val other = DeviceV2(deviceId = "d2", credentialId = "3party", deviceName = "ENC", deviceInfo = null)
+        whenever(session.decrypt("info.jwe")).thenReturn(Success(DeviceInfoPayload(name = "Pixel", type = "phone")))
+        whenever(fieldDecryptor.decrypt(other)).thenReturn(Success(DecryptedDevice("d2", "Chrome", "Browser")))
+
+        val result = decryptor.decryptAll(listOf(own, other), thisDeviceId = "d1")
+
+        assertFalse(result.thisDeviceInfoUnresolved)
+    }
+
+    @Test
+    fun whenOwnDeviceIsNotInTheListThenNotReportedAsUnresolved() {
+        enableReadFlag()
+        val other = DeviceV2(deviceId = "d2", credentialId = "ddg", deviceName = "ENC", deviceInfo = null)
+        whenever(fieldDecryptor.decrypt(other)).thenReturn(Success(DecryptedDevice("d2", "Chrome", "Browser")))
+
+        val result = decryptor.decryptAll(listOf(other), thisDeviceId = "d1")
+
+        assertFalse(result.thisDeviceInfoUnresolved)
+    }
+
+    @Test
+    fun whenReadFlagOffThenOwnUnresolvedDeviceInfoIsNotReported() {
+        // with the flag off no blob is read at all, so "unresolved" would be true for every device on every render
+        val own = DeviceV2(deviceId = "d1", credentialId = "ddg", deviceName = "ENC", deviceInfo = "info.jwe")
+        whenever(fieldDecryptor.decrypt(own)).thenReturn(Success(DecryptedDevice("d1", "Legacy Pixel", "phone")))
+
+        val result = decryptor.decryptAll(listOf(own), thisDeviceId = "d1")
+
+        assertFalse(result.thisDeviceInfoUnresolved)
     }
 
     @Test
@@ -368,7 +440,7 @@ class ThirdPartyDeviceListDecryptorTest {
         whenever(session.decrypt("corrupt.jwe")).thenReturn(Error(reason = "bad device_info"))
         whenever(fieldDecryptor.decrypt(ddg)).thenReturn(Error(reason = "bad legacy"))
 
-        val result = decryptor.decryptAll(listOf(ddg))
+        val result = decryptor.decryptAll(listOf(ddg), thisDeviceId = null)
 
         assertEquals(listOf(DecryptedDevice("d1", FALLBACK_NAME, null)), result.decrypted)
         assertTrue(result.undecryptable.isEmpty())

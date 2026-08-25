@@ -86,10 +86,14 @@ class NtpAfterIdleManagerImplTest {
         verify(pixel).fire(NTP_SHOWN_USER_INITIATED_DAILY, type = Daily())
         verify(pixel, never()).fire(NTP_SHOWN_AFTER_IDLE, type = Count)
         verify(pixel, never()).fire(NTP_SHOWN_AFTER_IDLE_DAILY, type = Daily())
+        verify(hatchInteractionsPlugins, never()).getPlugins()
     }
 
     @Test
     fun whenIdleReturnTriggeredAndThenOnNtpShownThenFiresAfterIdleShownPixels() {
+        val plugin: HatchInteractionsPlugin = mock()
+        whenever(hatchInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
+
         testee.onIdleReturnTriggered()
         testee.onNtpShown()
 
@@ -97,6 +101,7 @@ class NtpAfterIdleManagerImplTest {
         verify(pixel).fire(NTP_SHOWN_AFTER_IDLE_DAILY, type = Daily())
         verify(pixel, never()).fire(NTP_SHOWN_USER_INITIATED, type = Count)
         verify(pixel, never()).fire(NTP_SHOWN_USER_INITIATED_DAILY, type = Daily())
+        verify(plugin).onHatchShownAfterIdle()
     }
 
     @Test
@@ -121,6 +126,26 @@ class NtpAfterIdleManagerImplTest {
         testee.onTabSwitcherSelected()
 
         verify(plugin).onTabSwitcherSelected()
+    }
+
+    @Test
+    fun whenOnCloseTabTappedThenForwardsToHatchPlugins() {
+        val plugin: HatchInteractionsPlugin = mock()
+        whenever(hatchInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
+
+        testee.onCloseTabTapped()
+
+        verify(plugin).onCloseTabTapped()
+    }
+
+    @Test
+    fun whenOnBurnTabTappedThenForwardsToHatchPlugins() {
+        val plugin: HatchInteractionsPlugin = mock()
+        whenever(hatchInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
+
+        testee.onBurnTabTapped()
+
+        verify(plugin).onBurnTabTapped()
     }
 
     // --- onReturnToPageTapped classification ---

@@ -1,8 +1,8 @@
 {
   "name": "Quick People Trace",
   "url": "quickpeopletrace.com",
-  "version": "0.6.0",
-  "parent": "peoplefinders.com",
+  "version": "0.7.0",
+  "parent": "cyberbackgroundchecks.com",
   "addedDatetime": 1674540000000,
   "optOutUrl": "https://www.quickpeopletrace.com/contact-us/",
   "steps": [

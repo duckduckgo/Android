@@ -72,31 +72,29 @@
         app:layout_constraintTop_toBottomOf="@+id/browserProtectionTitle"
         app:typography="onboarding_body" />
 
-    <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+    <com.duckduckgo.common.ui.view.button.DaxButtonBrand
         android:id="@+id/launchSettingsButton"
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:text="@string/setAsDefaultBrowser"
-        android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.Button"
-        android:theme="@style/ThemeOverlay.DuckDuckGo.Onboarding"
+        app:daxButtonBrandTypography="duckSans"
         app:layout_constraintBottom_toTopOf="@+id/continueButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/contentGuideline"
-        app:layout_constraintTop_toBottomOf="@+id/browserProtectionSubtitle"
-        tools:ignore="InvalidDaxButtonProperty" />
+        app:layout_constraintTop_toBottomOf="@+id/browserProtectionSubtitle" />
 
     <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
         android:id="@+id/continueButton"
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:text="@string/defaultBrowserMaybeLater"
-        android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.Button"
-        android:theme="@style/ThemeOverlay.DuckDuckGo.Onboarding"
+        android:textAppearance="@style/Typography.DuckDuckGo.Rebrand.ButtonDuckSans"
+        android:theme="@style/ThemeOverlay.Rebrand"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/contentGuideline"
         app:layout_constraintTop_toBottomOf="@+id/launchSettingsButton"
-        tools:ignore="InvalidDaxButtonProperty" />
+        tools:ignore="InvalidDaxButtonDuckSans,InvalidDaxButtonProperty" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

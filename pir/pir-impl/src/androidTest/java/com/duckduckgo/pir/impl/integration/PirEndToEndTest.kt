@@ -34,6 +34,7 @@ import com.duckduckgo.pir.impl.common.RealBrokerStepsParser
 import com.duckduckgo.pir.impl.common.RealEmailDataResolver
 import com.duckduckgo.pir.impl.common.RealPirRunStateHandler
 import com.duckduckgo.pir.impl.common.RealPirWebViewCountProvider
+import com.duckduckgo.pir.impl.common.RealPirWorkDistributor
 import com.duckduckgo.pir.impl.common.actions.BrokerActionFailedEventHandler
 import com.duckduckgo.pir.impl.common.actions.BrokerStepCompletedEventHandler
 import com.duckduckgo.pir.impl.common.actions.CaptchaInfoReceivedEventHandler
@@ -42,7 +43,7 @@ import com.duckduckgo.pir.impl.common.actions.EmailReceivedEventHandler
 import com.duckduckgo.pir.impl.common.actions.ErrorReceivedHandler
 import com.duckduckgo.pir.impl.common.actions.EventHandler
 import com.duckduckgo.pir.impl.common.actions.ExecuteBrokerStepActionEventHandler
-import com.duckduckgo.pir.impl.common.actions.ExecuteNextBrokerStepEventHandler
+import com.duckduckgo.pir.impl.common.actions.ExecuteBrokerStepEventHandler
 import com.duckduckgo.pir.impl.common.actions.JsActionSuccessEventHandler
 import com.duckduckgo.pir.impl.common.actions.LoadUrlCompleteEventHandler
 import com.duckduckgo.pir.impl.common.actions.LoadUrlFailedEventHandler
@@ -328,6 +329,8 @@ class PirEndToEndTest {
             dispatcherProvider = dispatcherProvider,
         )
 
+        val pirWorkDistributor = RealPirWorkDistributor(FakeFeatureToggleFactory.create(PirRemoteFeatures::class.java))
+
         pirScan = RealPirScan(
             repository = pirRepository,
             eventsRepository = pirEventsRepository,
@@ -339,6 +342,7 @@ class PirEndToEndTest {
             callbacks = pirCallbacksPluginPoint,
             webViewDataCleaner = fakePirWebViewDataCleaner,
             pirWebViewCountProvider = pirWebViewCountProvider,
+            pirWorkDistributor = pirWorkDistributor,
         )
 
         pirOptOut = RealPirOptOut(
@@ -352,6 +356,7 @@ class PirEndToEndTest {
             callbacks = pirCallbacksPluginPoint,
             webViewDataCleaner = fakePirWebViewDataCleaner,
             pirWebViewCountProvider = pirWebViewCountProvider,
+            pirWorkDistributor = pirWorkDistributor,
         )
 
         eligibleScanJobProvider = RealEligibleScanJobProvider(
@@ -394,6 +399,8 @@ class PirEndToEndTest {
             callbacks = pirCallbacksPluginPoint,
             webViewDataCleaner = fakePirWebViewDataCleaner,
             pirWebViewCountProvider = pirWebViewCountProvider,
+            pirWorkDistributor = pirWorkDistributor,
+            jobRecordUpdater = jobRecordUpdater,
         )
 
         pirEmailConfirmationJobsRunner = RealPirEmailConfirmationJobsRunner(
@@ -826,7 +833,7 @@ class PirEndToEndTest {
             BrokerStepCompletedEventHandler(pirRunStateHandler, fakeTimeProvider),
             BrokerActionFailedEventHandler(pirRunStateHandler, fakeTimeProvider),
             ExecuteBrokerStepActionEventHandler(pirRunStateHandler, fakeTimeProvider),
-            ExecuteNextBrokerStepEventHandler(fakeTimeProvider, pirRunStateHandler),
+            ExecuteBrokerStepEventHandler(fakeTimeProvider, pirRunStateHandler),
             ConditionExpectationSucceededEventHandler(pirRunStateHandler, fakeTimeProvider),
             EmailReceivedEventHandler(pirRunStateHandler, fakeTimeProvider),
             CaptchaInfoReceivedEventHandler(fakeTimeProvider, pirRunStateHandler),

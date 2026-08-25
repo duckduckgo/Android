@@ -76,10 +76,12 @@ import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository.AuthCode
 import com.duckduckgo.sync.impl.crypto.SyncJweCrypto
 import com.duckduckgo.sync.impl.metrics.ConnectedDevicesObserver
+import com.duckduckgo.sync.impl.pixels.SyncAccountOperation
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrlWrapper
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
+import com.duckduckgo.sync.store.AccountInfoPublicKey
 import com.duckduckgo.sync.store.ScopedPassword
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.moshi.Moshi
@@ -95,6 +97,7 @@ import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.check
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -132,6 +135,8 @@ class AppSyncAccountRepositoryTest {
     private val thirdPartyCredentialManager: ThirdPartyCredentialManager = mock()
     private val thirdPartyDeviceListDecryptor: ThirdPartyDeviceListDecryptor = mock()
     private val loginDeviceInfoWriter: LoginDeviceInfoWriter = mock()
+    private val signupAccountInfoBuilder: SignupAccountInfoBuilder = mock()
+    private val deviceInfoUpdater: DeviceInfoUpdater = mock()
 
     @get:Rule
     val coroutineTestRule = CoroutineTestRule()
@@ -156,6 +161,8 @@ class AppSyncAccountRepositoryTest {
             thirdPartyCredentialManager = thirdPartyCredentialManager,
             thirdPartyDeviceListDecryptor = thirdPartyDeviceListDecryptor,
             loginDeviceInfoWriter = loginDeviceInfoWriter,
+            signupAccountInfoBuilder = signupAccountInfoBuilder,
+            deviceInfoUpdater = deviceInfoUpdater,
         )
         (syncRepo as AppSyncAccountRepository).upgradeRetryDelayMillis = 0L // keep retry-path tests instant
 
@@ -195,7 +202,7 @@ class AppSyncAccountRepositoryTest {
         prepareToProvideDeviceIds()
         prepareForEncryption()
         whenever(nativeLib.generateAccountKeys(userId = anyString(), password = anyString())).thenReturn(accountKeys)
-        whenever(syncApi.createAccount(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyOrNull()))
+        whenever(anyCreateAccountCall())
             .thenReturn(accountCreatedFailDupUser)
 
         val result = syncRepo.createAccount() as Error
@@ -207,7 +214,7 @@ class AppSyncAccountRepositoryTest {
     fun whenCreateAccountGenerateKeysFailsThenReturnCreateAccountError() {
         prepareToProvideDeviceIds()
         whenever(nativeLib.generateAccountKeys(userId = anyString(), password = anyString())).thenReturn(accountKeysFailed)
-        whenever(syncApi.createAccount(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyOrNull()))
+        whenever(anyCreateAccountCall())
             .thenReturn(accountCreatedSuccess)
 
         val result = syncRepo.createAccount() as Error
@@ -683,7 +690,7 @@ class AppSyncAccountRepositoryTest {
         whenever(syncApi.getDevices(anyString())).thenReturn(
             Success(DeviceEntries(entries = emptyList(), entriesV2 = listOf(v2Entry))),
         )
-        whenever(thirdPartyDeviceListDecryptor.decryptAll(listOf(v2Entry))).thenReturn(
+        whenever(thirdPartyDeviceListDecryptor.decryptAll(listOf(v2Entry), deviceId)).thenReturn(
             DecryptAllResult(
                 decrypted = listOf(DecryptedDevice(deviceId = "d1", name = "Chrome/148", type = "Browser")),
                 undecryptable = emptyList(),
@@ -694,7 +701,7 @@ class AppSyncAccountRepositoryTest {
 
         assertEquals(1, result.data.size)
         assertEquals("Chrome/148", result.data[0].deviceName)
-        verify(thirdPartyDeviceListDecryptor).decryptAll(listOf(v2Entry))
+        verify(thirdPartyDeviceListDecryptor).decryptAll(listOf(v2Entry), deviceId)
         verify(syncApi, never()).logout(anyString(), anyString())
     }
 
@@ -712,7 +719,7 @@ class AppSyncAccountRepositoryTest {
 
         // Fell back to legacy decrypt — same library path as the legacy `entries`-only response.
         assertEquals(1, result.data.size)
-        verify(thirdPartyDeviceListDecryptor, never()).decryptAll(any())
+        verify(thirdPartyDeviceListDecryptor, never()).decryptAll(any(), anyOrNull())
     }
 
     @Test
@@ -737,7 +744,7 @@ class AppSyncAccountRepositoryTest {
         whenever(syncApi.getDevices(anyString())).thenReturn(
             Success(DeviceEntries(entries = emptyList(), entriesV2 = listOf(v2Entry))),
         )
-        whenever(thirdPartyDeviceListDecryptor.decryptAll(any())).thenReturn(
+        whenever(thirdPartyDeviceListDecryptor.decryptAll(any(), anyOrNull())).thenReturn(
             DecryptAllResult(decrypted = emptyList(), undecryptable = listOf("d-other")),
         )
         whenever(syncApi.logout(eq(token), eq("d-other"))).thenReturn(Success(Logout("d-other")))
@@ -759,7 +766,7 @@ class AppSyncAccountRepositoryTest {
         whenever(syncApi.getDevices(anyString())).thenReturn(
             Success(DeviceEntries(entries = emptyList(), entriesV2 = listOf(v2Entry))),
         )
-        whenever(thirdPartyDeviceListDecryptor.decryptAll(any())).thenReturn(
+        whenever(thirdPartyDeviceListDecryptor.decryptAll(any(), anyOrNull())).thenReturn(
             DecryptAllResult(decrypted = emptyList(), undecryptable = listOf(deviceId)),
         )
 
@@ -779,7 +786,107 @@ class AppSyncAccountRepositoryTest {
 
         syncRepo.getConnectedDevices()
 
-        verify(thirdPartyDeviceListDecryptor, never()).decryptAll(any())
+        verify(thirdPartyDeviceListDecryptor, never()).decryptAll(any(), anyOrNull())
+    }
+
+    @Test
+    fun whenThisDeviceInfoUnresolvedThenRepublishesItWithTheCurrentName() = runTest {
+        givenThisDeviceInfoUnresolvedOnRead()
+        syncFeature.canWriteUnifiedDeviceList().setRawStoredState(State(enable = true))
+        whenever(deviceInfoUpdater.setThisDeviceName(any())).thenReturn(Success(emptyList()))
+
+        syncRepo.getConnectedDevices()
+
+        verify(deviceInfoUpdater).setThisDeviceName(deviceName)
+    }
+
+    @Test
+    fun whenThisDeviceInfoUnresolvedOnEveryRenderThenRepublishesOnlyOncePerProcess() = runTest {
+        givenThisDeviceInfoUnresolvedOnRead()
+        syncFeature.canWriteUnifiedDeviceList().setRawStoredState(State(enable = true))
+        whenever(deviceInfoUpdater.setThisDeviceName(any())).thenReturn(Success(emptyList()))
+
+        syncRepo.getConnectedDevices()
+        syncRepo.getConnectedDevices()
+
+        verify(deviceInfoUpdater, times(1)).setThisDeviceName(anyString())
+    }
+
+    @Test
+    fun whenRepublishFailsThenRetriesOnTheNextRender() = runTest {
+        givenThisDeviceInfoUnresolvedOnRead()
+        syncFeature.canWriteUnifiedDeviceList().setRawStoredState(State(enable = true))
+        whenever(deviceInfoUpdater.setThisDeviceName(any())).thenReturn(Error(reason = "no network"))
+
+        syncRepo.getConnectedDevices()
+        syncRepo.getConnectedDevices()
+
+        verify(deviceInfoUpdater, times(2)).setThisDeviceName(anyString())
+    }
+
+    @Test
+    fun whenSignedIntoAnotherAccountInTheSameProcessThenRepublishesAgain() = runTest {
+        givenThisDeviceInfoUnresolvedOnRead()
+        syncFeature.canWriteUnifiedDeviceList().setRawStoredState(State(enable = true))
+        whenever(deviceInfoUpdater.setThisDeviceName(any())).thenReturn(Success(emptyList()))
+
+        syncRepo.getConnectedDevices()
+        whenever(syncStore.userId).thenReturn("anotherUserId")
+        syncRepo.getConnectedDevices()
+
+        verify(deviceInfoUpdater, times(2)).setThisDeviceName(anyString())
+    }
+
+    @Test
+    fun whenNotSignedInThenDoesNotRepublish() = runTest {
+        givenThisDeviceInfoUnresolvedOnRead()
+        syncFeature.canWriteUnifiedDeviceList().setRawStoredState(State(enable = true))
+        whenever(syncStore.userId).thenReturn(null)
+
+        syncRepo.getConnectedDevices()
+
+        verifyNoInteractions(deviceInfoUpdater)
+    }
+
+    @Test
+    fun whenThisDeviceInfoUnresolvedButWritingDeviceInfoDisabledThenDoesNotRepublish() = runTest {
+        // the PATCH would omit device_info and the backend would clear it, deleting the blob we're repairing
+        givenThisDeviceInfoUnresolvedOnRead()
+        syncFeature.canWriteUnifiedDeviceList().setRawStoredState(State(enable = false))
+
+        syncRepo.getConnectedDevices()
+
+        verifyNoInteractions(deviceInfoUpdater)
+    }
+
+    @Test
+    fun whenThisDeviceInfoResolvedThenDoesNotRepublish() = runTest {
+        givenThisDeviceInfoUnresolvedOnRead(unresolved = false)
+        syncFeature.canWriteUnifiedDeviceList().setRawStoredState(State(enable = true))
+
+        syncRepo.getConnectedDevices()
+
+        verifyNoInteractions(deviceInfoUpdater)
+    }
+
+    private fun givenThisDeviceInfoUnresolvedOnRead(unresolved: Boolean = true) {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+        whenever(syncStore.token).thenReturn(token)
+        whenever(syncStore.primaryKey).thenReturn(primaryKey)
+        whenever(syncStore.deviceId).thenReturn(deviceId)
+        whenever(syncStore.userId).thenReturn(userId)
+        whenever(syncDeviceIds.deviceName()).thenReturn(deviceName)
+        val ownEntry = DeviceV2(deviceId = deviceId, deviceName = "ENC", credentialId = "ddg")
+        whenever(syncApi.getDevices(anyString())).thenReturn(
+            Success(DeviceEntries(entries = emptyList(), entriesV2 = listOf(ownEntry))),
+        )
+        whenever(thirdPartyDeviceListDecryptor.decryptAll(any(), anyOrNull())).thenReturn(
+            DecryptAllResult(
+                decrypted = listOf(DecryptedDevice(deviceId = deviceId, name = deviceName, type = "phone")),
+                undecryptable = emptyList(),
+                thisDeviceInfoUnresolved = unresolved,
+            ),
+        )
     }
 
     @Test
@@ -944,21 +1051,93 @@ class AppSyncAccountRepositoryTest {
     }
 
     @Test
-    fun whenRenameDeviceUnAuthenticatedThenReturnError() {
+    fun whenRenameDeviceUnAuthenticatedThenReturnError() = runTest {
         val result = syncRepo.renameDevice(connectedDevice)
 
         assertTrue(result is Error)
     }
 
     @Test
-    fun whenRenameDeviceSuccessThenReturnSuccess() {
+    fun whenPatchEndpointForLegacyRenameIsKillSwitchedThenReRegisterViaLogin() = runTest {
         givenAuthenticatedDevice()
         prepareForLoginSuccess()
+        syncFeature.canUsePatchEndpointForLegacyDeviceRename().setRawStoredState(State(enable = false))
 
         val result = syncRepo.renameDevice(connectedDevice)
 
         verify(syncApi).login(anyString(), anyString(), eq(connectedDevice.deviceId), anyString(), anyString(), anyOrNull())
+        verifyNoInteractions(deviceInfoUpdater)
         assertTrue(result is Success)
+    }
+
+    @Test
+    fun whenRenameThisDeviceAndCanWriteUnifiedDeviceListThenRenamesViaUnifiedPath() = runTest {
+        givenAuthenticatedDevice()
+        prepareForLoginSuccess()
+        syncFeature.canWriteUnifiedDeviceList().setRawStoredState(State(enable = true))
+        whenever(deviceInfoUpdater.setThisDeviceName(any())).thenReturn(Success(emptyList()))
+
+        val result = syncRepo.renameDevice(connectedDevice.copy(deviceName = "New Name"))
+
+        assertTrue(result is Success)
+        verify(deviceInfoUpdater).setThisDeviceName("New Name")
+        verify(syncApi, never()).login(anyString(), anyString(), anyString(), anyString(), anyString(), anyOrNull())
+    }
+
+    @Test
+    fun whenUnifiedRenameFailsThenReturnErrorAndFireUpdateDevicePixel() = runTest {
+        givenAuthenticatedDevice()
+        prepareForLoginSuccess()
+        syncFeature.canWriteUnifiedDeviceList().setRawStoredState(State(enable = true))
+        whenever(deviceInfoUpdater.setThisDeviceName(any())).thenReturn(Error(reason = "patch failed"))
+
+        val result = syncRepo.renameDevice(connectedDevice)
+
+        assertTrue(result is Error)
+        verify(syncPixels).fireSyncAccountErrorPixel(any(), eq(SyncAccountOperation.UPDATE_DEVICE))
+        verify(syncApi, never()).login(anyString(), anyString(), anyString(), anyString(), anyString(), anyOrNull())
+    }
+
+    @Test
+    fun whenRenameAnotherDeviceThenReturnErrorWithoutWritingAnything() = runTest {
+        givenAuthenticatedDevice()
+        prepareForLoginSuccess()
+        syncFeature.canWriteUnifiedDeviceList().setRawStoredState(State(enable = true))
+        val anotherDevice = connectedDevice.copy(thisDevice = false, deviceId = "anotherDeviceId")
+
+        val result = syncRepo.renameDevice(anotherDevice)
+
+        assertTrue(result is Error)
+        verifyNoInteractions(deviceInfoUpdater)
+        verify(syncApi, never()).login(anyString(), anyString(), anyString(), anyString(), anyString(), anyOrNull())
+    }
+
+    @Test
+    fun whenRenameThisDeviceAndCannotWriteUnifiedDeviceListThenStillPatchViaTheUpdater() = runTest {
+        givenAuthenticatedDevice()
+        prepareForLoginSuccess()
+        syncFeature.canWriteUnifiedDeviceList().setRawStoredState(State(enable = false))
+        whenever(deviceInfoUpdater.setThisDeviceName(any())).thenReturn(Success(emptyList()))
+
+        val result = syncRepo.renameDevice(connectedDevice.copy(deviceName = "New Name"))
+
+        assertTrue(result is Success)
+        verify(deviceInfoUpdater).setThisDeviceName("New Name")
+        verify(syncApi, never()).login(anyString(), anyString(), anyString(), anyString(), anyString(), anyOrNull())
+    }
+
+    @Test
+    fun whenLegacyOnlyRenameFailsThenReturnErrorAndFireUpdateDevicePixel() = runTest {
+        givenAuthenticatedDevice()
+        prepareForLoginSuccess()
+        syncFeature.canWriteUnifiedDeviceList().setRawStoredState(State(enable = false))
+        whenever(deviceInfoUpdater.setThisDeviceName(any())).thenReturn(Error(reason = "patch failed"))
+
+        val result = syncRepo.renameDevice(connectedDevice)
+
+        assertTrue(result is Error)
+        verify(syncPixels).fireSyncAccountErrorPixel(any(), eq(SyncAccountOperation.UPDATE_DEVICE))
+        verify(syncApi, never()).login(anyString(), anyString(), anyString(), anyString(), anyString(), anyOrNull())
     }
 
     @Test
@@ -1122,12 +1301,24 @@ class AppSyncAccountRepositoryTest {
         whenever(syncDeviceIds.deviceType()).thenReturn(deviceType)
     }
 
+    private fun anyCreateAccountCall() = syncApi.createAccount(
+        anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyOrNull(), anyOrNull(), anyOrNull(),
+    )
+
     private fun prepareForCreateAccountSuccess() {
         prepareForEncryption()
         whenever(nativeLib.generateAccountKeys(userId = anyString(), password = anyString())).thenReturn(accountKeys)
-        whenever(syncApi.createAccount(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyOrNull()))
+        whenever(anyCreateAccountCall())
             .thenReturn(Success(AccountCreatedResponse(userId, token)))
     }
+
+    private fun unifiedAccountInfoEntry() = ProtectedKeyEntry(
+        kid = "kid-1",
+        purpose = SYNC_PURPOSE_ACCOUNT_INFO,
+        encryptedWith = CREDENTIAL_ID_DDG,
+        encryptedPrivateKey = "ddg-wrapped-private-key",
+        publicKey = RsaJwk(n = "n", e = "AQAB"),
+    )
 
     private fun prepareForEncryption() {
         whenever(nativeLib.decrypt(encryptedData = protectedEncryptionKey, secretKey = stretchedPrimaryKey)).thenReturn(decryptedSecretKey)
@@ -1259,7 +1450,9 @@ class AppSyncAccountRepositoryTest {
 
         syncRepo.createAccount()
 
-        verify(syncApi).createAccount(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), eq("ddg"))
+        verify(syncApi).createAccount(
+            anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), eq("ddg"), anyOrNull(), anyOrNull(),
+        )
     }
 
     @Test
@@ -1270,7 +1463,51 @@ class AppSyncAccountRepositoryTest {
 
         syncRepo.createAccount()
 
-        verify(syncApi).createAccount(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), eq(null))
+        verify(syncApi).createAccount(
+            anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), eq(null), anyOrNull(), anyOrNull(),
+        )
+        // Unified device_info is only built on the v2/ddg signup path.
+        verify(signupAccountInfoBuilder, never()).build(any(), any(), any())
+    }
+
+    @Test
+    fun whenSignupAccountInfoBuilderReturnsAdditionsThenIncludedInSignupAndCached() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+        prepareToProvideDeviceIds()
+        prepareForCreateAccountSuccess()
+        val publicKey = AccountInfoPublicKey(keyId = "kid-1", modulus = "n", exponent = "AQAB")
+        whenever(signupAccountInfoBuilder.build(any(), any(), any()))
+            .thenReturn(SignupAccountInfo(deviceInfo = "deviceInfoJwe", keys = listOf(unifiedAccountInfoEntry()), publicKey = publicKey))
+
+        syncRepo.createAccount()
+
+        verify(syncApi).createAccount(
+            anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), eq("ddg"),
+            eq("deviceInfoJwe"),
+            check { keys ->
+                assertEquals(1, keys?.size)
+                assertEquals(CREDENTIAL_ID_DDG, keys?.first()?.encryptedWith)
+                assertEquals(SYNC_PURPOSE_ACCOUNT_INFO, keys?.first()?.purpose)
+            },
+        )
+        verify(syncStore).accountInfoPublicKey = publicKey
+        verify(syncStore).unifiedDeviceListMigratedForUserId = userId
+    }
+
+    @Test
+    fun whenSignupAccountInfoBuilderReturnsNullThenNoDeviceInfoOrKeysAndSignupStillSucceeds() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+        prepareToProvideDeviceIds()
+        prepareForCreateAccountSuccess()
+        whenever(signupAccountInfoBuilder.build(any(), any(), any())).thenReturn(null)
+
+        val result = syncRepo.createAccount()
+
+        assertEquals(Success(true), result)
+        verify(syncApi).createAccount(
+            anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), eq("ddg"), eq(null), eq(null),
+        )
+        verify(syncStore, never()).unifiedDeviceListMigratedForUserId = any()
     }
 
     // ---- Delegation to ThirdPartyCredentialManager ----

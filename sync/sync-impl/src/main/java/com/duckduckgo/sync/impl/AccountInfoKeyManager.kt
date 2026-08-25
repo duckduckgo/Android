@@ -23,6 +23,7 @@ import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.crypto.SyncJweCrypto
 import com.duckduckgo.sync.store.AccountInfoPublicKey
+import com.duckduckgo.sync.store.ScopedPassword
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -44,12 +45,17 @@ interface AccountInfoKeyManager {
 
     /**
      * Mints a fresh `account_info` keypair, wraps it for every credential this account currently holds
-     * (ddg always, 3party if a scoped password exists), and registers it with the server via set-if-absent.
+     * (ddg always, 3party whenever the account has that credential), and registers it with the server via set-if-absent.
      *
      * If another device already registered a key for this purpose first, the local mint is discarded and the server's key is adopted instead.
      * The winning public key is returned in [AccountInfoKeyResult] and cached in [SyncStore.accountInfoPublicKey].
      */
     suspend fun ensureKeyRegistered(): Result<AccountInfoKeyResult>
+
+    /**
+     * Mint a new `account_info` keypair wrapped for `ddg` only (a brand-new account has no scoped password yet) without registering it on the server
+     */
+    fun mintUnregistered(accountSecretKey: String): Result<MintedProtectedKey>
 }
 
 data class AccountInfoKeyResult(
@@ -67,6 +73,7 @@ class RealAccountInfoKeyManager @Inject constructor(
     private val syncJweCrypto: SyncJweCrypto,
     private val nativeLib: SyncLib,
     private val thirdPartyKeyWrapper: ThirdPartyKeyWrapper,
+    private val thirdPartyCredentialManager: ThirdPartyCredentialManager,
     private val dispatchers: DispatcherProvider,
 ) : AccountInfoKeyManager {
 
@@ -76,7 +83,7 @@ class RealAccountInfoKeyManager @Inject constructor(
         val accountSecretKey = syncStore.secretKey
             ?: return@withContext Error(reason = "CreateAccountInfoKey: no account secret key")
 
-        val minted = when (val result = mintKeypair(accountSecretKey)) {
+        val minted = when (val result = mintUnregistered(accountSecretKey)) {
             is Success -> result.data
             is Error -> return@withContext result
         }
@@ -101,7 +108,7 @@ class RealAccountInfoKeyManager @Inject constructor(
         registration
     }
 
-    private fun mintKeypair(accountSecretKey: String): Result<MintedProtectedKey> =
+    override fun mintUnregistered(accountSecretKey: String): Result<MintedProtectedKey> =
         mintDdgWrappedProtectedKey(
             purpose = SYNC_PURPOSE_ACCOUNT_INFO,
             accountSecretKey = accountSecretKey,
@@ -111,9 +118,15 @@ class RealAccountInfoKeyManager @Inject constructor(
             keySizeBits = RSA_KEY_SIZE_ACCOUNT_INFO,
         )
 
+    /**
+     * The spec requires the key to be wrapped for every credential the account holds. A cached scoped password is only evidence that this device
+     * created, recovered or logged into the 3party credential — not that the account lacks one — so when it's absent we ask the server before
+     * settling for a `ddg`-only key. Failing to recover one is not fatal: a `ddg`-only key still lets this device write `device_info`, and login
+     * re-wraps for the missing credential.
+     */
     private fun wrapForCredentials(minted: MintedProtectedKey): Result<List<ProtectedKeyEntry>> {
         val entries = mutableListOf(minted.entry)
-        val scopedPassword = syncStore.scopedPassword
+        val scopedPassword = syncStore.scopedPassword ?: recoverScopedPassword()
         val userId = syncStore.userId
         if (scopedPassword != null && userId != null) {
             entries += when (val result = thirdPartyKeyWrapper.wrap(minted, SYNC_PURPOSE_ACCOUNT_INFO, scopedPassword, userId)) {
@@ -122,6 +135,22 @@ class RealAccountInfoKeyManager @Inject constructor(
             }
         }
         return Success(entries)
+    }
+
+    private fun recoverScopedPassword(): ScopedPassword? {
+        logcat { "Sync-UnifiedDevices: no cached scoped password; checking whether the account has a 3party credential to wrap for" }
+        return when (val result = thirdPartyCredentialManager.refresh()) {
+            is Success -> if (result.data) {
+                syncStore.scopedPassword
+            } else {
+                logcat { "Sync-UnifiedDevices: account has no 3party credential; wrapping $SYNC_PURPOSE_ACCOUNT_INFO for ddg only" }
+                null
+            }
+            is Error -> {
+                logcat(ERROR) { "Sync-UnifiedDevices: could not recover scoped password, wrapping for ddg only: ${result.reason}" }
+                null
+            }
+        }
     }
 
     private fun onSetIfAbsentSuccess(

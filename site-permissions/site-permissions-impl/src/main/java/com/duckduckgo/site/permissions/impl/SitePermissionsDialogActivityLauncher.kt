@@ -44,6 +44,8 @@ import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
+import com.duckduckgo.site.permissions.impl.feature.DrmPolicyFeature
+import com.duckduckgo.site.permissions.impl.feature.isCentralPolicyEnabled
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType.ALLOW_ALWAYS
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType.DENY_ALWAYS
@@ -68,6 +70,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val duckAiHostProvider: DuckAiHostProvider,
     private val browserMode: BrowserMode,
+    private val drmPolicyFeature: DrmPolicyFeature,
 ) : SitePermissionsDialogLauncher {
 
     private lateinit var sitePermissionRequest: PermissionRequest
@@ -252,26 +255,32 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
     ) {
         val domain = url.extractDomain() ?: url
 
-        // Check if user allowed or denied per session
-        val sessionSetting = sitePermissionsRepository.getDrmForSession(domain)
-        if (sessionSetting != null) {
-            if (sessionSetting) {
-                grantPermissions()
-            } else {
-                denyPermissions()
+        // Session state and the block list are rules in the central policy, which has already decided PROMPT
+        // by the time we get here. Re-checking them would be a second evaluator, and its outcome would not
+        // appear in the policy decision or the auto-grant pixel.
+        if (!drmPolicyFeature.isCentralPolicyEnabled()) {
+            // Check if user allowed or denied per session
+            val sessionSetting = sitePermissionsRepository.getDrmForSession(tabId, domain)
+            if (sessionSetting != null) {
+                if (sessionSetting) {
+                    grantPermissions()
+                } else {
+                    denyPermissions()
+                }
+                return
             }
-            return
-        }
 
-        // No session-based setting --> check if DRM blocked by config
-        if (sitePermissionsRepository.isDrmBlockedForUrlByConfig(url)) {
-            denyPermissions()
-            return
+            // No session-based setting --> check if DRM blocked by config
+            if (sitePermissionsRepository.isDrmBlockedForUrlByConfig(url)) {
+                denyPermissions()
+                return
+            }
         }
 
         // No session-based setting and no config --> proceed to show dialog
         val title = url.websiteFromGeoLocationsApiOrigin()
-        TextAlertDialogBuilder(activity)
+        val dialog = TextAlertDialogBuilder(activity)
+        dialog
             .setTitle(
                 String.format(
                     activity.getString(R.string.drmSitePermissionDialogTitle),
@@ -282,6 +291,10 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                 activity.getText(R.string.drmSitePermissionDialogSubtitle).formatWithSpans(title),
                 DRM_LEARN_MORE_ANNOTATION,
             ) {
+                // When we are the default browser the link opens in a new tab of this same activity,
+                // so the dialog would otherwise stay on top of it with the request left unanswered.
+                dialog.dismiss()
+                denyPermissions()
                 activity.startActivity(Intent(Intent.ACTION_VIEW, DRM_LEARN_MORE_URL))
             }
             .setPositiveButton(R.string.sitePermissionsDialogAllowButton, GHOST)
@@ -305,7 +318,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                             // Fire mode grants the in-session WebView permission below but must not write the
                             // choice into the shared (app-wide, in-memory) DRM session map that regular tabs read.
                             if (browserMode != BrowserMode.FIRE) {
-                                sitePermissionsRepository.saveDrmForSession(domain, true)
+                                sitePermissionsRepository.saveDrmForSession(tabId, domain, true)
                             }
                             grantPermissions()
                         }
@@ -320,7 +333,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                         } else if (browserMode != BrowserMode.FIRE) {
                             // Fire mode denied the in-session permission above but must not write the
                             // choice into the shared (app-wide, in-memory) DRM session map that regular tabs read.
-                            sitePermissionsRepository.saveDrmForSession(domain, false)
+                            sitePermissionsRepository.saveDrmForSession(tabId, domain, false)
                         }
                         sendNegativeDialogClickPixel(SitePermissionsPixelValues.DRM, rememberChoice)
                     }

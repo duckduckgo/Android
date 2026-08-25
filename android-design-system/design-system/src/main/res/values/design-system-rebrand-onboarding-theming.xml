@@ -85,16 +85,9 @@
 
         <!--Text-->
         <item name="textAppearanceH2">@style/Typography.DuckDuckGo.Onboarding.Title</item>
-        <item name="textAppearanceButton">@style/Typography.DuckDuckGo.Onboarding.Button</item>
         <item name="daxColorSecondaryText">?attr/onboardingTextSecondary</item>
 
         <!--Button-->
-        <item name="daxButtonPrimary">
-            @style/Widget.DuckDuckGo.DaxButton.TextButton.Onboarding.Primary
-        </item>
-        <item name="daxButtonSecondary">
-            @style/Widget.DuckDuckGo.DaxButton.TextButton.Onboarding.Secondary
-        </item>
         <item name="selectionButtonStyle">
             @style/Widget.DuckDuckGo.DaxButton.OutlinedButton.Onboarding.SelectionButton
         </item>
@@ -154,17 +147,9 @@
 
         <!--Text-->
         <item name="textAppearanceH2">@style/Typography.DuckDuckGo.Onboarding.Title</item>
-        <item name="textAppearanceButton">@style/Typography.DuckDuckGo.Onboarding.Button</item>
         <item name="daxColorSecondaryText">?attr/onboardingTextSecondary</item>
 
-
         <!--Button-->
-        <item name="daxButtonPrimary">
-            @style/Widget.DuckDuckGo.DaxButton.TextButton.Onboarding.Primary
-        </item>
-        <item name="daxButtonSecondary">
-            @style/Widget.DuckDuckGo.DaxButton.TextButton.Onboarding.Secondary
-        </item>
         <item name="selectionButtonStyle">
             @style/Widget.DuckDuckGo.DaxButton.OutlinedButton.Onboarding.SelectionButton
         </item>
@@ -226,9 +211,15 @@
         <item name="android:fontFamily">@font/ducksansproduct_regular</item>
     </style>
 
-    <style name="Typography.DuckDuckGo.Onboarding.Button">
-        <item name="android:textSize">18sp</item>
-        <item name="android:textStyle">normal</item>
+    <style name="Typography.DuckDuckGo.Onboarding.PreferencePrimary">
+        <item name="android:textSize">16sp</item>
+        <item name="android:lineHeight">16sp</item>
+        <item name="android:fontFamily">@font/ducksansproduct_regular</item>
+    </style>
+
+    <style name="Typography.DuckDuckGo.Onboarding.PreferenceSecondary">
+        <item name="android:textSize">14sp</item>
+        <item name="android:lineHeight">18sp</item>
         <item name="android:fontFamily">@font/ducksansproduct_regular</item>
     </style>
 
@@ -239,31 +230,8 @@
         <item name="android:fontFamily">@font/ducksansdisplay_regular</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.DaxButton.TextButton.Onboarding" parent="Widget.MaterialComponents.Button.TextButton">
-        <item name="android:textAppearance">?attr/textAppearanceButton</item>
-        <item name="cornerRadius">64dp</item>
-        <item name="android:insetTop">4dp</item>
-        <item name="android:insetBottom">4dp</item>
-    </style>
-
-    <style name="Widget.DuckDuckGo.DaxButton.TextButton.Onboarding.Primary">
-        <item name="android:textColor">?attr/daxColorButtonPrimaryText</item>
-        <item name="backgroundTint">?attr/daxColorButtonPrimaryContainer</item>
-        <item name="rippleColor">?attr/daxColorButtonPrimaryContainerPressed</item>
-        <item name="iconTint">?attr/daxColorButtonPrimaryText</item>
-    </style>
-
-    <style name="Widget.DuckDuckGo.DaxButton.TextButton.Onboarding.Secondary">
-        <item name="android:textColor">?attr/daxColorButtonSecondaryText</item>
-        <item name="backgroundTint">?attr/daxColorButtonSecondaryContainer</item>
-        <item name="rippleColor">?attr/daxColorButtonSecondaryContainerPressed</item>
-        <item name="iconTint">?attr/daxColorButtonSecondaryText</item>
-        <item name="android:textAppearance">@style/Typography.DuckDuckGo.Onboarding.Button</item>
-        <item name="strokeColor">?attr/daxColorButtonSecondaryContainer</item>
-    </style>
-
     <style name="Widget.DuckDuckGo.DaxButton.OutlinedButton.Onboarding" parent="Widget.MaterialComponents.Button.OutlinedButton">
-        <item name="android:textAppearance">?attr/textAppearanceButton</item>
+        <item name="android:textAppearance">@style/Typography.DuckDuckGo.Rebrand.ButtonDuckSans</item>
         <item name="strokeWidth">1dp</item>
         <item name="cornerRadius">64dp</item>
         <item name="android:insetTop">4dp</item>

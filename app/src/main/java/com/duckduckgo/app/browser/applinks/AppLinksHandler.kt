@@ -18,7 +18,7 @@ package com.duckduckgo.app.browser.applinks
 
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
 import com.duckduckgo.app.browser.UriString
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -38,6 +38,21 @@ interface AppLinksHandler {
     fun updatePreviousUrl(urlString: String?)
     fun setUserQueryState(state: Boolean)
     fun isUserQuery(): Boolean
+
+    /**
+     * True when the app link resolves back to the app that opened the custom tab
+     *
+     * @param appLink the app link being evaluated.
+     * @param callerPackage package that launched the custom tab (if any).
+     */
+    fun isTrustedCaller(appLink: AppLink, callerPackage: String?): Boolean
+
+    /**
+     * True when the app link's domain always launches its app, bypassing the usual user-gesture and prompt requirements.
+     *
+     * @param appLink the app link being evaluated.
+     */
+    fun isAlwaysTriggerDomain(appLink: AppLink): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -67,15 +82,13 @@ class DuckDuckGoAppLinksHandler @Inject constructor(
         }
 
         val urlString = appLink.uriString
-        val isAlwaysTriggerDomain = alwaysTriggerList.contains(urlString.extractDomain())
+        val isAlwaysTriggerDomain = isAlwaysTriggerDomain(appLink)
 
         // HTTP navigations shouldn't launch apps unless started with a user gesture. That is unless
         // the "trusted-caller" carve-out applies - if an app opens a Custom Tab, App Links that
         // point back to that same app should be allowed even without user interaction.
         if (!isAlwaysTriggerDomain && androidBrowserConfigFeature.customTabEndlessLoopFix().isEnabled()) {
-            val targetPackage = appLink.appIntent?.component?.packageName ?: appLink.appIntent?.`package`
-            val isTrustedCaller = targetPackage != null && clientPackage == targetPackage
-            if (!hasGesture && !isTrustedCaller) {
+            if (!hasGesture && !isTrustedCaller(appLink, clientPackage)) {
                 return false
             }
         }
@@ -116,5 +129,14 @@ class DuckDuckGoAppLinksHandler @Inject constructor(
 
     override fun isUserQuery(): Boolean {
         return isAUserQuery
+    }
+
+    override fun isTrustedCaller(appLink: AppLink, callerPackage: String?): Boolean {
+        val targetPackage = appLink.appIntent?.component?.packageName ?: appLink.appIntent?.`package`
+        return targetPackage != null && callerPackage == targetPackage
+    }
+
+    override fun isAlwaysTriggerDomain(appLink: AppLink): Boolean {
+        return alwaysTriggerList.contains(appLink.uriString.extractDomain())
     }
 }

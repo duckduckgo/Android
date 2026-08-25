@@ -50,7 +50,7 @@ class CaptchaInfoReceivedEventHandler @Inject constructor(
          * from the GetCaptchaInfo js action.
          * We should proceed to the next broker action.
          */
-        val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex]
+        val currentBrokerStep = state.brokerStep
 
         if (currentBrokerStep is OptOutStep) {
             pirRunStateHandler.handleState(

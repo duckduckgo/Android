@@ -337,10 +337,11 @@ class CtaViewModel @Inject constructor(
         site: Site? = null,
         detectedRefreshPatterns: Set<RefreshPattern>,
         suppressDuckAiOnboardingCta: Boolean = false,
+        brokenSitePromptUrl: String?,
     ): Cta? {
         return withContext(dispatcher) {
             if (isBrowserShowing) {
-                getBrowserCta(site, detectedRefreshPatterns, suppressDuckAiOnboardingCta)
+                getBrowserCta(site, detectedRefreshPatterns, suppressDuckAiOnboardingCta, brokenSitePromptUrl)
             } else {
                 getHomeCta()
             }
@@ -455,6 +456,10 @@ class CtaViewModel @Inject constructor(
             // End
             canShowDaxCtaEndOfJourney() -> {
                 if (isBrandDesignUpdateEnabled()) {
+                    val isSegmentedSearchPathWithToggleEnabled = onboardingStore.isSegmentedSearchPathWithToggleEnabled()
+                    if (isSegmentedSearchPathWithToggleEnabled) {
+                        setInputToggleStateForDuckAiEndCta()
+                    }
                     DaxEndBrandDesignUpdateBubbleCta(
                         onboardingStore,
                         appInstallStore,
@@ -463,6 +468,7 @@ class CtaViewModel @Inject constructor(
                         onboardingImprovementsEnabled = isOnboardingImprovementsEnabled(),
                         onboardingImprovementsV2Enabled = isOnboardingImprovementsV2Enabled(),
                         isOmnibarBottom = settingsDataStore.omnibarType == OmnibarType.SINGLE_BOTTOM,
+                        isSegmentedSearchPathWithToggleEnabled = isSegmentedSearchPathWithToggleEnabled,
                     )
                 } else {
                     DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
@@ -524,15 +530,19 @@ class CtaViewModel @Inject constructor(
         site: Site?,
         detectedRefreshPatterns: Set<RefreshPattern>,
         suppressDuckAiOnboardingCta: Boolean,
+        brokenSitePromptUrl: String?,
     ): Cta? {
         val nonNullSite = site ?: return null
 
         val host = nonNullSite.domain
-        if (host == null || userAllowListRepository.isDomainInUserAllowList(host) || isSiteNotAllowedForOnboarding(nonNullSite)) {
+        val inContextDaxDialogsCompleted = areInContextDaxDialogsCompleted()
+        if (host == null || (!inContextDaxDialogsCompleted && userAllowListRepository.isDomainInUserAllowList(host)) ||
+            isSiteNotAllowedForOnboarding(nonNullSite)
+        ) {
             return null
         }
 
-        if (!areInContextDaxDialogsCompleted()) {
+        if (!inContextDaxDialogsCompleted) {
             nonNullSite.uri?.let { uri ->
                 if (contextualCtaSuppressorPlugins.getPlugins().any { !it.canShowCta(uri) }) {
                     return null
@@ -563,8 +573,11 @@ class CtaViewModel @Inject constructor(
                 return null
             }
 
-            if (areInContextDaxDialogsCompleted()) {
-                return if (brokenSitePrompt.shouldShowBrokenSitePrompt(nonNullSite.url, detectedRefreshPatterns)) {
+            if (inContextDaxDialogsCompleted) {
+                val promptUrl = brokenSitePromptUrl ?: return null
+                // Reports are built from Site, so reject stale state before showing the prompt.
+                if (nonNullSite.url != promptUrl) return null
+                return if (brokenSitePrompt.shouldShowBrokenSitePrompt(promptUrl, detectedRefreshPatterns)) {
                     BrokenSitePromptDialogCta()
                 } else {
                     null

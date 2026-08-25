@@ -1,8 +1,8 @@
 {
   "name": "USA People Search",
   "url": "usa-people-search.com",
-  "version": "0.8.0",
-  "parent": "peoplefinders.com",
+  "version": "0.9.0",
+  "parent": "cyberbackgroundchecks.com",
   "addedDatetime": 1678082400000,
   "optOutUrl": "https://www.usa-people-search.com/manage",
   "steps": [

@@ -46,6 +46,8 @@ import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.ui.AttachmentViewModel
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ImageAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.PageContextAttachment
+import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedFile
+import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedImage
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachmentsContainerView
 import kotlinx.coroutines.CoroutineScope
@@ -64,6 +66,7 @@ class AttachmentView(
     var onCameraCaptureRequested: ((ValueCallback<Array<Uri>>) -> Unit)? = null
     var onFilePickerRequested: ((ValueCallback<Array<Uri>>, List<String>) -> Unit)? = null
     var isContextual: Boolean = false
+    var isEditMode: Boolean = false
     var onAskAboutPage: (() -> Unit)? = null
     var onPageContextRemoved: (() -> Unit)? = null
 
@@ -108,7 +111,12 @@ class AttachmentView(
     }
 
     private fun updateButtonVisibility() {
-        val show = (supportsUpload || isContextual) && lastNativeInputState?.shouldShowPluginControls() == true
+        val show = shouldShowAttachButton(
+            supportsUpload = supportsUpload,
+            isContextual = isContextual,
+            isEditMode = isEditMode,
+            pluginControlsVisible = lastNativeInputState?.shouldShowPluginControls(isEditing = isEditMode) == true,
+        )
         isVisible = show
         (parent as? View)?.isVisible = show
     }
@@ -122,6 +130,11 @@ class AttachmentView(
     fun getFileAttachmentsJson(): JSONArray? = viewModel?.getFileAttachmentsJson()
 
     fun clearAttachments() = viewModel?.clearAttachments()
+
+    fun adoptAttachments(
+        images: List<SubmittedImage>,
+        files: List<SubmittedFile>,
+    ) = viewModel?.adopt(images, files)
 
     fun clearAttachmentsForNewChat() = viewModel?.clearAttachmentsForNewChat()
 
@@ -183,13 +196,13 @@ class AttachmentView(
         pageContextContainer = pageContext
 
         val imagesContainer = ImageAttachmentsContainerView(context).also {
-            it.onAttachmentRemoved = { id -> vm.removeImageAttachment(id) }
+            it.onAttachmentRemoved = { id -> vm.removeImageAttachment(id, isEditMode) }
         }
         row.addView(imagesContainer)
         imageAttachmentsContainer = imagesContainer
 
         val filesContainer = FileAttachmentsContainerView(context).also {
-            it.onAttachmentRemoved = { attachment -> vm.removeFileAttachment(attachment.id) }
+            it.onAttachmentRemoved = { attachment -> vm.removeFileAttachment(attachment.id, isEditMode) }
         }
         row.addView(filesContainer)
         fileAttachmentsContainer = filesContainer
@@ -210,12 +223,14 @@ class AttachmentView(
         syncImages(imagesView, state)
         syncFiles(state)
         syncPageContext(state)
-        val errorMessage =
-            state.imageLimitError
+        val errorMessage = effectiveLimitError(
+            imageLimitError = state.imageLimitError
                 ?: state.fileLimitError
                 ?: state.fileSizeError
                 ?: state.filePageCountError
-                ?: state.fileTotalSizeError
+                ?: state.fileTotalSizeError,
+            isEditMode = isEditMode,
+        )
         val notStreaming = lastNativeInputState?.isChatStreaming != true
         container.isVisible = (state.hasAttachments || errorMessage != null) && notStreaming
         updateLimitError(errorMessage)
@@ -271,7 +286,7 @@ class AttachmentView(
         updateButtonVisibility()
         host?.attachmentChanged(
             hasAttachments = state.hasAttachments,
-            limitExceeded = (
+            limitExceeded = !isEditMode && (
                 state.imageLimitError != null ||
                     state.fileLimitError != null ||
                     state.fileSizeError != null ||
@@ -401,3 +416,19 @@ class AttachmentView(
         if (!list.isNullOrEmpty()) viewModel?.onFilesPicked(list)
     }
 }
+
+internal fun shouldShowAttachButton(
+    supportsUpload: Boolean,
+    isContextual: Boolean,
+    isEditMode: Boolean,
+    pluginControlsVisible: Boolean,
+): Boolean = !isEditMode && (supportsUpload || isContextual) && pluginControlsVisible
+
+/**
+ * Adopted attachments are counted against the conversation limits, so an edit of a message already at
+ * the limit would show an error the user cannot act on. Editing only ever removes, so drop the errors.
+ */
+internal fun effectiveLimitError(
+    imageLimitError: String?,
+    isEditMode: Boolean,
+): String? = if (isEditMode) null else imageLimitError

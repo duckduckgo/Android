@@ -21,6 +21,8 @@ import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.newtabpage.api.NewTabPageShortcutPlugin
@@ -38,6 +40,7 @@ import javax.inject.Inject
 class AIChatNewTabShortcutPlugin @Inject constructor(
     private val browserNav: BrowserNav,
     private val setting: AIChatNewTabShortcutSetting,
+    private val duckChat: DuckChat,
 ) : NewTabPageShortcutPlugin {
 
     inner class AIChatShortcut() : NewTabShortcut {
@@ -51,6 +54,7 @@ class AIChatNewTabShortcutPlugin @Inject constructor(
     }
 
     override fun onClick(context: Context) {
+        duckChat.reportDuckChatEntry(DuckChatEntryPoint.ADDRESS_BAR_SHORTCUT_CHIP, opensNewTab = false, hasPrompt = false)
         context.startActivity(browserNav.openInCurrentTab(context, AI_CHAT_URL))
     }
 

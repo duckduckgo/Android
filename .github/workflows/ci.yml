@@ -7,6 +7,8 @@ on:
       - main
       - develop
   pull_request:
+  # Required by the merge queue: it validates a temporary merge-group branch and waits for the same required checks
+  merge_group:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -31,8 +33,8 @@ jobs:
           if [[ "${{ github.event_name }}" == "push" ]]; then
             echo "Direct push to branch — running checks"; echo "should_run=true" >> "$GITHUB_OUTPUT"; exit 0
           fi
-          BASE="${{ github.event.pull_request.base.sha }}"
-          HEAD="${{ github.event.pull_request.head.sha }}"
+          BASE="${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha }}"
+          HEAD="${{ github.event.pull_request.head.sha || github.event.merge_group.head_sha }}"
           if ! CHANGED=$(git diff --name-only "$BASE" "$HEAD"); then
             echo "git diff failed — running checks as fallback"
             echo "should_run=true" >> "$GITHUB_OUTPUT"
@@ -77,6 +79,39 @@ jobs:
       - name: Run Code Formatting Checks
         run: ./gradlew spotlessCheck
 
+  # Verify that source patches used for tests still apply.
+  # If the PR introduces a patch breakage, it might otherwise only surface in nightly test suites.
+  source_patches:
+    name: E2E Source Patches
+    needs: [check_changes]
+    # Not a required check, so skip it in the merge queue — it already ran on the PR.
+    if: needs.check_changes.outputs.should_run == 'true' && github.event_name != 'merge_group'
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check E2E source patches still apply
+        run: |
+          set -euo pipefail
+          shopt -s nullglob globstar
+          patches=(.maestro/**/source_patches/*.patch)
+          if [ ${#patches[@]} -eq 0 ]; then
+            echo "No E2E source patches to check."
+            exit 0
+          fi
+          failed=0
+          for patch in "${patches[@]}"; do
+            if git apply --check "$patch"; then
+              echo "OK: $patch"
+            else
+              echo "::error file=$patch::Source patch no longer applies. The code it targets changed — update the patch, or delete it along with the workflow job that uses it if the behaviour it covers has been retired."
+              failed=1
+            fi
+          done
+          exit "$failed"
+
   unit_tests:
     name: ${{ matrix.di == 'AnvilDagger' && 'Unit tests' || format('Unit tests ({0})', matrix.di) }}
     needs: [check_changes]
@@ -88,6 +123,7 @@ jobs:
     # steps skipped reports success and satisfies the required check.
     runs-on: android-large-runner
     strategy:
+      fail-fast: false
       matrix:
         di: [AnvilDagger, Metro]
     env:
@@ -115,7 +151,9 @@ jobs:
 
       - name: JVM tests
         if: needs.check_changes.outputs.should_run == 'true'
-        run: ./gradlew jvm_tests -Pddg.di=${{ matrix.di }} ${{ github.event_name != 'pull_request' && '-Dpts.enabled=false' || '' }}
+        # Predictive test selection narrows the suite to the tests a change set can affect, so it
+        # only applies to PRs and merge groups. Pushes and manual runs get the full suite.
+        run: ./gradlew jvm_tests -Pddg.di=${{ matrix.di }} -Dpts.enabled=${{ contains(fromJSON('["pull_request", "merge_group"]'), github.event_name) }}
 
       - name: Bundle the JVM checks report
         if: always() && needs.check_changes.outputs.should_run == 'true'
@@ -182,48 +220,59 @@ jobs:
 
   android_tests:
     needs: [check_changes]
-    if: needs.check_changes.outputs.should_run == 'true'
     runs-on: android-large-runner
-    name: Android CI tests
+    name: ${{ matrix.di == 'AnvilDagger' && 'Android CI tests' || format('Android CI tests ({0})', matrix.di) }}
+    strategy:
+      fail-fast: false
+      matrix:
+        di: [AnvilDagger, Metro]
     env:
       DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
 
     steps:
       - name: Checkout repository
+        if: needs.check_changes.outputs.should_run == 'true'
         uses: actions/checkout@v4
         with:
           submodules: recursive
 
       - name: Setup jq
+        if: needs.check_changes.outputs.should_run == 'true'
         uses: dcarbone/install-jq-action@v1.0.1
         with:
           force: true
 
       - name: Set up JDK version
+        if: needs.check_changes.outputs.should_run == 'true'
         uses: actions/setup-java@v4
         with:
           java-version-file: .github/.java-version
           distribution: 'adopt'
 
       - name: Set up Go
+        if: needs.check_changes.outputs.should_run == 'true'
         uses: actions/setup-go@v5
         with:
           go-version: '1.18.3'
 
       - name: Decode secret
+        if: needs.check_changes.outputs.should_run == 'true'
         env:
           FLANK: ${{ secrets.FLANK }}
         run: echo "$FLANK" > flank.json
 
       - name: Setup Gradle
+        if: needs.check_changes.outputs.should_run == 'true'
         uses: gradle/actions/setup-gradle@v5
         with:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
       - name: Build
-        run: ./gradlew androidTestsBuild
+        if: needs.check_changes.outputs.should_run == 'true'
+        run: ./gradlew androidTestsBuild -Pddg.di=${{ matrix.di }}
 
       - name: Find test APK path
+        if: needs.check_changes.outputs.should_run == 'true'
         id: find-apk
         run: |
           TEST_APK_PATH=$(find . -path '*/build/outputs/apk/play/debug/*.apk' -type f -print -quit)
@@ -231,9 +280,11 @@ jobs:
           echo "apk_path=$TEST_APK_PATH" >> "$GITHUB_OUTPUT"
 
       - name: Make script executable
+        if: needs.check_changes.outputs.should_run == 'true'
         run: chmod +x scripts/check_elf_alignment.sh
 
       - name: Check native libraries alignment
+        if: needs.check_changes.outputs.should_run == 'true'
         id: check-alignment
         continue-on-error: true
         run: ./scripts/check_elf_alignment.sh ${{ steps.find-apk.outputs.apk_path }}
@@ -247,13 +298,13 @@ jobs:
 
       - name: Run Android Tests
         if: steps.check-alignment.outcome == 'success'
-        run: ./gradlew runFlankAndroidTests --no-configuration-cache
+        run: ./gradlew runFlankAndroidTests --no-configuration-cache -Pddg.di=${{ matrix.di }}
 
       - name: Bundle the Android CI tests report
         if: |
           always() &&
           steps.check-alignment.outcome == 'success'
-        run: find . -type d -name 'fladleResults' | zip -@ -r android-tests-report.zip
+        run: find . -type d -name 'fladleResults' | zip -@ -r android-tests-report-${{ matrix.di }}.zip
 
       - name: Generate json file with failures
         if: |
@@ -274,5 +325,5 @@ jobs:
           steps.check-alignment.outcome == 'success'
         uses: actions/upload-artifact@v4
         with:
-          name: android-tests-report
-          path: android-tests-report.zip
+          name: android-tests-report-${{ matrix.di }}
+          path: android-tests-report-${{ matrix.di }}.zip

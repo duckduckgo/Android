@@ -1,8 +1,8 @@
 {
   "name": "FastPeopleSearch",
   "url": "fastpeoplesearch.com",
-  "version": "0.8.0",
-  "parent": "peoplefinders.com",
+  "version": "0.9.0",
+  "parent": "cyberbackgroundchecks.com",
   "addedDatetime": 1675317600000,
   "optOutUrl": "https://www.fastpeoplesearch.com/removal",
   "steps": [

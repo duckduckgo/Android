@@ -34,8 +34,8 @@ import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanF
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanSuccess
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted.StepStatus
-import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerStep
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.PirStageStatus
+import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.CompleteExecution
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.State
 import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.models.ExtractedProfile
@@ -57,6 +57,7 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -177,9 +178,8 @@ class BrokerStepCompletedEventHandlerTest {
         )
         val state = State(
             runType = RunType.OPTOUT,
-            brokerStepsToExecute = listOf(optOutStep),
+            brokerStep = optOutStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             currentActionIndex = 2,
             actionRetryCount = 1,
             attemptId = "attempt-123",
@@ -220,9 +220,8 @@ class BrokerStepCompletedEventHandlerTest {
         )
         val state = State(
             runType = RunType.OPTOUT,
-            brokerStepsToExecute = listOf(optOutStep),
+            brokerStep = optOutStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             currentActionIndex = 2,
             actionRetryCount = 1,
             attemptId = "attempt-123",
@@ -246,7 +245,7 @@ class BrokerStepCompletedEventHandlerTest {
     }
 
     @Test
-    fun whenNeedsEmailConfirmationTrueThenIncrementsStepIndexAndReturnsNextEvent() = runTest {
+    fun whenNeedsEmailConfirmationTrueThenResetsStateAndCompletesExecution() = runTest {
         val optOutStep = OptOutStep(
             broker = testBroker,
             step = OptOutStepActions(
@@ -258,9 +257,8 @@ class BrokerStepCompletedEventHandlerTest {
         )
         val state = State(
             runType = RunType.OPTOUT,
-            brokerStepsToExecute = listOf(optOutStep),
+            brokerStep = optOutStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             currentActionIndex = 0,
             actionRetryCount = 3,
             generatedEmailData = testGeneratedEmailData,
@@ -276,13 +274,12 @@ class BrokerStepCompletedEventHandlerTest {
 
         val result = testee.invoke(state, event)
 
-        assertEquals(1, result.nextState.currentBrokerStepIndex)
         assertEquals(0, result.nextState.actionRetryCount)
         assertNull(result.nextState.generatedEmailData)
         assertEquals(PirStage.VALIDATE, result.nextState.stageStatus.currentStage)
         assertEquals(testCurrentTimeInMillis, result.nextState.stageStatus.stageStartMs)
-        assertEquals(ExecuteNextBrokerStep, result.nextEvent)
-        assertNull(result.sideEffect)
+        assertEquals(CompleteExecution, result.sideEffect)
+        assertNull(result.nextEvent)
     }
 
     @Test
@@ -297,9 +294,8 @@ class BrokerStepCompletedEventHandlerTest {
         )
         val state = State(
             runType = RunType.MANUAL,
-            brokerStepsToExecute = listOf(scanStep),
+            brokerStep = scanStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             currentActionIndex = 2,
             brokerStepStartTime = testBrokerStartTime,
             stageStatus = PirStageStatus(
@@ -337,9 +333,8 @@ class BrokerStepCompletedEventHandlerTest {
         )
         val state = State(
             runType = RunType.SCHEDULED,
-            brokerStepsToExecute = listOf(scanStep),
+            brokerStep = scanStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             currentActionIndex = 3,
             brokerStepStartTime = testBrokerStartTime,
             stageStatus = PirStageStatus(
@@ -372,9 +367,8 @@ class BrokerStepCompletedEventHandlerTest {
         )
         val state = State(
             runType = RunType.MANUAL,
-            brokerStepsToExecute = listOf(scanStep),
+            brokerStep = scanStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             currentActionIndex = 1,
             brokerStepStartTime = testBrokerStartTime,
             stageStatus = PirStageStatus(
@@ -415,9 +409,8 @@ class BrokerStepCompletedEventHandlerTest {
         )
         val state = State(
             runType = RunType.SCHEDULED,
-            brokerStepsToExecute = listOf(scanStep),
+            brokerStep = scanStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             currentActionIndex = 0,
             brokerStepStartTime = testBrokerStartTime,
             stageStatus = PirStageStatus(
@@ -454,9 +447,8 @@ class BrokerStepCompletedEventHandlerTest {
         )
         val state = State(
             runType = RunType.OPTOUT,
-            brokerStepsToExecute = listOf(optOutStep),
+            brokerStep = optOutStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             currentActionIndex = 2,
             actionRetryCount = 0,
             attemptId = "attempt-456",
@@ -510,9 +502,8 @@ class BrokerStepCompletedEventHandlerTest {
         )
         val state = State(
             runType = RunType.OPTOUT,
-            brokerStepsToExecute = listOf(optOutStep),
+            brokerStep = optOutStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             currentActionIndex = 1,
             attemptId = "attempt-789",
             brokerStepStartTime = testBrokerStartTime,
@@ -547,9 +538,8 @@ class BrokerStepCompletedEventHandlerTest {
         )
         val state = State(
             runType = RunType.OPTOUT,
-            brokerStepsToExecute = listOf(optOutStep),
+            brokerStep = optOutStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             currentActionIndex = 1,
             attemptId = "attempt-999",
             brokerStepStartTime = testBrokerStartTime,
@@ -593,9 +583,8 @@ class BrokerStepCompletedEventHandlerTest {
         )
         val state = State(
             runType = RunType.EMAIL_CONFIRMATION,
-            brokerStepsToExecute = listOf(emailConfirmationStep),
+            brokerStep = emailConfirmationStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             currentActionIndex = 2,
             brokerStepStartTime = testBrokerStartTime,
             stageStatus = PirStageStatus(
@@ -636,9 +625,8 @@ class BrokerStepCompletedEventHandlerTest {
         )
         val state = State(
             runType = RunType.EMAIL_CONFIRMATION,
-            brokerStepsToExecute = listOf(emailConfirmationStep),
+            brokerStep = emailConfirmationStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             currentActionIndex = 0,
             brokerStepStartTime = testBrokerStartTime,
             stageStatus = PirStageStatus(
@@ -672,9 +660,8 @@ class BrokerStepCompletedEventHandlerTest {
         )
         val state = State(
             runType = RunType.MANUAL,
-            brokerStepsToExecute = listOf(scanStep),
+            brokerStep = scanStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             currentActionIndex = 1,
             actionRetryCount = 5,
             generatedEmailData = testGeneratedEmailData,
@@ -693,7 +680,6 @@ class BrokerStepCompletedEventHandlerTest {
 
         val result = testee.invoke(state, event)
 
-        assertEquals(1, result.nextState.currentBrokerStepIndex)
         assertEquals(0, result.nextState.actionRetryCount)
         assertNull(result.nextState.generatedEmailData)
         assertEquals(emptyMap<String, String>(), result.nextState.emailExtractedData)
@@ -704,7 +690,7 @@ class BrokerStepCompletedEventHandlerTest {
     }
 
     @Test
-    fun whenBrokerStepCompletedThenReturnsExecuteNextBrokerStepEvent() = runTest {
+    fun whenBrokerStepCompletedThenCompletesExecutionDirectly() = runTest {
         val scanStep = ScanStep(
             broker = testBroker,
             step = ScanStepActions(
@@ -715,9 +701,8 @@ class BrokerStepCompletedEventHandlerTest {
         )
         val state = State(
             runType = RunType.MANUAL,
-            brokerStepsToExecute = listOf(scanStep),
+            brokerStep = scanStep,
             profileQuery = testProfileQuery,
-            currentBrokerStepIndex = 0,
             currentActionIndex = 1,
             stageStatus = PirStageStatus(
                 currentStage = PirStage.OTHER,
@@ -731,7 +716,74 @@ class BrokerStepCompletedEventHandlerTest {
 
         val result = testee.invoke(state, event)
 
-        assertEquals(ExecuteNextBrokerStep, result.nextEvent)
-        assertNull(result.sideEffect)
+        assertEquals(CompleteExecution, result.sideEffect)
+        assertNull(result.nextEvent)
+    }
+
+    @Test
+    fun whenScanStepHasNoActionsAndSucceedsThenDoesNotCrashAndEmitsNoState() = runTest {
+        val scanStep = ScanStep(
+            broker = testBroker,
+            step = ScanStepActions(
+                stepType = "scan",
+                actions = emptyList(),
+                scanType = "initial",
+            ),
+        )
+        val state = State(
+            runType = RunType.MANUAL,
+            brokerStep = scanStep,
+            profileQuery = testProfileQuery,
+            currentActionIndex = 0,
+            brokerStepStartTime = testBrokerStartTime,
+            stageStatus = PirStageStatus(
+                currentStage = PirStage.OTHER,
+                stageStartMs = testStageStartMs,
+            ),
+        )
+        val event = BrokerStepCompleted(
+            needsEmailConfirmation = false,
+            stepStatus = StepStatus.Success,
+        )
+
+        val result = testee.invoke(state, event)
+
+        verify(mockPirRunStateHandler, never()).handleState(any())
+        assertEquals(CompleteExecution, result.sideEffect)
+    }
+
+    @Test
+    fun whenEmailConfirmationStepHasNoActionsAndSucceedsThenEmitsCompletedWithEmptyActionId() = runTest {
+        val emailConfirmationStep = EmailConfirmationStep(
+            broker = testBroker,
+            step = OptOutStepActions(
+                stepType = "optout",
+                actions = emptyList(),
+                optOutType = "form",
+            ),
+            emailConfirmationJob = testEmailConfirmationJob,
+            profileToOptOut = testExtractedProfile,
+        )
+        val state = State(
+            runType = RunType.EMAIL_CONFIRMATION,
+            brokerStep = emailConfirmationStep,
+            profileQuery = testProfileQuery,
+            currentActionIndex = 0,
+            brokerStepStartTime = testBrokerStartTime,
+            stageStatus = PirStageStatus(
+                currentStage = PirStage.OTHER,
+                stageStartMs = testStageStartMs,
+            ),
+        )
+        val event = BrokerStepCompleted(
+            needsEmailConfirmation = false,
+            stepStatus = StepStatus.Success,
+        )
+
+        testee.invoke(state, event)
+
+        val capturedState = argumentCaptor<BrokerRecordEmailConfirmationCompleted>()
+        verify(mockPirRunStateHandler).handleState(capturedState.capture())
+        assertEquals("", capturedState.firstValue.lastActionId)
     }
 }

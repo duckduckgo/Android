@@ -31,7 +31,6 @@ import android.view.LayoutInflater
 import android.view.View
 import androidx.core.content.ContextCompat.getString
 import androidx.core.view.isVisible
-import androidx.core.view.postDelayed
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.BottomSheetNewAddressBarPickerBinding
 import com.duckduckgo.app.onboardingquicksetup.ui.BrandDesignInputScreenPicker.Transition
@@ -73,7 +72,6 @@ class NewAddressBarPickerBottomSheetDialog(
 
     private var searchAndDuckAiSelected = true
     private var originalOrientation: Int = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-    private var leftWingRunnable: Runnable? = null
     private var contentFadeInAnimatorSet: AnimatorSet? = null
 
     init {
@@ -111,7 +109,6 @@ class NewAddressBarPickerBottomSheetDialog(
             if (!isWindowValid()) return@setOnShowListener
             (it as BottomSheetDialog).setRoundCorners()
             callback?.onDisplayed()
-            playLeftWingAnimation()
             revealContent()
         }
 
@@ -159,17 +156,6 @@ class NewAddressBarPickerBottomSheetDialog(
         }
     }
 
-    private fun playLeftWingAnimation() {
-        binding.leftWing.apply {
-            alpha = 0f
-            setMaxProgress(WING_STOP_PROGRESS)
-            leftWingRunnable = postDelayed(WING_START_DELAY) {
-                animate().alpha(1f).setDuration(WING_FADE_IN_DURATION).start()
-                playAnimation()
-            }
-        }
-    }
-
     @SuppressLint("SourceLockedOrientationActivity")
     private fun lockOrientationToPortrait() {
         (context as? Activity)?.let {
@@ -187,8 +173,6 @@ class NewAddressBarPickerBottomSheetDialog(
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         contentFadeInAnimatorSet?.cancel()
-        leftWingRunnable?.let { binding.leftWing.removeCallbacks(it) }
-        binding.leftWing.cancelAnimation()
         binding.inputScreen.inputScreenPicker.cancelLottieAnimations()
         restoreOrientation()
     }
@@ -198,9 +182,6 @@ class NewAddressBarPickerBottomSheetDialog(
     } ?: false
 
     private companion object {
-        private const val WING_STOP_PROGRESS = 0.5f
-        private const val WING_START_DELAY = 300L
-        private const val WING_FADE_IN_DURATION = 150L
         private const val CONTENT_FADE_IN_DURATION = 200L
     }
 }

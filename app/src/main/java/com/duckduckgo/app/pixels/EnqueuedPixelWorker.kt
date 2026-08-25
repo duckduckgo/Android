@@ -24,7 +24,6 @@ import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.DEFAULT_BROWSER
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.IS_DUCKDUCKGO_PACKAGE
@@ -32,6 +31,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.WEBVIEW_FULL_VE
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.WEBVIEW_VERSION
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.WebViewVersionProvider
+import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.customtabs.api.CustomTabDetector
@@ -58,6 +58,7 @@ class EnqueuedPixelWorker @Inject constructor(
     private val workManager: WorkManager,
     private val pixel: Provider<Pixel>,
     private val unsentForgetAllPixelStore: UnsentForgetAllPixelStore,
+    private val appReturnPixelSender: AppReturnPixelSender,
     private val webViewVersionProvider: WebViewVersionProvider,
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val customTabDetector: CustomTabDetector,
@@ -72,7 +73,7 @@ class EnqueuedPixelWorker @Inject constructor(
 
     override fun onCreate(owner: LifecycleOwner) {
         scheduleWorker(workManager)
-        launchedByFireAction = isLaunchByFireAction()
+        launchedByFireAction = appReturnPixelSender.isLaunchByFireAction()
     }
 
     override fun onStart(owner: LifecycleOwner) {
@@ -130,15 +131,6 @@ class EnqueuedPixelWorker @Inject constructor(
         return (applicationId == "com.duckduckgo.mobile.android" || applicationId == "com.duckduckgo.mobile.android.debug").toString()
     }
 
-    private fun isLaunchByFireAction(): Boolean {
-        val timeDifferenceMillis = System.currentTimeMillis() - unsentForgetAllPixelStore.lastClearTimestamp
-        if (timeDifferenceMillis <= APP_RESTART_CAUSED_BY_FIRE_GRACE_PERIOD) {
-            logcat(INFO) { "The app was re-launched as a result of the fire action being triggered (happened ${timeDifferenceMillis}ms ago)" }
-            return true
-        }
-        return false
-    }
-
     suspend fun submitUnsentFirePixels() {
         withContext(dispatchers.io()) {
             val pendingPixelCounts = unsentForgetAllPixelStore.pendingPixelCountsClearData
@@ -166,7 +158,6 @@ class EnqueuedPixelWorker @Inject constructor(
     }
 
     companion object {
-        private const val APP_RESTART_CAUSED_BY_FIRE_GRACE_PERIOD: Long = 10_000L
         private const val WORKER_SEND_ENQUEUED_PIXELS = "com.duckduckgo.pixels.enqueued.worker"
 
         private fun scheduleWorker(workManager: WorkManager) {

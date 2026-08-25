@@ -484,6 +484,13 @@ class NewTabReturnHatchViewModelTest {
     }
 
     @Test
+    fun whenCloseTabThenNotifiesNtpAfterIdleManager() = runTest {
+        testee.closeTab()
+
+        verify(mockNtpAfterIdleManager).onCloseTabTapped()
+    }
+
+    @Test
     fun whenBurnTabPressedAndTabRemovedFromRepositoryThenHatchHides() = runTest {
         val tab = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
         tabsFlow.value = listOf(tab)
@@ -543,6 +550,13 @@ class NewTabReturnHatchViewModelTest {
         val params = mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular")
         verify(mockPixel).fire(NewTabReturnHatchPixelName.OPTION_SELECTED_BURN_TAB, params, type = Count)
         verify(mockPixel).fire(NewTabReturnHatchPixelName.OPTION_SELECTED_BURN_TAB_DAILY, params, type = Daily())
+    }
+
+    @Test
+    fun whenOnBurnTabPressedThenNotifiesNtpAfterIdleManager() = runTest {
+        testee.onBurnTabPressed()
+
+        verify(mockNtpAfterIdleManager).onBurnTabTapped()
     }
 
     @Test

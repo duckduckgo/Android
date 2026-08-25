@@ -81,7 +81,7 @@ class Omnibar(
 
         fun onVoiceSearchPressed()
 
-        fun onDuckChatButtonPressed()
+        fun onDuckChatButtonPressed(anchor: View)
 
         fun onBackButtonPressed()
 

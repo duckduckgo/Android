@@ -142,6 +142,7 @@ constructor(
         val fetchDecryptDevicesResult: String = "",
         val canWriteUnifiedDeviceListEnabled: Boolean = false,
         val canReadUnifiedDeviceListEnabled: Boolean = false,
+        val canUsePatchEndpointForLegacyDeviceRenameEnabled: Boolean = false,
         val migrationStatusText: String = "",
         val migrationResult: String = "",
     )
@@ -336,6 +337,7 @@ constructor(
                 fetchDecryptDevicesResult = if (accountInfo.isSignedIn) viewState.value.fetchDecryptDevicesResult else "",
                 canWriteUnifiedDeviceListEnabled = syncFeature.canWriteUnifiedDeviceList().isEnabled(),
                 canReadUnifiedDeviceListEnabled = syncFeature.canReadUnifiedDeviceList().isEnabled(),
+                canUsePatchEndpointForLegacyDeviceRenameEnabled = syncFeature.canUsePatchEndpointForLegacyDeviceRename().isEnabled(),
                 migrationStatusText = buildMigrationStatusText(),
                 migrationResult = if (accountInfo.isSignedIn) viewState.value.migrationResult else "",
             ),
@@ -695,10 +697,6 @@ constructor(
                 command.send(ShowMessage("Not signed in"))
                 return@launch
             }
-            if (syncStore.accountInfoPublicKey == null) {
-                command.send(ShowMessage("No cached account_info key — tap 'Create & Register account_info Key' first"))
-                return@launch
-            }
             command.send(
                 Command.ShowRenameDeviceDialog(
                     currentName = syncDeviceIds.deviceName(),
@@ -710,7 +708,7 @@ constructor(
 
     fun onRenameDeviceConfirmed(newName: String) {
         viewModelScope.launch(dispatchers.io()) {
-            when (val result = deviceInfoUpdater.updateThisDevice(newName)) {
+            when (val result = deviceInfoUpdater.setThisDeviceName(newName)) {
                 is Success -> {
                     val text = "PATCH ok — ${result.data.size} devices_v2 returned; name set to \"$newName\""
                     logcat { "Sync-UnifiedDevices: $text" }
@@ -800,6 +798,14 @@ constructor(
         viewModelScope.launch(dispatchers.io()) {
             logcat { "Sync-UnifiedDevices: setting canReadUnifiedDeviceList flag = $enabled" }
             setRawToggleState(syncFeature.canReadUnifiedDeviceList(), enabled)
+            updateViewState()
+        }
+    }
+
+    fun onCanUsePatchEndpointForLegacyDeviceRenameFlagChanged(enabled: Boolean) {
+        viewModelScope.launch(dispatchers.io()) {
+            logcat { "Sync-UnifiedDevices: setting canUsePatchEndpointForLegacyDeviceRename flag = $enabled" }
+            setRawToggleState(syncFeature.canUsePatchEndpointForLegacyDeviceRename(), enabled)
             updateViewState()
         }
     }

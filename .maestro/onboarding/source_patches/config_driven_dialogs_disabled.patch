@@ -1,0 +1,26 @@
+Pins onboardingBrandDesignUpdate.configDrivenDialogs to FALSE so the nightly E2E suite still covers
+the legacy onboarding renderer. The config-driven renderer is now the compile-time default (TRUE), so
+every unpatched build renders it — the legacy renderer only appears when the flag is remotely
+disabled, and no unpatched binary can reproduce that. The flag is read during app launch, so only a
+compile-time change can pin it.
+
+Applied only by the "Onboarding, legacy renderer on internal" job in
+.github/workflows/e2e-nightly-non-blockers-suite.yml.
+
+This patch is meant to stop applying once the legacy renderer is deleted. CI fails loudly if the
+default changes again, and whoever changes it decides what coverage is still missing:
+
+  - legacy renderer deleted: delete this patch and the job that applies it.
+  - default moves back off TRUE: rewrite this patch to pin FALSE against the new default, or drop it
+    if an unpatched binary already covers the legacy renderer.
+
+See .claude/rules/maestro-ui-tests.md for the full mechanism.
+
+diff --git a/app/src/main/java/com/duckduckgo/app/onboardingbranddesignupdate/OnboardingBrandDesignUpdateToggles.kt b/app/src/main/java/com/duckduckgo/app/onboardingbranddesignupdate/OnboardingBrandDesignUpdateToggles.kt
+--- a/app/src/main/java/com/duckduckgo/app/onboardingbranddesignupdate/OnboardingBrandDesignUpdateToggles.kt
++++ b/app/src/main/java/com/duckduckgo/app/onboardingbranddesignupdate/OnboardingBrandDesignUpdateToggles.kt
+@@ -60,3 +60,3 @@ interface OnboardingBrandDesignUpdateToggles {
+      */
+-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
++    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+     fun configDrivenDialogs(): Toggle

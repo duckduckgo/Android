@@ -71,6 +71,8 @@ class DuckChatContentScopeJsMessageHandler @Inject constructor(
                     "showModelPicker",
                     "disableChatInput",
                     "enableChatInput",
+                    "editPrompt",
+                    "cancelEdit",
                 )
         }
 }

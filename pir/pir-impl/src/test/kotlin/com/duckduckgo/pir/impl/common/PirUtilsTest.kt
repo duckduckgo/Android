@@ -20,6 +20,7 @@ import com.duckduckgo.pir.impl.models.AddressCityState
 import com.duckduckgo.pir.impl.models.ExtractedProfile
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -27,80 +28,12 @@ import org.junit.Test
 class PirUtilsTest {
 
     @Test
-    fun whenSplitIntoPartsWithEmptyListThenReturnsEmptyList() {
-        val emptyList = emptyList<Int>()
-
-        val result = emptyList.splitIntoParts(3)
-
-        assertTrue(result.isEmpty())
-    }
-
-    @Test
-    fun whenSplitIntoPartsWithEvenDivisionThenSplitsEvenly() {
-        val list = listOf(1, 2, 3, 4, 5, 6)
-
-        val result = list.splitIntoParts(3)
-
-        assertEquals(3, result.size)
-        assertEquals(listOf(1, 2), result[0])
-        assertEquals(listOf(3, 4), result[1])
-        assertEquals(listOf(5, 6), result[2])
-    }
-
-    @Test
-    fun whenSplitIntoPartsWithUnevenDivisionThenDistributesRemainder() {
-        val list = listOf(1, 2, 3, 4, 5, 6, 7)
-
-        val result = list.splitIntoParts(3)
-
-        assertEquals(3, result.size)
-        assertEquals(listOf(1, 2, 3), result[0])
-        assertEquals(listOf(4, 5), result[1])
-        assertEquals(listOf(6, 7), result[2])
-    }
-
-    @Test
-    fun whenSplitIntoPartsWithSinglePartThenReturnsOriginalList() {
-        val list = listOf(1, 2, 3, 4, 5)
-
-        val result = list.splitIntoParts(1)
-
-        assertEquals(1, result.size)
-        assertEquals(listOf(1, 2, 3, 4, 5), result[0])
-    }
-
-    @Test
-    fun whenSplitIntoPartsWithMorePartsThanElementsThenSomePartsAreEmpty() {
-        val list = listOf(1, 2, 3)
-
-        val result = list.splitIntoParts(5)
-
-        assertEquals(5, result.size)
-        assertEquals(listOf(1), result[0])
-        assertEquals(listOf(2), result[1])
-        assertEquals(listOf(3), result[2])
-        assertEquals(emptyList<Int>(), result[3])
-        assertEquals(emptyList<Int>(), result[4])
-    }
-
-    @Test
-    fun whenSplitIntoPartsWithLargeListThenDistributesCorrectly() {
-        val list = (1..10).toList()
-
-        val result = list.splitIntoParts(3)
-
-        assertEquals(3, result.size)
-        assertEquals(listOf(1, 2, 3, 4), result[0])
-        assertEquals(listOf(5, 6, 7), result[1])
-        assertEquals(listOf(8, 9, 10), result[2])
-    }
-
-    @Test
     fun whenToParamsWithFilledProfileThenReturnsCorrectParams() {
         val profile = ExtractedProfile(
             profileQueryId = 123L,
             brokerName = "test-broker",
             name = "John Doe",
+            alternativeNames = listOf("Johnny Doe", "J Doe"),
             profileUrl = "https://example.com/profile",
             email = "john@example.com",
         )
@@ -108,6 +41,7 @@ class PirUtilsTest {
         val result = profile.toParams("John Doe")
 
         assertEquals("John Doe", result.name)
+        assertEquals(listOf("Johnny Doe", "J Doe"), result.alternativeNames)
         assertEquals("https://example.com/profile", result.profileUrl)
         assertEquals("John Doe", result.fullName)
         assertEquals("john@example.com", result.email)
@@ -501,5 +435,218 @@ class PirUtilsTest {
         val result = profile1.matches(profile2)
 
         assertTrue(result)
+    }
+
+    @Test
+    fun whenMatchesWithAddressesDifferingOnlyByExtrasThenReturnsTrue() {
+        val profile1 = ExtractedProfile(
+            profileQueryId = 123L,
+            brokerName = "test-broker",
+            name = "John Doe",
+            addresses = listOf(AddressCityState(city = "City", state = "State")),
+        )
+
+        val profile2 = ExtractedProfile(
+            profileQueryId = 456L,
+            brokerName = "test-broker",
+            name = "John Doe",
+            addresses = listOf(AddressCityState(city = "City", state = "State", extras = mapOf("zip" to "12345"))),
+        )
+
+        val result = profile1.matches(profile2)
+
+        assertTrue(result)
+    }
+
+    @Test
+    fun whenToParamsWithExtrasThenForwardsProfileAndAddressExtras() {
+        val profile = ExtractedProfile(
+            profileQueryId = 123L,
+            brokerName = "test-broker",
+            name = "John Doe",
+            age = "35",
+            addresses = listOf(
+                AddressCityState(
+                    city = "Springfield",
+                    state = "IL",
+                    fullAddress = "100 Sample Dr, Springfield, IL 62701",
+                    extras = mapOf("street" to "100 Sample Dr", "zip" to "62701"),
+                ),
+            ),
+            phoneNumbers = listOf("555-1234"),
+            relatives = listOf("Jane Doe"),
+            identifier = "id123",
+            extras = mapOf("county" to "Sangamon"),
+        )
+
+        val result = profile.toParams("John Doe")
+
+        assertEquals("35", result.age)
+        assertEquals(listOf("555-1234"), result.phoneNumbers)
+        assertEquals(listOf("Jane Doe"), result.relatives)
+        assertEquals("id123", result.identifier)
+        assertEquals(mapOf("county" to "Sangamon"), result.extras)
+        assertEquals(1, result.addresses.size)
+        assertEquals("Springfield", result.addresses[0].city)
+        assertEquals("IL", result.addresses[0].state)
+        assertEquals(mapOf("street" to "100 Sample Dr", "zip" to "62701"), result.addresses[0].extras)
+    }
+
+    @Test
+    fun whenToParamsWithoutExtrasThenSendsEmptyMaps() {
+        val profile = ExtractedProfile(
+            profileQueryId = 123L,
+            brokerName = "test-broker",
+            name = "John Doe",
+        )
+
+        val result = profile.toParams("John Doe")
+
+        assertNull(result.age)
+        assertNull(result.identifier)
+        assertTrue(result.extras.isEmpty())
+        assertTrue(result.addresses.isEmpty())
+        assertTrue(result.phoneNumbers.isEmpty())
+        assertTrue(result.relatives.isEmpty())
+    }
+
+    @Test
+    fun whenRefreshedWithThenKeepsLocallyOwnedAttributesAndTakesScrapedOnes() {
+        val stored = ExtractedProfile(
+            dbId = 42L,
+            profileQueryId = 123L,
+            brokerName = "test-broker",
+            name = "John Doe",
+            age = "35",
+            relatives = listOf("Jane Doe"),
+            dateAddedInMillis = 1000L,
+            deprecated = true,
+        )
+
+        val scraped = ExtractedProfile(
+            dbId = 0L,
+            profileQueryId = 123L,
+            brokerName = "test-broker",
+            name = "John Doe",
+            age = "36",
+            relatives = listOf("Jane Doe", "Jack Doe"),
+            dateAddedInMillis = 0L,
+            deprecated = false,
+        )
+
+        val result = stored.refreshedWith(scraped)
+
+        assertEquals(42L, result.dbId)
+        assertEquals(1000L, result.dateAddedInMillis)
+        assertTrue(result.deprecated)
+        assertEquals("36", result.age)
+        assertEquals(listOf("Jane Doe", "Jack Doe"), result.relatives)
+    }
+
+    @Test
+    fun whenRefreshedWithThenMergesProfileExtrasKeepingKeysMissingFromTheScrape() {
+        val stored = ExtractedProfile(
+            profileQueryId = 123L,
+            brokerName = "test-broker",
+            extras = mapOf("county" to "Sangamon", "middleName" to "Michael"),
+        )
+
+        val scraped = ExtractedProfile(
+            profileQueryId = 123L,
+            brokerName = "test-broker",
+            extras = mapOf("county" to "Cook"),
+        )
+
+        val result = stored.refreshedWith(scraped)
+
+        assertEquals(mapOf("county" to "Cook", "middleName" to "Michael"), result.extras)
+    }
+
+    @Test
+    fun whenRefreshedWithThenMergesExtrasOfTheAddressWithTheSameCityAndState() {
+        val stored = ExtractedProfile(
+            profileQueryId = 123L,
+            brokerName = "test-broker",
+            addresses = listOf(
+                AddressCityState(city = "Springfield", state = "IL", extras = mapOf("street" to "100 Sample Dr", "zip" to "62701")),
+                AddressCityState(city = "Boston", state = "MA", extras = mapOf("zip" to "02101")),
+            ),
+        )
+
+        val scraped = ExtractedProfile(
+            profileQueryId = 123L,
+            brokerName = "test-broker",
+            addresses = listOf(
+                AddressCityState(city = "Springfield", state = "IL", extras = mapOf("zip" to "62702")),
+            ),
+        )
+
+        val result = stored.refreshedWith(scraped)
+
+        assertEquals(1, result.addresses.size)
+        assertEquals(mapOf("street" to "100 Sample Dr", "zip" to "62702"), result.addresses[0].extras)
+    }
+
+    @Test
+    fun whenRefreshedWithNewAddressThenKeepsOnlyItsOwnExtras() {
+        val stored = ExtractedProfile(
+            profileQueryId = 123L,
+            brokerName = "test-broker",
+            addresses = listOf(AddressCityState(city = "Springfield", state = "IL", extras = mapOf("street" to "100 Sample Dr"))),
+        )
+
+        val scraped = ExtractedProfile(
+            profileQueryId = 123L,
+            brokerName = "test-broker",
+            addresses = listOf(AddressCityState(city = "Boston", state = "MA", extras = mapOf("zip" to "02101"))),
+        )
+
+        val result = stored.refreshedWith(scraped)
+
+        assertEquals(listOf(AddressCityState(city = "Boston", state = "MA", extras = mapOf("zip" to "02101"))), result.addresses)
+    }
+
+    @Test
+    fun whenToKeyAndOnlyScrapedDetailDiffersThenKeysAreEqual() {
+        val stored = ExtractedProfile(
+            profileQueryId = 123L,
+            brokerName = "test-broker",
+            name = "John Doe",
+            profileUrl = "https://example.com/profile/100",
+            identifier = "id100",
+            age = "35",
+            addresses = listOf(AddressCityState(city = "Springfield", state = "IL")),
+            alternativeNames = listOf("Johnny Doe"),
+            relatives = listOf("Jane Doe"),
+            extras = mapOf("county" to "Sangamon"),
+        )
+
+        val scraped = stored.copy(
+            dbId = 0L,
+            age = "36",
+            addresses = listOf(AddressCityState(city = "Boston", state = "MA")),
+            alternativeNames = emptyList(),
+            relatives = emptyList(),
+            extras = emptyMap(),
+        )
+
+        assertEquals(stored.toKey(), scraped.toKey())
+    }
+
+    @Test
+    fun whenToKeyAndAnIndexedFieldDiffersThenKeysAreNotEqual() {
+        val profile = ExtractedProfile(
+            profileQueryId = 123L,
+            brokerName = "test-broker",
+            name = "John Doe",
+            profileUrl = "https://example.com/profile/100",
+            identifier = "id100",
+        )
+
+        assertNotEquals(profile.toKey(), profile.copy(profileQueryId = 456L).toKey())
+        assertNotEquals(profile.toKey(), profile.copy(brokerName = "other-broker").toKey())
+        assertNotEquals(profile.toKey(), profile.copy(name = "Jane Doe").toKey())
+        assertNotEquals(profile.toKey(), profile.copy(profileUrl = "https://example.com/profile/200").toKey())
+        assertNotEquals(profile.toKey(), profile.copy(identifier = "id200").toKey())
     }
 }

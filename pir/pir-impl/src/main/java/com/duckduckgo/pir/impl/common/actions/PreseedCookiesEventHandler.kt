@@ -36,7 +36,7 @@ class PreseedCookiesEventHandler @Inject constructor() : EventHandler {
         state: State,
         event: Event,
     ): Next {
-        val currentBrokerStep = state.brokerStepsToExecute.getOrNull(state.currentBrokerStepIndex)
+        val currentBrokerStep = state.brokerStep
 
         if (currentBrokerStep == null) {
             return Next(state)

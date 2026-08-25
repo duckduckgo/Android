@@ -16,9 +16,11 @@
 
 package com.duckduckgo.duckchat.impl.ui
 
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
@@ -37,13 +39,16 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InteractionLock
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.EditPromptRequest
 import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.feature.maxUrlSuggestions
 import com.duckduckgo.duckchat.impl.helper.PendingNativeFile
 import com.duckduckgo.duckchat.impl.helper.PendingNativeImage
@@ -53,9 +58,10 @@ import com.duckduckgo.duckchat.impl.models.ReasoningResolver
 import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelPageType
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
-import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.reader.ChatSuggestionsReader
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
@@ -95,6 +101,7 @@ data class ChatTabSuggestions(
 @ContributesViewModel(ViewScope::class)
 class NativeInputModeWidgetViewModel @Inject constructor(
     private val duckChatInternal: DuckChatInternal,
+    private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     duckAiFeatureState: DuckAiFeatureState,
     subscriptions: Subscriptions,
     private val pendingNativePromptStore: PendingNativePromptStore,
@@ -104,6 +111,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     private val browserMode: BrowserMode,
     private val autoCompleteSettings: AutoCompleteSettings,
     private val duckAiChatHistoryFeature: DuckAiChatHistoryFeature,
+    private val duckChatFeature: DuckChatFeature,
     private val dispatchers: DispatcherProvider,
     private val pixel: Pixel,
     private val duckChatPixels: DuckChatPixels,
@@ -145,8 +153,15 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     private val _isHistoryAvailable = MutableStateFlow(false)
     val isHistoryAvailable: StateFlow<Boolean> = _isHistoryAvailable.asStateFlow()
 
+    private val _attachmentChangesEnabled = MutableStateFlow(false)
+    val attachmentChangesEnabled: StateFlow<Boolean> = _attachmentChangesEnabled.asStateFlow()
+
     private val currentChat = MutableStateFlow<DuckAiChat?>(null)
     private var currentChatJob: Job? = null
+
+    // Kept in sync via bindCurrentUrlSource so submission pixels can read the tab's URL
+    // synchronously — a suspend re-read at fire time would race the navigation the submission triggers.
+    private var latestTabUrl: String? = null
 
     // Defensive buffer for the (rare) case where setActiveChatId fires before configure has set
     // activeTabId. Replayed inside configure / configureContextual when activeTabId becomes known.
@@ -161,6 +176,11 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         }
         viewModelScope.launch {
             _isHistoryAvailable.value = duckChatInternal.isChatHistoryAvailable()
+        }
+        viewModelScope.launch {
+            _attachmentChangesEnabled.value = withContext(dispatchers.io()) {
+                duckChatFeature.nativeInputAttachmentChanges().isEnabled()
+            }
         }
         viewModelScope.launch {
             // FE recovery "Switch Model": enter the model-change mode, but only when the event
@@ -179,6 +199,16 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     val showModelPickerEvents: Flow<Unit> = duckChatInternal.showModelPickerEvents
         .filter { it == activeTabId.value }
         .map { }
+
+    /**
+     * Edit-screen requests for this widget's tab. Both the omnibar and the contextual sheet widget can
+     * be configured with the same tabId, so the surface has to match too or both would launch.
+     */
+    val editPromptRequests: Flow<EditPromptRequest> = duckChatInternal.editPromptRequests
+        .filter { it.tabId == activeTabId.value && it.contextual == isContextualSurface() }
+
+    private fun isContextualSurface(): Boolean =
+        widgetConfig.value.inputContext == NativeInputState.InputContext.DUCK_AI_CONTEXTUAL
 
     fun setModelPickerEnabled(enabled: Boolean) {
         _modelPickerEnabled.value = enabled
@@ -216,11 +246,20 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         return nativeInputStateProvider.stateForTab(tabId).value.selectedTool
     }
 
+    private fun currentInputState(): NativeInputState? =
+        activeTabId.value?.let { nativeInputStateProvider.stateForTab(it).value }
+
+    private fun resolvedTogglePositionIfVisible(state: NativeInputState? = currentInputState()): NativeInputState.ToggleSelection? =
+        if (state?.toggleVisible == true) duckChatInternal.resolvedTogglePosition() else null
+
     /** The pixel surface for the active tab, derived from its published input context. */
-    private fun currentSurface(): DuckChatPixelSurface {
-        val inputContext = activeTabId.value?.let { nativeInputStateProvider.stateForTab(it).value.inputContext }
-            ?: NativeInputState.InputContext.BROWSER
+    private fun currentSurface(state: NativeInputState? = currentInputState()): DuckChatPixelSurface {
+        val inputContext = state?.inputContext ?: NativeInputState.InputContext.BROWSER
         return DuckChatPixelSurface.from(inputContext)
+    }
+
+    fun fireOmnibarQuerySubmitted(query: String) {
+        duckChatPixels.fireOmnibarQuerySubmitted(query, resolvedTogglePositionIfVisible(currentInputState()))
     }
 
     /**
@@ -232,6 +271,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         hasText: Boolean,
         hasImageAttachment: Boolean,
         hasFileAttachment: Boolean,
+        addressBarEntryPoint: DuckChatEntryPoint,
     ) {
         val tool = getSelectedTool()?.let { Tool.from(it) }
         val selectedToolParam = when (tool) {
@@ -239,7 +279,8 @@ class NativeInputModeWidgetViewModel @Inject constructor(
             Tool.WEB_SEARCH -> "web_search"
             null -> "none"
         }
-        val surface = currentSurface()
+        val inputState = currentInputState()
+        val surface = currentSurface(inputState)
         duckChatPixels.firePromptSubmitted(
             selectedTool = selectedToolParam,
             modelId = getSelectedModelId(),
@@ -248,6 +289,10 @@ class NativeInputModeWidgetViewModel @Inject constructor(
             hasFileAttachment = hasFileAttachment,
             hasText = hasText,
             surface = surface,
+            defaultMode = resolvedTogglePositionIfVisible(inputState),
+            tabId = activeTabId.value,
+            pageType = resolvePageType(surface, latestTabUrl),
+            addressBarEntryPoint = addressBarEntryPoint,
         )
         when (tool) {
             Tool.IMAGE_GENERATION -> duckChatPixels.fireImageGenerationSubmitted(surface)
@@ -341,8 +386,14 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         interactionLock,
         duckAiFireButtonHighlighted,
     ) { state, chatState, chatId, lock, fireHighlighted ->
+        // chatState is a global signal, not scoped to any one tab — the edit widget has no chat of
+        // its own streaming, so it must never inherit whatever the real tab is doing. Read
+        // synchronously rather than folded into the combine's inputs, so this Flow's shape is
+        // otherwise identical to the pre-edit-mode code (a prior version spliced a derived Flow in
+        // here instead and shipped a regression in the real, non-edit composer's toggle state).
+        val isEditWidget = activeTabId.value?.startsWith(EDIT_STATE_KEY_PREFIX) == true
         state.copy(
-            isChatStreaming = chatState == ChatState.STREAMING || chatState == ChatState.LOADING,
+            isChatStreaming = !isEditWidget && (chatState == ChatState.STREAMING || chatState == ChatState.LOADING),
             chatId = chatId,
             interactionLock = lock,
             duckAiFireButtonHighlighted = fireHighlighted,
@@ -390,16 +441,14 @@ class NativeInputModeWidgetViewModel @Inject constructor(
 
     val chatSuggestionsUserEnabled: Flow<Boolean> = duckChatInternal.observeChatSuggestionsUserSettingEnabled()
 
-    val defaultTogglePosition: Flow<DefaultTogglePosition> = duckChatInternal.observeDefaultTogglePosition()
-
-    val lastUsedTogglePosition: Flow<String?> = duckChatInternal.observeLastUsedTogglePosition()
+    fun resolvedTogglePosition(): NativeInputState.ToggleSelection? = resolvedTogglePositionIfVisible()
 
     suspend fun saveLastUsedTogglePosition(position: String) {
         duckChatInternal.saveLastUsedTogglePosition(position)
     }
 
     fun openNewChat() {
-        duckChatInternal.openNewDuckChatSession()
+        duckChatInternal.openNewDuckChatSession(DuckChatEntryPoint.ADDRESS_BAR_EDITING_STATE)
     }
 
     fun setDuckAiMode(isDuckAiMode: Boolean) {
@@ -517,6 +566,22 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         }
     }
 
+    fun setActiveTabUrl(url: String?) {
+        latestTabUrl = url
+    }
+
+    /** What the user is looking at. See [DuckChatPixelParameters.PROMPT_PAGE_TYPE]. */
+    private fun resolvePageType(surface: DuckChatPixelSurface, currentUrl: String?): DuckChatPixelPageType = when (surface) {
+        DuckChatPixelSurface.DUCK_AI -> DuckChatPixelPageType.DUCK_AI
+        DuckChatPixelSurface.CONTEXTUAL_CHAT -> DuckChatPixelPageType.CONTEXTUAL
+        DuckChatPixelSurface.ADDRESS_BAR -> when {
+            currentUrl.isNullOrBlank() -> DuckChatPixelPageType.NTP
+            duckChatInternal.isDuckChatUrl(currentUrl.toUri()) -> DuckChatPixelPageType.DUCK_AI
+            duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(currentUrl) -> DuckChatPixelPageType.SERP
+            else -> DuckChatPixelPageType.WEBSITE
+        }
+    }
+
     fun storePendingPrompt(
         query: String,
         modelId: String?,
@@ -532,6 +597,20 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         activeTabId.value = tabId
         widgetConfig.update { it.copy(inputContext = NativeInputState.InputContext.DUCK_AI_CONTEXTUAL) }
         replayPendingState(tabId)
+    }
+
+    /**
+     * The edit screen hosts a second widget for a tab that already has one. Publishing under a
+     * synthetic key keeps it from overwriting the real tab's state, which nothing would repair:
+     * `state` only re-publishes when a value changes.
+     */
+    fun configureForEdit(sessionId: String) {
+        activeTabId.value = editStateKey(sessionId)
+        widgetConfig.value = WidgetConfig(
+            inputContext = NativeInputState.InputContext.DUCK_AI,
+            inputPosition = NativeInputState.InputPosition.TOP,
+            toggleSelection = NativeInputState.ToggleSelection.DUCK_AI,
+        )
     }
 
     fun cancelChatSuggestions() {
@@ -651,4 +730,9 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         } else {
             NativeInputState.InputMode.SEARCH_ONLY
         }
+
+    companion object {
+        private const val EDIT_STATE_KEY_PREFIX = "edit:"
+        fun editStateKey(sessionId: String): String = "$EDIT_STATE_KEY_PREFIX$sessionId"
+    }
 }

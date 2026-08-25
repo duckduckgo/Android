@@ -523,6 +523,10 @@
         <item name="trackTint">@color/switch_track_tint</item>
         <item name="thumbTint">@color/switch_thumb_tint</item>
         <item name="android:thumb">@drawable/switch_thumb</item>
+        <!-- The inherited Material3 tints resolve M3-only theme attributes our MaterialComponents
+             themes don't define, which makes every switch log a failed ColorStateList inflation. -->
+        <item name="thumbIconTint">@android:color/transparent</item>
+        <item name="trackDecorationTint">@android:color/transparent</item>
     </style>
 
     <!-- Slider -->

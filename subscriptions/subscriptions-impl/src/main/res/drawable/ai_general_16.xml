@@ -1,0 +1,25 @@
+<!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="16dp"
+    android:height="16dp"
+    android:viewportWidth="16"
+    android:viewportHeight="16">
+    <path
+        android:fillColor="?attr/daxColorPrimaryIcon"
+        android:pathData="M6.813,1.536C6.992,0.821 8.008,0.821 8.187,1.536L8.583,3.122C9.112,5.237 10.763,6.888 12.878,7.416L14.464,7.813C15.179,7.992 15.179,9.008 14.464,9.187L12.878,9.583L12.779,9.609C10.712,10.164 9.104,11.796 8.583,13.878L8.187,15.464L8.178,15.496C7.98,16.168 7.02,16.168 6.822,15.496L6.813,15.464L6.417,13.878C5.896,11.796 4.288,10.164 2.221,9.609L2.122,9.583L0.536,9.187C-0.179,9.008 -0.179,7.992 0.536,7.813L2.122,7.416C4.204,6.896 5.836,5.288 6.391,3.221L6.417,3.122L6.813,1.536ZM7.5,3.877C6.795,6.073 5.073,7.795 2.877,8.5C5.073,9.205 6.795,10.927 7.5,13.123C8.205,10.927 9.927,9.205 12.123,8.5C9.927,7.795 8.205,6.073 7.5,3.877ZM13.271,0.179C13.331,-0.06 13.669,-0.06 13.729,0.179L13.861,0.707C14.037,1.412 14.588,1.963 15.293,2.139L15.821,2.271C16.06,2.331 16.06,2.669 15.821,2.729L15.293,2.861L15.227,2.879C14.554,3.072 14.032,3.61 13.861,4.293L13.759,4.699L13.729,4.821L13.723,4.843C13.651,5.052 13.349,5.052 13.277,4.843L13.271,4.821L13.24,4.699L13.139,4.293C12.968,3.61 12.446,3.072 11.773,2.879L11.707,2.861L11.179,2.729C10.94,2.669 10.94,2.331 11.179,2.271L11.301,2.24L11.707,2.139C12.39,1.968 12.928,1.446 13.121,0.773L13.139,0.707L13.271,0.179Z" />
+</vector>

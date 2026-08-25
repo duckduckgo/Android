@@ -24,6 +24,12 @@
         <attr name="quickSetupRowPrimaryText" />
     </declare-styleable>
 
+    <declare-styleable name="QuickSetupTwoLineSwitchRow">
+        <attr name="quickSetupRowIcon" />
+        <attr name="quickSetupRowPrimaryText" />
+        <attr name="quickSetupRowSecondaryText" />
+    </declare-styleable>
+
     <declare-styleable name="QuickSetupEditRow">
         <attr name="quickSetupRowIcon" />
         <attr name="quickSetupRowPrimaryText" />

@@ -267,6 +267,15 @@
             app:showSwitch="true"
             app:primaryText="canReadUnifiedDeviceList" />
 
+        <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+            android:id="@+id/canUsePatchEndpointForLegacyDeviceRenameToggle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:showSwitch="true"
+            app:primaryText="canUsePatchEndpointFor\nLegacyDeviceRename"
+            app:primaryTextTruncated="false"
+        />
+
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/migrationStatusTextView"
             android:layout_width="match_parent"

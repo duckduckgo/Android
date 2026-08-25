@@ -19,12 +19,9 @@ package com.duckduckgo.app.browser.pdf
 import android.webkit.CookieManager
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.cookies.api.CookieManagerProvider
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.Toggle.State
 import okhttp3.OkHttpClient
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -46,7 +43,6 @@ class InlinePdfHandlerPreApi31Test {
     val coroutineTestRule = CoroutineTestRule()
 
     private lateinit var inlinePdfHandler: RealInlinePdfHandler
-    private val androidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
 
     private val cookieManagerProvider = object : CookieManagerProvider {
         override fun forMode(mode: BrowserMode): CookieManager? = null
@@ -60,9 +56,7 @@ class InlinePdfHandlerPreApi31Test {
             okHttpClient = OkHttpClient(),
             cookieManagerProvider = cookieManagerProvider,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
-            androidBrowserConfigFeature = androidBrowserConfigFeature,
         )
-        androidBrowserConfigFeature.pdfViewer().setRawStoredState(State(enable = true))
     }
 
     @Test

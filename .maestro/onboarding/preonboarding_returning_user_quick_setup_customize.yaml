@@ -57,6 +57,6 @@ tags:
       - assertVisible:
           id: "newTabPage"
       - assertVisible:
-          id: "toolbarContainer"
+          id: "toolbarContainer|inputModeBottomRoot"
           below:
             id: "newTabPage"

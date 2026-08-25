@@ -47,6 +47,8 @@
                 android:id="@+id/cardContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:clipChildren="false"
+                android:clipToPadding="false"
                 android:orientation="vertical"
                 android:paddingTop="28dp"
                 android:paddingBottom="20dp">
@@ -58,6 +60,15 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="20dp"
                     android:layout_marginEnd="20dp" />
+
+                <include
+                    android:id="@+id/downloadReasonContent"
+                    layout="@layout/include_brand_design_dialog_download_reason"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:visibility="gone" />
 
                 <include
                     android:id="@+id/comparisonChartContent"
@@ -121,7 +132,16 @@
                     android:layout_marginEnd="20dp"
                     android:visibility="gone" />
 
-                <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                <include
+                    android:id="@+id/preferenceSelectorContent"
+                    layout="@layout/include_brand_design_preference_selector"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:visibility="gone" />
+
+                <com.duckduckgo.common.ui.view.button.DaxButtonBrand
                     android:id="@+id/primaryCta"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -129,12 +149,9 @@
                     android:layout_marginTop="20dp"
                     android:layout_marginEnd="20dp"
                     android:alpha="0"
-                    android:includeFontPadding="false"
-                    android:paddingHorizontal="24dp"
                     android:text="@string/preOnboardingDaxDialog1ButtonBrandDesign"
-                    android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.Button"
-                    tools:alpha="1"
-                    tools:ignore="DeprecatedWidgetInXml,InvalidDaxButtonProperty" />
+                    app:daxButtonBrandTypography="duckSans"
+                    tools:alpha="1" />
 
                 <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
                     android:id="@+id/secondaryCta"
@@ -144,10 +161,11 @@
                     android:layout_marginEnd="20dp"
                     android:alpha="0"
                     android:text="@string/preOnboardingDaxDialog1SecondaryButton"
-                    android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.Button"
+                    android:textAppearance="@style/Typography.DuckDuckGo.Rebrand.ButtonDuckSans"
+                    android:theme="@style/ThemeOverlay.Rebrand"
                     android:visibility="gone"
                     tools:alpha="1"
-                    tools:ignore="DeprecatedWidgetInXml,InvalidDaxButtonProperty"
+                    tools:ignore="DeprecatedWidgetInXml,InvalidDaxButtonDuckSans,InvalidDaxButtonProperty"
                     tools:visibility="visible" />
 
             </com.duckduckgo.app.onboarding.ui.view.TouchInterceptingLinearLayout>

@@ -23,6 +23,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.annotation.ColorInt
+import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnAttach
@@ -46,18 +47,33 @@ class EdgeToEdgeHandler @Inject constructor() {
     /**
      * Pads [view]'s top (status bar + cutout) and left/right (side system bars + cutout) edges.
      *
+     * While [isFullScreen] reports true (e.g. a fullscreen video) no padding is reserved, so the content spans the
+     * whole display (including the cutout) instead of leaving a letterbox bar beside the notch. [isFullScreen] is
+     * evaluated on every inset dispatch; the caller — which owns the fullscreen state — forces a re-evaluation on
+     * entering/exiting fullscreen with [ViewCompat.requestApplyInsets].
+     *
      * @param view The view to pad, typically the screen's root.
      * @param installScrim When true (default), a status-bar scrim (see [installStatusBarScrim]) is drawn behind
      *   the transparent status bar. Pass false for screens that colour their own system bars (e.g. via SystemBarStyle).
+     * @param isFullScreen Reports whether the screen is currently in immersive fullscreen. Defaults to never; supply
+     *   it only for screens that host fullscreen video.
      */
-    fun applyStatusBarAndHorizontalInsets(view: View, installScrim: Boolean = true) {
+    fun applyStatusBarAndHorizontalInsets(
+        view: View,
+        installScrim: Boolean = true,
+        isFullScreen: () -> Boolean = { false },
+    ) {
         val initialLeft = view.paddingLeft
         val initialTop = view.paddingTop
         val initialRight = view.paddingRight
         ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
-            val windowInsets = insets.getInsets(
-                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout() or WindowInsetsCompat.Type.ime(),
-            )
+            val windowInsets = if (isFullScreen()) {
+                Insets.NONE
+            } else {
+                insets.getInsets(
+                    WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout() or WindowInsetsCompat.Type.ime(),
+                )
+            }
             v.updatePadding(
                 left = initialLeft + windowInsets.left,
                 top = initialTop + windowInsets.top,
@@ -87,6 +103,29 @@ class EdgeToEdgeHandler @Inject constructor() {
         }
         ViewCompat.requestApplyInsets(view)
         if (installScrim) installStatusBarScrim(view)
+    }
+
+    /**
+     * Adds the status-bar + cutout inset as [view]'s top margin; [view] must use [ViewGroup.MarginLayoutParams].
+     *
+     * Use instead of [applyStatusBarInsets] for a view whose background fills its whole box — a
+     * [com.google.android.material.button.MaterialButton] pill grows with padding, so only its label moves down.
+     */
+    fun applyStatusBarInsetsAsMargin(view: View) {
+        val initialTop = (view.layoutParams as? ViewGroup.MarginLayoutParams)?.topMargin ?: 0
+        view.applyInsets { insets ->
+            val top = insets.getInsets(
+                WindowInsetsCompat.Type.statusBars() or WindowInsetsCompat.Type.displayCutout(),
+            ).top
+
+            (view.layoutParams as? ViewGroup.MarginLayoutParams)?.let { lp ->
+                val newMargin = initialTop + top
+                if (lp.topMargin != newMargin) {
+                    lp.topMargin = newMargin
+                    view.requestLayout()
+                }
+            }
+        }
     }
 
     /**

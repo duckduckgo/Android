@@ -19,7 +19,9 @@ package com.duckduckgo.app.onboarding.ui.page.configdriven.engine
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
+import com.duckduckgo.app.onboarding.ui.page.OnboardingBackgroundAnimator
 import com.duckduckgo.app.onboarding.ui.page.configdriven.BindScope
+import com.duckduckgo.app.onboarding.ui.page.configdriven.CardEntry
 import com.duckduckgo.app.onboarding.ui.page.configdriven.ContentHandle
 import com.duckduckgo.app.onboarding.ui.page.configdriven.ContentInteraction
 import com.duckduckgo.app.onboarding.ui.page.configdriven.CtaAction
@@ -29,6 +31,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 class DialogRenderEngine(
     private val content: ContentController,
@@ -50,6 +54,12 @@ class DialogRenderEngine(
     private var afterFadeAnimator: Animator? = null
 
     /**
+     * The bound render's animation policy while its entrance is in flight; null once the entrance has run its
+     * course, animated, snapped or skipped, and the policy has expired.
+     */
+    private var entrancePolicy: Boolean? = null
+
+    /**
      * While set, every remaining stage runs snapped. Settling an in-flight entrance unwinds the rest of the
      * chain synchronously, and those stages must land on their end state rather than start fresh animations.
      */
@@ -67,42 +77,59 @@ class DialogRenderEngine(
      *
      * Re-rendering the [stepId] + [config] that is currently bound is a no-op, [animate] included, so a caller that can fire more
      * than once for one state does not need to de-duplicate itself.
-     *
-     * [animateBackground] splits the background off the [animate] policy, where needed.
      */
     fun render(
         stepId: LinearOnboardingStepId,
         config: DialogConfig,
         animate: Boolean,
-        animateBackground: Boolean = animate,
     ) {
         if (stepId == previousStepId && config == previous && bound != null) return
 
         val freshStage = previous == null
         skipRunningAnimations()
         unbindCurrent()
-        if (freshStage) content.resetStage()
+        if (freshStage) {
+            content.resetStage()
+            embellishments.resetStage()
+        }
 
-        background.apply(previous?.background, config.background, animateBackground)
+        background.apply(previous?.background, config.background, animate)
         stepIndicator.apply(previous?.stepIndicator, config.stepIndicator, animate)
         cardArrow.apply(previous?.cardArrow, config.cardArrow, animate)
 
         if (animate) isAnimating = true
+        entrancePolicy = animate
 
         val scope = createBindScope()
         bindScope = scope
-        val handle = content.bind(stepId, config.content, BindScope(coroutineScope = scope, execute = execute))
+        val handle = content.bind(
+            stepId,
+            config.content,
+            BindScope(coroutineScope = scope, execute = execute, animateCardBounds = ::animateCardBounds),
+        )
         bound = handle
 
+        cardStage.setPrimaryCtaEnabled(handle.primaryCtaState?.defaultValue ?: true)
+        handle.primaryCtaState?.enabled?.onEach {
+            cardStage.setPrimaryCtaEnabled(it)
+        }?.launchIn(scope)
         cardStage.showCtaButtons(config.primaryCta, config.secondaryCta) { cta -> performCta(cta.action, handle) }
+
         if (animate) cardStage.prepareEntrance(handle.fadeTargets)
 
         // Anchored before the morph below starts its transition, so the card's move to its new anchor is smooth
         val settledDecoration = embellishments.transition(previous?.embellishment, config.embellishment, animate)
         cardAnchor.apply(settledDecoration)
 
+        // A snapped background is already in place, so there is nothing for the card to wait on.
+        val revealDelayMs = if (config.cardEntry == CardEntry.AfterBackgroundTransition && animate) {
+            OnboardingBackgroundAnimator.EXIT_DURATION
+        } else {
+            0L
+        }
+
         // Every deferred stage below bails if the bound view has changed since dispatch
-        cardStage.reveal(animate) {
+        cardStage.reveal(animate, revealDelayMs) {
             if (bound !== handle) return@reveal
             cardStage.morph(animating(animate)) {
                 if (bound !== handle) return@morph
@@ -112,6 +139,7 @@ class DialogRenderEngine(
                         if (bound !== handle) return@fadeInContent
                         playAfterFade(handle, animating(animate))
                         handle.onContentReady?.invoke()
+                        entrancePolicy = null
                         isAnimating = false
                     }
                 }
@@ -154,6 +182,16 @@ class DialogRenderEngine(
     }
 
     private fun animating(animate: Boolean) = animate && !settling
+
+    /**
+     * While the entrance is running, a resize the bound screen drives follows the render's own policy, so a
+     * snapped or skipped entrance stays snapped. Once the screen is on stage, the entrance policy has expired:
+     * an interaction resizes the card the same way whether the screen animated in or was drawn in place.
+     */
+    private fun animateCardBounds(durationMs: Long) {
+        if (settling || entrancePolicy == false) return
+        cardStage.beginBoundsTransition(durationMs)
+    }
 
     private fun unbindCurrent() {
         val handle = bound ?: return

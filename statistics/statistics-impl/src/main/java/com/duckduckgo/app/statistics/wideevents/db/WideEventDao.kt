@@ -18,9 +18,11 @@ package com.duckduckgo.app.statistics.wideevents.db
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
+import java.time.LocalDate
 
 @Dao
 interface WideEventDao {
@@ -50,4 +52,10 @@ interface WideEventDao {
 
     @Query("SELECT EXISTS(SELECT 1 FROM wide_events WHERE status is not null)")
     fun hasCompletedWideEvents(): Flow<Boolean>
+
+    @Query("SELECT last_occurrence_date FROM wide_event_daily_occurrences WHERE dedup_key = :dedupKey")
+    suspend fun getLastDailyOccurrenceDate(dedupKey: String): LocalDate?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertDailyOccurrence(occurrence: WideEventDailyOccurrenceEntity)
 }

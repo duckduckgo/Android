@@ -77,7 +77,7 @@
 
     </androidx.core.widget.NestedScrollView>
 
-    <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+    <com.duckduckgo.common.ui.view.button.DaxButtonBrand
         android:id="@+id/launchSettingsButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -85,12 +85,10 @@
         android:layout_marginEnd="@dimen/keyline_5"
         android:layout_marginBottom="@dimen/keyline_1"
         android:text="@string/setAsDefaultBrowser"
-        android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.Button"
-        android:theme="@style/ThemeOverlay.DuckDuckGo.Onboarding"
+        app:daxButtonBrandTypography="duckSans"
         app:layout_constraintBottom_toTopOf="@+id/continueButton"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:ignore="InvalidDaxButtonProperty" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
         android:id="@+id/continueButton"
@@ -100,11 +98,11 @@
         android:layout_marginEnd="@dimen/keyline_5"
         android:layout_marginBottom="@dimen/keyline_5"
         android:text="@string/defaultBrowserMaybeLater"
-        android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.Button"
-        android:theme="@style/ThemeOverlay.DuckDuckGo.Onboarding"
+        android:textAppearance="@style/Typography.DuckDuckGo.Rebrand.ButtonDuckSans"
+        android:theme="@style/ThemeOverlay.Rebrand"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        tools:ignore="InvalidDaxButtonProperty" />
+        tools:ignore="InvalidDaxButtonDuckSans,InvalidDaxButtonProperty" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

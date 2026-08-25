@@ -40,8 +40,99 @@
     <string name="subscriptionExpirationReminderNotificationDescription">Try all your new premium protections before your trial ends!</string>
 
     <!-- Subscription Onboarding (English only, not translated) -->
-    <string name="subscriptionOnboardingWelcomeTitle">Welcome step</string>
-    <string name="subscriptionOnboardingWelcomeText">Welcome to the new subscription onboarding flow</string>
-    <string name="subscriptionOnboardingWelcomeContinue">Continue</string>
+    <string name="subscriptionOnboardingWelcomeTitle">Protections unlocked!</string>
+    <string name="subscriptionOnboardingWelcomeDescription">Start using your premium protections today.</string>
+    <string name="subscriptionOnboardingWelcomeBannerTitle1">Day</string>
+    <string name="subscriptionOnboardingWelcomeBannerTitle2">1</string>
+    <string name="subscriptionOnboardingWelcomeBannerTitle3">of your free trial</string>
+    <string name="subscriptionOnboardingWelcomeBannerDescription" instruction="Placeholder is the subscription start date, formatted like MMMM d, yyyy">Billing starts on %1$s</string>
+    <string name="subscriptionOnboardingWelcomePrimaryButton">Let\'s go!</string>
+    <string name="subscriptionOnboardingFeaturesTitle">Ready to activate your new protections?</string>
+    <string name="subscriptionOnboardingFeaturesDescription">Next, we\'ll get your VPN online and help you activate all your premium protections.</string>
+    <string name="subscriptionOnboardingFeature1Title">VPN</string>
+    <string name="subscriptionOnboardingFeature1Description">Get an extra layer of online protection with the VPN built for speed and simplicity.</string>
+    <string name="subscriptionOnboardingFeature2Title">Identity Theft Restoration</string>
+    <string name="subscriptionOnboardingFeature2Description">If your identity is stolen, let us handle the stress and expense to help you restore it.</string>
+    <string name="subscriptionOnboardingFeature3Title">Advanced Models in Duck.ai </string>
+    <string name="subscriptionOnboardingFeature3Description">You get advanced AI models and higher limits, all anonymized by DuckDuckGo.</string>
+    <string name="subscriptionOnboardingFeature4Title">Personal Information Removal</string>
+    <string name="subscriptionOnboardingFeature4Description">Find and remove your personal info from sites that store and sell it, reducing spam. </string>
+    <string name="subscriptionOnboardingFeaturesPrimaryButton">Next</string>
+    <!-- Feature detail screens -->
+
+    <!-- Platform labels -->
+    <string name="subscriptionOnboardingPlatformIos">iOS</string>
+    <string name="subscriptionOnboardingPlatformAndroid">Android</string>
+    <string name="subscriptionOnboardingPlatformMac">Mac</string>
+    <string name="subscriptionOnboardingPlatformWindows">Windows</string>
+
+    <!-- Feature detail: VPN -->
+    <string name="subscriptionOnboardingFeatureInfoVpnTitle">DuckDuckGo VPN</string>
+    <string name="subscriptionOnboardingFeatureInfoVpnDescription">Encrypt your connection across browsers and apps, and hide your location and IP address with a VPN built for speed and simplicity.</string>
+    <string name="subscriptionOnboardingFeatureInfoVpnItem1Title">Devices</string>
+    <string name="subscriptionOnboardingFeatureInfoVpnItem1Description">Full-device coverage on up to 5 devices at once.</string>
+    <string name="subscriptionOnboardingFeatureInfoVpnItem2Title">Strict no-logging policy</string>
+    <string name="subscriptionOnboardingFeatureInfoVpnItem2Description">We don\'t log or store data that can connect you to your online activity. And because connections are encrypted, your internet provider can\'t see your online traffic either.</string>
+    <string name="subscriptionOnboardingFeatureInfoVpnItem3Title">Easy to use</string>
+    <string name="subscriptionOnboardingFeatureInfoVpnItem3Description">No need to install a separate app. Connect in just one click in the DuckDuckGo browser and check VPN status at a glance.</string>
+    <string name="subscriptionOnboardingFeatureInfoVpnItem4Title">Full-device coverage on desktop and mobile</string>
+    <string name="subscriptionOnboardingFeatureInfoVpnItem4Description">Encrypt online traffic across browsers and apps on up to 5 devices at once.</string>
+    <string name="subscriptionOnboardingFeatureInfoVpnItem5Title">Fast and reliable</string>
+    <string name="subscriptionOnboardingFeatureInfoVpnItem5Description">With servers across the US and Europe, you get the closest connection to maximize speed and stability and can choose to connect to any of our servers worldwide.</string>
+    <string name="subscriptionOnboardingFeatureInfoVpnItem6Title">Data leak prevention</string>
+    <string name="subscriptionOnboardingFeatureInfoVpnItem6Description">Blocks all internet traffic automatically if the VPN tunnel fails, preventing accidental data leaks until the VPN tunnel is either restored or manually disabled.</string>
+    <string name="subscriptionOnboardingFeatureInfoVpnItem7Title">Secure DNS</string>
+    <string name="subscriptionOnboardingFeatureInfoVpnItem7Description">We route DNS queries through our secure VPN to stop traffic and IP address leaks to your internet provider.</string>
+    <string name="subscriptionOnboardingFeatureInfoVpnItem8Title">Always-on</string>
+    <string name="subscriptionOnboardingFeatureInfoVpnItem8Description">If your VPN connection gets interrupted, it reconnects automatically. Active by default on iOS, Mac, or Windows, or enabled in settings on Android.</string>
+    <string name="subscriptionOnboardingFeatureInfoVpnItem9Title">Secure WireGuard protocol</string>
+    <string name="subscriptionOnboardingFeatureInfoVpnItem9Description">We use the fast, secure, and open-source WireGuard protocol.</string>
+
+    <!-- Feature detail: Identity Theft Restoration -->
+    <string name="subscriptionOnboardingFeatureInfoItrTitle">Identity Theft Restoration</string>
+    <string name="subscriptionOnboardingFeatureInfoItrDescription">If your identity is stolen in the future, we\'ll help restore it. A personal case manager handles calls and paperwork so you don\'t have to.</string>
+    <string name="subscriptionOnboardingFeatureInfoItrItem1Title">Recover financial losses</string>
+    <string name="subscriptionOnboardingFeatureInfoItrItem1Description">We\'ll work with financial institutions to help reverse any fraudulent transactions, and we\'ll reimburse certain out-of-pocket expenses*** in the event that you become a victim of identity theft or fraud.</string>
+    <string name="subscriptionOnboardingFeatureInfoItrItem2Title">Fix your credit report</string>
+    <string name="subscriptionOnboardingFeatureInfoItrItem2Description">We\'ll help fix errors in your credit report that result from fraudulent activity, and assist you in freezing your credit report until your identity is restored.</string>
+    <string name="subscriptionOnboardingFeatureInfoItrItem3Title">Replace and cancel lost wallet items</string>
+    <string name="subscriptionOnboardingFeatureInfoItrItem3Description">Losing your wallet shouldn\'t be so stressful. Should you need to, we\'ll help you cancel and replace your driver\'s license, bank cards, passport, and social security card.</string>
+    <string name="subscriptionOnboardingFeatureInfoItrItem4Title">Get help from a personal case manager</string>
+    <string name="subscriptionOnboardingFeatureInfoItrItem4Description">With servers across the US and Europe, you get the closest connection to maximize speed and stability and can choose to connect to any of our servers worldwide.</string>
+    <string name="subscriptionOnboardingFeatureInfoItrItem5Title">Rapid and reliable response</string>
+    <string name="subscriptionOnboardingFeatureInfoItrItem5Description">We treat every stolen identity as an emergency. Call 24/7 to request assistance, and count on an answer from an expert advisor in less than 30 seconds.</string>
+    <string name="subscriptionOnboardingFeatureInfoItrItem6Title">Emergency cash and travel arrangements</string>
+    <string name="subscriptionOnboardingFeatureInfoItrItem6Description">If you experience identity theft away from home, get a cash advance of up to $500 to assist with emergency travel, if you\'re 100+ miles away from your primary residence.</string>
+    <string name="subscriptionOnboardingFeatureInfoItrItem7Title">Support informing the authorities</string>
+    <string name="subscriptionOnboardingFeatureInfoItrItem7Description">We\'ll help you report fraudulent activity to police and legal authorities.</string>
+    <string name="subscriptionOnboardingFeatureInfoItrItem8Title">Medical ID theft assistance</string>
+    <string name="subscriptionOnboardingFeatureInfoItrItem8Description">If fraudulent medical claims occur, we\'ll help inform healthcare and insurance providers, and help ensure medical records are corrected — with in-house medical staff if required.</string>
+    <string name="subscriptionOnboardingFeatureInfoItrLegalFooter">The Identity Expense Reimbursement and the Unauthorized Electronic Fund Transfer Reimbursement benefits are underwritten and administered by American Bankers Insurance Company of Florida, an Assurant company, under group or blanket policies issued to Generali Global Assistance, Inc., dba Iris® Powered by Generali for the benefit of its Members. Please refer to the actual policies for terms, conditions, and exclusions of coverage. Coverage may not be available in all jurisdictions. Review the Summary of Benefits.</string>
+
+    <!-- Feature detail: Duck.ai -->
+    <string name="subscriptionOnboardingFeatureInfoDuckAiTitle">Chat privately with advanced AI models</string>
+    <string name="subscriptionOnboardingFeatureInfoDuckAiDescription">Duck.ai lets you chat privately with advanced AI models, your conversations are anonymized by us and never used to train AI.</string>
+    <string name="subscriptionOnboardingFeatureInfoDuckAiItem1Title">Advanced AI models from OpenAI, Anthropic, and others</string>
+    <string name="subscriptionOnboardingFeatureInfoDuckAiItem1Description">Subscriber-exclusive GPT-5.4 and Claude Sonnet 4.6 are ideal for complex tasks like advanced coding, ideation, problem solving, and reasoning, all with greater accuracy and speed. We regularly add support for new models soon after they\'re released.</string>
+    <string name="subscriptionOnboardingFeatureInfoDuckAiItem2Title">Active Privacy Protection on every chat</string>
+    <string name="subscriptionOnboardingFeatureInfoDuckAiItem2Description">Just like the free version of Duck.ai, Active Privacy Protection keeps your conversations private and anonymous, and prevents AI companies from training their models on your chats.</string>
+    <string name="subscriptionOnboardingFeatureInfoDuckAiItem3Title">Premium AI models without a premium price</string>
+    <string name="subscriptionOnboardingFeatureInfoDuckAiItem3Description">Subscribers get multiple AI models for cheaper than the cost of subscribing to each model individually from the model providers.</string>
+    <string name="subscriptionOnboardingFeatureInfoDuckAiItem4Title">Access from any browser, on any device</string>
+    <string name="subscriptionOnboardingFeatureInfoDuckAiItem4Description">You can access Duck.ai\'s advanced AI models in any web browser by activating your subscription in Duck.ai settings. Duck.ai is also built in to the DuckDuckGo browser, giving you easy access to Duck.ai while browsing.</string>
+
+    <!-- Feature detail: Personal Information Removal -->
+    <string name="subscriptionOnboardingFeatureInfoPirTitle">Personal Information Removal</string>
+    <string name="subscriptionOnboardingFeatureInfoPirDescription">DuckDuckGo helps find and remove your personal info from data broker sites, fighting identity theft and spam.</string>
+    <string name="subscriptionOnboardingFeatureInfoPirItem1Title">Platforms</string>
+    <string name="subscriptionOnboardingFeatureInfoPirItem1Description">Personal Information Removal is only available on Mac and Windows</string>
+    <string name="subscriptionOnboardingFeatureInfoPirItem2Title">Repeatedly scans many data broker sites that sell your information</string>
+    <string name="subscriptionOnboardingFeatureInfoPirItem2Description">Find and remove your personal information from data broker sites around the web. DuckDuckGo re-scans regularly to minimize the risk of your info reappearing.</string>
+    <string name="subscriptionOnboardingFeatureInfoPirItem3Title">Your info stays on your device, not our servers</string>
+    <string name="subscriptionOnboardingFeatureInfoPirItem3Description">Unlike other services, the removal process happens entirely on your device, not remote servers — your device stores the personal information you provide during setup and initiates removal requests.</string>
+    <string name="subscriptionOnboardingFeatureInfoPirItem4Title">We automate many removals &amp; help you manually remove the rest</string>
+    <string name="subscriptionOnboardingFeatureInfoPirItem4Description">Let us help handle the time, effort, and complexity typically required to get your details removed. We scan for your info, request its removal where possible, then receive and handle confirmation emails for you.</string>
+    <string name="subscriptionOnboardingFeatureInfoPirItem5Title">Monitor removal progress in real time</string>
+    <string name="subscriptionOnboardingFeatureInfoPirItem5Description">It can take a while for sites to update, so we made it easy to keep tabs on progress of ongoing removals and see the personal info we\'ve removed in real time on your personal dashboard.</string>
 
 </resources>

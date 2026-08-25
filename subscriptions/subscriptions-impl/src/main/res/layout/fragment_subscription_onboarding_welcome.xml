@@ -16,26 +16,211 @@
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/daxColorBackground"
-    android:padding="@dimen/keyline_4">
+    android:background="?attr/daxColorSurface">
 
-    <com.duckduckgo.common.ui.view.text.DaxTextView
-        android:id="@+id/subscriptionOnboardingWelcomeText"
-        android:layout_width="match_parent"
+    <ImageView
+        android:id="@+id/subscriptionOnboardingWelcomeBackground"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="@string/subscriptionOnboardingWelcomeText"
+        android:layout_marginTop="@dimen/keyline_5"
+        android:layout_marginBottom="@dimen/keyline_5"
+        android:src="@drawable/onboarding_welcome_background"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:typography="h1" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/subscriptionOnboardingWelcomeContent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/subscriptionOnboardingWelcomeDax"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/keyline_5"
+            android:paddingBottom="@dimen/keyline_5">
+
+            <ImageView
+                android:id="@+id/subscriptionOnboardingWelcomeIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="@dimen/keyline_5"
+                android:src="@drawable/subscription_check_feature_128" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/subscriptionOnboardingWelcomeTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_5"
+                android:gravity="center"
+                android:text="@string/subscriptionOnboardingWelcomeTitle"
+                app:typography="h1" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/subscriptionOnboardingWelcomeDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_5"
+                android:gravity="center"
+                android:text="@string/subscriptionOnboardingWelcomeDescription"
+                app:typography="body1" />
+
+            <LinearLayout
+                android:id="@+id/subscriptionOnboardingWelcomeBanner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_5"
+                android:background="@drawable/background_subscription_onboarding_welcome_banner"
+                android:orientation="vertical"
+                android:padding="@dimen/keyline_5">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center">
+
+                    <com.duckduckgo.common.ui.view.text.DaxTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/keyline_1"
+                        android:text="@string/subscriptionOnboardingWelcomeBannerTitle1"
+                        app:typography="h3" />
+
+                    <com.duckduckgo.common.ui.view.text.DaxTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/keyline_1"
+                        android:text="@string/subscriptionOnboardingWelcomeBannerTitle2"
+                        app:typography="h1" />
+
+                    <com.duckduckgo.common.ui.view.text.DaxTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/subscriptionOnboardingWelcomeBannerTitle3"
+                        app:typography="h3" />
+                </LinearLayout>
+
+                <com.duckduckgo.common.ui.view.text.DaxTextView
+                    android:id="@+id/subscriptionOnboardingWelcomeBannerDescription"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    app:typography="body2"
+                    tools:text="Billing starts on May 7, 2026" />
+
+                <LinearLayout
+                    android:id="@+id/freeTrialDaysLinearLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginHorizontal="@dimen/keyline_1"
+                    android:layout_marginTop="@dimen/keyline_4"
+                    android:gravity="center">
+
+                    <com.duckduckgo.common.ui.view.text.DaxTextView
+                        android:id="@+id/freeTrialBannerDay1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        app:typography="body2_bold"
+                        tools:text="31" />
+
+                    <com.duckduckgo.common.ui.view.text.DaxTextView
+                        android:id="@+id/freeTrialBannerDay2"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        app:typography="body2_bold"
+                        tools:text="1" />
+
+                    <com.duckduckgo.common.ui.view.text.DaxTextView
+                        android:id="@+id/freeTrialBannerDay3"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        app:typography="body2_bold"
+                        tools:text="2" />
+
+                    <com.duckduckgo.common.ui.view.text.DaxTextView
+                        android:id="@+id/freeTrialBannerDay4"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        app:typography="body2_bold"
+                        tools:text="3" />
+
+                    <com.duckduckgo.common.ui.view.text.DaxTextView
+                        android:id="@+id/freeTrialBannerDay5"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        app:typography="body2_bold"
+                        tools:text="4" />
+
+                    <com.duckduckgo.common.ui.view.text.DaxTextView
+                        android:id="@+id/freeTrialBannerDay6"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        app:typography="body2_bold"
+                        tools:text="5" />
+
+                    <com.duckduckgo.common.ui.view.text.DaxTextView
+                        android:id="@+id/freeTrialBannerDay7"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        app:typography="body2_bold"
+                        tools:text="6" />
+
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/subscriptionOnboardingProgressBar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:src="@drawable/onboarding_welcome_progress_bar" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <ImageView
+        android:id="@+id/subscriptionOnboardingWelcomeDax"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/keyline_2"
+        android:src="@drawable/onboarding_dax_thumbs_up"
+        app:layout_constraintBottom_toTopOf="@id/subscriptionOnboardingWelcomePrimaryButton"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
-        android:id="@+id/subscriptionOnboardingWelcomeContinueButton"
+        android:id="@+id/subscriptionOnboardingWelcomePrimaryButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/subscriptionOnboardingWelcomeContinue"
+        android:layout_marginHorizontal="@dimen/keyline_5"
+        android:layout_marginBottom="@dimen/keyline_4"
+        android:text="@string/subscriptionOnboardingWelcomePrimaryButton"
         app:daxButtonSize="large"
         app:layout_constraintBottom_toBottomOf="parent" />
 

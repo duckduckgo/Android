@@ -178,6 +178,7 @@ import com.duckduckgo.app.browser.commands.Command.WebViewCompatWebShareRequest
 import com.duckduckgo.app.browser.commands.Command.WebViewError
 import com.duckduckgo.app.browser.commands.NavigationCommand
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
+import com.duckduckgo.app.browser.customtabs.CustomTabsFeature
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_PAGE_FEATURE_NAME
@@ -220,6 +221,7 @@ import com.duckduckgo.app.browser.pdf.PdfPixelName
 import com.duckduckgo.app.browser.pdf.PdfRenderDecision
 import com.duckduckgo.app.browser.progressbar.ProgressBarUpgradeFeature
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
+import com.duckduckgo.app.browser.returnsession.ReturnSessionLandingListener
 import com.duckduckgo.app.browser.santize.NonHttpAppLinkChecker
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabs.TabManager
@@ -297,7 +299,6 @@ import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_SEARCH_CUSTOM
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_VISIT_SITE_CUSTOM
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_CLICKED_DAILY
 import com.duckduckgo.app.pixels.duckchat.createWasUsedBeforePixelParams
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -342,6 +343,7 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_TH
 import com.duckduckgo.browser.api.brokensite.BrokenSiteReportTriggerPlugin
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
+import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.browser.ui.autocomplete.AutocompleteHistoryDeleteFeature
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
 import com.duckduckgo.browsermode.api.BrowserMode
@@ -374,6 +376,9 @@ import com.duckduckgo.downloads.store.DownloadStatus
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
+import com.duckduckgo.duckchat.api.DuckChatInputModeState
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.contextual.PageContextJSHelper
 import com.duckduckgo.duckchat.impl.contextual.RealPageContextJSHelper.Companion.PAGE_CONTEXT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
@@ -525,6 +530,7 @@ class BrowserTabViewModel @Inject constructor(
     private val sitePermissionsManager: SitePermissionsManager,
     private val cameraHardwareChecker: CameraHardwareChecker,
     private val androidBrowserConfig: AndroidBrowserConfigFeature,
+    private val customTabsFeature: CustomTabsFeature,
     private val faviconsFetchingPrompt: FaviconsFetchingPrompt,
     private val subscriptions: Subscriptions,
     private val sslCertificatesFeature: SSLCertificatesFeature,
@@ -537,6 +543,7 @@ class BrowserTabViewModel @Inject constructor(
     private val duckChat: DuckChat,
     private val duckAiHostProvider: DuckAiHostProvider,
     private val duckAiFeatureState: DuckAiFeatureState,
+    private val duckChatInputModeState: DuckChatInputModeState,
     private val duckPlayerJSHelper: DuckPlayerJSHelper,
     private val refreshPixelSender: RefreshPixelSender,
     private val privacyProtectionTogglePlugin: PluginPoint<PrivacyProtectionTogglePlugin>,
@@ -573,6 +580,7 @@ class BrowserTabViewModel @Inject constructor(
     private val progressBarUpgradeFeature: ProgressBarUpgradeFeature,
     private val faviconFetchingFixFeature: FaviconFetchingFixFeature,
     private val ntpAfterIdleManager: NtpAfterIdleManager,
+    private val returnSessionLandingListener: ReturnSessionLandingListener,
     private val browserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin>,
     private val browserRefreshTriggerPlugins: PluginPoint<BrowserRefreshTriggerPlugin>,
     private val brokenSiteReportTriggerPlugins: PluginPoint<BrokenSiteReportTriggerPlugin>,
@@ -620,7 +628,6 @@ class BrowserTabViewModel @Inject constructor(
     val ctaViewState: MutableLiveData<CtaViewState> = MutableLiveData()
     var siteLiveData: MutableLiveData<Site> = MutableLiveData()
     val privacyShieldViewState: MutableLiveData<PrivacyShieldViewState> = MutableLiveData()
-    val buckTryASearchAnimationEnabled: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val areFavoritesDisplayed =
         savedSitesRepository
             .getFavorites()
@@ -645,6 +652,12 @@ class BrowserTabViewModel @Inject constructor(
 
     private val _subscriptionEventDataChannel = Channel<SubscriptionEventData>(capacity = Channel.BUFFERED)
     val subscriptionEventDataFlow: Flow<SubscriptionEventData> = _subscriptionEventDataChannel.receiveAsFlow()
+
+    // DuckChat replies can be held open for a long time (the edit screen suspends this reply until the
+    // user submits or cancels) while the fragment is stopped, so this can't share the single-slot
+    // command LiveData: a command set while stopped would overwrite the pending reply and lose it.
+    private val _duckChatJsResponseChannel = Channel<JsCallbackData>(capacity = Channel.BUFFERED)
+    val duckChatJsResponseFlow: Flow<JsCallbackData> = _duckChatJsResponseChannel.receiveAsFlow()
 
     data class HiddenBookmarksIds(
         val favorites: List<String> = emptyList(),
@@ -770,9 +783,11 @@ class BrowserTabViewModel @Inject constructor(
     private var refreshTriggerJob: Job? = null
     private var brokenSiteReportTriggerJob: Job? = null
 
-    /** Non-null while this tab is displayed inside a Custom Tab. Captures the verified
-     * calling package (when known) used by [handleAppLink]'s trusted-caller carve-out. */
-    private data class CustomTabContext(val clientPackage: String?)
+    /** Non-null while this tab is displayed inside a Custom Tab. [clientPackage] is the verified
+     * calling package (when known), used by [handleAppLink]'s trusted-caller launch carve-out.
+     * [referrerPackage] is the best-effort, non-verified android-app:// referrer, used only for the
+     * prompt-skip decision in [appLinkClicked], never the launch carve-out. */
+    private data class CustomTabContext(val clientPackage: String?, val referrerPackage: String?)
     private var customTab: CustomTabContext? = null
 
     private var alreadyShownKeyboard: Boolean = false
@@ -1016,8 +1031,8 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun setIsCustomTab(isCustomTab: Boolean, clientPackage: String? = null) {
-        this.customTab = if (isCustomTab) CustomTabContext(clientPackage) else null
+    fun setIsCustomTab(isCustomTab: Boolean, clientPackage: String? = null, referrerPackage: String? = null) {
+        this.customTab = if (isCustomTab) CustomTabContext(clientPackage, referrerPackage) else null
     }
 
     fun onViewReady() {
@@ -1276,7 +1291,7 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun onViewVisible() {
+    fun onViewVisible(reportLandingFocus: Boolean = true) {
         newTabPageModalPresenterRegistry.register(this)
         setAdClickActiveTabData(url)
 
@@ -1284,7 +1299,7 @@ class BrowserTabViewModel @Inject constructor(
         if (!currentBrowserViewState().browserShowing && !currentBrowserViewState().maliciousSiteBlocked) {
             viewModelScope.launch {
                 val cta = refreshCta()
-                showOrHideKeyboard(cta)
+                showOrHideKeyboard(cta, reportLandingFocus)
                 if (cta == null) {
                     newTabPageModalTrigger.onNewTabPageShown()
                 }
@@ -1434,11 +1449,23 @@ class BrowserTabViewModel @Inject constructor(
         query: String,
         queryOrigin: QueryOrigin = QueryOrigin.FromUser,
     ) {
+        submitQuery(query, queryOrigin, QuerySubmissionSource.USER)
+    }
+
+    private fun submitQuery(
+        query: String,
+        queryOrigin: QueryOrigin,
+        submissionSource: QuerySubmissionSource,
+    ) {
         logcat { "onUserSubmittedQuery $query" }
         navigationAwareLoginDetector.onEvent(NavigationEvent.UserAction.NewQuerySubmitted)
 
         if (query.isBlank()) {
             return
+        }
+
+        if (submissionSource == QuerySubmissionSource.USER) {
+            notifySpecificSubmission(query, queryOrigin)
         }
 
         val layoutState = currentGlobalLayoutState()
@@ -1509,7 +1536,9 @@ class BrowserTabViewModel @Inject constructor(
         val verticalParameter = extractVerticalParameter(url)
         var urlToNavigate = queryUrlConverter.convertQueryToUrl(trimmedInput, verticalParameter, queryOrigin)
 
-        if (queryOrigin is QueryOrigin.FromUser && isTypedDuckAiUrl(urlToNavigate)) {
+        val isDuckAiDirectNavigation =
+            submissionSource == QuerySubmissionSource.USER && queryOrigin is QueryOrigin.FromUser && isTypedDuckAiUrl(urlToNavigate)
+        if (isDuckAiDirectNavigation) {
             fireDuckAiDirectNavigationPixel()
         }
 
@@ -1539,6 +1568,13 @@ class BrowserTabViewModel @Inject constructor(
             }
 
             else -> {
+                if (isDuckAiDirectNavigation) {
+                    duckChat.reportDuckChatEntry(
+                        DuckChatEntryPoint.DIRECT_URL,
+                        opensNewTab = false,
+                        hasPrompt = hasAutoSubmittedPrompt(urlToNavigate),
+                    )
+                }
                 if (type is SpecialUrlDetector.UrlType.ExtractedAmpLink) {
                     logcat { "AMP link detection: Using extracted URL: ${type.extractedUrl}" }
                     urlToNavigate = type.extractedUrl
@@ -1595,14 +1631,44 @@ class BrowserTabViewModel @Inject constructor(
             currentAutoCompleteViewState().copy(showSuggestions = false, showFocusedView = false, searchResults = AutoCompleteResult("", emptyList()))
     }
 
+    private fun notifySpecificSubmission(
+        query: String,
+        queryOrigin: QueryOrigin,
+    ) {
+        val isUrlSubmission = when (queryOrigin) {
+            QueryOrigin.FromBookmark -> true
+            is FromAutocomplete -> queryOrigin.isNav ?: queryUrlPredictor.isUrl(query.trim())
+            QueryOrigin.FromUser -> queryUrlPredictor.isUrl(query.trim())
+        }
+        if (isUrlSubmission) {
+            browserInteractionsPlugins.getPlugins().forEach { it.onUrlSubmitted() }
+        } else {
+            browserInteractionsPlugins.getPlugins().forEach { it.onSearchSubmitted() }
+        }
+    }
+
+    private enum class QuerySubmissionSource {
+        USER,
+        INTERNAL_NAVIGATION,
+    }
+
     private fun isTypedDuckAiUrl(url: String): Boolean {
         val host = runCatching { url.toUri().host }.getOrNull()?.lowercase() ?: return false
         val duckAiHost = duckAiHostProvider.getHost().lowercase()
         return host == duckAiHost || host == "www.$duckAiHost"
     }
 
+    private fun hasAutoSubmittedPrompt(url: String): Boolean = runCatching {
+        val uri = url.toUri()
+        uri.getQueryParameter("prompt") == "1" && !uri.getQueryParameter(QUERY).isNullOrBlank()
+    }.getOrDefault(false)
+
     private fun fireDuckAiDirectNavigationPixel() {
-        val params = mapOf("duck_ai_enabled" to duckChat.isEnabled().toString())
+        val inputScreenEnabled = duckChatInputModeState.inputModeCapability.value == NativeInputState.InputMode.SEARCH_AND_DUCK_AI
+        val params = mapOf(
+            "duck_ai_enabled" to duckChat.isEnabled().toString(),
+            "input_screen_enabled" to inputScreenEnabled.toString(),
+        )
         pixel.fire(AppPixelName.AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_COUNT, parameters = params)
         pixel.fire(AppPixelName.AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_DAILY, parameters = params, type = Daily())
     }
@@ -1817,7 +1883,8 @@ class BrowserTabViewModel @Inject constructor(
 
         if (triggeredByUser) {
             site?.realBrokenSiteContext?.onUserTriggeredRefresh()
-            site?.uri?.let {
+            val refreshedUrl = webNavigationState?.currentUrl?.toUri() ?: site?.uri
+            refreshedUrl?.let {
                 brokenSitePrompt.pageRefreshed(it)
             }
         }
@@ -1863,6 +1930,10 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun isOmnibarLockedForOnboarding(): Boolean = currentBrowserViewState().isOmnibarLockedForOnboarding
+
+    fun onBackInteraction() {
+        browserInteractionsPlugins.getPlugins().forEach { it.onBackPressed() }
+    }
 
     /**
      * Handles back navigation. Returns false if navigation could not be
@@ -3593,7 +3664,7 @@ class BrowserTabViewModel @Inject constructor(
             val fallbackUrl = lastUrl.ifBlank { url ?: "" }
             if (fallbackUrl.isNotBlank()) {
                 logcat(WARN) { "Restoring last url but page history has been lost - url=[$fallbackUrl]" }
-                onUserSubmittedQuery(fallbackUrl)
+                submitQuery(fallbackUrl, QueryOrigin.FromUser, QuerySubmissionSource.INTERNAL_NAVIGATION)
             }
         }
     }
@@ -3697,14 +3768,17 @@ class BrowserTabViewModel @Inject constructor(
             if (hasCtaBeenShownForCurrentPage.get() && isBrowserShowing) return null
             val detectedRefreshPatterns = brokenSitePrompt.getUserRefreshPatterns()
             handleBreakageRefreshPatterns(detectedRefreshPatterns)
+            val currentSite = siteLiveData.value
+            val currentNavigationUrl = webNavigationState?.currentUrl
             val cta =
                 withContext(dispatchers.io()) {
                     ctaViewModel.refreshCta(
                         dispatchers.io(),
                         isBrowserShowing && !isErrorShowing,
-                        siteLiveData.value,
+                        currentSite,
                         detectedRefreshPatterns,
                         suppressDuckAiOnboardingCta,
+                        brokenSitePromptUrl = currentNavigationUrl,
                     )
                 }
             val contextDaxDialogsShown =
@@ -3756,21 +3830,23 @@ class BrowserTabViewModel @Inject constructor(
     private fun canShowPromo(): Boolean =
         currentGlobalLayoutState() is Browser && !currentBrowserViewState().maliciousSiteBlocked
 
-    private fun showOrHideKeyboard(cta: Cta?) {
-        // we hide the keyboard when showing a DialogCta and HomeCta type in the home screen otherwise we show it
-        val shouldHideKeyboard =
-            cta is HomePanelCta || cta is DaxBubbleCta.DaxSubscriptionCta ||
-                cta is DaxSubscriptionBrandDesignUpdateBubbleCta || cta is SubscriptionPromoModalCta ||
-                duckAiFeatureState.showInputScreen.value || currentBrowserViewState().lastQueryOrigin == QueryOrigin.FromBookmark ||
-                (settingsDataStore.omnibarType == OmnibarType.SPLIT && alreadyShownKeyboard)
+    private fun showOrHideKeyboard(cta: Cta?, reportLandingFocus: Boolean = true) {
+        val shouldHideKeyboard = cta?.shouldDropAddressBarFocusWhenShown() == true ||
+            duckAiFeatureState.showInputScreen.value ||
+            currentBrowserViewState().lastQueryOrigin == QueryOrigin.FromBookmark ||
+            (settingsDataStore.omnibarType == OmnibarType.SPLIT && alreadyShownKeyboard)
 
         logcat { "shouldHideKeyboard: $shouldHideKeyboard" }
 
-        command.value = if (shouldHideKeyboard) {
-            Command.DropAddressBarFocus
-        } else {
+        val focused = !shouldHideKeyboard
+        command.value = if (focused) {
             alreadyShownKeyboard = true
             ShowKeyboard
+        } else {
+            Command.DropAddressBarFocus
+        }
+        if (reportLandingFocus) {
+            returnSessionLandingListener.onLandingFocusCaptured(focused)
         }
     }
 
@@ -3807,6 +3883,15 @@ class BrowserTabViewModel @Inject constructor(
             ctaViewModel.onUserDismissedCta(cta)
             if (cta is BrokenSitePromptDialogCta) {
                 onBrokenSiteCtaDismissButtonClicked(cta)
+            }
+
+            if (cta is DaxEndBrandDesignUpdateBubbleCta) {
+                val updatedCta = refreshCta()
+                if (updatedCta != null) {
+                    showOrHideKeyboard(updatedCta)
+                } else {
+                    command.value = HideOnboardingDaxBubbleCta(cta)
+                }
             }
         }
     }
@@ -3900,11 +3985,21 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun appLinkClicked(appLink: AppLink) {
-        command.value = when {
-            // When in custom tab, always open the app link directly, without prompting.
-            customTab != null -> OpenAppLink(appLink)
-            appSettingsPreferencesStore.showAppLinksPrompt -> ShowAppLinkPrompt(appLink)
-            else -> OpenAppLink(appLink)
+        val inCustomTab = customTab != null
+        val callerPackage = customTab?.clientPackage ?: customTab?.referrerPackage
+        when {
+            inCustomTab && !customTabsFeature.handleTrustedCallers().isEnabled() -> command.value = OpenAppLink(appLink)
+            inCustomTab && appLinksHandler.isTrustedCaller(appLink, callerPackage) -> {
+                // The handoff opens another app, leaving a stale custom tab behind; close it, but only once
+                // the app has actually launched, so a failed launch doesn't strand the user on a closed tab.
+                command.value = OpenAppLink(
+                    appLink,
+                    finishCustomTabOnLaunch = customTabsFeature.closeTabAfterTrustedCallerNavigation().isEnabled(),
+                )
+            }
+            inCustomTab && appLinksHandler.isAlwaysTriggerDomain(appLink) -> command.value = OpenAppLink(appLink)
+            appSettingsPreferencesStore.showAppLinksPrompt -> command.value = ShowAppLinkPrompt(appLink)
+            else -> command.value = OpenAppLink(appLink)
         }
         appLinksHandler.setUserQueryState(false)
     }
@@ -3963,9 +4058,9 @@ class BrowserTabViewModel @Inject constructor(
     private fun openDuckChatForUrl(uri: Uri) {
         val queryParameter = uri.getQueryParameter(QUERY)
         if (queryParameter != null) {
-            duckChat.openDuckChatWithPrefill(queryParameter)
+            duckChat.openDuckChatWithPrefill(queryParameter, DuckChatEntryPoint.DIRECT_URL)
         } else {
-            duckChat.openDuckChat()
+            duckChat.openDuckChat(DuckChatEntryPoint.DIRECT_URL)
         }
     }
 
@@ -4095,7 +4190,10 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun showErrorWithAction(errorMessage: Int = R.string.crashedWebViewErrorMessage) {
-        command.value = ShowErrorWithAction(errorMessage) { this.onUserSubmittedQuery(url.orEmpty()) }
+        command.value =
+            ShowErrorWithAction(errorMessage) {
+                submitQuery(url.orEmpty(), QueryOrigin.FromUser, QuerySubmissionSource.INTERNAL_NAVIGATION)
+            }
     }
 
     private fun recoverTabWithQuery(query: String) {
@@ -4982,7 +5080,10 @@ class BrowserTabViewModel @Inject constructor(
                     )
                     withContext(dispatchers.main()) {
                         response?.let {
-                            command.value = SendResponseToJs(it)
+                            // Not command.value: this reply can be held open for minutes (the edit
+                            // screen) while the fragment is stopped, and the single-slot LiveData
+                            // would drop it if any other command is set in the meantime.
+                            _duckChatJsResponseChannel.send(it)
                         }
                         if (method == "responseReceived") {
                             unblockDuckAiOnboardingCta()
@@ -5327,6 +5428,12 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun onDaxBubbleCtaOkButtonClicked(cta: DaxBubbleCta) {
         onUserDismissedCta(cta)
+        val refresh: () -> Unit = {
+            viewModelScope.launch {
+                val updatedCta = refreshCta()
+                showOrHideKeyboard(updatedCta)
+            }
+        }
         when (cta) {
             is DaxBubbleCta.DaxSubscriptionCta,
             is DaxSubscriptionBrandDesignUpdateBubbleCta,
@@ -5344,14 +5451,21 @@ class BrowserTabViewModel @Inject constructor(
                 }
             }
             is DaxBubbleCta.DaxEndCta,
-            is DaxEndBrandDesignUpdateBubbleCta,
             is DaxDuckAiEndBubbleCta,
             is DaxDuckAiEndBrandDesignUpdateBubbleCta,
             -> {
-                viewModelScope.launch {
-                    val updatedCta = refreshCta()
-                    ctaViewState.value = currentCtaViewState().copy(cta = updatedCta)
-                    showOrHideKeyboard(updatedCta)
+                refresh()
+            }
+            is DaxEndBrandDesignUpdateBubbleCta -> {
+                if (cta.isSegmentedSearchPathWithToggleEnabled) {
+                    viewModelScope.launch {
+                        ctaViewState.value = currentCtaViewState().copy(cta = null)
+                        command.value = HideOnboardingDaxBubbleCta(cta)
+                        customAiOnboardingStore.setOpenInputOnDuckAiTab()
+                        command.value = ShowKeyboard
+                    }
+                } else {
+                    refresh()
                 }
             }
             else -> { }
@@ -5533,7 +5647,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun onUserTappedDuckAiPromptAutocomplete(prompt: String) {
-        openDuckAiQuery(prompt, autoPrompt = true)
+        openDuckAiQuery(prompt, autoPrompt = true, entryPoint = DuckChatEntryPoint.SUGGESTION_ASK_AI)
 
         viewModelScope.launch {
             val params = duckChat.createWasUsedBeforePixelParams()
@@ -5547,9 +5661,22 @@ class BrowserTabViewModel @Inject constructor(
      * selected. The query opens in a new tab so the current tab is preserved; on the NTP we
      * reuse the empty tab instead of spawning another.
      */
-    fun openDuckAiQuery(query: String, autoPrompt: Boolean) {
+    fun openDuckAiQuery(
+        query: String,
+        autoPrompt: Boolean,
+        entryPoint: DuckChatEntryPoint,
+    ) {
+        val duckAiUrl = duckChat.getDuckChatUrl(query, autoPrompt)
+        val hasPrompt = hasAutoSubmittedPrompt(duckAiUrl)
         browserInteractionsPlugins.getPlugins().forEach { it.onInputSubmitted() }
-        navigateToDuckAi(duckChat.getDuckChatUrl(query, autoPrompt))
+        if (hasPrompt) {
+            browserInteractionsPlugins.getPlugins().forEach { it.onAiPromptSubmitted() }
+        }
+        navigateToDuckAi(
+            url = duckAiUrl,
+            entryPoint = entryPoint,
+            hasPrompt = hasPrompt,
+        )
     }
 
     /**
@@ -5559,13 +5686,29 @@ class BrowserTabViewModel @Inject constructor(
      */
     fun openDuckAiChatById(chatUrl: String) {
         browserInteractionsPlugins.getPlugins().forEach { it.onChatSelected() }
-        navigateToDuckAi(chatUrl)
+        navigateToDuckAi(chatUrl, DuckChatEntryPoint.CHAT_HISTORY_OPEN_CHAT, hasPrompt = false)
     }
 
-    private fun navigateToDuckAi(url: String) {
-        if (!currentBrowserViewState().browserShowing) {
-            // On NTP: reuse this tab — don't spawn another empty one.
-            onUserSubmittedQuery(url)
+    /**
+     * Entry point for a prompt submitted from within an already-open Duck.ai chat (a follow-up
+     * message, not the initial one that opened the chat).
+     */
+    fun onDuckAiChatPromptSubmitted() {
+        // onInputSubmitted() too: an in-chat follow-up is still "the bar was used" for the old
+        // post-idle-session event, which only listens for that generic signal.
+        browserInteractionsPlugins.getPlugins().forEach { it.onInputSubmitted() }
+        browserInteractionsPlugins.getPlugins().forEach { it.onAiPromptSubmitted() }
+    }
+
+    private fun navigateToDuckAi(
+        url: String,
+        entryPoint: DuckChatEntryPoint,
+        hasPrompt: Boolean,
+    ) {
+        val opensNewTab = currentBrowserViewState().browserShowing
+        duckChat.reportDuckChatEntry(entryPoint, opensNewTab = opensNewTab, hasPrompt = hasPrompt)
+        if (!opensNewTab) {
+            submitQuery(url, QueryOrigin.FromUser, QuerySubmissionSource.INTERNAL_NAVIGATION)
         } else {
             command.value = OpenInNewTab(query = url, sourceTabId = tabId)
         }
@@ -5580,6 +5723,12 @@ class BrowserTabViewModel @Inject constructor(
             }
         } else {
             val url = duckChat.getDuckChatUrl("", false)
+            val entryPoint = if (viewMode == ViewMode.NewTab) {
+                DuckChatEntryPoint.BROWSING_MENU_NTP
+            } else {
+                DuckChatEntryPoint.BROWSING_MENU_WEBPAGE
+            }
+            duckChat.reportDuckChatEntry(entryPoint, opensNewTab = true, hasPrompt = false)
             command.value = OpenInNewTab(url, tabId)
             pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_NEW_CHAT_TAB_TAPPED)
         }
@@ -5638,10 +5787,6 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun openDuckAIContextualMode() {
-        command.value = Command.ShowDuckAIContextualMode(tabId)
-    }
-
     fun onDuckChatOmnibarButtonClicked(
         query: String?,
         hasFocus: Boolean,
@@ -5665,13 +5810,26 @@ class BrowserTabViewModel @Inject constructor(
             }
 
             else -> {
-                val url = when {
-                    hasFocus && isNtp && query.isNullOrBlank() -> duckChat.getDuckChatUrl(query ?: "", false)
-                    hasFocus && queryUrlPredictor.isUrl(query ?: "") -> query ?: ""
-                    hasFocus -> duckChat.getDuckChatUrl(query ?: "", true)
-                    else -> duckChat.getDuckChatUrl(query ?: "", false)
+                val (url, submittedAiPrompt) = when {
+                    hasFocus && isNtp && query.isNullOrBlank() -> duckChat.getDuckChatUrl(query ?: "", false) to false
+                    hasFocus && queryUrlPredictor.isUrl(query ?: "") -> (query ?: "") to false
+                    hasFocus -> duckChat.getDuckChatUrl(query ?: "", true) to !query.isNullOrBlank()
+                    else -> duckChat.getDuckChatUrl(query ?: "", false) to false
                 }
-                onUserSubmittedQuery(url)
+                if (duckChat.isDuckChatUrl(url.toUri())) {
+                    if (submittedAiPrompt) {
+                        browserInteractionsPlugins.getPlugins().forEach { it.onAiPromptSubmitted() }
+                    }
+                    duckChat.reportDuckChatEntry(
+                        DuckChatEntryPoint.ADDRESS_BAR_ICON,
+                        opensNewTab = false,
+                        hasPrompt = submittedAiPrompt,
+                    )
+                    submitQuery(url, QueryOrigin.FromUser, QuerySubmissionSource.INTERNAL_NAVIGATION)
+                } else {
+                    // The typed-URL branch above: genuinely a URL submission, not a Duck.ai one.
+                    onUserSubmittedQuery(url)
+                }
             }
         }
     }

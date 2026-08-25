@@ -314,6 +314,7 @@ class OnboardingDaxDialogTests {
             isBrowserShowing = false,
             site = null,
             detectedRefreshPatterns = emptySet(),
+            brokenSitePromptUrl = null,
         )
 
         assertFalse(result is SubscriptionPromoModalCta)
@@ -332,6 +333,7 @@ class OnboardingDaxDialogTests {
             isBrowserShowing = false,
             site = null,
             detectedRefreshPatterns = emptySet(),
+            brokenSitePromptUrl = null,
         )
 
         assertFalse(result is SubscriptionPromoModalCta)
@@ -351,6 +353,7 @@ class OnboardingDaxDialogTests {
             isBrowserShowing = false,
             site = null,
             detectedRefreshPatterns = emptySet(),
+            brokenSitePromptUrl = null,
         )
 
         assertFalse(result is SubscriptionPromoModalCta)
@@ -367,6 +370,7 @@ class OnboardingDaxDialogTests {
             isBrowserShowing = true,
             site = site,
             detectedRefreshPatterns = emptySet(),
+            brokenSitePromptUrl = null,
         )
 
         assertNull(result)
@@ -383,6 +387,7 @@ class OnboardingDaxDialogTests {
             isBrowserShowing = true,
             site = site,
             detectedRefreshPatterns = emptySet(),
+            brokenSitePromptUrl = null,
         )
 
         assertTrue(result is OnboardingDaxDialogCta.DaxMainNetworkCta)
