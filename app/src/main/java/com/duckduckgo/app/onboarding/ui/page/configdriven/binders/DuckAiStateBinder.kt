@@ -49,7 +49,8 @@ class DuckAiStateBinder(
 
         return ContentHandle(
             title = binding.duckAiStateTitle,
-            fadeTargets = listOf(binding.duckAiStatePictogram, binding.duckAiStateContentContainer),
+            preTitleFadeTargets = listOf(binding.duckAiStatePictogram),
+            fadeTargets = listOf(binding.duckAiStateContentContainer),
             unbind = {
                 buttons.forEach { it.setOnClickListener(null) }
                 binding.duckAiStateOptions.removeAllViews()
