@@ -304,11 +304,17 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
         // to or remove from it.
         pendingEntryPrompt = entry.prompt
         pendingEntryPageContext = entry.serializedPageContext
+        val handedOffWithoutContext = entry.serializedPageContext == null
         val chatUrl = duckChat.getDuckChatUrl("", false, sidebar = true)
         withContext(dispatchers.main()) {
             setSheetUrl(chatUrl)
             _viewState.update {
-                it.copy(showFullscreen = hasChatId(chatUrl), tabId = tabId)
+                it.copy(
+                    showFullscreen = hasChatId(chatUrl),
+                    tabId = tabId,
+                    showContext = false,
+                    userRemovedContext = handedOffWithoutContext,
+                )
             }
             commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_EXPANDED))
             commandChannel.trySend(Command.LoadUrl(chatUrl))

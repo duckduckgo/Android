@@ -226,12 +226,12 @@ class DuckChatContextualWebViewViewModelTest {
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
         testee.subscriptionEventDataFlow.test {
-            // The sheet's native input auto-attaches the page before the web app is ready...
+            // The entry dialog handed off no context, so the sheet must not auto-attach the current page...
             testee.onPageContextReceived("tab-1", serializedPageData)
             assertEquals("submitAIChatPageContext", awaitItem().subscriptionName)
-            assertTrue(testee.viewState.value.showContext)
+            assertFalse(testee.viewState.value.showContext)
 
-            // ...but the first prompt is frozen to the entry dialog's (empty) attachment, so it carries none.
+            // ...and the first prompt is frozen to the entry dialog's (empty) attachment, so it carries none.
             testee.onWebAppReady()
             val promptEvent = awaitItem()
             assertEquals("submitAIChatNativePrompt", promptEvent.subscriptionName)
@@ -258,6 +258,69 @@ class DuckChatContextualWebViewViewModelTest {
             assertEquals("Page Title", promptEvent.params.getJSONObject("pageContext").getString("title"))
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun `no-context entry hand-off does not re-attach the current page while it stays put`() = runTest {
+        val prompt = NativeInputPrompt("hello", "model-1", "high", null, null, null)
+        whenever(contextualEntryPromptStore.consume("tab-1"))
+            .thenReturn(ContextualEntryPrompt("tab-1", prompt, serializedPageContext = null))
+
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        testee.onPageContextReceived("tab-1", serializedPageData)
+        assertFalse(testee.viewState.value.showContext)
+
+        // A repeated report for the same page still must not auto-attach.
+        testee.onPageContextReceived("tab-1", serializedPageData)
+        assertFalse(testee.viewState.value.showContext)
+    }
+
+    @Test
+    fun `no-context entry hand-off re-attaches after the user navigates to a new page`() = runTest {
+        val prompt = NativeInputPrompt("hello", "model-1", "high", null, null, null)
+        whenever(contextualEntryPromptStore.consume("tab-1"))
+            .thenReturn(ContextualEntryPrompt("tab-1", prompt, serializedPageContext = null))
+
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        testee.onPageContextReceived("tab-1", serializedPageData)
+        assertFalse(testee.viewState.value.showContext)
+
+        val otherPageData =
+            """
+            {
+                "title": "Other Page",
+                "url": "https://other.example.com",
+                "content": "Other extracted DOM text...",
+                "truncated": false,
+                "fullContentLength": 4321
+            }
+            """.trimIndent()
+        testee.onPageContextReceived("tab-1", otherPageData)
+
+        assertTrue(testee.viewState.value.showContext)
+        assertEquals("Other Page", testee.viewState.value.contextTitle)
+    }
+
+    @Test
+    fun `no-context entry hand-off re-attaches when the user manually attaches`() = runTest {
+        val prompt = NativeInputPrompt("hello", "model-1", "high", null, null, null)
+        whenever(contextualEntryPromptStore.consume("tab-1"))
+            .thenReturn(ContextualEntryPrompt("tab-1", prompt, serializedPageContext = null))
+
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        testee.onPageContextReceived("tab-1", serializedPageData)
+        assertFalse(testee.viewState.value.showContext)
+
+        testee.addPageContext()
+
+        assertTrue(testee.viewState.value.showContext)
+        assertEquals("Page Title", testee.viewState.value.contextTitle)
     }
 
     @Test
