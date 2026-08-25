@@ -480,11 +480,19 @@ constructor(
         }
     }
 
-    private fun fetchV1LinkingCode(): String =
-        when (val result = syncAccountRepository.getConnectQR()) {
-            is Success -> describeQrCode(result.data.qrCode)
-            is Error -> "Failed to fetch v1 connect code: $result"
+    private fun fetchV1LinkingCode(): String {
+        val signedIn = syncAccountRepository.isSignedIn()
+        val result = if (signedIn) {
+            syncAccountRepository.generateExchangeInvitationCode()
+        } else {
+            syncAccountRepository.getConnectQR()
         }
+        val label = if (signedIn) "invitation" else "connect"
+        return when (result) {
+            is Success -> describeQrCode(result.data.qrCode)
+            is Error -> "Failed to fetch v1 $label code: $result"
+        }
+    }
 
     private suspend fun fetchV2LinkingCode(): String {
         val outcome = syncCodeDispatcher.presentV2().firstOrNull { it is DispatchOutcome.LinkingCodeReady || it is DispatchOutcome.Failed }
