@@ -73,8 +73,12 @@ import com.duckduckgo.sync.TestSyncFixtures.signupSuccess
 import com.duckduckgo.sync.TestSyncFixtures.token
 import com.duckduckgo.sync.TestSyncFixtures.untilTimestamp
 import com.duckduckgo.sync.TestSyncFixtures.userId
+import com.duckduckgo.sync.impl.SyncService.Companion.EXCHANGE_CHANNEL_PATH_PREFIX
+import com.duckduckgo.sync.impl.SyncService.Companion.SYNC_PROD_ENVIRONMENT_URL
 import com.duckduckgo.sync.store.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.Protocol
+import okhttp3.Request
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -582,6 +586,77 @@ class SyncServiceRemoteTest {
 
         assertEquals(Result.Success(Unit), result)
         verify(syncService).deleteExchangeChannel(eq("Bearer $CHANNEL_SECRET"), eq(CHANNEL_ID))
+    }
+
+    @Test
+    fun whenPollExchangeMessagesReturnsInvalidCredentialsThenDoNotClearStore() {
+        val call: Call<ExchangeMessagesResponse> = mock()
+        whenever(syncService.pollExchangeMessages(anyOrNull(), anyString(), any())).thenReturn(call)
+        whenever(call.execute()).thenReturn(
+            invalidCredentialsResponse("$SYNC_PROD_ENVIRONMENT_URL$EXCHANGE_CHANNEL_PATH_PREFIX$CHANNEL_ID/messages", CHANNEL_SECRET),
+        )
+
+        val result = syncRemote.pollExchangeMessages(CHANNEL_ID, CHANNEL_SECRET, after = 0)
+
+        assertTrue(result is Result.Error)
+        verify(syncStore, never()).clearAll()
+    }
+
+    @Test
+    fun whenDeleteExchangeChannelReturnsInvalidCredentialsThenDoNotClearStore() {
+        val call: Call<Void> = mock()
+        whenever(syncService.deleteExchangeChannel(anyOrNull(), anyString())).thenReturn(call)
+        whenever(call.execute()).thenReturn(
+            invalidCredentialsResponse("$SYNC_PROD_ENVIRONMENT_URL$EXCHANGE_CHANNEL_PATH_PREFIX$CHANNEL_ID", CHANNEL_SECRET),
+        )
+
+        val result = syncRemote.deleteExchangeChannel(CHANNEL_ID, CHANNEL_SECRET)
+
+        assertTrue(result is Result.Error)
+        verify(syncStore, never()).clearAll()
+    }
+
+    @Test
+    fun whenAccountEndpointReturnsInvalidCredentialsForCurrentTokenThenClearStore() {
+        whenever(syncStore.token).thenReturn(token)
+        val call: Call<AccessCredentialsResponse> = mock()
+        whenever(syncService.getAccessCredentials(anyString())).thenReturn(call)
+        whenever(call.execute()).thenReturn(invalidCredentialsResponse("$SYNC_PROD_ENVIRONMENT_URL/sync/credentials", token))
+
+        syncRemote.getAccessCredentials(token)
+
+        verify(syncStore).clearAll()
+    }
+
+    @Test
+    fun whenAccountEndpointReturnsInvalidCredentialsForRotatedTokenThenDoNotClearStore() {
+        whenever(syncStore.token).thenReturn("newRotatedToken")
+        val call: Call<AccessCredentialsResponse> = mock()
+        whenever(syncService.getAccessCredentials(anyString())).thenReturn(call)
+        whenever(call.execute()).thenReturn(invalidCredentialsResponse("$SYNC_PROD_ENVIRONMENT_URL/sync/credentials", token))
+
+        syncRemote.getAccessCredentials(token)
+
+        verify(syncStore, never()).clearAll()
+    }
+
+    private fun <T> invalidCredentialsResponse(
+        url: String,
+        bearerToken: String,
+    ): Response<T> {
+        val request = Request.Builder()
+            .url(url)
+            .header("Authorization", "Bearer $bearerToken")
+            .build()
+        val raw = okhttp3.Response.Builder()
+            .request(request)
+            .protocol(Protocol.HTTP_1_1)
+            .code(API_CODE.INVALID_LOGIN_CREDENTIALS.code)
+            .message("Unauthorized")
+            .build()
+        val errorBody = """{"code":${API_CODE.INVALID_LOGIN_CREDENTIALS.code},"error":"invalid_login_credentials"}"""
+            .toResponseBody("application/json".toMediaTypeOrNull())
+        return Response.error(errorBody, raw)
     }
 
     private companion object {
