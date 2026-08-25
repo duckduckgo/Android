@@ -23,6 +23,7 @@ import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autoconsent.impl.FakeSettingsRepository
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.AppInstallTimeProvider
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -65,6 +66,9 @@ class CookiePopupOptInEvaluatorTest {
     private val currentTimeProvider: CurrentTimeProvider = mock {
         on { currentTimeMillis() } doReturn now
     }
+    private val appInstallTimeProvider: AppInstallTimeProvider = mock {
+        on { firstInstallTimeMillis() } doReturn now - TimeUnit.DAYS.toMillis(30)
+    }
 
     private val testee by lazy {
         CookiePopupOptInEvaluator(
@@ -77,6 +81,7 @@ class CookiePopupOptInEvaluatorTest {
             settingsRepository = settingsRepository,
             onboardingFlowChecker = onboardingFlowChecker,
             currentTimeProvider = currentTimeProvider,
+            appInstallTimeProvider = appInstallTimeProvider,
         )
     }
 
@@ -246,8 +251,6 @@ class CookiePopupOptInEvaluatorTest {
     }
 
     private fun setDaysSinceInstall(days: Long) {
-        shadowOf(application.packageManager)
-            .getInternalMutablePackageInfo(application.packageName)
-            .firstInstallTime = now - TimeUnit.DAYS.toMillis(days)
+        whenever(appInstallTimeProvider.firstInstallTimeMillis()).thenReturn(now - TimeUnit.DAYS.toMillis(days))
     }
 }
