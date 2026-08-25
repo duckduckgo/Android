@@ -63,6 +63,7 @@ import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTextStyle
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.compose.theme.asTextStyle
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
+import com.duckduckgo.common.ui.compose.tools.PreviewSurface
 import com.duckduckgo.mobile.android.R
 
 /**
@@ -251,7 +252,7 @@ internal object DaxSearchTopAppBarDefaults {
 @PreviewLightDark
 @Composable
 private fun DaxSearchTopAppBarEmptyPreview() {
-    PreviewBox {
+    PreviewSurface {
         DaxSearchTopAppBar(
             title = "Title",
             searchActive = true,

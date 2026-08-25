@@ -72,7 +72,7 @@ class DuckAiUrlSettingsActivity : DuckDuckGoActivity() {
     private fun configureEdgeToEdgeInsets() {
         edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
         edgeToEdgeHandler.applyStatusBarInsets(binding.appBar)
-        edgeToEdgeHandler.applyNavigationBarInsets(binding.reset, drawBehindGestureNav = false)
+        edgeToEdgeHandler.applyNavigationBarInsets(binding.contentLayout, drawBehindGestureNav = false)
     }
 
     private fun configureViews() {

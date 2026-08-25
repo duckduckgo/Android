@@ -86,6 +86,7 @@
         app:featureInfoTitle="@string/subscriptionOnboardingFeatureInfoItrItem8Title" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/subscriptionOnboardingFeatureInfoLegalFooter"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_4"

@@ -224,4 +224,15 @@
         app:daxButtonSize="large"
         app:layout_constraintBottom_toBottomOf="parent" />
 
+    <nl.dionsegijn.konfetti.KonfettiView
+        android:id="@+id/subscriptionOnboardingWelcomeKonfetti"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clickable="false"
+        android:focusable="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

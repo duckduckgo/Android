@@ -47,6 +47,7 @@ import com.duckduckgo.common.ui.compose.text.DaxText
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTextStyle
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
+import com.duckduckgo.common.ui.compose.tools.PreviewSurface
 import com.duckduckgo.mobile.android.R
 
 /**
@@ -198,7 +199,7 @@ private fun DaxTopAppBarLongTitlePreview() {
 @PreviewFontScale
 @Composable
 private fun DaxTopAppBarFontScalePreview() {
-    PreviewBox {
+    PreviewSurface {
         DaxTopAppBar(
             title = "Title",
             navigationIcon = DaxTopAppBarNavigationIcon.Back { },

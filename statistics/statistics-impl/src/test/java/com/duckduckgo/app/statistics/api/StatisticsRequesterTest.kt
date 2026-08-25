@@ -167,6 +167,21 @@ class StatisticsRequesterTest {
         testee.refreshSearchRetentionAtb()
         verify(mockService).updateSearchAtb(eq(ATB_WITH_VARIANT), eq(ATB.version), any(), any())
         verify(mockStatisticsStore).searchRetentionAtb = NEW_ATB
+        verify(mockStatisticsStore, never()).atb = any()
+        verify(mockStatisticsStore, never()).appRetentionAtb = any()
+        verify(mockStatisticsStore, never()).duckaiRetentionAtb = any()
+    }
+
+    @Test
+    fun whenStatisticsStoredThenRefreshAppUpdatesAtb() {
+        configureStoredStatistics()
+        whenever(mockService.updateAppAtb(any(), any(), any(), any())).thenReturn(Observable.just(Atb(NEW_ATB)))
+        testee.refreshAppRetentionAtb()
+        verify(mockService).updateAppAtb(eq(ATB_WITH_VARIANT), eq(ATB.version), any(), any())
+        verify(mockStatisticsStore).appRetentionAtb = NEW_ATB
+        verify(mockStatisticsStore, never()).atb = any()
+        verify(mockStatisticsStore, never()).searchRetentionAtb = any()
+        verify(mockStatisticsStore, never()).duckaiRetentionAtb = any()
     }
 
     @Test
@@ -175,6 +190,9 @@ class StatisticsRequesterTest {
         testee.refreshDuckAiRetentionAtb()
         verify(mockService).updateDuckAiAtb(eq(ATB_WITH_VARIANT), eq(ATB.version), any(), any())
         verify(mockStatisticsStore).duckaiRetentionAtb = NEW_ATB
+        verify(mockStatisticsStore, never()).atb = any()
+        verify(mockStatisticsStore, never()).searchRetentionAtb = any()
+        verify(mockStatisticsStore, never()).appRetentionAtb = any()
     }
 
     @Test
