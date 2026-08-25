@@ -19,6 +19,7 @@ package com.duckduckgo.app.onboarding.ui.page.configdriven.binders
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup.MarginLayoutParams
+import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import com.duckduckgo.app.browser.databinding.IncludeBrandDesignPreferenceRowBinding
@@ -40,6 +41,12 @@ class PreferenceSelectorBinder(
 
     override val view: View = binding.root
 
+    /** Rows shown only while their parent preference is on, keyed by that parent. */
+    private val dependentRows = mutableMapOf<OnboardingPreference, MutableList<View>>()
+
+    /** What a dependent row's fade is currently heading towards, so an interrupted fade doesn't land on the old target. */
+    private val fadeTarget = mutableMapOf<View, Boolean>()
+
     override fun bind(
         content: ContentConfig.PreferenceSelector,
         state: MutableStateFlow<PreferenceSelectorContentState>,
@@ -57,7 +64,14 @@ class PreferenceSelectorBinder(
             result = {
                 NewUserOnboardingEvent.PreferenceSelectorConfirmed(state.value.enabled)
             },
-            unbind = { binding.preferenceRows.removeAllViews() },
+            unbind = {
+                // Clearing first leaves a fade that is cancelled below with nothing to land on, so it cannot
+                // ask the card to tween once the next screen owns it.
+                dependentRows.clear()
+                fadeTarget.clear()
+                binding.preferenceRows.children.forEach { it.animate().cancel() }
+                binding.preferenceRows.removeAllViews()
+            },
         )
     }
 
@@ -73,7 +87,8 @@ class PreferenceSelectorBinder(
         val context = binding.root.context
         binding.preferenceRows.removeAllViews()
         val inflater = LayoutInflater.from(context)
-        val rowViews = mutableMapOf<OnboardingPreference, View>()
+        dependentRows.clear()
+        fadeTarget.clear()
         content.rows.forEachIndexed { index, row ->
             val rowBinding = IncludeBrandDesignPreferenceRowBinding.inflate(inflater, binding.preferenceRows, false)
             if (index > 0) {
@@ -88,36 +103,58 @@ class PreferenceSelectorBinder(
                 isChecked = state.value.enabled.getValue(row.preference)
                 setOnCheckedChangeListener { checked ->
                     state.update { it.copy(enabled = it.enabled + (row.preference to checked)) }
-                    showDependentsOf(content, rowViews, row.preference, checked, scope)
+                    showDependentsOf(row.preference, checked, scope)
                 }
             }
-            rowViews[row.preference] = rowBinding.root
+            row.dependsOn?.let { parent ->
+                val shown = state.value.enabled[parent] != false
+                dependentRows.getOrPut(parent) { mutableListOf() } += rowBinding.root
+                fadeTarget[rowBinding.root] = shown
+                rowBinding.root.isVisible = shown
+            }
             binding.preferenceRows.addView(rowBinding.root)
-        }
-        content.rows.forEach { row ->
-            val parent = row.dependsOn ?: return@forEach
-            rowViews.getValue(row.preference).isVisible = state.value.enabled[parent] != false
         }
     }
 
-    /**
-     * A dependent row appearing or leaving resizes the card, so the card is asked to tween into the new
-     * bounds rather than jump to them in the frame the row's visibility changes.
-     */
     private fun showDependentsOf(
-        content: ContentConfig.PreferenceSelector,
-        rowViews: Map<OnboardingPreference, View>,
         preference: OnboardingPreference,
         visible: Boolean,
         scope: BindScope,
     ) {
-        val dependents = content.rows.filter { it.dependsOn == preference }
-        if (dependents.isEmpty()) return
-        scope.animateCardBounds(DEPENDENT_ROW_DURATION_MS)
-        dependents.forEach { rowViews[it.preference]?.isVisible = visible }
+        dependentRows[preference].orEmpty().forEach { row ->
+            if (fadeTarget.put(row, visible) == visible) return@forEach
+            if (visible) showRow(row, scope) else hideRow(row, scope)
+        }
+    }
+
+    /**
+     * A row entering or leaving resizes the card, so the card is asked to tween into the new bounds rather
+     * than jump to them. The row itself fades: taking it out of the layout is what changes the card's size,
+     * so that only happens once it has faded out, and on the way back in it appears before it is visible.
+     */
+    private fun showRow(row: View, scope: BindScope) {
+        if (!row.isVisible) {
+            row.alpha = 0f
+            scope.animateCardBounds(DEPENDENT_ROW_MORPH_MS)
+            row.isVisible = true
+        }
+        row.animate().alpha(1f).setDuration(DEPENDENT_ROW_FADE_MS).start()
+    }
+
+    private fun hideRow(row: View, scope: BindScope) {
+        row.animate()
+            .alpha(0f)
+            .setDuration(DEPENDENT_ROW_FADE_MS)
+            .withEndAction {
+                if (fadeTarget[row] != false) return@withEndAction
+                scope.animateCardBounds(DEPENDENT_ROW_MORPH_MS)
+                row.isVisible = false
+            }
+            .start()
     }
 
     private companion object {
-        const val DEPENDENT_ROW_DURATION_MS = 400L
+        const val DEPENDENT_ROW_FADE_MS = 200L
+        const val DEPENDENT_ROW_MORPH_MS = 400L
     }
 }
