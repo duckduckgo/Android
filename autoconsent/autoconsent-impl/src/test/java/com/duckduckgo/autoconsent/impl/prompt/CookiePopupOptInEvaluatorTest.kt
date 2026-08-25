@@ -55,9 +55,6 @@ class CookiePopupOptInEvaluatorTest {
     private val application: Application get() = RuntimeEnvironment.getApplication()
     private val feature = FakeFeatureToggleFactory.create(AutoconsentFeature::class.java)
     private val autoconsent: Autoconsent = mock()
-    private val onboardingFlowChecker: OnboardingFlowChecker = mock {
-        onBlocking { isOnboardingComplete() } doReturn true
-    }
     private val settingsRepository = FakeSettingsRepository()
     private val onboardingFlowChecker: OnboardingFlowChecker = mock {
         onBlocking { isOnboardingComplete() } doReturn true
@@ -77,7 +74,6 @@ class CookiePopupOptInEvaluatorTest {
             autoconsentFeature = feature,
             dispatchers = coroutineRule.testDispatcherProvider,
             autoconsent = autoconsent,
-            onboardingFlowChecker = onboardingFlowChecker,
             settingsRepository = settingsRepository,
             onboardingFlowChecker = onboardingFlowChecker,
             currentTimeProvider = currentTimeProvider,
@@ -212,15 +208,6 @@ class CookiePopupOptInEvaluatorTest {
         testee.evaluate()
 
         assertEquals(1, settingsRepository.optInPromptShownCount)
-    }
-
-    @Test
-    fun whenOnboardingNotCompleteThenSkippedAndNothingLaunched() = runTest {
-        feature.cookiePopUpOptInPrompt().setRawStoredState(Toggle.State(enable = true))
-        whenever(onboardingFlowChecker.isOnboardingComplete()).thenReturn(false)
-
-        assertEquals(ModalEvaluator.EvaluationResult.Skipped, testee.evaluate())
-        assertNull(shadowOf(application).nextStartedActivity)
     }
 
     @Test
