@@ -605,6 +605,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 ),
                 duckAiStateStep(ctx, duckAiStateChoice),
                 addressBarPositionStep(),
+                inputScreenPreviewStep(ctx = ctx, isSearchDefault = true),
             ),
         )
     }
