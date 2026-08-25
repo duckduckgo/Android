@@ -44,7 +44,6 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.takeOrElse
 import com.duckduckgo.common.ui.compose.DaxStatusIndicator
 import com.duckduckgo.common.ui.compose.Status
@@ -135,7 +134,7 @@ internal fun DaxListItem(
         }
 
         Column(
-            verticalArrangement = Arrangement.spacedBy(2.dp),
+            verticalArrangement = Arrangement.spacedBy(DaxListItemDefaults.TextSpacing),
             modifier = Modifier
                 .weight(1f)
                 .alpha(if (enabled) 1f else DaxListItemDefaults.DisabledAlpha),

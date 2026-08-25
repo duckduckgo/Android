@@ -30,6 +30,7 @@ internal object DaxListItemDefaults {
     val LeadingGap: Dp = 16.dp
     val TrailingGap: Dp = 16.dp
     val PillGap: Dp = 8.dp
+    val TextSpacing: Dp = 2.dp
 
     val LeadingIconSmall: Dp = 24.dp
     val LeadingIconLarge: Dp = 32.dp
