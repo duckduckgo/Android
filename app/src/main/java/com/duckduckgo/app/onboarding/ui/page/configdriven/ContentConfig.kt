@@ -114,6 +114,8 @@ sealed interface ContentConfig {
             val primaryText: TextConfig,
             val secondaryText: TextConfig,
             val initiallyEnabled: Boolean,
+            /** When set, the row is only shown while the preference it names is switched on. */
+            val dependsOn: OnboardingPreference? = null,
         )
 
         override fun initialState() = PreferenceSelectorContentState(rows.associate { it.preference to it.initiallyEnabled })
