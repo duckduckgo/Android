@@ -270,7 +270,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         // Warms the options up while the user is still several screens away from the step that renders them.
         appCoroutineScope.launch(dispatchers.io()) { modelProviderChoice?.prefetch() }
         appCoroutineScope.launch(dispatchers.io()) { togglePositionChoice?.prefetch() }
-        appCoroutineScope.launch(dispatchers.io()) { duckAiStateChoice?.prefetch() }
 
         return rootPlan(
             ctx = ctx,
@@ -528,7 +527,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                         when (selection) {
                             DownloadReasonSelection.SEARCH -> SwitchTo(segmentedSearchPlan(ctx))
                             DownloadReasonSelection.AI_CHAT -> SwitchTo(segmentedAiPlan(ctx, modelProviderChoice, togglePositionChoice))
-                            DownloadReasonSelection.NO_AI -> SwitchTo(segmentedNoAiPlan(ctx, duckAiStateChoice))
+                            DownloadReasonSelection.NO_AI -> SwitchTo(segmentedNoAiPlan(duckAiStateChoice))
                             DownloadReasonSelection.BLOCK_ADS,
                             -> {
                                 Stay
@@ -587,10 +586,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         )
     }
 
-    private fun segmentedNoAiPlan(
-        ctx: NewUserOnboardingPlanContext,
-        duckAiStateChoice: OnboardingSingleChoiceDataPlugin?,
-    ): LinearOnboardingPlan {
+    private fun segmentedNoAiPlan(duckAiStateChoice: OnboardingSingleChoiceDataPlugin?): LinearOnboardingPlan {
         return sidePlan(
             id = SEGMENTED_NO_AI_PLAN_ID,
             steps = listOf(

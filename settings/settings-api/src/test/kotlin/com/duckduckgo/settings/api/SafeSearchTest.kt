@@ -17,7 +17,6 @@
 package com.duckduckgo.settings.api
 
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
 import org.junit.Test
 
 class SafeSearchTest {
@@ -26,19 +25,6 @@ class SafeSearchTest {
     fun whenSerpCodesThenEachOptionHasExpectedCode() {
         assertEquals("-1", SafeSearch.ON.serpCode)
         assertEquals("-2", SafeSearch.OFF.serpCode)
-    }
-
-    @Test
-    fun whenFromSerpCodeThenMapsEachCodeToItsOption() {
-        assertEquals(SafeSearch.ON, SafeSearch.fromSerpCode("-1"))
-        assertEquals(SafeSearch.OFF, SafeSearch.fromSerpCode("-2"))
-    }
-
-    @Test
-    fun whenFromSerpCodeUnknownOrNullThenNull() {
-        assertNull(SafeSearch.fromSerpCode(null))
-        assertNull(SafeSearch.fromSerpCode(""))
-        assertNull(SafeSearch.fromSerpCode("0"))
     }
 
     @Test

@@ -43,7 +43,10 @@ interface OnboardingPreferenceApplier {
     /** Whether the preference can be offered at all; a preference that isn't available is not shown as a row. */
     suspend fun isAvailable(preference: OnboardingPreference): Boolean
 
-    /** The value the preference holds right now, used to seed the row's switch. */
+    /**
+     * The value to seed the row's switch with. Usually the value the preference holds right now, but a path
+     * that offers a preference to steer the user towards a position seeds that position instead.
+     */
     suspend fun isEnabled(preference: OnboardingPreference): Boolean
 
     suspend fun apply(preference: OnboardingPreference, enabled: Boolean)
@@ -72,6 +75,8 @@ class OnboardingPreferenceApplierImpl @Inject constructor(
         when (preference) {
             OnboardingPreference.SEARCH_HISTORY -> navigationHistory.isHistoryUserEnabled()
             OnboardingPreference.SAFE_SEARCH -> safeSearchEnabled()
+            // The no-AI path offers these already set the way it wants the user to leave onboarding, so a user
+            // who proceeds without touching a row gets that position rather than the app's own default.
             OnboardingPreference.SEARCH_ASSIST -> false
             OnboardingPreference.HIDE_AI_GENERATED_IMAGES -> true
         }

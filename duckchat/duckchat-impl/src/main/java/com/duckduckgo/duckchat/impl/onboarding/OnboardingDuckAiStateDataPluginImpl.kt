@@ -25,6 +25,8 @@ import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.onboarding.api.OnboardingSingleChoiceDataPlugin
 import com.duckduckgo.onboarding.api.OnboardingSingleChoiceDataPlugin.Id
 import com.duckduckgo.onboarding.api.OnboardingSingleChoiceDataPlugin.Option
+import logcat.LogPriority.WARN
+import logcat.logcat
 import javax.inject.Inject
 
 /**
@@ -44,15 +46,15 @@ class OnboardingDuckAiStateDataPluginImpl @Inject constructor(
 
     override val id: Id = Id.DuckAiState
 
-    override suspend fun prefetch() {
-        // The options are static, so there is nothing to warm up.
-    }
-
     override suspend fun options(): List<Option> = OFFERED.map { it.toOption() }
 
     override suspend fun apply(option: Option) {
-        val enabled = (option as? StateOption)?.enabled ?: return
-        duckChat.setEnableDuckChatUserSetting(enabled)
+        val state = option as? StateOption
+        if (state == null) {
+            logcat(WARN) { "Duck.ai onboarding: ignoring Duck.ai state pick from a foreign option ${option.id}" }
+            return
+        }
+        duckChat.setEnableDuckChatUserSetting(state.enabled)
     }
 
     private fun StateSpec.toOption() = StateOption(

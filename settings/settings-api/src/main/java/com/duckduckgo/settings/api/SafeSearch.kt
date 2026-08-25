@@ -33,9 +33,5 @@ enum class SafeSearch(override val serpCode: String) : SerpSetting {
     companion object {
         // The SERP key carrying the safe-search value in the serpSettings blob.
         const val SERP_SETTINGS_KEY = "kp"
-
-        // Returns null for unknown/absent values, so callers can apply their own default.
-        fun fromSerpCode(serpCode: String?): SafeSearch? =
-            entries.firstOrNull { it.serpCode == serpCode }
     }
 }
