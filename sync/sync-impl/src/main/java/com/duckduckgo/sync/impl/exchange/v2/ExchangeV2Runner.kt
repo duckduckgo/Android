@@ -96,20 +96,13 @@ interface ExchangeV2Runner {
      */
     suspend fun cancel()
 
-    suspend fun deliverIncomingMessage(message: ExchangeV2Message)
-
-    suspend fun deliverIncomingMessageJson(rawJson: String)
-
     fun localTrigger(trigger: LocalTrigger)
-
-    fun recordSentMessage(message: ExchangeV2Message)
 }
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealExchangeV2Runner @Inject constructor(
     private val smFactory: ExchangeV2StateMachineFactory,
-    private val messageParser: ExchangeV2MessageParser,
     private val clock: ExchangeV2Clock,
     private val syncStore: SyncStore,
     private val jweCrypto: SyncJweCrypto,
@@ -414,7 +407,7 @@ class RealExchangeV2Runner @Inject constructor(
     // Inbound message handling + orchestration
     // -----------------------------------------------------------------------
 
-    override suspend fun deliverIncomingMessage(message: ExchangeV2Message) {
+    internal suspend fun deliverIncomingMessage(message: ExchangeV2Message) {
         // Suspends until processing completes so the poll loop processes messages in wire order;
         // a fire-and-forget launch here would let a poll batch race to the SM out of sequence.
         mutex.withLock { processIncomingLocked(message) }
@@ -603,10 +596,6 @@ class RealExchangeV2Runner @Inject constructor(
             ownRole == PairingRole.Presenter -> Role.Host
             else -> Role.Joiner
         }
-    }
-
-    override suspend fun deliverIncomingMessageJson(rawJson: String) {
-        deliverIncomingMessage(messageParser.parse(rawJson))
     }
 
     // -----------------------------------------------------------------------
@@ -818,7 +807,7 @@ class RealExchangeV2Runner @Inject constructor(
         else -> SessionErrorKind.Unknown
     }
 
-    override fun recordSentMessage(message: ExchangeV2Message) {
+    internal fun recordSentMessage(message: ExchangeV2Message) {
         logcat { "Sync-ExchangeV2: recordSentMessage ${message.messageType}" }
         emit(ExchangeV2Event.MessageSent(clock.nowMs(), message))
     }
