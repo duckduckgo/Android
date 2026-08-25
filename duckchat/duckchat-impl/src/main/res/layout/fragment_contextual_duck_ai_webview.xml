@@ -54,11 +54,10 @@
             android:background="@drawable/selectable_item_rounded_corner_background"
             android:contentDescription="@string/browserMenuChatHistory"
             android:scaleType="center"
-            android:layout_marginEnd="@dimen/keyline_2"
             app:layout_constraintBottom_toBottomOf="@id/contextualTitle"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/contextualTitle"
-            app:srcCompat="@drawable/ic_expand_24" />
+            app:srcCompat="@drawable/ic_open_in_24" />
 
         <ImageView
             android:id="@+id/contextualNewChat"
@@ -70,7 +69,7 @@
             android:visibility="gone"
             tools:visibility="visible"
             app:layout_constraintBottom_toBottomOf="@id/contextualTitle"
-            app:layout_constraintStart_toEndOf="@+id/contextualFullScreen"
+            app:layout_constraintStart_toEndOf="@+id/contextualClose"
             app:layout_constraintTop_toTopOf="@id/contextualTitle"
             app:srcCompat="@drawable/ic_chats_24" />
 
@@ -79,7 +78,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_4"
-            android:drawableStart="@drawable/ic_duck_ai_color_24"
+            android:drawableStart="@drawable/ic_ai_chat_color_24"
             android:drawablePadding="@dimen/keyline_2"
             android:gravity="center"
             android:text="@string/duck_chat_title"
@@ -98,7 +97,7 @@
             android:visibility="gone"
             tools:visibility="visible"
             app:layout_constraintBottom_toBottomOf="@id/contextualTitle"
-            app:layout_constraintEnd_toStartOf="@+id/contextualClose"
+            app:layout_constraintEnd_toStartOf="@+id/contextualFullScreen"
             app:layout_constraintTop_toTopOf="@id/contextualTitle"
             app:srcCompat="@drawable/ic_fire_24" />
 
@@ -111,7 +110,7 @@
             android:contentDescription="@string/browserMenuChatHistory"
             android:scaleType="center"
             app:layout_constraintBottom_toBottomOf="@id/contextualTitle"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/contextualTitle"
             app:srcCompat="@drawable/ic_close_24_small" />
 

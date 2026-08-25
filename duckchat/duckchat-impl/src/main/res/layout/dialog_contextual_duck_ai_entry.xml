@@ -44,17 +44,19 @@
             <com.duckduckgo.duckchat.impl.contextual.suggestions.ContextualSuggestionsView
                 android:id="@+id/entrySuggestionsView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                app:suggestionBackground="@drawable/duck_ai_suggested_prompts_background" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/entryPromptQuickAction"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/keyline_2"
-                android:background="@drawable/background_large_rounded_surface"
+                android:background="@drawable/duck_ai_suggested_prompts_background"
                 android:drawableStart="@drawable/ic_summarize_16"
                 android:drawablePadding="@dimen/keyline_2"
-                android:padding="@dimen/keyline_2"
+                android:paddingVertical="@dimen/keyline_2"
+                android:paddingHorizontal="@dimen/keyline_3"
                 android:text="@string/duckAIContextualPromptSummarize"
                 android:visibility="gone"
                 app:typography="body2_bold" />

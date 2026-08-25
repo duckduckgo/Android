@@ -111,6 +111,11 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
     // is ready (onWebAppReady). Held between opening the sheet and that ready signal.
     private var pendingEntryPrompt: NativeInputPrompt? = null
 
+    // The page context the entry dialog had attached to [pendingEntryPrompt] at hand-off (null if none).
+    // Frozen so the first webview prompt reflects the dialog's choice, regardless of the sheet's own
+    // native-input auto-attach that may run before the web app is ready.
+    private var pendingEntryPageContext: String? = null
+
     private var hidingSheetForNewChat = false
 
     sealed class Command {
@@ -156,6 +161,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
         val contextUrl: String = "",
         val contextTitle: String = "",
         val tabId: String = "",
+        val userRemovedContext: Boolean = false,
         val isFireButtonEnabled: Boolean = false,
         val recentChats: List<ChatHistoryItem> = emptyList(),
     )
@@ -293,30 +299,25 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
         tabId: String,
         entry: ContextualEntryPrompt,
     ) {
+        // Freeze the prompt and the dialog's attachment decision (a page context, or none). The first
+        // webview prompt carries exactly this; the sheet's own native-input attachment state must not add
+        // to or remove from it.
         pendingEntryPrompt = entry.prompt
+        pendingEntryPageContext = entry.serializedPageContext
+        val handedOffWithoutContext = entry.serializedPageContext == null
         val chatUrl = duckChat.getDuckChatUrl("", false, sidebar = true)
         withContext(dispatchers.main()) {
             setSheetUrl(chatUrl)
-            entry.serializedPageContext?.let { attachProvidedPageContext(it) }
             _viewState.update {
-                it.copy(showFullscreen = hasChatId(chatUrl), tabId = tabId)
+                it.copy(
+                    showFullscreen = hasChatId(chatUrl),
+                    tabId = tabId,
+                    showContext = false,
+                    userRemovedContext = handedOffWithoutContext,
+                )
             }
             commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_EXPANDED))
             commandChannel.trySend(Command.LoadUrl(chatUrl))
-        }
-    }
-
-    private fun attachProvidedPageContext(serializedPageContext: String) {
-        if (!isContextValid(serializedPageContext)) return
-        currentPageContext = serializedPageContext
-        pageContextState = pageContextState.copy(attachedPage = serializedPageContext)
-        val json = JSONObject(serializedPageContext)
-        _viewState.update {
-            it.copy(
-                showContext = true,
-                contextTitle = json.optString("title"),
-                contextUrl = json.optString("url"),
-            )
         }
     }
 
@@ -327,14 +328,17 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
      */
     fun onWebAppReady() {
         val entry = pendingEntryPrompt ?: return
+        val entryPageContext = pendingEntryPageContext
         pendingEntryPrompt = null
-        onPromptSent(
+        pendingEntryPageContext = null
+        submitPrompt(
             prompt = entry.prompt,
             modelId = entry.modelId,
             reasoningEffort = entry.reasoningEffort,
             selectedTool = entry.selectedTool,
             imagesJson = entry.imagesJson,
             filesJson = entry.filesJson,
+            pageContextSerialized = entryPageContext,
         )
     }
 
@@ -347,8 +351,22 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
         imagesJson: JSONArray? = null,
         filesJson: JSONArray? = null,
     ) {
+        val attachedContext = pageContextState.attachedPage.takeIf { _viewState.value.showContext }
+        submitPrompt(prompt, followUpPrefill, modelId, reasoningEffort, selectedTool, imagesJson, filesJson, attachedContext)
+    }
+
+    private fun submitPrompt(
+        prompt: String,
+        followUpPrefill: String? = null,
+        modelId: String? = null,
+        reasoningEffort: String? = null,
+        selectedTool: String? = null,
+        imagesJson: JSONArray? = null,
+        filesJson: JSONArray? = null,
+        pageContextSerialized: String?,
+    ) {
         viewModelScope.launch(dispatchers.io()) {
-            val contextPrompt = generateContextPrompt(prompt, modelId, reasoningEffort, selectedTool, imagesJson, filesJson)
+            val contextPrompt = generateContextPrompt(prompt, modelId, reasoningEffort, selectedTool, imagesJson, filesJson, pageContextSerialized)
             val prefillText = followUpPrefill?.takeIf { it.isNotEmpty() }
             val prefillEvent = prefillText?.let { generatePrefillEvent(it) }
             withContext(dispatchers.main()) {
@@ -435,20 +453,12 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
         selectedTool: String? = null,
         imagesJson: JSONArray? = null,
         filesJson: JSONArray? = null,
+        pageContextSerialized: String?,
     ): SubscriptionEventData {
-        val viewState = _viewState.value
         val pageContext =
-            if (viewState.showContext) {
-                pageContextState.attachedPage
-                    .takeIf { it.isNotBlank() }
-                    ?.let { runCatching { JSONObject(it) }.getOrNull() }
-                    ?: run {
-                        logcat { "Duck.ai: no pageContext available, skipping pageContext in prompt" }
-                        null
-                    }
-            } else {
-                null
-            }
+            pageContextSerialized
+                ?.takeIf { it.isNotBlank() }
+                ?.let { runCatching { JSONObject(it) }.getOrNull() }
 
         if (pageContext == null) {
             duckChatPixels.reportContextualPromptSubmittedWithoutContextNative()
@@ -505,7 +515,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
         }
 
         val params = JSONObject().apply {
-            if (duckChatInternal.isAutomaticContextAttachmentEnabled()) {
+            if (duckChatInternal.isAutomaticContextAttachmentEnabled() && _viewState.value.showContext) {
                 put("pageContext", pageContext)
             } else {
                 put("pageContext", null)
@@ -550,7 +560,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
     fun removePageContext() {
         logcat { "Duck.ai Contextual: removePageContext" }
         _viewState.update { current ->
-            current.copy(showContext = false)
+            current.copy(showContext = false, userRemovedContext = true)
         }
         duckChatPixels.reportContextualPageContextRemovedNative()
     }
@@ -571,6 +581,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
         _viewState.update { current ->
             current.copy(
                 showContext = true,
+                userRemovedContext = false,
                 contextTitle = json.optString("title"),
                 contextUrl = json.optString("url"),
             )
@@ -635,14 +646,35 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
             val url = json.optString("url")
 
             logcat { "Duck.ai: onPageContextReceived for url $url" }
-            _viewState.update { current ->
-                current.copy(
+            val current = _viewState.value
+            val allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled()
+
+            val urlChanged = current.contextUrl.isNotEmpty() && url != current.contextUrl
+            val remainsUserRemoved = current.userRemovedContext && !urlChanged
+            val dropStaleAttachment = !allowsAutomaticContextAttachment && current.showContext && urlChanged
+
+            val showContext = when {
+                allowsAutomaticContextAttachment -> !remainsUserRemoved
+                dropStaleAttachment -> false
+                else -> current.showContext
+            }
+            val newlyAutoAttached = showContext && !current.showContext
+            if (showContext) {
+                pageContextState = pageContextState.copy(attachedPage = pageContext)
+            }
+            _viewState.update {
+                it.copy(
                     contextTitle = title,
                     contextUrl = url,
                     tabId = tabId,
+                    showContext = showContext,
+                    userRemovedContext = remainsUserRemoved,
                 )
             }
-            if (duckChatInternal.isAutomaticContextAttachmentEnabled() || duckChatInternal.areMultipleContentAttachmentsEnabled()) {
+            if (newlyAutoAttached) {
+                duckChatPixels.reportContextualPageContextAutoAttached()
+            }
+            if (allowsAutomaticContextAttachment || duckChatInternal.areMultipleContentAttachmentsEnabled()) {
                 val pageContextEvent = generatePageContextEventData()
                 viewModelScope.launch(dispatchers.main()) {
                     _subscriptionEventDataChannel.trySend(pageContextEvent)
@@ -727,6 +759,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
                     it.copy(
                         showFullscreen = true,
                         showContext = false,
+                        userRemovedContext = false,
                     )
                 }
                 val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT)
