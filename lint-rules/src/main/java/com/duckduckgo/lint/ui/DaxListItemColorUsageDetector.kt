@@ -41,32 +41,28 @@ import org.jetbrains.uast.toUElement
 import java.util.EnumSet
 
 @Suppress("UnstableApiUsage")
-class DaxTextColorUsageDetector : Detector(), SourceCodeScanner {
+class DaxListItemColorUsageDetector : Detector(), SourceCodeScanner {
 
     override fun getApplicableUastTypes() = listOf(UCallExpression::class.java)
 
-    override fun createUastHandler(context: JavaContext): UElementHandler = DaxTextColorCallHandler(context)
+    override fun createUastHandler(context: JavaContext): UElementHandler = DaxListItemColorCallHandler(context)
 
-    internal class DaxTextColorCallHandler(private val context: JavaContext) : UElementHandler() {
+    internal class DaxListItemColorCallHandler(private val context: JavaContext) : UElementHandler() {
         override fun visitCallExpression(node: UCallExpression) {
             val methodName = node.methodName
 
-            if (methodName == "DaxText") {
-                checkColorParameter(node)
+            if (methodName == "DaxOneLineListItem" || methodName == "DaxTwoLineListItem") {
+                checkColorParameter(node, "primaryTextColor")
+                checkColorParameter(node, "secondaryTextColor")
             }
         }
 
-        private fun checkColorParameter(node: UCallExpression) {
-            // Find the 'color' parameter
+        private fun checkColorParameter(node: UCallExpression, parameterName: String) {
             val colorArgument = node.valueArguments.find { arg ->
-                val parameterName = node.getParameterForArgument(arg)?.name
-                parameterName == "color"
-            } ?: return // No color parameter provided, using default is fine
+                node.getParameterForArgument(arg)?.name == parameterName
+            } ?: return // No such color parameter provided, using default is fine
 
-            // Check if the color argument comes from a valid DuckDuckGo semantic color source.
-            val isFromValidColorSource = isFromValidDuckDuckGoColorSource(colorArgument)
-
-            if (!isFromValidColorSource) {
+            if (!isFromValidDuckDuckGoColorSource(colorArgument)) {
                 reportInvalidColorUsage(colorArgument)
             }
         }
@@ -77,7 +73,7 @@ class DaxTextColorUsageDetector : Detector(), SourceCodeScanner {
             // Direct semantic color access on theme.
             if (containsSemanticThemeColorPath(source)) return true
 
-            // 2) Direct reference to static colors in compose theme package.
+            // Direct reference to static colors in compose theme package.
             if (resolvesToThemePackageElement(argument)) return true
 
             // A colour forwarded from the enclosing composable's own parameter is the caller's to justify,
@@ -95,8 +91,7 @@ class DaxTextColorUsageDetector : Detector(), SourceCodeScanner {
         private fun containsSemanticThemeColorPath(source: String): Boolean {
             return source.contains("DuckDuckGoTheme.textColors") || // legacy
                 source.contains(".textColors.") ||
-                source.contains("DuckDuckGoTheme.colors.text") || // preferred
-                source.contains(".colors.text.")
+                source.contains(".colors.")
         }
 
         private fun resolvesToThemePackageElement(expression: UExpression): Boolean {
@@ -171,9 +166,9 @@ class DaxTextColorUsageDetector : Detector(), SourceCodeScanner {
 
         private fun reportInvalidColorUsage(colorArgument: UExpression) {
             context.report(
-                issue = INVALID_DAX_TEXT_COLOR_USAGE,
+                issue = INVALID_DAX_LIST_ITEM_COLOR_USAGE,
                 location = context.getLocation(colorArgument),
-                message = INVALID_DAX_TEXT_COLOR_USAGE.getExplanation(TextFormat.RAW)
+                message = INVALID_DAX_LIST_ITEM_COLOR_USAGE.getExplanation(TextFormat.RAW),
             )
         }
     }
@@ -185,20 +180,20 @@ class DaxTextColorUsageDetector : Detector(), SourceCodeScanner {
         private val ARBITRARY_COLOR_ACCESS_REGEX = Regex("""\bColor\.[A-Za-z_][A-Za-z0-9_]*""")
         private val ARBITRARY_COLOR_CONSTRUCTOR_REGEX = Regex("""\bColor\s*\(""")
 
-        val INVALID_DAX_TEXT_COLOR_USAGE = Issue
+        val INVALID_DAX_LIST_ITEM_COLOR_USAGE = Issue
             .create(
-                id = "InvalidDaxTextColorUsage",
-                briefDescription = "DaxText color parameter should use DuckDuckGoTheme semantic text colors",
+                id = "InvalidDaxListItemColorUsage",
+                briefDescription = "List item text color parameters should use DuckDuckGoTheme semantic colors",
                 explanation = """
-                    Use DuckDuckGoTheme semantic text colors (preferred: DuckDuckGoTheme.colors.text, legacy: DuckDuckGoTheme.textColors) instead of arbitrary Color values.
+                    Use DuckDuckGoTheme semantic colors (e.g. DuckDuckGoTheme.colors.text, DuckDuckGoTheme.textColors) for the primaryTextColor and secondaryTextColor parameters of list items instead of arbitrary Color values.
 
-                    Defaults classes are allowed only when their implementation resolves to DuckDuckGoTheme semantic text colors or theme-defined static colors.
+                    Defaults classes are allowed only when their implementation resolves to DuckDuckGoTheme semantic colors or theme-defined static colors.
 
                     Examples:
                     • DuckDuckGoTheme.colors.text.primary
                     • theme.colors.text.secondary
                     • DuckDuckGoTheme.textColors.primary
-                    • DuckDuckGoTheme.textColors.secondary
+                    • DuckDuckGoTheme.colors.destructive
 
                     For one-off cases requiring custom colors, use good judgement or consider raising it in the Android Design System AOR.
                 """.trimIndent(),
@@ -208,9 +203,9 @@ class DaxTextColorUsageDetector : Detector(), SourceCodeScanner {
                 severity = Severity.WARNING,
                 androidSpecific = true,
                 implementation = Implementation(
-                    DaxTextColorUsageDetector::class.java,
-                    EnumSet.of(Scope.JAVA_FILE, Scope.TEST_SOURCES)
-                )
+                    DaxListItemColorUsageDetector::class.java,
+                    EnumSet.of(Scope.JAVA_FILE, Scope.TEST_SOURCES),
+                ),
             )
     }
 }
