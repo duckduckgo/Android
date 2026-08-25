@@ -123,7 +123,13 @@ class NewUserOnboardingPlanProviderTest {
         id = OnboardingSingleChoiceDataPlugin.Id.DuckAiNewTabTogglePosition,
         options = togglePositionOptions,
     )
-    private var singleChoicePlugins: List<OnboardingSingleChoiceDataPlugin> = listOf(modelProviderPlugin, togglePositionPlugin)
+    private val duckAiStateOptions = listOf(TestOption("duck_ai_on"), TestOption("duck_ai_off"))
+    private val duckAiStatePlugin = FakeOnboardingSingleChoiceDataPlugin(
+        id = OnboardingSingleChoiceDataPlugin.Id.DuckAiState,
+        options = duckAiStateOptions,
+    )
+    private var singleChoicePlugins: List<OnboardingSingleChoiceDataPlugin> =
+        listOf(modelProviderPlugin, togglePositionPlugin, duckAiStatePlugin)
     private val singleChoiceDataPlugins = object : ActivePluginPoint<OnboardingSingleChoiceDataPlugin> {
         override suspend fun getPlugins(): Collection<OnboardingSingleChoiceDataPlugin> = singleChoicePlugins
     }
@@ -435,6 +441,46 @@ class NewUserOnboardingPlanProviderTest {
 
         startSegmentedAtAiProviderChoice()
         orchestrator.onEvent(NewUserOnboardingEvent.SingleChoiceConfirmed(providerOptions.first()))
+
+        assertStep(NewUserOnboardingStepIds.ADDRESS_BAR_POSITION)
+    }
+
+    private suspend fun startSegmentedAtDuckAiState() {
+        whenever(onboardingPreferenceApplier.isAvailable(OnboardingPreference.SEARCH_ASSIST)).thenReturn(false)
+        whenever(onboardingPreferenceApplier.isAvailable(OnboardingPreference.HIDE_AI_GENERATED_IMAGES)).thenReturn(false)
+        startSegmentedAtDownloadReason()
+        orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.NO_AI))
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
+        orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
+    }
+
+    @Test
+    fun `when the duck ai state step is reached then it offers the plugin options`() = runTest {
+        startSegmentedAtDuckAiState()
+
+        assertStep(NewUserOnboardingStepIds.DUCK_AI_STATE)
+        val step = (orchestrator.state.value as InProgress).currentStep as NewUserOnboardingActivityStep
+        assertEquals(
+            NewUserOnboardingActivityDialog.DuckAiState(options = duckAiStateOptions),
+            step.resolveDialog(),
+        )
+    }
+
+    @Test
+    fun `when a duck ai state is confirmed then it is applied to the plugin that offered it`() = runTest {
+        startSegmentedAtDuckAiState()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.SingleChoiceConfirmed(duckAiStateOptions[1]))
+
+        assertEquals(listOf(duckAiStateOptions[1]), duckAiStatePlugin.applied)
+        assertStep(NewUserOnboardingStepIds.ADDRESS_BAR_POSITION)
+    }
+
+    @Test
+    fun `when no plugin offers the duck ai state choice then the step is skipped`() = runTest {
+        singleChoicePlugins = listOf(modelProviderPlugin, togglePositionPlugin)
+
+        startSegmentedAtDuckAiState()
 
         assertStep(NewUserOnboardingStepIds.ADDRESS_BAR_POSITION)
     }

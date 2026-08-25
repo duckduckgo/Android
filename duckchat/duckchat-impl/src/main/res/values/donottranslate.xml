@@ -36,4 +36,8 @@
     <string name="duckChatOnboardingNewTabTogglePositionDuckAi">Open tabs with AI chat</string>
     <string name="duckChatOnboardingNewTabTogglePositionLastUsed">Not Now</string>
 
+    <!-- Duck.ai on/off, shown in the onboarding Duck.ai state choice -->
+    <string name="duckChatOnboardingDuckAiStateOn">Turn Duck.ai On</string>
+    <string name="duckChatOnboardingDuckAiStateOff">Keep Duck.ai Off</string>
+
 </resources>

@@ -232,6 +232,17 @@ class DialogConfigResolver @Inject constructor(
             ),
         )
 
+        is NewUserOnboardingActivityDialog.DuckAiState -> DialogConfig(
+            background = OnboardingBackgroundStep.PreferenceSelector,
+            embellishment = Embellishment.LeftWing,
+            cardArrow = CardArrowConfig.AtEnd,
+            content = ContentConfig.DuckAiState(
+                title = TextConfig.Resource(R.string.noAiPathDuckAiStateTitle),
+                body = TextConfig.Resource(R.string.noAiPathDuckAiStateBody),
+                options = dialog.options,
+            ),
+        )
+
         is NewUserOnboardingActivityDialog.IntroAnimation,
         NewUserOnboardingActivityDialog.NotificationPermission,
         NewUserOnboardingActivityDialog.DefaultBrowserPrompt,

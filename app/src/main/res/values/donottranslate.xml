@@ -93,6 +93,8 @@
     <string name="noAiPathPreferenceSearchAssistSecondary">Include AI-generated answers with search results</string>
     <string name="noAiPathPreferenceHideAiGeneratedImagesPrimary">Safe Search</string>
     <string name="noAiPathPreferenceHideAiGeneratedImagesSecondary">Filter out known AI spam sites from image search results</string>
+    <string name="noAiPathDuckAiStateTitle">Want the option to chat privately with popular AIs?</string>
+    <string name="noAiPathDuckAiStateBody">In Duck.ai, your chats are anonymized by us and never used to train AI.</string>
 
     <!-- Browser tab -->
     <string name="browserDuckPlayerShortUrl">Duck Player</string>

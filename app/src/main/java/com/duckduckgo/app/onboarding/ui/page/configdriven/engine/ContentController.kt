@@ -28,6 +28,7 @@ import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.AddToDockBinde
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.AddressBarBinder
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.ComparisonChartBinder
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.DownloadReasonBinder
+import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.DuckAiStateBinder
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.InputScreenBinder
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.InputScreenPreviewBinder
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.PreferenceSelectorBinder
@@ -68,6 +69,7 @@ class ContentControllerImpl(
     private val preferenceSelector = PreferenceSelectorBinder(binding.preferenceSelectorContent)
     private val singleChoice = SingleChoiceBinder(binding.singleChoiceContent)
     private val togglePosition = TogglePositionBinder(binding.togglePositionContent, isLightMode)
+    private val duckAiState = DuckAiStateBinder(binding.duckAiStateContent)
 
     private var boundView: View? = null
 
@@ -135,6 +137,10 @@ class ContentControllerImpl(
             is ContentConfig.TogglePosition -> {
                 boundView = togglePosition.view
                 togglePosition.bind(content, scope)
+            }
+            is ContentConfig.DuckAiState -> {
+                boundView = duckAiState.view
+                duckAiState.bind(content, scope)
             }
         }
         boundView?.isVisible = true

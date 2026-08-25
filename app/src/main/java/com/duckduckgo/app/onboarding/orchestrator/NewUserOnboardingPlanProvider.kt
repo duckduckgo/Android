@@ -265,10 +265,12 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         val firstDialog = SuspendMemo { FirstDialog.INITIAL }
         val modelProviderChoice = singleChoiceDataPlugin(OnboardingSingleChoiceDataPlugin.Id.DuckAiModelProvider)
         val togglePositionChoice = singleChoiceDataPlugin(OnboardingSingleChoiceDataPlugin.Id.DuckAiNewTabTogglePosition)
+        val duckAiStateChoice = singleChoiceDataPlugin(OnboardingSingleChoiceDataPlugin.Id.DuckAiState)
 
         // Warms the options up while the user is still several screens away from the step that renders them.
         appCoroutineScope.launch(dispatchers.io()) { modelProviderChoice?.prefetch() }
         appCoroutineScope.launch(dispatchers.io()) { togglePositionChoice?.prefetch() }
+        appCoroutineScope.launch(dispatchers.io()) { duckAiStateChoice?.prefetch() }
 
         return rootPlan(
             ctx = ctx,
@@ -278,7 +280,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 add(introAnimationStep())
                 add(notificationPermissionStep())
                 add(initialStep(firstDialog))
-                add(downloadReasonStep(ctx, modelProviderChoice, togglePositionChoice))
+                add(downloadReasonStep(ctx, modelProviderChoice, togglePositionChoice, duckAiStateChoice))
             },
         )
     }
@@ -505,6 +507,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         ctx: NewUserOnboardingPlanContext,
         modelProviderChoice: OnboardingSingleChoiceDataPlugin?,
         togglePositionChoice: OnboardingSingleChoiceDataPlugin?,
+        duckAiStateChoice: OnboardingSingleChoiceDataPlugin?,
     ): NewUserOnboardingActivityStep {
         return NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.DOWNLOAD_REASON,
@@ -525,7 +528,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                         when (selection) {
                             DownloadReasonSelection.SEARCH -> SwitchTo(segmentedSearchPlan(ctx))
                             DownloadReasonSelection.AI_CHAT -> SwitchTo(segmentedAiPlan(ctx, modelProviderChoice, togglePositionChoice))
-                            DownloadReasonSelection.NO_AI -> SwitchTo(segmentedNoAiPlan(ctx))
+                            DownloadReasonSelection.NO_AI -> SwitchTo(segmentedNoAiPlan(ctx, duckAiStateChoice))
                             DownloadReasonSelection.BLOCK_ADS,
                             -> {
                                 Stay
@@ -584,7 +587,10 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         )
     }
 
-    private fun segmentedNoAiPlan(ctx: NewUserOnboardingPlanContext): LinearOnboardingPlan {
+    private fun segmentedNoAiPlan(
+        ctx: NewUserOnboardingPlanContext,
+        duckAiStateChoice: OnboardingSingleChoiceDataPlugin?,
+    ): LinearOnboardingPlan {
         return sidePlan(
             id = SEGMENTED_NO_AI_PLAN_ID,
             steps = listOf(
@@ -596,6 +602,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                         OnboardingPreference.HIDE_AI_GENERATED_IMAGES,
                     ),
                 ),
+                duckAiStateStep(duckAiStateChoice),
                 addressBarPositionStep(),
             ),
         )
@@ -675,6 +682,32 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 when (event) {
                     is NewUserOnboardingEvent.SingleChoiceConfirmed -> {
                         logcat { "Toggle position confirmed: ${event.option.id}" }
+                        plugin?.apply(event.option)
+                        Advance
+                    }
+
+                    else -> Stay
+                }
+            },
+        )
+    }
+
+    /**
+     * The options are the screen's buttons, so a single option would leave the user with nothing to
+     * decline and the step is skipped rather than rendered.
+     */
+    private fun duckAiStateStep(plugin: OnboardingSingleChoiceDataPlugin?): NewUserOnboardingActivityStep {
+        val options = SuspendMemo { plugin?.options().orEmpty() }
+        return NewUserOnboardingActivityStep(
+            id = NewUserOnboardingStepIds.DUCK_AI_STATE,
+            pixelName = null,
+            showsStepIndicator = true,
+            precondition = { options().size > 1 },
+            resolveDialog = { NewUserOnboardingActivityDialog.DuckAiState(options()) },
+            transition = { event ->
+                when (event) {
+                    is NewUserOnboardingEvent.SingleChoiceConfirmed -> {
+                        logcat { "Duck.ai state confirmed: ${event.option.id}" }
                         plugin?.apply(event.option)
                         Advance
                     }
