@@ -35,9 +35,6 @@ import com.duckduckgo.mobile.android.R
  * Its trailing element is either a [DaxListItemTrailingScope.StatusIndicator] or a
  * [DaxListItemTrailingScope.Icon], so the slot is open like the other variants.
  *
- * Asana task: https://app.asana.com/1/137249556945/project/1202857801505092/task/1217018486992588
- * Figma reference: https://www.figma.com/design/BOHDESHODUXK7wSRNBOHdu/%F0%9F%A4%96-Android-Components?node-id=12994-10026
- *
  * @param primaryText Primary label.
  * @param modifier Modifier applied to the list item row.
  * @param secondaryText Secondary caption shown beneath the primary label; `null` = one-line layout.
@@ -46,6 +43,9 @@ import com.duckduckgo.mobile.android.R
  * @param trailingContent Optional trailing slot — use [DaxListItemTrailingScope] members.
  * @param onClick Optional click handler; when non-null the row becomes clickable.
  * @param enabled Whether the row is enabled; disabled rows are dimmed and non-interactive.
+ *
+ * Asana task: https://app.asana.com/1/137249556945/project/1202857801505092/task/1217018486992588
+ * Figma reference: https://www.figma.com/design/BOHDESHODUXK7wSRNBOHdu/%F0%9F%A4%96-Android-Components?node-id=12994-10026
  */
 @Composable
 fun DaxSettingsListItem(
