@@ -255,7 +255,7 @@ class RealDuckAiModelManagerTest {
     fun whenNoSelectionPersistedAndListReorderedThenDefaultFollowsNewFirstAccessible() = runTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
-        whenever(modelsService.getModels(any())).thenReturn(
+        whenever(modelsService.getModels(any(), anyOrNull())).thenReturn(
             AIChatModelsResponse(
                 listOf(
                     remoteModel("id1", accessTier = listOf("free"), entityHasAccess = true),
@@ -269,7 +269,7 @@ class RealDuckAiModelManagerTest {
 
         assertEquals("id1", testee.modelState.value.selectedModelId)
 
-        whenever(modelsService.getModels(any())).thenReturn(
+        whenever(modelsService.getModels(any(), anyOrNull())).thenReturn(
             AIChatModelsResponse(
                 listOf(
                     remoteModel("id2", accessTier = listOf("free"), entityHasAccess = true),
@@ -288,7 +288,7 @@ class RealDuckAiModelManagerTest {
     fun whenUserPickedModelAndListReorderedThenPickPreserved() = runTest {
         whenever(dataStore.getSelectedModel()).thenReturn(SelectedModel("id2", "model2"))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
-        whenever(modelsService.getModels(any())).thenReturn(
+        whenever(modelsService.getModels(any(), anyOrNull())).thenReturn(
             AIChatModelsResponse(
                 listOf(
                     remoteModel("id1", accessTier = listOf("free"), entityHasAccess = true),
