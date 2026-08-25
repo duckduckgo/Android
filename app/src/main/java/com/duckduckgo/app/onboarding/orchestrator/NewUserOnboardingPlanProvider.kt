@@ -529,10 +529,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                             DownloadReasonSelection.SEARCH -> SwitchTo(segmentedSearchPlan(ctx))
                             DownloadReasonSelection.AI_CHAT -> SwitchTo(segmentedAiPlan(ctx, modelProviderChoice, togglePositionChoice))
                             DownloadReasonSelection.NO_AI -> SwitchTo(segmentedNoAiPlan(ctx, duckAiStateChoice))
-                            DownloadReasonSelection.BLOCK_ADS,
-                            -> {
-                                Stay
-                            }
+                            DownloadReasonSelection.BLOCK_ADS -> SwitchTo(segmentedBlockAdsPlan(ctx))
                         }
                     }
                     else -> Stay
@@ -611,6 +608,31 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 duckAiStateStep(ctx, duckAiStateChoice),
                 addressBarPositionStep(),
                 inputScreenPreviewStep(ctx = ctx, isSearchDefault = true),
+            ),
+        )
+    }
+
+    private fun segmentedBlockAdsPlan(ctx: NewUserOnboardingPlanContext): LinearOnboardingPlan {
+        val duckAiEnabled = SuspendMemo { duckAiOnboardingAvailability.isDuckAiOnboardingEnabled() }
+        return sidePlan(
+            id = SEGMENTED_BLOCK_ADS_PLAN_ID,
+            steps = listOf(
+                comparisonChartStep(NewUserOnboardingActivityDialog.SegmentedComparisonChart(ComparisonChartConfig.SegmentedBlockAdsPath)),
+                defaultBrowserPromptStep(),
+                // preferenceSelectorStep(
+                //     listOf(
+                //         OnboardingPreference.SEARCH_ASSIST,
+                //         OnboardingPreference.HIDE_AI_GENERATED_IMAGES,
+                //     ),
+                // ),
+                inputScreenStep(ctx),
+                addressBarPositionStep(),
+                inputScreenPreviewStep(
+                    ctx = ctx,
+                    isSearchDefault = true,
+                    showModeToggle = { ctx.inputModeWasAi && duckAiEnabled() },
+                    shownOnlyWithModeToggle = false,
+                ),
             ),
         )
     }
@@ -1085,6 +1107,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         const val SEGMENTED_SEARCH_PLAN_ID = "new-user_segmented_search"
         const val SEGMENTED_AI_PLAN_ID = "new-user_segmented_ai"
         const val SEGMENTED_NO_AI_PLAN_ID = "new-user_segmented_no-ai"
+        const val SEGMENTED_BLOCK_ADS_PLAN_ID = "new-user_segmented_block-ads"
 
         private const val BLOCK_STORE_TIMEOUT_MS = 3_000L
     }
