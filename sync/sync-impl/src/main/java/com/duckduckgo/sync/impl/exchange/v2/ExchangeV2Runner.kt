@@ -462,15 +462,15 @@ class RealExchangeV2Runner @Inject constructor(
         when (effect) {
             SideEffect.SendAwaitingConfirmation -> {
                 logcat { "Sync-ExchangeV2: side effect → SendAwaitingConfirmation" }
-                sendMessageJson("""{"type":"recovery_code_awaiting_confirmation"}""")
+                sendMessage(ExchangeV2Message.RecoveryCodeAwaitingConfirmation.create())
             }
             SideEffect.SendConfirmed -> {
                 logcat { "Sync-ExchangeV2: side effect → SendConfirmed" }
-                sendMessageJson("""{"type":"recovery_code_confirmed"}""")
+                sendMessage(ExchangeV2Message.RecoveryCodeConfirmed.create())
             }
             SideEffect.SendDenied -> {
                 logcat { "Sync-ExchangeV2: side effect → SendDenied" }
-                sendMessageJson("""{"type":"recovery_code_denied"}""")
+                sendMessage(ExchangeV2Message.RecoveryCodeDenied.create())
             }
             SideEffect.RequestRecoveryCodeShare -> {
                 logcat { "Sync-ExchangeV2: side effect → RequestRecoveryCodeShare" }
@@ -776,10 +776,10 @@ class RealExchangeV2Runner @Inject constructor(
         return recoveryCodeProvider.getThirdPartyRecoveryCode()
     }
 
-    private fun sendMessageJson(json: String) {
+    private fun sendMessage(message: ExchangeV2Message) {
         val peer = peerChannelId ?: return
         val peerKey = peerPublicKey ?: return
-        sendOnWireAndRecord(messageParser.parse(json), peer, peerKey)
+        sendOnWireAndRecord(message, peer, peerKey)
     }
 
     /** Returns true on successful POST, false on transport error (caller decides if fatal). */
