@@ -54,12 +54,16 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argThat
+import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.util.Base64
 
 @RunWith(TestParameterInjector::class)
 class RealExchangeV2RunnerTest {
@@ -95,10 +99,11 @@ class RealExchangeV2RunnerTest {
         givenLinkingCodeVersion(ExchangeProtocolVersion.V2_0)
         whenever(qrCode.buildLinkingCode(any(), any(), any())).thenReturn("https://duckduckgo.com/sync/pairing/#&code2=fake")
         whenever(jweCrypto.generateRsaKeyPair(any())).thenReturn(RsaKeyPair(publicKeyBase64 = "own-pub", privateKeyBase64 = "own-priv"))
-        whenever(channel.createChannel(any())).thenReturn(Result.Success(Unit))
-        whenever(channel.poll(any(), any())).thenReturn(emptyFlow())
-        whenever(channel.sendMessage(any(), any(), any(), any())).thenReturn(Result.Success(Unit))
-        whenever(channel.deleteChannel(any())).thenReturn(Result.Success(Unit))
+        whenever(jweCrypto.generateSecureBytes(any())).thenReturn("channel-secret".toByteArray())
+        whenever(channel.createChannel(any(), anyOrNull())).thenReturn(Result.Success(Unit))
+        whenever(channel.poll(any(), any(), anyOrNull())).thenReturn(emptyFlow())
+        whenever(channel.sendMessage(any(), any(), any(), any(), anyOrNull())).thenReturn(Result.Success(Unit))
+        whenever(channel.deleteChannel(any(), anyOrNull())).thenReturn(Result.Success(Unit))
         whenever(syncDeviceIds.deviceName()).thenReturn("This Device")
     }
 
@@ -249,6 +254,7 @@ class RealExchangeV2RunnerTest {
             any(),
             any(),
             any(),
+            anyOrNull(),
         )
     }
 
@@ -264,6 +270,7 @@ class RealExchangeV2RunnerTest {
             any(),
             any(),
             any(),
+            anyOrNull(),
         )
     }
 
@@ -295,6 +302,7 @@ class RealExchangeV2RunnerTest {
             any(),
             any(),
             any(),
+            anyOrNull(),
         )
     }
 
@@ -456,12 +464,14 @@ class RealExchangeV2RunnerTest {
             any(),
             any(),
             any(),
+            anyOrNull(),
         )
         verify(channel, never()).sendMessage(
             argThat { this is RecoveryCodeConfirmed },
             any(),
             any(),
             any(),
+            anyOrNull(),
         )
     }
 
@@ -481,12 +491,14 @@ class RealExchangeV2RunnerTest {
             any(),
             any(),
             any(),
+            anyOrNull(),
         )
         verify(channel, org.mockito.kotlin.times(1)).sendMessage(
             argThat { this is RecoveryCodeAwaitingConfirmation },
             any(),
             any(),
             any(),
+            anyOrNull(),
         )
     }
 
@@ -495,7 +507,7 @@ class RealExchangeV2RunnerTest {
         whenever(recoveryCodeProvider.createDdgAccountIfNeeded()).thenReturn(Result.Success(Unit))
         whenever(recoveryCodeProvider.getDdgRecoveryCode()).thenReturn(Result.Success("the-code"))
         whenever(
-            channel.sendMessage(any<RecoveryCodeResponse>(), any(), any(), any()),
+            channel.sendMessage(any<RecoveryCodeResponse>(), any(), any(), any(), anyOrNull()),
         ).thenReturn(Result.Error(reason = "relay unreachable"))
 
         val runner = newRunner()
@@ -617,7 +629,7 @@ class RealExchangeV2RunnerTest {
 
     @Test fun `an unexpected poll error tears down the session with a SessionError`() = runTest {
         whenever(syncStore.userId).thenReturn("my-user")
-        whenever(channel.poll(any(), any())).thenReturn(flow<ExchangeV2Message> { throw RuntimeException("boom") })
+        whenever(channel.poll(any(), any(), anyOrNull())).thenReturn(flow<ExchangeV2Message> { throw RuntimeException("boom") })
         val runner = newRunner()
         runner.startPresent()
 
@@ -635,7 +647,7 @@ class RealExchangeV2RunnerTest {
 
     @Test fun `polled messages are processed in wire order (hello before request reaches Host_Confirming)`() = runTest {
         whenever(syncStore.userId).thenReturn("my-user")
-        whenever(channel.poll(any(), any())).thenReturn(
+        whenever(channel.poll(any(), any(), anyOrNull())).thenReturn(
             flowOf(
                 Hello.fromJson("""{"type":"hello"}"""),
                 RecoveryCodeRequest.create(name = "Joiner", kind = "ddg"),
@@ -650,7 +662,7 @@ class RealExchangeV2RunnerTest {
 
     @Test fun `a polled message that reaches a terminal state tears down without a spurious error`() = runTest {
         whenever(syncStore.userId).thenReturn("shared")
-        whenever(channel.poll(any(), any())).thenReturn(
+        whenever(channel.poll(any(), any(), anyOrNull())).thenReturn(
             flowOf(
                 RecoveryCodeAvailable.create(userId = "shared", name = "Peer", kind = "ddg"),
             ),
@@ -668,7 +680,7 @@ class RealExchangeV2RunnerTest {
 
     @Test fun `cancel during an open poll does not surface a spurious error`() = runTest {
         whenever(syncStore.userId).thenReturn("my-user")
-        whenever(channel.poll(any(), any())).thenReturn(flow<ExchangeV2Message> { awaitCancellation() })
+        whenever(channel.poll(any(), any(), anyOrNull())).thenReturn(flow<ExchangeV2Message> { awaitCancellation() })
         val runner = newRunner()
         runner.startPresent()
 
@@ -681,7 +693,7 @@ class RealExchangeV2RunnerTest {
     }
 
     @Test fun `startScan with a failed channel bootstrap aborts cleanly without the misleading reach-Presenter error`() = runTest {
-        whenever(channel.createChannel(any())).thenReturn(Result.Error(reason = "relay 500"))
+        whenever(channel.createChannel(any(), anyOrNull())).thenReturn(Result.Error(reason = "relay 500"))
         val runner = newRunner()
         runner.startScan("")
 
@@ -691,12 +703,93 @@ class RealExchangeV2RunnerTest {
     }
 
     @Test fun `a failed bootstrap clears the pairing role so no half-started session lingers`() = runTest {
-        whenever(channel.createChannel(any())).thenReturn(Result.Error(reason = "relay 500"))
+        whenever(channel.createChannel(any(), anyOrNull())).thenReturn(Result.Error(reason = "relay 500"))
         val runner = newRunner()
 
         runner.startScan("")
 
         assertNull("pairingRole must be cleared after a failed bootstrap", runner.pairingRole)
+    }
+
+    // ---- Channel authentication ----
+
+    @Test fun `the channel is claimed, polled and written to with a secret only when a flag calls for it`(
+        @TestParameter case: ExchangeAuthCase,
+    ) = runTest {
+        case.configure(syncFeature)
+        val utf8Secret = "channel-secret"
+        val expectedSecret = utf8Secret.toBase64Url().takeIf { case.isAuthenticated }
+        whenever(jweCrypto.generateSecureBytes(any())).thenReturn(utf8Secret.toByteArray())
+
+        val runner = newRunner()
+        runner.startScan("")
+
+        verify(jweCrypto, times(if (case.isAuthenticated) 1 else 0)).generateSecureBytes(any())
+        verify(channel).createChannel(any(), eq(expectedSecret))
+        verify(channel).poll(any(), any(), eq(expectedSecret))
+        verify(channel, atLeastOnce()).sendMessage(any(), any(), any(), any(), eq(expectedSecret))
+    }
+
+    @Test fun `cancel deletes the channel with whatever secret it was created with`(
+        @TestParameter case: ExchangeAuthCase,
+    ) = runTest {
+        case.configure(syncFeature)
+        val utf8Secret = "channel-secret"
+        val expectedSecret = utf8Secret.toBase64Url().takeIf { case.isAuthenticated }
+        whenever(jweCrypto.generateSecureBytes(any())).thenReturn(utf8Secret.toByteArray())
+
+        val runner = newRunner()
+        runner.startScan("")
+        runner.cancel()
+
+        verify(channel).deleteChannel(any(), eq(expectedSecret))
+    }
+
+    @Test fun `a channel_id collision retries with a fresh secret and keeps the one that was accepted`() = runTest {
+        val utf8Secrets = listOf("first-secret", "second-secret")
+        val base64UrlSecrets = utf8Secrets.map { it.toBase64Url() }
+        whenever(jweCrypto.generateSecureBytes(any())).thenReturn(
+            utf8Secrets[0].toByteArray(),
+            utf8Secrets[1].toByteArray(),
+        )
+        whenever(channel.createChannel(any(), anyOrNull())).thenReturn(
+            Result.Error(code = 409, reason = "channel_id taken"),
+            Result.Success(Unit),
+        )
+        val runner = newRunner()
+
+        runner.startScan("")
+
+        verify(channel).createChannel(any(), eq(base64UrlSecrets[0]))
+        verify(channel).createChannel(any(), eq(base64UrlSecrets[1]))
+        verify(channel).poll(any(), any(), eq(base64UrlSecrets[1]))
+    }
+
+    @Test fun `a new session claims its channel with a fresh secret`() = runTest {
+        val utf8Secrets = listOf("first-secret", "second-secret")
+        val base64UrlSecrets = utf8Secrets.map { it.toBase64Url() }
+        whenever(jweCrypto.generateSecureBytes(any())).thenReturn(
+            utf8Secrets[0].toByteArray(),
+            utf8Secrets[1].toByteArray(),
+        )
+        val runner = newRunner()
+
+        runner.startScan("")
+        runner.cancel()
+        runner.startScan("")
+
+        verify(channel).createChannel(any(), eq(base64UrlSecrets[0]))
+        verify(channel).createChannel(any(), eq(base64UrlSecrets[1]))
+    }
+
+    @Test fun `the channel secret is url-safe and unpadded so it survives an Authorization header`() = runTest {
+        // Standard base64 of these bytes is "fn4/Pz4+c2VjcmV0IQ==" — the '+', '/' and padding must all be gone.
+        whenever(jweCrypto.generateSecureBytes(any())).thenReturn("~~??>>secret!".toByteArray())
+        val runner = newRunner()
+
+        runner.startScan("")
+
+        verify(channel).createChannel(any(), eq("fn4_Pz4-c2VjcmV0IQ"))
     }
 
     // ---- Helpers ----
@@ -719,4 +812,39 @@ class RealExchangeV2RunnerTest {
     private fun String.toProtocolVersion() = ExchangeProtocolVersion.parse(this).getOrThrow()
 
     private fun String.toV2ProtocolVersion() = toProtocolVersion() as ExchangeProtocolVersion.V2
+
+    private fun String.toBase64Url(): String = Base64.getUrlEncoder().withoutPadding().encodeToString(toByteArray())
+
+    enum class ExchangeAuthCase(
+        val canSendExchangeChannelSecret: Boolean,
+        val canUseExchangeV2Point1: Boolean,
+        val isAuthenticated: Boolean,
+    ) {
+        BothFlagsOff(
+            canSendExchangeChannelSecret = false,
+            canUseExchangeV2Point1 = false,
+            isAuthenticated = false,
+        ),
+        SecretFlagOn(
+            canSendExchangeChannelSecret = true,
+            canUseExchangeV2Point1 = false,
+            isAuthenticated = true,
+        ),
+        V2Point1FlagOn(
+            canSendExchangeChannelSecret = false,
+            canUseExchangeV2Point1 = true,
+            isAuthenticated = true,
+        ),
+        BothFlagsOn(
+            canSendExchangeChannelSecret = true,
+            canUseExchangeV2Point1 = true,
+            isAuthenticated = true,
+        ),
+        ;
+
+        fun configure(syncFeature: SyncFeature) {
+            syncFeature.canSendExchangeChannelSecret().setRawStoredState(State(canSendExchangeChannelSecret))
+            syncFeature.canUseExchangeV2Point1().setRawStoredState(State(canUseExchangeV2Point1))
+        }
+    }
 }

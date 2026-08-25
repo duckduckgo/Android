@@ -166,24 +166,28 @@ interface SyncService {
 
     @PUT("$SYNC_PROD_ENVIRONMENT_URL/sync/v2/exchange/{channelId}")
     fun createExchangeChannel(
+        @Header("Authorization") authorization: String?,
         @Path("channelId") channelId: String,
         @Body body: ExchangeChannelCreateRequest,
     ): Call<Void>
 
     @POST("$SYNC_PROD_ENVIRONMENT_URL/sync/v2/exchange/{channelId}/messages")
     fun postExchangeMessages(
+        @Header("Authorization") authorization: String?,
         @Path("channelId") channelId: String,
         @Body body: ExchangeMessagesRequest,
     ): Call<Void>
 
     @GET("$SYNC_PROD_ENVIRONMENT_URL/sync/v2/exchange/{channelId}/messages")
     fun pollExchangeMessages(
+        @Header("Authorization") authorization: String?,
         @Path("channelId") channelId: String,
         @Query("after") after: Int,
     ): Call<ExchangeMessagesResponse>
 
     @DELETE("$SYNC_PROD_ENVIRONMENT_URL/sync/v2/exchange/{channelId}")
     fun deleteExchangeChannel(
+        @Header("Authorization") authorization: String?,
         @Path("channelId") channelId: String,
     ): Call<Void>
 

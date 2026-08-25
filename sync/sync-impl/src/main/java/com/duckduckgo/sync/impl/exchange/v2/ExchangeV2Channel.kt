@@ -45,31 +45,49 @@ class PollAuthDenied(val status: Int) : RuntimeException("Poll denied with $stat
 interface ExchangeV2Channel {
 
     /**
-     * Create [channelId] on the relay. Returns Success on 2xx. Returns Error with code=409 on
-     * UUID collision (caller should retry with a fresh UUID).
+     * Create [channelId] on the relay. [channelSecret] claims the channel and authorizes every later call on it, or
+     * null to claim it unauthenticated. Returns Success on 2xx. Returns Error with code=409 on UUID collision
+     * (caller should retry with a fresh UUID).
      */
-    fun createChannel(channelId: String): Result<Unit>
+    fun createChannel(
+        channelId: String,
+        channelSecret: String?,
+    ): Result<Unit>
 
     /**
-     * Encrypt [message] and send it to [peerChannelId]. Sender's kid is [ownChannelId].
+     * Encrypt [message] and send it to [peerChannelId]. Sender's kid is [ownChannelId]. [ownChannelSecret] authorizes
+     * the call, or null when the channel is unauthenticated. Writing to a peer's channel carries our own secret,
+     * never the peer's.
      */
     fun sendMessage(
         message: ExchangeV2Message,
         peerChannelId: String,
         peerPublicKeyBase64: String,
         ownChannelId: String,
+        ownChannelSecret: String?,
     ): Result<Unit>
 
     /**
-     * Poll loop on [ownChannelId], emitting decrypted + parsed messages.
+     * Poll loop on [ownChannelId], emitting decrypted + parsed messages. [ownChannelSecret] authorizes the calls, or
+     * null when the channel is unauthenticated, and [ownPrivateKeyBase64] decrypts the envelopes.
      *  - Transient statuses (5xx / 429 / network / timeouts) keep polling; the 5-min session timer catches persistent transient failures.
      *  - Throws [ChannelGone] on 404/410 (channel deleted or TTL'd), [PollBadRequest] on 400, [PollAuthDenied] on 401/403
      *  - Throws [EnvelopeVersionTooNew] on a too-new envelope and [EnvelopeDecryptFailure] on decrypt failure
      */
-    fun poll(ownChannelId: String, ownPrivateKeyBase64: String): Flow<ExchangeV2Message>
+    fun poll(
+        ownChannelId: String,
+        ownPrivateKeyBase64: String,
+        ownChannelSecret: String?,
+    ): Flow<ExchangeV2Message>
 
-    /** Best-effort DELETE of our own channel. Used on user-cancel + terminal SM states. */
-    fun deleteChannel(channelId: String): Result<Unit>
+    /**
+     * Best-effort DELETE of our own channel, used on user-cancel + terminal SM states. [channelSecret] authorizes the
+     * call, or null when the channel is unauthenticated.
+     */
+    fun deleteChannel(
+        channelId: String,
+        channelSecret: String?,
+    ): Result<Unit>
 }
 
 @ContributesBinding(AppScope::class)
@@ -79,9 +97,15 @@ class RealExchangeV2Channel @Inject constructor(
     private val messageParser: ExchangeV2MessageParser,
 ) : ExchangeV2Channel {
 
-    override fun createChannel(channelId: String): Result<Unit> {
+    override fun createChannel(
+        channelId: String,
+        channelSecret: String?,
+    ): Result<Unit> {
         logcat { "Sync-ExchangeV2: PUT /sync/v2/exchange/$channelId" }
-        return syncApi.createExchangeChannel(channelId)
+        return syncApi.createExchangeChannel(
+            channelId = channelId,
+            channelSecret = channelSecret,
+        )
     }
 
     override fun sendMessage(
@@ -89,6 +113,7 @@ class RealExchangeV2Channel @Inject constructor(
         peerChannelId: String,
         peerPublicKeyBase64: String,
         ownChannelId: String,
+        ownChannelSecret: String?,
     ): Result<Unit> {
         val sealed = runCatching {
             envelope.seal(message, peerPublicKeyBase64, ownChannelId)
@@ -97,13 +122,26 @@ class RealExchangeV2Channel @Inject constructor(
             return Result.Error(reason = "Failed to seal envelope: ${it.message}")
         }
         logcat { "Sync-ExchangeV2: POST /sync/v2/exchange/$peerChannelId/messages" }
-        return syncApi.sendExchangeMessages(peerChannelId, listOf(sealed))
+        return syncApi.sendExchangeMessages(
+            channelId = peerChannelId,
+            channelSecret = ownChannelSecret,
+            envelopes = listOf(sealed),
+        )
     }
 
-    override fun poll(ownChannelId: String, ownPrivateKeyBase64: String): Flow<ExchangeV2Message> = flow {
+    override fun poll(
+        ownChannelId: String,
+        ownPrivateKeyBase64: String,
+        ownChannelSecret: String?,
+    ): Flow<ExchangeV2Message> = flow {
         var cursor = 0
         while (true) {
-            when (val outcome = syncApi.pollExchangeMessages(ownChannelId, cursor)) {
+            val outcome = syncApi.pollExchangeMessages(
+                channelId = ownChannelId,
+                channelSecret = ownChannelSecret,
+                after = cursor,
+            )
+            when (outcome) {
                 is Result.Success -> {
                     for (entry in outcome.data) {
                         val decoded = decode(entry, ownPrivateKeyBase64)
@@ -111,6 +149,7 @@ class RealExchangeV2Channel @Inject constructor(
                         emit(decoded)
                     }
                 }
+
                 is Result.Error -> {
                     when (outcome.code) {
                         404, 410 -> throw ChannelGone(outcome.code)
@@ -124,12 +163,21 @@ class RealExchangeV2Channel @Inject constructor(
         }
     }
 
-    override fun deleteChannel(channelId: String): Result<Unit> {
+    override fun deleteChannel(
+        channelId: String,
+        channelSecret: String?,
+    ): Result<Unit> {
         logcat { "Sync-ExchangeV2: DELETE /sync/v2/exchange/$channelId (best effort)" }
-        return syncApi.deleteExchangeChannel(channelId)
+        return syncApi.deleteExchangeChannel(
+            channelId = channelId,
+            channelSecret = channelSecret,
+        )
     }
 
-    private fun decode(entry: com.duckduckgo.sync.impl.ExchangeMessageEntry, ownPrivateKeyBase64: String): ExchangeV2Message {
+    private fun decode(
+        entry: com.duckduckgo.sync.impl.ExchangeMessageEntry,
+        ownPrivateKeyBase64: String,
+    ): ExchangeV2Message {
         val inner = runCatching {
             envelope.open(ExchangeEnvelope(entry.version, entry.payload), ownPrivateKeyBase64)
         }.getOrElse {

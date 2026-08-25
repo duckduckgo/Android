@@ -28,7 +28,7 @@ import logcat.logcat
 import org.json.JSONObject
 import retrofit2.HttpException
 import retrofit2.Response
-import javax.inject.*
+import javax.inject.Inject
 
 interface SyncApi {
     fun createAccount(
@@ -154,17 +154,43 @@ interface SyncApi {
         request: CreateAccessCredentialRequest,
     ): Result<Boolean>
 
-    /** Open a relay channel for the v2 pairing flow. Returns Error(code=409) on UUID collision. */
-    fun createExchangeChannel(channelId: String): Result<Unit>
+    /**
+     * Open a relay channel for the v2 pairing flow. [channelSecret] claims the channel and authorizes every later
+     * call on it, or null to claim it unauthenticated. Returns Error(code=409) on UUID collision.
+     */
+    fun createExchangeChannel(
+        channelId: String,
+        channelSecret: String?,
+    ): Result<Unit>
 
-    /** Send a batch of encrypted envelopes to [channelId]. */
-    fun sendExchangeMessages(channelId: String, envelopes: List<ExchangeEnvelope>): Result<Unit>
+    /**
+     * Send a batch of encrypted envelopes to [channelId]. [channelSecret] authorizes the call, or null when the
+     * channel is unauthenticated. Writing to a peer's channel carries our own secret, never the peer's.
+     */
+    fun sendExchangeMessages(
+        channelId: String,
+        channelSecret: String?,
+        envelopes: List<ExchangeEnvelope>,
+    ): Result<Unit>
 
-    /** Poll [channelId] for messages with seq > [after]. Returns Error(code=404) if channel is gone. */
-    fun pollExchangeMessages(channelId: String, after: Int): Result<List<ExchangeMessageEntry>>
+    /**
+     * Poll [channelId] for messages with seq > [after]. [channelSecret] authorizes the call, or null when the
+     * channel is unauthenticated. Returns Error(code=404) if channel is gone.
+     */
+    fun pollExchangeMessages(
+        channelId: String,
+        channelSecret: String?,
+        after: Int,
+    ): Result<List<ExchangeMessageEntry>>
 
-    /** Best-effort DELETE of our own channel — discards relay state. */
-    fun deleteExchangeChannel(channelId: String): Result<Unit>
+    /**
+     * Best-effort DELETE of our own channel, discarding relay state. [channelSecret] authorizes the call, or null
+     * when the channel is unauthenticated.
+     */
+    fun deleteExchangeChannel(
+        channelId: String,
+        channelSecret: String?,
+    ): Result<Unit>
 }
 
 /**
@@ -666,23 +692,46 @@ class SyncServiceRemote @Inject constructor(
         }
     }
 
-    override fun createExchangeChannel(channelId: String): Result<Unit> {
+    override fun createExchangeChannel(
+        channelId: String,
+        channelSecret: String?,
+    ): Result<Unit> {
         val response = runCatching {
-            syncService.createExchangeChannel(channelId, ExchangeChannelCreateRequest()).execute()
+            syncService.createExchangeChannel(
+                authorization = channelSecret?.asBearerToken(),
+                channelId = channelId,
+                body = ExchangeChannelCreateRequest(),
+            ).execute()
         }.getOrElse { throwable -> return Result.Error(reason = throwable.message.toString()) }
         return onSuccess(response) { Result.Success(Unit) }
     }
 
-    override fun sendExchangeMessages(channelId: String, envelopes: List<ExchangeEnvelope>): Result<Unit> {
+    override fun sendExchangeMessages(
+        channelId: String,
+        channelSecret: String?,
+        envelopes: List<ExchangeEnvelope>,
+    ): Result<Unit> {
         val response = runCatching {
-            syncService.postExchangeMessages(channelId, ExchangeMessagesRequest(envelopes)).execute()
+            syncService.postExchangeMessages(
+                authorization = channelSecret?.asBearerToken(),
+                channelId = channelId,
+                body = ExchangeMessagesRequest(envelopes),
+            ).execute()
         }.getOrElse { throwable -> return Result.Error(reason = throwable.message.toString()) }
         return onSuccess(response) { Result.Success(Unit) }
     }
 
-    override fun pollExchangeMessages(channelId: String, after: Int): Result<List<ExchangeMessageEntry>> {
+    override fun pollExchangeMessages(
+        channelId: String,
+        channelSecret: String?,
+        after: Int,
+    ): Result<List<ExchangeMessageEntry>> {
         val response = runCatching {
-            syncService.pollExchangeMessages(channelId, after).execute()
+            syncService.pollExchangeMessages(
+                authorization = channelSecret?.asBearerToken(),
+                channelId = channelId,
+                after = after,
+            ).execute()
         }.getOrElse { throwable -> return Result.Error(reason = throwable.message.toString()) }
         return onSuccess(response) {
             val messages = response.body()?.messages ?: emptyList()
@@ -690,9 +739,15 @@ class SyncServiceRemote @Inject constructor(
         }
     }
 
-    override fun deleteExchangeChannel(channelId: String): Result<Unit> {
+    override fun deleteExchangeChannel(
+        channelId: String,
+        channelSecret: String?,
+    ): Result<Unit> {
         val response = runCatching {
-            syncService.deleteExchangeChannel(channelId).execute()
+            syncService.deleteExchangeChannel(
+                authorization = channelSecret?.asBearerToken(),
+                channelId = channelId,
+            ).execute()
         }.getOrElse { throwable -> return Result.Error(reason = throwable.message.toString()) }
         return onSuccess(response) { Result.Success(Unit) }
     }
@@ -712,6 +767,10 @@ class SyncServiceRemote @Inject constructor(
 
     private fun Response<*>.requestAuthToken(): String? {
         return raw().request.header("Authorization")?.removePrefix("Bearer ")
+    }
+
+    private fun String.asBearerToken(): String {
+        return "Bearer $this"
     }
 
     private class Adapters {
