@@ -149,8 +149,8 @@ class RealExchangeV2Runner @Inject constructor(
 
     @Volatile private var advertisedVersion: ExchangeProtocolVersion.V2 = BASELINE_PROTOCOL_VERSION
 
-    // TODO: Change to private once the negotiated version is used for anything and can be tested
     @Volatile internal var negotiatedVersion: ExchangeProtocolVersion.V2 = BASELINE_PROTOCOL_VERSION
+        private set
 
     /**
      * Host-side messages arriving while the Joiner is still at the user-confirm prompt, buffered
