@@ -59,8 +59,7 @@ sealed interface ExchangeV2Message {
      *  minimum requirement on the receiver — that is `envelope.version`. It lets the peer adjust
      *  its capabilities, and is the input to capability negotiation.
      */
-    @ConsistentCopyVisibility
-    data class Hello private constructor(
+    data class Hello(
         override val rawJson: String,
         val channelId: String,
         val publicKey: String,
@@ -115,8 +114,7 @@ sealed interface ExchangeV2Message {
      * @param name Human-readable device name shown to the peer.
      * @param kind Device kind, "ddg" or "3party"; drives cross-kind role election.
      */
-    @ConsistentCopyVisibility
-    data class RecoveryCodeAvailable private constructor(
+    data class RecoveryCodeAvailable(
         override val rawJson: String,
         val userId: String,
         val name: String,
@@ -171,8 +169,7 @@ sealed interface ExchangeV2Message {
      * @param name Human-readable device name shown to the peer.
      * @param kind Device kind, "ddg" or "3party"; drives cross-kind role election.
      */
-    @ConsistentCopyVisibility
-    data class RecoveryCodeRequest private constructor(
+    data class RecoveryCodeRequest(
         override val rawJson: String,
         val name: String,
         val kind: String,
@@ -215,8 +212,7 @@ sealed interface ExchangeV2Message {
      * The Joiner already confirmed locally before entering the message loop, so no action is
      * required. A UI may use it to show a hint such as "Check the other device".
      */
-    @ConsistentCopyVisibility
-    data class RecoveryCodeAwaitingConfirmation private constructor(
+    data class RecoveryCodeAwaitingConfirmation(
         override val rawJson: String,
     ) : ExchangeV2Message {
         override val messageType: String = TYPE
@@ -237,8 +233,7 @@ sealed interface ExchangeV2Message {
      * The Joiner must accept [RecoveryCodeResponse] regardless of whether this message was seen
      * first.
      */
-    @ConsistentCopyVisibility
-    data class RecoveryCodeConfirmed private constructor(
+    data class RecoveryCodeConfirmed(
         override val rawJson: String,
     ) : ExchangeV2Message {
         override val messageType: String = TYPE
@@ -257,8 +252,7 @@ sealed interface ExchangeV2Message {
      * Sent by the Host when its user declined to share the recovery code. The Joiner must abort the
      * session on receiving this.
      */
-    @ConsistentCopyVisibility
-    data class RecoveryCodeDenied private constructor(
+    data class RecoveryCodeDenied(
         override val rawJson: String,
     ) : ExchangeV2Message {
         override val messageType: String = TYPE
@@ -277,8 +271,7 @@ sealed interface ExchangeV2Message {
      * Sent by the Host when it cannot supply a recovery code (e.g. no account exists and creation
      * failed). The Joiner must abort the session on receiving this.
      */
-    @ConsistentCopyVisibility
-    data class RecoveryCodeUnavailable private constructor(
+    data class RecoveryCodeUnavailable(
         override val rawJson: String,
     ) : ExchangeV2Message {
         override val messageType: String = TYPE
@@ -299,8 +292,7 @@ sealed interface ExchangeV2Message {
      *
      * @param recoveryCode base64url-encoded recovery code payload.
      */
-    @ConsistentCopyVisibility
-    data class RecoveryCodeResponse private constructor(
+    data class RecoveryCodeResponse(
         override val rawJson: String,
         val recoveryCode: String,
     ) : ExchangeV2Message {
@@ -332,8 +324,7 @@ sealed interface ExchangeV2Message {
      *
      * Inbound only — we never send a type we don't know so there is no `create`.
      */
-    @ConsistentCopyVisibility
-    data class Unknown private constructor(
+    data class Unknown(
         override val rawJson: String,
         override val messageType: String,
     ) : ExchangeV2Message {
