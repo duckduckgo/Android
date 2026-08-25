@@ -33,6 +33,9 @@ import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeConfir
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeRequest
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeResponse
 import com.duckduckgo.sync.store.SyncStore
+import com.google.testing.junit.testparameterinjector.TestParameter
+import com.google.testing.junit.testparameterinjector.TestParameterInjector
+import com.google.testing.junit.testparameterinjector.TestParameters
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filterIsInstance
@@ -49,6 +52,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argThat
 import org.mockito.kotlin.eq
@@ -57,6 +61,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@RunWith(TestParameterInjector::class)
 class RealExchangeV2RunnerTest {
 
     @get:Rule val coroutineTestRule = CoroutineTestRule()
@@ -89,9 +94,7 @@ class RealExchangeV2RunnerTest {
         )
 
     @Before fun stubWireDeps() {
-        whenever(qrCode.parse(any())).thenReturn(
-            ExchangeV2CodeParseResult.LinkingV2(channelId = "peer-channel", publicKey = "peer-pubkey", version = ExchangeProtocolVersion.V2_0),
-        )
+        givenLinkingCodeVersion(ExchangeProtocolVersion.V2_0)
         whenever(qrCode.buildLinkingCode(any(), any(), any())).thenReturn("https://duckduckgo.com/sync/pairing/#&code2=fake")
         whenever(jweCrypto.generateRsaKeyPair(any())).thenReturn(RsaKeyPair(publicKeyBase64 = "own-pub", privateKeyBase64 = "own-priv"))
         whenever(channel.createChannel(any())).thenReturn(Result.Success(Unit))
@@ -266,20 +269,108 @@ class RealExchangeV2RunnerTest {
         )
     }
 
-    @Test fun `startPresent builds a v2_0 linking code when the v2_1 exchange flag is disabled`() {
-        syncFeature.canUseExchangeV2Point1().setRawStoredState(State(enable = false))
+    // ---- Protocol version negotiation ----
+
+    @Test fun `linking code advertises the version this device speaks`(
+        @TestParameter("2.0", "2.1") ourVersion: String,
+    ) {
+        val version = ourVersion.toV2ProtocolVersion()
+        givenOurVersion(version)
+
         val runner = newRunner()
         runner.startPresent()
 
+        verify(qrCode).buildLinkingCode(any(), any(), eq(version))
+    }
+
+    @Test fun `hello advertises the version this device speaks`(
+        @TestParameter("2.0", "2.1") ourVersion: String,
+    ) = runTest {
+        val version = ourVersion.toV2ProtocolVersion()
+        givenOurVersion(version)
+
+        val runner = newRunner()
+        runner.startScan("")
+
+        verify(channel).sendMessage(
+            argThat { this is Hello && this.version == version },
+            any(),
+            any(),
+            any(),
+        )
+    }
+
+    @Test fun `each session re-reads the flag rather than reusing the previous session's advertised version`() = runTest {
+        val runner = newRunner()
+
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        runner.startPresent()
+        verify(qrCode).buildLinkingCode(any(), any(), eq(ExchangeProtocolVersion.V2_1))
+
+        runner.cancel()
+
+        givenOurVersion(ExchangeProtocolVersion.V2_0)
+        runner.startPresent()
         verify(qrCode).buildLinkingCode(any(), any(), eq(ExchangeProtocolVersion.V2_0))
     }
 
-    @Test fun `startPresent builds a v2_1 linking code when the v2_1 exchange flag is enabled`() {
-        syncFeature.canUseExchangeV2Point1().setRawStoredState(State(enable = true))
+    @Test
+    @TestParameters(
+        "{ourVersion: '2.1', peerVersion: '2.1', negotiated: '2.1'}",
+        "{ourVersion: '2.1', peerVersion: '2.9', negotiated: '2.1'}",
+        "{ourVersion: '2.1', peerVersion: '2.0', negotiated: '2.0'}",
+        "{ourVersion: '2.0', peerVersion: '2.1', negotiated: '2.0'}",
+        "{ourVersion: '2.0', peerVersion: '2.0', negotiated: '2.0'}",
+    )
+    fun `Scanner negotiates the lower of our version and the scanned code's`(
+        ourVersion: String,
+        peerVersion: String,
+        negotiated: String,
+    ) = runTest {
+        givenOurVersion(ourVersion.toProtocolVersion())
+        givenLinkingCodeVersion(peerVersion.toV2ProtocolVersion())
+
+        val runner = newRunner()
+        runner.startScan("")
+
+        assertEquals(negotiated.toProtocolVersion(), runner.negotiatedVersion)
+    }
+
+    @Test
+    @TestParameters(
+        "{ourVersion: '2.1', peerVersion: '2.1', negotiated: '2.1'}",
+        "{ourVersion: '2.1', peerVersion: '2.9', negotiated: '2.1'}",
+        "{ourVersion: '2.1', peerVersion: '2.0', negotiated: '2.0'}",
+        "{ourVersion: '2.0', peerVersion: '2.1', negotiated: '2.0'}",
+        "{ourVersion: '2.0', peerVersion: '2.0', negotiated: '2.0'}",
+        "{ourVersion: '2.1', peerVersion: '1.0', negotiated: '2.0'}",
+        "{ourVersion: '2.1', peerVersion: '3.4', negotiated: '2.0'}",
+    )
+    fun `Presenter negotiates the lower of our version and the peer hello's`(
+        ourVersion: String,
+        peerVersion: String,
+        negotiated: String,
+    ) = runTest {
+        givenOurVersion(ourVersion.toProtocolVersion())
+        whenever(syncStore.userId).thenReturn("my-user")
+
         val runner = newRunner()
         runner.startPresent()
+        runner.deliverHello(peerVersion.toProtocolVersion())
 
-        verify(qrCode).buildLinkingCode(any(), any(), eq(ExchangeProtocolVersion.V2_1))
+        assertEquals(negotiated.toProtocolVersion(), runner.negotiatedVersion)
+    }
+
+    @Test fun `cancel clears negotiated version`() = runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenLinkingCodeVersion(ExchangeProtocolVersion.V2_1)
+
+        val runner = newRunner()
+        runner.startScan("")
+        assertEquals(ExchangeProtocolVersion.V2_1, runner.negotiatedVersion)
+
+        runner.cancel()
+        assertEquals(ExchangeProtocolVersion.V2_0, runner.negotiatedVersion)
     }
 
     // ---- Auto role election ----
@@ -609,4 +700,25 @@ class RealExchangeV2RunnerTest {
 
         assertNull("pairingRole must be cleared after a failed bootstrap", runner.pairingRole)
     }
+
+    // ---- Helpers ----
+
+    private fun givenOurVersion(version: ExchangeProtocolVersion) {
+        val state = State(remoteEnableState = version == ExchangeProtocolVersion.V2_1)
+        syncFeature.canUseExchangeV2Point1().setRawStoredState(state)
+    }
+
+    private fun givenLinkingCodeVersion(version: ExchangeProtocolVersion.V2) {
+        whenever(qrCode.parse(any())).thenReturn(
+            ExchangeV2CodeParseResult.LinkingV2(channelId = "peer-channel", publicKey = "peer-pubkey", version = version),
+        )
+    }
+
+    private suspend fun ExchangeV2Runner.deliverHello(version: ExchangeProtocolVersion) {
+        deliverIncomingMessage(Hello.create(channelId = "peer-channel", publicKey = "peer-pubkey", version = version))
+    }
+
+    private fun String.toProtocolVersion() = ExchangeProtocolVersion.parse(this).getOrThrow()
+
+    private fun String.toV2ProtocolVersion() = toProtocolVersion() as ExchangeProtocolVersion.V2
 }
