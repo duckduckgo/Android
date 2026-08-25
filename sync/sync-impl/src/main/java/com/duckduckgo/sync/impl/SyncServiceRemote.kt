@@ -607,7 +607,7 @@ class SyncServiceRemote @Inject constructor(
 
     private fun mapRescopeTokenError(response: Response<TokenRescopeResponse?>): Result<String> {
         val error = response.toUnparsedError()
-        error.removeKeysIfInvalid(response.requestAuthToken())
+        error.removeKeysIfInvalidForExchangeChannel(response)
         return error
     }
 
@@ -625,12 +625,12 @@ class SyncServiceRemote @Inject constructor(
                     val code = if (error.code == -1) response.code() else error.code
                     Result.Error(code, error.error)
                 } ?: Result.Error(code = response.code(), reason = response.message().toString())
-                error.removeKeysIfInvalid(response.requestAuthToken())
+                error.removeKeysIfInvalidForExchangeChannel(response)
                 return error
             }
         }.getOrElse {
             val result = Result.Error(response.code(), reason = response.message())
-            result.removeKeysIfInvalid(response.requestAuthToken())
+            result.removeKeysIfInvalidForExchangeChannel(response)
             return result
         }
     }
@@ -752,6 +752,13 @@ class SyncServiceRemote @Inject constructor(
         return onSuccess(response) { Result.Success(Unit) }
     }
 
+    private fun Result.Error.removeKeysIfInvalidForExchangeChannel(response: Response<*>) {
+        // These endpoints never authenticate the sync account, so a 401 from one carries no
+        // information about account validity. Regardless of whether we presented a channel secret.
+        if (response.isExchangeChannelRequest()) return
+        removeKeysIfInvalid(response.requestAuthToken())
+    }
+
     private fun Result.Error.removeKeysIfInvalid(requestToken: String?) {
         if (code != API_CODE.INVALID_LOGIN_CREDENTIALS.code) return
 
@@ -760,14 +767,17 @@ class SyncServiceRemote @Inject constructor(
         // token swap can 401 on the old token while the account is still valid. Only wipe local state
         // when the token that failed is still the current one (or unknown, preserving prior behavior).
         val tokenStillCurrent = requestToken == null || requestToken == syncStore.token
-        if (!syncFeature.preventStaleTokenLogout().isEnabled() || tokenStillCurrent) {
-            syncStore.clearAll()
-        }
+        if (!tokenStillCurrent && syncFeature.preventStaleTokenLogout().isEnabled()) return
+
+        syncStore.clearAll()
     }
 
     private fun Response<*>.requestAuthToken(): String? {
         return raw().request.header("Authorization")?.removePrefix("Bearer ")
     }
+
+    private fun Response<*>.isExchangeChannelRequest(): Boolean =
+        raw().request.url.encodedPath.startsWith(SyncService.EXCHANGE_CHANNEL_PATH_PREFIX)
 
     private fun String.asBearerToken(): String {
         return "Bearer $this"
