@@ -74,7 +74,7 @@ data class DaxDuckAiEndBrandDesignUpdateBubbleCta(
 
     override fun decorateDescription(
         context: Context,
-        text: CharSequence
+        text: CharSequence,
     ): CharSequence = if (segmentedPath == SegmentedOnboardingPath.AI) {
         text
     } else {
