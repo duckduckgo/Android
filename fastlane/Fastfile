@@ -252,6 +252,30 @@ platform :android do
 
         end
 
+    desc "Merge a release branch into the current branch, taking the release version when the version file conflicts"
+    private_lane :merge_release_branch do |options|
+        app_version = options[:app_version]
+        version_file = "app/version/version.properties"
+
+        sh("git merge --no-ff --no-commit release/#{app_version} || true")
+        conflicts = sh("git diff --name-only --diff-filter=U").split("\n").map(&:strip).reject(&:empty?)
+
+        unless conflicts.empty?
+            # a version bump that reached develop as its own commit instead of through a release branch leaves
+            # main and develop with independent edits to this file, so it conflicts on every subsequent release
+            UI.user_error!("Unexpected conflicts merging release/#{app_version}: #{conflicts.join(', ')}") unless conflicts == [version_file]
+            File.open("../#{version_file}", 'w') do |file|
+                file.write("VERSION=#{app_version}")
+            end
+            sh("git add ../#{version_file}")
+        end
+
+        sh("git commit --no-edit") unless sh("git rev-parse -q --verify MERGE_HEAD || true").strip.empty?
+
+        # the `|| true` above also swallows non-conflict merge failures, so prove the merge actually landed
+        sh("git merge-base --is-ancestor release/#{app_version} HEAD")
+    end
+
     desc "Create a new release branch and update the version"
     lane :tag_and_push_release_version do |options|
         app_version = options[:app_version]
@@ -285,7 +309,7 @@ platform :android do
 
         # Merge release branch into main and tag it
         sh "git checkout main"
-        sh "git merge --no-ff release/#{app_version}"
+        merge_release_branch(app_version: app_version)
         sh "git tag -a #{app_version} -m #{app_version}"
         sh "git push origin main --tags"
         UI.header("#{app_version} tag has been successfully created. 🎉")
@@ -293,7 +317,7 @@ platform :android do
         # Merge changes into develop
         sh "git checkout develop"
         sh "git pull origin develop"
-        sh "git merge --no-ff release/#{app_version}"
+        merge_release_branch(app_version: app_version)
         sh "git push origin develop"
 
         # Clean up branches
