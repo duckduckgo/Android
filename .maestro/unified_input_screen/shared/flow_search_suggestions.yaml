@@ -41,4 +41,4 @@ appId: com.duckduckgo.mobile.android
 - assertVisible:
     text: ".*privacy-test-pages.site.*"
     childOf:
-      id: "omnibarTextInput"
+      id: "omnibarTextInput|inputField"

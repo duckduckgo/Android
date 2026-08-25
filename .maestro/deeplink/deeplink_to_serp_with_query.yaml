@@ -14,6 +14,6 @@ tags:
           link: duck://https://duckduckgo.com?q=why%20use%20duckduckgo
 
       - copyTextFrom:
-          id: "omnibarTextInput"
+          id: "omnibarTextInput|inputField"
 
       - assertTrue: ${maestro.copiedText == "why use duckduckgo" }
