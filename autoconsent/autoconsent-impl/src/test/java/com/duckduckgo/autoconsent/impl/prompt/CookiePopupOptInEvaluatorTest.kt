@@ -18,6 +18,7 @@ package com.duckduckgo.autoconsent.impl.prompt
 
 import android.app.Application
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.onboarding.OnboardingFlowChecker
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -32,6 +33,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.robolectric.RuntimeEnvironment
@@ -47,6 +49,9 @@ class CookiePopupOptInEvaluatorTest {
     private val application: Application get() = RuntimeEnvironment.getApplication()
     private val feature = FakeFeatureToggleFactory.create(AutoconsentFeature::class.java)
     private val autoconsent: Autoconsent = mock()
+    private val onboardingFlowChecker: OnboardingFlowChecker = mock {
+        onBlocking { isOnboardingComplete() } doReturn true
+    }
 
     private val testee by lazy {
         CookiePopupOptInEvaluator(
@@ -55,12 +60,22 @@ class CookiePopupOptInEvaluatorTest {
             autoconsentFeature = feature,
             dispatchers = coroutineRule.testDispatcherProvider,
             autoconsent = autoconsent,
+            onboardingFlowChecker = onboardingFlowChecker,
         )
     }
 
     @Before
     fun setup() {
         feature.cookiePopUpPreferenceSetting().setRawStoredState(Toggle.State(enable = true))
+    }
+
+    @Test
+    fun whenOnboardingNotCompleteThenSkippedAndNothingLaunched() = runTest {
+        feature.cookiePopUpOptInPrompt().setRawStoredState(Toggle.State(enable = true))
+        whenever(onboardingFlowChecker.isOnboardingComplete()).thenReturn(false)
+
+        assertEquals(ModalEvaluator.EvaluationResult.Skipped, testee.evaluate())
+        assertNull(shadowOf(application).nextStartedActivity)
     }
 
     @Test

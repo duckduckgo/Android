@@ -20,6 +20,7 @@ import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.onboarding.OnboardingFlowChecker
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autoconsent.impl.R
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
@@ -45,6 +46,7 @@ class CookiePopupOptInEvaluator @Inject constructor(
     private val autoconsentFeature: AutoconsentFeature,
     private val dispatchers: DispatcherProvider,
     private val autoconsent: Autoconsent,
+    private val onboardingFlowChecker: OnboardingFlowChecker,
 ) : ModalEvaluator {
 
     override val priority: Int = 6
@@ -53,6 +55,10 @@ class CookiePopupOptInEvaluator @Inject constructor(
 
     override suspend fun evaluate(): ModalEvaluator.EvaluationResult = withContext(dispatchers.io()) {
         if (!autoconsentFeature.cookiePopUpOptInPrompt().isEnabled() || !autoconsentFeature.cookiePopUpPreferenceSetting().isEnabled()) {
+            return@withContext ModalEvaluator.EvaluationResult.Skipped
+        }
+
+        if (!onboardingFlowChecker.isOnboardingComplete()) {
             return@withContext ModalEvaluator.EvaluationResult.Skipped
         }
 
