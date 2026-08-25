@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.onboarding
 
+import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -43,11 +44,13 @@ class OnboardingPreferenceApplierImplTest {
     val coroutineRule = CoroutineTestRule()
 
     private val navigationHistory: NavigationHistory = mock()
+    private val autoconsent: Autoconsent = mock()
     private val serpSettingsDataProvider: SerpSettingsDataProvider = mock()
     private val serpSettingsFeature: SerpSettingsFeature = FakeFeatureToggleFactory.create(SerpSettingsFeature::class.java)
 
     private val testee = OnboardingPreferenceApplierImpl(
         navigationHistory = navigationHistory,
+        autoconsent = autoconsent,
         serpSettingsDataProvider = serpSettingsDataProvider,
         serpSettingsFeature = serpSettingsFeature,
         dispatcherProvider = coroutineRule.testDispatcherProvider,
@@ -227,8 +230,58 @@ class OnboardingPreferenceApplierImplTest {
                 OnboardingPreference.SAFE_SEARCH,
                 OnboardingPreference.SEARCH_ASSIST,
                 OnboardingPreference.HIDE_AI_GENERATED_IMAGES,
+                OnboardingPreference.REJECT_OPTIONAL_COOKIES,
+                OnboardingPreference.ACCEPT_NON_OPT_OUT_COOKIES,
             ),
             OnboardingPreference.entries,
         )
+    }
+
+    @Test
+    fun whenCookiePreferencesOfferedThenBothAreAvailable() = runTest {
+        assertTrue(testee.isAvailable(OnboardingPreference.REJECT_OPTIONAL_COOKIES))
+        assertTrue(testee.isAvailable(OnboardingPreference.ACCEPT_NON_OPT_OUT_COOKIES))
+    }
+
+    @Test
+    fun whenAutoconsentSettingOnThenRejectOptionalCookiesSeededOn() = runTest {
+        whenever(autoconsent.isSettingEnabled()).thenReturn(true)
+
+        assertTrue(testee.isEnabled(OnboardingPreference.REJECT_OPTIONAL_COOKIES))
+    }
+
+    @Test
+    fun whenAutoconsentSettingOffThenRejectOptionalCookiesSeededOff() = runTest {
+        whenever(autoconsent.isSettingEnabled()).thenReturn(false)
+
+        assertFalse(testee.isEnabled(OnboardingPreference.REJECT_OPTIONAL_COOKIES))
+    }
+
+    @Test
+    fun whenClickAcceptOnThenAcceptNonOptOutCookiesSeededOn() = runTest {
+        whenever(autoconsent.isClickAcceptEnabled()).thenReturn(true)
+
+        assertTrue(testee.isEnabled(OnboardingPreference.ACCEPT_NON_OPT_OUT_COOKIES))
+    }
+
+    @Test
+    fun whenClickAcceptOffThenAcceptNonOptOutCookiesSeededOff() = runTest {
+        whenever(autoconsent.isClickAcceptEnabled()).thenReturn(false)
+
+        assertFalse(testee.isEnabled(OnboardingPreference.ACCEPT_NON_OPT_OUT_COOKIES))
+    }
+
+    @Test
+    fun whenRejectOptionalCookiesAppliedThenAutoconsentSettingWritten() = runTest {
+        testee.apply(OnboardingPreference.REJECT_OPTIONAL_COOKIES, enabled = true)
+
+        verify(autoconsent).changeSetting(true)
+    }
+
+    @Test
+    fun whenAcceptNonOptOutCookiesAppliedThenClickAcceptWritten() = runTest {
+        testee.apply(OnboardingPreference.ACCEPT_NON_OPT_OUT_COOKIES, enabled = false)
+
+        verify(autoconsent).changeClickAcceptEnabled(false)
     }
 }

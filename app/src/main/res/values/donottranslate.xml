@@ -97,6 +97,11 @@
     <string name="noAiPathDuckAiStateTitle">Want the option to chat privately with popular AIs?</string>
     <string name="noAiPathDuckAiStateBody">In Duck.ai, your chats are anonymized by us and never used to train AI.</string>
 
+    <string name="blockAdsPathPreferenceRejectOptionalCookiesPrimary">Reject optional cookies</string>
+    <string name="blockAdsPathPreferenceRejectOptionalCookiesSecondary">Maximizes privacy and closes cookie pop-ups</string>
+    <string name="blockAdsPathPreferenceAcceptNonOptOutCookiesPrimary">Accept some cookies</string>
+    <string name="blockAdsPathPreferenceAcceptNonOptOutCookiesSecondary">Hides more pop-ups by accepting cookies that can’t be rejected</string>
+
     <string name="blockAdsPathComparisonChartTitle"><![CDATA[You\'re in the right place!<br/>Ad Blocking activated.]]></string>
 
     <!-- Browser tab -->

@@ -282,6 +282,23 @@ class DialogConfigResolver @Inject constructor(
             secondaryText = TextConfig.Resource(R.string.noAiPathPreferenceHideAiGeneratedImagesSecondary),
             initiallyEnabled = initiallyEnabled,
         )
+
+        OnboardingPreference.REJECT_OPTIONAL_COOKIES -> ContentConfig.PreferenceSelector.Row(
+            preference = preference,
+            iconRes = CommonR.drawable.cookie_blocked_color_24,
+            primaryText = TextConfig.Resource(R.string.blockAdsPathPreferenceRejectOptionalCookiesPrimary),
+            secondaryText = TextConfig.Resource(R.string.blockAdsPathPreferenceRejectOptionalCookiesSecondary),
+            initiallyEnabled = initiallyEnabled,
+        )
+
+        OnboardingPreference.ACCEPT_NON_OPT_OUT_COOKIES -> ContentConfig.PreferenceSelector.Row(
+            preference = preference,
+            iconRes = CommonR.drawable.cookie_color_24,
+            primaryText = TextConfig.Resource(R.string.blockAdsPathPreferenceAcceptNonOptOutCookiesPrimary),
+            secondaryText = TextConfig.Resource(R.string.blockAdsPathPreferenceAcceptNonOptOutCookiesSecondary),
+            initiallyEnabled = initiallyEnabled,
+            dependsOn = OnboardingPreference.REJECT_OPTIONAL_COOKIES,
+        )
     }
 
     private fun comparisonChart(chart: ComparisonChartConfig, showEmbellishment: Boolean = true) = DialogConfig(

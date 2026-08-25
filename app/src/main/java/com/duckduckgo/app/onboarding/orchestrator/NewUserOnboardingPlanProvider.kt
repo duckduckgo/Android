@@ -619,12 +619,12 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             steps = listOf(
                 comparisonChartStep(NewUserOnboardingActivityDialog.SegmentedComparisonChart(ComparisonChartConfig.SegmentedBlockAdsPath)),
                 defaultBrowserPromptStep(),
-                // preferenceSelectorStep(
-                //     listOf(
-                //         OnboardingPreference.SEARCH_ASSIST,
-                //         OnboardingPreference.HIDE_AI_GENERATED_IMAGES,
-                //     ),
-                // ),
+                preferenceSelectorStep(
+                    listOf(
+                        OnboardingPreference.REJECT_OPTIONAL_COOKIES,
+                        OnboardingPreference.ACCEPT_NON_OPT_OUT_COOKIES,
+                    ),
+                ),
                 inputScreenStep(ctx),
                 addressBarPositionStep(),
                 inputScreenPreviewStep(

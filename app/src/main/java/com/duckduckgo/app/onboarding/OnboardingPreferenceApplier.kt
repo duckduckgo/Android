@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.onboarding
 
+import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.history.api.NavigationHistory
@@ -56,6 +57,7 @@ interface OnboardingPreferenceApplier {
 @SingleInstanceIn(AppScope::class)
 class OnboardingPreferenceApplierImpl @Inject constructor(
     private val navigationHistory: NavigationHistory,
+    private val autoconsent: Autoconsent,
     private val serpSettingsDataProvider: SerpSettingsDataProvider,
     private val serpSettingsFeature: SerpSettingsFeature,
     private val dispatcherProvider: DispatcherProvider,
@@ -68,6 +70,11 @@ class OnboardingPreferenceApplierImpl @Inject constructor(
             OnboardingPreference.SEARCH_ASSIST,
             OnboardingPreference.HIDE_AI_GENERATED_IMAGES,
             -> serpSettingsFeature.storeSerpSettings().isEnabled()
+            // Autoconsent takes both values whatever its remote flags say: a value written here is simply
+            // inert until the flag that acts on it is on.
+            OnboardingPreference.REJECT_OPTIONAL_COOKIES,
+            OnboardingPreference.ACCEPT_NON_OPT_OUT_COOKIES,
+            -> true
         }
     }
 
@@ -79,6 +86,8 @@ class OnboardingPreferenceApplierImpl @Inject constructor(
             // who proceeds without touching a row gets that position rather than the app's own default.
             OnboardingPreference.SEARCH_ASSIST -> false
             OnboardingPreference.HIDE_AI_GENERATED_IMAGES -> true
+            OnboardingPreference.REJECT_OPTIONAL_COOKIES -> autoconsent.isSettingEnabled()
+            OnboardingPreference.ACCEPT_NON_OPT_OUT_COOKIES -> autoconsent.isClickAcceptEnabled()
         }
     }
 
@@ -92,6 +101,8 @@ class OnboardingPreferenceApplierImpl @Inject constructor(
             OnboardingPreference.HIDE_AI_GENERATED_IMAGES -> serpSettingsDataProvider.setSetting(
                 if (enabled) HideAiGeneratedImages.ON else HideAiGeneratedImages.OFF,
             )
+            OnboardingPreference.REJECT_OPTIONAL_COOKIES -> autoconsent.changeSetting(enabled)
+            OnboardingPreference.ACCEPT_NON_OPT_OUT_COOKIES -> autoconsent.changeClickAcceptEnabled(enabled)
         }
     }
 
