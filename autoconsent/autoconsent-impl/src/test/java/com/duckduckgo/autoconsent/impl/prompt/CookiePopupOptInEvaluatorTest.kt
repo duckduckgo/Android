@@ -23,6 +23,7 @@ import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autoconsent.impl.FakeSettingsRepository
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.promptscoordinator.api.ModalEvaluator
@@ -60,6 +61,10 @@ class CookiePopupOptInEvaluatorTest {
     private val onboardingFlowChecker: OnboardingFlowChecker = mock {
         onBlocking { isOnboardingComplete() } doReturn true
     }
+    private val now = System.currentTimeMillis()
+    private val currentTimeProvider: CurrentTimeProvider = mock {
+        on { currentTimeMillis() } doReturn now
+    }
 
     private val testee by lazy {
         CookiePopupOptInEvaluator(
@@ -71,6 +76,7 @@ class CookiePopupOptInEvaluatorTest {
             onboardingFlowChecker = onboardingFlowChecker,
             settingsRepository = settingsRepository,
             onboardingFlowChecker = onboardingFlowChecker,
+            currentTimeProvider = currentTimeProvider,
         )
     }
 
@@ -242,6 +248,6 @@ class CookiePopupOptInEvaluatorTest {
     private fun setDaysSinceInstall(days: Long) {
         shadowOf(application.packageManager)
             .getInternalMutablePackageInfo(application.packageName)
-            .firstInstallTime = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(days)
+            .firstInstallTime = now - TimeUnit.DAYS.toMillis(days)
     }
 }

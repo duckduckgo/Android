@@ -25,6 +25,7 @@ import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autoconsent.impl.R
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.autoconsent.impl.store.AutoconsentSettingsRepository
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.promptscoordinator.api.ModalEvaluator
@@ -50,6 +51,7 @@ class CookiePopupOptInEvaluator @Inject constructor(
     private val autoconsent: Autoconsent,
     private val onboardingFlowChecker: OnboardingFlowChecker,
     private val settingsRepository: AutoconsentSettingsRepository,
+    private val currentTimeProvider: CurrentTimeProvider,
 ) : ModalEvaluator {
 
     override val priority: Int = 6
@@ -100,7 +102,7 @@ class CookiePopupOptInEvaluator @Inject constructor(
         val firstInstallTime = applicationContext.packageManager
             .getPackageInfo(applicationContext.packageName, 0)
             .firstInstallTime
-        return TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis() - firstInstallTime)
+        return TimeUnit.MILLISECONDS.toDays(currentTimeProvider.currentTimeMillis() - firstInstallTime)
     }
 
     companion object {
