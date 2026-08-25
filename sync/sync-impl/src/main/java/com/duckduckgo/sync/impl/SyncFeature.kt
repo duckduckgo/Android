@@ -102,6 +102,14 @@ interface SyncFeature {
     fun canUseExchangeV2Point1(): Toggle
 
     /**
+     * Kill switch for sending the exchange channel secret as the `Authorization` header on the v2.0
+     * exchange relay endpoints. Independent of [canUseExchangeV2Point1] so the header can be turned
+     * on (or off) without moving the protocol version. See [authenticateExchangeEndpoints].
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun canSendExchangeChannelSecret(): Toggle
+
+    /**
      * When enabled, the sync barcode scanner only attempts to decode QR codes. Sync codes are
      * always encoded as QR, so other formats only add noise (and false-positive decodes) to
      * the scanner.
@@ -148,3 +156,10 @@ interface SyncFeature {
  */
 internal fun SyncFeature.canWriteDeviceInfo(): Boolean =
     canUseV2ConnectFlow().isEnabled() && canWriteUnifiedDeviceList().isEnabled()
+
+/**
+ * The v2.1 protocol requires the channel secret on every exchange relay call, so speaking v2.1 implies authenticating.
+ * [SyncFeature.canSendExchangeChannelSecret] lets the header be enabled ahead of (or independently of) that version bump.
+ */
+internal fun SyncFeature.authenticateExchangeEndpoints(): Boolean =
+    canSendExchangeChannelSecret().isEnabled() || canUseExchangeV2Point1().isEnabled()

@@ -22,6 +22,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncDeviceIds
 import com.duckduckgo.sync.impl.SyncFeature
+import com.duckduckgo.sync.impl.authenticateExchangeEndpoints
 import com.duckduckgo.sync.impl.crypto.RsaKeyPair
 import com.duckduckgo.sync.impl.crypto.SyncJweCrypto
 import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
@@ -48,6 +49,7 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.logcat
+import java.util.Base64
 import java.util.UUID
 import javax.inject.Inject
 
@@ -126,6 +128,8 @@ class RealExchangeV2Runner @Inject constructor(
     @Volatile private var _pairingRole: PairingRole? = null
 
     @Volatile private var ownChannelId: String? = null
+
+    @Volatile private var ownChannelSecret: String? = null
 
     @Volatile private var ownKeyPair: RsaKeyPair? = null
 
@@ -246,9 +250,11 @@ class RealExchangeV2Runner @Inject constructor(
         ownKeyPair = keyPair
         repeat(MAX_CHANNEL_CREATE_RETRIES) { attempt ->
             val candidate = UUID.randomUUID().toString()
-            when (val r = channel.createChannel(candidate)) {
+            val candidateSecret = generateChannelSecret()
+            when (val r = channel.createChannel(candidate, candidateSecret)) {
                 is Result.Success -> {
                     ownChannelId = candidate
+                    ownChannelSecret = candidateSecret
                     logcat { "Sync-ExchangeV2: bootstrap as $role channel_id=$candidate" }
                     return keyPair
                 }
@@ -314,16 +320,18 @@ class RealExchangeV2Runner @Inject constructor(
         pollJob = null
         timeoutJob?.cancel()
         timeoutJob = null
-        val toDelete = ownChannelId
-        if (toDelete != null) {
+        val channelId = ownChannelId
+        val channelSecret = ownChannelSecret
+        if (channelId != null) {
             // Best-effort DELETE.
             appScope.launch(dispatchers.io()) {
-                runCatching { channel.deleteChannel(toDelete) }
+                runCatching { channel.deleteChannel(channelId, channelSecret) }
             }
         }
         session = null
         _pairingRole = null
         ownChannelId = null
+        ownChannelSecret = null
         ownKeyPair = null
         peerChannelId = null
         peerPublicKey = null
@@ -344,12 +352,13 @@ class RealExchangeV2Runner @Inject constructor(
     private fun startPolling() {
         val ch = ownChannelId ?: return
         val key = ownKeyPair ?: return
+        val sec = ownChannelSecret
         pollJob = appScope.launch(dispatchers.io()) {
             try {
                 // collect suspends per message so envelopes are handled in poll() seq order. A
                 // message driving the SM terminal cancels this very poll job; that
                 // self-cancellation surfaces as the CancellationException caught below.
-                channel.poll(ch, key.privateKeyBase64).collect { incoming ->
+                channel.poll(ch, key.privateKeyBase64, sec).collect { incoming ->
                     deliverIncomingMessage(incoming)
                 }
             } catch (versionTooNew: EnvelopeVersionTooNew) {
@@ -785,7 +794,8 @@ class RealExchangeV2Runner @Inject constructor(
         peerKey: String,
     ): Boolean {
         val own = ownChannelId ?: return false
-        return when (val r = channel.sendMessage(outboundMessage, peerChannel, peerKey, own)) {
+        val sec = ownChannelSecret
+        return when (val r = channel.sendMessage(outboundMessage, peerChannel, peerKey, own, sec)) {
             is Result.Success -> {
                 recordSentMessage(outboundMessage)
                 true
@@ -871,9 +881,24 @@ class RealExchangeV2Runner @Inject constructor(
         return negotiatedVersion
     }
 
+    /**
+     * Null when this device does not authenticate exchange endpoints. The decision is made once per session, at
+     * bootstrap: a channel created without a secret can never start presenting one, since the relay would reject
+     * a header the channel was not claimed with.
+     */
+    private fun generateChannelSecret(): String? {
+        if (!syncFeature.authenticateExchangeEndpoints()) return null
+        return Base64.getUrlEncoder()
+            .withoutPadding()
+            .encodeToString(jweCrypto.generateSecureBytes(CHANNEL_SECRET_SIZE))
+    }
+
     companion object {
         // RSA modulus size (bits) for the v2 exchange pairing keypair.
         private const val EXCHANGE_RSA_KEY_SIZE = 2048
+
+        // Channel authorization secret size for the v2 exchange transport layer.
+        private const val CHANNEL_SECRET_SIZE = 32
 
         private const val REPLAY = 100
 
