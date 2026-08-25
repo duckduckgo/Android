@@ -549,6 +549,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 comparisonChartStep(NewUserOnboardingActivityDialog.SegmentedComparisonChart(ComparisonChartConfig.SegmentedSearchPath)),
                 defaultBrowserPromptStep(),
                 preferenceSelectorStep(
+                    ctx,
                     listOf(
                         OnboardingPreference.SEARCH_HISTORY,
                         OnboardingPreference.SAFE_SEARCH,
@@ -596,6 +597,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 comparisonChartStep(NewUserOnboardingActivityDialog.SegmentedComparisonChart(ComparisonChartConfig.SegmentedNoAiPath)),
                 defaultBrowserPromptStep(),
                 preferenceSelectorStep(
+                    ctx,
                     listOf(
                         OnboardingPreference.SEARCH_ASSIST,
                         OnboardingPreference.HIDE_AI_GENERATED_IMAGES,
@@ -615,7 +617,10 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             .filter { onboardingPreferenceApplier.isAvailable(it) }
             .associateWith { onboardingPreferenceApplier.isEnabled(it) }
 
-    private fun preferenceSelectorStep(offered: List<OnboardingPreference>): NewUserOnboardingActivityStep {
+    private fun preferenceSelectorStep(
+        ctx: NewUserOnboardingPlanContext,
+        offered: List<OnboardingPreference>,
+    ): NewUserOnboardingActivityStep {
         val preferenceSelections = SuspendMemo { resolvePreferenceSelections(offered) }
         return NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.PREFERENCE_SELECTOR,
@@ -626,8 +631,12 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             transition = { event ->
                 when (event) {
                     is NewUserOnboardingEvent.PreferenceSelectorConfirmed -> {
-                        event.selections.forEach { (preference, enabled) ->
-                            onboardingPreferenceApplier.apply(preference, enabled)
+                        // Committed only once the run ends, so preferences a path seeds its own way don't
+                        // survive a process death into the path a restarted onboarding takes.
+                        ctx.onFinish {
+                            event.selections.forEach { (preference, enabled) ->
+                                onboardingPreferenceApplier.apply(preference, enabled)
+                            }
                         }
                         Advance
                     }

@@ -562,8 +562,7 @@ class NewUserOnboardingPlanProviderTest {
                 ),
             ),
         )
-        verify(onboardingPreferenceApplier).apply(OnboardingPreference.SEARCH_HISTORY, true)
-        verify(onboardingPreferenceApplier).apply(OnboardingPreference.SAFE_SEARCH, true)
+        verify(onboardingPreferenceApplier, never()).apply(any(), any())
         assertStep(NewUserOnboardingStepIds.INPUT_SCREEN)
         orchestrator.onEvent(NewUserOnboardingEvent.InputModeConfirmed(withAi = false))
         verify(onboardingStore).setSegmentedOnboardingPath(SegmentedOnboardingPath.SEARCH)
@@ -584,6 +583,8 @@ class NewUserOnboardingPlanProviderTest {
             Completed(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, result = NewUserOnboardingResult.LaunchSearch(query = "weather")),
             orchestrator.state.value,
         )
+        verify(onboardingPreferenceApplier).apply(OnboardingPreference.SEARCH_HISTORY, true)
+        verify(onboardingPreferenceApplier).apply(OnboardingPreference.SAFE_SEARCH, true)
     }
 
     @Test
