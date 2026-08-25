@@ -527,7 +527,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                         when (selection) {
                             DownloadReasonSelection.SEARCH -> SwitchTo(segmentedSearchPlan(ctx))
                             DownloadReasonSelection.AI_CHAT -> SwitchTo(segmentedAiPlan(ctx, modelProviderChoice, togglePositionChoice))
-                            DownloadReasonSelection.NO_AI -> SwitchTo(segmentedNoAiPlan(duckAiStateChoice))
+                            DownloadReasonSelection.NO_AI -> SwitchTo(segmentedNoAiPlan(ctx, duckAiStateChoice))
                             DownloadReasonSelection.BLOCK_ADS,
                             -> {
                                 Stay
@@ -586,7 +586,10 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         )
     }
 
-    private fun segmentedNoAiPlan(duckAiStateChoice: OnboardingSingleChoiceDataPlugin?): LinearOnboardingPlan {
+    private fun segmentedNoAiPlan(
+        ctx: NewUserOnboardingPlanContext,
+        duckAiStateChoice: OnboardingSingleChoiceDataPlugin?,
+    ): LinearOnboardingPlan {
         return sidePlan(
             id = SEGMENTED_NO_AI_PLAN_ID,
             steps = listOf(
@@ -598,7 +601,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                         OnboardingPreference.HIDE_AI_GENERATED_IMAGES,
                     ),
                 ),
-                duckAiStateStep(duckAiStateChoice),
+                duckAiStateStep(ctx, duckAiStateChoice),
                 addressBarPositionStep(),
             ),
         )
@@ -688,7 +691,10 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         )
     }
 
-    private fun duckAiStateStep(plugin: OnboardingSingleChoiceDataPlugin?): NewUserOnboardingActivityStep {
+    private fun duckAiStateStep(
+        ctx: NewUserOnboardingPlanContext,
+        plugin: OnboardingSingleChoiceDataPlugin?,
+    ): NewUserOnboardingActivityStep {
         val options = SuspendMemo { plugin?.options().orEmpty() }
         return NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.DUCK_AI_STATE,
@@ -700,7 +706,9 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 when (event) {
                     is NewUserOnboardingEvent.SingleChoiceConfirmed -> {
                         logcat { "Duck.ai state confirmed: ${event.option.id}" }
-                        plugin?.apply(event.option)
+                        // Committed only once the run ends, so a pick abandoned by a process death doesn't
+                        // leak into the path a restarted onboarding takes.
+                        ctx.onFinish { plugin?.apply(event.option) }
                         Advance
                     }
 

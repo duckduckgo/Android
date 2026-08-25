@@ -467,13 +467,23 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
-    fun `when a duck ai state is confirmed then it is applied to the plugin that offered it`() = runTest {
+    fun `when a duck ai state is confirmed then it is not applied until the run ends`() = runTest {
         startSegmentedAtDuckAiState()
 
         orchestrator.onEvent(NewUserOnboardingEvent.SingleChoiceConfirmed(duckAiStateOptions[1]))
 
-        assertEquals(listOf(duckAiStateOptions[1]), duckAiStatePlugin.applied)
+        assertTrue(duckAiStatePlugin.applied.isEmpty())
         assertStep(NewUserOnboardingStepIds.ADDRESS_BAR_POSITION)
+    }
+
+    @Test
+    fun `when the run ends then the confirmed duck ai state is applied to the plugin that offered it`() = runTest {
+        startSegmentedAtDuckAiState()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.SingleChoiceConfirmed(duckAiStateOptions[1]))
+        orchestrator.onEvent(NewUserOnboardingEvent.AddressBarConfirmed(OmnibarType.SINGLE_TOP))
+
+        assertEquals(listOf(duckAiStateOptions[1]), duckAiStatePlugin.applied)
     }
 
     @Test
