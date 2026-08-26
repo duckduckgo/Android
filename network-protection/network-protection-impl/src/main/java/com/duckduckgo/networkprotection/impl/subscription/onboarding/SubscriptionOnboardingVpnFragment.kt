@@ -30,24 +30,30 @@ import android.widget.TextView
 import androidx.annotation.AttrRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
+import androidx.annotation.StringRes
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
+import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
+import com.duckduckgo.common.ui.view.addClickableSpan
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.databinding.FragmentSubscriptionOnboardingVpnBinding
 import com.duckduckgo.networkprotection.impl.subscription.onboarding.SubscriptionOnboardingVpnStepPlugin.Companion.VPN_STEP_ID
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController
+import com.duckduckgo.subscriptions.api.SubscriptionOnboardingFeature
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.COMPLETED
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.SKIPPED
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionOnboardingFeatureInfoScreen
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
@@ -69,6 +75,9 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
 
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
+
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
 
     private val binding: FragmentSubscriptionOnboardingVpnBinding by viewBinding()
 
@@ -101,6 +110,23 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
         super.onDestroyView()
     }
 
+    /** Sets the header copy and wires its "Learn More" annotation to open the VPN feature info screen. */
+    private fun setHeaderTextWithLearnMore(@StringRes textResId: Int) {
+        binding.subscriptionOnboardingVpnHeaderText.addClickableSpan(
+            getText(textResId),
+            spans = listOf(
+                "learn_more_link" to object : DuckDuckGoClickableSpan() {
+                    override fun onClick(widget: View) {
+                        globalActivityStarter.start(
+                            requireContext(),
+                            SubscriptionOnboardingFeatureInfoScreen(SubscriptionOnboardingFeature.VPN),
+                        )
+                    }
+                },
+            ),
+        )
+    }
+
     private fun observeConnectionInfo() {
         viewModel.viewState()
             .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
@@ -115,7 +141,7 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
         if (vpnOn) {
             subscriptionOnboardingVpnHeaderImage.setImageResource(R.drawable.vpn_lock_feature_128)
             subscriptionOnboardingVpnHeaderTitle.setText(R.string.subscriptionOnboardingVpnHeaderTitleOn)
-            subscriptionOnboardingVpnHeaderText.text = getText(R.string.subscriptionOnboardingVpnHeaderTextOn)
+            setHeaderTextWithLearnMore(R.string.subscriptionOnboardingVpnHeaderTextOn)
             subscriptionOnboardingVpnIpAddressTitle.setText(R.string.subscriptionOnboardingVpnIpAddressTitleOn)
             subscriptionOnboardingVpnNewIpAddressContainer.show()
             subscriptionOnboardingVpnIpAddressInfo.gone()
@@ -123,7 +149,7 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
         } else {
             subscriptionOnboardingVpnHeaderImage.setImageResource(R.drawable.vpn_disabled_feature_128)
             subscriptionOnboardingVpnHeaderTitle.setText(R.string.subscriptionOnboardingVpnHeaderTitle)
-            subscriptionOnboardingVpnHeaderText.text = getText(R.string.subscriptionOnboardingVpnHeaderText)
+            setHeaderTextWithLearnMore(R.string.subscriptionOnboardingVpnHeaderText)
             subscriptionOnboardingVpnIpAddressTitle.setText(R.string.subscriptionOnboardingVpnIpAddressTitle)
             subscriptionOnboardingVpnNewIpAddressContainer.gone()
             subscriptionOnboardingVpnIpAddressInfo.show()

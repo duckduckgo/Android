@@ -101,7 +101,7 @@
                         android:id="@+id/subscriptionOnboardingVpnIpAddressValue"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/subscriptionOnboardingVpnIpAddressValue"
+                        tools:text="@string/subscriptionOnboardingVpnIpAddressValue"
                         app:typography="h4"
                         tools:ignore="HardcodedText" />
 
@@ -109,7 +109,7 @@
                         android:id="@+id/subscriptionOnboardingVpnIpAddressLocation"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/subscriptionOnboardingVpnIpAddressLocation"
+                        tools:text="@string/subscriptionOnboardingVpnIpAddressLocation"
                         app:textType="secondary"
                         app:typography="caption" />
 
