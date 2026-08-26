@@ -23,6 +23,9 @@
     <string name="planTierNamePlus">Plus</string>
     <string name="planTierNamePro">Pro</string>
 
+    <!-- Partnerships Hub -->
+    <string name="partnershipsSettingTitle">Partner Benefits</string>
+
     <!-- Black Friday offer-->
     <string name="subscriptionSettingBlackFridayOffer">Save 40% on First Year</string>
 
