@@ -2811,7 +2811,7 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun updateNetworkLeaderboard(event: TrackingEvent) {
         val networkName = event.entity?.name ?: return
-        networkLeaderboardDao.incrementNetworkCount(networkName)
+        appCoroutineScope.launch(dispatchers.io()) { networkLeaderboardDao.incrementNetworkCount(networkName) }
     }
 
     override fun pageHasHttpResources(page: String) {
