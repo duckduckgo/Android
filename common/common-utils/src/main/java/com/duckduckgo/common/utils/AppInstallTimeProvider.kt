@@ -23,12 +23,17 @@ import javax.inject.Inject
 
 interface AppInstallTimeProvider {
     fun firstInstallTimeMillis(): Long
+
+    fun lastUpdateTimeMillis(): Long
 }
 
 @ContributesBinding(AppScope::class)
 class RealAppInstallTimeProvider @Inject constructor(
     private val context: Context,
 ) : AppInstallTimeProvider {
-    override fun firstInstallTimeMillis(): Long =
-        context.packageManager.getPackageInfo(context.packageName, 0).firstInstallTime
+    override fun firstInstallTimeMillis(): Long = packageInfo().firstInstallTime
+
+    override fun lastUpdateTimeMillis(): Long = packageInfo().lastUpdateTime
+
+    private fun packageInfo() = context.packageManager.getPackageInfo(context.packageName, 0)
 }
