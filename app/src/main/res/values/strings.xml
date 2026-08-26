@@ -1004,9 +1004,9 @@
     <string name="downloadsCannotOpenFileErrorMessage">Can\'t open file. Check for compatible app.</string>
 
     <!-- Error pages -->
-    <string name="webViewErrorTitle">DuckDuckGo can\'t load this page</string>
-    <string name="webViewErrorNoConnection">The internet connection appears to be offline.</string>
-    <string name="webViewErrorBadUrl">A server with the specified hostname could not be found.</string>
-    <string name="webViewErrorSslProtocol"><![CDATA[The certificate for this server is invalid. You might be connecting to a server that is pretending to be <b>%1$s</b> which could put your confidential information at risk.]]></string>
-    <string name="webViewErrorRedirectSuggestionMessage" instruction="Shown when a domain fails to load, offering a link to the www. version of the address. ^1 is the suggested address and is displayed as a tappable link.">Did you mean <annotation type="redirect_link">^1</annotation>?</string>
+    <string name="webViewErrorTitle" instruction="Title shown on the error pages">DuckDuckGo can\'t load this page</string>
+    <string name="webViewErrorNoConnection" instruction="Message shown when the page fails to load because the device has no internet connection">The internet connection appears to be offline.</string>
+    <string name="webViewErrorBadUrl" instruction="Message shown when the hostname of the website could not be resolved">A server with the specified hostname could not be found.</string>
+    <string name="webViewErrorSslProtocol" instruction="Message shown when the website's SSL certificate is invalid. Placeholder is the website's address"><![CDATA[The certificate for this server is invalid. You might be connecting to a server that is pretending to be <b>%1$s</b> which could put your confidential information at risk.]]></string>
+    <string name="webViewErrorRedirectSuggestionMessage" instruction="Shown when a domain fails to load, offering a link to the www. version of the address. Placeholder is a tappable link to the suggested address.">Did you mean <annotation type="redirect_link">^1</annotation>?</string>
 </resources>
