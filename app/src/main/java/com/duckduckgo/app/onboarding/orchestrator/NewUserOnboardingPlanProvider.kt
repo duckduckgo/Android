@@ -587,10 +587,11 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         )
     }
 
-    private fun segmentedNoAiPlan(
+    private suspend fun segmentedNoAiPlan(
         ctx: NewUserOnboardingPlanContext,
         duckAiStateChoice: OnboardingSingleChoiceDataPlugin?,
     ): LinearOnboardingPlan {
+        applyInputModeSelection(ctx, withAi = false, fireTelemetry = false)
         return sidePlan(
             id = SEGMENTED_NO_AI_PLAN_ID,
             steps = listOf(

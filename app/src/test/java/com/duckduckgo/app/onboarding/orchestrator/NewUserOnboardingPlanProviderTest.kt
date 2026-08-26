@@ -455,6 +455,16 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
+    fun `when the no ai download reason is confirmed then it clears an input screen selection left by an abandoned run`() = runTest {
+        startSegmentedAtDownloadReason()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.NO_AI))
+
+        verify(duckChat).setCosmeticInputScreenUserSetting(false)
+        verify(onboardingStore).storeInputScreenSelection(false)
+    }
+
+    @Test
     fun `when the duck ai state step is reached then it offers the plugin options`() = runTest {
         startSegmentedAtDuckAiState()
 
