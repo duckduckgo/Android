@@ -42,6 +42,18 @@ class NewUserOnboardingPlanContext {
     var completionResult: LinearOnboardingResult? = null
 
     /**
+     * Set by the [NewUserOnboardingStepIds.PASSWORD_IMPORT_LAUNCH] step once the import web flow returns
+     * successfully. Gates [NewUserOnboardingStepIds.PASSWORD_IMPORT_COMPLETE], and keeps the launch step
+     * eligible until then. The counts are not held here: they arrive after the outcome card is already on
+     * screen, so they live in that card's content state instead.
+     */
+    @Volatile
+    var passwordImportSucceeded: Boolean = false
+
+    @Volatile
+    var skipPasswordsImport: Boolean = false
+
+    /**
      * Chat prompt captured by the custom-AI [NewUserOnboardingStepIds.INPUT_SCREEN_PREVIEW] step,
      * read by the [NewUserOnboardingStepIds.DUCK_AI_DEMO] step.
      */

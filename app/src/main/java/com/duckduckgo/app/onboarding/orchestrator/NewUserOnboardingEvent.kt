@@ -56,4 +56,22 @@ sealed interface NewUserOnboardingEvent : LinearOnboardingEvent {
     data class AddWidgetFinished(val widgetAdded: Boolean) : NewUserOnboardingEvent
 
     data class PreferenceSelectorConfirmed(val selections: Map<OnboardingPreference, Boolean>) : NewUserOnboardingEvent
+
+    data object PasswordImportRequested : NewUserOnboardingEvent
+
+    data object PasswordImportSkipped : NewUserOnboardingEvent
+
+    /**
+     * The import web flow returned. [PasswordImportOutcome.SUCCESS] only means the credentials are being
+     * written; the counts arrive later as [PasswordImportParsed].
+     */
+    data class PasswordImportWebFlowFinished(val outcome: PasswordImportOutcome) : NewUserOnboardingEvent
+
+    /**
+     * Parsing of a successfully returned import finished. Raised on the outcome card, which is already on
+     * screen showing its parsing state, so it reports the result rather than moving the user anywhere.
+     */
+    data class PasswordImportParsed(val outcome: PasswordImportOutcome) : NewUserOnboardingEvent
 }
+
+enum class PasswordImportOutcome { SUCCESS, CANCELLED, ERROR }

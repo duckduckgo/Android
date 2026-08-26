@@ -36,4 +36,5 @@ enum class OnboardingPixelName(override val pixelName: String) : Pixel.PixelName
     ONBOARDING_TRACKERS_BLOCKED("onboarding_trackers-blocked"),
     ONBOARDING_END("onboarding_end"),
     ONBOARDING_SUBSCRIPTION_PROMO("onboarding_subscription-promo"),
+    ONBOARDING_PASSWORD_IMPORT("onboarding_password-import"),
 }

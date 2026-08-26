@@ -458,4 +458,20 @@ class DialogConfigResolverTest {
             config.primaryCta,
         )
     }
+
+    @Test
+    fun `resolves the import passwords dialog with a right wing and a mirrored arrow`() {
+        val config = testee.resolve(NewUserOnboardingActivityDialog.ImportPasswords, isCustomAiFlow = false)!!
+
+        assertEquals(Embellishment.RightWing, config.embellishment)
+        assertEquals(CardArrowConfig.AtStartMirrored, config.cardArrow)
+    }
+
+    @Test
+    fun `resolves the import complete dialog with a right wing and a mirrored arrow`() {
+        val config = testee.resolve(NewUserOnboardingActivityDialog.ImportComplete, isCustomAiFlow = false)!!
+
+        assertEquals(Embellishment.RightWing, config.embellishment)
+        assertEquals(CardArrowConfig.AtStartMirrored, config.cardArrow)
+    }
 }

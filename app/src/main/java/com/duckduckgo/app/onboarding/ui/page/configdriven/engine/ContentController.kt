@@ -28,6 +28,8 @@ import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.AddToDockBinde
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.AddressBarBinder
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.ComparisonChartBinder
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.DownloadReasonBinder
+import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.ImportCompleteBinder
+import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.ImportPasswordsBinder
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.InputScreenBinder
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.InputScreenPreviewBinder
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.PreferenceSelectorBinder
@@ -62,6 +64,8 @@ class ContentControllerImpl(
     private val welcome = WelcomeBinder(binding.welcomeContent)
     private val addToDock = AddToDockBinder(binding.addToDockContent)
     private val widgetPrompt = WidgetPromptBinder(binding.widgetPromptContent)
+    private val importPasswords = ImportPasswordsBinder(binding.importPasswordsContent)
+    private val importComplete = ImportCompleteBinder(binding.importCompleteContent)
     private val downloadReason = DownloadReasonBinder(binding.downloadReasonContent)
     private val preferenceSelector = PreferenceSelectorBinder(binding.preferenceSelectorContent)
 
@@ -115,6 +119,14 @@ class ContentControllerImpl(
             is ContentConfig.WidgetPrompt -> {
                 boundView = widgetPrompt.view
                 widgetPrompt.bind(content, scope)
+            }
+            is ContentConfig.ImportPasswords -> {
+                boundView = importPasswords.view
+                importPasswords.bind(content, scope)
+            }
+            is ContentConfig.ImportComplete -> {
+                boundView = importComplete.view
+                importComplete.bind(content, contentValues.contentState(stepId, content), scope)
             }
             is ContentConfig.DownloadReason -> {
                 boundView = downloadReason.view

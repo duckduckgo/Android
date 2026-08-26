@@ -117,6 +117,34 @@ sealed interface ContentConfig {
 
         override fun initialState() = PreferenceSelectorContentState(rows.associate { it.preference to it.initiallyEnabled })
     }
+
+    data class ImportPasswords(
+        override val title: TextConfig,
+        val body: TextConfig,
+    ) : ContentConfig
+
+    /** One title/body pair per [ImportCompleteContentState]; [title] is the finished one. */
+    data class ImportComplete(
+        override val title: TextConfig,
+        val parsingTitle: TextConfig,
+        val parsingBody: TextConfig,
+        val failedTitle: TextConfig,
+        val failedBody: TextConfig,
+    ) : ContentConfig, Stateful<ImportCompleteContentState> {
+        override fun initialState(): ImportCompleteContentState = ImportCompleteContentState.Parsing
+    }
+}
+
+/**
+ * The outcome card is entered as soon as the import web flow returns, before the imported credentials have
+ * been counted, so its content is state rather than config.
+ */
+sealed interface ImportCompleteContentState {
+    data object Parsing : ImportCompleteContentState
+    data class Finished(val imported: Int, val skipped: Int) : ImportCompleteContentState
+
+    /** The import returned successfully but never reported counts, so there is no outcome to show. */
+    data object Failed : ImportCompleteContentState
 }
 
 data class AddressBarContentState(val position: OmnibarType)

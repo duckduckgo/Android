@@ -60,6 +60,10 @@ sealed class OnboardingBackgroundStep(
         backgroundRes = R.drawable.onboarding_browser_comparison_background,
         maxHeightDp = 216,
     )
+    data object ImportPasswords : OnboardingBackgroundStep(
+        backgroundRes = R.drawable.onboarding_import_passwords_background,
+        maxHeightDp = 272,
+    )
     data object AddressBar : OnboardingBackgroundStep(
         backgroundRes = R.drawable.onboarding_address_bar_background,
         maxHeightDp = 360,

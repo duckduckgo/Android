@@ -49,8 +49,12 @@ class CardArrowControllerImpl(
         cardView.setShowArrow(next != CardArrowConfig.Hidden)
         cardView.setArrowAnimationTarget(ARROW_TARGET_OFFSET_END_DP.toPx().toFloat())
 
-        val target = if (next == CardArrowConfig.AtEnd) 1f else 0f
-        val moves = previous != null && previous != next &&
+        cardView.setArrowMirrored(next.mirrored)
+
+        val target = if (next.atEnd) 1f else 0f
+        // Only a change of end actually travels; a mirror-only change would otherwise animate from and to the
+        // same position.
+        val moves = previous != null && previous.atEnd != next.atEnd &&
             previous != CardArrowConfig.Hidden && next != CardArrowConfig.Hidden
         if (animate && moves) {
             slide = ValueAnimator.ofFloat(1f - target, target).apply {

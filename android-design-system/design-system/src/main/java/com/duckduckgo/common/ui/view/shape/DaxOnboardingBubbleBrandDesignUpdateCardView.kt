@@ -177,6 +177,17 @@ constructor(
     }
 
     /**
+     * Reflects the arrow's shape horizontally, for a card whose artwork sits on the side the tail
+     * would otherwise hook away from. Independent of where along the edge the arrow sits.
+     */
+    fun setArrowMirrored(mirrored: Boolean) {
+        if (!showArrow) return
+        if (baseBottomEdgeTreatment.mirrored == mirrored) return
+        baseBottomEdgeTreatment.mirrored = mirrored
+        shapeAppearanceModel = shapeAppearanceModel
+    }
+
+    /**
      * Set the target position for the arrow animation.
      *
      * @param offsetFromEndPx visual offset from the right/end edge in pixels.

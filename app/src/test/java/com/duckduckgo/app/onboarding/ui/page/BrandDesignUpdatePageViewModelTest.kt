@@ -36,6 +36,7 @@ import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanBootstrap
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanProvider
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingResult
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingStepIds
+import com.duckduckgo.app.onboarding.orchestrator.StepIndicatorMode
 import com.duckduckgo.app.onboarding.orchestrator.StepProgress
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.BrandDesignUpdatePageViewModel.Command
@@ -709,14 +710,14 @@ class BrandDesignUpdatePageViewModelTest {
                 NewUserOnboardingActivityStep(
                     id = "ai_comparison_chart",
                     pixelName = null,
-                    showsStepIndicator = true,
+                    indicator = StepIndicatorMode.COUNTED,
                     transition = { LinearOnboardingTransition.Advance },
                     resolveDialog = { NewUserOnboardingActivityDialog.AiComparisonChart },
                 ),
                 NewUserOnboardingActivityStep(
                     id = "input_screen_preview",
                     pixelName = null,
-                    showsStepIndicator = true,
+                    indicator = StepIndicatorMode.COUNTED,
                     transition = recordAndStay,
                     resolveDialog = {
                         NewUserOnboardingActivityDialog.InputScreenPreview(
@@ -961,7 +962,7 @@ class BrandDesignUpdatePageViewModelTest {
         NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.ADD_TO_DOCK,
             pixelName = null,
-            showsStepIndicator = true,
+            indicator = StepIndicatorMode.COUNTED,
             transition = { LinearOnboardingTransition.Stay },
             resolveDialog = { NewUserOnboardingActivityDialog.AddToDock },
         )
@@ -970,7 +971,7 @@ class BrandDesignUpdatePageViewModelTest {
         NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.WIDGET_PROMPT,
             pixelName = null,
-            showsStepIndicator = true,
+            indicator = StepIndicatorMode.COUNTED,
             transition = { LinearOnboardingTransition.Stay },
             resolveDialog = { NewUserOnboardingActivityDialog.WidgetPrompt },
         )

@@ -58,6 +58,9 @@ class OnboardingDialogShownPixels @Inject constructor(private val pixel: Pixel) 
             NewUserOnboardingActivityDialog.DefaultBrowserPrompt,
             NewUserOnboardingActivityDialog.AddWidget,
             is NewUserOnboardingActivityDialog.PreferenceSelector,
+            NewUserOnboardingActivityDialog.ImportPasswords,
+            is NewUserOnboardingActivityDialog.ImportComplete,
+            NewUserOnboardingActivityDialog.ImportPasswordsLaunch,
             -> Unit
         }
     }
