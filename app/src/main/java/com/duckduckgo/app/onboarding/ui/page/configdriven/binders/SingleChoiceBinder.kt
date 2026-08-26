@@ -108,6 +108,11 @@ class SingleChoiceBinder(
                     }
                 },
             )
+            // Seeded before attach and jumped past the state animation, so a re-inflate doesn't replay the check animation.
+            val selected = row == state.value.selected
+            rowBinding.root.isSelected = selected
+            rowBinding.singleChoiceRowRadioButton.isChecked = selected
+            rowBinding.singleChoiceRowRadioButton.jumpDrawablesToCurrentState()
             binding.radioButtonRows.addView(rowBinding.root)
             row to rowBinding
         }
