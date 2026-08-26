@@ -49,14 +49,14 @@ interface AppBrandDesignUpdateToggles {
 
     /**
      * Gates the address bar radius, Lotties: shield, cookies, ad-blocking and Duck Player
-     * assets, and the 40dp shield icon box.
+     * assets, the 40dp shield icon box, and the home screen widget search bar, previews, and promo artwork.
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun addressBar(): Toggle
 
     /**
-     * Gates pictogram swaps that change drawable type or call-site behaviour, plus the rebranded
-     * home screen widget styling. The remaining pictogram swaps are flavour-gated.
+     * Gates pictogram swaps that change drawable type or call-site behaviour. The remaining
+     * pictogram swaps are flavour-gated.
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun pictograms(): Toggle

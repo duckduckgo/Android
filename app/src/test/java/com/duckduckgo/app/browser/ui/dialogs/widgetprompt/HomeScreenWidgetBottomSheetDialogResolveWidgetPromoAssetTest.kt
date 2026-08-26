@@ -23,34 +23,34 @@ import org.junit.Test
 class HomeScreenWidgetBottomSheetDialogResolveWidgetPromoAssetTest {
 
     @Test
-    fun whenPictogramsEnabledAndLightThenBrandUpdateAsset() {
+    fun whenAddressBarEnabledAndLightThenBrandUpdateAsset() {
         assertEquals(
             R.drawable.widget_promo_light_brand_update,
-            resolveWidgetPromoAsset(isPictogramsEnabled = true, isLightModeEnabled = true),
+            resolveWidgetPromoAsset(isAddressBarRebrandEnabled = true, isLightModeEnabled = true),
         )
     }
 
     @Test
-    fun whenPictogramsEnabledAndDarkThenBrandUpdateAsset() {
+    fun whenAddressBarEnabledAndDarkThenBrandUpdateAsset() {
         assertEquals(
             R.drawable.widget_promo_dark_brand_update,
-            resolveWidgetPromoAsset(isPictogramsEnabled = true, isLightModeEnabled = false),
+            resolveWidgetPromoAsset(isAddressBarRebrandEnabled = true, isLightModeEnabled = false),
         )
     }
 
     @Test
-    fun whenPictogramsDisabledAndLightThenLegacyAsset() {
+    fun whenAddressBarDisabledAndLightThenLegacyAsset() {
         assertEquals(
             R.drawable.widget_promo_light,
-            resolveWidgetPromoAsset(isPictogramsEnabled = false, isLightModeEnabled = true),
+            resolveWidgetPromoAsset(isAddressBarRebrandEnabled = false, isLightModeEnabled = true),
         )
     }
 
     @Test
-    fun whenPictogramsDisabledAndDarkThenLegacyAsset() {
+    fun whenAddressBarDisabledAndDarkThenLegacyAsset() {
         assertEquals(
             R.drawable.widget_promo_dark,
-            resolveWidgetPromoAsset(isPictogramsEnabled = false, isLightModeEnabled = false),
+            resolveWidgetPromoAsset(isAddressBarRebrandEnabled = false, isLightModeEnabled = false),
         )
     }
 }

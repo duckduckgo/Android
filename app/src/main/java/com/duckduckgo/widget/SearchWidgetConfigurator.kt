@@ -35,19 +35,19 @@ import javax.inject.Inject
 
 internal fun resolveSearchBarBackground(
     widgetTheme: WidgetTheme,
-    isPictogramsEnabled: Boolean,
+    isAddressBarRebrandEnabled: Boolean,
 ): Int = when (widgetTheme) {
-    WidgetTheme.LIGHT -> if (isPictogramsEnabled) {
+    WidgetTheme.LIGHT -> if (isAddressBarRebrandEnabled) {
         R.drawable.search_widget_background_rebrand_light
     } else {
         R.drawable.search_widget_background_light
     }
-    WidgetTheme.DARK -> if (isPictogramsEnabled) {
+    WidgetTheme.DARK -> if (isAddressBarRebrandEnabled) {
         R.drawable.search_widget_background_rebrand_dark
     } else {
         R.drawable.search_widget_background_dark
     }
-    WidgetTheme.SYSTEM_DEFAULT -> if (isPictogramsEnabled) {
+    WidgetTheme.SYSTEM_DEFAULT -> if (isAddressBarRebrandEnabled) {
         R.drawable.search_widget_background_rebrand_daynight
     } else {
         R.drawable.search_widget_background_daynight
@@ -81,7 +81,7 @@ class SearchWidgetConfigurator @Inject constructor(
                 "setBackgroundResource",
                 resolveSearchBarBackground(
                     widgetTheme = widgetTheme,
-                    isPictogramsEnabled = appBrandDesignUpdateToggles.pictograms().isEnabled(),
+                    isAddressBarRebrandEnabled = appBrandDesignUpdateToggles.addressBar().isEnabled(),
                 ),
             )
             remoteViews.setViewVisibility(R.id.voiceSearch, if (voiceSearchEnabled) View.VISIBLE else View.GONE)

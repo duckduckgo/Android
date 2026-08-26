@@ -23,34 +23,34 @@ import org.junit.Test
 class SearchWidgetConfiguratorResolveSearchBarBackgroundTest {
 
     @Test
-    fun whenPictogramsEnabledThenEachThemeUsesRebrandBackground() {
+    fun whenAddressBarRebrandEnabledThenEachThemeUsesRebrandBackground() {
         assertEquals(
             R.drawable.search_widget_background_rebrand_light,
-            resolveSearchBarBackground(WidgetTheme.LIGHT, isPictogramsEnabled = true),
+            resolveSearchBarBackground(WidgetTheme.LIGHT, isAddressBarRebrandEnabled = true),
         )
         assertEquals(
             R.drawable.search_widget_background_rebrand_dark,
-            resolveSearchBarBackground(WidgetTheme.DARK, isPictogramsEnabled = true),
+            resolveSearchBarBackground(WidgetTheme.DARK, isAddressBarRebrandEnabled = true),
         )
         assertEquals(
             R.drawable.search_widget_background_rebrand_daynight,
-            resolveSearchBarBackground(WidgetTheme.SYSTEM_DEFAULT, isPictogramsEnabled = true),
+            resolveSearchBarBackground(WidgetTheme.SYSTEM_DEFAULT, isAddressBarRebrandEnabled = true),
         )
     }
 
     @Test
-    fun whenPictogramsDisabledThenEachThemeUsesLegacyBackground() {
+    fun whenAddressBarRebrandDisabledThenEachThemeUsesLegacyBackground() {
         assertEquals(
             R.drawable.search_widget_background_light,
-            resolveSearchBarBackground(WidgetTheme.LIGHT, isPictogramsEnabled = false),
+            resolveSearchBarBackground(WidgetTheme.LIGHT, isAddressBarRebrandEnabled = false),
         )
         assertEquals(
             R.drawable.search_widget_background_dark,
-            resolveSearchBarBackground(WidgetTheme.DARK, isPictogramsEnabled = false),
+            resolveSearchBarBackground(WidgetTheme.DARK, isAddressBarRebrandEnabled = false),
         )
         assertEquals(
             R.drawable.search_widget_background_daynight,
-            resolveSearchBarBackground(WidgetTheme.SYSTEM_DEFAULT, isPictogramsEnabled = false),
+            resolveSearchBarBackground(WidgetTheme.SYSTEM_DEFAULT, isAddressBarRebrandEnabled = false),
         )
     }
 }

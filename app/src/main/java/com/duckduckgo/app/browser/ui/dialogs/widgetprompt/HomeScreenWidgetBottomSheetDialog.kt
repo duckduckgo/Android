@@ -30,11 +30,11 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.duckduckgo.mobile.android.R as CommonR
 
 internal fun resolveWidgetPromoAsset(
-    isPictogramsEnabled: Boolean,
+    isAddressBarRebrandEnabled: Boolean,
     isLightModeEnabled: Boolean,
 ): Int = when {
-    isPictogramsEnabled && isLightModeEnabled -> R.drawable.widget_promo_light_brand_update
-    isPictogramsEnabled -> R.drawable.widget_promo_dark_brand_update
+    isAddressBarRebrandEnabled && isLightModeEnabled -> R.drawable.widget_promo_light_brand_update
+    isAddressBarRebrandEnabled -> R.drawable.widget_promo_dark_brand_update
     isLightModeEnabled -> R.drawable.widget_promo_light
     else -> R.drawable.widget_promo_dark
 }
@@ -43,7 +43,7 @@ internal fun resolveWidgetPromoAsset(
 class HomeScreenWidgetBottomSheetDialog(
     context: Context,
     isLightModeEnabled: Boolean,
-    isPictogramsEnabled: Boolean,
+    isAddressBarRebrandEnabled: Boolean,
     edgeToEdgeProvider: EdgeToEdgeProvider,
 ) : BottomSheetDialog(
     context,
@@ -79,7 +79,7 @@ class HomeScreenWidgetBottomSheetDialog(
             dismiss()
         }
         binding.homeScreenWidgetBottomSheetDialogImage.setImageResource(
-            resolveWidgetPromoAsset(isPictogramsEnabled, isLightModeEnabled),
+            resolveWidgetPromoAsset(isAddressBarRebrandEnabled, isLightModeEnabled),
         )
         binding.homeScreenWidgetBottomSheetDialogPrimaryButton.setOnClickListener {
             eventListener?.onAddWidgetButtonClicked()

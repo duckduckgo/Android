@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app
 
+import com.duckduckgo.app.browser.R
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import com.duckduckgo.mobile.android.R as CommonR
@@ -35,6 +36,30 @@ class WidgetThemeConfigurationResolveBackgroundTest {
         assertEquals(
             CommonR.attr.daxColorSurface,
             resolveWidgetConfigurationBackgroundAttr(isPictogramsEnabled = false),
+        )
+    }
+
+    @Test
+    fun whenAddressBarEnabledThenRoundedWidgetPreview() {
+        assertEquals(
+            R.drawable.image_preview_search_favorites_widget_light,
+            resolveWidgetConfigurationPreview(
+                roundedPreview = R.drawable.image_preview_search_favorites_widget_light,
+                legacyPreview = R.drawable.image_preview_search_favorites_widget_legacy_light,
+                isAddressBarRebrandEnabled = true,
+            ),
+        )
+    }
+
+    @Test
+    fun whenAddressBarDisabledThenLegacyWidgetPreview() {
+        assertEquals(
+            R.drawable.image_preview_search_favorites_widget_legacy_light,
+            resolveWidgetConfigurationPreview(
+                roundedPreview = R.drawable.image_preview_search_favorites_widget_light,
+                legacyPreview = R.drawable.image_preview_search_favorites_widget_legacy_light,
+                isAddressBarRebrandEnabled = false,
+            ),
         )
     }
 }

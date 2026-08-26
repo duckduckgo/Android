@@ -6522,14 +6522,14 @@ class BrowserTabFragment :
 
         private fun showHomeWidgetPrompt(configuration: HomePanelCta) {
             hideDaxCta()
-            val isPictogramsEnabled = appBrandDesignUpdateToggles.pictograms().isEnabled()
+            val isAddressBarRebrandEnabled = appBrandDesignUpdateToggles.addressBar().isEnabled()
 
             if (!::widgetBottomSheetDialog.isInitialized) {
                 widgetBottomSheetDialog =
                     HomeScreenWidgetBottomSheetDialog(
                         context = requireContext(),
                         isLightModeEnabled = appTheme.isLightModeEnabled(),
-                        isPictogramsEnabled = isPictogramsEnabled,
+                        isAddressBarRebrandEnabled = isAddressBarRebrandEnabled,
                         edgeToEdgeProvider = edgeToEdgeProvider,
                     )
                 widgetBottomSheetDialog.eventListener =
