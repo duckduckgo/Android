@@ -100,8 +100,8 @@ sealed class ComparisonChartConfig(
     data object SegmentedNoAiPath : ComparisonChartConfig(
         titleRes = R.string.noAiPathComparisonChartTitle,
         primaryCtaTextRes = R.string.preOnboardingDaxDialog2Button,
-        headerLeftIconRes = CommonR.drawable.ic_chrome,
-        headerLeftIconSizeDp = 32f, // the target size is 31.5dp but the icon already has some padding
+        headerLeftIconRes = CommonR.drawable.google_g_color_40,
+        headerLeftIconSizeDp = 31.5f,
         headerLeftLabelRes = null,
         rows = listOf(
             Row(CommonR.drawable.search_find_color_24, R.string.preOnboardingComparisonChartItem1),
