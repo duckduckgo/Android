@@ -17,18 +17,21 @@
 package com.duckduckgo.duckchat.impl.contextual
 
 import app.cash.turbine.test
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 
 class DuckChatContextualEntryViewModelTest {
 
     private val store: ContextualEntryPromptStore = mock()
-    private val viewModel = DuckChatContextualEntryViewModel(store)
+    private val duckChatPixels: DuckChatPixels = mock()
+    private val viewModel = DuckChatContextualEntryViewModel(store, duckChatPixels)
 
     private val validContext = """{"title":"Example","url":"https://example.com","content":"some page content"}"""
     private val samplePrompt = NativeInputPrompt("hi", "model-1", "high", "tool-1", null, null)
@@ -122,5 +125,73 @@ class DuckChatContextualEntryViewModelTest {
         val captor = argumentCaptor<ContextualEntryPrompt>()
         verify(store).store(captor.capture())
         assertNull(captor.firstValue.serializedPageContext)
+    }
+
+    @Test
+    fun whenStartedThenReportsFloatingInputShown() {
+        viewModel.start("tab-1")
+
+        verify(duckChatPixels).reportContextualFloatingInputShown()
+    }
+
+    @Test
+    fun whenStartedThenDoesNotReportSheetOpened() {
+        viewModel.start("tab-1")
+
+        verify(duckChatPixels, never()).reportContextualSheetOpened()
+    }
+
+    @Test
+    fun whenDismissedThenDoesNotReportSheetDismissed() {
+        viewModel.onDismiss()
+
+        verify(duckChatPixels, never()).reportContextualSheetDismissed()
+    }
+
+    @Test
+    fun whenPromptSubmittedThenReportsFloatingInputPromotedToSheet() = runTest {
+        viewModel.start("tab-1")
+
+        viewModel.commands.test {
+            viewModel.onPromptSubmitted(samplePrompt)
+            assertEquals(DuckChatContextualEntryViewModel.Command.HandOffToSheet, awaitItem())
+        }
+
+        verify(duckChatPixels).reportContextualFloatingInputPromotedToSheet()
+    }
+
+    @Test
+    fun whenDismissedWithAttachedContextThenReportsDismissed() {
+        viewModel.onDismiss()
+
+        verify(duckChatPixels).reportContextualFloatingInputDismissedWithoutSubmission()
+    }
+
+    @Test
+    fun whenContextManuallyAttachedThenReportsManualAttachPixel() {
+        viewModel.onPageContextReceived(validContext)
+        viewModel.onContextRemoved()
+
+        viewModel.onAttachContextRequested()
+
+        assertEquals(validContext, viewModel.viewState.value.attachedContext?.serialized)
+        verify(duckChatPixels).reportContextualPageContextManuallyAttachedNative()
+    }
+
+    @Test
+    fun whenNoValidContextToAttachThenDoesNotReportManualAttachPixel() {
+        viewModel.onAttachContextRequested()
+
+        assertNull(viewModel.viewState.value.attachedContext)
+        verify(duckChatPixels, never()).reportContextualPageContextManuallyAttachedNative()
+    }
+
+    @Test
+    fun whenContextRemovedThenReportsRemoveAttachmentPixel() {
+        viewModel.onPageContextReceived(validContext)
+
+        viewModel.onContextRemoved()
+
+        verify(duckChatPixels).reportContextualPageContextRemovedNative()
     }
 }

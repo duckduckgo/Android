@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.contextual
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,6 +38,7 @@ import javax.inject.Inject
 @ContributesViewModel(FragmentScope::class)
 class DuckChatContextualEntryViewModel @Inject constructor(
     private val contextualEntryPromptStore: ContextualEntryPromptStore,
+    private val duckChatPixels: DuckChatPixels,
 ) : ViewModel() {
 
     data class ViewState(
@@ -70,6 +72,7 @@ class DuckChatContextualEntryViewModel @Inject constructor(
 
     fun start(tabId: String) {
         this.tabId = tabId
+        duckChatPixels.reportContextualFloatingInputShown()
     }
 
     fun onPageContextReceived(serializedPageContext: String) {
@@ -82,12 +85,16 @@ class DuckChatContextualEntryViewModel @Inject constructor(
 
     /** The composer's "attach page context" affordance (shown when nothing is attached). */
     fun onAttachContextRequested() {
-        latestValidPageContext?.let { attach(it) }
+        latestValidPageContext?.let {
+            duckChatPixels.reportContextualPageContextManuallyAttachedNative()
+            attach(it)
+        }
     }
 
     fun onContextRemoved() {
         userRemovedContext = true
         _viewState.update { it.copy(attachedContext = null) }
+        duckChatPixels.reportContextualPageContextRemovedNative()
     }
 
     /** A suggested prompt was picked; suggestions are page-specific, so attach the context before submit. */
@@ -105,6 +112,7 @@ class DuckChatContextualEntryViewModel @Inject constructor(
         contextualEntryPromptStore.store(
             ContextualEntryPrompt(tabId, prompt, _viewState.value.attachedContext?.serialized),
         )
+        duckChatPixels.reportContextualFloatingInputPromotedToSheet()
         commandChannel.trySend(Command.HandOffToSheet)
     }
 
@@ -125,5 +133,9 @@ class DuckChatContextualEntryViewModel @Inject constructor(
     private fun isContextValid(serializedPageContext: String): Boolean {
         val json = runCatching { JSONObject(serializedPageContext) }.getOrNull() ?: return false
         return json.optString("title").isNotBlank() && json.optString("content").isNotBlank()
+    }
+
+    fun onDismiss() {
+        duckChatPixels.reportContextualFloatingInputDismissedWithoutSubmission()
     }
 }

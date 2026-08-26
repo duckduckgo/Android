@@ -423,6 +423,7 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
         super.onDismiss(dialog)
         if (!handedOffToSheet && ::tabId.isInitialized && activity?.isChangingConfigurations != true) {
             contextualNativeInputManager.onContextualClosed(tabId)
+            viewModel.onDismiss()
         }
     }
 
