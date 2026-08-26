@@ -74,8 +74,6 @@ class OnboardingPreferenceApplierImpl @Inject constructor(
             OnboardingPreference.SEARCH_ASSIST,
             OnboardingPreference.HIDE_AI_GENERATED_IMAGES,
             -> serpSettingsFeature.storeSerpSettings().isEnabled()
-            // Autoconsent takes both values whatever its remote flags say: a value written here is simply
-            // inert until the flag that acts on it is on.
             OnboardingPreference.REJECT_OPTIONAL_COOKIES,
             OnboardingPreference.ACCEPT_NON_OPT_OUT_COOKIES,
             -> true
@@ -86,8 +84,6 @@ class OnboardingPreferenceApplierImpl @Inject constructor(
         when (preference) {
             OnboardingPreference.SEARCH_HISTORY -> navigationHistory.isHistoryUserEnabled()
             OnboardingPreference.SAFE_SEARCH -> safeSearchEnabled()
-            // A path that steers offers these already set the way it wants the user to leave onboarding, so a
-            // user who proceeds without touching a row gets that position rather than the app's own default.
             OnboardingPreference.BLOCK_ADS -> true
             OnboardingPreference.SEARCH_ASSIST -> false
             OnboardingPreference.HIDE_AI_GENERATED_IMAGES -> true
