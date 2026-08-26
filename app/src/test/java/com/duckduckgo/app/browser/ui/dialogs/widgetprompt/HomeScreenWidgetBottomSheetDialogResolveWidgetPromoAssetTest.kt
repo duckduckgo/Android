@@ -18,6 +18,8 @@ package com.duckduckgo.app.browser.ui.dialogs.widgetprompt
 
 import com.duckduckgo.app.browser.R
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class HomeScreenWidgetBottomSheetDialogResolveWidgetPromoAssetTest {
@@ -52,5 +54,19 @@ class HomeScreenWidgetBottomSheetDialogResolveWidgetPromoAssetTest {
             R.drawable.widget_promo_dark,
             resolveWidgetPromoAsset(isAddressBarRebrandEnabled = false, isLightModeEnabled = false),
         )
+    }
+
+    @Test
+    fun whenAddressBarEnabledThenSearchTextOverlayIsHidden() {
+        val content = resolveWidgetPromoContent(isAddressBarRebrandEnabled = true, isLightModeEnabled = true)
+
+        assertFalse(content.showSearchTextOverlay)
+    }
+
+    @Test
+    fun whenAddressBarDisabledThenSearchTextOverlayIsVisible() {
+        val content = resolveWidgetPromoContent(isAddressBarRebrandEnabled = false, isLightModeEnabled = true)
+
+        assertTrue(content.showSearchTextOverlay)
     }
 }
