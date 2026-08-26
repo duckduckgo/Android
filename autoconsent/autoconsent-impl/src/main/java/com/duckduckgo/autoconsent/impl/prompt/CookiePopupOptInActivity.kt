@@ -72,8 +72,7 @@ class CookiePopupOptInActivity : DuckDuckGoActivity() {
 
         setContentView(binding.root)
         if (edgeToEdgeEnabled) {
-            edgeToEdgeHandler.applyStatusBarInsets(binding.cookiePopupOptInContainer, installScrim = false)
-            edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.cookiePopupOptInScrollView)
+            edgeToEdgeHandler.applySystemBarInsets(binding.cookiePopupOptInContainer)
         }
 
         if (SDK_INT >= 34) {

@@ -41,7 +41,7 @@ class CookiePopupOptInLayoutTest {
     fun whenInflatedThenSheetAndBubbleResolveOnboardingBackgrounds() {
         val binding = ActivityCookiePopupOptInBinding.inflate(LayoutInflater.from(context))
 
-        assertNotNull(binding.cookiePopupOptInSheet.background)
+        assertNotNull(binding.cookiePopupOptInContainer.background)
         assertNotNull(binding.cookiePopupOptInBubble.background)
     }
 

@@ -20,17 +20,8 @@
     android:id="@+id/cookiePopupOptInContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/background_cookie_popup_sheet"
     android:theme="@style/ThemeOverlay.DuckDuckGo.Onboarding">
-
-    <View
-        android:id="@+id/cookiePopupOptInSheet"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="@drawable/background_cookie_popup_sheet"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/cookiePopupOptInIllustration"
