@@ -96,6 +96,15 @@ class CookiePopupOptInEvaluatorTest {
     }
 
     @Test
+    fun whenAutoconsentKillSwitchDisabledThenSkippedAndNothingLaunched() = runTest {
+        feature.cookiePopUpOptInPrompt().setRawStoredState(Toggle.State(enable = true))
+        feature.self().setRawStoredState(Toggle.State(enable = false))
+
+        assertEquals(ModalEvaluator.EvaluationResult.Skipped, testee.evaluate())
+        assertNull(shadowOf(application).nextStartedActivity)
+    }
+
+    @Test
     fun whenPreferenceSettingDisabledThenSkippedAndNothingLaunched() = runTest {
         feature.cookiePopUpOptInPrompt().setRawStoredState(Toggle.State(enable = true))
         feature.cookiePopUpPreferenceSetting().setRawStoredState(Toggle.State(enable = false))
