@@ -28,6 +28,15 @@
     <string name="subscriptionOnboardingVpnBenefitLocation">Hiding your location &amp; IP address</string>
     <string name="subscriptionOnboardingVpnBenefitHarmful">Blocking harmful sites</string>
     <string name="subscriptionOnboardingVpnTurnOn">Turn On VPN</string>
+    <string name="subscriptionOnboardingVpnNext">Next</string>
     <string name="subscriptionOnboardingVpnSkip">Not now</string>
+
+    <!-- Subscription onboarding - VPN step, "On" state -->
+    <string name="subscriptionOnboardingVpnHeaderTitleOn">DuckDuckGo VPN is On</string>
+    <string name="subscriptionOnboardingVpnHeaderTextOn">All device internet traffic is being secured through the VPN. <annotation type="learn_more_link">Learn More</annotation></string>
+    <string name="subscriptionOnboardingVpnIpAddressTitleOn">Your IP Address is Hidden</string>
+    <string name="subscriptionOnboardingVpnNewIpAddressTitle">Your New IP Address</string>
+    <string name="subscriptionOnboardingVpnNewIpAddressValue">31.120.130.50</string>
+    <string name="subscriptionOnboardingVpnNewIpAddressLocation">🇪🇸 Valencia, Spain (Nearest)</string>
 
 </resources>
