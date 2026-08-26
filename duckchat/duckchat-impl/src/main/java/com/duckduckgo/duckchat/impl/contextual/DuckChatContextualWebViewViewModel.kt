@@ -250,6 +250,9 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
         val existingChatUrl = contextualDataStore.getTabChatUrl(tabId)
         if (!shouldReuseSession || isStoredChatMissingFromHistory(existingChatUrl)) {
             resetToNewChat()
+            withContext(dispatchers.main()) {
+                commandChannel.trySend(Command.ShowNewChatEntryDialog(tabId))
+            }
             return
         }
         withContext(dispatchers.main()) {

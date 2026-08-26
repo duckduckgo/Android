@@ -153,6 +153,23 @@ class DuckChatContextualWebViewViewModelTest {
     }
 
     @Test
+    fun `reopen with an unreusable session resets to a new chat and hands off to the entry dialog`() = runTest {
+        (duckChat as FakeDuckChat).nextUrl = "https://duckduckgo.com/?ia=chat"
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        contextualDataStore.persistTabClosedTimestamp("tab-1", 1L)
+
+        testee.commands.test {
+            testee.onSheetReopened()
+            coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+            assertTrue(expectMostRecentItem() is DuckChatContextualWebViewViewModel.Command.ShowNewChatEntryDialog)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun `onPromptSent with attached page context includes it in the event`() = runTest {
         testee.onSheetOpened("tab-1")
         testee.onPageContextReceived("tab-1", serializedPageData)
