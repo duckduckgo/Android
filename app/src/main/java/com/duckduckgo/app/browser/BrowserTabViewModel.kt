@@ -4568,7 +4568,10 @@ class BrowserTabViewModel @Inject constructor(
             command.value = WebViewError(errorType, url)
             suggestRedirectJob.cancel() // Cancel previous in-flight job as the new errorType might not be BAD_URL
         }
-        if (errorType == BAD_URL && suggestRedirectOnUnresolvedErrorFeature.suggestRedirect().isEnabled()) {
+        if (errorType == BAD_URL &&
+            suggestRedirectOnUnresolvedErrorFeature.self().isEnabled() &&
+            suggestRedirectOnUnresolvedErrorFeature.suggestRedirect().isEnabled()
+        ) {
             suggestRedirectJob += viewModelScope.launch {
                 suggestRedirectEvaluator.suggestRedirect(url)?.let { suggestion ->
                     browserViewState.value = currentBrowserViewState().copy(redirectSuggestion = suggestion)
