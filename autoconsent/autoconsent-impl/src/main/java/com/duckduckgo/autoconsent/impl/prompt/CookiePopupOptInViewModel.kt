@@ -65,7 +65,6 @@ class CookiePopupOptInViewModel @Inject constructor(
 
     fun onAcceptClicked() {
         viewModelScope.launch {
-            // All three land in SharedPreferences with a synchronous commit, so they stay off the main thread.
             withContext(dispatchers.io()) {
                 if (viewStateFlow.value.variant == Variant.PROTECTION_OFF) {
                     autoconsent.changeSetting(true)
