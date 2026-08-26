@@ -614,6 +614,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
     private fun segmentedBlockAdsPlan(ctx: NewUserOnboardingPlanContext): LinearOnboardingPlan {
         val duckAiEnabled = SuspendMemo { duckAiOnboardingAvailability.isDuckAiOnboardingEnabled() }
+        onboardingStore.setSegmentedOnboardingPath(null)
         return sidePlan(
             id = SEGMENTED_BLOCK_ADS_PLAN_ID,
             steps = listOf(
