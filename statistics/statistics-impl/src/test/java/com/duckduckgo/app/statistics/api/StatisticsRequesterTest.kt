@@ -179,9 +179,9 @@ class StatisticsRequesterTest {
     @Test
     fun whenStatisticsStoredThenRefreshAppUpdatesAtb() {
         configureStoredStatistics()
-        whenever(mockService.updateAppAtb(any(), any(), any(), any())).thenReturn(Observable.just(Atb(NEW_ATB)))
+        whenever(mockService.updateAppAtb(any(), any(), any(), any(), any())).thenReturn(Observable.just(Atb(NEW_ATB)))
         testee.refreshAppRetentionAtb()
-        verify(mockService).updateAppAtb(eq(ATB_WITH_VARIANT), eq(ATB.version), any(), any())
+        verify(mockService).updateAppAtb(eq(ATB_WITH_VARIANT), eq(ATB.version), any(), any(), any())
         verify(mockStatisticsStore).appRetentionAtb = NEW_ATB
         verify(mockStatisticsStore, never()).atb = any()
         verify(mockStatisticsStore, never()).searchRetentionAtb = any()
