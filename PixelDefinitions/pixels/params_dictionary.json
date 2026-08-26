@@ -38,6 +38,11 @@
             "none"
         ]
     },
+    "firstPromptNewInstall": {
+        "key": "first_prompt_new_install",
+        "type": "boolean",
+        "description": "Whether this is the first Duck.ai prompt ever submitted by a new install, across all surfaces. Omitted for existing installs and when false."
+    },
     "duckAiPromptPageType": {
         "key": "page_type",
         "type": "string",

@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.pixel
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.DuckAiTabSessionRepository
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.ToggleSelection
@@ -96,12 +97,15 @@ class RealDuckChatPixelsTest {
     private val duckAiMetricCollector: DuckAiMetricCollector = mock()
     private val mockTermsOfServiceHandler: DuckChatTermsOfServiceHandler = mock()
     private val mockDuckAiTabSessionRepository: DuckAiTabSessionRepository = mock()
+    private val mockAppBuildConfig: AppBuildConfig = mock()
 
     private lateinit var testee: RealDuckChatPixels
 
     @Before
     fun setup() = runTest {
         whenever(mockDuckChatFeatureRepository.sessionDeltaInMinutes()).thenReturn(1)
+        whenever(mockDuckChatFeatureRepository.checkAndMarkFirstPromptSubmission()).thenReturn(false)
+        whenever(mockAppBuildConfig.isNewInstall()).thenReturn(false)
 
         testee = RealDuckChatPixels(
             pixel = mockPixel,
@@ -112,6 +116,7 @@ class RealDuckChatPixelsTest {
             duckAiMetricCollector = duckAiMetricCollector,
             termsOfServiceHandler = mockTermsOfServiceHandler,
             duckAiTabSessionRepository = mockDuckAiTabSessionRepository,
+            appBuildConfig = mockAppBuildConfig,
         )
     }
 
@@ -132,6 +137,25 @@ class RealDuckChatPixelsTest {
     }
 
     @Test
+    fun `when sendReportMetricPixel with USER_DID_SUBMIT_PROMPT as first prompt on new install then params include it`() = runTest {
+        whenever(mockAppBuildConfig.isNewInstall()).thenReturn(true)
+        whenever(mockDuckChatFeatureRepository.checkAndMarkFirstPromptSubmission()).thenReturn(true)
+        whenever(mockDuckChatFeatureRepository.sessionDeltaInMinutes()).thenReturn(5)
+
+        testee.sendReportMetricPixel(USER_DID_SUBMIT_PROMPT)
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(
+            DUCK_CHAT_SEND_PROMPT_ONGOING_CHAT,
+            parameters = mapOf(
+                DuckChatPixelParameters.DELTA_TIMESTAMP_PARAMETERS to "5",
+                DuckChatPixelParameters.FIRST_PROMPT_NEW_INSTALL to "true",
+            ),
+        )
+    }
+
+    @Test
     fun `when sendReportMetricPixel with USER_DID_SUBMIT_FIRST_PROMPT then fires correct pixel with session params`() = runTest {
         whenever(mockDuckChatFeatureRepository.sessionDeltaInMinutes()).thenReturn(10)
 
@@ -145,6 +169,25 @@ class RealDuckChatPixelsTest {
         )
         verify(statisticsUpdater).refreshDuckAiRetentionAtb(mapOf("modelTier" to null))
         verify(duckAiMetricCollector).onMessageSent()
+    }
+
+    @Test
+    fun `when sendReportMetricPixel with USER_DID_SUBMIT_FIRST_PROMPT as first prompt on new install then params include it`() = runTest {
+        whenever(mockAppBuildConfig.isNewInstall()).thenReturn(true)
+        whenever(mockDuckChatFeatureRepository.checkAndMarkFirstPromptSubmission()).thenReturn(true)
+        whenever(mockDuckChatFeatureRepository.sessionDeltaInMinutes()).thenReturn(10)
+
+        testee.sendReportMetricPixel(USER_DID_SUBMIT_FIRST_PROMPT)
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(
+            DUCK_CHAT_START_NEW_CONVERSATION,
+            parameters = mapOf(
+                DuckChatPixelParameters.DELTA_TIMESTAMP_PARAMETERS to "10",
+                DuckChatPixelParameters.FIRST_PROMPT_NEW_INSTALL to "true",
+            ),
+        )
     }
 
     @Test
@@ -299,6 +342,38 @@ class RealDuckChatPixelsTest {
             parameters = expectedParams,
             type = Pixel.PixelType.Daily(),
         )
+    }
+
+    @Test
+    fun `when reportContextualPromptSubmittedWithContextNative then never includes first_prompt_new_install`() = runTest {
+        testee.reportContextualPromptSubmittedWithContextNative()
+
+        advanceUntilIdle()
+
+        val expectedParams = mapOf("page_type" to "contextual", "source" to "contextual_chat")
+        verify(mockPixel).fire(DUCK_CHAT_CONTEXTUAL_PROMPT_SUBMITTED_WITH_CONTEXT_NATIVE_COUNT, parameters = expectedParams)
+        verify(mockPixel).fire(
+            DUCK_CHAT_CONTEXTUAL_PROMPT_SUBMITTED_WITH_CONTEXT_NATIVE_DAILY,
+            parameters = expectedParams,
+            type = Pixel.PixelType.Daily(),
+        )
+        verifyNoInteractions(mockAppBuildConfig)
+    }
+
+    @Test
+    fun `when reportContextualPromptSubmittedWithoutContextNative then never includes first_prompt_new_install`() = runTest {
+        testee.reportContextualPromptSubmittedWithoutContextNative()
+
+        advanceUntilIdle()
+
+        val expectedParams = mapOf("page_type" to "contextual", "source" to "contextual_chat")
+        verify(mockPixel).fire(DUCK_CHAT_CONTEXTUAL_PROMPT_SUBMITTED_WITHOUT_CONTEXT_NATIVE_COUNT, parameters = expectedParams)
+        verify(mockPixel).fire(
+            DUCK_CHAT_CONTEXTUAL_PROMPT_SUBMITTED_WITHOUT_CONTEXT_NATIVE_DAILY,
+            parameters = expectedParams,
+            type = Pixel.PixelType.Daily(),
+        )
+        verifyNoInteractions(mockAppBuildConfig)
     }
 
     @Test

@@ -48,6 +48,7 @@ class RealDuckChatPixelsPickerTest {
         duckAiMetricCollector = duckAiMetricCollector,
         termsOfServiceHandler = termsOfServiceHandler,
         duckAiTabSessionRepository = mock(),
+        appBuildConfig = mock(),
     )
 
     @Test
