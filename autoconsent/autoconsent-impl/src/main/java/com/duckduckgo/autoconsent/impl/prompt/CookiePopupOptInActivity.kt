@@ -126,11 +126,18 @@ class CookiePopupOptInActivity : DuckDuckGoActivity() {
 
     private fun setupListeners() {
         binding.cookiePopupOptInAcceptButton.setOnClickListener {
+            disableButtons()
             viewModel.onAcceptClicked()
         }
         binding.cookiePopupOptInDeclineButton.setOnClickListener {
+            disableButtons()
             viewModel.onDeclineClicked()
         }
+    }
+
+    private fun disableButtons() {
+        binding.cookiePopupOptInAcceptButton.isEnabled = false
+        binding.cookiePopupOptInDeclineButton.isEnabled = false
     }
 
     private fun setupObservers() {

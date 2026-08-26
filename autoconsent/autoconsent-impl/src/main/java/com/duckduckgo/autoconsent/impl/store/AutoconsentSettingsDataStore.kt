@@ -29,6 +29,7 @@ interface AutoconsentSettingsDataStore {
     var clickAcceptEnabled: Boolean
     var firstPopupHandled: Boolean
     var optInPromptShownCount: Int
+    var optInPromptFirstShownAt: Long
     var optInPromptChoiceMade: Boolean
     fun invalidateCache()
 }
@@ -104,6 +105,14 @@ class RealAutoconsentSettingsDataStore constructor(
             }
         }
 
+    override var optInPromptFirstShownAt: Long
+        get() = preferences.getLong(AUTOCONSENT_OPT_IN_PROMPT_FIRST_SHOWN_AT, 0L)
+        set(value) {
+            preferences.edit(commit = true) {
+                putLong(AUTOCONSENT_OPT_IN_PROMPT_FIRST_SHOWN_AT, value)
+            }
+        }
+
     override var optInPromptChoiceMade: Boolean
         get() = preferences.getBoolean(AUTOCONSENT_OPT_IN_PROMPT_CHOICE_MADE, false)
         set(value) {
@@ -134,6 +143,7 @@ class RealAutoconsentSettingsDataStore constructor(
         private const val AUTOCONSENT_CLICK_ACCEPT_ENABLED = "AutoconsentClickAcceptEnabled"
         private const val AUTOCONSENT_FIRST_POPUP_HANDLED = "AutoconsentFirstPopupHandled"
         private const val AUTOCONSENT_OPT_IN_PROMPT_SHOWN_COUNT = "AutoconsentOptInPromptShownCount"
+        private const val AUTOCONSENT_OPT_IN_PROMPT_FIRST_SHOWN_AT = "AutoconsentOptInPromptFirstShownAt"
         private const val AUTOCONSENT_OPT_IN_PROMPT_CHOICE_MADE = "AutoconsentOptInPromptChoiceMade"
     }
 }

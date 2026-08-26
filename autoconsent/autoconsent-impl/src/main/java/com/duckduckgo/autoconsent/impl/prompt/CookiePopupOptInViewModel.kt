@@ -19,8 +19,12 @@ package com.duckduckgo.autoconsent.impl.prompt
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autoconsent.api.Autoconsent
+import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel
+import com.duckduckgo.autoconsent.impl.pixels.AutoconsentPixelParameters
 import com.duckduckgo.autoconsent.impl.store.AutoconsentSettingsRepository
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.channels.BufferOverflow
@@ -31,6 +35,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
@@ -38,6 +43,8 @@ class CookiePopupOptInViewModel @Inject constructor(
     private val autoconsent: Autoconsent,
     private val settingsRepository: AutoconsentSettingsRepository,
     private val dispatchers: DispatcherProvider,
+    private val currentTimeProvider: CurrentTimeProvider,
+    private val pixel: Pixel,
 ) : ViewModel() {
 
     /**
@@ -64,8 +71,22 @@ class CookiePopupOptInViewModel @Inject constructor(
     fun commands(): Flow<Command> = command.receiveAsFlow()
 
     fun onPromptShown() {
-        viewModelScope.launch(dispatchers.io()) {
-            settingsRepository.optInPromptShownCount++
+        viewModelScope.launch {
+            withContext(dispatchers.io()) {
+                settingsRepository.optInPromptShownCount++
+                val firstDisplay = settingsRepository.optInPromptFirstShownAt == 0L
+                if (firstDisplay) {
+                    settingsRepository.optInPromptFirstShownAt = currentTimeProvider.currentTimeMillis()
+                }
+                pixel.enqueueFire(
+                    if (firstDisplay) {
+                        AutoConsentPixel.COOKIE_POPUP_OPT_IN_SHOWN_FIRST
+                    } else {
+                        AutoConsentPixel.COOKIE_POPUP_OPT_IN_SHOWN_REPEAT
+                    },
+                    parameters = mapOf(AutoconsentPixelParameters.AUTOCONSENT_ENABLED to protectionWasOn().toString()),
+                )
+            }
         }
     }
 
@@ -77,6 +98,7 @@ class CookiePopupOptInViewModel @Inject constructor(
                 }
                 autoconsent.changeClickAcceptEnabled(true)
                 settingsRepository.optInPromptChoiceMade = true
+                fireOptionConfirmedPixel("max")
             }
             command.send(Command.Close)
         }
@@ -86,8 +108,33 @@ class CookiePopupOptInViewModel @Inject constructor(
         viewModelScope.launch {
             withContext(dispatchers.io()) {
                 settingsRepository.optInPromptChoiceMade = true
+                fireOptionConfirmedPixel(if (protectionWasOn()) "default" else "off")
             }
             command.send(Command.Close)
+        }
+    }
+
+    private fun fireOptionConfirmedPixel(preference: String) {
+        pixel.enqueueFire(
+            AutoConsentPixel.COOKIE_POPUP_OPT_IN_OPTION_CONFIRMED,
+            parameters = mapOf(
+                AutoconsentPixelParameters.AUTOCONSENT_ENABLED to protectionWasOn().toString(),
+                AutoconsentPixelParameters.COOKIE_POPUP_PREFERENCE to preference,
+                AutoconsentPixelParameters.TIME_SINCE_SHOWN to timeSinceShownBucket(),
+            ),
+        )
+    }
+
+    private fun protectionWasOn(): Boolean = viewStateFlow.value.variant == Variant.PROTECTION_ON
+
+    private fun timeSinceShownBucket(): String {
+        val elapsed = currentTimeProvider.currentTimeMillis() - settingsRepository.optInPromptFirstShownAt
+        return when {
+            elapsed < TimeUnit.MINUTES.toMillis(1) -> "0-1min"
+            elapsed < TimeUnit.MINUTES.toMillis(5) -> "1-5min"
+            elapsed < TimeUnit.HOURS.toMillis(1) -> "5-60min"
+            elapsed < TimeUnit.DAYS.toMillis(1) -> "1h-1d"
+            else -> "1d+"
         }
     }
 }
