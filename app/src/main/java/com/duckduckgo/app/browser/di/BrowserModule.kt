@@ -76,6 +76,7 @@ import com.duckduckgo.app.trackerdetection.CloakedCnameDetector
 import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.cookies.api.ThirdPartyCookieNames
 import com.duckduckgo.di.scopes.AppScope
@@ -117,6 +118,7 @@ class BrowserModule {
         duckChat: DuckChat,
         androidBrowserConfigFeature: AndroidBrowserConfigFeature,
         serpSettingsFeature: SerpSettingsFeature,
+        deviceInfo: DeviceInfo,
     ): RequestRewriter {
         return DuckDuckGoRequestRewriter(
             urlDetector,
@@ -126,6 +128,7 @@ class BrowserModule {
             duckChat,
             androidBrowserConfigFeature,
             serpSettingsFeature,
+            deviceInfo,
         )
     }
 
