@@ -127,4 +127,27 @@ class CookiePopupOptInViewModelTest {
     fun whenNoChoiceMadeYetThenNotRecorded() {
         assertFalse(settingsRepository.optInPromptChoiceMade)
     }
+
+    @Test
+    fun whenPromptShownThenShownCountIncremented() = runTest {
+        testee.onPromptShown()
+
+        assertEquals(1, settingsRepository.optInPromptShownCount)
+    }
+
+    @Test
+    fun whenPromptShownAgainThenShownCountIncrementedFromTheStoredValue() = runTest {
+        settingsRepository.optInPromptShownCount = 2
+
+        testee.onPromptShown()
+
+        assertEquals(3, settingsRepository.optInPromptShownCount)
+    }
+
+    @Test
+    fun whenPromptNotShownThenShownCountNotIncremented() = runTest {
+        testee.onDeclineClicked()
+
+        assertEquals(0, settingsRepository.optInPromptShownCount)
+    }
 }

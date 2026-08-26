@@ -89,8 +89,6 @@ class CookiePopupOptInEvaluator @Inject constructor(
             return@withContext ModalEvaluator.EvaluationResult.Skipped
         }
 
-        settingsRepository.optInPromptShownCount++
-
         delay(MODAL_DISPLAY_DELAY)
         appCoroutineScope.launch(dispatchers.main()) {
             val intent = CookiePopupOptInActivity.intent(applicationContext).apply {

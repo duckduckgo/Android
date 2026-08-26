@@ -63,6 +63,12 @@ class CookiePopupOptInViewModel @Inject constructor(
 
     fun commands(): Flow<Command> = command.receiveAsFlow()
 
+    fun onPromptShown() {
+        viewModelScope.launch(dispatchers.io()) {
+            settingsRepository.optInPromptShownCount++
+        }
+    }
+
     fun onAcceptClicked() {
         viewModelScope.launch {
             withContext(dispatchers.io()) {

@@ -85,6 +85,11 @@ class CookiePopupOptInActivity : DuckDuckGoActivity() {
         setupObservers()
         setupOrientationMode()
         setupOnBackNavigation()
+
+        // A restored Activity is the same presentation, so only a fresh one counts against the display cap.
+        if (savedInstanceState == null) {
+            viewModel.onPromptShown()
+        }
     }
 
     @SuppressLint("SourceLockedOrientationActivity")

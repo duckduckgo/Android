@@ -173,30 +173,11 @@ class CookiePopupOptInEvaluatorTest {
     }
 
     @Test
-    fun whenModalShownThenShownCountIncremented() = runTest {
-        feature.cookiePopUpOptInPrompt().setRawStoredState(Toggle.State(enable = true))
-
-        testee.evaluate()
-
-        assertEquals(1, settingsRepository.optInPromptShownCount)
-    }
-
-    @Test
-    fun whenSkippedThenShownCountNotIncremented() = runTest {
-        feature.cookiePopUpOptInPrompt().setRawStoredState(Toggle.State(enable = false))
-
-        testee.evaluate()
-
-        assertEquals(0, settingsRepository.optInPromptShownCount)
-    }
-
-    @Test
     fun whenShownFewerThanThreeTimesThenModalShown() = runTest {
         feature.cookiePopUpOptInPrompt().setRawStoredState(Toggle.State(enable = true))
         settingsRepository.optInPromptShownCount = 2
 
         assertEquals(ModalEvaluator.EvaluationResult.ModalShown, testee.evaluate())
-        assertEquals(3, settingsRepository.optInPromptShownCount)
     }
 
     @Test
@@ -206,17 +187,6 @@ class CookiePopupOptInEvaluatorTest {
 
         assertEquals(ModalEvaluator.EvaluationResult.Skipped, testee.evaluate())
         assertNull(shadowOf(application).nextStartedActivity)
-    }
-
-    @Test
-    fun whenChoiceAlreadyMadeThenShownCountNotIncremented() = runTest {
-        feature.cookiePopUpOptInPrompt().setRawStoredState(Toggle.State(enable = true))
-        settingsRepository.optInPromptChoiceMade = true
-        settingsRepository.optInPromptShownCount = 1
-
-        testee.evaluate()
-
-        assertEquals(1, settingsRepository.optInPromptShownCount)
     }
 
     @Test
@@ -243,7 +213,6 @@ class CookiePopupOptInEvaluatorTest {
 
         assertEquals(ModalEvaluator.EvaluationResult.Skipped, testee.evaluate())
         assertNull(shadowOf(application).nextStartedActivity)
-        assertEquals(3, settingsRepository.optInPromptShownCount)
     }
 
     private fun setDaysSinceInstall(days: Long) {
