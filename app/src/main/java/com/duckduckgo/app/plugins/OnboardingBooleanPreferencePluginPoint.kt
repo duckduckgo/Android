@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.onboarding
+package com.duckduckgo.app.plugins
 
-/**
- * A setting the user can turn on or off from the onboarding preference selector.
- */
-enum class OnboardingPreference {
-    BLOCK_ADS,
-    SEARCH_HISTORY,
-    SAFE_SEARCH,
-    SEARCH_ASSIST,
-    HIDE_AI_GENERATED_IMAGES,
-    REJECT_OPTIONAL_COOKIES,
-    ACCEPT_NON_OPT_OUT_COOKIES,
-}
+import com.duckduckgo.anvil.annotations.ContributesActivePluginPoint
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.onboarding.api.OnboardingBooleanPreferencePlugin
+
+@ContributesActivePluginPoint(
+    scope = AppScope::class,
+    boundType = OnboardingBooleanPreferencePlugin::class,
+    featureName = "pluginPointOnboardingBooleanPreference",
+)
+@Suppress("unused")
+private interface UnusedOnboardingBooleanPreferencePluginPoint

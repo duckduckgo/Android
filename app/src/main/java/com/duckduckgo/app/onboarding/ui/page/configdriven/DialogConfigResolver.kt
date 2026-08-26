@@ -251,6 +251,14 @@ class DialogConfigResolver @Inject constructor(
     }
 
     private fun preferenceRow(preference: OnboardingPreference, initiallyEnabled: Boolean) = when (preference) {
+        OnboardingPreference.BLOCK_ADS -> ContentConfig.PreferenceSelector.Row(
+            preference = preference,
+            iconRes = CommonR.drawable.ads_blocked_color_24,
+            primaryText = TextConfig.Resource(R.string.blockAdsPathPreferenceBlockAdsPrimary),
+            secondaryText = TextConfig.Resource(R.string.blockAdsPathPreferenceBlockAdsSecondary),
+            initiallyEnabled = initiallyEnabled,
+        )
+
         OnboardingPreference.SEARCH_HISTORY -> ContentConfig.PreferenceSelector.Row(
             preference = preference,
             iconRes = CommonR.drawable.history_color_24,
