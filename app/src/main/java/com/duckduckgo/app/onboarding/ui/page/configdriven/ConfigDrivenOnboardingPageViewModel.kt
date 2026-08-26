@@ -17,6 +17,7 @@
 package com.duckduckgo.app.onboarding.ui.page.configdriven
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.ViewModel
@@ -33,11 +34,16 @@ import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanBootstrapper
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanProvider
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingResult
+import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingStepIds
+import com.duckduckgo.app.onboarding.orchestrator.PasswordImportOutcome
 import com.duckduckgo.app.onboarding.orchestrator.stepIndicatorProgress
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
+import com.duckduckgo.autofill.api.ImportPasswordsFromGoogle
+import com.duckduckgo.autofill.api.ImportPasswordsFromGoogle.ImportPasswordsResult
+import com.duckduckgo.autofill.api.ImportPasswordsFromGoogle.ImportPasswordsStatus
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.onboarding.api.LinearOnboardingHost
@@ -51,6 +57,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -75,6 +83,7 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
     private val pixel: Pixel,
     private val appInstallStore: AppInstallStore,
     private val customAiOnboardingStore: CustomAiOnboardingStore,
+    private val importPasswordsFromGoogle: ImportPasswordsFromGoogle,
 ) : ViewModel() {
 
     data class ViewState(
@@ -125,6 +134,8 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
             val showSplitOption: Boolean,
         ) : Command
         data class ShowQuickSetupSearchOptionsBottomSheet(val initialWithAi: Boolean) : Command
+        data object LaunchPasswordImport : Command
+        data object ShowPasswordImportError : Command
     }
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -296,6 +307,61 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
         }
     }
 
+    /** The error alert's "Try again": another launch of the same flow, on the step we are already on. */
+    fun onPasswordImportRetry() = launchPasswordImport()
+
+    fun onPasswordImportResult(resultCode: Int, data: Intent?) {
+        if (resultCode != Activity.RESULT_OK) {
+            failPasswordImport(PasswordImportOutcome.CANCELLED, showError = false)
+            return
+        }
+        when (importPasswordsFromGoogle.parseResult(data)) {
+            is ImportPasswordsResult.Success -> showImportOutcome()
+            is ImportPasswordsResult.UserCancelled -> failPasswordImport(PasswordImportOutcome.CANCELLED, showError = false)
+            is ImportPasswordsResult.Error -> failPasswordImport(PasswordImportOutcome.ERROR, showError = true)
+        }
+    }
+
+    private fun launchPasswordImport() {
+        viewModelScope.launch { _commands.send(Command.LaunchPasswordImport) }
+    }
+
+    /**
+     * A returned web flow only means the credentials are being written; the counts come later. The outcome card
+     * is entered straight away so the wait is visible on it, and the counts are pushed into the state it is
+     * already bound to. Seeded before the event so the card finds a value there however fast it binds.
+     */
+    private fun showImportOutcome() {
+        val state = importCompleteState()
+        state.value = ImportCompleteContentState.Parsing
+        emit(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.SUCCESS))
+        viewModelScope.launch {
+            val finished = importPasswordsFromGoogle.importStatus().filterIsInstance<ImportPasswordsStatus.Finished>().firstOrNull()
+            if (finished == null) {
+                // The status flow ended without ever reporting a result. The user is already on the outcome
+                // card by now, so the attempt resolves there rather than back on the prompt.
+                state.value = ImportCompleteContentState.Failed
+                emit(NewUserOnboardingEvent.PasswordImportParsed(PasswordImportOutcome.ERROR))
+                return@launch
+            }
+            state.value = ImportCompleteContentState.Finished(imported = finished.imported, skipped = finished.skipped)
+            emit(NewUserOnboardingEvent.PasswordImportParsed(PasswordImportOutcome.SUCCESS))
+        }
+    }
+
+    private fun importCompleteState(): MutableStateFlow<ImportCompleteContentState> =
+        contentValues.contentState(NewUserOnboardingStepIds.PASSWORD_IMPORT_COMPLETE) { ImportCompleteContentState.Parsing }
+
+    private fun failPasswordImport(
+        outcome: PasswordImportOutcome,
+        showError: Boolean,
+    ) {
+        emit(NewUserOnboardingEvent.PasswordImportWebFlowFinished(outcome))
+        if (showError) {
+            viewModelScope.launch { _commands.send(Command.ShowPasswordImportError) }
+        }
+    }
+
     private fun requestDefaultBrowser() {
         viewModelScope.launch {
             if (!quickSetupDefaultBrowserDialogShown) {
@@ -457,11 +523,7 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
                 _commands.send(Command.LaunchAddWidgetPrompt)
             }
 
-            NewUserOnboardingActivityDialog.ImportPasswordsLaunch -> {
-                // TODO: launch the Google password import flow and report its outcome back as
-                //  PasswordImportWebFlowFinished / PasswordImportParsed. Until that lands, this step has no
-                //  side effect and the outcome card stays on its parsing state.
-            }
+            NewUserOnboardingActivityDialog.ImportPasswordsLaunch -> launchPasswordImport()
 
             NewUserOnboardingActivityDialog.SyncRestore,
             NewUserOnboardingActivityDialog.InitialReinstallUser,

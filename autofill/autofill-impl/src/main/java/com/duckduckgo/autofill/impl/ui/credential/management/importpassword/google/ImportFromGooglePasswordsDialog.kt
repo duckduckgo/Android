@@ -39,11 +39,11 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource.PasswordManagementPromo
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource.Unknown
+import com.duckduckgo.autofill.api.AutofillScreens.AutofillImportPasswordsScreen
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ContentImportFromGooglePasswordDialogBinding
 import com.duckduckgo.autofill.impl.deviceauth.AutofillAuthorizationGracePeriod
 import com.duckduckgo.autofill.impl.importing.CredentialImporter
-import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePassword
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordResult
 import com.duckduckgo.autofill.impl.ui.credential.dialog.animateClosed
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.ImportPasswordsPixelSender
@@ -370,7 +370,7 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
 
         val intent = globalActivityStarter.startIntent(
             requireContext(),
-            ImportGooglePassword.AutofillImportViaGooglePasswordManagerScreen,
+            AutofillImportPasswordsScreen(getLaunchSource()),
         )
         importGooglePasswordsFlowLauncher.launch(intent)
 

@@ -43,6 +43,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentOnboardingWelcomePageUpdateBinding
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserSystemSettings
 import com.duckduckgo.app.browser.omnibar.OmnibarType
+import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.app.onboarding.ui.page.OnboardingBackgroundAnimator
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
@@ -62,7 +63,10 @@ import com.duckduckgo.app.onboardingquicksetup.ui.RemoveWidgetInstructionsBottom
 import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.app.widget.AddWidgetSource
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.autofill.api.AutofillImportLaunchSource.Onboarding
+import com.duckduckgo.autofill.api.AutofillScreens.AutofillImportPasswordsScreen
 import com.duckduckgo.common.ui.store.AppTheme
+import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
@@ -128,6 +132,10 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
         } else {
             viewModel.onQuickSetupDefaultBrowserNotSet()
         }
+    }
+
+    private val passwordImportFlow = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        viewModel.onPasswordImportResult(result.resultCode, result.data)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -339,7 +347,31 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
                 QuickSetupSearchOptionsBottomSheet
                     .newInstance(initialWithAi = command.initialWithAi)
                     .show(childFragmentManager, QuickSetupSearchOptionsBottomSheet.TAG)
+            ConfigDrivenOnboardingPageViewModel.Command.LaunchPasswordImport -> passwordImportFlow.launch(
+                globalActivityStarter.startIntent(requireContext(), AutofillImportPasswordsScreen(Onboarding)),
+            )
+            ConfigDrivenOnboardingPageViewModel.Command.ShowPasswordImportError -> showPasswordImportError()
         }
+    }
+
+    private fun showPasswordImportError() {
+        TextAlertDialogBuilder(requireContext())
+            .setTitle(R.string.preOnboardingImportErrorTitle)
+            .setMessage(R.string.preOnboardingImportErrorBody)
+            .setPositiveButton(R.string.preOnboardingImportErrorRetry)
+            .setNegativeButton(R.string.preOnboardingImportErrorCancel)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onPasswordImportRetry()
+                    }
+
+                    override fun onNegativeButtonClicked() {
+                        viewModel.onEvent(NewUserOnboardingEvent.ContinueClicked)
+                    }
+                },
+            )
+            .show()
     }
 
     private fun openDefaultBrowserSystemSettings() {

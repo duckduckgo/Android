@@ -39,6 +39,7 @@ import com.duckduckgo.app.onboarding.ui.page.configdriven.ConfigDrivenOnboarding
 import com.duckduckgo.app.onboarding.ui.page.configdriven.ConfigDrivenOnboardingPageViewModel.Screen
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
+import com.duckduckgo.autofill.api.ImportPasswordsFromGoogle
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.onboarding.api.LinearOnboardingEvent
 import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
@@ -84,6 +85,7 @@ class ConfigDrivenOnboardingPageViewModelTest {
     private val newUserOnboardingPlanBootstrapper: NewUserOnboardingPlanBootstrapper = mock()
     private val mockOnboardingStore: OnboardingStore = mock()
     private val mockShownPixels: OnboardingDialogShownPixels = mock()
+    private val mockImportPasswordsFromGoogle: ImportPasswordsFromGoogle = mock()
 
     // Default harness: mock orchestrator left NotStarted, so the view model renders no dialog and emits no
     // commands on its own — the interaction tests drive a single method and assert exactly what it emits.
@@ -126,6 +128,7 @@ class ConfigDrivenOnboardingPageViewModelTest {
         pixel = pixel,
         appInstallStore = mockAppInstallStore,
         customAiOnboardingStore = customAiOnboardingStore,
+        importPasswordsFromGoogle = mockImportPasswordsFromGoogle,
     )
 
     // A one-step plan that renders [dialog]. By default the step records every event it is handed and stays put,

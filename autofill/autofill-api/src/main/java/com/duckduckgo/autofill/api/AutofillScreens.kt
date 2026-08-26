@@ -54,6 +54,13 @@ sealed interface AutofillScreens {
         val loginCredentials: LoginCredentials,
         val source: AutofillScreenLaunchSource,
     ) : ActivityParams
+
+    /**
+     * Launch the web flow which imports passwords from Google Password Manager.
+     *
+     * @param source where the import was started from
+     */
+    data class AutofillImportPasswordsScreen(val source: AutofillImportLaunchSource) : ActivityParams
 }
 
 enum class AutofillScreenLaunchSource {
