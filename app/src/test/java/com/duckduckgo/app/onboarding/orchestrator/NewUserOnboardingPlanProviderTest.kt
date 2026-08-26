@@ -460,6 +460,7 @@ class NewUserOnboardingPlanProviderTest {
 
         orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.NO_AI))
 
+        verify(onboardingStore).setSegmentedOnboardingPath(null)
         verify(duckChat).setCosmeticInputScreenUserSetting(false)
         verify(onboardingStore).storeInputScreenSelection(false)
     }

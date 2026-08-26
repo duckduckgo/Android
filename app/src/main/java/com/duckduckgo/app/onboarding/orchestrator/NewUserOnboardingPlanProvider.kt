@@ -591,6 +591,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         ctx: NewUserOnboardingPlanContext,
         duckAiStateChoice: OnboardingSingleChoiceDataPlugin?,
     ): LinearOnboardingPlan {
+        onboardingStore.setSegmentedOnboardingPath(null)
         applyInputModeSelection(ctx, withAi = false, fireTelemetry = false)
         return sidePlan(
             id = SEGMENTED_NO_AI_PLAN_ID,
