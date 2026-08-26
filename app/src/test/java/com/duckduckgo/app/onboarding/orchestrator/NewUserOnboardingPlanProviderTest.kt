@@ -492,6 +492,15 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
+    fun `when the block ads download reason is confirmed then it clears a segmented path left by an abandoned run`() = runTest {
+        startSegmentedAtDownloadReason()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.BLOCK_ADS))
+
+        verify(onboardingStore).setSegmentedOnboardingPath(null)
+    }
+
+    @Test
     fun `when the duck ai state step is reached then it offers the plugin options`() = runTest {
         startSegmentedAtDuckAiState()
 
