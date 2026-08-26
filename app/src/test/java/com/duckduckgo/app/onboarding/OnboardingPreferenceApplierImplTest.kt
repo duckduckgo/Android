@@ -18,9 +18,11 @@ package com.duckduckgo.app.onboarding
 
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.history.api.NavigationHistory
+import com.duckduckgo.onboarding.api.OnboardingBooleanPreferencePlugin
 import com.duckduckgo.settings.api.SerpSettingsDataProvider
 import com.duckduckgo.settings.api.SerpSettingsFeature
 import kotlinx.coroutines.awaitCancellation
@@ -47,12 +49,18 @@ class OnboardingPreferenceApplierImplTest {
     private val autoconsent: Autoconsent = mock()
     private val serpSettingsDataProvider: SerpSettingsDataProvider = mock()
     private val serpSettingsFeature: SerpSettingsFeature = FakeFeatureToggleFactory.create(SerpSettingsFeature::class.java)
+    private val adBlockingPlugin = FakeOnboardingBooleanPreferencePlugin()
+    private var contributedPlugins: List<OnboardingBooleanPreferencePlugin> = listOf(adBlockingPlugin)
+    private val booleanPreferencePlugins = object : ActivePluginPoint<OnboardingBooleanPreferencePlugin> {
+        override suspend fun getPlugins() = contributedPlugins
+    }
 
     private val testee = OnboardingPreferenceApplierImpl(
         navigationHistory = navigationHistory,
         autoconsent = autoconsent,
         serpSettingsDataProvider = serpSettingsDataProvider,
         serpSettingsFeature = serpSettingsFeature,
+        booleanPreferencePlugins = booleanPreferencePlugins,
         dispatcherProvider = coroutineRule.testDispatcherProvider,
     )
 
@@ -223,9 +231,10 @@ class OnboardingPreferenceApplierImplTest {
     }
 
     @Test
-    fun whenPreferencesEnumeratedThenSearchHistoryComesFirst() {
+    fun whenPreferencesEnumeratedThenBlockAdsComesFirst() {
         assertEquals(
             listOf(
+                OnboardingPreference.BLOCK_ADS,
                 OnboardingPreference.SEARCH_HISTORY,
                 OnboardingPreference.SAFE_SEARCH,
                 OnboardingPreference.SEARCH_ASSIST,
@@ -283,5 +292,49 @@ class OnboardingPreferenceApplierImplTest {
         testee.apply(OnboardingPreference.ACCEPT_NON_OPT_OUT_COOKIES, enabled = false)
 
         verify(autoconsent).changeClickAcceptEnabled(false)
+    }
+
+    @Test
+    fun whenAdBlockingPluginContributedThenBlockAdsIsAvailable() = runTest {
+        assertTrue(testee.isAvailable(OnboardingPreference.BLOCK_ADS))
+    }
+
+    @Test
+    fun whenAdBlockingPluginMissingThenBlockAdsIsNotAvailable() = runTest {
+        contributedPlugins = emptyList()
+
+        assertFalse(testee.isAvailable(OnboardingPreference.BLOCK_ADS))
+    }
+
+    @Test
+    fun whenBlockAdsOfferedThenItIsSeededOnToSteerTheUser() = runTest {
+        assertTrue(testee.isEnabled(OnboardingPreference.BLOCK_ADS))
+    }
+
+    @Test
+    fun whenBlockAdsAppliedThenThePickReachesTheAdBlockingPlugin() = runTest {
+        testee.apply(OnboardingPreference.BLOCK_ADS, enabled = true)
+
+        assertEquals(listOf(true), adBlockingPlugin.applied)
+    }
+
+    @Test
+    fun whenAdBlockingPluginMissingThenApplyingBlockAdsIsANoOp() = runTest {
+        contributedPlugins = emptyList()
+
+        testee.apply(OnboardingPreference.BLOCK_ADS, enabled = true)
+
+        assertEquals(emptyList<Boolean>(), adBlockingPlugin.applied)
+    }
+}
+
+private class FakeOnboardingBooleanPreferencePlugin(
+    override val id: OnboardingBooleanPreferencePlugin.Id = OnboardingBooleanPreferencePlugin.Id.AdBlocking,
+) : OnboardingBooleanPreferencePlugin {
+
+    val applied = mutableListOf<Boolean>()
+
+    override suspend fun apply(enabled: Boolean) {
+        applied += enabled
     }
 }

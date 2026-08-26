@@ -18,8 +18,10 @@ package com.duckduckgo.app.onboarding
 
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.history.api.NavigationHistory
+import com.duckduckgo.onboarding.api.OnboardingBooleanPreferencePlugin
 import com.duckduckgo.settings.api.HideAiGeneratedImages
 import com.duckduckgo.settings.api.SafeSearch
 import com.duckduckgo.settings.api.SearchAssistVisibility
@@ -60,11 +62,13 @@ class OnboardingPreferenceApplierImpl @Inject constructor(
     private val autoconsent: Autoconsent,
     private val serpSettingsDataProvider: SerpSettingsDataProvider,
     private val serpSettingsFeature: SerpSettingsFeature,
+    private val booleanPreferencePlugins: ActivePluginPoint<OnboardingBooleanPreferencePlugin>,
     private val dispatcherProvider: DispatcherProvider,
 ) : OnboardingPreferenceApplier {
 
     override suspend fun isAvailable(preference: OnboardingPreference): Boolean = withContext(dispatcherProvider.io()) {
         when (preference) {
+            OnboardingPreference.BLOCK_ADS -> plugin(OnboardingBooleanPreferencePlugin.Id.AdBlocking) != null
             OnboardingPreference.SEARCH_HISTORY -> navigationHistory.isHistoryFeatureAvailable()
             OnboardingPreference.SAFE_SEARCH,
             OnboardingPreference.SEARCH_ASSIST,
@@ -82,8 +86,9 @@ class OnboardingPreferenceApplierImpl @Inject constructor(
         when (preference) {
             OnboardingPreference.SEARCH_HISTORY -> navigationHistory.isHistoryUserEnabled()
             OnboardingPreference.SAFE_SEARCH -> safeSearchEnabled()
-            // The no-AI path offers these already set the way it wants the user to leave onboarding, so a user
-            // who proceeds without touching a row gets that position rather than the app's own default.
+            // A path that steers offers these already set the way it wants the user to leave onboarding, so a
+            // user who proceeds without touching a row gets that position rather than the app's own default.
+            OnboardingPreference.BLOCK_ADS -> true
             OnboardingPreference.SEARCH_ASSIST -> false
             OnboardingPreference.HIDE_AI_GENERATED_IMAGES -> true
             OnboardingPreference.REJECT_OPTIONAL_COOKIES -> autoconsent.isSettingEnabled()
@@ -91,8 +96,9 @@ class OnboardingPreferenceApplierImpl @Inject constructor(
         }
     }
 
-    override suspend fun apply(preference: OnboardingPreference, enabled: Boolean) = withContext(dispatcherProvider.io()) {
+    override suspend fun apply(preference: OnboardingPreference, enabled: Boolean): Unit = withContext(dispatcherProvider.io()) {
         when (preference) {
+            OnboardingPreference.BLOCK_ADS -> plugin(OnboardingBooleanPreferencePlugin.Id.AdBlocking)?.apply(enabled)
             OnboardingPreference.SEARCH_HISTORY -> navigationHistory.setHistoryUserEnabled(enabled)
             OnboardingPreference.SAFE_SEARCH -> serpSettingsDataProvider.setSetting(if (enabled) SafeSearch.ON else SafeSearch.OFF)
             OnboardingPreference.SEARCH_ASSIST -> serpSettingsDataProvider.setSetting(
@@ -105,6 +111,9 @@ class OnboardingPreferenceApplierImpl @Inject constructor(
             OnboardingPreference.ACCEPT_NON_OPT_OUT_COOKIES -> autoconsent.changeClickAcceptEnabled(enabled)
         }
     }
+
+    private suspend fun plugin(id: OnboardingBooleanPreferencePlugin.Id): OnboardingBooleanPreferencePlugin? =
+        booleanPreferencePlugins.getPlugins().firstOrNull { it.id == id }
 
     /**
      * The SERP only pushes `kp` to us once the user has loaded a SERP, so during onboarding it is normally absent:

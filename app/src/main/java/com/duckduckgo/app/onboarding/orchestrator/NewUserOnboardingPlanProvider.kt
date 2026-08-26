@@ -620,7 +620,9 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 comparisonChartStep(NewUserOnboardingActivityDialog.SegmentedComparisonChart(ComparisonChartConfig.SegmentedBlockAdsPath)),
                 defaultBrowserPromptStep(),
                 preferenceSelectorStep(
+                    ctx,
                     listOf(
+                        OnboardingPreference.BLOCK_ADS,
                         OnboardingPreference.REJECT_OPTIONAL_COOKIES,
                         OnboardingPreference.ACCEPT_NON_OPT_OUT_COOKIES,
                     ),
