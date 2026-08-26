@@ -63,12 +63,12 @@ class DuckChatContextualSharedViewModelTest {
     }
 
     @Test
-    fun whenOpenRequestedThenOpenSheetCommandEmitted() = runTest {
+    fun whenReloadChatRequestedThenReloadChatCommandEmitted() = runTest {
         testee.commands.test {
-            testee.onOpenRequested()
+            testee.onReloadChatRequested()
 
             val command = awaitItem()
-            assertEquals(DuckChatContextualSharedViewModel.Command.OpenSheet, command)
+            assertEquals(DuckChatContextualSharedViewModel.Command.ReloadChat, command)
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -121,23 +121,23 @@ class DuckChatContextualSharedViewModelTest {
     fun whenMultipleSubscribersThenAllReceiveCommands() = runTest {
         testee.commands.test {
             testee.commands.test {
-                testee.onOpenRequested()
+                testee.onReloadChatRequested()
 
-                assertEquals(DuckChatContextualSharedViewModel.Command.OpenSheet, awaitItem())
+                assertEquals(DuckChatContextualSharedViewModel.Command.ReloadChat, awaitItem())
                 cancelAndConsumeRemainingEvents()
             }
 
-            assertEquals(DuckChatContextualSharedViewModel.Command.OpenSheet, awaitItem())
+            assertEquals(DuckChatContextualSharedViewModel.Command.ReloadChat, awaitItem())
             cancelAndConsumeRemainingEvents()
         }
     }
 
     @Test
-    fun whenOpenRequestedThenSingleOpenSheetCommandEmitted() = runTest {
+    fun whenReloadChatRequestedThenSingleReloadChatCommandEmitted() = runTest {
         testee.commands.test {
-            testee.onOpenRequested()
+            testee.onReloadChatRequested()
 
-            assertEquals(DuckChatContextualSharedViewModel.Command.OpenSheet, awaitItem())
+            assertEquals(DuckChatContextualSharedViewModel.Command.ReloadChat, awaitItem())
             expectNoEvents()
             cancelAndConsumeRemainingEvents()
         }

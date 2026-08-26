@@ -2164,6 +2164,10 @@ class BrowserTabFragment :
                         viewModel.collectPageContext()
                     }
 
+                    is DuckChatContextualSharedViewModel.Command.ShowSheet -> {
+                        showDuckChatContextualSheet(command.tabId)
+                    }
+
                     else -> {}
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
@@ -3975,7 +3979,7 @@ class BrowserTabFragment :
 
     private fun createNewContextualFragment(tabId: String) {
         logcat { "Duck.ai Contextual: createNewContextualFragment" }
-        val fragment = duckChatContextual.createSheet(tabId)
+        val fragment = duckChatContextual.createChatSurface(tabId)
 
         duckAiContextualFragment = fragment
         val transaction = childFragmentManager.beginTransaction()
@@ -3992,7 +3996,7 @@ class BrowserTabFragment :
         transaction.show(fragment)
         transaction.commit()
 
-        sharedContextualViewModel.onOpenRequested()
+        sharedContextualViewModel.onReloadChatRequested()
     }
 
     private fun reactToDuckChatContextualSheetResult() {

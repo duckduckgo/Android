@@ -595,7 +595,12 @@ class NativeInputModeWidgetViewModel @Inject constructor(
 
     fun configureContextual(tabId: String) {
         activeTabId.value = tabId
-        widgetConfig.update { it.copy(inputContext = NativeInputState.InputContext.DUCK_AI_CONTEXTUAL) }
+        widgetConfig.update {
+            it.copy(
+                inputContext = NativeInputState.InputContext.DUCK_AI_CONTEXTUAL,
+                toggleSelection = NativeInputState.ToggleSelection.DUCK_AI,
+            )
+        }
         replayPendingState(tabId)
     }
 
