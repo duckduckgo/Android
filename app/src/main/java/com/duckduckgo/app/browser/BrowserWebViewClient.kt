@@ -150,6 +150,14 @@ class BrowserWebViewClient @Inject constructor(
     // WebView clears hasGesture() on redirect hops, but the App Link rules assume Chromium's per-navigation gesture flag.
     private var mainFrameGestureOriginUrl: String? = null
     private var start: Long? = null
+
+    // Needed for PageLoadWideEvent: it identifies the page load the wide event is currently measuring,
+    // so every callback reports against the flow that load opened and no later one can claim them.
+    private var navigationId: Long? = null
+
+    // Needed for PageLoadWideEvent: it identifies the url the measured load started with, so a main frame error
+    // can be told apart from one reported against some other url.
+    private var navigationUrl: String? = null
     private var lastInterceptedAppSchemeUrl: String? = null
     private var pageCommitVisibleFired: Boolean = false
     private var recompositeScheduled: Boolean = false
@@ -178,6 +186,7 @@ class BrowserWebViewClient @Inject constructor(
 
     private var currentLoadOperationId: String? = null
     private var parallelRequestsOnStart = 0
+    private var parallelRequestsOnMeasuredLoadStart = 0
 
     init {
         appCoroutineScope.launch {
@@ -517,8 +526,10 @@ class BrowserWebViewClient @Inject constructor(
         if (webView.url == url) {
             val navigationList = webView.safeCopyBackForwardList() ?: return
             webViewClientListener?.onPageCommitVisible(WebViewNavigationState(navigationList), url)
-            webViewClientListener?.getCurrentTabId()?.let { tabId ->
-                pageLoadWideEvent.onPageVisible(tabId, url, webView.progress)
+            navigationId?.let { loadNavigationId ->
+                webViewClientListener?.getCurrentTabId()?.let { tabId ->
+                    pageLoadWideEvent.onPageVisible(tabId, loadNavigationId, webView.progress)
+                }
             }
         }
     }
@@ -567,15 +578,15 @@ class BrowserWebViewClient @Inject constructor(
         var wideEventNavigation: Pair<String, Long>? = null
         url?.let {
             // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
-            if (it != ABOUT_BLANK && start == null) {
-                start = currentTimeProvider.elapsedRealtime()
-                webViewClientListener?.getCurrentTabId()?.let { tabId ->
-                    val navigationId = wideEventNavigationIdCounter.incrementAndGet()
-                    pageLoadWideEvent.onPageStarted(tabId, it, navigationId)
-                    wideEventNavigation = tabId to navigationId
+            if (it != ABOUT_BLANK) {
+                if (start == null) {
+                    start = currentTimeProvider.elapsedRealtime()
+                    incrementAndTrackLoad() // increment the request counter
+                    requestInterceptor.onPageStarted(url)
                 }
-                incrementAndTrackLoad() // increment the request counter
-                requestInterceptor.onPageStarted(url)
+                // A page start arriving while another load is in flight opens its own measured load, so a redirect
+                // chain is measured from its last hop.
+                wideEventNavigation = startWideEventPageLoad(it)
             }
 
             handleMediaPlayback(webView, it)
@@ -608,6 +619,56 @@ class BrowserWebViewClient @Inject constructor(
         lastPageStarted = url
         browserAutofillConfigurator.configureAutofillForCurrentPage(webView, url, browserMode)
         loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
+    }
+
+    private fun startWideEventPageLoad(url: String): Pair<String, Long>? {
+        val loadNavigationId = wideEventNavigationIdCounter.incrementAndGet()
+        val replacedNavigationId = navigationId
+        navigationId = loadNavigationId
+        navigationUrl = url
+        parallelRequestsOnMeasuredLoadStart = otherPageLoadsInFlight()
+        logcat { "Page load measured as navigationId=$loadNavigationId: url=$url, replacing=$replacedNavigationId" }
+        webViewClientListener?.onMainFrameLoadStarted(loadNavigationId)
+        val tabId = webViewClientListener?.getCurrentTabId() ?: return null
+        pageLoadWideEvent.onPageStarted(tabId, url, loadNavigationId)
+        return tabId to loadNavigationId
+    }
+
+    private fun endMeasuredPageLoad() {
+        navigationId = null
+        navigationUrl = null
+    }
+
+    private fun reportMeasuredLoadFailed(url: String?, errorDescription: String) {
+        failedNavigationIdFor(url)?.let { reportMeasuredLoadEnded(it, errorDescription) }
+    }
+
+    private fun reportMeasuredLoadFinished() {
+        navigationId?.let { reportMeasuredLoadEnded(it, errorDescription = null) }
+    }
+
+    private fun reportMeasuredLoadEnded(loadNavigationId: Long, errorDescription: String?) {
+        endMeasuredPageLoad()
+        val tabId = webViewClientListener?.getCurrentTabId() ?: return
+        pageLoadWideEvent.onPageLoadFinished(
+            tabId = tabId,
+            navigationId = loadNavigationId,
+            errorDescription = errorDescription,
+            isTabInForegroundOnFinish = webViewClientListener?.isTabInForeground() ?: true,
+            activeRequestsOnLoadStart = parallelRequestsOnMeasuredLoadStart,
+            concurrentRequestsOnFinish = otherPageLoadsInFlight(),
+        )
+    }
+
+    private fun otherPageLoadsInFlight(): Int = (parallelRequestCounter.get() - 1).coerceAtLeast(0)
+
+    private fun failedNavigationIdFor(url: String?): Long? {
+        val currentNavigationId = navigationId ?: return null
+        if (url == null || url != navigationUrl) {
+            logcat { "Ignoring load failure for $url: navigationId=$currentNavigationId is measuring $navigationUrl" }
+            return null
+        }
+        return currentNavigationId
     }
 
     override fun doUpdateVisitedHistory(
@@ -706,18 +767,9 @@ class BrowserWebViewClient @Inject constructor(
             printInjector.injectPrint(webView)
 
             if (url != null && url != ABOUT_BLANK) {
+                reportMeasuredLoadFinished()
                 start?.let { safeStart ->
                     val concurrentRequestsOnFinish = decrementLoadCountAndGet()
-                    webViewClientListener?.getCurrentTabId()?.let { tabId ->
-                        pageLoadWideEvent.onPageLoadFinished(
-                            tabId = tabId,
-                            url = url,
-                            errorDescription = null,
-                            isTabInForegroundOnFinish = webViewClientListener?.isTabInForeground() ?: true,
-                            activeRequestsOnLoadStart = parallelRequestsOnStart,
-                            concurrentRequestsOnFinish = concurrentRequestsOnFinish,
-                        )
-                    }
 
                     // TODO (cbarreiro - 22/05/2024): Extract to plugins
                     pageLoadedHandler.onPageLoaded(
@@ -811,20 +863,15 @@ class BrowserWebViewClient @Inject constructor(
             pixel.fire(WEB_RENDERER_GONE_KILLED)
         }
 
+        // Not url-scoped, and not gated on the cycle: a dead renderer ends whatever load it was running.
+        navigationId?.let { loadNavigationId ->
+            reportMeasuredLoadEnded(
+                loadNavigationId = loadNavigationId,
+                errorDescription = if (didCrash) "ERROR_RENDERER_CRASHED" else "ERROR_RENDERER_KILLED",
+            )
+        }
         if (this.start != null) {
-            val concurrentRequestsOnFinish = decrementLoadCountAndGet()
-            view?.url?.let { url ->
-                webViewClientListener?.getCurrentTabId()?.let { tabId ->
-                    pageLoadWideEvent.onPageLoadFinished(
-                        tabId = tabId,
-                        url = url,
-                        errorDescription = if (didCrash) "ERROR_RENDERER_CRASHED" else "ERROR_RENDERER_KILLED",
-                        isTabInForegroundOnFinish = webViewClientListener?.isTabInForeground() ?: true,
-                        activeRequestsOnLoadStart = parallelRequestsOnStart,
-                        concurrentRequestsOnFinish = concurrentRequestsOnFinish,
-                    )
-                }
-            }
+            decrementLoadCountAndGet()
             this.start = null
         }
 
@@ -942,22 +989,15 @@ class BrowserWebViewClient @Inject constructor(
 
             val parsedError = parseErrorResponse(webResourceError)
             if (request?.isForMainFrame == true) {
+                // Reported for every main-frame error, not just ones shown to the user. Otherwise, other failures
+                // never close properly and later get marked Unknown, making failed loads look like abandoned ones.
+                reportMeasuredLoadFailed(
+                    url = request.url?.toString(),
+                    errorDescription = webResourceError.errorCode.asStringErrorCode(),
+                )
                 if (parsedError != OMITTED) {
                     if (this.start != null) {
-                        // Trigger Wide Event failure for main frame errors
-                        val concurrentRequestsOnFinish = decrementLoadCountAndGet()
-                        request.url?.toString()?.let { url ->
-                            webViewClientListener?.getCurrentTabId()?.let { tabId ->
-                                pageLoadWideEvent.onPageLoadFinished(
-                                    tabId = tabId,
-                                    url = url,
-                                    errorDescription = webResourceError.errorCode.asStringErrorCode(),
-                                    isTabInForegroundOnFinish = webViewClientListener?.isTabInForeground() ?: true,
-                                    activeRequestsOnLoadStart = parallelRequestsOnStart,
-                                    concurrentRequestsOnFinish = concurrentRequestsOnFinish,
-                                )
-                            }
-                        }
+                        decrementLoadCountAndGet()
                         this.start = null
                     }
                 }
