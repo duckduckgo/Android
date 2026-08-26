@@ -30,12 +30,17 @@ import android.widget.TextView
 import androidx.annotation.AttrRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.databinding.FragmentSubscriptionOnboardingVpnBinding
@@ -43,6 +48,8 @@ import com.duckduckgo.networkprotection.impl.subscription.onboarding.Subscriptio
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.COMPLETED
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.SKIPPED
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 
@@ -60,7 +67,14 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
     @Inject
     lateinit var controller: SubscriptionOnboardingController
 
+    @Inject
+    lateinit var viewModelFactory: FragmentViewModelFactory
+
     private val binding: FragmentSubscriptionOnboardingVpnBinding by viewBinding()
+
+    private val viewModel by lazy {
+        ViewModelProvider(this, viewModelFactory)[SubscriptionOnboardingVpnViewModel::class.java]
+    }
 
     private var vpnOn = false
     private var transition: ValueAnimator? = null
@@ -68,6 +82,7 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         applyVpnState(animate = false)
+        observeConnectionInfo()
         binding.subscriptionOnboardingVpnHeaderTitle.setOnClickListener {
             vpnOn = !vpnOn
             applyVpnState(animate = true)
@@ -84,6 +99,16 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
         transition?.cancel()
         transition = null
         super.onDestroyView()
+    }
+
+    private fun observeConnectionInfo() {
+        viewModel.viewState()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { state ->
+                state.ipAddress?.let { binding.subscriptionOnboardingVpnIpAddressValue.text = it }
+                state.location?.let { binding.subscriptionOnboardingVpnIpAddressLocation.text = it }
+            }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
     private fun applyVpnState(animate: Boolean) = with(binding) {
