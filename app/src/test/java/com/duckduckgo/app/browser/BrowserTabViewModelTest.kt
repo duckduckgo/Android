@@ -8485,7 +8485,10 @@ class BrowserTabViewModelTest {
 
     @Test
     fun givenSuggestRedirectEnabledWhenBadUrlErrorReceivedAndRedirectShouldBeSuggestedThenRedirectSuggestionSetInViewState() = runTest {
-        fakeSuggestRedirectFeature.suggestRedirect().setRawStoredState(State(enable = true))
+        fakeSuggestRedirectFeature.apply {
+            self().setRawStoredState(State(enable = true))
+            suggestRedirect().setRawStoredState(State(enable = true))
+        }
         val redirectSuggestion = RedirectSuggestion(domain = "www.example.com", url = "http://www.example.com/path?q=1")
         whenever(mockSuggestRedirectEvaluator.suggestRedirect("http://example.com/path?q=1"))
             .thenReturn(redirectSuggestion)
@@ -8508,7 +8511,10 @@ class BrowserTabViewModelTest {
 
     @Test
     fun givenSuggestRedirectEnabledWhenBadUrlErrorReceivedAndRedirectShouldNotBeSuggestedThenRedirectSuggestionNotSetInViewState() = runTest {
-        fakeSuggestRedirectFeature.suggestRedirect().setRawStoredState(State(enable = true))
+        fakeSuggestRedirectFeature.apply {
+            self().setRawStoredState(State(enable = true))
+            suggestRedirect().setRawStoredState(State(enable = true))
+        }
         whenever(mockSuggestRedirectEvaluator.suggestRedirect(any()))
             .thenReturn(null)
 
@@ -8519,7 +8525,10 @@ class BrowserTabViewModelTest {
 
     @Test
     fun givenSuggestRedirectEnabledWhenNonBadUrlErrorReceivedThenRedirectSuggestionNotSetInViewState() = runTest {
-        fakeSuggestRedirectFeature.suggestRedirect().setRawStoredState(State(enable = true))
+        fakeSuggestRedirectFeature.apply {
+            self().setRawStoredState(State(enable = true))
+            suggestRedirect().setRawStoredState(State(enable = true))
+        }
         whenever(mockSuggestRedirectEvaluator.suggestRedirect(any()))
             .thenReturn(RedirectSuggestion(domain = "www.example.com", url = "http://www.example.com"))
 
@@ -8530,7 +8539,10 @@ class BrowserTabViewModelTest {
 
     @Test
     fun givenSuggestRedirectEvaluationInFlightWhenBrowserErrorResetThenRedirectSuggestionNotSetInViewState() = runTest {
-        fakeSuggestRedirectFeature.suggestRedirect().setRawStoredState(State(enable = true))
+        fakeSuggestRedirectFeature.apply {
+            self().setRawStoredState(State(enable = true))
+            suggestRedirect().setRawStoredState(State(enable = true))
+        }
         whenever(mockSuggestRedirectEvaluator.suggestRedirect(any()))
             .doSuspendableAnswer {
                 delay(1.seconds)
@@ -8547,7 +8559,10 @@ class BrowserTabViewModelTest {
 
     @Test
     fun givenSuggestRedirectEvaluationInFlightWhenNewErrorReceivedThenPreviousRedirectSuggestionNotSetInViewState() = runTest {
-        fakeSuggestRedirectFeature.suggestRedirect().setRawStoredState(State(enable = true))
+        fakeSuggestRedirectFeature.apply {
+            self().setRawStoredState(State(enable = true))
+            suggestRedirect().setRawStoredState(State(enable = true))
+        }
         whenever(mockSuggestRedirectEvaluator.suggestRedirect(any()))
             .doSuspendableAnswer {
                 delay(1.seconds)
@@ -8564,7 +8579,10 @@ class BrowserTabViewModelTest {
 
     @Test
     fun givenSuggestRedirectEvaluationInFlightWhenBrowserErrorRefreshedThenRedirectSuggestionNotSetInViewState() = runTest {
-        fakeSuggestRedirectFeature.suggestRedirect().setRawStoredState(State(enable = true))
+        fakeSuggestRedirectFeature.apply {
+            self().setRawStoredState(State(enable = true))
+            suggestRedirect().setRawStoredState(State(enable = true))
+        }
         whenever(mockSuggestRedirectEvaluator.suggestRedirect(any())).doSuspendableAnswer {
             delay(1.seconds)
             RedirectSuggestion(domain = "www.example.com", url = "http://www.example.com")
@@ -8581,7 +8599,10 @@ class BrowserTabViewModelTest {
     @Test
     fun givenSuggestRedirectEvaluationInFlightWhenUserSubmittedQueryThenRedirectSuggestionNotSetInViewState() = runTest {
         whenever(mockOmnibarConverter.convertQueryToUrl("http://another-site.com", null)).thenReturn("http://another-site.com")
-        fakeSuggestRedirectFeature.suggestRedirect().setRawStoredState(State(enable = true))
+        fakeSuggestRedirectFeature.apply {
+            self().setRawStoredState(State(enable = true))
+            suggestRedirect().setRawStoredState(State(enable = true))
+        }
         whenever(mockSuggestRedirectEvaluator.suggestRedirect(any())).doSuspendableAnswer {
             delay(1.seconds)
             RedirectSuggestion(domain = "www.example.com", url = "http://www.example.com")
@@ -8598,7 +8619,10 @@ class BrowserTabViewModelTest {
     @Test
     fun givenSuggestRedirectEvaluationInFlightWhenUserNavigatesHomeThenRedirectSuggestionNotSetInViewState() =
         runTest {
-            fakeSuggestRedirectFeature.suggestRedirect().setRawStoredState(State(enable = true))
+            fakeSuggestRedirectFeature.apply {
+                self().setRawStoredState(State(enable = true))
+                suggestRedirect().setRawStoredState(State(enable = true))
+            }
             whenever(mockSuggestRedirectEvaluator.suggestRedirect(any())).doSuspendableAnswer {
                 delay(1.seconds)
                 RedirectSuggestion(domain = "www.example.com", url = "http://www.example.com")
@@ -8615,7 +8639,10 @@ class BrowserTabViewModelTest {
 
     @Test
     fun givenSuggestRedirectEvaluationInFlightWhenOmittedErrorReceivedThenRedirectSuggestionStillSetInViewState() = runTest {
-        fakeSuggestRedirectFeature.suggestRedirect().setRawStoredState(State(enable = true))
+        fakeSuggestRedirectFeature.apply {
+            self().setRawStoredState(State(enable = true))
+            suggestRedirect().setRawStoredState(State(enable = true))
+        }
         val redirectSuggestion = RedirectSuggestion(domain = "www.example.com", url = "http://www.example.com")
         whenever(mockSuggestRedirectEvaluator.suggestRedirect(any())).doSuspendableAnswer {
             delay(1.seconds)
