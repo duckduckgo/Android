@@ -23,13 +23,9 @@ import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.onboarding.api.OnboardingBooleanPreferencePlugin
 import com.duckduckgo.onboarding.api.OnboardingBooleanPreferencePlugin.Id
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
 
-/**
- * Commits the onboarding ad blocking pick as the user's ad blocking setting, the same setting the
- * ad blocking settings screen writes.
- */
 @ContributesActivePlugin(
     scope = AppScope::class,
     boundType = OnboardingBooleanPreferencePlugin::class,
@@ -43,9 +39,10 @@ class OnboardingAdBlockingPreferencePluginImpl @Inject constructor(
 
     override val id: Id = Id.AdBlocking
 
-    /** Onboarding offers the preference exactly when the settings screen shows it. */
-    override suspend fun isActive(): Boolean =
-        statusChecker.settingsPlacementFlow().first() != SettingsPlacement.Hidden
+    override suspend fun isActive(): Boolean {
+        val placement = statusChecker.settingsPlacementFlow().firstOrNull()
+        return placement != null && placement != SettingsPlacement.Hidden
+    }
 
     override suspend fun apply(enabled: Boolean) {
         settingsRepository.setEnabled(enabled)

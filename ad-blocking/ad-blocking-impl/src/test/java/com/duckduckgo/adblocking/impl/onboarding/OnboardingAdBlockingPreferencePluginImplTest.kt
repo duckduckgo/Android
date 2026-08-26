@@ -20,6 +20,7 @@ import com.duckduckgo.adblocking.impl.AdBlockingSettingsRepository
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
 import com.duckduckgo.adblocking.impl.domain.SettingsPlacement
 import com.duckduckgo.onboarding.api.OnboardingBooleanPreferencePlugin
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -62,6 +63,13 @@ class OnboardingAdBlockingPreferencePluginImplTest {
     @Test
     fun whenSettingsHideTheEntryThenPluginIsNotActive() = runTest {
         whenever(statusChecker.settingsPlacementFlow()).thenReturn(flowOf(SettingsPlacement.Hidden))
+
+        assertFalse(testee.isActive())
+    }
+
+    @Test
+    fun whenSettingsPlacementIsUnknownThenPluginIsNotActive() = runTest {
+        whenever(statusChecker.settingsPlacementFlow()).thenReturn(emptyFlow())
 
         assertFalse(testee.isActive())
     }
