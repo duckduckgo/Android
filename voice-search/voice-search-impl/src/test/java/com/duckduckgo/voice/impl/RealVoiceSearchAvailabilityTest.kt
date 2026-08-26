@@ -393,13 +393,13 @@ class RealVoiceSearchAvailabilityTest {
     }
 
     @Test
-    fun whenVoiceSearchSupportedThenDefaultUserSettingsTrue() {
+    fun whenVoiceSearchSupportedThenDefaultUserSettingsFalse() {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray(), excludedLocales = emptyArray())
         setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
 
         testee.isVoiceSearchAvailable
 
-        verify(voiceSearchRepository).isVoiceSearchUserEnabled(eq(true))
+        verify(voiceSearchRepository).isVoiceSearchUserEnabled(eq(false))
     }
 
     @Test
@@ -412,10 +412,10 @@ class RealVoiceSearchAvailabilityTest {
     }
 
     @Test
-    fun whenObservedAvailabilityThenUsesEnabledByDefault() = runTest {
+    fun whenObservedAvailabilityThenUsesDisabledByDefault() = runTest {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray(), excludedLocales = emptyArray())
         setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
-        whenever(voiceSearchRepository.voiceSearchUserEnabledFlow(eq(true))).thenReturn(flowOf(true))
+        whenever(voiceSearchRepository.voiceSearchUserEnabledFlow(eq(false))).thenReturn(flowOf(true))
 
         assertTrue(testee.observeVoiceSearchAvailability().first())
     }
