@@ -1002,4 +1002,11 @@
     <string name="singleTabFireDialogTitleFireMode">Delete Fire Tabs and their data?</string>
 
     <string name="downloadsCannotOpenFileErrorMessage">Can\'t open file. Check for compatible app.</string>
+
+    <!-- Error pages -->
+    <string name="webViewErrorTitle">DuckDuckGo can\'t load this page</string>
+    <string name="webViewErrorNoConnection">The internet connection appears to be offline.</string>
+    <string name="webViewErrorBadUrl">A server with the specified hostname could not be found.</string>
+    <string name="webViewErrorSslProtocol"><![CDATA[The certificate for this server is invalid. You might be connecting to a server that is pretending to be <b>%1$s</b> which could put your confidential information at risk.]]></string>
+    <string name="webViewErrorRedirectSuggestionMessage" instruction="Shown when a domain fails to load, offering a link to the www. version of the address. ^1 is the suggested address and is displayed as a tappable link.">Did you mean <annotation type="redirect_link">^1</annotation>?</string>
 </resources>
