@@ -31,7 +31,7 @@ import com.duckduckgo.app.onboarding.DuckAiOnboardingAvailability
 import com.duckduckgo.app.onboarding.DuckAiOnboardingDemo
 import com.duckduckgo.app.onboarding.OnboardingInputScreenLaunchTarget
 import com.duckduckgo.app.onboarding.OnboardingPreference
-import com.duckduckgo.app.onboarding.OnboardingPreferenceApplier
+import com.duckduckgo.app.onboarding.OnboardingPreferenceCatalog
 import com.duckduckgo.app.onboarding.OnboardingPromptsExperimentManager
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager.SegmentedOnboardingExperimentVariant
@@ -111,7 +111,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     private val duckAiOnboardingDemo: DuckAiOnboardingDemo,
     private val onboardingPromptsExperimentManager: OnboardingPromptsExperimentManager,
     private val segmentedOnboardingExperimentManager: SegmentedOnboardingExperimentManager,
-    private val onboardingPreferenceApplier: OnboardingPreferenceApplier,
+    private val onboardingPreferenceCatalog: OnboardingPreferenceCatalog,
     private val singleChoiceDataPlugins: ActivePluginPoint<OnboardingSingleChoiceDataPlugin>,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) {
@@ -642,37 +642,24 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         )
     }
 
-    /**
-     * Filters unavailable preferences and assigns the default value.
-     */
-    private suspend fun resolvePreferenceSelections(
-        offered: List<OnboardingPreference>,
-    ): Map<OnboardingPreference, NewUserOnboardingActivityDialog.PreferenceSelector.Offered> =
-        offered
-            .filter { onboardingPreferenceApplier.isAvailable(it) }
-            .associateWith {
-                NewUserOnboardingActivityDialog.PreferenceSelector.Offered(
-                    initiallyEnabled = onboardingPreferenceApplier.isEnabled(it),
-                    presentation = onboardingPreferenceApplier.presentation(it),
-                )
-            }
-
     private fun preferenceSelectorStep(
         ctx: NewUserOnboardingPlanContext,
         @StringRes titleRes: Int,
         offered: List<OnboardingPreference>,
         @StringRes caption: Int? = null,
     ): NewUserOnboardingActivityStep {
-        val preferenceSelections = SuspendMemo { resolvePreferenceSelections(offered) }
+        // Resolved on first access, so a preference's availability is evaluated when the run reaches this
+        // step and not when the plan holding it was built.
+        val rows = SuspendMemo { onboardingPreferenceCatalog.offer(offered) }
         return NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.PREFERENCE_SELECTOR,
             pixelName = null,
             showsStepIndicator = true,
-            precondition = { preferenceSelections().isNotEmpty() },
+            precondition = { rows().isNotEmpty() },
             resolveDialog = {
                 NewUserOnboardingActivityDialog.PreferenceSelector(
                     titleRes = titleRes,
-                    offered = preferenceSelections(),
+                    rows = rows(),
                     caption = caption,
                 )
             },
@@ -681,11 +668,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                     is NewUserOnboardingEvent.PreferenceSelectorConfirmed -> {
                         // Committed only once the run ends, so preferences a path seeds its own way don't
                         // survive a process death into the path a restarted onboarding takes.
-                        ctx.onFinish {
-                            event.selections.forEach { (preference, enabled) ->
-                                onboardingPreferenceApplier.apply(preference, enabled)
-                            }
-                        }
+                        ctx.onFinish { onboardingPreferenceCatalog.apply(event.selections) }
                         Advance
                     }
 

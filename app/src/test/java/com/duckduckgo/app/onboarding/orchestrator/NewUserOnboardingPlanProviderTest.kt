@@ -30,18 +30,19 @@ import com.duckduckgo.app.onboarding.DuckAiOnboardingDemo
 import com.duckduckgo.app.onboarding.FakeOnboardingSingleChoiceDataPlugin
 import com.duckduckgo.app.onboarding.OnboardingInputScreenLaunchTarget
 import com.duckduckgo.app.onboarding.OnboardingPreference
-import com.duckduckgo.app.onboarding.OnboardingPreferenceApplier
+import com.duckduckgo.app.onboarding.OnboardingPreferenceCatalog
 import com.duckduckgo.app.onboarding.OnboardingPromptsExperimentManager
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager.SegmentedOnboardingExperimentVariant
 import com.duckduckgo.app.onboarding.TestOption
-import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityDialog.PreferenceSelector.Offered
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.SegmentedOnboardingPath
 import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
+import com.duckduckgo.app.onboarding.ui.page.configdriven.ContentConfig
 import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection
+import com.duckduckgo.app.onboarding.ui.page.configdriven.TextConfig
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_AICHAT_SELECTED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CHOOSE_BROWSER_PRESSED
@@ -84,6 +85,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.atLeastOnce
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -116,7 +118,9 @@ class NewUserOnboardingPlanProviderTest {
     private val duckAiOnboardingDemo: DuckAiOnboardingDemo = mock()
     private val homeScreenPromptsExperiment: OnboardingPromptsExperimentManager = mock()
     private val segmentedOnboardingExperiment: SegmentedOnboardingExperimentManager = mock()
-    private val onboardingPreferenceApplier: OnboardingPreferenceApplier = mock()
+    private val onboardingPreferenceCatalog: OnboardingPreferenceCatalog = mock {
+        onBlocking { offer(any()) } doReturn emptyList()
+    }
     private val providerOptions = listOf(TestOption("openai"), TestOption("anthropic"), TestOption("mistral"))
     private val modelProviderPlugin = FakeOnboardingSingleChoiceDataPlugin(options = providerOptions)
     private val togglePositionOptions = listOf(TestOption("duckAI"), TestOption("lastUsed"))
@@ -177,7 +181,7 @@ class NewUserOnboardingPlanProviderTest {
             duckAiOnboardingDemo = duckAiOnboardingDemo,
             onboardingPromptsExperimentManager = homeScreenPromptsExperiment,
             segmentedOnboardingExperimentManager = segmentedOnboardingExperiment,
-            onboardingPreferenceApplier = onboardingPreferenceApplier,
+            onboardingPreferenceCatalog = onboardingPreferenceCatalog,
             singleChoiceDataPlugins = singleChoiceDataPlugins,
             appCoroutineScope = coroutineRule.testScope,
         )
@@ -447,8 +451,6 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     private suspend fun startSegmentedAtDuckAiState() {
-        whenever(onboardingPreferenceApplier.isAvailable(OnboardingPreference.SEARCH_ASSIST)).thenReturn(false)
-        whenever(onboardingPreferenceApplier.isAvailable(OnboardingPreference.HIDE_AI_GENERATED_IMAGES)).thenReturn(false)
         startSegmentedAtDownloadReason()
         orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.NO_AI))
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
@@ -457,10 +459,11 @@ class NewUserOnboardingPlanProviderTest {
 
     @Test
     fun `when the no ai path offers preferences then the selector carries the no ai title`() = runTest {
-        whenever(onboardingPreferenceApplier.isAvailable(OnboardingPreference.SEARCH_ASSIST)).thenReturn(true)
-        whenever(onboardingPreferenceApplier.isAvailable(OnboardingPreference.HIDE_AI_GENERATED_IMAGES)).thenReturn(true)
-        whenever(onboardingPreferenceApplier.isEnabled(OnboardingPreference.SEARCH_ASSIST)).thenReturn(true)
-        whenever(onboardingPreferenceApplier.isEnabled(OnboardingPreference.HIDE_AI_GENERATED_IMAGES)).thenReturn(false)
+        val offeredRows = listOf(
+            preferenceRow(OnboardingPreference.SEARCH_ASSIST, initiallyEnabled = true),
+            preferenceRow(OnboardingPreference.HIDE_AI_GENERATED_IMAGES, initiallyEnabled = false),
+        )
+        whenever(onboardingPreferenceCatalog.offer(any())).thenReturn(offeredRows)
         startSegmentedAtDownloadReason()
 
         orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.NO_AI))
@@ -472,10 +475,7 @@ class NewUserOnboardingPlanProviderTest {
         assertEquals(
             NewUserOnboardingActivityDialog.PreferenceSelector(
                 titleRes = R.string.noAiPathPreferenceSelectorTitle,
-                offered = mapOf(
-                    OnboardingPreference.SEARCH_ASSIST to Offered(initiallyEnabled = true),
-                    OnboardingPreference.HIDE_AI_GENERATED_IMAGES to Offered(initiallyEnabled = false),
-                ),
+                rows = offeredRows,
             ),
             selectorStep.resolveDialog(),
         )
@@ -605,10 +605,11 @@ class NewUserOnboardingPlanProviderTest {
     @Test
     fun `when on the segmented search path then walks the full plan to completed`() = runTest {
         whenever(duckAiAvailability.isDuckAiOnboardingEnabled()).thenReturn(true)
-        whenever(onboardingPreferenceApplier.isAvailable(OnboardingPreference.SEARCH_HISTORY)).thenReturn(true)
-        whenever(onboardingPreferenceApplier.isAvailable(OnboardingPreference.SAFE_SEARCH)).thenReturn(true)
-        whenever(onboardingPreferenceApplier.isEnabled(OnboardingPreference.SEARCH_HISTORY)).thenReturn(false)
-        whenever(onboardingPreferenceApplier.isEnabled(OnboardingPreference.SAFE_SEARCH)).thenReturn(true)
+        val offeredRows = listOf(
+            preferenceRow(OnboardingPreference.SEARCH_HISTORY, initiallyEnabled = false),
+            preferenceRow(OnboardingPreference.SAFE_SEARCH, initiallyEnabled = true),
+        )
+        whenever(onboardingPreferenceCatalog.offer(any())).thenReturn(offeredRows)
         startSegmentedAtDownloadReason()
 
         orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.SEARCH))
@@ -621,10 +622,7 @@ class NewUserOnboardingPlanProviderTest {
         assertEquals(
             NewUserOnboardingActivityDialog.PreferenceSelector(
                 titleRes = R.string.searchPathPreferenceSelectorTitle,
-                offered = mapOf(
-                    OnboardingPreference.SEARCH_HISTORY to Offered(initiallyEnabled = false),
-                    OnboardingPreference.SAFE_SEARCH to Offered(initiallyEnabled = true),
-                ),
+                rows = offeredRows,
             ),
             selectorStep.resolveDialog(),
         )
@@ -636,7 +634,7 @@ class NewUserOnboardingPlanProviderTest {
                 ),
             ),
         )
-        verify(onboardingPreferenceApplier, never()).apply(any(), any())
+        verify(onboardingPreferenceCatalog, never()).apply(any())
         assertStep(NewUserOnboardingStepIds.INPUT_SCREEN)
         orchestrator.onEvent(NewUserOnboardingEvent.InputModeConfirmed(withAi = false))
         verify(onboardingStore).setSegmentedOnboardingPath(SegmentedOnboardingPath.SEARCH)
@@ -657,13 +655,16 @@ class NewUserOnboardingPlanProviderTest {
             Completed(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, result = NewUserOnboardingResult.LaunchSearch(query = "weather")),
             orchestrator.state.value,
         )
-        verify(onboardingPreferenceApplier).apply(OnboardingPreference.SEARCH_HISTORY, true)
-        verify(onboardingPreferenceApplier).apply(OnboardingPreference.SAFE_SEARCH, true)
+        verify(onboardingPreferenceCatalog).apply(
+            mapOf(
+                OnboardingPreference.SEARCH_HISTORY to true,
+                OnboardingPreference.SAFE_SEARCH to true,
+            ),
+        )
     }
 
     @Test
     fun `when no preference is available then the selector is skipped and the search path is persisted`() = runTest {
-        whenever(onboardingPreferenceApplier.isAvailable(any())).thenReturn(false)
         startSegmentedAtDownloadReason()
 
         orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.SEARCH))
@@ -679,7 +680,6 @@ class NewUserOnboardingPlanProviderTest {
     @Test
     fun `when the ai toggle was enabled on the search path then the preview keeps the mode toggle and default title`() = runTest {
         whenever(duckAiAvailability.isDuckAiOnboardingEnabled()).thenReturn(true)
-        whenever(onboardingPreferenceApplier.isAvailable(any())).thenReturn(false)
         startSegmentedAtDownloadReason()
 
         orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.SEARCH))
@@ -703,7 +703,6 @@ class NewUserOnboardingPlanProviderTest {
     @Test
     fun `when duck ai onboarding is disabled on the search path then the preview is still shown without the mode toggle`() = runTest {
         whenever(duckAiAvailability.isDuckAiOnboardingEnabled()).thenReturn(false)
-        whenever(onboardingPreferenceApplier.isAvailable(any())).thenReturn(false)
         startSegmentedAtDownloadReason()
 
         orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.SEARCH))
@@ -732,7 +731,6 @@ class NewUserOnboardingPlanProviderTest {
     @Test
     fun `when the ai toggle was on but duck ai onboarding is disabled then the search path preview drops the toggle`() = runTest {
         whenever(duckAiAvailability.isDuckAiOnboardingEnabled()).thenReturn(false)
-        whenever(onboardingPreferenceApplier.isAvailable(any())).thenReturn(false)
         startSegmentedAtDownloadReason()
 
         orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.SEARCH))
@@ -1667,4 +1665,14 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     // endregion
+    private fun preferenceRow(
+        preference: OnboardingPreference,
+        initiallyEnabled: Boolean,
+    ) = ContentConfig.PreferenceSelector.Row(
+        preference = preference,
+        iconRes = null,
+        primaryText = TextConfig.Literal(preference.name),
+        secondaryText = null,
+        initiallyEnabled = initiallyEnabled,
+    )
 }
