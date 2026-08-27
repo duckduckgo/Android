@@ -21,16 +21,16 @@
     <string name="autoconsentDescription"><![CDATA[DuckDuckGo will try to select the most private settings available and hide these pop-ups for you.\n<a href="">Learn More</a>]]></string>
     <string name="autoconsentToggle">Let DuckDuckGo handle cookie pop-ups</string>
     <string name="autoconsentAutoManageToggle">Reject optional cookies</string>
-    <string name="autoconsentAutoManageDescription">We'll aim to reject as many cookies as possible for you, then close the pop-ups.</string>
+    <string name="autoconsentAutoManageDescription">We\'ll aim to reject as many cookies as possible for you, then close the pop-ups.</string>
     <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[DuckDuckGo can auto-manage cookie pop-ups to maximize privacy and minimize cookies before you even see them.\n<a href="">Learn More</a>]]></string>
     <string name="autoconsentPopUpsWithoutOptOutsToggle">Accept cookies that can’t be rejected</string>
-    <string name="autoconsentPopUpsWithoutOptOutsDescription">If there's no reject option, we'll save you a click, accept these cookies for you, and close the pop-ups.</string>
+    <string name="autoconsentPopUpsWithoutOptOutsDescription">If there\'s no reject option, we\'ll save you a click, accept these cookies for you, and close the pop-ups.</string>
     <string name="autoconsentPromptTitle">Tired of cookie pop-ups?</string>
     <string name="autoconsentPromptFootnote">You can always adjust later in Settings.</string>
-    <string name="autoconsentPromptCpmOnMessage">Some cookies can't be rejected. We can accept these for you.</string>
+    <string name="autoconsentPromptCpmOnMessage">Some cookies can\'t be rejected. We can accept these for you.</string>
     <string name="autoconsentPromptCpmOnPrimaryButton">Accept cookies for me</string>
-    <string name="autoconsentPromptCpmOnSecondaryButton">I'll accept them myself</string>
-    <string name="autoconsentPromptCpmOffMessage">Let us deal with them for you. We'll reject cookies when possible, and accept those that can't be rejected.</string>
+    <string name="autoconsentPromptCpmOnSecondaryButton">I\'ll accept them myself</string>
+    <string name="autoconsentPromptCpmOffMessage">Let us deal with them for you. We\'ll reject cookies when possible, and accept those that can't be rejected.</string>
     <string name="autoconsentPromptCpmOffPrimaryButton">Reject if possible or accept for me</string>
-    <string name="autoconsentPromptCpmOffSecondaryButton">I’ll deal with them myself</string>
+    <string name="autoconsentPromptCpmOffSecondaryButton">I\'ll deal with them myself</string>
 </resources>
