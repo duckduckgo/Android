@@ -502,6 +502,73 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
+    fun `when on the segmented block ads path then walks the full plan to completed`() = runTest {
+        whenever(duckAiAvailability.isDuckAiOnboardingEnabled()).thenReturn(true)
+        val offeredRows = listOf(
+            preferenceRow(OnboardingPreference.BLOCK_ADS, initiallyEnabled = true),
+            preferenceRow(OnboardingPreference.REJECT_OPTIONAL_COOKIES, initiallyEnabled = true),
+            preferenceRow(OnboardingPreference.ACCEPT_NON_OPT_OUT_COOKIES, initiallyEnabled = false),
+        )
+        whenever(onboardingPreferenceCatalog.offer(any())).thenReturn(offeredRows)
+        startSegmentedAtDownloadReason()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.BLOCK_ADS))
+        assertStep(NewUserOnboardingStepIds.COMPARISON_CHART)
+        val chartStep = (orchestrator.state.value as InProgress).currentStep as NewUserOnboardingActivityStep
+        assertEquals(
+            NewUserOnboardingActivityDialog.SegmentedComparisonChart(ComparisonChartConfig.SegmentedBlockAdsPath),
+            chartStep.resolveDialog(),
+        )
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
+        assertStep(NewUserOnboardingStepIds.DEFAULT_BROWSER_PROMPT)
+        orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
+        assertStep(NewUserOnboardingStepIds.PREFERENCE_SELECTOR)
+        verify(onboardingPreferenceCatalog).offer(
+            listOf(
+                OnboardingPreference.BLOCK_ADS,
+                OnboardingPreference.REJECT_OPTIONAL_COOKIES,
+                OnboardingPreference.ACCEPT_NON_OPT_OUT_COOKIES,
+            ),
+        )
+        val selectorStep = (orchestrator.state.value as InProgress).currentStep as NewUserOnboardingActivityStep
+        assertEquals(
+            NewUserOnboardingActivityDialog.PreferenceSelector(
+                titleRes = R.string.blockAdsPathPreferenceSelectorTitle,
+                rows = offeredRows,
+                caption = R.string.preferenceChangeInSettingsCaption,
+            ),
+            selectorStep.resolveDialog(),
+        )
+        val selections = mapOf(
+            OnboardingPreference.BLOCK_ADS to true,
+            OnboardingPreference.REJECT_OPTIONAL_COOKIES to false,
+            OnboardingPreference.ACCEPT_NON_OPT_OUT_COOKIES to false,
+        )
+        orchestrator.onEvent(NewUserOnboardingEvent.PreferenceSelectorConfirmed(selections))
+        verify(onboardingPreferenceCatalog, never()).apply(any())
+        assertStep(NewUserOnboardingStepIds.INPUT_SCREEN)
+        orchestrator.onEvent(NewUserOnboardingEvent.InputModeConfirmed(withAi = false))
+        assertStep(NewUserOnboardingStepIds.ADDRESS_BAR_POSITION)
+        orchestrator.onEvent(NewUserOnboardingEvent.AddressBarConfirmed(OmnibarType.SINGLE_TOP))
+        assertStep(NewUserOnboardingStepIds.INPUT_SCREEN_PREVIEW)
+        val previewStep = (orchestrator.state.value as InProgress).currentStep as NewUserOnboardingActivityStep
+        assertEquals(
+            NewUserOnboardingActivityDialog.InputScreenPreview(
+                isSearchDefault = true,
+                showModeToggle = false,
+                titleRes = R.string.searchPathInputPreviewTitle,
+            ),
+            previewStep.resolveDialog(),
+        )
+        orchestrator.onEvent(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "weather", isChat = false, fromSuggestion = false))
+        assertEquals(
+            Completed(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, result = NewUserOnboardingResult.LaunchSearch(query = "weather")),
+            orchestrator.state.value,
+        )
+        verify(onboardingPreferenceCatalog).apply(selections)
+    }
+
+    @Test
     fun `when the duck ai state step is reached then it offers the plugin options`() = runTest {
         startSegmentedAtDuckAiState()
 
