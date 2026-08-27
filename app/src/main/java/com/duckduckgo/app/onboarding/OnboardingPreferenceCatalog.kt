@@ -21,7 +21,6 @@ import androidx.annotation.StringRes
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.onboarding.ui.page.configdriven.ContentConfig
 import com.duckduckgo.app.onboarding.ui.page.configdriven.TextConfig
-import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.di.scopes.AppScope
@@ -63,7 +62,6 @@ interface OnboardingPreferenceCatalog {
 @SingleInstanceIn(AppScope::class)
 class OnboardingPreferenceCatalogImpl @Inject constructor(
     private val navigationHistory: NavigationHistory,
-    private val autoconsent: Autoconsent,
     private val serpSettingsDataProvider: SerpSettingsDataProvider,
     private val serpSettingsFeature: SerpSettingsFeature,
     private val booleanPreferencePlugins: ActivePluginPoint<OnboardingBooleanPreferencePlugin>,
@@ -72,7 +70,11 @@ class OnboardingPreferenceCatalogImpl @Inject constructor(
 
     override suspend fun offer(preferences: List<OnboardingPreference>): List<ContentConfig.PreferenceSelector.Row> =
         withContext(dispatcherProvider.io()) {
-            preferences.mapNotNull { definitions.getValue(it).row(it) }
+            val rows = preferences.mapNotNull { definitions.getValue(it).row(it) }
+            // A dependent row only reveals itself once its parent is switched on, and the binder reads a
+            // missing parent as one that is switched on, so without the parent it would render unreachable.
+            val offered = rows.map { it.preference }.toSet()
+            rows.filter { it.dependsOn == null || it.dependsOn in offered }
         }
 
     override suspend fun apply(selections: Map<OnboardingPreference, Boolean>): Unit = withContext(dispatcherProvider.io()) {
@@ -88,11 +90,6 @@ class OnboardingPreferenceCatalogImpl @Inject constructor(
         val serpAvailable: suspend () -> Boolean = { serpSettingsFeature.storeSerpSettings().isEnabled() }
 
         mapOf(
-            OnboardingPreference.BLOCK_ADS to fromPlugin(
-                id = OnboardingBooleanPreferencePlugin.Id.AdBlocking,
-                seed = { true },
-            ),
-
             OnboardingPreference.SEARCH_HISTORY to definition(
                 iconRes = CommonR.drawable.history_color_24,
                 primary = R.string.searchPathPreferenceHistoryPrimary,
@@ -140,21 +137,20 @@ class OnboardingPreferenceCatalogImpl @Inject constructor(
                 },
             ),
 
-            OnboardingPreference.REJECT_OPTIONAL_COOKIES to definition(
-                iconRes = CommonR.drawable.cookie_blocked_color_24,
-                primary = R.string.blockAdsPathPreferenceRejectOptionalCookiesPrimary,
-                secondary = R.string.blockAdsPathPreferenceRejectOptionalCookiesSecondary,
-                seed = autoconsent::isSettingEnabled,
-                apply = autoconsent::changeSetting,
+            OnboardingPreference.BLOCK_ADS to fromPlugin(
+                id = OnboardingBooleanPreferencePlugin.Id.AdBlocking,
+                seed = { true },
             ),
 
-            OnboardingPreference.ACCEPT_NON_OPT_OUT_COOKIES to definition(
-                iconRes = CommonR.drawable.cookie_color_24,
-                primary = R.string.blockAdsPathPreferenceAcceptNonOptOutCookiesPrimary,
-                secondary = R.string.blockAdsPathPreferenceAcceptNonOptOutCookiesSecondary,
+            OnboardingPreference.REJECT_OPTIONAL_COOKIES to fromPlugin(
+                id = OnboardingBooleanPreferencePlugin.Id.RejectOptionalCookies,
+                seed = { true },
+            ),
+
+            OnboardingPreference.ACCEPT_NON_OPT_OUT_COOKIES to fromPlugin(
+                id = OnboardingBooleanPreferencePlugin.Id.AcceptNonOptOutCookies,
                 dependsOn = OnboardingPreference.REJECT_OPTIONAL_COOKIES,
-                seed = autoconsent::isClickAcceptEnabled,
-                apply = autoconsent::changeClickAcceptEnabled,
+                seed = { false },
             ),
         ).also { definitions ->
             check(definitions.keys == OnboardingPreference.entries.toSet()) {
@@ -202,6 +198,7 @@ class OnboardingPreferenceCatalogImpl @Inject constructor(
      */
     private fun fromPlugin(
         id: OnboardingBooleanPreferencePlugin.Id,
+        dependsOn: OnboardingPreference? = null,
         seed: suspend () -> Boolean,
     ) = Definition(
         row = { preference ->
@@ -212,6 +209,7 @@ class OnboardingPreferenceCatalogImpl @Inject constructor(
                     primaryText = TextConfig.Literal(it.primaryText),
                     secondaryText = it.secondaryText?.let(TextConfig::Literal),
                     initiallyEnabled = seed(),
+                    dependsOn = dependsOn,
                 )
             }
         },

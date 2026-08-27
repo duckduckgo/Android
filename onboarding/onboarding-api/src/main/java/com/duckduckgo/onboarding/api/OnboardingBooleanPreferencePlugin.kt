@@ -46,5 +46,7 @@ interface OnboardingBooleanPreferencePlugin : ActivePlugin {
 
     enum class Id {
         AdBlocking,
+        RejectOptionalCookies,
+        AcceptNonOptOutCookies,
     }
 }
