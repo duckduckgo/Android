@@ -111,9 +111,10 @@ private fun DaxSkeletonShape(
         modifier = modifier
             .clip(shape)
             .drawWithCache {
-                val tilt = size.height * tan(DaxSkeletonDefaults.SweepTiltRadians)
                 val sweepWidth = max(size.width, DaxSkeletonDefaults.MinSweepWidth.toPx())
-                val travel = size.width + sweepWidth + tilt
+                val clearance = size.height * tan(DaxSkeletonDefaults.SweepTiltRadians)
+                val bandTiltDy = sweepWidth * tan(DaxSkeletonDefaults.SweepTiltRadians)
+                val travel = size.width + sweepWidth + clearance
                 onDrawBehind {
                     val sweepStart = -sweepWidth + travel * progress
                     val brush = Brush.linearGradient(
@@ -123,7 +124,7 @@ private fun DaxSkeletonShape(
                             1f to restingColor,
                         ),
                         start = Offset(sweepStart, 0f),
-                        end = Offset(sweepStart + sweepWidth, tilt),
+                        end = Offset(sweepStart + sweepWidth, bandTiltDy),
                     )
                     drawRect(brush)
                 }
