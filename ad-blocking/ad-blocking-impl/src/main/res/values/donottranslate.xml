@@ -14,5 +14,5 @@
   ~ limitations under the License.
   -->
 <resources>
-    <string name="ad_blocking_onboarding_preference_primary">Block ads</string>
+    <string name="ad_blocking_onboarding_preference_primary">Block video ads on YouTube</string>
 </resources>
