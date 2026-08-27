@@ -172,15 +172,10 @@ sealed interface ContentConfig {
     }
 }
 
-/**
- * The outcome card is entered as soon as the import web flow returns, before the imported credentials have
- * been counted, so its content is state rather than config.
- */
 sealed interface ImportCompleteContentState {
     data object Parsing : ImportCompleteContentState
     data class Finished(val imported: Int, val skipped: Int) : ImportCompleteContentState
 
-    /** The import returned successfully but never reported counts, so there is no outcome to show. */
     data object Failed : ImportCompleteContentState
 }
 

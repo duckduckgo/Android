@@ -66,8 +66,7 @@ data class StepProgress(val current: Int, val total: Int)
  * reordering steps keeps the numbering correct without touching hardcoded page numbers.
  *
  * Counting up to and including the current index gives a [StepIndicatorMode.COUNTED] step its own position and
- * a [StepIndicatorMode.CONTINUES_PREVIOUS] step the position of the counted step before it. A plan that opens
- * with a continuing step has nothing to continue, and reports position 0.
+ * a [StepIndicatorMode.CONTINUES_PREVIOUS] step the position of the counted step before it.
  */
 fun LinearOnboardingState.InProgress.stepIndicatorProgress(): StepProgress? {
     val step = currentStep as? NewUserOnboardingActivityStep ?: return null

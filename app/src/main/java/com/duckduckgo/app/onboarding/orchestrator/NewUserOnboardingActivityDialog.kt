@@ -42,10 +42,8 @@ sealed interface NewUserOnboardingActivityDialog {
 
     data object ImportPasswords : NewUserOnboardingActivityDialog
 
-    /** Command-only: draws no card, the view model launches the Google web flow when this step is applied. */
     data object ImportPasswordsLaunch : NewUserOnboardingActivityDialog
 
-    /** Outcome of a successful import. Entered while the counts are still being parsed, so it carries none. */
     data object ImportComplete : NewUserOnboardingActivityDialog
     data class AddressBarPosition(val showSplitOption: Boolean) : NewUserOnboardingActivityDialog
     data object InputScreen : NewUserOnboardingActivityDialog

@@ -34,8 +34,8 @@ import com.duckduckgo.app.onboarding.ui.page.configdriven.StatefulDialogBinder
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import com.duckduckgo.mobile.android.R as CommonR
 
 class ImportCompleteBinder(
     private val binding: IncludeBrandDesignImportCompleteBinding,
@@ -50,9 +50,15 @@ class ImportCompleteBinder(
     ): ContentHandle = with(binding) {
         val context = root.context
 
+        importCompleteImportedRow.resultRowIcon.setImageResource(R.drawable.ic_check_onboarding_success_24)
+        importCompleteSkippedRow.resultRowIcon.setImageResource(CommonR.drawable.ic_cross_recolorable_gray_24)
+        importCompleteFailedRow.resultRowIcon.setImageResource(R.drawable.ic_cross_onboarding_error_24)
+
         var rendered: ImportCompleteContentState = state.value
         importCompleteTitle.setTitle(titleOf(rendered, content).resolve(context))
         apply(rendered, content, context)
+
+        val outcomeVisible = MutableStateFlow(rendered !is ImportCompleteContentState.Parsing)
 
         var stateJob: Job? = null
         var transition: Animator? = null
@@ -74,6 +80,7 @@ class ImportCompleteBinder(
 
                         scope.animateCardBounds(STATE_CHANGE_DURATION_MS)
                         apply(current, content, context)
+                        outcomeVisible.value = current !is ImportCompleteContentState.Parsing
 
                         val arriving = stateFadeTargets()
                         arriving.forEach { it.alpha = 0f }
@@ -85,8 +92,8 @@ class ImportCompleteBinder(
                 }.launchIn(scope.coroutineScope)
             },
             primaryCtaState = CtaState(
-                enabled = state.map { it !is ImportCompleteContentState.Parsing },
-                defaultValue = state.value !is ImportCompleteContentState.Parsing,
+                enabled = outcomeVisible,
+                defaultValue = outcomeVisible.value,
             ),
             unbind = {
                 stateJob?.cancel()
@@ -125,23 +132,21 @@ class ImportCompleteBinder(
     ) = with(binding) {
         importCompleteShimmer.isVisible = state is ImportCompleteContentState.Parsing
         importCompletePictogram.setImageResource(pictogramOf(state))
-        importCompleteImportedRow.isVisible = state is ImportCompleteContentState.Finished
-        importCompleteSkippedRow.isVisible = state is ImportCompleteContentState.Finished && state.skipped > 0
-        importCompleteFailedRow.isVisible = state is ImportCompleteContentState.Failed
+        importCompleteImportedRow.root.isVisible = state is ImportCompleteContentState.Finished
+        importCompleteSkippedRow.root.isVisible = state is ImportCompleteContentState.Finished && state.skipped > 0
+        importCompleteFailedRow.root.isVisible = state is ImportCompleteContentState.Failed
         importCompleteResultContainer.isVisible = state !is ImportCompleteContentState.Parsing
         importCompleteBody.isVisible = state is ImportCompleteContentState.Parsing
 
         when (state) {
             ImportCompleteContentState.Parsing -> importCompleteBody.text = content.parsingBody.resolve(context)
-            ImportCompleteContentState.Failed -> importCompleteFailedRow.setPrimaryText(content.failedRow.resolve(context))
+            ImportCompleteContentState.Failed -> importCompleteFailedRow.resultRowText.text = content.failedRow.resolve(context)
             is ImportCompleteContentState.Finished -> {
-                importCompleteImportedRow.setPrimaryText(
-                    context.getString(R.string.preOnboardingImportCompleteImported, state.imported),
-                )
+                importCompleteImportedRow.resultRowText.text =
+                    context.getString(R.string.preOnboardingImportCompleteImported, state.imported)
                 if (state.skipped > 0) {
-                    importCompleteSkippedRow.setPrimaryText(
-                        context.getString(R.string.preOnboardingImportCompleteSkipped, state.skipped),
-                    )
+                    importCompleteSkippedRow.resultRowText.text =
+                        context.getString(R.string.preOnboardingImportCompleteSkipped, state.skipped)
                 }
             }
         }

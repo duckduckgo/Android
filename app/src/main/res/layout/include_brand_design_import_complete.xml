@@ -45,6 +45,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_2"
         android:alpha="0"
+        android:fontFamily="@font/ducksansproduct_regular"
         android:gravity="center"
         android:paddingHorizontal="@dimen/keyline_3"
         app:textType="secondary"
@@ -98,34 +99,22 @@
         tools:alpha="1"
         tools:visibility="visible">
 
-        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+        <include
             android:id="@+id/importCompleteImportedRow"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clickable="false"
+            layout="@layout/include_brand_design_import_result_row"
             android:visibility="gone"
-            app:leadingIcon="@drawable/ic_check_onboarding_success_24"
-            tools:primaryText="@string/preOnboardingImportCompleteImported"
             tools:visibility="visible" />
 
-        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+        <include
             android:id="@+id/importCompleteSkippedRow"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clickable="false"
+            layout="@layout/include_brand_design_import_result_row"
             android:visibility="gone"
-            app:leadingIcon="@drawable/ic_cross_recolorable_gray_24"
-            tools:primaryText="@string/preOnboardingImportCompleteSkipped"
             tools:visibility="visible" />
 
-        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+        <include
             android:id="@+id/importCompleteFailedRow"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clickable="false"
+            layout="@layout/include_brand_design_import_result_row"
             android:visibility="gone"
-            app:leadingIcon="@drawable/ic_cross_onboarding_error_24"
-            tools:primaryText="@string/preOnboardingImportCompleteFailed"
             tools:visibility="visible" />
 
     </LinearLayout>
