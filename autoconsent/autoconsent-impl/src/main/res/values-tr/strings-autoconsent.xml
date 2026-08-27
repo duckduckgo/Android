@@ -25,4 +25,12 @@
     <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[DuckDuckGo, siz daha görmeden gizliliği en üst düzeye çıkarmak ve çerezleri en aza indirmek için çerez açılır pencerelerini otomatik olarak yönetebilir.\n<a href=\"\">Daha Fazla Bilgi</a>]]></string>
     <string name="autoconsentPopUpsWithoutOptOutsToggle">Reddedilemeyen çerezleri kabul et</string>
     <string name="autoconsentPopUpsWithoutOptOutsDescription">Reddetme seçeneği yoksa, sizi bir tıklama zahmetinden kurtarmak için bu çerezleri sizin yerinize kabul edecek ve açılır pencereleri kapatacağız.</string>
+    <string name="autoconsentPromptTitle">Çerez bildirimlerinden bıktınız mı?</string>
+    <string name="autoconsentPromptFootnote">Bunu daha sonra Ayarlar'dan her zaman değiştirebilirsiniz.</string>
+    <string name="autoconsentPromptCpmOnMessage">Bazı çerezler reddedilemez. Bunları sizin yerinize kabul edebiliriz.</string>
+    <string name="autoconsentPromptCpmOnPrimaryButton">Çerezleri benim için kabul et</string>
+    <string name="autoconsentPromptCpmOnSecondaryButton">Çerezleri benim için kabul et</string>
+    <string name="autoconsentPromptCpmOffMessage">Onlarla sizin yerinize biz ilgilenelim. Mümkün olduğunda çerezleri reddedecek, reddedilemeyenleri ise kabul edeceğiz.</string>
+    <string name="autoconsentPromptCpmOffPrimaryButton">Mümkünse reddet veya benim adıma kabul et</string>
+    <string name="autoconsentPromptCpmOffSecondaryButton">Bunlarla kendim ilgileneceğim</string>
 </resources>
