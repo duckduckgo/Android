@@ -23,11 +23,23 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import com.duckduckgo.common.ui.view.button.ButtonType
 import com.duckduckgo.common.ui.view.button.DaxButtonGhost
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.DialogStackedAlertBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+
+/**
+ * A single stacked button, paired with the [ButtonType] it should be rendered as.
+ *
+ * Use with [StackedAlertDialogBuilder.setStackedButtons] when a dialog needs a filled
+ * primary/secondary action instead of the default ghost styling.
+ */
+data class StackedButton(
+    @StringRes val textId: Int,
+    val type: ButtonType = ButtonType.GHOST,
+)
 
 class StackedAlertDialogBuilder(val context: Context) : DaxAlertDialog {
 
@@ -40,13 +52,22 @@ class StackedAlertDialogBuilder(val context: Context) : DaxAlertDialog {
 
     internal class DefaultEventListener : EventListener()
 
+    /**
+     * A button ready to be rendered. A null [type] means "use the builder's default styling",
+     * which keeps the ghost/destructive behaviour of [setStackedButtons] and [setDestructiveButtons].
+     */
+    private data class StackedButtonSpec(
+        val text: CharSequence,
+        val type: ButtonType?,
+    )
+
     private var dialog: AlertDialog? = null
 
     private var listener: EventListener = DefaultEventListener()
     private var titleText: CharSequence = ""
     private var messageText: CharSequence = ""
     private var headerImageDrawableId = 0
-    private var stackedButtonList: MutableList<CharSequence> = mutableListOf()
+    private var stackedButtonList: MutableList<StackedButtonSpec> = mutableListOf()
     private var isDestructiveVersion: Boolean = false
 
     fun setHeaderImageResource(@DrawableRes drawableId: Int): StackedAlertDialogBuilder {
@@ -74,9 +95,28 @@ class StackedAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         return this
     }
 
+    /**
+     * Adds the given buttons, all rendered as ghost buttons, or tinted ghost buttons when
+     * [setDestructiveButtons] is enabled.
+     */
     fun setStackedButtons(@StringRes stackedButtonTextId: List<Int>): StackedAlertDialogBuilder {
         stackedButtonTextId.forEach {
-            stackedButtonList.add(context.getText(it))
+            stackedButtonList.add(StackedButtonSpec(context.getText(it), type = null))
+        }
+        return this
+    }
+
+    /**
+     * Adds the given buttons, each rendered as its own [StackedButton.type], so a dialog can mix a
+     * filled primary or secondary action with ghost ones.
+     *
+     * [StackedButton.type] defaults to [ButtonType.GHOST], matching the styling of the
+     * [List]-of-string-resources overload. Types set here always win over [setDestructiveButtons].
+     */
+    @JvmName("setStackedButtonsWithType")
+    fun setStackedButtons(stackedButtons: List<StackedButton>): StackedAlertDialogBuilder {
+        stackedButtons.forEach {
+            stackedButtonList.add(StackedButtonSpec(context.getText(it.textId), it.type))
         }
         return this
     }
@@ -145,15 +185,16 @@ class StackedAlertDialogBuilder(val context: Context) : DaxAlertDialog {
 
     private fun addButtons(
         root: LinearLayout,
-        stackedButtonList: MutableList<CharSequence>,
+        stackedButtonList: MutableList<StackedButtonSpec>,
         dialog: AlertDialog,
     ) {
-        val buttonParams = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.WRAP_CONTENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT,
-        )
-        stackedButtonList.forEachIndexed { index, text ->
+        val buttonSpacing = context.resources.getDimensionPixelSize(R.dimen.keyline_2)
+        stackedButtonList.forEachIndexed { index, stackedButton ->
             val button = when {
+                stackedButton.type != null -> {
+                    stackedButton.type.getView(context)
+                }
+
                 isDestructiveVersion && index == stackedButtonList.lastIndex -> {
                     val ghostButton = DaxButtonGhost(context, null)
                     ghostButton.setTextColor(
@@ -181,8 +222,15 @@ class StackedAlertDialogBuilder(val context: Context) : DaxAlertDialog {
                 }
             }
 
-            button.text = text
-            button.layoutParams = buttonParams
+            button.text = stackedButton.text
+            button.layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+            ).apply {
+                if (index > 0) {
+                    topMargin = buttonSpacing
+                }
+            }
 
             button.setOnClickListener {
                 listener.onButtonClicked(index)
