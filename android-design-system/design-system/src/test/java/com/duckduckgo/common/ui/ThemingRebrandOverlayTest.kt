@@ -171,4 +171,58 @@ class ThemingRebrandOverlayTest {
             resolveColor(activity, R.attr.daxColorSwitchTrackOn),
         )
     }
+
+    @Test
+    fun whenBrandDesignUpdateThenStatusIndicatorOnColorIsRebrandGreen40() {
+        val activity = themedActivity()
+        activity.applyTheme(DuckDuckGoTheme.LIGHT, applyBrandDesignUpdate = true)
+
+        assertEquals(
+            colorOf(R.color.rb_green40),
+            resolveStatusIndicatorColor(activity, enabled = true),
+        )
+    }
+
+    @Test
+    fun whenLightThemeWithBrandDesignUpdateThenStatusIndicatorOffColorIsBlack36() {
+        val activity = themedActivity()
+        activity.applyTheme(DuckDuckGoTheme.LIGHT, applyBrandDesignUpdate = true)
+
+        assertEquals(
+            colorOf(R.color.black36),
+            resolveStatusIndicatorColor(activity, enabled = false),
+        )
+    }
+
+    @Test
+    fun whenDarkThemeWithBrandDesignUpdateThenStatusIndicatorOffColorIsWhite40() {
+        val activity = themedActivity()
+        activity.applyTheme(DuckDuckGoTheme.DARK, applyBrandDesignUpdate = true)
+
+        assertEquals(
+            colorOf(R.color.white40),
+            resolveStatusIndicatorColor(activity, enabled = false),
+        )
+    }
+
+    @Test
+    fun whenWithoutBrandDesignUpdateThenStatusIndicatorOffColorRemainsGray50() {
+        val activity = themedActivity()
+        activity.applyTheme(DuckDuckGoTheme.LIGHT)
+
+        assertEquals(
+            colorOf(R.color.gray50),
+            resolveStatusIndicatorColor(activity, enabled = false),
+        )
+    }
+
+    private fun resolveStatusIndicatorColor(
+        activity: AppCompatActivity,
+        enabled: Boolean,
+    ): Int {
+        val state = if (enabled) android.R.attr.state_enabled else -android.R.attr.state_enabled
+        return activity.resources
+            .getColorStateList(R.color.status_indicator_color_selector, activity.theme)
+            .getColorForState(intArrayOf(state), 0)
+    }
 }

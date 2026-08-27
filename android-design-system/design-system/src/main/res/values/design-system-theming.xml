@@ -143,6 +143,8 @@
         <item name="daxColorDim">@color/black60</item>
         <item name="daxColorWhite">@color/white</item>
         <item name="daxColorBlack">@color/black84</item>
+        <item name="daxColorStatusIndicatorOn">@color/alertGreen</item>
+        <item name="daxColorStatusIndicatorOff">@color/gray50</item>
         <item name="daxColorFireModeAccentLight">@color/mandarin50</item>
         <item name="daxColorFireModeAccentDark">@color/mandarin40</item>
         <item name="daxColorFireModeAccentLightTranslucent">@color/mandarin50_translucent</item>
@@ -338,6 +340,7 @@
         <item name="daxColorInputModeIndicatorShadow">@color/black</item>
 
         <!--Rebrand Status-->
+        <item name="daxColorRebrandStatusIndicatorOff">@color/white40</item>
         <item name="daxColorStatusRed">@color/alertRedOnDarkDefault</item>
     </style>
 
@@ -502,6 +505,7 @@
         <item name="daxColorInputModeIndicatorShadow">@color/gray60</item>
 
         <!--Rebrand Status-->
+        <item name="daxColorRebrandStatusIndicatorOff">@color/black36</item>
         <item name="daxColorStatusRed">@color/rb_red50</item>
     </style>
 
