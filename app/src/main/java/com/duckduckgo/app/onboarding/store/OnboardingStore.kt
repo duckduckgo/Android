@@ -31,7 +31,7 @@ interface OnboardingStore {
     fun setInputScreenSelectionOverriddenByUser()
     fun setDuckAiOnboardingFlow()
     fun isDuckAiOnboardingFlow(): Boolean
-    fun setSegmentedOnboardingPath(path: SegmentedOnboardingPath)
+    fun setSegmentedOnboardingPath(path: SegmentedOnboardingPath?)
 
     /**
      * The segmented path the user is on, but only once that path has opted into the input screen. The
@@ -42,8 +42,7 @@ interface OnboardingStore {
 }
 
 /**
- * The branch the user picked on the download reason step. The branches are mutually exclusive, so a
- * single value keeps the two impossible combinations out of the type.
+ * The branch the user picked on the download reason step. Only enumerates a subset of paths that can have side effects on contextual CTAs.
  */
 enum class SegmentedOnboardingPath {
     SEARCH,

@@ -150,9 +150,84 @@ class OnboardingPreferenceApplierImplTest {
     }
 
     @Test
+    fun whenSerpSettingsStorageEnabledThenSearchAssistIsAvailable() = runTest {
+        serpSettingsFeature.storeSerpSettings().setRawStoredState(Toggle.State(enable = true))
+
+        assertTrue(testee.isAvailable(OnboardingPreference.SEARCH_ASSIST))
+    }
+
+    @Test
+    fun whenSerpSettingsStorageDisabledThenSearchAssistIsNotAvailable() = runTest {
+        serpSettingsFeature.storeSerpSettings().setRawStoredState(Toggle.State(enable = false))
+
+        assertFalse(testee.isAvailable(OnboardingPreference.SEARCH_ASSIST))
+    }
+
+    @Test
+    fun whenSerpSettingsStorageEnabledThenHideAiGeneratedImagesIsAvailable() = runTest {
+        serpSettingsFeature.storeSerpSettings().setRawStoredState(Toggle.State(enable = true))
+
+        assertTrue(testee.isAvailable(OnboardingPreference.HIDE_AI_GENERATED_IMAGES))
+    }
+
+    @Test
+    fun whenSerpSettingsStorageDisabledThenHideAiGeneratedImagesIsNotAvailable() = runTest {
+        serpSettingsFeature.storeSerpSettings().setRawStoredState(Toggle.State(enable = false))
+
+        assertFalse(testee.isAvailable(OnboardingPreference.HIDE_AI_GENERATED_IMAGES))
+    }
+
+    @Test
+    fun whenSearchAssistAlreadyOnThenOnboardingStillSeedsItOff() = runTest {
+        whenever(serpSettingsDataProvider.observeSetting("kbe")).thenReturn(flowOf("3"))
+
+        assertFalse(testee.isEnabled(OnboardingPreference.SEARCH_ASSIST))
+    }
+
+    @Test
+    fun whenHideAiGeneratedImagesAlreadyOffThenOnboardingStillSeedsItOn() = runTest {
+        whenever(serpSettingsDataProvider.observeSetting("kbj")).thenReturn(flowOf("-1"))
+
+        assertTrue(testee.isEnabled(OnboardingPreference.HIDE_AI_GENERATED_IMAGES))
+    }
+
+    @Test
+    fun whenSearchAssistEnabledThenKbeSetToSometimes() = runTest {
+        testee.apply(OnboardingPreference.SEARCH_ASSIST, enabled = true)
+
+        verify(serpSettingsDataProvider).setSetting("kbe", "2")
+    }
+
+    @Test
+    fun whenSearchAssistDisabledThenKbeSetToNever() = runTest {
+        testee.apply(OnboardingPreference.SEARCH_ASSIST, enabled = false)
+
+        verify(serpSettingsDataProvider).setSetting("kbe", "0")
+    }
+
+    @Test
+    fun whenHideAiGeneratedImagesEnabledThenKbjSetToOn() = runTest {
+        testee.apply(OnboardingPreference.HIDE_AI_GENERATED_IMAGES, enabled = true)
+
+        verify(serpSettingsDataProvider).setSetting("kbj", "1")
+    }
+
+    @Test
+    fun whenHideAiGeneratedImagesDisabledThenKbjSetToOff() = runTest {
+        testee.apply(OnboardingPreference.HIDE_AI_GENERATED_IMAGES, enabled = false)
+
+        verify(serpSettingsDataProvider).setSetting("kbj", "-1")
+    }
+
+    @Test
     fun whenPreferencesEnumeratedThenSearchHistoryComesFirst() {
         assertEquals(
-            listOf(OnboardingPreference.SEARCH_HISTORY, OnboardingPreference.SAFE_SEARCH),
+            listOf(
+                OnboardingPreference.SEARCH_HISTORY,
+                OnboardingPreference.SAFE_SEARCH,
+                OnboardingPreference.SEARCH_ASSIST,
+                OnboardingPreference.HIDE_AI_GENERATED_IMAGES,
+            ),
             OnboardingPreference.entries,
         )
     }

@@ -42,4 +42,5 @@ internal object NewUserOnboardingStepIds {
     const val PREFERENCE_SELECTOR: LinearOnboardingStepId = "preference_selector"
     const val MODEL_PROVIDER: LinearOnboardingStepId = "model_provider"
     const val TOGGLE_POSITION: LinearOnboardingStepId = "toggle_position"
+    const val DUCK_AI_STATE: LinearOnboardingStepId = "duck_ai_state"
 }

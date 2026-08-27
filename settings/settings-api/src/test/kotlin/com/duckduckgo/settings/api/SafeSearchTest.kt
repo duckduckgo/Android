@@ -14,14 +14,21 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.onboarding
+package com.duckduckgo.settings.api
 
-/**
- * A setting the user can turn on or off from the onboarding preference selector.
- */
-enum class OnboardingPreference {
-    SEARCH_HISTORY,
-    SAFE_SEARCH,
-    SEARCH_ASSIST,
-    HIDE_AI_GENERATED_IMAGES,
+import org.junit.Assert.assertEquals
+import org.junit.Test
+
+class SafeSearchTest {
+
+    @Test
+    fun whenSerpCodesThenEachOptionHasExpectedCode() {
+        assertEquals("-1", SafeSearch.ON.serpCode)
+        assertEquals("-2", SafeSearch.OFF.serpCode)
+    }
+
+    @Test
+    fun whenSerpKeyThenEveryOptionCarriesTheSameKey() {
+        SafeSearch.entries.forEach { assertEquals("kp", it.serpKey) }
+    }
 }

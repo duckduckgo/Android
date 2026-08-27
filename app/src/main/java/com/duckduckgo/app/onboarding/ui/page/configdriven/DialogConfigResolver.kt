@@ -195,7 +195,7 @@ class DialogConfigResolver @Inject constructor(
             embellishment = Embellishment.LeftWing,
             cardArrow = CardArrowConfig.AtEnd,
             content = ContentConfig.PreferenceSelector(
-                title = TextConfig.Resource(R.string.searchPathPreferenceSelectorTitle),
+                title = TextConfig.Resource(dialog.titleRes),
                 rows = dialog.initialSelections.map { (preference, enabled) -> preferenceRow(preference, enabled) },
             ),
             primaryCta = CtaConfig(
@@ -232,6 +232,17 @@ class DialogConfigResolver @Inject constructor(
             ),
         )
 
+        is NewUserOnboardingActivityDialog.DuckAiState -> DialogConfig(
+            background = OnboardingBackgroundStep.PreferenceSelector,
+            embellishment = Embellishment.LeftWing,
+            cardArrow = CardArrowConfig.AtEnd,
+            content = ContentConfig.DuckAiState(
+                title = TextConfig.Resource(R.string.noAiPathDuckAiStateTitle),
+                body = TextConfig.Resource(R.string.noAiPathDuckAiStateBody),
+                options = dialog.options,
+            ),
+        )
+
         is NewUserOnboardingActivityDialog.IntroAnimation,
         NewUserOnboardingActivityDialog.NotificationPermission,
         NewUserOnboardingActivityDialog.DefaultBrowserPrompt,
@@ -253,6 +264,22 @@ class DialogConfigResolver @Inject constructor(
             iconRes = CommonR.drawable.exclamation_color_24,
             primaryText = TextConfig.Resource(R.string.searchPathPreferenceSafePrimary),
             secondaryText = TextConfig.Resource(R.string.searchPathPreferenceSafeSecondary),
+            initiallyEnabled = initiallyEnabled,
+        )
+
+        OnboardingPreference.SEARCH_ASSIST -> ContentConfig.PreferenceSelector.Row(
+            preference = preference,
+            iconRes = CommonR.drawable.search_assist_color_24,
+            primaryText = TextConfig.Resource(R.string.noAiPathPreferenceSearchAssistPrimary),
+            secondaryText = TextConfig.Resource(R.string.noAiPathPreferenceSearchAssistSecondary),
+            initiallyEnabled = initiallyEnabled,
+        )
+
+        OnboardingPreference.HIDE_AI_GENERATED_IMAGES -> ContentConfig.PreferenceSelector.Row(
+            preference = preference,
+            iconRes = CommonR.drawable.ai_images_strikethrough_color_24,
+            primaryText = TextConfig.Resource(R.string.noAiPathPreferenceHideAiGeneratedImagesPrimary),
+            secondaryText = TextConfig.Resource(R.string.noAiPathPreferenceHideAiGeneratedImagesSecondary),
             initiallyEnabled = initiallyEnabled,
         )
     }
