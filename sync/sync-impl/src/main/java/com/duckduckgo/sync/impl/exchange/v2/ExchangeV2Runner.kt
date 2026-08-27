@@ -22,7 +22,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncDeviceIds
 import com.duckduckgo.sync.impl.SyncFeature
-import com.duckduckgo.sync.impl.authenticateExchangeEndpoints
 import com.duckduckgo.sync.impl.crypto.RsaKeyPair
 import com.duckduckgo.sync.impl.crypto.SyncJweCrypto
 import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
@@ -150,6 +149,7 @@ class RealExchangeV2Runner @Inject constructor(
     private val qrCode: ExchangeV2QrCode,
     private val recoveryCodeProvider: RecoveryCodeProvider,
     private val syncDeviceIds: SyncDeviceIds,
+    private val advertisedExchangeV2Version: AdvertisedExchangeV2Version,
     private val syncFeature: SyncFeature,
     @AppCoroutineScope private val appScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
@@ -285,7 +285,7 @@ class RealExchangeV2Runner @Inject constructor(
      * (in which case an error event was already emitted).
      */
     private fun bootstrapLocked(role: PairingRole): RsaKeyPair? {
-        advertisedVersion = if (syncFeature.canUseExchangeV2Point1().isEnabled()) ExchangeProtocolVersion.V2_1 else BASELINE_PROTOCOL_VERSION
+        advertisedVersion = advertisedExchangeV2Version.resolve()
         val keyPair = jweCrypto.generateRsaKeyPair(EXCHANGE_RSA_KEY_SIZE)
         ownKeyPair = keyPair
         repeat(MAX_CHANNEL_CREATE_RETRIES) { attempt ->
@@ -941,7 +941,8 @@ class RealExchangeV2Runner @Inject constructor(
      * a header the channel was not claimed with.
      */
     private fun generateChannelSecret(): String? {
-        if (!syncFeature.authenticateExchangeEndpoints()) return null
+        val authenticate = advertisedVersion >= ExchangeProtocolVersion.V2_1 || syncFeature.canSendExchangeChannelSecret().isEnabled()
+        if (!authenticate) return null
         return Base64.getUrlEncoder()
             .withoutPadding()
             .encodeToString(jweCrypto.generateSecureBytes(CHANNEL_SECRET_SIZE))

@@ -26,13 +26,16 @@ import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncAuthCode
 import com.duckduckgo.sync.impl.SyncCodeDispatcher
 import com.duckduckgo.sync.impl.SyncCodeType
+import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Event
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.Hello
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Runner
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State
+import com.duckduckgo.sync.impl.exchange.v2.RealAdvertisedExchangeV2Version
 import com.duckduckgo.sync.impl.exchange.v2.RejectReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
+import com.duckduckgo.sync.internal.exchange.SyncInternalAdvertisedExchangeV2Version
 import com.duckduckgo.sync.store.SyncStore
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flowOf
@@ -63,12 +66,17 @@ class SyncV2PairingDebugViewModelTest {
     private val syncStore: SyncStore = mock()
     private val syncAccountRepository: SyncAccountRepository = mock()
     private val dispatcher: SyncCodeDispatcher = mock()
+    private val realAdvertisedVersion: RealAdvertisedExchangeV2Version = mock<RealAdvertisedExchangeV2Version>().also {
+        whenever(it.resolve()).thenReturn(ExchangeProtocolVersion.V2_0)
+    }
+    private val internalAdvertisedVersion = SyncInternalAdvertisedExchangeV2Version(realAdvertisedVersion)
 
     private fun newViewModel() = SyncV2PairingDebugViewModel(
         runner = runner,
         syncStore = syncStore,
         syncAccountRepository = syncAccountRepository,
         dispatcher = dispatcher,
+        internalAdvertisedVersion = internalAdvertisedVersion,
         dispatchers = coroutineTestRule.testDispatcherProvider,
         appScope = coroutineTestRule.testScope,
     )

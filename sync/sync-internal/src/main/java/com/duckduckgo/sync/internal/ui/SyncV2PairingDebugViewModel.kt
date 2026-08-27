@@ -31,6 +31,7 @@ import com.duckduckgo.sync.impl.RouteDecision
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncAuthCode
 import com.duckduckgo.sync.impl.SyncCodeDispatcher
+import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Event
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Event.VersionNegotiated
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message
@@ -41,6 +42,7 @@ import com.duckduckgo.sync.impl.exchange.v2.PeerVersionSource
 import com.duckduckgo.sync.impl.exchange.v2.RejectReason
 import com.duckduckgo.sync.impl.exchange.v2.Role
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Companion.POLLING_INTERVAL_EXCHANGE_FLOW
+import com.duckduckgo.sync.internal.exchange.SyncInternalAdvertisedExchangeV2Version
 import com.duckduckgo.sync.store.SyncStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
@@ -48,7 +50,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -61,6 +62,7 @@ class SyncV2PairingDebugViewModel @Inject constructor(
     private val syncStore: SyncStore,
     private val syncAccountRepository: SyncAccountRepository,
     private val dispatcher: SyncCodeDispatcher,
+    private val internalAdvertisedVersion: SyncInternalAdvertisedExchangeV2Version,
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope private val appScope: CoroutineScope,
 ) : ViewModel() {
@@ -97,6 +99,7 @@ class SyncV2PairingDebugViewModel @Inject constructor(
         val rows: List<LogRow> = emptyList(),
         val autoApproveConfirmation: Boolean = true,
         val accountStatus: AccountStatus = AccountStatus(false, null, false),
+        val protocolOverride: ExchangeProtocolVersion.V2? = null,
     )
 
     /**
@@ -131,7 +134,10 @@ class SyncV2PairingDebugViewModel @Inject constructor(
         super.onCleared()
         // cancel() suspends until teardown completes; onCleared can't await and viewModelScope is
         // already cancelling, so fire-and-forget the teardown on the app scope (it outlives the VM).
-        appScope.launch { runner.cancel() }
+        appScope.launch {
+            runner.cancel()
+            internalAdvertisedVersion.overrideFlow.value = null
+        }
     }
 
     private val confirmationRequests = Channel<ConfirmationRequest>(Channel.BUFFERED)
@@ -157,6 +163,11 @@ class SyncV2PairingDebugViewModel @Inject constructor(
             runner.events.collect { event ->
                 appendEvent(event, isReplay = processed < replayCount)
                 processed++
+            }
+        }
+        viewModelScope.launch {
+            internalAdvertisedVersion.overrideFlow.collect { version ->
+                viewState.update { it.copy(protocolOverride = version) }
             }
         }
     }
@@ -375,6 +386,16 @@ class SyncV2PairingDebugViewModel @Inject constructor(
 
     fun onAutoApproveToggled(checked: Boolean) {
         viewState.update { it.copy(autoApproveConfirmation = checked) }
+    }
+
+    fun onProtocolOverrideSelected(version: ExchangeProtocolVersion.V2?) {
+        internalAdvertisedVersion.overrideFlow.value = version
+        appendDevToolLog("Protocol version override → ${labelFor(version)} (applies to the next session)")
+    }
+
+    fun labelFor(version: ExchangeProtocolVersion.V2?): String = when (version) {
+        null -> "Default (${internalAdvertisedVersion.defaultVersion().prettyPrint()})"
+        else -> version.prettyPrint()
     }
 
     fun onConfirmationApproved(role: Role) {

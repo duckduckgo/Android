@@ -79,6 +79,7 @@ class RealExchangeV2RunnerTest {
     private val recoveryCodeProvider: RecoveryCodeProvider = mock()
     private val syncDeviceIds: SyncDeviceIds = mock()
     private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
+    private val advertisedVersion: AdvertisedExchangeV2Version = mock()
 
     private fun newRunner(): RealExchangeV2Runner =
         RealExchangeV2Runner(
@@ -90,12 +91,14 @@ class RealExchangeV2RunnerTest {
             qrCode = qrCode,
             recoveryCodeProvider = recoveryCodeProvider,
             syncDeviceIds = syncDeviceIds,
+            advertisedExchangeV2Version = advertisedVersion,
             syncFeature = syncFeature,
             appScope = coroutineTestRule.testScope,
             dispatchers = coroutineTestRule.testDispatcherProvider,
         )
 
     @Before fun stubWireDeps() {
+        givenOurVersion(ExchangeProtocolVersion.V2_0)
         givenLinkingCodeVersion(ExchangeProtocolVersion.V2_0)
         whenever(qrCode.buildLinkingCode(any(), any(), any())).thenReturn("https://duckduckgo.com/sync/pairing/#&code2=fake")
         whenever(jweCrypto.generateRsaKeyPair(any())).thenReturn(RsaKeyPair(publicKeyBase64 = "own-pub", privateKeyBase64 = "own-priv"))
@@ -306,7 +309,7 @@ class RealExchangeV2RunnerTest {
         )
     }
 
-    @Test fun `each session re-reads the flag rather than reusing the previous session's advertised version`() = runTest {
+    @Test fun `each session re-resolves the advertised version rather than reusing the previous session's`() = runTest {
         val runner = newRunner()
 
         givenOurVersion(ExchangeProtocolVersion.V2_1)
@@ -333,7 +336,7 @@ class RealExchangeV2RunnerTest {
         peerVersion: String,
         negotiated: String,
     ) = runTest {
-        givenOurVersion(ourVersion.toProtocolVersion())
+        givenOurVersion(ourVersion.toV2ProtocolVersion())
         givenLinkingCodeVersion(peerVersion.toV2ProtocolVersion())
 
         val runner = newRunner()
@@ -358,7 +361,7 @@ class RealExchangeV2RunnerTest {
         peerVersion: String,
         negotiated: String,
     ) = runTest {
-        givenOurVersion(ourVersion.toProtocolVersion())
+        givenOurVersion(ourVersion.toV2ProtocolVersion())
         whenever(syncStore.userId).thenReturn("my-user")
 
         val runner = newRunner()
@@ -757,7 +760,7 @@ class RealExchangeV2RunnerTest {
     @Test fun `the channel is claimed, polled and written to with a secret only when a flag calls for it`(
         @TestParameter case: ExchangeAuthCase,
     ) = runTest {
-        case.configure(syncFeature)
+        configure(case)
         val utf8Secret = "channel-secret"
         val expectedSecret = utf8Secret.toBase64Url().takeIf { case.isAuthenticated }
         whenever(jweCrypto.generateSecureBytes(any())).thenReturn(utf8Secret.toByteArray())
@@ -774,7 +777,7 @@ class RealExchangeV2RunnerTest {
     @Test fun `cancel deletes the channel with whatever secret it was created with`(
         @TestParameter case: ExchangeAuthCase,
     ) = runTest {
-        case.configure(syncFeature)
+        configure(case)
         val utf8Secret = "channel-secret"
         val expectedSecret = utf8Secret.toBase64Url().takeIf { case.isAuthenticated }
         whenever(jweCrypto.generateSecureBytes(any())).thenReturn(utf8Secret.toByteArray())
@@ -835,9 +838,8 @@ class RealExchangeV2RunnerTest {
 
     // ---- Helpers ----
 
-    private fun givenOurVersion(version: ExchangeProtocolVersion) {
-        val state = State(remoteEnableState = version == ExchangeProtocolVersion.V2_1)
-        syncFeature.canUseExchangeV2Point1().setRawStoredState(state)
+    private fun givenOurVersion(version: ExchangeProtocolVersion.V2) {
+        whenever(advertisedVersion.resolve()).thenReturn(version)
     }
 
     private fun givenLinkingCodeVersion(version: ExchangeProtocolVersion.V2) {
@@ -857,35 +859,34 @@ class RealExchangeV2RunnerTest {
     private fun String.toBase64Url(): String = Base64.getUrlEncoder().withoutPadding().encodeToString(toByteArray())
 
     enum class ExchangeAuthCase(
+        val advertisedVersion: ExchangeProtocolVersion.V2,
         val canSendExchangeChannelSecret: Boolean,
-        val canUseExchangeV2Point1: Boolean,
         val isAuthenticated: Boolean,
     ) {
-        BothFlagsOff(
+        V20WithoutSecretFlag(
+            advertisedVersion = ExchangeProtocolVersion.V2_0,
             canSendExchangeChannelSecret = false,
-            canUseExchangeV2Point1 = false,
             isAuthenticated = false,
         ),
-        SecretFlagOn(
+        V20WithSecretFlag(
+            advertisedVersion = ExchangeProtocolVersion.V2_0,
             canSendExchangeChannelSecret = true,
-            canUseExchangeV2Point1 = false,
             isAuthenticated = true,
         ),
-        V2Point1FlagOn(
+        V21WithoutSecretFlag(
+            advertisedVersion = ExchangeProtocolVersion.V2_1,
             canSendExchangeChannelSecret = false,
-            canUseExchangeV2Point1 = true,
             isAuthenticated = true,
         ),
-        BothFlagsOn(
+        V21WithSecretFlag(
+            advertisedVersion = ExchangeProtocolVersion.V2_1,
             canSendExchangeChannelSecret = true,
-            canUseExchangeV2Point1 = true,
             isAuthenticated = true,
         ),
-        ;
+    }
 
-        fun configure(syncFeature: SyncFeature) {
-            syncFeature.canSendExchangeChannelSecret().setRawStoredState(State(canSendExchangeChannelSecret))
-            syncFeature.canUseExchangeV2Point1().setRawStoredState(State(canUseExchangeV2Point1))
-        }
+    private fun configure(case: ExchangeAuthCase) {
+        givenOurVersion(case.advertisedVersion)
+        syncFeature.canSendExchangeChannelSecret().setRawStoredState(State(case.canSendExchangeChannelSecret))
     }
 }
