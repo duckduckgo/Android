@@ -713,6 +713,7 @@ class DuckChatContextualViewModel @Inject constructor(
                     return
                 }
                 duckChatPixels.reportContextualSummarizePromptSelected()
+                fireUnifiedInputPromptSubmitted()
                 onPromptSent(
                     prompt = context.getString(R.string.duckAIContextualPromptSummarize),
                     followUpPrefill = currentInput.takeIf { it.isNotEmpty() },
@@ -726,6 +727,14 @@ class DuckChatContextualViewModel @Inject constructor(
         currentInput: String,
     ) {
         attachPageContextForSuggestion()
+        fireUnifiedInputPromptSubmitted()
+        onPromptSent(
+            prompt = suggestion.prompt,
+            followUpPrefill = currentInput.takeIf { it.isNotEmpty() },
+        )
+    }
+
+    private fun fireUnifiedInputPromptSubmitted() {
         duckChatPixels.firePromptSubmitted(
             selectedTool = "none",
             modelId = modelManager.getSelectedModelId(),
@@ -738,10 +747,6 @@ class DuckChatContextualViewModel @Inject constructor(
             tabId = _viewState.value.tabId,
             pageType = DuckChatPixelPageType.CONTEXTUAL,
             addressBarEntryPoint = null,
-        )
-        onPromptSent(
-            prompt = suggestion.prompt,
-            followUpPrefill = currentInput.takeIf { it.isNotEmpty() },
         )
     }
 

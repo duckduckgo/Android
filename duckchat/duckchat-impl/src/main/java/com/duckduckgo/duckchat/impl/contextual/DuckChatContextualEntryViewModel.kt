@@ -104,6 +104,20 @@ class DuckChatContextualEntryViewModel @Inject constructor(
     /** A suggested prompt was picked; suggestions are page-specific, so attach the context before submit. */
     fun onSuggestionSubmitted(prompt: NativeInputPrompt) {
         if (_viewState.value.attachedContext == null) latestValidPageContext?.let { attach(it) }
+        fireUnifiedInputPromptSubmitted()
+        submit(prompt)
+    }
+
+    fun onSummarizeSubmitted(prompt: NativeInputPrompt) {
+        fireUnifiedInputPromptSubmitted()
+        submit(prompt)
+    }
+
+    fun onPromptSubmitted(prompt: NativeInputPrompt) {
+        submit(prompt)
+    }
+
+    private fun fireUnifiedInputPromptSubmitted() {
         duckChatPixels.firePromptSubmitted(
             selectedTool = "none",
             modelId = modelManager.getSelectedModelId(),
@@ -117,12 +131,6 @@ class DuckChatContextualEntryViewModel @Inject constructor(
             pageType = DuckChatPixelPageType.CONTEXTUAL,
             addressBarEntryPoint = null,
         )
-        submit(prompt)
-    }
-
-    /** A typed prompt or the Summarize quick action was submitted. */
-    fun onPromptSubmitted(prompt: NativeInputPrompt) {
-        submit(prompt)
     }
 
     private fun submit(prompt: NativeInputPrompt) {

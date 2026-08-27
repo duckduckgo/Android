@@ -131,6 +131,33 @@ class DuckChatContextualEntryViewModelTest {
     }
 
     @Test
+    fun whenSummarizeSubmittedThenUnifiedInputPromptSubmittedPixelFired() = runTest {
+        viewModel.start("tab-1")
+        viewModel.onPageContextReceived(validContext)
+        whenever(modelManager.getSelectedModelId()).thenReturn("gpt-5.2")
+        whenever(modelManager.getResolvedReasoningEffort()).thenReturn("low")
+
+        viewModel.commands.test {
+            viewModel.onSummarizeSubmitted(samplePrompt)
+            assertEquals(DuckChatContextualEntryViewModel.Command.HandOffToSheet, awaitItem())
+        }
+
+        verify(duckChatPixels).firePromptSubmitted(
+            selectedTool = "none",
+            modelId = "gpt-5.2",
+            reasoningEffort = "low",
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            hasText = true,
+            surface = DuckChatPixelSurface.CONTEXTUAL_CHAT,
+            defaultMode = null,
+            tabId = "tab-1",
+            pageType = DuckChatPixelPageType.CONTEXTUAL,
+            addressBarEntryPoint = null,
+        )
+    }
+
+    @Test
     fun whenPromptSubmittedThenUnifiedInputPromptSubmittedPixelNotFired() = runTest {
         viewModel.start("tab-1")
 
