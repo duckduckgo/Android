@@ -30,7 +30,10 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.ui.view.button.ButtonType.GHOST
+import com.duckduckgo.common.ui.view.button.ButtonType.PRIMARY
+import com.duckduckgo.common.ui.view.button.ButtonType.SECONDARY
 import com.duckduckgo.common.ui.view.dialog.StackedAlertDialogBuilder
+import com.duckduckgo.common.ui.view.dialog.StackedButton
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -634,13 +637,14 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
 
         if (isDuckAiAudioCapture) {
             StackedAlertDialogBuilder(activity)
+                .setRebrandUpdate(true)
                 .setHeaderImageResource(CommonR.drawable.ic_microphone_24)
                 .setTitle(R.string.duckAiMicPermissionDeniedDialogTitle)
                 .setMessage(R.string.duckAiMicPermissionDeniedDialogContent)
                 .setStackedButtons(
                     listOf(
-                        R.string.duckAiMicPermissionDeniedDialogPositiveButton,
-                        R.string.systemPermissionsDeniedDialogNegativeButton,
+                        StackedButton(R.string.duckAiMicPermissionDeniedDialogPositiveButton, PRIMARY, CommonR.drawable.ic_open_in_16),
+                        StackedButton(R.string.systemPermissionsDeniedDialogNegativeButton, SECONDARY),
                     ),
                 )
                 .addEventListener(

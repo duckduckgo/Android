@@ -81,7 +81,7 @@ class RealVoiceSearchPermissionDialogsLauncher @Inject constructor(
             R.string.voiceSearchMicAccessDeniedDialogMessage
         }
         val buttons = buildList {
-            add(StackedButton(R.string.voiceSearchMicAccessDeniedDialogChangePermissions, PRIMARY))
+            add(StackedButton(R.string.voiceSearchMicAccessDeniedDialogChangePermissions, PRIMARY, CommonR.drawable.ic_open_in_16))
             if (!isDuckAiMode) {
                 add(StackedButton(R.string.voiceSearchMicAccessDeniedDialogHideVoiceSearch, SECONDARY))
             }
@@ -94,6 +94,7 @@ class RealVoiceSearchPermissionDialogsLauncher @Inject constructor(
         )
 
         StackedAlertDialogBuilder(context)
+            .setRebrandUpdate(true)
             .setHeaderImageResource(CommonR.drawable.ic_microphone_24)
             .setTitle(R.string.voiceSearchMicAccessDeniedDialogTitle)
             .setMessage(message)
