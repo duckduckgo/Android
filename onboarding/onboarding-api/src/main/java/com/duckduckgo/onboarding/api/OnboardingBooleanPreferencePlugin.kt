@@ -38,8 +38,9 @@ interface OnboardingBooleanPreferencePlugin : ActivePlugin {
     /** Null when the row renders as a single line. */
     val secondaryText: String? get() = null
 
+    /** Null when the row renders without an icon. */
     @get:DrawableRes
-    val iconRes: Int
+    val iconRes: Int? get() = null
 
     suspend fun apply(enabled: Boolean)
 

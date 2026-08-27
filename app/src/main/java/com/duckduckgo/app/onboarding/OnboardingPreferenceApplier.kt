@@ -65,7 +65,7 @@ interface OnboardingPreferenceApplier {
 data class OnboardingPreferencePresentation(
     val primaryText: String,
     val secondaryText: String?,
-    @DrawableRes val iconRes: Int,
+    @field:DrawableRes val iconRes: Int?,
 )
 
 @ContributesBinding(AppScope::class, boundType = OnboardingPreferenceApplier::class)

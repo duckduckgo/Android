@@ -61,8 +61,10 @@ class QuickSetupTwoLineSwitchRow @JvmOverloads constructor(
             binding.quickSetupTwoLineSwitchRowSwitch.isChecked = value
         }
 
-    fun setIcon(@DrawableRes res: Int) {
-        binding.quickSetupTwoLineSwitchRowIcon.setImageResource(res)
+    /** A null [res] hides the icon, leaving the text aligned with the row's leading edge. */
+    fun setIcon(@DrawableRes res: Int?) {
+        res?.let(binding.quickSetupTwoLineSwitchRowIcon::setImageResource)
+        binding.quickSetupTwoLineSwitchRowIcon.isVisible = res != null
     }
 
     fun setPrimaryText(text: CharSequence) {

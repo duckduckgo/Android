@@ -111,7 +111,8 @@ sealed interface ContentConfig {
 
         data class Row(
             val preference: OnboardingPreference,
-            @DrawableRes val iconRes: Int,
+            /** Null when the row renders without an icon. */
+            @DrawableRes val iconRes: Int?,
             val primaryText: TextConfig,
             /** Null when the row is rendered as a single line. */
             val secondaryText: TextConfig?,
