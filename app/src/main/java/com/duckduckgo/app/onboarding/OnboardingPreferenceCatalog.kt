@@ -42,11 +42,6 @@ import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
 import com.duckduckgo.mobile.android.R as CommonR
 
-/**
- * The single definition of every [OnboardingPreference]: what its row looks like, whether it can be offered,
- * where its value lives, and how a pick is committed. Callers name the preferences a step offers and never
- * deal with the SERP's raw keys, the history store or the owning module's plugin.
- */
 interface OnboardingPreferenceCatalog {
 
     /**
@@ -71,8 +66,8 @@ class OnboardingPreferenceCatalogImpl @Inject constructor(
     override suspend fun offer(preferences: List<OnboardingPreference>): List<ContentConfig.PreferenceSelector.Row> =
         withContext(dispatcherProvider.io()) {
             val rows = preferences.mapNotNull { definitions.getValue(it).row(it) }
-            // A dependent row only reveals itself once its parent is switched on, and the binder reads a
-            // missing parent as one that is switched on, so without the parent it would render unreachable.
+
+            // Only offer a preference if it has no dependency or its dependency is also offered.
             val offered = rows.map { it.preference }.toSet()
             rows.filter { it.dependsOn == null || it.dependsOn in offered }
         }
@@ -82,9 +77,8 @@ class OnboardingPreferenceCatalogImpl @Inject constructor(
     }
 
     /**
-     * The table is built once for the process, so nothing here may read a flag or resolve a plugin: a
-     * definition only holds lambdas, and the step that offers a preference is what evaluates them. Otherwise
-     * the first step to be reached would evaluate availability for preferences only a later step offers.
+     * A definition only holds lambdas, and the step that offers a preference is what evaluates them
+     * to make sure that all the preconditions are checked just-in-time and allow maximal window for potential remote config flags loads, etc.
      */
     private val definitions: Map<OnboardingPreference, Definition> by lazy {
         val serpAvailable: suspend () -> Boolean = { serpSettingsFeature.storeSerpSettings().isEnabled() }
@@ -162,7 +156,6 @@ class OnboardingPreferenceCatalogImpl @Inject constructor(
         val apply: suspend (Boolean) -> Unit,
     )
 
-    /** A preference onboarding names itself, against a setting it can read and write directly. */
     private fun definition(
         @DrawableRes iconRes: Int,
         @StringRes primary: Int,
@@ -188,8 +181,8 @@ class OnboardingPreferenceCatalogImpl @Inject constructor(
     )
 
     /**
-     * A preference whose owning module supplies the copy, the icon and the write. The plugin not resolving is
-     * what makes the row unavailable, so a module can withdraw the preference behind its own flag.
+     * A preference whose owning module supplies the copy, the icon and the write process.
+     * The plugin not resolving is what makes the row unavailable, so a module can withdraw the preference behind its own conditions.
      */
     private fun fromPlugin(
         id: OnboardingBooleanPreferencePlugin.Id,
