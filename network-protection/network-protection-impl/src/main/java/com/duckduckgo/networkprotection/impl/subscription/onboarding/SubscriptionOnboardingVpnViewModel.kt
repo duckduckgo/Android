@@ -21,11 +21,15 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.getDisplayableCountry
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.getEmojiForCountryCode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import logcat.LogPriority.WARN
@@ -36,6 +40,7 @@ import javax.inject.Inject
 @ContributesViewModel(FragmentScope::class)
 class SubscriptionOnboardingVpnViewModel @Inject constructor(
     private val connectionService: SubscriptionOnboardingConnectionService,
+    private val networkProtectionState: NetworkProtectionState,
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 
@@ -60,9 +65,18 @@ class SubscriptionOnboardingVpnViewModel @Inject constructor(
                     }
                 }
         }
+
+        networkProtectionState.getConnectionStateFlow()
+            .onEach { connectionState ->
+                viewState.update { it.copy(vpnEnabled = connectionState.isConnected()) }
+            }
+            .flowOn(dispatcherProvider.io())
+            .launchIn(viewModelScope)
     }
 
     data class ViewState(
+        // null until the VPN connection state is first observed, so the UI does not flip states prematurely.
+        val vpnEnabled: Boolean? = null,
         val ipAddress: String? = null,
         val location: String? = null,
     )

@@ -18,11 +18,20 @@ package com.duckduckgo.networkprotection.impl.subscription.onboarding
 
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
+import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState
+import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.CONNECTED
+import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.DISCONNECTED
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.getDisplayableCountry
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 class SubscriptionOnboardingVpnViewModelTest {
 
@@ -31,10 +40,7 @@ class SubscriptionOnboardingVpnViewModelTest {
 
     @Test
     fun whenConnectionInfoLoadsThenViewStateShowsIpAndFlagFormattedLocation() = runTest {
-        val testee = SubscriptionOnboardingVpnViewModel(
-            FakeConnectionService(ConnectionInfo(ip = "137.220.87.36", city = "Birmingham", country = "GB")),
-            coroutineRule.testDispatcherProvider,
-        )
+        val testee = createViewModel(info = ConnectionInfo(ip = "137.220.87.36", city = "Birmingham", country = "GB"))
 
         testee.viewState().test {
             val state = awaitItem()
@@ -46,10 +52,7 @@ class SubscriptionOnboardingVpnViewModelTest {
 
     @Test
     fun whenConnectionInfoFailsThenViewStateShowsUnknownPlaceholders() = runTest {
-        val testee = SubscriptionOnboardingVpnViewModel(
-            FakeConnectionService(info = null),
-            coroutineRule.testDispatcherProvider,
-        )
+        val testee = createViewModel(info = null)
 
         testee.viewState().test {
             val state = awaitItem()
@@ -57,6 +60,40 @@ class SubscriptionOnboardingVpnViewModelTest {
             assertEquals("XX, XX", state.location)
             cancelAndConsumeRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenVpnConnectedThenVpnEnabledIsTrue() = runTest {
+        val testee = createViewModel(connectionState = CONNECTED)
+
+        testee.viewState().test {
+            assertTrue(awaitItem().vpnEnabled == true)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenVpnDisconnectedThenVpnEnabledIsFalse() = runTest {
+        val testee = createViewModel(connectionState = DISCONNECTED)
+
+        testee.viewState().test {
+            assertFalse(awaitItem().vpnEnabled == true)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    private fun createViewModel(
+        info: ConnectionInfo? = ConnectionInfo(ip = "137.220.87.36", city = "Birmingham", country = "GB"),
+        connectionState: ConnectionState = DISCONNECTED,
+    ): SubscriptionOnboardingVpnViewModel {
+        val networkProtectionState = mock<NetworkProtectionState>().apply {
+            whenever(getConnectionStateFlow()).thenReturn(flowOf(connectionState))
+        }
+        return SubscriptionOnboardingVpnViewModel(
+            FakeConnectionService(info),
+            networkProtectionState,
+            coroutineRule.testDispatcherProvider,
+        )
     }
 
     private class FakeConnectionService(

@@ -86,16 +86,14 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
     }
 
     private var vpnOn = false
+    private var lastRenderedVpnOn: Boolean? = null
     private var transition: ValueAnimator? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        lastRenderedVpnOn = null
         applyVpnState(animate = false)
-        observeConnectionInfo()
-        binding.subscriptionOnboardingVpnHeaderTitle.setOnClickListener {
-            vpnOn = !vpnOn
-            applyVpnState(animate = true)
-        }
+        observeViewState()
         binding.subscriptionOnboardingVpnNextButton.setOnClickListener {
             controller.onStepFinished(VPN_STEP_ID, COMPLETED)
         }
@@ -127,14 +125,27 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
         )
     }
 
-    private fun observeConnectionInfo() {
+    private fun observeViewState() {
         viewModel.viewState()
             .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
             .onEach { state ->
                 state.ipAddress?.let { binding.subscriptionOnboardingVpnIpAddressValue.text = it }
                 state.location?.let { binding.subscriptionOnboardingVpnIpAddressLocation.text = it }
+                state.vpnEnabled?.let(::renderVpnState)
             }
             .launchIn(viewLifecycleOwner.lifecycleScope)
+    }
+
+    /**
+     * Drives the on/off appearance from the real VPN connection state. The first observed value is rendered
+     * without animation; later changes (the VPN being turned on or off) animate the transition.
+     */
+    private fun renderVpnState(enabled: Boolean) {
+        if (lastRenderedVpnOn == enabled) return
+        val animate = lastRenderedVpnOn != null
+        vpnOn = enabled
+        lastRenderedVpnOn = enabled
+        applyVpnState(animate)
     }
 
     private fun applyVpnState(animate: Boolean) = with(binding) {
