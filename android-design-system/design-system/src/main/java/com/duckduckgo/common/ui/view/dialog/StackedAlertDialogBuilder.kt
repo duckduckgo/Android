@@ -16,6 +16,7 @@
 
 package com.duckduckgo.common.ui.view.dialog
 
+import android.app.Activity
 import android.content.ComponentCallbacks
 import android.content.Context
 import android.content.res.Configuration
@@ -193,9 +194,6 @@ class StackedAlertDialogBuilder(val context: Context) : DaxAlertDialog {
             build()
         }
         showDialog()
-        if (isRebrandUpdate) {
-            registerConfigurationCallback()
-        }
         listener.onDialogShown()
     }
 
@@ -216,9 +214,20 @@ class StackedAlertDialogBuilder(val context: Context) : DaxAlertDialog {
 
     private fun showDialog() {
         dialog?.show()
-        if (isRebrandUpdate) {
-            dialog?.window?.setLayout(cardWidth(), WindowManager.LayoutParams.WRAP_CONTENT)
-        }
+        if (!isRebrandUpdate) return
+
+        val shown = dialog ?: return
+        shown.window?.setLayout(cardWidth(), WindowManager.LayoutParams.WRAP_CONTENT)
+        shown.window?.decorView?.addOnAttachStateChangeListener(
+            object : View.OnAttachStateChangeListener {
+                override fun onViewAttachedToWindow(view: View) = Unit
+
+                override fun onViewDetachedFromWindow(view: View) {
+                    if (dialog === shown) unregisterConfigurationCallback()
+                }
+            },
+        )
+        registerConfigurationCallback()
     }
 
     private fun cardWidth(): Int {
@@ -249,6 +258,12 @@ class StackedAlertDialogBuilder(val context: Context) : DaxAlertDialog {
     }
 
     private fun recreate() {
+        val activity = context as? Activity
+        if (activity != null && (activity.isFinishing || activity.isDestroyed)) {
+            unregisterConfigurationCallback()
+            return
+        }
+
         val current = dialog ?: return
         if (!current.isShowing) return
 
