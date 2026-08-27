@@ -57,6 +57,8 @@ class PreferenceSelectorBinder(
         populateRows(content, state, scope)
 
         binding.preferenceSelectorTitle.setTitle(content.title.resolve(context))
+        binding.caption.text = content.caption?.resolve(context)
+        binding.caption.isVisible = content.caption != null
 
         return ContentHandle(
             title = binding.preferenceSelectorTitle,

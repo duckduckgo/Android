@@ -106,6 +106,7 @@ sealed interface ContentConfig {
     data class PreferenceSelector(
         override val title: TextConfig,
         val rows: List<Row>,
+        val caption: TextConfig? = null,
     ) : ContentConfig, Stateful<PreferenceSelectorContentState> {
 
         data class Row(

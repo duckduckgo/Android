@@ -64,6 +64,7 @@ sealed interface NewUserOnboardingActivityDialog {
     data class PreferenceSelector(
         @get:StringRes val titleRes: Int,
         val initialSelections: Map<OnboardingPreference, Boolean>,
+        @get:StringRes val caption: Int?,
     ) : NewUserOnboardingActivityDialog
 
     data class SingleChoice(

@@ -622,11 +622,13 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 defaultBrowserPromptStep(),
                 preferenceSelectorStep(
                     ctx,
+                    titleRes = R.string.blockAdsPathPreferenceSelectorTitle,
                     listOf(
                         OnboardingPreference.BLOCK_ADS,
                         OnboardingPreference.REJECT_OPTIONAL_COOKIES,
                         OnboardingPreference.ACCEPT_NON_OPT_OUT_COOKIES,
                     ),
+                    caption = R.string.preferenceChangeInSettingsCaption,
                 ),
                 inputScreenStep(ctx),
                 addressBarPositionStep(),
@@ -652,6 +654,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         ctx: NewUserOnboardingPlanContext,
         @StringRes titleRes: Int,
         offered: List<OnboardingPreference>,
+        @StringRes caption: Int? = null,
     ): NewUserOnboardingActivityStep {
         val preferenceSelections = SuspendMemo { resolvePreferenceSelections(offered) }
         return NewUserOnboardingActivityStep(
@@ -663,6 +666,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 NewUserOnboardingActivityDialog.PreferenceSelector(
                     titleRes = titleRes,
                     preferenceSelections(),
+                    caption = caption,
                 )
             },
             transition = { event ->
