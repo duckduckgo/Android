@@ -245,6 +245,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_SERP_CTA
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.systemsearch.DeviceAppLookup
 import com.duckduckgo.app.tabs.model.AggregateTabProvider
+import com.duckduckgo.app.tabs.model.DuckAiTabSessionRepository
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabPageContextRepository
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -647,6 +648,7 @@ class BrowserTabViewModelTest {
     private val mockNtpAfterIdleManager: NtpAfterIdleManager = mock()
     private val mockReturnSessionLandingListener: ReturnSessionLandingListener = mock()
     private val mockBrowserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin> = mock()
+    private val mockDuckAiTabSessionRepository: DuckAiTabSessionRepository = mock()
     private val browserRefreshTriggerFlow = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     private val browserRefreshTriggerPlugin: BrowserRefreshTriggerPlugin = mock {
         on { observeRefreshRequests() } doReturn browserRefreshTriggerFlow
@@ -1058,6 +1060,7 @@ class BrowserTabViewModelTest {
                 ntpAfterIdleManager = mockNtpAfterIdleManager,
                 returnSessionLandingListener = mockReturnSessionLandingListener,
                 browserInteractionsPlugins = mockBrowserInteractionsPlugins,
+                duckAiTabSessionRepository = mockDuckAiTabSessionRepository,
                 browserRefreshTriggerPlugins = mockBrowserRefreshTriggerPlugins,
                 brokenSiteReportTriggerPlugins = mockBrokenSiteReportTriggerPlugins,
                 inlinePdfHandler = mockInlinePdfHandler,
@@ -8954,7 +8957,7 @@ class BrowserTabViewModelTest {
         // Preserve the pre-return-session behavior: one callback is explicit and one comes from
         // reusing the NTP tab. The new AI classifier must still fire exactly once without a URL.
         verify(plugin, times(2)).onInputSubmitted()
-        verify(plugin, times(1)).onAiPromptSubmitted()
+        verify(plugin, times(1)).onAiPromptSubmitted(source = "address_bar_prompt")
         verify(plugin, never()).onUrlSubmitted()
         verify(plugin, never()).onSearchSubmitted()
     }
@@ -8993,7 +8996,7 @@ class BrowserTabViewModelTest {
         testee.openDuckAiQuery(query = "hello", autoPrompt = true, entryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT)
 
         verify(plugin).onInputSubmitted()
-        verify(plugin).onAiPromptSubmitted()
+        verify(plugin).onAiPromptSubmitted(source = "address_bar_prompt")
     }
 
     @Test
@@ -9027,11 +9030,25 @@ class BrowserTabViewModelTest {
     fun whenDuckAiChatPromptSubmittedThenFiresOnInputSubmittedAndOnAiPromptSubmitted() = runTest {
         val plugin: BrowserInteractionsPlugin = mock()
         whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
+        whenever(mockDuckAiTabSessionRepository.getEntryPointSource("abc")).thenReturn(null)
 
         testee.onDuckAiChatPromptSubmitted()
+        advanceUntilIdle()
 
         verify(plugin).onInputSubmitted()
-        verify(plugin).onAiPromptSubmitted()
+        verify(plugin).onAiPromptSubmitted(source = null)
+    }
+
+    @Test
+    fun whenDuckAiChatPromptSubmittedThenSourceIsTheTabsRecordedEntryPoint() = runTest {
+        val plugin: BrowserInteractionsPlugin = mock()
+        whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
+        whenever(mockDuckAiTabSessionRepository.getEntryPointSource("abc")).thenReturn("address_bar_prompt")
+
+        testee.onDuckAiChatPromptSubmitted()
+        advanceUntilIdle()
+
+        verify(plugin).onAiPromptSubmitted(source = "address_bar_prompt")
     }
 
     @Test
@@ -9287,7 +9304,7 @@ class BrowserTabViewModelTest {
         testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = true, isNtp = false)
 
         verify(plugin).onInputSubmitted()
-        verify(plugin).onAiPromptSubmitted()
+        verify(plugin).onAiPromptSubmitted(source = "address_bar_icon")
         verify(plugin, never()).onUrlSubmitted()
     }
 

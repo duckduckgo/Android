@@ -21,7 +21,9 @@ import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.DuckAiTabSessionRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.ToggleSelection
 import com.duckduckgo.duckchat.impl.helper.DuckChatTermsOfServiceHandler
@@ -49,6 +51,8 @@ class RealDuckChatPixelsToolsTest {
     private val termsOfServiceHandler: DuckChatTermsOfServiceHandler = mock()
     private val duckAiTabSessionRepository: DuckAiTabSessionRepository = mock()
     private val appBuildConfig: AppBuildConfig = mock()
+    private val browserInteractionsPlugin: BrowserInteractionsPlugin = mock()
+    private val browserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin> = mock()
 
     private val testee = RealDuckChatPixels(
         pixel = pixel,
@@ -60,6 +64,7 @@ class RealDuckChatPixelsToolsTest {
         termsOfServiceHandler = termsOfServiceHandler,
         duckAiTabSessionRepository = duckAiTabSessionRepository,
         appBuildConfig = appBuildConfig,
+        browserInteractionsPlugins = browserInteractionsPlugins,
     )
 
     private val surfaceParams = mapOf(DuckChatPixelParameters.SURFACE to "contextual_chat")
@@ -67,6 +72,7 @@ class RealDuckChatPixelsToolsTest {
     init {
         runBlocking { whenever(duckChatFeatureRepository.checkAndMarkFirstPromptSubmission()).thenReturn(false) }
         whenever(appBuildConfig.isNewInstall()).thenReturn(false)
+        whenever(browserInteractionsPlugins.getPlugins()).thenReturn(listOf(browserInteractionsPlugin))
     }
 
     @Test
@@ -382,6 +388,25 @@ class RealDuckChatPixelsToolsTest {
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_COUNT,
             parameters = promptSubmittedAddressBarParams(pageType = "website"),
         )
+    }
+
+    @Test
+    fun whenPromptSubmittedThenNotifiesBrowserInteractionsPluginWithTheResolvedSource() = runTest {
+        testee.firePromptSubmitted(
+            selectedTool = "none",
+            modelId = null,
+            reasoningEffort = null,
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            hasText = true,
+            surface = DuckChatPixelSurface.ADDRESS_BAR,
+            defaultMode = null,
+            tabId = "tab1",
+            pageType = DuckChatPixelPageType.WEBSITE,
+            addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
+        )
+
+        verify(browserInteractionsPlugin).onAiPromptSubmitted(source = "address_bar_prompt")
     }
 
     @Test

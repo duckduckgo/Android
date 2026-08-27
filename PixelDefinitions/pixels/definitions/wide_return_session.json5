@@ -96,6 +96,35 @@
                 "key": "feature.data.ext.burn_tab_tapped",
                 "type": "boolean",
                 "description": "Whether the user tapped the burn-tab action on the escape hatch during the session"
+            },
+            {
+                "key": "feature.data.ext.source",
+                "type": "string",
+                "description": "The Duck.ai entry point that triggered the session's ai_prompt_submitted terminal. Omitted for every other status_reason or when unknown",
+                "enum": [
+                    "address_bar_prompt",
+                    "address_bar_icon",
+                    "address_bar_shortcut_chip",
+                    "address_bar_editing_state",
+                    "suggestion_ask_ai",
+                    "browsing_menu_ntp",
+                    "browsing_menu_webpage",
+                    "tab_switcher",
+                    "chat_history_new_chat",
+                    "chat_history_open_chat",
+                    "voice",
+                    "onboarding",
+                    "direct_url",
+                    "serp",
+                    "icon_shortcut",
+                    "contextual_chat",
+                    "widget_quick_actions",
+                    "widget_favorite",
+                    "system_search",
+                    "digital_assistant",
+                    "deep_link_other",
+                    "paid_settings"
+                ]
             }
         ]
     }

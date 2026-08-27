@@ -116,9 +116,7 @@ class RealDuckChatJSHelperTest {
     }
     private val mockEditPromptSessionStore: EditPromptSessionStore = mock()
     private val mockBrowserInteractionsPlugin: BrowserInteractionsPlugin = mock()
-    private val mockBrowserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin> = mock {
-        on { getPlugins() } doReturn listOf(mockBrowserInteractionsPlugin)
-    }
+    private val mockBrowserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin> = mock()
     private val testee = RealDuckChatJSHelper(
         duckChat = mockDuckChat,
         duckChatPixels = mockDuckChatPixels,
@@ -139,6 +137,10 @@ class RealDuckChatJSHelperTest {
         editPromptSessionStore = mockEditPromptSessionStore,
         browserInteractionsPlugins = mockBrowserInteractionsPlugins,
     )
+
+    init {
+        whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(mockBrowserInteractionsPlugin))
+    }
     private val viewModel =
         object {
             val updatedPageContext: String =

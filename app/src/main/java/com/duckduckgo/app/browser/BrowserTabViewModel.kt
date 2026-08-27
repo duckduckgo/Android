@@ -309,6 +309,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.surrogates.SurrogateResponse
+import com.duckduckgo.app.tabs.model.DuckAiTabSessionRepository
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabPageContextRepository
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -582,6 +583,7 @@ class BrowserTabViewModel @Inject constructor(
     private val ntpAfterIdleManager: NtpAfterIdleManager,
     private val returnSessionLandingListener: ReturnSessionLandingListener,
     private val browserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin>,
+    private val duckAiTabSessionRepository: DuckAiTabSessionRepository,
     private val browserRefreshTriggerPlugins: PluginPoint<BrowserRefreshTriggerPlugin>,
     private val brokenSiteReportTriggerPlugins: PluginPoint<BrokenSiteReportTriggerPlugin>,
     private val inlinePdfHandler: InlinePdfHandler,
@@ -5676,7 +5678,7 @@ class BrowserTabViewModel @Inject constructor(
         val hasPrompt = hasAutoSubmittedPrompt(duckAiUrl)
         browserInteractionsPlugins.getPlugins().forEach { it.onInputSubmitted() }
         if (hasPrompt) {
-            browserInteractionsPlugins.getPlugins().forEach { it.onAiPromptSubmitted() }
+            browserInteractionsPlugins.getPlugins().forEach { it.onAiPromptSubmitted(source = entryPoint.name.lowercase()) }
         }
         navigateToDuckAi(
             url = duckAiUrl,
@@ -5703,7 +5705,11 @@ class BrowserTabViewModel @Inject constructor(
         // onInputSubmitted() too: an in-chat follow-up is still "the bar was used" for the old
         // post-idle-session event, which only listens for that generic signal.
         browserInteractionsPlugins.getPlugins().forEach { it.onInputSubmitted() }
-        browserInteractionsPlugins.getPlugins().forEach { it.onAiPromptSubmitted() }
+        viewModelScope.launch(dispatchers.io()) {
+            // The chat was already open, so its entry point was recorded when it was first navigated to.
+            val source = duckAiTabSessionRepository.getEntryPointSource(tabId)
+            browserInteractionsPlugins.getPlugins().forEach { it.onAiPromptSubmitted(source = source) }
+        }
     }
 
     private fun navigateToDuckAi(
@@ -5824,7 +5830,9 @@ class BrowserTabViewModel @Inject constructor(
                 }
                 if (duckChat.isDuckChatUrl(url.toUri())) {
                     if (submittedAiPrompt) {
-                        browserInteractionsPlugins.getPlugins().forEach { it.onAiPromptSubmitted() }
+                        browserInteractionsPlugins.getPlugins().forEach {
+                            it.onAiPromptSubmitted(source = DuckChatEntryPoint.ADDRESS_BAR_ICON.name.lowercase())
+                        }
                     }
                     duckChat.reportDuckChatEntry(
                         DuckChatEntryPoint.ADDRESS_BAR_ICON,
