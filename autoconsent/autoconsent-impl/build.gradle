@@ -46,6 +46,7 @@ dependencies {
     implementation project(path: ':app-build-config-api')
     implementation project(path: ':app-store')
     implementation project(path: ':autoconsent-api')
+    implementation project(path: ':onboarding-api')
     implementation project(path: ':statistics-api')
     implementation project(path: ':browser-api')
     implementation project(path: ':navigation-api')

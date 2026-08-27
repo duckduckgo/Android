@@ -19,7 +19,6 @@ package com.duckduckgo.app.onboarding
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.onboarding.ui.page.configdriven.ContentConfig.PreferenceSelector.Row
 import com.duckduckgo.app.onboarding.ui.page.configdriven.TextConfig
-import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -52,11 +51,23 @@ class OnboardingPreferenceCatalogImplTest {
     val coroutineRule = CoroutineTestRule()
 
     private val navigationHistory: NavigationHistory = mock()
-    private val autoconsent: Autoconsent = mock()
     private val serpSettingsDataProvider: SerpSettingsDataProvider = mock()
     private val serpSettingsFeature: SerpSettingsFeature = FakeFeatureToggleFactory.create(SerpSettingsFeature::class.java)
     private val adBlockingPlugin = FakeOnboardingBooleanPreferencePlugin()
-    private var contributedPlugins: List<OnboardingBooleanPreferencePlugin> = listOf(adBlockingPlugin)
+    private val rejectOptionalCookiesPlugin = FakeOnboardingBooleanPreferencePlugin(
+        id = OnboardingBooleanPreferencePlugin.Id.RejectOptionalCookies,
+        primaryText = "Reject optional cookies",
+        secondaryText = "Maximizes privacy and closes cookie pop-ups",
+        iconRes = 43,
+    )
+    private val acceptNonOptOutCookiesPlugin = FakeOnboardingBooleanPreferencePlugin(
+        id = OnboardingBooleanPreferencePlugin.Id.AcceptNonOptOutCookies,
+        primaryText = "Accept some cookies",
+        secondaryText = "Hides more pop-ups by accepting cookies that can't be rejected",
+        iconRes = 44,
+    )
+    private var contributedPlugins: List<OnboardingBooleanPreferencePlugin> =
+        listOf(adBlockingPlugin, rejectOptionalCookiesPlugin, acceptNonOptOutCookiesPlugin)
     private var pluginLookups = 0
     private val booleanPreferencePlugins = object : ActivePluginPoint<OnboardingBooleanPreferencePlugin> {
         override suspend fun getPlugins(): List<OnboardingBooleanPreferencePlugin> {
@@ -67,7 +78,6 @@ class OnboardingPreferenceCatalogImplTest {
 
     private val testee = OnboardingPreferenceCatalogImpl(
         navigationHistory = navigationHistory,
-        autoconsent = autoconsent,
         serpSettingsDataProvider = serpSettingsDataProvider,
         serpSettingsFeature = serpSettingsFeature,
         booleanPreferencePlugins = booleanPreferencePlugins,
@@ -80,6 +90,11 @@ class OnboardingPreferenceCatalogImplTest {
     }
 
     private suspend fun rowFor(preference: OnboardingPreference): Row? = testee.offer(listOf(preference)).singleOrNull()
+
+    /** A dependent row is only offered alongside its parent, so the pair has to be asked for together. */
+    private suspend fun acceptNonOptOutCookiesRow(): Row? = testee.offer(
+        listOf(OnboardingPreference.REJECT_OPTIONAL_COOKIES, OnboardingPreference.ACCEPT_NON_OPT_OUT_COOKIES),
+    ).lastOrNull()
 
     // region availability
 
@@ -162,7 +177,36 @@ class OnboardingPreferenceCatalogImplTest {
     fun whenAcceptNonOptOutCookiesOfferedThenItDependsOnRejectingOptionalCookies() = runTest {
         assertEquals(
             OnboardingPreference.REJECT_OPTIONAL_COOKIES,
-            rowFor(OnboardingPreference.ACCEPT_NON_OPT_OUT_COOKIES)?.dependsOn,
+            acceptNonOptOutCookiesRow()?.dependsOn,
+        )
+    }
+
+    @Test
+    fun whenRejectOptionalCookiesPluginMissingThenTheDependentAcceptRowIsDroppedToo() = runTest {
+        contributedPlugins = listOf(acceptNonOptOutCookiesPlugin)
+
+        assertEquals(
+            emptyList<Row>(),
+            testee.offer(
+                listOf(OnboardingPreference.REJECT_OPTIONAL_COOKIES, OnboardingPreference.ACCEPT_NON_OPT_OUT_COOKIES),
+            ),
+        )
+    }
+
+    @Test
+    fun whenAcceptNonOptOutCookiesIsOfferedWithoutItsParentThenItIsDropped() = runTest {
+        assertNull(rowFor(OnboardingPreference.ACCEPT_NON_OPT_OUT_COOKIES))
+    }
+
+    @Test
+    fun whenAcceptNonOptOutCookiesPluginMissingThenOnlyRejectIsOffered() = runTest {
+        contributedPlugins = listOf(rejectOptionalCookiesPlugin)
+
+        assertEquals(
+            listOf(OnboardingPreference.REJECT_OPTIONAL_COOKIES),
+            testee.offer(
+                listOf(OnboardingPreference.REJECT_OPTIONAL_COOKIES, OnboardingPreference.ACCEPT_NON_OPT_OUT_COOKIES),
+            ).map { it.preference },
         )
     }
 
@@ -242,31 +286,13 @@ class OnboardingPreferenceCatalogImplTest {
     }
 
     @Test
-    fun whenAutoconsentSettingOnThenRejectOptionalCookiesSeededOn() = runTest {
-        whenever(autoconsent.isSettingEnabled()).thenReturn(true)
-
+    fun whenRejectOptionalCookiesOfferedThenOnboardingSeedsItOn() = runTest {
         assertTrue(rowFor(OnboardingPreference.REJECT_OPTIONAL_COOKIES)!!.initiallyEnabled)
     }
 
     @Test
-    fun whenAutoconsentSettingOffThenRejectOptionalCookiesSeededOff() = runTest {
-        whenever(autoconsent.isSettingEnabled()).thenReturn(false)
-
-        assertFalse(rowFor(OnboardingPreference.REJECT_OPTIONAL_COOKIES)!!.initiallyEnabled)
-    }
-
-    @Test
-    fun whenClickAcceptOnThenAcceptNonOptOutCookiesSeededOn() = runTest {
-        whenever(autoconsent.isClickAcceptEnabled()).thenReturn(true)
-
-        assertTrue(rowFor(OnboardingPreference.ACCEPT_NON_OPT_OUT_COOKIES)!!.initiallyEnabled)
-    }
-
-    @Test
-    fun whenClickAcceptOffThenAcceptNonOptOutCookiesSeededOff() = runTest {
-        whenever(autoconsent.isClickAcceptEnabled()).thenReturn(false)
-
-        assertFalse(rowFor(OnboardingPreference.ACCEPT_NON_OPT_OUT_COOKIES)!!.initiallyEnabled)
+    fun whenAcceptNonOptOutCookiesOfferedThenOnboardingSeedsItOff() = runTest {
+        assertFalse(acceptNonOptOutCookiesRow()!!.initiallyEnabled)
     }
 
     // endregion
@@ -323,17 +349,17 @@ class OnboardingPreferenceCatalogImplTest {
     }
 
     @Test
-    fun whenRejectOptionalCookiesAppliedThenAutoconsentSettingWritten() = runTest {
+    fun whenRejectOptionalCookiesAppliedThenThePickReachesItsPlugin() = runTest {
         testee.apply(mapOf(OnboardingPreference.REJECT_OPTIONAL_COOKIES to true))
 
-        verify(autoconsent).changeSetting(true)
+        assertEquals(listOf(true), rejectOptionalCookiesPlugin.applied)
     }
 
     @Test
-    fun whenAcceptNonOptOutCookiesAppliedThenClickAcceptWritten() = runTest {
+    fun whenAcceptNonOptOutCookiesAppliedThenThePickReachesItsPlugin() = runTest {
         testee.apply(mapOf(OnboardingPreference.ACCEPT_NON_OPT_OUT_COOKIES to false))
 
-        verify(autoconsent).changeClickAcceptEnabled(false)
+        assertEquals(listOf(false), acceptNonOptOutCookiesPlugin.applied)
     }
 
     @Test
@@ -346,7 +372,7 @@ class OnboardingPreferenceCatalogImplTest {
         )
 
         verify(navigationHistory).setHistoryUserEnabled(true)
-        verify(autoconsent).changeSetting(false)
+        assertEquals(listOf(false), rejectOptionalCookiesPlugin.applied)
     }
 
     // endregion
@@ -382,6 +408,32 @@ class OnboardingPreferenceCatalogImplTest {
     }
 
     @Test
+    fun whenCookiePluginsContributedThenTheirRowsCarryTheirCopyAndIcons() = runTest {
+        assertEquals(
+            listOf(
+                Row(
+                    preference = OnboardingPreference.REJECT_OPTIONAL_COOKIES,
+                    iconRes = 43,
+                    primaryText = TextConfig.Literal("Reject optional cookies"),
+                    secondaryText = TextConfig.Literal("Maximizes privacy and closes cookie pop-ups"),
+                    initiallyEnabled = true,
+                ),
+                Row(
+                    preference = OnboardingPreference.ACCEPT_NON_OPT_OUT_COOKIES,
+                    iconRes = 44,
+                    primaryText = TextConfig.Literal("Accept some cookies"),
+                    secondaryText = TextConfig.Literal("Hides more pop-ups by accepting cookies that can't be rejected"),
+                    initiallyEnabled = false,
+                    dependsOn = OnboardingPreference.REJECT_OPTIONAL_COOKIES,
+                ),
+            ),
+            testee.offer(
+                listOf(OnboardingPreference.REJECT_OPTIONAL_COOKIES, OnboardingPreference.ACCEPT_NON_OPT_OUT_COOKIES),
+            ),
+        )
+    }
+
+    @Test
     fun whenAdBlockingPluginMissingThenApplyingBlockAdsIsANoOp() = runTest {
         contributedPlugins = emptyList()
 
@@ -397,7 +449,7 @@ class OnboardingPreferenceCatalogImplTest {
     @Test
     fun whenTheCatalogIsBuiltThenNothingIsEvaluated() {
         assertEquals(0, pluginLookups)
-        verifyNoInteractions(navigationHistory, autoconsent, serpSettingsDataProvider)
+        verifyNoInteractions(navigationHistory, serpSettingsDataProvider)
     }
 
     @Test
@@ -408,7 +460,7 @@ class OnboardingPreferenceCatalogImplTest {
         testee.offer(listOf(OnboardingPreference.SEARCH_HISTORY))
 
         assertEquals(0, pluginLookups)
-        verifyNoInteractions(autoconsent, serpSettingsDataProvider)
+        verifyNoInteractions(serpSettingsDataProvider)
     }
 
     // endregion
