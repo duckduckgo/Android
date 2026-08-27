@@ -86,27 +86,48 @@
 
     </com.facebook.shimmer.ShimmerFrameLayout>
 
-    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-        android:id="@+id/importCompleteImportedRow"
+    <LinearLayout
+        android:id="@+id/importCompleteResultContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:alpha="0"
+        android:background="@drawable/background_onboarding_import_result"
+        android:orientation="vertical"
         android:visibility="gone"
-        app:leadingIcon="@drawable/ic_check_onboarding_success_24"
         tools:alpha="1"
-        tools:primaryText="@string/preOnboardingImportCompleteImported"
-        tools:visibility="visible" />
+        tools:visibility="visible">
 
-    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-        android:id="@+id/importCompleteSkippedRow"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:alpha="0"
-        android:visibility="gone"
-        app:leadingIcon="@drawable/ic_cross_recolorable_gray_24"
-        tools:alpha="1"
-        tools:primaryText="@string/preOnboardingImportCompleteSkipped"
-        tools:visibility="visible" />
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/importCompleteImportedRow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="false"
+            android:visibility="gone"
+            app:leadingIcon="@drawable/ic_check_onboarding_success_24"
+            tools:primaryText="@string/preOnboardingImportCompleteImported"
+            tools:visibility="visible" />
+
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/importCompleteSkippedRow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="false"
+            android:visibility="gone"
+            app:leadingIcon="@drawable/ic_cross_recolorable_gray_24"
+            tools:primaryText="@string/preOnboardingImportCompleteSkipped"
+            tools:visibility="visible" />
+
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/importCompleteFailedRow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="false"
+            android:visibility="gone"
+            app:leadingIcon="@drawable/ic_cross_onboarding_error_24"
+            tools:primaryText="@string/preOnboardingImportCompleteFailed"
+            tools:visibility="visible" />
+
+    </LinearLayout>
 
 </LinearLayout>

@@ -231,7 +231,7 @@ class DialogConfigResolver @Inject constructor(
                 parsingTitle = TextConfig.Resource(R.string.preOnboardingImportCompleteParsingTitle),
                 parsingBody = TextConfig.Resource(R.string.preOnboardingImportCompleteParsingBody),
                 failedTitle = TextConfig.Resource(R.string.preOnboardingImportCompleteFailedTitle),
-                failedBody = TextConfig.Resource(R.string.preOnboardingImportCompleteFailedBody),
+                failedRow = TextConfig.Resource(R.string.preOnboardingImportCompleteFailed),
             ),
             primaryCta = CtaConfig(
                 text = TextConfig.Resource(R.string.preOnboardingImportCompleteCta),

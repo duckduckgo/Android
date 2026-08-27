@@ -126,8 +126,8 @@
     <string name="preOnboardingImportCompleteCta">Got it!</string>
     <string name="preOnboardingImportCompleteParsingTitle">Importing passwords</string>
     <string name="preOnboardingImportCompleteParsingBody">This will only take a moment.</string>
-    <string name="preOnboardingImportCompleteFailedTitle">Import finished</string>
-    <string name="preOnboardingImportCompleteFailedBody">We couldn\'t confirm how many passwords were imported.</string>
+    <string name="preOnboardingImportCompleteFailedTitle">Import failed</string>
+    <string name="preOnboardingImportCompleteFailed">Password import failed</string>
     <string name="preOnboardingImportCompleteImported" instruction="%1$d is the number of passwords that were imported.">Passwords imported: %1$d</string>
     <string name="preOnboardingImportCompleteSkipped" instruction="%1$d is the number of passwords that were not imported.">Skipped (duplicate or invalid): %1$d</string>
     <string name="preOnboardingImportErrorTitle">Something went wrong</string>

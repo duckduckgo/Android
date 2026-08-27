@@ -123,13 +123,12 @@ sealed interface ContentConfig {
         val body: TextConfig,
     ) : ContentConfig
 
-    /** One title/body pair per [ImportCompleteContentState]; [title] is the finished one. */
     data class ImportComplete(
         override val title: TextConfig,
         val parsingTitle: TextConfig,
         val parsingBody: TextConfig,
         val failedTitle: TextConfig,
-        val failedBody: TextConfig,
+        val failedRow: TextConfig,
     ) : ContentConfig, Stateful<ImportCompleteContentState> {
         override fun initialState(): ImportCompleteContentState = ImportCompleteContentState.Parsing
     }

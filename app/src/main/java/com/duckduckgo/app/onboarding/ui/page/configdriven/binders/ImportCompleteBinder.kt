@@ -16,6 +16,10 @@
 
 package com.duckduckgo.app.onboarding.ui.page.configdriven.binders
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.view.View
 import androidx.core.view.isVisible
@@ -44,11 +48,12 @@ class ImportCompleteBinder(
     ): ContentHandle = with(binding) {
         val context = root.context
 
-        var rendered = state.value
+        var rendered: ImportCompleteContentState = state.value
         importCompleteTitle.setTitle(titleOf(rendered, content).resolve(context))
         apply(rendered, content, context)
 
         var stateJob: Job? = null
+        var transition: Animator? = null
 
         ContentHandle(
             title = importCompleteTitle,
@@ -57,16 +62,52 @@ class ImportCompleteBinder(
                 stateJob = state.onEach { current ->
                     if (current == rendered) return@onEach
                     rendered = current
-                    importCompleteTitle.setTitle(titleOf(current, content).resolve(context))
 
-                    importCompleteTitle.snapTitle()
-                    scope.animateCardBounds(STATE_CHANGE_DURATION_MS)
-                    apply(current, content, context)
+                    transition?.cancel()
+                    val leaving = fadeTargets()
+                    transition = fade(leaving, to = 0f) {
+                        importCompleteTitle.setTitle(titleOf(current, content).resolve(context))
+                        importCompleteTitle.snapTitle()
 
-                    fadeTargets().forEach { it.alpha = 1f }
+                        scope.animateCardBounds(STATE_CHANGE_DURATION_MS)
+                        apply(current, content, context)
+
+                        val arriving = fadeTargets()
+                        arriving.forEach { it.alpha = 0f }
+
+                        leaving.filterNot { it in arriving }.forEach { it.alpha = 1f }
+
+                        transition = fade(arriving, to = 1f).also { it.start() }
+                    }.also { it.start() }
                 }.launchIn(scope.coroutineScope)
             },
-            unbind = { stateJob?.cancel() },
+            unbind = {
+                stateJob?.cancel()
+                transition?.cancel()
+            },
+        )
+    }
+
+    private fun fade(
+        views: List<View>,
+        to: Float,
+        onFaded: () -> Unit = {},
+    ): Animator = AnimatorSet().apply {
+        duration = STATE_FADE_DURATION_MS
+        playTogether(views.map { view -> ObjectAnimator.ofFloat(view, View.ALPHA, to) })
+        addListener(
+            object : AnimatorListenerAdapter() {
+                private var cancelled = false
+
+                override fun onAnimationCancel(animation: Animator) {
+                    cancelled = true
+                }
+
+                override fun onAnimationEnd(animation: Animator) {
+                    views.forEach { it.alpha = to }
+                    if (!cancelled) onFaded()
+                }
+            },
         )
     }
 
@@ -79,11 +120,13 @@ class ImportCompleteBinder(
         importCompletePictogram.setImageResource(pictogramOf(state))
         importCompleteImportedRow.isVisible = state is ImportCompleteContentState.Finished
         importCompleteSkippedRow.isVisible = state is ImportCompleteContentState.Finished && state.skipped > 0
-        importCompleteBody.isVisible = state !is ImportCompleteContentState.Finished
+        importCompleteFailedRow.isVisible = state is ImportCompleteContentState.Failed
+        importCompleteResultContainer.isVisible = state !is ImportCompleteContentState.Parsing
+        importCompleteBody.isVisible = state is ImportCompleteContentState.Parsing
 
         when (state) {
             ImportCompleteContentState.Parsing -> importCompleteBody.text = content.parsingBody.resolve(context)
-            ImportCompleteContentState.Failed -> importCompleteBody.text = content.failedBody.resolve(context)
+            ImportCompleteContentState.Failed -> importCompleteFailedRow.setPrimaryText(content.failedRow.resolve(context))
             is ImportCompleteContentState.Finished -> {
                 importCompleteImportedRow.setPrimaryText(
                     context.getString(R.string.preOnboardingImportCompleteImported, state.imported),
@@ -99,9 +142,8 @@ class ImportCompleteBinder(
 
     private fun pictogramOf(state: ImportCompleteContentState) = when (state) {
         is ImportCompleteContentState.Finished -> R.drawable.ic_success_96
-        ImportCompleteContentState.Parsing,
-        ImportCompleteContentState.Failed,
-        -> R.drawable.ic_passwords_import_96
+        ImportCompleteContentState.Failed -> R.drawable.ic_passwords_alert_96
+        ImportCompleteContentState.Parsing -> R.drawable.ic_passwords_import_96
     }
 
     private fun titleOf(
@@ -118,12 +160,13 @@ class ImportCompleteBinder(
             add(importCompletePictogram)
             if (importCompleteBody.isVisible) add(importCompleteBody)
             if (importCompleteShimmer.isVisible) add(importCompleteShimmer)
-            if (importCompleteImportedRow.isVisible) add(importCompleteImportedRow)
-            if (importCompleteSkippedRow.isVisible) add(importCompleteSkippedRow)
+            if (importCompleteResultContainer.isVisible) add(importCompleteResultContainer)
         }
     }
 
     private companion object {
         const val STATE_CHANGE_DURATION_MS = 300L
+
+        const val STATE_FADE_DURATION_MS = 150L
     }
 }

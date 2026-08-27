@@ -52,8 +52,6 @@ class CardArrowControllerImpl(
         cardView.setArrowMirrored(next.mirrored)
 
         val target = if (next.atEnd) 1f else 0f
-        // Only a change of end actually travels; a mirror-only change would otherwise animate from and to the
-        // same position.
         val moves = previous != null && previous.atEnd != next.atEnd &&
             previous != CardArrowConfig.Hidden && next != CardArrowConfig.Hidden
         if (animate && moves) {
