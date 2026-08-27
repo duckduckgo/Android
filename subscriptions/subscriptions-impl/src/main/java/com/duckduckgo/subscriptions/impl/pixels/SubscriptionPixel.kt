@@ -180,7 +180,7 @@ enum class SubscriptionPixel(
     APP_SETTINGS_PARTNER_BENEFITS_CLICK(
         baseName = "m_privacy-pro_app-settings_partner-benefits_click",
         type = Count,
-        includedParameters = setOf(ATB, APP_VERSION),
+        includedParameters = setOf(APP_VERSION),
     ),
     SUBSCRIPTION_SETTINGS_CHANGE_PLAN_OR_BILLING_CLICK(
         baseName = "m_privacy-pro_settings_change-plan-or-billing_click",
