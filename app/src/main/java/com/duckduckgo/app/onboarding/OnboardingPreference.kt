@@ -20,11 +20,11 @@ package com.duckduckgo.app.onboarding
  * A setting the user can turn on or off from the onboarding preference selector.
  */
 enum class OnboardingPreference {
-    BLOCK_ADS,
     SEARCH_HISTORY,
     SAFE_SEARCH,
     SEARCH_ASSIST,
     HIDE_AI_GENERATED_IMAGES,
+    BLOCK_ADS,
     REJECT_OPTIONAL_COOKIES,
     ACCEPT_NON_OPT_OUT_COOKIES,
 }

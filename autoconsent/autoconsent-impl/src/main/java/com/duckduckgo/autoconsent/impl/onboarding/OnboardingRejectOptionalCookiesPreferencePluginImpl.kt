@@ -51,7 +51,7 @@ class OnboardingRejectOptionalCookiesPreferencePluginImpl @Inject constructor(
 
     override suspend fun apply(enabled: Boolean) {
         // Persisting a value that already applies would turn the remote default into an explicit user
-        // choice, so the setting would stop following a later change to that default.
+        // choice, which can impact later default change or pixels.
         if (enabled == autoconsent.isSettingEnabled()) return
         autoconsent.changeSetting(enabled)
     }
