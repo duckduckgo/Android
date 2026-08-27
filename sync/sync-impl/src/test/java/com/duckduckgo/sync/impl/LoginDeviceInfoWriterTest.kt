@@ -24,6 +24,8 @@ import com.duckduckgo.sync.TestSyncFixtures.token
 import com.duckduckgo.sync.TestSyncFixtures.userId
 import com.duckduckgo.sync.crypto.EncryptBytesResult
 import com.duckduckgo.sync.crypto.SyncLib
+import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.pixels.UnifiedDeviceListPixel
 import com.duckduckgo.sync.store.ScopedPassword
 import com.duckduckgo.sync.store.SyncStore
 import kotlinx.coroutines.runBlocking
@@ -39,6 +41,7 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
@@ -50,6 +53,7 @@ class LoginDeviceInfoWriterTest {
     private val nativeLib: SyncLib = mock()
     private val deviceInfoMigrator: DeviceInfoMigrator = mock()
     private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
+    private val syncPixels: SyncPixels = mock()
 
     @get:Rule
     val coroutineTestRule = CoroutineTestRule()
@@ -68,7 +72,9 @@ class LoginDeviceInfoWriterTest {
             nativeLib = nativeLib,
             deviceInfoMigrator = deviceInfoMigrator,
             dispatchers = coroutineTestRule.testDispatcherProvider,
+            syncPixels = syncPixels,
         )
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(enable = true))
         syncFeature.canWriteUnifiedDeviceList().setRawStoredState(State(enable = true))
         whenever(syncStore.token).thenReturn(token)
         whenever(syncStore.secretKey).thenReturn(secretKey)
@@ -115,6 +121,7 @@ class LoginDeviceInfoWriterTest {
             },
         )
         verify(deviceInfoMigrator).ensureMigrated()
+        verify(syncPixels).fireUnifiedDeviceListPixel(UnifiedDeviceListPixel.AccountInfoKeyWrapSuccess)
     }
 
     @Test
@@ -136,6 +143,9 @@ class LoginDeviceInfoWriterTest {
 
         verify(syncApi, never()).setKeysIfAbsent(any(), any(), any())
         verify(deviceInfoMigrator).ensureMigrated()
+        verify(syncPixels).fireUnifiedDeviceListPixel(
+            UnifiedDeviceListPixel.AccountInfoKeyWrapFailed(UnifiedDeviceListPixel.AccountInfoKeyWrapFailureReason.UNWRAP_FAILED),
+        )
     }
 
     @Test
@@ -149,6 +159,41 @@ class LoginDeviceInfoWriterTest {
 
         assertTrue(result is Result.Success)
         verify(deviceInfoMigrator).ensureMigrated()
+        verify(syncPixels).fireUnifiedDeviceListPixel(
+            UnifiedDeviceListPixel.AccountInfoKeyWrapFailed(UnifiedDeviceListPixel.AccountInfoKeyWrapFailureReason.REQUEST_FAILED),
+        )
+    }
+
+    @Test
+    fun whenSetKeysIfAbsentReportsExistingThenNoWrapPixelFires() = runTest {
+        whenever(protectedKeyUnwrapper.unwrap(any())).thenReturn(Result.Success("rawKey".toByteArray()))
+        whenever(nativeLib.encryptData(any<ByteArray>(), eq(secretKey)))
+            .thenReturn(EncryptBytesResult(0, "ddgWrapped".toByteArray()))
+        whenever(syncApi.setKeysIfAbsent(any(), any(), any())).thenReturn(
+            Result.Success(SetKeysIfAbsentResult.Existing("kid-1", RsaJwk(n = "n", e = "AQAB"))),
+        )
+
+        writer.onLogin(loginResponseKeys = listOf(accountInfoEntry(encryptedWith = CREDENTIAL_ID_3PARTY)))
+
+        verifyNoInteractions(syncPixels)
+        verify(deviceInfoMigrator).ensureMigrated()
+    }
+
+    @Test
+    fun whenSetKeysIfAbsentReportsConflictThenWrapFailedPixelFires() = runTest {
+        whenever(protectedKeyUnwrapper.unwrap(any())).thenReturn(Result.Success("rawKey".toByteArray()))
+        whenever(nativeLib.encryptData(any<ByteArray>(), eq(secretKey)))
+            .thenReturn(EncryptBytesResult(0, "ddgWrapped".toByteArray()))
+        whenever(syncApi.setKeysIfAbsent(any(), any(), any())).thenReturn(
+            Result.Success(SetKeysIfAbsentResult.ExistsFetchRequired),
+        )
+
+        writer.onLogin(loginResponseKeys = listOf(accountInfoEntry(encryptedWith = CREDENTIAL_ID_3PARTY)))
+
+        verify(syncPixels).fireUnifiedDeviceListPixel(
+            UnifiedDeviceListPixel.AccountInfoKeyWrapFailed(UnifiedDeviceListPixel.AccountInfoKeyWrapFailureReason.REQUEST_FAILED),
+        )
+        verify(deviceInfoMigrator).ensureMigrated()
     }
 
     @Test
@@ -160,6 +205,17 @@ class LoginDeviceInfoWriterTest {
         assertTrue(result is Result.Success)
         verify(syncApi, never()).setKeysIfAbsent(any(), any(), any())
         verify(deviceInfoMigrator, never()).ensureMigrated()
+    }
+
+    @Test
+    fun whenV2ConnectFlowDisabledThenNothingRuns() = runTest {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(enable = false))
+
+        writer.onLogin(listOf(accountInfoEntry(encryptedWith = CREDENTIAL_ID_3PARTY)))
+
+        verify(syncApi, never()).setKeysIfAbsent(any(), any(), any())
+        verify(deviceInfoMigrator, never()).ensureMigrated()
+        verifyNoInteractions(syncPixels)
     }
 
     private fun accountInfoEntry(encryptedWith: String) = ProtectedKeyEntry(

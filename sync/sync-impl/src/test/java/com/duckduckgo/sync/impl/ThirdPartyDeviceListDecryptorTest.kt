@@ -24,6 +24,7 @@ import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.ThirdPartyDeviceListDecryptor.Companion.FALLBACK_NAME
 import com.duckduckgo.sync.impl.ThirdPartyDeviceListDecryptor.Companion.FALLBACK_TYPE_3PARTY
+import com.duckduckgo.sync.store.SyncStore
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -45,18 +46,19 @@ class ThirdPartyDeviceListDecryptorTest {
     private val thirdPartyCredentialManager: ThirdPartyCredentialManager = mock()
     private val deviceInfoDecryptor: DeviceInfoDecryptor = mock()
     private val session: Session = mock()
+    private val syncStore: SyncStore = mock()
     private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
 
     private lateinit var decryptor: ThirdPartyDeviceListDecryptor
 
     @Before
     fun before() {
-        decryptor = RealThirdPartyDeviceListDecryptor(fieldDecryptor, thirdPartyCredentialManager, deviceInfoDecryptor, syncFeature)
+        decryptor = RealThirdPartyDeviceListDecryptor(fieldDecryptor, thirdPartyCredentialManager, deviceInfoDecryptor, syncFeature, syncStore)
     }
 
     private fun enableReadFlag() {
         syncFeature.canReadUnifiedDeviceList().setRawStoredState(State(enable = true))
-        whenever(deviceInfoDecryptor.openSession()).thenReturn(Success(session))
+        whenever(deviceInfoDecryptor.openSession()).thenReturn(DeviceInfoSessionResult.Available(session))
     }
 
     @Test
@@ -235,8 +237,8 @@ class ThirdPartyDeviceListDecryptorTest {
     }
 
     @Test
-    fun whenReadFlagOnButNoEntryHasDeviceInfoThenSessionNeverOpenedAndLegacyUsed() {
-        syncFeature.canReadUnifiedDeviceList().setRawStoredState(State(enable = true))
+    fun whenReadFlagOnButNoEntryHasDeviceInfoThenSessionIsOpenedAndLegacyUsed() {
+        enableReadFlag()
         val ddg = DeviceV2(deviceId = "d1", credentialId = "ddg", deviceName = "ENC", deviceInfo = null)
         val tp = DeviceV2(deviceId = "d2", credentialId = "3party", deviceName = "ENC", deviceInfo = "")
         whenever(fieldDecryptor.decrypt(ddg)).thenReturn(Success(DecryptedDevice("d1", "Pixel", "phone")))
@@ -245,7 +247,7 @@ class ThirdPartyDeviceListDecryptorTest {
         val result = decryptor.decryptAll(listOf(ddg, tp), thisDeviceId = null)
 
         assertEquals(2, result.decrypted.size)
-        verify(deviceInfoDecryptor, never()).openSession()
+        verify(deviceInfoDecryptor).openSession()
     }
 
     @Test
@@ -309,7 +311,9 @@ class ThirdPartyDeviceListDecryptorTest {
     @Test
     fun whenReadFlagOnButSessionFailsToOpenThenWholeListDegradesToLegacy() {
         syncFeature.canReadUnifiedDeviceList().setRawStoredState(State(enable = true))
-        whenever(deviceInfoDecryptor.openSession()).thenReturn(Error(reason = "no account_info key"))
+        whenever(deviceInfoDecryptor.openSession()).thenReturn(
+            DeviceInfoSessionResult.Unavailable(AccountInfoKeyUnavailableReason.NO_KEY_ON_SERVER),
+        )
         val ddg = DeviceV2(deviceId = "d1", credentialId = "ddg", deviceName = "ENC", deviceInfo = "info.jwe")
         whenever(fieldDecryptor.decrypt(ddg)).thenReturn(Success(DecryptedDevice("d1", "Legacy Pixel", "phone")))
 
@@ -370,12 +374,15 @@ class ThirdPartyDeviceListDecryptorTest {
 
         val result = decryptor.decryptAll(listOf(own), thisDeviceId = "d1")
 
-        assertFalse(result.thisDeviceInfoUnresolved)
+        assertFalse(result.thisDeviceInfoNeedsRepair)
+        assertEquals(OwnDeviceReadOutcome.ResolvedDeviceInfo, result.ownDeviceReadOutcome)
     }
 
     @Test
     fun whenOwnDeviceInfoIsAbsentThenReportedAsUnresolved() {
         enableReadFlag()
+        whenever(syncStore.userId).thenReturn("user")
+        whenever(syncStore.unifiedDeviceListMigratedForUserId).thenReturn(null)
         val own = DeviceV2(deviceId = "d1", credentialId = "ddg", deviceName = "ENC", deviceInfo = null)
         val other = DeviceV2(deviceId = "d2", credentialId = "ddg", deviceName = "ENC", deviceInfo = "info.jwe")
         whenever(session.decrypt("info.jwe")).thenReturn(Success(DeviceInfoPayload(name = "Chrome", type = "Browser")))
@@ -383,7 +390,28 @@ class ThirdPartyDeviceListDecryptorTest {
 
         val result = decryptor.decryptAll(listOf(own, other), thisDeviceId = "d1")
 
-        assertTrue(result.thisDeviceInfoUnresolved)
+        assertFalse(result.thisDeviceInfoNeedsRepair)
+        assertEquals(
+            OwnDeviceReadOutcome.ResolvedLegacy(DeviceInfoReadFailureReason.NOT_PUBLISHED_YET),
+            result.ownDeviceReadOutcome,
+        )
+    }
+
+    @Test
+    fun whenOwnDeviceInfoIsAbsentAfterMigrationThenReportedAsBlobAbsent() {
+        enableReadFlag()
+        whenever(syncStore.userId).thenReturn("user")
+        whenever(syncStore.unifiedDeviceListMigratedForUserId).thenReturn("user")
+        val own = DeviceV2(deviceId = "d1", credentialId = "ddg", deviceName = "ENC", deviceInfo = null)
+        whenever(fieldDecryptor.decrypt(own)).thenReturn(Success(DecryptedDevice("d1", "Legacy Pixel", "phone")))
+
+        val result = decryptor.decryptAll(listOf(own), thisDeviceId = "d1")
+
+        assertEquals(
+            OwnDeviceReadOutcome.ResolvedLegacy(DeviceInfoReadFailureReason.BLOB_ABSENT),
+            result.ownDeviceReadOutcome,
+        )
+        assertTrue(result.thisDeviceInfoNeedsRepair)
     }
 
     @Test
@@ -395,7 +423,52 @@ class ThirdPartyDeviceListDecryptorTest {
 
         val result = decryptor.decryptAll(listOf(own), thisDeviceId = "d1")
 
-        assertTrue(result.thisDeviceInfoUnresolved)
+        assertTrue(result.thisDeviceInfoNeedsRepair)
+        assertEquals(
+            OwnDeviceReadOutcome.ResolvedLegacy(DeviceInfoReadFailureReason.BLOB_DECRYPT_FAILED),
+            result.ownDeviceReadOutcome,
+        )
+    }
+
+    @Test
+    fun whenSessionCannotOpenThenTypedReasonIsReported() {
+        syncFeature.canReadUnifiedDeviceList().setRawStoredState(State(enable = true))
+        whenever(deviceInfoDecryptor.openSession()).thenReturn(
+            DeviceInfoSessionResult.Unavailable(AccountInfoKeyUnavailableReason.NO_WRAP_FOR_OUR_CREDENTIAL),
+        )
+        val own = DeviceV2(deviceId = "d1", credentialId = "ddg", deviceName = "ENC", deviceInfo = null)
+        whenever(fieldDecryptor.decrypt(own)).thenReturn(Success(DecryptedDevice("d1", "Legacy Pixel", "phone")))
+
+        val result = decryptor.decryptAll(listOf(own), thisDeviceId = "d1")
+
+        assertEquals(AccountInfoKeyUnavailableReason.NO_WRAP_FOR_OUR_CREDENTIAL, result.keyUnavailableReason)
+        assertEquals(null, result.ownDeviceReadOutcome)
+    }
+
+    @Test
+    fun whenOtherDeviceInfoAndLegacyFailThenBothDecryptionAndPlaceholderCredentialsAreReported() {
+        enableReadFlag()
+        val other = DeviceV2(deviceId = "d2", credentialId = "3party", deviceName = "ENC", deviceInfo = "corrupt.jwe")
+        whenever(session.decrypt("corrupt.jwe")).thenReturn(Error(reason = "bad device_info"))
+        whenever(fieldDecryptor.decrypt(other)).thenReturn(Error(reason = "bad legacy"))
+
+        val result = decryptor.decryptAll(listOf(other), thisDeviceId = "d1")
+
+        assertEquals(setOf(DeviceCredential.THIRD_PARTY), result.otherRowFailedDecryptionCredentials)
+        assertEquals(setOf(DeviceCredential.THIRD_PARTY), result.otherRowPlaceholderCredentials)
+    }
+
+    @Test
+    fun whenOtherRowOmitsCredentialThenNoneIsReportedForBothFailurePixels() {
+        enableReadFlag()
+        val other = DeviceV2(deviceId = "d2", credentialId = null, deviceName = "ENC", deviceInfo = "corrupt.jwe")
+        whenever(session.decrypt("corrupt.jwe")).thenReturn(Error(reason = "bad device_info"))
+        whenever(fieldDecryptor.decrypt(other)).thenReturn(Error(reason = "bad legacy"))
+
+        val result = decryptor.decryptAll(listOf(other), thisDeviceId = "d1")
+
+        assertEquals(setOf(DeviceCredential.NONE), result.otherRowFailedDecryptionCredentials)
+        assertEquals(setOf(DeviceCredential.NONE), result.otherRowPlaceholderCredentials)
     }
 
     @Test
@@ -408,7 +481,7 @@ class ThirdPartyDeviceListDecryptorTest {
 
         val result = decryptor.decryptAll(listOf(own, other), thisDeviceId = "d1")
 
-        assertFalse(result.thisDeviceInfoUnresolved)
+        assertFalse(result.thisDeviceInfoNeedsRepair)
     }
 
     @Test
@@ -419,7 +492,18 @@ class ThirdPartyDeviceListDecryptorTest {
 
         val result = decryptor.decryptAll(listOf(other), thisDeviceId = "d1")
 
-        assertFalse(result.thisDeviceInfoUnresolved)
+        assertFalse(result.thisDeviceInfoNeedsRepair)
+    }
+
+    @Test
+    fun whenThisDeviceIdIsUnknownThenOrphanRowIsNotTreatedAsOwn() {
+        enableReadFlag()
+        val orphan = DeviceV2(deviceId = null, credentialId = "ddg", deviceName = "ENC", deviceInfo = null)
+        whenever(fieldDecryptor.decrypt(orphan)).thenReturn(Error(reason = "missing device id"))
+
+        val result = decryptor.decryptAll(listOf(orphan), thisDeviceId = null)
+
+        assertEquals(null, result.ownDeviceReadOutcome)
     }
 
     @Test
@@ -430,7 +514,7 @@ class ThirdPartyDeviceListDecryptorTest {
 
         val result = decryptor.decryptAll(listOf(own), thisDeviceId = "d1")
 
-        assertFalse(result.thisDeviceInfoUnresolved)
+        assertFalse(result.thisDeviceInfoNeedsRepair)
     }
 
     @Test
