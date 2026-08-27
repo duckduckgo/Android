@@ -230,12 +230,14 @@ class OnboardingStoreImpl @Inject constructor(
         return preferences.getBoolean(KEY_DUCK_AI_ONBOARDING_FLOW, false)
     }
 
-    override fun setSegmentedSearchPathWithToggleEnabled(enabled: Boolean) {
-        preferences.edit { putBoolean(KEY_SEGMENTED_SEARCH_PATH_WITH_TOGGLE_ENABLED, enabled) }
+    override fun setSegmentedOnboardingPath(path: SegmentedOnboardingPath) {
+        preferences.edit { putString(KEY_SEGMENTED_ONBOARDING_PATH, path.name) }
     }
 
-    override fun isSegmentedSearchPathWithToggleEnabled(): Boolean {
-        return preferences.getBoolean(KEY_SEGMENTED_SEARCH_PATH_WITH_TOGGLE_ENABLED, false)
+    override fun getSegmentedPathWithAiInput(): SegmentedOnboardingPath? {
+        if (getInputScreenSelection() != true) return null
+        val stored = preferences.getString(KEY_SEGMENTED_ONBOARDING_PATH, null) ?: return null
+        return SegmentedOnboardingPath.entries.firstOrNull { it.name == stored }
     }
 
     companion object {
@@ -245,6 +247,6 @@ class OnboardingStoreImpl @Inject constructor(
         private const val KEY_INPUT_SCREEN_SELECTION_OVERRIDDEN_BY_USER = "inputScreenSelectionOverriddenByUser"
         private const val KEY_DUCK_AI_ONBOARDING_FLOW = "duckAiOnboardingFlow"
         private const val KEY_LINEAR_PLAN_WIDGET_PROMPT_SHOWN = "linearPlanWidgetPromptShown"
-        private const val KEY_SEGMENTED_SEARCH_PATH_WITH_TOGGLE_ENABLED = "segmentedSearchPathWithToggleEnabled"
+        private const val KEY_SEGMENTED_ONBOARDING_PATH = "segmentedOnboardingPath"
     }
 }

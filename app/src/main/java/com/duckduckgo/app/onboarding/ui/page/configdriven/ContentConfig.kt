@@ -21,6 +21,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.onboarding.OnboardingPreference
 import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
+import com.duckduckgo.onboarding.api.OnboardingSingleChoiceDataPlugin.Option
 
 /** A screen with working state the user edits before submitting. */
 interface Stateful<S : Any> {
@@ -117,6 +118,32 @@ sealed interface ContentConfig {
 
         override fun initialState() = PreferenceSelectorContentState(rows.associate { it.preference to it.initiallyEnabled })
     }
+
+    data class SingleChoice(
+        override val title: TextConfig,
+        val body: TextConfig,
+        val rows: List<Option>,
+    ) : ContentConfig, Stateful<SingleChoiceContentState> {
+
+        init {
+            require(rows.isNotEmpty()) { "A single-choice screen needs at least one row" }
+        }
+
+        override fun initialState() = SingleChoiceContentState(selected = rows.first())
+    }
+
+    data class TogglePosition(
+        override val title: TextConfig,
+        @field:DrawableRes val pictogramLightRes: Int,
+        @field:DrawableRes val pictogramDarkRes: Int,
+        val pictogramCaption: TextConfig,
+        val options: List<Option>,
+    ) : ContentConfig {
+
+        init {
+            require(options.isNotEmpty()) { "A toggle position screen needs at least one option" }
+        }
+    }
 }
 
 data class AddressBarContentState(val position: OmnibarType)
@@ -135,6 +162,8 @@ data class QuickSetupContentState(
 data class DownloadReasonContentState(val selection: DownloadReasonSelection?)
 
 data class PreferenceSelectorContentState(val enabled: Map<OnboardingPreference, Boolean>)
+
+data class SingleChoiceContentState(val selected: Option)
 
 enum class DownloadReasonSelection {
     SEARCH,

@@ -27,4 +27,13 @@
     <!-- Page context attachment -->
     <string name="duckChatPageContextRemoveContentDescription">Remove page context</string>
 
+    <!-- Model provider names, shown in the onboarding provider choice -->
+    <string name="duckChatModelProviderOpenAi">ChatGPT</string>
+    <string name="duckChatModelProviderAnthropic">Claude</string>
+    <string name="duckChatModelProviderMistral">Mistral</string>
+
+    <!-- New tab toggle positions, shown in the onboarding toggle position choice -->
+    <string name="duckChatOnboardingNewTabTogglePositionDuckAi">Open tabs with AI chat</string>
+    <string name="duckChatOnboardingNewTabTogglePositionLastUsed">Not Now</string>
+
 </resources>

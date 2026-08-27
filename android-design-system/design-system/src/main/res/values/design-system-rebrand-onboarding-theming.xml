@@ -18,6 +18,7 @@
 
     <attr name="onboardingTextPrimary" format="color" />
     <attr name="onboardingTextSecondary" format="color" />
+    <attr name="onboardingTextSecondarySmall" format="color" />
     <attr name="onboardingSurfaceBackdrop" format="color" />
     <attr name="onboardingSurfaceTertiary" format="color" />
     <attr name="onboardingSurfaceDecorationPrimary" format="color" />
@@ -39,6 +40,10 @@
     <attr name="onboardingShadowPurple" format="color" />
     <attr name="onboardingShadowBlue" format="color" />
     <color name="onboardingBubbleShadowColor">#08000000</color>
+    <color name="onboardingTextSecondarySmallLight">#99242323</color> <!--60%-->
+    <color name="onboardingTextSecondarySmallDark">#D1CECB</color>
+    <attr name="onboardingBorderPrimary" format="color" />
+    <attr name="onboardingBorderTertiary" format="color" />
 
     <!-- Quick setup -->
     <attr name="quickSetupStepNumberText" format="color" />
@@ -50,6 +55,7 @@
         <!--Onboarding Colors-->
         <item name="onboardingTextPrimary">#F5242323</item> <!--96%-->
         <item name="onboardingTextSecondary">#99000000</item> <!--60%-->
+        <item name="onboardingTextSecondarySmall">@color/onboardingTextSecondarySmallLight</item>
         <item name="onboardingSurfaceBackdrop">@color/white</item>
         <item name="onboardingSurfaceTertiary">@color/white</item>
         <item name="onboardingSurfaceDecorationPrimary">#17242323</item> <!--9% Alpha-->
@@ -61,12 +67,14 @@
         <item name="onboardingAccentContentPrimary">@color/white</item>
         <item name="onboardingAccentPrimary">@color/pondwater50</item>
         <item name="onboardingAccentSecondary">@color/mandarin60</item>
-        <item name="onboardingAccentGlowPrimary">#332F95EE</item> <!--20% Alpha-->
+        <item name="onboardingAccentGlowPrimary">#29A1CFF7</item> <!--16% Alpha-->
         <item name="onboardingAccentTextPrimary">@color/pondwater60</item>
         <item name="onboardingAccentTextAlt">@color/pondwater60</item>
         <item name="onboardingControlFillTertiary">@color/black12</item>
         <item name="onboardingShadowPurple">#0F3E228C</item> <!--6% Alpha-->
         <item name="onboardingShadowBlue">#171E42A4</item> <!--9% Alpha-->
+        <item name="onboardingBorderPrimary">@color/black20</item>
+        <item name="onboardingBorderTertiary">#1F242323</item>
 
         <!--Quick setup-->
         <item name="quickSetupStepNumberText">@color/pondwater70</item>
@@ -112,6 +120,7 @@
         <!--Onboarding Colors-->
         <item name="onboardingTextPrimary">@color/white</item>
         <item name="onboardingTextSecondary">#99FFFFFF</item> <!--60%-->
+        <item name="onboardingTextSecondarySmall">@color/onboardingTextSecondarySmallDark</item>
         <item name="onboardingSurfaceBackdrop">#133E7C</item>
         <item name="onboardingSurfaceTertiary">#011D34</item>
         <item name="onboardingSurfaceDecorationPrimary">#0FFFFFFF</item> <!--6% Alpha-->
@@ -123,12 +132,14 @@
         <item name="onboardingAccentContentPrimary">@color/pollen100</item>
         <item name="onboardingAccentPrimary">@color/pondwater40</item>
         <item name="onboardingAccentSecondary">@color/pollen40</item>
-        <item name="onboardingAccentGlowPrimary">#2975B6EB</item> <!--16% Alpha-->
+        <item name="onboardingAccentGlowPrimary">#1FA1CFF7</item> <!--12% Alpha-->
         <item name="onboardingAccentTextPrimary">@color/pondwater40</item>
         <item name="onboardingAccentTextAlt">@color/mandarin30</item>
         <item name="onboardingControlFillTertiary">@color/white24</item>
         <item name="onboardingShadowPurple">#0F070019</item> <!--6% Alpha-->
         <item name="onboardingShadowBlue">#17051133</item> <!--9% Alpha-->
+        <item name="onboardingBorderPrimary">@color/white36</item>
+        <item name="onboardingBorderTertiary">@color/white18</item>
 
         <!--Quick setup-->
         <item name="quickSetupStepNumberText">@color/pondwater0</item>

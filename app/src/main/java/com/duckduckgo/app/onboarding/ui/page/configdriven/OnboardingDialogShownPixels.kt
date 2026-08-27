@@ -58,6 +58,8 @@ class OnboardingDialogShownPixels @Inject constructor(private val pixel: Pixel) 
             NewUserOnboardingActivityDialog.DefaultBrowserPrompt,
             NewUserOnboardingActivityDialog.AddWidget,
             is NewUserOnboardingActivityDialog.PreferenceSelector,
+            is NewUserOnboardingActivityDialog.SingleChoice,
+            is NewUserOnboardingActivityDialog.TogglePosition,
             -> Unit
         }
     }

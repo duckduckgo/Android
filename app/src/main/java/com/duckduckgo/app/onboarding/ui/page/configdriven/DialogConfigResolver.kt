@@ -204,6 +204,34 @@ class DialogConfigResolver @Inject constructor(
             ),
         )
 
+        is NewUserOnboardingActivityDialog.SingleChoice -> DialogConfig(
+            background = OnboardingBackgroundStep.PreferenceSelector,
+            embellishment = Embellishment.LeftWing,
+            cardArrow = CardArrowConfig.AtEnd,
+            content = ContentConfig.SingleChoice(
+                title = TextConfig.Resource(dialog.title),
+                body = TextConfig.Resource(dialog.body),
+                rows = dialog.options,
+            ),
+            primaryCta = CtaConfig(
+                text = TextConfig.Resource(R.string.preOnboardingInputScreenButton),
+                action = CtaAction.Submit,
+            ),
+        )
+
+        is NewUserOnboardingActivityDialog.TogglePosition -> DialogConfig(
+            background = OnboardingBackgroundStep.PreferenceSelector,
+            embellishment = Embellishment.LeftWing,
+            cardArrow = CardArrowConfig.AtEnd,
+            content = ContentConfig.TogglePosition(
+                title = TextConfig.Resource(R.string.aiPathTogglePositionTitle),
+                pictogramLightRes = CommonR.drawable.toggle_ai_chat_default_lighttheme,
+                pictogramDarkRes = CommonR.drawable.toggle_ai_chat_default_darktheme,
+                pictogramCaption = TextConfig.Resource(R.string.aiPathTogglePositionPictogramCaption),
+                options = dialog.options,
+            ),
+        )
+
         is NewUserOnboardingActivityDialog.IntroAnimation,
         NewUserOnboardingActivityDialog.NotificationPermission,
         NewUserOnboardingActivityDialog.DefaultBrowserPrompt,

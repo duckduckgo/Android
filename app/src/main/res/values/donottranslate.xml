@@ -78,6 +78,14 @@
     <string name="searchPathWithToggleEnabledContextualEndPrimaryCta">Try Duck.ai</string>
     <string name="searchPathWithToggleEnabledContextualEndSecondaryCta">Skip</string>
 
+    <string name="aiPathComparisonChartTitle"><![CDATA[You\'re in the right place!<br/>Protections activated.]]></string>
+    <string name="aiPathComparisonChartItem5">Search the web privately with trackers blocked</string>
+    <string name="aiPathModelChoiceTitle">Your chats, your way.</string>
+    <string name="aiPathModelChoiceBody">Change your default AI now, or anytime during chat.</string>
+    <string name="aiPathTogglePositionTitle">Want new tabs to open with AI chat?</string>
+    <string name="aiPathTogglePositionPictogramCaption">You can switch to Search with one tap</string>
+    <string name="aiPathWithToggleEnabledContextualEndDescription">Start a private AI chat with Duck.ai or toggle to Search for protected browsing.</string>
+
     <!-- Browser tab -->
     <string name="browserDuckPlayerShortUrl">Duck Player</string>
 

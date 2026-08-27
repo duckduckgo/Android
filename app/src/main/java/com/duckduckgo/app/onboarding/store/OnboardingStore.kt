@@ -31,6 +31,21 @@ interface OnboardingStore {
     fun setInputScreenSelectionOverriddenByUser()
     fun setDuckAiOnboardingFlow()
     fun isDuckAiOnboardingFlow(): Boolean
-    fun setSegmentedSearchPathWithToggleEnabled(enabled: Boolean)
-    fun isSegmentedSearchPathWithToggleEnabled(): Boolean
+    fun setSegmentedOnboardingPath(path: SegmentedOnboardingPath)
+
+    /**
+     * The segmented path the user is on, but only once that path has opted into the input screen. The
+     * search path only does so if the user enabled the toggle; the AI path always does. Null everywhere
+     * else, including a search path left without the toggle.
+     */
+    fun getSegmentedPathWithAiInput(): SegmentedOnboardingPath?
+}
+
+/**
+ * The branch the user picked on the download reason step. The branches are mutually exclusive, so a
+ * single value keeps the two impossible combinations out of the type.
+ */
+enum class SegmentedOnboardingPath {
+    SEARCH,
+    AI,
 }
