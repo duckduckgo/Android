@@ -19,7 +19,6 @@ package com.duckduckgo.privacy.config.impl.referencetests.trackerallowlist
 import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
-import com.duckduckgo.privacy.config.impl.features.trackerallowlist.OptimizeTrackerAllowListRCWrapper
 import com.duckduckgo.privacy.config.impl.features.trackerallowlist.RealTrackerAllowlist
 import com.duckduckgo.privacy.config.store.TrackerAllowlistEntity
 import com.duckduckgo.privacy.config.store.features.trackerallowlist.TrackerAllowlistRepository
@@ -35,14 +34,12 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.robolectric.ParameterizedRobolectricTestRunner
 import java.lang.reflect.ParameterizedType
-import java.util.concurrent.CopyOnWriteArrayList
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
 class TrackerAllowlistReferenceTest(private val testCase: TestCase) {
 
     private val mockTrackerAllowlistRepository: TrackerAllowlistRepository = mock()
     private val mockFeatureToggle: FeatureToggle = mock()
-    private val mockPrecompileRegexWrapper: OptimizeTrackerAllowListRCWrapper = mock()
 
     companion object {
         private val moshi = Moshi.Builder().build()
@@ -72,27 +69,9 @@ class TrackerAllowlistReferenceTest(private val testCase: TestCase) {
             ),
         )
             .thenReturn(true)
-        whenever(mockPrecompileRegexWrapper.enabled).thenReturn(false)
         mockAllowlist()
 
-        val testee = RealTrackerAllowlist(mockTrackerAllowlistRepository, mockFeatureToggle, mockPrecompileRegexWrapper)
-
-        assertEquals(testCase.isAllowlisted, testee.isAnException(testCase.site, testCase.request))
-    }
-
-    @Test
-    fun whenIsAnExceptionAnFeatureEnableAndPrecompileEnabledThenReturnCorrectValues() {
-        whenever(
-            mockFeatureToggle.isFeatureEnabled(
-                PrivacyFeatureName.TrackerAllowlistFeatureName.value,
-                true,
-            ),
-        )
-            .thenReturn(true)
-        whenever(mockPrecompileRegexWrapper.enabled).thenReturn(true)
-        mockAllowlist()
-
-        val testee = RealTrackerAllowlist(mockTrackerAllowlistRepository, mockFeatureToggle, mockPrecompileRegexWrapper)
+        val testee = RealTrackerAllowlist(mockTrackerAllowlistRepository, mockFeatureToggle)
 
         assertEquals(testCase.isAllowlisted, testee.isAnException(testCase.site, testCase.request))
     }
@@ -106,10 +85,9 @@ class TrackerAllowlistReferenceTest(private val testCase: TestCase) {
             ),
         )
             .thenReturn(false)
-        whenever(mockPrecompileRegexWrapper.enabled).thenReturn(false)
         mockAllowlist()
 
-        val testee = RealTrackerAllowlist(mockTrackerAllowlistRepository, mockFeatureToggle, mockPrecompileRegexWrapper)
+        val testee = RealTrackerAllowlist(mockTrackerAllowlistRepository, mockFeatureToggle)
 
         assertEquals(false, testee.isAnException(testCase.site, testCase.request))
     }
@@ -128,7 +106,6 @@ class TrackerAllowlistReferenceTest(private val testCase: TestCase) {
             val allowlistEntity = jsonAdapter.fromJson(jsonObject.get(it).toString())
             exceptions.add(allowlistEntity!!.copy(domain = it))
         }
-        whenever(mockTrackerAllowlistRepository.exceptions).thenReturn(CopyOnWriteArrayList(exceptions))
         whenever(mockTrackerAllowlistRepository.rulesByDomain).thenReturn(buildRulesByDomain(exceptions))
     }
 

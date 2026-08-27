@@ -66,13 +66,13 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.impl.features.contentblocking.RealContentBlocking
-import com.duckduckgo.privacy.config.impl.features.trackerallowlist.OptimizeTrackerAllowListRCWrapper
 import com.duckduckgo.privacy.config.impl.features.trackerallowlist.RealTrackerAllowlist
 import com.duckduckgo.privacy.config.impl.features.trackerallowlist.TrackerAllowlistFeature
 import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.RealUnprotectedTemporary
 import com.duckduckgo.privacy.config.store.TrackerAllowlistEntity
 import com.duckduckgo.privacy.config.store.features.contentblocking.ContentBlockingRepository
 import com.duckduckgo.privacy.config.store.features.trackerallowlist.TrackerAllowlistRepository
+import com.duckduckgo.privacy.config.store.features.trackerallowlist.buildRulesByDomain
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryRepository
 import com.duckduckgo.request.filterer.api.RequestFilterer
 import com.duckduckgo.request.interception.impl.RealRequestBlocklist
@@ -380,11 +380,8 @@ class RequestBlocklistReferenceTest(private val testCase: TestCase) {
             TrackerAllowlistEntity(entry.key, entry.value.rules)
         } ?: emptyList()
 
-        whenever(trackerAllowlistRepository.exceptions).thenReturn(CopyOnWriteArrayList(allowlistEntries))
-        val precompileWrapper = object : OptimizeTrackerAllowListRCWrapper {
-            override val enabled: Boolean = false
-        }
-        trackerAllowlist = RealTrackerAllowlist(trackerAllowlistRepository, fakeToggle, precompileWrapper)
+        whenever(trackerAllowlistRepository.rulesByDomain).thenReturn(buildRulesByDomain(allowlistEntries))
+        trackerAllowlist = RealTrackerAllowlist(trackerAllowlistRepository, fakeToggle)
     }
 
     private fun setupUserAllowList() {
