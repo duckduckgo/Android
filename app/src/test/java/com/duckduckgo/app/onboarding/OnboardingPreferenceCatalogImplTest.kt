@@ -99,14 +99,14 @@ class OnboardingPreferenceCatalogImplTest {
     // region availability
 
     @Test
-    fun whenHistoryFeatureUnavailableThenSearchHistoryIsNotOffered() = runTest {
+    fun `when history feature unavailable then search history is not offered`() = runTest {
         whenever(navigationHistory.isHistoryFeatureAvailable()).thenReturn(false)
 
         assertNull(rowFor(OnboardingPreference.SEARCH_HISTORY))
     }
 
     @Test
-    fun whenHistoryFeatureAvailableThenSearchHistoryIsOffered() = runTest {
+    fun `when history feature available then search history is offered`() = runTest {
         whenever(navigationHistory.isHistoryFeatureAvailable()).thenReturn(true)
         whenever(navigationHistory.isHistoryUserEnabled()).thenReturn(false)
 
@@ -123,7 +123,7 @@ class OnboardingPreferenceCatalogImplTest {
     }
 
     @Test
-    fun whenSerpSettingsStorageEnabledThenSerpBackedPreferencesAreOffered() = runTest {
+    fun `when serp settings storage enabled then serp backed preferences are offered`() = runTest {
         serpSettingsFeature.storeSerpSettings().setRawStoredState(Toggle.State(enable = true))
         whenever(serpSettingsDataProvider.observeSetting("kp")).thenReturn(flowOf(null))
 
@@ -146,7 +146,7 @@ class OnboardingPreferenceCatalogImplTest {
     }
 
     @Test
-    fun whenSerpSettingsStorageDisabledThenSerpBackedPreferencesAreNotOffered() = runTest {
+    fun `when serp settings storage disabled then serp backed preferences are not offered`() = runTest {
         serpSettingsFeature.storeSerpSettings().setRawStoredState(Toggle.State(enable = false))
 
         assertEquals(
@@ -162,7 +162,7 @@ class OnboardingPreferenceCatalogImplTest {
     }
 
     @Test
-    fun whenCookiePreferencesOfferedThenBothAreOffered() = runTest {
+    fun `when cookie preferences offered then both are offered`() = runTest {
         val offered = testee.offer(
             listOf(OnboardingPreference.REJECT_OPTIONAL_COOKIES, OnboardingPreference.ACCEPT_NON_OPT_OUT_COOKIES),
         )
@@ -174,7 +174,7 @@ class OnboardingPreferenceCatalogImplTest {
     }
 
     @Test
-    fun whenAcceptNonOptOutCookiesOfferedThenItDependsOnRejectingOptionalCookies() = runTest {
+    fun `when accept non opt out cookies offered then it depends on rejecting optional cookies`() = runTest {
         assertEquals(
             OnboardingPreference.REJECT_OPTIONAL_COOKIES,
             acceptNonOptOutCookiesRow()?.dependsOn,
@@ -182,7 +182,7 @@ class OnboardingPreferenceCatalogImplTest {
     }
 
     @Test
-    fun whenRejectOptionalCookiesPluginMissingThenTheDependentAcceptRowIsDroppedToo() = runTest {
+    fun `when reject optional cookies plugin missing then the dependent accept row is dropped too`() = runTest {
         contributedPlugins = listOf(acceptNonOptOutCookiesPlugin)
 
         assertEquals(
@@ -194,12 +194,12 @@ class OnboardingPreferenceCatalogImplTest {
     }
 
     @Test
-    fun whenAcceptNonOptOutCookiesIsOfferedWithoutItsParentThenItIsDropped() = runTest {
+    fun `when accept non opt out cookies is offered without its parent then it is dropped`() = runTest {
         assertNull(rowFor(OnboardingPreference.ACCEPT_NON_OPT_OUT_COOKIES))
     }
 
     @Test
-    fun whenAcceptNonOptOutCookiesPluginMissingThenOnlyRejectIsOffered() = runTest {
+    fun `when accept non opt out cookies plugin missing then only reject is offered`() = runTest {
         contributedPlugins = listOf(rejectOptionalCookiesPlugin)
 
         assertEquals(
@@ -211,7 +211,7 @@ class OnboardingPreferenceCatalogImplTest {
     }
 
     @Test
-    fun whenPreferencesAreOfferedThenRowsFollowTheRequestedOrder() = runTest {
+    fun `when preferences are offered then rows follow the requested order`() = runTest {
         whenever(navigationHistory.isHistoryFeatureAvailable()).thenReturn(true)
         whenever(navigationHistory.isHistoryUserEnabled()).thenReturn(false)
         whenever(serpSettingsDataProvider.observeSetting("kp")).thenReturn(flowOf(null))
@@ -229,7 +229,7 @@ class OnboardingPreferenceCatalogImplTest {
     // region seeds
 
     @Test
-    fun whenSearchHistoryOfferedThenSwitchSeedsFromUserSetting() = runTest {
+    fun `when search history offered then switch seeds from user setting`() = runTest {
         whenever(navigationHistory.isHistoryFeatureAvailable()).thenReturn(true)
         whenever(navigationHistory.isHistoryUserEnabled()).thenReturn(true)
 
@@ -237,61 +237,61 @@ class OnboardingPreferenceCatalogImplTest {
     }
 
     @Test
-    fun whenKpNotStoredThenSafeSearchSeedsOn() = runTest {
+    fun `when kp not stored then safe search seeds on`() = runTest {
         whenever(serpSettingsDataProvider.observeSetting("kp")).thenReturn(flowOf(null))
 
         assertTrue(rowFor(OnboardingPreference.SAFE_SEARCH)!!.initiallyEnabled)
     }
 
     @Test
-    fun whenKpIsOffThenSafeSearchSeedsOff() = runTest {
+    fun `when kp is off then safe search seeds off`() = runTest {
         whenever(serpSettingsDataProvider.observeSetting("kp")).thenReturn(flowOf("-2"))
 
         assertFalse(rowFor(OnboardingPreference.SAFE_SEARCH)!!.initiallyEnabled)
     }
 
     @Test
-    fun whenKpIsOnThenSafeSearchSeedsOn() = runTest {
+    fun `when kp is on then safe search seeds on`() = runTest {
         whenever(serpSettingsDataProvider.observeSetting("kp")).thenReturn(flowOf("-1"))
 
         assertTrue(rowFor(OnboardingPreference.SAFE_SEARCH)!!.initiallyEnabled)
     }
 
     @Test
-    fun whenSettingsFlowCompletesEmptyThenSafeSearchSeedsOn() = runTest {
+    fun `when settings flow completes empty then safe search seeds on`() = runTest {
         whenever(serpSettingsDataProvider.observeSetting("kp")).thenReturn(emptyFlow())
 
         assertTrue(rowFor(OnboardingPreference.SAFE_SEARCH)!!.initiallyEnabled)
     }
 
     @Test
-    fun whenSettingsFlowNeverEmitsThenSafeSearchSeedsOn() = runTest {
+    fun `when settings flow never emits then safe search seeds on`() = runTest {
         whenever(serpSettingsDataProvider.observeSetting("kp")).thenReturn(flow { awaitCancellation() })
 
         assertTrue(rowFor(OnboardingPreference.SAFE_SEARCH)!!.initiallyEnabled)
     }
 
     @Test
-    fun whenSearchAssistAlreadyOnThenOnboardingStillSeedsItOff() = runTest {
+    fun `when search assist already on then onboarding still seeds it off`() = runTest {
         whenever(serpSettingsDataProvider.observeSetting("kbe")).thenReturn(flowOf("3"))
 
         assertFalse(rowFor(OnboardingPreference.SEARCH_ASSIST)!!.initiallyEnabled)
     }
 
     @Test
-    fun whenHideAiGeneratedImagesAlreadyOffThenOnboardingStillSeedsItOn() = runTest {
+    fun `when hide ai generated images already off then onboarding still seeds it on`() = runTest {
         whenever(serpSettingsDataProvider.observeSetting("kbj")).thenReturn(flowOf("-1"))
 
         assertTrue(rowFor(OnboardingPreference.HIDE_AI_GENERATED_IMAGES)!!.initiallyEnabled)
     }
 
     @Test
-    fun whenRejectOptionalCookiesOfferedThenOnboardingSeedsItOn() = runTest {
+    fun `when reject optional cookies offered then onboarding seeds it on`() = runTest {
         assertTrue(rowFor(OnboardingPreference.REJECT_OPTIONAL_COOKIES)!!.initiallyEnabled)
     }
 
     @Test
-    fun whenAcceptNonOptOutCookiesOfferedThenOnboardingSeedsItOff() = runTest {
+    fun `when accept non opt out cookies offered then onboarding seeds it off`() = runTest {
         assertFalse(acceptNonOptOutCookiesRow()!!.initiallyEnabled)
     }
 
@@ -300,70 +300,70 @@ class OnboardingPreferenceCatalogImplTest {
     // region apply
 
     @Test
-    fun whenSearchHistoryAppliedThenUserSettingWritten() = runTest {
+    fun `when search history applied then user setting written`() = runTest {
         testee.apply(mapOf(OnboardingPreference.SEARCH_HISTORY to false))
 
         verify(navigationHistory).setHistoryUserEnabled(false)
     }
 
     @Test
-    fun whenSafeSearchEnabledThenKpSetToOn() = runTest {
+    fun `when safe search enabled then kp set to on`() = runTest {
         testee.apply(mapOf(OnboardingPreference.SAFE_SEARCH to true))
 
         verify(serpSettingsDataProvider).setSetting("kp", "-1")
     }
 
     @Test
-    fun whenSafeSearchDisabledThenKpSetToOff() = runTest {
+    fun `when safe search disabled then kp set to off`() = runTest {
         testee.apply(mapOf(OnboardingPreference.SAFE_SEARCH to false))
 
         verify(serpSettingsDataProvider).setSetting("kp", "-2")
     }
 
     @Test
-    fun whenSearchAssistEnabledThenKbeSetToSometimes() = runTest {
+    fun `when search assist enabled then kbe set to sometimes`() = runTest {
         testee.apply(mapOf(OnboardingPreference.SEARCH_ASSIST to true))
 
         verify(serpSettingsDataProvider).setSetting("kbe", "2")
     }
 
     @Test
-    fun whenSearchAssistDisabledThenKbeSetToNever() = runTest {
+    fun `when search assist disabled then kbe set to never`() = runTest {
         testee.apply(mapOf(OnboardingPreference.SEARCH_ASSIST to false))
 
         verify(serpSettingsDataProvider).setSetting("kbe", "0")
     }
 
     @Test
-    fun whenHideAiGeneratedImagesEnabledThenKbjSetToOn() = runTest {
+    fun `when hide ai generated images enabled then kbj set to on`() = runTest {
         testee.apply(mapOf(OnboardingPreference.HIDE_AI_GENERATED_IMAGES to true))
 
         verify(serpSettingsDataProvider).setSetting("kbj", "1")
     }
 
     @Test
-    fun whenHideAiGeneratedImagesDisabledThenKbjSetToOff() = runTest {
+    fun `when hide ai generated images disabled then kbj set to off`() = runTest {
         testee.apply(mapOf(OnboardingPreference.HIDE_AI_GENERATED_IMAGES to false))
 
         verify(serpSettingsDataProvider).setSetting("kbj", "-1")
     }
 
     @Test
-    fun whenRejectOptionalCookiesAppliedThenThePickReachesItsPlugin() = runTest {
+    fun `when reject optional cookies applied then the pick reaches its plugin`() = runTest {
         testee.apply(mapOf(OnboardingPreference.REJECT_OPTIONAL_COOKIES to true))
 
         assertEquals(listOf(true), rejectOptionalCookiesPlugin.applied)
     }
 
     @Test
-    fun whenAcceptNonOptOutCookiesAppliedThenThePickReachesItsPlugin() = runTest {
+    fun `when accept non opt out cookies applied then the pick reaches its plugin`() = runTest {
         testee.apply(mapOf(OnboardingPreference.ACCEPT_NON_OPT_OUT_COOKIES to false))
 
         assertEquals(listOf(false), acceptNonOptOutCookiesPlugin.applied)
     }
 
     @Test
-    fun whenSeveralSelectionsAppliedThenEachReachesItsOwnSetting() = runTest {
+    fun `when several selections applied then each reaches its own setting`() = runTest {
         testee.apply(
             mapOf(
                 OnboardingPreference.SEARCH_HISTORY to true,
@@ -380,7 +380,7 @@ class OnboardingPreferenceCatalogImplTest {
     // region plugin-backed preferences
 
     @Test
-    fun whenAdBlockingPluginContributedThenBlockAdsRowCarriesItsCopyAndIcon() = runTest {
+    fun `when ad blocking plugin contributed then block ads row carries its copy and icon`() = runTest {
         assertEquals(
             Row(
                 preference = OnboardingPreference.BLOCK_ADS,
@@ -394,21 +394,21 @@ class OnboardingPreferenceCatalogImplTest {
     }
 
     @Test
-    fun whenAdBlockingPluginMissingThenBlockAdsIsNotOffered() = runTest {
+    fun `when ad blocking plugin missing then block ads is not offered`() = runTest {
         contributedPlugins = emptyList()
 
         assertNull(rowFor(OnboardingPreference.BLOCK_ADS))
     }
 
     @Test
-    fun whenBlockAdsAppliedThenThePickReachesTheAdBlockingPlugin() = runTest {
+    fun `when block ads applied then the pick reaches the ad blocking plugin`() = runTest {
         testee.apply(mapOf(OnboardingPreference.BLOCK_ADS to true))
 
         assertEquals(listOf(true), adBlockingPlugin.applied)
     }
 
     @Test
-    fun whenCookiePluginsContributedThenTheirRowsCarryTheirCopyAndIcons() = runTest {
+    fun `when cookie plugins contributed then their rows carry their copy and icons`() = runTest {
         assertEquals(
             listOf(
                 Row(
@@ -434,7 +434,7 @@ class OnboardingPreferenceCatalogImplTest {
     }
 
     @Test
-    fun whenAdBlockingPluginMissingThenApplyingBlockAdsIsANoOp() = runTest {
+    fun `when ad blocking plugin missing then applying block ads is a no op`() = runTest {
         contributedPlugins = emptyList()
 
         testee.apply(mapOf(OnboardingPreference.BLOCK_ADS to true))
@@ -447,13 +447,13 @@ class OnboardingPreferenceCatalogImplTest {
     // region nothing is evaluated ahead of the step that offers it
 
     @Test
-    fun whenTheCatalogIsBuiltThenNothingIsEvaluated() {
+    fun `when the catalog is built then nothing is evaluated`() {
         assertEquals(0, pluginLookups)
         verifyNoInteractions(navigationHistory, serpSettingsDataProvider)
     }
 
     @Test
-    fun whenOneStepOffersItsPreferencesThenNoOtherPreferenceIsEvaluated() = runTest {
+    fun `when one step offers its preferences then no other preference is evaluated`() = runTest {
         whenever(navigationHistory.isHistoryFeatureAvailable()).thenReturn(true)
         whenever(navigationHistory.isHistoryUserEnabled()).thenReturn(false)
 

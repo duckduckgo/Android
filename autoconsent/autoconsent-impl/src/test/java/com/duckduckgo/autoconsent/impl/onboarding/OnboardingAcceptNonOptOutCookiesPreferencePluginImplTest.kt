@@ -58,45 +58,45 @@ class OnboardingAcceptNonOptOutCookiesPreferencePluginImplTest {
     }
 
     @Test
-    fun whenPluginContributedThenItAnswersForTheAcceptNonOptOutCookiesPreference() {
+    fun `when plugin contributed then it answers for the accept non opt out cookies preference`() {
         assertEquals(OnboardingBooleanPreferencePlugin.Id.AcceptNonOptOutCookies, testee.id)
     }
 
     @Test
-    fun whenRowIsDescribedThenAutoconsentNamesAndIllustratesIt() {
+    fun `when row is described then autoconsent names and illustrates it`() {
         assertEquals("Accept some cookies", testee.primaryText)
         assertEquals("Hides more pop-ups by accepting cookies that can't be rejected", testee.secondaryText)
         assertEquals(CommonR.drawable.cookie_color_24, testee.iconRes)
     }
 
     @Test
-    fun whenTheCookiePopUpPreferenceSettingIsOnThenPluginIsActive() = runTest {
+    fun `when the cookie pop up preference setting is on then plugin is active`() = runTest {
         assertTrue(testee.isActive())
     }
 
     @Test
-    fun whenTheCookiePopUpPreferenceSettingIsOffThenPluginIsNotActive() = runTest {
+    fun `when the cookie pop up preference setting is off then plugin is not active`() = runTest {
         autoconsentFeature.cookiePopUpPreferenceSetting().setRawStoredState(Toggle.State(enable = false))
 
         assertFalse(testee.isActive())
     }
 
     @Test
-    fun whenAutoconsentIsKilledRemotelyThenPluginIsNotActive() = runTest {
+    fun `when autoconsent is killed remotely then plugin is not active`() = runTest {
         autoconsentFeature.self().setRawStoredState(Toggle.State(enable = false))
 
         assertFalse(testee.isActive())
     }
 
     @Test
-    fun whenPreferenceAppliedOnThenClickAcceptIsEnabled() = runTest {
+    fun `when preference applied on then click accept is enabled`() = runTest {
         testee.apply(true)
 
         verify(autoconsent).changeClickAcceptEnabled(true)
     }
 
     @Test
-    fun whenPreferenceAppliedOffThenClickAcceptIsDisabled() = runTest {
+    fun `when preference applied off then click accept is disabled`() = runTest {
         testee.apply(false)
 
         verify(autoconsent).changeClickAcceptEnabled(false)

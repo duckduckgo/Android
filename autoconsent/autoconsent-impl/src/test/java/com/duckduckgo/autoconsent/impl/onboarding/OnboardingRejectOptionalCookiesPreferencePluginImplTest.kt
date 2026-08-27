@@ -52,33 +52,33 @@ class OnboardingRejectOptionalCookiesPreferencePluginImplTest {
     )
 
     @Test
-    fun whenPluginContributedThenItAnswersForTheRejectOptionalCookiesPreference() {
+    fun `when plugin contributed then it answers for the reject optional cookies preference`() {
         assertEquals(OnboardingBooleanPreferencePlugin.Id.RejectOptionalCookies, testee.id)
     }
 
     @Test
-    fun whenRowIsDescribedThenAutoconsentNamesAndIllustratesIt() {
+    fun `when row is described then autoconsent names and illustrates it`() {
         assertEquals("Reject optional cookies", testee.primaryText)
         assertEquals("Maximizes privacy and closes cookie pop-ups", testee.secondaryText)
         assertEquals(CommonR.drawable.cookie_blocked_color_24, testee.iconRes)
     }
 
     @Test
-    fun whenAutoconsentIsEnabledRemotelyThenPluginIsActive() = runTest {
+    fun `when autoconsent is enabled remotely then plugin is active`() = runTest {
         autoconsentFeature.self().setRawStoredState(Toggle.State(enable = true))
 
         assertTrue(testee.isActive())
     }
 
     @Test
-    fun whenAutoconsentIsKilledRemotelyThenPluginIsNotActive() = runTest {
+    fun `when autoconsent is killed remotely then plugin is not active`() = runTest {
         autoconsentFeature.self().setRawStoredState(Toggle.State(enable = false))
 
         assertFalse(testee.isActive())
     }
 
     @Test
-    fun whenPreferenceAppliedOnAndAutoconsentIsOffThenAutoconsentIsEnabled() = runTest {
+    fun `when preference applied on and autoconsent is off then autoconsent is enabled`() = runTest {
         whenever(autoconsent.isSettingEnabled()).thenReturn(false)
 
         testee.apply(true)
@@ -87,7 +87,7 @@ class OnboardingRejectOptionalCookiesPreferencePluginImplTest {
     }
 
     @Test
-    fun whenPreferenceAppliedOffAndAutoconsentIsOnThenAutoconsentIsDisabled() = runTest {
+    fun `when preference applied off and autoconsent is on then autoconsent is disabled`() = runTest {
         whenever(autoconsent.isSettingEnabled()).thenReturn(true)
 
         testee.apply(false)
@@ -96,7 +96,7 @@ class OnboardingRejectOptionalCookiesPreferencePluginImplTest {
     }
 
     @Test
-    fun whenPreferenceAppliedToTheValueThatAlreadyAppliesThenNothingIsPersisted() = runTest {
+    fun `when preference applied to the value that already applies then nothing is persisted`() = runTest {
         whenever(autoconsent.isSettingEnabled()).thenReturn(true)
 
         testee.apply(true)
@@ -105,7 +105,7 @@ class OnboardingRejectOptionalCookiesPreferencePluginImplTest {
     }
 
     @Test
-    fun whenPreferenceAppliedToTheValueTheDefaultAlreadyGivesThenNothingIsPersisted() = runTest {
+    fun `when preference applied to the value the default already gives then nothing is persisted`() = runTest {
         whenever(autoconsent.isSettingEnabled()).thenReturn(false)
 
         testee.apply(false)

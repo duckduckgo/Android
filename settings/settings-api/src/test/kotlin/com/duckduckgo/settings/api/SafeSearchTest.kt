@@ -22,13 +22,13 @@ import org.junit.Test
 class SafeSearchTest {
 
     @Test
-    fun whenSerpCodesThenEachOptionHasExpectedCode() {
+    fun `when serp codes then each option has expected code`() {
         assertEquals("-1", SafeSearch.ON.serpCode)
         assertEquals("-2", SafeSearch.OFF.serpCode)
     }
 
     @Test
-    fun whenSerpKeyThenEveryOptionCarriesTheSameKey() {
+    fun `when serp key then every option carries the same key`() {
         SafeSearch.entries.forEach { assertEquals("kp", it.serpKey) }
     }
 }
