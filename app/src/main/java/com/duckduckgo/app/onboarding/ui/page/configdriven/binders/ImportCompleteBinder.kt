@@ -57,6 +57,7 @@ class ImportCompleteBinder(
 
         ContentHandle(
             title = importCompleteTitle,
+            preTitleFadeTargets = listOf(importCompletePictogram),
             fadeTargets = fadeTargets(),
             onContentReady = {
                 stateJob = state.onEach { current ->
@@ -157,7 +158,6 @@ class ImportCompleteBinder(
 
     private fun fadeTargets(): List<View> = with(binding) {
         buildList {
-            add(importCompletePictogram)
             if (importCompleteBody.isVisible) add(importCompleteBody)
             if (importCompleteShimmer.isVisible) add(importCompleteShimmer)
             if (importCompleteResultContainer.isVisible) add(importCompleteResultContainer)

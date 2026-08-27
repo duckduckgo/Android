@@ -262,7 +262,7 @@ class DialogConfigResolver @Inject constructor(
         )
 
         NewUserOnboardingActivityDialog.ImportComplete -> DialogConfig(
-            background = OnboardingBackgroundStep.AddWidget,
+            background = OnboardingBackgroundStep.ImportPasswords,
             embellishment = Embellishment.RightWing,
             cardArrow = CardArrowConfig.AtStartMirrored,
             content = ContentConfig.ImportComplete(
