@@ -455,6 +455,32 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
+    fun `when the no ai path offers preferences then the selector carries the no ai title`() = runTest {
+        whenever(onboardingPreferenceApplier.isAvailable(OnboardingPreference.SEARCH_ASSIST)).thenReturn(true)
+        whenever(onboardingPreferenceApplier.isAvailable(OnboardingPreference.HIDE_AI_GENERATED_IMAGES)).thenReturn(true)
+        whenever(onboardingPreferenceApplier.isEnabled(OnboardingPreference.SEARCH_ASSIST)).thenReturn(true)
+        whenever(onboardingPreferenceApplier.isEnabled(OnboardingPreference.HIDE_AI_GENERATED_IMAGES)).thenReturn(false)
+        startSegmentedAtDownloadReason()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.NO_AI))
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
+        orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
+
+        assertStep(NewUserOnboardingStepIds.PREFERENCE_SELECTOR)
+        val selectorStep = (orchestrator.state.value as InProgress).currentStep as NewUserOnboardingActivityStep
+        assertEquals(
+            NewUserOnboardingActivityDialog.PreferenceSelector(
+                titleRes = R.string.noAiPathPreferenceSelectorTitle,
+                initialSelections = mapOf(
+                    OnboardingPreference.SEARCH_ASSIST to true,
+                    OnboardingPreference.HIDE_AI_GENERATED_IMAGES to false,
+                ),
+            ),
+            selectorStep.resolveDialog(),
+        )
+    }
+
+    @Test
     fun `when the no ai download reason is confirmed then it clears an input screen selection left by an abandoned run`() = runTest {
         startSegmentedAtDownloadReason()
 
@@ -584,7 +610,8 @@ class NewUserOnboardingPlanProviderTest {
         val selectorStep = (orchestrator.state.value as InProgress).currentStep as NewUserOnboardingActivityStep
         assertEquals(
             NewUserOnboardingActivityDialog.PreferenceSelector(
-                mapOf(
+                titleRes = R.string.searchPathPreferenceSelectorTitle,
+                initialSelections = mapOf(
                     OnboardingPreference.SEARCH_HISTORY to false,
                     OnboardingPreference.SAFE_SEARCH to true,
                 ),

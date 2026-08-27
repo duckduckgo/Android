@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.onboarding.orchestrator
 
+import androidx.annotation.StringRes
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.omnibar.OmnibarType
@@ -550,6 +551,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 defaultBrowserPromptStep(),
                 preferenceSelectorStep(
                     ctx,
+                    titleRes = R.string.searchPathPreferenceSelectorTitle,
                     listOf(
                         OnboardingPreference.SEARCH_HISTORY,
                         OnboardingPreference.SAFE_SEARCH,
@@ -600,6 +602,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 defaultBrowserPromptStep(),
                 preferenceSelectorStep(
                     ctx,
+                    titleRes = R.string.noAiPathPreferenceSelectorTitle,
                     listOf(
                         OnboardingPreference.SEARCH_ASSIST,
                         OnboardingPreference.HIDE_AI_GENERATED_IMAGES,
@@ -622,6 +625,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
     private fun preferenceSelectorStep(
         ctx: NewUserOnboardingPlanContext,
+        @StringRes titleRes: Int,
         offered: List<OnboardingPreference>,
     ): NewUserOnboardingActivityStep {
         val preferenceSelections = SuspendMemo { resolvePreferenceSelections(offered) }
@@ -630,7 +634,12 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             pixelName = null,
             showsStepIndicator = true,
             precondition = { preferenceSelections().isNotEmpty() },
-            resolveDialog = { NewUserOnboardingActivityDialog.PreferenceSelector(preferenceSelections()) },
+            resolveDialog = {
+                NewUserOnboardingActivityDialog.PreferenceSelector(
+                    titleRes = titleRes,
+                    preferenceSelections(),
+                )
+            },
             transition = { event ->
                 when (event) {
                     is NewUserOnboardingEvent.PreferenceSelectorConfirmed -> {

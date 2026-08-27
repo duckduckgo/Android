@@ -195,7 +195,7 @@ class DialogConfigResolver @Inject constructor(
             embellishment = Embellishment.LeftWing,
             cardArrow = CardArrowConfig.AtEnd,
             content = ContentConfig.PreferenceSelector(
-                title = TextConfig.Resource(R.string.searchPathPreferenceSelectorTitle),
+                title = TextConfig.Resource(dialog.titleRes),
                 rows = dialog.initialSelections.map { (preference, enabled) -> preferenceRow(preference, enabled) },
             ),
             primaryCta = CtaConfig(

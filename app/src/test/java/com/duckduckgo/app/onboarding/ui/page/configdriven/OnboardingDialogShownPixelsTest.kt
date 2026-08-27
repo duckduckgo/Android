@@ -96,7 +96,12 @@ class OnboardingDialogShownPixelsTest {
         )
         testee.fireFor(NewUserOnboardingActivityDialog.DownloadReason)
         testee.fireFor(NewUserOnboardingActivityDialog.SegmentedComparisonChart(ComparisonChartConfig.SegmentedSearchPath))
-        testee.fireFor(NewUserOnboardingActivityDialog.PreferenceSelector(mapOf(OnboardingPreference.SEARCH_HISTORY to true)))
+        testee.fireFor(
+            NewUserOnboardingActivityDialog.PreferenceSelector(
+                titleRes = R.string.searchPathPreferenceSelectorTitle,
+                initialSelections = mapOf(OnboardingPreference.SEARCH_HISTORY to true),
+            ),
+        )
         testee.fireFor(
             NewUserOnboardingActivityDialog.QuickSetup(
                 showSplitOption = true,
