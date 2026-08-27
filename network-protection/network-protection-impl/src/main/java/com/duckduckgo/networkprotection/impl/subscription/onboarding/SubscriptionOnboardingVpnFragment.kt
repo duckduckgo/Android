@@ -104,6 +104,7 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
 
     private var vpnOn = false
     private var activating = false
+    private var showingInfo = false
     private var lastRenderedState: ScreenState? = null
     private var transition: ValueAnimator? = null
 
@@ -126,7 +127,8 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
         binding.subscriptionOnboardingVpnNextButton.setOnClickListener {
             when {
                 activating -> {} // ignore taps while the VPN is being activated
-                vpnOn -> controller.onStepFinished(VPN_STEP_ID, COMPLETED)
+                showingInfo -> controller.onStepFinished(VPN_STEP_ID, COMPLETED) // "Got it" on the info page
+                vpnOn -> showInfoPage() // "Next" on the VPN-on screen opens the info page
                 else -> enableVpn()
             }
         }
@@ -179,7 +181,10 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
                 state.location?.let { binding.subscriptionOnboardingVpnIpAddressLocation.text = it }
                 state.newIpAddress?.let { binding.subscriptionOnboardingVpnNewIpAddressValue.text = it }
                 state.newLocation?.let { binding.subscriptionOnboardingVpnNewIpAddressLocation.text = it }
-                state.toScreenState()?.let(::renderScreenState)
+                // The info page takes over the screen once opened, so ignore connection-state re-renders there.
+                if (!showingInfo) {
+                    state.toScreenState()?.let(::renderScreenState)
+                }
                 renderActivating(state.activating)
             }
             .launchIn(viewLifecycleOwner.lifecycleScope)
@@ -212,8 +217,23 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
         applyState(state, animate)
     }
 
+    /** Opens the "what to know about your VPN" info page (reached from "Next" on the VPN-on screen). */
+    private fun showInfoPage() = with(binding) {
+        showingInfo = true
+        transition?.cancel()
+        subscriptionOnboardingVpnHeaderImage.setImageResource(R.drawable.vpn_lock_feature_128)
+        subscriptionOnboardingVpnHeaderTitle.setText(R.string.subscriptionOnboardingVpnInfoTitle)
+        subscriptionOnboardingVpnStatusContent.gone()
+        subscriptionOnboardingVpnInfoContent.show()
+        subscriptionOnboardingVpnNextButton.icon = null
+        subscriptionOnboardingVpnNextButton.setText(R.string.subscriptionOnboardingVpnInfoGotIt)
+        subscriptionOnboardingVpnSkipButton.gone()
+    }
+
     private fun applyState(state: ScreenState, animate: Boolean) = with(binding) {
         vpnOn = state == ScreenState.VPN_ON
+        subscriptionOnboardingVpnStatusContent.show()
+        subscriptionOnboardingVpnInfoContent.gone()
 
         when (state) {
             ScreenState.VPN_ON -> {

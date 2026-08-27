@@ -17,7 +17,7 @@
 <resources>
 
     <!-- Subscription onboarding - VPN step (placeholder copy) -->
-    <string name="subscriptionOnboardingVpnTitle">VPN step</string>
+    <string name="subscriptionOnboardingVpnTitle">Step 1 of 3</string>
     <string name="subscriptionOnboardingVpnHeaderTitle">DuckDuckGo VPN is Off</string>
     <string name="subscriptionOnboardingVpnHeaderText">Connect to secure all of your device\'s internet traffic. <annotation type="learn_more_link">Learn More</annotation></string>
     <string name="subscriptionOnboardingVpnIpAddressTitle">Your IP Address is Visible</string>
@@ -43,5 +43,15 @@
     <string name="subscriptionOnboardingVpnErrorTitle">Unable to Activate DuckDuckGo VPN</string>
     <string name="subscriptionOnboardingVpnErrorText">To activate, you need to \"Allow\" the DuckDuckGo VPN configuration.</string>
     <string name="subscriptionOnboardingVpnTryAgain">Let\'s Try That Again</string>
+
+    <!-- Subscription onboarding - VPN step, "what to know" info page -->
+    <string name="subscriptionOnboardingVpnInfoTitle">What to know about using your VPN</string>
+    <string name="subscriptionOnboardingVpnInfoGotIt">Got it</string>
+    <string name="subscriptionOnboardingVpnInfoNoCapsTitle">No data or speed caps</string>
+    <string name="subscriptionOnboardingVpnInfoNoCapsText">Stream, download, game, use as much data as you want. Unlike other VPNs, we only throttle connections to prevent abuse or network errors.</string>
+    <string name="subscriptionOnboardingVpnInfoSpeedsTitle">All VPNs affect internet speeds</string>
+    <string name="subscriptionOnboardingVpnInfoSpeedsText">Routing internet traffic through VPNs can cause speed differences. DuckDuckGo VPN is designed to make speed issues imperceptible for most browsing.</string>
+    <string name="subscriptionOnboardingVpnInfoBlockTitle">Some sites &amp; apps block VPNs outright</string>
+    <string name="subscriptionOnboardingVpnInfoBlockText">No matter which VPN you use, you\'ll need to turn it off to use certain sites and apps. For example, banking apps may block VPNs to help prevent fraudulent activity.</string>
 
 </resources>
