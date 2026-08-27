@@ -312,13 +312,15 @@ class RealSyncCodeDispatcher @Inject constructor(
         ExchangeV2State.Host.Aborted -> hostAbortedToOutcome(transition.localTrigger, transition.trigger)
         // Per spec §"Same-account case": not an abort; both devices share an account already.
         ExchangeV2State.SameAccountAbort -> DispatchOutcome.AlreadyConnected
-        ExchangeV2State.Joiner.Done -> {
+        ExchangeV2State.Joiner.Joining -> {
             val received = (transition.trigger as? ExchangeV2Message.RecoveryCodeResponse)?.recoveryCode
-            if (received.isNullOrBlank()) {
-                DispatchOutcome.Failed("joiner_done_missing_recovery_code", NO_RECOVERY_CODE.code)
+            val outcome = if (received.isNullOrBlank()) {
+                DispatchOutcome.Failed("joiner_joining_missing_recovery_code", NO_RECOVERY_CODE.code)
             } else {
                 loginWithV2RecoveryCode(received, peerKind)
             }
+            runner.localTrigger(LocalTrigger.JoinerJoinComplete(outcome.toRecoveryCodeDoneReason())).join()
+            outcome
         }
         ExchangeV2State.Joiner.AbortedByHost -> when (transition.trigger) {
             is ExchangeV2Message.RecoveryCodeDenied ->
@@ -350,6 +352,19 @@ class RealSyncCodeDispatcher @Inject constructor(
             SessionErrorKind.Unknown -> PAIRING_FAILED.code
         }
         return DispatchOutcome.Failed(event.message, code, timeoutStage = event.timeoutStage)
+    }
+
+    // TODO: Check how to map to a correct recovery_code_done.reason
+    private fun DispatchOutcome.toRecoveryCodeDoneReason(): ExchangeV2Message.RecoveryCodeDone.Reason = when {
+        this is DispatchOutcome.LoggedIn || this is DispatchOutcome.AlreadyConnected -> {
+            ExchangeV2Message.RecoveryCodeDone.Reason.Success
+        }
+
+        this is DispatchOutcome.Failed && code in SCOPE_REJECTION_CODES -> {
+            ExchangeV2Message.RecoveryCodeDone.Reason.ScopeRejected
+        }
+
+        else -> ExchangeV2Message.RecoveryCodeDone.Reason.LoginFailed
     }
 
     private fun hostAbortedToOutcome(
@@ -524,5 +539,12 @@ class RealSyncCodeDispatcher @Inject constructor(
 
         // Extracts the major version from the EnvelopeVersionTooNew SessionError message.
         private val VERSION_TOO_NEW_REGEX = Regex("""protocol v(\d+)""")
+
+        private val SCOPE_REJECTION_CODES = setOf(
+            AccountErrorCodes.THIRD_PARTY_ALREADY_UPGRADED.code,
+            AccountErrorCodes.MISSING_3PARTY_CREDENTIAL.code,
+            AccountErrorCodes.UNDECRYPTABLE_3PARTY_CREDENTIAL.code,
+            AccountErrorCodes.MISSING_3PARTY_KEY.code,
+        )
     }
 }

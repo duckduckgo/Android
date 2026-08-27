@@ -27,8 +27,8 @@ import org.json.JSONObject
  * required to process it) and `payload` (the JWE compact serialization of the encrypted message
  * JSON, whose `kid` header is the sender's channel ID).
  *
- * Spec: Asana 1215056232572321 (Exchange V2 Messages), 1215056232572322 (Exchange V2 Message
- * Sequence State Machine).
+ * Spec: Asana 1215056232572321 (Exchange V2 Messages), 1216906886019334 (Exchange V2.1 Messages)
+ * 1215056232572322 (Exchange V2 Message Sequence State Machine).
  */
 sealed interface ExchangeV2Message {
     /**
@@ -65,7 +65,7 @@ sealed interface ExchangeV2Message {
         val publicKey: String,
         val version: ExchangeProtocolVersion,
     ) : ExchangeV2Message {
-        override val messageType: String = TYPE
+        override val messageType get() = TYPE
         override val protocolVersion get() = ExchangeProtocolVersion.V2_0
 
         companion object {
@@ -120,7 +120,7 @@ sealed interface ExchangeV2Message {
         val name: String,
         val kind: String,
     ) : ExchangeV2Message {
-        override val messageType: String = TYPE
+        override val messageType get() = TYPE
         override val protocolVersion get() = ExchangeProtocolVersion.V2_0
 
         companion object {
@@ -174,7 +174,7 @@ sealed interface ExchangeV2Message {
         val name: String,
         val kind: String,
     ) : ExchangeV2Message {
-        override val messageType: String = TYPE
+        override val messageType get() = TYPE
         override val protocolVersion get() = ExchangeProtocolVersion.V2_0
 
         companion object {
@@ -215,7 +215,7 @@ sealed interface ExchangeV2Message {
     data class RecoveryCodeAwaitingConfirmation(
         override val rawJson: String,
     ) : ExchangeV2Message {
-        override val messageType: String = TYPE
+        override val messageType get() = TYPE
         override val protocolVersion get() = ExchangeProtocolVersion.V2_0
 
         companion object {
@@ -236,7 +236,7 @@ sealed interface ExchangeV2Message {
     data class RecoveryCodeConfirmed(
         override val rawJson: String,
     ) : ExchangeV2Message {
-        override val messageType: String = TYPE
+        override val messageType get() = TYPE
         override val protocolVersion get() = ExchangeProtocolVersion.V2_0
 
         companion object {
@@ -255,7 +255,7 @@ sealed interface ExchangeV2Message {
     data class RecoveryCodeDenied(
         override val rawJson: String,
     ) : ExchangeV2Message {
-        override val messageType: String = TYPE
+        override val messageType get() = TYPE
         override val protocolVersion get() = ExchangeProtocolVersion.V2_0
 
         companion object {
@@ -274,7 +274,7 @@ sealed interface ExchangeV2Message {
     data class RecoveryCodeUnavailable(
         override val rawJson: String,
     ) : ExchangeV2Message {
-        override val messageType: String = TYPE
+        override val messageType get() = TYPE
         override val protocolVersion get() = ExchangeProtocolVersion.V2_0
 
         companion object {
@@ -296,7 +296,7 @@ sealed interface ExchangeV2Message {
         override val rawJson: String,
         val recoveryCode: String,
     ) : ExchangeV2Message {
-        override val messageType: String = TYPE
+        override val messageType get() = TYPE
         override val protocolVersion get() = ExchangeProtocolVersion.V2_0
 
         companion object {
@@ -313,6 +313,67 @@ sealed interface ExchangeV2Message {
                 return RecoveryCodeResponse(
                     rawJson = rawJson,
                     recoveryCode = json.optString(FIELD_RECOVERY_CODE, ""),
+                )
+            }
+        }
+    }
+
+    /**
+     * Sent by the Joiner once it has finished using the recovery code, carrying the real outcome so
+     * the Host can show it instead of assuming success. Only valid after `recovery_code_response`.
+     */
+    data class RecoveryCodeDone(
+        override val rawJson: String,
+        val reason: Reason,
+    ) : ExchangeV2Message {
+        override val messageType get() = TYPE
+        override val protocolVersion get() = ExchangeProtocolVersion.V2_1
+
+        sealed interface Reason {
+            val value: String
+
+            data object Success : Reason {
+                override val value = "success"
+            }
+
+            data object LoginFailed : Reason {
+                override val value = "login_failed"
+            }
+
+            data object ScopeRejected : Reason {
+                override val value = "scope_rejected"
+            }
+
+            data class Unknown(
+                val rawValue: String,
+            ) : Reason {
+                override val value get() = rawValue
+            }
+
+            companion object {
+                fun fromJsonValue(value: String): Reason = when (value) {
+                    Success.value -> Success
+                    LoginFailed.value -> LoginFailed
+                    ScopeRejected.value -> ScopeRejected
+                    else -> Unknown(value)
+                }
+            }
+        }
+
+        companion object {
+            const val TYPE = "recovery_code_done"
+            private const val FIELD_REASON = "reason"
+
+            fun create(reason: Reason) = RecoveryCodeDone(
+                rawJson = buildMessageJson(TYPE) { put(FIELD_REASON, reason.value) },
+                reason = reason,
+            )
+
+            fun fromJson(rawJson: String): RecoveryCodeDone {
+                val json = JSONObject(rawJson)
+                return RecoveryCodeDone(
+                    rawJson = rawJson,
+                    reason = Reason.fromJsonValue(json.optString(FIELD_REASON, "")),
                 )
             }
         }

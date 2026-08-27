@@ -46,6 +46,7 @@ import com.duckduckgo.sync.impl.exchange.v2.SessionErrorKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
@@ -83,6 +84,7 @@ class RealSyncCodeDispatcherTest {
             val sinceMs = invocation.getArgument<Long>(0)
             runnerEventsFlow.filter { event -> event.timestampMs >= sinceMs }
         }
+        whenever(it.localTrigger(any())).thenAnswer { Job().apply { complete() } }
     }
 
     private val dispatcher = RealSyncCodeDispatcher(
@@ -479,15 +481,15 @@ class RealSyncCodeDispatcherTest {
         whenever(qrCode.parse(any())).thenReturn(
             ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = ExchangeProtocolVersion.V2_0),
         )
-        val staleJoinerDone = ExchangeV2Event.Transition(
+        val staleJoinerJoining = ExchangeV2Event.Transition(
             timestampMs = 1L,
             from = ExchangeV2State.Joiner.Waiting,
-            to = ExchangeV2State.Joiner.Done,
+            to = ExchangeV2State.Joiner.Joining,
             trigger = ExchangeV2Message.RecoveryCodeResponse.create(recoveryCode = "stale-code-from-prior-session"),
             localTrigger = null,
         )
         val staleFlow = MutableSharedFlow<ExchangeV2Event>(replay = 10)
-        staleFlow.tryEmit(staleJoinerDone)
+        staleFlow.tryEmit(staleJoinerJoining)
         whenever(runner.events).thenReturn(staleFlow)
         whenever(runner.eventsSince(any())).thenAnswer { invocation ->
             val sinceMs = invocation.getArgument<Long>(0)
@@ -544,7 +546,7 @@ class RealSyncCodeDispatcherTest {
                 ExchangeV2Event.Transition(
                     timestampMs = System.currentTimeMillis(),
                     from = ExchangeV2State.Joiner.Waiting,
-                    to = ExchangeV2State.Joiner.Done,
+                    to = ExchangeV2State.Joiner.Joining,
                     trigger = ExchangeV2Message.RecoveryCodeResponse.create(recoveryCode = recoveryCodeB64),
                     localTrigger = null,
                 ),
@@ -812,12 +814,12 @@ class RealSyncCodeDispatcherTest {
         }
     }
 
-    @Test fun `Presenter emits Failed when Joiner_Done arrives without a recovery code`() = runTest {
+    @Test fun `Presenter emits Failed when Joiner_Joining arrives without a recovery code`() = runTest {
         dispatcher.presentV2().test {
-            runnerEventsFlow.emit(transition(from = ExchangeV2State.Joiner.Waiting, to = ExchangeV2State.Joiner.Done))
+            runnerEventsFlow.emit(transition(from = ExchangeV2State.Joiner.Waiting, to = ExchangeV2State.Joiner.Joining))
             assertEquals(
                 DispatchOutcome.Failed(
-                    "joiner_done_missing_recovery_code",
+                    "joiner_joining_missing_recovery_code",
                     NO_RECOVERY_CODE.code,
                     path = SetupPath.PAIRING,
                     myRole = SetupRole.JOINER,
@@ -828,7 +830,7 @@ class RealSyncCodeDispatcherTest {
         }
     }
 
-    @Test fun `Presenter emits LoggedIn when Joiner_Done carries a cid=ddg recovery code`() = runTest {
+    @Test fun `Presenter emits LoggedIn when Joiner_Joining carries a cid=ddg recovery code`() = runTest {
         val recoveryJson = JSONObject().apply {
             put(
                 "recovery",
@@ -853,7 +855,7 @@ class RealSyncCodeDispatcherTest {
                 ExchangeV2Event.Transition(
                     timestampMs = System.currentTimeMillis(),
                     from = ExchangeV2State.Joiner.Waiting,
-                    to = ExchangeV2State.Joiner.Done,
+                    to = ExchangeV2State.Joiner.Joining,
                     trigger = responseMessage,
                     localTrigger = null,
                 ),
@@ -865,7 +867,7 @@ class RealSyncCodeDispatcherTest {
         verify(syncAccountRepository, never()).joinAccountFromThirdPartyRecoveryCode(any())
     }
 
-    @Test fun `Presenter emits LoggedIn via 3party upgrade when Joiner_Done carries a cid=3party recovery code`() = runTest {
+    @Test fun `Presenter emits LoggedIn via 3party upgrade when Joiner_Joining carries a cid=3party recovery code`() = runTest {
         val recoveryJson = JSONObject().apply {
             put(
                 "recovery",
@@ -889,7 +891,7 @@ class RealSyncCodeDispatcherTest {
                 ExchangeV2Event.Transition(
                     timestampMs = System.currentTimeMillis(),
                     from = ExchangeV2State.Joiner.Waiting,
-                    to = ExchangeV2State.Joiner.Done,
+                    to = ExchangeV2State.Joiner.Joining,
                     trigger = responseMessage,
                     localTrigger = null,
                 ),
@@ -1175,9 +1177,9 @@ class RealSyncCodeDispatcherTest {
         }
     }
 
-    @Test fun `Scanner - Joiner_Done without recovery code maps to Failed NO_RECOVERY_CODE`() = runTest {
+    @Test fun `Scanner - Joiner_Joining without recovery code maps to Failed NO_RECOVERY_CODE`() = runTest {
         startLinking().test {
-            runnerEventsFlow.emit(transition(from = ExchangeV2State.Joiner.Waiting, to = ExchangeV2State.Joiner.Done))
+            runnerEventsFlow.emit(transition(from = ExchangeV2State.Joiner.Waiting, to = ExchangeV2State.Joiner.Joining))
             assertEquals(NO_RECOVERY_CODE.code, (awaitItem() as DispatchOutcome.Failed).code)
             cancelAndIgnoreRemainingEvents()
         }
@@ -1249,7 +1251,7 @@ class RealSyncCodeDispatcherTest {
         }
     }
 
-    @Test fun `Presenter emits Failed when Joiner_Done carries a recovery code with unknown cid`() = runTest {
+    @Test fun `Presenter emits Failed when Joiner_Joining carries a recovery code with unknown cid`() = runTest {
         val recoveryJson = JSONObject().apply {
             put(
                 "recovery",
@@ -1272,7 +1274,7 @@ class RealSyncCodeDispatcherTest {
                 ExchangeV2Event.Transition(
                     timestampMs = System.currentTimeMillis(),
                     from = ExchangeV2State.Joiner.Waiting,
-                    to = ExchangeV2State.Joiner.Done,
+                    to = ExchangeV2State.Joiner.Joining,
                     trigger = responseMessage,
                     localTrigger = null,
                 ),

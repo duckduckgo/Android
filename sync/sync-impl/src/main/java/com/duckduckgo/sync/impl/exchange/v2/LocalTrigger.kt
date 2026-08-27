@@ -16,6 +16,9 @@
 
 package com.duckduckgo.sync.impl.exchange.v2
 
+import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeDone
+
 /**
  * Side-effect-free transitions driven by something other than an inbound wire message
  * (user input, role election by the runner, completion of an outbound send).
@@ -31,7 +34,13 @@ sealed interface LocalTrigger {
      * Host has finished delivering [ExchangeV2Message.RecoveryCodeResponse] (or one of its
      * negative siblings) and is leaving the [ExchangeV2State.Host.Sending] state.
      */
-    data object HostSendComplete : LocalTrigger
+    data class HostSendComplete(val negotiatedVersion: ExchangeProtocolVersion.V2) : LocalTrigger
+
+    /**
+     * The Joiner has finished applying the recovery code, for better or worse. Carries the outcome
+     * so the state machine can both pick a terminal and declare the `recovery_code_done` to send.
+     */
+    data class JoinerJoinComplete(val reason: RecoveryCodeDone.Reason) : LocalTrigger
 
     /**
      * Host couldn't produce a recovery code for the peer (e.g. not signed in, or no 3party

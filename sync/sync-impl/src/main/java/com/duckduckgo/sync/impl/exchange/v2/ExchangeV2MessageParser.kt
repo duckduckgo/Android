@@ -41,6 +41,7 @@ class JsonExchangeV2MessageParser @Inject constructor() : ExchangeV2MessageParse
                 ExchangeV2Message.RecoveryCodeDenied.TYPE -> ExchangeV2Message.RecoveryCodeDenied.fromJson(rawJson)
                 ExchangeV2Message.RecoveryCodeUnavailable.TYPE -> ExchangeV2Message.RecoveryCodeUnavailable.fromJson(rawJson)
                 ExchangeV2Message.RecoveryCodeResponse.TYPE -> ExchangeV2Message.RecoveryCodeResponse.fromJson(rawJson)
+                ExchangeV2Message.RecoveryCodeDone.TYPE -> ExchangeV2Message.RecoveryCodeDone.fromJson(rawJson)
                 else -> ExchangeV2Message.Unknown.fromJson(rawJson, messageType = type)
             }
         }.getOrElse { ExchangeV2Message.Unknown.fromJson(rawJson, messageType = type) }

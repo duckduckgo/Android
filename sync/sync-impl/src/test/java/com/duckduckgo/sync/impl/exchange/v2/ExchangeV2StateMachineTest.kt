@@ -16,11 +16,13 @@
 
 package com.duckduckgo.sync.impl.exchange.v2
 
+import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.Hello
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeAvailable
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeAwaitingConfirmation
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeConfirmed
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeDenied
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeDone
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeRequest
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeResponse
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeUnavailable
@@ -245,10 +247,10 @@ class ExchangeV2StateMachineTest {
         assertSame(ExchangeV2State.Host.Aborted, machine.currentState)
     }
 
-    @Test fun `when HostSendComplete in Host Sending then advances to Host Done`() {
+    @Test fun `when HostSendComplete against a v2 peer in Host Sending then advances to Host Done`() {
         val machine = inHostConfirming()
         machine.localTrigger(LocalTrigger.UserConfirmedHost)
-        val result = machine.localTrigger(LocalTrigger.HostSendComplete)
+        val result = machine.localTrigger(LocalTrigger.HostSendComplete(ExchangeProtocolVersion.V2_0))
 
         assertSame(TransitionOutcome.Accepted, result.outcome)
         assertSame(ExchangeV2State.Host.Done, machine.currentState)
@@ -394,12 +396,12 @@ class ExchangeV2StateMachineTest {
         assertSame(ExchangeV2State.Joiner.AbortedByHost, machine.currentState)
     }
 
-    @Test fun `when response received in Joiner Waiting then transitions to Joiner Done`() {
+    @Test fun `when response received in Joiner Waiting then transitions to Joiner Joining`() {
         val machine = inJoinerWaiting()
         val result = machine.receive(RecoveryCodeResponse.fromJson("{}"))
 
         assertSame(TransitionOutcome.Accepted, result.outcome)
-        assertSame(ExchangeV2State.Joiner.Done, machine.currentState)
+        assertSame(ExchangeV2State.Joiner.Joining, machine.currentState)
     }
 
     @Test fun `when negotiation-phase message received in Joiner Waiting then aborts to terminal Joiner AbortedLocal`() {
@@ -528,7 +530,7 @@ class ExchangeV2StateMachineTest {
     @Test fun `when message received in Host Done then state unchanged and outcome is Aborted`() {
         val machine = inHostConfirming().also {
             it.localTrigger(LocalTrigger.UserConfirmedHost)
-            it.localTrigger(LocalTrigger.HostSendComplete)
+            it.localTrigger(LocalTrigger.HostSendComplete(ExchangeProtocolVersion.V2_0))
         }
         assertSame(ExchangeV2State.Host.Done, machine.currentState)
 
@@ -539,7 +541,10 @@ class ExchangeV2StateMachineTest {
     }
 
     @Test fun `when message received in Joiner Done then state unchanged and outcome is Aborted`() {
-        val machine = inJoinerWaiting().also { it.receive(RecoveryCodeResponse.fromJson("{}")) }
+        val machine = inJoinerWaiting().also {
+            it.receive(RecoveryCodeResponse.fromJson("{}"))
+            it.localTrigger(LocalTrigger.JoinerJoinComplete(RecoveryCodeDone.Reason.Success))
+        }
         assertSame(ExchangeV2State.Joiner.Done, machine.currentState)
 
         val result = machine.receive(Hello.fromJson("{}"))
