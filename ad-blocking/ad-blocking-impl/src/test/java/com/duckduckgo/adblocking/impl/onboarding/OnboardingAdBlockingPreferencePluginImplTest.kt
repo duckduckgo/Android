@@ -97,7 +97,7 @@ class OnboardingAdBlockingPreferencePluginImplTest {
 
     @Test
     fun whenAdBlockingIsOnByRemoteDefaultAndPreferenceAppliedOnThenNothingIsPersisted() = runTest {
-        whenever(statusChecker.currentState()).thenReturn(Enabled.Default)
+        whenever(statusChecker.observeState()).thenReturn(flowOf(Enabled.Default))
 
         testee.apply(true)
 
@@ -106,7 +106,7 @@ class OnboardingAdBlockingPreferencePluginImplTest {
 
     @Test
     fun whenAdBlockingIsOnByRemoteDefaultAndPreferenceAppliedOffThenAdBlockingIsDisabled() = runTest {
-        whenever(statusChecker.currentState()).thenReturn(Enabled.Default)
+        whenever(statusChecker.observeState()).thenReturn(flowOf(Enabled.Default))
 
         testee.apply(false)
 
@@ -115,7 +115,7 @@ class OnboardingAdBlockingPreferencePluginImplTest {
 
     @Test
     fun whenAdBlockingIsOffAndPreferenceAppliedOffThenNothingIsPersisted() = runTest {
-        whenever(statusChecker.currentState()).thenReturn(Disabled.Permanent)
+        whenever(statusChecker.observeState()).thenReturn(flowOf(Disabled.Permanent))
 
         testee.apply(false)
 
@@ -124,7 +124,7 @@ class OnboardingAdBlockingPreferencePluginImplTest {
 
     @Test
     fun whenAdBlockingIsOffAndPreferenceAppliedOnThenAdBlockingIsEnabled() = runTest {
-        whenever(statusChecker.currentState()).thenReturn(Disabled.Permanent)
+        whenever(statusChecker.observeState()).thenReturn(flowOf(Disabled.Permanent))
 
         testee.apply(true)
 
@@ -133,7 +133,7 @@ class OnboardingAdBlockingPreferencePluginImplTest {
 
     @Test
     fun whenUserAlreadyEnabledAdBlockingAndPreferenceAppliedOnThenNothingIsPersisted() = runTest {
-        whenever(statusChecker.currentState()).thenReturn(Enabled.UserEnabled)
+        whenever(statusChecker.observeState()).thenReturn(flowOf(Enabled.UserEnabled))
 
         testee.apply(true)
 
@@ -142,7 +142,7 @@ class OnboardingAdBlockingPreferencePluginImplTest {
 
     @Test
     fun whenUserAlreadyEnabledAdBlockingAndPreferenceAppliedOffThenAdBlockingIsDisabled() = runTest {
-        whenever(statusChecker.currentState()).thenReturn(Enabled.UserEnabled)
+        whenever(statusChecker.observeState()).thenReturn(flowOf(Enabled.UserEnabled))
 
         testee.apply(false)
 
@@ -151,7 +151,7 @@ class OnboardingAdBlockingPreferencePluginImplTest {
 
     @Test
     fun whenAdBlockingIsOffForTheSessionAndPreferenceAppliedOffThenAdBlockingIsDisabled() = runTest {
-        whenever(statusChecker.currentState()).thenReturn(Disabled.UntilRelaunch)
+        whenever(statusChecker.observeState()).thenReturn(flowOf(Disabled.UntilRelaunch))
 
         testee.apply(false)
 
@@ -160,7 +160,7 @@ class OnboardingAdBlockingPreferencePluginImplTest {
 
     @Test
     fun whenAdBlockingIsOffForTheSessionAndPreferenceAppliedOnThenAdBlockingIsEnabled() = runTest {
-        whenever(statusChecker.currentState()).thenReturn(Disabled.UntilRelaunch)
+        whenever(statusChecker.observeState()).thenReturn(flowOf(Disabled.UntilRelaunch))
 
         testee.apply(true)
 
@@ -169,7 +169,16 @@ class OnboardingAdBlockingPreferencePluginImplTest {
 
     @Test
     fun whenStateHasNotResolvedYetThenThePickIsPersisted() = runTest {
-        whenever(statusChecker.currentState()).thenReturn(Uninitialized)
+        whenever(statusChecker.observeState()).thenReturn(flowOf(Uninitialized))
+
+        testee.apply(true)
+
+        verify(settingsRepository).setEnabled(true)
+    }
+
+    @Test
+    fun whenStateNeverArrivesThenThePickIsPersisted() = runTest {
+        whenever(statusChecker.observeState()).thenReturn(emptyFlow())
 
         testee.apply(true)
 

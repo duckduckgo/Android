@@ -58,11 +58,12 @@ class OnboardingAdBlockingPreferencePluginImpl @Inject constructor(
     override suspend fun apply(enabled: Boolean) {
         // Persisting a value that already applies would turn the remote default into an explicit user
         // choice, so the setting would stop following a later change to that default.
-        val alreadyApplies = when (statusChecker.currentState()) {
+        val alreadyApplies = when (statusChecker.observeState().firstOrNull()) {
             Enabled.UserEnabled, Enabled.Default -> enabled
             Disabled.Permanent -> !enabled
-            // A session-scoped kill hides the persisted choice, so there is nothing to compare against.
-            Disabled.UntilRelaunch, Uninitialized -> false
+            // A session-scoped kill hides the persisted choice, and a state that never arrives leaves
+            // nothing to compare against.
+            Disabled.UntilRelaunch, Uninitialized, null -> false
         }
         if (!alreadyApplies) {
             settingsRepository.setEnabled(enabled)
