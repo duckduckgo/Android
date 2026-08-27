@@ -39,4 +39,9 @@
     <string name="subscriptionOnboardingVpnNewIpAddressValue">31.120.130.50</string>
     <string name="subscriptionOnboardingVpnNewIpAddressLocation">🇪🇸 Valencia, Spain (Nearest)</string>
 
+    <!-- Subscription onboarding - VPN step, activation error state -->
+    <string name="subscriptionOnboardingVpnErrorTitle">Unable to Activate DuckDuckGo VPN</string>
+    <string name="subscriptionOnboardingVpnErrorText">To activate, you need to \"Allow\" the DuckDuckGo VPN configuration.</string>
+    <string name="subscriptionOnboardingVpnTryAgain">Let\'s Try That Again</string>
+
 </resources>

@@ -31,6 +31,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 class SubscriptionOnboardingVpnViewModelTest {
@@ -78,6 +79,38 @@ class SubscriptionOnboardingVpnViewModelTest {
 
         testee.viewState().test {
             assertFalse(awaitItem().vpnEnabled == true)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenVpnPermissionDeniedThenActivationErrorIsTrue() = runTest {
+        val testee = createViewModel(connectionState = DISCONNECTED)
+
+        testee.onVpnPermissionDenied()
+
+        testee.viewState().test {
+            assertTrue(awaitItem().activationError)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenVpnPermissionGrantedThenVpnStartedAndActivationErrorCleared() = runTest {
+        val networkProtectionState = mock<NetworkProtectionState>().apply {
+            whenever(getConnectionStateFlow()).thenReturn(flowOf(DISCONNECTED))
+        }
+        val testee = SubscriptionOnboardingVpnViewModel(
+            FakeConnectionService(ConnectionInfo(ip = "137.220.87.36", city = "Birmingham", country = "GB")),
+            networkProtectionState,
+            coroutineRule.testDispatcherProvider,
+        )
+
+        testee.onVpnPermissionGranted()
+
+        verify(networkProtectionState).start()
+        testee.viewState().test {
+            assertFalse(awaitItem().activationError)
             cancelAndConsumeRemainingEvents()
         }
     }

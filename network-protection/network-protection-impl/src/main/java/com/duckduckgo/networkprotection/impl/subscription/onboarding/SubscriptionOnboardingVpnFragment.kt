@@ -19,14 +19,17 @@ package com.duckduckgo.networkprotection.impl.subscription.onboarding
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
+import android.app.Activity
 import android.graphics.Color
 import android.graphics.RenderEffect
 import android.graphics.Shader
+import android.net.VpnService
 import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.annotation.AttrRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
@@ -60,12 +63,15 @@ import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 
 /**
- * VPN step of the native subscription onboarding: a placeholder screen with a primary button that completes
- * the step and a secondary button that skips it. Reports back through [SubscriptionOnboardingController] so it
- * stays decoupled from the host activity and the onboarding framework.
+ * VPN step of the native subscription onboarding. The screen reflects the real VPN state and lets the user
+ * turn the VPN on:
+ *  - [ScreenState.VPN_OFF]: the VPN is off; the primary button requests the VPN configuration permission.
+ *  - [ScreenState.VPN_ON]: the VPN is on; the primary button advances to the next onboarding step.
+ *  - [ScreenState.ACTIVATION_ERROR]: the user declined the system VPN permission dialog; the user can retry
+ *    or skip the step.
  *
- * Tapping the header title flips the screen between its "VPN off" and "VPN on" appearances, animating the
- * transition. This is a visual preview only — it does not connect or disconnect the VPN.
+ * Reports back through [SubscriptionOnboardingController] so it stays decoupled from the host activity and
+ * the onboarding framework.
  */
 @InjectWith(FragmentScope::class)
 class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_subscription_onboarding_vpn) {
@@ -85,17 +91,29 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
         ViewModelProvider(this, viewModelFactory)[SubscriptionOnboardingVpnViewModel::class.java]
     }
 
+    private val vpnPermissionRequest = registerForActivityResult(StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            viewModel.onVpnPermissionGranted()
+        } else {
+            viewModel.onVpnPermissionDenied()
+        }
+    }
+
     private var vpnOn = false
-    private var lastRenderedVpnOn: Boolean? = null
+    private var lastRenderedState: ScreenState? = null
     private var transition: ValueAnimator? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        lastRenderedVpnOn = null
-        applyVpnState(animate = false)
+        lastRenderedState = null
+        applyState(ScreenState.VPN_OFF, animate = false)
         observeViewState()
         binding.subscriptionOnboardingVpnNextButton.setOnClickListener {
-            controller.onStepFinished(VPN_STEP_ID, COMPLETED)
+            if (vpnOn) {
+                controller.onStepFinished(VPN_STEP_ID, COMPLETED)
+            } else {
+                enableVpn()
+            }
         }
         binding.subscriptionOnboardingVpnSkipButton.setOnClickListener {
             controller.onStepFinished(VPN_STEP_ID, SKIPPED)
@@ -106,6 +124,19 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
         transition?.cancel()
         transition = null
         super.onDestroyView()
+    }
+
+    /**
+     * Requests the VPN configuration permission. When it is already granted the VPN starts immediately;
+     * otherwise the system consent dialog is shown and the outcome is handled in [vpnPermissionRequest].
+     */
+    private fun enableVpn() {
+        val permissionIntent = VpnService.prepare(requireContext())
+        if (permissionIntent == null) {
+            viewModel.onVpnPermissionGranted()
+        } else {
+            vpnPermissionRequest.launch(permissionIntent)
+        }
     }
 
     /** Sets the header copy and wires its "Learn More" annotation to open the VPN feature info screen. */
@@ -131,40 +162,69 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
             .onEach { state ->
                 state.ipAddress?.let { binding.subscriptionOnboardingVpnIpAddressValue.text = it }
                 state.location?.let { binding.subscriptionOnboardingVpnIpAddressLocation.text = it }
-                state.vpnEnabled?.let(::renderVpnState)
+                state.toScreenState()?.let(::renderScreenState)
             }
             .launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
-    /**
-     * Drives the on/off appearance from the real VPN connection state. The first observed value is rendered
-     * without animation; later changes (the VPN being turned on or off) animate the transition.
-     */
-    private fun renderVpnState(enabled: Boolean) {
-        if (lastRenderedVpnOn == enabled) return
-        val animate = lastRenderedVpnOn != null
-        vpnOn = enabled
-        lastRenderedVpnOn = enabled
-        applyVpnState(animate)
+    private fun SubscriptionOnboardingVpnViewModel.ViewState.toScreenState(): ScreenState? = when {
+        vpnEnabled == true -> ScreenState.VPN_ON
+        activationError -> ScreenState.ACTIVATION_ERROR
+        vpnEnabled == false -> ScreenState.VPN_OFF
+        else -> null
     }
 
-    private fun applyVpnState(animate: Boolean) = with(binding) {
+    /**
+     * The first observed state is rendered without animation; a change to or from the "on" appearance
+     * animates the benefit rows and IP blur (off↔error swaps the header only, so they render instantly).
+     */
+    private fun renderScreenState(state: ScreenState) {
+        if (state == lastRenderedState) return
+        val wasOn = lastRenderedState == ScreenState.VPN_ON
+        val isOn = state == ScreenState.VPN_ON
+        val animate = lastRenderedState != null && wasOn != isOn
+        lastRenderedState = state
+        applyState(state, animate)
+    }
+
+    private fun applyState(state: ScreenState, animate: Boolean) = with(binding) {
+        vpnOn = state == ScreenState.VPN_ON
+
+        when (state) {
+            ScreenState.VPN_ON -> {
+                subscriptionOnboardingVpnHeaderImage.setImageResource(R.drawable.vpn_lock_feature_128)
+                subscriptionOnboardingVpnHeaderTitle.setText(R.string.subscriptionOnboardingVpnHeaderTitleOn)
+                setHeaderTextWithLearnMore(R.string.subscriptionOnboardingVpnHeaderTextOn)
+                subscriptionOnboardingVpnNextButton.setText(R.string.subscriptionOnboardingVpnNext)
+                subscriptionOnboardingVpnSkipButton.gone()
+            }
+
+            ScreenState.VPN_OFF -> {
+                subscriptionOnboardingVpnHeaderImage.setImageResource(R.drawable.vpn_disabled_feature_128)
+                subscriptionOnboardingVpnHeaderTitle.setText(R.string.subscriptionOnboardingVpnHeaderTitle)
+                setHeaderTextWithLearnMore(R.string.subscriptionOnboardingVpnHeaderText)
+                subscriptionOnboardingVpnNextButton.setText(R.string.subscriptionOnboardingVpnTurnOn)
+                subscriptionOnboardingVpnSkipButton.gone()
+            }
+
+            ScreenState.ACTIVATION_ERROR -> {
+                subscriptionOnboardingVpnHeaderImage.setImageResource(R.drawable.critical_update_feature_128)
+                subscriptionOnboardingVpnHeaderTitle.setText(R.string.subscriptionOnboardingVpnErrorTitle)
+                subscriptionOnboardingVpnHeaderText.setText(R.string.subscriptionOnboardingVpnErrorText)
+                subscriptionOnboardingVpnNextButton.setText(R.string.subscriptionOnboardingVpnTryAgain)
+                subscriptionOnboardingVpnSkipButton.show()
+            }
+        }
+
+        // The IP card and info line follow the on/off appearance (the error state looks like "off").
         if (vpnOn) {
-            subscriptionOnboardingVpnHeaderImage.setImageResource(R.drawable.vpn_lock_feature_128)
-            subscriptionOnboardingVpnHeaderTitle.setText(R.string.subscriptionOnboardingVpnHeaderTitleOn)
-            setHeaderTextWithLearnMore(R.string.subscriptionOnboardingVpnHeaderTextOn)
             subscriptionOnboardingVpnIpAddressTitle.setText(R.string.subscriptionOnboardingVpnIpAddressTitleOn)
             subscriptionOnboardingVpnNewIpAddressContainer.show()
             subscriptionOnboardingVpnIpAddressInfo.gone()
-            subscriptionOnboardingVpnNextButton.setText(R.string.subscriptionOnboardingVpnNext)
         } else {
-            subscriptionOnboardingVpnHeaderImage.setImageResource(R.drawable.vpn_disabled_feature_128)
-            subscriptionOnboardingVpnHeaderTitle.setText(R.string.subscriptionOnboardingVpnHeaderTitle)
-            setHeaderTextWithLearnMore(R.string.subscriptionOnboardingVpnHeaderText)
             subscriptionOnboardingVpnIpAddressTitle.setText(R.string.subscriptionOnboardingVpnIpAddressTitle)
             subscriptionOnboardingVpnNewIpAddressContainer.gone()
             subscriptionOnboardingVpnIpAddressInfo.show()
-            subscriptionOnboardingVpnNextButton.setText(R.string.subscriptionOnboardingVpnTurnOn)
         }
 
         val benefitIcon = if (vpnOn) R.drawable.check_circle_color_24 else R.drawable.alert_recolorable_24
@@ -284,6 +344,8 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
             setTextColor(context.getColorFromAttr(restoreColorAttr))
         }
     }
+
+    private enum class ScreenState { VPN_OFF, VPN_ON, ACTIVATION_ERROR }
 
     companion object {
         private const val TRANSITION_DURATION_MS = 1000L

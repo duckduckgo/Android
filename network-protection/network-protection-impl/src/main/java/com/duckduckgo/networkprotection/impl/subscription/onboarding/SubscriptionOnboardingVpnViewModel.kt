@@ -68,15 +68,31 @@ class SubscriptionOnboardingVpnViewModel @Inject constructor(
 
         networkProtectionState.getConnectionStateFlow()
             .onEach { connectionState ->
-                viewState.update { it.copy(vpnEnabled = connectionState.isConnected()) }
+                val connected = connectionState.isConnected()
+                viewState.update {
+                    // Once the VPN is on, any earlier activation error is resolved.
+                    it.copy(vpnEnabled = connected, activationError = if (connected) false else it.activationError)
+                }
             }
             .flowOn(dispatcherProvider.io())
             .launchIn(viewModelScope)
     }
 
+    /** The VPN permission was granted (or already present): clear any error and start the VPN. */
+    fun onVpnPermissionGranted() {
+        viewState.update { it.copy(activationError = false) }
+        networkProtectionState.start()
+    }
+
+    /** The user declined the system VPN configuration dialog: surface the activation error state. */
+    fun onVpnPermissionDenied() {
+        viewState.update { it.copy(activationError = true) }
+    }
+
     data class ViewState(
         // null until the VPN connection state is first observed, so the UI does not flip states prematurely.
         val vpnEnabled: Boolean? = null,
+        val activationError: Boolean = false,
         val ipAddress: String? = null,
         val location: String? = null,
     )
