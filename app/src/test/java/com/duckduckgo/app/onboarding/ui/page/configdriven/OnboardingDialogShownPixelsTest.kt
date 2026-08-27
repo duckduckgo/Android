@@ -20,7 +20,6 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.onboarding.CustomAiOnboardingPixelName
 import com.duckduckgo.app.onboarding.OnboardingPreference
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityDialog
-import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityDialog.PreferenceSelector.Offered
 import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -100,7 +99,15 @@ class OnboardingDialogShownPixelsTest {
         testee.fireFor(
             NewUserOnboardingActivityDialog.PreferenceSelector(
                 titleRes = R.string.searchPathPreferenceSelectorTitle,
-                offered = mapOf(OnboardingPreference.SEARCH_HISTORY to Offered(initiallyEnabled = true)),
+                rows = listOf(
+                    ContentConfig.PreferenceSelector.Row(
+                        preference = OnboardingPreference.SEARCH_HISTORY,
+                        iconRes = null,
+                        primaryText = TextConfig.Literal("history"),
+                        secondaryText = null,
+                        initiallyEnabled = true,
+                    ),
+                ),
             ),
         )
         testee.fireFor(

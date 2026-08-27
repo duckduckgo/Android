@@ -18,7 +18,6 @@ package com.duckduckgo.app.onboarding.ui.page.configdriven
 
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.omnibar.OmnibarType
-import com.duckduckgo.app.onboarding.OnboardingPreference
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityDialog
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
 import com.duckduckgo.app.onboarding.store.OnboardingStore
@@ -196,7 +195,7 @@ class DialogConfigResolver @Inject constructor(
             cardArrow = CardArrowConfig.AtEnd,
             content = ContentConfig.PreferenceSelector(
                 title = TextConfig.Resource(dialog.titleRes),
-                rows = dialog.offered.map { (preference, offered) -> preferenceRow(preference, offered) },
+                rows = dialog.rows,
                 caption = dialog.caption?.let { TextConfig.Resource(it) },
             ),
             primaryCta = CtaConfig(
@@ -249,72 +248,6 @@ class DialogConfigResolver @Inject constructor(
         NewUserOnboardingActivityDialog.DefaultBrowserPrompt,
         NewUserOnboardingActivityDialog.AddWidget,
         -> null // command-only: no card to render
-    }
-
-    private fun preferenceRow(
-        preference: OnboardingPreference,
-        offered: NewUserOnboardingActivityDialog.PreferenceSelector.Offered,
-    ) = when (preference) {
-        OnboardingPreference.BLOCK_ADS -> {
-            // The preference is only offered when its plugin resolves, and the plugin is what carries the copy.
-            val presentation = requireNotNull(offered.presentation) { "$preference was offered without a presentation" }
-            ContentConfig.PreferenceSelector.Row(
-                preference = preference,
-                iconRes = presentation.iconRes,
-                primaryText = TextConfig.Literal(presentation.primaryText),
-                secondaryText = presentation.secondaryText?.let(TextConfig::Literal),
-                initiallyEnabled = offered.initiallyEnabled,
-            )
-        }
-
-        OnboardingPreference.SEARCH_HISTORY -> ContentConfig.PreferenceSelector.Row(
-            preference = preference,
-            iconRes = CommonR.drawable.history_color_24,
-            primaryText = TextConfig.Resource(R.string.searchPathPreferenceHistoryPrimary),
-            secondaryText = TextConfig.Resource(R.string.searchPathPreferenceHistorySecondary),
-            initiallyEnabled = offered.initiallyEnabled,
-        )
-
-        OnboardingPreference.SAFE_SEARCH -> ContentConfig.PreferenceSelector.Row(
-            preference = preference,
-            iconRes = CommonR.drawable.exclamation_color_24,
-            primaryText = TextConfig.Resource(R.string.searchPathPreferenceSafePrimary),
-            secondaryText = TextConfig.Resource(R.string.searchPathPreferenceSafeSecondary),
-            initiallyEnabled = offered.initiallyEnabled,
-        )
-
-        OnboardingPreference.SEARCH_ASSIST -> ContentConfig.PreferenceSelector.Row(
-            preference = preference,
-            iconRes = CommonR.drawable.search_assist_color_24,
-            primaryText = TextConfig.Resource(R.string.noAiPathPreferenceSearchAssistPrimary),
-            secondaryText = TextConfig.Resource(R.string.noAiPathPreferenceSearchAssistSecondary),
-            initiallyEnabled = offered.initiallyEnabled,
-        )
-
-        OnboardingPreference.HIDE_AI_GENERATED_IMAGES -> ContentConfig.PreferenceSelector.Row(
-            preference = preference,
-            iconRes = CommonR.drawable.ai_images_strikethrough_color_24,
-            primaryText = TextConfig.Resource(R.string.noAiPathPreferenceHideAiGeneratedImagesPrimary),
-            secondaryText = TextConfig.Resource(R.string.noAiPathPreferenceHideAiGeneratedImagesSecondary),
-            initiallyEnabled = offered.initiallyEnabled,
-        )
-
-        OnboardingPreference.REJECT_OPTIONAL_COOKIES -> ContentConfig.PreferenceSelector.Row(
-            preference = preference,
-            iconRes = CommonR.drawable.cookie_blocked_color_24,
-            primaryText = TextConfig.Resource(R.string.blockAdsPathPreferenceRejectOptionalCookiesPrimary),
-            secondaryText = TextConfig.Resource(R.string.blockAdsPathPreferenceRejectOptionalCookiesSecondary),
-            initiallyEnabled = offered.initiallyEnabled,
-        )
-
-        OnboardingPreference.ACCEPT_NON_OPT_OUT_COOKIES -> ContentConfig.PreferenceSelector.Row(
-            preference = preference,
-            iconRes = CommonR.drawable.cookie_color_24,
-            primaryText = TextConfig.Resource(R.string.blockAdsPathPreferenceAcceptNonOptOutCookiesPrimary),
-            secondaryText = TextConfig.Resource(R.string.blockAdsPathPreferenceAcceptNonOptOutCookiesSecondary),
-            initiallyEnabled = offered.initiallyEnabled,
-            dependsOn = OnboardingPreference.REJECT_OPTIONAL_COOKIES,
-        )
     }
 
     private fun comparisonChart(chart: ComparisonChartConfig, showEmbellishment: Boolean = true) = DialogConfig(

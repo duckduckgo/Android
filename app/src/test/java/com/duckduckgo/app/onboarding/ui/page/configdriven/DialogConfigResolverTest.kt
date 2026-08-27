@@ -20,10 +20,8 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.onboarding.OnboardingPreference
-import com.duckduckgo.app.onboarding.OnboardingPreferencePresentation
 import com.duckduckgo.app.onboarding.TestOption
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityDialog
-import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityDialog.PreferenceSelector.Offered
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
@@ -100,14 +98,16 @@ class DialogConfigResolverTest {
     }
 
     @Test
-    fun `resolves the preference selector with a row per offered preference and a submitting cta`() {
+    fun `resolves the preference selector by passing its rows through against a submitting cta`() {
+        val rows = listOf(
+            row(OnboardingPreference.SEARCH_HISTORY, initiallyEnabled = true),
+            row(OnboardingPreference.SAFE_SEARCH, initiallyEnabled = false),
+        )
+
         val config = testee.resolve(
             NewUserOnboardingActivityDialog.PreferenceSelector(
                 titleRes = R.string.noAiPathPreferenceSelectorTitle,
-                offered = mapOf(
-                    OnboardingPreference.SEARCH_HISTORY to Offered(initiallyEnabled = true),
-                    OnboardingPreference.SAFE_SEARCH to Offered(initiallyEnabled = false),
-                ),
+                rows = rows,
             ),
             isCustomAiFlow = false,
         )!!
@@ -117,13 +117,8 @@ class DialogConfigResolverTest {
         assertEquals(CardArrowConfig.AtEnd, config.cardArrow)
         val content = config.content as ContentConfig.PreferenceSelector
         assertEquals(TextConfig.Resource(R.string.noAiPathPreferenceSelectorTitle), content.title)
-        assertEquals(
-            listOf(
-                OnboardingPreference.SEARCH_HISTORY to true,
-                OnboardingPreference.SAFE_SEARCH to false,
-            ),
-            content.rows.map { it.preference to it.initiallyEnabled },
-        )
+        assertEquals(rows, content.rows)
+        assertNull(content.caption)
         assertEquals(
             PreferenceSelectorContentState(
                 mapOf(
@@ -137,28 +132,20 @@ class DialogConfigResolverTest {
     }
 
     @Test
-    fun `takes the copy and icon of a plugin backed row from the preference that supplied them`() {
+    fun `resolves the preference selector caption when one is given`() {
         val config = testee.resolve(
             NewUserOnboardingActivityDialog.PreferenceSelector(
                 titleRes = R.string.blockAdsPathPreferenceSelectorTitle,
-                offered = mapOf(
-                    OnboardingPreference.BLOCK_ADS to Offered(
-                        initiallyEnabled = true,
-                        presentation = OnboardingPreferencePresentation(
-                            primaryText = "Block ads",
-                            secondaryText = null,
-                            iconRes = 42,
-                        ),
-                    ),
-                ),
+                rows = listOf(row(OnboardingPreference.BLOCK_ADS, initiallyEnabled = true)),
+                caption = R.string.preferenceChangeInSettingsCaption,
             ),
             isCustomAiFlow = false,
         )!!
 
-        val row = (config.content as ContentConfig.PreferenceSelector).rows.single()
-        assertEquals(TextConfig.Literal("Block ads"), row.primaryText)
-        assertNull(row.secondaryText)
-        assertEquals(42, row.iconRes)
+        assertEquals(
+            TextConfig.Resource(R.string.preferenceChangeInSettingsCaption),
+            (config.content as ContentConfig.PreferenceSelector).caption,
+        )
     }
 
     @Test
@@ -508,4 +495,14 @@ class DialogConfigResolverTest {
         assertNull(config.primaryCta)
         assertNull(config.secondaryCta)
     }
+    private fun row(
+        preference: OnboardingPreference,
+        initiallyEnabled: Boolean,
+    ) = ContentConfig.PreferenceSelector.Row(
+        preference = preference,
+        iconRes = null,
+        primaryText = TextConfig.Literal(preference.name),
+        secondaryText = null,
+        initiallyEnabled = initiallyEnabled,
+    )
 }
