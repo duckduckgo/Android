@@ -22,6 +22,7 @@ import android.view.LayoutInflater
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.res.use
+import androidx.core.view.isVisible
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ViewQuickSetupTwoLineSwitchRowBinding
 import com.duckduckgo.mobile.android.R as CommonR
@@ -68,8 +69,10 @@ class QuickSetupTwoLineSwitchRow @JvmOverloads constructor(
         binding.quickSetupTwoLineSwitchRowPrimaryText.text = text
     }
 
-    fun setSecondaryText(text: CharSequence) {
+    /** A null [text] collapses the second line, leaving the primary text centred against the icon and switch. */
+    fun setSecondaryText(text: CharSequence?) {
         binding.quickSetupTwoLineSwitchRowSecondaryText.text = text
+        binding.quickSetupTwoLineSwitchRowSecondaryText.isVisible = text != null
     }
 
     fun setOnCheckedChangeListener(listener: (Boolean) -> Unit) {

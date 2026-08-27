@@ -196,7 +196,7 @@ class DialogConfigResolver @Inject constructor(
             cardArrow = CardArrowConfig.AtEnd,
             content = ContentConfig.PreferenceSelector(
                 title = TextConfig.Resource(dialog.titleRes),
-                rows = dialog.initialSelections.map { (preference, enabled) -> preferenceRow(preference, enabled) },
+                rows = dialog.offered.map { (preference, offered) -> preferenceRow(preference, offered) },
                 caption = dialog.caption?.let { TextConfig.Resource(it) },
             ),
             primaryCta = CtaConfig(
@@ -251,21 +251,28 @@ class DialogConfigResolver @Inject constructor(
         -> null // command-only: no card to render
     }
 
-    private fun preferenceRow(preference: OnboardingPreference, initiallyEnabled: Boolean) = when (preference) {
-        OnboardingPreference.BLOCK_ADS -> ContentConfig.PreferenceSelector.Row(
-            preference = preference,
-            iconRes = CommonR.drawable.ads_blocked_color_24,
-            primaryText = TextConfig.Resource(R.string.blockAdsPathPreferenceBlockAdsPrimary),
-            secondaryText = TextConfig.Resource(R.string.blockAdsPathPreferenceBlockAdsSecondary),
-            initiallyEnabled = initiallyEnabled,
-        )
+    private fun preferenceRow(
+        preference: OnboardingPreference,
+        offered: NewUserOnboardingActivityDialog.PreferenceSelector.Offered,
+    ) = when (preference) {
+        OnboardingPreference.BLOCK_ADS -> {
+            // The preference is only offered when its plugin resolves, and the plugin is what carries the copy.
+            val presentation = requireNotNull(offered.presentation) { "$preference was offered without a presentation" }
+            ContentConfig.PreferenceSelector.Row(
+                preference = preference,
+                iconRes = presentation.iconRes,
+                primaryText = TextConfig.Literal(presentation.primaryText),
+                secondaryText = presentation.secondaryText?.let(TextConfig::Literal),
+                initiallyEnabled = offered.initiallyEnabled,
+            )
+        }
 
         OnboardingPreference.SEARCH_HISTORY -> ContentConfig.PreferenceSelector.Row(
             preference = preference,
             iconRes = CommonR.drawable.history_color_24,
             primaryText = TextConfig.Resource(R.string.searchPathPreferenceHistoryPrimary),
             secondaryText = TextConfig.Resource(R.string.searchPathPreferenceHistorySecondary),
-            initiallyEnabled = initiallyEnabled,
+            initiallyEnabled = offered.initiallyEnabled,
         )
 
         OnboardingPreference.SAFE_SEARCH -> ContentConfig.PreferenceSelector.Row(
@@ -273,7 +280,7 @@ class DialogConfigResolver @Inject constructor(
             iconRes = CommonR.drawable.exclamation_color_24,
             primaryText = TextConfig.Resource(R.string.searchPathPreferenceSafePrimary),
             secondaryText = TextConfig.Resource(R.string.searchPathPreferenceSafeSecondary),
-            initiallyEnabled = initiallyEnabled,
+            initiallyEnabled = offered.initiallyEnabled,
         )
 
         OnboardingPreference.SEARCH_ASSIST -> ContentConfig.PreferenceSelector.Row(
@@ -281,7 +288,7 @@ class DialogConfigResolver @Inject constructor(
             iconRes = CommonR.drawable.search_assist_color_24,
             primaryText = TextConfig.Resource(R.string.noAiPathPreferenceSearchAssistPrimary),
             secondaryText = TextConfig.Resource(R.string.noAiPathPreferenceSearchAssistSecondary),
-            initiallyEnabled = initiallyEnabled,
+            initiallyEnabled = offered.initiallyEnabled,
         )
 
         OnboardingPreference.HIDE_AI_GENERATED_IMAGES -> ContentConfig.PreferenceSelector.Row(
@@ -289,7 +296,7 @@ class DialogConfigResolver @Inject constructor(
             iconRes = CommonR.drawable.ai_images_strikethrough_color_24,
             primaryText = TextConfig.Resource(R.string.noAiPathPreferenceHideAiGeneratedImagesPrimary),
             secondaryText = TextConfig.Resource(R.string.noAiPathPreferenceHideAiGeneratedImagesSecondary),
-            initiallyEnabled = initiallyEnabled,
+            initiallyEnabled = offered.initiallyEnabled,
         )
 
         OnboardingPreference.REJECT_OPTIONAL_COOKIES -> ContentConfig.PreferenceSelector.Row(
@@ -297,7 +304,7 @@ class DialogConfigResolver @Inject constructor(
             iconRes = CommonR.drawable.cookie_blocked_color_24,
             primaryText = TextConfig.Resource(R.string.blockAdsPathPreferenceRejectOptionalCookiesPrimary),
             secondaryText = TextConfig.Resource(R.string.blockAdsPathPreferenceRejectOptionalCookiesSecondary),
-            initiallyEnabled = initiallyEnabled,
+            initiallyEnabled = offered.initiallyEnabled,
         )
 
         OnboardingPreference.ACCEPT_NON_OPT_OUT_COOKIES -> ContentConfig.PreferenceSelector.Row(
@@ -305,7 +312,7 @@ class DialogConfigResolver @Inject constructor(
             iconRes = CommonR.drawable.cookie_color_24,
             primaryText = TextConfig.Resource(R.string.blockAdsPathPreferenceAcceptNonOptOutCookiesPrimary),
             secondaryText = TextConfig.Resource(R.string.blockAdsPathPreferenceAcceptNonOptOutCookiesSecondary),
-            initiallyEnabled = initiallyEnabled,
+            initiallyEnabled = offered.initiallyEnabled,
             dependsOn = OnboardingPreference.REJECT_OPTIONAL_COOKIES,
         )
     }

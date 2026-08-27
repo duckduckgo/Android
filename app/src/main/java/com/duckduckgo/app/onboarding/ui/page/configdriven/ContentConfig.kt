@@ -113,7 +113,8 @@ sealed interface ContentConfig {
             val preference: OnboardingPreference,
             @DrawableRes val iconRes: Int,
             val primaryText: TextConfig,
-            val secondaryText: TextConfig,
+            /** Null when the row is rendered as a single line. */
+            val secondaryText: TextConfig?,
             val initiallyEnabled: Boolean,
             /** When set, the row is only shown while the preference it names is switched on. */
             val dependsOn: OnboardingPreference? = null,

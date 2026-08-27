@@ -20,8 +20,10 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.onboarding.OnboardingPreference
+import com.duckduckgo.app.onboarding.OnboardingPreferencePresentation
 import com.duckduckgo.app.onboarding.TestOption
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityDialog
+import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityDialog.PreferenceSelector.Offered
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
@@ -102,9 +104,9 @@ class DialogConfigResolverTest {
         val config = testee.resolve(
             NewUserOnboardingActivityDialog.PreferenceSelector(
                 titleRes = R.string.noAiPathPreferenceSelectorTitle,
-                initialSelections = mapOf(
-                    OnboardingPreference.SEARCH_HISTORY to true,
-                    OnboardingPreference.SAFE_SEARCH to false,
+                offered = mapOf(
+                    OnboardingPreference.SEARCH_HISTORY to Offered(initiallyEnabled = true),
+                    OnboardingPreference.SAFE_SEARCH to Offered(initiallyEnabled = false),
                 ),
             ),
             isCustomAiFlow = false,
@@ -132,6 +134,31 @@ class DialogConfigResolverTest {
             content.initialState(),
         )
         assertEquals(CtaAction.Submit, config.primaryCta!!.action)
+    }
+
+    @Test
+    fun `takes the copy and icon of a plugin backed row from the preference that supplied them`() {
+        val config = testee.resolve(
+            NewUserOnboardingActivityDialog.PreferenceSelector(
+                titleRes = R.string.blockAdsPathPreferenceSelectorTitle,
+                offered = mapOf(
+                    OnboardingPreference.BLOCK_ADS to Offered(
+                        initiallyEnabled = true,
+                        presentation = OnboardingPreferencePresentation(
+                            primaryText = "Block ads",
+                            secondaryText = null,
+                            iconRes = 42,
+                        ),
+                    ),
+                ),
+            ),
+            isCustomAiFlow = false,
+        )!!
+
+        val row = (config.content as ContentConfig.PreferenceSelector).rows.single()
+        assertEquals(TextConfig.Literal("Block ads"), row.primaryText)
+        assertNull(row.secondaryText)
+        assertEquals(42, row.iconRes)
     }
 
     @Test

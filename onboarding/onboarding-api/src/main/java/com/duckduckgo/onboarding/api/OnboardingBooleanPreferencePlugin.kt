@@ -16,21 +16,30 @@
 
 package com.duckduckgo.onboarding.api
 
+import androidx.annotation.DrawableRes
 import com.duckduckgo.common.utils.plugins.ActivePlugin
 
 /**
- * Commits an on/off onboarding preference into the module that owns the underlying setting, so
- * onboarding can offer it without that module publishing the setting.
+ * Describes and commits an on/off onboarding preference from the module that owns the underlying
+ * setting, so onboarding can offer it without that module publishing the setting.
  *
- * Onboarding owns which preferences exist and how they are presented, so it asks for a specific
- * plugin by [Id] rather than rendering whatever happens to be contributed. The row's copy, icon,
- * position and switch position all stay on the onboarding side.
+ * Onboarding owns which preferences exist, so it asks for a specific plugin by [Id] rather than
+ * rendering whatever happens to be contributed. The module owning the setting names and illustrates
+ * it; where the row sits and where its switch sits stay on the onboarding side.
  *
  * Whether the preference can be offered at all is expressed through [isActive]: a plugin that does
  * not resolve from the plugin point means the row is not shown.
  */
 interface OnboardingBooleanPreferencePlugin : ActivePlugin {
     val id: Id
+
+    val primaryText: String
+
+    /** Null when the row renders as a single line. */
+    val secondaryText: String? get() = null
+
+    @get:DrawableRes
+    val iconRes: Int
 
     suspend fun apply(enabled: Boolean)
 

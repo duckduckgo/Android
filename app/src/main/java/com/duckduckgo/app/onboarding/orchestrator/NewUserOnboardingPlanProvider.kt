@@ -645,10 +645,17 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     /**
      * Filters unavailable preferences and assigns the default value.
      */
-    private suspend fun resolvePreferenceSelections(offered: List<OnboardingPreference>): Map<OnboardingPreference, Boolean> =
+    private suspend fun resolvePreferenceSelections(
+        offered: List<OnboardingPreference>,
+    ): Map<OnboardingPreference, NewUserOnboardingActivityDialog.PreferenceSelector.Offered> =
         offered
             .filter { onboardingPreferenceApplier.isAvailable(it) }
-            .associateWith { onboardingPreferenceApplier.isEnabled(it) }
+            .associateWith {
+                NewUserOnboardingActivityDialog.PreferenceSelector.Offered(
+                    initiallyEnabled = onboardingPreferenceApplier.isEnabled(it),
+                    presentation = onboardingPreferenceApplier.presentation(it),
+                )
+            }
 
     private fun preferenceSelectorStep(
         ctx: NewUserOnboardingPlanContext,
@@ -665,7 +672,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             resolveDialog = {
                 NewUserOnboardingActivityDialog.PreferenceSelector(
                     titleRes = titleRes,
-                    preferenceSelections(),
+                    offered = preferenceSelections(),
                     caption = caption,
                 )
             },

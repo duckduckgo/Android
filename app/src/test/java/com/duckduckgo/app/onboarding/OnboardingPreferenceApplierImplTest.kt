@@ -32,6 +32,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -326,10 +327,33 @@ class OnboardingPreferenceApplierImplTest {
 
         assertEquals(emptyList<Boolean>(), adBlockingPlugin.applied)
     }
+
+    @Test
+    fun whenBlockAdsPresentationQueriedThenCopyAndIconComeFromPlugin() = runTest {
+        assertEquals(
+            OnboardingPreferencePresentation(primaryText = "Block ads", secondaryText = null, iconRes = 42),
+            testee.presentation(OnboardingPreference.BLOCK_ADS),
+        )
+    }
+
+    @Test
+    fun whenAdBlockingPluginMissingThenBlockAdsHasNoPresentation() = runTest {
+        contributedPlugins = emptyList()
+
+        assertNull(testee.presentation(OnboardingPreference.BLOCK_ADS))
+    }
+
+    @Test
+    fun whenPreferenceIsNamedByOnboardingThenItHasNoPresentation() = runTest {
+        assertNull(testee.presentation(OnboardingPreference.SEARCH_HISTORY))
+    }
 }
 
 private class FakeOnboardingBooleanPreferencePlugin(
     override val id: OnboardingBooleanPreferencePlugin.Id = OnboardingBooleanPreferencePlugin.Id.AdBlocking,
+    override val primaryText: String = "Block ads",
+    override val secondaryText: String? = null,
+    override val iconRes: Int = 42,
 ) : OnboardingBooleanPreferencePlugin {
 
     val applied = mutableListOf<Boolean>()

@@ -101,7 +101,7 @@ class PreferenceSelectorBinder(
             with(rowBinding.preferenceRowItem) {
                 setIcon(row.iconRes)
                 setPrimaryText(row.primaryText.resolve(context))
-                setSecondaryText(row.secondaryText.resolve(context))
+                setSecondaryText(row.secondaryText?.resolve(context))
                 isChecked = state.value.enabled.getValue(row.preference)
                 setOnCheckedChangeListener { checked ->
                     state.update { it.copy(enabled = it.enabled + (row.preference to checked)) }

@@ -35,6 +35,7 @@ import com.duckduckgo.app.onboarding.OnboardingPromptsExperimentManager
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager.SegmentedOnboardingExperimentVariant
 import com.duckduckgo.app.onboarding.TestOption
+import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityDialog.PreferenceSelector.Offered
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.SegmentedOnboardingPath
 import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
@@ -471,9 +472,9 @@ class NewUserOnboardingPlanProviderTest {
         assertEquals(
             NewUserOnboardingActivityDialog.PreferenceSelector(
                 titleRes = R.string.noAiPathPreferenceSelectorTitle,
-                initialSelections = mapOf(
-                    OnboardingPreference.SEARCH_ASSIST to true,
-                    OnboardingPreference.HIDE_AI_GENERATED_IMAGES to false,
+                offered = mapOf(
+                    OnboardingPreference.SEARCH_ASSIST to Offered(initiallyEnabled = true),
+                    OnboardingPreference.HIDE_AI_GENERATED_IMAGES to Offered(initiallyEnabled = false),
                 ),
             ),
             selectorStep.resolveDialog(),
@@ -620,9 +621,9 @@ class NewUserOnboardingPlanProviderTest {
         assertEquals(
             NewUserOnboardingActivityDialog.PreferenceSelector(
                 titleRes = R.string.searchPathPreferenceSelectorTitle,
-                initialSelections = mapOf(
-                    OnboardingPreference.SEARCH_HISTORY to false,
-                    OnboardingPreference.SAFE_SEARCH to true,
+                offered = mapOf(
+                    OnboardingPreference.SEARCH_HISTORY to Offered(initiallyEnabled = false),
+                    OnboardingPreference.SAFE_SEARCH to Offered(initiallyEnabled = true),
                 ),
             ),
             selectorStep.resolveDialog(),

@@ -16,7 +16,9 @@
 
 package com.duckduckgo.adblocking.impl.onboarding
 
+import android.content.Context
 import com.duckduckgo.adblocking.impl.AdBlockingSettingsRepository
+import com.duckduckgo.adblocking.impl.R
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
 import com.duckduckgo.adblocking.impl.domain.SettingsPlacement
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
@@ -25,6 +27,7 @@ import com.duckduckgo.onboarding.api.OnboardingBooleanPreferencePlugin
 import com.duckduckgo.onboarding.api.OnboardingBooleanPreferencePlugin.Id
 import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 @ContributesActivePlugin(
     scope = AppScope::class,
@@ -33,11 +36,16 @@ import javax.inject.Inject
     parentFeatureName = "pluginPointOnboardingBooleanPreference",
 )
 class OnboardingAdBlockingPreferencePluginImpl @Inject constructor(
+    private val context: Context,
     private val statusChecker: AdBlockingStatusChecker,
     private val settingsRepository: AdBlockingSettingsRepository,
 ) : OnboardingBooleanPreferencePlugin {
 
     override val id: Id = Id.AdBlocking
+
+    override val primaryText: String get() = context.getString(R.string.ad_blocking_onboarding_preference_primary)
+
+    override val iconRes: Int = CommonR.drawable.ads_blocked_color_24
 
     override suspend fun isActive(): Boolean {
         val placement = statusChecker.settingsPlacementFlow().firstOrNull()

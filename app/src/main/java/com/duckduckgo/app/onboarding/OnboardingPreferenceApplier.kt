@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.onboarding
 
+import androidx.annotation.DrawableRes
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
@@ -52,8 +53,20 @@ interface OnboardingPreferenceApplier {
      */
     suspend fun isEnabled(preference: OnboardingPreference): Boolean
 
+    /**
+     * How to render the row, for preferences whose owning module supplies its own copy and icon.
+     * Null for the preferences onboarding names itself.
+     */
+    suspend fun presentation(preference: OnboardingPreference): OnboardingPreferencePresentation?
+
     suspend fun apply(preference: OnboardingPreference, enabled: Boolean)
 }
+
+data class OnboardingPreferencePresentation(
+    val primaryText: String,
+    val secondaryText: String?,
+    @DrawableRes val iconRes: Int,
+)
 
 @ContributesBinding(AppScope::class, boundType = OnboardingPreferenceApplier::class)
 @SingleInstanceIn(AppScope::class)
@@ -91,6 +104,26 @@ class OnboardingPreferenceApplierImpl @Inject constructor(
             OnboardingPreference.ACCEPT_NON_OPT_OUT_COOKIES -> autoconsent.isClickAcceptEnabled()
         }
     }
+
+    override suspend fun presentation(preference: OnboardingPreference): OnboardingPreferencePresentation? =
+        withContext(dispatcherProvider.io()) {
+            when (preference) {
+                OnboardingPreference.BLOCK_ADS -> plugin(OnboardingBooleanPreferencePlugin.Id.AdBlocking)?.let {
+                    OnboardingPreferencePresentation(
+                        primaryText = it.primaryText,
+                        secondaryText = it.secondaryText,
+                        iconRes = it.iconRes,
+                    )
+                }
+                OnboardingPreference.SEARCH_HISTORY,
+                OnboardingPreference.SAFE_SEARCH,
+                OnboardingPreference.SEARCH_ASSIST,
+                OnboardingPreference.HIDE_AI_GENERATED_IMAGES,
+                OnboardingPreference.REJECT_OPTIONAL_COOKIES,
+                OnboardingPreference.ACCEPT_NON_OPT_OUT_COOKIES,
+                -> null
+            }
+        }
 
     override suspend fun apply(preference: OnboardingPreference, enabled: Boolean): Unit = withContext(dispatcherProvider.io()) {
         when (preference) {
