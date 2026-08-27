@@ -28,11 +28,13 @@ import com.duckduckgo.app.browser.databinding.IncludeBrandDesignImportCompleteBi
 import com.duckduckgo.app.onboarding.ui.page.configdriven.BindScope
 import com.duckduckgo.app.onboarding.ui.page.configdriven.ContentConfig
 import com.duckduckgo.app.onboarding.ui.page.configdriven.ContentHandle
+import com.duckduckgo.app.onboarding.ui.page.configdriven.CtaState
 import com.duckduckgo.app.onboarding.ui.page.configdriven.ImportCompleteContentState
 import com.duckduckgo.app.onboarding.ui.page.configdriven.StatefulDialogBinder
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 
 class ImportCompleteBinder(
@@ -65,7 +67,7 @@ class ImportCompleteBinder(
                     rendered = current
 
                     transition?.cancel()
-                    val leaving = fadeTargets()
+                    val leaving = stateFadeTargets()
                     transition = fade(leaving, to = 0f) {
                         importCompleteTitle.setTitle(titleOf(current, content).resolve(context))
                         importCompleteTitle.snapTitle()
@@ -73,7 +75,7 @@ class ImportCompleteBinder(
                         scope.animateCardBounds(STATE_CHANGE_DURATION_MS)
                         apply(current, content, context)
 
-                        val arriving = fadeTargets()
+                        val arriving = stateFadeTargets()
                         arriving.forEach { it.alpha = 0f }
 
                         leaving.filterNot { it in arriving }.forEach { it.alpha = 1f }
@@ -82,6 +84,10 @@ class ImportCompleteBinder(
                     }.also { it.start() }
                 }.launchIn(scope.coroutineScope)
             },
+            primaryCtaState = CtaState(
+                enabled = state.map { it !is ImportCompleteContentState.Parsing },
+                defaultValue = state.value !is ImportCompleteContentState.Parsing,
+            ),
             unbind = {
                 stateJob?.cancel()
                 transition?.cancel()
@@ -155,6 +161,8 @@ class ImportCompleteBinder(
         ImportCompleteContentState.Failed -> content.failedTitle
         is ImportCompleteContentState.Finished -> content.title
     }
+
+    private fun stateFadeTargets(): List<View> = fadeTargets() + binding.importCompletePictogram
 
     private fun fadeTargets(): List<View> = with(binding) {
         buildList {

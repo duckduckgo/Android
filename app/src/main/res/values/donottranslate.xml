@@ -143,7 +143,7 @@
     <string name="preOnboardingImportPasswordsPrimaryCta">Import From Google</string>
     <string name="preOnboardingImportPasswordsSecondaryCta">Skip</string>
     <string name="preOnboardingImportCompleteTitle">Import complete</string>
-    <string name="preOnboardingImportCompleteCta">Got it!</string>
+    <string name="preOnboardingImportCompleteCta">Continue</string>
     <string name="preOnboardingImportCompleteParsingTitle">Importing passwords</string>
     <string name="preOnboardingImportCompleteParsingBody">This will only take a moment.</string>
     <string name="preOnboardingImportCompleteFailedTitle">Import failed</string>
