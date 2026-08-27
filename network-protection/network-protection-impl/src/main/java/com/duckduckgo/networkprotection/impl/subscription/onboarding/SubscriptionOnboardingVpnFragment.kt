@@ -52,6 +52,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.databinding.FragmentSubscriptionOnboardingVpnBinding
 import com.duckduckgo.networkprotection.impl.subscription.onboarding.SubscriptionOnboardingVpnStepPlugin.Companion.VPN_STEP_ID
+import com.duckduckgo.networkprotection.impl.subscription.onboarding.SubscriptionOnboardingVpnViewModel.ActivationError
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingFeature
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.COMPLETED
@@ -192,7 +193,8 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
 
     private fun SubscriptionOnboardingVpnViewModel.ViewState.toScreenState(): ScreenState? = when {
         vpnEnabled == true -> ScreenState.VPN_ON
-        activationError -> ScreenState.ACTIVATION_ERROR
+        activationError == ActivationError.PERMISSION_DENIED -> ScreenState.ACTIVATION_ERROR_PERMISSION
+        activationError == ActivationError.FAILED -> ScreenState.ACTIVATION_ERROR_GENERAL
         vpnEnabled == false -> ScreenState.VPN_OFF
         else -> null
     }
@@ -217,6 +219,7 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
             ScreenState.VPN_ON -> {
                 subscriptionOnboardingVpnHeaderImage.setImageResource(R.drawable.vpn_lock_feature_128)
                 subscriptionOnboardingVpnHeaderTitle.setText(R.string.subscriptionOnboardingVpnHeaderTitleOn)
+                subscriptionOnboardingVpnHeaderText.show()
                 setHeaderTextWithLearnMore(R.string.subscriptionOnboardingVpnHeaderTextOn)
                 subscriptionOnboardingVpnNextButton.setText(R.string.subscriptionOnboardingVpnNext)
                 subscriptionOnboardingVpnSkipButton.gone()
@@ -225,15 +228,26 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
             ScreenState.VPN_OFF -> {
                 subscriptionOnboardingVpnHeaderImage.setImageResource(R.drawable.vpn_disabled_feature_128)
                 subscriptionOnboardingVpnHeaderTitle.setText(R.string.subscriptionOnboardingVpnHeaderTitle)
+                subscriptionOnboardingVpnHeaderText.show()
                 setHeaderTextWithLearnMore(R.string.subscriptionOnboardingVpnHeaderText)
                 subscriptionOnboardingVpnNextButton.setText(R.string.subscriptionOnboardingVpnTurnOn)
                 subscriptionOnboardingVpnSkipButton.gone()
             }
 
-            ScreenState.ACTIVATION_ERROR -> {
+            ScreenState.ACTIVATION_ERROR_PERMISSION -> {
                 subscriptionOnboardingVpnHeaderImage.setImageResource(R.drawable.critical_update_feature_128)
                 subscriptionOnboardingVpnHeaderTitle.setText(R.string.subscriptionOnboardingVpnErrorTitle)
+                subscriptionOnboardingVpnHeaderText.show()
                 subscriptionOnboardingVpnHeaderText.setText(R.string.subscriptionOnboardingVpnErrorText)
+                subscriptionOnboardingVpnNextButton.setText(R.string.subscriptionOnboardingVpnTryAgain)
+                subscriptionOnboardingVpnSkipButton.show()
+            }
+
+            ScreenState.ACTIVATION_ERROR_GENERAL -> {
+                subscriptionOnboardingVpnHeaderImage.setImageResource(R.drawable.critical_update_feature_128)
+                subscriptionOnboardingVpnHeaderTitle.setText(R.string.subscriptionOnboardingVpnErrorTitle)
+                // General activation failure shows the same error screen without the "allow the configuration" guidance.
+                subscriptionOnboardingVpnHeaderText.gone()
                 subscriptionOnboardingVpnNextButton.setText(R.string.subscriptionOnboardingVpnTryAgain)
                 subscriptionOnboardingVpnSkipButton.show()
             }
@@ -368,7 +382,7 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
         }
     }
 
-    private enum class ScreenState { VPN_OFF, VPN_ON, ACTIVATION_ERROR }
+    private enum class ScreenState { VPN_OFF, VPN_ON, ACTIVATION_ERROR_PERMISSION, ACTIVATION_ERROR_GENERAL }
 
     companion object {
         private const val TRANSITION_DURATION_MS = 1000L

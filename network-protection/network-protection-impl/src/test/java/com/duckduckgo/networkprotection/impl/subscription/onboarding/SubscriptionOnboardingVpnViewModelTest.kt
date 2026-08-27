@@ -25,6 +25,7 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionSta
 import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.DISCONNECTED
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.getDisplayableCountry
+import com.duckduckgo.networkprotection.impl.subscription.onboarding.SubscriptionOnboardingVpnViewModel.ActivationError
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -99,13 +100,33 @@ class SubscriptionOnboardingVpnViewModelTest {
     }
 
     @Test
-    fun whenVpnPermissionDeniedThenActivationErrorIsTrue() = runTest {
+    fun whenVpnPermissionDeniedThenActivationErrorIsPermissionDenied() = runTest {
         val testee = createViewModel(connectionState = DISCONNECTED)
 
         testee.onVpnPermissionDenied()
 
         testee.viewState().test {
-            assertTrue(awaitItem().activationError)
+            assertEquals(ActivationError.PERMISSION_DENIED, awaitItem().activationError)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenActivationFallsBackToDisconnectedThenActivationErrorIsFailed() = runTest {
+        val networkProtectionState = mock<NetworkProtectionState>().apply {
+            whenever(getConnectionStateFlow()).thenReturn(flowOf(CONNECTING, DISCONNECTED))
+        }
+        val testee = SubscriptionOnboardingVpnViewModel(
+            FakeConnectionService(ConnectionInfo(ip = "137.220.87.36", city = "Birmingham", country = "GB")),
+            networkProtectionState,
+            mock<WgTunnelConfig>(),
+            coroutineRule.testDispatcherProvider,
+        )
+
+        testee.viewState().test {
+            val state = awaitItem()
+            assertEquals(ActivationError.FAILED, state.activationError)
+            assertFalse(state.activating)
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -127,7 +148,7 @@ class SubscriptionOnboardingVpnViewModelTest {
         verify(networkProtectionState).start()
         testee.viewState().test {
             val state = awaitItem()
-            assertFalse(state.activationError)
+            assertNull(state.activationError)
             assertTrue(state.activating)
             cancelAndConsumeRemainingEvents()
         }

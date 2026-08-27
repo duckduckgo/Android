@@ -82,14 +82,21 @@ class SubscriptionOnboardingVpnViewModel @Inject constructor(
                             it.copy(
                                 vpnEnabled = true,
                                 activating = false,
-                                activationError = false,
+                                activationError = null,
                                 newIpAddress = server?.ipAddress,
                                 newLocation = formatVpnServerLocation(server?.location),
                             )
                         }
                     }
-                    CONNECTING -> viewState.update { it.copy(vpnEnabled = false, activating = true, activationError = false) }
-                    DISCONNECTED -> viewState.update { it.copy(vpnEnabled = false, activating = false) }
+                    CONNECTING -> viewState.update { it.copy(vpnEnabled = false, activating = true, activationError = null) }
+                    DISCONNECTED -> viewState.update {
+                        // Falling back to disconnected while activation was in progress means the VPN failed to start.
+                        it.copy(
+                            vpnEnabled = false,
+                            activating = false,
+                            activationError = if (it.activating) ActivationError.FAILED else it.activationError,
+                        )
+                    }
                 }
             }
             .flowOn(dispatcherProvider.io())
@@ -98,25 +105,31 @@ class SubscriptionOnboardingVpnViewModel @Inject constructor(
 
     /** The VPN permission was granted (or already present): clear any error, show activation in progress, start the VPN. */
     fun onVpnPermissionGranted() {
-        viewState.update { it.copy(activationError = false, activating = true) }
+        viewState.update { it.copy(activationError = null, activating = true) }
         networkProtectionState.start()
     }
 
-    /** The user declined the system VPN configuration dialog: surface the activation error state. */
+    /** The user declined the system VPN configuration dialog: surface the permission activation error state. */
     fun onVpnPermissionDenied() {
-        viewState.update { it.copy(activationError = true) }
+        viewState.update { it.copy(activationError = ActivationError.PERMISSION_DENIED) }
     }
 
     data class ViewState(
         // null until the VPN connection state is first observed, so the UI does not flip states prematurely.
         val vpnEnabled: Boolean? = null,
         val activating: Boolean = false,
-        val activationError: Boolean = false,
+        val activationError: ActivationError? = null,
         val ipAddress: String? = null,
         val location: String? = null,
         val newIpAddress: String? = null,
         val newLocation: String? = null,
     )
+
+    /**
+     * Why VPN activation failed. [PERMISSION_DENIED] shows the "allow the configuration" guidance; [FAILED]
+     * (the VPN could not be started for any other reason) shows the same error screen without that guidance.
+     */
+    enum class ActivationError { PERMISSION_DENIED, FAILED }
 
     companion object {
         private const val UNKNOWN_IP = "XXX.XXX.XX.XXX"
