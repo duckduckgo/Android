@@ -21,7 +21,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
-import com.duckduckgo.privacy.config.store.TrackerAllowlistEntity
 import com.duckduckgo.privacy.config.store.features.trackerallowlist.CompiledRule
 import com.duckduckgo.privacy.config.store.features.trackerallowlist.TrackerAllowlistRepository
 import com.squareup.anvil.annotations.ContributesBinding
@@ -33,7 +32,6 @@ import javax.inject.Inject
 class RealTrackerAllowlist @Inject constructor(
     private val trackerAllowlistRepository: TrackerAllowlistRepository,
     private val featureToggle: FeatureToggle,
-    private val optimizeTrackerAllowList: OptimizeTrackerAllowListRCWrapper,
 ) : TrackerAllowlist {
 
     override fun isAnException(
@@ -43,20 +41,6 @@ class RealTrackerAllowlist @Inject constructor(
         if (!featureToggle.isFeatureEnabled(PrivacyFeatureName.TrackerAllowlistFeatureName.value, true)) {
             return false
         }
-        return if (optimizeTrackerAllowList.enabled) {
-            isAnExceptionOptimized(url, documentURL)
-        } else {
-            trackerAllowlistRepository.exceptions
-                .filter { UriString.sameOrSubdomain(url, it.domain) }
-                .map { matches(url, documentURL, it) }
-                .firstOrNull() ?: false
-        }
-    }
-
-    private fun isAnExceptionOptimized(
-        url: String,
-        documentUrl: String,
-    ): Boolean {
         val host = UriString.host(url) ?: return false
         val rules = findRulesForHost(host, trackerAllowlistRepository.rulesByDomain) ?: return false
         val cleanedUrl = UriString.removePort(url)
@@ -64,7 +48,7 @@ class RealTrackerAllowlist @Inject constructor(
             val regex = compiledRule.regex ?: return@any false
             if (!cleanedUrl.matches(regex)) return@any false
             val ruleDomains = compiledRule.rule.domains
-            ruleDomains.contains("<all>") || ruleDomains.any { domain -> UriString.sameOrSubdomain(documentUrl, domain) }
+            ruleDomains.contains("<all>") || ruleDomains.any { domain -> UriString.sameOrSubdomain(documentURL, domain) }
         }
     }
 
@@ -78,18 +62,6 @@ class RealTrackerAllowlist @Inject constructor(
             val dot = candidate.indexOf('.')
             if (dot < 0) return null
             candidate = candidate.substring(dot + 1)
-        }
-    }
-
-    private fun matches(
-        url: String,
-        documentUrl: String,
-        trackerAllowlist: TrackerAllowlistEntity,
-    ): Boolean {
-        val cleanedUrl = UriString.removePort(url)
-        return trackerAllowlist.rules.any {
-            val regex = ".*${it.rule}.*".toRegex()
-            cleanedUrl.matches(regex) && (it.domains.contains("<all>") || it.domains.any { domain -> UriString.sameOrSubdomain(documentUrl, domain) })
         }
     }
 }
