@@ -22,7 +22,7 @@
     <string name="autoconsentToggle">Разрешить DuckDuckGo взять на себя окна выбора куки-файлов</string>
     <string name="autoconsentAutoManageToggle">Отклонить дополнительные файлы cookie</string>
     <string name="autoconsentAutoManageDescription">Мы постараемся отклонять за вас как можно больше файлов cookie, а затем закрывать всплывающие окна.</string>
-    <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[DuckDuckGo может автоматически управлять всплывающими окнами cookie, чтобы обеспечить максимальную конфиденциальность и минимизировать использование cookie еще до того, как вы их увидите.<a href=\"\">Подробнее</a>]]></string>
+    <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[DuckDuckGo может автоматически управлять всплывающими окнами cookie, чтобы обеспечить максимальную конфиденциальность и минимизировать использование cookie еще до того, как вы их увидите.\n<a href=\"\">Подробнее</a>]]></string>
     <string name="autoconsentPopUpsWithoutOptOutsToggle">Принимать файлы cookie, которые нельзя отклонить</string>
     <string name="autoconsentPopUpsWithoutOptOutsDescription">Если возможности отклонить файлы cookie нет, мы примем их за вас и закроем всплывающие окна, избавив вас от лишних нажатий.</string>
 </resources>
