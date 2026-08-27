@@ -25,4 +25,13 @@
     <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[DuckDuckGo kan automatisk håndtere popup-vinduer om informasjonskapsler. Vi ivaretar personvernet ditt og fjerner forespørsler om informasjonskapsler før du i det hele tatt ser dem.\n<a href=\"\">Finn ut mer</a>]]></string>
     <string name="autoconsentPopUpsWithoutOptOutsToggle">Godta informasjonskapsler som ikke kan avvises</string>
     <string name="autoconsentPopUpsWithoutOptOutsDescription">Hvis det ikke finnes noe alternativ for å avvise dem, sparer vi deg for et klikk, godtar disse informasjonskapslene for deg og lukker popup-vinduene.</string>
+    <string name="autoconsentPromptTitle">Lei av popup-vinduer om informasjonskapsler?</string>
+    <string name="autoconsentPromptFootnote">Du kan når som helst gjøre endringer senere i Innstillinger.</string>
+    <string name="autoconsentPromptCpmOnMessage">Noen informasjonskapsler kan ikke avvises. Vi kan godta dem for deg.</string>
+    <string name="autoconsentPromptCpmOnPrimaryButton">Godta informasjonskapsler for meg</string>
+    <string name="autoconsentPromptCpmOnSecondaryButton">Jeg godtar dem selv</string>
+    <string name="autoconsentPromptCpmOffMessage">Overlat det til oss. Vi avviser informasjonskapsler når det er mulig, og godtar dem som ikke kan avvises.</string>
+    <string name="autoconsentPromptCpmOffPrimaryButton">Avvis om mulig eller godta for meg</string>
+    <string name="autoconsentPromptCpmOffSecondaryButton">Jeg tar meg av dem selv</string>
+</resources>
 </resources>
