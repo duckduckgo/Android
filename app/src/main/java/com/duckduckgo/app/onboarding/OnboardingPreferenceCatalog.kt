@@ -113,8 +113,6 @@ class OnboardingPreferenceCatalogImpl @Inject constructor(
                 primary = R.string.noAiPathPreferenceSearchAssistPrimary,
                 secondary = R.string.noAiPathPreferenceSearchAssistSecondary,
                 available = serpAvailable,
-                // The no-AI path offers this to steer the user away from search assist, so the switch starts
-                // off whatever the setting currently holds.
                 seed = { false },
                 apply = { enabled ->
                     serpSettingsDataProvider.setSetting(
@@ -128,7 +126,6 @@ class OnboardingPreferenceCatalogImpl @Inject constructor(
                 primary = R.string.noAiPathPreferenceHideAiGeneratedImagesPrimary,
                 secondary = R.string.noAiPathPreferenceHideAiGeneratedImagesSecondary,
                 available = serpAvailable,
-                // Steered on for the same reason, in the other direction.
                 seed = { true },
                 apply = { enabled ->
                     serpSettingsDataProvider.setSetting(
@@ -170,8 +167,7 @@ class OnboardingPreferenceCatalogImpl @Inject constructor(
         @DrawableRes iconRes: Int,
         @StringRes primary: Int,
         @StringRes secondary: Int,
-        dependsOn: OnboardingPreference? = null,
-        available: suspend () -> Boolean = { true },
+        available: suspend () -> Boolean,
         seed: suspend () -> Boolean,
         apply: suspend (Boolean) -> Unit,
     ) = Definition(
@@ -183,7 +179,6 @@ class OnboardingPreferenceCatalogImpl @Inject constructor(
                     primaryText = TextConfig.Resource(primary),
                     secondaryText = TextConfig.Resource(secondary),
                     initiallyEnabled = seed(),
-                    dependsOn = dependsOn,
                 )
             } else {
                 null
