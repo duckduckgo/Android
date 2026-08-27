@@ -17,7 +17,6 @@
 package com.duckduckgo.app.trackerdetection
 
 import android.net.Uri
-import com.duckduckgo.app.browser.Domain
 import com.duckduckgo.app.browser.UriString.Companion.host
 import com.duckduckgo.app.browser.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.app.trackerdetection.model.Action.BLOCK
@@ -30,14 +29,11 @@ class TdsClient(
     override val name: Client.ClientName,
     trackers: List<TdsTracker>,
     private val urlToTypeMapper: UrlToTypeMapper,
-    private val optimizeTrackerEvaluationV3: Boolean,
-    precompileRegex: Boolean = false,
+    private val precompileRegex: Boolean = false,
 ) : Client {
 
-    private val precompileRegex: Boolean = precompileRegex && optimizeTrackerEvaluationV3
-
-    private val compiledTrackers: List<CompiledTracker> = trackers.map { tracker ->
-        CompiledTracker(
+    private val compiledTrackerByDomain: Map<String, CompiledTracker> = trackers.associate { tracker ->
+        tracker.domain.value to CompiledTracker(
             tracker = tracker,
             rules = tracker.rules.map { rule ->
                 val regex = if (precompileRegex) {
@@ -50,10 +46,6 @@ class TdsClient(
                 CompiledRule(rule = rule, regex = regex)
             },
         )
-    }
-
-    private val compiledTrackerByDomain: Map<String, CompiledTracker> by lazy {
-        compiledTrackers.associateBy { it.tracker.domain.value }
     }
 
     override fun matches(
@@ -90,15 +82,6 @@ class TdsClient(
 
     private fun findCompiledTracker(host: String?): CompiledTracker? {
         if (host.isNullOrEmpty()) return null
-        return if (optimizeTrackerEvaluationV3) {
-            findCompiledTrackerByLabelWalk(host)
-        } else {
-            val domain = Domain(host)
-            compiledTrackers.firstOrNull { sameOrSubdomain(domain, it.tracker.domain) }
-        }
-    }
-
-    private fun findCompiledTrackerByLabelWalk(host: String): CompiledTracker? {
         var candidate: String = host
         while (true) {
             compiledTrackerByDomain[candidate]?.let { return it }

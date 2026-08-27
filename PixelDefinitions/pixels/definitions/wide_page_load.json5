@@ -74,11 +74,6 @@
                 "type": "boolean"
             },
             {
-                "key": "feature.data.ext.tracker_optimization_enabled_v3",
-                "description": "Whether tracker evaluation optimization is enabled",
-                "type": "boolean"
-            },
-            {
                 "key": "feature.data.ext.is_tab_in_foreground_on_finish",
                 "description": "Whether the tab was in foreground when page finished loading. Reported by the caller at finish, so it is absent on a cancelled load.",
                 "type": "boolean"
