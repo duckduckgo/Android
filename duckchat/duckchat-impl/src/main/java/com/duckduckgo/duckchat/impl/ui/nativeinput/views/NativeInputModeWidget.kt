@@ -1732,7 +1732,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val lp = card.layoutParams as? MarginLayoutParams ?: return
         val isBrowserSearchOnly = state.inputContext == NativeInputState.InputContext.BROWSER && !state.toggleVisible
         val usesRebrandPill = isBrowserSearchOnly && appBrandDesignUpdateToggles.addressBar().isEnabled()
-        if (usesRebrandPill) {
+        if (usesRebrandPill && state.isBottom) {
+            card.radius = card.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.rebrandInputRadius)
+        } else if (usesRebrandPill) {
             card.shapeAppearanceModel = card.shapeAppearanceModel.withCornerSize(ShapeAppearanceModel.PILL)
         } else if (isBrowserSearchOnly || state.isBottom) {
             card.radius = card.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.largeShapeCornerRadius)

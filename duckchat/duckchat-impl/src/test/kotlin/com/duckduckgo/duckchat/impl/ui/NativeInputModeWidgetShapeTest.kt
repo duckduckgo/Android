@@ -27,7 +27,10 @@ import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputModeWidget
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.google.android.material.card.MaterialCardView
+import com.google.android.material.shape.RelativeCornerSize
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RuntimeEnvironment
@@ -53,6 +56,7 @@ class NativeInputModeWidgetShapeTest {
 
         subject.render(rebrandEnabled = true)
 
+        assertTrue(subject.card.shapeAppearanceModel.topLeftCornerSize is RelativeCornerSize)
         assertEquals(32f, subject.cornerSize())
     }
 
@@ -62,7 +66,11 @@ class NativeInputModeWidgetShapeTest {
 
         subject.render(rebrandEnabled = true)
 
-        assertEquals(32f, subject.cornerSize())
+        assertEquals(
+            subject.context.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.rebrandInputRadius),
+            subject.card.radius,
+        )
+        assertFalse(subject.card.useCompatPadding)
     }
 
     @Test
@@ -78,15 +86,21 @@ class NativeInputModeWidgetShapeTest {
     }
 
     @Test
-    fun `enabling address bar rebrand does not change top browser search-only card height`() {
+    fun `enabling address bar rebrand preserves top browser search-only geometry`() {
         val subject = createSubject()
 
         subject.render(rebrandEnabled = false)
         val legacyHeight = subject.measureHeight()
+        val legacyPaddingTop = subject.card.paddingTop
+        val legacyTop = subject.visibleTop()
+        assertTrue(legacyPaddingTop > 0)
 
         subject.render(rebrandEnabled = true)
 
+        assertTrue(subject.card.useCompatPadding)
         assertEquals(legacyHeight, subject.measureHeight())
+        assertEquals(legacyPaddingTop, subject.card.paddingTop)
+        assertEquals(legacyTop, subject.visibleTop())
     }
 
     @Test
@@ -133,9 +147,13 @@ class NativeInputModeWidgetShapeTest {
             RuntimeEnvironment.getApplication(),
             com.duckduckgo.mobile.android.R.style.Theme_DuckDuckGo_Light,
         )
+        val isBottom = inputPosition == NativeInputState.InputPosition.BOTTOM
+        val elevation = (if (isBottom) 3f else 6f) * context.resources.displayMetrics.density
         val card = MaterialCardView(context).apply {
             layoutParams = ViewGroup.MarginLayoutParams(200, ViewGroup.LayoutParams.WRAP_CONTENT)
-            useCompatPadding = true
+            useCompatPadding = !isBottom
+            maxCardElevation = elevation
+            cardElevation = elevation
             radius = context.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.largeShapeCornerRadius)
         }
         val widget = NativeInputModeWidget(context)
@@ -199,6 +217,11 @@ class NativeInputModeWidgetShapeTest {
         fun measureHeight(): Int {
             card.measure(widthSpec, heightSpec)
             return card.measuredHeight
+        }
+
+        fun visibleTop(): Int {
+            val params = card.layoutParams as ViewGroup.MarginLayoutParams
+            return params.topMargin + card.paddingTop
         }
     }
 }
