@@ -49,5 +49,10 @@ class OnboardingRejectOptionalCookiesPreferencePluginImpl @Inject constructor(
 
     override suspend fun isActive(): Boolean = autoconsentFeature.self().isEnabled()
 
-    override suspend fun apply(enabled: Boolean) = autoconsent.changeSetting(enabled)
+    override suspend fun apply(enabled: Boolean) {
+        // Persisting a value that already applies would turn the remote default into an explicit user
+        // choice, so the setting would stop following a later change to that default.
+        if (enabled == autoconsent.isSettingEnabled()) return
+        autoconsent.changeSetting(enabled)
+    }
 }
