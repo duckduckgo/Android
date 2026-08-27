@@ -16,7 +16,9 @@
 
 package com.duckduckgo.adblocking.impl.onboarding
 
+import android.content.Context
 import com.duckduckgo.adblocking.impl.AdBlockingSettingsRepository
+import com.duckduckgo.adblocking.impl.R
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
 import com.duckduckgo.adblocking.impl.domain.SettingsPlacement
 import com.duckduckgo.onboarding.api.OnboardingBooleanPreferencePlugin
@@ -25,18 +27,25 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import com.duckduckgo.mobile.android.R as CommonR
 
 class OnboardingAdBlockingPreferencePluginImplTest {
 
+    private val context: Context = mock {
+        on { getString(R.string.ad_blocking_onboarding_preference_primary) } doReturn "Block ads"
+    }
     private val statusChecker: AdBlockingStatusChecker = mock()
     private val settingsRepository: AdBlockingSettingsRepository = mock()
 
     private val testee = OnboardingAdBlockingPreferencePluginImpl(
+        context = context,
         statusChecker = statusChecker,
         settingsRepository = settingsRepository,
     )
@@ -44,6 +53,13 @@ class OnboardingAdBlockingPreferencePluginImplTest {
     @Test
     fun whenPluginContributedThenItAnswersForTheAdBlockingPreference() {
         assertEquals(OnboardingBooleanPreferencePlugin.Id.AdBlocking, testee.id)
+    }
+
+    @Test
+    fun whenRowIsDescribedThenAdBlockingNamesItAndLeavesTheSecondLineOut() {
+        assertEquals("Block ads", testee.primaryText)
+        assertNull(testee.secondaryText)
+        assertEquals(CommonR.drawable.ads_blocked_color_24, testee.iconRes)
     }
 
     @Test
