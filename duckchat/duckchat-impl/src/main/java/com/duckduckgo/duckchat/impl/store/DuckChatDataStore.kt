@@ -159,6 +159,10 @@ interface DuckChatDataStore {
 
     suspend fun setSelectedModel(model: SelectedModel?)
 
+    suspend fun getSelectedProvider(): String?
+
+    suspend fun setSelectedProvider(rawValue: String?)
+
     suspend fun getSelectedReasoningMode(): String?
 
     suspend fun setSelectedReasoningMode(rawValue: String?)
@@ -211,6 +215,7 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
         val DUCK_AI_SELECTED_MODEL_ID = stringPreferencesKey(name = "DUCK_AI_SELECTED_MODEL_ID")
         val DUCK_AI_SELECTED_MODEL_SHORT_NAME = stringPreferencesKey(name = "DUCK_AI_SELECTED_MODEL_SHORT_NAME")
         val DUCK_AI_SELECTED_MODEL_REASONING_MODE = stringPreferencesKey(name = "DUCK_AI_SELECTED_MODEL_REASONING_MODE")
+        val DUCK_AI_SELECTED_PROVIDER = stringPreferencesKey(name = "DUCK_AI_SELECTED_PROVIDER")
         val DUCK_AI_CLEARED_PINNED_DEFAULT_MODEL = booleanPreferencesKey(name = "DUCK_AI_CLEARED_PINNED_DEFAULT_MODEL")
         val DUCK_AI_ADDRESS_BAR_PICKER_SELECTED_AT = longPreferencesKey(name = "DUCK_AI_ADDRESS_BAR_PICKER_SELECTED_AT")
     }
@@ -488,6 +493,19 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
             } else {
                 prefs[Keys.DUCK_AI_SELECTED_MODEL_ID] = model.id
                 prefs[Keys.DUCK_AI_SELECTED_MODEL_SHORT_NAME] = model.shortName
+            }
+        }
+    }
+
+    override suspend fun getSelectedProvider(): String? =
+        store.data.firstOrNull()?.let { it[Keys.DUCK_AI_SELECTED_PROVIDER] }
+
+    override suspend fun setSelectedProvider(rawValue: String?) {
+        store.edit { prefs ->
+            if (rawValue == null) {
+                prefs.remove(Keys.DUCK_AI_SELECTED_PROVIDER)
+            } else {
+                prefs[Keys.DUCK_AI_SELECTED_PROVIDER] = rawValue
             }
         }
     }

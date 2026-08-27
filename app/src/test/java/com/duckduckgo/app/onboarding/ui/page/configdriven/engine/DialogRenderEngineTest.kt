@@ -35,6 +35,7 @@ import com.duckduckgo.app.onboarding.ui.page.configdriven.CtaState
 import com.duckduckgo.app.onboarding.ui.page.configdriven.DialogConfig
 import com.duckduckgo.app.onboarding.ui.page.configdriven.Embellishment
 import com.duckduckgo.app.onboarding.ui.page.configdriven.TextConfig
+import com.duckduckgo.app.onboarding.ui.view.OnboardingDialogTitleView
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.onboarding.api.LinearOnboardingStepId
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -45,8 +46,10 @@ import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 class DialogRenderEngineTest {
 
@@ -114,7 +117,48 @@ class DialogRenderEngineTest {
     fun `the card anchor is applied before the morph so the card's reposition rides the transition`() = runTest {
         testee.render(COMPARISON_STEP, comparisonConfig(), animate = true)
 
-        assertEquals(listOf("anchor", "morph"), callOrder)
+        assertEquals(listOf("anchor", "morph", "fade"), callOrder)
+    }
+
+    @Test
+    fun `anything above the title fades in before the title types`() = runTest {
+        content.preTitleFadeTargets = listOf(mock())
+        content.fadeTargets = listOf(mock())
+        content.title = typingTitle()
+
+        testee.render(COMPARISON_STEP, comparisonConfig(), animate = true)
+
+        assertEquals(listOf("anchor", "morph", "fade", "typeTitle", "fade"), callOrder)
+    }
+
+    @Test
+    fun `the ctas are left to the content fade rather than the pre-title one`() = runTest {
+        content.preTitleFadeTargets = listOf(mock())
+        content.fadeTargets = listOf(mock())
+
+        testee.render(COMPARISON_STEP, comparisonConfig(), animate = true)
+
+        assertEquals(listOf(false, true), cardStage.fadesWithCtas)
+        assertEquals(listOf(content.preTitleFadeTargets, content.fadeTargets), cardStage.fadedTargets)
+    }
+
+    @Test
+    fun `both fade phases are hidden before the entrance runs`() = runTest {
+        content.preTitleFadeTargets = listOf(mock())
+        content.fadeTargets = listOf(mock())
+
+        testee.render(COMPARISON_STEP, comparisonConfig(), animate = true)
+
+        assertEquals(content.preTitleFadeTargets + content.fadeTargets, cardStage.preparedTargets)
+    }
+
+    @Test
+    fun `a screen with nothing above its title has no pre-title fade`() = runTest {
+        content.fadeTargets = listOf(mock())
+
+        testee.render(COMPARISON_STEP, comparisonConfig(), animate = true)
+
+        assertEquals(listOf(content.fadeTargets), cardStage.fadedTargets)
     }
 
     @Test
@@ -417,6 +461,14 @@ class DialogRenderEngineTest {
         assertEquals(fadeCountAfterSupersede, cardStage.fadeCount)
     }
 
+    private fun typingTitle(): OnboardingDialogTitleView = mock<OnboardingDialogTitleView>().also { title ->
+        whenever(title.typeTitle(any())).then { invocation ->
+            callOrder += "typeTitle"
+            @Suppress("UNCHECKED_CAST")
+            (invocation.arguments[0] as () -> Unit).invoke()
+        }
+    }
+
     private companion object {
         const val COMPARISON_STEP: LinearOnboardingStepId = "comparison_chart"
         const val ADDRESS_BAR_STEP: LinearOnboardingStepId = "address_bar_position"
@@ -473,6 +525,9 @@ private class FakeContentController : ContentController {
     var stageReset = false
     var bindCount = 0
     var hidden = false
+    var title: OnboardingDialogTitleView? = null
+    var preTitleFadeTargets: List<View> = emptyList()
+    var fadeTargets: List<View> = emptyList()
     var afterFade: (() -> Animator)? = null
     var onContentReady: (() -> Unit)? = null
     var handleResult: (() -> NewUserOnboardingEvent)? = null
@@ -488,8 +543,9 @@ private class FakeContentController : ContentController {
         bindCount++
         boundScope = scope
         return ContentHandle(
-            title = null,
-            fadeTargets = emptyList(),
+            title = title,
+            preTitleFadeTargets = preTitleFadeTargets,
+            fadeTargets = fadeTargets,
             afterFade = afterFade,
             onContentReady = onContentReady,
             result = handleResult,
@@ -510,6 +566,9 @@ private class FakeCardStage(private val record: (String) -> Unit = {}) : CardSta
     var settled = false
     var released = false
     var fadeCount = 0
+    val fadedTargets = mutableListOf<List<View>>()
+    val fadesWithCtas = mutableListOf<Boolean>()
+    var preparedTargets: List<View> = emptyList()
     val animateFlags = mutableListOf<Boolean>()
     val revealDelaysMs = mutableListOf<Long>()
     val boundsTransitionsMs = mutableListOf<Long>()
@@ -536,8 +595,11 @@ private class FakeCardStage(private val record: (String) -> Unit = {}) : CardSta
         boundsTransitionsMs += durationMs
     }
 
-    override fun fadeInContent(contentTargets: List<View>, animate: Boolean, onEnd: () -> Unit) {
+    override fun fadeInContent(contentTargets: List<View>, animate: Boolean, withCtas: Boolean, onEnd: () -> Unit) {
+        record("fade")
         fadeCount++
+        fadedTargets += contentTargets
+        fadesWithCtas += withCtas
         stage(animate, onEnd)
     }
 
@@ -550,7 +612,9 @@ private class FakeCardStage(private val record: (String) -> Unit = {}) : CardSta
         primaryCtaEnabledCalls += enabled
     }
 
-    override fun prepareEntrance(contentTargets: List<View>) = Unit
+    override fun prepareEntrance(contentTargets: List<View>) {
+        preparedTargets = contentTargets
+    }
 
     override fun settle() {
         settled = true

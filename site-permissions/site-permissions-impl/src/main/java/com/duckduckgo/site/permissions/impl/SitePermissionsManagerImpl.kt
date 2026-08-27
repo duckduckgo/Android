@@ -197,6 +197,7 @@ class SitePermissionsManagerImpl @Inject constructor(
             mapOf(
                 SitePermissionsPixelParameters.PERMISSION_TYPE to SitePermissionsPixelValues.DRM,
                 SitePermissionsPixelParameters.REASON to reason,
+                SitePermissionsPixelParameters.PETAL to SitePermissionsPetalValues.RANDOMIZE,
             ),
         )
     }

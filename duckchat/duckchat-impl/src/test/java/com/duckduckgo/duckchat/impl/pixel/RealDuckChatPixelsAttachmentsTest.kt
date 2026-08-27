@@ -49,6 +49,7 @@ class RealDuckChatPixelsAttachmentsTest {
         termsOfServiceHandler = termsOfServiceHandler,
         duckAiTabSessionRepository = mock(),
         appBuildConfig = mock(),
+        browserInteractionsPlugins = mock(),
     )
 
     @Test

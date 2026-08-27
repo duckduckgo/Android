@@ -24,6 +24,7 @@
     <string name="webViewErrorNoConnection">The internet connection appears to be offline.</string>
     <string name="webViewErrorBadUrl">A server with the specified hostname could not be found.</string>
     <string name="webViewErrorSslProtocol"><![CDATA[The certificate for this server is invalid. You might be connecting to a server that is pretending to be <b>%1$s</b> which could put your confidential information at risk.]]></string>
+    <string name="webViewErrorRedirectSuggestionMessage" instruction="Shown when a domain fails to load, offering a link to the www. version of the address. ^1 is the suggested address and is displayed as a tappable link.">Did you mean <annotation type="redirect_link">^1</annotation>?</string>
 
     <!-- Broken Sites-->
     <string name="brokenSitesLoginHint">What site are you signing in to? (required)</string>
@@ -76,6 +77,25 @@
     <string name="searchPathWithToggleEnabledContextualEndDescription">Chats are anonymized, no account required. And it’s free!</string>
     <string name="searchPathWithToggleEnabledContextualEndPrimaryCta">Try Duck.ai</string>
     <string name="searchPathWithToggleEnabledContextualEndSecondaryCta">Skip</string>
+
+    <string name="aiPathComparisonChartTitle"><![CDATA[You\'re in the right place!<br/>Protections activated.]]></string>
+    <string name="aiPathComparisonChartItem5">Search the web privately with trackers blocked</string>
+    <string name="aiPathModelChoiceTitle">Your chats, your way.</string>
+    <string name="aiPathModelChoiceBody">Change your default AI now, or anytime during chat.</string>
+    <string name="aiPathTogglePositionTitle">Want new tabs to open with AI chat?</string>
+    <string name="aiPathTogglePositionPictogramCaption">You can switch to Search with one tap</string>
+    <string name="aiPathWithToggleEnabledContextualEndDescription">Start a private AI chat with Duck.ai or toggle to Search for protected browsing.</string>
+
+    <string name="noAiPathComparisonChartTitle"><![CDATA[You\'re in the right place!<br/>AI features disabled.]]></string>
+    <string name="noAiPathComparisonChartNoSearchAssist">No AI-assisted answers in search</string>
+    <string name="noAiPathComparisonChartNoAiImages">Hide AI-generated images in search</string>
+    <string name="noAiPathPreferenceSelectorTitle">Search without AI</string>
+    <string name="noAiPathPreferenceSearchAssistPrimary">Search Assist</string>
+    <string name="noAiPathPreferenceSearchAssistSecondary">Include AI-generated answers with search results</string>
+    <string name="noAiPathPreferenceHideAiGeneratedImagesPrimary">Hide AI-generated images</string>
+    <string name="noAiPathPreferenceHideAiGeneratedImagesSecondary">Filter out known AI spam sites from image search results</string>
+    <string name="noAiPathDuckAiStateTitle">Want the option to chat privately with popular AIs?</string>
+    <string name="noAiPathDuckAiStateBody">In Duck.ai, your chats are anonymized by us and never used to train AI.</string>
 
     <!-- Browser tab -->
     <string name="browserDuckPlayerShortUrl">Duck Player</string>

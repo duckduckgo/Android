@@ -195,12 +195,51 @@ class DialogConfigResolver @Inject constructor(
             embellishment = Embellishment.LeftWing,
             cardArrow = CardArrowConfig.AtEnd,
             content = ContentConfig.PreferenceSelector(
-                title = TextConfig.Resource(R.string.searchPathPreferenceSelectorTitle),
+                title = TextConfig.Resource(dialog.titleRes),
                 rows = dialog.initialSelections.map { (preference, enabled) -> preferenceRow(preference, enabled) },
             ),
             primaryCta = CtaConfig(
                 text = TextConfig.Resource(R.string.preOnboardingInputScreenButton),
                 action = CtaAction.Submit,
+            ),
+        )
+
+        is NewUserOnboardingActivityDialog.SingleChoice -> DialogConfig(
+            background = OnboardingBackgroundStep.PreferenceSelector,
+            embellishment = Embellishment.LeftWing,
+            cardArrow = CardArrowConfig.AtEnd,
+            content = ContentConfig.SingleChoice(
+                title = TextConfig.Resource(dialog.title),
+                body = TextConfig.Resource(dialog.body),
+                rows = dialog.options,
+            ),
+            primaryCta = CtaConfig(
+                text = TextConfig.Resource(R.string.preOnboardingInputScreenButton),
+                action = CtaAction.Submit,
+            ),
+        )
+
+        is NewUserOnboardingActivityDialog.TogglePosition -> DialogConfig(
+            background = OnboardingBackgroundStep.PreferenceSelector,
+            embellishment = Embellishment.LeftWing,
+            cardArrow = CardArrowConfig.AtEnd,
+            content = ContentConfig.TogglePosition(
+                title = TextConfig.Resource(R.string.aiPathTogglePositionTitle),
+                pictogramLightRes = CommonR.drawable.toggle_ai_chat_default_lighttheme,
+                pictogramDarkRes = CommonR.drawable.toggle_ai_chat_default_darktheme,
+                pictogramCaption = TextConfig.Resource(R.string.aiPathTogglePositionPictogramCaption),
+                options = dialog.options,
+            ),
+        )
+
+        is NewUserOnboardingActivityDialog.DuckAiState -> DialogConfig(
+            background = OnboardingBackgroundStep.PreferenceSelector,
+            embellishment = Embellishment.LeftWing,
+            cardArrow = CardArrowConfig.AtEnd,
+            content = ContentConfig.DuckAiState(
+                title = TextConfig.Resource(R.string.noAiPathDuckAiStateTitle),
+                body = TextConfig.Resource(R.string.noAiPathDuckAiStateBody),
+                options = dialog.options,
             ),
         )
 
@@ -261,6 +300,22 @@ class DialogConfigResolver @Inject constructor(
             iconRes = CommonR.drawable.exclamation_color_24,
             primaryText = TextConfig.Resource(R.string.searchPathPreferenceSafePrimary),
             secondaryText = TextConfig.Resource(R.string.searchPathPreferenceSafeSecondary),
+            initiallyEnabled = initiallyEnabled,
+        )
+
+        OnboardingPreference.SEARCH_ASSIST -> ContentConfig.PreferenceSelector.Row(
+            preference = preference,
+            iconRes = CommonR.drawable.search_assist_color_24,
+            primaryText = TextConfig.Resource(R.string.noAiPathPreferenceSearchAssistPrimary),
+            secondaryText = TextConfig.Resource(R.string.noAiPathPreferenceSearchAssistSecondary),
+            initiallyEnabled = initiallyEnabled,
+        )
+
+        OnboardingPreference.HIDE_AI_GENERATED_IMAGES -> ContentConfig.PreferenceSelector.Row(
+            preference = preference,
+            iconRes = CommonR.drawable.ai_images_strikethrough_color_24,
+            primaryText = TextConfig.Resource(R.string.noAiPathPreferenceHideAiGeneratedImagesPrimary),
+            secondaryText = TextConfig.Resource(R.string.noAiPathPreferenceHideAiGeneratedImagesSecondary),
             initiallyEnabled = initiallyEnabled,
         )
     }

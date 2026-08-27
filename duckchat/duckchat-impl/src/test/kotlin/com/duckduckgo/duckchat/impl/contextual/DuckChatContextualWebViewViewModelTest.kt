@@ -153,6 +153,44 @@ class DuckChatContextualWebViewViewModelTest {
     }
 
     @Test
+    fun `reopen with an unreusable session resets to a new chat and hands off to the entry dialog`() = runTest {
+        (duckChat as FakeDuckChat).nextUrl = "https://duckduckgo.com/?ia=chat"
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        contextualDataStore.persistTabClosedTimestamp("tab-1", 1L)
+
+        testee.commands.test {
+            testee.onSheetReopened()
+            coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+            assertTrue(expectMostRecentItem() is DuckChatContextualWebViewViewModel.Command.ShowNewChatEntryDialog)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `sheet closed after reopen entry dialog handoff does not revert the contextual input state`() = runTest {
+        (duckChat as FakeDuckChat).nextUrl = "https://duckduckgo.com/?ia=chat"
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        contextualDataStore.persistTabClosedTimestamp("tab-1", 1L)
+
+        testee.onSheetReopened()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        testee.commands.test {
+            // The STATE_HIDDEN that follows the entry dialog handoff must not be treated as a dismissal.
+            testee.onSheetClosed()
+
+            assertFalse(expectMostRecentItem() is DuckChatContextualWebViewViewModel.Command.ApplyContextualClosed)
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(duckChatPixels, never()).reportContextualSheetDismissed()
+    }
+
+    @Test
     fun `onPromptSent with attached page context includes it in the event`() = runTest {
         testee.onSheetOpened("tab-1")
         testee.onPageContextReceived("tab-1", serializedPageData)

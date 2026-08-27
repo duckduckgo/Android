@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.store
+package com.duckduckgo.settings.api
 
 /**
  * Whether AI-generated images are hidden from image search results.
@@ -23,16 +23,20 @@ package com.duckduckgo.duckchat.impl.store
  * used only to read/write the value the SERP exchanges. It is deliberately NOT used to derive radio-button
  * positions in the settings dialog — the dialog drives its selection off the order it displays options in.
  */
-enum class HideAiGeneratedImages(val serpCode: String) {
+enum class HideAiGeneratedImages(override val serpCode: String) : SerpSetting {
     ON("1"),
     OFF("-1"),
     ;
+
+    // A getter, not an initializer: enum entries are constructed before the companion object, so reading
+    // SERP_SETTINGS_KEY eagerly does not compile.
+    override val serpKey get() = SERP_SETTINGS_KEY
 
     companion object {
         // The SERP key carrying the hide-AI-generated-images value in the serpSettings blob.
         const val SERP_SETTINGS_KEY = "kbj"
 
-        // Maps the SERP-provided code to its option, defaulting to OFF (show) when absent or unrecognised.
+        // Maps the SERP-provided code to its option, defaulting to OFF (show) when absent or unrecognized.
         fun fromSerpCode(serpCode: String?): HideAiGeneratedImages =
             entries.firstOrNull { it.serpCode == serpCode } ?: OFF
     }

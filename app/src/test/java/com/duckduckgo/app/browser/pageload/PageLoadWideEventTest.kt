@@ -21,6 +21,7 @@ import com.duckduckgo.app.pixels.remoteconfig.OptimizeTrackerEvaluationRCWrapper
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
+import com.duckduckgo.app.statistics.wideevents.WideEventDefinition
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
@@ -100,6 +101,7 @@ class PageLoadWideEventTest {
             flowEntryPoint = null,
             metadata = emptyMap(),
             cleanupPolicy = CleanupPolicy.OnTimeout(5.minutes),
+            definition = WideEventDefinition(version = WideEventDefinition.Version(minor = 0, patch = 1)),
         )
         verify(wideEventClient).flowStep(
             wideEventId = 123L,
@@ -220,7 +222,7 @@ class PageLoadWideEventTest {
 
         pageLoadWideEvent.onPageStarted("tab_cs", "https://reddit.com", 1L)
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
-        finishPageLoad("tab_cs", "https://reddit.com")
+        finishPageLoad("tab_cs", 1L)
         // The same url loads again in this tab while the first navigation's deferred callback is still pending, so the
         // late measurement arrives with a live flow in place for the same tab and url.
         pageLoadWideEvent.onPageStarted("tab_cs", "https://reddit.com", 2L)
@@ -249,7 +251,7 @@ class PageLoadWideEventTest {
 
         pageLoadWideEvent.onPageStarted("tab_cs", "https://reddit.com", 1L)
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
-        finishPageLoad("tab_cs", "https://reddit.com")
+        finishPageLoad("tab_cs", 1L)
         pageLoadWideEvent.onJsInjectionComplete("tab_cs", 1L)
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
@@ -277,7 +279,7 @@ class PageLoadWideEventTest {
 
         pageLoadWideEvent.onPageStarted("tab_cs", "https://reddit.com", 1L)
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
-        finishPageLoad("tab_cs", "https://reddit.com")
+        finishPageLoad("tab_cs", 1L)
 
         val metadata = capturedFlowFinishMetadata(781L)
         assertEquals("true", metadata["content_scope_injection_optimized"])
@@ -285,10 +287,10 @@ class PageLoadWideEventTest {
         assertEquals("true", metadata["content_scope_experiments_cached"])
     }
 
-    private fun finishPageLoad(tabId: String, url: String) {
+    private fun finishPageLoad(tabId: String, navigationId: Long) {
         pageLoadWideEvent.onPageLoadFinished(
             tabId = tabId,
-            url = url,
+            navigationId = navigationId,
             errorDescription = null,
             isTabInForegroundOnFinish = true,
             activeRequestsOnLoadStart = 0,
@@ -310,7 +312,7 @@ class PageLoadWideEventTest {
 
         pageLoadWideEvent.onPageStarted("tab_2", "https://twitter.com", 1L)
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
-        pageLoadWideEvent.onPageVisible("tab_2", "https://twitter.com", 50)
+        pageLoadWideEvent.onPageVisible("tab_2", 1L, 50)
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
         verify(wideEventClient).intervalEnd(456L, "elapsed_time_to_visible_ms_bucketed")
@@ -324,7 +326,7 @@ class PageLoadWideEventTest {
 
     @Test
     fun `when onPageVisible called with unknown tab then does nothing`() = runTest {
-        pageLoadWideEvent.onPageVisible("unknown_tab", "https://unknown.com", 50)
+        pageLoadWideEvent.onPageVisible("unknown_tab", 1L, 50)
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
         verify(wideEventClient, never()).intervalEnd(any(), any())
@@ -338,7 +340,7 @@ class PageLoadWideEventTest {
 
         pageLoadWideEvent.onPageStarted("tab_3", "https://reddit.com", 1L)
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
-        pageLoadWideEvent.onProgressChanged("tab_3", "https://reddit.com")
+        pageLoadWideEvent.onProgressChanged("tab_3", 1L)
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
         verify(wideEventClient).intervalEnd(789L, "elapsed_time_to_escaped_fixed_progress_ms_bucketed")
@@ -350,7 +352,7 @@ class PageLoadWideEventTest {
 
     @Test
     fun `when onProgressChanged called with unknown tab then does nothing`() = runTest {
-        pageLoadWideEvent.onProgressChanged("unknown_tab", "https://unknown.com")
+        pageLoadWideEvent.onProgressChanged("unknown_tab", 1L)
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
         verify(wideEventClient, never()).intervalEnd(any(), any())
@@ -366,7 +368,7 @@ class PageLoadWideEventTest {
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
         pageLoadWideEvent.onPageLoadFinished(
             tabId = "tab_4",
-            url = "https://espn.com",
+            navigationId = 1L,
             errorDescription = null,
             isTabInForegroundOnFinish = true,
             activeRequestsOnLoadStart = 5,
@@ -407,7 +409,7 @@ class PageLoadWideEventTest {
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
         pageLoadWideEvent.onPageLoadFinished(
             tabId = "tab_5",
-            url = "https://wikipedia.org",
+            navigationId = 1L,
             errorDescription = "ERROR_HOST_LOOKUP",
             isTabInForegroundOnFinish = false,
             activeRequestsOnLoadStart = 3,
@@ -445,7 +447,7 @@ class PageLoadWideEventTest {
     fun `when onPageLoadFinished called with unknown tab then does nothing`() = runTest {
         pageLoadWideEvent.onPageLoadFinished(
             tabId = "unknown_tab",
-            url = "https://unknown.com",
+            navigationId = 1L,
             errorDescription = null,
             isTabInForegroundOnFinish = true,
             activeRequestsOnLoadStart = 0,
@@ -464,13 +466,13 @@ class PageLoadWideEventTest {
 
         pageLoadWideEvent.onPageStarted("tab_9", "https://github.com", 1L)
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
-        pageLoadWideEvent.onPageVisible("tab_9", "https://github.com", 50)
+        pageLoadWideEvent.onPageVisible("tab_9", 1L, 50)
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
-        pageLoadWideEvent.onProgressChanged("tab_9", "https://github.com")
+        pageLoadWideEvent.onProgressChanged("tab_9", 1L)
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
         pageLoadWideEvent.onPageLoadFinished(
             tabId = "tab_9",
-            url = "https://github.com",
+            navigationId = 1L,
             errorDescription = null,
             isTabInForegroundOnFinish = true,
             activeRequestsOnLoadStart = 0,
@@ -492,9 +494,9 @@ class PageLoadWideEventTest {
         pageLoadWideEvent.onPageStarted("tab_b", "https://weather.com", 2L)
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
-        pageLoadWideEvent.onPageVisible("tab_a", "https://ebay.com", 30)
+        pageLoadWideEvent.onPageVisible("tab_a", 1L, 30)
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
-        pageLoadWideEvent.onPageVisible("tab_b", "https://weather.com", 40)
+        pageLoadWideEvent.onPageVisible("tab_b", 2L, 40)
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
         verify(wideEventClient).flowStep(
@@ -534,17 +536,17 @@ class PageLoadWideEventTest {
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
         // Page becomes visible
-        pageLoadWideEvent.onPageVisible("tab_complete", "https://duckduckgo.com", 45)
+        pageLoadWideEvent.onPageVisible("tab_complete", 1L, 45)
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
         // Page escapes fixed progress
-        pageLoadWideEvent.onProgressChanged("tab_complete", "https://duckduckgo.com")
+        pageLoadWideEvent.onProgressChanged("tab_complete", 1L)
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
         // Page finishes
         pageLoadWideEvent.onPageLoadFinished(
             tabId = "tab_complete",
-            url = "https://duckduckgo.com",
+            navigationId = 1L,
             errorDescription = null,
             isTabInForegroundOnFinish = true,
             activeRequestsOnLoadStart = 7,
@@ -576,7 +578,7 @@ class PageLoadWideEventTest {
     }
 
     @Test
-    fun `when onPageStarted called with different url then aborts previous flow`() = runTest {
+    fun `when onPageStarted called with different url then cancels previous flow`() = runTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(800L))
             .thenReturn(Result.success(900L))
@@ -585,31 +587,81 @@ class PageLoadWideEventTest {
         pageLoadWideEvent.onPageStarted("tab_8", "https://espn.com", 1L)
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
-        // Start second page load with different URL - should abort first flow
+        // Start second page load with different URL - should cancel first flow
         pageLoadWideEvent.onPageStarted("tab_8", "https://twitter.com", 2L)
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
-        // Verify first flow was aborted
-        verify(wideEventClient).flowAbort(800L)
+        verify(wideEventClient).flowFinish(
+            wideEventId = 800L,
+            status = FlowStatus.Cancelled,
+            metadata = mapOf(
+                "webview_version" to "120",
+                "cpm_enabled" to "true",
+                "tracker_optimization_enabled_v3" to "true",
+                "content_scope_injection_optimized" to "true",
+                "content_scope_messaging_optimized" to "true",
+                "content_scope_experiments_cached" to "true",
+                "cancellation_reason" to "superseded_different_url",
+            ),
+        )
 
         // Verify second flow was started
         verify(wideEventClient, times(2)).flowStart(any(), anyOrNull(), any(), any(), any(), any())
     }
 
     @Test
-    fun `when onPageStarted called with same url then does not start duplicate flow`() = runTest {
+    fun `when a load is replaced by one of the same url then it is cancelled as a restart`() = runTest {
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
+            .thenReturn(Result.success(801L))
+            .thenReturn(Result.success(802L))
+
+        pageLoadWideEvent.onPageStarted("tab_same", "https://reddit.com", 1L)
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+        // A restart of the load rather than a navigation away from it, which the reason has to keep apart.
+        pageLoadWideEvent.onPageStarted("tab_same", "https://reddit.com", 2L)
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(wideEventClient).flowFinish(eq(801L), eq(FlowStatus.Cancelled), any())
+        assertEquals("superseded_same_url", capturedFlowFinishMetadata(801L)["cancellation_reason"])
+    }
+
+    @Test
+    fun `when the load being replaced is already past the cleanup timeout then it is left to the cleanup policy`() = runTest {
+        whenever(currentTimeProvider.currentTimeMillis())
+            .thenReturn(1000L)
+            .thenReturn(1000L + 6.minutes.inWholeMilliseconds)
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
+            .thenReturn(Result.success(910L))
+            .thenReturn(Result.success(911L))
+
+        pageLoadWideEvent.onPageStarted("tab_stale", "https://reddit.com", 1L)
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+        pageLoadWideEvent.onPageStarted("tab_stale", "https://ebay.com", 2L)
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+
+        // Cancelled means superseded while it was still being measured. A load this old was not, so its outcome is
+        // genuinely unaccounted for and the cleanup policy owns it.
+        verify(wideEventClient, times(2)).flowStart(any(), anyOrNull(), any(), any(), any(), any())
+        verify(wideEventClient, never()).flowFinish(eq(910L), any(), any())
+        verify(wideEventClient, never()).flowAbort(any())
+    }
+
+    @Test
+    fun `when the same url loads again in a tab then it gets its own flow`() = runTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(1000L))
+            .thenReturn(Result.success(1001L))
 
-        // Start page load twice with same URL
         pageLoadWideEvent.onPageStarted("tab_10", "https://reddit.com", 1L)
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
+        finishPageLoad("tab_10", 1L)
         pageLoadWideEvent.onPageStarted("tab_10", "https://reddit.com", 2L)
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
+        pageLoadWideEvent.onPageVisible("tab_10", 2L, 80)
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
-        // Verify flowStart was only called once and flowAbort was never called
-        verify(wideEventClient, times(1)).flowStart(any(), anyOrNull(), any(), any(), any(), any())
-        verify(wideEventClient, never()).flowAbort(any())
+        verify(wideEventClient, times(2)).flowStart(any(), anyOrNull(), any(), any(), any(), any())
+        verify(wideEventClient).flowStep(1001L, "page_visible", true, mapOf("progress" to "true"))
     }
 
     @Test
@@ -646,103 +698,146 @@ class PageLoadWideEventTest {
             flowEntryPoint = null,
             metadata = emptyMap(),
             cleanupPolicy = CleanupPolicy.OnTimeout(5.minutes),
+            definition = WideEventDefinition(version = WideEventDefinition.Version(minor = 0, patch = 1)),
         )
     }
 
     @Test
-    fun `when onPageVisible called with untracked url then does nothing`() = runTest {
-        // Start with a tracked URL
+    fun `when a load redirects then its events still reach the flow it started`() = runTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(123L))
-        pageLoadWideEvent.onPageStarted("tab_1", "https://reddit.com", 1L)
-        coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
-        // Clear invocations from setup
-        clearInvocations(wideEventClient)
-
-        // Call onPageVisible with untracked URL
-        pageLoadWideEvent.onPageVisible("tab_1", "https://untracked-example.com", 50)
-        coroutineRule.testScope.testScheduler.advanceUntilIdle()
-
-        // Verify no wide event operations were performed
-        verify(wideEventClient, never()).flowStep(any(), any(), any(), any())
-        verify(wideEventClient, never()).intervalEnd(any(), any())
-    }
-
-    @Test
-    fun `when onProgressChanged called with untracked url then does nothing`() = runTest {
-        // Start with a tracked URL
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
-            .thenReturn(Result.success(123L))
-        pageLoadWideEvent.onPageStarted("tab_1", "https://reddit.com", 1L)
-        coroutineRule.testScope.testScheduler.advanceUntilIdle()
-
-        // Clear invocations from setup
-        clearInvocations(wideEventClient)
-
-        // Call onProgressChanged with untracked URL
-        pageLoadWideEvent.onProgressChanged("tab_1", "https://untracked-example.com")
-        coroutineRule.testScope.testScheduler.advanceUntilIdle()
-
-        // Verify no wide event operations were performed
-        verify(wideEventClient, never()).flowStep(any(), any(), any(), any())
-        verify(wideEventClient, never()).intervalEnd(any(), any())
-    }
-
-    @Test
-    fun `when onPageLoadFinished called with success and untracked url then does nothing`() = runTest {
-        // Start with a tracked URL
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
-            .thenReturn(Result.success(123L))
-        pageLoadWideEvent.onPageStarted("tab_1", "https://reddit.com", 1L)
-        coroutineRule.testScope.testScheduler.advanceUntilIdle()
-
-        // Clear invocations from setup
-        clearInvocations(wideEventClient)
-
-        // Call onPageLoadFinished with untracked URL (e.g., redirect scenario)
-        pageLoadWideEvent.onPageLoadFinished(
-            tabId = "tab_1",
-            url = "https://untracked-redirect.com",
-            errorDescription = null,
-            isTabInForegroundOnFinish = true,
-            activeRequestsOnLoadStart = 5,
-            concurrentRequestsOnFinish = 2,
-        )
-        coroutineRule.testScope.testScheduler.advanceUntilIdle()
-
-        // Verify no wide event operations were performed
-        verify(wideEventClient, never()).flowStep(any(), any(), any(), any())
-        verify(wideEventClient, never()).intervalEnd(any(), any())
-        verify(wideEventClient, never()).flowFinish(any(), any(), any())
-    }
-
-    @Test
-    fun `when onPageLoadFinished called with error and untracked url then does nothing`() = runTest {
-        // Start with a tracked URL
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
-            .thenReturn(Result.success(123L))
+        // https://espn.com redirects to https://www.espn.com/, so every callback after the redirect carries a url the
+        // flow was not started with. They belong to the same load, and to the same navigationId.
         pageLoadWideEvent.onPageStarted("tab_1", "https://espn.com", 1L)
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
+        pageLoadWideEvent.onPageVisible("tab_1", 1L, 60)
+        pageLoadWideEvent.onProgressChanged("tab_1", 1L)
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+        finishPageLoad("tab_1", 1L)
 
-        // Clear invocations from setup
+        verify(wideEventClient).intervalEnd(123L, "elapsed_time_to_visible_ms_bucketed")
+        verify(wideEventClient).intervalEnd(123L, "elapsed_time_to_escaped_fixed_progress_ms_bucketed")
+        verify(wideEventClient).intervalEnd(123L, "elapsed_time_to_finish_ms_bucketed")
+        verify(wideEventClient).flowFinish(eq(123L), eq(FlowStatus.Success), any())
+    }
+
+    @Test
+    fun `when events arrive from a load the flow did not start then they are dropped`() = runTest {
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
+            .thenReturn(Result.success(123L))
+        pageLoadWideEvent.onPageStarted("tab_1", "https://reddit.com", 1L)
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
         clearInvocations(wideEventClient)
 
-        // Call onPageLoadFinished with error and untracked URL
-        pageLoadWideEvent.onPageLoadFinished(
-            tabId = "tab_1",
-            url = "https://untracked-error.com",
-            errorDescription = "ERR_CONNECTION_REFUSED",
-            isTabInForegroundOnFinish = true,
-            activeRequestsOnLoadStart = 3,
-            concurrentRequestsOnFinish = 0,
-        )
+        pageLoadWideEvent.onPageVisible("tab_1", 2L, 50)
+        pageLoadWideEvent.onProgressChanged("tab_1", 2L)
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
+        finishPageLoad("tab_1", 2L)
 
-        // Verify no wide event operations were performed
         verify(wideEventClient, never()).flowStep(any(), any(), any(), any())
         verify(wideEventClient, never()).intervalEnd(any(), any())
         verify(wideEventClient, never()).flowFinish(any(), any(), any())
+    }
+
+    @Test
+    fun `when a page becomes visible twice in one load then the first is kept`() = runTest {
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
+            .thenReturn(Result.success(123L))
+
+        pageLoadWideEvent.onPageStarted("tab_1", "https://reddit.com", 1L)
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+        pageLoadWideEvent.onPageVisible("tab_1", 1L, 10)
+        pageLoadWideEvent.onPageVisible("tab_1", 1L, 90)
+        pageLoadWideEvent.onProgressChanged("tab_1", 1L)
+        pageLoadWideEvent.onProgressChanged("tab_1", 1L)
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+
+        // The interval only ends once, so the progress reported alongside it has to be the one it was measured against.
+        verify(wideEventClient, times(1)).flowStep(eq(123L), eq("page_visible"), any(), any())
+        verify(wideEventClient).flowStep(123L, "page_visible", true, mapOf("progress" to "false"))
+        verify(wideEventClient, times(1)).flowStep(eq(123L), eq("page_escaped_fixed_progress"), any(), any())
+    }
+
+    @Test
+    fun `when a new load starts in a tab then the previous flow is cancelled even if untracked`() = runTest {
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
+            .thenReturn(Result.success(123L))
+
+        pageLoadWideEvent.onPageStarted("tab_1", "https://reddit.com", 1L)
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+        // Left open it would be swept by the cleanup policy and sent as an Unknown load with no duration.
+        pageLoadWideEvent.onPageStarted("tab_1", "https://untracked-site.com", 2L)
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+
+        assertEquals("superseded_different_url", capturedFlowFinishMetadata(123L)["cancellation_reason"])
+        verify(wideEventClient).flowFinish(eq(123L), eq(FlowStatus.Cancelled), any())
+        verify(wideEventClient, times(1)).flowStart(any(), anyOrNull(), any(), any(), any(), any())
+    }
+
+    @Test
+    fun `when a page becomes visible before its flow exists then the measurement still lands`() = runTest {
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
+            .thenReturn(Result.success(123L))
+
+        // Queued together, so flowStart has not run when the commit-visible callback arrives - the ordinary ordering
+        // for a cached page, since flowStart goes to disk. Gating these callbacks on an activeFlows hit outside the
+        // lock would drop them.
+        pageLoadWideEvent.onPageStarted("tab_early", "https://reddit.com", 1L)
+        pageLoadWideEvent.onPageVisible("tab_early", 1L, 80)
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(wideEventClient).intervalEnd(123L, "elapsed_time_to_visible_ms_bucketed")
+        verify(wideEventClient).flowStep(123L, "page_visible", true, mapOf("progress" to "true"))
+    }
+
+    @Test
+    fun `when an untracked load starts before the flow it replaces exists then that flow is still cancelled`() = runTest {
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
+            .thenReturn(Result.success(123L))
+
+        // Both starts are queued before either reaches the lock, which is what a tracked load redirecting off its
+        // domain looks like: the second start arrives while the flow it has to end is still being created.
+        pageLoadWideEvent.onPageStarted("tab_race", "https://reddit.com", 1L)
+        pageLoadWideEvent.onPageStarted("tab_race", "https://untracked-site.com", 2L)
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(wideEventClient).flowFinish(eq(123L), eq(FlowStatus.Cancelled), any())
+    }
+
+    @Test
+    fun `when a load is replaced mid flight then each load is measured on its own`() = runTest {
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
+            .thenReturn(Result.success(73L))
+            .thenReturn(Result.success(74L))
+            .thenReturn(Result.success(75L))
+
+        // reddit.com starts loading and the user navigates away to ebay.com before it finishes.
+        pageLoadWideEvent.onPageStarted("tab_r", "https://reddit.com", 1L)
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+        pageLoadWideEvent.onPageStarted("tab_r", "https://ebay.com", 2L)
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+        finishPageLoad("tab_r", 2L)
+
+        // Within the cleanup timeout, reddit.com loads again in the same tab.
+        pageLoadWideEvent.onPageStarted("tab_r", "https://reddit.com", 3L)
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+        pageLoadWideEvent.onPageVisible("tab_r", 3L, 70)
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+        finishPageLoad("tab_r", 3L)
+
+        // The abandoned reddit load is reported as superseded, rather than as an event whose duration spans it and
+        // ebay together, or as nothing at all.
+        verify(wideEventClient).flowFinish(eq(73L), eq(FlowStatus.Cancelled), any())
+        verify(wideEventClient, never()).intervalEnd(eq(73L), eq("elapsed_time_to_finish_ms_bucketed"))
+        verify(wideEventClient).intervalEnd(74L, "elapsed_time_to_finish_ms_bucketed")
+        verify(wideEventClient).flowFinish(eq(74L), eq(FlowStatus.Success), any())
+
+        // The reload is measured in full instead of being swallowed by the flow the first attempt left behind.
+        verify(wideEventClient).flowStep(75L, "page_visible", true, mapOf("progress" to "true"))
+        verify(wideEventClient).intervalEnd(75L, "elapsed_time_to_visible_ms_bucketed")
+        verify(wideEventClient).intervalEnd(75L, "elapsed_time_to_finish_ms_bucketed")
+        verify(wideEventClient).flowFinish(eq(75L), eq(FlowStatus.Success), any())
     }
 
     private class FakeContentScopeOptimizations : ContentScopeOptimizations {
