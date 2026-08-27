@@ -21,6 +21,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState
 import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.CONNECTED
+import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.CONNECTING
 import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.DISCONNECTED
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.getDisplayableCountry
 import kotlinx.coroutines.flow.flowOf
@@ -84,6 +85,18 @@ class SubscriptionOnboardingVpnViewModelTest {
     }
 
     @Test
+    fun whenVpnConnectingThenActivatingIsTrueAndVpnNotYetEnabled() = runTest {
+        val testee = createViewModel(connectionState = CONNECTING)
+
+        testee.viewState().test {
+            val state = awaitItem()
+            assertTrue(state.activating)
+            assertFalse(state.vpnEnabled == true)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenVpnPermissionDeniedThenActivationErrorIsTrue() = runTest {
         val testee = createViewModel(connectionState = DISCONNECTED)
 
@@ -110,7 +123,9 @@ class SubscriptionOnboardingVpnViewModelTest {
 
         verify(networkProtectionState).start()
         testee.viewState().test {
-            assertFalse(awaitItem().activationError)
+            val state = awaitItem()
+            assertFalse(state.activationError)
+            assertTrue(state.activating)
             cancelAndConsumeRemainingEvents()
         }
     }

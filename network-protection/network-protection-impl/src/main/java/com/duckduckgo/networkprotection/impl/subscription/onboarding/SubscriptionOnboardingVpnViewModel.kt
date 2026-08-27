@@ -22,6 +22,9 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
+import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.CONNECTED
+import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.CONNECTING
+import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.DISCONNECTED
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.getDisplayableCountry
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.getEmojiForCountryCode
 import kotlinx.coroutines.flow.Flow
@@ -68,19 +71,22 @@ class SubscriptionOnboardingVpnViewModel @Inject constructor(
 
         networkProtectionState.getConnectionStateFlow()
             .onEach { connectionState ->
-                val connected = connectionState.isConnected()
                 viewState.update {
-                    // Once the VPN is on, any earlier activation error is resolved.
-                    it.copy(vpnEnabled = connected, activationError = if (connected) false else it.activationError)
+                    when (connectionState) {
+                        // Once the VPN is on, any earlier activation error or in-progress activation is resolved.
+                        CONNECTED -> it.copy(vpnEnabled = true, activating = false, activationError = false)
+                        CONNECTING -> it.copy(vpnEnabled = false, activating = true, activationError = false)
+                        DISCONNECTED -> it.copy(vpnEnabled = false, activating = false)
+                    }
                 }
             }
             .flowOn(dispatcherProvider.io())
             .launchIn(viewModelScope)
     }
 
-    /** The VPN permission was granted (or already present): clear any error and start the VPN. */
+    /** The VPN permission was granted (or already present): clear any error, show activation in progress, start the VPN. */
     fun onVpnPermissionGranted() {
-        viewState.update { it.copy(activationError = false) }
+        viewState.update { it.copy(activationError = false, activating = true) }
         networkProtectionState.start()
     }
 
@@ -92,6 +98,7 @@ class SubscriptionOnboardingVpnViewModel @Inject constructor(
     data class ViewState(
         // null until the VPN connection state is first observed, so the UI does not flip states prematurely.
         val vpnEnabled: Boolean? = null,
+        val activating: Boolean = false,
         val activationError: Boolean = false,
         val ipAddress: String? = null,
         val location: String? = null,

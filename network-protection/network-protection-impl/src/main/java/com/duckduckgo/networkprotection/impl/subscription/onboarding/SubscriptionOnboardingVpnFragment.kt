@@ -57,6 +57,8 @@ import com.duckduckgo.subscriptions.api.SubscriptionOnboardingFeature
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.COMPLETED
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.SKIPPED
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionOnboardingFeatureInfoScreen
+import com.google.android.material.progressindicator.CircularProgressIndicatorSpec
+import com.google.android.material.progressindicator.IndeterminateDrawable
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
@@ -100,8 +102,20 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
     }
 
     private var vpnOn = false
+    private var activating = false
     private var lastRenderedState: ScreenState? = null
     private var transition: ValueAnimator? = null
+
+    // Indeterminate spinner shown inside the primary button while the VPN is being activated.
+    private val buttonSpinner: IndeterminateDrawable<CircularProgressIndicatorSpec> by lazy {
+        val density = resources.displayMetrics.density
+        val spec = CircularProgressIndicatorSpec(requireContext(), null).apply {
+            indicatorSize = (BUTTON_SPINNER_SIZE_DP * density).toInt()
+            trackThickness = (BUTTON_SPINNER_THICKNESS_DP * density).toInt()
+            indicatorColors = intArrayOf(binding.subscriptionOnboardingVpnNextButton.currentTextColor)
+        }
+        IndeterminateDrawable.createCircularDrawable(requireContext(), spec)
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -109,10 +123,10 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
         applyState(ScreenState.VPN_OFF, animate = false)
         observeViewState()
         binding.subscriptionOnboardingVpnNextButton.setOnClickListener {
-            if (vpnOn) {
-                controller.onStepFinished(VPN_STEP_ID, COMPLETED)
-            } else {
-                enableVpn()
+            when {
+                activating -> {} // ignore taps while the VPN is being activated
+                vpnOn -> controller.onStepFinished(VPN_STEP_ID, COMPLETED)
+                else -> enableVpn()
             }
         }
         binding.subscriptionOnboardingVpnSkipButton.setOnClickListener {
@@ -163,8 +177,15 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
                 state.ipAddress?.let { binding.subscriptionOnboardingVpnIpAddressValue.text = it }
                 state.location?.let { binding.subscriptionOnboardingVpnIpAddressLocation.text = it }
                 state.toScreenState()?.let(::renderScreenState)
+                renderActivating(state.activating)
             }
             .launchIn(viewLifecycleOwner.lifecycleScope)
+    }
+
+    /** Shows a spinner inside the primary button while the VPN is being activated (between grant and connected). */
+    private fun renderActivating(loading: Boolean) {
+        activating = loading
+        binding.subscriptionOnboardingVpnNextButton.icon = if (loading) buttonSpinner else null
     }
 
     private fun SubscriptionOnboardingVpnViewModel.ViewState.toScreenState(): ScreenState? = when {
@@ -350,5 +371,7 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
     companion object {
         private const val TRANSITION_DURATION_MS = 1000L
         private const val BLUR_RADIUS = 12f
+        private const val BUTTON_SPINNER_SIZE_DP = 20
+        private const val BUTTON_SPINNER_THICKNESS_DP = 2
     }
 }
