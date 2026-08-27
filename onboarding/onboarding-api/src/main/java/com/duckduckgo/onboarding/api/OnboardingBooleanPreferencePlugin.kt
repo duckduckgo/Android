@@ -24,8 +24,7 @@ import com.duckduckgo.common.utils.plugins.ActivePlugin
  * setting, so onboarding can offer it without that module publishing the setting.
  *
  * Onboarding owns which preferences exist, so it asks for a specific plugin by [Id] rather than
- * rendering whatever happens to be contributed. The module owning the setting names and illustrates
- * it; where the row sits and where its switch sits stay on the onboarding side.
+ * rendering whatever happens to be contributed.
  *
  * Whether the preference can be offered at all is expressed through [isActive]: a plugin that does
  * not resolve from the plugin point means the row is not shown.
