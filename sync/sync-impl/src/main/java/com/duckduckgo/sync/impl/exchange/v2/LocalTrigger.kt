@@ -17,14 +17,50 @@
 package com.duckduckgo.sync.impl.exchange.v2
 
 /**
- * Side-effect-free transitions driven by something other than an inbound wire message
- * (user input, role election by the runner, completion of an outbound send).
+ * An input to the state machine that didn't come off the wire: a user decision, role election, or
+ * the completion of work the runner was doing.
+ *
+ * Triggers carry no side effects themselves, but the transitions they drive declare most of them:
+ * every spec-mandated message this device originates follows a local decision rather than an
+ * inbound message (see [SideEffect]).
+ *
+ * A trigger the current state does not allow aborts the session, so the runner fires these only
+ * from the state each one belongs to.
  */
 sealed interface LocalTrigger {
+
+    /**
+     * Our user approved sharing the recovery code, at [ExchangeV2State.Host.Confirming]. Moves to
+     * [ExchangeV2State.Host.Sending], telling the peer and starting the handover.
+     */
     data object UserConfirmedHost : LocalTrigger
+
+    /**
+     * Our user refused to share, at [ExchangeV2State.Host.Confirming]. Moves to
+     * [ExchangeV2State.Host.Aborted], telling the peer why the session ended.
+     */
     data object UserDeniedHost : LocalTrigger
+
+    /**
+     * Our user approved joining, at [ExchangeV2State.Joiner.Confirming]. Moves to
+     * [ExchangeV2State.Joiner.Waiting], which is also when the runner replays any Host messages that
+     * arrived while the prompt was still up.
+     */
     data object UserConfirmedJoiner : LocalTrigger
+
+    /**
+     * Our user refused to join, at [ExchangeV2State.Joiner.Confirming]. Moves to
+     * [ExchangeV2State.Joiner.AbortedLocal]. Nothing is sent to the peer, since by spec the Joiner's
+     * denial is silent.
+     */
     data object UserDeniedJoiner : LocalTrigger
+
+    /**
+     * The runner picked which side this device plays, which is what forks the machine into the
+     * [ExchangeV2State.Host] or [ExchangeV2State.Joiner] branch. Election itself lives in the runner
+     * (Asana Unified Algorithm 1214739740392701), because it needs peer and account context the
+     * state machine deliberately doesn't track.
+     */
     data class RoleElected(val role: Role) : LocalTrigger
 
     /**

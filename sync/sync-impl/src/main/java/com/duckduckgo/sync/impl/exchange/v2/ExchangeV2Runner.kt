@@ -54,13 +54,32 @@ import java.util.UUID
 import javax.inject.Inject
 
 /**
- * Drives a single Exchange V2 protocol session.
+ * Drives a single Exchange V2 pairing session, from the linking code to a terminal state.
  *
- * Two entry points: [startPresent] generates a v2 linking code (surfaced via [SessionStarted]);
- * [startScan] parses a peer's code and joins their session. From there the runner manages the
- * wire I/O, drives the SM, and auto-elects role per the Unified Algorithm.
+ * Two entry points open a session: [startPresent] publishes a linking code for a peer to scan,
+ * [startScan] joins the session behind a code this device scanned. Either way the runner owns
+ * everything the [ExchangeV2StateMachine] deliberately does not: the relay channel, the poll loop,
+ * the session keys, role election, the session deadline, and executing the [SideEffect]s each
+ * transition declares. The state machine decides what is allowed; the runner makes it happen.
+ *
+ * Only a single session is allowed. Opening a session abandons any session already running, and
+ * reaching a terminal state tears the current one down, so nothing outlives it.
+ *
+ * Callers observe through [events] rather than polling the getters: the session advances on the
+ * poll loop's own coroutine, so [currentState] and friends are snapshots that can change between
+ * two reads.
+ *
+ * Spec:
+ *  - Asana 1214739740392701, Unified Algorithm: role election, and the abort rules applied around
+ *    the state machine.
+ *  - Asana 1214486492252757, Transport TD: channel lifecycle, polling, and the session deadline.
  */
 interface ExchangeV2Runner {
+
+    /**
+     * Everything that happened in this runner, including sessions that have already ended: the
+     * buffer is not cleared at teardown. Scope to one session with [eventsSince].
+     */
     val events: SharedFlow<ExchangeV2Event>
 
     /**
@@ -69,11 +88,13 @@ interface ExchangeV2Runner {
      */
     fun eventsSince(sinceMs: Long): Flow<ExchangeV2Event> = events.filter { it.timestampMs >= sinceMs }
 
+    /** Where the session currently is, or null when no session is running. */
     val currentState: ExchangeV2State?
 
+    /** How this device entered the session (scanned or presented), which is not its elected [Role]. */
     val pairingRole: PairingRole?
 
-    /** Linking code URL for the Presenter side — populated after [startPresent] completes bootstrap. */
+    /** Linking code URL for the Presenter side, populated once [startPresent] has bootstrapped. */
     val linkingCode: String?
 
     /**
@@ -88,8 +109,23 @@ interface ExchangeV2Runner {
     /** Peer device's credential kind ("ddg" / "3party"), learned during role election. Null before then. */
     val peerKind: String?
 
+    /**
+     * Join the session behind a linking code this device scanned or pasted. Returns immediately;
+     * the session is only usable once [ExchangeV2Event.SessionStarted] has been emitted, and a code
+     * that doesn't parse surfaces as a [ExchangeV2Event.SessionError] rather than a thrown exception.
+     *
+     * Starts in [ExchangeV2State.Negotiating]: the code already identifies the peer, so unlike the
+     * Presenter this side has no hello to wait for.
+     */
     fun startScan(pastedUrl: String)
 
+    /**
+     * Open a session for a peer to scan and publish a linking code for it. Returns immediately; the
+     * code is on [linkingCode], and in the emitted [ExchangeV2Eve nt.SessionStarted], once bootstrap
+     * completes.
+     *
+     * Starts in [ExchangeV2State.Bootstrapped], waiting for the peer's hello.
+     */
     fun startPresent()
 
     /**
@@ -98,6 +134,11 @@ interface ExchangeV2Runner {
      */
     suspend fun cancel()
 
+    /**
+     * Drive the state machine with something that didn't come off the wire, such as the user
+     * answering a confirmation prompt. Returns immediately, and a trigger the current state does not
+     * allow aborts the session rather than being ignored.
+     */
     fun localTrigger(trigger: LocalTrigger)
 }
 
