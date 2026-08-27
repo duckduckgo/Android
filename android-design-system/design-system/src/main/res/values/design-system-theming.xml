@@ -284,9 +284,9 @@
         <item name="daxColorRebrandButtonDestructiveContainer">@color/rb_red40</item>
         <item name="daxColorRebrandButtonDestructiveContainerPressed">@color/rb_red60</item>
         <item name="daxColorRebrandButtonDestructiveText">@color/black</item>
-        <item name="daxColorRebrandButtonDestructiveSecondaryText">@color/rb_red20</item>
+        <item name="daxColorRebrandButtonDestructiveSecondaryText">@color/rb_red40</item>
         <item name="daxColorRebrandButtonDestructiveGhostContainerPressed">@color/destructive_glow_secondary_dark</item>
-        <item name="daxColorRebrandButtonDestructiveGhostText">@color/rb_red20</item>
+        <item name="daxColorRebrandButtonDestructiveGhostText">@color/rb_red40</item>
 
         <!-- Fab -->
         <item name="daxColorFabPrimaryContainer">@color/blue20</item>
