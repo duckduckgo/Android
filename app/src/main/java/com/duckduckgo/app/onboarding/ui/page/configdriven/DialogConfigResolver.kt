@@ -197,6 +197,7 @@ class DialogConfigResolver @Inject constructor(
             content = ContentConfig.PreferenceSelector(
                 title = TextConfig.Resource(dialog.titleRes),
                 rows = dialog.initialSelections.map { (preference, enabled) -> preferenceRow(preference, enabled) },
+                caption = dialog.caption?.let { TextConfig.Resource(it) },
             ),
             primaryCta = CtaConfig(
                 text = TextConfig.Resource(R.string.preOnboardingInputScreenButton),
