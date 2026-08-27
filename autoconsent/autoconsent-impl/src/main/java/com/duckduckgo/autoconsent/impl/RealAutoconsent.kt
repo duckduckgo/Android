@@ -83,6 +83,9 @@ class RealAutoconsent @Inject constructor(
     }
 
     override fun changeSetting(setting: Boolean) {
+        // Persisting a value that already applies would turn the remote default into an explicit user
+        // choice, so the setting would stop following a later change to that default.
+        if (setting == settingsRepository.userSetting) return
         settingsRepository.userSetting = setting
     }
 

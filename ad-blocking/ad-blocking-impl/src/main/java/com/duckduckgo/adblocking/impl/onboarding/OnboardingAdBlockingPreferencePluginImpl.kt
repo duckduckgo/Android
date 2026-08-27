@@ -19,6 +19,9 @@ package com.duckduckgo.adblocking.impl.onboarding
 import android.content.Context
 import com.duckduckgo.adblocking.impl.AdBlockingSettingsRepository
 import com.duckduckgo.adblocking.impl.R
+import com.duckduckgo.adblocking.impl.domain.AdBlockingState.Disabled
+import com.duckduckgo.adblocking.impl.domain.AdBlockingState.Enabled
+import com.duckduckgo.adblocking.impl.domain.AdBlockingState.Uninitialized
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
 import com.duckduckgo.adblocking.impl.domain.SettingsPlacement
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
@@ -53,6 +56,16 @@ class OnboardingAdBlockingPreferencePluginImpl @Inject constructor(
     }
 
     override suspend fun apply(enabled: Boolean) {
-        settingsRepository.setEnabled(enabled)
+        // Persisting a value that already applies would turn the remote default into an explicit user
+        // choice, so the setting would stop following a later change to that default.
+        val alreadyApplies = when (statusChecker.currentState()) {
+            Enabled.UserEnabled, Enabled.Default -> enabled
+            Disabled.Permanent -> !enabled
+            // A session-scoped kill hides the persisted choice, so there is nothing to compare against.
+            Disabled.UntilRelaunch, Uninitialized -> false
+        }
+        if (!alreadyApplies) {
+            settingsRepository.setEnabled(enabled)
+        }
     }
 }

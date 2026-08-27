@@ -52,7 +52,13 @@ class FakeMessageHandlerPlugin : MessageHandlerPlugin {
 }
 
 class FakeSettingsRepository : AutoconsentSettingsRepository {
+    /** Lets a test tell an explicit write apart from a value that was only ever the default. */
+    var userSettingWrites = 0
     override var userSetting: Boolean = false
+        set(value) {
+            field = value
+            userSettingWrites++
+        }
     override var clickAcceptEnabled: Boolean = false
     override var firstPopupHandled: Boolean = false
     override fun invalidateCache() {}
