@@ -38,28 +38,28 @@ class SerpSettingTest {
     private val serpSettingsDataProvider: SerpSettingsDataProvider = mock()
 
     @Test
-    fun whenSettingWrittenThenItsKeyAndCodeAreStored() = runTest {
+    fun `when setting written then its key and code are stored`() = runTest {
         serpSettingsDataProvider.setSetting(TestSerpSetting.SECOND)
 
         verify(serpSettingsDataProvider).setSetting("test", "2")
     }
 
     @Test
-    fun whenStoredCodeIsKnownThenItDecodesToItsOption() = runTest {
+    fun `when stored code is known then it decodes to its option`() = runTest {
         whenever(serpSettingsDataProvider.observeSetting("test")).thenReturn(flowOf("2"))
 
         assertEquals(TestSerpSetting.SECOND, serpSettingsDataProvider.observeSetting(TestSerpSetting.FIRST).first())
     }
 
     @Test
-    fun whenNothingStoredThenDefaultIsEmitted() = runTest {
+    fun `when nothing stored then default is emitted`() = runTest {
         whenever(serpSettingsDataProvider.observeSetting("test")).thenReturn(flowOf(null))
 
         assertEquals(TestSerpSetting.FIRST, serpSettingsDataProvider.observeSetting(TestSerpSetting.FIRST).first())
     }
 
     @Test
-    fun whenStoredCodeIsUnrecognizedThenDefaultIsEmitted() = runTest {
+    fun `when stored code is unrecognized then default is emitted`() = runTest {
         whenever(serpSettingsDataProvider.observeSetting("test")).thenReturn(flowOf("99"))
 
         assertEquals(TestSerpSetting.FIRST, serpSettingsDataProvider.observeSetting(TestSerpSetting.FIRST).first())

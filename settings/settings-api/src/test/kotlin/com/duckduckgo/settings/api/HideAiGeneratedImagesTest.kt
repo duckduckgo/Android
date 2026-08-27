@@ -22,26 +22,26 @@ import org.junit.Test
 class HideAiGeneratedImagesTest {
 
     @Test
-    fun whenSerpCodesThenEachOptionHasExpectedCode() {
+    fun `when serp codes then each option has expected code`() {
         assertEquals("1", HideAiGeneratedImages.ON.serpCode)
         assertEquals("-1", HideAiGeneratedImages.OFF.serpCode)
     }
 
     @Test
-    fun whenFromSerpCodeThenMapsEachCodeToItsOption() {
+    fun `when from serp code then maps each code to its option`() {
         assertEquals(HideAiGeneratedImages.ON, HideAiGeneratedImages.fromSerpCode("1"))
         assertEquals(HideAiGeneratedImages.OFF, HideAiGeneratedImages.fromSerpCode("-1"))
     }
 
     @Test
-    fun whenFromSerpCodeUnknownOrNullThenDefaultsToOff() {
+    fun `when from serp code unknown or null then defaults to off`() {
         assertEquals(HideAiGeneratedImages.OFF, HideAiGeneratedImages.fromSerpCode(null))
         assertEquals(HideAiGeneratedImages.OFF, HideAiGeneratedImages.fromSerpCode(""))
         assertEquals(HideAiGeneratedImages.OFF, HideAiGeneratedImages.fromSerpCode("2"))
     }
 
     @Test
-    fun whenSerpKeyThenEveryOptionCarriesTheSameKey() {
+    fun `when serp key then every option carries the same key`() {
         HideAiGeneratedImages.entries.forEach { assertEquals("kbj", it.serpKey) }
     }
 }
