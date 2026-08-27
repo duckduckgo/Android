@@ -21,10 +21,10 @@
     <string name="autoconsentDescription"><![CDATA[DuckDuckGo proovib valida kõige privaatsemad saadaolevad seaded ja peita need hüpikaknad sinu eest.\n<a href=\"\">Loe edasi</a>]]></string>
     <string name="autoconsentToggle">Lase DuckDuckGol küpsiste hüpikaknaid hallata</string>
     <string name="autoconsentAutoManageToggle">Keeldu valikulistest küpsistest</string>
-    <string name="autoconsentAutoManageDescription">Püüame teie jaoks võimalikult palju küpsiseid tagasi lükata ja seejärel hüpikaknad sulgeda.</string>
+    <string name="autoconsentAutoManageDescription">Püüame sinu jaoks blokeerida nii palju küpsiseid kui võimalik, seejärel sulgeda hüpikaknad.</string>
     <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[DuckDuckGo saab automaatselt hallata küpsiste hüpikaknaid, et maksimeerida privaatsust ja minimeerida küpsiseid juba enne, kui neid näete.\n<a href=\"\">Loe edasi</a>]]></string>
     <string name="autoconsentPopUpsWithoutOptOutsToggle">Nõustu küpsistega, millest ei saa loobuda</string>
-    <string name="autoconsentPopUpsWithoutOptOutsDescription">Kui keeldumisvõimalust pole, säästame teile ühe klõpsu, nõustume teie eest nende küpsistega ja sulgeme hüpikaknad.</string>
+    <string name="autoconsentPopUpsWithoutOptOutsDescription">Kui keeldumisvõimalust pole, säästame sulle ühe klõpsu, nõustume sinu eest nende küpsistega ja sulgeme hüpikaknad.</string>
     <string name="autoconsentPromptTitle">Oled väsinud küpsiste hüpikakendest?</string>
     <string name="autoconsentPromptFootnote">Saad seda hiljem alati seadetes muuta.</string>
     <string name="autoconsentPromptCpmOnMessage">Mõnest küpsisest ei saa loobuda. Saame nõustuda nendega sinu eest.</string>
