@@ -119,6 +119,36 @@ class RealAutoconsentTest {
     }
 
     @Test
+    fun whenChangeSettingToTheValueTheDefaultAlreadyGivesThenNothingIsPersisted() {
+        autoconsent.changeSetting(false)
+
+        assertEquals(0, settingsRepository.userSettingWrites)
+        assertFalse(settingsRepository.userSetting)
+    }
+
+    @Test
+    fun whenChangeSettingToTheValueThatAlreadyAppliesThenNothingIsPersisted() {
+        settingsRepository.userSetting = true
+        settingsRepository.userSettingWrites = 0
+
+        autoconsent.changeSetting(true)
+
+        assertEquals(0, settingsRepository.userSettingWrites)
+        assertTrue(settingsRepository.userSetting)
+    }
+
+    @Test
+    fun whenChangeSettingAwayFromTheValueThatAppliesThenItIsPersisted() {
+        settingsRepository.userSetting = true
+        settingsRepository.userSettingWrites = 0
+
+        autoconsent.changeSetting(false)
+
+        assertEquals(1, settingsRepository.userSettingWrites)
+        assertFalse(settingsRepository.userSetting)
+    }
+
+    @Test
     fun whenChangeClickAcceptEnabledThenRepoSetValueChanged() {
         autoconsent.changeClickAcceptEnabled(true)
         assertTrue(settingsRepository.clickAcceptEnabled)

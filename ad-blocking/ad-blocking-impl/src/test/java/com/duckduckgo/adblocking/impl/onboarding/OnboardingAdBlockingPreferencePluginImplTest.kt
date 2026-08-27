@@ -19,6 +19,9 @@ package com.duckduckgo.adblocking.impl.onboarding
 import android.content.Context
 import com.duckduckgo.adblocking.impl.AdBlockingSettingsRepository
 import com.duckduckgo.adblocking.impl.R
+import com.duckduckgo.adblocking.impl.domain.AdBlockingState.Disabled
+import com.duckduckgo.adblocking.impl.domain.AdBlockingState.Enabled
+import com.duckduckgo.adblocking.impl.domain.AdBlockingState.Uninitialized
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
 import com.duckduckgo.adblocking.impl.domain.SettingsPlacement
 import com.duckduckgo.onboarding.api.OnboardingBooleanPreferencePlugin
@@ -30,8 +33,10 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import com.duckduckgo.mobile.android.R as CommonR
@@ -91,16 +96,83 @@ class OnboardingAdBlockingPreferencePluginImplTest {
     }
 
     @Test
-    fun whenPreferenceAppliedOnThenAdBlockingIsEnabled() = runTest {
+    fun whenAdBlockingIsOnByRemoteDefaultAndPreferenceAppliedOnThenNothingIsPersisted() = runTest {
+        whenever(statusChecker.currentState()).thenReturn(Enabled.Default)
+
+        testee.apply(true)
+
+        verify(settingsRepository, never()).setEnabled(any())
+    }
+
+    @Test
+    fun whenAdBlockingIsOnByRemoteDefaultAndPreferenceAppliedOffThenAdBlockingIsDisabled() = runTest {
+        whenever(statusChecker.currentState()).thenReturn(Enabled.Default)
+
+        testee.apply(false)
+
+        verify(settingsRepository).setEnabled(false)
+    }
+
+    @Test
+    fun whenAdBlockingIsOffAndPreferenceAppliedOffThenNothingIsPersisted() = runTest {
+        whenever(statusChecker.currentState()).thenReturn(Disabled.Permanent)
+
+        testee.apply(false)
+
+        verify(settingsRepository, never()).setEnabled(any())
+    }
+
+    @Test
+    fun whenAdBlockingIsOffAndPreferenceAppliedOnThenAdBlockingIsEnabled() = runTest {
+        whenever(statusChecker.currentState()).thenReturn(Disabled.Permanent)
+
         testee.apply(true)
 
         verify(settingsRepository).setEnabled(true)
     }
 
     @Test
-    fun whenPreferenceAppliedOffThenAdBlockingIsDisabled() = runTest {
+    fun whenUserAlreadyEnabledAdBlockingAndPreferenceAppliedOnThenNothingIsPersisted() = runTest {
+        whenever(statusChecker.currentState()).thenReturn(Enabled.UserEnabled)
+
+        testee.apply(true)
+
+        verify(settingsRepository, never()).setEnabled(any())
+    }
+
+    @Test
+    fun whenUserAlreadyEnabledAdBlockingAndPreferenceAppliedOffThenAdBlockingIsDisabled() = runTest {
+        whenever(statusChecker.currentState()).thenReturn(Enabled.UserEnabled)
+
         testee.apply(false)
 
         verify(settingsRepository).setEnabled(false)
+    }
+
+    @Test
+    fun whenAdBlockingIsOffForTheSessionAndPreferenceAppliedOffThenAdBlockingIsDisabled() = runTest {
+        whenever(statusChecker.currentState()).thenReturn(Disabled.UntilRelaunch)
+
+        testee.apply(false)
+
+        verify(settingsRepository).setEnabled(false)
+    }
+
+    @Test
+    fun whenAdBlockingIsOffForTheSessionAndPreferenceAppliedOnThenAdBlockingIsEnabled() = runTest {
+        whenever(statusChecker.currentState()).thenReturn(Disabled.UntilRelaunch)
+
+        testee.apply(true)
+
+        verify(settingsRepository).setEnabled(true)
+    }
+
+    @Test
+    fun whenStateHasNotResolvedYetThenThePickIsPersisted() = runTest {
+        whenever(statusChecker.currentState()).thenReturn(Uninitialized)
+
+        testee.apply(true)
+
+        verify(settingsRepository).setEnabled(true)
     }
 }
