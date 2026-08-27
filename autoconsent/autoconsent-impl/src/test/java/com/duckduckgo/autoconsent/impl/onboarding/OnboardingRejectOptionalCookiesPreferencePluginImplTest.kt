@@ -28,9 +28,12 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import com.duckduckgo.mobile.android.R as CommonR
 
 class OnboardingRejectOptionalCookiesPreferencePluginImplTest {
@@ -75,16 +78,38 @@ class OnboardingRejectOptionalCookiesPreferencePluginImplTest {
     }
 
     @Test
-    fun whenPreferenceAppliedOnThenAutoconsentIsEnabled() = runTest {
+    fun whenPreferenceAppliedOnAndAutoconsentIsOffThenAutoconsentIsEnabled() = runTest {
+        whenever(autoconsent.isSettingEnabled()).thenReturn(false)
+
         testee.apply(true)
 
         verify(autoconsent).changeSetting(true)
     }
 
     @Test
-    fun whenPreferenceAppliedOffThenAutoconsentIsDisabled() = runTest {
+    fun whenPreferenceAppliedOffAndAutoconsentIsOnThenAutoconsentIsDisabled() = runTest {
+        whenever(autoconsent.isSettingEnabled()).thenReturn(true)
+
         testee.apply(false)
 
         verify(autoconsent).changeSetting(false)
+    }
+
+    @Test
+    fun whenPreferenceAppliedToTheValueThatAlreadyAppliesThenNothingIsPersisted() = runTest {
+        whenever(autoconsent.isSettingEnabled()).thenReturn(true)
+
+        testee.apply(true)
+
+        verify(autoconsent, never()).changeSetting(any())
+    }
+
+    @Test
+    fun whenPreferenceAppliedToTheValueTheDefaultAlreadyGivesThenNothingIsPersisted() = runTest {
+        whenever(autoconsent.isSettingEnabled()).thenReturn(false)
+
+        testee.apply(false)
+
+        verify(autoconsent, never()).changeSetting(any())
     }
 }
