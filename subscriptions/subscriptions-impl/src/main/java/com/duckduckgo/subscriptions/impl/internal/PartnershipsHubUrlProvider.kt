@@ -23,14 +23,12 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import dagger.SingleInstanceIn
 import javax.inject.Inject
 
 interface PartnershipsHubUrlProvider {
     val partnershipsHubUrl: String
 }
 
-@SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealPartnershipsHubUrlProvider @Inject constructor(
     private val subscriptionsFeature: SubscriptionsFeature,
