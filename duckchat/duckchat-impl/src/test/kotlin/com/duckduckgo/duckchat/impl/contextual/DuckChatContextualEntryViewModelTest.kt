@@ -17,21 +17,28 @@
 package com.duckduckgo.duckchat.impl.contextual
 
 import app.cash.turbine.test
+import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelPageType
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 class DuckChatContextualEntryViewModelTest {
 
     private val store: ContextualEntryPromptStore = mock()
     private val duckChatPixels: DuckChatPixels = mock()
-    private val viewModel = DuckChatContextualEntryViewModel(store, duckChatPixels)
+    private val modelManager: DuckAiModelManager = mock()
+    private val viewModel = DuckChatContextualEntryViewModel(store, duckChatPixels, modelManager)
 
     private val validContext = """{"title":"Example","url":"https://example.com","content":"some page content"}"""
     private val samplePrompt = NativeInputPrompt("hi", "model-1", "high", "tool-1", null, null)
@@ -95,6 +102,56 @@ class DuckChatContextualEntryViewModelTest {
         val captor = argumentCaptor<ContextualEntryPrompt>()
         verify(store).store(captor.capture())
         assertEquals(validContext, captor.firstValue.serializedPageContext)
+    }
+
+    @Test
+    fun whenSuggestionSubmittedThenUnifiedInputPromptSubmittedPixelFired() = runTest {
+        viewModel.start("tab-1")
+        whenever(modelManager.getSelectedModelId()).thenReturn("gpt-5.2")
+        whenever(modelManager.getResolvedReasoningEffort()).thenReturn("low")
+
+        viewModel.commands.test {
+            viewModel.onSuggestionSubmitted(samplePrompt)
+            assertEquals(DuckChatContextualEntryViewModel.Command.HandOffToSheet, awaitItem())
+        }
+
+        verify(duckChatPixels).firePromptSubmitted(
+            selectedTool = "none",
+            modelId = "gpt-5.2",
+            reasoningEffort = "low",
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            hasText = true,
+            surface = DuckChatPixelSurface.CONTEXTUAL_CHAT,
+            defaultMode = null,
+            tabId = "tab-1",
+            pageType = DuckChatPixelPageType.CONTEXTUAL,
+            addressBarEntryPoint = null,
+        )
+    }
+
+    @Test
+    fun whenPromptSubmittedThenUnifiedInputPromptSubmittedPixelNotFired() = runTest {
+        viewModel.start("tab-1")
+
+        viewModel.commands.test {
+            viewModel.onPromptSubmitted(samplePrompt)
+            assertEquals(DuckChatContextualEntryViewModel.Command.HandOffToSheet, awaitItem())
+        }
+
+        verify(duckChatPixels, never()).firePromptSubmitted(
+            selectedTool = any(),
+            modelId = any(),
+            reasoningEffort = any(),
+            hasImageAttachment = any(),
+            hasFileAttachment = any(),
+            hasText = any(),
+            surface = any(),
+            defaultMode = anyOrNull(),
+            tabId = anyOrNull(),
+            pageType = any(),
+            addressBarEntryPoint = anyOrNull(),
+        )
     }
 
     @Test

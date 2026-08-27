@@ -33,6 +33,8 @@ import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
 import com.duckduckgo.duckchat.impl.history.ChatHistoryItem
 import com.duckduckgo.duckchat.impl.history.ChatHistoryRepository
 import com.duckduckgo.duckchat.impl.models.ChatType
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelPageType
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -2529,6 +2531,31 @@ class DuckChatContextualViewModelTest {
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
         verify(duckChatPixels).reportContextualPromptSubmittedWithContextNative()
+    }
+
+    @Test
+    fun `when suggestion selected then unified input prompt submitted pixel fired`() = runTest {
+        testee = buildViewModel()
+        whenever(modelManager.getSelectedModelId()).thenReturn("gpt-5.2")
+        whenever(modelManager.getResolvedReasoningEffort()).thenReturn("low")
+        val suggestion = ContextualSuggestedPrompt("id", "Label", "Do the thing.", null)
+
+        testee.onSuggestionSelected(suggestion, currentInput = "")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(duckChatPixels).firePromptSubmitted(
+            selectedTool = "none",
+            modelId = "gpt-5.2",
+            reasoningEffort = "low",
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            hasText = true,
+            surface = DuckChatPixelSurface.CONTEXTUAL_CHAT,
+            defaultMode = null,
+            tabId = "",
+            pageType = DuckChatPixelPageType.CONTEXTUAL,
+            addressBarEntryPoint = null,
+        )
     }
 
     @Test
