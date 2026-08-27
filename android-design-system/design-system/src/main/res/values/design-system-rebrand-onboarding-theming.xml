@@ -200,6 +200,13 @@
         <item name="android:fontFamily">@font/ducksansproduct_regular</item>
     </style>
 
+    <style name="Typography.DuckDuckGo.Onboarding.SmallText">
+        <item name="android:textSize">14sp</item>
+        <item name="android:lineHeight">16sp</item>
+        <item name="android:lineSpacingExtra">0sp</item>
+        <item name="android:fontFamily">@font/ducksansproduct_regular</item>
+    </style>
+
     <style name="Typography.DuckDuckGo.Onboarding.Body.InContext">
         <item name="android:textSize">16sp</item>
     </style>
