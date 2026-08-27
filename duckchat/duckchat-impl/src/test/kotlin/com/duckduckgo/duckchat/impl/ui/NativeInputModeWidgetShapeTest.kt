@@ -57,6 +57,27 @@ class NativeInputModeWidgetShapeTest {
     }
 
     @Test
+    fun `when address bar rebrand is enabled bottom browser search-only state uses pill shape`() {
+        val subject = createSubject(inputPosition = NativeInputState.InputPosition.BOTTOM)
+
+        subject.render(rebrandEnabled = true)
+
+        assertEquals(32f, subject.cornerSize())
+    }
+
+    @Test
+    fun `when address bar rebrand is disabled bottom browser search-only state uses legacy radius`() {
+        val subject = createSubject(inputPosition = NativeInputState.InputPosition.BOTTOM)
+
+        subject.render(rebrandEnabled = false)
+
+        assertEquals(
+            subject.context.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.largeShapeCornerRadius),
+            subject.cornerSize(),
+        )
+    }
+
+    @Test
     fun `enabling address bar rebrand does not change top browser search-only card height`() {
         val subject = createSubject()
 
@@ -82,6 +103,19 @@ class NativeInputModeWidgetShapeTest {
     }
 
     @Test
+    fun `when bottom browser search-only transitions to bottom Duck AI it restores the fixed corner radius`() {
+        val subject = createSubject(inputPosition = NativeInputState.InputPosition.BOTTOM)
+
+        subject.render(rebrandEnabled = true)
+        subject.renderDuckAi()
+
+        assertEquals(
+            subject.context.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.largeShapeCornerRadius),
+            subject.cornerSize(),
+        )
+    }
+
+    @Test
     fun `when rebrand changes from enabled to disabled top browser search-only restores the fixed corner radius`() {
         val subject = createSubject()
 
@@ -94,7 +128,7 @@ class NativeInputModeWidgetShapeTest {
         )
     }
 
-    private fun createSubject(): Subject {
+    private fun createSubject(inputPosition: NativeInputState.InputPosition = NativeInputState.InputPosition.TOP): Subject {
         val context = ContextThemeWrapper(
             RuntimeEnvironment.getApplication(),
             com.duckduckgo.mobile.android.R.style.Theme_DuckDuckGo_Light,
@@ -115,7 +149,7 @@ class NativeInputModeWidgetShapeTest {
                 NativeInputState(
                     inputMode = NativeInputState.InputMode.SEARCH_ONLY,
                     inputContext = NativeInputState.InputContext.BROWSER,
-                    inputPosition = NativeInputState.InputPosition.TOP,
+                    inputPosition = inputPosition,
                 ),
             )
         }

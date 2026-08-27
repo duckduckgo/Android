@@ -1730,20 +1730,16 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val state = nativeInputState ?: return
         val card = parent as? MaterialCardView ?: return
         val lp = card.layoutParams as? MarginLayoutParams ?: return
-        // Only the top browser search-only omnibar takes the wide-omnibar shape; isBottom is part of this
-        // condition (not an early return) so a bottom Duck.ai frame still reaches the reset below.
         val isBrowserSearchOnly = state.inputContext == NativeInputState.InputContext.BROWSER && !state.toggleVisible
-        if (state.isBottom) {
+        val usesRebrandPill = isBrowserSearchOnly && appBrandDesignUpdateToggles.addressBar().isEnabled()
+        if (usesRebrandPill) {
+            card.shapeAppearanceModel = card.shapeAppearanceModel.withCornerSize(ShapeAppearanceModel.PILL)
+        } else if (isBrowserSearchOnly || state.isBottom) {
             card.radius = card.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.largeShapeCornerRadius)
         }
         if (isBrowserSearchOnly && !state.isBottom) {
             val targetTopMargin = card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.omnibarCardMarginTop)
             val targetHorizontalMargin = card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.omnibarCardMarginHorizontal)
-            if (appBrandDesignUpdateToggles.addressBar().isEnabled()) {
-                card.shapeAppearanceModel = card.shapeAppearanceModel.withCornerSize(ShapeAppearanceModel.PILL)
-            } else {
-                card.radius = card.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.largeShapeCornerRadius)
-            }
             lp.topMargin = targetTopMargin - card.paddingTop
             lp.marginStart = targetHorizontalMargin - card.paddingLeft
             lp.marginEnd = targetHorizontalMargin - card.paddingRight
