@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.store
+package com.duckduckgo.settings.api
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -38,5 +38,10 @@ class HideAiGeneratedImagesTest {
         assertEquals(HideAiGeneratedImages.OFF, HideAiGeneratedImages.fromSerpCode(null))
         assertEquals(HideAiGeneratedImages.OFF, HideAiGeneratedImages.fromSerpCode(""))
         assertEquals(HideAiGeneratedImages.OFF, HideAiGeneratedImages.fromSerpCode("2"))
+    }
+
+    @Test
+    fun whenSerpKeyThenEveryOptionCarriesTheSameKey() {
+        HideAiGeneratedImages.entries.forEach { assertEquals("kbj", it.serpKey) }
     }
 }

@@ -476,6 +476,7 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
             is NewUserOnboardingActivityDialog.PreferenceSelector,
             is NewUserOnboardingActivityDialog.SingleChoice,
             is NewUserOnboardingActivityDialog.TogglePosition,
+            is NewUserOnboardingActivityDialog.DuckAiState,
             -> Unit
         }
     }

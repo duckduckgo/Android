@@ -40,6 +40,7 @@ interface OnboardingSingleChoiceDataPlugin : ActivePlugin {
     enum class Id {
         DuckAiModelProvider,
         DuckAiNewTabTogglePosition,
+        DuckAiState,
     }
 
     /**

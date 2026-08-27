@@ -230,8 +230,8 @@ class OnboardingStoreImpl @Inject constructor(
         return preferences.getBoolean(KEY_DUCK_AI_ONBOARDING_FLOW, false)
     }
 
-    override fun setSegmentedOnboardingPath(path: SegmentedOnboardingPath) {
-        preferences.edit { putString(KEY_SEGMENTED_ONBOARDING_PATH, path.name) }
+    override fun setSegmentedOnboardingPath(path: SegmentedOnboardingPath?) {
+        preferences.edit { putString(KEY_SEGMENTED_ONBOARDING_PATH, path?.name) }
     }
 
     override fun getSegmentedPathWithAiInput(): SegmentedOnboardingPath? {

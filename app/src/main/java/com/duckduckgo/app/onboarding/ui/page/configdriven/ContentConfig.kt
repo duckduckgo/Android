@@ -132,6 +132,17 @@ sealed interface ContentConfig {
         override fun initialState() = SingleChoiceContentState(selected = rows.first())
     }
 
+    data class DuckAiState(
+        override val title: TextConfig,
+        val body: TextConfig,
+        val options: List<Option>,
+    ) : ContentConfig {
+
+        init {
+            require(options.isNotEmpty()) { "A Duck.ai state screen needs at least one option" }
+        }
+    }
+
     data class TogglePosition(
         override val title: TextConfig,
         @field:DrawableRes val pictogramLightRes: Int,

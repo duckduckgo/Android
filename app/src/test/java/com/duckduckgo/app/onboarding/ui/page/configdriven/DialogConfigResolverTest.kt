@@ -101,7 +101,8 @@ class DialogConfigResolverTest {
     fun `resolves the preference selector with a row per offered preference and a submitting cta`() {
         val config = testee.resolve(
             NewUserOnboardingActivityDialog.PreferenceSelector(
-                mapOf(
+                titleRes = R.string.noAiPathPreferenceSelectorTitle,
+                initialSelections = mapOf(
                     OnboardingPreference.SEARCH_HISTORY to true,
                     OnboardingPreference.SAFE_SEARCH to false,
                 ),
@@ -113,7 +114,7 @@ class DialogConfigResolverTest {
         assertEquals(Embellishment.LeftWing, config.embellishment)
         assertEquals(CardArrowConfig.AtEnd, config.cardArrow)
         val content = config.content as ContentConfig.PreferenceSelector
-        assertEquals(TextConfig.Resource(R.string.searchPathPreferenceSelectorTitle), content.title)
+        assertEquals(TextConfig.Resource(R.string.noAiPathPreferenceSelectorTitle), content.title)
         assertEquals(
             listOf(
                 OnboardingPreference.SEARCH_HISTORY to true,

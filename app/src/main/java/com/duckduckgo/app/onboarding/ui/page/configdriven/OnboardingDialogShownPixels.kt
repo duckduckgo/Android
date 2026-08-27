@@ -60,6 +60,7 @@ class OnboardingDialogShownPixels @Inject constructor(private val pixel: Pixel) 
             is NewUserOnboardingActivityDialog.PreferenceSelector,
             is NewUserOnboardingActivityDialog.SingleChoice,
             is NewUserOnboardingActivityDialog.TogglePosition,
+            is NewUserOnboardingActivityDialog.DuckAiState,
             -> Unit
         }
     }
