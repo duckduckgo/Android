@@ -32,10 +32,12 @@ import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncAuthCode
 import com.duckduckgo.sync.impl.SyncCodeDispatcher
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Event
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Event.VersionNegotiated
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Runner
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State
 import com.duckduckgo.sync.impl.exchange.v2.LocalTrigger
+import com.duckduckgo.sync.impl.exchange.v2.PeerVersionSource
 import com.duckduckgo.sync.impl.exchange.v2.RejectReason
 import com.duckduckgo.sync.impl.exchange.v2.Role
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Companion.POLLING_INTERVAL_EXCHANGE_FLOW
@@ -67,8 +69,16 @@ class SyncV2PairingDebugViewModel @Inject constructor(
         val id: Long,
         val timestampMs: Long,
         val summary: String,
-        val rawJson: String,
+        val details: LogDetails,
     )
+
+    sealed interface LogDetails {
+        val value: String
+
+        data class Json(override val value: String) : LogDetails
+
+        data class PlainText(override val value: String) : LogDetails
+    }
 
     /**
      * Snapshot of the device's sync setup that's relevant to v2 pairing. Read from
@@ -299,7 +309,7 @@ class SyncV2PairingDebugViewModel @Inject constructor(
 
     /**
      * Push a synthetic row into the event log so v1-fallback progress is visible alongside
-     * native v2 [ExchangeV2Event]s. Reuses [LogRow] with the message in both summary and rawJson.
+     * native v2 [ExchangeV2Event]s. Reuses [LogRow] with the message in both summary and details.
      * Also tees to logcat with a `Sync-V2Debug:` prefix so the fallback path is traceable
      * end-to-end (the in-screen log alone misses the eyes of anyone watching logcat).
      */
@@ -311,7 +321,7 @@ class SyncV2PairingDebugViewModel @Inject constructor(
                     id = nextRowId++,
                     timestampMs = System.currentTimeMillis(),
                     summary = message,
-                    rawJson = message,
+                    details = LogDetails.PlainText(message),
                 ),
             )
         }
@@ -387,7 +397,7 @@ class SyncV2PairingDebugViewModel @Inject constructor(
             id = nextRowId++,
             timestampMs = event.timestampMs,
             summary = summarise(event),
-            rawJson = rawJsonFor(event),
+            details = detailsFor(event),
         )
         viewState.update { current ->
             current.copy(
@@ -552,40 +562,60 @@ class SyncV2PairingDebugViewModel @Inject constructor(
     }
 
     private fun summarise(event: ExchangeV2Event): String = when (event) {
-        is ExchangeV2Event.Transition -> {
-            val trigger = event.trigger?.let { "msg=${it.messageType}${peerSuffix(it)}" }
-                ?: event.localTrigger?.let { "local=${labelFor(it)}" }
-                ?: "(no trigger)"
-            "Transition ${labelFor(event.from)} → ${labelFor(event.to)} [$trigger]"
-        }
-        is ExchangeV2Event.MessageSent -> "Sent ${event.message.messageType}${peerSuffix(event.message)}"
-        is ExchangeV2Event.MessageRejected -> {
-            val verb = when (event.reason) {
-                RejectReason.ImplicitAbort -> "Aborted"
-                RejectReason.SameAccount -> "SameAccountAbort"
-                RejectReason.UnknownMessageDropped -> "Dropped (unknown)"
+        is ExchangeV2Event.Transition -> buildString {
+            append("Transition ${labelFor(event.from)} → ${labelFor(event.to)} [")
+            val trigger = event.trigger
+            val localTrigger = event.localTrigger
+            when {
+                trigger != null -> {
+                    append("msg=${trigger.messageType}")
+                    appendPeerDetails(trigger)
+                }
+                localTrigger != null -> append("local=${labelFor(localTrigger)}")
+                else -> append("no trigger")
             }
-            "$verb on ${event.message.messageType}${peerSuffix(event.message)} in ${labelFor(event.state)}"
+            append(']')
         }
-        is ExchangeV2Event.SessionStarted -> {
-            val codeLine = event.linkingCode?.let { " linkingCode=$it" } ?: ""
-            "Session started as ${event.pairingRole} ownChannelId=${event.ownChannelId}$codeLine"
+        is ExchangeV2Event.MessageSent -> buildString {
+            append("Sent ${event.message.messageType}")
+            appendPeerDetails(event.message)
+        }
+        is ExchangeV2Event.MessageRejected -> buildString {
+            append("${labelFor(event.reason)} on ${event.message.messageType}")
+            appendPeerDetails(event.message)
+            append(" in ${labelFor(event.state)}")
+        }
+        is ExchangeV2Event.SessionStarted -> buildString {
+            append("Session started as ${event.pairingRole} ownChannelId=${event.ownChannelId}")
+            event.linkingCode?.let { append(" linkingCode=$it") }
         }
         is ExchangeV2Event.SessionError -> "Session error: ${event.message}"
+        is VersionNegotiated -> "Negotiated Exchange protocol ${event.negotiatedVersion.prettyPrint()}"
     }
 
-    private fun peerSuffix(message: ExchangeV2Message): String = when (message) {
-        is ExchangeV2Message.RecoveryCodeAvailable -> " name=${message.name} kind=${message.kind} user_id=${message.userId}"
-        is ExchangeV2Message.RecoveryCodeRequest -> " name=${message.name} kind=${message.kind}"
-        else -> ""
+    private fun StringBuilder.appendPeerDetails(message: ExchangeV2Message) {
+        when (message) {
+            is ExchangeV2Message.RecoveryCodeAvailable -> append(" name=${message.name} kind=${message.kind} user_id=${message.userId}")
+            is ExchangeV2Message.RecoveryCodeRequest -> append(" name=${message.name} kind=${message.kind}")
+            else -> Unit
+        }
     }
 
-    private fun rawJsonFor(event: ExchangeV2Event): String = when (event) {
-        is ExchangeV2Event.Transition -> event.trigger?.rawJson ?: "(local trigger: ${event.localTrigger?.let(::labelFor)})"
-        is ExchangeV2Event.MessageSent -> event.message.rawJson
-        is ExchangeV2Event.MessageRejected -> event.message.rawJson
-        is ExchangeV2Event.SessionStarted -> event.linkingCode ?: "(no linking code — Scanner side)"
-        is ExchangeV2Event.SessionError -> event.message
+    private fun detailsFor(event: ExchangeV2Event): LogDetails = when (event) {
+        is ExchangeV2Event.Transition -> when (val trigger = event.trigger) {
+            null -> LogDetails.PlainText("local trigger: ${event.localTrigger?.let(::labelFor) ?: "none"}")
+            else -> LogDetails.Json(trigger.rawJson)
+        }
+        is ExchangeV2Event.MessageSent -> LogDetails.Json(event.message.rawJson)
+        is ExchangeV2Event.MessageRejected -> LogDetails.Json(event.message.rawJson)
+        is ExchangeV2Event.SessionStarted -> when (val linkingCode = event.linkingCode) {
+            null -> LogDetails.PlainText("no linking code — Scanner side")
+            else -> LogDetails.PlainText(linkingCode)
+        }
+        is ExchangeV2Event.SessionError -> LogDetails.PlainText(event.message)
+        is VersionNegotiated -> LogDetails.PlainText(
+            "ours=${event.ourVersion.prettyPrint()}, peer=${event.peerVersion.prettyPrint()} [${labelFor(event.peerSource)}]",
+        )
     }
 
     private fun labelFor(state: ExchangeV2State?): String = when (state) {
@@ -613,5 +643,16 @@ class SyncV2PairingDebugViewModel @Inject constructor(
         LocalTrigger.HostSendComplete -> "HostSendComplete"
         LocalTrigger.HostUnavailable -> "HostUnavailable"
         is LocalTrigger.RoleElected -> "RoleElected(${trigger.role})"
+    }
+
+    private fun labelFor(reason: RejectReason): String = when (reason) {
+        RejectReason.ImplicitAbort -> "Aborted"
+        RejectReason.SameAccount -> "SameAccountAbort"
+        RejectReason.UnknownMessageDropped -> "Dropped (unknown)"
+    }
+
+    private fun labelFor(peerSource: PeerVersionSource): String = when (peerSource) {
+        PeerVersionSource.LinkingCode -> "linking_code"
+        PeerVersionSource.HelloMessage -> "hello_message"
     }
 }

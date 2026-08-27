@@ -39,6 +39,7 @@ import com.duckduckgo.sync.impl.exchange.v2.Role
 import com.duckduckgo.sync.internal.databinding.ActivitySyncV2PairingDebugBinding
 import com.duckduckgo.sync.internal.databinding.ItemSyncV2PairingLogRowBinding
 import com.duckduckgo.sync.internal.ui.SyncV2PairingDebugViewModel.ConfirmationRequest
+import com.duckduckgo.sync.internal.ui.SyncV2PairingDebugViewModel.LogDetails
 import com.duckduckgo.sync.internal.ui.SyncV2PairingDebugViewModel.LogRow
 import com.duckduckgo.sync.internal.ui.SyncV2PairingDebugViewModel.TerminalReached
 import com.duckduckgo.sync.internal.ui.SyncV2PairingDebugViewModel.ViewState
@@ -253,15 +254,19 @@ class SyncV2PairingDebugActivity : DuckDuckGoActivity() {
             val rowBinding = ItemSyncV2PairingLogRowBinding.inflate(layoutInflater, binding.logContainer, true)
             val timestamp = timestampFormat.format(Date(row.timestampMs))
             rowBinding.summaryTextView.text = "[$timestamp] ${row.summary}"
-            rowBinding.rawJsonTextView.text = row.rawJson
+            rowBinding.rawJsonTextView.text = row.details.value
             applyExpansion(rowBinding, row.id in expandedRowIds)
             rowBinding.summaryRow.setOnClickListener {
                 val newlyExpanded = row.id !in expandedRowIds
                 if (newlyExpanded) expandedRowIds.add(row.id) else expandedRowIds.remove(row.id)
                 applyExpansion(rowBinding, newlyExpanded)
             }
-            rowBinding.copyRawButton.setOnClickListener {
-                copyToClipboard("Raw JSON", row.rawJson)
+            when (val details = row.details) {
+                is LogDetails.Json -> {
+                    rowBinding.copyRawButton.visibility = View.VISIBLE
+                    rowBinding.copyRawButton.setOnClickListener { copyToClipboard("Raw JSON", details.value) }
+                }
+                is LogDetails.PlainText -> rowBinding.copyRawButton.visibility = View.GONE
             }
         }
     }

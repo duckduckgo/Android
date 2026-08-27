@@ -339,7 +339,8 @@ class RealExchangeV2RunnerTest {
         val runner = newRunner()
         runner.startScan("")
 
-        assertEquals(negotiated.toProtocolVersion(), runner.negotiatedVersion)
+        val negotiation = runner.events.replayCache.filterIsInstance<ExchangeV2Event.VersionNegotiated>().single()
+        assertEquals(negotiated.toProtocolVersion(), negotiation.negotiatedVersion)
     }
 
     @Test
@@ -364,19 +365,59 @@ class RealExchangeV2RunnerTest {
         runner.startPresent()
         runner.deliverHello(peerVersion.toProtocolVersion())
 
-        assertEquals(negotiated.toProtocolVersion(), runner.negotiatedVersion)
+        val negotiation = runner.events.replayCache.filterIsInstance<ExchangeV2Event.VersionNegotiated>().single()
+        assertEquals(negotiated.toProtocolVersion(), negotiation.negotiatedVersion)
     }
 
-    @Test fun `cancel clears negotiated version`() = runTest {
+    @Test fun `Scanner reports the scanned code as the source of the peer version`() = runTest {
         givenOurVersion(ExchangeProtocolVersion.V2_1)
-        givenLinkingCodeVersion(ExchangeProtocolVersion.V2_1)
+        givenLinkingCodeVersion(ExchangeProtocolVersion.V2_0)
 
         val runner = newRunner()
         runner.startScan("")
-        assertEquals(ExchangeProtocolVersion.V2_1, runner.negotiatedVersion)
 
-        runner.cancel()
-        assertEquals(ExchangeProtocolVersion.V2_0, runner.negotiatedVersion)
+        val negotiation = runner.events.replayCache.filterIsInstance<ExchangeV2Event.VersionNegotiated>().single()
+        assertEquals(PeerVersionSource.LinkingCode, negotiation.peerSource)
+        assertEquals(ExchangeProtocolVersion.V2_1, negotiation.ourVersion)
+        assertEquals(ExchangeProtocolVersion.V2_0, negotiation.peerVersion)
+        assertEquals(ExchangeProtocolVersion.V2_0, negotiation.negotiatedVersion)
+    }
+
+    @Test fun `Presenter reports the peer hello as the source of the peer version`() = runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_0)
+        whenever(syncStore.userId).thenReturn("my-user")
+
+        val runner = newRunner()
+        runner.startPresent()
+        runner.deliverHello(ExchangeProtocolVersion.V2_1)
+
+        val negotiation = runner.events.replayCache.filterIsInstance<ExchangeV2Event.VersionNegotiated>().single()
+        assertEquals(PeerVersionSource.HelloMessage, negotiation.peerSource)
+        assertEquals(ExchangeProtocolVersion.V2_0, negotiation.ourVersion)
+        assertEquals(ExchangeProtocolVersion.V2_1, negotiation.peerVersion)
+        assertEquals(ExchangeProtocolVersion.V2_0, negotiation.negotiatedVersion)
+    }
+
+    @Test fun `a peer version we cannot speak falls back to the baseline but is reported as advertised`() = runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        whenever(syncStore.userId).thenReturn("my-user")
+
+        val runner = newRunner()
+        runner.startPresent()
+        runner.deliverHello("3.4".toProtocolVersion())
+
+        val negotiation = runner.events.replayCache.filterIsInstance<ExchangeV2Event.VersionNegotiated>().single()
+        assertEquals("3.4".toProtocolVersion(), negotiation.peerVersion)
+        assertEquals(ExchangeProtocolVersion.V2_0, negotiation.negotiatedVersion)
+    }
+
+    @Test fun `a peer that never advertises a version produces no negotiation event`() = runTest {
+        whenever(syncStore.userId).thenReturn("my-user")
+
+        val runner = newRunner()
+        runner.startPresent()
+
+        assertTrue(runner.events.replayCache.filterIsInstance<ExchangeV2Event.VersionNegotiated>().isEmpty())
     }
 
     // ---- Auto role election ----

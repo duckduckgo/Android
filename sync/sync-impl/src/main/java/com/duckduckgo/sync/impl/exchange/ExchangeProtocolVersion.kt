@@ -17,12 +17,15 @@
 package com.duckduckgo.sync.impl.exchange
 
 sealed class ExchangeProtocolVersion : Comparable<ExchangeProtocolVersion> {
+    abstract fun prettyPrint(): String
 
     sealed class Supported : ExchangeProtocolVersion() {
         abstract val major: Int
         abstract val minor: Int
 
         final override fun toString() = if (minor == 0) "$major" else "$major.$minor"
+
+        final override fun prettyPrint() = "v$major.$minor"
     }
 
     data class V1(
@@ -49,6 +52,8 @@ sealed class ExchangeProtocolVersion : Comparable<ExchangeProtocolVersion> {
         val rawVersion: String,
     ) : ExchangeProtocolVersion() {
         override fun toString() = rawVersion
+
+        override fun prettyPrint() = "v$rawVersion"
     }
 
     override fun compareTo(other: ExchangeProtocolVersion): Int = when {

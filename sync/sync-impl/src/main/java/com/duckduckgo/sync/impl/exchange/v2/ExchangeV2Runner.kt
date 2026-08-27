@@ -117,7 +117,10 @@ class RealExchangeV2Runner @Inject constructor(
     private val dispatchers: DispatcherProvider,
 ) : ExchangeV2Runner {
 
-    private val _events = MutableSharedFlow<ExchangeV2Event>(replay = REPLAY, extraBufferCapacity = REPLAY)
+    private val _events = MutableSharedFlow<ExchangeV2Event>(
+        replay = EVENT_BUFFER_SIZE,
+        extraBufferCapacity = EVENT_BUFFER_SIZE,
+    )
     override val events: SharedFlow<ExchangeV2Event> = _events.asSharedFlow()
 
     // Mutex serialises SM mutations + peer-state writes across the poll loop + user clicks.
@@ -153,7 +156,7 @@ class RealExchangeV2Runner @Inject constructor(
 
     @Volatile private var advertisedVersion: ExchangeProtocolVersion.V2 = BASELINE_PROTOCOL_VERSION
 
-    @Volatile internal var negotiatedVersion: ExchangeProtocolVersion.V2 = BASELINE_PROTOCOL_VERSION
+    @Volatile private var negotiatedVersion: ExchangeProtocolVersion.V2 = BASELINE_PROTOCOL_VERSION
         private set
 
     /**
@@ -191,7 +194,7 @@ class RealExchangeV2Runner @Inject constructor(
                     cancelLocked() // bootstrap already emitted the error; just clear the half-set state
                     return@launch
                 }
-                negotiatedVersion = negotiateProtocolVersion(parsed.version)
+                negotiatedVersion = negotiateProtocolVersion(parsed.version, PeerVersionSource.LinkingCode)
                 // Scanner already knows the peer; SM starts directly in Negotiating.
                 session = smFactory.create(
                     localUserId = syncStore.userId,
@@ -528,7 +531,7 @@ class RealExchangeV2Runner @Inject constructor(
             is ExchangeV2Message.Hello -> {
                 peerChannelId = message.channelId
                 peerPublicKey = message.publicKey
-                negotiatedVersion = negotiateProtocolVersion(message.version)
+                negotiatedVersion = negotiateProtocolVersion(message.version, PeerVersionSource.HelloMessage)
             }
             is ExchangeV2Message.RecoveryCodeAvailable -> {
                 _peerKind = message.kind
@@ -841,6 +844,16 @@ class RealExchangeV2Runner @Inject constructor(
                 "Sync-ExchangeV2: session started role=${event.pairingRole} channel_id=${event.ownChannelId}$codeLine"
             }
             is ExchangeV2Event.SessionError -> logcat(ERROR) { "Sync-ExchangeV2: session error: ${event.message}" }
+            is ExchangeV2Event.VersionNegotiated -> logcat {
+                buildString {
+                    append("Sync-ExchangeV2: negotiated protocol version: ")
+                    append(event.negotiatedVersion.prettyPrint())
+                    append(", our version: ")
+                    append(event.ourVersion.prettyPrint())
+                    append(", peer version: ")
+                    append(event.peerVersion.prettyPrint())
+                }
+            }
         }
         _events.tryEmit(event)
     }
@@ -871,13 +884,16 @@ class RealExchangeV2Runner @Inject constructor(
         else -> false
     }
 
-    private fun negotiateProtocolVersion(peerVersion: ExchangeProtocolVersion): ExchangeProtocolVersion.V2 {
+    private fun negotiateProtocolVersion(
+        peerVersion: ExchangeProtocolVersion,
+        peerSource: PeerVersionSource,
+    ): ExchangeProtocolVersion.V2 {
         val ourVersion = advertisedVersion
         val negotiatedVersion = when (peerVersion) {
             is ExchangeProtocolVersion.V2 -> minOf(ourVersion, peerVersion)
             else -> BASELINE_PROTOCOL_VERSION
         }
-        logcat { "Sync-ExchangeV2: negotiated protocol version: v$negotiatedVersion, our version: v$ourVersion, peer version: v$peerVersion" }
+        emit(ExchangeV2Event.VersionNegotiated(clock.nowMs(), peerSource, peerVersion, advertisedVersion, negotiatedVersion))
         return negotiatedVersion
     }
 
@@ -900,7 +916,8 @@ class RealExchangeV2Runner @Inject constructor(
         // Channel authorization secret size for the v2 exchange transport layer.
         private const val CHANNEL_SECRET_SIZE = 32
 
-        private const val REPLAY = 100
+        // Max count ExchangeV2Event held in buffer that will be replayed to consumers.
+        private const val EVENT_BUFFER_SIZE = 100
 
         // Transport TD 1214486492252757 §Session Lifecycle: 5-minute client session deadline.
         private const val SESSION_TIMEOUT_MS = 5 * 60 * 1000L
