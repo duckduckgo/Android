@@ -205,6 +205,8 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
                     _commands.send(if (interaction.checked) Command.LaunchAddWidgetPrompt else Command.ShowRemoveWidgetBottomSheet)
                 }
             }
+
+            is ContentInteraction.SelectSingleChoiceOption -> emit(NewUserOnboardingEvent.SingleChoiceConfirmed(interaction.option))
         }
     }
 
@@ -542,6 +544,9 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
             is NewUserOnboardingActivityDialog.InputScreenPreview,
             is NewUserOnboardingActivityDialog.QuickSetup,
             is NewUserOnboardingActivityDialog.PreferenceSelector,
+            is NewUserOnboardingActivityDialog.SingleChoice,
+            is NewUserOnboardingActivityDialog.TogglePosition,
+            is NewUserOnboardingActivityDialog.DuckAiState,
             -> Unit
         }
     }

@@ -67,7 +67,7 @@ class OnboardingInputScreenSelectionObserver @Inject constructor(
                 // Flows that enable the real setting themselves, just-in-time before the End CTA, produce a
                 // pre-ESTABLISHED cosmetic/real match that is not a user override.
                 !onboardingStore.isDuckAiOnboardingFlow() &&
-                    !onboardingStore.isSegmentedSearchPathWithToggleEnabled()
+                    onboardingStore.getSegmentedPathWithAiInput() == null
             }
             .onEach { (isInputScreenCosmeticallyEnabled, isInputScreenEnabled) ->
                 if (isInputScreenCosmeticallyEnabled != isInputScreenEnabled) return@onEach

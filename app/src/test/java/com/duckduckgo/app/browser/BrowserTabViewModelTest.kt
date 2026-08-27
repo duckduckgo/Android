@@ -74,6 +74,7 @@ import com.duckduckgo.app.browser.SSLErrorType.NONE
 import com.duckduckgo.app.browser.SSLErrorType.UNTRUSTED_HOST
 import com.duckduckgo.app.browser.SSLErrorType.WRONG_HOST
 import com.duckduckgo.app.browser.WebViewErrorResponse.BAD_URL
+import com.duckduckgo.app.browser.WebViewErrorResponse.CONNECTION
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
@@ -151,6 +152,9 @@ import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.returnsession.ReturnSessionLandingListener
 import com.duckduckgo.app.browser.santize.NonHttpAppLinkChecker
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
+import com.duckduckgo.app.browser.suggestredirect.RedirectSuggestion
+import com.duckduckgo.app.browser.suggestredirect.SuggestRedirectEvaluator
+import com.duckduckgo.app.browser.suggestredirect.SuggestRedirectOnUnresolvedErrorFeature
 import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.browser.trafficquality.AndroidFeaturesHeaderPlugin.Companion.X_DUCKDUCKGO_ANDROID_HEADER
 import com.duckduckgo.app.browser.uilock.BROWSER_UI_LOCK_FEATURE_NAME
@@ -211,9 +215,11 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactoryImpl
 import com.duckduckgo.app.location.data.LocationPermissionsDao
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
+import com.duckduckgo.app.onboarding.OnboardingInputScreenLaunchTarget
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.AppStage.ESTABLISHED
 import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.onboarding.store.SegmentedOnboardingPath
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
@@ -245,6 +251,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_SERP_CTA
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.systemsearch.DeviceAppLookup
 import com.duckduckgo.app.tabs.model.AggregateTabProvider
+import com.duckduckgo.app.tabs.model.DuckAiTabSessionRepository
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabPageContextRepository
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -363,6 +370,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import dagger.Lazy
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -407,6 +415,7 @@ import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -422,6 +431,7 @@ import java.time.LocalDateTime
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
+import kotlin.time.Duration.Companion.seconds
 import com.duckduckgo.mobile.android.R as CommonR
 
 @SuppressLint("DenyListedApi")
@@ -484,6 +494,7 @@ class BrowserTabViewModelTest {
 
     private val mockOnboardingStore: OnboardingStore = mock()
     private val mockCustomAiOnboardingStore: CustomAiOnboardingStore = mock()
+    private val mockOnboardingInputScreenLaunchTarget: OnboardingInputScreenLaunchTarget = mock()
 
     private val mockAutoCompleteService: AutoCompleteService = mock()
 
@@ -647,6 +658,7 @@ class BrowserTabViewModelTest {
     private val mockNtpAfterIdleManager: NtpAfterIdleManager = mock()
     private val mockReturnSessionLandingListener: ReturnSessionLandingListener = mock()
     private val mockBrowserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin> = mock()
+    private val mockDuckAiTabSessionRepository: DuckAiTabSessionRepository = mock()
     private val browserRefreshTriggerFlow = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     private val browserRefreshTriggerPlugin: BrowserRefreshTriggerPlugin = mock {
         on { observeRefreshRequests() } doReturn browserRefreshTriggerFlow
@@ -730,6 +742,8 @@ class BrowserTabViewModelTest {
     private val fakeAutocompleteHistoryDeleteFeature = FakeFeatureToggleFactory.create(AutocompleteHistoryDeleteFeature::class.java)
     private val mockDesktopModeSettings: DesktopModeSettings = mock()
     private val fakeRememberDesktopModeFeature = FakeFeatureToggleFactory.create(RememberDesktopModeFeature::class.java)
+    private val fakeSuggestRedirectFeature = FakeFeatureToggleFactory.create(SuggestRedirectOnUnresolvedErrorFeature::class.java)
+    private val mockSuggestRedirectEvaluator: SuggestRedirectEvaluator = mock()
     private val mockInlinePdfHandler: InlinePdfHandler = mock()
     private val mockPdfDownloadTooltipDataStore: PdfDownloadTooltipDataStore = mock()
     private val mockCachedFileDownloader: CachedFileDownloader = mock()
@@ -1058,6 +1072,7 @@ class BrowserTabViewModelTest {
                 ntpAfterIdleManager = mockNtpAfterIdleManager,
                 returnSessionLandingListener = mockReturnSessionLandingListener,
                 browserInteractionsPlugins = mockBrowserInteractionsPlugins,
+                duckAiTabSessionRepository = mockDuckAiTabSessionRepository,
                 browserRefreshTriggerPlugins = mockBrowserRefreshTriggerPlugins,
                 brokenSiteReportTriggerPlugins = mockBrokenSiteReportTriggerPlugins,
                 inlinePdfHandler = mockInlinePdfHandler,
@@ -1069,12 +1084,15 @@ class BrowserTabViewModelTest {
                 onboardingStore = mockOnboardingStore,
                 autocompleteHistoryDeleteFeature = fakeAutocompleteHistoryDeleteFeature,
                 customAiOnboardingStore = mockCustomAiOnboardingStore,
+                onboardingInputScreenLaunchTarget = mockOnboardingInputScreenLaunchTarget,
                 browserMode = browserMode,
                 desktopModeSettings = mockDesktopModeSettings,
                 rememberDesktopModeFeature = fakeRememberDesktopModeFeature,
                 adBlockingOmnibarAnimationProvider = mockAdBlockingOmnibarAnimationProvider,
                 newTabPageModalPresenterRegistry = NewTabPageModalPresenterRegistry(),
                 newTabPageModalTrigger = mockNewTabPageModalTrigger,
+                suggestRedirectOnUnresolvedErrorFeature = fakeSuggestRedirectFeature,
+                suggestRedirectEvaluator = mockSuggestRedirectEvaluator,
             )
 
         testee.loadData("abc", null, false, false)
@@ -4093,6 +4111,7 @@ class BrowserTabViewModelTest {
             isLightTheme = true,
             deviceInfo = mockDeviceInfo,
             isCustomAiOnboardingFlow = false,
+            segmentedPath = null,
             onboardingImprovementsV2Enabled = true,
         )
         setCta(cta)
@@ -4106,7 +4125,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserClickedSegmentedSearchEndCtaOkButtonThenBubbleHiddenAndInputOpensOnDuckAiTab() = runTest {
-        val cta = daxEndBrandDesignUpdateBubbleCta(isSegmentedSearchPathWithToggleEnabled = true)
+        val cta = daxEndBrandDesignUpdateBubbleCta(segmentedPath = SegmentedOnboardingPath.SEARCH)
         setCta(cta)
 
         testee.onUserClickCtaOkButton(cta)
@@ -4114,35 +4133,35 @@ class BrowserTabViewModelTest {
 
         assertNull(testee.ctaViewState.value?.cta)
         assertCommandIssued<HideOnboardingDaxBubbleCta>()
-        verify(mockCustomAiOnboardingStore).setOpenInputOnDuckAiTab()
+        verify(mockOnboardingInputScreenLaunchTarget).setOpenOnDuckAi()
         assertCommandIssued<ShowKeyboard>()
     }
 
     @Test
     fun whenUserClickedEndCtaOkButtonOutsideSegmentedSearchPathThenCtaIsRefreshedAway() = runTest {
-        val cta = daxEndBrandDesignUpdateBubbleCta(isSegmentedSearchPathWithToggleEnabled = false)
+        val cta = daxEndBrandDesignUpdateBubbleCta(segmentedPath = null)
         setCta(cta)
 
         testee.onUserClickCtaOkButton(cta)
         advanceUntilIdle()
 
         assertNotEquals(cta, testee.ctaViewState.value?.cta)
-        verify(mockCustomAiOnboardingStore, never()).setOpenInputOnDuckAiTab()
+        verify(mockOnboardingInputScreenLaunchTarget, never()).setOpenOnDuckAi()
     }
 
     @Test
     fun whenUserClickedSegmentedSearchEndCtaSecondaryButtonThenCtaIsRefreshedAway() = runTest {
-        val cta = daxEndBrandDesignUpdateBubbleCta(isSegmentedSearchPathWithToggleEnabled = true)
+        val cta = daxEndBrandDesignUpdateBubbleCta(segmentedPath = SegmentedOnboardingPath.SEARCH)
         setCta(cta)
 
         testee.onUserClickCtaSecondaryButton(cta)
         advanceUntilIdle()
 
         assertNotEquals(cta, testee.ctaViewState.value?.cta)
-        verify(mockCustomAiOnboardingStore, never()).setOpenInputOnDuckAiTab()
+        verify(mockOnboardingInputScreenLaunchTarget, never()).setOpenOnDuckAi()
     }
 
-    private fun daxEndBrandDesignUpdateBubbleCta(isSegmentedSearchPathWithToggleEnabled: Boolean) = DaxEndBrandDesignUpdateBubbleCta(
+    private fun daxEndBrandDesignUpdateBubbleCta(segmentedPath: SegmentedOnboardingPath?) = DaxEndBrandDesignUpdateBubbleCta(
         onboardingStore = mockOnboardingStore,
         appInstallStore = mockAppInstallStore,
         isLightTheme = true,
@@ -4150,7 +4169,7 @@ class BrowserTabViewModelTest {
         onboardingImprovementsEnabled = true,
         onboardingImprovementsV2Enabled = true,
         isOmnibarBottom = false,
-        isSegmentedSearchPathWithToggleEnabled = isSegmentedSearchPathWithToggleEnabled,
+        segmentedPath = segmentedPath,
     )
 
     @Test
@@ -4211,6 +4230,34 @@ class BrowserTabViewModelTest {
             assertEquals("funnel_onboarding_android", uri.getQueryParameter("origin"))
             assertEquals("duckai", uri.getQueryParameter("featurePage"))
         }
+    }
+
+    @Test
+    fun whenUserClickedDaxSubscriptionCtaOnSegmentedAiPathThenLaunchSubscriptionWithFeaturePageDuckAi() = runTest {
+        whenever(mockOnboardingStore.getSegmentedPathWithAiInput()).thenReturn(SegmentedOnboardingPath.AI)
+        val cta = DaxBubbleCta.DaxSubscriptionCta(
+            mockOnboardingStore,
+            mockAppInstallStore,
+            isFreeTrialCopy = false,
+        )
+        setCta(cta)
+        testee.onUserClickCtaOkButton(cta)
+        assertCommandIssued<LaunchSubscription> {
+            assertEquals("funnel_onboarding_android", uri.getQueryParameter("origin"))
+            assertEquals("duckai", uri.getQueryParameter("featurePage"))
+        }
+    }
+
+    @Test
+    fun whenUserClickedSegmentedAiEndCtaOkButtonThenCtaIsRefreshedAway() = runTest {
+        val cta = daxEndBrandDesignUpdateBubbleCta(segmentedPath = SegmentedOnboardingPath.AI)
+        setCta(cta)
+
+        testee.onUserClickCtaOkButton(cta)
+        advanceUntilIdle()
+
+        assertNotEquals(cta, testee.ctaViewState.value?.cta)
+        verify(mockOnboardingInputScreenLaunchTarget, never()).setOpenOnDuckAi()
     }
 
     @Test
@@ -8840,6 +8887,201 @@ class BrowserTabViewModelTest {
         }
 
     @Test
+    fun whenRedirectSuggestionClickedThenBrowserErrorResetAndNavigateCommandIssuedWithSuggestedUrl() =
+        runTest {
+            testee.onReceivedError(BAD_URL, "http://example.com", "ERROR_HOST_LOOKUP")
+
+            testee.onRedirectSuggestionClicked("http://www.example.com")
+
+            assertEquals(OMITTED, browserViewState().browserError)
+            assertCommandIssued<Navigate> {
+                assertEquals("http://www.example.com", url)
+            }
+        }
+
+    @Test
+    fun whenRedirectSuggestionClickedThenSearchCountNotIncremented() =
+        runTest {
+            testee.onRedirectSuggestionClicked("http://www.example.com")
+
+            verify(mockSearchCountDao, never()).incrementSearchCount()
+        }
+
+    @Test
+    fun givenSuggestRedirectEnabledWhenBadUrlErrorReceivedAndRedirectShouldBeSuggestedThenRedirectSuggestionSetInViewState() = runTest {
+        fakeSuggestRedirectFeature.apply {
+            self().setRawStoredState(State(enable = true))
+            suggestRedirect().setRawStoredState(State(enable = true))
+        }
+        val redirectSuggestion = RedirectSuggestion(domain = "www.example.com", url = "http://www.example.com/path?q=1")
+        whenever(mockSuggestRedirectEvaluator.suggestRedirect("http://example.com/path?q=1"))
+            .thenReturn(redirectSuggestion)
+
+        testee.onReceivedError(BAD_URL, "http://example.com/path?q=1", "ERROR_HOST_LOOKUP")
+
+        assertEquals(redirectSuggestion, browserViewState().redirectSuggestion)
+    }
+
+    @Test
+    fun givenSuggestRedirectDisabledWhenBadUrlErrorReceivedThenRedirectSuggestionNotSetInViewState() = runTest {
+        fakeSuggestRedirectFeature.suggestRedirect().setRawStoredState(State(enable = false))
+        whenever(mockSuggestRedirectEvaluator.suggestRedirect(any()))
+            .thenReturn(RedirectSuggestion(domain = "www.example.com", url = "http://www.example.com"))
+
+        testee.onReceivedError(BAD_URL, "http://example.com", "ERROR_HOST_LOOKUP")
+
+        assertNull(browserViewState().redirectSuggestion)
+    }
+
+    @Test
+    fun givenSuggestRedirectEnabledWhenBadUrlErrorReceivedAndRedirectShouldNotBeSuggestedThenRedirectSuggestionNotSetInViewState() = runTest {
+        fakeSuggestRedirectFeature.apply {
+            self().setRawStoredState(State(enable = true))
+            suggestRedirect().setRawStoredState(State(enable = true))
+        }
+        whenever(mockSuggestRedirectEvaluator.suggestRedirect(any()))
+            .thenReturn(null)
+
+        testee.onReceivedError(BAD_URL, "http://example.com", "ERROR_HOST_LOOKUP")
+
+        assertNull(browserViewState().redirectSuggestion)
+    }
+
+    @Test
+    fun givenSuggestRedirectEnabledWhenNonBadUrlErrorReceivedThenRedirectSuggestionNotSetInViewState() = runTest {
+        fakeSuggestRedirectFeature.apply {
+            self().setRawStoredState(State(enable = true))
+            suggestRedirect().setRawStoredState(State(enable = true))
+        }
+        whenever(mockSuggestRedirectEvaluator.suggestRedirect(any()))
+            .thenReturn(RedirectSuggestion(domain = "www.example.com", url = "http://www.example.com"))
+
+        testee.onReceivedError(CONNECTION, "http://example.com", "ERROR_CONNECT")
+
+        assertNull(browserViewState().redirectSuggestion)
+    }
+
+    @Test
+    fun givenSuggestRedirectEvaluationInFlightWhenBrowserErrorResetThenRedirectSuggestionNotSetInViewState() = runTest {
+        fakeSuggestRedirectFeature.apply {
+            self().setRawStoredState(State(enable = true))
+            suggestRedirect().setRawStoredState(State(enable = true))
+        }
+        whenever(mockSuggestRedirectEvaluator.suggestRedirect(any()))
+            .doSuspendableAnswer {
+                delay(1.seconds)
+                RedirectSuggestion(domain = "www.example.com", url = "http://www.example.com")
+            }
+
+        testee.onReceivedError(BAD_URL, "http://example.com", "ERROR_HOST_LOOKUP")
+        testee.resetBrowserError()
+        @OptIn(ExperimentalCoroutinesApi::class)
+        advanceUntilIdle()
+
+        assertNull(browserViewState().redirectSuggestion)
+    }
+
+    @Test
+    fun givenSuggestRedirectEvaluationInFlightWhenNewErrorReceivedThenPreviousRedirectSuggestionNotSetInViewState() = runTest {
+        fakeSuggestRedirectFeature.apply {
+            self().setRawStoredState(State(enable = true))
+            suggestRedirect().setRawStoredState(State(enable = true))
+        }
+        whenever(mockSuggestRedirectEvaluator.suggestRedirect(any()))
+            .doSuspendableAnswer {
+                delay(1.seconds)
+                RedirectSuggestion(domain = "www.example.com", url = "http://www.example.com")
+            }
+
+        testee.onReceivedError(BAD_URL, "http://example.com", "ERROR_HOST_LOOKUP")
+        testee.onReceivedError(CONNECTION, "http://example.com", "ERROR_CONNECT")
+        @OptIn(ExperimentalCoroutinesApi::class)
+        advanceUntilIdle()
+
+        assertNull(browserViewState().redirectSuggestion)
+    }
+
+    @Test
+    fun givenSuggestRedirectEvaluationInFlightWhenBrowserErrorRefreshedThenRedirectSuggestionNotSetInViewState() = runTest {
+        fakeSuggestRedirectFeature.apply {
+            self().setRawStoredState(State(enable = true))
+            suggestRedirect().setRawStoredState(State(enable = true))
+        }
+        whenever(mockSuggestRedirectEvaluator.suggestRedirect(any())).doSuspendableAnswer {
+            delay(1.seconds)
+            RedirectSuggestion(domain = "www.example.com", url = "http://www.example.com")
+        }
+
+        testee.onReceivedError(BAD_URL, "http://example.com", "ERROR_HOST_LOOKUP")
+        testee.refreshBrowserError()
+        @OptIn(ExperimentalCoroutinesApi::class)
+        advanceUntilIdle()
+
+        assertNull(browserViewState().redirectSuggestion)
+    }
+
+    @Test
+    fun givenSuggestRedirectEvaluationInFlightWhenUserSubmittedQueryThenRedirectSuggestionNotSetInViewState() = runTest {
+        whenever(mockOmnibarConverter.convertQueryToUrl("http://another-site.com", null)).thenReturn("http://another-site.com")
+        fakeSuggestRedirectFeature.apply {
+            self().setRawStoredState(State(enable = true))
+            suggestRedirect().setRawStoredState(State(enable = true))
+        }
+        whenever(mockSuggestRedirectEvaluator.suggestRedirect(any())).doSuspendableAnswer {
+            delay(1.seconds)
+            RedirectSuggestion(domain = "www.example.com", url = "http://www.example.com")
+        }
+
+        testee.onReceivedError(BAD_URL, "http://example.com", "ERROR_HOST_LOOKUP")
+        testee.onUserSubmittedQuery("http://another-site.com")
+        @OptIn(ExperimentalCoroutinesApi::class)
+        advanceUntilIdle()
+
+        assertNull(browserViewState().redirectSuggestion)
+    }
+
+    @Test
+    fun givenSuggestRedirectEvaluationInFlightWhenUserNavigatesHomeThenRedirectSuggestionNotSetInViewState() =
+        runTest {
+            fakeSuggestRedirectFeature.apply {
+                self().setRawStoredState(State(enable = true))
+                suggestRedirect().setRawStoredState(State(enable = true))
+            }
+            whenever(mockSuggestRedirectEvaluator.suggestRedirect(any())).doSuspendableAnswer {
+                delay(1.seconds)
+                RedirectSuggestion(domain = "www.example.com", url = "http://www.example.com")
+            }
+            setupNavigation(isBrowsing = true)
+
+            testee.onReceivedError(BAD_URL, "http://example.com", "ERROR_HOST_LOOKUP")
+            testee.onUserPressedBack()
+            @OptIn(ExperimentalCoroutinesApi::class)
+            advanceUntilIdle()
+
+            assertNull(browserViewState().redirectSuggestion)
+        }
+
+    @Test
+    fun givenSuggestRedirectEvaluationInFlightWhenOmittedErrorReceivedThenRedirectSuggestionStillSetInViewState() = runTest {
+        fakeSuggestRedirectFeature.apply {
+            self().setRawStoredState(State(enable = true))
+            suggestRedirect().setRawStoredState(State(enable = true))
+        }
+        val redirectSuggestion = RedirectSuggestion(domain = "www.example.com", url = "http://www.example.com")
+        whenever(mockSuggestRedirectEvaluator.suggestRedirect(any())).doSuspendableAnswer {
+            delay(1.seconds)
+            redirectSuggestion
+        }
+
+        testee.onReceivedError(BAD_URL, "http://example.com", "ERROR_HOST_LOOKUP")
+        testee.onReceivedError(OMITTED, "http://example.com", "ERROR_UNKNOWN")
+        @OptIn(ExperimentalCoroutinesApi::class)
+        advanceUntilIdle()
+
+        assertEquals(redirectSuggestion, browserViewState().redirectSuggestion)
+    }
+
+    @Test
     fun whenUserSelectedAutocompleteWithAutoCompleteSwitchToTabSuggestionThenSwitchToTabCommandSentWithTabId() =
         runTest {
             val tabId = "tabId"
@@ -8954,7 +9196,7 @@ class BrowserTabViewModelTest {
         // Preserve the pre-return-session behavior: one callback is explicit and one comes from
         // reusing the NTP tab. The new AI classifier must still fire exactly once without a URL.
         verify(plugin, times(2)).onInputSubmitted()
-        verify(plugin, times(1)).onAiPromptSubmitted()
+        verify(plugin, times(1)).onAiPromptSubmitted(source = "address_bar_prompt")
         verify(plugin, never()).onUrlSubmitted()
         verify(plugin, never()).onSearchSubmitted()
     }
@@ -8993,7 +9235,7 @@ class BrowserTabViewModelTest {
         testee.openDuckAiQuery(query = "hello", autoPrompt = true, entryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT)
 
         verify(plugin).onInputSubmitted()
-        verify(plugin).onAiPromptSubmitted()
+        verify(plugin).onAiPromptSubmitted(source = "address_bar_prompt")
     }
 
     @Test
@@ -9027,11 +9269,25 @@ class BrowserTabViewModelTest {
     fun whenDuckAiChatPromptSubmittedThenFiresOnInputSubmittedAndOnAiPromptSubmitted() = runTest {
         val plugin: BrowserInteractionsPlugin = mock()
         whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
+        whenever(mockDuckAiTabSessionRepository.getEntryPointSource("abc")).thenReturn(null)
 
         testee.onDuckAiChatPromptSubmitted()
+        advanceUntilIdle()
 
         verify(plugin).onInputSubmitted()
-        verify(plugin).onAiPromptSubmitted()
+        verify(plugin).onAiPromptSubmitted(source = null)
+    }
+
+    @Test
+    fun whenDuckAiChatPromptSubmittedThenSourceIsTheTabsRecordedEntryPoint() = runTest {
+        val plugin: BrowserInteractionsPlugin = mock()
+        whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(plugin))
+        whenever(mockDuckAiTabSessionRepository.getEntryPointSource("abc")).thenReturn("address_bar_prompt")
+
+        testee.onDuckAiChatPromptSubmitted()
+        advanceUntilIdle()
+
+        verify(plugin).onAiPromptSubmitted(source = "address_bar_prompt")
     }
 
     @Test
@@ -9287,7 +9543,7 @@ class BrowserTabViewModelTest {
         testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = true, isNtp = false)
 
         verify(plugin).onInputSubmitted()
-        verify(plugin).onAiPromptSubmitted()
+        verify(plugin).onAiPromptSubmitted(source = "address_bar_icon")
         verify(plugin, never()).onUrlSubmitted()
     }
 
@@ -11607,19 +11863,34 @@ class BrowserTabViewModelTest {
         whenever(mockStack.currentItem).thenReturn(mockWebHistoryItem)
         setBrowserShowing(true)
         loadUrl(testUrl)
+        testee.onMainFrameLoadStarted(11L)
 
         testee.progressChanged(60, WebViewNavigationState(mockStack, 60))
 
         val tabIdCaptor = argumentCaptor<String>()
-        val urlCaptor = argumentCaptor<String>()
+        val navigationIdCaptor = argumentCaptor<Long>()
 
         verify(mockPageLoadWideEvent).onProgressChanged(
             tabIdCaptor.capture(),
-            urlCaptor.capture(),
+            navigationIdCaptor.capture(),
         )
 
         assertNotNull(tabIdCaptor.firstValue)
-        assertEquals(testUrl, urlCaptor.firstValue)
+        assertEquals(11L, navigationIdCaptor.firstValue)
+    }
+
+    @Test
+    fun whenProgressExceedsFixedProgressBeforeAPageLoadStartedThenManagerNotCalled() {
+        val testUrl = "https://example.com"
+        val mockWebHistoryItem: WebHistoryItem = mock()
+        whenever(mockWebHistoryItem.url).thenReturn(testUrl)
+        whenever(mockStack.currentItem).thenReturn(mockWebHistoryItem)
+        setBrowserShowing(true)
+        loadUrl(testUrl)
+
+        testee.progressChanged(60, WebViewNavigationState(mockStack, 60))
+
+        verify(mockPageLoadWideEvent, never()).onProgressChanged(any(), any())
     }
 
     @Test
@@ -11630,6 +11901,7 @@ class BrowserTabViewModelTest {
         whenever(mockStack.currentItem).thenReturn(mockWebHistoryItem)
         setBrowserShowing(true)
         loadUrl(testUrl)
+        testee.onMainFrameLoadStarted(11L)
 
         // First time - should trigger call
         testee.progressChanged(60, WebViewNavigationState(mockStack, 60))
@@ -11651,6 +11923,7 @@ class BrowserTabViewModelTest {
         whenever(mockStack.currentItem).thenReturn(mockWebHistoryItem)
         setBrowserShowing(true)
         loadUrl(testUrl)
+        testee.onMainFrameLoadStarted(11L)
 
         // Progress below FIXED_PROGRESS (50) - should NOT call manager
         testee.progressChanged(30, WebViewNavigationState(mockStack, 30))
@@ -11671,16 +11944,41 @@ class BrowserTabViewModelTest {
         // First page load
         whenever(mockStack.currentItem).thenReturn(mockWebHistoryItem1)
         loadUrl(firstUrl)
+        testee.onMainFrameLoadStarted(11L)
         testee.progressChanged(60, WebViewNavigationState(mockStack, 60))
-        verify(mockPageLoadWideEvent).onProgressChanged(any(), eq(firstUrl))
+        verify(mockPageLoadWideEvent).onProgressChanged(any(), eq(11L))
 
-        // New page load - resets hasExitedFixedProgress flag
+        // New page load
         whenever(mockStack.currentItem).thenReturn(mockWebHistoryItem2)
         loadUrl(secondUrl)
+        testee.onMainFrameLoadStarted(12L)
         testee.progressChanged(70, WebViewNavigationState(mockStack, 70))
 
-        // Verify second call with new URL
-        verify(mockPageLoadWideEvent).onProgressChanged(any(), eq(secondUrl))
+        // Verify the second load is reported against its own navigation, not the one before it
+        verify(mockPageLoadWideEvent).onProgressChanged(any(), eq(12L))
+    }
+
+    @Test
+    fun whenProgressExceedsFixedProgressAfterSameHostRedirectThenReportedAgainstTheNewLoad() {
+        val firstUrl = "https://example.com/first"
+        val redirectedUrl = "https://example.com/second"
+        val mockWebHistoryItem: WebHistoryItem = mock()
+        whenever(mockWebHistoryItem.url).thenReturn(firstUrl)
+        whenever(mockStack.currentItem).thenReturn(mockWebHistoryItem)
+        setBrowserShowing(true)
+        loadUrl(firstUrl)
+
+        testee.onMainFrameLoadStarted(11L)
+        testee.progressChanged(60, WebViewNavigationState(mockStack, 60))
+        verify(mockPageLoadWideEvent).onProgressChanged(any(), eq(11L))
+
+        // A redirect within the same host compares as UrlUpdated rather than NewPage, so nothing url-driven runs
+        // between the two loads: the page start is the only signal that a new flow is being measured.
+        whenever(mockWebHistoryItem.url).thenReturn(redirectedUrl)
+        testee.onMainFrameLoadStarted(12L)
+        testee.progressChanged(70, WebViewNavigationState(mockStack, 70))
+
+        verify(mockPageLoadWideEvent).onProgressChanged(any(), eq(12L))
     }
 
     @Test
@@ -11691,6 +11989,7 @@ class BrowserTabViewModelTest {
         whenever(mockStack.currentItem).thenReturn(mockWebHistoryItem)
         setBrowserShowing(true)
         loadUrl(testUrl)
+        testee.onMainFrameLoadStarted(11L)
 
         testee.progressChanged(50, WebViewNavigationState(mockStack, 50))
 

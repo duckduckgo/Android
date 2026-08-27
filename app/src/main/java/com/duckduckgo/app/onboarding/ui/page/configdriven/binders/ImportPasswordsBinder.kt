@@ -37,7 +37,8 @@ class ImportPasswordsBinder(
 
         ContentHandle(
             title = importPasswordsTitle,
-            fadeTargets = listOf(importPasswordsPictogram, importPasswordsBody),
+            preTitleFadeTargets = listOf(importPasswordsPictogram),
+            fadeTargets = listOf(importPasswordsBody),
         )
     }
 }

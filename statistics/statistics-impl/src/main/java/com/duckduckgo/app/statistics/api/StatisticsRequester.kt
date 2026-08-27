@@ -22,6 +22,8 @@ import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.device.DeviceInfo
+import com.duckduckgo.common.utils.device.isTablet
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.experiments.api.VariantManager
@@ -47,6 +49,7 @@ class StatisticsRequester @Inject constructor(
     private val emailManager: EmailManager,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
+    private val deviceInfo: DeviceInfo,
 ) : StatisticsUpdater {
 
     /**
@@ -73,6 +76,7 @@ class StatisticsRequester @Inject constructor(
 
         service
             .atb(
+                isTablet = isTabletSignal(),
                 email = emailSignInState(),
             )
             .subscribeOn(Schedulers.io())
@@ -83,7 +87,7 @@ class StatisticsRequester @Inject constructor(
                 val atbWithVariant = atb.formatWithVariant(variantManager.getVariantKey())
 
                 logcat(INFO) { "Initialized ATB: $atbWithVariant" }
-                service.exti(atbWithVariant)
+                service.exti(atbWithVariant, isTablet = isTabletSignal())
             }
             .subscribe(
                 {
@@ -119,6 +123,7 @@ class StatisticsRequester @Inject constructor(
                     service.updateSearchAtb(
                         atb = fullAtb,
                         retentionAtb = retentionAtb,
+                        isTablet = isTabletSignal(),
                         email = email,
                     )
                 },
@@ -149,6 +154,7 @@ class StatisticsRequester @Inject constructor(
                     service.updateDuckAiAtb(
                         atb = fullAtb,
                         retentionAtb = retentionAtb,
+                        isTablet = isTabletSignal(),
                         email = email,
                     )
                 },
@@ -181,6 +187,7 @@ class StatisticsRequester @Inject constructor(
                 service.updateAppAtb(
                     atb = fullAtb,
                     retentionAtb = retentionAtb,
+                    isTablet = isTabletSignal(),
                     email = email,
                 )
             },
@@ -193,6 +200,8 @@ class StatisticsRequester @Inject constructor(
 
     private fun emailSignInState(): Int =
         kotlin.runCatching { emailManager.isSignedIn().asInt() }.getOrDefault(0)
+
+    private fun isTabletSignal(): Int = deviceInfo.isTablet().asInt()
 
     @SuppressLint("CheckResult")
     private fun refreshRetentionAtb(

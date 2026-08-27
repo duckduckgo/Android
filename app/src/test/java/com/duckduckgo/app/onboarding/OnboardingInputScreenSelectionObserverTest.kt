@@ -18,6 +18,7 @@ package com.duckduckgo.app.onboarding
 
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.onboarding.store.SegmentedOnboardingPath
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -246,9 +247,9 @@ class OnboardingInputScreenSelectionObserverTest {
         }
 
     @Test
-    fun whenSegmentedSearchPathWithToggleEnabledAndSettingEnabledBeforeEstablishedThenDoNotMarkAsOverriddenByUser() =
+    fun whenOnSegmentedPathWithAiInputAndSettingEnabledBeforeEstablishedThenDoNotMarkAsOverriddenByUser() =
         runTest {
-            whenever(mockOnboardingStore.isSegmentedSearchPathWithToggleEnabled()).thenReturn(true)
+            whenever(mockOnboardingStore.getSegmentedPathWithAiInput()).thenReturn(SegmentedOnboardingPath.SEARCH)
             whenever(mockUserStageStore.userAppStageFlow()).thenReturn(userAppStageFlow)
             whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
             whenever(mockOnboardingStore.getInputScreenSelection()).thenReturn(true)
@@ -274,9 +275,9 @@ class OnboardingInputScreenSelectionObserverTest {
         }
 
     @Test
-    fun whenSegmentedSearchPathWithToggleEnabledAndUserStageIsEstablishedThenStillApplySelection() =
+    fun whenOnSegmentedPathWithAiInputAndUserStageIsEstablishedThenStillApplySelection() =
         runTest {
-            whenever(mockOnboardingStore.isSegmentedSearchPathWithToggleEnabled()).thenReturn(true)
+            whenever(mockOnboardingStore.getSegmentedPathWithAiInput()).thenReturn(SegmentedOnboardingPath.SEARCH)
             whenever(mockUserStageStore.userAppStageFlow()).thenReturn(userAppStageFlow)
             whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
             whenever(mockOnboardingStore.getInputScreenSelection()).thenReturn(true)

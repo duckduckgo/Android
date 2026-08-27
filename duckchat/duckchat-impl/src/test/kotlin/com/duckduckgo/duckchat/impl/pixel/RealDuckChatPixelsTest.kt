@@ -20,7 +20,9 @@ import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.DuckAiTabSessionRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.ToggleSelection
 import com.duckduckgo.duckchat.impl.ReportMetric
@@ -98,6 +100,8 @@ class RealDuckChatPixelsTest {
     private val mockTermsOfServiceHandler: DuckChatTermsOfServiceHandler = mock()
     private val mockDuckAiTabSessionRepository: DuckAiTabSessionRepository = mock()
     private val mockAppBuildConfig: AppBuildConfig = mock()
+    private val mockBrowserInteractionsPlugin: BrowserInteractionsPlugin = mock()
+    private val mockBrowserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin> = mock()
 
     private lateinit var testee: RealDuckChatPixels
 
@@ -106,6 +110,7 @@ class RealDuckChatPixelsTest {
         whenever(mockDuckChatFeatureRepository.sessionDeltaInMinutes()).thenReturn(1)
         whenever(mockDuckChatFeatureRepository.checkAndMarkFirstPromptSubmission()).thenReturn(false)
         whenever(mockAppBuildConfig.isNewInstall()).thenReturn(false)
+        whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(mockBrowserInteractionsPlugin))
 
         testee = RealDuckChatPixels(
             pixel = mockPixel,
@@ -117,6 +122,7 @@ class RealDuckChatPixelsTest {
             termsOfServiceHandler = mockTermsOfServiceHandler,
             duckAiTabSessionRepository = mockDuckAiTabSessionRepository,
             appBuildConfig = mockAppBuildConfig,
+            browserInteractionsPlugins = mockBrowserInteractionsPlugins,
         )
     }
 
@@ -342,6 +348,24 @@ class RealDuckChatPixelsTest {
             parameters = expectedParams,
             type = Pixel.PixelType.Daily(),
         )
+    }
+
+    @Test
+    fun `when reportContextualPromptSubmittedWithContextNative then notifies BrowserInteractionsPlugin with contextual_chat source`() = runTest {
+        testee.reportContextualPromptSubmittedWithContextNative()
+
+        advanceUntilIdle()
+
+        verify(mockBrowserInteractionsPlugin).onAiPromptSubmitted(source = "contextual_chat")
+    }
+
+    @Test
+    fun `when reportContextualPromptSubmittedWithoutContextNative then notifies BrowserInteractionsPlugin with contextual_chat source`() = runTest {
+        testee.reportContextualPromptSubmittedWithoutContextNative()
+
+        advanceUntilIdle()
+
+        verify(mockBrowserInteractionsPlugin).onAiPromptSubmitted(source = "contextual_chat")
     }
 
     @Test

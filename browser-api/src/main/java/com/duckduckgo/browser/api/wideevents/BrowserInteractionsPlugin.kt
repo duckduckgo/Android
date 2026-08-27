@@ -33,8 +33,8 @@ interface BrowserInteractionsPlugin {
     /** User submitted a typed URL via the omnibar. */
     fun onUrlSubmitted() {}
 
-    /** User submitted a Duck.ai chat prompt. */
-    fun onAiPromptSubmitted() {}
+    /** User submitted a Duck.ai chat prompt. [source] is the entry point that triggered it, when known. */
+    fun onAiPromptSubmitted(source: String? = null) {}
 
     /** User selected a Duck.ai chat suggestion (without typing a prompt). */
     fun onChatSelected() {}

@@ -45,6 +45,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_2"
         android:alpha="0"
+        android:fontFamily="@font/ducksansproduct_regular"
         android:gravity="center"
         android:paddingHorizontal="@dimen/keyline_3"
         app:textType="secondary"
@@ -86,27 +87,36 @@
 
     </com.facebook.shimmer.ShimmerFrameLayout>
 
-    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-        android:id="@+id/importCompleteImportedRow"
+    <LinearLayout
+        android:id="@+id/importCompleteResultContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:alpha="0"
+        android:background="@drawable/background_onboarding_import_result"
+        android:orientation="vertical"
         android:visibility="gone"
-        app:leadingIcon="@drawable/ic_check_onboarding_success_24"
         tools:alpha="1"
-        tools:primaryText="@string/preOnboardingImportCompleteImported"
-        tools:visibility="visible" />
+        tools:visibility="visible">
 
-    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-        android:id="@+id/importCompleteSkippedRow"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:alpha="0"
-        android:visibility="gone"
-        app:leadingIcon="@drawable/ic_cross_recolorable_gray_24"
-        tools:alpha="1"
-        tools:primaryText="@string/preOnboardingImportCompleteSkipped"
-        tools:visibility="visible" />
+        <include
+            android:id="@+id/importCompleteImportedRow"
+            layout="@layout/include_brand_design_import_result_row"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <include
+            android:id="@+id/importCompleteSkippedRow"
+            layout="@layout/include_brand_design_import_result_row"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <include
+            android:id="@+id/importCompleteFailedRow"
+            layout="@layout/include_brand_design_import_result_row"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+    </LinearLayout>
 
 </LinearLayout>

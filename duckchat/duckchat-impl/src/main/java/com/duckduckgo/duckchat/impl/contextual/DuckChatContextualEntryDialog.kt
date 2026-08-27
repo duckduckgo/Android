@@ -64,6 +64,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Named
 import com.google.android.material.R as MaterialR
@@ -218,24 +219,28 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
     }
 
     private fun registerFileChooserResult() {
-        externalCameraLauncher.registerForResult(this) {
-            when (it) {
-                is UploadFromExternalMediaAppLauncher.MediaCaptureResult.MediaCaptured ->
-                    pendingUploadTask?.onReceiveValue(arrayOf(Uri.fromFile(it.file)))
+        externalCameraLauncher.registerForResult(this) { result ->
+            // The launcher may deliver the result from a background thread (media capture moves the file
+            // off the main thread), so hop back to the main thread before touching views / WebView callbacks.
+            lifecycleScope.launch {
+                when (result) {
+                    is UploadFromExternalMediaAppLauncher.MediaCaptureResult.MediaCaptured ->
+                        pendingUploadTask?.onReceiveValue(arrayOf(Uri.fromFile(result.file)))
 
-                is UploadFromExternalMediaAppLauncher.MediaCaptureResult.CouldNotCapturePermissionDenied -> {
-                    pendingUploadTask?.onReceiveValue(null)
-                    externalCameraLauncher.showPermissionRationaleDialog(requireActivity(), it.inputAction)
-                }
+                    is UploadFromExternalMediaAppLauncher.MediaCaptureResult.CouldNotCapturePermissionDenied -> {
+                        pendingUploadTask?.onReceiveValue(null)
+                        externalCameraLauncher.showPermissionRationaleDialog(requireActivity(), result.inputAction)
+                    }
 
-                is UploadFromExternalMediaAppLauncher.MediaCaptureResult.NoMediaCaptured -> pendingUploadTask?.onReceiveValue(null)
-                is UploadFromExternalMediaAppLauncher.MediaCaptureResult.ErrorAccessingMediaApp -> {
-                    pendingUploadTask?.onReceiveValue(null)
-                    Snackbar.make(binding.entryDialogRoot, it.messageId, Snackbar.LENGTH_SHORT).show()
+                    is UploadFromExternalMediaAppLauncher.MediaCaptureResult.NoMediaCaptured -> pendingUploadTask?.onReceiveValue(null)
+                    is UploadFromExternalMediaAppLauncher.MediaCaptureResult.ErrorAccessingMediaApp -> {
+                        pendingUploadTask?.onReceiveValue(null)
+                        Snackbar.make(binding.entryDialogRoot, result.messageId, Snackbar.LENGTH_SHORT).show()
+                    }
                 }
+                pendingUploadTask = null
+                restoreInputFocusAfterPicker()
             }
-            pendingUploadTask = null
-            restoreInputFocusAfterPicker()
         }
     }
 

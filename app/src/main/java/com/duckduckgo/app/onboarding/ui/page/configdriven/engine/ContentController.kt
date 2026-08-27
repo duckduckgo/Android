@@ -28,12 +28,15 @@ import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.AddToDockBinde
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.AddressBarBinder
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.ComparisonChartBinder
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.DownloadReasonBinder
+import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.DuckAiStateBinder
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.ImportCompleteBinder
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.ImportPasswordsBinder
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.InputScreenBinder
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.InputScreenPreviewBinder
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.PreferenceSelectorBinder
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.QuickSetupBinder
+import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.SingleChoiceBinder
+import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.TogglePositionBinder
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.WelcomeBinder
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.WidgetPromptBinder
 import com.duckduckgo.onboarding.api.LinearOnboardingStepId
@@ -68,6 +71,9 @@ class ContentControllerImpl(
     private val importComplete = ImportCompleteBinder(binding.importCompleteContent)
     private val downloadReason = DownloadReasonBinder(binding.downloadReasonContent)
     private val preferenceSelector = PreferenceSelectorBinder(binding.preferenceSelectorContent)
+    private val singleChoice = SingleChoiceBinder(binding.singleChoiceContent)
+    private val togglePosition = TogglePositionBinder(binding.togglePositionContent, isLightMode)
+    private val duckAiState = DuckAiStateBinder(binding.duckAiStateContent)
 
     private var boundView: View? = null
 
@@ -135,6 +141,18 @@ class ContentControllerImpl(
             is ContentConfig.PreferenceSelector -> {
                 boundView = preferenceSelector.view
                 preferenceSelector.bind(content, contentValues.contentState(stepId, content), scope)
+            }
+            is ContentConfig.SingleChoice -> {
+                boundView = singleChoice.view
+                singleChoice.bind(content, contentValues.contentState(stepId, content), scope)
+            }
+            is ContentConfig.TogglePosition -> {
+                boundView = togglePosition.view
+                togglePosition.bind(content, scope)
+            }
+            is ContentConfig.DuckAiState -> {
+                boundView = duckAiState.view
+                duckAiState.bind(content, scope)
             }
         }
         boundView?.isVisible = true

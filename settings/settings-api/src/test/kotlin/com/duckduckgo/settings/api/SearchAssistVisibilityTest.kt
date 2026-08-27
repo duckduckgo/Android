@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.store
+package com.duckduckgo.settings.api
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -46,9 +46,7 @@ class SearchAssistVisibilityTest {
     }
 
     @Test
-    fun whenFromNameThenRoundTripsForEveryOption() {
-        SearchAssistVisibility.entries.forEach { option ->
-            assertEquals(option, SearchAssistVisibility.fromName(option.name))
-        }
+    fun whenSerpKeyThenEveryOptionCarriesTheSameKey() {
+        SearchAssistVisibility.entries.forEach { assertEquals("kbe", it.serpKey) }
     }
 }

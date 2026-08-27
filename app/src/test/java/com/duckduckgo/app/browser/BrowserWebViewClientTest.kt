@@ -105,6 +105,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doNothing
@@ -453,13 +454,14 @@ class BrowserWebViewClientTest {
         testee.onPageStarted(mockWebView, url, null)
         testee.onRenderProcessGone(mockWebView, detail)
 
+        val navigationId = startedNavigationId()
         val tabIdCaptor = argumentCaptor<String>()
-        val urlCaptor = argumentCaptor<String>()
+        val navigationIdCaptor = argumentCaptor<Long>()
         val errorCaptor = argumentCaptor<String>()
 
         verify(pageLoadWideEvent).onPageLoadFinished(
             tabId = tabIdCaptor.capture(),
-            url = urlCaptor.capture(),
+            navigationId = navigationIdCaptor.capture(),
             errorDescription = errorCaptor.capture(),
             isTabInForegroundOnFinish = any(),
             activeRequestsOnLoadStart = any(),
@@ -467,7 +469,7 @@ class BrowserWebViewClientTest {
         )
 
         assertEquals(tabId, tabIdCaptor.firstValue)
-        assertEquals(url, urlCaptor.firstValue)
+        assertEquals(navigationId, navigationIdCaptor.firstValue)
         assertEquals("ERROR_RENDERER_CRASHED", errorCaptor.firstValue)
     }
 
@@ -487,13 +489,14 @@ class BrowserWebViewClientTest {
         testee.onPageStarted(mockWebView, url, null)
         testee.onRenderProcessGone(mockWebView, detail)
 
+        val navigationId = startedNavigationId()
         val tabIdCaptor = argumentCaptor<String>()
-        val urlCaptor = argumentCaptor<String>()
+        val navigationIdCaptor = argumentCaptor<Long>()
         val errorCaptor = argumentCaptor<String>()
 
         verify(pageLoadWideEvent).onPageLoadFinished(
             tabId = tabIdCaptor.capture(),
-            url = urlCaptor.capture(),
+            navigationId = navigationIdCaptor.capture(),
             errorDescription = errorCaptor.capture(),
             isTabInForegroundOnFinish = any(),
             activeRequestsOnLoadStart = any(),
@@ -501,7 +504,7 @@ class BrowserWebViewClientTest {
         )
 
         assertEquals(tabId, tabIdCaptor.firstValue)
-        assertEquals(url, urlCaptor.firstValue)
+        assertEquals(navigationId, navigationIdCaptor.firstValue)
         assertEquals("ERROR_RENDERER_KILLED", errorCaptor.firstValue)
     }
 
@@ -1310,9 +1313,10 @@ class BrowserWebViewClientTest {
         testee.onPageStarted(mockWebView, requestUrl, null)
         testee.onReceivedError(mockWebView, webResourceRequest, webResourceError)
 
+        val navigationId = startedNavigationId()
         verify(pageLoadWideEvent).onPageLoadFinished(
             tabId = eq(tabId),
-            url = eq(requestUrl),
+            navigationId = eq(navigationId),
             errorDescription = any(),
             isTabInForegroundOnFinish = eq(true),
             activeRequestsOnLoadStart = any(),
@@ -1321,7 +1325,7 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenOnReceivedErrorWithOmittedErrorThenPageLoadMonitorOnPageLoadFinishedIsNotCalled() {
+    fun whenErrorArrivesWithNoLoadInFlightThenNothingIsReported() {
         val mockWebView = getImmediatelyInvokedMockWebView()
         val requestUrl = "https://example.com"
         val tabId = "test-tab-789"
@@ -1336,12 +1340,93 @@ class BrowserWebViewClientTest {
 
         verify(pageLoadWideEvent, never()).onPageLoadFinished(
             tabId = any(),
-            url = any(),
-            errorDescription = any(),
+            navigationId = any(),
+            errorDescription = anyOrNull(),
             isTabInForegroundOnFinish = any(),
             activeRequestsOnLoadStart = any(),
             concurrentRequestsOnFinish = any(),
         )
+    }
+
+    @Test
+    fun whenMainFrameErrorHasNoErrorScreenThenTheLoadIsStillReportedAsFailed() {
+        val mockWebView = pageLoadMockWebView()
+        whenever(webResourceError.errorCode).thenReturn(ERROR_UNKNOWN)
+        whenever(webResourceError.description).thenReturn("some transient error")
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        whenever(webResourceRequest.url).thenReturn(EXAMPLE_URL.toUri())
+        whenever(listener.isTabInForeground()).thenReturn(true)
+
+        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
+        testee.onReceivedError(mockWebView, webResourceRequest, webResourceError)
+
+        // ERROR_UNKNOWN parses to OMITTED, so the user is shown no error screen. The load still failed, and measuring
+        // only the errors that get a screen is what left the rest to be swept as Unknown.
+        val navigationId = startedNavigationId()
+        verify(pageLoadWideEvent).onPageLoadFinished(
+            tabId = eq(TAB_ID),
+            navigationId = eq(navigationId),
+            errorDescription = eq("ERROR_UNKNOWN"),
+            isTabInForegroundOnFinish = any(),
+            activeRequestsOnLoadStart = any(),
+            concurrentRequestsOnFinish = any(),
+        )
+    }
+
+    @Test
+    fun whenMainFrameErrorIsForAUrlTheLoadNeverStartedThenTheLoadIsNotFailed() {
+        val mockWebView = pageLoadMockWebView()
+        whenever(mockWebView.progress).thenReturn(100)
+        whenever(webResourceError.errorCode).thenReturn(ERROR_UNKNOWN)
+        whenever(webResourceError.description).thenReturn("some transient error")
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        // A main frame error carries the url of the request that failed, which is not always the page being measured -
+        // a page navigating the main frame somewhere it cannot go reports against that url instead.
+        whenever(webResourceRequest.url).thenReturn("https://other.example.org/elsewhere".toUri())
+        whenever(listener.isTabInForeground()).thenReturn(true)
+
+        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
+        testee.onReceivedError(mockWebView, webResourceRequest, webResourceError)
+
+        verify(pageLoadWideEvent, never()).onPageLoadFinished(
+            tabId = any(),
+            navigationId = any(),
+            errorDescription = anyOrNull(),
+            isTabInForegroundOnFinish = any(),
+            activeRequestsOnLoadStart = any(),
+            concurrentRequestsOnFinish = any(),
+        )
+
+        // And the page's own finish still reports, which failing it would have suppressed.
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+        val navigationId = startedNavigationId()
+        verify(pageLoadWideEvent).onPageLoadFinished(
+            tabId = eq(TAB_ID),
+            navigationId = eq(navigationId),
+            errorDescription = isNull(),
+            isTabInForegroundOnFinish = any(),
+            activeRequestsOnLoadStart = any(),
+            concurrentRequestsOnFinish = any(),
+        )
+    }
+
+    @Test
+    fun whenMainFrameErrorHasNoErrorScreenThenTheCycleStillCompletes() {
+        val mockWebView = pageLoadMockWebView()
+        whenever(mockWebView.progress).thenReturn(100)
+        whenever(webResourceError.errorCode).thenReturn(ERROR_UNKNOWN)
+        whenever(webResourceError.description).thenReturn("some transient error")
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        whenever(webResourceRequest.url).thenReturn(EXAMPLE_URL.toUri())
+        whenever(listener.isTabInForeground()).thenReturn(true)
+
+        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
+        testee.onReceivedError(mockWebView, webResourceRequest, webResourceError)
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+
+        // Ending the measured load must not end the cycle: an aborted navigation is followed by the one that replaced
+        // it, and the page load pixel and the history entry still belong to that cycle.
+        verify(pageLoadedHandler).onPageLoaded(any(), anyOrNull(), any(), any(), any(), any(), any())
     }
 
     @Test
@@ -1635,20 +1720,17 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenPageStartedAgainMidLoadThenOnlyTheNavigationThatStartedTheFlowReportsMeasurements() {
-        val mockWebView = getImmediatelyInvokedMockWebView()
-        val tabId = "test-tab-123"
-        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
-        whenever(mockWebView.settings).thenReturn(mock())
-        whenever(listener.getCurrentTabId()).thenReturn(tabId)
+    fun whenPageStartedAgainMidLoadThenEachPageStartReportsItsOwnMeasurements() {
+        val mockWebView = pageLoadMockWebView()
 
         testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
-        // A hop within the same load does not start a flow, so its deferred measurements have no navigation to land on.
-        testee.onPageStarted(mockWebView, "$EXAMPLE_URL/redirected", null)
+        testee.onPageStarted(mockWebView, SECOND_URL, null)
 
-        verify(pageLoadWideEvent, times(1)).onPageStarted(any(), any(), any())
-        verify(pageLoadWideEvent, times(1)).onContentScopeExperimentsResolved(any(), any())
-        verify(pageLoadWideEvent, times(1)).onJsInjectionComplete(any(), any())
+        val navigationIds = startedNavigationIds(2)
+        verify(pageLoadWideEvent).onContentScopeExperimentsResolved(TAB_ID, navigationIds[0])
+        verify(pageLoadWideEvent).onJsInjectionComplete(TAB_ID, navigationIds[0])
+        verify(pageLoadWideEvent).onContentScopeExperimentsResolved(TAB_ID, navigationIds[1])
+        verify(pageLoadWideEvent).onJsInjectionComplete(TAB_ID, navigationIds[1])
     }
 
     @Test
@@ -1714,9 +1796,133 @@ class BrowserWebViewClientTest {
         whenever(mockWebView.url).thenReturn(EXAMPLE_URL)
         whenever(mockWebView.progress).thenReturn(progress)
         whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+        whenever(mockWebView.settings).thenReturn(mock())
         whenever(listener.getCurrentTabId()).thenReturn(tabId)
+
+        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
         testee.onPageCommitVisible(mockWebView, EXAMPLE_URL)
-        verify(pageLoadWideEvent).onPageVisible(tabId, EXAMPLE_URL, progress)
+
+        val navigationId = startedNavigationId()
+        verify(pageLoadWideEvent).onPageVisible(tabId, navigationId, progress)
+    }
+
+    @Test
+    fun whenPageVisibleBeforeAnyPageStartedThenManagerNotCalled() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.url).thenReturn(EXAMPLE_URL)
+        whenever(mockWebView.progress).thenReturn(42)
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+        whenever(listener.getCurrentTabId()).thenReturn("test-tab-456")
+
+        testee.onPageCommitVisible(mockWebView, EXAMPLE_URL)
+
+        verify(pageLoadWideEvent, never()).onPageVisible(any(), any(), any())
+    }
+
+    @Test
+    fun whenPageStartedWhileLoadInFlightThenReplacementGetsItsOwnLoad() {
+        val mockWebView = pageLoadMockWebView()
+
+        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
+        testee.onPageStarted(mockWebView, SECOND_URL, null)
+
+        val navigationIds = startedNavigationIds(2)
+        verify(pageLoadWideEvent).onPageStarted(TAB_ID, EXAMPLE_URL, navigationIds[0])
+        verify(pageLoadWideEvent).onPageStarted(TAB_ID, SECOND_URL, navigationIds[1])
+        assertNotEquals(navigationIds[0], navigationIds[1])
+    }
+
+    @Test
+    fun whenLoadInFlightIsReplacedThenFinishIsReportedAgainstTheReplacement() {
+        val mockWebView = pageLoadMockWebView()
+        whenever(mockWebView.progress).thenReturn(100)
+        whenever(listener.isTabInForeground()).thenReturn(true)
+
+        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
+        testee.onPageStarted(mockWebView, SECOND_URL, null)
+        testee.onPageFinished(mockWebView, SECOND_URL)
+
+        // Reporting the interrupted load's id here is what stretched its duration across both pages.
+        val replacementNavigationId = startedNavigationIds(2).last()
+        verify(pageLoadWideEvent).onPageLoadFinished(
+            tabId = eq(TAB_ID),
+            navigationId = eq(replacementNavigationId),
+            errorDescription = isNull(),
+            isTabInForegroundOnFinish = any(),
+            activeRequestsOnLoadStart = any(),
+            concurrentRequestsOnFinish = any(),
+        )
+    }
+
+    @Test
+    fun whenAFailureForAnotherUrlEndsTheCycleThenTheLoadCanStillReportItsFinish() {
+        val mockWebView = pageLoadMockWebView()
+        whenever(mockWebView.progress).thenReturn(100)
+        // BAD_URL, so this error gets an error screen and takes the cycle down with it.
+        whenever(webResourceError.errorCode).thenReturn(ERROR_HOST_LOOKUP)
+        whenever(webResourceError.description).thenReturn("net::ERR_NAME_NOT_RESOLVED")
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        whenever(webResourceRequest.url).thenReturn("https://other.example.org/elsewhere".toUri())
+        whenever(listener.isTabInForeground()).thenReturn(true)
+
+        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
+        testee.onReceivedError(mockWebView, webResourceRequest, webResourceError)
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+
+        // The measured load outlives the cycle: tying it to `start` left this flow with nothing able to end it, and it
+        // was swept as Unknown five minutes later.
+        val navigationId = startedNavigationId()
+        verify(pageLoadWideEvent).onPageLoadFinished(
+            tabId = eq(TAB_ID),
+            navigationId = eq(navigationId),
+            errorDescription = isNull(),
+            isTabInForegroundOnFinish = any(),
+            activeRequestsOnLoadStart = any(),
+            concurrentRequestsOnFinish = any(),
+        )
+    }
+
+    @Test
+    fun whenErrorArrivesForAnAlreadyReplacedLoadThenTheReplacementIsNotClosedWithIt() {
+        val mockWebView = pageLoadMockWebView()
+        whenever(webResourceError.errorCode).thenReturn(ERROR_HOST_LOOKUP)
+        whenever(webResourceError.description).thenReturn("net::ERR_NAME_NOT_RESOLVED")
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        whenever(webResourceRequest.url).thenReturn(EXAMPLE_URL.toUri())
+        whenever(listener.isTabInForeground()).thenReturn(true)
+
+        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
+        testee.onPageStarted(mockWebView, SECOND_URL, null)
+        testee.onReceivedError(mockWebView, webResourceRequest, webResourceError)
+
+        verify(pageLoadWideEvent, never()).onPageLoadFinished(
+            tabId = any(),
+            navigationId = any(),
+            errorDescription = anyOrNull(),
+            isTabInForegroundOnFinish = any(),
+            activeRequestsOnLoadStart = any(),
+            concurrentRequestsOnFinish = any(),
+        )
+    }
+
+    private fun pageLoadMockWebView(): WebView {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+        whenever(mockWebView.settings).thenReturn(mock())
+        whenever(listener.getCurrentTabId()).thenReturn(TAB_ID)
+        return mockWebView
+    }
+
+    /**
+     * The id [BrowserWebViewClient] assigned to the load it is timing. Read back from the listener rather than asserted
+     * as a literal, because the counter behind it is static and keeps counting across tests.
+     */
+    private fun startedNavigationId(): Long = startedNavigationIds(1).single()
+
+    private fun startedNavigationIds(count: Int): List<Long> {
+        val captor = argumentCaptor<Long>()
+        verify(listener, times(count)).onMainFrameLoadStarted(captor.capture())
+        return captor.allValues
     }
 
     @Test
@@ -1732,13 +1938,14 @@ class BrowserWebViewClientTest {
         testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
         testee.onPageFinished(mockWebView, EXAMPLE_URL)
 
+        val navigationId = startedNavigationId()
         val tabIdCaptor = argumentCaptor<String>()
-        val urlCaptor = argumentCaptor<String>()
+        val navigationIdCaptor = argumentCaptor<Long>()
         val foregroundCaptor = argumentCaptor<Boolean>()
 
         verify(pageLoadWideEvent).onPageLoadFinished(
             tabId = tabIdCaptor.capture(),
-            url = urlCaptor.capture(),
+            navigationId = navigationIdCaptor.capture(),
             errorDescription = isNull(),
             isTabInForegroundOnFinish = foregroundCaptor.capture(),
             activeRequestsOnLoadStart = any(),
@@ -1746,7 +1953,7 @@ class BrowserWebViewClientTest {
         )
 
         assertEquals(tabId, tabIdCaptor.firstValue)
-        assertEquals(EXAMPLE_URL, urlCaptor.firstValue)
+        assertEquals(navigationId, navigationIdCaptor.firstValue)
         assertEquals(true, foregroundCaptor.firstValue)
     }
 
@@ -1766,7 +1973,7 @@ class BrowserWebViewClientTest {
         val foregroundCaptor = argumentCaptor<Boolean>()
         verify(pageLoadWideEvent).onPageLoadFinished(
             tabId = any(),
-            url = any(),
+            navigationId = any(),
             errorDescription = isNull(),
             isTabInForegroundOnFinish = foregroundCaptor.capture(),
             activeRequestsOnLoadStart = any(),
@@ -1784,8 +1991,8 @@ class BrowserWebViewClientTest {
         testee.onPageFinished(mockWebView, EXAMPLE_URL)
         verify(pageLoadWideEvent, never()).onPageLoadFinished(
             tabId = any(),
-            url = any(),
-            errorDescription = any(),
+            navigationId = any(),
+            errorDescription = anyOrNull(),
             isTabInForegroundOnFinish = any(),
             activeRequestsOnLoadStart = any(),
             concurrentRequestsOnFinish = any(),
@@ -1806,8 +2013,8 @@ class BrowserWebViewClientTest {
 
         verify(pageLoadWideEvent, never()).onPageLoadFinished(
             tabId = any(),
-            url = any(),
-            errorDescription = any(),
+            navigationId = any(),
+            errorDescription = anyOrNull(),
             isTabInForegroundOnFinish = any(),
             activeRequestsOnLoadStart = any(),
             concurrentRequestsOnFinish = any(),
@@ -1828,8 +2035,8 @@ class BrowserWebViewClientTest {
 
         verify(pageLoadWideEvent, never()).onPageLoadFinished(
             tabId = any(),
-            url = any(),
-            errorDescription = any(),
+            navigationId = any(),
+            errorDescription = anyOrNull(),
             isTabInForegroundOnFinish = any(),
             activeRequestsOnLoadStart = any(),
             concurrentRequestsOnFinish = any(),
@@ -1853,13 +2060,14 @@ class BrowserWebViewClientTest {
         testee.onPageStarted(mockWebView, errorUrl, null)
         testee.onReceivedError(mockWebView, webResourceRequest, webResourceError)
 
+        val navigationId = startedNavigationId()
         val tabIdCaptor = argumentCaptor<String>()
-        val urlCaptor = argumentCaptor<String>()
+        val navigationIdCaptor = argumentCaptor<Long>()
         val errorCaptor = argumentCaptor<String>()
 
         verify(pageLoadWideEvent).onPageLoadFinished(
             tabId = tabIdCaptor.capture(),
-            url = urlCaptor.capture(),
+            navigationId = navigationIdCaptor.capture(),
             errorDescription = errorCaptor.capture(),
             isTabInForegroundOnFinish = any(),
             activeRequestsOnLoadStart = any(),
@@ -1867,7 +2075,7 @@ class BrowserWebViewClientTest {
         )
 
         assertEquals(tabId, tabIdCaptor.firstValue)
-        assertEquals(errorUrl, urlCaptor.firstValue)
+        assertEquals(navigationId, navigationIdCaptor.firstValue)
         assertEquals("ERROR_HOST_LOOKUP", errorCaptor.firstValue)
     }
 
@@ -1888,8 +2096,8 @@ class BrowserWebViewClientTest {
 
         verify(pageLoadWideEvent, never()).onPageLoadFinished(
             tabId = any(),
-            url = any(),
-            errorDescription = any(),
+            navigationId = any(),
+            errorDescription = anyOrNull(),
             isTabInForegroundOnFinish = any(),
             activeRequestsOnLoadStart = any(),
             concurrentRequestsOnFinish = any(),
@@ -2252,6 +2460,8 @@ class BrowserWebViewClientTest {
 
     companion object {
         const val EXAMPLE_URL = "https://example.com"
+        const val SECOND_URL = "https://www.example.com"
+        const val TAB_ID = "test-tab-page-load"
         const val DDG_URL = "https://duckduckgo.com"
         const val EXAMPLE_SERP_URL = "https://duckduckgo.com/?q=test"
         const val DUCK_AI_URL = "https://duck.ai/?q=test"

@@ -17,6 +17,7 @@
 package com.duckduckgo.app.onboarding.ui.page.configdriven
 
 import com.duckduckgo.app.browser.omnibar.OmnibarType
+import com.duckduckgo.app.onboarding.TestOption
 import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -42,6 +43,27 @@ class ContentConfigTest {
         )
 
         assertEquals(DownloadReasonContentState(selection = null), content.initialState())
+    }
+
+    @Test
+    fun `single choice seeds its state with the first row`() {
+        val first = TestOption(id = "first")
+        val content = ContentConfig.SingleChoice(
+            title = TextConfig.Literal("title"),
+            body = TextConfig.Literal("body"),
+            rows = listOf(first, TestOption(id = "second")),
+        )
+
+        assertEquals(SingleChoiceContentState(selected = first), content.initialState())
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `single choice rejects an empty row list`() {
+        ContentConfig.SingleChoice(
+            title = TextConfig.Literal("title"),
+            body = TextConfig.Literal("body"),
+            rows = emptyList(),
+        )
     }
 
     @Test

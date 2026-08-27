@@ -21,7 +21,9 @@ import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.DuckAiTabSessionRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
 import com.duckduckgo.di.scopes.AppScope
@@ -288,6 +290,7 @@ class RealDuckChatPixels @Inject constructor(
     private val termsOfServiceHandler: DuckChatTermsOfServiceHandler,
     private val duckAiTabSessionRepository: DuckAiTabSessionRepository,
     private val appBuildConfig: AppBuildConfig,
+    private val browserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin>,
 ) : DuckChatPixels {
 
     /** `first_prompt_new_install` must be attributable to a fresh install, never to an existing user who just updated. */
@@ -593,6 +596,7 @@ class RealDuckChatPixels @Inject constructor(
     override fun reportContextualPromptSubmittedWithContextNative() {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             val params = contextualPromptSubmittedParams()
+            browserInteractionsPlugins.getPlugins().forEach { it.onAiPromptSubmitted(source = DuckChatEntryPoint.CONTEXTUAL_CHAT.toPixelValue()) }
             pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PROMPT_SUBMITTED_WITH_CONTEXT_NATIVE_COUNT, parameters = params)
             pixel.fire(
                 DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PROMPT_SUBMITTED_WITH_CONTEXT_NATIVE_DAILY,
@@ -618,6 +622,7 @@ class RealDuckChatPixels @Inject constructor(
     override fun reportContextualPromptSubmittedWithoutContextNative() {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             val params = contextualPromptSubmittedParams()
+            browserInteractionsPlugins.getPlugins().forEach { it.onAiPromptSubmitted(source = DuckChatEntryPoint.CONTEXTUAL_CHAT.toPixelValue()) }
             pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PROMPT_SUBMITTED_WITHOUT_CONTEXT_NATIVE_COUNT, parameters = params)
             pixel.fire(
                 DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PROMPT_SUBMITTED_WITHOUT_CONTEXT_NATIVE_DAILY,
@@ -830,6 +835,7 @@ class RealDuckChatPixels @Inject constructor(
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_DAILY,
         ) {
             val source = resolveEntrySource(surface, tabId, addressBarEntryPoint)
+            browserInteractionsPlugins.getPlugins().forEach { it.onAiPromptSubmitted(source = source) }
             val isFirstPrompt = isFirstPromptForNewInstall()
             buildMap {
                 put(DuckChatPixelParameters.SELECTED_TOOL, selectedTool)

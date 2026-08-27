@@ -124,7 +124,7 @@ class RealReturnSessionWideEventTest {
             flowEntryPoint = isNull(),
             metadata = eq(defaultMetadata),
             cleanupPolicy = eq(CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = false, flowStatus = FlowStatus.Unknown)),
-            samplingProbability = eq(0.05f),
+            samplingProbability = eq(1.0f),
             definition = any(),
         )
     }
@@ -150,7 +150,7 @@ class RealReturnSessionWideEventTest {
                     ),
             ),
             cleanupPolicy = any(),
-            samplingProbability = eq(0.05f),
+            samplingProbability = eq(1.0f),
             definition = any(),
         )
     }
@@ -231,7 +231,7 @@ class RealReturnSessionWideEventTest {
             flowEntryPoint = isNull(),
             metadata = eq(defaultMetadata + ("landed_on" to "duck_ai")),
             cleanupPolicy = any(),
-            samplingProbability = eq(0.05f),
+            samplingProbability = eq(1.0f),
             definition = any(),
         )
     }
@@ -246,7 +246,7 @@ class RealReturnSessionWideEventTest {
             flowEntryPoint = isNull(),
             metadata = eq(defaultMetadata + ("landed_on" to "serp")),
             cleanupPolicy = any(),
-            samplingProbability = eq(0.05f),
+            samplingProbability = eq(1.0f),
             definition = any(),
         )
     }
@@ -261,7 +261,7 @@ class RealReturnSessionWideEventTest {
             flowEntryPoint = isNull(),
             metadata = eq(defaultMetadata + ("landed_on" to "web")),
             cleanupPolicy = any(),
-            samplingProbability = eq(0.05f),
+            samplingProbability = eq(1.0f),
             definition = any(),
         )
     }
@@ -276,7 +276,7 @@ class RealReturnSessionWideEventTest {
             flowEntryPoint = isNull(),
             metadata = eq(defaultMetadata),
             cleanupPolicy = any(),
-            samplingProbability = eq(0.05f),
+            samplingProbability = eq(1.0f),
             definition = any(),
         )
     }
@@ -344,7 +344,7 @@ class RealReturnSessionWideEventTest {
             flowEntryPoint = isNull(),
             metadata = eq(defaultMetadata + ("time_away_ms_bucketed" to "3600000")),
             cleanupPolicy = any(),
-            samplingProbability = eq(0.05f),
+            samplingProbability = eq(1.0f),
             definition = any(),
         )
     }
@@ -440,7 +440,22 @@ class RealReturnSessionWideEventTest {
         verify(wideEventClient).flowFinish(
             wideEventId = eq(123L),
             status = eq<FlowStatus>(FlowStatus.Success),
-            metadata = argThat { this["status_reason"] == "ai_prompt_submitted" },
+            metadata = argThat { this["status_reason"] == "ai_prompt_submitted" && !this.containsKey("source") },
+        )
+    }
+
+    @Test
+    fun `when onAiPromptSubmitted given a source then flowFinish metadata includes it`() = runTest {
+        startSession()
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+
+        testee.onAiPromptSubmitted(source = "address_bar_prompt")
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(wideEventClient).flowFinish(
+            wideEventId = eq(123L),
+            status = eq<FlowStatus>(FlowStatus.Success),
+            metadata = argThat { this["status_reason"] == "ai_prompt_submitted" && this["source"] == "address_bar_prompt" },
         )
     }
 
