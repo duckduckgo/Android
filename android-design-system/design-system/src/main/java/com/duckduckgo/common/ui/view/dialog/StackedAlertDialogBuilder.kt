@@ -22,6 +22,7 @@ import android.content.res.Configuration
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import androidx.annotation.DrawableRes
@@ -80,7 +81,6 @@ class StackedAlertDialogBuilder(val context: Context) : DaxAlertDialog {
     private var isDestructiveVersion: Boolean = false
     private var isRebrandUpdate: Boolean = false
     private var componentCallbacks: ComponentCallbacks? = null
-    private var isRecreating: Boolean = false
 
     fun setHeaderImageResource(@DrawableRes drawableId: Int): StackedAlertDialogBuilder {
         headerImageDrawableId = drawableId
@@ -172,12 +172,14 @@ class StackedAlertDialogBuilder(val context: Context) : DaxAlertDialog {
             .apply {
                 setCancelable(false)
                 setOnDismissListener {
-                    if (!isRecreating) {
-                        unregisterConfigurationCallback()
-                        listener.onDialogDismissed()
-                    }
+                    unregisterConfigurationCallback()
+                    listener.onDialogDismissed()
                 }
-                setOnCancelListener { if (!isRecreating) listener.onDialogCancelled() }
+                setOnCancelListener { listener.onDialogCancelled() }
+                if (isRebrandUpdate) {
+                    setBackgroundInsetStart(0)
+                    setBackgroundInsetEnd(0)
+                }
             }
 
         dialog = dialogBuilder.create()
@@ -186,10 +188,17 @@ class StackedAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         return this
     }
 
-    /**
-     * The layout has no scroll container of its own, so tall content is clipped rather than
-     * scrolled where the card cannot grow - short landscape screens, or large font scales.
-     */
+    override fun show() {
+        if (dialog == null) {
+            build()
+        }
+        showDialog()
+        if (isRebrandUpdate) {
+            registerConfigurationCallback()
+        }
+        listener.onDialogShown()
+    }
+
     private fun dialogContent(binding: DialogStackedAlertBinding): View {
         if (!isRebrandUpdate) return binding.root
 
@@ -205,15 +214,17 @@ class StackedAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         }
     }
 
-    override fun show() {
-        if (dialog == null) {
-            build()
-        }
+    private fun showDialog() {
         dialog?.show()
         if (isRebrandUpdate) {
-            registerConfigurationCallback()
+            dialog?.window?.setLayout(cardWidth(), WindowManager.LayoutParams.WRAP_CONTENT)
         }
-        listener.onDialogShown()
+    }
+
+    private fun cardWidth(): Int {
+        val maxWidth = context.resources.getDimensionPixelSize(R.dimen.rebrandDialogMaxWidth)
+        val margin = context.resources.getDimensionPixelSize(R.dimen.keyline_5)
+        return minOf(maxWidth, context.resources.displayMetrics.widthPixels - margin * 2)
     }
 
     /**
@@ -238,13 +249,15 @@ class StackedAlertDialogBuilder(val context: Context) : DaxAlertDialog {
     }
 
     private fun recreate() {
-        if (dialog?.isShowing != true) return
+        val current = dialog ?: return
+        if (!current.isShowing) return
 
-        isRecreating = true
-        dialog?.dismiss()
+        current.setOnDismissListener(null)
+        current.setOnCancelListener(null)
+        current.dismiss()
+
         build()
-        dialog?.show()
-        isRecreating = false
+        showDialog()
     }
 
     override fun dismiss() {

@@ -121,8 +121,9 @@
     <dimen name="dialogContentPaddingBottom">18dp</dimen>
     <dimen name="dialogContentPaddingStart">@dimen/keyline_5</dimen>
     <dimen name="dialogContentPaddingEnd">@dimen/keyline_5</dimen>
+    <dimen name="rebrandDialogMaxWidth">300dp</dimen>
     <dimen name="rebrandDialogBorderRadius">28dp</dimen>
-    <dimen name="rebrandDialogButtonSidePadding">@dimen/keyline_6</dimen>
+    <dimen name="rebrandDialogButtonSidePadding">0dp</dimen>
     <dimen name="rebrandDialogIconInset">@dimen/keyline_2</dimen>
 
     <!-- Dax Dialog -->
