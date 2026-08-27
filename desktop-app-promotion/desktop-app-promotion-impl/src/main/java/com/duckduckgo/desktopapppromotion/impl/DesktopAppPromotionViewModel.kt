@@ -22,7 +22,7 @@ import com.duckduckgo.app.clipboard.ClipboardInteractor
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.desktopapppromotion.api.DesktopAppPromotionInteractionHandler.Interaction
-import com.duckduckgo.desktopapppromotion.api.DesktopAppPromotionParams
+import com.duckduckgo.desktopapppromotion.api.PixelConfig
 import com.duckduckgo.desktopapppromotion.api.PixelFireSpec
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -36,8 +36,9 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 class DesktopAppPromotionViewModel @AssistedInject constructor(
-    @Assisted private val params: DesktopAppPromotionParams,
     @Assisted private val content: DesktopAppPromotionContent,
+    @Assisted private val pixels: PixelConfig,
+    @Assisted private val handlerId: String?,
     private val pixel: Pixel,
     private val dispatchers: DispatcherProvider,
     private val clipboardInteractor: ClipboardInteractor,
@@ -51,15 +52,14 @@ class DesktopAppPromotionViewModel @AssistedInject constructor(
     val commands: Flow<Command> = _commands.receiveAsFlow()
 
     init {
-        // The ViewModel outlives configuration changes, so this fires once per screen instance.
         viewModelScope.launch(dispatchers.io()) {
-            fire(params.pixels.impression)
+            fire(pixels.impression)
         }
     }
 
     fun onShareClicked() {
         viewModelScope.launch(dispatchers.io()) {
-            fire(params.pixels.shareClicked)
+            fire(pixels.shareClicked)
             _commands.send(
                 Command.ShareLink(
                     shareText = content.shareIntentBody ?: content.downloadUrl,
@@ -74,15 +74,15 @@ class DesktopAppPromotionViewModel @AssistedInject constructor(
             if (!clipboardInteractor.copyToClipboard(content.downloadUrl, isSensitive = false)) {
                 _commands.send(Command.ShowCopiedNotification)
             }
-            fire(params.pixels.linkClicked)
-            interactionDispatcher.dispatch(params.handlerId, Interaction.LINK_COPIED)
+            fire(pixels.linkClicked)
+            interactionDispatcher.dispatch(handlerId, Interaction.LINK_COPIED)
         }
     }
 
     fun onDismissClicked() {
         viewModelScope.launch(dispatchers.io()) {
-            fire(params.pixels.dismissed)
-            interactionDispatcher.dispatch(params.handlerId, Interaction.DISMISSED)
+            fire(pixels.dismissed)
+            interactionDispatcher.dispatch(handlerId, Interaction.DISMISSED)
             _commands.send(Command.Close)
         }
     }
@@ -112,8 +112,9 @@ class DesktopAppPromotionViewModel @AssistedInject constructor(
     @AssistedFactory
     interface Factory {
         fun create(
-            params: DesktopAppPromotionParams,
             content: DesktopAppPromotionContent,
+            pixels: PixelConfig,
+            handlerId: String?,
         ): DesktopAppPromotionViewModel
     }
 }

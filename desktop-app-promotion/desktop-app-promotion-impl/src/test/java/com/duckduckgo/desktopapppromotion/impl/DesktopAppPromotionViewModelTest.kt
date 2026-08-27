@@ -21,7 +21,6 @@ import com.duckduckgo.app.clipboard.ClipboardInteractor
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.desktopapppromotion.api.DesktopAppPromotionInteractionHandler.Interaction
-import com.duckduckgo.desktopapppromotion.api.DesktopAppPromotionParams
 import com.duckduckgo.desktopapppromotion.api.PixelConfig
 import com.duckduckgo.desktopapppromotion.api.PixelFireSpec
 import com.duckduckgo.desktopapppromotion.impl.DesktopAppPromotionViewModel.Command
@@ -47,10 +46,12 @@ class DesktopAppPromotionViewModelTest {
     private val interactionDispatcher = FakeInteractionDispatcher()
 
     private fun createViewModel(
-        params: DesktopAppPromotionParams = DesktopAppPromotionParams(),
+        pixels: PixelConfig = PixelConfig(),
+        handlerId: String? = null,
     ) = DesktopAppPromotionViewModel(
-        params = params,
         content = content,
+        pixels = pixels,
+        handlerId = handlerId,
         pixel = pixelMock,
         dispatchers = coroutineTestRule.testDispatcherProvider,
         clipboardInteractor = clipboardInteractorMock,
@@ -80,8 +81,9 @@ class DesktopAppPromotionViewModelTest {
     @Test
     fun whenShareClickedAndNoShareIntentBodyThenShareLinkCommandCarriesBareUrl() = runTest {
         val testee = DesktopAppPromotionViewModel(
-            params = DesktopAppPromotionParams(),
             content = content.copy(shareIntentBody = null),
+            pixels = PixelConfig(),
+            handlerId = null,
             pixel = pixelMock,
             dispatchers = coroutineTestRule.testDispatcherProvider,
             clipboardInteractor = clipboardInteractorMock,
@@ -141,7 +143,7 @@ class DesktopAppPromotionViewModelTest {
 
     @Test
     fun whenBackPressedThenEmitCloseWithoutPixelOrHandler() = runTest {
-        val testee = createViewModel(params = paramsWithAllPixels())
+        val testee = createViewModel(pixels = allPixels(), handlerId = HANDLER_ID)
 
         testee.commands.test {
             testee.onBackPressed()
@@ -155,7 +157,7 @@ class DesktopAppPromotionViewModelTest {
 
     @Test
     fun whenImpressionSpecPresentThenImpressionPixelFiresOnceOnCreation() = runTest {
-        createViewModel(params = paramsWithAllPixels())
+        createViewModel(pixels = allPixels(), handlerId = HANDLER_ID)
 
         verify(pixelMock).fire(eq(IMPRESSION_PIXEL), eq(hashMapOf("source" to "test")), any(), any())
     }
@@ -163,7 +165,7 @@ class DesktopAppPromotionViewModelTest {
     @Test
     fun whenSpecsPresentThenEachInteractionFiresItsConfiguredPixel() = runTest {
         whenever(clipboardInteractorMock.copyToClipboard(any(), any())).thenReturn(true)
-        val testee = createViewModel(params = paramsWithAllPixels())
+        val testee = createViewModel(pixels = allPixels(), handlerId = HANDLER_ID)
 
         testee.onShareClicked()
         testee.onLinkClicked()
@@ -177,7 +179,7 @@ class DesktopAppPromotionViewModelTest {
     @Test
     fun whenSpecsAbsentThenNoPixelIsFiredForAnyInteraction() = runTest {
         whenever(clipboardInteractorMock.copyToClipboard(any(), any())).thenReturn(true)
-        val testee = createViewModel(params = DesktopAppPromotionParams(pixels = PixelConfig()))
+        val testee = createViewModel()
 
         testee.onShareClicked()
         testee.onLinkClicked()
@@ -189,7 +191,7 @@ class DesktopAppPromotionViewModelTest {
     @Test
     fun whenInteractionsHappenThenTheyAreDispatchedWithTheLaunchHandlerId() = runTest {
         whenever(clipboardInteractorMock.copyToClipboard(any(), any())).thenReturn(true)
-        val testee = createViewModel(params = DesktopAppPromotionParams(handlerId = HANDLER_ID))
+        val testee = createViewModel(handlerId = HANDLER_ID)
 
         testee.onLinkClicked()
         testee.onDismissClicked()
@@ -203,7 +205,7 @@ class DesktopAppPromotionViewModelTest {
     @Test
     fun whenLaunchCarriesNoHandlerIdThenNullIsDispatchedAndNoHandlerCanMatch() = runTest {
         whenever(clipboardInteractorMock.copyToClipboard(any(), any())).thenReturn(true)
-        val testee = createViewModel(params = DesktopAppPromotionParams(handlerId = null))
+        val testee = createViewModel(handlerId = null)
 
         testee.onLinkClicked()
         testee.onDismissClicked()
@@ -214,14 +216,11 @@ class DesktopAppPromotionViewModelTest {
         )
     }
 
-    private fun paramsWithAllPixels() = DesktopAppPromotionParams(
-        handlerId = HANDLER_ID,
-        pixels = PixelConfig(
-            impression = PixelFireSpec(IMPRESSION_PIXEL, sourceParams()),
-            shareClicked = PixelFireSpec(SHARE_PIXEL, sourceParams()),
-            linkClicked = PixelFireSpec(LINK_PIXEL, sourceParams()),
-            dismissed = PixelFireSpec(DISMISS_PIXEL, sourceParams()),
-        ),
+    private fun allPixels() = PixelConfig(
+        impression = PixelFireSpec(IMPRESSION_PIXEL, sourceParams()),
+        shareClicked = PixelFireSpec(SHARE_PIXEL, sourceParams()),
+        linkClicked = PixelFireSpec(LINK_PIXEL, sourceParams()),
+        dismissed = PixelFireSpec(DISMISS_PIXEL, sourceParams()),
     )
 
     private fun sourceParams() = hashMapOf("source" to "test")

@@ -48,8 +48,6 @@ import logcat.asLog
 import logcat.logcat
 import javax.inject.Inject
 
-// The screen name is inherited from the Settings screen this replaces, so existing deeplinks keep
-// resolving. A deeplink supplies no content, so every field falls back to this module's defaults.
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(DesktopAppPromotionParams::class, screenName = "getDesktopBrowser")
 class DesktopAppPromotionActivity : DuckDuckGoActivity() {
@@ -76,7 +74,8 @@ class DesktopAppPromotionActivity : DuckDuckGoActivity() {
             store = viewModelStore,
             factory = object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
-                override fun <T : ViewModel> create(modelClass: Class<T>) = promotionViewModelFactory.create(params, content) as T
+                override fun <T : ViewModel> create(modelClass: Class<T>) =
+                    promotionViewModelFactory.create(content, params.pixels, params.handlerId) as T
             },
             extras = this.defaultViewModelCreationExtras,
         )[DesktopAppPromotionViewModel::class.java]
