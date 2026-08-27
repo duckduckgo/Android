@@ -17,6 +17,7 @@
 package com.duckduckgo.subscriptions.impl.internal
 
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PARTNER_BENEFITS_URL
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
@@ -41,7 +42,7 @@ class RealPartnershipsHubUrlProvider @Inject constructor(
     }
 
     override val partnershipsHubUrl: String
-        get() = parseHubUrl() ?: DEFAULT_URL
+        get() = parseHubUrl() ?: PARTNER_BENEFITS_URL
 
     private fun parseHubUrl(): String? {
         val settings = subscriptionsFeature.partnershipsHub().getSettings()?.let {
@@ -53,8 +54,4 @@ class RealPartnershipsHubUrlProvider @Inject constructor(
     private data class PartnershipsHubSettings(
         val url: String?,
     )
-
-    companion object {
-        const val DEFAULT_URL = "https://duckduckgo.com/partner-benefits"
-    }
 }

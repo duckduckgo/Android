@@ -18,8 +18,8 @@ package com.duckduckgo.subscriptions.impl.internal
 
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PARTNER_BENEFITS_URL
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
-import com.duckduckgo.subscriptions.impl.internal.RealPartnershipsHubUrlProvider.Companion.DEFAULT_URL
 import com.squareup.moshi.Moshi
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -39,7 +39,7 @@ class RealPartnershipsHubUrlProviderTest {
     fun whenNoRemoteSettingsThenDefaultHubUrlUsed() {
         subscriptionsFeature.partnershipsHub().setRawStoredState(State(true))
 
-        assertEquals(DEFAULT_URL, testee.partnershipsHubUrl)
+        assertEquals(PARTNER_BENEFITS_URL, testee.partnershipsHubUrl)
     }
 
     @Test
@@ -57,7 +57,7 @@ class RealPartnershipsHubUrlProviderTest {
             State(remoteEnableState = true, settings = "not json"),
         )
 
-        assertEquals(DEFAULT_URL, testee.partnershipsHubUrl)
+        assertEquals(PARTNER_BENEFITS_URL, testee.partnershipsHubUrl)
     }
 
     @Test
@@ -66,7 +66,7 @@ class RealPartnershipsHubUrlProviderTest {
             State(remoteEnableState = true, settings = """{"someOtherKey":"value"}"""),
         )
 
-        assertEquals(DEFAULT_URL, testee.partnershipsHubUrl)
+        assertEquals(PARTNER_BENEFITS_URL, testee.partnershipsHubUrl)
     }
 
     @Test
@@ -75,6 +75,6 @@ class RealPartnershipsHubUrlProviderTest {
             State(remoteEnableState = true, settings = """{"url":"  "}"""),
         )
 
-        assertEquals(DEFAULT_URL, testee.partnershipsHubUrl)
+        assertEquals(PARTNER_BENEFITS_URL, testee.partnershipsHubUrl)
     }
 }
