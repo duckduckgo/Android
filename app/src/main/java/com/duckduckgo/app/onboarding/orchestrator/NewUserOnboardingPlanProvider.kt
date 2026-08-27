@@ -636,7 +636,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                     ctx = ctx,
                     isSearchDefault = true,
                     showModeToggle = { ctx.inputModeWasAi && duckAiEnabled() },
-                    shownOnlyWithModeToggle = false,
                 ),
             ),
         )

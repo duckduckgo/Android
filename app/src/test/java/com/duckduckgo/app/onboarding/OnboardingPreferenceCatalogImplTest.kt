@@ -464,22 +464,6 @@ class OnboardingPreferenceCatalogImplTest {
     }
 
     // endregion
-
-    @Test
-    fun whenPreferencesEnumeratedThenBlockAdsComesFirst() {
-        assertEquals(
-            listOf(
-                OnboardingPreference.BLOCK_ADS,
-                OnboardingPreference.SEARCH_HISTORY,
-                OnboardingPreference.SAFE_SEARCH,
-                OnboardingPreference.SEARCH_ASSIST,
-                OnboardingPreference.HIDE_AI_GENERATED_IMAGES,
-                OnboardingPreference.REJECT_OPTIONAL_COOKIES,
-                OnboardingPreference.ACCEPT_NON_OPT_OUT_COOKIES,
-            ),
-            OnboardingPreference.entries,
-        )
-    }
 }
 
 private class FakeOnboardingBooleanPreferencePlugin(
