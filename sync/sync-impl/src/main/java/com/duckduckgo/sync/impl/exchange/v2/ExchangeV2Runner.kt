@@ -26,9 +26,6 @@ import com.duckduckgo.sync.impl.authenticateExchangeEndpoints
 import com.duckduckgo.sync.impl.crypto.RsaKeyPair
 import com.duckduckgo.sync.impl.crypto.SyncJweCrypto
 import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
-import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State.Host
-import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State.Joiner
-import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State.SameAccountAbort
 import com.duckduckgo.sync.impl.pixels.SyncPixels.TimeoutStage
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
@@ -198,7 +195,6 @@ class RealExchangeV2Runner @Inject constructor(
     @Volatile private var advertisedVersion: ExchangeProtocolVersion.V2 = BASELINE_PROTOCOL_VERSION
 
     @Volatile private var negotiatedVersion: ExchangeProtocolVersion.V2 = BASELINE_PROTOCOL_VERSION
-        private set
 
     /**
      * Host-side messages arriving while the Joiner is still at the user-confirm prompt, buffered
@@ -288,7 +284,7 @@ class RealExchangeV2Runner @Inject constructor(
      * the relay channel (with 409 retry). Returns the new keypair on success, null on error
      * (in which case an error event was already emitted).
      */
-    private suspend fun bootstrapLocked(role: PairingRole): RsaKeyPair? {
+    private fun bootstrapLocked(role: PairingRole): RsaKeyPair? {
         advertisedVersion = if (syncFeature.canUseExchangeV2Point1().isEnabled()) ExchangeProtocolVersion.V2_1 else BASELINE_PROTOCOL_VERSION
         val keyPair = jweCrypto.generateRsaKeyPair(EXCHANGE_RSA_KEY_SIZE)
         ownKeyPair = keyPair
@@ -451,8 +447,8 @@ class RealExchangeV2Runner @Inject constructor(
     private fun ExchangeV2State.toTimeoutStage(): TimeoutStage? = when (this) {
         ExchangeV2State.Bootstrapped -> TimeoutStage.WAITING_FOR_PEER_HELLO
         ExchangeV2State.Negotiating -> TimeoutStage.WAITING_FOR_PEER_STATUS
-        Host.Confirming, Joiner.Confirming -> TimeoutStage.WAITING_FOR_CONFIRMATION
-        Host.Sending, Joiner.Waiting -> TimeoutStage.WAITING_FOR_RECOVERY_CODE
+        ExchangeV2State.Host.Confirming, ExchangeV2State.Joiner.Confirming -> TimeoutStage.WAITING_FOR_CONFIRMATION
+        ExchangeV2State.Host.Sending, ExchangeV2State.Joiner.Waiting -> TimeoutStage.WAITING_FOR_RECOVERY_CODE
         else -> null
     }
 
@@ -466,7 +462,7 @@ class RealExchangeV2Runner @Inject constructor(
         mutex.withLock { processIncomingLocked(message) }
     }
 
-    private suspend fun processIncomingLocked(message: ExchangeV2Message) {
+    private fun processIncomingLocked(message: ExchangeV2Message) {
         val sm = session ?: run {
             logcat { "Sync-ExchangeV2: deliverIncomingMessage ${message.messageType} rejected — no active session" }
             emitSessionError(
@@ -590,7 +586,8 @@ class RealExchangeV2Runner @Inject constructor(
 
     /**
      * Can we auto-elect a role now? Requires an accepted transition, SM in Negotiating, and a
-     * peer availability message ([RecoveryCodeAvailable]/[RecoveryCodeRequest]) carrying peer kind/userId.
+     * peer availability message ([ExchangeV2Message.RecoveryCodeAvailable]/[ExchangeV2Message.RecoveryCodeRequest])
+     * carrying peer kind/userId.
      */
     private fun canAutoElectRole(
         sm: ExchangeV2StateMachine,
@@ -661,7 +658,7 @@ class RealExchangeV2Runner @Inject constructor(
         }
     }
 
-    private suspend fun processLocalTriggerLocked(trigger: LocalTrigger) {
+    private fun processLocalTriggerLocked(trigger: LocalTrigger) {
         val sm = session ?: run {
             logcat { "Sync-ExchangeV2: localTrigger $trigger ignored — no active session" }
             return
@@ -687,7 +684,7 @@ class RealExchangeV2Runner @Inject constructor(
      * Caller must have come from [ExchangeV2State.Joiner.Confirming]. On confirm (→ Joiner.Waiting)
      * replay buffered host-side messages; on any other exit discard them.
      */
-    private suspend fun replayBufferedJoinerMessagesLocked(newState: ExchangeV2State) {
+    private fun replayBufferedJoinerMessagesLocked(newState: ExchangeV2State) {
         if (pendingJoinerWaitingMessages.isEmpty()) return
         if (newState == ExchangeV2State.Joiner.Waiting) {
             val buffered = pendingJoinerWaitingMessages.toList()
@@ -914,13 +911,13 @@ class RealExchangeV2Runner @Inject constructor(
     }
 
     private fun ExchangeV2State.isTerminal(): Boolean = when (this) {
-        SameAccountAbort,
+        ExchangeV2State.SameAccountAbort,
         ExchangeV2State.Aborted,
-        Host.Aborted,
-        Host.Done,
-        Joiner.AbortedLocal,
-        Joiner.AbortedByHost,
-        Joiner.Done,
+        ExchangeV2State.Host.Aborted,
+        ExchangeV2State.Host.Done,
+        ExchangeV2State.Joiner.AbortedLocal,
+        ExchangeV2State.Joiner.AbortedByHost,
+        ExchangeV2State.Joiner.Done,
         -> true
         else -> false
     }

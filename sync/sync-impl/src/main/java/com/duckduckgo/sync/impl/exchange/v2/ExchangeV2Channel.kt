@@ -18,6 +18,7 @@ package com.duckduckgo.sync.impl.exchange.v2
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.ExchangeEnvelope
+import com.duckduckgo.sync.impl.ExchangeMessageEntry
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncApi
 import com.squareup.anvil.annotations.ContributesBinding
@@ -175,7 +176,7 @@ class RealExchangeV2Channel @Inject constructor(
     }
 
     private fun decode(
-        entry: com.duckduckgo.sync.impl.ExchangeMessageEntry,
+        entry: ExchangeMessageEntry,
         ownPrivateKeyBase64: String,
     ): ExchangeV2Message {
         val inner = runCatching {

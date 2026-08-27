@@ -24,8 +24,8 @@ import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeDenied
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeRequest
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeResponse
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeUnavailable
-import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.Unknown
 import javax.inject.Inject
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.Unknown as UnknownMessage
 
 /**
  * Pure validator for the Exchange V2 wire protocol. Stateful (it tracks [currentState] and the
@@ -103,7 +103,7 @@ internal class RealExchangeV2StateMachine(
         // Forward-compat rule, applied once for every state: a type this client doesn't model is
         // dropped, never treated as a protocol error. Handlers below therefore only decide between
         // "expected here" and the implicit abort.
-        if (msg is Unknown) return drop(msg)
+        if (msg is UnknownMessage) return drop(msg)
         return when (val state = currentState) {
             ExchangeV2State.Bootstrapped -> receiveInBootstrapped(state, msg)
             ExchangeV2State.Negotiating -> receiveInNegotiating(state, msg)
@@ -157,7 +157,7 @@ internal class RealExchangeV2StateMachine(
             is RecoveryCodeUnavailable,
             is RecoveryCodeResponse,
             -> abort(state, msg, RejectReason.ImplicitAbort)
-            is Unknown -> drop(msg)
+            is UnknownMessage -> drop(msg)
         }
     }
 
@@ -182,7 +182,7 @@ internal class RealExchangeV2StateMachine(
             is RecoveryCodeAvailable,
             is RecoveryCodeRequest,
             -> abort(state, msg, RejectReason.ImplicitAbort)
-            is Unknown -> drop(msg)
+            is UnknownMessage -> drop(msg)
         }
     }
 
