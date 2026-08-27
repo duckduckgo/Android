@@ -21,7 +21,9 @@ import com.duckduckgo.voice.api.VoiceSearchStatusListener
 import kotlinx.coroutines.flow.Flow
 
 interface VoiceSearchRepository {
+    fun acceptRationaleDialog()
     fun saveLoggedAvailability()
+    fun getHasAcceptedRationaleDialog(): Boolean
     fun getHasLoggedAvailability(): Boolean
     fun isVoiceSearchUserEnabled(default: Boolean): Boolean
     fun voiceSearchUserEnabledFlow(default: Boolean): Flow<Boolean>
@@ -34,9 +36,15 @@ class RealVoiceSearchRepository constructor(
     private val dataStore: VoiceSearchDataStore,
     private val voiceSearchStatusListener: VoiceSearchStatusListener,
 ) : VoiceSearchRepository {
+    override fun acceptRationaleDialog() {
+        dataStore.userAcceptedRationaleDialog = true
+    }
+
     override fun saveLoggedAvailability() {
         dataStore.availabilityLogged = true
     }
+
+    override fun getHasAcceptedRationaleDialog(): Boolean = dataStore.userAcceptedRationaleDialog
 
     override fun getHasLoggedAvailability(): Boolean = dataStore.availabilityLogged
 

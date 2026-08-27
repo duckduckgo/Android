@@ -51,10 +51,10 @@ class RealVoiceSearchAvailability @Inject constructor(
         }
 
     override val isVoiceSearchAvailable: Boolean
-        get() = isVoiceSearchSupported && voiceSearchRepository.isVoiceSearchUserEnabled(default = false)
+        get() = isVoiceSearchSupported && voiceSearchRepository.isVoiceSearchUserEnabled(voiceSearchRepository.getHasAcceptedRationaleDialog())
 
     override fun observeVoiceSearchAvailability(): Flow<Boolean> =
-        voiceSearchRepository.voiceSearchUserEnabledFlow(default = false)
+        voiceSearchRepository.voiceSearchUserEnabledFlow(voiceSearchRepository.getHasAcceptedRationaleDialog())
             .map { userEnabled -> isVoiceSearchSupported && userEnabled }
             .distinctUntilChanged()
 

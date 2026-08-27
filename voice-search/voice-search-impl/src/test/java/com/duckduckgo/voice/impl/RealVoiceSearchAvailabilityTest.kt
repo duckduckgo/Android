@@ -24,9 +24,6 @@ import com.duckduckgo.voice.impl.remoteconfig.Manufacturer
 import com.duckduckgo.voice.impl.remoteconfig.VoiceSearchFeature
 import com.duckduckgo.voice.impl.remoteconfig.VoiceSearchFeatureRepository
 import com.duckduckgo.voice.store.VoiceSearchRepository
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -393,31 +390,25 @@ class RealVoiceSearchAvailabilityTest {
     }
 
     @Test
-    fun whenVoiceSearchSupportedThenDefaultUserSettingsFalse() {
+    fun whenModelIsPixel6ThenDefaultUserSettingsTrue() {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray(), excludedLocales = emptyArray())
         setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        whenever(voiceSearchRepository.getHasAcceptedRationaleDialog()).thenReturn(true)
+
+        testee.isVoiceSearchAvailable
+
+        verify(voiceSearchRepository).isVoiceSearchUserEnabled(eq(true))
+    }
+
+    @Test
+    fun whenDeviceHadNotPreviouslyAcceptedVoiceRationaleThenDefaultUserSettingsFalse() {
+        setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray(), excludedLocales = emptyArray())
+        setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        whenever(voiceSearchRepository.getHasAcceptedRationaleDialog()).thenReturn(false)
 
         testee.isVoiceSearchAvailable
 
         verify(voiceSearchRepository).isVoiceSearchUserEnabled(eq(false))
-    }
-
-    @Test
-    fun whenUserTurnedVoiceSearchOffThenVoiceSearchNotAvailable() {
-        setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray(), excludedLocales = emptyArray())
-        setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
-        setupUserSettings(false)
-
-        assertFalse(testee.isVoiceSearchAvailable)
-    }
-
-    @Test
-    fun whenObservedAvailabilityThenUsesDisabledByDefault() = runTest {
-        setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray(), excludedLocales = emptyArray())
-        setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
-        whenever(voiceSearchRepository.voiceSearchUserEnabledFlow(eq(false))).thenReturn(flowOf(true))
-
-        assertTrue(testee.observeVoiceSearchAvailability().first())
     }
 
     private fun setupRemoteConfig(voiceSearchEnabled: Boolean, minSdk: Int?, excludedManufacturers: Array<String>, excludedLocales: Array<String>) {
