@@ -28,14 +28,12 @@ import com.duckduckgo.app.trackerdetection.model.Rule
 import com.duckduckgo.app.trackerdetection.model.RuleExceptions
 import com.duckduckgo.app.trackerdetection.model.TdsTracker
 import org.junit.Assert.assertEquals
-import org.junit.Assert.fail
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyMap
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import java.util.regex.PatternSyntaxException
 
 @RunWith(AndroidJUnit4::class)
 class TdsClientTest {
@@ -364,21 +362,14 @@ class TdsClientTest {
         }
 
         for (useUri in listOf(false, true)) {
-            for (precompile in listOf(false, true)) {
-                val tdsTracker = TdsTracker(trackerDomain, action, OWNER, CATEGORY, rule?.let { listOf(it) } ?: emptyList())
-                val testee = TdsClient(
-                    TDS,
-                    listOf(tdsTracker),
-                    mockUrlToTypeMapper,
-                    precompileRegex = precompile,
-                )
-                val result = if (useUri) {
-                    testee.matches(url.toUri(), DOCUMENT_URL, mapOf())
-                } else {
-                    testee.matches(url, DOCUMENT_URL, mapOf())
-                }
-                assertEquals(expected, result.matches)
+            val tdsTracker = TdsTracker(trackerDomain, action, OWNER, CATEGORY, rule?.let { listOf(it) } ?: emptyList())
+            val testee = TdsClient(TDS, listOf(tdsTracker), mockUrlToTypeMapper)
+            val result = if (useUri) {
+                testee.matches(url.toUri(), DOCUMENT_URL, mapOf())
+            } else {
+                testee.matches(url, DOCUMENT_URL, mapOf())
             }
+            assertEquals(expected, result.matches)
         }
     }
 
@@ -386,61 +377,30 @@ class TdsClientTest {
     fun whenUrlMatchesRuleWithSurrogateThenSurrogateScriptIdReturned() {
         val rule = Rule("api\\.tracker\\.com\\/auth", BLOCK, null, "script.js", null)
 
-        for (precompile in listOf(false, true)) {
-            val testee = TdsClient(
-                TDS,
-                listOf(TdsTracker(Domain("tracker.com"), BLOCK, OWNER, CATEGORY, listOf(rule))),
-                mockUrlToTypeMapper,
-                precompileRegex = precompile,
-            )
+        val testee = TdsClient(
+            TDS,
+            listOf(TdsTracker(Domain("tracker.com"), BLOCK, OWNER, CATEGORY, listOf(rule))),
+            mockUrlToTypeMapper,
+        )
 
-            assertEquals("script.js", testee.matches("http://api.tracker.com/auth/script.js", DOCUMENT_URL, mapOf()).surrogate)
-            assertEquals("script.js", testee.matches("http://api.tracker.com/auth/script.js".toUri(), DOCUMENT_URL, mapOf()).surrogate)
-        }
+        assertEquals("script.js", testee.matches("http://api.tracker.com/auth/script.js", DOCUMENT_URL, mapOf()).surrogate)
+        assertEquals("script.js", testee.matches("http://api.tracker.com/auth/script.js".toUri(), DOCUMENT_URL, mapOf()).surrogate)
     }
 
     @Test
-    fun whenPrecompileEnabledAndRuleHasInvalidRegexThenConstructionSucceedsAndRuleIsSkipped() {
-        // Unbalanced "(" — fails to compile. With precompile=true, construction must not crash
-        // and the rule must be treated as non-matching, falling through to the tracker's defaultAction.
+    fun whenRuleHasInvalidRegexThenConstructionSucceedsAndRuleIsSkipped() {
+        // Unbalanced "(" — fails to compile. Construction must not crash and the rule must be
+        // treated as non-matching, falling through to the tracker's defaultAction.
         val invalidRule = Rule("api\\.tracker\\.com\\/auth(", BLOCK, null, null, null)
 
         val testee = TdsClient(
             TDS,
             listOf(TdsTracker(trackerDomain, IGNORE, OWNER, CATEGORY, listOf(invalidRule))),
             mockUrlToTypeMapper,
-            precompileRegex = true,
         )
 
         assertEquals(false, testee.matches(url, DOCUMENT_URL, mapOf()).matches)
         assertEquals(false, testee.matches(url.toUri(), DOCUMENT_URL, mapOf()).matches)
-    }
-
-    @Test
-    fun whenPrecompileDisabledAndRuleHasInvalidRegexThenPerCallCompilationThrows() {
-        // The precompile path skips invalid rules at construction; the per-call path does not,
-        // so with precompile off an invalid regex surfaces as an exception on every match attempt.
-        val invalidRule = Rule("api\\.tracker\\.com\\/auth(", BLOCK, null, null, null)
-
-        val testee = TdsClient(
-            TDS,
-            listOf(TdsTracker(trackerDomain, IGNORE, OWNER, CATEGORY, listOf(invalidRule))),
-            mockUrlToTypeMapper,
-            precompileRegex = false,
-        )
-
-        try {
-            testee.matches(url, DOCUMENT_URL, mapOf())
-            fail("Expected per-call regex compilation to throw")
-        } catch (_: PatternSyntaxException) {
-            // expected
-        }
-        try {
-            testee.matches(url.toUri(), DOCUMENT_URL, mapOf())
-            fail("Expected per-call regex compilation to throw")
-        } catch (_: PatternSyntaxException) {
-            // expected
-        }
     }
 
     @Test

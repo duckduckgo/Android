@@ -87,7 +87,6 @@ class NoNewBrowserFeatureToggleDetector : Detector(), SourceCodeScanner {
             "AndroidBrowserConfigFeature#self",
             "AndroidBrowserConfigFeature#collectFullWebViewVersion",
             "AndroidBrowserConfigFeature#screenLock",
-            "AndroidBrowserConfigFeature#precompileTdsRegex",
             "AndroidBrowserConfigFeature#cachedEntityLookup",
             "AndroidBrowserConfigFeature#stripWebViewImeInsets",
             "AndroidBrowserConfigFeature#errorPagePixel",

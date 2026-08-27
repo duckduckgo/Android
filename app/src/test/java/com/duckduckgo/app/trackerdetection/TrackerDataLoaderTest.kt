@@ -19,7 +19,6 @@ package com.duckduckgo.app.trackerdetection
 import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.pixels.remoteconfig.PrecompileTdsRegexRCWrapper
 import com.duckduckgo.app.trackerdetection.api.TdsJson
 import com.duckduckgo.app.trackerdetection.api.TdsJsonEntity
 import com.duckduckgo.app.trackerdetection.api.TdsJsonTracker
@@ -86,10 +85,6 @@ class TrackerDataLoaderTest {
             entityLookupRefresher = mockEntityLookupRefresher,
             cloakedCnameRefresher = mockCloakedCnameRefresher,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
-            precompileTdsRegexRCWrapper = object : PrecompileTdsRegexRCWrapper {
-                override val enabled: Boolean
-                    get() = false
-            },
         )
     }
 

@@ -29,21 +29,16 @@ class TdsClient(
     override val name: Client.ClientName,
     trackers: List<TdsTracker>,
     private val urlToTypeMapper: UrlToTypeMapper,
-    private val precompileRegex: Boolean = false,
 ) : Client {
 
     private val compiledTrackerByDomain: Map<String, CompiledTracker> = trackers.associate { tracker ->
         tracker.domain.value to CompiledTracker(
             tracker = tracker,
-            rules = tracker.rules.map { rule ->
-                val regex = if (precompileRegex) {
-                    runCatching { ".*${rule.rule}.*".toRegex() }
-                        .onFailure { logcat { "TDS rule failed to compile, skipping: ${rule.rule} (${it.message})" } }
-                        .getOrNull()
-                } else {
-                    null
-                }
-                CompiledRule(rule = rule, regex = regex)
+            rules = tracker.rules.mapNotNull { rule ->
+                runCatching { ".*${rule.rule}.*".toRegex() }
+                    .onFailure { logcat { "TDS rule failed to compile, skipping: ${rule.rule} (${it.message})" } }
+                    .getOrNull()
+                    ?.let { regex -> CompiledRule(rule = rule, regex = regex) }
             },
         )
     }
@@ -102,12 +97,7 @@ class TdsClient(
         var typeResolved = false
         compiled.rules.forEach { compiledRule ->
             val rule = compiledRule.rule
-            val regex = if (precompileRegex) {
-                compiledRule.regex ?: return@forEach
-            } else {
-                ".*${rule.rule}.*".toRegex()
-            }
-            if (url.matches(regex)) {
+            if (url.matches(compiledRule.regex)) {
                 if (!typeResolved) {
                     type = urlToTypeMapper.map(url, requestHeaders)
                     typeResolved = true
@@ -168,7 +158,7 @@ class TdsClient(
 
     private data class CompiledRule(
         val rule: Rule,
-        val regex: Regex?,
+        val regex: Regex,
     )
 
     private data class CompiledTracker(

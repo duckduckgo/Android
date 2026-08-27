@@ -24,7 +24,6 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.lifecycle.PirProcessLifecycleObserver
-import com.duckduckgo.app.pixels.remoteconfig.PrecompileTdsRegexRCWrapper
 import com.duckduckgo.app.trackerdetection.api.TdsJson
 import com.duckduckgo.app.trackerdetection.db.TdsCnameEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
@@ -67,7 +66,6 @@ class TrackerDataLoader @Inject constructor(
     private val entityLookupRefresher: EntityLookupRefresher,
     private val cloakedCnameRefresher: CloakedCnameRefresher,
     private val dispatcherProvider: DispatcherProvider,
-    private val precompileTdsRegexRCWrapper: PrecompileTdsRegexRCWrapper,
 ) : MainProcessLifecycleObserver, PirProcessLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
@@ -123,7 +121,6 @@ class TrackerDataLoader @Inject constructor(
             name = Client.ClientName.TDS,
             trackers = trackers,
             urlToTypeMapper = urlToTypeMapper,
-            precompileRegex = precompileTdsRegexRCWrapper.enabled,
         )
         trackerDetectorClientProvider.addClient(client)
         entityLookupRefresher.refresh()

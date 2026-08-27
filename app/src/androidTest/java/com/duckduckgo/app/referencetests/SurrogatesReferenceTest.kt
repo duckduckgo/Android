@@ -258,7 +258,6 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
             name = Client.ClientName.TDS,
             trackers = trackers,
             urlToTypeMapper = RealUrlToTypeMapper(),
-            precompileRegex = false,
         )
 
         tdsEntityDao.insertAll(entities)
