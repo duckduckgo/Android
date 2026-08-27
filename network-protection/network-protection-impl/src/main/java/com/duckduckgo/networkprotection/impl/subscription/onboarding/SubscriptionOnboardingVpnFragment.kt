@@ -176,6 +176,8 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
             .onEach { state ->
                 state.ipAddress?.let { binding.subscriptionOnboardingVpnIpAddressValue.text = it }
                 state.location?.let { binding.subscriptionOnboardingVpnIpAddressLocation.text = it }
+                state.newIpAddress?.let { binding.subscriptionOnboardingVpnNewIpAddressValue.text = it }
+                state.newLocation?.let { binding.subscriptionOnboardingVpnNewIpAddressLocation.text = it }
                 state.toScreenState()?.let(::renderScreenState)
                 renderActivating(state.activating)
             }

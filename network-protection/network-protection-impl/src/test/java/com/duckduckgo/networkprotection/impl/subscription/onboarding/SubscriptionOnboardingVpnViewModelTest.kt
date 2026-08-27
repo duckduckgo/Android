@@ -23,11 +23,13 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionSta
 import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.CONNECTED
 import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.CONNECTING
 import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.DISCONNECTED
+import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.getDisplayableCountry
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -116,6 +118,7 @@ class SubscriptionOnboardingVpnViewModelTest {
         val testee = SubscriptionOnboardingVpnViewModel(
             FakeConnectionService(ConnectionInfo(ip = "137.220.87.36", city = "Birmingham", country = "GB")),
             networkProtectionState,
+            mock<WgTunnelConfig>(),
             coroutineRule.testDispatcherProvider,
         )
 
@@ -130,6 +133,20 @@ class SubscriptionOnboardingVpnViewModelTest {
         }
     }
 
+    @Test
+    fun whenServerLocationWellFormedThenFormattedAsFlagCityCountry() {
+        assertEquals(
+            "🇳🇱 Amsterdam, ${getDisplayableCountry("NL")}",
+            formatVpnServerLocation("Amsterdam, NL"),
+        )
+    }
+
+    @Test
+    fun whenServerLocationMissingOrMalformedThenNull() {
+        assertNull(formatVpnServerLocation(null))
+        assertNull(formatVpnServerLocation("Amsterdam"))
+    }
+
     private fun createViewModel(
         info: ConnectionInfo? = ConnectionInfo(ip = "137.220.87.36", city = "Birmingham", country = "GB"),
         connectionState: ConnectionState = DISCONNECTED,
@@ -140,6 +157,7 @@ class SubscriptionOnboardingVpnViewModelTest {
         return SubscriptionOnboardingVpnViewModel(
             FakeConnectionService(info),
             networkProtectionState,
+            mock<WgTunnelConfig>(),
             coroutineRule.testDispatcherProvider,
         )
     }

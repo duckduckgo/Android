@@ -149,16 +149,18 @@
                         app:typography="caption" />
 
                     <com.duckduckgo.common.ui.view.text.DaxTextView
+                        android:id="@+id/subscriptionOnboardingVpnNewIpAddressValue"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/subscriptionOnboardingVpnNewIpAddressValue"
+                        tools:text="@string/subscriptionOnboardingVpnNewIpAddressValue"
                         app:typography="h4"
                         tools:ignore="HardcodedText" />
 
                     <com.duckduckgo.common.ui.view.text.DaxTextView
+                        android:id="@+id/subscriptionOnboardingVpnNewIpAddressLocation"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/subscriptionOnboardingVpnNewIpAddressLocation"
+                        tools:text="@string/subscriptionOnboardingVpnNewIpAddressLocation"
                         app:textType="secondary"
                         app:typography="caption" />
 

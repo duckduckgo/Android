@@ -25,6 +25,8 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.CONNECTED
 import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.CONNECTING
 import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.DISCONNECTED
+import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
+import com.duckduckgo.networkprotection.impl.configuration.asServerDetails
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.getDisplayableCountry
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.getEmojiForCountryCode
 import kotlinx.coroutines.flow.Flow
@@ -44,6 +46,7 @@ import javax.inject.Inject
 class SubscriptionOnboardingVpnViewModel @Inject constructor(
     private val connectionService: SubscriptionOnboardingConnectionService,
     private val networkProtectionState: NetworkProtectionState,
+    private val wgTunnelConfig: WgTunnelConfig,
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 
@@ -71,13 +74,22 @@ class SubscriptionOnboardingVpnViewModel @Inject constructor(
 
         networkProtectionState.getConnectionStateFlow()
             .onEach { connectionState ->
-                viewState.update {
-                    when (connectionState) {
-                        // Once the VPN is on, any earlier activation error or in-progress activation is resolved.
-                        CONNECTED -> it.copy(vpnEnabled = true, activating = false, activationError = false)
-                        CONNECTING -> it.copy(vpnEnabled = false, activating = true, activationError = false)
-                        DISCONNECTED -> it.copy(vpnEnabled = false, activating = false)
+                when (connectionState) {
+                    CONNECTED -> {
+                        // The VPN is on: surface the server the traffic is now routed through.
+                        val server = wgTunnelConfig.getWgConfig()?.asServerDetails()
+                        viewState.update {
+                            it.copy(
+                                vpnEnabled = true,
+                                activating = false,
+                                activationError = false,
+                                newIpAddress = server?.ipAddress,
+                                newLocation = formatVpnServerLocation(server?.location),
+                            )
+                        }
                     }
+                    CONNECTING -> viewState.update { it.copy(vpnEnabled = false, activating = true, activationError = false) }
+                    DISCONNECTED -> viewState.update { it.copy(vpnEnabled = false, activating = false) }
                 }
             }
             .flowOn(dispatcherProvider.io())
@@ -102,10 +114,24 @@ class SubscriptionOnboardingVpnViewModel @Inject constructor(
         val activationError: Boolean = false,
         val ipAddress: String? = null,
         val location: String? = null,
+        val newIpAddress: String? = null,
+        val newLocation: String? = null,
     )
 
     companion object {
         private const val UNKNOWN_IP = "XXX.XXX.XX.XXX"
         private const val UNKNOWN_LOCATION = "XX, XX"
     }
+}
+
+/**
+ * Formats a WireGuard peer location ("City, CC") into the "🇨🇨 City, Country" label used on the screen,
+ * or null when the location is missing or not in the expected shape.
+ */
+internal fun formatVpnServerLocation(location: String?): String? {
+    val parts = location?.split(",") ?: return null
+    val city = parts.getOrNull(0)?.trim().orEmpty()
+    val countryCode = parts.getOrNull(1)?.trim().orEmpty()
+    if (city.isEmpty() || countryCode.isEmpty()) return null
+    return "${getEmojiForCountryCode(countryCode)} $city, ${getDisplayableCountry(countryCode)}"
 }
