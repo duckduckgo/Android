@@ -114,7 +114,7 @@ class DialogConfigResolverTest {
 
         assertEquals(OnboardingBackground.Clouds, config.background)
         assertEquals(Embellishment.LeftWing, config.embellishment)
-        assertEquals(CardArrowConfig.AtEnd, config.cardArrow)
+        assertEquals(CardArrowConfig.AtStart, config.cardArrow)
         val content = config.content as ContentConfig.PreferenceSelector
         assertEquals(TextConfig.Resource(R.string.noAiPathPreferenceSelectorTitle), content.title)
         assertEquals(rows, content.rows)
