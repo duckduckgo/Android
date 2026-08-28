@@ -121,7 +121,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/backgroundGuideline"
         app:layout_constraintVertical_bias="1"
-        tools:src="@drawable/onboarding_welcome_screen_background"
+        tools:src="@drawable/onboarding_background_pond"
         tools:visibility="visible" />
 
     <include

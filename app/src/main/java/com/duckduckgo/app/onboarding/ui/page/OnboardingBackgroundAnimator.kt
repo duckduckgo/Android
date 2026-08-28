@@ -42,27 +42,27 @@ sealed class OnboardingBackground(
     val maxHeightDp: Int,
 ) {
     data object Pond : OnboardingBackground(
-        backgroundRes = R.drawable.onboarding_welcome_screen_background,
+        backgroundRes = R.drawable.onboarding_background_pond,
         maxHeightDp = 404,
     )
     data object Horizon : OnboardingBackground(
-        backgroundRes = R.drawable.onboarding_browser_comparison_background,
+        backgroundRes = R.drawable.onboarding_background_horizon,
         maxHeightDp = 216,
     )
     data object Island : OnboardingBackground(
-        backgroundRes = R.drawable.onboarding_address_bar_background,
+        backgroundRes = R.drawable.onboarding_background_island,
         maxHeightDp = 360,
     )
-    data object IslandWithHorizon : OnboardingBackgroundStep(
+    data object IslandWithHorizon : OnboardingBackground(
         backgroundRes = R.drawable.onboarding_island_with_horizon,
         maxHeightDp = 272,
     )
     data object Shoreline : OnboardingBackground(
-        backgroundRes = CommonR.drawable.onboarding_input_type_background,
+        backgroundRes = CommonR.drawable.onboarding_background_shoreline,
         maxHeightDp = 166,
     )
     data object Clouds : OnboardingBackground(
-        backgroundRes = R.drawable.onboarding_preference_selector_background,
+        backgroundRes = R.drawable.onboarding_background_clouds,
         maxHeightDp = 286,
     )
 }
