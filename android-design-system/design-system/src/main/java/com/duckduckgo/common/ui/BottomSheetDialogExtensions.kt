@@ -45,7 +45,7 @@ fun BottomSheetDialog.setRoundCorners() {
  * Pads [this]'s bottom by the navigation-bar inset (on top of its existing bottom padding) so a bottom sheet's
  * content clears the gesture pill / button bar under edge-to-edge (Android 15+, targetSdk 35), where a
  * BottomSheetDialog's own window is edge-to-edge regardless of the host activity. Only call this when the sheet
- * is actually using an `.EdgeToEdge` theme (see `EdgeToEdgeBucket.BOTTOM_SHEETS`), otherwise the inset is 0 and
+ * is actually using an `.EdgeToEdge` theme, otherwise the inset is 0 and
  * the padding never changes. Call on the view that owns the sheet's rounded background (not necessarily
  * `binding.root` - e.g. when the root is a backgroundless `NestedScrollView` wrapping a styled `ConstraintLayout`,
  * pad that inner view instead, or the reserved clearance won't be covered by the sheet's background). Call in

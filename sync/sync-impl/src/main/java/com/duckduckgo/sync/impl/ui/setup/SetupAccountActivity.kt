@@ -28,9 +28,7 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.sync.impl.R.id
@@ -70,9 +68,6 @@ class SetupAccountActivity : DuckDuckGoActivity(), SyncSetupNavigationFlowListen
     lateinit var globalActivityStarter: GlobalActivityStarter
 
     @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
-
-    @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     private lateinit var screen: Screen
@@ -86,10 +81,7 @@ class SetupAccountActivity : DuckDuckGoActivity(), SyncSetupNavigationFlowListen
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.SYNC)
-        if (edgeToEdgeEnabled) {
-            enableTransparentEdgeToEdge()
-        }
+        enableTransparentEdgeToEdge()
 
         screen = if (savedInstanceState != null) {
             savedInstanceState.getSerializable(SETUP_ACCOUNT_SCREEN_EXTRA) as Screen
@@ -98,9 +90,7 @@ class SetupAccountActivity : DuckDuckGoActivity(), SyncSetupNavigationFlowListen
         }
         setContentView(binding.root)
 
-        if (edgeToEdgeEnabled) {
-            configureEdgeToEdgeInsets()
-        }
+        configureEdgeToEdgeInsets()
 
         observeUiEvents()
         configureListeners()

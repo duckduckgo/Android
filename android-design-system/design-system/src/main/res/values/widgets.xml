@@ -461,18 +461,18 @@
         <item name="bottomSheetStyle">@style/Widget.DuckDuckGo.ModalBottomSheetStyle</item>
     </style>
 
-    <!-- Opt-in variant used when EdgeToEdgeBucket.BOTTOM_SHEETS is enabled: draws the sheet behind the
+    <!-- Edge-to-edge variant used by bottom sheets: draws the sheet behind the
          transparent system bars (edge-to-edge, Android 15+). Content clears the nav bar via
          View.applyBottomSystemBarInsetPadding(); Material adds the top status-bar inset.
          `enableEdgeToEdge` can only be read from the theme at dialog construction (no runtime setter),
-         so callers pick this style vs. the plain one above based on the toggle. -->
+         so bottom sheets set this style rather than the plain one above. -->
     <style name="Widget.DuckDuckGo.BottomSheetDialog.EdgeToEdge" parent="Widget.DuckDuckGo.BottomSheetDialog">
         <item name="enableEdgeToEdge">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
-        <!-- Material's own bottom auto-padding (default true) would double up with our manual,
-             toggle-gated View.applyBottomSystemBarInsetPadding() now that the window is genuinely
+        <!-- Material's own bottom auto-padding (default true) would double up with our manual
+             View.applyBottomSystemBarInsetPadding() now that the window is genuinely
              edge-to-edge. Disable it; top/left/right auto-padding stay on (nothing manual replaces them). -->
         <item name="paddingBottomSystemWindowInsets">false</item>
     </style>
@@ -495,7 +495,7 @@
         <item name="bottomSheetStyle">@style/Widget.DuckDuckGo.ModalBottomSheetCollapsedStyle</item>
     </style>
 
-    <!-- Opt-in variant used when EdgeToEdgeBucket.BOTTOM_SHEETS is enabled: draw behind the transparent
+    <!-- Edge-to-edge variant used by bottom sheets: draw behind the transparent
          system bars; content clears the nav bar via View.applyBottomSystemBarInsetPadding(). -->
     <style name="Widget.DuckDuckGo.BottomSheetDialogCollapsed.EdgeToEdge" parent="Widget.DuckDuckGo.BottomSheetDialogCollapsed">
         <item name="enableEdgeToEdge">true</item>

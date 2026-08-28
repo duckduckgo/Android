@@ -22,9 +22,7 @@ import android.os.Bundle
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.databinding.ActivitySyncV2RecoverSyncedDataBinding
 import com.duckduckgo.sync.impl.pixels.SyncPixels
@@ -34,9 +32,6 @@ import javax.inject.Inject
 @InjectWith(ActivityScope::class)
 class RecoverSyncedDataActivity : DuckDuckGoActivity() {
     private val binding by viewBinding<ActivitySyncV2RecoverSyncedDataBinding>()
-
-    @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
 
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
@@ -62,14 +57,9 @@ class RecoverSyncedDataActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val isEdgeToEdge = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.SYNC)
-        if (isEdgeToEdge) {
-            enableTransparentEdgeToEdge()
-        }
+        enableTransparentEdgeToEdge()
         setContentView(binding.root)
-        if (isEdgeToEdge) {
-            configureEdgeToEdgeInsets()
-        }
+        configureEdgeToEdgeInsets()
 
         configureToolbar()
         configureRecoverDataCta()

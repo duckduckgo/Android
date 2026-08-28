@@ -28,7 +28,6 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.view.MenuItemView
 import com.duckduckgo.common.ui.view.MenuItemViewSize
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ViewScope
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.CoroutineScope
@@ -54,9 +53,6 @@ class AdBlockingMenuItemView @JvmOverloads constructor(
 
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
-
-    @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
 
     @Inject
     lateinit var brokenSiteReportRequester: BrokenSiteReportRequester
@@ -116,7 +112,7 @@ class AdBlockingMenuItemView @JvmOverloads constructor(
     }
 
     private fun showMenuBottomSheet() {
-        AdBlockingMenuBottomSheetDialog(context, menuController.currentChoice(), edgeToEdgeProvider).apply {
+        AdBlockingMenuBottomSheetDialog(context, menuController.currentChoice()).apply {
             eventListener = object : AdBlockingMenuBottomSheetDialog.EventListener {
                 override fun onChoiceSelected(choice: AdBlockingChoice) {
                     menuController.onChoiceSelected(choice)
@@ -130,7 +126,7 @@ class AdBlockingMenuItemView @JvmOverloads constructor(
     }
 
     private fun showDisabledBottomSheet() {
-        AdBlockingDisabledBottomSheetDialog(context, edgeToEdgeProvider, brokenSiteReportRequester).show()
+        AdBlockingDisabledBottomSheetDialog(context, brokenSiteReportRequester).show()
     }
 
     private fun render(state: AdBlockingMenuState) {

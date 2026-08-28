@@ -57,14 +57,9 @@ class NewAddressBarPickerBottomSheetDialog(
     private val context: Context,
     private val isLightMode: Boolean,
     private val callback: NewAddressBarCallback?,
-    private val edgeToEdgeEnabled: Boolean,
 ) : BottomSheetDialog(
     onboardingThemedContext(context),
-    if (edgeToEdgeEnabled) {
-        R.style.Widget_DuckDuckGo_BottomSheetDialog_NewAddressBarPicker_EdgeToEdge
-    } else {
-        R.style.Widget_DuckDuckGo_BottomSheetDialog_NewAddressBarPicker
-    },
+    R.style.Widget_DuckDuckGo_BottomSheetDialog_NewAddressBarPicker_EdgeToEdge,
 ) {
 
     private val binding: BottomSheetNewAddressBarPickerBinding =
@@ -76,9 +71,7 @@ class NewAddressBarPickerBottomSheetDialog(
 
     init {
         setContentView(binding.root)
-        if (edgeToEdgeEnabled) {
-            binding.root.applyBottomSystemBarInsetPadding()
-        }
+        binding.root.applyBottomSystemBarInsetPadding()
 
         this.behavior.isDraggable = false
         this.behavior.isHideable = false

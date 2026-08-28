@@ -31,9 +31,7 @@ import com.duckduckgo.common.ui.view.button.DaxButtonGhost
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.databinding.IncludeDefaultToolbarBinding
 import com.duckduckgo.sync.impl.R
@@ -71,9 +69,6 @@ class SyncConnectActivity : DuckDuckGoActivity() {
     lateinit var dispatcherProvider: DispatcherProvider
 
     @Inject
-    lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
-
-    @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     private lateinit var binding: ConnectSyncBinding
@@ -97,8 +92,6 @@ class SyncConnectActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.SYNC)
-
         lifecycleScope.launch {
             withContext(dispatcherProvider.io()) {
                 syncFeature.useExpandableBarcodeConnectSyncLayout().isEnabled()
@@ -112,16 +105,12 @@ class SyncConnectActivity : DuckDuckGoActivity() {
                         ConnectSyncBinding.OldBinding(viewBinding)
                     }
 
-                    if (edgeToEdgeEnabled) {
-                        enableTransparentEdgeToEdge()
-                    }
+                    enableTransparentEdgeToEdge()
 
                     setContentView(binding.root)
                     setupToolbar(binding.includeToolbar.toolbar)
 
-                    if (edgeToEdgeEnabled) {
-                        configureEdgeToEdgeInsets()
-                    }
+                    configureEdgeToEdgeInsets()
 
                     onBackPressedDispatcher.addCallback(this@SyncConnectActivity) {
                         onUserCancelled()
