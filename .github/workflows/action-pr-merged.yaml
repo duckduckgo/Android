@@ -25,9 +25,14 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           COMPARE: repos/${{ github.repository }}/compare/${{ github.event.repository.default_branch }}...${{ github.event.pull_request.merge_commit_sha }}
         run: |
-          status=$(gh api "$COMPARE" --jq .status)
+          on_default=false
+          status=""
+          for i in {1..5}; do
+            status=$(gh api "$COMPARE" --jq .status 2>/dev/null) && break
+            sleep 2
+          done
           case "$status" in identical|behind) on_default=true ;; *) on_default=false ;; esac
-          echo "compare status: $status -> on_default: $on_default"
+          echo "compare status: ${status:-<error>} -> on_default: $on_default"
           echo "on_default=$on_default" >> "$GITHUB_OUTPUT"
       - name: If merged to the default branch, add to Waiting for release
         if: steps.landed.outputs.on_default == 'true'
