@@ -19,11 +19,13 @@ package com.duckduckgo.feedback.impl.ui.negative.subreason
 import android.os.Bundle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.feedback.impl.R
 import com.duckduckgo.feedback.impl.databinding.ContentFeedbackNegativeDisambiguationSubReasonBinding
 import com.duckduckgo.feedback.impl.ui.common.FeedbackFragment
+import com.duckduckgo.feedback.impl.ui.common.resolveFeedbackFaceAsset
 import com.duckduckgo.feedback.impl.ui.negative.FeedbackType.*
 import com.duckduckgo.feedback.impl.ui.negative.FeedbackType.MainReason.*
 import com.duckduckgo.feedback.impl.ui.negative.FeedbackTypeDisplay
@@ -31,6 +33,7 @@ import com.duckduckgo.feedback.impl.ui.negative.FeedbackTypeDisplay.FeedbackType
 import com.duckduckgo.feedback.impl.ui.negative.displayText
 import logcat.LogPriority.INFO
 import logcat.logcat
+import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
 class SubReasonNegativeFeedbackFragment : FeedbackFragment(R.layout.content_feedback_negative_disambiguation_sub_reason) {
@@ -64,10 +67,19 @@ class SubReasonNegativeFeedbackFragment : FeedbackFragment(R.layout.content_feed
     private val listener: DisambiguationNegativeFeedbackListener?
         get() = activity as DisambiguationNegativeFeedbackListener
 
+    @Inject
+    lateinit var appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles
+
     private lateinit var mainReason: MainReason
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+
+        if (appBrandDesignUpdateToggles.pictograms().isEnabled()) {
+            binding.emoticonImage.setImageResource(
+                resolveFeedbackFaceAsset(isPositive = false, isPictogramsEnabled = true),
+            )
+        }
 
         recyclerAdapter = SubReasonAdapter(
             object : (FeedbackTypeSubReasonDisplay) -> Unit {

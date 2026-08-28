@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.ui.dialogs.widgetprompt
 import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
+import androidx.core.view.isVisible
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.BottomSheetHomeScreenWidgetBinding
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
@@ -33,6 +34,7 @@ import com.duckduckgo.mobile.android.R as CommonR
 class HomeScreenWidgetBottomSheetDialog(
     context: Context,
     isLightModeEnabled: Boolean,
+    isAddressBarRebrandEnabled: Boolean,
     edgeToEdgeProvider: EdgeToEdgeProvider,
 ) : BottomSheetDialog(
     context,
@@ -67,13 +69,9 @@ class HomeScreenWidgetBottomSheetDialog(
             eventListener?.onCanceled()
             dismiss()
         }
-        binding.homeScreenWidgetBottomSheetDialogImage.setImageResource(
-            if (isLightModeEnabled) {
-                R.drawable.widget_promo_light
-            } else {
-                R.drawable.widget_promo_dark
-            },
-        )
+        val promoContent = resolveWidgetPromoContent(isAddressBarRebrandEnabled, isLightModeEnabled)
+        binding.homeScreenWidgetBottomSheetDialogImage.setImageResource(promoContent.assetRes)
+        binding.homeScreenWidgetBottomSheetDialogSearchText.isVisible = promoContent.showSearchTextOverlay
         binding.homeScreenWidgetBottomSheetDialogPrimaryButton.setOnClickListener {
             eventListener?.onAddWidgetButtonClicked()
             dismiss()
@@ -90,4 +88,27 @@ class HomeScreenWidgetBottomSheetDialog(
         fun onAddWidgetButtonClicked()
         fun onNotNowButtonClicked()
     }
+}
+
+internal data class WidgetPromoContent(
+    val assetRes: Int,
+    val showSearchTextOverlay: Boolean,
+)
+
+internal fun resolveWidgetPromoContent(
+    isAddressBarRebrandEnabled: Boolean,
+    isLightModeEnabled: Boolean,
+): WidgetPromoContent = WidgetPromoContent(
+    assetRes = resolveWidgetPromoAsset(isAddressBarRebrandEnabled, isLightModeEnabled),
+    showSearchTextOverlay = !isAddressBarRebrandEnabled,
+)
+
+internal fun resolveWidgetPromoAsset(
+    isAddressBarRebrandEnabled: Boolean,
+    isLightModeEnabled: Boolean,
+): Int = when {
+    isAddressBarRebrandEnabled && isLightModeEnabled -> R.drawable.widget_promo_light_brand_update
+    isAddressBarRebrandEnabled -> R.drawable.widget_promo_dark_brand_update
+    isLightModeEnabled -> R.drawable.widget_promo_light
+    else -> R.drawable.widget_promo_dark
 }
