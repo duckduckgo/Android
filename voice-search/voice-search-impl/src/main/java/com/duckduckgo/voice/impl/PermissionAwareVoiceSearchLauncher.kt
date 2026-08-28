@@ -22,6 +22,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchLauncher
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Event
+import com.duckduckgo.voice.api.VoiceSearchLauncher.Event.SearchCancelled
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Event.VoiceSearchDisabled
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source
 import com.duckduckgo.voice.api.VoiceSearchLauncher.VoiceSearchMode
@@ -50,8 +51,9 @@ class PermissionAwareVoiceSearchLauncher @Inject constructor(
         permissionRequest.registerResultsCallback(
             caller,
             activity,
-            { voiceSearchActivityLauncher.launch(activity, pendingInitialMode) },
-            { onEvent(VoiceSearchDisabled) },
+            onPermissionsGranted = { voiceSearchActivityLauncher.launch(activity, pendingInitialMode) },
+            onRequestAborted = { onEvent(SearchCancelled) },
+            onVoiceSearchDisabled = { onEvent(VoiceSearchDisabled) },
         )
     }
 
@@ -62,7 +64,7 @@ class PermissionAwareVoiceSearchLauncher @Inject constructor(
         if (voiceSearchPermissionCheck.hasRequiredPermissionsGranted()) {
             voiceSearchActivityLauncher.launch(activity, mode)
         } else {
-            permissionRequest.launch(activity)
+            permissionRequest.launch(activity, mode ?: VoiceSearchMode.SEARCH)
         }
     }
 }

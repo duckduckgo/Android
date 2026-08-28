@@ -1095,6 +1095,7 @@ class BrowserTabFragment :
                 is VoiceSearchLauncher.Event.SearchCancelled -> resumeWebView()
                 is VoiceSearchLauncher.Event.VoiceSearchDisabled -> {
                     omnibar.voiceSearchDisabled(viewModel.url)
+                    resumeWebView()
                 }
             }
         }

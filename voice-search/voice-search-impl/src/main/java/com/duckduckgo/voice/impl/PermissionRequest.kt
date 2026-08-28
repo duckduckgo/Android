@@ -17,12 +17,10 @@
 package com.duckduckgo.voice.impl
 
 import android.app.Activity
-import android.content.Context
 import androidx.activity.result.ActivityResultCaller
-import androidx.appcompat.app.AppCompatActivity
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.extensions.launchApplicationInfoSettings
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.voice.api.VoiceSearchLauncher.VoiceSearchMode
 import com.duckduckgo.voice.impl.ActivityResultLauncherWrapper.Action.LaunchPermissionRequest
 import com.duckduckgo.voice.impl.ActivityResultLauncherWrapper.Request
 import com.duckduckgo.voice.store.VoiceSearchRepository
@@ -34,80 +32,85 @@ interface PermissionRequest {
         caller: ActivityResultCaller,
         activity: Activity,
         onPermissionsGranted: () -> Unit,
+        /** Invoked when the flow ends without voice search starting, so callers can undo anything they staged for it. */
+        onRequestAborted: () -> Unit = {},
         onVoiceSearchDisabled: () -> Unit = {},
     )
 
-    fun launch(activity: Activity)
+    fun launch(
+        activity: Activity,
+        mode: VoiceSearchMode,
+    )
 }
 
 @ContributesBinding(ActivityScope::class)
 class MicrophonePermissionRequest @Inject constructor(
-    private val pixel: Pixel,
     private val voiceSearchRepository: VoiceSearchRepository,
     private val voiceSearchPermissionDialogsLauncher: VoiceSearchPermissionDialogsLauncher,
     private val activityResultLauncherWrapper: ActivityResultLauncherWrapper,
     private val permissionRationale: PermissionRationale,
 ) : PermissionRequest {
     private lateinit var voiceSearchDisabled: () -> Unit
+    private var requestAborted: () -> Unit = {}
+
+    private var pendingMode: VoiceSearchMode = VoiceSearchMode.SEARCH
 
     override fun registerResultsCallback(
         caller: ActivityResultCaller,
         activity: Activity,
         onPermissionsGranted: () -> Unit,
+        onRequestAborted: () -> Unit,
         onVoiceSearchDisabled: () -> Unit,
     ) {
         activityResultLauncherWrapper.register(
             caller,
             Request.Permission { granted ->
-                if (granted) {
-                    onPermissionsGranted()
-                } else if (!permissionRationale.shouldShow(activity)) {
-                    showNoMicAccessDialog(activity)
+                when {
+                    granted -> onPermissionsGranted()
+                    permissionRationale.shouldShow(activity) -> {
+                        showMicPermissionDeniedSnackbar(activity)
+                        requestAborted()
+                    }
+                    else -> showMicAccessDeniedDialog(activity)
                 }
             },
         )
         voiceSearchDisabled = onVoiceSearchDisabled
+        requestAborted = onRequestAborted
     }
 
-    override fun launch(activity: Activity) {
-        if (voiceSearchRepository.getHasAcceptedRationaleDialog()) {
-            activityResultLauncherWrapper.launch(LaunchPermissionRequest)
-        } else {
-            voiceSearchPermissionDialogsLauncher.showPermissionRationale(
-                activity,
-                { handleRationaleAccepted() },
-                { handleRationaleCancelled(activity) },
-            )
-        }
-    }
-
-    private fun showNoMicAccessDialog(activity: Activity) {
-        if (activity.isFinishing || activity.isDestroyed) return
-        voiceSearchPermissionDialogsLauncher.showNoMicAccessDialog(
-            activity,
-            { (activity as? AppCompatActivity)?.launchApplicationInfoSettings() },
-            { showRemoveVoiceSearchDialog(activity) },
-        )
-    }
-
-    private fun handleRationaleAccepted() {
-        pixel.fire(VoiceSearchPixelNames.VOICE_SEARCH_PRIVACY_DIALOG_ACCEPTED)
-        voiceSearchRepository.acceptRationaleDialog()
+    override fun launch(
+        activity: Activity,
+        mode: VoiceSearchMode,
+    ) {
+        pendingMode = mode
         activityResultLauncherWrapper.launch(LaunchPermissionRequest)
     }
 
-    private fun handleRationaleCancelled(context: Context) {
-        pixel.fire(VoiceSearchPixelNames.VOICE_SEARCH_PRIVACY_DIALOG_REJECTED)
-        showRemoveVoiceSearchDialog(context)
+    private fun showMicPermissionDeniedSnackbar(activity: Activity) {
+        if (activity.isFinishing || activity.isDestroyed) return
+        voiceSearchPermissionDialogsLauncher.showMicPermissionDeniedSnackbar(
+            activity,
+            onAllowSelected = { activityResultLauncherWrapper.launch(LaunchPermissionRequest) },
+        )
     }
 
-    private fun showRemoveVoiceSearchDialog(context: Context) {
-        voiceSearchPermissionDialogsLauncher.showRemoveVoiceSearchDialog(
-            context,
-            onRemoveVoiceSearch = {
-                voiceSearchRepository.setVoiceSearchUserEnabled(false)
-                voiceSearchDisabled()
-            },
+    private fun showMicAccessDeniedDialog(activity: Activity) {
+        if (activity.isFinishing || activity.isDestroyed) {
+            requestAborted()
+            return
+        }
+        voiceSearchPermissionDialogsLauncher.showMicAccessDeniedDialog(
+            activity,
+            mode = pendingMode,
+            onChangePermissionsSelected = { activity.launchApplicationInfoSettings() },
+            onHideVoiceSearchSelected = { disableVoiceSearch() },
+            onCancelled = { requestAborted() },
         )
+    }
+
+    private fun disableVoiceSearch() {
+        voiceSearchRepository.setVoiceSearchUserEnabled(false)
+        voiceSearchDisabled()
     }
 }

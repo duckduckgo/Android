@@ -20,8 +20,6 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.content.res.Configuration
-import android.net.Uri
-import android.provider.Settings
 import android.view.ViewGroup
 import android.webkit.PermissionRequest
 import androidx.activity.result.ActivityResultCaller
@@ -32,10 +30,12 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.ui.view.button.ButtonType.GHOST
+import com.duckduckgo.common.ui.view.dialog.StackedAlertDialogBuilder
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.formatWithSpans
+import com.duckduckgo.common.utils.extensions.launchApplicationInfoSettings
 import com.duckduckgo.common.utils.extensions.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.FragmentScope
@@ -59,6 +59,7 @@ import logcat.LogPriority.WARN
 import logcat.logcat
 import java.lang.IllegalStateException
 import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 @ContributesBinding(FragmentScope::class)
 class SitePermissionsDialogActivityLauncher @Inject constructor(
@@ -82,6 +83,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
     private lateinit var permissionsHandledAutomatically: List<String>
     private var siteURL: String = ""
     private var tabId: String = ""
+    private var isDuckAiAudioCapture: Boolean = false
 
     override fun registerPermissionLauncher(caller: ActivityResultCaller) {
         systemPermissionsHelper.registerPermissionLaunchers(
@@ -107,6 +109,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         this.permissionsGrantedListener = permissionsGrantedListener
         permissionsHandledByUser = permissionsRequested.userHandled
         permissionsHandledAutomatically = permissionsRequested.autoAccept
+        isDuckAiAudioCapture = false
 
         when {
             permissionsHandledByUser.contains(PermissionRequest.RESOURCE_VIDEO_CAPTURE) && permissionsHandledByUser.contains(
@@ -441,6 +444,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
 
     private fun handleDuckAiAudioCapture() {
         // Grant mic access for this request only — never persist the site permission
+        isDuckAiAudioCapture = true
         askForMicPermissions(rememberChoice = false)
     }
 
@@ -552,7 +556,11 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                     onPermissionAllowed = {
                         askForMicPermissions(rememberChoice)
                     }
-                    R.string.sitePermissionsMicDeniedSnackBarMessage
+                    if (isDuckAiAudioCapture) {
+                        R.string.duckAiMicDeniedSnackBarMessage
+                    } else {
+                        R.string.sitePermissionsMicDeniedSnackBarMessage
+                    }
                 }
 
                 SitePermissionsRequestedType.CAMERA_AND_AUDIO -> {
@@ -622,35 +630,56 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
 
     private fun showSystemPermissionsDeniedDialog() {
         denyPermissions(permissionPermanent)
-        val titleRes = when (permissionRequested) {
-            SitePermissionsRequestedType.CAMERA -> R.string.systemPermissionDialogCameraDeniedTitle
-            SitePermissionsRequestedType.AUDIO -> R.string.systemPermissionDialogAudioDeniedTitle
-            SitePermissionsRequestedType.CAMERA_AND_AUDIO -> R.string.systemPermissionDialogCameraAndAudioDeniedTitle
-            SitePermissionsRequestedType.LOCATION -> R.string.systemPermissionDialogLocationDeniedTitle
+        val openAppSettings = { activity.launchApplicationInfoSettings() }
+
+        if (isDuckAiAudioCapture) {
+            StackedAlertDialogBuilder(activity)
+                .setHeaderImageResource(CommonR.drawable.ic_microphone_24)
+                .setTitle(R.string.duckAiMicPermissionDeniedDialogTitle)
+                .setMessage(R.string.duckAiMicPermissionDeniedDialogContent)
+                .setStackedButtons(
+                    listOf(
+                        R.string.duckAiMicPermissionDeniedDialogPositiveButton,
+                        R.string.systemPermissionsDeniedDialogNegativeButton,
+                    ),
+                )
+                .addEventListener(
+                    object : StackedAlertDialogBuilder.EventListener() {
+                        override fun onButtonClicked(position: Int) {
+                            if (position == CHANGE_PERMISSIONS_BUTTON) {
+                                openAppSettings()
+                            }
+                        }
+                    },
+                )
+                .show()
+        } else {
+            val titleRes = when (permissionRequested) {
+                SitePermissionsRequestedType.CAMERA -> R.string.systemPermissionDialogCameraDeniedTitle
+                SitePermissionsRequestedType.AUDIO -> R.string.systemPermissionDialogAudioDeniedTitle
+                SitePermissionsRequestedType.CAMERA_AND_AUDIO -> R.string.systemPermissionDialogCameraAndAudioDeniedTitle
+                SitePermissionsRequestedType.LOCATION -> R.string.systemPermissionDialogLocationDeniedTitle
+            }
+            val contentRes = when (permissionRequested) {
+                SitePermissionsRequestedType.CAMERA -> R.string.systemPermissionDialogCameraDeniedContent
+                SitePermissionsRequestedType.AUDIO -> R.string.systemPermissionDialogAudioDeniedContent
+                SitePermissionsRequestedType.CAMERA_AND_AUDIO -> R.string.systemPermissionDialogCameraAndAudioDeniedContent
+                SitePermissionsRequestedType.LOCATION -> R.string.systemPermissionDialogLocationDeniedContent
+            }
+            TextAlertDialogBuilder(activity)
+                .setTitle(titleRes)
+                .setMessage(contentRes)
+                .setPositiveButton(R.string.systemPermissionsDeniedDialogPositiveButton)
+                .setNegativeButton(R.string.systemPermissionsDeniedDialogNegativeButton)
+                .addEventListener(
+                    object : TextAlertDialogBuilder.EventListener() {
+                        override fun onPositiveButtonClicked() {
+                            openAppSettings()
+                        }
+                    },
+                )
+                .show()
         }
-        val contentRes = when (permissionRequested) {
-            SitePermissionsRequestedType.CAMERA -> R.string.systemPermissionDialogCameraDeniedContent
-            SitePermissionsRequestedType.AUDIO -> R.string.systemPermissionDialogAudioDeniedContent
-            SitePermissionsRequestedType.CAMERA_AND_AUDIO -> R.string.systemPermissionDialogCameraAndAudioDeniedContent
-            SitePermissionsRequestedType.LOCATION -> R.string.systemPermissionDialogLocationDeniedContent
-        }
-        TextAlertDialogBuilder(activity)
-            .setTitle(titleRes)
-            .setMessage(contentRes)
-            .setPositiveButton(R.string.systemPermissionsDeniedDialogPositiveButton)
-            .setNegativeButton(R.string.systemPermissionsDeniedDialogNegativeButton)
-            .addEventListener(
-                object : TextAlertDialogBuilder.EventListener() {
-                    override fun onPositiveButtonClicked() {
-                        val intent = Intent()
-                        intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-                        val uri = Uri.fromParts("package", activity.packageName, null)
-                        intent.data = uri
-                        activity.startActivity(intent)
-                    }
-                },
-            )
-            .show()
     }
 
     private fun storeFavicon(url: String) {
@@ -666,6 +695,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
 
     companion object {
         private const val DRM_LEARN_MORE_ANNOTATION = "drm_learn_more_link"
+        private const val CHANGE_PERMISSIONS_BUTTON = 0
         val DRM_LEARN_MORE_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy/drm-permission/".toUri()
     }
 }
