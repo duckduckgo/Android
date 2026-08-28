@@ -22,14 +22,12 @@
     <string name="voiceSearchListening">Räägi kohe</string>
     <string name="voiceSearchListeningFooter">Heli töödeldakse seadmes. Seda ei salvestata ega jagata kellegagi, sealhulgas DuckDuckGoga.</string>
     <string name="voiceSearchNegativeAction">Tühista</string>
-    <string name="voiceSearchPermissionRationaleDescription">DuckDuckGo ei kuula kunagi pealt, mida sa ütled. Heli töödeldakse seadmes kohapeal. Seda ei salvestata ega jagata kellegagi.</string>
-    <string name="voiceSearchPermissionRationaleTitle">Privaatse häälotsingu jaoks on vajalik juurdepääs mikrofonile</string>
-    <string name="voiceSearchPermissionRationalePositiveAction">OK</string>
-    <string name="voiceSearchPermissionRejectedDialogMessage">DuckDuckGo häälotsingu kasutamiseks pead süsteemiseadetes lubama mikrofonipääsu.</string>
-    <string name="voiceSearchPermissionRejectedDialogPositiveAction">Sätted</string>
-    <string name="voiceSearchPermissionRejectedDialogTitle">Vajalik juurdepääs mikrofonile</string>
-    <string name="voiceSearchRemovePositiveButton">Eemaldage</string>
-    <string name="voiceSearchRemoveTitle">Kas eemaldada privaatse häälotsingu valik aadressiribalt?</string>
-    <string name="voiceSearchRemoveSubtitle">Seda ja muid juurdepääsetavuse eelistusi saad alati muuta seadetes.</string>
+    <string name="voiceSearchMicAccessDeniedDialogTitle">DuckDuckGo vajab juurdepääsu teie mikrofonile</string>
+    <string name="voiceSearchMicAccessDeniedDialogMessage">Mikrofoni õigused on vajalikud, kui soovite kasutada meie privaatset häälotsingut.</string>
+    <string name="voiceSearchMicAccessDeniedDialogMessageDuckAi">Mikrofoni õigused on vajalikud, kui soovid kasutada meie privaatseid häälfunktsioone.</string>
+    <string name="voiceSearchMicAccessDeniedDialogChangePermissions">Muuda load</string>
+    <string name="voiceSearchMicAccessDeniedDialogHideVoiceSearch">Peida häälotsing</string>
+    <string name="voiceSearchMicPermissionDeniedSnackbarMessage">Häälfunktsioonide jaoks on tarvis mikrofoni luba</string>
+    <string name="voiceSearchMicPermissionDeniedSnackbarAction">Luba</string>
     <string name="voiceSearchTitle">Häälotsing</string>
 </resources>

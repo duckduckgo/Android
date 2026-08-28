@@ -57,6 +57,10 @@
     <string name="systemPermissionDialogCameraAndAudioDeniedContent">Webbplatser kan endast använda din kamera och mikrofon om du tillåter DuckDuckGo att be om åtkomst.</string>
     <string name="systemPermissionsDeniedDialogPositiveButton">Öppna inställningar</string>
     <string name="systemPermissionsDeniedDialogNegativeButton">Avbryt</string>
+    <string name="duckAiMicPermissionDeniedSnackBarMessage">Mikrofonbehörighet krävs för röstfunktioner</string>
+    <string name="duckAiMicPermissionDeniedDialogTitle">DuckDuckGo behöver komma åt din mikrofon</string>
+    <string name="duckAiMicPermissionDeniedDialogContent">Mikrofonbehörighet behövs om du vill använda röstchatt i Duck.ai</string>
+    <string name="duckAiMicPermissionDeniedDialogPositiveButton">Ändra behörigheter</string>
 
     <string name="sitePermissionsSettingsDescription">Webbplatser som du besöker kan begära åtkomst till din enhets plats, kamera, mikrofon eller DRM-programvara (Digital Rights Management). De kan inte komma åt dessa om du inte uttryckligen tillåter det.</string>
     <string name="sitePermissionsSettingsEnablePermissionTitle">Tillåt alla webbplatser att be om:</string>
