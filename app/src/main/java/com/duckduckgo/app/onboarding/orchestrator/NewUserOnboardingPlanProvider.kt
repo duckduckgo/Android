@@ -40,9 +40,11 @@ import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager.Segmen
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.SegmentedOnboardingPath
 import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
+import com.duckduckgo.app.onboarding.ui.page.OnboardingBackgroundStep
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
 import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection
+import com.duckduckgo.app.onboarding.ui.page.configdriven.Embellishment
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_AICHAT_SELECTED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CHOOSE_BROWSER_PRESSED
@@ -573,7 +575,11 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                         OnboardingPreference.SAFE_SEARCH,
                     ),
                 ),
-                inputScreenStep(ctx),
+                inputScreenStep(
+                    ctx,
+                    embellishment = Embellishment.BottomWing,
+                    background = OnboardingBackgroundStep.ComparisonChart,
+                ),
                 addressBarPositionStep(),
                 inputScreenPreviewStep(
                     ctx = ctx,
@@ -649,7 +655,11 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                     ),
                     caption = R.string.preferenceChangeInSettingsCaption,
                 ),
-                inputScreenStep(ctx),
+                inputScreenStep(
+                    ctx,
+                    embellishment = Embellishment.BottomWing,
+                    background = OnboardingBackgroundStep.ComparisonChart,
+                ),
                 addressBarPositionStep(),
                 inputScreenPreviewStep(
                     ctx = ctx,
@@ -1005,13 +1015,17 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         )
     }
 
-    private fun inputScreenStep(ctx: NewUserOnboardingPlanContext): NewUserOnboardingActivityStep {
+    private fun inputScreenStep(
+        ctx: NewUserOnboardingPlanContext,
+        embellishment: Embellishment = Embellishment.LeftWing,
+        background: OnboardingBackgroundStep = OnboardingBackgroundStep.InputType,
+    ): NewUserOnboardingActivityStep {
         val pixelName = OnboardingPixelName.ONBOARDING_SEARCH_EXPERIENCE
         return NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.INPUT_SCREEN,
             pixelName = pixelName,
             indicator = StepIndicatorMode.COUNTED,
-            resolveDialog = { NewUserOnboardingActivityDialog.InputScreen },
+            resolveDialog = { NewUserOnboardingActivityDialog.InputScreen(embellishment, background) },
             transition = { event ->
                 when {
                     event is NewUserOnboardingEvent.InputModeConfirmed -> {

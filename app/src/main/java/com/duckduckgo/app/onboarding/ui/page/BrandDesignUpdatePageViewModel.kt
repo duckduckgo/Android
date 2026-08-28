@@ -538,7 +538,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                 _viewState.update { it.copy(showSplitOption = dialog.showSplitOption) }
                 setCurrentDialog(ADDRESS_BAR_POSITION, stepIndicator = progress)
             }
-            NewUserOnboardingActivityDialog.InputScreen ->
+            is NewUserOnboardingActivityDialog.InputScreen ->
                 setCurrentDialog(INPUT_SCREEN, stepIndicator = progress)
             is NewUserOnboardingActivityDialog.InputScreenPreview ->
                 setInputScreenPreviewDialog(isSearchDefault = dialog.isSearchDefault, stepIndicator = progress)

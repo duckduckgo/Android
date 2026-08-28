@@ -18,7 +18,9 @@ package com.duckduckgo.app.onboarding.orchestrator
 
 import androidx.annotation.StringRes
 import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
+import com.duckduckgo.app.onboarding.ui.page.OnboardingBackgroundStep
 import com.duckduckgo.app.onboarding.ui.page.configdriven.ContentConfig
+import com.duckduckgo.app.onboarding.ui.page.configdriven.Embellishment
 import com.duckduckgo.onboarding.api.OnboardingSingleChoiceDataPlugin.Option
 
 /**
@@ -46,7 +48,10 @@ sealed interface NewUserOnboardingActivityDialog {
 
     data object ImportComplete : NewUserOnboardingActivityDialog
     data class AddressBarPosition(val showSplitOption: Boolean) : NewUserOnboardingActivityDialog
-    data object InputScreen : NewUserOnboardingActivityDialog
+    data class InputScreen(
+        val embellishment: Embellishment = Embellishment.LeftWing,
+        val background: OnboardingBackgroundStep = OnboardingBackgroundStep.InputType,
+    ) : NewUserOnboardingActivityDialog
 
     /**
      * @param isSearchDefault when true, the search tab is pre-selected, otherwise, the Duck.ai tab is pre-selected.

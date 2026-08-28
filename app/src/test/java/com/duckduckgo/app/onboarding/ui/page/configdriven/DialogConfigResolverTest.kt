@@ -334,7 +334,7 @@ class DialogConfigResolverTest {
 
     @Test
     fun `resolves the input screen with a submitting cta and ai preselected`() {
-        val config = testee.resolve(NewUserOnboardingActivityDialog.InputScreen, isCustomAiFlow = false)!!
+        val config = testee.resolve(NewUserOnboardingActivityDialog.InputScreen(), isCustomAiFlow = false)!!
 
         assertEquals(OnboardingBackgroundStep.InputType, config.background)
         assertEquals(Embellishment.LeftWing, config.embellishment)

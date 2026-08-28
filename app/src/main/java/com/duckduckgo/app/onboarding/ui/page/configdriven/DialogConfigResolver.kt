@@ -140,9 +140,9 @@ class DialogConfigResolver @Inject constructor(
             ),
         )
 
-        NewUserOnboardingActivityDialog.InputScreen -> DialogConfig(
-            background = OnboardingBackgroundStep.InputType,
-            embellishment = Embellishment.LeftWing,
+        is NewUserOnboardingActivityDialog.InputScreen -> DialogConfig(
+            background = dialog.background,
+            embellishment = dialog.embellishment,
             cardArrow = CardArrowConfig.AtEnd,
             content = ContentConfig.InputScreen(
                 title = TextConfig.Resource(R.string.preOnboardingInputScreenTitleUpdated),
@@ -192,7 +192,7 @@ class DialogConfigResolver @Inject constructor(
         is NewUserOnboardingActivityDialog.PreferenceSelector -> DialogConfig(
             background = OnboardingBackgroundStep.PreferenceSelector,
             embellishment = Embellishment.LeftWing,
-            cardArrow = CardArrowConfig.AtEnd,
+            cardArrow = CardArrowConfig.AtStart,
             content = ContentConfig.PreferenceSelector(
                 title = TextConfig.Resource(dialog.titleRes),
                 rows = dialog.rows,
@@ -207,7 +207,7 @@ class DialogConfigResolver @Inject constructor(
         is NewUserOnboardingActivityDialog.SingleChoice -> DialogConfig(
             background = OnboardingBackgroundStep.PreferenceSelector,
             embellishment = Embellishment.LeftWing,
-            cardArrow = CardArrowConfig.AtEnd,
+            cardArrow = CardArrowConfig.AtStart,
             content = ContentConfig.SingleChoice(
                 title = TextConfig.Resource(dialog.title),
                 body = TextConfig.Resource(dialog.body),
@@ -220,8 +220,8 @@ class DialogConfigResolver @Inject constructor(
         )
 
         is NewUserOnboardingActivityDialog.TogglePosition -> DialogConfig(
-            background = OnboardingBackgroundStep.PreferenceSelector,
-            embellishment = Embellishment.LeftWing,
+            background = OnboardingBackgroundStep.ComparisonChart,
+            embellishment = Embellishment.BottomWing,
             cardArrow = CardArrowConfig.AtEnd,
             content = ContentConfig.TogglePosition(
                 title = TextConfig.Resource(R.string.aiPathTogglePositionTitle),
@@ -233,8 +233,8 @@ class DialogConfigResolver @Inject constructor(
         )
 
         is NewUserOnboardingActivityDialog.DuckAiState -> DialogConfig(
-            background = OnboardingBackgroundStep.PreferenceSelector,
-            embellishment = Embellishment.LeftWing,
+            background = OnboardingBackgroundStep.ComparisonChart,
+            embellishment = Embellishment.BottomWing,
             cardArrow = CardArrowConfig.AtEnd,
             content = ContentConfig.DuckAiState(
                 title = TextConfig.Resource(R.string.noAiPathDuckAiStateTitle),

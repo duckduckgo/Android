@@ -78,7 +78,7 @@ class OnboardingDialogShownPixelsTest {
 
     @Test
     fun `fires the search experience shown pixel for the input screen`() {
-        testee.fireFor(NewUserOnboardingActivityDialog.InputScreen)
+        testee.fireFor(NewUserOnboardingActivityDialog.InputScreen())
 
         verify(pixel).fire(AppPixelName.PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE, type = Unique())
     }
