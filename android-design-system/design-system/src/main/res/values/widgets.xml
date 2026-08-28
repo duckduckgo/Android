@@ -364,6 +364,14 @@
         <item name="cornerSize">@dimen/dialogBorderRadius</item>
     </style>
 
+    <style name="Widget.DuckDuckGo.DialogCorners.Rebrand">
+        <item name="cornerSize">@dimen/rebrandDialogBorderRadius</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.Dialog.Rebrand">
+        <item name="shapeAppearanceOverlay">@style/Widget.DuckDuckGo.DialogCorners.Rebrand</item>
+    </style>
+
     <style name="Widget.DuckDuckGo.Dialog.Content">
         <item name="android:paddingTop">@dimen/keyline_5</item>
         <item name="android:paddingBottom">@dimen/dialogContentPaddingBottom</item>

@@ -21,7 +21,10 @@ import android.content.Context
 import android.content.res.Configuration
 import android.view.ViewGroup
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.ui.view.button.ButtonType.PRIMARY
+import com.duckduckgo.common.ui.view.button.ButtonType.SECONDARY
 import com.duckduckgo.common.ui.view.dialog.StackedAlertDialogBuilder
+import com.duckduckgo.common.ui.view.dialog.StackedButton
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.voice.api.VoiceSearchLauncher.VoiceSearchMode
@@ -78,11 +81,11 @@ class RealVoiceSearchPermissionDialogsLauncher @Inject constructor(
             R.string.voiceSearchMicAccessDeniedDialogMessage
         }
         val buttons = buildList {
-            add(R.string.voiceSearchMicAccessDeniedDialogChangePermissions)
+            add(StackedButton(R.string.voiceSearchMicAccessDeniedDialogChangePermissions, PRIMARY, CommonR.drawable.ic_open_in_16))
             if (!isDuckAiMode) {
-                add(R.string.voiceSearchMicAccessDeniedDialogHideVoiceSearch)
+                add(StackedButton(R.string.voiceSearchMicAccessDeniedDialogHideVoiceSearch, SECONDARY))
             }
-            add(R.string.voiceSearchNegativeAction)
+            add(StackedButton(R.string.voiceSearchNegativeAction, SECONDARY))
         }
 
         pixel.fire(
@@ -91,6 +94,7 @@ class RealVoiceSearchPermissionDialogsLauncher @Inject constructor(
         )
 
         StackedAlertDialogBuilder(context)
+            .setRebrandUpdate(true)
             .setHeaderImageResource(CommonR.drawable.ic_microphone_24)
             .setTitle(R.string.voiceSearchMicAccessDeniedDialogTitle)
             .setMessage(message)
