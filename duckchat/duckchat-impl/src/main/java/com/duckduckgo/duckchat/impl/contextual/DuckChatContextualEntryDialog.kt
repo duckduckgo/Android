@@ -261,7 +261,7 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
     private fun configureQuickAction() {
         binding.entryPromptQuickAction.setOnClickListener {
             if (viewModel.viewState.value.attachedContext == null) return@setOnClickListener
-            viewModel.onPromptSubmitted(NativeInputPrompt(getString(R.string.duckAIContextualPromptSummarize), null, null, null, null, null))
+            viewModel.onSummarizeSubmitted(NativeInputPrompt(getString(R.string.duckAIContextualPromptSummarize), null, null, null, null, null))
         }
     }
 

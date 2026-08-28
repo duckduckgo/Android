@@ -19,6 +19,9 @@ package com.duckduckgo.duckchat.impl.contextual
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelPageType
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -39,6 +42,7 @@ import javax.inject.Inject
 class DuckChatContextualEntryViewModel @Inject constructor(
     private val contextualEntryPromptStore: ContextualEntryPromptStore,
     private val duckChatPixels: DuckChatPixels,
+    private val modelManager: DuckAiModelManager,
 ) : ViewModel() {
 
     data class ViewState(
@@ -100,12 +104,33 @@ class DuckChatContextualEntryViewModel @Inject constructor(
     /** A suggested prompt was picked; suggestions are page-specific, so attach the context before submit. */
     fun onSuggestionSubmitted(prompt: NativeInputPrompt) {
         if (_viewState.value.attachedContext == null) latestValidPageContext?.let { attach(it) }
+        fireUnifiedInputPromptSubmitted()
         submit(prompt)
     }
 
-    /** A typed prompt or the Summarize quick action was submitted. */
+    fun onSummarizeSubmitted(prompt: NativeInputPrompt) {
+        fireUnifiedInputPromptSubmitted()
+        submit(prompt)
+    }
+
     fun onPromptSubmitted(prompt: NativeInputPrompt) {
         submit(prompt)
+    }
+
+    private fun fireUnifiedInputPromptSubmitted() {
+        duckChatPixels.firePromptSubmitted(
+            selectedTool = "none",
+            modelId = modelManager.getSelectedModelId(),
+            reasoningEffort = modelManager.getResolvedReasoningEffort(),
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            hasText = true,
+            surface = DuckChatPixelSurface.CONTEXTUAL_CHAT,
+            defaultMode = null,
+            tabId = tabId,
+            pageType = DuckChatPixelPageType.CONTEXTUAL,
+            addressBarEntryPoint = null,
+        )
     }
 
     private fun submit(prompt: NativeInputPrompt) {

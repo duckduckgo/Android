@@ -40,6 +40,8 @@ import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
 import com.duckduckgo.duckchat.impl.history.ChatHistoryItem
 import com.duckduckgo.duckchat.impl.history.ChatHistoryRepository
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelPageType
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
@@ -711,6 +713,7 @@ class DuckChatContextualViewModel @Inject constructor(
                     return
                 }
                 duckChatPixels.reportContextualSummarizePromptSelected()
+                fireUnifiedInputPromptSubmitted()
                 onPromptSent(
                     prompt = context.getString(R.string.duckAIContextualPromptSummarize),
                     followUpPrefill = currentInput.takeIf { it.isNotEmpty() },
@@ -724,9 +727,26 @@ class DuckChatContextualViewModel @Inject constructor(
         currentInput: String,
     ) {
         attachPageContextForSuggestion()
+        fireUnifiedInputPromptSubmitted()
         onPromptSent(
             prompt = suggestion.prompt,
             followUpPrefill = currentInput.takeIf { it.isNotEmpty() },
+        )
+    }
+
+    private fun fireUnifiedInputPromptSubmitted() {
+        duckChatPixels.firePromptSubmitted(
+            selectedTool = "none",
+            modelId = modelManager.getSelectedModelId(),
+            reasoningEffort = modelManager.getResolvedReasoningEffort(),
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            hasText = true,
+            surface = DuckChatPixelSurface.CONTEXTUAL_CHAT,
+            defaultMode = null,
+            tabId = _viewState.value.tabId,
+            pageType = DuckChatPixelPageType.CONTEXTUAL,
+            addressBarEntryPoint = null,
         )
     }
 
