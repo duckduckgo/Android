@@ -3102,10 +3102,11 @@ class BrowserTabFragment :
 
             is Command.ShowDuckAIContextualMode -> {
                 val tabId = it.tabId
+                val sourceUrl = it.sourceUrl
                 val anchor = duckChatButtonAnchor
                 duckChatButtonAnchor = null
                 viewLifecycleOwner.lifecycleScope.launch(dispatchers.main()) {
-                    duckChatContextual.launch(tabId, anchor) { showDuckChatContextualSheet(tabId) }
+                    duckChatContextual.launch(tabId, sourceUrl, anchor) { showDuckChatContextualSheet(tabId) }
                 }
             }
             is Command.StartAddressBarTrackersAnimation -> {

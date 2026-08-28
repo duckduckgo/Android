@@ -5845,7 +5845,7 @@ class BrowserTabViewModel @Inject constructor(
             // unfocused omnibar. Once the omnibar is focused (composing), fall through to full-screen
             // Duck.ai.
             duckAiFeatureState.showContextualMode.value && !isNtp && !hasFocus -> {
-                command.value = Command.ShowDuckAIContextualMode(tabId)
+                command.value = Command.ShowDuckAIContextualMode(tabId, url)
             }
 
             else -> {

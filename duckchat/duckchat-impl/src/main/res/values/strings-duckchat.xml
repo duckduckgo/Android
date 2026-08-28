@@ -341,7 +341,6 @@
     <string name="duckAiSettingsTitle">Duck.ai Settings</string>
 
     <!-- File/image attachment menu options -->
-    <string name="duckChatContextualAskAboutPage">Ask About Page</string>
 
     <!-- Editing a message already sent to Duck.ai -->
     <string name="duck_ai_edit_prompt_title" instruction="Screen title: the user is editing a message they already sent to Duck.ai">Edit message</string>
