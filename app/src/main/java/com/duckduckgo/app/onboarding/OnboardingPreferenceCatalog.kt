@@ -182,7 +182,8 @@ class OnboardingPreferenceCatalogImpl @Inject constructor(
 
     /**
      * A preference whose owning module supplies the copy, the icon and the write process.
-     * The plugin not resolving is what makes the row unavailable, so a module can withdraw the preference behind its own conditions.
+     * The plugin declining to describe the preference is what makes the row unavailable, so a module can
+     * withdraw the preference behind its own conditions.
      */
     private fun fromPlugin(
         id: OnboardingBooleanPreferencePlugin.Id,
@@ -190,7 +191,7 @@ class OnboardingPreferenceCatalogImpl @Inject constructor(
         seed: suspend () -> Boolean,
     ) = Definition(
         row = { preference ->
-            plugin(id)?.let {
+            plugin(id)?.getPreference()?.let {
                 ContentConfig.PreferenceSelector.Row(
                     preference = preference,
                     iconRes = it.iconRes,

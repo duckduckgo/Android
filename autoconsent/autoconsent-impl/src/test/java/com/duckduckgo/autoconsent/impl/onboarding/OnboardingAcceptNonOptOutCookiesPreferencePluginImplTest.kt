@@ -23,10 +23,10 @@ import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.onboarding.api.OnboardingBooleanPreferencePlugin
+import com.duckduckgo.onboarding.api.OnboardingBooleanPreferencePlugin.Preference
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.doReturn
@@ -63,29 +63,29 @@ class OnboardingAcceptNonOptOutCookiesPreferencePluginImplTest {
     }
 
     @Test
-    fun `when row is described then autoconsent names and illustrates it`() {
-        assertEquals("Accept some cookies", testee.primaryText)
-        assertEquals("Hides more pop-ups by accepting cookies that can't be rejected", testee.secondaryText)
-        assertEquals(CommonR.drawable.cookie_color_24, testee.iconRes)
+    fun `when the cookie pop up preference setting is on then it names and illustrates the preference`() = runTest {
+        assertEquals(
+            Preference(
+                primaryText = "Accept some cookies",
+                secondaryText = "Hides more pop-ups by accepting cookies that can't be rejected",
+                iconRes = CommonR.drawable.cookie_color_24,
+            ),
+            testee.getPreference(),
+        )
     }
 
     @Test
-    fun `when the cookie pop up preference setting is on then plugin is active`() = runTest {
-        assertTrue(testee.isActive())
-    }
-
-    @Test
-    fun `when the cookie pop up preference setting is off then plugin is not active`() = runTest {
+    fun `when the cookie pop up preference setting is off then the preference is withheld`() = runTest {
         autoconsentFeature.cookiePopUpPreferenceSetting().setRawStoredState(Toggle.State(enable = false))
 
-        assertFalse(testee.isActive())
+        assertNull(testee.getPreference())
     }
 
     @Test
-    fun `when autoconsent is killed remotely then plugin is not active`() = runTest {
+    fun `when autoconsent is killed remotely then the preference is withheld`() = runTest {
         autoconsentFeature.self().setRawStoredState(Toggle.State(enable = false))
 
-        assertFalse(testee.isActive())
+        assertNull(testee.getPreference())
     }
 
     @Test

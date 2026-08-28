@@ -25,13 +25,13 @@ import com.duckduckgo.adblocking.impl.domain.AdBlockingState.Uninitialized
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
 import com.duckduckgo.adblocking.impl.domain.SettingsPlacement
 import com.duckduckgo.onboarding.api.OnboardingBooleanPreferencePlugin
+import com.duckduckgo.onboarding.api.OnboardingBooleanPreferencePlugin.Preference
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
@@ -61,38 +61,34 @@ class OnboardingAdBlockingPreferencePluginImplTest {
     }
 
     @Test
-    fun `when row is described then ad blocking names it and leaves the second line out`() {
-        assertEquals("Block ads", testee.primaryText)
-        assertNull(testee.secondaryText)
-        assertEquals(CommonR.drawable.ads_blocked_color_24, testee.iconRes)
-    }
-
-    @Test
-    fun `when settings show the entry under protections then plugin is active`() = runTest {
+    fun `when settings show the entry under protections then ad blocking names the preference and leaves the second line out`() = runTest {
         whenever(statusChecker.settingsPlacementFlow()).thenReturn(flowOf(SettingsPlacement.Protections))
 
-        assertTrue(testee.isActive())
+        assertEquals(
+            Preference(primaryText = "Block ads", iconRes = CommonR.drawable.ads_blocked_color_24),
+            testee.getPreference(),
+        )
     }
 
     @Test
-    fun `when settings show the entry elsewhere then plugin is active`() = runTest {
+    fun `when settings show the entry elsewhere then the preference is offered`() = runTest {
         whenever(statusChecker.settingsPlacementFlow()).thenReturn(flowOf(SettingsPlacement.Other))
 
-        assertTrue(testee.isActive())
+        assertNotNull(testee.getPreference())
     }
 
     @Test
-    fun `when settings hide the entry then plugin is not active`() = runTest {
+    fun `when settings hide the entry then the preference is withheld`() = runTest {
         whenever(statusChecker.settingsPlacementFlow()).thenReturn(flowOf(SettingsPlacement.Hidden))
 
-        assertFalse(testee.isActive())
+        assertNull(testee.getPreference())
     }
 
     @Test
-    fun `when settings placement is unknown then plugin is not active`() = runTest {
+    fun `when settings placement is unknown then the preference is withheld`() = runTest {
         whenever(statusChecker.settingsPlacementFlow()).thenReturn(emptyFlow())
 
-        assertFalse(testee.isActive())
+        assertNull(testee.getPreference())
     }
 
     @Test

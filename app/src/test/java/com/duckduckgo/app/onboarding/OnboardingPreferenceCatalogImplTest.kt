@@ -25,6 +25,7 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.onboarding.api.OnboardingBooleanPreferencePlugin
+import com.duckduckgo.onboarding.api.OnboardingBooleanPreferencePlugin.Preference
 import com.duckduckgo.settings.api.SerpSettingsDataProvider
 import com.duckduckgo.settings.api.SerpSettingsFeature
 import kotlinx.coroutines.awaitCancellation
@@ -56,15 +57,19 @@ class OnboardingPreferenceCatalogImplTest {
     private val adBlockingPlugin = FakeOnboardingBooleanPreferencePlugin()
     private val rejectOptionalCookiesPlugin = FakeOnboardingBooleanPreferencePlugin(
         id = OnboardingBooleanPreferencePlugin.Id.RejectOptionalCookies,
-        primaryText = "Reject optional cookies",
-        secondaryText = "Maximizes privacy and closes cookie pop-ups",
-        iconRes = 43,
+        preference = Preference(
+            primaryText = "Reject optional cookies",
+            secondaryText = "Maximizes privacy and closes cookie pop-ups",
+            iconRes = 43,
+        ),
     )
     private val acceptNonOptOutCookiesPlugin = FakeOnboardingBooleanPreferencePlugin(
         id = OnboardingBooleanPreferencePlugin.Id.AcceptNonOptOutCookies,
-        primaryText = "Accept some cookies",
-        secondaryText = "Hides more pop-ups by accepting cookies that can't be rejected",
-        iconRes = 44,
+        preference = Preference(
+            primaryText = "Accept some cookies",
+            secondaryText = "Hides more pop-ups by accepting cookies that can't be rejected",
+            iconRes = 44,
+        ),
     )
     private var contributedPlugins: List<OnboardingBooleanPreferencePlugin> =
         listOf(adBlockingPlugin, rejectOptionalCookiesPlugin, acceptNonOptOutCookiesPlugin)
@@ -434,6 +439,13 @@ class OnboardingPreferenceCatalogImplTest {
     }
 
     @Test
+    fun `when ad blocking plugin withholds the preference then block ads is not offered`() = runTest {
+        contributedPlugins = listOf(FakeOnboardingBooleanPreferencePlugin(preference = null))
+
+        assertNull(rowFor(OnboardingPreference.BLOCK_ADS))
+    }
+
+    @Test
     fun `when ad blocking plugin missing then applying block ads is a no op`() = runTest {
         contributedPlugins = emptyList()
 
@@ -468,12 +480,12 @@ class OnboardingPreferenceCatalogImplTest {
 
 private class FakeOnboardingBooleanPreferencePlugin(
     override val id: OnboardingBooleanPreferencePlugin.Id = OnboardingBooleanPreferencePlugin.Id.AdBlocking,
-    override val primaryText: String = "Block ads",
-    override val secondaryText: String? = null,
-    override val iconRes: Int = 42,
+    private val preference: Preference? = Preference(primaryText = "Block ads", iconRes = 42),
 ) : OnboardingBooleanPreferencePlugin {
 
     val applied = mutableListOf<Boolean>()
+
+    override suspend fun getPreference(): Preference? = preference
 
     override suspend fun apply(enabled: Boolean) {
         applied += enabled

@@ -23,10 +23,10 @@ import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.onboarding.api.OnboardingBooleanPreferencePlugin
+import com.duckduckgo.onboarding.api.OnboardingBooleanPreferencePlugin.Preference
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
+import org.junit.Assert.assertNull
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
@@ -57,24 +57,24 @@ class OnboardingRejectOptionalCookiesPreferencePluginImplTest {
     }
 
     @Test
-    fun `when row is described then autoconsent names and illustrates it`() {
-        assertEquals("Reject optional cookies", testee.primaryText)
-        assertEquals("Maximizes privacy and closes cookie pop-ups", testee.secondaryText)
-        assertEquals(CommonR.drawable.cookie_blocked_color_24, testee.iconRes)
-    }
-
-    @Test
-    fun `when autoconsent is enabled remotely then plugin is active`() = runTest {
+    fun `when autoconsent is enabled remotely then it names and illustrates the preference`() = runTest {
         autoconsentFeature.self().setRawStoredState(Toggle.State(enable = true))
 
-        assertTrue(testee.isActive())
+        assertEquals(
+            Preference(
+                primaryText = "Reject optional cookies",
+                secondaryText = "Maximizes privacy and closes cookie pop-ups",
+                iconRes = CommonR.drawable.cookie_blocked_color_24,
+            ),
+            testee.getPreference(),
+        )
     }
 
     @Test
-    fun `when autoconsent is killed remotely then plugin is not active`() = runTest {
+    fun `when autoconsent is killed remotely then the preference is withheld`() = runTest {
         autoconsentFeature.self().setRawStoredState(Toggle.State(enable = false))
 
-        assertFalse(testee.isActive())
+        assertNull(testee.getPreference())
     }
 
     @Test

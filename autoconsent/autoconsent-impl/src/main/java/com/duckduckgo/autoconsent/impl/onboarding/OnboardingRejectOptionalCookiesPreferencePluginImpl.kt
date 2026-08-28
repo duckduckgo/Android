@@ -24,6 +24,7 @@ import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.onboarding.api.OnboardingBooleanPreferencePlugin
 import com.duckduckgo.onboarding.api.OnboardingBooleanPreferencePlugin.Id
+import com.duckduckgo.onboarding.api.OnboardingBooleanPreferencePlugin.Preference
 import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 
@@ -41,13 +42,15 @@ class OnboardingRejectOptionalCookiesPreferencePluginImpl @Inject constructor(
 
     override val id: Id = Id.RejectOptionalCookies
 
-    override val primaryText: String get() = context.getString(R.string.autoconsent_onboarding_reject_optional_cookies_primary)
+    override suspend fun getPreference(): Preference? {
+        if (!autoconsentFeature.self().isEnabled()) return null
 
-    override val secondaryText: String get() = context.getString(R.string.autoconsent_onboarding_reject_optional_cookies_secondary)
-
-    override val iconRes: Int = CommonR.drawable.cookie_blocked_color_24
-
-    override suspend fun isActive(): Boolean = autoconsentFeature.self().isEnabled()
+        return Preference(
+            primaryText = context.getString(R.string.autoconsent_onboarding_reject_optional_cookies_primary),
+            secondaryText = context.getString(R.string.autoconsent_onboarding_reject_optional_cookies_secondary),
+            iconRes = CommonR.drawable.cookie_blocked_color_24,
+        )
+    }
 
     override suspend fun apply(enabled: Boolean) {
         // Persisting a value that already applies would turn the remote default into an explicit user

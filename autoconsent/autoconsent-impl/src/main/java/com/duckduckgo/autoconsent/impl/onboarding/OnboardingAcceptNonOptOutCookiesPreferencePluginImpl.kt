@@ -24,6 +24,7 @@ import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.onboarding.api.OnboardingBooleanPreferencePlugin
 import com.duckduckgo.onboarding.api.OnboardingBooleanPreferencePlugin.Id
+import com.duckduckgo.onboarding.api.OnboardingBooleanPreferencePlugin.Preference
 import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 
@@ -41,18 +42,19 @@ class OnboardingAcceptNonOptOutCookiesPreferencePluginImpl @Inject constructor(
 
     override val id: Id = Id.AcceptNonOptOutCookies
 
-    override val primaryText: String get() = context.getString(R.string.autoconsent_onboarding_accept_non_opt_out_cookies_primary)
-
-    override val secondaryText: String get() = context.getString(R.string.autoconsent_onboarding_accept_non_opt_out_cookies_secondary)
-
-    override val iconRes: Int = CommonR.drawable.cookie_color_24
-
     /**
      * Settings only exposes this switch inside the cookie pop-up preference section, so offering it during
      * onboarding while that section is off would let the user set something they can never see again.
      */
-    override suspend fun isActive(): Boolean =
-        autoconsentFeature.self().isEnabled() && autoconsentFeature.cookiePopUpPreferenceSetting().isEnabled()
+    override suspend fun getPreference(): Preference? {
+        if (!autoconsentFeature.self().isEnabled() || !autoconsentFeature.cookiePopUpPreferenceSetting().isEnabled()) return null
+
+        return Preference(
+            primaryText = context.getString(R.string.autoconsent_onboarding_accept_non_opt_out_cookies_primary),
+            secondaryText = context.getString(R.string.autoconsent_onboarding_accept_non_opt_out_cookies_secondary),
+            iconRes = CommonR.drawable.cookie_color_24,
+        )
+    }
 
     override suspend fun apply(enabled: Boolean) = autoconsent.changeClickAcceptEnabled(enabled)
 }

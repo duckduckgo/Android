@@ -26,22 +26,24 @@ import com.duckduckgo.common.utils.plugins.ActivePlugin
  * Onboarding owns which preferences exist, so it asks for a specific plugin by [Id] rather than
  * rendering whatever happens to be contributed.
  *
- * Whether the preference can be offered at all is expressed through [isActive]: a plugin that does
- * not resolve from the plugin point means the row is not shown.
+ * Whether the preference can be offered at all is expressed through [getPreference] returning null:
+ * the module decides at the moment it is asked, so it can withdraw the row behind its own conditions.
  */
 interface OnboardingBooleanPreferencePlugin : ActivePlugin {
     val id: Id
 
-    val primaryText: String
-
-    /** Null when the row renders as a single line. */
-    val secondaryText: String? get() = null
-
-    /** Null when the row renders without an icon. */
-    @get:DrawableRes
-    val iconRes: Int? get() = null
+    /** Null when the owning module has nothing to offer right now, which drops the row. */
+    suspend fun getPreference(): Preference?
 
     suspend fun apply(enabled: Boolean)
+
+    data class Preference(
+        val primaryText: String,
+        /** Null when the row renders as a single line. */
+        val secondaryText: String? = null,
+        /** Null when the row renders without an icon. */
+        @DrawableRes val iconRes: Int? = null,
+    )
 
     enum class Id {
         AdBlocking,
