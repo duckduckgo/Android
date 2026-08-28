@@ -44,6 +44,7 @@
     <color name="onboardingTextSecondarySmallLight">#99242323</color> <!--60%-->
     <color name="onboardingTextSecondarySmallDark">#D1CECB</color>
     <attr name="onboardingBorderPrimary" format="color" />
+    <attr name="onboardingTileStroke" format="color" />
     <attr name="onboardingBorderTertiary" format="color" />
 
     <!-- Quick setup -->
@@ -75,6 +76,7 @@
         <item name="onboardingShadowPurple">#0F3E228C</item> <!--6% Alpha-->
         <item name="onboardingShadowBlue">#171E42A4</item> <!--9% Alpha-->
         <item name="onboardingBorderPrimary">@color/black20</item>
+        <item name="onboardingTileStroke">@color/black16</item>
         <item name="onboardingBorderTertiary">#1F242323</item>
 
         <!--Quick setup-->
@@ -141,6 +143,7 @@
         <item name="onboardingShadowPurple">#0F070019</item> <!--6% Alpha-->
         <item name="onboardingShadowBlue">#17051133</item> <!--9% Alpha-->
         <item name="onboardingBorderPrimary">@color/white36</item>
+        <item name="onboardingTileStroke">@color/white12</item>
         <item name="onboardingBorderTertiary">@color/white18</item>
 
         <!--Quick setup-->

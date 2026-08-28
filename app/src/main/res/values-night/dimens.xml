@@ -14,10 +14,6 @@
   ~ limitations under the License.
   -->
 
-<selector xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
-    <item android:state_pressed="true" android:color="?attr/onboardingAccentPrimary" />
-    <item android:state_selected="true" android:color="?attr/onboardingAccentPrimary" />
-    <!-- this selector is night-only, so a fixed dark palette color needs no theme attribute -->
-    <item android:color="@color/white12" tools:ignore="InvalidColorAttribute" />
-</selector>
+<resources>
+    <dimen name="brandDesignTabTileStrokeWidth">1dp</dimen>
+</resources>
