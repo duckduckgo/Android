@@ -71,6 +71,7 @@ import com.duckduckgo.common.ui.compose.button.DaxIconButton
 import com.duckduckgo.common.ui.compose.cards.DaxCard
 import com.duckduckgo.common.ui.compose.cards.DaxSurface
 import com.duckduckgo.common.ui.compose.checkbox.DaxCheckbox
+import com.duckduckgo.common.ui.compose.contextmenu.DaxContextMenu
 import com.duckduckgo.common.ui.compose.divider.DaxHorizontalDivider
 import com.duckduckgo.common.ui.compose.divider.DaxVerticalDivider
 import com.duckduckgo.common.ui.compose.layout.DaxScaffold
@@ -95,9 +96,11 @@ import com.duckduckgo.common.ui.compose.text.DaxText
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.internal.R
 import com.duckduckgo.common.ui.internal.ui.setupThemedComposeView
+import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.MessageCta
 import com.duckduckgo.common.ui.view.MessageCta.Message
 import com.duckduckgo.common.ui.view.MessageCta.MessageType.REMOTE_PROMO_MESSAGE
+import com.duckduckgo.common.ui.view.PopupMenuItemView
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.listitem.OneLineListItem
 import com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
@@ -532,6 +535,108 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
     class PopupMenuItemComponentViewHolder(
         parent: ViewGroup,
     ) : ComponentViewHolder(inflate(parent, R.layout.component_popup_menu_item))
+
+    class ContextMenuComponentViewHolder(
+        parent: ViewGroup,
+        private val isDarkTheme: Boolean,
+    ) : ComponentViewHolder(inflate(parent, R.layout.component_context_menu)) {
+        @SuppressLint("ShowToast")
+        override fun bind(component: Component) {
+            view.setupThemedComposeView(id = R.id.compose_context_menu_list_item, isDarkTheme = isDarkTheme) {
+                val context = LocalContext.current
+                Column {
+                    var firstMenuExpanded by remember { mutableStateOf(false) }
+                    DaxTwoLineListItem(
+                        primaryText = "Bookmark this page",
+                        secondaryText = "duckduckgo.com",
+                        leadingContent = {
+                            Icon(painterResource(CommonR.drawable.ic_globe_24), contentDescription = null)
+                        },
+                        trailingContent = {
+                            DaxContextMenu(
+                                anchor = {
+                                    Icon(
+                                        painter = painterResource(CommonR.drawable.ic_menu_vertical_24),
+                                        contentDescription = "More options",
+                                        onClick = { firstMenuExpanded = true },
+                                    )
+                                },
+                                expanded = firstMenuExpanded,
+                                onDismissRequest = { firstMenuExpanded = false },
+                            ) {
+                                DaxIconItem(
+                                    text = "Bookmark",
+                                    painterLeadingIcon = painterResource(CommonR.drawable.ic_bookmark_24),
+                                    onClick = { Toast.makeText(context, "Bookmark pressed", Toast.LENGTH_SHORT).show() },
+                                    showDivider = true,
+                                )
+                                DaxInsetItem(
+                                    text = "Copy link",
+                                    onClick = { Toast.makeText(context, "Copy link pressed", Toast.LENGTH_SHORT).show() },
+                                    trailingIcon = { Icon(painterResource(CommonR.drawable.ic_copy_24), null) },
+                                    showDivider = true,
+                                )
+                                DaxDefaultItem(text = "Unavailable", onClick = {}, enabled = false)
+                            }
+                        },
+                        onClick = {},
+                    )
+
+                    var secondMenuExpanded by remember { mutableStateOf(false) }
+                    DaxTwoLineListItem(
+                        primaryText = "Open in new tab",
+                        secondaryText = "example.com",
+                        leadingContent = {
+                            Icon(painterResource(CommonR.drawable.ic_globe_24), contentDescription = null)
+                        },
+                        trailingContent = {
+                            DaxContextMenu(
+                                anchor = {
+                                    Icon(
+                                        painter = painterResource(CommonR.drawable.ic_menu_vertical_24),
+                                        contentDescription = "More options",
+                                        onClick = { secondMenuExpanded = true },
+                                    )
+                                },
+                                expanded = secondMenuExpanded,
+                                onDismissRequest = { secondMenuExpanded = false },
+                            ) {
+                                DaxDefaultItem(
+                                    text = "Share",
+                                    onClick = { Toast.makeText(context, "Share pressed", Toast.LENGTH_SHORT).show() },
+                                    showDivider = true,
+                                )
+                                DaxDefaultItem(
+                                    text = "Delete",
+                                    onClick = { Toast.makeText(context, "Delete pressed", Toast.LENGTH_SHORT).show() },
+                                    isDestructive = true,
+                                )
+                            }
+                        },
+                        onClick = {},
+                    )
+                }
+            }
+
+            view.findViewById<TwoLineListItem>(R.id.xml_context_menu_list_item).setTrailingIconClickListener { anchor ->
+                val popupMenu = PopupMenu(LayoutInflater.from(view.context), R.layout.popup_component_context_menu)
+                val menuView = popupMenu.contentView
+                popupMenu.apply {
+                    onMenuItemClicked(menuView.findViewById(R.id.bookmark)) {
+                        Toast.makeText(view.context, "Bookmark pressed", Toast.LENGTH_SHORT).show()
+                    }
+                    onMenuItemClicked(menuView.findViewById(R.id.copyLink)) {
+                        Toast.makeText(view.context, "Copy link pressed", Toast.LENGTH_SHORT).show()
+                    }
+                    menuView.findViewById<PopupMenuItemView>(R.id.unavailable).setDisabled()
+                    onMenuItemClicked(menuView.findViewById(R.id.delete)) {
+                        Toast.makeText(view.context, "Delete pressed", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                popupMenu.show(view, anchor)
+            }
+        }
+    }
 
     class HeaderSectionComponentViewHolder(
         parent: ViewGroup,
@@ -1029,6 +1134,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 Component.CARD -> CardComponentViewHolder(parent, isDarkTheme)
                 Component.SCAFFOLD -> ScaffoldComponentViewHolder(parent, isDarkTheme)
                 Component.SETTINGS_LIST_ITEM -> SettingsListItemComponentViewHolder(parent, isDarkTheme)
+                Component.CONTEXT_MENU -> ContextMenuComponentViewHolder(parent, isDarkTheme)
                 else -> {
                     TODO()
                 }

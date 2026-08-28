@@ -48,6 +48,8 @@ import com.duckduckgo.lint.strings.PlaceholderDetector.Companion.PLACEHOLDER_MIS
 import com.duckduckgo.lint.ui.ColorAttributeInXmlDetector.Companion.INVALID_COLOR_ATTRIBUTE
 import com.duckduckgo.lint.ui.DaxButtonStylingDetector.Companion.INVALID_DAX_BUTTON_DUCK_SANS
 import com.duckduckgo.lint.ui.DaxButtonStylingDetector.Companion.INVALID_DAX_BUTTON_PROPERTY
+import com.duckduckgo.lint.ui.DaxContextMenuContentDetector.Companion.INVALID_DAX_CONTEXT_MENU_CONTENT_USAGE
+import com.duckduckgo.lint.ui.DaxContextMenuItemContentDetector.Companion.INVALID_DAX_CONTEXT_MENU_ITEM_CONTENT_USAGE
 import com.duckduckgo.lint.ui.DaxDividerColorUsageDetector.Companion.INVALID_DAX_DIVIDER_COLOR_USAGE
 import com.duckduckgo.lint.ui.DaxListItemColorUsageDetector.Companion.INVALID_DAX_LIST_ITEM_COLOR_USAGE
 import com.duckduckgo.lint.ui.DaxListItemContentDetector.Companion.INVALID_DAX_LIST_ITEM_CONTENT_USAGE
@@ -130,6 +132,8 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
             INVALID_DAX_SECURE_TEXT_FIELD_TRAILING_ICON_USAGE,
             INVALID_DAX_LIST_ITEM_CONTENT_USAGE,
             INVALID_DAX_LIST_ITEM_COLOR_USAGE,
+            INVALID_DAX_CONTEXT_MENU_ITEM_CONTENT_USAGE,
+            INVALID_DAX_CONTEXT_MENU_CONTENT_USAGE,
             NO_MATERIAL3_SWITCH_USAGE,
             NO_MATERIAL3_TOP_APP_BAR_USAGE,
             NO_MATERIAL3_RADIO_BUTTON_USAGE,

@@ -34,6 +34,10 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.duckduckgo.common.ui.compose.Status
+import com.duckduckgo.common.ui.compose.appbars.DaxTopAppBar
+import com.duckduckgo.common.ui.compose.appbars.DaxTopAppBarNavigationIcon
+import com.duckduckgo.common.ui.compose.button.DaxIconButton
+import com.duckduckgo.common.ui.compose.contextmenu.DaxContextMenuIconButton
 import com.duckduckgo.common.ui.compose.template.DaxPageHeader
 import com.duckduckgo.common.ui.compose.text.DaxText
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
@@ -96,6 +100,60 @@ fun TemplatesPane(modifier: Modifier = Modifier) {
                 body = "DuckDuckGo Private Search is your default search engine, so you can search the web without being tracked.",
                 learnMoreClick = {
                     Toast.makeText(context, "Learn more clicked", Toast.LENGTH_SHORT).show()
+                },
+            )
+        }
+        item {
+            DaxText(
+                text = "Top App Bar with a context menu",
+                style = DuckDuckGoTheme.typography.h4,
+                color = DuckDuckGoTheme.colors.text.tertiary,
+                modifier = Modifier.padding(vertical = keyline4),
+            )
+        }
+        item {
+            DaxTopAppBar(
+                title = "Bookmarks",
+                navigationIcon = DaxTopAppBarNavigationIcon.Back { },
+                actions = {
+                    DaxIconButton(
+                        onClick = { },
+                        iconPainter = painterResource(CommonR.drawable.ic_find_search_24),
+                        contentDescription = "Search",
+                    )
+                    DaxContextMenuIconButton(
+                        contentDescription = "More options",
+                    ) {
+                        DaxIconItem(
+                            text = "Bookmark",
+                            painterLeadingIcon = painterResource(CommonR.drawable.ic_bookmark_24),
+                            onClick = {
+                                Toast.makeText(context, "Bookmark clicked", Toast.LENGTH_SHORT).show()
+                            },
+                            showDivider = true,
+                        )
+                        DaxInsetItem(
+                            text = "Copy link",
+                            onClick = {
+                                Toast.makeText(context, "Copy link clicked", Toast.LENGTH_SHORT).show()
+                            },
+                            trailingIcon = { Icon(painterResource(CommonR.drawable.ic_copy_24), null) },
+                            showDivider = true,
+                        )
+                        DaxDefaultItem(
+                            text = "Unavailable",
+                            onClick = { },
+                            enabled = false,
+                            showDivider = true,
+                        )
+                        DaxDefaultItem(
+                            text = "Delete",
+                            onClick = {
+                                Toast.makeText(context, "Delete clicked", Toast.LENGTH_SHORT).show()
+                            },
+                            isDestructive = true,
+                        )
+                    }
                 },
             )
         }
