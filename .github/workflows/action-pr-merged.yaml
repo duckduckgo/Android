@@ -25,10 +25,9 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           COMPARE: repos/${{ github.repository }}/compare/${{ github.event.repository.default_branch }}...${{ github.event.pull_request.merge_commit_sha }}
         run: |
-          on_default=false
-          status=""
           for i in {1..5}; do
-            status=$(gh api "$COMPARE" --jq .status 2>/dev/null) && break
+            if status=$(gh api "$COMPARE" --jq .status); then break; fi
+            status=""
             sleep 2
           done
           case "$status" in identical|behind) on_default=true ;; *) on_default=false ;; esac
