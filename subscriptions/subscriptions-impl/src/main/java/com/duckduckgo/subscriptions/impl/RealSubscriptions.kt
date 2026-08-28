@@ -305,6 +305,13 @@ interface SubscriptionsFeature {
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.FALSE)
     fun notificationsPermissionMessaging(): Toggle
 
+    /**
+     * When enabled, the Partnerships Hub entry point is shown in Settings.
+     * The flag settings carry the hub URL to open.
+     */
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.FALSE)
+    fun partnershipsHub(): Toggle
+
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun handleExpiredStateWhenSubscriptionChangeSelected(): Toggle
 
