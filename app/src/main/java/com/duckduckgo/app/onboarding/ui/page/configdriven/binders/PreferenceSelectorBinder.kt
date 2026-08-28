@@ -67,8 +67,6 @@ class PreferenceSelectorBinder(
                 NewUserOnboardingEvent.PreferenceSelectorConfirmed(state.value.enabled)
             },
             unbind = {
-                // Clearing first leaves a fade that is cancelled below with nothing to land on, so it cannot
-                // ask the card to tween once the next screen owns it.
                 dependentRows.clear()
                 fadeTarget.clear()
                 binding.preferenceRows.children.forEach { it.animate().cancel() }
