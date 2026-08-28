@@ -32,7 +32,7 @@ import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.internal.PartnershipsHubUrlProvider
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
-import com.duckduckgo.subscriptions.impl.settings.views.PartnershipsSettingViewModel.Command.OpenPartnershipsHub
+import com.duckduckgo.subscriptions.impl.settings.views.PartnerBenefitSettingViewModel.Command.OpenPartnershipsHub
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -44,7 +44,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-class PartnershipsSettingViewModelTest {
+class PartnerBenefitSettingViewModelTest {
 
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
@@ -54,7 +54,7 @@ class PartnershipsSettingViewModelTest {
     private val subscriptionsFeature: SubscriptionsFeature = FakeFeatureToggleFactory.create(SubscriptionsFeature::class.java)
     private val pixelSender: SubscriptionPixelSender = mock()
 
-    private fun viewModel() = PartnershipsSettingViewModel(
+    private fun viewModel() = PartnerBenefitSettingViewModel(
         subscriptions = subscriptions,
         subscriptionsFeature = subscriptionsFeature,
         partnershipsHubUrlProvider = urlProvider,
@@ -63,7 +63,7 @@ class PartnershipsSettingViewModelTest {
     )
 
     @Test
-    fun givenFeatureEnabledWhenSubscriptionActiveThenPartnershipsRowVisible() = runTest {
+    fun givenFeatureEnabledWhenSubscriptionActiveThenPartnerBenefitRowVisible() = runTest {
         subscriptionsFeature.partnershipsHub().setRawStoredState(State(true))
 
         activeStatuses().forEach { status ->
@@ -79,7 +79,7 @@ class PartnershipsSettingViewModelTest {
     }
 
     @Test
-    fun givenActiveSubscriptionWhenFeatureDisabledThenPartnershipsRowHidden() = runTest {
+    fun givenActiveSubscriptionWhenFeatureDisabledThenPartnerBenefitRowHidden() = runTest {
         subscriptionsFeature.partnershipsHub().setRawStoredState(State(false))
         whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(AUTO_RENEWABLE))
 
@@ -92,7 +92,7 @@ class PartnershipsSettingViewModelTest {
     }
 
     @Test
-    fun givenFeatureEnabledWhenSubscriptionNotActiveThenPartnershipsRowHidden() = runTest {
+    fun givenFeatureEnabledWhenSubscriptionNotActiveThenPartnerBenefitRowHidden() = runTest {
         subscriptionsFeature.partnershipsHub().setRawStoredState(State(true))
 
         inactiveStatuses().forEach { status ->
@@ -108,7 +108,7 @@ class PartnershipsSettingViewModelTest {
     }
 
     @Test
-    fun givenFeatureEnabledWhenSubscriptionExpiresThenPartnershipsRowHidden() = runTest {
+    fun givenFeatureEnabledWhenSubscriptionExpiresThenPartnerBenefitRowHidden() = runTest {
         subscriptionsFeature.partnershipsHub().setRawStoredState(State(true))
         whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(AUTO_RENEWABLE, EXPIRED))
 

@@ -18,10 +18,10 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/partnershipsSettings"
+    android:id="@+id/partnerBenefitSettings"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:visibility="gone"
     app:leadingIcon="@drawable/ic_subscription_gift_color_24"
-    app:primaryText="@string/partnershipsSettingTitle"
+    app:primaryText="@string/partnerBenefitSettingTitle"
     tools:visibility="visible" />

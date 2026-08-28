@@ -24,7 +24,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.settings.api.ProSettingsPlugin
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingView
-import com.duckduckgo.subscriptions.impl.settings.views.PartnershipsSettingView
+import com.duckduckgo.subscriptions.impl.settings.views.PartnerBenefitSettingView
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingView
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingView
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -66,8 +66,8 @@ class ITRSettings @Inject constructor() : ProSettingsPlugin {
 
 @ContributesMultibinding(scope = ActivityScope::class)
 @PriorityKey(450)
-class PartnershipsSettings @Inject constructor() : ProSettingsPlugin {
+class PartnerBenefitSettings @Inject constructor() : ProSettingsPlugin {
     override fun getView(context: Context): View {
-        return PartnershipsSettingView(context)
+        return PartnerBenefitSettingView(context)
     }
 }

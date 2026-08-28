@@ -30,17 +30,17 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
-import com.duckduckgo.subscriptions.impl.databinding.ViewPartnershipsSettingsBinding
-import com.duckduckgo.subscriptions.impl.settings.views.PartnershipsSettingViewModel.Command
-import com.duckduckgo.subscriptions.impl.settings.views.PartnershipsSettingViewModel.Command.OpenPartnershipsHub
-import com.duckduckgo.subscriptions.impl.settings.views.PartnershipsSettingViewModel.ViewState
+import com.duckduckgo.subscriptions.impl.databinding.ViewPartnerBenefitSettingsBinding
+import com.duckduckgo.subscriptions.impl.settings.views.PartnerBenefitSettingViewModel.Command
+import com.duckduckgo.subscriptions.impl.settings.views.PartnerBenefitSettingViewModel.Command.OpenPartnershipsHub
+import com.duckduckgo.subscriptions.impl.settings.views.PartnerBenefitSettingViewModel.ViewState
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @InjectWith(ViewScope::class)
-class PartnershipsSettingView @JvmOverloads constructor(
+class PartnerBenefitSettingView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
@@ -52,10 +52,10 @@ class PartnershipsSettingView @JvmOverloads constructor(
     @Inject
     lateinit var browserNav: BrowserNav
 
-    private val binding: ViewPartnershipsSettingsBinding by viewBinding()
+    private val binding: ViewPartnerBenefitSettingsBinding by viewBinding()
 
-    private val viewModel: PartnershipsSettingViewModel by lazy {
-        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[PartnershipsSettingViewModel::class.java]
+    private val viewModel: PartnerBenefitSettingViewModel by lazy {
+        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[PartnerBenefitSettingViewModel::class.java]
     }
 
     private val commandJob = ConflatedJob()
@@ -68,7 +68,7 @@ class PartnershipsSettingView @JvmOverloads constructor(
         val lifecycleOwner = findViewTreeLifecycleOwner() ?: return
         lifecycleOwner.lifecycle.addObserver(viewModel)
 
-        binding.partnershipsSettings.setClickListener { viewModel.onPartnershipsHubClicked() }
+        binding.partnerBenefitSettings.setClickListener { viewModel.onPartnershipsHubClicked() }
 
         commandJob += viewModel.commands()
             .onEach { processCommand(it) }
@@ -87,7 +87,7 @@ class PartnershipsSettingView @JvmOverloads constructor(
     }
 
     private fun renderView(viewState: ViewState) {
-        binding.partnershipsSettings.isVisible = viewState.isVisible
+        binding.partnerBenefitSettings.isVisible = viewState.isVisible
     }
 
     private fun processCommand(command: Command) {
