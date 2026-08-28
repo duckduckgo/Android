@@ -28,8 +28,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.promptscoordinator.impl.RealPromptsCoordinator
-import com.duckduckgo.promptscoordinator.impl.store.ModalEvaluatorCompletionStore
+import com.duckduckgo.promptscoordinator.internal.PromptsCoordinatorDevSupport
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -41,10 +40,7 @@ class ModalCoordinatorDevSettingsActivity : DuckDuckGoActivity() {
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     @Inject
-    lateinit var completionStore: ModalEvaluatorCompletionStore
-
-    @Inject
-    lateinit var promptsCoordinator: RealPromptsCoordinator
+    lateinit var devSupport: PromptsCoordinatorDevSupport
 
     private val binding: ActivityModalCoordinatorDevSettingsBinding by viewBinding()
 
@@ -57,8 +53,7 @@ class ModalCoordinatorDevSettingsActivity : DuckDuckGoActivity() {
 
         binding.resetCooldownButton.setOnClickListener {
             lifecycleScope.launch {
-                completionStore.resetCooldown()
-                promptsCoordinator.resetGap()
+                devSupport.resetModalCooldown()
                 Toast.makeText(
                     this@ModalCoordinatorDevSettingsActivity,
                     R.string.modalCoordinatorDevSettingsResetCooldownDone,
