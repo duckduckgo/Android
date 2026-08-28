@@ -30,6 +30,7 @@ import com.duckduckgo.duckchat.api.DuckChatContextual
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -41,6 +42,7 @@ class RealDuckChatContextual @Inject constructor(
     private val contextualDataStore: DuckChatContextualDataStore,
     private val sessionTimeoutProvider: DuckChatContextualSessionTimeoutProvider,
     private val timeProvider: DuckChatContextualTimeProvider,
+    private val duckChatPixels: DuckChatPixels,
 ) : DuckChatContextual {
 
     override suspend fun launch(
@@ -96,11 +98,16 @@ class RealDuckChatContextual @Inject constructor(
         val activity = anchor.activity() ?: return
         val popup = PopupMenu(LayoutInflater.from(activity), R.layout.popup_contextual_chat_menu)
         val content = popup.contentView
-        popup.onMenuItemClicked(content.findViewById(R.id.contextualChatMenuNewChat)) { openNewChatTab(activity, sourceTabId) }
+        popup.onMenuItemClicked(content.findViewById(R.id.contextualChatMenuNewChat)) {
+            duckChatPixels.reportContextualAddressBarMenuNewChatSelected()
+            openNewChatTab(activity, sourceTabId)
+        }
         popup.onMenuItemClicked(content.findViewById(R.id.contextualChatMenuAskAboutPage)) {
+            duckChatPixels.reportContextualAddressBarMenuAskAboutPageSelected()
             showEntryDialog(anchor, sourceTabId, onAskAboutPage)
         }
         popup.showAnchoredView(activity, anchor.rootView, anchor)
+        duckChatPixels.reportContextualAddressBarMenuShown()
     }
 
     private fun showEntryDialog(
