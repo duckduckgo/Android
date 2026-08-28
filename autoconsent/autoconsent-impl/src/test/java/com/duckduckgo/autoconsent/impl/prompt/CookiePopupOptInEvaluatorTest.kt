@@ -20,15 +20,20 @@ import android.app.Application
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.onboarding.OnboardingFlowChecker
 import com.duckduckgo.autoconsent.api.Autoconsent
+import com.duckduckgo.autoconsent.impl.FakeSettingsRepository
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.AppInstallTimeProvider
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.promptscoordinator.api.ModalEvaluator
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -38,6 +43,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.Shadows.shadowOf
+import java.util.concurrent.TimeUnit
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
@@ -49,8 +55,16 @@ class CookiePopupOptInEvaluatorTest {
     private val application: Application get() = RuntimeEnvironment.getApplication()
     private val feature = FakeFeatureToggleFactory.create(AutoconsentFeature::class.java)
     private val autoconsent: Autoconsent = mock()
+    private val settingsRepository = FakeSettingsRepository()
     private val onboardingFlowChecker: OnboardingFlowChecker = mock {
         onBlocking { isOnboardingComplete() } doReturn true
+    }
+    private val now = System.currentTimeMillis()
+    private val currentTimeProvider: CurrentTimeProvider = mock {
+        on { currentTimeMillis() } doReturn now
+    }
+    private val appInstallTimeProvider: AppInstallTimeProvider = mock {
+        on { firstInstallTimeMillis() } doReturn now - TimeUnit.DAYS.toMillis(30)
     }
 
     private val testee by lazy {
@@ -60,7 +74,10 @@ class CookiePopupOptInEvaluatorTest {
             autoconsentFeature = feature,
             dispatchers = coroutineRule.testDispatcherProvider,
             autoconsent = autoconsent,
+            settingsRepository = settingsRepository,
             onboardingFlowChecker = onboardingFlowChecker,
+            currentTimeProvider = currentTimeProvider,
+            appInstallTimeProvider = appInstallTimeProvider,
         )
     }
 
@@ -73,6 +90,15 @@ class CookiePopupOptInEvaluatorTest {
     fun whenOnboardingNotCompleteThenSkippedAndNothingLaunched() = runTest {
         feature.cookiePopUpOptInPrompt().setRawStoredState(Toggle.State(enable = true))
         whenever(onboardingFlowChecker.isOnboardingComplete()).thenReturn(false)
+
+        assertEquals(ModalEvaluator.EvaluationResult.Skipped, testee.evaluate())
+        assertNull(shadowOf(application).nextStartedActivity)
+    }
+
+    @Test
+    fun whenAutoconsentKillSwitchDisabledThenSkippedAndNothingLaunched() = runTest {
+        feature.cookiePopUpOptInPrompt().setRawStoredState(Toggle.State(enable = true))
+        feature.self().setRawStoredState(Toggle.State(enable = false))
 
         assertEquals(ModalEvaluator.EvaluationResult.Skipped, testee.evaluate())
         assertNull(shadowOf(application).nextStartedActivity)
@@ -116,11 +142,80 @@ class CookiePopupOptInEvaluatorTest {
     }
 
     @Test
+    fun whenNothingLeftToOptInToThenChoiceRecorded() = runTest {
+        feature.cookiePopUpOptInPrompt().setRawStoredState(Toggle.State(enable = true))
+        whenever(autoconsent.isSettingEnabled()).thenReturn(true)
+        whenever(autoconsent.isClickAcceptEnabled()).thenReturn(true)
+
+        testee.evaluate()
+
+        assertTrue(settingsRepository.optInPromptChoiceMade)
+    }
+
+    @Test
+    fun whenProtectionOnButClickAcceptOffThenChoiceNotRecorded() = runTest {
+        feature.cookiePopUpOptInPrompt().setRawStoredState(Toggle.State(enable = true))
+        whenever(autoconsent.isSettingEnabled()).thenReturn(true)
+        whenever(autoconsent.isClickAcceptEnabled()).thenReturn(false)
+
+        testee.evaluate()
+
+        assertFalse(settingsRepository.optInPromptChoiceMade)
+    }
+
+    @Test
     fun whenProtectionOnButClickAcceptOffThenModalShown() = runTest {
         feature.cookiePopUpOptInPrompt().setRawStoredState(Toggle.State(enable = true))
         whenever(autoconsent.isSettingEnabled()).thenReturn(true)
         whenever(autoconsent.isClickAcceptEnabled()).thenReturn(false)
 
         assertEquals(ModalEvaluator.EvaluationResult.ModalShown, testee.evaluate())
+    }
+
+    @Test
+    fun whenShownFewerThanThreeTimesThenModalShown() = runTest {
+        feature.cookiePopUpOptInPrompt().setRawStoredState(Toggle.State(enable = true))
+        settingsRepository.optInPromptShownCount = 2
+
+        assertEquals(ModalEvaluator.EvaluationResult.ModalShown, testee.evaluate())
+    }
+
+    @Test
+    fun whenChoiceAlreadyMadeThenSkippedAndNothingLaunched() = runTest {
+        feature.cookiePopUpOptInPrompt().setRawStoredState(Toggle.State(enable = true))
+        settingsRepository.optInPromptChoiceMade = true
+
+        assertEquals(ModalEvaluator.EvaluationResult.Skipped, testee.evaluate())
+        assertNull(shadowOf(application).nextStartedActivity)
+    }
+
+    @Test
+    fun whenInstalledLessThanTwoDaysAgoThenSkippedAndNothingLaunched() = runTest {
+        feature.cookiePopUpOptInPrompt().setRawStoredState(Toggle.State(enable = true))
+        setDaysSinceInstall(1)
+
+        assertEquals(ModalEvaluator.EvaluationResult.Skipped, testee.evaluate())
+        assertNull(shadowOf(application).nextStartedActivity)
+    }
+
+    @Test
+    fun whenInstalledTwoDaysAgoThenModalShown() = runTest {
+        feature.cookiePopUpOptInPrompt().setRawStoredState(Toggle.State(enable = true))
+        setDaysSinceInstall(2)
+
+        assertEquals(ModalEvaluator.EvaluationResult.ModalShown, testee.evaluate())
+    }
+
+    @Test
+    fun whenAlreadyShownThreeTimesThenSkippedAndNothingLaunched() = runTest {
+        feature.cookiePopUpOptInPrompt().setRawStoredState(Toggle.State(enable = true))
+        settingsRepository.optInPromptShownCount = 3
+
+        assertEquals(ModalEvaluator.EvaluationResult.Skipped, testee.evaluate())
+        assertNull(shadowOf(application).nextStartedActivity)
+    }
+
+    private fun setDaysSinceInstall(days: Long) {
+        whenever(appInstallTimeProvider.firstInstallTimeMillis()).thenReturn(now - TimeUnit.DAYS.toMillis(days))
     }
 }

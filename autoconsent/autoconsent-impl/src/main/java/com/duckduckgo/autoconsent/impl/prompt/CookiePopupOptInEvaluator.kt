@@ -24,6 +24,9 @@ import com.duckduckgo.app.onboarding.OnboardingFlowChecker
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autoconsent.impl.R
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
+import com.duckduckgo.autoconsent.impl.store.AutoconsentSettingsRepository
+import com.duckduckgo.common.utils.AppInstallTimeProvider
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.promptscoordinator.api.ModalEvaluator
@@ -33,6 +36,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @ContributesMultibinding(
@@ -47,6 +51,9 @@ class CookiePopupOptInEvaluator @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val autoconsent: Autoconsent,
     private val onboardingFlowChecker: OnboardingFlowChecker,
+    private val settingsRepository: AutoconsentSettingsRepository,
+    private val currentTimeProvider: CurrentTimeProvider,
+    private val appInstallTimeProvider: AppInstallTimeProvider,
 ) : ModalEvaluator {
 
     override val priority: Int = 6
@@ -54,7 +61,10 @@ class CookiePopupOptInEvaluator @Inject constructor(
     override val evaluatorId: String = "cookie_popup_opt_in"
 
     override suspend fun evaluate(): ModalEvaluator.EvaluationResult = withContext(dispatchers.io()) {
-        if (!autoconsentFeature.cookiePopUpOptInPrompt().isEnabled() || !autoconsentFeature.cookiePopUpPreferenceSetting().isEnabled()) {
+        if (!autoconsentFeature.self().isEnabled() ||
+            !autoconsentFeature.cookiePopUpOptInPrompt().isEnabled() ||
+            !autoconsentFeature.cookiePopUpPreferenceSetting().isEnabled()
+        ) {
             return@withContext ModalEvaluator.EvaluationResult.Skipped
         }
 
@@ -62,8 +72,20 @@ class CookiePopupOptInEvaluator @Inject constructor(
             return@withContext ModalEvaluator.EvaluationResult.Skipped
         }
 
+        if (daysSinceInstall() < MIN_DAYS_SINCE_INSTALL) {
+            return@withContext ModalEvaluator.EvaluationResult.Skipped
+        }
+
         if (autoconsent.isSettingEnabled() && autoconsent.isClickAcceptEnabled()) {
-            // TODO: (cbarreiro) mark not show again
+            settingsRepository.optInPromptChoiceMade = true
+            return@withContext ModalEvaluator.EvaluationResult.Skipped
+        }
+
+        if (settingsRepository.optInPromptChoiceMade) {
+            return@withContext ModalEvaluator.EvaluationResult.Skipped
+        }
+
+        if (settingsRepository.optInPromptShownCount >= MAX_PROMPT_DISPLAYS) {
             return@withContext ModalEvaluator.EvaluationResult.Skipped
         }
 
@@ -79,7 +101,14 @@ class CookiePopupOptInEvaluator @Inject constructor(
         return@withContext ModalEvaluator.EvaluationResult.ModalShown
     }
 
+    private fun daysSinceInstall(): Long {
+        val elapsed = currentTimeProvider.currentTimeMillis() - appInstallTimeProvider.firstInstallTimeMillis()
+        return TimeUnit.MILLISECONDS.toDays(elapsed)
+    }
+
     companion object {
         private const val MODAL_DISPLAY_DELAY = 250L
+        private const val MIN_DAYS_SINCE_INSTALL = 2
+        private const val MAX_PROMPT_DISPLAYS = 3
     }
 }

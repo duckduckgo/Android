@@ -24,6 +24,7 @@ import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
+import androidx.activity.OnBackPressedCallback
 import androidx.annotation.StringRes
 import androidx.core.graphics.drawable.toDrawable
 import androidx.lifecycle.Lifecycle
@@ -83,6 +84,12 @@ class CookiePopupOptInActivity : DuckDuckGoActivity() {
         setupListeners()
         setupObservers()
         setupOrientationMode()
+        setupOnBackNavigation()
+
+        // A restored Activity is the same presentation, so only a fresh one counts against the display cap.
+        if (savedInstanceState == null) {
+            viewModel.onPromptShown()
+        }
     }
 
     @SuppressLint("SourceLockedOrientationActivity")
@@ -104,6 +111,17 @@ class CookiePopupOptInActivity : DuckDuckGoActivity() {
     private fun setupTextAppearances() {
         binding.cookiePopupOptInBrand.setTextAppearance(R.style.Typography_DuckDuckGo_CookiePopupOptIn_Brand)
         binding.cookiePopupOptInFootnote.setTextAppearance(R.style.Typography_DuckDuckGo_CookiePopupOptIn_Hint)
+    }
+
+    /**
+     * The prompt is a required choice, so back must not dismiss it.
+     */
+    private fun setupOnBackNavigation() {
+        onBackPressedDispatcher.addCallback(
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() = Unit
+            },
+        )
     }
 
     private fun setupListeners() {
