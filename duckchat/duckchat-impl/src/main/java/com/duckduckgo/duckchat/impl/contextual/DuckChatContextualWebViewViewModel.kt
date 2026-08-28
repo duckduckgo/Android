@@ -540,7 +540,6 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
     }
 
     fun onSheetClosed() {
-        duckChatPixels.reportContextualSheetDismissed()
         if (hidingSheetForNewChat) {
             // New Chat hid the sheet only to hand off to the entry dialog — not a user dismissal. Skip
             // onContextualClosed (which would revert the tab's contextual input state and strip the entry
@@ -549,6 +548,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
             hidingSheetForNewChat = false
             return
         }
+        duckChatPixels.reportContextualSheetDismissed()
         persistTabClosed()
         commandChannel.trySend(Command.ApplyContextualClosed(_viewState.value.tabId))
     }

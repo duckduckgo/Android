@@ -188,7 +188,7 @@ class DuckChatContextualWebViewViewModelTest {
             assertFalse(expectMostRecentItem() is DuckChatContextualWebViewViewModel.Command.ApplyContextualClosed)
             cancelAndIgnoreRemainingEvents()
         }
-        verify(duckChatPixels).reportContextualSheetDismissed()
+        verify(duckChatPixels, never()).reportContextualSheetDismissed()
     }
 
     @Test
@@ -448,7 +448,7 @@ class DuckChatContextualWebViewViewModelTest {
             assertFalse(expectMostRecentItem() is DuckChatContextualWebViewViewModel.Command.ApplyContextualClosed)
             cancelAndIgnoreRemainingEvents()
         }
-        verify(duckChatPixels).reportContextualSheetDismissed()
+        verify(duckChatPixels, never()).reportContextualSheetDismissed()
     }
 
     @Test
