@@ -52,7 +52,8 @@ private interface MyPluginPointTrigger
     parentFeatureName = "pluginPointMyPlugin",     // required, must match an existing plugin point's featureName
 )
 class MyPluginImpl @Inject constructor() : MyPlugin {
-    // isActive() is generated — backed by its own remote feature flag
+    // Override isActive() for conditions the plugin owns; it is ANDed with the remote feature flag.
+    // Leave it out and the flag alone decides.
 }
 ```
 
@@ -64,7 +65,9 @@ class Foo @Inject constructor(private val plugins: ActivePluginPoint<MyPlugin>)
 
 **How the gating works at runtime:**
 1. If the plugin point's own `self()` toggle is OFF → `emptyList()` immediately
-2. Otherwise, filter each plugin by its individual `pluginXxx()` toggle (via `isActive()`)
+2. Otherwise, filter each plugin by its individual `pluginXxx()` toggle ANDed with the plugin's own
+   `isActive()`. The toggle is checked first and short-circuits, so a remotely killed plugin never
+   runs its own check.
 
 **Naming conventions** (enforced at compile time):
 

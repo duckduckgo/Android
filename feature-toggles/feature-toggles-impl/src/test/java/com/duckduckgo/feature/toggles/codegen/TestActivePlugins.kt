@@ -102,6 +102,23 @@ class BazActivePlugin @Inject constructor() : MyPlugin {
     }
 }
 
+/**
+ * Leaves its toggle at the default of enabled and refuses through [isActive] instead, so a test can tell
+ * the two gates apart.
+ */
+@ContributesActivePlugin(
+    scope = AppScope::class,
+    boundType = MyPlugin::class,
+    featureName = "pluginSelfDisablingActivePlugin",
+    parentFeatureName = "pluginPointMyPlugin",
+)
+class SelfDisablingActivePlugin @Inject constructor() : MyPlugin {
+    override fun doSomething() {
+    }
+
+    override suspend fun isActive(): Boolean = false
+}
+
 @ContributesActivePlugin(
     scope = AppScope::class,
     boundType = MyPlugin::class,

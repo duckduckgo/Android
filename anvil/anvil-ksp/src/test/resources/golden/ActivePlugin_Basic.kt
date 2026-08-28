@@ -33,7 +33,8 @@ public class MyPlugin_ActivePlugin @Inject constructor(
   private val activePlugin: MyPlugin,
   private val toggle: MyPlugin_ActivePlugin_RemoteFeature,
 ) : TestActivePluginBase by activePlugin {
-  public override suspend fun isActive(): Boolean = toggle.pluginMyPlugin().isEnabled()
+  public override suspend fun isActive(): Boolean = toggle.pluginMyPlugin().isEnabled() &&
+      activePlugin.isActive()
 }
 
 @ContributesRemoteFeature(

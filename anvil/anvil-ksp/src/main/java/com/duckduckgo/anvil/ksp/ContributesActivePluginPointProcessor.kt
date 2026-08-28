@@ -55,7 +55,8 @@ import com.squareup.kotlinpoet.ksp.writeTo
  * - A sentinel object in a fixed package for cross-module validation
  *
  * **@ContributesActivePlugin** generates:
- * - An ActivePlugin wrapper that delegates to the original and implements isActive() via toggle
+ * - An ActivePlugin wrapper that delegates to the original and implements isActive() as its toggle
+ *   ANDed with the original's own isActive()
  * - A remote feature flag interface with @ContributesRemoteFeature
  * - A multi-process SharedPreferences store
  * - Conditionally, a deferred validation marker for cross-module parentFeatureName validation
@@ -720,7 +721,7 @@ class ContributesActivePluginPointProcessor(
                         FunSpec.builder("isActive")
                             .addModifiers(KModifier.OVERRIDE, KModifier.SUSPEND)
                             .returns(Boolean::class)
-                            .addCode(CodeBlock.of("return toggle.$featureName().isEnabled()"))
+                            .addCode(CodeBlock.of("return toggle.$featureName().isEnabled() && activePlugin.isActive()"))
                             .build(),
                     )
                 }.build(),

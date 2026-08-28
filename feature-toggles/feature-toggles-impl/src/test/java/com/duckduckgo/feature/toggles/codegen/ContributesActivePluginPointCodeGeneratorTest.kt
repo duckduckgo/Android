@@ -24,13 +24,17 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.FakeSharedPreferencesProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.feature.toggles.api.FakeToggleStore
+import com.duckduckgo.feature.toggles.api.FeatureToggles
 import com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.Experiment
 import com.duckduckgo.feature.toggles.api.Toggle.InternalAlwaysEnabled
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -58,6 +62,26 @@ class ContributesActivePluginPointCodeGeneratorTest {
         val priorityAnnotation = clazz.java.getAnnotation(PriorityKey::class.java)!!
         assertNotNull(priorityAnnotation)
         assertEquals(1000, priorityAnnotation.priority)
+    }
+
+    @Test
+    fun `generated wrapper refuses when the plugin itself is inactive`() = runTest {
+        val remoteFeatureClass = Class
+            .forName("com.duckduckgo.feature.toggles.codegen.SelfDisablingActivePlugin_ActivePlugin_RemoteFeature")
+        val toggle = FeatureToggles.Builder(
+            FakeToggleStore(),
+            featureName = "pluginPointMyPlugin",
+        ).build().create(remoteFeatureClass)
+
+        val pluginToggle = remoteFeatureClass.getMethod("pluginSelfDisablingActivePlugin").invoke(toggle) as Toggle
+        assertTrue(pluginToggle.isEnabled())
+
+        val wrapper = Class
+            .forName("com.duckduckgo.feature.toggles.codegen.SelfDisablingActivePlugin_ActivePlugin")
+            .getConstructor(SelfDisablingActivePlugin::class.java, remoteFeatureClass)
+            .newInstance(SelfDisablingActivePlugin(), toggle) as MyPlugin
+
+        assertFalse(wrapper.isActive())
     }
 
     @Test
