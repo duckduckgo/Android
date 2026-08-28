@@ -21,7 +21,7 @@
     <string name="autoconsentDescription"><![CDATA[DuckDuckGo, mevcut en gizli ayarları seçmeye ve bu açılır pencereleri gizlemeye çalışacaktır.\n<a href=\"\">Daha Fazla Bilgi</a>]]></string>
     <string name="autoconsentToggle">DuckDuckGo\'nun çerez açılır pencereleri için gereken işlemi yapmasına izin verin</string>
     <string name="autoconsentAutoManageToggle">İsteğe bağlı çerezleri reddet</string>
-    <string name="autoconsentAutoManageDescription">Mümkün olduğunca çok sayıda çerezi reddetmeyi hedefleyeceğiz, ardından açılır pencereleri kapatacağız.</string>
+    <string name="autoconsentAutoManageDescription">Mümkün olduğunca çok sayıda çerezi reddetmeyi hedefleyecek ve ardından açılır pencereleri kapatacağız.</string>
     <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[DuckDuckGo, siz daha görmeden gizliliği en üst düzeye çıkarmak ve çerezleri en aza indirmek için çerez açılır pencerelerini otomatik olarak yönetebilir.\n<a href=\"\">Daha Fazla Bilgi</a>]]></string>
     <string name="autoconsentPopUpsWithoutOptOutsToggle">Reddedilemeyen çerezleri kabul et</string>
     <string name="autoconsentPopUpsWithoutOptOutsDescription">Reddetme seçeneği yoksa, sizi bir tıklama zahmetinden kurtarmak için bu çerezleri sizin yerinize kabul edecek ve açılır pencereleri kapatacağız.</string>
