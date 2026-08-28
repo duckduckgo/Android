@@ -25,4 +25,12 @@
     <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[Το DuckDuckGo μπορεί να διαχειρίζεται αυτόματα τα αναδυόμενα παράθυρα cookie για τη μεγιστοποίηση του απορρήτου και την ελαχιστοποίηση των cookie προτού καν τα δεις.\n<a href=\"\">Μάθε περισσότερα</a>]]></string>
     <string name="autoconsentPopUpsWithoutOptOutsToggle">Αποδοχή cookie που δεν μπορούν να απορριφθούν</string>
     <string name="autoconsentPopUpsWithoutOptOutsDescription">Εάν δεν υπάρχει επιλογή απόρριψης, θα σε γλιτώσουμε από ένα κλικ, θα αποδεχτούμε αυτά τα cookie εκ μέρους σου και θα κλείσουμε τα αναδυόμενα παράθυρα.</string>
+    <string name="autoconsentPromptTitle">Σε κούρασαν τα αναδυόμενα παράθυρα για cookie;</string>
+    <string name="autoconsentPromptFootnote">Μπορείς πάντα να το αλλάξεις αργότερα από τις Ρυθμίσεις.</string>
+    <string name="autoconsentPromptCpmOnMessage">Ορισμένα cookie δεν μπορούν να απορριφθούν. Μπορούμε να τα αποδεχόμαστε εκ μέρους σου.</string>
+    <string name="autoconsentPromptCpmOnPrimaryButton">Αποδοχή cookie εκ μέρους μου</string>
+    <string name="autoconsentPromptCpmOnSecondaryButton">Θα τα αποδέχομαι εγώ προσωπικά</string>
+    <string name="autoconsentPromptCpmOffMessage">Επίτρεψέ μας να τα χειριζόμαστε εκ μέρους σου. Θα απορρίπτουμε τα cookie όποτε είναι εφικτό και θα αποδεχόμαστε όσα δεν μπορούν να απορριφθούν.</string>
+    <string name="autoconsentPromptCpmOffPrimaryButton">Απόρριψη αν είναι εφικτό ή αποδοχή εκ μέρους μου</string>
+    <string name="autoconsentPromptCpmOffSecondaryButton">Θα τα χειρίζομαι εγώ προσωπικά</string>
 </resources>
