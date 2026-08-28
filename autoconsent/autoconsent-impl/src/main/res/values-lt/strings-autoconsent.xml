@@ -21,16 +21,16 @@
     <string name="autoconsentDescription"><![CDATA[„DuckDuckGo“ stengsis pasirinkti didžiausią privatumą užtikrinančius nustatymus ir paslėpti šiuos iškylančiuosius langus.\n<a href=\"\">Sužinoti daugiau</a>]]></string>
     <string name="autoconsentToggle">Leiskite „DuckDuckGo“ tvarkyti slapukų iškylančiuosius langus</string>
     <string name="autoconsentAutoManageToggle">Atmesti neprivalomus slapukus</string>
-    <string name="autoconsentAutoManageDescription">Pasistengsime atmesti kuo daugiau slapukų, o tada uždarysime iškylančiuosius langus.</string>
+    <string name="autoconsentAutoManageDescription">Stengsimės už jus atmesti kuo daugiau slapukų ir uždaryti iškylančiuosius langus.</string>
     <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[„DuckDuckGo“ gali automatiškai tvarkyti slapukų iškylančiuosius langus, kad užtikrintų maksimalų privatumą ir sumažintų slapukų skaičių tau jų net nepamačius.\n<a href=\"\">Sužinoti daugiau</a>]]></string>
     <string name="autoconsentPopUpsWithoutOptOutsToggle">Priimti slapukus, kurių negalima atmesti</string>
-    <string name="autoconsentPopUpsWithoutOptOutsDescription">Jei nėra galimybės atmesti, sutaupysime tau paspaudimą – priimsime šiuos slapukus už tave ir uždarysime iškylančiuosius langus.</string>
+    <string name="autoconsentPopUpsWithoutOptOutsDescription">Jei nėra galimybės atmesti, sutaupysime jums spustelėjimą, priimsime šiuos slapukus už jus ir uždarysime iššokančiuosius langus.</string>
     <string name="autoconsentPromptTitle">Atsibodo slapukų iškylantieji langai?</string>
     <string name="autoconsentPromptFootnote">Vėliau visada galėsi tai pakeisti nuostatose.</string>
-    <string name="autoconsentPromptCpmOnMessage">Kai kurių slapukų atmesti negalima. Galime juos priimti už tave.</string>
+    <string name="autoconsentPromptCpmOnMessage">Kai kurių slapukų atmesti negalima. Galime juos priimti už jūs.</string>
     <string name="autoconsentPromptCpmOnPrimaryButton">Priimti slapukus už mane</string>
-    <string name="autoconsentPromptCpmOnSecondaryButton">Priimsiu pats</string>
-    <string name="autoconsentPromptCpmOffMessage">Leisk mums tuo pasirūpinti už tave. Atmesime slapukus, kai tai įmanoma, ir priimsime tuos, kurių atmesti negalima.</string>
+    <string name="autoconsentPromptCpmOnSecondaryButton">Priimsiu savarankiškai</string>
+    <string name="autoconsentPromptCpmOffMessage">Leiskite mums tuo pasirūpinti už jus. Atmesime slapukus, kai tai įmanoma, ir priimsime tuos, kurių atmesti negalima.</string>
     <string name="autoconsentPromptCpmOffPrimaryButton">Atmesti, jei įmanoma, arba priimti už mane</string>
-    <string name="autoconsentPromptCpmOffSecondaryButton">Susitvarkysiu pats</string>
+    <string name="autoconsentPromptCpmOffSecondaryButton">Susitvarkysiu</string>
 </resources>
