@@ -31,6 +31,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.internal.PartnershipsHubUrlProvider
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.settings.views.PartnershipsSettingViewModel.Command.OpenPartnershipsHub
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -40,6 +41,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 class PartnershipsSettingViewModelTest {
@@ -50,11 +52,13 @@ class PartnershipsSettingViewModelTest {
     private val subscriptions: Subscriptions = mock()
     private val urlProvider: PartnershipsHubUrlProvider = mock()
     private val subscriptionsFeature: SubscriptionsFeature = FakeFeatureToggleFactory.create(SubscriptionsFeature::class.java)
+    private val pixelSender: SubscriptionPixelSender = mock()
 
     private fun viewModel() = PartnershipsSettingViewModel(
         subscriptions = subscriptions,
         subscriptionsFeature = subscriptionsFeature,
         partnershipsHubUrlProvider = urlProvider,
+        pixelSender = pixelSender,
         dispatcherProvider = coroutineTestRule.testDispatcherProvider,
     )
 
@@ -126,6 +130,15 @@ class PartnershipsSettingViewModelTest {
             testee.onPartnershipsHubClicked()
             assertEquals(OpenPartnershipsHub("https://duckduckgo.com/partner-benefits"), awaitItem())
         }
+    }
+
+    @Test
+    fun whenOnPartnershipsHubClickedThenPixelFired() = runTest {
+        whenever(urlProvider.partnershipsHubUrl).thenReturn("https://duckduckgo.com/partner-benefits")
+
+        viewModel().onPartnershipsHubClicked()
+
+        verify(pixelSender).reportAppSettingsPartnerBenefitsClick()
     }
 
     private fun activeStatuses(): List<SubscriptionStatus> = listOf(AUTO_RENEWABLE, NOT_AUTO_RENEWABLE, GRACE_PERIOD)

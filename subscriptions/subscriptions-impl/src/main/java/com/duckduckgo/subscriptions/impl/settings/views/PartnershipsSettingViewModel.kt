@@ -27,6 +27,7 @@ import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.internal.PartnershipsHubUrlProvider
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.isActive
 import com.duckduckgo.subscriptions.impl.settings.views.PartnershipsSettingViewModel.Command.OpenPartnershipsHub
 import kotlinx.coroutines.channels.BufferOverflow
@@ -49,6 +50,7 @@ class PartnershipsSettingViewModel @Inject constructor(
     private val subscriptions: Subscriptions,
     private val subscriptionsFeature: SubscriptionsFeature,
     private val partnershipsHubUrlProvider: PartnershipsHubUrlProvider,
+    private val pixelSender: SubscriptionPixelSender,
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel(), DefaultLifecycleObserver {
 
@@ -77,6 +79,8 @@ class PartnershipsSettingViewModel @Inject constructor(
     }
 
     fun onPartnershipsHubClicked() {
+        pixelSender.reportAppSettingsPartnerBenefitsClick()
+
         viewModelScope.launch {
             val url = withContext(dispatcherProvider.io()) { partnershipsHubUrlProvider.partnershipsHubUrl }
             command.send(OpenPartnershipsHub(url))
