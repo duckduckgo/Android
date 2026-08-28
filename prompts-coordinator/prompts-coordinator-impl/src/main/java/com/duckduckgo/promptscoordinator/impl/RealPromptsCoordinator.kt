@@ -159,6 +159,15 @@ class RealPromptsCoordinator @Inject constructor(
         }
     }
 
+    /** Clears the persisted quiet gap so the next claim cannot be refused by it. Internal builds only. */
+    suspend fun resetGap() = withContext(dispatchers.io()) {
+        claimMutex.withLock {
+            lastPromptAt.set(NO_PROMPT)
+            store.edit { it.remove(LAST_PROMPT_AT_KEY) }
+            logcat { "PromptsCoordinator: gap timestamp reset" }
+        }
+    }
+
     private val PromptType.cooldownMillis: Long
         get() = (cooldownMinutes * TimeUnit.MINUTES.toMillis(1)).toLong()
 

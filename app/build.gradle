@@ -327,6 +327,7 @@ dependencies {
 
 	implementation project(":prompts-coordinator-impl")
 	implementation project(":prompts-coordinator-api")
+	internalImplementation project(":prompts-coordinator-internal")
 
     implementation project(':navigation-api')
     implementation project(':navigation-impl')
