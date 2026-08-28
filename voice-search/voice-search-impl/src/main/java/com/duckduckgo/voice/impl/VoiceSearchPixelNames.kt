@@ -30,4 +30,7 @@ enum class VoiceSearchPixelNames(override val pixelName: String) : Pixel.PixelNa
     VOICE_SEARCH_GENERAL_SETTINGS_OFF("m_settings_general_voice_search_off"),
     VOICE_SEARCH_ERROR("m_voice_search_error"),
     VOICE_SEARCH_CANCELLED("m_voice_search_cancelled"),
+    VOICE_SEARCH_ICON_CLICKED("m_voice_search_icon_clicked"),
+    VOICE_SEARCH_MIC_DENIED_DIALOG_SHOWN("m_voice_search_mic_denied_dialog_shown"),
+    VOICE_SEARCH_MIC_DENIED_DIALOG_CLICK("m_voice_search_mic_denied_dialog_click"),
 }
