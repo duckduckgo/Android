@@ -17,11 +17,11 @@
 package com.duckduckgo.app.onboarding.ui.page.configdriven.engine
 
 import com.duckduckgo.app.onboarding.ui.page.OnboardingBackgroundAnimator
-import com.duckduckgo.app.onboarding.ui.page.OnboardingBackgroundStep
+import com.duckduckgo.app.onboarding.ui.page.OnboardingBackground
 
-/** Owns the background axis: which [OnboardingBackgroundStep] image is showing behind the dialog. */
+/** Owns the background axis: which [OnboardingBackground] image is showing behind the dialog. */
 interface BackgroundController {
-    fun apply(previous: OnboardingBackgroundStep?, next: OnboardingBackgroundStep, animate: Boolean)
+    fun apply(previous: OnboardingBackground?, next: OnboardingBackground, animate: Boolean)
     fun skipRunning()
 
     fun release()
@@ -30,11 +30,11 @@ interface BackgroundController {
 class BackgroundControllerImpl(private val animator: OnboardingBackgroundAnimator) : BackgroundController {
 
     /** Set while a transitionTo may still be animating, so [skipRunning] knows there is something to settle. */
-    private var transitioningTo: OnboardingBackgroundStep? = null
+    private var transitioningTo: OnboardingBackground? = null
 
     override fun apply(
-        previous: OnboardingBackgroundStep?,
-        next: OnboardingBackgroundStep,
+        previous: OnboardingBackground?,
+        next: OnboardingBackground,
         animate: Boolean,
     ) {
         if (previous == next) return

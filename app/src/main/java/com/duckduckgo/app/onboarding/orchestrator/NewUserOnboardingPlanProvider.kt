@@ -40,7 +40,7 @@ import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager.Segmen
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.SegmentedOnboardingPath
 import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
-import com.duckduckgo.app.onboarding.ui.page.OnboardingBackgroundStep
+import com.duckduckgo.app.onboarding.ui.page.OnboardingBackground
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
 import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection
@@ -578,7 +578,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 inputScreenStep(
                     ctx,
                     embellishment = Embellishment.BottomWing,
-                    background = OnboardingBackgroundStep.ComparisonChart,
+                    background = OnboardingBackground.Horizon,
                 ),
                 addressBarPositionStep(),
                 inputScreenPreviewStep(
@@ -658,7 +658,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 inputScreenStep(
                     ctx,
                     embellishment = Embellishment.BottomWing,
-                    background = OnboardingBackgroundStep.ComparisonChart,
+                    background = OnboardingBackground.Horizon,
                 ),
                 addressBarPositionStep(),
                 inputScreenPreviewStep(
@@ -1018,7 +1018,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     private fun inputScreenStep(
         ctx: NewUserOnboardingPlanContext,
         embellishment: Embellishment = Embellishment.LeftWing,
-        background: OnboardingBackgroundStep = OnboardingBackgroundStep.InputType,
+        background: OnboardingBackground = OnboardingBackground.Shoreline,
     ): NewUserOnboardingActivityStep {
         val pixelName = OnboardingPixelName.ONBOARDING_SEARCH_EXPERIENCE
         return NewUserOnboardingActivityStep(

@@ -32,48 +32,36 @@ import kotlin.math.roundToInt
 import com.duckduckgo.mobile.android.R as CommonR
 
 /**
- * Per-step configuration for onboarding background images.
+ * Background artwork shown behind onboarding dialogs. Multiple steps may share the same background.
  *
- * @param backgroundRes Drawable resource for this step's background image.
+ * @param backgroundRes Drawable resource for this background image.
  * @param maxHeightDp Maximum display height for the background image, in dp.
  */
-sealed class OnboardingBackgroundStep(
+sealed class OnboardingBackground(
     @DrawableRes val backgroundRes: Int,
     val maxHeightDp: Int,
 ) {
-    data object Welcome : OnboardingBackgroundStep(
+    data object Pond : OnboardingBackground(
         backgroundRes = R.drawable.onboarding_welcome_screen_background,
         maxHeightDp = 404,
     )
-    data object ComparisonChart : OnboardingBackgroundStep(
+    data object Horizon : OnboardingBackground(
         backgroundRes = R.drawable.onboarding_browser_comparison_background,
         maxHeightDp = 216,
     )
-    data object AddWidget : OnboardingBackgroundStep(
-        backgroundRes = R.drawable.onboarding_browser_comparison_background,
-        maxHeightDp = 216,
-    )
-    data object AddToDock : OnboardingBackgroundStep(
-        backgroundRes = R.drawable.onboarding_browser_comparison_background,
-        maxHeightDp = 216,
-    )
-    data object QuickSetup : OnboardingBackgroundStep(
-        backgroundRes = R.drawable.onboarding_browser_comparison_background,
-        maxHeightDp = 216,
+    data object Island : OnboardingBackground(
+        backgroundRes = R.drawable.onboarding_address_bar_background,
+        maxHeightDp = 360,
     )
     data object IslandWithHorizon : OnboardingBackgroundStep(
         backgroundRes = R.drawable.onboarding_island_with_horizon,
         maxHeightDp = 272,
     )
-    data object AddressBar : OnboardingBackgroundStep(
-        backgroundRes = R.drawable.onboarding_address_bar_background,
-        maxHeightDp = 360,
-    )
-    data object InputType : OnboardingBackgroundStep(
+    data object Shoreline : OnboardingBackground(
         backgroundRes = CommonR.drawable.onboarding_input_type_background,
         maxHeightDp = 166,
     )
-    data object PreferenceSelector : OnboardingBackgroundStep(
+    data object Clouds : OnboardingBackground(
         backgroundRes = R.drawable.onboarding_preference_selector_background,
         maxHeightDp = 286,
     )
@@ -111,31 +99,31 @@ class OnboardingBackgroundAnimator(
 
     /**
      * Ensures [view] has the correct scaleType for the current layout and updates its
-     * layout params for the given [step].
+     * layout params for the given [background].
      */
-    private fun configureBackgroundView(view: ImageView, step: OnboardingBackgroundStep) {
+    private fun configureBackgroundView(view: ImageView, background: OnboardingBackground) {
         if (usesFitCenter && view == backgroundPrimary && backgroundPrimary.scaleType != ImageView.ScaleType.FIT_CENTER) {
             backgroundPrimary.scaleType = ImageView.ScaleType.FIT_CENTER
         }
         val density = view.resources.displayMetrics.density
-        view.setImageResource(step.backgroundRes)
+        view.setImageResource(background.backgroundRes)
         view.updateLayoutParams<ConstraintLayout.LayoutParams> {
             constrainedHeight = true
-            matchConstraintMaxHeight = (step.maxHeightDp * density).roundToInt()
+            matchConstraintMaxHeight = (background.maxHeightDp * density).roundToInt()
             verticalBias = 1f
             dimensionRatio = if (usesFitCenter) imageDimensionRatio(view) else null
         }
     }
 
     /**
-     * Transitions the background to the given [step].
+     * Transitions the background to the given [background].
      *
      * Must be called after the view hierarchy has been laid out (e.g., inside [View.doOnLayout]).
      *
      * The current active view exits (slides left + fades) while the new background enters
      * from the right.
      *
-     * @param step The background step to transition to.
+     * @param background The background to transition to.
      * @param enterStartX Optional starting X translation for the entering view. When non-null,
      *   overrides the default off-screen start position. Use this to start from a shorter
      *   distance on large screens.
@@ -143,7 +131,7 @@ class OnboardingBackgroundAnimator(
      * @param onAnimationEnd Callback invoked when the transition animation completes.
      */
     fun transitionTo(
-        step: OnboardingBackgroundStep,
+        background: OnboardingBackground,
         enterStartX: Float? = null,
         onAnimationStarted: () -> Unit = {},
         onAnimationEnd: () -> Unit = {},
@@ -153,7 +141,7 @@ class OnboardingBackgroundAnimator(
         val inView = if (activeView == backgroundPrimary) backgroundSecondary else backgroundPrimary
         val outView = activeView
 
-        configureBackgroundView(inView, step)
+        configureBackgroundView(inView, background)
 
         val screenWidth = inView.rootView.width.toFloat()
 
@@ -183,17 +171,17 @@ class OnboardingBackgroundAnimator(
     }
 
     /**
-     * Immediately sets the background to the given [step] without animation.
+     * Immediately sets the background to the given [background] without animation.
      *
      * Used to restore the correct background state after configuration changes (e.g., rotation).
      */
-    fun snapTo(step: OnboardingBackgroundStep) {
+    fun snapTo(background: OnboardingBackground) {
         cancel()
 
         val inView = if (activeView == backgroundPrimary) backgroundSecondary else backgroundPrimary
         val outView = activeView
 
-        configureBackgroundView(inView, step)
+        configureBackgroundView(inView, background)
 
         inView.translationX = 0f
         inView.alpha = 1f

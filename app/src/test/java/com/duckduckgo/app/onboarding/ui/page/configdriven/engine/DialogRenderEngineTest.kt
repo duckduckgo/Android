@@ -23,7 +23,7 @@ import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
 import com.duckduckgo.app.onboarding.orchestrator.StepProgress
 import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
 import com.duckduckgo.app.onboarding.ui.page.OnboardingBackgroundAnimator
-import com.duckduckgo.app.onboarding.ui.page.OnboardingBackgroundStep
+import com.duckduckgo.app.onboarding.ui.page.OnboardingBackground
 import com.duckduckgo.app.onboarding.ui.page.configdriven.BindScope
 import com.duckduckgo.app.onboarding.ui.page.configdriven.CardArrowConfig
 import com.duckduckgo.app.onboarding.ui.page.configdriven.CardEntry
@@ -89,7 +89,7 @@ class DialogRenderEngineTest {
 
         assertTrue(content.stageReset)
         assertTrue(embellishments.stageReset)
-        assertEquals(null to OnboardingBackgroundStep.ComparisonChart, background.applied)
+        assertEquals(null to OnboardingBackground.Horizon, background.applied)
         assertEquals(null to Embellishment.BottomWing, embellishments.applied)
         assertEquals(null to CardArrowConfig.AtEnd, cardArrow.applied)
         assertEquals(null to StepProgress(current = 1, total = 2), stepIndicator.applied)
@@ -105,7 +105,7 @@ class DialogRenderEngineTest {
 
         assertFalse(content.stageReset)
         assertFalse(embellishments.stageReset)
-        assertEquals(OnboardingBackgroundStep.ComparisonChart to OnboardingBackgroundStep.AddressBar, background.applied)
+        assertEquals(OnboardingBackground.Horizon to OnboardingBackground.Island, background.applied)
         assertEquals(Embellishment.BottomWing to Embellishment.BobbingDax, embellishments.applied)
         assertEquals(
             StepProgress(current = 1, total = 2) to StepProgress(current = 2, total = 2),
@@ -475,7 +475,7 @@ class DialogRenderEngineTest {
         const val WELCOME_STEP: LinearOnboardingStepId = "welcome"
 
         fun welcomeConfig() = DialogConfig(
-            background = OnboardingBackgroundStep.Welcome,
+            background = OnboardingBackground.Pond,
             embellishment = Embellishment.WalkingDax,
             cardArrow = CardArrowConfig.AtStart,
             cardEntry = CardEntry.AfterBackgroundTransition,
@@ -491,7 +491,7 @@ class DialogRenderEngineTest {
         )
 
         fun comparisonConfig() = DialogConfig(
-            background = OnboardingBackgroundStep.ComparisonChart,
+            background = OnboardingBackground.Horizon,
             embellishment = Embellishment.BottomWing,
             cardArrow = CardArrowConfig.AtEnd,
             content = ContentConfig.ComparisonChart(
@@ -506,7 +506,7 @@ class DialogRenderEngineTest {
         )
 
         fun addressBarConfig() = DialogConfig(
-            background = OnboardingBackgroundStep.AddressBar,
+            background = OnboardingBackground.Island,
             embellishment = Embellishment.BobbingDax,
             cardArrow = CardArrowConfig.AtEnd,
             content = ContentConfig.AddressBar(
@@ -646,12 +646,12 @@ private class FakeCardStage(private val record: (String) -> Unit = {}) : CardSta
 
 private class FakeBackgroundController : BackgroundController {
 
-    var applied: Pair<OnboardingBackgroundStep?, OnboardingBackgroundStep>? = null
+    var applied: Pair<OnboardingBackground?, OnboardingBackground>? = null
     var animated = false
     var skipped = false
     var released = false
 
-    override fun apply(previous: OnboardingBackgroundStep?, next: OnboardingBackgroundStep, animate: Boolean) {
+    override fun apply(previous: OnboardingBackground?, next: OnboardingBackground, animate: Boolean) {
         applied = previous to next
         animated = animate
     }

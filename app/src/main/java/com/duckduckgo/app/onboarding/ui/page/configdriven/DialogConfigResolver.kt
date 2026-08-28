@@ -22,7 +22,7 @@ import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityDialo
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
-import com.duckduckgo.app.onboarding.ui.page.OnboardingBackgroundStep
+import com.duckduckgo.app.onboarding.ui.page.OnboardingBackground
 import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 
@@ -44,7 +44,7 @@ class DialogConfigResolver @Inject constructor(
         )
 
         NewUserOnboardingActivityDialog.DownloadReason -> DialogConfig(
-            background = OnboardingBackgroundStep.ComparisonChart,
+            background = OnboardingBackground.Horizon,
             embellishment = Embellishment.BottomWing,
             cardArrow = CardArrowConfig.AtEnd,
             content = ContentConfig.DownloadReason(
@@ -58,7 +58,7 @@ class DialogConfigResolver @Inject constructor(
         )
 
         is NewUserOnboardingActivityDialog.AddressBarPosition -> DialogConfig(
-            background = OnboardingBackgroundStep.AddressBar,
+            background = OnboardingBackground.Island,
             embellishment = Embellishment.BobbingDax,
             cardArrow = CardArrowConfig.AtEnd,
             content = ContentConfig.AddressBar(
@@ -109,7 +109,7 @@ class DialogConfigResolver @Inject constructor(
         )
 
         NewUserOnboardingActivityDialog.AddToDock -> DialogConfig(
-            background = OnboardingBackgroundStep.AddToDock,
+            background = OnboardingBackground.Horizon,
             embellishment = Embellishment.None,
             cardArrow = CardArrowConfig.Hidden,
             content = ContentConfig.AddToDock(
@@ -123,7 +123,7 @@ class DialogConfigResolver @Inject constructor(
         )
 
         NewUserOnboardingActivityDialog.WidgetPrompt -> DialogConfig(
-            background = OnboardingBackgroundStep.AddWidget,
+            background = OnboardingBackground.Horizon,
             embellishment = Embellishment.LeftWing,
             cardArrow = CardArrowConfig.AtEnd,
             content = ContentConfig.WidgetPrompt(
@@ -156,7 +156,7 @@ class DialogConfigResolver @Inject constructor(
         )
 
         is NewUserOnboardingActivityDialog.InputScreenPreview -> DialogConfig(
-            background = OnboardingBackgroundStep.InputType,
+            background = OnboardingBackground.Shoreline,
             embellishment = Embellishment.None,
             cardArrow = CardArrowConfig.Hidden,
             content = ContentConfig.InputScreenPreview(
@@ -169,7 +169,7 @@ class DialogConfigResolver @Inject constructor(
         )
 
         is NewUserOnboardingActivityDialog.QuickSetup -> DialogConfig(
-            background = OnboardingBackgroundStep.QuickSetup,
+            background = OnboardingBackground.Horizon,
             embellishment = Embellishment.BottomWing,
             cardArrow = CardArrowConfig.AtEnd,
             content = ContentConfig.QuickSetup(
@@ -190,7 +190,7 @@ class DialogConfigResolver @Inject constructor(
         )
 
         is NewUserOnboardingActivityDialog.PreferenceSelector -> DialogConfig(
-            background = OnboardingBackgroundStep.PreferenceSelector,
+            background = OnboardingBackground.Clouds,
             embellishment = Embellishment.LeftWing,
             cardArrow = CardArrowConfig.AtStart,
             content = ContentConfig.PreferenceSelector(
@@ -205,7 +205,7 @@ class DialogConfigResolver @Inject constructor(
         )
 
         is NewUserOnboardingActivityDialog.SingleChoice -> DialogConfig(
-            background = OnboardingBackgroundStep.PreferenceSelector,
+            background = OnboardingBackground.Clouds,
             embellishment = Embellishment.LeftWing,
             cardArrow = CardArrowConfig.AtStart,
             content = ContentConfig.SingleChoice(
@@ -220,7 +220,7 @@ class DialogConfigResolver @Inject constructor(
         )
 
         is NewUserOnboardingActivityDialog.TogglePosition -> DialogConfig(
-            background = OnboardingBackgroundStep.ComparisonChart,
+            background = OnboardingBackground.Horizon,
             embellishment = Embellishment.BottomWing,
             cardArrow = CardArrowConfig.AtEnd,
             content = ContentConfig.TogglePosition(
@@ -233,7 +233,7 @@ class DialogConfigResolver @Inject constructor(
         )
 
         is NewUserOnboardingActivityDialog.DuckAiState -> DialogConfig(
-            background = OnboardingBackgroundStep.ComparisonChart,
+            background = OnboardingBackground.Horizon,
             embellishment = Embellishment.BottomWing,
             cardArrow = CardArrowConfig.AtEnd,
             content = ContentConfig.DuckAiState(
@@ -287,7 +287,7 @@ class DialogConfigResolver @Inject constructor(
     }
 
     private fun comparisonChart(chart: ComparisonChartConfig, showEmbellishment: Boolean = true) = DialogConfig(
-        background = OnboardingBackgroundStep.ComparisonChart,
+        background = OnboardingBackground.Horizon,
         embellishment = if (showEmbellishment) Embellishment.BottomWing else Embellishment.None,
         cardArrow = if (showEmbellishment) CardArrowConfig.AtEnd else CardArrowConfig.Hidden,
         content = ContentConfig.ComparisonChart(title = TextConfig.Resource(chart.titleRes), config = chart),
@@ -302,7 +302,7 @@ class DialogConfigResolver @Inject constructor(
         primaryCta: CtaConfig,
         secondaryCta: CtaConfig? = null,
     ) = DialogConfig(
-        background = OnboardingBackgroundStep.Welcome,
+        background = OnboardingBackground.Pond,
         embellishment = Embellishment.WalkingDax,
         cardArrow = CardArrowConfig.AtStart,
         cardEntry = CardEntry.AfterBackgroundTransition,
