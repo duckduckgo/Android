@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <!-- Onboarding body (DuckSans product) at the 14sp the design calls for; no design-system style pairs the two. -->
+    <style name="Typography.DuckDuckGo.CookiePopupOptIn.Hint" parent="Typography.DuckDuckGo.Onboarding.Body">
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <!-- No design-system typography pairs 12sp all-caps with the semibold weight the design calls for. -->
+    <style name="Typography.DuckDuckGo.CookiePopupOptIn.Brand" parent="Typography.DuckDuckGo.Caption.AllCaps">
+        <item name="android:fontFamily">@font/ducksansproduct_medium</item>
+    </style>
+
+    <!--
+      Declared on the activity so the platform keeps drawing the activity behind it: the sheet's rounded
+      top corners show the browser through. DuckDuckGoActivity re-applies the user's light/dark theme at
+      runtime, so only the manifest-parsed translucency flag survives from here; the window background is
+      cleared in code.
+      -->
+    <style name="Theme.DuckDuckGo.CookiePopupOptIn" parent="Theme.DuckDuckGo.Light">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
+</resources>
