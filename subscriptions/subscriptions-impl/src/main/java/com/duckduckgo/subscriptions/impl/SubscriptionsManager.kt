@@ -20,7 +20,6 @@ import android.app.Activity
 import android.content.Context
 import androidx.annotation.VisibleForTesting
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -285,7 +284,6 @@ class RealSubscriptionsManager @Inject constructor(
     private val subscriptionsService: SubscriptionsService,
     private val authRepository: AuthRepository,
     private val playBillingManager: PlayBillingManager,
-    private val emailManager: EmailManager,
     private val context: Context,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,

@@ -8,7 +8,6 @@ import com.android.billingclient.api.ProductDetails.PricingPhase
 import com.android.billingclient.api.ProductDetails.PricingPhases
 import com.android.billingclient.api.ProductDetails.SubscriptionOfferDetails
 import com.android.billingclient.api.Purchase
-import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.FixedLocaleRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
@@ -137,7 +136,6 @@ class RealSubscriptionsManagerTest {
             serializeTokenRefresh().setRawStoredState(State(true))
         }
     private val authRepository = RealAuthRepository(authDataStore, coroutineRule.testDispatcherProvider, serpPromo, { subscriptionsFeature })
-    private val emailManager: EmailManager = mock()
     private val playBillingManager: PlayBillingManager = mock()
     private val context: Context = mock()
     private val pixelSender: SubscriptionPixelSender = mock()
@@ -158,7 +156,6 @@ class RealSubscriptionsManagerTest {
 
     @Before
     fun before() = runTest {
-        whenever(emailManager.getToken()).thenReturn(null)
         whenever(context.packageName).thenReturn("packageName")
         whenever(playBillingManager.purchaseState).thenReturn(flowOf())
         whenever(crossProcessLock.acquire(any(), any())).thenReturn(Result.success(FakeLockHandle()))
@@ -167,7 +164,6 @@ class RealSubscriptionsManagerTest {
             subscriptionsService,
             authRepository,
             playBillingManager,
-            emailManager,
             context,
             TestScope(),
             coroutineRule.testDispatcherProvider,
@@ -633,7 +629,6 @@ class RealSubscriptionsManagerTest {
             subscriptionsService,
             authRepository,
             playBillingManager,
-            emailManager,
             context,
             TestScope(),
             coroutineRule.testDispatcherProvider,
@@ -669,7 +664,6 @@ class RealSubscriptionsManagerTest {
             subscriptionsService,
             authRepository,
             playBillingManager,
-            emailManager,
             context,
             TestScope(),
             coroutineRule.testDispatcherProvider,
@@ -709,7 +703,6 @@ class RealSubscriptionsManagerTest {
             subscriptionsService,
             authRepository,
             playBillingManager,
-            emailManager,
             context,
             TestScope(),
             coroutineRule.testDispatcherProvider,
@@ -763,7 +756,6 @@ class RealSubscriptionsManagerTest {
             subscriptionsService,
             authRepository,
             playBillingManager,
-            emailManager,
             context,
             TestScope(),
             coroutineRule.testDispatcherProvider,
@@ -813,7 +805,6 @@ class RealSubscriptionsManagerTest {
             subscriptionsService,
             authRepository,
             playBillingManager,
-            emailManager,
             context,
             TestScope(),
             coroutineRule.testDispatcherProvider,
@@ -857,7 +848,6 @@ class RealSubscriptionsManagerTest {
             subscriptionsService,
             authRepository,
             playBillingManager,
-            emailManager,
             context,
             TestScope(),
             coroutineRule.testDispatcherProvider,
@@ -894,7 +884,6 @@ class RealSubscriptionsManagerTest {
             subscriptionsService,
             authRepository,
             playBillingManager,
-            emailManager,
             context,
             TestScope(),
             coroutineRule.testDispatcherProvider,
@@ -1242,7 +1231,6 @@ class RealSubscriptionsManagerTest {
             subscriptionsService,
             mockRepo,
             playBillingManager,
-            emailManager,
             context,
             TestScope(),
             coroutineRule.testDispatcherProvider,
@@ -1295,7 +1283,6 @@ class RealSubscriptionsManagerTest {
             subscriptionsService,
             authRepository,
             playBillingManager,
-            emailManager,
             context,
             TestScope(),
             coroutineRule.testDispatcherProvider,
@@ -1651,7 +1638,6 @@ class RealSubscriptionsManagerTest {
             subscriptionsService,
             authRepository,
             playBillingManager,
-            emailManager,
             context,
             TestScope(),
             coroutineRule.testDispatcherProvider,
