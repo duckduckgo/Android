@@ -20,6 +20,11 @@ import androidx.annotation.WorkerThread
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
+import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.pixels.UnifiedDeviceListPixel.AccountInfoKeyCreateFailed
+import com.duckduckgo.sync.impl.pixels.UnifiedDeviceListPixel.AccountInfoKeyCreateFailureReason
+import com.duckduckgo.sync.impl.pixels.UnifiedDeviceListPixel.DeviceInfoWriteFailureReason
+import com.duckduckgo.sync.impl.pixels.UnifiedDeviceListPixel.OwnRowDeviceInfoFirstWriteFailed
 import com.duckduckgo.sync.store.AccountInfoPublicKey
 import com.squareup.anvil.annotations.ContributesBinding
 import logcat.LogPriority.ERROR
@@ -53,6 +58,7 @@ class RealSignupAccountInfoBuilder @Inject constructor(
     private val syncFeature: SyncFeature,
     private val accountInfoKeyManager: AccountInfoKeyManager,
     private val deviceInfoEncryptor: DeviceInfoEncryptor,
+    private val syncPixels: SyncPixels,
 ) : SignupAccountInfoBuilder {
 
     override fun build(accountSecretKey: String, deviceName: String, deviceType: String): SignupAccountInfo? {
@@ -62,6 +68,9 @@ class RealSignupAccountInfoBuilder @Inject constructor(
             is Success -> result.data
             is Error -> {
                 logcat(ERROR) { "Sync-UnifiedDevices: signup account_info mint failed, signing up without it: ${result.reason}" }
+                syncPixels.fireUnifiedDeviceListPixel(
+                    AccountInfoKeyCreateFailed(AccountInfoKeyCreateFailureReason.MINT_FAILED),
+                )
                 return null
             }
         }
@@ -75,6 +84,9 @@ class RealSignupAccountInfoBuilder @Inject constructor(
             is Success -> result.data
             is Error -> {
                 logcat(ERROR) { "Sync-UnifiedDevices: signup device_info encryption failed, signing up without it: ${result.reason}" }
+                syncPixels.fireUnifiedDeviceListPixel(
+                    OwnRowDeviceInfoFirstWriteFailed(DeviceInfoWriteFailureReason.ENCRYPT_FAILED),
+                )
                 return null
             }
         }

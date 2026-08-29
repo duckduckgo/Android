@@ -18,6 +18,7 @@ package com.duckduckgo.sync.impl
 
 import androidx.annotation.WorkerThread
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
 import logcat.LogPriority
 import logcat.LogPriority.WARN
@@ -47,15 +48,33 @@ interface ThirdPartyDeviceListDecryptor {
     }
 }
 
-/**
- * @param thisDeviceInfoUnresolved this device's own row was in the batch but did not resolve via `device_info` — either the server holds no blob
- *   for us or the one it holds can't be decrypted. Only ever set when the read flag is on, since with it off no blob is read at all.
- */
 data class DecryptAllResult(
     val decrypted: List<DecryptedDevice>,
     val undecryptable: List<String>,
-    val thisDeviceInfoUnresolved: Boolean = false,
+    val thisDeviceInfoNeedsRepair: Boolean = false,
+    val keyUnavailableReason: AccountInfoKeyUnavailableReason? = null,
+    val ownDeviceReadOutcome: OwnDeviceReadOutcome? = null,
+    val otherRowFailedDecryptionCredentials: Set<DeviceCredential> = emptySet(),
+    val otherRowPlaceholderCredentials: Set<DeviceCredential> = emptySet(),
 )
+
+sealed interface OwnDeviceReadOutcome {
+    data object ResolvedDeviceInfo : OwnDeviceReadOutcome
+    data class ResolvedLegacy(val reason: DeviceInfoReadFailureReason) : OwnDeviceReadOutcome
+    data class ResolvedPlaceholder(val reason: DeviceInfoReadFailureReason) : OwnDeviceReadOutcome
+}
+
+enum class DeviceInfoReadFailureReason {
+    NOT_PUBLISHED_YET,
+    BLOB_ABSENT,
+    BLOB_DECRYPT_FAILED,
+}
+
+enum class DeviceCredential {
+    DDG,
+    THIRD_PARTY,
+    NONE,
+}
 
 @ContributesBinding(AppScope::class)
 class RealThirdPartyDeviceListDecryptor @Inject constructor(
@@ -63,45 +82,107 @@ class RealThirdPartyDeviceListDecryptor @Inject constructor(
     private val thirdPartyCredentialManager: ThirdPartyCredentialManager,
     private val deviceInfoDecryptor: DeviceInfoDecryptor,
     private val syncFeature: SyncFeature,
+    private val syncStore: SyncStore,
 ) : ThirdPartyDeviceListDecryptor {
 
     override fun decryptAll(entries: List<DeviceV2>, thisDeviceId: String?): DecryptAllResult {
         if (entries.isEmpty()) return DecryptAllResult(emptyList(), emptyList())
 
         val readEnabled = syncFeature.canReadUnifiedDeviceList().isEnabled()
+        // Opening the session even when all blobs are absent distinguishes a missing blob from a key that could not be obtained.
+        val sessionOutcome = if (readEnabled) deviceInfoDecryptor.openSession() else null
+        val session = (sessionOutcome as? DeviceInfoSessionResult.Available)?.session
 
-        val viaDeviceInfo = mutableListOf<DecryptedDevice>()
-        val legacyEntries = mutableListOf<DeviceV2>()
-
-        // a single session can decrypt every device's blob since device_info is encrypted using account-wide account_info key
-        // only open one if the read flag is on and some entry actually carries device_info to decrypt
-        val session = if (readEnabled && entries.any { !it.deviceInfo.isNullOrEmpty() }) openDeviceInfoSession() else null
-
-        entries.forEach { entry ->
-            val resolved = session?.let { decryptDeviceInfo(entry, it) }
-            if (resolved != null) {
-                viaDeviceInfo += resolved
-            } else {
-                // entries it can't resolve (e.g. feature flag off, or undecryptable device_info) fall through to the legacy path
-                legacyEntries += entry
-            }
-        }
-
-        // read flag on ⇒ never auto-logout; undecryptable entries become "Unknown device" placeholders instead
-        val legacy = decryptLegacy(legacyEntries, neverAutoLogout = readEnabled)
+        val viaDeviceInfo = resolveViaDeviceInfo(entries, session)
+        val legacy = decryptLegacy(viaDeviceInfo.unresolved, neverAutoLogout = readEnabled)
 
         logcat(LogPriority.VERBOSE) {
-            "Sync-UnifiedDevices: ${entries.size} devices → ${viaDeviceInfo.size} via device_info, " +
+            "Sync-UnifiedDevices: ${entries.size} devices → ${viaDeviceInfo.resolved.size} via device_info, " +
                 "${legacy.viaLegacy.size} via legacy, ${legacy.fallbacks.size} placeholder, ${legacy.undecryptable.size} undecryptable"
         }
+
+        val ownDeviceReadOutcome = session?.let {
+            ownDeviceReadOutcome(entries, thisDeviceId, viaDeviceInfo.resolved, legacy, viaDeviceInfo.failedDecryptIds)
+        }
+        val credentialsById = otherRowCredentialsById(entries, excludingDeviceId = thisDeviceId)
+
         return DecryptAllResult(
-            decrypted = viaDeviceInfo + legacy.viaLegacy + legacy.fallbacks,
+            decrypted = viaDeviceInfo.resolved + legacy.viaLegacy + legacy.fallbacks,
             undecryptable = legacy.undecryptable,
-            thisDeviceInfoUnresolved = readEnabled &&
-                thisDeviceId != null &&
-                entries.any { it.deviceId == thisDeviceId } &&
-                viaDeviceInfo.none { it.deviceId == thisDeviceId },
+            thisDeviceInfoNeedsRepair = ownDeviceReadOutcome.needsRepair(),
+            keyUnavailableReason = (sessionOutcome as? DeviceInfoSessionResult.Unavailable)?.reason,
+            ownDeviceReadOutcome = ownDeviceReadOutcome,
+            otherRowFailedDecryptionCredentials = viaDeviceInfo.failedDecryptIds.mapNotNull(credentialsById::get).toSet(),
+            otherRowPlaceholderCredentials = legacy.fallbacks.mapNotNull { credentialsById[it.deviceId] }.toSet(),
         )
+    }
+
+    /**
+     * Tries `device_info` for every entry. [unresolved] is everything that must fall through to the legacy path
+     * (no session, blob absent, or blob present but undecryptable). [failedDecryptIds] is only the last of those.
+     */
+    private fun resolveViaDeviceInfo(
+        entries: List<DeviceV2>,
+        session: DeviceInfoDecryptor.Session?,
+    ): DeviceInfoDecryptResult {
+        if (session == null) {
+            return DeviceInfoDecryptResult(resolved = emptyList(), unresolved = entries, failedDecryptIds = emptySet())
+        }
+
+        val resolved = mutableListOf<DecryptedDevice>()
+        val unresolved = mutableListOf<DeviceV2>()
+        val failedDecryptIds = mutableSetOf<String>()
+        entries.forEach { entry ->
+            val device = decryptDeviceInfo(entry, session)
+            if (device != null) {
+                resolved += device
+            } else {
+                if (!entry.deviceInfo.isNullOrEmpty()) {
+                    entry.deviceId?.let(failedDecryptIds::add)
+                }
+                unresolved += entry
+            }
+        }
+        return DeviceInfoDecryptResult(resolved, unresolved, failedDecryptIds)
+    }
+
+    private fun otherRowCredentialsById(
+        entries: List<DeviceV2>,
+        excludingDeviceId: String?,
+    ): Map<String, DeviceCredential> = entries.mapNotNull { entry ->
+        if (entry.deviceId == excludingDeviceId) return@mapNotNull null
+        val id = entry.deviceId ?: return@mapNotNull null
+        val credential = entry.credentialId.toDeviceCredentialOrNull() ?: return@mapNotNull null
+        id to credential
+    }.toMap()
+
+    private fun OwnDeviceReadOutcome?.needsRepair(): Boolean = when (this) {
+        is OwnDeviceReadOutcome.ResolvedLegacy -> reason != DeviceInfoReadFailureReason.NOT_PUBLISHED_YET
+        is OwnDeviceReadOutcome.ResolvedPlaceholder -> reason != DeviceInfoReadFailureReason.NOT_PUBLISHED_YET
+        OwnDeviceReadOutcome.ResolvedDeviceInfo, null -> false
+    }
+
+    private fun ownDeviceReadOutcome(
+        entries: List<DeviceV2>,
+        thisDeviceId: String?,
+        viaDeviceInfo: List<DecryptedDevice>,
+        legacy: LegacyDecryptResult,
+        failedDeviceInfoIds: Set<String>,
+    ): OwnDeviceReadOutcome? {
+        val ownDeviceId = thisDeviceId ?: return null
+        val ownEntry = entries.firstOrNull { it.deviceId == ownDeviceId } ?: return null
+        if (viaDeviceInfo.any { it.deviceId == ownDeviceId }) return OwnDeviceReadOutcome.ResolvedDeviceInfo
+
+        val reason = when {
+            ownEntry.deviceId in failedDeviceInfoIds -> DeviceInfoReadFailureReason.BLOB_DECRYPT_FAILED
+            syncStore.unifiedDeviceListMigratedForUserId == syncStore.userId -> DeviceInfoReadFailureReason.BLOB_ABSENT
+            else -> DeviceInfoReadFailureReason.NOT_PUBLISHED_YET
+        }
+        return if (legacy.viaLegacy.any { it.deviceId == ownDeviceId }) {
+            OwnDeviceReadOutcome.ResolvedLegacy(reason)
+        } else {
+            OwnDeviceReadOutcome.ResolvedPlaceholder(reason)
+        }
     }
 
     private fun decryptDeviceInfo(
@@ -174,15 +255,6 @@ class RealThirdPartyDeviceListDecryptor @Inject constructor(
     private fun List<Pair<DeviceV2, Result<DecryptedDevice>>>.anyThirdPartyFailure(): Boolean =
         any { (entry, result) -> result is Result.Error && entry.credentialId == CREDENTIAL_ID_3PARTY }
 
-    private fun openDeviceInfoSession(): DeviceInfoDecryptor.Session? =
-        when (val result = deviceInfoDecryptor.openSession()) {
-            is Result.Success -> result.data
-            is Result.Error -> {
-                logcat(WARN) { "Sync-UnifiedDevices: device_info session unavailable (code=${result.code}), using legacy: ${result.reason}" }
-                null
-            }
-        }
-
     /**
      * Decides what to do with a device we couldn't decrypt.
      *
@@ -221,6 +293,12 @@ class RealThirdPartyDeviceListDecryptor @Inject constructor(
             type = if (credentialId == CREDENTIAL_ID_3PARTY) ThirdPartyDeviceListDecryptor.FALLBACK_TYPE_3PARTY else null,
         )
 
+    private data class DeviceInfoDecryptResult(
+        val resolved: List<DecryptedDevice>,
+        val unresolved: List<DeviceV2>,
+        val failedDecryptIds: Set<String>,
+    )
+
     /**
      * Outcome of the legacy per-credential pass, split so the caller can report and merge each bucket.
      * [viaLegacy] decrypted successfully; [fallbacks] rendered as an "Unknown device" placeholder; [undecryptable] marked for logout.
@@ -230,6 +308,13 @@ class RealThirdPartyDeviceListDecryptor @Inject constructor(
         val fallbacks: List<DecryptedDevice>,
         val undecryptable: List<String>,
     )
+
+    private fun String?.toDeviceCredentialOrNull(): DeviceCredential? = when (this) {
+        CREDENTIAL_ID_DDG -> DeviceCredential.DDG
+        CREDENTIAL_ID_3PARTY -> DeviceCredential.THIRD_PARTY
+        null -> DeviceCredential.NONE
+        else -> null
+    }
 
     private sealed interface FailureOutcome {
         /** Render an "Unknown device" placeholder row. */

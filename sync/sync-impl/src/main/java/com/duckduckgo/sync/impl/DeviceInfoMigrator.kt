@@ -126,7 +126,12 @@ class RealDeviceInfoMigrator @Inject constructor(
     }
 
     private suspend fun writeDeviceInfo(userId: String): Result<Unit> {
-        return when (val updateResult = deviceInfoUpdater.setThisDeviceName(syncDeviceIds.deviceName())) {
+        return when (
+            val updateResult = deviceInfoUpdater.setThisDeviceName(
+                name = syncDeviceIds.deviceName(),
+                source = DeviceInfoUpdateSource.FIRST_WRITE,
+            )
+        ) {
             is Success -> {
                 markMigrated(userId)
                 logcat { "Sync-UnifiedDevices: migration complete for this device (${updateResult.data.size} devices_v2 returned)" }

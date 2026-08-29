@@ -21,6 +21,9 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
+import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.pixels.UnifiedDeviceListPixel
+import com.duckduckgo.sync.impl.pixels.toAccountInfoKeyWrapFailureReason
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.withContext
@@ -49,6 +52,7 @@ class RealLoginDeviceInfoWriter @Inject constructor(
     private val nativeLib: SyncLib,
     private val deviceInfoMigrator: DeviceInfoMigrator,
     private val dispatchers: DispatcherProvider,
+    private val syncPixels: SyncPixels,
 ) : LoginDeviceInfoWriter {
 
     /**
@@ -58,7 +62,7 @@ class RealLoginDeviceInfoWriter @Inject constructor(
      *  No-op when the write feature flag is off.
      */
     override suspend fun onLogin(loginResponseKeys: List<ProtectedKeyEntry>?): Result<Unit> = withContext(dispatchers.io()) {
-        if (!syncFeature.canWriteUnifiedDeviceList().isEnabled()) return@withContext Success(Unit)
+        if (!syncFeature.canWriteDeviceInfo()) return@withContext Success(Unit)
         addDdgWrapIfThirdPartyOnly(loginResponseKeys)
         deviceInfoMigrator.ensureMigrated()
     }
@@ -100,6 +104,11 @@ class RealLoginDeviceInfoWriter @Inject constructor(
             is Success -> result.data
             is Error -> {
                 logcat(ERROR) { "Sync-UnifiedDevices: failed to build ddg wrap for account_info: ${result.reason}" }
+                syncPixels.fireUnifiedDeviceListPixel(
+                    UnifiedDeviceListPixel.AccountInfoKeyWrapFailed(
+                        UnifiedDeviceListPixel.AccountInfoKeyWrapFailureReason.UNWRAP_FAILED,
+                    ),
+                )
                 return
             }
         }
@@ -107,8 +116,30 @@ class RealLoginDeviceInfoWriter @Inject constructor(
         // Add the missing ddg wrap via set-if-absent, reusing the existing key's kid.
         // Best-effort; any failure just leaves this device's reads degraded until the key converges; it never blocks the device_info write below.
         when (val result = syncApi.setKeysIfAbsent(token, SYNC_PURPOSE_ACCOUNT_INFO, listOf(ddgEntry))) {
-            is Success -> logcat { "Sync-UnifiedDevices: added ddg wrap for account_info (kid=${threeParty.kid}); set-if-absent → ${result.data}" }
-            is Error -> logcat(ERROR) { "Sync-UnifiedDevices: set-if-absent of ddg account_info wrap failed: ${result.reason}" }
+            is Success -> when (result.data) {
+                SetKeysIfAbsentResult.Created -> {
+                    logcat { "Sync-UnifiedDevices: added ddg wrap for account_info (kid=${threeParty.kid})" }
+                    syncPixels.fireUnifiedDeviceListPixel(UnifiedDeviceListPixel.AccountInfoKeyWrapSuccess)
+                }
+                // 200: this encrypted_with was already stored; this device did not add a wrap
+                is SetKeysIfAbsentResult.Existing -> {
+                    logcat { "Sync-UnifiedDevices: ddg account_info wrap already present (kid=${threeParty.kid})" }
+                }
+                SetKeysIfAbsentResult.ExistsFetchRequired -> {
+                    logcat(ERROR) { "Sync-UnifiedDevices: server rejected the ddg account_info wrap" }
+                    syncPixels.fireUnifiedDeviceListPixel(
+                        UnifiedDeviceListPixel.AccountInfoKeyWrapFailed(
+                            UnifiedDeviceListPixel.AccountInfoKeyWrapFailureReason.REQUEST_FAILED,
+                        ),
+                    )
+                }
+            }
+            is Error -> {
+                logcat(ERROR) { "Sync-UnifiedDevices: set-if-absent of ddg account_info wrap failed: ${result.reason}" }
+                syncPixels.fireUnifiedDeviceListPixel(
+                    UnifiedDeviceListPixel.AccountInfoKeyWrapFailed(result.toAccountInfoKeyWrapFailureReason()),
+                )
+            }
         }
     }
 

@@ -22,6 +22,8 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.TestSyncFixtures.token
+import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.pixels.UnifiedDeviceListPixel
 import com.duckduckgo.sync.store.AccountInfoPublicKey
 import com.duckduckgo.sync.store.SyncStore
 import kotlinx.coroutines.test.runTest
@@ -37,6 +39,7 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @SuppressLint("DenyListedApi")
@@ -50,6 +53,7 @@ class DeviceInfoUpdaterTest {
     private val deviceFieldEncryptor: DeviceFieldEncryptor = mock()
     private val accountInfoKeyManager: AccountInfoKeyManager = mock()
     private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
+    private val syncPixels: SyncPixels = mock()
 
     @get:Rule
     val coroutineTestRule = CoroutineTestRule()
@@ -71,6 +75,7 @@ class DeviceInfoUpdaterTest {
             accountInfoKeyManager = accountInfoKeyManager,
             syncFeature = syncFeature,
             dispatchers = coroutineTestRule.testDispatcherProvider,
+            syncPixels = syncPixels,
         )
         syncFeature.canWriteUnifiedDeviceList().setRawStoredState(State(enable = true))
         whenever(syncStore.token).thenReturn(token)
@@ -86,16 +91,26 @@ class DeviceInfoUpdaterTest {
         whenever(syncApi.patchThisDevice(token, "encName", "encType", "device.info.jwe"))
             .thenReturn(Result.Success(PatchDevicesResponse(devicesV2 = updatedDevices)))
 
-        val result = updater.setThisDeviceName("My Phone")
+        val result = updater.setThisDeviceName(name = "My Phone", source = DeviceInfoUpdateSource.UPDATE)
 
         assertEquals(Result.Success(updatedDevices), result)
+        verify(syncPixels).fireUnifiedDeviceListPixel(UnifiedDeviceListPixel.OwnRowDeviceInfoUpdateSuccess)
+    }
+
+    @Test
+    fun whenNoProductionSourceIsProvidedThenNoUnifiedDevicePixelFires() = runTest {
+        givenEncryptionAndPatchSucceed()
+
+        updater.setThisDeviceName(name = "My Phone")
+
+        verifyNoInteractions(syncPixels)
     }
 
     @Test
     fun whenUpdateSucceedsThenStoreTheNewNameLocally() = runTest {
         givenEncryptionAndPatchSucceed()
 
-        updater.setThisDeviceName("My Phone")
+        updater.setThisDeviceName(name = "My Phone")
 
         verify(syncStore).deviceName = "My Phone"
     }
@@ -104,7 +119,7 @@ class DeviceInfoUpdaterTest {
     fun whenNotSignedInThenErrorWithoutEncrypting() = runTest {
         whenever(syncStore.token).thenReturn(null)
 
-        assertTrue(updater.setThisDeviceName("My Phone") is Result.Error)
+        assertTrue(updater.setThisDeviceName(name = "My Phone") is Result.Error)
         verify(deviceInfoEncryptor, never()).encrypt(any(), any())
     }
 
@@ -112,7 +127,7 @@ class DeviceInfoUpdaterTest {
     fun whenAccountInfoPublicKeyIsCachedThenNoKeyRegistration() = runTest {
         givenEncryptionAndPatchSucceed()
 
-        updater.setThisDeviceName("My Phone")
+        updater.setThisDeviceName(name = "My Phone")
 
         verify(accountInfoKeyManager, never()).ensureKeyRegistered()
     }
@@ -123,7 +138,7 @@ class DeviceInfoUpdaterTest {
         whenever(accountInfoKeyManager.ensureKeyRegistered()).thenReturn(Result.Success(keyRegistered))
         givenEncryptionAndPatchSucceed()
 
-        val result = updater.setThisDeviceName("My Phone")
+        val result = updater.setThisDeviceName(name = "My Phone")
 
         assertTrue(result is Result.Success)
         verify(accountInfoKeyManager).ensureKeyRegistered()
@@ -135,7 +150,7 @@ class DeviceInfoUpdaterTest {
         whenever(syncStore.accountInfoPublicKey).thenReturn(null)
         whenever(accountInfoKeyManager.ensureKeyRegistered()).thenReturn(Result.Error(reason = "no account secret key"))
 
-        assertTrue(updater.setThisDeviceName("My Phone") is Result.Error)
+        assertTrue(updater.setThisDeviceName(name = "My Phone") is Result.Error)
         verify(deviceInfoEncryptor, never()).encrypt(any(), any())
         verify(syncApi, never()).patchThisDevice(any(), any(), any(), any())
     }
@@ -144,8 +159,11 @@ class DeviceInfoUpdaterTest {
     fun whenDeviceInfoEncryptionFailsThenErrorWithoutPatching() = runTest {
         whenever(deviceInfoEncryptor.encrypt(any(), any())).thenReturn(Result.Error(reason = "no cached account_info key"))
 
-        assertTrue(updater.setThisDeviceName("My Phone") is Result.Error)
+        assertTrue(updater.setThisDeviceName(name = "My Phone", source = DeviceInfoUpdateSource.REPAIR) is Result.Error)
         verify(syncApi, never()).patchThisDevice(any(), any(), any(), any())
+        verify(syncPixels).fireUnifiedDeviceListPixel(
+            UnifiedDeviceListPixel.OwnRowDeviceInfoRepairFailed(UnifiedDeviceListPixel.DeviceInfoWriteFailureReason.ENCRYPT_FAILED),
+        )
     }
 
     @Test
@@ -153,7 +171,7 @@ class DeviceInfoUpdaterTest {
         whenever(deviceInfoEncryptor.encrypt(any(), any())).thenReturn(Result.Success("device.info.jwe"))
         whenever(deviceFieldEncryptor.encrypt(any(), any())).thenReturn(Result.Error(reason = "primaryKey missing"))
 
-        assertTrue(updater.setThisDeviceName("My Phone") is Result.Error)
+        assertTrue(updater.setThisDeviceName(name = "My Phone") is Result.Error)
         verify(syncApi, never()).patchThisDevice(any(), any(), any(), any())
     }
 
@@ -165,8 +183,22 @@ class DeviceInfoUpdaterTest {
         whenever(syncApi.patchThisDevice(any(), any(), any(), any()))
             .thenReturn(Result.Error(code = 500, reason = "unexpected status code"))
 
-        assertEquals(Result.Error(code = 500, reason = "unexpected status code"), updater.setThisDeviceName("My Phone"))
+        assertEquals(Result.Error(code = 500, reason = "unexpected status code"), updater.setThisDeviceName(name = "My Phone"))
         verify(syncStore, never()).deviceName = any()
+    }
+
+    @Test
+    fun whenFirstWritePatchIsRateLimitedThenFirstWriteRateLimitedPixelFires() = runTest {
+        whenever(deviceInfoEncryptor.encrypt(any(), any())).thenReturn(Result.Success("device.info.jwe"))
+        whenever(deviceFieldEncryptor.encrypt(any(), any()))
+            .thenReturn(Result.Success(EncryptedDeviceFields(name = "encName", type = "encType")))
+        whenever(syncApi.patchThisDevice(any(), any(), any(), any())).thenReturn(Result.Error(code = 429))
+
+        updater.setThisDeviceName(name = "My Phone", source = DeviceInfoUpdateSource.FIRST_WRITE)
+
+        verify(syncPixels).fireUnifiedDeviceListPixel(
+            UnifiedDeviceListPixel.OwnRowDeviceInfoFirstWriteFailed(UnifiedDeviceListPixel.DeviceInfoWriteFailureReason.RATE_LIMITED),
+        )
     }
 
     @Test
@@ -174,7 +206,7 @@ class DeviceInfoUpdaterTest {
         syncFeature.canWriteUnifiedDeviceList().setRawStoredState(State(enable = false))
         givenEncryptionAndPatchSucceed()
 
-        val result = updater.setThisDeviceName("My Phone")
+        val result = updater.setThisDeviceName(name = "My Phone")
 
         assertTrue(result is Result.Success)
         verify(syncApi).patchThisDevice(token, "encName", "encType", null)
@@ -187,7 +219,7 @@ class DeviceInfoUpdaterTest {
         whenever(syncStore.accountInfoPublicKey).thenReturn(null)
         givenEncryptionAndPatchSucceed()
 
-        updater.setThisDeviceName("My Phone")
+        updater.setThisDeviceName(name = "My Phone")
 
         verify(accountInfoKeyManager, never()).ensureKeyRegistered()
         verify(deviceInfoEncryptor, never()).encrypt(any(), any())
@@ -201,7 +233,7 @@ class DeviceInfoUpdaterTest {
         whenever(syncApi.patchThisDevice(any(), any(), any(), anyOrNull()))
             .thenReturn(Result.Error(code = 500, reason = "unexpected status code"))
 
-        assertTrue(updater.setThisDeviceName("My Phone") is Result.Error)
+        assertTrue(updater.setThisDeviceName(name = "My Phone") is Result.Error)
         verify(syncStore, never()).deviceName = any()
     }
 
@@ -211,7 +243,7 @@ class DeviceInfoUpdaterTest {
         whenever(syncStore.accountInfoPublicKey).thenReturn(null)
         givenEncryptionAndPatchSucceed()
 
-        val result = updater.setThisDeviceName("My Phone")
+        val result = updater.setThisDeviceName(name = "My Phone")
 
         assertTrue(result is Result.Success)
         verify(syncApi).patchThisDevice(token, "encName", "encType", null)
@@ -222,7 +254,7 @@ class DeviceInfoUpdaterTest {
     fun whenWriteFeatureEnabledThenSendDeviceInfoAlongsideTheLegacyFields() = runTest {
         givenEncryptionAndPatchSucceed()
 
-        updater.setThisDeviceName("My Phone")
+        updater.setThisDeviceName(name = "My Phone")
 
         verify(syncApi).patchThisDevice(token, "encName", "encType", "device.info.jwe")
     }
@@ -232,7 +264,7 @@ class DeviceInfoUpdaterTest {
         whenever(syncDeviceIds.deviceType()).thenReturn(DeviceType("desktop"))
         givenEncryptionAndPatchSucceed()
 
-        updater.setThisDeviceName("My Laptop")
+        updater.setThisDeviceName(name = "My Laptop")
 
         verify(deviceInfoEncryptor).encrypt(eq("My Laptop"), eq("desktop"))
         verify(deviceFieldEncryptor).encrypt(eq("My Laptop"), eq("desktop"))
