@@ -27,9 +27,11 @@ import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
-class NativeCrashDumpPlugin @Inject constructor() : CrashAnrDevCapabilityPlugin {
-    override fun title(): String = R.string.crashpad_crashdump_plugin_title.toString()
-    override fun subtitle(): String = R.string.crashpad_crashdump_plugin_subtitle.toString()
+class NativeCrashDumpPlugin @Inject constructor(
+    private val context: Context,
+) : CrashAnrDevCapabilityPlugin {
+    override fun title(): String = context.getString(R.string.crashpad_crashdump_plugin_title)
+    override fun subtitle(): String = context.getString(R.string.crashpad_crashdump_plugin_subtitle)
     override fun onCapabilityClicked(activityContext: Context) {
         Crashpad.dumpWithoutCrash()
     }
@@ -37,9 +39,11 @@ class NativeCrashDumpPlugin @Inject constructor() : CrashAnrDevCapabilityPlugin 
 
 @ContributesMultibinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
-class NativeCrashTriggerPlugin @Inject constructor() : CrashAnrDevCapabilityPlugin {
-    override fun title(): String = R.string.crashpad_trigger_plugin_title.toString()
-    override fun subtitle(): String = R.string.crashpad_trigger_plugin_subtitle.toString()
+class NativeCrashTriggerPlugin @Inject constructor(
+    private val context: Context,
+) : CrashAnrDevCapabilityPlugin {
+    override fun title(): String = context.getString(R.string.crashpad_trigger_plugin_title)
+    override fun subtitle(): String = context.getString(R.string.crashpad_trigger_plugin_subtitle)
     override fun onCapabilityClicked(activityContext: Context) {
         Crashpad.crash()
     }
@@ -47,9 +51,11 @@ class NativeCrashTriggerPlugin @Inject constructor() : CrashAnrDevCapabilityPlug
 
 @ContributesMultibinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
-class NativeCrashUploadPlugin @Inject constructor() : CrashAnrDevCapabilityPlugin {
-    override fun title(): String = R.string.crashpad_upload_plugin_title.toString()
-    override fun subtitle(): String = R.string.crashpad_upload_plugin_subtitle.toString()
+class NativeCrashUploadPlugin @Inject constructor(
+    private val context: Context,
+) : CrashAnrDevCapabilityPlugin {
+    override fun title(): String = context.getString(R.string.crashpad_upload_plugin_title)
+    override fun subtitle(): String = context.getString(R.string.crashpad_upload_plugin_subtitle)
     override fun onCapabilityClicked(activityContext: Context) {
         val count = Crashpad.requestUploadForPendingReports()
         android.widget.Toast.makeText(
