@@ -32,6 +32,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import logcat.LogPriority.ERROR
+import logcat.asLog
 import logcat.logcat
 import javax.inject.Inject
 
@@ -99,23 +100,28 @@ class NativeCrashInit @Inject constructor(
         if (isMainProcess && !nativeCrashFeature.nativeCrashHandling().isEnabled()) return
         if (!isMainProcess && !nativeCrashFeature.nativeCrashHandlingSecondaryProcess().isEnabled()) return
 
-        val initialized = crashpadInitializer.initialize(
-            extraAnnotations = mapOf(
-                "customTab" to "$isCustomTab",
-                "webViewPackage" to webViewPackage,
-                "webViewVersion" to webViewVersion,
-            ),
-            onCrash = {
-                pixel.enqueueFire(
-                    APPLICATION_CRASH_NATIVE,
-                    mapOf(
-                        "v" to "${appBuildConfig.versionName}-${appBuildConfig.flavor}",
-                        "pn" to processName,
-                        "customTab" to "$isCustomTab",
-                    ),
-                )
-            },
-        )
+        val initialized = runCatching {
+            crashpadInitializer.initialize(
+                extraAnnotations = mapOf(
+                    "customTab" to "$isCustomTab",
+                    "webViewPackage" to webViewPackage,
+                    "webViewVersion" to webViewVersion,
+                ),
+                onCrash = {
+                    pixel.enqueueFire(
+                        APPLICATION_CRASH_NATIVE,
+                        mapOf(
+                            "v" to "${appBuildConfig.versionName}-${appBuildConfig.flavor}",
+                            "pn" to processName,
+                            "customTab" to "$isCustomTab",
+                        ),
+                    )
+                },
+            )
+        }.onFailure {
+            logcat(ERROR) { "ndk-crash: error initializing Crashpad: ${it.asLog()}" }
+        }.getOrDefault(false)
+
         if (initialized) {
             pixel.fire(
                 APPLICATION_CRASH_NATIVE_HANDLER_REGISTERED,
