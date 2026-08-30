@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.anr.ndk
 
-import android.util.Log
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.anr.CrashPixel.APPLICATION_CRASH_NATIVE
 import com.duckduckgo.app.anr.CrashPixel.APPLICATION_CRASH_NATIVE_HANDLER_REGISTERED
@@ -27,16 +26,12 @@ import com.duckduckgo.app.lifecycle.PirProcessLifecycleObserver
 import com.duckduckgo.app.lifecycle.VpnProcessLifecycleObserver
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.browser.api.WebViewVersionProvider
-import com.duckduckgo.common.utils.checkMainThread
 import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.library.loader.LibraryLoader.LibraryLoaderListener
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import logcat.LogPriority.ERROR
-import logcat.asLog
 import logcat.logcat
 import javax.inject.Inject
 
@@ -62,7 +57,7 @@ class NativeCrashInit @Inject constructor(
     private val pixel: Pixel,
     @param:ProcessName private val processName: String,
     private val crashpadInitializer: CrashpadInitializer,
-) : MainProcessLifecycleObserver, VpnProcessLifecycleObserver, LibraryLoaderListener, PirProcessLifecycleObserver {
+) : MainProcessLifecycleObserver, VpnProcessLifecycleObserver, PirProcessLifecycleObserver {
 
     private val isCustomTab: Boolean by lazy { customTabDetector.isCustomTab() }
 
@@ -76,19 +71,9 @@ class NativeCrashInit @Inject constructor(
 
     private val webViewPackage: String by lazy { webViewVersionProvider.getPackageName() }
 
-    private external fun jni_register_sighandler(
-        logLevel: Int,
-        appVersion: String,
-        processName: String,
-        isCustomTab: Boolean,
-        webViewPackage: String,
-        webViewVersion: String,
-    )
-
     override fun onCreate(owner: LifecycleOwner) {
         if (isMainProcess) {
             initCrashpad()
-            // asyncLoadNativeLibrary()
         } else {
             logcat(ERROR) { "ndk-crash: onCreate wrongly called in a secondary process" }
         }
@@ -97,7 +82,6 @@ class NativeCrashInit @Inject constructor(
     override fun onVpnProcessCreated() {
         if (!isMainProcess) {
             initCrashpad()
-            // asyncLoadNativeLibrary()
         } else {
             logcat(ERROR) { "ndk-crash: onVpnProcessCreated wrongly called in the main process" }
         }
@@ -106,40 +90,10 @@ class NativeCrashInit @Inject constructor(
     override fun onPirProcessCreated() {
         if (!isMainProcess) {
             initCrashpad()
-            // asyncLoadNativeLibrary()
         } else {
             logcat(ERROR) { "ndk-crash: onPirProcessCreated wrongly called in the main process" }
         }
     }
-
-    override fun success() {
-        // do not call on main thread
-        checkMainThread()
-
-        runCatching {
-            logcat(ERROR) { "ndk-crash: Library loaded in process $processName" }
-
-            if (isMainProcess && !nativeCrashFeature.nativeCrashHandling().isEnabled()) return
-            if (!isMainProcess && !nativeCrashFeature.nativeCrashHandlingSecondaryProcess().isEnabled()) return
-
-            val logLevel = if (appBuildConfig.isDebug || appBuildConfig.isInternalBuild()) {
-                Log.VERBOSE
-            } else {
-                Log.ASSERT
-            }
-            jni_register_sighandler(logLevel, appBuildConfig.versionName, processName, isCustomTab, webViewPackage, webViewVersion)
-        }.onFailure {
-            logcat(ERROR) { "ndk-crash: Error calling jni_register_sighandler: ${it.asLog()}" }
-        }
-    }
-
-    override fun failure(t: Throwable) {
-        logcat(ERROR) { "ndk-crash: error loading library in process $processName: ${t?.asLog()}" }
-    }
-
-    // private fun asyncLoadNativeLibrary() {
-    //     LibraryLoader.loadLibrary(context, "crash-ndk", this)
-    // }
 
     private fun initCrashpad() {
         if (isMainProcess && !nativeCrashFeature.nativeCrashHandling().isEnabled()) return
