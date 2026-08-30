@@ -97,7 +97,7 @@ dependencies {
 
     api("org.jetbrains.kotlinx:kotlinx-collections-immutable:_")
 
-    api lintChecks("com.slack.lint.compose:compose-lint-checks:_")
+    lintChecks("com.slack.lint.compose:compose-lint-checks:_")
 
     // Lottie
     implementation "com.airbnb.android:lottie:_"
