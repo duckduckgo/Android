@@ -45,6 +45,7 @@ class NativeCrashInitTest {
     private val mockCrashpadInitializer: CrashpadInitializer = mock()
     private val mockLifecycleOwner: LifecycleOwner = mock()
     private val mockToggle: Toggle = mock()
+    private val mockEnabledToggle: Toggle = mock()
 
     @Before
     fun setup() {
@@ -55,7 +56,10 @@ class NativeCrashInitTest {
         whenever(mockWebViewVersionProvider.getMajorVersion()).thenReturn("120")
         whenever(mockWebViewVersionProvider.getPackageName()).thenReturn("com.google.android.webview")
         whenever(mockToggle.isEnabled()).thenReturn(false)
+        whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
         whenever(mockNativeCrashFeature.nativeCrashReportsFullWebViewVersion()).thenReturn(mockToggle)
+        whenever(mockNativeCrashFeature.nativeCrashHandling()).thenReturn(mockEnabledToggle)
+        whenever(mockNativeCrashFeature.nativeCrashHandlingSecondaryProcess()).thenReturn(mockEnabledToggle)
         whenever(mockCrashpadInitializer.initialize(any(), anyOrNull())).thenReturn(true)
     }
 
@@ -94,6 +98,29 @@ class NativeCrashInitTest {
     @Test
     fun `onPirProcessCreated skips Crashpad init in main process`() {
         buildNativeCrashInit(isMainProcess = true).onPirProcessCreated()
+        verify(mockCrashpadInitializer, never()).initialize(any(), anyOrNull())
+    }
+
+    // ── Feature toggles ───────────────────────────────────────────────────────
+
+    @Test
+    fun `onCreate skips Crashpad init when main process toggle disabled`() {
+        whenever(mockNativeCrashFeature.nativeCrashHandling()).thenReturn(mockToggle)
+        buildNativeCrashInit(isMainProcess = true).onCreate(mockLifecycleOwner)
+        verify(mockCrashpadInitializer, never()).initialize(any(), anyOrNull())
+    }
+
+    @Test
+    fun `onVpnProcessCreated skips Crashpad init when secondary process toggle disabled`() {
+        whenever(mockNativeCrashFeature.nativeCrashHandlingSecondaryProcess()).thenReturn(mockToggle)
+        buildNativeCrashInit(isMainProcess = false).onVpnProcessCreated()
+        verify(mockCrashpadInitializer, never()).initialize(any(), anyOrNull())
+    }
+
+    @Test
+    fun `onPirProcessCreated skips Crashpad init when secondary process toggle disabled`() {
+        whenever(mockNativeCrashFeature.nativeCrashHandlingSecondaryProcess()).thenReturn(mockToggle)
+        buildNativeCrashInit(isMainProcess = false).onPirProcessCreated()
         verify(mockCrashpadInitializer, never()).initialize(any(), anyOrNull())
     }
 

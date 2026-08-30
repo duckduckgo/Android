@@ -142,6 +142,9 @@ class NativeCrashInit @Inject constructor(
     // }
 
     private fun initCrashpad() {
+        if (isMainProcess && !nativeCrashFeature.nativeCrashHandling().isEnabled()) return
+        if (!isMainProcess && !nativeCrashFeature.nativeCrashHandlingSecondaryProcess().isEnabled()) return
+
         val initialized = crashpadInitializer.initialize(
             extraAnnotations = mapOf(
                 "customTab" to "$isCustomTab",
