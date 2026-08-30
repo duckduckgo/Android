@@ -140,6 +140,13 @@ class NativeCrashInitTest {
         verify(mockPixel, never()).fire(eq(APPLICATION_CRASH_NATIVE_HANDLER_REGISTERED), any(), any(), any())
     }
 
+    @Test
+    fun `initializer throwing does not propagate and no pixel is fired`() {
+        whenever(mockCrashpadInitializer.initialize(any(), anyOrNull())).thenThrow(UnsatisfiedLinkError("boom"))
+        buildNativeCrashInit().onCreate(mockLifecycleOwner)
+        verify(mockPixel, never()).fire(eq(APPLICATION_CRASH_NATIVE_HANDLER_REGISTERED), any(), any(), any())
+    }
+
     // ── onCrash pixel ─────────────────────────────────────────────────────────
 
     @Test
