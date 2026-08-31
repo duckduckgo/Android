@@ -43,9 +43,9 @@ class AdBlockingStateReporterTest {
     private val reporter = AdBlockingStateReporter(statusChecker, pixel, coroutineRule.testScope)
 
     @Test
-    fun whenCanInjectAndUserEnabledThenBothParamsTrue() {
+    fun whenCanInjectAndEnabledWithPixelConsentThenBothParamsTrue() {
         whenever(statusChecker.observeCanInject()).thenReturn(flowOf(true))
-        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.UserEnabled))
+        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.WithPixelConsent))
 
         reporter.onResume(owner)
 
@@ -71,9 +71,9 @@ class AdBlockingStateReporterTest {
     }
 
     @Test
-    fun whenEnabledFromOnboardingThenIsEnabledTrueButAnalyticsFalse() {
+    fun whenEnabledWithoutPixelConsentThenIsEnabledTrueButAnalyticsFalse() {
         whenever(statusChecker.observeCanInject()).thenReturn(flowOf(true))
-        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.FromOnboarding))
+        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.WithoutPixelConsent))
 
         reporter.onResume(owner)
 
@@ -87,7 +87,7 @@ class AdBlockingStateReporterTest {
     @Test
     fun whenUserOptedInButRemoteConfigGatesInjectionThenIsEnabledFalseButAnalyticsTrue() {
         whenever(statusChecker.observeCanInject()).thenReturn(flowOf(false))
-        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.UserEnabled))
+        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.WithPixelConsent))
 
         reporter.onResume(owner)
 

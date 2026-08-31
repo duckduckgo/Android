@@ -36,7 +36,7 @@ import javax.inject.Inject
  * The EventHub pipeline fires `webTelemetry_youTube*` pixels for every user for whom the feature is
  * remotely active, based on detection events sent by Content-Scope-Scripts.
  * This interceptor only sends pixels for users who have explicitly opted in
- * ([AdBlockingState.Enabled.UserEnabled]) — not for users enabled by the rollout
+ * ([AdBlockingState.Enabled.WithPixelConsent]) — not for users enabled by the rollout
  * default, nor users with the feature off.
  *
  * TODO: This native-side gate is a temporary workaround. Remove this interceptor once C-S-S honours
@@ -55,7 +55,7 @@ class AdBlockingTelemetryPixelInterceptor @Inject constructor(
         val pixelName = chain.request().url.pathSegments.last()
 
         if (pixelName.startsWith(YOUTUBE_TELEMETRY_PIXEL_PREFIX, ignoreCase = true)) {
-            if (statusChecker.currentState() !is AdBlockingState.Enabled.UserEnabled) {
+            if (statusChecker.currentState() !is AdBlockingState.Enabled.WithPixelConsent) {
                 logcat(INFO) { "Ad blocking telemetry pixel dropped (no explicit consent): $pixelName" }
                 return dummyResponse(chain)
             }

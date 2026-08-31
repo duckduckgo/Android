@@ -53,18 +53,18 @@ class RealAdBlockingMenuControllerTest {
     val coroutineRule = CoroutineTestRule()
 
     private val userEnabledFlow = MutableStateFlow<Boolean?>(true)
-    private val fromOnboardingFlow = MutableStateFlow(false)
+    private val pixelConsentFlow = MutableStateFlow(true)
     private val settingsRepository = object : AdBlockingSettingsRepository {
         override fun isEnabledFlow(): Flow<Boolean?> = userEnabledFlow
-        override fun isFromOnboardingFlow(): Flow<Boolean> = fromOnboardingFlow
-        override suspend fun setEnabled(enabled: Boolean, fromOnboarding: Boolean) {
+        override fun hasPixelConsentFlow(): Flow<Boolean> = pixelConsentFlow
+        override suspend fun setEnabled(enabled: Boolean, withPixelConsent: Boolean) {
             userEnabledFlow.value = enabled
-            fromOnboardingFlow.value = fromOnboarding
+            pixelConsentFlow.value = withPixelConsent
         }
     }
     private val sessionStore = RealAdBlockingSessionStore()
     private val statusChecker: AdBlockingStatusChecker = mock {
-        on { currentState() } doReturn AdBlockingState.Enabled.UserEnabled
+        on { currentState() } doReturn AdBlockingState.Enabled.WithPixelConsent
     }
     private val pixel: Pixel = mock()
 
@@ -85,8 +85,8 @@ class RealAdBlockingMenuControllerTest {
     }
 
     @Test
-    fun whenStateIsUserEnabledThenChoiceIsAlwaysOn() {
-        whenever(statusChecker.currentState()).thenReturn(AdBlockingState.Enabled.UserEnabled)
+    fun whenStateIsWithPixelConsentThenChoiceIsAlwaysOn() {
+        whenever(statusChecker.currentState()).thenReturn(AdBlockingState.Enabled.WithPixelConsent)
 
         assertEquals(AdBlockingChoice.ALWAYS_ON, controller.currentChoice())
     }

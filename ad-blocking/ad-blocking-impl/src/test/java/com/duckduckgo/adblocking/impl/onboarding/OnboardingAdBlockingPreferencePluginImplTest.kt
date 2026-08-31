@@ -106,7 +106,7 @@ class OnboardingAdBlockingPreferencePluginImplTest {
 
         testee.apply(false)
 
-        verify(settingsRepository).setEnabled(false, fromOnboarding = true)
+        verify(settingsRepository).setEnabled(false, withPixelConsent = false)
     }
 
     @Test
@@ -115,7 +115,7 @@ class OnboardingAdBlockingPreferencePluginImplTest {
 
         testee.apply(false)
 
-        verify(settingsRepository).setEnabled(false, fromOnboarding = true)
+        verify(settingsRepository).setEnabled(false, withPixelConsent = false)
     }
 
     @Test
@@ -124,12 +124,12 @@ class OnboardingAdBlockingPreferencePluginImplTest {
 
         testee.apply(true)
 
-        verify(settingsRepository).setEnabled(true, fromOnboarding = true)
+        verify(settingsRepository).setEnabled(true, withPixelConsent = false)
     }
 
     @Test
-    fun `when user already enabled ad blocking and preference applied on then nothing is persisted`() = runTest {
-        whenever(statusChecker.observeState()).thenReturn(flowOf(Enabled.UserEnabled))
+    fun `when the user had already enabled ad blocking and preference applied on then nothing is persisted`() = runTest {
+        whenever(statusChecker.observeState()).thenReturn(flowOf(Enabled.WithPixelConsent))
 
         testee.apply(true)
 
@@ -138,11 +138,11 @@ class OnboardingAdBlockingPreferencePluginImplTest {
 
     @Test
     fun `when user already enabled ad blocking and preference applied off then ad blocking is disabled`() = runTest {
-        whenever(statusChecker.observeState()).thenReturn(flowOf(Enabled.UserEnabled))
+        whenever(statusChecker.observeState()).thenReturn(flowOf(Enabled.WithPixelConsent))
 
         testee.apply(false)
 
-        verify(settingsRepository).setEnabled(false, fromOnboarding = true)
+        verify(settingsRepository).setEnabled(false, withPixelConsent = false)
     }
 
     @Test
@@ -151,7 +151,7 @@ class OnboardingAdBlockingPreferencePluginImplTest {
 
         testee.apply(false)
 
-        verify(settingsRepository).setEnabled(false, fromOnboarding = true)
+        verify(settingsRepository).setEnabled(false, withPixelConsent = false)
     }
 
     @Test
@@ -160,7 +160,7 @@ class OnboardingAdBlockingPreferencePluginImplTest {
 
         testee.apply(true)
 
-        verify(settingsRepository).setEnabled(true, fromOnboarding = true)
+        verify(settingsRepository).setEnabled(true, withPixelConsent = false)
     }
 
     @Test
@@ -169,7 +169,7 @@ class OnboardingAdBlockingPreferencePluginImplTest {
 
         testee.apply(true)
 
-        verify(settingsRepository).setEnabled(true, fromOnboarding = true)
+        verify(settingsRepository).setEnabled(true, withPixelConsent = false)
     }
 
     @Test
@@ -178,12 +178,12 @@ class OnboardingAdBlockingPreferencePluginImplTest {
 
         testee.apply(true)
 
-        verify(settingsRepository).setEnabled(true, fromOnboarding = true)
+        verify(settingsRepository).setEnabled(true, withPixelConsent = false)
     }
 
     @Test
     fun `when ad blocking was already enabled from onboarding and preference applied on then nothing is persisted`() = runTest {
-        whenever(statusChecker.observeState()).thenReturn(flowOf(Enabled.FromOnboarding))
+        whenever(statusChecker.observeState()).thenReturn(flowOf(Enabled.WithoutPixelConsent))
 
         testee.apply(true)
 
@@ -192,10 +192,10 @@ class OnboardingAdBlockingPreferencePluginImplTest {
 
     @Test
     fun `when ad blocking was already enabled from onboarding and preference applied off then ad blocking is disabled`() = runTest {
-        whenever(statusChecker.observeState()).thenReturn(flowOf(Enabled.FromOnboarding))
+        whenever(statusChecker.observeState()).thenReturn(flowOf(Enabled.WithoutPixelConsent))
 
         testee.apply(false)
 
-        verify(settingsRepository).setEnabled(false, fromOnboarding = true)
+        verify(settingsRepository).setEnabled(false, withPixelConsent = false)
     }
 }

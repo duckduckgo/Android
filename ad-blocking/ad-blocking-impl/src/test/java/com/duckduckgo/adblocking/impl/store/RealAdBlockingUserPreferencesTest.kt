@@ -54,30 +54,30 @@ class RealAdBlockingUserPreferencesTest {
     private val testee = RealAdBlockingUserPreferences(testDataStore)
 
     @Test
-    fun whenNothingStoredThenNoUserSettingAndNotFromOnboarding() = runTest {
+    fun whenNothingStoredThenNoUserSettingAndPixelConsentIsAssumed() = runTest {
         assertNull(testee.isEnabled())
-        assertFalse(testee.isFromOnboardingFlow().first())
+        assertTrue(testee.hasPixelConsentFlow().first())
     }
 
     @Test
-    fun whenEnabledFromOnboardingThenBothFlowsReportIt() = runTest {
-        testee.setEnabled(enabled = true, fromOnboarding = true)
+    fun whenEnabledWithoutPixelConsentThenBothFlowsReportIt() = runTest {
+        testee.setEnabled(enabled = true, withPixelConsent = false)
 
         assertTrue(testee.isEnabled()!!)
-        assertTrue(testee.isFromOnboardingFlow().first())
+        assertFalse(testee.hasPixelConsentFlow().first())
     }
 
     @Test
-    fun whenEnabledFromOnboardingThenBothKeysLandInASingleEmission() = coroutineRule.testScope.runTest {
-        combine(testee.isEnabledFlow(), testee.isFromOnboardingFlow(), ::Pair)
+    fun whenEnabledWithoutPixelConsentThenBothKeysLandInASingleEmission() = coroutineRule.testScope.runTest {
+        combine(testee.isEnabledFlow(), testee.hasPixelConsentFlow(), ::Pair)
             .distinctUntilChanged()
             .test {
-                assertEquals(null to false, awaitItem())
+                assertEquals(null to true, awaitItem())
 
-                testee.setEnabled(enabled = true, fromOnboarding = true)
+                testee.setEnabled(enabled = true, withPixelConsent = false)
 
-                // write needs to be a single emission. If it wasn't, (true, false) or (false, true) would surface here
-                assertEquals(true to true, awaitItem())
+                // write needs to be a single emission. If it wasn't, (true, true) or (null, false) would surface here
+                assertEquals(true to false, awaitItem())
                 cancelAndIgnoreRemainingEvents()
             }
     }

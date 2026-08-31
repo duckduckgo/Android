@@ -53,9 +53,9 @@ interface AdBlockingStatusChecker {
 
     /**
      * Emits the current [AdBlockingState], distinguishing whether ad blocking is enabled because
-     * the user turned it on ([AdBlockingState.Enabled.UserEnabled]), turned it on during
-     * onboarding ([AdBlockingState.Enabled.FromOnboarding]) or because of the remote default
-     * ([AdBlockingState.Enabled.Default]).
+     * the user turned it on having seen the consent disclaimer ([AdBlockingState.Enabled.WithPixelConsent]),
+     * turned it on without seeing it ([AdBlockingState.Enabled.WithoutPixelConsent]) or because of the
+     * remote default ([AdBlockingState.Enabled.Default]).
      */
     fun observeState(): Flow<AdBlockingState>
 
@@ -69,16 +69,16 @@ sealed interface AdBlockingState {
         data object UntilRelaunch : Disabled
     }
     sealed interface Enabled : AdBlockingState {
-        data object UserEnabled : Enabled
+        data object WithPixelConsent : Enabled
         data object Default : Enabled
 
         /**
-         * State reached when, during onboarding, the ad-blocking feature was [Disabled] by default and user explicitly enabled it.
-         * Behaves like [UserEnabled] but shows no disclaimer in settings, and sends no telemetry, since user has not seen the consent disclaimer.
+         * Enabled and sticky like [WithPixelConsent] but shows no disclaimer in settings, and sends no telemetry,
+         * since user has not seen the consent disclaimer.
          *
-         * Toggling ad-blocking pref on the settings screen Off -> On migrates this state to [UserEnabled].
+         * Toggling ad-blocking pref on the settings screen Off -> On migrates this state to [WithPixelConsent].
          */
-        data object FromOnboarding : Enabled
+        data object WithoutPixelConsent : Enabled
     }
 }
 
@@ -143,14 +143,14 @@ class RealAdBlockingStatusChecker @Inject constructor(
     override fun observeState(): Flow<AdBlockingState> =
         combine(
             settingsRepository.isEnabledFlow(),
-            settingsRepository.isFromOnboardingFlow(),
+            settingsRepository.hasPixelConsentFlow(),
             feature.enabledByDefault().enabled(),
             sessionStore.observe(),
-        ) { userSetting, fromOnboarding, enabledByDefault, disabledUntilRelaunch ->
+        ) { userSetting, pixelConsent, enabledByDefault, disabledUntilRelaunch ->
             when {
                 disabledUntilRelaunch -> AdBlockingState.Disabled.UntilRelaunch
-                userSetting == true && fromOnboarding -> AdBlockingState.Enabled.FromOnboarding
-                userSetting == true -> AdBlockingState.Enabled.UserEnabled
+                userSetting == true && !pixelConsent -> AdBlockingState.Enabled.WithoutPixelConsent
+                userSetting == true -> AdBlockingState.Enabled.WithPixelConsent
                 userSetting == false -> AdBlockingState.Disabled.Permanent
                 enabledByDefault -> AdBlockingState.Enabled.Default
                 else -> AdBlockingState.Disabled.Permanent

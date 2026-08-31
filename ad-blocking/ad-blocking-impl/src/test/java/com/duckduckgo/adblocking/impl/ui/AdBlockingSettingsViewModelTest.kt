@@ -90,8 +90,8 @@ class AdBlockingSettingsViewModelTest {
     }
 
     @Test
-    fun whenEnabledFromOnboardingThenDoesNotShowConsentDescription() = runTest {
-        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.FromOnboarding))
+    fun whenEnabledWithoutPixelConsentThenDoesNotShowConsentDescription() = runTest {
+        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.WithoutPixelConsent))
 
         createViewModel().viewState.test {
             val state = expectMostRecentItem()
@@ -101,8 +101,8 @@ class AdBlockingSettingsViewModelTest {
     }
 
     @Test
-    fun whenUserEnabledThenShowsConsentDescription() = runTest {
-        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.UserEnabled))
+    fun whenEnabledWithPixelConsentThenShowsConsentDescription() = runTest {
+        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.WithPixelConsent))
 
         createViewModel().viewState.test {
             val state = expectMostRecentItem()
@@ -135,7 +135,7 @@ class AdBlockingSettingsViewModelTest {
 
     @Test
     fun whenEnabledThenDisabledUntilRelaunchFlagNotSet() = runTest {
-        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.UserEnabled))
+        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.WithPixelConsent))
 
         createViewModel().viewState.test {
             assertFalse(expectMostRecentItem().disabledUntilRelaunch)
@@ -223,7 +223,7 @@ class AdBlockingSettingsViewModelTest {
 
     @Test
     fun whenBlockAdsToggledOffThenFiresDisabledPixels() = runTest {
-        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.UserEnabled))
+        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.WithPixelConsent))
 
         createViewModel().onBlockAdsToggled(enabled = false)
 
