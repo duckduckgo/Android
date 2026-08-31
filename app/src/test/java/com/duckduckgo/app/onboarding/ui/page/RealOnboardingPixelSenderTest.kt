@@ -20,9 +20,11 @@ import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
+import com.duckduckgo.app.onboarding.orchestrator.PasswordImportOutcome
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_ADDRESS_BAR_POSITION
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_AI_INTRO
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_NOTIFICATIONS
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_PASSWORD_IMPORT
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_QUICK_SETUP
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SEARCH
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SEARCH_CHAT_TOGGLE
@@ -855,6 +857,47 @@ class RealOnboardingPixelSenderTest {
             ONBOARDING_WELCOME,
             mapOf("installType" to "new", "flow" to "default", "pixelSource" to "phone", "daysSinceInstall" to bucket, "event" to "shown"),
             type = Unique(tag = "onboarding_welcome_shown"),
+        )
+    }
+
+    @Test
+    fun whenFirePasswordImportConfirmedSuccessThenValueSuccess() = runTest {
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
+
+        testee.fire(ONBOARDING_PASSWORD_IMPORT, OnboardingPixelAction.PasswordImportConfirmed(PasswordImportOutcome.SUCCESS))
+
+        verify(mockPixel).fire(
+            ONBOARDING_PASSWORD_IMPORT,
+            mapOf(
+                "installType" to "new",
+                "flow" to "default",
+                "pixelSource" to "phone",
+                "daysSinceInstall" to "0",
+                "event" to "confirmed",
+                "value" to "success",
+            ),
+            type = Unique(tag = "onboarding_password-import_confirmed_success"),
+        )
+    }
+
+    @Test
+    fun whenFirePasswordImportConfirmedForEitherErrorThenBothReportTheSameValue() = runTest {
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
+
+        testee.fire(ONBOARDING_PASSWORD_IMPORT, OnboardingPixelAction.PasswordImportConfirmed(PasswordImportOutcome.TRANSIENT_ERROR))
+        testee.fire(ONBOARDING_PASSWORD_IMPORT, OnboardingPixelAction.PasswordImportConfirmed(PasswordImportOutcome.PERMANENT_ERROR))
+
+        verify(mockPixel, times(2)).fire(
+            ONBOARDING_PASSWORD_IMPORT,
+            mapOf(
+                "installType" to "new",
+                "flow" to "default",
+                "pixelSource" to "phone",
+                "daysSinceInstall" to "0",
+                "event" to "confirmed",
+                "value" to "error",
+            ),
+            type = Unique(tag = "onboarding_password-import_confirmed_error"),
         )
     }
 }
