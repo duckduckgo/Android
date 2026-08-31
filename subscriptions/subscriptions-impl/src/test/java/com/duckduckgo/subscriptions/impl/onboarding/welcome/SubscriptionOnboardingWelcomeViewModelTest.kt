@@ -16,21 +16,32 @@
 
 package com.duckduckgo.subscriptions.impl.onboarding.welcome
 
+import app.cash.turbine.test
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.COMPLETED
 import com.duckduckgo.subscriptions.impl.onboarding.welcome.SubscriptionOnboardingWelcomeStepPlugin.Companion.WELCOME_STEP_ID
+import com.duckduckgo.subscriptions.impl.onboarding.welcome.SubscriptionOnboardingWelcomeViewModel.Command.LaunchConfetti
+import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStepStore
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 class SubscriptionOnboardingWelcomeViewModelTest {
 
+    @get:Rule
+    val coroutineRule = CoroutineTestRule()
+
     private val controller: SubscriptionOnboardingController = mock()
+    private val stepStore: SubscriptionOnboardingStepStore = mock()
 
     private fun viewModelStartingOn(date: LocalDate): SubscriptionOnboardingWelcomeViewModel {
         val timeProvider = object : CurrentTimeProvider {
@@ -38,7 +49,7 @@ class SubscriptionOnboardingWelcomeViewModelTest {
             override fun currentTimeMillis(): Long = 0
             override fun localDateTimeNow(): LocalDateTime = date.atStartOfDay()
         }
-        return SubscriptionOnboardingWelcomeViewModel(controller, timeProvider)
+        return SubscriptionOnboardingWelcomeViewModel(controller, timeProvider, stepStore, coroutineRule.testDispatcherProvider)
     }
 
     @Test
@@ -89,5 +100,44 @@ class SubscriptionOnboardingWelcomeViewModelTest {
         viewModelStartingOn(LocalDate.of(2026, 5, 7)).onPrimaryCtaClicked()
 
         verify(controller).onStepFinished(WELCOME_STEP_ID, COMPLETED)
+    }
+
+    @Test
+    fun whenScreenShownAndWelcomeStepNotCompletedThenLaunchesConfetti() = runTest {
+        whenever(stepStore.isCompleted(WELCOME_STEP_ID)).thenReturn(false)
+        val viewModel = viewModelStartingOn(LocalDate.of(2026, 5, 7))
+
+        viewModel.commands.test {
+            viewModel.onScreenShown()
+
+            assertEquals(LaunchConfetti, awaitItem())
+        }
+    }
+
+    @Test
+    fun whenScreenShownAndWelcomeStepAlreadyCompletedThenDoesNotLaunchConfetti() = runTest {
+        whenever(stepStore.isCompleted(WELCOME_STEP_ID)).thenReturn(true)
+        val viewModel = viewModelStartingOn(LocalDate.of(2026, 5, 7))
+
+        viewModel.commands.test {
+            viewModel.onScreenShown()
+
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun whenScreenShownAgainThenDoesNotLaunchConfettiTwice() = runTest {
+        whenever(stepStore.isCompleted(WELCOME_STEP_ID)).thenReturn(false)
+        val viewModel = viewModelStartingOn(LocalDate.of(2026, 5, 7))
+
+        viewModel.commands.test {
+            viewModel.onScreenShown()
+            assertEquals(LaunchConfetti, awaitItem())
+
+            viewModel.onScreenShown()
+
+            expectNoEvents()
+        }
     }
 }

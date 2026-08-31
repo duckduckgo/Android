@@ -63,7 +63,12 @@ class OnboardingInputScreenSelectionObserver @Inject constructor(
         }
             .distinctUntilChanged()
             .drop(1)
-            .filter { canProcess() }
+            .filter {
+                // Flows that enable the real setting themselves, just-in-time before the End CTA, produce a
+                // pre-ESTABLISHED cosmetic/real match that is not a user override.
+                !onboardingStore.isDuckAiOnboardingFlow() &&
+                    onboardingStore.getSegmentedPathWithAiInput() == null
+            }
             .onEach { (isInputScreenCosmeticallyEnabled, isInputScreenEnabled) ->
                 if (isInputScreenCosmeticallyEnabled != isInputScreenEnabled) return@onEach
 
@@ -81,7 +86,8 @@ class OnboardingInputScreenSelectionObserver @Inject constructor(
             .distinctUntilChanged()
             .drop(1)
             .filter {
-                canProcess() && it == AppStage.ESTABLISHED
+                // AI flows force the setting on, so we can skip changes in those cases.
+                !onboardingStore.isDuckAiOnboardingFlow() && it == AppStage.ESTABLISHED
             }
             .onEach {
                 val selection = onboardingStore.getInputScreenSelection()
@@ -91,12 +97,5 @@ class OnboardingInputScreenSelectionObserver @Inject constructor(
             }
             .flowOn(dispatchers.io())
             .launchIn(appCoroutineScope)
-    }
-
-    private fun canProcess(): Boolean {
-        // AI flows enable the real setting themselves, just-in-time before the End CTA, so a
-        // pre-ESTABLISHED match there is expected rather than a user override. Detection only
-        // applies to flows that defer the setting to ESTABLISHED (i.e. non-AI flows).
-        return !onboardingStore.isDuckAiOnboardingFlow()
     }
 }

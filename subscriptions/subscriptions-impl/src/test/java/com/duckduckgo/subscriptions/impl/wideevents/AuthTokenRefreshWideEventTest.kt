@@ -262,13 +262,30 @@ class AuthTokenRefreshWideEventTest {
             metadata = mapOf("play_login_error" to "sign-in-required"),
         )
         verify(wideEventClient).intervalEnd(16L, "total_duration_ms_bucketed")
-        verify(wideEventClient).flowFinish(16L, FlowStatus.Failure("IllegalStateException"), emptyMap())
+        verify(wideEventClient).flowFinish(16L, FlowStatus.Failure("IllegalStateException"), mapOf("signed_out" to "true"))
 
         reset(wideEventClient)
 
         // id cleared -> subsequent calls produce no client interactions
         authWideEvent.onSuccess()
         verifyNoInteractions(wideEventClient)
+    }
+
+    @Test
+    fun `onPlayLoginFailure without signing the user out logs signedOut as false`() = runTest {
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
+            .thenReturn(Result.success(20L))
+        authWideEvent.onStart(SubscriptionStatus.UNKNOWN, serializationEnabled = true)
+
+        authWideEvent.onPlayLoginFailure(signedOut = false, refreshException = IllegalStateException("boom"), loginError = "UnknownError")
+
+        verify(wideEventClient).flowStep(
+            wideEventId = 20L,
+            stepName = "play_login",
+            success = false,
+            metadata = mapOf("play_login_error" to "UnknownError"),
+        )
+        verify(wideEventClient).flowFinish(20L, FlowStatus.Failure("IllegalStateException"), mapOf("signed_out" to "false"))
     }
 
     @Test

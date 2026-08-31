@@ -16,11 +16,18 @@
 
 package com.duckduckgo.app.cta.ui
 
+import android.view.Gravity
 import android.view.View
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.core.view.isVisible
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.onboarding.store.SegmentedOnboardingPath
+import com.duckduckgo.app.onboarding.store.SegmentedOnboardingPath.AI
+import com.duckduckgo.app.onboarding.store.SegmentedOnboardingPath.SEARCH
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.device.DeviceInfo
@@ -35,10 +42,17 @@ data class DaxEndBrandDesignUpdateBubbleCta(
     override val onboardingImprovementsEnabled: Boolean,
     override val onboardingImprovementsV2Enabled: Boolean,
     val isOmnibarBottom: Boolean,
+    val segmentedPath: SegmentedOnboardingPath?,
 ) : DaxBubbleCta.BrandDesignUpdateBubbleCta(
     ctaId = CtaId.DAX_END,
-    title = R.string.onboardingEndDaxDialogTitle,
-    description = R.string.onboardingEndDaxDialogDescription,
+    title = when (segmentedPath) {
+        SEARCH -> R.string.searchPathWithToggleEnabledContextualEndTitle
+        AI, null -> R.string.onboardingEndDaxDialogTitle
+    },
+    description = when (segmentedPath) {
+        SEARCH -> R.string.searchPathWithToggleEnabledContextualEndDescription
+        AI, null -> R.string.onboardingEndDaxDialogDescription
+    },
     backgroundRes = CommonR.drawable.bg_onboarding_end,
     shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
     okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
@@ -52,7 +66,10 @@ data class DaxEndBrandDesignUpdateBubbleCta(
 ),
     DaxBubbleCta.ShowsWavingDax {
     override val backgroundFillSpec = BackgroundFillSpec(fillHeightDp = 280f, tabletFillHeightDp = 320f, maxHeightFraction = 0.3f)
-    override val activeIncludeId: Int = R.id.primaryCta
+    override val activeIncludeIds: List<Int> = listOfNotNull(
+        R.id.primaryCta,
+        R.id.secondaryCta.takeIf { segmentedPath == SEARCH },
+    )
     override val showArrow: Boolean = true
     override val wavingDaxSpec = WavingDaxSpec(
         rotationDegrees = 0f,
@@ -66,6 +83,24 @@ data class DaxEndBrandDesignUpdateBubbleCta(
     )
 
     override fun configureContentViews(view: View) {
-        view.findViewById<MaterialButton>(R.id.primaryCta)?.setText(R.string.onboardingEndDaxDialogButton)
+        val primaryCtaTextRes: Int
+        if (segmentedPath == SEARCH) {
+            view.findViewById<ImageView>(R.id.brandDesignHeaderImage)?.apply {
+                setImageResource(CommonR.drawable.ic_duckai)
+                isVisible = true
+            }
+
+            view.findViewById<TextView>(R.id.brandDesignHiddenTitle)?.gravity = Gravity.CENTER
+            view.findViewById<TextView>(R.id.brandDesignTitle)?.gravity = Gravity.CENTER
+            view.findViewById<TextView>(R.id.brandDesignDescription)?.gravity = Gravity.CENTER
+
+            primaryCtaTextRes = R.string.searchPathWithToggleEnabledContextualEndPrimaryCta
+            view.findViewById<MaterialButton>(R.id.secondaryCta)?.setText(R.string.searchPathWithToggleEnabledContextualEndSecondaryCta)
+        } else {
+            primaryCtaTextRes = R.string.onboardingEndDaxDialogButton
+        }
+        view.findViewById<MaterialButton>(R.id.primaryCta)?.setText(primaryCtaTextRes)
     }
+
+    override fun shouldDropAddressBarFocusWhenShown(): Boolean = segmentedPath == SEARCH
 }

@@ -21,6 +21,8 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
+import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.pixels.UnifiedDeviceListPixel
 import com.duckduckgo.sync.store.AccountInfoPublicKey
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -40,6 +42,7 @@ class SignupAccountInfoBuilderTest {
     private val accountInfoKeyManager: AccountInfoKeyManager = mock()
     private val deviceInfoEncryptor: DeviceInfoEncryptor = mock()
     private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
+    private val syncPixels: SyncPixels = mock()
 
     private lateinit var builder: SignupAccountInfoBuilder
 
@@ -47,7 +50,7 @@ class SignupAccountInfoBuilderTest {
 
     @Before
     fun before() {
-        builder = RealSignupAccountInfoBuilder(syncFeature, accountInfoKeyManager, deviceInfoEncryptor)
+        builder = RealSignupAccountInfoBuilder(syncFeature, accountInfoKeyManager, deviceInfoEncryptor, syncPixels)
         syncFeature.canWriteUnifiedDeviceList().setRawStoredState(State(enable = true))
     }
 
@@ -65,6 +68,9 @@ class SignupAccountInfoBuilderTest {
 
         assertNull(builder.build(secretKey, "My Phone", "phone"))
         verify(deviceInfoEncryptor, never()).encrypt(any(), any(), any())
+        verify(syncPixels).fireUnifiedDeviceListPixel(
+            UnifiedDeviceListPixel.AccountInfoKeyCreateFailed(UnifiedDeviceListPixel.AccountInfoKeyCreateFailureReason.MINT_FAILED),
+        )
     }
 
     @Test
@@ -73,6 +79,9 @@ class SignupAccountInfoBuilderTest {
         whenever(deviceInfoEncryptor.encrypt(any(), any(), any())).thenReturn(Error(reason = "encrypt boom"))
 
         assertNull(builder.build(secretKey, "My Phone", "phone"))
+        verify(syncPixels).fireUnifiedDeviceListPixel(
+            UnifiedDeviceListPixel.OwnRowDeviceInfoFirstWriteFailed(UnifiedDeviceListPixel.DeviceInfoWriteFailureReason.ENCRYPT_FAILED),
+        )
     }
 
     @Test

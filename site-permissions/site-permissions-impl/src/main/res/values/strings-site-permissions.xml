@@ -57,6 +57,10 @@
     <string name="systemPermissionDialogCameraAndAudioDeniedContent">Sites can only use your camera and microphone if you allow DuckDuckGo to ask for access.</string>
     <string name="systemPermissionsDeniedDialogPositiveButton">Open Settings</string>
     <string name="systemPermissionsDeniedDialogNegativeButton">Cancel</string>
+    <string name="duckAiMicPermissionDeniedSnackBarMessage">Microphone permission needed for voice features</string>
+    <string name="duckAiMicPermissionDeniedDialogTitle">DuckDuckGo needs to access your microphone</string>
+    <string name="duckAiMicPermissionDeniedDialogContent">Microphone permissions are needed if you want to use Voice Chat in Duck.ai</string>
+    <string name="duckAiMicPermissionDeniedDialogPositiveButton">Change Permissions</string>
 
     <string name="sitePermissionsSettingsDescription">Sites you visit may ask for access to your device’s location, camera, microphone, or DRM (Digital Rights Management) software. They won’t be able to access these unless you explicitly give them permission.</string>
     <string name="sitePermissionsSettingsEnablePermissionTitle">Allow all sites to ask for:</string>

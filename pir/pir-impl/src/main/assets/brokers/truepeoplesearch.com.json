@@ -1,8 +1,8 @@
 {
   "name": "TruePeopleSearch",
   "url": "truepeoplesearch.com",
-  "version": "0.11.0",
-  "parent": "cyberbackgroundchecks.com",
+  "version": "0.12.0",
+  "parent": "peoplefinders.com",
   "addedDatetime": 1703138400000,
   "optOutUrl": "https://www.truepeoplesearch.com/removal",
   "steps": [

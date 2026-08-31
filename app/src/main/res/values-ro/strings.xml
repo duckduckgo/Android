@@ -1015,4 +1015,11 @@
     <string name="singleTabFireDialogTitleFireMode">Ștergi filele Fire și datele aferente?</string>
 
     <string name="downloadsCannotOpenFileErrorMessage">Nu se poate deschide fișierul. Caută o aplicație compatibilă.</string>
+
+    <!-- Error pages -->
+    <string name="webViewErrorTitle" instruction="Title shown on the error pages">DuckDuckGo nu poate încărca această pagină</string>
+    <string name="webViewErrorNoConnection" instruction="Message shown when the page fails to load because the device has no internet connection">Se pare că nu ești conectat la internet.</string>
+    <string name="webViewErrorBadUrl" instruction="Message shown when the hostname of the website could not be resolved">Nu a putut fi găsit un server cu numele de gazdă specificat.</string>
+    <string name="webViewErrorSslProtocol" instruction="Message shown when the website&apos;s SSL certificate is invalid. Placeholder is the website&apos;s address"><![CDATA[Certificatul pentru acest server este incorect. S-ar putea să te conectezi la un server care pretinde a fi <b>%1$s</b>, ceea ce ar putea pune în pericol informațiile tale confidențiale.]]></string>
+    <string name="webViewErrorRedirectSuggestionMessage" instruction="Shown when a domain fails to load, offering a link to the www. version of the address. Placeholder is a tappable link to the suggested address.">Voiai să scrii <annotation type="redirect_link">^1</annotation>?</string>
 </resources>

@@ -18,7 +18,11 @@ package com.duckduckgo.app.generalsettings.showonapplaunch
 
 import androidx.lifecycle.MutableLiveData
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.autofill.SystemAutofillEngagement
+import com.duckduckgo.app.browser.returnsession.ReturnSessionLanding
+import com.duckduckgo.app.browser.returnsession.ReturnSessionLandingListener
+import com.duckduckgo.app.browser.returnsession.ReturnSessionLandingResult
 import com.duckduckgo.app.browser.state.ModeSwitchRecreateSignal
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.LastOpenedTab
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
@@ -62,9 +66,15 @@ class FirstScreenHandlerImplTest {
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature = mock()
     private val showOnAppLaunchFeature: ShowOnAppLaunchFeature = mock()
     private val settingsDataStore: SettingsDataStore = mock()
-    private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler = mock()
+    private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler = mock {
+        onBlocking { handleAfterInactivityOption(wasIdle = any(), currentMode = any()) } doReturn
+            ShowOnAppLaunchResult(destinationUrl = null, treatment = null)
+        onBlocking { handleAppLaunchOption(currentMode = any()) } doReturn
+            ShowOnAppLaunchResult(destinationUrl = null, treatment = null)
+    }
     private lateinit var showOnAppLaunchOptionDataStore: FakeShowOnAppLaunchOptionDataStore
     private val appBuildConfig: AppBuildConfig = mock()
+    private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
     private val duckChat: DuckChat = mock()
     private val tabRepository: TabRepository = mock()
     private val browserModeFlow = MutableStateFlow(BrowserMode.REGULAR)
@@ -80,6 +90,7 @@ class FirstScreenHandlerImplTest {
     private val showOnAppLaunchToggle: Toggle = mock()
     private val ntpAfterIdleManager: NtpAfterIdleManager = mock()
     private val modeSwitchRecreateSignal = ModeSwitchRecreateSignal()
+    private val returnSessionLandingListener: ReturnSessionLandingListener = mock()
     private val testScope = coroutineTestRule.testScope
 
     private lateinit var testee: FirstScreenHandlerImpl
@@ -104,6 +115,7 @@ class FirstScreenHandlerImplTest {
             showOnAppLaunchOptionHandler = showOnAppLaunchOptionHandler,
             showOnAppLaunchOptionDataStore = showOnAppLaunchOptionDataStore,
             appBuildConfig = appBuildConfig,
+            duckDuckGoUrlDetector = duckDuckGoUrlDetector,
             duckChat = duckChat,
             tabRepositoryProvider = tabRepositoryProvider,
             browserModeStateHolder = browserModeStateHolder,
@@ -111,6 +123,7 @@ class FirstScreenHandlerImplTest {
             systemAutofillEngagement = systemAutofillEngagement,
             customTabDetector = customTabDetector,
             modeSwitchRecreateSignal = modeSwitchRecreateSignal,
+            returnSessionLandingListener = returnSessionLandingListener,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             appCoroutineScope = testScope,
             idleThresholdResolver = RealIdleThresholdResolver(androidBrowserConfigFeature),
@@ -187,6 +200,123 @@ class FirstScreenHandlerImplTest {
     }
 
     @Test
+    fun whenIdleReturnCreatesNtpTreatmentThenReportsAfterIdleNtpLanding() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(System.currentTimeMillis() - (6 * 60 * 1000))
+        whenever(showOnAppLaunchOptionHandler.handleAfterInactivityOption(wasIdle = true, currentMode = BrowserMode.REGULAR))
+            .thenReturn(
+                ShowOnAppLaunchResult(
+                    destinationUrl = null,
+                    treatment = AfterIdleTreatment.NTP,
+                ),
+            )
+
+        testee.onOpen(isFreshLaunch = false)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verify(returnSessionLandingListener).onReturnLandingResolved(
+            ReturnSessionLandingResult(
+                afterIdle = true,
+                landing = ReturnSessionLanding.NTP,
+            ),
+        )
+    }
+
+    @Test
+    fun whenIdleReturnResolvesWhileAlreadyOnNtpThenReportsOrdinaryNtpLanding() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(System.currentTimeMillis() - (6 * 60 * 1000))
+        liveSelectedTab.value = TabEntity(tabId = "ntp", url = null)
+
+        testee.onOpen(isFreshLaunch = false)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verify(returnSessionLandingListener).onReturnLandingResolved(
+            ReturnSessionLandingResult(
+                afterIdle = false,
+                landing = ReturnSessionLanding.NTP_USER_INITIATED,
+            ),
+        )
+    }
+
+    @Test
+    fun whenIdleReturnResumesLutThenReportsAfterIdleClassifiedDestination() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(System.currentTimeMillis() - (6 * 60 * 1000))
+        whenever(tabRepository.getSelectedTab()).thenReturn(TabEntity(tabId = "stale", url = null))
+        whenever(showOnAppLaunchOptionHandler.handleAfterInactivityOption(wasIdle = true, currentMode = BrowserMode.REGULAR))
+            .thenReturn(
+                ShowOnAppLaunchResult(
+                    destinationUrl = "https://example.com",
+                    treatment = AfterIdleTreatment.LUT,
+                ),
+            )
+
+        testee.onOpen(isFreshLaunch = false)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verify(returnSessionLandingListener).onReturnLandingResolved(
+            ReturnSessionLandingResult(
+                afterIdle = true,
+                landing = ReturnSessionLanding.WEB,
+            ),
+        )
+    }
+
+    @Test
+    fun whenIdleSpecificPageResolvesToDuckAiThenReportsOrdinaryDuckAiLanding() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(System.currentTimeMillis() - (6 * 60 * 1000))
+        whenever(showOnAppLaunchOptionHandler.handleAfterInactivityOption(wasIdle = true, currentMode = BrowserMode.REGULAR))
+            .thenReturn(
+                ShowOnAppLaunchResult(
+                    destinationUrl = "https://duck.ai/chat",
+                    treatment = null,
+                ),
+            )
+        whenever(duckChat.isDuckChatUrl(any())).thenReturn(true)
+
+        testee.onOpen(isFreshLaunch = false)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verify(returnSessionLandingListener).onReturnLandingResolved(
+            ReturnSessionLandingResult(
+                afterIdle = false,
+                landing = ReturnSessionLanding.DUCK_AI,
+            ),
+        )
+    }
+
+    @Test
+    fun whenResolvedDestinationIsSerpThenReportsSerpLanding() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(System.currentTimeMillis() - (6 * 60 * 1000))
+        whenever(showOnAppLaunchOptionHandler.handleAfterInactivityOption(wasIdle = true, currentMode = BrowserMode.REGULAR))
+            .thenReturn(
+                ShowOnAppLaunchResult(
+                    destinationUrl = "https://duckduckgo.com/?q=test",
+                    treatment = AfterIdleTreatment.LUT,
+                ),
+            )
+        whenever(duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(any())).thenReturn(true)
+
+        testee.onOpen(isFreshLaunch = false)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verify(returnSessionLandingListener).onReturnLandingResolved(
+            ReturnSessionLandingResult(
+                afterIdle = true,
+                landing = ReturnSessionLanding.SERP,
+            ),
+        )
+    }
+
+    @Test
     fun whenIdleReturnEnabledAndFreshLaunchAndElapsedExceedsTimeoutThenDelegatesWithWasIdleTrue() = runTest {
         whenever(idleReturnToggle.isEnabled()).thenReturn(true)
         whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
@@ -210,6 +340,12 @@ class FirstScreenHandlerImplTest {
         testScope.testScheduler.advanceUntilIdle()
 
         verifyNoInteractions(showOnAppLaunchOptionHandler)
+        verify(returnSessionLandingListener).onReturnLandingResolved(
+            ReturnSessionLandingResult(
+                afterIdle = false,
+                landing = ReturnSessionLanding.NTP_USER_INITIATED,
+            ),
+        )
     }
 
     @Test
@@ -235,6 +371,12 @@ class FirstScreenHandlerImplTest {
         testScope.testScheduler.advanceUntilIdle()
 
         verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = false, currentMode = BrowserMode.REGULAR)
+        verify(returnSessionLandingListener).onReturnLandingResolved(
+            ReturnSessionLandingResult(
+                afterIdle = false,
+                landing = ReturnSessionLanding.NTP_USER_INITIATED,
+            ),
+        )
     }
 
     @Test
@@ -274,6 +416,12 @@ class FirstScreenHandlerImplTest {
         testScope.testScheduler.advanceUntilIdle()
 
         verifyNoInteractions(showOnAppLaunchOptionHandler)
+        verify(returnSessionLandingListener).onReturnLandingResolved(
+            ReturnSessionLandingResult(
+                afterIdle = false,
+                landing = ReturnSessionLanding.NTP_USER_INITIATED,
+            ),
+        )
     }
 
     @Test
@@ -367,6 +515,12 @@ class FirstScreenHandlerImplTest {
         testScope.testScheduler.advanceUntilIdle()
 
         verifyNoInteractions(showOnAppLaunchOptionHandler)
+        verify(returnSessionLandingListener).onReturnLandingResolved(
+            ReturnSessionLandingResult(
+                afterIdle = false,
+                landing = ReturnSessionLanding.DUCK_AI,
+            ),
+        )
     }
 
     @Test
@@ -447,7 +601,7 @@ class FirstScreenHandlerImplTest {
     // --- Synchronous onIdleReturnTriggered (only on fresh launch when current tab is already an NTP) ---
 
     @Test
-    fun whenFreshLaunchAndIdleReturnEnabledAndIdleAndCurrentTabIsNtpThenNotifiesNtpAfterIdleManagerSynchronously() {
+    fun whenFreshLaunchAndIdleReturnEnabledAndIdleAndCurrentTabIsNtpThenAppliesNtpTreatmentSynchronously() = runTest {
         whenever(idleReturnToggle.isEnabled()).thenReturn(true)
         whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
         val sixMinutesAgo = System.currentTimeMillis() - (6 * 60 * 1000)
@@ -458,6 +612,13 @@ class FirstScreenHandlerImplTest {
 
         // Called synchronously from onOpen, before any coroutine advances.
         verify(ntpAfterIdleManager).onIdleReturnTriggered()
+        testScope.testScheduler.advanceUntilIdle()
+        verify(returnSessionLandingListener).onReturnLandingResolved(
+            ReturnSessionLandingResult(
+                afterIdle = true,
+                landing = ReturnSessionLanding.NTP,
+            ),
+        )
     }
 
     @Test
@@ -530,9 +691,11 @@ class FirstScreenHandlerImplTest {
 
     @Test
     fun whenOnCloseThenWritesTimestamp() {
+        testee.onOpen(isFreshLaunch = false)
         testee.onClose()
 
         verify(settingsDataStore).lastSessionBackgroundTimestamp = org.mockito.kotlin.any()
+        verify(returnSessionLandingListener).onReturnClosed()
     }
 
     @Test
@@ -626,6 +789,12 @@ class FirstScreenHandlerImplTest {
         testScope.testScheduler.advanceUntilIdle()
 
         verify(showOnAppLaunchOptionHandler, never()).handleAfterInactivityOption(wasIdle = true, currentMode = BrowserMode.REGULAR)
+        verify(returnSessionLandingListener).onReturnLandingResolved(
+            ReturnSessionLandingResult(
+                afterIdle = false,
+                landing = ReturnSessionLanding.NTP_USER_INITIATED,
+            ),
+        )
     }
 
     @Test
@@ -653,6 +822,31 @@ class FirstScreenHandlerImplTest {
         testScope.testScheduler.advanceUntilIdle()
 
         verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = true, currentMode = BrowserMode.REGULAR)
+    }
+
+    @Test
+    fun whenIdleReturnRunsInFireModeThenReportsNoTreatment() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(System.currentTimeMillis() - (6 * 60 * 1000))
+        browserModeFlow.value = BrowserMode.FIRE
+        whenever(showOnAppLaunchOptionHandler.handleAfterInactivityOption(wasIdle = true, currentMode = BrowserMode.FIRE))
+            .thenReturn(
+                ShowOnAppLaunchResult(
+                    destinationUrl = "https://example.com",
+                    treatment = null,
+                ),
+            )
+
+        testee.onOpen(isFreshLaunch = false)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verify(returnSessionLandingListener).onReturnLandingResolved(
+            ReturnSessionLandingResult(
+                afterIdle = false,
+                landing = ReturnSessionLanding.WEB,
+            ),
+        )
     }
 
     // --- Mode-switch recreate guard ---

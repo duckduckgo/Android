@@ -293,8 +293,8 @@ interface DuckChatFeature {
 
     /**
      * @return `true` when the redesigned Duck.ai contextual sheet UI and flow are enabled.
-     * If the remote feature is not present defaults to `false`.
+     * If the remote feature is not present defaults to `INTERNAL`.
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun contextualSheetRedesign(): Toggle
 }

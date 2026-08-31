@@ -115,7 +115,7 @@ class DialogRenderEngine(
         }?.launchIn(scope)
         cardStage.showCtaButtons(config.primaryCta, config.secondaryCta) { cta -> performCta(cta.action, handle) }
 
-        if (animate) cardStage.prepareEntrance(handle.fadeTargets)
+        if (animate) cardStage.prepareEntrance(handle.preTitleFadeTargets + handle.fadeTargets)
 
         // Anchored before the morph below starts its transition, so the card's move to its new anchor is smooth
         val settledDecoration = embellishments.transition(previous?.embellishment, config.embellishment, animate)
@@ -133,14 +133,17 @@ class DialogRenderEngine(
             if (bound !== handle) return@reveal
             cardStage.morph(animating(animate)) {
                 if (bound !== handle) return@morph
-                showTitle(handle, animating(animate)) {
-                    if (bound !== handle) return@showTitle
-                    cardStage.fadeInContent(handle.fadeTargets, animating(animate)) {
-                        if (bound !== handle) return@fadeInContent
-                        playAfterFade(handle, animating(animate))
-                        handle.onContentReady?.invoke()
-                        entrancePolicy = null
-                        isAnimating = false
+                fadeInPreTitle(handle, animating(animate)) {
+                    if (bound !== handle) return@fadeInPreTitle
+                    showTitle(handle, animating(animate)) {
+                        if (bound !== handle) return@showTitle
+                        cardStage.fadeInContent(handle.fadeTargets, animating(animate)) {
+                            if (bound !== handle) return@fadeInContent
+                            playAfterFade(handle, animating(animate))
+                            handle.onContentReady?.invoke()
+                            entrancePolicy = null
+                            isAnimating = false
+                        }
                     }
                 }
             }
@@ -201,6 +204,19 @@ class DialogRenderEngine(
         bindScope = null
         content.hideBound()
         bound = null
+    }
+
+    /** The CTAs stay out of this phase: they belong with the content that fades in once the title has typed. */
+    private fun fadeInPreTitle(
+        handle: ContentHandle,
+        animate: Boolean,
+        onEnd: () -> Unit,
+    ) {
+        if (handle.preTitleFadeTargets.isEmpty()) {
+            onEnd()
+            return
+        }
+        cardStage.fadeInContent(handle.preTitleFadeTargets, animate, withCtas = false, onEnd = onEnd)
     }
 
     private fun showTitle(

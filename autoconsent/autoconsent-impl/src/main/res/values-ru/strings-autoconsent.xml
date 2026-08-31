@@ -20,9 +20,17 @@
     <string name="autoconsentTitle">Защита от всплывающих окон куки</string>
     <string name="autoconsentDescription"><![CDATA[DuckDuckGo по возможности откажется от куки-файлов и скроет подобные окна.\n<a href=\"\">Подробнее...</a>]]></string>
     <string name="autoconsentToggle">Разрешить DuckDuckGo взять на себя окна выбора куки-файлов</string>
-    <string name="autoconsentAutoManageToggle">Автоматическое управление окнами выбора файлов cookie</string>
-    <string name="autoconsentAutoManageDescription">Мы постараемся выбрать для вас только максимально конфиденциальные настройки файлов cookie, а затем закроем эти окна.</string>
-    <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[DuckDuckGo может автоматически управлять настройками файлов cookie, чтобы обеспечить максимальную конфиденциальность, минимизировать использование cookie и закрывать соответствующие всплывающие окна.\n<a href=\"\">Подробнее</a>]]></string>
-    <string name="autoconsentPopUpsWithoutOptOutsToggle">Всплывающие окна без возможности отказа</string>
-    <string name="autoconsentPopUpsWithoutOptOutsDescription">Также разрешите DuckDuckGo экономить вам время, принимая файлы cookie за вас, чтобы закрывать всплывающие окна без возможности отказа.</string>
+    <string name="autoconsentAutoManageToggle">Отклонить дополнительные файлы cookie</string>
+    <string name="autoconsentAutoManageDescription">Мы постараемся отклонять за вас как можно больше файлов cookie, а затем закрывать всплывающие окна.</string>
+    <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[DuckDuckGo может автоматически управлять всплывающими окнами cookie, чтобы обеспечить максимальную конфиденциальность и минимизировать использование cookie еще до того, как вы их увидите.<a href=\"\">Подробнее</a>]]></string>
+    <string name="autoconsentPopUpsWithoutOptOutsToggle">Принимать файлы cookie, которые нельзя отклонить</string>
+    <string name="autoconsentPopUpsWithoutOptOutsDescription">Если возможности отклонить файлы cookie нет, мы примем их за вас и закроем всплывающие окна, избавив вас от лишних нажатий.</string>
+    <string name="autoconsentPromptTitle">Устали от всплывающих окон с уведомлениями о файлах cookie?</string>
+    <string name="autoconsentPromptFootnote">Эту настройку всегда можно изменить позже в настройках.</string>
+    <string name="autoconsentPromptCpmOnMessage">От некоторых файлов cookie нельзя отказаться. Мы можем принять их за вас.</string>
+    <string name="autoconsentPromptCpmOnPrimaryButton">Принимать файлы cookie за меня</string>
+    <string name="autoconsentPromptCpmOnSecondaryButton">Я приму их самостоятельно</string>
+    <string name="autoconsentPromptCpmOffMessage">Мы разберёмся с ними за вас. По возможности мы будем отклонять файлы cookie и принимать те, которые нельзя отклонить.</string>
+    <string name="autoconsentPromptCpmOffPrimaryButton">Отклонять, если это возможно, или принимать за меня</string>
+    <string name="autoconsentPromptCpmOffSecondaryButton">Я сам разберусь с ними</string>
 </resources>

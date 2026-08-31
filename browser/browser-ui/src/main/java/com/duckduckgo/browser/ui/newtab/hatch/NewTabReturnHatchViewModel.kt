@@ -180,6 +180,7 @@ class NewTabReturnHatchViewModel @Inject constructor(
     fun closeTab() {
         pixel.fire(NewTabReturnHatchPixelName.OPTION_SELECTED_CLOSE_TAB, type = Count)
         pixel.fire(NewTabReturnHatchPixelName.OPTION_SELECTED_CLOSE_TAB_DAILY, type = Daily())
+        ntpAfterIdleManager.onCloseTabTapped()
         val tabId = viewState.value.currentTabId
         if (tabId.isEmpty()) return
         pendingCloseMode = snapshotTarget.value?.mode ?: BrowserMode.REGULAR
@@ -197,6 +198,7 @@ class NewTabReturnHatchViewModel @Inject constructor(
         val params = mapOf(Pixel.PixelParameter.BROWSER_MODE to viewState.value.mode.name.lowercase())
         pixel.fire(NewTabReturnHatchPixelName.OPTION_SELECTED_BURN_TAB, params, type = Count)
         pixel.fire(NewTabReturnHatchPixelName.OPTION_SELECTED_BURN_TAB_DAILY, params, type = Daily())
+        ntpAfterIdleManager.onBurnTabTapped()
     }
 
     fun onUndoCloseTab(tabId: String) {

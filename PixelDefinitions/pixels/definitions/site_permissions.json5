@@ -1,0 +1,25 @@
+// Site permissions pixels
+{
+    "m_site_permissions_auto_granted": {
+        "description": "Fires the first time a tab auto-grants DRM for a domain, when the central DRM policy grants the request without showing the permission dialog. A page can issue several DRM requests; only the first is counted, so this is comparable with m_site_permissions_dialog_impresssion",
+        "owners": ["0nko"],
+        "triggers": ["page_load"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "type",
+                "type": "string",
+                "description": "Permission type that was auto-granted",
+                "enum": ["drm"]
+            },
+            {
+                "key": "reason",
+                "type": "string",
+                "description": "Policy rule that produced the automatic grant",
+                "enum": ["allow_list", "protections_off"]
+            },
+            "petal_randomize"
+        ]
+    }
+}

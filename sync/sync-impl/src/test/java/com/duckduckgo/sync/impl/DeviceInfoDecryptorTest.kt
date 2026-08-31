@@ -39,7 +39,7 @@ class DeviceInfoDecryptorTest {
 
     @Test
     fun whenBlobDecryptsThenReturnNameAndType() {
-        whenever(accountInfoPrivateKeyProvider.privateKey()).thenReturn(Result.Success("private-key"))
+        givenPrivateKeyAvailable()
         whenever(syncJweCrypto.jweDecryptRsaOaep("device.info.jwe", "private-key"))
             .thenReturn("""{"name":"My Phone","type":"phone"}""".toByteArray(Charsets.UTF_8))
 
@@ -50,7 +50,7 @@ class DeviceInfoDecryptorTest {
 
     @Test
     fun whenTypeIsEmptyThenReturnNullType() {
-        whenever(accountInfoPrivateKeyProvider.privateKey()).thenReturn(Result.Success("private-key"))
+        givenPrivateKeyAvailable()
         whenever(syncJweCrypto.jweDecryptRsaOaep(any(), any()))
             .thenReturn("""{"name":"My Phone","type":""}""".toByteArray(Charsets.UTF_8))
 
@@ -60,16 +60,23 @@ class DeviceInfoDecryptorTest {
     }
 
     @Test
-    fun whenPrivateKeyUnavailableThenOpenSessionErrorsWithoutDecrypting() {
-        whenever(accountInfoPrivateKeyProvider.privateKey()).thenReturn(Result.Error(reason = "not signed in"))
+    fun whenPrivateKeyOutcomeIsUnavailableThenSessionPreservesTypedReasonWithoutDecrypting() {
+        whenever(accountInfoPrivateKeyProvider.privateKey()).thenReturn(
+            AccountInfoPrivateKeyResult.Unavailable(AccountInfoKeyUnavailableReason.NO_WRAP_FOR_OUR_CREDENTIAL),
+        )
 
-        assertTrue(decryptor.openSession() is Result.Error)
+        val result = decryptor.openSession()
+
+        assertEquals(
+            DeviceInfoSessionResult.Unavailable(AccountInfoKeyUnavailableReason.NO_WRAP_FOR_OUR_CREDENTIAL),
+            result,
+        )
         verify(syncJweCrypto, never()).jweDecryptRsaOaep(any(), any())
     }
 
     @Test
     fun whenBlobCannotBeDecryptedThenReturnError() {
-        whenever(accountInfoPrivateKeyProvider.privateKey()).thenReturn(Result.Success("private-key"))
+        givenPrivateKeyAvailable()
         whenever(syncJweCrypto.jweDecryptRsaOaep(eq("device.info.jwe"), any())).thenThrow(RuntimeException("bad tag"))
 
         assertTrue(openSessionAndDecrypt("device.info.jwe") is Result.Error)
@@ -77,7 +84,7 @@ class DeviceInfoDecryptorTest {
 
     @Test
     fun whenPayloadIsNotValidJsonThenReturnError() {
-        whenever(accountInfoPrivateKeyProvider.privateKey()).thenReturn(Result.Success("private-key"))
+        givenPrivateKeyAvailable()
         whenever(syncJweCrypto.jweDecryptRsaOaep(any(), any())).thenReturn("{ malformed".toByteArray(Charsets.UTF_8))
 
         assertTrue(openSessionAndDecrypt("device.info.jwe") is Result.Error)
@@ -85,11 +92,11 @@ class DeviceInfoDecryptorTest {
 
     @Test
     fun whenSessionDecryptsManyBlobsThenPrivateKeyFetchedOnce() {
-        whenever(accountInfoPrivateKeyProvider.privateKey()).thenReturn(Result.Success("private-key"))
+        givenPrivateKeyAvailable()
         whenever(syncJweCrypto.jweDecryptRsaOaep(any(), any()))
             .thenReturn("""{"name":"n","type":"phone"}""".toByteArray(Charsets.UTF_8))
 
-        val session = (decryptor.openSession() as Result.Success).data
+        val session = (decryptor.openSession() as DeviceInfoSessionResult.Available).session
         session.decrypt("a")
         session.decrypt("b")
         session.decrypt("c")
@@ -97,9 +104,14 @@ class DeviceInfoDecryptorTest {
         verify(accountInfoPrivateKeyProvider, times(1)).privateKey()
     }
 
+    private fun givenPrivateKeyAvailable() {
+        whenever(accountInfoPrivateKeyProvider.privateKey())
+            .thenReturn(AccountInfoPrivateKeyResult.Available("private-key"))
+    }
+
     private fun openSessionAndDecrypt(deviceInfoJwe: String): Result<DeviceInfoPayload> =
-        when (val session = decryptor.openSession()) {
-            is Result.Success -> session.data.decrypt(deviceInfoJwe)
-            is Result.Error -> session
+        when (val outcome = decryptor.openSession()) {
+            is DeviceInfoSessionResult.Available -> outcome.session.decrypt(deviceInfoJwe)
+            is DeviceInfoSessionResult.Unavailable -> Result.Error(reason = outcome.reason.name)
         }
 }

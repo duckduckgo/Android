@@ -20,9 +20,17 @@
     <string name="autoconsentTitle">Beskyttelse mod pop op-beskeder om cookies</string>
     <string name="autoconsentDescription"><![CDATA[DuckDuckGo vil forsøge at vælge de mest private indstillinger og skjule disse pop op-vinduer for dig.\n<a href=\"\">Mere info</a>]]></string>
     <string name="autoconsentToggle">Lad DuckDuckGo håndtere pop op-beskeder om cookies</string>
-    <string name="autoconsentAutoManageToggle">Administrer automatisk pop op-beskeder om cookies</string>
-    <string name="autoconsentAutoManageDescription">Vi vil forsøge kun at vælge de mest private cookieindstillinger for dig og derefter lukke disse pop op-vinduer.</string>
-    <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[DuckDuckGo kan automatisk administrere dine cookiepræferencer for at maksimere fortrolighed, minimere cookies og lukke disse pop op-vinduer.\n<a href=\"\">Mere info</a>]]></string>
-    <string name="autoconsentPopUpsWithoutOptOutsToggle">Pop op-vinduer uden fravalgsmulighed</string>
-    <string name="autoconsentPopUpsWithoutOptOutsDescription">Lad også DuckDuckGo spare dig for et klik ved at acceptere cookies på dine vegne for at lukke pop op-vinduer, hvor du ikke kan fravælge dem.</string>
+    <string name="autoconsentAutoManageToggle">Afvis valgfrie cookies</string>
+    <string name="autoconsentAutoManageDescription">Vi vil forsøge at afvise så mange cookies som muligt for dig og derefter lukke pop op-vinduerne.</string>
+    <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[DuckDuckGo kan automatisk administrere cookie-pop op-vinduer for at maksimere fortrolighed og minimere cookies, før du overhovedet ser dem.\n<a href=\"\">Mere info</a>]]></string>
+    <string name="autoconsentPopUpsWithoutOptOutsToggle">Acceptér cookies, der ikke kan fravælges</string>
+    <string name="autoconsentPopUpsWithoutOptOutsDescription">Hvis der ikke er en afvisningsmulighed, sparer vi dig for et klik, accepterer disse cookies for dig og lukker pop op-vinduerne.</string>
+    <string name="autoconsentPromptTitle">Træt af pop op-vinduer om cookies?</string>
+    <string name="autoconsentPromptFootnote">Du kan altid justere det senere i Indstillinger.</string>
+    <string name="autoconsentPromptCpmOnMessage">Nogle cookies kan ikke fravælges. Vi kan acceptere disse for dig.</string>
+    <string name="autoconsentPromptCpmOnPrimaryButton">Acceptér cookies for mig</string>
+    <string name="autoconsentPromptCpmOnSecondaryButton">Jeg vil acceptere dem selv</string>
+    <string name="autoconsentPromptCpmOffMessage">Lad os gøre det for dig. Vi afviser cookies, når det er muligt, og accepterer dem, der ikke kan fravælges.</string>
+    <string name="autoconsentPromptCpmOffPrimaryButton">Afvis hvis muligt, eller acceptér for mig</string>
+    <string name="autoconsentPromptCpmOffSecondaryButton">Jeg klarer dem selv</string>
 </resources>

@@ -57,6 +57,7 @@ import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.NativeInputEventListener
@@ -91,7 +92,7 @@ class NativeInputCallbacks(
         filesJson: JSONArray?,
     ) -> Unit,
     val onChatSuggestionSelected: (String) -> Unit,
-    val onDuckAiQuerySubmitted: (query: String) -> Unit = {},
+    val onDuckAiQuerySubmitted: (query: String, entryPoint: DuckChatEntryPoint) -> Unit = { _, _ -> },
     /** User picked a model in the native picker (→ submitChangeModelAction). */
     val onChangeModelSubmitted: (modelId: String) -> Unit = {},
     val onCustomizeResponsesClicked: () -> Unit = {},
@@ -188,6 +189,7 @@ class RealNativeInputManager @Inject constructor(
     private val duckChatInputModeState: DuckChatInputModeState,
     private val pixel: Pixel,
     private val nativeInputStateBugKillSwitch: NativeInputStateBugKillSwitch,
+    private val nativeInputUrlClearingFeature: NativeInputUrlClearingFeature,
     private val nativeInputOmnibarFeature: NativeInputOmnibarFeature,
     private val nativeInputEventListener: NativeInputEventListener,
     private val edgeToEdgeProvider: EdgeToEdgeProvider,
@@ -226,6 +228,8 @@ class RealNativeInputManager @Inject constructor(
     // The NTP top stroke is driven by hasFavorites, so we save its visibility on attach and restore it
     // on detach rather than re-showing unconditionally (which would show it with no favorites present).
     private var savedTopNtpStrokeVisibility: Int? = null
+
+    private var cachedUrl: String? = null
 
     private val interactionLockSource = MutableStateFlow(InteractionLock.Unlocked)
     private val duckAiFireButtonHighlightSource = MutableStateFlow(false)
@@ -291,6 +295,9 @@ class RealNativeInputManager @Inject constructor(
                 refreshNavBarVisibility()
             }
             .launchIn(lifecycleOwner.lifecycleScope)
+        voiceSearchAvailability.observeVoiceSearchAvailability()
+            .onEach { widgetFrom(rootView)?.let { widget -> updateVoiceButtons(widget) } }
+            .launchIn(lifecycleOwner.lifecycleScope)
     }
 
     override fun isNativeInputEnabled(): Boolean = isNativeInputFieldEnabled
@@ -352,12 +359,17 @@ class RealNativeInputManager @Inject constructor(
     override fun handleDuckAiVoiceResult(query: String) {
         val widget = widgetFrom(rootView)
         if (widget != null) {
-            if (!widget.isChatTabSelected()) {
-                widget.selectChatTab()
+            widget.nextDuckAiEntryPoint = DuckChatEntryPoint.VOICE
+            try {
+                if (!widget.isChatTabSelected()) {
+                    widget.selectChatTab()
+                }
+                widget.submitMessage(query)
+            } finally {
+                widget.nextDuckAiEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT
             }
-            widget.submitMessage(query)
         } else {
-            duckChat.openDuckChatWithAutoPrompt(query)
+            duckChat.openDuckChatWithAutoPrompt(query, DuckChatEntryPoint.VOICE)
         }
     }
 
@@ -642,6 +654,7 @@ class RealNativeInputManager @Inject constructor(
                 }
             }
         }
+        bindUrlCaching(widgetView)
         attachWidget(widgetView, navBarView, isBottom, tabId)
         // Bottom omnibar: slide the nav bar in with open. Top omnibar: snap the bar so the enter
         // morph can run from the omnibar while the buttons appear without animating — a concurrent
@@ -739,7 +752,9 @@ class RealNativeInputManager @Inject constructor(
                     }
                     isExiting = false
                     nativeInputEventListener.onChatPromptSubmitted()
-                    callbacks.onDuckAiQuerySubmitted(query)
+                    val entryPoint = widget.nextDuckAiEntryPoint
+                    widget.nextDuckAiEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT
+                    callbacks.onDuckAiQuerySubmitted(query, entryPoint)
                 }
             },
         )
@@ -801,6 +816,7 @@ class RealNativeInputManager @Inject constructor(
             savedTopNtpStrokeVisibility = null
         }
         duckAiToolbarHidden = false
+        cachedUrl = null
         // Drop Fragment-scoped callback closures so they don't outlive the widget.
         lastCallbacks = null
         return removed
@@ -906,6 +922,7 @@ class RealNativeInputManager @Inject constructor(
             // Picker tied to whether the current tab is a Duck.ai page that already has a chatId (existing chat) or new chat.
             bindModelPickerEnabledSource(chatIdFlow.map { it == null })
             bindChatIdSource(chatIdFlow)
+            bindCurrentUrlSource(currentTabUrl)
             bindInteractionLockSource(interactionLockSource)
             bindDuckAiFireButtonHighlightSource(duckAiFireButtonHighlightSource)
         }
@@ -938,7 +955,7 @@ class RealNativeInputManager @Inject constructor(
         }
         widget.onVoiceChatClick = {
             hideNativeInput(animate = false)
-            duckChat.openVoiceDuckChat()
+            duckChat.openVoiceDuckChat(DuckChatEntryPoint.VOICE)
         }
     }
 
@@ -969,6 +986,41 @@ class RealNativeInputManager @Inject constructor(
             }
             previousOnSearchSelected?.invoke(animate)
         }
+    }
+
+    internal fun bindUrlCaching(widgetView: View) {
+        if (!nativeInputUrlClearingFeature.self().isEnabled() || omnibarController.isDuckAiMode()) return
+        val widget = widgetFrom(widgetView) ?: return
+        val text = widget.text
+
+        val onChatSelected = widget.onChatSelected
+        widget.onChatSelected = { animate ->
+            val isDirty = widget.text != text
+            if (!isDirty) cacheUrl(widget)
+            onChatSelected?.invoke(animate)
+        }
+
+        val onSearchSelected = widget.onSearchSelected
+        widget.onSearchSelected = { animate ->
+            restoreUrl(widget)
+            onSearchSelected?.invoke(animate)
+        }
+    }
+
+    private fun cacheUrl(widget: NativeInputWidget) {
+        val text = widget.text
+        if (text.isNotBlank() && queryUrlPredictor.isUrl(text)) {
+            cachedUrl = text
+            widget.text = ""
+        }
+    }
+
+    private fun restoreUrl(widget: NativeInputWidget) {
+        cachedUrl?.takeIf { widget.text.isEmpty() }?.let { url ->
+            widget.text = url
+            widget.selectAllText()
+        }
+        cachedUrl = null
     }
 
     private fun applyInitialTabSelection(widgetView: View, isNewTab: Boolean, initialInputMode: InputMode?) {

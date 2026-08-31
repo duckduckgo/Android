@@ -1033,4 +1033,11 @@
     <string name="singleTabFireDialogTitleFireMode">Smazat karty Fire a jejich data?</string>
 
     <string name="downloadsCannotOpenFileErrorMessage">Soubor nejde otevřít. Zkus vyhledat kompatibilní aplikaci.</string>
+
+    <!-- Error pages -->
+    <string name="webViewErrorTitle" instruction="Title shown on the error pages">DuckDuckGo nemůže načíst tuto stránku</string>
+    <string name="webViewErrorNoConnection" instruction="Message shown when the page fails to load because the device has no internet connection">Zdá se, že internetové připojení je offline.</string>
+    <string name="webViewErrorBadUrl" instruction="Message shown when the hostname of the website could not be resolved">Server se zadaným názvem hostitele nebyl nalezen.</string>
+    <string name="webViewErrorSslProtocol" instruction="Message shown when the website&apos;s SSL certificate is invalid. Placeholder is the website&apos;s address"><![CDATA[Certifikát pro tento server není platný. Možná se dokonce připojuješ k serveru, který předstírá, že je <b>%1$s</b>. Tvoje důvěrné informace by mohly být ohrožené.]]></string>
+    <string name="webViewErrorRedirectSuggestionMessage" instruction="Shown when a domain fails to load, offering a link to the www. version of the address. Placeholder is a tappable link to the suggested address.">Nebo to mělo být <annotation type="redirect_link">^1</annotation>?</string>
 </resources>

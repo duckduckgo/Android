@@ -57,6 +57,10 @@
     <string name="systemPermissionDialogCameraAndAudioDeniedContent">Nettsteder kan bare bruke kameraet og mikrofonen din hvis du lar DuckDuckGo be om tilgang.</string>
     <string name="systemPermissionsDeniedDialogPositiveButton">Åpne innstillinger</string>
     <string name="systemPermissionsDeniedDialogNegativeButton">Avbryt</string>
+    <string name="duckAiMicPermissionDeniedSnackBarMessage">Mikrofontillatelse er nødvendig for talefunksjoner</string>
+    <string name="duckAiMicPermissionDeniedDialogTitle">DuckDuckGo trenger tilgang til mikrofonen</string>
+    <string name="duckAiMicPermissionDeniedDialogContent">Mikrofontillatelser er nødvendig hvis du vil bruke talefunksjoner i Duck.ai</string>
+    <string name="duckAiMicPermissionDeniedDialogPositiveButton">Endre tillatelser</string>
 
     <string name="sitePermissionsSettingsDescription">Nettsteder du besøker, kan be om tilgang til enhetens posisjon, kamera, mikrofon eller DRA-programvare (digital rettighetsadministrasjon). De får ikke tilgang til disse med mindre du uttrykkelig gir dem tillatelse.</string>
     <string name="sitePermissionsSettingsEnablePermissionTitle">Tillat alle nettsteder å be om:</string>

@@ -15,7 +15,7 @@ tags:
       - tapOn:
           id: "daxDialogDismissButton|contextualBrandDesignDismissButton"
       - tapOn:
-          id: "omnibarTextInput"
+          id: "omnibarTextInput|inputField"
       - inputText: "https://www.search-company.site/#ad-id-14"
       - pressKey: Enter
       - assertVisible:

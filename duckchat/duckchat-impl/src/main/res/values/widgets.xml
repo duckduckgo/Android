@@ -14,11 +14,25 @@
   ~ limitations under the License.
   -->
 
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <style name="Widget.DuckDuckGo.DuckChatContextualFavicon">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">@dimen/smallShapeCornerRadius</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.DuckAiContextualEntryDialog" parent="@style/Theme.Design.BottomSheetDialog">
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="enableEdgeToEdge">true</item>
+        <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
+        <item name="bottomSheetStyle">@style/Widget.DuckDuckGo.DuckAiContextualEntryDialogStyle
+        </item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.DuckAiContextualEntryDialogStyle" parent="@style/Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@android:color/transparent</item>
     </style>
 
 </resources>

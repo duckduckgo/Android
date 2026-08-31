@@ -16,4 +16,4 @@ tags:
       - assertNotVisible:
           text: ".*That's DuckDuckGo Search!.*"
       - assertVisible:
-          id: "omnibarTextInput"
+          id: "omnibarTextInput|inputField"

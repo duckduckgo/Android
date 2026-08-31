@@ -130,6 +130,9 @@ class NewTabPageView @JvmOverloads constructor(
     @Inject
     lateinit var hatchInteractionsPlugins: PluginPoint<HatchInteractionsPlugin>
 
+    @Inject
+    lateinit var ntpEngagementTracker: NtpEngagementTracker
+
     private val binding: ViewNewTabBinding by viewBinding()
 
     private val homeBackgroundLogo by lazy { HomeBackgroundLogo(binding.ddgLogo) }
@@ -150,11 +153,8 @@ class NewTabPageView @JvmOverloads constructor(
     private var lastSelectedMode: InputMode? = null
     private var logoAnimator: ValueAnimator? = null
 
-    private var pageEngagedFiredForCurrentAttachment = false
-
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
-        if (ev.actionMasked == MotionEvent.ACTION_DOWN && !pageEngagedFiredForCurrentAttachment) {
-            pageEngagedFiredForCurrentAttachment = true
+        if (ev.actionMasked == MotionEvent.ACTION_DOWN && ntpEngagementTracker.shouldReportEngagement()) {
             hatchInteractionsPlugins.getPlugins().forEach { it.onNtpEngaged() }
         }
         return super.dispatchTouchEvent(ev)
@@ -190,8 +190,6 @@ class NewTabPageView @JvmOverloads constructor(
         conflatedChatModeJob += inputModeState.displayedMode
             .onEach { mode -> updateLogoForMode(mode) }
             .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
-
-        pageEngagedFiredForCurrentAttachment = false
 
         disableViewStateSaving()
     }

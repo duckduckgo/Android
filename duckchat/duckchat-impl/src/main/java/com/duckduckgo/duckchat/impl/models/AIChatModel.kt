@@ -167,5 +167,7 @@ enum class ModelProvider {
                 else -> UNKNOWN
             }
         }
+
+        fun fromNameOrNull(name: String?): ModelProvider? = entries.firstOrNull { it.name == name }
     }
 }

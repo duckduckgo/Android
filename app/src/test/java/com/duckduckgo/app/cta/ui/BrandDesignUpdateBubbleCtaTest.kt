@@ -28,6 +28,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.onboarding.store.SegmentedOnboardingPath
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleBrandDesignUpdateCardView
@@ -204,6 +205,7 @@ class BrandDesignUpdateBubbleCtaTest {
             deviceInfo = mockDeviceInfo,
             isCustomAiOnboardingFlow = false,
             isFreeTrialCopy = false,
+            segmentedPath = null,
             onboardingImprovementsEnabled = true,
             onboardingImprovementsV2Enabled = true,
         )
@@ -246,6 +248,7 @@ class BrandDesignUpdateBubbleCtaTest {
             deviceInfo = mockDeviceInfo,
             isCustomAiOnboardingFlow = false,
             isFreeTrialCopy = false,
+            segmentedPath = null,
             onboardingImprovementsEnabled = true,
             onboardingImprovementsV2Enabled = true,
         )
@@ -294,6 +297,7 @@ class BrandDesignUpdateBubbleCtaTest {
             deviceInfo = mockDeviceInfo,
             isCustomAiOnboardingFlow = false,
             isFreeTrialCopy = false,
+            segmentedPath = null,
             onboardingImprovementsEnabled = true,
             onboardingImprovementsV2Enabled = true,
         )
@@ -327,6 +331,7 @@ class BrandDesignUpdateBubbleCtaTest {
             deviceInfo = mockDeviceInfo,
             isCustomAiOnboardingFlow = true,
             isFreeTrialCopy = false,
+            segmentedPath = null,
             onboardingImprovementsEnabled = true,
             onboardingImprovementsV2Enabled = true,
         )
@@ -342,6 +347,39 @@ class BrandDesignUpdateBubbleCtaTest {
             deviceInfo = mockDeviceInfo,
             isCustomAiOnboardingFlow = false,
             isFreeTrialCopy = false,
+            segmentedPath = null,
+            onboardingImprovementsEnabled = true,
+            onboardingImprovementsV2Enabled = true,
+        )
+        assertEquals(R.string.onboardingPrivacyProDaxDialogDescription, cta.description)
+    }
+
+    @Test
+    fun whenDaxSubscriptionSegmentedAiPathThenDescriptionIsCustomAi() {
+        val cta = DaxSubscriptionBrandDesignUpdateBubbleCta(
+            onboardingStore = onboardingStore,
+            appInstallStore = appInstallStore,
+            isLightTheme = true,
+            deviceInfo = mockDeviceInfo,
+            isCustomAiOnboardingFlow = false,
+            isFreeTrialCopy = false,
+            segmentedPath = SegmentedOnboardingPath.AI,
+            onboardingImprovementsEnabled = true,
+            onboardingImprovementsV2Enabled = true,
+        )
+        assertEquals(R.string.onboardingPrivacyProCustomAiFlowDaxDialogDescription, cta.description)
+    }
+
+    @Test
+    fun whenDaxSubscriptionSegmentedSearchPathThenDescriptionIsStandard() {
+        val cta = DaxSubscriptionBrandDesignUpdateBubbleCta(
+            onboardingStore = onboardingStore,
+            appInstallStore = appInstallStore,
+            isLightTheme = true,
+            deviceInfo = mockDeviceInfo,
+            isCustomAiOnboardingFlow = false,
+            isFreeTrialCopy = false,
+            segmentedPath = SegmentedOnboardingPath.SEARCH,
             onboardingImprovementsEnabled = true,
             onboardingImprovementsV2Enabled = true,
         )
@@ -365,7 +403,7 @@ class BrandDesignUpdateBubbleCtaTest {
         onboardingImprovementsEnabled = onboardingImprovementsEnabled,
         onboardingImprovementsV2Enabled = onboardingImprovementsV2Enabled,
     ) {
-        override val activeIncludeId: Int = R.id.primaryCta
+        override val activeIncludeIds: List<Int> = listOf(R.id.primaryCta)
         override val showArrow: Boolean = false
 
         override fun configureContentViews(view: View) {}
@@ -387,7 +425,7 @@ class BrandDesignUpdateBubbleCtaTest {
         onboardingImprovementsEnabled = onboardingImprovementsEnabled,
     ),
         DaxBubbleCta.ShowsWavingDax {
-        override val activeIncludeId: Int = R.id.primaryCta
+        override val activeIncludeIds: List<Int> = listOf(R.id.primaryCta)
         override val showArrow: Boolean = false
         override val wavingDaxSpec = DaxBubbleCta.WavingDaxSpec(
             rotationDegrees = 0f,

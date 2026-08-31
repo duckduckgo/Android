@@ -137,6 +137,7 @@ class OmnibarLayoutViewModelTest {
     private val browserMode: BrowserMode = BrowserMode.REGULAR
 
     private lateinit var fakeStandardizedLeadingIconToggle: StandardizedLeadingIconFeatureToggle
+    private lateinit var fakeOmnibarPreFillKillSwitch: OmnibarPreFillKillSwitch
     private lateinit var testee: OmnibarLayoutViewModel
 
     private val EMPTY_URL = ""
@@ -175,6 +176,12 @@ class OmnibarLayoutViewModelTest {
             FakeToggleStore(),
             featureName = "standardizedLeadingIcon",
         ).build().create(StandardizedLeadingIconFeatureToggle::class.java)
+
+        fakeOmnibarPreFillKillSwitch = FeatureToggles.Builder(
+            FakeToggleStore(),
+            featureName = "omnibarPreFillKillSwitch",
+        ).build().create(OmnibarPreFillKillSwitch::class.java)
+        fakeOmnibarPreFillKillSwitch.self().setRawStoredState(State(enable = true))
 
         initializeViewModel()
     }
@@ -220,6 +227,7 @@ class OmnibarLayoutViewModelTest {
             serpEasterEggLogosToggles = serpEasterEggLogosToggles,
             addressBarTrackersAnimationManager = addressBarTrackersAnimationManager,
             standardizedLeadingIconToggle = fakeStandardizedLeadingIconToggle,
+            omnibarPreFillKillSwitch = fakeOmnibarPreFillKillSwitch,
             progressBarUpgradeFeature = fakeProgressBarUpgradeFeature,
             nativeInputOmnibarFeature = fakeNativeInputOmnibarFeature,
             browserMode = browserMode,
@@ -1749,9 +1757,46 @@ class OmnibarLayoutViewModelTest {
     fun `when input text click catcher clicked and random URL then input screen launched with full URL`() = runTest {
         isFullUrlEnabledFlow.emit(false)
         initializeViewModel()
-        val omnibarViewState = OmnibarViewState(omnibarText = "test", queryOrFullUrl = "test", isEditing = false)
-        testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState))
         givenSiteLoaded(RANDOM_URL)
+        val omnibarViewState = OmnibarViewState(omnibarText = RANDOM_URL.toUri().baseHost!!, queryOrFullUrl = RANDOM_URL, isEditing = false)
+        testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState))
+
+        testee.onTextInputClickCatcherClicked()
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue(command is LaunchNativeInput)
+            assertEquals(RANDOM_URL, (command as LaunchNativeInput).query)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when input text click catcher clicked before a submitted URL is loaded then input screen shows submitted URL`() = runTest {
+        isFullUrlEnabledFlow.emit(false)
+        initializeViewModel()
+        givenSiteLoaded(RANDOM_URL)
+        val submitted = OmnibarViewState(omnibarText = "example.com", queryOrFullUrl = "example.com", isEditing = false)
+        testee.onExternalStateChange(StateChange.OmnibarStateChange(submitted))
+
+        testee.onTextInputClickCatcherClicked()
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue(command is LaunchNativeInput)
+            assertEquals("example.com", (command as LaunchNativeInput).query)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when pre-fill kill switch disabled then a submitted URL still pre-fills the loaded URL`() = runTest {
+        isFullUrlEnabledFlow.emit(false)
+        initializeViewModel()
+        fakeOmnibarPreFillKillSwitch.self().setRawStoredState(State(enable = false))
+        givenSiteLoaded(RANDOM_URL)
+        val submitted = OmnibarViewState(omnibarText = "example.com", queryOrFullUrl = "example.com", isEditing = false)
+        testee.onExternalStateChange(StateChange.OmnibarStateChange(submitted))
 
         testee.onTextInputClickCatcherClicked()
 

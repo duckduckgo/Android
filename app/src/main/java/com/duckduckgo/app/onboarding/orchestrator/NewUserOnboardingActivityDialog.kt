@@ -16,6 +16,11 @@
 
 package com.duckduckgo.app.onboarding.orchestrator
 
+import androidx.annotation.StringRes
+import com.duckduckgo.app.onboarding.OnboardingPreference
+import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
+import com.duckduckgo.onboarding.api.OnboardingSingleChoiceDataPlugin.Option
+
 /**
  * What the [com.duckduckgo.app.onboarding.ui.OnboardingActivity] renderer should present for the current step.
  */
@@ -28,6 +33,7 @@ sealed interface NewUserOnboardingActivityDialog {
     data object ComparisonChart : NewUserOnboardingActivityDialog
     data object DownloadReason : NewUserOnboardingActivityDialog
     data object AiComparisonChart : NewUserOnboardingActivityDialog
+    data class SegmentedComparisonChart(val chart: ComparisonChartConfig) : NewUserOnboardingActivityDialog
     data object DefaultBrowserPrompt : NewUserOnboardingActivityDialog
     data object AddToDock : NewUserOnboardingActivityDialog
     data object WidgetPrompt : NewUserOnboardingActivityDialog
@@ -35,7 +41,17 @@ sealed interface NewUserOnboardingActivityDialog {
     data object AddWidget : NewUserOnboardingActivityDialog
     data class AddressBarPosition(val showSplitOption: Boolean) : NewUserOnboardingActivityDialog
     data object InputScreen : NewUserOnboardingActivityDialog
-    data class InputScreenPreview(val isSearchDefault: Boolean) : NewUserOnboardingActivityDialog
+
+    /**
+     * @param isSearchDefault when true, the search tab is pre-selected, otherwise, the Duck.ai tab is pre-selected.
+     * @param showModeToggle when true, the toggle is visible and allows changing the pre-selected input method ([isSearchDefault]).
+     */
+    data class InputScreenPreview(
+        val isSearchDefault: Boolean,
+        val showModeToggle: Boolean,
+        @get:StringRes val titleRes: Int,
+    ) : NewUserOnboardingActivityDialog
+
     data class QuickSetup(
         val showSplitOption: Boolean,
         val hideSetDefaultBrowserRow: Boolean,
@@ -43,4 +59,20 @@ sealed interface NewUserOnboardingActivityDialog {
         val hideAddressBarRow: Boolean,
         val isReinstallUser: Boolean,
     ) : NewUserOnboardingActivityDialog
+
+    /** [initialSelections] holds only the preferences to offer, in row order, each against the value to start from. */
+    data class PreferenceSelector(
+        @get:StringRes val titleRes: Int,
+        val initialSelections: Map<OnboardingPreference, Boolean>,
+    ) : NewUserOnboardingActivityDialog
+
+    data class SingleChoice(
+        @field:StringRes val title: Int,
+        @field:StringRes val body: Int,
+        val options: List<Option>,
+    ) : NewUserOnboardingActivityDialog
+
+    data class TogglePosition(val options: List<Option>) : NewUserOnboardingActivityDialog
+
+    data class DuckAiState(val options: List<Option>) : NewUserOnboardingActivityDialog
 }

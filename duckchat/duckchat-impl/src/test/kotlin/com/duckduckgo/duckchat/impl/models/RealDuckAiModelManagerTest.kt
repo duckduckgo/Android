@@ -35,6 +35,8 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.stub
@@ -1370,5 +1372,117 @@ class RealDuckAiModelManagerTest {
         testee.fetchModels()
 
         assertEquals("low", testee.getResolvedReasoningEffort())
+    }
+
+    @Test
+    fun whenProviderPersistedAndNoModelPickedThenAModelOfThatProviderIsSelected() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(dataStore.getSelectedProvider()).thenReturn(ModelProvider.ANTHROPIC.name)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any())).thenReturn(
+            AIChatModelsResponse(
+                listOf(
+                    remoteModel("gpt", provider = "openai"),
+                    remoteModel("claude", provider = "anthropic"),
+                ),
+            ),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        assertEquals("claude", testee.modelState.value.selectedModelId)
+    }
+
+    @Test
+    fun whenBothAModelAndAProviderArePersistedThenTheModelWins() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(SelectedModel("gpt", "gpt"))
+        whenever(dataStore.getSelectedProvider()).thenReturn(ModelProvider.ANTHROPIC.name)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any())).thenReturn(
+            AIChatModelsResponse(
+                listOf(
+                    remoteModel("gpt", provider = "openai"),
+                    remoteModel("claude", provider = "anthropic"),
+                ),
+            ),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        assertEquals("gpt", testee.modelState.value.selectedModelId)
+    }
+
+    @Test
+    fun whenPersistedProviderHasNoModelInTheResponseThenTheDefaultIsUsedAndThePreferenceKept() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(dataStore.getSelectedProvider()).thenReturn(ModelProvider.MISTRAL.name)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any())).thenReturn(
+            AIChatModelsResponse(listOf(remoteModel("gpt", provider = "openai"))),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        assertEquals("gpt", testee.modelState.value.selectedModelId)
+        verify(dataStore, never()).setSelectedProvider(null)
+    }
+
+    @Test
+    fun whenProviderSelectedThenItReplacesAnyPersistedModelPick() = runTest {
+        givenProviderStore()
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any())).thenReturn(
+            AIChatModelsResponse(
+                listOf(
+                    remoteModel("gpt", provider = "openai"),
+                    remoteModel("claude", provider = "anthropic"),
+                ),
+            ),
+        )
+        testee = createManager()
+        testee.fetchModels()
+
+        testee.selectProvider(ModelProvider.ANTHROPIC)
+
+        verify(dataStore).setSelectedProvider(ModelProvider.ANTHROPIC.name)
+        verify(dataStore, atLeastOnce()).setSelectedModel(null)
+        assertEquals("claude", testee.modelState.value.selectedModelId)
+    }
+
+    @Test
+    fun whenModelSelectedThenTheProviderPreferenceIsCleared() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        testee = createManager()
+
+        testee.selectModel(
+            AIChatModel(
+                id = "gpt",
+                name = "gpt",
+                displayName = "gpt",
+                shortName = "gpt",
+                accessTier = listOf("free"),
+                isAccessible = true,
+                provider = ModelProvider.OPENAI,
+            ),
+        )
+
+        verify(dataStore).setSelectedProvider(null)
+    }
+
+    /** [DuckChatDataStore] is a mock, so the provider key has to remember what was written to it. */
+    private fun givenProviderStore() {
+        var stored: String? = null
+        dataStore.stub {
+            onBlocking { getSelectedProvider() }.thenAnswer { stored }
+            onBlocking { setSelectedProvider(anyOrNull()) }.thenAnswer {
+                stored = it.arguments[0] as String?
+                Unit
+            }
+        }
     }
 }

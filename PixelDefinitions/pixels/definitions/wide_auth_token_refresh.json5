@@ -99,6 +99,11 @@
                 "examples": ["HttpException", "SocketTimeoutException", "IllegalStateException"]
             },
             {
+                "key": "feature.data.ext.signed_out",
+                "description": "Whether the user was signed out after an irrecoverable error was encountered, such as an invalid refresh token.",
+                "type": "boolean"
+            },
+            {
                 "key": "feature.data.ext.step.lock_acquire",
                 "description": "true if the cross-process refresh lock was acquired, false if it timed out or errored. A false value does not fail the refresh - see lock_outcome.",
                 "type": "boolean"

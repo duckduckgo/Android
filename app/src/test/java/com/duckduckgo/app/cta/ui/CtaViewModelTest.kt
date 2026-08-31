@@ -41,6 +41,7 @@ import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.onboarding.RealDuckAiOnboardingDemo
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.onboarding.store.SegmentedOnboardingPath
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
@@ -451,6 +452,25 @@ class CtaViewModelTest {
             detectedRefreshPatterns = detectedRefreshPatterns,
             brokenSitePromptUrl = site.url,
         )
+        assertTrue(value is BrokenSitePromptDialogCta)
+    }
+
+    @Test
+    fun whenOnboardingCompletedAndPrivacyOffForSiteThenReturnBrokenSitePrompt() = runTest {
+        whenever(mockSettingsDataStore.hideTips).thenReturn(true)
+        whenever(mockUserAllowListRepository.isDomainInUserAllowList(any())).thenReturn(true)
+        val site = site(url = "http://www.facebook.com", entity = TdsEntity("Facebook", "Facebook", 9.0))
+        val detectedRefreshPatterns = setOf(RefreshPattern.THRICE_IN_20_SECONDS)
+        whenever(mockBrokenSitePrompt.shouldShowBrokenSitePrompt(any(), any())).thenReturn(true)
+
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = true,
+            site = site,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = site.url,
+        )
+
         assertTrue(value is BrokenSitePromptDialogCta)
     }
 
@@ -1430,6 +1450,69 @@ class CtaViewModelTest {
     }
 
     @Test
+    fun whenEndCtaConditionsMetAndOnSegmentedSearchPathWithAiInputThenSegmentedVariantReturnedAndInputScreenSettingApplied() = runTest {
+        givenDaxOnboardingActive()
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO_VISIT_SITE)).thenReturn(true)
+        givenAtLeastOneDaxDialogCtaShown()
+        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
+        whenever(mockOnboardingStore.getSegmentedPathWithAiInput()).thenReturn(SegmentedOnboardingPath.SEARCH)
+
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = false,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
+
+        assertEquals(SegmentedOnboardingPath.SEARCH, (value as DaxEndBrandDesignUpdateBubbleCta).segmentedPath)
+        verify(mockDuckChat).setInputScreenUserSetting(true)
+    }
+
+    @Test
+    fun whenEndCtaConditionsMetAndOnSegmentedAiPathThenAiVariantReturnedAndInputScreenSettingApplied() = runTest {
+        givenDaxOnboardingActive()
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO_VISIT_SITE)).thenReturn(true)
+        givenAtLeastOneDaxDialogCtaShown()
+        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
+        whenever(mockOnboardingStore.getSegmentedPathWithAiInput()).thenReturn(SegmentedOnboardingPath.AI)
+
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = false,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
+
+        value as DaxEndBrandDesignUpdateBubbleCta
+        assertEquals(SegmentedOnboardingPath.AI, value.segmentedPath)
+        // The AI path's own copy lives on the Duck.ai End CTA, which it reaches by submitting a chat.
+        assertEquals(R.string.onboardingEndDaxDialogDescription, value.description)
+        verify(mockDuckChat).setInputScreenUserSetting(true)
+    }
+
+    @Test
+    fun whenEndCtaConditionsMetAndNotOnSegmentedPathWithAiInputThenInputScreenSettingNotApplied() = runTest {
+        givenDaxOnboardingActive()
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO_VISIT_SITE)).thenReturn(true)
+        givenAtLeastOneDaxDialogCtaShown()
+        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
+        whenever(mockOnboardingStore.getSegmentedPathWithAiInput()).thenReturn(null)
+
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = false,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
+
+        assertNull((value as DaxEndBrandDesignUpdateBubbleCta).segmentedPath)
+        verify(mockDuckChat, never()).setInputScreenUserSetting(any())
+    }
+
+    @Test
     fun whenBrandDesignUpdateToggleDisabledAndEndCtaConditionsMetThenReturnLegacyEndCta() = runTest {
         givenDaxOnboardingActive()
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
@@ -1466,6 +1549,33 @@ class CtaViewModelTest {
             brokenSitePromptUrl = null,
         )
         assertTrue(value is DaxSubscriptionBrandDesignUpdateBubbleCta)
+    }
+
+    @Test
+    fun whenSubscriptionCtaOnSegmentedAiPathThenDescriptionIsCustomAi() = runTest {
+        givenDaxOnboardingActive()
+        whenever(mockSubscriptions.isEligible()).thenReturn(true)
+        whenever(mockSubscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
+        whenever(mockExtendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockEnabledToggle)
+        whenever(mockExtendedOnboardingFeatureToggles.freeTrialCopy()).thenReturn(mockDisabledToggle)
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO_VISIT_SITE)).thenReturn(true)
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_END)).thenReturn(true)
+        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
+        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
+        whenever(mockOnboardingStore.getSegmentedPathWithAiInput()).thenReturn(SegmentedOnboardingPath.AI)
+
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = false,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
+
+        assertEquals(
+            R.string.onboardingPrivacyProCustomAiFlowDaxDialogDescription,
+            (value as DaxSubscriptionBrandDesignUpdateBubbleCta).description,
+        )
     }
 
     @Test
@@ -1746,6 +1856,27 @@ class CtaViewModelTest {
     }
 
     @Test
+    fun whenCanShowDuckAiEndCtaOnSegmentedAiPathThenHomeCtaCarriesTheAiPath() = runTest {
+        givenDaxOnboardingActive()
+        givenCanShowDuckAiEndCta()
+        showInputScreenFlow.value = false
+        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
+        whenever(mockOnboardingStore.getSegmentedPathWithAiInput()).thenReturn(SegmentedOnboardingPath.AI)
+
+        val cta = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = false,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
+
+        assertEquals(
+            R.string.aiPathWithToggleEnabledContextualEndDescription,
+            (cta as DaxDuckAiEndBrandDesignUpdateBubbleCta).description,
+        )
+    }
+
+    @Test
     fun whenInputScreenEnabledAndCanShowDuckAiEndCtaThenHomeCtaIsNullSoLegacyInputScreenFlowOwnsIt() = runTest {
         givenDaxOnboardingActive()
         givenCanShowDuckAiEndCta()
@@ -1818,6 +1949,7 @@ class CtaViewModelTest {
             isLightTheme = true,
             deviceInfo = mockDeviceInfo,
             isCustomAiOnboardingFlow = false,
+            segmentedPath = null,
             onboardingImprovementsV2Enabled = true,
         )
         testee.onCtaShown(cta)
@@ -1833,9 +1965,38 @@ class CtaViewModelTest {
             isLightTheme = true,
             deviceInfo = mockDeviceInfo,
             isCustomAiOnboardingFlow = true,
+            segmentedPath = null,
             onboardingImprovementsV2Enabled = true,
         )
         assertEquals(R.string.onboardingEndCustomAiFlowDaxDialogDescription, cta.description)
+    }
+
+    @Test
+    fun whenDaxDuckAiEndBrandDesignBubbleCtaOnSegmentedAiPathThenDescriptionIsAiPath() {
+        val cta = DaxDuckAiEndBrandDesignUpdateBubbleCta(
+            onboardingStore = mockOnboardingStore,
+            appInstallStore = mockAppInstallStore,
+            isLightTheme = true,
+            deviceInfo = mockDeviceInfo,
+            isCustomAiOnboardingFlow = false,
+            segmentedPath = SegmentedOnboardingPath.AI,
+            onboardingImprovementsV2Enabled = true,
+        )
+        assertEquals(R.string.aiPathWithToggleEnabledContextualEndDescription, cta.description)
+    }
+
+    @Test
+    fun whenDaxDuckAiEndBrandDesignBubbleCtaOnSegmentedSearchPathThenDescriptionIsStandard() {
+        val cta = DaxDuckAiEndBrandDesignUpdateBubbleCta(
+            onboardingStore = mockOnboardingStore,
+            appInstallStore = mockAppInstallStore,
+            isLightTheme = true,
+            deviceInfo = mockDeviceInfo,
+            isCustomAiOnboardingFlow = false,
+            segmentedPath = SegmentedOnboardingPath.SEARCH,
+            onboardingImprovementsV2Enabled = true,
+        )
+        assertEquals(R.string.onboardingDuckAiEndCtaDescription, cta.description)
     }
 
     @Test
@@ -1846,6 +2007,7 @@ class CtaViewModelTest {
             isLightTheme = true,
             deviceInfo = mockDeviceInfo,
             isCustomAiOnboardingFlow = false,
+            segmentedPath = null,
             onboardingImprovementsV2Enabled = true,
         )
         assertEquals(R.string.onboardingDuckAiEndCtaDescription, cta.description)
@@ -2307,6 +2469,7 @@ class CtaViewModelTest {
         deviceInfo = mockDeviceInfo,
         isCustomAiOnboardingFlow = false,
         isFreeTrialCopy = false,
+        segmentedPath = null,
         onboardingImprovementsEnabled = false,
         onboardingImprovementsV2Enabled = true,
     )
@@ -2319,6 +2482,7 @@ class CtaViewModelTest {
         onboardingImprovementsEnabled = false,
         onboardingImprovementsV2Enabled = true,
         isOmnibarBottom = false,
+        segmentedPath = null,
     )
 
     private fun daxDuckAiEndBrandDesignUpdateBubbleCta() = DaxDuckAiEndBrandDesignUpdateBubbleCta(
@@ -2327,6 +2491,7 @@ class CtaViewModelTest {
         isLightTheme = true,
         deviceInfo = mockDeviceInfo,
         isCustomAiOnboardingFlow = false,
+        segmentedPath = null,
         onboardingImprovementsV2Enabled = true,
     )
 

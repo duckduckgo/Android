@@ -11,6 +11,11 @@ on:
         description: 'Commit SHA(s) cherry-picked into the hotfix (space- or comma-separated)'
         required: true
         type: string
+      create_asana_task:
+        description: 'Create an Asana failure task on failure (set false when a caller handles failure reporting)'
+        required: false
+        type: boolean
+        default: true
   workflow_dispatch:
     inputs:
       app-version:
@@ -21,6 +26,11 @@ on:
         description: 'Commit SHA(s) cherry-picked into the hotfix (space- or comma-separated)'
         required: true
         type: string
+      create_asana_task:
+        description: 'Create an Asana failure task on failure (set false when a caller handles failure reporting)'
+        required: false
+        type: boolean
+        default: true
 
 env:
   ASANA_PAT: ${{ secrets.ASANA_ACCESS_TOKEN }}
@@ -92,7 +102,7 @@ jobs:
           action: 'send-mattermost-message'
 
       - name: Create Asana task when workflow failed
-        if: ${{ failure() }}
+        if: ${{ failure() && inputs.create_asana_task == true }}
         uses: duckduckgo/native-github-asana-sync@v2.6.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}

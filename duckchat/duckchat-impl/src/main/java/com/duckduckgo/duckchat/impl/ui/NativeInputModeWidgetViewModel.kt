@@ -16,9 +16,11 @@
 
 package com.duckduckgo.duckchat.impl.ui
 
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
@@ -37,6 +39,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InteractionLock
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
@@ -55,6 +58,8 @@ import com.duckduckgo.duckchat.impl.models.ReasoningResolver
 import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelPageType
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.ChatSuggestion
@@ -96,6 +101,7 @@ data class ChatTabSuggestions(
 @ContributesViewModel(ViewScope::class)
 class NativeInputModeWidgetViewModel @Inject constructor(
     private val duckChatInternal: DuckChatInternal,
+    private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     duckAiFeatureState: DuckAiFeatureState,
     subscriptions: Subscriptions,
     private val pendingNativePromptStore: PendingNativePromptStore,
@@ -152,6 +158,10 @@ class NativeInputModeWidgetViewModel @Inject constructor(
 
     private val currentChat = MutableStateFlow<DuckAiChat?>(null)
     private var currentChatJob: Job? = null
+
+    // Kept in sync via bindCurrentUrlSource so submission pixels can read the tab's URL
+    // synchronously — a suspend re-read at fire time would race the navigation the submission triggers.
+    private var latestTabUrl: String? = null
 
     // Defensive buffer for the (rare) case where setActiveChatId fires before configure has set
     // activeTabId. Replayed inside configure / configureContextual when activeTabId becomes known.
@@ -261,6 +271,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         hasText: Boolean,
         hasImageAttachment: Boolean,
         hasFileAttachment: Boolean,
+        addressBarEntryPoint: DuckChatEntryPoint,
     ) {
         val tool = getSelectedTool()?.let { Tool.from(it) }
         val selectedToolParam = when (tool) {
@@ -279,6 +290,9 @@ class NativeInputModeWidgetViewModel @Inject constructor(
             hasText = hasText,
             surface = surface,
             defaultMode = resolvedTogglePositionIfVisible(inputState),
+            tabId = activeTabId.value,
+            pageType = resolvePageType(surface, latestTabUrl),
+            addressBarEntryPoint = addressBarEntryPoint,
         )
         when (tool) {
             Tool.IMAGE_GENERATION -> duckChatPixels.fireImageGenerationSubmitted(surface)
@@ -434,7 +448,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     }
 
     fun openNewChat() {
-        duckChatInternal.openNewDuckChatSession()
+        duckChatInternal.openNewDuckChatSession(DuckChatEntryPoint.ADDRESS_BAR_EDITING_STATE)
     }
 
     fun setDuckAiMode(isDuckAiMode: Boolean) {
@@ -552,6 +566,22 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         }
     }
 
+    fun setActiveTabUrl(url: String?) {
+        latestTabUrl = url
+    }
+
+    /** What the user is looking at. See [DuckChatPixelParameters.PROMPT_PAGE_TYPE]. */
+    private fun resolvePageType(surface: DuckChatPixelSurface, currentUrl: String?): DuckChatPixelPageType = when (surface) {
+        DuckChatPixelSurface.DUCK_AI -> DuckChatPixelPageType.DUCK_AI
+        DuckChatPixelSurface.CONTEXTUAL_CHAT -> DuckChatPixelPageType.CONTEXTUAL
+        DuckChatPixelSurface.ADDRESS_BAR -> when {
+            currentUrl.isNullOrBlank() -> DuckChatPixelPageType.NTP
+            duckChatInternal.isDuckChatUrl(currentUrl.toUri()) -> DuckChatPixelPageType.DUCK_AI
+            duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(currentUrl) -> DuckChatPixelPageType.SERP
+            else -> DuckChatPixelPageType.WEBSITE
+        }
+    }
+
     fun storePendingPrompt(
         query: String,
         modelId: String?,
@@ -565,7 +595,12 @@ class NativeInputModeWidgetViewModel @Inject constructor(
 
     fun configureContextual(tabId: String) {
         activeTabId.value = tabId
-        widgetConfig.update { it.copy(inputContext = NativeInputState.InputContext.DUCK_AI_CONTEXTUAL) }
+        widgetConfig.update {
+            it.copy(
+                inputContext = NativeInputState.InputContext.DUCK_AI_CONTEXTUAL,
+                toggleSelection = NativeInputState.ToggleSelection.DUCK_AI,
+            )
+        }
         replayPendingState(tabId)
     }
 

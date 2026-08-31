@@ -231,7 +231,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         val currentDialog = _viewState.value.currentDialog ?: return
         when (currentDialog) {
             SYNC_RESTORE -> emit(NewUserOnboardingEvent.RestoreRequested)
-            INITIAL, INITIAL_REINSTALL_USER, COMPARISON_CHART, AI_COMPARISON_CHART, INPUT_SCREEN_PREVIEW, ADD_TO_DOCK ->
+            INITIAL, INITIAL_REINSTALL_USER, COMPARISON_CHART, AI_COMPARISON_CHART, ADD_TO_DOCK ->
                 emit(NewUserOnboardingEvent.ContinueClicked)
             ADDRESS_BAR_POSITION ->
                 emit(NewUserOnboardingEvent.AddressBarConfirmed(_viewState.value.selectedAddressBarPosition))
@@ -242,7 +242,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                 emit(NewUserOnboardingEvent.QuickSetupConfirmed(state.selectedAddressBarPosition, state.inputScreenSelected))
             }
             WIDGET_PROMPT -> emit(NewUserOnboardingEvent.AddWidgetRequested)
-            SKIP_ONBOARDING_OPTION -> Unit
+            INPUT_SCREEN_PREVIEW, SKIP_ONBOARDING_OPTION -> Unit
         }
     }
 
@@ -514,9 +514,6 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                 setCurrentDialog(INITIAL_REINSTALL_USER)
             }
             NewUserOnboardingActivityDialog.Initial -> setCurrentDialog(INITIAL)
-            NewUserOnboardingActivityDialog.DownloadReason -> {
-                // no-op in this VM
-            }
             NewUserOnboardingActivityDialog.ComparisonChart ->
                 setCurrentDialog(COMPARISON_CHART, stepIndicator = progress)
             NewUserOnboardingActivityDialog.AiComparisonChart ->
@@ -557,6 +554,16 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                     )
                 }
                 setCurrentDialog(QUICK_SETUP)
+            }
+
+            NewUserOnboardingActivityDialog.DownloadReason,
+            is NewUserOnboardingActivityDialog.SegmentedComparisonChart,
+            is NewUserOnboardingActivityDialog.PreferenceSelector,
+            is NewUserOnboardingActivityDialog.SingleChoice,
+            is NewUserOnboardingActivityDialog.TogglePosition,
+            is NewUserOnboardingActivityDialog.DuckAiState,
+            -> {
+                // These views are only presented in the config-driven onboarding flow, which is not driven by this VM.
             }
         }
     }

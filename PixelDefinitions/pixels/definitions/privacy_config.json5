@@ -1,0 +1,26 @@
+{
+    "privacy_config_downloaded": {
+        "description": "Fired when the remote privacy config has been downloaded and stored successfully, reporting how long each stage took. Durations are bucketed; no URLs, identifiers or exact timings are sent.",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "fetch_duration_ms_bucketed",
+                "description": "Time spent fetching and parsing the remote privacy config, bucketed. Uses lower end of the bucket, so a value is reported when the duration is greater than or equal to it.",
+                "enum": ["0", "100", "200", "300", "400", "500", "800", "1000", "1500", "2000", "3000", "5000", "10000"]
+            },
+            {
+                "key": "persist_duration_ms_bucketed",
+                "description": "Time spent storing the privacy config and notifying its callbacks, bucketed. Uses lower end of the bucket, so a value is reported when the duration is greater than or equal to it.",
+                "enum": ["0", "100", "200", "300", "400", "500", "800", "1000", "1500", "2000", "3000", "5000", "10000"]
+            },
+            {
+                "key": "total_duration_ms_bucketed",
+                "description": "Time for the whole download, from starting the request to the config being stored, bucketed. Uses lower end of the bucket, so a value is reported when the duration is greater than or equal to it.",
+                "enum": ["0", "100", "200", "300", "400", "500", "800", "1000", "1500", "2000", "3000", "5000", "10000"]
+            }
+        ]
+    }
+}

@@ -18,6 +18,7 @@ package com.duckduckgo.duckchat.impl.messaging.fakes
 
 import android.net.Uri
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
@@ -44,17 +45,19 @@ class FakeDuckChat(
 
     override fun isEnabled(): Boolean = enabled
 
-    override fun openDuckChat() {
+    override fun openDuckChat(entryPoint: DuckChatEntryPoint) {
         openDuckChatCalls.add(Unit)
     }
 
-    override fun openDuckChatWithAutoPrompt(query: String) {
+    override fun openDuckChatWithAutoPrompt(query: String, entryPoint: DuckChatEntryPoint) {
         openDuckChatWithAutoPromptCalls.add(query)
     }
 
-    override fun openDuckChatWithPrefill(query: String) {
+    override fun openDuckChatWithPrefill(query: String, entryPoint: DuckChatEntryPoint) {
         openDuckChatWithPrefillCalls.add(query)
     }
+
+    override fun reportDuckChatEntry(entryPoint: DuckChatEntryPoint, opensNewTab: Boolean, hasPrompt: Boolean) { }
 
     override fun getDuckChatUrl(
         query: String,
@@ -118,7 +121,7 @@ class FakeDuckChat(
 
     override fun observeChatSuggestionsUserSettingEnabled(): Flow<Boolean> = chatSuggestionsUserSettingEnabled
 
-    override fun openVoiceDuckChat() { }
+    override fun openVoiceDuckChat(entryPoint: DuckChatEntryPoint) { }
     override fun isVoiceChatSessionActive(tabId: String): Boolean = false
     override val activeVoiceChatSessions: Flow<Set<String>> = MutableStateFlow(emptySet())
     override fun observeTriggerVoiceChatSessionEnd(): Flow<String> = emptyFlow()

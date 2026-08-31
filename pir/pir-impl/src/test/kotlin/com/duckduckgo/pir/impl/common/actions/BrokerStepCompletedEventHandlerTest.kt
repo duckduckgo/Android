@@ -57,6 +57,7 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -717,5 +718,72 @@ class BrokerStepCompletedEventHandlerTest {
 
         assertEquals(CompleteExecution, result.sideEffect)
         assertNull(result.nextEvent)
+    }
+
+    @Test
+    fun whenScanStepHasNoActionsAndSucceedsThenDoesNotCrashAndEmitsNoState() = runTest {
+        val scanStep = ScanStep(
+            broker = testBroker,
+            step = ScanStepActions(
+                stepType = "scan",
+                actions = emptyList(),
+                scanType = "initial",
+            ),
+        )
+        val state = State(
+            runType = RunType.MANUAL,
+            brokerStep = scanStep,
+            profileQuery = testProfileQuery,
+            currentActionIndex = 0,
+            brokerStepStartTime = testBrokerStartTime,
+            stageStatus = PirStageStatus(
+                currentStage = PirStage.OTHER,
+                stageStartMs = testStageStartMs,
+            ),
+        )
+        val event = BrokerStepCompleted(
+            needsEmailConfirmation = false,
+            stepStatus = StepStatus.Success,
+        )
+
+        val result = testee.invoke(state, event)
+
+        verify(mockPirRunStateHandler, never()).handleState(any())
+        assertEquals(CompleteExecution, result.sideEffect)
+    }
+
+    @Test
+    fun whenEmailConfirmationStepHasNoActionsAndSucceedsThenEmitsCompletedWithEmptyActionId() = runTest {
+        val emailConfirmationStep = EmailConfirmationStep(
+            broker = testBroker,
+            step = OptOutStepActions(
+                stepType = "optout",
+                actions = emptyList(),
+                optOutType = "form",
+            ),
+            emailConfirmationJob = testEmailConfirmationJob,
+            profileToOptOut = testExtractedProfile,
+        )
+        val state = State(
+            runType = RunType.EMAIL_CONFIRMATION,
+            brokerStep = emailConfirmationStep,
+            profileQuery = testProfileQuery,
+            currentActionIndex = 0,
+            brokerStepStartTime = testBrokerStartTime,
+            stageStatus = PirStageStatus(
+                currentStage = PirStage.OTHER,
+                stageStartMs = testStageStartMs,
+            ),
+        )
+        val event = BrokerStepCompleted(
+            needsEmailConfirmation = false,
+            stepStatus = StepStatus.Success,
+        )
+
+        testee.invoke(state, event)
+
+        val capturedState = argumentCaptor<BrokerRecordEmailConfirmationCompleted>()
+        verify(mockPirRunStateHandler).handleState(capturedState.capture())
+        assertEquals("", capturedState.firstValue.lastActionId)
     }
 }

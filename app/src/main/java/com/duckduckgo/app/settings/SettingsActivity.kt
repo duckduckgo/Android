@@ -114,6 +114,7 @@ import kotlinx.coroutines.flow.onEach
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 private const val OTHER_PLATFORMS_URL = "https://duckduckgo.com/app"
 
@@ -312,6 +313,10 @@ class SettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun configureSettings() {
+        viewsPrivacy.vpnSetting.setLeadingIconResource(
+            resolveAppTpSettingsIcon(appBrandDesignUpdateToggles.pictograms().isEnabled()),
+        )
+
         if (proSettingsPlugin.isEmpty()) {
             viewsPro.gone()
         } else {
@@ -608,3 +613,6 @@ class SettingsActivity : DuckDuckGoActivity() {
         }
     }
 }
+
+internal fun resolveAppTpSettingsIcon(isPictogramsEnabled: Boolean): Int =
+    if (isPictogramsEnabled) CommonR.drawable.ic_homescreen_lock_color_24 else CommonR.drawable.ic_lock_color_24

@@ -80,17 +80,17 @@
             },
             {
                 "key": "feature.data.ext.is_tab_in_foreground_on_finish",
-                "description": "Whether the tab was in foreground when page finished loading",
+                "description": "Whether the tab was in foreground when page finished loading. Reported by the caller at finish, so it is absent on a cancelled load.",
                 "type": "boolean"
             },
             {
                 "key": "feature.data.ext.active_requests_on_load_start",
-                "description": "Number of active network requests when page load started",
+                "description": "Number of active network requests when page load started. Reported by the caller at finish, so it is absent on a cancelled load.",
                 "type": "number"
             },
             {
                 "key": "feature.data.ext.concurrent_requests_on_finish",
-                "description": "Number of concurrent network requests when page finished loading",
+                "description": "Number of concurrent network requests when page finished loading. Reported by the caller at finish, so it is absent on a cancelled load.",
                 "type": "number"
             },
             {
@@ -142,6 +142,11 @@
                 "key": "feature.data.ext.failure_reason",
                 "description": "Failure reason auto-attached by the wide event client when the flow finishes with FlowStatus.Failure. Mirrors error_code for page-load failures.",
                 "type": "string"
+            },
+            {
+                "key": "feature.data.ext.cancellation_reason",
+                "description": "Why a load ended without finishing. Only present on CANCELLED loads, which are loads superseded by another main frame load in the same tab before they finished. superseded_same_url covers a reload or restart; superseded_different_url covers a redirect hop and the user navigating away - WebView does not distinguish them.",
+                "enum": ["superseded_same_url", "superseded_different_url"]
             }
         ]
     }

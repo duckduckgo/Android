@@ -31,24 +31,25 @@ interface DuckChatContextual {
      * (anchored to [anchor]) or opens the contextual sheet directly.
      * [sourceTabId] is the host tab the flow was launched from; a new chat tab is anchored to it so
      * closing that tab returns here rather than leaving an orphan tab.
-     * [onAskAboutPage] is invoked (on the launching host) when the embedded contextual
+     * [showChatSurface] is invoked (on the launching host) when the embedded contextual
      * sheet should be shown. A null [anchor] (no entry-point view, e.g. from native input) always
      * opens the sheet directly.
      */
     suspend fun launch(
         sourceTabId: String,
         anchor: View?,
-        onAskAboutPage: () -> Unit,
+        showChatSurface: () -> Unit,
     )
 
     /**
-     * Creates the contextual sheet fragment for [tabId]. The host embeds it in its own bottom-sheet
-     * container and drives its visibility.
+     * Creates the chat-in-progress surface of the contextual sheet for [tabId] — the fragment hosting
+     * the Duck.ai conversation. The host embeds it in its own bottom-sheet container and drives its
+     * visibility.
      *
      * The fragment reports the "open in full-screen Duck.ai" outcome back to the host via the Fragment
      * Result API, keyed by [RESULT_KEY] with the URL under [RESULT_URL].
      */
-    fun createSheet(tabId: String): Fragment
+    fun createChatSurface(tabId: String): Fragment
 
     companion object {
         const val RESULT_KEY: String = "KEY_DUCK_AI_CONTEXTUAL_RESULT"

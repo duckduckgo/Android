@@ -997,4 +997,11 @@
     <string name="singleTabFireDialogTitleFireMode">Eliminar separadores Fire e respetivos dados?</string>
 
     <string name="downloadsCannotOpenFileErrorMessage">Não é possível abrir o ficheiro. Verificar se a aplicação é compatível.</string>
+
+    <!-- Error pages -->
+    <string name="webViewErrorTitle" instruction="Title shown on the error pages">O DuckDuckGo não consegue carregar esta página</string>
+    <string name="webViewErrorNoConnection" instruction="Message shown when the page fails to load because the device has no internet connection">A ligação à internet parece estar desligada.</string>
+    <string name="webViewErrorBadUrl" instruction="Message shown when the hostname of the website could not be resolved">Não foi possível encontrar um servidor com o nome do anfitrião especificado.</string>
+    <string name="webViewErrorSslProtocol" instruction="Message shown when the website&apos;s SSL certificate is invalid. Placeholder is the website&apos;s address"><![CDATA[O certificado deste servidor é inválido. Podes estar a ligar a um servidor que finge ser <b>%1$s</b>, o que pode colocar as tuas informações confidenciais em risco.]]></string>
+    <string name="webViewErrorRedirectSuggestionMessage" instruction="Shown when a domain fails to load, offering a link to the www. version of the address. Placeholder is a tappable link to the suggested address.">Queres dizer <annotation type="redirect_link">^1</annotation>?</string>
 </resources>

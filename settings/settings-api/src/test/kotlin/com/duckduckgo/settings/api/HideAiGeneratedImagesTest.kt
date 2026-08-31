@@ -1,0 +1,47 @@
+/*
+ * Copyright (c) 2026 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.duckduckgo.settings.api
+
+import org.junit.Assert.assertEquals
+import org.junit.Test
+
+class HideAiGeneratedImagesTest {
+
+    @Test
+    fun whenSerpCodesThenEachOptionHasExpectedCode() {
+        assertEquals("1", HideAiGeneratedImages.ON.serpCode)
+        assertEquals("-1", HideAiGeneratedImages.OFF.serpCode)
+    }
+
+    @Test
+    fun whenFromSerpCodeThenMapsEachCodeToItsOption() {
+        assertEquals(HideAiGeneratedImages.ON, HideAiGeneratedImages.fromSerpCode("1"))
+        assertEquals(HideAiGeneratedImages.OFF, HideAiGeneratedImages.fromSerpCode("-1"))
+    }
+
+    @Test
+    fun whenFromSerpCodeUnknownOrNullThenDefaultsToOff() {
+        assertEquals(HideAiGeneratedImages.OFF, HideAiGeneratedImages.fromSerpCode(null))
+        assertEquals(HideAiGeneratedImages.OFF, HideAiGeneratedImages.fromSerpCode(""))
+        assertEquals(HideAiGeneratedImages.OFF, HideAiGeneratedImages.fromSerpCode("2"))
+    }
+
+    @Test
+    fun whenSerpKeyThenEveryOptionCarriesTheSameKey() {
+        HideAiGeneratedImages.entries.forEach { assertEquals("kbj", it.serpKey) }
+    }
+}

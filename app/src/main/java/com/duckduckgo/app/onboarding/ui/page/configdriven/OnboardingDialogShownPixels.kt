@@ -45,17 +45,22 @@ class OnboardingDialogShownPixels @Inject constructor(private val pixel: Pixel) 
                 pixel.fire(CustomAiOnboardingPixelName.AI_COMPARISON_SCREEN_SHOW, type = Unique())
             is NewUserOnboardingActivityDialog.AddressBarPosition ->
                 pixel.fire(PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE, type = Unique())
-            NewUserOnboardingActivityDialog.InputScreen ->
+            is NewUserOnboardingActivityDialog.InputScreen ->
                 pixel.fire(PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE, type = Unique())
             is NewUserOnboardingActivityDialog.InputScreenPreview,
             is NewUserOnboardingActivityDialog.QuickSetup,
             NewUserOnboardingActivityDialog.AddToDock,
             NewUserOnboardingActivityDialog.WidgetPrompt,
             NewUserOnboardingActivityDialog.DownloadReason,
+            is NewUserOnboardingActivityDialog.SegmentedComparisonChart,
             is NewUserOnboardingActivityDialog.IntroAnimation,
             NewUserOnboardingActivityDialog.NotificationPermission,
             NewUserOnboardingActivityDialog.DefaultBrowserPrompt,
             NewUserOnboardingActivityDialog.AddWidget,
+            is NewUserOnboardingActivityDialog.PreferenceSelector,
+            is NewUserOnboardingActivityDialog.SingleChoice,
+            is NewUserOnboardingActivityDialog.TogglePosition,
+            is NewUserOnboardingActivityDialog.DuckAiState,
             -> Unit
         }
     }

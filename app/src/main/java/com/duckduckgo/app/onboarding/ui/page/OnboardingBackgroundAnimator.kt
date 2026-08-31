@@ -29,6 +29,7 @@ import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import com.duckduckgo.app.browser.R
 import kotlin.math.roundToInt
+import com.duckduckgo.mobile.android.R as CommonR
 
 /**
  * Per-step configuration for onboarding background images.
@@ -43,10 +44,6 @@ sealed class OnboardingBackgroundStep(
     data object Welcome : OnboardingBackgroundStep(
         backgroundRes = R.drawable.onboarding_welcome_screen_background,
         maxHeightDp = 404,
-    )
-    data object DownloadReason : OnboardingBackgroundStep(
-        backgroundRes = R.drawable.onboarding_browser_comparison_background,
-        maxHeightDp = 216,
     )
     data object ComparisonChart : OnboardingBackgroundStep(
         backgroundRes = R.drawable.onboarding_browser_comparison_background,
@@ -69,8 +66,12 @@ sealed class OnboardingBackgroundStep(
         maxHeightDp = 360,
     )
     data object InputType : OnboardingBackgroundStep(
-        backgroundRes = R.drawable.onboarding_input_type_background,
+        backgroundRes = CommonR.drawable.onboarding_input_type_background,
         maxHeightDp = 166,
+    )
+    data object PreferenceSelector : OnboardingBackgroundStep(
+        backgroundRes = R.drawable.onboarding_preference_selector_background,
+        maxHeightDp = 286,
     )
 }
 

@@ -398,8 +398,8 @@ class CtaViewModel @Inject constructor(
     }
 
     private suspend fun setInputToggleStateForDuckAiEndCta() {
-        // AI flows always default the toggle on and offer no choice, so we apply the real setting here,
-        // just before the End CTA renders.
+        // Flows that end with the input screen enabled only set it cosmetically while onboarding runs, so we
+        // apply the real setting here, just before the End CTA renders.
         duckChat.setInputScreenUserSetting(true)
     }
 
@@ -420,6 +420,7 @@ class CtaViewModel @Inject constructor(
                             isLightTheme = appTheme.isLightModeEnabled(),
                             deviceInfo = deviceInfo,
                             isCustomAiOnboardingFlow = customAiOnboarding.isEnabled(),
+                            segmentedPath = onboardingStore.getSegmentedPathWithAiInput(),
                             onboardingImprovementsV2Enabled = isOnboardingImprovementsV2Enabled(),
                         )
                     } else {
@@ -456,6 +457,10 @@ class CtaViewModel @Inject constructor(
             // End
             canShowDaxCtaEndOfJourney() -> {
                 if (isBrandDesignUpdateEnabled()) {
+                    val segmentedPath = onboardingStore.getSegmentedPathWithAiInput()
+                    if (segmentedPath != null) {
+                        setInputToggleStateForDuckAiEndCta()
+                    }
                     DaxEndBrandDesignUpdateBubbleCta(
                         onboardingStore,
                         appInstallStore,
@@ -464,6 +469,7 @@ class CtaViewModel @Inject constructor(
                         onboardingImprovementsEnabled = isOnboardingImprovementsEnabled(),
                         onboardingImprovementsV2Enabled = isOnboardingImprovementsV2Enabled(),
                         isOmnibarBottom = settingsDataStore.omnibarType == OmnibarType.SINGLE_BOTTOM,
+                        segmentedPath = segmentedPath,
                     )
                 } else {
                     DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
@@ -480,6 +486,7 @@ class CtaViewModel @Inject constructor(
                         deviceInfo,
                         isCustomAiOnboardingFlow = customAiOnboarding.isEnabled(),
                         isFreeTrialCopy = freeTrialCopyAvailable(),
+                        segmentedPath = onboardingStore.getSegmentedPathWithAiInput(),
                         onboardingImprovementsEnabled = isOnboardingImprovementsEnabled(),
                         onboardingImprovementsV2Enabled = isOnboardingImprovementsV2Enabled(),
                     )
@@ -530,11 +537,14 @@ class CtaViewModel @Inject constructor(
         val nonNullSite = site ?: return null
 
         val host = nonNullSite.domain
-        if (host == null || userAllowListRepository.isDomainInUserAllowList(host) || isSiteNotAllowedForOnboarding(nonNullSite)) {
+        val inContextDaxDialogsCompleted = areInContextDaxDialogsCompleted()
+        if (host == null || (!inContextDaxDialogsCompleted && userAllowListRepository.isDomainInUserAllowList(host)) ||
+            isSiteNotAllowedForOnboarding(nonNullSite)
+        ) {
             return null
         }
 
-        if (!areInContextDaxDialogsCompleted()) {
+        if (!inContextDaxDialogsCompleted) {
             nonNullSite.uri?.let { uri ->
                 if (contextualCtaSuppressorPlugins.getPlugins().any { !it.canShowCta(uri) }) {
                     return null
@@ -565,7 +575,7 @@ class CtaViewModel @Inject constructor(
                 return null
             }
 
-            if (areInContextDaxDialogsCompleted()) {
+            if (inContextDaxDialogsCompleted) {
                 val promptUrl = brokenSitePromptUrl ?: return null
                 // Reports are built from Site, so reject stale state before showing the prompt.
                 if (nonNullSite.url != promptUrl) return null

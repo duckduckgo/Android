@@ -35,6 +35,7 @@ import com.duckduckgo.app.global.model.SiteFactoryImpl
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.tabs.TabManagerFeatureFlags
 import com.duckduckgo.app.tabs.db.TabsDao
+import com.duckduckgo.app.tabs.model.DuckAiTabSessionRepository
 import com.duckduckgo.app.tabs.model.TabDataRepository
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSelectionEntity
@@ -779,6 +780,7 @@ class TabDataRepositoryTest {
         contextualDataStore: DuckChatContextualDataStore = mockDuckChatContextualDataStore,
         tabVisitedSitesRepository: TabVisitedSitesRepository = mockTabVisitedSitesRepository,
         nativeInputStatePublisher: NativeInputStatePublisher = mockNativeInputStatePublisher,
+        duckAiTabSessionRepository: DuckAiTabSessionRepository = mock(),
     ): TabDataRepository {
         return TabDataRepository(
             dao,
@@ -805,6 +807,7 @@ class TabDataRepositoryTest {
             contextualDataStore,
             tabVisitedSitesRepository,
             nativeInputStatePublisher,
+            duckAiTabSessionRepository,
         )
     }
 

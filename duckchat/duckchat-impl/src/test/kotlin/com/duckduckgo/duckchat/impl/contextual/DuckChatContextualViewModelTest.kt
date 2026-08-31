@@ -21,6 +21,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.contextual.suggestions.ContextualSuggestedPrompt
@@ -32,6 +33,8 @@ import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
 import com.duckduckgo.duckchat.impl.history.ChatHistoryItem
 import com.duckduckgo.duckchat.impl.history.ChatHistoryRepository
 import com.duckduckgo.duckchat.impl.models.ChatType
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelPageType
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -1232,12 +1235,24 @@ class DuckChatContextualViewModelTest {
         }
 
     @Test
-    fun `when full mode requested then expanded pixel is fired`() = runTest {
+    fun `when full mode requested then expanded pixel and entry point are fired`() = runTest {
         testee.onFullModeRequested()
 
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
         verify(duckChatPixels).reportContextualSheetExpanded()
+        verify(duckChatInternal).reportDuckChatEntry(DuckChatEntryPoint.CONTEXTUAL_CHAT, opensNewTab = true, hasPrompt = false)
+    }
+
+    @Test
+    fun `when full mode requested with a prompt already sent then entry point reports hasPrompt true`() = runTest {
+        testee.onPromptSent("hello")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        testee.onFullModeRequested()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(duckChatInternal).reportDuckChatEntry(DuckChatEntryPoint.CONTEXTUAL_CHAT, opensNewTab = true, hasPrompt = true)
     }
 
     @Test
@@ -1604,12 +1619,14 @@ class DuckChatContextualViewModelTest {
         testee.onSheetOpened("tab-1")
         verify(duckChatPixels).reportContextualSheetOpened()
         verify(duckChatPixels).reportContextualAskAboutPageShown()
+        verify(duckChatInternal, never()).reportDuckChatEntry(any(), any(), any())
     }
 
     @Test
     fun `when reopenSheet called then contextual opened pixel is fired`() = runTest {
         testee.onSheetReopened()
         verify(duckChatPixels).reportContextualSheetOpened()
+        verify(duckChatInternal, never()).reportDuckChatEntry(any(), any(), any())
     }
 
     @Test
@@ -2051,6 +2068,35 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
+    fun `when SUBMIT_SUMMARIZE clicked then unified input prompt submitted pixel fired`() = runTest {
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
+        whenever(modelManager.getSelectedModelId()).thenReturn("gpt-5.2")
+        whenever(modelManager.getResolvedReasoningEffort()).thenReturn("low")
+        val testee = buildViewModel()
+        testee.onSheetOpened("tab-1")
+        val pageContext = """{"title":"Page","url":"https://example.com","content":"text"}"""
+        testee.onPageContextReceived("tab-1", pageContext)
+        testee.onQuickActionClicked("") // ASK_ABOUT_PAGE -> SUBMIT_SUMMARIZE
+
+        testee.onQuickActionClicked("") // SUBMIT_SUMMARIZE click
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(duckChatPixels).firePromptSubmitted(
+            selectedTool = "none",
+            modelId = "gpt-5.2",
+            reasoningEffort = "low",
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            hasText = true,
+            surface = DuckChatPixelSurface.CONTEXTUAL_CHAT,
+            defaultMode = null,
+            tabId = "tab-1",
+            pageType = DuckChatPixelPageType.CONTEXTUAL,
+            addressBarEntryPoint = null,
+        )
+    }
+
+    @Test
     fun `when SUBMIT_SUMMARIZE clicked then context-attach pixel not re-fired`() = runTest {
         whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
         val testee = buildViewModel()
@@ -2367,6 +2413,12 @@ class DuckChatContextualViewModelTest {
             assertEquals("tab-1", command.sourceTabId)
             cancelAndIgnoreRemainingEvents()
         }
+
+        verify(duckChatInternal, times(1)).reportDuckChatEntry(
+            DuckChatEntryPoint.CHAT_HISTORY_OPEN_CHAT,
+            opensNewTab = true,
+            hasPrompt = false,
+        )
     }
 
     @Test
@@ -2511,6 +2563,31 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
+    fun `when suggestion selected then unified input prompt submitted pixel fired`() = runTest {
+        testee = buildViewModel()
+        whenever(modelManager.getSelectedModelId()).thenReturn("gpt-5.2")
+        whenever(modelManager.getResolvedReasoningEffort()).thenReturn("low")
+        val suggestion = ContextualSuggestedPrompt("id", "Label", "Do the thing.", null)
+
+        testee.onSuggestionSelected(suggestion, currentInput = "")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(duckChatPixels).firePromptSubmitted(
+            selectedTool = "none",
+            modelId = "gpt-5.2",
+            reasoningEffort = "low",
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            hasText = true,
+            surface = DuckChatPixelSurface.CONTEXTUAL_CHAT,
+            defaultMode = null,
+            tabId = "",
+            pageType = DuckChatPixelPageType.CONTEXTUAL,
+            addressBarEntryPoint = null,
+        )
+    }
+
+    @Test
     fun `when suggestion selected without valid page context then submitted without context`() = runTest {
         testee = buildViewModel()
         testee.currentPageContext = ""
@@ -2611,9 +2688,14 @@ class DuckChatContextualViewModelTest {
         }
 
         override fun isEnabled(): Boolean = true
-        override fun openDuckChat() = Unit
-        override fun openDuckChatWithAutoPrompt(query: String) = Unit
-        override fun openDuckChatWithPrefill(query: String) = Unit
+        override fun openDuckChat(entryPoint: com.duckduckgo.duckchat.api.DuckChatEntryPoint) = Unit
+        override fun openDuckChatWithAutoPrompt(query: String, entryPoint: com.duckduckgo.duckchat.api.DuckChatEntryPoint) = Unit
+        override fun openDuckChatWithPrefill(query: String, entryPoint: com.duckduckgo.duckchat.api.DuckChatEntryPoint) = Unit
+        override fun reportDuckChatEntry(
+            entryPoint: com.duckduckgo.duckchat.api.DuckChatEntryPoint,
+            opensNewTab: Boolean,
+            hasPrompt: Boolean,
+        ) = Unit
         override fun getDuckChatUrl(
             query: String,
             autoPrompt: Boolean,
@@ -2638,7 +2720,7 @@ class DuckChatContextualViewModelTest {
         override suspend fun isStandaloneMigrationCompleted(): Boolean = true
         override suspend fun setChatSuggestionsUserSetting(enabled: Boolean) = Unit
         override fun observeChatSuggestionsUserSettingEnabled(): Flow<Boolean> = flowOf(true)
-        override fun openVoiceDuckChat() { }
+        override fun openVoiceDuckChat(entryPoint: com.duckduckgo.duckchat.api.DuckChatEntryPoint) { }
         override fun isVoiceChatSessionActive(tabId: String): Boolean = false
         override val activeVoiceChatSessions: Flow<Set<String>> = flowOf(emptySet())
         override fun observeTriggerVoiceChatSessionEnd(): Flow<String> = emptyFlow()

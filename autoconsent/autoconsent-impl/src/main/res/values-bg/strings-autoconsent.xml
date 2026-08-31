@@ -20,9 +20,17 @@
     <string name="autoconsentTitle">Защита от изскачащи прозорци за бисквитки</string>
     <string name="autoconsentDescription"><![CDATA[DuckDuckGo ще се опита да избере възможно най-поверителните настройки и ще скрива досадните изскачащи прозорци.\n<a href=\"\">Научете повече</a>]]></string>
     <string name="autoconsentToggle">Позволете на DuckDuckGo да се погрижи за изскачащите прозорци за бисквитки</string>
-    <string name="autoconsentAutoManageToggle">Автоматично управление на изскачащи прозорци за бисквитки</string>
-    <string name="autoconsentAutoManageDescription">Ще се стремим да избираме само най-поверителните налични опции за бисквитки вместо Вас, след което ще затваряме тези изскачащи прозорци.</string>
-    <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[DuckDuckGo може автоматично да управлява предпочитанията за бисквитки, за да увеличи поверителността, да свежда до минимум бисквитките и да затваря тези изскачащи прозорци.\n<a href=\"\">Научете повече</a>]]></string>
-    <string name="autoconsentPopUpsWithoutOptOutsToggle">Изскачащи прозорци без опция за отказ</string>
-    <string name="autoconsentPopUpsWithoutOptOutsDescription">Можете също така да разрешите на DuckDuckGo да Ви спести едно кликване, като приема бисквитки от Ваше име и затваря изскачащите прозорци без опция за отказ.</string>
+    <string name="autoconsentAutoManageToggle">Отхвърляне на незадължителни бисквитки</string>
+    <string name="autoconsentAutoManageDescription">Ще се стремим да отхвърляме възможно най-много бисквитки вместо Вас, след което ще затваряме изскачащите прозорци.</string>
+    <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[DuckDuckGo може автоматично да управлява изскачащите прозорци за бисквитки, за да увеличи поверителността и да сведе до минимум бисквитките, преди дори да ги видите.\n<a href=\"\">Научете повече</a>]]></string>
+    <string name="autoconsentPopUpsWithoutOptOutsToggle">Приемане на бисквитки, които не могат да бъдат отхвърлени</string>
+    <string name="autoconsentPopUpsWithoutOptOutsDescription">Ако няма опция за отказ, ще Ви спестим едно кликване, ще приемем тези бисквитки вместо Вас и ще затворим изскачащите прозорци.</string>
+    <string name="autoconsentPromptTitle">Омръзнаха ли Ви изскачащите прозорци за бисквитки?</string>
+    <string name="autoconsentPromptFootnote">Можете винаги да коригирате това по-късно в Настройки.</string>
+    <string name="autoconsentPromptCpmOnMessage">Някои бисквитки не могат да бъдат отхвърлени. Ние можем да ги приемаме вместо Вас.</string>
+    <string name="autoconsentPromptCpmOnPrimaryButton">Приемане на бисквитки вместо мен</string>
+    <string name="autoconsentPromptCpmOnSecondaryButton">Ще ги приемам самостоятелно</string>
+    <string name="autoconsentPromptCpmOffMessage">Остави на нас да се погрижим за това. Ще отхвърляме бисквитките, когато е възможно, и ще приемаме тези, които не могат да бъдат отхвърлени.</string>
+    <string name="autoconsentPromptCpmOffPrimaryButton">Отхвърляне, ако е възможно, или приемане вместо мен</string>
+    <string name="autoconsentPromptCpmOffSecondaryButton">Ще се справя с тях самостоятелно</string>
 </resources>

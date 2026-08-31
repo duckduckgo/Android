@@ -997,4 +997,11 @@
     <string name="singleTabFireDialogTitleFireMode">Fire-tabbladen en hun gegevens verwijderen?</string>
 
     <string name="downloadsCannotOpenFileErrorMessage">Kan bestand niet openen. Kijk of er een compatibele app is.</string>
+
+    <!-- Error pages -->
+    <string name="webViewErrorTitle" instruction="Title shown on the error pages">DuckDuckGo kan deze pagina niet laden</string>
+    <string name="webViewErrorNoConnection" instruction="Message shown when the page fails to load because the device has no internet connection">De internetverbinding lijkt offline te zijn.</string>
+    <string name="webViewErrorBadUrl" instruction="Message shown when the hostname of the website could not be resolved">Er kon geen server met de opgegeven hostnaam worden gevonden.</string>
+    <string name="webViewErrorSslProtocol" instruction="Message shown when the website&apos;s SSL certificate is invalid. Placeholder is the website&apos;s address"><![CDATA[Het certificaat voor deze server is ongeldig. Je maakt mogelijk verbinding met een server die zich voordoet als <b>%1$s</b>, waardoor je vertrouwelijke informatie in gevaar kan komen.]]></string>
+    <string name="webViewErrorRedirectSuggestionMessage" instruction="Shown when a domain fails to load, offering a link to the www. version of the address. Placeholder is a tappable link to the suggested address.">Bedoelde je <annotation type="redirect_link">^1</annotation>?</string>
 </resources>

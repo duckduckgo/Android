@@ -20,9 +20,17 @@
     <string name="autoconsentTitle">Sīkfailu uznirstošo logu aizsardzība</string>
     <string name="autoconsentDescription"><![CDATA[DuckDuckGo centīsies atlasīt visprivātākos pieejamos iestatījumus un paslēpt uznirstošos logus.\n<a href=\"\">Uzzināt vairāk</a>]]></string>
     <string name="autoconsentToggle">Ļauj DuckDuckGo apstrādāt sīkfailu uznirstošos logus</string>
-    <string name="autoconsentAutoManageToggle">Automātiski pārvaldīt sīkfailu uznirstošos logus</string>
-    <string name="autoconsentAutoManageDescription">Mēs centīsimies tavā vietā atlasīt tikai visprivātākās pieejamās sīkfailu opcijas un pēc tam aizvērt šos uznirstošos logus.</string>
-    <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[DuckDuckGo var automātiski pārvaldīt sīkfailu preferences, lai maksimāli palielinātu privātumu, samazinātu sīkfailus un aizvērtu šos uznirstošos logus.\n<a href=\"\">Uzzināt vairāk</a>]]></string>
-    <string name="autoconsentPopUpsWithoutOptOutsToggle">Uznirstošie logi bez atteikšanās iespējas</string>
-    <string name="autoconsentPopUpsWithoutOptOutsDescription">Ļauj arī DuckDuckGo ietaupīt tev klikšķi, tavā vārdā pieņemot sīkfailus, lai aizvērtu uznirstošos logus, no kuriem nav iespējams atteikties.</string>
+    <string name="autoconsentAutoManageToggle">Noraidīt neobligātos sīkfailus</string>
+    <string name="autoconsentAutoManageDescription">Mēs centīsimies tavā vietā noraidīt pēc iespējas vairāk sīkfailu un pēc tam aizvērt uznirstošos logus.</string>
+    <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[DuckDuckGo var automātiski pārvaldīt sīkfailu uznirstošos logus, lai maksimāli palielinātu privātumu un samazinātu sīkfailus, pirms tu tos vispār ieraugi.\n<a href=\"\">Uzzināt vairāk</a>]]></string>
+    <string name="autoconsentPopUpsWithoutOptOutsToggle">Pieņemt sīkfailus, no kuriem nevar atteikties</string>
+    <string name="autoconsentPopUpsWithoutOptOutsDescription">Ja nav noraidīšanas iespējas, mēs ietaupīsim tev klikšķi, pieņemsim šos sīkfailus tavā vietā un aizvērsim uznirstošos logus.</string>
+    <string name="autoconsentPromptTitle">Vai esi noguris no sīkfailu uznirstošajiem logiem?</string>
+    <string name="autoconsentPromptFootnote">Vēlāk to vienmēr vari mainīt sadaļā Iestatījumi.</string>
+    <string name="autoconsentPromptCpmOnMessage">No dažiem sīkfailiem nevar atteikties. Mēs tos varam pieņemt tavā vietā.</string>
+    <string name="autoconsentPromptCpmOnPrimaryButton">Pieņemt sīkfailus manā vietā</string>
+    <string name="autoconsentPromptCpmOnSecondaryButton">Es tos pieņemšu pats</string>
+    <string name="autoconsentPromptCpmOffMessage">Ļauj mums tos pārvaldīt tavā vietā. Mēs noraidīsim sīkfailus, ja iespējams, un pieņemsim tos, no kuriem nevar atteikties.</string>
+    <string name="autoconsentPromptCpmOffPrimaryButton">Noraidīt, ja iespējams, vai pieņemt manā vietā</string>
+    <string name="autoconsentPromptCpmOffSecondaryButton">Es tos pārvaldīšu pats</string>
 </resources>

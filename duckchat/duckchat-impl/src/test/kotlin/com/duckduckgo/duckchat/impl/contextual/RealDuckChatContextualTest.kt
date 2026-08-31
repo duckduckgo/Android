@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.contextual
 import android.view.View
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -34,6 +35,7 @@ class RealDuckChatContextualTest {
     private val contextualDataStore: DuckChatContextualDataStore = mock()
     private val sessionTimeoutProvider: DuckChatContextualSessionTimeoutProvider = mock()
     private val timeProvider: DuckChatContextualTimeProvider = mock()
+    private val duckChatPixels: DuckChatPixels = mock()
     private val anchor: View = mock()
 
     private val testee = RealDuckChatContextual(
@@ -42,6 +44,7 @@ class RealDuckChatContextualTest {
         contextualDataStore,
         sessionTimeoutProvider,
         timeProvider,
+        duckChatPixels,
     )
 
     @Test

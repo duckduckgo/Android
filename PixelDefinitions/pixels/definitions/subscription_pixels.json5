@@ -185,6 +185,13 @@
             }
         ]
     },
+    "m_privacy-pro_app-settings_partner-benefits_click": {
+        "description": "The user tapped 'Partner Benefits' (DuckDuckGo Subscription) in the app-wide Settings.",
+        "owners": ["Kyriakos-Georgiopoulos"],
+        "triggers": ["other"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": ["appVersion"]
+    },
     "m_privacy-pro_app-settings_get_click": {
         "description": "The user tapped 'Get Subscription' (DuckDuckGo Subscription) in the app-wide Settings.",
         "owners": ["YoussefKeyrouz"],

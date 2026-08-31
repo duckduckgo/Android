@@ -126,6 +126,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles,
     private val addressBarTrackersAnimationManager: AddressBarTrackersAnimationManager,
     private val standardizedLeadingIconToggle: StandardizedLeadingIconFeatureToggle,
+    private val omnibarPreFillKillSwitch: OmnibarPreFillKillSwitch,
     private val progressBarUpgradeFeature: ProgressBarUpgradeFeature,
     private val nativeInputOmnibarFeature: NativeInputOmnibarFeature,
     private val browserMode: BrowserMode,
@@ -1297,16 +1298,17 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     fun onTextInputClickCatcherClicked() {
         viewModelScope.launch {
-            val omnibarText = viewState.value.omnibarText
-            val url = viewState.value.url
-            val isDuckDuckGoQueryUrl = duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)
-            val textToPreFill = if (omnibarText.isNotEmpty() && url.isNotEmpty() && !isDuckDuckGoQueryUrl) {
-                url
-            } else {
-                omnibarText
-            }
-            command.send(Command.LaunchNativeInput(query = textToPreFill))
+            command.send(Command.LaunchNativeInput(query = getPreFillText()))
         }
+    }
+
+    private fun getPreFillText(): String {
+        val omnibarText = viewState.value.omnibarText
+        val url = viewState.value.url
+        if (omnibarText.isEmpty() || url.isEmpty() || duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) return omnibarText
+        if (!omnibarPreFillKillSwitch.self().isEnabled()) return url
+        val displayedUrl = if (isFullUrlEnabled.value) url else addressDisplayFormatter.getShortUrl(url)
+        return if (omnibarText == displayedUrl) url else omnibarText
     }
 
     fun onLogoClicked() {

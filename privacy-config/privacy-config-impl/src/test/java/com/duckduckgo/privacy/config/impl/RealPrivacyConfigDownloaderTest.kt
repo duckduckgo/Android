@@ -35,7 +35,9 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import retrofit2.Response
@@ -49,6 +51,7 @@ class RealPrivacyConfigDownloaderTest {
 
     private val mockPrivacyConfigPersister: PrivacyConfigPersister = mock()
     private val pixel: Pixel = mock()
+    private val telemetry: PrivacyConfigDownloadTelemetry = mock()
     private val oneCallback = FakePrivacyConfigCallbackPlugin()
     private val anotherCallback = FakePrivacyConfigCallbackPlugin()
     private val callbacks = listOf(oneCallback, anotherCallback)
@@ -56,7 +59,7 @@ class RealPrivacyConfigDownloaderTest {
 
     @Before
     fun before() {
-        testee = RealPrivacyConfigDownloader(TestPrivacyConfigService(), mockPrivacyConfigPersister, pluginPoint, pixel)
+        testee = RealPrivacyConfigDownloader(TestPrivacyConfigService(), mockPrivacyConfigPersister, pluginPoint, pixel, telemetry)
     }
 
     @Test
@@ -67,9 +70,11 @@ class RealPrivacyConfigDownloaderTest {
                 mockPrivacyConfigPersister,
                 pluginPoint,
                 pixel,
+                telemetry,
             )
         assertTrue(testee.download() is Error)
         verify(pixel).fire("m_privacy_config_download_error", mapOf("code" to "unknown", "message" to "unknown"))
+        verify(telemetry).onDownloadFailed("unknown")
     }
 
     @Test
@@ -80,6 +85,7 @@ class RealPrivacyConfigDownloaderTest {
                 mockPrivacyConfigPersister,
                 pluginPoint,
                 pixel,
+                telemetry,
             )
         assertTrue(testee.download() is Error)
         verify(pixel).fire("m_privacy_config_empty_error")
@@ -107,8 +113,28 @@ class RealPrivacyConfigDownloaderTest {
     }
 
     @Test
+    fun whenDownloadIsSuccessfulThenReportStageTimingsToTelemetry() = runTest {
+        testee.download()
+
+        inOrder(telemetry) {
+            verify(telemetry).onDownloadStarted()
+            verify(telemetry).onDownloadFinished()
+            verify(telemetry).onProcessFinished()
+        }
+    }
+
+    @Test
+    fun whenPersistFailsThenProcessFinishedNotReported() = runTest {
+        whenever(mockPrivacyConfigPersister.persistPrivacyConfig(any(), any())).thenThrow(RuntimeException())
+
+        testee.download()
+
+        verify(telemetry, never()).onProcessFinished()
+    }
+
+    @Test
     fun whenDownloadStoreErrorThenFireStoreErrorPixel() = runTest {
-        whenever(mockPrivacyConfigPersister.persistPrivacyConfig(any(), any())).thenThrow()
+        whenever(mockPrivacyConfigPersister.persistPrivacyConfig(any(), any())).thenThrow(RuntimeException())
 
         testee.download()
         verify(pixel).fire("m_privacy_config_store_error")

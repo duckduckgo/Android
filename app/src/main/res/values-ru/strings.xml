@@ -1033,4 +1033,11 @@
     <string name="singleTabFireDialogTitleFireMode">Удалить Fire-вкладки и их данные?</string>
 
     <string name="downloadsCannotOpenFileErrorMessage">Не удается открыть файл. Попробуйте найти совместимое приложение.</string>
+
+    <!-- Error pages -->
+    <string name="webViewErrorTitle" instruction="Title shown on the error pages">DuckDuckGo не удалось загрузить эту страницу</string>
+    <string name="webViewErrorNoConnection" instruction="Message shown when the page fails to load because the device has no internet connection">Похоже, нет подключения к интернету.</string>
+    <string name="webViewErrorBadUrl" instruction="Message shown when the hostname of the website could not be resolved">Сервер с указанным именем хоста не найден.</string>
+    <string name="webViewErrorSslProtocol" instruction="Message shown when the website&apos;s SSL certificate is invalid. Placeholder is the website&apos;s address"><![CDATA[Сертификат этого сервера недействителен. Возможно, вы пытаетесь подключиться к серверу, который выдает себя за <b>%1$s</b>, что ставит под угрозу вашу конфиденциальную информацию.]]></string>
+    <string name="webViewErrorRedirectSuggestionMessage" instruction="Shown when a domain fails to load, offering a link to the www. version of the address. Placeholder is a tappable link to the suggested address.">Возможно, вы искали: <annotation type="redirect_link">^1</annotation>?</string>
 </resources>

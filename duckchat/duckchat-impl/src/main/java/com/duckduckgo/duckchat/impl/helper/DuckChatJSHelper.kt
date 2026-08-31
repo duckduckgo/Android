@@ -20,11 +20,14 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.install.AppInstall
+import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.ui.view.encodeBitmapToBase64
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.ChatState
@@ -34,6 +37,8 @@ import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.EditPromptRequest
 import com.duckduckgo.duckchat.impl.ModelTier
 import com.duckduckgo.duckchat.impl.ReportMetric
+import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_FIRST_PROMPT
+import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_PROMPT
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.messaging.sync.isSyncable
 import com.duckduckgo.duckchat.impl.models.AIChatAttachmentUsage
@@ -122,6 +127,7 @@ class RealDuckChatJSHelper @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val subscriptions: Subscriptions,
     private val editPromptSessionStore: EditPromptSessionStore,
+    private val browserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin>,
 ) : DuckChatJSHelper {
 
     private val registerOpenedJob = ConflatedJob()
@@ -171,7 +177,11 @@ class RealDuckChatJSHelper @Inject constructor(
             METHOD_OPEN_AI_CHAT -> {
                 val payload = extractPayload(data)
                 dataStore.updateUserPreferences(payload)
-                duckChat.openNewDuckChatSession()
+                val entryPoint = when {
+                    mode == Mode.CONTEXTUAL -> DuckChatEntryPoint.CONTEXTUAL_CHAT
+                    else -> DuckChatEntryPoint.DIRECT_URL
+                }
+                duckChat.openNewDuckChatSession(entryPoint)
                 null
             }
 
@@ -252,6 +262,9 @@ class RealDuckChatJSHelper @Inject constructor(
 
                 reportMetric?.let {
                     duckChatPixels.sendReportMetricPixel(it, modelTier, source)
+                    if (it == USER_DID_SUBMIT_PROMPT || it == USER_DID_SUBMIT_FIRST_PROMPT) {
+                        browserInteractionsPlugins.getPlugins().forEach { plugin -> plugin.onAiPromptSubmitted() }
+                    }
                 }
                 null
             }

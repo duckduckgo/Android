@@ -997,4 +997,11 @@
     <string name="singleTabFireDialogTitleFireMode">Slet Fire-faner og deres data?</string>
 
     <string name="downloadsCannotOpenFileErrorMessage">Kan ikke åbne filen. Kontrollér, om der er en kompatibel app.</string>
+
+    <!-- Error pages -->
+    <string name="webViewErrorTitle" instruction="Title shown on the error pages">DuckDuckGo kan ikke indlæse denne side</string>
+    <string name="webViewErrorNoConnection" instruction="Message shown when the page fails to load because the device has no internet connection">Internetforbindelsen ser ud til at være offline.</string>
+    <string name="webViewErrorBadUrl" instruction="Message shown when the hostname of the website could not be resolved">En server med det angivne værtsnavn kunne ikke findes.</string>
+    <string name="webViewErrorSslProtocol" instruction="Message shown when the website&apos;s SSL certificate is invalid. Placeholder is the website&apos;s address"><![CDATA[Certifikatet for denne server er ugyldigt. Du opretter muligvis forbindelse til en server, der foregiver at være <b>%1$s</b>, hvilket kan bringe dine fortrolige oplysninger i fare.]]></string>
+    <string name="webViewErrorRedirectSuggestionMessage" instruction="Shown when a domain fails to load, offering a link to the www. version of the address. Placeholder is a tappable link to the suggested address.">Mente du <annotation type="redirect_link">^1</annotation>?</string>
 </resources>

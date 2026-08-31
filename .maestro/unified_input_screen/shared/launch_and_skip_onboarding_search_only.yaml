@@ -1,0 +1,17 @@
+appId: com.duckduckgo.mobile.android
+---
+# Search-only (Duck.ai off in the address bar) variant of launch_and_skip_onboarding.yaml.
+# Which input the NTP lands on depends on the `nativeInputOmnibar.nativeInputSearchOnly`
+# remote flag, which is on a percentage rollout: with it on we get the native input widget,
+# with it off the legacy omnibar. Wait for whichever field is live so the suite doesn't
+# depend on the rollout dice.
+- extendedWaitUntil:
+    visible:
+      id: "skipOnboardingButton"
+    timeout: 30000
+- tapOn:
+    id: "skipOnboardingButton"
+- extendedWaitUntil:
+    visible:
+      id: "inputModeWidget|omnibarTextInput"
+    timeout: 30000

@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import app.cash.turbine.test
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
@@ -717,7 +718,13 @@ class BrandDesignUpdatePageViewModelTest {
                     pixelName = null,
                     showsStepIndicator = true,
                     transition = recordAndStay,
-                    resolveDialog = { NewUserOnboardingActivityDialog.InputScreenPreview(isSearchDefault = false) },
+                    resolveDialog = {
+                        NewUserOnboardingActivityDialog.InputScreenPreview(
+                            isSearchDefault = false,
+                            showModeToggle = false,
+                            titleRes = R.string.preOnboardingInputModeDemoTitleCustomAi,
+                        )
+                    },
                 ),
             ),
         )
@@ -838,7 +845,14 @@ class BrandDesignUpdatePageViewModelTest {
 
     @Test
     fun `when demo query submitted then forwards event`() = runTest {
-        val testee = startAt(NewUserOnboardingActivityDialog.InputScreenPreview(isSearchDefault = false))
+        val testee =
+            startAt(
+                NewUserOnboardingActivityDialog.InputScreenPreview(
+                    isSearchDefault = false,
+                    showModeToggle = false,
+                    titleRes = R.string.preOnboardingInputModeDemoTitleCustomAi,
+                ),
+            )
         advanceUntilIdle()
 
         testee.onInputModeDemoQuerySubmitted(query = "cats", isChat = true, fromSuggestion = false)
@@ -880,7 +894,11 @@ class BrandDesignUpdatePageViewModelTest {
     @Test
     fun `when run completes with launch chat result then submits chat prompt`() = runTest {
         val testee = startAt(
-            NewUserOnboardingActivityDialog.InputScreenPreview(isSearchDefault = false),
+            NewUserOnboardingActivityDialog.InputScreenPreview(
+                isSearchDefault = false,
+                showModeToggle = false,
+                titleRes = R.string.preOnboardingInputModeDemoTitleCustomAi,
+            ),
             transition = { LinearOnboardingTransition.Advance },
             result = { NewUserOnboardingResult.LaunchChat(prompt = "cats") },
         )

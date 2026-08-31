@@ -21,11 +21,14 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 enum class SitePermissionsPixelName(override val pixelName: String) : Pixel.PixelName {
     PERMISSION_DIALOG_IMPRESSION("m_site_permissions_dialog_impresssion"),
     PERMISSION_DIALOG_CLICK("m_site_permissions_dialog_click"),
+    PERMISSION_AUTO_GRANTED("m_site_permissions_auto_granted"),
 }
 
 object SitePermissionsPixelParameters {
     const val PERMISSION_TYPE = "type"
     const val PERMISSION_SELECTION = "selection"
+    const val REASON = "reason"
+    const val PETAL = "petal"
 }
 
 object SitePermissionsPixelValues {
@@ -38,4 +41,10 @@ object SitePermissionsPixelValues {
     const val ALLOW_ONCE = "allow_once"
     const val DENY_ALWAYS = "deny_always"
     const val DENY_ONCE = "deny_once"
+    const val ALLOW_LIST = "allow_list"
+    const val PROTECTIONS_OFF = "protections_off"
+}
+
+object SitePermissionsPetalValues {
+    const val RANDOMIZE = "randomize"
 }

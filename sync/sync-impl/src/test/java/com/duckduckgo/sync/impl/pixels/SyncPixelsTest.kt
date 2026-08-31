@@ -25,6 +25,9 @@ import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.api.engine.SyncableType
 import com.duckduckgo.sync.impl.API_CODE
 import com.duckduckgo.sync.impl.AccountErrorCodes
+import com.duckduckgo.sync.impl.AccountInfoKeyUnavailableReason
+import com.duckduckgo.sync.impl.DeviceCredential
+import com.duckduckgo.sync.impl.DeviceInfoReadFailureReason
 import com.duckduckgo.sync.impl.DispatchOutcome
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.SyncCodeType
@@ -1129,6 +1132,106 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_UI_VERSION to ui.value,
                 SyncPixelParameters.OPTION to option.value,
             ),
+        )
+    }
+
+    @Test
+    fun `when unified device read succeeds then daily pixel is fired`() {
+        testee.fireUnifiedDeviceListPixel(UnifiedDeviceListPixel.OwnRowResolvedDeviceInfo)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_UNIFIED_DEVICES_OWN_ROW_RESOLVED_DEVICE_INFO,
+            emptyMap(),
+            emptyMap(),
+            type = Pixel.PixelType.Daily(),
+        )
+    }
+
+    @Test
+    fun `when unified device read falls back then each reason keeps its wire value and own daily latch`(
+        @TestParameter reason: DeviceInfoReadFailureReason,
+    ) {
+        val wireValue = when (reason) {
+            DeviceInfoReadFailureReason.NOT_PUBLISHED_YET -> "not_published_yet"
+            DeviceInfoReadFailureReason.BLOB_ABSENT -> "blob_absent"
+            DeviceInfoReadFailureReason.BLOB_DECRYPT_FAILED -> "blob_decrypt_failed"
+        }
+
+        testee.fireUnifiedDeviceListPixel(UnifiedDeviceListPixel.OwnRowResolvedLegacy(reason))
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_UNIFIED_DEVICES_OWN_ROW_RESOLVED_LEGACY,
+            mapOf("reason" to wireValue),
+            emptyMap(),
+            type = Pixel.PixelType.Daily("sync_unified_devices_own_row_resolved_legacy:reason:$wireValue"),
+        )
+    }
+
+    @Test
+    fun `when unified device other row fails then each credential keeps its wire value and own daily latch`(
+        @TestParameter credential: DeviceCredential,
+    ) {
+        val wireValue = when (credential) {
+            DeviceCredential.DDG -> "ddg"
+            DeviceCredential.THIRD_PARTY -> "3party"
+            DeviceCredential.NONE -> "none"
+        }
+
+        testee.fireUnifiedDeviceListPixel(UnifiedDeviceListPixel.OtherRowDeviceInfoFailedDecryption(credential))
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_UNIFIED_DEVICES_OTHER_ROW_DEVICE_INFO_FAILED_DECRYPTION,
+            mapOf("credential" to wireValue),
+            emptyMap(),
+            type = Pixel.PixelType.Daily("sync_unified_devices_other_row_device_info_failed_decryption:credential:$wireValue"),
+        )
+    }
+
+    @Test
+    fun `when account info key is unavailable then each reason keeps its wire value and own daily latch`(
+        @TestParameter reason: AccountInfoKeyUnavailableReason,
+    ) {
+        val wireValue = when (reason) {
+            AccountInfoKeyUnavailableReason.NO_KEY_ON_SERVER -> "no_key_on_server"
+            AccountInfoKeyUnavailableReason.NO_WRAP_FOR_OUR_CREDENTIAL -> "no_wrap_for_our_credential"
+            AccountInfoKeyUnavailableReason.UNWRAP_FAILED -> "unwrap_failed"
+            AccountInfoKeyUnavailableReason.KEYS_FETCH_FAILED -> "keys_fetch_failed"
+            AccountInfoKeyUnavailableReason.RATE_LIMITED -> "rate_limited"
+        }
+
+        testee.fireUnifiedDeviceListPixel(UnifiedDeviceListPixel.AccountInfoKeyUnavailable(reason))
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_UNIFIED_DEVICES_ACCOUNT_INFO_KEY_UNAVAILABLE,
+            mapOf("reason" to wireValue),
+            emptyMap(),
+            type = Pixel.PixelType.Daily("sync_unified_devices_account_info_key_unavailable:reason:$wireValue"),
+        )
+    }
+
+    @Test
+    fun `when unified device write succeeds then count pixel is fired`() {
+        testee.fireUnifiedDeviceListPixel(UnifiedDeviceListPixel.OwnRowDeviceInfoUpdateSuccess)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_UNIFIED_DEVICES_OWN_ROW_DEVICE_INFO_UPDATE_SUCCESS,
+            emptyMap(),
+            emptyMap(),
+            type = Pixel.PixelType.Count,
+        )
+    }
+
+    @Test
+    fun `when unified device write fails then reason gets its own daily latch`() {
+        testee.fireUnifiedDeviceListPixel(
+            UnifiedDeviceListPixel.OwnRowDeviceInfoRepairFailed(UnifiedDeviceListPixel.DeviceInfoWriteFailureReason.RATE_LIMITED),
+        )
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_UNIFIED_DEVICES_OWN_ROW_DEVICE_INFO_REPAIR_FAILED,
+            mapOf("reason" to "rate_limited"),
+            emptyMap(),
+            type = Pixel.PixelType.Daily("sync_unified_devices_own_row_device_info_repair_failed:reason:rate_limited"),
         )
     }
 

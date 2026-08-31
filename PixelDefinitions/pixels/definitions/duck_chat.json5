@@ -230,28 +230,28 @@
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "duckAiPromptPageType", "duckAiEntrySource"]
     },
     "m_aichat_contextual_prompt_submitted_with_context_native_daily": {
         "description": "(Daily Pixel) The user has submitted a prompt to Contextual Duck.ai with the page context attached",
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "duckAiPromptPageType", "duckAiEntrySource"]
     },
     "m_aichat_contextual_prompt_submitted_without_context_native_count": {
         "description": "The user has submitted a prompt to Contextual Duck.ai without the page context attached",
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "duckAiPromptPageType", "duckAiEntrySource"]
     },
     "m_aichat_contextual_prompt_submitted_without_context_native_daily": {
         "description": "(Daily Pixel) The user has submitted a prompt to Contextual Duck.ai without the page context attached",
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "duckAiPromptPageType", "duckAiEntrySource"]
     },
     "m_aichat_contextual_page_context_collection_empty": {
         "description": "The page context collected via content scripts is not valid / is empty",
@@ -439,6 +439,24 @@
             }
         ]
     },
+    "m_aichat_entry_point": {
+        "description": "Fires when an active user action enters Duck.ai, with the initiating surface and navigation context.",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": [
+            "appVersion",
+            "duckAiEntrySource",
+            { "key": "duck_ai_enabled", "type": "boolean", "description": "Whether Duck.ai is enabled by feature and user settings." },
+            {
+                "key": "input_screen_enabled",
+                "type": "boolean",
+                "description": "Whether the Search and Duck.ai input capability is enabled."
+            },
+            { "key": "opens_new_tab", "type": "boolean", "description": "Whether this entry opens a new browser tab." },
+            { "key": "has_prompt", "type": "boolean", "description": "Whether a non-blank prompt is automatically submitted on entry." }
+        ]
+    },
     "m_aichat_duck_ai_direct_navigation_count": {
         "description": "User navigated directly to the Duck.ai URL by typing it in the omnibar",
         "owners": ["malmstein"],
@@ -448,9 +466,13 @@
             "appVersion",
             {
                 "key": "duck_ai_enabled",
-                "type": "string",
-                "description": "Whether the Duck.ai global setting is enabled",
-                "enum": ["true", "false"]
+                "type": "boolean",
+                "description": "Whether the Duck.ai global setting is enabled"
+            },
+            {
+                "key": "input_screen_enabled",
+                "type": "boolean",
+                "description": "Whether the Search and Duck.ai input capability is enabled."
             }
         ]
     },
@@ -463,9 +485,13 @@
             "appVersion",
             {
                 "key": "duck_ai_enabled",
-                "type": "string",
-                "description": "Whether the Duck.ai global setting is enabled",
-                "enum": ["true", "false"]
+                "type": "boolean",
+                "description": "Whether the Duck.ai global setting is enabled"
+            },
+            {
+                "key": "input_screen_enabled",
+                "type": "boolean",
+                "description": "Whether the Search and Duck.ai input capability is enabled."
             }
         ]
     },
@@ -898,6 +924,13 @@
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
+    "m_aichat_voice_service_start_failed": {
+        "description": "The Duck.ai voice microphone foreground service could not enter the foreground because the system rejected the microphone service type (e.g. RECORD_AUDIO not granted at start time); the service was stopped instead of crashing",
+        "owners": ["karlenDimla"],
+        "triggers": ["exception"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
     "m_aichat_unified_input_image_generation_selected_count": {
         "description": "User selected the image generation tool in the Unified Input",
         "owners": ["malmstein"],
@@ -1227,7 +1260,10 @@
             },
             { "key": "has_image_attachment", "type": "boolean", "description": "Whether the prompt included an image attachment" },
             { "key": "has_file_attachment", "type": "boolean", "description": "Whether the prompt included a file attachment" },
-            { "key": "has_text", "type": "boolean", "description": "Whether the prompt included text" }
+            { "key": "has_text", "type": "boolean", "description": "Whether the prompt included text" },
+            "duckAiPromptPageType",
+            "duckAiEntrySource",
+            "firstPromptNewInstall"
         ]
     },
     "m_aichat_unified_input_prompt_submitted_daily": {
@@ -1259,7 +1295,10 @@
             },
             { "key": "has_image_attachment", "type": "boolean", "description": "Whether the prompt included an image attachment" },
             { "key": "has_file_attachment", "type": "boolean", "description": "Whether the prompt included a file attachment" },
-            { "key": "has_text", "type": "boolean", "description": "Whether the prompt included text" }
+            { "key": "has_text", "type": "boolean", "description": "Whether the prompt included text" },
+            "duckAiPromptPageType",
+            "duckAiEntrySource",
+            "firstPromptNewInstall"
         ]
     },
     "m_aichat_unified_input_sent_prompt_in_chat_count": {
@@ -1695,6 +1734,74 @@
         "description": "Page context collection did not complete within the timeout while contextual suggestions were loading; suggestions fall back to generic defaults.",
         "owners": ["joshliebe"],
         "triggers": ["exception"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "aichat_sent_prompt_ongoing_chat": {
+        "description": "User submitted a follow-up prompt in an existing Duck.ai chat, reported by the Duck.ai frontend via the reportMetric JS bridge.",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "parameters": [
+            {
+                "key": "delta-timestamp-minutes",
+                "type": "integer",
+                "description": "Minutes since the previous Duck.ai session interaction"
+            },
+            "firstPromptNewInstall"
+        ]
+    },
+    "aichat_start_new_conversation": {
+        "description": "User submitted the first prompt of a new Duck.ai chat, reported by the Duck.ai frontend via the reportMetric JS bridge.",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "parameters": [
+            {
+                "key": "delta-timestamp-minutes",
+                "type": "integer",
+                "description": "Minutes since the previous Duck.ai session interaction"
+            },
+            "firstPromptNewInstall"
+        ]
+    },
+    "aichat_contextual_address_bar_menu_shown": {
+        "description": "Fired when the Duck.ai menu offering New Chat and Ask About Page is shown from the address bar",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "aichat_contextual_address_bar_menu_new_chat_selected": {
+        "description": "Fired when the user selects New Chat in the address bar Duck.ai menu",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "aichat_contextual_address_bar_menu_ask_about_page_selected": {
+        "description": "Fired when the user selects Ask About Page in the address bar Duck.ai menu",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "aichat_contextual_floating_input_opened": {
+        "description": "Fired when the floating contextual input (entry) is opened",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "aichat_contextual_floating_input_dismissed_without_submission": {
+        "description": "Fired when the floating contextual input is closed without the user sending a prompt.",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "aichat_contextual_floating_input_promoted_to_sheet": {
+        "description": "Fired when a prompt sent from the floating contextual input opens the contextual sheet",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
         "suffixes": ["first_daily_count", "form_factor"],
         "parameters": ["appVersion"]
     }

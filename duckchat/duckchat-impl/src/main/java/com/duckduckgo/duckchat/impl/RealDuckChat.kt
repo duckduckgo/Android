@@ -26,8 +26,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
+import com.duckduckgo.app.tabs.model.DuckAiTabSessionRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.AppUrl
@@ -38,12 +38,15 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
+import com.duckduckgo.duckchat.impl.pixel.toPixelValue
 import com.duckduckgo.duckchat.impl.repository.AddressBarPickerAttributionRepository
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
@@ -56,6 +59,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import dagger.Lazy
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -179,7 +183,7 @@ interface DuckChatInternal : DuckChat {
     /**
      * Opens DuckChat with a new session.
      */
-    fun openNewDuckChatSession()
+    fun openNewDuckChatSession(entryPoint: DuckChatEntryPoint)
 
     /** Single source of truth for the Duck.ai chat URL shape. */
     fun buildChatUrl(chatId: String): String
@@ -459,7 +463,7 @@ class RealDuckChat @Inject constructor(
     private val context: Context,
     @IsMainProcess private val isMainProcess: Boolean,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val pixel: Pixel,
+    private val duckChatPixels: Lazy<DuckChatPixels>,
     private val imageUploadFeature: AIChatImageUploadFeature,
     private val browserNav: BrowserNav,
     private val deviceSyncState: DeviceSyncState,
@@ -468,6 +472,7 @@ class RealDuckChat @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val voiceSessionStateManager: VoiceSessionStateManager,
     private val chatSuggestionsStore: ChatSuggestionsStore,
+    private val duckAiTabSessionRepository: DuckAiTabSessionRepository,
 ) : DuckChatInternal,
     DuckAiFeatureState,
     DuckChatInputModeState,
@@ -717,13 +722,15 @@ class RealDuckChat @Inject constructor(
 
     override fun keepSessionIntervalInMinutes() = keepSessionAliveInMinutes
 
-    override fun openDuckChat() {
+    override fun openDuckChat(entryPoint: DuckChatEntryPoint) {
         logcat { "Duck.ai: openDuckChat" }
+        reportDuckChatEntry(entryPoint, opensNewTab = true, hasPrompt = false)
         openDuckChat(emptyMap())
     }
 
-    override fun openDuckChatWithAutoPrompt(query: String) {
+    override fun openDuckChatWithAutoPrompt(query: String, entryPoint: DuckChatEntryPoint) {
         logcat { "Duck.ai: openDuckChatWithAutoPrompt query $query" }
+        reportDuckChatEntry(entryPoint, opensNewTab = true, hasPrompt = stripBang(query).isNotEmpty())
         val parameters = addChatParameters(query, autoPrompt = true, sidebar = false)
         openDuckChat(parameters, forceNewSession = true)
     }
@@ -732,8 +739,9 @@ class RealDuckChat @Inject constructor(
         addressBarPickerAttributionRepository.onPickerDuckAiSelected()
     }
 
-    override fun openDuckChatWithPrefill(query: String) {
+    override fun openDuckChatWithPrefill(query: String, entryPoint: DuckChatEntryPoint) {
         logcat { "Duck.ai: openDuckChatWithPrefill query $query" }
+        reportDuckChatEntry(entryPoint, opensNewTab = true, hasPrompt = false)
         val parameters = addChatParameters(query, autoPrompt = false, sidebar = false)
         openDuckChat(parameters, forceNewSession = true)
     }
@@ -777,14 +785,33 @@ class RealDuckChat @Inject constructor(
         return query.replace(bangPattern, "").trim()
     }
 
-    override fun openVoiceDuckChat() {
+    override fun openVoiceDuckChat(entryPoint: DuckChatEntryPoint) {
         logcat { "Duck.ai: openVoiceDuckChat" }
+        reportDuckChatEntry(entryPoint, opensNewTab = true, hasPrompt = false)
         val parameters = mapOf(MODE_QUERY_NAME to VOICE_MODE_QUERY_VALUE)
         openDuckChat(parameters, forceNewSession = true)
     }
 
-    override fun openNewDuckChatSession() {
+    override fun openNewDuckChatSession(entryPoint: DuckChatEntryPoint) {
+        reportDuckChatEntry(entryPoint, opensNewTab = true, hasPrompt = false)
         openDuckChat(emptyMap(), forceNewSession = true)
+    }
+
+    override fun reportDuckChatEntry(
+        entryPoint: DuckChatEntryPoint,
+        opensNewTab: Boolean,
+        hasPrompt: Boolean,
+    ) {
+        // Lets the tab that ends up hosting this entry attribute itself once it's created/navigated,
+        // so a later prompt submission in it can carry this same entry point as its `source`.
+        duckAiTabSessionRepository.setPendingEntryPointSource(entryPoint.toPixelValue())
+        duckChatPixels.get().sendDuckChatEntryPixel(
+            entryPoint = entryPoint,
+            opensNewTab = opensNewTab,
+            hasPrompt = hasPrompt,
+            duckAiEnabled = isEnabled(),
+            inputScreenEnabled = inputModeCapability.value == NativeInputState.InputMode.SEARCH_AND_DUCK_AI,
+        )
     }
 
     private fun openDuckChat(

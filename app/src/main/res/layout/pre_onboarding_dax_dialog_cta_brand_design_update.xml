@@ -132,6 +132,42 @@
                     android:layout_marginEnd="20dp"
                     android:visibility="gone" />
 
+                <include
+                    android:id="@+id/preferenceSelectorContent"
+                    layout="@layout/include_brand_design_preference_selector"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:visibility="gone" />
+
+                <include
+                    android:id="@+id/singleChoiceContent"
+                    layout="@layout/include_brand_design_single_choice"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:visibility="gone" />
+
+                <include
+                    android:id="@+id/togglePositionContent"
+                    layout="@layout/include_brand_design_toggle_position"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:visibility="gone" />
+
+                <include
+                    android:id="@+id/duckAiStateContent"
+                    layout="@layout/include_brand_design_duck_ai_state"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:visibility="gone" />
+
                 <com.duckduckgo.common.ui.view.button.DaxButtonBrand
                     android:id="@+id/primaryCta"
                     android:layout_width="match_parent"

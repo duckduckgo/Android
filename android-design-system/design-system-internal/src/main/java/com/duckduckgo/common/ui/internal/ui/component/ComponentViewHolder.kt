@@ -35,6 +35,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -47,9 +48,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withLink
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.recyclerview.widget.RecyclerView
 import coil3.compose.rememberAsyncImagePainter
@@ -58,6 +63,7 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.duckduckgo.common.ui.compose.DaxAction
+import com.duckduckgo.common.ui.compose.Status
 import com.duckduckgo.common.ui.compose.appbars.DaxSearchTopAppBar
 import com.duckduckgo.common.ui.compose.appbars.DaxTopAppBar
 import com.duckduckgo.common.ui.compose.appbars.DaxTopAppBarNavigationIcon
@@ -68,6 +74,12 @@ import com.duckduckgo.common.ui.compose.checkbox.DaxCheckbox
 import com.duckduckgo.common.ui.compose.divider.DaxHorizontalDivider
 import com.duckduckgo.common.ui.compose.divider.DaxVerticalDivider
 import com.duckduckgo.common.ui.compose.layout.DaxScaffold
+import com.duckduckgo.common.ui.compose.listitem.DaxListItemIconBackground
+import com.duckduckgo.common.ui.compose.listitem.DaxListItemIconSize
+import com.duckduckgo.common.ui.compose.listitem.DaxListItemTrailingIconSize
+import com.duckduckgo.common.ui.compose.listitem.DaxOneLineListItem
+import com.duckduckgo.common.ui.compose.listitem.DaxSettingsListItem
+import com.duckduckgo.common.ui.compose.listitem.DaxTwoLineListItem
 import com.duckduckgo.common.ui.compose.message.remote.DaxBigSingleActionMessage
 import com.duckduckgo.common.ui.compose.message.remote.DaxBigTwoActionsMessage
 import com.duckduckgo.common.ui.compose.message.remote.DaxMediumMessage
@@ -80,6 +92,7 @@ import com.duckduckgo.common.ui.compose.radiobutton.DaxRadioButton
 import com.duckduckgo.common.ui.compose.snackbar.DaxSnackbar
 import com.duckduckgo.common.ui.compose.switch.DaxSwitch
 import com.duckduckgo.common.ui.compose.text.DaxText
+import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.internal.R
 import com.duckduckgo.common.ui.internal.ui.setupThemedComposeView
 import com.duckduckgo.common.ui.view.MessageCta
@@ -536,6 +549,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
     class OneLineListItemComponentViewHolder(
         parent: ViewGroup,
+        private val isDarkTheme: Boolean,
     ) : ComponentViewHolder(inflate(parent, R.layout.component_one_line_item)) {
         override fun bind(component: Component) {
             view.findViewById<OneLineListItem>(R.id.oneLineListItem).apply {
@@ -601,11 +615,35 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             view.findViewById<OneLineListItem>(R.id.oneLineListItemWithLongTextTruncated).apply {
                 setPrimaryText(context.getString(CommonR.string.dax_one_line_list_item_html_primary_text).html(context))
             }
+
+            val snackbar = ShowcaseSnackbar(view, component.name)
+            val composeContent: List<Pair<Int, @Composable () -> Unit>> = listOf(
+                R.id.composeOneLineSimple to { ComposeOneLineSimple(snackbar) },
+                R.id.composeOneLineMediumImage to { ComposeOneLineMediumImage(snackbar) },
+                R.id.composeOneLineMediumImageBg to { ComposeOneLineMediumImageBg() },
+                R.id.composeOneLineLargeImage to { ComposeOneLineLargeImage(snackbar) },
+                R.id.composeOneLineLargeImageBg to { ComposeOneLineLargeImageBg() },
+                R.id.composeOneLineTrailingIcon to { ComposeOneLineTrailingIcon(snackbar) },
+                R.id.composeOneLineTrailingTinted to { ComposeOneLineTrailingTinted() },
+                R.id.composeOneLineLeadingTrailing to { ComposeOneLineLeadingTrailing(snackbar) },
+                R.id.composeOneLineSwitch to { ComposeOneLineSwitch(snackbar) },
+                R.id.composeOneLineSwitchRounded to { ComposeOneLineSwitchRounded(snackbar) },
+                R.id.composeOneLineDisabled to { ComposeOneLineDisabled(snackbar) },
+                R.id.composeOneLineDestructive to { ComposeOneLineDestructive(snackbar) },
+                R.id.composeOneLineLongText to { ComposeOneLineLongText() },
+                R.id.composeOneLineLongTextTruncated to { ComposeOneLineLongTextTruncated() },
+                R.id.composeOneLineNewPill to { ComposeOneLineNewPill() },
+                R.id.composeOneLineExtras to { ComposeOneLineExtras() },
+            )
+            composeContent.forEach { (id, content) ->
+                view.setupThemedComposeView(id, isDarkTheme) { Column(modifier = Modifier.fillMaxWidth()) { content() } }
+            }
         }
     }
 
     class TwoLineItemComponentViewHolder(
         parent: ViewGroup,
+        private val isDarkTheme: Boolean,
     ) : ComponentViewHolder(inflate(parent, R.layout.component_two_line_item)) {
         override fun bind(component: Component) {
             view.findViewById<TwoLineListItem>(R.id.twoLineListItemWithoutImage).apply {
@@ -685,6 +723,36 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             view.findViewById<TwoLineListItem>(R.id.twoLineListItemWithHTMLTags).apply {
                 setPrimaryText(context.getString(CommonR.string.dax_list_item_html_primary_text).html(context))
                 setSecondaryText(context.getString(CommonR.string.dax_list_item_html_secondary_text).html(context))
+            }
+
+            val snackbar = ShowcaseSnackbar(view, component.name)
+            val composeContent: List<Pair<Int, @Composable () -> Unit>> = listOf(
+                R.id.composeTwoLinePlain to { ComposeTwoLinePlain(snackbar) },
+                R.id.composeTwoLineImage to { ComposeTwoLineImage(snackbar) },
+                R.id.composeTwoLineMediumTrailing to { ComposeTwoLineMediumTrailing(snackbar) },
+                R.id.composeTwoLineMediumTrailingBg to { ComposeTwoLineMediumTrailingBg() },
+                R.id.composeTwoLineLargeTrailing to { ComposeTwoLineLargeTrailing(snackbar) },
+                R.id.composeTwoLineLargeTrailingBg to { ComposeTwoLineLargeTrailingBg() },
+                R.id.composeTwoLineTrailing to { ComposeTwoLineTrailing(snackbar) },
+                R.id.composeTwoLineSmallTrailing to { ComposeTwoLineSmallTrailing() },
+                R.id.composeTwoLineMediumTrailingOnly to { ComposeTwoLineMediumTrailingOnly() },
+                R.id.composeTwoLineBetaPill to { ComposeTwoLineBetaPill(snackbar) },
+                R.id.composeTwoLineCircular to { ComposeTwoLineCircular() },
+                R.id.composeTwoLineRounded to { ComposeTwoLineRounded() },
+                R.id.composeTwoLineSwitch to { ComposeTwoLineSwitch(snackbar) },
+                R.id.composeTwoLineSwitchImage to { ComposeTwoLineSwitchImage(snackbar) },
+                R.id.composeTwoLineSwitchPill to { ComposeTwoLineSwitchPill(snackbar) },
+                R.id.composeTwoLineSwitchTruncated to { ComposeTwoLineSwitchTruncated() },
+                R.id.composeTwoLineDisabled to { ComposeTwoLineDisabled(snackbar) },
+                R.id.composeTwoLineSwitchChecked to { ComposeTwoLineSwitchChecked(snackbar) },
+                R.id.composeTwoLineSwitchDisabledChecked to { ComposeTwoLineSwitchDisabledChecked() },
+                R.id.composeTwoLinePrimaryColor to { ComposeTwoLinePrimaryColor() },
+                R.id.composeTwoLineSecondaryColor to { ComposeTwoLineSecondaryColor() },
+                R.id.composeTwoLineHtml to { ComposeTwoLineHtml() },
+                R.id.composeTwoLineExtras to { ComposeTwoLineExtras() },
+            )
+            composeContent.forEach { (id, content) ->
+                view.setupThemedComposeView(id, isDarkTheme) { Column(modifier = Modifier.fillMaxWidth()) { content() } }
             }
         }
     }
@@ -910,11 +978,26 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
         }
     }
 
-    class SettingsListItemComponentViewHolder(parent: ViewGroup) :
-        ComponentViewHolder(inflate(parent, R.layout.component_settings)) {
+    class SettingsListItemComponentViewHolder(
+        parent: ViewGroup,
+        private val isDarkTheme: Boolean,
+    ) : ComponentViewHolder(inflate(parent, R.layout.component_settings)) {
         override fun bind(component: Component) {
             view.findViewById<SettingsListItem>(R.id.settingsListItemWithBetaTag).apply {
                 showPillIcon(true)
+            }
+            val composeContent: List<Pair<Int, @Composable () -> Unit>> = listOf(
+                R.id.composeSettingsWithIcon to { ComposeSettingsWithIcon() },
+                R.id.composeSettingsAlwaysOn to { ComposeSettingsAlwaysOn() },
+                R.id.composeSettingsOn to { ComposeSettingsOn() },
+                R.id.composeSettingsOff to { ComposeSettingsOff() },
+                R.id.composeSettingsBeta to { ComposeSettingsBeta() },
+                R.id.composeSettingsBetaLongText to { ComposeSettingsBetaLongText() },
+                R.id.composeSettingsNew to { ComposeSettingsNew() },
+                R.id.composeSettingsExtras to { ComposeSettingsExtras() },
+            )
+            composeContent.forEach { (id, content) ->
+                view.setupThemedComposeView(id, isDarkTheme) { Column(modifier = Modifier.fillMaxWidth()) { content() } }
             }
         }
     }
@@ -939,13 +1022,13 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 Component.MENU_ITEM -> MenuItemComponentViewHolder(parent)
                 Component.POPUP_MENU_ITEM -> PopupMenuItemComponentViewHolder(parent)
                 Component.SECTION_HEADER_LIST_ITEM -> HeaderSectionComponentViewHolder(parent)
-                Component.SINGLE_LINE_LIST_ITEM -> OneLineListItemComponentViewHolder(parent)
-                Component.TWO_LINE_LIST_ITEM -> TwoLineItemComponentViewHolder(parent)
+                Component.SINGLE_LINE_LIST_ITEM -> OneLineListItemComponentViewHolder(parent, isDarkTheme)
+                Component.TWO_LINE_LIST_ITEM -> TwoLineItemComponentViewHolder(parent, isDarkTheme)
                 Component.SECTION_DIVIDER -> DividerComponentViewHolder(parent, isDarkTheme)
                 Component.PROGRESS_SPINNER -> ProgressSpinnerComponentViewHolder(parent, isDarkTheme)
                 Component.CARD -> CardComponentViewHolder(parent, isDarkTheme)
                 Component.SCAFFOLD -> ScaffoldComponentViewHolder(parent, isDarkTheme)
-                Component.SETTINGS_LIST_ITEM -> SettingsListItemComponentViewHolder(parent)
+                Component.SETTINGS_LIST_ITEM -> SettingsListItemComponentViewHolder(parent, isDarkTheme)
                 else -> {
                     TODO()
                 }
@@ -959,4 +1042,692 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             return LayoutInflater.from(parent.context).inflate(layout, parent, false)
         }
     }
+}
+
+private class ShowcaseSnackbar(
+    private val view: View,
+    private val componentName: String,
+) {
+    fun row() = show(componentName)
+
+    fun trailingIcon() = show("Overflow menu clicked")
+
+    fun switch(checked: Boolean) = show("Switch checked: $checked")
+
+    private fun show(message: String) = Snackbar.make(view, message, Snackbar.LENGTH_SHORT).show()
+}
+
+@Composable
+private fun ComposeOneLineSimple(snackbar: ShowcaseSnackbar) {
+    ComposeCaption()
+    DaxOneLineListItem(primaryText = "This is a simple item", onClick = { snackbar.row() })
+}
+
+@Composable
+private fun ComposeOneLineMediumImage(snackbar: ShowcaseSnackbar) {
+    ComposeCaption()
+    DaxOneLineListItem(
+        primaryText = "Item with Medium Leading Image",
+        leadingContent = { Image(painterResource(CommonR.drawable.ic_dax_icon), null, size = DaxListItemIconSize.Small) },
+        onClick = { snackbar.row() },
+    )
+}
+
+@Composable
+private fun ComposeOneLineMediumImageBg() {
+    ComposeCaption()
+    DaxOneLineListItem(
+        primaryText = "Item with Medium Leading Image",
+        leadingContent = {
+            Image(
+                painterResource(CommonR.drawable.ic_dax_icon),
+                null,
+                size = DaxListItemIconSize.Small,
+                background = DaxListItemIconBackground.Circular,
+            )
+        },
+        onClick = {},
+    )
+}
+
+@Composable
+private fun ComposeOneLineLargeImage(snackbar: ShowcaseSnackbar) {
+    ComposeCaption()
+    DaxOneLineListItem(
+        primaryText = "Item with Large Leading Image",
+        leadingContent = { Image(painterResource(CommonR.drawable.ic_dax_icon), null, size = DaxListItemIconSize.Large) },
+        onClick = { snackbar.row() },
+    )
+}
+
+@Composable
+private fun ComposeOneLineLargeImageBg() {
+    ComposeCaption()
+    DaxOneLineListItem(
+        primaryText = "Item with Large Leading Image",
+        leadingContent = {
+            Image(
+                painterResource(CommonR.drawable.ic_dax_icon),
+                null,
+                size = DaxListItemIconSize.Large,
+                background = DaxListItemIconBackground.Circular,
+            )
+        },
+        onClick = {},
+    )
+}
+
+@Composable
+private fun ComposeOneLineTrailingIcon(snackbar: ShowcaseSnackbar) {
+    ComposeCaption()
+    DaxOneLineListItem(
+        primaryText = "Item With Trailing Icon",
+        trailingContent = { Icon(painterResource(CommonR.drawable.ic_menu_vertical_24), "Overflow", onClick = { snackbar.trailingIcon() }) },
+        onClick = { snackbar.row() },
+    )
+}
+
+@Composable
+private fun ComposeOneLineTrailingTinted() {
+    ComposeCaption()
+    DaxOneLineListItem(
+        primaryText = "Item With Trailing Icon Tinted",
+        trailingContent = {
+            Icon(painterResource(CommonR.drawable.ic_open_in_16), null, tint = DuckDuckGoTheme.colors.icons.secondary)
+        },
+    )
+}
+
+@Composable
+private fun ComposeOneLineLeadingTrailing(snackbar: ShowcaseSnackbar) {
+    ComposeCaption()
+    DaxOneLineListItem(
+        primaryText = "Item With Leading and Trailing Icons",
+        leadingContent = {
+            Icon(
+                painterResource(CommonR.drawable.ic_globe_24),
+                null,
+                size = DaxListItemIconSize.Small,
+                background = DaxListItemIconBackground.Circular,
+            )
+        },
+        trailingContent = { Icon(painterResource(CommonR.drawable.ic_menu_vertical_24), "Overflow", onClick = { snackbar.trailingIcon() }) },
+        onClick = { snackbar.row() },
+    )
+}
+
+@Composable
+private fun ComposeOneLineSwitch(snackbar: ShowcaseSnackbar) {
+    ComposeCaption()
+    var checked by remember { mutableStateOf(false) }
+    DaxOneLineListItem(
+        primaryText = "Item with Switch Item",
+        trailingContent = {
+            Switch(
+                checked = checked,
+                onCheckedChange = {
+                    checked = it
+                    snackbar.switch(it)
+                },
+            )
+        },
+        onClick = { snackbar.row() },
+    )
+}
+
+@Composable
+private fun ComposeOneLineSwitchRounded(snackbar: ShowcaseSnackbar) {
+    ComposeCaption()
+    var checked by remember { mutableStateOf(false) }
+    DaxOneLineListItem(
+        primaryText = "Item With Switch and Leading Icon",
+        leadingContent = {
+            Icon(
+                painterResource(CommonR.drawable.ic_globe_24),
+                null,
+                size = DaxListItemIconSize.Small,
+                background = DaxListItemIconBackground.Rounded,
+            )
+        },
+        trailingContent = {
+            Switch(
+                checked = checked,
+                onCheckedChange = {
+                    checked = it
+                    snackbar.switch(it)
+                },
+            )
+        },
+        onClick = { snackbar.row() },
+    )
+}
+
+@Composable
+private fun ComposeOneLineDisabled(snackbar: ShowcaseSnackbar) {
+    ComposeCaption()
+    DaxOneLineListItem(primaryText = "Item disabled", enabled = false, onClick = { snackbar.row() })
+}
+
+@Composable
+private fun ComposeOneLineDestructive(snackbar: ShowcaseSnackbar) {
+    ComposeCaption()
+    DaxOneLineListItem(
+        primaryText = "Item with custom text color",
+        primaryTextColor = DuckDuckGoTheme.textColors.destructive,
+        onClick = { snackbar.row() },
+    )
+}
+
+@Composable
+private fun ComposeOneLineLongText() {
+    ComposeCaption()
+    DaxOneLineListItem(
+        primaryText = "Item with long primary text that expands to more lines as primaryTextTruncated is disabled by default",
+        onClick = {},
+    )
+}
+
+@Composable
+private fun ComposeOneLineLongTextTruncated() {
+    ComposeCaption()
+    val primary = buildAnnotatedString {
+        append("Item with ")
+        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append("HTML tags") }
+        append(" and ")
+        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append("truncated") }
+        append(" text: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.")
+    }
+    DaxOneLineListItem(
+        primaryText = primary,
+        primaryMaxLines = 1,
+        onClick = {},
+    )
+}
+
+@Composable
+private fun ComposeOneLineNewPill() {
+    ComposeCaption()
+    DaxOneLineListItem(primaryText = "Item with New Pill", inlineContent = { Pill("New") }, onClick = {})
+}
+
+@Composable
+private fun ComposeOneLineExtras() {
+    ComposeCaption(stringResource(R.string.dsShowcaseCaptionComposeOnly))
+    DaxOneLineListItem(
+        primaryText = "Favicon (untinted image)",
+        leadingContent = { Image(painterResource(CommonR.drawable.ic_ddg_logo), null, size = DaxListItemIconSize.Large) },
+        onClick = {},
+    )
+    DaxOneLineListItem(
+        primaryText = "Disabled with checked switch",
+        enabled = false,
+        trailingContent = { Switch(checked = true, onCheckedChange = {}) },
+    )
+    DaxOneLineListItem(
+        primaryText = "Switch-only disabled",
+        trailingContent = { Switch(checked = true, onCheckedChange = {}, enabled = false) },
+    )
+    DaxOneLineListItem(primaryText = "Accent", primaryTextColor = DuckDuckGoTheme.colors.brand.accentBlue, onClick = {})
+}
+
+@Composable
+private fun ComposeTwoLinePlain(snackbar: ShowcaseSnackbar) {
+    ComposeCaption()
+    DaxTwoLineListItem(primaryText = "Two Line Item", secondaryText = "Without Image", onClick = { snackbar.row() })
+}
+
+@Composable
+private fun ComposeTwoLineImage(snackbar: ShowcaseSnackbar) {
+    ComposeCaption()
+    DaxTwoLineListItem(
+        primaryText = "Two Line Item",
+        secondaryText = "With Leading Image",
+        leadingContent = { Icon(painterResource(CommonR.drawable.ic_globe_24), null, size = DaxListItemIconSize.Small) },
+        onClick = { snackbar.row() },
+    )
+}
+
+@Composable
+private fun ComposeTwoLineMediumTrailing(snackbar: ShowcaseSnackbar) {
+    ComposeCaption()
+    DaxTwoLineListItem(
+        primaryText = "Two Line Item",
+        secondaryText = "With Medium Leading and Trailing Image",
+        leadingContent = { Image(painterResource(CommonR.drawable.ic_dax_icon), null, size = DaxListItemIconSize.Small) },
+        trailingContent = { Icon(painterResource(CommonR.drawable.ic_menu_vertical_24), "Overflow", onClick = { snackbar.trailingIcon() }) },
+        onClick = { snackbar.row() },
+    )
+}
+
+@Composable
+private fun ComposeTwoLineMediumTrailingBg() {
+    ComposeCaption()
+    DaxTwoLineListItem(
+        primaryText = "Two Line Item",
+        secondaryText = "With Medium Leading Background and Trailing Image",
+        leadingContent = {
+            Image(
+                painterResource(CommonR.drawable.ic_dax_icon),
+                null,
+                size = DaxListItemIconSize.Small,
+                background = DaxListItemIconBackground.Circular,
+            )
+        },
+        trailingContent = { Icon(painterResource(CommonR.drawable.ic_menu_vertical_24), "Overflow", onClick = {}) },
+        onClick = {},
+    )
+}
+
+@Composable
+private fun ComposeTwoLineLargeTrailing(snackbar: ShowcaseSnackbar) {
+    ComposeCaption()
+    DaxTwoLineListItem(
+        primaryText = "Two Line Item",
+        secondaryText = "With Large Leading and Trailing Image",
+        leadingContent = { Image(painterResource(CommonR.drawable.ic_dax_icon), null, size = DaxListItemIconSize.Large) },
+        trailingContent = { Icon(painterResource(CommonR.drawable.ic_menu_vertical_24), "Overflow", onClick = { snackbar.trailingIcon() }) },
+        onClick = { snackbar.row() },
+    )
+}
+
+@Composable
+private fun ComposeTwoLineLargeTrailingBg() {
+    ComposeCaption()
+    DaxTwoLineListItem(
+        primaryText = "Two Line Item",
+        secondaryText = "With Large Leading Background and Trailing Image",
+        leadingContent = {
+            Image(
+                painterResource(CommonR.drawable.ic_dax_icon),
+                null,
+                size = DaxListItemIconSize.Large,
+                background = DaxListItemIconBackground.Circular,
+            )
+        },
+        trailingContent = { Icon(painterResource(CommonR.drawable.ic_menu_vertical_24), "Overflow", onClick = {}) },
+        onClick = {},
+    )
+}
+
+@Composable
+private fun ComposeTwoLineTrailing(snackbar: ShowcaseSnackbar) {
+    ComposeCaption()
+    DaxTwoLineListItem(
+        primaryText = "Two Line Item",
+        secondaryText = "With Trailing Image",
+        trailingContent = { Icon(painterResource(CommonR.drawable.ic_menu_vertical_24), "Overflow", onClick = { snackbar.trailingIcon() }) },
+        onClick = { snackbar.row() },
+    )
+}
+
+@Composable
+private fun ComposeTwoLineSmallTrailing() {
+    ComposeCaption()
+    DaxTwoLineListItem(
+        primaryText = "Two Line Item",
+        secondaryText = "With Small Trailing Image",
+        trailingContent = {
+            Icon(painterResource(CommonR.drawable.ic_exclamation_recolorable_16), "Info", onClick = {}, size = DaxListItemTrailingIconSize.Small)
+        },
+        onClick = {},
+    )
+}
+
+@Composable
+private fun ComposeTwoLineMediumTrailingOnly() {
+    ComposeCaption()
+    DaxTwoLineListItem(
+        primaryText = "Two Line Item",
+        secondaryText = "With Medium (default) Trailing Image",
+        trailingContent = {
+            Icon(painterResource(CommonR.drawable.ic_exclamation_recolorable_16), "Info", onClick = {}, size = DaxListItemTrailingIconSize.Medium)
+        },
+        onClick = {},
+    )
+}
+
+@Composable
+private fun ComposeTwoLineBetaPill(snackbar: ShowcaseSnackbar) {
+    ComposeCaption()
+    DaxTwoLineListItem(
+        primaryText = "Two Line Item",
+        secondaryText = "With Beta Pill",
+        inlineContent = { Pill("Beta") },
+        onClick = { snackbar.row() },
+    )
+}
+
+@Composable
+private fun ComposeTwoLineCircular() {
+    ComposeCaption()
+    DaxTwoLineListItem(
+        primaryText = "Two Line Item",
+        secondaryText = "With Leading Image over Circular Background",
+        leadingContent = {
+            Icon(
+                painterResource(CommonR.drawable.ic_globe_24),
+                null,
+                size = DaxListItemIconSize.Small,
+                background = DaxListItemIconBackground.Circular,
+            )
+        },
+        trailingContent = { Icon(painterResource(CommonR.drawable.ic_menu_vertical_24), "Overflow", onClick = {}) },
+        onClick = {},
+    )
+}
+
+@Composable
+private fun ComposeTwoLineRounded() {
+    ComposeCaption()
+    DaxTwoLineListItem(
+        primaryText = "Two Line Item",
+        secondaryText = "With Leading Image over Rounded Background",
+        leadingContent = {
+            Icon(
+                painterResource(CommonR.drawable.ic_globe_24),
+                null,
+                size = DaxListItemIconSize.Small,
+                background = DaxListItemIconBackground.Rounded,
+            )
+        },
+        trailingContent = { Icon(painterResource(CommonR.drawable.ic_menu_vertical_24), "Overflow", onClick = {}) },
+        onClick = {},
+    )
+}
+
+@Composable
+private fun ComposeTwoLineSwitch(snackbar: ShowcaseSnackbar) {
+    ComposeCaption()
+    var checked by remember { mutableStateOf(false) }
+    DaxTwoLineListItem(
+        primaryText = "Two Line Item",
+        secondaryText = "With Switch",
+        trailingContent = {
+            Switch(
+                checked = checked,
+                onCheckedChange = {
+                    checked = it
+                    snackbar.switch(it)
+                },
+            )
+        },
+        onClick = { snackbar.row() },
+    )
+}
+
+@Composable
+private fun ComposeTwoLineSwitchImage(snackbar: ShowcaseSnackbar) {
+    ComposeCaption()
+    var checked by remember { mutableStateOf(false) }
+    DaxTwoLineListItem(
+        primaryText = "Two Line Item",
+        secondaryText = "With Leading Image and Switch",
+        leadingContent = { Icon(painterResource(CommonR.drawable.ic_globe_24), null, size = DaxListItemIconSize.Small) },
+        trailingContent = {
+            Switch(
+                checked = checked,
+                onCheckedChange = {
+                    checked = it
+                    snackbar.switch(it)
+                },
+            )
+        },
+        onClick = { snackbar.row() },
+    )
+}
+
+@Composable
+private fun ComposeTwoLineSwitchPill(snackbar: ShowcaseSnackbar) {
+    ComposeCaption()
+    var checked by remember { mutableStateOf(false) }
+    DaxTwoLineListItem(
+        primaryText = "Two Line Item",
+        secondaryText = "With Beta Pill and Switch",
+        inlineContent = { Pill("Beta") },
+        trailingContent = {
+            Switch(
+                checked = checked,
+                onCheckedChange = {
+                    checked = it
+                    snackbar.switch(it)
+                },
+            )
+        },
+        onClick = { snackbar.row() },
+    )
+}
+
+@Composable
+private fun ComposeTwoLineSwitchTruncated() {
+    ComposeCaption()
+    var checked by remember { mutableStateOf(false) }
+    DaxTwoLineListItem(
+        primaryText = "Two Line Item Two Line Item Two Line Item Two Line Item",
+        secondaryText = "In disabled state",
+        inlineContent = { Pill("Beta") },
+        leadingContent = { Icon(painterResource(CommonR.drawable.ic_globe_24), null, size = DaxListItemIconSize.Small) },
+        trailingContent = { Switch(checked = checked, onCheckedChange = { checked = it }) },
+        primaryMaxLines = 1,
+        onClick = {},
+    )
+}
+
+@Composable
+private fun ComposeTwoLineDisabled(snackbar: ShowcaseSnackbar) {
+    ComposeCaption()
+    DaxTwoLineListItem(
+        primaryText = "Two Line Item Two Line Item Two Line Item Two Line Item",
+        secondaryText = "In disabled state",
+        inlineContent = { Pill("Beta") },
+        leadingContent = { Icon(painterResource(CommonR.drawable.ic_globe_24), null, size = DaxListItemIconSize.Small) },
+        trailingContent = { Switch(checked = false, onCheckedChange = {}) },
+        enabled = false,
+        onClick = { snackbar.row() },
+    )
+}
+
+@Composable
+private fun ComposeTwoLineSwitchChecked(snackbar: ShowcaseSnackbar) {
+    ComposeCaption()
+    DaxTwoLineListItem(
+        primaryText = "Two Line Item Two",
+        secondaryText = "Checked in disabled state",
+        inlineContent = { Pill("Whatever") },
+        leadingContent = { Icon(painterResource(CommonR.drawable.ic_globe_24), null, size = DaxListItemIconSize.Small) },
+        trailingContent = { Switch(checked = true, onCheckedChange = {}) },
+        enabled = false,
+        onClick = { snackbar.row() },
+    )
+}
+
+@Composable
+private fun ComposeTwoLineSwitchDisabledChecked() {
+    ComposeCaption()
+    DaxTwoLineListItem(
+        primaryText = "Two Line Item Two",
+        secondaryText = "Checked with switch in disabled state",
+        inlineContent = { Pill("Beta") },
+        leadingContent = { Icon(painterResource(CommonR.drawable.ic_globe_24), null, size = DaxListItemIconSize.Small) },
+        trailingContent = { Switch(checked = true, onCheckedChange = {}, enabled = false) },
+        onClick = {},
+    )
+}
+
+@Composable
+private fun ComposeTwoLinePrimaryColor() {
+    ComposeCaption()
+    DaxTwoLineListItem(
+        primaryText = "Two Line Item",
+        secondaryText = "With custom Primary Text color",
+        primaryTextColor = DuckDuckGoTheme.textColors.destructive,
+        leadingContent = { Icon(painterResource(CommonR.drawable.ic_globe_24), null, size = DaxListItemIconSize.Small) },
+    )
+}
+
+@Composable
+private fun ComposeTwoLineSecondaryColor() {
+    ComposeCaption()
+    DaxTwoLineListItem(
+        primaryText = "Two Line Item",
+        secondaryText = "With custom Secondary Text color",
+        secondaryTextColor = DuckDuckGoTheme.textColors.destructive,
+        leadingContent = { Icon(painterResource(CommonR.drawable.ic_globe_24), null, size = DaxListItemIconSize.Small) },
+    )
+}
+
+@Composable
+private fun ComposeTwoLineHtml() {
+    ComposeCaption()
+    val primary: AnnotatedString = buildAnnotatedString {
+        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append("Two Line") }
+        append(" Item")
+    }
+    val secondary: AnnotatedString = buildAnnotatedString {
+        append("With HTML tags in ")
+        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append("primary") }
+        append(" and ")
+        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append("secondary") }
+        append(" text")
+    }
+    DaxTwoLineListItem(primaryText = primary, secondaryText = secondary, onClick = {})
+}
+
+@Composable
+private fun ComposeTwoLineExtras() {
+    ComposeCaption(stringResource(R.string.dsShowcaseCaptionComposeOnly))
+    DaxTwoLineListItem(
+        primaryText = "Unbounded secondary text",
+        secondaryText = "This supporting caption is intentionally long so it wraps over several lines, showing the unbounded secondary default.",
+        onClick = {},
+    )
+}
+
+@Composable
+private fun ComposeCaption(text: String = stringResource(R.string.dsShowcaseCaptionCompose)) {
+    DaxText(
+        text = text,
+        style = DuckDuckGoTheme.typography.caption,
+        modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 2.dp),
+    )
+}
+
+@Composable
+private fun ComposeSettingsWithIcon() {
+    ComposeCaption()
+    DaxSettingsListItem(
+        primaryText = "Settings List Item",
+        trailingContent = { StatusIndicator(Status.Off) },
+        leadingContent = { Image(painterResource(CommonR.drawable.ic_dax_icon), null, size = DaxListItemIconSize.Small) },
+        onClick = {},
+    )
+}
+
+@Composable
+private fun ComposeSettingsAlwaysOn() {
+    ComposeCaption()
+    DaxSettingsListItem(
+        primaryText = "Settings List Item Always On",
+        trailingContent = { StatusIndicator(Status.AlwaysOn) },
+        leadingContent = { Image(painterResource(CommonR.drawable.ic_dax_icon), null, size = DaxListItemIconSize.Small) },
+        onClick = {},
+    )
+}
+
+@Composable
+private fun ComposeSettingsOn() {
+    ComposeCaption()
+    DaxSettingsListItem(
+        primaryText = "Settings List Item on",
+        trailingContent = { StatusIndicator(Status.On) },
+        leadingContent = { Image(painterResource(CommonR.drawable.ic_dax_icon), null, size = DaxListItemIconSize.Small) },
+        onClick = {},
+    )
+}
+
+@Composable
+private fun ComposeSettingsOff() {
+    ComposeCaption()
+    DaxSettingsListItem(
+        primaryText = "Settings List Item Off",
+        trailingContent = { StatusIndicator(Status.Off) },
+        leadingContent = { Image(painterResource(CommonR.drawable.ic_dax_icon), null, size = DaxListItemIconSize.Small) },
+        onClick = {},
+    )
+}
+
+@Composable
+private fun ComposeSettingsBeta() {
+    ComposeCaption()
+    DaxSettingsListItem(
+        primaryText = "Settings List Item with Beta Pill",
+        trailingContent = { StatusIndicator(Status.On) },
+        inlineContent = { Pill("Beta") },
+        leadingContent = { Image(painterResource(CommonR.drawable.ic_dax_icon), null, size = DaxListItemIconSize.Small) },
+        onClick = {},
+    )
+}
+
+@Composable
+private fun ComposeSettingsBetaLongText() {
+    ComposeCaption()
+    DaxSettingsListItem(
+        primaryText = "Settings List Item with Beta Pill and a very long piece of text that should hopefully wrap",
+        trailingContent = { StatusIndicator(Status.On) },
+        inlineContent = { Pill("Beta") },
+        leadingContent = { Image(painterResource(CommonR.drawable.ic_dax_icon), null, size = DaxListItemIconSize.Small) },
+        onClick = {},
+    )
+}
+
+@Composable
+private fun ComposeSettingsNew() {
+    ComposeCaption()
+    DaxSettingsListItem(
+        primaryText = "Settings List Item with New Pill",
+        trailingContent = { StatusIndicator(Status.On) },
+        inlineContent = { Pill("New") },
+        leadingContent = { Image(painterResource(CommonR.drawable.ic_dax_icon), null, size = DaxListItemIconSize.Small) },
+        onClick = {},
+    )
+}
+
+@Composable
+private fun ComposeSettingsExtras() {
+    ComposeCaption(stringResource(R.string.dsShowcaseCaptionComposeOnly))
+    DaxSettingsListItem(
+        primaryText = "Leading icon over circular background",
+        trailingContent = { StatusIndicator(Status.On) },
+        leadingContent = {
+            Image(
+                painterResource(CommonR.drawable.ic_dax_icon),
+                null,
+                size = DaxListItemIconSize.Small,
+                background = DaxListItemIconBackground.Circular,
+            )
+        },
+        onClick = {},
+    )
+    DaxSettingsListItem(primaryText = "Disabled", trailingContent = { StatusIndicator(Status.Off) }, enabled = false, onClick = {})
+    DaxSettingsListItem(
+        primaryText = "Trailing icon instead of a status",
+        leadingContent = { Icon(painterResource(CommonR.drawable.ic_globe_24), null) },
+        trailingContent = {
+            Icon(painterResource(CommonR.drawable.ic_open_in_16), "Open", onClick = {}, size = DaxListItemTrailingIconSize.Small)
+        },
+        onClick = {},
+    )
+    DaxSettingsListItem(
+        primaryText = "Two line settings row",
+        secondaryText = "Your Privacy Pro subscription expired",
+        leadingContent = { Icon(painterResource(CommonR.drawable.ic_globe_24), null) },
+        trailingContent = {
+            Icon(
+                painterResource(CommonR.drawable.ic_exclamation_recolorable_16),
+                "Expired",
+                onClick = {},
+                size = DaxListItemTrailingIconSize.Small,
+            )
+        },
+        onClick = {},
+    )
 }

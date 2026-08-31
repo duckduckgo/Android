@@ -41,6 +41,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.viewModels
 import androidx.annotation.VisibleForTesting
+import androidx.core.net.toUri
+import androidx.core.view.ViewCompat
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.lifecycle.Lifecycle
@@ -60,7 +62,10 @@ import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarMockupBinding
 import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarMockupBottomBinding
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.DefaultBrowserBottomSheetDialog
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.DefaultBrowserBottomSheetDialog.EventListener
+import com.duckduckgo.app.browser.mode.AppShortcutDuckAi
 import com.duckduckgo.app.browser.mode.BrowserLaunchSource
+import com.duckduckgo.app.browser.mode.DuckAiPinShortcut
+import com.duckduckgo.app.browser.mode.SearchWidgetDuckAi
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.applyAddressBarRebrandRadius
@@ -86,7 +91,10 @@ import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CANCEL
+import com.duckduckgo.app.pixels.AppReturnPixelSender
 import com.duckduckgo.app.pixels.BrowserModeSwitchSource
+import com.duckduckgo.app.pixels.LaunchSourceValues
+import com.duckduckgo.app.pixels.toPixelLaunchSourceValue
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
@@ -123,6 +131,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.downloads.api.DownloadsScreens.DownloadsScreenNoParams
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.viewmodel.DuckChatSharedViewModel
 import com.duckduckgo.feedback.api.FeedbackScreenNoParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -147,6 +156,12 @@ import logcat.asLog
 import logcat.logcat
 import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
+
+private fun BrowserLaunchSource.toDuckChatEntryPoint(): DuckChatEntryPoint? = when (this) {
+    AppShortcutDuckAi, DuckAiPinShortcut -> DuckChatEntryPoint.ICON_SHORTCUT
+    SearchWidgetDuckAi -> DuckChatEntryPoint.WIDGET_QUICK_ACTIONS
+    else -> null
+}
 
 // open class so that we can test BrowserApplicationStateInfo
 @HasMemberInjections
@@ -173,6 +188,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var dataClearerForegroundAppRestartPixel: DataClearerForegroundAppRestartPixel
+
+    @Inject
+    lateinit var appReturnPixelSender: AppReturnPixelSender
 
     @Inject
     lateinit var serviceWorkerClientCompat: ServiceWorkerClientCompat
@@ -247,6 +265,14 @@ open class BrowserActivity : DuckDuckGoActivity() {
     private val duckChatViewModel: DuckChatSharedViewModel by viewModels()
 
     private var instanceStateBundles: CombinedInstanceState? = null
+
+    /**
+     * The launch source extra from a genuinely new [Intent] delivery (fresh launch or [onNewIntent]),
+     * consumed by the next [onResume]. Not read off [getIntent] directly, since after process death the
+     * system replays the original Intent extras on recreation and a mutated (extra-removed) copy is never
+     * persisted for that replay.
+     */
+    private var pendingLaunchSource: String? = null
 
     /**
      * Holds an [Intent] that arrived in [onNewIntent] while [dataClearer] was still clearing,
@@ -358,6 +384,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         intent?.sanitize()
         logcat(INFO) { "onCreate called. freshAppLaunch: ${dataClearer.isFreshAppLaunch}, savedInstanceState: $savedInstanceState" }
+        if (savedInstanceState == null) {
+            pendingLaunchSource = intent?.getStringExtra(LAUNCH_SOURCE_PIXEL_VALUE)
+        }
         dataClearerForegroundAppRestartPixel.registerIntent(intent)
         renderer = BrowserStateRenderer()
         val newInstanceState = if (dataClearer.isFreshAppLaunch) null else savedInstanceState
@@ -579,6 +608,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        appReturnPixelSender.fireIfNeeded(pendingLaunchSource ?: LaunchSourceValues.STANDARD)
+        pendingLaunchSource = null
+    }
+
     override fun onStop() {
         openMessageInNewTabJob?.cancel()
 
@@ -606,6 +641,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
         logcat(INFO) { "onNewIntent: $intent" }
 
         intent.sanitize()
+        setIntent(intent)
+        pendingLaunchSource = intent.getStringExtra(LAUNCH_SOURCE_PIXEL_VALUE)
 
         intent.getStringExtra(LAUNCH_FROM_NOTIFICATION_PIXEL_NAME)?.let {
             viewModel.onLaunchedFromNotification(it)
@@ -787,6 +824,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         if (intent.getBooleanExtra(OPEN_DUCK_CHAT, false)) {
             val sourceTabId = intent.getStringExtra(SOURCE_TAB_ID_EXTRA)
+            intent.getStringExtra(DUCK_CHAT_ENTRY_POINT_EXTRA)?.let { source ->
+                runCatching { DuckChatEntryPoint.valueOf(source) }
+                    .getOrNull()
+                    ?.let { duckChat.reportDuckChatEntry(it, opensNewTab = true, hasPrompt = false) }
+            }
             launchDuckAi(url = intent.getStringExtra(DUCK_CHAT_URL), sourceTabId = sourceTabId)
             return
         }
@@ -812,6 +854,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 lifecycleScope.launch { viewModel.onOpenShortcut(sharedText) }
             } else if (intent.getBooleanExtra(LAUNCH_FROM_FAVORITES_WIDGET, false)) {
                 logcat { "Favorite clicked from widget $sharedText" }
+                if (duckChat.isDuckChatUrl(sharedText.toUri())) {
+                    duckChat.reportDuckChatEntry(
+                        DuckChatEntryPoint.WIDGET_FAVORITE,
+                        opensNewTab = true,
+                        hasPrompt = hasAutoSubmittedPrompt(sharedText),
+                    )
+                }
                 lifecycleScope.launch { viewModel.onOpenFavoriteFromWidget(query = sharedText) }
             } else if (intent.getBooleanExtra(OPEN_IN_CURRENT_TAB_EXTRA, false)) {
                 logcat(WARN) { "open in current tab requested" }
@@ -828,6 +877,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
             } else {
                 val isExternal = intent.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false)
                 val interstitialScreen = intent.getBooleanExtra(LAUNCH_FROM_INTERSTITIAL_EXTRA, false)
+                if (isExternal && duckChat.isDuckChatUrl(sharedText.toUri())) {
+                    duckChat.reportDuckChatEntry(
+                        DuckChatEntryPoint.DEEP_LINK_OTHER,
+                        opensNewTab = true,
+                        hasPrompt = hasAutoSubmittedPrompt(sharedText),
+                    )
+                }
                 logcat(WARN) { "opening in new tab requested for $sharedText isExternal $isExternal interstitial $interstitialScreen" }
                 if (!interstitialScreen) {
                     logcat(WARN) { "not launching from interstitial screen" }
@@ -865,7 +921,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 SystemBarStyle.light(toolbarColor, toolbarColor)
             }
             enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
-            edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.root, installScrim = false)
+            edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(
+                binding.root,
+                installScrim = false,
+                isFullScreen = { isFullScreen() },
+            )
             edgeToEdgeHandler.applyNavigationBarInsets(binding.navigationBarMockup.root)
             edgeToEdgeHandler.applyNavigationBarInsets(binding.bottomMockupToolbar.appBarLayoutMockup)
             applyDisplayCutoutMode(resources.configuration.orientation)
@@ -1036,6 +1096,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
     }
 
+    private fun hasAutoSubmittedPrompt(url: String): Boolean = runCatching {
+        val uri = url.toUri()
+        uri.getQueryParameter("prompt") == "1" && !uri.getQueryParameter("q").isNullOrBlank()
+    }.getOrDefault(false)
+
     fun closeDuckChatFullScreen() {
         isDuckChatVisible = false
         currentTab?.closeCurrentTab()
@@ -1121,6 +1186,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
                             finish()
                         }
                         is NewUserBrowserOnboardingViewModel.Command.OpenDuckAiOnboardingDemo -> {
+                            duckChat.reportDuckChatEntry(
+                                DuckChatEntryPoint.ONBOARDING,
+                                opensNewTab = true,
+                                hasPrompt = hasAutoSubmittedPrompt(command.url),
+                            )
                             launchDuckAi(url = command.url)
                         }
                     }
@@ -1192,6 +1262,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
     override fun toggleFullScreen() {
         super.toggleFullScreen()
 
+        // Fullscreen state is owned here, so re-apply insets to pick up the new state.
+        ViewCompat.requestApplyInsets(binding.root)
+
         if (swipingTabsFeature.isEnabled) {
             viewModel.onFullScreenModeChanged(isFullScreen())
         }
@@ -1227,11 +1300,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
             intent.putExtra(LAUNCH_FROM_INTERSTITIAL_EXTRA, interstitialScreen)
             intent.putExtra(OPEN_EXISTING_TAB_ID_EXTRA, openExistingTabId)
             intent.putExtra(OPEN_DUCK_CHAT, openDuckChat)
+            intent.putExtra(DUCK_CHAT_ENTRY_POINT_EXTRA, launchSource.toDuckChatEntryPoint()?.name)
             intent.putExtra(CLOSE_DUCK_CHAT, closeDuckChat)
             intent.putExtra(DUCK_CHAT_URL, duckChatUrl)
             intent.putExtra(DUCK_CHAT_SESSION_ACTIVE, duckChatSessionActive)
             intent.putExtra(DELETED_TAB_COUNT_EXTRA, deletedTabCount)
             intent.putExtra(LAUNCH_REQUIRES_REGULAR_MODE, launchSource.requiresRegularMode)
+            intent.putExtra(LAUNCH_SOURCE_PIXEL_VALUE, launchSource.toPixelLaunchSourceValue())
             return intent
         }
 
@@ -1254,7 +1329,14 @@ open class BrowserActivity : DuckDuckGoActivity() {
          */
         const val LAUNCH_REQUIRES_REGULAR_MODE = "LAUNCH_REQUIRES_REGULAR_MODE"
 
+        /**
+         * The [BrowserLaunchSource], pre-mapped to its [LaunchSourceValues] pixel string. Read by
+         * [AppReturnPixelSender] for the `m_app_return` pixel's `launch_source` param.
+         */
+        const val LAUNCH_SOURCE_PIXEL_VALUE = "LAUNCH_SOURCE_PIXEL_VALUE"
+
         private const val OPEN_DUCK_CHAT = "OPEN_DUCK_CHAT_EXTRA"
+        private const val DUCK_CHAT_ENTRY_POINT_EXTRA = "DUCK_CHAT_ENTRY_POINT_EXTRA"
         private const val CLOSE_DUCK_CHAT = "CLOSE_DUCK_CHAT_EXTRA"
         private const val DUCK_CHAT_URL = "DUCK_CHAT_URL"
         private const val DUCK_CHAT_SESSION_ACTIVE = "DUCK_CHAT_SESSION_ACTIVE"
