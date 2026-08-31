@@ -94,7 +94,7 @@ interface BadUrlErrorPageWideEvent {
     fun onErrorPageRefreshed(tabId: String)
 
     /**
-     * Must be invoked when a page load settles (reaches full progress) without an error page being displayed.
+     * Must be invoked when a page load finishes without an error page being displayed.
      * @param tabId Indicates the current tab ID.
      */
     fun onPageLoadFinished(tabId: String)

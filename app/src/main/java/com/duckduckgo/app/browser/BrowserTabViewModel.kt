@@ -2641,10 +2641,6 @@ class BrowserTabViewModel @Inject constructor(
 
         if (newProgress == 100) {
             hasCompletedPageLoad = true
-            when (currentBrowserViewState().browserError) {
-                OMITTED, LOADING -> badUrlErrorPageWideEvent.onPageLoadFinished(tabId)
-                BAD_URL, CONNECTION, SSL_PROTOCOL_ERROR -> Unit
-            }
             command.value = RefreshUserAgent(url, currentBrowserViewState().isDesktopBrowsingMode)
             navigationAwareLoginDetector.onEvent(NavigationEvent.PageFinished)
         }
@@ -2655,6 +2651,10 @@ class BrowserTabViewModel @Inject constructor(
         webViewNavigationState: WebViewNavigationState,
         url: String?,
     ) {
+        when (currentBrowserViewState().browserError) {
+            OMITTED, LOADING -> badUrlErrorPageWideEvent.onPageLoadFinished(tabId)
+            BAD_URL, CONNECTION, SSL_PROTOCOL_ERROR -> Unit
+        }
         if (!currentBrowserViewState().maliciousSiteBlocked && site != null) {
             navigationStateChanged(webViewNavigationState)
             url?.let { prefetchFavicon(url) }

@@ -9136,18 +9136,27 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenPageLoadCompletesThenWideEventPageLoadFinished() = runTest {
+    fun whenPageFinishedThenWideEventPageLoadFinished() = runTest {
         loadUrl("http://www.example.com")
 
-        testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
+        testee.pageFinished(mockWebView, WebViewNavigationState(mockStack, 100), "http://www.example.com")
 
         verify(mockBadUrlErrorPageWideEvent).onPageLoadFinished("abc")
     }
 
     @Test
-    fun whenPageLoadCompletesWhileErrorPageShowingThenWideEventPageLoadFinishedNotCalled() = runTest {
+    fun whenPageFinishedWhileErrorPageShowingThenWideEventPageLoadFinishedNotCalled() = runTest {
         loadUrl("http://example.com")
         testee.onReceivedError(BAD_URL, "http://example.com", "ERROR_HOST_LOOKUP")
+
+        testee.pageFinished(mockWebView, WebViewNavigationState(mockStack, 100), "http://example.com")
+
+        verify(mockBadUrlErrorPageWideEvent, never()).onPageLoadFinished(any())
+    }
+
+    @Test
+    fun whenProgressReaches100ThenWideEventPageLoadFinishedNotCalled() = runTest {
+        loadUrl("http://www.example.com")
 
         testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
 
@@ -9178,12 +9187,12 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenPageLoadCompletesWhileErrorPageRefreshingThenWideEventPageLoadFinished() = runTest {
+    fun whenPageFinishedWhileErrorPageRefreshingThenWideEventPageLoadFinished() = runTest {
         loadUrl("http://example.com")
         testee.onReceivedError(BAD_URL, "http://example.com", "ERROR_HOST_LOOKUP")
         testee.onWebViewRefreshed()
 
-        testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
+        testee.pageFinished(mockWebView, WebViewNavigationState(mockStack, 100), "http://example.com")
 
         verify(mockBadUrlErrorPageWideEvent).onPageLoadFinished("abc")
     }
@@ -9194,10 +9203,27 @@ class BrowserTabViewModelTest {
         testee.onReceivedError(OMITTED, "http://www.example.com", "ERROR_UNKNOWN")
         testee.onReceivedError(BAD_URL, "http://www.example.com", "ERROR_HOST_LOOKUP")
 
-        testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
+        testee.pageFinished(mockWebView, WebViewNavigationState(mockStack, 100), "http://www.example.com")
 
         verify(mockBadUrlErrorPageWideEvent).onBadUrlErrorPageDisplayed("abc")
         verify(mockBadUrlErrorPageWideEvent, never()).onPageLoadFinished(any())
+    }
+
+    @Test
+    fun whenProgressReaches100BeforeRepeatBadUrlErrorDuringRefreshThenWideEventPageLoadFinishedNotCalled() = runTest {
+        // Reproduces the reload race: Chromium can report full progress before dispatching the
+        // main-frame error, which must not settle the refresh as recovered.
+        loadUrl("http://example.com")
+        testee.onReceivedError(BAD_URL, "http://example.com", "ERROR_HOST_LOOKUP")
+        testee.onWebViewRefreshed()
+
+        testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
+        testee.onReceivedError(BAD_URL, "http://example.com", "ERROR_HOST_LOOKUP")
+        testee.pageFinished(mockWebView, WebViewNavigationState(mockStack, 100), "http://example.com")
+
+        verify(mockBadUrlErrorPageWideEvent, never()).onPageLoadFinished(any())
+        verify(mockBadUrlErrorPageWideEvent, times(2)).onBadUrlErrorPageDisplayed("abc")
+        verify(mockBadUrlErrorPageWideEvent).onErrorPageRefreshed("abc")
     }
 
     @Test
