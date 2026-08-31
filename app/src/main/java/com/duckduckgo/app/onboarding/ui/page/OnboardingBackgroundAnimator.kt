@@ -60,7 +60,7 @@ sealed class OnboardingBackgroundStep(
         backgroundRes = R.drawable.onboarding_browser_comparison_background,
         maxHeightDp = 216,
     )
-    data object ImportPasswords : OnboardingBackgroundStep(
+    data object IslandWithHorizon : OnboardingBackgroundStep(
         backgroundRes = R.drawable.onboarding_island_with_horizon,
         maxHeightDp = 272,
     )
