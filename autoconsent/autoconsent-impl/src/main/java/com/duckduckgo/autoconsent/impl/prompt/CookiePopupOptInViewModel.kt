@@ -23,6 +23,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel
 import com.duckduckgo.autoconsent.impl.pixels.AutoconsentPixelParameters
+import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.autoconsent.impl.store.AutoconsentSettingsRepository
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -45,6 +46,7 @@ class CookiePopupOptInViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val currentTimeProvider: CurrentTimeProvider,
     private val pixel: Pixel,
+    autoconsentFeature: AutoconsentFeature,
 ) : ViewModel() {
 
     /**
@@ -53,7 +55,11 @@ class CookiePopupOptInViewModel @Inject constructor(
      */
     enum class Variant { PROTECTION_ON, PROTECTION_OFF }
 
-    data class ViewState(val variant: Variant)
+    data class ViewState(
+        val variant: Variant,
+        val isBackNavigationEnabled: Boolean,
+        val isCloseButtonVisible: Boolean,
+    )
 
     sealed class Command {
         data object Close : Command()
@@ -64,6 +70,8 @@ class CookiePopupOptInViewModel @Inject constructor(
     private val viewStateFlow = MutableStateFlow(
         ViewState(
             variant = if (autoconsent.isSettingEnabled()) Variant.PROTECTION_ON else Variant.PROTECTION_OFF,
+            isBackNavigationEnabled = autoconsentFeature.cookiePopUpOptInPromptDismissible().isEnabled(),
+            isCloseButtonVisible = autoconsentFeature.cookiePopUpOptInPromptCloseButton().isEnabled(),
         ),
     )
     val viewState: StateFlow<ViewState> = viewStateFlow
@@ -110,6 +118,12 @@ class CookiePopupOptInViewModel @Inject constructor(
                 settingsRepository.optInPromptChoiceMade = true
                 fireOptionConfirmedPixel(if (protectionWasOn()) "default" else "off")
             }
+            command.send(Command.Close)
+        }
+    }
+
+    fun onCloseClicked() {
+        viewModelScope.launch {
             command.send(Command.Close)
         }
     }

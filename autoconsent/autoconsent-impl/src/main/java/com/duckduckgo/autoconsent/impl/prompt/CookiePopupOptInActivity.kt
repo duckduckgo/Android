@@ -27,6 +27,7 @@ import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.StringRes
 import androidx.core.graphics.drawable.toDrawable
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -114,9 +115,11 @@ class CookiePopupOptInActivity : DuckDuckGoActivity() {
     }
 
     /**
-     * The prompt is a required choice, so back must not dismiss it.
+     * The prompt is a required choice unless explicitly made dismissible through remote config.
      */
     private fun setupOnBackNavigation() {
+        if (viewModel.viewState.value.isBackNavigationEnabled) return
+
         onBackPressedDispatcher.addCallback(
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() = Unit
@@ -125,6 +128,9 @@ class CookiePopupOptInActivity : DuckDuckGoActivity() {
     }
 
     private fun setupListeners() {
+        binding.cookiePopupOptInCloseButton.setOnClickListener {
+            viewModel.onCloseClicked()
+        }
         binding.cookiePopupOptInAcceptButton.setOnClickListener {
             disableButtons()
             viewModel.onAcceptClicked()
@@ -154,6 +160,7 @@ class CookiePopupOptInActivity : DuckDuckGoActivity() {
 
     private fun render(viewState: ViewState) {
         val text = viewState.variant.textResources()
+        binding.cookiePopupOptInCloseButton.isVisible = viewState.isCloseButtonVisible
         binding.cookiePopupOptInTitle.setText(text.title)
         binding.cookiePopupOptInDescription.setText(text.description)
         binding.cookiePopupOptInAcceptButton.text = getString(text.acceptButton)
