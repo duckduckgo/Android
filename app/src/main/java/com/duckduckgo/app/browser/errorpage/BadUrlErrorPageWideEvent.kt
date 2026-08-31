@@ -160,7 +160,7 @@ class RealBadUrlErrorPageWideEvent @Inject constructor(
                     }
                     // The clicked redirect landed on another BAD_URL page: the redirect failed,
                     // and the freshly shown error page starts a flow of its own.
-                    finishFlow(tabId, Failure(reason = FAILURE_REASON_NEW_HOSTNAME_RESOLUTION_FAILED))
+                    failFlow(tabId, FailureReason.NEW_HOSTNAME_RESOLUTION_FAILED)
                 }
                 // The feature flag only gates starting new flows. Flows already in flight always resolve,
                 // here and in every other callback, so no stale state survives a mid-journey flag change.
@@ -178,9 +178,9 @@ class RealBadUrlErrorPageWideEvent @Inject constructor(
                 val state = activeFlows[tabId] ?: return@launch
                 if (state.awaitingRedirectOutcome) {
                     // The device went offline before the suggested hostname could be looked up. It's neither a success nor a feature failure
-                    finishFlow(tabId, Cancelled, mapOf(KEY_CANCEL_REASON to CancelReason.DEVICE_OFFLINE.value))
+                    cancelFlow(tabId, CancelReason.DEVICE_OFFLINE)
                 } else {
-                    finishFlow(tabId, Cancelled, mapOf(KEY_CANCEL_REASON to CancelReason.ERROR_REPLACED_ON_REFRESH.value))
+                    cancelFlow(tabId, CancelReason.ERROR_REPLACED_ON_REFRESH)
                 }
             }
         }
@@ -194,7 +194,7 @@ class RealBadUrlErrorPageWideEvent @Inject constructor(
                     // The suggested hostname resolved. Whatever failed afterwards is out of scope.
                     finishFlow(tabId, Success)
                 } else {
-                    finishFlow(tabId, Cancelled, mapOf(KEY_CANCEL_REASON to CancelReason.ERROR_REPLACED_ON_REFRESH.value))
+                    cancelFlow(tabId, CancelReason.ERROR_REPLACED_ON_REFRESH)
                 }
             }
         }
@@ -236,7 +236,7 @@ class RealBadUrlErrorPageWideEvent @Inject constructor(
                         } else {
                             CancelReason.RECOVERED_ON_REFRESH
                         }
-                        finishFlow(tabId, Cancelled, mapOf(KEY_CANCEL_REASON to cancelReason.value))
+                        cancelFlow(tabId, cancelReason)
                     }
                     else -> Unit // The error page is still displayed, so the flow stays open
                 }
@@ -266,7 +266,7 @@ class RealBadUrlErrorPageWideEvent @Inject constructor(
     override fun onBadUrlErrorPageExited(tabId: String) {
         coroutineScope.launch {
             mutex.withLock {
-                finishFlow(tabId, Cancelled, mapOf(KEY_CANCEL_REASON to CancelReason.ABANDONED.value))
+                cancelFlow(tabId, CancelReason.ABANDONED)
             }
         }
     }
@@ -301,6 +301,14 @@ class RealBadUrlErrorPageWideEvent @Inject constructor(
             metadata = mapOf(KEY_LAST_STEP to stepName),
         )
         logcat { "Recorded $stepName for flowId=${state.flowId}" }
+    }
+
+    private suspend fun cancelFlow(tabId: String, reason: CancelReason) {
+        finishFlow(tabId, Cancelled, mapOf(KEY_CANCEL_REASON to reason.value))
+    }
+
+    private suspend fun failFlow(tabId: String, reason: FailureReason) {
+        finishFlow(tabId, Failure(reason = reason.value))
     }
 
     private suspend fun finishFlow(
@@ -339,7 +347,7 @@ class RealBadUrlErrorPageWideEvent @Inject constructor(
                     mutex.withLock {
                         val inactiveTabIds = activeFlows.keys.filter { it !in activeTabIds }
                         for (tabId in inactiveTabIds) {
-                            finishFlow(tabId, Cancelled, mapOf(KEY_CANCEL_REASON to CancelReason.ABANDONED.value))
+                            cancelFlow(tabId, CancelReason.ABANDONED)
                         }
                     }
                 }
@@ -372,6 +380,10 @@ class RealBadUrlErrorPageWideEvent @Inject constructor(
         DEVICE_OFFLINE("device_offline"),
     }
 
+    private enum class FailureReason(val value: String) {
+        NEW_HOSTNAME_RESOLUTION_FAILED("new_hostname_resolution_failed"),
+    }
+
     private companion object {
         val ERROR_PAGE_INTERVAL_BUCKETS: Set<Duration> = setOf(
             1.seconds,
@@ -389,6 +401,5 @@ class RealBadUrlErrorPageWideEvent @Inject constructor(
         const val KEY_CANCEL_REASON = "cancel_reason"
         const val KEY_LAST_STEP = "last_step"
         const val KEY_ERROR_PAGE_DURATION = "error_page_duration_ms_bucketed"
-        const val FAILURE_REASON_NEW_HOSTNAME_RESOLUTION_FAILED = "new_hostname_resolution_failed"
     }
 }
