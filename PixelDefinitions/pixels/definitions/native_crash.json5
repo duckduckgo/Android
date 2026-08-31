@@ -35,7 +35,6 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
-            "atb",
             {
                 "key": "v",
                 "description": "App version and build flavor at the time the handler was registered.",
