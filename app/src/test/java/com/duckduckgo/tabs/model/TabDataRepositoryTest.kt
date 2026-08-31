@@ -31,6 +31,7 @@ import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactoryImpl
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.tabs.TabManagerFeatureFlags
@@ -69,7 +70,9 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.isNull
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.time.Instant
@@ -165,6 +168,160 @@ class TabDataRepositoryTest {
         val captor = argumentCaptor<Boolean>()
         verify(mockDao).updateUrlAndTitle(any(), anyOrNull(), anyOrNull(), captor.capture())
         assertTrue(captor.firstValue)
+    }
+
+    @Test
+    fun whenUpdateCalledRepeatedlyWithUnchangedSiteThenDaoWrittenOnce() = runTest {
+        val testee = tabDataRepository()
+        val site = site("http://example.com", "Example")
+
+        repeat(50) { testee.update("tabid", site) }
+
+        verify(mockDao, times(1)).updateUrlAndTitle(eq("tabid"), eq("http://example.com"), eq("Example"), eq(true))
+    }
+
+    @Test
+    fun whenUpdateCalledRepeatedlyWithNullSiteThenDaoWrittenOnce() = runTest {
+        val testee = tabDataRepository()
+
+        repeat(50) { testee.update("tabid", null) }
+
+        verify(mockDao, times(1)).updateUrlAndTitle(eq("tabid"), anyOrNull(), anyOrNull(), eq(true))
+    }
+
+    @Test
+    fun whenUpdateCalledWithChangedUrlThenDaoWrittenAgain() = runTest {
+        val testee = tabDataRepository()
+
+        testee.update("tabid", site("http://example.com", "Example"))
+        testee.update("tabid", site("http://example.com/other", "Example"))
+
+        verify(mockDao).updateUrlAndTitle(eq("tabid"), eq("http://example.com"), eq("Example"), eq(true))
+        verify(mockDao).updateUrlAndTitle(eq("tabid"), eq("http://example.com/other"), eq("Example"), eq(true))
+    }
+
+    @Test
+    fun whenUpdateCalledWithChangedTitleThenDaoWrittenAgain() = runTest {
+        val testee = tabDataRepository()
+
+        testee.update("tabid", site("http://example.com", null))
+        testee.update("tabid", site("http://example.com", "Example"))
+
+        verify(mockDao).updateUrlAndTitle(eq("tabid"), eq("http://example.com"), isNull(), eq(true))
+        verify(mockDao).updateUrlAndTitle(eq("tabid"), eq("http://example.com"), eq("Example"), eq(true))
+    }
+
+    @Test
+    fun whenUpdateCalledForDifferentTabsThenEachTabIsWritten() = runTest {
+        val testee = tabDataRepository()
+        val site = site("http://example.com", "Example")
+
+        testee.update("tabid1", site)
+        testee.update("tabid2", site)
+
+        verify(mockDao).updateUrlAndTitle(eq("tabid1"), eq("http://example.com"), eq("Example"), eq(true))
+        verify(mockDao).updateUrlAndTitle(eq("tabid2"), eq("http://example.com"), eq("Example"), eq(true))
+    }
+
+    @Test
+    fun whenTabDeletedThenSubsequentUpdateWritesAgain() = runTest {
+        val testee = tabDataRepository()
+        val site = site("http://example.com", "Example")
+
+        testee.update("tabid", site)
+        testee.delete(TabEntity("tabid", position = 0))
+        testee.update("tabid", site)
+
+        verify(mockDao, times(2)).updateUrlAndTitle(eq("tabid"), eq("http://example.com"), eq("Example"), eq(true))
+    }
+
+    @Test
+    fun whenTabsDeletedThenSubsequentUpdateWritesAgain() = runTest {
+        val testee = tabDataRepository()
+        val site = site("http://example.com", "Example")
+
+        testee.update("tabid", site)
+        testee.deleteTabs(listOf("tabid"))
+        testee.update("tabid", site)
+
+        verify(mockDao, times(2)).updateUrlAndTitle(eq("tabid"), eq("http://example.com"), eq("Example"), eq(true))
+    }
+
+    @Test
+    fun whenTabReplacedWithNewTabThenSubsequentUpdateWritesAgain() = runTest {
+        val testee = tabDataRepository()
+        val site = site("http://example.com", "Example")
+
+        testee.update("tabid", site)
+        testee.replaceTabWithNewTab("tabid", "http://example.com")
+        testee.update("tabid", site)
+
+        verify(mockDao, times(2)).updateUrlAndTitle(eq("tabid"), eq("http://example.com"), eq("Example"), eq(true))
+    }
+
+    @Test
+    fun whenAllTabsDeletedThenSubsequentUpdateWritesAgain() = runTest {
+        val testee = tabDataRepository()
+        val site = site("http://example.com", "Example")
+
+        testee.update("tabid", site)
+        testee.deleteAll()
+        testee.update("tabid", site)
+
+        verify(mockDao, times(2)).updateUrlAndTitle(eq("tabid"), eq("http://example.com"), eq("Example"), eq(true))
+    }
+
+    @Test
+    fun whenTabMarkedDeletableThenUndoneSubsequentUnchangedUpdateStillSkipsDao() = runTest {
+        val testee = tabDataRepository()
+        val site = site("http://example.com", "Example")
+        val tab = TabEntity("tabid", position = 0)
+
+        testee.update("tabid", site)
+        // markDeletable/undoDeletable only flip the deletable flag and never write url/title,
+        // so they deliberately leave the update() dedup cache untouched.
+        testee.markDeletable(tab)
+        testee.undoDeletable(tab)
+        testee.update("tabid", site)
+
+        verify(mockDao, times(1)).updateUrlAndTitle(eq("tabid"), eq("http://example.com"), eq("Example"), eq(true))
+    }
+
+    /**
+     * A background tab is inserted with title defaulted to its host, so the first update() can carry values
+     * identical to the inserted row. That update still has to reach the DAO or the tab stays unread forever.
+     */
+    @Test
+    fun whenBackgroundTabUpdatedWithValuesMatchingInsertedRowThenViewedIsStillWritten() = runTest {
+        val testee = tabDataRepository()
+        testee.addNewTabAfterExistingTab("http://www.example.com", "tabid")
+
+        val inserted = argumentCaptor<TabEntity>()
+        verify(mockDao).insertTabAtPosition(inserted.capture())
+        val newTabId = inserted.firstValue.tabId
+
+        testee.update(newTabId, site(inserted.firstValue.url!!, inserted.firstValue.title))
+
+        verify(mockDao).updateUrlAndTitle(eq(newTabId), eq("http://www.example.com"), eq("example.com"), eq(true))
+    }
+
+    @Test
+    fun whenUpdateCalledRepeatedlyWithUnchangedSiteThenEntryPointSourceClaimedOnce() = runTest {
+        val duckAiTabSessionRepository: DuckAiTabSessionRepository = mock()
+        val testee = tabDataRepository(duckAiTabSessionRepository = duckAiTabSessionRepository)
+        val site = site("http://example.com", "Example")
+
+        repeat(50) { testee.update("tabid", site) }
+
+        verify(duckAiTabSessionRepository, times(1)).tryClaimEntryPointSource("tabid", "http://example.com")
+    }
+
+    private fun site(
+        url: String,
+        title: String?,
+    ): Site = mock<Site>().apply {
+        whenever(this.url).thenReturn(url)
+        whenever(this.title).thenReturn(title)
     }
 
     @Test
@@ -386,6 +543,29 @@ class TabDataRepositoryTest {
         currentSelectedTabId = testee.liveSelectedTab.blockingObserve()?.tabId
         assertEquals(currentSelectedTabId, sourceTab.tabId)
         verify(mockTabVisitedSitesRepository).clearTab("tabToDeleteId")
+    }
+
+    @Test
+    fun whenTabDeletedAndSelectSourceThenSubsequentUpdateWritesAgain() = runTest {
+        val db = createDatabase()
+        val dao = db.tabsDao()
+        val sourceTab = TabEntity(tabId = "sourceId", url = "http://www.example.com", position = 0)
+        val tabToDelete = TabEntity(tabId = "tabToDeleteId", url = "http://www.example.com", position = 1, sourceTabId = "sourceId")
+        dao.addAndSelectTab(sourceTab)
+        dao.addAndSelectTab(tabToDelete)
+        val testee = tabDataRepository(dao)
+        val site = site("http://example.com", "Example")
+
+        testee.update(tabToDelete.tabId, site)
+        testee.deleteTabAndSelectSource(tabToDelete.tabId)
+        dao.addAndSelectTab(TabEntity(tabId = tabToDelete.tabId, position = 2))
+
+        testee.update(tabToDelete.tabId, site)
+
+        val reinsertedTab = dao.tab(tabToDelete.tabId)
+        assertEquals("http://example.com", reinsertedTab?.url)
+        assertEquals("Example", reinsertedTab?.title)
+        db.close()
     }
 
     @Test
