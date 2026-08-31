@@ -26,7 +26,9 @@ import javax.inject.Inject
 interface AdBlockingSettingsRepository {
 
     fun isEnabledFlow(): Flow<Boolean?>
-    suspend fun setEnabled(enabled: Boolean)
+    fun isFromOnboardingFlow(): Flow<Boolean>
+
+    suspend fun setEnabled(enabled: Boolean, fromOnboarding: Boolean = false)
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -37,7 +39,9 @@ class RealAdBlockingSettingsRepository @Inject constructor(
 
     override fun isEnabledFlow(): Flow<Boolean?> = userPreferences.isEnabledFlow()
 
-    override suspend fun setEnabled(enabled: Boolean) {
-        userPreferences.setEnabled(enabled)
+    override fun isFromOnboardingFlow(): Flow<Boolean> = userPreferences.isFromOnboardingFlow()
+
+    override suspend fun setEnabled(enabled: Boolean, fromOnboarding: Boolean) {
+        userPreferences.setEnabled(enabled, fromOnboarding)
     }
 }

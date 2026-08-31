@@ -90,6 +90,17 @@ class AdBlockingSettingsViewModelTest {
     }
 
     @Test
+    fun whenEnabledFromOnboardingThenDoesNotShowConsentDescription() = runTest {
+        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.FromOnboarding))
+
+        createViewModel().viewState.test {
+            val state = expectMostRecentItem()
+            assertTrue(state.isEnabled)
+            assertEquals(false, state.showConsentDescription)
+        }
+    }
+
+    @Test
     fun whenUserEnabledThenShowsConsentDescription() = runTest {
         whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.UserEnabled))
 

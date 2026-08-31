@@ -85,7 +85,8 @@ class AdBlockingSettingsViewModel @Inject constructor(
         ViewState(
             isEnabled = state is AdBlockingState.Enabled,
             disabledUntilRelaunch = state is AdBlockingState.Disabled.UntilRelaunch,
-            showConsentDescription = state !is AdBlockingState.Enabled.Default,
+            showConsentDescription = state !is AdBlockingState.Enabled.Default &&
+                state !is AdBlockingState.Enabled.FromOnboarding,
             isContingencyMode = uxImprovements && contingencyModeOn,
             duckPlayerMode = duckPlayerPreferences.privatePlayerMode,
         )

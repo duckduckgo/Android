@@ -73,10 +73,13 @@ class RealAdBlockingStatusCheckerTest {
     }
 
     private val userEnabledFlow = MutableStateFlow<Boolean?>(true)
+    private val fromOnboardingFlow = MutableStateFlow(false)
     private val settingsRepository: AdBlockingSettingsRepository = object : AdBlockingSettingsRepository {
         override fun isEnabledFlow(): Flow<Boolean?> = userEnabledFlow
-        override suspend fun setEnabled(enabled: Boolean) {
+        override fun isFromOnboardingFlow(): Flow<Boolean> = fromOnboardingFlow
+        override suspend fun setEnabled(enabled: Boolean, fromOnboarding: Boolean) {
             userEnabledFlow.value = enabled
+            fromOnboardingFlow.value = fromOnboarding
         }
     }
     private val sessionStore = RealAdBlockingSessionStore()
@@ -338,12 +341,53 @@ class RealAdBlockingStatusCheckerTest {
     fun whenUpstreamHasNotEmittedYetThenCurrentStateIsUninitialized() {
         val pendingRepository = object : AdBlockingSettingsRepository {
             override fun isEnabledFlow(): Flow<Boolean?> = emptyFlow()
-            override suspend fun setEnabled(enabled: Boolean) = Unit
+            override fun isFromOnboardingFlow(): Flow<Boolean> = MutableStateFlow(false)
+            override suspend fun setEnabled(enabled: Boolean, fromOnboarding: Boolean) = Unit
         }
 
         val checker = RealAdBlockingStatusChecker(feature, pendingRepository, sessionStore, testScope)
 
         assertEquals(AdBlockingState.Uninitialized, checker.currentState())
+    }
+
+    @Test
+    fun whenEnabledFromOnboardingThenObserveStateEmitsFromOnboarding() = runTest {
+        userEnabledFlow.value = true
+        fromOnboardingFlow.value = true
+
+        assertEquals(AdBlockingState.Enabled.FromOnboarding, checker.observeState().first())
+    }
+
+    @Test
+    fun whenEnabledFromOnboardingThenStaysEnabledAfterDefaultTurnsOff() = runTest {
+        userEnabledFlow.value = true
+        fromOnboardingFlow.value = true
+        enabledByDefaultFlow.value = true
+        assertEquals(AdBlockingState.Enabled.FromOnboarding, checker.observeState().first())
+
+        enabledByDefaultFlow.value = false
+        assertEquals(AdBlockingState.Enabled.FromOnboarding, checker.observeState().first())
+    }
+
+    @Test
+    fun whenDisabledFromOnboardingThenObserveStateEmitsDisabled() = runTest {
+        userEnabledFlow.value = false
+        fromOnboardingFlow.value = true
+
+        assertEquals(AdBlockingState.Disabled.Permanent, checker.observeState().first())
+    }
+
+    @Test
+    fun whenUserTogglesInSettingsAfterOnboardingThenStateIsUserEnabled() = runTest {
+        userEnabledFlow.value = true
+        fromOnboardingFlow.value = true
+        assertEquals(AdBlockingState.Enabled.FromOnboarding, checker.observeState().first())
+
+        settingsRepository.setEnabled(false)
+        assertEquals(AdBlockingState.Disabled.Permanent, checker.observeState().first())
+
+        settingsRepository.setEnabled(true)
+        assertEquals(AdBlockingState.Enabled.UserEnabled, checker.observeState().first())
     }
 
     @Test

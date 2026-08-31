@@ -33,7 +33,8 @@ interface AdBlockingUserPreferences {
 
     fun isEnabledFlow(): Flow<Boolean?>
     suspend fun isEnabled(): Boolean?
-    suspend fun setEnabled(enabled: Boolean)
+    fun isFromOnboardingFlow(): Flow<Boolean>
+    suspend fun setEnabled(enabled: Boolean, fromOnboarding: Boolean)
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -46,11 +47,18 @@ class RealAdBlockingUserPreferences @Inject constructor(
 
     override suspend fun isEnabled(): Boolean? = isEnabledFlow().firstOrNull()
 
-    override suspend fun setEnabled(enabled: Boolean) {
-        dataStore.edit { prefs -> prefs[KEY_ENABLED] = enabled }
+    override fun isFromOnboardingFlow(): Flow<Boolean> =
+        dataStore.data.map { prefs -> prefs[KEY_FROM_ONBOARDING] ?: false }
+
+    override suspend fun setEnabled(enabled: Boolean, fromOnboarding: Boolean) {
+        dataStore.edit { prefs ->
+            prefs[KEY_FROM_ONBOARDING] = fromOnboarding
+            prefs[KEY_ENABLED] = enabled
+        }
     }
 
     private companion object {
         val KEY_ENABLED = booleanPreferencesKey("ad_blocking_enabled")
+        val KEY_FROM_ONBOARDING = booleanPreferencesKey("ad_blocking_changed_from_onboarding")
     }
 }

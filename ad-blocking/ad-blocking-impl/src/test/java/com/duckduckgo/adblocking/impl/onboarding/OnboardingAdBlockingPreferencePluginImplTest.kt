@@ -97,7 +97,7 @@ class OnboardingAdBlockingPreferencePluginImplTest {
 
         testee.apply(true)
 
-        verify(settingsRepository, never()).setEnabled(any())
+        verify(settingsRepository, never()).setEnabled(any(), any())
     }
 
     @Test
@@ -106,16 +106,16 @@ class OnboardingAdBlockingPreferencePluginImplTest {
 
         testee.apply(false)
 
-        verify(settingsRepository).setEnabled(false)
+        verify(settingsRepository).setEnabled(false, fromOnboarding = true)
     }
 
     @Test
-    fun `when ad blocking is off and preference applied off then nothing is persisted`() = runTest {
+    fun `when ad blocking is off and preference applied off then the pick is persisted`() = runTest {
         whenever(statusChecker.observeState()).thenReturn(flowOf(Disabled.Permanent))
 
         testee.apply(false)
 
-        verify(settingsRepository, never()).setEnabled(any())
+        verify(settingsRepository).setEnabled(false, fromOnboarding = true)
     }
 
     @Test
@@ -124,7 +124,7 @@ class OnboardingAdBlockingPreferencePluginImplTest {
 
         testee.apply(true)
 
-        verify(settingsRepository).setEnabled(true)
+        verify(settingsRepository).setEnabled(true, fromOnboarding = true)
     }
 
     @Test
@@ -133,7 +133,7 @@ class OnboardingAdBlockingPreferencePluginImplTest {
 
         testee.apply(true)
 
-        verify(settingsRepository, never()).setEnabled(any())
+        verify(settingsRepository, never()).setEnabled(any(), any())
     }
 
     @Test
@@ -142,7 +142,7 @@ class OnboardingAdBlockingPreferencePluginImplTest {
 
         testee.apply(false)
 
-        verify(settingsRepository).setEnabled(false)
+        verify(settingsRepository).setEnabled(false, fromOnboarding = true)
     }
 
     @Test
@@ -151,7 +151,7 @@ class OnboardingAdBlockingPreferencePluginImplTest {
 
         testee.apply(false)
 
-        verify(settingsRepository).setEnabled(false)
+        verify(settingsRepository).setEnabled(false, fromOnboarding = true)
     }
 
     @Test
@@ -160,7 +160,7 @@ class OnboardingAdBlockingPreferencePluginImplTest {
 
         testee.apply(true)
 
-        verify(settingsRepository).setEnabled(true)
+        verify(settingsRepository).setEnabled(true, fromOnboarding = true)
     }
 
     @Test
@@ -169,7 +169,7 @@ class OnboardingAdBlockingPreferencePluginImplTest {
 
         testee.apply(true)
 
-        verify(settingsRepository).setEnabled(true)
+        verify(settingsRepository).setEnabled(true, fromOnboarding = true)
     }
 
     @Test
@@ -178,6 +178,24 @@ class OnboardingAdBlockingPreferencePluginImplTest {
 
         testee.apply(true)
 
-        verify(settingsRepository).setEnabled(true)
+        verify(settingsRepository).setEnabled(true, fromOnboarding = true)
+    }
+
+    @Test
+    fun `when ad blocking was already enabled from onboarding and preference applied on then nothing is persisted`() = runTest {
+        whenever(statusChecker.observeState()).thenReturn(flowOf(Enabled.FromOnboarding))
+
+        testee.apply(true)
+
+        verify(settingsRepository, never()).setEnabled(any(), any())
+    }
+
+    @Test
+    fun `when ad blocking was already enabled from onboarding and preference applied off then ad blocking is disabled`() = runTest {
+        whenever(statusChecker.observeState()).thenReturn(flowOf(Enabled.FromOnboarding))
+
+        testee.apply(false)
+
+        verify(settingsRepository).setEnabled(false, fromOnboarding = true)
     }
 }
