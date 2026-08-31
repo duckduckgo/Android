@@ -34,8 +34,8 @@
             },
             {
                 "key": "feature.data.ext.cancel_reason",
-                "description": "Present only when the flow finished with CANCELLED status. recovered_on_refresh: the user refreshed the failed page and it loaded. error_replaced_on_refresh: the user refreshed and the hostname resolved but the page failed another way, replacing this error page with a different one. abandoned: the user navigated back/forward or home, closed the tab, or submitted a new query.",
-                "enum": ["recovered_on_refresh", "abandoned", "error_replaced_on_refresh"]
+                "description": "Present only when the flow finished with CANCELLED status. recovered_on_refresh: the user refreshed the failed page and it loaded. error_replaced_on_refresh: the user refreshed and this error page was replaced by a different error page. abandoned: the user navigated back/forward or home, closed the tab, or submitted a new query. device_offline: the device was offline when the tapped redirect suggestion was looked up, so whether the suggested hostname resolves is unknowable.",
+                "enum": ["recovered_on_refresh", "abandoned", "error_replaced_on_refresh", "device_offline"]
             },
             {
                 "key": "feature.data.ext.failure_reason",

@@ -77,6 +77,7 @@ import com.duckduckgo.app.browser.WebViewErrorResponse.BAD_URL
 import com.duckduckgo.app.browser.WebViewErrorResponse.CONNECTION
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
+import com.duckduckgo.app.browser.WebViewErrorResponse.SSL_PROTOCOL_ERROR
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
 import com.duckduckgo.app.browser.api.OmnibarRepository
@@ -9225,10 +9226,19 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenNonBadUrlErrorReceivedThenWideEventOtherErrorPageDisplayed() = runTest {
+    fun whenConnectionErrorReceivedThenWideEventConnectionErrorPageDisplayed() = runTest {
         testee.onReceivedError(CONNECTION, "http://example.com", "ERROR_CONNECT")
 
+        verify(mockBadUrlErrorPageWideEvent).onConnectionErrorPageDisplayed("abc")
+        verify(mockBadUrlErrorPageWideEvent, never()).onOtherErrorPageDisplayed(any())
+    }
+
+    @Test
+    fun whenSslProtocolErrorReceivedThenWideEventOtherErrorPageDisplayed() = runTest {
+        testee.onReceivedError(SSL_PROTOCOL_ERROR, "http://example.com", "ERROR_FAILED_SSL_HANDSHAKE")
+
         verify(mockBadUrlErrorPageWideEvent).onOtherErrorPageDisplayed("abc")
+        verify(mockBadUrlErrorPageWideEvent, never()).onConnectionErrorPageDisplayed(any())
     }
 
     @Test

@@ -68,7 +68,15 @@ interface BadUrlErrorPageWideEvent {
     fun onBadUrlErrorPageDisplayed(tabId: String)
 
     /**
-     * Must be invoked when a non-BAD_URL error page (connection, SSL, malicious site) is displayed.
+     * Must be invoked when a connection error page (device offline during host lookup) is
+     * displayed. Unlike other non-BAD_URL error pages, it does not prove the hostname resolved.
+     * @param tabId Indicates the current tab ID.
+     */
+    fun onConnectionErrorPageDisplayed(tabId: String)
+
+    /**
+     * Must be invoked when a non-BAD_URL error page that proves the hostname resolved (SSL,
+     * malicious site) is displayed.
      * @param tabId Indicates the current tab ID.
      */
     fun onOtherErrorPageDisplayed(tabId: String)
@@ -160,6 +168,20 @@ class RealBadUrlErrorPageWideEvent @Inject constructor(
                     return@launch
                 }
                 startFlow(tabId)
+            }
+        }
+    }
+
+    override fun onConnectionErrorPageDisplayed(tabId: String) {
+        coroutineScope.launch {
+            mutex.withLock {
+                val state = activeFlows[tabId] ?: return@launch
+                if (state.awaitingRedirectOutcome) {
+                    // The device went offline before the suggested hostname could be looked up. It's neither a success nor a feature failure
+                    finishFlow(tabId, Cancelled, mapOf(KEY_CANCEL_REASON to CancelReason.DEVICE_OFFLINE.value))
+                } else {
+                    finishFlow(tabId, Cancelled, mapOf(KEY_CANCEL_REASON to CancelReason.ERROR_REPLACED_ON_REFRESH.value))
+                }
             }
         }
     }
@@ -347,6 +369,7 @@ class RealBadUrlErrorPageWideEvent @Inject constructor(
         RECOVERED_ON_REFRESH("recovered_on_refresh"),
         ABANDONED("abandoned"),
         ERROR_REPLACED_ON_REFRESH("error_replaced_on_refresh"),
+        DEVICE_OFFLINE("device_offline"),
     }
 
     private companion object {

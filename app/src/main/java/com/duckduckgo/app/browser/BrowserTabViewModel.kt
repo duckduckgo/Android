@@ -4691,7 +4691,8 @@ class BrowserTabViewModel @Inject constructor(
         }
         when (errorType) {
             BAD_URL -> badUrlErrorPageWideEvent.onBadUrlErrorPageDisplayed(tabId)
-            CONNECTION, SSL_PROTOCOL_ERROR -> badUrlErrorPageWideEvent.onOtherErrorPageDisplayed(tabId)
+            CONNECTION -> badUrlErrorPageWideEvent.onConnectionErrorPageDisplayed(tabId)
+            SSL_PROTOCOL_ERROR -> badUrlErrorPageWideEvent.onOtherErrorPageDisplayed(tabId)
             OMITTED -> badUrlErrorPageWideEvent.onOmittedErrorReceived(tabId)
             LOADING -> Unit
         }

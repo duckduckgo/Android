@@ -336,6 +336,7 @@ class BadUrlErrorPageWideEventTest {
         testee.onRedirectSuggested(TAB_ID)
         testee.onRedirectClicked(TAB_ID)
         testee.onOtherErrorPageDisplayed(TAB_ID)
+        testee.onConnectionErrorPageDisplayed(TAB_ID)
         testee.onOmittedErrorReceived(TAB_ID)
         testee.onPageLoadFinished(TAB_ID)
         testee.onErrorPageRefreshed(TAB_ID)
@@ -432,6 +433,33 @@ class BadUrlErrorPageWideEventTest {
             wideEventId = FLOW_ID,
             status = FlowStatus.Success,
             metadata = emptyMap(),
+        )
+    }
+
+    @Test
+    fun `when connection error page displayed after redirect clicked, then flow cancelled as device_offline`() = runTest {
+        testee.onBadUrlErrorPageDisplayed(TAB_ID)
+        testee.onRedirectClicked(TAB_ID)
+        testee.onConnectionErrorPageDisplayed(TAB_ID)
+        advanceUntilIdle()
+
+        verify(wideEventClient).flowFinish(
+            wideEventId = FLOW_ID,
+            status = FlowStatus.Cancelled,
+            metadata = mapOf("cancel_reason" to "device_offline"),
+        )
+    }
+
+    @Test
+    fun `when connection error page displayed without redirect clicked, then flow cancelled as error_replaced_on_refresh`() = runTest {
+        testee.onBadUrlErrorPageDisplayed(TAB_ID)
+        testee.onConnectionErrorPageDisplayed(TAB_ID)
+        advanceUntilIdle()
+
+        verify(wideEventClient).flowFinish(
+            wideEventId = FLOW_ID,
+            status = FlowStatus.Cancelled,
+            metadata = mapOf("cancel_reason" to "error_replaced_on_refresh"),
         )
     }
 
