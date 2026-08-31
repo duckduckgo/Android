@@ -9252,6 +9252,19 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenUserSubmittedQueryRetypesFailedHostnameThenWideEventErrorPageRefreshedAndNoExitReported() = runTest {
+        loadUrl("http://example.com")
+        whenever(mockOmnibarConverter.convertQueryToUrl("example.com", null))
+            .thenReturn("http://example.com")
+
+        testee.onUserSubmittedQuery("example.com")
+
+        // The raw input differs from the tab's URL only by normalization, so it's a retry, not an exit.
+        verify(mockBadUrlErrorPageWideEvent).onErrorPageRefreshed("abc")
+        verify(mockBadUrlErrorPageWideEvent, never()).onBadUrlErrorPageExited(any())
+    }
+
+    @Test
     fun whenConnectionErrorReceivedThenWideEventConnectionErrorPageDisplayed() = runTest {
         testee.onReceivedError(CONNECTION, "http://example.com", "ERROR_CONNECT")
 
