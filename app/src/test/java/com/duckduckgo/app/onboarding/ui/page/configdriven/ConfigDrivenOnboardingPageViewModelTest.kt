@@ -17,6 +17,7 @@
 package com.duckduckgo.app.onboarding.ui.page.configdriven
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import app.cash.turbine.test
@@ -34,6 +35,8 @@ import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityStep
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanBootstrapper
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanProvider
+import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingStepIds
+import com.duckduckgo.app.onboarding.orchestrator.PasswordImportOutcome
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.OnboardingBackgroundStep
 import com.duckduckgo.app.onboarding.ui.page.configdriven.ConfigDrivenOnboardingPageViewModel.Command
@@ -41,6 +44,7 @@ import com.duckduckgo.app.onboarding.ui.page.configdriven.ConfigDrivenOnboarding
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.autofill.api.ImportPasswordsFromGoogle
+import com.duckduckgo.autofill.api.ImportPasswordsFromGoogle.ImportPasswordsResult
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.onboarding.api.LinearOnboardingEvent
 import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
@@ -62,6 +66,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -171,6 +176,9 @@ class ConfigDrivenOnboardingPageViewModelTest {
 
     private fun quickSetupState(testee: ConfigDrivenOnboardingPageViewModel): QuickSetupContentState =
         quickSetupStateFlow(testee).value
+
+    private fun importCompleteState(testee: ConfigDrivenOnboardingPageViewModel): MutableStateFlow<ImportCompleteContentState> =
+        testee.contentValues.contentState(NewUserOnboardingStepIds.PASSWORD_IMPORT_COMPLETE) { ImportCompleteContentState.Parsing }
 
     private suspend fun startAtBrowserStep(): ConfigDrivenOnboardingPageViewModel {
         val browserStep = NewUserBrowserActivityStep(
@@ -664,5 +672,47 @@ class ConfigDrivenOnboardingPageViewModelTest {
 
         verify(mockDefaultRoleBrowserDialog).dialogShown()
         verify(mockAppInstallStore).defaultBrowser = true
+    }
+
+    @Test
+    fun `offers a retry when the password import fails with a transient error`() = runTest {
+        whenever(mockImportPasswordsFromGoogle.parseResult(anyOrNull())).thenReturn(ImportPasswordsResult.Error.Transient)
+        val testee = startAt(NewUserOnboardingActivityDialog.ImportPasswordsLaunch)
+        advanceUntilIdle()
+
+        testee.commands.test {
+            // The step launches the web flow as soon as it is presented.
+            assertEquals(Command.LaunchPasswordImport, awaitItem())
+
+            testee.onPasswordImportResult(Activity.RESULT_OK, null)
+            advanceUntilIdle()
+            assertEquals(Command.ShowPasswordImportError, awaitItem())
+        }
+
+        assertEquals(
+            listOf(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.TRANSIENT_ERROR)),
+            recordedEvents,
+        )
+    }
+
+    @Test
+    fun `resolves a permanent password import error on the outcome card instead of offering a retry`() = runTest {
+        whenever(mockImportPasswordsFromGoogle.parseResult(anyOrNull())).thenReturn(ImportPasswordsResult.Error.Permanent)
+        val testee = startAt(NewUserOnboardingActivityDialog.ImportPasswordsLaunch)
+        advanceUntilIdle()
+
+        testee.commands.test {
+            assertEquals(Command.LaunchPasswordImport, awaitItem())
+
+            testee.onPasswordImportResult(Activity.RESULT_OK, null)
+            advanceUntilIdle()
+            expectNoEvents()
+        }
+
+        assertEquals(
+            listOf(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.PERMANENT_ERROR)),
+            recordedEvents,
+        )
+        assertEquals(ImportCompleteContentState.Failed, importCompleteState(testee).value)
     }
 }

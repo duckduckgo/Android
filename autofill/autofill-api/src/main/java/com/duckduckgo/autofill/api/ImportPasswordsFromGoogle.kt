@@ -44,7 +44,11 @@ interface ImportPasswordsFromGoogle {
         data object Success : ImportPasswordsResult
 
         data object UserCancelled : ImportPasswordsResult
-        data object Error : ImportPasswordsResult
+
+        sealed interface Error : ImportPasswordsResult {
+            data object Transient : Error
+            data object Permanent : Error
+        }
     }
 
     sealed interface ImportPasswordsStatus {

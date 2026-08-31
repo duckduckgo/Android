@@ -52,8 +52,9 @@ class NewUserOnboardingPlanContext {
     var passwordImportSucceeded: Boolean = false
 
     /**
-     * Set true by the [NewUserOnboardingStepIds.PASSWORD_IMPORT] step when the user taps "Skip",
-     * read by the [NewUserOnboardingStepIds.PASSWORD_IMPORT_LAUNCH] precondition to skip launching the passwords import flow.
+     * Set true by the [NewUserOnboardingStepIds.PASSWORD_IMPORT] step when the user taps "Skip", read by the
+     * [NewUserOnboardingStepIds.PASSWORD_IMPORT_LAUNCH] precondition to skip launching the passwords import flow
+     * and by [NewUserOnboardingStepIds.PASSWORD_IMPORT_COMPLETE] to skip reporting an outcome there is none of.
      */
     @Volatile
     var skipPasswordsImport: Boolean = false

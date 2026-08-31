@@ -24,6 +24,8 @@ import com.duckduckgo.autofill.api.ImportPasswordsFromGoogle.ImportPasswordsStat
 import com.duckduckgo.autofill.impl.importing.CredentialImporter.ImportResult
 import com.duckduckgo.autofill.impl.importing.capability.ImportGooglePasswordsCapabilityChecker
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordResult
+import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.UserCannotImportReason.ErrorParsingCsv
+import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.UserCannotImportReason.WebViewCrash
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.flow.Flow
@@ -45,8 +47,11 @@ class RealImportPasswordsFromGoogle @Inject constructor(
         return when (result) {
             is ImportGooglePasswordResult.Success -> ImportPasswordsResult.Success
             is ImportGooglePasswordResult.UserCancelled -> ImportPasswordsResult.UserCancelled
-            is ImportGooglePasswordResult.Error -> ImportPasswordsResult.Error
-            null -> ImportPasswordsResult.Error
+            is ImportGooglePasswordResult.Error -> when (result.reason) {
+                is ErrorParsingCsv -> ImportPasswordsResult.Error.Permanent
+                is WebViewCrash -> ImportPasswordsResult.Error.Transient
+            }
+            null -> ImportPasswordsResult.Error.Transient
         }
     }
 

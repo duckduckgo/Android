@@ -367,7 +367,7 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
                     }
 
                     override fun onNegativeButtonClicked() {
-                        viewModel.onEvent(NewUserOnboardingEvent.ContinueClicked)
+                        viewModel.onEvent(NewUserOnboardingEvent.PasswordImportSkipped)
                     }
                 },
             )

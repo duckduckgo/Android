@@ -157,7 +157,7 @@ class RealOnboardingPixelSender @Inject constructor(
                 fireQuickSetupClicked(pixelName, action.addressBarPosition, action.inputScreenSelected)
 
             is OnboardingPixelAction.PasswordImportConfirmed ->
-                fireStep(pixelName, PIXEL_EVENT_CONFIRMED, action.outcome.name.lowercase())
+                fireStep(pixelName, PIXEL_EVENT_CONFIRMED, action.outcome.value)
         }
     }
 

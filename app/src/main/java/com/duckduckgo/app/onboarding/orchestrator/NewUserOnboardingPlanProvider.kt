@@ -929,13 +929,22 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                             GoBack
                         }
 
-                        PasswordImportOutcome.ERROR -> {
+                        PasswordImportOutcome.TRANSIENT_ERROR -> {
                             onboardingPixelSender.fire(pixelName, OnboardingPixelAction.PasswordImportConfirmed(event.outcome))
                             Stay
                         }
+
+                        PasswordImportOutcome.PERMANENT_ERROR -> {
+                            onboardingPixelSender.fire(pixelName, OnboardingPixelAction.PasswordImportConfirmed(event.outcome))
+                            Advance
+                        }
                     }
 
-                    is NewUserOnboardingEvent.ContinueClicked -> Advance
+                    is NewUserOnboardingEvent.PasswordImportSkipped -> {
+                        ctx.skipPasswordsImport = true
+                        Advance
+                    }
+
                     else -> Stay
                 }
             },
@@ -948,7 +957,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             id = NewUserOnboardingStepIds.PASSWORD_IMPORT_COMPLETE,
             pixelName = null,
             indicator = StepIndicatorMode.CONTINUES_PREVIOUS,
-            precondition = { ctx.passwordImportSucceeded },
+            precondition = { !ctx.skipPasswordsImport },
             resolveDialog = { NewUserOnboardingActivityDialog.ImportComplete },
             transition = { event ->
                 when (event) {

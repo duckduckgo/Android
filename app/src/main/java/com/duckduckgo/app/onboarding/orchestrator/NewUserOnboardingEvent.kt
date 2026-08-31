@@ -69,4 +69,11 @@ sealed interface NewUserOnboardingEvent : LinearOnboardingEvent {
     data class PasswordImportParsed(val outcome: PasswordImportOutcome) : NewUserOnboardingEvent
 }
 
-enum class PasswordImportOutcome { SUCCESS, CANCELLED, ERROR }
+enum class PasswordImportOutcome(val value: String) {
+    SUCCESS("success"),
+    CANCELLED("cancelled"),
+
+    TRANSIENT_ERROR("error"),
+
+    PERMANENT_ERROR("error"),
+}

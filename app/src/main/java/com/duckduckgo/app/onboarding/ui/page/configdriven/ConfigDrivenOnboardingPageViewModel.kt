@@ -314,13 +314,14 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
 
     fun onPasswordImportResult(resultCode: Int, data: Intent?) {
         if (resultCode != Activity.RESULT_OK) {
-            failPasswordImport(PasswordImportOutcome.CANCELLED, showError = false)
+            cancelPasswordImport()
             return
         }
         when (importPasswordsFromGoogle.parseResult(data)) {
             is ImportPasswordsResult.Success -> showImportOutcome()
-            is ImportPasswordsResult.UserCancelled -> failPasswordImport(PasswordImportOutcome.CANCELLED, showError = false)
-            is ImportPasswordsResult.Error -> failPasswordImport(PasswordImportOutcome.ERROR, showError = true)
+            is ImportPasswordsResult.UserCancelled -> cancelPasswordImport()
+            is ImportPasswordsResult.Error.Transient -> showImportErrorDialog()
+            is ImportPasswordsResult.Error.Permanent -> failPasswordImport()
         }
     }
 
@@ -343,7 +344,7 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
                 // The status flow ended without ever reporting a result. The user is already on the outcome
                 // card by now, so the attempt resolves there rather than back on the prompt.
                 state.value = ImportCompleteContentState.Failed
-                emit(NewUserOnboardingEvent.PasswordImportParsed(PasswordImportOutcome.ERROR))
+                emit(NewUserOnboardingEvent.PasswordImportParsed(PasswordImportOutcome.PERMANENT_ERROR))
                 return@launch
             }
             state.value = ImportCompleteContentState.Finished(imported = finished.imported, skipped = finished.skipped)
@@ -354,14 +355,18 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
     private fun importCompleteState(): MutableStateFlow<ImportCompleteContentState> =
         contentValues.contentState(NewUserOnboardingStepIds.PASSWORD_IMPORT_COMPLETE) { ImportCompleteContentState.Parsing }
 
-    private fun failPasswordImport(
-        outcome: PasswordImportOutcome,
-        showError: Boolean,
-    ) {
-        emit(NewUserOnboardingEvent.PasswordImportWebFlowFinished(outcome))
-        if (showError) {
-            viewModelScope.launch { _commands.send(Command.ShowPasswordImportError) }
-        }
+    private fun failPasswordImport() {
+        importCompleteState().value = ImportCompleteContentState.Failed
+        emit(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.PERMANENT_ERROR))
+    }
+
+    private fun showImportErrorDialog() {
+        emit(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.TRANSIENT_ERROR))
+        viewModelScope.launch { _commands.send(Command.ShowPasswordImportError) }
+    }
+
+    private fun cancelPasswordImport() {
+        emit(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.CANCELLED))
     }
 
     private fun requestDefaultBrowser() {

@@ -30,6 +30,7 @@ import com.duckduckgo.app.onboarding.DuckAiOnboardingDemo
 import com.duckduckgo.app.onboarding.FakeOnboardingSingleChoiceDataPlugin
 import com.duckduckgo.app.onboarding.OnboardingInputScreenLaunchTarget
 import com.duckduckgo.app.onboarding.OnboardingPasswordImportExperimentManager
+import com.duckduckgo.app.onboarding.OnboardingPasswordImportExperimentManager.OnboardingPasswordImportVariant
 import com.duckduckgo.app.onboarding.OnboardingPreference
 import com.duckduckgo.app.onboarding.OnboardingPreferenceApplier
 import com.duckduckgo.app.onboarding.OnboardingPromptsExperimentManager
@@ -135,8 +136,9 @@ class NewUserOnboardingPlanProviderTest {
         override suspend fun getPlugins(): Collection<OnboardingSingleChoiceDataPlugin> = singleChoicePlugins
     }
 
-    // Password import is off in these tests: its steps are then left out of the plan entirely, so every
-    // existing step-order and indicator expectation below is unaffected by the feature.
+    // Password import is off by default here: its steps are then left out of the plan entirely, so every
+    // existing step-order and indicator expectation below is unaffected by the feature. The password import
+    // tests enroll into the treatment themselves.
     private val passwordImportExperiment: OnboardingPasswordImportExperimentManager = mock()
 
     private lateinit var provider: NewUserOnboardingPlanProvider
@@ -1664,4 +1666,45 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     // endregion
+
+    private suspend fun startAtPasswordImportLaunch() {
+        whenever(passwordImportExperiment.enroll()).thenReturn(OnboardingPasswordImportVariant.TREATMENT)
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
+        orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
+        assertStep(NewUserOnboardingStepIds.PASSWORD_IMPORT)
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportRequested)
+        assertStep(NewUserOnboardingStepIds.PASSWORD_IMPORT_LAUNCH)
+    }
+
+    @Test
+    fun `when the password import fails transiently then stays on the launch step`() = runTest {
+        startAtPasswordImportLaunch()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.TRANSIENT_ERROR))
+
+        assertStep(NewUserOnboardingStepIds.PASSWORD_IMPORT_LAUNCH)
+    }
+
+    @Test
+    fun `when the retry alert is dismissed then skips past the import and its outcome step`() = runTest {
+        startAtPasswordImportLaunch()
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.TRANSIENT_ERROR))
+
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportSkipped)
+
+        assertStep(NewUserOnboardingStepIds.ADDRESS_BAR_POSITION)
+    }
+
+    @Test
+    fun `when the password import fails permanently then advances to the outcome step`() = runTest {
+        startAtPasswordImportLaunch()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.PERMANENT_ERROR))
+
+        assertStep(NewUserOnboardingStepIds.PASSWORD_IMPORT_COMPLETE)
+    }
 }
