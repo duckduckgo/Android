@@ -515,5 +515,167 @@
         "triggers": ["exception"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion", "error"]
+    },
+    "autofill_import_google_passwords_preimport_prompt_displayed": {
+        "description": "The prompt explaining the Google Password Manager import was displayed to the user.",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "source",
+                "type": "string",
+                "description": "Where the import was launched from.",
+                "enum": [
+                    "password_management_promo",
+                    "password_management_empty_state",
+                    "password_management_overflow",
+                    "autofill_settings_button",
+                    "in_browser_promo",
+                    "settings",
+                    "onboarding",
+                    "unknown"
+                ]
+            }
+        ]
+    },
+    "autofill_import_google_passwords_preimport_prompt_confirmed": {
+        "description": "The user accepted the pre-import prompt, starting the Google Password Manager import web flow.",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "source",
+                "type": "string",
+                "description": "Where the import was launched from.",
+                "enum": [
+                    "password_management_promo",
+                    "password_management_empty_state",
+                    "password_management_overflow",
+                    "autofill_settings_button",
+                    "in_browser_promo",
+                    "settings",
+                    "onboarding",
+                    "unknown"
+                ]
+            }
+        ]
+    },
+    "autofill_import_google_passwords_result_user_cancelled": {
+        "description": "The user backed out of the Google Password Manager import. `stage` says where they were when they left: the pre-import prompt, or a stage of the web flow itself.",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "stage",
+                "type": "string",
+                "description": "Where the user left the import. `pre-import-dialog` for the prompt before the web flow; otherwise the web flow stage, mapped from the current URL against the URL mappings in the privacy config, or `webflow-unknown` when no mapping matches.",
+                "examples": ["pre-import-dialog", "webflow-unknown"]
+            },
+            {
+                "key": "source",
+                "type": "string",
+                "description": "Where the import was launched from.",
+                "enum": [
+                    "password_management_promo",
+                    "password_management_empty_state",
+                    "password_management_overflow",
+                    "autofill_settings_button",
+                    "in_browser_promo",
+                    "settings",
+                    "onboarding",
+                    "unknown"
+                ]
+            }
+        ]
+    },
+    "autofill_import_google_passwords_result_success": {
+        "description": "The Google Password Manager import completed and the credentials were written to the password store.",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "saved_credentials",
+                "type": "string",
+                "description": "Number of credentials saved, bucketed.",
+                "enum": ["none", "few", "some", "many", "lots"]
+            },
+            {
+                "key": "skipped_credentials",
+                "type": "string",
+                "description": "Number of credentials skipped as duplicates, bucketed.",
+                "enum": ["none", "few", "some", "many", "lots"]
+            },
+            {
+                "key": "source",
+                "type": "string",
+                "description": "Where the import was launched from.",
+                "enum": [
+                    "password_management_promo",
+                    "password_management_empty_state",
+                    "password_management_overflow",
+                    "autofill_settings_button",
+                    "in_browser_promo",
+                    "settings",
+                    "onboarding",
+                    "unknown"
+                ]
+            }
+        ]
+    },
+    "autofill_import_google_passwords_result_parsing": {
+        "description": "The Google Password Manager import failed because the exported CSV of credentials could not be parsed.",
+        "owners": ["catalinradoiu"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "source",
+                "type": "string",
+                "description": "Where the import was launched from.",
+                "enum": [
+                    "password_management_promo",
+                    "password_management_empty_state",
+                    "password_management_overflow",
+                    "autofill_settings_button",
+                    "in_browser_promo",
+                    "settings",
+                    "onboarding",
+                    "unknown"
+                ]
+            }
+        ]
+    },
+    "autofill_import_google_passwords_webview_crash": {
+        "description": "The Google Password Manager import failed because the WebView hosting the import flow crashed.",
+        "owners": ["catalinradoiu"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "source",
+                "type": "string",
+                "description": "Where the import was launched from.",
+                "enum": [
+                    "password_management_promo",
+                    "password_management_empty_state",
+                    "password_management_overflow",
+                    "autofill_settings_button",
+                    "in_browser_promo",
+                    "settings",
+                    "onboarding",
+                    "unknown"
+                ]
+            }
+        ]
     }
 }

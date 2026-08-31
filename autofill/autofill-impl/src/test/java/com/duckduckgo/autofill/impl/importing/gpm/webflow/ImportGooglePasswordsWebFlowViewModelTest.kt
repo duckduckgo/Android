@@ -3,6 +3,7 @@ package com.duckduckgo.autofill.impl.importing.gpm.webflow
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.autofill.api.AutofillFeature
+import com.duckduckgo.autofill.api.AutofillImportLaunchSource.Onboarding
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.domain.app.LoginTriggerType.AUTOPROMPT
 import com.duckduckgo.autofill.api.domain.app.LoginTriggerType.USER_INITIATED
@@ -15,6 +16,7 @@ import com.duckduckgo.autofill.impl.importing.gpm.feature.AutofillImportPassword
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.Command.InjectCredentialsFromReauth
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.Command.NoCredentialsAvailable
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.Command.PromptUserToSelectFromStoredCredentials
+import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.UserCannotImportReason.ErrorParsingCsv
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.UserCannotImportReason.WebViewCrash
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.ViewState.LoadStartPage
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.ViewState.NavigatingBack
@@ -23,6 +25,7 @@ import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsW
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.ViewState.UserFinishedImportFlow
 import com.duckduckgo.autofill.impl.store.ReAuthenticationDetails
 import com.duckduckgo.autofill.impl.store.ReauthenticationHandler
+import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.ImportPasswordsPixelSender
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.runTest
@@ -49,8 +52,10 @@ class ImportGooglePasswordsWebFlowViewModelTest {
     private val urlToStageMapper: ImportGooglePasswordUrlToStageMapper = mock()
     private val reauthenticationHandler: ReauthenticationHandler = mock()
     private val autofillFeature: AutofillFeature = mock()
+    private val importPasswordsPixelSender: ImportPasswordsPixelSender = mock()
 
     private val testee = ImportGooglePasswordsWebFlowViewModel(
+        launchSource = Onboarding,
         dispatchers = coroutineTestRule.testDispatcherProvider,
         credentialImporter = credentialImporter,
         csvCredentialConverter = csvCredentialConverter,
@@ -58,6 +63,7 @@ class ImportGooglePasswordsWebFlowViewModelTest {
         urlToStageMapper = urlToStageMapper,
         reauthenticationHandler = reauthenticationHandler,
         autofillFeature = autofillFeature,
+        importPasswordsPixelSender = importPasswordsPixelSender,
     )
 
     @Test
@@ -327,6 +333,54 @@ class ImportGooglePasswordsWebFlowViewModelTest {
             val viewState = awaitItem() as UserFinishedCannotImport
             assertEquals(WebViewCrash, viewState.reason)
         }
+    }
+
+    @Test
+    fun whenCloseButtonPressedThenUserCancelledPixelSentWithStageAndLaunchSource() = runTest {
+        val expectedStage = "stage"
+        whenever(urlToStageMapper.getStage(any())).thenReturn(expectedStage)
+        testee.onCloseButtonPressed("https://example.com")
+
+        verify(importPasswordsPixelSender).onUserCancelledImportWebFlow(expectedStage, Onboarding)
+    }
+
+    @Test
+    fun whenBackButtonPressedAndCannotGoBackThenUserCancelledPixelSent() = runTest {
+        val expectedStage = "stage"
+        whenever(urlToStageMapper.getStage(any())).thenReturn(expectedStage)
+        testee.onBackButtonPressed(url = "https://example.com", canGoBack = false)
+
+        verify(importPasswordsPixelSender).onUserCancelledImportWebFlow(expectedStage, Onboarding)
+    }
+
+    @Test
+    fun whenBackButtonPressedAndCanGoBackThenNoUserCancelledPixelSent() = runTest {
+        testee.onBackButtonPressed(url = "https://example.com", canGoBack = true)
+
+        verify(importPasswordsPixelSender, never()).onUserCancelledImportWebFlow(any(), any())
+    }
+
+    @Test
+    fun whenCsvParseErrorThenImportFailedPixelSent() = runTest {
+        configureCsvParseError()
+
+        verify(importPasswordsPixelSender).onImportFailed(ErrorParsingCsv, Onboarding)
+    }
+
+    @Test
+    fun whenWebViewCrashesThenImportFailedPixelSent() = runTest {
+        testee.onWebViewCrash()
+
+        verify(importPasswordsPixelSender).onImportFailed(WebViewCrash, Onboarding)
+    }
+
+    @Test
+    fun whenCsvParsedThenImportStartedWithLaunchSource() = runTest {
+        val credentials = listOf(creds())
+
+        configureCsvSuccess(loginCredentialsToImport = credentials)
+
+        verify(credentialImporter).import(credentials, credentials.size, Onboarding)
     }
 
     private fun configureReAuthenticationFeatureFlagEnabled() {

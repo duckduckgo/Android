@@ -7,7 +7,6 @@ import com.duckduckgo.autofill.api.AutofillImportLaunchSource.InBrowserPromo
 import com.duckduckgo.autofill.impl.importing.CredentialImporter
 import com.duckduckgo.autofill.impl.importing.CredentialImporter.ImportResult.Finished
 import com.duckduckgo.autofill.impl.importing.CredentialImporter.ImportResult.InProgress
-import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.UserCannotImportReason.ErrorParsingCsv
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.ImportPasswordsPixelSender
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode
@@ -55,7 +54,7 @@ class ImportFromGooglePasswordsDialogViewModelTest {
 
     @Test
     fun whenParsingErrorOnImportThenViewModeUpdatedToError() = runTest {
-        testee.onImportFlowFinishedWithError(reason = ErrorParsingCsv, importSource = TEST_SOURCE)
+        testee.onImportFlowFinishedWithError()
         testee.viewState.test {
             assertTrue(awaitItem().viewMode is ViewMode.ImportError)
         }
@@ -65,7 +64,7 @@ class ImportFromGooglePasswordsDialogViewModelTest {
     fun whenSuccessfulImportThenViewModeUpdatedToInProgress() = runTest {
         configureImportInProgress()
         testee.shouldShowInitialInstructionalPrompt(importSource = TEST_SOURCE)
-        testee.onImportFlowFinishedSuccessfully(importSource = TEST_SOURCE)
+        testee.onImportFlowFinishedSuccessfully()
         testee.viewState.test {
             awaitImportInProgress()
         }
@@ -75,7 +74,7 @@ class ImportFromGooglePasswordsDialogViewModelTest {
     fun whenSuccessfulImportFlowThenImportFinishesNothingImportedThenViewModeUpdatedToResults() = runTest {
         configureImportFinished(savedCredentials = 0, numberSkipped = 0)
         testee.shouldShowInitialInstructionalPrompt(importSource = TEST_SOURCE)
-        testee.onImportFlowFinishedSuccessfully(importSource = TEST_SOURCE)
+        testee.onImportFlowFinishedSuccessfully()
         testee.viewState.test {
             awaitImportSuccess()
         }
@@ -85,7 +84,7 @@ class ImportFromGooglePasswordsDialogViewModelTest {
     fun whenSuccessfulImportFlowThenImportFinishesCredentialsImportedNoDuplicatesThenViewModeUpdatedToResults() = runTest {
         configureImportFinished(savedCredentials = 10, numberSkipped = 0)
         testee.shouldShowInitialInstructionalPrompt(importSource = TEST_SOURCE)
-        testee.onImportFlowFinishedSuccessfully(importSource = TEST_SOURCE)
+        testee.onImportFlowFinishedSuccessfully()
         testee.viewState.test {
             val result = awaitImportSuccess()
             assertEquals(10, result.importResult.savedCredentials)
@@ -97,7 +96,7 @@ class ImportFromGooglePasswordsDialogViewModelTest {
     fun whenSuccessfulImportFlowThenImportFinishesOnlyDuplicatesThenViewModeUpdatedToResults() = runTest {
         configureImportFinished(savedCredentials = 0, numberSkipped = 2)
         testee.shouldShowInitialInstructionalPrompt(importSource = TEST_SOURCE)
-        testee.onImportFlowFinishedSuccessfully(importSource = TEST_SOURCE)
+        testee.onImportFlowFinishedSuccessfully()
         testee.viewState.test {
             val result = awaitImportSuccess()
             assertEquals(0, result.importResult.savedCredentials)
@@ -108,7 +107,7 @@ class ImportFromGooglePasswordsDialogViewModelTest {
     @Test
     fun whenSuccessfulImportNoUpdatesThenThenViewModeFirstInitialisedToPreImport() = runTest {
         testee.shouldShowInitialInstructionalPrompt(importSource = TEST_SOURCE)
-        testee.onImportFlowFinishedSuccessfully(importSource = TEST_SOURCE)
+        testee.onImportFlowFinishedSuccessfully()
         testee.viewState.test {
             awaitItem().assertIsPreImport()
         }
@@ -154,7 +153,7 @@ class ImportFromGooglePasswordsDialogViewModelTest {
         whenever(credentialImporter.getImportStatus()).thenReturn(
             listOf(
                 InProgress,
-                Finished(savedCredentials = savedCredentials, numberSkipped = numberSkipped),
+                Finished(savedCredentials = savedCredentials, numberSkipped = numberSkipped, source = TEST_SOURCE),
             ).asFlow(),
         )
     }
