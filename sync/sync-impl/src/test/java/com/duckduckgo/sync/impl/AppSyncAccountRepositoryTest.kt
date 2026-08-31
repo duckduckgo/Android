@@ -1170,6 +1170,7 @@ class AppSyncAccountRepositoryTest {
     fun whenPatchEndpointForLegacyRenameIsKillSwitchedThenReRegisterViaLogin() = runTest {
         givenAuthenticatedDevice()
         prepareForLoginSuccess()
+        syncFeature.canWriteUnifiedDeviceList().setRawStoredState(State(enable = false))
         syncFeature.canUsePatchEndpointForLegacyDeviceRename().setRawStoredState(State(enable = false))
 
         val result = syncRepo.renameDevice(connectedDevice)

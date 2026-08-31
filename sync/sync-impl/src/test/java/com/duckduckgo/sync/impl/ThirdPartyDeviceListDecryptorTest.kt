@@ -53,6 +53,7 @@ class ThirdPartyDeviceListDecryptorTest {
 
     @Before
     fun before() {
+        syncFeature.canReadUnifiedDeviceList().setRawStoredState(State(enable = false))
         decryptor = RealThirdPartyDeviceListDecryptor(fieldDecryptor, thirdPartyCredentialManager, deviceInfoDecryptor, syncFeature, syncStore)
     }
 

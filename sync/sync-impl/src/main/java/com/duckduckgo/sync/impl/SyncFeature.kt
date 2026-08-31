@@ -115,13 +115,13 @@ interface SyncFeature {
     /**
      * Gates writing `device_info`
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun canWriteUnifiedDeviceList(): Toggle
 
     /**
      * Gates reading from `device_info`
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun canReadUnifiedDeviceList(): Toggle
 
     /**
