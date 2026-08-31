@@ -1134,7 +1134,7 @@ class RealSubscriptionsManager @Inject constructor(
     override suspend fun getAccessToken(): AccessTokenResult {
         return if (isSignedIn()) {
             try {
-                AccessTokenResult.Success(getValidAccessTokenV2())
+                AccessTokenResult.Success(getValidAccessToken())
             } catch (e: Exception) {
                 AccessTokenResult.Failure("Token not found")
             }
@@ -1143,7 +1143,7 @@ class RealSubscriptionsManager @Inject constructor(
         }
     }
 
-    private suspend fun getValidAccessTokenV2(): String {
+    private suspend fun getValidAccessToken(): String {
         check(isSignedIn())
 
         if (!isSignedInV2() && isSignedInV1()) {
