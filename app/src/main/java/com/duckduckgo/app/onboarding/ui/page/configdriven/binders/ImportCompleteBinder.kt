@@ -43,6 +43,12 @@ class ImportCompleteBinder(
 
     override val view: View = binding.root
 
+    private val outcomeVisible = MutableStateFlow(false)
+
+    private var rendered: ImportCompleteContentState? = null
+    private var stateJob: Job? = null
+    private var transition: Animator? = null
+
     override fun bind(
         content: ContentConfig.ImportComplete,
         state: MutableStateFlow<ImportCompleteContentState>,
@@ -50,46 +56,24 @@ class ImportCompleteBinder(
     ): ContentHandle = with(binding) {
         val context = root.context
 
-        importCompleteImportedRow.resultRowIcon.setImageResource(R.drawable.ic_check_onboarding_success_24)
+        importCompleteImportedRow.resultRowIcon.setImageResource(CommonR.drawable.ic_cross_recolorable_gray_24)
         importCompleteSkippedRow.resultRowIcon.setImageResource(CommonR.drawable.ic_cross_recolorable_gray_24)
-        importCompleteFailedRow.resultRowIcon.setImageResource(R.drawable.ic_cross_onboarding_error_24)
+        importCompleteFailedRow.resultRowIcon.setImageResource(CommonR.drawable.ic_cross_recolorable_gray_24)
 
-        var rendered: ImportCompleteContentState = state.value
-        importCompleteTitle.setTitle(titleOf(rendered, content).resolve(context))
-        apply(rendered, content, context)
-
-        val outcomeVisible = MutableStateFlow(rendered !is ImportCompleteContentState.Parsing)
-
-        var stateJob: Job? = null
-        var transition: Animator? = null
+        val initial = state.value
+        rendered = initial
+        importCompleteTitle.setTitle(titleOf(initial, content).resolve(context))
+        apply(initial, content, context)
+        outcomeVisible.value = initial !is ImportCompleteContentState.Parsing
 
         ContentHandle(
             title = importCompleteTitle,
             preTitleFadeTargets = listOf(importCompletePictogram),
             fadeTargets = fadeTargets(),
             onContentReady = {
-                stateJob = state.onEach { current ->
-                    if (current == rendered) return@onEach
-                    rendered = current
-
-                    transition?.cancel()
-                    val leaving = stateFadeTargets()
-                    transition = fade(leaving, to = 0f) {
-                        importCompleteTitle.setTitle(titleOf(current, content).resolve(context))
-                        importCompleteTitle.snapTitle()
-
-                        scope.animateCardBounds(STATE_CHANGE_DURATION_MS)
-                        apply(current, content, context)
-                        outcomeVisible.value = current !is ImportCompleteContentState.Parsing
-
-                        val arriving = stateFadeTargets()
-                        arriving.forEach { it.alpha = 0f }
-
-                        leaving.filterNot { it in arriving }.forEach { it.alpha = 1f }
-
-                        transition = fade(arriving, to = 1f).also { it.start() }
-                    }.also { it.start() }
-                }.launchIn(scope.coroutineScope)
+                stateJob = state
+                    .onEach { renderStateChange(it, content, scope) }
+                    .launchIn(scope.coroutineScope)
             },
             primaryCtaState = CtaState(
                 enabled = outcomeVisible,
@@ -100,6 +84,34 @@ class ImportCompleteBinder(
                 transition?.cancel()
             },
         )
+    }
+
+    private fun renderStateChange(
+        current: ImportCompleteContentState,
+        content: ContentConfig.ImportComplete,
+        scope: BindScope,
+    ) = with(binding) {
+        if (current == rendered) return@with
+        rendered = current
+        val context = root.context
+
+        transition?.cancel()
+        val leaving = stateFadeTargets()
+        transition = fade(leaving, to = 0f) {
+            importCompleteTitle.setTitle(titleOf(current, content).resolve(context))
+            importCompleteTitle.snapTitle()
+
+            scope.animateCardBounds(STATE_CHANGE_DURATION_MS)
+            apply(current, content, context)
+            outcomeVisible.value = current !is ImportCompleteContentState.Parsing
+
+            val arriving = stateFadeTargets()
+            arriving.forEach { it.alpha = 0f }
+
+            leaving.filterNot { it in arriving }.forEach { it.alpha = 1f }
+
+            transition = fade(arriving, to = 1f).also { it.start() }
+        }.also { it.start() }
     }
 
     private fun fade(

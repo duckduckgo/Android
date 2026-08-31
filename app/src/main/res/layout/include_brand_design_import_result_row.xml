@@ -29,7 +29,7 @@
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:importantForAccessibility="no"
-        tools:srcCompat="@drawable/ic_check_onboarding_success_24" />
+        tools:srcCompat="@drawable/ic_cross_recolorable_gray_24" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/resultRowText"
