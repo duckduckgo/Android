@@ -64,8 +64,10 @@ import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.NonHttpAppLink
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.ShouldLaunchDuckChatLink
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.ShouldLaunchSubscriptionLink
 import com.duckduckgo.app.browser.WebViewErrorResponse.BAD_URL
+import com.duckduckgo.app.browser.WebViewErrorResponse.CONNECTION
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
+import com.duckduckgo.app.browser.WebViewErrorResponse.SSL_PROTOCOL_ERROR
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
 import com.duckduckgo.app.browser.api.OmnibarRepository
@@ -184,6 +186,7 @@ import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrows
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_PAGE_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DuckPlayerJSHelper
+import com.duckduckgo.app.browser.errorpage.BadUrlErrorPageWideEvent
 import com.duckduckgo.app.browser.favicon.FaviconFetchingFixFeature
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource.ImageFavicon
@@ -609,6 +612,7 @@ class BrowserTabViewModel @Inject constructor(
     private val newTabPageModalTrigger: NewTabPageModalTrigger,
     private val suggestRedirectOnUnresolvedErrorFeature: SuggestRedirectOnUnresolvedErrorFeature,
     private val suggestRedirectEvaluator: SuggestRedirectEvaluator,
+    private val badUrlErrorPageWideEvent: BadUrlErrorPageWideEvent,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -1633,6 +1637,13 @@ class BrowserTabViewModel @Inject constructor(
                 forceExpand = true,
             )
         suggestRedirectJob.cancel()
+        // Re-submitting the tab's current URL (session restoration, crash recovery, user retry)
+        // reloads the page rather than exiting it
+        if (query != url) {
+            badUrlErrorPageWideEvent.onBadUrlErrorPageExited(tabId)
+        } else {
+            badUrlErrorPageWideEvent.onErrorPageRefreshed(tabId)
+        }
         browserViewState.value =
             currentBrowserViewState().copy(
                 browserShowing = true,
@@ -1865,6 +1876,7 @@ class BrowserTabViewModel @Inject constructor(
             browserViewState.value = browserStateModifier.copyForBrowserShowing(currentBrowserViewState())
             command.value = NavigationCommand.Refresh
         } else {
+            badUrlErrorPageWideEvent.onBadUrlErrorPageExited(tabId)
             command.value = NavigationCommand.NavigateForward
         }
     }
@@ -1991,6 +2003,7 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         if (navigation.canGoBack) {
+            badUrlErrorPageWideEvent.onBadUrlErrorPageExited(tabId)
             command.value = NavigationCommand.NavigateBack(navigation.stepsToPreviousPage)
             return true
         } else if (hasSourceTab && !isCustomTab) {
@@ -2024,6 +2037,7 @@ class BrowserTabViewModel @Inject constructor(
         }
         pdfDownloadJob.cancel()
         suggestRedirectJob.cancel()
+        badUrlErrorPageWideEvent.onBadUrlErrorPageExited(tabId)
         site = null
         onSiteChanged()
         webNavigationState = null
@@ -2627,6 +2641,10 @@ class BrowserTabViewModel @Inject constructor(
 
         if (newProgress == 100) {
             hasCompletedPageLoad = true
+            when (currentBrowserViewState().browserError) {
+                OMITTED, LOADING -> badUrlErrorPageWideEvent.onPageLoadFinished(tabId)
+                BAD_URL, CONNECTION, SSL_PROTOCOL_ERROR -> Unit
+            }
             command.value = RefreshUserAgent(url, currentBrowserViewState().isDesktopBrowsingMode)
             navigationAwareLoginDetector.onEvent(NavigationEvent.PageFinished)
         }
@@ -2942,6 +2960,7 @@ class BrowserTabViewModel @Inject constructor(
                 logcat { "SSLError: received ssl error for a page we are not loading, cancelling request" }
                 handler.cancel()
             } else {
+                badUrlErrorPageWideEvent.onOtherErrorPageDisplayed(tabId)
                 browserViewState.value =
                     currentBrowserViewState().copy(
                         browserShowing = false,
@@ -3560,6 +3579,7 @@ class BrowserTabViewModel @Inject constructor(
 
         val targetUrl = if (desktop && uri.isMobileSite) uri.toDesktopUri().toString() else uri.toString()
         logcat(INFO) { "Reloading $targetUrl in ${if (desktop) "desktop" else "mobile"} mode" }
+        badUrlErrorPageWideEvent.onBadUrlErrorPageExited(tabId)
         command.value = NavigationCommand.Navigate(targetUrl, getUrlHeaders(targetUrl))
     }
 
@@ -3628,6 +3648,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun historicalPageSelected(stackIndex: Int) {
+        badUrlErrorPageWideEvent.onBadUrlErrorPageExited(tabId)
         command.value = NavigationCommand.NavigateToHistory(stackIndex)
     }
 
@@ -4568,6 +4589,7 @@ class BrowserTabViewModel @Inject constructor(
     fun refreshBrowserError() {
         suggestRedirectJob.cancel()
         if (currentBrowserViewState().browserError != OMITTED && currentBrowserViewState().browserError != LOADING) {
+            badUrlErrorPageWideEvent.onErrorPageRefreshed(tabId)
             browserViewState.value = currentBrowserViewState().copy(browserError = LOADING, redirectSuggestion = null)
         }
         if (currentBrowserViewState().sslError != NONE) {
@@ -4667,12 +4689,19 @@ class BrowserTabViewModel @Inject constructor(
             command.value = WebViewError(errorType, url)
             suggestRedirectJob.cancel() // Cancel previous in-flight job as the new errorType might not be BAD_URL
         }
+        when (errorType) {
+            BAD_URL -> badUrlErrorPageWideEvent.onBadUrlErrorPageDisplayed(tabId)
+            CONNECTION, SSL_PROTOCOL_ERROR -> badUrlErrorPageWideEvent.onOtherErrorPageDisplayed(tabId)
+            OMITTED -> badUrlErrorPageWideEvent.onOmittedErrorReceived(tabId)
+            LOADING -> Unit
+        }
         if (errorType == BAD_URL &&
             suggestRedirectOnUnresolvedErrorFeature.self().isEnabled() &&
             suggestRedirectOnUnresolvedErrorFeature.suggestRedirect().isEnabled()
         ) {
             suggestRedirectJob += viewModelScope.launch {
                 suggestRedirectEvaluator.suggestRedirect(url)?.let { suggestion ->
+                    badUrlErrorPageWideEvent.onRedirectSuggested(tabId)
                     browserViewState.value = currentBrowserViewState().copy(redirectSuggestion = suggestion)
                 }
             }
@@ -4707,6 +4736,7 @@ class BrowserTabViewModel @Inject constructor(
         )
 
         if (!exempted) {
+            badUrlErrorPageWideEvent.onOtherErrorPageDisplayed(tabId)
             if (currentBrowserViewState().maliciousSiteBlocked && previousSite?.url == url.toString()) {
                 logcat { "maliciousSiteBlocked already shown for $url, previousSite: ${previousSite.url}" }
             } else {
@@ -5988,6 +6018,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onRedirectSuggestionClicked(url: String) {
+        badUrlErrorPageWideEvent.onRedirectClicked(tabId)
         resetBrowserError()
         command.value = NavigationCommand.Navigate(url, getUrlHeaders(url))
     }
