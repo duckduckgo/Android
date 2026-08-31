@@ -187,7 +187,7 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
         else -> null
     }
 
-   private fun renderScreenState(state: ScreenState) {
+    private fun renderScreenState(state: ScreenState) {
         if (state == lastRenderedState) return
         val wasOn = lastRenderedState == ScreenState.VPN_ON
         val isOn = state == ScreenState.VPN_ON
@@ -375,7 +375,7 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
         VPN_OFF,
         VPN_ON,
         ACTIVATION_ERROR_PERMISSION,
-        ACTIVATION_ERROR_GENERAL
+        ACTIVATION_ERROR_GENERAL,
     }
 
     companion object {

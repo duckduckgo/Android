@@ -19,6 +19,7 @@ package com.duckduckgo.networkprotection.impl.subscription.onboarding
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
@@ -38,16 +39,19 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 
 @ContributesViewModel(FragmentScope::class)
 class SubscriptionOnboardingVpnViewModel @Inject constructor(
@@ -63,6 +67,8 @@ class SubscriptionOnboardingVpnViewModel @Inject constructor(
 
     private val _commands = Channel<Command>(1, DROP_OLDEST)
     val commands: Flow<Command> = _commands.receiveAsFlow()
+
+    private val activationTimeoutJob = ConflatedJob()
 
     init {
         viewModelScope.launch(dispatcherProvider.io()) {
@@ -122,6 +128,16 @@ class SubscriptionOnboardingVpnViewModel @Inject constructor(
     fun onVpnPermissionGranted() {
         viewState.update { it.copy(vpnActivationError = null, activating = true) }
         networkProtectionState.start()
+        activationTimeoutJob += viewModelScope.launch(dispatcherProvider.io()) {
+            val connected = withTimeoutOrNull(ACTIVATION_TIMEOUT_MILLIS.milliseconds) {
+                networkProtectionState.getConnectionStateFlow().firstOrNull { it == CONNECTED }
+            }
+            if (connected == null) {
+                viewState.update {
+                    if (it.activating) it.copy(activating = false, vpnActivationError = VPNActivationError.CONNECTION_FAILED) else it
+                }
+            }
+        }
     }
 
     fun onVpnPermissionDenied() {
@@ -159,12 +175,13 @@ class SubscriptionOnboardingVpnViewModel @Inject constructor(
 
     enum class VPNActivationError {
         PERMISSION_DENIED,
-        CONNECTION_FAILED
+        CONNECTION_FAILED,
     }
 
     companion object {
         private const val UNKNOWN_IP = "XXX.XXX.XX.XXX"
         private const val UNKNOWN_LOCATION = "XX, XX"
+        private const val ACTIVATION_TIMEOUT_MILLIS = 15_000L
     }
 }
 

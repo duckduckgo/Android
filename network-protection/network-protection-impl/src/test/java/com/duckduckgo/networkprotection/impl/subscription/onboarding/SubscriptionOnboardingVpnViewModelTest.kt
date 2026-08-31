@@ -26,8 +26,8 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionSta
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.getDisplayableCountry
 import com.duckduckgo.networkprotection.impl.subscription.onboarding.SubscriptionOnboardingVpnStepPlugin.Companion.VPN_STEP_ID
-import com.duckduckgo.networkprotection.impl.subscription.onboarding.SubscriptionOnboardingVpnViewModel.VPNActivationError
 import com.duckduckgo.networkprotection.impl.subscription.onboarding.SubscriptionOnboardingVpnViewModel.Command
+import com.duckduckgo.networkprotection.impl.subscription.onboarding.SubscriptionOnboardingVpnViewModel.VPNActivationError
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.COMPLETED
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.SKIPPED
@@ -141,7 +141,7 @@ class SubscriptionOnboardingVpnViewModelTest {
     }
 
     @Test
-    fun whenVpnPermissionGrantedThenVpnStartedAndActivationErrorCleared() = runTest {
+    fun whenPermissionDeniedThenGrantedButActivationSilentlyFailsThenConnectionFailedNotStuck() = runTest {
         val networkProtectionState = mock<NetworkProtectionState>().apply {
             whenever(getConnectionStateFlow()).thenReturn(flowOf(DISCONNECTED))
         }
@@ -153,13 +153,14 @@ class SubscriptionOnboardingVpnViewModelTest {
             coroutineRule.testDispatcherProvider,
         )
 
+        testee.onVpnPermissionDenied()
         testee.onVpnPermissionGranted()
 
         verify(networkProtectionState).start()
         testee.viewState().test {
             val state = awaitItem()
-            assertNull(state.vpnActivationError)
-            assertTrue(state.activating)
+            assertEquals(VPNActivationError.CONNECTION_FAILED, state.vpnActivationError)
+            assertFalse(state.activating)
             cancelAndConsumeRemainingEvents()
         }
     }
