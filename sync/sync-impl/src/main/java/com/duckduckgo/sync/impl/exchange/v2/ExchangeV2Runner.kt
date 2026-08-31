@@ -174,25 +174,13 @@ class RealExchangeV2Runner @Inject constructor(
 
     @Volatile private var session: ExchangeV2StateMachine? = null
 
-    @Volatile private var _pairingRole: PairingRole? = null
+    @Volatile private var ownChannel: OwnChannelData? = null
 
-    @Volatile private var ownChannelId: String? = null
+    @Volatile private var ownData: OwnData? = null
 
-    @Volatile private var ownChannelSecret: String? = null
+    @Volatile private var peerChannel: PeerChannelData? = null
 
-    @Volatile private var ownKeyPair: RsaKeyPair? = null
-
-    @Volatile private var peerChannelId: String? = null
-
-    @Volatile private var peerPublicKey: String? = null
-
-    @Volatile private var _peerKind: String? = null
-
-    @Volatile private var peerUserId: String? = null
-
-    @Volatile private var _peerName: String? = null
-
-    @Volatile private var _linkingCode: String? = null
+    @Volatile private var peerData: PeerData? = null
 
     @Volatile private var messagePollJob: Job? = null
 
@@ -214,11 +202,11 @@ class RealExchangeV2Runner @Inject constructor(
     private val pendingJoinerWaitingMessages = mutableListOf<ExchangeV2Message>()
 
     override val currentState: ExchangeV2State? get() = session?.currentState
-    override val pairingRole: PairingRole? get() = _pairingRole
-    override val linkingCode: String? get() = _linkingCode
+    override val pairingRole: PairingRole? get() = ownData?.role
+    override val linkingCode: String? get() = ownData?.linkingCode
     override val canStartAsPresenter: Boolean get() = true
-    override val peerName: String? get() = _peerName
-    override val peerKind: String? get() = _peerKind
+    override val peerName: String? get() = peerData?.name
+    override val peerKind: String? get() = peerData?.kind
 
     // -----------------------------------------------------------------------
     // Entry points
@@ -234,10 +222,10 @@ class RealExchangeV2Runner @Inject constructor(
             }
             mutex.withLock {
                 cancelLocked() // abandon any prior session
-                _pairingRole = PairingRole.Scanner
-                peerChannelId = parsed.channelId
-                peerPublicKey = parsed.publicKey
-                bootstrapLocked(PairingRole.Scanner) ?: run {
+                ownData = OwnData(PairingRole.Scanner, linkingCode = null)
+                peerChannel = PeerChannelData(parsed.channelId, parsed.publicKey)
+                bootstrapLocked(PairingRole.Scanner)
+                if (ownChannel == null) {
                     cancelLocked() // bootstrap already emitted the error; just clear the half-set state
                     return@launch
                 }
@@ -267,16 +255,17 @@ class RealExchangeV2Runner @Inject constructor(
             // an account creates one mid-flow ([sendRecoveryCodeResponse] at Host.Sending).
             mutex.withLock {
                 cancelLocked() // abandon any prior session
-                _pairingRole = PairingRole.Presenter
-                val keyPair = bootstrapLocked(PairingRole.Presenter) ?: run {
+                bootstrapLocked(PairingRole.Presenter)
+                val own = ownChannel ?: run {
                     cancelLocked() // bootstrap already emitted the error; just clear the half-set state
                     return@launch
                 }
-                _linkingCode = qrCode.buildLinkingCode(
-                    channelId = ownChannelId!!,
-                    publicKeyBase64Url = keyPair.publicKeyBase64,
+                val linkingCode = qrCode.buildLinkingCode(
+                    channelId = own.id,
+                    publicKeyBase64Url = own.keyPair.publicKeyBase64,
                     version = advertisedVersion,
                 )
+                ownData = OwnData(PairingRole.Presenter, linkingCode)
                 // Presenter waits to receive hello before transitioning out of Bootstrapped.
                 session = smFactory.create(
                     localUserId = syncStore.userId,
@@ -291,29 +280,27 @@ class RealExchangeV2Runner @Inject constructor(
 
     /**
      * Caller must hold [mutex]. Generates ephemeral keypair, allocates channel_id, and creates
-     * the relay channel (with 409 retry). Returns the new keypair on success, null on error
-     * (in which case an error event was already emitted).
+     * the relay channel (with 409 retry). Sets [ownChannel] on success, and leaves it null on
+     * error, in which case an error event was already emitted.
      */
-    private fun bootstrapLocked(role: PairingRole): RsaKeyPair? {
+    private fun bootstrapLocked(role: PairingRole) {
         advertisedVersion = advertisedExchangeV2Version.resolve()
         val keyPair = jweCrypto.generateRsaKeyPair(EXCHANGE_RSA_KEY_SIZE)
-        ownKeyPair = keyPair
         repeat(MAX_CHANNEL_CREATE_RETRIES) { attempt ->
             val candidate = UUID.randomUUID().toString()
             val candidateSecret = generateChannelSecret()
             when (val r = channel.createChannel(candidate, candidateSecret)) {
                 is Result.Success -> {
-                    ownChannelId = candidate
-                    ownChannelSecret = candidateSecret
+                    ownChannel = OwnChannelData(candidate, keyPair, candidateSecret)
                     logcat { "Sync-ExchangeV2: bootstrap as $role channel_id=$candidate" }
-                    return keyPair
+                    return
                 }
                 is Result.Error -> {
                     if (r.code == HTTP_CONFLICT) {
                         logcat { "Sync-ExchangeV2: channel_id $candidate already taken, retrying (${attempt + 1}/$MAX_CHANNEL_CREATE_RETRIES)" }
                     } else {
                         emitSessionError("Failed to create channel", SessionErrorKind.RelayChannelUnavailable)
-                        return null
+                        return
                     }
                 }
             }
@@ -322,7 +309,7 @@ class RealExchangeV2Runner @Inject constructor(
             "Could not allocate unique channel_id after $MAX_CHANNEL_CREATE_RETRIES attempts",
             SessionErrorKind.RelayChannelUnavailable,
         )
-        return null
+        return
     }
 
     override suspend fun cancel() {
@@ -372,25 +359,18 @@ class RealExchangeV2Runner @Inject constructor(
         lateJoinerDeadlineJob = null
         syncTimeoutJob?.cancel()
         syncTimeoutJob = null
-        val channelId = ownChannelId
-        val channelSecret = ownChannelSecret
-        if (channelId != null) {
+        val own = ownChannel
+        if (own != null) {
             // Best-effort DELETE.
             appScope.launch(dispatchers.io()) {
-                runCatching { channel.deleteChannel(channelId, channelSecret) }
+                runCatching { channel.deleteChannel(own.id, own.secret) }
             }
         }
         session = null
-        _pairingRole = null
-        ownChannelId = null
-        ownChannelSecret = null
-        ownKeyPair = null
-        peerChannelId = null
-        peerPublicKey = null
-        _peerKind = null
-        peerUserId = null
-        _peerName = null
-        _linkingCode = null
+        ownChannel = null
+        ownData = null
+        peerChannel = null
+        peerData = null
         advertisedVersion = BASELINE_PROTOCOL_VERSION
         negotiatedVersion = BASELINE_PROTOCOL_VERSION
         sentOwnAvailability = false
@@ -402,15 +382,13 @@ class RealExchangeV2Runner @Inject constructor(
     // -----------------------------------------------------------------------
 
     private fun startPolling() {
-        val ch = ownChannelId ?: return
-        val key = ownKeyPair ?: return
-        val sec = ownChannelSecret
+        val own = ownChannel ?: return
         messagePollJob = appScope.launch(dispatchers.io()) {
             try {
                 // collect suspends per message so envelopes are handled in poll() seq order. A
                 // message driving the SM terminal cancels this very poll job; that
                 // self-cancellation surfaces as the CancellationException caught below.
-                channel.poll(ch, key.privateKeyBase64, sec).collect { incoming ->
+                channel.poll(own.id, own.keyPair.privateKeyBase64, own.secret).collect { incoming ->
                     deliverIncomingMessage(incoming)
                 }
             } catch (versionTooNew: EnvelopeVersionTooNew) {
@@ -593,7 +571,11 @@ class RealExchangeV2Runner @Inject constructor(
             mutex.withLock {
                 val s = session ?: return@withLock
                 if (s.currentState != ExchangeV2State.Host.Sending) return@withLock
-                val terminalTrigger = if (responseOk) LocalTrigger.HostSendComplete(negotiatedVersion) else LocalTrigger.HostUnavailable
+                val terminalTrigger = if (responseOk) {
+                    LocalTrigger.HostSendComplete(negotiatedVersion)
+                } else {
+                    LocalTrigger.HostUnavailable
+                }
                 val r = s.localTrigger(terminalTrigger)
                 emit(r.event)
                 r.sideEffects.forEach { applySideEffectLocked(it) }
@@ -618,19 +600,14 @@ class RealExchangeV2Runner @Inject constructor(
     private fun recordPeerContext(message: ExchangeV2Message) {
         when (message) {
             is ExchangeV2Message.Hello -> {
-                peerChannelId = message.channelId
-                peerPublicKey = message.publicKey
+                peerChannel = PeerChannelData(message.channelId, message.publicKey)
                 negotiatedVersion = negotiateProtocolVersion(message.version, PeerVersionSource.HelloMessage)
             }
             is ExchangeV2Message.RecoveryCodeAvailable -> {
-                _peerKind = message.kind
-                peerUserId = message.userId
-                _peerName = message.name
+                peerData = PeerData(message.userId, message.kind, message.name)
             }
             is ExchangeV2Message.RecoveryCodeRequest -> {
-                _peerKind = message.kind
-                peerUserId = null
-                _peerName = message.name
+                peerData = PeerData(userId = null, message.kind, message.name)
             }
             else -> Unit
         }
@@ -662,12 +639,12 @@ class RealExchangeV2Runner @Inject constructor(
      */
     private fun autoElectRoleLocked(sm: ExchangeV2StateMachine) {
         val elected = electRole() ?: run {
-            logcat { "Sync-ExchangeV2: cannot auto-elect role yet (role=${_pairingRole}, peerKind=$_peerKind)" }
+            logcat { "Sync-ExchangeV2: cannot auto-elect role yet (role=${ownData?.role}, peerKind=${peerData?.kind})" }
             return
         }
         logcat {
             "Sync-ExchangeV2: auto-electing $elected " +
-                "(own role=${_pairingRole}, own userId=${syncStore.userId}, peer kind=$_peerKind, peer userId=$peerUserId)"
+                "(own role=${ownData?.role}, own userId=${syncStore.userId}, peer kind=${peerData?.kind}, peer userId=${peerData?.userId})"
         }
         val electResult = sm.localTrigger(LocalTrigger.RoleElected(elected))
         emit(electResult.event)
@@ -681,21 +658,21 @@ class RealExchangeV2Runner @Inject constructor(
     private fun canSendOwnAvailability(sm: ExchangeV2StateMachine): Boolean {
         if (sentOwnAvailability) return false
         if (sm.currentState != ExchangeV2State.Negotiating) return false
-        if (peerChannelId == null || peerPublicKey == null) return false
+        if (peerChannel == null) return false
         return true
     }
 
     private fun electRole(): Role? {
-        val ownRole = _pairingRole ?: return null
+        val peerData = peerData ?: return null
+        val ownData = ownData ?: return null
         val ownUserId = syncStore.userId
-        val pKind = _peerKind ?: return null
-        val pUserId = peerUserId
+
         return when {
-            ownUserId != null && pUserId == null -> Role.Host
-            ownUserId == null && pUserId != null -> Role.Joiner
-            OWN_DEVICE_KIND == "ddg" && pKind == "3party" -> Role.Host
-            OWN_DEVICE_KIND == "3party" && pKind == "ddg" -> Role.Joiner
-            ownRole == PairingRole.Presenter -> Role.Host
+            ownUserId != null && peerData.userId == null -> Role.Host
+            ownUserId == null && peerData.userId != null -> Role.Joiner
+            OWN_DEVICE_KIND == "ddg" && peerData.kind == "3party" -> Role.Host
+            OWN_DEVICE_KIND == "3party" && peerData.kind == "ddg" -> Role.Joiner
+            ownData.role == PairingRole.Presenter -> Role.Host
             else -> Role.Joiner
         }
     }
@@ -757,49 +734,39 @@ class RealExchangeV2Runner @Inject constructor(
 
     /** Returns true if hello reached the relay; false signals a fatal abort to the caller. */
     private fun sendHello(): Boolean {
-        val own = ownChannelId
-        val peer = peerChannelId
-        val peerKey = peerPublicKey
-        val ourKey = ownKeyPair
-        if (own == null || peer == null || peerKey == null || ourKey == null) {
-            emitSessionError("Cannot send hello — pairing session state is incomplete", SessionErrorKind.PairingSessionNotReady)
-            return false
+        return sendMessage(ExchangeV2Message.Hello.TYPE) { own, _ ->
+            ExchangeV2Message.Hello.create(
+                channelId = own.id,
+                publicKey = own.keyPair.publicKeyBase64,
+                version = advertisedVersion,
+            )
         }
-        val hello = ExchangeV2Message.Hello.create(
-            channelId = own,
-            publicKey = ourKey.publicKeyBase64,
-            version = advertisedVersion,
-        )
-        return sendOnWireAndRecord(hello, peer, peerKey)
     }
 
     private fun sendOwnAvailability() {
         if (sentOwnAvailability) return
-        val own = ownChannelId ?: return
-        val peer = peerChannelId ?: return
-        val peerKey = peerPublicKey ?: return
+
         val userId = syncStore.userId
         val deviceName = syncDeviceIds.deviceName()
-        if (userId != null) {
-            val available = ExchangeV2Message.RecoveryCodeAvailable.create(
+        val message = if (userId != null) {
+            ExchangeV2Message.RecoveryCodeAvailable.create(
                 userId = userId,
                 name = deviceName,
                 kind = OWN_DEVICE_KIND,
             )
-            sendOnWireAndRecord(available, peer, peerKey)
         } else {
-            val request = ExchangeV2Message.RecoveryCodeRequest.create(
+            ExchangeV2Message.RecoveryCodeRequest.create(
                 name = deviceName,
                 kind = OWN_DEVICE_KIND,
             )
-            sendOnWireAndRecord(request, peer, peerKey)
         }
+        sendMessage(message)
         sentOwnAvailability = true
         // Re-elect in case the peer's availability arrived before we sent ours.
         // REVIEW: likely unreachable under eager-send ordering — confirm against the ordering spec
         // (Unified Algorithm 1214739740392701) and delete if dead.
         val sm = session ?: return
-        if (sm.currentState == ExchangeV2State.Negotiating && _peerKind != null) {
+        if (sm.currentState == ExchangeV2State.Negotiating && peerData != null) {
             autoElectRoleLocked(sm)
         }
     }
@@ -811,32 +778,33 @@ class RealExchangeV2Runner @Inject constructor(
      * should be driven to [ExchangeV2State.Host.Aborted] rather than Done).
      */
     private suspend fun sendRecoveryCodeResponse(): Boolean {
-        val peer = peerChannelId ?: return false
-        val peerKey = peerPublicKey ?: return false
+        if (peerChannel == null) return false
+        val peerKind = peerData?.kind
         // Recovery code per peer kind. Per spec §"Exchange Share Recovery Code": create the host
         // account if absent; extend it with a 3party credential when peer is 3party. Provisioning
         // failure falls through to recovery_code_unavailable below.
         // peerKind is set during role election; reaching Host.Sending without it means something
         // upstream is broken — bail rather than silently assuming ddg.
-        val codeResult = when (_peerKind) {
+        val codeResult = when (peerKind) {
             "ddg" -> provisionForDdgPeer()
             "3party" -> provisionForThirdPartyPeer()
             null -> Result.Error(reason = "Host.Sending reached without a known peer kind")
-            else -> Result.Error(reason = "Unsupported peer kind '$_peerKind'")
+            else -> Result.Error(reason = "Unsupported peer kind '$peerKind'")
         }
         return when (codeResult) {
             is Result.Success -> {
                 val recoveryCode = codeResult.data
                 // Propagate the send result
-                sendOnWireAndRecord(ExchangeV2Message.RecoveryCodeResponse.create(recoveryCode), peer, peerKey)
+                sendMessage(ExchangeV2Message.RecoveryCodeResponse.create(recoveryCode))
             }
             is Result.Error -> {
-                logcat(ERROR) { "Sync-ExchangeV2: recovery code unavailable for peerKind=$_peerKind: ${codeResult.reason}" }
-                sendOnWireAndRecord(ExchangeV2Message.RecoveryCodeUnavailable.create(), peer, peerKey)
+                logcat(ERROR) { "Sync-ExchangeV2: recovery code unavailable for peerKind=$peerKind: ${codeResult.reason}" }
+                sendMessage(ExchangeV2Message.RecoveryCodeUnavailable.create())
                 emitSessionError(
                     "Couldn't generate a recovery code: ${codeResult.reason}",
                     SessionErrorKind.RecoveryCodePreparationFailed,
                 )
+                // No code went out, so the Host aborts regardless of whether the peer got told.
                 false
             }
         }
@@ -873,27 +841,31 @@ class RealExchangeV2Runner @Inject constructor(
         return recoveryCodeProvider.getThirdPartyRecoveryCode()
     }
 
-    private fun sendMessage(message: ExchangeV2Message) {
-        val peer = peerChannelId ?: return
-        val peerKey = peerPublicKey ?: return
-        if (message.protocolVersion <= negotiatedVersion) {
-            sendOnWireAndRecord(message, peer, peerKey)
-        } else {
-            logcat { "Sync-ExchangeV2: skipping ${message.messageType} (needs v${message.protocolVersion}, negotiated v$negotiatedVersion)" }
-        }
+    private fun sendMessage(message: ExchangeV2Message): Boolean {
+        return sendMessage(message.messageType) { _, _ -> message }
     }
 
-    /** Returns true on successful POST, false on transport error (caller decides if fatal). */
-    private fun sendOnWireAndRecord(
-        outboundMessage: ExchangeV2Message,
-        peerChannel: String,
-        peerKey: String,
+    private fun sendMessage(
+        messageType: String,
+        message: (OwnChannelData, PeerChannelData) -> ExchangeV2Message,
     ): Boolean {
-        val own = ownChannelId ?: return false
-        val sec = ownChannelSecret
-        return when (val r = channel.sendMessage(outboundMessage, peerChannel, peerKey, own, sec)) {
+        val own = ownChannel
+        val peer = peerChannel
+        if (own == null || peer == null) {
+            logcat(ERROR) { "Sync-ExchangeV2: cannot send $messageType — no channel pair" }
+            emitSessionError("Cannot send $messageType — pairing session state is incomplete", SessionErrorKind.PairingSessionNotReady)
+            return false
+        }
+
+        val message = message(own, peer)
+        if (message.protocolVersion > negotiatedVersion) {
+            logcat { "Sync-ExchangeV2: skipping ${message.messageType} (needs v${message.protocolVersion}, negotiated v$negotiatedVersion)" }
+            return false
+        }
+
+        return when (val r = channel.sendMessage(message, peer.id, peer.publicKey, own.id, own.secret)) {
             is Result.Success -> {
-                recordSentMessage(outboundMessage)
+                recordSentMessage(message)
                 true
             }
             is Result.Error -> {
@@ -952,9 +924,9 @@ class RealExchangeV2Runner @Inject constructor(
     }
 
     private fun emitSessionStarted() {
-        val ch = ownChannelId ?: return
-        val role = _pairingRole ?: return
-        emit(ExchangeV2Event.SessionStarted(clock.nowMs(), role, ch, _linkingCode))
+        val ch = ownChannel?.id ?: return
+        val own = ownData ?: return
+        emit(ExchangeV2Event.SessionStarted(clock.nowMs(), own.role, ch, own.linkingCode))
     }
 
     private fun emitSessionError(
@@ -1031,3 +1003,25 @@ class RealExchangeV2Runner @Inject constructor(
         private val BASELINE_PROTOCOL_VERSION get() = ExchangeProtocolVersion.V2_0
     }
 }
+
+private data class OwnChannelData(
+    val id: String,
+    val keyPair: RsaKeyPair,
+    val secret: String?,
+)
+
+private data class OwnData(
+    val role: PairingRole,
+    val linkingCode: String?,
+)
+
+private data class PeerChannelData(
+    val id: String,
+    val publicKey: String,
+)
+
+private data class PeerData(
+    val userId: String?,
+    val kind: String,
+    val name: String,
+)
