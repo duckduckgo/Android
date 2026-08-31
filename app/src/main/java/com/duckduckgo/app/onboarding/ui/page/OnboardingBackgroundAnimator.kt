@@ -61,6 +61,10 @@ sealed class OnboardingBackgroundStep(
         backgroundRes = R.drawable.onboarding_browser_comparison_background,
         maxHeightDp = 216,
     )
+    data object IslandWithHorizon : OnboardingBackgroundStep(
+        backgroundRes = R.drawable.onboarding_island_with_horizon,
+        maxHeightDp = 272,
+    )
     data object AddressBar : OnboardingBackgroundStep(
         backgroundRes = R.drawable.onboarding_address_bar_background,
         maxHeightDp = 360,

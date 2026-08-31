@@ -243,10 +243,46 @@ class DialogConfigResolver @Inject constructor(
             ),
         )
 
+        NewUserOnboardingActivityDialog.ImportPasswords -> DialogConfig(
+            background = OnboardingBackgroundStep.IslandWithHorizon,
+            embellishment = Embellishment.RightWing,
+            cardArrow = CardArrowConfig.AtStartMirrored,
+            content = ContentConfig.ImportPasswords(
+                title = TextConfig.Resource(R.string.preOnboardingImportPasswordsTitle),
+                body = TextConfig.Resource(R.string.preOnboardingImportPasswordsBody),
+            ),
+            primaryCta = CtaConfig(
+                text = TextConfig.Resource(R.string.preOnboardingImportPasswordsPrimaryCta),
+                action = CtaAction.Emit(NewUserOnboardingEvent.PasswordImportRequested),
+            ),
+            secondaryCta = CtaConfig(
+                text = TextConfig.Resource(R.string.preOnboardingImportPasswordsSecondaryCta),
+                action = CtaAction.Emit(NewUserOnboardingEvent.PasswordImportSkipped),
+            ),
+        )
+
+        NewUserOnboardingActivityDialog.ImportComplete -> DialogConfig(
+            background = OnboardingBackgroundStep.IslandWithHorizon,
+            embellishment = Embellishment.RightWing,
+            cardArrow = CardArrowConfig.AtStartMirrored,
+            content = ContentConfig.ImportComplete(
+                title = TextConfig.Resource(R.string.preOnboardingImportCompleteTitle),
+                parsingTitle = TextConfig.Resource(R.string.preOnboardingImportCompleteParsingTitle),
+                parsingBody = TextConfig.Resource(R.string.preOnboardingImportCompleteParsingBody),
+                failedTitle = TextConfig.Resource(R.string.preOnboardingImportCompleteFailedTitle),
+                failedRow = TextConfig.Resource(R.string.preOnboardingImportCompleteFailed),
+            ),
+            primaryCta = CtaConfig(
+                text = TextConfig.Resource(R.string.preOnboardingImportCompleteCta),
+                action = CtaAction.Emit(NewUserOnboardingEvent.ContinueClicked),
+            ),
+        )
+
         is NewUserOnboardingActivityDialog.IntroAnimation,
         NewUserOnboardingActivityDialog.NotificationPermission,
         NewUserOnboardingActivityDialog.DefaultBrowserPrompt,
         NewUserOnboardingActivityDialog.AddWidget,
+        NewUserOnboardingActivityDialog.ImportPasswordsLaunch,
         -> null // command-only: no card to render
     }
 

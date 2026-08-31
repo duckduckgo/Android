@@ -36,9 +36,21 @@ data class DialogConfig(
 )
 
 /** The animated stage decoration accompanying a dialog. A runtime fit check may still hide it. */
-enum class Embellishment { WalkingDax, BobbingDax, BottomWing, LeftWing, None }
+enum class Embellishment { WalkingDax, BobbingDax, BottomWing, LeftWing, RightWing, None }
 
-enum class CardArrowConfig { Hidden, AtStart, AtEnd }
+/**
+ * Where the card's bubble tail sits, and which way it hooks. The tail is asymmetric, so a screen whose
+ * artwork sits opposite the default hook needs a mirrored variant rather than just a different position.
+ */
+enum class CardArrowConfig(
+    val atEnd: Boolean,
+    val mirrored: Boolean,
+) {
+    Hidden(atEnd = false, mirrored = false),
+    AtStart(atEnd = false, mirrored = false),
+    AtEnd(atEnd = true, mirrored = false),
+    AtStartMirrored(atEnd = false, mirrored = true),
+}
 
 /** When the card's one-time fade-in starts. [AfterBackgroundTransition] holds it back until an animated background transition has finished. */
 enum class CardEntry { Immediate, AfterBackgroundTransition }

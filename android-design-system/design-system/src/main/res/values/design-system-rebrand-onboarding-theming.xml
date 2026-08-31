@@ -36,6 +36,7 @@
     <attr name="onboardingIconsPrimary" format="color" />
     <attr name="onboardingIconsSecondary" format="color" />
     <attr name="onboardingIconsTertiary" format="color" />
+    <attr name="onboardingIconsSuccess" format="color" />
     <attr name="onboardingControlFillTertiary" format="color" />
     <attr name="onboardingShadowPurple" format="color" />
     <attr name="onboardingShadowBlue" format="color" />
@@ -83,6 +84,7 @@
         <item name="onboardingIconsPrimary">#D6242323</item> <!--84% Alpha-->
         <item name="onboardingIconsSecondary">#99383838</item> <!--60% Alpha-->
         <item name="onboardingIconsTertiary">#66242323</item> <!--40% Alpha-->
+        <item name="onboardingIconsSuccess">@color/lilypad60</item>
 
         <!--Surface-->
         <item name="daxColorBackground">?attr/onboardingSurfaceBackdrop</item>
@@ -148,6 +150,7 @@
         <item name="onboardingIconsPrimary">#D6FBFAF9</item> <!--84% Alpha-->
         <item name="onboardingIconsSecondary">#7AFBFAF9</item> <!--48% Alpha-->
         <item name="onboardingIconsTertiary">#7AFBFAF9</item> <!--48% Alpha-->
+        <item name="onboardingIconsSuccess">@color/lilypad30</item>
 
         <!--Surface-->
         <item name="daxColorBackground">?attr/onboardingSurfaceBackdrop</item>

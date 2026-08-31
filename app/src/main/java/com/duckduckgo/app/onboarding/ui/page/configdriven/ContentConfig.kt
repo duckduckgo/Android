@@ -155,6 +155,28 @@ sealed interface ContentConfig {
             require(options.isNotEmpty()) { "A toggle position screen needs at least one option" }
         }
     }
+
+    data class ImportPasswords(
+        override val title: TextConfig,
+        val body: TextConfig,
+    ) : ContentConfig
+
+    data class ImportComplete(
+        override val title: TextConfig,
+        val parsingTitle: TextConfig,
+        val parsingBody: TextConfig,
+        val failedTitle: TextConfig,
+        val failedRow: TextConfig,
+    ) : ContentConfig, Stateful<ImportCompleteContentState> {
+        override fun initialState(): ImportCompleteContentState = ImportCompleteContentState.Parsing
+    }
+}
+
+sealed interface ImportCompleteContentState {
+    data object Parsing : ImportCompleteContentState
+    data class Finished(val imported: Int, val skipped: Int) : ImportCompleteContentState
+
+    data object Failed : ImportCompleteContentState
 }
 
 data class AddressBarContentState(val position: OmnibarType)

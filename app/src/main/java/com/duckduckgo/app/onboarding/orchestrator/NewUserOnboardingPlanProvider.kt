@@ -30,6 +30,8 @@ import com.duckduckgo.app.onboarding.CustomAiOnboardingResolver
 import com.duckduckgo.app.onboarding.DuckAiOnboardingAvailability
 import com.duckduckgo.app.onboarding.DuckAiOnboardingDemo
 import com.duckduckgo.app.onboarding.OnboardingInputScreenLaunchTarget
+import com.duckduckgo.app.onboarding.OnboardingPasswordImportExperimentManager
+import com.duckduckgo.app.onboarding.OnboardingPasswordImportExperimentManager.OnboardingPasswordImportVariant
 import com.duckduckgo.app.onboarding.OnboardingPreference
 import com.duckduckgo.app.onboarding.OnboardingPreferenceApplier
 import com.duckduckgo.app.onboarding.OnboardingPromptsExperimentManager
@@ -69,6 +71,7 @@ import com.duckduckgo.onboarding.api.LinearOnboardingStep
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition.AbortPlan
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition.Advance
+import com.duckduckgo.onboarding.api.LinearOnboardingTransition.GoBack
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition.Stay
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition.SwitchTo
 import com.duckduckgo.onboarding.api.OnboardingSingleChoiceDataPlugin
@@ -111,6 +114,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     private val duckAiOnboardingDemo: DuckAiOnboardingDemo,
     private val onboardingPromptsExperimentManager: OnboardingPromptsExperimentManager,
     private val segmentedOnboardingExperimentManager: SegmentedOnboardingExperimentManager,
+    private val onboardingPasswordImportExperimentManager: OnboardingPasswordImportExperimentManager,
     private val onboardingPreferenceApplier: OnboardingPreferenceApplier,
     private val singleChoiceDataPlugins: ActivePluginPoint<OnboardingSingleChoiceDataPlugin>,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
@@ -145,6 +149,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 onboardingPromptExperimentVariant != null -> buildDefaultPlan(ctx, onCompleted, onSkipped, onboardingPromptExperimentVariant)
                 segmentedOnboardingExperimentManager.enroll() == SegmentedOnboardingExperimentVariant.TREATMENT ->
                     buildSegmentedPlan(ctx, onCompleted, onSkipped)
+
                 else -> buildDefaultPlan(ctx, onCompleted, onSkipped)
             }
         }
@@ -170,6 +175,8 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             onboardingPromptExperimentVariant == OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_DOCK_AND_WIDGET
         val showWidget = variantAllowsWidget && withContext(dispatchers.io()) { !widgetCapabilities.hasInstalledWidgets }
 
+        val showPasswordImport = onboardingPasswordImportExperimentManager.enroll() == OnboardingPasswordImportVariant.TREATMENT
+
         return rootPlan(
             ctx = ctx,
             onCompleted = onCompleted,
@@ -188,6 +195,11 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 if (showWidget) {
                     add(widgetPromptStep(ctx))
                     add(addWidgetStep(ctx))
+                }
+                if (showPasswordImport) {
+                    add(passwordImportStep(ctx))
+                    add(passwordImportLaunchStep(ctx))
+                    add(passwordImportCompleteStep(ctx))
                 }
                 add(addressBarPositionStep())
                 add(inputScreenStep(ctx))
@@ -309,7 +321,10 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     private fun sidePlan(id: LinearOnboardingPlanId, steps: List<LinearOnboardingStep>): LinearOnboardingPlan =
         LinearOnboardingPlan(id = id, steps = steps.firingShownPixels().abortingOnDevSkip())
 
-    private fun quickSetupPlan(ctx: NewUserOnboardingPlanContext, forceWithAiInput: Boolean = false): LinearOnboardingPlan =
+    private fun quickSetupPlan(
+        ctx: NewUserOnboardingPlanContext,
+        forceWithAiInput: Boolean = false,
+    ): LinearOnboardingPlan =
         sidePlan(QUICK_SETUP_PLAN_ID, listOf(quickSetupStep(ctx, forceWithAiInput)))
 
     /**
@@ -403,6 +418,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                         }
                         Advance
                     }
+
                     else -> Stay
                 }
             },
@@ -459,6 +475,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                             false
                         }
                     }
+
                     FirstDialog.REINSTALL -> true
                     FirstDialog.INITIAL -> false
                 }
@@ -470,6 +487,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                         onboardingPixelSender.fire(pixelName, OnboardingPixelAction.Clicked(engaged = true))
                         Advance
                     }
+
                     is NewUserOnboardingEvent.SkipRequested -> {
                         pixel.fire(PREONBOARDING_SKIP_ONBOARDING_PRESSED)
                         onboardingPixelSender.fire(pixelName, OnboardingPixelAction.Clicked(engaged = false))
@@ -497,6 +515,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                         onboardingPixelSender.fire(pixelName, OnboardingPixelAction.Clicked(engaged = true))
                         Advance
                     }
+
                     else -> Stay
                 }
             },
@@ -632,7 +651,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         return NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.PREFERENCE_SELECTOR,
             pixelName = null,
-            showsStepIndicator = true,
+            indicator = StepIndicatorMode.COUNTED,
             precondition = { preferenceSelections().isNotEmpty() },
             resolveDialog = {
                 NewUserOnboardingActivityDialog.PreferenceSelector(
@@ -667,7 +686,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         return NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.MODEL_PROVIDER,
             pixelName = null,
-            showsStepIndicator = true,
+            indicator = StepIndicatorMode.COUNTED,
             precondition = { options().size > 1 },
             resolveDialog = {
                 NewUserOnboardingActivityDialog.SingleChoice(
@@ -695,7 +714,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         return NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.TOGGLE_POSITION,
             pixelName = null,
-            showsStepIndicator = true,
+            indicator = StepIndicatorMode.COUNTED,
             precondition = { options().size > 1 },
             resolveDialog = { NewUserOnboardingActivityDialog.TogglePosition(options()) },
             transition = { event ->
@@ -720,7 +739,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         return NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.DUCK_AI_STATE,
             pixelName = null,
-            showsStepIndicator = true,
+            indicator = StepIndicatorMode.COUNTED,
             precondition = { options().size > 1 },
             resolveDialog = { NewUserOnboardingActivityDialog.DuckAiState(options()) },
             transition = { event ->
@@ -746,7 +765,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         return NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.COMPARISON_CHART,
             pixelName = pixelName,
-            showsStepIndicator = true,
+            indicator = StepIndicatorMode.COUNTED,
             resolveDialog = { dialog },
             transition = { event ->
                 when {
@@ -759,6 +778,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                         onboardingPixelSender.fire(pixelName, OnboardingPixelAction.Clicked(engaged = true))
                         Advance
                     }
+
                     else -> Stay
                 }
             },
@@ -780,6 +800,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                     )
                     Advance
                 }
+
                 else -> Stay
             }
         },
@@ -790,7 +811,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         return NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.ADD_TO_DOCK,
             pixelName = pixelName,
-            showsStepIndicator = true,
+            indicator = StepIndicatorMode.COUNTED,
             resolveDialog = { NewUserOnboardingActivityDialog.AddToDock },
             transition = { event ->
                 when {
@@ -798,6 +819,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                         onboardingPixelSender.fire(pixelName, OnboardingPixelAction.Clicked(engaged = true))
                         Advance
                     }
+
                     else -> Stay
                 }
             },
@@ -809,7 +831,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         return NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.WIDGET_PROMPT,
             pixelName = pixelName,
-            showsStepIndicator = true,
+            indicator = StepIndicatorMode.COUNTED,
             resolveDialog = { NewUserOnboardingActivityDialog.WidgetPrompt },
             transition = { event ->
                 when (event) {
@@ -817,15 +839,18 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                         onboardingStore.linearPlanWidgetPromptShown = true
                         Stay
                     }
+
                     is NewUserOnboardingEvent.AddWidgetRequested -> {
                         onboardingPixelSender.fire(pixelName, OnboardingPixelAction.Clicked(engaged = true))
                         Advance
                     }
+
                     is NewUserOnboardingEvent.WidgetPromptSkipped -> {
                         onboardingPixelSender.fire(pixelName, OnboardingPixelAction.Clicked(engaged = false))
                         ctx.skipAddWidget = true
                         Advance
                     }
+
                     else -> Stay
                 }
             },
@@ -851,6 +876,88 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                         )
                         Advance
                     }
+
+                    else -> Stay
+                }
+            },
+        )
+    }
+
+    private fun passwordImportStep(ctx: NewUserOnboardingPlanContext): NewUserOnboardingActivityStep {
+        val pixelName = OnboardingPixelName.ONBOARDING_PASSWORD_IMPORT
+        return NewUserOnboardingActivityStep(
+            id = NewUserOnboardingStepIds.PASSWORD_IMPORT,
+            pixelName = pixelName,
+            indicator = StepIndicatorMode.COUNTED,
+            resolveDialog = { NewUserOnboardingActivityDialog.ImportPasswords },
+            transition = { event ->
+                when (event) {
+                    is NewUserOnboardingEvent.PasswordImportRequested -> {
+                        onboardingPixelSender.fire(pixelName, OnboardingPixelAction.Clicked(engaged = true))
+                        Advance
+                    }
+
+                    is NewUserOnboardingEvent.PasswordImportSkipped -> {
+                        ctx.skipPasswordsImport = true
+                        onboardingPixelSender.fire(pixelName, OnboardingPixelAction.Clicked(engaged = false))
+                        Advance
+                    }
+
+                    else -> Stay
+                }
+            },
+        )
+    }
+
+    private fun passwordImportLaunchStep(ctx: NewUserOnboardingPlanContext): NewUserOnboardingActivityStep {
+        val pixelName = OnboardingPixelName.ONBOARDING_PASSWORD_IMPORT
+        return NewUserOnboardingActivityStep(
+            id = NewUserOnboardingStepIds.PASSWORD_IMPORT_LAUNCH,
+            pixelName = null,
+            precondition = { !ctx.passwordImportSucceeded && !ctx.skipPasswordsImport },
+            resolveDialog = { NewUserOnboardingActivityDialog.ImportPasswordsLaunch },
+            transition = { event ->
+                when (event) {
+                    is NewUserOnboardingEvent.PasswordImportWebFlowFinished -> when (event.outcome) {
+                        PasswordImportOutcome.SUCCESS -> {
+                            ctx.passwordImportSucceeded = true
+                            Advance
+                        }
+
+                        PasswordImportOutcome.CANCELLED -> {
+                            onboardingPixelSender.fire(pixelName, OnboardingPixelAction.PasswordImportConfirmed(event.outcome))
+                            GoBack
+                        }
+
+                        PasswordImportOutcome.ERROR -> {
+                            onboardingPixelSender.fire(pixelName, OnboardingPixelAction.PasswordImportConfirmed(event.outcome))
+                            Stay
+                        }
+                    }
+
+                    is NewUserOnboardingEvent.ContinueClicked -> Advance
+                    else -> Stay
+                }
+            },
+        )
+    }
+
+    private fun passwordImportCompleteStep(ctx: NewUserOnboardingPlanContext): NewUserOnboardingActivityStep {
+        val pixelName = OnboardingPixelName.ONBOARDING_PASSWORD_IMPORT
+        return NewUserOnboardingActivityStep(
+            id = NewUserOnboardingStepIds.PASSWORD_IMPORT_COMPLETE,
+            pixelName = null,
+            indicator = StepIndicatorMode.CONTINUES_PREVIOUS,
+            precondition = { ctx.passwordImportSucceeded },
+            resolveDialog = { NewUserOnboardingActivityDialog.ImportComplete },
+            transition = { event ->
+                when (event) {
+                    is NewUserOnboardingEvent.PasswordImportParsed -> {
+                        onboardingPixelSender.fire(pixelName, OnboardingPixelAction.PasswordImportConfirmed(event.outcome))
+                        Stay
+                    }
+
+                    is NewUserOnboardingEvent.ContinueClicked -> Advance
                     else -> Stay
                 }
             },
@@ -862,7 +969,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         return NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.ADDRESS_BAR_POSITION,
             pixelName = pixelName,
-            showsStepIndicator = true,
+            indicator = StepIndicatorMode.COUNTED,
             resolveDialog = { NewUserOnboardingActivityDialog.AddressBarPosition(showSplitOption = isSplitOmnibarEnabled()) },
             transition = { event ->
                 when {
@@ -873,6 +980,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                         onboardingPixelSender.fire(pixelName, OnboardingPixelAction.AddressBarClicked(position = resolved))
                         Advance
                     }
+
                     else -> Stay
                 }
             },
@@ -884,7 +992,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         return NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.INPUT_SCREEN,
             pixelName = pixelName,
-            showsStepIndicator = true,
+            indicator = StepIndicatorMode.COUNTED,
             resolveDialog = { NewUserOnboardingActivityDialog.InputScreen },
             transition = { event ->
                 when {
@@ -894,6 +1002,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                         onboardingPixelSender.fire(pixelName, OnboardingPixelAction.SearchExperienceClicked(withAi = event.withAi))
                         Advance
                     }
+
                     else -> Stay
                 }
             },
@@ -919,7 +1028,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         return NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.INPUT_SCREEN_PREVIEW,
             pixelName = pixelName,
-            showsStepIndicator = showsStepIndicator,
+            indicator = if (showsStepIndicator) StepIndicatorMode.COUNTED else StepIndicatorMode.NONE,
             precondition = { !shownOnlyWithModeToggle || showModeToggle() },
             resolveDialog = {
                 val modeToggleShown = showModeToggle()
@@ -969,7 +1078,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         return NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.AI_COMPARISON_CHART,
             pixelName = pixelName,
-            showsStepIndicator = true,
+            indicator = StepIndicatorMode.COUNTED,
             resolveDialog = { NewUserOnboardingActivityDialog.AiComparisonChart },
             transition = { event ->
                 when {
@@ -977,6 +1086,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                         onboardingPixelSender.fire(pixelName, OnboardingPixelAction.Clicked(engaged = true))
                         Advance
                     }
+
                     else -> Stay
                 }
             },
@@ -995,13 +1105,17 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                         onboardingPixelSender.fire(pixelName, OnboardingPixelAction.Clicked(engaged = true))
                         Advance
                     }
+
                     else -> Stay
                 }
             },
         )
     }
 
-    private fun quickSetupStep(ctx: NewUserOnboardingPlanContext, forceWithAiInput: Boolean): NewUserOnboardingActivityStep {
+    private fun quickSetupStep(
+        ctx: NewUserOnboardingPlanContext,
+        forceWithAiInput: Boolean,
+    ): NewUserOnboardingActivityStep {
         val pixelName = OnboardingPixelName.ONBOARDING_QUICK_SETUP
         return NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.QUICK_SETUP,
@@ -1036,6 +1150,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                         )
                         AbortPlan
                     }
+
                     else -> Stay
                 }
             },
@@ -1076,7 +1191,11 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 androidBrowserConfigFeature.splitOmnibarWelcomePage().isEnabled()
         }
 
-    private enum class FirstDialog { SYNC_RESTORE, REINSTALL, INITIAL }
+    private enum class FirstDialog {
+        SYNC_RESTORE,
+        REINSTALL,
+        INITIAL,
+    }
 
     companion object {
 
