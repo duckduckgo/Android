@@ -2165,6 +2165,31 @@ class SingleTabFireDialogViewModelTest {
     }
 
     @Test
+    fun `when delete this tab clicked with fire hatch origin then tab count comes from the fire repository`() = runTest {
+        whenever(mockSettingsDataStore.fireAnimationEnabled).thenReturn(false)
+        whenever(mockFireTabRepository.getTab("fire-tab")).thenReturn(
+            TabEntity(tabId = "fire-tab", url = "https://news.example.com", title = "News"),
+        )
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(9)
+        whenever(mockFireTabRepository.getOpenTabCount()).thenReturn(2)
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
+        testee = createViewModel(browserMode = BrowserMode.REGULAR)
+        testee.setOrigin(FireDialogOrigin.Hatch("fire-tab"))
+
+        testee.onDeleteThisTabClicked()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockDataClearingWideEvent).start(
+            entryPoint = eq(DataClearingWideEvent.EntryPoint.SINGLE_TAB_BURN),
+            clearOptions = any(),
+            browserMode = eq(BrowserMode.FIRE),
+            tabType = anyOrNull(),
+            tabCount = eq(2),
+        )
+    }
+
+    @Test
     fun `when delete this tab clicked with hatch origin and tab is gone then clears nothing and reports error`() = runTest {
         whenever(mockSettingsDataStore.fireAnimationEnabled).thenReturn(false)
         whenever(mockTabRepository.getTab("gone-tab")).thenReturn(null)

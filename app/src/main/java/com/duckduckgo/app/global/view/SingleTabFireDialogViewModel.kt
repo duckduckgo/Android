@@ -274,8 +274,9 @@ class SingleTabFireDialogViewModel @Inject constructor(
             shouldRestartAfterClearing = false
 
             val target = withContext(dispatcherProvider.io()) { resolveTarget(origin.value) }
+            val currentMode = target?.second ?: browserMode
+            val browserModeParams = mapOf(Pixel.PixelParameter.BROWSER_MODE to currentMode.name.lowercase())
 
-            val browserModeParams = mapOf(Pixel.PixelParameter.BROWSER_MODE to (target?.second ?: browserMode).name.lowercase())
             pixel.enqueueFire(AppPixelName.FIRE_DIALOG_CLEAR_SINGLE_TAB_PRESSED, browserModeParams)
             pixel.enqueueFire(AppPixelName.FIRE_DIALOG_CLEAR_SINGLE_TAB_PRESSED_DAILY, browserModeParams, type = Daily())
             fireDataClearingSurfacePixels()
@@ -317,9 +318,9 @@ class SingleTabFireDialogViewModel @Inject constructor(
                 dataClearingWideEvent.start(
                     entryPoint = entryPoint,
                     clearOptions = clearOptions,
-                    browserMode = target?.second ?: browserMode,
+                    browserMode = currentMode,
                     tabType = stateData?.let { if (it.isDuckAiTab) TabType.AI else TabType.WEB },
-                    tabCount = stateData?.tabCount,
+                    tabCount = openTabCountFor(currentMode),
                 )
 
                 if (target != null) {
@@ -442,6 +443,9 @@ class SingleTabFireDialogViewModel @Inject constructor(
         is Hatch -> findTabAcrossModes(dialogOrigin.tabId)?.second?.url
         else -> tabRepository.getSelectedTab()?.url
     }
+
+    // The Hatch renders in Regular mode but can target either Regular or Fire mode
+    private fun openTabCountFor(mode: BrowserMode): Int = tabRepositoryProvider.forMode(mode).getOpenTabCount()
 
     private suspend fun findTabAcrossModes(tabId: String): Pair<BrowserMode, TabEntity>? {
         val modes = if (fireModeAvailability.isAvailable()) BrowserMode.entries else listOf(BrowserMode.REGULAR)
