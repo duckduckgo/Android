@@ -36,7 +36,6 @@ dependencies {
     implementation project(':custom-tabs-api')
     implementation project(':statistics-api')
     implementation project(':verified-installation-api')
-    implementation project(':library-loader-api')
     implementation project(':feature-toggles-api')
     implementation project(':data-store-api')
     implementation "com.duckduckgo.crashkit:android-crashkit:_"
@@ -71,16 +70,9 @@ android {
         generateDaggerFactories = true // default is false
     }
 
-    ndkVersion '28.2.13676358'
     namespace 'com.duckduckgo.app.anr'
     compileOptions {
         coreLibraryDesugaringEnabled = true
-    }
-
-    externalNativeBuild {
-        cmake {
-            path "CMakeLists.txt"
-        }
     }
 
     packagingOptions {
