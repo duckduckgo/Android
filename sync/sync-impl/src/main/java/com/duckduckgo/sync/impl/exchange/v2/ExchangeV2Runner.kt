@@ -45,9 +45,14 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.logcat
+import org.json.JSONObject
 import java.util.Base64
 import java.util.UUID
 import javax.inject.Inject
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Drives a single Exchange V2 pairing session, from the linking code to a terminal state.
@@ -189,9 +194,11 @@ class RealExchangeV2Runner @Inject constructor(
 
     @Volatile private var _linkingCode: String? = null
 
-    @Volatile private var pollJob: Job? = null
+    @Volatile private var messagePollJob: Job? = null
 
-    @Volatile private var timeoutJob: Job? = null
+    @Volatile private var syncTimeoutJob: Job? = null
+
+    @Volatile private var lateJoinerDeadlineJob: Job? = null
 
     @Volatile private var sentOwnAvailability: Boolean = false
 
@@ -356,13 +363,15 @@ class RealExchangeV2Runner @Inject constructor(
     /** Caller MUST hold [mutex]. The single teardown path, so field resets can't drift between
      *  call sites: stop the jobs, best-effort DELETE the channel, discard keys, clear all state. */
     private fun cancelLocked() {
-        if (session != null || pollJob != null) {
+        if (session != null || messagePollJob != null) {
             logcat { "Sync-ExchangeV2: teardown (was in state ${session?.currentState})" }
         }
-        pollJob?.cancel()
-        pollJob = null
-        timeoutJob?.cancel()
-        timeoutJob = null
+        messagePollJob?.cancel()
+        messagePollJob = null
+        lateJoinerDeadlineJob?.cancel()
+        lateJoinerDeadlineJob = null
+        syncTimeoutJob?.cancel()
+        syncTimeoutJob = null
         val channelId = ownChannelId
         val channelSecret = ownChannelSecret
         if (channelId != null) {
@@ -396,7 +405,7 @@ class RealExchangeV2Runner @Inject constructor(
         val ch = ownChannelId ?: return
         val key = ownKeyPair ?: return
         val sec = ownChannelSecret
-        pollJob = appScope.launch(dispatchers.io()) {
+        messagePollJob = appScope.launch(dispatchers.io()) {
             try {
                 // collect suspends per message so envelopes are handled in poll() seq order. A
                 // message driving the SM terminal cancels this very poll job; that
@@ -435,13 +444,44 @@ class RealExchangeV2Runner @Inject constructor(
      * spec's per-event cancel conditions, since those all drive the SM to a terminal state.
      */
     private fun startSessionTimer() {
-        timeoutJob = appScope.launch(dispatchers.io()) {
+        syncTimeoutJob = appScope.launch(dispatchers.io()) {
             delay(SESSION_TIMEOUT_MS)
             logcat { "Sync-ExchangeV2: session deadline (${SESSION_TIMEOUT_MS}ms) reached" }
             // Capture the phase we were stuck in before failSession() tears the state machine down
             val stage = mutex.withLock { session?.currentState?.toTimeoutStage() }
             failSession("Session timed out", kind = SessionErrorKind.SessionTimeout, timeoutStage = stage)
         }
+    }
+
+    /**
+     * Host-side deadline for the Joiner's report. Elapsing here is not a failure, it just moves us
+     * to [ExchangeV2State.Host.Unknown], where a late report is still accepted until the 5-minute
+     * session deadline.
+     */
+    private fun startLateJoinerDeadlineLocked() {
+        lateJoinerDeadlineJob?.cancel()
+        lateJoinerDeadlineJob = appScope.launch(dispatchers.io()) {
+            val deadline = lateJoinStatusDeadline()
+            delay(deadline)
+            mutex.withLock {
+                // The report may have landed while we were waiting on the lock.
+                if (session?.currentState != ExchangeV2State.Host.AwaitingStatus) return@withLock
+                logcat { "Sync-ExchangeV2: join status deadline ($deadline) reached" }
+                processLocalTriggerLocked(LocalTrigger.HostStatusDeadlineElapsed(deadline))
+            }
+        }
+    }
+
+    private fun lateJoinStatusDeadline(): Duration {
+        val configured = runCatching {
+            syncFeature.self().getSettings()?.let { settings ->
+                JSONObject(settings)
+                    .getLong(SETTING_JOIN_STATUS_DEADLINE_MS)
+                    .milliseconds
+                    .coerceIn(MIN_JOIN_STATUS_DEADLINE, MAX_JOIN_STATUS_DEADLINE)
+            }
+        }.getOrNull()
+        return configured ?: DEFAULT_JOIN_STATUS_DEADLINE
     }
 
     /**
@@ -452,7 +492,7 @@ class RealExchangeV2Runner @Inject constructor(
         ExchangeV2State.Negotiating -> TimeoutStage.WAITING_FOR_PEER_STATUS
         ExchangeV2State.Host.Confirming, ExchangeV2State.Joiner.Confirming -> TimeoutStage.WAITING_FOR_CONFIRMATION
         ExchangeV2State.Host.Sending, ExchangeV2State.Joiner.Waiting -> TimeoutStage.WAITING_FOR_RECOVERY_CODE
-        ExchangeV2State.Host.AwaitingStatus, ExchangeV2State.Joiner.Joining -> TimeoutStage.LOGGING_IN
+        ExchangeV2State.Host.AwaitingStatus, ExchangeV2State.Host.Unknown, ExchangeV2State.Joiner.Joining -> TimeoutStage.LOGGING_IN
         else -> null
     }
 
@@ -534,6 +574,10 @@ class RealExchangeV2Runner @Inject constructor(
             is SideEffect.SendRecoveryCodeDone -> {
                 logcat { "Sync-ExchangeV2: side effect → SendRecoveryCodeDone(${effect.reason.value})" }
                 sendMessage(ExchangeV2Message.RecoveryCodeDone.create(effect.reason))
+            }
+            SideEffect.AwaitJoinStatus -> {
+                logcat { "Sync-ExchangeV2: side effect → AwaitJoinStatus" }
+                startLateJoinerDeadlineLocked()
             }
         }
     }
@@ -972,6 +1016,12 @@ class RealExchangeV2Runner @Inject constructor(
 
         // Transport TD 1214486492252757 §Session Lifecycle: 5-minute client session deadline.
         private const val SESSION_TIMEOUT_MS = 5 * 60 * 1000L
+
+        // Spec 1216906888491126 §"Account join status": 30 seconds, remotely tunable.
+        private const val SETTING_JOIN_STATUS_DEADLINE_MS = "joinStatusDeadlineMs"
+        private val DEFAULT_JOIN_STATUS_DEADLINE = 30.seconds
+        private val MIN_JOIN_STATUS_DEADLINE = 5.seconds
+        private val MAX_JOIN_STATUS_DEADLINE = 2.minutes
 
         // Android is always a ddg-kind device.
         private const val OWN_DEVICE_KIND = "ddg"

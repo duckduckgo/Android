@@ -18,6 +18,7 @@ package com.duckduckgo.sync.impl.exchange.v2
 
 import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeDone
+import kotlin.time.Duration
 
 /**
  * An input to the state machine that didn't come off the wire: a user decision, role election, or
@@ -77,6 +78,14 @@ sealed interface LocalTrigger {
      * so the state machine can both pick a terminal and declare the `recovery_code_done` to send.
      */
     data class JoinerJoinComplete(val reason: RecoveryCodeDone.Reason) : LocalTrigger
+
+    /**
+     * The Host waited [deadline] without receiving [ExchangeV2Message.RecoveryCodeDone].
+     * Drives [ExchangeV2State.Host.AwaitingStatus] to [ExchangeV2State.Host.Unknown]; neither is
+     * terminal, so a late report can still arrive. [deadline] carries how long was waited, since
+     * the value is remotely tunable and the transition event would otherwise not say.
+     */
+    data class HostStatusDeadlineElapsed(val deadline: Duration) : LocalTrigger
 
     /**
      * Host couldn't produce a recovery code for the peer (e.g. not signed in, or no 3party

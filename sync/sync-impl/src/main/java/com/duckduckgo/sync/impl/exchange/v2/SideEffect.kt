@@ -97,4 +97,13 @@ sealed interface SideEffect {
      * Since 2.1.
      */
     data class SendRecoveryCodeDone(val reason: RecoveryCodeDone.Reason) : SideEffect
+
+    /**
+     * Start the deadline after which the Host shows an unknown outcome for the Joiner's
+     * `recovery_code_done`. Elapsing changes only what the user sees: the session keeps waiting in
+     * [ExchangeV2State.Host.Unknown], and a late report still lands on the real outcome.
+     *
+     * Since 2.1.
+     */
+    data object AwaitJoinStatus : SideEffect
 }
