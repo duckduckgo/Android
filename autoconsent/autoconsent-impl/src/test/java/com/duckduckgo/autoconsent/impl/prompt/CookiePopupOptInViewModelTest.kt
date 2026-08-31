@@ -98,17 +98,17 @@ class CookiePopupOptInViewModelTest {
     }
 
     @Test
-    fun whenBackNavigationFlagEnabledThenBackNavigationIsEnabled() {
+    fun whenBackDismissFlagEnabledThenBackDismissIsEnabled() {
         feature.cookiePopUpOptInPromptDismissible().setRawStoredState(Toggle.State(enable = true))
 
-        assertTrue(testee.viewState.value.isBackNavigationEnabled)
+        assertTrue(testee.viewState.value.isBackDismissEnabled)
     }
 
     @Test
-    fun whenBackNavigationFlagDisabledThenBackNavigationIsDisabled() {
+    fun whenBackDismissFlagDisabledThenBackDismissIsDisabled() {
         feature.cookiePopUpOptInPromptDismissible().setRawStoredState(Toggle.State(enable = false))
 
-        assertFalse(testee.viewState.value.isBackNavigationEnabled)
+        assertFalse(testee.viewState.value.isBackDismissEnabled)
     }
 
     @Test

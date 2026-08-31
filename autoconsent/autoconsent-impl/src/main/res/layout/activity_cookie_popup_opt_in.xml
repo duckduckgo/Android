@@ -161,25 +161,36 @@
 
             </com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleBrandDesignUpdateCardView>
 
-            <ImageView
+            <FrameLayout
                 android:id="@+id/cookiePopupOptInCloseButton"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_marginTop="-4dp"
-                android:layout_marginEnd="-4dp"
-                android:background="@drawable/background_cookie_popup_close_button"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginTop="-12dp"
+                android:layout_marginEnd="-12dp"
+                android:clickable="true"
                 android:contentDescription="@string/closeButtonContentDescription"
                 android:foreground="?attr/selectableItemBackgroundBorderless"
-                android:outlineProvider="none"
-                android:padding="8dp"
+                android:focusable="true"
                 android:theme="@style/ThemeOverlay.DuckDuckGo.Onboarding"
                 android:translationZ="8dp"
                 android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="@id/cookiePopupOptInBubble"
                 app:layout_constraintTop_toTopOf="@id/cookiePopupOptInBubble"
-                app:srcCompat="@drawable/ic_close_16"
-                app:tint="?attr/onboardingIconsPrimary"
-                tools:visibility="visible" />
+                tools:visibility="visible">
+
+                <ImageView
+                    android:id="@+id/cookiePopupOptInCloseIcon"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/background_cookie_popup_close_button"
+                    android:importantForAccessibility="no"
+                    android:outlineProvider="none"
+                    android:padding="8dp"
+                    app:srcCompat="@drawable/ic_close_16"
+                    app:tint="?attr/onboardingIconsPrimary" />
+
+            </FrameLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

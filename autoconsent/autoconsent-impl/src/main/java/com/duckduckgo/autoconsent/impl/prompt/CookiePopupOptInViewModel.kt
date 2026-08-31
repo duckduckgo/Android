@@ -57,7 +57,7 @@ class CookiePopupOptInViewModel @Inject constructor(
 
     data class ViewState(
         val variant: Variant,
-        val isBackNavigationEnabled: Boolean,
+        val isBackDismissEnabled: Boolean,
         val isCloseButtonVisible: Boolean,
     )
 
@@ -70,7 +70,7 @@ class CookiePopupOptInViewModel @Inject constructor(
     private val viewStateFlow = MutableStateFlow(
         ViewState(
             variant = if (autoconsent.isSettingEnabled()) Variant.PROTECTION_ON else Variant.PROTECTION_OFF,
-            isBackNavigationEnabled = autoconsentFeature.cookiePopUpOptInPromptDismissible().isEnabled(),
+            isBackDismissEnabled = autoconsentFeature.cookiePopUpOptInPromptDismissible().isEnabled(),
             isCloseButtonVisible = autoconsentFeature.cookiePopUpOptInPromptCloseButton().isEnabled(),
         ),
     )

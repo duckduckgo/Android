@@ -61,6 +61,7 @@ class CookiePopupOptInActivity : DuckDuckGoActivity() {
     private val viewModel: CookiePopupOptInViewModel by bindViewModel()
 
     private var lockedInPortraitMode: Boolean = false
+    private var backNavigationCallback: OnBackPressedCallback? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -115,35 +116,36 @@ class CookiePopupOptInActivity : DuckDuckGoActivity() {
     }
 
     /**
-     * The prompt is a required choice unless explicitly made dismissible through remote config.
+     * Blocks system Back unless Back dismissal is enabled through remote config.
      */
     private fun setupOnBackNavigation() {
-        if (viewModel.viewState.value.isBackNavigationEnabled) return
-
-        onBackPressedDispatcher.addCallback(
-            object : OnBackPressedCallback(true) {
-                override fun handleOnBackPressed() = Unit
-            },
-        )
+        val callback = object : OnBackPressedCallback(!viewModel.viewState.value.isBackDismissEnabled) {
+            override fun handleOnBackPressed() = Unit
+        }
+        backNavigationCallback = callback
+        onBackPressedDispatcher.addCallback(this, callback)
     }
 
     private fun setupListeners() {
         binding.cookiePopupOptInCloseButton.setOnClickListener {
+            disableActions()
             viewModel.onCloseClicked()
         }
         binding.cookiePopupOptInAcceptButton.setOnClickListener {
-            disableButtons()
+            disableActions()
             viewModel.onAcceptClicked()
         }
         binding.cookiePopupOptInDeclineButton.setOnClickListener {
-            disableButtons()
+            disableActions()
             viewModel.onDeclineClicked()
         }
     }
 
-    private fun disableButtons() {
+    private fun disableActions() {
         binding.cookiePopupOptInAcceptButton.isEnabled = false
         binding.cookiePopupOptInDeclineButton.isEnabled = false
+        binding.cookiePopupOptInCloseButton.isEnabled = false
+        backNavigationCallback?.isEnabled = true
     }
 
     private fun setupObservers() {
