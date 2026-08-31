@@ -38,13 +38,21 @@
             android:paddingTop="@dimen/keyline_6"
             android:paddingBottom="@dimen/keyline_4">
 
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/subscriptionOnboardingVpnHeaderAnimation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:importantForAccessibility="no" />
+
             <ImageView
-                android:id="@+id/subscriptionOnboardingVpnHeaderImage"
+                android:id="@+id/subscriptionOnboardingVpnHeaderErrorIcon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:importantForAccessibility="no"
-                android:src="@drawable/vpn_disabled_feature_128" />
+                android:src="@drawable/critical_update_feature_128"
+                android:visibility="gone" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/subscriptionOnboardingVpnHeaderTitle"
