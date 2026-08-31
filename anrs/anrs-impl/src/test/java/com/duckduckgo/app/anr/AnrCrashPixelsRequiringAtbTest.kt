@@ -48,8 +48,8 @@ class AnrCrashPixelsRequiringAtbTest {
     }
 
     @Test
-    fun nativeCrashHandlerRegisteredPixelIsCovered() {
-        assertTrue(isCovered(CrashPixel.APPLICATION_CRASH_NATIVE_HANDLER_REGISTERED.pixelName))
+    fun nativeCrashHandlerRegisteredPixelIsNotCovered() {
+        assertFalse(isCovered(CrashPixel.APPLICATION_CRASH_NATIVE_HANDLER_REGISTERED.pixelName))
     }
 
     @Test

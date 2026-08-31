@@ -28,6 +28,5 @@ class AnrCrashPixelsRequiringAtb @Inject constructor() : PixelRequiringAtbPlugin
         CrashPixel.APPLICATION_CRASH_GLOBAL.pixelName,
         CrashPixel.APPLICATION_CRASH_GLOBAL_VERIFIED_INSTALL.pixelName,
         CrashPixel.APPLICATION_CRASH_NATIVE.pixelName,
-        CrashPixel.APPLICATION_CRASH_NATIVE_HANDLER_REGISTERED.pixelName,
     )
 }
