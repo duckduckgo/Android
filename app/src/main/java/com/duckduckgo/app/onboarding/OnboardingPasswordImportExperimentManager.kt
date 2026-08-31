@@ -17,6 +17,7 @@
 package com.duckduckgo.app.onboarding
 
 import com.duckduckgo.app.onboarding.OnboardingPasswordImportExperimentManager.OnboardingPasswordImportVariant
+import com.duckduckgo.app.onboarding.OnboardingPasswordImportToggles.OnboardingPasswordImportCohorts
 import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.ImportPasswordsFromGoogle
@@ -49,20 +50,18 @@ class OnboardingPasswordImportExperimentManagerImpl @Inject constructor(
 ) : OnboardingPasswordImportExperimentManager {
 
     override suspend fun enroll(): OnboardingPasswordImportVariant? = withContext(dispatcherProvider.io()) {
-        OnboardingPasswordImportVariant.TREATMENT
+        if (onboardingPrivacyConfigPersistedGate.awaitPersisted() && checkPrerequisites()) {
+            val toggle = toggles.passwordImportExperimentAug25()
+            toggle.enroll()
+            when {
+                toggle.isEnrolledAndEnabled(OnboardingPasswordImportCohorts.TREATMENT) -> OnboardingPasswordImportVariant.TREATMENT
+                toggle.isEnrolledAndEnabled(OnboardingPasswordImportCohorts.CONTROL) -> OnboardingPasswordImportVariant.CONTROL
+                else -> null
+            }
+        } else {
+            null
+        }
     }
-    //     if (onboardingPrivacyConfigPersistedGate.awaitPersisted() && checkPrerequisites()) {
-    //         val toggle = toggles.passwordImportExperimentAug25()
-    //         toggle.enroll()
-    //         when {
-    //             toggle.isEnrolledAndEnabled(OnboardingPasswordImportCohorts.TREATMENT) -> OnboardingPasswordImportVariant.TREATMENT
-    //             toggle.isEnrolledAndEnabled(OnboardingPasswordImportCohorts.CONTROL) -> OnboardingPasswordImportVariant.CONTROL
-    //             else -> null
-    //         }
-    //     } else {
-    //         null
-    //     }
-    // }
 
     /**
      * Checked before enrolling, so users who could never reach the step are kept out of the experiment: it exists
