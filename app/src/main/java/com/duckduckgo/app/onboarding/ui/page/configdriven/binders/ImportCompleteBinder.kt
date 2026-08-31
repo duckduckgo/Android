@@ -56,9 +56,9 @@ class ImportCompleteBinder(
     ): ContentHandle = with(binding) {
         val context = root.context
 
-        importCompleteImportedRow.resultRowIcon.setImageResource(R.drawable.ic_check_onboarding_success_24)
+        importCompleteImportedRow.resultRowIcon.setImageResource(CommonR.drawable.ic_cross_recolorable_gray_24)
         importCompleteSkippedRow.resultRowIcon.setImageResource(CommonR.drawable.ic_cross_recolorable_gray_24)
-        importCompleteFailedRow.resultRowIcon.setImageResource(R.drawable.ic_cross_onboarding_error_24)
+        importCompleteFailedRow.resultRowIcon.setImageResource(CommonR.drawable.ic_cross_recolorable_gray_24)
 
         val initial = state.value
         rendered = initial
