@@ -75,6 +75,9 @@ class DaxContextMenuItemContentDetector : Detector(), SourceCodeScanner {
             "DaxDefaultContextMenuItem",
             "DaxIconContextMenuItem",
             "DaxInsetContextMenuItem",
+            "DaxDefaultItem",
+            "DaxIconItem",
+            "DaxInsetItem",
         )
 
         val INVALID_DAX_CONTEXT_MENU_ITEM_CONTENT_USAGE: Issue = Issue
