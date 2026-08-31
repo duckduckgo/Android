@@ -1026,6 +1026,13 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
+    fun `when a new onboarding run starts then any persisted branch selection is cleared`() = runTest {
+        start()
+
+        verify(onboardingPixelSender).clearBranchSelection()
+    }
+
+    @Test
     fun `when onboarding path then custom ai plan walks to completed`() = runTest {
         whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
         start()

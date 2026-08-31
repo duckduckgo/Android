@@ -124,6 +124,10 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         // Side-effecting (creates the DDG downloads dir, persists reinstall state) and must always run
         ctx.isReinstall = appBuildConfig.isAppReinstall()
 
+        // A restarted run replays from before the branching step, so a branch persisted by a previous
+        // run must not label this run's pre-branch pixels as branched.
+        onboardingPixelSender.clearBranchSelection()
+
         return if (customAiOnboardingResolver.resolve()) {
             // in custom AI onboarding path, the input toggle is enabled by default
             duckChat.setCosmeticInputScreenUserSetting(enabled = true)

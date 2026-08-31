@@ -90,6 +90,13 @@ interface OnboardingPixelSender {
      * attached as the `variant` param to every subsequent onboarding pixel.
      * */
     fun chatBranchSelected()
+
+    /**
+     * Clears any persisted branch selection. Called when a new linear onboarding run starts: a run
+     * restarted after an app kill replays from before the branching step, so a branch persisted by a
+     * previous run must not label this run's pre-branch pixels as branched.
+     */
+    fun clearBranchSelection()
 }
 
 @ContributesBinding(AppScope::class)
@@ -119,6 +126,10 @@ class RealOnboardingPixelSender @Inject constructor(
 
     override fun chatBranchSelected() {
         variantPrefs.edit().putString(PREFS_KEY_VARIANT, PREFS_VARIANT_CHAT).apply()
+    }
+
+    override fun clearBranchSelection() {
+        variantPrefs.edit().remove(PREFS_KEY_VARIANT).apply()
     }
 
     override fun fire(pixelName: OnboardingPixelName, action: OnboardingPixelAction) {
