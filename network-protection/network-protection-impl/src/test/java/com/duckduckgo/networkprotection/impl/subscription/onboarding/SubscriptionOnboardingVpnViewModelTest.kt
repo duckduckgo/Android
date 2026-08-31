@@ -26,7 +26,7 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionSta
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.getDisplayableCountry
 import com.duckduckgo.networkprotection.impl.subscription.onboarding.SubscriptionOnboardingVpnStepPlugin.Companion.VPN_STEP_ID
-import com.duckduckgo.networkprotection.impl.subscription.onboarding.SubscriptionOnboardingVpnViewModel.ActivationError
+import com.duckduckgo.networkprotection.impl.subscription.onboarding.SubscriptionOnboardingVpnViewModel.VPNActivationError
 import com.duckduckgo.networkprotection.impl.subscription.onboarding.SubscriptionOnboardingVpnViewModel.Command
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.COMPLETED
@@ -114,7 +114,7 @@ class SubscriptionOnboardingVpnViewModelTest {
         testee.onVpnPermissionDenied()
 
         testee.viewState().test {
-            assertEquals(ActivationError.PERMISSION_DENIED, awaitItem().activationError)
+            assertEquals(VPNActivationError.PERMISSION_DENIED, awaitItem().vpnActivationError)
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -134,7 +134,7 @@ class SubscriptionOnboardingVpnViewModelTest {
 
         testee.viewState().test {
             val state = awaitItem()
-            assertEquals(ActivationError.FAILED, state.activationError)
+            assertEquals(VPNActivationError.CONNECTION_FAILED, state.vpnActivationError)
             assertFalse(state.activating)
             cancelAndConsumeRemainingEvents()
         }
@@ -158,7 +158,7 @@ class SubscriptionOnboardingVpnViewModelTest {
         verify(networkProtectionState).start()
         testee.viewState().test {
             val state = awaitItem()
-            assertNull(state.activationError)
+            assertNull(state.vpnActivationError)
             assertTrue(state.activating)
             cancelAndConsumeRemainingEvents()
         }
@@ -198,7 +198,7 @@ class SubscriptionOnboardingVpnViewModelTest {
         testee.onPrimaryCtaClicked()
 
         testee.viewState().test {
-            assertTrue(awaitItem().showingInfo)
+            assertTrue(awaitItem().showingVPNInfoBanners)
             cancelAndConsumeRemainingEvents()
         }
         verifyNoInteractions(controller)

@@ -108,7 +108,7 @@
                             android:id="@+id/subscriptionOnboardingVpnIpAddressValue"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            tools:text="@string/subscriptionOnboardingVpnIpAddressValue"
+                            tools:text="31.120.130.50"
                             app:typography="h4"
                             tools:ignore="HardcodedText" />
 
@@ -116,7 +116,7 @@
                             android:id="@+id/subscriptionOnboardingVpnIpAddressLocation"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            tools:text="@string/subscriptionOnboardingVpnIpAddressLocation"
+                            tools:text="🇪🇸 Madrid, Spain"
                             app:textType="secondary"
                             app:typography="caption" />
 
@@ -159,7 +159,7 @@
                             android:id="@+id/subscriptionOnboardingVpnNewIpAddressValue"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            tools:text="@string/subscriptionOnboardingVpnNewIpAddressValue"
+                            tools:text="31.120.130.50"
                             app:typography="h4"
                             tools:ignore="HardcodedText" />
 
@@ -167,7 +167,7 @@
                             android:id="@+id/subscriptionOnboardingVpnNewIpAddressLocation"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            tools:text="@string/subscriptionOnboardingVpnNewIpAddressLocation"
+                            tools:text="🇪🇸 Valencia, Spain (Nearest)"
                             app:textType="secondary"
                             app:typography="caption" />
 

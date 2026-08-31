@@ -21,8 +21,6 @@
     <string name="subscriptionOnboardingVpnHeaderTitle">DuckDuckGo VPN is Off</string>
     <string name="subscriptionOnboardingVpnHeaderText">Connect to secure all of your device\'s internet traffic. <annotation type="learn_more_link">Learn More</annotation></string>
     <string name="subscriptionOnboardingVpnIpAddressTitle">Your IP Address is Visible</string>
-    <string name="subscriptionOnboardingVpnIpAddressValue">31.120.130.50</string>
-    <string name="subscriptionOnboardingVpnIpAddressLocation">🇪🇸 Madrid, Spain</string>
     <string name="subscriptionOnboardingVpnIpAddressInfo">When the VPN is off, sites and apps can see this info and use it to connect your activity across sessions.</string>
     <string name="subscriptionOnboardingVpnBenefitShielding">Shielding your online activity</string>
     <string name="subscriptionOnboardingVpnBenefitLocation">Hiding your location &amp; IP address</string>
@@ -36,8 +34,6 @@
     <string name="subscriptionOnboardingVpnHeaderTextOn">All device internet traffic is being secured through the VPN. <annotation type="learn_more_link">Learn More</annotation></string>
     <string name="subscriptionOnboardingVpnIpAddressTitleOn">Your IP Address is Hidden</string>
     <string name="subscriptionOnboardingVpnNewIpAddressTitle">Your New IP Address</string>
-    <string name="subscriptionOnboardingVpnNewIpAddressValue">31.120.130.50</string>
-    <string name="subscriptionOnboardingVpnNewIpAddressLocation">🇪🇸 Valencia, Spain (Nearest)</string>
 
     <!-- Subscription onboarding - VPN step, activation error state -->
     <string name="subscriptionOnboardingVpnErrorTitle">Unable to Activate DuckDuckGo VPN</string>

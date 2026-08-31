@@ -51,8 +51,8 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.databinding.FragmentSubscriptionOnboardingVpnBinding
-import com.duckduckgo.networkprotection.impl.subscription.onboarding.SubscriptionOnboardingVpnViewModel.ActivationError
 import com.duckduckgo.networkprotection.impl.subscription.onboarding.SubscriptionOnboardingVpnViewModel.Command
+import com.duckduckgo.networkprotection.impl.subscription.onboarding.SubscriptionOnboardingVpnViewModel.VPNActivationError
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingFeature
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionOnboardingFeatureInfoScreen
 import com.google.android.material.progressindicator.CircularProgressIndicatorSpec
@@ -62,17 +62,6 @@ import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 
-/**
- * VPN step of the native subscription onboarding. The screen reflects the real VPN state and lets the user
- * turn the VPN on:
- *  - [ScreenState.VPN_OFF]: the VPN is off; the primary button requests the VPN configuration permission.
- *  - [ScreenState.VPN_ON]: the VPN is on; the primary button advances to the next onboarding step.
- *  - [ScreenState.ACTIVATION_ERROR]: the user declined the system VPN permission dialog; the user can retry
- *    or skip the step.
- *
- * The screen only renders: which of those states is shown, and when the step finishes, is decided by
- * [SubscriptionOnboardingVpnViewModel].
- */
 @InjectWith(FragmentScope::class)
 class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_subscription_onboarding_vpn) {
 
@@ -97,13 +86,10 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
     }
 
     private var vpnOn = false
-
-    // Latches the info page so it is applied once per view lifecycle rather than on every state emission.
     private var showingInfo = false
     private var lastRenderedState: ScreenState? = null
     private var transition: ValueAnimator? = null
 
-    // Indeterminate spinner shown inside the primary button while the VPN is being activated.
     private val buttonSpinner: IndeterminateDrawable<CircularProgressIndicatorSpec> by lazy {
         val density = resources.displayMetrics.density
         val spec = CircularProgressIndicatorSpec(requireContext(), null).apply {
@@ -134,10 +120,6 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
         super.onDestroyView()
     }
 
-    /**
-     * Requests the VPN configuration permission. When it is already granted the VPN starts immediately;
-     * otherwise the system consent dialog is shown and the outcome is handled in [vpnPermissionRequest].
-     */
     private fun enableVpn() {
         val permissionIntent = VpnService.prepare(requireContext())
         if (permissionIntent == null) {
@@ -147,7 +129,6 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
         }
     }
 
-    /** Sets the header copy and wires its "Learn More" annotation to open the VPN feature info screen. */
     private fun setHeaderTextWithLearnMore(@StringRes textResId: Int) {
         binding.subscriptionOnboardingVpnHeaderText.addClickableSpan(
             getText(textResId),
@@ -172,8 +153,8 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
                 state.location?.let { binding.subscriptionOnboardingVpnIpAddressLocation.text = it }
                 state.newIpAddress?.let { binding.subscriptionOnboardingVpnNewIpAddressValue.text = it }
                 state.newLocation?.let { binding.subscriptionOnboardingVpnNewIpAddressLocation.text = it }
-                // The info page takes over the screen once opened, so ignore connection-state re-renders there.
-                if (state.showingInfo) {
+
+                if (state.showingVPNInfoBanners) {
                     if (!showingInfo) showInfoPage()
                 } else {
                     state.toScreenState()?.let(::renderScreenState)
@@ -194,24 +175,19 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
             .launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
-    /** Shows a spinner inside the primary button while the VPN is being activated (between grant and connected). */
     private fun renderActivating(loading: Boolean) {
         binding.subscriptionOnboardingVpnNextButton.icon = if (loading) buttonSpinner else null
     }
 
     private fun SubscriptionOnboardingVpnViewModel.ViewState.toScreenState(): ScreenState? = when {
         vpnEnabled == true -> ScreenState.VPN_ON
-        activationError == ActivationError.PERMISSION_DENIED -> ScreenState.ACTIVATION_ERROR_PERMISSION
-        activationError == ActivationError.FAILED -> ScreenState.ACTIVATION_ERROR_GENERAL
+        vpnActivationError == VPNActivationError.PERMISSION_DENIED -> ScreenState.ACTIVATION_ERROR_PERMISSION
+        vpnActivationError == VPNActivationError.CONNECTION_FAILED -> ScreenState.ACTIVATION_ERROR_GENERAL
         vpnEnabled == false -> ScreenState.VPN_OFF
         else -> null
     }
 
-    /**
-     * The first observed state is rendered without animation; a change to or from the "on" appearance
-     * animates the benefit rows and IP blur (off↔error swaps the header only, so they render instantly).
-     */
-    private fun renderScreenState(state: ScreenState) {
+   private fun renderScreenState(state: ScreenState) {
         if (state == lastRenderedState) return
         val wasOn = lastRenderedState == ScreenState.VPN_ON
         val isOn = state == ScreenState.VPN_ON
@@ -220,7 +196,6 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
         applyState(state, animate)
     }
 
-    /** Renders the "what to know about your VPN" info page (reached from "Next" on the VPN-on screen). */
     private fun showInfoPage() = with(binding) {
         showingInfo = true
         transition?.cancel()
@@ -269,14 +244,12 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
             ScreenState.ACTIVATION_ERROR_GENERAL -> {
                 subscriptionOnboardingVpnHeaderImage.setImageResource(R.drawable.critical_update_feature_128)
                 subscriptionOnboardingVpnHeaderTitle.setText(R.string.subscriptionOnboardingVpnErrorTitle)
-                // General activation failure shows the same error screen without the "allow the configuration" guidance.
                 subscriptionOnboardingVpnHeaderText.gone()
                 subscriptionOnboardingVpnNextButton.setText(R.string.subscriptionOnboardingVpnTryAgain)
                 subscriptionOnboardingVpnSkipButton.show()
             }
         }
 
-        // The IP card and info line follow the on/off appearance (the error state looks like "off").
         if (vpnOn) {
             subscriptionOnboardingVpnIpAddressTitle.setText(R.string.subscriptionOnboardingVpnIpAddressTitleOn)
             subscriptionOnboardingVpnNewIpAddressContainer.show()
@@ -302,11 +275,6 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
         }
     }
 
-    /**
-     * Runs the "off"↔"on" transition on a single [ValueAnimator]. The outgoing rows are dropped instantly
-     * (icons swapped, moved off to the left) and the three incoming rows then slide in together from the left
-     * while the old IP address and location blur in (or out) over the same ~1s.
-     */
     private fun animateBenefitsAndBlur(@DrawableRes benefitIcon: Int, redacted: Boolean) = with(binding) {
         val rows = benefitRows()
         val slide = rows.firstOrNull { it.width > 0 }?.width?.toFloat()
@@ -319,7 +287,6 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
             row.translationX = -slide
         }
 
-        // Below API 31 there is no RenderEffect to animate, so the redaction bar is applied up front.
         if (Build.VERSION.SDK_INT < 31) applyBlurInstant(redacted)
 
         transition = ValueAnimator.ofFloat(0f, 1f).apply {
@@ -394,7 +361,6 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
         )
     }
 
-    /** Fallback for API < 31 where [RenderEffect] is unavailable: hide the text behind a solid redaction bar. */
     private fun TextView.redactWithBar(redacted: Boolean, @AttrRes restoreColorAttr: Int) {
         if (redacted) {
             setBackgroundResource(R.drawable.subscription_onboarding_vpn_ip_redaction)
@@ -405,7 +371,12 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
         }
     }
 
-    private enum class ScreenState { VPN_OFF, VPN_ON, ACTIVATION_ERROR_PERMISSION, ACTIVATION_ERROR_GENERAL }
+    private enum class ScreenState {
+        VPN_OFF,
+        VPN_ON,
+        ACTIVATION_ERROR_PERMISSION,
+        ACTIVATION_ERROR_GENERAL
+    }
 
     companion object {
         private const val TRANSITION_DURATION_MS = 1000L
