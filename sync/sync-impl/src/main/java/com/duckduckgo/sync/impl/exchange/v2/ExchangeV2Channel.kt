@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.flow
 import logcat.LogPriority.ERROR
 import logcat.logcat
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Wraps the BE relay endpoints with envelope encryption/decryption + a polling Flow.
@@ -160,7 +161,7 @@ class RealExchangeV2Channel @Inject constructor(
                     }
                 }
             }
-            delay(POLL_INTERVAL_MS)
+            delay(POLL_INTERVAL)
         }
     }
 
@@ -191,6 +192,6 @@ class RealExchangeV2Channel @Inject constructor(
     }
 
     companion object {
-        private const val POLL_INTERVAL_MS: Long = 1_000L
+        private val POLL_INTERVAL = 1.seconds
     }
 }

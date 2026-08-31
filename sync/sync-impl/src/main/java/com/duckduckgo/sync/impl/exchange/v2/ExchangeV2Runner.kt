@@ -445,8 +445,8 @@ class RealExchangeV2Runner @Inject constructor(
      */
     private fun startSessionTimer() {
         syncTimeoutJob = appScope.launch(dispatchers.io()) {
-            delay(SESSION_TIMEOUT_MS)
-            logcat { "Sync-ExchangeV2: session deadline (${SESSION_TIMEOUT_MS}ms) reached" }
+            delay(SESSION_TIMEOUT)
+            logcat { "Sync-ExchangeV2: session deadline ($SESSION_TIMEOUT) reached" }
             // Capture the phase we were stuck in before failSession() tears the state machine down
             val stage = mutex.withLock { session?.currentState?.toTimeoutStage() }
             failSession("Session timed out", kind = SessionErrorKind.SessionTimeout, timeoutStage = stage)
@@ -1015,7 +1015,7 @@ class RealExchangeV2Runner @Inject constructor(
         private const val EVENT_BUFFER_SIZE = 100
 
         // Transport TD 1214486492252757 §Session Lifecycle: 5-minute client session deadline.
-        private const val SESSION_TIMEOUT_MS = 5 * 60 * 1000L
+        private val SESSION_TIMEOUT = 5.minutes
 
         // Spec 1216906888491126 §"Account join status": 30 seconds, remotely tunable.
         private const val SETTING_JOIN_STATUS_DEADLINE_MS = "joinStatusDeadlineMs"

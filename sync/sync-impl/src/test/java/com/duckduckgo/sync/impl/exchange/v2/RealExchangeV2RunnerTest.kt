@@ -66,6 +66,9 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.util.Base64
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 @RunWith(TestParameterInjector::class)
 class RealExchangeV2RunnerTest {
@@ -713,7 +716,7 @@ class RealExchangeV2RunnerTest {
         runner.startPresent()
         assertSame(ExchangeV2State.Bootstrapped, runner.currentState)
 
-        advanceTimeBy(6 * 60 * 1000L) // past the 5-min session deadline
+        advanceTimeBy(6.minutes) // past the 5-min session deadline
 
         val sessionErrors = runner.events.replayCache.filterIsInstance<ExchangeV2Event.SessionError>()
         val timedOut = sessionErrors.singleOrNull { it.message.contains("timed out", ignoreCase = true) }
@@ -738,7 +741,7 @@ class RealExchangeV2RunnerTest {
         runner.localTrigger(LocalTrigger.JoinerJoinComplete(RecoveryCodeDone.Reason.Success))
         assertNull(runner.currentState)
 
-        advanceTimeBy(6 * 60 * 1000L)
+        advanceTimeBy(6.minutes)
 
         val timedOut = runner.events.replayCache
             .filterIsInstance<ExchangeV2Event.SessionError>()
@@ -755,7 +758,7 @@ class RealExchangeV2RunnerTest {
         runner.reachHostAwaitingStatus()
         assertSame(ExchangeV2State.Host.AwaitingStatus, runner.currentState)
 
-        advanceTimeBy(31_000L)
+        advanceTimeBy(31.seconds)
 
         assertSame(ExchangeV2State.Host.Unknown, runner.currentState)
         verify(channel, never()).deleteChannel(any(), anyOrNull())
@@ -766,7 +769,7 @@ class RealExchangeV2RunnerTest {
         givenHostCanProduceRecoveryCode()
         val runner = newRunner()
         runner.reachHostAwaitingStatus()
-        advanceTimeBy(31_000L)
+        advanceTimeBy(31.seconds)
         assertSame(ExchangeV2State.Host.Unknown, runner.currentState)
 
         runner.deliverIncomingMessage(RecoveryCodeDone.create(RecoveryCodeDone.Reason.Success))
@@ -783,7 +786,7 @@ class RealExchangeV2RunnerTest {
         runner.reachHostAwaitingStatus()
 
         runner.deliverIncomingMessage(RecoveryCodeDone.create(RecoveryCodeDone.Reason.Success))
-        advanceTimeBy(31_000L)
+        advanceTimeBy(31.seconds)
 
         val enteredUnknown = runner.events.replayCache
             .filterIsInstance<ExchangeV2Event.Transition>()
@@ -798,10 +801,10 @@ class RealExchangeV2RunnerTest {
         val runner = newRunner()
         runner.reachHostAwaitingStatus()
 
-        advanceTimeBy(31_000L)
+        advanceTimeBy(31.seconds)
         assertSame(ExchangeV2State.Host.AwaitingStatus, runner.currentState)
 
-        advanceTimeBy(30_000L)
+        advanceTimeBy(30.seconds)
         assertSame(ExchangeV2State.Host.Unknown, runner.currentState)
     }
 
@@ -817,10 +820,10 @@ class RealExchangeV2RunnerTest {
         val runner = newRunner()
         runner.reachHostAwaitingStatus()
 
-        advanceTimeBy(clampedMs - 100L)
+        advanceTimeBy(clampedMs.milliseconds - 100.milliseconds)
         assertSame(ExchangeV2State.Host.AwaitingStatus, runner.currentState)
 
-        advanceTimeBy(200L)
+        advanceTimeBy(200.milliseconds)
         assertSame(ExchangeV2State.Host.Unknown, runner.currentState)
     }
 
@@ -829,10 +832,10 @@ class RealExchangeV2RunnerTest {
         givenHostCanProduceRecoveryCode()
         val runner = newRunner()
         runner.reachHostAwaitingStatus()
-        advanceTimeBy(31_000L)
+        advanceTimeBy(31.seconds)
         assertSame(ExchangeV2State.Host.Unknown, runner.currentState)
 
-        advanceTimeBy(5 * 60 * 1000L)
+        advanceTimeBy(5.minutes)
 
         assertNull(runner.currentState)
         val timedOut = runner.events.replayCache
