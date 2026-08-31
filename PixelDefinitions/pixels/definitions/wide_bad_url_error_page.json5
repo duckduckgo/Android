@@ -1,0 +1,57 @@
+// Wide event pixel for the BAD_URL error page
+{
+    "wide_bad-url-error-page": {
+        "description": "Monitors the lifecycle of a BAD_URL (unresolved host) error page: whether a redirect suggestion was offered, whether the user clicked it, and how the error page was exited. Error pages shown in custom tabs are excluded, so the measured population is regular and fire tabs only.",
+        "owners": ["juandiana"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "widePixelPlatform",
+            "widePixelType",
+            "widePixelSampleRate",
+            "widePixelFeatureStatus",
+            "widePixelAppVersion",
+            "widePixelAppName",
+            "widePixelFormFactor",
+            "widePixelDevMode",
+            "widePixelMetaType",
+            "widePixelMetaVersion",
+            "widePixelIsFirstDailyOccurrence",
+            {
+                "key": "feature.name",
+                "description": "Feature identifier for this wide event",
+                "enum": ["bad-url-error-page"]
+            },
+            {
+                "key": "feature.data.ext.step.redirect_suggested",
+                "description": "Parameter present when a redirect suggestion (Did you mean www.example.com?) was displayed on the error page. Absent when no suggestion was shown.",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.redirect_clicked",
+                "description": "Parameter present when the user tapped the redirect suggestion. Absent when the suggestion was not shown or not clicked.",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.cancel_reason",
+                "description": "Present only when the flow finished with CANCELLED status. recovered_on_refresh: the user refreshed the failed page and it loaded. error_replaced_on_refresh: the user refreshed and the hostname resolved but the page failed another way, replacing this error page with a different one. abandoned: the user navigated back/forward or home, closed the tab, or submitted a new query.",
+                "enum": ["recovered_on_refresh", "abandoned", "error_replaced_on_refresh"]
+            },
+            {
+                "key": "feature.data.ext.failure_reason",
+                "description": "Present only when the flow finished with FAILURE status, i.e. the tapped redirect suggestion hit another BAD_URL error because the suggested hostname did not resolve either.",
+                "enum": ["new_hostname_resolution_failed"]
+            },
+            {
+                "key": "feature.data.ext.last_step",
+                "description": "Furthest step reached when the flow ended. Persisted as each step is recorded, so flows force-completed by the cleanup policy (UNKNOWN status) still carry it. Absent when the error page was exited before any step was recorded.",
+                "enum": ["redirect_suggested", "redirect_clicked"]
+            },
+            {
+                "key": "feature.data.ext.error_page_duration_ms_bucketed",
+                "description": "How long the error page was displayed before it was exited, bucketed. Uses lower end of the bucket; -1 records a negative measured duration (device clock changed mid-flow). Absent when the flow was force-completed by the cleanup policy.",
+                "enum": ["-1", "0", "1000", "2000", "3000", "4000", "5000", "10000", "30000", "60000"]
+            }
+        ]
+    }
+}
