@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.subscriptions.impl.auth2
+package com.duckduckgo.subscriptions.impl.auth
 
 import android.content.Context
 import androidx.work.BackoffPolicy
@@ -29,7 +29,7 @@ import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.AccessTokenResult.Success
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
-import com.duckduckgo.subscriptions.impl.auth2.TokenRefreshWorker.Companion.REFRESH_WORKER_NAME
+import com.duckduckgo.subscriptions.impl.auth.TokenRefreshWorker.Companion.REFRESH_WORKER_NAME
 import com.squareup.anvil.annotations.ContributesBinding
 import java.time.Duration
 import java.util.concurrent.TimeUnit.MINUTES

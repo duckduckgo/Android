@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.subscriptions.impl.auth2
+package com.duckduckgo.subscriptions.impl.auth
 
 import com.squareup.moshi.Json
 import okhttp3.ResponseBody
@@ -81,4 +81,8 @@ data class StoreLoginBody(
     @field:Json(name = "source") val source: String,
     @field:Json(name = "google_signed_data") val googleSignedData: String,
     @field:Json(name = "google_package_name") val googlePackageName: String,
+)
+
+data class ResponseError(
+    val error: String,
 )
