@@ -343,11 +343,11 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
         val slide = rows.firstOrNull { it.width > 0 }?.width?.toFloat()
             ?: resources.displayMetrics.widthPixels.toFloat()
         var cancelled = false
+        var swapped = false
 
-        setBenefitIcons(benefitIcon)
         rows.forEach { row ->
-            row.alpha = 0f
-            row.translationX = -slide
+            row.alpha = 1f
+            row.translationX = 0f
         }
 
         if (Build.VERSION.SDK_INT < 31) applyBlurInstant(redacted)
@@ -361,9 +361,22 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
                     subscriptionOnboardingVpnIpAddressValue.blur(radius)
                     subscriptionOnboardingVpnIpAddressLocation.blur(radius)
                 }
-                rows.forEach { row ->
-                    row.alpha = fraction
-                    row.translationX = -slide * (1f - fraction)
+                if (fraction < CROSS_SLIDE_MIDPOINT) {
+                    val exit = fraction / CROSS_SLIDE_MIDPOINT
+                    rows.forEach { row ->
+                        row.alpha = 1f - exit
+                        row.translationX = -slide * exit
+                    }
+                } else {
+                    if (!swapped) {
+                        setBenefitIcons(benefitIcon)
+                        swapped = true
+                    }
+                    val enter = (fraction - CROSS_SLIDE_MIDPOINT) / (1f - CROSS_SLIDE_MIDPOINT)
+                    rows.forEach { row ->
+                        row.alpha = enter
+                        row.translationX = slide * (1f - enter)
+                    }
                 }
             }
             addListener(object : AnimatorListenerAdapter() {
@@ -373,6 +386,7 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
 
                 override fun onAnimationEnd(animation: Animator) {
                     if (cancelled) return
+                    if (!swapped) setBenefitIcons(benefitIcon)
                     rows.forEach { row ->
                         row.alpha = 1f
                         row.translationX = 0f
@@ -447,5 +461,6 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
         private const val BUTTON_SPINNER_SIZE_DP = 20
         private const val BUTTON_SPINNER_THICKNESS_DP = 2
         private const val CONNECTED_LOOP_START = 0.35f
+        private const val CROSS_SLIDE_MIDPOINT = 0.5f
     }
 }
