@@ -61,7 +61,7 @@ sealed class OnboardingBackgroundStep(
         maxHeightDp = 216,
     )
     data object ImportPasswords : OnboardingBackgroundStep(
-        backgroundRes = R.drawable.onboarding_import_passwords_background,
+        backgroundRes = R.drawable.onboarding_island_with_horizon,
         maxHeightDp = 272,
     )
     data object AddressBar : OnboardingBackgroundStep(

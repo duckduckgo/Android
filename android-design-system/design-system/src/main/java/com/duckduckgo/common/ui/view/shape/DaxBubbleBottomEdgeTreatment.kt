@@ -37,8 +37,11 @@ open class DaxBubbleBottomEdgeTreatment(
     /**
      * The tail is asymmetric — it hooks towards one side — so a card whose artwork sits on the opposite side
      * needs the shape reflected rather than just repositioned.
+     *
+     * 0 is the default hook direction and 1 is fully reflected. Intermediate values morph between the two so
+     * the reflection can be animated
      */
-    var mirrored: Boolean = false
+    var mirrorFraction: Float = 0f
 
     override fun getEdgePath(
         length: Float,
@@ -52,7 +55,8 @@ open class DaxBubbleBottomEdgeTreatment(
 
         shapePath.lineTo(arrowStart, 0f)
 
-        (if (mirrored) MIRRORED_TAIL else TAIL).forEach { curve ->
+        TAIL.indices.forEach { index ->
+            val curve = tailCurveAt(index)
             shapePath.cubicToPoint(
                 arrowStart + curve.control1X * scaleFactor,
                 curve.control1Y * scaleFactor,
@@ -65,6 +69,23 @@ open class DaxBubbleBottomEdgeTreatment(
 
         shapePath.lineTo(arrowStart + arrowWidth, 0f)
     }
+
+    private fun tailCurveAt(index: Int): Curve {
+        val plain = TAIL[index]
+        if (mirrorFraction <= 0f) return plain
+        val mirrored = MIRRORED_TAIL[index]
+        if (mirrorFraction >= 1f) return mirrored
+        return Curve(
+            control1X = lerp(plain.control1X, mirrored.control1X),
+            control1Y = lerp(plain.control1Y, mirrored.control1Y),
+            control2X = lerp(plain.control2X, mirrored.control2X),
+            control2Y = lerp(plain.control2Y, mirrored.control2Y),
+            endX = lerp(plain.endX, mirrored.endX),
+            endY = lerp(plain.endY, mirrored.endY),
+        )
+    }
+
+    private fun lerp(from: Float, to: Float): Float = from + (to - from) * mirrorFraction
 
     /** One cubic of the tail outline, in unscaled dp relative to the tail's leading edge. */
     private class Curve(

@@ -18,7 +18,6 @@ package com.duckduckgo.common.ui.view.shape
 
 import com.google.android.material.shape.ShapePath
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import kotlin.math.abs
@@ -99,13 +98,13 @@ class DaxBubbleBottomEdgeTreatmentTest {
     @Test
     fun `mirroring is off by default`() {
         val treatment = DaxBubbleBottomEdgeTreatment(heightPx = 100)
-        assertFalse(treatment.mirrored)
+        assertEquals(0f, treatment.mirrorFraction, 0.0001f)
     }
 
     @Test
     fun `mirroring reflects every tail coordinate about the centre`() {
-        val plain = tailOf(mirrored = false)
-        val mirrored = tailOf(mirrored = true)
+        val plain = tailOf(mirrorFraction = 0f)
+        val mirrored = tailOf(mirrorFraction = 1f)
 
         assertEquals(plain.size, mirrored.size)
         val reflected = plain.map { (x, y) -> (2 * CENTER - x) to y }.sortedBy { it.first }
@@ -117,11 +116,22 @@ class DaxBubbleBottomEdgeTreatmentTest {
 
     @Test
     fun `mirroring moves the tail hook to the other side of the centre`() {
-        val plainHook = tailOf(mirrored = false).minByOrNull { it.second }!!.first
-        val mirroredHook = tailOf(mirrored = true).minByOrNull { it.second }!!.first
+        val plainHook = tailOf(mirrorFraction = 0f).minByOrNull { it.second }!!.first
+        val mirroredHook = tailOf(mirrorFraction = 1f).minByOrNull { it.second }!!.first
 
         assertTrue("Expected the plain hook past the centre, got $plainHook", plainHook > CENTER)
         assertTrue("Expected the mirrored hook before the centre, got $mirroredHook", mirroredHook < CENTER)
+    }
+
+    @Test
+    fun `a half mirror fraction produces a tail that is symmetric about the centre`() {
+        val halfway = tailOf(mirrorFraction = 0.5f)
+
+        val reflected = halfway.map { (x, y) -> (2 * CENTER - x) to y }.sortedBy { it.first }
+        halfway.sortedBy { it.first }.zip(reflected).forEach { (actual, expected) ->
+            assertEquals(expected.first, actual.first, 0.01f)
+            assertEquals(expected.second, actual.second, 0.01f)
+        }
     }
 
     @Test
@@ -142,9 +152,9 @@ class DaxBubbleBottomEdgeTreatmentTest {
         }
     }
 
-    private fun tailOf(mirrored: Boolean): List<Pair<Float, Float>> {
+    private fun tailOf(mirrorFraction: Float): List<Pair<Float, Float>> {
         val path = RecordingShapePath()
-        DaxBubbleBottomEdgeTreatment(heightPx = 100).apply { this.mirrored = mirrored }
+        DaxBubbleBottomEdgeTreatment(heightPx = 100).apply { this.mirrorFraction = mirrorFraction }
             .getEdgePath(length = 400f, center = CENTER, interpolation = 1f, shapePath = path)
         // Distinct because the closing lineTo repeats the last curve's end point, and mirroring moves that
         // duplicate to the opposite end of the tail.

@@ -29,52 +29,63 @@ interface CardArrowController {
 }
 
 /**
- * Owns the card's bubble arrow: whether it shows, and where along the card's edge it sits. The position only
- * animates across a transition that actually moves it; every other render snaps it.
+ * Owns the card's bubble arrow: whether it shows, where along the card's edge it sits, and which way its tail
+ * hooks. Either property only animates across a transition that actually changes it; every other render snaps
+ * it. When a transition changes both, one animator drives them so the tail travels and reflects as a single
+ * gesture instead of the reflection popping before the slide.
  */
 class CardArrowControllerImpl(
     private val cardView: DaxOnboardingBubbleBrandDesignUpdateCardView,
 ) : CardArrowController {
 
-    private var slide: ValueAnimator? = null
+    private var transition: ValueAnimator? = null
 
     override fun apply(
         previous: CardArrowConfig?,
         next: CardArrowConfig,
         animate: Boolean,
     ) {
-        slide?.cancel()
-        slide = null
+        transition?.cancel()
+        transition = null
 
         cardView.setShowArrow(next != CardArrowConfig.Hidden)
         cardView.setArrowAnimationTarget(ARROW_TARGET_OFFSET_END_DP.toPx().toFloat())
 
-        cardView.setArrowMirrored(next.mirrored)
+        val positionTarget = if (next.atEnd) 1f else 0f
+        val mirrorTarget = if (next.mirrored) 1f else 0f
 
-        val target = if (next.atEnd) 1f else 0f
-        val moves = previous != null && previous.atEnd != next.atEnd &&
-            previous != CardArrowConfig.Hidden && next != CardArrowConfig.Hidden
-        if (animate && moves) {
-            slide = ValueAnimator.ofFloat(1f - target, target).apply {
+        val from = previous?.takeIf { it != CardArrowConfig.Hidden && next != CardArrowConfig.Hidden }
+        val moves = animate && from != null && from.atEnd != next.atEnd
+        val flips = animate && from != null && from.mirrored != next.mirrored
+
+        if (!moves) cardView.setArrowAnimationFraction(positionTarget)
+        if (!flips) cardView.setArrowMirrorFraction(mirrorTarget)
+
+        if (moves || flips) {
+            transition = ValueAnimator.ofFloat(0f, 1f).apply {
                 duration = SLIDE_DURATION_MS
                 interpolator = FastOutSlowInInterpolator()
-                addUpdateListener { cardView.setArrowAnimationFraction(it.animatedValue as Float) }
+                addUpdateListener {
+                    val progress = it.animatedValue as Float
+                    if (moves) cardView.setArrowAnimationFraction(lerp(1f - positionTarget, positionTarget, progress))
+                    if (flips) cardView.setArrowMirrorFraction(lerp(1f - mirrorTarget, mirrorTarget, progress))
+                }
                 start()
             }
-        } else {
-            cardView.setArrowAnimationFraction(target)
         }
     }
 
     override fun skipRunning() {
-        slide?.end()
-        slide = null
+        transition?.end()
+        transition = null
     }
 
     override fun release() {
-        slide?.cancel()
-        slide = null
+        transition?.cancel()
+        transition = null
     }
+
+    private fun lerp(from: Float, to: Float, fraction: Float): Float = from + (to - from) * fraction
 
     private companion object {
         const val ARROW_TARGET_OFFSET_END_DP = 80
