@@ -244,7 +244,7 @@ class DialogConfigResolver @Inject constructor(
         )
 
         NewUserOnboardingActivityDialog.ImportPasswords -> DialogConfig(
-            background = OnboardingBackgroundStep.ImportPasswords,
+            background = OnboardingBackgroundStep.IslandWithHorizon,
             embellishment = Embellishment.RightWing,
             cardArrow = CardArrowConfig.AtStartMirrored,
             content = ContentConfig.ImportPasswords(
@@ -262,7 +262,7 @@ class DialogConfigResolver @Inject constructor(
         )
 
         NewUserOnboardingActivityDialog.ImportComplete -> DialogConfig(
-            background = OnboardingBackgroundStep.ImportPasswords,
+            background = OnboardingBackgroundStep.IslandWithHorizon,
             embellishment = Embellishment.RightWing,
             cardArrow = CardArrowConfig.AtStartMirrored,
             content = ContentConfig.ImportComplete(
