@@ -59,7 +59,7 @@ class DesktopAppPromotionViewModel @AssistedInject constructor(
 
     fun onShareClicked() {
         viewModelScope.launch(dispatchers.io()) {
-            fire(pixels.shareClicked)
+            fire(pixels.shareClicked ?: PixelFireSpec(DesktopAppPromotionPixels.SHARE_DOWNLOAD_LINK_CLICK))
             _commands.send(
                 Command.ShareLink(
                     shareText = content.shareIntentBody ?: content.downloadUrl,
@@ -74,7 +74,7 @@ class DesktopAppPromotionViewModel @AssistedInject constructor(
             if (!clipboardInteractor.copyToClipboard(content.downloadUrl, isSensitive = false)) {
                 _commands.send(Command.ShowCopiedNotification)
             }
-            fire(pixels.linkClicked)
+            fire(pixels.linkClicked ?: PixelFireSpec(DesktopAppPromotionPixels.LINK_CLICK))
             interactionDispatcher.dispatch(handlerId, Interaction.LINK_COPIED)
         }
     }

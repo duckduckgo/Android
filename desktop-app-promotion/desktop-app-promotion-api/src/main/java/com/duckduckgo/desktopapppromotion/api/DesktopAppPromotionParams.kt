@@ -85,25 +85,37 @@ data class DesktopAppPromotionParams(
 ) : GlobalActivityStarter.ActivityParams
 
 /**
- * Per-interaction pixel configuration. Each field is independently nullable: `null` means "this
- * caller doesn't track this interaction" and the screen fires nothing for it. There is no
- * default/fallback pixel — callers keep firing their own already-reviewed pixel names, and this
- * module never invents its own pixel taxonomy.
+ * Per-interaction pixel configuration. Each field is independently nullable, but `null` means
+ * different things for different interactions:
+ *
+ * - [shareClicked] and [linkClicked] fall back to the screen's own default pixels (parameterless,
+ *   owned by the implementation module). Every consumer tracks these two interactions, and the
+ *   defaults keep them tracked for deeplink launches, which cannot supply params.
+ * - [impression] and [dismissed] fire nothing when `null` — only callers that track them supply a
+ *   spec, and a deeplink launch has no card impression or persisted dismissal of its own.
+ *
+ * A caller that supplies a spec always overrides the default for that interaction.
  */
 data class PixelConfig(
 
-    /** Fired once, when the screen is first shown. Not re-fired on rotation or recreation. */
+    /**
+     * Fired once, when the screen is first shown. Not re-fired on rotation or recreation.
+     * `null` fires nothing.
+     */
     val impression: PixelFireSpec? = null,
 
-    /** Fired when the user taps the share button. */
+    /** Fired when the user taps the share button. `null` fires the screen's default pixel. */
     val shareClicked: PixelFireSpec? = null,
 
-    /** Fired when the user taps the on-screen URL to copy it to the clipboard. */
+    /**
+     * Fired when the user taps the on-screen URL to copy it to the clipboard. `null` fires the
+     * screen's default pixel.
+     */
     val linkClicked: PixelFireSpec? = null,
 
     /**
      * Fired when the user taps the dismiss button. Only reachable when
-     * [DesktopAppPromotionParams.showDismissButton] is `true`.
+     * [DesktopAppPromotionParams.showDismissButton] is `true`. `null` fires nothing.
      */
     val dismissed: PixelFireSpec? = null,
 ) : Serializable

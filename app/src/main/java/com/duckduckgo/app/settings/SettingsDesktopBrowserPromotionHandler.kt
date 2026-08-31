@@ -55,9 +55,10 @@ class SettingsDesktopBrowserPromotionHandler @Inject constructor(
 }
 
 /**
- * The promo screen's default copy is this screen's copy, so Settings supplies only the parts that are
- * genuinely its own: the attributed URL, whether the dismiss button is offered, its pixels, and the
- * handler that persists the dismissal.
+ * The promo screen's default copy is this screen's copy, and its default share/link-copy pixels are
+ * the ones Settings always fired, so Settings supplies only the parts that are genuinely its own:
+ * the attributed URL, whether the dismiss button is offered, the dismissal pixel, and the handler
+ * that persists the dismissal.
  */
 object SettingsDesktopBrowserPromotionParams {
 
@@ -65,8 +66,6 @@ object SettingsDesktopBrowserPromotionParams {
         downloadUrl = DOWNLOAD_URL,
         showDismissButton = true,
         pixels = PixelConfig(
-            shareClicked = PixelFireSpec(AppPixelName.GET_DESKTOP_BROWSER_SHARE_DOWNLOAD_LINK_CLICK.pixelName),
-            linkClicked = PixelFireSpec(AppPixelName.GET_DESKTOP_BROWSER_LINK_CLICK.pixelName),
             dismissed = PixelFireSpec(
                 AppPixelName.GET_DESKTOP_BROWSER_DISMISSED.pixelName,
                 hashMapOf(GET_DESKTOP_BROWSER_SOURCE_PIXEL_PARAM to SOURCE_NO_THANKS),
@@ -78,10 +77,6 @@ object SettingsDesktopBrowserPromotionParams {
     fun forSettingsListItem(): DesktopAppPromotionParams = DesktopAppPromotionParams(
         downloadUrl = DOWNLOAD_URL,
         showDismissButton = false,
-        pixels = PixelConfig(
-            shareClicked = PixelFireSpec(AppPixelName.GET_DESKTOP_BROWSER_SHARE_DOWNLOAD_LINK_CLICK.pixelName),
-            linkClicked = PixelFireSpec(AppPixelName.GET_DESKTOP_BROWSER_LINK_CLICK.pixelName),
-        ),
         handlerId = SettingsDesktopBrowserPromotionHandler.HANDLER_ID,
     )
 

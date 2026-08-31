@@ -46,13 +46,14 @@ class SettingsDesktopBrowserPromotionParamsTest {
     }
 
     @Test
-    fun whenLaunchedFromEitherEntryPointThenShareAndLinkPixelsAreUnchanged() {
+    fun whenLaunchedFromEitherEntryPointThenShareAndLinkPixelsAreLeftToTheScreenDefaults() {
+        // The screen's default share/link-copy pixels are the wire names Settings always fired.
         listOf(
             SettingsDesktopBrowserPromotionParams.forCompleteSetupCard(),
             SettingsDesktopBrowserPromotionParams.forSettingsListItem(),
         ).forEach { params ->
-            assertEquals("m_get_desktop_browser_share_download_link_click", params.pixels.shareClicked?.pixelName)
-            assertEquals("m_get_desktop_browser_link_click", params.pixels.linkClicked?.pixelName)
+            assertNull(params.pixels.shareClicked)
+            assertNull(params.pixels.linkClicked)
         }
     }
 

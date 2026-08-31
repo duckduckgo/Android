@@ -177,12 +177,28 @@ class DesktopAppPromotionViewModelTest {
     }
 
     @Test
-    fun whenSpecsAbsentThenNoPixelIsFiredForAnyInteraction() = runTest {
-        whenever(clipboardInteractorMock.copyToClipboard(any(), any())).thenReturn(true)
+    fun whenShareSpecAbsentThenTheScreenDefaultSharePixelFiresWithoutParams() = runTest {
         val testee = createViewModel()
 
         testee.onShareClicked()
+
+        verify(pixelMock).fire(eq("m_get_desktop_browser_share_download_link_click"), eq(hashMapOf()), any(), any())
+    }
+
+    @Test
+    fun whenLinkSpecAbsentThenTheScreenDefaultLinkPixelFiresWithoutParams() = runTest {
+        whenever(clipboardInteractorMock.copyToClipboard(any(), any())).thenReturn(true)
+        val testee = createViewModel()
+
         testee.onLinkClicked()
+
+        verify(pixelMock).fire(eq("m_get_desktop_browser_link_click"), eq(hashMapOf()), any(), any())
+    }
+
+    @Test
+    fun whenImpressionAndDismissSpecsAbsentThenNoPixelIsFiredForThem() = runTest {
+        val testee = createViewModel()
+
         testee.onDismissClicked()
 
         verify(pixelMock, never()).fire(any<String>(), any(), any(), any())
