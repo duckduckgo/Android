@@ -70,6 +70,7 @@ import com.duckduckgo.common.ui.tabs.SwipingTabsFeature
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
@@ -397,6 +398,30 @@ class TabSwitcherViewModelTest {
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_SWITCH_TABS, mapOf(Pixel.PixelParameter.BROWSER_MODE to "regular"))
         assertEquals(Command.Close, commandCaptor.lastValue)
+    }
+
+    @Test
+    fun whenExistingDuckAiTabSelectedThenEntryPointReported() = runTest {
+        val duckAiUrl = "https://duck.ai/chat"
+        tabList = listOf(TabEntity("duckai1", url = duckAiUrl, position = 1))
+        whenever(duckChatMock.isDuckChatUrl(any())).thenReturn(true)
+        initializeMockTabEntitesData()
+        initializeViewModel()
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            testee.viewState.collect()
+        }
+        advanceUntilIdle()
+
+        testee.onTabSelected("duckai1")
+
+        verify(duckChatMock).reportDuckChatEntry(DuckChatEntryPoint.TAB_SWITCHER_EXISTING_CHAT, opensNewTab = false, hasPrompt = false)
+    }
+
+    @Test
+    fun whenExistingRegularTabSelectedThenEntryPointNotReported() = runTest {
+        testee.onTabSelected("abc")
+
+        verify(duckChatMock, never()).reportDuckChatEntry(any(), any(), any())
     }
 
     @Test
