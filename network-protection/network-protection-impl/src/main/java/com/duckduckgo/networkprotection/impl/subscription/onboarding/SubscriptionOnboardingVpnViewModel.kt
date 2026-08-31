@@ -69,6 +69,7 @@ class SubscriptionOnboardingVpnViewModel @Inject constructor(
     val commands: Flow<Command> = _commands.receiveAsFlow()
 
     private val activationTimeoutJob = ConflatedJob()
+    private var hasConnected = false
 
     init {
         viewModelScope.launch(dispatcherProvider.io()) {
@@ -93,6 +94,7 @@ class SubscriptionOnboardingVpnViewModel @Inject constructor(
             .onEach { connectionState ->
                 when (connectionState) {
                     CONNECTED -> {
+                        hasConnected = true
                         val server = wgTunnelConfig.getWgConfig()?.asServerDetails()
                         viewState.update {
                             it.copy(
@@ -104,20 +106,24 @@ class SubscriptionOnboardingVpnViewModel @Inject constructor(
                             )
                         }
                     }
-                    CONNECTING -> viewState.update {
-                        it.copy(
-                            vpnEnabled = false,
-                            activating = true,
-                            vpnActivationError = null,
-                        )
+                    CONNECTING -> if (!hasConnected) {
+                        viewState.update {
+                            it.copy(
+                                vpnEnabled = false,
+                                activating = true,
+                                vpnActivationError = null,
+                            )
+                        }
                     }
-                    DISCONNECTED -> viewState.update {
-                        // Falling back to disconnected while activation was in progress means the VPN failed to start.
-                        it.copy(
-                            vpnEnabled = false,
-                            activating = false,
-                            vpnActivationError = if (it.activating) VPNActivationError.CONNECTION_FAILED else it.vpnActivationError,
-                        )
+                    DISCONNECTED -> if (!hasConnected) {
+                        viewState.update {
+                            // Falling back to disconnected while activation was in progress means the VPN failed to start.
+                            it.copy(
+                                vpnEnabled = false,
+                                activating = false,
+                                vpnActivationError = if (it.activating) VPNActivationError.CONNECTION_FAILED else it.vpnActivationError,
+                            )
+                        }
                     }
                 }
             }

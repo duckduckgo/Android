@@ -86,6 +86,29 @@ class SubscriptionOnboardingVpnViewModelTest {
     }
 
     @Test
+    fun whenVpnReconnectsAfterConnectedThenStaysOnSuccessAndNoError() = runTest {
+        // Once connected, later CONNECTING/DISCONNECTED churn must not rewind the screen or invent a failure.
+        val networkProtectionState = mock<NetworkProtectionState>().apply {
+            whenever(getConnectionStateFlow()).thenReturn(flowOf(CONNECTED, CONNECTING, DISCONNECTED))
+        }
+        val testee = SubscriptionOnboardingVpnViewModel(
+            controller,
+            FakeConnectionService(ConnectionInfo(ip = "137.220.87.36", city = "Birmingham", country = "GB")),
+            networkProtectionState,
+            mock<WgTunnelConfig>(),
+            coroutineRule.testDispatcherProvider,
+        )
+
+        testee.viewState().test {
+            val state = awaitItem()
+            assertTrue(state.vpnEnabled == true)
+            assertFalse(state.activating)
+            assertNull(state.vpnActivationError)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenVpnDisconnectedThenVpnEnabledIsFalse() = runTest {
         val testee = createViewModel(connectionState = DISCONNECTED)
 
