@@ -26,7 +26,7 @@ import javax.inject.Inject
 interface AdBlockingSettingsRepository {
 
     fun isEnabledFlow(): Flow<Boolean?>
-    fun hasPixelConsentFlow(): Flow<Boolean>
+    fun hasPixelConsentFlow(): Flow<Boolean?>
 
     suspend fun setEnabled(enabled: Boolean, withPixelConsent: Boolean = true)
 }
@@ -39,7 +39,7 @@ class RealAdBlockingSettingsRepository @Inject constructor(
 
     override fun isEnabledFlow(): Flow<Boolean?> = userPreferences.isEnabledFlow()
 
-    override fun hasPixelConsentFlow(): Flow<Boolean> = userPreferences.hasPixelConsentFlow()
+    override fun hasPixelConsentFlow(): Flow<Boolean?> = userPreferences.hasPixelConsentFlow()
 
     override suspend fun setEnabled(enabled: Boolean, withPixelConsent: Boolean) {
         userPreferences.setEnabled(enabled, withPixelConsent)

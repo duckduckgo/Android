@@ -73,10 +73,10 @@ class RealAdBlockingStatusCheckerTest {
     }
 
     private val userEnabledFlow = MutableStateFlow<Boolean?>(true)
-    private val pixelConsentFlow = MutableStateFlow(true)
+    private val pixelConsentFlow = MutableStateFlow<Boolean?>(null)
     private val settingsRepository: AdBlockingSettingsRepository = object : AdBlockingSettingsRepository {
         override fun isEnabledFlow(): Flow<Boolean?> = userEnabledFlow
-        override fun hasPixelConsentFlow(): Flow<Boolean> = pixelConsentFlow
+        override fun hasPixelConsentFlow(): Flow<Boolean?> = pixelConsentFlow
         override suspend fun setEnabled(enabled: Boolean, withPixelConsent: Boolean) {
             userEnabledFlow.value = enabled
             pixelConsentFlow.value = withPixelConsent
@@ -341,13 +341,21 @@ class RealAdBlockingStatusCheckerTest {
     fun whenUpstreamHasNotEmittedYetThenCurrentStateIsUninitialized() {
         val pendingRepository = object : AdBlockingSettingsRepository {
             override fun isEnabledFlow(): Flow<Boolean?> = emptyFlow()
-            override fun hasPixelConsentFlow(): Flow<Boolean> = MutableStateFlow(true)
+            override fun hasPixelConsentFlow(): Flow<Boolean?> = MutableStateFlow(null)
             override suspend fun setEnabled(enabled: Boolean, withPixelConsent: Boolean) = Unit
         }
 
         val checker = RealAdBlockingStatusChecker(feature, pendingRepository, sessionStore, testScope)
 
         assertEquals(AdBlockingState.Uninitialized, checker.currentState())
+    }
+
+    @Test
+    fun whenEnabledBeforeConsentWasTrackedThenObserveStateEmitsWithPixelConsent() = runTest {
+        userEnabledFlow.value = true
+        pixelConsentFlow.value = null
+
+        assertEquals(AdBlockingState.Enabled.WithPixelConsent, checker.observeState().first())
     }
 
     @Test

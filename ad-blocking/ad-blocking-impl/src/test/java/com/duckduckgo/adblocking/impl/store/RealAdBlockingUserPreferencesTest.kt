@@ -30,7 +30,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -54,9 +53,9 @@ class RealAdBlockingUserPreferencesTest {
     private val testee = RealAdBlockingUserPreferences(testDataStore)
 
     @Test
-    fun whenNothingStoredThenNoUserSettingAndPixelConsentIsAssumed() = runTest {
+    fun whenNothingStoredThenNeitherUserSettingNorPixelConsentIsRecorded() = runTest {
         assertNull(testee.isEnabled())
-        assertTrue(testee.hasPixelConsentFlow().first())
+        assertNull(testee.hasPixelConsentFlow().first())
     }
 
     @Test
@@ -64,7 +63,7 @@ class RealAdBlockingUserPreferencesTest {
         testee.setEnabled(enabled = true, withPixelConsent = false)
 
         assertTrue(testee.isEnabled()!!)
-        assertFalse(testee.hasPixelConsentFlow().first())
+        assertEquals(false, testee.hasPixelConsentFlow().first())
     }
 
     @Test
@@ -72,11 +71,11 @@ class RealAdBlockingUserPreferencesTest {
         combine(testee.isEnabledFlow(), testee.hasPixelConsentFlow(), ::Pair)
             .distinctUntilChanged()
             .test {
-                assertEquals(null to true, awaitItem())
+                assertEquals(null to null, awaitItem())
 
                 testee.setEnabled(enabled = true, withPixelConsent = false)
 
-                // write needs to be a single emission. If it wasn't, (true, true) or (null, false) would surface here
+                // write needs to be a single emission. If it wasn't, (true, null) or (null, false) would surface here
                 assertEquals(true to false, awaitItem())
                 cancelAndIgnoreRemainingEvents()
             }
