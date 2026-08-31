@@ -17,6 +17,7 @@
 package com.duckduckgo.sync.impl.exchange.v2
 
 import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.Bye
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeDone
 import com.google.testing.junit.testparameterinjector.TestParameter
 import com.google.testing.junit.testparameterinjector.TestParameterInjector
@@ -104,6 +105,46 @@ class JsonExchangeV2MessageParserTest {
         val parsed = parser.parse(json) as RecoveryCodeDone
 
         assertEquals(case.expectedReason, parsed.reason)
+    }
+
+    enum class ByeCase(
+        val rawReason: String,
+        val expectedReason: Bye.Reason,
+    ) {
+        Done(
+            rawReason = "done",
+            expectedReason = Bye.Reason.Done,
+        ),
+        Cancelled(
+            rawReason = "cancelled",
+            expectedReason = Bye.Reason.Cancelled,
+        ),
+        Error(
+            rawReason = "error",
+            expectedReason = Bye.Reason.Error,
+        ),
+        Unknown(
+            rawReason = "future_reason",
+            expectedReason = Bye.Reason.Unknown("future_reason"),
+        ),
+    }
+
+    @Test
+    fun `parses bye with reason`(
+        @TestParameter case: ByeCase,
+    ) {
+        val json = """{"type":"bye","reason":"${case.rawReason}"}"""
+
+        val parsed = parser.parse(json) as Bye
+
+        assertEquals(case.expectedReason, parsed.reason)
+        assertEquals(json, parsed.rawJson)
+    }
+
+    @Test fun `bye without a reason still parses as Bye`() {
+        // An unrecognised or absent reason must not abort the parse (spec 1216906886019334 §Unknown reason values).
+        val parsed = parser.parse("""{"type":"bye"}""") as Bye
+        assertEquals(Bye.Reason.Unknown(""), parsed.reason)
     }
 
     @Test fun `parses bodyless types awaiting_confirmation confirmed denied unavailable`() {

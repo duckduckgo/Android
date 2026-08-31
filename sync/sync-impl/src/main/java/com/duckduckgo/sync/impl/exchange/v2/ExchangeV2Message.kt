@@ -51,6 +51,8 @@ sealed interface ExchangeV2Message {
     /**
      * Sent by the Scanner to the Presenter's relay channel to open the session.
      *
+     * Since 2.0.
+     *
      * @param channelId Scanner's own relay channel ID — the Presenter learns this here and uses
      *  it as the address for replies.
      * @param publicKey Scanner's session public key (base64url-encoded SPKI DER); used to
@@ -109,6 +111,8 @@ sealed interface ExchangeV2Message {
     /**
      * Sent by either device during negotiation to declare it has a sync account.
      *
+     * Since 2.0.
+     *
      * @param userId Identifies the sender's account. If both sides send the same [userId] the
      *  session must be aborted — the devices are already on the same account.
      * @param name Human-readable device name shown to the peer.
@@ -166,6 +170,8 @@ sealed interface ExchangeV2Message {
      * Sent by either device during negotiation to declare it has no sync account. No user_id
      * accompanies it.
      *
+     * Since 2.0.
+     *
      * @param name Human-readable device name shown to the peer.
      * @param kind Device kind, "ddg" or "3party"; drives cross-kind role election.
      */
@@ -211,6 +217,8 @@ sealed interface ExchangeV2Message {
      *
      * The Joiner already confirmed locally before entering the message loop, so no action is
      * required. A UI may use it to show a hint such as "Check the other device".
+     *
+     * Since 2.0.
      */
     data class RecoveryCodeAwaitingConfirmation(
         override val rawJson: String,
@@ -232,6 +240,8 @@ sealed interface ExchangeV2Message {
      *
      * The Joiner must accept [RecoveryCodeResponse] regardless of whether this message was seen
      * first.
+     *
+     * Since 2.0.
      */
     data class RecoveryCodeConfirmed(
         override val rawJson: String,
@@ -251,6 +261,8 @@ sealed interface ExchangeV2Message {
     /**
      * Sent by the Host when its user declined to share the recovery code. The Joiner must abort the
      * session on receiving this.
+     *
+     * Since 2.0.
      */
     data class RecoveryCodeDenied(
         override val rawJson: String,
@@ -270,6 +282,8 @@ sealed interface ExchangeV2Message {
     /**
      * Sent by the Host when it cannot supply a recovery code (e.g. no account exists and creation
      * failed). The Joiner must abort the session on receiving this.
+     *
+     * Since 2.0.
      */
     data class RecoveryCodeUnavailable(
         override val rawJson: String,
@@ -289,6 +303,8 @@ sealed interface ExchangeV2Message {
     /**
      * Sent by the Host carrying the actual recovery code. Terminal message of a successful pairing
      * exchange.
+     *
+     * Since 2.0.
      *
      * @param recoveryCode base64url-encoded recovery code payload.
      */
@@ -321,6 +337,8 @@ sealed interface ExchangeV2Message {
     /**
      * Sent by the Joiner once it has finished using the recovery code, carrying the real outcome so
      * the Host can show it instead of assuming success. Only valid after `recovery_code_response`.
+     *
+     * Since 2.1.
      */
     data class RecoveryCodeDone(
         override val rawJson: String,
@@ -380,10 +398,76 @@ sealed interface ExchangeV2Message {
     }
 
     /**
+     * Sent by either peer as the last message it writes before leaving the exchange, so the other
+     * side doesn't sit waiting on a device that has gone.
+     *
+     * Never an instruction to stop: a Host may send `bye(Done)` on a completely successful pairing
+     * while the Joiner is still logging in, and work already in flight continues.
+     *
+     * Since 2.1.
+     */
+    data class Bye(
+        override val rawJson: String,
+        val reason: Reason,
+    ) : ExchangeV2Message {
+        override val messageType get() = TYPE
+        override val protocolVersion get() = ExchangeProtocolVersion.V2_1
+
+        sealed interface Reason {
+            val value: String
+
+            data object Done : Reason {
+                override val value = "done"
+            }
+
+            data object Cancelled : Reason {
+                override val value = "cancelled"
+            }
+
+            data object Error : Reason {
+                override val value = "error"
+            }
+
+            data class Unknown(val rawValue: String) : Reason {
+                override val value get() = rawValue
+            }
+
+            companion object {
+                fun fromJsonValue(value: String): Reason = when (value) {
+                    Done.value -> Done
+                    Cancelled.value -> Cancelled
+                    Error.value -> Error
+                    else -> Unknown(value)
+                }
+            }
+        }
+
+        companion object {
+            const val TYPE = "bye"
+            private const val FIELD_REASON = "reason"
+
+            fun create(reason: Reason) = Bye(
+                rawJson = buildMessageJson(TYPE) { put(FIELD_REASON, reason.value) },
+                reason = reason,
+            )
+
+            fun fromJson(rawJson: String): Bye {
+                val json = JSONObject(rawJson)
+                return Bye(
+                    rawJson = rawJson,
+                    reason = Reason.fromJsonValue(json.optString(FIELD_REASON, "")),
+                )
+            }
+        }
+    }
+
+    /**
      * Forward-compatibility variant: a message whose type field doesn't match any known
      * value. The SM drops these without changing state per the spec's forward-compat rule.
      *
      * Inbound only — we never send a type we don't know so there is no `create`.
+     *
+     * Not tied to a protocol version. Any unrecognized type from any version parses as this.
      */
     data class Unknown(
         override val rawJson: String,

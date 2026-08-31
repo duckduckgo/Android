@@ -331,7 +331,10 @@ class RealSyncCodeDispatcher @Inject constructor(
             else -> DispatchOutcome.Failed("peer_aborted", PAIRING_REJECTED.code)
         }
         ExchangeV2State.Joiner.AbortedLocal -> joinerAbortedLocalToOutcome(transition.localTrigger, transition.trigger)
-        ExchangeV2State.Aborted -> DispatchOutcome.Failed("negotiation_aborted", UNEXPECTED_EVENT.code)
+        ExchangeV2State.Aborted -> when (val wireTrigger = transition.trigger) {
+            is ExchangeV2Message.Bye -> wireTrigger.toPeerLeftOutcome()
+            else -> DispatchOutcome.Failed("negotiation_aborted", UNEXPECTED_EVENT.code)
+        }
         else -> null
     }
 
@@ -384,6 +387,7 @@ class RealSyncCodeDispatcher @Inject constructor(
     ): DispatchOutcome = when {
         localTrigger == LocalTrigger.UserDeniedHost -> DispatchOutcome.Failed("user_denied", PAIRING_CANCELLED.code)
         localTrigger == LocalTrigger.HostUnavailable -> DispatchOutcome.Failed("host_unavailable", PAIRING_UNAVAILABLE.code)
+        wireTrigger is ExchangeV2Message.Bye -> wireTrigger.toPeerLeftOutcome()
         wireTrigger != null -> DispatchOutcome.Failed("host_protocol_error", UNEXPECTED_EVENT.code)
         else -> DispatchOutcome.Failed("host_aborted", NEGOTIATION_ABORTED.code)
     }
@@ -393,6 +397,7 @@ class RealSyncCodeDispatcher @Inject constructor(
         wireTrigger: ExchangeV2Message?,
     ): DispatchOutcome = when {
         localTrigger == LocalTrigger.UserDeniedJoiner -> DispatchOutcome.Failed("user_denied_joiner", PAIRING_CANCELLED.code)
+        wireTrigger is ExchangeV2Message.Bye -> wireTrigger.toPeerLeftOutcome()
         wireTrigger != null -> DispatchOutcome.Failed("joiner_protocol_error", UNEXPECTED_EVENT.code)
         else -> DispatchOutcome.Failed("joiner_local_aborted", PAIRING_FAILED.code)
     }
@@ -522,6 +527,14 @@ class RealSyncCodeDispatcher @Inject constructor(
             }
         }
     }
+
+    private fun ExchangeV2Message.Bye.toPeerLeftOutcome(): DispatchOutcome.Failed = DispatchOutcome.Failed(
+        "peer_left(${reason.value})",
+        code = when (reason) {
+            ExchangeV2Message.Bye.Reason.Error -> PAIRING_FAILED.code
+            else -> PAIRING_REJECTED.code
+        },
+    )
 
     /**
      * Re-encode a v2 ddg recovery (userId + secret) as a v1-shape `{recovery:{primary_key,
