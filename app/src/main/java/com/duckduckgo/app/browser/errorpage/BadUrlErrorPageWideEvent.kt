@@ -37,6 +37,8 @@ import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -309,9 +311,10 @@ class RealBadUrlErrorPageWideEvent @Inject constructor(
                 regularTabRepository.flowTabs,
                 fireTabRepository.flowTabs,
             ) { regularTabs, fireTabs -> (regularTabs + fireTabs) }
-                .collect { activeTabs ->
+                .map { activeTabs -> activeTabs.map { it.tabId } }
+                .distinctUntilChanged()
+                .collect { activeTabIds ->
                     mutex.withLock {
-                        val activeTabIds = activeTabs.map { it.tabId }
                         val inactiveTabIds = activeFlows.keys.filter { it !in activeTabIds }
                         for (tabId in inactiveTabIds) {
                             finishFlow(tabId, Cancelled, mapOf(KEY_CANCEL_REASON to CancelReason.ABANDONED.value))
