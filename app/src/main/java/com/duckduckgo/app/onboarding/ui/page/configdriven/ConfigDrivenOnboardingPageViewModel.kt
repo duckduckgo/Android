@@ -309,7 +309,6 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
         }
     }
 
-    /** The error alert's "Try again": another launch of the same flow, on the step we are already on. */
     fun onPasswordImportRetry() = launchPasswordImport()
 
     fun onPasswordImportResult(resultCode: Int, data: Intent?) {
@@ -329,11 +328,6 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
         viewModelScope.launch { _commands.send(Command.LaunchPasswordImport) }
     }
 
-    /**
-     * A returned web flow only means the credentials are being written; the counts come later. The outcome card
-     * is entered straight away so the wait is visible on it, and the counts are pushed into the state it is
-     * already bound to. Seeded before the event so the card finds a value there however fast it binds.
-     */
     private fun showImportOutcome() {
         val state = importCompleteState()
         state.value = ImportCompleteContentState.Parsing
@@ -341,8 +335,6 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
         viewModelScope.launch {
             val finished = importPasswordsFromGoogle.importStatus().filterIsInstance<ImportPasswordsStatus.Finished>().firstOrNull()
             if (finished == null) {
-                // The status flow ended without ever reporting a result. The user is already on the outcome
-                // card by now, so the attempt resolves there rather than back on the prompt.
                 state.value = ImportCompleteContentState.Failed
                 emit(NewUserOnboardingEvent.PasswordImportParsed(PasswordImportOutcome.PERMANENT_ERROR))
                 return@launch
