@@ -25,7 +25,12 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionSta
 import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.DISCONNECTED
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.getDisplayableCountry
+import com.duckduckgo.networkprotection.impl.subscription.onboarding.SubscriptionOnboardingVpnStepPlugin.Companion.VPN_STEP_ID
 import com.duckduckgo.networkprotection.impl.subscription.onboarding.SubscriptionOnboardingVpnViewModel.ActivationError
+import com.duckduckgo.networkprotection.impl.subscription.onboarding.SubscriptionOnboardingVpnViewModel.Command
+import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController
+import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.COMPLETED
+import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.SKIPPED
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -36,12 +41,15 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 class SubscriptionOnboardingVpnViewModelTest {
 
     @get:Rule
     val coroutineRule = CoroutineTestRule()
+
+    private val controller: SubscriptionOnboardingController = mock()
 
     @Test
     fun whenConnectionInfoLoadsThenViewStateShowsIpAndFlagFormattedLocation() = runTest {
@@ -117,6 +125,7 @@ class SubscriptionOnboardingVpnViewModelTest {
             whenever(getConnectionStateFlow()).thenReturn(flowOf(CONNECTING, DISCONNECTED))
         }
         val testee = SubscriptionOnboardingVpnViewModel(
+            controller,
             FakeConnectionService(ConnectionInfo(ip = "137.220.87.36", city = "Birmingham", country = "GB")),
             networkProtectionState,
             mock<WgTunnelConfig>(),
@@ -137,6 +146,7 @@ class SubscriptionOnboardingVpnViewModelTest {
             whenever(getConnectionStateFlow()).thenReturn(flowOf(DISCONNECTED))
         }
         val testee = SubscriptionOnboardingVpnViewModel(
+            controller,
             FakeConnectionService(ConnectionInfo(ip = "137.220.87.36", city = "Birmingham", country = "GB")),
             networkProtectionState,
             mock<WgTunnelConfig>(),
@@ -168,6 +178,64 @@ class SubscriptionOnboardingVpnViewModelTest {
         assertNull(formatVpnServerLocation("Amsterdam"))
     }
 
+    @Test
+    fun whenPrimaryCtaClickedAndVpnOffThenVpnPermissionRequested() = runTest {
+        val testee = createViewModel(connectionState = DISCONNECTED)
+
+        testee.onPrimaryCtaClicked()
+
+        testee.commands.test {
+            assertEquals(Command.RequestVpnPermission, awaitItem())
+            cancelAndConsumeRemainingEvents()
+        }
+        verifyNoInteractions(controller)
+    }
+
+    @Test
+    fun whenPrimaryCtaClickedAndVpnOnThenInfoPageShown() = runTest {
+        val testee = createViewModel(connectionState = CONNECTED)
+
+        testee.onPrimaryCtaClicked()
+
+        testee.viewState().test {
+            assertTrue(awaitItem().showingInfo)
+            cancelAndConsumeRemainingEvents()
+        }
+        verifyNoInteractions(controller)
+    }
+
+    @Test
+    fun whenPrimaryCtaClickedOnInfoPageThenStepCompleted() = runTest {
+        val testee = createViewModel(connectionState = CONNECTED)
+
+        testee.onPrimaryCtaClicked()
+        testee.onPrimaryCtaClicked()
+
+        verify(controller).onStepFinished(VPN_STEP_ID, COMPLETED)
+    }
+
+    @Test
+    fun whenPrimaryCtaClickedWhileActivatingThenNothingHappens() = runTest {
+        val testee = createViewModel(connectionState = CONNECTING)
+
+        testee.onPrimaryCtaClicked()
+
+        testee.commands.test {
+            expectNoEvents()
+            cancelAndConsumeRemainingEvents()
+        }
+        verifyNoInteractions(controller)
+    }
+
+    @Test
+    fun whenSkipClickedThenStepSkipped() = runTest {
+        val testee = createViewModel(connectionState = DISCONNECTED)
+
+        testee.onSkipClicked()
+
+        verify(controller).onStepFinished(VPN_STEP_ID, SKIPPED)
+    }
+
     private fun createViewModel(
         info: ConnectionInfo? = ConnectionInfo(ip = "137.220.87.36", city = "Birmingham", country = "GB"),
         connectionState: ConnectionState = DISCONNECTED,
@@ -176,6 +244,7 @@ class SubscriptionOnboardingVpnViewModelTest {
             whenever(getConnectionStateFlow()).thenReturn(flowOf(connectionState))
         }
         return SubscriptionOnboardingVpnViewModel(
+            controller,
             FakeConnectionService(info),
             networkProtectionState,
             mock<WgTunnelConfig>(),

@@ -51,12 +51,9 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.databinding.FragmentSubscriptionOnboardingVpnBinding
-import com.duckduckgo.networkprotection.impl.subscription.onboarding.SubscriptionOnboardingVpnStepPlugin.Companion.VPN_STEP_ID
 import com.duckduckgo.networkprotection.impl.subscription.onboarding.SubscriptionOnboardingVpnViewModel.ActivationError
-import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController
+import com.duckduckgo.networkprotection.impl.subscription.onboarding.SubscriptionOnboardingVpnViewModel.Command
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingFeature
-import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.COMPLETED
-import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.SKIPPED
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionOnboardingFeatureInfoScreen
 import com.google.android.material.progressindicator.CircularProgressIndicatorSpec
 import com.google.android.material.progressindicator.IndeterminateDrawable
@@ -73,14 +70,11 @@ import com.duckduckgo.mobile.android.R as CommonR
  *  - [ScreenState.ACTIVATION_ERROR]: the user declined the system VPN permission dialog; the user can retry
  *    or skip the step.
  *
- * Reports back through [SubscriptionOnboardingController] so it stays decoupled from the host activity and
- * the onboarding framework.
+ * The screen only renders: which of those states is shown, and when the step finishes, is decided by
+ * [SubscriptionOnboardingVpnViewModel].
  */
 @InjectWith(FragmentScope::class)
 class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_subscription_onboarding_vpn) {
-
-    @Inject
-    lateinit var controller: SubscriptionOnboardingController
 
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
@@ -103,7 +97,8 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
     }
 
     private var vpnOn = false
-    private var activating = false
+
+    // Latches the info page so it is applied once per view lifecycle rather than on every state emission.
     private var showingInfo = false
     private var lastRenderedState: ScreenState? = null
     private var transition: ValueAnimator? = null
@@ -124,16 +119,12 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
         lastRenderedState = null
         applyState(ScreenState.VPN_OFF, animate = false)
         observeViewState()
+        observeCommands()
         binding.subscriptionOnboardingVpnNextButton.setOnClickListener {
-            when {
-                activating -> {} // ignore taps while the VPN is being activated
-                showingInfo -> controller.onStepFinished(VPN_STEP_ID, COMPLETED) // "Got it" on the info page
-                vpnOn -> showInfoPage() // "Next" on the VPN-on screen opens the info page
-                else -> enableVpn()
-            }
+            viewModel.onPrimaryCtaClicked()
         }
         binding.subscriptionOnboardingVpnSkipButton.setOnClickListener {
-            controller.onStepFinished(VPN_STEP_ID, SKIPPED)
+            viewModel.onSkipClicked()
         }
     }
 
@@ -182,7 +173,9 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
                 state.newIpAddress?.let { binding.subscriptionOnboardingVpnNewIpAddressValue.text = it }
                 state.newLocation?.let { binding.subscriptionOnboardingVpnNewIpAddressLocation.text = it }
                 // The info page takes over the screen once opened, so ignore connection-state re-renders there.
-                if (!showingInfo) {
+                if (state.showingInfo) {
+                    if (!showingInfo) showInfoPage()
+                } else {
                     state.toScreenState()?.let(::renderScreenState)
                 }
                 renderActivating(state.activating)
@@ -190,9 +183,19 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
             .launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
+    private fun observeCommands() {
+        viewModel.commands
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { command ->
+                when (command) {
+                    Command.RequestVpnPermission -> enableVpn()
+                }
+            }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+    }
+
     /** Shows a spinner inside the primary button while the VPN is being activated (between grant and connected). */
     private fun renderActivating(loading: Boolean) {
-        activating = loading
         binding.subscriptionOnboardingVpnNextButton.icon = if (loading) buttonSpinner else null
     }
 
@@ -217,7 +220,7 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
         applyState(state, animate)
     }
 
-    /** Opens the "what to know about your VPN" info page (reached from "Next" on the VPN-on screen). */
+    /** Renders the "what to know about your VPN" info page (reached from "Next" on the VPN-on screen). */
     private fun showInfoPage() = with(binding) {
         showingInfo = true
         transition?.cancel()

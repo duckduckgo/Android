@@ -29,12 +29,19 @@ import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.configuration.asServerDetails
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.getDisplayableCountry
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.getEmojiForCountryCode
+import com.duckduckgo.networkprotection.impl.subscription.onboarding.SubscriptionOnboardingVpnStepPlugin.Companion.VPN_STEP_ID
+import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController
+import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.COMPLETED
+import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.SKIPPED
+import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import logcat.LogPriority.WARN
@@ -44,6 +51,7 @@ import javax.inject.Inject
 
 @ContributesViewModel(FragmentScope::class)
 class SubscriptionOnboardingVpnViewModel @Inject constructor(
+    private val controller: SubscriptionOnboardingController,
     private val connectionService: SubscriptionOnboardingConnectionService,
     private val networkProtectionState: NetworkProtectionState,
     private val wgTunnelConfig: WgTunnelConfig,
@@ -52,6 +60,9 @@ class SubscriptionOnboardingVpnViewModel @Inject constructor(
 
     private val viewState = MutableStateFlow(ViewState())
     fun viewState(): Flow<ViewState> = viewState.asStateFlow()
+
+    private val _commands = Channel<Command>(1, DROP_OLDEST)
+    val commands: Flow<Command> = _commands.receiveAsFlow()
 
     init {
         viewModelScope.launch(dispatcherProvider.io()) {
@@ -114,6 +125,24 @@ class SubscriptionOnboardingVpnViewModel @Inject constructor(
         viewState.update { it.copy(activationError = ActivationError.PERMISSION_DENIED) }
     }
 
+    /**
+     * The primary button drives the whole step: it turns the VPN on, then opens the info page, then finishes
+     * the step. Which of those it does depends on the current state.
+     */
+    fun onPrimaryCtaClicked() {
+        val state = viewState.value
+        when {
+            state.activating -> {} // ignore taps while the VPN is being activated
+            state.showingInfo -> controller.onStepFinished(VPN_STEP_ID, COMPLETED)
+            state.vpnEnabled == true -> viewState.update { it.copy(showingInfo = true) }
+            else -> viewModelScope.launch { _commands.send(Command.RequestVpnPermission) }
+        }
+    }
+
+    fun onSkipClicked() {
+        controller.onStepFinished(VPN_STEP_ID, SKIPPED)
+    }
+
     data class ViewState(
         // null until the VPN connection state is first observed, so the UI does not flip states prematurely.
         val vpnEnabled: Boolean? = null,
@@ -123,7 +152,14 @@ class SubscriptionOnboardingVpnViewModel @Inject constructor(
         val location: String? = null,
         val newIpAddress: String? = null,
         val newLocation: String? = null,
+        // Once the info page is open it takes over the screen and the connection state no longer drives it.
+        val showingInfo: Boolean = false,
     )
+
+    sealed interface Command {
+        /** Only the view can call [android.net.VpnService.prepare], so asking for the permission is delegated back to it. */
+        data object RequestVpnPermission : Command
+    }
 
     /**
      * Why VPN activation failed. [PERMISSION_DENIED] shows the "allow the configuration" guidance; [FAILED]
