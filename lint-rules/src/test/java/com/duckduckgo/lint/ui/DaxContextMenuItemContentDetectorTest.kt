@@ -39,6 +39,21 @@ class DaxContextMenuItemContentDetectorTest {
             text: String,
             trailingIcon: (DaxContextMenuItemTrailingScope.() -> Unit)? = null,
         ) {}
+        object DaxContextMenuScope {
+            fun DaxDefaultItem(
+                text: String,
+                trailingIcon: (DaxContextMenuItemTrailingScope.() -> Unit)? = null,
+            ) {}
+            fun DaxIconItem(
+                text: String,
+                trailingIcon: (DaxContextMenuItemTrailingScope.() -> Unit)? = null,
+            ) {}
+            fun DaxInsetItem(
+                text: String,
+                trailingIcon: (DaxContextMenuItemTrailingScope.() -> Unit)? = null,
+            ) {}
+        }
+        fun DaxContextMenu(content: DaxContextMenuScope.() -> Unit) {}
         """,
     ).indented()
 
@@ -101,5 +116,25 @@ class DaxContextMenuItemContentDetectorTest {
     @Test
     fun whenTrailingIconWrapsScopeMemberInLayoutThenWarning() {
         run("""DaxDefaultContextMenuItem(text = "x", trailingIcon = { Column { Icon() } })""").expectWarningCount(1)
+    }
+
+    @Test
+    fun whenScopedDefaultItemTrailingIconArbitraryThenWarning() {
+        run("""DaxContextMenu { DaxDefaultItem(text = "x", trailingIcon = { Text("x") }) }""").expectWarningCount(1)
+    }
+
+    @Test
+    fun whenScopedIconItemTrailingIconArbitraryThenWarning() {
+        run("""DaxContextMenu { DaxIconItem(text = "x", trailingIcon = { Image(1) }) }""").expectWarningCount(1)
+    }
+
+    @Test
+    fun whenScopedInsetItemTrailingIconArbitraryThenWarning() {
+        run("""DaxContextMenu { DaxInsetItem(text = "x", trailingIcon = { Text("x") }) }""").expectWarningCount(1)
+    }
+
+    @Test
+    fun whenScopedItemTrailingIconUsesScopeMemberThenNoWarning() {
+        run("""DaxContextMenu { DaxIconItem(text = "x", trailingIcon = { Icon() }) }""").expectClean()
     }
 }

@@ -103,12 +103,12 @@ fun DaxContextMenuIconButton(
                 onClick = { expanded = true },
                 iconPainter = painterResource(R.drawable.ic_menu_vertical_24),
                 contentDescription = contentDescription,
+                modifier = modifier,
                 enabled = enabled,
             )
         },
         expanded = expanded,
         onDismissRequest = { expanded = false },
-        modifier = modifier,
         content = content,
     )
 }
