@@ -20,6 +20,10 @@
     android:layout_height="wrap_content"
     android:background="@drawable/popup_menu_bg"
     android:orientation="vertical">
+    <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        app:primaryText="@string/duck_chat_title"/>
 
     <com.duckduckgo.common.ui.view.PopupMenuItemView
         android:id="@+id/contextualChatMenuNewChat"
