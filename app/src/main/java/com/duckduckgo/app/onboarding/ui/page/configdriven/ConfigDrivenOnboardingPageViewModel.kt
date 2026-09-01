@@ -478,7 +478,7 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
             NewUserOnboardingActivityDialog.ImportPasswords,
             NewUserOnboardingActivityDialog.ImportComplete,
             is NewUserOnboardingActivityDialog.AddressBarPosition,
-            NewUserOnboardingActivityDialog.InputScreen,
+            is NewUserOnboardingActivityDialog.InputScreen,
             is NewUserOnboardingActivityDialog.InputScreenPreview,
             is NewUserOnboardingActivityDialog.QuickSetup,
             is NewUserOnboardingActivityDialog.PreferenceSelector,

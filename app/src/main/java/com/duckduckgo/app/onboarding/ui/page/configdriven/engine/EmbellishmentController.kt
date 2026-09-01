@@ -332,7 +332,7 @@ class EmbellishmentControllerImpl(
             enter = {
                 view.isVisible = true
                 view.alpha = 0f
-                view.setMaxProgress(WING_STOP_PROGRESS)
+                view.setMinAndMaxProgress(0f, WING_STOP_PROGRESS)
                 val fadeIn = ObjectAnimator.ofFloat(view, View.ALPHA, 0f, 1f).apply {
                     startDelay = WING_START_DELAY
                     duration = WING_FADE_IN_DURATION
@@ -359,6 +359,7 @@ class EmbellishmentControllerImpl(
                 view.cancelAnimation()
                 view.isVisible = true
                 view.alpha = 1f
+                view.setMinAndMaxProgress(0f, WING_STOP_PROGRESS)
                 view.progress = WING_STOP_PROGRESS
             },
         )

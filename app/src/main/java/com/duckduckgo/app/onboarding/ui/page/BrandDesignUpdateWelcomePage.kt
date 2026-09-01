@@ -484,7 +484,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     }
 
     private fun playOutroAnimation(
-        nextStep: OnboardingBackgroundStep,
+        nextBackground: OnboardingBackground,
         onAnimationStart: () -> Unit,
         onAnimationEnd: () -> Unit,
     ) {
@@ -497,7 +497,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         }
 
         backgroundAnimator?.transitionTo(
-            step = nextStep,
+            background = nextBackground,
             enterStartX = enterStartX,
             onAnimationStarted = onAnimationStart,
             onAnimationEnd = onAnimationEnd,
@@ -934,7 +934,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     binding.daxDialogCta.cardView.setArrowDepthFraction(if (showWalkingDax) 1f else 0f)
 
                     playOutroAnimation(
-                        nextStep = OnboardingBackgroundStep.Welcome,
+                        nextBackground = OnboardingBackground.Pond,
                         onAnimationStart = {
                             if (showWalkingDax) playWalkingDaxAnimation()
                         },
@@ -977,7 +977,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                 QUICK_SETUP -> {
                     binding.welcomeScreenWalkingDax.isVisible = false
-                    backgroundAnimator?.transitionTo(step = OnboardingBackgroundStep.QuickSetup)
+                    backgroundAnimator?.transitionTo(background = OnboardingBackground.Horizon)
 
                     // Swap content before measuring so the next layout pass reflects the quick-setup size,
                     // and ChangeBounds animates the card expanding into it. The include root stays fully
@@ -1130,7 +1130,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                     binding.daxDialogCta.cardView.setArrowDepthFraction(0f)
 
-                    backgroundAnimator?.transitionTo(step = OnboardingBackgroundStep.AddToDock)
+                    backgroundAnimator?.transitionTo(background = OnboardingBackground.Horizon)
 
                     binding.daxDialogCta.stepIndicator.animateToStep(stepIndicator)
 
@@ -1211,7 +1211,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     binding.daxDialogCta.cardView.setArrowAnimationFraction(1f)
                     binding.daxDialogCta.cardView.setArrowDepthFraction(1f)
 
-                    backgroundAnimator?.transitionTo(step = OnboardingBackgroundStep.AddWidget)
+                    backgroundAnimator?.transitionTo(background = OnboardingBackground.Horizon)
 
                     binding.daxDialogCta.stepIndicator.animateToStep(stepIndicator)
 
@@ -1297,7 +1297,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                         }
                     }
                     backgroundAnimator?.transitionTo(
-                        step = OnboardingBackgroundStep.AddressBar,
+                        background = OnboardingBackground.Island,
                     )
 
                     if (showBobbingDax) {
@@ -1359,7 +1359,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                 INPUT_SCREEN -> {
                     backgroundAnimator?.transitionTo(
-                        step = OnboardingBackgroundStep.InputType,
+                        background = OnboardingBackground.Shoreline,
                     )
 
                     animateBobbingDaxOut()
@@ -1607,9 +1607,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             binding.logoAnimation.alpha = 0f
             binding.welcomeTitle.alpha = 0f
             binding.duckAiIntroAnimation.alpha = 0f
-            backgroundAnimator?.snapTo(OnboardingBackgroundStep.ComparisonChart)
+            backgroundAnimator?.snapTo(OnboardingBackground.Horizon)
         } else {
-            backgroundAnimator?.transitionTo(step = OnboardingBackgroundStep.ComparisonChart)
+            backgroundAnimator?.transitionTo(background = OnboardingBackground.Horizon)
         }
 
         // Swap content before measuring so the dialog height reflects the comparison chart
@@ -1712,7 +1712,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.welcomeTitle.alpha = 0f
                 binding.duckAiIntroAnimation.alpha = 0f
 
-                backgroundAnimator?.snapTo(OnboardingBackgroundStep.Welcome)
+                backgroundAnimator?.snapTo(OnboardingBackground.Pond)
 
                 binding.daxDialogCta.secondaryCta.visibility = if (showSecondaryCta) View.INVISIBLE else View.GONE
 
@@ -1771,7 +1771,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.welcomeTitle.alpha = 0f
                 binding.duckAiIntroAnimation.alpha = 0f
 
-                backgroundAnimator?.snapTo(OnboardingBackgroundStep.ComparisonChart)
+                backgroundAnimator?.snapTo(OnboardingBackground.Horizon)
 
                 binding.welcomeScreenWalkingDax.isVisible = false
                 val cardView = binding.daxDialogCta.cardView
@@ -1832,7 +1832,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.welcomeTitle.alpha = 0f
                 binding.duckAiIntroAnimation.alpha = 0f
 
-                backgroundAnimator?.snapTo(OnboardingBackgroundStep.AddToDock)
+                backgroundAnimator?.snapTo(OnboardingBackground.Horizon)
 
                 binding.welcomeScreenWalkingDax.isVisible = false
                 binding.bottomWingAnimation.isVisible = false
@@ -1883,7 +1883,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.welcomeTitle.alpha = 0f
                 binding.duckAiIntroAnimation.alpha = 0f
 
-                backgroundAnimator?.snapTo(OnboardingBackgroundStep.ComparisonChart)
+                backgroundAnimator?.snapTo(OnboardingBackground.Horizon)
 
                 binding.welcomeScreenWalkingDax.isVisible = false
                 binding.bottomWingAnimation.isVisible = false
@@ -1971,7 +1971,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.leftWingAnimation.isVisible = false
                 binding.bottomWingAnimation.isVisible = false
 
-                backgroundAnimator?.snapTo(OnboardingBackgroundStep.AddressBar)
+                backgroundAnimator?.snapTo(OnboardingBackground.Island)
 
                 binding.welcomeScreenWalkingDax.isVisible = false
                 binding.daxDialogCta.welcomeContent.root.isVisible = false
@@ -2080,7 +2080,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.welcomeTitle.alpha = 0f
                 binding.duckAiIntroAnimation.alpha = 0f
 
-                backgroundAnimator?.snapTo(OnboardingBackgroundStep.InputType)
+                backgroundAnimator?.snapTo(OnboardingBackground.Shoreline)
 
                 (binding.daxDialogCta.root.layoutParams as ConstraintLayout.LayoutParams).apply {
                     if (showLeftWing && deviceInfo.isTablet()) {
@@ -2133,7 +2133,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 }
 
                 binding.welcomeScreenWalkingDax.isVisible = false
-                backgroundAnimator?.snapTo(OnboardingBackgroundStep.QuickSetup)
+                backgroundAnimator?.snapTo(OnboardingBackground.Horizon)
 
                 // Apply the final visibility of every include + cta BEFORE measuring, so the dialog's
                 // measured height reflects what will actually be on screen.
@@ -2202,7 +2202,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.bottomWingAnimation.isVisible = false
                 decorationFitCorrector?.clear()
 
-                backgroundAnimator?.snapTo(OnboardingBackgroundStep.InputType)
+                backgroundAnimator?.snapTo(OnboardingBackground.Shoreline)
 
                 binding.welcomeScreenWalkingDax.isVisible = false
                 binding.daxDialogCta.root.updateLayoutParams<ConstraintLayout.LayoutParams> {

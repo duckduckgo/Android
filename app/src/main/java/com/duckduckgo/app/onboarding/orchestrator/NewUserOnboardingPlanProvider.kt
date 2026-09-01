@@ -40,9 +40,11 @@ import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager.Segmen
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.SegmentedOnboardingPath
 import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
+import com.duckduckgo.app.onboarding.ui.page.OnboardingBackground
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
 import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection
+import com.duckduckgo.app.onboarding.ui.page.configdriven.Embellishment
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_AICHAT_SELECTED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CHOOSE_BROWSER_PRESSED
@@ -570,14 +572,18 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 comparisonChartStep(NewUserOnboardingActivityDialog.SegmentedComparisonChart(ComparisonChartConfig.SegmentedSearchPath)),
                 defaultBrowserPromptStep(),
                 preferenceSelectorStep(
-                    ctx,
+                    ctx = ctx,
                     titleRes = R.string.searchPathPreferenceSelectorTitle,
                     listOf(
                         OnboardingPreference.SEARCH_HISTORY,
                         OnboardingPreference.SAFE_SEARCH,
                     ),
                 ),
-                inputScreenStep(ctx),
+                inputScreenStep(
+                    ctx = ctx,
+                    embellishment = Embellishment.BottomWing,
+                    background = OnboardingBackground.Horizon,
+                ),
                 addressBarPositionStep(),
                 inputScreenPreviewStep(
                     ctx = ctx,
@@ -621,7 +627,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 comparisonChartStep(NewUserOnboardingActivityDialog.SegmentedComparisonChart(ComparisonChartConfig.SegmentedNoAiPath)),
                 defaultBrowserPromptStep(),
                 preferenceSelectorStep(
-                    ctx,
+                    ctx = ctx,
                     titleRes = R.string.noAiPathPreferenceSelectorTitle,
                     listOf(
                         OnboardingPreference.SEARCH_ASSIST,
@@ -644,7 +650,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 comparisonChartStep(NewUserOnboardingActivityDialog.SegmentedComparisonChart(ComparisonChartConfig.SegmentedBlockAdsPath)),
                 defaultBrowserPromptStep(),
                 preferenceSelectorStep(
-                    ctx,
+                    ctx = ctx,
                     titleRes = R.string.blockAdsPathPreferenceSelectorTitle,
                     listOf(
                         OnboardingPreference.BLOCK_ADS,
@@ -653,7 +659,11 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                     ),
                     caption = R.string.preferenceChangeInSettingsCaption,
                 ),
-                inputScreenStep(ctx),
+                inputScreenStep(
+                    ctx = ctx,
+                    embellishment = Embellishment.BottomWing,
+                    background = OnboardingBackground.Horizon,
+                ),
                 addressBarPositionStep(),
                 inputScreenPreviewStep(
                     ctx = ctx,
@@ -1009,13 +1019,17 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         )
     }
 
-    private fun inputScreenStep(ctx: NewUserOnboardingPlanContext): NewUserOnboardingActivityStep {
+    private fun inputScreenStep(
+        ctx: NewUserOnboardingPlanContext,
+        embellishment: Embellishment = Embellishment.LeftWing,
+        background: OnboardingBackground = OnboardingBackground.Shoreline,
+    ): NewUserOnboardingActivityStep {
         val pixelName = OnboardingPixelName.ONBOARDING_SEARCH_EXPERIENCE
         return NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.INPUT_SCREEN,
             pixelName = pixelName,
             indicator = StepIndicatorMode.COUNTED,
-            resolveDialog = { NewUserOnboardingActivityDialog.InputScreen },
+            resolveDialog = { NewUserOnboardingActivityDialog.InputScreen(embellishment, background) },
             transition = { event ->
                 when {
                     event is NewUserOnboardingEvent.InputModeConfirmed -> {
