@@ -24,6 +24,7 @@
     <style name="Typography.DuckDuckGo.CookiePopupOptIn.Brand" parent="Typography.DuckDuckGo.Onboarding.SmallText">
         <item name="android:fontFamily">@font/ducksansproduct_medium</item>
         <item name="android:textAllCaps">true</item>
+        <item name="android:letterSpacing">0.057</item>
     </style>
 
     <!--
