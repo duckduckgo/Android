@@ -112,7 +112,7 @@
             app:layout_constraintBottom_toBottomOf="@id/contextualTitle"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/contextualTitle"
-            app:srcCompat="@drawable/ic_close_24_small" />
+            app:srcCompat="@drawable/ic_close_24" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
