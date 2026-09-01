@@ -167,12 +167,7 @@
             },
             { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
             { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
-            {
-                "key": "variant",
-                "type": "string",
-                "description": "Duck.ai search/chat branch. Set only after the user passes the search/chat branching step, which precedes this step in the custom Duck.ai flow.",
-                "enum": ["search_plus_duckai-search", "search_plus_duckai-chat"]
-            },
+            "duckAiOnboardingBranchVariant",
             {
                 "key": "value",
                 "type": "string",
@@ -258,12 +253,7 @@
             },
             { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
             { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
-            {
-                "key": "variant",
-                "type": "string",
-                "description": "Duck.ai search/chat branch. Set only after the user passes the search/chat branching step, which precedes this step in the custom Duck.ai flow.",
-                "enum": ["search_plus_duckai-search", "search_plus_duckai-chat"]
-            },
+            "duckAiOnboardingBranchVariant",
             {
                 "key": "value",
                 "type": "string",
@@ -379,12 +369,7 @@
             },
             { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
             { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
-            {
-                "key": "variant",
-                "type": "string",
-                "description": "Duck.ai search/chat branch. This step is the branching step, so its clicked event carries the branch just selected.",
-                "enum": ["search_plus_duckai-search", "search_plus_duckai-chat"]
-            },
+            "duckAiOnboardingBranchVariant",
             {
                 "key": "value",
                 "type": "string",
@@ -440,12 +425,7 @@
             },
             { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
             { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
-            {
-                "key": "variant",
-                "type": "string",
-                "description": "Duck.ai search/chat branch. Set only after the user passes the search/chat branching step.",
-                "enum": ["search_plus_duckai-search", "search_plus_duckai-chat"]
-            },
+            "duckAiOnboardingBranchVariant",
             { "key": "value", "type": "string", "description": "Only set when event=clicked.", "enum": ["engage", "dismiss"] }
         ]
     },
@@ -471,12 +451,7 @@
             },
             { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
             { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
-            {
-                "key": "variant",
-                "type": "string",
-                "description": "Duck.ai search/chat branch. Set only after the user passes the search/chat branching step.",
-                "enum": ["search_plus_duckai-search", "search_plus_duckai-chat"]
-            },
+            "duckAiOnboardingBranchVariant",
             {
                 "key": "value",
                 "type": "string",
@@ -507,12 +482,7 @@
             },
             { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
             { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
-            {
-                "key": "variant",
-                "type": "string",
-                "description": "Duck.ai search/chat branch. Set only after the user passes the search/chat branching step.",
-                "enum": ["search_plus_duckai-search", "search_plus_duckai-chat"]
-            },
+            "duckAiOnboardingBranchVariant",
             { "key": "value", "type": "string", "description": "Only set when event=clicked.", "enum": ["engage", "dismiss"] }
         ]
     },
@@ -538,12 +508,7 @@
             },
             { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
             { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
-            {
-                "key": "variant",
-                "type": "string",
-                "description": "Duck.ai search/chat branch. Set only after the user passes the search/chat branching step.",
-                "enum": ["search_plus_duckai-search", "search_plus_duckai-chat"]
-            },
+            "duckAiOnboardingBranchVariant",
             {
                 "key": "value",
                 "type": "string",
@@ -574,12 +539,7 @@
             },
             { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
             { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
-            {
-                "key": "variant",
-                "type": "string",
-                "description": "Duck.ai search/chat branch. Set only after the user passes the search/chat branching step.",
-                "enum": ["search_plus_duckai-search", "search_plus_duckai-chat"]
-            },
+            "duckAiOnboardingBranchVariant",
             { "key": "value", "type": "string", "description": "Only set when event=clicked.", "enum": ["engage", "dismiss"] }
         ]
     },
@@ -605,12 +565,7 @@
             },
             { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
             { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
-            {
-                "key": "variant",
-                "type": "string",
-                "description": "Duck.ai search/chat branch. Set only after the user passes the search/chat branching step.",
-                "enum": ["search_plus_duckai-search", "search_plus_duckai-chat"]
-            },
+            "duckAiOnboardingBranchVariant",
             { "key": "value", "type": "string", "description": "Only set when event=clicked.", "enum": ["engage", "dismiss"] }
         ]
     },
@@ -636,12 +591,7 @@
             },
             { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
             { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
-            {
-                "key": "variant",
-                "type": "string",
-                "description": "Duck.ai search/chat branch. Set only after the user passes the search/chat branching step.",
-                "enum": ["search_plus_duckai-search", "search_plus_duckai-chat"]
-            },
+            "duckAiOnboardingBranchVariant",
             { "key": "value", "type": "string", "description": "Only set when event=clicked.", "enum": ["engage", "dismiss"] }
         ]
     }
