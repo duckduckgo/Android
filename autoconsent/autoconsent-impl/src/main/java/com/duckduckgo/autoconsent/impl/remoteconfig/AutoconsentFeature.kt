@@ -71,4 +71,16 @@ interface AutoconsentFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun cookiePopUpOptInPrompt(): Toggle
+
+    /**
+     * Allows the Cookie Pop-up Protection opt-in prompt to be dismissed with the back button.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun cookiePopUpOptInPromptDismissible(): Toggle
+
+    /**
+     * Shows a close button on the Cookie Pop-up Protection opt-in prompt.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun cookiePopUpOptInPromptCloseButton(): Toggle
 }
