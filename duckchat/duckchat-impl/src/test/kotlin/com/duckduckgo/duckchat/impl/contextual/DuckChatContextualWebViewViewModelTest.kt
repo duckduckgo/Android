@@ -514,6 +514,24 @@ class DuckChatContextualWebViewViewModelTest {
     }
 
     @Test
+    fun `onOpenDuckAiFromPopup opens a new duck ai tab with no prompt`() = runTest {
+        (duckChat as FakeDuckChat).nextUrl = "https://duckduckgo.com/?ia=chat"
+        testee.onSheetOpened("tab-1")
+
+        testee.commands.test {
+            testee.onOpenDuckAiFromPopup()
+
+            val command = expectMostRecentItem()
+            assertTrue(command is DuckChatContextualWebViewViewModel.Command.OpenChatUrl)
+            command as DuckChatContextualWebViewViewModel.Command.OpenChatUrl
+            assertEquals("https://duckduckgo.com/?ia=chat", command.url)
+            assertEquals("tab-1", command.sourceTabId)
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(duckChatInternal).reportDuckChatEntry(DuckChatEntryPoint.CONTEXTUAL_CHAT, opensNewTab = true, hasPrompt = false)
+    }
+
+    @Test
     fun `onChatsIconClicked with no recent chats launches chat history`() = runTest {
         testee.commands.test {
             testee.onChatsIconClicked()

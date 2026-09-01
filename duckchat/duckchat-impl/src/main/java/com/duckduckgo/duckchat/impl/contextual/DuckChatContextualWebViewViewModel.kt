@@ -723,6 +723,13 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
         }
     }
 
+    fun onOpenDuckAiFromPopup() {
+        val url = duckChat.getDuckChatUrl(query = "", autoPrompt = false)
+        val sourceTabId = _viewState.value.tabId
+        duckChatInternal.reportDuckChatEntry(DuckChatEntryPoint.CONTEXTUAL_CHAT, opensNewTab = true, hasPrompt = false)
+        commandChannel.trySend(Command.OpenChatUrl(url = url, sourceTabId = sourceTabId))
+    }
+
     fun onRecentChatClicked(chatId: String) {
         duckChatPixels.reportContextualRecentChatSelected()
         val url = duckChatInternal.buildChatUrl(chatId)

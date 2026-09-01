@@ -40,7 +40,7 @@
     <string name="duckChatOnboardingDuckAiStateOn">Turn Duck.ai On</string>
     <string name="duckChatOnboardingDuckAiStateOff">Keep Duck.ai Off</string>
 
-    <string name="duckChatContextualAskAboutPage">Ask About Page</string>
     <string name="duckChatContextualAskAboutSearch">Ask About Search</string>
+    <string name="duckChatContextualOpenDuckAi">Open Duck.ai</string>
 
 </resources>
