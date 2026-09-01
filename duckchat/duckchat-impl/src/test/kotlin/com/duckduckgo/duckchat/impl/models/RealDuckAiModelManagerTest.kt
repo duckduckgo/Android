@@ -40,7 +40,6 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.atLeastOnce
-import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -1432,7 +1431,7 @@ class RealDuckAiModelManagerTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(dataStore.getSelectedProvider()).thenReturn(ModelProvider.ANTHROPIC.name)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
-        whenever(modelsService.getModels(any())).thenReturn(
+        whenever(modelsService.getModels(any(), anyOrNull())).thenReturn(
             AIChatModelsResponse(
                 listOf(
                     remoteModel("gpt", provider = "openai"),
@@ -1452,7 +1451,7 @@ class RealDuckAiModelManagerTest {
         whenever(dataStore.getSelectedModel()).thenReturn(SelectedModel("gpt", "gpt"))
         whenever(dataStore.getSelectedProvider()).thenReturn(ModelProvider.ANTHROPIC.name)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
-        whenever(modelsService.getModels(any())).thenReturn(
+        whenever(modelsService.getModels(any(), anyOrNull())).thenReturn(
             AIChatModelsResponse(
                 listOf(
                     remoteModel("gpt", provider = "openai"),
@@ -1472,7 +1471,7 @@ class RealDuckAiModelManagerTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(dataStore.getSelectedProvider()).thenReturn(ModelProvider.MISTRAL.name)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
-        whenever(modelsService.getModels(any())).thenReturn(
+        whenever(modelsService.getModels(any(), anyOrNull())).thenReturn(
             AIChatModelsResponse(listOf(remoteModel("gpt", provider = "openai"))),
         )
 
@@ -1488,7 +1487,7 @@ class RealDuckAiModelManagerTest {
         givenProviderStore()
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
-        whenever(modelsService.getModels(any())).thenReturn(
+        whenever(modelsService.getModels(any(), anyOrNull())).thenReturn(
             AIChatModelsResponse(
                 listOf(
                     remoteModel("gpt", provider = "openai"),
