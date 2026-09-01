@@ -33,12 +33,23 @@ jobs:
           case "$status" in identical|behind) on_default=true ;; *) on_default=false ;; esac
           echo "compare status: ${status:-<error>} -> on_default: $on_default"
           echo "on_default=$on_default" >> "$GITHUB_OUTPUT"
-      - name: If merged to the default branch, add to Waiting for release
+      # Resolve the task id here rather than letting add-task-asana-project parse the body: given
+      # asana-project it also uses it to filter, so it drops any task not already on the board it
+      # is meant to add the task to.
+      - name: Find Asana task ID
+        id: find-asana-task
         if: steps.landed.outputs.on_default == 'true'
+        uses: duckduckgo/native-github-asana-sync@v2.6.0
+        with:
+          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          trigger-phrase: "Task/Issue URL:"
+          action: 'find-asana-task-id'
+      - name: If merged to the default branch, add to Waiting for release
+        if: steps.find-asana-task.outputs.asanaTaskId != ''
         uses: duckduckgo/native-github-asana-sync@v2.6.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_ANDROID_RELEASE_BOARD_PROJECT_ID }}
           asana-section: ${{ vars.GH_ANDROID_RELEASE_BOARD_WAITING_FOR_RELEASE_SECTION_ID }}
-          trigger-phrase: "Task/Issue URL:"
+          asana-task-id: ${{ steps.find-asana-task.outputs.asanaTaskId }}
           action: 'add-task-asana-project'
