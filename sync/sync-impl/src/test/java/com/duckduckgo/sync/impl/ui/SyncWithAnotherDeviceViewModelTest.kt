@@ -786,7 +786,7 @@ class SyncWithAnotherDeviceViewModelTest {
                     timestampMs = System.currentTimeMillis(),
                     from = ExchangeV2State.Joiner.Confirming,
                     to = ExchangeV2State.Joiner.AbortedByHost,
-                    trigger = ExchangeV2Message.RecoveryCodeDenied(rawJson = "{}"),
+                    trigger = ExchangeV2Message.RecoveryCodeDenied.fromJson("{}"),
                     localTrigger = null,
                 ),
             )
