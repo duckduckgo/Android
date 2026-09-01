@@ -112,7 +112,7 @@ class RealAdBlockingMenuController @Inject constructor(
         appScope.launch(dispatcherProvider.io()) {
             when (choice) {
                 AdBlockingChoice.ALWAYS_ON -> {
-                    settingsRepository.enable(withPixelConsent = true)
+                    settingsRepository.enable(withPixelConsent = false)
                     sessionStore.clear()
                 }
                 AdBlockingChoice.DISABLE_UNTIL_RELAUNCH -> sessionStore.setDisabledUntilRelaunch()

@@ -116,6 +116,7 @@ class RealAdBlockingMenuControllerTest {
         controller.onChoiceSelected(AdBlockingChoice.ALWAYS_ON)
 
         assertEquals(true, userEnabledFlow.value)
+        assertEquals(false, pixelConsentFlow.value)
         assertFalse(sessionStore.isDisabledUntilRelaunch())
     }
 
@@ -170,6 +171,7 @@ class RealAdBlockingMenuControllerTest {
         controller.onEnableTapped()
 
         assertEquals(true, userEnabledFlow.value)
+        assertEquals(false, pixelConsentFlow.value)
         assertFalse(sessionStore.isDisabledUntilRelaunch())
     }
 
