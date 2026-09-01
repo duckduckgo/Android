@@ -15,10 +15,10 @@
         "description": "The Unified Input surface the pixel was fired from, distinguishing the contextual chat sheet from the Duck.ai tab and the address bar",
         "enum": ["address_bar", "duck_ai", "contextual_chat"]
     },
-    "duckAiOnboardingBranchVariant": {
+    "inputPreviewAction": {
         "key": "variant",
         "type": "string",
-        "description": "Onboarding Duck.ai search/chat branch. Set on every onboarding pixel fired after the user passes the search/chat branching step (the input-screen preview); absent for pixels fired before that step or for users who never see it.",
+        "description": "Onboarding Duck.ai search/chat branch, chosen at the input-screen preview step. Set on every onboarding pixel fired after the user passes that step; absent for pixels fired before it or for users who never see it.",
         "enum": ["search_plus_duckai-search", "search_plus_duckai-chat"]
     },
     "contextualSuggestionsPageType": {
