@@ -116,7 +116,7 @@ class RealDuckChatContextual @Inject constructor(
         if (serpQuery != null) {
             askItem.setPrimaryText(activity.getString(R.string.duckChatContextualAskAboutSearch))
             popup.onMenuItemClicked(askItem) {
-                duckChatPixels.reportContextualAddressBarMenuAskAboutPageSelected()
+                duckChatPixels.reportContextualAddressBarMenuAskAboutSearchSelected()
                 openSearchChatInSheet(sourceTabId, serpQuery, onAskAboutPage)
             }
         } else {

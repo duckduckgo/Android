@@ -1784,6 +1784,13 @@
         "suffixes": ["first_daily_count", "form_factor"],
         "parameters": ["appVersion"]
     },
+    "aichat_contextual_address_bar_menu_ask_about_search_selected": {
+        "description": "Fired when the user selects Ask About Search in the address bar Duck.ai menu",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
     "aichat_contextual_floating_input_opened": {
         "description": "Fired when the floating contextual input (entry) is opened",
         "owners": ["karlenDimla"],
