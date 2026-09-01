@@ -102,6 +102,11 @@ class CookiePopupOptInActivity : DuckDuckGoActivity() {
         }
     }
 
+    override fun onDestroy() {
+        backNavigationCallback = null
+        super.onDestroy()
+    }
+
     override fun finish() {
         super.finish()
         if (SDK_INT < 34) {
