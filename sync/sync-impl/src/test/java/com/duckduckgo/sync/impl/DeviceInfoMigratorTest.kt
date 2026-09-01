@@ -116,18 +116,19 @@ class DeviceInfoMigratorTest {
 
         assertTrue(result is Result.Success)
         verify(syncStore).unifiedDeviceListMigratedForUserId = userId
-        verify(deviceInfoUpdater, never()).setThisDeviceName(any())
+        verify(deviceInfoUpdater, never()).setThisDeviceName(name = any(), source = any())
     }
 
     @Test
     fun whenDeviceInfoWrittenThenMarkDone() = runTest {
         whenever(syncApi.getDevices(token)).thenReturn(Result.Success(deviceEntries(deviceInfo = null)))
-        whenever(deviceInfoUpdater.setThisDeviceName("deviceName")).thenReturn(Result.Success(emptyList()))
+        whenever(deviceInfoUpdater.setThisDeviceName(name = "deviceName", source = DeviceInfoUpdateSource.FIRST_WRITE))
+            .thenReturn(Result.Success(emptyList()))
 
         val result = migrator.ensureMigrated()
 
         assertTrue(result is Result.Success)
-        verify(deviceInfoUpdater).setThisDeviceName("deviceName")
+        verify(deviceInfoUpdater).setThisDeviceName(name = "deviceName", source = DeviceInfoUpdateSource.FIRST_WRITE)
         verify(syncStore).unifiedDeviceListMigratedForUserId = userId
     }
 
@@ -136,14 +137,15 @@ class DeviceInfoMigratorTest {
         whenever(syncApi.getDevices(token)).thenReturn(Result.Error(reason = "network"))
 
         assertTrue(migrator.ensureMigrated() is Result.Error)
-        verify(deviceInfoUpdater, never()).setThisDeviceName(any())
+        verify(deviceInfoUpdater, never()).setThisDeviceName(name = any(), source = any())
         verify(syncStore, never()).unifiedDeviceListMigratedForUserId = any()
     }
 
     @Test
     fun whenWriteFailsThenErrorAndNotMarked() = runTest {
         whenever(syncApi.getDevices(token)).thenReturn(Result.Success(deviceEntries(deviceInfo = null)))
-        whenever(deviceInfoUpdater.setThisDeviceName("deviceName")).thenReturn(Result.Error(reason = "patch failed"))
+        whenever(deviceInfoUpdater.setThisDeviceName(name = "deviceName", source = DeviceInfoUpdateSource.FIRST_WRITE))
+            .thenReturn(Result.Error(reason = "patch failed"))
 
         assertTrue(migrator.ensureMigrated() is Result.Error)
         verify(syncStore, never()).unifiedDeviceListMigratedForUserId = any()

@@ -426,7 +426,12 @@ class AppSyncAccountRepository @Inject constructor(
         val canPatchDevice = withDeviceInfo || syncFeature.canUsePatchEndpointForLegacyDeviceRename().isEnabled()
         logcat { "Sync-UnifiedDevices: rename via ${if (canPatchDevice) "PATCH" else "login"}, withDeviceInfo=$withDeviceInfo" }
         if (canPatchDevice) {
-            return@withContext when (val result = deviceInfoUpdater.setThisDeviceName(device.deviceName)) {
+            return@withContext when (
+                val result = deviceInfoUpdater.setThisDeviceName(
+                    name = device.deviceName,
+                    source = DeviceInfoUpdateSource.UPDATE,
+                )
+            ) {
                 is Success -> Success(true)
                 is Error -> result.alsoFireUpdateDeviceErrorPixel()
             }
@@ -986,13 +991,48 @@ class AppSyncAccountRepository @Inject constructor(
             val devices = if (entriesV2 != null) {
                 val decryptResult = thirdPartyDeviceListDecryptor.decryptAll(entriesV2, syncStore.deviceId)
                 logoutFailedV2Devices(decryptResult.undecryptable)
-                if (decryptResult.thisDeviceInfoUnresolved) republishThisDeviceInfo()
+                fireUnifiedDeviceListReadPixels(decryptResult)
+                if (decryptResult.thisDeviceInfoNeedsRepair) republishThisDeviceInfo()
                 decryptResult.decrypted.map { it.toConnectedDevice() }
             } else {
                 // entries_v2 missing
                 decryptLegacyEntries(result.data.entries, primaryKey)
             }
             finishWith(devices)
+        }
+    }
+
+    private fun fireUnifiedDeviceListReadPixels(result: DecryptAllResult) {
+        if (!syncFeature.canReadUnifiedDeviceList().isEnabled()) return
+
+        result.keyUnavailableReason?.let {
+            syncPixels.fireUnifiedDeviceListPixel(UnifiedDeviceListPixel.AccountInfoKeyUnavailable(it))
+            return
+        }
+
+        when (val outcome = result.ownDeviceReadOutcome) {
+            OwnDeviceReadOutcome.ResolvedDeviceInfo ->
+                syncPixels.fireUnifiedDeviceListPixel(UnifiedDeviceListPixel.OwnRowResolvedDeviceInfo)
+            is OwnDeviceReadOutcome.ResolvedLegacy -> fireOwnRowFallbackIfWritable(
+                UnifiedDeviceListPixel.OwnRowResolvedLegacy(outcome.reason),
+            )
+            is OwnDeviceReadOutcome.ResolvedPlaceholder -> fireOwnRowFallbackIfWritable(
+                UnifiedDeviceListPixel.OwnRowResolvedPlaceholder(outcome.reason),
+            )
+            null -> {}
+        }
+
+        result.otherRowFailedDecryptionCredentials.forEach {
+            syncPixels.fireUnifiedDeviceListPixel(UnifiedDeviceListPixel.OtherRowDeviceInfoFailedDecryption(it))
+        }
+        result.otherRowPlaceholderCredentials.forEach {
+            syncPixels.fireUnifiedDeviceListPixel(UnifiedDeviceListPixel.OtherRowResolvedPlaceholder(it))
+        }
+    }
+
+    private fun fireOwnRowFallbackIfWritable(event: UnifiedDeviceListPixel) {
+        if (syncFeature.canWriteUnifiedDeviceList().isEnabled()) {
+            syncPixels.fireUnifiedDeviceListPixel(event)
         }
     }
 
@@ -1012,7 +1052,12 @@ class AppSyncAccountRepository @Inject constructor(
 
         appCoroutineScope.launch(dispatcherProvider.io()) {
             logcat { "Sync-UnifiedDevices: this device's device_info did not resolve on read; re-publishing it" }
-            when (val result = deviceInfoUpdater.setThisDeviceName(syncDeviceIds.deviceName())) {
+            when (
+                val result = deviceInfoUpdater.setThisDeviceName(
+                    name = syncDeviceIds.deviceName(),
+                    source = DeviceInfoUpdateSource.REPAIR,
+                )
+            ) {
                 is Success -> logcat { "Sync-UnifiedDevices: device_info re-published" }
                 is Error -> {
                     logcat(WARN) { "Sync-UnifiedDevices: device_info re-publish failed: ${result.reason}" }
@@ -1195,6 +1240,11 @@ class AppSyncAccountRepository @Inject constructor(
 
         return when (result) {
             is Error -> {
+                if (unifiedDeviceInfo != null) {
+                    syncPixels.fireUnifiedDeviceListPixel(
+                        UnifiedDeviceListPixel.AccountInfoKeyCreateFailed(result.toAccountInfoKeyCreateFailureReason()),
+                    )
+                }
                 result
             }
 
@@ -1205,6 +1255,8 @@ class AppSyncAccountRepository @Inject constructor(
                     syncStore.credentialId = CREDENTIAL_ID_DDG
                 }
                 unifiedDeviceInfo?.let {
+                    syncPixels.fireUnifiedDeviceListPixel(UnifiedDeviceListPixel.AccountInfoKeyCreateSuccess)
+                    syncPixels.fireUnifiedDeviceListPixel(UnifiedDeviceListPixel.OwnRowDeviceInfoFirstWriteSuccess)
                     // cache the pubkey and mark migration done
                     syncStore.accountInfoPublicKey = it.publicKey
                     syncStore.unifiedDeviceListMigratedForUserId = account.userId

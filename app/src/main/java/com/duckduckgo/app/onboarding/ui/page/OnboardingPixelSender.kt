@@ -22,6 +22,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
+import com.duckduckgo.app.onboarding.orchestrator.PasswordImportOutcome
 import com.duckduckgo.app.pixels.OnboardingPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
@@ -65,6 +66,8 @@ sealed interface OnboardingPixelAction {
         val addressBarPosition: OmnibarType,
         val inputScreenSelected: Boolean,
     ) : OnboardingPixelAction
+
+    data class PasswordImportConfirmed(val outcome: PasswordImportOutcome) : OnboardingPixelAction
 }
 
 interface OnboardingPixelSender {
@@ -152,6 +155,9 @@ class RealOnboardingPixelSender @Inject constructor(
 
             is OnboardingPixelAction.QuickSetupClicked ->
                 fireQuickSetupClicked(pixelName, action.addressBarPosition, action.inputScreenSelected)
+
+            is OnboardingPixelAction.PasswordImportConfirmed ->
+                fireStep(pixelName, PIXEL_EVENT_CONFIRMED, action.outcome.name.lowercase())
         }
     }
 

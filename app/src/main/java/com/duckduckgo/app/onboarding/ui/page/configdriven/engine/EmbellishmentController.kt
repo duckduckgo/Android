@@ -92,6 +92,7 @@ class EmbellishmentControllerImpl(
         Embellishment.WalkingDax to buildWalkingDax(),
         Embellishment.BottomWing to buildBottomWing(),
         Embellishment.LeftWing to buildLeftWing(),
+        Embellishment.RightWing to buildRightWing(),
         Embellishment.BobbingDax to buildBobbingDax(),
         Embellishment.None to buildUndecoratedBand(),
     )
@@ -153,8 +154,10 @@ class EmbellishmentControllerImpl(
     }
 
     override fun release() {
-        trackedAnimators.forEach { it.cancel() }
+        val animators = trackedAnimators.toList()
         trackedAnimators.clear()
+        animators.forEach { it.cancel() }
+
         pendingExit?.let {
             it.view.removeAnimatorListener(it.listener)
             it.view.cancelAnimation()
@@ -228,9 +231,9 @@ class EmbellishmentControllerImpl(
         }
     }
 
-    private fun leftWingBottomOverlapPx(): Int {
+    private fun sideWingBottomOverlapPx(): Int {
         val cardBottomMargin = (binding.daxDialogCta.cardView.layoutParams as? ViewGroup.MarginLayoutParams)?.bottomMargin ?: return 0
-        return (cardBottomMargin - LEFT_WING_CARD_GAP_DP.toPx()).coerceAtLeast(0)
+        return (cardBottomMargin - SIDE_WING_CARD_GAP_DP.toPx()).coerceAtLeast(0)
     }
 
     private fun buildWalkingDax(): Decoration {
@@ -368,7 +371,51 @@ class EmbellishmentControllerImpl(
             placement = EmbellishmentPlacement.of(Embellishment.LeftWing),
             maxHeightPx = { LEFT_WING_MAX_HEIGHT_DP.toPx() },
             minHeightPx = { LEFT_WING_MIN_HEIGHT_DP.toPx() },
-            bottomOverlapPx = { leftWingBottomOverlapPx() },
+            bottomOverlapPx = { sideWingBottomOverlapPx() },
+            enter = {
+                view.isVisible = true
+                view.alpha = 0f
+                view.setMinAndMaxProgress(0f, WING_STOP_PROGRESS)
+                val fadeIn = ObjectAnimator.ofFloat(view, View.ALPHA, 0f, 1f).apply {
+                    startDelay = WING_START_DELAY
+                    duration = WING_FADE_IN_DURATION
+                    addListener(
+                        object : AnimatorListenerAdapter() {
+                            override fun onAnimationStart(animation: Animator) {
+                                view.playAnimation()
+                            }
+                        },
+                    )
+                }
+                fadeIn.start()
+                listOf(fadeIn)
+            },
+            exit = {
+                view.setMinProgress(WING_STOP_PROGRESS)
+                view.setMaxProgress(1f)
+                view.speed = 1f
+                exitViaLottie(view, applyFinalState = { view.isGone = true })
+                emptyList()
+            },
+            hide = instantHideOf(view),
+            snap = {
+                view.cancelAnimation()
+                view.isVisible = true
+                view.alpha = 1f
+                view.setMinAndMaxProgress(0f, WING_STOP_PROGRESS)
+                view.progress = WING_STOP_PROGRESS
+            },
+        )
+    }
+
+    private fun buildRightWing(): Decoration {
+        val view = binding.rightWingAnimation
+        return Decoration(
+            view = view,
+            placement = EmbellishmentPlacement.of(Embellishment.RightWing),
+            maxHeightPx = { RIGHT_WING_MAX_HEIGHT_DP.toPx() },
+            minHeightPx = { RIGHT_WING_MIN_HEIGHT_DP.toPx() },
+            bottomOverlapPx = { sideWingBottomOverlapPx() },
             enter = {
                 view.isVisible = true
                 view.alpha = 0f
@@ -540,7 +587,9 @@ class EmbellishmentControllerImpl(
         const val BOTTOM_WING_MIN_HEIGHT_DP = 130
         const val LEFT_WING_MAX_HEIGHT_DP = 196
         const val LEFT_WING_MIN_HEIGHT_DP = 130
-        const val LEFT_WING_CARD_GAP_DP = 8
+        const val RIGHT_WING_MAX_HEIGHT_DP = 196
+        const val RIGHT_WING_MIN_HEIGHT_DP = 130
+        const val SIDE_WING_CARD_GAP_DP = 8
         const val BOBBING_DAX_MAX_HEIGHT_DP = 156
         const val BOBBING_DAX_MIN_HEIGHT_DP = 130
 

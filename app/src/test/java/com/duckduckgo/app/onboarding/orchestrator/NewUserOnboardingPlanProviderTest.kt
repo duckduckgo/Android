@@ -29,6 +29,7 @@ import com.duckduckgo.app.onboarding.DuckAiOnboardingAvailability
 import com.duckduckgo.app.onboarding.DuckAiOnboardingDemo
 import com.duckduckgo.app.onboarding.FakeOnboardingSingleChoiceDataPlugin
 import com.duckduckgo.app.onboarding.OnboardingInputScreenLaunchTarget
+import com.duckduckgo.app.onboarding.OnboardingPasswordImportExperimentManager
 import com.duckduckgo.app.onboarding.OnboardingPreference
 import com.duckduckgo.app.onboarding.OnboardingPreferenceCatalog
 import com.duckduckgo.app.onboarding.OnboardingPromptsExperimentManager
@@ -139,6 +140,10 @@ class NewUserOnboardingPlanProviderTest {
         override suspend fun getPlugins(): Collection<OnboardingSingleChoiceDataPlugin> = singleChoicePlugins
     }
 
+    // Password import is off in these tests: its steps are then left out of the plan entirely, so every
+    // existing step-order and indicator expectation below is unaffected by the feature.
+    private val passwordImportExperiment: OnboardingPasswordImportExperimentManager = mock()
+
     private lateinit var provider: NewUserOnboardingPlanProvider
     private val orchestrator = LinearOnboardingOrchestratorImpl()
 
@@ -159,6 +164,7 @@ class NewUserOnboardingPlanProviderTest {
             whenever(homeScreenPromptsExperiment.enroll())
                 .thenReturn(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.CONTROL)
             whenever(segmentedOnboardingExperiment.enroll()).thenReturn(null)
+            whenever(passwordImportExperiment.enroll()).thenReturn(null)
         }
         provider = NewUserOnboardingPlanProvider(
             syncAutoRestore = syncAutoRestore,
@@ -181,6 +187,7 @@ class NewUserOnboardingPlanProviderTest {
             duckAiOnboardingDemo = duckAiOnboardingDemo,
             onboardingPromptsExperimentManager = homeScreenPromptsExperiment,
             segmentedOnboardingExperimentManager = segmentedOnboardingExperiment,
+            onboardingPasswordImportExperimentManager = passwordImportExperiment,
             onboardingPreferenceCatalog = onboardingPreferenceCatalog,
             singleChoiceDataPlugins = singleChoiceDataPlugins,
             appCoroutineScope = coroutineRule.testScope,
@@ -1720,7 +1727,7 @@ class NewUserOnboardingPlanProviderTest {
     ): Int {
         whenever(homeScreenPromptsExperiment.enroll()).thenReturn(onboardingPromptExperimentVariant)
         return provider.buildRootPlan(onCompleted = {}, onSkipped = {}).steps
-            .count { (it as? NewUserOnboardingActivityStep)?.showsStepIndicator == true }
+            .count { (it as? NewUserOnboardingActivityStep)?.indicator == StepIndicatorMode.COUNTED }
     }
 
     @Test

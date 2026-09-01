@@ -459,6 +459,12 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
                 _commands.send(Command.LaunchAddWidgetPrompt)
             }
 
+            NewUserOnboardingActivityDialog.ImportPasswordsLaunch -> {
+                // TODO: launch the Google password import flow and report its outcome back as
+                //  PasswordImportWebFlowFinished / PasswordImportParsed. Until that lands, this step has no
+                //  side effect and the outcome card stays on its parsing state.
+            }
+
             NewUserOnboardingActivityDialog.SyncRestore,
             NewUserOnboardingActivityDialog.InitialReinstallUser,
             NewUserOnboardingActivityDialog.Initial,
@@ -469,6 +475,8 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
             NewUserOnboardingActivityDialog.DownloadReason,
             NewUserOnboardingActivityDialog.AddToDock,
             NewUserOnboardingActivityDialog.WidgetPrompt,
+            NewUserOnboardingActivityDialog.ImportPasswords,
+            NewUserOnboardingActivityDialog.ImportComplete,
             is NewUserOnboardingActivityDialog.AddressBarPosition,
             NewUserOnboardingActivityDialog.InputScreen,
             is NewUserOnboardingActivityDialog.InputScreenPreview,

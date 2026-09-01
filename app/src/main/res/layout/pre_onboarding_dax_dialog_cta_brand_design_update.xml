@@ -168,6 +168,24 @@
                     android:layout_marginEnd="20dp"
                     android:visibility="gone" />
 
+                <include
+                    android:id="@+id/importPasswordsContent"
+                    layout="@layout/include_brand_design_import_passwords"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:visibility="gone" />
+
+                <include
+                    android:id="@+id/importCompleteContent"
+                    layout="@layout/include_brand_design_import_complete"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:visibility="gone" />
+
                 <com.duckduckgo.common.ui.view.button.DaxButtonBrand
                     android:id="@+id/primaryCta"
                     android:layout_width="match_parent"

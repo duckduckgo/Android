@@ -39,6 +39,12 @@ sealed interface NewUserOnboardingActivityDialog {
     data object WidgetPrompt : NewUserOnboardingActivityDialog
 
     data object AddWidget : NewUserOnboardingActivityDialog
+
+    data object ImportPasswords : NewUserOnboardingActivityDialog
+
+    data object ImportPasswordsLaunch : NewUserOnboardingActivityDialog
+
+    data object ImportComplete : NewUserOnboardingActivityDialog
     data class AddressBarPosition(val showSplitOption: Boolean) : NewUserOnboardingActivityDialog
     data object InputScreen : NewUserOnboardingActivityDialog
 

@@ -59,4 +59,14 @@ sealed interface NewUserOnboardingEvent : LinearOnboardingEvent {
     data class PreferenceSelectorConfirmed(val selections: Map<OnboardingPreference, Boolean>) : NewUserOnboardingEvent
 
     data class SingleChoiceConfirmed(val option: Option) : NewUserOnboardingEvent
+
+    data object PasswordImportRequested : NewUserOnboardingEvent
+
+    data object PasswordImportSkipped : NewUserOnboardingEvent
+
+    data class PasswordImportWebFlowFinished(val outcome: PasswordImportOutcome) : NewUserOnboardingEvent
+
+    data class PasswordImportParsed(val outcome: PasswordImportOutcome) : NewUserOnboardingEvent
 }
+
+enum class PasswordImportOutcome { SUCCESS, CANCELLED, ERROR }

@@ -51,5 +51,6 @@ interface InternalFeaturePlugin {
         const val SAVED_SITES_SETTINGS_PRIO_KEY = 1_100
         const val ATTRIBUTED_METRICS_SETTINGS_PRIO_KEY = 1_200
         const val ONBOARDING_DEV_SETTINGS_PRIO_KEY = 1_300
+        const val MODAL_COORDINATOR_DEV_SETTINGS_PRIO_KEY = 1_400
     }
 }

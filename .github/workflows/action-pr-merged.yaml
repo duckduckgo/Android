@@ -16,8 +16,25 @@ jobs:
           trigger-phrase: "Task/Issue URL:"
           action: 'notify-pr-merged'
           is-complete: true
+      # A stacked PR keeps its parent's branch as base.ref even though the merge queue lands its
+      # commit on the default branch, so check where the commit actually ended up.
+      - name: Check whether the merge commit landed on the default branch
+        id: landed
+        if: github.event.pull_request.merged
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COMPARE: repos/${{ github.repository }}/compare/${{ github.event.repository.default_branch }}...${{ github.event.pull_request.merge_commit_sha }}
+        run: |
+          for _ in {1..5}; do
+            if status=$(gh api "$COMPARE" --jq .status); then break; fi
+            status=""
+            sleep 2
+          done
+          case "$status" in identical|behind) on_default=true ;; *) on_default=false ;; esac
+          echo "compare status: ${status:-<error>} -> on_default: $on_default"
+          echo "on_default=$on_default" >> "$GITHUB_OUTPUT"
       - name: If merged to the default branch, add to Waiting for release
-        if: github.event.pull_request.merged && github.event.pull_request.base.ref == github.event.repository.default_branch
+        if: steps.landed.outputs.on_default == 'true'
         uses: duckduckgo/native-github-asana-sync@v2.6.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}

@@ -195,6 +195,13 @@ interface DuckChatPixels {
     fun reportContextualFireButtonTapped()
     fun reportContextualFireButtonConfirmed()
 
+    fun reportContextualAddressBarMenuShown()
+    fun reportContextualAddressBarMenuNewChatSelected()
+    fun reportContextualAddressBarMenuAskAboutPageSelected()
+    fun reportContextualFloatingInputShown()
+    fun reportContextualFloatingInputDismissedWithoutSubmission()
+    fun reportContextualFloatingInputPromotedToSheet()
+
     fun reportChatSyncActive()
 
     fun reportNativeStorageReaderUsed(native: Boolean)
@@ -733,6 +740,48 @@ class RealDuckChatPixels @Inject constructor(
             pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_FIRE_BUTTON_CONFIRMED_FIRST, type = Pixel.PixelType.Unique())
             pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_FIRE_BUTTON_CONFIRMED_DAILY, type = Pixel.PixelType.Daily())
             pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_FIRE_BUTTON_CONFIRMED_COUNT)
+        }
+    }
+
+    override fun reportContextualAddressBarMenuShown() {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_SHOWN_COUNT)
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_SHOWN_DAILY, type = Pixel.PixelType.Daily())
+        }
+    }
+
+    override fun reportContextualAddressBarMenuNewChatSelected() {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_NEW_CHAT_SELECTED_COUNT)
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_NEW_CHAT_SELECTED_DAILY, type = Pixel.PixelType.Daily())
+        }
+    }
+
+    override fun reportContextualAddressBarMenuAskAboutPageSelected() {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_ASK_ABOUT_PAGE_SELECTED_COUNT)
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_ASK_ABOUT_PAGE_SELECTED_DAILY, type = Pixel.PixelType.Daily())
+        }
+    }
+
+    override fun reportContextualFloatingInputShown() {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_FLOATING_INPUT_SHOWN_COUNT)
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_FLOATING_INPUT_SHOWN_DAILY, type = Pixel.PixelType.Daily())
+        }
+    }
+
+    override fun reportContextualFloatingInputDismissedWithoutSubmission() {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_FLOATING_INPUT_DISMISSED_WITHOUT_SUBMISSION_COUNT)
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_FLOATING_INPUT_DISMISSED_WITHOUT_SUBMISSION_DAILY, type = Pixel.PixelType.Daily())
+        }
+    }
+
+    override fun reportContextualFloatingInputPromotedToSheet() {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_FLOATING_INPUT_PROMOTED_TO_SHEET_COUNT)
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_FLOATING_INPUT_PROMOTED_TO_SHEET_DAILY, type = Pixel.PixelType.Daily())
         }
     }
 
@@ -1343,6 +1392,18 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_CONTEXTUAL_FIRE_BUTTON_CONFIRMED_FIRST("m_aichat_contextual_fire_button_confirmed_first"),
     DUCK_CHAT_CONTEXTUAL_FIRE_BUTTON_CONFIRMED_DAILY("m_aichat_contextual_fire_button_confirmed_daily"),
     DUCK_CHAT_CONTEXTUAL_FIRE_BUTTON_CONFIRMED_COUNT("m_aichat_contextual_fire_button_confirmed_count"),
+    DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_SHOWN_COUNT("aichat_contextual_address_bar_menu_shown_count"),
+    DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_SHOWN_DAILY("aichat_contextual_address_bar_menu_shown_daily"),
+    DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_NEW_CHAT_SELECTED_COUNT("aichat_contextual_address_bar_menu_new_chat_selected_count"),
+    DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_NEW_CHAT_SELECTED_DAILY("aichat_contextual_address_bar_menu_new_chat_selected_daily"),
+    DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_ASK_ABOUT_PAGE_SELECTED_COUNT("aichat_contextual_address_bar_menu_ask_about_page_selected_count"),
+    DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_ASK_ABOUT_PAGE_SELECTED_DAILY("aichat_contextual_address_bar_menu_ask_about_page_selected_daily"),
+    DUCK_CHAT_CONTEXTUAL_FLOATING_INPUT_SHOWN_COUNT("aichat_contextual_floating_input_opened_count"),
+    DUCK_CHAT_CONTEXTUAL_FLOATING_INPUT_SHOWN_DAILY("aichat_contextual_floating_input_opened_daily"),
+    DUCK_CHAT_CONTEXTUAL_FLOATING_INPUT_DISMISSED_WITHOUT_SUBMISSION_COUNT("aichat_contextual_floating_input_dismissed_without_submission_count"),
+    DUCK_CHAT_CONTEXTUAL_FLOATING_INPUT_DISMISSED_WITHOUT_SUBMISSION_DAILY("aichat_contextual_floating_input_dismissed_without_submission_daily"),
+    DUCK_CHAT_CONTEXTUAL_FLOATING_INPUT_PROMOTED_TO_SHEET_COUNT("aichat_contextual_floating_input_promoted_to_sheet_count"),
+    DUCK_CHAT_CONTEXTUAL_FLOATING_INPUT_PROMOTED_TO_SHEET_DAILY("aichat_contextual_floating_input_promoted_to_sheet_daily"),
 
     SYNC_AI_CHAT_ACTIVE("sync_ai_chat_active"),
 
@@ -1676,6 +1737,18 @@ class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_FIRE_BUTTON_CONFIRMED_FIRST.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_FIRE_BUTTON_CONFIRMED_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_FIRE_BUTTON_CONFIRMED_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_SHOWN_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_SHOWN_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_NEW_CHAT_SELECTED_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_NEW_CHAT_SELECTED_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_ASK_ABOUT_PAGE_SELECTED_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_ASK_ABOUT_PAGE_SELECTED_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_FLOATING_INPUT_SHOWN_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_FLOATING_INPUT_SHOWN_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_FLOATING_INPUT_DISMISSED_WITHOUT_SUBMISSION_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_FLOATING_INPUT_DISMISSED_WITHOUT_SUBMISSION_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_FLOATING_INPUT_PROMOTED_TO_SHEET_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_FLOATING_INPUT_PROMOTED_TO_SHEET_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_NATIVE_STORAGE_READER_NATIVE_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_NATIVE_STORAGE_READER_WEBVIEW_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_NATIVE_STORAGE_DELETION_NATIVE_COUNT.pixelName to PixelParameter.removeAtb(),

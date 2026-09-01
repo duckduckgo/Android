@@ -25,4 +25,12 @@
     <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[O DuckDuckGo pode gerir automaticamente os pop-ups de cookies para maximizar a privacidade e minimizar os cookies antes mesmo de os veres.\n<a href=\"\">Sabe mais</a>]]></string>
     <string name="autoconsentPopUpsWithoutOptOutsToggle">Aceitar cookies que não podem ser rejeitados</string>
     <string name="autoconsentPopUpsWithoutOptOutsDescription">Se não houver opção de rejeição, vamos poupar-te um clique, aceitar estes cookies por ti e fechar os pop-ups.</string>
+    <string name="autoconsentPromptTitle">Cansado de pop-ups de cookies?</string>
+    <string name="autoconsentPromptFootnote">Podes sempre ajustar mais tarde nas Definições.</string>
+    <string name="autoconsentPromptCpmOnMessage">Alguns cookies não podem ser rejeitados. Podemos aceitá-los por ti.</string>
+    <string name="autoconsentPromptCpmOnPrimaryButton">Aceitar cookies por mim</string>
+    <string name="autoconsentPromptCpmOnSecondaryButton">Eu aceito-os</string>
+    <string name="autoconsentPromptCpmOffMessage">Deixa-nos tratar deles por ti. Rejeitamos cookies quando possível e aceitamos os que não podem ser rejeitados.</string>
+    <string name="autoconsentPromptCpmOffPrimaryButton">Rejeitar se possível ou aceitar por mim</string>
+    <string name="autoconsentPromptCpmOffSecondaryButton">Prefiro ser eu a geri-los</string>
 </resources>

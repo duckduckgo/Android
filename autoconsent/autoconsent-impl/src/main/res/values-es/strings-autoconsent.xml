@@ -25,4 +25,12 @@
     <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[DuckDuckGo puede gestionar automáticamente las ventanas emergentes de cookies para maximizar la privacidad y minimizar las cookies antes incluso de que las veas.\n<a href=\"\">Más información</a>]]></string>
     <string name="autoconsentPopUpsWithoutOptOutsToggle">Aceptar cookies sin opción de rechazarlas</string>
     <string name="autoconsentPopUpsWithoutOptOutsDescription">Si no hay opción de rechazarlas, te ahorraremos un clic, aceptaremos estas cookies por ti y cerraremos las ventanas emergentes.</string>
+    <string name="autoconsentPromptTitle">¿Cansado de las ventanas emergentes de cookies?</string>
+    <string name="autoconsentPromptFootnote">Siempre puedes cambiar esto más tarde en Ajustes.</string>
+    <string name="autoconsentPromptCpmOnMessage">Algunas cookies no se pueden rechazar. Podemos aceptarlas por ti.</string>
+    <string name="autoconsentPromptCpmOnPrimaryButton">Aceptar cookies por mí</string>
+    <string name="autoconsentPromptCpmOnSecondaryButton">Las aceptaré por mi cuenta</string>
+    <string name="autoconsentPromptCpmOffMessage">Deja que nos ocupemos de ellas por ti. Rechazaremos las cookies cuando sea posible y aceptaremos las que no se puedan rechazar.</string>
+    <string name="autoconsentPromptCpmOffPrimaryButton">Rechazar si es posible o aceptar por mí</string>
+    <string name="autoconsentPromptCpmOffSecondaryButton">Me encargaré yo de ellas</string>
 </resources>

@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cookiePopupOptInContainer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background_cookie_popup_sheet"
+    android:theme="@style/ThemeOverlay.DuckDuckGo.Onboarding">
+
+    <ImageView
+        android:id="@+id/cookiePopupOptInIllustration"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/cookiePopupOptInIllustrationHeight"
+        android:importantForAccessibility="no"
+        android:scaleType="centerCrop"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/onboarding_input_type_background" />
+
+    <ScrollView
+        android:id="@+id/cookiePopupOptInScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/keyline_5">
+
+            <ImageView
+                android:id="@+id/cookiePopupOptInLogo"
+                android:layout_width="@dimen/cookiePopupOptInLogoSize"
+                android:layout_height="@dimen/cookiePopupOptInLogoSize"
+                android:layout_marginTop="@dimen/keyline_7"
+                android:importantForAccessibility="no"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_duckduckgo_color_24" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/cookiePopupOptInBrand"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:text="@string/autoconsentPopupBrand"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cookiePopupOptInLogo"
+                app:typography="caption_allCaps" />
+
+            <com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleBrandDesignUpdateCardView
+                android:id="@+id/cookiePopupOptInBubble"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/keyline_5"
+                android:layout_marginTop="@dimen/keyline_6"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cookiePopupOptInBrand"
+                app:showArrow="false">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="@dimen/cookiePopupOptInCardPadding"
+                    android:paddingTop="@dimen/keyline_6"
+                    android:paddingBottom="@dimen/cookiePopupOptInCardPadding">
+
+                    <ImageView
+                        android:id="@+id/cookiePopupOptInPictogram"
+                        android:layout_width="@dimen/cookiePopupOptInPictogramSize"
+                        android:layout_height="@dimen/cookiePopupOptInPictogramSize"
+                        android:importantForAccessibility="no"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:srcCompat="@drawable/cookie_popups_check_96" />
+
+                    <com.duckduckgo.common.ui.view.text.DaxTextView
+                        android:id="@+id/cookiePopupOptInTitle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="@dimen/keyline_3"
+                        android:layout_marginTop="@dimen/keyline_4"
+                        android:gravity="center_horizontal"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/cookiePopupOptInPictogram"
+                        app:typography="onboarding_title"
+                        tools:text="@string/autoconsentPromptTitle" />
+
+                    <com.duckduckgo.common.ui.view.text.DaxTextView
+                        android:id="@+id/cookiePopupOptInDescription"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="@dimen/keyline_3"
+                        android:layout_marginTop="@dimen/cookiePopupOptInSectionSpacing"
+                        android:gravity="center_horizontal"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/cookiePopupOptInTitle"
+                        app:typography="onboarding_body"
+                        tools:text="@string/autoconsentPromptCpmOnMessage" />
+
+                    <com.duckduckgo.common.ui.view.button.DaxButtonBrand
+                        android:id="@+id/cookiePopupOptInAcceptButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/keyline_5"
+                        app:daxButtonBrandTypography="duckSans"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/cookiePopupOptInDescription"
+                        tools:text="@string/autoconsentPromptCpmOnPrimaryButton" />
+
+                    <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+                        android:id="@+id/cookiePopupOptInDeclineButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="@style/Typography.DuckDuckGo.Rebrand.ButtonDuckSans"
+                        android:theme="@style/ThemeOverlay.Rebrand"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/cookiePopupOptInAcceptButton"
+                        tools:ignore="DeprecatedWidgetInXml,InvalidDaxButtonDuckSans,InvalidDaxButtonProperty"
+                        tools:text="@string/autoconsentPromptCpmOnSecondaryButton" />
+
+                    <com.duckduckgo.common.ui.view.text.DaxTextView
+                        android:id="@+id/cookiePopupOptInFootnote"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/keyline_5"
+                        android:gravity="center_horizontal"
+                        android:text="@string/autoconsentPromptFootnote"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/cookiePopupOptInDeclineButton"
+                        app:textType="secondary" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleBrandDesignUpdateCardView>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
