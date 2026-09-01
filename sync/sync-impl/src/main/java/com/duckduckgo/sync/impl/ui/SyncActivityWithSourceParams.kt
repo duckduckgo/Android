@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,8 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.sync.impl.ui.setup
+package com.duckduckgo.sync.impl.ui
 
-interface SyncSetupFlowFinishedListener {
-    fun launchGetAppOnOtherPlatformsScreen()
-    fun finishSetup()
-}
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 
-interface SyncSetupNavigationFlowListener {
-    fun launchRecoveryCodeScreen()
-    fun launchCreateAccountScreen()
-    fun launchRestoreInProgressScreen()
-    fun launchContinueSetupSkippingRestoreCheck()
-    fun launchRecoverAccountScreen()
-    fun launchDeviceConnectedScreen()
-}
+data class SyncActivityWithSourceParams(val source: String?) : GlobalActivityStarter.ActivityParams

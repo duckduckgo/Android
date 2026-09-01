@@ -52,9 +52,7 @@ import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SO
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SOURCE_SYNC_ENABLED
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskDeleteAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskEditDevice
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskRemoveDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskToCopyRecoveryCode
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroCreateAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchSyncGetOnOtherPlatforms
@@ -247,13 +245,10 @@ class SyncActivityViewModel @Inject constructor(
         data class AskSetupSyncDeepLink(val syncBarcodeUrl: SyncBarcodeUrl) : Command()
         data object IntroCreateAccount : Command()
         data object IntroRecoverSyncData : Command()
-        data object ShowRecoveryCode : Command()
-        data class AskTurnOffSync(val device: ConnectedDevice) : Command()
         data object AskDeleteAccount : Command()
         data object CheckIfUserHasStoragePermission : Command()
         data class RecoveryCodePDFSuccess(val recoveryCodePDFFile: File) : Command()
         data object AskToCopyRecoveryCode : Command()
-        data class AskRemoveDevice(val device: ConnectedDevice) : Command()
         data class AskEditDevice(val device: ConnectedDevice, val requireAuthentication: Boolean) : Command()
         data class ShowError(
             @StringRes val message: Int,
@@ -343,20 +338,6 @@ class SyncActivityViewModel @Inject constructor(
                     command.send(ShowError(R.string.sync_general_error, result.reason))
                 }
             }
-        }
-    }
-
-    fun onLoginSuccess() {
-        viewModelScope.launch {
-            command.send(Command.ShowRecoveryCode)
-        }
-    }
-
-    fun onTurnOffClicked() {
-        viewModelScope.launch {
-            syncAccountRepository.getThisConnectedDevice()?.let {
-                command.send(AskTurnOffSync(it))
-            } ?: showAccountDetailsIfNeeded()
         }
     }
 
@@ -539,12 +520,6 @@ class SyncActivityViewModel @Inject constructor(
             } else {
                 command.send(askEditCommand)
             }
-        }
-    }
-
-    fun onRemoveDeviceClicked(device: ConnectedDevice) {
-        viewModelScope.launch {
-            command.send(AskRemoveDevice(device))
         }
     }
 

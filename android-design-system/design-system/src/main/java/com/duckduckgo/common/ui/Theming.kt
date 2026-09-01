@@ -50,10 +50,6 @@ object Theming {
     object Constants {
         const val BROADCAST_THEME_CHANGED = "BROADCAST_THEME_CHANGED"
         val FIXED_THEME_ACTIVITIES = listOf(
-            "com.duckduckgo.sync.impl.ui.SyncLoginActivity",
-            "com.duckduckgo.sync.impl.ui.SyncConnectActivity",
-            "com.duckduckgo.sync.impl.ui.EnterCodeActivity",
-            "com.duckduckgo.sync.impl.ui.SyncWithAnotherDeviceActivity",
             "com.duckduckgo.autofill.impl.service.AutofillProviderFillSuggestionActivity",
             "com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeActivity",
             "com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeActivity",

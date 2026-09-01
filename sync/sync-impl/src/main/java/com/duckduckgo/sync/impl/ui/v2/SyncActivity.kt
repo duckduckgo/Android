@@ -29,6 +29,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -50,6 +51,7 @@ import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.settings.api.SettingsWebViewScreenWithParams
 import com.duckduckgo.sync.api.SyncActivityFromSetupUrl
 import com.duckduckgo.sync.api.SyncActivityWithAnotherDevice
+import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.duckduckgo.sync.api.SyncMessagePlugin
 import com.duckduckgo.sync.api.SyncSettingsPlugin
 import com.duckduckgo.sync.impl.ConnectedDevice
@@ -68,10 +70,8 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AddAnotherDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskDeleteAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskEditDevice
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskRemoveDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskSetupSyncDeepLink
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskToCopyRecoveryCode
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.DeepLinkIntoSetup
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroCreateAccount
@@ -85,7 +85,6 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowDeviceUnsup
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowPreviousSessionReady
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowRecoveryCode
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.SyncWithAnotherDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows.CreateAccountFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows.SignInFlow
@@ -102,6 +101,10 @@ import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(ActivityScope::class)
+@ContributeToActivityStarter(SyncActivityWithEmptyParams::class)
+@ContributeToActivityStarter(SyncActivityWithSourceParams::class)
+@ContributeToActivityStarter(SyncActivityFromSetupUrl::class)
+@ContributeToActivityStarter(SyncActivityWithAnotherDevice::class)
 class SyncActivity : DuckDuckGoActivity() {
     private val binding by viewBinding<ActivitySyncV2Binding>()
 
@@ -406,9 +409,6 @@ class SyncActivity : DuckDuckGoActivity() {
                 }
             }
 
-            // No-op in the simplified flow.
-            is AskRemoveDevice -> Unit
-
             is AskSetupSyncDeepLink -> {
                 askSetupSyncDeepLink(command.syncBarcodeUrl)
             }
@@ -418,9 +418,6 @@ class SyncActivity : DuckDuckGoActivity() {
                     viewModel.onCopyRecoveryCodeAuthenticated()
                 }
             }
-
-            // No-op in the simplified flow.
-            is AskTurnOffSync -> Unit
 
             is CheckIfUserHasStoragePermission -> {
                 if (appBuildConfig.sdkInt < 30) {
@@ -579,9 +576,6 @@ class SyncActivity : DuckDuckGoActivity() {
                     },
                 )
             }
-
-            // No-op in the simplified flow.
-            is ShowRecoveryCode -> Unit
 
             is SyncWithAnotherDevice -> {
                 authenticate {

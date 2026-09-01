@@ -283,8 +283,8 @@ class RealSyncPixels @Inject constructor(
      * - [SYNC_SETUP_FLOW_VERSION]: "v2" when the device is on the v2 connect/exchange stack
      *   ([SyncFeature.canUseV2ConnectFlow]), "v1" otherwise. Independent of which code version is
      *   actually displayed (that is gated separately by [SyncFeature.canShowV2ConnectCode]).
-     * - [SYNC_SETUP_UI_VERSION]: "v2" when the simplified sync UI is enabled ([SyncFeature.useSimplifiedSync])
-     *   and "v1" on the legacy setup screens.
+     * - [SYNC_SETUP_UI_VERSION]: always "v2"; the simplified sync UI is the only setup UI, so "v1"
+     *   is reported only by older app versions.
      * - [SYNC_SETUP_MY_KIND]: always "ddg" — this is the native DuckDuckGo client.
      */
     private fun setupFlowMetadata(): Map<String, String> = buildMap {
@@ -294,13 +294,10 @@ class RealSyncPixels @Inject constructor(
     }
 
     /**
-     * Which sync setup UI the user is looking at: [SYNC_SETUP_UI_VERSION] is "v2" when the simplified
-     * sync UI is enabled ([SyncFeature.useSimplifiedSync]) and "v1" on the legacy setup screens.
+     * Which sync setup UI the user is looking at: [SYNC_SETUP_UI_VERSION] is always "v2", the simplified
+     * sync UI being the only setup UI. Older app versions can still report "v1".
      */
-    private fun setupUiMetadata(): Map<String, String> = buildMap {
-        val version = if (syncFeature.useSimplifiedSync().isEnabled()) UI_VERSION_V2 else UI_VERSION_V1
-        put(SYNC_SETUP_UI_VERSION, version)
-    }
+    private fun setupUiMetadata(): Map<String, String> = mapOf(SYNC_SETUP_UI_VERSION to UI_VERSION_V2)
 
     /**
      * Params for the "Code recognized" pixels (scanner/manual-entry success): the screen [source],
@@ -941,7 +938,6 @@ class RealSyncPixels @Inject constructor(
         private const val SYNC_PIXELS_PREF_FILE = "com.duckduckgo.sync.pixels.v1"
         private const val FLOW_VERSION_V1 = "v1"
         private const val FLOW_VERSION_V2 = "v2"
-        const val UI_VERSION_V1 = "v1"
         const val UI_VERSION_V2 = "v2"
         private const val MY_KIND_DDG = "ddg"
         private const val CODE_TYPE_RECOVERY = "recovery"

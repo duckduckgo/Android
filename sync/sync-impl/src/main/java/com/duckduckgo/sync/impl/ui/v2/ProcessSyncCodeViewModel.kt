@@ -265,7 +265,7 @@ class ProcessSyncCodeViewModel @AssistedInject constructor(
         syncPixels.fireSetupCancelledIfDenied(screenType, outcome)
 
         when (outcome) {
-            // No-op. QR code is not show while sync is in progress in the simplified sync.
+            // This screen only processes a code that was already scanned or entered, so it never displays one of its own.
             is DispatchOutcome.LinkingCodeReady -> Unit
 
             is DispatchOutcome.HostConfirmationRequested -> {

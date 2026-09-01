@@ -51,7 +51,6 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskEditDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskToCopyRecoveryCode
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroCreateAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroRecoverSyncData
@@ -430,18 +429,6 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenTurnOffClickedThenAskTurnOffCommandShown() = runTest {
-        givenAuthenticatedUser()
-
-        testee.onTurnOffClicked()
-
-        testee.commands().test {
-            awaitItem().assertCommandType(AskTurnOffSync::class)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
     fun whenTurnOffSyncConfirmedThenLogoutLocalDevice() = runTest {
         whenever(syncAccountRepository.getThisConnectedDevice()).thenReturn(connectedDevice)
         whenever(syncAccountRepository.logout(deviceId)).thenReturn(Result.Success(true))
@@ -604,16 +591,6 @@ class SyncActivityViewModelTest {
             testee.onDeleteAccountCancelled()
             val viewState = expectMostRecentItem()
             assertTrue(viewState.showAccount)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenOnRemoveDeviceClickedThenAskRemoveDevice() = runTest {
-        testee.onRemoveDeviceClicked(connectedDevice)
-
-        testee.commands().test {
-            awaitItem().assertCommandType(Command.AskRemoveDevice::class)
             cancelAndIgnoreRemainingEvents()
         }
     }
