@@ -22,7 +22,7 @@
             android:name=".promotion.SyncGetOnOtherPlatformsActivity"
             android:exported="false"
             android:label="@string/syncGetAppsOnOtherPlatformsActivityTitle"
-            android:parentActivityName=".ui.v2.SyncActivity" />
+            android:parentActivityName=".ui.dashboard.SyncActivity" />
 
         <activity
             android:name=".ui.DeviceUnsupportedActivity"
@@ -37,68 +37,68 @@
             tools:replace="screenOrientation" />
 
         <activity
-            android:name=".ui.v2.SyncActivity"
+            android:name=".ui.dashboard.SyncActivity"
             android:exported="false"
             android:label="@string/sync_screen_title"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".ui.v2.SyncThisDeviceActivity"
+            android:name=".ui.setup.SyncThisDeviceActivity"
             android:exported="false"
             android:label="@string/sync_screen_title"
-            android:parentActivityName=".ui.v2.SyncActivity"
+            android:parentActivityName=".ui.dashboard.SyncActivity"
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".ui.v2.RecoveryCodeActivity"
+            android:name=".ui.recoverycode.RecoveryCodeActivity"
             android:exported="false"
             android:label="@string/sync_screen_title"
-            android:parentActivityName=".ui.v2.SyncActivity"
+            android:parentActivityName=".ui.dashboard.SyncActivity"
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".ui.v2.EditDeviceActivity"
+            android:name=".ui.devices.EditDeviceActivity"
             android:exported="false"
             android:label="@string/sync_screen_title"
-            android:parentActivityName=".ui.v2.SyncActivity"
+            android:parentActivityName=".ui.dashboard.SyncActivity"
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".ui.v2.ReadSyncCodeActivity"
+            android:name=".ui.pairing.read.ReadSyncCodeActivity"
             android:exported="false"
             android:label="@string/sync_screen_title"
-            android:parentActivityName=".ui.v2.SyncActivity"
+            android:parentActivityName=".ui.dashboard.SyncActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.DuckDuckGo.Dark" />
 
         <activity
-            android:name=".ui.v2.DisplayQrCodeActivity"
+            android:name=".ui.pairing.show.DisplayQrCodeActivity"
             android:exported="false"
             android:label="@string/sync_simplified_qr_code_screen_title"
-            android:parentActivityName=".ui.v2.ReadSyncCodeActivity"
+            android:parentActivityName=".ui.pairing.read.ReadSyncCodeActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.DuckDuckGo.Dark" />
 
         <activity
-            android:name=".ui.v2.ProcessSyncCodeActivity"
+            android:name=".ui.pairing.process.ProcessSyncCodeActivity"
             android:exported="false"
             android:label="@string/sync_screen_title"
-            android:parentActivityName=".ui.v2.ReadSyncCodeActivity"
+            android:parentActivityName=".ui.pairing.read.ReadSyncCodeActivity"
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".ui.v2.RecoverSyncedDataActivity"
+            android:name=".ui.pairing.recover.RecoverSyncedDataActivity"
             android:exported="false"
             android:label="@string/sync_screen_title"
-            android:parentActivityName=".ui.v2.SyncActivity"
+            android:parentActivityName=".ui.dashboard.SyncActivity"
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".ui.v2.PreviousSessionReadyActivity"
+            android:name=".ui.setup.PreviousSessionReadyActivity"
             android:exported="false"
             android:label="@string/sync_screen_title"
-            android:parentActivityName=".ui.v2.SyncActivity"
+            android:parentActivityName=".ui.dashboard.SyncActivity"
             android:screenOrientation="portrait" />
     </application>
 </manifest>
