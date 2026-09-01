@@ -528,6 +528,7 @@ class DuckChatContextualWebViewViewModelTest {
             assertEquals("tab-1", command.sourceTabId)
             cancelAndIgnoreRemainingEvents()
         }
+        verify(duckChatPixels).reportContextualOpenDuckAiMenuTapped()
         verify(duckChatInternal).reportDuckChatEntry(DuckChatEntryPoint.CONTEXTUAL_CHAT, opensNewTab = true, hasPrompt = false)
     }
 

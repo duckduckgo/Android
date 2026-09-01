@@ -724,6 +724,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
     }
 
     fun onOpenDuckAiFromPopup() {
+        duckChatPixels.reportContextualOpenDuckAiMenuTapped()
         val url = duckChat.getDuckChatUrl(query = "", autoPrompt = false)
         val sourceTabId = _viewState.value.tabId
         duckChatInternal.reportDuckChatEntry(DuckChatEntryPoint.CONTEXTUAL_CHAT, opensNewTab = true, hasPrompt = false)

@@ -1791,6 +1791,13 @@
         "suffixes": ["first_daily_count", "form_factor"],
         "parameters": ["appVersion"]
     },
+    "aichat_contextual_open_duckai_menu_tapped": {
+        "description": "Fired when the user selects Open Duck.ai in the contextual sheet chats menu",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
     "aichat_contextual_floating_input_opened": {
         "description": "Fired when the floating contextual input (entry) is opened",
         "owners": ["karlenDimla"],
