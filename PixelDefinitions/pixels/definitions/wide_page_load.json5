@@ -30,8 +30,8 @@
             },
             {
                 "key": "feature.data.ext.elapsed_time_to_visible_ms_bucketed",
-                "description": "Duration from page_start to page_visible, bucketed. Uses lower end of the bucket.",
-                "enum": ["0", "1000", "2000", "3000", "4000", "5000", "10000", "30000", "60000"]
+                "description": "Duration from page_start to page_visible, bucketed. Uses lower end of the bucket. -1 marks a negative interval caused by a wall-clock adjustment during measurement.",
+                "enum": ["-1", "0", "1000", "2000", "3000", "4000", "5000", "10000", "30000", "60000"]
             },
             {
                 "key": "feature.data.ext.elapsed_time_to_escaped_fixed_progress_ms_bucketed",
