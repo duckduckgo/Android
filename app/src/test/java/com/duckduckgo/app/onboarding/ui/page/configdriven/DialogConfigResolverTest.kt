@@ -98,14 +98,16 @@ class DialogConfigResolverTest {
     }
 
     @Test
-    fun `resolves the preference selector with a row per offered preference and a submitting cta`() {
+    fun `resolves the preference selector by passing its rows through against a submitting cta`() {
+        val rows = listOf(
+            row(OnboardingPreference.SEARCH_HISTORY, initiallyEnabled = true),
+            row(OnboardingPreference.SAFE_SEARCH, initiallyEnabled = false),
+        )
+
         val config = testee.resolve(
             NewUserOnboardingActivityDialog.PreferenceSelector(
                 titleRes = R.string.noAiPathPreferenceSelectorTitle,
-                initialSelections = mapOf(
-                    OnboardingPreference.SEARCH_HISTORY to true,
-                    OnboardingPreference.SAFE_SEARCH to false,
-                ),
+                rows = rows,
             ),
             isCustomAiFlow = false,
         )!!
@@ -115,13 +117,8 @@ class DialogConfigResolverTest {
         assertEquals(CardArrowConfig.AtEnd, config.cardArrow)
         val content = config.content as ContentConfig.PreferenceSelector
         assertEquals(TextConfig.Resource(R.string.noAiPathPreferenceSelectorTitle), content.title)
-        assertEquals(
-            listOf(
-                OnboardingPreference.SEARCH_HISTORY to true,
-                OnboardingPreference.SAFE_SEARCH to false,
-            ),
-            content.rows.map { it.preference to it.initiallyEnabled },
-        )
+        assertEquals(rows, content.rows)
+        assertNull(content.caption)
         assertEquals(
             PreferenceSelectorContentState(
                 mapOf(
@@ -132,6 +129,23 @@ class DialogConfigResolverTest {
             content.initialState(),
         )
         assertEquals(CtaAction.Submit, config.primaryCta!!.action)
+    }
+
+    @Test
+    fun `resolves the preference selector caption when one is given`() {
+        val config = testee.resolve(
+            NewUserOnboardingActivityDialog.PreferenceSelector(
+                titleRes = R.string.blockAdsPathPreferenceSelectorTitle,
+                rows = listOf(row(OnboardingPreference.BLOCK_ADS, initiallyEnabled = true)),
+                caption = R.string.preferenceChangeInSettingsCaption,
+            ),
+            isCustomAiFlow = false,
+        )!!
+
+        assertEquals(
+            TextConfig.Resource(R.string.preferenceChangeInSettingsCaption),
+            (config.content as ContentConfig.PreferenceSelector).caption,
+        )
     }
 
     @Test
@@ -497,4 +511,15 @@ class DialogConfigResolverTest {
         assertEquals(Embellishment.RightWing, config.embellishment)
         assertEquals(CardArrowConfig.AtStartMirrored, config.cardArrow)
     }
+
+    private fun row(
+        preference: OnboardingPreference,
+        initiallyEnabled: Boolean,
+    ) = ContentConfig.PreferenceSelector.Row(
+        preference = preference,
+        iconRes = null,
+        primaryText = TextConfig.Literal(preference.name),
+        secondaryText = null,
+        initiallyEnabled = initiallyEnabled,
+    )
 }

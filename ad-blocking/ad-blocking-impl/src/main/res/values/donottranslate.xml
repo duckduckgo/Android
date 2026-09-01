@@ -13,11 +13,6 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
 <resources>
-    <string name="autoconsentPopupBrand" translatable="false">DuckDuckGo</string>
-    <string name="autoconsent_onboarding_reject_optional_cookies_primary">Reject optional cookies</string>
-    <string name="autoconsent_onboarding_reject_optional_cookies_secondary">Maximizes privacy and closes cookie pop-ups</string>
-    <string name="autoconsent_onboarding_accept_non_opt_out_cookies_primary">Accept some cookies</string>
-    <string name="autoconsent_onboarding_accept_non_opt_out_cookies_secondary">Hides more pop-ups by accepting cookies that can’t be rejected</string>
+    <string name="ad_blocking_onboarding_preference_primary">Block video ads on YouTube</string>
 </resources>

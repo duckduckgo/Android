@@ -14,21 +14,16 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.settings.api
+package com.duckduckgo.app.plugins
 
-import org.junit.Assert.assertEquals
-import org.junit.Test
+import com.duckduckgo.anvil.annotations.ContributesActivePluginPoint
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.onboarding.api.OnboardingBooleanPreferencePlugin
 
-class SafeSearchTest {
-
-    @Test
-    fun `when serp codes then each option has expected code`() {
-        assertEquals("-1", SafeSearch.ON.serpCode)
-        assertEquals("-2", SafeSearch.OFF.serpCode)
-    }
-
-    @Test
-    fun `when serp key then every option carries the same key`() {
-        SafeSearch.entries.forEach { assertEquals("kp", it.serpKey) }
-    }
-}
+@ContributesActivePluginPoint(
+    scope = AppScope::class,
+    boundType = OnboardingBooleanPreferencePlugin::class,
+    featureName = "pluginPointOnboardingBooleanPreference",
+)
+@Suppress("unused")
+private interface UnusedOnboardingBooleanPreferencePluginPoint

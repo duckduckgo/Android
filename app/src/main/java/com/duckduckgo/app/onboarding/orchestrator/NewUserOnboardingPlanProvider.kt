@@ -33,7 +33,7 @@ import com.duckduckgo.app.onboarding.OnboardingInputScreenLaunchTarget
 import com.duckduckgo.app.onboarding.OnboardingPasswordImportExperimentManager
 import com.duckduckgo.app.onboarding.OnboardingPasswordImportExperimentManager.OnboardingPasswordImportVariant
 import com.duckduckgo.app.onboarding.OnboardingPreference
-import com.duckduckgo.app.onboarding.OnboardingPreferenceApplier
+import com.duckduckgo.app.onboarding.OnboardingPreferenceCatalog
 import com.duckduckgo.app.onboarding.OnboardingPromptsExperimentManager
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager.SegmentedOnboardingExperimentVariant
@@ -115,7 +115,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     private val onboardingPromptsExperimentManager: OnboardingPromptsExperimentManager,
     private val segmentedOnboardingExperimentManager: SegmentedOnboardingExperimentManager,
     private val onboardingPasswordImportExperimentManager: OnboardingPasswordImportExperimentManager,
-    private val onboardingPreferenceApplier: OnboardingPreferenceApplier,
+    private val onboardingPreferenceCatalog: OnboardingPreferenceCatalog,
     private val singleChoiceDataPlugins: ActivePluginPoint<OnboardingSingleChoiceDataPlugin>,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) {
@@ -548,10 +548,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                             DownloadReasonSelection.SEARCH -> SwitchTo(segmentedSearchPlan(ctx))
                             DownloadReasonSelection.AI_CHAT -> SwitchTo(segmentedAiPlan(ctx, modelProviderChoice, togglePositionChoice))
                             DownloadReasonSelection.NO_AI -> SwitchTo(segmentedNoAiPlan(ctx, duckAiStateChoice))
-                            DownloadReasonSelection.BLOCK_ADS,
-                            -> {
-                                Stay
-                            }
+                            DownloadReasonSelection.BLOCK_ADS -> SwitchTo(segmentedBlockAdsPlan(ctx))
                         }
                     }
                     else -> Stay
@@ -634,29 +631,54 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         )
     }
 
-    /**
-     * Filters unavailable preferences and assigns the default value.
-     */
-    private suspend fun resolvePreferenceSelections(offered: List<OnboardingPreference>): Map<OnboardingPreference, Boolean> =
-        offered
-            .filter { onboardingPreferenceApplier.isAvailable(it) }
-            .associateWith { onboardingPreferenceApplier.isEnabled(it) }
+    private fun segmentedBlockAdsPlan(ctx: NewUserOnboardingPlanContext): LinearOnboardingPlan {
+        val duckAiEnabled = SuspendMemo { duckAiOnboardingAvailability.isDuckAiOnboardingEnabled() }
+        onboardingStore.setSegmentedOnboardingPath(null)
+        return sidePlan(
+            id = SEGMENTED_BLOCK_ADS_PLAN_ID,
+            steps = listOf(
+                comparisonChartStep(NewUserOnboardingActivityDialog.SegmentedComparisonChart(ComparisonChartConfig.SegmentedBlockAdsPath)),
+                defaultBrowserPromptStep(),
+                preferenceSelectorStep(
+                    ctx,
+                    titleRes = R.string.blockAdsPathPreferenceSelectorTitle,
+                    listOf(
+                        OnboardingPreference.BLOCK_ADS,
+                        OnboardingPreference.REJECT_OPTIONAL_COOKIES,
+                        OnboardingPreference.ACCEPT_NON_OPT_OUT_COOKIES,
+                    ),
+                    caption = R.string.preferenceChangeInSettingsCaption,
+                ),
+                inputScreenStep(ctx),
+                addressBarPositionStep(),
+                inputScreenPreviewStep(
+                    ctx = ctx,
+                    isSearchDefault = true,
+                    showModeToggle = { ctx.inputModeWasAi && duckAiEnabled() },
+                ),
+            ),
+        )
+    }
 
     private fun preferenceSelectorStep(
         ctx: NewUserOnboardingPlanContext,
         @StringRes titleRes: Int,
         offered: List<OnboardingPreference>,
+        @StringRes caption: Int? = null,
     ): NewUserOnboardingActivityStep {
-        val preferenceSelections = SuspendMemo { resolvePreferenceSelections(offered) }
+        // Resolved on first access, so a preference's availability is evaluated when the run reaches this
+        // step and not when the plan holding it was built.
+        val rows = SuspendMemo { onboardingPreferenceCatalog.offer(offered) }
         return NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.PREFERENCE_SELECTOR,
             pixelName = null,
             indicator = StepIndicatorMode.COUNTED,
-            precondition = { preferenceSelections().isNotEmpty() },
+            precondition = { rows().isNotEmpty() },
             resolveDialog = {
                 NewUserOnboardingActivityDialog.PreferenceSelector(
                     titleRes = titleRes,
-                    preferenceSelections(),
+                    rows = rows(),
+                    caption = caption,
                 )
             },
             transition = { event ->
@@ -664,11 +686,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                     is NewUserOnboardingEvent.PreferenceSelectorConfirmed -> {
                         // Committed only once the run ends, so preferences a path seeds its own way don't
                         // survive a process death into the path a restarted onboarding takes.
-                        ctx.onFinish {
-                            event.selections.forEach { (preference, enabled) ->
-                                onboardingPreferenceApplier.apply(preference, enabled)
-                            }
-                        }
+                        ctx.onFinish { onboardingPreferenceCatalog.apply(event.selections) }
                         Advance
                     }
 
@@ -1204,6 +1222,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         const val SEGMENTED_SEARCH_PLAN_ID = "new-user_segmented_search"
         const val SEGMENTED_AI_PLAN_ID = "new-user_segmented_ai"
         const val SEGMENTED_NO_AI_PLAN_ID = "new-user_segmented_no-ai"
+        const val SEGMENTED_BLOCK_ADS_PLAN_ID = "new-user_segmented_block-ads"
 
         private const val BLOCK_STORE_TIMEOUT_MS = 3_000L
     }

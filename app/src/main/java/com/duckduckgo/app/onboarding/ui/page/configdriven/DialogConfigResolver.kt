@@ -18,7 +18,6 @@ package com.duckduckgo.app.onboarding.ui.page.configdriven
 
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.omnibar.OmnibarType
-import com.duckduckgo.app.onboarding.OnboardingPreference
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityDialog
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
 import com.duckduckgo.app.onboarding.store.OnboardingStore
@@ -196,7 +195,8 @@ class DialogConfigResolver @Inject constructor(
             cardArrow = CardArrowConfig.AtEnd,
             content = ContentConfig.PreferenceSelector(
                 title = TextConfig.Resource(dialog.titleRes),
-                rows = dialog.initialSelections.map { (preference, enabled) -> preferenceRow(preference, enabled) },
+                rows = dialog.rows,
+                caption = dialog.caption?.let { TextConfig.Resource(it) },
             ),
             primaryCta = CtaConfig(
                 text = TextConfig.Resource(R.string.preOnboardingInputScreenButton),
@@ -284,40 +284,6 @@ class DialogConfigResolver @Inject constructor(
         NewUserOnboardingActivityDialog.AddWidget,
         NewUserOnboardingActivityDialog.ImportPasswordsLaunch,
         -> null // command-only: no card to render
-    }
-
-    private fun preferenceRow(preference: OnboardingPreference, initiallyEnabled: Boolean) = when (preference) {
-        OnboardingPreference.SEARCH_HISTORY -> ContentConfig.PreferenceSelector.Row(
-            preference = preference,
-            iconRes = CommonR.drawable.history_color_24,
-            primaryText = TextConfig.Resource(R.string.searchPathPreferenceHistoryPrimary),
-            secondaryText = TextConfig.Resource(R.string.searchPathPreferenceHistorySecondary),
-            initiallyEnabled = initiallyEnabled,
-        )
-
-        OnboardingPreference.SAFE_SEARCH -> ContentConfig.PreferenceSelector.Row(
-            preference = preference,
-            iconRes = CommonR.drawable.exclamation_color_24,
-            primaryText = TextConfig.Resource(R.string.searchPathPreferenceSafePrimary),
-            secondaryText = TextConfig.Resource(R.string.searchPathPreferenceSafeSecondary),
-            initiallyEnabled = initiallyEnabled,
-        )
-
-        OnboardingPreference.SEARCH_ASSIST -> ContentConfig.PreferenceSelector.Row(
-            preference = preference,
-            iconRes = CommonR.drawable.search_assist_color_24,
-            primaryText = TextConfig.Resource(R.string.noAiPathPreferenceSearchAssistPrimary),
-            secondaryText = TextConfig.Resource(R.string.noAiPathPreferenceSearchAssistSecondary),
-            initiallyEnabled = initiallyEnabled,
-        )
-
-        OnboardingPreference.HIDE_AI_GENERATED_IMAGES -> ContentConfig.PreferenceSelector.Row(
-            preference = preference,
-            iconRes = CommonR.drawable.ai_images_strikethrough_color_24,
-            primaryText = TextConfig.Resource(R.string.noAiPathPreferenceHideAiGeneratedImagesPrimary),
-            secondaryText = TextConfig.Resource(R.string.noAiPathPreferenceHideAiGeneratedImagesSecondary),
-            initiallyEnabled = initiallyEnabled,
-        )
     }
 
     private fun comparisonChart(chart: ComparisonChartConfig, showEmbellishment: Boolean = true) = DialogConfig(

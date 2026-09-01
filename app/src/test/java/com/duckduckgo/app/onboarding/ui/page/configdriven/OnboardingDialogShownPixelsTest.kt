@@ -99,7 +99,15 @@ class OnboardingDialogShownPixelsTest {
         testee.fireFor(
             NewUserOnboardingActivityDialog.PreferenceSelector(
                 titleRes = R.string.searchPathPreferenceSelectorTitle,
-                initialSelections = mapOf(OnboardingPreference.SEARCH_HISTORY to true),
+                rows = listOf(
+                    ContentConfig.PreferenceSelector.Row(
+                        preference = OnboardingPreference.SEARCH_HISTORY,
+                        iconRes = null,
+                        primaryText = TextConfig.Literal("history"),
+                        secondaryText = null,
+                        initiallyEnabled = true,
+                    ),
+                ),
             ),
         )
         testee.fireFor(

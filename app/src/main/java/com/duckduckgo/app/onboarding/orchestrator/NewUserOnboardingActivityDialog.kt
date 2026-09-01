@@ -17,8 +17,8 @@
 package com.duckduckgo.app.onboarding.orchestrator
 
 import androidx.annotation.StringRes
-import com.duckduckgo.app.onboarding.OnboardingPreference
 import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
+import com.duckduckgo.app.onboarding.ui.page.configdriven.ContentConfig
 import com.duckduckgo.onboarding.api.OnboardingSingleChoiceDataPlugin.Option
 
 /**
@@ -66,10 +66,11 @@ sealed interface NewUserOnboardingActivityDialog {
         val isReinstallUser: Boolean,
     ) : NewUserOnboardingActivityDialog
 
-    /** [initialSelections] holds only the preferences to offer, in row order, each against the value to start from. */
+    /** [rows] holds only the preferences to offer, in row order, each already resolved against its definition. */
     data class PreferenceSelector(
         @get:StringRes val titleRes: Int,
-        val initialSelections: Map<OnboardingPreference, Boolean>,
+        val rows: List<ContentConfig.PreferenceSelector.Row>,
+        @get:StringRes val caption: Int? = null,
     ) : NewUserOnboardingActivityDialog
 
     data class SingleChoice(

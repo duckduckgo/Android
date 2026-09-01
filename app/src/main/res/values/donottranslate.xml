@@ -48,6 +48,8 @@
     <string name="skipOnboarding">Skip Onboarding</string>
 
     <!-- Segmented onboarding -->
+    <string name="preferenceChangeInSettingsCaption">You can always adjust later in Settings.</string>
+
     <string name="downloadReasonTitle">Set things up your way</string>
     <string name="downloadReasonBody">Choose one option that interests you most, and we’ll set you up quickly.</string>
     <string name="downloadReasonOptionSearch">Search and browse privately</string>
@@ -89,6 +91,10 @@
     <string name="noAiPathPreferenceHideAiGeneratedImagesSecondary">Filter out known AI spam sites from image search results</string>
     <string name="noAiPathDuckAiStateTitle">Want the option to chat privately with popular AIs?</string>
     <string name="noAiPathDuckAiStateBody">In Duck.ai, your chats are anonymized by us and never used to train AI.</string>
+
+    <string name="blockAdsPathPreferenceSelectorTitle">Internet, without the noise.</string>
+
+    <string name="blockAdsPathComparisonChartTitle"><![CDATA[You\'re in the right place!<br/>Ad Blocking activated.]]></string>
 
     <!-- Browser tab -->
     <string name="browserDuckPlayerShortUrl">Duck Player</string>

@@ -106,14 +106,19 @@ sealed interface ContentConfig {
     data class PreferenceSelector(
         override val title: TextConfig,
         val rows: List<Row>,
+        val caption: TextConfig? = null,
     ) : ContentConfig, Stateful<PreferenceSelectorContentState> {
 
         data class Row(
             val preference: OnboardingPreference,
-            @DrawableRes val iconRes: Int,
+            /** Null when the row renders without an icon. */
+            @DrawableRes val iconRes: Int?,
             val primaryText: TextConfig,
-            val secondaryText: TextConfig,
+            /** Null when the row is rendered as a single line. */
+            val secondaryText: TextConfig?,
             val initiallyEnabled: Boolean,
+            /** When set, the row is only shown while the preference it names is switched on. */
+            val dependsOn: OnboardingPreference? = null,
         )
 
         override fun initialState() = PreferenceSelectorContentState(rows.associate { it.preference to it.initiallyEnabled })
