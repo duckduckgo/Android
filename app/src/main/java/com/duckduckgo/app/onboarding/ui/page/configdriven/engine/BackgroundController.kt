@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.onboarding.ui.page.configdriven.engine
 
-import com.duckduckgo.app.onboarding.ui.page.OnboardingBackgroundAnimator
 import com.duckduckgo.app.onboarding.ui.page.OnboardingBackground
+import com.duckduckgo.app.onboarding.ui.page.OnboardingBackgroundAnimator
 
 /** Owns the background axis: which [OnboardingBackground] image is showing behind the dialog. */
 interface BackgroundController {

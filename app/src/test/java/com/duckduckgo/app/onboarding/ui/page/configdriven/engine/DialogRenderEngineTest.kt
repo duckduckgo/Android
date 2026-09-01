@@ -22,8 +22,8 @@ import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
 import com.duckduckgo.app.onboarding.orchestrator.StepProgress
 import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
-import com.duckduckgo.app.onboarding.ui.page.OnboardingBackgroundAnimator
 import com.duckduckgo.app.onboarding.ui.page.OnboardingBackground
+import com.duckduckgo.app.onboarding.ui.page.OnboardingBackgroundAnimator
 import com.duckduckgo.app.onboarding.ui.page.configdriven.BindScope
 import com.duckduckgo.app.onboarding.ui.page.configdriven.CardArrowConfig
 import com.duckduckgo.app.onboarding.ui.page.configdriven.CardEntry
