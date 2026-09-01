@@ -57,9 +57,13 @@ class RealAdBlockingMenuControllerTest {
     private val settingsRepository = object : AdBlockingSettingsRepository {
         override fun isEnabledFlow(): Flow<Boolean?> = userEnabledFlow
         override fun hasPixelConsentFlow(): Flow<Boolean?> = pixelConsentFlow
-        override suspend fun setEnabled(enabled: Boolean, withPixelConsent: Boolean) {
-            userEnabledFlow.value = enabled
+        override suspend fun enable(withPixelConsent: Boolean) {
+            userEnabledFlow.value = true
             pixelConsentFlow.value = withPixelConsent
+        }
+
+        override suspend fun disable() {
+            userEnabledFlow.value = false
         }
     }
     private val sessionStore = RealAdBlockingSessionStore()

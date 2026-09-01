@@ -206,7 +206,7 @@ class AdBlockingSettingsViewModelTest {
 
         createViewModel().onBlockAdsToggled(enabled = true)
 
-        verify(repository).setEnabled(true)
+        verify(repository).enable(withPixelConsent = true)
         verify(pixel).fire(AdBlockingPixelNames.AD_BLOCKING_ENABLED_DAILY, type = Pixel.PixelType.Daily())
         verify(pixel).fire(AdBlockingPixelNames.AD_BLOCKING_ENABLED_COUNT)
     }
@@ -227,7 +227,7 @@ class AdBlockingSettingsViewModelTest {
 
         createViewModel().onBlockAdsToggled(enabled = false)
 
-        verify(repository).setEnabled(false)
+        verify(repository).disable()
         verify(pixel).fire(AdBlockingPixelNames.AD_BLOCKING_DISABLED_DAILY, type = Pixel.PixelType.Daily())
         verify(pixel).fire(AdBlockingPixelNames.AD_BLOCKING_DISABLED_COUNT)
     }

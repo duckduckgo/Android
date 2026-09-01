@@ -77,9 +77,13 @@ class RealAdBlockingStatusCheckerTest {
     private val settingsRepository: AdBlockingSettingsRepository = object : AdBlockingSettingsRepository {
         override fun isEnabledFlow(): Flow<Boolean?> = userEnabledFlow
         override fun hasPixelConsentFlow(): Flow<Boolean?> = pixelConsentFlow
-        override suspend fun setEnabled(enabled: Boolean, withPixelConsent: Boolean) {
-            userEnabledFlow.value = enabled
+        override suspend fun enable(withPixelConsent: Boolean) {
+            userEnabledFlow.value = true
             pixelConsentFlow.value = withPixelConsent
+        }
+
+        override suspend fun disable() {
+            userEnabledFlow.value = false
         }
     }
     private val sessionStore = RealAdBlockingSessionStore()
@@ -342,7 +346,8 @@ class RealAdBlockingStatusCheckerTest {
         val pendingRepository = object : AdBlockingSettingsRepository {
             override fun isEnabledFlow(): Flow<Boolean?> = emptyFlow()
             override fun hasPixelConsentFlow(): Flow<Boolean?> = MutableStateFlow(null)
-            override suspend fun setEnabled(enabled: Boolean, withPixelConsent: Boolean) = Unit
+            override suspend fun enable(withPixelConsent: Boolean) = Unit
+            override suspend fun disable() = Unit
         }
 
         val checker = RealAdBlockingStatusChecker(feature, pendingRepository, sessionStore, testScope)
@@ -391,10 +396,10 @@ class RealAdBlockingStatusCheckerTest {
         pixelConsentFlow.value = false
         assertEquals(AdBlockingState.Enabled.WithoutPixelConsent, checker.observeState().first())
 
-        settingsRepository.setEnabled(false)
+        settingsRepository.disable()
         assertEquals(AdBlockingState.Disabled.Permanent, checker.observeState().first())
 
-        settingsRepository.setEnabled(true)
+        settingsRepository.enable(withPixelConsent = true)
         assertEquals(AdBlockingState.Enabled.WithPixelConsent, checker.observeState().first())
     }
 

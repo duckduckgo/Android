@@ -28,7 +28,8 @@ interface AdBlockingSettingsRepository {
     fun isEnabledFlow(): Flow<Boolean?>
     fun hasPixelConsentFlow(): Flow<Boolean?>
 
-    suspend fun setEnabled(enabled: Boolean, withPixelConsent: Boolean = true)
+    suspend fun enable(withPixelConsent: Boolean)
+    suspend fun disable()
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -41,7 +42,11 @@ class RealAdBlockingSettingsRepository @Inject constructor(
 
     override fun hasPixelConsentFlow(): Flow<Boolean?> = userPreferences.hasPixelConsentFlow()
 
-    override suspend fun setEnabled(enabled: Boolean, withPixelConsent: Boolean) {
-        userPreferences.setEnabled(enabled, withPixelConsent)
+    override suspend fun enable(withPixelConsent: Boolean) {
+        userPreferences.enable(withPixelConsent)
+    }
+
+    override suspend fun disable() {
+        userPreferences.disable()
     }
 }

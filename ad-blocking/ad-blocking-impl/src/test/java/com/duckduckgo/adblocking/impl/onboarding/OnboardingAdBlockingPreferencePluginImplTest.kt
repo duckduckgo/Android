@@ -97,7 +97,8 @@ class OnboardingAdBlockingPreferencePluginImplTest {
 
         testee.apply(true)
 
-        verify(settingsRepository, never()).setEnabled(any(), any())
+        verify(settingsRepository, never()).enable(any())
+        verify(settingsRepository, never()).disable()
     }
 
     @Test
@@ -106,7 +107,7 @@ class OnboardingAdBlockingPreferencePluginImplTest {
 
         testee.apply(false)
 
-        verify(settingsRepository).setEnabled(false, withPixelConsent = false)
+        verify(settingsRepository).disable()
     }
 
     @Test
@@ -115,7 +116,7 @@ class OnboardingAdBlockingPreferencePluginImplTest {
 
         testee.apply(false)
 
-        verify(settingsRepository).setEnabled(false, withPixelConsent = false)
+        verify(settingsRepository).disable()
     }
 
     @Test
@@ -124,7 +125,7 @@ class OnboardingAdBlockingPreferencePluginImplTest {
 
         testee.apply(true)
 
-        verify(settingsRepository).setEnabled(true, withPixelConsent = false)
+        verify(settingsRepository).enable(withPixelConsent = false)
     }
 
     @Test
@@ -133,7 +134,8 @@ class OnboardingAdBlockingPreferencePluginImplTest {
 
         testee.apply(true)
 
-        verify(settingsRepository, never()).setEnabled(any(), any())
+        verify(settingsRepository, never()).enable(any())
+        verify(settingsRepository, never()).disable()
     }
 
     @Test
@@ -142,7 +144,7 @@ class OnboardingAdBlockingPreferencePluginImplTest {
 
         testee.apply(false)
 
-        verify(settingsRepository).setEnabled(false, withPixelConsent = false)
+        verify(settingsRepository).disable()
     }
 
     @Test
@@ -151,7 +153,7 @@ class OnboardingAdBlockingPreferencePluginImplTest {
 
         testee.apply(false)
 
-        verify(settingsRepository).setEnabled(false, withPixelConsent = false)
+        verify(settingsRepository).disable()
     }
 
     @Test
@@ -160,7 +162,7 @@ class OnboardingAdBlockingPreferencePluginImplTest {
 
         testee.apply(true)
 
-        verify(settingsRepository).setEnabled(true, withPixelConsent = false)
+        verify(settingsRepository).enable(withPixelConsent = false)
     }
 
     @Test
@@ -169,7 +171,7 @@ class OnboardingAdBlockingPreferencePluginImplTest {
 
         testee.apply(true)
 
-        verify(settingsRepository).setEnabled(true, withPixelConsent = false)
+        verify(settingsRepository).enable(withPixelConsent = false)
     }
 
     @Test
@@ -178,7 +180,7 @@ class OnboardingAdBlockingPreferencePluginImplTest {
 
         testee.apply(true)
 
-        verify(settingsRepository).setEnabled(true, withPixelConsent = false)
+        verify(settingsRepository).enable(withPixelConsent = false)
     }
 
     @Test
@@ -187,7 +189,8 @@ class OnboardingAdBlockingPreferencePluginImplTest {
 
         testee.apply(true)
 
-        verify(settingsRepository, never()).setEnabled(any(), any())
+        verify(settingsRepository, never()).enable(any())
+        verify(settingsRepository, never()).disable()
     }
 
     @Test
@@ -196,6 +199,6 @@ class OnboardingAdBlockingPreferencePluginImplTest {
 
         testee.apply(false)
 
-        verify(settingsRepository).setEnabled(false, withPixelConsent = false)
+        verify(settingsRepository).disable()
     }
 }

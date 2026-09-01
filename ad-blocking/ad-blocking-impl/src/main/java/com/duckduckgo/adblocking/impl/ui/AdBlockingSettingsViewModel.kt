@@ -103,15 +103,16 @@ class AdBlockingSettingsViewModel @Inject constructor(
 
     fun onBlockAdsToggled(enabled: Boolean) {
         viewModelScope.launch {
-            repository.setEnabled(enabled)
-            sessionStore.clear()
             if (enabled) {
+                repository.enable(withPixelConsent = true)
                 pixel.fire(AD_BLOCKING_ENABLED_DAILY, type = Pixel.PixelType.Daily())
                 pixel.fire(AD_BLOCKING_ENABLED_COUNT)
             } else {
+                repository.disable()
                 pixel.fire(AD_BLOCKING_DISABLED_DAILY, type = Pixel.PixelType.Daily())
                 pixel.fire(AD_BLOCKING_DISABLED_COUNT)
             }
+            sessionStore.clear()
         }
     }
 

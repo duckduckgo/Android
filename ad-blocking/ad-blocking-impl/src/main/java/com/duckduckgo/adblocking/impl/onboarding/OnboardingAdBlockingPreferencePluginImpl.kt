@@ -60,6 +60,10 @@ class OnboardingAdBlockingPreferencePluginImpl @Inject constructor(
         // Persisting it would turn the remote default into a stored choice.
         if (enabled && statusChecker.observeState().firstOrNull() is Enabled) return
 
-        settingsRepository.setEnabled(enabled, withPixelConsent = false)
+        if (enabled) {
+            settingsRepository.enable(withPixelConsent = false)
+        } else {
+            settingsRepository.disable()
+        }
     }
 }

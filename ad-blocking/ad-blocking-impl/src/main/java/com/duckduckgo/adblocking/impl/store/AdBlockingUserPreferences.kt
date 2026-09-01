@@ -34,7 +34,8 @@ interface AdBlockingUserPreferences {
     fun isEnabledFlow(): Flow<Boolean?>
     suspend fun isEnabled(): Boolean?
     fun hasPixelConsentFlow(): Flow<Boolean?>
-    suspend fun setEnabled(enabled: Boolean, withPixelConsent: Boolean)
+    suspend fun enable(withPixelConsent: Boolean)
+    suspend fun disable()
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -49,10 +50,16 @@ class RealAdBlockingUserPreferences @Inject constructor(
 
     override fun hasPixelConsentFlow(): Flow<Boolean?> = dataStore.data.map { prefs -> prefs[KEY_PIXEL_CONSENT] }
 
-    override suspend fun setEnabled(enabled: Boolean, withPixelConsent: Boolean) {
+    override suspend fun enable(withPixelConsent: Boolean) {
         dataStore.edit { prefs ->
             prefs[KEY_PIXEL_CONSENT] = withPixelConsent
-            prefs[KEY_ENABLED] = enabled
+            prefs[KEY_ENABLED] = true
+        }
+    }
+
+    override suspend fun disable() {
+        dataStore.edit { prefs ->
+            prefs[KEY_ENABLED] = false
         }
     }
 

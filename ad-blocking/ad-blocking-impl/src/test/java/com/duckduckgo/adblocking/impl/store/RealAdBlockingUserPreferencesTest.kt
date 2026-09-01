@@ -60,7 +60,7 @@ class RealAdBlockingUserPreferencesTest {
 
     @Test
     fun whenEnabledWithoutPixelConsentThenBothFlowsReportIt() = runTest {
-        testee.setEnabled(enabled = true, withPixelConsent = false)
+        testee.enable(withPixelConsent = false)
 
         assertTrue(testee.isEnabled()!!)
         assertEquals(false, testee.hasPixelConsentFlow().first())
@@ -73,7 +73,7 @@ class RealAdBlockingUserPreferencesTest {
             .test {
                 assertEquals(null to null, awaitItem())
 
-                testee.setEnabled(enabled = true, withPixelConsent = false)
+                testee.enable(withPixelConsent = false)
 
                 // write needs to be a single emission. If it wasn't, (true, null) or (null, false) would surface here
                 assertEquals(true to false, awaitItem())
