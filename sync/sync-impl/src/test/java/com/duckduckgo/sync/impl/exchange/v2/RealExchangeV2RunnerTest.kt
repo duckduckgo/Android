@@ -18,10 +18,14 @@ package com.duckduckgo.sync.impl.exchange.v2
 
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncDeviceIds
+import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.crypto.RsaKeyPair
 import com.duckduckgo.sync.impl.crypto.SyncJweCrypto
+import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.Hello
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeRequest
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeResponse
@@ -44,6 +48,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argThat
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -62,6 +67,7 @@ class RealExchangeV2RunnerTest {
     private val qrCode: ExchangeV2QrCode = mock()
     private val recoveryCodeProvider: RecoveryCodeProvider = mock()
     private val syncDeviceIds: SyncDeviceIds = mock()
+    private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
 
     private fun newRunner(): RealExchangeV2Runner =
         RealExchangeV2Runner(
@@ -74,13 +80,14 @@ class RealExchangeV2RunnerTest {
             qrCode = qrCode,
             recoveryCodeProvider = recoveryCodeProvider,
             syncDeviceIds = syncDeviceIds,
+            syncFeature = syncFeature,
             appScope = coroutineTestRule.testScope,
             dispatchers = coroutineTestRule.testDispatcherProvider,
         )
 
     @Before fun stubWireDeps() {
         whenever(qrCode.parse(any())).thenReturn(
-            ExchangeV2CodeParseResult.LinkingV2(channelId = "peer-channel", publicKey = "peer-pubkey", version = "2"),
+            ExchangeV2CodeParseResult.LinkingV2(channelId = "peer-channel", publicKey = "peer-pubkey", version = ExchangeProtocolVersion.V2_0),
         )
         whenever(qrCode.buildLinkingCode(any(), any(), any())).thenReturn("https://duckduckgo.com/sync/pairing/#&code2=fake")
         whenever(jweCrypto.generateRsaKeyPair(any())).thenReturn(RsaKeyPair(publicKeyBase64 = "own-pub", privateKeyBase64 = "own-priv"))
@@ -254,6 +261,22 @@ class RealExchangeV2RunnerTest {
             any(),
             any(),
         )
+    }
+
+    @Test fun `startPresent builds a v2_0 linking code when the v2_1 exchange flag is disabled`() {
+        syncFeature.canUseExchangeV2Point1().setRawStoredState(State(enable = false))
+        val runner = newRunner()
+        runner.startPresent()
+
+        verify(qrCode).buildLinkingCode(any(), any(), eq(ExchangeProtocolVersion.V2_0))
+    }
+
+    @Test fun `startPresent builds a v2_1 linking code when the v2_1 exchange flag is enabled`() {
+        syncFeature.canUseExchangeV2Point1().setRawStoredState(State(enable = true))
+        val runner = newRunner()
+        runner.startPresent()
+
+        verify(qrCode).buildLinkingCode(any(), any(), eq(ExchangeProtocolVersion.V2_1))
     }
 
     // ---- Auto role election ----

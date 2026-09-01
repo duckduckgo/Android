@@ -112,6 +112,13 @@
             app:showSwitch="true"
             app:primaryText="canShowV2ConnectCode (display, requires canUseV2ConnectFlow)" />
 
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/canUseExchangeV2Point1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="canUseExchangeV2.1"
+            app:showSwitch="true" />
+
         <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
             android:id="@+id/openV2PairingDebugButton"
             android:layout_width="wrap_content"
@@ -694,6 +701,28 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="5"
+                app:typography="body2" />
+
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="Check linking code" />
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/checkLinkingCodeCta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/sync_internal_check_linking_code_cta"
+                app:daxButtonSize="large" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/checkLinkingCodeResultTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:layout_marginTop="@dimen/keyline_2"
+                android:layout_marginEnd="@dimen/keyline_4"
                 app:typography="body2" />
 
             <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem

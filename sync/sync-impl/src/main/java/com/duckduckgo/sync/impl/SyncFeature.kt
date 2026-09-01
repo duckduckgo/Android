@@ -96,6 +96,12 @@ interface SyncFeature {
     fun canShowV2ConnectCode(): Toggle
 
     /**
+     * Global switch for the v2.1 exchange protocol.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun canUseExchangeV2Point1(): Toggle
+
+    /**
      * When enabled, the sync barcode scanner only attempts to decode QR codes. Sync codes are
      * always encoded as QR, so other formats only add noise (and false-positive decodes) to
      * the scanner.

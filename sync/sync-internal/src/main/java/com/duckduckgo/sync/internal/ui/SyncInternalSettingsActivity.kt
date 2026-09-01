@@ -158,6 +158,7 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         binding.syncFaviconsPromptCta.setOnClickListener {
             viewModel.resetFaviconsPrompt()
         }
+        binding.checkLinkingCodeCta.setOnClickListener { viewModel.onCheckLinkingCodeClicked() }
         binding.testSyncWarningToggle.setOnCheckedChangeListener(testSyncWarningListener)
         binding.clearHistoryBookmarkAddedDialogPromo.setOnClickListener { viewModel.onClearHistoryBookmarkAddedDialogPromoClicked() }
         binding.clearHistoryBookmarkScreenPromo.setOnClickListener { viewModel.onClearHistoryBookmarkScreenPromoClicked() }
@@ -348,6 +349,7 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         binding.recoveryCodeDecodedTextView.text = decodeStandardBase64(viewState.recoveryCode, emptyPlaceholder = "(not signed in)")
         binding.thirdPartyRecoveryCodeTextView.text = viewState.thirdPartyRecoveryCode.ifEmpty { "(no 3party credential yet)" }
         binding.thirdPartyRecoveryCodeDecodedTextView.text = decodeThirdPartyRecoveryCode(viewState.thirdPartyRecoveryCode)
+        binding.checkLinkingCodeResultTextView.text = viewState.checkLinkingCodeResult
         binding.connectedDevicesList.removeAllViews()
         binding.blockStoreFeatureFlag.text = viewState.blockStoreFeatureFlagText
         binding.blockStoreAvailability.text = viewState.blockStoreAvailabilityText
@@ -367,6 +369,9 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         }
         binding.canShowV2ConnectCodeToggle.quietlySetIsChecked(viewState.canShowV2ConnectCodeEnabled) { _, enabled ->
             viewModel.onCanShowV2ConnectCodeFlagChanged(enabled)
+        }
+        binding.canUseExchangeV2Point1.quietlySetIsChecked(viewState.canUseExchangeV2Point1) { _, enabled ->
+            viewModel.onCanUseExchangeV2Point1FlagChanged(enabled)
         }
         binding.accessCredentialsTextView.text = viewState.accessCredentialsText
         binding.scopedTokenResultTextView.text = viewState.scopedTokenResult

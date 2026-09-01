@@ -44,6 +44,7 @@ import com.duckduckgo.sync.impl.SyncAuthCode.Connect
 import com.duckduckgo.sync.impl.SyncAuthCode.Recovery
 import com.duckduckgo.sync.impl.SyncCodeType
 import com.duckduckgo.sync.impl.SyncFeature
+import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2CodeParseResult
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Event
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message
@@ -613,7 +614,7 @@ class SyncConnectViewModelTest {
             com.duckduckgo.sync.impl.exchange.v2.ExchangeV2CodeParseResult.LinkingV2(
                 channelId = "chan",
                 publicKey = "pk",
-                version = "2",
+                version = ExchangeProtocolVersion.V2_0,
             ),
         )
         val recoveryJson = org.json.JSONObject().apply {
@@ -831,7 +832,7 @@ class SyncConnectViewModelTest {
         whenever(syncRepository.getAccountInfo()).thenReturn(AccountInfo())
         val scannedCode = "https://duckduckgo.com/sync/pairing/#&code2=v2code"
         whenever(qrCode.parse(scannedCode)).thenReturn(
-            ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = "2"),
+            ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = ExchangeProtocolVersion.V2_0),
         )
         whenever(runner.eventsSince(any())).thenReturn(
             flowOf(
@@ -883,7 +884,7 @@ class SyncConnectViewModelTest {
         whenever(syncRepository.getAccountInfo()).thenReturn(AccountInfo())
         val scannedCode = "https://duckduckgo.com/sync/pairing/#&code2=v2code"
         whenever(qrCode.parse(scannedCode)).thenReturn(
-            ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = "2"),
+            ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = ExchangeProtocolVersion.V2_0),
         )
         whenever(runner.eventsSince(any())).thenReturn(
             flowOf(ExchangeV2Event.SessionError(timestampMs = 0L, message = "Peer requires protocol v3; please update this app")),

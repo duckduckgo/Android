@@ -21,8 +21,10 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncDeviceIds
+import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.crypto.RsaKeyPair
 import com.duckduckgo.sync.impl.crypto.SyncJweCrypto
+import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State.Host
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State.Joiner
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State.SameAccountAbort
@@ -116,6 +118,7 @@ class RealExchangeV2Runner @Inject constructor(
     private val qrCode: ExchangeV2QrCode,
     private val recoveryCodeProvider: RecoveryCodeProvider,
     private val syncDeviceIds: SyncDeviceIds,
+    private val syncFeature: SyncFeature,
     @AppCoroutineScope private val appScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
 ) : ExchangeV2Runner {
@@ -220,6 +223,7 @@ class RealExchangeV2Runner @Inject constructor(
                 _linkingCode = qrCode.buildLinkingCode(
                     channelId = ownChannelId!!,
                     publicKeyBase64Url = keyPair.publicKeyBase64,
+                    version = if (syncFeature.canUseExchangeV2Point1().isEnabled()) ExchangeProtocolVersion.V2_1 else ExchangeProtocolVersion.V2_0,
                 )
                 // Presenter waits to receive hello before transitioning out of Bootstrapped.
                 session = smFactory.create(
