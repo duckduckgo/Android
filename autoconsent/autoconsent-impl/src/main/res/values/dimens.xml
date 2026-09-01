@@ -17,7 +17,7 @@
 <resources>
     <bool name="lockedInPortraitMode">true</bool>
 
-    <dimen name="cookiePopupOptInLogoSize">32dp</dimen>
+    <dimen name="cookiePopupOptInLogoSize">48dp</dimen>
     <dimen name="cookiePopupOptInPictogramSize">96dp</dimen>
     <dimen name="cookiePopupOptInIllustrationHeight">180dp</dimen>
 

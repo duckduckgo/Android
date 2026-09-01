@@ -55,19 +55,19 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/ic_duckduckgo_color_24" />
+                app:srcCompat="@drawable/ic_duckduckgo_color_32" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/cookiePopupOptInBrand"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/keyline_3"
-                android:includeFontPadding="false"
+                android:layout_marginTop="@dimen/keyline_4"
                 android:text="@string/autoconsentPopupBrand"
+                android:textAllCaps="true"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/cookiePopupOptInLogo"
-                app:typography="caption_allCaps" />
+                app:typography="onboarding_small_text" />
 
             <com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleBrandDesignUpdateCardView
                 android:id="@+id/cookiePopupOptInBubble"

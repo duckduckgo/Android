@@ -20,9 +20,10 @@
         <item name="android:textSize">14sp</item>
     </style>
 
-    <!-- No design-system typography pairs 12sp all-caps with the semibold weight the design calls for. -->
-    <style name="Typography.DuckDuckGo.CookiePopupOptIn.Brand" parent="Typography.DuckDuckGo.Caption.AllCaps">
+    <!-- Keep the brand at the onboarding small-text size, with the medium all-caps weight required by the design. -->
+    <style name="Typography.DuckDuckGo.CookiePopupOptIn.Brand" parent="Typography.DuckDuckGo.Onboarding.SmallText">
         <item name="android:fontFamily">@font/ducksansproduct_medium</item>
+        <item name="android:textAllCaps">true</item>
     </style>
 
     <!--
