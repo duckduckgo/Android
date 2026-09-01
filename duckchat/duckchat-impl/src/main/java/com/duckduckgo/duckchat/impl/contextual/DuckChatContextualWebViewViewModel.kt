@@ -187,6 +187,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
     }
 
     fun onSheetOpened(tabId: String) {
+        duckChatPixels.reportContextualSheetOpened()
         _viewState.update { it.copy(tabId = tabId) }
         viewModelScope.launch(dispatchers.io()) {
             val pendingEntry = contextualEntryPromptStore.consume(tabId)
@@ -210,19 +211,20 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
                 !isStoredChatMissingFromHistory(existingChatUrl)
             if (shouldReuseUrl) {
                 logcat { "Duck.ai: tab=$tabId has an existing url and don't need to restart the session" }
+                duckChatPixels.reportContextualSheetSessionRestored()
                 loadWebViewUrl(tabId, existingChatUrl!!)
             } else {
                 logcat { "Duck.ai: tab=$tabId session expired or absent, starting a new chat" }
                 loadFreshChat(tabId)
             }
         }
-        duckChatPixels.reportContextualSheetOpened()
     }
 
     fun onSheetReopened() {
         logcat { "Duck.ai: onSheetReopened" }
         commandChannel.trySend(Command.ApplyContextualReopened(_viewState.value.tabId))
 
+        duckChatPixels.reportContextualSheetOpened()
         viewModelScope.launch(dispatchers.io()) {
             val tabId = _viewState.value.tabId
             val pendingEntry = contextualEntryPromptStore.consume(tabId)
@@ -242,7 +244,6 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
             }
             reopenWebViewState(tabId)
         }
-        duckChatPixels.reportContextualSheetOpened()
     }
 
     private suspend fun reopenWebViewState(tabId: String) {
@@ -547,8 +548,8 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
             hidingSheetForNewChat = false
             return
         }
-        persistTabClosed()
         duckChatPixels.reportContextualSheetDismissed()
+        persistTabClosed()
         commandChannel.trySend(Command.ApplyContextualClosed(_viewState.value.tabId))
     }
 

@@ -136,9 +136,6 @@ class NewUserOnboardingPlanProviderTest {
         override suspend fun getPlugins(): Collection<OnboardingSingleChoiceDataPlugin> = singleChoicePlugins
     }
 
-    // Password import is off by default here: its steps are then left out of the plan entirely, so every
-    // existing step-order and indicator expectation below is unaffected by the feature. The password import
-    // tests enroll into the treatment themselves.
     private val passwordImportExperiment: OnboardingPasswordImportExperimentManager = mock()
 
     private lateinit var provider: NewUserOnboardingPlanProvider

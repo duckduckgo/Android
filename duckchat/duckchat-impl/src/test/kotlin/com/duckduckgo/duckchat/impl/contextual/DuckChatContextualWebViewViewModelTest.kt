@@ -49,6 +49,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -188,6 +189,68 @@ class DuckChatContextualWebViewViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
         verify(duckChatPixels, never()).reportContextualSheetDismissed()
+    }
+
+    @Test
+    fun `onSheetOpened reports the sheet opened even for an entry-dialog hand-off`() = runTest {
+        val prompt = NativeInputPrompt("hello", "model-1", "high", null, null, null)
+        whenever(contextualEntryPromptStore.consume("tab-1")).thenReturn(ContextualEntryPrompt("tab-1", prompt, null))
+        (duckChat as FakeDuckChat).nextUrl = "https://duckduckgo.com/?ia=chat"
+
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(duckChatPixels).reportContextualSheetOpened()
+    }
+
+    @Test
+    fun `onSheetOpened reusing an existing chat reports session restored and the sheet opened`() = runTest {
+        val chatUrl = "https://duckduckgo.com/?ia=chat&chatID=abc"
+        contextualDataStore.persistTabChatUrl("tab-1", chatUrl)
+        recentChatsFlow.value = listOf(
+            ChatHistoryItem(
+                chatId = "abc",
+                displayTitle = "Chat",
+                type = ChatType.Discussion,
+                model = "",
+                pinned = false,
+                lastEditMillis = 1L,
+            ),
+        )
+
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(duckChatPixels).reportContextualSheetSessionRestored()
+        verify(duckChatPixels).reportContextualSheetOpened()
+    }
+
+    @Test
+    fun `onSheetReopened without a pending entry reports the sheet opened`() = runTest {
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        testee.onSheetReopened()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        // Once for the initial open, once for the reopen.
+        verify(duckChatPixels, times(2)).reportContextualSheetOpened()
+    }
+
+    @Test
+    fun `onSheetReopened reports the sheet opened even for an entry-dialog hand-off`() = runTest {
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        val prompt = NativeInputPrompt("hello", "model-1", "high", null, null, null)
+        whenever(contextualEntryPromptStore.consume("tab-1")).thenReturn(ContextualEntryPrompt("tab-1", prompt, null))
+        (duckChat as FakeDuckChat).nextUrl = "https://duckduckgo.com/?ia=chat"
+
+        testee.onSheetReopened()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        // Once for the initial open, once for the reopen — the sheet reports the open regardless of hand-off.
+        verify(duckChatPixels, times(2)).reportContextualSheetOpened()
     }
 
     @Test
@@ -380,7 +443,6 @@ class DuckChatContextualWebViewViewModelTest {
         testee.onNewChatRequestedFromPopup()
 
         testee.commands.test {
-            // The STATE_HIDDEN that follows the New Chat handoff must not be treated as a dismissal.
             testee.onSheetClosed()
 
             assertFalse(expectMostRecentItem() is DuckChatContextualWebViewViewModel.Command.ApplyContextualClosed)

@@ -26,6 +26,7 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.ACTIVATE_SUBSC
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.ACTIVATE_SUBSCRIPTION_RESTORE_PURCHASE_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_GET_SUBSCRIPTION_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_IDTR_CLICK
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_PARTNER_BENEFITS_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_PIR_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_RESTORE_PURCHASE_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V2_INVALID_REFRESH_TOKEN_DETECTED
@@ -121,6 +122,7 @@ interface SubscriptionPixelSender {
     fun reportAppSettingsIdtrClick()
     fun reportAppSettingsGetSubscriptionClick()
     fun reportAppSettingsRestorePurchaseClick()
+    fun reportAppSettingsPartnerBenefitsClick()
     fun reportSubscriptionSettingsChangePlanOrBillingClick()
     fun reportSubscriptionSettingsRemoveFromDeviceClick()
     fun reportMonthlyPriceClick()
@@ -283,6 +285,9 @@ class SubscriptionPixelSenderImpl @Inject constructor(
 
     override fun reportAppSettingsRestorePurchaseClick() =
         fire(APP_SETTINGS_RESTORE_PURCHASE_CLICK)
+
+    override fun reportAppSettingsPartnerBenefitsClick() =
+        fire(APP_SETTINGS_PARTNER_BENEFITS_CLICK)
 
     override fun reportSubscriptionSettingsChangePlanOrBillingClick() =
         fire(SUBSCRIPTION_SETTINGS_CHANGE_PLAN_OR_BILLING_CLICK)

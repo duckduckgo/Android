@@ -20,7 +20,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.ActivityOptions
 import android.app.PendingIntent
-import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -33,6 +32,7 @@ import com.duckduckgo.widget.SearchAndFavoritesWidget
 import com.duckduckgo.widget.SearchOnlyWidget
 import com.duckduckgo.widget.SearchWidget
 import com.duckduckgo.widget.SearchWidgetLight
+import com.duckduckgo.widget.SearchWidgetProviderInfoUpdater
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import javax.inject.Named
@@ -85,6 +85,7 @@ class AddWidgetCompatLauncher @Inject constructor(
 @Named("appWidgetManagerAddWidgetLauncher")
 class AppWidgetManagerAddWidgetLauncher @Inject constructor(
     private val appTheme: AppTheme,
+    private val searchWidgetProviderInfoUpdater: SearchWidgetProviderInfoUpdater,
 ) : AddWidgetLauncher {
     companion object {
         const val ACTION_ADD_WIDGET = "actionWidgetAdded"
@@ -121,7 +122,7 @@ class AppWidgetManagerAddWidgetLauncher @Inject constructor(
                     ComponentName(it, SearchAndFavoritesWidget::class.java)
                 }
             }
-            AppWidgetManager.getInstance(it).requestPinAppWidget(provider, null, buildPendingIntent(it, widgetLabel, source))
+            searchWidgetProviderInfoUpdater.syncAndRequestPinAppWidget(provider, buildPendingIntent(it, widgetLabel, source))
         }
     }
 

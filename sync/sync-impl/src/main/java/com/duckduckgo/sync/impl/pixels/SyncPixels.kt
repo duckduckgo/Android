@@ -247,6 +247,8 @@ interface SyncPixels {
     fun fireAiChatActive()
     fun fireAiChatsRescopeTokenError(error: Error)
 
+    fun fireUnifiedDeviceListPixel(event: UnifiedDeviceListPixel)
+
     fun fireAutoRestoreSetupToggleShown()
     fun fireAutoRestoreSetupToggleOptedOut()
     fun fireAutoRestoreSettingsReadyShown(source: String)
@@ -922,6 +924,19 @@ class RealSyncPixels @Inject constructor(
         )
     }
 
+    override fun fireUnifiedDeviceListPixel(event: UnifiedDeviceListPixel) {
+        val parameter = event.parameter
+        pixel.fire(
+            event.pixelName,
+            parameters = parameter?.let { mapOf(it.first to it.second) }.orEmpty(),
+            type = if (event.isDaily) {
+                Pixel.PixelType.Daily(tag = event.tag)
+            } else {
+                Pixel.PixelType.Count
+            },
+        )
+    }
+
     companion object {
         private const val SYNC_PIXELS_PREF_FILE = "com.duckduckgo.sync.pixels.v1"
         private const val FLOW_VERSION_V1 = "v1"
@@ -1012,6 +1027,25 @@ enum class SyncPixelName(override val pixelName: String) : Pixel.PixelName {
     SYNC_SETUP_ANOTHER_DEVICE_PROMPT_SHOWN("m_settings_sync_another_device_prompt_shown"),
     SYNC_SETUP_ANOTHER_DEVICE_PROMPT_OPTION_TAPPED("m_settings_sync_another_device_prompt_option_tapped"),
     SYNC_AI_CHAT_ACTIVE("sync_ai_chat_active"),
+
+    SYNC_UNIFIED_DEVICES_OWN_ROW_RESOLVED_DEVICE_INFO("sync_unified_devices_own_row_resolved_device_info"),
+    SYNC_UNIFIED_DEVICES_OWN_ROW_RESOLVED_LEGACY("sync_unified_devices_own_row_resolved_legacy"),
+    SYNC_UNIFIED_DEVICES_OWN_ROW_RESOLVED_PLACEHOLDER("sync_unified_devices_own_row_resolved_placeholder"),
+    SYNC_UNIFIED_DEVICES_ACCOUNT_INFO_KEY_UNAVAILABLE("sync_unified_devices_account_info_key_unavailable"),
+    SYNC_UNIFIED_DEVICES_OTHER_ROW_DEVICE_INFO_FAILED_DECRYPTION("sync_unified_devices_other_row_device_info_failed_decryption"),
+    SYNC_UNIFIED_DEVICES_OTHER_ROW_RESOLVED_PLACEHOLDER("sync_unified_devices_other_row_resolved_placeholder"),
+    SYNC_UNIFIED_DEVICES_ACCOUNT_INFO_KEY_CREATE_SUCCESS("sync_unified_devices_account_info_key_create_success"),
+    SYNC_UNIFIED_DEVICES_ACCOUNT_INFO_KEY_CREATE_FAILED("sync_unified_devices_account_info_key_create_failed"),
+    SYNC_UNIFIED_DEVICES_ACCOUNT_INFO_KEY_WRAP_SUCCESS("sync_unified_devices_account_info_key_wrap_success"),
+    SYNC_UNIFIED_DEVICES_ACCOUNT_INFO_KEY_WRAP_FAILED("sync_unified_devices_account_info_key_wrap_failed"),
+    SYNC_UNIFIED_DEVICES_ACCOUNT_INFO_KEY_ADOPT_SUCCESS("sync_unified_devices_account_info_key_adopt_success"),
+    SYNC_UNIFIED_DEVICES_ACCOUNT_INFO_KEY_ADOPT_FAILED("sync_unified_devices_account_info_key_adopt_failed"),
+    SYNC_UNIFIED_DEVICES_OWN_ROW_DEVICE_INFO_FIRST_WRITE_SUCCESS("sync_unified_devices_own_row_device_info_first_write_success"),
+    SYNC_UNIFIED_DEVICES_OWN_ROW_DEVICE_INFO_FIRST_WRITE_FAILED("sync_unified_devices_own_row_device_info_first_write_failed"),
+    SYNC_UNIFIED_DEVICES_OWN_ROW_DEVICE_INFO_UPDATE_SUCCESS("sync_unified_devices_own_row_device_info_update_success"),
+    SYNC_UNIFIED_DEVICES_OWN_ROW_DEVICE_INFO_UPDATE_FAILED("sync_unified_devices_own_row_device_info_update_failed"),
+    SYNC_UNIFIED_DEVICES_OWN_ROW_DEVICE_INFO_REPAIR_SUCCESS("sync_unified_devices_own_row_device_info_repair_success"),
+    SYNC_UNIFIED_DEVICES_OWN_ROW_DEVICE_INFO_REPAIR_FAILED("sync_unified_devices_own_row_device_info_repair_failed"),
 
     SYNC_AUTO_RESTORE_TOGGLE_SHOWN("sync-auto-restore_toggle_shown"),
     SYNC_AUTO_RESTORE_TOGGLE_OPTED_OUT("sync-auto-restore_toggle_opted_out"),

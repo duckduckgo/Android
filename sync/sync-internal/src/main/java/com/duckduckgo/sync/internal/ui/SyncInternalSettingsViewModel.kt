@@ -34,6 +34,7 @@ import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.DeviceFieldDecryptor
 import com.duckduckgo.sync.impl.DeviceInfoDecryptor
 import com.duckduckgo.sync.impl.DeviceInfoMigrator
+import com.duckduckgo.sync.impl.DeviceInfoSessionResult
 import com.duckduckgo.sync.impl.DeviceInfoUpdater
 import com.duckduckgo.sync.impl.DeviceV2
 import com.duckduckgo.sync.impl.Result
@@ -708,7 +709,7 @@ constructor(
 
     fun onRenameDeviceConfirmed(newName: String) {
         viewModelScope.launch(dispatchers.io()) {
-            when (val result = deviceInfoUpdater.setThisDeviceName(newName)) {
+            when (val result = deviceInfoUpdater.setThisDeviceName(name = newName)) {
                 is Success -> {
                     val text = "PATCH ok — ${result.data.size} devices_v2 returned; name set to \"$newName\""
                     logcat { "Sync-UnifiedDevices: $text" }
@@ -755,7 +756,7 @@ constructor(
         }
     }
 
-    private fun describeDeviceInfo(entry: DeviceV2, session: Result<DeviceInfoDecryptor.Session>): String {
+    private fun describeDeviceInfo(entry: DeviceV2, session: DeviceInfoSessionResult): String {
         val id = entry.deviceId ?: "(no id)"
         val marker = if (entry.deviceId != null && entry.deviceId == syncStore.deviceId) " (this device)" else ""
 
@@ -767,8 +768,8 @@ constructor(
         val info = entry.deviceInfo
         val deviceInfo = when {
             info.isNullOrEmpty() -> "(no device_info)"
-            session is Error -> "(cannot decrypt: ${session.reason})"
-            session is Success -> when (val result = session.data.decrypt(info)) {
+            session is DeviceInfoSessionResult.Unavailable -> "(cannot decrypt: ${session.reason})"
+            session is DeviceInfoSessionResult.Available -> when (val result = session.session.decrypt(info)) {
                 is Success -> "name=${result.data.name}, type=${result.data.type ?: "(none)"}"
                 is Error -> "(cannot decrypt: ${result.reason})"
             }

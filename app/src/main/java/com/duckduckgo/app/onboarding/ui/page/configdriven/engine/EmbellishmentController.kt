@@ -154,8 +154,10 @@ class EmbellishmentControllerImpl(
     }
 
     override fun release() {
-        trackedAnimators.forEach { it.cancel() }
+        val animators = trackedAnimators.toList()
         trackedAnimators.clear()
+        animators.forEach { it.cancel() }
+
         pendingExit?.let {
             it.view.removeAnimatorListener(it.listener)
             it.view.cancelAnimation()
