@@ -1637,11 +1637,10 @@ class BrowserTabViewModel @Inject constructor(
                 forceExpand = true,
             )
         suggestRedirectJob.cancel()
-        // Re-submitting the tab's current URL (session restoration, crash recovery, user retry)
-        // reloads the page rather than exiting it.
-        // The normalized URL is compared instead of the raw input so that retyping a failed hostname
-        // ("example.com") matches the tab's normalized URL ("http://example.com") and counts as a retry.
-        if (urlToNavigate != url) {
+        // We compare the newly submitted URL and the current URL, stripping the ending slash from both. before comparing them.
+        // This lets us classify re-submission of a same URL as a refresh instead of a user exiting from the BAD_URL error page.
+        // This also covers session restoration or crash recovery.
+        if (urlToNavigate.trimEnd('/') != url?.trimEnd('/')) {
             badUrlErrorPageWideEvent.onBadUrlErrorPageExited(tabId)
         } else {
             badUrlErrorPageWideEvent.onErrorPageRefreshed(tabId)
