@@ -78,8 +78,8 @@ class TdsClientPerfAndroidTest {
 
         // JIT/ART warmup — both paths and both code branches.
         repeat(WARMUP_ROUNDS) {
-            val warmOff = TdsClient(TDS, trackers, mapper, true, false)
-            val warmOn = TdsClient(TDS, trackers, mapper, true, true)
+            val warmOff = TdsClient(TDS, trackers, mapper, precompileRegex = false)
+            val warmOn = TdsClient(TDS, trackers, mapper, precompileRegex = true)
             urls.forEach {
                 warmOff.matches(it, documentUrl, emptyMap())
                 warmOn.matches(it, documentUrl, emptyMap())
@@ -88,11 +88,11 @@ class TdsClientPerfAndroidTest {
 
         // Construction cost — pre-compile work happens here when flag is on.
         val tStartConstructOff = System.nanoTime()
-        val clientOff = TdsClient(TDS, trackers, mapper, true, false)
+        val clientOff = TdsClient(TDS, trackers, mapper, precompileRegex = false)
         val constructOffNs = System.nanoTime() - tStartConstructOff
 
         val tStartConstructOn = System.nanoTime()
-        val clientOn = TdsClient(TDS, trackers, mapper, true, true)
+        val clientOn = TdsClient(TDS, trackers, mapper, precompileRegex = true)
         val constructOnNs = System.nanoTime() - tStartConstructOn
 
         // Match throughput.
