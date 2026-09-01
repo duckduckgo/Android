@@ -568,7 +568,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 comparisonChartStep(NewUserOnboardingActivityDialog.SegmentedComparisonChart(ComparisonChartConfig.SegmentedSearchPath)),
                 defaultBrowserPromptStep(),
                 preferenceSelectorStep(
-                    ctx,
+                    ctx = ctx,
                     titleRes = R.string.searchPathPreferenceSelectorTitle,
                     listOf(
                         OnboardingPreference.SEARCH_HISTORY,
@@ -576,7 +576,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                     ),
                 ),
                 inputScreenStep(
-                    ctx,
+                    ctx = ctx,
                     embellishment = Embellishment.BottomWing,
                     background = OnboardingBackground.Horizon,
                 ),
@@ -623,7 +623,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 comparisonChartStep(NewUserOnboardingActivityDialog.SegmentedComparisonChart(ComparisonChartConfig.SegmentedNoAiPath)),
                 defaultBrowserPromptStep(),
                 preferenceSelectorStep(
-                    ctx,
+                    ctx = ctx,
                     titleRes = R.string.noAiPathPreferenceSelectorTitle,
                     listOf(
                         OnboardingPreference.SEARCH_ASSIST,
@@ -646,7 +646,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 comparisonChartStep(NewUserOnboardingActivityDialog.SegmentedComparisonChart(ComparisonChartConfig.SegmentedBlockAdsPath)),
                 defaultBrowserPromptStep(),
                 preferenceSelectorStep(
-                    ctx,
+                    ctx = ctx,
                     titleRes = R.string.blockAdsPathPreferenceSelectorTitle,
                     listOf(
                         OnboardingPreference.BLOCK_ADS,
@@ -656,7 +656,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                     caption = R.string.preferenceChangeInSettingsCaption,
                 ),
                 inputScreenStep(
-                    ctx,
+                    ctx = ctx,
                     embellishment = Embellishment.BottomWing,
                     background = OnboardingBackground.Horizon,
                 ),
