@@ -533,6 +533,41 @@ class RealOnboardingPixelSenderTest {
     }
 
     @Test
+    fun whenBranchSelectionClearedThenVariantParamNotSent() = runTest {
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
+        whenever(mockCustomAiOnboardingStore.isEnabled()).thenReturn(true)
+        val prefs = InMemorySharedPreferences()
+        val variantTestee = RealOnboardingPixelSender(
+            appCoroutineScope = coroutineRule.testScope,
+            pixel = mockPixel,
+            dispatchers = coroutineRule.testDispatcherProvider,
+            appInstallStore = mockAppInstallStore,
+            customAiOnboardingStore = mockCustomAiOnboardingStore,
+            sharedPreferencesProvider = mock { on { getSharedPreferences(any(), any(), any()) } doReturn prefs },
+            defaultBrowserDetector = mockDefaultBrowserDetector,
+            widgetCapabilities = mockWidgetCapabilities,
+            deviceInfo = mockDeviceInfo,
+            appBuildConfig = mockAppBuildConfig,
+        )
+        variantTestee.chatBranchSelected()
+
+        variantTestee.clearBranchSelection()
+        variantTestee.fire(ONBOARDING_AI_INTRO, OnboardingPixelAction.Shown)
+
+        verify(mockPixel).fire(
+            ONBOARDING_AI_INTRO,
+            mapOf(
+                "installType" to "new",
+                "flow" to "duckai",
+                "pixelSource" to "phone",
+                "daysSinceInstall" to "0",
+                "event" to "shown",
+            ),
+            type = Unique(tag = "onboarding_ai-intro_shown"),
+        )
+    }
+
+    @Test
     fun whenFireSyncRestoreShownThenStandardShownParams() = runTest {
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
 
