@@ -118,9 +118,6 @@ interface SyncFeature {
     fun restrictScannedBarcodesToQrTypes(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun updateSyncActivityViewStateAtomically(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun preventStaleTokenLogout(): Toggle
 
     /**
