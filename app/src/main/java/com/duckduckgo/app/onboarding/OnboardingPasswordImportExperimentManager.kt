@@ -50,18 +50,20 @@ class OnboardingPasswordImportExperimentManagerImpl @Inject constructor(
 ) : OnboardingPasswordImportExperimentManager {
 
     override suspend fun enroll(): OnboardingPasswordImportVariant? = withContext(dispatcherProvider.io()) {
-        if (onboardingPrivacyConfigPersistedGate.awaitPersisted() && checkPrerequisites()) {
-            val toggle = toggles.passwordImportExperimentAug25()
-            toggle.enroll()
-            when {
-                toggle.isEnrolledAndEnabled(OnboardingPasswordImportCohorts.TREATMENT) -> OnboardingPasswordImportVariant.TREATMENT
-                toggle.isEnrolledAndEnabled(OnboardingPasswordImportCohorts.CONTROL) -> OnboardingPasswordImportVariant.CONTROL
-                else -> null
-            }
-        } else {
-            null
-        }
+        OnboardingPasswordImportVariant.TREATMENT
     }
+    //     if (onboardingPrivacyConfigPersistedGate.awaitPersisted() && checkPrerequisites()) {
+    //         val toggle = toggles.passwordImportExperimentAug25()
+    //         toggle.enroll()
+    //         when {
+    //             toggle.isEnrolledAndEnabled(OnboardingPasswordImportCohorts.TREATMENT) -> OnboardingPasswordImportVariant.TREATMENT
+    //             toggle.isEnrolledAndEnabled(OnboardingPasswordImportCohorts.CONTROL) -> OnboardingPasswordImportVariant.CONTROL
+    //             else -> null
+    //         }
+    //     } else {
+    //         null
+    //     }
+    // }
 
     /**
      * Checked before enrolling, so users who could never reach the step are kept out of the experiment: it exists
