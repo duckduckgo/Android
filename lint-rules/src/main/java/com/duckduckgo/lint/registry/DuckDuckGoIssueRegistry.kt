@@ -24,6 +24,7 @@ import com.duckduckgo.lint.DenyListedApiDetector
 import com.duckduckgo.lint.NoDispatcherComputation.Companion.ISSUE_AVOID_COMPUTATION
 import com.duckduckgo.lint.NoFragmentDetector.Companion.NO_FRAGMENT_ISSUE
 import com.duckduckgo.lint.NoHardcodedCoroutineDispatcherDetector.Companion.NO_HARCODED_COROUTINE_DISPATCHER
+import com.duckduckgo.lint.NoHardcodedPetalPixelParamDetector.Companion.NO_HARDCODED_PETAL_PIXEL_PARAM
 import com.duckduckgo.lint.NoImplImportsInAppModuleDetector.Companion.NO_IMPL_IMPORTS_IN_APP_MODULE_ISSUE
 import com.duckduckgo.lint.MetricsPixelNumericValueDetector.Companion.NUMERIC_VALUE_REQUIRED
 import com.duckduckgo.lint.MissingContributesToOnModuleDetector.Companion.MISSING_CONTRIBUTES_TO_ON_MODULE
@@ -91,6 +92,7 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
             NO_FRAGMENT_ISSUE,
             NO_SYSTEM_LOAD_LIBRARY,
             NO_HARCODED_COROUTINE_DISPATCHER,
+            NO_HARDCODED_PETAL_PIXEL_PARAM,
             NO_IMPL_IMPORTS_IN_APP_MODULE_ISSUE,
             NO_METRICS_PIXEL_EXTENSION_USAGE,
             NUMERIC_VALUE_REQUIRED,

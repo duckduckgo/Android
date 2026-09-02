@@ -178,12 +178,6 @@
     "petal": {
         "key": "petal",
         "type": "string",
-        "description": "Signals the pixel processing pipeline (deprecated)",
-        "enum": ["true"]
-    },
-    "petal_randomize": {
-        "key": "petal",
-        "type": "string",
         "description": "Routes the pixel through the PETAL timestamp-randomization pipeline",
         "enum": ["randomize", "kanon"]
     },
