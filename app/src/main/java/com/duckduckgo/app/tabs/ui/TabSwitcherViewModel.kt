@@ -350,6 +350,9 @@ class TabSwitcherViewModel @Inject constructor(
                 selectTab(tabId)
             }
         } else {
+            if (viewState.value.tabSwitcherItems.find { it.id == tabId } is DuckAiTab) {
+                duckChat.reportDuckChatEntry(DuckChatEntryPoint.TAB_SWITCHER_EXISTING_CHAT, opensNewTab = false, hasPrompt = false)
+            }
             tabRepository.select(tabId)
             command.value = Command.Close
             pixel.fire(

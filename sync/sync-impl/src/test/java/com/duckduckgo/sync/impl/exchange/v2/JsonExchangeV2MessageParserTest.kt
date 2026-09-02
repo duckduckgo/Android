@@ -16,6 +16,7 @@
 
 package com.duckduckgo.sync.impl.exchange.v2
 
+import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -31,13 +32,13 @@ class JsonExchangeV2MessageParserTest {
 
         assertEquals("abc", parsed.channelId)
         assertEquals("key", parsed.publicKey)
-        assertEquals("2.1", parsed.version)
+        assertEquals(ExchangeProtocolVersion.V2(minor = 1), parsed.version)
         assertEquals(json, parsed.rawJson)
     }
 
     @Test fun `hello defaults version to 2 when omitted`() {
         val parsed = parser.parse("""{"type":"hello"}""") as ExchangeV2Message.Hello
-        assertEquals("2", parsed.version)
+        assertEquals(ExchangeProtocolVersion.V2(minor = 0), parsed.version)
     }
 
     @Test fun `parses recovery_code_available with user_id+name+kind`() {

@@ -33,16 +33,18 @@ import com.duckduckgo.app.onboarding.OnboardingInputScreenLaunchTarget
 import com.duckduckgo.app.onboarding.OnboardingPasswordImportExperimentManager
 import com.duckduckgo.app.onboarding.OnboardingPasswordImportExperimentManager.OnboardingPasswordImportVariant
 import com.duckduckgo.app.onboarding.OnboardingPreference
-import com.duckduckgo.app.onboarding.OnboardingPreferenceApplier
+import com.duckduckgo.app.onboarding.OnboardingPreferenceCatalog
 import com.duckduckgo.app.onboarding.OnboardingPromptsExperimentManager
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager.SegmentedOnboardingExperimentVariant
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.SegmentedOnboardingPath
 import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
+import com.duckduckgo.app.onboarding.ui.page.OnboardingBackground
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
 import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection
+import com.duckduckgo.app.onboarding.ui.page.configdriven.Embellishment
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_AICHAT_SELECTED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CHOOSE_BROWSER_PRESSED
@@ -115,7 +117,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     private val onboardingPromptsExperimentManager: OnboardingPromptsExperimentManager,
     private val segmentedOnboardingExperimentManager: SegmentedOnboardingExperimentManager,
     private val onboardingPasswordImportExperimentManager: OnboardingPasswordImportExperimentManager,
-    private val onboardingPreferenceApplier: OnboardingPreferenceApplier,
+    private val onboardingPreferenceCatalog: OnboardingPreferenceCatalog,
     private val singleChoiceDataPlugins: ActivePluginPoint<OnboardingSingleChoiceDataPlugin>,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) {
@@ -127,6 +129,10 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         val ctx = NewUserOnboardingPlanContext()
         // Side-effecting (creates the DDG downloads dir, persists reinstall state) and must always run
         ctx.isReinstall = appBuildConfig.isAppReinstall()
+
+        // A restarted run replays from before the branching step, so a branch persisted by a previous
+        // run must not label this run's pre-branch pixels as branched.
+        onboardingPixelSender.clearBranchSelection()
 
         return if (customAiOnboardingResolver.resolve()) {
             // in custom AI onboarding path, the input toggle is enabled by default
@@ -548,10 +554,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                             DownloadReasonSelection.SEARCH -> SwitchTo(segmentedSearchPlan(ctx))
                             DownloadReasonSelection.AI_CHAT -> SwitchTo(segmentedAiPlan(ctx, modelProviderChoice, togglePositionChoice))
                             DownloadReasonSelection.NO_AI -> SwitchTo(segmentedNoAiPlan(ctx, duckAiStateChoice))
-                            DownloadReasonSelection.BLOCK_ADS,
-                            -> {
-                                Stay
-                            }
+                            DownloadReasonSelection.BLOCK_ADS -> SwitchTo(segmentedBlockAdsPlan(ctx))
                         }
                     }
                     else -> Stay
@@ -569,14 +572,18 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 comparisonChartStep(NewUserOnboardingActivityDialog.SegmentedComparisonChart(ComparisonChartConfig.SegmentedSearchPath)),
                 defaultBrowserPromptStep(),
                 preferenceSelectorStep(
-                    ctx,
+                    ctx = ctx,
                     titleRes = R.string.searchPathPreferenceSelectorTitle,
                     listOf(
                         OnboardingPreference.SEARCH_HISTORY,
                         OnboardingPreference.SAFE_SEARCH,
                     ),
                 ),
-                inputScreenStep(ctx),
+                inputScreenStep(
+                    ctx = ctx,
+                    embellishment = Embellishment.BottomWing,
+                    background = OnboardingBackground.Horizon,
+                ),
                 addressBarPositionStep(),
                 inputScreenPreviewStep(
                     ctx = ctx,
@@ -620,7 +627,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 comparisonChartStep(NewUserOnboardingActivityDialog.SegmentedComparisonChart(ComparisonChartConfig.SegmentedNoAiPath)),
                 defaultBrowserPromptStep(),
                 preferenceSelectorStep(
-                    ctx,
+                    ctx = ctx,
                     titleRes = R.string.noAiPathPreferenceSelectorTitle,
                     listOf(
                         OnboardingPreference.SEARCH_ASSIST,
@@ -634,29 +641,58 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         )
     }
 
-    /**
-     * Filters unavailable preferences and assigns the default value.
-     */
-    private suspend fun resolvePreferenceSelections(offered: List<OnboardingPreference>): Map<OnboardingPreference, Boolean> =
-        offered
-            .filter { onboardingPreferenceApplier.isAvailable(it) }
-            .associateWith { onboardingPreferenceApplier.isEnabled(it) }
+    private fun segmentedBlockAdsPlan(ctx: NewUserOnboardingPlanContext): LinearOnboardingPlan {
+        val duckAiEnabled = SuspendMemo { duckAiOnboardingAvailability.isDuckAiOnboardingEnabled() }
+        onboardingStore.setSegmentedOnboardingPath(null)
+        return sidePlan(
+            id = SEGMENTED_BLOCK_ADS_PLAN_ID,
+            steps = listOf(
+                comparisonChartStep(NewUserOnboardingActivityDialog.SegmentedComparisonChart(ComparisonChartConfig.SegmentedBlockAdsPath)),
+                defaultBrowserPromptStep(),
+                preferenceSelectorStep(
+                    ctx = ctx,
+                    titleRes = R.string.blockAdsPathPreferenceSelectorTitle,
+                    listOf(
+                        OnboardingPreference.BLOCK_ADS,
+                        OnboardingPreference.REJECT_OPTIONAL_COOKIES,
+                        OnboardingPreference.ACCEPT_NON_OPT_OUT_COOKIES,
+                    ),
+                    caption = R.string.preferenceChangeInSettingsCaption,
+                ),
+                inputScreenStep(
+                    ctx = ctx,
+                    embellishment = Embellishment.BottomWing,
+                    background = OnboardingBackground.Horizon,
+                ),
+                addressBarPositionStep(),
+                inputScreenPreviewStep(
+                    ctx = ctx,
+                    isSearchDefault = true,
+                    showModeToggle = { ctx.inputModeWasAi && duckAiEnabled() },
+                ),
+            ),
+        )
+    }
 
     private fun preferenceSelectorStep(
         ctx: NewUserOnboardingPlanContext,
         @StringRes titleRes: Int,
         offered: List<OnboardingPreference>,
+        @StringRes caption: Int? = null,
     ): NewUserOnboardingActivityStep {
-        val preferenceSelections = SuspendMemo { resolvePreferenceSelections(offered) }
+        // Resolved on first access, so a preference's availability is evaluated when the run reaches this
+        // step and not when the plan holding it was built.
+        val rows = SuspendMemo { onboardingPreferenceCatalog.offer(offered) }
         return NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.PREFERENCE_SELECTOR,
             pixelName = null,
             indicator = StepIndicatorMode.COUNTED,
-            precondition = { preferenceSelections().isNotEmpty() },
+            precondition = { rows().isNotEmpty() },
             resolveDialog = {
                 NewUserOnboardingActivityDialog.PreferenceSelector(
                     titleRes = titleRes,
-                    preferenceSelections(),
+                    rows = rows(),
+                    caption = caption,
                 )
             },
             transition = { event ->
@@ -664,11 +700,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                     is NewUserOnboardingEvent.PreferenceSelectorConfirmed -> {
                         // Committed only once the run ends, so preferences a path seeds its own way don't
                         // survive a process death into the path a restarted onboarding takes.
-                        ctx.onFinish {
-                            event.selections.forEach { (preference, enabled) ->
-                                onboardingPreferenceApplier.apply(preference, enabled)
-                            }
-                        }
+                        ctx.onFinish { onboardingPreferenceCatalog.apply(event.selections) }
                         Advance
                     }
 
@@ -996,13 +1028,17 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         )
     }
 
-    private fun inputScreenStep(ctx: NewUserOnboardingPlanContext): NewUserOnboardingActivityStep {
+    private fun inputScreenStep(
+        ctx: NewUserOnboardingPlanContext,
+        embellishment: Embellishment = Embellishment.LeftWing,
+        background: OnboardingBackground = OnboardingBackground.Shoreline,
+    ): NewUserOnboardingActivityStep {
         val pixelName = OnboardingPixelName.ONBOARDING_SEARCH_EXPERIENCE
         return NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.INPUT_SCREEN,
             pixelName = pixelName,
             indicator = StepIndicatorMode.COUNTED,
-            resolveDialog = { NewUserOnboardingActivityDialog.InputScreen },
+            resolveDialog = { NewUserOnboardingActivityDialog.InputScreen(embellishment, background) },
             transition = { event ->
                 when {
                     event is NewUserOnboardingEvent.InputModeConfirmed -> {
@@ -1213,6 +1249,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         const val SEGMENTED_SEARCH_PLAN_ID = "new-user_segmented_search"
         const val SEGMENTED_AI_PLAN_ID = "new-user_segmented_ai"
         const val SEGMENTED_NO_AI_PLAN_ID = "new-user_segmented_no-ai"
+        const val SEGMENTED_BLOCK_ADS_PLAN_ID = "new-user_segmented_block-ads"
 
         private const val BLOCK_STORE_TIMEOUT_MS = 3_000L
     }

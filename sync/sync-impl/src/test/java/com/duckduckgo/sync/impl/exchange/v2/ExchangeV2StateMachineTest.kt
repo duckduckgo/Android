@@ -41,14 +41,14 @@ class ExchangeV2StateMachineTest {
         RealExchangeV2StateMachine(localUserId = localUserId, clock = clock, initialState = ExchangeV2State.Negotiating)
 
     private fun availableFromPeer(userId: String = "other", name: String = "Peer", kind: String = "3party") =
-        RecoveryCodeAvailable(rawJson = "{}", userId = userId, name = name, kind = kind)
+        RecoveryCodeAvailable.create(userId = userId, name = name, kind = kind)
 
     private fun requestFromPeer(name: String = "Peer", kind: String = "3party") =
-        RecoveryCodeRequest(rawJson = "{}", name = name, kind = kind)
+        RecoveryCodeRequest.create(name = name, kind = kind)
 
     @Test fun `when hello received in Bootstrapped then transitions to Negotiating`() {
         val machine = sm()
-        val result = machine.receive(Hello("{}"))
+        val result = machine.receive(Hello.fromJson("{}"))
 
         assertSame(ExchangeV2State.Negotiating, result.newState)
         assertSame(ExchangeV2State.Negotiating, machine.currentState)
@@ -63,11 +63,11 @@ class ExchangeV2StateMachineTest {
         val known: List<ExchangeV2Message> = listOf(
             availableFromPeer(),
             requestFromPeer(),
-            RecoveryCodeAwaitingConfirmation("{}"),
-            RecoveryCodeConfirmed("{}"),
-            RecoveryCodeDenied("{}"),
-            RecoveryCodeUnavailable("{}"),
-            RecoveryCodeResponse("{}"),
+            RecoveryCodeAwaitingConfirmation.fromJson("{}"),
+            RecoveryCodeConfirmed.fromJson("{}"),
+            RecoveryCodeDenied.fromJson("{}"),
+            RecoveryCodeUnavailable.fromJson("{}"),
+            RecoveryCodeResponse.fromJson("{}"),
         )
         for (msg in known) {
             val machine = sm()
@@ -84,7 +84,7 @@ class ExchangeV2StateMachineTest {
 
     @Test fun `when unknown message received in Bootstrapped then dropped and state unchanged`() {
         val machine = sm()
-        val result = machine.receive(Unknown("{}", "future_message"))
+        val result = machine.receive(Unknown.fromJson("{}", "future_message"))
 
         assertSame(TransitionOutcome.Dropped, result.outcome)
         assertSame(ExchangeV2State.Bootstrapped, machine.currentState)
@@ -105,9 +105,9 @@ class ExchangeV2StateMachineTest {
 
     @Test fun `when presenter receives second hello in Negotiating then aborts to terminal Aborted`() {
         val machine = sm()
-        assertSame(ExchangeV2State.Negotiating, machine.receive(Hello("{}")).newState)
+        assertSame(ExchangeV2State.Negotiating, machine.receive(Hello.fromJson("{}")).newState)
 
-        val result = machine.receive(Hello("{}"))
+        val result = machine.receive(Hello.fromJson("{}"))
 
         assertSame(ExchangeV2State.Aborted, machine.currentState)
         assertTrue(result.outcome is TransitionOutcome.Aborted)
@@ -120,7 +120,7 @@ class ExchangeV2StateMachineTest {
     @Test fun `when scanner receives hello in Negotiating then aborts to terminal Aborted`() {
         val machine = scannerSm()
 
-        val result = machine.receive(Hello("{}"))
+        val result = machine.receive(Hello.fromJson("{}"))
 
         assertSame(ExchangeV2State.Aborted, machine.currentState)
         assertTrue(result.outcome is TransitionOutcome.Aborted)
@@ -132,7 +132,7 @@ class ExchangeV2StateMachineTest {
 
     @Test fun `when message received in Aborted then state unchanged and aborts`() {
         val machine = scannerSm()
-        machine.receive(Hello("{}"))
+        machine.receive(Hello.fromJson("{}"))
         assertSame(ExchangeV2State.Aborted, machine.currentState)
 
         val result = machine.receive(availableFromPeer())
@@ -143,7 +143,7 @@ class ExchangeV2StateMachineTest {
 
     @Test fun `when recovery_code_available with matching user_id received in Negotiating then transitions to SameAccountAbort`() {
         val machine = sm(localUserId = "shared-user")
-        machine.receive(Hello("{}"))
+        machine.receive(Hello.fromJson("{}"))
         val msg = availableFromPeer(userId = "shared-user")
         val result = machine.receive(msg)
 
@@ -162,7 +162,7 @@ class ExchangeV2StateMachineTest {
 
     @Test fun `when recovery_code_available with different user_id received in Negotiating then stays in Negotiating`() {
         val machine = sm(localUserId = "local-user")
-        machine.receive(Hello("{}"))
+        machine.receive(Hello.fromJson("{}"))
         val result = machine.receive(availableFromPeer(userId = "other-user"))
 
         assertSame(TransitionOutcome.Accepted, result.outcome)
@@ -173,7 +173,7 @@ class ExchangeV2StateMachineTest {
 
     @Test fun `when recovery_code_request received in Negotiating then stays in Negotiating`() {
         val machine = sm()
-        machine.receive(Hello("{}"))
+        machine.receive(Hello.fromJson("{}"))
         val result = machine.receive(requestFromPeer())
 
         assertSame(TransitionOutcome.Accepted, result.outcome)
@@ -182,15 +182,15 @@ class ExchangeV2StateMachineTest {
 
     @Test fun `when finalise-phase message received in Negotiating then aborts to terminal Aborted`() {
         val finalise: List<ExchangeV2Message> = listOf(
-            RecoveryCodeAwaitingConfirmation("{}"),
-            RecoveryCodeConfirmed("{}"),
-            RecoveryCodeDenied("{}"),
-            RecoveryCodeUnavailable("{}"),
-            RecoveryCodeResponse("{}"),
+            RecoveryCodeAwaitingConfirmation.fromJson("{}"),
+            RecoveryCodeConfirmed.fromJson("{}"),
+            RecoveryCodeDenied.fromJson("{}"),
+            RecoveryCodeUnavailable.fromJson("{}"),
+            RecoveryCodeResponse.fromJson("{}"),
         )
         for (msg in finalise) {
             val machine = sm()
-            machine.receive(Hello("{}"))
+            machine.receive(Hello.fromJson("{}"))
             val result = machine.receive(msg)
             assertTrue("expected abort for $msg in Negotiating, got ${result.outcome}", result.outcome is TransitionOutcome.Aborted)
             assertSame("recv $msg in Negotiating should drive to Aborted", ExchangeV2State.Aborted, machine.currentState)
@@ -203,7 +203,7 @@ class ExchangeV2StateMachineTest {
 
     @Test fun `when RoleElected Host in Negotiating then transitions to Host Confirming`() {
         val machine = sm()
-        machine.receive(Hello("{}"))
+        machine.receive(Hello.fromJson("{}"))
         val result = machine.localTrigger(LocalTrigger.RoleElected(Role.Host))
 
         assertSame(TransitionOutcome.Accepted, result.outcome)
@@ -212,7 +212,7 @@ class ExchangeV2StateMachineTest {
 
     @Test fun `when RoleElected Joiner in Negotiating then transitions to Joiner Confirming`() {
         val machine = sm()
-        machine.receive(Hello("{}"))
+        machine.receive(Hello.fromJson("{}"))
         val result = machine.localTrigger(LocalTrigger.RoleElected(Role.Joiner))
 
         assertSame(TransitionOutcome.Accepted, result.outcome)
@@ -221,7 +221,7 @@ class ExchangeV2StateMachineTest {
 
     @Test fun `when RoleElected fires after peer availability then transitions to Joiner Confirming`() {
         val machine = sm()
-        machine.receive(Hello("{}"))
+        machine.receive(Hello.fromJson("{}"))
         machine.receive(availableFromPeer(userId = "other-user"))
         val result = machine.localTrigger(LocalTrigger.RoleElected(Role.Joiner))
 
@@ -262,10 +262,10 @@ class ExchangeV2StateMachineTest {
             },
         )
         val knownIncoming: List<ExchangeV2Message> = listOf(
-            Hello("{}"),
+            Hello.fromJson("{}"),
             availableFromPeer(),
             requestFromPeer(),
-            RecoveryCodeResponse("{}"),
+            RecoveryCodeResponse.fromJson("{}"),
         )
         for ((from, build) in hostStateBuilders) {
             for (msg in knownIncoming) {
@@ -283,7 +283,7 @@ class ExchangeV2StateMachineTest {
 
     @Test fun `when unknown message received in Host Confirming then dropped`() {
         val machine = inHostConfirming()
-        val result = machine.receive(Unknown("{}", "future"))
+        val result = machine.receive(Unknown.fromJson("{}", "future"))
 
         assertSame(TransitionOutcome.Dropped, result.outcome)
         assertSame(ExchangeV2State.Host.Confirming, machine.currentState)
@@ -307,7 +307,7 @@ class ExchangeV2StateMachineTest {
 
     @Test fun `when denied received in Joiner Confirming then transitions to Joiner AbortedByHost`() {
         val machine = inJoinerConfirming()
-        val result = machine.receive(RecoveryCodeDenied("{}"))
+        val result = machine.receive(RecoveryCodeDenied.fromJson("{}"))
 
         assertSame(TransitionOutcome.Accepted, result.outcome)
         assertSame(ExchangeV2State.Joiner.AbortedByHost, machine.currentState)
@@ -315,7 +315,7 @@ class ExchangeV2StateMachineTest {
 
     @Test fun `when unavailable received in Joiner Confirming then transitions to Joiner AbortedByHost`() {
         val machine = inJoinerConfirming()
-        val result = machine.receive(RecoveryCodeUnavailable("{}"))
+        val result = machine.receive(RecoveryCodeUnavailable.fromJson("{}"))
 
         assertSame(TransitionOutcome.Accepted, result.outcome)
         assertSame(ExchangeV2State.Joiner.AbortedByHost, machine.currentState)
@@ -323,9 +323,9 @@ class ExchangeV2StateMachineTest {
 
     @Test fun `when host success-phase message received in Joiner Confirming then aborts to terminal Joiner AbortedLocal`() {
         val hostSuccessPhase: List<ExchangeV2Message> = listOf(
-            RecoveryCodeAwaitingConfirmation("{}"),
-            RecoveryCodeConfirmed("{}"),
-            RecoveryCodeResponse("{}"),
+            RecoveryCodeAwaitingConfirmation.fromJson("{}"),
+            RecoveryCodeConfirmed.fromJson("{}"),
+            RecoveryCodeResponse.fromJson("{}"),
         )
         for (msg in hostSuccessPhase) {
             val machine = inJoinerConfirming()
@@ -342,7 +342,7 @@ class ExchangeV2StateMachineTest {
 
     @Test fun `when negotiation-phase message received in Joiner Confirming then aborts to terminal Joiner AbortedLocal`() {
         val negotiationPhase: List<ExchangeV2Message> = listOf(
-            Hello("{}"),
+            Hello.fromJson("{}"),
             availableFromPeer(),
             requestFromPeer(),
         )
@@ -356,7 +356,7 @@ class ExchangeV2StateMachineTest {
 
     @Test fun `when unknown message received in Joiner Confirming then dropped`() {
         val machine = inJoinerConfirming()
-        val result = machine.receive(Unknown("{}", "future"))
+        val result = machine.receive(Unknown.fromJson("{}", "future"))
 
         assertSame(TransitionOutcome.Dropped, result.outcome)
         assertSame(ExchangeV2State.Joiner.Confirming, machine.currentState)
@@ -364,7 +364,7 @@ class ExchangeV2StateMachineTest {
 
     @Test fun `when awaiting_confirmation received in Joiner Waiting then stays in Joiner Waiting`() {
         val machine = inJoinerWaiting()
-        val result = machine.receive(RecoveryCodeAwaitingConfirmation("{}"))
+        val result = machine.receive(RecoveryCodeAwaitingConfirmation.fromJson("{}"))
 
         assertSame(TransitionOutcome.Accepted, result.outcome)
         assertSame(ExchangeV2State.Joiner.Waiting, machine.currentState)
@@ -372,7 +372,7 @@ class ExchangeV2StateMachineTest {
 
     @Test fun `when confirmed received in Joiner Waiting then stays in Joiner Waiting`() {
         val machine = inJoinerWaiting()
-        val result = machine.receive(RecoveryCodeConfirmed("{}"))
+        val result = machine.receive(RecoveryCodeConfirmed.fromJson("{}"))
 
         assertSame(TransitionOutcome.Accepted, result.outcome)
         assertSame(ExchangeV2State.Joiner.Waiting, machine.currentState)
@@ -380,7 +380,7 @@ class ExchangeV2StateMachineTest {
 
     @Test fun `when denied received in Joiner Waiting then transitions to Joiner AbortedByHost`() {
         val machine = inJoinerWaiting()
-        val result = machine.receive(RecoveryCodeDenied("{}"))
+        val result = machine.receive(RecoveryCodeDenied.fromJson("{}"))
 
         assertSame(TransitionOutcome.Accepted, result.outcome)
         assertSame(ExchangeV2State.Joiner.AbortedByHost, machine.currentState)
@@ -388,7 +388,7 @@ class ExchangeV2StateMachineTest {
 
     @Test fun `when unavailable received in Joiner Waiting then transitions to Joiner AbortedByHost`() {
         val machine = inJoinerWaiting()
-        val result = machine.receive(RecoveryCodeUnavailable("{}"))
+        val result = machine.receive(RecoveryCodeUnavailable.fromJson("{}"))
 
         assertSame(TransitionOutcome.Accepted, result.outcome)
         assertSame(ExchangeV2State.Joiner.AbortedByHost, machine.currentState)
@@ -396,7 +396,7 @@ class ExchangeV2StateMachineTest {
 
     @Test fun `when response received in Joiner Waiting then transitions to Joiner Done`() {
         val machine = inJoinerWaiting()
-        val result = machine.receive(RecoveryCodeResponse("{}"))
+        val result = machine.receive(RecoveryCodeResponse.fromJson("{}"))
 
         assertSame(TransitionOutcome.Accepted, result.outcome)
         assertSame(ExchangeV2State.Joiner.Done, machine.currentState)
@@ -404,7 +404,7 @@ class ExchangeV2StateMachineTest {
 
     @Test fun `when negotiation-phase message received in Joiner Waiting then aborts to terminal Joiner AbortedLocal`() {
         val negotiationPhase: List<ExchangeV2Message> = listOf(
-            Hello("{}"),
+            Hello.fromJson("{}"),
             availableFromPeer(),
             requestFromPeer(),
         )
@@ -422,7 +422,7 @@ class ExchangeV2StateMachineTest {
 
     @Test fun `when unknown message received in Joiner Waiting then dropped`() {
         val machine = inJoinerWaiting()
-        val result = machine.receive(Unknown("{}", "future"))
+        val result = machine.receive(Unknown.fromJson("{}", "future"))
 
         assertSame(TransitionOutcome.Dropped, result.outcome)
         assertSame(ExchangeV2State.Joiner.Waiting, machine.currentState)
@@ -430,10 +430,10 @@ class ExchangeV2StateMachineTest {
 
     @Test fun `when message received in SameAccountAbort then aborts and state unchanged`() {
         val machine = sm(localUserId = "shared-user")
-        machine.receive(Hello("{}"))
+        machine.receive(Hello.fromJson("{}"))
         machine.receive(availableFromPeer(userId = "shared-user"))
         val before = machine.currentState
-        val result = machine.receive(RecoveryCodeResponse("{}"))
+        val result = machine.receive(RecoveryCodeResponse.fromJson("{}"))
 
         assertTrue(result.outcome is TransitionOutcome.Aborted)
         assertSame(before, machine.currentState)
@@ -441,7 +441,7 @@ class ExchangeV2StateMachineTest {
 
     @Test fun `when recovery_code_available received and local user is null then stays in Negotiating`() {
         val machine = sm(localUserId = null)
-        machine.receive(Hello("{}"))
+        machine.receive(Hello.fromJson("{}"))
         val result = machine.receive(availableFromPeer(userId = "anything"))
 
         assertSame(TransitionOutcome.Accepted, result.outcome)
@@ -450,7 +450,7 @@ class ExchangeV2StateMachineTest {
 
     @Test fun `when RoleElected Host then emits SendAwaitingConfirmation side effect`() {
         val machine = sm()
-        machine.receive(Hello("{}"))
+        machine.receive(Hello.fromJson("{}"))
         machine.receive(requestFromPeer())
 
         val result = machine.localTrigger(LocalTrigger.RoleElected(Role.Host))
@@ -460,7 +460,7 @@ class ExchangeV2StateMachineTest {
 
     @Test fun `when RoleElected Joiner then emits no side effects`() {
         val machine = sm()
-        machine.receive(Hello("{}"))
+        machine.receive(Hello.fromJson("{}"))
         machine.receive(availableFromPeer(userId = "other"))
 
         val result = machine.localTrigger(LocalTrigger.RoleElected(Role.Joiner))
@@ -532,17 +532,17 @@ class ExchangeV2StateMachineTest {
         }
         assertSame(ExchangeV2State.Host.Done, machine.currentState)
 
-        val result = machine.receive(RecoveryCodeResponse("{}"))
+        val result = machine.receive(RecoveryCodeResponse.fromJson("{}"))
 
         assertTrue(result.outcome is TransitionOutcome.Aborted)
         assertSame(ExchangeV2State.Host.Done, machine.currentState)
     }
 
     @Test fun `when message received in Joiner Done then state unchanged and outcome is Aborted`() {
-        val machine = inJoinerWaiting().also { it.receive(RecoveryCodeResponse("{}")) }
+        val machine = inJoinerWaiting().also { it.receive(RecoveryCodeResponse.fromJson("{}")) }
         assertSame(ExchangeV2State.Joiner.Done, machine.currentState)
 
-        val result = machine.receive(Hello("{}"))
+        val result = machine.receive(Hello.fromJson("{}"))
 
         assertTrue(result.outcome is TransitionOutcome.Aborted)
         assertSame(ExchangeV2State.Joiner.Done, machine.currentState)
@@ -550,14 +550,14 @@ class ExchangeV2StateMachineTest {
 
     private fun inHostConfirming(): ExchangeV2StateMachine =
         sm().also {
-            it.receive(Hello("{}"))
+            it.receive(Hello.fromJson("{}"))
             it.receive(requestFromPeer())
             it.localTrigger(LocalTrigger.RoleElected(Role.Host))
         }
 
     private fun inJoinerConfirming(): ExchangeV2StateMachine =
         sm().also {
-            it.receive(Hello("{}"))
+            it.receive(Hello.fromJson("{}"))
             it.receive(availableFromPeer(userId = "other"))
             it.localTrigger(LocalTrigger.RoleElected(Role.Joiner))
         }

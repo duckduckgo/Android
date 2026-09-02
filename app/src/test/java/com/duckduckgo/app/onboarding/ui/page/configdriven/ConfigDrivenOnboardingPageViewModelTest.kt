@@ -38,7 +38,7 @@ import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanProvider
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingStepIds
 import com.duckduckgo.app.onboarding.orchestrator.PasswordImportOutcome
 import com.duckduckgo.app.onboarding.store.OnboardingStore
-import com.duckduckgo.app.onboarding.ui.page.OnboardingBackgroundStep
+import com.duckduckgo.app.onboarding.ui.page.OnboardingBackground
 import com.duckduckgo.app.onboarding.ui.page.configdriven.ConfigDrivenOnboardingPageViewModel.Command
 import com.duckduckgo.app.onboarding.ui.page.configdriven.ConfigDrivenOnboardingPageViewModel.Screen
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -198,7 +198,7 @@ class ConfigDrivenOnboardingPageViewModelTest {
 
         val screen = testee.viewState.value.screen as Screen.Dialog
         assertEquals("step", screen.stepId)
-        assertEquals(OnboardingBackgroundStep.ComparisonChart, screen.config.background)
+        assertEquals(OnboardingBackground.Horizon, screen.config.background)
         assertTrue(screen.animateEntry)
     }
 

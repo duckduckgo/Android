@@ -86,7 +86,7 @@ class SyncV2PairingDebugViewModelTest {
                     timestampMs = 100L,
                     from = ExchangeV2State.Bootstrapped,
                     to = ExchangeV2State.Negotiating,
-                    trigger = Hello("""{"type":"hello"}"""),
+                    trigger = Hello.fromJson("""{"type":"hello"}"""),
                     localTrigger = null,
                 ),
             )
@@ -105,7 +105,7 @@ class SyncV2PairingDebugViewModelTest {
             eventFlow.emit(
                 ExchangeV2Event.MessageSent(
                     timestampMs = 0L,
-                    message = ExchangeV2Message.RecoveryCodeRequest(rawJson = "{}", name = "me", kind = "3party"),
+                    message = ExchangeV2Message.RecoveryCodeRequest.create(name = "me", kind = "3party"),
                 ),
             )
             val state = awaitItem()
@@ -121,8 +121,7 @@ class SyncV2PairingDebugViewModelTest {
             eventFlow.emit(
                 ExchangeV2Event.MessageRejected(
                     timestampMs = 0L,
-                    message = ExchangeV2Message.RecoveryCodeAvailable(
-                        rawJson = "{}",
+                    message = ExchangeV2Message.RecoveryCodeAvailable.create(
                         userId = "shared",
                         name = "Peer",
                         kind = "3party",
@@ -145,7 +144,7 @@ class SyncV2PairingDebugViewModelTest {
                     timestampMs = 0L,
                     from = ExchangeV2State.Bootstrapped,
                     to = ExchangeV2State.Negotiating,
-                    trigger = Hello("{}"),
+                    trigger = Hello.fromJson("{}"),
                     localTrigger = null,
                 ),
             )

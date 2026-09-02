@@ -27,6 +27,7 @@ import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.StringRes
 import androidx.core.graphics.drawable.toDrawable
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -60,6 +61,7 @@ class CookiePopupOptInActivity : DuckDuckGoActivity() {
     private val viewModel: CookiePopupOptInViewModel by bindViewModel()
 
     private var lockedInPortraitMode: Boolean = false
+    private var backNavigationCallback: OnBackPressedCallback? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -100,6 +102,11 @@ class CookiePopupOptInActivity : DuckDuckGoActivity() {
         }
     }
 
+    override fun onDestroy() {
+        backNavigationCallback = null
+        super.onDestroy()
+    }
+
     override fun finish() {
         super.finish()
         if (SDK_INT < 34) {
@@ -114,30 +121,36 @@ class CookiePopupOptInActivity : DuckDuckGoActivity() {
     }
 
     /**
-     * The prompt is a required choice, so back must not dismiss it.
+     * Blocks system Back unless Back dismissal is enabled through remote config.
      */
     private fun setupOnBackNavigation() {
-        onBackPressedDispatcher.addCallback(
-            object : OnBackPressedCallback(true) {
-                override fun handleOnBackPressed() = Unit
-            },
-        )
+        val callback = object : OnBackPressedCallback(!viewModel.viewState.value.isBackDismissEnabled) {
+            override fun handleOnBackPressed() = Unit
+        }
+        backNavigationCallback = callback
+        onBackPressedDispatcher.addCallback(this, callback)
     }
 
     private fun setupListeners() {
+        binding.cookiePopupOptInCloseButton.setOnClickListener {
+            disableActions()
+            viewModel.onCloseClicked()
+        }
         binding.cookiePopupOptInAcceptButton.setOnClickListener {
-            disableButtons()
+            disableActions()
             viewModel.onAcceptClicked()
         }
         binding.cookiePopupOptInDeclineButton.setOnClickListener {
-            disableButtons()
+            disableActions()
             viewModel.onDeclineClicked()
         }
     }
 
-    private fun disableButtons() {
+    private fun disableActions() {
         binding.cookiePopupOptInAcceptButton.isEnabled = false
         binding.cookiePopupOptInDeclineButton.isEnabled = false
+        binding.cookiePopupOptInCloseButton.isEnabled = false
+        backNavigationCallback?.isEnabled = true
     }
 
     private fun setupObservers() {
@@ -154,6 +167,7 @@ class CookiePopupOptInActivity : DuckDuckGoActivity() {
 
     private fun render(viewState: ViewState) {
         val text = viewState.variant.textResources()
+        binding.cookiePopupOptInCloseButton.isVisible = viewState.isCloseButtonVisible
         binding.cookiePopupOptInTitle.setText(text.title)
         binding.cookiePopupOptInDescription.setText(text.description)
         binding.cookiePopupOptInAcceptButton.text = getString(text.acceptButton)

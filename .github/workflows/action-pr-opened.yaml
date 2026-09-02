@@ -14,8 +14,11 @@ jobs:
     permissions:
       issues: write
     steps:
+      # A stacked PR is retargeted to the default branch when its parent merges, which fires an
+      # `edited` event and lands it on the board then. That retarget can arrive after the PR has
+      # merged, so ignore closed PRs or this moves the task back out of Waiting for release.
       - name: Find Asana Task ID
-        if: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.ref == github.event.repository.default_branch }}
+        if: ${{ github.event_name == 'pull_request' && github.event.pull_request.state == 'open' && github.event.pull_request.base.ref == github.event.repository.default_branch }}
         id: find-asana-task
         uses: duckduckgo/native-github-asana-sync@v2.6.0
         with:

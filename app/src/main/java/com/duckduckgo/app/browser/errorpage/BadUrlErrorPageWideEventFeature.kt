@@ -14,26 +14,21 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.impl.features.trackerallowlist
+package com.duckduckgo.app.browser.errorpage
 
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 
+/**
+ * Controls whether [BadUrlErrorPageWideEvent] sends the `bad-url-error-page` wide event.
+ */
 @ContributesRemoteFeature(
     scope = AppScope::class,
-    featureName = "optimizeTrackerAllowList",
+    featureName = "badUrlErrorPageWideEvent",
 )
-interface OptimizeTrackerAllowListFeatures {
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun self(): Toggle
-
-    /**
-     * Pre-compile tracker allowlist rule regex patterns once when the exceptions list is loaded
-     * rather than recompiling on every request. Also builds a per-domain hash map so the
-     * tracker-domain lookup is O(1) instead of a linear filter.
-     */
+interface BadUrlErrorPageWideEventFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun precompileRegexAndCacheDomains(): Toggle
+    fun self(): Toggle
 }

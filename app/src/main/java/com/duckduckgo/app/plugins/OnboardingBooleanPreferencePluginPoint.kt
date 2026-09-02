@@ -14,19 +14,16 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.impl.features.trackerallowlist
+package com.duckduckgo.app.plugins
 
+import com.duckduckgo.anvil.annotations.ContributesActivePluginPoint
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
+import com.duckduckgo.onboarding.api.OnboardingBooleanPreferencePlugin
 
-interface OptimizeTrackerAllowListRCWrapper {
-    val enabled: Boolean
-}
-
-@ContributesBinding(AppScope::class)
-class RealOptimizeTrackerAllowListRCWrapper @Inject constructor(
-    private val optimizeTrackerAllowListFeatures: OptimizeTrackerAllowListFeatures,
-) : OptimizeTrackerAllowListRCWrapper {
-    override val enabled by lazy { optimizeTrackerAllowListFeatures.precompileRegexAndCacheDomains().isEnabled() }
-}
+@ContributesActivePluginPoint(
+    scope = AppScope::class,
+    boundType = OnboardingBooleanPreferencePlugin::class,
+    featureName = "pluginPointOnboardingBooleanPreference",
+)
+@Suppress("unused")
+private interface UnusedOnboardingBooleanPreferencePluginPoint

@@ -51,10 +51,10 @@ interface ExchangeV2Channel {
     fun createChannel(channelId: String): Result<Unit>
 
     /**
-     * Encrypt [messageJson] and send it to [peerChannelId]. Sender's kid is [ownChannelId].
+     * Encrypt [message] and send it to [peerChannelId]. Sender's kid is [ownChannelId].
      */
     fun sendMessage(
-        messageJson: String,
+        message: ExchangeV2Message,
         peerChannelId: String,
         peerPublicKeyBase64: String,
         ownChannelId: String,
@@ -85,13 +85,13 @@ class RealExchangeV2Channel @Inject constructor(
     }
 
     override fun sendMessage(
-        messageJson: String,
+        message: ExchangeV2Message,
         peerChannelId: String,
         peerPublicKeyBase64: String,
         ownChannelId: String,
     ): Result<Unit> {
         val sealed = runCatching {
-            envelope.seal(messageJson, peerPublicKeyBase64, ownChannelId)
+            envelope.seal(message, peerPublicKeyBase64, ownChannelId)
         }.getOrElse {
             logcat(ERROR) { "Sync-ExchangeV2: seal failed: ${it.message}" }
             return Result.Error(reason = "Failed to seal envelope: ${it.message}")

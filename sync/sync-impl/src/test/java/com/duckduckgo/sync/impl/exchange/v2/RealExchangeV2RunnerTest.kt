@@ -18,11 +18,18 @@ package com.duckduckgo.sync.impl.exchange.v2
 
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncDeviceIds
+import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.crypto.RsaKeyPair
 import com.duckduckgo.sync.impl.crypto.SyncJweCrypto
+import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.Hello
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeAvailable
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeAwaitingConfirmation
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeConfirmed
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeRequest
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeResponse
 import com.duckduckgo.sync.store.SyncStore
@@ -44,6 +51,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argThat
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -62,6 +70,7 @@ class RealExchangeV2RunnerTest {
     private val qrCode: ExchangeV2QrCode = mock()
     private val recoveryCodeProvider: RecoveryCodeProvider = mock()
     private val syncDeviceIds: SyncDeviceIds = mock()
+    private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
 
     private fun newRunner(): RealExchangeV2Runner =
         RealExchangeV2Runner(
@@ -74,13 +83,14 @@ class RealExchangeV2RunnerTest {
             qrCode = qrCode,
             recoveryCodeProvider = recoveryCodeProvider,
             syncDeviceIds = syncDeviceIds,
+            syncFeature = syncFeature,
             appScope = coroutineTestRule.testScope,
             dispatchers = coroutineTestRule.testDispatcherProvider,
         )
 
     @Before fun stubWireDeps() {
         whenever(qrCode.parse(any())).thenReturn(
-            ExchangeV2CodeParseResult.LinkingV2(channelId = "peer-channel", publicKey = "peer-pubkey", version = "2"),
+            ExchangeV2CodeParseResult.LinkingV2(channelId = "peer-channel", publicKey = "peer-pubkey", version = ExchangeProtocolVersion.V2_0),
         )
         whenever(qrCode.buildLinkingCode(any(), any(), any())).thenReturn("https://duckduckgo.com/sync/pairing/#&code2=fake")
         whenever(jweCrypto.generateRsaKeyPair(any())).thenReturn(RsaKeyPair(publicKeyBase64 = "own-pub", privateKeyBase64 = "own-priv"))
@@ -117,7 +127,7 @@ class RealExchangeV2RunnerTest {
         val runner = newRunner()
         runner.startScan("")
         runner.deliverIncomingMessage(
-            ExchangeV2Message.RecoveryCodeAvailable(rawJson = "{}", userId = "peer", name = "Peer", kind = "3party"),
+            RecoveryCodeAvailable.create(userId = "peer", name = "Peer", kind = "3party"),
         )
 
         runner.startScan("")
@@ -132,7 +142,7 @@ class RealExchangeV2RunnerTest {
         runner.startPresent()
 
         runner.events.filterIsInstance<ExchangeV2Event.Transition>().test {
-            runner.deliverIncomingMessage(Hello("""{"type":"hello"}"""))
+            runner.deliverIncomingMessage(Hello.fromJson("""{"type":"hello"}"""))
             val event = awaitItem()
             assertSame(ExchangeV2State.Bootstrapped, event.from)
             assertSame(ExchangeV2State.Negotiating, event.to)
@@ -142,7 +152,7 @@ class RealExchangeV2RunnerTest {
     @Test fun `deliverIncomingMessage without a session emits PairingSessionNotReady`() = runTest {
         val runner = newRunner()
         runner.events.filterIsInstance<ExchangeV2Event.SessionError>().test {
-            runner.deliverIncomingMessage(Hello("{}"))
+            runner.deliverIncomingMessage(Hello.fromJson("{}"))
             val event = awaitItem()
             assertEquals(SessionErrorKind.PairingSessionNotReady, event.kind)
         }
@@ -175,7 +185,7 @@ class RealExchangeV2RunnerTest {
 
     @Test fun `recordSentMessage emits MessageSent with given message`() = runTest {
         val runner = newRunner()
-        val sent = RecoveryCodeRequest(rawJson = "{}", name = "me", kind = "3party")
+        val sent = RecoveryCodeRequest.create(name = "me", kind = "3party")
 
         runner.events.test {
             runner.recordSentMessage(sent)
@@ -188,7 +198,7 @@ class RealExchangeV2RunnerTest {
         whenever(syncStore.userId).thenReturn("my-user")
         val runner = newRunner()
         runner.startPresent()
-        runner.deliverIncomingMessage(Hello("{}"))
+        runner.deliverIncomingMessage(Hello.fromJson("{}"))
 
         runner.events.filterIsInstance<ExchangeV2Event.Transition>().test {
             awaitItem()
@@ -202,10 +212,10 @@ class RealExchangeV2RunnerTest {
         whenever(syncStore.userId).thenReturn(null)
         val runner = newRunner()
         runner.startScan("")
-        runner.deliverIncomingMessage(ExchangeV2Message.RecoveryCodeAvailable(rawJson = "{}", userId = "other", name = "Peer", kind = "3party"))
+        runner.deliverIncomingMessage(RecoveryCodeAvailable.create(userId = "other", name = "Peer", kind = "3party"))
         runner.localTrigger(LocalTrigger.RoleElected(Role.Joiner))
         runner.localTrigger(LocalTrigger.UserConfirmedJoiner)
-        runner.deliverIncomingMessage(RecoveryCodeResponse("{}"))
+        runner.deliverIncomingMessage(RecoveryCodeResponse.fromJson("{}"))
 
         assertNull(runner.currentState)
     }
@@ -217,7 +227,7 @@ class RealExchangeV2RunnerTest {
 
         runner.events.filterIsInstance<ExchangeV2Event.Transition>().test {
             runner.deliverIncomingMessage(
-                ExchangeV2Message.RecoveryCodeAvailable(rawJson = "{}", userId = "shared-user", name = "Peer", kind = "3party"),
+                RecoveryCodeAvailable.create(userId = "shared-user", name = "Peer", kind = "3party"),
             )
             val event = awaitItem()
             assertSame(ExchangeV2State.SameAccountAbort, event.to)
@@ -234,7 +244,7 @@ class RealExchangeV2RunnerTest {
         // The peer shows this name on its security-confirmation screen, so it must be the real
         // device name (e.g. "google Pixel 7"), never a generic "Android".
         verify(channel).sendMessage(
-            argThat { contains("recovery_code_request") && contains("\"name\":\"google Pixel 7\"") },
+            argThat { this is RecoveryCodeRequest && this.name == "google Pixel 7" },
             any(),
             any(),
             any(),
@@ -249,11 +259,27 @@ class RealExchangeV2RunnerTest {
         runner.startScan("")
 
         verify(channel).sendMessage(
-            argThat { contains("recovery_code_available") && contains("\"name\":\"google Pixel 7\"") },
+            argThat { this is RecoveryCodeAvailable && this.name == "google Pixel 7" },
             any(),
             any(),
             any(),
         )
+    }
+
+    @Test fun `startPresent builds a v2_0 linking code when the v2_1 exchange flag is disabled`() {
+        syncFeature.canUseExchangeV2Point1().setRawStoredState(State(enable = false))
+        val runner = newRunner()
+        runner.startPresent()
+
+        verify(qrCode).buildLinkingCode(any(), any(), eq(ExchangeProtocolVersion.V2_0))
+    }
+
+    @Test fun `startPresent builds a v2_1 linking code when the v2_1 exchange flag is enabled`() {
+        syncFeature.canUseExchangeV2Point1().setRawStoredState(State(enable = true))
+        val runner = newRunner()
+        runner.startPresent()
+
+        verify(qrCode).buildLinkingCode(any(), any(), eq(ExchangeProtocolVersion.V2_1))
     }
 
     // ---- Auto role election ----
@@ -305,7 +331,7 @@ class RealExchangeV2RunnerTest {
         runner.startScan("")
 
         runner.deliverIncomingMessage(
-            ExchangeV2Message.RecoveryCodeAvailable(rawJson = "{}", userId = "host-user", name = "Host", kind = "ddg"),
+            RecoveryCodeAvailable.create(userId = "host-user", name = "Host", kind = "ddg"),
         )
 
         assertSame(ExchangeV2State.Joiner.Confirming, runner.currentState)
@@ -315,10 +341,10 @@ class RealExchangeV2RunnerTest {
         whenever(syncStore.userId).thenReturn("my-user")
         val runner = newRunner()
         runner.startPresent()
-        runner.deliverIncomingMessage(Hello("{}"))
+        runner.deliverIncomingMessage(Hello.fromJson("{}"))
 
         runner.deliverIncomingMessage(
-            ExchangeV2Message.RecoveryCodeRequest(rawJson = "{}", name = "Joiner", kind = "ddg"),
+            RecoveryCodeRequest.create(name = "Joiner", kind = "ddg"),
         )
 
         assertSame(ExchangeV2State.Host.Confirming, runner.currentState)
@@ -328,22 +354,22 @@ class RealExchangeV2RunnerTest {
         whenever(syncStore.userId).thenReturn("my-user")
         val runner = newRunner()
         runner.startPresent()
-        runner.deliverIncomingMessage(Hello("{}"))
+        runner.deliverIncomingMessage(Hello.fromJson("{}"))
 
         runner.deliverIncomingMessage(
-            ExchangeV2Message.RecoveryCodeRequest(rawJson = "{}", name = "Joiner", kind = "ddg"),
+            RecoveryCodeRequest.create(name = "Joiner", kind = "ddg"),
         )
 
         // Spec §"Exchange Confirmations → Host": awaiting_confirmation is sent on entry to
         // Confirming, before the user is prompted.
         verify(channel).sendMessage(
-            argThat { contains("recovery_code_awaiting_confirmation") },
+            argThat { this is RecoveryCodeAwaitingConfirmation },
             any(),
             any(),
             any(),
         )
         verify(channel, never()).sendMessage(
-            argThat { contains("recovery_code_confirmed") },
+            argThat { this is RecoveryCodeConfirmed },
             any(),
             any(),
             any(),
@@ -355,20 +381,20 @@ class RealExchangeV2RunnerTest {
         whenever(recoveryCodeProvider.getDdgRecoveryCode()).thenReturn(com.duckduckgo.sync.impl.Result.Success("the-code"))
         val runner = newRunner()
         runner.startPresent()
-        runner.deliverIncomingMessage(Hello("{}"))
+        runner.deliverIncomingMessage(Hello.fromJson("{}"))
         runner.deliverIncomingMessage(
-            ExchangeV2Message.RecoveryCodeRequest(rawJson = "{}", name = "Joiner", kind = "ddg"),
+            RecoveryCodeRequest.create(name = "Joiner", kind = "ddg"),
         )
         runner.localTrigger(LocalTrigger.UserConfirmedHost)
 
         verify(channel).sendMessage(
-            argThat { contains("recovery_code_confirmed") && !contains("recovery_code_awaiting_confirmation") },
+            argThat { this is RecoveryCodeConfirmed },
             any(),
             any(),
             any(),
         )
         verify(channel, org.mockito.kotlin.times(1)).sendMessage(
-            argThat { contains("recovery_code_awaiting_confirmation") },
+            argThat { this is RecoveryCodeAwaitingConfirmation },
             any(),
             any(),
             any(),
@@ -380,13 +406,13 @@ class RealExchangeV2RunnerTest {
         whenever(recoveryCodeProvider.createDdgAccountIfNeeded()).thenReturn(Result.Success(Unit))
         whenever(recoveryCodeProvider.getDdgRecoveryCode()).thenReturn(Result.Success("the-code"))
         whenever(
-            channel.sendMessage(argThat { contains("recovery_code_response") }, any(), any(), any()),
+            channel.sendMessage(any<RecoveryCodeResponse>(), any(), any(), any()),
         ).thenReturn(Result.Error(reason = "relay unreachable"))
 
         val runner = newRunner()
         runner.startPresent()
-        runner.deliverIncomingMessage(Hello("{}"))
-        runner.deliverIncomingMessage(RecoveryCodeRequest(rawJson = "{}", name = "Joiner", kind = "ddg"))
+        runner.deliverIncomingMessage(Hello.fromJson("{}"))
+        runner.deliverIncomingMessage(RecoveryCodeRequest.create(name = "Joiner", kind = "ddg"))
         runner.localTrigger(LocalTrigger.UserConfirmedHost)
 
         val lastTransition = runner.events.replayCache.filterIsInstance<ExchangeV2Event.Transition>().last()
@@ -399,7 +425,7 @@ class RealExchangeV2RunnerTest {
         runner.startScan("")
 
         runner.deliverIncomingMessage(
-            ExchangeV2Message.RecoveryCodeAvailable(rawJson = "{}", userId = "peer-user", name = "Peer", kind = "3party"),
+            RecoveryCodeAvailable.create(userId = "peer-user", name = "Peer", kind = "3party"),
         )
 
         assertSame(ExchangeV2State.Host.Confirming, runner.currentState)
@@ -411,7 +437,7 @@ class RealExchangeV2RunnerTest {
         runner.startScan("")
 
         runner.events.filterIsInstance<ExchangeV2Event.SessionError>().test {
-            runner.deliverIncomingMessage(Hello("{}"))
+            runner.deliverIncomingMessage(Hello.fromJson("{}"))
             val event = awaitItem()
             assertSame(SessionErrorKind.UnexpectedSecondHello, event.kind)
         }
@@ -425,7 +451,7 @@ class RealExchangeV2RunnerTest {
 
         runner.events.filterIsInstance<ExchangeV2Event.Transition>().test {
             runner.deliverIncomingMessage(
-                ExchangeV2Message.RecoveryCodeAvailable(rawJson = "{}", userId = "shared-user", name = "Peer", kind = "ddg"),
+                RecoveryCodeAvailable.create(userId = "shared-user", name = "Peer", kind = "ddg"),
             )
             val event = awaitItem()
             assertSame(ExchangeV2State.SameAccountAbort, event.to)
@@ -437,10 +463,10 @@ class RealExchangeV2RunnerTest {
         whenever(syncStore.userId).thenReturn("my-user")
         val runner = newRunner()
         runner.startPresent()
-        runner.deliverIncomingMessage(Hello("{}"))
+        runner.deliverIncomingMessage(Hello.fromJson("{}"))
 
         runner.deliverIncomingMessage(
-            ExchangeV2Message.RecoveryCodeAvailable(rawJson = "{}", userId = "peer-user", name = "Peer", kind = "ddg"),
+            RecoveryCodeAvailable.create(userId = "peer-user", name = "Peer", kind = "ddg"),
         )
 
         assertSame(ExchangeV2State.Host.Confirming, runner.currentState)
@@ -452,7 +478,7 @@ class RealExchangeV2RunnerTest {
         runner.startScan("")
 
         runner.deliverIncomingMessage(
-            ExchangeV2Message.RecoveryCodeAvailable(rawJson = "{}", userId = "peer-user", name = "Peer", kind = "ddg"),
+            RecoveryCodeAvailable.create(userId = "peer-user", name = "Peer", kind = "ddg"),
         )
 
         assertSame(ExchangeV2State.Joiner.Confirming, runner.currentState)
@@ -484,10 +510,10 @@ class RealExchangeV2RunnerTest {
         val runner = newRunner()
         runner.startScan("")
         runner.deliverIncomingMessage(
-            ExchangeV2Message.RecoveryCodeAvailable(rawJson = "{}", userId = "other", name = "Peer", kind = "3party"),
+            RecoveryCodeAvailable.create(userId = "other", name = "Peer", kind = "3party"),
         )
         runner.localTrigger(LocalTrigger.UserConfirmedJoiner)
-        runner.deliverIncomingMessage(RecoveryCodeResponse("{}"))
+        runner.deliverIncomingMessage(RecoveryCodeResponse.fromJson("{}"))
         assertNull(runner.currentState)
 
         advanceTimeBy(6 * 60 * 1000L)
@@ -522,8 +548,8 @@ class RealExchangeV2RunnerTest {
         whenever(syncStore.userId).thenReturn("my-user")
         whenever(channel.poll(any(), any())).thenReturn(
             flowOf(
-                Hello("""{"type":"hello"}"""),
-                RecoveryCodeRequest(rawJson = "{}", name = "Joiner", kind = "ddg"),
+                Hello.fromJson("""{"type":"hello"}"""),
+                RecoveryCodeRequest.create(name = "Joiner", kind = "ddg"),
             ),
         )
 
@@ -537,7 +563,7 @@ class RealExchangeV2RunnerTest {
         whenever(syncStore.userId).thenReturn("shared")
         whenever(channel.poll(any(), any())).thenReturn(
             flowOf(
-                ExchangeV2Message.RecoveryCodeAvailable(rawJson = "{}", userId = "shared", name = "Peer", kind = "ddg"),
+                RecoveryCodeAvailable.create(userId = "shared", name = "Peer", kind = "ddg"),
             ),
         )
 

@@ -808,7 +808,7 @@ class BrandDesignUpdatePageViewModelTest {
 
     @Test
     fun `when input mode confirmed then emits with selection`() = runTest {
-        val testee = startAt(NewUserOnboardingActivityDialog.InputScreen)
+        val testee = startAt(NewUserOnboardingActivityDialog.InputScreen())
         advanceUntilIdle()
 
         testee.onInputScreenOptionSelected(withAi = false)
