@@ -94,6 +94,7 @@ import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SYNC_RESTOR
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.WIDGET_PROMPT
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.applyInputScreenPreviewInsets
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.applyInputScreenPreviewShape
+import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.updateInputModePreservingSelection
 import com.duckduckgo.app.onboarding.ui.view.OnboardingStepIndicatorView
 import com.duckduckgo.app.onboardingquicksetup.ui.BrandDesignInputScreenPicker
 import com.duckduckgo.app.onboardingquicksetup.ui.QuickSetupAddressBarPositionBottomSheet
@@ -2873,30 +2874,32 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             }
         }
 
-        when (inputMode) {
-            InputMode.SEARCH -> {
-                previewContent.inputText.minLines = 1
-                previewContent.inputText.maxLines = 1
-                previewContent.inputText.inputType = InputType.TYPE_CLASS_TEXT
-                previewContent.inputText.imeOptions = EditorInfo.IME_ACTION_SEARCH
-                previewContent.inputText.setHint(R.string.preOnboardingInputModeDemoSearchHint)
-                previewContent.inputModeDemoActionIcon.setImageResource(CommonR.drawable.ic_find_search_24)
+        previewContent.inputText.updateInputModePreservingSelection {
+            when (inputMode) {
+                InputMode.SEARCH -> {
+                    minLines = 1
+                    maxLines = 1
+                    inputType = InputType.TYPE_CLASS_TEXT
+                    imeOptions = EditorInfo.IME_ACTION_SEARCH
+                    setHint(R.string.preOnboardingInputModeDemoSearchHint)
+                    previewContent.inputModeDemoActionIcon.setImageResource(CommonR.drawable.ic_find_search_24)
+                }
+                InputMode.CHAT -> {
+                    minLines = 3
+                    maxLines = 3
+                    inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
+                    imeOptions = EditorInfo.IME_ACTION_UNSPECIFIED
+                    setHint(R.string.preOnboardingInputModeDemoChatHint)
+                    previewContent.inputModeDemoActionIcon.setImageResource(CommonR.drawable.ic_arrow_right_24)
+                }
             }
-            InputMode.CHAT -> {
-                previewContent.inputText.minLines = 3
-                previewContent.inputText.maxLines = 3
-                previewContent.inputText.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
-                previewContent.inputText.imeOptions = EditorInfo.IME_ACTION_UNSPECIFIED
-                previewContent.inputText.setHint(R.string.preOnboardingInputModeDemoChatHint)
-                previewContent.inputModeDemoActionIcon.setImageResource(CommonR.drawable.ic_arrow_right_24)
-            }
-        }
 
-        // Toggling modes changes inputType/imeOptions while the EditText may be focused with the keyboard shown;
-        // restart input so the IME picks up the new action/Enter behavior immediately.
-        if (previewContent.inputText.hasFocus()) {
-            context?.let { ctx ->
-                ContextCompat.getSystemService(ctx, InputMethodManager::class.java)?.restartInput(previewContent.inputText)
+            // Toggling modes changes inputType/imeOptions while the EditText may be focused with the keyboard shown;
+            // restart input so the IME picks up the new action/Enter behavior immediately.
+            if (hasFocus()) {
+                this@BrandDesignUpdateWelcomePage.context?.let { ctx ->
+                    ContextCompat.getSystemService(ctx, InputMethodManager::class.java)?.restartInput(this)
+                }
             }
         }
     }

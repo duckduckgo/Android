@@ -147,26 +147,28 @@ class InputScreenPreviewBinder(
             }
         }
 
-        if (isSearchSelected) {
-            inputText.minLines = 1
-            inputText.maxLines = 1
-            inputText.inputType = InputType.TYPE_CLASS_TEXT
-            inputText.imeOptions = EditorInfo.IME_ACTION_SEARCH
-            inputText.setHint(R.string.preOnboardingInputModeDemoSearchHint)
-            inputModeDemoActionIcon.setImageResource(CommonR.drawable.ic_find_search_24)
-        } else {
-            inputText.minLines = CHAT_INPUT_LINES
-            inputText.maxLines = CHAT_INPUT_LINES
-            inputText.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
-            inputText.imeOptions = EditorInfo.IME_ACTION_UNSPECIFIED
-            inputText.setHint(R.string.preOnboardingInputModeDemoChatHint)
-            inputModeDemoActionIcon.setImageResource(CommonR.drawable.ic_arrow_right_24)
-        }
+        inputText.updateInputModePreservingSelection {
+            if (isSearchSelected) {
+                minLines = 1
+                maxLines = 1
+                inputType = InputType.TYPE_CLASS_TEXT
+                imeOptions = EditorInfo.IME_ACTION_SEARCH
+                setHint(R.string.preOnboardingInputModeDemoSearchHint)
+                inputModeDemoActionIcon.setImageResource(CommonR.drawable.ic_find_search_24)
+            } else {
+                minLines = CHAT_INPUT_LINES
+                maxLines = CHAT_INPUT_LINES
+                inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
+                imeOptions = EditorInfo.IME_ACTION_UNSPECIFIED
+                setHint(R.string.preOnboardingInputModeDemoChatHint)
+                inputModeDemoActionIcon.setImageResource(CommonR.drawable.ic_arrow_right_24)
+            }
 
-        // A mode switch can land while the field is already focused, so the IME has to be told to pick up the
-        // new action and Enter behaviour.
-        if (inputText.hasFocus()) {
-            ContextCompat.getSystemService(root.context, InputMethodManager::class.java)?.restartInput(inputText)
+            // A mode switch can land while the field is already focused, so the IME has to be told to pick up the
+            // new action and Enter behaviour.
+            if (hasFocus()) {
+                ContextCompat.getSystemService(root.context, InputMethodManager::class.java)?.restartInput(this)
+            }
         }
     }
 
@@ -296,6 +298,21 @@ internal fun EditText.applyInputScreenPreviewInsets(
         actionIcon.updateLayoutParams<ViewGroup.MarginLayoutParams> {
             marginEnd = actionIconMarginEnd
         }
+    }
+}
+
+internal inline fun EditText.updateInputModePreservingSelection(updateInputMode: EditText.() -> Unit) {
+    val previousSelectionStart = selectionStart
+    val previousSelectionEnd = selectionEnd
+
+    updateInputMode()
+
+    if (previousSelectionStart >= 0 && previousSelectionEnd >= 0) {
+        val textLength = text.length
+        setSelection(
+            previousSelectionStart.coerceAtMost(textLength),
+            previousSelectionEnd.coerceAtMost(textLength),
+        )
     }
 }
 

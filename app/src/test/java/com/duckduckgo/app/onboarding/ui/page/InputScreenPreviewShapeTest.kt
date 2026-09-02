@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.content.res.Resources
 import android.graphics.RectF
+import android.text.InputType
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -29,6 +30,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.applyInputScreenPreviewInsets
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.applyInputScreenPreviewShape
+import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.updateInputModePreservingSelection
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.shape.RelativeCornerSize
 import com.google.android.material.shape.ShapeAppearanceModel
@@ -148,6 +150,38 @@ class InputScreenPreviewShapeTest {
         assertEquals(initialContainerPadding, listOf(container.paddingStart, container.paddingTop, container.paddingEnd, container.paddingBottom))
         verify(context.resources, never()).getDimensionPixelSize(CommonR.dimen.keyline_4)
         verify(context.resources, never()).getDimensionPixelSize(CommonR.dimen.keyline_3)
+    }
+
+    @Test
+    fun whenSwitchingFromSearchToDuckAiThenKeepsCursorAtEnd() {
+        val input = EditText(baseContext).apply {
+            inputType = InputType.TYPE_CLASS_TEXT
+            setText("typed query")
+            setSelection(11)
+        }
+
+        input.updateInputModePreservingSelection {
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
+        }
+
+        assertEquals(11, input.selectionStart)
+        assertEquals(11, input.selectionEnd)
+    }
+
+    @Test
+    fun whenSwitchingFromDuckAiToSearchThenKeepsCursorAtEnd() {
+        val input = EditText(baseContext).apply {
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
+            setText("typed query")
+            setSelection(11)
+        }
+
+        input.updateInputModePreservingSelection {
+            inputType = InputType.TYPE_CLASS_TEXT
+        }
+
+        assertEquals(11, input.selectionStart)
+        assertEquals(11, input.selectionEnd)
     }
 
     private fun shapeResources(
