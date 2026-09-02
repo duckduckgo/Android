@@ -92,6 +92,8 @@ import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.QUICK_SETUP
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SKIP_ONBOARDING_OPTION
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SYNC_RESTORE
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.WIDGET_PROMPT
+import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.applyInputScreenPreviewInsets
+import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.applyInputScreenPreviewShape
 import com.duckduckgo.app.onboarding.ui.view.OnboardingStepIndicatorView
 import com.duckduckgo.app.onboardingquicksetup.ui.BrandDesignInputScreenPicker
 import com.duckduckgo.app.onboardingquicksetup.ui.QuickSetupAddressBarPositionBottomSheet
@@ -100,6 +102,7 @@ import com.duckduckgo.app.onboardingquicksetup.ui.RemoveWidgetInstructionsBottom
 import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.app.widget.AddWidgetSource
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.addBottomShadow
 import com.duckduckgo.common.ui.view.text.DaxTextView
@@ -140,6 +143,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
     @Inject
     lateinit var appTheme: AppTheme
+
+    @Inject
+    lateinit var appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles
 
     @Inject
     lateinit var addWidgetLauncher: AddWidgetLauncher
@@ -2832,6 +2838,14 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     ) {
         currentInputMode = inputMode
         val previewContent = binding.daxDialogCta.inputScreenPreviewContent
+        val isAddressBarRebrandEnabled = appBrandDesignUpdateToggles.addressBar().isEnabled()
+        previewContent.inputModeDemoCard.applyInputScreenPreviewShape(
+            isAddressBarRebrandEnabled = isAddressBarRebrandEnabled,
+        )
+        previewContent.inputText.applyInputScreenPreviewInsets(
+            isAddressBarRebrandEnabled = isAddressBarRebrandEnabled,
+            actionIcon = previewContent.inputModeDemoActionIcon,
+        )
 
         listOf(previewContent.suggestion1, previewContent.suggestion2, previewContent.suggestion3)
             .forEachIndexed { index, button ->

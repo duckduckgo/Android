@@ -274,14 +274,12 @@ fun View.addBottomShadow(
     val offsetY = offsetYDp.toPx(context)
     val inset = insetDp.toPx(context).toInt()
 
-    // Get corner radius if view is a card
-    val cornerRadius = when (this) {
-        is MaterialCardView -> this.radius
-        else -> 0f
-    }
-
     outlineProvider = object : ViewOutlineProvider() {
         override fun getOutline(view: View, outline: Outline) {
+            val cornerRadius = when (view) {
+                is MaterialCardView -> view.radius
+                else -> 0f
+            }
             // Create outline with rounded corners that match the view
             outline.setRoundRect(
                 -inset,
