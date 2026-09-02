@@ -252,7 +252,7 @@ platform :android do
 
         end
 
-    desc "Create a new release branch and update the version"
+    desc "Cut a local release branch, merge it into develop then main, and publish the tag last"
     lane :tag_and_push_release_version do |options|
         app_version = options[:app_version]
         ref = options[:ref]
