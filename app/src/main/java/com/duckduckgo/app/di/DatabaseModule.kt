@@ -62,7 +62,6 @@ object DatabaseModule {
         return Room.databaseBuilder(context, AppDatabase::class.java, "app.db")
             .addMigrations(*migrationsProvider.ALL_MIGRATIONS.toTypedArray())
             .addCallback(migrationsProvider.BOOKMARKS_DB_ON_CREATE)
-            .addCallback(migrationsProvider.CHANGE_JOURNAL_ON_OPEN)
             .addCallback(databaseBookmarksMigrationCallbackProvider.provideCallbacks())
             .setJournalMode(RoomDatabase.JournalMode.TRUNCATE)
             .enableMultiInstanceInvalidation()
