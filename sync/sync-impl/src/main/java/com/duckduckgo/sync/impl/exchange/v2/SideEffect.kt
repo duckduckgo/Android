@@ -16,6 +16,8 @@
 
 package com.duckduckgo.sync.impl.exchange.v2
 
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeDone
+
 /**
  * A protocol action the runner must perform because a transition happened.
  *
@@ -32,8 +34,13 @@ package com.duckduckgo.sync.impl.exchange.v2
  * Declaring effects at the transition, rather than scattering them across the runner's post-trigger
  * hooks, keeps each spec rule in exactly one place and auditable against the spec.
  *
- * Spec: Asana 1214739740392701, Unified Algorithm: §"Exchange Confirmations" and §"Exchange Share
- * Recovery Code" define the effects and the point at which each fires.
+ * Each effect is tagged with the protocol version that introduced it. 2.1 effects are only reached
+ * when both peers advertised 2.1.
+ *
+ * Spec:
+ *  - Asana 1214739740392701, Unified Algorithm: §"Exchange Confirmations" and §"Exchange Share
+ *    Recovery Code" define the 2.0 effects and the point at which each fires.
+ *  - Asana 1216906886019334, Exchange v2.1 Messages: `recovery_code_done` and its best-effort rule.
  */
 sealed interface SideEffect {
 
@@ -78,4 +85,16 @@ sealed interface SideEffect {
      * Since 2.0.
      */
     data object RequestRecoveryCodeShare : SideEffect
+
+    /**
+     * Send `recovery_code_done`, telling the Host what we actually did with its recovery code, so it
+     * can report the real result instead of assuming success.
+     *
+     * Best-effort by spec: send once, never retry, and never depend on delivery. Not sent at all
+     * when the negotiated version is below 2.1, since the peer could only drop it; and even against
+     * a 2.1 Host the channel may already be gone.
+     *
+     * Since 2.1.
+     */
+    data class SendRecoveryCodeDone(val reason: RecoveryCodeDone.Reason) : SideEffect
 }

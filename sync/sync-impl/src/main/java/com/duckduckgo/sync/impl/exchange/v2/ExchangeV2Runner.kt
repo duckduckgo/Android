@@ -134,8 +134,11 @@ interface ExchangeV2Runner {
      * Drive the state machine with something that didn't come off the wire, such as the user
      * answering a confirmation prompt. Returns immediately, and a trigger the current state does not
      * allow aborts the session rather than being ignored.
+     *
+     * The returned [Job] is that work. Most callers can ignore it, but one about to end the session
+     * must join it first, and never from code holding the runner's mutex.
      */
-    fun localTrigger(trigger: LocalTrigger)
+    fun localTrigger(trigger: LocalTrigger): Job
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -449,6 +452,7 @@ class RealExchangeV2Runner @Inject constructor(
         ExchangeV2State.Negotiating -> TimeoutStage.WAITING_FOR_PEER_STATUS
         ExchangeV2State.Host.Confirming, ExchangeV2State.Joiner.Confirming -> TimeoutStage.WAITING_FOR_CONFIRMATION
         ExchangeV2State.Host.Sending, ExchangeV2State.Joiner.Waiting -> TimeoutStage.WAITING_FOR_RECOVERY_CODE
+        ExchangeV2State.Host.AwaitingStatus, ExchangeV2State.Joiner.Joining -> TimeoutStage.LOGGING_IN
         else -> null
     }
 
@@ -527,6 +531,10 @@ class RealExchangeV2Runner @Inject constructor(
                 logcat { "Sync-ExchangeV2: side effect → RequestRecoveryCodeShare" }
                 shareRecoveryCodeAndAdvanceLocked()
             }
+            is SideEffect.SendRecoveryCodeDone -> {
+                logcat { "Sync-ExchangeV2: side effect → SendRecoveryCodeDone(${effect.reason.value})" }
+                sendMessage(ExchangeV2Message.RecoveryCodeDone.create(effect.reason))
+            }
         }
     }
 
@@ -541,7 +549,7 @@ class RealExchangeV2Runner @Inject constructor(
             mutex.withLock {
                 val s = session ?: return@withLock
                 if (s.currentState != ExchangeV2State.Host.Sending) return@withLock
-                val terminalTrigger = if (responseOk) LocalTrigger.HostSendComplete else LocalTrigger.HostUnavailable
+                val terminalTrigger = if (responseOk) LocalTrigger.HostSendComplete(negotiatedVersion) else LocalTrigger.HostUnavailable
                 val r = s.localTrigger(terminalTrigger)
                 emit(r.event)
                 r.sideEffects.forEach { applySideEffectLocked(it) }
@@ -652,11 +660,10 @@ class RealExchangeV2Runner @Inject constructor(
     // Local triggers — drive SM + send outbound messages on Host transitions
     // -----------------------------------------------------------------------
 
-    override fun localTrigger(trigger: LocalTrigger) {
+    override fun localTrigger(trigger: LocalTrigger): Job =
         appScope.launch(dispatchers.io()) {
             mutex.withLock { processLocalTriggerLocked(trigger) }
         }
-    }
 
     private fun processLocalTriggerLocked(trigger: LocalTrigger) {
         val sm = session ?: run {
@@ -825,7 +832,11 @@ class RealExchangeV2Runner @Inject constructor(
     private fun sendMessage(message: ExchangeV2Message) {
         val peer = peerChannelId ?: return
         val peerKey = peerPublicKey ?: return
-        sendOnWireAndRecord(message, peer, peerKey)
+        if (message.protocolVersion <= negotiatedVersion) {
+            sendOnWireAndRecord(message, peer, peerKey)
+        } else {
+            logcat { "Sync-ExchangeV2: skipping ${message.messageType} (needs v${message.protocolVersion}, negotiated v$negotiatedVersion)" }
+        }
     }
 
     /** Returns true on successful POST, false on transport error (caller decides if fatal). */
@@ -918,6 +929,7 @@ class RealExchangeV2Runner @Inject constructor(
         ExchangeV2State.Joiner.AbortedLocal,
         ExchangeV2State.Joiner.AbortedByHost,
         ExchangeV2State.Joiner.Done,
+        ExchangeV2State.Joiner.JoinFailed,
         -> true
         else -> false
     }

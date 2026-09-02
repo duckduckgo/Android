@@ -38,6 +38,7 @@ import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Runner
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State
 import com.duckduckgo.sync.impl.exchange.v2.LocalTrigger
+import com.duckduckgo.sync.impl.exchange.v2.PairingRole
 import com.duckduckgo.sync.impl.exchange.v2.PeerVersionSource
 import com.duckduckgo.sync.impl.exchange.v2.RejectReason
 import com.duckduckgo.sync.impl.exchange.v2.Role
@@ -435,39 +436,66 @@ class SyncV2PairingDebugViewModel @Inject constructor(
             maybeHandleConfirmingTransition(event)
             maybeEmitTerminalAlert(event)
             maybeToastSessionError(event)
-            maybeLoginAfterJoinerDone(event)
+            maybeLoginAfterJoinerJoining(event)
         }
     }
 
     /**
-     * When the runner reaches [ExchangeV2State.Joiner.Done] from a session that was started
+     * When the runner reaches [ExchangeV2State.Joiner.Joining] from a session that was started
      * via [onRunPresentClicked] (i.e. not routed through [SyncCodeDispatcher]), the dispatcher's
      * own login Flow never runs and nothing else drives a login from the received recovery code.
-     * This handler closes that gap. Idempotent for dispatcher-routed sessions because
-     * [SyncCodeDispatcher.route] is only invoked from [onRunScanClicked] — the Presenter path
-     * never goes through it.
+     * This handler closes that gap. Scoped to Presenter sessions so a Scanner session, which does
+     * go through the dispatcher, isn't logged in twice and doesn't report two conflicting outcomes.
+     *
+     * Reports the result back to the peer, which is what moves the session off Joining and on to a
+     * Joiner terminal. A missing or blank recovery code reports login_failed rather than leaving
+     * the session parked in Joining until the deadline, matching the production dispatcher.
      */
-    private fun maybeLoginAfterJoinerDone(event: ExchangeV2Event) {
+    private fun maybeLoginAfterJoinerJoining(event: ExchangeV2Event) {
         if (event !is ExchangeV2Event.Transition) return
-        if (event.to != ExchangeV2State.Joiner.Done) return
+        if (event.to != ExchangeV2State.Joiner.Joining) return
+        if (runner.pairingRole != PairingRole.Presenter) return
         val received = (event.trigger as? ExchangeV2Message.RecoveryCodeResponse)?.recoveryCode
-        if (received.isNullOrBlank()) return
         viewModelScope.launch(dispatchers.io()) {
-            appendDevToolLog("Joiner.Done — driving login from received recovery code")
-            when (val decision = dispatcher.route(received)) {
-                is RouteDecision.V2InProgress -> decision.outcomes.collect { handleV2Outcome(it) }
-                is RouteDecision.Legacy -> when (decision.authCode) {
-                    is SyncAuthCode.Recovery -> emitProcessCodeResult(
-                        "Joiner.Done login",
-                        syncAccountRepository.processCode(decision.authCode),
-                    )
-                    else -> {
-                        appendDevToolLog("Joiner.Done: received code wasn't a Recovery shape, can't auto-login")
-                        toasts.send("Joiner.Done: unexpected code shape, manual login required")
-                    }
+            val loggedIn = if (received.isNullOrBlank()) {
+                appendDevToolLog("Joiner.Joining: no recovery code in the response, reporting login_failed")
+                false
+            } else {
+                loginWithReceivedRecoveryCode(received)
+            }
+            val reason = if (loggedIn) {
+                ExchangeV2Message.RecoveryCodeDone.Reason.Success
+            } else {
+                ExchangeV2Message.RecoveryCodeDone.Reason.LoginFailed
+            }
+            runner.localTrigger(LocalTrigger.JoinerJoinComplete(reason)).join()
+            refreshState()
+        }
+    }
+
+    private suspend fun loginWithReceivedRecoveryCode(received: String): Boolean {
+        appendDevToolLog("Joiner.Joining: driving login from received recovery code")
+        return when (val decision = dispatcher.route(received)) {
+            is RouteDecision.V2InProgress -> {
+                var success = false
+                decision.outcomes.collect { outcome ->
+                    handleV2Outcome(outcome)
+                    if (outcome is DispatchOutcome.LoggedIn || outcome is DispatchOutcome.AlreadyConnected) success = true
+                }
+                success
+            }
+            is RouteDecision.Legacy -> when (decision.authCode) {
+                is SyncAuthCode.Recovery -> {
+                    val result = syncAccountRepository.processCode(decision.authCode)
+                    emitProcessCodeResult("Joiner.Joining login", result)
+                    result is Result.Success
+                }
+                else -> {
+                    appendDevToolLog("Joiner.Joining: received code wasn't a Recovery shape, can't auto-login")
+                    toasts.send("Joiner.Joining: unexpected code shape, manual login required")
+                    false
                 }
             }
-            refreshState()
         }
     }
 
@@ -483,59 +511,33 @@ class SyncV2PairingDebugViewModel @Inject constructor(
         viewModelScope.launch { terminalReached.send(terminal) }
     }
 
-    private fun describeTerminal(event: ExchangeV2Event.Transition): TerminalReached? = when (event.to) {
-        ExchangeV2State.Host.Done -> TerminalReached(
-            state = event.to,
-            title = "✓ Pairing complete (Host)",
-            message = "Sent recovery_code_response to peer. Session closed on this side.",
-            isSuccess = true,
-        )
-        ExchangeV2State.Joiner.Done -> {
-            val code = (event.trigger as? ExchangeV2Message.RecoveryCodeResponse)?.recoveryCode
-            TerminalReached(
-                state = event.to,
-                title = "✓ Pairing complete (Joiner)",
-                message = "Received recovery code from peer:\n\n${code ?: "(missing)"}",
-                isSuccess = true,
-            )
-        }
-        ExchangeV2State.Host.Aborted -> {
-            val (title, message) = when (event.localTrigger) {
-                LocalTrigger.HostUnavailable -> "✗ Pairing aborted (Host)" to (
-                    "Couldn't produce a recovery code on this device — sent recovery_code_unavailable to peer." +
-                        "\n\nIs this device signed in to a sync account?"
-                    )
-                else ->
-                    "✗ Pairing aborted (Host)" to
-                        "You denied the prompt on this device. Sent recovery_code_denied to peer."
+    private fun describeTerminal(event: ExchangeV2Event.Transition): TerminalReached? {
+        val (title, isSuccess) = when (event.to) {
+            ExchangeV2State.Host.Done -> if (event.isPeerFailure()) {
+                "✗ Join failed on the peer" to false
+            } else {
+                "✓ Pairing complete (Host)" to true
             }
-            TerminalReached(state = event.to, title = title, message = message, isSuccess = false)
+            ExchangeV2State.Joiner.Done -> "✓ Pairing complete (Joiner)" to true
+            ExchangeV2State.Joiner.JoinFailed -> "✗ Join failed (Joiner)" to false
+            ExchangeV2State.Host.Aborted -> "✗ Pairing aborted (Host)" to false
+            ExchangeV2State.Joiner.AbortedLocal -> "✗ Pairing aborted (Joiner)" to false
+            ExchangeV2State.Joiner.AbortedByHost -> "✗ Pairing aborted by peer" to false
+            ExchangeV2State.SameAccountAbort -> "✗ Same-account abort" to false
+            ExchangeV2State.Aborted -> "✗ Negotiation aborted" to false
+            else -> return null
         }
-        ExchangeV2State.Joiner.AbortedLocal -> TerminalReached(
+        return TerminalReached(
             state = event.to,
-            title = "✗ Pairing aborted (Joiner)",
-            message = "You denied the prompt on this device. No message sent to peer (per spec).",
-            isSuccess = false,
+            title = title,
+            message = "Check the event log for details.",
+            isSuccess = isSuccess,
         )
-        ExchangeV2State.Joiner.AbortedByHost -> TerminalReached(
-            state = event.to,
-            title = "✗ Pairing aborted by peer",
-            message = "Peer sent ${event.trigger?.messageType ?: "an abort message"}.",
-            isSuccess = false,
-        )
-        ExchangeV2State.SameAccountAbort -> TerminalReached(
-            state = event.to,
-            title = "✗ Same-account abort",
-            message = "Peer reported the same user_id — devices are already paired. No action taken.",
-            isSuccess = false,
-        )
-        ExchangeV2State.Aborted -> TerminalReached(
-            state = event.to,
-            title = "✗ Negotiation aborted",
-            message = "Received an unexpected hello during negotiation (duplicate or double-scan). Channel closed.",
-            isSuccess = false,
-        )
-        else -> null
+    }
+
+    private fun ExchangeV2Event.Transition.isPeerFailure(): Boolean {
+        val reason = (trigger as? ExchangeV2Message.RecoveryCodeDone)?.reason ?: return false
+        return reason != ExchangeV2Message.RecoveryCodeDone.Reason.Success
     }
 
     private fun maybeHandleConfirmingTransition(event: ExchangeV2Event) {
@@ -618,6 +620,7 @@ class SyncV2PairingDebugViewModel @Inject constructor(
         when (message) {
             is ExchangeV2Message.RecoveryCodeAvailable -> append(" name=${message.name} kind=${message.kind} user_id=${message.userId}")
             is ExchangeV2Message.RecoveryCodeRequest -> append(" name=${message.name} kind=${message.kind}")
+            is ExchangeV2Message.RecoveryCodeDone -> append(" reason=${message.reason.value}")
             else -> Unit
         }
     }
@@ -647,13 +650,16 @@ class SyncV2PairingDebugViewModel @Inject constructor(
         ExchangeV2State.Aborted -> "Aborted"
         ExchangeV2State.Host.Confirming -> "Host.Confirming"
         ExchangeV2State.Host.Sending -> "Host.Sending"
+        ExchangeV2State.Host.AwaitingStatus -> "Host.AwaitingStatus"
         ExchangeV2State.Host.Aborted -> "Host.Aborted"
         ExchangeV2State.Host.Done -> "Host.Done"
         ExchangeV2State.Joiner.Confirming -> "Joiner.Confirming"
         ExchangeV2State.Joiner.Waiting -> "Joiner.Waiting"
+        ExchangeV2State.Joiner.Joining -> "Joiner.Joining"
         ExchangeV2State.Joiner.AbortedLocal -> "Joiner.AbortedLocal"
         ExchangeV2State.Joiner.AbortedByHost -> "Joiner.AbortedByHost"
         ExchangeV2State.Joiner.Done -> "Joiner.Done"
+        ExchangeV2State.Joiner.JoinFailed -> "Joiner.JoinFailed"
     }
 
     private fun labelFor(trigger: LocalTrigger): String = when (trigger) {
@@ -661,7 +667,8 @@ class SyncV2PairingDebugViewModel @Inject constructor(
         LocalTrigger.UserDeniedHost -> "UserDeniedHost"
         LocalTrigger.UserConfirmedJoiner -> "UserConfirmedJoiner"
         LocalTrigger.UserDeniedJoiner -> "UserDeniedJoiner"
-        LocalTrigger.HostSendComplete -> "HostSendComplete"
+        is LocalTrigger.HostSendComplete -> "HostSendComplete(${trigger.negotiatedVersion.prettyPrint()})"
+        is LocalTrigger.JoinerJoinComplete -> "JoinerJoinComplete(${trigger.reason.value})"
         LocalTrigger.HostUnavailable -> "HostUnavailable"
         is LocalTrigger.RoleElected -> "RoleElected(${trigger.role})"
     }
