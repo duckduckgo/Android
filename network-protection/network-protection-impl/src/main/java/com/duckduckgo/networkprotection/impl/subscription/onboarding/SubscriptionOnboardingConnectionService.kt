@@ -20,10 +20,6 @@ import com.duckduckgo.anvil.annotations.ContributesServiceApi
 import com.duckduckgo.di.scopes.AppScope
 import retrofit2.http.GET
 
-/**
- * Reports the device's currently visible connection as seen by DuckDuckGo. Served from the `@Named("api")`
- * Retrofit base URL (`https://duckduckgo.com`), so [getConnectionInfo] hits `https://duckduckgo.com/connection.json`.
- */
 @ContributesServiceApi(AppScope::class)
 interface SubscriptionOnboardingConnectionService {
     @GET("/connection.json")
