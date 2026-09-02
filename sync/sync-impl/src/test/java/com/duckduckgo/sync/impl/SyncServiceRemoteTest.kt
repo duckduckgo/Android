@@ -533,4 +533,60 @@ class SyncServiceRemoteTest {
 
         verify(syncStore).clearAll()
     }
+
+    @Test
+    fun whenCreateExchangeChannelThenChannelSecretSentAsBearerAuthorization() {
+        val call: Call<Void> = mock()
+        whenever(syncService.createExchangeChannel(anyOrNull(), anyString(), any())).thenReturn(call)
+        whenever(call.execute()).thenReturn(Response.success(null))
+
+        val result = syncRemote.createExchangeChannel(CHANNEL_ID, CHANNEL_SECRET)
+
+        assertEquals(Result.Success(Unit), result)
+        verify(syncService).createExchangeChannel(eq("Bearer $CHANNEL_SECRET"), eq(CHANNEL_ID), any())
+    }
+
+    @Test
+    fun whenSendExchangeMessagesThenChannelSecretSentAsBearerAuthorization() {
+        val call: Call<Void> = mock()
+        val envelopes = listOf(ExchangeEnvelope(version = "2.0", payload = "jwe"))
+        whenever(syncService.postExchangeMessages(anyOrNull(), anyString(), any())).thenReturn(call)
+        whenever(call.execute()).thenReturn(Response.success(null))
+
+        val result = syncRemote.sendExchangeMessages(PEER_CHANNEL_ID, CHANNEL_SECRET, envelopes)
+
+        assertEquals(Result.Success(Unit), result)
+        verify(syncService).postExchangeMessages(eq("Bearer $CHANNEL_SECRET"), eq(PEER_CHANNEL_ID), eq(ExchangeMessagesRequest(envelopes)))
+    }
+
+    @Test
+    fun whenPollExchangeMessagesThenChannelSecretSentAsBearerAuthorization() {
+        val entry = ExchangeMessageEntry(seq = 3, version = "2.0", payload = "jwe")
+        val call: Call<ExchangeMessagesResponse> = mock()
+        whenever(syncService.pollExchangeMessages(anyOrNull(), anyString(), any())).thenReturn(call)
+        whenever(call.execute()).thenReturn(Response.success(ExchangeMessagesResponse(listOf(entry))))
+
+        val result = syncRemote.pollExchangeMessages(CHANNEL_ID, CHANNEL_SECRET, after = 2)
+
+        assertEquals(Result.Success(listOf(entry)), result)
+        verify(syncService).pollExchangeMessages(eq("Bearer $CHANNEL_SECRET"), eq(CHANNEL_ID), eq(2))
+    }
+
+    @Test
+    fun whenDeleteExchangeChannelThenChannelSecretSentAsBearerAuthorization() {
+        val call: Call<Void> = mock()
+        whenever(syncService.deleteExchangeChannel(anyOrNull(), anyString())).thenReturn(call)
+        whenever(call.execute()).thenReturn(Response.success(null))
+
+        val result = syncRemote.deleteExchangeChannel(CHANNEL_ID, CHANNEL_SECRET)
+
+        assertEquals(Result.Success(Unit), result)
+        verify(syncService).deleteExchangeChannel(eq("Bearer $CHANNEL_SECRET"), eq(CHANNEL_ID))
+    }
+
+    private companion object {
+        const val CHANNEL_ID = "channel-id"
+        const val PEER_CHANNEL_ID = "peer-channel-id"
+        const val CHANNEL_SECRET = "channel-secret"
+    }
 }
