@@ -33,6 +33,7 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.PEER_RECOVERY_CODE_UNAVAILABLE
 import com.duckduckgo.sync.impl.AccountErrorCodes.RECOVERY_CODE_PREPARATION_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.SESSION_TIMEOUT
 import com.duckduckgo.sync.impl.AccountErrorCodes.UNEXPECTED_EVENT
+import com.duckduckgo.sync.impl.AccountErrorCodes.UNSUPPORTED_CREDENTIAL_TYPE
 import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2CodeParseResult
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Event
@@ -46,6 +47,7 @@ import com.duckduckgo.sync.impl.exchange.v2.SessionErrorKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
@@ -83,6 +85,7 @@ class RealSyncCodeDispatcherTest {
             val sinceMs = invocation.getArgument<Long>(0)
             runnerEventsFlow.filter { event -> event.timestampMs >= sinceMs }
         }
+        whenever(it.localTrigger(any())).thenAnswer { Job().apply { complete() } }
     }
 
     private val dispatcher = RealSyncCodeDispatcher(
@@ -479,15 +482,15 @@ class RealSyncCodeDispatcherTest {
         whenever(qrCode.parse(any())).thenReturn(
             ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = ExchangeProtocolVersion.V2_0),
         )
-        val staleJoinerDone = ExchangeV2Event.Transition(
+        val staleJoinerJoining = ExchangeV2Event.Transition(
             timestampMs = 1L,
             from = ExchangeV2State.Joiner.Waiting,
-            to = ExchangeV2State.Joiner.Done,
+            to = ExchangeV2State.Joiner.Joining,
             trigger = ExchangeV2Message.RecoveryCodeResponse.create(recoveryCode = "stale-code-from-prior-session"),
             localTrigger = null,
         )
         val staleFlow = MutableSharedFlow<ExchangeV2Event>(replay = 10)
-        staleFlow.tryEmit(staleJoinerDone)
+        staleFlow.tryEmit(staleJoinerJoining)
         whenever(runner.events).thenReturn(staleFlow)
         whenever(runner.eventsSince(any())).thenAnswer { invocation ->
             val sinceMs = invocation.getArgument<Long>(0)
@@ -544,7 +547,7 @@ class RealSyncCodeDispatcherTest {
                 ExchangeV2Event.Transition(
                     timestampMs = System.currentTimeMillis(),
                     from = ExchangeV2State.Joiner.Waiting,
-                    to = ExchangeV2State.Joiner.Done,
+                    to = ExchangeV2State.Joiner.Joining,
                     trigger = ExchangeV2Message.RecoveryCodeResponse.create(recoveryCode = recoveryCodeB64),
                     localTrigger = null,
                 ),
@@ -577,6 +580,36 @@ class RealSyncCodeDispatcherTest {
         trigger = trigger,
         localTrigger = localTrigger,
     )
+
+    private fun hostDone(reason: ExchangeV2Message.RecoveryCodeDone.Reason) = transition(
+        from = ExchangeV2State.Host.AwaitingStatus,
+        to = ExchangeV2State.Host.Done,
+        trigger = ExchangeV2Message.RecoveryCodeDone.create(reason),
+    )
+
+    private fun joinerJoining(recoveryCode: String) = transition(
+        from = ExchangeV2State.Joiner.Waiting,
+        to = ExchangeV2State.Joiner.Joining,
+        trigger = ExchangeV2Message.RecoveryCodeResponse.create(recoveryCode = recoveryCode),
+    )
+
+    private fun recoveryCode(cid: String): String {
+        val recoveryJson = JSONObject().apply {
+            put(
+                "recovery",
+                JSONObject().apply {
+                    put("user_id", "u-1")
+                    put("secret", "s-1")
+                    put("cid", cid)
+                    put("v", "2.0")
+                },
+            )
+        }.toString()
+        return android.util.Base64.encodeToString(
+            recoveryJson.toByteArray(Charsets.UTF_8),
+            android.util.Base64.URL_SAFE or android.util.Base64.NO_PADDING or android.util.Base64.NO_WRAP,
+        )
+    }
 
     private fun sessionStarted(linkingCode: String?, timestampMs: Long = System.currentTimeMillis()) =
         ExchangeV2Event.SessionStarted(
@@ -646,6 +679,42 @@ class RealSyncCodeDispatcherTest {
         dispatcher.presentV2().test {
             runnerEventsFlow.emit(transition(from = ExchangeV2State.Host.Sending, to = ExchangeV2State.Host.Done))
             assertEquals(DispatchOutcome.LoggedIn(SetupPath.PAIRING, SetupRole.HOST, PeerKind.THIRD_PARTY), awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test fun `Presenter emits LoggedIn when Host_Done carries recovery_code_done success`() = runTest {
+        whenever(runner.peerKind).thenReturn("ddg")
+        dispatcher.presentV2().test {
+            runnerEventsFlow.emit(hostDone(ExchangeV2Message.RecoveryCodeDone.Reason.Success))
+            assertEquals(DispatchOutcome.LoggedIn(SetupPath.PAIRING, SetupRole.HOST, PeerKind.DDG), awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test fun `Presenter emits LoggedIn when Host_Done carries recovery_code_done login_failed`() = runTest {
+        whenever(runner.peerKind).thenReturn("ddg")
+        dispatcher.presentV2().test {
+            runnerEventsFlow.emit(hostDone(ExchangeV2Message.RecoveryCodeDone.Reason.LoginFailed))
+            assertEquals(DispatchOutcome.LoggedIn(SetupPath.PAIRING, SetupRole.HOST, PeerKind.DDG), awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test fun `Presenter emits LoggedIn when Host_Done carries recovery_code_done scope_rejected`() = runTest {
+        whenever(runner.peerKind).thenReturn("ddg")
+        dispatcher.presentV2().test {
+            runnerEventsFlow.emit(hostDone(ExchangeV2Message.RecoveryCodeDone.Reason.ScopeRejected))
+            assertEquals(DispatchOutcome.LoggedIn(SetupPath.PAIRING, SetupRole.HOST, PeerKind.DDG), awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test fun `Presenter emits LoggedIn when Host_Done carries an unrecognised recovery_code_done reason`() = runTest {
+        whenever(runner.peerKind).thenReturn("ddg")
+        dispatcher.presentV2().test {
+            runnerEventsFlow.emit(hostDone(ExchangeV2Message.RecoveryCodeDone.Reason.Unknown("sync_deferred")))
+            assertEquals(DispatchOutcome.LoggedIn(SetupPath.PAIRING, SetupRole.HOST, PeerKind.DDG), awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -812,12 +881,12 @@ class RealSyncCodeDispatcherTest {
         }
     }
 
-    @Test fun `Presenter emits Failed when Joiner_Done arrives without a recovery code`() = runTest {
+    @Test fun `Presenter emits Failed when Joiner_Joining arrives without a recovery code`() = runTest {
         dispatcher.presentV2().test {
-            runnerEventsFlow.emit(transition(from = ExchangeV2State.Joiner.Waiting, to = ExchangeV2State.Joiner.Done))
+            runnerEventsFlow.emit(transition(from = ExchangeV2State.Joiner.Waiting, to = ExchangeV2State.Joiner.Joining))
             assertEquals(
                 DispatchOutcome.Failed(
-                    "joiner_done_missing_recovery_code",
+                    "joiner_joining_missing_recovery_code",
                     NO_RECOVERY_CODE.code,
                     path = SetupPath.PAIRING,
                     myRole = SetupRole.JOINER,
@@ -828,7 +897,7 @@ class RealSyncCodeDispatcherTest {
         }
     }
 
-    @Test fun `Presenter emits LoggedIn when Joiner_Done carries a cid=ddg recovery code`() = runTest {
+    @Test fun `Presenter emits LoggedIn when Joiner_Joining carries a cid=ddg recovery code`() = runTest {
         val recoveryJson = JSONObject().apply {
             put(
                 "recovery",
@@ -853,7 +922,7 @@ class RealSyncCodeDispatcherTest {
                 ExchangeV2Event.Transition(
                     timestampMs = System.currentTimeMillis(),
                     from = ExchangeV2State.Joiner.Waiting,
-                    to = ExchangeV2State.Joiner.Done,
+                    to = ExchangeV2State.Joiner.Joining,
                     trigger = responseMessage,
                     localTrigger = null,
                 ),
@@ -865,7 +934,7 @@ class RealSyncCodeDispatcherTest {
         verify(syncAccountRepository, never()).joinAccountFromThirdPartyRecoveryCode(any())
     }
 
-    @Test fun `Presenter emits LoggedIn via 3party upgrade when Joiner_Done carries a cid=3party recovery code`() = runTest {
+    @Test fun `Presenter emits LoggedIn via 3party upgrade when Joiner_Joining carries a cid=3party recovery code`() = runTest {
         val recoveryJson = JSONObject().apply {
             put(
                 "recovery",
@@ -889,7 +958,7 @@ class RealSyncCodeDispatcherTest {
                 ExchangeV2Event.Transition(
                     timestampMs = System.currentTimeMillis(),
                     from = ExchangeV2State.Joiner.Waiting,
-                    to = ExchangeV2State.Joiner.Done,
+                    to = ExchangeV2State.Joiner.Joining,
                     trigger = responseMessage,
                     localTrigger = null,
                 ),
@@ -898,6 +967,48 @@ class RealSyncCodeDispatcherTest {
             cancelAndIgnoreRemainingEvents()
         }
         verify(syncAccountRepository).joinAccountFromThirdPartyRecoveryCode(any())
+        verify(syncAccountRepository, never()).processCode(any(), anyOrNull())
+    }
+
+    @Test fun `Presenter reports JoinerJoinComplete success when the Joiner_Joining login succeeds`() = runTest {
+        whenever(syncAccountRepository.processCode(any(), anyOrNull())).thenReturn(Result.Success(true))
+
+        dispatcher.presentV2().test {
+            runnerEventsFlow.emit(joinerJoining(recoveryCode(cid = "ddg")))
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        verify(runner).localTrigger(
+            LocalTrigger.JoinerJoinComplete(ExchangeV2Message.RecoveryCodeDone.Reason.Success),
+        )
+    }
+
+    @Test fun `Presenter reports JoinerJoinComplete login_failed when the Joiner_Joining login fails`() = runTest {
+        whenever(syncAccountRepository.processCode(any(), anyOrNull()))
+            .thenReturn(Result.Error(code = LOGIN_FAILED.code, reason = "login rejected"))
+
+        dispatcher.presentV2().test {
+            runnerEventsFlow.emit(joinerJoining(recoveryCode(cid = "ddg")))
+            assertEquals(LOGIN_FAILED.code, (awaitItem() as DispatchOutcome.Failed).code)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        verify(runner).localTrigger(
+            LocalTrigger.JoinerJoinComplete(ExchangeV2Message.RecoveryCodeDone.Reason.LoginFailed),
+        )
+    }
+
+    @Test fun `Presenter reports JoinerJoinComplete scope_rejected when Joiner_Joining carries an unknown cid`() = runTest {
+        dispatcher.presentV2().test {
+            runnerEventsFlow.emit(joinerJoining(recoveryCode(cid = "future-credential")))
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        verify(runner).localTrigger(
+            LocalTrigger.JoinerJoinComplete(ExchangeV2Message.RecoveryCodeDone.Reason.ScopeRejected),
+        )
         verify(syncAccountRepository, never()).processCode(any(), anyOrNull())
     }
 
@@ -1175,9 +1286,9 @@ class RealSyncCodeDispatcherTest {
         }
     }
 
-    @Test fun `Scanner - Joiner_Done without recovery code maps to Failed NO_RECOVERY_CODE`() = runTest {
+    @Test fun `Scanner - Joiner_Joining without recovery code maps to Failed NO_RECOVERY_CODE`() = runTest {
         startLinking().test {
-            runnerEventsFlow.emit(transition(from = ExchangeV2State.Joiner.Waiting, to = ExchangeV2State.Joiner.Done))
+            runnerEventsFlow.emit(transition(from = ExchangeV2State.Joiner.Waiting, to = ExchangeV2State.Joiner.Joining))
             assertEquals(NO_RECOVERY_CODE.code, (awaitItem() as DispatchOutcome.Failed).code)
             cancelAndIgnoreRemainingEvents()
         }
@@ -1249,7 +1360,7 @@ class RealSyncCodeDispatcherTest {
         }
     }
 
-    @Test fun `Presenter emits Failed when Joiner_Done carries a recovery code with unknown cid`() = runTest {
+    @Test fun `Presenter emits Failed when Joiner_Joining carries a recovery code with unknown cid`() = runTest {
         val recoveryJson = JSONObject().apply {
             put(
                 "recovery",
@@ -1272,13 +1383,14 @@ class RealSyncCodeDispatcherTest {
                 ExchangeV2Event.Transition(
                     timestampMs = System.currentTimeMillis(),
                     from = ExchangeV2State.Joiner.Waiting,
-                    to = ExchangeV2State.Joiner.Done,
+                    to = ExchangeV2State.Joiner.Joining,
                     trigger = responseMessage,
                     localTrigger = null,
                 ),
             )
             val outcome = awaitItem() as DispatchOutcome.Failed
             assertTrue("expected reason to mention the unknown cid, got '${outcome.reason}'", outcome.reason.contains("future-credential"))
+            assertEquals(UNSUPPORTED_CREDENTIAL_TYPE.code, outcome.code)
             cancelAndIgnoreRemainingEvents()
         }
         verify(syncAccountRepository, never()).processCode(any(), anyOrNull())

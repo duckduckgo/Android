@@ -17,10 +17,15 @@
 package com.duckduckgo.sync.impl.exchange.v2
 
 import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeDone
+import com.google.testing.junit.testparameterinjector.TestParameter
+import com.google.testing.junit.testparameterinjector.TestParameterInjector
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.junit.runner.RunWith
 
+@RunWith(TestParameterInjector::class)
 class JsonExchangeV2MessageParserTest {
 
     private val parser = JsonExchangeV2MessageParser()
@@ -66,6 +71,39 @@ class JsonExchangeV2MessageParserTest {
         val parsed = parser.parse(json) as ExchangeV2Message.RecoveryCodeResponse
 
         assertEquals("the-code", parsed.recoveryCode)
+    }
+
+    enum class RecoverCodeCase(
+        val rawReason: String,
+        val expectedReason: RecoveryCodeDone.Reason,
+    ) {
+        Success(
+            rawReason = "success",
+            expectedReason = RecoveryCodeDone.Reason.Success,
+        ),
+        LoginFailed(
+            rawReason = "login_failed",
+            expectedReason = RecoveryCodeDone.Reason.LoginFailed,
+        ),
+        ScopeRejected(
+            rawReason = "scope_rejected",
+            expectedReason = RecoveryCodeDone.Reason.ScopeRejected,
+        ),
+        Unknown(
+            rawReason = "future_reason",
+            expectedReason = RecoveryCodeDone.Reason.Unknown("future_reason"),
+        ),
+    }
+
+    @Test
+    fun `parses recovery_code_done with reason`(
+        @TestParameter case: RecoverCodeCase,
+    ) {
+        val json = """{"type":"recovery_code_done","reason":"${case.rawReason}"}"""
+
+        val parsed = parser.parse(json) as RecoveryCodeDone
+
+        assertEquals(case.expectedReason, parsed.reason)
     }
 
     @Test fun `parses bodyless types awaiting_confirmation confirmed denied unavailable`() {

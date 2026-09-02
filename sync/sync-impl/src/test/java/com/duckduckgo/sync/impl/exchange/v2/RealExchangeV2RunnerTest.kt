@@ -30,6 +30,7 @@ import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.Hello
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeAvailable
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeAwaitingConfirmation
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeConfirmed
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeDone
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeRequest
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeResponse
 import com.duckduckgo.sync.store.SyncStore
@@ -519,6 +520,80 @@ class RealExchangeV2RunnerTest {
         )
     }
 
+    @Test fun `Host with a v2_1 peer stays in Host_AwaitingStatus after sending the recovery code`() = runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenHostCanProduceRecoveryCode()
+
+        val runner = newRunner()
+        runner.startPresent()
+        runner.deliverHello(ExchangeProtocolVersion.V2_1)
+        runner.deliverIncomingMessage(RecoveryCodeRequest.create(name = "Joiner", kind = "ddg"))
+
+        runner.localTrigger(LocalTrigger.UserConfirmedHost)
+
+        assertSame(ExchangeV2State.Host.AwaitingStatus, runner.currentState)
+        verify(channel, never()).deleteChannel(any(), anyOrNull())
+    }
+
+    @Test fun `Host with a v2_0 peer abandons the session after sending the recovery code`() = runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenHostCanProduceRecoveryCode()
+
+        val runner = newRunner()
+        runner.startPresent()
+        runner.deliverHello(ExchangeProtocolVersion.V2_0)
+        runner.deliverIncomingMessage(RecoveryCodeRequest.create(name = "Joiner", kind = "ddg"))
+
+        runner.localTrigger(LocalTrigger.UserConfirmedHost)
+
+        assertNull(runner.currentState)
+        verify(channel).deleteChannel(any(), anyOrNull())
+    }
+
+    @Test fun `Joiner with a v2_1 peer sends recovery_code_done when the join completes`() = runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenLinkingCodeVersion(ExchangeProtocolVersion.V2_1)
+        whenever(syncStore.userId).thenReturn(null)
+
+        val runner = newRunner()
+        runner.startScan("")
+        runner.deliverIncomingMessage(RecoveryCodeAvailable.create(userId = "host-user", name = "Host", kind = "ddg"))
+        runner.localTrigger(LocalTrigger.UserConfirmedJoiner)
+        runner.deliverIncomingMessage(RecoveryCodeResponse.create(recoveryCode = "the-code"))
+
+        runner.localTrigger(LocalTrigger.JoinerJoinComplete(RecoveryCodeDone.Reason.Success))
+
+        verify(channel).sendMessage(
+            argThat { this is RecoveryCodeDone && reason == RecoveryCodeDone.Reason.Success },
+            any(),
+            any(),
+            any(),
+            anyOrNull(),
+        )
+    }
+
+    @Test fun `Joiner with a v2_0 peer does not send recovery_code_done`() = runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenLinkingCodeVersion(ExchangeProtocolVersion.V2_0)
+        whenever(syncStore.userId).thenReturn(null)
+
+        val runner = newRunner()
+        runner.startScan("")
+        runner.deliverIncomingMessage(RecoveryCodeAvailable.create(userId = "host-user", name = "Host", kind = "ddg"))
+        runner.localTrigger(LocalTrigger.UserConfirmedJoiner)
+        runner.deliverIncomingMessage(RecoveryCodeResponse.create(recoveryCode = "the-code"))
+
+        runner.localTrigger(LocalTrigger.JoinerJoinComplete(RecoveryCodeDone.Reason.Success))
+
+        verify(channel, never()).sendMessage(
+            argThat { this is RecoveryCodeDone },
+            any(),
+            any(),
+            any(),
+            anyOrNull(),
+        )
+    }
+
     @Test fun `UserConfirmedHost sends recovery_code_confirmed but does NOT re-send awaiting_confirmation`() = runTest {
         whenever(syncStore.userId).thenReturn("my-user")
         whenever(recoveryCodeProvider.getDdgRecoveryCode()).thenReturn(com.duckduckgo.sync.impl.Result.Success("the-code"))
@@ -659,6 +734,7 @@ class RealExchangeV2RunnerTest {
         )
         runner.localTrigger(LocalTrigger.UserConfirmedJoiner)
         runner.deliverIncomingMessage(RecoveryCodeResponse.fromJson("{}"))
+        runner.localTrigger(LocalTrigger.JoinerJoinComplete(RecoveryCodeDone.Reason.Success))
         assertNull(runner.currentState)
 
         advanceTimeBy(6 * 60 * 1000L)
@@ -846,6 +922,12 @@ class RealExchangeV2RunnerTest {
         whenever(qrCode.parse(any())).thenReturn(
             ExchangeV2CodeParseResult.LinkingV2(channelId = "peer-channel", publicKey = "peer-pubkey", version = version),
         )
+    }
+
+    private fun givenHostCanProduceRecoveryCode() {
+        whenever(recoveryCodeProvider.createDdgAccountIfNeeded()).thenReturn(Result.Success(Unit))
+        whenever(recoveryCodeProvider.getDdgRecoveryCode()).thenReturn(Result.Success("the-code"))
+        whenever(syncStore.userId).thenReturn("my-user")
     }
 
     private suspend fun RealExchangeV2Runner.deliverHello(version: ExchangeProtocolVersion) {

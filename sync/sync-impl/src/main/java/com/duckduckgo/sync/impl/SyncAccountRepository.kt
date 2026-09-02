@@ -1646,6 +1646,7 @@ enum class AccountErrorCodes(val code: Int) {
     UNEXPECTED_SECOND_HELLO(76),
     PAIRING_SESSION_NOT_READY(77),
     RELAY_CHANNEL_UNAVAILABLE(78),
+    UNSUPPORTED_CREDENTIAL_TYPE(79),
 }
 
 sealed interface SyncAuthCode {

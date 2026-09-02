@@ -32,15 +32,19 @@ import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.Hello
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Runner
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State
+import com.duckduckgo.sync.impl.exchange.v2.LocalTrigger
+import com.duckduckgo.sync.impl.exchange.v2.PairingRole
 import com.duckduckgo.sync.impl.exchange.v2.RealAdvertisedExchangeV2Version
 import com.duckduckgo.sync.impl.exchange.v2.RejectReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
 import com.duckduckgo.sync.internal.exchange.SyncInternalAdvertisedExchangeV2Version
 import com.duckduckgo.sync.store.SyncStore
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -79,6 +83,25 @@ class SyncV2PairingDebugViewModelTest {
         internalAdvertisedVersion = internalAdvertisedVersion,
         dispatchers = coroutineTestRule.testDispatcherProvider,
         appScope = coroutineTestRule.testScope,
+    )
+
+    private fun hostDone(reason: ExchangeV2Message.RecoveryCodeDone.Reason) = ExchangeV2Event.Transition(
+        timestampMs = 0L,
+        from = ExchangeV2State.Host.AwaitingStatus,
+        to = ExchangeV2State.Host.Done,
+        trigger = ExchangeV2Message.RecoveryCodeDone.create(reason),
+        localTrigger = null,
+    )
+
+    private fun joinerTerminal(
+        to: ExchangeV2State,
+        localTrigger: LocalTrigger = LocalTrigger.JoinerJoinComplete(ExchangeV2Message.RecoveryCodeDone.Reason.Success),
+    ) = ExchangeV2Event.Transition(
+        timestampMs = 0L,
+        from = ExchangeV2State.Joiner.Joining,
+        to = to,
+        trigger = null,
+        localTrigger = localTrigger,
     )
 
     // ---- Event log ----
@@ -140,6 +163,85 @@ class SyncV2PairingDebugViewModelTest {
             )
             val state = awaitItem()
             assertTrue(state.rows.single().summary.startsWith("SameAccountAbort"))
+        }
+    }
+
+    @Test fun `Joiner_JoinFailed alert is a failure that points at the event log`() = runTest {
+        val viewModel = newViewModel()
+        viewModel.terminals().test {
+            eventFlow.emit(
+                joinerTerminal(
+                    ExchangeV2State.Joiner.JoinFailed,
+                    LocalTrigger.JoinerJoinComplete(ExchangeV2Message.RecoveryCodeDone.Reason.LoginFailed),
+                ),
+            )
+
+            val terminal = awaitItem()
+            assertEquals("✗ Join failed (Joiner)", terminal.title)
+            assertFalse(terminal.isSuccess)
+            assertEquals("Check the event log for details.", terminal.message)
+        }
+    }
+
+    @Test fun `Presenter at Joiner_Joining with no recovery code reports LoginFailed to the peer`() = runTest {
+        whenever(runner.pairingRole).thenReturn(PairingRole.Presenter)
+        val joinComplete = Job()
+        joinComplete.complete()
+        whenever(runner.localTrigger(any())).thenReturn(joinComplete)
+        newViewModel()
+
+        eventFlow.emit(
+            ExchangeV2Event.Transition(
+                timestampMs = 0L,
+                from = ExchangeV2State.Joiner.Waiting,
+                to = ExchangeV2State.Joiner.Joining,
+                trigger = ExchangeV2Message.RecoveryCodeResponse.create(recoveryCode = ""),
+                localTrigger = null,
+            ),
+        )
+
+        verify(runner).localTrigger(LocalTrigger.JoinerJoinComplete(ExchangeV2Message.RecoveryCodeDone.Reason.LoginFailed))
+        verify(dispatcher, never()).route(any())
+    }
+
+    @Test fun `Host_Done alert is a failure when the peer reported one`() = runTest {
+        val viewModel = newViewModel()
+        viewModel.terminals().test {
+            eventFlow.emit(hostDone(ExchangeV2Message.RecoveryCodeDone.Reason.LoginFailed))
+
+            val terminal = awaitItem()
+            assertEquals("✗ Join failed on the peer", terminal.title)
+            assertFalse(terminal.isSuccess)
+        }
+    }
+
+    @Test fun `Host_Done alert is a success when the peer reported success`() = runTest {
+        val viewModel = newViewModel()
+        viewModel.terminals().test {
+            eventFlow.emit(hostDone(ExchangeV2Message.RecoveryCodeDone.Reason.Success))
+
+            val terminal = awaitItem()
+            assertEquals("✓ Pairing complete (Host)", terminal.title)
+            assertTrue(terminal.isSuccess)
+        }
+    }
+
+    @Test fun `Host_Done alert is a success when a pre-2_1 peer sent no report`() = runTest {
+        val viewModel = newViewModel()
+        viewModel.terminals().test {
+            eventFlow.emit(
+                ExchangeV2Event.Transition(
+                    timestampMs = 0L,
+                    from = ExchangeV2State.Host.Sending,
+                    to = ExchangeV2State.Host.Done,
+                    trigger = null,
+                    localTrigger = LocalTrigger.HostSendComplete(ExchangeProtocolVersion.V2_0),
+                ),
+            )
+
+            val terminal = awaitItem()
+            assertEquals("✓ Pairing complete (Host)", terminal.title)
+            assertTrue(terminal.isSuccess)
         }
     }
 

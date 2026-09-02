@@ -64,6 +64,7 @@ import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.AskJoinerConfirm
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.LoginSuccess
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ShowV2Error
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -106,6 +107,7 @@ class SyncConnectViewModelTest {
             val sinceMs = invocation.getArgument<Long>(0)
             runnerEventsFlow.filter { event -> event.timestampMs >= sinceMs }
         }
+        whenever(it.localTrigger(any())).thenAnswer { Job().apply { complete() } }
     }
     private val codeDispatcher = com.duckduckgo.sync.impl.RealSyncCodeDispatcher(
         syncFeature = syncFeature,
@@ -548,7 +550,7 @@ class SyncConnectViewModelTest {
             runnerEventsFlow.emit(
                 transition(
                     from = ExchangeV2State.Joiner.Waiting,
-                    to = ExchangeV2State.Joiner.Done,
+                    to = ExchangeV2State.Joiner.Joining,
                     trigger = ExchangeV2Message.RecoveryCodeResponse.create(recoveryCode = b64),
                 ),
             )
@@ -591,7 +593,7 @@ class SyncConnectViewModelTest {
             runnerEventsFlow.emit(
                 transition(
                     from = ExchangeV2State.Joiner.Waiting,
-                    to = ExchangeV2State.Joiner.Done,
+                    to = ExchangeV2State.Joiner.Joining,
                     trigger = ExchangeV2Message.RecoveryCodeResponse.create(recoveryCode = b64),
                 ),
             )
@@ -639,7 +641,7 @@ class SyncConnectViewModelTest {
             runnerEventsFlow.emit(
                 transition(
                     from = ExchangeV2State.Joiner.Waiting,
-                    to = ExchangeV2State.Joiner.Done,
+                    to = ExchangeV2State.Joiner.Joining,
                     trigger = ExchangeV2Message.RecoveryCodeResponse.create(recoveryCode = recoveryB64),
                 ),
             )
