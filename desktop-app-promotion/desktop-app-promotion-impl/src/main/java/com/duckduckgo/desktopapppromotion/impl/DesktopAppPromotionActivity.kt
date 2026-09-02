@@ -75,7 +75,7 @@ class DesktopAppPromotionActivity : DuckDuckGoActivity() {
             factory = object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>) =
-                    promotionViewModelFactory.create(content, params.pixels, params.handlerId) as T
+                    promotionViewModelFactory.create(content, params.handlerId) as T
             },
             extras = this.defaultViewModelCreationExtras,
         )[DesktopAppPromotionViewModel::class.java]

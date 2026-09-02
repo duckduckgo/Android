@@ -18,17 +18,11 @@ package com.duckduckgo.autofill.impl.ui.credential.management.importpassword
 
 import android.content.Context
 import com.duckduckgo.autofill.impl.R
-import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_PASSWORDS_COPIED_DESKTOP_LINK
-import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_PASSWORDS_SHARED_DESKTOP_LINK
 import com.duckduckgo.desktopapppromotion.api.DesktopAppPromotionParams
-import com.duckduckgo.desktopapppromotion.api.PixelConfig
-import com.duckduckgo.desktopapppromotion.api.PixelFireSpec
+import com.duckduckgo.desktopapppromotion.api.DownloadLinkConfig
+import com.duckduckgo.desktopapppromotion.api.ShareConfig
 import com.duckduckgo.mobile.android.R as CommonR
 
-/**
- * No impression or dismiss pixel, and no interaction handler: this entry point tracks neither, and
- * has no dismissal to persist.
- */
 object ImportPasswordsDesktopAppPromotionParams {
 
     fun create(context: Context): DesktopAppPromotionParams = DesktopAppPromotionParams(
@@ -36,14 +30,13 @@ object ImportPasswordsDesktopAppPromotionParams {
         title = context.getString(R.string.autofillManagementImportPasswordsGetDesktopAppSubtitle),
         body = context.getString(R.string.autofillManagementImportPasswordsGetDesktopAppInstruction),
         illustration = CommonR.drawable.ic_app_download_128,
-        downloadUrl = DESKTOP_APP_URL,
-        shareIntentTitle = context.getString(R.string.autofillManagementImportPasswordsGetDesktopBrowserIntentTitle),
-        shareIntentBody = context.getString(R.string.autofillManagementImportPasswordsGetDesktopBrowserIntentMessage, DESKTOP_APP_URL),
-        showDismissButton = false,
-        pixels = PixelConfig(
-            shareClicked = PixelFireSpec(AUTOFILL_IMPORT_PASSWORDS_SHARED_DESKTOP_LINK.pixelName),
-            linkClicked = PixelFireSpec(AUTOFILL_IMPORT_PASSWORDS_COPIED_DESKTOP_LINK.pixelName),
+        link = DownloadLinkConfig(downloadUrl = DESKTOP_APP_URL),
+        share = ShareConfig(
+            shareIntentTitle = context.getString(R.string.autofillManagementImportPasswordsGetDesktopBrowserIntentTitle),
+            shareIntentBody = context.getString(R.string.autofillManagementImportPasswordsGetDesktopBrowserIntentMessage, DESKTOP_APP_URL),
         ),
+        showDismissButton = false,
+        handlerId = ImportPasswordsDesktopAppPromotionInteractionHandler.HANDLER_ID,
     )
 
     // Preserved verbatim from the screen this replaces, sync attribution and all, so funnel

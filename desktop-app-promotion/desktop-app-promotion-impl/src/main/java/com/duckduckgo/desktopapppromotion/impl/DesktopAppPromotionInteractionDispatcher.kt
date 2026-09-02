@@ -28,10 +28,14 @@ import javax.inject.Inject
  * broadcast receiver so both resolve handlers the same way.
  */
 interface DesktopAppPromotionInteractionDispatcher {
+    /**
+     * Returns `true` if a registered handler ran and fully handled [interaction] (see
+     * [DesktopAppPromotionInteractionHandler.onInteraction]).
+     */
     suspend fun dispatch(
         handlerId: String?,
         interaction: Interaction,
-    )
+    ): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -42,12 +46,11 @@ class RealDesktopAppPromotionInteractionDispatcher @Inject constructor(
     override suspend fun dispatch(
         handlerId: String?,
         interaction: Interaction,
-    ) {
-        // Exact match only: a launch with no handler, or one naming a handler nobody contributed,
-        // must not reach another caller's handler.
-        val id = handlerId ?: return
-        handlers.getPlugins()
+    ): Boolean {
+        val id = handlerId ?: return false
+        return handlers.getPlugins()
             .firstOrNull { it.handlerId == id }
             ?.onInteraction(interaction)
+            ?: false
     }
 }

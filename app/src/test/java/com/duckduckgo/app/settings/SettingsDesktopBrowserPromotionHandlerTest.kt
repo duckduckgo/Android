@@ -16,13 +16,19 @@
 
 package com.duckduckgo.app.settings
 
+import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.settings.GetDesktopBrowserCompleteSetupSettings.Companion.GET_DESKTOP_BROWSER_SOURCE_PIXEL_PARAM
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.desktopapppromotion.api.DesktopAppPromotionInteractionHandler.Interaction
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 
 class SettingsDesktopBrowserPromotionHandlerTest {
@@ -31,30 +37,55 @@ class SettingsDesktopBrowserPromotionHandlerTest {
     val coroutineTestRule = CoroutineTestRule()
 
     private val settingsDataStoreMock: SettingsDataStore = mock()
+    private val pixelMock: Pixel = mock()
 
     private val testee = SettingsDesktopBrowserPromotionHandler(
         settingsDataStore = settingsDataStoreMock,
         dispatchers = coroutineTestRule.testDispatcherProvider,
+        pixel = pixelMock,
     )
 
     @Test
-    fun whenLinkCopiedThenSettingIsDismissed() = runTest {
-        testee.onInteraction(Interaction.LINK_COPIED)
+    fun whenImpressionThenSettingIsNotDismissedAndNoDefaultIsNeeded() = runTest {
+        val handled = testee.onInteraction(Interaction.IMPRESSION)
 
-        verify(settingsDataStoreMock).getDesktopBrowserSettingDismissed = true
+        verify(settingsDataStoreMock, never()).getDesktopBrowserSettingDismissed = true
+        assertTrue(handled)
     }
 
     @Test
-    fun whenShareCompletedThenSettingIsDismissed() = runTest {
-        testee.onInteraction(Interaction.SHARE_COMPLETED)
+    fun whenLinkCopiedThenSettingIsDismissedAndDefaultPixelIsLeftToTheScreen() = runTest {
+        val handled = testee.onInteraction(Interaction.LINK_COPIED)
 
         verify(settingsDataStoreMock).getDesktopBrowserSettingDismissed = true
+        assertFalse(handled)
     }
 
     @Test
-    fun whenDismissedThenSettingIsDismissed() = runTest {
-        testee.onInteraction(Interaction.DISMISSED)
+    fun whenShareCompletedThenSettingIsDismissedAndNoDefaultIsNeeded() = runTest {
+        val handled = testee.onInteraction(Interaction.SHARE_COMPLETED)
 
         verify(settingsDataStoreMock).getDesktopBrowserSettingDismissed = true
+        assertTrue(handled)
+    }
+
+    @Test
+    fun whenShareClickedThenSettingIsNotDismissedAndDefaultPixelIsLeftToTheScreen() = runTest {
+        val handled = testee.onInteraction(Interaction.SHARE_CLICKED)
+
+        verify(settingsDataStoreMock, never()).getDesktopBrowserSettingDismissed = true
+        assertFalse(handled)
+    }
+
+    @Test
+    fun whenDismissedThenSettingIsDismissedAndThePixelIsFired() = runTest {
+        val handled = testee.onInteraction(Interaction.DISMISSED)
+
+        verify(settingsDataStoreMock).getDesktopBrowserSettingDismissed = true
+        verify(pixelMock).fire(
+            AppPixelName.GET_DESKTOP_BROWSER_DISMISSED,
+            mapOf(GET_DESKTOP_BROWSER_SOURCE_PIXEL_PARAM to "no_thanks"),
+        )
+        assertTrue(handled)
     }
 }

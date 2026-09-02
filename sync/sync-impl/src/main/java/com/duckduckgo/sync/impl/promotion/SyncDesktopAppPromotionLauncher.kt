@@ -19,14 +19,12 @@ package com.duckduckgo.sync.impl.promotion
 import android.content.Context
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.desktopapppromotion.api.DesktopAppPromotionParams
-import com.duckduckgo.desktopapppromotion.api.PixelConfig
-import com.duckduckgo.desktopapppromotion.api.PixelFireSpec
+import com.duckduckgo.desktopapppromotion.api.DownloadLinkConfig
+import com.duckduckgo.desktopapppromotion.api.ShareConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.settings.api.SettingsPageFeature
 import com.duckduckgo.sync.impl.R
-import com.duckduckgo.sync.impl.pixels.SyncPixelName
-import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.GET_OTHER_DEVICES_SCREEN_LAUNCH_SOURCE
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -72,21 +70,15 @@ class RealSyncDesktopAppPromotionLauncher @Inject constructor(
         context: Context,
         source: SyncGetOnOtherPlatformsLaunchSource,
     ): DesktopAppPromotionParams {
-        val sourceParams = hashMapOf(GET_OTHER_DEVICES_SCREEN_LAUNCH_SOURCE to source.value)
-
         return DesktopAppPromotionParams(
             toolbarTitle = context.getString(R.string.syncGetAppsOnOtherPlatformsActivityTitle),
             title = context.getString(R.string.syncGetAppsOnOtherPlatformsTitle),
             body = context.getString(R.string.syncGetAppsOnOtherPlatformInstruction),
             illustration = CommonR.drawable.ic_app_download_128,
-            downloadUrl = DESKTOP_BROWSER_URL,
-            shareIntentTitle = context.getString(R.string.syncGetAppsOnOtherPlatforms),
+            link = DownloadLinkConfig(downloadUrl = DESKTOP_BROWSER_URL),
+            share = ShareConfig(shareIntentTitle = context.getString(R.string.syncGetAppsOnOtherPlatforms)),
             showDismissButton = false,
-            pixels = PixelConfig(
-                impression = PixelFireSpec(SyncPixelName.SYNC_GET_OTHER_DEVICES_SCREEN_SHOWN.pixelName, sourceParams),
-                shareClicked = PixelFireSpec(SyncPixelName.SYNC_GET_OTHER_DEVICES_LINK_SHARED.pixelName, sourceParams),
-                linkClicked = PixelFireSpec(SyncPixelName.SYNC_GET_OTHER_DEVICES_LINK_COPIED.pixelName, sourceParams),
-            ),
+            handlerId = SyncDesktopAppPromotionInteractionHandler.handlerId(source),
         )
     }
 

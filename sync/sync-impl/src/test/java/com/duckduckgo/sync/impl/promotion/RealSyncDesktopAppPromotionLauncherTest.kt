@@ -73,36 +73,25 @@ class RealSyncDesktopAppPromotionLauncherTest {
 
         testee.launch(contextMock, SOURCE_SYNC_ENABLED)
 
-        assertEquals("https://duckduckgo.com/browser?origin=funnel_browser_android_sync", capturedParams().downloadUrl)
+        assertEquals("https://duckduckgo.com/browser?origin=funnel_browser_android_sync", capturedParams().link.downloadUrl)
     }
 
     @Test
-    fun whenSharedPromoScreenIsLaunchedThenSyncPixelNamesAndSourceAreUnchanged() = runTest {
+    fun whenSharedPromoScreenIsLaunchedThenHandlerIdEncodesTheSource() = runTest {
         givenPromoEnabled()
 
         testee.launch(contextMock, SOURCE_SYNC_ENABLED)
 
-        val expectedSource = mapOf("source" to "activated")
-        with(capturedParams().pixels) {
-            assertEquals("sync_get_other_devices", impression?.pixelName)
-            assertEquals(expectedSource, impression?.parameters)
-            assertEquals("sync_get_other_devices_share", shareClicked?.pixelName)
-            assertEquals(expectedSource, shareClicked?.parameters)
-            assertEquals("sync_get_other_devices_copy", linkClicked?.pixelName)
-            assertEquals(expectedSource, linkClicked?.parameters)
-            assertEquals(null, dismissed)
-        }
+        assertEquals(SyncDesktopAppPromotionInteractionHandler.handlerId(SOURCE_SYNC_ENABLED), capturedParams().handlerId)
     }
 
     @Test
-    fun whenSharedPromoScreenIsLaunchedThenNoDismissButtonAndNoInteractionHandler() = runTest {
+    fun whenSharedPromoScreenIsLaunchedThenNoDismissButton() = runTest {
         givenPromoEnabled()
 
         testee.launch(contextMock, SOURCE_SYNC_ENABLED)
 
-        val params = capturedParams()
-        assertEquals(false, params.showDismissButton)
-        assertEquals(null, params.handlerId)
+        assertEquals(false, capturedParams().showDismissButton)
     }
 
     private fun givenPromoEnabled() {

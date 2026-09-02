@@ -21,6 +21,7 @@ import com.duckduckgo.desktopapppromotion.api.DesktopAppPromotionInteractionHand
 import com.duckduckgo.desktopapppromotion.api.DesktopAppPromotionInteractionHandler.Interaction
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -42,38 +43,68 @@ class RealDesktopAppPromotionInteractionDispatcherTest {
     }
 
     @Test
-    fun whenHandlerIdIsNullThenNoHandlerIsNotified() = runTest {
-        testee.dispatch(null, Interaction.DISMISSED)
+    fun whenHandlerIdIsNullThenNoHandlerIsNotifiedAndDispatchReturnsFalse() = runTest {
+        val handled = testee.dispatch(null, Interaction.DISMISSED)
 
         assertTrue(settingsHandler.interactions.isEmpty())
         assertTrue(otherHandler.interactions.isEmpty())
+        assertFalse(handled)
     }
 
     @Test
-    fun whenHandlerIdMatchesNoRegisteredHandlerThenNoHandlerIsNotified() = runTest {
-        testee.dispatch("nobody_contributed_this", Interaction.SHARE_COMPLETED)
+    fun whenHandlerIdMatchesNoRegisteredHandlerThenNoHandlerIsNotifiedAndDispatchReturnsFalse() = runTest {
+        val handled = testee.dispatch("nobody_contributed_this", Interaction.SHARE_COMPLETED)
 
         assertTrue(settingsHandler.interactions.isEmpty())
         assertTrue(otherHandler.interactions.isEmpty())
+        assertFalse(handled)
     }
 
     @Test
     fun whenEveryInteractionIsDispatchedThenAllReachTheMatchingHandler() = runTest {
+        testee.dispatch("settings_desktop_browser", Interaction.IMPRESSION)
+        testee.dispatch("settings_desktop_browser", Interaction.SHARE_CLICKED)
         testee.dispatch("settings_desktop_browser", Interaction.LINK_COPIED)
         testee.dispatch("settings_desktop_browser", Interaction.SHARE_COMPLETED)
         testee.dispatch("settings_desktop_browser", Interaction.DISMISSED)
 
         assertEquals(
-            listOf(Interaction.LINK_COPIED, Interaction.SHARE_COMPLETED, Interaction.DISMISSED),
+            listOf(
+                Interaction.IMPRESSION,
+                Interaction.SHARE_CLICKED,
+                Interaction.LINK_COPIED,
+                Interaction.SHARE_COMPLETED,
+                Interaction.DISMISSED,
+            ),
             settingsHandler.interactions,
         )
     }
 
+    @Test
+    fun whenMatchedHandlerReturnsTrueThenDispatchReturnsTrue() = runTest {
+        settingsHandler.result = true
+
+        val handled = testee.dispatch("settings_desktop_browser", Interaction.DISMISSED)
+
+        assertTrue(handled)
+    }
+
+    @Test
+    fun whenMatchedHandlerReturnsFalseThenDispatchReturnsFalse() = runTest {
+        settingsHandler.result = false
+
+        val handled = testee.dispatch("settings_desktop_browser", Interaction.SHARE_CLICKED)
+
+        assertFalse(handled)
+    }
+
     private class FakeInteractionHandler(override val handlerId: String) : DesktopAppPromotionInteractionHandler {
         val interactions = mutableListOf<Interaction>()
+        var result = true
 
-        override suspend fun onInteraction(interaction: Interaction) {
+        override suspend fun onInteraction(interaction: Interaction): Boolean {
             interactions += interaction
+            return result
         }
     }
 

@@ -23,12 +23,12 @@ import java.io.Serializable
 /**
  * Launch params for the shared "get the DuckDuckGo desktop app/browser" promo screen.
  *
- * The screen is a renderer: every piece of content and every pixel it may fire is supplied here, and
- * it never infers behaviour from which feature launched it.
+ * The screen is a renderer: every piece of content it may show is supplied here, and it never infers
+ * behaviour from which feature launched it. Pixels are not part of this contract — a caller that wants
+ * to react to what the user did contributes a
+ * [DesktopAppPromotionInteractionHandler] and sets [handlerId].
  *
- * Every content field is nullable, and `null` means "use the promo screen's own default". The
- * defaults are real, translated resources owned by the implementation module, so a caller that wants
- * the canonical copy — including a deeplink, which can only supply JSON — passes nothing.
+ * Every content field is nullable, and `null` means "use the promo screen's own default"
  */
 data class DesktopAppPromotionParams(
 
@@ -41,8 +41,30 @@ data class DesktopAppPromotionParams(
     /** Body copy shown under the title. */
     val body: String? = null,
 
-    /** Illustration shown above the title. `0` means use the default. */
-    @DrawableRes val illustration: Int = 0,
+    /** Illustration shown above the title. `null` means use the default. */
+    @DrawableRes val illustration: Int? = null,
+
+    /** The download link shown on screen and used for the share sheet and copy-to-clipboard action. */
+    val link: DownloadLinkConfig = DownloadLinkConfig(),
+
+    /** Copy for the share button and the OS share sheet. */
+    val share: ShareConfig = ShareConfig(),
+
+    /** Whether to show the dismiss ("No Thanks") button. */
+    val showDismissButton: Boolean = false,
+
+    /** Label of the dismiss button, when shown. */
+    val dismissButtonLabel: String? = null,
+
+    /**
+     * Opaque key routing interactions. `null` means this caller wants no side effects.
+     */
+    val handlerId: String? = null,
+
+) : GlobalActivityStarter.ActivityParams
+
+/** The download link shown on screen, and used for the share sheet and copy-to-clipboard action. */
+data class DownloadLinkConfig(
 
     /** The human-readable URL shown on screen, e.g. `"duckduckgo.com/browser"`. */
     val downloadUrlDisplay: String? = null,
@@ -53,6 +75,10 @@ data class DesktopAppPromotionParams(
      * Callers own their own attribution origin — this module does not construct or validate it.
      */
     val downloadUrl: String? = null,
+) : Serializable
+
+/** Copy for the share button and the OS share sheet. */
+data class ShareConfig(
 
     /** Label of the primary share button. */
     val shareButtonLabel: String? = null,
@@ -61,76 +87,8 @@ data class DesktopAppPromotionParams(
     val shareIntentTitle: String? = null,
 
     /**
-     * Optional complete message shared to the OS share sheet, already containing [downloadUrl] if
+     * Optional complete message shared to the OS share sheet, already containing the download URL if
      * the caller wants it there. When `null`, the bare URL is shared.
      */
     val shareIntentBody: String? = null,
-
-    /** Whether to show the dismiss ("No Thanks") button. */
-    val showDismissButton: Boolean = false,
-
-    /** Label of the dismiss button, when shown. */
-    val dismissButtonLabel: String? = null,
-
-    /** What to fire, and with what params, for each of this screen's four interaction points. */
-    val pixels: PixelConfig = PixelConfig(),
-
-    /**
-     * Opaque key routing post-interaction side effects back to a
-     * [DesktopAppPromotionInteractionHandler] contributed by the caller's module. `null` means this
-     * caller wants no side effects.
-     */
-    val handlerId: String? = null,
-
-) : GlobalActivityStarter.ActivityParams
-
-/**
- * Per-interaction pixel configuration. Each field is independently nullable, but `null` means
- * different things for different interactions:
- *
- * - [shareClicked] and [linkClicked] fall back to the screen's own default pixels (parameterless,
- *   owned by the implementation module). Every consumer tracks these two interactions, and the
- *   defaults keep them tracked for deeplink launches, which cannot supply params.
- * - [impression] and [dismissed] fire nothing when `null` — only callers that track them supply a
- *   spec, and a deeplink launch has no card impression or persisted dismissal of its own.
- *
- * A caller that supplies a spec always overrides the default for that interaction.
- */
-data class PixelConfig(
-
-    /**
-     * Fired once, when the screen is first shown. Not re-fired on rotation or recreation.
-     * `null` fires nothing.
-     */
-    val impression: PixelFireSpec? = null,
-
-    /** Fired when the user taps the share button. `null` fires the screen's default pixel. */
-    val shareClicked: PixelFireSpec? = null,
-
-    /**
-     * Fired when the user taps the on-screen URL to copy it to the clipboard. `null` fires the
-     * screen's default pixel.
-     */
-    val linkClicked: PixelFireSpec? = null,
-
-    /**
-     * Fired when the user taps the dismiss button. Only reachable when
-     * [DesktopAppPromotionParams.showDismissButton] is `true`. `null` fires nothing.
-     */
-    val dismissed: PixelFireSpec? = null,
-) : Serializable
-
-/**
- * One pixel to fire: a wire-format pixel name plus its parameters.
- *
- * [pixelName] is a plain `String`, not `Pixel.PixelName`, on purpose — the caller passes its own
- * enum's `.pixelName` so this module never has to know about any feature-specific pixel-name enum.
- *
- * [parameters] must already satisfy the repo's pixel privacy rules; that responsibility stays with
- * the caller that owns the pixel definition. `HashMap` rather than `Map` because
- * [GlobalActivityStarter.ActivityParams] is `Serializable` and `Map` is not a serializable type.
- */
-data class PixelFireSpec(
-    val pixelName: String,
-    val parameters: HashMap<String, String> = HashMap(),
 ) : Serializable

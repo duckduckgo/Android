@@ -22,8 +22,6 @@ import com.duckduckgo.app.clipboard.ClipboardInteractor
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.desktopapppromotion.api.DesktopAppPromotionInteractionHandler.Interaction
-import com.duckduckgo.desktopapppromotion.api.PixelConfig
-import com.duckduckgo.desktopapppromotion.api.PixelFireSpec
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -37,7 +35,6 @@ import kotlinx.coroutines.launch
 
 class DesktopAppPromotionViewModel @AssistedInject constructor(
     @Assisted private val content: DesktopAppPromotionContent,
-    @Assisted private val pixels: PixelConfig,
     @Assisted private val handlerId: String?,
     private val pixel: Pixel,
     private val dispatchers: DispatcherProvider,
@@ -53,13 +50,13 @@ class DesktopAppPromotionViewModel @AssistedInject constructor(
 
     init {
         viewModelScope.launch(dispatchers.io()) {
-            fire(pixels.impression)
+            interactionDispatcher.dispatch(handlerId, Interaction.IMPRESSION)
         }
     }
 
     fun onShareClicked() {
         viewModelScope.launch(dispatchers.io()) {
-            fire(pixels.shareClicked ?: PixelFireSpec(DesktopAppPromotionPixels.SHARE_DOWNLOAD_LINK_CLICK))
+            fireDefaultUnlessHandled(Interaction.SHARE_CLICKED, DesktopAppPromotionPixels.SHARE_DOWNLOAD_LINK_CLICK)
             _commands.send(
                 Command.ShareLink(
                     shareText = content.shareIntentBody ?: content.downloadUrl,
@@ -74,14 +71,12 @@ class DesktopAppPromotionViewModel @AssistedInject constructor(
             if (!clipboardInteractor.copyToClipboard(content.downloadUrl, isSensitive = false)) {
                 _commands.send(Command.ShowCopiedNotification)
             }
-            fire(pixels.linkClicked ?: PixelFireSpec(DesktopAppPromotionPixels.LINK_CLICK))
-            interactionDispatcher.dispatch(handlerId, Interaction.LINK_COPIED)
+            fireDefaultUnlessHandled(Interaction.LINK_COPIED, DesktopAppPromotionPixels.LINK_CLICK)
         }
     }
 
     fun onDismissClicked() {
         viewModelScope.launch(dispatchers.io()) {
-            fire(pixels.dismissed)
             interactionDispatcher.dispatch(handlerId, Interaction.DISMISSED)
             _commands.send(Command.Close)
         }
@@ -93,8 +88,14 @@ class DesktopAppPromotionViewModel @AssistedInject constructor(
         }
     }
 
-    private fun fire(spec: PixelFireSpec?) {
-        spec?.let { pixel.fire(it.pixelName, it.parameters) }
+    private suspend fun fireDefaultUnlessHandled(
+        interaction: Interaction,
+        defaultPixelName: String,
+    ) {
+        val handled = interactionDispatcher.dispatch(handlerId, interaction)
+        if (!handled) {
+            pixel.fire(defaultPixelName)
+        }
     }
 
     data class ViewState(val content: DesktopAppPromotionContent)
@@ -113,7 +114,6 @@ class DesktopAppPromotionViewModel @AssistedInject constructor(
     interface Factory {
         fun create(
             content: DesktopAppPromotionContent,
-            pixels: PixelConfig,
             handlerId: String?,
         ): DesktopAppPromotionViewModel
     }

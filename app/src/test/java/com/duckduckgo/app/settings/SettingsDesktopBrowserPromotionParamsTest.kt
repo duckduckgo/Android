@@ -23,45 +23,23 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /**
- * Pixel names reach the shared promo screen as plain strings, so these assert the exact wire names
- * and parameters this entry point fired before the screens were consolidated.
+ * Pixels are no longer part of this params object — they're fired by [SettingsDesktopBrowserPromotionHandler],
+ * covered by its own test — so these assert the surface that's still genuinely Settings' own.
  */
 class SettingsDesktopBrowserPromotionParamsTest {
 
     @Test
-    fun whenLaunchedFromCompleteSetupCardThenDismissButtonIsOfferedAndDismissPixelIsConfigured() {
+    fun whenLaunchedFromCompleteSetupCardThenDismissButtonIsOffered() {
         val params = SettingsDesktopBrowserPromotionParams.forCompleteSetupCard()
 
         assertTrue(params.showDismissButton)
-        assertEquals("m_get_desktop_browser_dismissed", params.pixels.dismissed?.pixelName)
-        assertEquals(mapOf("source" to "no_thanks"), params.pixels.dismissed?.parameters)
     }
 
     @Test
-    fun whenLaunchedFromSettingsListItemThenNoDismissButtonAndNoDismissPixel() {
+    fun whenLaunchedFromSettingsListItemThenNoDismissButton() {
         val params = SettingsDesktopBrowserPromotionParams.forSettingsListItem()
 
         assertFalse(params.showDismissButton)
-        assertNull(params.pixels.dismissed)
-    }
-
-    @Test
-    fun whenLaunchedFromEitherEntryPointThenShareAndLinkPixelsAreLeftToTheScreenDefaults() {
-        // The screen's default share/link-copy pixels are the wire names Settings always fired.
-        listOf(
-            SettingsDesktopBrowserPromotionParams.forCompleteSetupCard(),
-            SettingsDesktopBrowserPromotionParams.forSettingsListItem(),
-        ).forEach { params ->
-            assertNull(params.pixels.shareClicked)
-            assertNull(params.pixels.linkClicked)
-        }
-    }
-
-    @Test
-    fun whenLaunchedFromEitherEntryPointThenNoImpressionPixelIsConfigured() {
-        // The impression pixel belongs to the Settings card, which fires it before this screen opens.
-        assertNull(SettingsDesktopBrowserPromotionParams.forCompleteSetupCard().pixels.impression)
-        assertNull(SettingsDesktopBrowserPromotionParams.forSettingsListItem().pixels.impression)
     }
 
     @Test
@@ -70,12 +48,12 @@ class SettingsDesktopBrowserPromotionParamsTest {
             SettingsDesktopBrowserPromotionParams.forCompleteSetupCard(),
             SettingsDesktopBrowserPromotionParams.forSettingsListItem(),
         ).forEach { params ->
-            assertEquals("https://duckduckgo.com/browser?origin=funnel_appsettings_android", params.downloadUrl)
+            assertEquals("https://duckduckgo.com/browser?origin=funnel_appsettings_android", params.link.downloadUrl)
         }
     }
 
     @Test
-    fun whenLaunchedFromEitherEntryPointThenTheSettingsHandlerPersistsTheDismissal() {
+    fun whenLaunchedFromEitherEntryPointThenTheSettingsHandlerReceivesInteractions() {
         listOf(
             SettingsDesktopBrowserPromotionParams.forCompleteSetupCard(),
             SettingsDesktopBrowserPromotionParams.forSettingsListItem(),
@@ -91,6 +69,6 @@ class SettingsDesktopBrowserPromotionParamsTest {
         assertNull(params.toolbarTitle)
         assertNull(params.title)
         assertNull(params.body)
-        assertEquals(0, params.illustration)
+        assertNull(params.illustration)
     }
 }
