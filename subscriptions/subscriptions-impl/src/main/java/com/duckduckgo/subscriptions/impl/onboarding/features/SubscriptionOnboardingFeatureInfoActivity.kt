@@ -135,13 +135,15 @@ class SubscriptionOnboardingFeatureInfoActivity : DuckDuckGoActivity() {
     }
 
     override fun onResume() {
-        launchDownloadMessagesJob()
+        if (feature == OnboardingFeature.ITR) {
+            launchDownloadMessagesJob()
+        }
         super.onResume()
     }
 
-    override fun onDestroy() {
+    override fun onPause() {
         downloadMessagesJob.cancel()
-        super.onDestroy()
+        super.onPause()
     }
 
     private fun setupSummaryOfBenefitsLink() {
