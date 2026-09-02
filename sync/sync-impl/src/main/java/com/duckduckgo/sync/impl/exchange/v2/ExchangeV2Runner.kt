@@ -505,6 +505,15 @@ class RealExchangeV2Runner @Inject constructor(
             return
         }
 
+        if (message.protocolVersion > negotiatedVersion) {
+            logcat {
+                "Sync-ExchangeV2: dropping ${message.messageType}: " +
+                    "requires ${message.protocolVersion.prettyPrint()}, session negotiated ${negotiatedVersion.prettyPrint()}"
+            }
+            emit(ExchangeV2Event.MessageRejected(clock.nowMs(), message, sm.currentState, RejectReason.TooHighProtocolDropped))
+            return
+        }
+
         // Race guard: a Host with auto-approve enabled can finish sending its messages before
         // the Joiner's user has tapped Confirm. Stash them and replay after the SM enters Waiting.
         if (sm.currentState == ExchangeV2State.Joiner.Confirming && message.isJoinerWaitingPhase()) {

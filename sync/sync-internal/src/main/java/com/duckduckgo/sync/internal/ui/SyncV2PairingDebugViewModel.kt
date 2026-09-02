@@ -685,6 +685,7 @@ class SyncV2PairingDebugViewModel @Inject constructor(
         RejectReason.ImplicitAbort -> "ImplicitAbort"
         RejectReason.SameAccount -> "SameAccount"
         RejectReason.UnknownMessageDropped -> "UnknownMessageDropped"
+        RejectReason.TooHighProtocolDropped -> "TooHighProtocolDropped"
         RejectReason.PeerLeft -> "PeerLeft"
     }
 

@@ -67,8 +67,9 @@ sealed interface ExchangeV2Event {
     ) : ExchangeV2Event
 
     /**
-     * [message] was received but not acted on in [state]: either an unknown message type dropped to keep
-     * the session alive, or a protocol violation aborting a session already in a terminal state (an abort
+     * [message] was received but not acted on in [state]: an unknown message type dropped to keep
+     * the session alive, a known type above the session's negotiated protocol version dropped the same
+     * way, or a protocol violation aborting a session already in a terminal state (an abort
      * from an active state surfaces as a [Transition] instead). See [RejectReason].
      */
     data class MessageRejected(
@@ -126,6 +127,12 @@ enum class RejectReason {
 
     /** An unrecognized message type, ignored so a newer peer's extra messages can't kill the session. */
     UnknownMessageDropped,
+
+    /**
+     * A message requiring a newer protocol than the session negotiated; ignored, since a client
+     * genuinely capped at the negotiated version would not know the type and would drop it.
+     */
+    TooHighProtocolDropped,
 
     /** The peer sent `bye` before the exchange completed. Not a protocol violation: the peer is simply gone. */
     PeerLeft,

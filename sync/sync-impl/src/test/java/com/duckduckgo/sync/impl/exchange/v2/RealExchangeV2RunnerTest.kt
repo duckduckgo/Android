@@ -1130,6 +1130,33 @@ class RealExchangeV2RunnerTest {
         assertEquals(Bye.TYPE, notSent.messageType)
     }
 
+    @Test fun `a 2_1 message received on a v2_0 session is dropped with TooHighProtocolDropped`() = runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenLinkingCodeVersion(ExchangeProtocolVersion.V2_0)
+        val runner = newRunner()
+        runner.startScan("")
+
+        runner.deliverIncomingMessage(RecoveryCodeDone.create(RecoveryCodeDone.Reason.Success))
+
+        val rejected = runner.events.replayCache.filterIsInstance<ExchangeV2Event.MessageRejected>().single()
+        assertEquals(RejectReason.TooHighProtocolDropped, rejected.reason)
+        assertTrue(rejected.message is RecoveryCodeDone)
+        assertSame(ExchangeV2State.Negotiating, runner.currentState)
+    }
+
+    @Test fun `a bye received on a v2_0 session is dropped rather than ending the session`() = runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenLinkingCodeVersion(ExchangeProtocolVersion.V2_0)
+        val runner = newRunner()
+        runner.startScan("")
+
+        runner.deliverIncomingMessage(Bye.create(Bye.Reason.Cancelled))
+
+        val rejected = runner.events.replayCache.filterIsInstance<ExchangeV2Event.MessageRejected>().single()
+        assertEquals(RejectReason.TooHighProtocolDropped, rejected.reason)
+        assertSame(ExchangeV2State.Negotiating, runner.currentState)
+    }
+
     @Test fun `a failed send emits MessageNotSent alongside the session error`() = runTest {
         givenOurVersion(ExchangeProtocolVersion.V2_1)
         givenLinkingCodeVersion(ExchangeProtocolVersion.V2_1)
