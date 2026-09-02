@@ -503,7 +503,10 @@ class RealExchangeV2Runner @Inject constructor(
         mutex.withLock { processIncomingLocked(message) }
     }
 
-    private fun processIncomingLocked(message: ExchangeV2Message) {
+    private fun processIncomingLocked(
+        message: ExchangeV2Message,
+        isReplayedFromBuffer: Boolean = false,
+    ) {
         val sm = session ?: run {
             logcat { "Sync-ExchangeV2: deliverIncomingMessage ${message.messageType} rejected — no active session" }
             emitSessionError(
@@ -522,7 +525,10 @@ class RealExchangeV2Runner @Inject constructor(
             return
         }
 
-        emit(ExchangeV2Event.MessageReceived(clock.nowMs(), message))
+        // A replayed message already emitted MessageReceived when it first came off the wire.
+        if (!isReplayedFromBuffer) {
+            emit(ExchangeV2Event.MessageReceived(clock.nowMs(), message))
+        }
 
         // Race guard: a Host with auto-approve enabled can finish sending its messages before
         // the Joiner's user has tapped Confirm. Stash them and replay after the SM enters Waiting.
@@ -779,7 +785,7 @@ class RealExchangeV2Runner @Inject constructor(
             pendingJoinerWaitingMessages.clear()
             logcat { "Sync-ExchangeV2: replaying ${buffered.size} buffered Joiner message(s) now that user confirmed" }
             for (m in buffered) {
-                processIncomingLocked(m)
+                processIncomingLocked(m, isReplayedFromBuffer = true)
                 if (session == null) return // terminal reached, stop replay
             }
         } else {

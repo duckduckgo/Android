@@ -484,6 +484,22 @@ class RealExchangeV2RunnerTest {
         assertSame(ExchangeV2State.Joiner.Confirming, runner.currentState)
     }
 
+    @Test fun `a message buffered during Joiner_Confirming emits MessageReceived only once`() = runTest {
+        whenever(syncStore.userId).thenReturn(null)
+        val runner = newRunner()
+        runner.startScan("")
+        runner.deliverIncomingMessage(RecoveryCodeAvailable.create(userId = "host-user", name = "Host", kind = "ddg"))
+        assertSame(ExchangeV2State.Joiner.Confirming, runner.currentState)
+
+        runner.deliverIncomingMessage(RecoveryCodeResponse.create(recoveryCode = "the-code"))
+        runner.localTrigger(LocalTrigger.UserConfirmedJoiner)
+
+        val received = runner.events.replayCache
+            .filterIsInstance<ExchangeV2Event.MessageReceived>()
+            .filter { it.message is RecoveryCodeResponse }
+        assertEquals("replaying a buffered message must not log it as received again", 1, received.size)
+    }
+
     @Test fun `Presenter with account auto-elects Host when peer has no account`() = runTest {
         whenever(syncStore.userId).thenReturn("my-user")
         val runner = newRunner()
