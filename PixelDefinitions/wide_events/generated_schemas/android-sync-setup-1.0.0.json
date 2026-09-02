@@ -1,0 +1,147 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "description": "User attempts to set up Sync via 'Sync and Back Up This Device'",
+    "$comment": "{\"owners\":[\"LukasPaczos\"]}",
+    "type": "object",
+    "required": ["meta", "global", "feature", "app", "context"],
+    "additionalProperties": false,
+    "properties": {
+        "meta": {
+            "type": "object",
+            "required": ["type", "version"],
+            "additionalProperties": false,
+            "properties": { "type": { "const": "android-sync-setup" }, "version": { "const": "1.0.0" } }
+        },
+        "app": {
+            "type": "object",
+            "required": ["name", "version"],
+            "additionalProperties": false,
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "The name of the application sending the event",
+                    "enum": ["DuckDuckGo Android"]
+                },
+                "version": {
+                    "type": "string",
+                    "description": "The version of the app sending the event. Release builds are X.Y.Z; internal and nightly builds append the build number and channel suffix.",
+                    "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(\\.[0-9]+(-[a-z]+)?)?$"
+                },
+                "form_factor": { "type": "string", "description": "The form factor of the current device", "enum": ["phone", "tablet"] },
+                "dev_mode": { "type": "boolean", "description": "Whether the app is a debug build" }
+            }
+        },
+        "global": {
+            "type": "object",
+            "required": ["platform", "type", "sample_rate"],
+            "additionalProperties": false,
+            "properties": {
+                "platform": { "type": "string", "description": "The platform the app is running on", "enum": ["Android"] },
+                "type": { "type": "string", "description": "The type of software sending the event", "enum": ["app"] },
+                "sample_rate": {
+                    "type": "number",
+                    "description": "Sample rate for this event, between 0 and 1",
+                    "minimum": 0,
+                    "maximum": 1
+                },
+                "is_first_daily_occurrence": {
+                    "type": "boolean",
+                    "description": "Whether this is the first event completed with this feature name and status in the current UTC calendar day"
+                }
+            }
+        },
+        "feature": {
+            "type": "object",
+            "required": ["name", "status", "data"],
+            "additionalProperties": false,
+            "properties": {
+                "name": { "type": "string", "description": "The feature name for this event", "enum": ["sync-setup"] },
+                "status": {
+                    "type": "string",
+                    "description": "The terminal status of the flow",
+                    "enum": ["SUCCESS", "FAILURE", "CANCELLED", "UNKNOWN"]
+                },
+                "data": {
+                    "type": "object",
+                    "required": ["ext"],
+                    "additionalProperties": false,
+                    "properties": {
+                        "ext": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                                "user_auth_required": {
+                                    "type": "string",
+                                    "description": "Whether device authentication is required for this Sync setup flow",
+                                    "enum": ["true", "false"]
+                                },
+                                "ui_version": {
+                                    "type": "string",
+                                    "description": "Which sync setup UI the user is on: v2 when the simplified sync UI is enabled (useSimplifiedSync), v1 on the legacy setup screens",
+                                    "enum": ["v1", "v2"]
+                                },
+                                "account_creation_latency_ms_bucketed": {
+                                    "type": "string",
+                                    "description": "Latency of the account creation API call in milliseconds, bucketed",
+                                    "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                                },
+                                "initial_sync_latency_ms_bucketed": {
+                                    "type": "string",
+                                    "description": "Latency of the initial sync in milliseconds, bucketed",
+                                    "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                                },
+                                "failure_reason": {
+                                    "type": "string",
+                                    "description": "Reason for failure. Only present on FAILURE events.",
+                                    "enum": ["account_creation_failed", "recovery_code_generation_failed"]
+                                },
+                                "step.device_auth_not_enrolled": {
+                                    "type": "string",
+                                    "description": "Parameter present if the device was detected as not having authentication enrolled",
+                                    "enum": ["true"]
+                                },
+                                "step.user_auth": {
+                                    "type": "string",
+                                    "description": "Parameter present if the user was successfully authenticated via device auth",
+                                    "enum": ["true"]
+                                },
+                                "step.intro_screen_shown": {
+                                    "type": "string",
+                                    "description": "Parameter present if the sync intro screen was displayed",
+                                    "enum": ["true"]
+                                },
+                                "step.sync_enabled": {
+                                    "type": "string",
+                                    "description": "Parameter present if the user opted to enable sync",
+                                    "enum": ["true"]
+                                },
+                                "step.account_created": {
+                                    "type": "string",
+                                    "description": "Parameter present if the account was successfully created and initial sync completed",
+                                    "enum": ["true"]
+                                },
+                                "step.recovery_code_shown": {
+                                    "type": "string",
+                                    "description": "Parameter present if the recovery code screen was displayed",
+                                    "enum": ["true"]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "context": {
+            "type": "object",
+            "required": ["name"],
+            "additionalProperties": false,
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "Entry point the flow was started from",
+                    "enum": ["promotion_passwords", "promotion_bookmarks"]
+                }
+            }
+        }
+    }
+}
