@@ -1,0 +1,104 @@
+{
+    "android-pir-time-to-first-scan-complete": {
+        "description": "Long-lived wide event measuring the wall-clock duration from the first time the user starts the initial PIR scan (MANUAL_INITIAL) to the moment every broker has at least one completed scan job (the dashboard's 'all done' state). Spans multiple foreground service runs and scheduled worker runs since the foreground service is frequently killed and the worker resumes the work later. One-shot per install (cleared only via PIR data reset). 30-day cleanup timeout records abandoned journeys as Unknown.",
+        "owners": ["karlenDimla", "landomen"],
+        "meta": {
+            "type": "android-pir-time-to-first-scan-complete",
+            "version": "0.0"
+        },
+        "feature": {
+            "name": "pir-time-to-first-scan-complete",
+            "status": ["SUCCESS", "UNKNOWN"],
+            "data": {
+                "ext": {
+                    "profile_queries_count": {
+                        "type": "string",
+                        "description": "Number of user profile queries at the moment the flow started (first MANUAL_INITIAL run)",
+                        "pattern": "^[0-9]+$"
+                    },
+                    "broker_count": {
+                        "type": "string",
+                        "description": "Number of active brokers at the moment the flow started",
+                        "pattern": "^[0-9]+$"
+                    },
+                    "total_scan_jobs": {
+                        "type": "string",
+                        "description": "Total number of (broker x profile) scan jobs eligible for execution at the moment the flow started",
+                        "pattern": "^[0-9]+$"
+                    },
+                    "web_view_count": {
+                        "type": "string",
+                        "description": "Number of parallel WebView runners used at the start of the flow. Equals min(total_scan_jobs, MAX_DETACHED_WEBVIEW_COUNT=20). 0 when there are no eligible scan jobs.",
+                        "pattern": "^[0-9]+$"
+                    },
+                    "power_saving": {
+                        "type": "string",
+                        "description": "Whether the device was in power saving mode at the moment the flow started",
+                        "enum": ["true", "false"]
+                    },
+                    "battery_optimizations": {
+                        "type": "string",
+                        "description": "Whether battery optimizations were enabled for the app at the moment the flow started",
+                        "enum": ["true", "false"]
+                    },
+                    "vpn_connection_state": {
+                        "type": "string",
+                        "description": "Reported VPN connection state at the moment the flow started",
+                        "enum": ["connected", "disconnected"]
+                    },
+                    "notifications_permission_granted": {
+                        "type": "string",
+                        "description": "Whether the user had granted the POST_NOTIFICATIONS runtime permission at the moment the flow started",
+                        "enum": ["true", "false"]
+                    },
+                    "tracker_blocking_state": {
+                        "type": "string",
+                        "description": "Whether tracker blocking was enabled or disabled at the moment the flow started",
+                        "enum": ["enabled", "disabled"]
+                    },
+                    "total_scan_jobs_at_finish": {
+                        "type": "string",
+                        "description": "Total number of valid scan jobs at the moment the flow completed. Can differ from total_scan_jobs because the user may edit their profile or brokers may be added/removed during the multi-day journey. Only present on Success events.",
+                        "pattern": "^[0-9]+$"
+                    },
+                    "foreground_run_count": {
+                        "type": "string",
+                        "description": "Number of foreground service runs (MANUAL_INITIAL or MANUAL_EDIT_PROFILE) that contributed to the journey. Higher counts indicate the user re-opened the app multiple times to make progress. Only present on Success events.",
+                        "pattern": "^[0-9]+$"
+                    },
+                    "scheduled_run_count": {
+                        "type": "string",
+                        "description": "Number of scheduled WorkManager runs that contributed to the journey. Higher counts indicate the foreground service was killed by the system and the work was picked up by background workers. Only present on Success events.",
+                        "pattern": "^[0-9]+$"
+                    },
+                    "total_duration_ms_bucketed": {
+                        "type": "string",
+                        "description": "Total wall-clock duration from the first MANUAL_INITIAL run starting to the moment every broker had a completed scan job. Bucketed using the lower bucket boundary. Only present on Success events. A value of -1 means the device clock moved backwards during the interval, so the duration could not be measured.",
+                        "enum": [
+                            "-1",
+                            "0",
+                            "60000",
+                            "300000",
+                            "600000",
+                            "1800000",
+                            "3600000",
+                            "10800000",
+                            "21600000",
+                            "43200000",
+                            "86400000",
+                            "172800000",
+                            "259200000",
+                            "432000000",
+                            "604800000",
+                            "864000000",
+                            "1209600000"
+                        ]
+                    }
+                }
+            }
+        },
+        "context": {
+            "name": ["funnel_pir_time_to_first_scan_complete_android"]
+        }
+    }
+}
