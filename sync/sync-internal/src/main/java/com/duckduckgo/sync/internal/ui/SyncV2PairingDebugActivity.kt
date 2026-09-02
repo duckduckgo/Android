@@ -29,16 +29,19 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.DaxAlertDialog
+import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
 import com.duckduckgo.sync.impl.exchange.v2.Role
 import com.duckduckgo.sync.internal.databinding.ActivitySyncV2PairingDebugBinding
 import com.duckduckgo.sync.internal.databinding.ItemSyncV2PairingLogRowBinding
 import com.duckduckgo.sync.internal.ui.SyncV2PairingDebugViewModel.ConfirmationRequest
+import com.duckduckgo.sync.internal.ui.SyncV2PairingDebugViewModel.LogDetails
 import com.duckduckgo.sync.internal.ui.SyncV2PairingDebugViewModel.LogRow
 import com.duckduckgo.sync.internal.ui.SyncV2PairingDebugViewModel.TerminalReached
 import com.duckduckgo.sync.internal.ui.SyncV2PairingDebugViewModel.ViewState
@@ -68,6 +71,7 @@ class SyncV2PairingDebugActivity : DuckDuckGoActivity() {
     private val expandedRowIds = mutableSetOf<Long>()
     private var renderedRows: List<LogRow> = emptyList()
     private var activeConfirmationDialog: DaxAlertDialog? = null
+    private var selectedProtocolVersion: ExchangeProtocolVersion.V2? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -111,8 +115,32 @@ class SyncV2PairingDebugActivity : DuckDuckGoActivity() {
         binding.autoApproveSetting.quietlySetIsChecked(newCheckedState = true) { _, enabled ->
             viewModel.onAutoApproveToggled(enabled)
         }
+        binding.protocolVersionSetting.setOnClickListener { showProtocolVersionDialog() }
+        binding.changeProtocolVersionButton.setOnClickListener { showProtocolVersionDialog() }
 
         binding.signInOutButton.setOnClickListener { viewModel.onSignInOutClicked() }
+    }
+
+    @Suppress("DEPRECATION") // Options don't need to be localized in the debug screen
+    private fun showProtocolVersionDialog() {
+        RadioListAlertDialogBuilder(this)
+            .setTitle("Protocol version")
+            .setMessage("Force the advertised exchange protocol version. Applies to the next session.")
+            .setOptions(
+                PROTOCOL_VERSION_OPTIONS.map(viewModel::labelFor),
+                PROTOCOL_VERSION_OPTIONS.indexOf(selectedProtocolVersion) + 1,
+            )
+            .setPositiveButton(com.duckduckgo.mobile.android.R.string.dialogSave)
+            .setNegativeButton(android.R.string.cancel)
+            .addEventListener(
+                object : RadioListAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked(selectedItem: Int) {
+                        viewModel.onProtocolOverrideSelected(PROTOCOL_VERSION_OPTIONS[selectedItem - 1])
+                    }
+                },
+            )
+            .setCancelable(true)
+            .show()
     }
 
     private fun observeViewState() {
@@ -192,6 +220,7 @@ class SyncV2PairingDebugActivity : DuckDuckGoActivity() {
 
     private fun render(state: ViewState) {
         renderAccountStatus(state.accountStatus)
+        renderProtocolVersion(state)
         binding.currentStateTextView.text = state.currentStateLabel
         val code = state.linkingCode
         if (code != null) {
@@ -253,15 +282,19 @@ class SyncV2PairingDebugActivity : DuckDuckGoActivity() {
             val rowBinding = ItemSyncV2PairingLogRowBinding.inflate(layoutInflater, binding.logContainer, true)
             val timestamp = timestampFormat.format(Date(row.timestampMs))
             rowBinding.summaryTextView.text = "[$timestamp] ${row.summary}"
-            rowBinding.rawJsonTextView.text = row.rawJson
+            rowBinding.rawJsonTextView.text = row.details.value
             applyExpansion(rowBinding, row.id in expandedRowIds)
             rowBinding.summaryRow.setOnClickListener {
                 val newlyExpanded = row.id !in expandedRowIds
                 if (newlyExpanded) expandedRowIds.add(row.id) else expandedRowIds.remove(row.id)
                 applyExpansion(rowBinding, newlyExpanded)
             }
-            rowBinding.copyRawButton.setOnClickListener {
-                copyToClipboard("Raw JSON", row.rawJson)
+            when (val details = row.details) {
+                is LogDetails.Json -> {
+                    rowBinding.copyRawButton.visibility = View.VISIBLE
+                    rowBinding.copyRawButton.setOnClickListener { copyToClipboard("Raw JSON", details.value) }
+                }
+                is LogDetails.PlainText -> rowBinding.copyRawButton.visibility = View.GONE
             }
         }
     }
@@ -319,6 +352,11 @@ class SyncV2PairingDebugActivity : DuckDuckGoActivity() {
         startScanFromInput()
     }
 
+    private fun renderProtocolVersion(state: ViewState) {
+        selectedProtocolVersion = state.protocolOverride
+        binding.protocolVersionSetting.setSecondaryText(viewModel.labelFor(state.protocolOverride))
+    }
+
     private fun renderAccountStatus(status: SyncV2PairingDebugViewModel.AccountStatus) {
         binding.statusSignedIn.setSecondaryText(
             if (status.signedIn) "Yes · user_id ${status.userId ?: "(unknown)"}" else "No",
@@ -335,5 +373,11 @@ class SyncV2PairingDebugActivity : DuckDuckGoActivity() {
 
     private companion object {
         const val QR_SIZE_PX = 600
+
+        private val PROTOCOL_VERSION_OPTIONS = listOf(
+            null, // Default
+            ExchangeProtocolVersion.V2_0,
+            ExchangeProtocolVersion.V2_1,
+        )
     }
 }

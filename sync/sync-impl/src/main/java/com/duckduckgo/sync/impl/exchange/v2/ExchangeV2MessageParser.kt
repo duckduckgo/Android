@@ -17,9 +17,18 @@
 package com.duckduckgo.sync.impl.exchange.v2
 
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.Hello
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeAvailable
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeAwaitingConfirmation
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeConfirmed
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeDenied
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeRequest
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeResponse
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeUnavailable
 import com.squareup.anvil.annotations.ContributesBinding
 import org.json.JSONObject
 import javax.inject.Inject
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.Unknown as UnknownMessage
 
 interface ExchangeV2MessageParser {
     fun parse(rawJson: String): ExchangeV2Message
@@ -30,19 +39,19 @@ class JsonExchangeV2MessageParser @Inject constructor() : ExchangeV2MessageParse
 
     override fun parse(rawJson: String): ExchangeV2Message {
         val type = runCatching { JSONObject(rawJson).optString(ExchangeV2Message.FIELD_TYPE, "") }
-            .getOrElse { return ExchangeV2Message.Unknown.fromJson(rawJson, messageType = "") }
+            .getOrElse { return UnknownMessage.fromJson(rawJson, messageType = "") }
         return runCatching {
             when (type) {
-                ExchangeV2Message.Hello.TYPE -> ExchangeV2Message.Hello.fromJson(rawJson)
-                ExchangeV2Message.RecoveryCodeAvailable.TYPE -> ExchangeV2Message.RecoveryCodeAvailable.fromJson(rawJson)
-                ExchangeV2Message.RecoveryCodeRequest.TYPE -> ExchangeV2Message.RecoveryCodeRequest.fromJson(rawJson)
-                ExchangeV2Message.RecoveryCodeAwaitingConfirmation.TYPE -> ExchangeV2Message.RecoveryCodeAwaitingConfirmation.fromJson(rawJson)
-                ExchangeV2Message.RecoveryCodeConfirmed.TYPE -> ExchangeV2Message.RecoveryCodeConfirmed.fromJson(rawJson)
-                ExchangeV2Message.RecoveryCodeDenied.TYPE -> ExchangeV2Message.RecoveryCodeDenied.fromJson(rawJson)
-                ExchangeV2Message.RecoveryCodeUnavailable.TYPE -> ExchangeV2Message.RecoveryCodeUnavailable.fromJson(rawJson)
-                ExchangeV2Message.RecoveryCodeResponse.TYPE -> ExchangeV2Message.RecoveryCodeResponse.fromJson(rawJson)
-                else -> ExchangeV2Message.Unknown.fromJson(rawJson, messageType = type)
+                Hello.TYPE -> Hello.fromJson(rawJson)
+                RecoveryCodeAvailable.TYPE -> RecoveryCodeAvailable.fromJson(rawJson)
+                RecoveryCodeRequest.TYPE -> RecoveryCodeRequest.fromJson(rawJson)
+                RecoveryCodeAwaitingConfirmation.TYPE -> RecoveryCodeAwaitingConfirmation.fromJson(rawJson)
+                RecoveryCodeConfirmed.TYPE -> RecoveryCodeConfirmed.fromJson(rawJson)
+                RecoveryCodeDenied.TYPE -> RecoveryCodeDenied.fromJson(rawJson)
+                RecoveryCodeUnavailable.TYPE -> RecoveryCodeUnavailable.fromJson(rawJson)
+                RecoveryCodeResponse.TYPE -> RecoveryCodeResponse.fromJson(rawJson)
+                else -> UnknownMessage.fromJson(rawJson, messageType = type)
             }
-        }.getOrElse { ExchangeV2Message.Unknown.fromJson(rawJson, messageType = type) }
+        }.getOrElse { UnknownMessage.fromJson(rawJson, messageType = type) }
     }
 }

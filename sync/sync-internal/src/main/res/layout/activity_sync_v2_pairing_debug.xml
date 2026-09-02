@@ -46,8 +46,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
                 <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                     android:id="@+id/statusSignedIn"
@@ -89,6 +89,28 @@
                 app:secondaryText="When on, this device automatically confirms its own Host/Joiner prompt. Turn off to see the real alert dialog."
                 app:showSwitch="true" />
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                    android:id="@+id/protocolVersionSetting"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    app:primaryText="Protocol version"
+                    tools:secondaryText="Default" />
+
+                <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+                    android:id="@+id/changeProtocolVersionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/keyline_4"
+                    android:text="Change" />
+            </LinearLayout>
+
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
@@ -112,8 +134,8 @@
                 android:id="@+id/runPresentButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/keyline_4"
                 android:layout_margin="10dp"
+                android:layout_marginStart="@dimen/keyline_4"
                 android:text="Start as Presenter" />
 
             <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem

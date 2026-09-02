@@ -24,8 +24,8 @@ import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeDenied
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeRequest
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeResponse
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeUnavailable
-import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.Unknown
 import javax.inject.Inject
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.Unknown as UnknownMessage
 
 /**
  * Pure validator for the Exchange V2 wire protocol. Stateful (it tracks [currentState] and the
@@ -33,11 +33,35 @@ import javax.inject.Inject
  * input returns a [TransitionResult] that the runner forwards to the event sink and whose declared
  * [SideEffect]s the runner executes.
  *
- * Spec: Asana 1215056232572322 — Exchange V2 Message Sequence State Machine.
+ * Validates order, never content: it decides whether an input is allowed where the session
+ * currently is, and leaves what the input means to the runner. Which is why role election,
+ * provisioning and all network work live there instead.
+ *
+ * Every input is answered with a transition, so there is no way to ask "may I" without also moving.
+ * An input the current state doesn't allow is a protocol violation and aborts the session, with the
+ * single exception of an unrecognized message type, which is dropped so a newer peer can't kill the
+ * session by talking about things we don't model.
+ *
+ * Not thread-safe: one instance belongs to one session, and the runner serializes access to it.
+ *
+ * Spec: Asana 1215056232572322, Exchange V2 Message Sequence State Machine.
  */
 interface ExchangeV2StateMachine {
+
+    /** Where the session is now. Moves on every [receive] and [localTrigger], including aborts. */
     val currentState: ExchangeV2State
+
+    /**
+     * Feed in a message received from the peer. Accepts it, drops it, or aborts the session, per
+     * [TransitionResult.outcome].
+     */
     fun receive(msg: ExchangeV2Message): TransitionResult
+
+    /**
+     * Feed in something that didn't come off the wire: a user decision, role election, or the
+     * completion of work the runner was doing. Aborts the session if the current state does not
+     * allow the trigger.
+     */
     fun localTrigger(trigger: LocalTrigger): TransitionResult
 }
 
@@ -76,7 +100,10 @@ internal class RealExchangeV2StateMachine(
         private set
 
     override fun receive(msg: ExchangeV2Message): TransitionResult {
-        if (msg is Unknown) return drop(msg)
+        // Forward-compat rule, applied once for every state: a type this client doesn't model is
+        // dropped, never treated as a protocol error. Handlers below therefore only decide between
+        // "expected here" and the implicit abort.
+        if (msg is UnknownMessage) return drop(msg)
         return when (val state = currentState) {
             ExchangeV2State.Bootstrapped -> receiveInBootstrapped(state, msg)
             ExchangeV2State.Negotiating -> receiveInNegotiating(state, msg)
@@ -130,11 +157,11 @@ internal class RealExchangeV2StateMachine(
             is RecoveryCodeUnavailable,
             is RecoveryCodeResponse,
             -> abort(state, msg, RejectReason.ImplicitAbort)
-            is Unknown -> drop(msg)
+            is UnknownMessage -> drop(msg)
         }
     }
 
-    // If the peer aborts while we're still showing the confirm prompt, act on it now instead of
+    // If the peer aborts while we're still showing the confirmation prompt, act on it now instead of
     // making the user confirm a doomed pairing.
     private fun receiveInJoinerConfirming(state: ExchangeV2State, msg: ExchangeV2Message): TransitionResult {
         return when (msg) {
@@ -155,7 +182,7 @@ internal class RealExchangeV2StateMachine(
             is RecoveryCodeAvailable,
             is RecoveryCodeRequest,
             -> abort(state, msg, RejectReason.ImplicitAbort)
-            is Unknown -> drop(msg)
+            is UnknownMessage -> drop(msg)
         }
     }
 
@@ -245,9 +272,9 @@ internal class RealExchangeV2StateMachine(
     }
 
     /**
-     * Reject [msg] and abort. By default we drive to [from]'s terminal state (see [abortTerminal]):
-     *  - If [from] is still active, that's a real transition into the terminal → emit [Transition].
-     *  - If [from] is already terminal, [abortTerminal] returns itself, so we stay put → emit [MessageRejected].
+     * Reject [msg] and abort. By default, we drive to [from]'s terminal state (see [abortTerminal]):
+     *  - If [from] is still active, that's a real transition into the terminal → emit [ExchangeV2Event.Transition].
+     *  - If [from] is already terminal, [abortTerminal] returns itself, so we stay put → emit [ExchangeV2Event.MessageRejected].
      *
      * Callers can override [newState] to abort somewhere other than the default terminal.
      */
