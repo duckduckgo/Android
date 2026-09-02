@@ -36,18 +36,19 @@ import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Event
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Runner
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State
-import com.duckduckgo.sync.impl.exchange.v2.LocalTrigger
-import com.duckduckgo.sync.impl.exchange.v2.PairingRole
 import com.duckduckgo.sync.impl.exchange.v2.Role
 import com.duckduckgo.sync.internal.exchange.SyncInternalAdvertisedExchangeV2Version
 import com.duckduckgo.sync.store.SyncStore
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import logcat.logcat
@@ -66,11 +67,6 @@ class SyncV2PairingDebugViewModel @Inject constructor(
     @AppCoroutineScope private val appScope: CoroutineScope,
 ) : ViewModel() {
 
-    /**
-     * Snapshot of the device's sync setup that's relevant to v2 pairing. Read from
-     * [SyncStore] at the points where it could have changed (init + after Cancel /
-     * terminal). Not reactive — this is a dev tool, the user can tap Cancel to refresh.
-     */
     data class AccountStatus(
         val signedIn: Boolean,
         val userId: String?,
@@ -89,19 +85,11 @@ class SyncV2PairingDebugViewModel @Inject constructor(
         val visibleRows: List<LogRow> get() = rows.filter { it.eventType.category in activeCategories }
     }
 
-    /**
-     * One-shot prompt to show the user. The Activity renders this as an [AlertDialog] and
-     * dispatches the result back via [onConfirmationApproved] / [onConfirmationDenied].
-     */
     data class ConfirmationRequest(
         val role: Role,
         val peerName: String?,
     )
 
-    /**
-     * Emitted once when the session reaches a terminal state. The Activity shows a result
-     * alert summarising what happened.
-     */
     data class TerminalReached(
         val state: ExchangeV2State,
         val title: String,
@@ -111,21 +99,6 @@ class SyncV2PairingDebugViewModel @Inject constructor(
 
     private val viewState = MutableStateFlow(ViewState())
     fun viewState(): Flow<ViewState> = viewState.asStateFlow()
-
-    /**
-     * Tear down any in-flight session when the Activity is finishing. ActivityScope VMs
-     * survive config changes but [onCleared] runs on real finish (back press, navigation away),
-     * which is when we want to dispose of a pairing session that the user has abandoned.
-     */
-    override fun onCleared() {
-        super.onCleared()
-        // cancel() suspends until teardown completes; onCleared can't await and viewModelScope is
-        // already cancelling, so fire-and-forget the teardown on the app scope (it outlives the VM).
-        appScope.launch {
-            runner.cancel()
-            internalAdvertisedVersion.overrideFlow.value = null
-        }
-    }
 
     private val confirmationRequests = Channel<ConfirmationRequest>(Channel.BUFFERED)
     fun confirmations(): Flow<ConfirmationRequest> = confirmationRequests.receiveAsFlow()
@@ -138,44 +111,59 @@ class SyncV2PairingDebugViewModel @Inject constructor(
 
     private val nextRowId = AtomicLong(0L)
 
+    private var presentSessionJob: Job? = null
+    private var scanSessionJob: Job? = null
+
+    private fun sessionJobs(): List<Job> = listOfNotNull(presentSessionJob, scanSessionJob)
+
     init {
-        viewState.update { it.copy(accountStatus = readAccountStatus()) }
+        viewState.update { current ->
+            current.copy(accountStatus = readAccountStatus())
+        }
+
         viewModelScope.launch(dispatchers.io()) {
-            // Snapshot how many events the runner's SharedFlow will replay to us. Those events
-            // populate the log row history, but we skip side effects (terminal alerts,
-            // confirmation dialogs) for them — otherwise re-entering this Activity after a
-            // completed pairing would re-pop the "Pairing complete" dialog from a stale event.
-            val replayCount = runner.events.replayCache.size
-            var processed = 0
             runner.events.collect { event ->
-                appendEvent(event, isReplay = processed < replayCount)
-                processed++
+                val row = LogRow.from(event, id = nextRowId.getAndIncrement())
+                viewState.update { current ->
+                    current.copy(
+                        rows = current.rows + row,
+                        currentStateLabel = buildStateLabel(),
+                        // Refresh on every event so runner-driven account changes (e.g. on-demand
+                        // account creation at Host.Sending per spec §"Exchange Share Recovery Code")
+                        // surface immediately, not on next manual refresh.
+                        accountStatus = readAccountStatus(),
+                    )
+                }
             }
         }
-        viewModelScope.launch {
+
+        viewModelScope.launch(dispatchers.io()) {
             internalAdvertisedVersion.overrideFlow.collect { version ->
-                viewState.update { it.copy(protocolOverride = version) }
+                viewState.update { current ->
+                    current.copy(protocolOverride = version)
+                }
             }
         }
     }
 
-    /**
-     * Delegate routing to [SyncCodeDispatcher] — the single source of truth for v1/v2 dispatch
-     * that the production VMs now share. The dispatcher's contract: FF off → byte-identical to
-     * direct [SyncAccountRepository.parseSyncAuthCode]; FF on → v2 shapes are taken into
-     * ownership and surfaced via a one-shot [DispatchOutcome] Flow.
-     *
-     * The VM still owns the v1 [SyncAuthCode.Exchange] two-stage polling locally (in
-     * [dispatchV1Exchange]) — the dispatcher only handles the routing decision, not the
-     * downstream v1 protocol details (preserved byte-for-byte from production).
-     */
+    override fun onCleared() {
+        super.onCleared()
+        appScope.launch {
+            sessionJobs().forEach { it.cancel() }
+            internalAdvertisedVersion.overrideFlow.value = null
+        }
+    }
+
     fun onRunScanClicked(pastedUrl: String) {
-        viewModelScope.launch(dispatchers.io()) {
+        val previousSessions = sessionJobs()
+        scanSessionJob = viewModelScope.launch(dispatchers.io()) {
+            previousSessions.forEach { it.cancelAndJoin() }
             appendDevToolLog("Routing pasted code via SyncCodeDispatcher")
             when (val decision = dispatcher.route(pastedUrl)) {
                 is RouteDecision.Legacy -> handleLegacyAuthCode(decision.authCode)
                 is RouteDecision.V2InProgress -> {
                     appendDevToolLog("Dispatcher took v2 ownership — observing outcomes")
+                    launchSessionSideEffects(System.currentTimeMillis())
                     decision.outcomes.collect { outcome -> handleV2Outcome(outcome) }
                     refreshState()
                 }
@@ -183,30 +171,159 @@ class SyncV2PairingDebugViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Mirrors production v1 handling exactly: Recovery / Connect → [SyncAccountRepository.processCode];
-     * Exchange → two-stage post-then-poll loop; Unknown → user-facing error. Identical control
-     * flow to [com.duckduckgo.sync.impl.ui.EnterCodeViewModel.authFlow] but logging into the
-     * dev-tool log row stream instead of UI commands.
-     */
-    private suspend fun handleLegacyAuthCode(authCode: SyncAuthCode) {
-        appendDevToolLog("Legacy v1 auth code: ${authCode::class.simpleName}")
-        when (authCode) {
-            is SyncAuthCode.Recovery -> emitProcessCodeResult("v1 recovery", syncAccountRepository.processCode(authCode))
-            is SyncAuthCode.Connect -> emitProcessCodeResult("v1 connect", syncAccountRepository.processCode(authCode))
-            is SyncAuthCode.Exchange -> dispatchV1Exchange(authCode)
-            is SyncAuthCode.Unknown -> {
-                appendDevToolLog("Couldn't read the pasted code as v1 or v2")
-                toasts.send("Couldn't read the pasted code (no v1 or v2 shape matched)")
+    fun canStartAsPresenter(): Boolean = runner.canStartAsPresenter
+
+    fun onRunPresentClicked() {
+        val previousSessions = sessionJobs()
+        presentSessionJob = viewModelScope.launch(dispatchers.io()) {
+            previousSessions.forEach { it.cancelAndJoin() }
+            launchSessionSideEffects(System.currentTimeMillis())
+            appendDevToolLog("Starting Presenter session via SyncCodeDispatcher")
+            try {
+                dispatcher.presentV2().collect { outcome -> handleV2Outcome(outcome) }
+                refreshState()
+            } finally {
+                // The linking code is only valid while this session is alive; clear it on any
+                // exit — terminal outcome, Cancel/sign-out cancellation, or being replaced by
+                // a newer session (whose cancelAndJoin runs this before it starts).
+                viewState.update { it.copy(linkingCode = null) }
             }
         }
-        refreshState()
     }
 
-    /**
-     * Translate one [DispatchOutcome] emitted by the v2 dispatcher into the dev tool's log +
-     * toast surface. Production VMs map these to their own command/error-dialog channels.
-     */
+    fun onCancelClicked() {
+        viewModelScope.launch(dispatchers.io()) {
+            sessionJobs().forEach { it.cancelAndJoin() }
+            refreshState()
+        }
+    }
+
+    fun onSignInOutClicked() {
+        viewModelScope.launch(dispatchers.io()) {
+            val signedIn = syncStore.userId != null
+            val result = if (signedIn) {
+                sessionJobs().forEach { it.cancelAndJoin() }
+                val deviceId = syncStore.deviceId.orEmpty()
+                syncAccountRepository.logout(deviceId)
+            } else {
+                syncAccountRepository.createAccount()
+            }
+            val action = if (signedIn) "Sign out" else "Create account"
+            when (result) {
+                is Result.Success -> toasts.send("$action: OK")
+                is Result.Error -> toasts.send("$action failed: ${result.reason}")
+            }
+            refreshState()
+        }
+    }
+
+    fun onConfirmationApproved(role: Role) {
+        when (role) {
+            Role.Host -> dispatcher.confirmHost()
+            Role.Joiner -> dispatcher.confirmJoiner()
+        }
+    }
+
+    fun onConfirmationDenied(role: Role) {
+        when (role) {
+            Role.Host -> dispatcher.denyHost()
+            Role.Joiner -> dispatcher.denyJoiner()
+        }
+    }
+
+    fun onAutoApproveToggled(checked: Boolean) {
+        viewState.update { it.copy(autoApproveConfirmation = checked) }
+    }
+
+    fun onProtocolOverrideSelected(version: ExchangeProtocolVersion.V2?) {
+        internalAdvertisedVersion.overrideFlow.value = version
+        appendDevToolLog("Protocol version override → ${labelFor(version)}")
+    }
+
+    fun labelFor(version: ExchangeProtocolVersion.V2?): String = when (version) {
+        null -> "Default (${internalAdvertisedVersion.defaultVersion().prettyPrint()})"
+        else -> version.prettyPrint()
+    }
+
+    fun onClearLogClicked() {
+        viewState.update { it.copy(rows = emptyList()) }
+    }
+
+    fun onLogFilterChanged(activeCategories: Set<LogRow.Category>) {
+        viewState.update { it.copy(activeCategories = activeCategories) }
+    }
+
+    private fun CoroutineScope.launchSessionSideEffects(sessionStartMs: Long): Job = launch {
+        var sessionStarted = false
+        runner.eventsSince(sessionStartMs)
+            .transformWhile { event ->
+                if (event is ExchangeV2Event.SessionStarted) sessionStarted = true
+                emit(event)
+                !(sessionStarted && event is ExchangeV2Event.SessionEnded)
+            }
+            .collect { event ->
+                maybeHandleConfirmingTransition(event)
+                maybeEmitTerminalAlert(event)
+                maybeToastSessionError(event)
+            }
+    }
+
+    private fun maybeHandleConfirmingTransition(event: ExchangeV2Event) {
+        if (event !is ExchangeV2Event.Transition) return
+        val role = when (event.to) {
+            ExchangeV2State.Host.Confirming -> Role.Host
+            ExchangeV2State.Joiner.Confirming -> Role.Joiner
+            else -> return
+        }
+        if (viewState.value.autoApproveConfirmation) {
+            onConfirmationApproved(role)
+        } else {
+            viewModelScope.launch {
+                confirmationRequests.send(ConfirmationRequest(role = role, peerName = runner.peerName))
+            }
+        }
+    }
+
+    private fun maybeEmitTerminalAlert(event: ExchangeV2Event) {
+        if (event !is ExchangeV2Event.Transition) return
+        val terminal = describeTerminal(event) ?: return
+        viewModelScope.launch { terminalReached.send(terminal) }
+    }
+
+    private fun describeTerminal(event: ExchangeV2Event.Transition): TerminalReached? {
+        val (title, isSuccess) = when (event.to) {
+            ExchangeV2State.Host.Done -> if (event.isPeerFailure()) {
+                "✗ Join failed on the peer" to false
+            } else {
+                "✓ Pairing complete (Host)" to true
+            }
+            ExchangeV2State.Joiner.Done -> "✓ Pairing complete (Joiner)" to true
+            ExchangeV2State.Joiner.JoinFailed -> "✗ Join failed (Joiner)" to false
+            ExchangeV2State.Host.Aborted -> "✗ Pairing aborted (Host)" to false
+            ExchangeV2State.Joiner.AbortedLocal -> "✗ Pairing aborted (Joiner)" to false
+            ExchangeV2State.Joiner.AbortedByHost -> "✗ Pairing aborted by peer" to false
+            ExchangeV2State.SameAccountAbort -> "✗ Same-account abort" to false
+            ExchangeV2State.Aborted -> "✗ Negotiation aborted" to false
+            else -> return null
+        }
+        return TerminalReached(
+            state = event.to,
+            title = title,
+            message = "Check the event log for details.",
+            isSuccess = isSuccess,
+        )
+    }
+
+    private fun ExchangeV2Event.Transition.isPeerFailure(): Boolean {
+        val reason = (trigger as? ExchangeV2Message.RecoveryCodeDone)?.reason ?: return false
+        return reason != ExchangeV2Message.RecoveryCodeDone.Reason.Success
+    }
+
+    private fun maybeToastSessionError(event: ExchangeV2Event) {
+        if (event !is ExchangeV2Event.SessionError) return
+        viewModelScope.launch { toasts.send(event.message) }
+    }
+
     private suspend fun handleV2Outcome(outcome: DispatchOutcome) {
         when (outcome) {
             is DispatchOutcome.LoggedIn -> {
@@ -234,25 +351,26 @@ class SyncV2PairingDebugViewModel @Inject constructor(
                 appendDevToolLog("v2 dispatch → ${outcome::class.simpleName} (handled by dev tool's direct observation)")
             }
             is DispatchOutcome.LinkingCodeReady -> {
-                // No-op: the dev tool drives Presenter sessions directly via runner.startPresent()
-                // (onRunPresentClicked), not through dispatcher.presentV2(). This branch only exists
-                // to keep the when block exhaustive.
-                appendDevToolLog("v2 dispatch → LinkingCodeReady (handled by dev tool's direct observation)")
+                appendDevToolLog("v2 dispatch → LinkingCodeReady")
+                viewState.update { it.copy(linkingCode = outcome.linkingCode) }
             }
         }
     }
 
-    /**
-     * v1 Exchange is a two-stage scanner flow:
-     *   1. [SyncAccountRepository.processCode] (→ `onInvitationCodeReceived`) posts our
-     *      encrypted device details to the presenter's relay slot.
-     *   2. Poll [SyncAccountRepository.pollForRecoveryCodeAndLogin] until the presenter
-     *      replies with the encrypted recovery code, which the repo then uses to log us in.
-     *
-     * Mirrors [SyncLoginViewModel.pollForRecoveryKey] / [SyncWithAnotherActivityViewModel]
-     * — same polling cadence, same result handling. Without step 2 the device finishes step
-     * 1 with "OK" but never actually logs in (the original bug).
-     */
+    private suspend fun handleLegacyAuthCode(authCode: SyncAuthCode) {
+        appendDevToolLog("Legacy v1 auth code: ${authCode::class.simpleName}")
+        when (authCode) {
+            is SyncAuthCode.Recovery -> emitProcessCodeResult("v1 recovery", syncAccountRepository.processCode(authCode))
+            is SyncAuthCode.Connect -> emitProcessCodeResult("v1 connect", syncAccountRepository.processCode(authCode))
+            is SyncAuthCode.Exchange -> dispatchV1Exchange(authCode)
+            is SyncAuthCode.Unknown -> {
+                appendDevToolLog("Couldn't read the pasted code as v1 or v2")
+                toasts.send("Couldn't read the pasted code (no v1 or v2 shape matched)")
+            }
+        }
+        refreshState()
+    }
+
     private suspend fun dispatchV1Exchange(code: SyncAuthCode.Exchange) {
         when (val postResult = syncAccountRepository.processCode(code)) {
             is Result.Error -> {
@@ -305,12 +423,6 @@ class SyncV2PairingDebugViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Push a dev-tool row into the event log so v1-fallback progress is visible alongside
-     * native v2 [ExchangeV2Event]s, with the message as both name and details.
-     * Also tees to logcat with a `Sync-V2Debug:` prefix so the fallback path is traceable
-     * end-to-end (the in-screen log alone misses the eyes of anyone watching logcat).
-     */
     private fun appendDevToolLog(message: String) {
         logcat { "Sync-V2Debug: $message" }
         val row = LogRow.devTool(
@@ -322,228 +434,10 @@ class SyncV2PairingDebugViewModel @Inject constructor(
         }
     }
 
-    fun onRunPresentClicked() {
-        viewModelScope.launch(dispatchers.io()) {
-            runner.startPresent()
-            refreshState()
-        }
-    }
-
-    /** True when this device has a sync account whose recovery code we could share with a Joiner. */
-    fun canStartAsPresenter(): Boolean = runner.canStartAsPresenter
-
-    /**
-     * Toggle account state: create a fresh sync account if signed out, or log out (and tear
-     * down the current session) if signed in. Status row refreshes either way.
-     */
-    fun onSignInOutClicked() {
-        viewModelScope.launch(dispatchers.io()) {
-            val signedIn = syncStore.userId != null
-            val result = if (signedIn) {
-                // If a pairing session was running on this device's old credentials, kill it
-                // before logout invalidates the recovery code under us.
-                runner.cancel()
-                val deviceId = syncStore.deviceId.orEmpty()
-                syncAccountRepository.logout(deviceId)
-            } else {
-                syncAccountRepository.createAccount()
-            }
-            val action = if (signedIn) "Sign out" else "Create account"
-            when (result) {
-                is Result.Success -> toasts.send("$action: OK")
-                is Result.Error -> toasts.send("$action failed: ${result.reason}")
-            }
-            refreshState()
-        }
-    }
-
-    fun onCancelClicked() {
-        viewModelScope.launch(dispatchers.io()) {
-            runner.cancel()
-            refreshState()
-        }
-    }
-
-    fun onClearLogClicked() {
-        viewState.update { it.copy(rows = emptyList()) }
-    }
-
-    fun onLogFilterChanged(activeCategories: Set<LogRow.Category>) {
-        viewState.update { it.copy(activeCategories = activeCategories) }
-    }
-
-    fun onAutoApproveToggled(checked: Boolean) {
-        viewState.update { it.copy(autoApproveConfirmation = checked) }
-    }
-
-    fun onProtocolOverrideSelected(version: ExchangeProtocolVersion.V2?) {
-        internalAdvertisedVersion.overrideFlow.value = version
-        appendDevToolLog("Protocol version override → ${labelFor(version)}")
-    }
-
-    fun labelFor(version: ExchangeProtocolVersion.V2?): String = when (version) {
-        null -> "Default (${internalAdvertisedVersion.defaultVersion().prettyPrint()})"
-        else -> version.prettyPrint()
-    }
-
-    fun onConfirmationApproved(role: Role) {
-        fireLocalTrigger(if (role == Role.Host) LocalTrigger.UserConfirmedHost else LocalTrigger.UserConfirmedJoiner)
-    }
-
-    fun onConfirmationDenied(role: Role) {
-        fireLocalTrigger(if (role == Role.Host) LocalTrigger.UserDeniedHost else LocalTrigger.UserDeniedJoiner)
-    }
-
-    private fun fireLocalTrigger(trigger: LocalTrigger) {
-        viewModelScope.launch(dispatchers.io()) {
-            runner.localTrigger(trigger)
-            refreshState()
-        }
-    }
-
-    private fun appendEvent(event: ExchangeV2Event, isReplay: Boolean = false) {
-        val row = LogRow.from(event, id = nextRowId.getAndIncrement())
-        viewState.update { current ->
-            current.copy(
-                rows = current.rows + row,
-                currentStateLabel = buildStateLabel(),
-                linkingCode = runner.linkingCode,
-                // Refresh on every event so runner-driven account changes (e.g. on-demand
-                // account creation at Host.Sending per spec §"Exchange Share Recovery Code")
-                // surface immediately, not on next manual refresh.
-                accountStatus = readAccountStatus(),
-            )
-        }
-        if (!isReplay) {
-            maybeHandleConfirmingTransition(event)
-            maybeEmitTerminalAlert(event)
-            maybeToastSessionError(event)
-            maybeLoginAfterJoinerJoining(event)
-        }
-    }
-
-    /**
-     * When the runner reaches [ExchangeV2State.Joiner.Joining] from a session that was started
-     * via [onRunPresentClicked] (i.e. not routed through [SyncCodeDispatcher]), the dispatcher's
-     * own login Flow never runs and nothing else drives a login from the received recovery code.
-     * This handler closes that gap. Scoped to Presenter sessions so a Scanner session, which does
-     * go through the dispatcher, isn't logged in twice and doesn't report two conflicting outcomes.
-     *
-     * Reports the result back to the peer, which is what moves the session off Joining and on to a
-     * Joiner terminal. A missing or blank recovery code reports login_failed rather than leaving
-     * the session parked in Joining until the deadline, matching the production dispatcher.
-     */
-    private fun maybeLoginAfterJoinerJoining(event: ExchangeV2Event) {
-        if (event !is ExchangeV2Event.Transition) return
-        if (event.to != ExchangeV2State.Joiner.Joining) return
-        if (runner.pairingRole != PairingRole.Presenter) return
-        val received = (event.trigger as? ExchangeV2Message.RecoveryCodeResponse)?.recoveryCode
-        viewModelScope.launch(dispatchers.io()) {
-            val loggedIn = if (received.isNullOrBlank()) {
-                appendDevToolLog("Joiner.Joining: no recovery code in the response, reporting login_failed")
-                false
-            } else {
-                loginWithReceivedRecoveryCode(received)
-            }
-            val reason = if (loggedIn) {
-                ExchangeV2Message.RecoveryCodeDone.Reason.Success
-            } else {
-                ExchangeV2Message.RecoveryCodeDone.Reason.LoginFailed
-            }
-            runner.localTrigger(LocalTrigger.JoinerJoinComplete(reason)).join()
-            refreshState()
-        }
-    }
-
-    private suspend fun loginWithReceivedRecoveryCode(received: String): Boolean {
-        appendDevToolLog("Joiner.Joining: driving login from received recovery code")
-        return when (val decision = dispatcher.route(received)) {
-            is RouteDecision.V2InProgress -> {
-                var success = false
-                decision.outcomes.collect { outcome ->
-                    handleV2Outcome(outcome)
-                    if (outcome is DispatchOutcome.LoggedIn || outcome is DispatchOutcome.AlreadyConnected) success = true
-                }
-                success
-            }
-            is RouteDecision.Legacy -> when (decision.authCode) {
-                is SyncAuthCode.Recovery -> {
-                    val result = syncAccountRepository.processCode(decision.authCode)
-                    emitProcessCodeResult("Joiner.Joining login", result)
-                    result is Result.Success
-                }
-                else -> {
-                    appendDevToolLog("Joiner.Joining: received code wasn't a Recovery shape, can't auto-login")
-                    toasts.send("Joiner.Joining: unexpected code shape, manual login required")
-                    false
-                }
-            }
-        }
-    }
-
-    /** Surface transport-level errors (failed sends, version mismatches) so they don't just bury in the log. */
-    private fun maybeToastSessionError(event: ExchangeV2Event) {
-        if (event !is ExchangeV2Event.SessionError) return
-        viewModelScope.launch { toasts.send(event.message) }
-    }
-
-    private fun maybeEmitTerminalAlert(event: ExchangeV2Event) {
-        if (event !is ExchangeV2Event.Transition) return
-        val terminal = describeTerminal(event) ?: return
-        viewModelScope.launch { terminalReached.send(terminal) }
-    }
-
-    private fun describeTerminal(event: ExchangeV2Event.Transition): TerminalReached? {
-        val (title, isSuccess) = when (event.to) {
-            ExchangeV2State.Host.Done -> if (event.isPeerFailure()) {
-                "✗ Join failed on the peer" to false
-            } else {
-                "✓ Pairing complete (Host)" to true
-            }
-            ExchangeV2State.Joiner.Done -> "✓ Pairing complete (Joiner)" to true
-            ExchangeV2State.Joiner.JoinFailed -> "✗ Join failed (Joiner)" to false
-            ExchangeV2State.Host.Aborted -> "✗ Pairing aborted (Host)" to false
-            ExchangeV2State.Joiner.AbortedLocal -> "✗ Pairing aborted (Joiner)" to false
-            ExchangeV2State.Joiner.AbortedByHost -> "✗ Pairing aborted by peer" to false
-            ExchangeV2State.SameAccountAbort -> "✗ Same-account abort" to false
-            ExchangeV2State.Aborted -> "✗ Negotiation aborted" to false
-            else -> return null
-        }
-        return TerminalReached(
-            state = event.to,
-            title = title,
-            message = "Check the event log for details.",
-            isSuccess = isSuccess,
-        )
-    }
-
-    private fun ExchangeV2Event.Transition.isPeerFailure(): Boolean {
-        val reason = (trigger as? ExchangeV2Message.RecoveryCodeDone)?.reason ?: return false
-        return reason != ExchangeV2Message.RecoveryCodeDone.Reason.Success
-    }
-
-    private fun maybeHandleConfirmingTransition(event: ExchangeV2Event) {
-        if (event !is ExchangeV2Event.Transition) return
-        val role = when (event.to) {
-            ExchangeV2State.Host.Confirming -> Role.Host
-            ExchangeV2State.Joiner.Confirming -> Role.Joiner
-            else -> return
-        }
-        if (viewState.value.autoApproveConfirmation) {
-            val trigger = if (role == Role.Host) LocalTrigger.UserConfirmedHost else LocalTrigger.UserConfirmedJoiner
-            viewModelScope.launch(dispatchers.io()) { runner.localTrigger(trigger) }
-        } else {
-            viewModelScope.launch {
-                confirmationRequests.send(ConfirmationRequest(role = role, peerName = runner.peerName))
-            }
-        }
-    }
-
     private fun refreshState() {
         viewState.update {
             it.copy(
                 currentStateLabel = buildStateLabel(),
-                linkingCode = runner.linkingCode,
                 accountStatus = readAccountStatus(),
             )
         }
