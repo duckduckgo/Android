@@ -40,16 +40,20 @@ class WebViewCompatPasskeyUsedContentScopeJsMessageHandler @Inject constructor(
         override fun process(jsMessage: JsMessage): ProcessResult? {
             // TEMP diagnostic: proves the WebMessageListener transport routed to this handler.
             android.util.Log.i("PasskeyUsedDbg", "webviewcompat handler process() reached: ${jsMessage.featureName}/${jsMessage.method}")
-            logger.log(jsMessage.params)
+            when (jsMessage.method) {
+                METHOD_PASSKEY_USED -> logger.logUsed(jsMessage.params)
+                METHOD_PASSKEY_FAILED -> logger.logFailed(jsMessage.params)
+            }
             return null
         }
 
         override val featureName: String = FEATURE_NAME
-        override val methods: List<String> = listOf(METHOD_PASSKEY_USED)
+        override val methods: List<String> = listOf(METHOD_PASSKEY_USED, METHOD_PASSKEY_FAILED)
     }
 
     private companion object {
         const val FEATURE_NAME = "webCompat"
         const val METHOD_PASSKEY_USED = "passkeyUsed"
+        const val METHOD_PASSKEY_FAILED = "passkeyFailed"
     }
 }

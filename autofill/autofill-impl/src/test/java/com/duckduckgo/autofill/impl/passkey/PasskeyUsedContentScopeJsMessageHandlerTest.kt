@@ -36,51 +36,77 @@ class PasskeyUsedContentScopeJsMessageHandlerTest {
     private val jsMessaging: JsMessaging = mock()
 
     @Test
-    fun whenClassicHandlerThenRegistersWebCompatPasskeyUsedForAllDomains() {
+    fun whenClassicHandlerThenRegistersWebCompatPasskeyMessagesForAllDomains() {
         val handler = PasskeyUsedContentScopeJsMessageHandler(logger).getJsMessageHandler()
 
         assertEquals("webCompat", handler.featureName)
-        assertEquals(listOf("passkeyUsed"), handler.methods)
+        assertEquals(listOf("passkeyUsed", "passkeyFailed"), handler.methods)
         assertTrue(handler.allowedDomains.isEmpty())
     }
 
     @Test
-    fun whenClassicHandlerReceivesNotificationWithoutIdThenParamsAreLogged() {
+    fun whenClassicHandlerReceivesPasskeyUsedThenLogUsedIsCalled() {
         val handler = PasskeyUsedContentScopeJsMessageHandler(logger).getJsMessageHandler()
-        val params = params()
+        val params = usedParams()
 
-        handler.process(message(params), jsMessaging, null)
+        handler.process(message("passkeyUsed", params), jsMessaging, null)
 
-        verify(logger).log(params)
+        verify(logger).logUsed(params)
     }
 
     @Test
-    fun whenWebViewCompatHandlerThenRegistersWebCompatPasskeyUsed() {
+    fun whenClassicHandlerReceivesPasskeyFailedThenLogFailedIsCalled() {
+        val handler = PasskeyUsedContentScopeJsMessageHandler(logger).getJsMessageHandler()
+        val params = failedParams()
+
+        handler.process(message("passkeyFailed", params), jsMessaging, null)
+
+        verify(logger).logFailed(params)
+    }
+
+    @Test
+    fun whenWebViewCompatHandlerThenRegistersWebCompatPasskeyMessages() {
         val handler = WebViewCompatPasskeyUsedContentScopeJsMessageHandler(logger).getJsMessageHandler()
 
         assertEquals("webCompat", handler.featureName)
-        assertEquals(listOf("passkeyUsed"), handler.methods)
+        assertEquals(listOf("passkeyUsed", "passkeyFailed"), handler.methods)
     }
 
     @Test
-    fun whenWebViewCompatHandlerReceivesNotificationThenParamsAreLoggedAndMessageConsumed() {
+    fun whenWebViewCompatHandlerReceivesPasskeyUsedThenLogUsedIsCalledAndMessageConsumed() {
         val handler = WebViewCompatPasskeyUsedContentScopeJsMessageHandler(logger).getJsMessageHandler()
-        val params = params()
+        val params = usedParams()
 
-        val result = handler.process(message(params))
+        val result = handler.process(message("passkeyUsed", params))
 
         assertNull(result)
-        verify(logger).log(params)
+        verify(logger).logUsed(params)
     }
 
-    private fun params(): JSONObject = JSONObject()
-        .put("type", "get")
-        .put("success", true)
+    @Test
+    fun whenWebViewCompatHandlerReceivesPasskeyFailedThenLogFailedIsCalledAndMessageConsumed() {
+        val handler = WebViewCompatPasskeyUsedContentScopeJsMessageHandler(logger).getJsMessageHandler()
+        val params = failedParams()
 
-    private fun message(params: JSONObject) = JsMessage(
+        val result = handler.process(message("passkeyFailed", params))
+
+        assertNull(result)
+        verify(logger).logFailed(params)
+    }
+
+    private fun usedParams(): JSONObject = JSONObject().put("type", "get")
+
+    private fun failedParams(): JSONObject = JSONObject()
+        .put("type", "get")
+        .put("error", "NotAllowedError")
+
+    private fun message(
+        method: String,
+        params: JSONObject,
+    ) = JsMessage(
         context = "contentScopeScripts",
         featureName = "webCompat",
-        method = "passkeyUsed",
+        method = method,
         params = params,
         id = null,
     )

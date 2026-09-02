@@ -24,48 +24,42 @@ import org.json.JSONObject
 import javax.inject.Inject
 
 /**
- * Parses the `webCompat` / `passkeyUsed` notification sent by content-scope-scripts when a
- * WebAuthn ceremony completes, and logs the outcome.
+ * Logs `webCompat` / `passkeyUsed` and `webCompat` / `passkeyFailed` notifications
+ * from content-scope-scripts when a WebAuthn ceremony completes.
  *
- * Payload contract (see `injected/src/messages/web-compat/passkeyUsed.notify.json` in C-S-S):
- * ```
- * { "type": "get" | "create", "success": boolean, "error"?: string }
- * ```
- * `error` is a sanitized DOMException name and is only present when `success` is false.
+ * Payload contracts:
+ * - `passkeyUsed`: `{ "type": "get" | "create" }`
+ * - `passkeyFailed`: `{ "type": "get" | "create", "error": string }`
  *
  * Pixel firing is intentionally not implemented here yet.
  */
 class PasskeyUsedMessageLogger @Inject constructor() {
 
-    fun log(params: JSONObject) {
-        // TEMP diagnostic: android.util.Log writes regardless of the debuggable flag or the
-        // logcat{} logger being installed. Remove once the message flow is confirmed on device.
-        Log.i(DIAG_TAG, "log() reached with params=$params")
+    fun logUsed(params: JSONObject) {
+        Log.i(DIAG_TAG, "logUsed() reached with params=$params")
+        val type = ceremonyType(params) ?: return
+        logcat(INFO) { "Passkey: $type succeeded" }
+    }
 
+    fun logFailed(params: JSONObject) {
+        Log.i(DIAG_TAG, "logFailed() reached with params=$params")
+        val type = ceremonyType(params) ?: return
+        val error = params.optString(PARAM_ERROR).ifEmpty { "unspecified" }
+        logcat(INFO) { "Passkey: $type failed with $error" }
+    }
+
+    private fun ceremonyType(params: JSONObject): String? {
         val type = params.optString(PARAM_TYPE)
         if (type != TYPE_GET && type != TYPE_CREATE) {
             logcat(WARN) { "Passkey: ignoring message with unsupported type '$type'" }
-            return
+            return null
         }
-
-        val success = params.opt(PARAM_SUCCESS) as? Boolean
-        if (success == null) {
-            logcat(WARN) { "Passkey: ignoring $type message without a boolean '$PARAM_SUCCESS'" }
-            return
-        }
-
-        if (success) {
-            logcat(INFO) { "Passkey: $type succeeded" }
-        } else {
-            val error = params.optString(PARAM_ERROR).ifEmpty { "unspecified" }
-            logcat(INFO) { "Passkey: $type failed with $error" }
-        }
+        return type
     }
 
     private companion object {
         const val DIAG_TAG = "PasskeyUsedDbg"
         const val PARAM_TYPE = "type"
-        const val PARAM_SUCCESS = "success"
         const val PARAM_ERROR = "error"
         const val TYPE_GET = "get"
         const val TYPE_CREATE = "create"

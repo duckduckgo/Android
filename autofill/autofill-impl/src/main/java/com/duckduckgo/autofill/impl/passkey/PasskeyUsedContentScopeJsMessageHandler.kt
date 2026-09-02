@@ -26,9 +26,10 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 /**
- * Handles the `webCompat` / `passkeyUsed` notification from content-scope-scripts.
+ * Handles the `webCompat` / `passkeyUsed` and `passkeyFailed` notifications from
+ * content-scope-scripts.
  *
- * This is a notification rather than a request, so it carries no `id` and needs no
+ * These are notifications rather than requests, so they carry no `id` and need no
  * response - unlike the request/response methods registered by web-compat's own handler,
  * which is why this is a separate plugin rather than an addition to that method list.
  */
@@ -45,16 +46,20 @@ class PasskeyUsedContentScopeJsMessageHandler @Inject constructor(
         ) {
             // TEMP diagnostic: proves the classic transport routed the message to this handler.
             android.util.Log.i("PasskeyUsedDbg", "classic handler process() reached: ${jsMessage.featureName}/${jsMessage.method}")
-            logger.log(jsMessage.params)
+            when (jsMessage.method) {
+                METHOD_PASSKEY_USED -> logger.logUsed(jsMessage.params)
+                METHOD_PASSKEY_FAILED -> logger.logFailed(jsMessage.params)
+            }
         }
 
         override val allowedDomains: List<String> = emptyList()
         override val featureName: String = FEATURE_NAME
-        override val methods: List<String> = listOf(METHOD_PASSKEY_USED)
+        override val methods: List<String> = listOf(METHOD_PASSKEY_USED, METHOD_PASSKEY_FAILED)
     }
 
     private companion object {
         const val FEATURE_NAME = "webCompat"
         const val METHOD_PASSKEY_USED = "passkeyUsed"
+        const val METHOD_PASSKEY_FAILED = "passkeyFailed"
     }
 }

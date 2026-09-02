@@ -56,64 +56,43 @@ class PasskeyUsedMessageLoggerTest {
 
     @Test
     fun whenAuthenticationSucceedsThenOutcomeIsLogged() {
-        testee.log(params(type = "get", success = true))
+        testee.logUsed(JSONObject().put("type", "get"))
 
         assertEquals(listOf("Passkey: get succeeded"), logged)
     }
 
     @Test
     fun whenRegistrationSucceedsThenOutcomeIsLogged() {
-        testee.log(params(type = "create", success = true))
+        testee.logUsed(JSONObject().put("type", "create"))
 
         assertEquals(listOf("Passkey: create succeeded"), logged)
     }
 
     @Test
     fun whenCeremonyFailsWithErrorThenErrorNameIsLogged() {
-        testee.log(params(type = "create", success = false).put("error", "NotReadableError"))
+        testee.logFailed(JSONObject().put("type", "create").put("error", "NotReadableError"))
 
         assertEquals(listOf("Passkey: create failed with NotReadableError"), logged)
     }
 
     @Test
     fun whenCeremonyFailsWithoutErrorThenFailureIsStillLogged() {
-        testee.log(params(type = "get", success = false))
+        testee.logFailed(JSONObject().put("type", "get"))
 
         assertEquals(listOf("Passkey: get failed with unspecified"), logged)
     }
 
     @Test
     fun whenTypeIsUnsupportedThenNoOutcomeIsLogged() {
-        testee.log(params(type = "password", success = true))
+        testee.logUsed(JSONObject().put("type", "password"))
 
         assertTrue(logged.none { it.startsWith("Passkey: password") })
     }
 
     @Test
     fun whenTypeIsMissingThenNoOutcomeIsLogged() {
-        testee.log(JSONObject().put("success", true))
+        testee.logUsed(JSONObject())
 
         assertTrue(logged.none { it.contains("succeeded") })
     }
-
-    @Test
-    fun whenSuccessIsMissingThenNoOutcomeIsLogged() {
-        testee.log(JSONObject().put("type", "get"))
-
-        assertTrue(logged.none { it.contains("succeeded") || it.contains("failed") })
-    }
-
-    @Test
-    fun whenSuccessIsNotBooleanThenNoOutcomeIsLogged() {
-        testee.log(JSONObject().put("type", "get").put("success", "true"))
-
-        assertTrue(logged.none { it.contains("succeeded") || it.contains("failed") })
-    }
-
-    private fun params(
-        type: String,
-        success: Boolean,
-    ): JSONObject = JSONObject()
-        .put("type", type)
-        .put("success", success)
 }
