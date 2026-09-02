@@ -270,7 +270,9 @@ platform :android do
         sh("git reset --hard")
         sh("git clean -f -fxd")
 
-        # Create a new release branch
+        # Create a new release branch. Deliberately never pushed: the bump commit is
+        # regenerated from `ref` on every run, and a remote release branch rejects the
+        # same-version retry as non-fast-forward.
         sh("git checkout -b #{branch_name}")
         UI.success("Release branch #{branch_name} created successfully!")
 
