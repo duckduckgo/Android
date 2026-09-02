@@ -37,6 +37,7 @@ interface DuckChatContextual {
      */
     suspend fun launch(
         sourceTabId: String,
+        sourceUrl: String?,
         anchor: View?,
         showChatSurface: () -> Unit,
     )

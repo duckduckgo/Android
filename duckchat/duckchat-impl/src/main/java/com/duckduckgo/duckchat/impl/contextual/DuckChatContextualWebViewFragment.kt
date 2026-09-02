@@ -689,6 +689,9 @@ class DuckChatContextualWebViewFragment :
         headerDivider.visibility = View.VISIBLE
         popup.onMenuItemClicked(newChatRow) { viewModel.onNewChatRequestedFromPopup() }
 
+        val openDuckAiRow = content.findViewById<PopupMenuItemView>(R.id.contextualChatsPopupOpenDuckAi)
+        popup.onMenuItemClicked(openDuckAiRow) { viewModel.onOpenDuckAiFromPopup() }
+
         val recentContainer = content.findViewById<LinearLayout>(R.id.contextualChatsPopupRecentContainer)
         recentContainer.removeAllViews()
         recentChats.forEach { chat ->
