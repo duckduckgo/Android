@@ -734,6 +734,10 @@ class RealExchangeV2Runner @Inject constructor(
 
     /** Returns true if hello reached the relay; false signals a fatal abort to the caller. */
     private fun sendHello(): Boolean {
+        if (ownChannel == null || peerChannel == null) {
+            emitSessionError("Cannot send hello — pairing session state is incomplete", SessionErrorKind.PairingSessionNotReady)
+            return false
+        }
         return sendMessage(ExchangeV2Message.Hello.TYPE) { own, _ ->
             ExchangeV2Message.Hello.create(
                 channelId = own.id,
@@ -760,8 +764,7 @@ class RealExchangeV2Runner @Inject constructor(
                 kind = OWN_DEVICE_KIND,
             )
         }
-        sendMessage(message)
-        sentOwnAvailability = true
+        sentOwnAvailability = sendMessage(message)
         // Re-elect in case the peer's availability arrived before we sent ours.
         // REVIEW: likely unreachable under eager-send ordering — confirm against the ordering spec
         // (Unified Algorithm 1214739740392701) and delete if dead.
@@ -853,7 +856,6 @@ class RealExchangeV2Runner @Inject constructor(
         val peer = peerChannel
         if (own == null || peer == null) {
             logcat(ERROR) { "Sync-ExchangeV2: cannot send $messageType — no channel pair" }
-            emitSessionError("Cannot send $messageType — pairing session state is incomplete", SessionErrorKind.PairingSessionNotReady)
             return false
         }
 
