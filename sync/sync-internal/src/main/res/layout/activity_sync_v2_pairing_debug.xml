@@ -25,7 +25,7 @@
         android:id="@+id/includeToolbar"
         layout="@layout/include_default_toolbar" />
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:id="@+id/contentScrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -246,6 +246,13 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
                     android:text="Clear Log" />
+
+                <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+                    android:id="@+id/filterLogButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:text="Filter log" />
             </LinearLayout>
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
@@ -266,18 +273,34 @@
                 android:layout_marginBottom="@dimen/keyline_4"
                 app:typography="body2" />
 
-            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:primaryText="Log" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-            <LinearLayout
-                android:id="@+id/logContainer"
+                <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    app:primaryText="Log" />
+
+                <com.duckduckgo.common.ui.view.text.DaxTextView
+                    android:id="@+id/logFilterSummaryTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/keyline_2"
+                    android:layout_marginEnd="@dimen/keyline_4"
+                    app:textType="secondary"
+                    app:typography="caption" />
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/logRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/keyline_4"
-                android:orientation="vertical" />
-
+                android:nestedScrollingEnabled="false" />
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 </LinearLayout>

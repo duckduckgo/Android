@@ -353,6 +353,8 @@ class RealSyncCodeDispatcher @Inject constructor(
             SessionErrorKind.RelayChannelUnavailable -> RELAY_CHANNEL_UNAVAILABLE.code
             SessionErrorKind.RecoveryCodePreparationFailed -> RECOVERY_CODE_PREPARATION_FAILED.code
             SessionErrorKind.MalformedRelayRequest -> NEGOTIATION_ABORTED.code
+            SessionErrorKind.MessageDecryptionFailed -> PAIRING_FAILED.code
+            SessionErrorKind.PeerProtocolTooNew -> PAIRING_FAILED.code
             SessionErrorKind.Unknown -> PAIRING_FAILED.code
         }
         return DispatchOutcome.Failed(event.message, code, timeoutStage = event.timeoutStage)

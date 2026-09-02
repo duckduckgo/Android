@@ -226,7 +226,8 @@ class RealExchangeV2Runner @Inject constructor(
                 peerChannel = PeerChannelData(parsed.channelId, parsed.publicKey)
                 bootstrapLocked(PairingRole.Scanner)
                 if (ownChannel == null) {
-                    cancelLocked(ExchangeV2Message.Bye.Reason.Error) // bootstrap already emitted the error; just clear the half-set state
+                    // bootstrap already emitted the error; just clear the half-set state
+                    cancelLocked(ExchangeV2Message.Bye.Reason.Error)
                     return@launch
                 }
                 negotiatedVersion = negotiateProtocolVersion(parsed.version, PeerVersionSource.LinkingCode)
@@ -257,7 +258,8 @@ class RealExchangeV2Runner @Inject constructor(
                 cancelLocked(ExchangeV2Message.Bye.Reason.Cancelled) // abandon any prior session
                 bootstrapLocked(PairingRole.Presenter)
                 val own = ownChannel ?: run {
-                    cancelLocked(ExchangeV2Message.Bye.Reason.Error) // bootstrap already emitted the error; just clear the half-set state
+                    // bootstrap already emitted the error; just clear the half-set state
+                    cancelLocked(ExchangeV2Message.Bye.Reason.Error)
                     return@launch
                 }
                 val linkingCode = qrCode.buildLinkingCode(
@@ -366,12 +368,17 @@ class RealExchangeV2Runner @Inject constructor(
         if (own != null) {
             val peer = peerChannel
             val version = negotiatedVersion
+            val currentSession = session
+
             appScope.launch(dispatchers.io()) {
                 // Sequenced before the DELETE so the peer can learn we've gone rather than
                 // discovering it when its next write 404s. Sent once, never retried, and delivery
                 // is never depended on.
                 if (peer != null) {
                     runCatching { sendMessage(ExchangeV2Message.Bye.create(byeReason), own, peer, version) }
+                }
+                if (currentSession != null) {
+                    emit(ExchangeV2Event.SessionEnded(clock.nowMs(), currentSession.currentState, byeReason))
                 }
                 // Best-effort DELETE.
                 runCatching { channel.deleteChannel(own.id, own.secret) }
@@ -403,12 +410,13 @@ class RealExchangeV2Runner @Inject constructor(
                     deliverIncomingMessage(incoming)
                 }
             } catch (versionTooNew: EnvelopeVersionTooNew) {
-                failSession("Peer requires protocol v${versionTooNew.version}; please update this app")
+                failSession("Peer requires protocol v${versionTooNew.version}; please update this app", SessionErrorKind.PeerProtocolTooNew)
             } catch (decryptFailure: EnvelopeDecryptFailure) {
                 // Permanent — the cursor would just re-pull the same broken bytes forever.
                 failSession(
                     "Couldn't decrypt a message from the peer (seq=${decryptFailure.seq}): " +
                         "${decryptFailure.cause?.message}. The keys probably don't match — try restarting pairing.",
+                    SessionErrorKind.MessageDecryptionFailed,
                 )
             } catch (gone: ChannelGone) {
                 failSession("Poll got ${gone.status} — channel gone", SessionErrorKind.RelayChannelUnavailable)
@@ -513,6 +521,8 @@ class RealExchangeV2Runner @Inject constructor(
             emit(ExchangeV2Event.MessageRejected(clock.nowMs(), message, sm.currentState, RejectReason.TooHighProtocolDropped))
             return
         }
+
+        emit(ExchangeV2Event.MessageReceived(clock.nowMs(), message))
 
         // Race guard: a Host with auto-approve enabled can finish sending its messages before
         // the Joiner's user has tapped Confirm. Stash them and replay after the SM enters Waiting.
@@ -662,10 +672,17 @@ class RealExchangeV2Runner @Inject constructor(
             logcat { "Sync-ExchangeV2: cannot auto-elect role yet (role=${ownData?.role}, peerKind=${peerData?.kind})" }
             return
         }
-        logcat {
-            "Sync-ExchangeV2: auto-electing $elected " +
-                "(own role=${ownData?.role}, own userId=${syncStore.userId}, peer kind=${peerData?.kind}, peer userId=${peerData?.userId})"
-        }
+        emit(
+            ExchangeV2Event.RoleElected(
+                timestampMs = clock.nowMs(),
+                role = elected,
+                ownPairingRole = ownData?.role,
+                ownSignedIn = syncStore.userId != null,
+                ownKind = OWN_DEVICE_KIND,
+                peerKind = peerData?.kind,
+                peerSignedIn = peerData?.userId != null,
+            ),
+        )
         val electResult = sm.localTrigger(LocalTrigger.RoleElected(elected))
         emit(electResult.event)
         electResult.sideEffects.forEach { applySideEffectLocked(it) }
@@ -940,7 +957,6 @@ class RealExchangeV2Runner @Inject constructor(
     }
 
     internal fun recordSentMessage(message: ExchangeV2Message) {
-        logcat { "Sync-ExchangeV2: recordSentMessage ${message.messageType}" }
         emit(ExchangeV2Event.MessageSent(clock.nowMs(), message))
     }
 
@@ -950,31 +966,57 @@ class RealExchangeV2Runner @Inject constructor(
 
     private fun emit(event: ExchangeV2Event) {
         when (event) {
-            is ExchangeV2Event.Transition -> logcat {
-                "Sync-ExchangeV2: transition ${event.from} → ${event.to} " +
-                    "(trigger=${event.trigger?.messageType ?: event.localTrigger})"
-            }
-            is ExchangeV2Event.MessageRejected -> logcat {
-                "Sync-ExchangeV2: rejected ${event.message.messageType} in ${event.state} reason=${event.reason}"
-            }
-            is ExchangeV2Event.MessageSent -> Unit
-            is ExchangeV2Event.MessageNotSent -> logcat {
-                "Sync-ExchangeV2: not sent ${event.messageType} reason=${event.reason}"
-            }
-            is ExchangeV2Event.SessionStarted -> logcat {
-                val codeLine = event.linkingCode?.let { " linkingCode=$it" } ?: ""
-                "Sync-ExchangeV2: session started role=${event.pairingRole} channel_id=${event.ownChannelId}$codeLine"
-            }
-            is ExchangeV2Event.SessionError -> logcat(ERROR) { "Sync-ExchangeV2: session error: ${event.message}" }
-            is ExchangeV2Event.VersionNegotiated -> logcat {
-                buildString {
-                    append("Sync-ExchangeV2: negotiated protocol version: ")
-                    append(event.negotiatedVersion.prettyPrint())
-                    append(", our version: ")
-                    append(event.ourVersion.prettyPrint())
-                    append(", peer version: ")
-                    append(event.peerVersion.prettyPrint())
+            is ExchangeV2Event.SessionStarted -> {
+                logcat {
+                    val codeLine = event.linkingCode?.let { " linkingCode=$it" } ?: ""
+                    "Sync-ExchangeV2: session started role=${event.pairingRole} channel_id=${event.ownChannelId}$codeLine"
                 }
+            }
+
+            is ExchangeV2Event.VersionNegotiated -> {
+                logcat {
+                    "Sync-ExchangeV2: negotiated protocol version: ${event.negotiatedVersion.prettyPrint()}, " +
+                        "our version: ${event.ourVersion.prettyPrint()}, peer version: ${event.peerVersion.prettyPrint()}"
+                }
+            }
+
+            is ExchangeV2Event.RoleElected -> {
+                logcat {
+                    "Sync-ExchangeV2: role elected ${event.role} " +
+                        "(own role=${event.ownPairingRole}, own signedIn=${event.ownSignedIn}, own kind=${event.ownKind}, " +
+                        "peer kind=${event.peerKind}, peer signedIn=${event.peerSignedIn})"
+                }
+            }
+
+            is ExchangeV2Event.Transition -> {
+                logcat {
+                    "Sync-ExchangeV2: transition ${event.from} → ${event.to} " +
+                        "(trigger=${event.trigger?.messageType ?: event.localTrigger})"
+                }
+            }
+
+            is ExchangeV2Event.MessageSent -> {
+                logcat { "Sync-ExchangeV2: sent ${event.message.messageType}" }
+            }
+
+            is ExchangeV2Event.MessageNotSent -> {
+                logcat { "Sync-ExchangeV2: not sent ${event.messageType} reason=${event.reason}" }
+            }
+
+            is ExchangeV2Event.MessageReceived -> {
+                logcat { "Sync-ExchangeV2: received ${event.message.messageType}" }
+            }
+
+            is ExchangeV2Event.MessageRejected -> {
+                logcat { "Sync-ExchangeV2: rejected ${event.message.messageType} in ${event.state} reason=${event.reason}" }
+            }
+
+            is ExchangeV2Event.SessionError -> {
+                logcat(ERROR) { "Sync-ExchangeV2: session error: ${event.message}" }
+            }
+
+            is ExchangeV2Event.SessionEnded -> {
+                logcat { "Sync-ExchangeV2: session ended lastState=${event.lastState} bye=${event.byeReason.value}" }
             }
         }
         _events.tryEmit(event)

@@ -31,6 +31,47 @@ sealed interface ExchangeV2Event {
     val timestampMs: Long
 
     /**
+     * Bootstrap completed: own channel created on the relay, ephemeral keypair generated.
+     * Presenter-side: [linkingCode] carries the URL to display as QR. Scanner-side: null.
+     */
+    data class SessionStarted(
+        override val timestampMs: Long,
+        val pairingRole: PairingRole,
+        val ownChannelId: String,
+        val linkingCode: String?,
+    ) : ExchangeV2Event
+
+    /**
+     * The peer's advertised protocol version became known and both sides settled on [negotiatedVersion],
+     * the lower of [ourVersion] and [peerVersion], falling back to the baseline when the peer advertises
+     * something we can't parse. Emitted once per side, at the point named by [peerSource]: the Scanner
+     * learns the version from the linking code, the Presenter from the peer's hello.
+     */
+    data class VersionNegotiated(
+        override val timestampMs: Long,
+        val peerSource: PeerVersionSource,
+        val peerVersion: ExchangeProtocolVersion,
+        val ourVersion: ExchangeProtocolVersion,
+        val negotiatedVersion: ExchangeProtocolVersion,
+    ) : ExchangeV2Event
+
+    /**
+     * The runner auto-elected which side this device plays, with the inputs that drove the
+     * decision. Emitted just before the [Transition] carrying [LocalTrigger.RoleElected], which
+     * shows the outcome but not the reasoning. Carries no account identifiers: signed-in state
+     * is reduced to booleans.
+     */
+    data class RoleElected(
+        override val timestampMs: Long,
+        val role: Role,
+        val ownPairingRole: PairingRole?,
+        val ownSignedIn: Boolean,
+        val ownKind: String,
+        val peerKind: String?,
+        val peerSignedIn: Boolean,
+    ) : ExchangeV2Event
+
+    /**
      * The state machine accepted a trigger and moved from [from] to [to]. Exactly one of [trigger] (an
      * inbound peer message) and [localTrigger] (a user or runner decision) is set; an abort driven by a
      * peer message arrives here rather than as [MessageRejected] whenever [from] was still active.
@@ -55,8 +96,9 @@ sealed interface ExchangeV2Event {
     /**
      * An outbound message never reached the relay, whether sending failed or was skipped
      * deliberately. The counterpart of [MessageSent] and just as observational: when the failure
-     * also ends the session, a separate [SessionError] follows. A teardown `bye` never produces
-     * one, since it is best-effort by contract. [messageType] is always set; [message] is null
+     * also ends the session, a separate [SessionError] follows. A failed teardown `bye` produces
+     * one too, but never a follow-up [SessionError], since `bye` is best-effort by contract.
+     * [messageType] is always set; [message] is null
      * when sending failed before the message was built, see [NotSentReason.OwnChannelNotConfigured].
      */
     data class MessageNotSent(
@@ -64,6 +106,11 @@ sealed interface ExchangeV2Event {
         val reason: NotSentReason,
         val messageType: String,
         val message: ExchangeV2Message?,
+    ) : ExchangeV2Event
+
+    data class MessageReceived(
+        override val timestampMs: Long,
+        val message: ExchangeV2Message,
     ) : ExchangeV2Event
 
     /**
@@ -80,17 +127,6 @@ sealed interface ExchangeV2Event {
     ) : ExchangeV2Event
 
     /**
-     * Bootstrap completed: own channel created on the relay, ephemeral keypair generated.
-     * Presenter-side: [linkingCode] carries the URL to display as QR. Scanner-side: null.
-     */
-    data class SessionStarted(
-        override val timestampMs: Long,
-        val pairingRole: PairingRole,
-        val ownChannelId: String,
-        val linkingCode: String?,
-    ) : ExchangeV2Event
-
-    /**
      * A transport or protocol-level failure while bootstrapping, polling, or sending. Terminal: the runner tears the
      * session down after emitting, and emits at most one per session. [message] is developer-facing text;
      * [kind] is the value to branch on. [timeoutStage] is set only for [SessionErrorKind.SessionTimeout].
@@ -103,18 +139,37 @@ sealed interface ExchangeV2Event {
     ) : ExchangeV2Event
 
     /**
-     * The peer's advertised protocol version became known and both sides settled on [negotiatedVersion],
-     * the lower of [ourVersion] and [peerVersion], falling back to the baseline when the peer advertises
-     * something we can't parse. Emitted once per side, at the point named by [peerSource]: the Scanner
-     * learns the version from the linking code, the Presenter from the peer's hello.
+     * The runner tore the session down and cleared all session state. Emitted once per session,
+     * at the end of every path that ends one. [lastState] is the state
+     * machine state at teardown, null when the session never got one. [byeReason] is the reason
+     * declared in the teardown `bye`, whether or not that message could actually be sent.
      */
-    data class VersionNegotiated(
+    data class SessionEnded(
         override val timestampMs: Long,
-        val peerSource: PeerVersionSource,
-        val peerVersion: ExchangeProtocolVersion,
-        val ourVersion: ExchangeProtocolVersion,
-        val negotiatedVersion: ExchangeProtocolVersion,
+        val lastState: ExchangeV2State,
+        val byeReason: ExchangeV2Message.Bye.Reason,
     ) : ExchangeV2Event
+}
+
+/** Where the peer's advertised version was read from. See [ExchangeV2Event.VersionNegotiated]. */
+enum class PeerVersionSource {
+    /** Scanner side: parsed out of the linking code before any message is exchanged. */
+    LinkingCode,
+
+    /** Presenter side: taken from the peer's hello. */
+    HelloMessage,
+}
+
+/** Why an outbound message never reached the relay. See [ExchangeV2Event.MessageNotSent]. */
+sealed interface NotSentReason {
+    /** Sending was attempted without a bootstrapped session, so there was no channel pair to write over. */
+    data object OwnChannelNotConfigured : NotSentReason
+
+    /** The relay rejected the write with HTTP [code]. */
+    data class HttpError(val code: Int) : NotSentReason
+
+    /** Deliberate skip: the message requires a newer protocol than [negotiatedVersion], so the peer could not process it. */
+    data class TooHighProtocol(val negotiatedVersion: ExchangeProtocolVersion.V2) : NotSentReason
 }
 
 /** Why a received message was not acted on. See [ExchangeV2Event.MessageRejected]. */
@@ -136,18 +191,6 @@ enum class RejectReason {
 
     /** The peer sent `bye` before the exchange completed. Not a protocol violation: the peer is simply gone. */
     PeerLeft,
-}
-
-/** Why an outbound message never reached the relay. See [ExchangeV2Event.MessageNotSent]. */
-sealed interface NotSentReason {
-    /** Sending was attempted without a bootstrapped session, so there was no channel pair to write over. */
-    data object OwnChannelNotConfigured : NotSentReason
-
-    /** The relay rejected the write with HTTP [code]. */
-    data class HttpError(val code: Int) : NotSentReason
-
-    /** Deliberate skip: the message requires a newer protocol than [negotiatedVersion], so the peer could not process it. */
-    data class TooHighProtocol(val negotiatedVersion: ExchangeProtocolVersion.V2) : NotSentReason
 }
 
 /**
@@ -176,15 +219,12 @@ enum class SessionErrorKind {
     /** The relay rejected our request as malformed. */
     MalformedRelayRequest,
 
+    /** An inbound envelope could not be decrypted; permanent for the session, since the poll cursor would re-pull the same bytes. */
+    MessageDecryptionFailed,
+
+    /** An inbound envelope requires a newer protocol version than this client supports. */
+    PeerProtocolTooNew,
+
     /** Anything else, including generic transport failures. */
     Unknown,
-}
-
-/** Where the peer's advertised version was read from. See [ExchangeV2Event.VersionNegotiated]. */
-enum class PeerVersionSource {
-    /** Scanner side: parsed out of the linking code before any message is exchanged. */
-    LinkingCode,
-
-    /** Presenter side: taken from the peer's hello. */
-    HelloMessage,
 }

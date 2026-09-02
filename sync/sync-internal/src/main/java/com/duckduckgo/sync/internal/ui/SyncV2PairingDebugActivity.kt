@@ -17,7 +17,6 @@
 package com.duckduckgo.sync.internal.ui
 
 import android.annotation.SuppressLint
-import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.os.Bundle
@@ -26,8 +25,11 @@ import android.widget.Toast
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.clipboard.ClipboardInteractor
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.dialog.CustomAlertDialogBuilder
 import com.duckduckgo.common.ui.view.dialog.DaxAlertDialog
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
@@ -39,10 +41,9 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
 import com.duckduckgo.sync.impl.exchange.v2.Role
 import com.duckduckgo.sync.internal.databinding.ActivitySyncV2PairingDebugBinding
-import com.duckduckgo.sync.internal.databinding.ItemSyncV2PairingLogRowBinding
+import com.duckduckgo.sync.internal.databinding.DialogSyncDebugLogFilterBinding
+import com.duckduckgo.sync.internal.databinding.ItemSyncDebugLogFilterOptionBinding
 import com.duckduckgo.sync.internal.ui.SyncV2PairingDebugViewModel.ConfirmationRequest
-import com.duckduckgo.sync.internal.ui.SyncV2PairingDebugViewModel.LogDetails
-import com.duckduckgo.sync.internal.ui.SyncV2PairingDebugViewModel.LogRow
 import com.duckduckgo.sync.internal.ui.SyncV2PairingDebugViewModel.TerminalReached
 import com.duckduckgo.sync.internal.ui.SyncV2PairingDebugViewModel.ViewState
 import com.google.zxing.BarcodeFormat.QR_CODE
@@ -50,9 +51,6 @@ import com.journeyapps.barcodescanner.BarcodeEncoder
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
@@ -64,19 +62,27 @@ class SyncV2PairingDebugActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
+    @Inject
+    lateinit var clipboardInteractor: ClipboardInteractor
+
     private val binding: ActivitySyncV2PairingDebugBinding by viewBinding()
     private val viewModel: SyncV2PairingDebugViewModel by bindViewModel()
 
-    private val timestampFormat = SimpleDateFormat("HH:mm:ss.SSS", Locale.US)
-    private val expandedRowIds = mutableSetOf<Long>()
-    private var renderedRows: List<LogRow> = emptyList()
+    private val logAdapter = SyncV2PairingLogAdapter(
+        onCopyJson = { json -> copyToClipboard("Raw JSON", json) },
+    )
+
     private var activeConfirmationDialog: DaxAlertDialog? = null
     private var selectedProtocolVersion: ExchangeProtocolVersion.V2? = null
+    private var activeCategories: Set<LogRow.Category> = LogRow.Category.entries.toSet()
+    private var renderedRows: List<LogRow>? = null
+    private var renderedCategories: Set<LogRow.Category>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableTransparentEdgeToEdge()
         setContentView(binding.root)
+        configureLogList()
         configureEdgeToEdgeInsets()
         setupToolbar(binding.includeToolbar.toolbar)
         configureListeners()
@@ -84,6 +90,12 @@ class SyncV2PairingDebugActivity : DuckDuckGoActivity() {
         observeConfirmations()
         observeTerminals()
         observeToasts()
+    }
+
+    private fun configureLogList() {
+        binding.logRecyclerView.layoutManager = LinearLayoutManager(this)
+        binding.logRecyclerView.adapter = logAdapter
+        binding.logRecyclerView.addItemDecoration(AlternatingRowBackgroundDecoration(this))
     }
 
     private fun configureEdgeToEdgeInsets() {
@@ -109,9 +121,10 @@ class SyncV2PairingDebugActivity : DuckDuckGoActivity() {
         binding.clearPastedUrlButton.setOnClickListener { binding.pastedUrlInput.text = "" }
         binding.cancelButton.setOnClickListener { viewModel.onCancelClicked() }
         binding.clearLogButton.setOnClickListener {
-            expandedRowIds.clear()
+            logAdapter.clearExpansionState()
             viewModel.onClearLogClicked()
         }
+        binding.filterLogButton.setOnClickListener { showFilterLogDialog() }
         binding.autoApproveSetting.quietlySetIsChecked(newCheckedState = true) { _, enabled ->
             viewModel.onAutoApproveToggled(enabled)
         }
@@ -140,6 +153,42 @@ class SyncV2PairingDebugActivity : DuckDuckGoActivity() {
                 },
             )
             .setCancelable(true)
+            .show()
+    }
+
+    private fun showFilterLogDialog() {
+        val dialogBinding = DialogSyncDebugLogFilterBinding.inflate(layoutInflater)
+
+        val categoryCheckBoxes = LogRow.Category.entries.associateWith { category ->
+            val checkBox = ItemSyncDebugLogFilterOptionBinding.inflate(layoutInflater, dialogBinding.categoryContainer, true).root
+            checkBox.text = category.label
+            checkBox.isChecked = category in activeCategories
+            checkBox
+        }
+        categoryCheckBoxes.values.forEach { checkBox ->
+            checkBox.setOnCheckedChangeListener { _, _ ->
+                dialogBinding.selectAllCheckBox.isChecked = categoryCheckBoxes.values.all { it.isChecked }
+            }
+        }
+
+        dialogBinding.selectAllCheckBox.isChecked = categoryCheckBoxes.values.all { it.isChecked }
+        dialogBinding.selectAllCheckBox.setOnClickListener {
+            val checked = dialogBinding.selectAllCheckBox.isChecked
+            categoryCheckBoxes.values.forEach { it.isChecked = checked }
+        }
+
+        CustomAlertDialogBuilder(this)
+            .setTitle("Filter log")
+            .setPositiveButton(android.R.string.ok)
+            .setNegativeButton(android.R.string.cancel)
+            .setView(dialogBinding)
+            .addEventListener(
+                object : CustomAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onLogFilterChanged(categoryCheckBoxes.filterValues { it.isChecked }.keys)
+                    }
+                },
+            )
             .show()
     }
 
@@ -247,9 +296,21 @@ class SyncV2PairingDebugActivity : DuckDuckGoActivity() {
             renderedQrFor = null
             autoCopiedLinkingCode = null
         }
-        if (state.rows !== renderedRows) {
-            renderedRows = state.rows
-            renderRows(state.rows)
+        renderLog(state)
+    }
+
+    private fun renderLog(state: ViewState) {
+        activeCategories = state.activeCategories
+        if (state.rows === renderedRows && state.activeCategories === renderedCategories) return
+        renderedRows = state.rows
+        renderedCategories = state.activeCategories
+        val visibleRows = state.visibleRows
+        logAdapter.submitList(visibleRows)
+        binding.logFilterSummaryTextView.text = if (state.activeCategories.size == LogRow.Category.entries.size) {
+            "Showing all ${state.rows.size} rows"
+        } else {
+            "Showing ${visibleRows.size} of ${state.rows.size} rows " +
+                "(${state.activeCategories.joinToString { it.label }})"
         }
     }
 
@@ -276,38 +337,11 @@ class SyncV2PairingDebugActivity : DuckDuckGoActivity() {
 
     private var renderedQrFor: String? = null
 
-    private fun renderRows(rows: List<LogRow>) {
-        binding.logContainer.removeAllViews()
-        rows.forEach { row ->
-            val rowBinding = ItemSyncV2PairingLogRowBinding.inflate(layoutInflater, binding.logContainer, true)
-            val timestamp = timestampFormat.format(Date(row.timestampMs))
-            rowBinding.summaryTextView.text = "[$timestamp] ${row.summary}"
-            rowBinding.rawJsonTextView.text = row.details.value
-            applyExpansion(rowBinding, row.id in expandedRowIds)
-            rowBinding.summaryRow.setOnClickListener {
-                val newlyExpanded = row.id !in expandedRowIds
-                if (newlyExpanded) expandedRowIds.add(row.id) else expandedRowIds.remove(row.id)
-                applyExpansion(rowBinding, newlyExpanded)
-            }
-            when (val details = row.details) {
-                is LogDetails.Json -> {
-                    rowBinding.copyRawButton.visibility = View.VISIBLE
-                    rowBinding.copyRawButton.setOnClickListener { copyToClipboard("Raw JSON", details.value) }
-                }
-                is LogDetails.PlainText -> rowBinding.copyRawButton.visibility = View.GONE
-            }
-        }
-    }
-
-    private fun applyExpansion(rowBinding: ItemSyncV2PairingLogRowBinding, expanded: Boolean) {
-        rowBinding.rawDetail.visibility = if (expanded) View.VISIBLE else View.GONE
-        rowBinding.chevronTextView.text = if (expanded) "▾" else "▸"
-    }
-
     private fun copyToClipboard(label: String, value: String) {
-        val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        clipboard.setPrimaryClip(ClipData.newPlainText(label, value))
-        Toast.makeText(this, "$label copied", Toast.LENGTH_SHORT).show()
+        val systemNotificationShown = clipboardInteractor.copyToClipboard(value, isSensitive = false)
+        if (!systemNotificationShown) {
+            Toast.makeText(this, "$label copied", Toast.LENGTH_SHORT).show()
+        }
     }
 
     /** Shared handler for the "Start as Scanner" button — uses whatever is in the input field. */

@@ -33,15 +33,11 @@ import com.duckduckgo.sync.impl.SyncAuthCode
 import com.duckduckgo.sync.impl.SyncCodeDispatcher
 import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Event
-import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Event.VersionNegotiated
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Runner
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State
 import com.duckduckgo.sync.impl.exchange.v2.LocalTrigger
-import com.duckduckgo.sync.impl.exchange.v2.NotSentReason
 import com.duckduckgo.sync.impl.exchange.v2.PairingRole
-import com.duckduckgo.sync.impl.exchange.v2.PeerVersionSource
-import com.duckduckgo.sync.impl.exchange.v2.RejectReason
 import com.duckduckgo.sync.impl.exchange.v2.Role
 import com.duckduckgo.sync.internal.exchange.SyncInternalAdvertisedExchangeV2Version
 import com.duckduckgo.sync.store.SyncStore
@@ -55,6 +51,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import logcat.logcat
+import java.util.concurrent.atomic.AtomicLong
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 
@@ -68,21 +65,6 @@ class SyncV2PairingDebugViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope private val appScope: CoroutineScope,
 ) : ViewModel() {
-
-    data class LogRow(
-        val id: Long,
-        val timestampMs: Long,
-        val summary: String,
-        val details: LogDetails,
-    )
-
-    sealed interface LogDetails {
-        val value: String
-
-        data class Json(override val value: String) : LogDetails
-
-        data class PlainText(override val value: String) : LogDetails
-    }
 
     /**
      * Snapshot of the device's sync setup that's relevant to v2 pairing. Read from
@@ -99,10 +81,13 @@ class SyncV2PairingDebugViewModel @Inject constructor(
         val currentStateLabel: String = "(no session)",
         val linkingCode: String? = null,
         val rows: List<LogRow> = emptyList(),
+        val activeCategories: Set<LogRow.Category> = LogRow.Category.entries.toSet(),
         val autoApproveConfirmation: Boolean = true,
         val accountStatus: AccountStatus = AccountStatus(false, null, false),
         val protocolOverride: ExchangeProtocolVersion.V2? = null,
-    )
+    ) {
+        val visibleRows: List<LogRow> get() = rows.filter { it.eventType.category in activeCategories }
+    }
 
     /**
      * One-shot prompt to show the user. The Activity renders this as an [AlertDialog] and
@@ -151,7 +136,7 @@ class SyncV2PairingDebugViewModel @Inject constructor(
     private val toasts = Channel<String>(Channel.BUFFERED)
     fun toasts(): Flow<String> = toasts.receiveAsFlow()
 
-    private var nextRowId: Long = 0L
+    private val nextRowId = AtomicLong(0L)
 
     init {
         viewState.update { it.copy(accountStatus = readAccountStatus()) }
@@ -321,22 +306,19 @@ class SyncV2PairingDebugViewModel @Inject constructor(
     }
 
     /**
-     * Push a synthetic row into the event log so v1-fallback progress is visible alongside
-     * native v2 [ExchangeV2Event]s. Reuses [LogRow] with the message in both summary and details.
+     * Push a dev-tool row into the event log so v1-fallback progress is visible alongside
+     * native v2 [ExchangeV2Event]s, with the message as both name and details.
      * Also tees to logcat with a `Sync-V2Debug:` prefix so the fallback path is traceable
      * end-to-end (the in-screen log alone misses the eyes of anyone watching logcat).
      */
     private fun appendDevToolLog(message: String) {
         logcat { "Sync-V2Debug: $message" }
+        val row = LogRow.devTool(
+            id = nextRowId.getAndIncrement(),
+            message = message,
+        )
         viewState.update { current ->
-            current.copy(
-                rows = current.rows + LogRow(
-                    id = nextRowId++,
-                    timestampMs = System.currentTimeMillis(),
-                    summary = message,
-                    details = LogDetails.PlainText(message),
-                ),
-            )
+            current.copy(rows = current.rows + row)
         }
     }
 
@@ -386,13 +368,17 @@ class SyncV2PairingDebugViewModel @Inject constructor(
         viewState.update { it.copy(rows = emptyList()) }
     }
 
+    fun onLogFilterChanged(activeCategories: Set<LogRow.Category>) {
+        viewState.update { it.copy(activeCategories = activeCategories) }
+    }
+
     fun onAutoApproveToggled(checked: Boolean) {
         viewState.update { it.copy(autoApproveConfirmation = checked) }
     }
 
     fun onProtocolOverrideSelected(version: ExchangeProtocolVersion.V2?) {
         internalAdvertisedVersion.overrideFlow.value = version
-        appendDevToolLog("Protocol version override → ${labelFor(version)} (applies to the next session)")
+        appendDevToolLog("Protocol version override → ${labelFor(version)}")
     }
 
     fun labelFor(version: ExchangeProtocolVersion.V2?): String = when (version) {
@@ -416,12 +402,7 @@ class SyncV2PairingDebugViewModel @Inject constructor(
     }
 
     private fun appendEvent(event: ExchangeV2Event, isReplay: Boolean = false) {
-        val row = LogRow(
-            id = nextRowId++,
-            timestampMs = event.timestampMs,
-            summary = summarise(event),
-            details = detailsFor(event),
-        )
+        val row = LogRow.from(event, id = nextRowId.getAndIncrement())
         viewState.update { current ->
             current.copy(
                 rows = current.rows + row,
@@ -580,124 +561,9 @@ class SyncV2PairingDebugViewModel @Inject constructor(
     }
 
     private fun buildStateLabel(): String {
-        val state = labelFor(runner.currentState)
+        val state = runner.currentState.debugLabel()
         val role = runner.pairingRole ?: return state
         return "$state · pairing as $role"
-    }
-
-    private fun summarise(event: ExchangeV2Event): String = when (event) {
-        is ExchangeV2Event.Transition -> buildString {
-            append("Transition ${labelFor(event.from)} → ${labelFor(event.to)} [")
-            val trigger = event.trigger
-            val localTrigger = event.localTrigger
-            when {
-                trigger != null -> {
-                    append("msg=${trigger.messageType}")
-                    appendPeerDetails(trigger)
-                }
-                localTrigger != null -> append("local=${labelFor(localTrigger)}")
-                else -> append("no trigger")
-            }
-            append(']')
-        }
-        is ExchangeV2Event.MessageSent -> buildString {
-            append("Sent ${event.message.messageType}")
-            appendPeerDetails(event.message)
-        }
-        is ExchangeV2Event.MessageNotSent -> "Not sent ${event.messageType}: ${labelFor(event.reason)}"
-        is ExchangeV2Event.MessageRejected -> buildString {
-            append("${labelFor(event.reason)} on ${event.message.messageType}")
-            appendPeerDetails(event.message)
-            append(" in ${labelFor(event.state)}")
-        }
-        is ExchangeV2Event.SessionStarted -> buildString {
-            append("Session started as ${event.pairingRole} ownChannelId=${event.ownChannelId}")
-            event.linkingCode?.let { append(" linkingCode=$it") }
-        }
-        is ExchangeV2Event.SessionError -> "Session error: ${event.message}"
-        is VersionNegotiated -> "Negotiated Exchange protocol ${event.negotiatedVersion.prettyPrint()}"
-    }
-
-    private fun StringBuilder.appendPeerDetails(message: ExchangeV2Message) {
-        when (message) {
-            is ExchangeV2Message.RecoveryCodeAvailable -> append(" name=${message.name} kind=${message.kind} user_id=${message.userId}")
-            is ExchangeV2Message.RecoveryCodeRequest -> append(" name=${message.name} kind=${message.kind}")
-            is ExchangeV2Message.RecoveryCodeDone -> append(" reason=${message.reason.value}")
-            else -> Unit
-        }
-    }
-
-    private fun detailsFor(event: ExchangeV2Event): LogDetails = when (event) {
-        is ExchangeV2Event.Transition -> when (val trigger = event.trigger) {
-            null -> LogDetails.PlainText("local trigger: ${event.localTrigger?.let(::labelFor) ?: "none"}")
-            else -> LogDetails.Json(trigger.rawJson)
-        }
-        is ExchangeV2Event.MessageSent -> LogDetails.Json(event.message.rawJson)
-        is ExchangeV2Event.MessageNotSent -> when (val message = event.message) {
-            null -> LogDetails.PlainText(labelFor(event.reason))
-            else -> LogDetails.Json(message.rawJson)
-        }
-        is ExchangeV2Event.MessageRejected -> LogDetails.Json(event.message.rawJson)
-        is ExchangeV2Event.SessionStarted -> when (val linkingCode = event.linkingCode) {
-            null -> LogDetails.PlainText("no linking code — Scanner side")
-            else -> LogDetails.PlainText(linkingCode)
-        }
-        is ExchangeV2Event.SessionError -> LogDetails.PlainText(event.message)
-        is VersionNegotiated -> LogDetails.PlainText(
-            "ours=${event.ourVersion.prettyPrint()}, peer=${event.peerVersion.prettyPrint()} [${labelFor(event.peerSource)}]",
-        )
-    }
-
-    private fun labelFor(state: ExchangeV2State?): String = when (state) {
-        null -> "(no session)"
-        ExchangeV2State.Bootstrapped -> "Bootstrapped"
-        ExchangeV2State.Negotiating -> "Negotiating"
-        ExchangeV2State.SameAccountAbort -> "SameAccountAbort"
-        ExchangeV2State.Aborted -> "Aborted"
-        ExchangeV2State.Host.Confirming -> "Host.Confirming"
-        ExchangeV2State.Host.Sending -> "Host.Sending"
-        ExchangeV2State.Host.AwaitingStatus -> "Host.AwaitingStatus"
-        ExchangeV2State.Host.Unknown -> "Host.Unknown"
-        ExchangeV2State.Host.Aborted -> "Host.Aborted"
-        ExchangeV2State.Host.Done -> "Host.Done"
-        ExchangeV2State.Joiner.Confirming -> "Joiner.Confirming"
-        ExchangeV2State.Joiner.Waiting -> "Joiner.Waiting"
-        ExchangeV2State.Joiner.Joining -> "Joiner.Joining"
-        ExchangeV2State.Joiner.AbortedLocal -> "Joiner.AbortedLocal"
-        ExchangeV2State.Joiner.AbortedByHost -> "Joiner.AbortedByHost"
-        ExchangeV2State.Joiner.Done -> "Joiner.Done"
-        ExchangeV2State.Joiner.JoinFailed -> "Joiner.JoinFailed"
-    }
-
-    private fun labelFor(trigger: LocalTrigger): String = when (trigger) {
-        LocalTrigger.UserConfirmedHost -> "UserConfirmedHost"
-        LocalTrigger.UserDeniedHost -> "UserDeniedHost"
-        LocalTrigger.UserConfirmedJoiner -> "UserConfirmedJoiner"
-        LocalTrigger.UserDeniedJoiner -> "UserDeniedJoiner"
-        is LocalTrigger.HostSendComplete -> "HostSendComplete(${trigger.negotiatedVersion.prettyPrint()})"
-        is LocalTrigger.JoinerJoinComplete -> "JoinerJoinComplete(${trigger.reason.value})"
-        LocalTrigger.HostUnavailable -> "HostUnavailable"
-        is LocalTrigger.RoleElected -> "RoleElected(${trigger.role})"
-        is LocalTrigger.HostStatusDeadlineElapsed -> "HostStatusDeadlineElapsed(${trigger.deadline})"
-    }
-
-    private fun labelFor(reason: RejectReason): String = when (reason) {
-        RejectReason.ImplicitAbort -> "ImplicitAbort"
-        RejectReason.SameAccount -> "SameAccount"
-        RejectReason.UnknownMessageDropped -> "UnknownMessageDropped"
-        RejectReason.TooHighProtocolDropped -> "TooHighProtocolDropped"
-        RejectReason.PeerLeft -> "PeerLeft"
-    }
-
-    private fun labelFor(reason: NotSentReason): String = when (reason) {
-        NotSentReason.OwnChannelNotConfigured -> "OwnChannelNotConfigured"
-        is NotSentReason.HttpError -> "HttpError(${reason.code})"
-        is NotSentReason.TooHighProtocol -> "TooHighProtocol(negotiated ${reason.negotiatedVersion.prettyPrint()})"
-    }
-
-    private fun labelFor(peerSource: PeerVersionSource): String = when (peerSource) {
-        PeerVersionSource.LinkingCode -> "linking_code"
-        PeerVersionSource.HelloMessage -> "hello_message"
     }
 
     private companion object {

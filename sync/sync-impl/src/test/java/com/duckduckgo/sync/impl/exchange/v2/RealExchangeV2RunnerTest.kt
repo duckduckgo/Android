@@ -1263,6 +1263,100 @@ class RealExchangeV2RunnerTest {
         )
     }
 
+    // ---- SessionEnded + RoleElected events ----
+
+    @Test fun `cancel emits SessionEnded with bye reason Cancelled`() = runTest {
+        val runner = newRunner()
+        runner.startScan("")
+
+        runner.cancel()
+
+        val ended = runner.events.replayCache.filterIsInstance<ExchangeV2Event.SessionEnded>().single()
+        assertSame(ExchangeV2State.Negotiating, ended.lastState)
+        assertEquals(Bye.Reason.Cancelled, ended.byeReason)
+    }
+
+    @Test fun `a terminal state emits SessionEnded`() = runTest {
+        whenever(syncStore.userId).thenReturn(null)
+        val runner = newRunner()
+        runner.startScan("")
+        runner.deliverIncomingMessage(RecoveryCodeAvailable.create(userId = "other", name = "Peer", kind = "3party"))
+        runner.localTrigger(LocalTrigger.UserConfirmedJoiner)
+        runner.deliverIncomingMessage(RecoveryCodeResponse.fromJson("{}"))
+
+        runner.localTrigger(LocalTrigger.JoinerJoinComplete(RecoveryCodeDone.Reason.Success))
+
+        assertNull(runner.currentState)
+        val ended = runner.events.replayCache.filterIsInstance<ExchangeV2Event.SessionEnded>().single()
+        assertSame(ExchangeV2State.Joiner.Done, ended.lastState)
+    }
+
+    @Test fun `starting a new session emits SessionEnded for the abandoned one`() = runTest {
+        val runner = newRunner()
+        runner.startScan("")
+
+        runner.startScan("")
+
+        val ended = runner.events.replayCache.filterIsInstance<ExchangeV2Event.SessionEnded>().single()
+        assertEquals(Bye.Reason.Cancelled, ended.byeReason)
+    }
+
+    @Test fun `tearing down nothing emits no SessionEnded`() = runTest {
+        val runner = newRunner()
+
+        runner.cancel()
+
+        assertTrue(runner.events.replayCache.filterIsInstance<ExchangeV2Event.SessionEnded>().isEmpty())
+    }
+
+    @Test fun `auto-election emits RoleElected carrying the inputs that drove it, before the transition`() = runTest {
+        whenever(syncStore.userId).thenReturn(null)
+        val runner = newRunner()
+        runner.startScan("")
+
+        runner.deliverIncomingMessage(RecoveryCodeAvailable.create(userId = "peer-user", name = "Peer", kind = "3party"))
+
+        val events = runner.events.replayCache
+        val elected = events.filterIsInstance<ExchangeV2Event.RoleElected>().single()
+        assertSame(Role.Joiner, elected.role)
+        assertSame(PairingRole.Scanner, elected.ownPairingRole)
+        assertFalse(elected.ownSignedIn)
+        assertEquals("ddg", elected.ownKind)
+        assertEquals("3party", elected.peerKind)
+        assertTrue(elected.peerSignedIn)
+        val electedIndex = events.indexOfFirst { it is ExchangeV2Event.RoleElected }
+        val transitionIndex = events.indexOfFirst { it is ExchangeV2Event.Transition && it.to == ExchangeV2State.Joiner.Confirming }
+        assertTrue("RoleElected must precede the transition it explains", electedIndex in 0 until transitionIndex)
+    }
+
+    @Test fun `a poll decrypt failure emits a MessageDecryptionFailed SessionError and SessionEnded`() = runTest {
+        whenever(syncStore.userId).thenReturn("my-user")
+        whenever(channel.poll(any(), any(), anyOrNull())).thenReturn(
+            flow<ExchangeV2Message> { throw EnvelopeDecryptFailure(seq = 3, cause = RuntimeException("bad key")) },
+        )
+        val runner = newRunner()
+
+        runner.startPresent()
+
+        val error = runner.events.replayCache.filterIsInstance<ExchangeV2Event.SessionError>().single()
+        assertEquals(SessionErrorKind.MessageDecryptionFailed, error.kind)
+        val ended = runner.events.replayCache.filterIsInstance<ExchangeV2Event.SessionEnded>().single()
+        assertEquals(Bye.Reason.Error, ended.byeReason)
+    }
+
+    @Test fun `a poll envelope requiring a newer protocol emits a PeerProtocolTooNew SessionError`() = runTest {
+        whenever(syncStore.userId).thenReturn("my-user")
+        whenever(channel.poll(any(), any(), anyOrNull())).thenReturn(
+            flow<ExchangeV2Message> { throw EnvelopeVersionTooNew(ExchangeProtocolVersion.V2_1) },
+        )
+        val runner = newRunner()
+
+        runner.startPresent()
+
+        val error = runner.events.replayCache.filterIsInstance<ExchangeV2Event.SessionError>().single()
+        assertEquals(SessionErrorKind.PeerProtocolTooNew, error.kind)
+    }
+
     // ---- Helpers ----
 
     private fun givenOurVersion(version: ExchangeProtocolVersion.V2) {
