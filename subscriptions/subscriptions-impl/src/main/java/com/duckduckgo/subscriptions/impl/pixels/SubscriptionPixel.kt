@@ -364,7 +364,6 @@ object SubscriptionPixelParameter {
     const val ERROR_TYPE = "errorType"
     const val REASON = "reason"
     const val OS_VERSION = "os_version"
-    const val PETAL = "petal"
     const val ACTIVATION_DAY = "activation_day"
     const val ACTIVATION_PLATFORM = "activation_platform"
     const val DAYS_SINCE_INSTALL = "days_since_install"
