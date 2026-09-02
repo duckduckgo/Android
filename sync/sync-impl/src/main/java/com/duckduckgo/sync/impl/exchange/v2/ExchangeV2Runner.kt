@@ -96,20 +96,13 @@ interface ExchangeV2Runner {
      */
     suspend fun cancel()
 
-    suspend fun deliverIncomingMessage(message: ExchangeV2Message)
-
-    suspend fun deliverIncomingMessageJson(rawJson: String)
-
     fun localTrigger(trigger: LocalTrigger)
-
-    fun recordSentMessage(message: ExchangeV2Message)
 }
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealExchangeV2Runner @Inject constructor(
     private val smFactory: ExchangeV2StateMachineFactory,
-    private val messageParser: ExchangeV2MessageParser,
     private val clock: ExchangeV2Clock,
     private val syncStore: SyncStore,
     private val jweCrypto: SyncJweCrypto,
@@ -154,6 +147,11 @@ class RealExchangeV2Runner @Inject constructor(
 
     @Volatile private var sentOwnAvailability: Boolean = false
 
+    @Volatile private var advertisedVersion: ExchangeProtocolVersion.V2 = BASELINE_PROTOCOL_VERSION
+
+    @Volatile internal var negotiatedVersion: ExchangeProtocolVersion.V2 = BASELINE_PROTOCOL_VERSION
+        private set
+
     /**
      * Host-side messages arriving while the Joiner is still at the user-confirm prompt, buffered
      * and replayed on confirm (Joiner.Confirming → Joiner.Waiting) so the SM doesn't reject them
@@ -189,6 +187,7 @@ class RealExchangeV2Runner @Inject constructor(
                     cancelLocked() // bootstrap already emitted the error; just clear the half-set state
                     return@launch
                 }
+                negotiatedVersion = negotiateProtocolVersion(parsed.version)
                 // Scanner already knows the peer; SM starts directly in Negotiating.
                 session = smFactory.create(
                     localUserId = syncStore.userId,
@@ -222,7 +221,7 @@ class RealExchangeV2Runner @Inject constructor(
                 _linkingCode = qrCode.buildLinkingCode(
                     channelId = ownChannelId!!,
                     publicKeyBase64Url = keyPair.publicKeyBase64,
-                    version = ourProtocolVersion(),
+                    version = advertisedVersion,
                 )
                 // Presenter waits to receive hello before transitioning out of Bootstrapped.
                 session = smFactory.create(
@@ -242,6 +241,7 @@ class RealExchangeV2Runner @Inject constructor(
      * (in which case an error event was already emitted).
      */
     private suspend fun bootstrapLocked(role: PairingRole): RsaKeyPair? {
+        advertisedVersion = if (syncFeature.canUseExchangeV2Point1().isEnabled()) ExchangeProtocolVersion.V2_1 else BASELINE_PROTOCOL_VERSION
         val keyPair = jweCrypto.generateRsaKeyPair(EXCHANGE_RSA_KEY_SIZE)
         ownKeyPair = keyPair
         repeat(MAX_CHANNEL_CREATE_RETRIES) { attempt ->
@@ -331,6 +331,8 @@ class RealExchangeV2Runner @Inject constructor(
         peerUserId = null
         _peerName = null
         _linkingCode = null
+        advertisedVersion = BASELINE_PROTOCOL_VERSION
+        negotiatedVersion = BASELINE_PROTOCOL_VERSION
         sentOwnAvailability = false
         pendingJoinerWaitingMessages.clear()
     }
@@ -405,7 +407,7 @@ class RealExchangeV2Runner @Inject constructor(
     // Inbound message handling + orchestration
     // -----------------------------------------------------------------------
 
-    override suspend fun deliverIncomingMessage(message: ExchangeV2Message) {
+    internal suspend fun deliverIncomingMessage(message: ExchangeV2Message) {
         // Suspends until processing completes so the poll loop processes messages in wire order;
         // a fire-and-forget launch here would let a poll batch race to the SM out of sequence.
         mutex.withLock { processIncomingLocked(message) }
@@ -517,6 +519,7 @@ class RealExchangeV2Runner @Inject constructor(
             is ExchangeV2Message.Hello -> {
                 peerChannelId = message.channelId
                 peerPublicKey = message.publicKey
+                negotiatedVersion = negotiateProtocolVersion(message.version)
             }
             is ExchangeV2Message.RecoveryCodeAvailable -> {
                 _peerKind = message.kind
@@ -595,10 +598,6 @@ class RealExchangeV2Runner @Inject constructor(
         }
     }
 
-    override suspend fun deliverIncomingMessageJson(rawJson: String) {
-        deliverIncomingMessage(messageParser.parse(rawJson))
-    }
-
     // -----------------------------------------------------------------------
     // Local triggers — drive SM + send outbound messages on Host transitions
     // -----------------------------------------------------------------------
@@ -668,13 +667,10 @@ class RealExchangeV2Runner @Inject constructor(
         val hello = ExchangeV2Message.Hello.create(
             channelId = own,
             publicKey = ourKey.publicKeyBase64,
-            version = ourProtocolVersion(),
+            version = advertisedVersion,
         )
         return sendOnWireAndRecord(hello, peer, peerKey)
     }
-
-    private fun ourProtocolVersion(): ExchangeProtocolVersion.V2 =
-        if (syncFeature.canUseExchangeV2Point1().isEnabled()) ExchangeProtocolVersion.V2_1 else ExchangeProtocolVersion.V2_0
 
     private fun sendOwnAvailability() {
         if (sentOwnAvailability) return
@@ -811,7 +807,7 @@ class RealExchangeV2Runner @Inject constructor(
         else -> SessionErrorKind.Unknown
     }
 
-    override fun recordSentMessage(message: ExchangeV2Message) {
+    internal fun recordSentMessage(message: ExchangeV2Message) {
         logcat { "Sync-ExchangeV2: recordSentMessage ${message.messageType}" }
         emit(ExchangeV2Event.MessageSent(clock.nowMs(), message))
     }
@@ -865,6 +861,16 @@ class RealExchangeV2Runner @Inject constructor(
         else -> false
     }
 
+    private fun negotiateProtocolVersion(peerVersion: ExchangeProtocolVersion): ExchangeProtocolVersion.V2 {
+        val ourVersion = advertisedVersion
+        val negotiatedVersion = when (peerVersion) {
+            is ExchangeProtocolVersion.V2 -> minOf(ourVersion, peerVersion)
+            else -> BASELINE_PROTOCOL_VERSION
+        }
+        logcat { "Sync-ExchangeV2: negotiated protocol version: v$negotiatedVersion, our version: v$ourVersion, peer version: v$peerVersion" }
+        return negotiatedVersion
+    }
+
     companion object {
         // RSA modulus size (bits) for the v2 exchange pairing keypair.
         private const val EXCHANGE_RSA_KEY_SIZE = 2048
@@ -878,5 +884,7 @@ class RealExchangeV2Runner @Inject constructor(
         private const val OWN_DEVICE_KIND = "ddg"
         private const val MAX_CHANNEL_CREATE_RETRIES = 3
         private const val HTTP_CONFLICT = 409
+
+        private val BASELINE_PROTOCOL_VERSION get() = ExchangeProtocolVersion.V2_0
     }
 }
