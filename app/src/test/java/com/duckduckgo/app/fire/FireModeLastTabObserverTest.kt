@@ -151,6 +151,22 @@ class FireModeLastTabObserverTest {
     }
 
     @Test
+    fun whenTheAppIsForegroundedWithAFireClosePendingThenItIsCommittedAndBurned() = runTest {
+        startObserving()
+        // the user closed the last Fire tab, so its row is still counted while it waits on Undo
+        pendingUndoIds = listOf("fire-1")
+        whenever(fireTabRepository.purgeDeletableTabs()).thenAnswer {
+            fireTabCount.value = 0
+            Unit
+        }
+
+        testee.onStart(mock())
+
+        verify(adClickManager).clearTabId("fire-1")
+        verifyBurned(times(1))
+    }
+
+    @Test
     fun whenNoFireCloseIsPendingThenStartupPurgesNothing() = runTest {
         fireTabCount.value = 0
 
