@@ -37,4 +37,11 @@ enum class OnboardingPixelName(override val pixelName: String) : Pixel.PixelName
     ONBOARDING_END("onboarding_end"),
     ONBOARDING_SUBSCRIPTION_PROMO("onboarding_subscription-promo"),
     ONBOARDING_PASSWORD_IMPORT("onboarding_password-import"),
+    ONBOARDING_DOWNLOAD_CHOICE("onboarding_download-choice"),
+    ONBOARDING_PREFERENCES_SERP("onboarding_preferences_serp"),
+    ONBOARDING_PREFERENCES_AI_MODEL("onboarding_preferences_ai-model"),
+    ONBOARDING_PREFERENCES_AI_TOGGLE_MODE("onboarding_preferences_ai-toggle-mode"),
+    ONBOARDING_PREFERENCES_AI_SEARCH("onboarding_preferences_ai-search"),
+    ONBOARDING_PREFERENCES_DUCK_AI("onboarding_preferences_duck-ai"),
+    ONBOARDING_PREFERENCES_AD_BLOCKING("onboarding_preferences_ad-blocking"),
 }

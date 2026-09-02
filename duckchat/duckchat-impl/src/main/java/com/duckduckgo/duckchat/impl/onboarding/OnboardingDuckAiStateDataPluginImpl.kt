@@ -80,12 +80,12 @@ class OnboardingDuckAiStateDataPluginImpl @Inject constructor(
         /** Display order, first entry is the default. Ids are the step's pixel values, so they must not change. */
         val OFFERED = listOf(
             StateSpec(
-                id = "duck_ai_on",
+                id = "on",
                 enabled = true,
                 labelRes = R.string.duckChatOnboardingDuckAiStateOn,
             ),
             StateSpec(
-                id = "duck_ai_off",
+                id = "off",
                 enabled = false,
                 labelRes = R.string.duckChatOnboardingDuckAiStateOff,
             ),

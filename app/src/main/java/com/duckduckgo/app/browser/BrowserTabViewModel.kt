@@ -3922,7 +3922,7 @@ class BrowserTabViewModel @Inject constructor(
     fun onUserClickCtaSecondaryButton(cta: Cta) {
         releaseAddWidgetModalSlot(cta)
         viewModelScope.launch {
-            ctaViewModel.onUserDismissedCta(cta)
+            ctaViewModel.onUserDismissedCta(cta, viaSkipBtn = true)
             if (cta is BrokenSitePromptDialogCta) {
                 onBrokenSiteCtaDismissButtonClicked(cta)
             }

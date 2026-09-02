@@ -2462,6 +2462,24 @@ class CtaViewModelTest {
         verify(mockOnboardingPixelSender).fireContextual(ONBOARDING_SUBSCRIPTION_PROMO, OnboardingPixelAction.Clicked(engaged = false))
     }
 
+    @Test
+    fun whenBrandDesignEndBubbleSkippedThenClickedDismissFired() = runTest {
+        val cta = daxEndBrandDesignUpdateBubbleCta()
+
+        testee.onUserDismissedCta(cta, viaSkipBtn = true)
+
+        verify(mockOnboardingPixelSender).fireContextual(ONBOARDING_END, OnboardingPixelAction.Clicked(engaged = false))
+    }
+
+    @Test
+    fun whenBrandDesignEndBubbleSkippedThenClosePixelNotFired() = runTest {
+        val cta = daxEndBrandDesignUpdateBubbleCta()
+
+        testee.onUserDismissedCta(cta, viaSkipBtn = true)
+
+        verify(mockPixel, never()).fire(eq(ONBOARDING_DAX_CTA_DISMISS_BUTTON), any(), any(), eq(Count))
+    }
+
     private fun subscriptionPromoBubbleCta() = DaxSubscriptionBrandDesignUpdateBubbleCta(
         mockOnboardingStore,
         mockAppInstallStore,

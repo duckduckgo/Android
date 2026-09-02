@@ -256,9 +256,10 @@ class CtaViewModel @Inject constructor(
     suspend fun onUserDismissedCta(
         cta: Cta,
         viaCloseBtn: Boolean = false,
+        viaSkipBtn: Boolean = false,
     ) {
         withContext(dispatchers.io()) {
-            if (viaCloseBtn) {
+            if (viaCloseBtn || viaSkipBtn) {
                 contextualOnboardingPixelName(cta)?.let {
                     onboardingPixelSender.fireContextual(it, OnboardingPixelAction.Clicked(engaged = false))
                 }
