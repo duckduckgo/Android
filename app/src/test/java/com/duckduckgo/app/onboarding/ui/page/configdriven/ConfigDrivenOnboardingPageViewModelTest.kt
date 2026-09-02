@@ -686,13 +686,72 @@ class ConfigDrivenOnboardingPageViewModelTest {
 
             testee.onPasswordImportResult(Activity.RESULT_OK, null)
             advanceUntilIdle()
-            assertEquals(Command.ShowPasswordImportError, awaitItem())
+            expectNoEvents()
         }
 
+        assertTrue(testee.viewState.value.showPasswordImportError)
         assertEquals(
             listOf(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.TRANSIENT_ERROR)),
             recordedEvents,
         )
+    }
+
+    @Test
+    fun `keeps the transient import error flagged so a recreated view can restore the alert`() = runTest {
+        whenever(mockImportPasswordsFromGoogle.parseResult(anyOrNull())).thenReturn(ImportPasswordsResult.Error.Transient)
+        val testee = startAt(NewUserOnboardingActivityDialog.ImportPasswordsLaunch)
+        advanceUntilIdle()
+        testee.onPasswordImportResult(Activity.RESULT_OK, null)
+        advanceUntilIdle()
+
+        // The view collecting the state again is what a configuration change looks like to the view model.
+        assertTrue(testee.viewState.value.showPasswordImportError)
+    }
+
+    @Test
+    fun `clears the transient import error and asks for the import again on retry`() = runTest {
+        whenever(mockImportPasswordsFromGoogle.parseResult(anyOrNull())).thenReturn(ImportPasswordsResult.Error.Transient)
+        val testee = startAt(NewUserOnboardingActivityDialog.ImportPasswordsLaunch)
+        advanceUntilIdle()
+        testee.onPasswordImportResult(Activity.RESULT_OK, null)
+        advanceUntilIdle()
+
+        testee.onPasswordImportRetry()
+        advanceUntilIdle()
+
+        assertFalse(testee.viewState.value.showPasswordImportError)
+        assertTrue(recordedEvents.contains(NewUserOnboardingEvent.PasswordImportRequested))
+    }
+
+    @Test
+    fun `clears the transient import error and skips the import when the alert is dismissed with cancel`() = runTest {
+        whenever(mockImportPasswordsFromGoogle.parseResult(anyOrNull())).thenReturn(ImportPasswordsResult.Error.Transient)
+        val testee = startAt(NewUserOnboardingActivityDialog.ImportPasswordsLaunch)
+        advanceUntilIdle()
+        testee.onPasswordImportResult(Activity.RESULT_OK, null)
+        advanceUntilIdle()
+
+        testee.onPasswordImportErrorSkipped()
+        advanceUntilIdle()
+
+        assertFalse(testee.viewState.value.showPasswordImportError)
+        assertTrue(recordedEvents.contains(NewUserOnboardingEvent.PasswordImportSkipped))
+    }
+
+    @Test
+    fun `clears the transient import error without moving the flow when the alert is cancelled`() = runTest {
+        whenever(mockImportPasswordsFromGoogle.parseResult(anyOrNull())).thenReturn(ImportPasswordsResult.Error.Transient)
+        val testee = startAt(NewUserOnboardingActivityDialog.ImportPasswordsLaunch)
+        advanceUntilIdle()
+        testee.onPasswordImportResult(Activity.RESULT_OK, null)
+        advanceUntilIdle()
+        val eventsBefore = recordedEvents.toList()
+
+        testee.onPasswordImportErrorDismissed()
+        advanceUntilIdle()
+
+        assertFalse(testee.viewState.value.showPasswordImportError)
+        assertEquals(eventsBefore, recordedEvents)
     }
 
     @Test

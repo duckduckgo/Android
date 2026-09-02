@@ -1760,16 +1760,26 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
-    fun `when the password import fails transiently then stays on the launch step`() = runTest {
+    fun `when the password import fails transiently then goes back to the import step`() = runTest {
         startAtPasswordImportLaunch()
 
         orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.TRANSIENT_ERROR))
+
+        assertStep(NewUserOnboardingStepIds.PASSWORD_IMPORT)
+    }
+
+    @Test
+    fun `when the import is requested again after a transient failure then returns to the launch step`() = runTest {
+        startAtPasswordImportLaunch()
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.TRANSIENT_ERROR))
+
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportRequested)
 
         assertStep(NewUserOnboardingStepIds.PASSWORD_IMPORT_LAUNCH)
     }
 
     @Test
-    fun `when the retry alert is dismissed then skips past the import and its outcome step`() = runTest {
+    fun `when the import is skipped after a transient failure then skips past the import and its outcome step`() = runTest {
         startAtPasswordImportLaunch()
         orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.TRANSIENT_ERROR))
 

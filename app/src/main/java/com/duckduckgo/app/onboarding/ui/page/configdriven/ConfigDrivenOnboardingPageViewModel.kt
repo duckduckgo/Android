@@ -88,6 +88,7 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
 
     data class ViewState(
         val screen: Screen? = null,
+        val showPasswordImportError: Boolean = false,
     )
 
     sealed interface Screen {
@@ -135,7 +136,6 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
         ) : Command
         data class ShowQuickSetupSearchOptionsBottomSheet(val initialWithAi: Boolean) : Command
         data object LaunchPasswordImport : Command
-        data object ShowPasswordImportError : Command
     }
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -309,7 +309,18 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
         }
     }
 
-    fun onPasswordImportRetry() = launchPasswordImport()
+    fun onPasswordImportRetry() {
+        dismissPasswordImportError()
+        emit(NewUserOnboardingEvent.PasswordImportRequested)
+    }
+
+    fun onPasswordImportErrorSkipped() {
+        dismissPasswordImportError()
+        emit(NewUserOnboardingEvent.PasswordImportSkipped)
+    }
+
+    /** The alert was cancelled without choosing: the import card underneath still offers both actions. */
+    fun onPasswordImportErrorDismissed() = dismissPasswordImportError()
 
     fun onPasswordImportResult(resultCode: Int, data: Intent?) {
         if (resultCode != Activity.RESULT_OK) {
@@ -353,8 +364,12 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
     }
 
     private fun showImportErrorDialog() {
+        _viewState.update { it.copy(showPasswordImportError = true) }
         emit(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.TRANSIENT_ERROR))
-        viewModelScope.launch { _commands.send(Command.ShowPasswordImportError) }
+    }
+
+    private fun dismissPasswordImportError() {
+        _viewState.update { it.copy(showPasswordImportError = false) }
     }
 
     private fun cancelPasswordImport() {

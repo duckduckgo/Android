@@ -43,7 +43,6 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentOnboardingWelcomePageUpdateBinding
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserSystemSettings
 import com.duckduckgo.app.browser.omnibar.OmnibarType
-import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.app.onboarding.ui.page.OnboardingBackgroundAnimator
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
@@ -66,6 +65,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource.Onboarding
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillImportPasswordsScreen
 import com.duckduckgo.common.ui.store.AppTheme
+import com.duckduckgo.common.ui.view.dialog.DaxAlertDialog
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -110,6 +110,7 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
 
     private var engine: DialogRenderEngine? = null
     private var intro: OnboardingIntroChoreographer? = null
+    private var passwordImportErrorDialog: DaxAlertDialog? = null
 
     /** Fed to the embellishment controller's fit corrector; kept in sync by the window-insets listener below. */
     private var cardBottomInsetPx = 0
@@ -222,6 +223,7 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
                     ConfigDrivenOnboardingPageViewModel.Screen.None -> intro?.dismissUnplayed()
                     null -> Unit
                 }
+                renderPasswordImportError(state.showPasswordImportError)
             }
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
@@ -350,12 +352,17 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
             ConfigDrivenOnboardingPageViewModel.Command.LaunchPasswordImport -> passwordImportFlow.launch(
                 globalActivityStarter.startIntent(requireContext(), AutofillImportPasswordsScreen(Onboarding)),
             )
-            ConfigDrivenOnboardingPageViewModel.Command.ShowPasswordImportError -> showPasswordImportError()
         }
     }
 
-    private fun showPasswordImportError() {
-        TextAlertDialogBuilder(requireContext())
+    private fun renderPasswordImportError(visible: Boolean) {
+        if (!visible) {
+            passwordImportErrorDialog?.dismiss()
+            passwordImportErrorDialog = null
+            return
+        }
+        if (passwordImportErrorDialog?.isShowing() == true) return
+        passwordImportErrorDialog = TextAlertDialogBuilder(requireContext())
             .setTitle(R.string.preOnboardingImportErrorTitle)
             .setMessage(R.string.preOnboardingImportErrorBody)
             .setPositiveButton(R.string.preOnboardingImportErrorRetry)
@@ -367,11 +374,15 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
                     }
 
                     override fun onNegativeButtonClicked() {
-                        viewModel.onEvent(NewUserOnboardingEvent.PasswordImportSkipped)
+                        viewModel.onPasswordImportErrorSkipped()
+                    }
+
+                    override fun onDialogCancelled() {
+                        viewModel.onPasswordImportErrorDismissed()
                     }
                 },
             )
-            .show()
+            .also { it.show() }
     }
 
     private fun openDefaultBrowserSystemSettings() {
@@ -403,6 +414,9 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
 
     override fun onDestroyView() {
         super.onDestroyView()
+        // Detach the window before it goes; the view model keeps the flag so the next view puts the alert back.
+        passwordImportErrorDialog?.dismiss()
+        passwordImportErrorDialog = null
         engine?.release()
         engine = null
         intro?.release()

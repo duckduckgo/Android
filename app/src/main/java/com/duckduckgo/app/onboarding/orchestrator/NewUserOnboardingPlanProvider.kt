@@ -961,9 +961,11 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                             GoBack
                         }
 
+                        // Back to the import card so its Import/Skip actions stay live: the retry alert is
+                        // dropped on configuration change and would otherwise be the only way forward.
                         PasswordImportOutcome.TRANSIENT_ERROR -> {
                             onboardingPixelSender.fire(pixelName, OnboardingPixelAction.PasswordImportConfirmed(event.outcome))
-                            Stay
+                            GoBack
                         }
 
                         PasswordImportOutcome.PERMANENT_ERROR -> {
