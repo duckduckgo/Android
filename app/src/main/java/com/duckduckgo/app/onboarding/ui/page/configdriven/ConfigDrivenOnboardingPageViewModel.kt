@@ -36,6 +36,7 @@ import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanProvider
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingResult
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingStepIds
 import com.duckduckgo.app.onboarding.orchestrator.PasswordImportOutcome
+import com.duckduckgo.app.onboarding.orchestrator.PasswordImportResult
 import com.duckduckgo.app.onboarding.orchestrator.stepIndicatorProgress
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -51,6 +52,7 @@ import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
 import com.duckduckgo.onboarding.api.LinearOnboardingState
 import com.duckduckgo.onboarding.api.LinearOnboardingStepId
 import com.duckduckgo.onboarding.api.forPlan
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -65,6 +67,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 
@@ -156,6 +159,8 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
 
     private var quickSetupDefaultBrowserDialogShown = false
 
+    private var importOutcomeJob: Job? = null
+
     init {
         start()
     }
@@ -207,6 +212,8 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
             }
 
             is ContentInteraction.SelectSingleChoiceOption -> emit(NewUserOnboardingEvent.SingleChoiceConfirmed(interaction.option))
+
+            ContentInteraction.ResolveImportOutcome -> resolveImportOutcome(importCompleteState())
         }
     }
 
@@ -328,10 +335,12 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
             return
         }
         when (importPasswordsFromGoogle.parseResult(data)) {
-            is ImportPasswordsResult.Success -> showImportOutcome()
+            is ImportPasswordsResult.Success -> emit(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.SUCCESS))
             is ImportPasswordsResult.UserCancelled -> cancelPasswordImport()
             is ImportPasswordsResult.Error.Transient -> showImportErrorDialog()
-            is ImportPasswordsResult.Error.Permanent -> failPasswordImport()
+            is ImportPasswordsResult.Error.Permanent -> emit(
+                NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.PERMANENT_ERROR),
+            )
         }
     }
 
@@ -339,29 +348,26 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
         viewModelScope.launch { _commands.send(Command.LaunchPasswordImport) }
     }
 
-    private fun showImportOutcome() {
-        val state = importCompleteState()
-        state.value = ImportCompleteContentState.Parsing
-        emit(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.SUCCESS))
-        viewModelScope.launch {
-            val finished = importPasswordsFromGoogle.importStatus().filterIsInstance<ImportPasswordsStatus.Finished>().firstOrNull()
-            if (finished == null) {
-                state.value = ImportCompleteContentState.Failed
-                emit(NewUserOnboardingEvent.PasswordImportParsed(PasswordImportOutcome.PERMANENT_ERROR))
-                return@launch
+    private fun resolveImportOutcome(state: MutableStateFlow<ImportCompleteContentState>) {
+        if (state.value !is ImportCompleteContentState.Parsing) return
+        if (importOutcomeJob?.isActive == true) return
+        importOutcomeJob = viewModelScope.launch {
+            val finished = withTimeoutOrNull(IMPORT_STATUS_TIMEOUT) {
+                importPasswordsFromGoogle.importStatus().filterIsInstance<ImportPasswordsStatus.Finished>().firstOrNull()
             }
-            state.value = ImportCompleteContentState.Finished(imported = finished.imported, skipped = finished.skipped)
-            emit(NewUserOnboardingEvent.PasswordImportParsed(PasswordImportOutcome.SUCCESS))
+            val result = finished
+                ?.let { PasswordImportResult.Imported(imported = it.imported, skipped = it.skipped) }
+                ?: PasswordImportResult.Failed
+            state.value = when (result) {
+                is PasswordImportResult.Imported -> ImportCompleteContentState.Finished(result.imported, result.skipped)
+                else -> ImportCompleteContentState.Failed
+            }
+            emit(NewUserOnboardingEvent.PasswordImportParsed(result))
         }
     }
 
     private fun importCompleteState(): MutableStateFlow<ImportCompleteContentState> =
         contentValues.contentState(NewUserOnboardingStepIds.PASSWORD_IMPORT_COMPLETE) { ImportCompleteContentState.Parsing }
-
-    private fun failPasswordImport() {
-        importCompleteState().value = ImportCompleteContentState.Failed
-        emit(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.PERMANENT_ERROR))
-    }
 
     private fun showImportErrorDialog() {
         _viewState.update { it.copy(showPasswordImportError = true) }
@@ -550,7 +556,7 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
             NewUserOnboardingActivityDialog.AddToDock,
             NewUserOnboardingActivityDialog.WidgetPrompt,
             NewUserOnboardingActivityDialog.ImportPasswords,
-            NewUserOnboardingActivityDialog.ImportComplete,
+            is NewUserOnboardingActivityDialog.ImportComplete,
             is NewUserOnboardingActivityDialog.AddressBarPosition,
             is NewUserOnboardingActivityDialog.InputScreen,
             is NewUserOnboardingActivityDialog.InputScreenPreview,
@@ -565,5 +571,9 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
 
     private fun emit(event: NewUserOnboardingEvent) {
         viewModelScope.launch { orchestrator.onEvent(event) }
+    }
+
+    private companion object {
+        val IMPORT_STATUS_TIMEOUT = 20.seconds
     }
 }

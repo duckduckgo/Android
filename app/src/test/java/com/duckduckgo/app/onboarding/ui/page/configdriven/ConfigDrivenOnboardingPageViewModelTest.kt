@@ -37,6 +37,7 @@ import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanBootstrap
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanProvider
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingStepIds
 import com.duckduckgo.app.onboarding.orchestrator.PasswordImportOutcome
+import com.duckduckgo.app.onboarding.orchestrator.PasswordImportResult
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.OnboardingBackground
 import com.duckduckgo.app.onboarding.ui.page.configdriven.ConfigDrivenOnboardingPageViewModel.Command
@@ -45,6 +46,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.autofill.api.ImportPasswordsFromGoogle
 import com.duckduckgo.autofill.api.ImportPasswordsFromGoogle.ImportPasswordsResult
+import com.duckduckgo.autofill.api.ImportPasswordsFromGoogle.ImportPasswordsStatus
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.onboarding.api.LinearOnboardingEvent
 import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
@@ -54,7 +56,9 @@ import com.duckduckgo.onboarding.api.LinearOnboardingState
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition
 import com.duckduckgo.onboarding.impl.LinearOnboardingOrchestratorImpl
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -772,6 +776,41 @@ class ConfigDrivenOnboardingPageViewModelTest {
             listOf(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.PERMANENT_ERROR)),
             recordedEvents,
         )
+    }
+
+    @Test
+    fun `resolves the outcome card and reports the counts once the import status reports`() = runTest {
+        whenever(mockImportPasswordsFromGoogle.importStatus())
+            .thenReturn(flowOf(ImportPasswordsStatus.Finished(imported = 3, skipped = 1)))
+        val testee = startAt(NewUserOnboardingActivityDialog.ImportComplete(PasswordImportResult.InProgress))
+        advanceUntilIdle()
+
+        // What the bound card raises when it binds on a state it cannot leave on its own.
+        testee.onContentInteraction(ContentInteraction.ResolveImportOutcome)
+        advanceUntilIdle()
+
+        assertEquals(
+            ImportCompleteContentState.Finished(imported = 3, skipped = 1),
+            importCompleteState(testee).value,
+        )
+        assertTrue(
+            recordedEvents.contains(
+                NewUserOnboardingEvent.PasswordImportParsed(PasswordImportResult.Imported(imported = 3, skipped = 1)),
+            ),
+        )
+    }
+
+    @Test
+    fun `fails the outcome card when the import status never reports a result`() = runTest {
+        whenever(mockImportPasswordsFromGoogle.importStatus()).thenReturn(MutableSharedFlow())
+        val testee = startAt(NewUserOnboardingActivityDialog.ImportComplete(PasswordImportResult.InProgress))
+        advanceUntilIdle()
+
+        testee.onContentInteraction(ContentInteraction.ResolveImportOutcome)
+        // Runs out the bounded wait: the status never reports, so the card cannot stay on the shimmer.
+        advanceUntilIdle()
+
         assertEquals(ImportCompleteContentState.Failed, importCompleteState(testee).value)
+        assertTrue(recordedEvents.contains(NewUserOnboardingEvent.PasswordImportParsed(PasswordImportResult.Failed)))
     }
 }
