@@ -377,6 +377,7 @@
 
     <!-- Pairing screen -->
     <string name="sync_simplified_pairing_headline">Sync &amp; Backup er ende-til-ende-kryptert på alle enhetene dine.</string>
+    <string name="sync_simplified_pairing_headline_check_other_device">Sjekk den andre enheten din</string>
     <string name="sync_simplified_pairing_headline_recovery">Gjenoppretter data</string>
     <string name="sync_simplified_pairing_body">Kobler til…</string>
 
@@ -389,6 +390,9 @@
     <string name="sync_simplified_pairing_dialog_joiner_secondary_button">Avbryt</string>
     <string name="sync_simplified_pairing_dialog_acknowledgment_title">Bekreft på den andre enheten …</string>
     <string name="sync_simplified_pairing_dialog_acknowledgment_primary_button">Den er grei</string>
+    <string name="sync_simplified_pairing_dialog_check_other_device_title">Sjekk den andre enheten din</string>
+    <string name="sync_simplified_pairing_dialog_connecting_title">Synkronisering pågår</string>
+    <string name="sync_simplified_pairing_dialog_connecting_body">Kobler til…</string>
 
     <!-- Recovery Code screen -->
     <string name="sync_simplified_recovery_code_headline" instruction="Placeholder is a device name. e.g., Samsung S23">%1$s er lagt til i Sync &amp; Backup.</string>
