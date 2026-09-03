@@ -1591,31 +1591,19 @@ sealed class DaxBubbleCta(
         fun configureWavingDax(
             dax: LottieAnimationView,
             deviceInfo: DeviceInfo,
-            improvementsEnabled: Boolean = false,
         ) {
             val spec = wavingDaxSpec
             val density = dax.resources.displayMetrics.density
             dax.rotation = spec.rotationDegrees
-            if (improvementsEnabled) {
-                dax.translationY = spec.bottomTranslationYDp * density
-            } else {
-                dax.translationX = spec.translationXDp * density
-                dax.translationY = spec.translationYDp * density
-            }
+            dax.translationY = spec.bottomTranslationYDp * density
             (dax.layoutParams as? ConstraintLayout.LayoutParams)?.let { lp ->
                 lp.startToStart = if (spec.anchorToCardOnTablet && deviceInfo.isTablet()) {
                     R.id.brandDesignCardView
                 } else {
                     ConstraintLayout.LayoutParams.PARENT_ID
                 }
-                if (improvementsEnabled) {
-                    lp.topToBottom = ConstraintLayout.LayoutParams.UNSET
-                    lp.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
-                } else {
-                    lp.bottomToBottom = ConstraintLayout.LayoutParams.UNSET
-                    lp.topToBottom = ConstraintLayout.LayoutParams.PARENT_ID
-                    lp.height = (spec.maxHeightDp * density).toInt()
-                }
+                lp.topToBottom = ConstraintLayout.LayoutParams.UNSET
+                lp.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
                 dax.layoutParams = lp
             }
         }
@@ -1645,8 +1633,6 @@ sealed class DaxBubbleCta(
         appInstallStore: AppInstallStore,
         open val isLightTheme: Boolean,
         open val deviceInfo: DeviceInfo,
-        open val onboardingImprovementsEnabled: Boolean = true,
-        open val onboardingImprovementsV2Enabled: Boolean = true,
     ) : DaxBubbleCta(
         ctaId = ctaId,
         title = title,
@@ -1699,8 +1685,8 @@ sealed class DaxBubbleCta(
         private var arrowDepthAnimator: ValueAnimator? = null
 
         private val wavingDaxController: WavingDaxController? by lazy {
-            if (onboardingImprovementsEnabled && this is ShowsWavingDax) {
-                WavingDaxController(showArrow, deviceInfo, wavingDaxSpec, improvementsV2Enabled = onboardingImprovementsV2Enabled)
+            if (this is ShowsWavingDax) {
+                WavingDaxController(showArrow, deviceInfo, wavingDaxSpec)
             } else {
                 null
             }
@@ -1741,18 +1727,8 @@ sealed class DaxBubbleCta(
                     showsWavingDax.configureWavingDax(
                         dax = dax,
                         deviceInfo = deviceInfo,
-                        improvementsEnabled = onboardingImprovementsEnabled && onboardingImprovementsV2Enabled,
                     )
-                    if (onboardingImprovementsEnabled) {
-                        dax.isInvisible = true
-                    } else {
-                        if (!dax.isVisible || dax.alpha == 0f) {
-                            dax.progress = 0f
-                            dax.alpha = 1f
-                            dax.isVisible = true
-                            dax.post { dax.playAnimation() }
-                        }
-                    }
+                    dax.isInvisible = true
                 } else {
                     dax.isGone = true
                 }
@@ -1765,7 +1741,7 @@ sealed class DaxBubbleCta(
          * guard, so [showCta] and the controller can never both write the fin.
          */
         private fun showCtaFinTarget(container: View): Float? {
-            if (onboardingImprovementsEnabled && this is ShowsWavingDax && !container.isPhoneLandscape()) return null
+            if (this is ShowsWavingDax && !container.isPhoneLandscape()) return null
             return if (showArrow && !container.isPhoneLandscape()) 1f else 0f
         }
 
@@ -1775,7 +1751,6 @@ sealed class DaxBubbleCta(
         }
 
         fun onOrientationChanged() {
-            if (!onboardingImprovementsEnabled) return
             val container = ctaView ?: return
             val cardView = container.findViewById<DaxOnboardingBubbleBrandDesignUpdateCardView>(R.id.brandDesignCardView) ?: return
 

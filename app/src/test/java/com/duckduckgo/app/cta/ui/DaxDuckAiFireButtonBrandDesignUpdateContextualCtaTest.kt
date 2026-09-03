@@ -35,7 +35,6 @@ import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
-import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -116,12 +115,10 @@ class DaxDuckAiFireButtonBrandDesignUpdateContextualCtaTest {
         on { getPlugins() } doReturn listOf(mockSubscriptionPromoCtaShownPlugin)
     }
     private val mockDuckChat: DuckChat = mock()
-    private val mockOnboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = mock()
     private val mockAppTheme: AppTheme = mock { on { isLightModeEnabled() } doReturn true }
 
     private val mockDeviceInfo: DeviceInfo = mock()
 
-    private val enabledToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
     private val disabledToggle: Toggle = mock { on { it.isEnabled() } doReturn false }
 
     private val detectedRefreshPatterns = emptySet<RefreshPattern>()
@@ -142,8 +139,6 @@ class DaxDuckAiFireButtonBrandDesignUpdateContextualCtaTest {
         whenever(mockBrokenSitePrompt.isFeatureEnabled()).thenReturn(false)
         whenever(mockBrokenSitePrompt.getUserRefreshPatterns()).thenReturn(emptySet())
         whenever(mockSubscriptions.isEligible()).thenReturn(false)
-        whenever(mockOnboardingBrandDesignUpdateToggles.self()).thenReturn(disabledToggle)
-        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(disabledToggle)
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         whenever(mockOnboardingStore.isDuckAiOnboardingFlow()).thenReturn(true)
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
@@ -175,7 +170,6 @@ class DaxDuckAiFireButtonBrandDesignUpdateContextualCtaTest {
             duckPlayer = mockDuckPlayer,
             brokenSitePrompt = mockBrokenSitePrompt,
             subscriptionPromoCtaShownPlugins = mockSubscriptionPromoCtaShownPlugins,
-            onboardingBrandDesignUpdateToggles = mockOnboardingBrandDesignUpdateToggles,
             appTheme = mockAppTheme,
             deviceInfo = mockDeviceInfo,
             coroutineScope = coroutineRule.testScope,
@@ -189,9 +183,7 @@ class DaxDuckAiFireButtonBrandDesignUpdateContextualCtaTest {
     }
 
     @Test
-    fun whenBrandDesignFlagEnabledThenDuckAiFireButtonCtaReturnsBrandDesignVariant() = runTest {
-        givenBrandDesignFlagEnabled()
-
+    fun whenDuckAiFireButtonCtaAvailableThenReturnsBrandDesignVariant() = runTest {
         val cta = testee.refreshCta(
             coroutineRule.testDispatcher,
             isBrowserShowing = true,
@@ -201,20 +193,6 @@ class DaxDuckAiFireButtonBrandDesignUpdateContextualCtaTest {
         )
 
         assertTrue(cta is DaxDuckAiFireButtonBrandDesignUpdateContextualCta)
-    }
-
-    @Test
-    fun whenBrandDesignFlagDisabledThenDuckAiFireButtonCtaReturnsLegacyVariant() = runTest {
-        val cta = testee.refreshCta(
-            coroutineRule.testDispatcher,
-            isBrowserShowing = true,
-            site = duckAiSite(),
-            detectedRefreshPatterns = detectedRefreshPatterns,
-            brokenSitePromptUrl = null,
-        )
-
-        assertTrue(cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta)
-        assertFalse(cta is DaxDuckAiFireButtonBrandDesignUpdateContextualCta)
     }
 
     @Test
@@ -282,11 +260,6 @@ class DaxDuckAiFireButtonBrandDesignUpdateContextualCtaTest {
         isLightTheme = true,
         deviceInfo = mockDeviceInfo,
     )
-
-    private fun givenBrandDesignFlagEnabled() {
-        whenever(mockOnboardingBrandDesignUpdateToggles.self()).thenReturn(enabledToggle)
-        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(enabledToggle)
-    }
 
     private fun duckAiSite(): Site {
         val url = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"

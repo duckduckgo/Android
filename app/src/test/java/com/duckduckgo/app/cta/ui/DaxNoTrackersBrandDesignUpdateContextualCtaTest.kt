@@ -35,7 +35,6 @@ import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
-import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_DAX_CTA_SHOWN
@@ -116,7 +115,6 @@ class DaxNoTrackersBrandDesignUpdateContextualCtaTest {
         on { getPlugins() } doReturn listOf(mockSubscriptionPromoCtaShownPlugin)
     }
     private val mockDuckChat: DuckChat = mock()
-    private val mockOnboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = mock()
     private val mockAppTheme: AppTheme = mock { on { isLightModeEnabled() } doReturn true }
 
     private val mockDeviceInfo: DeviceInfo = mock()
@@ -173,7 +171,6 @@ class DaxNoTrackersBrandDesignUpdateContextualCtaTest {
             duckPlayer = mockDuckPlayer,
             brokenSitePrompt = mockBrokenSitePrompt,
             subscriptionPromoCtaShownPlugins = mockSubscriptionPromoCtaShownPlugins,
-            onboardingBrandDesignUpdateToggles = mockOnboardingBrandDesignUpdateToggles,
             appTheme = mockAppTheme,
             deviceInfo = mockDeviceInfo,
             coroutineScope = coroutineRule.testScope,
@@ -192,9 +189,8 @@ class DaxNoTrackersBrandDesignUpdateContextualCtaTest {
     }
 
     @Test
-    fun whenBrandDesignUpdateToggleEnabledAndNoTrackersSiteThenReturnBrandDesignUpdateCta() = runTest {
+    fun whenNoTrackersSiteThenReturnBrandDesignUpdateCta() = runTest {
         givenDaxOnboardingActive()
-        givenBrandDesignUpdateEnabled()
 
         val value = testee.refreshCta(
             coroutineRule.testDispatcher,
@@ -205,22 +201,6 @@ class DaxNoTrackersBrandDesignUpdateContextualCtaTest {
         )
 
         assertTrue(value is DaxNoTrackersBrandDesignUpdateContextualCta)
-    }
-
-    @Test
-    fun whenBrandDesignUpdateToggleDisabledAndNoTrackersSiteThenReturnLegacyCta() = runTest {
-        givenDaxOnboardingActive()
-        givenBrandDesignUpdateDisabled()
-
-        val value = testee.refreshCta(
-            coroutineRule.testDispatcher,
-            isBrowserShowing = true,
-            site = site(url = "http://www.wikipedia.com"),
-            detectedRefreshPatterns = detectedRefreshPatterns,
-            brokenSitePromptUrl = null,
-        )
-
-        assertTrue(value is OnboardingDaxDialogCta.DaxNoTrackersCta)
     }
 
     @Test
@@ -297,16 +277,6 @@ class DaxNoTrackersBrandDesignUpdateContextualCtaTest {
 
     private suspend fun givenDaxOnboardingActive() {
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
-    }
-
-    private fun givenBrandDesignUpdateEnabled() {
-        whenever(mockOnboardingBrandDesignUpdateToggles.self()).thenReturn(mockEnabledToggle)
-        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
-    }
-
-    private fun givenBrandDesignUpdateDisabled() {
-        whenever(mockOnboardingBrandDesignUpdateToggles.self()).thenReturn(mockDisabledToggle)
-        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockDisabledToggle)
     }
 
     private fun site(

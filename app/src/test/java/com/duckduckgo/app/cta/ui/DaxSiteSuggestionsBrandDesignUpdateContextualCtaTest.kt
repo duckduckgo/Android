@@ -43,7 +43,6 @@ import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
-import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_DAX_CTA_SHOWN
@@ -89,8 +88,7 @@ import java.util.concurrent.TimeUnit
 /**
  * Unit tests for [DaxSiteSuggestionsBrandDesignUpdateContextualCta].
  *
- * Verifies the CTA is constructed when the brand-design flag is on and that the pixel
- * parameters the legacy CTA carried (`shownPixel`, `okPixel`, `closePixel` with the
+ * Verifies the CTA construction and that the pixel parameters the legacy CTA carried (`shownPixel`, `okPixel`, `closePixel` with the
  * `DAX_INITIAL_VISIT_SITE_CTA` param) still fire via `CtaViewModel`. Telemetry parity
  * is the regression-surface a stale stub would break, so it's exercised explicitly.
  */
@@ -131,11 +129,9 @@ class DaxSiteSuggestionsBrandDesignUpdateContextualCtaTest {
         on { getPlugins() } doReturn listOf(mockSubscriptionPromoCtaShownPlugin)
     }
     private val mockDuckChat: DuckChat = mock()
-    private val mockOnboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = mock()
     private val mockAppTheme: AppTheme = mock { on { isLightModeEnabled() } doReturn true }
     private val mockDeviceInfo: DeviceInfo = mock()
 
-    private val mockEnabledToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
     private val mockDisabledToggle: Toggle = mock { on { it.isEnabled() } doReturn false }
 
     private lateinit var testee: CtaViewModel
@@ -187,7 +183,6 @@ class DaxSiteSuggestionsBrandDesignUpdateContextualCtaTest {
             duckPlayer = mockDuckPlayer,
             brokenSitePrompt = mockBrokenSitePrompt,
             subscriptionPromoCtaShownPlugins = mockSubscriptionPromoCtaShownPlugins,
-            onboardingBrandDesignUpdateToggles = mockOnboardingBrandDesignUpdateToggles,
             appTheme = mockAppTheme,
             deviceInfo = mockDeviceInfo,
             coroutineScope = coroutineRule.testScope,
@@ -206,25 +201,12 @@ class DaxSiteSuggestionsBrandDesignUpdateContextualCtaTest {
     }
 
     @Test
-    fun whenBrandDesignUpdateEnabledThenGetSiteSuggestionsCtaReturnsBrandDesignClass() = runTest {
+    fun whenGetSiteSuggestionsCtaReturnsBrandDesignClass() = runTest {
         givenSiteSuggestionsCtaPreconditions()
-        whenever(mockOnboardingBrandDesignUpdateToggles.self()).thenReturn(mockEnabledToggle)
-        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
 
         val value = testee.getSiteSuggestionsDialogCta(onSiteSuggestionOptionClicked = {})
 
         assertTrue(value is DaxSiteSuggestionsBrandDesignUpdateContextualCta)
-    }
-
-    @Test
-    fun whenBrandDesignUpdateDisabledThenGetSiteSuggestionsCtaReturnsLegacyClass() = runTest {
-        givenSiteSuggestionsCtaPreconditions()
-        whenever(mockOnboardingBrandDesignUpdateToggles.self()).thenReturn(mockDisabledToggle)
-        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockDisabledToggle)
-
-        val value = testee.getSiteSuggestionsDialogCta(onSiteSuggestionOptionClicked = {})
-
-        assertTrue(value is OnboardingDaxDialogCta.DaxSiteSuggestionsCta)
     }
 
     @Test

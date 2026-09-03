@@ -41,8 +41,6 @@ data class DaxEndBrandDesignUpdateBubbleCta constructor(
     override val appInstallStore: AppInstallStore,
     override val isLightTheme: Boolean,
     override val deviceInfo: DeviceInfo,
-    override val onboardingImprovementsEnabled: Boolean,
-    override val onboardingImprovementsV2Enabled: Boolean,
     val isOmnibarBottom: Boolean,
     val segmentedPathWithAiInput: DownloadReasonSelection?,
 ) : DaxBubbleCta.BrandDesignUpdateBubbleCta(
@@ -63,8 +61,6 @@ data class DaxEndBrandDesignUpdateBubbleCta constructor(
     appInstallStore = appInstallStore,
     isLightTheme = isLightTheme,
     deviceInfo = deviceInfo,
-    onboardingImprovementsEnabled = onboardingImprovementsEnabled,
-    onboardingImprovementsV2Enabled = onboardingImprovementsV2Enabled,
 ),
     DaxBubbleCta.ShowsWavingDax {
     override val backgroundFillSpec = BackgroundFillSpec(fillHeightDp = 280f, tabletFillHeightDp = 320f, maxHeightFraction = 0.3f)

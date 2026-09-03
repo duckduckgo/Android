@@ -45,8 +45,6 @@ class BrandDesignBackgroundFillSpecTest {
                 appInstallStore,
                 isLightTheme = true,
                 deviceInfo,
-                onboardingImprovementsEnabled = true,
-                onboardingImprovementsV2Enabled = true,
                 isOmnibarBottom = false,
                 segmentedPathWithAiInput = null,
             )
@@ -64,8 +62,6 @@ class BrandDesignBackgroundFillSpecTest {
                 isCustomAiOnboardingFlow = false,
                 isFreeTrialCopy = false,
                 segmentedPath = null,
-                onboardingImprovementsEnabled = true,
-                onboardingImprovementsV2Enabled = true,
             )
         assertEquals(190f, cta.backgroundFillSpec?.fillHeightDp)
     }

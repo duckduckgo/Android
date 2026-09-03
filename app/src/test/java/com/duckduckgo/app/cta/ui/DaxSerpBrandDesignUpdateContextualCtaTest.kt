@@ -38,7 +38,6 @@ import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
-import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.privacy.model.HttpsStatus
@@ -116,7 +115,6 @@ class DaxSerpBrandDesignUpdateContextualCtaTest {
         on { getPlugins() } doReturn listOf(mockSubscriptionPromoCtaShownPlugin)
     }
     private val mockDuckChat: DuckChat = mock()
-    private val mockOnboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = mock()
     private val mockAppTheme: AppTheme = mock { on { isLightModeEnabled() } doReturn true }
 
     private val mockDeviceInfo: DeviceInfo = mock()
@@ -126,7 +124,6 @@ class DaxSerpBrandDesignUpdateContextualCtaTest {
     private lateinit var testee: CtaViewModel
     private val context: Context = ApplicationProvider.getApplicationContext()
 
-    private val enabledToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
     private val disabledToggle: Toggle = mock { on { it.isEnabled() } doReturn false }
 
     @Before
@@ -149,8 +146,6 @@ class DaxSerpBrandDesignUpdateContextualCtaTest {
         whenever(mockBrokenSitePrompt.isFeatureEnabled()).thenReturn(false)
         whenever(mockBrokenSitePrompt.getUserRefreshPatterns()).thenReturn(emptySet())
         whenever(mockSubscriptions.isEligible()).thenReturn(false)
-        whenever(mockOnboardingBrandDesignUpdateToggles.self()).thenReturn(enabledToggle)
-        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(enabledToggle)
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
 
         testee = CtaViewModel(
@@ -179,7 +174,6 @@ class DaxSerpBrandDesignUpdateContextualCtaTest {
             duckPlayer = mockDuckPlayer,
             brokenSitePrompt = mockBrokenSitePrompt,
             subscriptionPromoCtaShownPlugins = mockSubscriptionPromoCtaShownPlugins,
-            onboardingBrandDesignUpdateToggles = mockOnboardingBrandDesignUpdateToggles,
             appTheme = mockAppTheme,
             deviceInfo = mockDeviceInfo,
             coroutineScope = coroutineRule.testScope,
@@ -198,7 +192,7 @@ class DaxSerpBrandDesignUpdateContextualCtaTest {
     }
 
     @Test
-    fun whenRefreshCtaOnSerpAndBrandDesignFlagEnabledThenReturnsBrandDesignSerpCta() = runTest {
+    fun whenRefreshCtaOnSerpThenReturnsBrandDesignSerpCta() = runTest {
         val value = testee.refreshCta(
             coroutineRule.testDispatcher,
             isBrowserShowing = true,
@@ -209,22 +203,6 @@ class DaxSerpBrandDesignUpdateContextualCtaTest {
 
         assertTrue(value is DaxSerpBrandDesignUpdateContextualCta)
         assertFalse(value is OnboardingDaxDialogCta.DaxSerpCta)
-    }
-
-    @Test
-    fun whenRefreshCtaOnSerpAndBrandDesignFlagDisabledThenReturnsLegacySerpCta() = runTest {
-        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(disabledToggle)
-
-        val value = testee.refreshCta(
-            coroutineRule.testDispatcher,
-            isBrowserShowing = true,
-            site = site(url = "http://www.duckduckgo.com"),
-            detectedRefreshPatterns = detectedRefreshPatterns,
-            brokenSitePromptUrl = null,
-        )
-
-        assertTrue(value is OnboardingDaxDialogCta.DaxSerpCta)
-        assertFalse(value is DaxSerpBrandDesignUpdateContextualCta)
     }
 
     @Test

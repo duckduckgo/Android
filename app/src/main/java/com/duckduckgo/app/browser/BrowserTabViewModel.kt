@@ -300,7 +300,6 @@ import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.onboarding.OnboardingInputScreenLaunchTarget
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection
-import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_RESULT_DELETED
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_RESULT_DELETED_DAILY
@@ -608,7 +607,6 @@ class BrowserTabViewModel @Inject constructor(
     private val cachedFileDownloader: CachedFileDownloader,
     private val newDownloadState: NewDownloadState,
     private val downloadsRepository: DownloadsRepository,
-    private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
     private val onboardingStore: OnboardingStore,
     private val autocompleteHistoryDeleteFeature: AutocompleteHistoryDeleteFeature,
     private val customAiOnboardingStore: CustomAiOnboardingStore,
@@ -4725,10 +4723,8 @@ class BrowserTabViewModel @Inject constructor(
             )
         if (!orientationChanged) return
         viewModelScope.launch(dispatchers.io()) {
-            if (onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled()) {
-                withContext(dispatchers.main()) {
-                    command.value = Command.ReinflateBrandDesignContextualDialog
-                }
+            withContext(dispatchers.main()) {
+                command.value = Command.ReinflateBrandDesignContextualDialog
             }
         }
     }

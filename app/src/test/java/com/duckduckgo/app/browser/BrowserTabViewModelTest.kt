@@ -229,7 +229,6 @@ import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
 import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
-import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_ALWAYS_DUCK_PLAYER
 import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_ALWAYS_OVERLAY_YOUTUBE
@@ -656,7 +655,6 @@ class BrowserTabViewModelTest {
     private val mockSSLCertificatesFeature: SSLCertificatesFeature = mock()
     private val mockBypassedSSLCertificatesRepository: BypassedSSLCertificatesRepository = mock()
     private val mockExtendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles = mock()
-    private val mockOnboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = mock()
     private val mockUserBrowserProperties: UserBrowserProperties = mock()
     private val protectionTogglePlugin = FakePrivacyProtectionTogglePlugin()
     private val protectionTogglePluginPoint = FakePluginPoint(protectionTogglePlugin)
@@ -874,8 +872,6 @@ class BrowserTabViewModelTest {
             whenever(mockExtendedOnboardingFeatureToggles.subscriptionPromoModalCta()).thenReturn(mockDisabledToggle)
             whenever(mockExtendedOnboardingFeatureToggles.subscriptionPromoModalCtaExistingUsers()).thenReturn(mockDisabledToggle)
             whenever(mockExtendedOnboardingFeatureToggles.freeTrialCopy()).thenReturn(mockDisabledToggle)
-            whenever(mockOnboardingBrandDesignUpdateToggles.self()).thenReturn(mockDisabledToggle)
-            whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockDisabledToggle)
             whenever(mockDuckAiFeatureState.showPopupMenuShortcut).thenReturn(MutableStateFlow(false))
             whenever(mockDuckAiFeatureState.showInputScreen).thenReturn(mockDuckAiFeatureStateInputScreenFlow)
             whenever(mockDuckAiFeatureState.showContextualMode).thenReturn(mockDuckAiContextualModeFlow)
@@ -909,7 +905,6 @@ class BrowserTabViewModelTest {
                         on { getPlugins() } doReturn emptyList()
                     },
                     duckChat = mockDuckChat,
-                    onboardingBrandDesignUpdateToggles = mockOnboardingBrandDesignUpdateToggles,
                     appTheme = mockAppTheme,
                     deviceInfo = mockDeviceInfo,
                     coroutineScope = coroutineRule.testScope,
@@ -1105,7 +1100,6 @@ class BrowserTabViewModelTest {
                 cachedFileDownloader = mockCachedFileDownloader,
                 newDownloadState = mockNewDownloadState,
                 downloadsRepository = mockDownloadsRepository,
-                onboardingBrandDesignUpdateToggles = mockOnboardingBrandDesignUpdateToggles,
                 onboardingStore = mockOnboardingStore,
                 autocompleteHistoryDeleteFeature = fakeAutocompleteHistoryDeleteFeature,
                 customAiOnboardingStore = mockCustomAiOnboardingStore,
@@ -4245,7 +4239,6 @@ class BrowserTabViewModelTest {
             deviceInfo = mockDeviceInfo,
             isCustomAiOnboardingFlow = false,
             segmentedPath = null,
-            onboardingImprovementsV2Enabled = true,
         )
         setCta(cta)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_DUCK_AI_END)).thenReturn(true)
@@ -4299,8 +4292,6 @@ class BrowserTabViewModelTest {
         appInstallStore = mockAppInstallStore,
         isLightTheme = true,
         deviceInfo = mockDeviceInfo,
-        onboardingImprovementsEnabled = true,
-        onboardingImprovementsV2Enabled = true,
         isOmnibarBottom = false,
         segmentedPathWithAiInput = segmentedPath,
     )
@@ -6575,9 +6566,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnConfigurationChangedAndOrientationChangedAndBrandDesignToggleEnabledThenReinflateCommandIsEmitted() = runTest {
-        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
-
+    fun whenOnConfigurationChangedAndOrientationChangedThenReinflateCommandIsEmitted() = runTest {
         testee.onConfigurationChanged(orientationChanged = true)
         advanceUntilIdle()
 
@@ -6586,19 +6575,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnConfigurationChangedAndOrientationChangedAndBrandDesignToggleDisabledThenNoReinflateCommandIsEmitted() = runTest {
-        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockDisabledToggle)
-
-        testee.onConfigurationChanged(orientationChanged = true)
-        advanceUntilIdle()
-
-        verify(mockCommandObserver, never()).onChanged(any<Command.ReinflateBrandDesignContextualDialog>())
-    }
-
-    @Test
-    fun whenOnConfigurationChangedAndOrientationUnchangedAndBrandDesignToggleEnabledThenNoReinflateCommandIsEmitted() = runTest {
-        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
-
+    fun whenOnConfigurationChangedAndOrientationUnchangedThenNoReinflateCommandIsEmitted() = runTest {
         testee.onConfigurationChanged(orientationChanged = false)
         advanceUntilIdle()
 
@@ -6606,8 +6583,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnConfigurationChangedThenForceRenderingTickerUpdatedRegardlessOfToggleOrOrientation() = runTest {
-        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockDisabledToggle)
+    fun whenOnConfigurationChangedThenForceRenderingTickerUpdatedRegardlessOfOrientation() = runTest {
         val tickerBefore = testee.browserViewState.value?.forceRenderingTicker
 
         testee.onConfigurationChanged(orientationChanged = false)

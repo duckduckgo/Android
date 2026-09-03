@@ -42,7 +42,6 @@ import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
 import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
-import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.OnboardingPixelName
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
@@ -106,7 +105,6 @@ class CtaViewModel @Inject constructor(
     private val brokenSitePrompt: BrokenSitePrompt,
     private val subscriptionPromoCtaShownPlugins: PluginPoint<SubscriptionPromoCtaShownPlugin>,
     private val contextualCtaSuppressorPlugins: PluginPoint<ContextualCtaSuppressorPlugin>,
-    private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
     private val appTheme: AppTheme,
     private val deviceInfo: DeviceInfo,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
@@ -135,18 +133,6 @@ class CtaViewModel @Inject constructor(
             .filterIsInstance<LinearOnboardingState.Completed>()
             .onEach { completeStageIfDaxOnboardingCompleted() }
             .launchIn(coroutineScope)
-    }
-
-    private suspend fun isBrandDesignUpdateEnabled(): Boolean = withContext(dispatchers.io()) {
-        onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled()
-    }
-
-    private suspend fun isOnboardingImprovementsEnabled(): Boolean = withContext(dispatchers.io()) {
-        onboardingBrandDesignUpdateToggles.onboardingImprovements().isEnabled()
-    }
-
-    private suspend fun isOnboardingImprovementsV2Enabled(): Boolean = withContext(dispatchers.io()) {
-        onboardingBrandDesignUpdateToggles.onboardingImprovementsV2().isEnabled()
     }
 
     /**
@@ -321,11 +307,7 @@ class CtaViewModel @Inject constructor(
                 val journey = addCtaToHistory(onboardingStore, appInstallStore, Pixel.PixelValues.DUCK_AI_END_CTA)
                 pixel.fire(AppPixelName.ONBOARDING_DAX_CTA_SHOWN, mapOf(Pixel.PixelParameter.CTA_SHOWN to journey))
             }
-            if (isBrandDesignUpdateEnabled()) {
-                DuckAiOnboardingEndCtaVariant.BRAND_DESIGN_UPDATE
-            } else {
-                DuckAiOnboardingEndCtaVariant.LEGACY
-            }
+            DuckAiOnboardingEndCtaVariant.BRAND_DESIGN_UPDATE
         }
     }
 
@@ -362,33 +344,23 @@ class CtaViewModel @Inject constructor(
         return withContext(dispatchers.io()) {
             if (!daxOnboardingActive() || daxDialogFireEducationShown() || hideTips()) return@withContext null
             if (tooManyTabsOpenForFireEducation()) return@withContext null
-            if (isBrandDesignUpdateEnabled()) {
-                return@withContext DaxFireButtonBrandDesignUpdateContextualCta(
-                    onboardingStore = onboardingStore,
-                    appInstallStore = appInstallStore,
-                    isLightTheme = appTheme.isLightModeEnabled(),
-                    deviceInfo = deviceInfo,
-                )
-            }
-            OnboardingDaxDialogCta.DaxFireButtonCta(onboardingStore, appInstallStore)
+            DaxFireButtonBrandDesignUpdateContextualCta(
+                onboardingStore = onboardingStore,
+                appInstallStore = appInstallStore,
+                isLightTheme = appTheme.isLightModeEnabled(),
+                deviceInfo = deviceInfo,
+            )
         }
     }
 
     suspend fun getSiteSuggestionsDialogCta(onSiteSuggestionOptionClicked: (index: Int) -> Unit): OnboardingDaxDialogCta? {
         return withContext(dispatchers.io()) {
             if (!daxOnboardingActive() || !canShowDaxIntroVisitSiteCta()) return@withContext null
-            if (isBrandDesignUpdateEnabled()) {
-                return@withContext DaxSiteSuggestionsBrandDesignUpdateContextualCta(
-                    onboardingStore,
-                    appInstallStore,
-                    isLightTheme = appTheme.isLightModeEnabled(),
-                    deviceInfo = deviceInfo,
-                )
-            }
-            OnboardingDaxDialogCta.DaxSiteSuggestionsCta(
+            DaxSiteSuggestionsBrandDesignUpdateContextualCta(
                 onboardingStore,
                 appInstallStore,
-                onSiteSuggestionOptionClicked,
+                isLightTheme = appTheme.isLightModeEnabled(),
+                deviceInfo = deviceInfo,
             )
         }
     }
@@ -396,15 +368,12 @@ class CtaViewModel @Inject constructor(
     suspend fun getEndStaticDialogCta(): OnboardingDaxDialogCta? {
         return withContext(dispatchers.io()) {
             if (!daxOnboardingActive() && daxDialogEndShown()) return@withContext null
-            if (isBrandDesignUpdateEnabled()) {
-                return@withContext DaxEndBrandDesignUpdateContextualCta(
-                    onboardingStore,
-                    appInstallStore,
-                    isLightTheme = appTheme.isLightModeEnabled(),
-                    deviceInfo = deviceInfo,
-                )
-            }
-            return@withContext OnboardingDaxDialogCta.DaxEndCta(onboardingStore, appInstallStore)
+            DaxEndBrandDesignUpdateContextualCta(
+                onboardingStore,
+                appInstallStore,
+                isLightTheme = appTheme.isLightModeEnabled(),
+                deviceInfo = deviceInfo,
+            )
         }
     }
 
@@ -424,90 +393,59 @@ class CtaViewModel @Inject constructor(
                     null
                 } else {
                     setInputToggleStateForDuckAiEndCta()
-                    if (isBrandDesignUpdateEnabled()) {
-                        DaxDuckAiEndBrandDesignUpdateBubbleCta(
-                            onboardingStore = onboardingStore,
-                            appInstallStore = appInstallStore,
-                            isLightTheme = appTheme.isLightModeEnabled(),
-                            deviceInfo = deviceInfo,
-                            isCustomAiOnboardingFlow = customAiOnboarding.isEnabled(),
-                            segmentedPath = onboardingStore.getSegmentedPathWithAiInput(),
-                            onboardingImprovementsV2Enabled = isOnboardingImprovementsV2Enabled(),
-                        )
-                    } else {
-                        DaxDuckAiEndBubbleCta(onboardingStore, appInstallStore)
-                    }
+                    DaxDuckAiEndBrandDesignUpdateBubbleCta(
+                        onboardingStore = onboardingStore,
+                        appInstallStore = appInstallStore,
+                        isLightTheme = appTheme.isLightModeEnabled(),
+                        deviceInfo = deviceInfo,
+                        isCustomAiOnboardingFlow = customAiOnboarding.isEnabled(),
+                        segmentedPath = onboardingStore.getSegmentedPathWithAiInput(),
+                    )
                 }
             }
 
             // Search suggestions
             canShowDaxIntroCta() -> {
-                if (isBrandDesignUpdateEnabled()) {
-                    DaxTryASearchBrandDesignUpdateBubbleCta(onboardingStore, appInstallStore, appTheme.isLightModeEnabled(), deviceInfo)
-                } else {
-                    DaxBubbleCta.DaxIntroSearchOptionsCta(onboardingStore, appInstallStore)
-                }
+                DaxTryASearchBrandDesignUpdateBubbleCta(onboardingStore, appInstallStore, appTheme.isLightModeEnabled(), deviceInfo)
             }
 
             // Site suggestions
             canShowDaxIntroVisitSiteCta() -> {
-                if (isBrandDesignUpdateEnabled()) {
-                    DaxVisitSiteOptionsBrandDesignUpdateBubbleCta(
-                        onboardingStore,
-                        appInstallStore,
-                        appTheme.isLightModeEnabled(),
-                        deviceInfo,
-                        onboardingImprovementsEnabled = isOnboardingImprovementsEnabled(),
-                        onboardingImprovementsV2Enabled = isOnboardingImprovementsV2Enabled(),
-                    )
-                } else {
-                    DaxBubbleCta.DaxIntroVisitSiteOptionsCta(onboardingStore, appInstallStore)
-                }
+                DaxVisitSiteOptionsBrandDesignUpdateBubbleCta(
+                    onboardingStore,
+                    appInstallStore,
+                    appTheme.isLightModeEnabled(),
+                    deviceInfo,
+                )
             }
 
             // End
             canShowDaxCtaEndOfJourney() -> {
-                if (isBrandDesignUpdateEnabled()) {
-                    val segmentedPathWithAiInput = onboardingStore.getSegmentedPathWithAiInput()
-                    if (segmentedPathWithAiInput != null) {
-                        setInputToggleStateForDuckAiEndCta()
-                    }
-                    DaxEndBrandDesignUpdateBubbleCta(
-                        onboardingStore,
-                        appInstallStore,
-                        appTheme.isLightModeEnabled(),
-                        deviceInfo,
-                        onboardingImprovementsEnabled = isOnboardingImprovementsEnabled(),
-                        onboardingImprovementsV2Enabled = isOnboardingImprovementsV2Enabled(),
-                        isOmnibarBottom = settingsDataStore.omnibarType == OmnibarType.SINGLE_BOTTOM,
-                        segmentedPathWithAiInput = segmentedPathWithAiInput,
-                    )
-                } else {
-                    DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
+                val segmentedPathWithAiInput = onboardingStore.getSegmentedPathWithAiInput()
+                if (segmentedPathWithAiInput != null) {
+                    setInputToggleStateForDuckAiEndCta()
                 }
+                DaxEndBrandDesignUpdateBubbleCta(
+                    onboardingStore,
+                    appInstallStore,
+                    appTheme.isLightModeEnabled(),
+                    deviceInfo,
+                    isOmnibarBottom = settingsDataStore.omnibarType == OmnibarType.SINGLE_BOTTOM,
+                    segmentedPathWithAiInput = segmentedPathWithAiInput,
+                )
             }
 
             // Subscription onboarding
             canShowSubscriptionCta() -> {
-                if (isBrandDesignUpdateEnabled()) {
-                    DaxSubscriptionBrandDesignUpdateBubbleCta(
-                        onboardingStore,
-                        appInstallStore,
-                        appTheme.isLightModeEnabled(),
-                        deviceInfo,
-                        isCustomAiOnboardingFlow = customAiOnboarding.isEnabled(),
-                        isFreeTrialCopy = freeTrialCopyAvailable(),
-                        segmentedPath = onboardingStore.getSegmentedPathWithAiInput(),
-                        onboardingImprovementsEnabled = isOnboardingImprovementsEnabled(),
-                        onboardingImprovementsV2Enabled = isOnboardingImprovementsV2Enabled(),
-                    )
-                } else {
-                    DaxBubbleCta.DaxSubscriptionCta(
-                        onboardingStore,
-                        appInstallStore,
-                        isFreeTrialCopy = freeTrialCopyAvailable(),
-                    )
-                }
+                DaxSubscriptionBrandDesignUpdateBubbleCta(
+                    onboardingStore,
+                    appInstallStore,
+                    appTheme.isLightModeEnabled(),
+                    deviceInfo,
+                    isCustomAiOnboardingFlow = customAiOnboarding.isEnabled(),
+                    isFreeTrialCopy = freeTrialCopyAvailable(),
+                    segmentedPath = onboardingStore.getSegmentedPathWithAiInput(),
+                )
             }
             else -> null
         }
@@ -572,15 +510,12 @@ class CtaViewModel @Inject constructor(
             if (duckChat.isDuckChatUrl(it.url.toUri())) {
                 if (onboardingStore.isDuckAiOnboardingFlow() && !suppressDuckAiOnboardingCta) {
                     if (!duckAiFireButtonShown()) {
-                        if (isBrandDesignUpdateEnabled()) {
-                            return DaxDuckAiFireButtonBrandDesignUpdateContextualCta(
-                                onboardingStore = onboardingStore,
-                                appInstallStore = appInstallStore,
-                                isLightTheme = appTheme.isLightModeEnabled(),
-                                deviceInfo = deviceInfo,
-                            )
-                        }
-                        return OnboardingDaxDialogCta.DaxDuckAiFireButtonCta(onboardingStore, appInstallStore)
+                        return DaxDuckAiFireButtonBrandDesignUpdateContextualCta(
+                            onboardingStore = onboardingStore,
+                            appInstallStore = appInstallStore,
+                            isLightTheme = appTheme.isLightModeEnabled(),
+                            deviceInfo = deviceInfo,
+                        )
                     }
                 }
                 return null
@@ -599,21 +534,13 @@ class CtaViewModel @Inject constructor(
 
             // Trackers blocked
             if (!daxDialogTrackersFoundShown() && !isSerpUrl(it.url) && it.orderedTrackerBlockedEntities().isNotEmpty()) {
-                if (isBrandDesignUpdateEnabled()) {
-                    return DaxTrackersBlockedBrandDesignUpdateContextualCta(
-                        onboardingStore = onboardingStore,
-                        appInstallStore = appInstallStore,
-                        trackers = it.orderedTrackerBlockedEntities(),
-                        settingsDataStore = settingsDataStore,
-                        isLightTheme = appTheme.isLightModeEnabled(),
-                        deviceInfo = deviceInfo,
-                    )
-                }
-                return OnboardingDaxDialogCta.DaxTrackersBlockedCta(
-                    onboardingStore,
-                    appInstallStore,
-                    it.orderedTrackerBlockedEntities(),
-                    settingsDataStore,
+                return DaxTrackersBlockedBrandDesignUpdateContextualCta(
+                    onboardingStore = onboardingStore,
+                    appInstallStore = appInstallStore,
+                    trackers = it.orderedTrackerBlockedEntities(),
+                    settingsDataStore = settingsDataStore,
+                    isLightTheme = appTheme.isLightModeEnabled(),
+                    deviceInfo = deviceInfo,
                 )
             }
 
@@ -623,21 +550,13 @@ class CtaViewModel @Inject constructor(
                     if (!daxDialogNetworkShown() && !daxDialogTrackersFoundShown() &&
                         OnboardingDaxDialogCta.mainTrackerNetworks.any { mainNetwork -> entity.displayName.contains(mainNetwork) }
                     ) {
-                        if (isBrandDesignUpdateEnabled()) {
-                            return DaxMainNetworkBrandDesignUpdateContextualCta(
-                                onboardingStore = onboardingStore,
-                                appInstallStore = appInstallStore,
-                                network = entity.displayName,
-                                siteHost = host,
-                                isLightTheme = appTheme.isLightModeEnabled(),
-                                deviceInfo = deviceInfo,
-                            )
-                        }
-                        return OnboardingDaxDialogCta.DaxMainNetworkCta(
-                            onboardingStore,
-                            appInstallStore,
-                            entity.displayName,
-                            host,
+                        return DaxMainNetworkBrandDesignUpdateContextualCta(
+                            onboardingStore = onboardingStore,
+                            appInstallStore = appInstallStore,
+                            network = entity.displayName,
+                            siteHost = host,
+                            isLightTheme = appTheme.isLightModeEnabled(),
+                            deviceInfo = deviceInfo,
                         )
                     }
                 }
@@ -645,41 +564,32 @@ class CtaViewModel @Inject constructor(
 
             // SERP
             if (isSerpUrl(it.url) && !daxDialogSerpShown()) {
-                if (isBrandDesignUpdateEnabled()) {
-                    return DaxSerpBrandDesignUpdateContextualCta(
-                        onboardingStore,
-                        appInstallStore,
-                        isLightTheme = appTheme.isLightModeEnabled(),
-                        deviceInfo = deviceInfo,
-                    )
-                }
-                return OnboardingDaxDialogCta.DaxSerpCta(onboardingStore, appInstallStore)
+                return DaxSerpBrandDesignUpdateContextualCta(
+                    onboardingStore,
+                    appInstallStore,
+                    isLightTheme = appTheme.isLightModeEnabled(),
+                    deviceInfo = deviceInfo,
+                )
             }
 
             // No trackers blocked
             if (!isSerpUrl(it.url) && !daxDialogOtherShown() && !daxDialogTrackersFoundShown() && !daxDialogNetworkShown()) {
-                if (isBrandDesignUpdateEnabled()) {
-                    return DaxNoTrackersBrandDesignUpdateContextualCta(
-                        onboardingStore,
-                        appInstallStore,
-                        isLightTheme = appTheme.isLightModeEnabled(),
-                        deviceInfo = deviceInfo,
-                    )
-                }
-                return OnboardingDaxDialogCta.DaxNoTrackersCta(onboardingStore, appInstallStore)
+                return DaxNoTrackersBrandDesignUpdateContextualCta(
+                    onboardingStore,
+                    appInstallStore,
+                    isLightTheme = appTheme.isLightModeEnabled(),
+                    deviceInfo = deviceInfo,
+                )
             }
 
             // End
             if (canShowDaxCtaEndOfJourney() && daxDialogFireEducationShown()) {
-                if (isBrandDesignUpdateEnabled()) {
-                    return DaxEndBrandDesignUpdateContextualCta(
-                        onboardingStore,
-                        appInstallStore,
-                        isLightTheme = appTheme.isLightModeEnabled(),
-                        deviceInfo = deviceInfo,
-                    )
-                }
-                return OnboardingDaxDialogCta.DaxEndCta(onboardingStore, appInstallStore)
+                return DaxEndBrandDesignUpdateContextualCta(
+                    onboardingStore,
+                    appInstallStore,
+                    isLightTheme = appTheme.isLightModeEnabled(),
+                    deviceInfo = deviceInfo,
+                )
             }
 
             return null

@@ -31,7 +31,6 @@ import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
-import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -72,9 +71,8 @@ import org.mockito.kotlin.whenever
 import java.util.concurrent.TimeUnit
 
 /**
- * Verifies the brand-design rebrand of the fire-button contextual dialog CTA. Covers CTA construction
- * when the brand-design flag is on, fallback to the legacy CTA when off, and pixel parameters for
- * the three pixel firing paths the legacy CTA uses (`shownPixel`, `okPixel`, `closePixel`).
+ * Verifies the brand-design fire-button contextual dialog CTA and pixel parameters for its three
+ * pixel firing paths (`shownPixel`, `okPixel`, `closePixel`).
  */
 @FlowPreview
 @RunWith(AndroidJUnit4::class)
@@ -110,12 +108,10 @@ class DaxFireButtonBrandDesignUpdateContextualCtaTest {
         on { getPlugins() } doReturn listOf(mockSubscriptionPromoCtaShownPlugin)
     }
     private val mockDuckChat: DuckChat = mock()
-    private val mockOnboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = mock()
     private val mockAppTheme: AppTheme = mock { on { isLightModeEnabled() } doReturn true }
 
     private val mockDeviceInfo: DeviceInfo = mock()
 
-    private val enabledToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
     private val disabledToggle: Toggle = mock { on { it.isEnabled() } doReturn false }
 
     private lateinit var testee: CtaViewModel
@@ -135,8 +131,6 @@ class DaxFireButtonBrandDesignUpdateContextualCtaTest {
         whenever(mockBrokenSitePrompt.isFeatureEnabled()).thenReturn(false)
         whenever(mockBrokenSitePrompt.getUserRefreshPatterns()).thenReturn(emptySet())
         whenever(mockSubscriptions.isEligible()).thenReturn(false)
-        whenever(mockOnboardingBrandDesignUpdateToggles.self()).thenReturn(disabledToggle)
-        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(disabledToggle)
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_FIRE_BUTTON)).thenReturn(false)
 
@@ -166,7 +160,6 @@ class DaxFireButtonBrandDesignUpdateContextualCtaTest {
             duckPlayer = mockDuckPlayer,
             brokenSitePrompt = mockBrokenSitePrompt,
             subscriptionPromoCtaShownPlugins = mockSubscriptionPromoCtaShownPlugins,
-            onboardingBrandDesignUpdateToggles = mockOnboardingBrandDesignUpdateToggles,
             appTheme = mockAppTheme,
             deviceInfo = mockDeviceInfo,
             coroutineScope = coroutineRule.testScope,
@@ -180,19 +173,10 @@ class DaxFireButtonBrandDesignUpdateContextualCtaTest {
     }
 
     @Test
-    fun whenBrandDesignFlagEnabledThenFireDialogCtaReturnsBrandDesignCta() = runTest {
-        givenBrandDesignFlagEnabled()
-
+    fun whenFireDialogCtaAvailableThenReturnsBrandDesignCta() = runTest {
         val cta = testee.getFireDialogCta()
 
         assertTrue(cta is DaxFireButtonBrandDesignUpdateContextualCta)
-    }
-
-    @Test
-    fun whenBrandDesignFlagDisabledThenFireDialogCtaReturnsLegacyCta() = runTest {
-        val cta = testee.getFireDialogCta()
-
-        assertTrue(cta is OnboardingDaxDialogCta.DaxFireButtonCta)
     }
 
     @Test
@@ -249,9 +233,4 @@ class DaxFireButtonBrandDesignUpdateContextualCtaTest {
         isLightTheme = true,
         deviceInfo = mockDeviceInfo,
     )
-
-    private fun givenBrandDesignFlagEnabled() {
-        whenever(mockOnboardingBrandDesignUpdateToggles.self()).thenReturn(enabledToggle)
-        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(enabledToggle)
-    }
 }

@@ -30,12 +30,14 @@ interface OnboardingBrandDesignUpdateToggles {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun self(): Toggle
 
+    /** This toggle is being removed in U7. */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun brandDesignUpdate(): Toggle
 
     /**
      * Gates the new fire animation work: new Inferno default in Data Clearing
      * settings + bottom-sheet Lottie swap.
+     * This toggle is being removed in U6.
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun fireAnimationUpdate(): Toggle
@@ -43,6 +45,7 @@ interface OnboardingBrandDesignUpdateToggles {
     /**
      * Gates new-tab onboarding bubble improvements: showing/hiding the waving Dax and shark fin
      * based on whether they fit below the bubble (keyboard state, orientation, per-bubble sizing).
+     * This toggle is being removed in U7.
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun onboardingImprovements(): Toggle
@@ -51,6 +54,7 @@ interface OnboardingBrandDesignUpdateToggles {
      * Gates this branch's onboarding sizing refinements: the welcome-page decoration fit engine
      * and the new-tab waving-Dax room-based sizing. Off restores develop's sizing behavior.
      * onboardingImprovements still gates whether the waving Dax appears at all.
+     * This toggle is being removed in U7.
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun onboardingImprovementsV2(): Toggle
