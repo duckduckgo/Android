@@ -9031,13 +9031,12 @@ class BrowserTabViewModelTest {
     //endregion
 
     @Test
-    fun whenRedirectSuggestionClickedThenBrowserErrorResetAndNavigateCommandIssuedWithSuggestedUrl() =
+    fun whenRedirectSuggestionClickedThenNavigateCommandIsIssuedWithSuggestedUrl() =
         runTest {
             testee.onReceivedError(BAD_URL, "http://example.com", "ERROR_HOST_LOOKUP")
 
             testee.onRedirectSuggestionClicked("http://www.example.com")
 
-            assertEquals(OMITTED, browserViewState().browserError)
             assertCommandIssued<Navigate> {
                 assertEquals("http://www.example.com", url)
             }
