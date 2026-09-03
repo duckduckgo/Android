@@ -54,6 +54,7 @@ import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_ADDRESS_BAR_POSI
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_AI_INTRO
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_FIRE_BUTTON
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_NOTIFICATIONS
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_PASSWORD_IMPORT
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_QUICK_SETUP
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SEARCH_CHAT_TOGGLE
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SEARCH_EXPERIENCE
@@ -202,6 +203,9 @@ class NewUserOnboardingPlanProviderTest {
         assertTrue("expected InProgress on '$id' but was $state", state is InProgress)
         assertEquals(id, (state as InProgress).currentStep.id)
     }
+
+    private suspend fun currentDialog(): NewUserOnboardingActivityDialog =
+        ((orchestrator.state.value as InProgress).currentStep as NewUserOnboardingActivityStep).resolveDialog()
 
     private fun assertStepProgress(current: Int, total: Int) {
         assertEquals(StepProgress(current = current, total = total), (orchestrator.state.value as InProgress).stepIndicatorProgress())
@@ -1795,6 +1799,49 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.PERMANENT_ERROR))
 
         assertStep(NewUserOnboardingStepIds.PASSWORD_IMPORT_COMPLETE)
+    }
+
+    @Test
+    fun `when the import outcome is reported more than once then reports it to telemetry once`() = runTest {
+        startAtPasswordImportLaunch()
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.SUCCESS))
+        assertStep(NewUserOnboardingStepIds.PASSWORD_IMPORT_COMPLETE)
+
+        // The outcome card resolves itself every time it is presented, so it can report an outcome it already reported.
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportParsed(PasswordImportResult.Imported(imported = 3, skipped = 1)))
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportParsed(PasswordImportResult.Imported(imported = 3, skipped = 1)))
+
+        verify(onboardingPixelSender).fire(
+            ONBOARDING_PASSWORD_IMPORT,
+            OnboardingPixelAction.PasswordImportConfirmed(PasswordImportOutcome.SUCCESS),
+        )
+    }
+
+    @Test
+    fun `when the import outcome is reported then the outcome step seeds its card with it`() = runTest {
+        startAtPasswordImportLaunch()
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.SUCCESS))
+        assertEquals(
+            NewUserOnboardingActivityDialog.ImportComplete(PasswordImportResult.InProgress),
+            currentDialog(),
+        )
+
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportParsed(PasswordImportResult.Imported(imported = 3, skipped = 1)))
+
+        // Seeds a card rebuilt after this one is gone, rather than leaving it to look like an import in flight.
+        assertEquals(
+            NewUserOnboardingActivityDialog.ImportComplete(PasswordImportResult.Imported(imported = 3, skipped = 1)),
+            currentDialog(),
+        )
+    }
+
+    @Test
+    fun `when the password import fails permanently then the outcome step seeds its card as failed`() = runTest {
+        startAtPasswordImportLaunch()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.PERMANENT_ERROR))
+
+        assertEquals(NewUserOnboardingActivityDialog.ImportComplete(PasswordImportResult.Failed), currentDialog())
     }
     private fun preferenceRow(
         preference: OnboardingPreference,

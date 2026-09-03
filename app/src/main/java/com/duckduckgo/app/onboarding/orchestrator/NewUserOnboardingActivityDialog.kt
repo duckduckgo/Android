@@ -46,7 +46,7 @@ sealed interface NewUserOnboardingActivityDialog {
 
     data object ImportPasswordsLaunch : NewUserOnboardingActivityDialog
 
-    data object ImportComplete : NewUserOnboardingActivityDialog
+    data class ImportComplete(val result: PasswordImportResult?) : NewUserOnboardingActivityDialog
     data class AddressBarPosition(val showSplitOption: Boolean) : NewUserOnboardingActivityDialog
     data class InputScreen(
         val embellishment: Embellishment = Embellishment.LeftWing,

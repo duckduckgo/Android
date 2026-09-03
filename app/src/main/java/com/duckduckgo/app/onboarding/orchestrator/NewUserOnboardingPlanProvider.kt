@@ -946,13 +946,13 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         return NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.PASSWORD_IMPORT_LAUNCH,
             pixelName = null,
-            precondition = { !ctx.passwordImportSucceeded && !ctx.skipPasswordsImport },
+            precondition = { ctx.passwordImportResult == null && !ctx.skipPasswordsImport },
             resolveDialog = { NewUserOnboardingActivityDialog.ImportPasswordsLaunch },
             transition = { event ->
                 when (event) {
                     is NewUserOnboardingEvent.PasswordImportWebFlowFinished -> when (event.outcome) {
                         PasswordImportOutcome.SUCCESS -> {
-                            ctx.passwordImportSucceeded = true
+                            ctx.passwordImportResult = PasswordImportResult.InProgress
                             Advance
                         }
 
@@ -969,6 +969,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                         }
 
                         PasswordImportOutcome.PERMANENT_ERROR -> {
+                            ctx.passwordImportResult = PasswordImportResult.Failed
                             onboardingPixelSender.fire(pixelName, OnboardingPixelAction.PasswordImportConfirmed(event.outcome))
                             Advance
                         }
@@ -992,11 +993,14 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             pixelName = null,
             indicator = StepIndicatorMode.CONTINUES_PREVIOUS,
             precondition = { !ctx.skipPasswordsImport },
-            resolveDialog = { NewUserOnboardingActivityDialog.ImportComplete },
+            resolveDialog = { NewUserOnboardingActivityDialog.ImportComplete(result = ctx.passwordImportResult) },
             transition = { event ->
                 when (event) {
                     is NewUserOnboardingEvent.PasswordImportParsed -> {
-                        onboardingPixelSender.fire(pixelName, OnboardingPixelAction.PasswordImportConfirmed(event.outcome))
+                        if (!ctx.passwordImportResult.isTerminal()) {
+                            onboardingPixelSender.fire(pixelName, OnboardingPixelAction.PasswordImportConfirmed(event.result.toOutcome()))
+                        }
+                        ctx.passwordImportResult = event.result
                         Stay
                     }
 
@@ -1005,6 +1009,18 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 }
             },
         )
+    }
+
+    private fun PasswordImportResult.toOutcome(): PasswordImportOutcome = when (this) {
+        is PasswordImportResult.Imported -> PasswordImportOutcome.SUCCESS
+        PasswordImportResult.Failed,
+        PasswordImportResult.InProgress,
+        -> PasswordImportOutcome.PERMANENT_ERROR
+    }
+
+    private fun PasswordImportResult?.isTerminal(): Boolean = when (this) {
+        null, PasswordImportResult.InProgress -> false
+        PasswordImportResult.Failed, is PasswordImportResult.Imported -> true
     }
 
     private fun addressBarPositionStep(): NewUserOnboardingActivityStep {

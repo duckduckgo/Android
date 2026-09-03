@@ -23,6 +23,7 @@ import com.duckduckgo.app.onboarding.OnboardingPreference
 import com.duckduckgo.app.onboarding.TestOption
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityDialog
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
+import com.duckduckgo.app.onboarding.orchestrator.PasswordImportResult
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
 import com.duckduckgo.app.onboarding.ui.page.OnboardingBackground
@@ -506,7 +507,7 @@ class DialogConfigResolverTest {
 
     @Test
     fun `resolves the import complete dialog with a right wing and a mirrored arrow`() {
-        val config = testee.resolve(NewUserOnboardingActivityDialog.ImportComplete, isCustomAiFlow = false)!!
+        val config = testee.resolve(NewUserOnboardingActivityDialog.ImportComplete(PasswordImportResult.InProgress), isCustomAiFlow = false)!!
 
         assertEquals(Embellishment.RightWing, config.embellishment)
         assertEquals(CardArrowConfig.AtStartMirrored, config.cardArrow)
