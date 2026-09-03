@@ -356,7 +356,7 @@ class RealExchangeV2Runner @Inject constructor(
      *  discard keys, clear all state. */
     private fun cancelLocked(byeReason: ExchangeV2Message.Bye.Reason) {
         if (session != null || messagePollJob != null) {
-            logcat { "Sync-ExchangeV2: teardown (was in state ${session?.currentState})" }
+            emit(ExchangeV2Event.SessionEnded(clock.nowMs(), session?.currentState, byeReason))
         }
         messagePollJob?.cancel()
         messagePollJob = null
@@ -368,7 +368,6 @@ class RealExchangeV2Runner @Inject constructor(
         if (own != null) {
             val peer = peerChannel
             val version = negotiatedVersion
-            val currentSession = session
 
             appScope.launch(dispatchers.io()) {
                 // Sequenced before the DELETE so the peer can learn we've gone rather than
@@ -376,9 +375,6 @@ class RealExchangeV2Runner @Inject constructor(
                 // is never depended on.
                 if (peer != null) {
                     runCatching { sendMessage(ExchangeV2Message.Bye.create(byeReason), own, peer, version) }
-                }
-                if (currentSession != null) {
-                    emit(ExchangeV2Event.SessionEnded(clock.nowMs(), currentSession.currentState, byeReason))
                 }
                 // Best-effort DELETE.
                 runCatching { channel.deleteChannel(own.id, own.secret) }

@@ -146,7 +146,7 @@ sealed interface ExchangeV2Event {
      */
     data class SessionEnded(
         override val timestampMs: Long,
-        val lastState: ExchangeV2State,
+        val lastState: ExchangeV2State?,
         val byeReason: ExchangeV2Message.Bye.Reason,
     ) : ExchangeV2Event
 }
