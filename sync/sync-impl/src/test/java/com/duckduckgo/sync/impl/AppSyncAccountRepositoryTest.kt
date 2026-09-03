@@ -138,6 +138,7 @@ class AppSyncAccountRepositoryTest {
     private val loginDeviceInfoWriter: LoginDeviceInfoWriter = mock()
     private val signupAccountInfoBuilder: SignupAccountInfoBuilder = mock()
     private val deviceInfoUpdater: DeviceInfoUpdater = mock()
+    private val publishTracker = DeviceInfoPublishWatcher()
 
     @get:Rule
     val coroutineTestRule = CoroutineTestRule()
@@ -164,6 +165,7 @@ class AppSyncAccountRepositoryTest {
             loginDeviceInfoWriter = loginDeviceInfoWriter,
             signupAccountInfoBuilder = signupAccountInfoBuilder,
             deviceInfoUpdater = deviceInfoUpdater,
+            deviceInfoPublishWatcher = publishTracker,
         )
         (syncRepo as AppSyncAccountRepository).upgradeRetryDelayMillis = 0L // keep retry-path tests instant
 
@@ -692,7 +694,7 @@ class AppSyncAccountRepositoryTest {
         whenever(syncApi.getDevices(anyString())).thenReturn(
             Success(DeviceEntries(entries = emptyList(), entriesV2 = listOf(v2Entry))),
         )
-        whenever(thirdPartyDeviceListDecryptor.decryptAll(listOf(v2Entry), deviceId)).thenReturn(
+        whenever(thirdPartyDeviceListDecryptor.decryptAll(listOf(v2Entry), deviceId, 0)).thenReturn(
             DecryptAllResult(
                 decrypted = listOf(DecryptedDevice(deviceId = "d1", name = "Chrome/148", type = "Browser")),
                 undecryptable = emptyList(),
@@ -704,9 +706,31 @@ class AppSyncAccountRepositoryTest {
 
         assertEquals(1, result.data.size)
         assertEquals("Chrome/148", result.data[0].deviceName)
-        verify(thirdPartyDeviceListDecryptor).decryptAll(listOf(v2Entry), deviceId)
+        verify(thirdPartyDeviceListDecryptor).decryptAll(listOf(v2Entry), deviceId, 0)
         verify(syncPixels).fireUnifiedDeviceListPixel(UnifiedDeviceListPixel.OwnRowResolvedDeviceInfo)
         verify(syncApi, never()).logout(anyString(), anyString())
+    }
+
+    @Test
+    fun whenDeviceInfoPublishedDuringTheDevicesRequestThenDecryptorGetsThePrePublishSnapshot() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+        syncFeature.canReadUnifiedDeviceList().setRawStoredState(State(true))
+        whenever(syncStore.token).thenReturn(token)
+        whenever(syncStore.primaryKey).thenReturn(primaryKey)
+        whenever(syncStore.deviceId).thenReturn(deviceId)
+        val v2Entry = DeviceV2(deviceId = "d1", deviceName = "ENC", deviceType = "ENC_T", credentialId = "ddg")
+        val snapshotBefore = publishTracker.snapshot()
+        whenever(syncApi.getDevices(anyString())).thenAnswer {
+            publishTracker.markPublished()
+            Success(DeviceEntries(entries = emptyList(), entriesV2 = listOf(v2Entry)))
+        }
+        whenever(thirdPartyDeviceListDecryptor.decryptAll(any(), anyOrNull(), any())).thenReturn(
+            DecryptAllResult(decrypted = emptyList(), undecryptable = emptyList()),
+        )
+
+        syncRepo.getConnectedDevices()
+
+        verify(thirdPartyDeviceListDecryptor).decryptAll(listOf(v2Entry), deviceId, snapshotBefore)
     }
 
     @Test
@@ -719,7 +743,7 @@ class AppSyncAccountRepositoryTest {
         whenever(syncStore.deviceId).thenReturn(deviceId)
         val own = DeviceV2(deviceId = deviceId, credentialId = "ddg")
         whenever(syncApi.getDevices(anyString())).thenReturn(Success(DeviceEntries(emptyList(), listOf(own))))
-        whenever(thirdPartyDeviceListDecryptor.decryptAll(listOf(own), deviceId)).thenReturn(
+        whenever(thirdPartyDeviceListDecryptor.decryptAll(listOf(own), deviceId, 0)).thenReturn(
             DecryptAllResult(
                 decrypted = listOf(DecryptedDevice(deviceId, deviceName, "phone")),
                 undecryptable = emptyList(),
@@ -744,7 +768,7 @@ class AppSyncAccountRepositoryTest {
         whenever(syncStore.deviceId).thenReturn(deviceId)
         val own = DeviceV2(deviceId = deviceId, credentialId = "ddg")
         whenever(syncApi.getDevices(anyString())).thenReturn(Success(DeviceEntries(emptyList(), listOf(own))))
-        whenever(thirdPartyDeviceListDecryptor.decryptAll(listOf(own), deviceId)).thenReturn(
+        whenever(thirdPartyDeviceListDecryptor.decryptAll(listOf(own), deviceId, 0)).thenReturn(
             DecryptAllResult(
                 decrypted = listOf(DecryptedDevice(deviceId, deviceName, "phone")),
                 undecryptable = emptyList(),
@@ -769,7 +793,7 @@ class AppSyncAccountRepositoryTest {
         whenever(syncStore.deviceId).thenReturn(deviceId)
         val own = DeviceV2(deviceId = deviceId, credentialId = "ddg")
         whenever(syncApi.getDevices(anyString())).thenReturn(Success(DeviceEntries(emptyList(), listOf(own))))
-        whenever(thirdPartyDeviceListDecryptor.decryptAll(listOf(own), deviceId)).thenReturn(
+        whenever(thirdPartyDeviceListDecryptor.decryptAll(listOf(own), deviceId, 0)).thenReturn(
             DecryptAllResult(
                 decrypted = listOf(DecryptedDevice(deviceId, deviceName, "phone")),
                 undecryptable = emptyList(),
@@ -793,7 +817,7 @@ class AppSyncAccountRepositoryTest {
         whenever(syncStore.deviceId).thenReturn(deviceId)
         val other = DeviceV2(deviceId = "other", credentialId = "3party")
         whenever(syncApi.getDevices(anyString())).thenReturn(Success(DeviceEntries(emptyList(), listOf(other))))
-        whenever(thirdPartyDeviceListDecryptor.decryptAll(listOf(other), deviceId)).thenReturn(
+        whenever(thirdPartyDeviceListDecryptor.decryptAll(listOf(other), deviceId, 0)).thenReturn(
             DecryptAllResult(
                 decrypted = listOf(DecryptedDevice("other", "Unknown device", "Browser")),
                 undecryptable = emptyList(),
@@ -826,7 +850,7 @@ class AppSyncAccountRepositoryTest {
 
         // Fell back to legacy decrypt — same library path as the legacy `entries`-only response.
         assertEquals(1, result.data.size)
-        verify(thirdPartyDeviceListDecryptor, never()).decryptAll(any(), anyOrNull())
+        verify(thirdPartyDeviceListDecryptor, never()).decryptAll(any(), anyOrNull(), any())
     }
 
     @Test
@@ -851,7 +875,7 @@ class AppSyncAccountRepositoryTest {
         whenever(syncApi.getDevices(anyString())).thenReturn(
             Success(DeviceEntries(entries = emptyList(), entriesV2 = listOf(v2Entry))),
         )
-        whenever(thirdPartyDeviceListDecryptor.decryptAll(any(), anyOrNull())).thenReturn(
+        whenever(thirdPartyDeviceListDecryptor.decryptAll(any(), anyOrNull(), any())).thenReturn(
             DecryptAllResult(decrypted = emptyList(), undecryptable = listOf("d-other")),
         )
         whenever(syncApi.logout(eq(token), eq("d-other"))).thenReturn(Success(Logout("d-other")))
@@ -873,7 +897,7 @@ class AppSyncAccountRepositoryTest {
         whenever(syncApi.getDevices(anyString())).thenReturn(
             Success(DeviceEntries(entries = emptyList(), entriesV2 = listOf(v2Entry))),
         )
-        whenever(thirdPartyDeviceListDecryptor.decryptAll(any(), anyOrNull())).thenReturn(
+        whenever(thirdPartyDeviceListDecryptor.decryptAll(any(), anyOrNull(), any())).thenReturn(
             DecryptAllResult(decrypted = emptyList(), undecryptable = listOf(deviceId)),
         )
 
@@ -893,7 +917,7 @@ class AppSyncAccountRepositoryTest {
 
         syncRepo.getConnectedDevices()
 
-        verify(thirdPartyDeviceListDecryptor, never()).decryptAll(any(), anyOrNull())
+        verify(thirdPartyDeviceListDecryptor, never()).decryptAll(any(), anyOrNull(), any())
     }
 
     @Test
@@ -989,7 +1013,7 @@ class AppSyncAccountRepositoryTest {
         whenever(syncApi.getDevices(anyString())).thenReturn(
             Success(DeviceEntries(entries = emptyList(), entriesV2 = listOf(ownEntry))),
         )
-        whenever(thirdPartyDeviceListDecryptor.decryptAll(any(), anyOrNull())).thenReturn(
+        whenever(thirdPartyDeviceListDecryptor.decryptAll(any(), anyOrNull(), any())).thenReturn(
             DecryptAllResult(
                 decrypted = listOf(DecryptedDevice(deviceId = deviceId, name = deviceName, type = "phone")),
                 undecryptable = emptyList(),

@@ -54,6 +54,7 @@ class RealDeviceInfoMigrator @Inject constructor(
     private val syncFeature: SyncFeature,
     private val syncDeviceIds: SyncDeviceIds,
     private val deviceInfoUpdater: DeviceInfoUpdater,
+    private val deviceInfoPublishWatcher: DeviceInfoPublishWatcher,
     private val dispatchers: DispatcherProvider,
 ) : DeviceInfoMigrator {
 
@@ -133,6 +134,8 @@ class RealDeviceInfoMigrator @Inject constructor(
             )
         ) {
             is Success -> {
+                // record before the migration marker so a concurrent read seeing the marker also sees this publish
+                deviceInfoPublishWatcher.markPublished()
                 markMigrated(userId)
                 logcat { "Sync-UnifiedDevices: migration complete for this device (${updateResult.data.size} devices_v2 returned)" }
                 Success(Unit)
