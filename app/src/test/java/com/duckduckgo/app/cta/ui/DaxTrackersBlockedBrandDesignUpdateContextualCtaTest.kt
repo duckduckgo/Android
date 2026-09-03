@@ -35,7 +35,6 @@ import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
-import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -113,7 +112,6 @@ class DaxTrackersBlockedBrandDesignUpdateContextualCtaTest {
         on { getPlugins() } doReturn listOf(mockSubscriptionPromoCtaShownPlugin)
     }
     private val mockDuckChat: DuckChat = mock()
-    private val mockOnboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = mock()
     private val mockAppTheme: AppTheme = mock { on { isLightModeEnabled() } doReturn true }
 
     private val mockDeviceInfo: DeviceInfo = mock()
@@ -165,7 +163,6 @@ class DaxTrackersBlockedBrandDesignUpdateContextualCtaTest {
             duckPlayer = mockDuckPlayer,
             brokenSitePrompt = mockBrokenSitePrompt,
             subscriptionPromoCtaShownPlugins = mockSubscriptionPromoCtaShownPlugins,
-            onboardingBrandDesignUpdateToggles = mockOnboardingBrandDesignUpdateToggles,
             appTheme = mockAppTheme,
             deviceInfo = mockDeviceInfo,
             coroutineScope = coroutineRule.testScope,
@@ -179,9 +176,8 @@ class DaxTrackersBlockedBrandDesignUpdateContextualCtaTest {
     }
 
     @Test
-    fun whenBrandDesignUpdateEnabledAndTrackersBlockedConditionsMetThenReturnBrandDesignCta() = runTest {
+    fun whenTrackersBlockedConditionsMetThenReturnBrandDesignCta() = runTest {
         givenDaxOnboardingActive()
-        givenBrandDesignUpdateEnabled()
 
         val value = testee.refreshCta(
             coroutineRule.testDispatcher,
@@ -192,22 +188,6 @@ class DaxTrackersBlockedBrandDesignUpdateContextualCtaTest {
         )
 
         assertTrue(value is DaxTrackersBlockedBrandDesignUpdateContextualCta)
-    }
-
-    @Test
-    fun whenBrandDesignUpdateDisabledAndTrackersBlockedConditionsMetThenReturnLegacyCta() = runTest {
-        givenDaxOnboardingActive()
-        givenBrandDesignUpdateDisabled()
-
-        val value = testee.refreshCta(
-            coroutineRule.testDispatcher,
-            isBrowserShowing = true,
-            site = siteWithBlockedTrackers(),
-            detectedRefreshPatterns = detectedRefreshPatterns,
-            brokenSitePromptUrl = null,
-        )
-
-        assertTrue(value is OnboardingDaxDialogCta.DaxTrackersBlockedCta)
     }
 
     @Test
@@ -363,16 +343,6 @@ class DaxTrackersBlockedBrandDesignUpdateContextualCtaTest {
 
     private suspend fun givenDaxOnboardingActive() {
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
-    }
-
-    private fun givenBrandDesignUpdateEnabled() {
-        whenever(mockOnboardingBrandDesignUpdateToggles.self()).thenReturn(mockEnabledToggle)
-        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
-    }
-
-    private fun givenBrandDesignUpdateDisabled() {
-        whenever(mockOnboardingBrandDesignUpdateToggles.self()).thenReturn(mockDisabledToggle)
-        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockDisabledToggle)
     }
 
     private fun siteWithBlockedTrackers(): Site {

@@ -33,7 +33,6 @@ import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
-import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_DAX_CTA_SHOWN
@@ -109,14 +108,12 @@ class DaxEndBrandDesignUpdateContextualCtaTest {
         on { getPlugins() } doReturn listOf(mockSubscriptionPromoCtaShownPlugin)
     }
     private val mockDuckChat: DuckChat = mock()
-    private val mockOnboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = mock()
     private val mockAppTheme: AppTheme = mock { on { isLightModeEnabled() } doReturn true }
 
     private val mockDeviceInfo: DeviceInfo = mock()
 
     private val detectedRefreshPatterns: Set<RefreshPattern> = emptySet()
 
-    private val mockEnabledToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
     private val mockDisabledToggle: Toggle = mock { on { it.isEnabled() } doReturn false }
 
     private lateinit var testee: CtaViewModel
@@ -167,7 +164,6 @@ class DaxEndBrandDesignUpdateContextualCtaTest {
             duckPlayer = mockDuckPlayer,
             brokenSitePrompt = mockBrokenSitePrompt,
             subscriptionPromoCtaShownPlugins = mockSubscriptionPromoCtaShownPlugins,
-            onboardingBrandDesignUpdateToggles = mockOnboardingBrandDesignUpdateToggles,
             appTheme = mockAppTheme,
             deviceInfo = mockDeviceInfo,
             coroutineScope = coroutineRule.testScope,
@@ -186,9 +182,8 @@ class DaxEndBrandDesignUpdateContextualCtaTest {
     }
 
     @Test
-    fun whenBrandDesignFlagEnabledAndGetEndStaticDialogCtaThenReturnsContextualBrandDesignCta() = runTest {
+    fun whenGetEndStaticDialogCtaThenReturnsContextualBrandDesignCta() = runTest {
         givenDaxOnboardingActive()
-        givenBrandDesignUpdateEnabled()
 
         val value = testee.getEndStaticDialogCta()
 
@@ -196,9 +191,8 @@ class DaxEndBrandDesignUpdateContextualCtaTest {
     }
 
     @Test
-    fun whenBrandDesignFlagEnabledAndRefreshCtaEndOfJourneyConditionsMetThenReturnsContextualBrandDesignCta() = runTest {
+    fun whenRefreshCtaEndOfJourneyConditionsMetThenReturnsContextualBrandDesignCta() = runTest {
         givenDaxOnboardingActive()
-        givenBrandDesignUpdateEnabled()
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_DIALOG_TRACKERS_FOUND)).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_FIRE_BUTTON)).thenReturn(true)
@@ -212,16 +206,6 @@ class DaxEndBrandDesignUpdateContextualCtaTest {
         )
 
         assertTrue(value is DaxEndBrandDesignUpdateContextualCta)
-    }
-
-    @Test
-    fun whenBrandDesignFlagDisabledAndGetEndStaticDialogCtaThenReturnsLegacyCta() = runTest {
-        givenDaxOnboardingActive()
-        givenBrandDesignUpdateDisabled()
-
-        val value = testee.getEndStaticDialogCta()
-
-        assertTrue(value is OnboardingDaxDialogCta.DaxEndCta)
     }
 
     @Test
@@ -273,16 +257,6 @@ class DaxEndBrandDesignUpdateContextualCtaTest {
         isLightTheme = true,
         deviceInfo = mockDeviceInfo,
     )
-
-    private fun givenBrandDesignUpdateEnabled() {
-        whenever(mockOnboardingBrandDesignUpdateToggles.self()).thenReturn(mockEnabledToggle)
-        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
-    }
-
-    private fun givenBrandDesignUpdateDisabled() {
-        whenever(mockOnboardingBrandDesignUpdateToggles.self()).thenReturn(mockDisabledToggle)
-        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockDisabledToggle)
-    }
 
     private suspend fun givenDaxOnboardingActive() {
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)

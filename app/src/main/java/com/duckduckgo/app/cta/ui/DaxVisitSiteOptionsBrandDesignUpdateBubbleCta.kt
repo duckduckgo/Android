@@ -29,8 +29,6 @@ data class DaxVisitSiteOptionsBrandDesignUpdateBubbleCta(
     override val appInstallStore: AppInstallStore,
     override val isLightTheme: Boolean,
     override val deviceInfo: DeviceInfo,
-    override val onboardingImprovementsEnabled: Boolean,
-    override val onboardingImprovementsV2Enabled: Boolean,
 ) : OptionsBubbleCta(
     ctaId = CtaId.DAX_INTRO_VISIT_SITE,
     title = R.string.onboardingSitesDaxDialogTitle,
@@ -42,8 +40,6 @@ data class DaxVisitSiteOptionsBrandDesignUpdateBubbleCta(
     appInstallStore = appInstallStore,
     isLightTheme = isLightTheme,
     deviceInfo = deviceInfo,
-    onboardingImprovementsEnabled = onboardingImprovementsEnabled,
-    onboardingImprovementsV2Enabled = onboardingImprovementsV2Enabled,
     showArrow = true,
 ),
     DaxBubbleCta.ShowsWavingDax {

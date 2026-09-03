@@ -802,17 +802,11 @@ class BrowserTabFragment :
     private val sslErrorView
         get() = binding.sslErrorWarningLayout
 
-    private val daxDialogIntroBubble
-        get() = binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble
-
     private val daxDialogIntroBubbleBrandDesign
         get() = binding.includeNewBrowserTab.includeOnboardingDaxDialogBubbleBrandDesignUpdate
 
     private val brandDesignDialogScrollView
         get() = binding.includeNewBrowserTab.brandDesignDialogScrollView
-
-    private val daxDialogInContext
-        get() = binding.includeOnboardingInContextDaxDialog
 
     private val daxDialogInContextBrandDesign
         get() = binding.includeOnboardingInContextDaxDialogBrandDesign
@@ -1287,18 +1281,20 @@ class BrowserTabFragment :
 
                 newBrowserTab.newTabContainerScrollView.isSaveEnabled = false
 
-                daxDialogIntroBubble.daxDialogOption1.isSaveEnabled = false
-                daxDialogIntroBubble.daxDialogOption2.isSaveEnabled = false
-                daxDialogIntroBubble.daxDialogOption3.isSaveEnabled = false
-                daxDialogIntroBubble.daxDialogOption4.isSaveEnabled = false
-                daxDialogIntroBubble.primaryCta.isSaveEnabled = false
-                daxDialogIntroBubble.secondaryCta.isSaveEnabled = false
-                daxDialogIntroBubble.placeholder.isSaveEnabled = false
-                daxDialogIntroBubble.dialogTextCta.isSaveEnabled = false
-                daxDialogIntroBubble.hiddenTextCta.isSaveEnabled = false
-                daxDialogIntroBubble.daxBubbleDialogTitle.isSaveEnabled = false
-                daxDialogIntroBubble.daxDialogDismissButton.isSaveEnabled = false
-                daxDialogIntroBubble.logo.isSaveEnabled = false
+                // These legacy includes remain inflated until U9. Keep their state out of the
+                // BrowserActivity bundle without restoring their renderer accessors or behavior.
+                binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.daxDialogOption1.isSaveEnabled = false
+                binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.daxDialogOption2.isSaveEnabled = false
+                binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.daxDialogOption3.isSaveEnabled = false
+                binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.daxDialogOption4.isSaveEnabled = false
+                binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.primaryCta.isSaveEnabled = false
+                binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.secondaryCta.isSaveEnabled = false
+                binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.placeholder.isSaveEnabled = false
+                binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.dialogTextCta.isSaveEnabled = false
+                binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.hiddenTextCta.isSaveEnabled = false
+                binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.daxBubbleDialogTitle.isSaveEnabled = false
+                binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.daxDialogDismissButton.isSaveEnabled = false
+                binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.logo.isSaveEnabled = false
 
                 daxDialogIntroBubbleBrandDesign.brandDesignTitle.isSaveEnabled = false
                 daxDialogIntroBubbleBrandDesign.brandDesignHiddenTitle.isSaveEnabled = false
@@ -1312,22 +1308,39 @@ class BrowserTabFragment :
 
                 daxDialogIntroBubbleBrandDesign.brandDesignHeaderImage.isSaveEnabled = false
 
-                daxDialogInContext.daxDialogOption1.isSaveEnabled = false
-                daxDialogInContext.daxDialogOption2.isSaveEnabled = false
-                daxDialogInContext.daxDialogOption3.isSaveEnabled = false
-                daxDialogInContext.daxDialogOption4.isSaveEnabled = false
-                daxDialogInContext.suggestionsDialogTextCta.isSaveEnabled = false
-                daxDialogInContext.suggestionsHiddenTextCta.isSaveEnabled = false
-                daxDialogInContext.daxBubbleDialogTitle.isSaveEnabled = false
-                daxDialogInContext.onboardingDaxDialogBackground.isSaveEnabled = false
-                daxDialogInContext.logo.isSaveEnabled = false
-                daxDialogInContext.daxDialogDismissButton.isSaveEnabled = false
-                daxDialogInContext.cardView.isSaveEnabled = false
-                daxDialogInContext.onboardingDialogTitle.isSaveEnabled = false
-                daxDialogInContext.hiddenTextCta.isSaveEnabled = false
-                daxDialogInContext.dialogTextCta.isSaveEnabled = false
-                daxDialogInContext.secondaryCta.isSaveEnabled = false
-                daxDialogInContext.primaryCta.isSaveEnabled = false
+                binding.includeOnboardingInContextDaxDialog.daxDialogOption1.isSaveEnabled = false
+                binding.includeOnboardingInContextDaxDialog.daxDialogOption2.isSaveEnabled = false
+                binding.includeOnboardingInContextDaxDialog.daxDialogOption3.isSaveEnabled = false
+                binding.includeOnboardingInContextDaxDialog.daxDialogOption4.isSaveEnabled = false
+                binding.includeOnboardingInContextDaxDialog.suggestionsDialogTextCta.isSaveEnabled = false
+                binding.includeOnboardingInContextDaxDialog.suggestionsHiddenTextCta.isSaveEnabled = false
+                binding.includeOnboardingInContextDaxDialog.daxBubbleDialogTitle.isSaveEnabled = false
+                binding.includeOnboardingInContextDaxDialog.onboardingDaxDialogBackground.isSaveEnabled = false
+                binding.includeOnboardingInContextDaxDialog.logo.isSaveEnabled = false
+                binding.includeOnboardingInContextDaxDialog.daxDialogDismissButton.isSaveEnabled = false
+                binding.includeOnboardingInContextDaxDialog.cardView.isSaveEnabled = false
+                binding.includeOnboardingInContextDaxDialog.onboardingDialogTitle.isSaveEnabled = false
+                binding.includeOnboardingInContextDaxDialog.hiddenTextCta.isSaveEnabled = false
+                binding.includeOnboardingInContextDaxDialog.dialogTextCta.isSaveEnabled = false
+                binding.includeOnboardingInContextDaxDialog.secondaryCta.isSaveEnabled = false
+                binding.includeOnboardingInContextDaxDialog.primaryCta.isSaveEnabled = false
+
+                daxDialogInContextBrandDesign.contextualBrandDesignBackground.isSaveEnabled = false
+                daxDialogInContextBrandDesign.contextualBrandDesignCardContainer.isSaveEnabled = false
+                daxDialogInContextBrandDesign.contextualBrandDesignCardView.isSaveEnabled = false
+                daxDialogInContextBrandDesign.contextualBrandDesignDescription.isSaveEnabled = false
+                daxDialogInContextBrandDesign.contextualBrandDesignDismissButton.isSaveEnabled = false
+                daxDialogInContextBrandDesign.contextualBrandDesignHiddenTitle.isSaveEnabled = false
+                daxDialogInContextBrandDesign.contextualBrandDesignNoCtaContent?.isSaveEnabled = false
+                daxDialogInContextBrandDesign.contextualBrandDesignOptionsContent.contextualBrandDesignSiteOption1.isSaveEnabled = false
+                daxDialogInContextBrandDesign.contextualBrandDesignOptionsContent.contextualBrandDesignSiteOption2.isSaveEnabled = false
+                daxDialogInContextBrandDesign.contextualBrandDesignOptionsContent.contextualBrandDesignSiteOption3.isSaveEnabled = false
+                daxDialogInContextBrandDesign.contextualBrandDesignOptionsContent.contextualBrandDesignSiteOption4.isSaveEnabled = false
+                daxDialogInContextBrandDesign.contextualBrandDesignPrimaryCtaContent.contextualBrandDesignPrimaryCta.isSaveEnabled = false
+                daxDialogInContextBrandDesign.contextualBrandDesignTitle.isSaveEnabled = false
+                daxDialogInContextBrandDesign.contextualBrandDesignTitleSlot.isSaveEnabled = false
+                daxDialogInContextBrandDesign.wavingDax.isSaveEnabled = false
+                daxDialogInContextBrandDesign.wingBottom.isSaveEnabled = false
 
                 binding.autoCompleteSuggestionsList.isSaveEnabled = false
                 binding.daxDialogOnboardingCtaContent.isSaveEnabled = false
@@ -3258,13 +3271,13 @@ class BrowserTabFragment :
     }
 
     private fun setOnboardingDialogBackgroundRes(backgroundRes: Int) {
-        daxDialogInContext.onboardingDaxDialogBackground.setImageResource(backgroundRes)
+        daxDialogInContextBrandDesign.contextualBrandDesignBackground.setImageResource(backgroundRes)
     }
 
     private fun setOnboardingDialogBackgroundColor(
         @ColorRes colorRes: Int,
     ) {
-        daxDialogInContext.onboardingDaxDialogContainer.setBackgroundColor(getColor(requireContext(), colorRes))
+        daxDialogInContextBrandDesign.root.setBackgroundColor(getColor(requireContext(), colorRes))
     }
 
     private fun showRemoveSearchSuggestionDialog(suggestion: AutoCompleteSuggestion) {
@@ -4469,7 +4482,6 @@ class BrowserTabFragment :
         if (wasBrandDesign) {
             newBrowserTab.newTabLayout.setBackgroundColor(0)
         }
-        daxDialogIntroBubble.root.gone()
         daxDialogIntroBubbleBrandDesign.root.gone()
         brandDesignDialogScrollView.gone()
     }
@@ -6385,21 +6397,15 @@ class BrowserTabFragment :
         }
 
         private fun showDaxOnboardingBubbleCta(configuration: DaxBubbleCta) {
+            val brandDesignConfiguration = configuration as? DaxBubbleCta.BrandDesignUpdateBubbleCta ?: return
             hideNewTab()
-            val container = if (configuration is DaxBubbleCta.BrandDesignUpdateBubbleCta) {
-                daxDialogIntroBubble.root.gone()
-                brandDesignDialogScrollView.show()
-                daxDialogIntroBubbleBrandDesign.daxCtaContainer
-            } else {
-                daxDialogIntroBubbleBrandDesign.root.gone()
-                brandDesignDialogScrollView.gone()
-                daxDialogIntroBubble.daxCtaContainer
-            }
+            brandDesignDialogScrollView.show()
+            val container = daxDialogIntroBubbleBrandDesign.daxCtaContainer
             configuration.apply {
                 showCta(container) {
                     setOnOptionClicked(
                         onboardingExperimentEnabled = false,
-                        configuration = configuration,
+                        configuration = brandDesignConfiguration,
                     ) { option, index ->
                         submitQuery(option.link)
                         viewModel.onUserSelectedOnboardingDialogOption(configuration, index)
@@ -6418,20 +6424,15 @@ class BrowserTabFragment :
                 }
             }
 
-            if (configuration is DaxBubbleCta.BrandDesignUpdateBubbleCta) {
-                setBrowserBackgroundRes(
-                    configuration.backgroundRes,
-                    useRebrandBackground = true,
-                    fillHeightDp = configuration.backgroundFillSpec?.heightDpFor(configuration.deviceInfo.isTablet()) ?: 0f,
-                    fillMaxHeightFraction = configuration.backgroundFillSpec?.maxHeightFraction ?: 1f,
-                )
-                setNewTabBackgroundColor(com.duckduckgo.mobile.android.R.attr.onboardingSurfaceBackdrop)
-                configureBrandDesignFitListener()
-                brandDesignDialogScrollView.post { configuration.applyFit() }
-            } else {
-                removeBrandDesignFitListener()
-                viewModel.setBrowserBackground(appTheme.isLightModeEnabled())
-            }
+            setBrowserBackgroundRes(
+                brandDesignConfiguration.backgroundRes,
+                useRebrandBackground = true,
+                fillHeightDp = brandDesignConfiguration.backgroundFillSpec?.heightDpFor(brandDesignConfiguration.deviceInfo.isTablet()) ?: 0f,
+                fillMaxHeightFraction = brandDesignConfiguration.backgroundFillSpec?.maxHeightFraction ?: 1f,
+            )
+            setNewTabBackgroundColor(com.duckduckgo.mobile.android.R.attr.onboardingSurfaceBackdrop)
+            configureBrandDesignFitListener()
+            brandDesignDialogScrollView.post { brandDesignConfiguration.applyFit() }
             viewModel.onCtaShown()
         }
 
@@ -6599,8 +6600,6 @@ class BrowserTabFragment :
                 disableTransitionType(LayoutTransition.APPEARING)
                 disableTransitionType(LayoutTransition.DISAPPEARING)
             }
-            // Both layouts live in the tree; only one should be visible at a time.
-            daxDialogInContext.root.gone()
             configuration.showOnboardingCta(
                 binding = binding,
                 onPrimaryCtaClicked = { viewModel.onUserClickCtaOkButton(configuration) },
@@ -6613,7 +6612,6 @@ class BrowserTabFragment :
                 onDismissCtaClicked = { viewModel.onUserClickCtaDismissButton(configuration) },
                 instantShow = instantShow,
             )
-            viewModel.setOnboardingDialogBackground(appTheme.isLightModeEnabled())
             if (!instantShow) {
                 viewModel.onCtaShown()
             }
@@ -6759,8 +6757,8 @@ class BrowserTabFragment :
         }
 
         private fun hideDaxCta() {
-            daxDialogInContext.dialogTextCta.cancelAnimation()
-            daxDialogInContext.daxCtaContainer.gone()
+            daxDialogInContextBrandDesign.contextualBrandDesignTitle.cancelAnimation()
+            daxDialogInContextBrandDesign.root.gone()
             val cta = lastSeenCtaViewState?.cta as? OnboardingDaxDialogCta.BrandDesignContextualDaxDialogCta
             if (cta != null) {
                 cta.hideOnboardingCta(binding)
