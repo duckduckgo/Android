@@ -254,12 +254,10 @@ class SyncV2PairingDebugViewModel @Inject constructor(
     }
 
     private fun CoroutineScope.launchSessionSideEffects(sessionStartMs: Long): Job = launch {
-        var sessionStarted = false
         runner.eventsSince(sessionStartMs)
             .transformWhile { event ->
-                if (event is ExchangeV2Event.SessionStarted) sessionStarted = true
                 emit(event)
-                !(sessionStarted && event is ExchangeV2Event.SessionEnded)
+                event !is ExchangeV2Event.SessionEnded && event !is ExchangeV2Event.SessionError
             }
             .collect { event ->
                 maybeHandleConfirmingTransition(event)
