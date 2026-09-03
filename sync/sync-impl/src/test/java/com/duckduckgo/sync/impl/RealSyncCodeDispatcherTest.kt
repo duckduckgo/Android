@@ -1126,6 +1126,56 @@ class RealSyncCodeDispatcherTest {
         }
     }
 
+    @Test fun `Presenter emits Failed peer_left PAIRING_FAILED when Host_Aborted driven by a bye with an unrecognised reason`() = runTest {
+        dispatcher.presentV2().test {
+            runnerEventsFlow.emit(
+                transition(
+                    from = ExchangeV2State.Host.AwaitingStatus,
+                    to = ExchangeV2State.Host.Aborted,
+                    trigger = ExchangeV2Message.Bye.create(ExchangeV2Message.Bye.Reason.Unknown("future_reason")),
+                ),
+            )
+            assertEquals(
+                DispatchOutcome.Failed(
+                    "peer_left(future_reason)",
+                    PAIRING_FAILED.code,
+                    path = SetupPath.PAIRING,
+                    myRole = SetupRole.HOST,
+                ),
+                awaitItem(),
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test fun `Presenter emits JoinOutcomeUnknown when the session enters Host_Unknown`() = runTest {
+        dispatcher.presentV2().test {
+            runnerEventsFlow.emit(
+                transition(
+                    from = ExchangeV2State.Host.AwaitingStatus,
+                    to = ExchangeV2State.Host.Unknown,
+                    trigger = ExchangeV2Message.Bye.create(ExchangeV2Message.Bye.Reason.Done),
+                ),
+            )
+            assertTrue(awaitItem() is DispatchOutcome.JoinOutcomeUnknown)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test fun `Presenter emits nothing when a bye done is absorbed while already in Host_Unknown`() = runTest {
+        dispatcher.presentV2().test {
+            runnerEventsFlow.emit(
+                transition(
+                    from = ExchangeV2State.Host.Unknown,
+                    to = ExchangeV2State.Host.Unknown,
+                    trigger = ExchangeV2Message.Bye.create(ExchangeV2Message.Bye.Reason.Done),
+                ),
+            )
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
     @Test fun `Presenter emits Failed peer_left PAIRING_REJECTED when Aborted driven by a bye during negotiation`() = runTest {
         dispatcher.presentV2().test {
             runnerEventsFlow.emit(

@@ -24,7 +24,7 @@ import android.os.Bundle
 import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.core.content.IntentCompat
-import androidx.core.view.isGone
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -138,7 +138,7 @@ class ProcessSyncCodeActivity : DuckDuckGoActivity() {
 
     private fun renderViewState(viewState: ViewState) {
         val isWaiting = viewState.isWaitingForOtherDevice
-        binding.lockAnimation.isGone = isWaiting
+        binding.lockAnimation.isInvisible = isWaiting
         binding.checkOtherDeviceImage.isVisible = isWaiting
         binding.headlineText.setText(if (isWaiting) R.string.sync_simplified_pairing_headline_check_other_device else headlineLabel)
 
