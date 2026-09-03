@@ -29,6 +29,8 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.dialog.CustomAlertDialogBuilder
+import com.duckduckgo.common.ui.view.dialog.DaxAlertDialog
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
@@ -38,24 +40,26 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.ShareAction
 import com.duckduckgo.sync.impl.databinding.ActivityDisplayQrCodeBinding
+import com.duckduckgo.sync.impl.databinding.DialogSyncCheckOtherDeviceBinding
+import com.duckduckgo.sync.impl.databinding.DialogSyncConnectingBinding
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import com.duckduckgo.sync.impl.ui.pairing.SyncPairingResult
 import com.duckduckgo.sync.impl.ui.pairing.exchangeV2ConfirmationMessage
 import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.Command
-import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.Command.AskHostConfirmation
-import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.Command.AskJoinerConfirmation
 import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.Command.Close
 import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.Command.SetPairingResult
 import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.Command.ShareCode
 import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.Command.ShowV1Error
 import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.Command.ShowV2Error
+import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.DialogType
 import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.Factory
 import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.Factory.Provider
 import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.pairing.showExchangeV1PairingError
 import com.duckduckgo.sync.impl.ui.pairing.showExchangeV2PairingError
+import com.duckduckgo.sync.impl.ui.pairing.showLeadingProgressSpinner
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -89,6 +93,9 @@ class DisplayQrCodeActivity : DuckDuckGoActivity() {
         Provider(vmFactory, syncEntryPoint, launchSource)
     }
 
+    private var visibleDialog: DaxAlertDialog? = null
+    private var visibleDialogType: DialogType? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -105,6 +112,12 @@ class DisplayQrCodeActivity : DuckDuckGoActivity() {
         configureCodeButtons()
 
         observeViewModel()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        visibleDialog?.dismiss()
+        visibleDialog = null
     }
 
     private fun configureCodeButtons() {
@@ -134,12 +147,26 @@ class DisplayQrCodeActivity : DuckDuckGoActivity() {
         }
         binding.loadingIndicator.isGone = bitmapWrapper != null
         binding.qrCodeContent.isVisible = bitmapWrapper != null
+
+        renderDialog(viewState.dialog)
+    }
+
+    private fun renderDialog(dialogType: DialogType?) {
+        if (dialogType == visibleDialogType) return
+
+        visibleDialogType = dialogType
+        visibleDialog?.dismiss()
+        visibleDialog = when (dialogType) {
+            is DialogType.HostConfirmation -> showHostConfirmationDialog(dialogType.peerName, dialogType.peerKind)
+            is DialogType.JoinerConfirmation -> showJoinerConfirmationDialog(dialogType.peerName, dialogType.peerKind)
+            is DialogType.Connecting -> showConnectingDialog()
+            is DialogType.CheckOtherDevice -> showCheckOtherDeviceDialog()
+            null -> null
+        }
     }
 
     private fun processCommand(command: Command) {
         when (command) {
-            is AskHostConfirmation -> showHostConfirmationDialog(command.peerName, command.peerKind)
-            is AskJoinerConfirmation -> showJoinerConfirmationDialog(command.peerName, command.peerKind)
             is ShowMessage -> showMessage(command.message)
             is ShareCode -> shareText(command.code)
             is SetPairingResult -> setResult(SyncPairingResult.RESULT_SYNC_COMPLETED, SyncPairingResult.resultIntent(command.result))
@@ -149,8 +176,8 @@ class DisplayQrCodeActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun showHostConfirmationDialog(peerName: String?, peerKind: PeerKind?) {
-        TextAlertDialogBuilder(this)
+    private fun showHostConfirmationDialog(peerName: String?, peerKind: PeerKind?): DaxAlertDialog {
+        val dialog = TextAlertDialogBuilder(this)
             .setTitle(R.string.sync_simplified_pairing_dialog_host_title)
             .setMessage(exchangeV2ConfirmationMessage(peerName, peerKind))
             .setPositiveButton(R.string.sync_simplified_pairing_dialog_host_primary_button)
@@ -166,11 +193,12 @@ class DisplayQrCodeActivity : DuckDuckGoActivity() {
                     }
                 },
             )
-            .show()
+        dialog.show()
+        return dialog
     }
 
-    private fun showJoinerConfirmationDialog(peerName: String?, peerKind: PeerKind?) {
-        TextAlertDialogBuilder(this)
+    private fun showJoinerConfirmationDialog(peerName: String?, peerKind: PeerKind?): DaxAlertDialog {
+        val dialog = TextAlertDialogBuilder(this)
             .setTitle(R.string.sync_simplified_pairing_dialog_joiner_title)
             .setMessage(exchangeV2ConfirmationMessage(peerName, peerKind))
             .setPositiveButton(R.string.sync_simplified_pairing_dialog_joiner_primary_button)
@@ -186,7 +214,46 @@ class DisplayQrCodeActivity : DuckDuckGoActivity() {
                     }
                 },
             )
-            .show()
+        dialog.show()
+        return dialog
+    }
+
+    private fun showConnectingDialog(): DaxAlertDialog {
+        val content = DialogSyncConnectingBinding.inflate(layoutInflater)
+        content.connectingLabel.showLeadingProgressSpinner()
+
+        val dialog = CustomAlertDialogBuilder(this)
+            .setTitle(R.string.sync_simplified_pairing_dialog_connecting_title)
+            .setView(content)
+            .setNegativeButton(CommonR.string.cancel)
+            .addEventListener(
+                object : CustomAlertDialogBuilder.EventListener() {
+                    override fun onNegativeButtonClicked() {
+                        viewModel.onConnectingCancelled()
+                    }
+                },
+            )
+        dialog.show()
+        return dialog
+    }
+
+    private fun showCheckOtherDeviceDialog(): DaxAlertDialog {
+        val content = DialogSyncCheckOtherDeviceBinding.inflate(layoutInflater)
+        content.checkOtherDeviceLabel.showLeadingProgressSpinner()
+
+        val dialog = CustomAlertDialogBuilder(this)
+            .setTitle(R.string.sync_simplified_pairing_dialog_check_other_device_title)
+            .setView(content)
+            .setNegativeButton(CommonR.string.cancel)
+            .addEventListener(
+                object : CustomAlertDialogBuilder.EventListener() {
+                    override fun onNegativeButtonClicked() {
+                        viewModel.onCheckOtherDeviceCancelled()
+                    }
+                },
+            )
+        dialog.show()
+        return dialog
     }
 
     private fun showMessage(@StringRes message: Int) {

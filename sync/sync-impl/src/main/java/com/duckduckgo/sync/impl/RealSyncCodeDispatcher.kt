@@ -287,6 +287,7 @@ class RealSyncCodeDispatcher @Inject constructor(
         is DispatchOutcome.LinkingCodeReady,
         is DispatchOutcome.JoinerConfirmationRequested,
         is DispatchOutcome.HostConfirmationRequested,
+        is DispatchOutcome.JoinOutcomeUnknown,
         -> false
         is DispatchOutcome.LoggedIn,
         is DispatchOutcome.AlreadyConnected,
@@ -312,6 +313,8 @@ class RealSyncCodeDispatcher @Inject constructor(
             DispatchOutcome.HostConfirmationRequested(peerName = runner.peerName, peerKind = peerKind)
 
         ExchangeV2State.Host.Done -> hostDoneToOutcome(transition.trigger, peerKind)
+
+        ExchangeV2State.Host.Unknown -> DispatchOutcome.JoinOutcomeUnknown(peerKind)
 
         ExchangeV2State.Host.Aborted -> hostAbortedToOutcome(transition.localTrigger, transition.trigger)
 

@@ -52,17 +52,16 @@ import com.duckduckgo.sync.impl.ui.devices.ParcelableDevice
 import com.duckduckgo.sync.impl.ui.pairing.SyncPairingResult
 import com.duckduckgo.sync.impl.ui.pairing.exchangeV2AlreadyPairedError
 import com.duckduckgo.sync.impl.ui.pairing.exchangeV2UpgradeRequiredError
-import com.duckduckgo.sync.impl.ui.pairing.process.ProcessSyncCodeViewModel.Command.AskHostConfirmation
-import com.duckduckgo.sync.impl.ui.pairing.process.ProcessSyncCodeViewModel.Command.AskJoinerConfirmation
-import com.duckduckgo.sync.impl.ui.pairing.process.ProcessSyncCodeViewModel.Command.AskSwitchAccount
 import com.duckduckgo.sync.impl.ui.pairing.process.ProcessSyncCodeViewModel.Command.Close
 import com.duckduckgo.sync.impl.ui.pairing.process.ProcessSyncCodeViewModel.Command.RunAcknowledgmentAnimation
 import com.duckduckgo.sync.impl.ui.pairing.process.ProcessSyncCodeViewModel.Command.SetPairingResult
-import com.duckduckgo.sync.impl.ui.pairing.process.ProcessSyncCodeViewModel.Command.ShowPairingAcknowledgement
 import com.duckduckgo.sync.impl.ui.pairing.process.ProcessSyncCodeViewModel.Command.ShowV1Error
 import com.duckduckgo.sync.impl.ui.pairing.process.ProcessSyncCodeViewModel.Command.ShowV2Error
+import com.duckduckgo.sync.impl.ui.pairing.process.ProcessSyncCodeViewModel.DialogType
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -283,10 +282,11 @@ class ProcessSyncCodeViewModelTest {
 
         testee.commands.test {
             assertIs<RunAcknowledgmentAnimation>(awaitItem())
-            assertEquals(AskSwitchAccount("sync-url"), awaitItem())
 
             cancel()
         }
+        advanceUntilIdle()
+        assertEquals(DialogType.SwitchAccount("sync-url"), testee.viewState.value.dialog)
     }
 
     @Test
@@ -321,14 +321,15 @@ class ProcessSyncCodeViewModelTest {
 
         testee.commands.test {
             assertIs<RunAcknowledgmentAnimation>(awaitItem())
-            assertEquals(AskSwitchAccount("sync-url"), awaitItem())
 
             cancel()
         }
+        advanceUntilIdle()
+        assertEquals(DialogType.SwitchAccount("sync-url"), testee.viewState.value.dialog)
     }
 
     @Test
-    fun `when polling requires account switching then the user is asked to switch accounts`() = runTest {
+    fun `when polling requires account switching then the switch account dialog is shown`() = runTest {
         givenLegacyCode(exchangeAuthCode)
         givenProcessCodeSucceeds()
         whenever(accountRepository.pollForRecoveryCodeAndLogin())
@@ -338,11 +339,12 @@ class ProcessSyncCodeViewModelTest {
 
         testee.commands.test {
             assertIs<RunAcknowledgmentAnimation>(awaitItem())
-            assertEquals(AskSwitchAccount("encoded-code"), awaitItem())
             expectNoEvents()
 
             cancel()
         }
+        advanceUntilIdle()
+        assertEquals(DialogType.SwitchAccount("encoded-code"), testee.viewState.value.dialog)
     }
 
     @Test
@@ -358,7 +360,6 @@ class ProcessSyncCodeViewModelTest {
 
         testee.commands.test {
             assertIs<RunAcknowledgmentAnimation>(awaitItem())
-            assertIs<AskSwitchAccount>(awaitItem())
 
             testee.onAnimationComplete()
             testee.onUserAcceptedSwitchingAccount("encoded-code")
@@ -388,7 +389,6 @@ class ProcessSyncCodeViewModelTest {
 
         testee.commands.test {
             assertIs<RunAcknowledgmentAnimation>(awaitItem())
-            assertIs<AskSwitchAccount>(awaitItem())
 
             testee.onUserAcceptedSwitchingAccount("encoded-code")
             val command = awaitItem()
@@ -411,7 +411,6 @@ class ProcessSyncCodeViewModelTest {
 
         testee.commands.test {
             assertIs<RunAcknowledgmentAnimation>(awaitItem())
-            assertIs<AskSwitchAccount>(awaitItem())
 
             testee.onUserCancelledSwitchingAccount()
             val command = awaitItem()
@@ -437,29 +436,23 @@ class ProcessSyncCodeViewModelTest {
     }
 
     @Test
-    fun `when the host confirmation is requested then the user is asked to confirm the host`() = runTest {
+    fun `when the host confirmation is requested then the host confirmation dialog is shown`() = runTest {
         givenV2Outcomes(DispatchOutcome.HostConfirmationRequested(peerName = "Other Device"))
 
         val testee = createTestee()
+        advanceUntilIdle()
 
-        testee.commands.test {
-            assertEquals(AskHostConfirmation(peerName = "Other Device"), awaitItem())
-
-            cancel()
-        }
+        assertEquals(DialogType.HostConfirmation(peerName = "Other Device"), testee.viewState.value.dialog)
     }
 
     @Test
-    fun `when the joiner confirmation is requested then the user is asked to confirm the joiner`() = runTest {
+    fun `when the joiner confirmation is requested then the joiner confirmation dialog is shown`() = runTest {
         givenV2Outcomes(DispatchOutcome.JoinerConfirmationRequested(peerName = "Other Device"))
 
         val testee = createTestee()
+        advanceUntilIdle()
 
-        testee.commands.test {
-            assertEquals(AskJoinerConfirmation(peerName = "Other Device"), awaitItem())
-
-            cancel()
-        }
+        assertEquals(DialogType.JoinerConfirmation(peerName = "Other Device"), testee.viewState.value.dialog)
     }
 
     @Test
@@ -619,17 +612,13 @@ class ProcessSyncCodeViewModelTest {
     }
 
     @Test
-    fun `when the host is confirmed then the dispatcher is notified and the acknowledgement is shown`() = runTest {
+    fun `when the host is confirmed then the dispatcher is notified and the acknowledgment dialog is shown`() = runTest {
         givenV2Outcomes()
 
         val testee = createTestee()
+        testee.onHostConfirmed()
 
-        testee.commands.test {
-            testee.onHostConfirmed()
-            assertIs<ShowPairingAcknowledgement>(awaitItem())
-
-            cancel()
-        }
+        assertEquals(DialogType.PairingAcknowledgment, testee.viewState.value.dialog)
         verify(codeDispatcher).confirmHost()
     }
 
@@ -645,17 +634,13 @@ class ProcessSyncCodeViewModelTest {
     }
 
     @Test
-    fun `when the joiner is confirmed then the dispatcher is notified and the acknowledgement is shown`() = runTest {
+    fun `when the joiner is confirmed then the dispatcher is notified and the acknowledgment dialog is shown`() = runTest {
         givenV2Outcomes()
 
         val testee = createTestee()
+        testee.onJoinerConfirmed()
 
-        testee.commands.test {
-            testee.onJoinerConfirmed()
-            assertIs<ShowPairingAcknowledgement>(awaitItem())
-
-            cancel()
-        }
+        assertEquals(DialogType.PairingAcknowledgment, testee.viewState.value.dialog)
         verify(codeDispatcher).confirmJoiner()
     }
 
@@ -671,17 +656,63 @@ class ProcessSyncCodeViewModelTest {
     }
 
     @Test
-    fun `when the acknowledgement animation is requested then the acknowledgment animation runs`() = runTest {
+    fun `when the acknowledgment dialog is confirmed then the dialog is dismissed and the acknowledgment animation runs`() = runTest {
         givenV2Outcomes()
 
         val testee = createTestee()
+        testee.onHostConfirmed()
 
         testee.commands.test {
-            testee.runAcknowledgementAnimation()
+            testee.onAcknowledgmentConfirmed()
             assertIs<RunAcknowledgmentAnimation>(awaitItem())
 
             cancel()
         }
+        assertEquals(null, testee.viewState.value.dialog)
+    }
+
+    @Test
+    fun `when the login completes while the acknowledgment dialog is open then the animation runs before the success result`() = runTest {
+        val outcomes = MutableSharedFlow<DispatchOutcome>(extraBufferCapacity = 8)
+        whenever(codeDispatcher.route(any())).thenReturn(RouteDecision.V2InProgress(SyncCodeType.LINKING, outcomes))
+        givenThisConnectedDevice()
+
+        val testee = createTestee()
+        advanceUntilIdle()
+
+        outcomes.emit(DispatchOutcome.JoinerConfirmationRequested(peerName = "Other Device"))
+        advanceUntilIdle()
+        testee.onJoinerConfirmed()
+        outcomes.emit(DispatchOutcome.LoggedIn(path = SetupPath.PAIRING))
+
+        testee.commands.test {
+            assertIs<RunAcknowledgmentAnimation>(awaitItem())
+            assertEquals(null, testee.viewState.value.dialog)
+
+            testee.onAnimationComplete()
+            assertIs<SetPairingResult>(awaitItem())
+            assertIs<Close>(awaitItem())
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when the join outcome is unknown then the waiting screen replaces the acknowledgment dialog`() = runTest {
+        val outcomes = MutableSharedFlow<DispatchOutcome>(extraBufferCapacity = 8)
+        whenever(codeDispatcher.route(any())).thenReturn(RouteDecision.V2InProgress(SyncCodeType.LINKING, outcomes))
+
+        val testee = createTestee()
+        advanceUntilIdle()
+
+        outcomes.emit(DispatchOutcome.JoinerConfirmationRequested(peerName = "Other Device"))
+        advanceUntilIdle()
+        testee.onJoinerConfirmed()
+        outcomes.emit(DispatchOutcome.JoinOutcomeUnknown())
+        advanceUntilIdle()
+
+        assertEquals(null, testee.viewState.value.dialog)
+        assertTrue(testee.viewState.value.isWaitingForOtherDevice)
     }
 
     @Test
@@ -856,9 +887,9 @@ class ProcessSyncCodeViewModelTest {
 
         testee.commands.test {
             assertIs<RunAcknowledgmentAnimation>(awaitItem())
-            assertIs<AskSwitchAccount>(awaitItem())
             cancel()
         }
+        advanceUntilIdle()
         verify(syncPixels).fireAskUserToSwitchAccount()
     }
 
@@ -875,7 +906,6 @@ class ProcessSyncCodeViewModelTest {
 
         testee.commands.test {
             assertIs<RunAcknowledgmentAnimation>(awaitItem())
-            assertIs<AskSwitchAccount>(awaitItem())
             testee.onAnimationComplete()
             testee.onUserAcceptedSwitchingAccount("encoded-code")
             awaitItem()
@@ -897,7 +927,6 @@ class ProcessSyncCodeViewModelTest {
 
         testee.commands.test {
             assertIs<RunAcknowledgmentAnimation>(awaitItem())
-            assertIs<AskSwitchAccount>(awaitItem())
             testee.onUserCancelledSwitchingAccount()
             awaitItem()
             awaitItem()

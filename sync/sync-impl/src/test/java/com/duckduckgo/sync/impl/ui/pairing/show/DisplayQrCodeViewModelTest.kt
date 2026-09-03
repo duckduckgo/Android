@@ -50,16 +50,16 @@ import com.duckduckgo.sync.impl.ui.pairing.SyncPairingResult
 import com.duckduckgo.sync.impl.ui.pairing.exchangeV2AlreadyPairedError
 import com.duckduckgo.sync.impl.ui.pairing.exchangeV2UpgradeRequiredError
 import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.BitmapWithCode
-import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.Command.AskHostConfirmation
-import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.Command.AskJoinerConfirmation
 import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.Command.Close
 import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.Command.SetPairingResult
 import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.Command.ShareCode
 import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.Command.ShowV1Error
 import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.Command.ShowV2Error
+import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.DialogType
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl.ProtocolVersion.V2
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -356,28 +356,28 @@ class DisplayQrCodeViewModelTest {
     }
 
     @Test
-    fun `when the host confirmation is requested then the user is asked to confirm the host`() = runTest {
+    fun `when the host confirmation is requested then the host confirmation dialog is shown`() = runTest {
         givenV2Enabled()
         whenever(codeDispatcher.presentV2()).thenReturn(flowOf(DispatchOutcome.HostConfirmationRequested(peerName = "Other Device")))
 
         val testee = createTestee()
 
-        testee.commands.test {
-            assertEquals(AskHostConfirmation(peerName = "Other Device"), awaitItem())
+        testee.viewState.test {
+            assertEquals(DialogType.HostConfirmation(peerName = "Other Device"), awaitItem().dialog)
 
             cancel()
         }
     }
 
     @Test
-    fun `when the joiner confirmation is requested then the user is asked to confirm the joiner`() = runTest {
+    fun `when the joiner confirmation is requested then the joiner confirmation dialog is shown`() = runTest {
         givenV2Enabled()
         whenever(codeDispatcher.presentV2()).thenReturn(flowOf(DispatchOutcome.JoinerConfirmationRequested(peerName = "Other Device")))
 
         val testee = createTestee()
 
-        testee.commands.test {
-            assertEquals(AskJoinerConfirmation(peerName = "Other Device"), awaitItem())
+        testee.viewState.test {
+            assertEquals(DialogType.JoinerConfirmation(peerName = "Other Device"), awaitItem().dialog)
 
             cancel()
         }
@@ -421,6 +421,126 @@ class DisplayQrCodeViewModelTest {
         testee.onJoinerDenied()
 
         verify(codeDispatcher).denyJoiner()
+    }
+
+    @Test
+    fun `when the host is confirmed then the connecting dialog is shown`() = runTest {
+        givenV2Enabled()
+
+        val testee = createTestee()
+        testee.onHostConfirmed()
+
+        testee.viewState.test {
+            assertEquals(DialogType.Connecting, awaitItem().dialog)
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when the joiner is confirmed then the connecting dialog is shown`() = runTest {
+        givenV2Enabled()
+
+        val testee = createTestee()
+        testee.onJoinerConfirmed()
+
+        testee.viewState.test {
+            assertEquals(DialogType.Connecting, awaitItem().dialog)
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when the host is denied then no dialog is shown`() = runTest {
+        givenV2Enabled()
+
+        val testee = createTestee()
+        testee.onHostConfirmed()
+        testee.onHostDenied()
+
+        testee.viewState.test {
+            assertEquals(null, awaitItem().dialog)
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when the login completes after confirming then the connecting dialog is dismissed`() = runTest {
+        givenV2Enabled()
+        givenThisConnectedDevice()
+        val outcomes = MutableSharedFlow<DispatchOutcome>()
+        whenever(codeDispatcher.presentV2()).thenReturn(outcomes)
+
+        val testee = createTestee()
+
+        testee.viewState.test {
+            assertEquals(null, awaitItem().dialog)
+
+            testee.onHostConfirmed()
+            assertEquals(DialogType.Connecting, awaitItem().dialog)
+
+            outcomes.emit(DispatchOutcome.LoggedIn(path = SetupPath.PAIRING))
+            assertEquals(null, awaitItem().dialog)
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when the join outcome is unknown after confirming then the check other device dialog is shown`() = runTest {
+        givenV2Enabled()
+        val outcomes = MutableSharedFlow<DispatchOutcome>()
+        whenever(codeDispatcher.presentV2()).thenReturn(outcomes)
+
+        val testee = createTestee()
+
+        testee.viewState.test {
+            assertEquals(null, awaitItem().dialog)
+
+            testee.onJoinerConfirmed()
+            assertEquals(DialogType.Connecting, awaitItem().dialog)
+
+            outcomes.emit(DispatchOutcome.JoinOutcomeUnknown())
+            assertEquals(DialogType.CheckOtherDevice, awaitItem().dialog)
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when the connecting dialog is cancelled then the failure result is set and the screen closes`() = runTest {
+        givenV2Enabled()
+
+        val testee = createTestee()
+
+        testee.commands.test {
+            testee.onConnectingCancelled()
+            val command = awaitItem()
+            assertIs<SetPairingResult>(command)
+            assertEquals(SyncPairingResult.Failure, command.result)
+            assertIs<Close>(awaitItem())
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when the check other device dialog is cancelled then the failure result is set and the screen closes`() = runTest {
+        givenV2Enabled()
+
+        val testee = createTestee()
+
+        testee.commands.test {
+            testee.onCheckOtherDeviceCancelled()
+            val command = awaitItem()
+            assertIs<SetPairingResult>(command)
+            assertEquals(SyncPairingResult.Failure, command.result)
+            assertIs<Close>(awaitItem())
+
+            cancel()
+        }
     }
 
     @Test

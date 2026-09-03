@@ -104,6 +104,10 @@ enum class SyncCodeType { RECOVERY, LINKING }
  * [HostConfirmationRequested] (role is elected by the runner), then exactly one terminal
  * ([LoggedIn] / [AlreadyConnected] / [Failed]).
  *
+ * Either side elected Host may additionally emit zero or one [JoinOutcomeUnknown] before its
+ * terminal outcome: v2.1 keeps the session open after the recovery code is sent, so the wait for the
+ * Joiner's report is surfaced without ending the flow.
+ *
  * v2 RecoveryCode flows (cid=ddg, cid=3party) have no confirmation phase — only a terminal outcome.
  *
  * v2 does not surface a v1-style `AskToSwitchAccount` prompt; the spec's Confirmations phase is the
@@ -129,6 +133,16 @@ sealed interface DispatchOutcome {
      * to scan. Non-terminal — the Flow continues.
      */
     data class LinkingCodeReady(val linkingCode: String) : DispatchOutcome
+
+    /**
+     * The Host shared its recovery code and 30s passed without a `recovery_code_done`.
+     *
+     * The session keeps polling, so a late report still follows with [LoggedIn]. If nothing arrives,
+     * the 5-minute session deadline closes the flow with [Failed].
+     */
+    data class JoinOutcomeUnknown(
+        val peerKind: PeerKind? = null,
+    ) : DispatchOutcome
 
     /**
      * Terminal — login completed (recovery code applied; account state updated). Carries telemetry
