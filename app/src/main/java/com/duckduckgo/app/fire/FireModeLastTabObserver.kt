@@ -44,10 +44,11 @@ import logcat.logcat
 import javax.inject.Inject
 
 /**
- * Whether Fire mode holds browsing data that has not been burned yet.
+ * Keeps a state Fire mode has browsing data that still needs burning.
  *
- * A Fire burn deletes the Fire tabs itself, so [FireModeLastTabObserver] cannot tell that apart from the
- * user closing the last tab. This is what does: only an emptying that follows real browsing owes a burn.
+ * Set while a Fire tab exists, cleared once a burn runs. [FireModeLastTabObserver] needs it because a burn
+ * deletes the Fire tabs itself, which would otherwise look exactly like the user closing the last tab and
+ * start a second burn.
  */
 @SingleInstanceIn(AppScope::class)
 class FireModeDataClearingState @Inject constructor() {
@@ -65,10 +66,6 @@ class FireModeDataClearingState @Inject constructor() {
 
 /**
  * Burns Fire mode data once the last Fire tab is gone.
- *
- * The trigger is a count of the Fire tab rows rather than the tab lists: open and pending-undo rows are
- * separate queries over the same write, so their emissions interleave and a close briefly looks like an
- * emptying. One count is one fact, and only reaches zero once the close is committed.
  */
 @ContributesMultibinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
@@ -102,7 +99,7 @@ class FireModeLastTabObserver @Inject constructor(
         }
     }
 
-    // Fire mode's share of the startup tab purge; arms the burn before a pending close's row disappears
+    // Fire mode's startup tab purge, which marks the data for auto-burn
     override fun onStart(owner: LifecycleOwner) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             commitPendingFireCloses()
