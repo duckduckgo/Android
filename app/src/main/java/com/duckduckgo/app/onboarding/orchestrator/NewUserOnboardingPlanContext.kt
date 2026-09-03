@@ -43,20 +43,20 @@ class NewUserOnboardingPlanContext {
     var completionResult: LinearOnboardingResult? = null
 
     /**
-     * Set by the [NewUserOnboardingStepIds.PASSWORD_IMPORT_LAUNCH] step once the import web flow returns
-     * successfully. Gates [NewUserOnboardingStepIds.PASSWORD_IMPORT_COMPLETE], and keeps the launch step
-     * eligible until then. The counts are not held here: they arrive after the outcome card is already on
-     * screen, so they live in that card's content state instead.
-     */
-    @Volatile
-    var passwordImportSucceeded: Boolean = false
-
-    /**
-     * Set true by the [NewUserOnboardingStepIds.PASSWORD_IMPORT] step when the user taps "Skip",
-     * read by the [NewUserOnboardingStepIds.PASSWORD_IMPORT_LAUNCH] precondition to skip launching the passwords import flow.
+     * Set true by the [NewUserOnboardingStepIds.PASSWORD_IMPORT] step when the user taps "Skip", read by the
+     * [NewUserOnboardingStepIds.PASSWORD_IMPORT_LAUNCH] precondition to skip launching the passwords import flow
+     * and by [NewUserOnboardingStepIds.PASSWORD_IMPORT_COMPLETE] to skip reporting an outcome there is none of.
      */
     @Volatile
     var skipPasswordsImport: Boolean = false
+
+    /**
+     * What this run has recorded about the import, written by the
+     * [NewUserOnboardingStepIds.PASSWORD_IMPORT_LAUNCH] and [NewUserOnboardingStepIds.PASSWORD_IMPORT_COMPLETE]
+     * steps.
+     */
+    @Volatile
+    var passwordImportResult: PasswordImportResult? = null
 
     /**
      * Chat prompt captured by the custom-AI [NewUserOnboardingStepIds.INPUT_SCREEN_PREVIEW] step,

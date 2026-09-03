@@ -946,13 +946,13 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         return NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.PASSWORD_IMPORT_LAUNCH,
             pixelName = null,
-            precondition = { !ctx.passwordImportSucceeded && !ctx.skipPasswordsImport },
+            precondition = { ctx.passwordImportResult == null && !ctx.skipPasswordsImport },
             resolveDialog = { NewUserOnboardingActivityDialog.ImportPasswordsLaunch },
             transition = { event ->
                 when (event) {
                     is NewUserOnboardingEvent.PasswordImportWebFlowFinished -> when (event.outcome) {
                         PasswordImportOutcome.SUCCESS -> {
-                            ctx.passwordImportSucceeded = true
+                            ctx.passwordImportResult = PasswordImportResult.InProgress
                             Advance
                         }
 
@@ -961,13 +961,25 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                             GoBack
                         }
 
-                        PasswordImportOutcome.ERROR -> {
+                        // Back to the import card so its Import/Skip actions stay live: the retry alert is
+                        // dropped on configuration change and would otherwise be the only way forward.
+                        PasswordImportOutcome.TRANSIENT_ERROR -> {
                             onboardingPixelSender.fire(pixelName, OnboardingPixelAction.PasswordImportConfirmed(event.outcome))
-                            Stay
+                            GoBack
+                        }
+
+                        PasswordImportOutcome.PERMANENT_ERROR -> {
+                            ctx.passwordImportResult = PasswordImportResult.Failed
+                            onboardingPixelSender.fire(pixelName, OnboardingPixelAction.PasswordImportConfirmed(event.outcome))
+                            Advance
                         }
                     }
 
-                    is NewUserOnboardingEvent.ContinueClicked -> Advance
+                    is NewUserOnboardingEvent.PasswordImportSkipped -> {
+                        ctx.skipPasswordsImport = true
+                        Advance
+                    }
+
                     else -> Stay
                 }
             },
@@ -980,12 +992,15 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             id = NewUserOnboardingStepIds.PASSWORD_IMPORT_COMPLETE,
             pixelName = null,
             indicator = StepIndicatorMode.CONTINUES_PREVIOUS,
-            precondition = { ctx.passwordImportSucceeded },
-            resolveDialog = { NewUserOnboardingActivityDialog.ImportComplete },
+            precondition = { !ctx.skipPasswordsImport },
+            resolveDialog = { NewUserOnboardingActivityDialog.ImportComplete(result = ctx.passwordImportResult) },
             transition = { event ->
                 when (event) {
                     is NewUserOnboardingEvent.PasswordImportParsed -> {
-                        onboardingPixelSender.fire(pixelName, OnboardingPixelAction.PasswordImportConfirmed(event.outcome))
+                        if (!ctx.passwordImportResult.isTerminal()) {
+                            onboardingPixelSender.fire(pixelName, OnboardingPixelAction.PasswordImportConfirmed(event.result.toOutcome()))
+                        }
+                        ctx.passwordImportResult = event.result
                         Stay
                     }
 
@@ -994,6 +1009,18 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 }
             },
         )
+    }
+
+    private fun PasswordImportResult.toOutcome(): PasswordImportOutcome = when (this) {
+        is PasswordImportResult.Imported -> PasswordImportOutcome.SUCCESS
+        PasswordImportResult.Failed,
+        PasswordImportResult.InProgress,
+        -> PasswordImportOutcome.PERMANENT_ERROR
+    }
+
+    private fun PasswordImportResult?.isTerminal(): Boolean = when (this) {
+        null, PasswordImportResult.InProgress -> false
+        PasswordImportResult.Failed, is PasswordImportResult.Imported -> true
     }
 
     private fun addressBarPositionStep(): NewUserOnboardingActivityStep {

@@ -17,6 +17,7 @@
 package com.duckduckgo.app.onboarding.ui.page.configdriven
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.ViewModel
@@ -33,11 +34,17 @@ import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanBootstrapper
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanProvider
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingResult
+import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingStepIds
+import com.duckduckgo.app.onboarding.orchestrator.PasswordImportOutcome
+import com.duckduckgo.app.onboarding.orchestrator.PasswordImportResult
 import com.duckduckgo.app.onboarding.orchestrator.stepIndicatorProgress
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
+import com.duckduckgo.autofill.api.ImportPasswordsFromGoogle
+import com.duckduckgo.autofill.api.ImportPasswordsFromGoogle.ImportPasswordsResult
+import com.duckduckgo.autofill.api.ImportPasswordsFromGoogle.ImportPasswordsStatus
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.onboarding.api.LinearOnboardingHost
@@ -45,18 +52,22 @@ import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
 import com.duckduckgo.onboarding.api.LinearOnboardingState
 import com.duckduckgo.onboarding.api.LinearOnboardingStepId
 import com.duckduckgo.onboarding.api.forPlan
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 
@@ -75,10 +86,12 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
     private val pixel: Pixel,
     private val appInstallStore: AppInstallStore,
     private val customAiOnboardingStore: CustomAiOnboardingStore,
+    private val importPasswordsFromGoogle: ImportPasswordsFromGoogle,
 ) : ViewModel() {
 
     data class ViewState(
         val screen: Screen? = null,
+        val showPasswordImportError: Boolean = false,
     )
 
     sealed interface Screen {
@@ -125,6 +138,7 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
             val showSplitOption: Boolean,
         ) : Command
         data class ShowQuickSetupSearchOptionsBottomSheet(val initialWithAi: Boolean) : Command
+        data object LaunchPasswordImport : Command
     }
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -144,6 +158,8 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
     private var addWidgetPromptFlowStarted = false
 
     private var quickSetupDefaultBrowserDialogShown = false
+
+    private var importOutcomeJob: Job? = null
 
     init {
         start()
@@ -196,6 +212,8 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
             }
 
             is ContentInteraction.SelectSingleChoiceOption -> emit(NewUserOnboardingEvent.SingleChoiceConfirmed(interaction.option))
+
+            ContentInteraction.ResolveImportOutcome -> resolveImportOutcome(importCompleteState())
         }
     }
 
@@ -296,6 +314,72 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
                 orchestrator.onEvent(NewUserOnboardingEvent.AddWidgetFinished(widgetAdded = hasWidget))
             }
         }
+    }
+
+    fun onPasswordImportRetry() {
+        dismissPasswordImportError()
+        emit(NewUserOnboardingEvent.PasswordImportRequested)
+    }
+
+    fun onPasswordImportErrorSkipped() {
+        dismissPasswordImportError()
+        emit(NewUserOnboardingEvent.PasswordImportSkipped)
+    }
+
+    /** The alert was cancelled without choosing: the import card underneath still offers both actions. */
+    fun onPasswordImportErrorDismissed() = dismissPasswordImportError()
+
+    fun onPasswordImportResult(resultCode: Int, data: Intent?) {
+        if (resultCode != Activity.RESULT_OK) {
+            cancelPasswordImport()
+            return
+        }
+        when (importPasswordsFromGoogle.parseResult(data)) {
+            is ImportPasswordsResult.Success -> emit(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.SUCCESS))
+            is ImportPasswordsResult.UserCancelled -> cancelPasswordImport()
+            is ImportPasswordsResult.Error.Transient -> showImportErrorDialog()
+            is ImportPasswordsResult.Error.Permanent -> emit(
+                NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.PERMANENT_ERROR),
+            )
+        }
+    }
+
+    private fun launchPasswordImport() {
+        viewModelScope.launch { _commands.send(Command.LaunchPasswordImport) }
+    }
+
+    private fun resolveImportOutcome(state: MutableStateFlow<ImportCompleteContentState>) {
+        if (state.value !is ImportCompleteContentState.Parsing) return
+        if (importOutcomeJob?.isActive == true) return
+        importOutcomeJob = viewModelScope.launch {
+            val finished = withTimeoutOrNull(IMPORT_STATUS_TIMEOUT) {
+                importPasswordsFromGoogle.importStatus().filterIsInstance<ImportPasswordsStatus.Finished>().firstOrNull()
+            }
+            val result = finished
+                ?.let { PasswordImportResult.Imported(imported = it.imported, skipped = it.skipped) }
+                ?: PasswordImportResult.Failed
+            state.value = when (result) {
+                is PasswordImportResult.Imported -> ImportCompleteContentState.Finished(result.imported, result.skipped)
+                else -> ImportCompleteContentState.Failed
+            }
+            emit(NewUserOnboardingEvent.PasswordImportParsed(result))
+        }
+    }
+
+    private fun importCompleteState(): MutableStateFlow<ImportCompleteContentState> =
+        contentValues.contentState(NewUserOnboardingStepIds.PASSWORD_IMPORT_COMPLETE) { ImportCompleteContentState.Parsing }
+
+    private fun showImportErrorDialog() {
+        _viewState.update { it.copy(showPasswordImportError = true) }
+        emit(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.TRANSIENT_ERROR))
+    }
+
+    private fun dismissPasswordImportError() {
+        _viewState.update { it.copy(showPasswordImportError = false) }
+    }
+
+    private fun cancelPasswordImport() {
+        emit(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.CANCELLED))
     }
 
     private fun requestDefaultBrowser() {
@@ -459,11 +543,7 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
                 _commands.send(Command.LaunchAddWidgetPrompt)
             }
 
-            NewUserOnboardingActivityDialog.ImportPasswordsLaunch -> {
-                // TODO: launch the Google password import flow and report its outcome back as
-                //  PasswordImportWebFlowFinished / PasswordImportParsed. Until that lands, this step has no
-                //  side effect and the outcome card stays on its parsing state.
-            }
+            NewUserOnboardingActivityDialog.ImportPasswordsLaunch -> launchPasswordImport()
 
             NewUserOnboardingActivityDialog.SyncRestore,
             NewUserOnboardingActivityDialog.InitialReinstallUser,
@@ -476,7 +556,7 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
             NewUserOnboardingActivityDialog.AddToDock,
             NewUserOnboardingActivityDialog.WidgetPrompt,
             NewUserOnboardingActivityDialog.ImportPasswords,
-            NewUserOnboardingActivityDialog.ImportComplete,
+            is NewUserOnboardingActivityDialog.ImportComplete,
             is NewUserOnboardingActivityDialog.AddressBarPosition,
             is NewUserOnboardingActivityDialog.InputScreen,
             is NewUserOnboardingActivityDialog.InputScreenPreview,
@@ -491,5 +571,9 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
 
     private fun emit(event: NewUserOnboardingEvent) {
         viewModelScope.launch { orchestrator.onEvent(event) }
+    }
+
+    private companion object {
+        val IMPORT_STATUS_TIMEOUT = 20.seconds
     }
 }
