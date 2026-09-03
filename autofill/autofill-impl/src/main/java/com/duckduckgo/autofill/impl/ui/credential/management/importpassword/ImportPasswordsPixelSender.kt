@@ -32,7 +32,7 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_GOO
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_GOOGLE_PASSWORDS_RESULT_SUCCESS
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SYNC_DESKTOP_PASSWORDS_CTA_BUTTON
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SYNC_DESKTOP_PASSWORDS_OVERFLOW_MENU
-import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
@@ -49,7 +49,7 @@ interface ImportPasswordsPixelSender {
     fun onImportPasswordsViaDesktopSyncOverflowMenuTapped()
 }
 
-@ContributesBinding(FragmentScope::class)
+@ContributesBinding(AppScope::class)
 class ImportPasswordsPixelSenderImpl @Inject constructor(
     private val pixel: Pixel,
     private val engagementBucketing: AutofillEngagementBucketing,
