@@ -81,6 +81,7 @@ class StackedAlertDialogBuilder(val context: Context) : DaxAlertDialog {
     private var stackedButtonList: MutableList<StackedButtonSpec> = mutableListOf()
     private var isDestructiveVersion: Boolean = false
     private var isRebrandUpdate: Boolean = false
+    private var isCancellable: Boolean = false
     private var componentCallbacks: ComponentCallbacks? = null
 
     fun setHeaderImageResource(@DrawableRes drawableId: Int): StackedAlertDialogBuilder {
@@ -153,6 +154,15 @@ class StackedAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         return this
     }
 
+    /**
+     * Allows the dialog to be dismissed by tapping outside it or pressing back. Off by default.
+     * [EventListener.onDialogCancelled] only fires when this is enabled.
+     */
+    fun setCancellable(cancellable: Boolean): StackedAlertDialogBuilder {
+        isCancellable = cancellable
+        return this
+    }
+
     fun addEventListener(eventListener: EventListener): StackedAlertDialogBuilder {
         listener = eventListener
         return this
@@ -171,7 +181,7 @@ class StackedAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         val dialogBuilder = MaterialAlertDialogBuilder(context, dialogTheme)
             .setView(dialogContent(binding))
             .apply {
-                setCancelable(false)
+                setCancelable(isCancellable)
                 setOnDismissListener {
                     unregisterConfigurationCallback()
                     listener.onDialogDismissed()
