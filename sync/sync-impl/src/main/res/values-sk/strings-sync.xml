@@ -377,6 +377,7 @@
 
     <!-- Pairing screen -->
     <string name="sync_simplified_pairing_headline">Služba Sync &amp; Backup je na všetkých tvojich zariadeniach šifrovaná spôsobom end-to-end.</string>
+    <string name="sync_simplified_pairing_headline_check_other_device">Skontroluj svoje druhé zariadenie</string>
     <string name="sync_simplified_pairing_headline_recovery">Obnovenie údajov</string>
     <string name="sync_simplified_pairing_body">Pripája sa...</string>
 
@@ -389,6 +390,9 @@
     <string name="sync_simplified_pairing_dialog_joiner_secondary_button">Zrušiť</string>
     <string name="sync_simplified_pairing_dialog_acknowledgment_title">Potvrď na inom zariadení…</string>
     <string name="sync_simplified_pairing_dialog_acknowledgment_primary_button">Rozumiem</string>
+    <string name="sync_simplified_pairing_dialog_check_other_device_title">Skontroluj svoje druhé zariadenie</string>
+    <string name="sync_simplified_pairing_dialog_connecting_title">Prebieha synchronizácia</string>
+    <string name="sync_simplified_pairing_dialog_connecting_body">Pripája sa…</string>
 
     <!-- Recovery Code screen -->
     <string name="sync_simplified_recovery_code_headline" instruction="Placeholder is a device name. e.g., Samsung S23">Zariadenie %1$s bolo pridané do služby Sync &amp; Backup.</string>
