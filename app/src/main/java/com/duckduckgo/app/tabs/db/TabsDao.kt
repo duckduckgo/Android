@@ -50,7 +50,6 @@ abstract class TabsDao {
     @Query("select * from tabs where deletable is 1 order by position")
     abstract fun flowDeletableTabs(): Flow<List<TabEntity>>
 
-    /** Open and pending-undo rows alike, so "are there any tabs left" is one value from one write. */
     @Query("select count(*) from tabs")
     abstract fun flowTabCount(): Flow<Int>
 
