@@ -37,14 +37,16 @@ import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanBootstrap
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanProvider
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingStepIds
 import com.duckduckgo.app.onboarding.orchestrator.PasswordImportOutcome
+import com.duckduckgo.app.onboarding.orchestrator.PasswordImportResult
 import com.duckduckgo.app.onboarding.store.OnboardingStore
-import com.duckduckgo.app.onboarding.ui.page.OnboardingBackgroundStep
+import com.duckduckgo.app.onboarding.ui.page.OnboardingBackground
 import com.duckduckgo.app.onboarding.ui.page.configdriven.ConfigDrivenOnboardingPageViewModel.Command
 import com.duckduckgo.app.onboarding.ui.page.configdriven.ConfigDrivenOnboardingPageViewModel.Screen
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.autofill.api.ImportPasswordsFromGoogle
 import com.duckduckgo.autofill.api.ImportPasswordsFromGoogle.ImportPasswordsResult
+import com.duckduckgo.autofill.api.ImportPasswordsFromGoogle.ImportPasswordsStatus
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.onboarding.api.LinearOnboardingEvent
 import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
@@ -54,7 +56,9 @@ import com.duckduckgo.onboarding.api.LinearOnboardingState
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition
 import com.duckduckgo.onboarding.impl.LinearOnboardingOrchestratorImpl
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -198,7 +202,7 @@ class ConfigDrivenOnboardingPageViewModelTest {
 
         val screen = testee.viewState.value.screen as Screen.Dialog
         assertEquals("step", screen.stepId)
-        assertEquals(OnboardingBackgroundStep.ComparisonChart, screen.config.background)
+        assertEquals(OnboardingBackground.Horizon, screen.config.background)
         assertTrue(screen.animateEntry)
     }
 
@@ -686,13 +690,72 @@ class ConfigDrivenOnboardingPageViewModelTest {
 
             testee.onPasswordImportResult(Activity.RESULT_OK, null)
             advanceUntilIdle()
-            assertEquals(Command.ShowPasswordImportError, awaitItem())
+            expectNoEvents()
         }
 
+        assertTrue(testee.viewState.value.showPasswordImportError)
         assertEquals(
             listOf(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.TRANSIENT_ERROR)),
             recordedEvents,
         )
+    }
+
+    @Test
+    fun `keeps the transient import error flagged so a recreated view can restore the alert`() = runTest {
+        whenever(mockImportPasswordsFromGoogle.parseResult(anyOrNull())).thenReturn(ImportPasswordsResult.Error.Transient)
+        val testee = startAt(NewUserOnboardingActivityDialog.ImportPasswordsLaunch)
+        advanceUntilIdle()
+        testee.onPasswordImportResult(Activity.RESULT_OK, null)
+        advanceUntilIdle()
+
+        // The view collecting the state again is what a configuration change looks like to the view model.
+        assertTrue(testee.viewState.value.showPasswordImportError)
+    }
+
+    @Test
+    fun `clears the transient import error and asks for the import again on retry`() = runTest {
+        whenever(mockImportPasswordsFromGoogle.parseResult(anyOrNull())).thenReturn(ImportPasswordsResult.Error.Transient)
+        val testee = startAt(NewUserOnboardingActivityDialog.ImportPasswordsLaunch)
+        advanceUntilIdle()
+        testee.onPasswordImportResult(Activity.RESULT_OK, null)
+        advanceUntilIdle()
+
+        testee.onPasswordImportRetry()
+        advanceUntilIdle()
+
+        assertFalse(testee.viewState.value.showPasswordImportError)
+        assertTrue(recordedEvents.contains(NewUserOnboardingEvent.PasswordImportRequested))
+    }
+
+    @Test
+    fun `clears the transient import error and skips the import when the alert is dismissed with cancel`() = runTest {
+        whenever(mockImportPasswordsFromGoogle.parseResult(anyOrNull())).thenReturn(ImportPasswordsResult.Error.Transient)
+        val testee = startAt(NewUserOnboardingActivityDialog.ImportPasswordsLaunch)
+        advanceUntilIdle()
+        testee.onPasswordImportResult(Activity.RESULT_OK, null)
+        advanceUntilIdle()
+
+        testee.onPasswordImportErrorSkipped()
+        advanceUntilIdle()
+
+        assertFalse(testee.viewState.value.showPasswordImportError)
+        assertTrue(recordedEvents.contains(NewUserOnboardingEvent.PasswordImportSkipped))
+    }
+
+    @Test
+    fun `clears the transient import error without moving the flow when the alert is cancelled`() = runTest {
+        whenever(mockImportPasswordsFromGoogle.parseResult(anyOrNull())).thenReturn(ImportPasswordsResult.Error.Transient)
+        val testee = startAt(NewUserOnboardingActivityDialog.ImportPasswordsLaunch)
+        advanceUntilIdle()
+        testee.onPasswordImportResult(Activity.RESULT_OK, null)
+        advanceUntilIdle()
+        val eventsBefore = recordedEvents.toList()
+
+        testee.onPasswordImportErrorDismissed()
+        advanceUntilIdle()
+
+        assertFalse(testee.viewState.value.showPasswordImportError)
+        assertEquals(eventsBefore, recordedEvents)
     }
 
     @Test
@@ -713,6 +776,41 @@ class ConfigDrivenOnboardingPageViewModelTest {
             listOf(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.PERMANENT_ERROR)),
             recordedEvents,
         )
+    }
+
+    @Test
+    fun `resolves the outcome card and reports the counts once the import status reports`() = runTest {
+        whenever(mockImportPasswordsFromGoogle.importStatus())
+            .thenReturn(flowOf(ImportPasswordsStatus.Finished(imported = 3, skipped = 1)))
+        val testee = startAt(NewUserOnboardingActivityDialog.ImportComplete(PasswordImportResult.InProgress))
+        advanceUntilIdle()
+
+        // What the bound card raises when it binds on a state it cannot leave on its own.
+        testee.onContentInteraction(ContentInteraction.ResolveImportOutcome)
+        advanceUntilIdle()
+
+        assertEquals(
+            ImportCompleteContentState.Finished(imported = 3, skipped = 1),
+            importCompleteState(testee).value,
+        )
+        assertTrue(
+            recordedEvents.contains(
+                NewUserOnboardingEvent.PasswordImportParsed(PasswordImportResult.Imported(imported = 3, skipped = 1)),
+            ),
+        )
+    }
+
+    @Test
+    fun `fails the outcome card when the import status never reports a result`() = runTest {
+        whenever(mockImportPasswordsFromGoogle.importStatus()).thenReturn(MutableSharedFlow())
+        val testee = startAt(NewUserOnboardingActivityDialog.ImportComplete(PasswordImportResult.InProgress))
+        advanceUntilIdle()
+
+        testee.onContentInteraction(ContentInteraction.ResolveImportOutcome)
+        // Runs out the bounded wait: the status never reports, so the card cannot stay on the shimmer.
+        advanceUntilIdle()
+
         assertEquals(ImportCompleteContentState.Failed, importCompleteState(testee).value)
+        assertTrue(recordedEvents.contains(NewUserOnboardingEvent.PasswordImportParsed(PasswordImportResult.Failed)))
     }
 }

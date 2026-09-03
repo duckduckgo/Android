@@ -78,7 +78,7 @@ class OnboardingDialogShownPixelsTest {
 
     @Test
     fun `fires the search experience shown pixel for the input screen`() {
-        testee.fireFor(NewUserOnboardingActivityDialog.InputScreen)
+        testee.fireFor(NewUserOnboardingActivityDialog.InputScreen())
 
         verify(pixel).fire(AppPixelName.PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE, type = Unique())
     }
@@ -99,7 +99,15 @@ class OnboardingDialogShownPixelsTest {
         testee.fireFor(
             NewUserOnboardingActivityDialog.PreferenceSelector(
                 titleRes = R.string.searchPathPreferenceSelectorTitle,
-                initialSelections = mapOf(OnboardingPreference.SEARCH_HISTORY to true),
+                rows = listOf(
+                    ContentConfig.PreferenceSelector.Row(
+                        preference = OnboardingPreference.SEARCH_HISTORY,
+                        iconRes = null,
+                        primaryText = TextConfig.Literal("history"),
+                        secondaryText = null,
+                        initiallyEnabled = true,
+                    ),
+                ),
             ),
         )
         testee.fireFor(

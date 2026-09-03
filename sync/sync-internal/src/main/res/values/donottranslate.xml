@@ -31,6 +31,7 @@
     <string name="sync_internal_recovery_code">Recovery code</string>
     <string name="sync_internal_recovery_code_cta">Copy Recovery code</string>
     <string name="sync_internal_favicons_prompt_cta">Reset Favicons Prompt</string>
+    <string name="sync_internal_check_linking_code_cta">Check linking code</string>
     <string name="userIdSectionHeader">User ID</string>
     <string name="deviceIdSectionHeader">Device Id</string>
     <string name="deviceNameSectionHeader">Device Name</string>

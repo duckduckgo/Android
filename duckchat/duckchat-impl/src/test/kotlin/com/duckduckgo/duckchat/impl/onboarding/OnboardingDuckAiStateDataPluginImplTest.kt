@@ -42,37 +42,37 @@ class OnboardingDuckAiStateDataPluginImplTest {
     )
 
     @Test
-    fun whenIdRequestedThenItIsTheDuckAiStateChoice() {
+    fun `when id requested then it is the duck ai state choice`() {
         assertEquals(Id.DuckAiState, testee.id)
     }
 
     /** The ids are the pixel values for the step, so they are pinned here rather than left to follow a rename. */
     @Test
-    fun whenOptionsOfferedThenTheirIdsAreTheShippedOnes() = runTest {
+    fun `when options offered then their ids are the shipped ones`() = runTest {
         assertEquals(listOf("duck_ai_on", "duck_ai_off"), testee.options().map { it.id })
     }
 
     @Test
-    fun whenOptionsOfferedThenTheyCarryNoIcon() = runTest {
+    fun `when options offered then they carry no icon`() = runTest {
         testee.options().forEach { assertNull(it.iconRes) }
     }
 
     @Test
-    fun whenTheFirstOptionIsAppliedThenDuckAiIsTurnedOn() = runTest {
+    fun `when the first option is applied then duck ai is turned on`() = runTest {
         testee.apply(testee.options().first())
 
         verify(duckChat).setEnableDuckChatUserSetting(true)
     }
 
     @Test
-    fun whenTheSecondOptionIsAppliedThenDuckAiIsLeftOff() = runTest {
+    fun `when the second option is applied then duck ai is left off`() = runTest {
         testee.apply(testee.options()[1])
 
         verify(duckChat).setEnableDuckChatUserSetting(false)
     }
 
     @Test
-    fun whenAnOptionFromAnotherPluginIsAppliedThenNothingIsWritten() = runTest {
+    fun `when an option from another plugin is applied then nothing is written`() = runTest {
         testee.apply(
             object : Option {
                 override val id: String = "duck_ai_on"

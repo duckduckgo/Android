@@ -53,8 +53,9 @@ interface AdBlockingStatusChecker {
 
     /**
      * Emits the current [AdBlockingState], distinguishing whether ad blocking is enabled because
-     * the user turned it on ([AdBlockingState.Enabled.UserEnabled]) or because of the remote
-     * default ([AdBlockingState.Enabled.Default]).
+     * the user turned it on having seen the consent disclaimer ([AdBlockingState.Enabled.WithPixelConsent]),
+     * turned it on without seeing it ([AdBlockingState.Enabled.WithoutPixelConsent]) or because of the
+     * remote default ([AdBlockingState.Enabled.Default]).
      */
     fun observeState(): Flow<AdBlockingState>
 
@@ -68,8 +69,16 @@ sealed interface AdBlockingState {
         data object UntilRelaunch : Disabled
     }
     sealed interface Enabled : AdBlockingState {
-        data object UserEnabled : Enabled
+        data object WithPixelConsent : Enabled
         data object Default : Enabled
+
+        /**
+         * Enabled and sticky like [WithPixelConsent] but shows no disclaimer in settings, and sends no telemetry,
+         * since user has not seen the consent disclaimer.
+         *
+         * Toggling ad-blocking pref on the settings screen Off -> On migrates this state to [WithPixelConsent].
+         */
+        data object WithoutPixelConsent : Enabled
     }
 }
 
@@ -134,12 +143,15 @@ class RealAdBlockingStatusChecker @Inject constructor(
     override fun observeState(): Flow<AdBlockingState> =
         combine(
             settingsRepository.isEnabledFlow(),
+            settingsRepository.hasPixelConsentFlow(),
             feature.enabledByDefault().enabled(),
             sessionStore.observe(),
-        ) { userSetting, enabledByDefault, disabledUntilRelaunch ->
+        ) { userSetting, pixelConsent, enabledByDefault, disabledUntilRelaunch ->
             when {
                 disabledUntilRelaunch -> AdBlockingState.Disabled.UntilRelaunch
-                userSetting == true -> AdBlockingState.Enabled.UserEnabled
+                userSetting == true && pixelConsent == false -> AdBlockingState.Enabled.WithoutPixelConsent
+                // Consent is null when the setting was stored before consent was tracked, which only a settings toggle could have done.
+                userSetting == true -> AdBlockingState.Enabled.WithPixelConsent
                 userSetting == false -> AdBlockingState.Disabled.Permanent
                 enabledByDefault -> AdBlockingState.Enabled.Default
                 else -> AdBlockingState.Disabled.Permanent

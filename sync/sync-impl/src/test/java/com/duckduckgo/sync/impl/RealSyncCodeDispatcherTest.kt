@@ -33,6 +33,7 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.PEER_RECOVERY_CODE_UNAVAILABLE
 import com.duckduckgo.sync.impl.AccountErrorCodes.RECOVERY_CODE_PREPARATION_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.SESSION_TIMEOUT
 import com.duckduckgo.sync.impl.AccountErrorCodes.UNEXPECTED_EVENT
+import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2CodeParseResult
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Event
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message
@@ -171,7 +172,7 @@ class RealSyncCodeDispatcherTest {
     @Test fun `v2 flag on, v2 LinkingV2 - returns V2InProgress and does NOT call parseSyncAuthCode`() {
         configureFeatureFlag(canUseV2Code = true)
         whenever(qrCode.parse(any())).thenReturn(
-            ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = "2"),
+            ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = ExchangeProtocolVersion.V2_0),
         )
 
         val decision = dispatcher.route("v2-link-url")
@@ -476,16 +477,13 @@ class RealSyncCodeDispatcherTest {
     @Test fun `v2 flag on, LinkingV2 - ignores stale terminal events from prior sessions in the replay cache`() = runTest {
         configureFeatureFlag(canUseV2Code = true)
         whenever(qrCode.parse(any())).thenReturn(
-            ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = "2"),
+            ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = ExchangeProtocolVersion.V2_0),
         )
         val staleJoinerDone = ExchangeV2Event.Transition(
             timestampMs = 1L,
             from = ExchangeV2State.Joiner.Waiting,
             to = ExchangeV2State.Joiner.Done,
-            trigger = ExchangeV2Message.RecoveryCodeResponse(
-                rawJson = "{}",
-                recoveryCode = "stale-code-from-prior-session",
-            ),
+            trigger = ExchangeV2Message.RecoveryCodeResponse.create(recoveryCode = "stale-code-from-prior-session"),
             localTrigger = null,
         )
         val staleFlow = MutableSharedFlow<ExchangeV2Event>(replay = 10)
@@ -508,7 +506,7 @@ class RealSyncCodeDispatcherTest {
     @Test fun `v2 flag on, LinkingV2 - runner_startScan deferred until Flow is collected (cold)`() = runTest {
         configureFeatureFlag(canUseV2Code = true)
         whenever(qrCode.parse(any())).thenReturn(
-            ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = "2"),
+            ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = ExchangeProtocolVersion.V2_0),
         )
 
         val decision = dispatcher.route("v2-url") as RouteDecision.V2InProgress
@@ -523,7 +521,7 @@ class RealSyncCodeDispatcherTest {
         // Spec 1214802412121967: the v2 wire `secret` is base64url; v1 login decodes as standard base64.
         configureFeatureFlag(canUseV2Code = true)
         whenever(qrCode.parse(any())).thenReturn(
-            ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = "2"),
+            ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = ExchangeProtocolVersion.V2_0),
         )
         whenever(syncAccountRepository.processCode(any(), anyOrNull())).thenReturn(Result.Success(true))
         val base64urlSecret = "rUzlGqLLlbonAC_zIeh1nrCmuDsDAn6UooUUDz-6x3o"
@@ -547,10 +545,7 @@ class RealSyncCodeDispatcherTest {
                     timestampMs = System.currentTimeMillis(),
                     from = ExchangeV2State.Joiner.Waiting,
                     to = ExchangeV2State.Joiner.Done,
-                    trigger = ExchangeV2Message.RecoveryCodeResponse(
-                        rawJson = payloadJson,
-                        recoveryCode = recoveryCodeB64,
-                    ),
+                    trigger = ExchangeV2Message.RecoveryCodeResponse.create(recoveryCode = recoveryCodeB64),
                     localTrigger = null,
                 ),
             )
@@ -671,7 +666,7 @@ class RealSyncCodeDispatcherTest {
     @Test fun `Scanner maps a version-too-new SessionError to UpgradeRequired`() = runTest {
         configureFeatureFlag(canUseV2Code = true)
         whenever(qrCode.parse(any())).thenReturn(
-            ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = "2"),
+            ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = ExchangeProtocolVersion.V2_0),
         )
         val flow = (dispatcher.route("v2-url") as RouteDecision.V2InProgress).outcomes
         flow.test {
@@ -689,7 +684,7 @@ class RealSyncCodeDispatcherTest {
     @Test fun `Scanner - Host_Aborted with UserDeniedHost maps to Failed PAIRING_CANCELLED`() = runTest {
         configureFeatureFlag(canUseV2Code = true)
         whenever(qrCode.parse(any())).thenReturn(
-            ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = "2"),
+            ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = ExchangeProtocolVersion.V2_0),
         )
         val flow = (dispatcher.route("v2-url") as RouteDecision.V2InProgress).outcomes
         flow.test {
@@ -711,7 +706,7 @@ class RealSyncCodeDispatcherTest {
     @Test fun `Scanner - Host_Aborted with HostUnavailable maps to Failed PAIRING_UNAVAILABLE`() = runTest {
         configureFeatureFlag(canUseV2Code = true)
         whenever(qrCode.parse(any())).thenReturn(
-            ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = "2"),
+            ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = ExchangeProtocolVersion.V2_0),
         )
         val flow = (dispatcher.route("v2-url") as RouteDecision.V2InProgress).outcomes
         flow.test {
@@ -849,10 +844,7 @@ class RealSyncCodeDispatcherTest {
             recoveryJson.toByteArray(Charsets.UTF_8),
             android.util.Base64.URL_SAFE or android.util.Base64.NO_PADDING or android.util.Base64.NO_WRAP,
         )
-        val responseMessage = ExchangeV2Message.RecoveryCodeResponse(
-            rawJson = "{}",
-            recoveryCode = b64,
-        )
+        val responseMessage = ExchangeV2Message.RecoveryCodeResponse.create(recoveryCode = b64)
         whenever(syncAccountRepository.processCode(any(), anyOrNull())).thenReturn(Result.Success(true))
         whenever(runner.peerKind).thenReturn("ddg")
 
@@ -889,10 +881,7 @@ class RealSyncCodeDispatcherTest {
             recoveryJson.toByteArray(Charsets.UTF_8),
             android.util.Base64.URL_SAFE or android.util.Base64.NO_PADDING or android.util.Base64.NO_WRAP,
         )
-        val responseMessage = ExchangeV2Message.RecoveryCodeResponse(
-            rawJson = "{}",
-            recoveryCode = b64,
-        )
+        val responseMessage = ExchangeV2Message.RecoveryCodeResponse.create(recoveryCode = b64)
         whenever(syncAccountRepository.joinAccountFromThirdPartyRecoveryCode(any())).thenReturn(Result.Success(true))
 
         dispatcher.presentV2().test {
@@ -940,7 +929,7 @@ class RealSyncCodeDispatcherTest {
                 transition(
                     from = ExchangeV2State.Joiner.Waiting,
                     to = ExchangeV2State.Joiner.AbortedLocal,
-                    trigger = ExchangeV2Message.Hello(rawJson = "{}"),
+                    trigger = ExchangeV2Message.Hello.fromJson("{}"),
                 ),
             )
             assertEquals(UNEXPECTED_EVENT.code, (awaitItem() as DispatchOutcome.Failed).code)
@@ -954,7 +943,7 @@ class RealSyncCodeDispatcherTest {
                 transition(
                     from = ExchangeV2State.Host.Confirming,
                     to = ExchangeV2State.Host.Aborted,
-                    trigger = ExchangeV2Message.RecoveryCodeResponse(rawJson = "{}"),
+                    trigger = ExchangeV2Message.RecoveryCodeResponse.fromJson("{}"),
                 ),
             )
             assertEquals(UNEXPECTED_EVENT.code, (awaitItem() as DispatchOutcome.Failed).code)
@@ -989,7 +978,7 @@ class RealSyncCodeDispatcherTest {
             ExchangeV2CodeParseResult.LinkingV2(
                 channelId = "c",
                 publicKey = "k",
-                version = "2",
+                version = ExchangeProtocolVersion.V2_0,
             ),
         )
         val decision = dispatcher.route("v2-url") as RouteDecision.V2InProgress
@@ -1026,7 +1015,7 @@ class RealSyncCodeDispatcherTest {
             ExchangeV2CodeParseResult.LinkingV2(
                 channelId = "peer-channel",
                 publicKey = "k",
-                version = "2",
+                version = ExchangeProtocolVersion.V2_0,
             ),
         )
         val decision = dispatcher.route("v2-url") as RouteDecision.V2InProgress
@@ -1064,7 +1053,7 @@ class RealSyncCodeDispatcherTest {
     @Test fun `Scanner emits Failed when runner reaches Aborted (hello during negotiating)`() = runTest {
         configureFeatureFlag(canUseV2Code = true)
         whenever(qrCode.parse(any())).thenReturn(
-            ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = "2"),
+            ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = ExchangeProtocolVersion.V2_0),
         )
         val decision = dispatcher.route("v2-url") as RouteDecision.V2InProgress
         decision.outcomes.test {
@@ -1101,7 +1090,7 @@ class RealSyncCodeDispatcherTest {
     private fun startLinking(): kotlinx.coroutines.flow.Flow<DispatchOutcome> {
         configureFeatureFlag(canUseV2Code = true)
         whenever(qrCode.parse(any())).thenReturn(
-            ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = "2"),
+            ExchangeV2CodeParseResult.LinkingV2(channelId = "c", publicKey = "k", version = ExchangeProtocolVersion.V2_0),
         )
         return (dispatcher.route("v2-url") as RouteDecision.V2InProgress).outcomes
     }
@@ -1112,7 +1101,7 @@ class RealSyncCodeDispatcherTest {
                 transition(
                     from = ExchangeV2State.Joiner.Confirming,
                     to = ExchangeV2State.Joiner.AbortedByHost,
-                    trigger = ExchangeV2Message.RecoveryCodeDenied(rawJson = "{}"),
+                    trigger = ExchangeV2Message.RecoveryCodeDenied.fromJson("{}"),
                 ),
             )
             val outcome = awaitItem()
@@ -1128,7 +1117,7 @@ class RealSyncCodeDispatcherTest {
                 transition(
                     from = ExchangeV2State.Joiner.Confirming,
                     to = ExchangeV2State.Joiner.AbortedByHost,
-                    trigger = ExchangeV2Message.RecoveryCodeUnavailable(rawJson = "{}"),
+                    trigger = ExchangeV2Message.RecoveryCodeUnavailable.fromJson("{}"),
                 ),
             )
             assertEquals(PEER_RECOVERY_CODE_UNAVAILABLE.code, (awaitItem() as DispatchOutcome.Failed).code)
@@ -1156,7 +1145,7 @@ class RealSyncCodeDispatcherTest {
                 transition(
                     from = ExchangeV2State.Joiner.Waiting,
                     to = ExchangeV2State.Joiner.AbortedLocal,
-                    trigger = ExchangeV2Message.Hello(rawJson = "{}"),
+                    trigger = ExchangeV2Message.Hello.fromJson("{}"),
                 ),
             )
             assertEquals(UNEXPECTED_EVENT.code, (awaitItem() as DispatchOutcome.Failed).code)
@@ -1170,7 +1159,7 @@ class RealSyncCodeDispatcherTest {
                 transition(
                     from = ExchangeV2State.Host.Confirming,
                     to = ExchangeV2State.Host.Aborted,
-                    trigger = ExchangeV2Message.Hello(rawJson = "{}"),
+                    trigger = ExchangeV2Message.Hello.fromJson("{}"),
                 ),
             )
             assertEquals(UNEXPECTED_EVENT.code, (awaitItem() as DispatchOutcome.Failed).code)
@@ -1216,7 +1205,7 @@ class RealSyncCodeDispatcherTest {
                 transition(
                     from = ExchangeV2State.Joiner.Confirming,
                     to = ExchangeV2State.Joiner.AbortedByHost,
-                    trigger = ExchangeV2Message.RecoveryCodeDenied(rawJson = "{}"),
+                    trigger = ExchangeV2Message.RecoveryCodeDenied.fromJson("{}"),
                 ),
             )
             assertEquals(PAIRING_REJECTED.code, (awaitItem() as DispatchOutcome.Failed).code)
@@ -1238,7 +1227,7 @@ class RealSyncCodeDispatcherTest {
                 transition(
                     from = ExchangeV2State.Joiner.Confirming,
                     to = ExchangeV2State.Joiner.AbortedByHost,
-                    trigger = ExchangeV2Message.Hello(rawJson = "{}"),
+                    trigger = ExchangeV2Message.Hello.fromJson("{}"),
                 ),
             )
             val outcome = awaitItem() as DispatchOutcome.Failed
@@ -1276,7 +1265,7 @@ class RealSyncCodeDispatcherTest {
             recoveryJson.toByteArray(Charsets.UTF_8),
             android.util.Base64.URL_SAFE or android.util.Base64.NO_PADDING or android.util.Base64.NO_WRAP,
         )
-        val responseMessage = ExchangeV2Message.RecoveryCodeResponse(rawJson = "{}", recoveryCode = b64)
+        val responseMessage = ExchangeV2Message.RecoveryCodeResponse.create(recoveryCode = b64)
 
         dispatcher.presentV2().test {
             runnerEventsFlow.emit(

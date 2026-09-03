@@ -48,6 +48,8 @@
     <string name="skipOnboarding">Skip Onboarding</string>
 
     <!-- Segmented onboarding -->
+    <string name="preferenceChangeInSettingsCaption">You can always adjust later in Settings.</string>
+
     <string name="downloadReasonTitle">Set things up your way</string>
     <string name="downloadReasonBody">Choose one option that interests you most, and we’ll set you up quickly.</string>
     <string name="downloadReasonOptionSearch">Search and browse privately</string>
@@ -89,6 +91,10 @@
     <string name="noAiPathPreferenceHideAiGeneratedImagesSecondary">Filter out known AI spam sites from image search results</string>
     <string name="noAiPathDuckAiStateTitle">Want the option to chat privately with popular AIs?</string>
     <string name="noAiPathDuckAiStateBody">In Duck.ai, your chats are anonymized by us and never used to train AI.</string>
+
+    <string name="blockAdsPathPreferenceSelectorTitle">Internet, without the noise.</string>
+
+    <string name="blockAdsPathComparisonChartTitle"><![CDATA[You\'re in the right place!<br/>Ad Blocking activated.]]></string>
 
     <!-- Browser tab -->
     <string name="browserDuckPlayerShortUrl">Duck Player</string>
@@ -132,7 +138,7 @@
 
     <!-- Pre-onboarding: import passwords -->
     <string name="preOnboardingImportPasswordsTitle">Import passwords from Google</string>
-    <string name="preOnboardingImportPasswordsBody">Google may ask you to sign in or enter your password to confirm</string>
+    <string name="preOnboardingImportPasswordsBody">Google may ask you to sign in or enter your password to confirm.</string>
     <string name="preOnboardingImportPasswordsPrimaryCta">Import From Google</string>
     <string name="preOnboardingImportPasswordsSecondaryCta">Skip</string>
     <string name="preOnboardingImportCompleteTitle">Import complete</string>
@@ -141,8 +147,8 @@
     <string name="preOnboardingImportCompleteParsingBody">This will only take a moment.</string>
     <string name="preOnboardingImportCompleteFailedTitle">Import failed</string>
     <string name="preOnboardingImportCompleteFailed">Password import failed</string>
-    <string name="preOnboardingImportCompleteImported" instruction="%1$d is the number of passwords that were imported.">Passwords imported: %1$d</string>
-    <string name="preOnboardingImportCompleteSkipped" instruction="%1$d is the number of passwords that were not imported.">Skipped (duplicate or invalid): %1$d</string>
+    <string name="preOnboardingImportCompleteImported" instruction="%1$s is the number of passwords that were imported.">Passwords imported: %1$s</string>
+    <string name="preOnboardingImportCompleteSkipped" instruction="%1$s is the number of passwords that were not imported.">Skipped (duplicate or invalid): %1$s</string>
     <string name="preOnboardingImportErrorTitle">Something went wrong</string>
     <string name="preOnboardingImportErrorBody">Please try again.</string>
     <string name="preOnboardingImportErrorRetry">Try again</string>

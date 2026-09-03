@@ -182,7 +182,7 @@ class WebViewRequestInterceptor(
             }
 
             webViewClientListener?.upgradedToHttps()
-            privacyProtectionCountDao.incrementUpgradeCount()
+            appCoroutineScope.launch(dispatchers.io()) { privacyProtectionCountDao.incrementUpgradeCount() }
             return WebResourceResponse(null, null, null)
         }
 
@@ -386,7 +386,7 @@ class WebViewRequestInterceptor(
         }
 
         logcat { "Blocking request ${request.url}" }
-        privacyProtectionCountDao.incrementBlockedTrackerCount()
+        appCoroutineScope.launch(dispatchers.io()) { privacyProtectionCountDao.incrementBlockedTrackerCount() }
         return WebResourceResponse(null, null, null)
     }
 
@@ -457,7 +457,9 @@ class WebViewRequestInterceptor(
 
     private fun recordTrackerBlocked(trackingEvent: TrackingEvent) {
         val trackerCompany = trackingEvent.entity?.displayName ?: "Undefined"
-        webTrackersBlockedDao.insert(WebTrackerBlocked(trackerUrl = trackingEvent.trackerUrl, trackerCompany = trackerCompany))
+        appCoroutineScope.launch(dispatchers.io()) {
+            webTrackersBlockedDao.insert(WebTrackerBlocked(trackerUrl = trackingEvent.trackerUrl, trackerCompany = trackerCompany))
+        }
     }
 
     private fun appUrlPixel(url: Uri?): Boolean =

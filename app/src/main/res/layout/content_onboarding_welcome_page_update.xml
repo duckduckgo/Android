@@ -119,7 +119,7 @@
         app:layout_constraintTop_toTopOf="@id/backgroundGuideline"
         app:layout_constraintVertical_bias="1"
         tools:layout_constraintHeight_max="404dp"
-        tools:src="@drawable/onboarding_welcome_screen_background"
+        tools:src="@drawable/onboarding_background_pond"
         tools:visibility="visible" />
 
     <include

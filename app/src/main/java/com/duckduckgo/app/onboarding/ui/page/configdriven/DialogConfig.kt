@@ -18,14 +18,14 @@ package com.duckduckgo.app.onboarding.ui.page.configdriven
 
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
 import com.duckduckgo.app.onboarding.orchestrator.StepProgress
-import com.duckduckgo.app.onboarding.ui.page.OnboardingBackgroundStep
+import com.duckduckgo.app.onboarding.ui.page.OnboardingBackground
 
 /**
  * Everything that makes one onboarding dialog different from another. Plain, value-comparable data: equality
  * drives the render engine's diff, so it must never hold views or lambdas over view state.
  */
 data class DialogConfig(
-    val background: OnboardingBackgroundStep,
+    val background: OnboardingBackground,
     val embellishment: Embellishment = Embellishment.None,
     val cardArrow: CardArrowConfig = CardArrowConfig.Hidden,
     val cardEntry: CardEntry = CardEntry.Immediate,

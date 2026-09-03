@@ -20,6 +20,7 @@ import androidx.annotation.DrawableRes
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.onboarding.OnboardingPreference
+import com.duckduckgo.app.onboarding.orchestrator.PasswordImportResult
 import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
 import com.duckduckgo.onboarding.api.OnboardingSingleChoiceDataPlugin.Option
 
@@ -106,14 +107,19 @@ sealed interface ContentConfig {
     data class PreferenceSelector(
         override val title: TextConfig,
         val rows: List<Row>,
+        val caption: TextConfig? = null,
     ) : ContentConfig, Stateful<PreferenceSelectorContentState> {
 
         data class Row(
             val preference: OnboardingPreference,
-            @DrawableRes val iconRes: Int,
+            /** Null when the row renders without an icon. */
+            @DrawableRes val iconRes: Int?,
             val primaryText: TextConfig,
-            val secondaryText: TextConfig,
+            /** Null when the row is rendered as a single line. */
+            val secondaryText: TextConfig?,
             val initiallyEnabled: Boolean,
+            /** When set, the row is only shown while the preference it names is switched on. */
+            val dependsOn: OnboardingPreference? = null,
         )
 
         override fun initialState() = PreferenceSelectorContentState(rows.associate { it.preference to it.initiallyEnabled })
@@ -167,8 +173,13 @@ sealed interface ContentConfig {
         val parsingBody: TextConfig,
         val failedTitle: TextConfig,
         val failedRow: TextConfig,
+        val result: PasswordImportResult?,
     ) : ContentConfig, Stateful<ImportCompleteContentState> {
-        override fun initialState(): ImportCompleteContentState = ImportCompleteContentState.Parsing
+        override fun initialState(): ImportCompleteContentState = when (result) {
+            null, PasswordImportResult.InProgress -> ImportCompleteContentState.Parsing
+            is PasswordImportResult.Imported -> ImportCompleteContentState.Finished(imported = result.imported, skipped = result.skipped)
+            PasswordImportResult.Failed -> ImportCompleteContentState.Failed
+        }
     }
 }
 

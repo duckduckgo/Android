@@ -87,7 +87,7 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
  */
 @Database(
     exportSchema = true,
-    version = 63,
+    version = 64,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
@@ -770,6 +770,35 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         }
     }
 
+    // Recreate-and-copy rather than ALTER TABLE DROP COLUMN, which needs SQLite 3.35 (API 35) and min_sdk is 28.
+    private val MIGRATION_63_TO_64: Migration = object : Migration(63, 64) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL(
+                "CREATE TABLE IF NOT EXISTS `page_loaded_pixel_entity_new` (" +
+                    "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                    "`appVersion` TEXT NOT NULL, " +
+                    "`elapsedTime` INTEGER NOT NULL, " +
+                    "`webviewVersion` TEXT NOT NULL, " +
+                    "`cpmEnabled` INTEGER NOT NULL, " +
+                    "`isTabInForegroundOnFinish` INTEGER NOT NULL, " +
+                    "`activeRequestsOnLoadStart` INTEGER NOT NULL, " +
+                    "`concurrentRequestsOnFinish` INTEGER NOT NULL" +
+                    ")",
+            )
+            database.execSQL(
+                "INSERT INTO `page_loaded_pixel_entity_new` (" +
+                    "`id`, `appVersion`, `elapsedTime`, `webviewVersion`, `cpmEnabled`, " +
+                    "`isTabInForegroundOnFinish`, `activeRequestsOnLoadStart`, `concurrentRequestsOnFinish`" +
+                    ") SELECT " +
+                    "`id`, `appVersion`, `elapsedTime`, `webviewVersion`, `cpmEnabled`, " +
+                    "`isTabInForegroundOnFinish`, `activeRequestsOnLoadStart`, `concurrentRequestsOnFinish` " +
+                    "FROM `page_loaded_pixel_entity`",
+            )
+            database.execSQL("DROP TABLE `page_loaded_pixel_entity`")
+            database.execSQL("ALTER TABLE `page_loaded_pixel_entity_new` RENAME TO `page_loaded_pixel_entity`")
+        }
+    }
+
     /**
      * WARNING ⚠️
      * This needs to happen because Room doesn't support UNIQUE (...) ON CONFLICT REPLACE when creating the bookmarks table.
@@ -858,6 +887,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
             MIGRATION_60_TO_61,
             MIGRATION_61_TO_62,
             MIGRATION_62_TO_63,
+            MIGRATION_63_TO_64,
         )
 
     @Deprecated(

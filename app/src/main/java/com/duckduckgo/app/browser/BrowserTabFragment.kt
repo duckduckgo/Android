@@ -3848,6 +3848,9 @@ class BrowserTabFragment :
                 override fun onHatchPressed() {
                     hideKeyboard()
                     ntpAfterIdleManager.onReturnToPageTapped()
+                    if (newTabReturnHatchView.isDuckChat) {
+                        duckChat.reportDuckChatEntry(DuckChatEntryPoint.RETURN_TO_CHAT_CARD, opensNewTab = false, hasPrompt = false)
+                    }
                     browserActivity?.openExistingTabInMode(
                         newTabReturnHatchView.targetMode,
                         newTabReturnHatchView.tabId,
