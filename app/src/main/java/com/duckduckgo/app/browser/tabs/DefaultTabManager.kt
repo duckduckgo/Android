@@ -24,6 +24,8 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.duckchat.api.DuckAiSessionWideEvent
+import com.duckduckgo.duckchat.api.ExitTrigger
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.withContext
@@ -61,6 +63,7 @@ class DefaultTabManager @Inject constructor(
     private val queryUrlConverter: OmnibarEntryConverter,
     private val skipUrlConversionOnNewTabFeature: SkipUrlConversionOnNewTabFeature,
     private val browserMode: BrowserMode,
+    private val duckAiSessionWideEvent: DuckAiSessionWideEvent,
 ) : TabManager {
     private lateinit var onTabsUpdated: (List<TabModel>) -> Unit
     private var selectedTabId: String? = null
@@ -104,6 +107,9 @@ class DefaultTabManager @Inject constructor(
         sourceTabId: String?,
         skipHome: Boolean,
     ): String = withContext(dispatchers.io()) {
+        selectedTabId?.let { tabId ->
+            duckAiSessionWideEvent.onExitIntent(tabId, ExitTrigger.NEW_TAB_OPENED)
+        }
         val url = query?.let {
             if (skipUrlConversionOnNewTabFeature.self().isEnabled()) {
                 query
