@@ -80,6 +80,7 @@ class RetentionMetricsAtbLifecyclePluginTest {
             appUseMetricPixelsPlugin = appUseMetricPixelsPlugin,
             duckAiPromptSentMetricPixelsPlugin = duckAiPromptSentMetricPixelsPlugin,
             appCoroutineScope = coroutineRule.testScope,
+            experimentsExcludedFromDuckAiSearchMetric = setOf("experimentFooFeature"),
         )
     }
 
@@ -189,8 +190,7 @@ class RetentionMetricsAtbLifecyclePluginTest {
 
         val expected = duckAiPromptSentMetricPixelsPlugin.getMetrics()
         assertTrue(expected.isNotEmpty())
-        assertEquals(expected.size, fakeMetricsPixelExtension.sentMetrics.size)
-        assertTrue(fakeMetricsPixelExtension.sentMetrics.all { it.metric == "duck_ai_prompt_sent" })
+        assertEquals(expected.size, fakeMetricsPixelExtension.sentMetrics.count { it.metric == "duck_ai_prompt_sent" })
     }
 
     @Test
@@ -258,6 +258,41 @@ class RetentionMetricsAtbLifecyclePluginTest {
                 assignedCohort = cohort,
             ),
         )
+    }
+
+    @Test
+    fun `when duck ai atb refreshed then search metrics are also sent`() = runTest {
+        setCohorts(ZonedDateTime.now(ZoneId.of("America/New_York")).toString())
+
+        atbLifecyclePlugin.onDuckAiRetentionAtbRefreshed("", "", emptyMap())
+
+        assertTrue(fakeMetricsPixelExtension.sentMetrics.any { it.metric == "search" })
+        assertTrue(fakeMetricsPixelExtension.sentMetrics.any { it.metric == "duck_ai_prompt_sent" })
+    }
+
+    @Test
+    fun `when duck ai atb refreshed then excluded experiments get no search metrics`() = runTest {
+        setCohorts(ZonedDateTime.now(ZoneId.of("America/New_York")).toString())
+
+        atbLifecyclePlugin.onDuckAiRetentionAtbRefreshed("", "", emptyMap())
+
+        val searchMetricToggles = fakeMetricsPixelExtension.sentMetrics
+            .filter { it.metric == "search" }
+            .map { it.toggle.featureName().name }
+            .toSet()
+        assertEquals(setOf("fooFeature"), searchMetricToggles)
+    }
+
+    @Test
+    fun `when search atb refreshed then excluded experiments still get search metrics`() = runTest {
+        setCohorts(ZonedDateTime.now(ZoneId.of("America/New_York")).toString())
+
+        atbLifecyclePlugin.onSearchRetentionAtbRefreshed("", "")
+
+        val searchMetricToggles = fakeMetricsPixelExtension.sentMetrics
+            .map { it.toggle.featureName().name }
+            .toSet()
+        assertTrue(searchMetricToggles.containsAll(setOf("experimentFooFeature", "fooFeature")))
     }
 }
 
