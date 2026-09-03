@@ -114,6 +114,7 @@ import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_PAGE_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DuckPlayerJSHelper
 import com.duckduckgo.app.browser.errorpage.BadUrlErrorPageWideEvent
+import com.duckduckgo.app.browser.errorpage.CustomErrorPagesFeature
 import com.duckduckgo.app.browser.favicon.FaviconFetchingFixFeature
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource
@@ -745,6 +746,7 @@ class BrowserTabViewModelTest {
     private val mockDesktopModeSettings: DesktopModeSettings = mock()
     private val fakeRememberDesktopModeFeature = FakeFeatureToggleFactory.create(RememberDesktopModeFeature::class.java)
     private val fakeSuggestRedirectFeature = FakeFeatureToggleFactory.create(SuggestRedirectOnUnresolvedErrorFeature::class.java)
+    private val fakeCustomErrorPagesFeature = FakeFeatureToggleFactory.create(CustomErrorPagesFeature::class.java)
     private val mockSuggestRedirectEvaluator: SuggestRedirectEvaluator = mock()
     private val mockBadUrlErrorPageWideEvent: BadUrlErrorPageWideEvent = mock()
     private val mockInlinePdfHandler: InlinePdfHandler = mock()
@@ -764,6 +766,10 @@ class BrowserTabViewModelTest {
     fun before() =
         runTest {
             MockitoAnnotations.openMocks(this)
+            fakeCustomErrorPagesFeature.apply {
+                self().setRawStoredState(State(enable = true))
+                keepErrorPageUntilNextPageStartsLoading().setRawStoredState(State(enable = true))
+            }
 
             // Register MIME types needed by file chooser tests (Robolectric's MimeTypeMap is empty by default)
             val mimeTypeMap = android.webkit.MimeTypeMap.getSingleton()
@@ -1097,6 +1103,7 @@ class BrowserTabViewModelTest {
                 suggestRedirectOnUnresolvedErrorFeature = fakeSuggestRedirectFeature,
                 suggestRedirectEvaluator = mockSuggestRedirectEvaluator,
                 badUrlErrorPageWideEvent = mockBadUrlErrorPageWideEvent,
+                customErrorPagesFeature = fakeCustomErrorPagesFeature,
             )
 
         testee.loadData("abc", null, false, false)
@@ -8890,6 +8897,139 @@ class BrowserTabViewModelTest {
             assertCommandIssued<Command.WebViewError>()
         }
 
+    // region Custom error page is kept until the next page starts loading
+    @Test
+    fun whenUserSubmitsQueryWhileErrorPageShowingThenErrorPageIsKeptUntilNextPageBecomesVisible() = runTest {
+        whenever(mockOmnibarConverter.convertQueryToUrl(NEW_SITE, null))
+            .thenReturn(NEW_SITE)
+
+        listOf(BAD_URL, CONNECTION, SSL_PROTOCOL_ERROR).forEach { error ->
+            givenErrorPageShowingForSite(error, FAILED_SITE)
+
+            testee.onUserSubmittedQuery(NEW_SITE)
+            testee.onMainFrameLoadStarted(navigationId = 1L)
+
+            assertEquals(error, browserViewState().browserError)
+
+            testee.onPageCommitVisible(WebViewNavigationState(mockStack, 50), NEW_SITE)
+
+            assertEquals(OMITTED, browserViewState().browserError)
+        }
+    }
+
+    @Test
+    fun whenUserSubmitsQueryWhileBadUrlErrorPageShowingThenRedirectSuggestionIsKeptUntilNextPageBecomesVisible() = runTest {
+        whenever(mockOmnibarConverter.convertQueryToUrl(NEW_SITE, null))
+            .thenReturn(NEW_SITE)
+        val suggestion = RedirectSuggestion(domain = "www.nope.invalid", url = "http://www.nope.invalid")
+        givenErrorPageShowingForSite(BAD_URL, FAILED_SITE, redirectSuggestion = suggestion)
+
+        testee.onUserSubmittedQuery(NEW_SITE)
+        testee.onMainFrameLoadStarted(navigationId = 1L)
+
+        assertEquals(suggestion, browserViewState().redirectSuggestion)
+
+        testee.onPageCommitVisible(WebViewNavigationState(mockStack, 50), NEW_SITE)
+
+        assertNull(browserViewState().redirectSuggestion)
+    }
+
+    @Test
+    fun whenBrowserErrorRefreshedWhileErrorPageShowingThenLoadingStateIsKeptUntilNextPageBecomesVisible() = runTest {
+        givenErrorPageShowingForSite(BAD_URL, FAILED_SITE)
+
+        testee.refreshBrowserError() // Called when the user triggers a back/forward navigation or performs a pull-to-refresh
+        testee.onMainFrameLoadStarted(navigationId = 1L)
+
+        assertEquals(LOADING, browserViewState().browserError)
+
+        testee.onPageCommitVisible(WebViewNavigationState(mockStack, 50), NEW_SITE)
+
+        assertEquals(OMITTED, browserViewState().browserError)
+    }
+
+    @Test
+    fun whenRedirectSuggestionTappedThenErrorPageAndRedirectSuggestionAreKeptUntilNextPageBecomesVisible() = runTest {
+        val suggestion = RedirectSuggestion(domain = "www.nope.invalid", url = "http://www.nope.invalid")
+        givenErrorPageShowingForSite(BAD_URL, FAILED_SITE, redirectSuggestion = suggestion)
+
+        testee.onRedirectSuggestionClicked(NEW_SITE)
+        testee.onMainFrameLoadStarted(navigationId = 1L)
+
+        assertEquals(BAD_URL, browserViewState().browserError)
+        assertEquals(suggestion, browserViewState().redirectSuggestion)
+
+        testee.onPageCommitVisible(WebViewNavigationState(mockStack, 50), NEW_SITE)
+
+        assertEquals(OMITTED, browserViewState().browserError)
+        assertNull(browserViewState().redirectSuggestion)
+    }
+
+    @Test
+    fun whenNextPageFinishesWithoutBecomingVisibleThenKeptErrorPageIsStillDismissed() = runTest {
+        whenever(mockOmnibarConverter.convertQueryToUrl(NEW_SITE, null))
+            .thenReturn(NEW_SITE)
+        givenErrorPageShowingForSite(BAD_URL, FAILED_SITE)
+
+        testee.onUserSubmittedQuery(NEW_SITE)
+        testee.onMainFrameLoadStarted(navigationId = 1L)
+
+        assertEquals(BAD_URL, browserViewState().browserError)
+
+        testee.pageFinished(mockWebView, WebViewNavigationState(mockStack, 100), NEW_SITE)
+
+        assertEquals(OMITTED, browserViewState().browserError)
+    }
+
+    @Test
+    fun whenNextPageFailsDifferentCustomErrorThenErrorPageIsReplacedWhenPageBecomesVisible() = runTest {
+        whenever(mockOmnibarConverter.convertQueryToUrl(NEW_SITE, null))
+            .thenReturn(NEW_SITE)
+        val suggestion = RedirectSuggestion(domain = "www.nope.invalid", url = "http://www.nope.invalid")
+        givenErrorPageShowingForSite(BAD_URL, FAILED_SITE, redirectSuggestion = suggestion)
+
+        testee.onUserSubmittedQuery(NEW_SITE)
+        testee.onMainFrameLoadStarted(navigationId = 1L)
+
+        assertEquals(BAD_URL, browserViewState().browserError)
+        assertEquals(suggestion, browserViewState().redirectSuggestion)
+
+        testee.onReceivedError(CONNECTION, NEW_SITE, "ERROR_HOST_LOOKUP")
+        testee.onPageCommitVisible(WebViewNavigationState(mockStack, 50), NEW_SITE)
+
+        assertEquals(CONNECTION, browserViewState().browserError)
+    }
+
+    @Test
+    fun whenNextPageFailsWithAnOmittedErrorThenErrorPageIsDismissedWhenPageBecomesVisible() = runTest {
+        whenever(mockOmnibarConverter.convertQueryToUrl(NEW_SITE, null))
+            .thenReturn(NEW_SITE)
+        val suggestion = RedirectSuggestion(domain = "www.nope.invalid", url = "http://www.nope.invalid")
+        givenErrorPageShowingForSite(BAD_URL, FAILED_SITE, redirectSuggestion = suggestion)
+
+        testee.onUserSubmittedQuery(NEW_SITE)
+        testee.onMainFrameLoadStarted(navigationId = 1L)
+
+        assertEquals(BAD_URL, browserViewState().browserError)
+        assertEquals(suggestion, browserViewState().redirectSuggestion)
+
+        testee.onReceivedError(OMITTED, NEW_SITE, "ERROR_CONNECT")
+        testee.onPageCommitVisible(WebViewNavigationState(mockStack, 50), NEW_SITE)
+
+        assertEquals(OMITTED, browserViewState().browserError)
+    }
+
+    private fun givenErrorPageShowingForSite(
+        error: WebViewErrorResponse,
+        site: String,
+        redirectSuggestion: RedirectSuggestion? = null,
+    ) {
+        loadUrl(site)
+        testee.onReceivedError(error, site, "ERROR_HOST_LOOKUP")
+        redirectSuggestion?.let { testee.browserViewState.value = browserViewState().copy(redirectSuggestion = it) }
+    }
+    //endregion
+
     @Test
     fun whenRedirectSuggestionClickedThenBrowserErrorResetAndNavigateCommandIssuedWithSuggestedUrl() =
         runTest {
@@ -13389,5 +13529,7 @@ class BrowserTabViewModelTest {
 
     companion object {
         private const val ONBOARDING_URL = "https://duck.ai/chat?flow=mobile-app-onboarding"
+        private const val FAILED_SITE = "http://nope.invalid"
+        private const val NEW_SITE = "http://another-site.com"
     }
 }
