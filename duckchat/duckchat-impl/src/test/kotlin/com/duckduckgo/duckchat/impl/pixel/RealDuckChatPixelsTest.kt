@@ -71,6 +71,11 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_START_NEW_
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN_DAILY
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
+import com.duckduckgo.feature.toggles.api.ConversionWindow
+import com.duckduckgo.feature.toggles.api.FakeMetricsPixelExtension
+import com.duckduckgo.feature.toggles.api.MetricType
+import com.duckduckgo.feature.toggles.api.MetricsPixel
+import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -102,6 +107,16 @@ class RealDuckChatPixelsTest {
     private val mockAppBuildConfig: AppBuildConfig = mock()
     private val mockBrowserInteractionsPlugin: BrowserInteractionsPlugin = mock()
     private val mockBrowserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin> = mock()
+    private val mockDuckAiNewChatMetricPixelsPlugin: DuckAiNewChatMetricPixelsPlugin = mock()
+    private val fakeMetricsPixelExtension = FakeMetricsPixelExtension()
+
+    private val newChatMetric = MetricsPixel(
+        metric = "duck_ai_new_chat",
+        value = "1",
+        conversionWindow = listOf(ConversionWindow(lowerWindow = 0, upperWindow = 0)),
+        toggle = mock<Toggle>(),
+        type = MetricType.COUNT_WHEN_IN_WINDOW,
+    )
 
     private lateinit var testee: RealDuckChatPixels
 
@@ -111,6 +126,8 @@ class RealDuckChatPixelsTest {
         whenever(mockDuckChatFeatureRepository.checkAndMarkFirstPromptSubmission()).thenReturn(false)
         whenever(mockAppBuildConfig.isNewInstall()).thenReturn(false)
         whenever(mockBrowserInteractionsPlugins.getPlugins()).thenReturn(listOf(mockBrowserInteractionsPlugin))
+        whenever(mockDuckAiNewChatMetricPixelsPlugin.getMetrics()).thenReturn(listOf(newChatMetric))
+        fakeMetricsPixelExtension.register()
 
         testee = RealDuckChatPixels(
             pixel = mockPixel,
@@ -123,6 +140,7 @@ class RealDuckChatPixelsTest {
             duckAiTabSessionRepository = mockDuckAiTabSessionRepository,
             appBuildConfig = mockAppBuildConfig,
             browserInteractionsPlugins = mockBrowserInteractionsPlugins,
+            duckAiNewChatMetricPixelsPlugin = mockDuckAiNewChatMetricPixelsPlugin,
         )
     }
 
@@ -239,6 +257,24 @@ class RealDuckChatPixelsTest {
             parameters = mapOf(DuckChatPixelParameters.DELTA_TIMESTAMP_PARAMETERS to "25"),
         )
         verifyNoInteractions(statisticsUpdater)
+    }
+
+    @Test
+    fun `when sendReportMetricPixel with USER_DID_SUBMIT_FIRST_PROMPT then sends new chat experiment metrics`() = runTest {
+        testee.sendReportMetricPixel(USER_DID_SUBMIT_FIRST_PROMPT)
+
+        advanceUntilIdle()
+
+        assertEquals(listOf(newChatMetric), fakeMetricsPixelExtension.sentMetrics)
+    }
+
+    @Test
+    fun `when sendReportMetricPixel with another metric then sends no new chat experiment metrics`() = runTest {
+        testee.sendReportMetricPixel(USER_DID_SUBMIT_PROMPT)
+
+        advanceUntilIdle()
+
+        assertEquals(emptyList<MetricsPixel>(), fakeMetricsPixelExtension.sentMetrics)
     }
 
     @Test

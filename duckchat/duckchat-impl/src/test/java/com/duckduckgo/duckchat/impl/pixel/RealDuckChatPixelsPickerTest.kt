@@ -50,6 +50,7 @@ class RealDuckChatPixelsPickerTest {
         duckAiTabSessionRepository = mock(),
         appBuildConfig = mock(),
         browserInteractionsPlugins = mock(),
+        duckAiNewChatMetricPixelsPlugin = mock(),
     )
 
     @Test
