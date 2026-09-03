@@ -344,10 +344,10 @@
     <string name="duckAiSettingsTitle">„Duck.ai“ nuostatos</string>
 
     <!-- File/image attachment menu options -->
-    <string name="duckChatContextualAskAboutPage">Klausk apie puslapį</string>
 
     <!-- Editing a message already sent to Duck.ai -->
     <string name="duck_ai_edit_prompt_title" instruction="Screen title: the user is editing a message they already sent to Duck.ai">Redaguoti žinutę</string>
     <string name="duck_ai_edit_prompt_lose_responses_warning" instruction="Warning shown while editing a sent message: the answer Duck.ai already gave will be discarded and answered again">Redaguojant atsakymas bus pakeistas nauju.</string>
 
+    <string name="duckChatContextualAskAboutPage">Klausk apie puslapį</string>
 </resources>

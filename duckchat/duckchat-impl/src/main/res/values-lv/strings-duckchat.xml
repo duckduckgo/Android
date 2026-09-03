@@ -343,10 +343,10 @@
     <string name="duckAiSettingsTitle">Duck.ai iestatījumi</string>
 
     <!-- File/image attachment menu options -->
-    <string name="duckChatContextualAskAboutPage">Jautā par lapu</string>
 
     <!-- Editing a message already sent to Duck.ai -->
     <string name="duck_ai_edit_prompt_title" instruction="Screen title: the user is editing a message they already sent to Duck.ai">Rediģēt ziņojumu</string>
     <string name="duck_ai_edit_prompt_lose_responses_warning" instruction="Warning shown while editing a sent message: the answer Duck.ai already gave will be discarded and answered again">Rediģējot atbildi, tā tiks aizstāta ar jaunu.</string>
 
+    <string name="duckChatContextualAskAboutPage">Jautā par lapu</string>
 </resources>
