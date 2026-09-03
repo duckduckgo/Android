@@ -210,10 +210,3 @@ data class DownloadReasonContentState(val selection: DownloadReasonSelection?)
 data class PreferenceSelectorContentState(val enabled: Map<OnboardingPreference, Boolean>)
 
 data class SingleChoiceContentState(val selected: Option)
-
-enum class DownloadReasonSelection {
-    SEARCH,
-    AI_CHAT,
-    NO_AI,
-    BLOCK_ADS,
-}

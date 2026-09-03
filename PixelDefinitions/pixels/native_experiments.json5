@@ -1,5 +1,47 @@
 {
     // This file will define pixels sent by the native experiments framework
     "defaultSuffixes": ["form_factor"],
-    "activeExperiments": {}
+    "activeExperiments": {
+        "onboardingFlowByDownloadReasonExperiment": {
+            "cohorts": ["control", "treatment"],
+            "metrics": {
+                "onboarding_completed": {
+                    "description": "User reached the end-of-journey dialog (onboarding completed)",
+                    "enum": [""]
+                },
+                "download_reason_selected_search": {
+                    "description": "User selected the 'search' download reason",
+                    "enum": [""]
+                },
+                "download_reason_selected_ai-chat": {
+                    "description": "User selected the 'ai-chat' download reason",
+                    "enum": [""]
+                },
+                "download_reason_selected_no-ai": {
+                    "description": "User selected the 'no-ai' download reason",
+                    "enum": [""]
+                },
+                "download_reason_selected_ad-blocking": {
+                    "description": "User selected the 'ad-blocking' download reason",
+                    "enum": [""]
+                },
+                "download_reason_search_retention_search": {
+                    "description": "D5-7 search retention for the 'search' download-reason segment",
+                    "enum": ["1", "4", "6", "11", "21", "30"]
+                },
+                "download_reason_search_retention_ai-chat": {
+                    "description": "D5-7 search retention for the 'ai-chat' download-reason segment",
+                    "enum": ["1", "4", "6", "11", "21", "30"]
+                },
+                "download_reason_search_retention_no-ai": {
+                    "description": "D5-7 search retention for the 'no-ai' download-reason segment",
+                    "enum": ["1", "4", "6", "11", "21", "30"]
+                },
+                "download_reason_search_retention_ad-blocking": {
+                    "description": "D5-7 search retention for the 'ad-blocking' download-reason segment",
+                    "enum": ["1", "4", "6", "11", "21", "30"]
+                }
+            }
+        }
+    }
 }

@@ -122,7 +122,7 @@
             "onboardingDaysSinceInstall",
             "onboardingFlow",
             "onboardingPixelSource",
-            "onboardingSegmentedVariant",
+            "onboardingDownloadReasonVariant",
             "inputPreviewAction",
             {
                 "key": "value",
@@ -179,7 +179,7 @@
             "onboardingDaysSinceInstall",
             "onboardingFlow",
             "onboardingPixelSource",
-            "onboardingSegmentedVariant",
+            "onboardingDownloadReasonVariant",
             "inputPreviewAction",
             {
                 "key": "value",
@@ -201,7 +201,7 @@
             "onboardingDaysSinceInstall",
             "onboardingFlow",
             "onboardingPixelSource",
-            "onboardingSegmentedVariant",
+            "onboardingDownloadReasonVariant",
             {
                 "key": "value",
                 "type": "string",
@@ -262,7 +262,7 @@
             "onboardingDaysSinceInstall",
             "onboardingFlow",
             "onboardingPixelSource",
-            "onboardingSegmentedVariant",
+            "onboardingDownloadReasonVariant",
             "inputPreviewAction",
             {
                 "key": "value",
@@ -299,7 +299,7 @@
             "onboardingDaysSinceInstall",
             "onboardingFlow",
             "onboardingPixelSource",
-            "onboardingSegmentedVariant",
+            "onboardingDownloadReasonVariant",
             "inputPreviewAction",
             { "key": "value", "type": "string", "description": "Only set when event=clicked.", "enum": ["engage", "dismiss"] }
         ]
@@ -336,7 +336,7 @@
             "onboardingDaysSinceInstall",
             "onboardingFlow",
             "onboardingPixelSource",
-            "onboardingSegmentedVariant",
+            "onboardingDownloadReasonVariant",
             "inputPreviewAction",
             { "key": "value", "type": "string", "description": "Only set when event=clicked.", "enum": ["engage", "dismiss"] }
         ]
@@ -353,7 +353,7 @@
             "onboardingDaysSinceInstall",
             "onboardingFlow",
             "onboardingPixelSource",
-            "onboardingSegmentedVariant",
+            "onboardingDownloadReasonVariant",
             "inputPreviewAction",
             {
                 "key": "value",
@@ -375,7 +375,7 @@
             "onboardingDaysSinceInstall",
             "onboardingFlow",
             "onboardingPixelSource",
-            "onboardingSegmentedVariant",
+            "onboardingDownloadReasonVariant",
             "inputPreviewAction",
             { "key": "value", "type": "string", "description": "Only set when event=clicked.", "enum": ["engage", "dismiss"] }
         ]
@@ -392,7 +392,7 @@
             "onboardingDaysSinceInstall",
             "onboardingFlow",
             "onboardingPixelSource",
-            "onboardingSegmentedVariant",
+            "onboardingDownloadReasonVariant",
             "inputPreviewAction",
             { "key": "value", "type": "string", "description": "Only set when event=clicked.", "enum": ["engage", "dismiss"] }
         ]
@@ -409,7 +409,7 @@
             "onboardingDaysSinceInstall",
             "onboardingFlow",
             "onboardingPixelSource",
-            "onboardingSegmentedVariant",
+            "onboardingDownloadReasonVariant",
             "inputPreviewAction",
             { "key": "value", "type": "string", "description": "Only set when event=clicked.", "enum": ["engage", "dismiss"] }
         ]
@@ -446,13 +446,13 @@
             "onboardingDaysSinceInstall",
             "onboardingFlow",
             "onboardingPixelSource",
-            "onboardingSegmentedVariant",
+            "onboardingDownloadReasonVariant",
             "inputPreviewAction",
             { "key": "value", "type": "string", "description": "Only set when event=clicked.", "enum": ["engage", "dismiss"] }
         ]
     },
     "onboarding_download-choice": {
-        "description": "Download-reason step of the segmented onboarding flow. shown when the download-reason screen is displayed; clicked when the user confirms a reason, which is also the point the reason starts being reported as variant_segmented. Unique once per user per (event, value).",
+        "description": "Download-reason step of the segmented onboarding flow. shown when the download-reason screen is displayed; clicked when the user confirms a reason, which is also the point the reason starts being reported as variant_download_reason. Unique once per user per (event, value).",
         "owners": ["LukasPaczos"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
@@ -463,7 +463,7 @@
             "onboardingDaysSinceInstall",
             "onboardingFlow",
             "onboardingPixelSource",
-            "onboardingSegmentedVariant",
+            "onboardingDownloadReasonVariant",
             {
                 "key": "value",
                 "type": "string",
@@ -484,7 +484,7 @@
             "onboardingDaysSinceInstall",
             "onboardingFlow",
             "onboardingPixelSource",
-            "onboardingSegmentedVariant",
+            "onboardingDownloadReasonVariant",
             {
                 "key": "recently_visited_sites_enabled",
                 "type": "boolean",
@@ -509,7 +509,7 @@
             "onboardingDaysSinceInstall",
             "onboardingFlow",
             "onboardingPixelSource",
-            "onboardingSegmentedVariant",
+            "onboardingDownloadReasonVariant",
             {
                 "key": "value",
                 "type": "string",
@@ -530,7 +530,7 @@
             "onboardingDaysSinceInstall",
             "onboardingFlow",
             "onboardingPixelSource",
-            "onboardingSegmentedVariant",
+            "onboardingDownloadReasonVariant",
             {
                 "key": "value",
                 "type": "string",
@@ -551,7 +551,7 @@
             "onboardingDaysSinceInstall",
             "onboardingFlow",
             "onboardingPixelSource",
-            "onboardingSegmentedVariant",
+            "onboardingDownloadReasonVariant",
             {
                 "key": "search_assist_enabled",
                 "type": "boolean",
@@ -576,7 +576,7 @@
             "onboardingDaysSinceInstall",
             "onboardingFlow",
             "onboardingPixelSource",
-            "onboardingSegmentedVariant",
+            "onboardingDownloadReasonVariant",
             {
                 "key": "value",
                 "type": "string",
@@ -597,7 +597,7 @@
             "onboardingDaysSinceInstall",
             "onboardingFlow",
             "onboardingPixelSource",
-            "onboardingSegmentedVariant",
+            "onboardingDownloadReasonVariant",
             {
                 "key": "youtube_ad_blocking_enabled",
                 "type": "boolean",
