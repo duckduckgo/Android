@@ -1125,9 +1125,9 @@ enum class SyncPixelName(override val pixelName: String) : PixelName {
     SYNC_SETUP_PROMO_BOOKMARK_ADDED_DIALOG_CONFIRMED("sync_setup_promo_bookmark_added_dialog_confirmed"),
     SYNC_SETUP_ANOTHER_DEVICE_PROMPT_SHOWN("m_settings_sync_another_device_prompt_shown"),
     SYNC_SETUP_ANOTHER_DEVICE_PROMPT_OPTION_TAPPED("m_settings_sync_another_device_prompt_option_tapped"),
-    SYNC_SETUP_JOINER_RECOVERY_CODE_DONE_SUCCESS("sync_setup_joiner_recovery_code_done_success"),
+    SYNC_SETUP_JOINER_RECOVERY_CODE_DONE_SUCCESS("sync_setup_joiner_recovery_code_done_success_count"),
     SYNC_SETUP_JOINER_RECOVERY_CODE_DONE_SUCCESS_DAILY("sync_setup_joiner_recovery_code_done_success_daily"),
-    SYNC_SETUP_JOINER_RECOVERY_CODE_DONE_FAILED("sync_setup_joiner_recovery_code_done_failed"),
+    SYNC_SETUP_JOINER_RECOVERY_CODE_DONE_FAILED("sync_setup_joiner_recovery_code_done_failed_count"),
     SYNC_SETUP_JOINER_RECOVERY_CODE_DONE_FAILED_DAILY("sync_setup_joiner_recovery_code_done_failed_daily"),
     SYNC_AI_CHAT_ACTIVE("sync_ai_chat_active"),
 

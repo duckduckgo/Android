@@ -21,6 +21,11 @@
                         "description": "Which sync setup UI the user is on: v2 when the simplified sync UI is enabled (useSimplifiedSync), v1 on the legacy setup screens",
                         "enum": ["v1", "v2"]
                     },
+                    "flow_version": {
+                        "type": "string",
+                        "description": "Which sync setup protocol stack the device is on (v2 when canUseV2ConnectFlow is enabled, v2.1 when canUseExchangeV2Point1 is also enabled)",
+                        "enum": ["v1", "v2", "v2.1"]
+                    },
                     "account_creation_latency_ms_bucketed": {
                         "type": "string",
                         "description": "Latency of the account creation API call in milliseconds, bucketed",
