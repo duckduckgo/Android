@@ -256,6 +256,13 @@ platform :android do
     lane :tag_and_push_release_version do |options|
         app_version = options[:app_version]
         ref = options[:ref]
+
+        # app_version reaches git through interpolated shell commands below, and the
+        # workflow input is a free-form string, so require the production release format.
+        unless app_version.to_s =~ /\A\d+\.\d+\.\d+\z/
+            UI.user_error!("app_version must be X.Y.Z, got #{app_version.inspect}")
+        end
+
         branch_name = "release/#{app_version}"
 
         # Checkout all branches are available
@@ -272,8 +279,9 @@ platform :android do
 
         # Create a new release branch. Deliberately never pushed: the bump commit is
         # regenerated from `ref` on every run, and a remote release branch rejects the
-        # same-version retry as non-fast-forward.
-        sh("git checkout -b #{branch_name}")
+        # same-version retry as non-fast-forward. -B resets a branch a previous local
+        # attempt left behind, which reset and clean do not remove.
+        sh("git checkout -B #{branch_name}")
         UI.success("Release branch #{branch_name} created successfully!")
 
         # Update version properties file and push release branch
