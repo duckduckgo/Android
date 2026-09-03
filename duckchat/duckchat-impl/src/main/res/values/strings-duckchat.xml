@@ -347,4 +347,6 @@
     <string name="duck_ai_edit_prompt_lose_responses_warning" instruction="Warning shown while editing a sent message: the answer Duck.ai already gave will be discarded and answered again">Editing will replace the response with a new one.</string>
 
     <string name="duckChatContextualAskAboutPage">Ask About Page</string>
+    <string name="duckChatContextualAskAboutSearch">Continue in Duck.ai</string>
+    <string name="duckChatContextualOpenDuckAi">Open Duck.ai</string>
 </resources>
