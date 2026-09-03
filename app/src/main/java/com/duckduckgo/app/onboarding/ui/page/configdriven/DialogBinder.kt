@@ -34,9 +34,8 @@ class BindScope(
     val animateCardBounds: (durationMs: Long) -> Unit,
 )
 
+/** Interactions a bound screen raises outside the shared CTA buttons interactions. */
 sealed interface ContentInteraction {
-
-    data object ResolveImportOutcome : ContentInteraction
 
     data class SubmitInputPreview(
         val query: String,

@@ -34,7 +34,6 @@ import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanBootstrapper
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanProvider
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingResult
-import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingStepIds
 import com.duckduckgo.app.onboarding.orchestrator.PasswordImportOutcome
 import com.duckduckgo.app.onboarding.orchestrator.PasswordImportResult
 import com.duckduckgo.app.onboarding.orchestrator.stepIndicatorProgress
@@ -212,8 +211,15 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
             }
 
             is ContentInteraction.SelectSingleChoiceOption -> emit(NewUserOnboardingEvent.SingleChoiceConfirmed(interaction.option))
+        }
+    }
 
-            ContentInteraction.ResolveImportOutcome -> resolveImportOutcome(importCompleteState())
+    fun onContentBound(
+        stepId: LinearOnboardingStepId,
+        content: ContentConfig,
+    ) {
+        if (content is ContentConfig.ImportComplete) {
+            resolveImportOutcome(contentValues.contentState(stepId, content))
         }
     }
 
@@ -365,9 +371,6 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
             emit(NewUserOnboardingEvent.PasswordImportParsed(result))
         }
     }
-
-    private fun importCompleteState(): MutableStateFlow<ImportCompleteContentState> =
-        contentValues.contentState(NewUserOnboardingStepIds.PASSWORD_IMPORT_COMPLETE) { ImportCompleteContentState.Parsing }
 
     private fun showImportErrorDialog() {
         _viewState.update { it.copy(showPasswordImportError = true) }

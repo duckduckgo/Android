@@ -185,6 +185,7 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
             content = ContentControllerImpl(
                 binding = binding.daxDialogCta,
                 contentValues = viewModel.contentValues,
+                onContentBound = viewModel::onContentBound,
                 isLightMode = { appTheme.isLightModeEnabled() },
             ),
             cardStage = CardStageImpl(binding),

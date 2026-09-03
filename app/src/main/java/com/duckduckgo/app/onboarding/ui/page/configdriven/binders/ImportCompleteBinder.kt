@@ -28,7 +28,6 @@ import com.duckduckgo.app.browser.databinding.IncludeBrandDesignImportCompleteBi
 import com.duckduckgo.app.onboarding.ui.page.configdriven.BindScope
 import com.duckduckgo.app.onboarding.ui.page.configdriven.ContentConfig
 import com.duckduckgo.app.onboarding.ui.page.configdriven.ContentHandle
-import com.duckduckgo.app.onboarding.ui.page.configdriven.ContentInteraction
 import com.duckduckgo.app.onboarding.ui.page.configdriven.CtaState
 import com.duckduckgo.app.onboarding.ui.page.configdriven.ImportCompleteContentState
 import com.duckduckgo.app.onboarding.ui.page.configdriven.StatefulDialogBinder
@@ -62,9 +61,6 @@ class ImportCompleteBinder(
         importCompleteFailedRow.resultRowIcon.setImageResource(CommonR.drawable.ic_cross_recolorable_gray_24)
 
         val initial = state.value
-        if (initial is ImportCompleteContentState.Parsing) {
-            scope.execute(ContentInteraction.ResolveImportOutcome)
-        }
         rendered = initial
         importCompleteTitle.setTitle(titleOf(initial, content).resolve(context))
         apply(initial, content, context)

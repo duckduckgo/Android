@@ -35,7 +35,6 @@ import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityStep
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanBootstrapper
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanProvider
-import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingStepIds
 import com.duckduckgo.app.onboarding.orchestrator.PasswordImportOutcome
 import com.duckduckgo.app.onboarding.orchestrator.PasswordImportResult
 import com.duckduckgo.app.onboarding.store.OnboardingStore
@@ -181,8 +180,16 @@ class ConfigDrivenOnboardingPageViewModelTest {
     private fun quickSetupState(testee: ConfigDrivenOnboardingPageViewModel): QuickSetupContentState =
         quickSetupStateFlow(testee).value
 
-    private fun importCompleteState(testee: ConfigDrivenOnboardingPageViewModel): MutableStateFlow<ImportCompleteContentState> =
-        testee.contentValues.contentState(NewUserOnboardingStepIds.PASSWORD_IMPORT_COMPLETE) { ImportCompleteContentState.Parsing }
+    private fun bindContent(testee: ConfigDrivenOnboardingPageViewModel) {
+        val dialog = testee.viewState.value.screen as Screen.Dialog
+        testee.onContentBound(dialog.stepId, dialog.config.content)
+    }
+
+    private fun importCompleteState(testee: ConfigDrivenOnboardingPageViewModel): MutableStateFlow<ImportCompleteContentState> {
+        val dialog = testee.viewState.value.screen as Screen.Dialog
+        val content = dialog.config.content as ContentConfig.ImportComplete
+        return testee.contentValues.contentState(dialog.stepId, content)
+    }
 
     private suspend fun startAtBrowserStep(): ConfigDrivenOnboardingPageViewModel {
         val browserStep = NewUserBrowserActivityStep(
@@ -785,8 +792,8 @@ class ConfigDrivenOnboardingPageViewModelTest {
         val testee = startAt(NewUserOnboardingActivityDialog.ImportComplete(PasswordImportResult.InProgress))
         advanceUntilIdle()
 
-        // What the bound card raises when it binds on a state it cannot leave on its own.
-        testee.onContentInteraction(ContentInteraction.ResolveImportOutcome)
+        // What the engine reports once the outcome card is bound.
+        bindContent(testee)
         advanceUntilIdle()
 
         assertEquals(
@@ -806,7 +813,7 @@ class ConfigDrivenOnboardingPageViewModelTest {
         val testee = startAt(NewUserOnboardingActivityDialog.ImportComplete(PasswordImportResult.InProgress))
         advanceUntilIdle()
 
-        testee.onContentInteraction(ContentInteraction.ResolveImportOutcome)
+        bindContent(testee)
         // Runs out the bounded wait: the status never reports, so the card cannot stay on the shimmer.
         advanceUntilIdle()
 
