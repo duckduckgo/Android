@@ -39,6 +39,7 @@ import com.duckduckgo.savedsites.impl.RealFavoritesDelegate
 import com.duckduckgo.savedsites.impl.RealSavedSitesRepository
 import com.duckduckgo.savedsites.store.Entity
 import com.duckduckgo.savedsites.store.EntityType.BOOKMARK
+import com.duckduckgo.savedsites.store.EntityType.FOLDER
 import com.duckduckgo.savedsites.store.Relation
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
@@ -767,6 +768,41 @@ class SavedSitesRepositoryTest {
         assertNull(repository.getFolder(parentFolder.id))
         assertNull(repository.getFolder(childFolder.id))
         assertNull(repository.getBookmark(childBookmark.url))
+    }
+
+    @Test
+    fun whenFolderRelationsContainACycleThenGetFolderBranchTerminatesWithoutDuplicates() = runTest {
+        // Simulates a corrupted relations table where folderA and folderB reference each other as
+        // children. Without cycle protection, traverseBranch() recurses forever and crashes with a
+        // StackOverflowError (https://github.com/duckduckgo/Android/issues/5928).
+        val folderAEntity = Entity(entityId = "folderA", url = "", title = "Folder A", type = FOLDER)
+        val folderBEntity = Entity(entityId = "folderB", url = "", title = "Folder B", type = FOLDER)
+        val bookmarkEntity = givenSomeBookmarks(1).first()
+        savedSitesEntitiesDao.insertList(listOf(folderAEntity, folderBEntity, bookmarkEntity))
+
+        savedSitesRelationsDao.insertList(
+            listOf(
+                Relation(folderId = SavedSitesNames.BOOKMARKS_ROOT, entityId = folderAEntity.entityId),
+                Relation(folderId = folderAEntity.entityId, entityId = folderBEntity.entityId),
+                Relation(folderId = folderBEntity.entityId, entityId = folderAEntity.entityId),
+                Relation(folderId = folderAEntity.entityId, entityId = bookmarkEntity.entityId),
+            ),
+        )
+
+        val folderA =
+            BookmarkFolder(
+                folderAEntity.entityId,
+                "Folder A",
+                SavedSitesNames.BOOKMARKS_ROOT,
+                numBookmarks = 1,
+                numFolders = 1,
+                lastModified = "timestamp",
+            )
+
+        val branch = repository.getFolderBranch(folderA)
+
+        assertEquals(listOf(folderAEntity.entityId, folderBEntity.entityId), branch.folders.map { it.id })
+        assertEquals(1, branch.bookmarks.size)
     }
 
     @Test
