@@ -1012,6 +1012,26 @@ class RealSyncCodeDispatcherTest {
         verify(syncAccountRepository, never()).processCode(any(), anyOrNull())
     }
 
+    @Test fun `Presenter ignores a Bye received during Joiner_Joining and keeps the session alive`() = runTest {
+        whenever(syncAccountRepository.processCode(any(), anyOrNull())).thenReturn(Result.Success(true))
+
+        dispatcher.presentV2().test {
+            runnerEventsFlow.emit(
+                transition(
+                    from = ExchangeV2State.Joiner.Joining,
+                    to = ExchangeV2State.Joiner.Joining,
+                    trigger = ExchangeV2Message.Bye.create(ExchangeV2Message.Bye.Reason.Done),
+                ),
+            )
+            expectNoEvents()
+            verify(runner, never()).localTrigger(any())
+
+            runnerEventsFlow.emit(joinerJoining(recoveryCode(cid = "ddg")))
+            assertEquals(DispatchOutcome.LoggedIn(SetupPath.PAIRING, SetupRole.JOINER), awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
     @Test fun `Presenter emits Failed PAIRING_CANCELLED when Joiner_AbortedLocal driven by UserDeniedJoiner`() = runTest {
         dispatcher.presentV2().test {
             runnerEventsFlow.emit(
