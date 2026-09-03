@@ -304,12 +304,14 @@ class TabDataRepository(
         tabId: String,
         site: Site?,
     ) {
+        val url = site?.url
+        val title = site?.title
         databaseExecutor().scheduleDirect {
-            val state = TabUpdateState(site?.url, site?.title)
+            val state = TabUpdateState(url, title)
             if (lastUpdatedTabState.put(tabId, state) == state) return@scheduleDirect
 
-            tabsDao.updateUrlAndTitle(tabId, site?.url, site?.title, viewed = true)
-            duckAiTabSessionRepository.tryClaimEntryPointSource(tabId, site?.url)
+            tabsDao.updateUrlAndTitle(tabId, url, title, viewed = true)
+            duckAiTabSessionRepository.tryClaimEntryPointSource(tabId, url)
         }
     }
 

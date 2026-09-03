@@ -325,6 +325,27 @@ class TabDataRepositoryTest {
     }
 
     @Test
+    fun whenSiteUrlMutatesBetweenCacheGuardAndDaoWriteThenLaterUpdateWithOriginalUrlIsPersisted() = runTest {
+        val db = createDatabase()
+        val dao = db.tabsDao()
+        dao.insertTab(TabEntity(tabId = "tabid", position = 0))
+        val testee = tabDataRepository(dao)
+
+        // Site.url/title are unsynchronized vars mutated on the main thread; this fake reproduces a
+        // mutation landing between update()'s cache-guard read and its DAO-write read of the same call.
+        val divergingSite = mock<Site>().apply {
+            whenever(this.url).thenReturn("http://first.example.com", "http://second.example.com")
+            whenever(this.title).thenReturn("Example")
+        }
+        val stableSite = site("http://first.example.com", "Example")
+
+        testee.update("tabid", divergingSite)
+        testee.update("tabid", stableSite)
+
+        assertEquals("http://first.example.com", dao.tab("tabid")?.url)
+    }
+
+    @Test
     fun whenNewTabAddedAfterNonExistingTabThenTitleUrlPositionOfNewTabAreCorrectAndTabIsNotViewed() = runTest {
         val testee = tabDataRepository()
         testee.addNewTabAfterExistingTab("http://www.example.com", "tabid")
