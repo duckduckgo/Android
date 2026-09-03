@@ -836,9 +836,11 @@ class BrowserTabFragment :
                 duckChat.openVoiceDuckChat(DuckChatEntryPoint.VOICE)
             }
             onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewTab)) {
+                viewModel.recordPendingNewTabOpenedExit()
                 browserActivity?.launchNewTab(browserMode = BrowserMode.REGULAR)
             }
             onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewFireTab)) {
+                viewModel.recordPendingFireTabOpenedExit()
                 browserActivity?.launchNewTab(browserMode = BrowserMode.FIRE)
             }
         }

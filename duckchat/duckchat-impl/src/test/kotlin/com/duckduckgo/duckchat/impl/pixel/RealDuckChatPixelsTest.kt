@@ -141,6 +141,7 @@ class RealDuckChatPixelsTest {
             appBuildConfig = mockAppBuildConfig,
             browserInteractionsPlugins = mockBrowserInteractionsPlugins,
             duckAiNewChatMetricPixelsPlugin = mockDuckAiNewChatMetricPixelsPlugin,
+            duckAiSessionWideEvent = mock(),
         )
     }
 
