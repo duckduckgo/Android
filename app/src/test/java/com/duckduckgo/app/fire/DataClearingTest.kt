@@ -130,6 +130,8 @@ class DataClearingTest {
     @Mock
     private lateinit var mockDataClearingTrigger: DataClearingTrigger
 
+    private val fireModeDataClearingState = FireModeDataClearingState()
+
     private val showClearDuckAIChatHistoryFlow = MutableStateFlow(true)
     private val showOnAppLaunchOptionFlow = MutableStateFlow<ShowOnAppLaunchOption>(ShowOnAppLaunchOption.LastOpenedTab)
 
@@ -144,6 +146,7 @@ class DataClearingTest {
         // test explicitly enables it.
         whenever(mockFireModeAvailability.isAvailable()).thenReturn(false)
         whenever(mockTabRepositoryProvider.forMode(any())).thenReturn(mockTabRepository)
+        fireModeDataClearingState.markDataForClearing()
         runBlocking {
             whenever(mockClearDataAction.clearDataForSpecificDomains(any())).thenReturn(ClearDataResult.Success)
             whenever(mockFireDataStore.getManualClearOptions()).thenReturn(emptySet())
@@ -165,6 +168,7 @@ class DataClearingTest {
             contextualDataStore = mockContextualDataStore,
             showOnAppLaunchOptionDataStore = mockShowOnAppLaunchOptionDataStore,
             dataClearingTrigger = mockDataClearingTrigger,
+            fireModeDataClearingState = fireModeDataClearingState,
         )
     }
 
@@ -1181,6 +1185,51 @@ class DataClearingTest {
                 ),
             ),
         )
+    }
+
+    @Test
+    fun `fire burn marks the fire profile clean so the auto burner does not burn again`() = runTest {
+        whenever(mockFireModeAvailability.isAvailable()).thenReturn(true)
+        configureManualOptions(setOf(FireClearOption.TABS, FireClearOption.DATA, FireClearOption.DUCKAI_CHATS))
+
+        testee.clearDataUsingManualFireOptions(shouldRestartIfRequired = false, wasAppUsedSinceLastClear = true, browserMode = BrowserMode.FIRE)
+
+        assertFalse(fireModeDataClearingState.hasUnclearedData.value)
+    }
+
+    @Test
+    fun `fire profile is marked clean before the clear runs so emptying the fire tabs does not burn again`() = runTest {
+        whenever(mockFireModeAvailability.isAvailable()).thenReturn(true)
+        configureManualOptions(setOf(FireClearOption.TABS, FireClearOption.DATA, FireClearOption.DUCKAI_CHATS))
+        var dirtyWhileClearing: Boolean? = null
+        whenever(mockDataClearingTrigger.clearData(any())).thenAnswer {
+            dirtyWhileClearing = fireModeDataClearingState.hasUnclearedData.value
+            Unit
+        }
+
+        testee.clearDataUsingManualFireOptions(shouldRestartIfRequired = false, wasAppUsedSinceLastClear = true, browserMode = BrowserMode.FIRE)
+
+        assertEquals(false, dirtyWhileClearing)
+    }
+
+    @Test
+    fun `automatic clear marks the fire profile clean`() = runTest {
+        whenever(mockFireModeAvailability.isAvailable()).thenReturn(true)
+        configureAutomaticOptions(setOf(FireClearOption.TABS, FireClearOption.DATA))
+
+        testee.clearDataUsingAutomaticFireOptions(killProcessIfNeeded = false)
+
+        assertFalse(fireModeDataClearingState.hasUnclearedData.value)
+    }
+
+    @Test
+    fun `clear with fire mode unavailable leaves the fire profile dirty`() = runTest {
+        whenever(mockFireModeAvailability.isAvailable()).thenReturn(false)
+        configureManualOptions(setOf(FireClearOption.TABS, FireClearOption.DATA, FireClearOption.DUCKAI_CHATS))
+
+        testee.clearDataUsingManualFireOptions(shouldRestartIfRequired = false, wasAppUsedSinceLastClear = true, browserMode = BrowserMode.FIRE)
+
+        assertTrue(fireModeDataClearingState.hasUnclearedData.value)
     }
 
     @Test
