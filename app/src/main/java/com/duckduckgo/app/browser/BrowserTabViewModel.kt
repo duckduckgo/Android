@@ -5524,7 +5524,7 @@ class BrowserTabViewModel @Inject constructor(
                 refresh()
             }
             is DaxEndBrandDesignUpdateBubbleCta -> {
-                if (cta.segmentedPath == SegmentedOnboardingPath.SEARCH) {
+                if (cta.segmentedPathWithAiInput == SegmentedOnboardingPath.SEARCH) {
                     viewModelScope.launch {
                         ctaViewState.value = currentCtaViewState().copy(cta = null)
                         command.value = HideOnboardingDaxBubbleCta(cta)

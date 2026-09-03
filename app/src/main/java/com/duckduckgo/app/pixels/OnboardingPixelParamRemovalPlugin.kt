@@ -41,6 +41,7 @@ class OnboardingPixelParamRemovalPlugin @Inject constructor() : PixelParamRemova
             OnboardingPixelName.ONBOARDING_VISIT_SITE.pixelName to PixelParameter.removeAtb(),
             OnboardingPixelName.ONBOARDING_TRACKERS_BLOCKED.pixelName to PixelParameter.removeAtb(),
             OnboardingPixelName.ONBOARDING_END.pixelName to PixelParameter.removeAtb(),
+            OnboardingPixelName.ONBOARDING_END_TRY_DUCK_AI.pixelName to PixelParameter.removeAtb(),
             OnboardingPixelName.ONBOARDING_SUBSCRIPTION_PROMO.pixelName to PixelParameter.removeAtb(),
             OnboardingPixelName.ONBOARDING_WIDGET_PROMPT.pixelName to PixelParameter.removeAtb(),
             OnboardingPixelName.ONBOARDING_PASSWORD_IMPORT.pixelName to PixelParameter.removeAtb(),

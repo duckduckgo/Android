@@ -397,6 +397,23 @@
             { "key": "value", "type": "string", "description": "Only set when event=clicked.", "enum": ["engage", "dismiss"] }
         ]
     },
+    "onboarding_end-try-duckai": {
+        "description": "Onboarding end step for the segmented onboarding's search path Try Duck.ai offer, shown only on the New Tab Page. Shown when the bubble is displayed; clicked engage when the user taps Try Duck.ai, dismiss when the user taps Skip or close button. Unique once per user per (event, value).",
+        "owners": ["LukasPaczos"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            "onboardingEvent",
+            "onboardingInstallType",
+            "onboardingDaysSinceInstall",
+            "onboardingFlow",
+            "onboardingPixelSource",
+            "onboardingSegmentedVariant",
+            "inputPreviewAction",
+            { "key": "value", "type": "string", "description": "Only set when event=clicked.", "enum": ["engage", "dismiss"] }
+        ]
+    },
     "onboarding_password-import": {
         "description": "Password-import-from-Google onboarding step. shown when the page is displayed; clicked engage/dismiss on the Import / Skip CTAs; confirmed carries the import outcome. Unique once per user per (event, value).",
         "owners": ["catalinradoiu"],
