@@ -66,7 +66,29 @@ sealed interface NewUserOnboardingEvent : LinearOnboardingEvent {
 
     data class PasswordImportWebFlowFinished(val outcome: PasswordImportOutcome) : NewUserOnboardingEvent
 
-    data class PasswordImportParsed(val outcome: PasswordImportOutcome) : NewUserOnboardingEvent
+    data class PasswordImportParsed(val result: PasswordImportResult.Terminal) : NewUserOnboardingEvent
 }
 
-enum class PasswordImportOutcome { SUCCESS, CANCELLED, ERROR }
+sealed interface PasswordImportResult {
+
+    data object InProgress : PasswordImportResult
+
+    sealed interface Terminal : PasswordImportResult {
+
+        data class Imported(
+            val imported: Int,
+            val skipped: Int,
+        ) : Terminal
+
+        data object Failed : Terminal
+    }
+}
+
+enum class PasswordImportOutcome(val value: String) {
+    SUCCESS("success"),
+    CANCELLED("cancelled"),
+
+    TRANSIENT_ERROR("error"),
+
+    PERMANENT_ERROR("error"),
+}

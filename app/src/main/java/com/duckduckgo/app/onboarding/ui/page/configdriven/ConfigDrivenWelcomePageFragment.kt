@@ -62,13 +62,18 @@ import com.duckduckgo.app.onboardingquicksetup.ui.RemoveWidgetInstructionsBottom
 import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.app.widget.AddWidgetSource
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.autofill.api.AutofillImportLaunchSource.Onboarding
+import com.duckduckgo.autofill.api.AutofillScreens.AutofillImportPasswordsScreen
 import com.duckduckgo.common.ui.store.AppTheme
+import com.duckduckgo.common.ui.view.dialog.DaxAlertDialog
+import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.device.isTablet
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import logcat.LogPriority.WARN
@@ -95,6 +100,9 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
     @Inject
     lateinit var addWidgetLauncher: AddWidgetLauncher
 
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
+
     private val binding: ContentOnboardingWelcomePageUpdateBinding by viewBinding()
     private val viewModel by lazy {
         ViewModelProvider(this, viewModelFactory)[ConfigDrivenOnboardingPageViewModel::class.java]
@@ -102,6 +110,7 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
 
     private var engine: DialogRenderEngine? = null
     private var intro: OnboardingIntroChoreographer? = null
+    private var passwordImportErrorDialog: DaxAlertDialog? = null
 
     /** Fed to the embellishment controller's fit corrector; kept in sync by the window-insets listener below. */
     private var cardBottomInsetPx = 0
@@ -124,6 +133,10 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
         } else {
             viewModel.onQuickSetupDefaultBrowserNotSet()
         }
+    }
+
+    private val passwordImportFlow = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        viewModel.onPasswordImportResult(result.resultCode, result.data)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -172,6 +185,7 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
             content = ContentControllerImpl(
                 binding = binding.daxDialogCta,
                 contentValues = viewModel.contentValues,
+                onContentBound = viewModel::onContentBound,
                 isLightMode = { appTheme.isLightModeEnabled() },
             ),
             cardStage = CardStageImpl(binding),
@@ -210,6 +224,7 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
                     ConfigDrivenOnboardingPageViewModel.Screen.None -> intro?.dismissUnplayed()
                     null -> Unit
                 }
+                renderPasswordImportError(state.showPasswordImportError)
             }
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
@@ -335,7 +350,40 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
                 QuickSetupSearchOptionsBottomSheet
                     .newInstance(initialWithAi = command.initialWithAi)
                     .show(childFragmentManager, QuickSetupSearchOptionsBottomSheet.TAG)
+            ConfigDrivenOnboardingPageViewModel.Command.LaunchPasswordImport -> passwordImportFlow.launch(
+                globalActivityStarter.startIntent(requireContext(), AutofillImportPasswordsScreen(Onboarding)),
+            )
         }
+    }
+
+    private fun renderPasswordImportError(visible: Boolean) {
+        if (!visible) {
+            passwordImportErrorDialog?.dismiss()
+            passwordImportErrorDialog = null
+            return
+        }
+        if (passwordImportErrorDialog?.isShowing() == true) return
+        passwordImportErrorDialog = TextAlertDialogBuilder(requireContext())
+            .setTitle(R.string.preOnboardingImportErrorTitle)
+            .setMessage(R.string.preOnboardingImportErrorBody)
+            .setPositiveButton(R.string.preOnboardingImportErrorRetry)
+            .setNegativeButton(R.string.preOnboardingImportErrorCancel)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onPasswordImportRetry()
+                    }
+
+                    override fun onNegativeButtonClicked() {
+                        viewModel.onPasswordImportErrorSkipped()
+                    }
+
+                    override fun onDialogCancelled() {
+                        viewModel.onPasswordImportErrorDismissed()
+                    }
+                },
+            )
+            .also { it.show() }
     }
 
     private fun openDefaultBrowserSystemSettings() {
@@ -367,6 +415,9 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
 
     override fun onDestroyView() {
         super.onDestroyView()
+        // Detach the window before it goes; the view model keeps the flag so the next view puts the alert back.
+        passwordImportErrorDialog?.dismiss()
+        passwordImportErrorDialog = null
         engine?.release()
         engine = null
         intro?.release()

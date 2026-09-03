@@ -20,6 +20,7 @@ import androidx.annotation.DrawableRes
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.onboarding.OnboardingPreference
+import com.duckduckgo.app.onboarding.orchestrator.PasswordImportResult
 import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
 import com.duckduckgo.onboarding.api.OnboardingSingleChoiceDataPlugin.Option
 
@@ -172,8 +173,15 @@ sealed interface ContentConfig {
         val parsingBody: TextConfig,
         val failedTitle: TextConfig,
         val failedRow: TextConfig,
+        val result: PasswordImportResult?,
     ) : ContentConfig, Stateful<ImportCompleteContentState> {
-        override fun initialState(): ImportCompleteContentState = ImportCompleteContentState.Parsing
+        override fun initialState(): ImportCompleteContentState = when (result) {
+            null, PasswordImportResult.InProgress -> ImportCompleteContentState.Parsing
+            is PasswordImportResult.Terminal.Imported ->
+                ImportCompleteContentState.Finished(imported = result.imported, skipped = result.skipped)
+
+            PasswordImportResult.Terminal.Failed -> ImportCompleteContentState.Failed
+        }
     }
 }
 
