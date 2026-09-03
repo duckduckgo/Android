@@ -802,7 +802,7 @@ class ConfigDrivenOnboardingPageViewModelTest {
         )
         assertTrue(
             recordedEvents.contains(
-                NewUserOnboardingEvent.PasswordImportParsed(PasswordImportResult.Imported(imported = 3, skipped = 1)),
+                NewUserOnboardingEvent.PasswordImportParsed(PasswordImportResult.Terminal.Imported(imported = 3, skipped = 1)),
             ),
         )
     }
@@ -818,6 +818,6 @@ class ConfigDrivenOnboardingPageViewModelTest {
         advanceUntilIdle()
 
         assertEquals(ImportCompleteContentState.Failed, importCompleteState(testee).value)
-        assertTrue(recordedEvents.contains(NewUserOnboardingEvent.PasswordImportParsed(PasswordImportResult.Failed)))
+        assertTrue(recordedEvents.contains(NewUserOnboardingEvent.PasswordImportParsed(PasswordImportResult.Terminal.Failed)))
     }
 }

@@ -969,7 +969,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                         }
 
                         PasswordImportOutcome.PERMANENT_ERROR -> {
-                            ctx.passwordImportResult = PasswordImportResult.Failed
+                            ctx.passwordImportResult = PasswordImportResult.Terminal.Failed
                             onboardingPixelSender.fire(pixelName, OnboardingPixelAction.PasswordImportConfirmed(event.outcome))
                             Advance
                         }
@@ -997,7 +997,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             transition = { event ->
                 when (event) {
                     is NewUserOnboardingEvent.PasswordImportParsed -> {
-                        if (!ctx.passwordImportResult.isTerminal()) {
+                        if (ctx.passwordImportResult !is PasswordImportResult.Terminal) {
                             onboardingPixelSender.fire(pixelName, OnboardingPixelAction.PasswordImportConfirmed(event.result.toOutcome()))
                         }
                         ctx.passwordImportResult = event.result
@@ -1011,16 +1011,9 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         )
     }
 
-    private fun PasswordImportResult.toOutcome(): PasswordImportOutcome = when (this) {
-        is PasswordImportResult.Imported -> PasswordImportOutcome.SUCCESS
-        PasswordImportResult.Failed,
-        PasswordImportResult.InProgress,
-        -> PasswordImportOutcome.PERMANENT_ERROR
-    }
-
-    private fun PasswordImportResult?.isTerminal(): Boolean = when (this) {
-        null, PasswordImportResult.InProgress -> false
-        PasswordImportResult.Failed, is PasswordImportResult.Imported -> true
+    private fun PasswordImportResult.Terminal.toOutcome(): PasswordImportOutcome = when (this) {
+        is PasswordImportResult.Terminal.Imported -> PasswordImportOutcome.SUCCESS
+        PasswordImportResult.Terminal.Failed -> PasswordImportOutcome.PERMANENT_ERROR
     }
 
     private fun addressBarPositionStep(): NewUserOnboardingActivityStep {

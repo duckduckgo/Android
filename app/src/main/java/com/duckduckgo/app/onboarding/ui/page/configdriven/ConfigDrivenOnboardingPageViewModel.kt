@@ -362,11 +362,11 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
                 importPasswordsFromGoogle.importStatus().filterIsInstance<ImportPasswordsStatus.Finished>().firstOrNull()
             }
             val result = finished
-                ?.let { PasswordImportResult.Imported(imported = it.imported, skipped = it.skipped) }
-                ?: PasswordImportResult.Failed
+                ?.let { PasswordImportResult.Terminal.Imported(imported = it.imported, skipped = it.skipped) }
+                ?: PasswordImportResult.Terminal.Failed
             state.value = when (result) {
-                is PasswordImportResult.Imported -> ImportCompleteContentState.Finished(result.imported, result.skipped)
-                else -> ImportCompleteContentState.Failed
+                is PasswordImportResult.Terminal.Imported -> ImportCompleteContentState.Finished(result.imported, result.skipped)
+                PasswordImportResult.Terminal.Failed -> ImportCompleteContentState.Failed
             }
             emit(NewUserOnboardingEvent.PasswordImportParsed(result))
         }

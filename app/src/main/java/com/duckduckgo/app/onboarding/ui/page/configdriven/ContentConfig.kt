@@ -177,8 +177,10 @@ sealed interface ContentConfig {
     ) : ContentConfig, Stateful<ImportCompleteContentState> {
         override fun initialState(): ImportCompleteContentState = when (result) {
             null, PasswordImportResult.InProgress -> ImportCompleteContentState.Parsing
-            is PasswordImportResult.Imported -> ImportCompleteContentState.Finished(imported = result.imported, skipped = result.skipped)
-            PasswordImportResult.Failed -> ImportCompleteContentState.Failed
+            is PasswordImportResult.Terminal.Imported ->
+                ImportCompleteContentState.Finished(imported = result.imported, skipped = result.skipped)
+
+            PasswordImportResult.Terminal.Failed -> ImportCompleteContentState.Failed
         }
     }
 }

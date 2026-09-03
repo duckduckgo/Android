@@ -1808,8 +1808,8 @@ class NewUserOnboardingPlanProviderTest {
         assertStep(NewUserOnboardingStepIds.PASSWORD_IMPORT_COMPLETE)
 
         // The outcome card resolves itself every time it is presented, so it can report an outcome it already reported.
-        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportParsed(PasswordImportResult.Imported(imported = 3, skipped = 1)))
-        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportParsed(PasswordImportResult.Imported(imported = 3, skipped = 1)))
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportParsed(PasswordImportResult.Terminal.Imported(imported = 3, skipped = 1)))
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportParsed(PasswordImportResult.Terminal.Imported(imported = 3, skipped = 1)))
 
         verify(onboardingPixelSender).fire(
             ONBOARDING_PASSWORD_IMPORT,
@@ -1826,11 +1826,11 @@ class NewUserOnboardingPlanProviderTest {
             currentDialog(),
         )
 
-        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportParsed(PasswordImportResult.Imported(imported = 3, skipped = 1)))
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportParsed(PasswordImportResult.Terminal.Imported(imported = 3, skipped = 1)))
 
         // Seeds a card rebuilt after this one is gone, rather than leaving it to look like an import in flight.
         assertEquals(
-            NewUserOnboardingActivityDialog.ImportComplete(PasswordImportResult.Imported(imported = 3, skipped = 1)),
+            NewUserOnboardingActivityDialog.ImportComplete(PasswordImportResult.Terminal.Imported(imported = 3, skipped = 1)),
             currentDialog(),
         )
     }
@@ -1841,7 +1841,7 @@ class NewUserOnboardingPlanProviderTest {
 
         orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.PERMANENT_ERROR))
 
-        assertEquals(NewUserOnboardingActivityDialog.ImportComplete(PasswordImportResult.Failed), currentDialog())
+        assertEquals(NewUserOnboardingActivityDialog.ImportComplete(PasswordImportResult.Terminal.Failed), currentDialog())
     }
     private fun preferenceRow(
         preference: OnboardingPreference,

@@ -84,14 +84,14 @@ class ContentConfigTest {
 
     @Test
     fun `import complete seeds its state from the counts the run recorded`() {
-        val content = importComplete(PasswordImportResult.Imported(imported = 4, skipped = 2))
+        val content = importComplete(PasswordImportResult.Terminal.Imported(imported = 4, skipped = 2))
 
         assertEquals(ImportCompleteContentState.Finished(imported = 4, skipped = 2), content.initialState())
     }
 
     @Test
     fun `import complete seeds its state as failed when the run recorded a failure`() {
-        assertEquals(ImportCompleteContentState.Failed, importComplete(PasswordImportResult.Failed).initialState())
+        assertEquals(ImportCompleteContentState.Failed, importComplete(PasswordImportResult.Terminal.Failed).initialState())
     }
 
     private fun importComplete(result: PasswordImportResult?) = ContentConfig.ImportComplete(
