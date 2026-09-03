@@ -26,7 +26,7 @@
         android:layout_marginTop="@dimen/keyline_5"
         android:drawablePadding="@dimen/keyline_3"
         android:gravity="center_vertical"
-        android:text="@string/sync_simplified_pairing_dialog_check_other_device_body"
+        android:text="@string/sync_simplified_pairing_dialog_connecting_body"
         app:textType="primary"
         app:typography="body1" />
 
