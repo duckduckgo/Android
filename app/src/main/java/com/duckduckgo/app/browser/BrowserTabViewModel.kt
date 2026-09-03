@@ -1649,7 +1649,7 @@ class BrowserTabViewModel @Inject constructor(
         } else {
             badUrlErrorPageWideEvent.onErrorPageRefreshed(tabId)
         }
-        val keepErrorPage = customErrorPagesFeature.self().isEnabled() && customErrorPagesFeature.keepErrorPageUntilNextPageStartsLoading().isEnabled()
+        val keepErrorPage = keepErrorPage()
         val state = currentBrowserViewState()
         browserViewState.value = state.copy(
             browserShowing = true,
@@ -2658,7 +2658,7 @@ class BrowserTabViewModel @Inject constructor(
         webViewNavigationState: WebViewNavigationState,
         url: String?,
     ) {
-        if (customErrorPagesFeature.self().isEnabled() && customErrorPagesFeature.keepErrorPageUntilNextPageStartsLoading().isEnabled()) {
+        if (keepErrorPage()) {
             // Fallback in case onPageCommitVisible is not called
             if (errorPagePendingDismissal) resetBrowserError()
         }
@@ -2718,7 +2718,7 @@ class BrowserTabViewModel @Inject constructor(
         webViewNavigationState: WebViewNavigationState,
         url: String,
     ) {
-        if (customErrorPagesFeature.self().isEnabled() && customErrorPagesFeature.keepErrorPageUntilNextPageStartsLoading().isEnabled()) {
+        if (keepErrorPage()) {
             if (errorPagePendingDismissal) resetBrowserError()
         }
         if (!currentBrowserViewState().maliciousSiteBlocked && site != null) {
@@ -6036,11 +6036,14 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onRedirectSuggestionClicked(url: String) {
         badUrlErrorPageWideEvent.onRedirectClicked(tabId)
-        if (!(customErrorPagesFeature.self().isEnabled() && customErrorPagesFeature.keepErrorPageUntilNextPageStartsLoading().isEnabled())) {
+        if (!keepErrorPage()) {
             resetBrowserError()
         }
         command.value = NavigationCommand.Navigate(url, getUrlHeaders(url))
     }
+
+    private fun keepErrorPage(): Boolean =
+        customErrorPagesFeature.self().isEnabled() && customErrorPagesFeature.keepErrorPageUntilNextPageStartsLoading().isEnabled()
 
     private fun trackersCount(): String =
         siteLiveData.value?.trackerCount?.takeIf { it > 0 }?.toString() ?: ""
