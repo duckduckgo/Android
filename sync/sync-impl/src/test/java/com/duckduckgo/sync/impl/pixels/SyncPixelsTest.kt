@@ -1144,14 +1144,14 @@ class RealSyncPixelsTest {
     ) {
         ProtocolV1("v1"),
         ProtocolV2("v2"),
+        ProtocolV2Point1("v2.1"),
         ;
 
         fun configure(syncFeature: SyncFeature) {
-            val isEnabled = when (this) {
-                ProtocolV1 -> false
-                ProtocolV2 -> true
-            }
-            syncFeature.canUseV2ConnectFlow().setRawStoredState(State(isEnabled))
+            val v2Enabled = this != ProtocolV1
+            val v2Point1Enabled = this == ProtocolV2Point1
+            syncFeature.canUseV2ConnectFlow().setRawStoredState(State(v2Enabled))
+            syncFeature.canUseExchangeV2Point1().setRawStoredState(State(v2Point1Enabled))
         }
     }
 }

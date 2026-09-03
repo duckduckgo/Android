@@ -288,7 +288,16 @@ class RealSyncPixels @Inject constructor(
      * - [SYNC_SETUP_MY_KIND]: always "ddg" — this is the native DuckDuckGo client.
      */
     private fun setupFlowMetadata(): Map<String, String> = buildMap {
-        put(SYNC_SETUP_FLOW_VERSION, if (syncFeature.canUseV2ConnectFlow().isEnabled()) FLOW_VERSION_V2 else FLOW_VERSION_V1)
+        val flowVersion = if (syncFeature.canUseV2ConnectFlow().isEnabled()) {
+            if (syncFeature.canUseExchangeV2Point1().isEnabled()) {
+                FLOW_VERSION_V2_1
+            } else {
+                FLOW_VERSION_V2
+            }
+        } else {
+            FLOW_VERSION_V1
+        }
+        put(SYNC_SETUP_FLOW_VERSION, flowVersion)
         put(SYNC_SETUP_MY_KIND, MY_KIND_DDG)
         putAll(setupUiMetadata())
     }
@@ -936,8 +945,9 @@ class RealSyncPixels @Inject constructor(
 
     companion object {
         private const val SYNC_PIXELS_PREF_FILE = "com.duckduckgo.sync.pixels.v1"
-        private const val FLOW_VERSION_V1 = "v1"
-        private const val FLOW_VERSION_V2 = "v2"
+        const val FLOW_VERSION_V1 = "v1"
+        const val FLOW_VERSION_V2 = "v2"
+        const val FLOW_VERSION_V2_1 = "v2.1"
         const val UI_VERSION_V2 = "v2"
         private const val MY_KIND_DDG = "ddg"
         private const val CODE_TYPE_RECOVERY = "recovery"
