@@ -104,6 +104,13 @@
             app:showSwitch="true"
             app:primaryText="canShowV2ConnectCode (display, requires canUseV2ConnectFlow)" />
 
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/canUseExchangeV2Point1Toggle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:showSwitch="true"
+            app:primaryText="canUseExchangeV2Point1 (v2.1 protocol)" />
+
         <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
             android:id="@+id/openV2PairingDebugButton"
             android:layout_width="wrap_content"
