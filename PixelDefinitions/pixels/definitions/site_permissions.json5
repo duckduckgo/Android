@@ -21,5 +21,41 @@
             },
             "petal"
         ]
+    },
+    "m_site_permissions_dialog_click": {
+        "description": "Fires when the user resolves the site permission dialog. Paired with m_site_permissions_dialog_impresssion to give the decision rate per permission type; a prompt abandoned without a decision fires no click pixel and so appears only in the impression count. The pixel name retains the historic misspelling of its impression counterpart",
+        "owners": ["0nko"],
+        "triggers": ["page_load"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "type",
+                "type": "string",
+                "description": "Permission type the dialog was shown for",
+                "enum": ["location", "camera", "microphone", "camera_and_microphone", "drm"]
+            },
+            {
+                "key": "selection",
+                "type": "string",
+                "description": "The decision made, and whether it persists for the site. The _always variants are remembered for future visits; the _once variants apply to the current visit only. Under the binary dialog the split comes from the remember-my-choice checkbox; under the tiered dialog it comes from the explicit option chosen, and deny_once additionally covers dismissing the prompt. Figures either side of the tiered-dialog rollout are therefore not directly comparable",
+                "enum": ["allow_always", "allow_once", "deny_always", "deny_once"]
+            }
+        ]
+    },
+    "m_site_permissions_dialog_impresssion": {
+        "description": "Fires when a site permission dialog is shown to the user. Acts as the denominator for m_site_permissions_dialog_click. Note the triple-s misspelling is the live wire name and is kept deliberately",
+        "owners": ["0nko"],
+        "triggers": ["page_load"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "type",
+                "type": "string",
+                "description": "Permission type the dialog was shown for",
+                "enum": ["location", "camera", "microphone", "camera_and_microphone", "drm"]
+            }
+        ]
     }
 }
