@@ -60,7 +60,7 @@
                 android:id="@+id/subscriptionOnboardingWelcomeTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/keyline_5"
+                android:layout_marginTop="@dimen/keyline_4"
                 android:gravity="center"
                 android:text="@string/subscriptionOnboardingWelcomeTitle"
                 app:typography="h1" />
