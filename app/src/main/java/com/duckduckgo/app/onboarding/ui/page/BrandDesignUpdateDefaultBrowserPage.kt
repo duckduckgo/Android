@@ -237,7 +237,7 @@ class BrandDesignUpdateDefaultBrowserPage :
         userTriedToSetDDGAsDefault = true
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
         intent.putExtra(BrowserActivity.LAUNCH_FROM_DEFAULT_BROWSER_DIALOG, true)
-        startActivityForResult(intent, DefaultBrowserPage.DEFAULT_BROWSER_REQUEST_CODE_DIALOG)
+        startActivityForResult(intent, DEFAULT_BROWSER_REQUEST_CODE_DIALOG)
     }
 
     private fun onLaunchDefaultBrowserSettingsClicked() {
@@ -259,9 +259,9 @@ class BrandDesignUpdateDefaultBrowserPage :
             DEFAULT_BROWSER_REQUEST_CODE_SETTINGS -> {
                 viewModel.handleResult(DefaultBrowserPageViewModel.Origin.Settings)
             }
-            DefaultBrowserPage.DEFAULT_BROWSER_REQUEST_CODE_DIALOG -> {
+            DEFAULT_BROWSER_REQUEST_CODE_DIALOG -> {
                 val origin =
-                    if (resultCode == DefaultBrowserPage.DEFAULT_BROWSER_RESULT_CODE_DIALOG_INTERNAL) {
+                    if (resultCode == DEFAULT_BROWSER_RESULT_CODE_DIALOG_INTERNAL) {
                         DefaultBrowserPageViewModel.Origin.InternalBrowser
                     } else {
                         if (userSelectedExternalBrowser) {
@@ -282,5 +282,7 @@ class BrandDesignUpdateDefaultBrowserPage :
         private const val SAVED_STATE_LAUNCHED_DEFAULT = "SAVED_STATE_LAUNCHED_DEFAULT"
         private const val HEADER_IMAGE_MIN_DP = 180
         private const val HEADER_IMAGE_DESIGN_WIDTH_DP = 514
+        const val DEFAULT_BROWSER_REQUEST_CODE_DIALOG = 101
+        const val DEFAULT_BROWSER_RESULT_CODE_DIALOG_INTERNAL = 102
     }
 }

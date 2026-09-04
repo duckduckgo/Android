@@ -35,14 +35,6 @@ interface OnboardingBrandDesignUpdateToggles {
     fun brandDesignUpdate(): Toggle
 
     /**
-     * Gates the new fire animation work: new Inferno default in Data Clearing
-     * settings + bottom-sheet Lottie swap.
-     * This toggle is being removed in U6.
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun fireAnimationUpdate(): Toggle
-
-    /**
      * Gates new-tab onboarding bubble improvements: showing/hiding the waving Dax and shark fin
      * based on whether they fit below the bubble (keyboard state, orientation, per-bubble sizing).
      * This toggle is being removed in U7.
