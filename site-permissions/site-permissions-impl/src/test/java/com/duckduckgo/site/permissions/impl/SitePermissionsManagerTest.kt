@@ -25,9 +25,9 @@ import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
 import com.duckduckgo.site.permissions.impl.drm.DrmPolicyAction
 import com.duckduckgo.site.permissions.impl.drm.DrmPolicyDecision
@@ -35,7 +35,7 @@ import com.duckduckgo.site.permissions.impl.drm.DrmPolicyManager
 import com.duckduckgo.site.permissions.impl.drm.DrmPolicyReason
 import com.duckduckgo.site.permissions.impl.drm.DrmSessionStore
 import com.duckduckgo.site.permissions.impl.feature.DrmPolicyFeature
-import com.duckduckgo.site.permissions.impl.feature.MicrophoneSitePermissionsDomainRecoveryFeature
+import com.duckduckgo.site.permissions.impl.feature.SitePermissionsSystemRecoveryFeature
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.eq
@@ -64,9 +64,8 @@ class SitePermissionsManagerTest {
     private val mockPackageManager = mock<PackageManager>()
     private val mockLocationManager = mock<LocationManager>()
     private val mockContext = mock<Context>()
-    private val mockDuckAiHostProvider = mock<DuckAiHostProvider>()
-    private val fakeMicrophoneSitePermissionsDomainRecoveryFeature = FakeFeatureToggleFactory.create(
-        MicrophoneSitePermissionsDomainRecoveryFeature::class.java,
+    private val fakeSitePermissionsSystemRecoveryFeature = FakeFeatureToggleFactory.create(
+        SitePermissionsSystemRecoveryFeature::class.java,
     )
     private val drmPolicyFeature = FakeFeatureToggleFactory.create(DrmPolicyFeature::class.java)
     private val mockDrmPolicyManager: DrmPolicyManager = mock()
@@ -80,12 +79,11 @@ class SitePermissionsManagerTest {
             mockSitePermissionsRepository,
             coroutineRule.testDispatcherProvider,
             mockContext,
-            fakeMicrophoneSitePermissionsDomainRecoveryFeature,
+            fakeSitePermissionsSystemRecoveryFeature,
             drmPolicyFeature,
             mockDrmPolicyManager,
             drmSessionStore,
             mockPixel,
-            mockDuckAiHostProvider,
         )
     }
 
@@ -94,9 +92,9 @@ class SitePermissionsManagerTest {
 
     @Before
     fun before() {
-        whenever(mockDuckAiHostProvider.getHost()).thenReturn("duck.ai")
         whenever(mockPackageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)).thenReturn(true)
-        fakeMicrophoneSitePermissionsDomainRecoveryFeature.self().setRawStoredState(Toggle.State(false))
+        fakeSitePermissionsSystemRecoveryFeature.self().setRawStoredState(Toggle.State(true))
+        whenever(mockContext.checkPermission(any(), any(), any())).thenReturn(PackageManager.PERMISSION_GRANTED)
         drmPolicyFeature.self().setRawStoredState(Toggle.State(true))
         drmPolicyFeature.centralPolicy().setRawStoredState(Toggle.State(false))
     }
@@ -419,21 +417,68 @@ class SitePermissionsManagerTest {
     }
 
     @Test
-    fun whenRecoveryEnabledAndDuckAiAudioGrantedAndAndroidPermissionDeniedThenAudioNotAutoAccepted() = runTest {
-        val duckAiUrl = "https://duck.ai/chat"
-        fakeMicrophoneSitePermissionsDomainRecoveryFeature.self().setRawStoredState(Toggle.State(true))
-        val resources = arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE)
-        whenever(mockSitePermissionsRepository.isDomainAllowedToAsk(duckAiUrl, PermissionRequest.RESOURCE_AUDIO_CAPTURE)).thenReturn(true)
-        whenever(mockSitePermissionsRepository.isDomainGranted(duckAiUrl, tabId, PermissionRequest.RESOURCE_AUDIO_CAPTURE)).thenReturn(true)
+    fun whenAudioSiteGrantedAndSystemPermissionDeniedThenAudioUserHandled() = runTest {
+        assertSavedGrantIsUserHandledWhenSystemPermissionDenied(PermissionRequest.RESOURCE_AUDIO_CAPTURE)
+    }
+
+    @Test
+    fun whenCameraSiteGrantedAndSystemPermissionDeniedThenCameraUserHandled() = runTest {
+        assertSavedGrantIsUserHandledWhenSystemPermissionDenied(PermissionRequest.RESOURCE_VIDEO_CAPTURE)
+    }
+
+    @Test
+    fun whenLocationSiteGrantedAndSystemPermissionDeniedThenLocationUserHandled() = runTest {
+        assertSavedGrantIsUserHandledWhenSystemPermissionDenied(LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION)
+    }
+
+    @Test
+    fun whenRecoveryDisabledAndSystemPermissionDeniedThenSavedGrantStillAutoAccepted() = runTest {
+        fakeSitePermissionsSystemRecoveryFeature.self().setRawStoredState(Toggle.State(false))
         whenever(mockContext.checkPermission(any(), any(), any())).thenReturn(PackageManager.PERMISSION_DENIED)
+        val resources = arrayOf(PermissionRequest.RESOURCE_VIDEO_CAPTURE)
+        whenever(mockSitePermissionsRepository.isDomainAllowedToAsk(url, PermissionRequest.RESOURCE_VIDEO_CAPTURE)).thenReturn(true)
+        whenever(mockSitePermissionsRepository.isDomainGranted(url, tabId, PermissionRequest.RESOURCE_VIDEO_CAPTURE)).thenReturn(true)
 
         val permissionRequest: PermissionRequest = mock()
-        whenever(permissionRequest.origin).thenReturn(duckAiUrl.toUri())
+        whenever(permissionRequest.origin).thenReturn(url.toUri())
+        whenever(permissionRequest.resources).thenReturn(resources)
+
+        testee.getSitePermissions(tabId, permissionRequest)
+
+        verify(permissionRequest).grant(arrayOf(PermissionRequest.RESOURCE_VIDEO_CAPTURE))
+    }
+
+    @Test
+    fun whenDrmSiteGrantedThenAutoAcceptedRegardlessOfSystemPermissions() = runTest {
+        whenever(mockContext.checkPermission(any(), any(), any())).thenReturn(PackageManager.PERMISSION_DENIED)
+        val resources = arrayOf(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)
+        whenever(mockSitePermissionsRepository.isDomainAllowedToAsk(url, PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)).thenReturn(true)
+        whenever(mockSitePermissionsRepository.isDomainGranted(url, tabId, PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)).thenReturn(true)
+
+        val permissionRequest: PermissionRequest = mock()
+        whenever(permissionRequest.origin).thenReturn(url.toUri())
+        whenever(permissionRequest.resources).thenReturn(resources)
+
+        testee.getSitePermissions(tabId, permissionRequest)
+
+        verify(permissionRequest).grant(arrayOf(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID))
+    }
+
+    private suspend fun assertSavedGrantIsUserHandledWhenSystemPermissionDenied(permission: String) {
+        whenever(mockContext.checkPermission(any(), any(), any())).thenReturn(PackageManager.PERMISSION_DENIED)
+        whenever(mockLocationManager.isLocationEnabled).thenReturn(true)
+        val resources = arrayOf(permission)
+        whenever(mockSitePermissionsRepository.isDomainAllowedToAsk(url, permission)).thenReturn(true)
+        whenever(mockSitePermissionsRepository.isDomainGranted(url, tabId, permission)).thenReturn(true)
+
+        val permissionRequest: PermissionRequest = mock()
+        whenever(permissionRequest.origin).thenReturn(url.toUri())
         whenever(permissionRequest.resources).thenReturn(resources)
 
         val permissions = testee.getSitePermissions(tabId, permissionRequest)
-        assertEquals(1, permissions.userHandled.size)
-        assertEquals(PermissionRequest.RESOURCE_AUDIO_CAPTURE, permissions.userHandled.first())
+
+        assertEquals(listOf(permission), permissions.userHandled)
         assertEquals(0, permissions.autoAccept.size)
+        verify(permissionRequest, never()).grant(any())
     }
 }
