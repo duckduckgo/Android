@@ -202,7 +202,6 @@
     <string name="autofillManagementHowToSyncDesktopPasswordsTitle">So synchronisierst du Desktop-Passwörter</string>
     <string name="autofillManagementImportPasswordsHowToInstruction">Importiere Passwörter in der Desktop-Version des DuckDuckGo-Browsers und synchronisiere sie dann auf allen Geräten.</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Desktop-Browser herunterladen</string>
-    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Link kopiert</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Hole dir den DuckDuckGo-Browser für Mac oder Windows</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Suche privat und blockiere Tracker mit dem DuckDuckGo Desktop-Browser. Besuche zum Herunterladen diesen Link auf deinem Computer.\n\n%1$s</string>
     <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Mit Desktop synchronisieren</string>
@@ -215,8 +214,6 @@
     <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Lade dir die Desktop-App herunter</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">Hole dir DuckDuckGo für Mac oder Windows</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">Gehe auf deinem Computer zu:</string>
-    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
-    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Download-Link teilen</string>
 
     <string name="autofillManagementReportBreakagePromptTitle">Problem mit Autofill melden</string>
     <string name="autofillManagementReportBreakagePromptSubtitle">Melde anonym, dass das automatische Ausfüllen auf dieser Seite nicht funktioniert. Passwörter werden niemals geteilt.</string>

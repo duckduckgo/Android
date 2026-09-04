@@ -214,7 +214,6 @@
     <string name="autofillManagementHowToSyncDesktopPasswordsTitle">Ako synchronizovať heslá pracovnej plochy</string>
     <string name="autofillManagementImportPasswordsHowToInstruction">Heslá môžete importovať do počítačovej verzie prehliadača DuckDuckGo a potom ich synchronizovať medzi zariadeniami.</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Získajte prehliadač pre desktop PC</string>
-    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Odkaz bol skopírovaný</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Získajte prehliadač DuckDuckGo pre Mac alebo Windows</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Vyhľadávajte súkromne a blokujte sledovacie zariadenia pomocou prehliadača DuckDuckGo pre počítače. Navštívte tento odkaz vo svojom počítači a stiahnite si ho ešte dnes.\n\n%1$s</string>
     <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Synchronizácia s počítačom</string>
@@ -227,8 +226,6 @@
     <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Získajte aplikáciu pre počítače</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">Získajte DuckDuckGo pre Mac alebo Windows</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">V počítači prejdite na:</string>
-    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
-    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Zdieľať odkaz na stiahnutie</string>
 
     <string name="autofillManagementReportBreakagePromptTitle">Nahlásenie problému s funkciou Automatické dopĺňanie</string>
     <string name="autofillManagementReportBreakagePromptSubtitle">Anonymne nahláste, že automatické dopĺňanie na tejto stránke nefunguje. Heslá sa nikdy nezdieľajú.</string>

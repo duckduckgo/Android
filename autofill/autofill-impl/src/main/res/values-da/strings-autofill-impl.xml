@@ -202,7 +202,6 @@
     <string name="autofillManagementHowToSyncDesktopPasswordsTitle">Sådan synkroniseres adgangskoder fra pc</string>
     <string name="autofillManagementImportPasswordsHowToInstruction">Importer adgangskoder i computerversionen af DuckDuckGo-browseren, og synkroniser derefter på tværs af enheder.</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Hent browser til computeren</string>
-    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Link kopieret</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Hent DuckDuckGo-browseren til Mac eller Windows</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Søg privat og bloker trackere med DuckDuckGo-browseren til computeren. Besøg dette link på din computer for at downloade i dag.\n\n%1$s</string>
     <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Synkroniser med computer</string>
@@ -215,8 +214,6 @@
     <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Hent skrivebordsapp</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">Hent DuckDuckGo til Mac eller Windows</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">På din computer skal du gå til:</string>
-    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
-    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Del downloadlink</string>
 
     <string name="autofillManagementReportBreakagePromptTitle">Rapporter et problem med automatisk udfyldning</string>
     <string name="autofillManagementReportBreakagePromptSubtitle">Rapportér anonymt, at automatisk udfyldning ikke fungerer på dette websted. Adgangskoder deles aldrig.</string>

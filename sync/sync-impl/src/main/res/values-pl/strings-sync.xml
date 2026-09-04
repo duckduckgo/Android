@@ -221,7 +221,6 @@
     <!-- Get Desktop Browser -->
     <string name="getDesktopBrowserSettingItemTitle">Pobierz przeglądarkę komputerową</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo dla komputerów Mac i Windows</string>
-    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
 
     <!-- Sync Settings Recovery Section -->
     <string name="sync_settings_recovery_section_header">Odzyskiwanie</string>

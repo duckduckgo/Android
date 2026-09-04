@@ -202,7 +202,6 @@
     <string name="autofillManagementHowToSyncDesktopPasswordsTitle">Asztali jelszavak szinkronizálásának módja</string>
     <string name="autofillManagementImportPasswordsHowToInstruction">Importálj jelszavakat a DuckDuckGo böngésző asztali verziójába, majd szinkronizáld őket az eszközök között.</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Asztali böngésző letöltése</string>
-    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Link másolva</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Mac vagy Windows verziójú DuckDuckGo böngésző letöltése</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Keress privát módon, és blokkold a nyomkövetőket a DuckDuckGo asztali böngészőjével. A letöltéshez nyisd meg ezt a linket a számítógépen.\n\n%1$s</string>
     <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Szinkronizálás asztali böngészővel</string>
@@ -215,8 +214,6 @@
     <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Asztali alkalmazás letöltése</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">Mac vagy Windows verziójú DuckDuckGo letöltése</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">A számítógépeden lépj a következő lehetőségre:</string>
-    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
-    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Letöltési link megosztása</string>
 
     <string name="autofillManagementReportBreakagePromptTitle">Automatikus kitöltéssel kapcsolatos probléma jelentése</string>
     <string name="autofillManagementReportBreakagePromptSubtitle">Jelentsd névtelenül, hogy az automatikus kitöltés nem működik ezen a webhelyen. Jelszavak megosztására soha nem kerül sor.</string>

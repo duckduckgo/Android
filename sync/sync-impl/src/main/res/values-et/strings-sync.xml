@@ -221,7 +221,6 @@
     <!-- Get Desktop Browser -->
     <string name="getDesktopBrowserSettingItemTitle">Hangi töölaua brauser</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo Maci ja Windowsi jaoks</string>
-    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
 
     <!-- Sync Settings Recovery Section -->
     <string name="sync_settings_recovery_section_header">Taastamine</string>

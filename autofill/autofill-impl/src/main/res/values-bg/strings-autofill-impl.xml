@@ -202,7 +202,6 @@
     <string name="autofillManagementHowToSyncDesktopPasswordsTitle">Как да синхронизирате паролите от работния плот</string>
     <string name="autofillManagementImportPasswordsHowToInstruction">Импортирайте пароли в десктоп версията на браузъра DuckDuckGo, след което ги синхронизирайте с различни устройства.</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Вземете браузъра за работен плот</string>
-    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Връзката е копирана</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Вземете браузъра DuckDuckGo за Mac или Windows</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Търсете поверително и блокирайте тракерите с браузъра за настолен компютър DuckDuckGo. Посетете тази връзка на своя компютър, за да го изтеглите още днес.\n\n%1$s</string>
     <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Синхронизиране с браузъра на работния плот</string>
@@ -215,8 +214,6 @@
     <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Изтеглете приложението за настолен компютър</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">Вземете DuckDuckGo за Mac или Windows</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">На компютъра си отидете на:</string>
-    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
-    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Споделяне на връзка за изтегляне</string>
 
     <string name="autofillManagementReportBreakagePromptTitle">Докладване на проблем с автоматичното попълване</string>
     <string name="autofillManagementReportBreakagePromptSubtitle">Анонимно докладвайте, че автоматичното попълване не работи на този сайт. Паролите никога няма да бъдат споделяни.</string>

@@ -221,7 +221,6 @@
     <!-- Get Desktop Browser -->
     <string name="getDesktopBrowserSettingItemTitle">Hent browser til computeren</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo til Mac og Windows</string>
-    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
 
     <!-- Sync Settings Recovery Section -->
     <string name="sync_settings_recovery_section_header">Gendannelse</string>

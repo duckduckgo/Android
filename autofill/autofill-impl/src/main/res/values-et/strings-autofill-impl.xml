@@ -202,7 +202,6 @@
     <string name="autofillManagementHowToSyncDesktopPasswordsTitle">Kuidas sünkroonida töölaua paroole</string>
     <string name="autofillManagementImportPasswordsHowToInstruction">Impordi paroolid DuckDuckGo brauseri töölauaversiooni, seejärel sünkrooni need kõigis seadmetes.</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Hangi töölaua brauser</string>
-    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Link kopeeritud</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Hangi DuckDuckGo brauser Maci või Windowsi jaoks</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Otsi privaatselt ja blokeeri jälgurid DuckDuckGo töölaua brauseriga. Külasta oma arvutis seda linki, et laadida see alla juba täna.\n\n%1$s</string>
     <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Sünkrooni töölauaga</string>
@@ -215,8 +214,6 @@
     <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Hangi töölaua rakendus</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">Hangi DuckDuckGo Maci või Windowsi jaoks</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">Ava oma arvutis:</string>
-    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
-    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Jaga allalaadimise linki</string>
 
     <string name="autofillManagementReportBreakagePromptTitle">Teata automaatse täitmise probleemist</string>
     <string name="autofillManagementReportBreakagePromptSubtitle">Teata anonüümselt, et automaatne täitmine sellel saidil ei tööta. Paroole ei jagata kunagi.</string>

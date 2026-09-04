@@ -55,8 +55,8 @@ import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthConfiguration
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthResult.Success
 import com.duckduckgo.sync.impl.databinding.ActivitySyncBinding
 import com.duckduckgo.sync.impl.databinding.DialogEditDeviceBinding
+import com.duckduckgo.sync.impl.promotion.SyncDesktopAppPromotionLauncher
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource
-import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsParams
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AddAnotherDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskDeleteAccount
@@ -115,6 +115,9 @@ class SyncActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var deviceAuthenticator: DeviceAuthenticator
+
+    @Inject
+    lateinit var syncDesktopAppPromotionLauncher: SyncDesktopAppPromotionLauncher
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
@@ -486,7 +489,7 @@ class SyncActivity : DuckDuckGoActivity() {
     }
 
     private fun launchSyncGetOnOtherPlatforms(source: SyncGetOnOtherPlatformsLaunchSource) {
-        globalActivityStarter.start(this, SyncGetOnOtherPlatformsParams(source))
+        lifecycleScope.launch { syncDesktopAppPromotionLauncher.launch(this@SyncActivity, source) }
     }
 
     private fun showError(it: ShowError) {

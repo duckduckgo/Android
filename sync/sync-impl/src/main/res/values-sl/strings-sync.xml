@@ -221,7 +221,6 @@
     <!-- Get Desktop Browser -->
     <string name="getDesktopBrowserSettingItemTitle">Namesti namizni brskalnik</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo za računalnike Mac in Windows</string>
-    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
 
     <!-- Sync Settings Recovery Section -->
     <string name="sync_settings_recovery_section_header">Obnovitev</string>
