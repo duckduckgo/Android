@@ -187,6 +187,7 @@ import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_PAGE_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DuckPlayerJSHelper
 import com.duckduckgo.app.browser.errorpage.BadUrlErrorPageWideEvent
+import com.duckduckgo.app.browser.errorpage.CustomErrorPagesFeature
 import com.duckduckgo.app.browser.favicon.FaviconFetchingFixFeature
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource.ImageFavicon
@@ -613,6 +614,7 @@ class BrowserTabViewModel @Inject constructor(
     private val suggestRedirectOnUnresolvedErrorFeature: SuggestRedirectOnUnresolvedErrorFeature,
     private val suggestRedirectEvaluator: SuggestRedirectEvaluator,
     private val badUrlErrorPageWideEvent: BadUrlErrorPageWideEvent,
+    private val customErrorPagesFeature: CustomErrorPagesFeature,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -846,6 +848,8 @@ class BrowserTabViewModel @Inject constructor(
                 registerAndScheduleDismissAction()
             }
         }
+
+    private var errorPagePendingDismissal = false
 
     private fun registerAndScheduleDismissAction() {
         viewModelScope.launch(dispatchers.io()) {
@@ -1645,16 +1649,17 @@ class BrowserTabViewModel @Inject constructor(
         } else {
             badUrlErrorPageWideEvent.onErrorPageRefreshed(tabId)
         }
-        browserViewState.value =
-            currentBrowserViewState().copy(
-                browserShowing = true,
-                browserError = OMITTED,
-                redirectSuggestion = null,
-                sslError = NONE,
-                maliciousSiteBlocked = false,
-                maliciousSiteStatus = null,
-                lastQueryOrigin = queryOrigin,
-            )
+        val keepErrorPage = keepErrorPage()
+        val state = currentBrowserViewState()
+        browserViewState.value = state.copy(
+            browserShowing = true,
+            browserError = if (keepErrorPage) state.browserError else OMITTED,
+            redirectSuggestion = if (keepErrorPage) state.redirectSuggestion else null,
+            sslError = NONE,
+            maliciousSiteBlocked = false,
+            maliciousSiteStatus = null,
+            lastQueryOrigin = queryOrigin,
+        )
         autoCompleteViewState.value =
             currentAutoCompleteViewState().copy(showSuggestions = false, showFocusedView = false, searchResults = AutoCompleteResult("", emptyList()))
     }
@@ -2588,6 +2593,7 @@ class BrowserTabViewModel @Inject constructor(
     override fun onMainFrameLoadStarted(navigationId: Long) {
         pageLoadNavigationId = navigationId
         hasExitedFixedProgress = false
+        errorPagePendingDismissal = currentBrowserViewState().browserError != OMITTED
     }
 
     override fun pageRefreshed(refreshedUrl: String) {
@@ -2652,6 +2658,10 @@ class BrowserTabViewModel @Inject constructor(
         webViewNavigationState: WebViewNavigationState,
         url: String?,
     ) {
+        if (keepErrorPage()) {
+            // Fallback in case onPageCommitVisible is not called
+            if (errorPagePendingDismissal) resetBrowserError()
+        }
         when (currentBrowserViewState().browserError) {
             OMITTED, LOADING -> badUrlErrorPageWideEvent.onPageLoadFinished(tabId)
             BAD_URL, CONNECTION, SSL_PROTOCOL_ERROR -> Unit
@@ -2708,6 +2718,9 @@ class BrowserTabViewModel @Inject constructor(
         webViewNavigationState: WebViewNavigationState,
         url: String,
     ) {
+        if (keepErrorPage()) {
+            if (errorPagePendingDismissal) resetBrowserError()
+        }
         if (!currentBrowserViewState().maliciousSiteBlocked && site != null) {
             navigationStateChanged(webViewNavigationState)
             onPageContentStart(url)
@@ -4582,6 +4595,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun resetBrowserError() {
         suggestRedirectJob.cancel()
+        errorPagePendingDismissal = false
         browserViewState.value = currentBrowserViewState().copy(browserError = OMITTED, redirectSuggestion = null)
         // Catches the race where pageFinished fired while browserError was still LOADING.
         onDuckAiOnboardingPageFinishedIfApplicable()
@@ -4678,6 +4692,7 @@ class BrowserTabViewModel @Inject constructor(
         errorCode: String,
     ) {
         if (errorType != OMITTED) {
+            errorPagePendingDismissal = false
             browserViewState.value =
                 currentBrowserViewState().copy(
                     browserError = errorType,
@@ -6021,9 +6036,14 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onRedirectSuggestionClicked(url: String) {
         badUrlErrorPageWideEvent.onRedirectClicked(tabId)
-        resetBrowserError()
+        if (!keepErrorPage()) {
+            resetBrowserError()
+        }
         command.value = NavigationCommand.Navigate(url, getUrlHeaders(url))
     }
+
+    private fun keepErrorPage(): Boolean =
+        customErrorPagesFeature.self().isEnabled() && customErrorPagesFeature.keepErrorPageUntilNextPageStartsLoading().isEnabled()
 
     private fun trackersCount(): String =
         siteLiveData.value?.trackerCount?.takeIf { it > 0 }?.toString() ?: ""
