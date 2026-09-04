@@ -255,7 +255,7 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
 
     private suspend fun showQrCode(url: String) {
         val bitmap = withContext(dispatchers.io()) {
-            qrEncoder.encodeAsBitmap(url, R.dimen.simplifiedSyncQrSize, R.dimen.simplifiedSyncQrSize)
+            qrEncoder.encodeAsBitmap(url, R.dimen.qrBarcodeSize, R.dimen.qrBarcodeSize)
         }
         val displayCode = SyncBarcodeUrl.parseUrl(url)?.webSafeB64EncodedCode ?: url
         val bitmapWithCode = BitmapWithCode(bitmap, url, displayCode)

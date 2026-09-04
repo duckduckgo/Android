@@ -39,8 +39,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.sync.impl.ui.SyncActivity
-import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity
+import com.duckduckgo.sync.impl.ui.v2.RecoveryCodeActivity
 import com.duckduckgo.sync.internal.databinding.ActivityInternalSyncSettingsBinding
 import com.duckduckgo.sync.internal.databinding.DialogRenameDeviceBinding
 import com.duckduckgo.sync.internal.databinding.ItemConnectedDeviceBinding
@@ -122,9 +121,6 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
 
     private fun configureListeners() {
         binding.launchSyncSettingsButton.setOnClickListener {
-            startActivity(Intent(this, SyncActivity::class.java))
-        }
-        binding.launchSimplifiedSyncSettingsButton.setOnClickListener {
             startActivity(Intent(this, SyncActivityV2::class.java))
         }
         binding.openV2PairingDebugButton.setOnClickListener {
@@ -258,11 +254,7 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
             }
 
             Command.LaunchRecoverDataScreen -> {
-                startActivity(
-                    Intent(this, SetupAccountActivity::class.java).apply {
-                        putExtra(SetupAccountActivity.SETUP_ACCOUNT_SCREEN_EXTRA, SetupAccountActivity.Companion.Screen.RECOVERY_CODE)
-                    },
-                )
+                startActivity(RecoveryCodeActivity.intent(this, binding.deviceNameTextView.text.toString()))
             }
 
             is Command.ShowRenameDeviceDialog -> showRenameDeviceDialog(command)

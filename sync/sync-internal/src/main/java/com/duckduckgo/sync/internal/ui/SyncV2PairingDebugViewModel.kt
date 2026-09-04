@@ -43,7 +43,6 @@ import com.duckduckgo.sync.impl.exchange.v2.PairingRole
 import com.duckduckgo.sync.impl.exchange.v2.PeerVersionSource
 import com.duckduckgo.sync.impl.exchange.v2.RejectReason
 import com.duckduckgo.sync.impl.exchange.v2.Role
-import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Companion.POLLING_INTERVAL_EXCHANGE_FLOW
 import com.duckduckgo.sync.internal.exchange.SyncInternalAdvertisedExchangeV2Version
 import com.duckduckgo.sync.store.SyncStore
 import kotlinx.coroutines.CoroutineScope
@@ -57,6 +56,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import logcat.logcat
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 
 @ContributesViewModel(ActivityScope::class)
 class SyncV2PairingDebugViewModel @Inject constructor(
@@ -697,5 +697,9 @@ class SyncV2PairingDebugViewModel @Inject constructor(
     private fun labelFor(peerSource: PeerVersionSource): String = when (peerSource) {
         PeerVersionSource.LinkingCode -> "linking_code"
         PeerVersionSource.HelloMessage -> "hello_message"
+    }
+
+    private companion object {
+        val POLLING_INTERVAL_EXCHANGE_FLOW = 2.seconds
     }
 }

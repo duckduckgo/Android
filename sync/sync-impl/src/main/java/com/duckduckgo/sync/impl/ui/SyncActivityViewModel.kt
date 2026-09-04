@@ -39,7 +39,6 @@ import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncAuthCode
-import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.SyncFeatureToggle
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator
 import com.duckduckgo.sync.impl.autorestore.SyncAutoRestoreManager
@@ -52,9 +51,7 @@ import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SO
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SOURCE_SYNC_ENABLED
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskDeleteAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskEditDevice
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskRemoveDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskToCopyRecoveryCode
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroCreateAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchSyncGetOnOtherPlatforms
@@ -105,7 +102,6 @@ class SyncActivityViewModel @Inject constructor(
     private val syncAutoRestore: SyncAutoRestore,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val syncSetupWideEvent: SyncSetupWideEvent,
-    private val syncFeature: SyncFeature,
 ) : ViewModel() {
 
     private val syncStateObserverJob = ConflatedJob()
@@ -119,17 +115,13 @@ class SyncActivityViewModel @Inject constructor(
     // null until the first load from preference; used by onScreenExit() to detect changes.
     @Volatile private var initialAutoRestoreEnabled: Boolean? = null
 
-    @Volatile private var isAtomicViewStateUpdateEnabled = false
-
     private val command = Channel<Command>(1, DROP_OLDEST)
     private val viewState = MutableStateFlow(ViewState())
 
     init {
         syncPixels.fireSyncSettingsShown()
-        viewModelScope.launch {
-            syncFeature.updateSyncActivityViewStateAtomically().enabled().collect { isAtomicViewStateUpdateEnabled = it }
-        }
     }
+
     fun commands(): Flow<Command> = command.receiveAsFlow().onStart {
         checkIfDeviceSupported()
     }
@@ -148,7 +140,7 @@ class SyncActivityViewModel @Inject constructor(
         syncStateObserverJob += syncStateMonitor.syncState()
             .onEach { syncState ->
                 if (syncState == OFF) {
-                    updateViewState { signedOutState() }
+                    viewState.update { signedOutState() }
                 } else {
                     updateSignedInState()
                 }
@@ -187,9 +179,9 @@ class SyncActivityViewModel @Inject constructor(
         val thisDevice = syncAccountRepository.getThisConnectedDevice()
         val signedOutState = signedOutState()
 
-        updateViewState { current ->
+        viewState.update { current ->
             val syncedDevices = current.syncedDevices.ifEmpty {
-                thisDevice?.let { listOf(SyncedDevice(it)) } ?: return@updateViewState signedOutState
+                thisDevice?.let { listOf(SyncedDevice(it)) } ?: return@update signedOutState
             }
             signedOutState.copy(
                 showAccount = showAccount,
@@ -204,7 +196,7 @@ class SyncActivityViewModel @Inject constructor(
     private suspend fun initViewStateThisDeviceState() {
         withContext(dispatchers.io()) {
             if (!syncAccountRepository.isSignedIn()) {
-                updateViewState { signedOutState() }
+                viewState.update { signedOutState() }
             } else {
                 updateSignedInState()
             }
@@ -247,13 +239,10 @@ class SyncActivityViewModel @Inject constructor(
         data class AskSetupSyncDeepLink(val syncBarcodeUrl: SyncBarcodeUrl) : Command()
         data object IntroCreateAccount : Command()
         data object IntroRecoverSyncData : Command()
-        data object ShowRecoveryCode : Command()
-        data class AskTurnOffSync(val device: ConnectedDevice) : Command()
         data object AskDeleteAccount : Command()
         data object CheckIfUserHasStoragePermission : Command()
         data class RecoveryCodePDFSuccess(val recoveryCodePDFFile: File) : Command()
         data object AskToCopyRecoveryCode : Command()
-        data class AskRemoveDevice(val device: ConnectedDevice) : Command()
         data class AskEditDevice(val device: ConnectedDevice, val requireAuthentication: Boolean) : Command()
         data class ShowError(
             @StringRes val message: Int,
@@ -294,7 +283,7 @@ class SyncActivityViewModel @Inject constructor(
 
     fun onSyncThisDevice(source: String? = null) {
         syncPixels.fireBackupThisDeviceTapped()
-        updateViewState { it.setThisDeviceSyncInProgress() }
+        viewState.update { it.setThisDeviceSyncInProgress() }
         viewModelScope.launch(dispatchers.io()) {
             syncSetupWideEvent.onFlowStarted(source)
             requiresSetupAuthentication(
@@ -334,7 +323,7 @@ class SyncActivityViewModel @Inject constructor(
                     command.send(Command.LaunchOriginalFlow(syncEntryPoint))
                 }
                 is Error -> {
-                    updateViewState { it.setThisDeviceSyncIdle() }
+                    viewState.update { it.setThisDeviceSyncIdle() }
                     syncPixels.fireAutoRestorePreservedAccountClearFailed(
                         source = source,
                         errorCode = result.code.toString(),
@@ -346,29 +335,15 @@ class SyncActivityViewModel @Inject constructor(
         }
     }
 
-    fun onLoginSuccess() {
-        viewModelScope.launch {
-            command.send(Command.ShowRecoveryCode)
-        }
-    }
-
-    fun onTurnOffClicked() {
-        viewModelScope.launch {
-            syncAccountRepository.getThisConnectedDevice()?.let {
-                command.send(AskTurnOffSync(it))
-            } ?: showAccountDetailsIfNeeded()
-        }
-    }
-
     private fun fetchRemoteDevices(showLoadingState: Boolean = true) {
         fetchDevicesJob += viewModelScope.launch(dispatchers.io()) {
             if (showLoadingState) {
-                updateViewState { it.showDeviceListItemLoading() }
+                viewState.update { it.showDeviceListItemLoading() }
             }
 
             val result = syncAccountRepository.getConnectedDevices()
             ensureActive() // don't apply a result that was superseded while in flight
-            updateViewState { current ->
+            viewState.update { current ->
                 if (result is Success) {
                     current.hideDeviceListItemLoading().setDevices(result.data.map { SyncedDevice(it) })
                 } else {
@@ -382,15 +357,15 @@ class SyncActivityViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             syncPixels.fireUserConfirmedToTurnOffSync()
 
-            updateViewState { it.hideAccount().setThisDeviceSyncIdle() }
+            viewState.update { it.hideAccount().setThisDeviceSyncIdle() }
             when (val result = syncAccountRepository.logout(connectedDevice.deviceId)) {
                 is Error -> {
-                    updateViewState { it.showAccount() }
+                    viewState.update { it.showAccount() }
                     command.send(ShowError(R.string.sync_turn_off_error, result.reason))
                 }
 
                 is Success -> {
-                    updateViewState { signedOutState() }
+                    viewState.update { signedOutState() }
                 }
             }
         }
@@ -421,15 +396,15 @@ class SyncActivityViewModel @Inject constructor(
 
     fun onDeleteAccountConfirmed() {
         viewModelScope.launch(dispatchers.io()) {
-            updateViewState { it.hideAccount() }
+            viewState.update { it.hideAccount() }
             when (val result = syncAccountRepository.deleteAccount()) {
                 is Error -> {
-                    updateViewState { it.showAccount() }
+                    viewState.update { it.showAccount() }
                     command.send(ShowError(R.string.sync_turn_off_error, result.reason))
                 }
 
                 is Success -> {
-                    updateViewState { signedOutState() }
+                    viewState.update { signedOutState() }
                 }
             }
         }
@@ -474,7 +449,7 @@ class SyncActivityViewModel @Inject constructor(
 
     fun onAutoRestoreToggleChanged(enabled: Boolean) {
         logcat { "Sync-Recovery: restore on reinstall toggle changed to $enabled (pending until screen stopped)" }
-        updateViewState { it.copy(autoRestoreEnabled = enabled) }
+        viewState.update { it.copy(autoRestoreEnabled = enabled) }
     }
 
     fun onScreenExit() {
@@ -542,18 +517,12 @@ class SyncActivityViewModel @Inject constructor(
         }
     }
 
-    fun onRemoveDeviceClicked(device: ConnectedDevice) {
-        viewModelScope.launch {
-            command.send(AskRemoveDevice(device))
-        }
-    }
-
     fun onRemoveDeviceConfirmed(device: ConnectedDevice) {
         viewModelScope.launch(dispatchers.io()) {
-            updateViewState { it.showDeviceListItemLoading(device) }
+            viewState.update { it.showDeviceListItemLoading(device) }
             when (val result = syncAccountRepository.logout(device.deviceId)) {
                 is Error -> {
-                    updateViewState { it.hideDeviceListItemLoading(device) }
+                    viewState.update { it.hideDeviceListItemLoading(device) }
                     command.send(ShowError(R.string.sync_remove_device_error, result.reason))
                 }
 
@@ -562,7 +531,7 @@ class SyncActivityViewModel @Inject constructor(
                     // server before the logout could otherwise land afterwards and re-insert the
                     // device until the next periodic refresh corrects it.
                     fetchDevicesJob.cancel()
-                    updateViewState { current ->
+                    viewState.update { current ->
                         current.setDevices(
                             current.syncedDevices.filterNot { it is SyncedDevice && it.device.deviceId == device.deviceId },
                         )
@@ -574,10 +543,10 @@ class SyncActivityViewModel @Inject constructor(
 
     fun onDeviceEdited(editedConnectedDevice: ConnectedDevice) {
         viewModelScope.launch(dispatchers.io()) {
-            updateViewState { it.showDeviceListItemLoading(editedConnectedDevice) }
+            viewState.update { it.showDeviceListItemLoading(editedConnectedDevice) }
             when (val result = syncAccountRepository.renameDevice(editedConnectedDevice)) {
                 is Error -> {
-                    updateViewState { it.hideDeviceListItemLoading(editedConnectedDevice) }
+                    viewState.update { it.hideDeviceListItemLoading(editedConnectedDevice) }
                     command.send(ShowError(R.string.sync_edit_device_error, result.reason))
                 }
 
@@ -587,7 +556,7 @@ class SyncActivityViewModel @Inject constructor(
     }
 
     fun onDeviceConnected() {
-        updateViewState { it.setThisDeviceSyncIdle() }
+        viewState.update { it.setThisDeviceSyncIdle() }
         fetchRemoteDevices()
     }
 
@@ -614,15 +583,15 @@ class SyncActivityViewModel @Inject constructor(
     }
 
     fun onSyncThisDeviceCanceled() {
-        updateViewState { it.setThisDeviceSyncIdle() }
+        viewState.update { it.setThisDeviceSyncIdle() }
     }
 
     private fun showAccountDetailsIfNeeded() {
         viewModelScope.launch(dispatchers.io()) {
             if (syncAccountRepository.isSignedIn()) {
-                updateViewState { it.showAccount() }
+                viewState.update { it.showAccount() }
             } else {
-                updateViewState { signedOutState() }
+                viewState.update { signedOutState() }
             }
         }
     }
@@ -650,14 +619,6 @@ class SyncActivityViewModel @Inject constructor(
             command.send(RequestSetupAuthentication(forSyncThisDevice))
         } else {
             action()
-        }
-    }
-
-    private fun updateViewState(update: (ViewState) -> ViewState) {
-        if (isAtomicViewStateUpdateEnabled) {
-            viewState.update(update)
-        } else {
-            viewState.value = update(viewState.value)
         }
     }
 

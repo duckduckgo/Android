@@ -19,56 +19,10 @@
 
     <application>
         <activity
-            android:name=".ui.SyncActivity"
-            android:exported="false"
-            android:label="@string/sync_screen_title"
-            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
-            android:screenOrientation="portrait" />
-
-        <activity
             android:name=".promotion.SyncGetOnOtherPlatformsActivity"
             android:exported="false"
             android:label="@string/syncGetAppsOnOtherPlatformsActivityTitle"
-            android:parentActivityName=".ui.SyncActivity" />
-
-        <activity
-            android:name=".ui.setup.SetupAccountActivity"
-            android:exported="false"
-            android:label="@string/sync_screen_title"
-            android:parentActivityName=".ui.SyncActivity"
-            android:screenOrientation="portrait" />
-
-        <activity
-            android:name=".ui.SyncLoginActivity"
-            android:exported="false"
-            android:label="@string/login_screen_title"
-            android:parentActivityName=".ui.setup.SetupAccountActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.DuckDuckGo.Dark" />
-
-        <activity
-            android:name=".ui.SyncWithAnotherDeviceActivity"
-            android:exported="false"
-            android:label="@string/login_screen_title"
-            android:parentActivityName=".ui.SyncActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.DuckDuckGo.Dark" />
-
-        <activity
-            android:name=".ui.SyncConnectActivity"
-            android:exported="false"
-            android:label="@string/connect_screen_title"
-            android:parentActivityName=".ui.setup.SetupAccountActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.DuckDuckGo.Dark" />
-
-        <activity
-            android:name=".ui.EnterCodeActivity"
-            android:exported="false"
-            android:label="@string/enter_code_screen_title"
-            android:parentActivityName=".ui.setup.SetupAccountActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.DuckDuckGo.Dark" />
+            android:parentActivityName=".ui.v2.SyncActivity" />
 
         <activity
             android:name=".ui.DeviceUnsupportedActivity"

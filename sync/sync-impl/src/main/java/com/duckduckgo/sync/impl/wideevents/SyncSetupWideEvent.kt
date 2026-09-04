@@ -23,7 +23,6 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator
-import com.duckduckgo.sync.impl.pixels.RealSyncPixels.Companion.UI_VERSION_V1
 import com.duckduckgo.sync.impl.pixels.RealSyncPixels.Companion.UI_VERSION_V2
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_UI_VERSION
 import com.squareup.anvil.annotations.ContributesBinding
@@ -243,12 +242,7 @@ class SyncSetupWideEventImpl @Inject constructor(
         cachedFlowId = null
     }
 
-    private suspend fun uiMetadata(): Map<String, String> = withContext(dispatchers.io()) {
-        buildMap {
-            val version = if (syncFeature.get().useSimplifiedSync().isEnabled()) UI_VERSION_V2 else UI_VERSION_V1
-            put(SYNC_SETUP_UI_VERSION, version)
-        }
-    }
+    private fun uiMetadata(): Map<String, String> = mapOf(SYNC_SETUP_UI_VERSION to UI_VERSION_V2)
 
     private companion object {
         const val FLOW_NAME = "sync-setup"

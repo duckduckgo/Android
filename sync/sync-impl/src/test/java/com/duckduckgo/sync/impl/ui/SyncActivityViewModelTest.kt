@@ -43,7 +43,6 @@ import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncAccountRepository.AuthCode
 import com.duckduckgo.sync.impl.SyncAuthCode
-import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.SyncFeatureToggle
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator
 import com.duckduckgo.sync.impl.autorestore.SyncAutoRestoreManager
@@ -51,7 +50,6 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskEditDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskToCopyRecoveryCode
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroCreateAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroRecoverSyncData
@@ -111,11 +109,6 @@ class SyncActivityViewModelTest {
 
     private val fakeSettingsPageFeature = FakeFeatureToggleFactory.create(SettingsPageFeature::class.java)
 
-    private val syncFeature = FakeFeatureToggleFactory.create(
-        SyncFeature::class.java,
-        ioDispatcher = coroutineTestRule.testDispatcher,
-    )
-
     private val stateFlow = MutableStateFlow(SyncState.READY)
 
     private lateinit var testee: SyncActivityViewModel
@@ -137,7 +130,6 @@ class SyncActivityViewModelTest {
             syncAutoRestoreManager = syncAutoRestoreManager,
             syncAutoRestore = syncAutoRestore,
             appCoroutineScope = coroutineTestRule.testScope,
-            syncFeature = syncFeature,
         )
         whenever(deviceAuthenticator.isAuthenticationRequired()).thenReturn(true)
         whenever(syncStateMonitor.syncState()).thenReturn(emptyFlow())
@@ -145,7 +137,6 @@ class SyncActivityViewModelTest {
         whenever(syncAutoRestoreManager.isAutoRestoreAvailable()).thenReturn(false)
         whenever(syncAutoRestoreManager.isRestoreOnReinstallEnabled()).thenReturn(true)
         whenever(syncAutoRestore.canRestore()).thenReturn(false)
-        syncFeature.updateSyncActivityViewStateAtomically().setRawStoredState(State(true))
     }
 
     @Test
@@ -430,18 +421,6 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenTurnOffClickedThenAskTurnOffCommandShown() = runTest {
-        givenAuthenticatedUser()
-
-        testee.onTurnOffClicked()
-
-        testee.commands().test {
-            awaitItem().assertCommandType(AskTurnOffSync::class)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
     fun whenTurnOffSyncConfirmedThenLogoutLocalDevice() = runTest {
         whenever(syncAccountRepository.getThisConnectedDevice()).thenReturn(connectedDevice)
         whenever(syncAccountRepository.logout(deviceId)).thenReturn(Result.Success(true))
@@ -604,16 +583,6 @@ class SyncActivityViewModelTest {
             testee.onDeleteAccountCancelled()
             val viewState = expectMostRecentItem()
             assertTrue(viewState.showAccount)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenOnRemoveDeviceClickedThenAskRemoveDevice() = runTest {
-        testee.onRemoveDeviceClicked(connectedDevice)
-
-        testee.commands().test {
-            awaitItem().assertCommandType(Command.AskRemoveDevice::class)
             cancelAndIgnoreRemainingEvents()
         }
     }
