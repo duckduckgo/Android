@@ -31,6 +31,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import kotlin.time.Duration.Companion.seconds
 
 class ExchangeV2StateMachineTest {
 
@@ -247,12 +248,30 @@ class ExchangeV2StateMachineTest {
         assertSame(ExchangeV2State.Host.Aborted, machine.currentState)
     }
 
-    @Test fun `when HostSendComplete v2_1 in Host Sending then advances to Host AwaitingStatus`() {
+    @Test fun `when HostSendComplete v2_1 in Host Sending then advances to Host AwaitingStatus and starts the deadline`() {
         val machine = inHostSending()
         val result = machine.localTrigger(LocalTrigger.HostSendComplete(ExchangeProtocolVersion.V2_1))
 
         assertSame(TransitionOutcome.Accepted, result.outcome)
         assertSame(ExchangeV2State.Host.AwaitingStatus, machine.currentState)
+        assertEquals(listOf(SideEffect.AwaitJoinStatus), result.sideEffects)
+    }
+
+    @Test fun `when HostStatusDeadlineElapsed in Host AwaitingStatus then advances to Host Unknown`() {
+        val machine = inHostAwaitingStatus()
+        val result = machine.localTrigger(LocalTrigger.HostStatusDeadlineElapsed(30.seconds))
+
+        assertSame(TransitionOutcome.Accepted, result.outcome)
+        assertSame(ExchangeV2State.Host.Unknown, machine.currentState)
+        assertTrue("expected no side effects, got ${result.sideEffects}", result.sideEffects.isEmpty())
+    }
+
+    @Test fun `when out-of-sequence local trigger in Host AwaitingStatus then aborts to terminal Host Aborted`() {
+        val machine = inHostAwaitingStatus()
+        val result = machine.localTrigger(LocalTrigger.UserConfirmedHost)
+
+        assertTrue(result.outcome is TransitionOutcome.Aborted)
+        assertSame(ExchangeV2State.Host.Aborted, machine.currentState)
     }
 
     @Test fun `when recovery_code_done received in Host AwaitingStatus then transitions to Host Done`() {
@@ -289,6 +308,42 @@ class ExchangeV2StateMachineTest {
 
         assertSame(TransitionOutcome.Dropped, result.outcome)
         assertSame(ExchangeV2State.Host.AwaitingStatus, machine.currentState)
+    }
+
+    @Test fun `when late recovery_code_done received in Host Unknown then transitions to Host Done`() {
+        val machine = inHostUnknown()
+        val done = RecoveryCodeDone.create(RecoveryCodeDone.Reason.Success)
+        val result = machine.receive(done)
+        val transition = result.event as ExchangeV2Event.Transition
+
+        assertSame(TransitionOutcome.Accepted, result.outcome)
+        assertSame(ExchangeV2State.Host.Done, machine.currentState)
+        assertSame(ExchangeV2State.Host.Unknown, transition.from)
+        assertSame(done, transition.trigger)
+    }
+
+    @Test fun `when unexpected message received in Host Unknown then aborts to terminal Host Aborted`() {
+        val machine = inHostUnknown()
+        val result = machine.receive(RecoveryCodeResponse.fromJson("{}"))
+
+        assertTrue(result.outcome is TransitionOutcome.Aborted)
+        assertSame(ExchangeV2State.Host.Aborted, machine.currentState)
+    }
+
+    @Test fun `when unknown message received in Host Unknown then dropped`() {
+        val machine = inHostUnknown()
+        val result = machine.receive(Unknown.fromJson("{}", "future"))
+
+        assertSame(TransitionOutcome.Dropped, result.outcome)
+        assertSame(ExchangeV2State.Host.Unknown, machine.currentState)
+    }
+
+    @Test fun `when local trigger in Host Unknown then aborts to terminal Host Aborted`() {
+        val machine = inHostUnknown()
+        val result = machine.localTrigger(LocalTrigger.HostStatusDeadlineElapsed(30.seconds))
+
+        assertTrue(result.outcome is TransitionOutcome.Aborted)
+        assertSame(ExchangeV2State.Host.Aborted, machine.currentState)
     }
 
     @Test fun `when JoinerJoinComplete success in Joiner Joining then advances to Joiner Done`() {
@@ -335,13 +390,14 @@ class ExchangeV2StateMachineTest {
         assertSame(ExchangeV2State.Joiner.AbortedLocal, machine.currentState)
     }
 
-    @Test fun `when HostSendComplete v2_0 in Host Sending then advances to Host Done`() {
+    @Test fun `when HostSendComplete v2_0 in Host Sending then advances to Host Done without a deadline`() {
         val machine = inHostConfirming()
         machine.localTrigger(LocalTrigger.UserConfirmedHost)
         val result = machine.localTrigger(LocalTrigger.HostSendComplete(ExchangeProtocolVersion.V2_0))
 
         assertSame(TransitionOutcome.Accepted, result.outcome)
         assertSame(ExchangeV2State.Host.Done, machine.currentState)
+        assertTrue("expected no side effects, got ${result.sideEffects}", result.sideEffects.isEmpty())
     }
 
     @Test fun `when wire message received in Host states then aborts to terminal Host Aborted`() {
@@ -668,6 +724,11 @@ class ExchangeV2StateMachineTest {
     private fun inHostAwaitingStatus(): ExchangeV2StateMachine =
         inHostSending().also {
             it.localTrigger(LocalTrigger.HostSendComplete(ExchangeProtocolVersion.V2_1))
+        }
+
+    private fun inHostUnknown(): ExchangeV2StateMachine =
+        inHostAwaitingStatus().also {
+            it.localTrigger(LocalTrigger.HostStatusDeadlineElapsed(30.seconds))
         }
 
     private fun inJoinerJoining(): ExchangeV2StateMachine =

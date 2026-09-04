@@ -33,6 +33,7 @@ import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeConfir
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeDone
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeRequest
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeResponse
+import com.duckduckgo.sync.impl.pixels.SyncPixels.TimeoutStage
 import com.duckduckgo.sync.store.SyncStore
 import com.google.testing.junit.testparameterinjector.TestParameter
 import com.google.testing.junit.testparameterinjector.TestParameterInjector
@@ -65,6 +66,9 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.util.Base64
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 @RunWith(TestParameterInjector::class)
 class RealExchangeV2RunnerTest {
@@ -712,7 +716,7 @@ class RealExchangeV2RunnerTest {
         runner.startPresent()
         assertSame(ExchangeV2State.Bootstrapped, runner.currentState)
 
-        advanceTimeBy(6 * 60 * 1000L) // past the 5-min session deadline
+        advanceTimeBy(6.minutes) // past the 5-min session deadline
 
         val sessionErrors = runner.events.replayCache.filterIsInstance<ExchangeV2Event.SessionError>()
         val timedOut = sessionErrors.singleOrNull { it.message.contains("timed out", ignoreCase = true) }
@@ -737,12 +741,107 @@ class RealExchangeV2RunnerTest {
         runner.localTrigger(LocalTrigger.JoinerJoinComplete(RecoveryCodeDone.Reason.Success))
         assertNull(runner.currentState)
 
-        advanceTimeBy(6 * 60 * 1000L)
+        advanceTimeBy(6.minutes)
 
         val timedOut = runner.events.replayCache
             .filterIsInstance<ExchangeV2Event.SessionError>()
             .any { it.message.contains("timed out", ignoreCase = true) }
         assertFalse("a completed session must not later emit a timeout", timedOut)
+    }
+
+    // ---- Late joiner deadline ----
+
+    @Test fun `Host moves to Host_Unknown when the join status deadline elapses without a report`() = coroutineTestRule.testScope.runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenHostCanProduceRecoveryCode()
+        val runner = newRunner()
+        runner.reachHostAwaitingStatus()
+        assertSame(ExchangeV2State.Host.AwaitingStatus, runner.currentState)
+
+        advanceTimeBy(31.seconds)
+
+        assertSame(ExchangeV2State.Host.Unknown, runner.currentState)
+        verify(channel, never()).deleteChannel(any(), anyOrNull())
+    }
+
+    @Test fun `a late recovery_code_done still lands the Host on the real outcome after the deadline`() = coroutineTestRule.testScope.runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenHostCanProduceRecoveryCode()
+        val runner = newRunner()
+        runner.reachHostAwaitingStatus()
+        advanceTimeBy(31.seconds)
+        assertSame(ExchangeV2State.Host.Unknown, runner.currentState)
+
+        runner.deliverIncomingMessage(RecoveryCodeDone.create(RecoveryCodeDone.Reason.Success))
+
+        val lastTransition = runner.events.replayCache.filterIsInstance<ExchangeV2Event.Transition>().last()
+        assertSame(ExchangeV2State.Host.Done, lastTransition.to)
+        assertNull(runner.currentState)
+    }
+
+    @Test fun `a report arriving before the deadline means Host_Unknown is never entered`() = coroutineTestRule.testScope.runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenHostCanProduceRecoveryCode()
+        val runner = newRunner()
+        runner.reachHostAwaitingStatus()
+
+        runner.deliverIncomingMessage(RecoveryCodeDone.create(RecoveryCodeDone.Reason.Success))
+        advanceTimeBy(31.seconds)
+
+        val enteredUnknown = runner.events.replayCache
+            .filterIsInstance<ExchangeV2Event.Transition>()
+            .any { it.to == ExchangeV2State.Host.Unknown }
+        assertFalse("a reported outcome must not later degrade to Unknown", enteredUnknown)
+    }
+
+    @Test fun `the join status deadline is read from the sync feature settings`() = coroutineTestRule.testScope.runTest {
+        syncFeature.self().setRawStoredState(State(settings = """{"joinStatusDeadlineMs": 60000}"""))
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenHostCanProduceRecoveryCode()
+        val runner = newRunner()
+        runner.reachHostAwaitingStatus()
+
+        advanceTimeBy(31.seconds)
+        assertSame(ExchangeV2State.Host.AwaitingStatus, runner.currentState)
+
+        advanceTimeBy(30.seconds)
+        assertSame(ExchangeV2State.Host.Unknown, runner.currentState)
+    }
+
+    @Test
+    @TestParameters(
+        "{configuredMs: 1000, clampedMs: 5000}",
+        "{configuredMs: 1000000, clampedMs: 120000}",
+    )
+    fun `an out-of-bounds remote deadline is clamped`(configuredMs: Long, clampedMs: Long) = coroutineTestRule.testScope.runTest {
+        syncFeature.self().setRawStoredState(State(settings = """{"joinStatusDeadlineMs": $configuredMs}"""))
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenHostCanProduceRecoveryCode()
+        val runner = newRunner()
+        runner.reachHostAwaitingStatus()
+
+        advanceTimeBy(clampedMs.milliseconds - 100.milliseconds)
+        assertSame(ExchangeV2State.Host.AwaitingStatus, runner.currentState)
+
+        advanceTimeBy(200.milliseconds)
+        assertSame(ExchangeV2State.Host.Unknown, runner.currentState)
+    }
+
+    @Test fun `the session deadline tears down a Host left in Host_Unknown`() = coroutineTestRule.testScope.runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenHostCanProduceRecoveryCode()
+        val runner = newRunner()
+        runner.reachHostAwaitingStatus()
+        advanceTimeBy(31.seconds)
+        assertSame(ExchangeV2State.Host.Unknown, runner.currentState)
+
+        advanceTimeBy(5.minutes)
+
+        assertNull(runner.currentState)
+        val timedOut = runner.events.replayCache
+            .filterIsInstance<ExchangeV2Event.SessionError>()
+            .single { it.kind == SessionErrorKind.SessionTimeout }
+        assertEquals(TimeoutStage.LOGGING_IN, timedOut.timeoutStage)
     }
 
     // ---- Poll-loop error handling ----
@@ -932,6 +1031,13 @@ class RealExchangeV2RunnerTest {
 
     private suspend fun RealExchangeV2Runner.deliverHello(version: ExchangeProtocolVersion) {
         deliverIncomingMessage(Hello.create(channelId = "peer-channel", publicKey = "peer-pubkey", version = version))
+    }
+
+    private suspend fun RealExchangeV2Runner.reachHostAwaitingStatus() {
+        startPresent()
+        deliverHello(ExchangeProtocolVersion.V2_1)
+        deliverIncomingMessage(RecoveryCodeRequest.create(name = "Joiner", kind = "ddg"))
+        localTrigger(LocalTrigger.UserConfirmedHost)
     }
 
     private fun String.toProtocolVersion() = ExchangeProtocolVersion.parse(this).getOrThrow()

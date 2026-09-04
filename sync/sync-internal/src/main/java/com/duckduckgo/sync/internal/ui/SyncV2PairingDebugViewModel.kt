@@ -651,6 +651,7 @@ class SyncV2PairingDebugViewModel @Inject constructor(
         ExchangeV2State.Host.Confirming -> "Host.Confirming"
         ExchangeV2State.Host.Sending -> "Host.Sending"
         ExchangeV2State.Host.AwaitingStatus -> "Host.AwaitingStatus"
+        ExchangeV2State.Host.Unknown -> "Host.Unknown"
         ExchangeV2State.Host.Aborted -> "Host.Aborted"
         ExchangeV2State.Host.Done -> "Host.Done"
         ExchangeV2State.Joiner.Confirming -> "Joiner.Confirming"
@@ -671,6 +672,7 @@ class SyncV2PairingDebugViewModel @Inject constructor(
         is LocalTrigger.JoinerJoinComplete -> "JoinerJoinComplete(${trigger.reason.value})"
         LocalTrigger.HostUnavailable -> "HostUnavailable"
         is LocalTrigger.RoleElected -> "RoleElected(${trigger.role})"
+        is LocalTrigger.HostStatusDeadlineElapsed -> "HostStatusDeadlineElapsed(${trigger.deadline})"
     }
 
     private fun labelFor(reason: RejectReason): String = when (reason) {

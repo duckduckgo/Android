@@ -119,6 +119,17 @@ sealed interface ExchangeV2State {
         data object AwaitingStatus : Host
 
         /**
+         * The status deadline passed without a report. The pairing may well have succeeded, so this
+         * is explicitly not a failure.
+         *
+         * Not terminal either: the session keeps polling, and a late `recovery_code_done` still
+         * promotes this to [Done].
+         *
+         * Since 2.1.
+         */
+        data object Unknown : Host
+
+        /**
          * Terminal. The Host side gave up: our user denied the prompt, no recovery code could be
          * produced, or the peer broke the message sequence.
          *
