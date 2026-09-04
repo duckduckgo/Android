@@ -15,8 +15,8 @@
             {
                 "key": "flow_version",
                 "type": "string",
-                "description": "Which sync setup protocol stack the device is on (v2 when canUseV2ConnectFlow is enabled)",
-                "enum": ["v1", "v2"]
+                "description": "Which sync setup protocol stack the device is on (v2 when canUseV2ConnectFlow is enabled, v2.1 when canUseExchangeV2Point1 is also enabled)",
+                "enum": ["v1", "v2", "v2.1"]
             },
             {
                 "key": "ui_version",
@@ -67,8 +67,8 @@
             {
                 "key": "flow_version",
                 "type": "string",
-                "description": "Which sync setup protocol stack the device is on (v2 when canUseV2ConnectFlow is enabled)",
-                "enum": ["v1", "v2"]
+                "description": "Which sync setup protocol stack the device is on (v2 when canUseV2ConnectFlow is enabled, v2.1 when canUseExchangeV2Point1 is also enabled)",
+                "enum": ["v1", "v2", "v2.1"]
             },
             {
                 "key": "ui_version",
@@ -100,8 +100,8 @@
             {
                 "key": "flow_version",
                 "type": "string",
-                "description": "Which sync setup protocol stack the device is on (v2 when canUseV2ConnectFlow is enabled)",
-                "enum": ["v1", "v2"]
+                "description": "Which sync setup protocol stack the device is on (v2 when canUseV2ConnectFlow is enabled, v2.1 when canUseExchangeV2Point1 is also enabled)",
+                "enum": ["v1", "v2", "v2.1"]
             },
             {
                 "key": "ui_version",
@@ -145,8 +145,8 @@
             {
                 "key": "flow_version",
                 "type": "string",
-                "description": "Which sync setup protocol stack the device is on (v2 when canUseV2ConnectFlow is enabled)",
-                "enum": ["v1", "v2"]
+                "description": "Which sync setup protocol stack the device is on (v2 when canUseV2ConnectFlow is enabled, v2.1 when canUseExchangeV2Point1 is also enabled)",
+                "enum": ["v1", "v2", "v2.1"]
             },
             {
                 "key": "ui_version",
@@ -190,8 +190,8 @@
             {
                 "key": "flow_version",
                 "type": "string",
-                "description": "Which sync setup protocol stack the device is on (v2 when canUseV2ConnectFlow is enabled)",
-                "enum": ["v1", "v2"]
+                "description": "Which sync setup protocol stack the device is on (v2 when canUseV2ConnectFlow is enabled, v2.1 when canUseExchangeV2Point1 is also enabled)",
+                "enum": ["v1", "v2", "v2.1"]
             },
             {
                 "key": "ui_version",
@@ -223,8 +223,8 @@
             {
                 "key": "flow_version",
                 "type": "string",
-                "description": "Which sync setup protocol stack the device is on (v2 when canUseV2ConnectFlow is enabled)",
-                "enum": ["v1", "v2"]
+                "description": "Which sync setup protocol stack the device is on (v2 when canUseV2ConnectFlow is enabled, v2.1 when canUseExchangeV2Point1 is also enabled)",
+                "enum": ["v1", "v2", "v2.1"]
             },
             {
                 "key": "ui_version",
@@ -262,8 +262,8 @@
             {
                 "key": "flow_version",
                 "type": "string",
-                "description": "Which sync setup protocol stack the device is on (v2 when canUseV2ConnectFlow is enabled)",
-                "enum": ["v1", "v2"]
+                "description": "Which sync setup protocol stack the device is on (v2 when canUseV2ConnectFlow is enabled, v2.1 when canUseExchangeV2Point1 is also enabled)",
+                "enum": ["v1", "v2", "v2.1"]
             },
             {
                 "key": "ui_version",
@@ -301,8 +301,8 @@
             {
                 "key": "flow_version",
                 "type": "string",
-                "description": "Which sync setup protocol stack the device is on (v2 when canUseV2ConnectFlow is enabled)",
-                "enum": ["v1", "v2"]
+                "description": "Which sync setup protocol stack the device is on (v2 when canUseV2ConnectFlow is enabled, v2.1 when canUseExchangeV2Point1 is also enabled)",
+                "enum": ["v1", "v2", "v2.1"]
             },
             {
                 "key": "ui_version",
@@ -392,8 +392,8 @@
             {
                 "key": "flow_version",
                 "type": "string",
-                "description": "Which sync setup protocol stack the device is on. Always v2 for this pixel",
-                "enum": ["v1", "v2"]
+                "description": "Which sync setup protocol stack the device is on. Always v2 or v2.1 for this pixel",
+                "enum": ["v1", "v2", "v2.1"]
             },
             {
                 "key": "ui_version",
@@ -449,8 +449,8 @@
             {
                 "key": "flow_version",
                 "type": "string",
-                "description": "Which sync setup protocol stack the device is on (v2 when canUseV2ConnectFlow is enabled)",
-                "enum": ["v1", "v2"]
+                "description": "Which sync setup protocol stack the device is on (v2 when canUseV2ConnectFlow is enabled, v2.1 when canUseExchangeV2Point1 is also enabled)",
+                "enum": ["v1", "v2", "v2.1"]
             },
             {
                 "key": "ui_version",
@@ -463,6 +463,82 @@
                 "type": "string",
                 "description": "This device's credential kind. Always ddg for the native client",
                 "enum": ["ddg", "3party"]
+            }
+        ]
+    },
+    "sync_setup_joiner_recovery_code_done_success": {
+        "description": "The Joiner's join report (recovery_code_done with reason success) was accepted by the relay after a v2.1 pairing, so the Host had a chance to receive it",
+        "owners": ["MiSikora"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "host_has_account",
+                "type": "boolean",
+                "description": "Whether the Host side was already signed in to sync when roles were elected"
+            },
+            {
+                "key": "host_kind",
+                "type": "string",
+                "description": "The Host device's credential kind",
+                "enum": ["ddg", "3party"]
+            },
+            {
+                "key": "joiner_has_account",
+                "type": "boolean",
+                "description": "Whether the Joiner side was already signed in to sync when roles were elected"
+            },
+            {
+                "key": "joiner_kind",
+                "type": "string",
+                "description": "The Joiner device's credential kind. Always ddg from this client, since only the Joiner fires this pixel",
+                "enum": ["ddg", "3party"]
+            },
+            {
+                "key": "protocol_version",
+                "type": "string",
+                "description": "Exchange protocol version negotiated for the session. recovery_code_done exists since 2.1, so never lower",
+                "pattern": "^[0-9]+(\\.[0-9]+)?$",
+                "examples": ["2.1"]
+            }
+        ]
+    },
+    "sync_setup_joiner_recovery_code_done_failed": {
+        "description": "The Joiner's join report (recovery_code_done with a non-success reason such as login_failed or scope_rejected) was accepted by the relay after a v2.1 pairing",
+        "owners": ["MiSikora"],
+        "triggers": ["exception"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "host_has_account",
+                "type": "boolean",
+                "description": "Whether the Host side was already signed in to sync when roles were elected"
+            },
+            {
+                "key": "host_kind",
+                "type": "string",
+                "description": "The Host device's credential kind",
+                "enum": ["ddg", "3party"]
+            },
+            {
+                "key": "joiner_has_account",
+                "type": "boolean",
+                "description": "Whether the Joiner side was already signed in to sync when roles were elected"
+            },
+            {
+                "key": "joiner_kind",
+                "type": "string",
+                "description": "The Joiner device's credential kind. Always ddg from this client, since only the Joiner fires this pixel",
+                "enum": ["ddg", "3party"]
+            },
+            {
+                "key": "protocol_version",
+                "type": "string",
+                "description": "Exchange protocol version negotiated for the session. recovery_code_done exists since 2.1, so never lower",
+                "pattern": "^[0-9]+(\\.[0-9]+)?$",
+                "examples": ["2", "2.1", "3.0"]
             }
         ]
     }
