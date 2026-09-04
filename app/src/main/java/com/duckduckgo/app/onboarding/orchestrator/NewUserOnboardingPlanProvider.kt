@@ -132,7 +132,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
         // A restarted run replays from before the branching step, so a branch persisted by a previous
         // run must not label this run's pre-branch pixels as branched.
-        onboardingPixelSender.clearBranchSelection()
+        onboardingPixelSender.clearFlowAttribution()
 
         return if (customAiOnboardingResolver.resolve()) {
             // in custom AI onboarding path, the input toggle is enabled by default
@@ -281,6 +281,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         onCompleted: suspend () -> Unit,
         onSkipped: suspend () -> Unit,
     ): LinearOnboardingPlan {
+        onboardingPixelSender.segmentedFlowStarted()
         val firstDialog = SuspendMemo { FirstDialog.INITIAL }
         val modelProviderChoice = singleChoiceDataPlugin(OnboardingSingleChoiceDataPlugin.Id.DuckAiModelProvider)
         val togglePositionChoice = singleChoiceDataPlugin(OnboardingSingleChoiceDataPlugin.Id.DuckAiNewTabTogglePosition)
@@ -534,9 +535,10 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         togglePositionChoice: OnboardingSingleChoiceDataPlugin?,
         duckAiStateChoice: OnboardingSingleChoiceDataPlugin?,
     ): NewUserOnboardingActivityStep {
+        val pixelName = OnboardingPixelName.ONBOARDING_DOWNLOAD_CHOICE
         return NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.DOWNLOAD_REASON,
-            pixelName = null,
+            pixelName = pixelName,
             resolveDialog = { NewUserOnboardingActivityDialog.DownloadReason },
             transition = { event ->
                 when {
@@ -549,6 +551,9 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                             }
                             DownloadReasonSelection.SEARCH
                         }
+
+                        onboardingPixelSender.fire(pixelName, OnboardingPixelAction.DownloadReasonClicked(selection))
+                        onboardingPixelSender.downloadReasonSelected(selection)
 
                         when (selection) {
                             DownloadReasonSelection.SEARCH -> SwitchTo(segmentedSearchPlan(ctx))
@@ -573,6 +578,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 defaultBrowserPromptStep(),
                 preferenceSelectorStep(
                     ctx = ctx,
+                    pixelName = OnboardingPixelName.ONBOARDING_PREFERENCES_SERP,
                     titleRes = R.string.searchPathPreferenceSelectorTitle,
                     listOf(
                         OnboardingPreference.SEARCH_HISTORY,
@@ -628,6 +634,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 defaultBrowserPromptStep(),
                 preferenceSelectorStep(
                     ctx = ctx,
+                    pixelName = OnboardingPixelName.ONBOARDING_PREFERENCES_AI_SEARCH,
                     titleRes = R.string.noAiPathPreferenceSelectorTitle,
                     listOf(
                         OnboardingPreference.SEARCH_ASSIST,
@@ -651,6 +658,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 defaultBrowserPromptStep(),
                 preferenceSelectorStep(
                     ctx = ctx,
+                    pixelName = OnboardingPixelName.ONBOARDING_PREFERENCES_AD_BLOCKING,
                     titleRes = R.string.blockAdsPathPreferenceSelectorTitle,
                     listOf(
                         OnboardingPreference.BLOCK_ADS,
@@ -676,6 +684,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
     private fun preferenceSelectorStep(
         ctx: NewUserOnboardingPlanContext,
+        pixelName: OnboardingPixelName,
         @StringRes titleRes: Int,
         offered: List<OnboardingPreference>,
         @StringRes caption: Int? = null,
@@ -685,7 +694,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         val rows = SuspendMemo { onboardingPreferenceCatalog.offer(offered) }
         return NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.PREFERENCE_SELECTOR,
-            pixelName = null,
+            pixelName = pixelName,
             indicator = StepIndicatorMode.COUNTED,
             precondition = { rows().isNotEmpty() },
             resolveDialog = {
@@ -698,6 +707,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             transition = { event ->
                 when (event) {
                     is NewUserOnboardingEvent.PreferenceSelectorConfirmed -> {
+                        onboardingPixelSender.fire(pixelName, OnboardingPixelAction.PreferencesClicked(event.selections))
                         // Committed only once the run ends, so preferences a path seeds its own way don't
                         // survive a process death into the path a restarted onboarding takes.
                         ctx.onFinish { onboardingPreferenceCatalog.apply(event.selections) }
@@ -714,10 +724,11 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         singleChoiceDataPlugins.getPlugins().firstOrNull { it.id == id }
 
     private fun modelProviderStep(plugin: OnboardingSingleChoiceDataPlugin?): NewUserOnboardingActivityStep {
+        val pixelName = OnboardingPixelName.ONBOARDING_PREFERENCES_AI_MODEL
         val options = SuspendMemo { plugin?.options().orEmpty() }
         return NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.MODEL_PROVIDER,
-            pixelName = null,
+            pixelName = pixelName,
             indicator = StepIndicatorMode.COUNTED,
             precondition = { options().size > 1 },
             resolveDialog = {
@@ -731,6 +742,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 when (event) {
                     is NewUserOnboardingEvent.SingleChoiceConfirmed -> {
                         logcat { "Model provider confirmed: ${event.option.id}" }
+                        onboardingPixelSender.fire(pixelName, OnboardingPixelAction.SingleChoiceClicked(event.option.id))
                         plugin?.apply(event.option)
                         Advance
                     }
@@ -742,10 +754,11 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     }
 
     private fun togglePositionStep(plugin: OnboardingSingleChoiceDataPlugin?): NewUserOnboardingActivityStep {
+        val pixelName = OnboardingPixelName.ONBOARDING_PREFERENCES_AI_TOGGLE_MODE
         val options = SuspendMemo { plugin?.options().orEmpty() }
         return NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.TOGGLE_POSITION,
-            pixelName = null,
+            pixelName = pixelName,
             indicator = StepIndicatorMode.COUNTED,
             precondition = { options().size > 1 },
             resolveDialog = { NewUserOnboardingActivityDialog.TogglePosition(options()) },
@@ -753,6 +766,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 when (event) {
                     is NewUserOnboardingEvent.SingleChoiceConfirmed -> {
                         logcat { "Toggle position confirmed: ${event.option.id}" }
+                        onboardingPixelSender.fire(pixelName, OnboardingPixelAction.SingleChoiceClicked(event.option.id))
                         plugin?.apply(event.option)
                         Advance
                     }
@@ -767,10 +781,11 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         ctx: NewUserOnboardingPlanContext,
         plugin: OnboardingSingleChoiceDataPlugin?,
     ): NewUserOnboardingActivityStep {
+        val pixelName = OnboardingPixelName.ONBOARDING_PREFERENCES_DUCK_AI
         val options = SuspendMemo { plugin?.options().orEmpty() }
         return NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.DUCK_AI_STATE,
-            pixelName = null,
+            pixelName = pixelName,
             indicator = StepIndicatorMode.COUNTED,
             precondition = { options().size > 1 },
             resolveDialog = { NewUserOnboardingActivityDialog.DuckAiState(options()) },
@@ -778,6 +793,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 when (event) {
                     is NewUserOnboardingEvent.SingleChoiceConfirmed -> {
                         logcat { "Duck.ai state confirmed: ${event.option.id}" }
+                        onboardingPixelSender.fire(pixelName, OnboardingPixelAction.SingleChoiceClicked(event.option.id))
                         // Committed only once the run ends, so a pick abandoned by a process death doesn't
                         // leak into the path a restarted onboarding takes.
                         ctx.onFinish { plugin?.apply(event.option) }

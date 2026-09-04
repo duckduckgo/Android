@@ -15,11 +15,53 @@
         "description": "The Unified Input surface the pixel was fired from, distinguishing the contextual chat sheet from the Duck.ai tab and the address bar",
         "enum": ["address_bar", "duck_ai", "contextual_chat"]
     },
+    "onboardingFlow": {
+        "key": "flow",
+        "type": "string",
+        "description": "Onboarding flow type",
+        "enum": ["default", "duckai", "tailored_by_download_reason"]
+    },
+    "onboardingEvent": {
+        "key": "event",
+        "type": "string",
+        "description": "Event type for the onboarding instrumentation standard",
+        "enum": ["shown", "clicked"]
+    },
+    "onboardingEventWithConfirmed": {
+        "key": "event",
+        "type": "string",
+        "description": "Event type for the onboarding instrumentation standard, for steps whose outcome is resolved outside the app (an OS prompt or an external flow) and reported as a separate confirmed event",
+        "enum": ["shown", "clicked", "confirmed"]
+    },
+    "onboardingInstallType": {
+        "key": "installType",
+        "type": "string",
+        "description": "Install type",
+        "enum": ["new", "reinstall"]
+    },
+    "onboardingDaysSinceInstall": {
+        "key": "daysSinceInstall",
+        "type": "string",
+        "description": "Days since install, bucketed.",
+        "enum": ["0", "1-3", "4-10", "11-28", "28+"]
+    },
+    "onboardingPixelSource": {
+        "key": "pixelSource",
+        "type": "string",
+        "description": "Device form factor",
+        "enum": ["phone", "tablet"]
+    },
     "inputPreviewAction": {
         "key": "variant",
         "type": "string",
         "description": "Onboarding Duck.ai search/chat branch, chosen at the input-screen preview step. Set on every onboarding pixel fired after the user passes that step; absent for pixels fired before it or for users who never see it.",
         "enum": ["search_plus_duckai-search", "search_plus_duckai-chat"]
+    },
+    "onboardingSegmentedVariant": {
+        "key": "variant_segmented",
+        "type": "string",
+        "description": "Download reason picked on the download-choice screen of the segmented onboarding flow. Set on every onboarding pixel fired after that screen; absent for pixels fired before it and for flows that never show it. Independent of the search/chat branch reported by `variant`, since a run can make both choices.",
+        "enum": ["download_reason_search", "download_reason_ai-chat", "download_reason_no-ai", "download_reason_ad-blocking"]
     },
     "contextualSuggestionsPageType": {
         "key": "pageType",

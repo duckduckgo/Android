@@ -3922,7 +3922,7 @@ class BrowserTabViewModel @Inject constructor(
     fun onUserClickCtaSecondaryButton(cta: Cta) {
         releaseAddWidgetModalSlot(cta)
         viewModelScope.launch {
-            ctaViewModel.onUserDismissedCta(cta)
+            ctaViewModel.onUserDismissedCta(cta, viaSkipBtn = true)
             if (cta is BrokenSitePromptDialogCta) {
                 onBrokenSiteCtaDismissButtonClicked(cta)
             }
@@ -5524,7 +5524,7 @@ class BrowserTabViewModel @Inject constructor(
                 refresh()
             }
             is DaxEndBrandDesignUpdateBubbleCta -> {
-                if (cta.segmentedPath == SegmentedOnboardingPath.SEARCH) {
+                if (cta.segmentedPathWithAiInput == SegmentedOnboardingPath.SEARCH) {
                     viewModelScope.launch {
                         ctaViewState.value = currentCtaViewState().copy(cta = null)
                         command.value = HideOnboardingDaxBubbleCta(cta)

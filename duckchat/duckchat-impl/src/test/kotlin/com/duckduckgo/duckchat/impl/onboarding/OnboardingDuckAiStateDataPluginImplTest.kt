@@ -49,7 +49,7 @@ class OnboardingDuckAiStateDataPluginImplTest {
     /** The ids are the pixel values for the step, so they are pinned here rather than left to follow a rename. */
     @Test
     fun `when options offered then their ids are the shipped ones`() = runTest {
-        assertEquals(listOf("duck_ai_on", "duck_ai_off"), testee.options().map { it.id })
+        assertEquals(listOf("on", "off"), testee.options().map { it.id })
     }
 
     @Test
@@ -75,7 +75,7 @@ class OnboardingDuckAiStateDataPluginImplTest {
     fun `when an option from another plugin is applied then nothing is written`() = runTest {
         testee.apply(
             object : Option {
-                override val id: String = "duck_ai_on"
+                override val id: String = "on"
                 override val label: String = "Turn Duck.ai On"
                 override val iconRes: Int? = null
             },

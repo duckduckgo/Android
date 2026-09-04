@@ -20,11 +20,19 @@ import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
+import com.duckduckgo.app.onboarding.OnboardingPreference
 import com.duckduckgo.app.onboarding.orchestrator.PasswordImportOutcome
+import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_ADDRESS_BAR_POSITION
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_AI_INTRO
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_DOWNLOAD_CHOICE
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_END
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_NOTIFICATIONS
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_PASSWORD_IMPORT
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_PREFERENCES_AD_BLOCKING
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_PREFERENCES_AI_MODEL
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_PREFERENCES_AI_SEARCH
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_PREFERENCES_SERP
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_QUICK_SETUP
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SEARCH
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SEARCH_CHAT_TOGGLE
@@ -553,7 +561,7 @@ class RealOnboardingPixelSenderTest {
         )
         variantTestee.chatBranchSelected()
 
-        variantTestee.clearBranchSelection()
+        variantTestee.clearFlowAttribution()
         variantTestee.fire(ONBOARDING_AI_INTRO, OnboardingPixelAction.Shown)
 
         verify(mockPixel).fire(
@@ -933,6 +941,280 @@ class RealOnboardingPixelSenderTest {
                 "value" to "error",
             ),
             type = Unique(tag = "onboarding_password-import_confirmed_error"),
+        )
+    }
+
+    @Test
+    fun whenSegmentedFlowStartedThenFlowParamIsTailoredByDownloadReason() = runTest {
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
+
+        testee.segmentedFlowStarted()
+        testee.fire(ONBOARDING_DOWNLOAD_CHOICE, OnboardingPixelAction.Shown)
+
+        verify(mockPixel).fire(
+            ONBOARDING_DOWNLOAD_CHOICE,
+            mapOf(
+                "installType" to "new",
+                "flow" to "tailored_by_download_reason",
+                "pixelSource" to "phone",
+                "daysSinceInstall" to "0",
+                "event" to "shown",
+            ),
+            type = Unique(tag = "onboarding_download-choice_shown"),
+        )
+    }
+
+    @Test
+    fun whenSegmentedFlowStartedThenItWinsOverTheCustomAiFlow() = runTest {
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
+        whenever(mockCustomAiOnboardingStore.isEnabled()).thenReturn(true)
+
+        testee.segmentedFlowStarted()
+        testee.fire(ONBOARDING_WELCOME, OnboardingPixelAction.Shown)
+
+        verify(mockPixel).fire(
+            ONBOARDING_WELCOME,
+            mapOf(
+                "installType" to "new",
+                "flow" to "tailored_by_download_reason",
+                "pixelSource" to "phone",
+                "daysSinceInstall" to "0",
+                "event" to "shown",
+            ),
+            type = Unique(tag = "onboarding_welcome_shown"),
+        )
+    }
+
+    @Test
+    fun whenDownloadReasonSelectedThenSegmentedVariantParamIsThatReason() = runTest {
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
+
+        testee.downloadReasonSelected(DownloadReasonSelection.AI_CHAT)
+        testee.fire(ONBOARDING_SET_DEFAULT, OnboardingPixelAction.Shown)
+
+        verify(mockPixel).fire(
+            ONBOARDING_SET_DEFAULT,
+            mapOf(
+                "installType" to "new",
+                "flow" to "default",
+                "variant_segmented" to "download_reason_ai-chat",
+                "pixelSource" to "phone",
+                "daysSinceInstall" to "0",
+                "event" to "shown",
+            ),
+            type = Unique(tag = "onboarding_set-default_shown"),
+        )
+    }
+
+    @Test
+    fun whenBothDownloadReasonAndBranchSelectedThenEachGetsItsOwnParam() = runTest {
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
+
+        testee.downloadReasonSelected(DownloadReasonSelection.BLOCK_ADS)
+        testee.chatBranchSelected()
+        testee.fire(ONBOARDING_END, OnboardingPixelAction.Shown)
+
+        verify(mockPixel).fire(
+            ONBOARDING_END,
+            mapOf(
+                "installType" to "new",
+                "flow" to "default",
+                "variant" to "search_plus_duckai-chat",
+                "variant_segmented" to "download_reason_ad-blocking",
+                "pixelSource" to "phone",
+                "daysSinceInstall" to "0",
+                "event" to "shown",
+            ),
+            type = Unique(tag = "onboarding_end_shown"),
+        )
+    }
+
+    @Test
+    fun whenOnlyTheBranchIsSelectedThenSegmentedVariantIsAbsent() = runTest {
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
+
+        testee.searchBranchSelected()
+        testee.fire(ONBOARDING_END, OnboardingPixelAction.Shown)
+
+        verify(mockPixel).fire(
+            ONBOARDING_END,
+            mapOf(
+                "installType" to "new",
+                "flow" to "default",
+                "variant" to "search_plus_duckai-search",
+                "pixelSource" to "phone",
+                "daysSinceInstall" to "0",
+                "event" to "shown",
+            ),
+            type = Unique(tag = "onboarding_end_shown"),
+        )
+    }
+
+    @Test
+    fun whenFlowAttributionClearedThenSegmentedFlowAndReasonAreBothDropped() = runTest {
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
+
+        testee.segmentedFlowStarted()
+        testee.downloadReasonSelected(DownloadReasonSelection.SEARCH)
+        testee.clearFlowAttribution()
+        testee.fire(ONBOARDING_WELCOME, OnboardingPixelAction.Shown)
+
+        verify(mockPixel).fire(
+            ONBOARDING_WELCOME,
+            mapOf("installType" to "new", "flow" to "default", "pixelSource" to "phone", "daysSinceInstall" to "0", "event" to "shown"),
+            type = Unique(tag = "onboarding_welcome_shown"),
+        )
+    }
+
+    @Test
+    fun whenFireDownloadReasonClickedThenValueIsTheReasonToken() = runTest {
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
+
+        testee.fire(ONBOARDING_DOWNLOAD_CHOICE, OnboardingPixelAction.DownloadReasonClicked(DownloadReasonSelection.NO_AI))
+
+        verify(mockPixel).fire(
+            ONBOARDING_DOWNLOAD_CHOICE,
+            mapOf(
+                "installType" to "new",
+                "flow" to "default",
+                "pixelSource" to "phone",
+                "daysSinceInstall" to "0",
+                "event" to "clicked",
+                "value" to "no-ai",
+            ),
+            type = Unique(tag = "onboarding_download-choice_clicked_no-ai"),
+        )
+    }
+
+    /** The reason is persisted as the choice is confirmed, so the step's own clicked pixel already carries it. */
+    @Test
+    fun whenFireDownloadReasonClickedAfterTheReasonIsPersistedThenTheSegmentedVariantIsAlsoSent() = runTest {
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
+
+        testee.downloadReasonSelected(DownloadReasonSelection.NO_AI)
+        testee.fire(ONBOARDING_DOWNLOAD_CHOICE, OnboardingPixelAction.DownloadReasonClicked(DownloadReasonSelection.NO_AI))
+
+        verify(mockPixel).fire(
+            ONBOARDING_DOWNLOAD_CHOICE,
+            mapOf(
+                "installType" to "new",
+                "flow" to "default",
+                "variant_segmented" to "download_reason_no-ai",
+                "pixelSource" to "phone",
+                "daysSinceInstall" to "0",
+                "event" to "clicked",
+                "value" to "no-ai",
+            ),
+            type = Unique(tag = "onboarding_download-choice_clicked_no-ai"),
+        )
+    }
+
+    @Test
+    fun whenFireSerpPreferencesClickedThenEachToggleIsItsOwnParam() = runTest {
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
+
+        testee.fire(
+            ONBOARDING_PREFERENCES_SERP,
+            OnboardingPixelAction.PreferencesClicked(
+                mapOf(
+                    OnboardingPreference.SEARCH_HISTORY to true,
+                    OnboardingPreference.SAFE_SEARCH to false,
+                ),
+            ),
+        )
+
+        verify(mockPixel).fire(
+            ONBOARDING_PREFERENCES_SERP,
+            mapOf(
+                "installType" to "new",
+                "flow" to "default",
+                "pixelSource" to "phone",
+                "daysSinceInstall" to "0",
+                "event" to "clicked",
+                "recently_visited_sites_enabled" to "true",
+                "safe_search_enabled" to "false",
+            ),
+            type = Unique(tag = "onboarding_preferences_serp_clicked"),
+        )
+    }
+
+    @Test
+    fun whenFireAiSearchPreferencesClickedThenHideAiImagesIsInvertedIntoImagesEnabled() = runTest {
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
+
+        testee.fire(
+            ONBOARDING_PREFERENCES_AI_SEARCH,
+            OnboardingPixelAction.PreferencesClicked(
+                mapOf(
+                    OnboardingPreference.SEARCH_ASSIST to true,
+                    OnboardingPreference.HIDE_AI_GENERATED_IMAGES to true,
+                ),
+            ),
+        )
+
+        verify(mockPixel).fire(
+            ONBOARDING_PREFERENCES_AI_SEARCH,
+            mapOf(
+                "installType" to "new",
+                "flow" to "default",
+                "pixelSource" to "phone",
+                "daysSinceInstall" to "0",
+                "event" to "clicked",
+                "search_assist_enabled" to "true",
+                "ai_generated_images_enabled" to "false",
+            ),
+            type = Unique(tag = "onboarding_preferences_ai-search_clicked"),
+        )
+    }
+
+    @Test
+    fun whenFireAdBlockingPreferencesClickedThenAllThreeTogglesAreSent() = runTest {
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
+
+        testee.fire(
+            ONBOARDING_PREFERENCES_AD_BLOCKING,
+            OnboardingPixelAction.PreferencesClicked(
+                mapOf(
+                    OnboardingPreference.BLOCK_ADS to true,
+                    OnboardingPreference.REJECT_OPTIONAL_COOKIES to true,
+                    OnboardingPreference.ACCEPT_NON_OPT_OUT_COOKIES to false,
+                ),
+            ),
+        )
+
+        verify(mockPixel).fire(
+            ONBOARDING_PREFERENCES_AD_BLOCKING,
+            mapOf(
+                "installType" to "new",
+                "flow" to "default",
+                "pixelSource" to "phone",
+                "daysSinceInstall" to "0",
+                "event" to "clicked",
+                "youtube_ad_blocking_enabled" to "true",
+                "cookie_popup_protection_enabled" to "true",
+                "popups_without_optouts_enabled" to "false",
+            ),
+            type = Unique(tag = "onboarding_preferences_ad-blocking_clicked"),
+        )
+    }
+
+    @Test
+    fun whenFireSingleChoiceClickedThenValueIsTheOptionIdVerbatim() = runTest {
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
+
+        testee.fire(ONBOARDING_PREFERENCES_AI_MODEL, OnboardingPixelAction.SingleChoiceClicked("anthropic"))
+
+        verify(mockPixel).fire(
+            ONBOARDING_PREFERENCES_AI_MODEL,
+            mapOf(
+                "installType" to "new",
+                "flow" to "default",
+                "pixelSource" to "phone",
+                "daysSinceInstall" to "0",
+                "event" to "clicked",
+                "value" to "anthropic",
+            ),
+            type = Unique(tag = "onboarding_preferences_ai-model_clicked_anthropic"),
         )
     }
 }

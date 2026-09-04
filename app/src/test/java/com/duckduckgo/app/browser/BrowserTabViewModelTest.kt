@@ -4173,7 +4173,7 @@ class BrowserTabViewModelTest {
         onboardingImprovementsEnabled = true,
         onboardingImprovementsV2Enabled = true,
         isOmnibarBottom = false,
-        segmentedPath = segmentedPath,
+        segmentedPathWithAiInput = segmentedPath,
     )
 
     @Test
