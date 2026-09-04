@@ -39,8 +39,9 @@ import javax.inject.Inject
 interface ThirdPartyDeviceListDecryptor {
     /**
      * @param thisDeviceId this device's sync id, used to report back whether our own `device_info` resolved
+     * @param publishSnapshot [DeviceInfoPublishWatcher.snapshot] taken before [entries] were fetched, so a read that raced our first write isn't reported as a missing blob
      */
-    fun decryptAll(entries: List<DeviceV2>, thisDeviceId: String?): DecryptAllResult
+    fun decryptAll(entries: List<DeviceV2>, thisDeviceId: String?, publishSnapshot: Int): DecryptAllResult
 
     companion object {
         const val FALLBACK_TYPE_3PARTY = "Browser"
@@ -83,9 +84,10 @@ class RealThirdPartyDeviceListDecryptor @Inject constructor(
     private val deviceInfoDecryptor: DeviceInfoDecryptor,
     private val syncFeature: SyncFeature,
     private val syncStore: SyncStore,
+    private val deviceInfoPublishWatcher: DeviceInfoPublishWatcher,
 ) : ThirdPartyDeviceListDecryptor {
 
-    override fun decryptAll(entries: List<DeviceV2>, thisDeviceId: String?): DecryptAllResult {
+    override fun decryptAll(entries: List<DeviceV2>, thisDeviceId: String?, publishSnapshot: Int): DecryptAllResult {
         if (entries.isEmpty()) return DecryptAllResult(emptyList(), emptyList())
 
         val readEnabled = syncFeature.canReadUnifiedDeviceList().isEnabled()
@@ -102,7 +104,7 @@ class RealThirdPartyDeviceListDecryptor @Inject constructor(
         }
 
         val ownDeviceReadOutcome = session?.let {
-            ownDeviceReadOutcome(entries, thisDeviceId, viaDeviceInfo.resolved, legacy, viaDeviceInfo.failedDecryptIds)
+            ownDeviceReadOutcome(entries, thisDeviceId, viaDeviceInfo.resolved, legacy, viaDeviceInfo.failedDecryptIds, publishSnapshot)
         }
         val credentialsById = otherRowCredentialsById(entries, excludingDeviceId = thisDeviceId)
 
@@ -168,14 +170,17 @@ class RealThirdPartyDeviceListDecryptor @Inject constructor(
         viaDeviceInfo: List<DecryptedDevice>,
         legacy: LegacyDecryptResult,
         failedDeviceInfoIds: Set<String>,
+        publishSnapshot: Int,
     ): OwnDeviceReadOutcome? {
         val ownDeviceId = thisDeviceId ?: return null
         val ownEntry = entries.firstOrNull { it.deviceId == ownDeviceId } ?: return null
         if (viaDeviceInfo.any { it.deviceId == ownDeviceId }) return OwnDeviceReadOutcome.ResolvedDeviceInfo
 
+        val publishedDuringFetch = deviceInfoPublishWatcher.publishedSince(publishSnapshot)
         val reason = when {
             ownEntry.deviceId in failedDeviceInfoIds -> DeviceInfoReadFailureReason.BLOB_DECRYPT_FAILED
-            syncStore.unifiedDeviceListMigratedForUserId == syncStore.userId -> DeviceInfoReadFailureReason.BLOB_ABSENT
+            syncStore.unifiedDeviceListMigratedForUserId == syncStore.userId && !publishedDuringFetch ->
+                DeviceInfoReadFailureReason.BLOB_ABSENT
             else -> DeviceInfoReadFailureReason.NOT_PUBLISHED_YET
         }
         return if (legacy.viaLegacy.any { it.deviceId == ownDeviceId }) {

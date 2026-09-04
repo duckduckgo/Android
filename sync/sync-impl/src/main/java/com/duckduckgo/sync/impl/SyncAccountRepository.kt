@@ -179,6 +179,7 @@ class AppSyncAccountRepository @Inject constructor(
     private val loginDeviceInfoWriter: LoginDeviceInfoWriter,
     private val signupAccountInfoBuilder: SignupAccountInfoBuilder,
     private val deviceInfoUpdater: DeviceInfoUpdater,
+    private val deviceInfoPublishWatcher: DeviceInfoPublishWatcher,
 ) : SyncAccountRepository {
 
     // Bounded backoff for the 3party→ddg upgrade network calls.
@@ -981,24 +982,27 @@ class AppSyncAccountRepository @Inject constructor(
     private fun getConnectedDevicesV2(
         token: String,
         primaryKey: String,
-    ): Result<List<ConnectedDevice>> = when (val result = syncApi.getDevices(token)) {
-        is Error -> {
-            connectedDevicesCached.clear()
-            result.alsoFireAccountErrorPixel().copy(code = GENERIC_ERROR.code)
-        }
-        is Success -> {
-            val entriesV2 = result.data.entriesV2
-            val devices = if (entriesV2 != null) {
-                val decryptResult = thirdPartyDeviceListDecryptor.decryptAll(entriesV2, syncStore.deviceId)
-                logoutFailedV2Devices(decryptResult.undecryptable)
-                fireUnifiedDeviceListReadPixels(decryptResult)
-                if (decryptResult.thisDeviceInfoNeedsRepair) republishThisDeviceInfo()
-                decryptResult.decrypted.map { it.toConnectedDevice() }
-            } else {
-                // entries_v2 missing
-                decryptLegacyEntries(result.data.entries, primaryKey)
+    ): Result<List<ConnectedDevice>> {
+        val publishSnapshot = deviceInfoPublishWatcher.snapshot()
+        return when (val result = syncApi.getDevices(token)) {
+            is Error -> {
+                connectedDevicesCached.clear()
+                result.alsoFireAccountErrorPixel().copy(code = GENERIC_ERROR.code)
             }
-            finishWith(devices)
+            is Success -> {
+                val entriesV2 = result.data.entriesV2
+                val devices = if (entriesV2 != null) {
+                    val decryptResult = thirdPartyDeviceListDecryptor.decryptAll(entriesV2, syncStore.deviceId, publishSnapshot)
+                    logoutFailedV2Devices(decryptResult.undecryptable)
+                    fireUnifiedDeviceListReadPixels(decryptResult)
+                    if (decryptResult.thisDeviceInfoNeedsRepair) republishThisDeviceInfo()
+                    decryptResult.decrypted.map { it.toConnectedDevice() }
+                } else {
+                    // entries_v2 missing
+                    decryptLegacyEntries(result.data.entries, primaryKey)
+                }
+                finishWith(devices)
+            }
         }
     }
 
