@@ -28,7 +28,6 @@ import androidx.transition.ChangeBounds
 import androidx.transition.Transition
 import androidx.transition.TransitionListenerAdapter
 import androidx.transition.TransitionManager
-import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentOnboardingWelcomePageUpdateBinding
 import com.duckduckgo.app.onboarding.ui.page.configdriven.CtaConfig
 import com.duckduckgo.common.ui.view.button.DaxButton
@@ -136,11 +135,7 @@ class CardStageImpl(private val binding: ContentOnboardingWelcomePageUpdateBindi
     override fun beginBoundsTransition(durationMs: Long) {
         // A view that has never been laid out has zero bounds, which the transition would tween the card out of.
         if (!morphScene.isLaidOut) return
-        val transition = ChangeBounds().apply {
-            duration = durationMs
-            excludeTarget(R.id.inputText, true)
-        }
-        TransitionManager.beginDelayedTransition(morphScene, transition)
+        TransitionManager.beginDelayedTransition(morphScene, ChangeBounds().setDuration(durationMs))
     }
 
     override fun showCtaButtons(
