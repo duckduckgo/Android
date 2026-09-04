@@ -218,6 +218,19 @@ class RealSyncPixelsTest {
     }
 
     @Test
+    fun `when scanner camera permission state is reported then the pixel is fired`() {
+        testee.fireScannerCameraPermissionState(beforeRequesting = false, afterRequesting = true)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SCANNER_CAMERA_PERMISSION_STATE,
+            mapOf(
+                SyncPixelParameters.SYNC_SCANNER_CAMERA_PERMISSION_BEFORE_REQUESTING to "false",
+                SyncPixelParameters.SYNC_SCANNER_CAMERA_PERMISSION_AFTER_REQUESTING to "true",
+            ),
+        )
+    }
+
+    @Test
     fun `when manual code entry screen is shown the pixel is fired`(
         @TestParameter protocol: ProtocolVersion,
         @TestParameter screenType: ScreenType,
