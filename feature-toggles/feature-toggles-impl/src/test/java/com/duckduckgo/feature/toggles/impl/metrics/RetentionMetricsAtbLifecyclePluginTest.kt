@@ -23,6 +23,9 @@ import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureToggles
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
+import com.duckduckgo.feature.toggles.api.Toggle.DefaultValue
+import com.duckduckgo.feature.toggles.api.Toggle.Experiment
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.feature.toggles.codegen.TestTriggerFeature
 import com.duckduckgo.feature.toggles.impl.RealFeatureTogglesInventory
@@ -44,6 +47,7 @@ class RetentionMetricsAtbLifecyclePluginTest {
 
     private val fakeMetricsPixelExtension = FakeMetricsPixelExtension()
     private lateinit var testFeature: TestTriggerFeature
+    private lateinit var excludedExperimentFeature: ExcludedExperimentFeature
     private lateinit var inventory: FeatureTogglesInventory
     private lateinit var searchMetricPixelsPlugin: SearchMetricPixelsPlugin
     private lateinit var appUseMetricPixelsPlugin: AppUseMetricPixelsPlugin
@@ -57,12 +61,18 @@ class RetentionMetricsAtbLifecyclePluginTest {
             featureName = "testFeature",
         ).build().create(TestTriggerFeature::class.java)
 
+        excludedExperimentFeature = FeatureToggles.Builder(
+            FakeToggleStore(),
+            featureName = "testFeature",
+        ).build().create(ExcludedExperimentFeature::class.java)
+
         inventory = RealFeatureTogglesInventory(
             setOf(
                 FakeFeatureTogglesInventory(
                     features = listOf(
                         testFeature.experimentFooFeature(),
                         testFeature.fooFeature(),
+                        excludedExperimentFeature.addToDockAndWidgetExperimentJul25(),
                     ),
                 ),
             ),
@@ -80,7 +90,6 @@ class RetentionMetricsAtbLifecyclePluginTest {
             appUseMetricPixelsPlugin = appUseMetricPixelsPlugin,
             duckAiPromptSentMetricPixelsPlugin = duckAiPromptSentMetricPixelsPlugin,
             appCoroutineScope = coroutineRule.testScope,
-            experimentsExcludedFromDuckAiSearchMetric = setOf("experimentFooFeature"),
         )
     }
 
@@ -258,6 +267,14 @@ class RetentionMetricsAtbLifecyclePluginTest {
                 assignedCohort = cohort,
             ),
         )
+        excludedExperimentFeature.addToDockAndWidgetExperimentJul25().setRawStoredState(
+            State(
+                remoteEnableState = true,
+                enable = true,
+                cohorts = listOf(cohort),
+                assignedCohort = cohort,
+            ),
+        )
     }
 
     @Test
@@ -271,7 +288,7 @@ class RetentionMetricsAtbLifecyclePluginTest {
     }
 
     @Test
-    fun `when duck ai atb refreshed then excluded experiments get no search metrics`() = runTest {
+    fun `when duck ai atb refreshed then addToDockAndWidgetExperimentJul25 gets no search metric`() = runTest {
         setCohorts(ZonedDateTime.now(ZoneId.of("America/New_York")).toString())
 
         atbLifecyclePlugin.onDuckAiRetentionAtbRefreshed("", "", emptyMap())
@@ -280,20 +297,27 @@ class RetentionMetricsAtbLifecyclePluginTest {
             .filter { it.metric == "search" }
             .map { it.toggle.featureName().name }
             .toSet()
-        assertEquals(setOf("fooFeature"), searchMetricToggles)
+        assertEquals(setOf("experimentFooFeature", "fooFeature"), searchMetricToggles)
     }
 
     @Test
-    fun `when search atb refreshed then excluded experiments still get search metrics`() = runTest {
+    fun `when search atb refreshed then addToDockAndWidgetExperimentJul25 still gets a search metric`() = runTest {
         setCohorts(ZonedDateTime.now(ZoneId.of("America/New_York")).toString())
 
         atbLifecyclePlugin.onSearchRetentionAtbRefreshed("", "")
 
         val searchMetricToggles = fakeMetricsPixelExtension.sentMetrics
+            .filter { it.metric == "search" }
             .map { it.toggle.featureName().name }
             .toSet()
-        assertTrue(searchMetricToggles.containsAll(setOf("experimentFooFeature", "fooFeature")))
+        assertEquals(setOf("addToDockAndWidgetExperimentJul25", "experimentFooFeature", "fooFeature"), searchMetricToggles)
     }
+}
+
+interface ExcludedExperimentFeature {
+    @DefaultValue(DefaultFeatureValue.FALSE)
+    @Experiment
+    fun addToDockAndWidgetExperimentJul25(): Toggle
 }
 
 class FakeFeatureTogglesInventory(private val features: List<Toggle>) : FeatureTogglesInventory {

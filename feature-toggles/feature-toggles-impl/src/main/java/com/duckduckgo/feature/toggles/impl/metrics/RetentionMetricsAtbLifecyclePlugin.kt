@@ -26,27 +26,12 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
-class RetentionMetricsAtbLifecyclePlugin(
+class RetentionMetricsAtbLifecyclePlugin @Inject constructor(
     private val searchMetricPixelsPlugin: SearchMetricPixelsPlugin,
     private val appUseMetricPixelsPlugin: AppUseMetricPixelsPlugin,
     private val duckAiPromptSentMetricPixelsPlugin: DuckAiPromptSentMetricPixelsPlugin,
-    private val appCoroutineScope: CoroutineScope,
-    private val experimentsExcludedFromDuckAiSearchMetric: Set<String>,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : AtbLifecyclePlugin {
-
-    @Inject
-    constructor(
-        searchMetricPixelsPlugin: SearchMetricPixelsPlugin,
-        appUseMetricPixelsPlugin: AppUseMetricPixelsPlugin,
-        duckAiPromptSentMetricPixelsPlugin: DuckAiPromptSentMetricPixelsPlugin,
-        @AppCoroutineScope appCoroutineScope: CoroutineScope,
-    ) : this(
-        searchMetricPixelsPlugin,
-        appUseMetricPixelsPlugin,
-        duckAiPromptSentMetricPixelsPlugin,
-        appCoroutineScope,
-        EXPERIMENTS_EXCLUDED_FROM_DUCK_AI_SEARCH_METRIC,
-    )
 
     override fun onSearchRetentionAtbRefreshed(oldAtb: String, newAtb: String) {
         appCoroutineScope.launch {
@@ -63,7 +48,9 @@ class RetentionMetricsAtbLifecyclePlugin(
     override fun onDuckAiRetentionAtbRefreshed(oldAtb: String, newAtb: String, metadata: Map<String, String?>) {
         appCoroutineScope.launch {
             duckAiPromptSentMetricPixelsPlugin.getMetrics().forEach { it.send() }
-            searchMetricPixelsPlugin.getMetrics(excluding = experimentsExcludedFromDuckAiSearchMetric).forEach { it.send() }
+            searchMetricPixelsPlugin.getMetrics()
+                .filterNot { it.toggle.featureName().name in EXPERIMENTS_EXCLUDED_FROM_DUCK_AI_SEARCH_METRIC }
+                .forEach { it.send() }
         }
     }
 
@@ -73,8 +60,6 @@ class RetentionMetricsAtbLifecyclePlugin(
          * They are excluded from counting prompts to avoid skewing the metrics.
          */
         private val EXPERIMENTS_EXCLUDED_FROM_DUCK_AI_SEARCH_METRIC = setOf(
-            "tdsNextExperiment016",
-            "contentScopeExperiment7",
             "addToDockAndWidgetExperimentJul25",
         )
     }

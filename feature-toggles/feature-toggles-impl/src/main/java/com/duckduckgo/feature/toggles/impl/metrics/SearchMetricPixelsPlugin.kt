@@ -28,13 +28,8 @@ import javax.inject.Inject
 @ContributesMultibinding(AppScope::class)
 class SearchMetricPixelsPlugin @Inject constructor(private val inventory: FeatureTogglesInventory) : MetricsPixelPlugin {
 
-    override suspend fun getMetrics(): List<MetricsPixel> = getMetrics(excluding = emptySet())
-
-    /**
-     * @param excluding bare subfeature names, as returned by [com.duckduckgo.feature.toggles.api.Toggle.featureName], to leave out.
-     */
-    suspend fun getMetrics(excluding: Set<String>): List<MetricsPixel> {
-        return inventory.getAllActiveExperimentToggles().filterNot { it.featureName().name in excluding }.flatMap { toggle ->
+    override suspend fun getMetrics(): List<MetricsPixel> {
+        return inventory.getAllActiveExperimentToggles().flatMap { toggle ->
             listOf(
                 MetricsPixel(
                     metric = "search",
