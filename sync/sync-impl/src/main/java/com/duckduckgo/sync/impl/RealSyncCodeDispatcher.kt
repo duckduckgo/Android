@@ -307,34 +307,50 @@ class RealSyncCodeDispatcher @Inject constructor(
     ): DispatchOutcome? = when (transition.to) {
         ExchangeV2State.Joiner.Confirming ->
             DispatchOutcome.JoinerConfirmationRequested(peerName = runner.peerName, peerKind = peerKind)
+
         ExchangeV2State.Host.Confirming ->
             DispatchOutcome.HostConfirmationRequested(peerName = runner.peerName, peerKind = peerKind)
+
         ExchangeV2State.Host.Done -> hostDoneToOutcome(transition.trigger, peerKind)
+
         ExchangeV2State.Host.Aborted -> hostAbortedToOutcome(transition.localTrigger, transition.trigger)
+
         // Per spec §"Same-account case": not an abort; both devices share an account already.
         ExchangeV2State.SameAccountAbort -> DispatchOutcome.AlreadyConnected
+
         ExchangeV2State.Joiner.Joining -> {
-            val received = (transition.trigger as? ExchangeV2Message.RecoveryCodeResponse)?.recoveryCode
-            val outcome = if (received.isNullOrBlank()) {
-                DispatchOutcome.Failed("joiner_joining_missing_recovery_code", NO_RECOVERY_CODE.code)
-            } else {
-                loginWithV2RecoveryCode(received, peerKind)
+            when (val message = transition.trigger) {
+                is ExchangeV2Message.RecoveryCodeResponse -> {
+                    val outcome = loginWithV2RecoveryCode(message.recoveryCode, peerKind)
+                    runner.localTrigger(LocalTrigger.JoinerJoinComplete(outcome.toRecoveryCodeDoneReason())).join()
+                    outcome
+                }
+
+                is ExchangeV2Message.Bye -> null
+
+                else -> DispatchOutcome.Failed("joiner_joining_missing_recovery_code", NO_RECOVERY_CODE.code)
             }
-            runner.localTrigger(LocalTrigger.JoinerJoinComplete(outcome.toRecoveryCodeDoneReason())).join()
-            outcome
         }
+
         ExchangeV2State.Joiner.AbortedByHost -> when (transition.trigger) {
             is ExchangeV2Message.RecoveryCodeDenied ->
                 DispatchOutcome.Failed("peer_denied_recovery_code", PAIRING_REJECTED.code)
+
             is ExchangeV2Message.RecoveryCodeUnavailable ->
                 DispatchOutcome.Failed("peer_recovery_code_unavailable", PEER_RECOVERY_CODE_UNAVAILABLE.code)
-            else -> DispatchOutcome.Failed("peer_aborted", PAIRING_REJECTED.code)
+
+            else ->
+                DispatchOutcome.Failed("peer_aborted", PAIRING_REJECTED.code)
         }
-        ExchangeV2State.Joiner.AbortedLocal -> joinerAbortedLocalToOutcome(transition.localTrigger, transition.trigger)
+
+        ExchangeV2State.Joiner.AbortedLocal ->
+            joinerAbortedLocalToOutcome(transition.localTrigger, transition.trigger)
+
         ExchangeV2State.Aborted -> when (val wireTrigger = transition.trigger) {
             is ExchangeV2Message.Bye -> wireTrigger.toPeerLeftOutcome()
             else -> DispatchOutcome.Failed("negotiation_aborted", UNEXPECTED_EVENT.code)
         }
+
         else -> null
     }
 
