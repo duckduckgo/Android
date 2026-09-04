@@ -24,7 +24,6 @@ import com.duckduckgo.subscriptions.impl.R
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
-/** Identity Theft Restoration step of the subscription onboarding, between the VPN and Duck.ai steps. */
 @ContributesMultibinding(AppScope::class)
 @PriorityKey(250)
 class SubscriptionOnboardingItrStepPlugin @Inject constructor() : SubscriptionOnboardingStepPlugin {

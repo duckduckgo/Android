@@ -25,32 +25,30 @@ import androidx.core.graphics.ColorUtils
 import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.core.widget.NestedScrollView
+import androidx.lifecycle.ViewModelProvider
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController
-import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.COMPLETED
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.databinding.FragmentSubscriptionOnboardingItrBinding
 import com.duckduckgo.subscriptions.impl.onboarding.features.OnboardingFeature
 import com.duckduckgo.subscriptions.impl.onboarding.features.SummaryOfBenefitsFooterView
-import com.duckduckgo.subscriptions.impl.onboarding.itr.SubscriptionOnboardingItrStepPlugin.Companion.ITR_STEP_ID
 import javax.inject.Inject
 
-/**
- * Identity Theft Restoration step of the native subscription onboarding. Shows the same content as the ITR
- * feature-detail screen, but with an always-visible Activate button and the content scrolling behind it.
- * Reports back through [SubscriptionOnboardingController] so it stays decoupled from the host activity.
- */
 @InjectWith(FragmentScope::class)
 class SubscriptionOnboardingItrFragment : DuckDuckGoFragment(R.layout.fragment_subscription_onboarding_itr) {
 
     @Inject
-    lateinit var controller: SubscriptionOnboardingController
+    lateinit var viewModelFactory: FragmentViewModelFactory
 
     private val binding: FragmentSubscriptionOnboardingItrBinding by viewBinding()
+
+    private val viewModel by lazy {
+        ViewModelProvider(this, viewModelFactory)[SubscriptionOnboardingItrViewModel::class.java]
+    }
 
     private val summaryOfBenefitsFooter: SummaryOfBenefitsFooterView
         get() = binding.subscriptionOnboardingItrContent.findViewById(R.id.subscriptionOnboardingFeatureInfoLegalFooter)
@@ -75,15 +73,13 @@ class SubscriptionOnboardingItrFragment : DuckDuckGoFragment(R.layout.fragment_s
         }
 
         binding.subscriptionOnboardingItrActivateButton.setOnClickListener {
-            controller.onStepFinished(ITR_STEP_ID, COMPLETED)
+            viewModel.onPrimaryCtaClicked()
         }
 
         setupScrollFade()
     }
 
     private fun setupScrollFade() {
-        // A gradient can't reference ?attr colors, so derive it from the surface the content sits on. Starting
-        // from a zero-alpha surface rather than Color.TRANSPARENT keeps the hue constant across the ramp.
         val surfaceColor = requireContext().getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorSurface)
         binding.subscriptionOnboardingItrScrollFade.background = GradientDrawable(
             GradientDrawable.Orientation.TOP_BOTTOM,
@@ -93,7 +89,7 @@ class SubscriptionOnboardingItrFragment : DuckDuckGoFragment(R.layout.fragment_s
         binding.subscriptionOnboardingItrScrollView.setOnScrollChangeListener(
             NestedScrollView.OnScrollChangeListener { _, _, _, _, _ -> updateScrollFade() },
         )
-        // The per-feature content is inflated above, so the first reliable measurement is the next layout pass.
+
         binding.subscriptionOnboardingItrScrollView.doOnLayout { updateScrollFade() }
     }
 
