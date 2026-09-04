@@ -279,7 +279,7 @@
                 android:id="@+id/subscriptionOnboardingVpnInfoContent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/keyline_5"
+                android:layout_marginTop="@dimen/keyline_7"
                 android:clipToPadding="false"
                 android:paddingHorizontal="@dimen/keyline_4"
                 android:scrollbars="none"
