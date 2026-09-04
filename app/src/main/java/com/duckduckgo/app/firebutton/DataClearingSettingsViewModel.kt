@@ -23,7 +23,6 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.fire.FireAnimationLoader
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.store.FireDataStore
-import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.settings.clear.FireClearOption.DUCKAI_CHATS
@@ -58,12 +57,11 @@ class DataClearingSettingsViewModel @Inject constructor(
     private val fireDataStore: FireDataStore,
     private val dispatcherProvider: DispatcherProvider,
     fireproofWebsiteRepository: FireproofWebsiteRepository,
-    private val brandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
 ) : ViewModel() {
 
     data class ViewState(
         val selectedFireAnimation: FireAnimation = FireAnimation.HeroFire,
-        val isFireAnimationUpdateEnabled: Boolean = false,
+        val isFireAnimationUpdateEnabled: Boolean = true,
         val clearDuckAiData: Boolean = false,
         val showClearDuckAiDataSetting: Boolean = false,
         val fireproofWebsitesCount: Int = 0,
@@ -102,9 +100,6 @@ class DataClearingSettingsViewModel @Inject constructor(
 
     private fun loadInitialState() {
         viewModelScope.launch {
-            val isFireAnimationUpdateEnabled = withContext(dispatcherProvider.io()) {
-                brandDesignUpdateToggles.fireAnimationUpdate().isEnabled()
-            }
             val initialFireAnimation = withContext(dispatcherProvider.io()) {
                 settingsDataStore.selectedFireAnimation
             }
@@ -117,7 +112,6 @@ class DataClearingSettingsViewModel @Inject constructor(
             _viewState.update {
                 it.copy(
                     selectedFireAnimation = initialFireAnimation,
-                    isFireAnimationUpdateEnabled = isFireAnimationUpdateEnabled,
                     clearDuckAiData = initialClearDuckAi,
                     showClearDuckAiDataSetting = initialShowClearDuckAi,
                 )
