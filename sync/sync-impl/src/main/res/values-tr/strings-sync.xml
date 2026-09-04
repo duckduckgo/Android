@@ -377,6 +377,7 @@
 
     <!-- Pairing screen -->
     <string name="sync_simplified_pairing_headline">Sync &amp; Backup tüm cihazlarınızda uçtan uca şifrelenmiştir.</string>
+    <string name="sync_simplified_pairing_headline_check_other_device">Diğer cihazı kontrol edin</string>
     <string name="sync_simplified_pairing_headline_recovery">Veriler kurtarılıyor</string>
     <string name="sync_simplified_pairing_body">Bağlantı kuruluyor...</string>
 
@@ -389,6 +390,9 @@
     <string name="sync_simplified_pairing_dialog_joiner_secondary_button">İptal</string>
     <string name="sync_simplified_pairing_dialog_acknowledgment_title">Diğer cihazınızdan onaylayın…</string>
     <string name="sync_simplified_pairing_dialog_acknowledgment_primary_button">Anladım</string>
+    <string name="sync_simplified_pairing_dialog_check_other_device_title">Diğer cihazı kontrol edin</string>
+    <string name="sync_simplified_pairing_dialog_connecting_title">Senkronizasyon devam ediyor</string>
+    <string name="sync_simplified_pairing_dialog_connecting_body">Bağlantı kuruluyor...</string>
 
     <!-- Recovery Code screen -->
     <string name="sync_simplified_recovery_code_headline" instruction="Placeholder is a device name. e.g., Samsung S23">%1$s, Sync &amp; Backup\'a eklendi.</string>

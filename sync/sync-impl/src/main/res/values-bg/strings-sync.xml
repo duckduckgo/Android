@@ -377,6 +377,7 @@
 
     <!-- Pairing screen -->
     <string name="sync_simplified_pairing_headline">Sync &amp; Backup е криптирано от край до край на всички устройства.</string>
+    <string name="sync_simplified_pairing_headline_check_other_device">Проверете другото устройство</string>
     <string name="sync_simplified_pairing_headline_recovery">Възстановяване на данни</string>
     <string name="sync_simplified_pairing_body">Свързване…</string>
 
@@ -389,6 +390,9 @@
     <string name="sync_simplified_pairing_dialog_joiner_secondary_button">Отмяна</string>
     <string name="sync_simplified_pairing_dialog_acknowledgment_title">Потвърдете на другото устройство…</string>
     <string name="sync_simplified_pairing_dialog_acknowledgment_primary_button">Разбрах</string>
+    <string name="sync_simplified_pairing_dialog_check_other_device_title">Проверете другото устройство</string>
+    <string name="sync_simplified_pairing_dialog_connecting_title">В процес на синхронизиране</string>
+    <string name="sync_simplified_pairing_dialog_connecting_body">Свързване…</string>
 
     <!-- Recovery Code screen -->
     <string name="sync_simplified_recovery_code_headline" instruction="Placeholder is a device name. e.g., Samsung S23">%1$s е добавено към Sync &amp; Backup.</string>

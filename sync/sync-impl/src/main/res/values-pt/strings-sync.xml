@@ -377,6 +377,7 @@
 
     <!-- Pairing screen -->
     <string name="sync_simplified_pairing_headline">O Sync &amp; Backup é encriptado ponto a ponto em todos os teus dispositivos.</string>
+    <string name="sync_simplified_pairing_headline_check_other_device">Verifica o teu outro dispositivo</string>
     <string name="sync_simplified_pairing_headline_recovery">Recuperar dados</string>
     <string name="sync_simplified_pairing_body">A ligar…</string>
 
@@ -389,6 +390,9 @@
     <string name="sync_simplified_pairing_dialog_joiner_secondary_button">Cancelar</string>
     <string name="sync_simplified_pairing_dialog_acknowledgment_title">Confirma no teu outro dispositivo…</string>
     <string name="sync_simplified_pairing_dialog_acknowledgment_primary_button">Entendido</string>
+    <string name="sync_simplified_pairing_dialog_check_other_device_title">Verifica o teu outro dispositivo</string>
+    <string name="sync_simplified_pairing_dialog_connecting_title">Sincronização em curso</string>
+    <string name="sync_simplified_pairing_dialog_connecting_body">A ligar…</string>
 
     <!-- Recovery Code screen -->
     <string name="sync_simplified_recovery_code_headline" instruction="Placeholder is a device name. e.g., Samsung S23">O %1$s foi adicionado ao Sync &amp; Backup.</string>

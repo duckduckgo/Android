@@ -377,6 +377,7 @@
 
     <!-- Pairing screen -->
     <string name="sync_simplified_pairing_headline">Sync &amp; Backup ir pilnībā šifrēta visās tavās ierīcēs.</string>
+    <string name="sync_simplified_pairing_headline_check_other_device">Pārbaudi otru ierīci</string>
     <string name="sync_simplified_pairing_headline_recovery">Datu atgūšana</string>
     <string name="sync_simplified_pairing_body">Notiek savienojuma izveide…</string>
 
@@ -389,6 +390,9 @@
     <string name="sync_simplified_pairing_dialog_joiner_secondary_button">Atcelt</string>
     <string name="sync_simplified_pairing_dialog_acknowledgment_title">Apstiprini to savā otrā ierīcē...</string>
     <string name="sync_simplified_pairing_dialog_acknowledgment_primary_button">Sapratu</string>
+    <string name="sync_simplified_pairing_dialog_check_other_device_title">Pārbaudi otru ierīci</string>
+    <string name="sync_simplified_pairing_dialog_connecting_title">Notiek sinhronizācija</string>
+    <string name="sync_simplified_pairing_dialog_connecting_body">Notiek savienojuma izveide…</string>
 
     <!-- Recovery Code screen -->
     <string name="sync_simplified_recovery_code_headline" instruction="Placeholder is a device name. e.g., Samsung S23">Ierīce %1$s ir pievienota pakalpojumam Sync &amp; Backup.</string>

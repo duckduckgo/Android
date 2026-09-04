@@ -377,6 +377,7 @@
 
     <!-- Pairing screen -->
     <string name="sync_simplified_pairing_headline">Функция Sync &amp; Backup защищена сквозным шифрованием на всех ваших устройствах.</string>
+    <string name="sync_simplified_pairing_headline_check_other_device">Проверьте другое устройство</string>
     <string name="sync_simplified_pairing_headline_recovery">Восстановление данных</string>
     <string name="sync_simplified_pairing_body">Выполняется подключение…</string>
 
@@ -389,6 +390,9 @@
     <string name="sync_simplified_pairing_dialog_joiner_secondary_button">Отменить</string>
     <string name="sync_simplified_pairing_dialog_acknowledgment_title">Подтвердите на другом устройстве…</string>
     <string name="sync_simplified_pairing_dialog_acknowledgment_primary_button">Понятно</string>
+    <string name="sync_simplified_pairing_dialog_check_other_device_title">Проверьте другое устройство</string>
+    <string name="sync_simplified_pairing_dialog_connecting_title">Выполняется синхронизация</string>
+    <string name="sync_simplified_pairing_dialog_connecting_body">Выполняется подключение…</string>
 
     <!-- Recovery Code screen -->
     <string name="sync_simplified_recovery_code_headline" instruction="Placeholder is a device name. e.g., Samsung S23">Устройство %1$s подключено к Sync &amp; Backup.</string>

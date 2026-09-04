@@ -377,6 +377,7 @@
 
     <!-- Pairing screen -->
     <string name="sync_simplified_pairing_headline">Opcija Sync &amp; Backup šifrirana je metodom \"od kraja do kraja\" (end-to-end) na svim tvojim uređajima.</string>
+    <string name="sync_simplified_pairing_headline_check_other_device">Provjeri svoj drugi uređaj</string>
     <string name="sync_simplified_pairing_headline_recovery">Obnavljanje podataka</string>
     <string name="sync_simplified_pairing_body">Povezivanje u tijeku...</string>
 
@@ -389,6 +390,9 @@
     <string name="sync_simplified_pairing_dialog_joiner_secondary_button">Otkaži</string>
     <string name="sync_simplified_pairing_dialog_acknowledgment_title">Potvrdi na drugom uređaju…</string>
     <string name="sync_simplified_pairing_dialog_acknowledgment_primary_button">Shvaćam</string>
+    <string name="sync_simplified_pairing_dialog_check_other_device_title">Provjeri svoj drugi uređaj</string>
+    <string name="sync_simplified_pairing_dialog_connecting_title">Sinkronizacija u tijeku</string>
+    <string name="sync_simplified_pairing_dialog_connecting_body">Povezivanje u tijeku...</string>
 
     <!-- Recovery Code screen -->
     <string name="sync_simplified_recovery_code_headline" instruction="Placeholder is a device name. e.g., Samsung S23">%1$s je dodan u Sync &amp; Backup.</string>
