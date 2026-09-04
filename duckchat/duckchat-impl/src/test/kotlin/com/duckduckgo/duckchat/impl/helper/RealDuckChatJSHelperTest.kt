@@ -25,9 +25,9 @@ import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.PluginPoint
-import com.duckduckgo.duckchat.api.DuckAiSessionWideEvent
+import com.duckduckgo.duckchat.api.DuckAiSessionCallback
+import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
-import com.duckduckgo.duckchat.api.ExitTrigger
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
@@ -120,7 +120,7 @@ class RealDuckChatJSHelperTest {
     private val mockEditPromptSessionStore: EditPromptSessionStore = mock()
     private val mockBrowserInteractionsPlugin: BrowserInteractionsPlugin = mock()
     private val mockBrowserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin> = mock()
-    private val mockDuckAiSessionWideEvent: DuckAiSessionWideEvent = mock()
+    private val mockDuckAiSessionCallback: DuckAiSessionCallback = mock()
     private val testee = RealDuckChatJSHelper(
         duckChat = mockDuckChat,
         duckChatPixels = mockDuckChatPixels,
@@ -140,7 +140,7 @@ class RealDuckChatJSHelperTest {
         subscriptions = mockSubscriptions,
         editPromptSessionStore = mockEditPromptSessionStore,
         browserInteractionsPlugins = mockBrowserInteractionsPlugins,
-        duckAiSessionWideEvent = mockDuckAiSessionWideEvent,
+        duckAiSessionCallback = mockDuckAiSessionCallback,
     )
 
     init {
@@ -1956,7 +1956,7 @@ class RealDuckChatJSHelperTest {
             tabId = "tab-1",
         )
 
-        verify(mockDuckAiSessionWideEvent).onPromptSubmitted("tab-1")
+        verify(mockDuckAiSessionCallback).onPromptSubmitted("tab-1")
     }
 
     @Test
@@ -1972,7 +1972,7 @@ class RealDuckChatJSHelperTest {
             tabId = "tab-1",
         )
 
-        verify(mockDuckAiSessionWideEvent, never()).onPromptSubmitted(any())
+        verify(mockDuckAiSessionCallback, never()).onPromptSubmitted(any())
     }
 
     @Test
@@ -1986,8 +1986,8 @@ class RealDuckChatJSHelperTest {
             tabId = "tab-1",
         )
 
-        val inOrder = inOrder(mockDuckAiSessionWideEvent, mockDuckChat)
-        inOrder.verify(mockDuckAiSessionWideEvent).onExitIntent("tab-1", ExitTrigger.BACK_OR_CLOSE)
+        val inOrder = inOrder(mockDuckAiSessionCallback, mockDuckChat)
+        inOrder.verify(mockDuckAiSessionCallback).onExitIntent("tab-1", DuckAiSessionExitTrigger.BACK_OR_CLOSE)
         inOrder.verify(mockDuckChat).closeDuckChat()
     }
 
@@ -2002,7 +2002,7 @@ class RealDuckChatJSHelperTest {
             tabId = "tab-1",
         )
 
-        verify(mockDuckAiSessionWideEvent, never()).onExitIntent(any(), any())
+        verify(mockDuckAiSessionCallback, never()).onExitIntent(any(), any())
         verify(mockDuckChat).closeDuckChat()
     }
 
@@ -2093,7 +2093,7 @@ class RealDuckChatJSHelperTest {
             tabId = "tab-1",
         )
 
-        verify(mockDuckAiSessionWideEvent).onNewChatCreated("tab-1")
+        verify(mockDuckAiSessionCallback).onNewChatCreated("tab-1")
     }
 
     @Test
@@ -2109,7 +2109,7 @@ class RealDuckChatJSHelperTest {
             tabId = "tab-1",
         )
 
-        verify(mockDuckAiSessionWideEvent, never()).onNewChatCreated(any())
+        verify(mockDuckAiSessionCallback, never()).onNewChatCreated(any())
     }
 
     @Test

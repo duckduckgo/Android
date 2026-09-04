@@ -17,29 +17,28 @@
 package com.duckduckgo.duckchat.api
 
 /**
- * Covers every visit to a full Duck.ai tab, from becoming visible to a confirmed exit, as one wide event.
+ * Receives lifecycle and interaction events for visits to a full Duck.ai tab.
  */
-interface DuckAiSessionWideEvent {
+interface DuckAiSessionCallback {
     /**
      * Called once per app-open. [tabId] and [url] are supplied only when the resolved landing is Duck.ai.
-     * A repeated call for a tab that is already active is a no-op.
      */
     fun onLaunchLandingResolved(tabId: String?, url: String?)
 
     /**
-     * Called whenever [tabId] finishes loading [url] and it's a full Duck.ai page, for the currently active tab.
+     * Called whenever [tabId] finishes loading [url] and it is a full Duck.ai page for the currently active tab.
      */
     fun onDuckAiPageVisible(tabId: String, url: String)
 
     /**
-     * Records the selected-tab state for [tabId] and [url]
+     * Records the selected-tab state for [tabId] and [url].
      */
     fun onSelectedTabChanged(tabId: String?, url: String?)
 
     /**
-     * Records that [tabId] left Duck.ai for [trigger].
+     * Records that [tabId] may leave Duck.ai for [trigger].
      */
-    fun onExitIntent(tabId: String, trigger: ExitTrigger)
+    fun onExitIntent(tabId: String, trigger: DuckAiSessionExitTrigger)
 
     /** Records that a prompt was submitted from the active Duck.ai session in [tabId]. */
     fun onPromptSubmitted(tabId: String)
@@ -48,10 +47,10 @@ interface DuckAiSessionWideEvent {
     fun onNewChatCreated(tabId: String)
 }
 
-enum class ExitTrigger(val value: String) {
-    BACK_OR_CLOSE("back_or_close"),
-    TAB_SWITCHED("tab_switched"),
-    NEW_TAB_OPENED("new_tab_opened"),
-    FIRE_TAB_OPENED("fire_tab_opened"),
-    OTHER_NAVIGATION("other_navigation"),
+enum class DuckAiSessionExitTrigger {
+    BACK_OR_CLOSE,
+    TAB_SWITCHED,
+    NEW_TAB_OPENED,
+    FIRE_TAB_OPENED,
+    OTHER_NAVIGATION,
 }

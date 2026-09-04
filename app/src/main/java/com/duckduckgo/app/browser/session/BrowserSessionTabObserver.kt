@@ -22,7 +22,7 @@ import com.duckduckgo.browser.api.BrowserLifecycleObserver
 import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.api.DuckAiSessionWideEvent
+import com.duckduckgo.duckchat.api.DuckAiSessionCallback
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
@@ -33,7 +33,7 @@ import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 /**
- * Watches the active browser mode's selected tab and reports every raw emission [DuckAiSessionWideEvent].
+ * Watches the active browser mode's selected tab and reports every raw emission [DuckAiSessionCallback].
  * All interpretation lives in the coordinator; this class is just an adapter from the tab repository's Flow to that API.
  */
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -42,7 +42,7 @@ import javax.inject.Inject
 class BrowserSessionTabObserver @Inject constructor(
     private val tabRepositoryProvider: BrowserModeDataProvider<TabRepository>,
     private val browserModeStateHolder: BrowserModeStateHolder,
-    private val duckAiSessionWideEvent: DuckAiSessionWideEvent,
+    private val duckAiSessionCallback: DuckAiSessionCallback,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : BrowserLifecycleObserver {
 
@@ -53,7 +53,7 @@ class BrowserSessionTabObserver @Inject constructor(
     init {
         currentMode
             .flatMapLatest { mode -> tabRepositoryProvider.forMode(mode).flowSelectedTab }
-            .onEach { tab -> duckAiSessionWideEvent.onSelectedTabChanged(tab?.tabId, tab?.url) }
+            .onEach { tab -> duckAiSessionCallback.onSelectedTabChanged(tab?.tabId, tab?.url) }
             .launchIn(appCoroutineScope)
     }
 }

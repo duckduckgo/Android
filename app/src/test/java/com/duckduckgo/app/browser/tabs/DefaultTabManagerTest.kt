@@ -8,8 +8,8 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.duckchat.api.DuckAiSessionWideEvent
-import com.duckduckgo.duckchat.api.ExitTrigger
+import com.duckduckgo.duckchat.api.DuckAiSessionCallback
+import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.test.runTest
@@ -33,7 +33,7 @@ class DefaultTabManagerTest {
     private val tabRepository: TabRepository = mock()
     private val omnibarEntryConverter: OmnibarEntryConverter = mock()
     private val skipUrlConversionOnNewTabFeature = FakeFeatureToggleFactory.create(SkipUrlConversionOnNewTabFeature::class.java)
-    private val duckAiSessionWideEvent: DuckAiSessionWideEvent = mock()
+    private val duckAiSessionCallback: DuckAiSessionCallback = mock()
 
     private lateinit var testee: DefaultTabManager
 
@@ -51,7 +51,7 @@ class DefaultTabManagerTest {
         queryUrlConverter = omnibarEntryConverter,
         skipUrlConversionOnNewTabFeature = skipUrlConversionOnNewTabFeature,
         browserMode = browserMode,
-        duckAiSessionWideEvent = duckAiSessionWideEvent,
+        duckAiSessionCallback = duckAiSessionCallback,
     )
 
     @Test
@@ -68,14 +68,14 @@ class DefaultTabManagerTest {
 
         testee.openNewTab()
 
-        verify(duckAiSessionWideEvent).onExitIntent("current-tab", ExitTrigger.NEW_TAB_OPENED)
+        verify(duckAiSessionCallback).onExitIntent("current-tab", DuckAiSessionExitTrigger.NEW_TAB_OPENED)
     }
 
     @Test
     fun whenOpenNewTabWithNoSelectedTabThenNoPendingExitRecorded() = runTest {
         testee.openNewTab()
 
-        verify(duckAiSessionWideEvent, never()).onExitIntent(any(), any())
+        verify(duckAiSessionCallback, never()).onExitIntent(any(), any())
     }
 
     @Test

@@ -27,9 +27,9 @@ import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.api.DuckAiSessionWideEvent
+import com.duckduckgo.duckchat.api.DuckAiSessionCallback
+import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
-import com.duckduckgo.duckchat.api.ExitTrigger
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.ChatState
@@ -130,7 +130,7 @@ class RealDuckChatJSHelper @Inject constructor(
     private val subscriptions: Subscriptions,
     private val editPromptSessionStore: EditPromptSessionStore,
     private val browserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin>,
-    private val duckAiSessionWideEvent: DuckAiSessionWideEvent,
+    private val duckAiSessionCallback: DuckAiSessionCallback,
 ) : DuckChatJSHelper {
 
     private val registerOpenedJob = ConflatedJob()
@@ -190,7 +190,7 @@ class RealDuckChatJSHelper @Inject constructor(
 
             METHOD_CLOSE_AI_CHAT -> {
                 if (mode == Mode.FULL && tabId.isNotEmpty()) {
-                    duckAiSessionWideEvent.onExitIntent(tabId, ExitTrigger.BACK_OR_CLOSE)
+                    duckAiSessionCallback.onExitIntent(tabId, DuckAiSessionExitTrigger.BACK_OR_CLOSE)
                 }
                 duckChat.closeDuckChat()
                 null
@@ -271,11 +271,11 @@ class RealDuckChatJSHelper @Inject constructor(
                     if (it == USER_DID_SUBMIT_PROMPT || it == USER_DID_SUBMIT_FIRST_PROMPT) {
                         browserInteractionsPlugins.getPlugins().forEach { plugin -> plugin.onAiPromptSubmitted() }
                         if (mode == Mode.FULL && tabId.isNotEmpty()) {
-                            duckAiSessionWideEvent.onPromptSubmitted(tabId)
+                            duckAiSessionCallback.onPromptSubmitted(tabId)
                         }
                     }
                     if (it == ReportMetric.USER_DID_CREATE_NEW_CHAT && mode == Mode.FULL && tabId.isNotEmpty()) {
-                        duckAiSessionWideEvent.onNewChatCreated(tabId)
+                        duckAiSessionCallback.onNewChatCreated(tabId)
                     }
                 }
                 null

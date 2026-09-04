@@ -66,10 +66,10 @@ import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.common.utils.extensions.combine
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
-import com.duckduckgo.duckchat.api.DuckAiSessionWideEvent
+import com.duckduckgo.duckchat.api.DuckAiSessionCallback
+import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
-import com.duckduckgo.duckchat.api.ExitTrigger
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.remote.messaging.api.RemoteMessageModel
 import com.duckduckgo.savedsites.api.SavedSitesRepository
@@ -115,7 +115,7 @@ class TabSwitcherViewModel @Inject constructor(
     private val trackersAnimationInfoPanelPixels: TrackersAnimationInfoPanelPixels,
     private val omnibarRepository: OmnibarRepository,
     private val tabTitleResolver: TabTitleResolver,
-    private val duckAiSessionWideEvent: DuckAiSessionWideEvent,
+    private val duckAiSessionCallback: DuckAiSessionCallback,
     @param:AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val fireTabsPromos: FireTabsPromos,
     private val remoteMessageModel: RemoteMessageModel,
@@ -252,7 +252,7 @@ class TabSwitcherViewModel @Inject constructor(
 
     fun onNewTabRequested(fromOverflowMenu: Boolean = false) = viewModelScope.launch {
         tabRepository.getSelectedTab()?.tabId?.let { tabId ->
-            duckAiSessionWideEvent.onExitIntent(tabId, ExitTrigger.NEW_TAB_OPENED)
+            duckAiSessionCallback.onExitIntent(tabId, DuckAiSessionExitTrigger.NEW_TAB_OPENED)
         }
         if (swipingTabsFeature.isEnabled) {
             val newTab = tabs.firstOrNull { tabItem ->

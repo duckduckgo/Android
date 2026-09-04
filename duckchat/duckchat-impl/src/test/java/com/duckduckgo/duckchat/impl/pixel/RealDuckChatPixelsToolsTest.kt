@@ -24,7 +24,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.PluginPoint
-import com.duckduckgo.duckchat.api.DuckAiSessionWideEvent
+import com.duckduckgo.duckchat.api.DuckAiSessionCallback
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.ToggleSelection
 import com.duckduckgo.duckchat.impl.helper.DuckChatTermsOfServiceHandler
@@ -56,7 +56,7 @@ class RealDuckChatPixelsToolsTest {
     private val appBuildConfig: AppBuildConfig = mock()
     private val browserInteractionsPlugin: BrowserInteractionsPlugin = mock()
     private val browserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin> = mock()
-    private val duckAiSessionWideEvent: DuckAiSessionWideEvent = mock()
+    private val duckAiSessionCallback: DuckAiSessionCallback = mock()
 
     private val testee = RealDuckChatPixels(
         pixel = pixel,
@@ -70,7 +70,7 @@ class RealDuckChatPixelsToolsTest {
         appBuildConfig = appBuildConfig,
         browserInteractionsPlugins = browserInteractionsPlugins,
         duckAiNewChatMetricPixelsPlugin = mock(),
-        duckAiSessionWideEvent = duckAiSessionWideEvent,
+        duckAiSessionCallback = duckAiSessionCallback,
     )
 
     private val surfaceParams = mapOf(DuckChatPixelParameters.SURFACE to "contextual_chat")
@@ -431,7 +431,7 @@ class RealDuckChatPixelsToolsTest {
             addressBarEntryPoint = null,
         )
 
-        verify(duckAiSessionWideEvent).onPromptSubmitted("tab1")
+        verify(duckAiSessionCallback).onPromptSubmitted("tab1")
     }
 
     @Test
@@ -450,7 +450,7 @@ class RealDuckChatPixelsToolsTest {
             addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
         )
 
-        verify(duckAiSessionWideEvent, never()).onPromptSubmitted(any())
+        verify(duckAiSessionCallback, never()).onPromptSubmitted(any())
     }
 
     @Test
@@ -469,7 +469,7 @@ class RealDuckChatPixelsToolsTest {
             addressBarEntryPoint = null,
         )
 
-        verify(duckAiSessionWideEvent, never()).onPromptSubmitted(any())
+        verify(duckAiSessionCallback, never()).onPromptSubmitted(any())
     }
 
     @Test

@@ -37,7 +37,7 @@ import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.api.DuckAiSessionWideEvent
+import com.duckduckgo.duckchat.api.DuckAiSessionCallback
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -72,7 +72,7 @@ class FirstScreenHandlerImpl @Inject constructor(
     private val returnSessionLandingListener: ReturnSessionLandingListener,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val idleThresholdResolver: IdleThresholdResolver,
-    private val duckAiSessionWideEvent: DuckAiSessionWideEvent,
+    private val duckAiSessionCallback: DuckAiSessionCallback,
 ) : BrowserLifecycleObserver {
 
     // Launch boundary: process-lifecycle callback, no activity graph exists to provide a frozen mode.
@@ -116,7 +116,7 @@ class FirstScreenHandlerImpl @Inject constructor(
             returnSessionLandingListener.onReturnLandingResolved(resolvedLanding)
             // Report a duck.ai tab launch to the Ai session wide event.
             val duckAiTab = tabRepository.getSelectedTab().takeIf { resolvedLanding.landing == ReturnSessionLanding.DUCK_AI }
-            duckAiSessionWideEvent.onLaunchLandingResolved(duckAiTab?.tabId, duckAiTab?.url)
+            duckAiSessionCallback.onLaunchLandingResolved(duckAiTab?.tabId, duckAiTab?.url)
         }
     }
 

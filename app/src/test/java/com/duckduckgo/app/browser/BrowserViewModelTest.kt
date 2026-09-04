@@ -45,8 +45,8 @@ import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeature
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
-import com.duckduckgo.duckchat.api.DuckAiSessionWideEvent
-import com.duckduckgo.duckchat.api.ExitTrigger
+import com.duckduckgo.duckchat.api.DuckAiSessionCallback
+import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
@@ -111,7 +111,7 @@ class BrowserViewModelTest {
         on { currentMode } doReturn browserModeFlow
     }
     private val mockFireModeAvailability: FireModeAvailability = mock()
-    private val mockDuckAiSessionWideEvent: DuckAiSessionWideEvent = mock()
+    private val mockDuckAiSessionCallback: DuckAiSessionCallback = mock()
 
     // The activity's frozen BrowserMode value injected into BrowserViewModel; defaults to REGULAR.
     private var browserMode = BrowserMode.REGULAR
@@ -163,7 +163,7 @@ class BrowserViewModelTest {
 
         testee.onNewTabRequested()
 
-        verify(mockDuckAiSessionWideEvent).onExitIntent("current-tab", ExitTrigger.NEW_TAB_OPENED)
+        verify(mockDuckAiSessionCallback).onExitIntent("current-tab", DuckAiSessionExitTrigger.NEW_TAB_OPENED)
     }
 
     @Test
@@ -172,7 +172,7 @@ class BrowserViewModelTest {
 
         testee.onOpenInNewTabRequested(query = "https://example.com")
 
-        verify(mockDuckAiSessionWideEvent).onExitIntent("current-tab", ExitTrigger.NEW_TAB_OPENED)
+        verify(mockDuckAiSessionCallback).onExitIntent("current-tab", DuckAiSessionExitTrigger.NEW_TAB_OPENED)
     }
 
     @Test
@@ -181,7 +181,7 @@ class BrowserViewModelTest {
 
         testee.onOpenInNewTabRequested(query = "https://example.com")
 
-        verify(mockDuckAiSessionWideEvent, never()).onExitIntent(any(), any())
+        verify(mockDuckAiSessionCallback, never()).onExitIntent(any(), any())
     }
 
     // --- selectedTab flow → NtpAfterIdleManager.onNtpShown ---
@@ -770,7 +770,7 @@ class BrowserViewModelTest {
             browserModeStateHolder = mockBrowserModeStateHolder,
             fireModeAvailability = mockFireModeAvailability,
             browserMode = browserMode,
-            duckAiSessionWideEvent = mockDuckAiSessionWideEvent,
+            duckAiSessionCallback = mockDuckAiSessionCallback,
         )
     }
 
@@ -795,7 +795,7 @@ class BrowserViewModelTest {
             browserModeStateHolder = mockBrowserModeStateHolder,
             fireModeAvailability = mockFireModeAvailability,
             browserMode = browserMode,
-            duckAiSessionWideEvent = mockDuckAiSessionWideEvent,
+            duckAiSessionCallback = mockDuckAiSessionCallback,
         )
     }
 

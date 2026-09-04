@@ -68,8 +68,8 @@ import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.api.DuckAiSessionWideEvent
-import com.duckduckgo.duckchat.api.ExitTrigger
+import com.duckduckgo.duckchat.api.DuckAiSessionCallback
+import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
@@ -117,7 +117,7 @@ class BrowserViewModel @Inject constructor(
     private val browserModeStateHolder: BrowserModeStateHolder,
     private val fireModeAvailability: FireModeAvailability,
     private val browserMode: BrowserMode,
-    private val duckAiSessionWideEvent: DuckAiSessionWideEvent,
+    private val duckAiSessionCallback: DuckAiSessionCallback,
 ) : ViewModel(), CoroutineScope {
 
     // Mode-switch orchestrator: observes the mode it also writes via switchTo().
@@ -309,7 +309,7 @@ class BrowserViewModel @Inject constructor(
 
     private suspend fun recordPendingNewTabOpenedExit() {
         tabRepository.getSelectedTab()?.tabId?.let { tabId ->
-            duckAiSessionWideEvent.onExitIntent(tabId, ExitTrigger.NEW_TAB_OPENED)
+            duckAiSessionCallback.onExitIntent(tabId, DuckAiSessionExitTrigger.NEW_TAB_OPENED)
         }
     }
 

@@ -316,11 +316,11 @@ import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadStatus
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
-import com.duckduckgo.duckchat.api.DuckAiSessionWideEvent
+import com.duckduckgo.duckchat.api.DuckAiSessionCallback
+import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
-import com.duckduckgo.duckchat.api.ExitTrigger
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.contextual.PageContextJSHelper
 import com.duckduckgo.duckchat.impl.contextual.RealPageContextJSHelper.Companion.PAGE_CONTEXT_FEATURE_NAME
@@ -749,7 +749,7 @@ class BrowserTabViewModelTest {
     private val fakeSuggestRedirectFeature = FakeFeatureToggleFactory.create(SuggestRedirectOnUnresolvedErrorFeature::class.java)
     private val mockSuggestRedirectEvaluator: SuggestRedirectEvaluator = mock()
     private val mockBadUrlErrorPageWideEvent: BadUrlErrorPageWideEvent = mock()
-    private val mockDuckAiSessionWideEvent: DuckAiSessionWideEvent = mock()
+    private val mockDuckAiSessionCallback: DuckAiSessionCallback = mock()
     private val mockInlinePdfHandler: InlinePdfHandler = mock()
     private val mockPdfDownloadTooltipDataStore: PdfDownloadTooltipDataStore = mock()
     private val mockCachedFileDownloader: CachedFileDownloader = mock()
@@ -1100,7 +1100,7 @@ class BrowserTabViewModelTest {
                 suggestRedirectOnUnresolvedErrorFeature = fakeSuggestRedirectFeature,
                 suggestRedirectEvaluator = mockSuggestRedirectEvaluator,
                 badUrlErrorPageWideEvent = mockBadUrlErrorPageWideEvent,
-                duckAiSessionWideEvent = mockDuckAiSessionWideEvent,
+                duckAiSessionCallback = mockDuckAiSessionCallback,
             )
 
         testee.loadData("abc", null, false, false)
@@ -3068,7 +3068,7 @@ class BrowserTabViewModelTest {
 
         testee.onLongPressRequiredAction(target, RequiredAction.OpenInNewTab("https://example.com"))
 
-        verify(mockDuckAiSessionWideEvent).onExitIntent("abc", ExitTrigger.NEW_TAB_OPENED)
+        verify(mockDuckAiSessionCallback).onExitIntent("abc", DuckAiSessionExitTrigger.NEW_TAB_OPENED)
     }
 
     @Test
@@ -3077,7 +3077,7 @@ class BrowserTabViewModelTest {
 
         testee.onLongPressRequiredAction(target, RequiredAction.OpenInFireTab("https://example.com"))
 
-        verify(mockDuckAiSessionWideEvent).onExitIntent("abc", ExitTrigger.FIRE_TAB_OPENED)
+        verify(mockDuckAiSessionCallback).onExitIntent("abc", DuckAiSessionExitTrigger.FIRE_TAB_OPENED)
     }
 
     @Test
@@ -3087,7 +3087,7 @@ class BrowserTabViewModelTest {
 
         testee.onLongPressRequiredAction(target, RequiredAction.OpenInFireTab("https://example.com"))
 
-        verify(mockDuckAiSessionWideEvent, never()).onExitIntent(any(), any())
+        verify(mockDuckAiSessionCallback, never()).onExitIntent(any(), any())
     }
 
     @Test
@@ -9377,7 +9377,7 @@ class BrowserTabViewModelTest {
 
         testee.onUserPressedBack()
 
-        verify(mockDuckAiSessionWideEvent).onExitIntent("abc", ExitTrigger.BACK_OR_CLOSE)
+        verify(mockDuckAiSessionCallback).onExitIntent("abc", DuckAiSessionExitTrigger.BACK_OR_CLOSE)
     }
 
     @Test
@@ -9387,7 +9387,7 @@ class BrowserTabViewModelTest {
 
         testee.onUserPressedBack()
 
-        verify(mockDuckAiSessionWideEvent).onExitIntent("abc", ExitTrigger.BACK_OR_CLOSE)
+        verify(mockDuckAiSessionCallback).onExitIntent("abc", DuckAiSessionExitTrigger.BACK_OR_CLOSE)
     }
 
     @Test
@@ -9396,7 +9396,7 @@ class BrowserTabViewModelTest {
 
         testee.onUserPressedBack()
 
-        verify(mockDuckAiSessionWideEvent).onExitIntent("abc", ExitTrigger.BACK_OR_CLOSE)
+        verify(mockDuckAiSessionCallback).onExitIntent("abc", DuckAiSessionExitTrigger.BACK_OR_CLOSE)
     }
 
     @Test
@@ -9405,21 +9405,21 @@ class BrowserTabViewModelTest {
 
         testee.onUserPressedBack()
 
-        verify(mockDuckAiSessionWideEvent).onExitIntent("abc", ExitTrigger.BACK_OR_CLOSE)
+        verify(mockDuckAiSessionCallback).onExitIntent("abc", DuckAiSessionExitTrigger.BACK_OR_CLOSE)
     }
 
     @Test
     fun whenRecordPendingNewTabOpenedExitCalledThenPendingNewTabOpenedExitRecorded() = runTest {
         testee.recordPendingNewTabOpenedExit()
 
-        verify(mockDuckAiSessionWideEvent).onExitIntent("abc", ExitTrigger.NEW_TAB_OPENED)
+        verify(mockDuckAiSessionCallback).onExitIntent("abc", DuckAiSessionExitTrigger.NEW_TAB_OPENED)
     }
 
     @Test
     fun whenRecordPendingFireTabOpenedExitCalledThenPendingFireTabOpenedExitRecorded() = runTest {
         testee.recordPendingFireTabOpenedExit()
 
-        verify(mockDuckAiSessionWideEvent).onExitIntent("abc", ExitTrigger.FIRE_TAB_OPENED)
+        verify(mockDuckAiSessionCallback).onExitIntent("abc", DuckAiSessionExitTrigger.FIRE_TAB_OPENED)
     }
 
     @Test
@@ -11870,7 +11870,7 @@ class BrowserTabViewModelTest {
 
         testee.pageFinished(mockWebView, webViewNavState, url)
 
-        verify(mockDuckAiSessionWideEvent).onDuckAiPageVisible("TAB_ID", url)
+        verify(mockDuckAiSessionCallback).onDuckAiPageVisible("TAB_ID", url)
     }
 
     @Test
@@ -11883,7 +11883,7 @@ class BrowserTabViewModelTest {
 
         testee.pageFinished(mockWebView, webViewNavState, "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5")
 
-        verify(mockDuckAiSessionWideEvent, never()).onDuckAiPageVisible(any(), any())
+        verify(mockDuckAiSessionCallback, never()).onDuckAiPageVisible(any(), any())
     }
 
     @Test
