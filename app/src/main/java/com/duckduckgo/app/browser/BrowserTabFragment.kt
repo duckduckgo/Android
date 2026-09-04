@@ -213,6 +213,8 @@ import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.cta.ui.DaxDuckAiFireButtonBrandDesignUpdateContextualCta
+import com.duckduckgo.app.cta.ui.DaxSiteSuggestionsBrandDesignUpdateContextualCta
+import com.duckduckgo.app.cta.ui.DaxTrackersBlockedBrandDesignUpdateContextualCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetAutoOnboarding
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
@@ -1650,8 +1652,7 @@ class BrowserTabFragment :
     private fun onFireButtonPressed() {
         val isFocusedNtp = omnibar.viewMode == ViewMode.NewTab && omnibar.getText().isEmpty() && omnibar.omnibarTextInput.hasFocus()
         val cta = viewModel.ctaViewState.value?.cta
-        val isDuckAiOnboarding =
-            cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta || cta is DaxDuckAiFireButtonBrandDesignUpdateContextualCta
+        val isDuckAiOnboarding = cta is DaxDuckAiFireButtonBrandDesignUpdateContextualCta
         browserActivity?.launchFire(launchedFromFocusedNtp = isFocusedNtp, isDuckAiOnboarding = isDuckAiOnboarding)
         viewModel.onFireMenuSelected(omnibar.viewMode)
     }
@@ -6522,13 +6523,13 @@ class BrowserTabFragment :
             // Both layouts live in the tree; only one should be visible at a time.
             daxDialogInContextBrandDesign.root.gone()
             val onTypingAnimationFinished =
-                if (configuration is OnboardingDaxDialogCta.DaxTrackersBlockedCta) {
+                if (configuration is DaxTrackersBlockedBrandDesignUpdateContextualCta) {
                     { viewModel.onOnboardingDaxTypingAnimationFinished() }
                 } else {
                     {}
                 }
             val onSuggestedOptionsSelected: ((DaxDialogIntroOption) -> Unit)? =
-                if (configuration is OnboardingDaxDialogCta.DaxSiteSuggestionsCta) {
+                if (configuration is DaxSiteSuggestionsBrandDesignUpdateContextualCta) {
                     { option: DaxDialogIntroOption -> submitQuery(option.link) }
                 } else {
                     null

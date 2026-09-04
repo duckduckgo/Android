@@ -231,7 +231,7 @@ class CtaViewModel @Inject constructor(
             if (cta is BrokenSitePromptDialogCta) {
                 brokenSitePrompt.ctaShown()
             }
-            if (cta is DaxBubbleCta.DaxSubscriptionCta || cta is DaxSubscriptionBrandDesignUpdateBubbleCta || cta is SubscriptionPromoModalCta) {
+            if (cta is DaxSubscriptionBrandDesignUpdateBubbleCta || cta is SubscriptionPromoModalCta) {
                 subscriptionPromoCtaShownPlugins.getPlugins().forEach { it.onSubscriptionPromoCtaShown() }
             }
             if (cta is SubscriptionPromoModalCta) {

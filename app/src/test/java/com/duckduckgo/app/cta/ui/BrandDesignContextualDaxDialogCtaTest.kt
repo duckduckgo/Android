@@ -25,6 +25,8 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
+import com.duckduckgo.app.browser.databinding.IncludeOnboardingInContextDaxDialogBrandDesignUpdateBinding
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
@@ -32,6 +34,7 @@ import com.duckduckgo.app.onboarding.ui.view.DaxTypeAnimationTextView
 import com.duckduckgo.app.onboarding.ui.view.OnboardingFillImageView
 import com.duckduckgo.app.onboarding.ui.view.TouchInterceptingLinearLayout
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleBrandDesignUpdateCardView
 import com.duckduckgo.common.ui.view.text.DaxTextView
@@ -47,12 +50,13 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 class BrandDesignContextualDaxDialogCtaTest {
 
-    private val container: View = mock()
+    private val container: ConstraintLayout = mock()
     private val titleView: DaxTypeAnimationTextView = mock()
     private val hiddenTitle: DaxTextView = mock()
     private val descriptionView: DaxTextView = mock()
@@ -62,6 +66,9 @@ class BrandDesignContextualDaxDialogCtaTest {
     private val activeInclude: View = mock()
     private val primaryInclude: View = mock()
     private val optionsInclude: View = mock()
+    private val browserTabBinding: FragmentBrowserTabBinding = mock()
+    private val brandDesignBinding: IncludeOnboardingInContextDaxDialogBrandDesignUpdateBinding = mock()
+    private val settingsDataStore: SettingsDataStore = mock()
 
     private val cardView: DaxOnboardingBubbleBrandDesignUpdateCardView = mock()
 
@@ -89,8 +96,36 @@ class BrandDesignContextualDaxDialogCtaTest {
             .thenReturn(backgroundView)
         whenever(container.findViewById<DaxOnboardingBubbleBrandDesignUpdateCardView>(R.id.contextualBrandDesignCardView))
             .thenReturn(cardView)
+        whenever(browserTabBinding.includeOnboardingInContextDaxDialogBrandDesign)
+            .thenReturn(brandDesignBinding)
+        whenever(brandDesignBinding.root).thenReturn(container)
 
         testee = TestableBrandDesignContextualDaxDialogCta(onboardingStore, appInstallStore, mockDeviceInfo)
+    }
+
+    @Test
+    fun hideContainer_hidesBrandDesignRoot() {
+        OnboardingDaxDialogCta.BrandDesignContextualDaxDialogCta.hideContainer(browserTabBinding)
+
+        verify(container).visibility = View.GONE
+    }
+
+    @Test
+    fun hideOnboardingCta_hidesBrandDesignContainerForEverySurvivingContextualCta() {
+        val ctas = listOf(
+            DaxDuckAiFireButtonBrandDesignUpdateContextualCta(onboardingStore, appInstallStore, true, mockDeviceInfo),
+            DaxFireButtonBrandDesignUpdateContextualCta(onboardingStore, appInstallStore, true, mockDeviceInfo),
+            DaxMainNetworkBrandDesignUpdateContextualCta(onboardingStore, appInstallStore, "Facebook", "facebook.com", true, mockDeviceInfo),
+            DaxNoTrackersBrandDesignUpdateContextualCta(onboardingStore, appInstallStore, true, mockDeviceInfo),
+            DaxSerpBrandDesignUpdateContextualCta(onboardingStore, appInstallStore, true, mockDeviceInfo),
+            DaxSiteSuggestionsBrandDesignUpdateContextualCta(onboardingStore, appInstallStore, true, mockDeviceInfo),
+            DaxTrackersBlockedBrandDesignUpdateContextualCta(onboardingStore, appInstallStore, emptyList(), settingsDataStore, true, mockDeviceInfo),
+            DaxEndBrandDesignUpdateContextualCta(onboardingStore, appInstallStore, true, mockDeviceInfo),
+        )
+
+        ctas.forEach { it.hideOnboardingCta(browserTabBinding) }
+
+        verify(container, times(ctas.size)).visibility = View.GONE
     }
 
     @Test

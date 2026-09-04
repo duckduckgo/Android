@@ -57,6 +57,7 @@ import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.ui.store.AppTheme
+import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.duckchat.api.DuckChat
@@ -308,15 +309,17 @@ class DaxMainNetworkBrandDesignUpdateContextualCtaTest {
             isLightTheme = true,
             deviceInfo = mockDeviceInfo,
         )
-        val legacyCta = OnboardingDaxDialogCta.DaxMainNetworkCta(
-            onboardingStore = mockOnboardingStore,
-            appInstallStore = mockAppInstallStore,
-            network = network,
-            siteHost = siteHost,
-        )
-
         assertEquals(
-            legacyCta.getTrackersDescription(resourceContext),
+            resourceContext.resources.getString(
+                if (siteHost.contains("facebook") || siteHost.contains("google")) {
+                    com.duckduckgo.app.browser.R.string.daxMainNetworkCtaText
+                } else {
+                    com.duckduckgo.app.browser.R.string.daxMainNetworkOwnedCtaText
+                },
+                network,
+                Uri.parse(siteHost).baseHost?.removePrefix("m."),
+                network,
+            ),
             brandDesignCta.getTrackersDescription(resourceContext),
         )
     }
