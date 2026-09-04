@@ -39,7 +39,8 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.sync.impl.ui.v2.RecoveryCodeActivity
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivity
+import com.duckduckgo.sync.impl.ui.recoverycode.RecoveryCodeActivity
 import com.duckduckgo.sync.internal.databinding.ActivityInternalSyncSettingsBinding
 import com.duckduckgo.sync.internal.databinding.DialogRenameDeviceBinding
 import com.duckduckgo.sync.internal.databinding.ItemConnectedDeviceBinding
@@ -63,7 +64,6 @@ import kotlinx.coroutines.withContext
 import logcat.LogPriority
 import logcat.logcat
 import javax.inject.Inject
-import com.duckduckgo.sync.impl.ui.v2.SyncActivity as SyncActivityV2
 
 @InjectWith(ActivityScope::class)
 class SyncInternalSettingsActivity : DuckDuckGoActivity() {
@@ -121,7 +121,7 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
 
     private fun configureListeners() {
         binding.launchSyncSettingsButton.setOnClickListener {
-            startActivity(Intent(this, SyncActivityV2::class.java))
+            startActivity(Intent(this, SyncActivity::class.java))
         }
         binding.openV2PairingDebugButton.setOnClickListener {
             startActivity(Intent(this, SyncV2PairingDebugActivity::class.java))

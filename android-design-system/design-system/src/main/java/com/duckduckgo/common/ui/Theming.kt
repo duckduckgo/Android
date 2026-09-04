@@ -51,8 +51,8 @@ object Theming {
         const val BROADCAST_THEME_CHANGED = "BROADCAST_THEME_CHANGED"
         val FIXED_THEME_ACTIVITIES = listOf(
             "com.duckduckgo.autofill.impl.service.AutofillProviderFillSuggestionActivity",
-            "com.duckduckgo.sync.impl.ui.v2.ReadSyncCodeActivity",
-            "com.duckduckgo.sync.impl.ui.v2.DisplayQrCodeActivity",
+            "com.duckduckgo.sync.impl.ui.pairing.read.ReadSyncCodeActivity",
+            "com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeActivity",
         )
     }
 }
