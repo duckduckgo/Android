@@ -85,13 +85,10 @@
         app:featureInfoIcon="@drawable/profile_16"
         app:featureInfoTitle="@string/subscriptionOnboardingFeatureInfoItrItem8Title" />
 
-    <com.duckduckgo.common.ui.view.text.DaxTextView
+    <com.duckduckgo.subscriptions.impl.onboarding.features.SummaryOfBenefitsFooterView
         android:id="@+id/subscriptionOnboardingFeatureInfoLegalFooter"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/keyline_4"
-        android:text="@string/subscriptionOnboardingFeatureInfoItrLegalFooter"
-        app:textType="secondary"
-        app:typography="caption" />
+        android:layout_marginTop="@dimen/keyline_4" />
 
 </merge>

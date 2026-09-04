@@ -17,48 +17,26 @@
 package com.duckduckgo.subscriptions.impl.onboarding.itr
 
 import android.Manifest
-import android.annotation.SuppressLint
-import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
-import android.os.Environment
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
-import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.core.widget.NestedScrollView
-import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.ui.DuckDuckGoFragment
-import com.duckduckgo.common.ui.view.addClickableLink
 import com.duckduckgo.common.ui.view.getColorFromAttr
-import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
-import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_DELAY
-import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_LENGTH
-import com.duckduckgo.downloads.api.DownloadCommand
-import com.duckduckgo.downloads.api.DownloadStateListener
-import com.duckduckgo.downloads.api.DownloadsFileActions
-import com.duckduckgo.downloads.api.FileDownloader
-import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.COMPLETED
 import com.duckduckgo.subscriptions.impl.R
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ITR_SUMMARY_OF_BENEFITS_URL
 import com.duckduckgo.subscriptions.impl.databinding.FragmentSubscriptionOnboardingItrBinding
 import com.duckduckgo.subscriptions.impl.onboarding.features.OnboardingFeature
+import com.duckduckgo.subscriptions.impl.onboarding.features.SummaryOfBenefitsFooterView
 import com.duckduckgo.subscriptions.impl.onboarding.itr.SubscriptionOnboardingItrStepPlugin.Companion.ITR_STEP_ID
-import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.flow.cancellable
-import kotlinx.coroutines.launch
-import java.io.File
 import javax.inject.Inject
 
 /**
@@ -72,25 +50,14 @@ class SubscriptionOnboardingItrFragment : DuckDuckGoFragment(R.layout.fragment_s
     @Inject
     lateinit var controller: SubscriptionOnboardingController
 
-    @Inject
-    lateinit var appBuildConfig: AppBuildConfig
-
-    @Inject
-    lateinit var fileDownloader: FileDownloader
-
-    @Inject
-    lateinit var downloadCallback: DownloadStateListener
-
-    @Inject
-    lateinit var downloadsFileActions: DownloadsFileActions
-
     private val binding: FragmentSubscriptionOnboardingItrBinding by viewBinding()
 
-    private val downloadMessagesJob = ConflatedJob()
+    private val summaryOfBenefitsFooter: SummaryOfBenefitsFooterView
+        get() = binding.subscriptionOnboardingItrContent.findViewById(R.id.subscriptionOnboardingFeatureInfoLegalFooter)
 
     private val writeStoragePermission = registerForActivityResult(RequestPermission()) { granted ->
         if (granted) {
-            downloadSummaryOfBenefits()
+            summaryOfBenefitsFooter.onWriteStoragePermissionGranted()
         }
     }
 
@@ -103,23 +70,15 @@ class SubscriptionOnboardingItrFragment : DuckDuckGoFragment(R.layout.fragment_s
         binding.subscriptionOnboardingItrDescription.setText(feature.descriptionRes)
         layoutInflater.inflate(feature.contentRes, binding.subscriptionOnboardingItrContent, true)
 
-        setupSummaryOfBenefitsLink()
+        summaryOfBenefitsFooter.onWriteStoragePermissionRequired = {
+            writeStoragePermission.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        }
 
         binding.subscriptionOnboardingItrActivateButton.setOnClickListener {
             controller.onStepFinished(ITR_STEP_ID, COMPLETED)
         }
 
         setupScrollFade()
-    }
-
-    override fun onResume() {
-        launchDownloadMessagesJob()
-        super.onResume()
-    }
-
-    override fun onPause() {
-        downloadMessagesJob.cancel()
-        super.onPause()
     }
 
     private fun setupScrollFade() {
@@ -141,83 +100,5 @@ class SubscriptionOnboardingItrFragment : DuckDuckGoFragment(R.layout.fragment_s
     private fun updateScrollFade() {
         binding.subscriptionOnboardingItrScrollFade.isVisible =
             binding.subscriptionOnboardingItrScrollView.canScrollVertically(1)
-    }
-
-    private fun setupSummaryOfBenefitsLink() {
-        binding.subscriptionOnboardingItrContent
-            .findViewById<DaxTextView>(R.id.subscriptionOnboardingFeatureInfoLegalFooter)
-            .addClickableLink(
-                annotation = "summary_of_benefits_link",
-                textSequence = getText(R.string.subscriptionOnboardingFeatureInfoItrLegalFooter),
-            ) {
-                if (hasWriteStoragePermission()) {
-                    downloadSummaryOfBenefits()
-                } else {
-                    writeStoragePermission.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                }
-            }
-    }
-
-    private fun downloadSummaryOfBenefits() {
-        fileDownloader.enqueueDownload(
-            PendingFileDownload(
-                url = ITR_SUMMARY_OF_BENEFITS_URL,
-                mimeType = PDF_MIME_TYPE,
-                subfolder = Environment.DIRECTORY_DOWNLOADS,
-                browserMode = BrowserMode.REGULAR,
-            ),
-        )
-    }
-
-    @Suppress("NewApi")
-    private fun hasWriteStoragePermission(): Boolean {
-        return appBuildConfig.sdkInt >= 30 ||
-            ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PERMISSION_GRANTED
-    }
-
-    private fun launchDownloadMessagesJob() {
-        downloadMessagesJob += viewLifecycleOwner.lifecycleScope.launch {
-            downloadCallback.commands().cancellable().collect {
-                processFileDownloadedCommand(it)
-            }
-        }
-    }
-
-    private fun processFileDownloadedCommand(command: DownloadCommand) {
-        when (command) {
-            is DownloadCommand.ShowDownloadStartedMessage -> downloadStarted(command)
-            is DownloadCommand.ShowDownloadFailedMessage -> downloadFailed(command)
-            is DownloadCommand.ShowDownloadSuccessMessage -> downloadSucceeded(command)
-        }
-    }
-
-    @SuppressLint("WrongConstant")
-    private fun downloadStarted(command: DownloadCommand.ShowDownloadStartedMessage) {
-        binding.root.makeSnackbarWithNoBottomInset(getString(command.messageId, command.fileName), DOWNLOAD_SNACKBAR_LENGTH).show()
-    }
-
-    private fun downloadFailed(command: DownloadCommand.ShowDownloadFailedMessage) {
-        val downloadFailedSnackbar = binding.root.makeSnackbarWithNoBottomInset(getString(command.messageId), Snackbar.LENGTH_LONG)
-        binding.root.postDelayed({ downloadFailedSnackbar.show() }, DOWNLOAD_SNACKBAR_DELAY)
-    }
-
-    private fun downloadSucceeded(command: DownloadCommand.ShowDownloadSuccessMessage) {
-        val downloadSucceededSnackbar = binding.root.makeSnackbarWithNoBottomInset(
-            getString(command.messageId, command.fileName),
-            Snackbar.LENGTH_LONG,
-        )
-            .apply {
-                this.setAction(R.string.downloadsDownloadFinishedActionName) {
-                    val result = downloadsFileActions.openFile(context, File(command.filePath))
-                    if (!result) {
-                        view.makeSnackbarWithNoBottomInset(getString(R.string.downloadsCannotOpenFileErrorMessage), Snackbar.LENGTH_LONG).show()
-                    }
-                }
-            }
-        binding.root.postDelayed({ downloadSucceededSnackbar.show() }, DOWNLOAD_SNACKBAR_DELAY)
-    }
-
-    companion object {
-        private const val PDF_MIME_TYPE = "application/pdf"
     }
 }
