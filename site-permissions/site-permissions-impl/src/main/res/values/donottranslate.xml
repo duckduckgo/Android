@@ -22,10 +22,10 @@
     <string name="sitePermissionsDialogAllowWhileUsingSiteButton">Allow While Using Site</string>
     <string name="sitePermissionsDialogAllowThisTimeButton">Allow This Time</string>
     <string name="sitePermissionsDialogNeverAllowButton">Never Allow</string>
-    <string name="sitePermissionsTieredLocationDialogTitle">\"%1$s\" website wants to access your location</string>
-    <string name="sitePermissionsTieredDdgLocationDialogTitle">\"%1$s\" wants to access your location</string>
+    <string name="sitePermissionsTieredLocationDialogTitle" instruction="Placeholder is a website">\"%1$s\" website wants to access your location</string>
+    <string name="sitePermissionsTieredDdgLocationDialogTitle" instruction="Placeholder is a website">\"%1$s\" wants to access your location</string>
     <string name="sitePermissionsTieredDdgLocationDialogSubtitle">We\'ll anonymize your location and use it to deliver better results, closer to you.</string>
-    <string name="sitePermissionsTieredCameraDialogTitle">\"%1$s\" website wants to access the camera</string>
-    <string name="sitePermissionsTieredMicDialogTitle">\"%1$s\" website wants to access the microphone</string>
-    <string name="sitePermissionsTieredMicAndCameraDialogTitle">\"%1$s\" website wants to access the camera and microphone</string>
+    <string name="sitePermissionsTieredCameraDialogTitle" instruction="Placeholder is a website">\"%1$s\" website wants to access the camera</string>
+    <string name="sitePermissionsTieredMicDialogTitle" instruction="Placeholder is a website">\"%1$s\" website wants to access the microphone</string>
+    <string name="sitePermissionsTieredMicAndCameraDialogTitle" instruction="Placeholder is a website">\"%1$s\" website wants to access the camera and microphone</string>
 </resources>
