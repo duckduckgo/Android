@@ -377,6 +377,7 @@
 
     <!-- Pairing screen -->
     <string name="sync_simplified_pairing_headline">Sync &amp; Backup je šifriran v celoti v vseh vaših napravah.</string>
+    <string name="sync_simplified_pairing_headline_check_other_device">Preveri drugo napravo</string>
     <string name="sync_simplified_pairing_headline_recovery">Obnovitev podatkov</string>
     <string name="sync_simplified_pairing_body">Povezovanje ...</string>
 
@@ -389,6 +390,9 @@
     <string name="sync_simplified_pairing_dialog_joiner_secondary_button">Prekliči</string>
     <string name="sync_simplified_pairing_dialog_acknowledgment_title">Potrdite v drugi napravi …</string>
     <string name="sync_simplified_pairing_dialog_acknowledgment_primary_button">Razumem</string>
+    <string name="sync_simplified_pairing_dialog_check_other_device_title">Preveri drugo napravo</string>
+    <string name="sync_simplified_pairing_dialog_connecting_title">Sinhronizacija poteka</string>
+    <string name="sync_simplified_pairing_dialog_connecting_body">Povezovanje ...</string>
 
     <!-- Recovery Code screen -->
     <string name="sync_simplified_recovery_code_headline" instruction="Placeholder is a device name. e.g., Samsung S23">Naprava %1$s je bila dodana v Sync &amp; Backup.</string>

@@ -377,6 +377,7 @@
 
     <!-- Pairing screen -->
     <string name="sync_simplified_pairing_headline">A Sync &amp; Backup végpontok közötti titkosítással működik minden eszközödön.</string>
+    <string name="sync_simplified_pairing_headline_check_other_device">Ellenőrizd a másik eszközödet</string>
     <string name="sync_simplified_pairing_headline_recovery">Adatok helyreállítása</string>
     <string name="sync_simplified_pairing_body">Csatlakozás…</string>
 
@@ -389,6 +390,9 @@
     <string name="sync_simplified_pairing_dialog_joiner_secondary_button">Mégsem</string>
     <string name="sync_simplified_pairing_dialog_acknowledgment_title">Erősítsd meg a másik eszközödön…</string>
     <string name="sync_simplified_pairing_dialog_acknowledgment_primary_button">Értem</string>
+    <string name="sync_simplified_pairing_dialog_check_other_device_title">Ellenőrizd a másik eszközödet</string>
+    <string name="sync_simplified_pairing_dialog_connecting_title">Szinkronizálás folyamatban</string>
+    <string name="sync_simplified_pairing_dialog_connecting_body">Csatlakozás…</string>
 
     <!-- Recovery Code screen -->
     <string name="sync_simplified_recovery_code_headline" instruction="Placeholder is a device name. e.g., Samsung S23">A(z) %1$s hozzáadva a Sync &amp; Backup szolgáltatáshoz.</string>

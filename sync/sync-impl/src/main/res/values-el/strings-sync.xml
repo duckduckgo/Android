@@ -377,6 +377,7 @@
 
     <!-- Pairing screen -->
     <string name="sync_simplified_pairing_headline">Το Sync &amp; Backup είναι κρυπτογραφημένο από άκρο σε άκρο σε όλες τις συσκευές σας.</string>
+    <string name="sync_simplified_pairing_headline_check_other_device">Έλεγξε την άλλη συσκευή σου</string>
     <string name="sync_simplified_pairing_headline_recovery">Γίνεται ανάκτηση δεδομένων</string>
     <string name="sync_simplified_pairing_body">Σύνδεση...</string>
 
@@ -389,6 +390,9 @@
     <string name="sync_simplified_pairing_dialog_joiner_secondary_button">Ακύρωση</string>
     <string name="sync_simplified_pairing_dialog_acknowledgment_title">Επιβεβαιώστε στην άλλη συσκευή σας...</string>
     <string name="sync_simplified_pairing_dialog_acknowledgment_primary_button">Το κατάλαβα</string>
+    <string name="sync_simplified_pairing_dialog_check_other_device_title">Έλεγξε την άλλη συσκευή σου</string>
+    <string name="sync_simplified_pairing_dialog_connecting_title">Συγχρονισμός σε εξέλιξη</string>
+    <string name="sync_simplified_pairing_dialog_connecting_body">Σύνδεση...</string>
 
     <!-- Recovery Code screen -->
     <string name="sync_simplified_recovery_code_headline" instruction="Placeholder is a device name. e.g., Samsung S23">Η συσκευή %1$s προστέθηκε στο Sync &amp; Backup.</string>

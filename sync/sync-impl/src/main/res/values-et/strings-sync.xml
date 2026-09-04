@@ -377,6 +377,7 @@
 
     <!-- Pairing screen -->
     <string name="sync_simplified_pairing_headline">Sync &amp; Backup on kõigis sinu seadmetes otspunktkrüpeeritud.</string>
+    <string name="sync_simplified_pairing_headline_check_other_device">Kontrolli oma teist seadet</string>
     <string name="sync_simplified_pairing_headline_recovery">Andmete taastamine</string>
     <string name="sync_simplified_pairing_body">Ühendamine...</string>
 
@@ -389,6 +390,9 @@
     <string name="sync_simplified_pairing_dialog_joiner_secondary_button">Tühista</string>
     <string name="sync_simplified_pairing_dialog_acknowledgment_title">Kinnita oma teises seadmes…</string>
     <string name="sync_simplified_pairing_dialog_acknowledgment_primary_button">Sain aru</string>
+    <string name="sync_simplified_pairing_dialog_check_other_device_title">Kontrolli oma teist seadet</string>
+    <string name="sync_simplified_pairing_dialog_connecting_title">Sünkroonimine pooleli</string>
+    <string name="sync_simplified_pairing_dialog_connecting_body">Ühendamine...</string>
 
     <!-- Recovery Code screen -->
     <string name="sync_simplified_recovery_code_headline" instruction="Placeholder is a device name. e.g., Samsung S23">%1$s on lisatud Sync &amp; Backupi.</string>

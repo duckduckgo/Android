@@ -377,6 +377,7 @@
 
     <!-- Pairing screen -->
     <string name="sync_simplified_pairing_headline">Funkcijai „Sync &amp; Backup“ visuose jūsų įrenginiuose naudojamas ištisinis šifravimas.</string>
+    <string name="sync_simplified_pairing_headline_check_other_device">Patikrink kitą savo įrenginį</string>
     <string name="sync_simplified_pairing_headline_recovery">Duomenų atkūrimas</string>
     <string name="sync_simplified_pairing_body">Jungiamasi...</string>
 
@@ -389,6 +390,9 @@
     <string name="sync_simplified_pairing_dialog_joiner_secondary_button">Atšaukti</string>
     <string name="sync_simplified_pairing_dialog_acknowledgment_title">Patvirtinkite kitame įrenginyje…</string>
     <string name="sync_simplified_pairing_dialog_acknowledgment_primary_button">Supratau</string>
+    <string name="sync_simplified_pairing_dialog_check_other_device_title">Patikrink kitą savo įrenginį</string>
+    <string name="sync_simplified_pairing_dialog_connecting_title">Vyksta sinchronizavimas</string>
+    <string name="sync_simplified_pairing_dialog_connecting_body">Jungiamasi...</string>
 
     <!-- Recovery Code screen -->
     <string name="sync_simplified_recovery_code_headline" instruction="Placeholder is a device name. e.g., Samsung S23">%1$s buvo pridėtas prie „Sync &amp; Backup“.</string>
