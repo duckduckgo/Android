@@ -304,6 +304,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         pixelType: String,
         faviconUrl: String?,
         onPermissionAllowed: (Boolean) -> Unit,
+        onPermissionDenied: (Boolean) -> Unit = ::denyPermissions,
     ) {
         StackedAlertDialogBuilder(activity)
             .setRebrandUpdate(true)
@@ -336,7 +337,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                             NEVER_ALLOW_BUTTON -> {
                                 faviconUrl?.let { storeFavicon(it) }
                                 sendNegativeDialogClickPixel(pixelType, rememberChoice = true)
-                                denyPermissions(rememberChoice = true)
+                                onPermissionDenied(true)
                             }
                         }
                     }
@@ -344,7 +345,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                     // The tiered dialog has no explicit deny-once button; dismissing it is that choice.
                     override fun onDialogCancelled() {
                         sendNegativeDialogClickPixel(pixelType, rememberChoice = false)
-                        denyPermissions(rememberChoice = false)
+                        onPermissionDenied(false)
                     }
                 },
             )
@@ -381,6 +382,21 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
 
         // No session-based setting and no config --> proceed to show dialog
         val title = url.websiteFromGeoLocationsApiOrigin()
+
+        if (sitePermissionsDialogRedesignFeature.self().isEnabled()) {
+            sendDialogImpressionPixel(SitePermissionsPixelValues.DRM)
+            showTieredSitePermissionsDialog(
+                iconRes = CommonR.drawable.ic_video_player_24,
+                title = String.format(activity.getString(R.string.drmSitePermissionDialogTitle), title),
+                messageRes = R.string.sitePermissionsTieredDrmDialogSubtitle,
+                pixelType = SitePermissionsPixelValues.DRM,
+                faviconUrl = url,
+                onPermissionAllowed = { rememberChoice -> allowDrmPermissions(domain, rememberChoice) },
+                onPermissionDenied = { rememberChoice -> denyDrmPermissions(domain, rememberChoice) },
+            )
+            return
+        }
+
         val dialog = TextAlertDialogBuilder(activity)
         dialog
             .setTitle(
@@ -417,8 +433,6 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                             onSiteDrmPermissionSave(domain, SitePermissionAskSettingType.ALLOW_ALWAYS)
                             storeFavicon(url)
                         } else {
-                            // Fire mode grants the in-session WebView permission below but must not write the
-                            // choice into the shared (app-wide, in-memory) DRM session map that regular tabs read.
                             if (browserMode != BrowserMode.FIRE) {
                                 sitePermissionsRepository.saveDrmForSession(tabId, domain, true)
                             }
@@ -433,8 +447,6 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                             onSiteDrmPermissionSave(domain, SitePermissionAskSettingType.DENY_ALWAYS)
                             storeFavicon(url)
                         } else if (browserMode != BrowserMode.FIRE) {
-                            // Fire mode denied the in-session permission above but must not write the
-                            // choice into the shared (app-wide, in-memory) DRM session map that regular tabs read.
                             sitePermissionsRepository.saveDrmForSession(tabId, domain, false)
                         }
                         sendNegativeDialogClickPixel(SitePermissionsPixelValues.DRM, rememberChoice)
@@ -448,11 +460,34 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
             .show()
     }
 
+    private fun allowDrmPermissions(
+        domain: String,
+        rememberChoice: Boolean,
+    ) {
+        if (browserMode != BrowserMode.FIRE) {
+            if (rememberChoice) {
+                sitePermissionsRepository.sitePermissionPermanentlySaved(siteURL, PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID, ALLOW_ALWAYS)
+            } else {
+                sitePermissionsRepository.saveDrmForSession(tabId, domain, true)
+            }
+        }
+        grantPermissions()
+    }
+
+    private fun denyDrmPermissions(
+        domain: String,
+        rememberChoice: Boolean,
+    ) {
+        if (!rememberChoice && browserMode != BrowserMode.FIRE) {
+            sitePermissionsRepository.saveDrmForSession(tabId, domain, false)
+        }
+        denyPermissions(rememberChoice)
+    }
+
     private fun onSiteDrmPermissionSave(
         domain: String,
         drmPermission: SitePermissionAskSettingType,
     ) {
-        // Fire mode must not persist a per-site DRM choice into the shared store.
         if (browserMode == BrowserMode.FIRE) return
 
         val sitePermissionsEntity = SitePermissionsEntity(
