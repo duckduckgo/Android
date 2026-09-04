@@ -53,6 +53,20 @@ sealed interface ExchangeV2Event {
     ) : ExchangeV2Event
 
     /**
+     * An outbound message never reached the relay, whether sending failed or was skipped
+     * deliberately. The counterpart of [MessageSent] and just as observational: when the failure
+     * also ends the session, a separate [SessionError] follows. A teardown `bye` never produces
+     * one, since it is best-effort by contract. [messageType] is always set; [message] is null
+     * when sending failed before the message was built, see [NotSentReason.OwnChannelNotConfigured].
+     */
+    data class MessageNotSent(
+        override val timestampMs: Long,
+        val reason: NotSentReason,
+        val messageType: String,
+        val message: ExchangeV2Message?,
+    ) : ExchangeV2Event
+
+    /**
      * [message] was received but not acted on in [state]: either an unknown message type dropped to keep
      * the session alive, or a protocol violation aborting a session already in a terminal state (an abort
      * from an active state surfaces as a [Transition] instead). See [RejectReason].
@@ -112,6 +126,21 @@ enum class RejectReason {
 
     /** An unrecognized message type, ignored so a newer peer's extra messages can't kill the session. */
     UnknownMessageDropped,
+
+    /** The peer sent `bye` before the exchange completed. Not a protocol violation: the peer is simply gone. */
+    PeerLeft,
+}
+
+/** Why an outbound message never reached the relay. See [ExchangeV2Event.MessageNotSent]. */
+sealed interface NotSentReason {
+    /** Sending was attempted without a bootstrapped session, so there was no channel pair to write over. */
+    data object OwnChannelNotConfigured : NotSentReason
+
+    /** The relay rejected the write with HTTP [code]. */
+    data class HttpError(val code: Int) : NotSentReason
+
+    /** Deliberate skip: the message requires a newer protocol than [negotiatedVersion], so the peer could not process it. */
+    data class TooHighProtocol(val negotiatedVersion: ExchangeProtocolVersion.V2) : NotSentReason
 }
 
 /**

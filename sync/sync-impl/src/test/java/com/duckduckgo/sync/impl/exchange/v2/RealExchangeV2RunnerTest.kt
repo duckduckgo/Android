@@ -26,6 +26,7 @@ import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.crypto.RsaKeyPair
 import com.duckduckgo.sync.impl.crypto.SyncJweCrypto
 import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.Bye
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.Hello
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeAvailable
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeAwaitingConfirmation
@@ -1011,6 +1012,230 @@ class RealExchangeV2RunnerTest {
         verify(channel).createChannel(any(), eq("fn4_Pz4-c2VjcmV0IQ"))
     }
 
+    // ---- Bye on teardown ----
+
+    @Test fun `teardown says bye to a v2_1 peer`() = runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenLinkingCodeVersion(ExchangeProtocolVersion.V2_1)
+        val runner = newRunner()
+        runner.startScan("")
+
+        runner.cancel()
+
+        verify(channel).sendMessage(
+            argThat { this is Bye && reason == Bye.Reason.Cancelled },
+            any(),
+            any(),
+            any(),
+            anyOrNull(),
+        )
+    }
+
+    @Test fun `teardown after a v2_0 session sends no bye`() = runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenLinkingCodeVersion(ExchangeProtocolVersion.V2_0)
+        val runner = newRunner()
+        runner.startScan("")
+
+        runner.cancel()
+
+        verify(channel, never()).sendMessage(argThat { this is Bye }, any(), any(), any(), anyOrNull())
+    }
+
+    @Test fun `a completed Host session says bye with reason done`() = runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenHostCanProduceRecoveryCode()
+        val runner = newRunner()
+        runner.reachHostAwaitingStatus()
+
+        runner.deliverIncomingMessage(RecoveryCodeDone.create(RecoveryCodeDone.Reason.Success))
+
+        verify(channel).sendMessage(
+            argThat { this is Bye && reason == Bye.Reason.Done },
+            any(),
+            any(),
+            any(),
+            anyOrNull(),
+        )
+    }
+
+    @Test fun `a denied Joiner prompt says bye with reason cancelled`() = runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenLinkingCodeVersion(ExchangeProtocolVersion.V2_1)
+        whenever(syncStore.userId).thenReturn(null)
+        val runner = newRunner()
+        runner.startScan("")
+        runner.deliverIncomingMessage(RecoveryCodeAvailable.create(userId = "host-user", name = "Host", kind = "ddg"))
+
+        runner.localTrigger(LocalTrigger.UserDeniedJoiner)
+
+        verify(channel).sendMessage(
+            argThat { this is Bye && reason == Bye.Reason.Cancelled },
+            any(),
+            any(),
+            any(),
+            anyOrNull(),
+        )
+    }
+
+    @Test fun `a Host that cannot send the recovery code says bye with reason error`() = runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenHostCanProduceRecoveryCode()
+        whenever(
+            channel.sendMessage(any<RecoveryCodeResponse>(), any(), any(), any(), anyOrNull()),
+        ).thenReturn(Result.Error(reason = "relay unreachable"))
+
+        val runner = newRunner()
+        runner.startPresent()
+        runner.deliverHello(ExchangeProtocolVersion.V2_1)
+        runner.deliverIncomingMessage(RecoveryCodeRequest.create(name = "Joiner", kind = "ddg"))
+        runner.localTrigger(LocalTrigger.UserConfirmedHost)
+
+        verify(channel).sendMessage(
+            argThat { this is Bye && reason == Bye.Reason.Error },
+            any(),
+            any(),
+            any(),
+            anyOrNull(),
+        )
+    }
+
+    @Test fun `an undeliverable bye emits MessageNotSent but no session error`() = runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenLinkingCodeVersion(ExchangeProtocolVersion.V2_1)
+        whenever(channel.sendMessage(any<Bye>(), any(), any(), any(), anyOrNull()))
+            .thenReturn(Result.Error(code = 404, reason = "channel gone"))
+        val runner = newRunner()
+        runner.startScan("")
+
+        runner.cancel()
+
+        assertTrue(runner.events.replayCache.filterIsInstance<ExchangeV2Event.SessionError>().isEmpty())
+        val notSent = runner.events.replayCache.filterIsInstance<ExchangeV2Event.MessageNotSent>().single()
+        assertEquals(NotSentReason.HttpError(404), notSent.reason)
+        assertEquals(Bye.TYPE, notSent.messageType)
+        assertTrue(notSent.message is Bye)
+    }
+
+    @Test fun `a bye skipped on a v2_0 session emits MessageNotSent with TooHighProtocol`() = runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenLinkingCodeVersion(ExchangeProtocolVersion.V2_0)
+        val runner = newRunner()
+        runner.startScan("")
+
+        runner.cancel()
+
+        val notSent = runner.events.replayCache.filterIsInstance<ExchangeV2Event.MessageNotSent>().single()
+        assertEquals(NotSentReason.TooHighProtocol(ExchangeProtocolVersion.V2_0), notSent.reason)
+        assertEquals(Bye.TYPE, notSent.messageType)
+    }
+
+    @Test fun `a failed send emits MessageNotSent alongside the session error`() = runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenLinkingCodeVersion(ExchangeProtocolVersion.V2_1)
+        whenever(channel.sendMessage(any<Hello>(), any(), any(), any(), anyOrNull()))
+            .thenReturn(Result.Error(code = 500, reason = "relay unavailable"))
+        val runner = newRunner()
+
+        runner.startScan("")
+
+        val notSent = runner.events.replayCache.filterIsInstance<ExchangeV2Event.MessageNotSent>().single()
+        assertEquals(NotSentReason.HttpError(500), notSent.reason)
+        assertEquals(Hello.TYPE, notSent.messageType)
+        assertTrue(runner.events.replayCache.filterIsInstance<ExchangeV2Event.SessionError>().isNotEmpty())
+    }
+
+    @Test fun `a received bye still gets our own farewell on teardown, and it says done rather than error`() = runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenLinkingCodeVersion(ExchangeProtocolVersion.V2_1)
+        val runner = newRunner()
+        runner.startScan("")
+
+        runner.deliverIncomingMessage(Bye.create(Bye.Reason.Cancelled))
+
+        assertNull(runner.currentState)
+        verify(channel).sendMessage(
+            argThat { this is Bye && reason == Bye.Reason.Done },
+            any(),
+            any(),
+            any(),
+            anyOrNull(),
+        )
+    }
+
+    @Test fun `a failed hello send says bye with reason error`() = runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenLinkingCodeVersion(ExchangeProtocolVersion.V2_1)
+        whenever(channel.sendMessage(any<Hello>(), any(), any(), any(), anyOrNull()))
+            .thenReturn(Result.Error(reason = "relay unreachable"))
+        val runner = newRunner()
+
+        runner.startScan("")
+
+        assertNull(runner.currentState)
+        verify(channel).sendMessage(
+            argThat { this is Bye && reason == Bye.Reason.Error },
+            any(),
+            any(),
+            any(),
+            anyOrNull(),
+        )
+    }
+
+    // ---- Bye on receipt ----
+
+    @Test fun `a bye received in Host AwaitingStatus moves the session to Host Unknown, not a failure`() = runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenHostCanProduceRecoveryCode()
+        val runner = newRunner()
+        runner.reachHostAwaitingStatus()
+
+        runner.deliverIncomingMessage(Bye.create(Bye.Reason.Done))
+
+        assertSame(ExchangeV2State.Host.Unknown, runner.currentState)
+        assertTrue(runner.events.replayCache.filterIsInstance<ExchangeV2Event.SessionError>().isEmpty())
+        verify(channel, never()).sendMessage(argThat { this is Bye }, any(), any(), any(), anyOrNull())
+    }
+
+    @Test fun `a bye received while the Joiner is joining does not end the session`() = runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenLinkingCodeVersion(ExchangeProtocolVersion.V2_1)
+        whenever(syncStore.userId).thenReturn(null)
+        val runner = newRunner()
+        runner.reachJoinerJoining()
+
+        runner.deliverIncomingMessage(Bye.create(Bye.Reason.Done))
+
+        assertSame(ExchangeV2State.Joiner.Joining, runner.currentState)
+    }
+
+    @Test fun `a Joiner that got a bye mid-join still reports recovery_code_done before its own farewell`() = runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenLinkingCodeVersion(ExchangeProtocolVersion.V2_1)
+        whenever(syncStore.userId).thenReturn(null)
+        val runner = newRunner()
+        runner.reachJoinerJoining()
+        runner.deliverIncomingMessage(Bye.create(Bye.Reason.Done))
+
+        runner.localTrigger(LocalTrigger.JoinerJoinComplete(RecoveryCodeDone.Reason.Success))
+
+        assertNull(runner.currentState)
+        verify(channel).sendMessage(
+            argThat { this is RecoveryCodeDone && reason == RecoveryCodeDone.Reason.Success },
+            any(),
+            any(),
+            any(),
+            anyOrNull(),
+        )
+        verify(channel).sendMessage(
+            argThat { this is Bye && reason == Bye.Reason.Done },
+            any(),
+            any(),
+            any(),
+            anyOrNull(),
+        )
+    }
+
     // ---- Helpers ----
 
     private fun givenOurVersion(version: ExchangeProtocolVersion.V2) {
@@ -1038,6 +1263,14 @@ class RealExchangeV2RunnerTest {
         deliverHello(ExchangeProtocolVersion.V2_1)
         deliverIncomingMessage(RecoveryCodeRequest.create(name = "Joiner", kind = "ddg"))
         localTrigger(LocalTrigger.UserConfirmedHost)
+    }
+
+    // Caller must stub a null [SyncStore.userId] first so role election picks Joiner.
+    private suspend fun RealExchangeV2Runner.reachJoinerJoining() {
+        startScan("")
+        deliverIncomingMessage(RecoveryCodeAvailable.create(userId = "host-user", name = "Host", kind = "ddg"))
+        localTrigger(LocalTrigger.UserConfirmedJoiner)
+        deliverIncomingMessage(RecoveryCodeResponse.create("the-code"))
     }
 
     private fun String.toProtocolVersion() = ExchangeProtocolVersion.parse(this).getOrThrow()

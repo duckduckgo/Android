@@ -1062,6 +1062,67 @@ class RealSyncCodeDispatcherTest {
         }
     }
 
+    @Test fun `Presenter emits Failed peer_left PAIRING_REJECTED when Joiner_AbortedLocal driven by a bye`() = runTest {
+        dispatcher.presentV2().test {
+            runnerEventsFlow.emit(
+                transition(
+                    from = ExchangeV2State.Joiner.Waiting,
+                    to = ExchangeV2State.Joiner.AbortedLocal,
+                    trigger = ExchangeV2Message.Bye.create(ExchangeV2Message.Bye.Reason.Cancelled),
+                ),
+            )
+            assertEquals(
+                DispatchOutcome.Failed(
+                    "peer_left(cancelled)",
+                    PAIRING_REJECTED.code,
+                    path = SetupPath.PAIRING,
+                    myRole = SetupRole.JOINER,
+                ),
+                awaitItem(),
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test fun `Presenter emits Failed peer_left PAIRING_FAILED when Host_Aborted driven by a bye with reason error`() = runTest {
+        dispatcher.presentV2().test {
+            runnerEventsFlow.emit(
+                transition(
+                    from = ExchangeV2State.Host.Confirming,
+                    to = ExchangeV2State.Host.Aborted,
+                    trigger = ExchangeV2Message.Bye.create(ExchangeV2Message.Bye.Reason.Error),
+                ),
+            )
+            assertEquals(
+                DispatchOutcome.Failed(
+                    "peer_left(error)",
+                    PAIRING_FAILED.code,
+                    path = SetupPath.PAIRING,
+                    myRole = SetupRole.HOST,
+                ),
+                awaitItem(),
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test fun `Presenter emits Failed peer_left PAIRING_REJECTED when Aborted driven by a bye during negotiation`() = runTest {
+        dispatcher.presentV2().test {
+            runnerEventsFlow.emit(
+                transition(
+                    from = ExchangeV2State.Negotiating,
+                    to = ExchangeV2State.Aborted,
+                    trigger = ExchangeV2Message.Bye.create(ExchangeV2Message.Bye.Reason.Cancelled),
+                ),
+            )
+            assertEquals(
+                DispatchOutcome.Failed("peer_left(cancelled)", PAIRING_REJECTED.code, path = SetupPath.PAIRING),
+                awaitItem(),
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
     @Test fun `Presenter calls runner_startPresent when Flow is collected`() = runTest {
         val flow = dispatcher.presentV2()
         verify(runner, never()).startPresent()

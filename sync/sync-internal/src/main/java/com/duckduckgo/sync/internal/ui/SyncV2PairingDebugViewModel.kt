@@ -38,6 +38,7 @@ import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Runner
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State
 import com.duckduckgo.sync.impl.exchange.v2.LocalTrigger
+import com.duckduckgo.sync.impl.exchange.v2.NotSentReason
 import com.duckduckgo.sync.impl.exchange.v2.PairingRole
 import com.duckduckgo.sync.impl.exchange.v2.PeerVersionSource
 import com.duckduckgo.sync.impl.exchange.v2.RejectReason
@@ -603,6 +604,7 @@ class SyncV2PairingDebugViewModel @Inject constructor(
             append("Sent ${event.message.messageType}")
             appendPeerDetails(event.message)
         }
+        is ExchangeV2Event.MessageNotSent -> "Not sent ${event.messageType}: ${labelFor(event.reason)}"
         is ExchangeV2Event.MessageRejected -> buildString {
             append("${labelFor(event.reason)} on ${event.message.messageType}")
             appendPeerDetails(event.message)
@@ -631,6 +633,10 @@ class SyncV2PairingDebugViewModel @Inject constructor(
             else -> LogDetails.Json(trigger.rawJson)
         }
         is ExchangeV2Event.MessageSent -> LogDetails.Json(event.message.rawJson)
+        is ExchangeV2Event.MessageNotSent -> when (val message = event.message) {
+            null -> LogDetails.PlainText(labelFor(event.reason))
+            else -> LogDetails.Json(message.rawJson)
+        }
         is ExchangeV2Event.MessageRejected -> LogDetails.Json(event.message.rawJson)
         is ExchangeV2Event.SessionStarted -> when (val linkingCode = event.linkingCode) {
             null -> LogDetails.PlainText("no linking code — Scanner side")
@@ -676,9 +682,16 @@ class SyncV2PairingDebugViewModel @Inject constructor(
     }
 
     private fun labelFor(reason: RejectReason): String = when (reason) {
-        RejectReason.ImplicitAbort -> "Aborted"
-        RejectReason.SameAccount -> "SameAccountAbort"
-        RejectReason.UnknownMessageDropped -> "Dropped (unknown)"
+        RejectReason.ImplicitAbort -> "ImplicitAbort"
+        RejectReason.SameAccount -> "SameAccount"
+        RejectReason.UnknownMessageDropped -> "UnknownMessageDropped"
+        RejectReason.PeerLeft -> "PeerLeft"
+    }
+
+    private fun labelFor(reason: NotSentReason): String = when (reason) {
+        NotSentReason.OwnChannelNotConfigured -> "OwnChannelNotConfigured"
+        is NotSentReason.HttpError -> "HttpError(${reason.code})"
+        is NotSentReason.TooHighProtocol -> "TooHighProtocol(negotiated ${reason.negotiatedVersion.prettyPrint()})"
     }
 
     private fun labelFor(peerSource: PeerVersionSource): String = when (peerSource) {

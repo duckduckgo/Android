@@ -17,6 +17,7 @@
 package com.duckduckgo.sync.impl.exchange.v2
 
 import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.Bye
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.Hello
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeAvailable
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeAwaitingConfirmation
@@ -695,6 +696,187 @@ class ExchangeV2StateMachineTest {
 
         assertTrue(result.outcome is TransitionOutcome.Aborted)
         assertSame(ExchangeV2State.Joiner.Done, machine.currentState)
+    }
+
+    @Test fun `when bye received in Host AwaitingStatus then transitions to Host Unknown`() {
+        val machine = inHostAwaitingStatus()
+        val bye = Bye.create(Bye.Reason.Done)
+        val result = machine.receive(bye)
+
+        assertSame(TransitionOutcome.Accepted, result.outcome)
+        assertSame(ExchangeV2State.Host.Unknown, machine.currentState)
+        val transition = result.event as ExchangeV2Event.Transition
+        assertSame(ExchangeV2State.Host.AwaitingStatus, transition.from)
+        assertSame(ExchangeV2State.Host.Unknown, transition.to)
+        assertSame(bye, transition.trigger)
+    }
+
+    @Test fun `when bye with reason error received in Host AwaitingStatus then still transitions to Host Unknown`() {
+        val machine = inHostAwaitingStatus()
+        val result = machine.receive(Bye.create(Bye.Reason.Error))
+
+        assertSame(TransitionOutcome.Accepted, result.outcome)
+        assertSame(ExchangeV2State.Host.Unknown, machine.currentState)
+    }
+
+    @Test fun `when bye with unrecognised reason received in Host AwaitingStatus then still transitions to Host Unknown`() {
+        val machine = inHostAwaitingStatus()
+        val result = machine.receive(Bye.create(Bye.Reason.Unknown("future_reason")))
+
+        assertSame(TransitionOutcome.Accepted, result.outcome)
+        assertSame(ExchangeV2State.Host.Unknown, machine.currentState)
+    }
+
+    @Test fun `when bye received in Host Unknown then stays in Host Unknown`() {
+        val machine = inHostUnknown()
+        val result = machine.receive(Bye.create(Bye.Reason.Done))
+
+        assertSame(TransitionOutcome.Accepted, result.outcome)
+        assertSame(ExchangeV2State.Host.Unknown, machine.currentState)
+    }
+
+    @Test fun `when bye received in Joiner Joining then stays in Joiner Joining so work in flight continues`() {
+        val machine = inJoinerJoining()
+        val result = machine.receive(Bye.create(Bye.Reason.Done))
+
+        assertSame(TransitionOutcome.Accepted, result.outcome)
+        assertSame(ExchangeV2State.Joiner.Joining, machine.currentState)
+        assertTrue("expected no side effects, got ${result.sideEffects}", result.sideEffects.isEmpty())
+    }
+
+    @Test fun `when bye received in Joiner Joining then JoinerJoinComplete still reaches its terminal`() {
+        val machine = inJoinerJoining()
+        machine.receive(Bye.create(Bye.Reason.Done))
+
+        val result = machine.localTrigger(LocalTrigger.JoinerJoinComplete(RecoveryCodeDone.Reason.Success))
+
+        assertSame(TransitionOutcome.Accepted, result.outcome)
+        assertSame(ExchangeV2State.Joiner.Done, machine.currentState)
+        assertEquals(listOf(SideEffect.SendRecoveryCodeDone(RecoveryCodeDone.Reason.Success)), result.sideEffects)
+    }
+
+    @Test fun `when bye received in Bootstrapped then aborts with PeerLeft to terminal Aborted`() {
+        val machine = sm()
+        val bye = Bye.create(Bye.Reason.Cancelled)
+        val result = machine.receive(bye)
+
+        assertTrue(result.outcome is TransitionOutcome.Aborted)
+        assertEquals(RejectReason.PeerLeft, (result.outcome as TransitionOutcome.Aborted).reason)
+        assertSame(ExchangeV2State.Aborted, machine.currentState)
+
+        val transition = result.event as ExchangeV2Event.Transition
+        assertSame(ExchangeV2State.Bootstrapped, transition.from)
+        assertSame(ExchangeV2State.Aborted, transition.to)
+        assertSame(bye, transition.trigger)
+    }
+
+    @Test fun `when bye received in Negotiating then aborts with PeerLeft to terminal Aborted`() {
+        val machine = sm()
+        machine.receive(Hello.fromJson("{}"))
+        val bye = Bye.create(Bye.Reason.Cancelled)
+        val result = machine.receive(bye)
+
+        assertTrue(result.outcome is TransitionOutcome.Aborted)
+        assertEquals(RejectReason.PeerLeft, (result.outcome as TransitionOutcome.Aborted).reason)
+        assertSame(ExchangeV2State.Aborted, machine.currentState)
+
+        val transition = result.event as ExchangeV2Event.Transition
+        assertSame(ExchangeV2State.Negotiating, transition.from)
+        assertSame(ExchangeV2State.Aborted, transition.to)
+        assertSame(bye, transition.trigger)
+    }
+
+    @Test fun `when bye received in Host Confirming then aborts with PeerLeft to terminal Host Aborted`() {
+        val machine = inHostConfirming()
+        val bye = Bye.create(Bye.Reason.Cancelled)
+        val result = machine.receive(bye)
+
+        assertTrue(result.outcome is TransitionOutcome.Aborted)
+        assertEquals(RejectReason.PeerLeft, (result.outcome as TransitionOutcome.Aborted).reason)
+        assertSame(ExchangeV2State.Host.Aborted, machine.currentState)
+
+        val transition = result.event as ExchangeV2Event.Transition
+        assertSame(ExchangeV2State.Host.Confirming, transition.from)
+        assertSame(ExchangeV2State.Host.Aborted, transition.to)
+        assertSame(bye, transition.trigger)
+    }
+
+    @Test fun `when bye received in Host Sending then aborts with PeerLeft to terminal Host Aborted`() {
+        val machine = inHostSending()
+        val bye = Bye.create(Bye.Reason.Cancelled)
+        val result = machine.receive(bye)
+
+        assertTrue(result.outcome is TransitionOutcome.Aborted)
+        assertEquals(RejectReason.PeerLeft, (result.outcome as TransitionOutcome.Aborted).reason)
+        assertSame(ExchangeV2State.Host.Aborted, machine.currentState)
+
+        val transition = result.event as ExchangeV2Event.Transition
+        assertSame(ExchangeV2State.Host.Sending, transition.from)
+        assertSame(ExchangeV2State.Host.Aborted, transition.to)
+        assertSame(bye, transition.trigger)
+    }
+
+    @Test fun `when bye received in Joiner Confirming then aborts with PeerLeft to terminal Joiner AbortedLocal`() {
+        val machine = inJoinerConfirming()
+        val bye = Bye.create(Bye.Reason.Cancelled)
+        val result = machine.receive(bye)
+
+        assertTrue(result.outcome is TransitionOutcome.Aborted)
+        assertEquals(RejectReason.PeerLeft, (result.outcome as TransitionOutcome.Aborted).reason)
+        assertSame(ExchangeV2State.Joiner.AbortedLocal, machine.currentState)
+
+        val transition = result.event as ExchangeV2Event.Transition
+        assertSame(ExchangeV2State.Joiner.Confirming, transition.from)
+        assertSame(ExchangeV2State.Joiner.AbortedLocal, transition.to)
+        assertSame(bye, transition.trigger)
+    }
+
+    @Test fun `when bye received in Joiner Waiting then aborts with PeerLeft to terminal Joiner AbortedLocal`() {
+        val machine = inJoinerWaiting()
+        val bye = Bye.create(Bye.Reason.Cancelled)
+        val result = machine.receive(bye)
+
+        assertTrue(result.outcome is TransitionOutcome.Aborted)
+        assertEquals(RejectReason.PeerLeft, (result.outcome as TransitionOutcome.Aborted).reason)
+        assertSame(ExchangeV2State.Joiner.AbortedLocal, machine.currentState)
+
+        val transition = result.event as ExchangeV2Event.Transition
+        assertSame(ExchangeV2State.Joiner.Waiting, transition.from)
+        assertSame(ExchangeV2State.Joiner.AbortedLocal, transition.to)
+        assertSame(bye, transition.trigger)
+    }
+
+    @Test fun `when bye received in Host Done then state unchanged`() {
+        val machine = inHostSending()
+        machine.localTrigger(LocalTrigger.HostSendComplete(ExchangeProtocolVersion.V2_0))
+        assertSame(ExchangeV2State.Host.Done, machine.currentState)
+
+        val result = machine.receive(Bye.create(Bye.Reason.Done))
+
+        assertSame(ExchangeV2State.Host.Done, machine.currentState)
+        assertEquals(RejectReason.PeerLeft, (result.event as ExchangeV2Event.MessageRejected).reason)
+    }
+
+    @Test fun `when bye received in Joiner Done then state unchanged`() {
+        val machine = inJoinerJoining()
+        machine.localTrigger(LocalTrigger.JoinerJoinComplete(RecoveryCodeDone.Reason.Success))
+        assertSame(ExchangeV2State.Joiner.Done, machine.currentState)
+
+        val result = machine.receive(Bye.create(Bye.Reason.Done))
+
+        assertSame(ExchangeV2State.Joiner.Done, machine.currentState)
+        assertEquals(RejectReason.PeerLeft, (result.event as ExchangeV2Event.MessageRejected).reason)
+    }
+
+    @Test fun `when bye received in Host Aborted then state unchanged`() {
+        val machine = inHostConfirming()
+        machine.localTrigger(LocalTrigger.UserDeniedHost)
+        assertSame(ExchangeV2State.Host.Aborted, machine.currentState)
+
+        val result = machine.receive(Bye.create(Bye.Reason.Done))
+
+        assertSame(ExchangeV2State.Host.Aborted, machine.currentState)
+        assertEquals(RejectReason.PeerLeft, (result.event as ExchangeV2Event.MessageRejected).reason)
     }
 
     private fun inHostConfirming(): ExchangeV2StateMachine =

@@ -17,6 +17,7 @@
 package com.duckduckgo.sync.impl.exchange.v2
 
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.Bye
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.Hello
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeAvailable
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeAwaitingConfirmation
@@ -52,6 +53,7 @@ class JsonExchangeV2MessageParser @Inject constructor() : ExchangeV2MessageParse
                 RecoveryCodeUnavailable.TYPE -> RecoveryCodeUnavailable.fromJson(rawJson)
                 RecoveryCodeResponse.TYPE -> RecoveryCodeResponse.fromJson(rawJson)
                 RecoveryCodeDone.TYPE -> RecoveryCodeDone.fromJson(rawJson)
+                Bye.TYPE -> Bye.fromJson(rawJson)
                 else -> UnknownMessage.fromJson(rawJson, messageType = type)
             }
         }.getOrElse { UnknownMessage.fromJson(rawJson, messageType = type) }

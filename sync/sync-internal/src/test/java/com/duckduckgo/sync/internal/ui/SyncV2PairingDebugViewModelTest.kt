@@ -33,6 +33,7 @@ import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.Hello
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Runner
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State
 import com.duckduckgo.sync.impl.exchange.v2.LocalTrigger
+import com.duckduckgo.sync.impl.exchange.v2.NotSentReason
 import com.duckduckgo.sync.impl.exchange.v2.PairingRole
 import com.duckduckgo.sync.impl.exchange.v2.RealAdvertisedExchangeV2Version
 import com.duckduckgo.sync.impl.exchange.v2.RejectReason
@@ -145,6 +146,24 @@ class SyncV2PairingDebugViewModelTest {
         }
     }
 
+    @Test fun `MessageNotSent event labelled as Not sent with reason`() = runTest {
+        val viewModel = newViewModel()
+        viewModel.viewState().test {
+            awaitItem()
+            eventFlow.emit(
+                ExchangeV2Event.MessageNotSent(
+                    timestampMs = 0L,
+                    reason = NotSentReason.HttpError(404),
+                    messageType = ExchangeV2Message.Bye.TYPE,
+                    message = ExchangeV2Message.Bye.create(ExchangeV2Message.Bye.Reason.Done),
+                ),
+            )
+            val state = awaitItem()
+            assertEquals(1, state.rows.size)
+            assertEquals("Not sent bye: HttpError(404)", state.rows.single().summary)
+        }
+    }
+
     @Test fun `MessageRejected with SameAccount labelled SameAccountAbort`() = runTest {
         val viewModel = newViewModel()
         viewModel.viewState().test {
@@ -162,7 +181,7 @@ class SyncV2PairingDebugViewModelTest {
                 ),
             )
             val state = awaitItem()
-            assertTrue(state.rows.single().summary.startsWith("SameAccountAbort"))
+            assertTrue(state.rows.single().summary.startsWith("SameAccount"))
         }
     }
 
