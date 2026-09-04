@@ -47,4 +47,5 @@ enum class Component {
     SETTINGS_LIST_ITEM,
     SECTION_DIVIDER,
     PROGRESS_SPINNER,
+    SKELETON,
 }

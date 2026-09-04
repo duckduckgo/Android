@@ -89,6 +89,8 @@ import com.duckduckgo.common.ui.compose.panel.DaxAlertPanel
 import com.duckduckgo.common.ui.compose.panel.DaxInfoPanel
 import com.duckduckgo.common.ui.compose.progress.DaxProgressSpinner
 import com.duckduckgo.common.ui.compose.radiobutton.DaxRadioButton
+import com.duckduckgo.common.ui.compose.skeleton.DaxSkeletonListItem
+import com.duckduckgo.common.ui.compose.skeleton.DaxSkeletonSectionHeader
 import com.duckduckgo.common.ui.compose.snackbar.DaxSnackbar
 import com.duckduckgo.common.ui.compose.switch.DaxSwitch
 import com.duckduckgo.common.ui.compose.text.DaxText
@@ -938,6 +940,27 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
         }
     }
 
+    class SkeletonComponentViewHolder(
+        parent: ViewGroup,
+        private val isDarkTheme: Boolean,
+    ) : ComponentViewHolder(inflate(parent, R.layout.component_skeleton)) {
+        override fun bind(component: Component) {
+            view.setupThemedComposeView(id = R.id.compose_dax_skeleton_list_item, isDarkTheme = isDarkTheme) {
+                Column {
+                    DaxSkeletonListItem()
+                    DaxSkeletonListItem(hasTwoLines = true)
+                    DaxSkeletonListItem(hasLeadingIcon = false)
+                }
+            }
+            view.setupThemedComposeView(id = R.id.compose_dax_skeleton_section_header, isDarkTheme = isDarkTheme) {
+                Column {
+                    DaxSkeletonSectionHeader()
+                    DaxSkeletonSectionHeader(hasTrailingIcon = true)
+                }
+            }
+        }
+    }
+
     class ScaffoldComponentViewHolder(
         parent: ViewGroup,
         private val isDarkTheme: Boolean,
@@ -1026,6 +1049,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 Component.TWO_LINE_LIST_ITEM -> TwoLineItemComponentViewHolder(parent, isDarkTheme)
                 Component.SECTION_DIVIDER -> DividerComponentViewHolder(parent, isDarkTheme)
                 Component.PROGRESS_SPINNER -> ProgressSpinnerComponentViewHolder(parent, isDarkTheme)
+                Component.SKELETON -> SkeletonComponentViewHolder(parent, isDarkTheme)
                 Component.CARD -> CardComponentViewHolder(parent, isDarkTheme)
                 Component.SCAFFOLD -> ScaffoldComponentViewHolder(parent, isDarkTheme)
                 Component.SETTINGS_LIST_ITEM -> SettingsListItemComponentViewHolder(parent, isDarkTheme)
