@@ -84,7 +84,7 @@ import logcat.logcat
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(AutofillPasswordsManagementScreen::class)
+@ContributeToActivityStarter(AutofillPasswordsManagementScreen::class, deeplinkScreenName = "passwords")
 @ContributeToActivityStarter(AutofillPasswordsManagementScreenWithSuggestions::class)
 @ContributeToActivityStarter(AutofillPasswordsManagementViewCredential::class)
 class AutofillManagementActivity : DuckDuckGoActivity(), PasswordsScreenPromotionPlugin.Callback {

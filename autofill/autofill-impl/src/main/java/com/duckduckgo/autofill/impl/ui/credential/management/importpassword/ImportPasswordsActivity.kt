@@ -39,7 +39,7 @@ import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(ImportPasswordActivityParams::class)
+@ContributeToActivityStarter(ImportPasswordActivityParams::class, deeplinkScreenName = "passwords.import")
 class ImportPasswordsActivity : DuckDuckGoActivity() {
 
     private val viewModel: ImportPasswordsViewModel by bindViewModel()

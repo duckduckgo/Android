@@ -50,7 +50,7 @@ import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(RestoreSubscriptionScreenWithParams::class)
+@ContributeToActivityStarter(RestoreSubscriptionScreenWithParams::class, deeplinkScreenName = "subscriptions.restore")
 class RestoreSubscriptionActivity : DuckDuckGoActivity() {
 
     @Inject

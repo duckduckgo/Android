@@ -31,7 +31,7 @@ import com.duckduckgo.subscriptions.impl.ui.ChangePlanActivity.Companion.ChangeP
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(ChangePlanScreenWithEmptyParams::class)
+@ContributeToActivityStarter(ChangePlanScreenWithEmptyParams::class, deeplinkScreenName = "subscriptions.changePlan")
 class ChangePlanActivity : DuckDuckGoActivity() {
 
     private val binding: ActivityChangePlanBinding by viewBinding()

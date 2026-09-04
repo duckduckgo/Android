@@ -43,7 +43,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(SitePermissionScreenNoParams::class)
+@ContributeToActivityStarter(SitePermissionScreenNoParams::class, deeplinkScreenName = "sitePermissions")
 class SitePermissionsActivity : DuckDuckGoActivity() {
 
     @Inject

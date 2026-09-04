@@ -32,7 +32,7 @@ import javax.inject.Inject
  * Thin host for chat-history-related fragments.
  */
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(DuckChatHistoryNoParams::class, screenName = "duckai.history")
+@ContributeToActivityStarter(DuckChatHistoryNoParams::class, deeplinkScreenName = "duckai.history")
 class ChatHistoryActivity : DuckDuckGoActivity() {
 
     @Inject

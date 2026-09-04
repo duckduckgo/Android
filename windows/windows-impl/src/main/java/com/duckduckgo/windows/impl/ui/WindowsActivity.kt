@@ -48,7 +48,7 @@ import logcat.logcat
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(WindowsScreenWithEmptyParams::class)
+@ContributeToActivityStarter(WindowsScreenWithEmptyParams::class, deeplinkScreenName = "windows")
 class WindowsActivity : DuckDuckGoActivity() {
 
     private val viewModel: WindowsViewModel by bindViewModel()

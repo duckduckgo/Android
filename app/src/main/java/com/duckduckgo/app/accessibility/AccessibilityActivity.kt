@@ -49,8 +49,8 @@ import java.text.NumberFormat
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(Default::class, screenName = "accessibility")
-@ContributeToActivityStarter(HighlightedItem::class, screenName = "accessibility")
+@ContributeToActivityStarter(Default::class, deeplinkScreenName = "accessibility")
+@ContributeToActivityStarter(HighlightedItem::class, deeplinkScreenName = "accessibility")
 class AccessibilityActivity : DuckDuckGoActivity() {
 
     @Inject

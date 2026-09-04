@@ -123,8 +123,8 @@ import kotlin.math.max
 import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(TabSwitcherScreenNoParams::class, screenName = "tabSwitcher")
-@ContributeToActivityStarter(TabSwitcherScreenWithParams::class, screenName = "tabSwitcherWithParams")
+@ContributeToActivityStarter(TabSwitcherScreenNoParams::class, deeplinkScreenName = "tabSwitcher")
+@ContributeToActivityStarter(TabSwitcherScreenWithParams::class, deeplinkScreenName = "tabSwitcherWithParams")
 class TabSwitcherActivity :
     DuckDuckGoActivity(),
     TabSwitcherListener,

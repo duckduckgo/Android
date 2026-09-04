@@ -67,7 +67,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(Default::class)
+@ContributeToActivityStarter(Default::class, deeplinkScreenName = "vpn.customDns")
 class VpnCustomDnsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter

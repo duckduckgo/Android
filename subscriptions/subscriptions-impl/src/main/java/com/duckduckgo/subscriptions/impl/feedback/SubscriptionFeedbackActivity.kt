@@ -59,7 +59,7 @@ import javax.inject.Inject
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(SubscriptionFeedbackScreenWithParams::class)
 @ContributeToActivityStarter(SubscriptionAppFeedbackScreenWithParams::class)
-@ContributeToActivityStarter(GeneralSubscriptionFeedbackScreenNoParams::class)
+@ContributeToActivityStarter(GeneralSubscriptionFeedbackScreenNoParams::class, deeplinkScreenName = "ppro.feedback")
 class SubscriptionFeedbackActivity :
     DuckDuckGoActivity(),
     SubscriptionFeedbackGeneralFragment.Listener,

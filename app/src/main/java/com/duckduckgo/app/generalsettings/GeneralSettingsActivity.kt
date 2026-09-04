@@ -54,7 +54,7 @@ import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(GeneralSettingsScreenNoParams::class, screenName = "settingsGeneral")
+@ContributeToActivityStarter(GeneralSettingsScreenNoParams::class, deeplinkScreenName = "settingsGeneral")
 class GeneralSettingsActivity : DuckDuckGoActivity() {
 
     @Inject

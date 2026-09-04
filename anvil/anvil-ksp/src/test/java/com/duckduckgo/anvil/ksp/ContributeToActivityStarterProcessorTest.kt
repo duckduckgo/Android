@@ -113,7 +113,7 @@ class ContributeToActivityStarterProcessorTest {
     )
 
     @Test
-    fun `basic mapper without screenName generates correct code`() {
+    fun `basic mapper without deeplinkScreenName generates correct code`() {
         val source = SourceFile.kotlin(
             "TestActivity.kt",
             """
@@ -131,12 +131,12 @@ class ContributeToActivityStarterProcessorTest {
 
         val result = compile(source, *commonStubs)
         val generated = result.findGeneratedSource("TestActivity_ActivityMapper.kt")
-        val golden = loadGolden("ActivityMapper_NoScreenName.kt")
+        val golden = loadGolden("ActivityMapper_NoDeeplinkScreenName.kt")
         assertEquals(golden, generated)
     }
 
     @Test
-    fun `mapper with screenName generates deeplink handling code`() {
+    fun `mapper with deeplinkScreenName generates deeplink handling code`() {
         val source = SourceFile.kotlin(
             "TestActivity.kt",
             """
@@ -147,14 +147,14 @@ class ContributeToActivityStarterProcessorTest {
 
             data class TestParams(val id: String) : ActivityParams
 
-            @ContributeToActivityStarter(TestParams::class, screenName = "example")
+            @ContributeToActivityStarter(TestParams::class, deeplinkScreenName = "example")
             class TestActivity : DuckDuckGoActivity()
             """.trimIndent(),
         )
 
         val result = compile(source, *commonStubs)
         val generated = result.findGeneratedSource("TestActivity_ActivityMapper.kt")
-        val golden = loadGolden("ActivityMapper_WithScreenName.kt")
+        val golden = loadGolden("ActivityMapper_WithDeeplinkScreenName.kt")
         assertEquals(golden, generated)
     }
 

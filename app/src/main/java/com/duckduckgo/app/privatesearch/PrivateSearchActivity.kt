@@ -43,7 +43,7 @@ import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(PrivateSearchScreenNoParams::class)
+@ContributeToActivityStarter(PrivateSearchScreenNoParams::class, deeplinkScreenName = "privateSearch")
 class PrivateSearchActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter

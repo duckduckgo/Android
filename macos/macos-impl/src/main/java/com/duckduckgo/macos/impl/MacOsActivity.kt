@@ -48,7 +48,7 @@ import logcat.logcat
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(MacOsScreenWithEmptyParams::class)
+@ContributeToActivityStarter(MacOsScreenWithEmptyParams::class, deeplinkScreenName = "macos")
 class MacOsActivity : DuckDuckGoActivity() {
 
     private val viewModel: MacOsViewModel by bindViewModel()

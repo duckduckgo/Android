@@ -103,6 +103,19 @@ class SyncActivityParamMapperTest {
         assertNull(testee.map(object : GlobalActivityStarter.ActivityParams {}))
     }
 
+    @Test
+    fun `map sync deeplink to 'with empty params' activity params`() {
+        assertEquals(
+            SyncActivityWithEmptyParams,
+            testee.map(GlobalActivityStarter.DeeplinkActivityParams(screenName = "sync")),
+        )
+    }
+
+    @Test
+    fun `map unknown deeplink to null`() {
+        assertNull(testee.map(GlobalActivityStarter.DeeplinkActivityParams(screenName = "unknown")))
+    }
+
     private fun enableSimplifiedSync(enable: Boolean) {
         syncFeature.useSimplifiedSync().setRawStoredState(State(enable))
     }

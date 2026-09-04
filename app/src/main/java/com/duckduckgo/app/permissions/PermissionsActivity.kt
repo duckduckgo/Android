@@ -48,7 +48,7 @@ import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(PermissionsScreenNoParams::class)
+@ContributeToActivityStarter(PermissionsScreenNoParams::class, deeplinkScreenName = "permissions")
 class PermissionsActivity : DuckDuckGoActivity() {
 
     @Inject

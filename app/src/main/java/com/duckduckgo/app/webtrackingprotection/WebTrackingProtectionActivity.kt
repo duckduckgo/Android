@@ -54,7 +54,7 @@ import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(WebTrackingProtectionScreenNoParams::class)
+@ContributeToActivityStarter(WebTrackingProtectionScreenNoParams::class, deeplinkScreenName = "webTrackingProtection")
 class WebTrackingProtectionActivity : DuckDuckGoActivity() {
 
     @Inject

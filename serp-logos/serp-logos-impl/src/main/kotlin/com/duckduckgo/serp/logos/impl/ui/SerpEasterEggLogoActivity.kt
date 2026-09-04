@@ -49,7 +49,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(EasterEggLogoScreen::class, screenName = "easterEggLogo")
+@ContributeToActivityStarter(EasterEggLogoScreen::class, deeplinkScreenName = "easterEggLogo")
 class SerpEasterEggLogoActivity : DuckDuckGoActivity() {
 
     private val viewModel: SerpEasterEggLogoViewModel by bindViewModel()

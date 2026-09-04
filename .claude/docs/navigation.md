@@ -18,11 +18,18 @@ class MyActivity : DuckDuckGoActivity() {
 }
 ```
 
-Use `screenName` to opt into deeplink support:
+Use `deeplinkScreenName` to opt into deeplink support:
 
 ```kotlin
-@ContributeToActivityStarter(MyScreenParams::class, screenName = "myScreen")
+@ContributeToActivityStarter(MyScreenParams::class, deeplinkScreenName = "myScreen")
 ```
+
+Only declare one for screens that are a sensible entry point — settings screens, feature landing
+screens. Do not declare one for screens in the middle of a flow, screens that need caller context
+(a tab, a credential), screens that load a caller-provided URL, or screens in `*-internal` modules
+and internal build variants. Names follow `<feature>.<subScreen>` with each segment camelCase
+(`vpn.geoswitching`), or a single segment when the screen has no parent feature (`bookmarks`), and
+must be unique: when two mappers claim the same name the winner is undefined.
 
 ## Choosing the overload
 

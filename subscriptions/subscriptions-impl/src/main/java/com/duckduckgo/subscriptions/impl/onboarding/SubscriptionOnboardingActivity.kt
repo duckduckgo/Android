@@ -51,7 +51,7 @@ import javax.inject.Inject
  * back through [SubscriptionOnboardingController].
  */
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(SubscriptionOnboardingScreenWithEmptyParams::class, screenName = "subscriptions.onboarding")
+@ContributeToActivityStarter(SubscriptionOnboardingScreenWithEmptyParams::class, deeplinkScreenName = "subscriptions.onboarding")
 class SubscriptionOnboardingActivity : DuckDuckGoActivity() {
 
     @Inject

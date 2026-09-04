@@ -72,8 +72,8 @@ import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(DuckChatSettingsNoParams::class, screenName = "duckai.settings")
-@ContributeToActivityStarter(DuckChatNativeSettingsNoParams::class, screenName = "duckai.settings")
+@ContributeToActivityStarter(DuckChatSettingsNoParams::class, deeplinkScreenName = "duckai.settings")
+@ContributeToActivityStarter(DuckChatNativeSettingsNoParams::class, deeplinkScreenName = "duckai.settings")
 class DuckChatSettingsActivity : DuckDuckGoActivity() {
 
     @Inject

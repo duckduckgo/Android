@@ -65,8 +65,8 @@ import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(Default::class, screenName = "appearance")
-@ContributeToActivityStarter(HighlightedItem::class, screenName = "appearance")
+@ContributeToActivityStarter(Default::class, deeplinkScreenName = "appearance")
+@ContributeToActivityStarter(HighlightedItem::class, deeplinkScreenName = "appearance")
 class AppearanceActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var appTheme: AppTheme
