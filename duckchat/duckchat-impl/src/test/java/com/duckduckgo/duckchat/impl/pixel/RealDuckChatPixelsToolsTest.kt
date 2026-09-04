@@ -65,6 +65,7 @@ class RealDuckChatPixelsToolsTest {
         duckAiTabSessionRepository = duckAiTabSessionRepository,
         appBuildConfig = appBuildConfig,
         browserInteractionsPlugins = browserInteractionsPlugins,
+        duckAiNewChatMetricPixelsPlugin = mock(),
     )
 
     private val surfaceParams = mapOf(DuckChatPixelParameters.SURFACE to "contextual_chat")
