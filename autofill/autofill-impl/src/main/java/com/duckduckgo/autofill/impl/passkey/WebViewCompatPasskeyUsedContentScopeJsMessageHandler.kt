@@ -1,0 +1,59 @@
+/*
+ * Copyright (c) 2026 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.duckduckgo.autofill.impl.passkey
+
+import com.duckduckgo.contentscopescripts.api.WebViewCompatContentScopeJsMessageHandlersPlugin
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.js.messaging.api.JsMessage
+import com.duckduckgo.js.messaging.api.ProcessResult
+import com.duckduckgo.js.messaging.api.WebViewCompatMessageHandler
+import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
+
+/**
+ * WebMessageListener counterpart of [PasskeyUsedContentScopeJsMessageHandler], so the
+ * notification is handled on whichever content-scope-scripts transport the build uses.
+ *
+ * Returns null: the message is fully handled here, with nothing to forward to a consumer
+ * and no response to send.
+ */
+@ContributesMultibinding(AppScope::class)
+class WebViewCompatPasskeyUsedContentScopeJsMessageHandler @Inject constructor(
+    private val logger: PasskeyUsedMessageLogger,
+) : WebViewCompatContentScopeJsMessageHandlersPlugin {
+
+    override fun getJsMessageHandler(): WebViewCompatMessageHandler = object : WebViewCompatMessageHandler {
+        override fun process(jsMessage: JsMessage): ProcessResult? {
+            // TEMP diagnostic: proves the WebMessageListener transport routed to this handler.
+            android.util.Log.i("PasskeyUsedDbg", "webviewcompat handler process() reached: ${jsMessage.featureName}/${jsMessage.method}")
+            when (jsMessage.method) {
+                METHOD_PASSKEY_USED -> logger.logUsed(jsMessage.params)
+                METHOD_PASSKEY_FAILED -> logger.logFailed(jsMessage.params)
+            }
+            return null
+        }
+
+        override val featureName: String = FEATURE_NAME
+        override val methods: List<String> = listOf(METHOD_PASSKEY_USED, METHOD_PASSKEY_FAILED)
+    }
+
+    private companion object {
+        const val FEATURE_NAME = "webCompat"
+        const val METHOD_PASSKEY_USED = "passkeyUsed"
+        const val METHOD_PASSKEY_FAILED = "passkeyFailed"
+    }
+}
