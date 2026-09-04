@@ -61,7 +61,7 @@ class NativeInputModeWidgetShapeTest {
     }
 
     @Test
-    fun `when address bar rebrand is enabled bottom browser search-only state uses pill shape`() {
+    fun `when address bar rebrand is enabled bottom browser search-only state uses rebrand radius`() {
         val subject = createSubject(inputPosition = NativeInputState.InputPosition.BOTTOM)
 
         subject.render(rebrandEnabled = true)
