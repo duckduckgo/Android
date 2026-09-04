@@ -22,8 +22,8 @@ import com.duckduckgo.app.statistics.wideevents.CleanupPolicy
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckchat.api.ExitTrigger
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -171,7 +171,7 @@ class DuckAiSessionWideEventTest {
         testee.onSelectedTabChanged("tab-1", DUCKAI_URL_A)
         idle()
 
-        testee.onExitIntent("tab-1", ExitTrigger.BACK_OR_CLOSE)
+        testee.onExitIntent("tab-1", DuckAiSessionExitTrigger.BACK_OR_CLOSE)
         testee.onSelectedTabChanged("tab-1", "https://example.com")
         idle()
 
@@ -204,7 +204,7 @@ class DuckAiSessionWideEventTest {
         testee.onSelectedTabChanged("tab-1", DUCKAI_URL_A)
         idle()
 
-        testee.onExitIntent("tab-1", ExitTrigger.NEW_TAB_OPENED)
+        testee.onExitIntent("tab-1", DuckAiSessionExitTrigger.NEW_TAB_OPENED)
         testee.onSelectedTabChanged("tab-2", null)
         idle()
 
@@ -221,7 +221,7 @@ class DuckAiSessionWideEventTest {
         testee.onSelectedTabChanged("tab-1", DUCKAI_URL_A)
         idle()
 
-        testee.onExitIntent("tab-1", ExitTrigger.FIRE_TAB_OPENED)
+        testee.onExitIntent("tab-1", DuckAiSessionExitTrigger.FIRE_TAB_OPENED)
         testee.onSelectedTabChanged("tab-2", null)
         idle()
 
@@ -255,7 +255,7 @@ class DuckAiSessionWideEventTest {
         startFlow(tabId = "tab-1")
         testee.onSelectedTabChanged("tab-1", DUCKAI_URL_A)
         idle()
-        testee.onExitIntent("tab-1", ExitTrigger.BACK_OR_CLOSE)
+        testee.onExitIntent("tab-1", DuckAiSessionExitTrigger.BACK_OR_CLOSE)
 
         // Back landed on another Duck.ai page in the same tab.
         testee.onSelectedTabChanged("tab-1", DUCKAI_URL_B)
@@ -291,7 +291,7 @@ class DuckAiSessionWideEventTest {
     @Test
     fun `when app backgrounded with a matching pending back_or_close then flow finishes success with left_duckai`() = runTest {
         startFlow(tabId = "tab-1")
-        testee.onExitIntent("tab-1", ExitTrigger.BACK_OR_CLOSE)
+        testee.onExitIntent("tab-1", DuckAiSessionExitTrigger.BACK_OR_CLOSE)
 
         testee.onClose()
         idle()
@@ -307,7 +307,7 @@ class DuckAiSessionWideEventTest {
     fun `when app backgrounded with a pending exit for another tab then it is discarded and app_backgrounded is used`() = runTest {
         startFlow(tabId = "tab-1")
         // A pending exit can only ever be recorded for the active tab, but guard the discard path too.
-        testee.onExitIntent("tab-1", ExitTrigger.TAB_SWITCHED)
+        testee.onExitIntent("tab-1", DuckAiSessionExitTrigger.TAB_SWITCHED)
 
         testee.onClose()
         idle()
@@ -329,7 +329,7 @@ class DuckAiSessionWideEventTest {
 
     @Test
     fun `onExitIntent is rejected when there is no active session`() = runTest {
-        testee.onExitIntent("tab-1", ExitTrigger.BACK_OR_CLOSE)
+        testee.onExitIntent("tab-1", DuckAiSessionExitTrigger.BACK_OR_CLOSE)
         idle()
 
         testee.onClose()
@@ -342,7 +342,7 @@ class DuckAiSessionWideEventTest {
     fun `onExitIntent is rejected for a tab that is not the active session`() = runTest {
         startFlow(tabId = "tab-1")
 
-        testee.onExitIntent("tab-2", ExitTrigger.BACK_OR_CLOSE)
+        testee.onExitIntent("tab-2", DuckAiSessionExitTrigger.BACK_OR_CLOSE)
         idle()
         testee.onSelectedTabChanged("tab-1", DUCKAI_URL_A)
         idle()
@@ -359,7 +359,7 @@ class DuckAiSessionWideEventTest {
     @Test
     fun `a pending exit recorded during ordinary browsing does not leak into a later Duck ai session on the same tab`() = runTest {
         // Back pressed on tab-1 while it's an ordinary (non-Duck.ai) page: no session is active yet.
-        testee.onExitIntent("tab-1", ExitTrigger.BACK_OR_CLOSE)
+        testee.onExitIntent("tab-1", DuckAiSessionExitTrigger.BACK_OR_CLOSE)
 
         // tab-1 later navigates to Duck.ai.
         startFlow(tabId = "tab-1")
@@ -387,7 +387,7 @@ class DuckAiSessionWideEventTest {
         coroutineRule.testScope.testScheduler.runCurrent()
 
         // Back pressed immediately, before flowStart has resolved.
-        testee.onExitIntent("tab-1", ExitTrigger.BACK_OR_CLOSE)
+        testee.onExitIntent("tab-1", DuckAiSessionExitTrigger.BACK_OR_CLOSE)
 
         flowStartResult.complete(Result.success(1L))
         idle()

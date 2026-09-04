@@ -24,9 +24,9 @@ import com.duckduckgo.app.statistics.wideevents.WideEventClient
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.api.DuckAiSessionWideEvent
+import com.duckduckgo.duckchat.api.DuckAiSessionCallback
+import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckchat.api.ExitTrigger
 import com.duckduckgo.duckchat.api.toChatIdOrNull
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.squareup.anvil.annotations.ContributesBinding
@@ -43,7 +43,7 @@ import javax.inject.Inject
 /**
  * All work happens on one sequential consumer reading from one [Channel], so there is never more than
  * one caller's event being processed at a time, and — crucially — events are processed in the order
- * they were sent. That ordering is what makes [DuckAiSessionWideEvent.onExitIntent] safe to call for a
+ * they were sent. That ordering is what makes [DuckAiSessionCallback.onExitIntent] safe to call for a
  * tab whose session is still starting: `onLaunchLandingResolved`/`onDuckAiPageVisible`/
  * `onSelectedTabChanged` for that tab can only have been sent first (the user can't act on a tab before
  * it becomes visible), so the consumer always finishes starting the session before it looks at the exit
@@ -53,7 +53,7 @@ import javax.inject.Inject
  * [WideEventClient.flowFinish].
  */
 @SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class, boundType = DuckAiSessionWideEvent::class)
+@ContributesBinding(AppScope::class, boundType = DuckAiSessionCallback::class)
 @ContributesMultibinding(AppScope::class, boundType = BrowserLifecycleObserver::class)
 class RealDuckAiSessionWideEvent @Inject constructor(
     private val wideEventClient: WideEventClient,
@@ -61,7 +61,7 @@ class RealDuckAiSessionWideEvent @Inject constructor(
     private val duckChatFeature: Lazy<DuckChatFeature>,
     dispatchers: DispatcherProvider,
     @AppCoroutineScope appCoroutineScope: CoroutineScope,
-) : DuckAiSessionWideEvent, BrowserLifecycleObserver {
+) : DuckAiSessionCallback, BrowserLifecycleObserver {
 
     private val coroutineScope = CoroutineScope(appCoroutineScope.coroutineContext + dispatchers.io())
     private val channel = Channel<Action>(capacity = Channel.UNLIMITED)
@@ -104,7 +104,7 @@ class RealDuckAiSessionWideEvent @Inject constructor(
         channel.trySend(Action.SelectedTabChanged(tabId, url))
     }
 
-    override fun onExitIntent(tabId: String, trigger: ExitTrigger) {
+    override fun onExitIntent(tabId: String, trigger: DuckAiSessionExitTrigger) {
         channel.trySend(Action.ExitIntent(tabId, trigger))
     }
 
@@ -201,7 +201,7 @@ class RealDuckAiSessionWideEvent @Inject constructor(
     private suspend fun applySelectedTabTransition(previous: TabState, current: TabState) {
         when {
             previous.isDuckAi && current.tabId != previous.tabId -> {
-                val trigger = resolvePendingExit(previous.tabId!!) ?: ExitTrigger.TAB_SWITCHED
+                val trigger = resolvePendingExit(previous.tabId!!) ?: DuckAiSessionExitTrigger.TAB_SWITCHED
                 endSessionIfMatches(previous.tabId, trigger)
                 if (current.isDuckAi && current.tabId != null) {
                     startSessionIfNoneActive(current.tabId, current.chatId)
@@ -210,7 +210,7 @@ class RealDuckAiSessionWideEvent @Inject constructor(
             // The two branches below are only reached once the tab identifier is known to be
             // unchanged, since the branch above already handles every case where it differs.
             previous.isDuckAi && !current.isDuckAi -> {
-                val trigger = resolvePendingExit(previous.tabId!!) ?: ExitTrigger.OTHER_NAVIGATION
+                val trigger = resolvePendingExit(previous.tabId!!) ?: DuckAiSessionExitTrigger.OTHER_NAVIGATION
                 endSessionIfMatches(previous.tabId, trigger)
             }
             previous.isDuckAi && current.isDuckAi -> {
@@ -227,7 +227,7 @@ class RealDuckAiSessionWideEvent @Inject constructor(
         }
     }
 
-    private fun processExitIntent(tabId: String, trigger: ExitTrigger) {
+    private fun processExitIntent(tabId: String, trigger: DuckAiSessionExitTrigger) {
         if (activeSession?.tabId != tabId) return
         pendingExit = PendingExit(tabId, trigger)
     }
@@ -242,7 +242,7 @@ class RealDuckAiSessionWideEvent @Inject constructor(
         val pending = pendingExit
         pendingExit = null
         val backOrCloseTrigger = pending
-            ?.takeIf { it.tabId == session.tabId && it.trigger == ExitTrigger.BACK_OR_CLOSE }
+            ?.takeIf { it.tabId == session.tabId && it.trigger == DuckAiSessionExitTrigger.BACK_OR_CLOSE }
             ?.trigger
 
         if (backOrCloseTrigger != null) {
@@ -252,7 +252,7 @@ class RealDuckAiSessionWideEvent @Inject constructor(
         }
     }
 
-    private fun resolvePendingExit(tabId: String): ExitTrigger? {
+    private fun resolvePendingExit(tabId: String): DuckAiSessionExitTrigger? {
         val current = pendingExit ?: return null
         if (current.tabId != tabId) return null
         pendingExit = null
@@ -268,7 +268,7 @@ class RealDuckAiSessionWideEvent @Inject constructor(
         startSession(tabId, chatId)
     }
 
-    private suspend fun endSessionIfMatches(tabId: String, trigger: ExitTrigger) {
+    private suspend fun endSessionIfMatches(tabId: String, trigger: DuckAiSessionExitTrigger) {
         val session = activeSession ?: return
         if (session.tabId != tabId) return
         activeSession = null
@@ -324,14 +324,14 @@ class RealDuckAiSessionWideEvent @Inject constructor(
         session: SessionState,
         status: FlowStatus,
         statusReason: String,
-        exitTrigger: ExitTrigger?,
+        exitTrigger: DuckAiSessionExitTrigger?,
     ) {
         wideEventClient.flowFinish(
             wideEventId = session.flowId,
             status = status,
             metadata = buildMap {
                 put(KEY_STATUS_REASON, statusReason)
-                exitTrigger?.let { put(KEY_EXIT_TRIGGER, it.value) }
+                exitTrigger?.let { put(KEY_EXIT_TRIGGER, it.toPixelValue()) }
             },
         )
         logcat(tag = TAG) { "Duck.ai session finished: status=$status, reason=$statusReason" }
@@ -361,7 +361,7 @@ class RealDuckAiSessionWideEvent @Inject constructor(
         sealed class Dispatchable : Action()
         data class LaunchLandingResolved(val tabId: String?, val url: String?) : Dispatchable()
         data class DuckAiPageVisible(val tabId: String, val url: String) : Dispatchable()
-        data class ExitIntent(val tabId: String, val trigger: ExitTrigger) : Dispatchable()
+        data class ExitIntent(val tabId: String, val trigger: DuckAiSessionExitTrigger) : Dispatchable()
         data class PromptSubmitted(val tabId: String) : Dispatchable()
         data class NewChatCreated(val tabId: String) : Dispatchable()
         data object AppClosed : Dispatchable()
@@ -379,7 +379,7 @@ class RealDuckAiSessionWideEvent @Inject constructor(
 
     private data class PendingExit(
         val tabId: String,
-        val trigger: ExitTrigger,
+        val trigger: DuckAiSessionExitTrigger,
     )
 
     private class SessionState(
@@ -407,3 +407,5 @@ class RealDuckAiSessionWideEvent @Inject constructor(
         const val STEP_CHAT_ID_CHANGED = "chat_id_changed"
     }
 }
+
+private fun DuckAiSessionExitTrigger.toPixelValue(): String = name.lowercase()

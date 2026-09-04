@@ -23,7 +23,7 @@ import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.duckchat.api.DuckAiSessionWideEvent
+import com.duckduckgo.duckchat.api.DuckAiSessionCallback
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -63,7 +63,7 @@ class BrowserSessionTabObserverTest {
     private val browserModeStateHolder: BrowserModeStateHolder = mock<BrowserModeStateHolder>().also {
         whenever(it.currentMode).thenReturn(currentModeFlow)
     }
-    private val duckAiSessionWideEvent: DuckAiSessionWideEvent = mock()
+    private val duckAiSessionCallback: DuckAiSessionCallback = mock()
 
     private lateinit var testee: BrowserSessionTabObserver
 
@@ -72,7 +72,7 @@ class BrowserSessionTabObserverTest {
         testee = BrowserSessionTabObserver(
             tabRepositoryProvider = tabRepositoryProvider,
             browserModeStateHolder = browserModeStateHolder,
-            duckAiSessionWideEvent = duckAiSessionWideEvent,
+            duckAiSessionCallback = duckAiSessionCallback,
             appCoroutineScope = coroutineRule.testScope,
         )
     }
@@ -83,7 +83,7 @@ class BrowserSessionTabObserverTest {
     fun `when no tab is selected at start then it is reported as null tab and null url`() = runTest {
         idle()
 
-        verify(duckAiSessionWideEvent).onSelectedTabChanged(null, null)
+        verify(duckAiSessionCallback).onSelectedTabChanged(null, null)
     }
 
     @Test
@@ -91,7 +91,7 @@ class BrowserSessionTabObserverTest {
         regularSelectedTabFlow.value = TabEntity(tabId = "tab-1", url = "https://duck.ai/?chatID=chat-a")
         idle()
 
-        verify(duckAiSessionWideEvent).onSelectedTabChanged("tab-1", "https://duck.ai/?chatID=chat-a")
+        verify(duckAiSessionCallback).onSelectedTabChanged("tab-1", "https://duck.ai/?chatID=chat-a")
     }
 
     @Test
@@ -101,18 +101,18 @@ class BrowserSessionTabObserverTest {
         regularSelectedTabFlow.value = TabEntity(tabId = "tab-1", url = "https://duck.ai/", title = "Duck.ai 2")
         idle()
 
-        verify(duckAiSessionWideEvent, times(2)).onSelectedTabChanged("tab-1", "https://duck.ai/")
+        verify(duckAiSessionCallback, times(2)).onSelectedTabChanged("tab-1", "https://duck.ai/")
     }
 
     @Test
     fun `opening the tab switcher without changing the selection reports nothing new`() = runTest {
         regularSelectedTabFlow.value = TabEntity(tabId = "tab-1", url = "https://duck.ai/")
         idle()
-        verify(duckAiSessionWideEvent).onSelectedTabChanged("tab-1", "https://duck.ai/")
+        verify(duckAiSessionCallback).onSelectedTabChanged("tab-1", "https://duck.ai/")
 
         // Opening/dismissing the tab switcher doesn't touch the selected-tab flow at all, so nothing
         // further is emitted — there's nothing to verify beyond the single call above.
-        verifyNoMoreInteractions(duckAiSessionWideEvent)
+        verifyNoMoreInteractions(duckAiSessionCallback)
     }
 
     @Test
@@ -124,7 +124,7 @@ class BrowserSessionTabObserverTest {
         fireSelectedTabFlow.value = TabEntity(tabId = "fire-tab", url = "https://example.com")
         idle()
 
-        verify(duckAiSessionWideEvent).onSelectedTabChanged("regular-tab", "https://duck.ai/")
-        verify(duckAiSessionWideEvent).onSelectedTabChanged("fire-tab", "https://example.com")
+        verify(duckAiSessionCallback).onSelectedTabChanged("regular-tab", "https://duck.ai/")
+        verify(duckAiSessionCallback).onSelectedTabChanged("fire-tab", "https://example.com")
     }
 }

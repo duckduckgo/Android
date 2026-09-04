@@ -37,7 +37,7 @@ import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.customtabs.api.CustomTabDetector
-import com.duckduckgo.duckchat.api.DuckAiSessionWideEvent
+import com.duckduckgo.duckchat.api.DuckAiSessionCallback
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
@@ -92,7 +92,7 @@ class FirstScreenHandlerImplTest {
     private val ntpAfterIdleManager: NtpAfterIdleManager = mock()
     private val modeSwitchRecreateSignal = ModeSwitchRecreateSignal()
     private val returnSessionLandingListener: ReturnSessionLandingListener = mock()
-    private val duckAiSessionWideEvent: DuckAiSessionWideEvent = mock()
+    private val duckAiSessionCallback: DuckAiSessionCallback = mock()
     private val testScope = coroutineTestRule.testScope
 
     private lateinit var testee: FirstScreenHandlerImpl
@@ -129,7 +129,7 @@ class FirstScreenHandlerImplTest {
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             appCoroutineScope = testScope,
             idleThresholdResolver = RealIdleThresholdResolver(androidBrowserConfigFeature),
-            duckAiSessionWideEvent = duckAiSessionWideEvent,
+            duckAiSessionCallback = duckAiSessionCallback,
         )
     }
 
@@ -243,7 +243,7 @@ class FirstScreenHandlerImplTest {
         testee.onOpen(isFreshLaunch = false)
         testScope.testScheduler.advanceUntilIdle()
 
-        verify(duckAiSessionWideEvent).onLaunchLandingResolved(null, null)
+        verify(duckAiSessionCallback).onLaunchLandingResolved(null, null)
     }
 
     @Test
@@ -332,7 +332,7 @@ class FirstScreenHandlerImplTest {
         testee.onOpen(isFreshLaunch = false)
         testScope.testScheduler.advanceUntilIdle()
 
-        verify(duckAiSessionWideEvent).onLaunchLandingResolved("tab-1", "https://duck.ai/chat?chatID=chat-a")
+        verify(duckAiSessionCallback).onLaunchLandingResolved("tab-1", "https://duck.ai/chat?chatID=chat-a")
     }
 
     @Test
@@ -355,7 +355,7 @@ class FirstScreenHandlerImplTest {
         testee.onOpen(isFreshLaunch = false)
         testScope.testScheduler.advanceUntilIdle()
 
-        verify(duckAiSessionWideEvent).onLaunchLandingResolved(null, null)
+        verify(duckAiSessionCallback).onLaunchLandingResolved(null, null)
     }
 
     @Test
@@ -370,7 +370,7 @@ class FirstScreenHandlerImplTest {
         testee.onOpen(isFreshLaunch = false)
         testScope.testScheduler.advanceUntilIdle()
 
-        verify(duckAiSessionWideEvent).onLaunchLandingResolved(null, null)
+        verify(duckAiSessionCallback).onLaunchLandingResolved(null, null)
     }
 
     @Test
