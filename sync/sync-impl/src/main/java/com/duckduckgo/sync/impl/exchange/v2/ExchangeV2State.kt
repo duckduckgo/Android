@@ -119,11 +119,12 @@ sealed interface ExchangeV2State {
         data object AwaitingStatus : Host
 
         /**
-         * The status deadline passed without a report. The pairing may well have succeeded, so this
-         * is explicitly not a failure.
+         * The status deadline passed, or the peer left with `bye(done)`, without a report having
+         * arrived. The pairing may well have succeeded, so this is explicitly not a failure.
          *
          * Not terminal either: the session keeps polling, and a late `recovery_code_done` still
-         * promotes this to [Done].
+         * promotes this to [Done]. A `bye` with any reason other than `done` ends the wait instead:
+         * the peer has declared the pairing cancelled or failed.
          *
          * Since 2.1.
          */

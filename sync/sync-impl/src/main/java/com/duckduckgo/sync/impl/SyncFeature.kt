@@ -98,7 +98,7 @@ interface SyncFeature {
     /**
      * Global switch for the v2.1 exchange protocol.
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun canUseExchangeV2Point1(): Toggle
 
     /**

@@ -332,6 +332,10 @@ class SyncV2PairingDebugViewModel @Inject constructor(
                 appendDevToolLog("v2 dispatch → AlreadyConnected (same-account, spec friendly finish)")
                 toasts.send("Already connected (same account)")
             }
+            is DispatchOutcome.JoinOutcomeUnknown -> {
+                appendDevToolLog("v2 dispatch → JoinOutcomeUnknown (no report yet; session still polling)")
+                toasts.send("No report from the peer yet; check the other device")
+            }
             is DispatchOutcome.UpgradeRequired -> {
                 appendDevToolLog("v2 dispatch → UpgradeRequired (codeMajor=${outcome.codeMajor})")
                 toasts.send("This code requires a newer app version (v${outcome.codeMajor})")

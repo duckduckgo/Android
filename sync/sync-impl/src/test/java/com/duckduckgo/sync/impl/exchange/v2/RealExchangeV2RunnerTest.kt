@@ -1227,7 +1227,7 @@ class RealExchangeV2RunnerTest {
 
     // ---- Bye on receipt ----
 
-    @Test fun `a bye received in Host AwaitingStatus moves the session to Host Unknown, not a failure`() = runTest {
+    @Test fun `a bye with reason done received in Host AwaitingStatus moves the session to Host Unknown, not a failure`() = runTest {
         givenOurVersion(ExchangeProtocolVersion.V2_1)
         givenHostCanProduceRecoveryCode()
         val runner = newRunner()
@@ -1238,6 +1238,24 @@ class RealExchangeV2RunnerTest {
         assertSame(ExchangeV2State.Host.Unknown, runner.currentState)
         assertTrue(runner.events.replayCache.filterIsInstance<ExchangeV2Event.SessionError>().isEmpty())
         verify(channel, never()).sendMessage(argThat { this is Bye }, any(), any(), any(), anyOrNull())
+    }
+
+    @Test fun `a bye with reason cancelled received in Host AwaitingStatus ends the session with a done farewell`() = runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenHostCanProduceRecoveryCode()
+        val runner = newRunner()
+        runner.reachHostAwaitingStatus()
+
+        runner.deliverIncomingMessage(Bye.create(Bye.Reason.Cancelled))
+
+        assertNull(runner.currentState)
+        verify(channel).sendMessage(
+            argThat { this is Bye && reason == Bye.Reason.Done },
+            any(),
+            any(),
+            any(),
+            anyOrNull(),
+        )
     }
 
     @Test fun `a bye received while the Joiner is joining does not end the session`() = runTest {

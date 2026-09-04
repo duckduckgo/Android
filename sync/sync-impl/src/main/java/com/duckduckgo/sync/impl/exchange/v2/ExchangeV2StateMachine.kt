@@ -228,13 +228,24 @@ internal class RealExchangeV2StateMachine(
      * saying goodbye is not a protocol error, so it never reports [RejectReason.ImplicitAbort].
      * Delivery is not guaranteed, so no state may depend on having received one.
      *
+     * The reason matters only in the Host join-status states: `done` leaves the join outcome
+     * unknown, while any other reason ends the session as the peer's cancellation or failure.
+     *
      * Spec: Asana 1216906888491126 §Rules.
      */
     private fun receiveBye(state: ExchangeV2State, msg: Bye): TransitionResult = when (state) {
-        // No report is coming, but the peer may well have joined; never a failure.
-        ExchangeV2State.Host.AwaitingStatus,
-        ExchangeV2State.Host.Unknown,
-        -> accept(state, ExchangeV2State.Host.Unknown, msg)
+        // bye(done): no report is coming, but the peer may well have joined; never a failure. Any
+        // other reason is the peer declaring the pairing over (cancelled, failed, or something this
+        // client doesn't model), so there is no join outcome left to wait for.
+        ExchangeV2State.Host.AwaitingStatus -> when (msg.reason) {
+            Bye.Reason.Done -> accept(state, ExchangeV2State.Host.Unknown, msg)
+            else -> abort(state, msg, RejectReason.PeerLeft)
+        }
+        // Same split, but the join outcome is already unknown, so bye(done) changes nothing.
+        ExchangeV2State.Host.Unknown -> when (msg.reason) {
+            Bye.Reason.Done -> accept(state, state, msg)
+            else -> abort(state, msg, RejectReason.PeerLeft)
+        }
         // Past the point of no return: the peer going away is not a reason to abandon a login,
         // upgrade or sync that is already running. The later recovery_code_done just won't land.
         ExchangeV2State.Joiner.Joining -> accept(state, state, msg)

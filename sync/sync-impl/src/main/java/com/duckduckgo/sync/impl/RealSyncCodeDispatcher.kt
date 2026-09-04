@@ -19,6 +19,7 @@ package com.duckduckgo.sync.impl
 import android.util.Base64
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.AccountErrorCodes.ALREADY_SIGNED_IN
+import com.duckduckgo.sync.impl.AccountErrorCodes.GENERIC_ERROR
 import com.duckduckgo.sync.impl.AccountErrorCodes.NEGOTIATION_ABORTED
 import com.duckduckgo.sync.impl.AccountErrorCodes.NO_RECOVERY_CODE
 import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_CANCELLED
@@ -287,6 +288,7 @@ class RealSyncCodeDispatcher @Inject constructor(
         is DispatchOutcome.LinkingCodeReady,
         is DispatchOutcome.JoinerConfirmationRequested,
         is DispatchOutcome.HostConfirmationRequested,
+        is DispatchOutcome.JoinOutcomeUnknown,
         -> false
         is DispatchOutcome.LoggedIn,
         is DispatchOutcome.AlreadyConnected,
@@ -312,6 +314,14 @@ class RealSyncCodeDispatcher @Inject constructor(
             DispatchOutcome.HostConfirmationRequested(peerName = runner.peerName, peerKind = peerKind)
 
         ExchangeV2State.Host.Done -> hostDoneToOutcome(transition.trigger, peerKind)
+
+        ExchangeV2State.Host.Unknown -> {
+            if (transition.from != ExchangeV2State.Host.Unknown) {
+                DispatchOutcome.JoinOutcomeUnknown(peerKind)
+            } else {
+                null
+            }
+        }
 
         ExchangeV2State.Host.Aborted -> hostAbortedToOutcome(transition.localTrigger, transition.trigger)
 
@@ -549,8 +559,16 @@ class RealSyncCodeDispatcher @Inject constructor(
     private fun ExchangeV2Message.Bye.toPeerLeftOutcome(): DispatchOutcome.Failed = DispatchOutcome.Failed(
         "peer_left(${reason.value})",
         code = when (reason) {
-            ExchangeV2Message.Bye.Reason.Error -> PAIRING_FAILED.code
-            else -> PAIRING_REJECTED.code
+            is ExchangeV2Message.Bye.Reason.Cancelled -> PAIRING_REJECTED.code
+
+            is ExchangeV2Message.Bye.Reason.Error,
+            is ExchangeV2Message.Bye.Reason.Unknown,
+            -> PAIRING_FAILED.code
+
+            // A bye only aborts a session that hasn't handed the recovery code over yet,
+            // so a peer claiming it finished can't legitimately land here and is likely
+            // a protocol implementation error.
+            is ExchangeV2Message.Bye.Reason.Done -> GENERIC_ERROR.code
         },
     )
 

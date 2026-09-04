@@ -99,22 +99,39 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
     }
 
     fun onHostConfirmed() {
+        _viewState.update { it.copy(dialog = DialogType.Connecting) }
         codeDispatcher.confirmHost()
     }
 
     fun onHostDenied() {
+        _viewState.update { it.copy(dialog = null) }
         codeDispatcher.denyHost()
     }
 
     fun onJoinerConfirmed() {
+        _viewState.update { it.copy(dialog = DialogType.Connecting) }
         codeDispatcher.confirmJoiner()
     }
 
     fun onJoinerDenied() {
+        _viewState.update { it.copy(dialog = null) }
         codeDispatcher.denyJoiner()
     }
 
     fun onErrorDialogDismissed() {
+        closeWithoutPairing()
+    }
+
+    fun onConnectingCancelled() {
+        closeWithoutPairing()
+    }
+
+    fun onCheckOtherDeviceCancelled() {
+        closeWithoutPairing()
+    }
+
+    private fun closeWithoutPairing() {
+        _viewState.update { it.copy(dialog = null) }
         viewModelScope.launch {
             _commands.send(Command.SetPairingResult(SyncPairingResult.Failure))
             _commands.send(Command.Close)
@@ -226,14 +243,15 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
                 }
 
                 is DispatchOutcome.HostConfirmationRequested -> {
-                    _commands.send(Command.AskHostConfirmation(outcome.peerName, outcome.peerKind))
+                    _viewState.update { it.copy(dialog = DialogType.HostConfirmation(outcome.peerName, outcome.peerKind)) }
                 }
 
                 is DispatchOutcome.JoinerConfirmationRequested -> {
-                    _commands.send(Command.AskJoinerConfirmation(outcome.peerName, outcome.peerKind))
+                    _viewState.update { it.copy(dialog = DialogType.JoinerConfirmation(outcome.peerName, outcome.peerKind)) }
                 }
 
                 is DispatchOutcome.LoggedIn -> {
+                    _viewState.update { it.copy(dialog = null) }
                     pixels.fireLoginPixel()
                     pixels.fireSyncSetupFinishedSuccessfully(syncType, outcome.path, outcome.myRole, outcome.peerKind)
                     _commands.send(Command.SetPairingResult(pairingResult()))
@@ -241,14 +259,21 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
                 }
 
                 is DispatchOutcome.AlreadyConnected -> {
+                    _viewState.update { it.copy(dialog = null) }
                     _commands.send(Command.ShowV2Error(exchangeV2AlreadyPairedError))
                 }
 
+                is DispatchOutcome.JoinOutcomeUnknown -> {
+                    _viewState.update { it.copy(dialog = DialogType.CheckOtherDevice) }
+                }
+
                 is DispatchOutcome.UpgradeRequired -> {
+                    _viewState.update { it.copy(dialog = null) }
                     _commands.send(Command.ShowV2Error(exchangeV2UpgradeRequiredError))
                 }
 
                 is DispatchOutcome.Failed -> {
+                    _viewState.update { it.copy(dialog = null) }
                     _commands.send(Command.ShowV2Error(outcome.code.toExchangeV2PairingError()))
                 }
             }
@@ -282,7 +307,24 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
 
     data class ViewState(
         val bitmap: BitmapWithCode? = null,
+        val dialog: DialogType? = null,
     )
+
+    sealed interface DialogType {
+        data class HostConfirmation(
+            val peerName: String?,
+            val peerKind: PeerKind? = null,
+        ) : DialogType
+
+        data class JoinerConfirmation(
+            val peerName: String?,
+            val peerKind: PeerKind? = null,
+        ) : DialogType
+
+        data object Connecting : DialogType
+
+        data object CheckOtherDevice : DialogType
+    }
 
     data class BitmapWithCode(
         val bitmap: Bitmap,
@@ -291,16 +333,6 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
     )
 
     internal sealed interface Command {
-        data class AskJoinerConfirmation(
-            val peerName: String?,
-            val peerKind: PeerKind? = null,
-        ) : Command
-
-        data class AskHostConfirmation(
-            val peerName: String?,
-            val peerKind: PeerKind? = null,
-        ) : Command
-
         data class ShowV1Error(
             val content: ExchangeV1PairingErrorContent,
         ) : Command

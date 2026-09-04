@@ -698,7 +698,7 @@ class ExchangeV2StateMachineTest {
         assertSame(ExchangeV2State.Joiner.Done, machine.currentState)
     }
 
-    @Test fun `when bye received in Host AwaitingStatus then transitions to Host Unknown`() {
+    @Test fun `when bye with reason done received in Host AwaitingStatus then transitions to Host Unknown`() {
         val machine = inHostAwaitingStatus()
         val bye = Bye.create(Bye.Reason.Done)
         val result = machine.receive(bye)
@@ -711,28 +711,81 @@ class ExchangeV2StateMachineTest {
         assertSame(bye, transition.trigger)
     }
 
-    @Test fun `when bye with reason error received in Host AwaitingStatus then still transitions to Host Unknown`() {
+    @Test fun `when bye with reason cancelled received in Host AwaitingStatus then aborts with PeerLeft to terminal Host Aborted`() {
+        val machine = inHostAwaitingStatus()
+        val bye = Bye.create(Bye.Reason.Cancelled)
+        val result = machine.receive(bye)
+
+        assertTrue(result.outcome is TransitionOutcome.Aborted)
+        assertEquals(RejectReason.PeerLeft, (result.outcome as TransitionOutcome.Aborted).reason)
+        assertSame(ExchangeV2State.Host.Aborted, machine.currentState)
+
+        val transition = result.event as ExchangeV2Event.Transition
+        assertSame(ExchangeV2State.Host.AwaitingStatus, transition.from)
+        assertSame(ExchangeV2State.Host.Aborted, transition.to)
+        assertSame(bye, transition.trigger)
+    }
+
+    @Test fun `when bye with reason error received in Host AwaitingStatus then aborts with PeerLeft to terminal Host Aborted`() {
         val machine = inHostAwaitingStatus()
         val result = machine.receive(Bye.create(Bye.Reason.Error))
 
-        assertSame(TransitionOutcome.Accepted, result.outcome)
-        assertSame(ExchangeV2State.Host.Unknown, machine.currentState)
+        assertTrue(result.outcome is TransitionOutcome.Aborted)
+        assertEquals(RejectReason.PeerLeft, (result.outcome as TransitionOutcome.Aborted).reason)
+        assertSame(ExchangeV2State.Host.Aborted, machine.currentState)
     }
 
-    @Test fun `when bye with unrecognised reason received in Host AwaitingStatus then still transitions to Host Unknown`() {
+    @Test fun `when bye with unrecognised reason received in Host AwaitingStatus then aborts with PeerLeft to terminal Host Aborted`() {
         val machine = inHostAwaitingStatus()
         val result = machine.receive(Bye.create(Bye.Reason.Unknown("future_reason")))
 
-        assertSame(TransitionOutcome.Accepted, result.outcome)
-        assertSame(ExchangeV2State.Host.Unknown, machine.currentState)
+        assertTrue(result.outcome is TransitionOutcome.Aborted)
+        assertEquals(RejectReason.PeerLeft, (result.outcome as TransitionOutcome.Aborted).reason)
+        assertSame(ExchangeV2State.Host.Aborted, machine.currentState)
     }
 
-    @Test fun `when bye received in Host Unknown then stays in Host Unknown`() {
+    @Test fun `when bye with reason done received in Host Unknown then stays in Host Unknown`() {
         val machine = inHostUnknown()
         val result = machine.receive(Bye.create(Bye.Reason.Done))
 
         assertSame(TransitionOutcome.Accepted, result.outcome)
         assertSame(ExchangeV2State.Host.Unknown, machine.currentState)
+        val transition = result.event as ExchangeV2Event.Transition
+        assertSame(ExchangeV2State.Host.Unknown, transition.from)
+        assertSame(ExchangeV2State.Host.Unknown, transition.to)
+    }
+
+    @Test fun `when bye with reason cancelled received in Host Unknown then aborts with PeerLeft to terminal Host Aborted`() {
+        val machine = inHostUnknown()
+        val bye = Bye.create(Bye.Reason.Cancelled)
+        val result = machine.receive(bye)
+
+        assertTrue(result.outcome is TransitionOutcome.Aborted)
+        assertEquals(RejectReason.PeerLeft, (result.outcome as TransitionOutcome.Aborted).reason)
+        assertSame(ExchangeV2State.Host.Aborted, machine.currentState)
+
+        val transition = result.event as ExchangeV2Event.Transition
+        assertSame(ExchangeV2State.Host.Unknown, transition.from)
+        assertSame(ExchangeV2State.Host.Aborted, transition.to)
+        assertSame(bye, transition.trigger)
+    }
+
+    @Test fun `when bye with reason error received in Host Unknown then aborts with PeerLeft to terminal Host Aborted`() {
+        val machine = inHostUnknown()
+        val result = machine.receive(Bye.create(Bye.Reason.Error))
+
+        assertTrue(result.outcome is TransitionOutcome.Aborted)
+        assertEquals(RejectReason.PeerLeft, (result.outcome as TransitionOutcome.Aborted).reason)
+        assertSame(ExchangeV2State.Host.Aborted, machine.currentState)
+    }
+
+    @Test fun `when bye with unrecognised reason received in Host Unknown then aborts with PeerLeft to terminal Host Aborted`() {
+        val machine = inHostUnknown()
+        val result = machine.receive(Bye.create(Bye.Reason.Unknown("future_reason")))
+
+        assertTrue(result.outcome is TransitionOutcome.Aborted)
+        assertEquals(RejectReason.PeerLeft, (result.outcome as TransitionOutcome.Aborted).reason)
+        assertSame(ExchangeV2State.Host.Aborted, machine.currentState)
     }
 
     @Test fun `when bye received in Joiner Joining then stays in Joiner Joining so work in flight continues`() {

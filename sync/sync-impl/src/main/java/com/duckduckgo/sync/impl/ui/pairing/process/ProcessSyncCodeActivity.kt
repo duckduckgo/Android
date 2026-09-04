@@ -24,14 +24,15 @@ import android.os.Bundle
 import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.core.content.IntentCompat
+import androidx.core.view.isInvisible
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.dialog.DaxAlertDialog
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
-import com.duckduckgo.common.ui.view.getColorFromAttr
-import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
@@ -44,29 +45,24 @@ import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import com.duckduckgo.sync.impl.ui.pairing.SyncPairingResult
 import com.duckduckgo.sync.impl.ui.pairing.exchangeV2ConfirmationMessage
 import com.duckduckgo.sync.impl.ui.pairing.process.ProcessSyncCodeViewModel.Command
-import com.duckduckgo.sync.impl.ui.pairing.process.ProcessSyncCodeViewModel.Command.AskHostConfirmation
-import com.duckduckgo.sync.impl.ui.pairing.process.ProcessSyncCodeViewModel.Command.AskJoinerConfirmation
-import com.duckduckgo.sync.impl.ui.pairing.process.ProcessSyncCodeViewModel.Command.AskSwitchAccount
 import com.duckduckgo.sync.impl.ui.pairing.process.ProcessSyncCodeViewModel.Command.Close
 import com.duckduckgo.sync.impl.ui.pairing.process.ProcessSyncCodeViewModel.Command.RunAcknowledgmentAnimation
 import com.duckduckgo.sync.impl.ui.pairing.process.ProcessSyncCodeViewModel.Command.SetPairingResult
-import com.duckduckgo.sync.impl.ui.pairing.process.ProcessSyncCodeViewModel.Command.ShowPairingAcknowledgement
 import com.duckduckgo.sync.impl.ui.pairing.process.ProcessSyncCodeViewModel.Command.ShowV1Error
 import com.duckduckgo.sync.impl.ui.pairing.process.ProcessSyncCodeViewModel.Command.ShowV2Error
+import com.duckduckgo.sync.impl.ui.pairing.process.ProcessSyncCodeViewModel.DialogType
 import com.duckduckgo.sync.impl.ui.pairing.process.ProcessSyncCodeViewModel.Factory
 import com.duckduckgo.sync.impl.ui.pairing.process.ProcessSyncCodeViewModel.Factory.Provider
 import com.duckduckgo.sync.impl.ui.pairing.process.ProcessSyncCodeViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.pairing.showExchangeV1PairingError
 import com.duckduckgo.sync.impl.ui.pairing.showExchangeV2PairingError
-import com.google.android.material.progressindicator.CircularProgressIndicatorSpec
-import com.google.android.material.progressindicator.IndeterminateDrawable
+import com.duckduckgo.sync.impl.ui.pairing.showLeadingProgressSpinner
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
-import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(ActivityScope::class)
 class ProcessSyncCodeActivity : DuckDuckGoActivity() {
@@ -90,9 +86,17 @@ class ProcessSyncCodeActivity : DuckDuckGoActivity() {
         Provider(vmFactory, source)
     }
 
-    private var acknowledgementDialog: TextAlertDialogBuilder? = null
+    private var visibleDialog: DaxAlertDialog? = null
+    private var visibleDialogType: DialogType? = null
 
     private var isAcknowledgementAnimationExecuted = false
+
+    private val headlineLabel
+        get() = if (source.entryPoint == SyncEntryPoint.RECOVER_SYNCED_DATA) {
+            R.string.sync_simplified_pairing_headline_recovery
+        } else {
+            R.string.sync_simplified_pairing_headline
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -115,7 +119,8 @@ class ProcessSyncCodeActivity : DuckDuckGoActivity() {
     }
 
     override fun onDestroy() {
-        acknowledgementDialog = null
+        visibleDialog?.dismiss()
+        visibleDialog = null
         super.onDestroy()
     }
 
@@ -132,17 +137,30 @@ class ProcessSyncCodeActivity : DuckDuckGoActivity() {
     }
 
     private fun renderViewState(viewState: ViewState) {
-        if (viewState.isLoggedIn) {
-            dismissPairingAcknowledgementDialog()
+        val isWaiting = viewState.isWaitingForOtherDevice
+        binding.lockAnimation.isInvisible = isWaiting
+        binding.checkOtherDeviceImage.isVisible = isWaiting
+        binding.headlineText.setText(if (isWaiting) R.string.sync_simplified_pairing_headline_check_other_device else headlineLabel)
+
+        renderDialog(viewState.dialog)
+    }
+
+    private fun renderDialog(dialogType: DialogType?) {
+        if (dialogType == visibleDialogType) return
+
+        visibleDialogType = dialogType
+        visibleDialog?.dismiss()
+        visibleDialog = when (dialogType) {
+            is DialogType.HostConfirmation -> showHostConfirmationDialog(dialogType.peerName, dialogType.peerKind)
+            is DialogType.JoinerConfirmation -> showJoinerConfirmationDialog(dialogType.peerName, dialogType.peerKind)
+            is DialogType.SwitchAccount -> showSwitchAccountDialog(dialogType.encodedStringCode)
+            is DialogType.PairingAcknowledgment -> showPairingAcknowledgmentDialog()
+            null -> null
         }
     }
 
     private fun processCommand(command: Command) {
         when (command) {
-            is AskHostConfirmation -> showHostConfirmationDialog(command.peerName, command.peerKind)
-            is AskJoinerConfirmation -> showJoinerConfirmationDialog(command.peerName, command.peerKind)
-            is AskSwitchAccount -> showSwitchAccountDialog(command.encodedStringCode)
-            is ShowPairingAcknowledgement -> showPairingAcknowledgmentDialog()
             is RunAcknowledgmentAnimation -> runAcknowledgementAnimation()
             is SetPairingResult -> setResult(SyncPairingResult.RESULT_SYNC_COMPLETED, SyncPairingResult.resultIntent(command.result))
             is ShowV1Error -> showV1Error(command)
@@ -154,8 +172,8 @@ class ProcessSyncCodeActivity : DuckDuckGoActivity() {
     private fun showHostConfirmationDialog(
         peerName: String?,
         peerKind: PeerKind?,
-    ) {
-        TextAlertDialogBuilder(this)
+    ): DaxAlertDialog {
+        val dialog = TextAlertDialogBuilder(this)
             .setTitle(R.string.sync_simplified_pairing_dialog_host_title)
             .setMessage(exchangeV2ConfirmationMessage(peerName, peerKind))
             .setPositiveButton(R.string.sync_simplified_pairing_dialog_host_primary_button)
@@ -171,14 +189,15 @@ class ProcessSyncCodeActivity : DuckDuckGoActivity() {
                     }
                 },
             )
-            .show()
+        dialog.show()
+        return dialog
     }
 
     private fun showJoinerConfirmationDialog(
         peerName: String?,
         peerKind: PeerKind?,
-    ) {
-        TextAlertDialogBuilder(this)
+    ): DaxAlertDialog {
+        val dialog = TextAlertDialogBuilder(this)
             .setTitle(R.string.sync_simplified_pairing_dialog_joiner_title)
             .setMessage(exchangeV2ConfirmationMessage(peerName, peerKind))
             .setPositiveButton(R.string.sync_simplified_pairing_dialog_joiner_primary_button)
@@ -194,11 +213,12 @@ class ProcessSyncCodeActivity : DuckDuckGoActivity() {
                     }
                 },
             )
-            .show()
+        dialog.show()
+        return dialog
     }
 
-    private fun showSwitchAccountDialog(encodedStringCode: String) {
-        TextAlertDialogBuilder(this)
+    private fun showSwitchAccountDialog(encodedStringCode: String): DaxAlertDialog {
+        val dialog = TextAlertDialogBuilder(this)
             .setTitle(R.string.sync_dialog_switch_account_header)
             .setMessage(R.string.sync_dialog_switch_account_description)
             .setPositiveButton(R.string.sync_dialog_switch_account_primary_button)
@@ -214,30 +234,23 @@ class ProcessSyncCodeActivity : DuckDuckGoActivity() {
                     }
                 },
             )
-            .show()
+        dialog.show()
+        return dialog
     }
 
-    private fun showPairingAcknowledgmentDialog() {
-        if (viewModel.viewState.value.isLoggedIn) {
-            viewModel.runAcknowledgementAnimation()
-            return
-        }
-        acknowledgementDialog = TextAlertDialogBuilder(this)
+    private fun showPairingAcknowledgmentDialog(): DaxAlertDialog {
+        val dialog = TextAlertDialogBuilder(this)
             .setTitle(R.string.sync_simplified_pairing_dialog_acknowledgment_title)
             .setPositiveButton(R.string.sync_simplified_pairing_dialog_acknowledgment_primary_button)
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
-                    override fun onDialogDismissed() {
-                        viewModel.runAcknowledgementAnimation()
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onAcknowledgmentConfirmed()
                     }
                 },
             )
-        acknowledgementDialog?.show()
-    }
-
-    private fun dismissPairingAcknowledgementDialog() {
-        acknowledgementDialog?.dismiss()
-        acknowledgementDialog = null
+        dialog.show()
+        return dialog
     }
 
     private fun runAcknowledgementAnimation() {
@@ -270,25 +283,11 @@ class ProcessSyncCodeActivity : DuckDuckGoActivity() {
     }
 
     private fun configureHeadline() {
-        val text = if (source.entryPoint == SyncEntryPoint.RECOVER_SYNCED_DATA) {
-            R.string.sync_simplified_pairing_headline_recovery
-        } else {
-            R.string.sync_simplified_pairing_headline
-        }
-        binding.headlineText.setText(text)
+        binding.headlineText.setText(headlineLabel)
     }
 
     private fun configureConnectingLabel() {
-        val progressDrawableSpec = CircularProgressIndicatorSpec(this, null, 0).apply {
-            indicatorSize = 20.toPx()
-            indicatorInset = 0
-            trackThickness = 3.toPx()
-            indicatorColors = intArrayOf(getColorFromAttr(CommonR.attr.daxColorAccentBlue))
-        }
-        val progressDrawable = IndeterminateDrawable.createCircularDrawable(this, progressDrawableSpec).apply {
-            setVisible(true, false)
-        }
-        binding.connectingLabel.setCompoundDrawablesRelativeWithIntrinsicBounds(progressDrawable, null, null, null)
+        binding.connectingLabel.showLeadingProgressSpinner()
     }
 
     private fun configureAcknowledgementAnimation() {

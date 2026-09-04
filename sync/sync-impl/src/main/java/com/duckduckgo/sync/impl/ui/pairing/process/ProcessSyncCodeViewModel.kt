@@ -127,31 +127,31 @@ class ProcessSyncCodeViewModel @AssistedInject constructor(
         }
     }
 
-    fun runAcknowledgementAnimation() {
+    fun onAcknowledgmentConfirmed() {
+        _viewState.update { it.copy(dialog = null) }
+        if (viewState.value.isWaitingForOtherDevice) return
         viewModelScope.launch {
             _commands.send(Command.RunAcknowledgmentAnimation)
         }
     }
 
     fun onHostConfirmed() {
+        _viewState.update { it.copy(dialog = DialogType.PairingAcknowledgment) }
         codeDispatcher.confirmHost()
-        viewModelScope.launch {
-            _commands.send(Command.ShowPairingAcknowledgement)
-        }
     }
 
     fun onHostDenied() {
+        _viewState.update { it.copy(dialog = null) }
         codeDispatcher.denyHost()
     }
 
     fun onJoinerConfirmed() {
+        _viewState.update { it.copy(dialog = DialogType.PairingAcknowledgment) }
         codeDispatcher.confirmJoiner()
-        viewModelScope.launch {
-            _commands.send(Command.ShowPairingAcknowledgement)
-        }
     }
 
     fun onJoinerDenied() {
+        _viewState.update { it.copy(dialog = null) }
         codeDispatcher.denyJoiner()
     }
 
@@ -167,6 +167,7 @@ class ProcessSyncCodeViewModel @AssistedInject constructor(
     }
 
     fun onUserAcceptedSwitchingAccount(encodedStringCode: String) {
+        _viewState.update { it.copy(dialog = null) }
         viewModelScope.launch(dispatchers.io()) {
             syncPixels.fireUserAcceptedSwitchingAccount()
             accountRepository.logoutAndJoinNewAccount(encodedStringCode)
@@ -182,6 +183,7 @@ class ProcessSyncCodeViewModel @AssistedInject constructor(
     }
 
     fun onUserCancelledSwitchingAccount() {
+        _viewState.update { it.copy(dialog = null) }
         viewModelScope.launch {
             syncPixels.fireUserCancelledSwitchingAccount()
             _commands.send(Command.SetPairingResult(SyncPairingResult.Failure))
@@ -226,7 +228,7 @@ class ProcessSyncCodeViewModel @AssistedInject constructor(
                     when (result) {
                         is AccountSwitchingRequired -> {
                             syncPixels.fireAskUserToSwitchAccount()
-                            _commands.send(Command.AskSwitchAccount(result.recoveryCode))
+                            _viewState.update { it.copy(dialog = DialogType.SwitchAccount(result.recoveryCode)) }
                             isPolling = false
                         }
 
@@ -252,7 +254,7 @@ class ProcessSyncCodeViewModel @AssistedInject constructor(
         }
         if (failure.code == ALREADY_SIGNED_IN.code && syncFeature.seamlessAccountSwitching().isEnabled()) {
             syncPixels.fireAskUserToSwitchAccount()
-            _commands.send(Command.AskSwitchAccount(syncCode))
+            _viewState.update { it.copy(dialog = DialogType.SwitchAccount(syncCode)) }
         } else {
             _commands.send(Command.ShowV1Error(failure.toExchangeV1PairingError()))
         }
@@ -271,16 +273,23 @@ class ProcessSyncCodeViewModel @AssistedInject constructor(
             is DispatchOutcome.LinkingCodeReady -> Unit
 
             is DispatchOutcome.HostConfirmationRequested -> {
-                _commands.send(Command.AskHostConfirmation(outcome.peerName, outcome.peerKind))
+                _viewState.update { it.copy(dialog = DialogType.HostConfirmation(outcome.peerName, outcome.peerKind)) }
             }
 
             is DispatchOutcome.JoinerConfirmationRequested -> {
-                _commands.send(Command.AskJoinerConfirmation(outcome.peerName, outcome.peerKind))
+                _viewState.update { it.copy(dialog = DialogType.JoinerConfirmation(outcome.peerName, outcome.peerKind)) }
             }
 
             is DispatchOutcome.LoggedIn -> {
-                _viewState.update { it.copy(isLoggedIn = true) }
-                if (outcome.path == SetupPath.RECOVERY) {
+                val stateBeforeLogin = viewState.value
+                _viewState.update { it.copy(isLoggedIn = true, isWaitingForOtherDevice = false, dialog = null) }
+                // The animation normally starts when the user confirms the acknowledgment dialog; if the
+                // login lands while that dialog is still open, it has to be started here or the wait for
+                // the animation below would never finish.
+                val startAnimation = outcome.path == SetupPath.RECOVERY ||
+                    stateBeforeLogin.isWaitingForOtherDevice ||
+                    stateBeforeLogin.dialog == DialogType.PairingAcknowledgment
+                if (startAnimation) {
                     _commands.send(Command.RunAcknowledgmentAnimation)
                 }
                 animationCompletionSignal.await()
@@ -289,13 +298,19 @@ class ProcessSyncCodeViewModel @AssistedInject constructor(
             }
 
             is DispatchOutcome.AlreadyConnected -> {
+                _viewState.update { it.copy(dialog = null) }
                 _commands.send(Command.ShowV2Error(exchangeV2AlreadyPairedError))
+            }
+
+            is DispatchOutcome.JoinOutcomeUnknown -> {
+                _viewState.update { it.copy(isWaitingForOtherDevice = true, dialog = null) }
             }
 
             is DispatchOutcome.UpgradeRequired -> {
                 if (source is SyncCodeSource.Restored) {
                     fireAutoRestoreFailurePixels(outcome.codeMajor.toString(), SetupFailureReason.NEEDS_UPGRADE.value)
                 }
+                _viewState.update { it.copy(dialog = null) }
                 _commands.send(Command.ShowV2Error(exchangeV2UpgradeRequiredError))
             }
 
@@ -303,6 +318,7 @@ class ProcessSyncCodeViewModel @AssistedInject constructor(
                 if (source is SyncCodeSource.Restored) {
                     fireAutoRestoreFailurePixels(outcome.code.toString(), outcome.reason)
                 }
+                _viewState.update { it.copy(dialog = null) }
                 _commands.send(Command.ShowV2Error(outcome.code.toExchangeV2PairingError()))
             }
         }
@@ -394,25 +410,29 @@ class ProcessSyncCodeViewModel @AssistedInject constructor(
 
     internal data class ViewState(
         val isLoggedIn: Boolean = false,
+        val isWaitingForOtherDevice: Boolean = false,
+        val dialog: DialogType? = null,
     )
 
-    internal sealed interface Command {
-        data class AskJoinerConfirmation(
+    internal sealed interface DialogType {
+        data class HostConfirmation(
             val peerName: String?,
             val peerKind: PeerKind? = null,
-        ) : Command
+        ) : DialogType
 
-        data class AskHostConfirmation(
+        data class JoinerConfirmation(
             val peerName: String?,
             val peerKind: PeerKind? = null,
-        ) : Command
+        ) : DialogType
 
-        data class AskSwitchAccount(
+        data class SwitchAccount(
             val encodedStringCode: String,
-        ) : Command
+        ) : DialogType
 
-        data object ShowPairingAcknowledgement : Command
+        data object PairingAcknowledgment : DialogType
+    }
 
+    internal sealed interface Command {
         data object RunAcknowledgmentAnimation : Command
 
         data class ShowV1Error(

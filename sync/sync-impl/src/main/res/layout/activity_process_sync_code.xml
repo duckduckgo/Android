@@ -30,16 +30,37 @@
         android:gravity="center_horizontal"
         android:orientation="vertical">
 
-        <com.airbnb.lottie.LottieAnimationView
-            android:id="@+id/lockAnimation"
-            android:layout_width="128dp"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:adjustViewBounds="true"
-            android:importantForAccessibility="no"
-            app:lottie_autoPlay="false"
-            app:lottie_loop="false"
-            app:lottie_rawRes="@raw/sync_process_sync_code_animation" />
+            android:layout_marginTop="20dp">
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/lockAnimation"
+                android:layout_width="128dp"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:importantForAccessibility="no"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:lottie_autoPlay="false"
+                app:lottie_loop="false"
+                app:lottie_rawRes="@raw/sync_process_sync_code_animation" />
+
+            <ImageView
+                android:id="@+id/checkOtherDeviceImage"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:adjustViewBounds="true"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_sync_late_join"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@id/lockAnimation"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/lockAnimation" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/headlineText"

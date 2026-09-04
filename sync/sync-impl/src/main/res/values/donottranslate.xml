@@ -15,6 +15,11 @@
   -->
 
 <resources>
+    <string name="sync_simplified_pairing_headline_check_other_device">Check your other device</string>
+    <string name="sync_simplified_pairing_dialog_check_other_device_title">Check your other device</string>
+    <string name="sync_simplified_pairing_dialog_connecting_title">Sync in progress</string>
+    <string name="sync_simplified_pairing_dialog_connecting_body">Connecting…</string>
+
     <!-- Scanner screen: manual entry tab -->
     <string name="sync_simplified_scanner_manual_entry_example_code">eyJyZWNvdmVyeSI6eyJ1c2VyX2lkIjoiNjgwRDQ1QjUtNUU2RS00MzQ3LTlDNDQtQjZGQkU4MEZDNEE3IiwicHJpbWFyelkasd92V9rZXkiOiJBUUVCQVFFQkFRRUJBUUVCQVFFQkFRRUJBUUVCQVFFQkFRRUJBUUVCQVFFPSJ9fQ==</string>
 </resources>
