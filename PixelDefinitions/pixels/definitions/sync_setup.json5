@@ -32,6 +32,25 @@
             }
         ]
     },
+    "sync_scanner_camera_permission_state": {
+        "description": "Reports the camera permission state observed on the sync scanner screen: whether it was already granted before and after asking for it, via the permission dialog or the system settings",
+        "owners": ["MiSikora"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "before_requesting",
+                "type": "boolean",
+                "description": "Whether camera permission was already granted before any request was made"
+            },
+            {
+                "key": "after_requesting",
+                "type": "boolean",
+                "description": "Whether camera permission ended up granted, via the permission dialog or the system settings"
+            }
+        ]
+    },
     "sync_setup_barcode_screen_shown": {
         "description": "The sync setup barcode (QR) screen was shown to the user",
         "owners": ["CDRussell"],

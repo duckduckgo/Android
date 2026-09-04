@@ -20,7 +20,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.pairing.read.camera.ReadSyncCodeCameraIntroViewModel.Command.ExpandScannerCutout
+import com.duckduckgo.sync.impl.ui.pairing.read.camera.ReadSyncCodeCameraIntroViewModel.Command.OpenPermissionSettings
 import com.duckduckgo.sync.impl.ui.pairing.read.camera.ReadSyncCodeCameraIntroViewModel.Command.PlayIntroAnimation
 import com.duckduckgo.sync.impl.ui.pairing.read.camera.ReadSyncCodeCameraIntroViewModel.Command.RequestCameraPermission
 import com.duckduckgo.sync.impl.ui.pairing.read.camera.ReadSyncCodeCameraIntroViewModel.Command.ResumeCamera
@@ -35,8 +37,11 @@ import javax.inject.Inject
 @ContributesViewModel(FragmentScope::class)
 class ReadSyncCodeCameraIntroViewModel @Inject constructor(
     private val cameraAccess: CameraAccess,
+    private val syncPixels: SyncPixels,
 ) : ViewModel() {
     private val isCameraHardwareAvailable = cameraAccess.isHardwareAvailable()
+    private val isCameraGrantedOnInit = cameraAccess.isPermissionGranted()
+    private var shouldReportCameraPermission = true
 
     private val _viewState = MutableStateFlow(
         ViewState(
@@ -95,6 +100,7 @@ class ReadSyncCodeCameraIntroViewModel @Inject constructor(
 
     fun onCameraPermissionResult() = withCameraHardware {
         val isGranted = cameraAccess.isPermissionGranted()
+        reportCameraPermissionState(isGranted = isGranted)
         _viewState.update {
             it.copy(viewMode = if (isGranted) ViewMode.Camera else ViewMode.NoCameraPermission)
         }
@@ -103,13 +109,34 @@ class ReadSyncCodeCameraIntroViewModel @Inject constructor(
         }
     }
 
+    fun onGoToPermissionSettingsClicked() = withCameraHardware {
+        // The user may grant the permission in the system settings, so we allow to capture the pixel again.
+        shouldReportCameraPermission = true
+        viewModelScope.launch {
+            _command.send(OpenPermissionSettings)
+        }
+    }
+
     private fun requestCameraActivation() {
         if (viewState.value.viewMode == ViewMode.Camera) {
+            // An active camera means the permission is granted. This is where we report grants
+            // that skip the permission dialog: a permission granted before this screen opened or
+            // one granted from the system settings.
+            reportCameraPermissionState(isGranted = true)
             viewModelScope.launch {
                 _command.send(ResumeCamera)
                 _command.send(ExpandScannerCutout)
             }
         }
+    }
+
+    private fun reportCameraPermissionState(isGranted: Boolean) {
+        if (!shouldReportCameraPermission) return
+        shouldReportCameraPermission = false
+        syncPixels.fireScannerCameraPermissionState(
+            beforeRequesting = isCameraGrantedOnInit,
+            afterRequesting = isGranted,
+        )
     }
 
     private inline fun withCameraHardware(block: () -> Unit) {
@@ -133,6 +160,7 @@ class ReadSyncCodeCameraIntroViewModel @Inject constructor(
     sealed class Command {
         data object PlayIntroAnimation : Command()
         data object RequestCameraPermission : Command()
+        data object OpenPermissionSettings : Command()
         data object ResumeCamera : Command()
         data object ExpandScannerCutout : Command()
     }

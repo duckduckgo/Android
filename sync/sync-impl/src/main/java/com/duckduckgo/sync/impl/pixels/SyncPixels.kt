@@ -36,6 +36,8 @@ import com.duckduckgo.sync.impl.pixels.SyncPixelName.SYNC_DAILY_SUCCESS_RATE_PIX
 import com.duckduckgo.sync.impl.pixels.SyncPixelName.SYNC_OBJECT_LIMIT_EXCEEDED_DAILY
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.CONNECTED_DEVICES_WHEN_DELETING
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_FEATURE_PROMOTION_SOURCE
+import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SCANNER_CAMERA_PERMISSION_AFTER_REQUESTING
+import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SCANNER_CAMERA_PERMISSION_BEFORE_REQUESTING
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_CODE_TYPE
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_CODE_VERSION
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_FLOW_VERSION
@@ -125,6 +127,7 @@ interface SyncPixels {
     fun fireTimeoutOnDeepLinkSetup()
     fun fireScanCodeScreenShown(screenType: ScreenType)
     fun fireSyncBarcodeScreenShown(screenType: ScreenType)
+    fun fireScannerCameraPermissionState(beforeRequesting: Boolean, afterRequesting: Boolean)
     fun fireSyncSetupFinishedSuccessfully(
         screenType: ScreenType,
         path: SetupPath? = null,
@@ -668,6 +671,16 @@ class RealSyncPixels @Inject constructor(
         )
     }
 
+    override fun fireScannerCameraPermissionState(beforeRequesting: Boolean, afterRequesting: Boolean) {
+        pixel.fire(
+            SyncPixelName.SYNC_SCANNER_CAMERA_PERMISSION_STATE,
+            parameters = mapOf(
+                SYNC_SCANNER_CAMERA_PERMISSION_BEFORE_REQUESTING to beforeRequesting.toString(),
+                SYNC_SCANNER_CAMERA_PERMISSION_AFTER_REQUESTING to afterRequesting.toString(),
+            ),
+        )
+    }
+
     override fun fireSyncSetupAbandoned(screenType: ScreenType, reason: CancellationReason?) {
         pixel.fire(
             SyncPixelName.SYNC_SETUP_ENDED_ABANDONED,
@@ -1005,6 +1018,7 @@ enum class SyncPixelName(override val pixelName: String) : Pixel.PixelName {
     SYNC_SETTINGS_RECOVER_SYNC_DATA_TAPPED("m_settings_sync_recover_synced_data_tapped"),
     SYNC_SETTINGS_RECOVER_SYNC_DATA_CONFIRMED("m_settings_sync_recovery_confirmed_tapped"),
     SYNC_SETUP_SCAN_QR_SCREEN_SHOWN("sync_setup_scan_qr_screen_shown"),
+    SYNC_SCANNER_CAMERA_PERMISSION_STATE("sync_scanner_camera_permission_state"),
     SYNC_SETUP_BARCODE_SCREEN_SHOWN("sync_setup_barcode_screen_shown"),
     SYNC_SETUP_BARCODE_SCANNER_SUCCESS("sync_setup_barcode_scanner_success"),
     SYNC_SETUP_BARCODE_SCANNER_FAILED("sync_setup_barcode_scanner_failed"),
@@ -1080,6 +1094,8 @@ object SyncPixelParameters {
     const val SYNC_FEATURE_PROMOTION_DISMISS_REASON = "reason"
     const val GET_OTHER_DEVICES_SCREEN_LAUNCH_SOURCE = "source"
     const val SYNC_SETUP_SCREEN_TYPE = "source"
+    const val SYNC_SCANNER_CAMERA_PERMISSION_BEFORE_REQUESTING = "before_requesting"
+    const val SYNC_SCANNER_CAMERA_PERMISSION_AFTER_REQUESTING = "after_requesting"
     const val SYNC_SETUP_FLOW_VERSION = "flow_version"
     const val SYNC_SETUP_UI_VERSION = "ui_version"
     const val SYNC_SETUP_MY_KIND = "my_kind"

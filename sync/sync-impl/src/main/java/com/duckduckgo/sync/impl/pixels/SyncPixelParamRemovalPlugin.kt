@@ -49,6 +49,7 @@ class SyncPixelParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugi
             SyncPixelName.SYNC_SETUP_DEEP_LINK_FLOW_ABANDONED.pixelName to PixelParameter.removeAtb(),
 
             SyncPixelName.SYNC_SETUP_BARCODE_SCREEN_SHOWN.pixelName to PixelParameter.removeAtb(),
+            SyncPixelName.SYNC_SCANNER_CAMERA_PERMISSION_STATE.pixelName to PixelParameter.removeAtb(),
             SyncPixelName.SYNC_SETUP_BARCODE_SCANNER_SUCCESS.pixelName to PixelParameter.removeAtb(),
             SyncPixelName.SYNC_SETUP_BARCODE_SCANNER_FAILED.pixelName to PixelParameter.removeAtb(),
             SyncPixelName.SYNC_SETUP_BARCODE_CODE_COPIED.pixelName to PixelParameter.removeAtb(),

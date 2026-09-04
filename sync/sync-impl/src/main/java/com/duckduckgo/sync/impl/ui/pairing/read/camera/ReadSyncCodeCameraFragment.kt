@@ -54,6 +54,7 @@ import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import com.duckduckgo.sync.impl.ui.pairing.read.ReadSyncCodeViewModel
 import com.duckduckgo.sync.impl.ui.pairing.read.camera.ReadSyncCodeCameraIntroViewModel.Command
 import com.duckduckgo.sync.impl.ui.pairing.read.camera.ReadSyncCodeCameraIntroViewModel.Command.ExpandScannerCutout
+import com.duckduckgo.sync.impl.ui.pairing.read.camera.ReadSyncCodeCameraIntroViewModel.Command.OpenPermissionSettings
 import com.duckduckgo.sync.impl.ui.pairing.read.camera.ReadSyncCodeCameraIntroViewModel.Command.PlayIntroAnimation
 import com.duckduckgo.sync.impl.ui.pairing.read.camera.ReadSyncCodeCameraIntroViewModel.Command.RequestCameraPermission
 import com.duckduckgo.sync.impl.ui.pairing.read.camera.ReadSyncCodeCameraIntroViewModel.Command.ResumeCamera
@@ -214,6 +215,14 @@ class ReadSyncCodeCameraFragment : DuckDuckGoFragment() {
                 cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
             }
 
+            OpenPermissionSettings -> {
+                val intent = Intent(
+                    Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                    Uri.fromParts("package", requireContext().packageName, null),
+                )
+                startActivity(intent)
+            }
+
             ResumeCamera -> {
                 if (isResumed) binding.includeCamera.barcodeView.resume()
             }
@@ -259,11 +268,7 @@ class ReadSyncCodeCameraFragment : DuckDuckGoFragment() {
 
     private fun configureGoToSettingsButton() {
         binding.includeNoPermission.goToPermissionsSettingsButton.setOnClickListener {
-            val intent = Intent(
-                Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                Uri.fromParts("package", requireContext().packageName, null),
-            )
-            startActivity(intent)
+            animationViewModel.onGoToPermissionSettingsClicked()
         }
     }
 
