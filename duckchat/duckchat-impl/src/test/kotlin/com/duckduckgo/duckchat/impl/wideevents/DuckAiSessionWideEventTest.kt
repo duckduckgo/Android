@@ -233,6 +233,24 @@ class DuckAiSessionWideEventTest {
     }
 
     @Test
+    fun `a generic new tab intent does not overwrite an earlier fire tab intent`() = runTest {
+        startFlow(tabId = "tab-1")
+        testee.onSelectedTabChanged("tab-1", DUCKAI_URL_A)
+        idle()
+
+        testee.onExitIntent("tab-1", DuckAiSessionExitTrigger.FIRE_TAB_OPENED)
+        testee.onExitIntent("tab-1", DuckAiSessionExitTrigger.NEW_TAB_OPENED)
+        testee.onSelectedTabChanged("tab-2", null)
+        idle()
+
+        verify(wideEventClient).flowFinish(
+            wideEventId = eq(1L),
+            status = eq(FlowStatus.Success),
+            metadata = eq(mapOf("status_reason" to "left_duckai", "exit_trigger" to "fire_tab_opened")),
+        )
+    }
+
+    @Test
     fun `when switching between two Duck ai tabs then the old session ends and the new one starts`() = runTest {
         startFlow(tabId = "tab-1")
         testee.onSelectedTabChanged("tab-1", DUCKAI_URL_A)

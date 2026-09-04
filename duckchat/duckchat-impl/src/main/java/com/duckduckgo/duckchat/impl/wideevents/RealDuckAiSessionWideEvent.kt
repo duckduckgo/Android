@@ -229,6 +229,7 @@ class RealDuckAiSessionWideEvent @Inject constructor(
 
     private fun processExitIntent(tabId: String, trigger: DuckAiSessionExitTrigger) {
         if (activeSession?.tabId != tabId) return
+        if (pendingExit != null) return
         pendingExit = PendingExit(tabId, trigger)
     }
 
