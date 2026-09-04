@@ -59,7 +59,7 @@ import com.duckduckgo.mobile.android.R as CommonR
  */
 class InputScreenPreviewBinder(
     private val binding: IncludeBrandDesignInputScreenPreviewBinding,
-    private val isAddressBarRebrandEnabled: Boolean,
+    private val isAddressBarRebrandEnabled: () -> Boolean,
 ) : StatefulDialogBinder<ContentConfig.InputScreenPreview, InputScreenPreviewContentState> {
 
     override val view: View = binding.root
@@ -122,6 +122,7 @@ class InputScreenPreviewBinder(
         isSearchSelected: Boolean,
         scope: BindScope,
     ) = with(binding) {
+        val isAddressBarRebrandEnabled = isAddressBarRebrandEnabled()
         inputModeDemoCard.applyInputScreenPreviewShape(isAddressBarRebrandEnabled)
         inputText.applyInputScreenPreviewInsets(isAddressBarRebrandEnabled, inputModeDemoActionIcon)
 
