@@ -307,26 +307,31 @@ class DaxTrackersBlockedBrandDesignUpdateContextualCtaTest {
             isLightTheme = true,
             deviceInfo = mockDeviceInfo,
         )
-        val legacyCta = OnboardingDaxDialogCta.DaxTrackersBlockedCta(
-            onboardingStore = mockOnboardingStore,
-            appInstallStore = mockAppInstallStore,
-            trackers = trackers,
-            settingsDataStore = mockSettingsDataStore,
-        )
-
-        assertEquals(
-            legacyCta.getTrackersDescription(resourceContext, trackers),
-            brandDesignCta.getTrackersDescription(resourceContext, trackers),
-        )
+        val distinctTrackers = trackers.map { it.displayName }.distinct()
+        val shownTrackers = distinctTrackers.take(2)
+        val remainingCount = distinctTrackers.size - shownTrackers.size
+        val quantityString = if (remainingCount == 0) {
+            resourceContext.resources.getQuantityString(
+                com.duckduckgo.app.browser.R.plurals.onboardingTrackersBlockedZeroDialogDescription,
+                shownTrackers.size,
+            ).getStringForOmnibarPosition(omnibarType)
+        } else {
+            resourceContext.resources.getQuantityString(
+                com.duckduckgo.app.browser.R.plurals.onboardingTrackersBlockedDialogDescription,
+                remainingCount,
+                remainingCount,
+            ).getStringForOmnibarPosition(omnibarType)
+        }
+        assertEquals("<b>${shownTrackers.joinToString(", ")}</b>$quantityString", brandDesignCta.getTrackersDescription(resourceContext, trackers))
     }
 
     private fun mockContextEncodingResourceArgs(): Context {
         val resources: Resources = mock {
             on { getQuantityString(any(), any()) } doAnswer { invocation ->
-                "plural:${invocation.arguments.joinToString(",")}"
+                "☝ plural:${invocation.arguments.joinToString(",")}"
             }
             on { getQuantityString(any(), any(), any()) } doAnswer { invocation ->
-                "plural:${invocation.arguments.joinToString(",")}"
+                "☝ plural:${invocation.arguments.joinToString(",")}"
             }
         }
         return mock { on { this.resources } doReturn resources }

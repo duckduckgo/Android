@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.res.Configuration
 import android.content.res.Resources
 import android.view.View
+import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
@@ -29,9 +30,11 @@ import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection
+import com.duckduckgo.app.onboarding.ui.view.DaxTypeAnimationTextView
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleBrandDesignUpdateCardView
+import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.device.DeviceInfo.FormFactor
 import org.junit.Assert.assertEquals
@@ -48,6 +51,12 @@ class BrandDesignUpdateBubbleCtaTest {
     private val container: View = mock()
     private val dax: LottieAnimationView = mock()
     private val cardView: DaxOnboardingBubbleBrandDesignUpdateCardView = mock()
+    private val titleView: DaxTypeAnimationTextView = mock()
+    private val descriptionView: DaxTextView = mock()
+    private val dismissButton: ImageView = mock()
+    private val optionsInclude: View = mock()
+    private val primaryInclude: View = mock()
+    private val secondaryInclude: View = mock()
 
     private val onboardingStore: OnboardingStore = mock()
     private val appInstallStore: AppInstallStore = mock()
@@ -56,6 +65,28 @@ class BrandDesignUpdateBubbleCtaTest {
     @Before
     fun before() {
         whenever(container.findViewById<LottieAnimationView>(R.id.wavingDax)).thenReturn(dax)
+        whenever(container.findViewById<DaxTypeAnimationTextView>(R.id.brandDesignTitle)).thenReturn(titleView)
+        whenever(container.findViewById<DaxTextView>(R.id.brandDesignDescription)).thenReturn(descriptionView)
+        whenever(container.findViewById<ImageView>(R.id.brandDesignDismissButton)).thenReturn(dismissButton)
+        whenever(container.findViewById<View>(R.id.optionsContent)).thenReturn(optionsInclude)
+        whenever(container.findViewById<View>(R.id.primaryCta)).thenReturn(primaryInclude)
+        whenever(container.findViewById<View>(R.id.secondaryCta)).thenReturn(secondaryInclude)
+    }
+
+    @Test
+    fun clearDialog_resetsBrandDesignBubbleContent() {
+        val cta = TestableBubbleCta().apply { attachCtaView(container) }
+
+        cta.clearDialog()
+
+        verify(titleView).alpha = 1f
+        verify(titleView).text = ""
+        verify(descriptionView).alpha = 0f
+        verify(dismissButton).alpha = 0f
+        listOf(optionsInclude, primaryInclude, secondaryInclude).forEach { include ->
+            verify(include).alpha = 0f
+            verify(include).visibility = View.GONE
+        }
     }
 
     @Test
