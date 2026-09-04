@@ -211,8 +211,11 @@ class NewUserOnboardingPlanProviderTest {
         )
     }
 
-    private suspend fun start() {
-        orchestrator.startPlan(provider.buildRootPlan(onCompleted = {}, onSkipped = {}))
+    private suspend fun start(
+        onCompleted: suspend () -> Unit = {},
+        onSkipped: suspend () -> Unit = {},
+    ) {
+        orchestrator.startPlan(provider.buildRootPlan(onCompleted = onCompleted, onSkipped = onSkipped))
     }
 
     private fun assertStep(id: String) {
@@ -230,7 +233,8 @@ class NewUserOnboardingPlanProviderTest {
 
     @Test
     fun `when initial user then walks full happy path to completed`() = runTest {
-        start()
+        var callbackState: LinearOnboardingState? = null
+        start(onCompleted = { callbackState = orchestrator.state.value })
         assertStep(NewUserOnboardingStepIds.INTRO_ANIMATION)
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
         assertStep(NewUserOnboardingStepIds.NOTIFICATION_PERMISSION)
@@ -249,7 +253,19 @@ class NewUserOnboardingPlanProviderTest {
         assertStep(NewUserOnboardingStepIds.INPUT_SCREEN)
         orchestrator.onEvent(NewUserOnboardingEvent.InputModeConfirmed(withAi = false))
         // input_screen_preview precondition is false (not AI) -> plan exhausts.
+        assertTrue(callbackState is InProgress)
         assertEquals(Completed(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID), orchestrator.state.value)
+    }
+
+    @Test
+    fun `when dev skip aborts real root plan then supplied callback runs while orchestrator is in progress`() = runTest {
+        var callbackState: LinearOnboardingState? = null
+        start(onSkipped = { callbackState = orchestrator.state.value })
+
+        orchestrator.onEvent(NewUserOnboardingEvent.SkipNewUserOnboardingDevOptionClicked)
+
+        assertTrue(callbackState is InProgress)
+        assertEquals(Skipped(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID), orchestrator.state.value)
     }
 
     @Test
