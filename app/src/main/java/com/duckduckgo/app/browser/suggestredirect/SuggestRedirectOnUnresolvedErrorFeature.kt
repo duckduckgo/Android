@@ -30,9 +30,9 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
     featureName = "suggestRedirectOnUnresolvedError",
 )
 interface SuggestRedirectOnUnresolvedErrorFeature {
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun self(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun suggestRedirect(): Toggle
 }
