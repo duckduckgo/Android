@@ -53,14 +53,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="@dimen/keyline_5"
+                android:layout_marginTop="@dimen/keyline_3"
                 android:src="@drawable/subscription_check_feature_128" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/subscriptionOnboardingWelcomeTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/keyline_5"
+                android:layout_marginTop="@dimen/keyline_4"
                 android:gravity="center"
                 android:text="@string/subscriptionOnboardingWelcomeTitle"
                 app:typography="h1" />
