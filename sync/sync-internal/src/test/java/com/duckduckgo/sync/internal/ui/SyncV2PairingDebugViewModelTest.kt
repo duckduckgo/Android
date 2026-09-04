@@ -107,10 +107,10 @@ class SyncV2PairingDebugViewModelTest {
 
     // ---- Event log ----
 
-    @Test fun `Transition event appended to rows with correct summary`() = runTest {
+    @Test fun `Transition event appended to rows with correct name`() = runTest {
         val viewModel = newViewModel()
         viewModel.viewState().test {
-            assertEquals(emptyList<SyncV2PairingDebugViewModel.LogRow>(), awaitItem().rows)
+            assertEquals(emptyList<LogRow>(), awaitItem().rows)
 
             whenever(runner.currentState).thenReturn(ExchangeV2State.Negotiating)
             eventFlow.emit(
@@ -125,12 +125,13 @@ class SyncV2PairingDebugViewModelTest {
 
             val updated = awaitItem()
             assertEquals(1, updated.rows.size)
-            assertTrue(updated.rows.single().summary.contains("Bootstrapped → Negotiating"))
+            assertEquals(LogRow.Type.StateTransition, updated.rows.single().eventType)
+            assertEquals("Bootstrapped → Negotiating", updated.rows.single().summary)
             assertEquals("Negotiating", updated.currentStateLabel)
         }
     }
 
-    @Test fun `MessageSent event labelled as Sent with type`() = runTest {
+    @Test fun `MessageSent event labelled with message type`() = runTest {
         val viewModel = newViewModel()
         viewModel.viewState().test {
             awaitItem()
@@ -142,11 +143,12 @@ class SyncV2PairingDebugViewModelTest {
             )
             val state = awaitItem()
             assertEquals(1, state.rows.size)
-            assertTrue(state.rows.single().summary.startsWith("Sent recovery_code_request"))
+            assertEquals(LogRow.Type.MessageSent, state.rows.single().eventType)
+            assertEquals("recovery_code_request", state.rows.single().summary)
         }
     }
 
-    @Test fun `MessageNotSent event labelled as Not sent with reason`() = runTest {
+    @Test fun `MessageNotSent event labelled with reason`() = runTest {
         val viewModel = newViewModel()
         viewModel.viewState().test {
             awaitItem()
@@ -160,11 +162,12 @@ class SyncV2PairingDebugViewModelTest {
             )
             val state = awaitItem()
             assertEquals(1, state.rows.size)
-            assertEquals("Not sent bye: HttpError(404)", state.rows.single().summary)
+            assertEquals(LogRow.Type.MessageNotSent, state.rows.single().eventType)
+            assertEquals("bye: HttpError(404)", state.rows.single().summary)
         }
     }
 
-    @Test fun `MessageRejected with SameAccount labelled SameAccountAbort`() = runTest {
+    @Test fun `MessageRejected with SameAccount labelled with reject reason`() = runTest {
         val viewModel = newViewModel()
         viewModel.viewState().test {
             awaitItem()
@@ -181,7 +184,30 @@ class SyncV2PairingDebugViewModelTest {
                 ),
             )
             val state = awaitItem()
-            assertTrue(state.rows.single().summary.startsWith("SameAccount"))
+            assertEquals(LogRow.Type.MessageRejected, state.rows.single().eventType)
+            assertEquals("recovery_code_available: SameAccount", state.rows.single().summary)
+        }
+    }
+
+    @Test fun `onLogFilterChanged hides rows of filtered-out categories from visibleRows`() = runTest {
+        val viewModel = newViewModel()
+        viewModel.viewState().test {
+            awaitItem()
+            eventFlow.emit(
+                ExchangeV2Event.MessageSent(
+                    timestampMs = 0L,
+                    message = ExchangeV2Message.RecoveryCodeRequest.create(name = "me", kind = "3party"),
+                ),
+            )
+            assertEquals(1, awaitItem().visibleRows.size)
+
+            viewModel.onLogFilterChanged(setOf(LogRow.Category.Session))
+            val filtered = awaitItem()
+            assertEquals(1, filtered.rows.size)
+            assertEquals(0, filtered.visibleRows.size)
+
+            viewModel.onLogFilterChanged(LogRow.Category.entries.toSet())
+            assertEquals(1, awaitItem().visibleRows.size)
         }
     }
 
