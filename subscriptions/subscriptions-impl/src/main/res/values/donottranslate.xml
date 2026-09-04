@@ -61,6 +61,10 @@
     <string name="subscriptionOnboardingFeature4Title">Personal Information Removal</string>
     <string name="subscriptionOnboardingFeature4Description">Find and remove your personal info from sites that store and sell it, reducing spam. </string>
     <string name="subscriptionOnboardingFeaturesPrimaryButton">Next</string>
+
+    <!-- ITR step -->
+    <string name="subscriptionOnboardingItrTitle">Step 2 of 3</string>
+    <string name="subscriptionOnboardingItrActivate">Activate</string>
     <!-- Feature detail screens -->
 
     <!-- Platform labels -->
