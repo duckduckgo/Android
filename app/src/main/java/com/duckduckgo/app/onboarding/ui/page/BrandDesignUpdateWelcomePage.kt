@@ -1569,7 +1569,10 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     binding.daxDialogCta.inputScreenPreviewContent.inputModeToggle.addOnTabSelectedListener(
                         object : com.google.android.material.tabs.TabLayout.OnTabSelectedListener {
                             override fun onTabSelected(tab: com.google.android.material.tabs.TabLayout.Tab) {
-                                val changeBounds = ChangeBounds().apply { duration = DIALOG_TRANSITION_DURATION }
+                                val changeBounds = ChangeBounds().apply {
+                                    duration = DIALOG_TRANSITION_DURATION
+                                    excludeTarget(R.id.inputText, true)
+                                }
                                 TransitionManager.beginDelayedTransition(
                                     binding.daxDialogCta.cardView,
                                     changeBounds,
@@ -2273,7 +2276,10 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 previewContent.inputModeToggle.addOnTabSelectedListener(
                     object : com.google.android.material.tabs.TabLayout.OnTabSelectedListener {
                         override fun onTabSelected(tab: com.google.android.material.tabs.TabLayout.Tab) {
-                            val changeBounds = ChangeBounds().apply { duration = DIALOG_TRANSITION_DURATION }
+                            val changeBounds = ChangeBounds().apply {
+                                duration = DIALOG_TRANSITION_DURATION
+                                excludeTarget(R.id.inputText, true)
+                            }
                             TransitionManager.beginDelayedTransition(
                                 binding.daxDialogCta.cardView,
                                 changeBounds,
