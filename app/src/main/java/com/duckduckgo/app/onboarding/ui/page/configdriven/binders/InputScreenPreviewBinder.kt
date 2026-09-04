@@ -149,17 +149,12 @@ class InputScreenPreviewBinder(
         }
 
         inputText.updateInputModePreservingSelection {
+            applyInputTextMode(isSearchSelected)
             if (isSearchSelected) {
-                minLines = 1
-                maxLines = 1
-                inputType = InputType.TYPE_CLASS_TEXT
                 imeOptions = EditorInfo.IME_ACTION_SEARCH
                 setHint(R.string.preOnboardingInputModeDemoSearchHint)
                 inputModeDemoActionIcon.setImageResource(CommonR.drawable.ic_find_search_24)
             } else {
-                minLines = CHAT_INPUT_LINES
-                maxLines = CHAT_INPUT_LINES
-                inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
                 imeOptions = EditorInfo.IME_ACTION_UNSPECIFIED
                 setHint(R.string.preOnboardingInputModeDemoChatHint)
                 inputModeDemoActionIcon.setImageResource(CommonR.drawable.ic_arrow_right_24)
@@ -247,7 +242,6 @@ class InputScreenPreviewBinder(
     private companion object {
         const val SEARCH_TAB_INDEX = 0
         const val CHAT_TAB_INDEX = 1
-        const val CHAT_INPUT_LINES = 3
         const val SUGGESTION_FADE_DURATION_MS = 500L
         const val MODE_SWITCH_DURATION_MS = 400L
         const val SUGGESTIONS_START_DELAY_MS = 500L
@@ -299,6 +293,18 @@ internal fun EditText.applyInputScreenPreviewInsets(
         actionIcon.updateLayoutParams<ViewGroup.MarginLayoutParams> {
             marginEnd = actionIconMarginEnd
         }
+    }
+}
+
+internal fun EditText.applyInputTextMode(isSearchSelected: Boolean) {
+    if (isSearchSelected) {
+        inputType = InputType.TYPE_CLASS_TEXT
+        minLines = 1
+        maxLines = 1
+    } else {
+        inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
+        minLines = 3
+        maxLines = Int.MAX_VALUE
     }
 }
 

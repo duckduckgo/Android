@@ -31,7 +31,6 @@ import android.graphics.Typeface
 import android.graphics.drawable.AnimatedVectorDrawable
 import android.media.MediaPlayer
 import android.os.Bundle
-import android.text.InputType
 import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
@@ -94,6 +93,7 @@ import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SYNC_RESTOR
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.WIDGET_PROMPT
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.applyInputScreenPreviewInsets
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.applyInputScreenPreviewShape
+import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.applyInputTextMode
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.updateInputModePreservingSelection
 import com.duckduckgo.app.onboarding.ui.view.OnboardingStepIndicatorView
 import com.duckduckgo.app.onboardingquicksetup.ui.BrandDesignInputScreenPicker
@@ -2881,19 +2881,14 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         }
 
         previewContent.inputText.updateInputModePreservingSelection {
+            applyInputTextMode(inputMode == InputMode.SEARCH)
             when (inputMode) {
                 InputMode.SEARCH -> {
-                    minLines = 1
-                    maxLines = 1
-                    inputType = InputType.TYPE_CLASS_TEXT
                     imeOptions = EditorInfo.IME_ACTION_SEARCH
                     setHint(R.string.preOnboardingInputModeDemoSearchHint)
                     previewContent.inputModeDemoActionIcon.setImageResource(CommonR.drawable.ic_find_search_24)
                 }
                 InputMode.CHAT -> {
-                    minLines = 3
-                    maxLines = 3
-                    inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
                     imeOptions = EditorInfo.IME_ACTION_UNSPECIFIED
                     setHint(R.string.preOnboardingInputModeDemoChatHint)
                     previewContent.inputModeDemoActionIcon.setImageResource(CommonR.drawable.ic_arrow_right_24)

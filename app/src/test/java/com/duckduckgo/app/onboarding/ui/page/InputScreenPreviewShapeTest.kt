@@ -30,6 +30,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.applyInputScreenPreviewInsets
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.applyInputScreenPreviewShape
+import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.applyInputTextMode
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.updateInputModePreservingSelection
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.shape.RelativeCornerSize
@@ -182,6 +183,23 @@ class InputScreenPreviewShapeTest {
 
         assertEquals(11, input.selectionStart)
         assertEquals(11, input.selectionEnd)
+    }
+
+    @Test
+    fun whenDuckAiModeIsRestoredThenKeepsTheSameExpandableLineBounds() {
+        val switchedInput = EditText(baseContext).apply {
+            applyInputTextMode(isSearchSelected = true)
+            applyInputTextMode(isSearchSelected = false)
+        }
+        val restoredInput = EditText(baseContext).apply {
+            maxLines = 1
+            applyInputTextMode(isSearchSelected = false)
+        }
+
+        assertEquals(3, restoredInput.minLines)
+        assertEquals(Int.MAX_VALUE, restoredInput.maxLines)
+        assertEquals(switchedInput.minLines, restoredInput.minLines)
+        assertEquals(switchedInput.maxLines, restoredInput.maxLines)
     }
 
     private fun shapeResources(
