@@ -253,13 +253,6 @@ interface DuckChatFeature {
     fun aiFeaturesNativeControls(): Toggle
 
     /**
-     * @return `true` when the "Duck.ai Settings" link is visible in AI Features.
-     * If the remote feature is not present defaults to `internal`
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun duckAiSettings(): Toggle
-
-    /**
      * @return Toggle iseÉnabled `true` when the remove chat history feature is enabled.
      * If the remote feature is not present defaults to `true`
      */
