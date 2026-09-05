@@ -38,10 +38,12 @@ import com.duckduckgo.savedsites.impl.RealFavoritesDelegate
 import com.duckduckgo.savedsites.impl.RealSavedSitesRepository
 import com.duckduckgo.savedsites.impl.service.RealSavedSitesExporter
 import com.duckduckgo.savedsites.impl.service.RealSavedSitesParser
+import com.duckduckgo.savedsites.store.Relation
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 import kotlinx.coroutines.test.runTest
 import org.junit.*
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.runner.RunWith
 import java.io.File
@@ -187,6 +189,29 @@ class SavedSitesExporterTest {
                 preOrderCount++
             },
         )
+    }
+
+    @Test
+    fun whenFolderRelationsContainCycleThenGetTreeStructureTerminates() = runTest {
+        val root = BookmarkFolder(SavedSitesNames.BOOKMARKS_ROOT, "DuckDuckGo Bookmarks", "", 0, 0, "timestamp")
+        val parentFolder = BookmarkFolder("folder1", "Folder One", SavedSitesNames.BOOKMARKS_ROOT, 0, 0, "timestamp")
+        val childFolder = BookmarkFolder("folder2", "Folder Two", "folder1", 0, 0, "timestamp")
+        val childBookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2", "timestamp")
+        savedSitesRepository.insertFolderBranch(FolderBranch(listOf(childBookmark), listOf(root, parentFolder, childFolder)))
+
+        // folder2 is already a child of folder1; making folder1 a child of folder2 closes the loop
+        savedSitesRelationsDao.insert(Relation(folderId = childFolder.id, entityId = parentFolder.id))
+
+        val treeStructure = exporter.getTreeFolderStructure()
+
+        val visitedFolderIds = mutableListOf<String>()
+        treeStructure.forEachVisit(
+            { node -> if (node.value.url == null) visitedFolderIds.add(node.value.id) },
+            { },
+        )
+
+        assertTrue(visitedFolderIds.containsAll(listOf(parentFolder.id, childFolder.id)))
+        assertEquals(visitedFolderIds.distinct().size, visitedFolderIds.size)
     }
 
     private fun testNode(
