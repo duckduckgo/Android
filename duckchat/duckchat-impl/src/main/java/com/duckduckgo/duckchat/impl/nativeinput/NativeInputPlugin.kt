@@ -38,6 +38,9 @@ interface NativeInputHost {
     fun showModelPicker(showing: Boolean)
     fun showReasoningPicker(showing: Boolean)
 
+    /** Return focus and the keyboard to the input field after a plugin handed control to another screen. */
+    fun restoreInputFocus()
+
     fun attachmentChanged(hasAttachments: Boolean, limitExceeded: Boolean, supportsUpload: Boolean)
 
     /**

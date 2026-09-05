@@ -409,11 +409,13 @@ class AttachmentView(
     private fun buildImagePickerCallback(source: AttachmentViewModel.ImageSource): ValueCallback<Array<Uri>> = ValueCallback { uris ->
         val list = uris?.toList()
         if (!list.isNullOrEmpty()) viewModel?.onImagesPicked(list, source)
+        host?.restoreInputFocus()
     }
 
     private fun buildFilePickerCallback(): ValueCallback<Array<Uri>> = ValueCallback { uris ->
         val list = uris?.toList()
         if (!list.isNullOrEmpty()) viewModel?.onFilesPicked(list)
+        host?.restoreInputFocus()
     }
 }
 
