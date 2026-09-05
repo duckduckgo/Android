@@ -215,6 +215,34 @@ class FileBasedFaviconPersisterTest {
     }
 
     @Test
+    fun whenOneLegacyFileCannotBeMovedThenOthersMigrateAndLegacyDirectoryIsKeptForRetry() = runTest {
+        createLegacyCacheFile(FileBasedFaviconPersister.FAVICON_PERSISTED_DIR, content = "legacy")
+        val legacyRoot = File(context.cacheDir, FileBasedFaviconPersister.FAVICON_PERSISTED_DIR)
+        val blockedLegacyFile = File(File(legacyRoot, "blocked"), "inner.png")
+        blockedLegacyFile.parentFile!!.mkdirs()
+        writeBytesToFile(blockedLegacyFile, "blocked")
+        // A regular file where the destination sub-directory should be makes that one move fail.
+        val destinationRoot = File(context.filesDir, FileBasedFaviconPersister.FAVICON_PERSISTED_DIR)
+        destinationRoot.mkdirs()
+        val blocker = File(destinationRoot, "blocked")
+        writeBytesToFile(blocker, "not a directory")
+
+        val file = testee.faviconFile(FileBasedFaviconPersister.FAVICON_PERSISTED_DIR, subFolder, domain)
+
+        assertNotNull(file)
+        assertEquals("legacy", file!!.readText())
+        assertTrue(legacyRoot.exists())
+        assertTrue(blockedLegacyFile.exists())
+        assertFalse(File(File(legacyRoot, subFolder), filename(domain)).exists())
+
+        blocker.delete()
+        testee.faviconFile(FileBasedFaviconPersister.FAVICON_PERSISTED_DIR, subFolder, domain)
+
+        assertEquals("blocked", File(File(destinationRoot, "blocked"), "inner.png").readText())
+        assertFalse(legacyRoot.exists())
+    }
+
+    @Test
     fun whenTempDirectoryIsAccessedThenNothingIsMigrated() = runTest {
         val legacyFile = createLegacyCacheFile(FileBasedFaviconPersister.FAVICON_PERSISTED_DIR, content = "legacy")
 

@@ -307,22 +307,47 @@ class FileBasedFaviconPersister(
         synchronized(legacyMigrationLock) {
             if (!legacyDirectory.exists()) return
 
-            runCatching {
-                legacyDirectory.walkTopDown()
-                    .filter { it.isFile && !it.name.endsWith(TMP_FILE_SUFFIX) }
-                    .forEach { legacyFile ->
-                        val target = File(destination, legacyFile.relativeTo(legacyDirectory).path)
-                        target.parentFile?.mkdirs()
-                        // A file already written by this version is newer than the legacy one, keep it.
-                        if (!target.exists() && !legacyFile.renameTo(target)) {
-                            legacyFile.copyTo(target)
-                        }
-                    }
-            }.onFailure {
-                logcat(LogPriority.WARN) { "FaviconPersister: failed to migrate legacy $directory favicons: ${it.message}" }
+            val allMoved = legacyDirectory.walkTopDown()
+                .filter { it.isFile && !it.name.endsWith(TMP_FILE_SUFFIX) }
+                .map { legacyFile -> moveLegacyFile(legacyFile, File(destination, legacyFile.relativeTo(legacyDirectory).path)) }
+                .toList()
+                .all { it }
+
+            // Only drop the legacy directory once every file is safely in the new location. A partial
+            // failure (e.g. no space for the copy fallback) leaves the remaining files where they are so
+            // the next lookup can retry them instead of losing them.
+            if (allMoved) {
+                legacyDirectory.deleteRecursively()
+            } else {
+                logcat(LogPriority.WARN) { "FaviconPersister: some legacy $directory favicons could not be migrated, will retry on next access" }
             }
-            legacyDirectory.deleteRecursively()
         }
+    }
+
+    private fun moveLegacyFile(
+        source: File,
+        target: File,
+    ): Boolean = runCatching {
+        // A file already written by this version is newer than the legacy one, keep it.
+        if (target.exists()) return@runCatching true
+        target.parentFile?.mkdirs()
+        if (source.renameTo(target)) return@runCatching true
+
+        // Copy through a temp file so a failure part-way never leaves a truncated favicon behind.
+        val tmp = File(target.parent, "${target.name}$TMP_FILE_SUFFIX")
+        val copied = runCatching {
+            source.copyTo(tmp, overwrite = true)
+            tmp.renameTo(target)
+        }.getOrDefault(false)
+        if (!copied) {
+            tmp.delete()
+            return@runCatching false
+        }
+        source.delete()
+        true
+    }.getOrElse {
+        logcat(LogPriority.WARN) { "FaviconPersister: failed to migrate ${source.name}: ${it.message}" }
+        false
     }
 
     private fun filename(name: String): String = "${name.sha256}.png"
