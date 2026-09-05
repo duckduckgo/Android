@@ -44,9 +44,11 @@ import javax.inject.Inject
  * Key behaviors:
  * - A pass only considers evaluators declaring the [ModalTrigger] that started it
  * - Evaluators are sorted by priority (lowest number = highest priority)
- * - Only one evaluator runs per coordinated pass
+ * - At most one modal shows per coordinated pass
+ * - Evaluation is decide-then-show: evaluators answer with a deferred show action, and the shared
+ *   prompt surface is claimed only once an evaluator wants to show, never while deliberating
  * - Evaluators blocked by 24-hour window are skipped entirely (evaluate() not called)
- * - When evaluation completes (with or without action), timestamp is recorded
+ * - When a modal is shown, timestamp is recorded
  */
 @ContributesMultibinding(
     scope = AppScope::class,
@@ -83,54 +85,79 @@ class ModalEvaluatorCoordinator @Inject constructor(
     private suspend fun coordinateEvaluation(trigger: ModalTrigger) = evaluationMutex.withLock {
         logcat { "ModalEvaluatorCoordinator: Starting coordinated evaluation for trigger $trigger" }
 
-        var claimHeld = false
         val promptsCoordinatorEnabled = promptsCoordinator.isEnabled()
-        if (promptsCoordinatorEnabled) {
-            // The coordinator's gap subsumes the internal modal↔modal window, kept below as the
-            // kill-switch fallback.
-            if (!promptsCoordinator.tryClaim(PromptType.MODAL)) {
-                logcat { "ModalEvaluatorCoordinator: Evaluation is blocked by the prompts coordinator" }
-                return@withLock
-            }
-            claimHeld = true
-        } else if (completionStore.isBlockedBy24HourWindow()) {
+        // The coordinator's gap subsumes the internal modal↔modal window, kept as the kill-switch
+        // fallback. When enabled, the gap is enforced at claim time instead, so nothing is checked
+        // upfront: evaluation itself is side-effect free and needs no gating.
+        if (!promptsCoordinatorEnabled && completionStore.isBlockedBy24HourWindow()) {
             logcat { "ModalEvaluatorCoordinator: Evaluation is blocked by 24-hour window" }
             return@withLock
         }
 
-        // Everything past the claim runs inside the try: evaluators are plugin code from other teams,
-        // and a throw anywhere here would otherwise strand the surface for the rest of the process.
-        try {
-            val evaluators = modalEvaluatorPluginPoint.getPlugins()
-                .filter { it.trigger == trigger }
-                .sortedBy { it.priority }
-            logcat { "ModalEvaluatorCoordinator: Found ${evaluators.size} evaluators for trigger $trigger" }
+        val evaluators = modalEvaluatorPluginPoint.getPlugins()
+            .filter { it.trigger == trigger }
+            .sortedBy { it.priority }
+        logcat { "ModalEvaluatorCoordinator: Found ${evaluators.size} evaluators for trigger $trigger" }
 
-            for (evaluator in evaluators) {
-                logcat { "ModalEvaluatorCoordinator: Evaluating '${evaluator.evaluatorId}' (priority ${evaluator.priority})" }
+        for (evaluator in evaluators) {
+            logcat { "ModalEvaluatorCoordinator: Evaluating '${evaluator.evaluatorId}' (priority ${evaluator.priority})" }
 
-                when (evaluator.evaluate()) {
-                    is ModalEvaluator.EvaluationResult.ModalShown -> {
+            when (val result = evaluator.evaluate()) {
+                is ModalEvaluator.EvaluationResult.WantsToShow -> {
+                    // The surface is claimed only now that a modal is definitely about to show, so
+                    // the claim is never speculative. A refusal means another prompt genuinely holds
+                    // the surface (or the quiet gap hasn't elapsed) — either way it refuses every
+                    // evaluator in this pass, so stop rather than continue down the priority list.
+                    if (promptsCoordinatorEnabled && !promptsCoordinator.tryClaim(PromptType.MODAL)) {
+                        logcat {
+                            "ModalEvaluatorCoordinator: '${evaluator.evaluatorId}' wants to show " +
+                                "but is blocked by the prompts coordinator"
+                        }
+                        return@withLock
+                    }
+
+                    if (show(result, promptsCoordinatorEnabled)) {
                         logcat {
                             "ModalEvaluatorCoordinator: Evaluator '${evaluator.evaluatorId}' " +
-                                "completed and modal shown, record timestamp and stop"
+                                "modal shown, record timestamp and stop"
                         }
                         // Recorded either way so kill-switch flips stay seamless.
                         completionStore.recordCompletion()
-                        promptsCoordinator.onClaimDone(PromptType.MODAL)
-                        claimHeld = false
                         return@withLock
                     }
-                    is ModalEvaluator.EvaluationResult.Skipped -> {
-                        logcat { "ModalEvaluatorCoordinator: Evaluator '${evaluator.evaluatorId}' skipped, continue to next" }
-                    }
+                    logcat { "ModalEvaluatorCoordinator: '${evaluator.evaluatorId}' show fell through, continue to next" }
+                }
+                is ModalEvaluator.EvaluationResult.Skipped -> {
+                    logcat { "ModalEvaluatorCoordinator: Evaluator '${evaluator.evaluatorId}' skipped, continue to next" }
                 }
             }
-        } finally {
-            // Nothing is stamped: a pass that showed nothing is no evidence a prompt reached the user.
-            if (claimHeld) promptsCoordinator.onClaimCancelled(PromptType.MODAL)
         }
 
         logcat { "ModalEvaluatorCoordinator: Coordination complete for trigger $trigger, no action taken" }
+    }
+
+    /**
+     * Runs the deferred show action while guaranteeing the claim is settled afterwards: done when the
+     * modal reached the user, cancelled when showing fell through or threw. Show actions are plugin
+     * code from other teams, and a throw would otherwise strand the surface for the rest of the process.
+     */
+    private suspend fun show(
+        result: ModalEvaluator.EvaluationResult.WantsToShow,
+        claimHeld: Boolean,
+    ): Boolean {
+        var shown = false
+        try {
+            shown = result.show()
+        } finally {
+            if (claimHeld) {
+                if (shown) {
+                    promptsCoordinator.onClaimDone(PromptType.MODAL)
+                } else {
+                    // Nothing is stamped: a show that fell through is no evidence a prompt reached the user.
+                    promptsCoordinator.onClaimCancelled(PromptType.MODAL)
+                }
+            }
+        }
+        return shown
     }
 }

@@ -96,20 +96,22 @@ class RemoteMessageModalSurfaceEvaluatorImpl @Inject constructor(
                     ModalSurfaceActivityFromMessageId(message.id, message.content.messageType),
                 ) ?: return@withContext ModalEvaluator.EvaluationResult.Skipped
 
-                // Launch activity in app scope to decouple from evaluation completion
+                return@withContext ModalEvaluator.EvaluationResult.WantsToShow {
+                    // Launch activity in app scope to decouple from evaluation completion
 
-                delay(MODAL_DISPLAY_DELAY)
-                appCoroutineScope.launch(dispatchers.main()) {
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
-                    val options = ActivityOptions.makeCustomAnimation(applicationContext, R.anim.slide_from_bottom, 0).toBundle()
-                    applicationContext.startActivity(intent, options)
+                    delay(MODAL_DISPLAY_DELAY)
+                    appCoroutineScope.launch(dispatchers.main()) {
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                        val options = ActivityOptions.makeCustomAnimation(applicationContext, R.anim.slide_from_bottom, 0).toBundle()
+                        applicationContext.startActivity(intent, options)
+                    }
+
+                    // Record this message as shown, and clear background timestamp
+                    modalSurfaceStore.recordLastShownRemoteMessage(message)
+                    modalSurfaceStore.clearBackgroundTimestamp()
+
+                    true
                 }
-
-                // Record this message as shown, and clear background timestamp
-                modalSurfaceStore.recordLastShownRemoteMessage(message)
-                modalSurfaceStore.clearBackgroundTimestamp()
-
-                return@withContext ModalEvaluator.EvaluationResult.ModalShown
             }
 
             return@withContext ModalEvaluator.EvaluationResult.Skipped

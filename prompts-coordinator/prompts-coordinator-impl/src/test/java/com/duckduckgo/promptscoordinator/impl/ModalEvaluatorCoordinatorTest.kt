@@ -25,6 +25,8 @@ import com.duckduckgo.promptscoordinator.api.PromptType
 import com.duckduckgo.promptscoordinator.api.PromptsCoordinator
 import com.duckduckgo.promptscoordinator.impl.store.ModalEvaluatorCompletionStore
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -84,9 +86,9 @@ class ModalEvaluatorCoordinatorTest {
     }
 
     @Test
-    fun whenEvaluatorCompletesWithActionThenCompletionIsRecordedAndNoMoreEvaluatorsCalled() = runTest {
+    fun whenEvaluatorShowsThenCompletionIsRecordedAndNoMoreEvaluatorsCalled() = runTest {
         whenever(mockCompletionStore.isBlockedBy24HourWindow()).thenReturn(false)
-        val evaluator1 = createMockEvaluator("first", 1, ModalEvaluator.EvaluationResult.ModalShown)
+        val evaluator1 = createMockEvaluator("first", 1, wantsToShow())
         val evaluator2 = createMockEvaluator("second", 2, ModalEvaluator.EvaluationResult.Skipped)
         whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(evaluator1, evaluator2))
 
@@ -102,7 +104,22 @@ class ModalEvaluatorCoordinatorTest {
     fun whenEvaluatorIsSkippedThenNextEvaluatorIsCalled() = runTest {
         whenever(mockCompletionStore.isBlockedBy24HourWindow()).thenReturn(false)
         val evaluator1 = createMockEvaluator("first", 1, ModalEvaluator.EvaluationResult.Skipped)
-        val evaluator2 = createMockEvaluator("second", 2, ModalEvaluator.EvaluationResult.ModalShown)
+        val evaluator2 = createMockEvaluator("second", 2, wantsToShow())
+        whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(evaluator1, evaluator2))
+
+        testee.onResume(mockLifecycleOwner)
+        coroutinesTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(evaluator1).evaluate()
+        verify(evaluator2).evaluate()
+        verify(mockCompletionStore).recordCompletion()
+    }
+
+    @Test
+    fun whenShowFallsThroughThenNextEvaluatorIsCalledAndNoCompletionIsRecordedForIt() = runTest {
+        whenever(mockCompletionStore.isBlockedBy24HourWindow()).thenReturn(false)
+        val evaluator1 = createMockEvaluator("first", 1, wantsToShow(shown = false))
+        val evaluator2 = createMockEvaluator("second", 2, wantsToShow())
         whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(evaluator1, evaluator2))
 
         testee.onResume(mockLifecycleOwner)
@@ -133,7 +150,7 @@ class ModalEvaluatorCoordinatorTest {
         whenever(mockCompletionStore.isBlockedBy24HourWindow()).thenReturn(false)
         val lowPriorityEvaluator = createMockEvaluator("low", 10, ModalEvaluator.EvaluationResult.Skipped)
         val highPriorityEvaluator = createMockEvaluator("high", 1, ModalEvaluator.EvaluationResult.Skipped)
-        val midPriorityEvaluator = createMockEvaluator("mid", 5, ModalEvaluator.EvaluationResult.ModalShown)
+        val midPriorityEvaluator = createMockEvaluator("mid", 5, wantsToShow())
 
         // Return in unsorted order
         whenever(mockPluginPoint.getPlugins()).thenReturn(
@@ -167,7 +184,7 @@ class ModalEvaluatorCoordinatorTest {
     fun whenMultipleEvaluatorsHaveSamePriorityThenBothAreEvaluatedInOrder() = runTest {
         whenever(mockCompletionStore.isBlockedBy24HourWindow()).thenReturn(false)
         val evaluator1 = createMockEvaluator("first", 1, ModalEvaluator.EvaluationResult.Skipped)
-        val evaluator2 = createMockEvaluator("second", 1, ModalEvaluator.EvaluationResult.ModalShown)
+        val evaluator2 = createMockEvaluator("second", 1, wantsToShow())
         whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(evaluator1, evaluator2))
 
         testee.onResume(mockLifecycleOwner)
@@ -209,7 +226,7 @@ class ModalEvaluatorCoordinatorTest {
     @Test
     fun whenNewTabPageShownAndBlockedBy24HourWindowThenNoEvaluatorsAreCalled() = runTest {
         whenever(mockCompletionStore.isBlockedBy24HourWindow()).thenReturn(true)
-        val ntpEvaluator = createMockEvaluator("ntp", 1, ModalEvaluator.EvaluationResult.ModalShown, ModalTrigger.NTP_RENDER)
+        val ntpEvaluator = createMockEvaluator("ntp", 1, wantsToShow(), ModalTrigger.NTP_RENDER)
         whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(ntpEvaluator))
 
         testee.onNewTabPageShown()
@@ -220,33 +237,40 @@ class ModalEvaluatorCoordinatorTest {
     }
 
     @Test
-    fun whenPromptsCoordinatorEnabledAndClaimRefusedThenNoEvaluatorsAreCalled() = runTest {
+    fun whenPromptsCoordinatorEnabledAndClaimRefusedThenShowIsNotInvokedAndThePassStops() = runTest {
         whenever(mockPromptsCoordinator.isEnabled()).thenReturn(true)
         whenever(mockPromptsCoordinator.tryClaim(PromptType.MODAL)).thenReturn(false)
-        val mockEvaluator = createMockEvaluator("test", 1)
-        whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(mockEvaluator))
+        var firstShown = false
+        val evaluator1 = createMockEvaluator("first", 1, wantsToShow { firstShown = true })
+        val evaluator2 = createMockEvaluator("second", 2, wantsToShow())
+        whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(evaluator1, evaluator2))
 
         testee.onResume(mockLifecycleOwner)
         coroutinesTestRule.testScope.testScheduler.advanceUntilIdle()
 
-        verify(mockEvaluator, never()).evaluate()
+        // Deciding needs no claim: the evaluator runs, but nothing shows on a refused surface.
+        verify(evaluator1).evaluate()
+        assertFalse(firstShown)
+        // A refusal refuses the whole pass: lower priority evaluators cannot show either.
+        verify(evaluator2, never()).evaluate()
         verify(mockCompletionStore, never()).recordCompletion()
         // The internal 24h window must not be consulted while the prompts-coordinator owns gating.
         verify(mockCompletionStore, never()).isBlockedBy24HourWindow()
     }
 
     @Test
-    fun whenPromptsCoordinatorEnabledAndClaimGrantedThenInternal24HourWindowIsSkipped() = runTest {
+    fun whenPromptsCoordinatorEnabledAndClaimGrantedThenShowRunsAndClaimIsDone() = runTest {
         whenever(mockPromptsCoordinator.isEnabled()).thenReturn(true)
         whenever(mockPromptsCoordinator.tryClaim(PromptType.MODAL)).thenReturn(true)
-        val mockEvaluator = createMockEvaluator("test", 1, ModalEvaluator.EvaluationResult.ModalShown)
+        var shown = false
+        val mockEvaluator = createMockEvaluator("test", 1, wantsToShow { shown = true })
         whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(mockEvaluator))
 
         testee.onResume(mockLifecycleOwner)
         coroutinesTestRule.testScope.testScheduler.advanceUntilIdle()
 
         verify(mockCompletionStore, never()).isBlockedBy24HourWindow()
-        verify(mockEvaluator).evaluate()
+        assertTrue(shown)
         // Timestamps keep recording regardless of the flag so kill-switch flips stay seamless.
         verify(mockCompletionStore).recordCompletion()
         // Showing is terminal, so the gap is stamped here rather than at dismissal.
@@ -255,9 +279,8 @@ class ModalEvaluatorCoordinatorTest {
     }
 
     @Test
-    fun whenPromptsCoordinatorEnabledAndAllEvaluatorsSkipThenClaimIsCancelled() = runTest {
+    fun whenAllEvaluatorsSkipThenNoClaimIsEverAttempted() = runTest {
         whenever(mockPromptsCoordinator.isEnabled()).thenReturn(true)
-        whenever(mockPromptsCoordinator.tryClaim(PromptType.MODAL)).thenReturn(true)
         val evaluator = createMockEvaluator("test", 1, ModalEvaluator.EvaluationResult.Skipped)
         whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(evaluator))
 
@@ -265,7 +288,24 @@ class ModalEvaluatorCoordinatorTest {
         coroutinesTestRule.testScope.testScheduler.advanceUntilIdle()
 
         verify(evaluator).evaluate()
+        // Nothing wanted to show, so the surface was never touched.
+        verify(mockPromptsCoordinator, never()).tryClaim(PromptType.MODAL)
+        verify(mockPromptsCoordinator, never()).onClaimCancelled(PromptType.MODAL)
+        verify(mockCompletionStore, never()).recordCompletion()
+    }
+
+    @Test
+    fun whenShowFallsThroughThenClaimIsCancelledAndNotDone() = runTest {
+        whenever(mockPromptsCoordinator.isEnabled()).thenReturn(true)
+        whenever(mockPromptsCoordinator.tryClaim(PromptType.MODAL)).thenReturn(true)
+        val evaluator = createMockEvaluator("test", 1, wantsToShow(shown = false))
+        whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(evaluator))
+
+        testee.onResume(mockLifecycleOwner)
+        coroutinesTestRule.testScope.testScheduler.advanceUntilIdle()
+
         verify(mockPromptsCoordinator).onClaimCancelled(PromptType.MODAL)
+        verify(mockPromptsCoordinator, never()).onClaimDone(PromptType.MODAL)
         verify(mockCompletionStore, never()).recordCompletion()
     }
 
@@ -273,7 +313,7 @@ class ModalEvaluatorCoordinatorTest {
     fun whenPromptsCoordinatorDisabledThenClaimIsNeverAttempted() = runTest {
         whenever(mockPromptsCoordinator.isEnabled()).thenReturn(false)
         whenever(mockCompletionStore.isBlockedBy24HourWindow()).thenReturn(false)
-        val evaluator = createMockEvaluator("test", 1, ModalEvaluator.EvaluationResult.ModalShown)
+        val evaluator = createMockEvaluator("test", 1, wantsToShow())
         whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(evaluator))
 
         testee.onResume(mockLifecycleOwner)
@@ -285,21 +325,33 @@ class ModalEvaluatorCoordinatorTest {
     }
 
     @Test
-    fun whenEvaluatorThrowsThenTheModalClaimIsStillReleased() = runTest {
+    fun whenShowThrowsThenTheModalClaimIsStillReleased() = runTest {
         whenever(mockPromptsCoordinator.isEnabled()).thenReturn(true)
         whenever(mockPromptsCoordinator.tryClaim(PromptType.MODAL)).thenReturn(true)
-        val throwing = createMockEvaluator("throwing", 1)
-        whenever(throwing.evaluate()).thenThrow(IllegalStateException("plugin blew up"))
+        val throwing = createMockEvaluator(
+            "throwing",
+            1,
+            ModalEvaluator.EvaluationResult.WantsToShow { throw IllegalStateException("plugin blew up") },
+        )
         whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(throwing))
 
         testee.onResume(mockLifecycleOwner)
         coroutinesTestRule.testScope.testScheduler.advanceUntilIdle()
 
-        // Evaluators are third-party plugin code: a throw must not strand the surface, which would
+        // Show actions are third-party plugin code: a throw must not strand the surface, which would
         // silently block every prompt for the rest of the process.
         verify(mockPromptsCoordinator).onClaimCancelled(PromptType.MODAL)
         verify(mockPromptsCoordinator, never()).onClaimDone(PromptType.MODAL)
     }
+
+    private fun wantsToShow(
+        shown: Boolean = true,
+        onShow: () -> Unit = {},
+    ): ModalEvaluator.EvaluationResult.WantsToShow =
+        ModalEvaluator.EvaluationResult.WantsToShow {
+            onShow()
+            shown
+        }
 
     private suspend fun createMockEvaluator(
         id: String,
