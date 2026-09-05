@@ -281,7 +281,11 @@ class FileBasedFaviconPersister(
     }
 
     private fun faviconDirectory(directory: String): File {
-        return File(context.cacheDir, directory)
+        // FAVICON_TEMP_DIR holds per-tab favicons and is fine to live under cacheDir, which the OS
+        // may clear under storage pressure. FAVICON_PERSISTED_DIR (bookmarks/favorites) and
+        // FAVICON_WIDGET_PLACEHOLDERS_DIR must survive that, so they live in non-cache storage.
+        val baseDir = if (directory == FAVICON_TEMP_DIR) context.cacheDir else context.filesDir
+        return File(baseDir, directory)
     }
 
     private fun filename(name: String): String = "${name.sha256}.png"
