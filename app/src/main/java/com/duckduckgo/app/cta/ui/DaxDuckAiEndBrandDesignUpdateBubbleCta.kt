@@ -22,7 +22,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
-import com.duckduckgo.app.onboarding.store.SegmentedOnboardingPath
+import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.view.appendIconToText
@@ -36,14 +36,14 @@ data class DaxDuckAiEndBrandDesignUpdateBubbleCta(
     override val isLightTheme: Boolean,
     override val deviceInfo: DeviceInfo,
     val isCustomAiOnboardingFlow: Boolean,
-    val segmentedPath: SegmentedOnboardingPath?,
+    val segmentedPath: DownloadReasonSelection?,
     override val onboardingImprovementsV2Enabled: Boolean,
 ) : DaxBubbleCta.BrandDesignUpdateBubbleCta(
     ctaId = CtaId.DAX_DUCK_AI_END,
     title = R.string.onboardingDuckAiEndCtaTitle,
     description = when {
         isCustomAiOnboardingFlow -> R.string.onboardingEndCustomAiFlowDaxDialogDescription
-        segmentedPath == SegmentedOnboardingPath.AI -> R.string.aiPathWithToggleEnabledContextualEndDescription
+        segmentedPath == DownloadReasonSelection.AI_CHAT -> R.string.aiPathWithToggleEnabledContextualEndDescription
         else -> R.string.onboardingDuckAiEndCtaDescription
     },
     backgroundRes = CommonR.drawable.bg_onboarding_end,
@@ -75,7 +75,7 @@ data class DaxDuckAiEndBrandDesignUpdateBubbleCta(
     override fun decorateDescription(
         context: Context,
         text: CharSequence,
-    ): CharSequence = if (segmentedPath == SegmentedOnboardingPath.AI) {
+    ): CharSequence = if (segmentedPath == DownloadReasonSelection.AI_CHAT) {
         text
     } else {
         context.appendIconToText(text, CommonR.drawable.ic_ai_chat_16)

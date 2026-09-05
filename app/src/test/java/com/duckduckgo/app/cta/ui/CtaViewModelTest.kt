@@ -41,10 +41,10 @@ import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.onboarding.RealDuckAiOnboardingDemo
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
-import com.duckduckgo.app.onboarding.store.SegmentedOnboardingPath
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
+import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
 import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.AppPixelName.*
@@ -1457,7 +1457,7 @@ class CtaViewModelTest {
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO_VISIT_SITE)).thenReturn(true)
         givenAtLeastOneDaxDialogCtaShown()
         whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
-        whenever(mockOnboardingStore.getSegmentedPathWithAiInput()).thenReturn(SegmentedOnboardingPath.SEARCH)
+        whenever(mockOnboardingStore.getSegmentedPathWithAiInput()).thenReturn(DownloadReasonSelection.SEARCH)
 
         val value = testee.refreshCta(
             coroutineRule.testDispatcher,
@@ -1466,7 +1466,7 @@ class CtaViewModelTest {
             brokenSitePromptUrl = null,
         )
 
-        assertEquals(SegmentedOnboardingPath.SEARCH, (value as DaxEndBrandDesignUpdateBubbleCta).segmentedPathWithAiInput)
+        assertEquals(DownloadReasonSelection.SEARCH, (value as DaxEndBrandDesignUpdateBubbleCta).segmentedPathWithAiInput)
         verify(mockDuckChat).setInputScreenUserSetting(true)
     }
 
@@ -1477,7 +1477,7 @@ class CtaViewModelTest {
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO_VISIT_SITE)).thenReturn(true)
         givenAtLeastOneDaxDialogCtaShown()
         whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
-        whenever(mockOnboardingStore.getSegmentedPathWithAiInput()).thenReturn(SegmentedOnboardingPath.AI)
+        whenever(mockOnboardingStore.getSegmentedPathWithAiInput()).thenReturn(DownloadReasonSelection.AI_CHAT)
 
         val value = testee.refreshCta(
             coroutineRule.testDispatcher,
@@ -1487,7 +1487,7 @@ class CtaViewModelTest {
         )
 
         value as DaxEndBrandDesignUpdateBubbleCta
-        assertEquals(SegmentedOnboardingPath.AI, value.segmentedPathWithAiInput)
+        assertEquals(DownloadReasonSelection.AI_CHAT, value.segmentedPathWithAiInput)
         // The AI path's own copy lives on the Duck.ai End CTA, which it reaches by submitting a chat.
         assertEquals(R.string.onboardingEndDaxDialogDescription, value.description)
         verify(mockDuckChat).setInputScreenUserSetting(true)
@@ -1564,7 +1564,7 @@ class CtaViewModelTest {
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_END)).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
         whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
-        whenever(mockOnboardingStore.getSegmentedPathWithAiInput()).thenReturn(SegmentedOnboardingPath.AI)
+        whenever(mockOnboardingStore.getSegmentedPathWithAiInput()).thenReturn(DownloadReasonSelection.AI_CHAT)
 
         val value = testee.refreshCta(
             coroutineRule.testDispatcher,
@@ -1862,7 +1862,7 @@ class CtaViewModelTest {
         givenCanShowDuckAiEndCta()
         showInputScreenFlow.value = false
         whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
-        whenever(mockOnboardingStore.getSegmentedPathWithAiInput()).thenReturn(SegmentedOnboardingPath.AI)
+        whenever(mockOnboardingStore.getSegmentedPathWithAiInput()).thenReturn(DownloadReasonSelection.AI_CHAT)
 
         val cta = testee.refreshCta(
             coroutineRule.testDispatcher,
@@ -1980,7 +1980,7 @@ class CtaViewModelTest {
             isLightTheme = true,
             deviceInfo = mockDeviceInfo,
             isCustomAiOnboardingFlow = false,
-            segmentedPath = SegmentedOnboardingPath.AI,
+            segmentedPath = DownloadReasonSelection.AI_CHAT,
             onboardingImprovementsV2Enabled = true,
         )
         assertEquals(R.string.aiPathWithToggleEnabledContextualEndDescription, cta.description)
@@ -1994,7 +1994,7 @@ class CtaViewModelTest {
             isLightTheme = true,
             deviceInfo = mockDeviceInfo,
             isCustomAiOnboardingFlow = false,
-            segmentedPath = SegmentedOnboardingPath.SEARCH,
+            segmentedPath = DownloadReasonSelection.SEARCH,
             onboardingImprovementsV2Enabled = true,
         )
         assertEquals(R.string.onboardingDuckAiEndCtaDescription, cta.description)
@@ -2402,7 +2402,7 @@ class CtaViewModelTest {
 
     @Test
     fun whenSegmentedSearchPathEndBubbleShownThenBothEndAndTryDuckAiShownPixelsFired() = runTest {
-        val cta = daxEndBrandDesignUpdateBubbleCta(segmentedPath = SegmentedOnboardingPath.SEARCH)
+        val cta = daxEndBrandDesignUpdateBubbleCta(segmentedPath = DownloadReasonSelection.SEARCH)
 
         testee.onCtaShown(cta)
 
@@ -2412,7 +2412,7 @@ class CtaViewModelTest {
 
     @Test
     fun whenSegmentedSearchPathEndBubbleOkClickedThenBothEndAndTryDuckAiClickedEngageFired() = runTest {
-        val cta = daxEndBrandDesignUpdateBubbleCta(segmentedPath = SegmentedOnboardingPath.SEARCH)
+        val cta = daxEndBrandDesignUpdateBubbleCta(segmentedPath = DownloadReasonSelection.SEARCH)
 
         testee.onUserClickCtaOkButton(cta)
 
@@ -2422,7 +2422,7 @@ class CtaViewModelTest {
 
     @Test
     fun whenSegmentedSearchPathEndBubbleSkippedThenBothEndAndTryDuckAiClickedDismissFired() = runTest {
-        val cta = daxEndBrandDesignUpdateBubbleCta(segmentedPath = SegmentedOnboardingPath.SEARCH)
+        val cta = daxEndBrandDesignUpdateBubbleCta(segmentedPath = DownloadReasonSelection.SEARCH)
 
         testee.onUserDismissedCta(cta, viaSkipBtn = true)
 
@@ -2432,7 +2432,7 @@ class CtaViewModelTest {
 
     @Test
     fun whenSegmentedAiPathEndBubbleShownThenTryDuckAiPixelNotFired() = runTest {
-        val cta = daxEndBrandDesignUpdateBubbleCta(segmentedPath = SegmentedOnboardingPath.AI)
+        val cta = daxEndBrandDesignUpdateBubbleCta(segmentedPath = DownloadReasonSelection.AI_CHAT)
 
         testee.onCtaShown(cta)
 
@@ -2543,7 +2543,7 @@ class CtaViewModelTest {
         onboardingImprovementsV2Enabled = true,
     )
 
-    private fun daxEndBrandDesignUpdateBubbleCta(segmentedPath: SegmentedOnboardingPath? = null) = DaxEndBrandDesignUpdateBubbleCta(
+    private fun daxEndBrandDesignUpdateBubbleCta(segmentedPath: DownloadReasonSelection? = null) = DaxEndBrandDesignUpdateBubbleCta(
         mockOnboardingStore,
         mockAppInstallStore,
         isLightTheme = true,

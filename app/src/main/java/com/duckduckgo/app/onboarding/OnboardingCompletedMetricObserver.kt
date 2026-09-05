@@ -37,12 +37,16 @@ class OnboardingCompletedMetricObserver @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val userStageStore: UserStageStore,
     private val onboardingPromptsExperimentMetrics: OnboardingPromptsExperimentMetrics,
+    private val segmentedOnboardingExperimentMetrics: SegmentedOnboardingExperimentMetrics,
 ) : MainProcessLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
         userStageStore.userAppStageFlow()
             .filter { it == AppStage.ESTABLISHED }
-            .onEach { onboardingPromptsExperimentMetrics.fireOnboardingCompletedMetric() }
+            .onEach {
+                onboardingPromptsExperimentMetrics.fireOnboardingCompletedMetric()
+                segmentedOnboardingExperimentMetrics.fireOnboardingCompletedMetric()
+            }
             .launchIn(appCoroutineScope)
     }
 }

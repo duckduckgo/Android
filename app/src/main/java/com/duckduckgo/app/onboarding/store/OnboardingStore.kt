@@ -17,6 +17,7 @@
 package com.duckduckgo.app.onboarding.store
 
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
+import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection
 
 interface OnboardingStore {
     var onboardingDialogJourney: String?
@@ -31,20 +32,14 @@ interface OnboardingStore {
     fun setInputScreenSelectionOverriddenByUser()
     fun setDuckAiOnboardingFlow()
     fun isDuckAiOnboardingFlow(): Boolean
-    fun setSegmentedOnboardingPath(path: SegmentedOnboardingPath?)
+    fun setDownloadReason(reason: DownloadReasonSelection?)
+    fun getDownloadReason(): DownloadReasonSelection?
 
     /**
      * The segmented path the user is on, but only once that path has opted into the input screen. The
      * search path only does so if the user enabled the toggle; the AI path always does. Null everywhere
-     * else, including a search path left without the toggle.
+     * else, including a search path left without the toggle and the paths that never touch the input
+     * screen.
      */
-    fun getSegmentedPathWithAiInput(): SegmentedOnboardingPath?
-}
-
-/**
- * The branch the user picked on the download reason step. Only enumerates a subset of paths that can have side effects on contextual CTAs.
- */
-enum class SegmentedOnboardingPath {
-    SEARCH,
-    AI,
+    fun getSegmentedPathWithAiInput(): DownloadReasonSelection?
 }

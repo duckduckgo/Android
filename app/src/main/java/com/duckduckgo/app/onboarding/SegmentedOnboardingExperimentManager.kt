@@ -17,6 +17,7 @@
 package com.duckduckgo.app.onboarding
 
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager.SegmentedOnboardingExperimentVariant
+import com.duckduckgo.app.onboarding.SegmentedOnboardingFeatureToggles.Cohorts
 import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -39,21 +40,32 @@ interface SegmentedOnboardingExperimentManager {
 @SingleInstanceIn(AppScope::class)
 class SegmentedOnboardingExperimentManagerImpl @Inject constructor(
     private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
-    private val dispatcherProvider: DispatcherProvider,
+    private val segmentedOnboardingFeatureToggles: SegmentedOnboardingFeatureToggles,
+    private val onboardingPasswordImportToggles: OnboardingPasswordImportToggles,
+    private val onboardingPromptsToggles: OnboardingPromptsToggles,
     private val appBuildConfig: AppBuildConfig,
+    private val dispatcherProvider: DispatcherProvider,
     private val onboardingPrivacyConfigPersistedGate: OnboardingPrivacyConfigPersistedGate,
 ) : SegmentedOnboardingExperimentManager {
 
     override suspend fun enroll(): SegmentedOnboardingExperimentVariant? = withContext(dispatcherProvider.io()) {
-        if (onboardingPrivacyConfigPersistedGate.awaitPersisted() && checkPrerequisites()) {
-            // scaffolding for future experiment enrollment logic
+        if (!onboardingPrivacyConfigPersistedGate.awaitPersisted() || !checkPrerequisites()) {
             return@withContext null
-        } else {
-            null
+        }
+
+        val toggle = segmentedOnboardingFeatureToggles.onboardingFlowByDownloadReasonExperiment()
+        toggle.enroll()
+        when {
+            toggle.isEnrolledAndEnabled(Cohorts.TREATMENT) -> SegmentedOnboardingExperimentVariant.TREATMENT
+            toggle.isEnrolledAndEnabled(Cohorts.CONTROL) -> SegmentedOnboardingExperimentVariant.CONTROL
+            else -> null
         }
     }
 
     private suspend fun checkPrerequisites() =
-        onboardingBrandDesignUpdateToggles.configDrivenDialogs().isEnabled() &&
+        onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled() &&
+            onboardingBrandDesignUpdateToggles.configDrivenDialogs().isEnabled() &&
+            !onboardingPromptsToggles.addToDockAndWidgetExperimentJul25().isEnabled() &&
+            !onboardingPasswordImportToggles.passwordImportExperimentAug25().isEnabled() &&
             !appBuildConfig.isAppReinstall()
 }
