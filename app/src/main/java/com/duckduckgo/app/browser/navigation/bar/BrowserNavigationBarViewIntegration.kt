@@ -39,7 +39,7 @@ import kotlinx.coroutines.launch
  * Helper class that extracts business logic that manages the [BrowserNavigationBarView] from the [BrowserTabFragment].
  *
  * The class needs to be instantiated strictly after the fragment's view has been created,
- * and [onDestroyView] has to be called when the the fragment's view is destroyed.
+ * and [onDestroyView] has to be called when the fragment's view is destroyed.
  * After the view is destroyed, the class becomes no-op and needs to be re-instantiated with a valid view binding.
  */
 class BrowserNavigationBarViewIntegration(

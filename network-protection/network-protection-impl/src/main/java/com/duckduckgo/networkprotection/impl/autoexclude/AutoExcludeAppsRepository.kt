@@ -63,19 +63,19 @@ interface AutoExcludeAppsRepository {
     fun markAppsAsShown(app: List<VpnIncompatibleApp>)
 
     /**
-     * Returns a list of apps that is is part of the auto exclude list
+     * Returns a list of apps that is part of the auto exclude list
      *
      * This method is internally dispatched to be executed in IO.
      */
     suspend fun getAllIncompatibleApps(): List<VpnIncompatibleApp>
 
     /**
-     * Returns a flow of list of apps that is is part of the auto exclude list
+     * Returns a flow of list of apps that is part of the auto exclude list
      */
     fun getAllIncompatibleAppPackagesFlow(): Flow<List<String>>
 
     /**
-     * Returns a list of apps that is is part of the auto exclude list and is installed in this device
+     * Returns a list of apps that is part of the auto exclude list and is installed in this device
      *
      * This method is internally dispatched to be executed in IO.
      */
