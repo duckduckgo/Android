@@ -33,6 +33,7 @@ enum class DuckChatEntryPoint {
     ONBOARDING,
     DIRECT_URL,
     SERP,
+    DDG_HOMEPAGE,
     ICON_SHORTCUT,
     CONTEXTUAL_CHAT,
     WIDGET_QUICK_ACTIONS,

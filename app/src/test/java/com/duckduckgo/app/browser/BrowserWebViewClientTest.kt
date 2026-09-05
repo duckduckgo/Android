@@ -605,6 +605,34 @@ class BrowserWebViewClientTest {
     }
 
     @Test
+    fun whenDuckChatLinkIsLaunchedFromDuckDuckGoHomepageThenSourceIsDdgHomepage() {
+        val homepageWebView: WebView = mock()
+        whenever(homepageWebView.originalUrl).thenReturn("https://duckduckgo.com/")
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any()))
+            .thenReturn(SpecialUrlDetector.UrlType.ShouldLaunchDuckChatLink)
+        whenever(webResourceRequest.url).thenReturn("https://duck.ai/".toUri())
+
+        testee.shouldOverrideUrlLoading(homepageWebView, webResourceRequest)
+
+        verify(mockDuckChat).openDuckChat(DuckChatEntryPoint.DDG_HOMEPAGE)
+    }
+
+    @Test
+    fun whenDuckChatLinkIsLaunchedFromDuckDuckGoChatPageThenSourceIsDirectUrl() {
+        val chatPage = "https://duckduckgo.com/?ia=chat"
+        val chatWebView: WebView = mock()
+        whenever(chatWebView.originalUrl).thenReturn(chatPage)
+        whenever(mockDuckChat.isDuckChatUrl(chatPage.toUri())).thenReturn(true)
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any()))
+            .thenReturn(SpecialUrlDetector.UrlType.ShouldLaunchDuckChatLink)
+        whenever(webResourceRequest.url).thenReturn("https://duck.ai/".toUri())
+
+        testee.shouldOverrideUrlLoading(chatWebView, webResourceRequest)
+
+        verify(mockDuckChat).openDuckChat(DuckChatEntryPoint.DIRECT_URL)
+    }
+
+    @Test
     fun whenInPageDuckChatLinkNavigatesInPlaceThenDirectUrlEntryIsReported() {
         val pageWebView: WebView = mock()
         whenever(pageWebView.originalUrl).thenReturn("https://example.com/page")
@@ -619,6 +647,57 @@ class BrowserWebViewClientTest {
         testee.shouldOverrideUrlLoading(pageWebView, webResourceRequest)
 
         verify(mockDuckChat).reportDuckChatEntry(DuckChatEntryPoint.DIRECT_URL, opensNewTab = false, hasPrompt = false)
+    }
+
+    @Test
+    fun whenDuckChatNavigationRedirectsThenEntryIsReportedOnceForTheNavigation() {
+        val homepageUrl = "https://duckduckgo.com/"
+        val duckChatUrl = "https://duck.ai/?q=prompt&prompt=1"
+        val homepageWebView: WebView = mock()
+        whenever(homepageWebView.originalUrl).thenReturn(homepageUrl)
+        whenever(homepageWebView.url).thenReturn(homepageUrl)
+        whenever(webResourceRequest.url).thenReturn(duckChatUrl.toUri())
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        whenever(webResourceRequest.isRedirect).thenReturn(false, true)
+        whenever(webResourceRequest.hasGesture()).thenReturn(true, false)
+        whenever(mockDuckChat.isDuckChatUrl(duckChatUrl.toUri())).thenReturn(true)
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any()))
+            .thenReturn(SpecialUrlDetector.UrlType.Web(duckChatUrl))
+
+        testee.shouldOverrideUrlLoading(homepageWebView, webResourceRequest)
+        testee.shouldOverrideUrlLoading(homepageWebView, webResourceRequest)
+
+        verify(mockDuckChat, times(1)).reportDuckChatEntry(
+            DuckChatEntryPoint.DDG_HOMEPAGE,
+            opensNewTab = false,
+            hasPrompt = true,
+        )
+    }
+
+    @Test
+    fun whenDuckChatIsEnteredAgainAfterRedirectThenEntryIsReportedForTheNewNavigation() {
+        val homepageUrl = "https://duckduckgo.com/"
+        val duckChatUrl = "https://duck.ai/?q=prompt&prompt=1"
+        val homepageWebView: WebView = mock()
+        whenever(homepageWebView.originalUrl).thenReturn(homepageUrl)
+        whenever(homepageWebView.url).thenReturn(homepageUrl)
+        whenever(webResourceRequest.url).thenReturn(duckChatUrl.toUri())
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        whenever(webResourceRequest.isRedirect).thenReturn(false, true, false)
+        whenever(webResourceRequest.hasGesture()).thenReturn(true, false, true)
+        whenever(mockDuckChat.isDuckChatUrl(duckChatUrl.toUri())).thenReturn(true)
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any()))
+            .thenReturn(SpecialUrlDetector.UrlType.Web(duckChatUrl))
+
+        testee.shouldOverrideUrlLoading(homepageWebView, webResourceRequest)
+        testee.shouldOverrideUrlLoading(homepageWebView, webResourceRequest)
+        testee.shouldOverrideUrlLoading(homepageWebView, webResourceRequest)
+
+        verify(mockDuckChat, times(2)).reportDuckChatEntry(
+            DuckChatEntryPoint.DDG_HOMEPAGE,
+            opensNewTab = false,
+            hasPrompt = true,
+        )
     }
 
     @Test
