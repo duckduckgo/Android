@@ -71,6 +71,7 @@ class FileBasedFaviconPersister(
 ) : FaviconPersister {
 
     val mutex = Mutex()
+    private val legacyMigrationLock = Any()
 
     override suspend fun deleteAll(directory: String) {
         fileDeleter.deleteDirectory(faviconDirectory(directory))
@@ -98,7 +99,7 @@ class FileBasedFaviconPersister(
         withContext(dispatcherProvider.io()) {
             val persistedFile = fileForFavicon(directory, newSubfolder, newFilename)
             if (androidBrowserConfigFeature.atomicFaviconWrites().isEnabled()) {
-                val tmp = File(persistedFile.parent, "${persistedFile.name}.tmp")
+                val tmp = File(persistedFile.parent, "${persistedFile.name}$TMP_FILE_SUFFIX")
                 runCatching {
                     file.copyTo(tmp, overwrite = true)
                     if (!tmp.renameTo(persistedFile)) {
@@ -268,7 +269,7 @@ class FileBasedFaviconPersister(
     }
 
     private fun writeBitmapAtomically(file: File, bitmap: Bitmap) {
-        val tmp = File(file.parent, "${file.name}.tmp")
+        val tmp = File(file.parent, "${file.name}$TMP_FILE_SUFFIX")
         FileOutputStream(tmp).use { outputStream ->
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
             outputStream.flush()
@@ -284,8 +285,44 @@ class FileBasedFaviconPersister(
         // FAVICON_TEMP_DIR holds per-tab favicons and is fine to live under cacheDir, which the OS
         // may clear under storage pressure. FAVICON_PERSISTED_DIR (bookmarks/favorites) and
         // FAVICON_WIDGET_PLACEHOLDERS_DIR must survive that, so they live in non-cache storage.
-        val baseDir = if (directory == FAVICON_TEMP_DIR) context.cacheDir else context.filesDir
-        return File(baseDir, directory)
+        if (directory == FAVICON_TEMP_DIR) {
+            return File(context.cacheDir, directory)
+        }
+        return File(context.filesDir, directory).also { migrateLegacyCacheDirectory(directory, it) }
+    }
+
+    /**
+     * Persisted favicons used to live under cacheDir. Moving them on first access keeps existing
+     * bookmark and favorite icons after an upgrade instead of showing placeholders until each site
+     * is visited again. The legacy directory is removed afterwards, so this is a single exists()
+     * check on every later call.
+     */
+    private fun migrateLegacyCacheDirectory(
+        directory: String,
+        destination: File,
+    ) {
+        val legacyDirectory = File(context.cacheDir, directory)
+        if (!legacyDirectory.exists()) return
+
+        synchronized(legacyMigrationLock) {
+            if (!legacyDirectory.exists()) return
+
+            runCatching {
+                legacyDirectory.walkTopDown()
+                    .filter { it.isFile && !it.name.endsWith(TMP_FILE_SUFFIX) }
+                    .forEach { legacyFile ->
+                        val target = File(destination, legacyFile.relativeTo(legacyDirectory).path)
+                        target.parentFile?.mkdirs()
+                        // A file already written by this version is newer than the legacy one, keep it.
+                        if (!target.exists() && !legacyFile.renameTo(target)) {
+                            legacyFile.copyTo(target)
+                        }
+                    }
+            }.onFailure {
+                logcat(LogPriority.WARN) { "FaviconPersister: failed to migrate legacy $directory favicons: ${it.message}" }
+            }
+            legacyDirectory.deleteRecursively()
+        }
     }
 
     private fun filename(name: String): String = "${name.sha256}.png"
@@ -295,5 +332,6 @@ class FileBasedFaviconPersister(
         const val FAVICON_PERSISTED_DIR = "favicons"
         const val FAVICON_WIDGET_PLACEHOLDERS_DIR = "faviconsWidgetPlaceholders"
         const val NO_SUBFOLDER = ""
+        private const val TMP_FILE_SUFFIX = ".tmp"
     }
 }
