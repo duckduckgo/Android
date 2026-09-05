@@ -37,5 +37,8 @@ class AttachmentNativeInputPlugin @Inject constructor() : NativeInputPlugin {
     override val containerId: Int = R.id.attachButtonContainer
 
     override fun createView(context: Context, host: NativeInputHost): View =
-        AttachmentView(context).also { it.host = host }
+        AttachmentView(context).also {
+            it.host = host
+            it.isEditMode = host.isEditSurface()
+        }
 }

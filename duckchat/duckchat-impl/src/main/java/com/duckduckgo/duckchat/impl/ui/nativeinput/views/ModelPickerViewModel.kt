@@ -28,8 +28,8 @@ import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ModelProvider
 import com.duckduckgo.duckchat.impl.models.ModelState
-import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.models.UserTier
+import com.duckduckgo.duckchat.impl.nativeinput.EffectiveModelProvider
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
@@ -63,6 +63,7 @@ class ModelPickerViewModel @Inject constructor(
     private val duckChatPixels: DuckChatPixels,
     private val nativeInputStateProvider: NativeInputStateProvider,
     private val duckAiChatStore: DuckAiChatStore,
+    private val effectiveModelProvider: EffectiveModelProvider,
 ) : ViewModel() {
 
     val state: StateFlow<ModelState> = modelManager.modelState
@@ -70,6 +71,10 @@ class ModelPickerViewModel @Inject constructor(
     private val currentChat = MutableStateFlow<DuckAiChat?>(null)
 
     private var modelChangeMode: Boolean = false
+
+    // The published chatId, which is the key for the recovery pick. Read from state rather than
+    // currentChat, which can still be resolving when the user picks.
+    private var publishedChatId: String? = null
 
     // The pixel surface for the active tab, tracked from the published input context.
     // Named distinctly from the [PickerSurface] param on [onModelTapped] to avoid shadowing.
@@ -93,29 +98,18 @@ class ModelPickerViewModel @Inject constructor(
         viewModelScope.launch {
             nativeInputStateProvider.state.collect { state ->
                 modelChangeMode = state.modelChangeMode
+                publishedChatId = state.chatId
                 pixelSurface = DuckChatPixelSurface.from(state.inputContext)
-                if (!state.modelChangeMode) recoverySelectedModelId.value = null
+                if (!state.modelChangeMode) {
+                    recoverySelectedModelId.value = null
+                    effectiveModelProvider.clearRecoveryModelPick(state.chatId)
+                }
             }
         }
     }
 
-    /**
-     * The model the chip displays and whose capabilities the options should reflect: a just-picked
-     * recovery model, else the active chat's model (when in the list, e.g. not lost access), else
-     * the global selection. Single source of truth for [chipLabel] and [getSelectedModel].
-     */
-    val effectiveModelId: StateFlow<String?> = combine(
-        modelManager.modelState,
-        nativeInputStateProvider.state,
-        currentChat,
-        recoverySelectedModelId,
-    ) { modelState, nativeState, chat, recoveryId ->
-        val modelIds = modelState.models.mapTo(HashSet()) { it.id }
-        // A just-picked recovery model wins (display, before the chat's model syncs back).
-        recoveryId?.takeIf { it in modelIds }?.let { return@combine it }
-        val activeChat = chat?.takeIf { it.chatId == nativeState.chatId }
-        activeChat?.model?.takeIf { it in modelIds } ?: modelState.selectedModelId
-    }.stateIn(
+    /** Mirrors [EffectiveModelProvider.effectiveModelId] for this view: the model the chip displays. */
+    val effectiveModelId: StateFlow<String?> = effectiveModelProvider.effectiveModelId.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Eagerly,
         initialValue = modelManager.modelState.value.selectedModelId,
@@ -149,14 +143,6 @@ class ModelPickerViewModel @Inject constructor(
     }
 
     var menuShowing = false
-
-    fun getSelectedModelId(): String? = modelManager.getSelectedModelId()
-
-    fun getSelectedModel(): AIChatModel? = state.value.models.firstOrNull { it.id == effectiveModelId.value }
-
-    fun isImageGenerationSupported(): Boolean = getSelectedModel()?.supportsTool(Tool.IMAGE_GENERATION) ?: true
-
-    fun isWebSearchSupported(): Boolean = getSelectedModel()?.supportsTool(Tool.WEB_SEARCH) ?: true
 
     fun fetchModels() {
         viewModelScope.launch {
@@ -194,6 +180,7 @@ class ModelPickerViewModel @Inject constructor(
                 }
                 duckChatPixels.fireSubmitChangeModel(model.id, pixelSurface)
                 recoverySelectedModelId.value = model.id
+                effectiveModelProvider.onRecoveryModelPicked(chatId = publishedChatId, modelId = model.id)
                 modelChangeChannel.trySend(PickerModelChange.ChangeModel(model.id))
             } else {
                 if (model.id != modelManager.getSelectedModelId()) {

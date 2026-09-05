@@ -17,7 +17,9 @@
 package com.duckduckgo.duckchat.impl.nativeinput
 
 import android.content.Context
+import android.net.Uri
 import android.view.View
+import android.webkit.ValueCallback
 import com.duckduckgo.anvil.annotations.ContributesActivePluginPoint
 import com.duckduckgo.common.utils.plugins.ActivePlugin
 import com.duckduckgo.di.scopes.AppScope
@@ -47,6 +49,40 @@ interface NativeInputHost {
      */
     fun toolSelected(tool: String?)
     fun customizeResponsesClicked()
+
+    /** The model menu opened. The host suppresses input teardown while it is up. */
+    fun modelMenuShown()
+
+    /**
+     * The model menu closed. [hasPendingRecoverySelection] is false when the user dismissed it without
+     * picking, which ends the FE model-change window.
+     */
+    fun modelMenuDismissed(hasPendingRecoverySelection: Boolean)
+
+    /** The user picked a model during the FE model-change recovery flow. */
+    fun changeModelSubmitted(modelId: String)
+
+    /** Ask the host to run the camera capture flow; the activity owns the result plumbing. */
+    fun requestCameraCapture(callback: ValueCallback<Array<Uri>>)
+
+    /** Ask the host to run the file picker for [mimeTypes]. */
+    fun requestFilePicker(callback: ValueCallback<Array<Uri>>, mimeTypes: List<String>)
+
+    /** The user chose to ask about the current page, offered only on the contextual surface. */
+    fun askAboutPage()
+
+    /** The user removed the page-context attachment. */
+    fun pageContextRemoved()
+
+    /** True when the host is the fullscreen edit-message surface, which offers a reduced control set. */
+    fun isEditSurface(): Boolean
+
+    /**
+     * True when the host is the contextual Duck.ai sheet. Asked of the host rather than read from
+     * `inputContext`, because the sheet shares its per-tab state slot with the omnibar widget and that
+     * slot can briefly carry BROWSER state.
+     */
+    fun isContextualSurface(): Boolean
 }
 
 interface NativeInputPlugin : ActivePlugin {

@@ -27,6 +27,7 @@ import com.duckduckgo.duckchat.impl.models.ModelProvider
 import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.models.UserTier
+import com.duckduckgo.duckchat.impl.nativeinput.RealEffectiveModelProvider
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.ModelPickerViewModel
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.PickerModelChange
@@ -79,21 +80,8 @@ class ModelPickerViewModelTest {
             duckChatPixels = duckChatPixels,
             nativeInputStateProvider = nativeInputStateProvider,
             duckAiChatStore = duckAiChatStore,
+            effectiveModelProvider = RealEffectiveModelProvider(modelManager, nativeInputStateProvider, duckAiChatStore),
         )
-    }
-
-    @Test
-    fun whenGetSelectedModelIdThenDelegatesToModelManager() {
-        whenever(modelManager.getSelectedModelId()).thenReturn("id")
-
-        assertEquals("id", testee.getSelectedModelId())
-    }
-
-    @Test
-    fun whenGetSelectedModelIdAndNoneSelectedThenReturnsNull() {
-        whenever(modelManager.getSelectedModelId()).thenReturn(null)
-
-        assertNull(testee.getSelectedModelId())
     }
 
     @Test
@@ -571,76 +559,22 @@ class ModelPickerViewModelTest {
     }
 
     @Test
-    fun whenNoModelSelectedThenGetSelectedModelReturnsNull() {
+    fun whenNoModelSelectedThenEffectiveModelIsNull() {
         stateFlow.value = ModelState(models = listOf(freeModel("id1", "model1")), selectedModelId = null)
 
-        assertNull(testee.getSelectedModel())
+        assertNull(testee.effectiveModelId.value)
     }
 
     @Test
-    fun whenModelSelectedThenGetSelectedModelReturnsIt() {
+    fun whenModelSelectedThenEffectiveModelIsIt() {
         val model = freeModel("id1", "model1")
         stateFlow.value = ModelState(models = listOf(model), selectedModelId = "id1")
 
-        assertEquals(model, testee.getSelectedModel())
+        assertEquals(model.id, testee.effectiveModelId.value)
     }
 
     @Test
-    fun whenSelectedModelSupportsImageGenerationThenIsImageGenerationSupportedIsTrue() {
-        stateFlow.value = ModelState(
-            models = listOf(freeModel("id1", "model1", supportedTools = listOf(Tool.IMAGE_GENERATION))),
-            selectedModelId = "id1",
-        )
-
-        assertTrue(testee.isImageGenerationSupported())
-    }
-
-    @Test
-    fun whenSelectedModelDoesNotSupportImageGenerationThenIsImageGenerationSupportedIsFalse() {
-        stateFlow.value = ModelState(
-            models = listOf(freeModel("id1", "model1", supportedTools = emptyList())),
-            selectedModelId = "id1",
-        )
-
-        assertFalse(testee.isImageGenerationSupported())
-    }
-
-    @Test
-    fun whenNoModelSelectedThenIsImageGenerationSupportedDefaultsToTrue() {
-        stateFlow.value = ModelState(models = emptyList(), selectedModelId = null)
-
-        assertTrue(testee.isImageGenerationSupported())
-    }
-
-    @Test
-    fun whenSelectedModelSupportsWebSearchThenIsWebSearchSupportedIsTrue() {
-        stateFlow.value = ModelState(
-            models = listOf(freeModel("id1", "model1", supportedTools = listOf(Tool.WEB_SEARCH))),
-            selectedModelId = "id1",
-        )
-
-        assertTrue(testee.isWebSearchSupported())
-    }
-
-    @Test
-    fun whenSelectedModelDoesNotSupportWebSearchThenIsWebSearchSupportedIsFalse() {
-        stateFlow.value = ModelState(
-            models = listOf(freeModel("id1", "model1", supportedTools = emptyList())),
-            selectedModelId = "id1",
-        )
-
-        assertFalse(testee.isWebSearchSupported())
-    }
-
-    @Test
-    fun whenNoModelSelectedThenIsWebSearchSupportedDefaultsToTrue() {
-        stateFlow.value = ModelState(models = emptyList(), selectedModelId = null)
-
-        assertTrue(testee.isWebSearchSupported())
-    }
-
-    @Test
-    fun whenOngoingChatThenCapabilitiesReflectChatModelNotGlobal() = runTest {
+    fun whenOngoingChatThenEffectiveModelIsChatModelNotGlobal() = runTest {
         stateFlow.value = ModelState(
             models = listOf(
                 freeModel(id = "global-model", shortName = "Global", supportedTools = emptyList()),
@@ -655,30 +589,7 @@ class ModelPickerViewModelTest {
         nativeInputState.value = nativeInputState.value.copy(chatId = "c1")
         advanceUntilIdle()
 
-        assertEquals("chat-model", testee.getSelectedModel()?.id)
-        assertTrue(testee.isImageGenerationSupported())
-    }
-
-    @Test
-    fun whenRecoveryModelPickedThenCapabilitiesReflectRecoveryModel() = runTest {
-        val recoveryModel = freeModel(id = "recovery-model", shortName = "Recovery", supportedTools = listOf(Tool.WEB_SEARCH))
-        stateFlow.value = ModelState(
-            models = listOf(
-                freeModel(id = "global-model", shortName = "Global", supportedTools = listOf(Tool.IMAGE_GENERATION)),
-                recoveryModel,
-            ),
-            selectedModelId = "global-model",
-            selectedModelShortName = "Global",
-        )
-        nativeInputState.value = nativeInputState.value.copy(chatId = "c1", modelChangeMode = true)
-        advanceUntilIdle()
-
-        testee.onModelTapped(recoveryModel, PickerSurface.MODEL_PICKER_ADDRESS_BAR)
-        advanceUntilIdle()
-
-        assertEquals("recovery-model", testee.getSelectedModel()?.id)
-        assertTrue(testee.isWebSearchSupported())
-        assertFalse(testee.isImageGenerationSupported())
+        assertEquals("chat-model", testee.effectiveModelId.value)
     }
 
     @Test
@@ -754,6 +665,25 @@ class ModelPickerViewModelTest {
         assertEquals("New Model", testee.chipLabel.value)
 
         nativeInputState.value = nativeInputState.value.copy(modelChangeMode = false)
+        advanceUntilIdle()
+
+        assertEquals("Global Model", testee.chipLabel.value)
+    }
+
+    @Test
+    fun whenANewRecoveryWindowOpensThenTheChipDoesNotShowThePreviousPick() = runTest {
+        stateFlow.value = ModelState(
+            models = listOf(freeModel(id = "new-model", shortName = "New Model")),
+            selectedModelShortName = "Global Model",
+        )
+        nativeInputState.value = nativeInputState.value.copy(chatId = null, modelChangeMode = true)
+        advanceUntilIdle()
+        testee.onModelTapped(freeModel(id = "new-model", shortName = "New Model"), PickerSurface.MODEL_PICKER_ADDRESS_BAR)
+        advanceUntilIdle()
+        nativeInputState.value = nativeInputState.value.copy(modelChangeMode = false)
+        advanceUntilIdle()
+
+        nativeInputState.value = nativeInputState.value.copy(modelChangeMode = true)
         advanceUntilIdle()
 
         assertEquals("Global Model", testee.chipLabel.value)
