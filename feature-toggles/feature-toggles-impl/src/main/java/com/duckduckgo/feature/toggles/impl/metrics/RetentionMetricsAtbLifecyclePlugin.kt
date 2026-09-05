@@ -48,6 +48,19 @@ class RetentionMetricsAtbLifecyclePlugin @Inject constructor(
     override fun onDuckAiRetentionAtbRefreshed(oldAtb: String, newAtb: String, metadata: Map<String, String?>) {
         appCoroutineScope.launch {
             duckAiPromptSentMetricPixelsPlugin.getMetrics().forEach { it.send() }
+            searchMetricPixelsPlugin.getMetrics()
+                .filterNot { it.toggle.featureName().name in EXPERIMENTS_EXCLUDED_FROM_DUCK_AI_SEARCH_METRIC }
+                .forEach { it.send() }
         }
+    }
+
+    companion object {
+        /**
+         * Experiments that were enrolling/running before Duck.ai prompts were added towards search retention metrics.
+         * They are excluded from counting prompts to avoid skewing the metrics.
+         */
+        private val EXPERIMENTS_EXCLUDED_FROM_DUCK_AI_SEARCH_METRIC = setOf(
+            "addToDockAndWidgetExperimentJul25",
+        )
     }
 }
