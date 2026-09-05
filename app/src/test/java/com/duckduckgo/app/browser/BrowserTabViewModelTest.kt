@@ -316,6 +316,8 @@ import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadStatus
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
+import com.duckduckgo.duckchat.api.DuckAiSessionCallback
+import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
@@ -747,6 +749,7 @@ class BrowserTabViewModelTest {
     private val fakeSuggestRedirectFeature = FakeFeatureToggleFactory.create(SuggestRedirectOnUnresolvedErrorFeature::class.java)
     private val mockSuggestRedirectEvaluator: SuggestRedirectEvaluator = mock()
     private val mockBadUrlErrorPageWideEvent: BadUrlErrorPageWideEvent = mock()
+    private val mockDuckAiSessionCallback: DuckAiSessionCallback = mock()
     private val mockInlinePdfHandler: InlinePdfHandler = mock()
     private val mockPdfDownloadTooltipDataStore: PdfDownloadTooltipDataStore = mock()
     private val mockCachedFileDownloader: CachedFileDownloader = mock()
@@ -1097,6 +1100,7 @@ class BrowserTabViewModelTest {
                 suggestRedirectOnUnresolvedErrorFeature = fakeSuggestRedirectFeature,
                 suggestRedirectEvaluator = mockSuggestRedirectEvaluator,
                 badUrlErrorPageWideEvent = mockBadUrlErrorPageWideEvent,
+                duckAiSessionCallback = mockDuckAiSessionCallback,
             )
 
         testee.loadData("abc", null, false, false)
@@ -3056,6 +3060,34 @@ class BrowserTabViewModelTest {
             assertEquals("https://example.com", query)
             assertNotNull(sourceTabId)
         }
+    }
+
+    @Test
+    fun whenOnLongPressRequiredActionWithOpenInNewTabThenPendingNewTabOpenedExitRecorded() = runTest {
+        val target = LongPressTarget(url = "https://example.com", type = WebView.HitTestResult.SRC_ANCHOR_TYPE)
+
+        testee.onLongPressRequiredAction(target, RequiredAction.OpenInNewTab("https://example.com"))
+
+        verify(mockDuckAiSessionCallback).onExitIntent("abc", DuckAiSessionExitTrigger.NEW_TAB_OPENED)
+    }
+
+    @Test
+    fun whenOnLongPressRequiredActionWithOpenInFireTabThenPendingFireTabOpenedExitRecorded() = runTest {
+        val target = LongPressTarget(url = "https://example.com", type = WebView.HitTestResult.SRC_ANCHOR_TYPE)
+
+        testee.onLongPressRequiredAction(target, RequiredAction.OpenInFireTab("https://example.com"))
+
+        verify(mockDuckAiSessionCallback).onExitIntent("abc", DuckAiSessionExitTrigger.FIRE_TAB_OPENED)
+    }
+
+    @Test
+    fun whenOnLongPressRequiredActionWithOpenInFireTabAndSubscriptionUrlThenNoPendingExitRecorded() = runTest {
+        whenever(subscriptions.shouldLaunchSubscriptionForUrl(any())).thenReturn(true)
+        val target = LongPressTarget(url = "https://example.com", type = WebView.HitTestResult.SRC_ANCHOR_TYPE)
+
+        testee.onLongPressRequiredAction(target, RequiredAction.OpenInFireTab("https://example.com"))
+
+        verify(mockDuckAiSessionCallback, never()).onExitIntent(any(), any())
     }
 
     @Test
@@ -9340,6 +9372,57 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenUserPressedBackAndCanGoBackThenPendingBackOrCloseExitRecorded() = runTest {
+        setupNavigation(isBrowsing = true, canGoBack = true)
+
+        testee.onUserPressedBack()
+
+        verify(mockDuckAiSessionCallback).onExitIntent("abc", DuckAiSessionExitTrigger.BACK_OR_CLOSE)
+    }
+
+    @Test
+    fun whenUserPressedBackWithSourceTabThenPendingBackOrCloseExitRecorded() = runTest {
+        selectedTabLiveData.value = TabEntity(tabId = "abc", sourceTabId = "source-tab")
+        setupNavigation(isBrowsing = true, canGoBack = false)
+
+        testee.onUserPressedBack()
+
+        verify(mockDuckAiSessionCallback).onExitIntent("abc", DuckAiSessionExitTrigger.BACK_OR_CLOSE)
+    }
+
+    @Test
+    fun whenUserPressedBackNavigatesHomeThenPendingBackOrCloseExitRecorded() = runTest {
+        setupNavigation(isBrowsing = true, canGoBack = false, skipHome = false)
+
+        testee.onUserPressedBack()
+
+        verify(mockDuckAiSessionCallback).onExitIntent("abc", DuckAiSessionExitTrigger.BACK_OR_CLOSE)
+    }
+
+    @Test
+    fun whenUserPressedBackWithNothingLeftToHandleThenPendingBackOrCloseExitRecorded() = runTest {
+        setupNavigation(isBrowsing = true, canGoBack = false, skipHome = true)
+
+        testee.onUserPressedBack()
+
+        verify(mockDuckAiSessionCallback).onExitIntent("abc", DuckAiSessionExitTrigger.BACK_OR_CLOSE)
+    }
+
+    @Test
+    fun whenRecordPendingNewTabOpenedExitCalledThenPendingNewTabOpenedExitRecorded() = runTest {
+        testee.recordPendingNewTabOpenedExit()
+
+        verify(mockDuckAiSessionCallback).onExitIntent("abc", DuckAiSessionExitTrigger.NEW_TAB_OPENED)
+    }
+
+    @Test
+    fun whenRecordPendingFireTabOpenedExitCalledThenPendingFireTabOpenedExitRecorded() = runTest {
+        testee.recordPendingFireTabOpenedExit()
+
+        verify(mockDuckAiSessionCallback).onExitIntent("abc", DuckAiSessionExitTrigger.FIRE_TAB_OPENED)
+    }
+
+    @Test
     fun whenUserPressedForwardThenWideEventBadUrlErrorPageExited() = runTest {
         setBrowserShowing(true)
 
@@ -11773,6 +11856,34 @@ class BrowserTabViewModelTest {
         val commands = commandCaptor.allValues
         assertFalse(commands.any { it is Command.DuckAIFullScreenDisabled })
         assertTrue(commands.any { it is Command.EnableDuckAIFullScreen })
+    }
+
+    @Test
+    fun whenDuckAiPageFinishedOnTheActiveTabThenFullTabVisibleReported() = runTest {
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+        // givenCurrentSite reloads the ViewModel for tabId "TAB_ID"; matching it here is what makes
+        // isActiveTab() true.
+        val url = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5&chatID=chat-a"
+        givenCurrentSite(url)
+        selectedTabLiveData.value = TabEntity(tabId = "TAB_ID", url = url)
+        val webViewNavState = WebViewNavigationState(mockStack, 100)
+
+        testee.pageFinished(mockWebView, webViewNavState, url)
+
+        verify(mockDuckAiSessionCallback).onDuckAiPageVisible("TAB_ID", url)
+    }
+
+    @Test
+    fun whenDuckAiPageFinishedOnABackgroundTabThenFullTabVisibleNotReported() = runTest {
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+        givenCurrentSite("https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5")
+        // A different tab is selected: this ViewModel's tab ("TAB_ID") is not the one on screen.
+        selectedTabLiveData.value = TabEntity(tabId = "some-other-tab", url = "https://example.com")
+        val webViewNavState = WebViewNavigationState(mockStack, 100)
+
+        testee.pageFinished(mockWebView, webViewNavState, "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5")
+
+        verify(mockDuckAiSessionCallback, never()).onDuckAiPageVisible(any(), any())
     }
 
     @Test

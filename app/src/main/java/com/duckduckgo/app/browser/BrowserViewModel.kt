@@ -68,6 +68,8 @@ import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckAiSessionCallback
+import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
@@ -115,6 +117,7 @@ class BrowserViewModel @Inject constructor(
     private val browserModeStateHolder: BrowserModeStateHolder,
     private val fireModeAvailability: FireModeAvailability,
     private val browserMode: BrowserMode,
+    private val duckAiSessionCallback: DuckAiSessionCallback,
 ) : ViewModel(), CoroutineScope {
 
     // Mode-switch orchestrator: observes the mode it also writes via switchTo().
@@ -264,6 +267,7 @@ class BrowserViewModel @Inject constructor(
     }
 
     suspend fun onNewTabRequested(sourceTabId: String? = null): String {
+        recordPendingNewTabOpenedExit()
         return if (sourceTabId != null) {
             tabRepository.addFromSourceTab(sourceTabId = sourceTabId)
         } else {
@@ -282,6 +286,7 @@ class BrowserViewModel @Inject constructor(
         sourceTabId: String? = null,
         skipHome: Boolean = false,
     ): String {
+        recordPendingNewTabOpenedExit()
         val url = if (skipUrlConversionOnNewTabFeature.self().isEnabled()) {
             query
         } else {
@@ -299,6 +304,12 @@ class BrowserViewModel @Inject constructor(
                 url = url,
                 skipHome = skipHome,
             )
+        }
+    }
+
+    private suspend fun recordPendingNewTabOpenedExit() {
+        tabRepository.getSelectedTab()?.tabId?.let { tabId ->
+            duckAiSessionCallback.onExitIntent(tabId, DuckAiSessionExitTrigger.NEW_TAB_OPENED)
         }
     }
 

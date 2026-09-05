@@ -27,6 +27,7 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckAiSessionCallback
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.ToggleSelection
@@ -302,6 +303,7 @@ class RealDuckChatPixels @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val browserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin>,
     private val duckAiNewChatMetricPixelsPlugin: DuckAiNewChatMetricPixelsPlugin,
+    private val duckAiSessionCallback: DuckAiSessionCallback,
 ) : DuckChatPixels {
 
     /** `first_prompt_new_install` must be attributable to a fresh install, never to an existing user who just updated. */
@@ -909,6 +911,9 @@ class RealDuckChatPixels @Inject constructor(
         ) {
             val source = resolveEntrySource(surface, tabId, addressBarEntryPoint)
             browserInteractionsPlugins.getPlugins().forEach { it.onAiPromptSubmitted(source = source) }
+            if (surface == DuckChatPixelSurface.DUCK_AI && !tabId.isNullOrEmpty()) {
+                duckAiSessionCallback.onPromptSubmitted(tabId)
+            }
             val isFirstPrompt = isFirstPromptForNewInstall()
             buildMap {
                 put(DuckChatPixelParameters.SELECTED_TOOL, selectedTool)

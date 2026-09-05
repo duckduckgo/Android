@@ -66,6 +66,8 @@ import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeature
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.DuckAiSessionCallback
+import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
@@ -106,6 +108,7 @@ import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
@@ -173,6 +176,7 @@ class TabSwitcherViewModelTest {
 
     private val mockTabTitleResolver: TabTitleResolver = mock()
 
+    private val mockDuckAiSessionCallback: DuckAiSessionCallback = mock()
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
     private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
 
@@ -247,6 +251,7 @@ class TabSwitcherViewModelTest {
             mockTrackersAnimationInfoPanelPixels,
             mockOmnibarFeatureRepository,
             mockTabTitleResolver,
+            mockDuckAiSessionCallback,
             coroutinesTestRule.testScope,
             fireTabsPromos,
             remoteMessageModel,
@@ -293,6 +298,17 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
+    fun whenNewTabRequestedThenPendingNewTabOpenedExitRecordedForCurrentTabBeforeAdding() = runTest {
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(TabEntity("CURRENT_TAB", url = "https://duck.ai/"))
+
+        testee.onNewTabRequested()
+
+        val inOrder = inOrder(mockDuckAiSessionCallback, mockTabRepository)
+        inOrder.verify(mockDuckAiSessionCallback).onExitIntent("CURRENT_TAB", DuckAiSessionExitTrigger.NEW_TAB_OPENED)
+        inOrder.verify(mockTabRepository).add()
+    }
+
+    @Test
     fun whenNewTabRequestedAndSwipingTabsEnabledAndEmptyTabExistsThenSelectEmptyTab() = runTest {
         swipingTabsFeature.self().setRawStoredState(State(enable = true))
         swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
@@ -307,9 +323,13 @@ class TabSwitcherViewModelTest {
         initializeViewModel()
         prepareSelectionMode()
 
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(TabEntity("1", url = "https://duck.ai/"))
+
         testee.onNewTabRequested()
 
-        verify(mockTabRepository).select("EMPTY_TAB")
+        val inOrder = inOrder(mockDuckAiSessionCallback, mockTabRepository)
+        inOrder.verify(mockDuckAiSessionCallback).onExitIntent("1", DuckAiSessionExitTrigger.NEW_TAB_OPENED)
+        inOrder.verify(mockTabRepository).select("EMPTY_TAB")
         verify(mockTabRepository, never()).add()
     }
 
@@ -2224,6 +2244,7 @@ class TabSwitcherViewModelTest {
             mockTrackersAnimationInfoPanelPixels,
             mockOmnibarFeatureRepository,
             mockTabTitleResolver,
+            mockDuckAiSessionCallback,
             coroutinesTestRule.testScope,
             fireTabsPromos,
             remoteMessageModel,
@@ -2269,6 +2290,7 @@ class TabSwitcherViewModelTest {
             mockTrackersAnimationInfoPanelPixels,
             mockOmnibarFeatureRepository,
             mockTabTitleResolver,
+            mockDuckAiSessionCallback,
             coroutinesTestRule.testScope,
             fireTabsPromos,
             remoteMessageModel,
@@ -2343,6 +2365,7 @@ class TabSwitcherViewModelTest {
             mockTrackersAnimationInfoPanelPixels,
             mockOmnibarFeatureRepository,
             mockTabTitleResolver,
+            mockDuckAiSessionCallback,
             coroutinesTestRule.testScope,
             fireTabsPromos,
             remoteMessageModel,

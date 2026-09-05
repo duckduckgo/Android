@@ -24,6 +24,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.duckchat.api.DuckAiSessionCallback
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.ToggleSelection
 import com.duckduckgo.duckchat.impl.helper.DuckChatTermsOfServiceHandler
@@ -34,7 +35,9 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -53,6 +56,7 @@ class RealDuckChatPixelsToolsTest {
     private val appBuildConfig: AppBuildConfig = mock()
     private val browserInteractionsPlugin: BrowserInteractionsPlugin = mock()
     private val browserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin> = mock()
+    private val duckAiSessionCallback: DuckAiSessionCallback = mock()
 
     private val testee = RealDuckChatPixels(
         pixel = pixel,
@@ -66,6 +70,7 @@ class RealDuckChatPixelsToolsTest {
         appBuildConfig = appBuildConfig,
         browserInteractionsPlugins = browserInteractionsPlugins,
         duckAiNewChatMetricPixelsPlugin = mock(),
+        duckAiSessionCallback = duckAiSessionCallback,
     )
 
     private val surfaceParams = mapOf(DuckChatPixelParameters.SURFACE to "contextual_chat")
@@ -408,6 +413,63 @@ class RealDuckChatPixelsToolsTest {
         )
 
         verify(browserInteractionsPlugin).onAiPromptSubmitted(source = "address_bar_prompt")
+    }
+
+    @Test
+    fun whenPromptSubmittedFromDuckAiSurfaceThenSessionWideEventNotified() = runTest {
+        testee.firePromptSubmitted(
+            selectedTool = "none",
+            modelId = null,
+            reasoningEffort = null,
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            hasText = true,
+            surface = DuckChatPixelSurface.DUCK_AI,
+            defaultMode = null,
+            tabId = "tab1",
+            pageType = DuckChatPixelPageType.DUCK_AI,
+            addressBarEntryPoint = null,
+        )
+
+        verify(duckAiSessionCallback).onPromptSubmitted("tab1")
+    }
+
+    @Test
+    fun whenPromptSubmittedFromAddressBarThenSessionWideEventNotNotified() = runTest {
+        testee.firePromptSubmitted(
+            selectedTool = "none",
+            modelId = null,
+            reasoningEffort = null,
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            hasText = true,
+            surface = DuckChatPixelSurface.ADDRESS_BAR,
+            defaultMode = null,
+            tabId = "tab1",
+            pageType = DuckChatPixelPageType.WEBSITE,
+            addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
+        )
+
+        verify(duckAiSessionCallback, never()).onPromptSubmitted(any())
+    }
+
+    @Test
+    fun whenPromptSubmittedFromContextualChatThenSessionWideEventNotNotified() = runTest {
+        testee.firePromptSubmitted(
+            selectedTool = "none",
+            modelId = null,
+            reasoningEffort = null,
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            hasText = true,
+            surface = DuckChatPixelSurface.CONTEXTUAL_CHAT,
+            defaultMode = null,
+            tabId = "tab1",
+            pageType = DuckChatPixelPageType.CONTEXTUAL,
+            addressBarEntryPoint = null,
+        )
+
+        verify(duckAiSessionCallback, never()).onPromptSubmitted(any())
     }
 
     @Test

@@ -290,4 +290,11 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun contextualSheetRedesign(): Toggle
+
+    /**
+     * @return `true` when the Duck.ai session wide event should be sent
+     * If the remote feature is not present defaults to `internal`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun sendDuckAiSessionWideEvent(): Toggle
 }
