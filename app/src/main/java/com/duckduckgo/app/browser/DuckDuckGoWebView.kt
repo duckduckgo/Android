@@ -33,11 +33,9 @@ import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import androidx.core.graphics.Insets
 import androidx.core.view.NestedScrollingChild3
 import androidx.core.view.NestedScrollingChildHelper
 import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.webkit.JavaScriptReplyProxy
 import androidx.webkit.ScriptHandler
 import androidx.webkit.WebViewCompat
@@ -106,21 +104,10 @@ class DuckDuckGoWebView :
     }
 
     override fun onApplyWindowInsets(insets: WindowInsets): WindowInsets {
-        val adjustedInsets = if (stripImeInsetsEnabled) stripImeInsets(insets) else insets
+        // Zero IME insets when the surrounding layout already resizes for the keyboard, so WebView
+        // M139+ does not additionally shrink the visual viewport (double padding). See WebViewImeInsets.
+        val adjustedInsets = if (stripImeInsetsEnabled) WebViewImeInsets.strip(insets, this) else insets
         return super.onApplyWindowInsets(adjustedInsets)
-    }
-
-    // Zero any IME inset passed to the WebView to avoid double-padding if the IME padding is handled by the surrounding layout.
-    // Reference https://developer.android.com/develop/ui/views/layout/webapps/understand-window-insets
-    private fun stripImeInsets(insets: WindowInsets): WindowInsets {
-        val windowInsetsCompat = WindowInsetsCompat.toWindowInsetsCompat(insets, this)
-
-        if (windowInsetsCompat.getInsets(WindowInsetsCompat.Type.ime()) == Insets.NONE) return insets
-
-        return WindowInsetsCompat.Builder(windowInsetsCompat)
-            .setInsets(WindowInsetsCompat.Type.ime(), Insets.NONE)
-            .build()
-            .toWindowInsets() ?: insets
     }
 
     override fun destroy() {
