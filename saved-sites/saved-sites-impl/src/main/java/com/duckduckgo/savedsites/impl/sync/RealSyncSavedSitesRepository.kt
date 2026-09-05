@@ -417,6 +417,8 @@ class RealSyncSavedSitesRepository(
     }
 
     private fun traverseParents(entity: String, entitiesToUpdate: MutableList<String>) {
+        // folder relations can form a loop, so an entity already collected is never walked up from again
+        if (entitiesToUpdate.contains(entity)) return
         // find parent of each entity
         entitiesToUpdate.add(entity)
         val parents = savedSitesRelationsDao.relationsByEntityId(entity)
