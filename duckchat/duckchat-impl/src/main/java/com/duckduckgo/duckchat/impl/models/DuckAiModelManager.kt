@@ -17,7 +17,9 @@
 package com.duckduckgo.duckchat.impl.models
 
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
@@ -86,6 +88,7 @@ class RealDuckAiModelManager @Inject constructor(
     private val dataStore: DuckChatDataStore,
     private val subscriptions: Subscriptions,
     private val duckAiHostProvider: DuckAiHostProvider,
+    private val cookiesManager: CookieManagerProvider,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : DuckAiModelManager {
@@ -205,7 +208,12 @@ class RealDuckAiModelManager @Inject constructor(
 
     private suspend fun fetchModelsResponse(): AIChatModelsResponse {
         val url = DuckAiModelsService.modelsUrl(duckAiHostProvider.getHost())
-        return modelsService.getModels(url)
+        val cookies = if (duckAiHostProvider.isCustomHost()) {
+            cookiesManager.forMode(BrowserMode.REGULAR)?.getCookie(url)
+        } else {
+            null
+        }
+        return modelsService.getModels(url, cookies)
     }
 
     /**

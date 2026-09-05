@@ -19,12 +19,16 @@ package com.duckduckgo.duckchat.impl.models
 import com.duckduckgo.anvil.annotations.ContributesServiceApi
 import com.duckduckgo.di.scopes.AppScope
 import retrofit2.http.GET
+import retrofit2.http.Header
 import retrofit2.http.Url
 
 @ContributesServiceApi(AppScope::class)
 interface DuckAiModelsService {
     @GET
-    suspend fun getModels(@Url url: String): AIChatModelsResponse
+    suspend fun getModels(
+        @Url url: String,
+        @Header("Cookie") cookies: String?,
+    ): AIChatModelsResponse
 
     companion object {
         private const val MODELS_PATH = "/duckchat/v1/models"
