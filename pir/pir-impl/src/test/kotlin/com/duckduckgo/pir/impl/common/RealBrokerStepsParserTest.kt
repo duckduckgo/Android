@@ -20,9 +20,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.EmailConfirmationStep
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.OptOutStep
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.ScanStep
-import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions
-import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions.OptOutStepActions
-import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions.ScanStepActions
+import com.duckduckgo.pir.impl.di.PirModule
 import com.duckduckgo.pir.impl.models.AddressCityState
 import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.models.ExtractedProfile
@@ -33,8 +31,6 @@ import com.duckduckgo.pir.impl.scripts.models.BrokerAction
 import com.duckduckgo.pir.impl.scripts.models.ElementSelector
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.squareup.moshi.Moshi
-import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -84,25 +80,7 @@ class RealBrokerStepsParserTest {
 
     @Before
     fun setUp() {
-        moshi = Moshi.Builder()
-            .add(
-                PolymorphicJsonAdapterFactory.of(BrokerAction::class.java, "actionType")
-                    .withSubtype(BrokerAction.Extract::class.java, "extract")
-                    .withSubtype(BrokerAction.Expectation::class.java, "expectation")
-                    .withSubtype(BrokerAction.Click::class.java, "click")
-                    .withSubtype(BrokerAction.FillForm::class.java, "fillForm")
-                    .withSubtype(BrokerAction.Navigate::class.java, "navigate")
-                    .withSubtype(BrokerAction.GetCaptchaInfo::class.java, "getCaptchaInfo")
-                    .withSubtype(BrokerAction.SolveCaptcha::class.java, "solveCaptcha")
-                    .withSubtype(BrokerAction.EmailConfirmation::class.java, "emailConfirmation")
-                    .withSubtype(BrokerAction.Condition::class.java, "condition"),
-            ).add(
-                PolymorphicJsonAdapterFactory.of(BrokerStepActions::class.java, "stepType")
-                    .withSubtype(ScanStepActions::class.java, "scan")
-                    .withSubtype(OptOutStepActions::class.java, "optOut"),
-            )
-            .add(KotlinJsonAdapterFactory())
-            .build()
+        moshi = PirModule().providePirMoshi(Moshi.Builder().build())
 
         testee = RealBrokerStepsParser(
             dispatcherProvider = coroutineRule.testDispatcherProvider,
@@ -136,6 +114,37 @@ class RealBrokerStepsParserTest {
         assertEquals("scan", scanStep.step.stepType)
         assertEquals("automated", scanStep.step.scanType)
         assertEquals(1, scanStep.step.actions.size)
+    }
+
+    @Test
+    fun whenParseStepWithExecuteScriptActionThenReturnExecuteScriptAction() = runTest {
+        val actionId = "execute-script-1"
+        val script = "document.querySelector('#target').click();"
+        val scanJson = """
+            {
+                "stepType": "scan",
+                "scanType": "automated",
+                "actions": [
+                    {
+                        "actionType": "navigate",
+                        "id": "nav-1",
+                        "url": "https://testbroker.com/search"
+                    },
+                    {
+                        "actionType": "executeScript",
+                        "id": "$actionId",
+                        "script": "$script"
+                    }
+                ]
+            }
+        """.trimIndent()
+
+        val result = testee.parseStep(testBroker, scanJson, null)
+
+        val actions = result.filterIsInstance<ScanStep>().single().step.actions
+        assertEquals(2, actions.size)
+        val executeScript = actions.filterIsInstance<BrokerAction.ExecuteScript>().single { it.id == actionId }
+        assertEquals(script, executeScript.script)
     }
 
     @Test
