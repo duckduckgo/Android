@@ -60,7 +60,6 @@
     <string name="duckAiMicPermissionDeniedSnackBarMessage">Häälfunktsioonide jaoks on tarvis mikrofoni luba</string>
     <string name="duckAiMicPermissionDeniedDialogTitle">DuckDuckGo vajab juurdepääsu teie mikrofonile</string>
     <string name="duckAiMicPermissionDeniedDialogContent">Mikrofoni juurdepääsu on tarvis, kui soovite Duck.ai-s häälvestlust kasutada.</string>
-    <string name="sitePermissionsDialogChangePermissionsButton">Muuda load</string>
 
     <string name="sitePermissionsSettingsDescription">Külastatavad veebisaidid võivad küsida juurdepääsu sinu seadme asukohale, kaamerale, mikrofonile või DRM-i (Digital Rights Management) tarkvarale. Need ei saa juurdepääsu enne, kui oled selleks andnud selgesõnalise loa.</string>
     <string name="sitePermissionsSettingsEnablePermissionTitle">Luba kõigil saitidel küsida järgmist.</string>
@@ -76,5 +75,34 @@
     <string name="permissionsPerWebsiteAllowSetting">Luba</string>
     <string name="permissionsPerWebsiteAskDisabledSetting">Kõigi saitide jaoks keelatud</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">Luba %1$s saidile %2$s</string>
+
+    <!-- Tiered permission dialog -->
+    <string name="sitePermissionsDialogAllowWhileUsingSiteButton" instruction="Button granting a website a permission for every visit, until the user changes it">Luba saidi kasutamise ajal</string>
+    <string name="sitePermissionsDialogAllowThisTimeButton" instruction="Button granting a website a permission for the current visit only">Luba seekord</string>
+    <string name="sitePermissionsDialogNeverAllowButton" instruction="Button refusing a website a permission for every visit, until the user changes it">Ära kunagi luba</string>
+    <string name="sitePermissionsTieredLocationDialogTitle" instruction="Placeholder is a website">Veebisait „%1$s“ soovib juurdepääsu sinu asukohale</string>
+    <string name="sitePermissionsTieredDdgLocationDialogTitle" instruction="Placeholder is a website">„%1$s“ soovib juurdepääsu sinu asukohale</string>
+    <string name="sitePermissionsTieredDdgLocationDialogSubtitle">Anonümiseerime sinu asukoha ja kasutame seda selleks, et pakkuda paremaid tulemusi, mis on sulle lähemal.</string>
+    <string name="sitePermissionsTieredCameraDialogTitle" instruction="Placeholder is a website">Veebisait „%1$s“ soovib juurdepääsu sinu kaamerale</string>
+    <string name="sitePermissionsTieredMicDialogTitle" instruction="Placeholder is a website">Veebisait „%1$s“ soovib juurdepääsu sinu mikrofonile</string>
+    <string name="sitePermissionsTieredMicAndCameraDialogTitle" instruction="Placeholder is a website">Veebisait „%1$s“ soovib juurdepääsu kaamerale ja mikrofonile</string>
+    <string name="sitePermissionsTieredDrmDialogSubtitle">Kui keeldud, võivad saidil videod muutuda mängitamatuks, kuid sellel saidil puudub juurdepääs DRM-tarkvara pakutavatele seadme identifikaatoritele.</string>
+
+    <!-- Reminder dialog -->
+    <string name="sitePermissionsDialogChangePermissionsButton" instruction="Button opening the DuckDuckGo permission settings in the Android system settings app">Muuda load</string>
+    <string name="sitePermissionsTieredSystemDeniedLocationTitle">DuckDuckGo vajab juurdepääsu sinu asukohale</string>
+    <string name="sitePermissionsTieredSystemDeniedLocationContent">Asukoha load on vajalikud, kui soovid sellel saidil asukohafunktsioone kasutada.</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraTitle">DuckDuckGo vajab juurdepääsu kaamerale</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraContent">Kaamera load on vajalikud, kui soovid sellel saidil kaamerafunktsioone kasutada.</string>
+    <string name="sitePermissionsTieredSystemDeniedMicTitle">DuckDuckGo vajab juurdepääsu sinu mikrofonile</string>
+    <string name="sitePermissionsTieredSystemDeniedMicContent">Mikrofoni load on vajalikud, kui soovid sellel saidil kasutada mikrofoni funktsioone.</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraAndMicTitle">DuckDuckGo vajab juurdepääsu sinu kaamerale ja mikrofonile</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraAndMicContent">Kaamera ja mikrofoni load on vajalikud, kui soovid sellel saidil kaamera ja mikrofoni funktsioone kasutada.</string>
+
+    <!-- Denial snackbar -->
+    <string name="sitePermissionsTieredLocationDeniedSnackBarMessage">DuckDuckGo ei saanud selle saidiga asukohta jagada</string>
+    <string name="sitePermissionsTieredCameraDeniedSnackBarMessage">DuckDuckGo ei saanud sellele saidile kaamerale juurdepääsu anda</string>
+    <string name="sitePermissionsTieredMicDeniedSnackBarMessage">DuckDuckGo ei saanud sellele saidile mikrofoni ligipääsu anda</string>
+    <string name="sitePermissionsTieredCameraAndMicDeniedSnackBarMessage">DuckDuckGo ei saanud sellele saidile kaamerale ja mikrofonile juurdepääsu anda</string>
 
 </resources>
