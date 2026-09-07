@@ -57,6 +57,7 @@ class AppBrowserNav @Inject constructor() : BrowserNav {
         duckChatUrl: String,
         forceImageGeneration: Boolean,
         isContextual: Boolean,
+        textSelection: String?,
     ): Intent {
         return BrowserActivity.intent(
             context = context,
@@ -66,6 +67,7 @@ class AppBrowserNav @Inject constructor() : BrowserNav {
             duckChatUrl = duckChatUrl,
             duckChatSessionActive = hasSessionActive,
             duckChatForceImageGeneration = forceImageGeneration,
+            duckChatTextSelection = textSelection,
         )
     }
 
