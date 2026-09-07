@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/daxColorSurface">
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/subscriptionOnboardingItrScrollView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintBottom_toTopOf="@id/subscriptionOnboardingItrActivateButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/keyline_5"
+            android:paddingBottom="@dimen/keyline_5">
+
+            <ImageView
+                android:id="@+id/subscriptionOnboardingItrIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="@dimen/keyline_5"
+                android:src="@drawable/identity_theft_restoration_feature_128"
+                tools:ignore="ContentDescription" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/subscriptionOnboardingItrTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:gravity="center"
+                app:typography="h1"
+                tools:text="@string/subscriptionOnboardingFeatureInfoItrTitle" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/subscriptionOnboardingItrDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                app:textType="secondary"
+                app:typography="body1"
+                tools:text="@string/subscriptionOnboardingFeatureInfoItrDescription" />
+
+            <LinearLayout
+                android:id="@+id/subscriptionOnboardingItrContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <View
+        android:id="@+id/subscriptionOnboardingItrScrollFade"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:importantForAccessibility="no"
+        app:layout_constraintBottom_toBottomOf="@id/subscriptionOnboardingItrScrollView"
+        app:layout_constraintEnd_toEndOf="@id/subscriptionOnboardingItrScrollView"
+        app:layout_constraintStart_toStartOf="@id/subscriptionOnboardingItrScrollView" />
+
+    <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+        android:id="@+id/subscriptionOnboardingItrActivateButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/keyline_5"
+        android:layout_marginBottom="@dimen/keyline_4"
+        android:text="@string/subscriptionOnboardingItrActivate"
+        app:daxButtonSize="large"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
