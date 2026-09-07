@@ -9975,17 +9975,6 @@
 
     <issue
         id="UnusedResources"
-        message="The resource `R.drawable.shield_96` appears to be unused"
-        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
-        errorLine2="^">
-        <location
-            file="src/main/res/drawable/shield_96.xml"
-            line="1"
-            column="1"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
         message="The resource `R.drawable.shield_check_128` appears to be unused"
         errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
         errorLine2="^">
@@ -10218,17 +10207,6 @@
         errorLine2="^">
         <location
             file="src/main/res/drawable/selected_icon_background.xml"
-            line="17"
-            column="1"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.drawable.shield_neutral_color_24` appears to be unused"
-        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
-        errorLine2="^">
-        <location
-            file="src/main/res/drawable/shield_neutral_color_24.xml"
             line="17"
             column="1"/>
     </issue>
