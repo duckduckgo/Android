@@ -26,9 +26,11 @@ import androidx.activity.result.ActivityResultCaller
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.net.toUri
+import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.ui.view.button.ButtonType.GHOST
 import com.duckduckgo.common.ui.view.button.ButtonType.PRIMARY
@@ -66,6 +68,12 @@ import java.lang.IllegalStateException
 import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 
+private enum class PermissionTier(@StringRes val textId: Int) {
+    ALLOW_WHILE_USING_SITE(R.string.sitePermissionsDialogAllowWhileUsingSiteButton),
+    ALLOW_THIS_TIME(R.string.sitePermissionsDialogAllowThisTimeButton),
+    NEVER_ALLOW(R.string.sitePermissionsDialogNeverAllowButton),
+}
+
 @ContributesBinding(FragmentScope::class)
 class SitePermissionsDialogActivityLauncher @Inject constructor(
     private val systemPermissionsHelper: SystemPermissionsHelper,
@@ -78,6 +86,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
     private val browserMode: BrowserMode,
     private val drmPolicyFeature: DrmPolicyFeature,
     private val sitePermissionsDialogRedesignFeature: SitePermissionsDialogRedesignFeature,
+    private val tabRepository: TabRepository,
 ) : SitePermissionsDialogLauncher {
 
     private lateinit var sitePermissionRequest: PermissionRequest
@@ -90,6 +99,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
     private var siteURL: String = ""
     private var tabId: String = ""
     private var isDuckAiAudioCapture: Boolean = false
+    private var isThirdParty: Boolean = false
 
     override fun registerPermissionLauncher(caller: ActivityResultCaller) {
         systemPermissionsHelper.registerPermissionLaunchers(
@@ -116,6 +126,14 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         permissionsHandledByUser = permissionsRequested.userHandled
         permissionsHandledAutomatically = permissionsRequested.autoAccept
         isDuckAiAudioCapture = false
+        isThirdParty = isThirdPartyOrigin(url)
+
+        if (isThirdParty && !sitePermissionsDialogRedesignFeature.self().isEnabled() &&
+            permissionsHandledByUser.contains(LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION)
+        ) {
+            denyPermissions()
+            return
+        }
 
         when {
             permissionsHandledByUser.contains(PermissionRequest.RESOURCE_VIDEO_CAPTURE) && permissionsHandledByUser.contains(
@@ -306,35 +324,35 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         onPermissionAllowed: (Boolean) -> Unit,
         onPermissionDenied: (Boolean) -> Unit = ::denyPermissions,
     ) {
+        val tiers = if (isThirdParty) {
+            listOf(PermissionTier.ALLOW_THIS_TIME, PermissionTier.NEVER_ALLOW)
+        } else {
+            listOf(PermissionTier.ALLOW_WHILE_USING_SITE, PermissionTier.ALLOW_THIS_TIME, PermissionTier.NEVER_ALLOW)
+        }
+
         StackedAlertDialogBuilder(activity)
             .setRebrandUpdate(true)
             .setCancellable(true)
             .setHeaderImageResource(iconRes)
             .setTitle(title)
             .setMessage(messageRes?.let { activity.getText(it) } ?: "")
-            .setStackedButtons(
-                listOf(
-                    StackedButton(R.string.sitePermissionsDialogAllowWhileUsingSiteButton, SECONDARY),
-                    StackedButton(R.string.sitePermissionsDialogAllowThisTimeButton, SECONDARY),
-                    StackedButton(R.string.sitePermissionsDialogNeverAllowButton, SECONDARY),
-                ),
-            )
+            .setStackedButtons(tiers.map { StackedButton(it.textId, SECONDARY) })
             .addEventListener(
                 object : StackedAlertDialogBuilder.EventListener() {
                     override fun onButtonClicked(position: Int) {
-                        when (position) {
-                            ALLOW_WHILE_USING_SITE_BUTTON -> {
+                        when (tiers[position]) {
+                            PermissionTier.ALLOW_WHILE_USING_SITE -> {
                                 faviconUrl?.let { storeFavicon(it) }
                                 sendPositiveDialogClickPixel(pixelType, rememberChoice = true)
                                 onPermissionAllowed(true)
                             }
 
-                            ALLOW_THIS_TIME_BUTTON -> {
+                            PermissionTier.ALLOW_THIS_TIME -> {
                                 sendPositiveDialogClickPixel(pixelType, rememberChoice = false)
                                 onPermissionAllowed(false)
                             }
 
-                            NEVER_ALLOW_BUTTON -> {
+                            PermissionTier.NEVER_ALLOW -> {
                                 faviconUrl?.let { storeFavicon(it) }
                                 sendNegativeDialogClickPixel(pixelType, rememberChoice = true)
                                 onPermissionDenied(true)
@@ -472,6 +490,11 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
             }
         }
         grantPermissions()
+    }
+
+    private fun isThirdPartyOrigin(requestOrigin: String): Boolean {
+        val pageUrl = tabRepository.retrieveSiteData(tabId).value?.url ?: return true
+        return !UriString.sameEffectiveSite(pageUrl, requestOrigin)
     }
 
     private fun denyDrmPermissions(
@@ -834,9 +857,6 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
     companion object {
         private const val DRM_LEARN_MORE_ANNOTATION = "drm_learn_more_link"
         private const val CHANGE_PERMISSIONS_BUTTON = 0
-        private const val ALLOW_WHILE_USING_SITE_BUTTON = 0
-        private const val ALLOW_THIS_TIME_BUTTON = 1
-        private const val NEVER_ALLOW_BUTTON = 2
         val DRM_LEARN_MORE_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy/drm-permission/".toUri()
     }
 }

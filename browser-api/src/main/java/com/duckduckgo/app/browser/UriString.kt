@@ -21,6 +21,7 @@ import androidx.collection.LruCache
 import androidx.core.util.PatternsCompat
 import com.duckduckgo.common.utils.UrlScheme
 import com.duckduckgo.common.utils.baseHost
+import com.duckduckgo.common.utils.extensions.toTldPlusOneOrSelf
 import com.duckduckgo.common.utils.withScheme
 import logcat.LogPriority.INFO
 import logcat.logcat
@@ -69,6 +70,22 @@ class UriString {
             } catch (e: Exception) {
                 url
             }
+        }
+
+        /**
+         * Whether two URLs belong to the same site, comparing their registrable domains (eTLD+1) and
+         * falling back to the host itself where there is none, such as IP addresses and `localhost`.
+         *
+         * Unlike [sameOrSubdomainPair] this treats sibling subdomains as the same site, so
+         * `www.example.com` and `cdn.example.com` match. Returns false when either host cannot be read.
+         */
+        fun sameEffectiveSite(
+            first: String,
+            second: String,
+        ): Boolean {
+            val firstHost = host(first) ?: return false
+            val secondHost = host(second) ?: return false
+            return firstHost.toTldPlusOneOrSelf() == secondHost.toTldPlusOneOrSelf()
         }
 
         fun sameOrSubdomain(

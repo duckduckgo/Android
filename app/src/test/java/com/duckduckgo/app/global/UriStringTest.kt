@@ -20,6 +20,7 @@ import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.UriString.Companion.isWebUrl
 import com.duckduckgo.app.browser.UriString.Companion.removePort
+import com.duckduckgo.app.browser.UriString.Companion.sameEffectiveSite
 import com.duckduckgo.app.browser.UriString.Companion.sameOrSubdomain
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -29,6 +30,26 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class UriStringTest {
+
+    @Test
+    fun whenHostsShareRegistrableDomainThenSameEffectiveSite() {
+        assertTrue(sameEffectiveSite("https://example.com/page", "https://example.com"))
+        assertTrue(sameEffectiveSite("https://www.example.com/page", "https://cdn.example.com"))
+        assertTrue(sameEffectiveSite("https://news.example.co.uk", "https://shop.example.co.uk"))
+    }
+
+    @Test
+    fun whenHostsDifferThenNotSameEffectiveSite() {
+        assertFalse(sameEffectiveSite("https://example.com", "https://other.com"))
+        assertFalse(sameEffectiveSite("https://example.co.uk", "https://other.co.uk"))
+    }
+
+    @Test
+    fun whenHostHasNoRegistrableDomainThenComparedAsItself() {
+        assertTrue(sameEffectiveSite("http://localhost:8000/a", "http://localhost:8000/b"))
+        assertFalse(sameEffectiveSite("http://localhost:8000", "http://127.0.0.1:8000"))
+        assertFalse(sameEffectiveSite("http://127.0.0.1", "http://10.0.0.1"))
+    }
 
     @Test
     fun whenUrlsHaveSameDomainThenSameOrSubdomainIsTrue() {
