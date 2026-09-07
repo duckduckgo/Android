@@ -17,17 +17,23 @@
 package com.duckduckgo.duckchat.impl.contextual
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelPageType
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
+import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelection
+import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionPayloadBuilder
+import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionStore
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import org.json.JSONObject
@@ -43,10 +49,14 @@ class DuckChatContextualEntryViewModel @Inject constructor(
     private val contextualEntryPromptStore: ContextualEntryPromptStore,
     private val duckChatPixels: DuckChatPixels,
     private val modelManager: DuckAiModelManager,
+    private val textSelectionStore: TextSelectionStore,
+    private val selectionPayloadBuilder: TextSelectionPayloadBuilder,
 ) : ViewModel() {
 
     data class ViewState(
         val attachedContext: AttachedPageContext? = null,
+        val latestPageContext: String? = null,
+        val textSelections: List<TextSelection> = emptyList(),
     )
 
     data class AttachedPageContext(
@@ -77,18 +87,27 @@ class DuckChatContextualEntryViewModel @Inject constructor(
     fun start(tabId: String) {
         this.tabId = tabId
         duckChatPixels.reportContextualFloatingInputShown()
+        textSelectionStore.selections(tabId)
+            .onEach { selections -> _viewState.update { it.copy(textSelections = selections) } }
+            .launchIn(viewModelScope)
+    }
+
+    fun onTextSelectionRemoved(id: String) {
+        textSelectionStore.remove(tabId, id)
     }
 
     fun onPageContextReceived(serializedPageContext: String) {
         if (!isContextValid(serializedPageContext)) return
         latestValidPageContext = serializedPageContext
+        _viewState.update { it.copy(latestPageContext = serializedPageContext) }
         // The dialog is only shown from "Ask about page", so attach regardless of the auto-attach feature
         // flag — unless the user explicitly removed the context this session.
-        if (!userRemovedContext) attach(serializedPageContext)
+        if (!userRemovedContext && !hasTextSelections()) attach(serializedPageContext)
     }
 
     /** The composer's "attach page context" affordance (shown when nothing is attached). */
     fun onAttachContextRequested() {
+        if (hasTextSelections()) return
         latestValidPageContext?.let {
             duckChatPixels.reportContextualPageContextManuallyAttachedNative()
             attach(it)
@@ -103,7 +122,7 @@ class DuckChatContextualEntryViewModel @Inject constructor(
 
     /** A suggested prompt was picked; suggestions are page-specific, so attach the context before submit. */
     fun onSuggestionSubmitted(prompt: NativeInputPrompt) {
-        if (_viewState.value.attachedContext == null) latestValidPageContext?.let { attach(it) }
+        if (_viewState.value.attachedContext == null && !hasTextSelections()) latestValidPageContext?.let { attach(it) }
         fireUnifiedInputPromptSubmitted()
         submit(prompt)
     }
@@ -134,12 +153,26 @@ class DuckChatContextualEntryViewModel @Inject constructor(
     }
 
     private fun submit(prompt: NativeInputPrompt) {
+        val selections = textSelectionStore.consume(tabId)
         contextualEntryPromptStore.store(
-            ContextualEntryPrompt(tabId, prompt, _viewState.value.attachedContext?.serialized),
+            ContextualEntryPrompt(
+                tabId = tabId,
+                prompt = prompt,
+                serializedPageContext = _viewState.value.attachedContext?.serialized,
+                selectionsJson = selectionPayloadBuilder.toJson(selections = selections, url = pageUrl()),
+            ),
         )
         duckChatPixels.reportContextualFloatingInputPromotedToSheet()
         commandChannel.trySend(Command.HandOffToSheet)
     }
+
+    private fun pageUrl(): String =
+        latestValidPageContext
+            ?.let { runCatching { JSONObject(it) }.getOrNull() }
+            ?.optString("url")
+            .orEmpty()
+
+    private fun hasTextSelections(): Boolean = textSelectionStore.selections(tabId).value.isNotEmpty()
 
     private fun attach(serializedPageContext: String) {
         val json = runCatching { JSONObject(serializedPageContext) }.getOrNull() ?: return

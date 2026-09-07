@@ -53,6 +53,7 @@ import com.duckduckgo.duckchat.impl.databinding.DialogContextualDuckAiEntryBindi
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.ui.filechooser.FileChooserIntentBuilder
 import com.duckduckgo.duckchat.impl.ui.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher
+import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.TextSelectionAttachment
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.voice.api.VoiceSearchLauncher
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
@@ -223,6 +224,10 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
         } else {
             binding.entryNativeInputWidget.clearPageContext()
         }
+        binding.entryNativeInputWidget.setTextSelections(
+            state.textSelections.map { TextSelectionAttachment(id = it.id, text = it.text) },
+        )
+        binding.entrySuggestionsView.onTextSelectionCountChanged(state.textSelections.size)
         updateQuickActionVisibility()
     }
 
@@ -341,7 +346,7 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
             }
             .launchIn(viewLifecycleOwner.lifecycleScope)
         viewModel.viewState
-            .map { it.attachedContext?.serialized }
+            .map { it.latestPageContext }
             .filterNotNull()
             .distinctUntilChanged()
             .onEach { binding.entrySuggestionsView.onPageContextUpdated(it) }
@@ -367,6 +372,7 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
             onFilePickerRequested = { callback, mimeTypes -> launchFilePicker(callback, mimeTypes) },
             onAskAboutPage = { viewModel.onAttachContextRequested() },
             onPageContextRemoved = { viewModel.onContextRemoved() },
+            onTextSelectionRemoved = { id -> viewModel.onTextSelectionRemoved(id) },
             onVoiceChatRequested = {
                 duckChat.openVoiceDuckChat(DuckChatEntryPoint.VOICE)
                 dismiss()
