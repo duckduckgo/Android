@@ -31,11 +31,9 @@ import javax.inject.Inject
 
 interface ContextualSuggestedPromptsProvider {
     suspend fun resolveSuggestions(input: ResolvePageSuggestionsInput): ResolvedPageSuggestions
+    suspend fun resolveTextSelectionSuggestions(input: ResolvePageSuggestionsInput): List<ContextualSuggestedPrompt>
     suspend fun maxSuggestedPrompts(): Int
     suspend fun prioritySuggestionIds(): Set<String>
-
-    /** The prompts offered for a single attached text selection, rather than for the page as a whole. */
-    suspend fun resolveTextSelectionSuggestions(input: ResolvePageSuggestionsInput): List<ContextualSuggestedPrompt>
 }
 
 @ContributesBinding(AppScope::class)
