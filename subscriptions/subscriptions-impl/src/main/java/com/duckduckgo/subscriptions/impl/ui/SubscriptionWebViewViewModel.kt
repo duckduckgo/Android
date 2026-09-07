@@ -66,6 +66,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PRO_PLAN_
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.billing.SubscriptionReplacementMode
+import com.duckduckgo.subscriptions.impl.internal.PaywallUrlResolver
 import com.duckduckgo.subscriptions.impl.notification.SubscriptionExpirationReminderScheduler
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionFailureErrorType
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
@@ -104,6 +105,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
     private val subscriptionsFeature: SubscriptionsFeature,
     private val pirFeature: PirFeature,
     private val subscriptionExpirationReminderScheduler: SubscriptionExpirationReminderScheduler,
+    private val paywallUrlResolver: PaywallUrlResolver,
 ) : ViewModel() {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -170,6 +172,12 @@ class SubscriptionWebViewViewModel @Inject constructor(
         subscriptionsManager.subscriptionStatus
             .onEach { subscriptionStatus = it }
             .launchIn(viewModelScope)
+    }
+
+    fun loadInitialUrl(url: String) {
+        viewModelScope.launch {
+            command.send(LoadUrl(paywallUrlResolver.resolve(url)))
+        }
     }
 
     fun processJsCallbackMessage(featureName: String, method: String, id: String?, data: JSONObject?) {
@@ -799,6 +807,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
     }
 
     sealed class Command {
+        data class LoadUrl(val url: String) : Command()
         data object BackToSettings : Command()
         data object BackToSettingsActivateSuccess : Command()
         data class SendJsEvent(val event: SubscriptionEventData) : Command()

@@ -104,6 +104,7 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.GoToNetP
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.GoToPIR
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.GoToPIRDashboard
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.LoadUrl
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.Reload
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.RequestNotificationsPermission
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.RestoreSubscription
@@ -324,17 +325,14 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             }
         }
 
-        logcat {
-            "SubscriptionsWebViewActivity: Loading subscriptions webview with URL: ${params.url}"
-        }
-        binding.webview.loadUrl(params.url)
-
         viewModel.start()
 
         viewModel.commands()
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
+
+        viewModel.loadInitialUrl(params.url)
 
         viewModel.currentPurchaseViewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).distinctUntilChanged().onEach {
             renderPurchaseState(it.purchaseState)
@@ -570,6 +568,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
 
     private fun processCommand(command: Command) {
         when (command) {
+            is LoadUrl -> loadUrl(command.url)
             is BackToSettings, BackToSettingsActivateSuccess -> finishToSettings()
             is SendJsEvent -> sendJsEvent(command.event)
             is SendResponseToJs -> sendResponseToJs(command.data)
@@ -585,6 +584,13 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             is RequestNotificationsPermission -> launchNotificationsPermission(command.id)
             Reload -> binding.webview.reload()
         }
+    }
+
+    private fun loadUrl(url: String) {
+        logcat {
+            "SubscriptionsWebViewActivity: Loading subscriptions webview with URL: $url"
+        }
+        binding.webview.loadUrl(url)
     }
 
     private fun goToPIRDashboard() {
