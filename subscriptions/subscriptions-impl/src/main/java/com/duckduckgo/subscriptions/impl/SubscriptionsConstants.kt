@@ -96,6 +96,12 @@ object SubscriptionsConstants {
     const val SUBSCRIPTIONS_PATH = "pro"
     const val PRIVACY_SUBSCRIPTIONS_PATH = "subscriptions"
 
+    const val DUCK_AI_FEATURE_PAGE = "duckai"
+    const val VPN_FEATURE_PAGE = "vpn"
+
+    const val TRIAL_QUERY_PARAM_KEY = "trial"
+    const val PIR_QUERY_PARAM_KEY = "pir"
+
     // Subscription-funnel origin for the app-settings "Get Subscription" entry point. Used both to
     // launch the buy webview (ProSettingView) and on the app-settings click pixel (SubscriptionPixelSender).
     const val ORIGIN_APP_SETTINGS = "funnel_appsettings_android"
