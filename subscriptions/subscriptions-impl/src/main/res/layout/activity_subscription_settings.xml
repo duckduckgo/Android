@@ -155,7 +155,7 @@
                 <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:leadingIcon="@drawable/ic_ai_chat_advanced"
+                    app:leadingIcon="@drawable/ai_chat_advanced_color_24"
                     app:primaryText="@string/subscriptionsProUpgradeTitle"
                     app:primaryTextColorOverlay="?attr/daxColorAccentBlue"
                     app:secondaryTextColorOverlay="?attr/daxColorPrimaryText"
