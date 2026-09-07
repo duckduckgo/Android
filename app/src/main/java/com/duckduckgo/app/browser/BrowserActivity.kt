@@ -846,6 +846,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
 
         if (intent.getBooleanExtra(OPEN_DUCK_CHAT, false)) {
+            pendingDuckChatTextSelection = intent.getStringExtra(DUCK_CHAT_TEXT_SELECTION)
             val sourceTabId = intent.getStringExtra(SOURCE_TAB_ID_EXTRA)
             pendingDuckChatForceImageGeneration = intent.getBooleanExtra(DUCK_CHAT_FORCE_IMAGE_GENERATION, false)
             intent.getStringExtra(DUCK_CHAT_ENTRY_POINT_EXTRA)?.let { source ->
@@ -858,7 +859,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
 
         if (intent.getBooleanExtra(OPEN_DUCK_CHAT_CONTEXTUAL, false)) {
-            currentTab?.launchDuckAiContextual()
+            currentTab?.launchDuckAiContextual(intent.getStringExtra(DUCK_CHAT_TEXT_SELECTION))
             return
         }
 
@@ -1111,6 +1112,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
         globalActivityStarter.start(this, DownloadsScreenNoParams)
     }
 
+    private var pendingDuckChatTextSelection: String? = null
+    fun consumePendingDuckChatTextSelection(): String? = pendingDuckChatTextSelection.also { pendingDuckChatTextSelection = null }
+
     private fun launchDuckAi(url: String?, sourceTabId: String? = null) {
         isDuckChatVisible = true
         // The tab to return to when this Duck.ai tab is closed.
@@ -1321,6 +1325,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             openExistingTabId: String? = null,
             openDuckChat: Boolean = false,
             openDuckChatContextual: Boolean = false,
+            duckChatTextSelection: String? = null,
             closeDuckChat: Boolean = false,
             duckChatUrl: String? = null,
             duckChatSessionActive: Boolean = false,
@@ -1339,6 +1344,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             intent.putExtra(OPEN_EXISTING_TAB_ID_EXTRA, openExistingTabId)
             intent.putExtra(OPEN_DUCK_CHAT, openDuckChat)
             intent.putExtra(OPEN_DUCK_CHAT_CONTEXTUAL, openDuckChatContextual)
+            intent.putExtra(DUCK_CHAT_TEXT_SELECTION, duckChatTextSelection)
             intent.putExtra(DUCK_CHAT_ENTRY_POINT_EXTRA, launchSource.toDuckChatEntryPoint()?.name)
             intent.putExtra(CLOSE_DUCK_CHAT, closeDuckChat)
             intent.putExtra(DUCK_CHAT_URL, duckChatUrl)
@@ -1377,6 +1383,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         private const val OPEN_DUCK_CHAT = "OPEN_DUCK_CHAT_EXTRA"
         private const val OPEN_DUCK_CHAT_CONTEXTUAL = "OPEN_DUCK_CHAT_CONTEXTUAL_EXTRA"
+        private const val DUCK_CHAT_TEXT_SELECTION = "DUCK_CHAT_TEXT_SELECTION_EXTRA"
         private const val DUCK_CHAT_ENTRY_POINT_EXTRA = "DUCK_CHAT_ENTRY_POINT_EXTRA"
         private const val CLOSE_DUCK_CHAT = "CLOSE_DUCK_CHAT_EXTRA"
         private const val DUCK_CHAT_URL = "DUCK_CHAT_URL"
