@@ -4045,6 +4045,12 @@ class BrowserTabFragment :
         )
     }
 
+    fun launchDuckAiContextual() {
+        viewLifecycleOwner.lifecycleScope.launch(dispatchers.main()) {
+            duckChatContextual.launch(tabId, webView?.url, webView) { showDuckChatContextualSheet(tabId) }
+        }
+    }
+
     private fun showDuckChatContextualSheet(tabId: String) {
         binding.duckAiContextualFragmentContainer.show()
 

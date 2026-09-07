@@ -37,12 +37,14 @@ interface BrowserNav {
      * Returns an Intent that opens Duck.ai full screen in a new tab.
      *
      * @param forceImageGeneration when true, the new tab's native input preselects the image-generation tool.
+     * @param isContextual when true, opens the contextual Duck.ai flow instead of a full screen tab.
      */
     fun openDuckChat(
         context: Context,
         hasSessionActive: Boolean = false,
         duckChatUrl: String,
         forceImageGeneration: Boolean = false,
+        isContextual: Boolean = false,
     ): Intent
     fun closeDuckChat(context: Context): Intent
 
