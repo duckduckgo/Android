@@ -108,7 +108,7 @@ class CtaTest {
 
     @Test
     fun whenCtaIsBubbleTypeReturnCorrectCancelParameters() {
-        val testee = DaxTryASearchBrandDesignUpdateBubbleCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mock())
+        val testee = DaxTryASearchBubbleCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mock())
         val value = testee.pixelCancelParameters()
 
         assertEquals(1, value.size)
@@ -118,7 +118,7 @@ class CtaTest {
 
     @Test
     fun whenCtaIsBubbleTypeReturnCorrectOkParameters() {
-        val testee = DaxTryASearchBrandDesignUpdateBubbleCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mock())
+        val testee = DaxTryASearchBubbleCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mock())
         val value = testee.pixelOkParameters()
 
         assertEquals(1, value.size)
@@ -131,7 +131,7 @@ class CtaTest {
         whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn(null)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
 
-        val testee = DaxTryASearchBrandDesignUpdateBubbleCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mock())
+        val testee = DaxTryASearchBubbleCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mock())
         val expectedValue = "${testee.ctaPixelParam}:0"
 
         val value = testee.pixelShownParameters()
@@ -145,7 +145,15 @@ class CtaTest {
         whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn(null)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
 
-        val testee = DaxEndBrandDesignUpdateBubbleCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mock(), isOmnibarBottom = false, segmentedPath = null)
+        val testee =
+            DaxEndBubbleCta(
+                mockOnboardingStore,
+                mockAppInstallStore,
+                isLightTheme = true,
+                deviceInfo = mock(),
+                isOmnibarBottom = false,
+                segmentedPath = null,
+            )
         val value = testee.addCtaToHistory("test")
         assertEquals("test:0", value)
     }
@@ -155,7 +163,15 @@ class CtaTest {
         whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn(null)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(3))
 
-        val testee = DaxEndBrandDesignUpdateBubbleCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mock(), isOmnibarBottom = false, segmentedPath = null)
+        val testee =
+            DaxEndBubbleCta(
+                mockOnboardingStore,
+                mockAppInstallStore,
+                isLightTheme = true,
+                deviceInfo = mock(),
+                isOmnibarBottom = false,
+                segmentedPath = null,
+            )
         val value = testee.addCtaToHistory("test")
         assertEquals("test:3", value)
     }
@@ -165,7 +181,15 @@ class CtaTest {
         whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn(null)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(4))
 
-        val testee = DaxEndBrandDesignUpdateBubbleCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mock(), isOmnibarBottom = false, segmentedPath = null)
+        val testee =
+            DaxEndBubbleCta(
+                mockOnboardingStore,
+                mockAppInstallStore,
+                isLightTheme = true,
+                deviceInfo = mock(),
+                isOmnibarBottom = false,
+                segmentedPath = null,
+            )
         val value = testee.addCtaToHistory("test")
         assertEquals("test:3", value)
     }
@@ -176,7 +200,15 @@ class CtaTest {
         whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn(ctaHistory)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
 
-        val testee = DaxEndBrandDesignUpdateBubbleCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mock(), isOmnibarBottom = false, segmentedPath = null)
+        val testee =
+            DaxEndBubbleCta(
+                mockOnboardingStore,
+                mockAppInstallStore,
+                isLightTheme = true,
+                deviceInfo = mock(),
+                isOmnibarBottom = false,
+                segmentedPath = null,
+            )
         val value = testee.addCtaToHistory("test")
         val expectedValue = "$ctaHistory-test:1"
 
@@ -188,7 +220,15 @@ class CtaTest {
         val existingJourney = "s:0-t:1"
         whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn(existingJourney)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
-        val testee = DaxEndBrandDesignUpdateBubbleCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mock(), isOmnibarBottom = false, segmentedPath = null)
+        val testee =
+            DaxEndBubbleCta(
+                mockOnboardingStore,
+                mockAppInstallStore,
+                isLightTheme = true,
+                deviceInfo = mock(),
+                isOmnibarBottom = false,
+                segmentedPath = null,
+            )
         val expectedValue = "$existingJourney-${testee.ctaPixelParam}:1"
 
         val value = testee.pixelShownParameters()
@@ -198,7 +238,15 @@ class CtaTest {
     @Test
     fun whenCanSendPixelAndCtaNotPartOfHistoryThenReturnTrue() {
         whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn("s:0")
-        val testee = DaxEndBrandDesignUpdateBubbleCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mock(), isOmnibarBottom = false, segmentedPath = null)
+        val testee =
+            DaxEndBubbleCta(
+                mockOnboardingStore,
+                mockAppInstallStore,
+                isLightTheme = true,
+                deviceInfo = mock(),
+                isOmnibarBottom = false,
+                segmentedPath = null,
+            )
         assertTrue(testee.canSendShownPixel())
     }
 
@@ -218,7 +266,15 @@ class CtaTest {
     @Test
     fun whenCanSendPixelAndCtaNotPartOfHistoryButIsASubstringThenReturnTrue() {
         whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn("s:0-te:0")
-        val testee = DaxEndBrandDesignUpdateBubbleCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mock(), isOmnibarBottom = false, segmentedPath = null)
+        val testee =
+            DaxEndBubbleCta(
+                mockOnboardingStore,
+                mockAppInstallStore,
+                isLightTheme = true,
+                deviceInfo = mock(),
+                isOmnibarBottom = false,
+                segmentedPath = null,
+            )
         assertTrue(testee.canSendShownPixel())
     }
 
@@ -226,13 +282,21 @@ class CtaTest {
     fun whenCanSendPixelAndCtaIsPartOfHistoryThenReturnFalse() {
         whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn("i:0-e:0-s:0")
 
-        val testee = DaxEndBrandDesignUpdateBubbleCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mock(), isOmnibarBottom = false, segmentedPath = null)
+        val testee =
+            DaxEndBubbleCta(
+                mockOnboardingStore,
+                mockAppInstallStore,
+                isLightTheme = true,
+                deviceInfo = mock(),
+                isOmnibarBottom = false,
+                segmentedPath = null,
+            )
         assertFalse(testee.canSendShownPixel())
     }
 
     @Test
     fun whenCtaIsDialogTypeReturnCorrectCancelParameters() {
-        val testee = DaxSerpBrandDesignUpdateContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mock())
+        val testee = DaxSerpContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mock())
 
         val value = testee.pixelCancelParameters()
         assertEquals(1, value.size)
@@ -242,7 +306,7 @@ class CtaTest {
 
     @Test
     fun whenCtaIsDialogTypeReturnCorrectOkParameters() {
-        val testee = DaxSerpBrandDesignUpdateContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mock())
+        val testee = DaxSerpContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mock())
 
         val value = testee.pixelOkParameters()
         assertEquals(1, value.size)
@@ -254,7 +318,7 @@ class CtaTest {
     fun whenCtaIsDialogTypeReturnCorrectShownParameters() {
         whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn(null)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
-        val testee = DaxSerpBrandDesignUpdateContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mock())
+        val testee = DaxSerpContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mock())
         val expectedValue = "${testee.ctaPixelParam}:0"
 
         val value = testee.pixelShownParameters()
@@ -268,7 +332,7 @@ class CtaTest {
         val existingJourney = "s:0-t:1"
         whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn(existingJourney)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
-        val testee = DaxSerpBrandDesignUpdateContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mock())
+        val testee = DaxSerpContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mock())
         val expectedValue = "$existingJourney-${testee.ctaPixelParam}:1"
 
         val value = testee.pixelShownParameters()
@@ -285,7 +349,7 @@ class CtaTest {
             )
 
         val testee =
-            DaxTrackersBlockedBrandDesignUpdateContextualCta(
+            DaxTrackersBlockedContextualCta(
                 mockOnboardingStore,
                 mockAppInstallStore,
                 trackers,
@@ -307,7 +371,7 @@ class CtaTest {
             )
 
         val testee =
-            DaxTrackersBlockedBrandDesignUpdateContextualCta(
+            DaxTrackersBlockedContextualCta(
                 mockOnboardingStore,
                 mockAppInstallStore,
                 trackers,
@@ -346,7 +410,7 @@ class CtaTest {
         val site = site(events = trackers)
 
         val testee =
-            DaxTrackersBlockedBrandDesignUpdateContextualCta(
+            DaxTrackersBlockedContextualCta(
                 mockOnboardingStore,
                 mockAppInstallStore,
                 site.orderedTrackerBlockedEntities(),
@@ -385,7 +449,7 @@ class CtaTest {
         val site = site(events = trackers)
 
         val testee =
-            DaxTrackersBlockedBrandDesignUpdateContextualCta(
+            DaxTrackersBlockedContextualCta(
                 mockOnboardingStore,
                 mockAppInstallStore,
                 site.orderedTrackerBlockedEntities(),
@@ -424,7 +488,7 @@ class CtaTest {
         val site = site(events = trackers)
 
         val testee =
-            DaxTrackersBlockedBrandDesignUpdateContextualCta(
+            DaxTrackersBlockedContextualCta(
                 mockOnboardingStore,
                 mockAppInstallStore,
                 site.orderedTrackerBlockedEntities(),
@@ -447,7 +511,7 @@ class CtaTest {
             )
 
         val testee =
-            DaxTrackersBlockedBrandDesignUpdateContextualCta(
+            DaxTrackersBlockedContextualCta(
                 mockOnboardingStore,
                 mockAppInstallStore,
                 trackers,
@@ -465,7 +529,7 @@ class CtaTest {
         val existingJourney = "s:0-t:1"
         whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn(existingJourney)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
-        val testee = DaxFireButtonBrandDesignUpdateContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mock())
+        val testee = DaxFireButtonContextualCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mock())
         val expectedValue = "$existingJourney-${testee.ctaPixelParam}:1"
 
         val value = testee.pixelShownParameters()

@@ -50,8 +50,8 @@ import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(FragmentScope::class)
-class BrandDesignUpdateDefaultBrowserPage :
-    OnboardingPageFragment(R.layout.content_onboarding_default_browser_update) {
+class DefaultBrowserPage :
+    OnboardingPageFragment(R.layout.content_onboarding_default_browser) {
 
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory

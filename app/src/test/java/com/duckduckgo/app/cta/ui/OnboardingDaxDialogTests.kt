@@ -385,7 +385,7 @@ class OnboardingDaxDialogTests {
             brokenSitePromptUrl = null,
         )
 
-        assertTrue(result is DaxMainNetworkBrandDesignUpdateContextualCta)
+        assertTrue(result is DaxMainNetworkContextualCta)
     }
 
     private fun site(

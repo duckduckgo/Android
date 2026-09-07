@@ -16,12 +16,12 @@
 
 package com.duckduckgo.app.onboarding.ui
 
-import com.duckduckgo.app.onboarding.ui.page.BrandDesignUpdateDefaultBrowserPage
+import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.onboarding.ui.page.configdriven.ConfigDrivenWelcomePageFragment
 
 interface OnboardingPageBuilder {
     fun buildConfigDrivenWelcomePage(): ConfigDrivenWelcomePageFragment
-    fun buildBrandDesignUpdateDefaultBrowserPage(): BrandDesignUpdateDefaultBrowserPage
+    fun buildBrandDesignUpdateDefaultBrowserPage(): DefaultBrowserPage
 
     sealed class OnboardingPageBlueprint {
         data object ConfigDrivenWelcomePageBlueprint : OnboardingPageBlueprint()
@@ -32,5 +32,5 @@ interface OnboardingPageBuilder {
 class OnboardingFragmentPageBuilder : OnboardingPageBuilder {
 
     override fun buildConfigDrivenWelcomePage() = ConfigDrivenWelcomePageFragment()
-    override fun buildBrandDesignUpdateDefaultBrowserPage() = BrandDesignUpdateDefaultBrowserPage()
+    override fun buildBrandDesignUpdateDefaultBrowserPage() = DefaultBrowserPage()
 }

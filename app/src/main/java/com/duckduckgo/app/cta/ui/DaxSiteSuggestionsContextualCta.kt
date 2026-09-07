@@ -34,12 +34,12 @@ import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.preventWidows
 
-data class DaxSiteSuggestionsBrandDesignUpdateContextualCta(
+data class DaxSiteSuggestionsContextualCta(
     override val onboardingStore: OnboardingStore,
     override val appInstallStore: AppInstallStore,
     override val isLightTheme: Boolean,
     override val deviceInfo: DeviceInfo,
-) : OnboardingDaxDialogCta.BrandDesignContextualDaxDialogCta(
+) : OnboardingDaxDialogCta.ContextualDaxDialogCta(
     ctaId = CtaId.DAX_INTRO_VISIT_SITE,
     description = R.string.onboardingSitesDaxDialogDescription,
     buttonText = null,

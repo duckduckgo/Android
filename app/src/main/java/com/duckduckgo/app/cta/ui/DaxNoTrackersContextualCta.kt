@@ -16,38 +16,32 @@
 
 package com.duckduckgo.app.cta.ui
 
-import android.content.Context
 import android.view.View
-import androidx.annotation.VisibleForTesting
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.preventWidows
 
-data class DaxTrackersBlockedBrandDesignUpdateContextualCta(
+data class DaxNoTrackersContextualCta(
     override val onboardingStore: OnboardingStore,
     override val appInstallStore: AppInstallStore,
-    val trackers: List<Entity>,
-    val settingsDataStore: SettingsDataStore,
     override val isLightTheme: Boolean,
     override val deviceInfo: DeviceInfo,
-) : OnboardingDaxDialogCta.BrandDesignContextualDaxDialogCta(
-    ctaId = CtaId.DAX_DIALOG_TRACKERS_FOUND,
-    description = null,
-    buttonText = R.string.onboardingTrackersBlockedDaxDialogButton,
+) : OnboardingDaxDialogCta.ContextualDaxDialogCta(
+    ctaId = CtaId.DAX_DIALOG_OTHER,
+    description = R.string.daxNonSerpCtaText,
+    buttonText = R.string.daxDialogGotIt,
     shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
     okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
     cancelPixel = null,
     closePixel = AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON,
-    ctaPixelParam = Pixel.PixelValues.DAX_TRACKERS_BLOCKED_CTA,
+    ctaPixelParam = Pixel.PixelValues.DAX_NO_TRACKERS_CTA,
     onboardingStore = onboardingStore,
     appInstallStore = appInstallStore,
     isLightTheme = isLightTheme,
@@ -62,45 +56,12 @@ data class DaxTrackersBlockedBrandDesignUpdateContextualCta(
     override fun configureContentViews(view: View) {
         val context = view.context
         view.findViewById<DaxTextView>(R.id.contextualBrandDesignDescription)?.text =
-            getTrackersDescription(context, trackers).preventWidows().html(context)
-    }
-
-    override fun onTypingAnimationSettled(onTypingAnimationFinished: () -> Unit) {
-        onTypingAnimationFinished()
+            context.getString(R.string.daxNonSerpCtaText).preventWidows().html(context)
     }
 
     override fun setOnPrimaryCtaClicked(onButtonClicked: () -> Unit) {
         ctaView?.findViewById<View>(R.id.contextualBrandDesignPrimaryCta)?.setOnClickListener {
             onButtonClicked.invoke()
         }
-    }
-
-    @VisibleForTesting
-    fun getTrackersDescription(
-        context: Context,
-        trackersEntities: List<Entity>,
-    ): String {
-        val trackers = trackersEntities
-            .map { it.displayName }
-            .distinct()
-
-        val trackersFiltered = trackers.take(MAX_TRACKERS_SHOWS)
-        val trackersText = trackersFiltered.joinToString(", ")
-        val size = trackers.size - trackersFiltered.size
-        val quantityString =
-            if (size == 0) {
-                context.resources
-                    .getQuantityString(R.plurals.onboardingTrackersBlockedZeroDialogDescription, trackersFiltered.size)
-                    .getStringForOmnibarPosition(settingsDataStore.omnibarType)
-            } else {
-                context.resources
-                    .getQuantityString(R.plurals.onboardingTrackersBlockedDialogDescription, size, size)
-                    .getStringForOmnibarPosition(settingsDataStore.omnibarType)
-            }
-        return "<b>$trackersText</b>$quantityString"
-    }
-
-    private companion object {
-        private const val MAX_TRACKERS_SHOWS = 2
     }
 }

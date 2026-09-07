@@ -211,7 +211,7 @@ class BrandDesignUpdateBubbleCtaTest {
         val dax: LottieAnimationView = mock()
         val lp = stubDaxForFormFactor(dax, FormFactor.TABLET)
         lp.startToStart = R.id.brandDesignCardView
-        val cta = DaxSubscriptionBrandDesignUpdateBubbleCta(
+        val cta = DaxSubscriptionBubbleCta(
             onboardingStore = onboardingStore,
             appInstallStore = appInstallStore,
             isLightTheme = true,
@@ -233,7 +233,7 @@ class BrandDesignUpdateBubbleCtaTest {
     fun visitSiteConfigureWavingDax_resetsRotationToZero() {
         val dax: LottieAnimationView = mock()
         stubDaxForFormFactor(dax, FormFactor.PHONE)
-        val cta = DaxVisitSiteOptionsBrandDesignUpdateBubbleCta(
+        val cta = DaxVisitSiteOptionsBubbleCta(
             onboardingStore = onboardingStore,
             appInstallStore = appInstallStore,
             isLightTheme = true,
@@ -250,7 +250,7 @@ class BrandDesignUpdateBubbleCtaTest {
         val dax: LottieAnimationView = mock()
         val lp = stubDaxForFormFactor(dax, FormFactor.PHONE)
         lp.startToStart = R.id.brandDesignCardView
-        val cta = DaxSubscriptionBrandDesignUpdateBubbleCta(
+        val cta = DaxSubscriptionBubbleCta(
             onboardingStore = onboardingStore,
             appInstallStore = appInstallStore,
             isLightTheme = true,
@@ -297,7 +297,7 @@ class BrandDesignUpdateBubbleCtaTest {
 
     @Test
     fun whenDaxSubscriptionCustomAiOnboardingFlowThenDescriptionIsCustomAi() {
-        val cta = DaxSubscriptionBrandDesignUpdateBubbleCta(
+        val cta = DaxSubscriptionBubbleCta(
             onboardingStore = onboardingStore,
             appInstallStore = appInstallStore,
             isLightTheme = true,
@@ -311,7 +311,7 @@ class BrandDesignUpdateBubbleCtaTest {
 
     @Test
     fun whenDaxSubscriptionStandardFlowThenDescriptionIsStandard() {
-        val cta = DaxSubscriptionBrandDesignUpdateBubbleCta(
+        val cta = DaxSubscriptionBubbleCta(
             onboardingStore = onboardingStore,
             appInstallStore = appInstallStore,
             isLightTheme = true,
@@ -325,7 +325,7 @@ class BrandDesignUpdateBubbleCtaTest {
 
     @Test
     fun whenDaxSubscriptionSegmentedAiPathThenDescriptionIsCustomAi() {
-        val cta = DaxSubscriptionBrandDesignUpdateBubbleCta(
+        val cta = DaxSubscriptionBubbleCta(
             onboardingStore = onboardingStore,
             appInstallStore = appInstallStore,
             isLightTheme = true,
@@ -339,7 +339,7 @@ class BrandDesignUpdateBubbleCtaTest {
 
     @Test
     fun whenDaxSubscriptionSegmentedSearchPathThenDescriptionIsStandard() {
-        val cta = DaxSubscriptionBrandDesignUpdateBubbleCta(
+        val cta = DaxSubscriptionBubbleCta(
             onboardingStore = onboardingStore,
             appInstallStore = appInstallStore,
             isLightTheme = true,

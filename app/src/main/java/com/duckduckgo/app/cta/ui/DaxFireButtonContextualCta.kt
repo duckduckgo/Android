@@ -21,43 +21,41 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
-import com.duckduckgo.app.onboarding.ui.view.DaxTypeAnimationTextView
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.device.DeviceInfo
-import com.duckduckgo.common.utils.extensions.preventWidows
+import com.duckduckgo.common.utils.extensions.html
 
-data class DaxSerpBrandDesignUpdateContextualCta(
+data class DaxFireButtonContextualCta(
     override val onboardingStore: OnboardingStore,
     override val appInstallStore: AppInstallStore,
     override val isLightTheme: Boolean,
     override val deviceInfo: DeviceInfo,
-) : OnboardingDaxDialogCta.BrandDesignContextualDaxDialogCta(
-    ctaId = CtaId.DAX_DIALOG_SERP,
-    description = R.string.onboardingSerpDaxDialogBrandDesignDescription,
-    buttonText = R.string.onboardingSerpDaxDialogButton,
+) : OnboardingDaxDialogCta.ContextualDaxDialogCta(
+    ctaId = CtaId.DAX_FIRE_BUTTON,
+    description = R.string.onboardingFireButtonDaxDialogDescription,
+    buttonText = R.string.onboardingFireButtonDaxDialogOkButton,
     shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
     okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
     cancelPixel = null,
     closePixel = AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON,
-    ctaPixelParam = Pixel.PixelValues.DAX_SERP_CTA,
+    ctaPixelParam = Pixel.PixelValues.DAX_FIRE_DIALOG_CTA,
     onboardingStore = onboardingStore,
     appInstallStore = appInstallStore,
     isLightTheme = isLightTheme,
     deviceInfo = deviceInfo,
-    backgroundRes = R.drawable.bg_onboarding_serp,
-) {
+    backgroundRes = R.drawable.bg_onboarding_fire_button,
+),
+    OnboardingDaxDialogCta.ShowsWingBottom {
     override val activeIncludeId: Int = R.id.contextualBrandDesignPrimaryCtaContent
 
-    override val showArrow: Boolean = false
+    override val showArrow: Boolean = true
 
     override fun configureContentViews(view: View) {
         val context = view.context
-        view.findViewById<DaxTypeAnimationTextView>(R.id.contextualBrandDesignTitle)
-            ?.setText(R.string.onboardingSerpDaxDialogBrandDesignTitle)
         view.findViewById<DaxTextView>(R.id.contextualBrandDesignDescription)?.text =
-            context.getString(R.string.onboardingSerpDaxDialogBrandDesignDescription).preventWidows()
+            context.getString(R.string.onboardingFireButtonDaxDialogDescription).html(context)
     }
 
     override fun setOnPrimaryCtaClicked(onButtonClicked: () -> Unit) {

@@ -26,7 +26,7 @@ import androidx.core.view.isVisible
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
-import com.duckduckgo.app.browser.databinding.IncludeOnboardingInContextDaxDialogBrandDesignUpdateBinding
+import com.duckduckgo.app.browser.databinding.IncludeOnboardingInContextDaxDialogBinding
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
@@ -54,7 +54,7 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-class BrandDesignContextualDaxDialogCtaTest {
+class ContextualDaxDialogCtaTest {
 
     private val container: ConstraintLayout = mock()
     private val titleView: DaxTypeAnimationTextView = mock()
@@ -67,7 +67,7 @@ class BrandDesignContextualDaxDialogCtaTest {
     private val primaryInclude: View = mock()
     private val optionsInclude: View = mock()
     private val browserTabBinding: FragmentBrowserTabBinding = mock()
-    private val brandDesignBinding: IncludeOnboardingInContextDaxDialogBrandDesignUpdateBinding = mock()
+    private val brandDesignBinding: IncludeOnboardingInContextDaxDialogBinding = mock()
     private val settingsDataStore: SettingsDataStore = mock()
 
     private val cardView: DaxOnboardingBubbleBrandDesignUpdateCardView = mock()
@@ -76,7 +76,7 @@ class BrandDesignContextualDaxDialogCtaTest {
     private val appInstallStore: AppInstallStore = mock()
     private val mockDeviceInfo: DeviceInfo = mock()
 
-    private lateinit var testee: TestableBrandDesignContextualDaxDialogCta
+    private lateinit var testee: TestableContextualDaxDialogCta
 
     @Before
     fun before() {
@@ -100,12 +100,12 @@ class BrandDesignContextualDaxDialogCtaTest {
             .thenReturn(brandDesignBinding)
         whenever(brandDesignBinding.root).thenReturn(container)
 
-        testee = TestableBrandDesignContextualDaxDialogCta(onboardingStore, appInstallStore, mockDeviceInfo)
+        testee = TestableContextualDaxDialogCta(onboardingStore, appInstallStore, mockDeviceInfo)
     }
 
     @Test
     fun hideContainer_hidesBrandDesignRoot() {
-        OnboardingDaxDialogCta.BrandDesignContextualDaxDialogCta.hideContainer(browserTabBinding)
+        OnboardingDaxDialogCta.ContextualDaxDialogCta.hideContainer(browserTabBinding)
 
         verify(container).visibility = View.GONE
     }
@@ -113,14 +113,14 @@ class BrandDesignContextualDaxDialogCtaTest {
     @Test
     fun hideOnboardingCta_hidesBrandDesignContainerForEverySurvivingContextualCta() {
         val ctas = listOf(
-            DaxDuckAiFireButtonBrandDesignUpdateContextualCta(onboardingStore, appInstallStore, true, mockDeviceInfo),
-            DaxFireButtonBrandDesignUpdateContextualCta(onboardingStore, appInstallStore, true, mockDeviceInfo),
-            DaxMainNetworkBrandDesignUpdateContextualCta(onboardingStore, appInstallStore, "Facebook", "facebook.com", true, mockDeviceInfo),
-            DaxNoTrackersBrandDesignUpdateContextualCta(onboardingStore, appInstallStore, true, mockDeviceInfo),
-            DaxSerpBrandDesignUpdateContextualCta(onboardingStore, appInstallStore, true, mockDeviceInfo),
-            DaxSiteSuggestionsBrandDesignUpdateContextualCta(onboardingStore, appInstallStore, true, mockDeviceInfo),
-            DaxTrackersBlockedBrandDesignUpdateContextualCta(onboardingStore, appInstallStore, emptyList(), settingsDataStore, true, mockDeviceInfo),
-            DaxEndBrandDesignUpdateContextualCta(onboardingStore, appInstallStore, true, mockDeviceInfo),
+            DaxDuckAiFireButtonContextualCta(onboardingStore, appInstallStore, true, mockDeviceInfo),
+            DaxFireButtonContextualCta(onboardingStore, appInstallStore, true, mockDeviceInfo),
+            DaxMainNetworkContextualCta(onboardingStore, appInstallStore, "Facebook", "facebook.com", true, mockDeviceInfo),
+            DaxNoTrackersContextualCta(onboardingStore, appInstallStore, true, mockDeviceInfo),
+            DaxSerpContextualCta(onboardingStore, appInstallStore, true, mockDeviceInfo),
+            DaxSiteSuggestionsContextualCta(onboardingStore, appInstallStore, true, mockDeviceInfo),
+            DaxTrackersBlockedContextualCta(onboardingStore, appInstallStore, emptyList(), settingsDataStore, true, mockDeviceInfo),
+            DaxEndContextualCta(onboardingStore, appInstallStore, true, mockDeviceInfo),
         )
 
         ctas.forEach { it.hideOnboardingCta(browserTabBinding) }
@@ -447,11 +447,11 @@ class BrandDesignContextualDaxDialogCtaTest {
         verify(wing, never()).playAnimation()
     }
 
-    private inner class TestableBrandDesignContextualDaxDialogCta(
+    private inner class TestableContextualDaxDialogCta(
         override val onboardingStore: OnboardingStore,
         override val appInstallStore: AppInstallStore,
         override val deviceInfo: DeviceInfo,
-    ) : OnboardingDaxDialogCta.BrandDesignContextualDaxDialogCta(
+    ) : OnboardingDaxDialogCta.ContextualDaxDialogCta(
         ctaId = CtaId.DAX_DIALOG_SERP,
         description = null,
         buttonText = null,
@@ -500,7 +500,7 @@ class BrandDesignContextualDaxDialogCtaTest {
         override val onboardingStore: OnboardingStore,
         override val appInstallStore: AppInstallStore,
         override val deviceInfo: DeviceInfo,
-    ) : OnboardingDaxDialogCta.BrandDesignContextualDaxDialogCta(
+    ) : OnboardingDaxDialogCta.ContextualDaxDialogCta(
         ctaId = CtaId.DAX_DIALOG_TRACKERS_FOUND,
         description = null,
         buttonText = null,

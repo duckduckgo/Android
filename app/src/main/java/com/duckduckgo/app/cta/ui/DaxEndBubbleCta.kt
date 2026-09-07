@@ -36,7 +36,7 @@ import com.duckduckgo.common.utils.device.DeviceInfo
 import com.google.android.material.button.MaterialButton
 import com.duckduckgo.mobile.android.R as CommonR
 
-data class DaxEndBrandDesignUpdateBubbleCta constructor(
+data class DaxEndBubbleCta(
     override val onboardingStore: OnboardingStore,
     override val appInstallStore: AppInstallStore,
     override val isLightTheme: Boolean,

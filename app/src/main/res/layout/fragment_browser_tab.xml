@@ -93,7 +93,7 @@
 
             <include
                 android:id="@+id/includeOnboardingInContextDaxDialogBrandDesign"
-                layout="@layout/include_onboarding_in_context_dax_dialog_brand_design_update"
+                layout="@layout/include_onboarding_in_context_dax_dialog"
                 android:visibility="gone" />
 
             <include
