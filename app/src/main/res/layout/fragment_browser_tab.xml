@@ -92,11 +92,6 @@
             android:elevation="@dimen/keyline_4">
 
             <include
-                android:id="@+id/includeOnboardingInContextDaxDialog"
-                layout="@layout/include_onboarding_in_context_dax_dialog"
-                android:visibility="gone" />
-
-            <include
                 android:id="@+id/includeOnboardingInContextDaxDialogBrandDesign"
                 layout="@layout/include_onboarding_in_context_dax_dialog_brand_design_update"
                 android:visibility="gone" />

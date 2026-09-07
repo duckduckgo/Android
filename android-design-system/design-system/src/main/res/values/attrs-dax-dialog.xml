@@ -22,7 +22,6 @@
         <!-- Left -->
         <enum name="left" value="1" />
     </attr>
-    <attr name="arrowHeight" format="dimension" />
     <attr name="arrowOffsetStart" format="dimension" />
     <attr name="arrowOffsetEnd" format="dimension" />
 
@@ -30,16 +29,6 @@
     <declare-styleable name="DaxBubbleCardView">
         <attr name="edgePosition"/>
     </declare-styleable>
-
-    <!-- DaxOnboardingBubbleCardView-->
-    <declare-styleable name="DaxOnboardingBubbleCardView">
-        <attr name="edgePosition" />
-        <attr name="arrowHeight" />
-        <attr name="arrowOffsetStart" />
-        <attr name="arrowOffsetEnd" />
-    </declare-styleable>
-
-    <dimen name="dax_onboarding_bubble_card_view_corner_radius">24dp</dimen>
 
     <!-- DaxOnboardingBubbleBrandDesignUpdateCardView -->
     <declare-styleable name="DaxOnboardingBubbleBrandDesignUpdateCardView">

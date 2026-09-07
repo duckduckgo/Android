@@ -18,7 +18,6 @@ package com.duckduckgo.app.onboarding
 
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager.SegmentedOnboardingExperimentVariant
 import com.duckduckgo.app.onboarding.SegmentedOnboardingFeatureToggles.Cohorts
-import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -39,7 +38,6 @@ interface SegmentedOnboardingExperimentManager {
 @ContributesBinding(AppScope::class, boundType = SegmentedOnboardingExperimentManager::class)
 @SingleInstanceIn(AppScope::class)
 class SegmentedOnboardingExperimentManagerImpl @Inject constructor(
-    private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
     private val segmentedOnboardingFeatureToggles: SegmentedOnboardingFeatureToggles,
     private val onboardingPasswordImportToggles: OnboardingPasswordImportToggles,
     private val appBuildConfig: AppBuildConfig,
@@ -62,7 +60,6 @@ class SegmentedOnboardingExperimentManagerImpl @Inject constructor(
     }
 
     private suspend fun checkPrerequisites() =
-        onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled() &&
-            !onboardingPasswordImportToggles.passwordImportExperimentAug25().isEnabled() &&
+        !onboardingPasswordImportToggles.passwordImportExperimentAug25().isEnabled() &&
             !appBuildConfig.isAppReinstall()
 }
