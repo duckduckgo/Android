@@ -26,7 +26,6 @@ import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.RealTextSelecti
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.RealTextSelectionStore
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionPayloadBuilder
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionStore
-import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionTarget
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -299,8 +298,7 @@ class DuckChatContextualEntryViewModelTest {
     @Test
     fun whenTextSelectionAttachedThenPageContextNotAttached() = runTest {
         viewModel.start("tab-1")
-        textSelectionStore.store("selected words", TextSelectionTarget.CONTEXTUAL)
-        textSelectionStore.claim("tab-1", TextSelectionTarget.CONTEXTUAL)
+        textSelectionStore.add("tab-1", "selected words")
 
         viewModel.onPageContextReceived(validContext)
 
@@ -311,9 +309,8 @@ class DuckChatContextualEntryViewModelTest {
     fun whenPromptSubmittedWithTextSelectionsThenSelectionsSentOnOwnKeyAndCleared() = runTest {
         viewModel.start("tab-1")
         viewModel.onPageContextReceived(validContext)
-        textSelectionStore.store("first selection", TextSelectionTarget.CONTEXTUAL)
-        textSelectionStore.store("second selection", TextSelectionTarget.CONTEXTUAL)
-        textSelectionStore.claim("tab-1", TextSelectionTarget.CONTEXTUAL)
+        textSelectionStore.add("tab-1", "first selection")
+        textSelectionStore.add("tab-1", "second selection")
 
         viewModel.commands.test {
             viewModel.onPromptSubmitted(samplePrompt)
@@ -353,8 +350,7 @@ class DuckChatContextualEntryViewModelTest {
     fun whenSelectionExceedsMaxContentLengthThenTruncatedButSizeReported() = runTest {
         val long = "word ".repeat(3000)
         viewModel.start("tab-1")
-        textSelectionStore.store(long, TextSelectionTarget.CONTEXTUAL)
-        textSelectionStore.claim("tab-1", TextSelectionTarget.CONTEXTUAL)
+        textSelectionStore.add("tab-1", long)
 
         viewModel.commands.test {
             viewModel.onPromptSubmitted(samplePrompt)
@@ -374,49 +370,20 @@ class DuckChatContextualEntryViewModelTest {
     fun whenSelectionsExceedMaxThenExtrasDropped() {
         repeat(
             TextSelectionStore.MAX_SELECTIONS + 2,
-        ) { index -> textSelectionStore.store("selection $index", TextSelectionTarget.CONTEXTUAL) }
-        textSelectionStore.claim("tab-1", TextSelectionTarget.CONTEXTUAL)
+        ) { index -> textSelectionStore.add("tab-1", "selection $index") }
 
         assertEquals(TextSelectionStore.MAX_SELECTIONS, textSelectionStore.consume("tab-1").size)
     }
 
     @Test
     fun whenSelectionRemovedThenDroppedFromStore() = runTest {
-        textSelectionStore.store("keep me", TextSelectionTarget.CONTEXTUAL)
-        textSelectionStore.store("remove me", TextSelectionTarget.CONTEXTUAL)
-        textSelectionStore.claim("tab-1", TextSelectionTarget.CONTEXTUAL)
+        textSelectionStore.add("tab-1", "keep me")
+        textSelectionStore.add("tab-1", "remove me")
         val target = textSelectionStore.selections("tab-1").value.last()
 
         viewModel.start("tab-1")
         viewModel.onTextSelectionRemoved(target.id)
 
         assertEquals(listOf("keep me"), textSelectionStore.consume("tab-1").map { it.text })
-    }
-
-    @Test
-    fun whenNoPendingSelectionThenClaimReportsNothing() {
-        assertFalse(textSelectionStore.claim("tab-1", TextSelectionTarget.CONTEXTUAL))
-    }
-
-    @Test
-    fun whenSelectionTargetsFullScreenThenOnlyAFullScreenSurfaceClaimsIt() {
-        textSelectionStore.store("from another app", TextSelectionTarget.FULL_SCREEN)
-
-        // The browser tab that happens to resume first must not take it.
-        assertFalse(textSelectionStore.claim("tab-1", TextSelectionTarget.CONTEXTUAL))
-        assertTrue(textSelectionStore.selections("tab-1").value.isEmpty())
-
-        assertTrue(textSelectionStore.claim("duck-ai-tab", TextSelectionTarget.FULL_SCREEN))
-        assertEquals(listOf("from another app"), textSelectionStore.consume("duck-ai-tab").map { it.text })
-    }
-
-    @Test
-    fun whenTargetSwitchesThenEarlierPendingSelectionsDropped() {
-        textSelectionStore.store("in app", TextSelectionTarget.CONTEXTUAL)
-
-        textSelectionStore.store("from another app", TextSelectionTarget.FULL_SCREEN)
-        textSelectionStore.claim("tab-1", TextSelectionTarget.FULL_SCREEN)
-
-        assertEquals(listOf("from another app"), textSelectionStore.consume("tab-1").map { it.text })
     }
 }
