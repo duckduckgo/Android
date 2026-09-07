@@ -71,6 +71,14 @@ class RealContextualSuggestedPromptsProvider @Inject constructor(
         )
     }
 
+    override suspend fun resolveTextSelectionSuggestions(
+        input: ResolvePageSuggestionsInput,
+    ): List<ContextualSuggestedPrompt> = withContext(dispatcherProvider.io()) {
+        val catalog = bundledCatalog ?: return@withContext emptyList()
+        ContextualSuggestionsMatcher.resolveIds(TEXT_SELECTION_SUGGESTION_IDS, input, catalog)
+            .map { localize(it, input) }
+    }
+
     private fun localize(
         suggestion: ContextualSuggestedPrompt,
         input: ResolvePageSuggestionsInput,
@@ -80,14 +88,6 @@ class RealContextualSuggestedPromptsProvider @Inject constructor(
             label = context.getString(labelRes),
             prompt = ContextualSuggestionsMatcher.applyTemplate(context.getString(promptRes), input),
         )
-    }
-
-    override suspend fun resolveTextSelectionSuggestions(
-        input: ResolvePageSuggestionsInput,
-    ): List<ContextualSuggestedPrompt> = withContext(dispatcherProvider.io()) {
-        val catalog = bundledCatalog ?: return@withContext emptyList()
-        ContextualSuggestionsMatcher.resolveIds(TEXT_SELECTION_SUGGESTION_IDS, input, catalog)
-            .map { localize(it, input) }
     }
 
     override suspend fun maxSuggestedPrompts(): Int = withContext(dispatcherProvider.io()) {
