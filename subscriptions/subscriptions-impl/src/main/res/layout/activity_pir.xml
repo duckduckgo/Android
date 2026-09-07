@@ -41,8 +41,8 @@
 
             <ImageView
                     android:id="@+id/headerImage"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="320dp"
+                    android:layout_height="240dp"
                     android:layout_gravity="center"
                     android:layout_marginTop="@dimen/keyline_5"
                     app:layout_constraintEnd_toEndOf="parent"
