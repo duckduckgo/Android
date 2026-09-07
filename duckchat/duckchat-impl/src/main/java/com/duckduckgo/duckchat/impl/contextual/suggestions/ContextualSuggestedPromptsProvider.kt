@@ -33,6 +33,9 @@ interface ContextualSuggestedPromptsProvider {
     suspend fun resolveSuggestions(input: ResolvePageSuggestionsInput): ResolvedPageSuggestions
     suspend fun maxSuggestedPrompts(): Int
     suspend fun prioritySuggestionIds(): Set<String>
+
+    /** The prompts offered for a single attached text selection, rather than for the page as a whole. */
+    suspend fun resolveTextSelectionSuggestions(input: ResolvePageSuggestionsInput): List<ContextualSuggestedPrompt>
 }
 
 @ContributesBinding(AppScope::class)
@@ -81,6 +84,14 @@ class RealContextualSuggestedPromptsProvider @Inject constructor(
         )
     }
 
+    override suspend fun resolveTextSelectionSuggestions(
+        input: ResolvePageSuggestionsInput,
+    ): List<ContextualSuggestedPrompt> = withContext(dispatcherProvider.io()) {
+        val catalog = bundledCatalog ?: return@withContext emptyList()
+        ContextualSuggestionsMatcher.resolveIds(TEXT_SELECTION_SUGGESTION_IDS, input, catalog)
+            .map { localize(it, input) }
+    }
+
     override suspend fun maxSuggestedPrompts(): Int = withContext(dispatcherProvider.io()) {
         bundledCatalog?.maxSuggestedPrompts ?: 1
     }
@@ -102,9 +113,12 @@ class RealContextualSuggestedPromptsProvider @Inject constructor(
     companion object {
         private const val CATALOG_ASSET_PATH = "PageSuggestionsCatalog.json"
         private const val SUGGESTION_ID_SUMMARIZE_PAGE = "summarize-page"
+        private val TEXT_SELECTION_SUGGESTION_IDS = listOf("summarize-selection", "translate-selection")
 
         private val LOCALIZED_COPY_RES = mapOf(
             "translate-page" to (R.string.duckAiSuggestionTranslatePageLabel to R.string.duckAiSuggestionTranslatePagePrompt),
+            "summarize-selection" to (R.string.duckAiSuggestionSummarizeSelectionLabel to R.string.duckAiSuggestionSummarizeSelectionPrompt),
+            "translate-selection" to (R.string.duckAiSuggestionTranslateSelectionLabel to R.string.duckAiSuggestionTranslateSelectionPrompt),
             "key-takeaways" to (R.string.duckAiSuggestionKeyTakeawaysLabel to R.string.duckAiSuggestionKeyTakeawaysPrompt),
             "explain-simply" to (R.string.duckAiSuggestionExplainSimplyLabel to R.string.duckAiSuggestionExplainSimplyPrompt),
             "counterarguments" to (R.string.duckAiSuggestionCounterargumentsLabel to R.string.duckAiSuggestionCounterargumentsPrompt),
