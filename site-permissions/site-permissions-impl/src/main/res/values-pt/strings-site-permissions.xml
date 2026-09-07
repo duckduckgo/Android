@@ -60,7 +60,7 @@
     <string name="duckAiMicPermissionDeniedSnackBarMessage">É necessária permissão de microfone para as funcionalidades de voz</string>
     <string name="duckAiMicPermissionDeniedDialogTitle">O DuckDuckGo precisa de aceder ao teu microfone</string>
     <string name="duckAiMicPermissionDeniedDialogContent">Precisas de permissões de microfone se quiseres utilizar o chat de voz no Duck.ai</string>
-    <string name="duckAiMicPermissionDeniedDialogPositiveButton">Alterar permissões</string>
+    <string name="sitePermissionsDialogChangePermissionsButton">Alterar permissões</string>
 
     <string name="sitePermissionsSettingsDescription">Os sites que visitas podem pedir acesso à localização, câmara, microfone ou DRM (Digital Rights Management) do teu dispositivo. Não poderão aceder a estas funcionalidades sem que concedas permissão explicitamente.</string>
     <string name="sitePermissionsSettingsEnablePermissionTitle">Permitir que todos os sites peçam:</string>

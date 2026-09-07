@@ -60,7 +60,7 @@
     <string name="duckAiMicPermissionDeniedSnackBarMessage">Mikrofontillatelse er nødvendig for talefunksjoner</string>
     <string name="duckAiMicPermissionDeniedDialogTitle">DuckDuckGo trenger tilgang til mikrofonen</string>
     <string name="duckAiMicPermissionDeniedDialogContent">Mikrofontillatelser er nødvendig hvis du vil bruke talefunksjoner i Duck.ai</string>
-    <string name="duckAiMicPermissionDeniedDialogPositiveButton">Endre tillatelser</string>
+    <string name="sitePermissionsDialogChangePermissionsButton">Endre tillatelser</string>
 
     <string name="sitePermissionsSettingsDescription">Nettsteder du besøker, kan be om tilgang til enhetens posisjon, kamera, mikrofon eller DRA-programvare (digital rettighetsadministrasjon). De får ikke tilgang til disse med mindre du uttrykkelig gir dem tillatelse.</string>
     <string name="sitePermissionsSettingsEnablePermissionTitle">Tillat alle nettsteder å be om:</string>
