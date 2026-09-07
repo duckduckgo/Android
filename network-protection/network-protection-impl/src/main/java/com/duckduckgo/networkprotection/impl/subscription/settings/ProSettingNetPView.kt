@@ -102,7 +102,7 @@ class ProSettingNetPView @JvmOverloads constructor(
                     isVisible = true
                     isClickable = true
                     setClickListener { viewModel.onNetPSettingClicked() }
-                    setLeadingIconResource(R.drawable.ic_vpn_color_24)
+                    setLeadingIconResource(R.drawable.vpn_color_24)
                     setStatus(isOn = networkProtectionEntryState.isActive)
                 }
             }

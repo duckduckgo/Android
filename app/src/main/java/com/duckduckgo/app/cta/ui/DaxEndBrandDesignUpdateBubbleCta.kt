@@ -86,7 +86,7 @@ data class DaxEndBrandDesignUpdateBubbleCta constructor(
         val primaryCtaTextRes: Int
         if (segmentedPathWithAiInput == SEARCH) {
             view.findViewById<ImageView>(R.id.brandDesignHeaderImage)?.apply {
-                setImageResource(CommonR.drawable.ic_duckai)
+                setImageResource(CommonR.drawable.duckduckgo_duckai_96)
                 isVisible = true
             }
 

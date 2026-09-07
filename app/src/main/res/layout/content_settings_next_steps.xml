@@ -38,7 +38,7 @@
         android:id="@+id/addWidgetToHomeScreenSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:leadingIcon="@drawable/ic_add_widget_color_24"
+        app:leadingIcon="@drawable/ic_home_screen_widget_color_24"
         app:primaryText="@string/settingsAddWidget" />
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem

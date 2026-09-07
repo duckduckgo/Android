@@ -43,7 +43,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:primaryText="@string/settingsSyncSetting"
-        app:leadingIcon="@drawable/ic_sync_color_24"/>
+        app:leadingIcon="@drawable/sync_color_24"/>
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/appearanceSetting"
@@ -71,14 +71,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:primaryText="@string/settingsPermissionsSetting"
-        app:leadingIcon="@drawable/ic_lock_color_24"/>
+        app:leadingIcon="@drawable/lock_color_24"/>
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/fireButtonSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:primaryText="@string/settingsDataClearing"
-        app:leadingIcon="@drawable/ic_fire_color_24"/>
+        app:leadingIcon="@drawable/fire_color_24"/>
 
     <include
         android:id="@+id/includeDuckChatSetting"

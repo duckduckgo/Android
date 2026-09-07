@@ -33,7 +33,7 @@ class SettingsActivityAppTpIconTest {
     @Test
     fun whenPictogramsAreDisabledThenAppTpUsesSharedLockIcon() {
         assertEquals(
-            CommonR.drawable.ic_lock_color_24,
+            CommonR.drawable.lock_color_24,
             resolveAppTpSettingsIcon(isPictogramsEnabled = false),
         )
     }

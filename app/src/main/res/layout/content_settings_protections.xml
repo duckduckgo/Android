@@ -39,7 +39,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:indicatorStatus="on"
-        app:leadingIcon="@drawable/ic_find_search_color_24"
+        app:leadingIcon="@drawable/search_find_color_24"
         app:primaryText="@string/settingsPrivateSearchTitle" />
 
     <com.duckduckgo.common.ui.view.listitem.SettingsListItem
@@ -47,7 +47,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:indicatorStatus="on"
-        app:leadingIcon="@drawable/ic_shield_color_24"
+        app:leadingIcon="@drawable/shield_color_24"
         app:primaryText="@string/settingsWebTrackingProtectionTitle" />
 
     <LinearLayout
@@ -74,7 +74,7 @@
         android:id="@+id/vpnSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:leadingIcon="@drawable/ic_lock_color_24"
+        app:leadingIcon="@drawable/lock_color_24"
         app:primaryText="@string/atp_SettingsTitle" />
 
     <com.duckduckgo.common.ui.view.listitem.SettingsListItem

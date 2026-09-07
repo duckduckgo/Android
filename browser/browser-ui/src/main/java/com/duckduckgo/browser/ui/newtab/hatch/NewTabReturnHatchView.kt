@@ -147,7 +147,7 @@ class NewTabReturnHatchView @JvmOverloads constructor(
                 BrowserMode.REGULAR -> {
                     binding.returnHatchSiteTitle.text = state.titleOrPlaceholder()
                     if (state.isDuckChat) {
-                        binding.returnHatchFavicon.setImageResource(CommonR.drawable.ic_duckai)
+                        binding.returnHatchFavicon.setImageResource(CommonR.drawable.duckduckgo_duckai_96)
                     } else {
                         faviconJob += viewModel.viewModelScope.launch {
                             faviconManager.loadToViewFromLocalWithRetry(state.tabId, state.url, binding.returnHatchFavicon)

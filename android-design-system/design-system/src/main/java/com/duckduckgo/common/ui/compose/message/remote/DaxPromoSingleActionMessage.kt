@@ -154,7 +154,7 @@ private fun DaxPromoSingleActionMessagePreview() {
         DaxPromoSingleActionMessage(
             title = "Promo Single Action Message",
             body = "Body text goes here. This component has two buttons and showcases an app update",
-            illustration = painterResource(R.drawable.promo_mac_and_windows),
+            illustration = painterResource(R.drawable.laptop_ddginstall_96),
             illustrationContentDescription = null,
             action = DaxAction(text = "Promo Link", onClick = {}),
             onDismissed = {},

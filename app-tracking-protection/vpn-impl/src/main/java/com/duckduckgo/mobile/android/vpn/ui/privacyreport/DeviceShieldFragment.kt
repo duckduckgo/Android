@@ -130,12 +130,12 @@ class DeviceShieldFragment : DuckDuckGoFragment() {
 
     private fun renderStateDisabled() {
         deviceShieldCtaHeaderTextView.setText(R.string.atp_NewTabDisabled)
-        deviceShieldCtaImageView.setImageResource(R.drawable.ic_apptp_warning)
+        deviceShieldCtaImageView.setImageResource(R.drawable.exclamation_recolorable_24)
     }
 
     private fun renderStateRevoked() {
         deviceShieldCtaHeaderTextView.setText(R.string.atp_NewTabRevoked)
-        deviceShieldCtaImageView.setImageResource(R.drawable.ic_apptp_warning)
+        deviceShieldCtaImageView.setImageResource(R.drawable.exclamation_recolorable_24)
     }
 
     private fun renderTrackersBlockedWhenEnabled(trackerBlocked: TrackersBlocked) {

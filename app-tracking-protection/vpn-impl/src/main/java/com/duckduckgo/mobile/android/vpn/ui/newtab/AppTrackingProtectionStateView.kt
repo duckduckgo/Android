@@ -129,12 +129,12 @@ class AppTrackingProtectionStateView @JvmOverloads constructor(
 
     private fun renderStateDisabled() {
         binding.deviceShieldCtaHeader.setText(R.string.atp_NewTabDisabled)
-        binding.deviceShieldCtaImage.setImageResource(R.drawable.ic_apptp_warning)
+        binding.deviceShieldCtaImage.setImageResource(R.drawable.exclamation_recolorable_24)
     }
 
     private fun renderStateRevoked() {
         binding.deviceShieldCtaHeader.setText(R.string.atp_NewTabRevoked)
-        binding.deviceShieldCtaImage.setImageResource(R.drawable.ic_apptp_warning)
+        binding.deviceShieldCtaImage.setImageResource(R.drawable.exclamation_recolorable_24)
     }
 
     private fun renderTrackersBlockedWhenEnabled(trackerBlocked: TrackersBlocked) {

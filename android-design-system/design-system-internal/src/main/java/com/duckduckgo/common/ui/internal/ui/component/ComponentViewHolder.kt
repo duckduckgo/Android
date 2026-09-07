@@ -363,7 +363,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             )
 
             val promoSingleMessage = Message(
-                middleIllustration = CommonR.drawable.promo_mac_and_windows,
+                middleIllustration = CommonR.drawable.laptop_ddginstall_96,
                 title = "Promo Single Action Message",
                 subtitle = "Body text goes here. This component has one promo button and supports <b>bold</b> text",
                 promoAction = "Promo Link",
@@ -398,7 +398,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 DaxPromoSingleActionMessage(
                     title = "Promo Single Action Message",
                     body = "Body text goes here. This component has one promo button and supports <b>bold</b> text",
-                    illustration = painterResource(CommonR.drawable.promo_mac_and_windows),
+                    illustration = painterResource(CommonR.drawable.laptop_ddginstall_96),
                     illustrationContentDescription = null,
                     action = DaxAction(text = "Promo Link", onClick = {}),
                     onDismissed = {

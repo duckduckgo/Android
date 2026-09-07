@@ -104,7 +104,7 @@ class ItrSettingView @JvmOverloads constructor(
                 is ItrState.Enabled -> {
                     isVisible = true
                     setStatus(isOn = true)
-                    setLeadingIconResource(R.drawable.ic_identity_theft_restoration_color_24)
+                    setLeadingIconResource(R.drawable.identity_theft_restoration_color_24)
                     isClickable = true
                     setClickListener { viewModel.onItr() }
                 }
