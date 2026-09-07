@@ -52,11 +52,21 @@ tags:
           text: ".*Remember: every time you browse with me a creepy ad loses its.wings..*"
       - runFlow: ../shared/browser_screen/click_on_tabs_button.yaml
       - tapOn: "New Tab"
-      # Suppressed when the linear plan already showed the widget page (see
-      # AddWidgetModalEvaluator), which happens in the widget cohorts of
-      # addToDockAndWidgetExperimentJul25 — so this stays optional.
+      # The widget bottom sheet is suppressed when the linear plan already showed the widget page
       - extendedWaitUntil:
           visible:
             text: ".*Try our Home screen widget!.*"
           timeout: 3000
           optional: true
+      - runFlow:
+          when:
+            true: ${!output.linearWidgetPromptShown}
+          commands:
+            - assertVisible:
+                text: ".*Try our Home screen widget!.*"
+      - runFlow:
+          when:
+            true: ${output.linearWidgetPromptShown}
+          commands:
+            - assertNotVisible:
+                text: ".*Try our Home screen widget!.*"
