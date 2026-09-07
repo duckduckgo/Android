@@ -48,3 +48,20 @@ jobs:
               run: npm run validate-defs-without-formatting -- -g ../internal-github-asana-utils/user_map.yml
               working-directory: PixelDefinitions
 
+            # Validation regenerates generated_schemas/ in place and exits 0 either way.
+            # If there are any changes after previous steps, it means the committed schemas
+            # no longer match the definitions they come from.
+            - name: Check generated schemas match definitions
+              run: |
+                changes=$(git status --porcelain -- PixelDefinitions)
+                if [ -n "$changes" ]; then
+                  echo 'Generated schemas do not match the pixel definitions.'
+                  echo
+                  echo "$changes"
+                  echo
+                  git --no-pager diff -- PixelDefinitions
+                  echo
+                  echo 'Run "npm run validate-defs-without-formatting" in PixelDefinitions and commit the result.'
+                  exit 1
+                fi
+

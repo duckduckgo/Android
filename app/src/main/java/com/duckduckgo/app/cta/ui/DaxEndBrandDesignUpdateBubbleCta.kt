@@ -34,7 +34,7 @@ import com.duckduckgo.common.utils.device.DeviceInfo
 import com.google.android.material.button.MaterialButton
 import com.duckduckgo.mobile.android.R as CommonR
 
-data class DaxEndBrandDesignUpdateBubbleCta(
+data class DaxEndBrandDesignUpdateBubbleCta constructor(
     override val onboardingStore: OnboardingStore,
     override val appInstallStore: AppInstallStore,
     override val isLightTheme: Boolean,
@@ -42,14 +42,14 @@ data class DaxEndBrandDesignUpdateBubbleCta(
     override val onboardingImprovementsEnabled: Boolean,
     override val onboardingImprovementsV2Enabled: Boolean,
     val isOmnibarBottom: Boolean,
-    val segmentedPath: SegmentedOnboardingPath?,
+    val segmentedPathWithAiInput: SegmentedOnboardingPath?,
 ) : DaxBubbleCta.BrandDesignUpdateBubbleCta(
     ctaId = CtaId.DAX_END,
-    title = when (segmentedPath) {
+    title = when (segmentedPathWithAiInput) {
         SEARCH -> R.string.searchPathWithToggleEnabledContextualEndTitle
         AI, null -> R.string.onboardingEndDaxDialogTitle
     },
-    description = when (segmentedPath) {
+    description = when (segmentedPathWithAiInput) {
         SEARCH -> R.string.searchPathWithToggleEnabledContextualEndDescription
         AI, null -> R.string.onboardingEndDaxDialogDescription
     },
@@ -68,7 +68,7 @@ data class DaxEndBrandDesignUpdateBubbleCta(
     override val backgroundFillSpec = BackgroundFillSpec(fillHeightDp = 280f, tabletFillHeightDp = 320f, maxHeightFraction = 0.3f)
     override val activeIncludeIds: List<Int> = listOfNotNull(
         R.id.primaryCta,
-        R.id.secondaryCta.takeIf { segmentedPath == SEARCH },
+        R.id.secondaryCta.takeIf { segmentedPathWithAiInput == SEARCH },
     )
     override val showArrow: Boolean = true
     override val wavingDaxSpec = WavingDaxSpec(
@@ -84,7 +84,7 @@ data class DaxEndBrandDesignUpdateBubbleCta(
 
     override fun configureContentViews(view: View) {
         val primaryCtaTextRes: Int
-        if (segmentedPath == SEARCH) {
+        if (segmentedPathWithAiInput == SEARCH) {
             view.findViewById<ImageView>(R.id.brandDesignHeaderImage)?.apply {
                 setImageResource(CommonR.drawable.ic_duckai)
                 isVisible = true
@@ -102,5 +102,5 @@ data class DaxEndBrandDesignUpdateBubbleCta(
         view.findViewById<MaterialButton>(R.id.primaryCta)?.setText(primaryCtaTextRes)
     }
 
-    override fun shouldDropAddressBarFocusWhenShown(): Boolean = segmentedPath == SEARCH
+    override fun shouldDropAddressBarFocusWhenShown(): Boolean = segmentedPathWithAiInput == SEARCH
 }

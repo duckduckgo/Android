@@ -116,82 +116,62 @@ class RealSyncPixelsTest {
     }
 
     @Test
-    fun `when login pixel is fired then pixel is fired`(
-        @TestParameter ui: UiVersion,
-    ) {
-        ui.configure(syncFeature)
-
+    fun `when login pixel is fired then pixel is fired`() {
         testee.fireLoginPixel()
 
         verify(pixel).fire(
             SyncPixelName.SYNC_LOGIN,
             mapOf(
-                SyncPixelParameters.SYNC_SETUP_UI_VERSION to ui.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
             ),
         )
     }
 
     @Test
-    fun `when signup direct pixel is called without source then pixel is fired`(
-        @TestParameter ui: UiVersion,
-    ) {
-        ui.configure(syncFeature)
-
+    fun `when signup direct pixel is called without source then pixel is fired`() {
         testee.fireSignupDirectPixel(source = null)
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SIGNUP_DIRECT,
             mapOf(
-                SyncPixelParameters.SYNC_SETUP_UI_VERSION to ui.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
             ),
         )
     }
 
     @Test
-    fun `when signup direct pixel is called with source then fired pixel includes source`(
-        @TestParameter ui: UiVersion,
-    ) {
-        ui.configure(syncFeature)
-
+    fun `when signup direct pixel is called with source then fired pixel includes source`() {
         testee.fireSignupDirectPixel(source = "foo")
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SIGNUP_DIRECT,
             mapOf(
-                SyncPixelParameters.SYNC_SETUP_UI_VERSION to ui.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "foo",
             ),
         )
     }
 
     @Test
-    fun `when signup connect pixel is called without source then pixel is fired`(
-        @TestParameter ui: UiVersion,
-    ) {
-        ui.configure(syncFeature)
-
+    fun `when signup connect pixel is called without source then pixel is fired`() {
         testee.fireSignupConnectPixel(source = null)
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SIGNUP_CONNECT,
             mapOf(
-                SyncPixelParameters.SYNC_SETUP_UI_VERSION to ui.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
             ),
         )
     }
 
     @Test
-    fun `when signup connect pixel is called with source then fired pixel includes source`(
-        @TestParameter ui: UiVersion,
-    ) {
-        ui.configure(syncFeature)
-
+    fun `when signup connect pixel is called with source then fired pixel includes source`() {
         testee.fireSignupConnectPixel(source = "foo")
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SIGNUP_CONNECT,
             mapOf(
-                SyncPixelParameters.SYNC_SETUP_UI_VERSION to ui.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "foo",
             ),
         )
@@ -200,11 +180,9 @@ class RealSyncPixelsTest {
     @Test
     fun `when barcode screen is shown the pixel is fired`(
         @TestParameter protocol: ProtocolVersion,
-        @TestParameter ui: UiVersion,
         @TestParameter screenType: ScreenType,
     ) {
         protocol.configure(syncFeature)
-        ui.configure(syncFeature)
 
         testee.fireSyncBarcodeScreenShown(screenType)
 
@@ -212,7 +190,7 @@ class RealSyncPixelsTest {
             SyncPixelName.SYNC_SETUP_BARCODE_SCREEN_SHOWN,
             mapOf(
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
-                SyncPixelParameters.SYNC_SETUP_UI_VERSION to ui.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
             ),
@@ -222,11 +200,9 @@ class RealSyncPixelsTest {
     @Test
     fun `when scan code screen is shown the pixel is fired`(
         @TestParameter protocol: ProtocolVersion,
-        @TestParameter ui: UiVersion,
         @TestParameter screenType: ScreenType,
     ) {
         protocol.configure(syncFeature)
-        ui.configure(syncFeature)
 
         testee.fireScanCodeScreenShown(screenType)
 
@@ -234,7 +210,7 @@ class RealSyncPixelsTest {
             SyncPixelName.SYNC_SETUP_SCAN_QR_SCREEN_SHOWN,
             mapOf(
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
-                SyncPixelParameters.SYNC_SETUP_UI_VERSION to ui.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
             ),
@@ -242,13 +218,24 @@ class RealSyncPixelsTest {
     }
 
     @Test
+    fun `when scanner camera permission state is reported then the pixel is fired`() {
+        testee.fireScannerCameraPermissionState(beforeRequesting = false, afterRequesting = true)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SCANNER_CAMERA_PERMISSION_STATE,
+            mapOf(
+                SyncPixelParameters.SYNC_SCANNER_CAMERA_PERMISSION_BEFORE_REQUESTING to "false",
+                SyncPixelParameters.SYNC_SCANNER_CAMERA_PERMISSION_AFTER_REQUESTING to "true",
+            ),
+        )
+    }
+
+    @Test
     fun `when manual code entry screen is shown the pixel is fired`(
         @TestParameter protocol: ProtocolVersion,
-        @TestParameter ui: UiVersion,
         @TestParameter screenType: ScreenType,
     ) {
         protocol.configure(syncFeature)
-        ui.configure(syncFeature)
 
         testee.fireSyncSetupManualCodeScreenShown(screenType)
 
@@ -256,7 +243,7 @@ class RealSyncPixelsTest {
             SyncPixelName.SYNC_SETUP_MANUAL_CODE_ENTRY_SCREEN_SHOWN,
             mapOf(
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
-                SyncPixelParameters.SYNC_SETUP_UI_VERSION to ui.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
             ),
@@ -266,11 +253,9 @@ class RealSyncPixelsTest {
     @Test
     fun `when barcode scanner parses a v1 code then the success pixel carries no code type`(
         @TestParameter protocol: ProtocolVersion,
-        @TestParameter ui: UiVersion,
         @TestParameter screenType: ScreenType,
     ) {
         protocol.configure(syncFeature)
-        ui.configure(syncFeature)
 
         testee.fireBarcodeScannerParseSuccess(screenType, CodeVersion.V1)
 
@@ -278,7 +263,7 @@ class RealSyncPixelsTest {
             SyncPixelName.SYNC_SETUP_BARCODE_SCANNER_SUCCESS,
             mapOf(
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
-                SyncPixelParameters.SYNC_SETUP_UI_VERSION to ui.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
                 SyncPixelParameters.SYNC_SETUP_CODE_VERSION to "v1",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
@@ -289,11 +274,9 @@ class RealSyncPixelsTest {
     @Test
     fun `when barcode scanner parses a v2 recovery code then the success pixel carries the code metadata`(
         @TestParameter protocol: ProtocolVersion,
-        @TestParameter ui: UiVersion,
         @TestParameter screenType: ScreenType,
     ) {
         protocol.configure(syncFeature)
-        ui.configure(syncFeature)
 
         testee.fireBarcodeScannerParseSuccess(screenType, CodeVersion.V2, SyncCodeType.RECOVERY)
 
@@ -301,7 +284,7 @@ class RealSyncPixelsTest {
             SyncPixelName.SYNC_SETUP_BARCODE_SCANNER_SUCCESS,
             mapOf(
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
-                SyncPixelParameters.SYNC_SETUP_UI_VERSION to ui.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
                 SyncPixelParameters.SYNC_SETUP_CODE_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_CODE_TYPE to "recovery",
@@ -313,11 +296,9 @@ class RealSyncPixelsTest {
     @Test
     fun `when a v2 linking code is entered manually then the success pixel carries the code metadata`(
         @TestParameter protocol: ProtocolVersion,
-        @TestParameter ui: UiVersion,
         @TestParameter screenType: ScreenType,
     ) {
         protocol.configure(syncFeature)
-        ui.configure(syncFeature)
 
         testee.fireSyncSetupCodePastedParseSuccess(screenType, CodeVersion.V2, SyncCodeType.LINKING)
 
@@ -325,7 +306,7 @@ class RealSyncPixelsTest {
             SyncPixelName.SYNC_SETUP_MANUAL_CODE_ENTERED_SUCCESS,
             mapOf(
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
-                SyncPixelParameters.SYNC_SETUP_UI_VERSION to ui.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
                 SyncPixelParameters.SYNC_SETUP_CODE_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_CODE_TYPE to "linking",
@@ -337,11 +318,9 @@ class RealSyncPixelsTest {
     @Test
     fun `when a v1 code is entered manually then the success pixel carries no code type`(
         @TestParameter protocol: ProtocolVersion,
-        @TestParameter ui: UiVersion,
         @TestParameter screenType: ScreenType,
     ) {
         protocol.configure(syncFeature)
-        ui.configure(syncFeature)
 
         testee.fireSyncSetupCodePastedParseSuccess(screenType, CodeVersion.V1)
 
@@ -349,7 +328,7 @@ class RealSyncPixelsTest {
             SyncPixelName.SYNC_SETUP_MANUAL_CODE_ENTERED_SUCCESS,
             mapOf(
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
-                SyncPixelParameters.SYNC_SETUP_UI_VERSION to ui.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
                 SyncPixelParameters.SYNC_SETUP_CODE_VERSION to "v1",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
@@ -360,11 +339,9 @@ class RealSyncPixelsTest {
     @Test
     fun `when barcode scanner parse fails without a reason then the pixel is fired`(
         @TestParameter protocol: ProtocolVersion,
-        @TestParameter ui: UiVersion,
         @TestParameter screenType: ScreenType,
     ) {
         protocol.configure(syncFeature)
-        ui.configure(syncFeature)
 
         testee.fireBarcodeScannerParseError(screenType)
 
@@ -372,7 +349,7 @@ class RealSyncPixelsTest {
             SyncPixelName.SYNC_SETUP_BARCODE_SCANNER_FAILED,
             mapOf(
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
-                SyncPixelParameters.SYNC_SETUP_UI_VERSION to ui.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
             ),
@@ -382,11 +359,9 @@ class RealSyncPixelsTest {
     @Test
     fun `when barcode scanner parse fails with a reason then the pixel carries the reason`(
         @TestParameter protocol: ProtocolVersion,
-        @TestParameter ui: UiVersion,
         @TestParameter screenType: ScreenType,
     ) {
         protocol.configure(syncFeature)
-        ui.configure(syncFeature)
 
         testee.fireBarcodeScannerParseError(screenType, reason = SetupFailureReason.UNRECOGNIZED_CODE)
 
@@ -394,7 +369,7 @@ class RealSyncPixelsTest {
             SyncPixelName.SYNC_SETUP_BARCODE_SCANNER_FAILED,
             mapOf(
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
-                SyncPixelParameters.SYNC_SETUP_UI_VERSION to ui.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
                 SyncPixelParameters.SYNC_SETUP_REASON to "unrecognized_code",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
@@ -405,11 +380,9 @@ class RealSyncPixelsTest {
     @Test
     fun `when manual code entry fails without a reason then the pixel is fired`(
         @TestParameter protocol: ProtocolVersion,
-        @TestParameter ui: UiVersion,
         @TestParameter screenType: ScreenType,
     ) {
         protocol.configure(syncFeature)
-        ui.configure(syncFeature)
 
         testee.fireSyncSetupCodePastedParseFailure(screenType)
 
@@ -417,7 +390,7 @@ class RealSyncPixelsTest {
             SyncPixelName.SYNC_SETUP_MANUAL_CODE_ENTERED_FAILED,
             mapOf(
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
-                SyncPixelParameters.SYNC_SETUP_UI_VERSION to ui.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
             ),
@@ -427,11 +400,9 @@ class RealSyncPixelsTest {
     @Test
     fun `when manual code entry fails with a reason then the pixel carries the reason`(
         @TestParameter protocol: ProtocolVersion,
-        @TestParameter ui: UiVersion,
         @TestParameter screenType: ScreenType,
     ) {
         protocol.configure(syncFeature)
-        ui.configure(syncFeature)
 
         testee.fireSyncSetupCodePastedParseFailure(screenType, reason = SetupFailureReason.UNRECOGNIZED_CODE)
 
@@ -439,7 +410,7 @@ class RealSyncPixelsTest {
             SyncPixelName.SYNC_SETUP_MANUAL_CODE_ENTERED_FAILED,
             mapOf(
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
-                SyncPixelParameters.SYNC_SETUP_UI_VERSION to ui.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
                 SyncPixelParameters.SYNC_SETUP_REASON to "unrecognized_code",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
@@ -450,11 +421,9 @@ class RealSyncPixelsTest {
     @Test
     fun `when setup finished without a path then the pixel is fired`(
         @TestParameter protocol: ProtocolVersion,
-        @TestParameter ui: UiVersion,
         @TestParameter screenType: ScreenType,
     ) {
         protocol.configure(syncFeature)
-        ui.configure(syncFeature)
 
         testee.fireSyncSetupFinishedSuccessfully(screenType)
 
@@ -462,7 +431,7 @@ class RealSyncPixelsTest {
             SyncPixelName.SYNC_SETUP_ENDED_SUCCESS,
             mapOf(
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
-                SyncPixelParameters.SYNC_SETUP_UI_VERSION to ui.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
             ),
@@ -472,11 +441,9 @@ class RealSyncPixelsTest {
     @Test
     fun `when setup finished for a recovery path then the pixel carries the path`(
         @TestParameter protocol: ProtocolVersion,
-        @TestParameter ui: UiVersion,
         @TestParameter screenType: ScreenType,
     ) {
         protocol.configure(syncFeature)
-        ui.configure(syncFeature)
 
         testee.fireSyncSetupFinishedSuccessfully(screenType, SetupPath.RECOVERY)
 
@@ -484,7 +451,7 @@ class RealSyncPixelsTest {
             SyncPixelName.SYNC_SETUP_ENDED_SUCCESS,
             mapOf(
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
-                SyncPixelParameters.SYNC_SETUP_UI_VERSION to ui.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
                 SyncPixelParameters.SYNC_SETUP_PATH to "recovery",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
@@ -495,11 +462,9 @@ class RealSyncPixelsTest {
     @Test
     fun `when setup finished for a pairing path then the pixel carries the path role and peer`(
         @TestParameter protocol: ProtocolVersion,
-        @TestParameter ui: UiVersion,
         @TestParameter screenType: ScreenType,
     ) {
         protocol.configure(syncFeature)
-        ui.configure(syncFeature)
 
         testee.fireSyncSetupFinishedSuccessfully(
             screenType,
@@ -512,7 +477,7 @@ class RealSyncPixelsTest {
             SyncPixelName.SYNC_SETUP_ENDED_SUCCESS,
             mapOf(
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
-                SyncPixelParameters.SYNC_SETUP_UI_VERSION to ui.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
                 SyncPixelParameters.SYNC_SETUP_PATH to "pairing",
                 SyncPixelParameters.SYNC_SETUP_MY_ROLE to "host",
@@ -525,11 +490,9 @@ class RealSyncPixelsTest {
     @Test
     fun `when setup failed with path role and peer then all are included in the pixel`(
         @TestParameter protocol: ProtocolVersion,
-        @TestParameter ui: UiVersion,
         @TestParameter screenType: ScreenType,
     ) {
         protocol.configure(syncFeature)
-        ui.configure(syncFeature)
 
         testee.fireSyncSetupFailed(
             screenType,
@@ -543,7 +506,7 @@ class RealSyncPixelsTest {
             SyncPixelName.SYNC_SETUP_ENDED_FAILED,
             mapOf(
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
-                SyncPixelParameters.SYNC_SETUP_UI_VERSION to ui.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
                 SyncPixelParameters.SYNC_SETUP_REASON to "transport_failure",
                 SyncPixelParameters.SYNC_SETUP_PATH to "pairing",
@@ -557,11 +520,9 @@ class RealSyncPixelsTest {
     @Test
     fun `when setup failed without path role and peer then those params are omitted`(
         @TestParameter protocol: ProtocolVersion,
-        @TestParameter ui: UiVersion,
         @TestParameter screenType: ScreenType,
     ) {
         protocol.configure(syncFeature)
-        ui.configure(syncFeature)
 
         testee.fireSyncSetupFailed(screenType, SetupFailureReason.UNEXPECTED_FAILURE)
 
@@ -569,7 +530,7 @@ class RealSyncPixelsTest {
             SyncPixelName.SYNC_SETUP_ENDED_FAILED,
             mapOf(
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
-                SyncPixelParameters.SYNC_SETUP_UI_VERSION to ui.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
                 SyncPixelParameters.SYNC_SETUP_REASON to "unexpected_failure",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
@@ -580,11 +541,9 @@ class RealSyncPixelsTest {
     @Test
     fun `when setup failed for an upgrade required outcome then needs upgrade reason is used`(
         @TestParameter protocol: ProtocolVersion,
-        @TestParameter ui: UiVersion,
         @TestParameter screenType: ScreenType,
     ) {
         protocol.configure(syncFeature)
-        ui.configure(syncFeature)
 
         testee.fireSetupFailed(
             screenType,
@@ -595,7 +554,7 @@ class RealSyncPixelsTest {
             SyncPixelName.SYNC_SETUP_ENDED_FAILED,
             mapOf(
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
-                SyncPixelParameters.SYNC_SETUP_UI_VERSION to ui.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
                 SyncPixelParameters.SYNC_SETUP_REASON to "needs_upgrade",
                 SyncPixelParameters.SYNC_SETUP_PATH to "pairing",
@@ -608,11 +567,9 @@ class RealSyncPixelsTest {
     @Test
     fun `when setup failed for a failed outcome then the reason is mapped and the path forwarded`(
         @TestParameter protocol: ProtocolVersion,
-        @TestParameter ui: UiVersion,
         @TestParameter screenType: ScreenType,
     ) {
         protocol.configure(syncFeature)
-        ui.configure(syncFeature)
 
         testee.fireSetupFailed(
             screenType,
@@ -627,7 +584,7 @@ class RealSyncPixelsTest {
             SyncPixelName.SYNC_SETUP_ENDED_FAILED,
             mapOf(
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
-                SyncPixelParameters.SYNC_SETUP_UI_VERSION to ui.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
                 SyncPixelParameters.SYNC_SETUP_REASON to "invalid_credentials",
                 SyncPixelParameters.SYNC_SETUP_PATH to "recovery",
@@ -647,11 +604,9 @@ class RealSyncPixelsTest {
     @Test
     fun `when setup failed for a session timeout code then session timeout reason is used`(
         @TestParameter protocol: ProtocolVersion,
-        @TestParameter ui: UiVersion,
         @TestParameter screenType: ScreenType,
     ) {
         protocol.configure(syncFeature)
-        ui.configure(syncFeature)
 
         testee.fireSetupFailed(
             screenType,
@@ -662,7 +617,7 @@ class RealSyncPixelsTest {
             SyncPixelName.SYNC_SETUP_ENDED_FAILED,
             mapOf(
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
-                SyncPixelParameters.SYNC_SETUP_UI_VERSION to ui.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
                 SyncPixelParameters.SYNC_SETUP_REASON to "session_timeout",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
@@ -673,11 +628,9 @@ class RealSyncPixelsTest {
     @Test
     fun `when setup failed for a create account failed code then account creation failed reason is used`(
         @TestParameter protocol: ProtocolVersion,
-        @TestParameter ui: UiVersion,
         @TestParameter screenType: ScreenType,
     ) {
         protocol.configure(syncFeature)
-        ui.configure(syncFeature)
 
         testee.fireSetupFailed(
             screenType,
@@ -688,7 +641,7 @@ class RealSyncPixelsTest {
             SyncPixelName.SYNC_SETUP_ENDED_FAILED,
             mapOf(
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
-                SyncPixelParameters.SYNC_SETUP_UI_VERSION to ui.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
                 SyncPixelParameters.SYNC_SETUP_REASON to "account_creation_failed",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
@@ -699,11 +652,9 @@ class RealSyncPixelsTest {
     @Test
     fun `when setup failed for an account upgrade failed code then account upgrade failed reason is used`(
         @TestParameter protocol: ProtocolVersion,
-        @TestParameter ui: UiVersion,
         @TestParameter screenType: ScreenType,
     ) {
         protocol.configure(syncFeature)
-        ui.configure(syncFeature)
 
         testee.fireSetupFailed(
             screenType,
@@ -714,7 +665,7 @@ class RealSyncPixelsTest {
             SyncPixelName.SYNC_SETUP_ENDED_FAILED,
             mapOf(
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
-                SyncPixelParameters.SYNC_SETUP_UI_VERSION to ui.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
                 SyncPixelParameters.SYNC_SETUP_REASON to "account_upgrade_failed",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
@@ -725,11 +676,9 @@ class RealSyncPixelsTest {
     @Test
     fun `when setup failed for an already paired code then already paired reason is used`(
         @TestParameter protocol: ProtocolVersion,
-        @TestParameter ui: UiVersion,
         @TestParameter screenType: ScreenType,
     ) {
         protocol.configure(syncFeature)
-        ui.configure(syncFeature)
 
         testee.fireSetupFailed(
             screenType,
@@ -740,7 +689,7 @@ class RealSyncPixelsTest {
             SyncPixelName.SYNC_SETUP_ENDED_FAILED,
             mapOf(
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
-                SyncPixelParameters.SYNC_SETUP_UI_VERSION to ui.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
                 SyncPixelParameters.SYNC_SETUP_REASON to "already_paired",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
@@ -751,11 +700,9 @@ class RealSyncPixelsTest {
     @Test
     fun `when setup failed for an already connected outcome then already paired reason with pairing path`(
         @TestParameter protocol: ProtocolVersion,
-        @TestParameter ui: UiVersion,
         @TestParameter screenType: ScreenType,
     ) {
         protocol.configure(syncFeature)
-        ui.configure(syncFeature)
 
         // v2 same-account case: both peers exchange intros and discover a matching user_id
         testee.fireSetupFailed(screenType, DispatchOutcome.AlreadyConnected)
@@ -764,7 +711,7 @@ class RealSyncPixelsTest {
             SyncPixelName.SYNC_SETUP_ENDED_FAILED,
             mapOf(
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
-                SyncPixelParameters.SYNC_SETUP_UI_VERSION to ui.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
                 SyncPixelParameters.SYNC_SETUP_REASON to "already_paired",
                 SyncPixelParameters.SYNC_SETUP_PATH to "pairing",
@@ -776,11 +723,9 @@ class RealSyncPixelsTest {
     @Test
     fun `when setup failed with a timeout stage then the pixel includes the timeout stage param`(
         @TestParameter protocol: ProtocolVersion,
-        @TestParameter ui: UiVersion,
         @TestParameter screenType: ScreenType,
     ) {
         protocol.configure(syncFeature)
-        ui.configure(syncFeature)
 
         testee.fireSetupFailed(
             screenType,
@@ -795,7 +740,7 @@ class RealSyncPixelsTest {
             SyncPixelName.SYNC_SETUP_ENDED_FAILED,
             mapOf(
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
-                SyncPixelParameters.SYNC_SETUP_UI_VERSION to ui.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
                 SyncPixelParameters.SYNC_SETUP_REASON to "session_timeout",
                 SyncPixelParameters.SYNC_SETUP_TIMEOUT_STAGE to "waiting_for_confirmation",
@@ -807,11 +752,9 @@ class RealSyncPixelsTest {
     @Test
     fun `when setup failed for a pairing unavailable code then protocol error reason is used`(
         @TestParameter protocol: ProtocolVersion,
-        @TestParameter ui: UiVersion,
         @TestParameter screenType: ScreenType,
     ) {
         protocol.configure(syncFeature)
-        ui.configure(syncFeature)
 
         testee.fireSetupFailed(
             screenType,
@@ -822,7 +765,7 @@ class RealSyncPixelsTest {
             SyncPixelName.SYNC_SETUP_ENDED_FAILED,
             mapOf(
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
-                SyncPixelParameters.SYNC_SETUP_UI_VERSION to ui.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
                 SyncPixelParameters.SYNC_SETUP_REASON to "protocol_error",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
@@ -833,11 +776,9 @@ class RealSyncPixelsTest {
     @Test
     fun `when setup abandoned with a reason then the pixel carries the reason`(
         @TestParameter protocol: ProtocolVersion,
-        @TestParameter ui: UiVersion,
         @TestParameter screenType: ScreenType,
     ) {
         protocol.configure(syncFeature)
-        ui.configure(syncFeature)
 
         testee.fireSyncSetupAbandoned(screenType, CancellationReason.CANCELLED_BEFORE_FINISHED)
 
@@ -845,7 +786,7 @@ class RealSyncPixelsTest {
             SyncPixelName.SYNC_SETUP_ENDED_ABANDONED,
             mapOf(
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
-                SyncPixelParameters.SYNC_SETUP_UI_VERSION to ui.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
                 SyncPixelParameters.SYNC_SETUP_REASON to "cancelled_before_finished",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
@@ -856,11 +797,9 @@ class RealSyncPixelsTest {
     @Test
     fun `when setup abandoned without a reason then the reason is omitted`(
         @TestParameter protocol: ProtocolVersion,
-        @TestParameter ui: UiVersion,
         @TestParameter screenType: ScreenType,
     ) {
         protocol.configure(syncFeature)
-        ui.configure(syncFeature)
 
         testee.fireSyncSetupAbandoned(screenType)
 
@@ -868,7 +807,7 @@ class RealSyncPixelsTest {
             SyncPixelName.SYNC_SETUP_ENDED_ABANDONED,
             mapOf(
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
-                SyncPixelParameters.SYNC_SETUP_UI_VERSION to ui.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
             ),
@@ -878,11 +817,9 @@ class RealSyncPixelsTest {
     @Test
     fun `when setup cancelled if denied for a pairing cancelled code then abandoned pixel fired`(
         @TestParameter protocol: ProtocolVersion,
-        @TestParameter ui: UiVersion,
         @TestParameter screenType: ScreenType,
     ) {
         protocol.configure(syncFeature)
-        ui.configure(syncFeature)
 
         testee.fireSetupCancelledIfDenied(
             screenType,
@@ -893,7 +830,7 @@ class RealSyncPixelsTest {
             SyncPixelName.SYNC_SETUP_ENDED_ABANDONED,
             mapOf(
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
-                SyncPixelParameters.SYNC_SETUP_UI_VERSION to ui.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
                 SyncPixelParameters.SYNC_SETUP_REASON to "sync_confirmation_denied",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
@@ -904,11 +841,9 @@ class RealSyncPixelsTest {
     @Test
     fun `when setup cancelled if denied for a peer rejection code then abandoned pixel fired`(
         @TestParameter protocol: ProtocolVersion,
-        @TestParameter ui: UiVersion,
         @TestParameter screenType: ScreenType,
     ) {
         protocol.configure(syncFeature)
-        ui.configure(syncFeature)
 
         testee.fireSetupCancelledIfDenied(
             screenType,
@@ -919,7 +854,7 @@ class RealSyncPixelsTest {
             SyncPixelName.SYNC_SETUP_ENDED_ABANDONED,
             mapOf(
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to protocol.value,
-                SyncPixelParameters.SYNC_SETUP_UI_VERSION to ui.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to screenType.value,
                 SyncPixelParameters.SYNC_SETUP_REASON to "sync_confirmation_denied",
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
@@ -967,10 +902,7 @@ class RealSyncPixelsTest {
     }
 
     @Test
-    fun `when rescope token error pixel is fired then it carries the error`(
-        @TestParameter ui: UiVersion,
-    ) {
-        ui.configure(syncFeature)
+    fun `when rescope token error pixel is fired then it carries the error`() {
         val error = Error(code = 401, reason = "unauthorized")
 
         testee.fireSyncAccountErrorPixel(error, SyncAccountOperation.RESCOPE_TOKEN)
@@ -978,7 +910,7 @@ class RealSyncPixelsTest {
         verify(pixel).fire(
             SyncPixelName.SYNC_RESCOPE_TOKEN_FAILURE,
             mapOf(
-                SyncPixelParameters.SYNC_SETUP_UI_VERSION to ui.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.ERROR_CODE to "401",
                 SyncPixelParameters.ERROR_REASON to "unauthorized",
             ),
@@ -1038,98 +970,75 @@ class RealSyncPixelsTest {
     }
 
     @Test
-    fun `when sync settings shown then the pixel is fired`(
-        @TestParameter ui: UiVersion,
-    ) {
-        ui.configure(syncFeature)
-
+    fun `when sync settings shown then the pixel is fired`() {
         testee.fireSyncSettingsShown()
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SETTINGS_SCREEN_SHOWN,
             mapOf(
-                SyncPixelParameters.SYNC_SETUP_UI_VERSION to ui.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
             ),
         )
     }
 
     @Test
-    fun `when backup this device tapped then the pixel is fired`(
-        @TestParameter ui: UiVersion,
-    ) {
-        ui.configure(syncFeature)
-
+    fun `when backup this device tapped then the pixel is fired`() {
         testee.fireBackupThisDeviceTapped()
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SETTINGS_BACK_UP_THIS_DEVICE_TAPPED,
             mapOf(
-                SyncPixelParameters.SYNC_SETUP_UI_VERSION to ui.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
             ),
         )
     }
 
     @Test
-    fun `when recover sync data tapped then the pixel is fired`(
-        @TestParameter ui: UiVersion,
-    ) {
-        ui.configure(syncFeature)
-
+    fun `when recover sync data tapped then the pixel is fired`() {
         testee.fireRecoverSyncDataTapped()
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SETTINGS_RECOVER_SYNC_DATA_TAPPED,
             mapOf(
-                SyncPixelParameters.SYNC_SETUP_UI_VERSION to ui.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
             ),
         )
     }
 
     @Test
-    fun `when recover sync data confirmed then the pixel is fired`(
-        @TestParameter ui: UiVersion,
-    ) {
-        ui.configure(syncFeature)
-
+    fun `when recover sync data confirmed then the pixel is fired`() {
         testee.fireRecoverSyncDataConfirmed()
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SETTINGS_RECOVER_SYNC_DATA_CONFIRMED,
             mapOf(
-                SyncPixelParameters.SYNC_SETUP_UI_VERSION to ui.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
             ),
         )
     }
 
     @Test
-    fun `when another device prompt shown then the pixel is fired`(
-        @TestParameter ui: UiVersion,
-    ) {
-        ui.configure(syncFeature)
-
+    fun `when another device prompt shown then the pixel is fired`() {
         testee.fireSyncAnotherDevicePromptShown()
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SETUP_ANOTHER_DEVICE_PROMPT_SHOWN,
             mapOf(
-                SyncPixelParameters.SYNC_SETUP_UI_VERSION to ui.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
             ),
         )
     }
 
     @Test
     fun `when another device prompt option tapped then the pixel carries the option`(
-        @TestParameter ui: UiVersion,
         @TestParameter option: AnotherDevicePromptOption,
     ) {
-        ui.configure(syncFeature)
-
         testee.fireSyncAnotherDevicePromptOptionTapped(option)
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SETUP_ANOTHER_DEVICE_PROMPT_OPTION_TAPPED,
             mapOf(
-                SyncPixelParameters.SYNC_SETUP_UI_VERSION to ui.value,
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.OPTION to option.value,
             ),
         )
@@ -1256,22 +1165,6 @@ class RealSyncPixelsTest {
                 ProtocolV2 -> true
             }
             syncFeature.canUseV2ConnectFlow().setRawStoredState(State(isEnabled))
-        }
-    }
-
-    enum class UiVersion(
-        val value: String,
-    ) {
-        UiV1("v1"),
-        UiV2("v2"),
-        ;
-
-        fun configure(syncFeature: SyncFeature) {
-            val isEnabled = when (this) {
-                UiV1 -> false
-                UiV2 -> true
-            }
-            syncFeature.useSimplifiedSync().setRawStoredState(State(isEnabled))
         }
     }
 }

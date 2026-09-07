@@ -37,6 +37,8 @@ import androidx.core.view.updateLayoutParams
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.RenderMode
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.omnibar.resolveRebrandPrivacyShieldLayout
+import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
@@ -98,14 +100,15 @@ class AddressBarTrackersAnimator @Inject constructor(
         } else {
             RenderMode.AUTOMATIC
         }
-        if (addressBarRebrandEnabled) {
-            val boxSize = addressBarTrackersBlockedAnimationShieldIcon.resources.getDimensionPixelSize(CommonR.dimen.toolbarIcon)
+        resolveRebrandPrivacyShieldLayout(PROTECTED, addressBarRebrandEnabled)?.let { shieldLayout ->
+            val boxSize = shieldLayout.slotSizeDp.toPx(context)
             addressBarTrackersBlockedAnimationShieldIcon.setAnimation(R.raw.shield_color_24)
             addressBarTrackersBlockedAnimationShieldIcon.updateLayoutParams<ViewGroup.MarginLayoutParams> {
                 width = boxSize
                 height = boxSize
-                marginStart = 2.toPx(context)
+                marginStart = 0
             }
+            addressBarTrackersBlockedAnimationShieldIcon.setPadding(0, 0, 0, 0)
             addressBarTrackersBlockedAnimationShieldIcon.scaleType = ImageView.ScaleType.FIT_CENTER
         }
         addressBarTrackersBlockedAnimationShieldIcon.show()

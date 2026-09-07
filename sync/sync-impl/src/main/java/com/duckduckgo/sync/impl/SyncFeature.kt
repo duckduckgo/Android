@@ -98,13 +98,13 @@ interface SyncFeature {
     /**
      * Global switch for the v2.1 exchange protocol.
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun canUseExchangeV2Point1(): Toggle
 
     /**
      * Kill switch for sending the exchange channel secret as the `Authorization` header on the v2.0
      * exchange relay endpoints. Independent of [canUseExchangeV2Point1] so the header can be turned
-     * on (or off) without moving the protocol version. See [authenticateExchangeEndpoints].
+     * on (or off) without moving the protocol version.
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun canSendExchangeChannelSecret(): Toggle
@@ -117,25 +117,19 @@ interface SyncFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun restrictScannedBarcodesToQrTypes(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun useSimplifiedSync(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun updateSyncActivityViewStateAtomically(): Toggle
-
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun preventStaleTokenLogout(): Toggle
 
     /**
      * Gates writing `device_info`
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun canWriteUnifiedDeviceList(): Toggle
 
     /**
      * Gates reading from `device_info`
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun canReadUnifiedDeviceList(): Toggle
 
     /**
@@ -156,10 +150,3 @@ interface SyncFeature {
  */
 internal fun SyncFeature.canWriteDeviceInfo(): Boolean =
     canUseV2ConnectFlow().isEnabled() && canWriteUnifiedDeviceList().isEnabled()
-
-/**
- * The v2.1 protocol requires the channel secret on every exchange relay call, so speaking v2.1 implies authenticating.
- * [SyncFeature.canSendExchangeChannelSecret] lets the header be enabled ahead of (or independently of) that version bump.
- */
-internal fun SyncFeature.authenticateExchangeEndpoints(): Boolean =
-    canSendExchangeChannelSecret().isEnabled() || canUseExchangeV2Point1().isEnabled()

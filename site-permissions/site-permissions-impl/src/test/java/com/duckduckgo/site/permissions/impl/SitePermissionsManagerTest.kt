@@ -161,7 +161,7 @@ class SitePermissionsManagerTest {
             mapOf(
                 SitePermissionsPixelParameters.PERMISSION_TYPE to SitePermissionsPixelValues.DRM,
                 SitePermissionsPixelParameters.REASON to SitePermissionsPixelValues.ALLOW_LIST,
-                SitePermissionsPixelParameters.PETAL to SitePermissionsPetalValues.RANDOMIZE,
+                Pixel.PixelParameter.PETAL to Pixel.PixelValues.PETAL_RANDOMIZE,
             ),
         )
     }
@@ -184,7 +184,7 @@ class SitePermissionsManagerTest {
             mapOf(
                 SitePermissionsPixelParameters.PERMISSION_TYPE to SitePermissionsPixelValues.DRM,
                 SitePermissionsPixelParameters.REASON to SitePermissionsPixelValues.PROTECTIONS_OFF,
-                SitePermissionsPixelParameters.PETAL to SitePermissionsPetalValues.RANDOMIZE,
+                Pixel.PixelParameter.PETAL to Pixel.PixelValues.PETAL_RANDOMIZE,
             ),
         )
     }

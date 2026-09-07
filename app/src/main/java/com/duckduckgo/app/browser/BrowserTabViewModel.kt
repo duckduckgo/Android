@@ -385,6 +385,8 @@ import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadStatus
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
+import com.duckduckgo.duckchat.api.DuckAiSessionCallback
+import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
@@ -615,6 +617,7 @@ class BrowserTabViewModel @Inject constructor(
     private val suggestRedirectEvaluator: SuggestRedirectEvaluator,
     private val badUrlErrorPageWideEvent: BadUrlErrorPageWideEvent,
     private val customErrorPagesFeature: CustomErrorPagesFeature,
+    private val duckAiSessionCallback: DuckAiSessionCallback,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -1981,13 +1984,17 @@ class BrowserTabViewModel @Inject constructor(
         val hasSourceTab = tabRepository.liveSelectedTab.value?.sourceTabId != null
 
         if (isNavigationToEmptyUrlFromParent(hasSourceTab, isCustomTab)) {
+            recordPendingDuckAiBackExit()
             viewModelScope.launch {
                 removeCurrentTabFromRepository()
             }
             return true
         }
 
-        val navigation = webNavigationState ?: return false
+        val navigation = webNavigationState ?: run {
+            recordPendingDuckAiBackExit()
+            return false
+        }
 
         if (currentFindInPageViewState().visible) {
             dismissFindInView()
@@ -2005,19 +2012,23 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         if (!currentBrowserViewState().browserShowing) {
+            recordPendingDuckAiBackExit()
             return false
         }
 
         if (navigation.canGoBack) {
             badUrlErrorPageWideEvent.onBadUrlErrorPageExited(tabId)
+            recordPendingDuckAiBackExit()
             command.value = NavigationCommand.NavigateBack(navigation.stepsToPreviousPage)
             return true
         } else if (hasSourceTab && !isCustomTab) {
+            recordPendingDuckAiBackExit()
             viewModelScope.launch {
                 removeCurrentTabFromRepository()
             }
             return true
         } else if (!skipHome && !isCustomTab) {
+            recordPendingDuckAiBackExit()
             navigateHome()
             return true
         }
@@ -2026,7 +2037,20 @@ class BrowserTabViewModel @Inject constructor(
             logcat { "User pressed back and tab is set to skip home; need to generate WebView preview now" }
             command.value = GenerateWebViewPreviewImage
         }
+        recordPendingDuckAiBackExit()
         return false
+    }
+
+    private fun recordPendingDuckAiBackExit() {
+        duckAiSessionCallback.onExitIntent(tabId, DuckAiSessionExitTrigger.BACK_OR_CLOSE)
+    }
+
+    fun recordPendingNewTabOpenedExit() {
+        duckAiSessionCallback.onExitIntent(tabId, DuckAiSessionExitTrigger.NEW_TAB_OPENED)
+    }
+
+    fun recordPendingFireTabOpenedExit() {
+        duckAiSessionCallback.onExitIntent(tabId, DuckAiSessionExitTrigger.FIRE_TAB_OPENED)
     }
 
     private fun isNavigationToEmptyUrlFromParent(
@@ -2708,6 +2732,9 @@ class BrowserTabViewModel @Inject constructor(
         url?.let {
             if (duckChat.isDuckChatUrl(Uri.parse(it))) {
                 command.value = Command.EnableDuckAIFullScreen(currentBrowserViewState())
+                if (isActiveTab()) {
+                    duckAiSessionCallback.onDuckAiPageVisible(tabId, it)
+                }
             } else {
                 command.value = Command.DuckAIFullScreenDisabled(url)
             }
@@ -3465,6 +3492,7 @@ class BrowserTabViewModel @Inject constructor(
                     command.value = LaunchSubscription(requiredAction.url.toUri())
                     return true
                 }
+                duckAiSessionCallback.onExitIntent(tabId, DuckAiSessionExitTrigger.NEW_TAB_OPENED)
                 command.value = GenerateWebViewPreviewImage
                 command.value = OpenInNewTab(query = requiredAction.url, sourceTabId = tabId)
                 true
@@ -3475,6 +3503,7 @@ class BrowserTabViewModel @Inject constructor(
                     command.value = LaunchSubscription(requiredAction.url.toUri())
                     return true
                 }
+                duckAiSessionCallback.onExitIntent(tabId, DuckAiSessionExitTrigger.FIRE_TAB_OPENED)
                 command.value = GenerateWebViewPreviewImage
                 command.value = OpenInFireTab(
                     query = requiredAction.url,
@@ -3935,7 +3964,7 @@ class BrowserTabViewModel @Inject constructor(
     fun onUserClickCtaSecondaryButton(cta: Cta) {
         releaseAddWidgetModalSlot(cta)
         viewModelScope.launch {
-            ctaViewModel.onUserDismissedCta(cta)
+            ctaViewModel.onUserDismissedCta(cta, viaSkipBtn = true)
             if (cta is BrokenSitePromptDialogCta) {
                 onBrokenSiteCtaDismissButtonClicked(cta)
             }
@@ -5539,7 +5568,7 @@ class BrowserTabViewModel @Inject constructor(
                 refresh()
             }
             is DaxEndBrandDesignUpdateBubbleCta -> {
-                if (cta.segmentedPath == SegmentedOnboardingPath.SEARCH) {
+                if (cta.segmentedPathWithAiInput == SegmentedOnboardingPath.SEARCH) {
                     viewModelScope.launch {
                         ctaViewState.value = currentCtaViewState().copy(cta = null)
                         command.value = HideOnboardingDaxBubbleCta(cta)
@@ -5779,6 +5808,7 @@ class BrowserTabViewModel @Inject constructor(
         // onInputSubmitted() too: an in-chat follow-up is still "the bar was used" for the old
         // post-idle-session event, which only listens for that generic signal.
         browserInteractionsPlugins.getPlugins().forEach { it.onInputSubmitted() }
+        duckAiSessionCallback.onPromptSubmitted(tabId)
         viewModelScope.launch(dispatchers.io()) {
             // The chat was already open, so its entry point was recorded when it was first navigated to.
             val source = duckAiTabSessionRepository.getEntryPointSource(tabId)
@@ -5803,6 +5833,7 @@ class BrowserTabViewModel @Inject constructor(
     fun openNewDuckChat(viewMode: ViewMode) {
         if (viewMode == ViewMode.DuckAI) {
             pixel.fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_NEW_CHAT_TAPPED)
+            duckAiSessionCallback.onNewChatCreated(tabId)
             viewModelScope.launch {
                 val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT)
                 _subscriptionEventDataChannel.send(subscriptionEvent)

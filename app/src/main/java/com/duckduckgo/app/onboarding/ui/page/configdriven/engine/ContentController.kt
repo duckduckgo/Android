@@ -56,13 +56,15 @@ interface ContentController {
 class ContentControllerImpl(
     private val binding: PreOnboardingDaxDialogCtaBrandDesignUpdateBinding,
     private val contentValues: ContentValueStore,
+    private val onContentBound: (LinearOnboardingStepId, ContentConfig) -> Unit,
     isLightMode: () -> Boolean,
+    isAddressBarRebrandEnabled: () -> Boolean,
 ) : ContentController {
 
     private val comparisonChart = ComparisonChartBinder(binding.comparisonChartContent)
     private val addressBar = AddressBarBinder(binding.addressBarContent, isLightMode)
     private val inputScreen = InputScreenBinder(binding.inputScreenContent, isLightMode)
-    private val inputScreenPreview = InputScreenPreviewBinder(binding.inputScreenPreviewContent)
+    private val inputScreenPreview = InputScreenPreviewBinder(binding.inputScreenPreviewContent, isAddressBarRebrandEnabled)
     private val quickSetup = QuickSetupBinder(binding.reinstallerQuickSetupContent)
     private val welcome = WelcomeBinder(binding.welcomeContent)
     private val addToDock = AddToDockBinder(binding.addToDockContent)
@@ -93,6 +95,7 @@ class ContentControllerImpl(
         content: ContentConfig,
         scope: BindScope,
     ): ContentHandle {
+        onContentBound(stepId, content)
         val handle = when (content) {
             is ContentConfig.Welcome -> {
                 boundView = welcome.view

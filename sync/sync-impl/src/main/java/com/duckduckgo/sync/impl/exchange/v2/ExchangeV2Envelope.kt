@@ -24,9 +24,12 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
 /**
- * Wire-level envelope wrapping for relay messages. The outer object is `{version, payload}`
- * with [version] unencrypted (used for protocol version negotiation) and [payload] a JWE
- * compact string carrying the encrypted message JSON.
+ * Wire-level envelope wrapping for relay messages, converting between an [ExchangeV2Message] and the
+ * `{version, payload}` object the relay carries.
+ *
+ * [ExchangeEnvelope.version] travels unencrypted, so a peer can tell whether it can read an envelope
+ * before trying to; [ExchangeEnvelope.payload] is a JWE compact string carrying the encrypted
+ * message JSON. The relay sees only the version, never the message.
  *
  * Spec: Transport TD (Asana 1214486492252757) §Message Envelope + §Encryption.
  *  - alg = RSA-OAEP-256 (wraps an ephemeral A256GCM key)
@@ -43,8 +46,11 @@ interface ExchangeV2Envelope {
 
     /**
      * Decrypt an inbound envelope with our ephemeral private key, returning the inner message JSON.
+     * Parsing that JSON into a message is [ExchangeV2MessageParser]'s job, not this one's.
      *
      * @throws EnvelopeVersionTooNew if the envelope's major version is higher than ours.
+     * @throws IllegalArgumentException if the version is malformed, or is a v1 envelope on a v2
+     *  channel, neither of which a peer following the spec can produce.
      */
     fun open(envelope: ExchangeEnvelope, ownPrivateKeyBase64: String): String
 }
@@ -55,8 +61,9 @@ class EnvelopeVersionTooNew(val version: ExchangeProtocolVersion) : RuntimeExcep
 )
 
 /**
- * Thrown when an envelope's payload can't be decrypted or parsed. Permanent (the same bytes
- * fail identically on retry), so the runner treats it as terminal rather than retrying.
+ * Thrown when an envelope's payload can't be decrypted or parsed. Raised by the channel, which knows
+ * the [seq] of the entry that failed. Permanent (the same bytes fail identically on retry), so the
+ * runner treats it as terminal rather than retrying.
  */
 class EnvelopeDecryptFailure(val seq: Int, cause: Throwable) : RuntimeException(
     "Failed to decrypt envelope seq=$seq: ${cause.message}",

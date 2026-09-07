@@ -139,7 +139,7 @@ constructor(
         val blockStoreCurrentValueText: String = "Loading...",
         val canUseV2ConnectFlowEnabled: Boolean = false,
         val canShowV2ConnectCodeEnabled: Boolean = false,
-        val canUseExchangeV2Point1: Boolean = false,
+        val canUseExchangeV2Point1Enabled: Boolean = false,
         val checkLinkingCodeResult: String = "",
         val accessCredentialsText: String = "",
         val scopedTokenResult: String = "",
@@ -348,7 +348,7 @@ constructor(
                 environment = syncEnvDataStore.syncEnvironmentUrl,
                 canUseV2ConnectFlowEnabled = syncFeature.canUseV2ConnectFlow().isEnabled(),
                 canShowV2ConnectCodeEnabled = syncFeature.canShowV2ConnectCode().isEnabled(),
-                canUseExchangeV2Point1 = syncFeature.canUseExchangeV2Point1().isEnabled(),
+                canUseExchangeV2Point1Enabled = syncFeature.canUseExchangeV2Point1().isEnabled(),
                 v2StoreFieldsText = buildV2StoreFieldsText(),
                 // Clear per-session dev-tool results once signed out so stale keys aren't shown.
                 keysText = if (accountInfo.isSignedIn) viewState.value.keysText else "",

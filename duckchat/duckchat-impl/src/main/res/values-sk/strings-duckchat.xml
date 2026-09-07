@@ -344,10 +344,12 @@
     <string name="duckAiSettingsTitle">Nastavenia Duck.ai</string>
 
     <!-- File/image attachment menu options -->
-    <string name="duckChatContextualAskAboutPage">Opýtaj sa na stránku</string>
 
     <!-- Editing a message already sent to Duck.ai -->
     <string name="duck_ai_edit_prompt_title" instruction="Screen title: the user is editing a message they already sent to Duck.ai">Upraviť správu</string>
     <string name="duck_ai_edit_prompt_lose_responses_warning" instruction="Warning shown while editing a sent message: the answer Duck.ai already gave will be discarded and answered again">Upravením sa odpoveď nahradí novou.</string>
 
+    <string name="duckChatContextualAskAboutPage">Opýtaj sa na stránku</string>
+    <string name="duckChatContextualAskAboutSearch">Pokračovať v Duck.ai</string>
+    <string name="duckChatContextualOpenDuckAi">Otvoriť Duck.ai</string>
 </resources>

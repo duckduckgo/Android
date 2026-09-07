@@ -39,8 +39,4 @@
     <!-- Duck.ai on/off, shown in the onboarding Duck.ai state choice -->
     <string name="duckChatOnboardingDuckAiStateOn">Turn Duck.ai On</string>
     <string name="duckChatOnboardingDuckAiStateOff">Keep Duck.ai Off</string>
-
-    <string name="duckChatContextualAskAboutSearch">Ask About Search</string>
-    <string name="duckChatContextualOpenDuckAi">Open Duck.ai</string>
-
 </resources>

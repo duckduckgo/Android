@@ -223,17 +223,6 @@
 
     <issue
         id="DenyListedApi"
-        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
-        errorLine1="        return appBuildConfig.sdkInt >= Build.VERSION_CODES.R"
-        errorLine2="                                        ~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/sync/impl/StoragePermissionRequest.kt"
-            line="84"
-            column="41"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
         message="Use com.duckduckgo.data.store.api.SharedPreferencesProvider instead"
         errorLine1="    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }"
         errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
@@ -799,7 +788,7 @@
         errorLine1="    &lt;LinearLayout"
         errorLine2="     ~~~~~~~~~~~~">
         <location
-            file="src/main/res/layout/view_recovery_code.xml"
+            file="src/main/res/layout/view_recovery_code_pdf.xml"
             line="142"
             column="6"/>
     </issue>

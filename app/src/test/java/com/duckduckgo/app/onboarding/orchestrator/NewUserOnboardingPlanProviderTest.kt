@@ -30,6 +30,7 @@ import com.duckduckgo.app.onboarding.DuckAiOnboardingDemo
 import com.duckduckgo.app.onboarding.FakeOnboardingSingleChoiceDataPlugin
 import com.duckduckgo.app.onboarding.OnboardingInputScreenLaunchTarget
 import com.duckduckgo.app.onboarding.OnboardingPasswordImportExperimentManager
+import com.duckduckgo.app.onboarding.OnboardingPasswordImportExperimentManager.OnboardingPasswordImportVariant
 import com.duckduckgo.app.onboarding.OnboardingPreference
 import com.duckduckgo.app.onboarding.OnboardingPreferenceCatalog
 import com.duckduckgo.app.onboarding.OnboardingPromptsExperimentManager
@@ -51,8 +52,16 @@ import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SKIP_ONBOARDING_PRES
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SYNC_RESTORE_TAPPED_UNIQUE
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_ADDRESS_BAR_POSITION
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_AI_INTRO
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_DOWNLOAD_CHOICE
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_FIRE_BUTTON
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_NOTIFICATIONS
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_PASSWORD_IMPORT
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_PREFERENCES_AD_BLOCKING
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_PREFERENCES_AI_MODEL
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_PREFERENCES_AI_SEARCH
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_PREFERENCES_AI_TOGGLE_MODE
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_PREFERENCES_DUCK_AI
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_PREFERENCES_SERP
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_QUICK_SETUP
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SEARCH_CHAT_TOGGLE
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SEARCH_EXPERIENCE
@@ -129,7 +138,7 @@ class NewUserOnboardingPlanProviderTest {
         id = OnboardingSingleChoiceDataPlugin.Id.DuckAiNewTabTogglePosition,
         options = togglePositionOptions,
     )
-    private val duckAiStateOptions = listOf(TestOption("duck_ai_on"), TestOption("duck_ai_off"))
+    private val duckAiStateOptions = listOf(TestOption("on"), TestOption("off"))
     private val duckAiStatePlugin = FakeOnboardingSingleChoiceDataPlugin(
         id = OnboardingSingleChoiceDataPlugin.Id.DuckAiState,
         options = duckAiStateOptions,
@@ -140,8 +149,6 @@ class NewUserOnboardingPlanProviderTest {
         override suspend fun getPlugins(): Collection<OnboardingSingleChoiceDataPlugin> = singleChoicePlugins
     }
 
-    // Password import is off in these tests: its steps are then left out of the plan entirely, so every
-    // existing step-order and indicator expectation below is unaffected by the feature.
     private val passwordImportExperiment: OnboardingPasswordImportExperimentManager = mock()
 
     private lateinit var provider: NewUserOnboardingPlanProvider
@@ -203,6 +210,9 @@ class NewUserOnboardingPlanProviderTest {
         assertTrue("expected InProgress on '$id' but was $state", state is InProgress)
         assertEquals(id, (state as InProgress).currentStep.id)
     }
+
+    private suspend fun currentDialog(): NewUserOnboardingActivityDialog =
+        ((orchestrator.state.value as InProgress).currentStep as NewUserOnboardingActivityStep).resolveDialog()
 
     private fun assertStepProgress(current: Int, total: Int) {
         assertEquals(StepProgress(current = current, total = total), (orchestrator.state.value as InProgress).stepIndicatorProgress())
@@ -1111,7 +1121,7 @@ class NewUserOnboardingPlanProviderTest {
     fun `when a new onboarding run starts then any persisted branch selection is cleared`() = runTest {
         start()
 
-        verify(onboardingPixelSender).clearBranchSelection()
+        verify(onboardingPixelSender).clearFlowAttribution()
     }
 
     @Test
@@ -1746,6 +1756,245 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     // endregion
+
+    private suspend fun startAtPasswordImportLaunch() {
+        whenever(passwordImportExperiment.enroll()).thenReturn(OnboardingPasswordImportVariant.TREATMENT)
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
+        orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
+        assertStep(NewUserOnboardingStepIds.PASSWORD_IMPORT)
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportRequested)
+        assertStep(NewUserOnboardingStepIds.PASSWORD_IMPORT_LAUNCH)
+    }
+
+    @Test
+    fun `when the password import fails transiently then goes back to the import step`() = runTest {
+        startAtPasswordImportLaunch()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.TRANSIENT_ERROR))
+
+        assertStep(NewUserOnboardingStepIds.PASSWORD_IMPORT)
+    }
+
+    @Test
+    fun `when the import is requested again after a transient failure then returns to the launch step`() = runTest {
+        startAtPasswordImportLaunch()
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.TRANSIENT_ERROR))
+
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportRequested)
+
+        assertStep(NewUserOnboardingStepIds.PASSWORD_IMPORT_LAUNCH)
+    }
+
+    @Test
+    fun `when the import is skipped after a transient failure then skips past the import and its outcome step`() = runTest {
+        startAtPasswordImportLaunch()
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.TRANSIENT_ERROR))
+
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportSkipped)
+
+        assertStep(NewUserOnboardingStepIds.ADDRESS_BAR_POSITION)
+    }
+
+    @Test
+    fun `when the password import fails permanently then advances to the outcome step`() = runTest {
+        startAtPasswordImportLaunch()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.PERMANENT_ERROR))
+
+        assertStep(NewUserOnboardingStepIds.PASSWORD_IMPORT_COMPLETE)
+    }
+
+    @Test
+    fun `when the import outcome is reported more than once then reports it to telemetry once`() = runTest {
+        startAtPasswordImportLaunch()
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.SUCCESS))
+        assertStep(NewUserOnboardingStepIds.PASSWORD_IMPORT_COMPLETE)
+
+        // The outcome card resolves itself every time it is presented, so it can report an outcome it already reported.
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportParsed(PasswordImportResult.Terminal.Imported(imported = 3, skipped = 1)))
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportParsed(PasswordImportResult.Terminal.Imported(imported = 3, skipped = 1)))
+
+        verify(onboardingPixelSender).fire(
+            ONBOARDING_PASSWORD_IMPORT,
+            OnboardingPixelAction.PasswordImportConfirmed(PasswordImportOutcome.SUCCESS),
+        )
+    }
+
+    @Test
+    fun `when the import outcome is reported then the outcome step seeds its card with it`() = runTest {
+        startAtPasswordImportLaunch()
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.SUCCESS))
+        assertEquals(
+            NewUserOnboardingActivityDialog.ImportComplete(PasswordImportResult.InProgress),
+            currentDialog(),
+        )
+
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportParsed(PasswordImportResult.Terminal.Imported(imported = 3, skipped = 1)))
+
+        // Seeds a card rebuilt after this one is gone, rather than leaving it to look like an import in flight.
+        assertEquals(
+            NewUserOnboardingActivityDialog.ImportComplete(PasswordImportResult.Terminal.Imported(imported = 3, skipped = 1)),
+            currentDialog(),
+        )
+    }
+
+    @Test
+    fun `when the password import fails permanently then the outcome step seeds its card as failed`() = runTest {
+        startAtPasswordImportLaunch()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.PERMANENT_ERROR))
+
+        assertEquals(NewUserOnboardingActivityDialog.ImportComplete(PasswordImportResult.Terminal.Failed), currentDialog())
+    }
+
+    // region segmented onboarding pixels
+
+    @Test
+    fun `when the segmented plan is built then the flow is attributed to the download reason`() = runTest {
+        startSegmentedAtDownloadReason()
+
+        verify(onboardingPixelSender).segmentedFlowStarted()
+    }
+
+    @Test
+    fun `when the download reason step is presented then fires DownloadChoiceShown pixel`() = runTest {
+        startSegmentedAtDownloadReason()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.Presented)
+
+        verify(onboardingPixelSender).fire(ONBOARDING_DOWNLOAD_CHOICE, OnboardingPixelAction.Shown)
+    }
+
+    @Test
+    fun `when a download reason is confirmed then the clicked pixel fires and the variant is established`() = runTest {
+        startSegmentedAtDownloadReason()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.BLOCK_ADS))
+
+        verify(onboardingPixelSender).fire(
+            ONBOARDING_DOWNLOAD_CHOICE,
+            OnboardingPixelAction.DownloadReasonClicked(DownloadReasonSelection.BLOCK_ADS),
+        )
+        verify(onboardingPixelSender).downloadReasonSelected(DownloadReasonSelection.BLOCK_ADS)
+    }
+
+    @Test
+    fun `when the search path preferences are confirmed then fires the serp preferences pixel`() = runTest {
+        val selections = mapOf(
+            OnboardingPreference.SEARCH_HISTORY to true,
+            OnboardingPreference.SAFE_SEARCH to false,
+        )
+        whenever(onboardingPreferenceCatalog.offer(any())).thenReturn(
+            listOf(
+                preferenceRow(OnboardingPreference.SEARCH_HISTORY, initiallyEnabled = true),
+                preferenceRow(OnboardingPreference.SAFE_SEARCH, initiallyEnabled = true),
+            ),
+        )
+        startSegmentedAtDownloadReason()
+        orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.SEARCH))
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
+        orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
+        assertStep(NewUserOnboardingStepIds.PREFERENCE_SELECTOR)
+        orchestrator.onEvent(NewUserOnboardingEvent.Presented)
+
+        orchestrator.onEvent(NewUserOnboardingEvent.PreferenceSelectorConfirmed(selections))
+
+        verify(onboardingPixelSender).fire(ONBOARDING_PREFERENCES_SERP, OnboardingPixelAction.Shown)
+        verify(onboardingPixelSender).fire(ONBOARDING_PREFERENCES_SERP, OnboardingPixelAction.PreferencesClicked(selections))
+    }
+
+    @Test
+    fun `when the no ai path preferences are confirmed then fires the ai search preferences pixel`() = runTest {
+        val selections = mapOf(
+            OnboardingPreference.SEARCH_ASSIST to true,
+            OnboardingPreference.HIDE_AI_GENERATED_IMAGES to false,
+        )
+        whenever(onboardingPreferenceCatalog.offer(any())).thenReturn(
+            listOf(
+                preferenceRow(OnboardingPreference.SEARCH_ASSIST, initiallyEnabled = true),
+                preferenceRow(OnboardingPreference.HIDE_AI_GENERATED_IMAGES, initiallyEnabled = false),
+            ),
+        )
+        startSegmentedAtDuckAiState()
+        assertStep(NewUserOnboardingStepIds.PREFERENCE_SELECTOR)
+
+        orchestrator.onEvent(NewUserOnboardingEvent.PreferenceSelectorConfirmed(selections))
+
+        verify(onboardingPixelSender).fire(ONBOARDING_PREFERENCES_AI_SEARCH, OnboardingPixelAction.PreferencesClicked(selections))
+    }
+
+    @Test
+    fun `when the ad blocking path preferences are confirmed then fires the ad blocking preferences pixel`() = runTest {
+        val selections = mapOf(
+            OnboardingPreference.BLOCK_ADS to true,
+            OnboardingPreference.REJECT_OPTIONAL_COOKIES to true,
+            OnboardingPreference.ACCEPT_NON_OPT_OUT_COOKIES to false,
+        )
+        whenever(onboardingPreferenceCatalog.offer(any())).thenReturn(
+            listOf(
+                preferenceRow(OnboardingPreference.BLOCK_ADS, initiallyEnabled = true),
+                preferenceRow(OnboardingPreference.REJECT_OPTIONAL_COOKIES, initiallyEnabled = true),
+                preferenceRow(OnboardingPreference.ACCEPT_NON_OPT_OUT_COOKIES, initiallyEnabled = false),
+            ),
+        )
+        startSegmentedAtDownloadReason()
+        orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.BLOCK_ADS))
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
+        orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
+        assertStep(NewUserOnboardingStepIds.PREFERENCE_SELECTOR)
+
+        orchestrator.onEvent(NewUserOnboardingEvent.PreferenceSelectorConfirmed(selections))
+
+        verify(onboardingPixelSender).fire(ONBOARDING_PREFERENCES_AD_BLOCKING, OnboardingPixelAction.PreferencesClicked(selections))
+    }
+
+    @Test
+    fun `when a model provider is confirmed then fires the ai model pixel with the option id`() = runTest {
+        startSegmentedAtAiProviderChoice()
+        assertStep(NewUserOnboardingStepIds.MODEL_PROVIDER)
+        orchestrator.onEvent(NewUserOnboardingEvent.Presented)
+
+        orchestrator.onEvent(NewUserOnboardingEvent.SingleChoiceConfirmed(providerOptions[1]))
+
+        verify(onboardingPixelSender).fire(ONBOARDING_PREFERENCES_AI_MODEL, OnboardingPixelAction.Shown)
+        verify(onboardingPixelSender).fire(
+            ONBOARDING_PREFERENCES_AI_MODEL,
+            OnboardingPixelAction.SingleChoiceClicked(providerOptions[1].id),
+        )
+    }
+
+    @Test
+    fun `when a toggle position is confirmed then fires the ai toggle mode pixel with the option id`() = runTest {
+        startSegmentedAtTogglePosition()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.SingleChoiceConfirmed(togglePositionOptions[1]))
+
+        verify(onboardingPixelSender).fire(
+            ONBOARDING_PREFERENCES_AI_TOGGLE_MODE,
+            OnboardingPixelAction.SingleChoiceClicked(togglePositionOptions[1].id),
+        )
+    }
+
+    @Test
+    fun `when a duck ai state is confirmed then fires the duck ai preferences pixel with the option id`() = runTest {
+        whenever(onboardingPreferenceCatalog.offer(any())).thenReturn(emptyList())
+        startSegmentedAtDuckAiState()
+        assertStep(NewUserOnboardingStepIds.DUCK_AI_STATE)
+
+        orchestrator.onEvent(NewUserOnboardingEvent.SingleChoiceConfirmed(duckAiStateOptions[1]))
+
+        verify(onboardingPixelSender).fire(
+            ONBOARDING_PREFERENCES_DUCK_AI,
+            OnboardingPixelAction.SingleChoiceClicked(duckAiStateOptions[1].id),
+        )
+    }
+
+    // endregion
+
     private fun preferenceRow(
         preference: OnboardingPreference,
         initiallyEnabled: Boolean,

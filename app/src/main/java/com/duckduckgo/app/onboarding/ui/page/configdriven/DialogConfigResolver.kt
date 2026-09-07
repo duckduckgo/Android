@@ -261,7 +261,7 @@ class DialogConfigResolver @Inject constructor(
             ),
         )
 
-        NewUserOnboardingActivityDialog.ImportComplete -> DialogConfig(
+        is NewUserOnboardingActivityDialog.ImportComplete -> DialogConfig(
             background = OnboardingBackground.IslandWithHorizon,
             embellishment = Embellishment.RightWing,
             cardArrow = CardArrowConfig.AtStartMirrored,
@@ -271,6 +271,7 @@ class DialogConfigResolver @Inject constructor(
                 parsingBody = TextConfig.Resource(R.string.preOnboardingImportCompleteParsingBody),
                 failedTitle = TextConfig.Resource(R.string.preOnboardingImportCompleteFailedTitle),
                 failedRow = TextConfig.Resource(R.string.preOnboardingImportCompleteFailed),
+                result = dialog.result,
             ),
             primaryCta = CtaConfig(
                 text = TextConfig.Resource(R.string.preOnboardingImportCompleteCta),

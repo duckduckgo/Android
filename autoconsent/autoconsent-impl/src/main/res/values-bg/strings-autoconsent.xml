@@ -30,7 +30,7 @@
     <string name="autoconsentPromptCpmOnMessage">Някои бисквитки не могат да бъдат отхвърлени. Ние можем да ги приемаме вместо Вас.</string>
     <string name="autoconsentPromptCpmOnPrimaryButton">Приемане на бисквитки вместо мен</string>
     <string name="autoconsentPromptCpmOnSecondaryButton">Ще ги приемам самостоятелно</string>
-    <string name="autoconsentPromptCpmOffMessage">Остави на нас да се погрижим за това. Ще отхвърляме бисквитките, когато е възможно, и ще приемаме тези, които не могат да бъдат отхвърлени.</string>
+    <string name="autoconsentPromptCpmOffMessage">Нека ние се погрижим за това. Ще отхвърляме бисквитките, когато е възможно, и ще приемаме тези, които не могат да бъдат отхвърлени.</string>
     <string name="autoconsentPromptCpmOffPrimaryButton">Отхвърляне, ако е възможно, или приемане вместо мен</string>
     <string name="autoconsentPromptCpmOffSecondaryButton">Ще се справя с тях самостоятелно</string>
 </resources>

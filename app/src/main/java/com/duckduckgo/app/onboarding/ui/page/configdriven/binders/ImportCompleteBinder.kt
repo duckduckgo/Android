@@ -31,6 +31,7 @@ import com.duckduckgo.app.onboarding.ui.page.configdriven.ContentHandle
 import com.duckduckgo.app.onboarding.ui.page.configdriven.CtaState
 import com.duckduckgo.app.onboarding.ui.page.configdriven.ImportCompleteContentState
 import com.duckduckgo.app.onboarding.ui.page.configdriven.StatefulDialogBinder
+import com.duckduckgo.common.utils.extensions.applyBoldSpanTo
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.launchIn
@@ -56,9 +57,9 @@ class ImportCompleteBinder(
     ): ContentHandle = with(binding) {
         val context = root.context
 
-        importCompleteImportedRow.resultRowIcon.setImageResource(CommonR.drawable.ic_cross_recolorable_gray_24)
+        importCompleteImportedRow.resultRowIcon.setImageResource(CommonR.drawable.check_recolorable_24)
         importCompleteSkippedRow.resultRowIcon.setImageResource(CommonR.drawable.ic_cross_recolorable_gray_24)
-        importCompleteFailedRow.resultRowIcon.setImageResource(CommonR.drawable.ic_cross_recolorable_gray_24)
+        importCompleteFailedRow.resultRowIcon.setImageResource(CommonR.drawable.cross_recolorable_24)
 
         val initial = state.value
         rendered = initial
@@ -154,11 +155,13 @@ class ImportCompleteBinder(
             ImportCompleteContentState.Parsing -> importCompleteBody.text = content.parsingBody.resolve(context)
             ImportCompleteContentState.Failed -> importCompleteFailedRow.resultRowText.text = content.failedRow.resolve(context)
             is ImportCompleteContentState.Finished -> {
+                val imported = state.imported.toString()
                 importCompleteImportedRow.resultRowText.text =
-                    context.getString(R.string.preOnboardingImportCompleteImported, state.imported)
+                    context.getString(R.string.preOnboardingImportCompleteImported, imported).applyBoldSpanTo(imported)
                 if (state.skipped > 0) {
+                    val skipped = state.skipped.toString()
                     importCompleteSkippedRow.resultRowText.text =
-                        context.getString(R.string.preOnboardingImportCompleteSkipped, state.skipped)
+                        context.getString(R.string.preOnboardingImportCompleteSkipped, skipped).applyBoldSpanTo(skipped)
                 }
             }
         }

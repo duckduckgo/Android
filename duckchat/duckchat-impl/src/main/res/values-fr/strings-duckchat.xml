@@ -342,10 +342,12 @@
     <string name="duckAiSettingsTitle">Paramètres Duck.ai</string>
 
     <!-- File/image attachment menu options -->
-    <string name="duckChatContextualAskAboutPage">Posez des questions sur la page</string>
 
     <!-- Editing a message already sent to Duck.ai -->
     <string name="duck_ai_edit_prompt_title" instruction="Screen title: the user is editing a message they already sent to Duck.ai">Modifier le message</string>
     <string name="duck_ai_edit_prompt_lose_responses_warning" instruction="Warning shown while editing a sent message: the answer Duck.ai already gave will be discarded and answered again">La modification remplacera la réponse existante par une nouvelle réponse.</string>
 
+    <string name="duckChatContextualAskAboutPage">Posez des questions sur la page</string>
+    <string name="duckChatContextualAskAboutSearch">Continuer dans Duck.ai</string>
+    <string name="duckChatContextualOpenDuckAi">Ouvrir Duck.ai</string>
 </resources>

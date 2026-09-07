@@ -27,6 +27,7 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckAiSessionCallback
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.ToggleSelection
@@ -110,6 +111,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.PRODUCT_TELEMETRY_SU
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE_DAILY
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.SERP_SETTINGS_OPEN_HIDE_AI_GENERATED_IMAGES
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
+import com.duckduckgo.feature.toggles.api.send
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
@@ -300,6 +302,8 @@ class RealDuckChatPixels @Inject constructor(
     private val duckAiTabSessionRepository: DuckAiTabSessionRepository,
     private val appBuildConfig: AppBuildConfig,
     private val browserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin>,
+    private val duckAiNewChatMetricPixelsPlugin: DuckAiNewChatMetricPixelsPlugin,
+    private val duckAiSessionCallback: DuckAiSessionCallback,
 ) : DuckChatPixels {
 
     /** `first_prompt_new_install` must be attributable to a fresh install, never to an existing user who just updated. */
@@ -416,6 +420,7 @@ class RealDuckChatPixels @Inject constructor(
     override fun sendReportMetricPixel(reportMetric: ReportMetric, modelTier: ModelTier?, source: String?) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             var refreshAtb = false
+            var fireNewChatMetric = false
             val sessionParams = mapOf(
                 DuckChatPixelParameters.DELTA_TIMESTAMP_PARAMETERS to duckChatFeatureRepository.sessionDeltaInMinutes().toString(),
             )
@@ -431,6 +436,7 @@ class RealDuckChatPixels @Inject constructor(
 
                 USER_DID_SUBMIT_FIRST_PROMPT -> {
                     refreshAtb = true
+                    fireNewChatMetric = true
                     val isFirstPrompt = isFirstPromptForNewInstall()
                     DUCK_CHAT_START_NEW_CONVERSATION to buildMap {
                         putAll(sessionParams)
@@ -507,6 +513,10 @@ class RealDuckChatPixels @Inject constructor(
                     statisticsUpdater.refreshDuckAiRetentionAtb(mapOf("modelTier" to modelTier?.model))
                     duckAiMetricCollector.onMessageSent()
                 }
+            }
+
+            if (fireNewChatMetric) {
+                duckAiNewChatMetricPixelsPlugin.getMetrics().forEach { it.send() }
             }
         }
     }
@@ -901,6 +911,9 @@ class RealDuckChatPixels @Inject constructor(
         ) {
             val source = resolveEntrySource(surface, tabId, addressBarEntryPoint)
             browserInteractionsPlugins.getPlugins().forEach { it.onAiPromptSubmitted(source = source) }
+            if (surface == DuckChatPixelSurface.DUCK_AI && !tabId.isNullOrEmpty()) {
+                duckAiSessionCallback.onPromptSubmitted(tabId)
+            }
             val isFirstPrompt = isFirstPromptForNewInstall()
             buildMap {
                 put(DuckChatPixelParameters.SELECTED_TOOL, selectedTool)

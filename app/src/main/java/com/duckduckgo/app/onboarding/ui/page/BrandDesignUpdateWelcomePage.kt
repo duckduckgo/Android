@@ -31,7 +31,6 @@ import android.graphics.Typeface
 import android.graphics.drawable.AnimatedVectorDrawable
 import android.media.MediaPlayer
 import android.os.Bundle
-import android.text.InputType
 import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
@@ -92,6 +91,10 @@ import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.QUICK_SETUP
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SKIP_ONBOARDING_OPTION
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SYNC_RESTORE
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.WIDGET_PROMPT
+import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.applyInputScreenPreviewInsets
+import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.applyInputScreenPreviewShape
+import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.applyInputTextMode
+import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.updateInputModePreservingSelection
 import com.duckduckgo.app.onboarding.ui.view.OnboardingStepIndicatorView
 import com.duckduckgo.app.onboardingquicksetup.ui.BrandDesignInputScreenPicker
 import com.duckduckgo.app.onboardingquicksetup.ui.QuickSetupAddressBarPositionBottomSheet
@@ -100,6 +103,7 @@ import com.duckduckgo.app.onboardingquicksetup.ui.RemoveWidgetInstructionsBottom
 import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.app.widget.AddWidgetSource
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.addBottomShadow
 import com.duckduckgo.common.ui.view.text.DaxTextView
@@ -140,6 +144,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
     @Inject
     lateinit var appTheme: AppTheme
+
+    @Inject
+    lateinit var appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles
 
     @Inject
     lateinit var addWidgetLauncher: AddWidgetLauncher
@@ -2832,6 +2839,14 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     ) {
         currentInputMode = inputMode
         val previewContent = binding.daxDialogCta.inputScreenPreviewContent
+        val isAddressBarRebrandEnabled = appBrandDesignUpdateToggles.addressBar().isEnabled()
+        previewContent.inputModeDemoCard.applyInputScreenPreviewShape(
+            isAddressBarRebrandEnabled = isAddressBarRebrandEnabled,
+        )
+        previewContent.inputText.applyInputScreenPreviewInsets(
+            isAddressBarRebrandEnabled = isAddressBarRebrandEnabled,
+            actionIcon = previewContent.inputModeDemoActionIcon,
+        )
 
         listOf(previewContent.suggestion1, previewContent.suggestion2, previewContent.suggestion3)
             .forEachIndexed { index, button ->
@@ -2859,30 +2874,27 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             }
         }
 
-        when (inputMode) {
-            InputMode.SEARCH -> {
-                previewContent.inputText.minLines = 1
-                previewContent.inputText.maxLines = 1
-                previewContent.inputText.inputType = InputType.TYPE_CLASS_TEXT
-                previewContent.inputText.imeOptions = EditorInfo.IME_ACTION_SEARCH
-                previewContent.inputText.setHint(R.string.preOnboardingInputModeDemoSearchHint)
-                previewContent.inputModeDemoActionIcon.setImageResource(CommonR.drawable.ic_find_search_24)
+        previewContent.inputText.updateInputModePreservingSelection {
+            applyInputTextMode(inputMode == InputMode.SEARCH)
+            when (inputMode) {
+                InputMode.SEARCH -> {
+                    imeOptions = EditorInfo.IME_ACTION_SEARCH
+                    setHint(R.string.preOnboardingInputModeDemoSearchHint)
+                    previewContent.inputModeDemoActionIcon.setImageResource(CommonR.drawable.ic_find_search_24)
+                }
+                InputMode.CHAT -> {
+                    imeOptions = EditorInfo.IME_ACTION_UNSPECIFIED
+                    setHint(R.string.preOnboardingInputModeDemoChatHint)
+                    previewContent.inputModeDemoActionIcon.setImageResource(CommonR.drawable.ic_arrow_right_24)
+                }
             }
-            InputMode.CHAT -> {
-                previewContent.inputText.minLines = 3
-                previewContent.inputText.maxLines = 3
-                previewContent.inputText.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
-                previewContent.inputText.imeOptions = EditorInfo.IME_ACTION_UNSPECIFIED
-                previewContent.inputText.setHint(R.string.preOnboardingInputModeDemoChatHint)
-                previewContent.inputModeDemoActionIcon.setImageResource(CommonR.drawable.ic_arrow_right_24)
-            }
-        }
 
-        // Toggling modes changes inputType/imeOptions while the EditText may be focused with the keyboard shown;
-        // restart input so the IME picks up the new action/Enter behavior immediately.
-        if (previewContent.inputText.hasFocus()) {
-            context?.let { ctx ->
-                ContextCompat.getSystemService(ctx, InputMethodManager::class.java)?.restartInput(previewContent.inputText)
+            // Toggling modes changes inputType/imeOptions while the EditText may be focused with the keyboard shown;
+            // restart input so the IME picks up the new action/Enter behavior immediately.
+            if (hasFocus()) {
+                this@BrandDesignUpdateWelcomePage.context?.let { ctx ->
+                    ContextCompat.getSystemService(ctx, InputMethodManager::class.java)?.restartInput(this)
+                }
             }
         }
     }

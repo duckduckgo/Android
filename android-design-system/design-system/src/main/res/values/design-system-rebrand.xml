@@ -42,6 +42,9 @@
     <attr name="daxColorRebrandButtonDestructiveGhostContainerPressed" format="color" />
     <attr name="daxColorRebrandButtonDestructiveGhostText" format="color" />
     <attr name="daxColorRebrandAccentBlue" format="color" />
+    <attr name="daxColorStatusIndicatorOn" format="color" />
+    <attr name="daxColorStatusIndicatorOff" format="color" />
+    <attr name="daxColorRebrandStatusIndicatorOff" format="color" />
     <attr name="daxColorStatusRed" format="color" />
 
     <dimen name="rebrandButtonSmallHeight">48dp</dimen>
@@ -156,6 +159,8 @@
         <item name="daxButtonLargeTopPadding">@dimen/rebrandButtonLargeTopPadding</item>
         <item name="daxButtonSmallVerticalInset">@dimen/rebrandButtonSmallVerticalInset</item>
         <item name="daxButtonLargeVerticalInset">@dimen/rebrandButtonLargeVerticalInset</item>
+        <item name="daxColorStatusIndicatorOn">@color/rb_green40</item>
+        <item name="daxColorStatusIndicatorOff">?attr/daxColorRebrandStatusIndicatorOff</item>
     </style>
 
     <style name="ThemeOverlay.Rebrand.AddressBarAnimation" parent="">
