@@ -43,8 +43,6 @@ import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.NativeInputEventListener
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
-import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionPayloadBuilder
-import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.RealTextSelectionStore
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputWidget
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
@@ -85,8 +83,6 @@ class RealNativeInputManagerTest {
     private val nativeInputEventListener: NativeInputEventListener = mock()
     private val edgeToEdgeProvider: EdgeToEdgeProvider = mock()
     private val edgeToEdgeHandler = EdgeToEdgeHandler()
-    private val textSelectionStore = RealTextSelectionStore()
-    private val selectionPayloadBuilder: TextSelectionPayloadBuilder = mock()
     private val nativeInputStateBugKillSwitch = FakeFeatureToggleFactory.create(NativeInputStateBugKillSwitch::class.java)
     private val nativeInputUrlClearingFeature = FakeFeatureToggleFactory.create(NativeInputUrlClearingFeature::class.java)
     private val nativeInputOmnibarFeature = FakeFeatureToggleFactory.create(NativeInputOmnibarFeature::class.java)
@@ -122,8 +118,6 @@ class RealNativeInputManagerTest {
             nativeInputEventListener,
             edgeToEdgeProvider,
             edgeToEdgeHandler,
-            textSelectionStore,
-            selectionPayloadBuilder,
         )
     }
 
