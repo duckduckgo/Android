@@ -46,6 +46,7 @@ import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.ui.AttachmentViewModel
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ImageAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.PageContextAttachment
+import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.TextSelectionAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedFile
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedImage
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachment
@@ -69,6 +70,7 @@ class AttachmentView(
     var isEditMode: Boolean = false
     var onAskAboutPage: (() -> Unit)? = null
     var onPageContextRemoved: (() -> Unit)? = null
+    var onTextSelectionRemoved: ((String) -> Unit)? = null
 
     private var viewModel: AttachmentViewModel? = null
     private var faviconManager: FaviconManager? = null
@@ -80,6 +82,7 @@ class AttachmentView(
     private var imageAttachmentsContainer: ImageAttachmentsContainerView? = null
     private var fileAttachmentsContainer: FileAttachmentsContainerView? = null
     private var pageContextContainer: PageContextAttachmentView? = null
+    private var textSelectionsContainer: TextSelectionAttachmentsContainerView? = null
     private var limitErrorView: TextView? = null
 
     init {
@@ -138,6 +141,8 @@ class AttachmentView(
 
     fun clearAttachmentsForNewChat() = viewModel?.clearAttachmentsForNewChat()
 
+    fun setTextSelections(selections: List<TextSelectionAttachment>) = viewModel?.setTextSelections(selections)
+
     fun setPageContext(attachment: PageContextAttachment) = viewModel?.setPageContext(attachment)
 
     fun clearPageContext() = viewModel?.removePageContext()
@@ -195,6 +200,12 @@ class AttachmentView(
         row.addView(pageContext)
         pageContextContainer = pageContext
 
+        val selections = TextSelectionAttachmentsContainerView(context).also {
+            it.onAttachmentRemoved = { id -> onTextSelectionRemoved?.invoke(id) }
+        }
+        row.addView(selections)
+        textSelectionsContainer = selections
+
         val imagesContainer = ImageAttachmentsContainerView(context).also {
             it.onAttachmentRemoved = { id -> vm.removeImageAttachment(id, isEditMode) }
         }
@@ -223,6 +234,7 @@ class AttachmentView(
         syncImages(imagesView, state)
         syncFiles(state)
         syncPageContext(state)
+        syncTextSelections(state)
         val errorMessage = effectiveLimitError(
             imageLimitError = state.imageLimitError
                 ?: state.fileLimitError
@@ -255,6 +267,13 @@ class AttachmentView(
         }
         (stateFileIds - containerFileIds).forEach { id ->
             state.files.find { it.id == id }?.let { filesView.addAttachment(it) }
+        }
+    }
+
+    private fun syncTextSelections(state: AttachmentViewModel.AttachmentState) {
+        val view = textSelectionsContainer ?: return
+        if (view.current() != state.textSelections) {
+            view.render(state.textSelections)
         }
     }
 
