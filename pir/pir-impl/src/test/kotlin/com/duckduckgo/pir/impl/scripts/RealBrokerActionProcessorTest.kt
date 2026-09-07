@@ -199,6 +199,9 @@ class RealBrokerActionProcessorTest {
             assertEquals("li", profileMatch.getString("selector"))
             assertEquals(".name", profileMatch.getJSONObject("profile").getJSONObject("name").getString("selector"))
         }
+    }
+
+    @Test
     fun whenProcessJsCallbackWithExecuteScriptSuccessThenCallsOnSuccess() = runTest {
         val callback = registerAndGetCallback()
 
@@ -362,5 +365,54 @@ class RealBrokerActionProcessorTest {
         val errorCaptor = argumentCaptor<PirError>()
         verify(mockActionResultListener).onError(errorCaptor.capture())
         assertEquals(PirError.JsError.ParsingErrorObjectFailed, errorCaptor.firstValue)
+    }
+
+    @Test
+    fun whenPushExecuteScriptThenForwardOpaqueScriptAndUserProfile() {
+        val script = "const anchor = root.createElement(\"a\");\nanchor.textContent = userProfile.firstName;"
+        val profile = com.duckduckgo.pir.impl.models.ProfileQuery(
+            id = 1L, firstName = "John", lastName = "Doe", city = "New York", state = "NY",
+            addresses = emptyList(), birthYear = 1990, fullName = "John Doe", age = 36, deprecated = false,
+        )
+        val action = BrokerAction.ExecuteScript("script-1", script, failSilently = true)
+
+        testee.pushAction(action, UserProfile(userProfile = profile))
+
+        val captor = argumentCaptor<SubscriptionEventData>()
+        verify(mockJsMessaging).sendSubscriptionEvent(captor.capture())
+        assertEquals(PIRScriptConstants.SCRIPT_FEATURE_NAME, captor.firstValue.featureName)
+        assertEquals(PIRScriptConstants.SUBSCRIBED_METHOD_NAME_RECEIVED, captor.firstValue.subscriptionName)
+        val state = captor.firstValue.params.getJSONObject("state")
+        val pushedAction = state.getJSONObject("action")
+        assertEquals("executeScript", pushedAction.getString("actionType"))
+        assertEquals(action.id, pushedAction.getString("id"))
+        assertEquals(script, pushedAction.getString("script"))
+        assertTrue(pushedAction.getBoolean("failSilently"))
+        val userProfile = state.getJSONObject("data").getJSONObject("userProfile")
+        assertEquals(profile.firstName, userProfile.getString("firstName"))
+        assertEquals(profile.lastName, userProfile.getString("lastName"))
+        assertEquals(profile.city, userProfile.getString("city"))
+        assertEquals(profile.state, userProfile.getString("state"))
+        assertEquals(profile.birthYear, userProfile.getInt("birthYear"))
+    }
+
+    @Test
+    fun whenExecuteScriptFailsThenForwardSanitizedMessageUnmodified() {
+        val callback = registerAndGetCallback()
+        val message = "executeScript failed: TypeError: " + "x".repeat(468)
+        val data = JSONObject().put(
+            "result",
+            JSONObject().put("error", JSONObject().put("actionID", "script-1").put("message", message)),
+        )
+
+        callback.process(
+            PIRScriptConstants.SCRIPT_FEATURE_NAME,
+            PIRScriptConstants.RECEIVED_METHOD_NAME_COMPLETED,
+            null,
+            data,
+        )
+
+        verify(mockActionResultListener).onError(JsActionFailed("script-1", message))
+        org.mockito.kotlin.verifyNoMoreInteractions(mockActionResultListener)
     }
 }

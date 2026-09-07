@@ -459,4 +459,37 @@ class RealBrokerStepsParserTest {
 
         assertNull(result)
     }
+
+    @Test
+    fun whenParseExecuteScriptThenPreserveScriptAndDefaultFailSilentlyToFalse() = runTest {
+        val script = "const value = \"quoted\";\nroot.body.textContent = userProfile.firstName;"
+        val encodedScript = moshi.adapter(String::class.java).toJson(script)
+        listOf("", ", \"failSilently\": false", ", \"failSilently\": true").forEach { flag ->
+            val step = """
+                {
+                    "stepType": "scan", "scanType": "automated",
+                    "actions": [{"actionType": "executeScript", "id": "script-1", "script": $encodedScript $flag}]
+                }
+            """.trimIndent()
+
+            val result = testee.parseStep(testBroker, step, null).single() as ScanStep
+
+            assertEquals(
+                BrokerAction.ExecuteScript("script-1", script, failSilently = flag.contains("true")),
+                result.step.actions.single(),
+            )
+        }
+    }
+
+    @Test
+    fun whenParseExecuteScriptWithoutScriptThenRejectStep() = runTest {
+        val json = """
+            {
+                "stepType": "scan", "scanType": "automated",
+                "actions": [{"actionType": "executeScript", "id": "script-1"}]
+            }
+        """.trimIndent()
+
+        assertTrue(testee.parseStep(testBroker, json, null).isEmpty())
+    }
 }

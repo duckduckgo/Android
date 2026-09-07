@@ -25,6 +25,7 @@ import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions.ScanSt
 import com.duckduckgo.pir.impl.common.PirJob.RunType
 import com.duckduckgo.pir.impl.common.PirRunStateHandler
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutConditionNotFound
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerStepActionFailed
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerStepInvalidEvent
 import com.duckduckgo.pir.impl.common.actions.BrokerActionFailedEventHandler.Companion.MAX_RETRY_COUNT_OPTOUT
 import com.duckduckgo.pir.impl.common.actions.BrokerActionFailedEventHandler.Companion.MAX_RETRY_COUNT_SCAN
@@ -48,7 +49,10 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.isA
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -533,5 +537,73 @@ class BrokerActionFailedEventHandlerTest {
         testee.invoke(state, event)
 
         verify(mockPirRunStateHandler).handleState(any())
+    }
+
+    @Test
+    fun whenExecuteScriptFailsThenNeverRetryAndRecordFailureForEveryRunType() = runTest {
+        RunType.entries.forEach { runType ->
+            val action = BrokerAction.ExecuteScript("script-1", "throw new Error('failed')")
+            val state = executeScriptState(action, runType)
+            val error = PirError.ActionError.JsActionFailed(action.id, "executeScript failed: Error: failed")
+
+            val result = testee.invoke(state, BrokerActionFailed(error, allowRetry = true))
+
+            assertEquals(state, result.nextState)
+            assertEquals(BrokerStepCompleted(false, Failure(error)), result.nextEvent)
+            assertNull(result.sideEffect)
+        }
+        verify(mockPirRunStateHandler, times(RunType.entries.size)).handleState(
+            isA<BrokerStepActionFailed>(),
+        )
+    }
+
+    @Test
+    fun whenExecuteScriptFailureIsSilencedThenRecordErrorAndAdvanceForEveryRunType() = runTest {
+        RunType.entries.forEach { runType ->
+            val action = BrokerAction.ExecuteScript("script-1", "throw new Error('failed')", failSilently = true)
+            val state = executeScriptState(action, runType).copy(actionRetryCount = 2)
+            val error = PirError.ActionError.JsActionFailed(action.id, "executeScript failed: Error: failed")
+
+            val result = testee.invoke(state, BrokerActionFailed(error, allowRetry = true))
+
+            assertEquals(state.copy(currentActionIndex = 1, actionRetryCount = 0), result.nextState)
+            assertEquals(ExecuteBrokerStepAction(PirScriptRequestData.UserProfile(testProfileQuery)), result.nextEvent)
+            assertNull(result.sideEffect)
+        }
+        val captor = argumentCaptor<BrokerStepActionFailed>()
+        verify(mockPirRunStateHandler, times(RunType.entries.size)).handleState(captor.capture())
+        captor.allValues.forEach {
+            assertEquals("script-1", it.actionID)
+            assertEquals("executeScript", it.actionType)
+            assertEquals("executeScript failed: Error: failed", it.errorMessage)
+            assertEquals(testCurrentTimeInMillis, it.completionTimeInMillis)
+        }
+    }
+
+    @Test
+    fun whenSilencedExecuteScriptFailsWithoutRetryPermissionThenStillAdvance() = runTest {
+        val action = BrokerAction.ExecuteScript("script-1", "", failSilently = true)
+        val state = executeScriptState(action, RunType.OPTOUT)
+
+        val result = testee.invoke(state, BrokerActionFailed(testError, allowRetry = false))
+
+        assertEquals(1, result.nextState.currentActionIndex)
+        assertEquals(ExecuteBrokerStepAction(PirScriptRequestData.UserProfile(testProfileQuery)), result.nextEvent)
+        verify(mockPirRunStateHandler).handleState(isA<BrokerStepActionFailed>())
+    }
+
+    private fun executeScriptState(action: BrokerAction.ExecuteScript, runType: RunType): State {
+        val actions = listOf(action, testClickAction)
+        val step = if (runType == RunType.OPTOUT || runType == RunType.EMAIL_CONFIRMATION) {
+            OptOutStep(testBroker, OptOutStepActions(stepType = "optOut", actions = actions, optOutType = "form"), testExtractedProfile)
+        } else {
+            testScanStep(actions = actions).copy(broker = testBroker)
+        }
+        return State(
+            runType = runType,
+            brokerStep = step,
+            profileQuery = testProfileQuery,
+            stageStatus = PirStageStatus(PirStage.OTHER, 0L),
+        )
     }
 }

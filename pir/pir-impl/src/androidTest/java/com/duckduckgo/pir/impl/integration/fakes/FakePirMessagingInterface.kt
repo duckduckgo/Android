@@ -154,6 +154,14 @@ class FakePirMessagingInterface(moshi: Moshi) : JsMessaging {
                 """.trimIndent()
             }
 
+            is BrokerAction.ExecuteScript -> """
+                {
+                    "actionID": "${action.id}",
+                    "actionType": "executeScript",
+                    "response": null
+                }
+            """.trimIndent()
+
             is BrokerAction.FillForm -> """
                 {
                     "actionID": "${action.id}",

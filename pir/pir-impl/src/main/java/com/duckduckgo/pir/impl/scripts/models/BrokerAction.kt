@@ -96,6 +96,7 @@ sealed class BrokerAction(
     data class ExecuteScript(
         override val id: String,
         val script: String,
+        val failSilently: Boolean = false,
     ) : BrokerAction(id)
 
     data class Expectation(
