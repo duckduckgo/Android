@@ -339,21 +339,22 @@ class SitePermissionsDialogActivityLauncherTest {
     }
 
     private fun showCameraDialog(
-        isThirdParty: Boolean = false,
+        pageUrl: String = "https://example.com",
+        requestUrl: String = "https://example.com",
         redesignEnabled: Boolean = true,
     ): AlertDialog {
-        onPage(if (isThirdParty) "https://publisher.example" else "https://example.com")
+        onPage(pageUrl)
         sitePermissionsDialogRedesignFeature.self().setRawStoredState(Toggle.State(redesignEnabled))
         whenever(systemPermissionsHelper.hasCameraPermissionsGranted()).thenReturn(true)
 
         val activity = Robolectric.buildActivity(ThemedActivity::class.java).setup().get()
         val request: PermissionRequest = mock()
         whenever(request.resources).thenReturn(arrayOf(PermissionRequest.RESOURCE_VIDEO_CAPTURE))
-        whenever(request.origin).thenReturn(Uri.parse("https://example.com"))
+        whenever(request.origin).thenReturn(Uri.parse(requestUrl))
 
         testee.askForSitePermission(
             activity = activity,
-            url = "https://example.com",
+            url = requestUrl,
             tabId = "tabId",
             permissionsRequested = SitePermissions(
                 autoAccept = emptyList(),
@@ -782,8 +783,30 @@ class SitePermissionsDialogActivityLauncherTest {
     }
 
     @Test
+    fun whenPageEmbedsASiblingSubdomainThenRequestIsFirstParty() {
+        val dialog = showCameraDialog(pageUrl = "https://www.example.com/watch")
+
+        assertEquals(3, dialog.tieredButtons().childCount)
+    }
+
+    @Test
+    fun whenPageAndRequestHostsHaveNoRegistrableDomainThenComparedAsThemselves() {
+        val sameHost = showCameraDialog(
+            pageUrl = "http://localhost:8000/index.html",
+            requestUrl = "http://localhost:8000",
+        )
+        assertEquals(3, sameHost.tieredButtons().childCount)
+
+        val differentHost = showCameraDialog(
+            pageUrl = "http://localhost:8000/index.html",
+            requestUrl = "http://127.0.0.1:8000",
+        )
+        assertEquals(2, differentHost.tieredButtons().childCount)
+    }
+
+    @Test
     fun whenRequestIsThirdPartyThenStandingGrantIsNotOffered() {
-        val dialog = showCameraDialog(isThirdParty = true)
+        val dialog = showCameraDialog(pageUrl = THIRD_PARTY_PAGE)
 
         val buttons = dialog.tieredButtons()
         assertEquals(2, buttons.childCount)
@@ -799,7 +822,7 @@ class SitePermissionsDialogActivityLauncherTest {
 
     @Test
     fun whenThirdPartyAllowThisTimeClickedThenGrantIsSessionOnly() {
-        val dialog = showCameraDialog(isThirdParty = true)
+        val dialog = showCameraDialog(pageUrl = THIRD_PARTY_PAGE)
 
         dialog.tieredButtons().getChildAt(0).performClick()
         shadowOf(Looper.getMainLooper()).idle()
@@ -815,7 +838,7 @@ class SitePermissionsDialogActivityLauncherTest {
 
     @Test
     fun whenThirdPartyNeverAllowClickedThenDeniedAndPersistedAsDenyAlways() {
-        val dialog = showCameraDialog(isThirdParty = true)
+        val dialog = showCameraDialog(pageUrl = THIRD_PARTY_PAGE)
 
         dialog.tieredButtons().getChildAt(1).performClick()
         shadowOf(Looper.getMainLooper()).idle()
@@ -855,9 +878,13 @@ class SitePermissionsDialogActivityLauncherTest {
 
     @Test
     fun whenRedesignDisabledThenThirdPartyCameraStillShowsTheLegacyDialog() {
-        val dialog = showCameraDialog(isThirdParty = true, redesignEnabled = false)
+        val dialog = showCameraDialog(pageUrl = THIRD_PARTY_PAGE, redesignEnabled = false)
 
         assertNotNull(dialog.findViewById<TextView>(CommonR.id.textAlertDialogMessage))
+    }
+
+    companion object {
+        private const val THIRD_PARTY_PAGE = "https://publisher.example"
     }
 
     class ThemedActivity : AppCompatActivity() {

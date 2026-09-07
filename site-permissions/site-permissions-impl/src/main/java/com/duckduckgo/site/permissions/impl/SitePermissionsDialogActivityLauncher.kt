@@ -26,7 +26,6 @@ import androidx.activity.result.ActivityResultCaller
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.net.toUri
-import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -42,6 +41,7 @@ import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.formatWithSpans
 import com.duckduckgo.common.utils.extensions.launchApplicationInfoSettings
+import com.duckduckgo.common.utils.extensions.toTldPlusOneOrSelf
 import com.duckduckgo.common.utils.extensions.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.FragmentScope
@@ -493,8 +493,10 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
     }
 
     private fun isThirdPartyOrigin(requestOrigin: String): Boolean {
-        val pageUrl = tabRepository.retrieveSiteData(tabId).value?.url ?: return true
-        return !UriString.sameEffectiveSite(pageUrl, requestOrigin)
+        val pageDomain = tabRepository.retrieveSiteData(tabId).value?.url?.extractDomain() ?: return true
+        val originDomain = requestOrigin.extractDomain() ?: return true
+
+        return pageDomain.toTldPlusOneOrSelf() != originDomain.toTldPlusOneOrSelf()
     }
 
     private fun denyDrmPermissions(
