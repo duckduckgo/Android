@@ -1422,7 +1422,8 @@
     "trackerProtection",
     // only enabled on apple platforms
     "textSelection",
-    "uaChBrands"
+    "uaChBrands",
+    "chromeWebstorePatching"
   ];
   var selfGatingFeatures = ["trackerProtection", "uaChBrands"];
   function isPlatformSpecificFeature(featureName) {
@@ -1507,7 +1508,8 @@
       "trackerProtection",
       "tabSuspension",
       "autofillPasskeys",
-      "textSelection"
+      "textSelection",
+      "chromeWebstorePatching"
     ]
   );
   var platformSupport = {
@@ -1580,7 +1582,8 @@
       "duckAiDataClearing",
       "performanceMetrics",
       "duckAiChatHistory",
-      "autofillPasskeys"
+      "autofillPasskeys",
+      "chromeWebstorePatching"
     ],
     firefox: ["cookie", ...baseFeatures, "clickToLoad", "webDetection", "webEvents", "webInterferenceDetection", "breakageReporting"],
     chrome: ["cookie", ...baseFeatures, "clickToLoad", "webDetection", "webEvents", "webInterferenceDetection", "breakageReporting"],
