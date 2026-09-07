@@ -51,6 +51,7 @@ class RealDuckChatPixelsAttachmentsTest {
         appBuildConfig = mock(),
         browserInteractionsPlugins = mock(),
         duckAiNewChatMetricPixelsPlugin = mock(),
+        duckAiSessionCallback = mock(),
     )
 
     @Test
