@@ -581,14 +581,37 @@ class BrokerActionFailedEventHandlerTest {
     }
 
     @Test
-    fun whenSilencedExecuteScriptFailsWithoutRetryPermissionThenStillAdvance() = runTest {
+    fun whenUnrecoverableErrorDuringSilencedExecuteScriptThenFailStep() = runTest {
         val action = BrokerAction.ExecuteScript("script-1", "", failSilently = true)
         val state = executeScriptState(action, RunType.OPTOUT)
+        val errors = listOf(
+            PirError.JsError.ParsingErrorObjectFailed,
+            PirError.ActionError.ClientError(action.id, "Client error"),
+            PirError.ActionError.EmailError(action.id, 500, "Email service error"),
+            PirError.ActionError.CaptchaServiceError(action.id, 500, "Captcha service error"),
+        )
 
-        val result = testee.invoke(state, BrokerActionFailed(testError, allowRetry = false))
+        errors.forEach { error ->
+            val result = testee.invoke(state, BrokerActionFailed(error, allowRetry = false))
 
-        assertEquals(1, result.nextState.currentActionIndex)
+            assertEquals(state, result.nextState)
+            assertEquals(BrokerStepCompleted(false, Failure(error)), result.nextEvent)
+            assertNull(result.sideEffect)
+        }
+        verify(mockPirRunStateHandler, times(errors.size)).handleState(isA<BrokerStepActionFailed>())
+    }
+
+    @Test
+    fun whenSilencedExecuteScriptTimesOutThenRecordErrorAndAdvance() = runTest {
+        val action = BrokerAction.ExecuteScript("script-1", "return new Promise(() => {});", failSilently = true)
+        val state = executeScriptState(action, RunType.OPTOUT)
+        val error = PirError.ActionError.JsActionFailed(action.id, "Local timeout")
+
+        val result = testee.invoke(state, BrokerActionFailed(error, allowRetry = true))
+
+        assertEquals(state.copy(currentActionIndex = 1, actionRetryCount = 0), result.nextState)
         assertEquals(ExecuteBrokerStepAction(PirScriptRequestData.UserProfile(testProfileQuery)), result.nextEvent)
+        assertNull(result.sideEffect)
         verify(mockPirRunStateHandler).handleState(isA<BrokerStepActionFailed>())
     }
 

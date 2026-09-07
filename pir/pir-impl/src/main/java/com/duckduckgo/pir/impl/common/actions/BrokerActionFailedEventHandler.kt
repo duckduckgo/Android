@@ -84,7 +84,7 @@ class BrokerActionFailedEventHandler @Inject constructor(
         }
 
         // Silenced script failures still need diagnostics, but must not stop the broker step.
-        if (currentAction is BrokerAction.ExecuteScript && currentAction.failSilently) {
+        if (currentAction is BrokerAction.ExecuteScript && currentAction.failSilently && error is PirError.ActionError.JsActionFailed) {
             emitBrokerActionFailedPixel(state, error)
             return Next(
                 nextState = state.copy(
