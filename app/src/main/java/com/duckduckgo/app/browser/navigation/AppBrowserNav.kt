@@ -56,6 +56,7 @@ class AppBrowserNav @Inject constructor() : BrowserNav {
         hasSessionActive: Boolean,
         duckChatUrl: String,
         isContextual: Boolean,
+        textSelection: String?,
     ): Intent {
         return BrowserActivity.intent(
             context = context,
@@ -64,6 +65,7 @@ class AppBrowserNav @Inject constructor() : BrowserNav {
             openDuckChatContextual = isContextual,
             duckChatUrl = duckChatUrl,
             duckChatSessionActive = hasSessionActive,
+            duckChatTextSelection = textSelection,
         )
     }
 
