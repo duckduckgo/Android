@@ -47,4 +47,16 @@
     <!-- Chat history overflow (three-dot) menu -->
     <string name="duck_ai_chat_history_overflow_select_chats">Select Chats</string>
     <string name="duck_ai_chat_history_overflow_chats_protection">Chat Protection</string>
+
+    <!-- Duck.ai address bar menu -->
+    <string name="duckChatContextualAllChats">All Chats</string>
+
+    <!-- Suggested prompts for text selection -->
+    <string name="duckAiSuggestionSummarizeSelectionLabel">Summarize this selection</string>
+    <string name="duckAiSuggestionSummarizeSelectionPrompt">Summarize this selection.</string>
+    <string name="duckAiSuggestionTranslateSelectionLabel">Translate this selection</string>
+    <string name="duckAiSuggestionTranslateSelectionPrompt" instruction="%1$s is replaced with the name of the user's language.">Translate this selection into %1$s.</string>
+
+    <!-- Duck.ai text selection menu action -->
+    <string name="duckAiTextSelectionMenuItem">Ask Duck.ai</string>
 </resources>
