@@ -18,8 +18,11 @@ package com.duckduckgo.browser.ui.newtab.hatch
 
 import android.content.Context
 import android.util.AttributeSet
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.widget.FrameLayout
+import androidx.annotation.AttrRes
+import androidx.annotation.DrawableRes
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
@@ -142,7 +145,7 @@ class NewTabReturnHatchView @JvmOverloads constructor(
             when (state.mode) {
                 BrowserMode.FIRE -> {
                     binding.returnHatchSiteTitle.text = context.getString(R.string.newTabReturnHatchFireTabTitle)
-                    binding.returnHatchFavicon.setImageResource(CommonR.drawable.fire_window_light_phone_96)
+                    binding.returnHatchFavicon.setImageResource(resolveThemedDrawableAttr(CommonR.attr.daxDrawableFireWindowPhone))
                 }
                 BrowserMode.REGULAR -> {
                     binding.returnHatchSiteTitle.text = state.titleOrPlaceholder()
@@ -208,5 +211,14 @@ class NewTabReturnHatchView @JvmOverloads constructor(
         binding.returnHatchTabsMenu.setOnClickListener { view ->
             viewModel.onTabManagerPressed()
         }
+    }
+
+    @DrawableRes
+    private fun resolveThemedDrawableAttr(
+        @AttrRes attr: Int,
+    ): Int {
+        val typedValue = TypedValue()
+        context.theme.resolveAttribute(attr, typedValue, true)
+        return typedValue.resourceId
     }
 }

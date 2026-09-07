@@ -158,6 +158,7 @@
         <item name="daxColorSnackbarAction">?attr/daxColorAccentBlue</item>
         <item name="daxIconTabSwitcher">@drawable/ic_tab_24</item>
         <item name="daxDrawableTabPlaceholderPreview">@drawable/ic_dax_icon_72</item>
+        <item name="daxDrawableFireWindowPhone">@drawable/fire_window_light_phone_96</item>
         <item name="daxOmnibarThemeOverlay">@style/ThemeOverlay.DuckDuckGo.Omnibar.None</item>
         <item name="daxInputModeCardThemeOverlay">@style/ThemeOverlay.DuckDuckGo.InputModeCard.None</item>
 
@@ -184,6 +185,7 @@
         <item name="android:isLightTheme" tools:ignore="NewApi">false</item>
         <item name="preferDarkStatusBarIcons">false</item>
         <item name="preferDarkNavigationBarIcons">false</item>
+        <item name="daxDrawableFireWindowPhone">@drawable/fire_window_dark_phone_96</item>
 
         <!-- Feature specific colors -->
         <!-- Autofill -->

@@ -50,7 +50,7 @@
         <item name="daxColorSnackbarAction">?attr/daxColorFireModeAccentDark</item>
 
         <item name="daxIconTabSwitcher">@drawable/ic_tab_fire_mode_24</item>
-        <item name="daxDrawableTabPlaceholderPreview">@drawable/fire_window_light_phone_96</item>
+        <item name="daxDrawableTabPlaceholderPreview">@drawable/fire_window_dark_phone_96</item>
 
         <item name="daxOmnibarThemeOverlay">@style/ThemeOverlay.DuckDuckGo.Omnibar.FireDark</item>
         <item name="daxInputModeCardThemeOverlay">@style/ThemeOverlay.DuckDuckGo.InputModeCard.FireDark</item>
