@@ -60,7 +60,6 @@
     <string name="duckAiMicPermissionDeniedSnackBarMessage">Mikrofonin käyttöoikeus tarvitaan äänitoimintoja varten</string>
     <string name="duckAiMicPermissionDeniedDialogTitle">DuckDuckGo tarvitsee mikrofonisi käyttöoikeuden</string>
     <string name="duckAiMicPermissionDeniedDialogContent">Mikrofonin käyttöoikeudet tarvitaan, jos haluat käyttää äänikeskustelua Duck.ai:ssa</string>
-    <string name="sitePermissionsDialogChangePermissionsButton">Muuta käyttöoikeuksia</string>
 
     <string name="sitePermissionsSettingsDescription">Käyttämäsi sivustot saattavat pyytää pääsyä laitteesi sijaintiin, kameraan, mikrofoniin tai DRM-ohjelmistoon (Digital Rights Management). Ne eivät voi käyttää tietoja, ellet myönnä niille erillistä käyttöoikeutta.</string>
     <string name="sitePermissionsSettingsEnablePermissionTitle">Salli kaikkien sivustojen pyytää:</string>
@@ -76,5 +75,34 @@
     <string name="permissionsPerWebsiteAllowSetting">Salli</string>
     <string name="permissionsPerWebsiteAskDisabledSetting">Poistettu käytöstä kaikilla sivustoilla</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s: käyttöoikeus – lupa %2$s</string>
+
+    <!-- Tiered permission dialog -->
+    <string name="sitePermissionsDialogAllowWhileUsingSiteButton" instruction="Button granting a website a permission for every visit, until the user changes it">Salli sivustoa käytettäessä</string>
+    <string name="sitePermissionsDialogAllowThisTimeButton" instruction="Button granting a website a permission for the current visit only">Salli tällä kertaa</string>
+    <string name="sitePermissionsDialogNeverAllowButton" instruction="Button refusing a website a permission for every visit, until the user changes it">Älä koskaan salli</string>
+    <string name="sitePermissionsTieredLocationDialogTitle" instruction="Placeholder is a website">\"%1$s\"-verkkosivusto haluaa käyttää sijaintiasi</string>
+    <string name="sitePermissionsTieredDdgLocationDialogTitle" instruction="Placeholder is a website">\"%1$s\" haluaa käyttää sijaintiasi</string>
+    <string name="sitePermissionsTieredDdgLocationDialogSubtitle">Anonymisoimme sijaintisi ja käytämme sitä tarjotaksemme parempia tuloksia lähempää sinua.</string>
+    <string name="sitePermissionsTieredCameraDialogTitle" instruction="Placeholder is a website">\"%1$s\"-verkkosivusto haluaa käyttää kameraasi</string>
+    <string name="sitePermissionsTieredMicDialogTitle" instruction="Placeholder is a website">Sivusto \"%1$s\" haluaa käyttää mikrofonia</string>
+    <string name="sitePermissionsTieredMicAndCameraDialogTitle" instruction="Placeholder is a website">\"%1$s\"-verkkosivusto haluaa käyttää kameraasi ja mikrofoniasi</string>
+    <string name="sitePermissionsTieredDrmDialogSubtitle">Jos et salli, sivustolla olevia videoita ei ehkä voida toistaa, mutta tämä sivusto ei voi käyttää DRM-ohjelmiston tarjoamia laitetunnisteita.</string>
+
+    <!-- Reminder dialog -->
+    <string name="sitePermissionsDialogChangePermissionsButton" instruction="Button opening the DuckDuckGo permission settings in the Android system settings app">Muuta käyttöoikeuksia</string>
+    <string name="sitePermissionsTieredSystemDeniedLocationTitle">DuckDuckGo tarvitsee sijaintisi käyttöoikeuden</string>
+    <string name="sitePermissionsTieredSystemDeniedLocationContent">Sijainnin käyttöoikeudet tarvitaan, jos haluat käyttää sijaintiominaisuuksia tällä sivustolla.</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraTitle">DuckDuckGo tarvitsee kamerasi käyttöoikeuden</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraContent">Kameran käyttöoikeudet tarvitaan, jos haluat käyttää kameratoimintoja tällä sivustolla.</string>
+    <string name="sitePermissionsTieredSystemDeniedMicTitle">DuckDuckGo tarvitsee mikrofonisi käyttöoikeuden</string>
+    <string name="sitePermissionsTieredSystemDeniedMicContent">Mikrofonin käyttöoikeudet tarvitaan, jos haluat käyttää mikrofonitoimintoja tällä sivustolla.</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraAndMicTitle">DuckDuckGo tarvitsee kamerasi ja mikrofonisi käyttöoikeuden</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraAndMicContent">Kameran ja mikrofonin käyttöoikeudet tarvitaan, jos haluat käyttää kamera- ja mikrofonitoimintoja tällä sivustolla.</string>
+
+    <!-- Denial snackbar -->
+    <string name="sitePermissionsTieredLocationDeniedSnackBarMessage">DuckDuckGo ei voinut jakaa sijaintia tämän sivuston kanssa</string>
+    <string name="sitePermissionsTieredCameraDeniedSnackBarMessage">DuckDuckGo ei voinut antaa kameran käyttöoikeutta tälle sivustolle</string>
+    <string name="sitePermissionsTieredMicDeniedSnackBarMessage">DuckDuckGo ei voinut antaa mikrofonin käyttöoikeutta tälle sivustolle</string>
+    <string name="sitePermissionsTieredCameraAndMicDeniedSnackBarMessage">DuckDuckGo ei voinut antaa kameran ja mikrofonin käyttöoikeutta tälle sivustolle</string>
 
 </resources>
