@@ -115,6 +115,12 @@ class ContextualSuggestionsView @JvmOverloads constructor(
         }
     }
 
+    fun onTextSelectionCountChanged(count: Int) {
+        doOnAttach {
+            viewModel.onTextSelectionCountChanged(count)
+        }
+    }
+
     fun setReservedQuickActionSlots(count: Int) {
         doOnAttach {
             viewModel.onReservedQuickActionSlotsChanged(count)
