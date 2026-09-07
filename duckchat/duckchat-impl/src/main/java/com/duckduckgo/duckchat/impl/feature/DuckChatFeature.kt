@@ -303,5 +303,5 @@ interface DuckChatFeature {
      * If the remote feature is not present defaults to `INTERNAL`.
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun askDuckAi(): Toggle
+    fun duckAiTextSelectionAction(): Toggle
 }
