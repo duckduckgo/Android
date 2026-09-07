@@ -57,6 +57,10 @@
     <string name="systemPermissionDialogCameraAndAudioDeniedContent">Les sites ne peuvent utiliser votre appareil photo et votre micro que si vous autorisez DuckDuckGo à demander l\'accès.</string>
     <string name="systemPermissionsDeniedDialogPositiveButton">Ouvrir les paramètres</string>
     <string name="systemPermissionsDeniedDialogNegativeButton">Annuler</string>
+    <string name="duckAiMicPermissionDeniedSnackBarMessage">Autorisation d’accès au micro requise pour les fonctionnalités vocales</string>
+    <string name="duckAiMicPermissionDeniedDialogTitle">DuckDuckGo a besoin d’accéder à votre micro</string>
+    <string name="duckAiMicPermissionDeniedDialogContent">Les autorisations d’accès au micro sont nécessaires si vous souhaitez utiliser le chat vocal dans Duck.ai</string>
+    <string name="duckAiMicPermissionDeniedDialogPositiveButton">Modifier les autorisations</string>
 
     <string name="sitePermissionsSettingsDescription">Les sites que vous visitez sont susceptibles de demander l\'accès à la localisation, à l\'appareil photo, au micro ou au logiciel DRM (gestion des droits numériques) de votre appareil. Ils ne pourront y accéder que si vous leur en donnez explicitement la permission.</string>
     <string name="sitePermissionsSettingsEnablePermissionTitle">Autoriser tous les sites à demander :</string>

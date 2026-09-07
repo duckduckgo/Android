@@ -57,6 +57,10 @@
     <string name="systemPermissionDialogCameraAndAudioDeniedContent">Sivustot voivat käyttää kameraa ja mikrofonia vain, jos annat DuckDuckGon pyytää niiden käyttöoikeutta.</string>
     <string name="systemPermissionsDeniedDialogPositiveButton">Avaa asetukset</string>
     <string name="systemPermissionsDeniedDialogNegativeButton">Peruuta</string>
+    <string name="duckAiMicPermissionDeniedSnackBarMessage">Mikrofonin käyttöoikeus tarvitaan äänitoimintoja varten</string>
+    <string name="duckAiMicPermissionDeniedDialogTitle">DuckDuckGo tarvitsee mikrofonisi käyttöoikeuden</string>
+    <string name="duckAiMicPermissionDeniedDialogContent">Mikrofonin käyttöoikeudet tarvitaan, jos haluat käyttää äänikeskustelua Duck.ai:ssa</string>
+    <string name="duckAiMicPermissionDeniedDialogPositiveButton">Muuta käyttöoikeuksia</string>
 
     <string name="sitePermissionsSettingsDescription">Käyttämäsi sivustot saattavat pyytää pääsyä laitteesi sijaintiin, kameraan, mikrofoniin tai DRM-ohjelmistoon (Digital Rights Management). Ne eivät voi käyttää tietoja, ellet myönnä niille erillistä käyttöoikeutta.</string>
     <string name="sitePermissionsSettingsEnablePermissionTitle">Salli kaikkien sivustojen pyytää:</string>

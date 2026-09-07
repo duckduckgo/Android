@@ -20,7 +20,9 @@ import androidx.annotation.DrawableRes
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.onboarding.OnboardingPreference
+import com.duckduckgo.app.onboarding.orchestrator.PasswordImportResult
 import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
+import com.duckduckgo.onboarding.api.OnboardingSingleChoiceDataPlugin.Option
 
 /** A screen with working state the user edits before submitting. */
 interface Stateful<S : Any> {
@@ -105,18 +107,89 @@ sealed interface ContentConfig {
     data class PreferenceSelector(
         override val title: TextConfig,
         val rows: List<Row>,
+        val caption: TextConfig? = null,
     ) : ContentConfig, Stateful<PreferenceSelectorContentState> {
 
         data class Row(
             val preference: OnboardingPreference,
-            @DrawableRes val iconRes: Int,
+            /** Null when the row renders without an icon. */
+            @DrawableRes val iconRes: Int?,
             val primaryText: TextConfig,
-            val secondaryText: TextConfig,
+            /** Null when the row is rendered as a single line. */
+            val secondaryText: TextConfig?,
             val initiallyEnabled: Boolean,
+            /** When set, the row is only shown while the preference it names is switched on. */
+            val dependsOn: OnboardingPreference? = null,
         )
 
         override fun initialState() = PreferenceSelectorContentState(rows.associate { it.preference to it.initiallyEnabled })
     }
+
+    data class SingleChoice(
+        override val title: TextConfig,
+        val body: TextConfig,
+        val rows: List<Option>,
+    ) : ContentConfig, Stateful<SingleChoiceContentState> {
+
+        init {
+            require(rows.isNotEmpty()) { "A single-choice screen needs at least one row" }
+        }
+
+        override fun initialState() = SingleChoiceContentState(selected = rows.first())
+    }
+
+    data class DuckAiState(
+        override val title: TextConfig,
+        val body: TextConfig,
+        val options: List<Option>,
+    ) : ContentConfig {
+
+        init {
+            require(options.isNotEmpty()) { "A Duck.ai state screen needs at least one option" }
+        }
+    }
+
+    data class TogglePosition(
+        override val title: TextConfig,
+        @field:DrawableRes val pictogramLightRes: Int,
+        @field:DrawableRes val pictogramDarkRes: Int,
+        val pictogramCaption: TextConfig,
+        val options: List<Option>,
+    ) : ContentConfig {
+
+        init {
+            require(options.isNotEmpty()) { "A toggle position screen needs at least one option" }
+        }
+    }
+
+    data class ImportPasswords(
+        override val title: TextConfig,
+        val body: TextConfig,
+    ) : ContentConfig
+
+    data class ImportComplete(
+        override val title: TextConfig,
+        val parsingTitle: TextConfig,
+        val parsingBody: TextConfig,
+        val failedTitle: TextConfig,
+        val failedRow: TextConfig,
+        val result: PasswordImportResult?,
+    ) : ContentConfig, Stateful<ImportCompleteContentState> {
+        override fun initialState(): ImportCompleteContentState = when (result) {
+            null, PasswordImportResult.InProgress -> ImportCompleteContentState.Parsing
+            is PasswordImportResult.Terminal.Imported ->
+                ImportCompleteContentState.Finished(imported = result.imported, skipped = result.skipped)
+
+            PasswordImportResult.Terminal.Failed -> ImportCompleteContentState.Failed
+        }
+    }
+}
+
+sealed interface ImportCompleteContentState {
+    data object Parsing : ImportCompleteContentState
+    data class Finished(val imported: Int, val skipped: Int) : ImportCompleteContentState
+
+    data object Failed : ImportCompleteContentState
 }
 
 data class AddressBarContentState(val position: OmnibarType)
@@ -135,6 +208,8 @@ data class QuickSetupContentState(
 data class DownloadReasonContentState(val selection: DownloadReasonSelection?)
 
 data class PreferenceSelectorContentState(val enabled: Map<OnboardingPreference, Boolean>)
+
+data class SingleChoiceContentState(val selected: Option)
 
 enum class DownloadReasonSelection {
     SEARCH,

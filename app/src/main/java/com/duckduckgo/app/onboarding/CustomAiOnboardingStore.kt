@@ -45,19 +45,6 @@ interface CustomAiOnboardingStore {
      * Calling [isEnabled] does not re-evaluate.
      */
     suspend fun isEnabled(): Boolean
-
-    /**
-     * Arms a one-shot signal that the next auto-launched input screen should open on the Duck.ai (chat) tab.
-     * Set when the custom-AI onboarding finishes (completed or skipped); consumed once by
-     * [consumeOpenInputOnDuckAiTab].
-     */
-    fun setOpenInputOnDuckAiTab()
-
-    /**
-     * Returns whether the next auto-launched input screen should open on the Duck.ai (chat) tab, clearing the
-     * signal so subsequent launches behave normally. Returns `false` when not armed.
-     */
-    fun consumeOpenInputOnDuckAiTab(): Boolean
 }
 
 interface CustomAiOnboardingResolver {
@@ -119,19 +106,6 @@ class CustomAiOnboardingStoreImpl @Inject constructor(
         withContext(dispatcherProvider.io()) {
             preferences.getBoolean(PREFS_KEY_ENABLED, false)
         }
-    }
-
-    // Deliberately not persisted: a one-shot that should only influence the input screen launched
-    // immediately after onboarding finishes within this process.
-    @Volatile
-    private var openInputOnDuckAiTab: Boolean = false
-
-    override fun setOpenInputOnDuckAiTab() {
-        openInputOnDuckAiTab = true
-    }
-
-    override fun consumeOpenInputOnDuckAiTab(): Boolean {
-        return openInputOnDuckAiTab.also { openInputOnDuckAiTab = false }
     }
 
     companion object {

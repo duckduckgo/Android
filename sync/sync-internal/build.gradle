@@ -54,6 +54,7 @@ dependencies {
     implementation AndroidX.core.ktx
     implementation Google.android.material
     implementation AndroidX.constraintLayout
+    implementation AndroidX.recyclerView
 
     // Barcode scanning
     implementation "com.journeyapps:zxing-android-embedded:_"

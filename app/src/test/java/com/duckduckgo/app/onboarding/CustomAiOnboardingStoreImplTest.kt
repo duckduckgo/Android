@@ -180,18 +180,4 @@ class CustomAiOnboardingStoreImplTest {
         // a fresh instance backed by the same storage reads the persisted decision
         assertTrue(store().isEnabled())
     }
-
-    @Test
-    fun `when not armed then consume open input returns false`() {
-        assertFalse(store().consumeOpenInputOnDuckAiTab())
-    }
-
-    @Test
-    fun `when armed then consume open input returns true once and self clears`() {
-        val store = store()
-        store.setOpenInputOnDuckAiTab()
-
-        assertTrue(store.consumeOpenInputOnDuckAiTab())
-        assertFalse(store.consumeOpenInputOnDuckAiTab())
-    }
 }

@@ -16,14 +16,18 @@
 
 package com.duckduckgo.feedback.impl.ui.negative.brokensite
 
+import android.os.Bundle
 import androidx.core.view.doOnNextLayout
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.feedback.impl.R
 import com.duckduckgo.feedback.impl.databinding.ContentFeedbackNegativeBrokenSiteFeedbackBinding
 import com.duckduckgo.feedback.impl.ui.common.FeedbackFragment
 import com.duckduckgo.feedback.impl.ui.common.LayoutScrollingTouchListener
+import com.duckduckgo.feedback.impl.ui.common.resolveFeedbackFaceAsset
+import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
 class BrokenSiteNegativeFeedbackFragment : FeedbackFragment(R.layout.content_feedback_negative_broken_site_feedback) {
@@ -43,6 +47,19 @@ class BrokenSiteNegativeFeedbackFragment : FeedbackFragment(R.layout.content_fee
 
     private val listener: BrokenSiteFeedbackListener?
         get() = activity as BrokenSiteFeedbackListener
+
+    @Inject
+    lateinit var appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+
+        if (appBrandDesignUpdateToggles.pictograms().isEnabled()) {
+            binding.emoticonImage.setImageResource(
+                resolveFeedbackFaceAsset(isPositive = false, isPictogramsEnabled = true),
+            )
+        }
+    }
 
     override fun configureViewModelObservers() {
         viewModel.command.observe(this) { command ->

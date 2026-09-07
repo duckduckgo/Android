@@ -119,6 +119,7 @@ class RealAppReturnPixelSender @Inject constructor(
                 put(AppReturnPixelParameters.UNIFIED_INPUT_AVAILABLE, duckAiFeatureState.nativeInputFieldEnabled.value.toString())
                 put(AppReturnPixelParameters.TOGGLE_VISIBLE, toggleVisible.toString())
                 put(AppReturnPixelParameters.LAUNCH_SOURCE, launchSource)
+                put(Pixel.PixelParameter.PETAL, Pixel.PixelValues.PETAL_RANDOMIZE)
             }
 
             pixel.get().fire(pixel = AppPixelName.APP_RETURN_COUNT, parameters = params)

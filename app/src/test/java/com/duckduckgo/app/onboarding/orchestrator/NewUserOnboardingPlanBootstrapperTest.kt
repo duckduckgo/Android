@@ -31,6 +31,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -38,6 +40,7 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -102,6 +105,19 @@ class NewUserOnboardingPlanBootstrapperTest {
         val exception = runCatching { testee.startNewUserOnboardingPlan() }.exceptionOrNull()
 
         assertTrue(exception is IllegalArgumentException)
+    }
+
+    @Test
+    fun `when a run is already in progress then returns it without building a plan`() = runTest {
+        val plan = LinearOnboardingPlan(id = "running_plan", steps = emptyList())
+        val running = InProgress(rootPlanId = plan.id, currentPlan = plan, currentStepIndex = 0)
+        fakeOrchestrator.stateFlow.value = running
+
+        val result = testee.startNewUserOnboardingPlan()
+
+        assertEquals(running, result)
+        assertNull(fakeOrchestrator.startedPlan)
+        verify(planProvider, never()).buildRootPlan(any(), any())
     }
 
     @Test

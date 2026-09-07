@@ -252,10 +252,17 @@ platform :android do
 
         end
 
-    desc "Create a new release branch and update the version"
+    desc "Cut a local release branch, merge it into develop then main, and publish the tag last"
     lane :tag_and_push_release_version do |options|
         app_version = options[:app_version]
         ref = options[:ref]
+
+        # app_version reaches git through interpolated shell commands below, and the
+        # workflow input is a free-form string, so require the production release format.
+        unless app_version.to_s =~ /\A\d+\.\d+\.\d+\z/
+            UI.user_error!("app_version must be X.Y.Z, got #{app_version.inspect}")
+        end
+
         branch_name = "release/#{app_version}"
 
         # Checkout all branches are available
@@ -270,8 +277,11 @@ platform :android do
         sh("git reset --hard")
         sh("git clean -f -fxd")
 
-        # Create a new release branch
-        sh("git checkout -b #{branch_name}")
+        # Create a new release branch. Deliberately never pushed: the bump commit is
+        # regenerated from `ref` on every run, and a remote release branch rejects the
+        # same-version retry as non-fast-forward. -B resets a branch a previous local
+        # attempt left behind, which reset and clean do not remove.
+        sh("git checkout -B #{branch_name}")
         UI.success("Release branch #{branch_name} created successfully!")
 
         # Update version properties file and push release branch
@@ -280,25 +290,34 @@ platform :android do
         end
 
         sh("git add #{appVersionFilePath}")
-        sh("git commit -am 'Updated version number for new release - #{app_version}'")
-        sh "git push origin #{branch_name}"
+        # A retry after a failed tag push can find the bump already on develop, reached
+        # through a newer LGC, leaving nothing to stage. Test the index rather than the
+        # worktree, so an unrelated modification cannot turn this into an empty commit.
+        if sh("git diff --cached --name-only", log: false).strip.empty?
+            UI.important("version.properties is already at #{app_version}, skipping the bump commit")
+        else
+            sh("git commit -m 'Updated version number for new release - #{app_version}'")
+        end
 
-        # Merge release branch into main and tag it
-        sh "git checkout main"
-        sh "git merge --no-ff release/#{app_version}"
-        sh "git tag -a #{app_version} -m #{app_version}"
-        sh "git push origin main --tags"
-        UI.header("#{app_version} tag has been successfully created. 🎉")
-
-        # Merge changes into develop
+        # develop before main: a push rejected here must not leave a published tag behind.
+        # --ff-only on both pulls: a plain pull on a diverged local branch would quietly
+        # merge and push that merge.
         sh "git checkout develop"
-        sh "git pull origin develop"
-        sh "git merge --no-ff release/#{app_version}"
+        sh "git pull --ff-only origin develop"
+        sh "git merge --no-ff #{branch_name}"
         sh "git push origin develop"
 
-        # Clean up branches
-        sh "git push -d origin release/#{app_version}"
-        sh "git branch -d release/#{app_version}"
+        # The tag is the last thing to become public, and lands with main or not at all
+        sh "git checkout main"
+        sh "git pull --ff-only origin main"
+        sh "git merge --no-ff #{branch_name}"
+        # -f: reset/clean do not remove tags, so a previous local attempt can leave one
+        # behind. The remote still refuses a tag it already has, so this cannot mispublish.
+        sh "git tag -f -a #{app_version} -m #{app_version}"
+        sh "git push --atomic origin main refs/tags/#{app_version}"
+        UI.header("#{app_version} tag has been successfully created. 🎉")
+
+        sh "git branch -d #{branch_name}"
     end
 
     # Note, this currently relies on having `git flow` tools installed.

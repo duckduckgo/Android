@@ -54,6 +54,15 @@ class EmbellishmentPlacementTest {
     }
 
     @Test
+    fun `the right wing reserves room on tablet only`() {
+        val placement = EmbellishmentPlacement.of(Embellishment.RightWing)
+
+        assertFalse(placement.anchorsCardOnPhone)
+        assertEquals(0.5f, placement.biasTablet)
+        assertTrue(placement.drawsArtwork)
+    }
+
+    @Test
     fun `the bobbing dax reserves room on tablet only`() {
         val placement = EmbellishmentPlacement.of(Embellishment.BobbingDax)
 

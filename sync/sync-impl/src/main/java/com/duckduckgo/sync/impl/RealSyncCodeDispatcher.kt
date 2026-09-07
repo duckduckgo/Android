@@ -19,6 +19,7 @@ package com.duckduckgo.sync.impl
 import android.util.Base64
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.AccountErrorCodes.ALREADY_SIGNED_IN
+import com.duckduckgo.sync.impl.AccountErrorCodes.GENERIC_ERROR
 import com.duckduckgo.sync.impl.AccountErrorCodes.NEGOTIATION_ABORTED
 import com.duckduckgo.sync.impl.AccountErrorCodes.NO_RECOVERY_CODE
 import com.duckduckgo.sync.impl.AccountErrorCodes.PAIRING_CANCELLED
@@ -32,6 +33,7 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.RELAY_CHANNEL_UNAVAILABLE
 import com.duckduckgo.sync.impl.AccountErrorCodes.SESSION_TIMEOUT
 import com.duckduckgo.sync.impl.AccountErrorCodes.UNEXPECTED_EVENT
 import com.duckduckgo.sync.impl.AccountErrorCodes.UNEXPECTED_SECOND_HELLO
+import com.duckduckgo.sync.impl.AccountErrorCodes.UNSUPPORTED_CREDENTIAL_TYPE
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2CodeParseResult
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Event
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message
@@ -286,6 +288,7 @@ class RealSyncCodeDispatcher @Inject constructor(
         is DispatchOutcome.LinkingCodeReady,
         is DispatchOutcome.JoinerConfirmationRequested,
         is DispatchOutcome.HostConfirmationRequested,
+        is DispatchOutcome.JoinOutcomeUnknown,
         -> false
         is DispatchOutcome.LoggedIn,
         is DispatchOutcome.AlreadyConnected,
@@ -306,29 +309,58 @@ class RealSyncCodeDispatcher @Inject constructor(
     ): DispatchOutcome? = when (transition.to) {
         ExchangeV2State.Joiner.Confirming ->
             DispatchOutcome.JoinerConfirmationRequested(peerName = runner.peerName, peerKind = peerKind)
+
         ExchangeV2State.Host.Confirming ->
             DispatchOutcome.HostConfirmationRequested(peerName = runner.peerName, peerKind = peerKind)
-        ExchangeV2State.Host.Done -> DispatchOutcome.LoggedIn(SetupPath.PAIRING, SetupRole.HOST, peerKind)
-        ExchangeV2State.Host.Aborted -> hostAbortedToOutcome(transition.localTrigger, transition.trigger)
-        // Per spec §"Same-account case": not an abort; both devices share an account already.
-        ExchangeV2State.SameAccountAbort -> DispatchOutcome.AlreadyConnected
-        ExchangeV2State.Joiner.Done -> {
-            val received = (transition.trigger as? ExchangeV2Message.RecoveryCodeResponse)?.recoveryCode
-            if (received.isNullOrBlank()) {
-                DispatchOutcome.Failed("joiner_done_missing_recovery_code", NO_RECOVERY_CODE.code)
+
+        ExchangeV2State.Host.Done -> hostDoneToOutcome(transition.trigger, peerKind)
+
+        ExchangeV2State.Host.Unknown -> {
+            if (transition.from != ExchangeV2State.Host.Unknown) {
+                DispatchOutcome.JoinOutcomeUnknown(peerKind)
             } else {
-                loginWithV2RecoveryCode(received, peerKind)
+                null
             }
         }
+
+        ExchangeV2State.Host.Aborted -> hostAbortedToOutcome(transition.localTrigger, transition.trigger)
+
+        // Per spec §"Same-account case": not an abort; both devices share an account already.
+        ExchangeV2State.SameAccountAbort -> DispatchOutcome.AlreadyConnected
+
+        ExchangeV2State.Joiner.Joining -> {
+            when (val message = transition.trigger) {
+                is ExchangeV2Message.RecoveryCodeResponse -> {
+                    val outcome = loginWithV2RecoveryCode(message.recoveryCode, peerKind)
+                    runner.localTrigger(LocalTrigger.JoinerJoinComplete(outcome.toRecoveryCodeDoneReason())).join()
+                    outcome
+                }
+
+                is ExchangeV2Message.Bye -> null
+
+                else -> DispatchOutcome.Failed("joiner_joining_missing_recovery_code", NO_RECOVERY_CODE.code)
+            }
+        }
+
         ExchangeV2State.Joiner.AbortedByHost -> when (transition.trigger) {
             is ExchangeV2Message.RecoveryCodeDenied ->
                 DispatchOutcome.Failed("peer_denied_recovery_code", PAIRING_REJECTED.code)
+
             is ExchangeV2Message.RecoveryCodeUnavailable ->
                 DispatchOutcome.Failed("peer_recovery_code_unavailable", PEER_RECOVERY_CODE_UNAVAILABLE.code)
-            else -> DispatchOutcome.Failed("peer_aborted", PAIRING_REJECTED.code)
+
+            else ->
+                DispatchOutcome.Failed("peer_aborted", PAIRING_REJECTED.code)
         }
-        ExchangeV2State.Joiner.AbortedLocal -> joinerAbortedLocalToOutcome(transition.localTrigger, transition.trigger)
-        ExchangeV2State.Aborted -> DispatchOutcome.Failed("negotiation_aborted", UNEXPECTED_EVENT.code)
+
+        ExchangeV2State.Joiner.AbortedLocal ->
+            joinerAbortedLocalToOutcome(transition.localTrigger, transition.trigger)
+
+        ExchangeV2State.Aborted -> when (val wireTrigger = transition.trigger) {
+            is ExchangeV2Message.Bye -> wireTrigger.toPeerLeftOutcome()
+            else -> DispatchOutcome.Failed("negotiation_aborted", UNEXPECTED_EVENT.code)
+        }
+
         else -> null
     }
 
@@ -347,9 +379,34 @@ class RealSyncCodeDispatcher @Inject constructor(
             SessionErrorKind.RelayChannelUnavailable -> RELAY_CHANNEL_UNAVAILABLE.code
             SessionErrorKind.RecoveryCodePreparationFailed -> RECOVERY_CODE_PREPARATION_FAILED.code
             SessionErrorKind.MalformedRelayRequest -> NEGOTIATION_ABORTED.code
+            SessionErrorKind.MessageDecryptionFailed -> PAIRING_FAILED.code
+            SessionErrorKind.PeerProtocolTooNew -> PAIRING_FAILED.code
             SessionErrorKind.Unknown -> PAIRING_FAILED.code
         }
         return DispatchOutcome.Failed(event.message, code, timeoutStage = event.timeoutStage)
+    }
+
+    private fun DispatchOutcome.toRecoveryCodeDoneReason(): ExchangeV2Message.RecoveryCodeDone.Reason = when {
+        this is DispatchOutcome.LoggedIn || this is DispatchOutcome.AlreadyConnected -> {
+            ExchangeV2Message.RecoveryCodeDone.Reason.Success
+        }
+
+        this is DispatchOutcome.Failed && code == UNSUPPORTED_CREDENTIAL_TYPE.code -> {
+            ExchangeV2Message.RecoveryCodeDone.Reason.ScopeRejected
+        }
+
+        else -> ExchangeV2Message.RecoveryCodeDone.Reason.LoginFailed
+    }
+
+    private fun hostDoneToOutcome(
+        wireTrigger: ExchangeV2Message?,
+        peerKind: PeerKind?,
+    ): DispatchOutcome {
+        val reason = (wireTrigger as? ExchangeV2Message.RecoveryCodeDone)?.reason
+        if (reason != null && reason != ExchangeV2Message.RecoveryCodeDone.Reason.Success) {
+            logcat { "$TAG: Host.Done with peer-reported outcome $reason; host sync succeeded regardless" }
+        }
+        return DispatchOutcome.LoggedIn(SetupPath.PAIRING, SetupRole.HOST, peerKind)
     }
 
     private fun hostAbortedToOutcome(
@@ -358,6 +415,7 @@ class RealSyncCodeDispatcher @Inject constructor(
     ): DispatchOutcome = when {
         localTrigger == LocalTrigger.UserDeniedHost -> DispatchOutcome.Failed("user_denied", PAIRING_CANCELLED.code)
         localTrigger == LocalTrigger.HostUnavailable -> DispatchOutcome.Failed("host_unavailable", PAIRING_UNAVAILABLE.code)
+        wireTrigger is ExchangeV2Message.Bye -> wireTrigger.toPeerLeftOutcome()
         wireTrigger != null -> DispatchOutcome.Failed("host_protocol_error", UNEXPECTED_EVENT.code)
         else -> DispatchOutcome.Failed("host_aborted", NEGOTIATION_ABORTED.code)
     }
@@ -367,6 +425,7 @@ class RealSyncCodeDispatcher @Inject constructor(
         wireTrigger: ExchangeV2Message?,
     ): DispatchOutcome = when {
         localTrigger == LocalTrigger.UserDeniedJoiner -> DispatchOutcome.Failed("user_denied_joiner", PAIRING_CANCELLED.code)
+        wireTrigger is ExchangeV2Message.Bye -> wireTrigger.toPeerLeftOutcome()
         wireTrigger != null -> DispatchOutcome.Failed("joiner_protocol_error", UNEXPECTED_EVENT.code)
         else -> DispatchOutcome.Failed("joiner_local_aborted", PAIRING_FAILED.code)
     }
@@ -404,7 +463,10 @@ class RealSyncCodeDispatcher @Inject constructor(
                         peerKind = peerKind,
                     )
             }
-            else -> DispatchOutcome.Failed("Received unknown credential type '${parsed.cid}' over v2 linking")
+            else -> DispatchOutcome.Failed(
+                "Received unknown credential type '${parsed.cid}' over v2 linking",
+                UNSUPPORTED_CREDENTIAL_TYPE.code,
+            )
         }
     }
 
@@ -493,6 +555,22 @@ class RealSyncCodeDispatcher @Inject constructor(
             }
         }
     }
+
+    private fun ExchangeV2Message.Bye.toPeerLeftOutcome(): DispatchOutcome.Failed = DispatchOutcome.Failed(
+        "peer_left(${reason.value})",
+        code = when (reason) {
+            is ExchangeV2Message.Bye.Reason.Cancelled -> PAIRING_REJECTED.code
+
+            is ExchangeV2Message.Bye.Reason.Error,
+            is ExchangeV2Message.Bye.Reason.Unknown,
+            -> PAIRING_FAILED.code
+
+            // A bye only aborts a session that hasn't handed the recovery code over yet,
+            // so a peer claiming it finished can't legitimately land here and is likely
+            // a protocol implementation error.
+            is ExchangeV2Message.Bye.Reason.Done -> GENERIC_ERROR.code
+        },
+    )
 
     /**
      * Re-encode a v2 ddg recovery (userId + secret) as a v1-shape `{recovery:{primary_key,

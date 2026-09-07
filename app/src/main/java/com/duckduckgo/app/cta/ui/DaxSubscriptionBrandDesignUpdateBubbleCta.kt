@@ -25,6 +25,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.onboarding.store.SegmentedOnboardingPath
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.device.DeviceInfo
@@ -38,12 +39,13 @@ data class DaxSubscriptionBrandDesignUpdateBubbleCta(
     override val deviceInfo: DeviceInfo,
     val isCustomAiOnboardingFlow: Boolean,
     val isFreeTrialCopy: Boolean,
+    val segmentedPath: SegmentedOnboardingPath?,
     override val onboardingImprovementsEnabled: Boolean,
     override val onboardingImprovementsV2Enabled: Boolean,
 ) : DaxBubbleCta.BrandDesignUpdateBubbleCta(
     ctaId = CtaId.DAX_INTRO_PRIVACY_PRO,
     title = R.string.onboardingPrivacyProDaxDialogTitle,
-    description = if (isCustomAiOnboardingFlow) {
+    description = if (isCustomAiOnboardingFlow || segmentedPath == SegmentedOnboardingPath.AI) {
         R.string.onboardingPrivacyProCustomAiFlowDaxDialogDescription
     } else {
         R.string.onboardingPrivacyProDaxDialogDescription

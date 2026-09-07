@@ -39,4 +39,6 @@
     <dimen name="changeAppIconSpacing">24dp</dimen>
     <dimen name="changeAppIconSelectionStrokeWidth">2dp</dimen>
     <dimen name="changeAppIconSelectionGap">2dp</dimen>
+    <dimen name="brandDesignTabTileStrokeWidth">1px</dimen>
+    <dimen name="brandDesignTabTileStrokeWidthSelected">1dp</dimen>
 </resources>

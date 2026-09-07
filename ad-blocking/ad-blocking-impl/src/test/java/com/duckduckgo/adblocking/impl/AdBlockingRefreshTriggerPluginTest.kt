@@ -29,7 +29,7 @@ import org.mockito.kotlin.mock
 @OptIn(ExperimentalCoroutinesApi::class)
 class AdBlockingRefreshTriggerPluginTest {
 
-    private val stateFlow = MutableStateFlow<AdBlockingState>(AdBlockingState.Enabled.UserEnabled)
+    private val stateFlow = MutableStateFlow<AdBlockingState>(AdBlockingState.Enabled.WithPixelConsent)
     private val statusChecker: AdBlockingStatusChecker = mock {
         on { observeState() } doReturn stateFlow
     }
@@ -59,7 +59,7 @@ class AdBlockingRefreshTriggerPluginTest {
             stateFlow.value = AdBlockingState.Disabled.UntilRelaunch
             awaitItem()
 
-            stateFlow.value = AdBlockingState.Enabled.UserEnabled
+            stateFlow.value = AdBlockingState.Enabled.WithPixelConsent
             awaitItem()
 
             cancelAndConsumeRemainingEvents()
@@ -69,7 +69,7 @@ class AdBlockingRefreshTriggerPluginTest {
     @Test
     fun whenStateRepeatsSameValueThenDoesNotEmit() = runTest {
         plugin.observeRefreshRequests().test {
-            stateFlow.value = AdBlockingState.Enabled.UserEnabled
+            stateFlow.value = AdBlockingState.Enabled.WithPixelConsent
 
             expectNoEvents()
             cancel()

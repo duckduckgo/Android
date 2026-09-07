@@ -19,6 +19,8 @@ package com.duckduckgo.app.browser.di
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.pm.PackageManager
+import android.net.ConnectivityManager
+import android.net.DnsResolver
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
@@ -49,6 +51,10 @@ import com.duckduckgo.app.browser.menu.BrowserMenuHighlightPlugin
 import com.duckduckgo.app.browser.menu.TopInContextSection
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedPixelDao
 import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedPixelDao
+import com.duckduckgo.app.browser.suggestredirect.DnsLookupApi29Impl
+import com.duckduckgo.app.browser.suggestredirect.DnsLookupPreApi29Impl
+import com.duckduckgo.app.browser.suggestredirect.HostnameResolver
+import com.duckduckgo.app.browser.suggestredirect.HostnameResolverImpl
 import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewPersister
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
@@ -74,8 +80,10 @@ import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.trackerdetection.CloakedCnameDetector
 import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.cookies.api.ThirdPartyCookieNames
 import com.duckduckgo.di.scopes.AppScope
@@ -103,6 +111,7 @@ import dagger.multibindings.IntoSet
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Named
 import javax.inject.Qualifier
+import kotlin.time.Duration.Companion.milliseconds
 
 @Module
 @ContributesTo(AppScope::class)
@@ -117,6 +126,7 @@ class BrowserModule {
         duckChat: DuckChat,
         androidBrowserConfigFeature: AndroidBrowserConfigFeature,
         serpSettingsFeature: SerpSettingsFeature,
+        deviceInfo: DeviceInfo,
     ): RequestRewriter {
         return DuckDuckGoRequestRewriter(
             urlDetector,
@@ -126,6 +136,7 @@ class BrowserModule {
             duckChat,
             androidBrowserConfigFeature,
             serpSettingsFeature,
+            deviceInfo,
         )
     }
 
@@ -348,6 +359,23 @@ class BrowserModule {
     @Provides
     fun provideSiteErrorCodeHandler(): HttpCodeSiteErrorHandler {
         return HttpCodeSiteErrorHandlerImpl()
+    }
+
+    @SingleInstanceIn(AppScope::class)
+    @Provides
+    fun provideHostnameResolver(
+        appBuildConfig: AppBuildConfig,
+        connectivityManager: ConnectivityManager,
+        dispatcherProvider: DispatcherProvider,
+    ): HostnameResolver {
+        val lookupTimeout = HostnameResolver.LOOKUP_TIMEOUT_MS.milliseconds
+        val dnsLookup = if (appBuildConfig.sdkInt >= 29) {
+            @Suppress("NewApi") // we use appBuildConfig
+            DnsLookupApi29Impl(dispatcherProvider, DnsResolver.getInstance())
+        } else {
+            DnsLookupPreApi29Impl(dispatcherProvider)
+        }
+        return HostnameResolverImpl(lookupTimeout, connectivityManager, dispatcherProvider, dnsLookup)
     }
 }
 

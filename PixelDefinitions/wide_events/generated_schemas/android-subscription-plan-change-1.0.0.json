@@ -1,0 +1,173 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "description": "User switches their Privacy Pro subscription to a different plan.",
+    "$comment": "{\"owners\":[\"lmac012\"]}",
+    "type": "object",
+    "required": ["meta", "global", "feature", "app", "context"],
+    "additionalProperties": false,
+    "properties": {
+        "meta": {
+            "type": "object",
+            "required": ["type", "version"],
+            "additionalProperties": false,
+            "properties": { "type": { "const": "android-subscription-plan-change" }, "version": { "const": "1.0.0" } }
+        },
+        "app": {
+            "type": "object",
+            "required": ["name", "version"],
+            "additionalProperties": false,
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "The name of the application sending the event",
+                    "enum": ["DuckDuckGo Android"]
+                },
+                "version": {
+                    "type": "string",
+                    "description": "The version of the app sending the event. Release builds are X.Y.Z; internal and nightly builds append the build number and channel suffix.",
+                    "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(\\.[0-9]+(-[a-z]+)?)?$"
+                },
+                "form_factor": { "type": "string", "description": "The form factor of the current device", "enum": ["phone", "tablet"] },
+                "dev_mode": { "type": "boolean", "description": "Whether the app is a debug build" }
+            }
+        },
+        "global": {
+            "type": "object",
+            "required": ["platform", "type", "sample_rate"],
+            "additionalProperties": false,
+            "properties": {
+                "platform": { "type": "string", "description": "The platform the app is running on", "enum": ["Android"] },
+                "type": { "type": "string", "description": "The type of software sending the event", "enum": ["app"] },
+                "sample_rate": {
+                    "type": "number",
+                    "description": "Sample rate for this event, between 0 and 1",
+                    "minimum": 0,
+                    "maximum": 1
+                },
+                "is_first_daily_occurrence": {
+                    "type": "boolean",
+                    "description": "Whether this is the first event completed with this feature name and status in the current UTC calendar day"
+                }
+            }
+        },
+        "feature": {
+            "type": "object",
+            "required": ["name", "status", "data"],
+            "additionalProperties": false,
+            "properties": {
+                "name": { "type": "string", "description": "The feature name for this event", "enum": ["subscription-plan-change"] },
+                "status": {
+                    "type": "string",
+                    "description": "The terminal status of the flow",
+                    "enum": ["SUCCESS", "FAILURE", "CANCELLED", "UNKNOWN"]
+                },
+                "data": {
+                    "type": "object",
+                    "required": ["ext"],
+                    "additionalProperties": false,
+                    "properties": {
+                        "ext": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                                "from_plan": { "type": "string", "description": "Play basePlan ID the user is switching from" },
+                                "to_plan": { "type": "string", "description": "Play basePlan ID the user is switching to" },
+                                "from_tier": {
+                                    "type": "string",
+                                    "description": "Subscription tier the user is switching from",
+                                    "enum": ["plus", "pro", "unknown"]
+                                },
+                                "to_tier": {
+                                    "type": "string",
+                                    "description": "Subscription tier the user is switching to",
+                                    "enum": ["plus", "pro", "unknown"]
+                                },
+                                "billing_cycle_switch_type": {
+                                    "type": "string",
+                                    "description": "Whether the billing cycle changes as part of the switch",
+                                    "enum": ["upgrade", "downgrade", "none"]
+                                },
+                                "tier_change_type": {
+                                    "type": "string",
+                                    "description": "Direction of the tier change",
+                                    "enum": ["upgrade", "downgrade", "crossgrade"]
+                                },
+                                "activation_latency_ms_bucketed": {
+                                    "type": "string",
+                                    "description": "Duration from the Play billing switch to subscription activation",
+                                    "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                                },
+                                "failure_reason": {
+                                    "type": "string",
+                                    "description": "Exception class name of the failure. Only present on FAILURE events."
+                                },
+                                "step.validate_current_subscription": {
+                                    "type": "string",
+                                    "description": "Whether the current subscription validated successfully",
+                                    "enum": ["true", "false"]
+                                },
+                                "step.retrieve_target_plan": {
+                                    "type": "string",
+                                    "description": "Whether the target plan was found",
+                                    "enum": ["true", "false"]
+                                },
+                                "step.billing_flow_init": {
+                                    "type": "string",
+                                    "description": "Whether the Play billing flow initialised successfully",
+                                    "enum": ["true", "false"]
+                                },
+                                "step.billing_flow_switch": {
+                                    "type": "string",
+                                    "description": "Present if the Play billing switch succeeded",
+                                    "enum": ["true"]
+                                },
+                                "step.confirm_switch": {
+                                    "type": "string",
+                                    "description": "Present if the backend confirmed the switch",
+                                    "enum": ["true"]
+                                },
+                                "step.ui_refresh": {
+                                    "type": "string",
+                                    "description": "Present if the UI refreshed after the switch",
+                                    "enum": ["true"]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "context": {
+            "type": "object",
+            "required": ["name"],
+            "additionalProperties": false,
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "Entry point the flow was started from",
+                    "enum": [
+                        "",
+                        "funnel_addressbar_android__aitoggle",
+                        "funnel_addressbar_android__modelpicker",
+                        "funnel_addressbar_android__reasoningdropdown",
+                        "funnel_appmenu_android",
+                        "funnel_appsettings_android",
+                        "funnel_duckai_android__freelabel",
+                        "funnel_duckai_android__modelpicker",
+                        "funnel_duckai_android__reasoningdropdown",
+                        "funnel_duckai_android__switchmodel",
+                        "funnel_modal_android__skippedonboardingupsell",
+                        "funnel_modal_android__subscriptionnudge",
+                        "funnel_onboarding_android",
+                        "funnel_playstore",
+                        "funnel_purchase_offer_page_android",
+                        "funnel_restore_android__viewplans",
+                        "funnel_subscriptionsettings_android__viewplans",
+                        "dev_settings",
+                        "dev_settings_cancel_pending"
+                    ]
+                }
+            }
+        }
+    }
+}

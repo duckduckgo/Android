@@ -57,6 +57,10 @@
     <string name="systemPermissionDialogCameraAndAudioDeniedContent">Οι ιστότοποι μπορούν να χρησιμοποιούν την κάμερα και το μικρόφωνό σας μόνο εάν επιτρέψετε στο DuckDuckGo να αιτηθεί πρόσβαση.</string>
     <string name="systemPermissionsDeniedDialogPositiveButton">Άνοιγμα ρυθμίσεων</string>
     <string name="systemPermissionsDeniedDialogNegativeButton">Ακύρωση</string>
+    <string name="duckAiMicPermissionDeniedSnackBarMessage">Απαιτείται δικαίωμα πρόσβασης στο μικρόφωνο για τις φωνητικές λειτουργίες</string>
+    <string name="duckAiMicPermissionDeniedDialogTitle">Το DuckDuckGo χρειάζεται πρόσβαση στο μικρόφωνό σου</string>
+    <string name="duckAiMicPermissionDeniedDialogContent">Απαιτούνται δικαιώματα πρόσβασης στο μικρόφωνο αν θέλεις να χρησιμοποιήσεις τη φωνητική συνομιλία στο Duck.ai</string>
+    <string name="duckAiMicPermissionDeniedDialogPositiveButton">Αλλαγή δικαιωμάτων</string>
 
     <string name="sitePermissionsSettingsDescription">Οι ιστότοποι που επισκέπτεστε ενδέχεται να ζητήσουν πρόσβαση στην τοποθεσία, την κάμερα, το μικρόφωνο ή το λογισμικό DRM (Διαχείριση ψηφιακών δικαιωμάτων) της συσκευής σας. Δεν θα μπορούν να έχουν πρόσβαση σε αυτά εάν δεν τους παρέχετε ρητά την άδειά σας.</string>
     <string name="sitePermissionsSettingsEnablePermissionTitle">Να επιτρέπεται σε όλους τους ιστότοπους να αιτούνται:</string>

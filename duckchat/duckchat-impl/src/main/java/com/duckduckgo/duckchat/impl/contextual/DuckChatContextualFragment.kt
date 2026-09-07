@@ -816,8 +816,8 @@ class DuckChatContextualFragment :
                         viewModel.onMainBrowserPageFinished(command.isStorePageContextEnabled)
                     }
 
-                    DuckChatContextualSharedViewModel.Command.OpenSheet -> {
-                        logcat { "Duck.ai Contextual: OpenSheet" }
+                    DuckChatContextualSharedViewModel.Command.ReloadChat -> {
+                        logcat { "Duck.ai Contextual: ReloadChat" }
                         setupKeyboardVisibilityListener()
                         viewModel.onSheetReopened()
                         if (viewModel.viewState.value.sheetMode == DuckChatContextualViewModel.SheetMode.INPUT) {

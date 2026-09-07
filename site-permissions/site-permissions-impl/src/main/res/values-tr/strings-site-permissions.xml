@@ -57,6 +57,10 @@
     <string name="systemPermissionDialogCameraAndAudioDeniedContent">Siteler kameranızı ve mikrofonunuzu yalnızca DuckDuckGo\'nun erişim istemesine izin verirseniz kullanabilir.</string>
     <string name="systemPermissionsDeniedDialogPositiveButton">Ayarları Aç</string>
     <string name="systemPermissionsDeniedDialogNegativeButton">İptal</string>
+    <string name="duckAiMicPermissionDeniedSnackBarMessage">Ses özellikleri için mikrofon izni gerekiyor</string>
+    <string name="duckAiMicPermissionDeniedDialogTitle">DuckDuckGo\'nun mikrofonunuza erişmesi gerekiyor</string>
+    <string name="duckAiMicPermissionDeniedDialogContent">Duck.ai\'da Sesli Sohbet özelliğini kullanmak istiyorsanız mikrofon izinleri gereklidir</string>
+    <string name="duckAiMicPermissionDeniedDialogPositiveButton">İzinleri Değiştir</string>
 
     <string name="sitePermissionsSettingsDescription">Ziyaret ettiğiniz siteler cihazınızın konumuna, kamerasına, mikrofonuna veya DRM (Dijital Haklar Yönetimi) yazılımına erişim isteyebilir. Siz açıkça izin vermediğiniz sürece bunlara erişemezler.</string>
     <string name="sitePermissionsSettingsEnablePermissionTitle">Tüm sitelerin şunları istemesine izin ver:</string>

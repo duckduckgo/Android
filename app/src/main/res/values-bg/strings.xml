@@ -1003,4 +1003,11 @@
     <string name="singleTabFireDialogTitleFireMode">Изтриване на разделите Fire и данните в тях?</string>
 
     <string name="downloadsCannotOpenFileErrorMessage">Файлът не може да се отвори. Проверете за съвместимо приложение.</string>
+
+    <!-- Error pages -->
+    <string name="webViewErrorTitle" instruction="Title shown on the error pages">DuckDuckGo не може да зареди тази страница</string>
+    <string name="webViewErrorNoConnection" instruction="Message shown when the page fails to load because the device has no internet connection">Изглежда, че няма връзка с интернет.</string>
+    <string name="webViewErrorBadUrl" instruction="Message shown when the hostname of the website could not be resolved">Не може да бъде намерен сървър с посоченото име на хост.</string>
+    <string name="webViewErrorSslProtocol" instruction="Message shown when the website&apos;s SSL certificate is invalid. Placeholder is the website&apos;s address"><![CDATA[Сертификатът за този сървър е невалиден. Възможно е да се свързвате със сървър, който се представя за <b>%1$s</b>, което може да изложи поверителната Ви информация на риск.]]></string>
+    <string name="webViewErrorRedirectSuggestionMessage" instruction="Shown when a domain fails to load, offering a link to the www. version of the address. Placeholder is a tappable link to the suggested address.">Може би имахте предвид <annotation type="redirect_link">^1</annotation>?</string>
 </resources>

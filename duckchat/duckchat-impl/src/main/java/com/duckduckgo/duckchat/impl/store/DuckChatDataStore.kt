@@ -30,6 +30,7 @@ import com.duckduckgo.duckchat.impl.di.DuckChat
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_AUTOMATIC_CONTEXT_ATTACHMENT
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_CHAT_SUGGESTIONS_USER_SETTING
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_DEFAULT_TOGGLE_POSITION
+import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_HAS_SUBMITTED_PROMPT
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_INPUT_SCREEN_COSMETIC_SETTING
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_INPUT_SCREEN_EVER_ENABLED
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_INPUT_SCREEN_USER_SETTING
@@ -140,6 +141,10 @@ interface DuckChatDataStore {
 
     suspend fun setUserAcceptedTerms()
 
+    suspend fun hasSubmittedPromptBefore(): Boolean
+
+    suspend fun setPromptSubmitted()
+
     suspend fun setDefaultTogglePosition(position: String)
 
     suspend fun getDefaultTogglePosition(): String?
@@ -153,6 +158,10 @@ interface DuckChatDataStore {
     suspend fun getSelectedModel(): SelectedModel?
 
     suspend fun setSelectedModel(model: SelectedModel?)
+
+    suspend fun getSelectedProvider(): String?
+
+    suspend fun setSelectedProvider(rawValue: String?)
 
     suspend fun getSelectedReasoningMode(): String?
 
@@ -200,11 +209,13 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
         val DUCK_AI_AUTOMATIC_CONTEXT_ATTACHMENT = booleanPreferencesKey(name = "DUCK_AI_AUTOMATIC_CONTEXT_ATTACHMENT")
         val DUCK_AI_CHAT_SUGGESTIONS_USER_SETTING = booleanPreferencesKey(name = "DUCK_AI_CHAT_SUGGESTIONS_USER_SETTING")
         val DUCK_AI_TERMS_ACCEPTED = booleanPreferencesKey(name = "DUCK_AI_TERMS_ACCEPTED")
+        val DUCK_AI_HAS_SUBMITTED_PROMPT = booleanPreferencesKey(name = "DUCK_AI_HAS_SUBMITTED_PROMPT")
         val DUCK_AI_DEFAULT_TOGGLE_POSITION = stringPreferencesKey(name = "DUCK_AI_DEFAULT_TOGGLE_POSITION")
         val DUCK_AI_LAST_USED_TOGGLE_POSITION = stringPreferencesKey(name = "DUCK_AI_LAST_USED_TOGGLE_POSITION")
         val DUCK_AI_SELECTED_MODEL_ID = stringPreferencesKey(name = "DUCK_AI_SELECTED_MODEL_ID")
         val DUCK_AI_SELECTED_MODEL_SHORT_NAME = stringPreferencesKey(name = "DUCK_AI_SELECTED_MODEL_SHORT_NAME")
         val DUCK_AI_SELECTED_MODEL_REASONING_MODE = stringPreferencesKey(name = "DUCK_AI_SELECTED_MODEL_REASONING_MODE")
+        val DUCK_AI_SELECTED_PROVIDER = stringPreferencesKey(name = "DUCK_AI_SELECTED_PROVIDER")
         val DUCK_AI_CLEARED_PINNED_DEFAULT_MODEL = booleanPreferencesKey(name = "DUCK_AI_CLEARED_PINNED_DEFAULT_MODEL")
         val DUCK_AI_ADDRESS_BAR_PICKER_SELECTED_AT = longPreferencesKey(name = "DUCK_AI_ADDRESS_BAR_PICKER_SELECTED_AT")
     }
@@ -446,6 +457,12 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
         store.edit { prefs -> prefs[DUCK_AI_TERMS_ACCEPTED] = true }
     }
 
+    override suspend fun hasSubmittedPromptBefore(): Boolean = store.data.firstOrNull()?.let { it[DUCK_AI_HAS_SUBMITTED_PROMPT] } ?: false
+
+    override suspend fun setPromptSubmitted() {
+        store.edit { prefs -> prefs[DUCK_AI_HAS_SUBMITTED_PROMPT] = true }
+    }
+
     override suspend fun setDefaultTogglePosition(position: String) {
         store.edit { prefs -> prefs[DUCK_AI_DEFAULT_TOGGLE_POSITION] = position }
     }
@@ -476,6 +493,19 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
             } else {
                 prefs[Keys.DUCK_AI_SELECTED_MODEL_ID] = model.id
                 prefs[Keys.DUCK_AI_SELECTED_MODEL_SHORT_NAME] = model.shortName
+            }
+        }
+    }
+
+    override suspend fun getSelectedProvider(): String? =
+        store.data.firstOrNull()?.let { it[Keys.DUCK_AI_SELECTED_PROVIDER] }
+
+    override suspend fun setSelectedProvider(rawValue: String?) {
+        store.edit { prefs ->
+            if (rawValue == null) {
+                prefs.remove(Keys.DUCK_AI_SELECTED_PROVIDER)
+            } else {
+                prefs[Keys.DUCK_AI_SELECTED_PROVIDER] = rawValue
             }
         }
     }

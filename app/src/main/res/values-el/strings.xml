@@ -1003,4 +1003,11 @@
     <string name="singleTabFireDialogTitleFireMode">Να διαγραφούν οι καρτέλες Fire και τα δεδομένα τους;</string>
 
     <string name="downloadsCannotOpenFileErrorMessage">Δεν ήταν δυνατό το άνοιγμα του αρχείου. Ελέγξτε για μια συμβατή εφαρμογή.</string>
+
+    <!-- Error pages -->
+    <string name="webViewErrorTitle" instruction="Title shown on the error pages">Το DuckDuckGo δεν μπορεί να φορτώσει αυτή τη σελίδα</string>
+    <string name="webViewErrorNoConnection" instruction="Message shown when the page fails to load because the device has no internet connection">Φαίνεται να μην υπάρχει ενεργή σύνδεση στο διαδίκτυο.</string>
+    <string name="webViewErrorBadUrl" instruction="Message shown when the hostname of the website could not be resolved">Δεν ήταν δυνατή η εύρεση διακομιστή με το καθορισμένο όνομα κεντρικού υπολογιστή.</string>
+    <string name="webViewErrorSslProtocol" instruction="Message shown when the website&apos;s SSL certificate is invalid. Placeholder is the website&apos;s address"><![CDATA[Το πιστοποιητικό για αυτόν τον διακομιστή δεν είναι έγκυρο. Ίσως συνδέεσαι σε διακομιστή που προσποιείται ότι είναι ο τομέας <b>%1$s</b>, γεγονός που θα μπορούσε να θέσει σε κίνδυνο τις εμπιστευτικές πληροφορίες σου.]]></string>
+    <string name="webViewErrorRedirectSuggestionMessage" instruction="Shown when a domain fails to load, offering a link to the www. version of the address. Placeholder is a tappable link to the suggested address.">Μήπως εννοείς <annotation type="redirect_link">^1</annotation>;</string>
 </resources>

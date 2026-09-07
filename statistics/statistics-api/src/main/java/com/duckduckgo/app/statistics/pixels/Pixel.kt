@@ -78,6 +78,7 @@ interface Pixel {
         const val FREE_TRIAL = "free_trial"
         const val BROWSER_MODE = "browser_mode"
         const val SOURCE = "source"
+        const val PETAL = "petal"
     }
 
     object PixelValues {
@@ -105,6 +106,8 @@ interface Pixel {
         const val FIRE_ANIMATION_AIRSTREAM = "faas"
         const val FIRE_ANIMATION_WHIRLPOOL = "fawp"
         const val FIRE_ANIMATION_NONE = "fann"
+        const val PETAL_RANDOMIZE = "randomize"
+        const val PETAL_KANON = "kanon"
     }
 
     sealed class PixelType {

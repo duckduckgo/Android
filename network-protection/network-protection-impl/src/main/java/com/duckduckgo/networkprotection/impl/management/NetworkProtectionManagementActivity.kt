@@ -330,6 +330,14 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
         } else {
             binding.netpStatusImage.setAnimation(R.raw.vpn_header_dark)
         }
+
+        if (appBrandDesignUpdateToggles.pictograms().isEnabled()) {
+            binding.netpStatusImage.setAnimation(R.raw.vpn_header_brand_update)
+            binding.netpStatusImage.layoutParams = binding.netpStatusImage.layoutParams.apply {
+                width = resources.getDimensionPixelSize(R.dimen.netp_header_animation_width)
+                height = resources.getDimensionPixelSize(R.dimen.netp_header_animation_height)
+            }
+        }
     }
 
     private fun handleAnimation(newState: ConnectionState) {

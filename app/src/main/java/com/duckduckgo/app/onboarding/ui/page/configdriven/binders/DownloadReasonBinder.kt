@@ -20,6 +20,7 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.view.View
 import com.airbnb.lottie.LottieAnimationView
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.IncludeBrandDesignDialogDownloadReasonBinding
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent.DownloadReasonConfirmed
 import com.duckduckgo.app.onboarding.ui.page.configdriven.BindScope
@@ -30,6 +31,7 @@ import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonContentS
 import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection
 import com.duckduckgo.app.onboarding.ui.page.configdriven.StatefulDialogBinder
 import com.duckduckgo.common.utils.extensions.preventWidows
+import com.google.android.material.card.MaterialCardView
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.launchIn
@@ -86,10 +88,10 @@ class DownloadReasonBinder(
 
         state.onEach {
             if (it.selection != null) {
-                downloadReasonOptionSearch.isSelected = it.selection == DownloadReasonSelection.SEARCH
-                downloadReasonOptionAiChat.isSelected = it.selection == DownloadReasonSelection.AI_CHAT
-                downloadReasonOptionNoAi.isSelected = it.selection == DownloadReasonSelection.NO_AI
-                downloadReasonOptionBlockAds.isSelected = it.selection == DownloadReasonSelection.BLOCK_ADS
+                downloadReasonOptionSearch.applySelected(it.selection == DownloadReasonSelection.SEARCH)
+                downloadReasonOptionAiChat.applySelected(it.selection == DownloadReasonSelection.AI_CHAT)
+                downloadReasonOptionNoAi.applySelected(it.selection == DownloadReasonSelection.NO_AI)
+                downloadReasonOptionBlockAds.applySelected(it.selection == DownloadReasonSelection.BLOCK_ADS)
             }
         }.launchIn(scope.coroutineScope)
 
@@ -123,6 +125,13 @@ class DownloadReasonBinder(
             iconToAnimate.playDelayed(scope)
         }
         state.value = DownloadReasonContentState(selection)
+    }
+
+    private fun MaterialCardView.applySelected(selected: Boolean) {
+        isSelected = selected
+        strokeWidth = resources.getDimensionPixelSize(
+            if (selected) R.dimen.brandDesignTabTileStrokeWidthSelected else R.dimen.brandDesignTabTileStrokeWidth,
+        )
     }
 
     private fun LottieAnimationView.playDelayed(scope: BindScope) {

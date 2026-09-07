@@ -1,7 +1,7 @@
 // Wide event pixel for data clearing flow monitoring
 {
     "wide_data-clearing": {
-        "description": "User clears browsing data through various entry points (Fire button, app shortcuts, automatic clearing)",
+        "description": "User clears browsing data through various entry points (Fire button, single tab burn, Duck.ai chat deletion, app shortcuts, automatic clearing)",
         "owners": ["lmac012"],
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
@@ -25,7 +25,15 @@
             {
                 "key": "context.name",
                 "description": "Describes the entry point to the data clearing flow.",
-                "enum": ["single_tab_fire_dialog", "app_shortcut", "fire_tabs_emptied", "auto_foreground", "auto_background"]
+                "enum": [
+                    "single_tab_fire_dialog",
+                    "single_tab_burn",
+                    "duckai_chat_deletion",
+                    "app_shortcut",
+                    "fire_tabs_emptied",
+                    "auto_foreground",
+                    "auto_background"
+                ]
             },
             {
                 "key": "feature.data.ext.clear_options",
@@ -54,7 +62,7 @@
             },
             {
                 "key": "feature.data.ext.failure_reason",
-                "description": "Reason for failure. Only present on FAILURE events. By default this is going to be exception class name.",
+                "description": "Reason for failure. Only present on FAILURE events. Exception class name, or feature_not_supported / tab_not_found when the clear ended without an exception.",
                 "type": "string"
             },
             {

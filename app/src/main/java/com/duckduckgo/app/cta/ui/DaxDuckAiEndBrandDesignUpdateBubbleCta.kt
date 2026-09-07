@@ -22,6 +22,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.onboarding.store.SegmentedOnboardingPath
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.view.appendIconToText
@@ -35,14 +36,15 @@ data class DaxDuckAiEndBrandDesignUpdateBubbleCta(
     override val isLightTheme: Boolean,
     override val deviceInfo: DeviceInfo,
     val isCustomAiOnboardingFlow: Boolean,
+    val segmentedPath: SegmentedOnboardingPath?,
     override val onboardingImprovementsV2Enabled: Boolean,
 ) : DaxBubbleCta.BrandDesignUpdateBubbleCta(
     ctaId = CtaId.DAX_DUCK_AI_END,
     title = R.string.onboardingDuckAiEndCtaTitle,
-    description = if (isCustomAiOnboardingFlow) {
-        R.string.onboardingEndCustomAiFlowDaxDialogDescription
-    } else {
-        R.string.onboardingDuckAiEndCtaDescription
+    description = when {
+        isCustomAiOnboardingFlow -> R.string.onboardingEndCustomAiFlowDaxDialogDescription
+        segmentedPath == SegmentedOnboardingPath.AI -> R.string.aiPathWithToggleEnabledContextualEndDescription
+        else -> R.string.onboardingDuckAiEndCtaDescription
     },
     backgroundRes = CommonR.drawable.bg_onboarding_end,
     shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
@@ -70,6 +72,12 @@ data class DaxDuckAiEndBrandDesignUpdateBubbleCta(
         view.findViewById<MaterialButton>(R.id.primaryCta)?.setText(R.string.onboardingDuckAiEndCtaButton)
     }
 
-    override fun decorateDescription(context: Context, text: CharSequence): CharSequence =
+    override fun decorateDescription(
+        context: Context,
+        text: CharSequence,
+    ): CharSequence = if (segmentedPath == SegmentedOnboardingPath.AI) {
+        text
+    } else {
         context.appendIconToText(text, CommonR.drawable.ic_ai_chat_16)
+    }
 }

@@ -394,6 +394,17 @@ class SharedPreferencesDuckChatDataStoreTest {
     }
 
     @Test
+    fun `when hasSubmittedPromptBefore default then return false`() = runTest {
+        assertFalse(testee.hasSubmittedPromptBefore())
+    }
+
+    @Test
+    fun `when setPromptSubmitted then hasSubmittedPromptBefore returns true`() = runTest {
+        testee.setPromptSubmitted()
+        assertTrue(testee.hasSubmittedPromptBefore())
+    }
+
+    @Test
     fun `when observeDefaultTogglePosition then receive updates`() = runTest {
         val results = mutableListOf<String?>()
         val job = launch {

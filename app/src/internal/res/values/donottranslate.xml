@@ -134,4 +134,10 @@
     <string name="onboardingDevSettingsCompletedTitle">Onboarding completed</string>
     <string name="onboardingDevSettingsSkippedTitle">Onboarding skipped</string>
     <string name="onboardingDevSettingsDialogsSection">Dialogs shown</string>
+
+    <!-- Modal Coordinator Dev Settings -->
+    <string name="modalCoordinatorDevSettingsTitle">Modal Coordinator Dev Settings</string>
+    <string name="modalCoordinatorDevSettingsResetCooldownDescription">Once a prompt is shown, further modals are blocked: by the prompts coordinator quiet gap, or by the internal 24-hour window when the coordinator is off. This clears both, so modals are evaluated again on the next app resume.</string>
+    <string name="modalCoordinatorDevSettingsResetCooldown">Reset modal cooldown</string>
+    <string name="modalCoordinatorDevSettingsResetCooldownDone">Modal cooldown reset</string>
 </resources>

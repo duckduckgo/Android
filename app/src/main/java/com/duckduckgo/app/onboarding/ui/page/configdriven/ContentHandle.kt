@@ -25,6 +25,10 @@ import kotlinx.coroutines.flow.Flow
 /** What a binder hands back to the render engine after binding a screen. */
 class ContentHandle(
     val title: OnboardingDialogTitleView?,
+    /**
+     * Faded in before [title] types.
+     */
+    val preTitleFadeTargets: List<View> = emptyList(),
     val fadeTargets: List<View>,
     /**
      * Bounded entrance animation, played once [fadeTargets] have faded in. A factory, not a running animator:

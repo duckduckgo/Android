@@ -51,6 +51,11 @@ interface SyncJweCrypto {
     fun generateRsaKeyPair(keySizeBits: Int): RsaKeyPair
 
     /**
+     * Generate [byteCount] cryptographically random bytes.
+     */
+    fun generateSecureBytes(byteCount: Int): ByteArray
+
+    /**
      * JWE-encrypt content with a symmetric AES-256 key using direct encryption (alg=dir, enc=A256GCM).
      * Optional `kid` is written to the JWE header to identify which key was used to wrap the payload.
      */
@@ -116,6 +121,10 @@ class RealSyncJweCrypto @Inject constructor() : SyncJweCrypto {
             publicKeyBase64 = b64UrlEncode(keyPair.public.encoded),
             privateKeyBase64 = b64UrlEncode(keyPair.private.encoded),
         )
+    }
+
+    override fun generateSecureBytes(byteCount: Int): ByteArray {
+        return ByteArray(byteCount).also { secureRandom.nextBytes(it) }
     }
 
     override fun jweEncryptSymmetric(plaintext: ByteArray, symmetricKey: ByteArray, kid: String?): String {

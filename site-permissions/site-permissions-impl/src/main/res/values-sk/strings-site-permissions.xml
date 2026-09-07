@@ -57,6 +57,10 @@
     <string name="systemPermissionDialogCameraAndAudioDeniedContent">Lokality môžu používať váš fotoaparát a mikrofón len vtedy, ak povolíte aplikácii DuckDuckGo žiadať o prístup.</string>
     <string name="systemPermissionsDeniedDialogPositiveButton">Otvoriť nastavenia</string>
     <string name="systemPermissionsDeniedDialogNegativeButton">Zrušiť</string>
+    <string name="duckAiMicPermissionDeniedSnackBarMessage">Na používanie hlasových funkcií potrebuješ povolenie pre mikrofón</string>
+    <string name="duckAiMicPermissionDeniedDialogTitle">DuckDuckGo potrebuje prístup k tvojmu mikrofónu</string>
+    <string name="duckAiMicPermissionDeniedDialogContent">Ak chceš v Duck.ai používať hlasový čet, je potrebné povolenie pre mikrofón.</string>
+    <string name="duckAiMicPermissionDeniedDialogPositiveButton">Zmeniť oprávnenia</string>
 
     <string name="sitePermissionsSettingsDescription">Stránky, ktoré navštívite, môžu požiadať o prístup k polohe vášho zariadenia, fotoaparátu, mikrofónu alebo softvéru DRM (Digital Rights Management). Nebudú mať k nim prístup, pokiaľ im to výslovne nepovolíte.</string>
     <string name="sitePermissionsSettingsEnablePermissionTitle">Povoliť všetkým lokalitám žiadať o:</string>

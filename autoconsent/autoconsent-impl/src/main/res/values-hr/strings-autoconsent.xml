@@ -25,4 +25,12 @@
     <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[DuckDuckGo može automatski upravljati skočnim prozorima kolačića kako bi maksimizirao privatnost i minimizirao kolačiće prije nego što ih uopće vidiš.\n<a href=\"\">Saznaj više</a>]]></string>
     <string name="autoconsentPopUpsWithoutOptOutsToggle">Prihvati kolačiće koji se ne mogu odbiti</string>
     <string name="autoconsentPopUpsWithoutOptOutsDescription">Ako ne postoji opcija odbijanja, uštedjet ćemo ti klik, umjesto tebe prihvatiti te kolačiće i zatvoriti skočne prozore.</string>
+    <string name="autoconsentPromptTitle">Umoran si od skočnih prozora kolačića?</string>
+    <string name="autoconsentPromptFootnote">To uvijek možeš prilagoditi kasnije u Postavkama.</string>
+    <string name="autoconsentPromptCpmOnMessage">Neki se kolačići ne mogu odbiti. Možemo ih prihvatiti umjesto tebe.</string>
+    <string name="autoconsentPromptCpmOnPrimaryButton">Prihvati kolačiće umjesto mene</string>
+    <string name="autoconsentPromptCpmOnSecondaryButton">Prihvatit ću ih sam</string>
+    <string name="autoconsentPromptCpmOffMessage">Pobrinut ćemo se za njih umjesto tebe. Odbit ćemo kolačiće kada je to moguće, a prihvatiti one koji se ne mogu odbiti.</string>
+    <string name="autoconsentPromptCpmOffPrimaryButton">Odbij ako je moguće ili prihvati umjesto mene</string>
+    <string name="autoconsentPromptCpmOffSecondaryButton">Sam ću se njima pozabaviti</string>
 </resources>

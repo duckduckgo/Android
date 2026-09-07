@@ -33,6 +33,8 @@ import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ViewImportPasswordsPromoBinding
 import com.duckduckgo.autofill.impl.importing.promo.ImportInPasswordsPromotionViewModel.Command
 import com.duckduckgo.autofill.impl.importing.promo.ImportInPasswordsPromotionViewModel.Command.DismissImport
+import com.duckduckgo.autofill.impl.importing.resolvePasswordsKeychainAnimationAsset
+import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.view.MessageCta.Message
 import com.duckduckgo.common.ui.view.MessageCta.MessageType.REMOTE_MESSAGE
 import com.duckduckgo.common.ui.view.show
@@ -82,6 +84,9 @@ class ImportInPasswordsPromotionView @JvmOverloads constructor(
     @Inject
     lateinit var dispatchers: DispatcherProvider
 
+    @Inject
+    lateinit var appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles
+
     private val binding: ViewImportPasswordsPromoBinding by viewBinding()
 
     private val viewModel: ImportInPasswordsPromotionViewModel by lazy {
@@ -118,10 +123,13 @@ class ImportInPasswordsPromotionView @JvmOverloads constructor(
     }
 
     private fun showPromo() {
+        val isPictogramsEnabled = appBrandDesignUpdateToggles.pictograms().isEnabled()
+        val animationAsset = resolvePasswordsKeychainAnimationAsset(isPictogramsEnabled)
+
         with(binding.importPromo) {
             setMessage(
                 Message(
-                    topAnimation = R.raw.anim_password_keys,
+                    topAnimation = animationAsset.animationRes,
                     title = context.getString(R.string.passwords_import_promo_title),
                     subtitle = context.getString(R.string.passwords_import_promo_subtitle),
                     action = context.getString(R.string.passwords_import_promo_action),
@@ -129,8 +137,13 @@ class ImportInPasswordsPromotionView @JvmOverloads constructor(
                 ),
             )
             onTopAnimationConfigured { view ->
-                view.repeatCount = 1
-                view.playAnimation()
+                animationAsset.staticRes?.let { staticRes ->
+                    view.cancelAnimation()
+                    view.setImageResource(staticRes)
+                } ?: run {
+                    view.repeatCount = 1
+                    view.playAnimation()
+                }
             }
             onPrimaryActionClicked {
                 viewModel.onUserClickedToImport()

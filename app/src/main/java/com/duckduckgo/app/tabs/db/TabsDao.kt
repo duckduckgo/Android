@@ -50,6 +50,9 @@ abstract class TabsDao {
     @Query("select * from tabs where deletable is 1 order by position")
     abstract fun flowDeletableTabs(): Flow<List<TabEntity>>
 
+    @Query("select count(*) from tabs")
+    abstract fun flowTabCount(): Flow<Int>
+
     @Query("select * from tabs where tabId = :tabId")
     abstract fun tab(tabId: String): TabEntity?
 

@@ -57,6 +57,10 @@
     <string name="systemPermissionDialogCameraAndAudioDeniedContent">Svetainės gali naudoti jūsų kamerą ir mikrofoną tik tada, jei leisite „DuckDuckGo“ prašyti prieigos.</string>
     <string name="systemPermissionsDeniedDialogPositiveButton">Atidaryti nustatymus</string>
     <string name="systemPermissionsDeniedDialogNegativeButton">Atšaukti</string>
+    <string name="duckAiMicPermissionDeniedSnackBarMessage">Balso funkcijoms reikia leidimo naudoti mikrofoną</string>
+    <string name="duckAiMicPermissionDeniedDialogTitle">„DuckDuckGo“ reikia prieigos prie tavo mikrofono</string>
+    <string name="duckAiMicPermissionDeniedDialogContent">Jei nori naudotis „Duck.ai“ pokalbiais balsu, reikia leidimo naudoti mikrofoną</string>
+    <string name="duckAiMicPermissionDeniedDialogPositiveButton">Keisti leidimus</string>
 
     <string name="sitePermissionsSettingsDescription">Svetainėse, kuriose lankotės, gali būti prašoma prieigos prie jūsų įrenginio buvimo vietos, kameros, mikrofono arba DRM (skaitmeninių teisių valdymo) programinės įrangos. Jos negalės prie jų prisijungti, nebent aiškiai suteiksite joms leidimą.</string>
     <string name="sitePermissionsSettingsEnablePermissionTitle">Leisti visoms svetainėms prašyti:</string>

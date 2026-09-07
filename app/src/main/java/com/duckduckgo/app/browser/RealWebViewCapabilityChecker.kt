@@ -71,7 +71,7 @@ class RealWebViewCapabilityChecker @Inject constructor(
                     "version" to webViewVersionProvider.getFullVersion(),
                     "multi_profile" to isMultiProfileSupported().toString(),
                     "delete_browsing_data" to isDeleteBrowsingDataSupported().toString(),
-                    "petal" to "true",
+                    Pixel.PixelParameter.PETAL to Pixel.PixelValues.PETAL_KANON,
                 )
                 pixel.fire(pixel = WebViewCapabilityPixelName.WEBVIEW_CAPABILITIES, parameters = params, type = Pixel.PixelType.Daily())
             }

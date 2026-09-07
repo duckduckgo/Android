@@ -1,0 +1,56 @@
+{
+    "android-free-trial-conversion": {
+        "description": "Monitors free trial user journey from activation to conversion or expiration",
+        "owners": ["nalcalag"],
+        "meta": {
+            "type": "android-free-trial-conversion",
+            "version": "0.0"
+        },
+        "feature": {
+            "name": "free-trial-conversion",
+            "status": ["SUCCESS", "FAILURE"],
+            "data": {
+                "ext": {
+                    "free_trial_plan": {
+                        "type": "string",
+                        "description": "The base plan ID of the free trial product activated",
+                        "enum": [
+                            "ddg-privacy-pro-monthly-renews-us",
+                            "ddg-privacy-pro-monthly-renews-row",
+                            "ddg-privacy-pro-yearly-renews-us",
+                            "ddg-privacy-pro-yearly-renews-row",
+                            "ddg-privacy-pro-sandbox-monthly-renews-us",
+                            "ddg-privacy-pro-sandbox-monthly-renews-row",
+                            "ddg-privacy-pro-sandbox-yearly-renews-us",
+                            "ddg-privacy-pro-sandbox-yearly-renews-row",
+                            "ddg-subscription-pro-yearly-renews-us",
+                            "ddg-subscription-pro-monthly-renews-us",
+                            "ddg-subscription-pro-yearly-renews-row",
+                            "ddg-subscription-pro-monthly-renews-row"
+                        ]
+                    },
+                    "failure_reason": {
+                        "type": "string",
+                        "description": "Reason for failure. Only present on FAILURE events.",
+                        "enum": ["expired", "timeout"]
+                    },
+                    "step.vpn_activated_d1": {
+                        "type": "string",
+                        "description": "true if VPN was successfully activated within first day of Free Trial",
+                        "enum": ["true", "false"]
+                    },
+                    "step.vpn_activated_d2_to_d7": {
+                        "type": "string",
+                        "description": "true if VPN was successfully activated between D2-D7 of Free Trial",
+                        "enum": ["true", "false"]
+                    },
+                    "step.duck_ai_paid_used": {
+                        "type": "string",
+                        "description": "true if paid duck.ai model has been used within a Free Trial",
+                        "enum": ["true", "false"]
+                    }
+                }
+            }
+        }
+    }
+}

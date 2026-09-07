@@ -193,9 +193,6 @@ interface SubscriptionsFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun serpPromoCookie(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun authApiV2(): Toggle
-
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun privacyProFreeTrial(): Toggle
 
@@ -205,16 +202,6 @@ interface SubscriptionsFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun duckAiPlus(): Toggle
-
-    /**
-     * When enabled, we signal FE if v2 is available, enabling v2 messaging
-     * When disabled, FE works with old messaging (v1)
-     * This flag will be used to select FE subscription messaging mode.
-     * The value is added into GetFeatureConfig to allow FE to select the mode.
-     * Note: best to remove together with v1 clean up.
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun enableSubscriptionFlowsV2(): Toggle
 
     /**
      * Kill-switch for in-memory caching of auth v2 JWKs.
@@ -304,6 +291,13 @@ interface SubscriptionsFeature {
      */
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.FALSE)
     fun notificationsPermissionMessaging(): Toggle
+
+    /**
+     * When enabled, the Partnerships Hub entry point is shown in Settings.
+     * The flag settings carry the hub URL to open.
+     */
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.FALSE)
+    fun partnershipsHub(): Toggle
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun handleExpiredStateWhenSubscriptionChangeSelected(): Toggle

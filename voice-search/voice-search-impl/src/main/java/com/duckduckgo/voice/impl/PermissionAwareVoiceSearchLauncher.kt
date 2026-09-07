@@ -18,10 +18,12 @@ package com.duckduckgo.voice.impl
 
 import android.app.Activity
 import androidx.activity.result.ActivityResultCaller
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchLauncher
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Event
+import com.duckduckgo.voice.api.VoiceSearchLauncher.Event.SearchCancelled
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Event.VoiceSearchDisabled
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source
 import com.duckduckgo.voice.api.VoiceSearchLauncher.VoiceSearchMode
@@ -34,9 +36,15 @@ class PermissionAwareVoiceSearchLauncher @Inject constructor(
     private val voiceSearchActivityLauncher: VoiceSearchActivityLauncher,
     private val voiceSearchPermissionCheck: VoiceSearchPermissionCheck,
     private val voiceSearchAvailability: VoiceSearchAvailability,
+    private val pixel: Pixel,
 ) : VoiceSearchLauncher {
 
+    companion object {
+        private const val KEY_PARAM_SOURCE = "source"
+    }
+
     private var pendingInitialMode: VoiceSearchMode? = null
+    private var source: Source? = null
 
     override fun registerResultsCallback(
         caller: ActivityResultCaller,
@@ -44,25 +52,32 @@ class PermissionAwareVoiceSearchLauncher @Inject constructor(
         source: Source,
         onEvent: (Event) -> Unit,
     ) {
+        this.source = source
         voiceSearchActivityLauncher.registerResultsCallback(caller, activity, source) {
             onEvent(it)
         }
         permissionRequest.registerResultsCallback(
             caller,
             activity,
-            { voiceSearchActivityLauncher.launch(activity, pendingInitialMode) },
-            { onEvent(VoiceSearchDisabled) },
+            onPermissionsGranted = { voiceSearchActivityLauncher.launch(activity, pendingInitialMode) },
+            onRequestAborted = { onEvent(SearchCancelled) },
+            onVoiceSearchDisabled = { onEvent(VoiceSearchDisabled) },
         )
     }
 
     override fun launch(activity: Activity, mode: VoiceSearchMode?) {
         if (!voiceSearchAvailability.isVoiceSearchAvailable) return
 
+        pixel.fire(
+            pixel = VoiceSearchPixelNames.VOICE_SEARCH_ICON_CLICKED,
+            parameters = mapOf(KEY_PARAM_SOURCE to source?.paramValueName.orEmpty()),
+        )
+
         pendingInitialMode = mode
         if (voiceSearchPermissionCheck.hasRequiredPermissionsGranted()) {
             voiceSearchActivityLauncher.launch(activity, mode)
         } else {
-            permissionRequest.launch(activity)
+            permissionRequest.launch(activity, mode ?: VoiceSearchMode.SEARCH)
         }
     }
 }

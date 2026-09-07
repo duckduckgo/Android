@@ -49,7 +49,6 @@ class SyncSetupWideEventImplTest {
     @Before
     fun setup() {
         syncFeature.sendSyncSetupWideEvent().setRawStoredState(State(true))
-        syncFeature.useSimplifiedSync().setRawStoredState(State(false))
         whenever(deviceAuthenticator.isAuthenticationRequired()).thenReturn(true)
 
         wideEvent = SyncSetupWideEventImpl(
@@ -61,24 +60,9 @@ class SyncSetupWideEventImplTest {
     }
 
     @Test
-    fun `onFlowStarted starts a new flow with correct ui v1 parameters`() = runTest {
+    fun `onFlowStarted starts a new flow with correct ui parameters`() = runTest {
         whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any()))
             .thenReturn(Result.success(1L))
-
-        wideEvent.onFlowStarted()
-
-        verify(wideEventClient).flowStart(
-            name = "sync-setup",
-            metadata = mapOf("user_auth_required" to "true", "ui_version" to "v1"),
-            cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
-        )
-    }
-
-    @Test
-    fun `onFlowStarted starts a new flow with correct ui v2 parameters`() = runTest {
-        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any()))
-            .thenReturn(Result.success(1L))
-        syncFeature.useSimplifiedSync().setRawStoredState(State(true))
 
         wideEvent.onFlowStarted()
 
@@ -99,7 +83,7 @@ class SyncSetupWideEventImplTest {
         verify(wideEventClient).flowStart(
             name = "sync-setup",
             flowEntryPoint = "settings",
-            metadata = mapOf("user_auth_required" to "true", "ui_version" to "v1"),
+            metadata = mapOf("user_auth_required" to "true", "ui_version" to "v2"),
             cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
         )
     }

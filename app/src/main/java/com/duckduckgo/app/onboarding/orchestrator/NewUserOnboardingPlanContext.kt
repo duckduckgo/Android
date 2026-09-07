@@ -17,6 +17,7 @@
 package com.duckduckgo.app.onboarding.orchestrator
 
 import com.duckduckgo.onboarding.api.LinearOnboardingResult
+import java.util.concurrent.CopyOnWriteArrayList
 
 /**
  * Per-run cross-step state. A fresh instance is created inside
@@ -42,6 +43,22 @@ class NewUserOnboardingPlanContext {
     var completionResult: LinearOnboardingResult? = null
 
     /**
+     * Set true by the [NewUserOnboardingStepIds.PASSWORD_IMPORT] step when the user taps "Skip", read by the
+     * [NewUserOnboardingStepIds.PASSWORD_IMPORT_LAUNCH] precondition to skip launching the passwords import flow
+     * and by [NewUserOnboardingStepIds.PASSWORD_IMPORT_COMPLETE] to skip reporting an outcome there is none of.
+     */
+    @Volatile
+    var skipPasswordsImport: Boolean = false
+
+    /**
+     * What this run has recorded about the import, written by the
+     * [NewUserOnboardingStepIds.PASSWORD_IMPORT_LAUNCH] and [NewUserOnboardingStepIds.PASSWORD_IMPORT_COMPLETE]
+     * steps.
+     */
+    @Volatile
+    var passwordImportResult: PasswordImportResult? = null
+
+    /**
      * Chat prompt captured by the custom-AI [NewUserOnboardingStepIds.INPUT_SCREEN_PREVIEW] step,
      * read by the [NewUserOnboardingStepIds.DUCK_AI_DEMO] step.
      */
@@ -54,4 +71,17 @@ class NewUserOnboardingPlanContext {
      */
     @Volatile
     var skipAddWidget: Boolean = false
+
+    private val finalizers = CopyOnWriteArrayList<suspend () -> Unit>()
+
+    /**
+     * Registers teardown to run once the whole run ends, completed or skipped.
+     */
+    fun onFinish(block: suspend () -> Unit) {
+        finalizers += block
+    }
+
+    suspend fun runFinalizers() {
+        finalizers.forEach { it() }
+    }
 }

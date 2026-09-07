@@ -39,12 +39,13 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource.PasswordManagementPromo
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource.Unknown
+import com.duckduckgo.autofill.api.AutofillScreens.AutofillImportPasswordsScreen
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ContentImportFromGooglePasswordDialogBinding
 import com.duckduckgo.autofill.impl.deviceauth.AutofillAuthorizationGracePeriod
 import com.duckduckgo.autofill.impl.importing.CredentialImporter
-import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePassword
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordResult
+import com.duckduckgo.autofill.impl.importing.resolvePasswordsKeychainAnimationAsset
 import com.duckduckgo.autofill.impl.ui.credential.dialog.animateClosed
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.ImportPasswordsPixelSender
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialog.ImportPasswordsDialog.Companion.KEY_IMPORT_SUCCESS
@@ -59,6 +60,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.goog
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.PreImport
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewState
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
+import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.prependIconToText
 import com.duckduckgo.common.ui.view.show
@@ -110,6 +112,9 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
 
     @Inject
     lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
+
+    @Inject
+    lateinit var appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles
 
     private var _binding: ContentImportFromGooglePasswordDialogBinding? = null
 
@@ -182,9 +187,17 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
             dialogTitle.text = getString(R.string.passwords_import_promo_in_browser_title)
             onboardingSubtitle.text = binding.root.context.prependIconToText(R.string.passwords_import_promo_subtitle, R.drawable.ic_lock_solid_12)
             declineButton.show()
-            topIllustrationAnimated.setAnimation(R.raw.anim_password_keys)
+            val animationAsset = resolvePasswordsKeychainAnimationAsset(appBrandDesignUpdateToggles.pictograms().isEnabled())
+            animationAsset.staticRes?.let { staticRes ->
+                topIllustrationAnimated.cancelAnimation()
+                topIllustrationAnimated.setImageResource(staticRes)
+            } ?: run {
+                topIllustrationAnimated.setAnimation(animationAsset.animationRes)
+            }
             topIllustrationAnimated.show()
-            topIllustrationAnimated.playAnimation()
+            if (animationAsset.staticRes == null) {
+                topIllustrationAnimated.playAnimation()
+            }
             appIcon.gone()
         }
         showDialogContent()
@@ -370,7 +383,7 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
 
         val intent = globalActivityStarter.startIntent(
             requireContext(),
-            ImportGooglePassword.AutofillImportViaGooglePasswordManagerScreen,
+            AutofillImportPasswordsScreen(getLaunchSource()),
         )
         importGooglePasswordsFlowLauncher.launch(intent)
 

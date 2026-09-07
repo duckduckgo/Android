@@ -57,6 +57,10 @@
     <string name="systemPermissionDialogCameraAndAudioDeniedContent">Sites kunnen je camera en microfoon alleen gebruiken als je DuckDuckGo toestaat om toegang te vragen.</string>
     <string name="systemPermissionsDeniedDialogPositiveButton">Open Instellingen</string>
     <string name="systemPermissionsDeniedDialogNegativeButton">Annuleren</string>
+    <string name="duckAiMicPermissionDeniedSnackBarMessage">Microfoonmachtiging nodig voor spraakfuncties</string>
+    <string name="duckAiMicPermissionDeniedDialogTitle">DuckDuckGo heeft toegang tot je microfoon nodig</string>
+    <string name="duckAiMicPermissionDeniedDialogContent">Microfoonmachtigingen zijn vereist als je spraakchat wilt gebruiken in Duck.ai</string>
+    <string name="duckAiMicPermissionDeniedDialogPositiveButton">Toestemmingen wijzigen</string>
 
     <string name="sitePermissionsSettingsDescription">Sites die je bezoekt, kunnen toegang vragen tot de software, je camera, je microfoon of DRM (Digital Rights Management) op je apparaat. Ze krijgen die toegang alleen als je daar expliciet toestemming voor geeft.</string>
     <string name="sitePermissionsSettingsEnablePermissionTitle">Sta alle sites toe om het volgende vragen:</string>

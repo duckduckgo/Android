@@ -21,11 +21,10 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncDeviceIds
+import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.crypto.RsaKeyPair
 import com.duckduckgo.sync.impl.crypto.SyncJweCrypto
-import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State.Host
-import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State.Joiner
-import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State.SameAccountAbort
+import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
 import com.duckduckgo.sync.impl.pixels.SyncPixels.TimeoutStage
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
@@ -47,17 +46,41 @@ import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.logcat
 import org.json.JSONObject
+import java.util.Base64
 import java.util.UUID
 import javax.inject.Inject
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 /**
- * Drives a single Exchange V2 protocol session.
+ * Drives a single Exchange V2 pairing session, from the linking code to a terminal state.
  *
- * Two entry points: [startPresent] generates a v2 linking code (surfaced via [SessionStarted]);
- * [startScan] parses a peer's code and joins their session. From there the runner manages the
- * wire I/O, drives the SM, and auto-elects role per the Unified Algorithm.
+ * Two entry points open a session: [startPresent] publishes a linking code for a peer to scan,
+ * [startScan] joins the session behind a code this device scanned. Either way the runner owns
+ * everything the [ExchangeV2StateMachine] deliberately does not: the relay channel, the poll loop,
+ * the session keys, role election, the session deadline, and executing the [SideEffect]s each
+ * transition declares. The state machine decides what is allowed; the runner makes it happen.
+ *
+ * Only a single session is allowed. Opening a session abandons any session already running, and
+ * reaching a terminal state tears the current one down, so nothing outlives it.
+ *
+ * Callers observe through [events] rather than polling the getters: the session advances on the
+ * poll loop's own coroutine, so [currentState] and friends are snapshots that can change between
+ * two reads.
+ *
+ * Spec:
+ *  - Asana 1214739740392701, Unified Algorithm: role election, and the abort rules applied around
+ *    the state machine.
+ *  - Asana 1214486492252757, Transport TD: channel lifecycle, polling, and the session deadline.
  */
 interface ExchangeV2Runner {
+
+    /**
+     * Everything that happened in this runner, including sessions that have already ended: the
+     * buffer is not cleared at teardown. Scope to one session with [eventsSince].
+     */
     val events: SharedFlow<ExchangeV2Event>
 
     /**
@@ -66,11 +89,13 @@ interface ExchangeV2Runner {
      */
     fun eventsSince(sinceMs: Long): Flow<ExchangeV2Event> = events.filter { it.timestampMs >= sinceMs }
 
+    /** Where the session currently is, or null when no session is running. */
     val currentState: ExchangeV2State?
 
+    /** How this device entered the session (scanned or presented), which is not its elected [Role]. */
     val pairingRole: PairingRole?
 
-    /** Linking code URL for the Presenter side — populated after [startPresent] completes bootstrap. */
+    /** Linking code URL for the Presenter side, populated once [startPresent] has bootstrapped. */
     val linkingCode: String?
 
     /**
@@ -85,8 +110,23 @@ interface ExchangeV2Runner {
     /** Peer device's credential kind ("ddg" / "3party"), learned during role election. Null before then. */
     val peerKind: String?
 
+    /**
+     * Join the session behind a linking code this device scanned or pasted. Returns immediately;
+     * the session is only usable once [ExchangeV2Event.SessionStarted] has been emitted, and a code
+     * that doesn't parse surfaces as a [ExchangeV2Event.SessionError] rather than a thrown exception.
+     *
+     * Starts in [ExchangeV2State.Negotiating]: the code already identifies the peer, so unlike the
+     * Presenter this side has no hello to wait for.
+     */
     fun startScan(pastedUrl: String)
 
+    /**
+     * Open a session for a peer to scan and publish a linking code for it. Returns immediately; the
+     * code is on [linkingCode], and in the emitted [ExchangeV2Eve nt.SessionStarted], once bootstrap
+     * completes.
+     *
+     * Starts in [ExchangeV2State.Bootstrapped], waiting for the peer's hello.
+     */
     fun startPresent()
 
     /**
@@ -95,20 +135,21 @@ interface ExchangeV2Runner {
      */
     suspend fun cancel()
 
-    suspend fun deliverIncomingMessage(message: ExchangeV2Message)
-
-    suspend fun deliverIncomingMessageJson(rawJson: String)
-
-    fun localTrigger(trigger: LocalTrigger)
-
-    fun recordSentMessage(message: ExchangeV2Message)
+    /**
+     * Drive the state machine with something that didn't come off the wire, such as the user
+     * answering a confirmation prompt. Returns immediately, and a trigger the current state does not
+     * allow aborts the session rather than being ignored.
+     *
+     * The returned [Job] is that work. Most callers can ignore it, but one about to end the session
+     * must join it first, and never from code holding the runner's mutex.
+     */
+    fun localTrigger(trigger: LocalTrigger): Job
 }
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealExchangeV2Runner @Inject constructor(
     private val smFactory: ExchangeV2StateMachineFactory,
-    private val messageParser: ExchangeV2MessageParser,
     private val clock: ExchangeV2Clock,
     private val syncStore: SyncStore,
     private val jweCrypto: SyncJweCrypto,
@@ -116,11 +157,16 @@ class RealExchangeV2Runner @Inject constructor(
     private val qrCode: ExchangeV2QrCode,
     private val recoveryCodeProvider: RecoveryCodeProvider,
     private val syncDeviceIds: SyncDeviceIds,
+    private val advertisedExchangeV2Version: AdvertisedExchangeV2Version,
+    private val syncFeature: SyncFeature,
     @AppCoroutineScope private val appScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
 ) : ExchangeV2Runner {
 
-    private val _events = MutableSharedFlow<ExchangeV2Event>(replay = REPLAY, extraBufferCapacity = REPLAY)
+    private val _events = MutableSharedFlow<ExchangeV2Event>(
+        replay = EVENT_BUFFER_SIZE,
+        extraBufferCapacity = EVENT_BUFFER_SIZE,
+    )
     override val events: SharedFlow<ExchangeV2Event> = _events.asSharedFlow()
 
     // Mutex serialises SM mutations + peer-state writes across the poll loop + user clicks.
@@ -128,29 +174,25 @@ class RealExchangeV2Runner @Inject constructor(
 
     @Volatile private var session: ExchangeV2StateMachine? = null
 
-    @Volatile private var _pairingRole: PairingRole? = null
+    @Volatile private var ownChannel: OwnChannelData? = null
 
-    @Volatile private var ownChannelId: String? = null
+    @Volatile private var ownData: OwnData? = null
 
-    @Volatile private var ownKeyPair: RsaKeyPair? = null
+    @Volatile private var peerChannel: PeerChannelData? = null
 
-    @Volatile private var peerChannelId: String? = null
+    @Volatile private var peerData: PeerData? = null
 
-    @Volatile private var peerPublicKey: String? = null
+    @Volatile private var messagePollJob: Job? = null
 
-    @Volatile private var _peerKind: String? = null
+    @Volatile private var syncTimeoutJob: Job? = null
 
-    @Volatile private var peerUserId: String? = null
-
-    @Volatile private var _peerName: String? = null
-
-    @Volatile private var _linkingCode: String? = null
-
-    @Volatile private var pollJob: Job? = null
-
-    @Volatile private var timeoutJob: Job? = null
+    @Volatile private var lateJoinerDeadlineJob: Job? = null
 
     @Volatile private var sentOwnAvailability: Boolean = false
+
+    @Volatile private var advertisedVersion: ExchangeProtocolVersion.V2 = BASELINE_PROTOCOL_VERSION
+
+    @Volatile private var negotiatedVersion: ExchangeProtocolVersion.V2 = BASELINE_PROTOCOL_VERSION
 
     /**
      * Host-side messages arriving while the Joiner is still at the user-confirm prompt, buffered
@@ -160,11 +202,11 @@ class RealExchangeV2Runner @Inject constructor(
     private val pendingJoinerWaitingMessages = mutableListOf<ExchangeV2Message>()
 
     override val currentState: ExchangeV2State? get() = session?.currentState
-    override val pairingRole: PairingRole? get() = _pairingRole
-    override val linkingCode: String? get() = _linkingCode
+    override val pairingRole: PairingRole? get() = ownData?.role
+    override val linkingCode: String? get() = ownData?.linkingCode
     override val canStartAsPresenter: Boolean get() = true
-    override val peerName: String? get() = _peerName
-    override val peerKind: String? get() = _peerKind
+    override val peerName: String? get() = peerData?.name
+    override val peerKind: String? get() = peerData?.kind
 
     // -----------------------------------------------------------------------
     // Entry points
@@ -179,14 +221,16 @@ class RealExchangeV2Runner @Inject constructor(
                 return@launch
             }
             mutex.withLock {
-                cancelLocked() // abandon any prior session
-                _pairingRole = PairingRole.Scanner
-                peerChannelId = parsed.channelId
-                peerPublicKey = parsed.publicKey
-                bootstrapLocked(PairingRole.Scanner) ?: run {
-                    cancelLocked() // bootstrap already emitted the error; just clear the half-set state
+                cancelLocked(ExchangeV2Message.Bye.Reason.Cancelled) // abandon any prior session
+                ownData = OwnData(PairingRole.Scanner, linkingCode = null)
+                peerChannel = PeerChannelData(parsed.channelId, parsed.publicKey)
+                bootstrapLocked(PairingRole.Scanner)
+                if (ownChannel == null) {
+                    // bootstrap already emitted the error; just clear the half-set state
+                    cancelLocked(ExchangeV2Message.Bye.Reason.Error)
                     return@launch
                 }
+                negotiatedVersion = negotiateProtocolVersion(parsed.version, PeerVersionSource.LinkingCode)
                 // Scanner already knows the peer; SM starts directly in Negotiating.
                 session = smFactory.create(
                     localUserId = syncStore.userId,
@@ -196,7 +240,7 @@ class RealExchangeV2Runner @Inject constructor(
             emitSessionStarted()
             if (!sendHello()) {
                 // sendHello already emitted a SessionError (incomplete state or HTTP status)
-                cancel()
+                cancel(ExchangeV2Message.Bye.Reason.Error)
                 return@launch
             }
             sendOwnAvailability()
@@ -211,16 +255,19 @@ class RealExchangeV2Runner @Inject constructor(
             // No pre-flight account check: per spec §"Exchange Share Recovery Code" a Host without
             // an account creates one mid-flow ([sendRecoveryCodeResponse] at Host.Sending).
             mutex.withLock {
-                cancelLocked() // abandon any prior session
-                _pairingRole = PairingRole.Presenter
-                val keyPair = bootstrapLocked(PairingRole.Presenter) ?: run {
-                    cancelLocked() // bootstrap already emitted the error; just clear the half-set state
+                cancelLocked(ExchangeV2Message.Bye.Reason.Cancelled) // abandon any prior session
+                bootstrapLocked(PairingRole.Presenter)
+                val own = ownChannel ?: run {
+                    // bootstrap already emitted the error; just clear the half-set state
+                    cancelLocked(ExchangeV2Message.Bye.Reason.Error)
                     return@launch
                 }
-                _linkingCode = qrCode.buildLinkingCode(
-                    channelId = ownChannelId!!,
-                    publicKeyBase64Url = keyPair.publicKeyBase64,
+                val linkingCode = qrCode.buildLinkingCode(
+                    channelId = own.id,
+                    publicKeyBase64Url = own.keyPair.publicKeyBase64,
+                    version = advertisedVersion,
                 )
+                ownData = OwnData(PairingRole.Presenter, linkingCode)
                 // Presenter waits to receive hello before transitioning out of Bootstrapped.
                 session = smFactory.create(
                     localUserId = syncStore.userId,
@@ -235,26 +282,27 @@ class RealExchangeV2Runner @Inject constructor(
 
     /**
      * Caller must hold [mutex]. Generates ephemeral keypair, allocates channel_id, and creates
-     * the relay channel (with 409 retry). Returns the new keypair on success, null on error
-     * (in which case an error event was already emitted).
+     * the relay channel (with 409 retry). Sets [ownChannel] on success, and leaves it null on
+     * error, in which case an error event was already emitted.
      */
-    private suspend fun bootstrapLocked(role: PairingRole): RsaKeyPair? {
+    private fun bootstrapLocked(role: PairingRole) {
+        advertisedVersion = advertisedExchangeV2Version.resolve()
         val keyPair = jweCrypto.generateRsaKeyPair(EXCHANGE_RSA_KEY_SIZE)
-        ownKeyPair = keyPair
         repeat(MAX_CHANNEL_CREATE_RETRIES) { attempt ->
             val candidate = UUID.randomUUID().toString()
-            when (val r = channel.createChannel(candidate)) {
+            val candidateSecret = generateChannelSecret()
+            when (val r = channel.createChannel(candidate, candidateSecret)) {
                 is Result.Success -> {
-                    ownChannelId = candidate
+                    ownChannel = OwnChannelData(candidate, keyPair, candidateSecret)
                     logcat { "Sync-ExchangeV2: bootstrap as $role channel_id=$candidate" }
-                    return keyPair
+                    return
                 }
                 is Result.Error -> {
                     if (r.code == HTTP_CONFLICT) {
                         logcat { "Sync-ExchangeV2: channel_id $candidate already taken, retrying (${attempt + 1}/$MAX_CHANNEL_CREATE_RETRIES)" }
                     } else {
                         emitSessionError("Failed to create channel", SessionErrorKind.RelayChannelUnavailable)
-                        return null
+                        return
                     }
                 }
             }
@@ -263,13 +311,15 @@ class RealExchangeV2Runner @Inject constructor(
             "Could not allocate unique channel_id after $MAX_CHANNEL_CREATE_RETRIES attempts",
             SessionErrorKind.RelayChannelUnavailable,
         )
-        return null
+        return
     }
 
-    override suspend fun cancel() {
+    override suspend fun cancel() = cancel(ExchangeV2Message.Bye.Reason.Cancelled)
+
+    private suspend fun cancel(byeReason: ExchangeV2Message.Bye.Reason) {
         // NonCancellable: teardown must finish even when the caller's coroutine is itself being
         // cancelled (e.g. the dispatcher cancels this from a flow's onCompletion).
-        withContext(NonCancellable) { mutex.withLock { cancelLocked() } }
+        withContext(NonCancellable) { mutex.withLock { cancelLocked(byeReason) } }
     }
 
     /**
@@ -298,36 +348,45 @@ class RealExchangeV2Runner @Inject constructor(
     ) {
         if (session == null) return
         emitSessionError(reason, kind, timeoutStage)
-        cancelLocked()
+        cancelLocked(ExchangeV2Message.Bye.Reason.Error)
     }
 
     /** Caller MUST hold [mutex]. The single teardown path, so field resets can't drift between
-     *  call sites: stop the jobs, best-effort DELETE the channel, discard keys, clear all state. */
-    private fun cancelLocked() {
-        if (session != null || pollJob != null) {
-            logcat { "Sync-ExchangeV2: teardown (was in state ${session?.currentState})" }
+     *  call sites: stop the jobs, say [byeReason] to the peer, best-effort DELETE the channel,
+     *  discard keys, clear all state. */
+    private fun cancelLocked(byeReason: ExchangeV2Message.Bye.Reason) {
+        if (session != null || messagePollJob != null) {
+            emit(ExchangeV2Event.SessionEnded(clock.nowMs(), session?.currentState, byeReason))
         }
-        pollJob?.cancel()
-        pollJob = null
-        timeoutJob?.cancel()
-        timeoutJob = null
-        val toDelete = ownChannelId
-        if (toDelete != null) {
-            // Best-effort DELETE.
+        messagePollJob?.cancel()
+        messagePollJob = null
+        lateJoinerDeadlineJob?.cancel()
+        lateJoinerDeadlineJob = null
+        syncTimeoutJob?.cancel()
+        syncTimeoutJob = null
+        val own = ownChannel
+        if (own != null) {
+            val peer = peerChannel
+            val version = negotiatedVersion
+
             appScope.launch(dispatchers.io()) {
-                runCatching { channel.deleteChannel(toDelete) }
+                // Sequenced before the DELETE so the peer can learn we've gone rather than
+                // discovering it when its next write 404s. Sent once, never retried, and delivery
+                // is never depended on.
+                if (peer != null) {
+                    runCatching { sendMessage(ExchangeV2Message.Bye.create(byeReason), own, peer, version) }
+                }
+                // Best-effort DELETE.
+                runCatching { channel.deleteChannel(own.id, own.secret) }
             }
         }
         session = null
-        _pairingRole = null
-        ownChannelId = null
-        ownKeyPair = null
-        peerChannelId = null
-        peerPublicKey = null
-        _peerKind = null
-        peerUserId = null
-        _peerName = null
-        _linkingCode = null
+        ownChannel = null
+        ownData = null
+        peerChannel = null
+        peerData = null
+        advertisedVersion = BASELINE_PROTOCOL_VERSION
+        negotiatedVersion = BASELINE_PROTOCOL_VERSION
         sentOwnAvailability = false
         pendingJoinerWaitingMessages.clear()
     }
@@ -337,23 +396,23 @@ class RealExchangeV2Runner @Inject constructor(
     // -----------------------------------------------------------------------
 
     private fun startPolling() {
-        val ch = ownChannelId ?: return
-        val key = ownKeyPair ?: return
-        pollJob = appScope.launch(dispatchers.io()) {
+        val own = ownChannel ?: return
+        messagePollJob = appScope.launch(dispatchers.io()) {
             try {
                 // collect suspends per message so envelopes are handled in poll() seq order. A
                 // message driving the SM terminal cancels this very poll job; that
                 // self-cancellation surfaces as the CancellationException caught below.
-                channel.poll(ch, key.privateKeyBase64).collect { incoming ->
+                channel.poll(own.id, own.keyPair.privateKeyBase64, own.secret).collect { incoming ->
                     deliverIncomingMessage(incoming)
                 }
             } catch (versionTooNew: EnvelopeVersionTooNew) {
-                failSession("Peer requires protocol v${versionTooNew.version}; please update this app")
+                failSession("Peer requires protocol v${versionTooNew.version}; please update this app", SessionErrorKind.PeerProtocolTooNew)
             } catch (decryptFailure: EnvelopeDecryptFailure) {
                 // Permanent — the cursor would just re-pull the same broken bytes forever.
                 failSession(
                     "Couldn't decrypt a message from the peer (seq=${decryptFailure.seq}): " +
                         "${decryptFailure.cause?.message}. The keys probably don't match — try restarting pairing.",
+                    SessionErrorKind.MessageDecryptionFailed,
                 )
             } catch (gone: ChannelGone) {
                 failSession("Poll got ${gone.status} — channel gone", SessionErrorKind.RelayChannelUnavailable)
@@ -378,13 +437,44 @@ class RealExchangeV2Runner @Inject constructor(
      * spec's per-event cancel conditions, since those all drive the SM to a terminal state.
      */
     private fun startSessionTimer() {
-        timeoutJob = appScope.launch(dispatchers.io()) {
-            delay(SESSION_TIMEOUT_MS)
-            logcat { "Sync-ExchangeV2: session deadline (${SESSION_TIMEOUT_MS}ms) reached" }
+        syncTimeoutJob = appScope.launch(dispatchers.io()) {
+            delay(SESSION_TIMEOUT)
+            logcat { "Sync-ExchangeV2: session deadline ($SESSION_TIMEOUT) reached" }
             // Capture the phase we were stuck in before failSession() tears the state machine down
             val stage = mutex.withLock { session?.currentState?.toTimeoutStage() }
             failSession("Session timed out", kind = SessionErrorKind.SessionTimeout, timeoutStage = stage)
         }
+    }
+
+    /**
+     * Host-side deadline for the Joiner's report. Elapsing here is not a failure, it just moves us
+     * to [ExchangeV2State.Host.Unknown], where a late report is still accepted until the 5-minute
+     * session deadline.
+     */
+    private fun startLateJoinerDeadlineLocked() {
+        lateJoinerDeadlineJob?.cancel()
+        lateJoinerDeadlineJob = appScope.launch(dispatchers.io()) {
+            val deadline = lateJoinStatusDeadline()
+            delay(deadline)
+            mutex.withLock {
+                // The report may have landed while we were waiting on the lock.
+                if (session?.currentState != ExchangeV2State.Host.AwaitingStatus) return@withLock
+                logcat { "Sync-ExchangeV2: join status deadline ($deadline) reached" }
+                processLocalTriggerLocked(LocalTrigger.HostStatusDeadlineElapsed(deadline))
+            }
+        }
+    }
+
+    private fun lateJoinStatusDeadline(): Duration {
+        val configured = runCatching {
+            syncFeature.self().getSettings()?.let { settings ->
+                JSONObject(settings)
+                    .getLong(SETTING_JOIN_STATUS_DEADLINE_MS)
+                    .milliseconds
+                    .coerceIn(MIN_JOIN_STATUS_DEADLINE, MAX_JOIN_STATUS_DEADLINE)
+            }
+        }.getOrNull()
+        return configured ?: DEFAULT_JOIN_STATUS_DEADLINE
     }
 
     /**
@@ -393,8 +483,9 @@ class RealExchangeV2Runner @Inject constructor(
     private fun ExchangeV2State.toTimeoutStage(): TimeoutStage? = when (this) {
         ExchangeV2State.Bootstrapped -> TimeoutStage.WAITING_FOR_PEER_HELLO
         ExchangeV2State.Negotiating -> TimeoutStage.WAITING_FOR_PEER_STATUS
-        Host.Confirming, Joiner.Confirming -> TimeoutStage.WAITING_FOR_CONFIRMATION
-        Host.Sending, Joiner.Waiting -> TimeoutStage.WAITING_FOR_RECOVERY_CODE
+        ExchangeV2State.Host.Confirming, ExchangeV2State.Joiner.Confirming -> TimeoutStage.WAITING_FOR_CONFIRMATION
+        ExchangeV2State.Host.Sending, ExchangeV2State.Joiner.Waiting -> TimeoutStage.WAITING_FOR_RECOVERY_CODE
+        ExchangeV2State.Host.AwaitingStatus, ExchangeV2State.Host.Unknown, ExchangeV2State.Joiner.Joining -> TimeoutStage.LOGGING_IN
         else -> null
     }
 
@@ -402,13 +493,16 @@ class RealExchangeV2Runner @Inject constructor(
     // Inbound message handling + orchestration
     // -----------------------------------------------------------------------
 
-    override suspend fun deliverIncomingMessage(message: ExchangeV2Message) {
+    internal suspend fun deliverIncomingMessage(message: ExchangeV2Message) {
         // Suspends until processing completes so the poll loop processes messages in wire order;
         // a fire-and-forget launch here would let a poll batch race to the SM out of sequence.
         mutex.withLock { processIncomingLocked(message) }
     }
 
-    private suspend fun processIncomingLocked(message: ExchangeV2Message) {
+    private fun processIncomingLocked(
+        message: ExchangeV2Message,
+        isReplayedFromBuffer: Boolean = false,
+    ) {
         val sm = session ?: run {
             logcat { "Sync-ExchangeV2: deliverIncomingMessage ${message.messageType} rejected — no active session" }
             emitSessionError(
@@ -416,6 +510,20 @@ class RealExchangeV2Runner @Inject constructor(
                 SessionErrorKind.PairingSessionNotReady,
             )
             return
+        }
+
+        if (message.protocolVersion > negotiatedVersion) {
+            logcat {
+                "Sync-ExchangeV2: dropping ${message.messageType}: " +
+                    "requires ${message.protocolVersion.prettyPrint()}, session negotiated ${negotiatedVersion.prettyPrint()}"
+            }
+            emit(ExchangeV2Event.MessageRejected(clock.nowMs(), message, sm.currentState, RejectReason.TooHighProtocolDropped))
+            return
+        }
+
+        // A replayed message already emitted MessageReceived when it first came off the wire.
+        if (!isReplayedFromBuffer) {
+            emit(ExchangeV2Event.MessageReceived(clock.nowMs(), message))
         }
 
         // Race guard: a Host with auto-approve enabled can finish sending its messages before
@@ -447,7 +555,7 @@ class RealExchangeV2Runner @Inject constructor(
             sendOwnAvailability()
         }
 
-        if (sm.currentState.isTerminal()) onTerminalReachedLocked(sm.currentState)
+        if (sm.currentState.isTerminal()) onTerminalReachedLocked(sm.currentState, localTrigger = null, message)
     }
 
     /**
@@ -459,19 +567,27 @@ class RealExchangeV2Runner @Inject constructor(
         when (effect) {
             SideEffect.SendAwaitingConfirmation -> {
                 logcat { "Sync-ExchangeV2: side effect → SendAwaitingConfirmation" }
-                sendMessageJson("""{"type":"recovery_code_awaiting_confirmation"}""")
+                sendMessage(ExchangeV2Message.RecoveryCodeAwaitingConfirmation.create())
             }
             SideEffect.SendConfirmed -> {
                 logcat { "Sync-ExchangeV2: side effect → SendConfirmed" }
-                sendMessageJson("""{"type":"recovery_code_confirmed"}""")
+                sendMessage(ExchangeV2Message.RecoveryCodeConfirmed.create())
             }
             SideEffect.SendDenied -> {
                 logcat { "Sync-ExchangeV2: side effect → SendDenied" }
-                sendMessageJson("""{"type":"recovery_code_denied"}""")
+                sendMessage(ExchangeV2Message.RecoveryCodeDenied.create())
             }
             SideEffect.RequestRecoveryCodeShare -> {
                 logcat { "Sync-ExchangeV2: side effect → RequestRecoveryCodeShare" }
                 shareRecoveryCodeAndAdvanceLocked()
+            }
+            is SideEffect.SendRecoveryCodeDone -> {
+                logcat { "Sync-ExchangeV2: side effect → SendRecoveryCodeDone(${effect.reason.value})" }
+                sendMessage(ExchangeV2Message.RecoveryCodeDone.create(effect.reason))
+            }
+            SideEffect.AwaitJoinStatus -> {
+                logcat { "Sync-ExchangeV2: side effect → AwaitJoinStatus" }
+                startLateJoinerDeadlineLocked()
             }
         }
     }
@@ -487,11 +603,15 @@ class RealExchangeV2Runner @Inject constructor(
             mutex.withLock {
                 val s = session ?: return@withLock
                 if (s.currentState != ExchangeV2State.Host.Sending) return@withLock
-                val terminalTrigger = if (responseOk) LocalTrigger.HostSendComplete else LocalTrigger.HostUnavailable
+                val terminalTrigger = if (responseOk) {
+                    LocalTrigger.HostSendComplete(negotiatedVersion)
+                } else {
+                    LocalTrigger.HostUnavailable
+                }
                 val r = s.localTrigger(terminalTrigger)
                 emit(r.event)
                 r.sideEffects.forEach { applySideEffectLocked(it) }
-                if (s.currentState.isTerminal()) onTerminalReachedLocked(s.currentState)
+                if (s.currentState.isTerminal()) onTerminalReachedLocked(s.currentState, terminalTrigger, peerTrigger = null)
             }
         }
     }
@@ -512,18 +632,14 @@ class RealExchangeV2Runner @Inject constructor(
     private fun recordPeerContext(message: ExchangeV2Message) {
         when (message) {
             is ExchangeV2Message.Hello -> {
-                peerChannelId = message.channelId
-                peerPublicKey = message.publicKey
+                peerChannel = PeerChannelData(message.channelId, message.publicKey)
+                negotiatedVersion = negotiateProtocolVersion(message.version, PeerVersionSource.HelloMessage)
             }
             is ExchangeV2Message.RecoveryCodeAvailable -> {
-                _peerKind = message.kind
-                peerUserId = message.userId
-                _peerName = message.name
+                peerData = PeerData(message.userId, message.kind, message.name)
             }
             is ExchangeV2Message.RecoveryCodeRequest -> {
-                _peerKind = message.kind
-                peerUserId = null
-                _peerName = message.name
+                peerData = PeerData(userId = null, message.kind, message.name)
             }
             else -> Unit
         }
@@ -531,7 +647,8 @@ class RealExchangeV2Runner @Inject constructor(
 
     /**
      * Can we auto-elect a role now? Requires an accepted transition, SM in Negotiating, and a
-     * peer availability message ([RecoveryCodeAvailable]/[RecoveryCodeRequest]) carrying peer kind/userId.
+     * peer availability message ([ExchangeV2Message.RecoveryCodeAvailable]/[ExchangeV2Message.RecoveryCodeRequest])
+     * carrying peer kind/userId.
      */
     private fun canAutoElectRole(
         sm: ExchangeV2StateMachine,
@@ -554,13 +671,20 @@ class RealExchangeV2Runner @Inject constructor(
      */
     private fun autoElectRoleLocked(sm: ExchangeV2StateMachine) {
         val elected = electRole() ?: run {
-            logcat { "Sync-ExchangeV2: cannot auto-elect role yet (role=${_pairingRole}, peerKind=$_peerKind)" }
+            logcat { "Sync-ExchangeV2: cannot auto-elect role yet (role=${ownData?.role}, peerKind=${peerData?.kind})" }
             return
         }
-        logcat {
-            "Sync-ExchangeV2: auto-electing $elected " +
-                "(own role=${_pairingRole}, own userId=${syncStore.userId}, peer kind=$_peerKind, peer userId=$peerUserId)"
-        }
+        emit(
+            ExchangeV2Event.RoleElected(
+                timestampMs = clock.nowMs(),
+                role = elected,
+                ownPairingRole = ownData?.role,
+                ownSignedIn = syncStore.userId != null,
+                ownKind = OWN_DEVICE_KIND,
+                peerKind = peerData?.kind,
+                peerSignedIn = peerData?.userId != null,
+            ),
+        )
         val electResult = sm.localTrigger(LocalTrigger.RoleElected(elected))
         emit(electResult.event)
         electResult.sideEffects.forEach { applySideEffectLocked(it) }
@@ -573,40 +697,35 @@ class RealExchangeV2Runner @Inject constructor(
     private fun canSendOwnAvailability(sm: ExchangeV2StateMachine): Boolean {
         if (sentOwnAvailability) return false
         if (sm.currentState != ExchangeV2State.Negotiating) return false
-        if (peerChannelId == null || peerPublicKey == null) return false
+        if (peerChannel == null) return false
         return true
     }
 
     private fun electRole(): Role? {
-        val ownRole = _pairingRole ?: return null
+        val peerData = peerData ?: return null
+        val ownData = ownData ?: return null
         val ownUserId = syncStore.userId
-        val pKind = _peerKind ?: return null
-        val pUserId = peerUserId
+
         return when {
-            ownUserId != null && pUserId == null -> Role.Host
-            ownUserId == null && pUserId != null -> Role.Joiner
-            OWN_DEVICE_KIND == "ddg" && pKind == "3party" -> Role.Host
-            OWN_DEVICE_KIND == "3party" && pKind == "ddg" -> Role.Joiner
-            ownRole == PairingRole.Presenter -> Role.Host
+            ownUserId != null && peerData.userId == null -> Role.Host
+            ownUserId == null && peerData.userId != null -> Role.Joiner
+            OWN_DEVICE_KIND == "ddg" && peerData.kind == "3party" -> Role.Host
+            OWN_DEVICE_KIND == "3party" && peerData.kind == "ddg" -> Role.Joiner
+            ownData.role == PairingRole.Presenter -> Role.Host
             else -> Role.Joiner
         }
-    }
-
-    override suspend fun deliverIncomingMessageJson(rawJson: String) {
-        deliverIncomingMessage(messageParser.parse(rawJson))
     }
 
     // -----------------------------------------------------------------------
     // Local triggers — drive SM + send outbound messages on Host transitions
     // -----------------------------------------------------------------------
 
-    override fun localTrigger(trigger: LocalTrigger) {
+    override fun localTrigger(trigger: LocalTrigger): Job =
         appScope.launch(dispatchers.io()) {
             mutex.withLock { processLocalTriggerLocked(trigger) }
         }
-    }
 
-    private suspend fun processLocalTriggerLocked(trigger: LocalTrigger) {
+    private fun processLocalTriggerLocked(trigger: LocalTrigger) {
         val sm = session ?: run {
             logcat { "Sync-ExchangeV2: localTrigger $trigger ignored — no active session" }
             return
@@ -619,27 +738,50 @@ class RealExchangeV2Runner @Inject constructor(
         if (priorState == ExchangeV2State.Joiner.Confirming) {
             replayBufferedJoinerMessagesLocked(newState = sm.currentState)
         }
-        if (sm.currentState.isTerminal()) onTerminalReachedLocked(sm.currentState)
+        if (sm.currentState.isTerminal()) onTerminalReachedLocked(sm.currentState, trigger, peerTrigger = null)
     }
 
     /** On a terminal SM state, tear down via [cancelLocked]. Caller holds [mutex]. */
-    private fun onTerminalReachedLocked(terminal: ExchangeV2State) {
-        logcat { "Sync-ExchangeV2: session reached terminal state $terminal, tearing down" }
-        cancelLocked()
+    private fun onTerminalReachedLocked(
+        terminalState: ExchangeV2State,
+        localTrigger: LocalTrigger?,
+        peerTrigger: ExchangeV2Message?,
+    ) {
+        logcat { "Sync-ExchangeV2: session reached terminal state $terminalState, tearing down" }
+        cancelLocked(computeByeReason(terminalState, localTrigger, peerTrigger))
+    }
+
+    /**
+     * Per Messages spec 1216906886019334: `done` is nothing left to do, `cancelled` is the user
+     * backing out, `error` is a local failure. The trigger is checked first because the same
+     * terminal is reachable both ways: a denied prompt and a protocol error both land on
+     * [ExchangeV2State.Host.Aborted] / [ExchangeV2State.Joiner.AbortedLocal]. A teardown answering
+     * the peer's own `bye` is not a local failure either, even when it lands on an error terminal:
+     * the peer left and there is simply nothing left to do.
+     */
+    private fun computeByeReason(
+        state: ExchangeV2State,
+        localTrigger: LocalTrigger?,
+        peerTrigger: ExchangeV2Message?,
+    ): ExchangeV2Message.Bye.Reason = when {
+        localTrigger in CANCELLED_BYE_TRIGGERS -> ExchangeV2Message.Bye.Reason.Cancelled
+        peerTrigger is ExchangeV2Message.Bye -> ExchangeV2Message.Bye.Reason.Done
+        state in ERROR_BYE_STATES -> ExchangeV2Message.Bye.Reason.Error
+        else -> ExchangeV2Message.Bye.Reason.Done
     }
 
     /**
      * Caller must have come from [ExchangeV2State.Joiner.Confirming]. On confirm (→ Joiner.Waiting)
      * replay buffered host-side messages; on any other exit discard them.
      */
-    private suspend fun replayBufferedJoinerMessagesLocked(newState: ExchangeV2State) {
+    private fun replayBufferedJoinerMessagesLocked(newState: ExchangeV2State) {
         if (pendingJoinerWaitingMessages.isEmpty()) return
         if (newState == ExchangeV2State.Joiner.Waiting) {
             val buffered = pendingJoinerWaitingMessages.toList()
             pendingJoinerWaitingMessages.clear()
             logcat { "Sync-ExchangeV2: replaying ${buffered.size} buffered Joiner message(s) now that user confirmed" }
             for (m in buffered) {
-                processIncomingLocked(m)
+                processIncomingLocked(m, isReplayedFromBuffer = true)
                 if (session == null) return // terminal reached, stop replay
             }
         } else {
@@ -654,52 +796,42 @@ class RealExchangeV2Runner @Inject constructor(
 
     /** Returns true if hello reached the relay; false signals a fatal abort to the caller. */
     private fun sendHello(): Boolean {
-        val own = ownChannelId
-        val peer = peerChannelId
-        val peerKey = peerPublicKey
-        val ourKey = ownKeyPair
-        if (own == null || peer == null || peerKey == null || ourKey == null) {
+        if (ownChannel == null || peerChannel == null) {
             emitSessionError("Cannot send hello — pairing session state is incomplete", SessionErrorKind.PairingSessionNotReady)
             return false
         }
-        val json = JSONObject().apply {
-            put("type", "hello")
-            put("channel_id", own)
-            put("public_key", ourKey.publicKeyBase64)
-            put("version", OUR_VERSION_STRING)
-        }.toString()
-        return sendOnWireAndRecord(json, peer, peerKey, ExchangeV2Message.Hello(json, own, ourKey.publicKeyBase64, OUR_VERSION_STRING))
+        return sendMessage(ExchangeV2Message.Hello.TYPE) { own, _ ->
+            ExchangeV2Message.Hello.create(
+                channelId = own.id,
+                publicKey = own.keyPair.publicKeyBase64,
+                version = advertisedVersion,
+            )
+        }
     }
 
     private fun sendOwnAvailability() {
         if (sentOwnAvailability) return
-        val own = ownChannelId ?: return
-        val peer = peerChannelId ?: return
-        val peerKey = peerPublicKey ?: return
+
         val userId = syncStore.userId
         val deviceName = syncDeviceIds.deviceName()
-        if (userId != null) {
-            val json = JSONObject().apply {
-                put("type", "recovery_code_available")
-                put("name", deviceName)
-                put("kind", OWN_DEVICE_KIND)
-                put("user_id", userId)
-            }.toString()
-            sendOnWireAndRecord(json, peer, peerKey, ExchangeV2Message.RecoveryCodeAvailable(json, userId, deviceName, OWN_DEVICE_KIND))
+        val message = if (userId != null) {
+            ExchangeV2Message.RecoveryCodeAvailable.create(
+                userId = userId,
+                name = deviceName,
+                kind = OWN_DEVICE_KIND,
+            )
         } else {
-            val json = JSONObject().apply {
-                put("type", "recovery_code_request")
-                put("name", deviceName)
-                put("kind", OWN_DEVICE_KIND)
-            }.toString()
-            sendOnWireAndRecord(json, peer, peerKey, ExchangeV2Message.RecoveryCodeRequest(json, deviceName, OWN_DEVICE_KIND))
+            ExchangeV2Message.RecoveryCodeRequest.create(
+                name = deviceName,
+                kind = OWN_DEVICE_KIND,
+            )
         }
-        sentOwnAvailability = true
+        sentOwnAvailability = sendMessage(message)
         // Re-elect in case the peer's availability arrived before we sent ours.
         // REVIEW: likely unreachable under eager-send ordering — confirm against the ordering spec
         // (Unified Algorithm 1214739740392701) and delete if dead.
         val sm = session ?: return
-        if (sm.currentState == ExchangeV2State.Negotiating && _peerKind != null) {
+        if (sm.currentState == ExchangeV2State.Negotiating && peerData != null) {
             autoElectRoleLocked(sm)
         }
     }
@@ -711,37 +843,33 @@ class RealExchangeV2Runner @Inject constructor(
      * should be driven to [ExchangeV2State.Host.Aborted] rather than Done).
      */
     private suspend fun sendRecoveryCodeResponse(): Boolean {
-        val peer = peerChannelId ?: return false
-        val peerKey = peerPublicKey ?: return false
+        if (peerChannel == null) return false
+        val peerKind = peerData?.kind
         // Recovery code per peer kind. Per spec §"Exchange Share Recovery Code": create the host
         // account if absent; extend it with a 3party credential when peer is 3party. Provisioning
         // failure falls through to recovery_code_unavailable below.
         // peerKind is set during role election; reaching Host.Sending without it means something
         // upstream is broken — bail rather than silently assuming ddg.
-        val codeResult = when (_peerKind) {
+        val codeResult = when (peerKind) {
             "ddg" -> provisionForDdgPeer()
             "3party" -> provisionForThirdPartyPeer()
             null -> Result.Error(reason = "Host.Sending reached without a known peer kind")
-            else -> Result.Error(reason = "Unsupported peer kind '$_peerKind'")
+            else -> Result.Error(reason = "Unsupported peer kind '$peerKind'")
         }
         return when (codeResult) {
             is Result.Success -> {
                 val recoveryCode = codeResult.data
-                val json = JSONObject().apply {
-                    put("type", "recovery_code_response")
-                    put("recovery_code", recoveryCode)
-                }.toString()
                 // Propagate the send result
-                sendOnWireAndRecord(json, peer, peerKey, ExchangeV2Message.RecoveryCodeResponse(json, recoveryCode))
+                sendMessage(ExchangeV2Message.RecoveryCodeResponse.create(recoveryCode))
             }
             is Result.Error -> {
-                logcat(ERROR) { "Sync-ExchangeV2: recovery code unavailable for peerKind=$_peerKind: ${codeResult.reason}" }
-                val json = """{"type":"recovery_code_unavailable"}"""
-                sendOnWireAndRecord(json, peer, peerKey, ExchangeV2Message.RecoveryCodeUnavailable(json))
+                logcat(ERROR) { "Sync-ExchangeV2: recovery code unavailable for peerKind=$peerKind: ${codeResult.reason}" }
+                sendMessage(ExchangeV2Message.RecoveryCodeUnavailable.create())
                 emitSessionError(
                     "Couldn't generate a recovery code: ${codeResult.reason}",
                     SessionErrorKind.RecoveryCodePreparationFailed,
                 )
+                // No code went out, so the Host aborts regardless of whether the peer got told.
                 false
             }
         }
@@ -778,28 +906,43 @@ class RealExchangeV2Runner @Inject constructor(
         return recoveryCodeProvider.getThirdPartyRecoveryCode()
     }
 
-    private fun sendMessageJson(json: String) {
-        val peer = peerChannelId ?: return
-        val peerKey = peerPublicKey ?: return
-        val parsed = messageParser.parse(json)
-        sendOnWireAndRecord(json, peer, peerKey, parsed)
+    private fun sendMessage(
+        message: ExchangeV2Message,
+        ownChannel: OwnChannelData? = this.ownChannel,
+        peerChannel: PeerChannelData? = this.peerChannel,
+        negotiatedVersion: ExchangeProtocolVersion.V2 = this.negotiatedVersion,
+    ): Boolean {
+        return sendMessage(message.messageType, ownChannel, peerChannel, negotiatedVersion) { _, _ -> message }
     }
 
-    /** Returns true on successful POST, false on transport error (caller decides if fatal). */
-    private fun sendOnWireAndRecord(
-        messageJson: String,
-        peerChannel: String,
-        peerKey: String,
-        outboundMessage: ExchangeV2Message,
+    private fun sendMessage(
+        messageType: String,
+        ownChannel: OwnChannelData? = this.ownChannel,
+        peerChannel: PeerChannelData? = this.peerChannel,
+        negotiatedVersion: ExchangeProtocolVersion.V2 = this.negotiatedVersion,
+        message: (OwnChannelData, PeerChannelData) -> ExchangeV2Message,
     ): Boolean {
-        val own = ownChannelId ?: return false
-        return when (val r = channel.sendMessage(messageJson, peerChannel, peerKey, own)) {
+        if (ownChannel == null || peerChannel == null) {
+            emit(ExchangeV2Event.MessageNotSent(clock.nowMs(), NotSentReason.OwnChannelNotConfigured, messageType, message = null))
+            return false
+        }
+
+        val message = message(ownChannel, peerChannel)
+        if (message.protocolVersion > negotiatedVersion) {
+            emit(ExchangeV2Event.MessageNotSent(clock.nowMs(), NotSentReason.TooHighProtocol(negotiatedVersion), messageType, message))
+            return false
+        }
+
+        return when (val r = channel.sendMessage(message, peerChannel.id, peerChannel.publicKey, ownChannel.id, ownChannel.secret)) {
             is Result.Success -> {
-                recordSentMessage(outboundMessage)
+                recordSentMessage(message)
                 true
             }
             is Result.Error -> {
-                emitSessionError("Failed to send message to peer over channel (${r.code})", r.code.toSendFailureKind())
+                emit(ExchangeV2Event.MessageNotSent(clock.nowMs(), NotSentReason.HttpError(r.code), message.messageType, message))
+                if (messageType != ExchangeV2Message.Bye.TYPE) {
+                    emitSessionError("Failed to send message '$messageType' to peer over channel (${r.code})", r.code.toSendFailureKind())
+                }
                 false
             }
         }
@@ -815,8 +958,7 @@ class RealExchangeV2Runner @Inject constructor(
         else -> SessionErrorKind.Unknown
     }
 
-    override fun recordSentMessage(message: ExchangeV2Message) {
-        logcat { "Sync-ExchangeV2: recordSentMessage ${message.messageType}" }
+    internal fun recordSentMessage(message: ExchangeV2Message) {
         emit(ExchangeV2Event.MessageSent(clock.nowMs(), message))
     }
 
@@ -826,27 +968,66 @@ class RealExchangeV2Runner @Inject constructor(
 
     private fun emit(event: ExchangeV2Event) {
         when (event) {
-            is ExchangeV2Event.Transition -> logcat {
-                "Sync-ExchangeV2: transition ${event.from} → ${event.to} " +
-                    "(trigger=${event.trigger?.messageType ?: event.localTrigger})"
+            is ExchangeV2Event.SessionStarted -> {
+                logcat {
+                    val codeLine = event.linkingCode?.let { " linkingCode=$it" } ?: ""
+                    "Sync-ExchangeV2: session started role=${event.pairingRole} channel_id=${event.ownChannelId}$codeLine"
+                }
             }
-            is ExchangeV2Event.MessageRejected -> logcat {
-                "Sync-ExchangeV2: rejected ${event.message.messageType} in ${event.state} reason=${event.reason}"
+
+            is ExchangeV2Event.VersionNegotiated -> {
+                logcat {
+                    "Sync-ExchangeV2: negotiated protocol version: ${event.negotiatedVersion.prettyPrint()}, " +
+                        "our version: ${event.ourVersion.prettyPrint()}, peer version: ${event.peerVersion.prettyPrint()}"
+                }
             }
-            is ExchangeV2Event.MessageSent -> Unit
-            is ExchangeV2Event.SessionStarted -> logcat {
-                val codeLine = event.linkingCode?.let { " linkingCode=$it" } ?: ""
-                "Sync-ExchangeV2: session started role=${event.pairingRole} channel_id=${event.ownChannelId}$codeLine"
+
+            is ExchangeV2Event.RoleElected -> {
+                logcat {
+                    "Sync-ExchangeV2: role elected ${event.role} " +
+                        "(own role=${event.ownPairingRole}, own signedIn=${event.ownSignedIn}, own kind=${event.ownKind}, " +
+                        "peer kind=${event.peerKind}, peer signedIn=${event.peerSignedIn})"
+                }
             }
-            is ExchangeV2Event.SessionError -> logcat(ERROR) { "Sync-ExchangeV2: session error: ${event.message}" }
+
+            is ExchangeV2Event.Transition -> {
+                logcat {
+                    "Sync-ExchangeV2: transition ${event.from} → ${event.to} " +
+                        "(trigger=${event.trigger?.messageType ?: event.localTrigger})"
+                }
+            }
+
+            is ExchangeV2Event.MessageSent -> {
+                logcat { "Sync-ExchangeV2: sent ${event.message.messageType}" }
+            }
+
+            is ExchangeV2Event.MessageNotSent -> {
+                logcat { "Sync-ExchangeV2: not sent ${event.messageType} reason=${event.reason}" }
+            }
+
+            is ExchangeV2Event.MessageReceived -> {
+                logcat { "Sync-ExchangeV2: received ${event.message.messageType}" }
+            }
+
+            is ExchangeV2Event.MessageRejected -> {
+                logcat { "Sync-ExchangeV2: rejected ${event.message.messageType} in ${event.state} reason=${event.reason}" }
+            }
+
+            is ExchangeV2Event.SessionError -> {
+                logcat(ERROR) { "Sync-ExchangeV2: session error: ${event.message}" }
+            }
+
+            is ExchangeV2Event.SessionEnded -> {
+                logcat { "Sync-ExchangeV2: session ended lastState=${event.lastState} bye=${event.byeReason.value}" }
+            }
         }
         _events.tryEmit(event)
     }
 
     private fun emitSessionStarted() {
-        val ch = ownChannelId ?: return
-        val role = _pairingRole ?: return
-        emit(ExchangeV2Event.SessionStarted(clock.nowMs(), role, ch, _linkingCode))
+        val ch = ownChannel?.id ?: return
+        val own = ownData ?: return
+        emit(ExchangeV2Event.SessionStarted(clock.nowMs(), own.role, ch, own.linkingCode))
     }
 
     private fun emitSessionError(
@@ -858,29 +1039,104 @@ class RealExchangeV2Runner @Inject constructor(
     }
 
     private fun ExchangeV2State.isTerminal(): Boolean = when (this) {
-        SameAccountAbort,
+        ExchangeV2State.SameAccountAbort,
         ExchangeV2State.Aborted,
-        Host.Aborted,
-        Host.Done,
-        Joiner.AbortedLocal,
-        Joiner.AbortedByHost,
-        Joiner.Done,
+        ExchangeV2State.Host.Aborted,
+        ExchangeV2State.Host.Done,
+        ExchangeV2State.Joiner.AbortedLocal,
+        ExchangeV2State.Joiner.AbortedByHost,
+        ExchangeV2State.Joiner.Done,
+        ExchangeV2State.Joiner.JoinFailed,
         -> true
         else -> false
+    }
+
+    private fun negotiateProtocolVersion(
+        peerVersion: ExchangeProtocolVersion,
+        peerSource: PeerVersionSource,
+    ): ExchangeProtocolVersion.V2 {
+        val ourVersion = advertisedVersion
+        val negotiatedVersion = when (peerVersion) {
+            is ExchangeProtocolVersion.V2 -> minOf(ourVersion, peerVersion)
+            else -> BASELINE_PROTOCOL_VERSION
+        }
+        emit(ExchangeV2Event.VersionNegotiated(clock.nowMs(), peerSource, peerVersion, advertisedVersion, negotiatedVersion))
+        return negotiatedVersion
+    }
+
+    /**
+     * Null when this device does not authenticate exchange endpoints. The decision is made once per session, at
+     * bootstrap: a channel created without a secret can never start presenting one, since the relay would reject
+     * a header the channel was not claimed with.
+     */
+    private fun generateChannelSecret(): String? {
+        val authenticate = advertisedVersion >= ExchangeProtocolVersion.V2_1 || syncFeature.canSendExchangeChannelSecret().isEnabled()
+        if (!authenticate) return null
+        return Base64.getUrlEncoder()
+            .withoutPadding()
+            .encodeToString(jweCrypto.generateSecureBytes(CHANNEL_SECRET_SIZE))
     }
 
     companion object {
         // RSA modulus size (bits) for the v2 exchange pairing keypair.
         private const val EXCHANGE_RSA_KEY_SIZE = 2048
 
-        private const val REPLAY = 100
+        // Channel authorization secret size for the v2 exchange transport layer.
+        private const val CHANNEL_SECRET_SIZE = 32
+
+        // Max count ExchangeV2Event held in buffer that will be replayed to consumers.
+        private const val EVENT_BUFFER_SIZE = 100
 
         // Transport TD 1214486492252757 §Session Lifecycle: 5-minute client session deadline.
-        private const val SESSION_TIMEOUT_MS = 5 * 60 * 1000L
+        private val SESSION_TIMEOUT = 5.minutes
+
+        // Spec 1216906888491126 §"Account join status": 30 seconds, remotely tunable.
+        private const val SETTING_JOIN_STATUS_DEADLINE_MS = "joinStatusDeadlineMs"
+        private val DEFAULT_JOIN_STATUS_DEADLINE = 30.seconds
+        private val MIN_JOIN_STATUS_DEADLINE = 5.seconds
+        private val MAX_JOIN_STATUS_DEADLINE = 2.minutes
 
         // Android is always a ddg-kind device.
         private const val OWN_DEVICE_KIND = "ddg"
         private const val MAX_CHANNEL_CREATE_RETRIES = 3
         private const val HTTP_CONFLICT = 409
+
+        private val BASELINE_PROTOCOL_VERSION get() = ExchangeProtocolVersion.V2_0
+
+        // Triggers that make a terminal state a user cancellation rather than a failure.
+        private val CANCELLED_BYE_TRIGGERS: Set<LocalTrigger> = setOf(
+            LocalTrigger.UserDeniedHost,
+            LocalTrigger.UserDeniedJoiner,
+        )
+
+        // Terminal states we only reach because something went wrong on this device.
+        private val ERROR_BYE_STATES: Set<ExchangeV2State> = setOf(
+            ExchangeV2State.Aborted,
+            ExchangeV2State.Host.Aborted,
+            ExchangeV2State.Joiner.AbortedLocal,
+            ExchangeV2State.Joiner.JoinFailed,
+        )
     }
 }
+
+private data class OwnChannelData(
+    val id: String,
+    val keyPair: RsaKeyPair,
+    val secret: String?,
+)
+
+private data class OwnData(
+    val role: PairingRole,
+    val linkingCode: String?,
+)
+
+private data class PeerChannelData(
+    val id: String,
+    val publicKey: String,
+)
+
+private data class PeerData(
+    val userId: String?,
+    val kind: String,
+    val name: String,
+)

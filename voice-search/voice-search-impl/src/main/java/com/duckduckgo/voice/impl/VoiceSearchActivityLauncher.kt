@@ -25,7 +25,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Event
-import com.duckduckgo.voice.api.VoiceSearchLauncher.Event.VoiceSearchDisabled
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source
 import com.duckduckgo.voice.api.VoiceSearchLauncher.VoiceRecognitionResult
 import com.duckduckgo.voice.api.VoiceSearchLauncher.VoiceSearchMode
@@ -56,14 +55,12 @@ class RealVoiceSearchActivityLauncher @Inject constructor(
     private val pixel: Pixel,
     private val activityResultLauncherWrapper: ActivityResultLauncherWrapper,
     private val voiceSearchRepository: VoiceSearchRepository,
-    private val permissionRequest: VoiceSearchPermissionDialogsLauncher,
     private val duckAiFeatureState: DuckAiFeatureState,
 ) : VoiceSearchActivityLauncher {
 
     companion object {
         private const val KEY_PARAM_SOURCE = "source"
         private const val KEY_PARAM_ERROR = "error"
-        private const val SUGGEST_REMOVE_VOICE_SEARCH_AFTER_TIMES = 3
     }
 
     private var _source: Source? = null
@@ -94,7 +91,6 @@ class RealVoiceSearchActivityLauncher @Inject constructor(
                             pixel = VoiceSearchPixelNames.VOICE_SEARCH_DONE,
                             parameters = mapOf(KEY_PARAM_SOURCE to _source?.paramValueName.orEmpty()),
                         )
-                        voiceSearchRepository.resetVoiceSearchDismissed()
                         val recognitionResult = when (mode) {
                             VoiceSearchMode.SEARCH -> VoiceRecognitionResult.SearchResult(data)
                             VoiceSearchMode.DUCK_AI -> VoiceRecognitionResult.DuckAiResult(data)
@@ -129,16 +125,6 @@ class RealVoiceSearchActivityLauncher @Inject constructor(
                             parameters = mapOf(KEY_PARAM_SOURCE to _source?.paramValueName.orEmpty()),
                         )
                         onEvent(Event.SearchCancelled)
-                    }
-                    voiceSearchRepository.dismissVoiceSearch()
-                    if (voiceSearchRepository.countVoiceSearchDismissed() >= SUGGEST_REMOVE_VOICE_SEARCH_AFTER_TIMES) {
-                        permissionRequest.showRemoveVoiceSearchDialog(
-                            activity,
-                            onRemoveVoiceSearch = {
-                                voiceSearchRepository.setVoiceSearchUserEnabled(false)
-                                onEvent(VoiceSearchDisabled)
-                            },
-                        )
                     }
                 }
                 activity.window?.decorView?.rootView?.let {

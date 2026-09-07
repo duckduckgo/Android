@@ -120,7 +120,6 @@ class RealReturnSessionWideEvent @Inject constructor(
                         // OnProcessStart cleanup sends whatever metadata is already persisted.
                         put(KEY_STATUS_REASON, REASON_APP_TERMINATED)
                     },
-                    samplingProbability = SAMPLING_PROBABILITY,
                 )
 
                 startResult.onSuccess { flowId ->
@@ -199,8 +198,8 @@ class RealReturnSessionWideEvent @Inject constructor(
         finishSession(statusReason = REASON_URL_SUBMITTED, status = FlowStatus.Success)
     }
 
-    override fun onAiPromptSubmitted() {
-        finishSession(statusReason = REASON_AI_PROMPT_SUBMITTED, status = FlowStatus.Success)
+    override fun onAiPromptSubmitted(source: String?) {
+        finishSession(statusReason = REASON_AI_PROMPT_SUBMITTED, status = FlowStatus.Success, aiPromptSource = source)
     }
 
     override fun onChatSelected() {
@@ -277,11 +276,11 @@ class RealReturnSessionWideEvent @Inject constructor(
         }
     }
 
-    private fun finishSession(statusReason: String, status: FlowStatus) {
+    private fun finishSession(statusReason: String, status: FlowStatus, aiPromptSource: String? = null) {
         coroutineScope.launch {
             mutex.withLock {
                 if (abortIfDisabled()) return@launch
-                finishSessionLocked(statusReason, status)
+                finishSessionLocked(statusReason, status, aiPromptSource)
             }
         }
     }
@@ -289,6 +288,7 @@ class RealReturnSessionWideEvent @Inject constructor(
     private suspend fun finishSessionLocked(
         statusReason: String,
         status: FlowStatus,
+        aiPromptSource: String? = null,
     ) {
         val session = activeSession ?: return
         activeSession = null
@@ -300,17 +300,18 @@ class RealReturnSessionWideEvent @Inject constructor(
         wideEventClient.flowFinish(
             wideEventId = session.flowId,
             status = status,
-            metadata = mapOf(
-                KEY_AFTER_IDLE to session.afterIdle.toString(),
-                KEY_LANDED_ON to session.landedOn.value,
-                KEY_STATUS_REASON to statusReason,
-                KEY_FOCUSED to (session.focused ?: false).toString(),
-                KEY_PAGE_ENGAGED to session.pageEngaged.toString(),
-                KEY_BACK_PRESSED to session.backPressed.toString(),
-                KEY_OPENING_SCREEN_CHANGED to session.openingScreenChanged.toString(),
-                KEY_CLOSE_TAB_TAPPED to session.closeTabTapped.toString(),
-                KEY_BURN_TAB_TAPPED to session.burnTabTapped.toString(),
-            ),
+            metadata = buildMap {
+                put(KEY_AFTER_IDLE, session.afterIdle.toString())
+                put(KEY_LANDED_ON, session.landedOn.value)
+                put(KEY_STATUS_REASON, statusReason)
+                put(KEY_FOCUSED, (session.focused ?: false).toString())
+                put(KEY_PAGE_ENGAGED, session.pageEngaged.toString())
+                put(KEY_BACK_PRESSED, session.backPressed.toString())
+                put(KEY_OPENING_SCREEN_CHANGED, session.openingScreenChanged.toString())
+                put(KEY_CLOSE_TAB_TAPPED, session.closeTabTapped.toString())
+                put(KEY_BURN_TAB_TAPPED, session.burnTabTapped.toString())
+                aiPromptSource?.let { put(KEY_SOURCE, it) }
+            },
         )
         logcat(tag = TAG) { "Return session finished: status=$status, reason=$statusReason" }
     }
@@ -351,8 +352,6 @@ class RealReturnSessionWideEvent @Inject constructor(
     private companion object {
         const val TAG = "RealReturnSessionWideEvent"
         const val FEATURE_NAME = "return_session"
-        const val SAMPLING_PROBABILITY = 0.05f
-
         const val REASON_SEARCH_SUBMITTED = "search_submitted"
         const val REASON_URL_SUBMITTED = "url_submitted"
         const val REASON_AI_PROMPT_SUBMITTED = "ai_prompt_submitted"
@@ -373,6 +372,7 @@ class RealReturnSessionWideEvent @Inject constructor(
         const val KEY_OPENING_SCREEN_CHANGED = "opening_screen_changed"
         const val KEY_CLOSE_TAB_TAPPED = "close_tab_tapped"
         const val KEY_BURN_TAB_TAPPED = "burn_tab_tapped"
+        const val KEY_SOURCE = "source"
         const val KEY_SESSION_DURATION = "session_duration_ms_bucketed"
         const val KEY_TIME_TO_FIRST_INTERACTION = "time_to_first_interaction_ms_bucketed"
 

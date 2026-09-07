@@ -177,6 +177,11 @@ enum class SubscriptionPixel(
         type = Count,
         includedParameters = setOf(ATB, APP_VERSION),
     ),
+    APP_SETTINGS_PARTNER_BENEFITS_CLICK(
+        baseName = "m_privacy-pro_app-settings_partner-benefits_click",
+        type = Count,
+        includedParameters = setOf(APP_VERSION),
+    ),
     SUBSCRIPTION_SETTINGS_CHANGE_PLAN_OR_BILLING_CLICK(
         baseName = "m_privacy-pro_settings_change-plan-or-billing_click",
         type = Count,
@@ -359,7 +364,6 @@ object SubscriptionPixelParameter {
     const val ERROR_TYPE = "errorType"
     const val REASON = "reason"
     const val OS_VERSION = "os_version"
-    const val PETAL = "petal"
     const val ACTIVATION_DAY = "activation_day"
     const val ACTIVATION_PLATFORM = "activation_platform"
     const val DAYS_SINCE_INSTALL = "days_since_install"

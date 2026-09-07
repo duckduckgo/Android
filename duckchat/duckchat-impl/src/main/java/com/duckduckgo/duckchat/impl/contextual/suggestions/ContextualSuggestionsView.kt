@@ -21,6 +21,7 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.LinearLayout
 import androidx.annotation.DrawableRes
+import androidx.core.content.res.use
 import androidx.core.view.doOnAttach
 import androidx.core.view.isNotEmpty
 import androidx.core.view.isVisible
@@ -41,6 +42,7 @@ import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(ViewScope::class)
 class ContextualSuggestionsView @JvmOverloads constructor(
@@ -65,8 +67,14 @@ class ContextualSuggestionsView @JvmOverloads constructor(
 
     private val viewStateJob = ConflatedJob()
 
+    @DrawableRes
+    private val suggestionBackgroundRes: Int = context.obtainStyledAttributes(attrs, R.styleable.ContextualSuggestionsView).use {
+        it.getResourceId(R.styleable.ContextualSuggestionsView_suggestionBackground, CommonR.drawable.duck_ai_prompt_background)
+    }
+
     init {
         orientation = VERTICAL
+        loadingView.setBackgroundResource(suggestionBackgroundRes)
         addView(
             loadingView,
             LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT).apply { bottomMargin = LOADING_MARGIN_BOTTOM_DP.toPx() },
@@ -128,6 +136,7 @@ class ContextualSuggestionsView @JvmOverloads constructor(
             val inflater = LayoutInflater.from(context)
             viewState.suggestions.forEach { suggestion ->
                 val itemBinding = ItemContextualSuggestionBinding.inflate(inflater, cardsContainer, false)
+                itemBinding.suggestionLabel.setBackgroundResource(suggestionBackgroundRes)
                 itemBinding.suggestionLabel.text = suggestion.label
                 itemBinding.suggestionLabel.setCompoundDrawablesRelativeWithIntrinsicBounds(iconResFor(suggestion.icon), 0, 0, 0)
                 itemBinding.root.setOnClickListener {

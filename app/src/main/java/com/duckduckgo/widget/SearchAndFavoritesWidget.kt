@@ -180,6 +180,7 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
                 context = context,
                 remoteViews = remoteViews,
                 fromFavWidget = true,
+                widgetTheme = widgetTheme,
             )
             configureFavoritesGridView(context, appWidgetId, remoteViews, widgetTheme)
             configureEmptyWidgetCta(context, appWidgetId, remoteViews)

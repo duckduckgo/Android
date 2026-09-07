@@ -1262,7 +1262,8 @@
             { "key": "has_file_attachment", "type": "boolean", "description": "Whether the prompt included a file attachment" },
             { "key": "has_text", "type": "boolean", "description": "Whether the prompt included text" },
             "duckAiPromptPageType",
-            "duckAiEntrySource"
+            "duckAiEntrySource",
+            "firstPromptNewInstall"
         ]
     },
     "m_aichat_unified_input_prompt_submitted_daily": {
@@ -1296,7 +1297,8 @@
             { "key": "has_file_attachment", "type": "boolean", "description": "Whether the prompt included a file attachment" },
             { "key": "has_text", "type": "boolean", "description": "Whether the prompt included text" },
             "duckAiPromptPageType",
-            "duckAiEntrySource"
+            "duckAiEntrySource",
+            "firstPromptNewInstall"
         ]
     },
     "m_aichat_unified_input_sent_prompt_in_chat_count": {
@@ -1732,6 +1734,88 @@
         "description": "Page context collection did not complete within the timeout while contextual suggestions were loading; suggestions fall back to generic defaults.",
         "owners": ["joshliebe"],
         "triggers": ["exception"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "aichat_sent_prompt_ongoing_chat": {
+        "description": "User submitted a follow-up prompt in an existing Duck.ai chat, reported by the Duck.ai frontend via the reportMetric JS bridge.",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "parameters": [
+            {
+                "key": "delta-timestamp-minutes",
+                "type": "integer",
+                "description": "Minutes since the previous Duck.ai session interaction"
+            },
+            "firstPromptNewInstall"
+        ]
+    },
+    "aichat_start_new_conversation": {
+        "description": "User submitted the first prompt of a new Duck.ai chat, reported by the Duck.ai frontend via the reportMetric JS bridge.",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "parameters": [
+            {
+                "key": "delta-timestamp-minutes",
+                "type": "integer",
+                "description": "Minutes since the previous Duck.ai session interaction"
+            },
+            "firstPromptNewInstall"
+        ]
+    },
+    "aichat_contextual_address_bar_menu_shown": {
+        "description": "Fired when the Duck.ai menu offering New Chat and Ask About Page is shown from the address bar",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "aichat_contextual_address_bar_menu_new_chat_selected": {
+        "description": "Fired when the user selects New Chat in the address bar Duck.ai menu",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "aichat_contextual_address_bar_menu_ask_about_page_selected": {
+        "description": "Fired when the user selects Ask About Page in the address bar Duck.ai menu",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "aichat_contextual_address_bar_menu_ask_about_search_selected": {
+        "description": "Fired when the user selects Ask About Search in the address bar Duck.ai menu",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "aichat_contextual_open_duckai_menu_tapped": {
+        "description": "Fired when the user selects Open Duck.ai in the contextual sheet chats menu",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "aichat_contextual_floating_input_opened": {
+        "description": "Fired when the floating contextual input (entry) is opened",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "aichat_contextual_floating_input_dismissed_without_submission": {
+        "description": "Fired when the floating contextual input is closed without the user sending a prompt.",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "aichat_contextual_floating_input_promoted_to_sheet": {
+        "description": "Fired when a prompt sent from the floating contextual input opens the contextual sheet",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
         "suffixes": ["first_daily_count", "form_factor"],
         "parameters": ["appVersion"]
     }

@@ -55,36 +55,11 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
-            {
-                "key": "event",
-                "type": "string",
-                "description": "Event type for the onboarding instrumentation standard",
-                "enum": ["shown", "clicked"]
-            },
-            {
-                "key": "installType",
-                "type": "string",
-                "description": "Install type",
-                "enum": ["new", "reinstall"]
-            },
-            {
-                "key": "daysSinceInstall",
-                "type": "string",
-                "description": "Days since install, bucketed.",
-                "enum": ["0", "1-3", "4-10", "11-28", "28+"]
-            },
-            {
-                "key": "flow",
-                "type": "string",
-                "description": "Onboarding flow type",
-                "enum": ["default", "duckai"]
-            },
-            {
-                "key": "pixelSource",
-                "type": "string",
-                "description": "Device form factor",
-                "enum": ["phone", "tablet"]
-            },
+            "onboardingEvent",
+            "onboardingInstallType",
+            "onboardingDaysSinceInstall",
+            "onboardingFlow",
+            "onboardingPixelSource",
             {
                 "key": "value",
                 "type": "string",
@@ -127,21 +102,11 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
-            {
-                "key": "event",
-                "type": "string",
-                "description": "Event type for the onboarding instrumentation standard",
-                "enum": ["shown", "clicked"]
-            },
-            { "key": "installType", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
-            {
-                "key": "daysSinceInstall",
-                "type": "string",
-                "description": "Days since install, bucketed.",
-                "enum": ["0", "1-3", "4-10", "11-28", "28+"]
-            },
-            { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
-            { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
+            "onboardingEvent",
+            "onboardingInstallType",
+            "onboardingDaysSinceInstall",
+            "onboardingFlow",
+            "onboardingPixelSource",
             { "key": "value", "type": "string", "description": "Only set when event=clicked.", "enum": ["engage", "dismiss"] }
         ]
     },
@@ -152,21 +117,13 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
-            {
-                "key": "event",
-                "type": "string",
-                "description": "Event type for the onboarding instrumentation standard",
-                "enum": ["shown", "clicked", "confirmed"]
-            },
-            { "key": "installType", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
-            {
-                "key": "daysSinceInstall",
-                "type": "string",
-                "description": "Days since install, bucketed.",
-                "enum": ["0", "1-3", "4-10", "11-28", "28+"]
-            },
-            { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
-            { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
+            "onboardingEventWithConfirmed",
+            "onboardingInstallType",
+            "onboardingDaysSinceInstall",
+            "onboardingFlow",
+            "onboardingPixelSource",
+            "onboardingSegmentedVariant",
+            "inputPreviewAction",
             {
                 "key": "value",
                 "type": "string",
@@ -182,21 +139,12 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
-            {
-                "key": "event",
-                "type": "string",
-                "description": "Event type for the onboarding instrumentation standard",
-                "enum": ["shown", "clicked"]
-            },
-            { "key": "installType", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
-            {
-                "key": "daysSinceInstall",
-                "type": "string",
-                "description": "Days since install, bucketed.",
-                "enum": ["0", "1-3", "4-10", "11-28", "28+"]
-            },
-            { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
-            { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] }
+            "onboardingEvent",
+            "onboardingInstallType",
+            "onboardingDaysSinceInstall",
+            "onboardingFlow",
+            "onboardingPixelSource",
+            { "key": "value", "type": "string", "description": "Only set when event=clicked.", "enum": ["engage"] }
         ]
     },
     "onboarding_widget-prompt": {
@@ -206,21 +154,11 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
-            {
-                "key": "event",
-                "type": "string",
-                "description": "Event type for the onboarding instrumentation standard",
-                "enum": ["shown", "clicked", "confirmed"]
-            },
-            { "key": "installType", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
-            {
-                "key": "daysSinceInstall",
-                "type": "string",
-                "description": "Days since install, bucketed.",
-                "enum": ["0", "1-3", "4-10", "11-28", "28+"]
-            },
-            { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
-            { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
+            "onboardingEventWithConfirmed",
+            "onboardingInstallType",
+            "onboardingDaysSinceInstall",
+            "onboardingFlow",
+            "onboardingPixelSource",
             {
                 "key": "value",
                 "type": "string",
@@ -236,21 +174,13 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
-            {
-                "key": "event",
-                "type": "string",
-                "description": "Event type for the onboarding instrumentation standard",
-                "enum": ["shown", "clicked"]
-            },
-            { "key": "installType", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
-            {
-                "key": "daysSinceInstall",
-                "type": "string",
-                "description": "Days since install, bucketed.",
-                "enum": ["0", "1-3", "4-10", "11-28", "28+"]
-            },
-            { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
-            { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
+            "onboardingEvent",
+            "onboardingInstallType",
+            "onboardingDaysSinceInstall",
+            "onboardingFlow",
+            "onboardingPixelSource",
+            "onboardingSegmentedVariant",
+            "inputPreviewAction",
             {
                 "key": "value",
                 "type": "string",
@@ -266,21 +196,12 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
-            {
-                "key": "event",
-                "type": "string",
-                "description": "Event type for the onboarding instrumentation standard",
-                "enum": ["shown", "clicked"]
-            },
-            { "key": "installType", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
-            {
-                "key": "daysSinceInstall",
-                "type": "string",
-                "description": "Days since install, bucketed.",
-                "enum": ["0", "1-3", "4-10", "11-28", "28+"]
-            },
-            { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
-            { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
+            "onboardingEvent",
+            "onboardingInstallType",
+            "onboardingDaysSinceInstall",
+            "onboardingFlow",
+            "onboardingPixelSource",
+            "onboardingSegmentedVariant",
             {
                 "key": "value",
                 "type": "string",
@@ -296,21 +217,11 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
-            {
-                "key": "event",
-                "type": "string",
-                "description": "Event type for the onboarding instrumentation standard",
-                "enum": ["shown", "clicked"]
-            },
-            { "key": "installType", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
-            {
-                "key": "daysSinceInstall",
-                "type": "string",
-                "description": "Days since install, bucketed.",
-                "enum": ["0", "1-3", "4-10", "11-28", "28+"]
-            },
-            { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
-            { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
+            "onboardingEvent",
+            "onboardingInstallType",
+            "onboardingDaysSinceInstall",
+            "onboardingFlow",
+            "onboardingPixelSource",
             { "key": "value", "type": "string", "description": "Only set when event=clicked.", "enum": ["engage", "dismiss"] }
         ]
     },
@@ -327,15 +238,10 @@
                 "description": "Event type for the onboarding instrumentation standard",
                 "enum": ["shown", "confirmed"]
             },
-            { "key": "installType", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
-            {
-                "key": "daysSinceInstall",
-                "type": "string",
-                "description": "Days since install, bucketed.",
-                "enum": ["0", "1-3", "4-10", "11-28", "28+"]
-            },
-            { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
-            { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
+            "onboardingInstallType",
+            "onboardingDaysSinceInstall",
+            "onboardingFlow",
+            "onboardingPixelSource",
             {
                 "key": "value",
                 "type": "string",
@@ -351,27 +257,13 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
-            {
-                "key": "event",
-                "type": "string",
-                "description": "Event type for the onboarding instrumentation standard",
-                "enum": ["shown", "clicked"]
-            },
-            { "key": "installType", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
-            {
-                "key": "daysSinceInstall",
-                "type": "string",
-                "description": "Days since install, bucketed.",
-                "enum": ["0", "1-3", "4-10", "11-28", "28+"]
-            },
-            { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
-            { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
-            {
-                "key": "variant",
-                "type": "string",
-                "description": "Duck.ai search/chat branch. Set only in the custom Duck.ai flow.",
-                "enum": ["search_plus_duckai-search", "search_plus_duckai-chat"]
-            },
+            "onboardingEvent",
+            "onboardingInstallType",
+            "onboardingDaysSinceInstall",
+            "onboardingFlow",
+            "onboardingPixelSource",
+            "onboardingSegmentedVariant",
+            "inputPreviewAction",
             {
                 "key": "value",
                 "type": "string",
@@ -387,53 +279,29 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
-            {
-                "key": "event",
-                "type": "string",
-                "description": "Event type for the onboarding instrumentation standard",
-                "enum": ["shown", "clicked"]
-            },
-            { "key": "installType", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
-            {
-                "key": "daysSinceInstall",
-                "type": "string",
-                "description": "Days since install, bucketed.",
-                "enum": ["0", "1-3", "4-10", "11-28", "28+"]
-            },
-            { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
-            { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
+            "onboardingEvent",
+            "onboardingInstallType",
+            "onboardingDaysSinceInstall",
+            "onboardingFlow",
+            "onboardingPixelSource",
             { "key": "value", "type": "string", "description": "Only set when event=clicked.", "enum": ["engage"] }
         ]
     },
     "onboarding_fire-button": {
-        "description": "Fire-button demo step. shown when the in-browser fire-button demo is presented; clicked engage when the demo completes. Displayed both in the Duck.ai flow, on the chat tab, and in the regular flow in the browser tab.",
+        "description": "Fire-button step. In the custom Duck.ai flow: shown when the in-browser fire-button demo is presented, clicked engage when the demo completes. In contextual onboarding: shown when the fire-button DAX dialog is displayed, clicked engage when the user taps the fire button (via Got it or the toolbar fire icon), dismiss when the user closes. Unique once per user per (event, value).",
         "owners": ["catalinradoiu"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
-            {
-                "key": "event",
-                "type": "string",
-                "description": "Event type for the onboarding instrumentation standard",
-                "enum": ["shown", "clicked"]
-            },
-            { "key": "installType", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
-            {
-                "key": "daysSinceInstall",
-                "type": "string",
-                "description": "Days since install, bucketed.",
-                "enum": ["0", "1-3", "4-10", "11-28", "28+"]
-            },
-            { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
-            { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
-            {
-                "key": "variant",
-                "type": "string",
-                "description": "Duck.ai search/chat branch. Set only in the custom Duck.ai flow.",
-                "enum": ["search_plus_duckai-search", "search_plus_duckai-chat"]
-            },
-            { "key": "value", "type": "string", "description": "Only set when event=clicked.", "enum": ["engage"] }
+            "onboardingEvent",
+            "onboardingInstallType",
+            "onboardingDaysSinceInstall",
+            "onboardingFlow",
+            "onboardingPixelSource",
+            "onboardingSegmentedVariant",
+            "inputPreviewAction",
+            { "key": "value", "type": "string", "description": "Only set when event=clicked.", "enum": ["engage", "dismiss"] }
         ]
     },
     "onboarding_search": {
@@ -443,21 +311,11 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
-            {
-                "key": "event",
-                "type": "string",
-                "description": "Event type for the onboarding instrumentation standard",
-                "enum": ["shown", "clicked"]
-            },
-            { "key": "installType", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
-            {
-                "key": "daysSinceInstall",
-                "type": "string",
-                "description": "Days since install, bucketed.",
-                "enum": ["0", "1-3", "4-10", "11-28", "28+"]
-            },
-            { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
-            { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
+            "onboardingEvent",
+            "onboardingInstallType",
+            "onboardingDaysSinceInstall",
+            "onboardingFlow",
+            "onboardingPixelSource",
             {
                 "key": "value",
                 "type": "string",
@@ -473,21 +331,13 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
-            {
-                "key": "event",
-                "type": "string",
-                "description": "Event type for the onboarding instrumentation standard",
-                "enum": ["shown", "clicked"]
-            },
-            { "key": "installType", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
-            {
-                "key": "daysSinceInstall",
-                "type": "string",
-                "description": "Days since install, bucketed.",
-                "enum": ["0", "1-3", "4-10", "11-28", "28+"]
-            },
-            { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
-            { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
+            "onboardingEvent",
+            "onboardingInstallType",
+            "onboardingDaysSinceInstall",
+            "onboardingFlow",
+            "onboardingPixelSource",
+            "onboardingSegmentedVariant",
+            "inputPreviewAction",
             { "key": "value", "type": "string", "description": "Only set when event=clicked.", "enum": ["engage", "dismiss"] }
         ]
     },
@@ -498,21 +348,13 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
-            {
-                "key": "event",
-                "type": "string",
-                "description": "Event type for the onboarding instrumentation standard",
-                "enum": ["shown", "clicked"]
-            },
-            { "key": "installType", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
-            {
-                "key": "daysSinceInstall",
-                "type": "string",
-                "description": "Days since install, bucketed.",
-                "enum": ["0", "1-3", "4-10", "11-28", "28+"]
-            },
-            { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
-            { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
+            "onboardingEvent",
+            "onboardingInstallType",
+            "onboardingDaysSinceInstall",
+            "onboardingFlow",
+            "onboardingPixelSource",
+            "onboardingSegmentedVariant",
+            "inputPreviewAction",
             {
                 "key": "value",
                 "type": "string",
@@ -528,46 +370,13 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
-            {
-                "key": "event",
-                "type": "string",
-                "description": "Event type for the onboarding instrumentation standard",
-                "enum": ["shown", "clicked"]
-            },
-            { "key": "installType", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
-            {
-                "key": "daysSinceInstall",
-                "type": "string",
-                "description": "Days since install, bucketed.",
-                "enum": ["0", "1-3", "4-10", "11-28", "28+"]
-            },
-            { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
-            { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
-            { "key": "value", "type": "string", "description": "Only set when event=clicked.", "enum": ["engage", "dismiss"] }
-        ]
-    },
-    "onboarding_fire-button": {
-        "description": "Contextual onboarding fire-button step. shown when the fire-button DAX dialog is displayed; clicked engage when the user taps the fire button (via Got it or the toolbar fire icon), dismiss when the user closes. Unique once per user per (event, value).",
-        "owners": ["catalinradoiu"],
-        "triggers": ["other"],
-        "suffixes": ["form_factor"],
-        "parameters": [
-            "appVersion",
-            {
-                "key": "event",
-                "type": "string",
-                "description": "Event type for the onboarding instrumentation standard",
-                "enum": ["shown", "clicked"]
-            },
-            { "key": "installType", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
-            {
-                "key": "daysSinceInstall",
-                "type": "string",
-                "description": "Days since install, bucketed.",
-                "enum": ["0", "1-3", "4-10", "11-28", "28+"]
-            },
-            { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
-            { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
+            "onboardingEvent",
+            "onboardingInstallType",
+            "onboardingDaysSinceInstall",
+            "onboardingFlow",
+            "onboardingPixelSource",
+            "onboardingSegmentedVariant",
+            "inputPreviewAction",
             { "key": "value", "type": "string", "description": "Only set when event=clicked.", "enum": ["engage", "dismiss"] }
         ]
     },
@@ -578,22 +387,51 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
-            {
-                "key": "event",
-                "type": "string",
-                "description": "Event type for the onboarding instrumentation standard",
-                "enum": ["shown", "clicked"]
-            },
-            { "key": "installType", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
-            {
-                "key": "daysSinceInstall",
-                "type": "string",
-                "description": "Days since install, bucketed.",
-                "enum": ["0", "1-3", "4-10", "11-28", "28+"]
-            },
-            { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
-            { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
+            "onboardingEvent",
+            "onboardingInstallType",
+            "onboardingDaysSinceInstall",
+            "onboardingFlow",
+            "onboardingPixelSource",
+            "onboardingSegmentedVariant",
+            "inputPreviewAction",
             { "key": "value", "type": "string", "description": "Only set when event=clicked.", "enum": ["engage", "dismiss"] }
+        ]
+    },
+    "onboarding_end-try-duckai": {
+        "description": "Onboarding end step for the segmented onboarding's search path Try Duck.ai offer, shown only on the New Tab Page. Shown when the bubble is displayed; clicked engage when the user taps Try Duck.ai, dismiss when the user taps Skip or close button. Unique once per user per (event, value).",
+        "owners": ["LukasPaczos"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            "onboardingEvent",
+            "onboardingInstallType",
+            "onboardingDaysSinceInstall",
+            "onboardingFlow",
+            "onboardingPixelSource",
+            "onboardingSegmentedVariant",
+            "inputPreviewAction",
+            { "key": "value", "type": "string", "description": "Only set when event=clicked.", "enum": ["engage", "dismiss"] }
+        ]
+    },
+    "onboarding_password-import": {
+        "description": "Password-import-from-Google onboarding step. shown when the page is displayed; clicked engage/dismiss on the Import / Skip CTAs; confirmed carries the import outcome. Unique once per user per (event, value).",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            "onboardingEventWithConfirmed",
+            "onboardingInstallType",
+            "onboardingDaysSinceInstall",
+            "onboardingFlow",
+            "onboardingPixelSource",
+            {
+                "key": "value",
+                "type": "string",
+                "description": "For event=clicked: engage|dismiss. For event=confirmed: the import outcome. No count is sent.",
+                "enum": ["engage", "dismiss", "success", "cancelled", "error"]
+            }
         ]
     },
     "onboarding_subscription-promo": {
@@ -603,22 +441,178 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
-            {
-                "key": "event",
-                "type": "string",
-                "description": "Event type for the onboarding instrumentation standard",
-                "enum": ["shown", "clicked"]
-            },
-            { "key": "installType", "type": "string", "description": "Install type", "enum": ["new", "reinstall"] },
-            {
-                "key": "daysSinceInstall",
-                "type": "string",
-                "description": "Days since install, bucketed.",
-                "enum": ["0", "1-3", "4-10", "11-28", "28+"]
-            },
-            { "key": "flow", "type": "string", "description": "Onboarding flow type", "enum": ["default", "duckai"] },
-            { "key": "pixelSource", "type": "string", "description": "Device form factor", "enum": ["phone", "tablet"] },
+            "onboardingEvent",
+            "onboardingInstallType",
+            "onboardingDaysSinceInstall",
+            "onboardingFlow",
+            "onboardingPixelSource",
+            "onboardingSegmentedVariant",
+            "inputPreviewAction",
             { "key": "value", "type": "string", "description": "Only set when event=clicked.", "enum": ["engage", "dismiss"] }
+        ]
+    },
+    "onboarding_download-choice": {
+        "description": "Download-reason step of the segmented onboarding flow. shown when the download-reason screen is displayed; clicked when the user confirms a reason, which is also the point the reason starts being reported as variant_segmented. Unique once per user per (event, value).",
+        "owners": ["LukasPaczos"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            "onboardingEvent",
+            "onboardingInstallType",
+            "onboardingDaysSinceInstall",
+            "onboardingFlow",
+            "onboardingPixelSource",
+            "onboardingSegmentedVariant",
+            {
+                "key": "value",
+                "type": "string",
+                "description": "Only set when event=clicked. The download reason the user picked.",
+                "enum": ["search", "ai-chat", "no-ai", "ad-blocking"]
+            }
+        ]
+    },
+    "onboarding_preferences_serp": {
+        "description": "Search-preferences step of the search path of the segmented onboarding flow. shown when the step is displayed; clicked when the user confirms, with one param per offered toggle. A toggle the run did not offer is absent. Unique once per user per event.",
+        "owners": ["LukasPaczos"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            "onboardingEvent",
+            "onboardingInstallType",
+            "onboardingDaysSinceInstall",
+            "onboardingFlow",
+            "onboardingPixelSource",
+            "onboardingSegmentedVariant",
+            {
+                "key": "recently_visited_sites_enabled",
+                "type": "boolean",
+                "description": "Only set when event=clicked. Whether recently visited sites are kept."
+            },
+            {
+                "key": "safe_search_enabled",
+                "type": "boolean",
+                "description": "Only set when event=clicked. Whether safe search is on."
+            }
+        ]
+    },
+    "onboarding_preferences_ai-model": {
+        "description": "Duck.ai model-provider step of the AI path of the segmented onboarding flow. shown when the step is displayed; clicked when the user confirms a provider. Unique once per user per (event, value).",
+        "owners": ["LukasPaczos"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            "onboardingEvent",
+            "onboardingInstallType",
+            "onboardingDaysSinceInstall",
+            "onboardingFlow",
+            "onboardingPixelSource",
+            "onboardingSegmentedVariant",
+            {
+                "key": "value",
+                "type": "string",
+                "description": "Only set when event=clicked. The provider of the chosen Duck.ai model.",
+                "enum": ["openai", "anthropic", "mistral"]
+            }
+        ]
+    },
+    "onboarding_preferences_ai-toggle-mode": {
+        "description": "Duck.ai new-tab toggle-position step of the AI path of the segmented onboarding flow. shown when the step is displayed; clicked when the user confirms a position. Unique once per user per (event, value).",
+        "owners": ["LukasPaczos"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            "onboardingEvent",
+            "onboardingInstallType",
+            "onboardingDaysSinceInstall",
+            "onboardingFlow",
+            "onboardingPixelSource",
+            "onboardingSegmentedVariant",
+            {
+                "key": "value",
+                "type": "string",
+                "description": "Only set when event=clicked. Which mode a new tab opens in.",
+                "enum": ["duckAI", "lastUsed"]
+            }
+        ]
+    },
+    "onboarding_preferences_ai-search": {
+        "description": "AI preferences step of the no-AI path of the segmented onboarding flow. shown when the step is displayed; clicked when the user confirms, with one param per offered toggle. A toggle the run did not offer is absent. Unique once per user per event.",
+        "owners": ["LukasPaczos"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            "onboardingEvent",
+            "onboardingInstallType",
+            "onboardingDaysSinceInstall",
+            "onboardingFlow",
+            "onboardingPixelSource",
+            "onboardingSegmentedVariant",
+            {
+                "key": "search_assist_enabled",
+                "type": "boolean",
+                "description": "Only set when event=clicked. Whether search assist is on."
+            },
+            {
+                "key": "ai_generated_images_enabled",
+                "type": "boolean",
+                "description": "Only set when event=clicked. Whether AI-generated images are shown."
+            }
+        ]
+    },
+    "onboarding_preferences_duck-ai": {
+        "description": "Keep-Duck.ai step of the no-AI path of the segmented onboarding flow. shown when the step is displayed; clicked when the user confirms. Unique once per user per (event, value).",
+        "owners": ["LukasPaczos"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            "onboardingEvent",
+            "onboardingInstallType",
+            "onboardingDaysSinceInstall",
+            "onboardingFlow",
+            "onboardingPixelSource",
+            "onboardingSegmentedVariant",
+            {
+                "key": "value",
+                "type": "string",
+                "description": "Only set when event=clicked. Whether the user kept Duck.ai on.",
+                "enum": ["on", "off"]
+            }
+        ]
+    },
+    "onboarding_preferences_ad-blocking": {
+        "description": "Ad-blocking and cookie preferences step of the ad-blocking path of the segmented onboarding flow. shown when the step is displayed; clicked when the user confirms, with one param per offered toggle. A toggle the run did not offer is absent. Unique once per user per event.",
+        "owners": ["LukasPaczos"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            "onboardingEvent",
+            "onboardingInstallType",
+            "onboardingDaysSinceInstall",
+            "onboardingFlow",
+            "onboardingPixelSource",
+            "onboardingSegmentedVariant",
+            {
+                "key": "youtube_ad_blocking_enabled",
+                "type": "boolean",
+                "description": "Only set when event=clicked. Whether YouTube ad blocking is on."
+            },
+            {
+                "key": "cookie_popup_protection_enabled",
+                "type": "boolean",
+                "description": "Only set when event=clicked. Whether cookie pop-up protection is on."
+            },
+            {
+                "key": "popups_without_optouts_enabled",
+                "type": "boolean",
+                "description": "Only set when event=clicked. Whether cookie pop-ups without opt-outs are auto-accepted."
+            }
         ]
     }
 }

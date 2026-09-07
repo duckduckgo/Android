@@ -23,12 +23,15 @@ import android.animation.ObjectAnimator
 import android.os.Build
 import android.text.InputType
 import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.IncludeBrandDesignInputScreenPreviewBinding
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
@@ -39,6 +42,8 @@ import com.duckduckgo.app.onboarding.ui.page.configdriven.ContentInteraction
 import com.duckduckgo.app.onboarding.ui.page.configdriven.InputScreenPreviewContentState
 import com.duckduckgo.app.onboarding.ui.page.configdriven.StatefulDialogBinder
 import com.duckduckgo.common.ui.view.addBottomShadow
+import com.google.android.material.card.MaterialCardView
+import com.google.android.material.shape.ShapeAppearanceModel
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectIndexed
@@ -54,6 +59,7 @@ import com.duckduckgo.mobile.android.R as CommonR
  */
 class InputScreenPreviewBinder(
     private val binding: IncludeBrandDesignInputScreenPreviewBinding,
+    private val isAddressBarRebrandEnabled: () -> Boolean,
 ) : StatefulDialogBinder<ContentConfig.InputScreenPreview, InputScreenPreviewContentState> {
 
     override val view: View = binding.root
@@ -116,6 +122,10 @@ class InputScreenPreviewBinder(
         isSearchSelected: Boolean,
         scope: BindScope,
     ) = with(binding) {
+        val isAddressBarRebrandEnabled = isAddressBarRebrandEnabled()
+        inputModeDemoCard.applyInputScreenPreviewShape(isAddressBarRebrandEnabled)
+        inputText.applyInputScreenPreviewInsets(isAddressBarRebrandEnabled, inputModeDemoActionIcon)
+
         bindSuggestionButtons(
             suggestions = if (isSearchSelected) content.searchSuggestions else content.chatSuggestions,
             isSearchSelected = isSearchSelected,
@@ -138,26 +148,23 @@ class InputScreenPreviewBinder(
             }
         }
 
-        if (isSearchSelected) {
-            inputText.minLines = 1
-            inputText.maxLines = 1
-            inputText.inputType = InputType.TYPE_CLASS_TEXT
-            inputText.imeOptions = EditorInfo.IME_ACTION_SEARCH
-            inputText.setHint(R.string.preOnboardingInputModeDemoSearchHint)
-            inputModeDemoActionIcon.setImageResource(CommonR.drawable.ic_find_search_24)
-        } else {
-            inputText.minLines = CHAT_INPUT_LINES
-            inputText.maxLines = CHAT_INPUT_LINES
-            inputText.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
-            inputText.imeOptions = EditorInfo.IME_ACTION_UNSPECIFIED
-            inputText.setHint(R.string.preOnboardingInputModeDemoChatHint)
-            inputModeDemoActionIcon.setImageResource(CommonR.drawable.ic_arrow_right_24)
-        }
+        inputText.updateInputModePreservingSelection {
+            applyInputTextMode(isSearchSelected)
+            if (isSearchSelected) {
+                imeOptions = EditorInfo.IME_ACTION_SEARCH
+                setHint(R.string.preOnboardingInputModeDemoSearchHint)
+                inputModeDemoActionIcon.setImageResource(CommonR.drawable.ic_find_search_24)
+            } else {
+                imeOptions = EditorInfo.IME_ACTION_UNSPECIFIED
+                setHint(R.string.preOnboardingInputModeDemoChatHint)
+                inputModeDemoActionIcon.setImageResource(CommonR.drawable.ic_arrow_right_24)
+            }
 
-        // A mode switch can land while the field is already focused, so the IME has to be told to pick up the
-        // new action and Enter behaviour.
-        if (inputText.hasFocus()) {
-            ContextCompat.getSystemService(root.context, InputMethodManager::class.java)?.restartInput(inputText)
+            // A mode switch can land while the field is already focused, so the IME has to be told to pick up the
+            // new action and Enter behaviour.
+            if (hasFocus()) {
+                ContextCompat.getSystemService(root.context, InputMethodManager::class.java)?.restartInput(this)
+            }
         }
     }
 
@@ -235,10 +242,95 @@ class InputScreenPreviewBinder(
     private companion object {
         const val SEARCH_TAB_INDEX = 0
         const val CHAT_TAB_INDEX = 1
-        const val CHAT_INPUT_LINES = 3
         const val SUGGESTION_FADE_DURATION_MS = 500L
         const val MODE_SWITCH_DURATION_MS = 400L
         const val SUGGESTIONS_START_DELAY_MS = 500L
         const val MIN_SCREEN_HEIGHT_FOR_KEYBOARD_DP = 600
     }
 }
+
+internal fun MaterialCardView.applyInputScreenPreviewShape(
+    isAddressBarRebrandEnabled: Boolean,
+) {
+    shapeAppearanceModel = inputScreenPreviewShape(
+        baseShape = shapeAppearanceModel,
+        isAddressBarRebrandEnabled = isAddressBarRebrandEnabled,
+        // The full input radius keeps the taller Duck.ai preview pill-shaped; half leaves straight sides.
+        rebrandCornerSize = resources.getDimension(CommonR.dimen.rebrandInputRadius) / 2f,
+        legacyCornerSize = resources.getDimension(CommonR.dimen.largeShapeCornerRadius),
+    )
+    clipToOutline = false
+    invalidateOutline()
+}
+
+internal fun EditText.applyInputScreenPreviewInsets(
+    isAddressBarRebrandEnabled: Boolean,
+    actionIcon: View,
+) {
+    if (!isAddressBarRebrandEnabled) return
+
+    val container = parent as View
+    val horizontalInset = resources.getDimensionPixelSize(CommonR.dimen.keyline_4)
+    val verticalInset = resources.getDimensionPixelSize(CommonR.dimen.keyline_3)
+    val inputMarginStart = (horizontalInset - container.paddingStart).coerceAtLeast(0)
+    if ((layoutParams as ViewGroup.MarginLayoutParams).marginStart != inputMarginStart) {
+        updateLayoutParams<ViewGroup.MarginLayoutParams> {
+            marginStart = inputMarginStart
+        }
+    }
+    val inputPaddingTop = (verticalInset - container.paddingTop).coerceAtLeast(0)
+    val inputPaddingBottom = (verticalInset - container.paddingBottom).coerceAtLeast(0)
+    if (paddingStart != 0 || paddingTop != inputPaddingTop || paddingEnd != 0 || paddingBottom != inputPaddingBottom) {
+        setPaddingRelative(0, inputPaddingTop, 0, inputPaddingBottom)
+    }
+
+    val actionIconContentInset = (
+        resources.getDimensionPixelSize(CommonR.dimen.toolbarIcon) -
+            resources.getDimensionPixelSize(CommonR.dimen.toolbarIconSize)
+        ) / 2
+    val actionIconMarginEnd = (horizontalInset - container.paddingEnd - actionIconContentInset).coerceAtLeast(0)
+    if ((actionIcon.layoutParams as ViewGroup.MarginLayoutParams).marginEnd != actionIconMarginEnd) {
+        actionIcon.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+            marginEnd = actionIconMarginEnd
+        }
+    }
+}
+
+internal fun EditText.applyInputTextMode(isSearchSelected: Boolean) {
+    if (isSearchSelected) {
+        inputType = InputType.TYPE_CLASS_TEXT
+        minLines = 1
+        maxLines = 1
+    } else {
+        inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
+        minLines = 3
+        maxLines = Int.MAX_VALUE
+    }
+}
+
+internal inline fun EditText.updateInputModePreservingSelection(updateInputMode: EditText.() -> Unit) {
+    val previousSelectionStart = selectionStart
+    val previousSelectionEnd = selectionEnd
+
+    updateInputMode()
+
+    if (previousSelectionStart >= 0 && previousSelectionEnd >= 0) {
+        val textLength = text.length
+        setSelection(
+            previousSelectionStart.coerceAtMost(textLength),
+            previousSelectionEnd.coerceAtMost(textLength),
+        )
+    }
+}
+
+internal fun inputScreenPreviewShape(
+    baseShape: ShapeAppearanceModel,
+    isAddressBarRebrandEnabled: Boolean,
+    rebrandCornerSize: Float,
+    legacyCornerSize: Float,
+): ShapeAppearanceModel =
+    if (isAddressBarRebrandEnabled) {
+        baseShape.withCornerSize(rebrandCornerSize)
+    } else {
+        baseShape.withCornerSize(legacyCornerSize)
+    }

@@ -20,6 +20,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.onboarding.OnboardingPreference
 import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection
 import com.duckduckgo.onboarding.api.LinearOnboardingEvent
+import com.duckduckgo.onboarding.api.OnboardingSingleChoiceDataPlugin.Option
 
 /**
  * User actions on the [NewUserOnboardingPlanProvider].
@@ -56,4 +57,38 @@ sealed interface NewUserOnboardingEvent : LinearOnboardingEvent {
     data class AddWidgetFinished(val widgetAdded: Boolean) : NewUserOnboardingEvent
 
     data class PreferenceSelectorConfirmed(val selections: Map<OnboardingPreference, Boolean>) : NewUserOnboardingEvent
+
+    data class SingleChoiceConfirmed(val option: Option) : NewUserOnboardingEvent
+
+    data object PasswordImportRequested : NewUserOnboardingEvent
+
+    data object PasswordImportSkipped : NewUserOnboardingEvent
+
+    data class PasswordImportWebFlowFinished(val outcome: PasswordImportOutcome) : NewUserOnboardingEvent
+
+    data class PasswordImportParsed(val result: PasswordImportResult.Terminal) : NewUserOnboardingEvent
+}
+
+sealed interface PasswordImportResult {
+
+    data object InProgress : PasswordImportResult
+
+    sealed interface Terminal : PasswordImportResult {
+
+        data class Imported(
+            val imported: Int,
+            val skipped: Int,
+        ) : Terminal
+
+        data object Failed : Terminal
+    }
+}
+
+enum class PasswordImportOutcome(val value: String) {
+    SUCCESS("success"),
+    CANCELLED("cancelled"),
+
+    TRANSIENT_ERROR("error"),
+
+    PERMANENT_ERROR("error"),
 }

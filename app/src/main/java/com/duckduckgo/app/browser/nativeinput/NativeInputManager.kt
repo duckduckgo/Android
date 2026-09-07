@@ -295,6 +295,9 @@ class RealNativeInputManager @Inject constructor(
                 refreshNavBarVisibility()
             }
             .launchIn(lifecycleOwner.lifecycleScope)
+        voiceSearchAvailability.observeVoiceSearchAvailability()
+            .onEach { widgetFrom(rootView)?.let { widget -> updateVoiceButtons(widget) } }
+            .launchIn(lifecycleOwner.lifecycleScope)
     }
 
     override fun isNativeInputEnabled(): Boolean = isNativeInputFieldEnabled

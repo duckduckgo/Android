@@ -25,4 +25,12 @@
     <string name="autoconsentCookiePopUpPreferenceHeaderDescription"><![CDATA[DuckDuckGo kan automatiskt hantera popup-fönster för cookies för att maximera din integritet och minimera antalet cookies innan du ens ser dem.\n<a href=\"\">Läs mer</a>]]></string>
     <string name="autoconsentPopUpsWithoutOptOutsToggle">Acceptera cookies som inte kan väljas bort</string>
     <string name="autoconsentPopUpsWithoutOptOutsDescription">Om det inte finns något alternativ för att avvisa sparar vi ett klick åt dig, accepterar dessa cookies åt dig och stänger popup-fönstren.</string>
+    <string name="autoconsentPromptTitle">Är du trött på popup-fönster för cookies?</string>
+    <string name="autoconsentPromptFootnote">Du kan alltid justera det här senare i inställningarna.</string>
+    <string name="autoconsentPromptCpmOnMessage">Vissa cookies kan inte avvisas. Vi kan godkänna dessa åt dig.</string>
+    <string name="autoconsentPromptCpmOnPrimaryButton">Godkänn cookies åt mig</string>
+    <string name="autoconsentPromptCpmOnSecondaryButton">Jag accepterar dem själv</string>
+    <string name="autoconsentPromptCpmOffMessage">Låt oss hantera dem åt dig. Vi avvisar cookies när det går, och godkänner de som inte kan avvisas.</string>
+    <string name="autoconsentPromptCpmOffPrimaryButton">Avvisa om möjligt, eller acceptera åt mig</string>
+    <string name="autoconsentPromptCpmOffSecondaryButton">Jag hanterar dem själv</string>
 </resources>
