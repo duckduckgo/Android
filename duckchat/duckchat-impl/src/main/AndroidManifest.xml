@@ -46,6 +46,22 @@
             android:label="@string/duck_ai_edit_prompt_title"
             android:windowSoftInputMode="stateVisible|adjustResize" />
 
+        <!--
+          Adds "Ask Duck.ai" to the text selection menu (in this app and other apps).
+        -->
+        <activity
+            android:name=".ui.nativeinput.textselection.SelectedTextDuckAiActivity"
+            android:enabled="false"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:label="@string/duckAiTextSelectionMenuItem">
+            <intent-filter>
+                <action android:name="android.intent.action.PROCESS_TEXT" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+        </activity>
+
         <service
             android:name=".ui.DuckChatVoiceMicrophoneService"
             android:exported="false"
