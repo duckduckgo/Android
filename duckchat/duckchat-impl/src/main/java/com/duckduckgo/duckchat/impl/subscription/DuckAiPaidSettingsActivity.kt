@@ -53,7 +53,6 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
-import com.duckduckgo.duckchat.impl.R as DuckChatR
 import com.duckduckgo.mobile.android.R as CommonR
 
 object DuckAiPaidSettingsNoParams : GlobalActivityStarter.ActivityParams
