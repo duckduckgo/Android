@@ -261,6 +261,12 @@ interface SubscriptionsFeature {
     fun allowProTierPurchase(): Toggle
 
     /**
+     * When enabled, the paywall opens a faster-rendering page
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun performanceOptimizedPaywalls(): Toggle
+
+    /**
      * When enabled, pending plan hint is displayed to users.
      * When disabled, pending plans hint is not shown (kill switch for pending plans UI).
      */
