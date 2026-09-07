@@ -37,6 +37,7 @@ import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionStore
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
@@ -51,16 +52,23 @@ class RealDuckChatContextual @Inject constructor(
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val contextualEntryPromptStore: ContextualEntryPromptStore,
     private val globalActivityStarter: GlobalActivityStarter,
+    private val textSelectionStore: TextSelectionStore,
 ) : DuckChatContextual {
 
     override suspend fun launch(
         sourceTabId: String,
         sourceUrl: String?,
         anchor: View?,
+        textSelection: String?,
         showChatSurface: () -> Unit,
     ) {
         if (anchor == null || !duckChatInternal.isContextualSheetRedesignEnabled()) {
             showChatSurface()
+            return
+        }
+        textSelection?.let { textSelectionStore.add(sourceTabId, it) }
+        if (textSelectionStore.selections(sourceTabId).value.isNotEmpty()) {
+            showEntryDialog(anchor, sourceTabId, showChatSurface)
             return
         }
         if (hasChatInProgress(sourceTabId)) {
@@ -126,6 +134,7 @@ class RealDuckChatContextual @Inject constructor(
         } else {
             popup.onMenuItemClicked(askItem) {
                 duckChatPixels.reportContextualAddressBarMenuAskAboutPageSelected()
+                textSelectionStore.consume(sourceTabId)
                 showEntryDialog(anchor, sourceTabId, onAskAboutPage)
             }
         }
