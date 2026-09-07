@@ -501,6 +501,7 @@ class RealDuckChat @Inject constructor(
     private val _showVoiceSearchToggle = MutableStateFlow(false)
     private val _showVoiceChatEntry = MutableStateFlow(false)
     private val _showContextualMode = MutableStateFlow(false)
+    private val _showAskDuckAi = MutableStateFlow(false)
     private val _allowDuckAiAsDigitalAssistant = MutableStateFlow(false)
     private val _displayedMode = MutableStateFlow(InputMode.SEARCH)
     private val _inputQuery = MutableStateFlow("")
@@ -718,6 +719,8 @@ class RealDuckChat @Inject constructor(
     override val showVoiceChatEntry: StateFlow<Boolean> = _showVoiceChatEntry.asStateFlow()
 
     override val showContextualMode: StateFlow<Boolean> = _showContextualMode.asStateFlow()
+
+    override val showAskDuckAi: StateFlow<Boolean> = _showAskDuckAi.asStateFlow()
 
     override val allowDuckAiAsDigitalAssistant: StateFlow<Boolean> = _allowDuckAiAsDigitalAssistant.asStateFlow()
 
@@ -1115,6 +1118,8 @@ class RealDuckChat @Inject constructor(
             contextualSheetRedesignEnabled = isContextualModeEnabled && duckChatFeature.contextualSheetRedesign().isEnabled()
 
             contextualMenuAllChatsEnabled = contextualSheetRedesignEnabled && duckChatFeature.contextualMenuAllChats().isEnabled()
+
+            _showAskDuckAi.emit(contextualSheetRedesignEnabled && duckChatFeature.askDuckAi().isEnabled())
 
             isAutomaticContextAttachmentEnabled = isContextualModeEnabled &&
                 duckChatFeature.automaticContextAttachment()
