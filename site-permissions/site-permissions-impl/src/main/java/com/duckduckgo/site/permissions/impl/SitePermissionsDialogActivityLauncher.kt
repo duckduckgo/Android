@@ -875,6 +875,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
     ) {
         StackedAlertDialogBuilder(activity)
             .setRebrandUpdate(true)
+            .setCancellable(true)
             .setHeaderImageResource(iconRes)
             .setTitle(titleRes)
             .setMessage(contentRes)

@@ -63,6 +63,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -920,6 +921,18 @@ class SitePermissionsDialogActivityLauncherTest {
             dialog.context.getString(R.string.sitePermissionsTieredSystemDeniedCameraTitle),
             dialog.findViewById<TextView>(CommonR.id.stackedAlertDialogTitle)!!.text,
         )
+    }
+
+    @Test
+    fun whenReminderDialogIsDismissedThenRequestStaysDeniedWithoutPersisting() {
+        val dialog = denyOsPermissionAfter(tier = 1, rejectedForever = true)!!
+
+        dialog.cancel()
+        shadowOf(Looper.getMainLooper()).idle()
+
+        assertTrue(shadowOf(dialog).isCancelable)
+        verify(request).deny()
+        verify(sitePermissionsRepository, never()).sitePermissionPermanentlySaved(any(), any(), any())
     }
 
     @Test
