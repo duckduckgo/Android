@@ -25,6 +25,7 @@ import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
@@ -133,7 +134,12 @@ class SitePermissionsActivity : DuckDuckGoActivity() {
     }
 
     private fun setupRecyclerView() {
-        adapter = SitePermissionsAdapter(viewModel, this, faviconManager)
+        adapter = SitePermissionsAdapter(
+            viewModel = viewModel,
+            lifecycleOwner = this,
+            faviconManager = faviconManager,
+            appBrandDesignUpdateToggles = appBrandDesignUpdateToggles,
+        )
         binding.recycler.adapter = adapter
     }
 
