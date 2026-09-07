@@ -90,6 +90,7 @@ class NativeInputCallbacks(
         selectedTool: String?,
         imagesJson: JSONArray?,
         filesJson: JSONArray?,
+        selectionsJson: JSONArray?,
     ) -> Unit,
     val onChatSuggestionSelected: (String) -> Unit,
     val onDuckAiQuerySubmitted: (query: String, entryPoint: DuckChatEntryPoint) -> Unit = { _, _ -> },
@@ -147,6 +148,7 @@ interface NativeInputManager {
         query: String = "",
         callbacks: NativeInputCallbacks,
         initialInputMode: InputMode? = null,
+        textSelection: String? = null,
     )
 
     fun hideNativeInput(animate: Boolean = true, isNavigation: Boolean = false): Boolean
@@ -586,6 +588,7 @@ class RealNativeInputManager @Inject constructor(
         query: String,
         callbacks: NativeInputCallbacks,
         initialInputMode: InputMode?,
+        textSelection: String?,
     ) {
         if (!isNativeInputFieldEnabled) return
 
@@ -655,7 +658,7 @@ class RealNativeInputManager @Inject constructor(
             }
         }
         bindUrlCaching(widgetView)
-        attachWidget(widgetView, navBarView, isBottom, tabId)
+        attachWidget(widgetView, navBarView, isBottom, tabId, textSelection)
         // Bottom omnibar: slide the nav bar in with open. Top omnibar: snap the bar so the enter
         // morph can run from the omnibar while the buttons appear without animating — a concurrent
         // top slide fights that morph (and was only needed for bottom chrome).
@@ -713,6 +716,7 @@ class RealNativeInputManager @Inject constructor(
                     widget.saveLastUsedTogglePosition(isChat = true)
                     val imagesJson = widget.getImageAttachmentsJson()
                     val filesJson = widget.getFileAttachmentsJson()
+                    val selectionsJson = widget.getTextSelectionsJson()
                     widget.text = ""
                     widget.clearAttachments()
                     callbacks.onDuckAiChatSubmitted(
@@ -722,6 +726,7 @@ class RealNativeInputManager @Inject constructor(
                         widget.getSelectedTool(),
                         imagesJson,
                         filesJson,
+                        selectionsJson,
                     )
                     widget.clearSelectedTool()
                     widget.onPromptSubmitted()
@@ -1229,7 +1234,7 @@ class RealNativeInputManager @Inject constructor(
         )
     }
 
-    private fun attachWidget(widgetView: View, navBarView: View?, isBottom: Boolean, tabId: String) {
+    private fun attachWidget(widgetView: View, navBarView: View?, isBottom: Boolean, tabId: String, textSelection: String?) {
         // Inflated from a ?attr/actionBarSize height, so layoutParams carries the resolved nav bar height.
         val navBarHeightPx = navBarView?.layoutParams?.height?.takeIf { it > 0 } ?: 0
         this.navBarHeightPx = navBarHeightPx
@@ -1258,6 +1263,7 @@ class RealNativeInputManager @Inject constructor(
         widgetFrom(widgetView)?.apply {
             setWidgetRootView(widgetView)
             configure(tabId = tabId, isDuckAiMode = omnibarController.isDuckAiMode(), isBottom = isBottom)
+            bindTextSelections(tabId, textSelection)
         }
 
         applyWindowChrome(widgetView, isBottom)
