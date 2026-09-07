@@ -1045,10 +1045,8 @@ class DuckChatSettingsViewModelTest {
         }
 
     @Test
-    fun `when duckAiSettings toggle enabled and duck chat enabled then isDuckAiWebSettingsVisible is true`() =
+    fun `when duck chat enabled then isDuckAiWebSettingsVisible is true`() =
         runTest {
-            @Suppress("DenyListedApi")
-            duckChatFeature.duckAiSettings().setRawStoredState(State(enable = true))
             whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(true))
             testee = DuckChatSettingsViewModel(
                 duckChatActivityParams = DuckChatSettingsNoParams,
@@ -1068,33 +1066,8 @@ class DuckChatSettingsViewModelTest {
         }
 
     @Test
-    fun `when duckAiSettings toggle disabled then isDuckAiWebSettingsVisible is false`() =
+    fun `when duck chat disabled then isDuckAiWebSettingsVisible is false`() =
         runTest {
-            @Suppress("DenyListedApi")
-            duckChatFeature.duckAiSettings().setRawStoredState(State(enable = false))
-            whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(true))
-            testee = DuckChatSettingsViewModel(
-                duckChatActivityParams = DuckChatSettingsNoParams,
-                duckChat = duckChat,
-                pixel = mockPixel,
-                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
-                settingsPageFeature = settingsPageFeature,
-                duckChatPixels = mockDuckChatPixels,
-                dispatcherProvider = coroutineRule.testDispatcherProvider,
-                duckChatFeature = duckChatFeature,
-                serpSettingsDataProvider = serpSettingsDataProvider,
-            )
-
-            testee.viewState.test {
-                assertFalse(awaitItem().isDuckAiWebSettingsVisible)
-            }
-        }
-
-    @Test
-    fun `when duckAiSettings toggle enabled and duck chat disabled then isDuckAiWebSettingsVisible is false`() =
-        runTest {
-            @Suppress("DenyListedApi")
-            duckChatFeature.duckAiSettings().setRawStoredState(State(enable = true))
             whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(false))
             testee = DuckChatSettingsViewModel(
                 duckChatActivityParams = DuckChatSettingsNoParams,
