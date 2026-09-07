@@ -1,8 +1,7 @@
 appId: com.duckduckgo.mobile.android
 ---
-# Consumers need to know whether the linear widget page ran: it and the end-of-onboarding widget
-# bottom sheet are mutually exclusive (see AddWidgetModalEvaluator). Initialised here rather than in
-# onboarding_scripts/setup.js because this flow is also called directly, without that script.
+# Consumers need to know whether the linear widget step was shown: it and the end-of-onboarding widget
+# bottom sheet are mutually exclusive (see AddWidgetModalEvaluator).
 - evalScript: ${output.linearWidgetPromptShown = false}
 - assertVisible:
     text: ".*(Ready for a faster browser that protects you and lets you decide when and how to use.AI|Ready for a faster browser that puts you in.control).*"
