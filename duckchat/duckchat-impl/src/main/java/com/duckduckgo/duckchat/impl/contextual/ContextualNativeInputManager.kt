@@ -73,6 +73,7 @@ interface ContextualNativeInputManager {
         onPromptSubmitted: (NativeInputPrompt) -> Unit = {},
         onAskAboutPage: () -> Unit = {},
         onPageContextRemoved: () -> Unit = {},
+        onTextSelectionRemoved: (String) -> Unit = {},
         onVoiceChatRequested: () -> Unit = {},
         onVoiceSearchRequested: () -> Unit = {},
     )
@@ -128,6 +129,7 @@ class RealContextualNativeInputManager @Inject constructor(
         onPromptSubmitted: (NativeInputPrompt) -> Unit,
         onAskAboutPage: () -> Unit,
         onPageContextRemoved: () -> Unit,
+        onTextSelectionRemoved: (String) -> Unit,
         onVoiceChatRequested: () -> Unit,
         onVoiceSearchRequested: () -> Unit,
     ) {
@@ -140,7 +142,7 @@ class RealContextualNativeInputManager @Inject constructor(
             tabId, widget, chatIdFlow, onSearchSubmitted,
             onCameraCaptureRequested, onFilePickerRequested,
             onPromptSubmitted, onAskAboutPage, onPageContextRemoved,
-            onVoiceChatRequested, onVoiceSearchRequested,
+            onTextSelectionRemoved, onVoiceChatRequested, onVoiceSearchRequested,
         )
         observeNativeInputSetting(lifecycleOwner)
         observeVoiceChatEntry(widget, lifecycleOwner)
@@ -215,6 +217,7 @@ class RealContextualNativeInputManager @Inject constructor(
         onPromptSubmitted: (NativeInputPrompt) -> Unit,
         onAskAboutPage: () -> Unit,
         onPageContextRemoved: () -> Unit,
+        onTextSelectionRemoved: (String) -> Unit,
         onVoiceChatRequested: () -> Unit,
         onVoiceSearchRequested: () -> Unit,
     ) {
@@ -233,6 +236,7 @@ class RealContextualNativeInputManager @Inject constructor(
             onAskAboutPage = onAskAboutPage,
             onPageContextRemoved = onPageContextRemoved,
         )
+        widget.setTextSelectionRemovedAction(onTextSelectionRemoved)
         widget.bindInputEvents(
             onSearchTextChanged = { },
             onSearchSubmitted = { query ->
