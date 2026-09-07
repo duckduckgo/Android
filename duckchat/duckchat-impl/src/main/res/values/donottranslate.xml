@@ -49,6 +49,9 @@
     <string name="duckAiSuggestionTranslateSelectionLabel">Translate this selection</string>
     <string name="duckAiSuggestionTranslateSelectionPrompt" instruction="%1$s is replaced with the name of the user's language.">Translate this selection into %1$s.</string>
 
+    <!-- Name shown for an attached text selection in the Duck.ai -->
+    <string name="duckAiTextSelectionAttachmentTitle">Text selection</string>
+
     <!-- Duck.ai text selection menu action -->
     <string name="duckAiTextSelectionMenuItem">Ask Duck.ai</string>
 </resources>
