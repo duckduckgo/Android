@@ -25,6 +25,7 @@
 
     <!-- Partnerships Hub -->
     <string name="partnerBenefitSettingTitle">Subscriber Offers</string>
+    <string name="partnerBenefitSettingNewPill">New</string>
 
     <!-- Black Friday offer-->
     <string name="subscriptionSettingBlackFridayOffer">Save 40% on First Year</string>

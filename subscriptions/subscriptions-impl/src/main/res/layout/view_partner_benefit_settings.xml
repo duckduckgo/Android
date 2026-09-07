@@ -24,4 +24,6 @@
     android:visibility="gone"
     app:leadingIcon="@drawable/ic_subscription_gift_color_24"
     app:primaryText="@string/partnerBenefitSettingTitle"
+    app:pillIcon="true"
+    app:pillText="@string/partnerBenefitSettingNewPill"
     tools:visibility="visible" />
