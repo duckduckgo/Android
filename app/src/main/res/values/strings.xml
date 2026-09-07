@@ -713,10 +713,6 @@
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">The security certificate for %1$s is not trusted by your device\'s operating system. It’s possible that the website is misconfigured or that an attacker has compromised your connection, or that your system clock is incorrect.</string>
 
     <!-- Extended Onboarding-->
-    <string name="preOnboardingDaxDialog1Title"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that keeps you protected?]]></string>
-    <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
-    <string name="preOnboardingDaxDialog1Button">Let\'s do it!</string>
-    <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\'s get started!</string>
     <string name="preOnboardingDaxDialog1ButtonBrandDesign">Let\'s get started!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">I\'ve been here before</string>
     <string name="preOnboardingDaxDialog2Title">Protections activated!</string>
@@ -744,8 +740,6 @@
     <string name="highlightsPreOnboardingAddressBarOption2Description">Easy to reach</string>
     <string name="onboardingSearchDaxDialogTitle">Try a search!</string>
     <string name="onboardingSearchDaxDialogDescription">Your DuckDuckGo searches are always private.</string>
-    <string name="onboardingSearchDaxDialogOption1" instruction="translate 'duck' too.">how to say "duck" in english</string>
-    <string name="onboardingSearchDaxDialogOption1English" instruction="translate 'duck' too. Don't add question mark">how to say "duck" in spanish</string>
     <string name="onboardingSearchQueryOption1">how to say duck in english</string>
     <string name="onboardingSearchQueryOption1English">how to say duck in spanish</string>
     <string name="onboardingSearchDaxDialogOption2">cast of avatar</string>

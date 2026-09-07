@@ -287,8 +287,8 @@ constructor(
      * [OffsetStartTreatment] (center=offsetPx, i.e. near x=0) visually offsets from the end,
      * and [OffsetEndTreatment] (center=length-offsetPx) visually offsets from the start.
      *
-     * The old [DaxOnboardingBubbleCardView] uses setTopEdge where x=0 is the left, so the
-     * mapping is not inverted there.
+     * The old bubble-card treatment uses setTopEdge where x=0 is the left, so the mapping is not
+     * inverted there.
      */
     private fun applyOffsetEdgeTreatment(
         offsetStart: Int,

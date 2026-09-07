@@ -19,7 +19,6 @@ package com.duckduckgo.app.onboarding
 import android.annotation.SuppressLint
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager.SegmentedOnboardingExperimentVariant
 import com.duckduckgo.app.onboarding.SegmentedOnboardingFeatureToggles.Cohorts
-import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -40,15 +39,12 @@ class SegmentedOnboardingExperimentManagerTest {
 
     private val segmentedToggles: SegmentedOnboardingFeatureToggles =
         FakeFeatureToggleFactory.create(SegmentedOnboardingFeatureToggles::class.java)
-    private val brandDesignToggles: OnboardingBrandDesignUpdateToggles =
-        FakeFeatureToggleFactory.create(OnboardingBrandDesignUpdateToggles::class.java)
     private val passwordImportToggles: OnboardingPasswordImportToggles =
         FakeFeatureToggleFactory.create(OnboardingPasswordImportToggles::class.java)
     private val privacyConfigPersistedGate = OnboardingPrivacyConfigPersistedGateImpl()
     private val appBuildConfig: AppBuildConfig = mock()
 
     private val testee = SegmentedOnboardingExperimentManagerImpl(
-        onboardingBrandDesignUpdateToggles = brandDesignToggles,
         segmentedOnboardingFeatureToggles = segmentedToggles,
         onboardingPasswordImportToggles = passwordImportToggles,
         appBuildConfig = appBuildConfig,
@@ -60,17 +56,6 @@ class SegmentedOnboardingExperimentManagerTest {
     fun `when privacy config never persisted then enroll returns null`() = runTest {
         givenPrerequisitesMet()
         givenCohortEnabled(Cohorts.TREATMENT)
-
-        assertNull(testee.enroll())
-    }
-
-    @Test
-    fun `when brand design update disabled then enroll returns null`() = runTest {
-        givenPrerequisitesMet()
-        brandDesignToggles.brandDesignUpdate().setRawStoredState(Toggle.State(enable = false))
-        givenCohortEnabled(Cohorts.TREATMENT)
-
-        privacyConfigPersistedGate.onPrivacyConfigPersisted()
 
         assertNull(testee.enroll())
     }
@@ -138,7 +123,6 @@ class SegmentedOnboardingExperimentManagerTest {
     }
 
     private suspend fun givenPrerequisitesMet() {
-        brandDesignToggles.brandDesignUpdate().setRawStoredState(Toggle.State(enable = true))
         whenever(appBuildConfig.isAppReinstall()).thenReturn(false)
         passwordImportToggles.passwordImportExperimentAug25().setRawStoredState(Toggle.State(enable = false))
     }

@@ -1289,21 +1289,6 @@ class BrowserTabFragment :
 
                 newBrowserTab.newTabContainerScrollView.isSaveEnabled = false
 
-                // These legacy includes remain inflated until U9. Keep their state out of the
-                // BrowserActivity bundle without restoring their renderer accessors or behavior.
-                binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.daxDialogOption1.isSaveEnabled = false
-                binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.daxDialogOption2.isSaveEnabled = false
-                binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.daxDialogOption3.isSaveEnabled = false
-                binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.daxDialogOption4.isSaveEnabled = false
-                binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.primaryCta.isSaveEnabled = false
-                binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.secondaryCta.isSaveEnabled = false
-                binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.placeholder.isSaveEnabled = false
-                binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.dialogTextCta.isSaveEnabled = false
-                binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.hiddenTextCta.isSaveEnabled = false
-                binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.daxBubbleDialogTitle.isSaveEnabled = false
-                binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.daxDialogDismissButton.isSaveEnabled = false
-                binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.logo.isSaveEnabled = false
-
                 daxDialogIntroBubbleBrandDesign.brandDesignTitle.isSaveEnabled = false
                 daxDialogIntroBubbleBrandDesign.brandDesignHiddenTitle.isSaveEnabled = false
                 daxDialogIntroBubbleBrandDesign.brandDesignDescription.isSaveEnabled = false
@@ -1315,23 +1300,6 @@ class BrowserTabFragment :
                 daxDialogIntroBubbleBrandDesign.primaryCta.isSaveEnabled = false
 
                 daxDialogIntroBubbleBrandDesign.brandDesignHeaderImage.isSaveEnabled = false
-
-                binding.includeOnboardingInContextDaxDialog.daxDialogOption1.isSaveEnabled = false
-                binding.includeOnboardingInContextDaxDialog.daxDialogOption2.isSaveEnabled = false
-                binding.includeOnboardingInContextDaxDialog.daxDialogOption3.isSaveEnabled = false
-                binding.includeOnboardingInContextDaxDialog.daxDialogOption4.isSaveEnabled = false
-                binding.includeOnboardingInContextDaxDialog.suggestionsDialogTextCta.isSaveEnabled = false
-                binding.includeOnboardingInContextDaxDialog.suggestionsHiddenTextCta.isSaveEnabled = false
-                binding.includeOnboardingInContextDaxDialog.daxBubbleDialogTitle.isSaveEnabled = false
-                binding.includeOnboardingInContextDaxDialog.onboardingDaxDialogBackground.isSaveEnabled = false
-                binding.includeOnboardingInContextDaxDialog.logo.isSaveEnabled = false
-                binding.includeOnboardingInContextDaxDialog.daxDialogDismissButton.isSaveEnabled = false
-                binding.includeOnboardingInContextDaxDialog.cardView.isSaveEnabled = false
-                binding.includeOnboardingInContextDaxDialog.onboardingDialogTitle.isSaveEnabled = false
-                binding.includeOnboardingInContextDaxDialog.hiddenTextCta.isSaveEnabled = false
-                binding.includeOnboardingInContextDaxDialog.dialogTextCta.isSaveEnabled = false
-                binding.includeOnboardingInContextDaxDialog.secondaryCta.isSaveEnabled = false
-                binding.includeOnboardingInContextDaxDialog.primaryCta.isSaveEnabled = false
 
                 daxDialogInContextBrandDesign.contextualBrandDesignBackground.isSaveEnabled = false
                 daxDialogInContextBrandDesign.contextualBrandDesignCardContainer.isSaveEnabled = false
