@@ -835,7 +835,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
 
         if (intent.getBooleanExtra(OPEN_DUCK_CHAT_CONTEXTUAL, false)) {
-            currentTab?.launchDuckAiContextual(intent.getStringExtra(DUCK_CHAT_TEXT_SELECTION))
+            currentTab?.launchContextualDuckAi(intent.getStringExtra(DUCK_CHAT_TEXT_SELECTION))
             return
         }
 
