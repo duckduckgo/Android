@@ -18,38 +18,26 @@ package com.duckduckgo.app.cta.ui
 
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.model.CtaId
-import com.duckduckgo.app.cta.ui.DaxBubbleCta.WavingDaxSpec
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.device.DeviceInfo
 
-data class DaxVisitSiteOptionsBrandDesignUpdateBubbleCta(
+data class DaxTryASearchBubbleCta(
     override val onboardingStore: OnboardingStore,
     override val appInstallStore: AppInstallStore,
     override val isLightTheme: Boolean,
     override val deviceInfo: DeviceInfo,
 ) : OptionsBubbleCta(
-    ctaId = CtaId.DAX_INTRO_VISIT_SITE,
-    title = R.string.onboardingSitesDaxDialogTitle,
-    description = R.string.onboardingSitesDaxDialogDescription,
-    options = onboardingStore.getSitesOptions(),
-    backgroundRes = R.drawable.bg_onboarding_site_options,
-    ctaPixelParam = Pixel.PixelValues.DAX_INITIAL_VISIT_SITE_CTA,
+    ctaId = CtaId.DAX_INTRO,
+    title = R.string.onboardingSearchDaxDialogTitle,
+    description = R.string.onboardingSearchDaxDialogDescription,
+    options = onboardingStore.getSearchOptions(),
+    backgroundRes = R.drawable.bg_onboarding_search_options,
+    ctaPixelParam = Pixel.PixelValues.DAX_INITIAL_CTA,
     onboardingStore = onboardingStore,
     appInstallStore = appInstallStore,
     isLightTheme = isLightTheme,
     deviceInfo = deviceInfo,
-    showArrow = true,
-),
-    DaxBubbleCta.ShowsWavingDax {
-
-    override val wavingDaxSpec = WavingDaxSpec(
-        rotationDegrees = 0f,
-        translationXDp = -54f,
-        translationYDp = -110f,
-        minHeightDp = 178f,
-        maxHeightDp = 178f,
-        anchorToCardOnTablet = true,
-    )
-}
+    showArrow = false,
+)

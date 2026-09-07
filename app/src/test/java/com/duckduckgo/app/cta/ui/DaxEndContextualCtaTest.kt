@@ -17,6 +17,8 @@
 package com.duckduckgo.app.cta.ui
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.room.Room
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerState.DISABLED
@@ -25,21 +27,25 @@ import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetectorImpl
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
-import com.duckduckgo.app.cta.model.DismissedCta
+import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
-import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON
+import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON
+import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_DAX_CTA_SHOWN
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.CTA_SHOWN
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_FIRE_DIALOG_CTA
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_ONBOARDING_END_CTA
 import com.duckduckgo.app.tabs.model.AggregateTabProvider
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
+import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.ui.store.AppTheme
@@ -51,18 +57,15 @@ import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
 import com.duckduckgo.onboarding.api.LinearOnboardingState
 import com.duckduckgo.subscriptions.api.SubscriptionPromoCtaShownPlugin
 import com.duckduckgo.subscriptions.api.Subscriptions
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
+import org.junit.After
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
-import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -70,17 +73,12 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.util.concurrent.TimeUnit
 
-/**
- * Verifies the brand-design fire-button contextual dialog CTA and pixel parameters for its three
- * pixel firing paths (`shownPixel`, `okPixel`, `closePixel`).
- */
-@FlowPreview
 @RunWith(AndroidJUnit4::class)
-class DaxFireButtonBrandDesignUpdateContextualCtaTest {
+class DaxEndContextualCtaTest {
 
     @get:Rule
     @Suppress("unused")
-    var instantTaskExecutorRule = InstantTaskExecutorRule()
+    val instantTaskExecutorRule = InstantTaskExecutorRule()
 
     @get:Rule
     @Suppress("unused")
@@ -89,6 +87,8 @@ class DaxFireButtonBrandDesignUpdateContextualCtaTest {
     @get:Rule
     @Suppress("unused")
     val coroutineRule = CoroutineTestRule()
+
+    private lateinit var db: AppDatabase
 
     private val mockWidgetCapabilities: WidgetCapabilities = mock()
     private val mockDismissedCtaDao: DismissedCtaDao = mock()
@@ -112,16 +112,22 @@ class DaxFireButtonBrandDesignUpdateContextualCtaTest {
 
     private val mockDeviceInfo: DeviceInfo = mock()
 
-    private val disabledToggle: Toggle = mock { on { it.isEnabled() } doReturn false }
+    private val detectedRefreshPatterns: Set<RefreshPattern> = emptySet()
+
+    private val mockDisabledToggle: Toggle = mock { on { it.isEnabled() } doReturn false }
 
     private lateinit var testee: CtaViewModel
 
     @Before
     fun before() = runTest {
-        whenever(mockExtendedOnboardingFeatureToggles.subscriptionPromoModalCta()).thenReturn(disabledToggle)
-        whenever(mockAggregateTabProvider.observe()).thenReturn(flowOf(emptyList()))
+        db = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(), AppDatabase::class.java)
+            .allowMainThreadQueries()
+            .build()
+
+        whenever(mockExtendedOnboardingFeatureToggles.subscriptionPromoModalCta()).thenReturn(mockDisabledToggle)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
         whenever(mockUserAllowListRepository.isDomainInUserAllowList(any())).thenReturn(false)
+        whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(db.dismissedCtaDao().dismissedCtas())
         whenever(mockDuckPlayer.getDuckPlayerState()).thenReturn(DISABLED)
         whenever(mockDuckPlayer.isDuckPlayerUri(any())).thenReturn(false)
         whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(false, AlwaysAsk))
@@ -131,8 +137,6 @@ class DaxFireButtonBrandDesignUpdateContextualCtaTest {
         whenever(mockBrokenSitePrompt.isFeatureEnabled()).thenReturn(false)
         whenever(mockBrokenSitePrompt.getUserRefreshPatterns()).thenReturn(emptySet())
         whenever(mockSubscriptions.isEligible()).thenReturn(false)
-        whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
-        whenever(mockDismissedCtaDao.exists(CtaId.DAX_FIRE_BUTTON)).thenReturn(false)
 
         testee = CtaViewModel(
             appInstallStore = mockAppInstallStore,
@@ -172,65 +176,102 @@ class DaxFireButtonBrandDesignUpdateContextualCtaTest {
         )
     }
 
-    @Test
-    fun whenFireDialogCtaAvailableThenReturnsBrandDesignCta() = runTest {
-        val cta = testee.getFireDialogCta()
-
-        assertTrue(cta is DaxFireButtonBrandDesignUpdateContextualCta)
+    @After
+    fun after() {
+        db.close()
     }
 
     @Test
-    fun whenBrandDesignCtaShownThenShownPixelFiredWithFireDialogCtaParam() = runTest {
-        val cta = newBrandDesignCta()
+    fun whenGetEndStaticDialogCtaThenReturnsContextualBrandDesignCta() = runTest {
+        givenDaxOnboardingActive()
 
-        testee.onCtaShown(cta)
+        val value = testee.getEndStaticDialogCta()
+
+        assertTrue(value is DaxEndContextualCta)
+    }
+
+    @Test
+    fun whenRefreshCtaEndOfJourneyConditionsMetThenReturnsContextualBrandDesignCta() = runTest {
+        givenDaxOnboardingActive()
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_DIALOG_TRACKERS_FOUND)).thenReturn(true)
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_FIRE_BUTTON)).thenReturn(true)
+
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = true,
+            site = siteStub(),
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
+
+        assertTrue(value is DaxEndContextualCta)
+    }
+
+    @Test
+    fun whenCtaShownThenShownPixelFiredWithEndCtaParam() = runTest {
+        testee.onCtaShown(newContextualCta())
 
         verify(mockPixel).fire(
-            eq(AppPixelName.ONBOARDING_DAX_CTA_SHOWN),
-            argThat<Map<String, String>> { get(Pixel.PixelParameter.CTA_SHOWN)?.contains(DAX_FIRE_DIALOG_CTA) == true },
+            eq(ONBOARDING_DAX_CTA_SHOWN),
+            any(),
             any(),
             eq(Count),
         )
     }
 
     @Test
-    fun whenBrandDesignCtaOkClickedThenOkPixelFiredWithFireDialogCtaParam() = runTest {
-        val cta = newBrandDesignCta()
-
-        testee.onUserClickCtaOkButton(cta)
+    fun whenUserClicksOkButtonThenOkPixelFiredWithEndCtaParam() = runTest {
+        testee.onUserClickCtaOkButton(newContextualCta())
 
         verify(mockPixel).fire(
-            eq(AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON),
-            eq(mapOf(Pixel.PixelParameter.CTA_SHOWN to DAX_FIRE_DIALOG_CTA)),
+            eq(ONBOARDING_DAX_CTA_OK_BUTTON),
+            eq(mapOf(CTA_SHOWN to DAX_ONBOARDING_END_CTA)),
             any(),
             eq(Count),
         )
     }
 
     @Test
-    fun whenBrandDesignCtaDismissedViaCloseButtonThenClosePixelFiredWithFireDialogCtaParam() = runTest {
-        val cta = newBrandDesignCta()
-
-        testee.onUserDismissedCta(cta, viaCloseBtn = true)
+    fun whenUserDismissesViaCloseButtonThenClosePixelFiredWithEndCtaParam() = runTest {
+        testee.onUserDismissedCta(newContextualCta(), viaCloseBtn = true)
 
         verify(mockPixel).fire(
-            eq(AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON),
-            eq(mapOf(Pixel.PixelParameter.CTA_SHOWN to DAX_FIRE_DIALOG_CTA)),
+            eq(ONBOARDING_DAX_CTA_DISMISS_BUTTON),
+            eq(mapOf(CTA_SHOWN to DAX_ONBOARDING_END_CTA)),
             any(),
             eq(Count),
         )
-        verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_FIRE_BUTTON))
     }
 
     @Test
-    fun brandDesignCtaExposesFireButtonCtaId() {
-        assertEquals(CtaId.DAX_FIRE_BUTTON, newBrandDesignCta().ctaId)
+    fun whenMarkAsReadOnShowIsTrueThenDismissedCtaInsertedOnShown() = runTest {
+        testee.onCtaShown(newContextualCta())
+
+        verify(mockDismissedCtaDao).insert(com.duckduckgo.app.cta.model.DismissedCta(CtaId.DAX_END))
     }
 
-    private fun newBrandDesignCta() = DaxFireButtonBrandDesignUpdateContextualCta(
+    private fun newContextualCta() = DaxEndContextualCta(
         onboardingStore = mockOnboardingStore,
         appInstallStore = mockAppInstallStore,
         isLightTheme = true,
         deviceInfo = mockDeviceInfo,
     )
+
+    private suspend fun givenDaxOnboardingActive() {
+        whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
+    }
+
+    private fun siteStub(): com.duckduckgo.app.global.model.Site {
+        val site: com.duckduckgo.app.global.model.Site = mock()
+        whenever(site.url).thenReturn("http://www.cnn.com")
+        whenever(site.uri).thenReturn(android.net.Uri.parse("http://www.cnn.com"))
+        whenever(site.https).thenReturn(com.duckduckgo.app.privacy.model.HttpsStatus.SECURE)
+        whenever(site.trackerCount).thenReturn(1)
+        whenever(site.majorNetworkCount).thenReturn(0)
+        whenever(site.allTrackersBlocked).thenReturn(true)
+        whenever(site.trackingEvents).thenReturn(emptyList())
+        whenever(site.entity).thenReturn(null)
+        return site
+    }
 }

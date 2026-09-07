@@ -111,7 +111,7 @@
 
             <include
                 android:id="@+id/includeOnboardingDaxDialogBubbleBrandDesignUpdate"
-                layout="@layout/include_onboarding_bubble_dax_dialog_brand_design_update"
+                layout="@layout/include_onboarding_bubble_dax_dialog"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"

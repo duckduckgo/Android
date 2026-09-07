@@ -152,7 +152,7 @@ sealed class OnboardingDaxDialogCta(
      * pipeline so subclasses only need to declare their active content include and populate it.
      *
      * Mirrors the structure of [DaxBubbleCta.BrandDesignUpdateBubbleCta] but targets the
-     * contextual in-browser dialog layout (`include_onboarding_in_context_dax_dialog_brand_design_update.xml`).
+     * contextual in-browser dialog layout (`include_onboarding_in_context_dax_dialog.xml`).
      *
      * Subclasses supply:
      *  - [activeIncludeId]: the id of the single content-include slot to show for this CTA
@@ -163,7 +163,7 @@ sealed class OnboardingDaxDialogCta(
 
     interface ShowsWingBottom
 
-    abstract class BrandDesignContextualDaxDialogCta(
+    abstract class ContextualDaxDialogCta(
         ctaId: CtaId,
         @StringRes description: Int?,
         @StringRes buttonText: Int?,
@@ -882,7 +882,6 @@ sealed class OnboardingDaxDialogCta(
     companion object {
         const val SERP = "duckduckgo"
         val mainTrackerNetworks = listOf("Facebook", "Google")
-
     }
 }
 

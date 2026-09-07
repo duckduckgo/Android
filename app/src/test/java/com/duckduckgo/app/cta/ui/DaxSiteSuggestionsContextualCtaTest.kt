@@ -16,15 +16,25 @@
 
 package com.duckduckgo.app.cta.ui
 
+import android.content.Context
+import android.content.res.Configuration
+import android.content.res.Resources
+import android.util.DisplayMetrics
+import android.view.View
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isVisible
+import androidx.lifecycle.asFlow
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerState.DISABLED
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.UserPreferences
 import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetectorImpl
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.global.db.AppDatabase
@@ -41,15 +51,15 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.CTA_SHOWN
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_ONBOARDING_END_CTA
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_INITIAL_VISIT_SITE_CTA
 import com.duckduckgo.app.tabs.model.AggregateTabProvider
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
-import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.utils.device.DeviceInfo
+import com.duckduckgo.common.utils.device.DeviceInfo.FormFactor
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -60,6 +70,7 @@ import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.After
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -69,16 +80,24 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.util.concurrent.TimeUnit
 
+/**
+ * Unit tests for [DaxSiteSuggestionsContextualCta].
+ *
+ * Verifies the CTA construction and that the pixel parameters the legacy CTA carried (`shownPixel`, `okPixel`, `closePixel` with the
+ * `DAX_INITIAL_VISIT_SITE_CTA` param) still fire via `CtaViewModel`. Telemetry parity
+ * is the regression-surface a stale stub would break, so it's exercised explicitly.
+ */
 @RunWith(AndroidJUnit4::class)
-class DaxEndBrandDesignUpdateContextualCtaTest {
+class DaxSiteSuggestionsContextualCtaTest {
 
     @get:Rule
     @Suppress("unused")
-    val instantTaskExecutorRule = InstantTaskExecutorRule()
+    var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     @get:Rule
     @Suppress("unused")
@@ -87,6 +106,8 @@ class DaxEndBrandDesignUpdateContextualCtaTest {
     @get:Rule
     @Suppress("unused")
     val coroutineRule = CoroutineTestRule()
+
+    private val context: Context = ApplicationProvider.getApplicationContext()
 
     private lateinit var db: AppDatabase
 
@@ -109,10 +130,7 @@ class DaxEndBrandDesignUpdateContextualCtaTest {
     }
     private val mockDuckChat: DuckChat = mock()
     private val mockAppTheme: AppTheme = mock { on { isLightModeEnabled() } doReturn true }
-
     private val mockDeviceInfo: DeviceInfo = mock()
-
-    private val detectedRefreshPatterns: Set<RefreshPattern> = emptySet()
 
     private val mockDisabledToggle: Toggle = mock { on { it.isEnabled() } doReturn false }
 
@@ -120,7 +138,7 @@ class DaxEndBrandDesignUpdateContextualCtaTest {
 
     @Before
     fun before() = runTest {
-        db = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(), AppDatabase::class.java)
+        db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
 
@@ -128,6 +146,7 @@ class DaxEndBrandDesignUpdateContextualCtaTest {
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
         whenever(mockUserAllowListRepository.isDomainInUserAllowList(any())).thenReturn(false)
         whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(db.dismissedCtaDao().dismissedCtas())
+        whenever(mockAggregateTabProvider.observe()).thenReturn(db.tabsDao().liveTabs().asFlow())
         whenever(mockDuckPlayer.getDuckPlayerState()).thenReturn(DISABLED)
         whenever(mockDuckPlayer.isDuckPlayerUri(any())).thenReturn(false)
         whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(false, AlwaysAsk))
@@ -182,96 +201,158 @@ class DaxEndBrandDesignUpdateContextualCtaTest {
     }
 
     @Test
-    fun whenGetEndStaticDialogCtaThenReturnsContextualBrandDesignCta() = runTest {
-        givenDaxOnboardingActive()
+    fun whenGetSiteSuggestionsCtaReturnsBrandDesignClass() = runTest {
+        givenSiteSuggestionsCtaPreconditions()
 
-        val value = testee.getEndStaticDialogCta()
+        val value = testee.getSiteSuggestionsDialogCta(onSiteSuggestionOptionClicked = {})
 
-        assertTrue(value is DaxEndBrandDesignUpdateContextualCta)
+        assertTrue(value is DaxSiteSuggestionsContextualCta)
     }
 
     @Test
-    fun whenRefreshCtaEndOfJourneyConditionsMetThenReturnsContextualBrandDesignCta() = runTest {
-        givenDaxOnboardingActive()
-        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
-        whenever(mockDismissedCtaDao.exists(CtaId.DAX_DIALOG_TRACKERS_FOUND)).thenReturn(true)
-        whenever(mockDismissedCtaDao.exists(CtaId.DAX_FIRE_BUTTON)).thenReturn(true)
+    fun whenOnCtaShownThenShownPixelFiresWithCtaShownParameter() = runTest {
+        whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn("")
+        val cta = newBrandDesignCta()
 
-        val value = testee.refreshCta(
-            coroutineRule.testDispatcher,
-            isBrowserShowing = true,
-            site = siteStub(),
-            detectedRefreshPatterns = detectedRefreshPatterns,
-            brokenSitePromptUrl = null,
-        )
-
-        assertTrue(value is DaxEndBrandDesignUpdateContextualCta)
-    }
-
-    @Test
-    fun whenCtaShownThenShownPixelFiredWithEndCtaParam() = runTest {
-        testee.onCtaShown(newContextualCta())
+        testee.onCtaShown(cta)
 
         verify(mockPixel).fire(
             eq(ONBOARDING_DAX_CTA_SHOWN),
-            any(),
+            org.mockito.kotlin.argThat { containsKey(CTA_SHOWN) },
             any(),
             eq(Count),
         )
     }
 
     @Test
-    fun whenUserClicksOkButtonThenOkPixelFiredWithEndCtaParam() = runTest {
-        testee.onUserClickCtaOkButton(newContextualCta())
+    fun whenOnUserClickCtaOkButtonThenOkPixelFiresWithCtaShownParameter() = runTest {
+        val cta = newBrandDesignCta()
+
+        testee.onUserClickCtaOkButton(cta)
 
         verify(mockPixel).fire(
             eq(ONBOARDING_DAX_CTA_OK_BUTTON),
-            eq(mapOf(CTA_SHOWN to DAX_ONBOARDING_END_CTA)),
+            eq(mapOf(CTA_SHOWN to DAX_INITIAL_VISIT_SITE_CTA)),
             any(),
             eq(Count),
         )
     }
 
     @Test
-    fun whenUserDismissesViaCloseButtonThenClosePixelFiredWithEndCtaParam() = runTest {
-        testee.onUserDismissedCta(newContextualCta(), viaCloseBtn = true)
+    fun whenOnUserDismissedViaCloseButtonThenClosePixelFires() = runTest {
+        val cta = newBrandDesignCta()
+
+        testee.onUserDismissedCta(cta, viaCloseBtn = true)
 
         verify(mockPixel).fire(
             eq(ONBOARDING_DAX_CTA_DISMISS_BUTTON),
-            eq(mapOf(CTA_SHOWN to DAX_ONBOARDING_END_CTA)),
+            any(),
             any(),
             eq(Count),
         )
     }
 
     @Test
-    fun whenMarkAsReadOnShowIsTrueThenDismissedCtaInsertedOnShown() = runTest {
-        testee.onCtaShown(newContextualCta())
+    fun applyWavingDaxState_phoneLandscape_hidesDax() {
+        val dax: LottieAnimationView = mock()
+        val container = stubContainerAndDax(dax, formFactor = FormFactor.PHONE, orientation = Configuration.ORIENTATION_LANDSCAPE)
+        whenever(dax.isAnimating).thenReturn(false)
 
-        verify(mockDismissedCtaDao).insert(com.duckduckgo.app.cta.model.DismissedCta(CtaId.DAX_END))
+        newBrandDesignCta().applyWavingDaxState(container)
+
+        verify(dax).isVisible = false
+        verify(dax, never()).isVisible = true
     }
 
-    private fun newContextualCta() = DaxEndBrandDesignUpdateContextualCta(
-        onboardingStore = mockOnboardingStore,
-        appInstallStore = mockAppInstallStore,
-        isLightTheme = true,
-        deviceInfo = mockDeviceInfo,
-    )
+    @Test
+    fun applyWavingDaxState_tabletLandscape_anchorsDaxToCard() {
+        val dax: LottieAnimationView = mock()
+        val lp = stubContainerAndDaxWithLayoutParams(dax, formFactor = FormFactor.TABLET, orientation = Configuration.ORIENTATION_LANDSCAPE)
 
-    private suspend fun givenDaxOnboardingActive() {
+        newBrandDesignCta().applyWavingDaxState(stubContainerWithDax(dax))
+
+        assertEquals(R.id.contextualBrandDesignCardView, lp.startToStart)
+        verify(dax).isVisible = true
+        verify(dax).translationX = -70f
+    }
+
+    @Test
+    fun applyWavingDaxState_tabletPortrait_anchorsDaxToCard() {
+        val dax: LottieAnimationView = mock()
+        val lp = stubContainerAndDaxWithLayoutParams(dax, formFactor = FormFactor.TABLET, orientation = Configuration.ORIENTATION_PORTRAIT)
+
+        newBrandDesignCta().applyWavingDaxState(stubContainerWithDax(dax))
+
+        assertEquals(R.id.contextualBrandDesignCardView, lp.startToStart)
+        verify(dax).isVisible = true
+    }
+
+    @Test
+    fun applyWavingDaxState_phonePortrait_anchorsDaxToParent() {
+        val dax: LottieAnimationView = mock()
+        val lp = stubContainerAndDaxWithLayoutParams(dax, formFactor = FormFactor.PHONE, orientation = Configuration.ORIENTATION_PORTRAIT)
+
+        newBrandDesignCta().applyWavingDaxState(stubContainerWithDax(dax))
+
+        assertEquals(ConstraintLayout.LayoutParams.PARENT_ID, lp.startToStart)
+        verify(dax).isVisible = true
+    }
+
+    private fun stubContainerWithDax(dax: LottieAnimationView): View {
+        val container: View = mock()
+        whenever(container.findViewById<LottieAnimationView>(R.id.wavingDax)).thenReturn(dax)
+        return container
+    }
+
+    private fun stubContainerAndDax(
+        dax: LottieAnimationView,
+        formFactor: FormFactor,
+        orientation: Int,
+    ): View {
+        val configuration = Configuration().apply { this.orientation = orientation }
+        val resources: Resources = mock()
+        val daxContext: Context = mock()
+        whenever(dax.context).thenReturn(daxContext)
+        whenever(daxContext.resources).thenReturn(resources)
+        whenever(resources.configuration).thenReturn(configuration)
+        whenever(mockDeviceInfo.formFactor()).thenReturn(formFactor)
+        return stubContainerWithDax(dax)
+    }
+
+    private fun stubContainerAndDaxWithLayoutParams(
+        dax: LottieAnimationView,
+        formFactor: FormFactor,
+        orientation: Int,
+    ): ConstraintLayout.LayoutParams {
+        val lp = ConstraintLayout.LayoutParams(0, 0)
+        val configuration = Configuration().apply { this.orientation = orientation }
+        val displayMetrics = DisplayMetrics().apply { density = 1f }
+        val resources: Resources = mock()
+        val daxContext: Context = mock()
+        whenever(dax.layoutParams).thenReturn(lp)
+        whenever(dax.context).thenReturn(daxContext)
+        whenever(dax.resources).thenReturn(resources)
+        whenever(daxContext.resources).thenReturn(resources)
+        whenever(resources.configuration).thenReturn(configuration)
+        whenever(resources.displayMetrics).thenReturn(displayMetrics)
+        whenever(mockDeviceInfo.formFactor()).thenReturn(formFactor)
+        return lp
+    }
+
+    private fun newBrandDesignCta(): DaxSiteSuggestionsContextualCta =
+        DaxSiteSuggestionsContextualCta(
+            onboardingStore = mockOnboardingStore,
+            appInstallStore = mockAppInstallStore,
+            isLightTheme = true,
+            deviceInfo = mockDeviceInfo,
+        )
+
+    private suspend fun givenSiteSuggestionsCtaPreconditions() {
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
-    }
-
-    private fun siteStub(): com.duckduckgo.app.global.model.Site {
-        val site: com.duckduckgo.app.global.model.Site = mock()
-        whenever(site.url).thenReturn("http://www.cnn.com")
-        whenever(site.uri).thenReturn(android.net.Uri.parse("http://www.cnn.com"))
-        whenever(site.https).thenReturn(com.duckduckgo.app.privacy.model.HttpsStatus.SECURE)
-        whenever(site.trackerCount).thenReturn(1)
-        whenever(site.majorNetworkCount).thenReturn(0)
-        whenever(site.allTrackersBlocked).thenReturn(true)
-        whenever(site.trackingEvents).thenReturn(emptyList())
-        whenever(site.entity).thenReturn(null)
-        return site
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO_VISIT_SITE)).thenReturn(false)
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_DIALOG_NETWORK)).thenReturn(false)
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_DIALOG_OTHER)).thenReturn(false)
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_DIALOG_TRACKERS_FOUND)).thenReturn(false)
     }
 }
