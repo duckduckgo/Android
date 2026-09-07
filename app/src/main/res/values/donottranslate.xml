@@ -136,6 +136,4 @@
         <item quantity="other" instruction="%1$d is the number of chats the user is about to delete.">Delete %1$d chats?</item>
     </plurals>
 
-    <!-- Duck.ai text selection menu action -->
-    <string name="duckAiTextSelectionMenuItem">Ask Duck.ai</string>
 </resources>

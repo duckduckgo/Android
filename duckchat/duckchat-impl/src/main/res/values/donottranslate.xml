@@ -42,4 +42,13 @@
 
     <!-- Duck.ai address bar menu -->
     <string name="duckChatContextualAllChats">All Chats</string>
+
+    <!-- Suggested prompts for text selection -->
+    <string name="duckAiSuggestionSummarizeSelectionLabel">Summarize this selection</string>
+    <string name="duckAiSuggestionSummarizeSelectionPrompt">Summarize this selection.</string>
+    <string name="duckAiSuggestionTranslateSelectionLabel">Translate this selection</string>
+    <string name="duckAiSuggestionTranslateSelectionPrompt" instruction="%1$s is replaced with the name of the user's language.">Translate this selection into %1$s.</string>
+
+    <!-- Duck.ai text selection menu action -->
+    <string name="duckAiTextSelectionMenuItem">Ask Duck.ai</string>
 </resources>
