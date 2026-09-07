@@ -88,9 +88,12 @@ import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.duckduckgo.duckchat.impl.ui.AttachmentViewModel
 import com.duckduckgo.duckchat.impl.ui.NativeInputModeWidgetViewModel
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.PageContextAttachment
+import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.TextSelectionAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.EditPromptScreenParams
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedFile
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedImage
+import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionPayloadBuilder
+import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionStore
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.shape.ShapeAppearanceModel
@@ -194,6 +197,11 @@ interface NativeInputWidget {
     fun setWidgetPosition(isBottom: Boolean)
     fun setWidgetRootView(view: View)
 
+    fun setTextSelections(selections: List<TextSelectionAttachment>)
+    fun setTextSelectionRemovedAction(onTextSelectionRemoved: (String) -> Unit)
+    fun bindTextSelections(tabId: String, textSelection: String?)
+    fun getTextSelectionsJson(): JSONArray?
+
     /**
      * Binds a reactive source of the active chat id for this tab.
      * The widget forwards changes into the [NativeInputState] so observers can react.
@@ -262,6 +270,12 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     @Inject
     lateinit var pixel: Pixel
+
+    @Inject
+    lateinit var textSelectionStore: TextSelectionStore
+
+    @Inject
+    lateinit var selectionPayloadBuilder: TextSelectionPayloadBuilder
 
     @Inject
     lateinit var duckChatInternal: DuckChatInternal
@@ -391,6 +405,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var askAboutPageAction: (() -> Unit)? = null
     private var pageContextRemovedAction: (() -> Unit)? = null
     private var pendingPageContext: PageContextAttachment? = null
+    private var pendingTextSelections: List<TextSelectionAttachment> = emptyList()
+    private var boundTextSelectionsTabId: String? = null
+    private var textSelectionsJob: Job? = null
+    private var pendingOnTextSelectionRemoved: ((String) -> Unit)? = null
 
     // adoptEditAttachments() can be called (from EditPromptActivity.onCreate) before the widget is
     // attached, when the attachment ViewModel cannot be resolved yet, so the values are held here and
@@ -1606,6 +1624,32 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     override fun getPageContext(): PageContextAttachment? = attachmentViewModel?.getPageContext()
+
+    override fun setTextSelections(selections: List<TextSelectionAttachment>) {
+        pendingTextSelections = selections
+        attachmentViewModel?.setTextSelections(selections)
+    }
+
+    override fun setTextSelectionRemovedAction(onTextSelectionRemoved: (String) -> Unit) {
+        pendingOnTextSelectionRemoved = onTextSelectionRemoved
+    }
+
+    override fun bindTextSelections(tabId: String, textSelection: String?) {
+        boundTextSelectionsTabId = tabId
+        textSelection?.let { textSelectionStore.add(tabId, it) }
+        setTextSelectionRemovedAction { id -> textSelectionStore.remove(tabId, id) }
+        textSelectionsJob?.cancel()
+        textSelectionsJob = findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
+            textSelectionStore.selections(tabId).collect { selections ->
+                setTextSelections(selections.map { TextSelectionAttachment(id = it.id, text = it.text) })
+            }
+        }
+    }
+
+    override fun getTextSelectionsJson(): JSONArray? {
+        val tabId = boundTextSelectionsTabId ?: return null
+        return selectionPayloadBuilder.toJson(selections = textSelectionStore.consume(tabId), url = "")
+    }
 
     override fun setContextualAttachmentActions(
         onAskAboutPage: () -> Unit,
