@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.contextual
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import org.json.JSONArray
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
@@ -34,6 +35,7 @@ data class ContextualEntryPrompt(
     val tabId: String,
     val prompt: NativeInputPrompt,
     val serializedPageContext: String?,
+    val selectionsJson: JSONArray? = null,
 )
 
 /**
