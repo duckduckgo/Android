@@ -46,7 +46,7 @@
                 android:layout_gravity="center"
                 android:layout_marginTop="@dimen/keyline_5"
                 android:importantForAccessibility="no"
-                android:src="@drawable/duckai_chat_128" />
+                android:src="@drawable/duckduckgo_duckai_128" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/duckAiPaidSettingsTitle"
