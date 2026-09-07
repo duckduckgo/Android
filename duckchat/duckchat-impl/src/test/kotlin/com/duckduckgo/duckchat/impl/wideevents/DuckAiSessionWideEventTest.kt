@@ -150,6 +150,18 @@ class DuckAiSessionWideEventTest {
     }
 
     @Test
+    fun `when a Duck ai tab id becomes available then the flow starts`() = runTest {
+        testee.onLaunchLandingResolved(null, null)
+        testee.onSelectedTabChanged(null, DUCKAI_URL_A)
+        idle()
+
+        testee.onSelectedTabChanged("tab-1", DUCKAI_URL_A)
+        idle()
+
+        verify(wideEventClient).flowStart(any(), anyOrNull(), any(), any(), any(), any())
+    }
+
+    @Test
     fun `when selected tab changes away from Duck ai with no pending exit then other_navigation is used`() = runTest {
         startFlow(tabId = "tab-1")
         testee.onSelectedTabChanged("tab-1", DUCKAI_URL_A) // baseline for the observer's own tracking

@@ -199,28 +199,26 @@ class RealDuckAiSessionWideEvent @Inject constructor(
     }
 
     private suspend fun applySelectedTabTransition(previous: TabState, current: TabState) {
+        val previousTabId = previous.tabId
         when {
-            previous.isDuckAi && current.tabId != previous.tabId -> {
-                val trigger = resolvePendingExit(previous.tabId!!) ?: DuckAiSessionExitTrigger.TAB_SWITCHED
-                endSessionIfMatches(previous.tabId, trigger)
+            previous.isDuckAi && previousTabId != null && current.tabId != previousTabId -> {
+                val trigger = resolvePendingExit(previousTabId) ?: DuckAiSessionExitTrigger.TAB_SWITCHED
+                endSessionIfMatches(previousTabId, trigger)
                 if (current.isDuckAi && current.tabId != null) {
                     startSessionIfNoneActive(current.tabId, current.chatId)
                 }
             }
-            // The two branches below are only reached once the tab identifier is known to be
-            // unchanged, since the branch above already handles every case where it differs.
-            previous.isDuckAi && !current.isDuckAi -> {
-                val trigger = resolvePendingExit(previous.tabId!!) ?: DuckAiSessionExitTrigger.OTHER_NAVIGATION
-                endSessionIfMatches(previous.tabId, trigger)
+            previous.isDuckAi && previousTabId != null && !current.isDuckAi -> {
+                val trigger = resolvePendingExit(previousTabId) ?: DuckAiSessionExitTrigger.OTHER_NAVIGATION
+                endSessionIfMatches(previousTabId, trigger)
             }
-            previous.isDuckAi && current.isDuckAi -> {
+            previous.isDuckAi && previousTabId != null && current.isDuckAi -> {
                 // The URL changed but Duck.ai is still showing in the same tab (a link within the chat,
                 // or Back landing on another Duck.ai page): any pending exit for it no longer applies,
                 // and the active session's chat identity may have changed.
-                resolvePendingExit(previous.tabId!!)
-                updateChatId(previous.tabId, current.chatId)
+                resolvePendingExit(previousTabId)
+                updateChatId(previousTabId, current.chatId)
             }
-            // previous.isDuckAi is guaranteed false here, since it's covered by the three branches above.
             current.isDuckAi && current.tabId != null -> {
                 startSessionIfNoneActive(current.tabId, current.chatId)
             }
