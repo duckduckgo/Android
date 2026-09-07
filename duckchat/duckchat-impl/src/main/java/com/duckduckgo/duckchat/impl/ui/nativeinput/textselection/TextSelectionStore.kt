@@ -63,7 +63,7 @@ class RealTextSelectionStore @Inject constructor() : TextSelectionStore {
     }
 
     private fun flowFor(tabId: String): MutableStateFlow<List<TextSelection>> =
-        selections.getOrPut(tabId) { MutableStateFlow(emptyList()) }
+        selections.computeIfAbsent(tabId) { MutableStateFlow(emptyList()) }
 
     private fun selectionOf(text: String): TextSelection? {
         val trimmed = text.trim()
