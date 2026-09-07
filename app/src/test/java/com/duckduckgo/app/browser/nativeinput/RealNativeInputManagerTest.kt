@@ -43,6 +43,8 @@ import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.NativeInputEventListener
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
+import com.duckduckgo.duckchat.impl.contextual.ContextualTextSelectionPayloadBuilder
+import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.RealTextSelectionStore
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputWidget
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
@@ -83,6 +85,8 @@ class RealNativeInputManagerTest {
     private val nativeInputEventListener: NativeInputEventListener = mock()
     private val edgeToEdgeProvider: EdgeToEdgeProvider = mock()
     private val edgeToEdgeHandler = EdgeToEdgeHandler()
+    private val textSelectionStore = RealTextSelectionStore()
+    private val selectionPayloadBuilder: ContextualTextSelectionPayloadBuilder = mock()
     private val nativeInputStateBugKillSwitch = FakeFeatureToggleFactory.create(NativeInputStateBugKillSwitch::class.java)
     private val nativeInputUrlClearingFeature = FakeFeatureToggleFactory.create(NativeInputUrlClearingFeature::class.java)
     private val nativeInputOmnibarFeature = FakeFeatureToggleFactory.create(NativeInputOmnibarFeature::class.java)
@@ -118,6 +122,8 @@ class RealNativeInputManagerTest {
             nativeInputEventListener,
             edgeToEdgeProvider,
             edgeToEdgeHandler,
+            textSelectionStore,
+            selectionPayloadBuilder,
         )
     }
 
@@ -424,7 +430,7 @@ class RealNativeInputManagerTest {
             callbacks = NativeInputCallbacks(
                 onSearchTextChanged = {},
                 onSearchSubmitted = {},
-                onDuckAiChatSubmitted = { _, _, _, _, _, _ -> },
+                onDuckAiChatSubmitted = { _, _, _, _, _, _, _ -> },
                 onChatSuggestionSelected = {},
                 onDuckAiQuerySubmitted = onDuckAiQuerySubmitted,
                 onClearAutocomplete = {},
