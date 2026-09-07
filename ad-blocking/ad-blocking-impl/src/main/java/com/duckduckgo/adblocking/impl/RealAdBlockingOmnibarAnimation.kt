@@ -63,6 +63,7 @@ class RealAdBlockingOmnibarAnimation @Inject constructor(
 
     private fun showBadge(): AdBlockingAnimation.Show =
         AdBlockingAnimation.Show(
+            // TODO update to new video_player_color_24.xml resource when AppBrandDesignUpdateToggles.addressBar() is removed
             icon = R.drawable.ic_video_player_blocked_color_24,
             text = R.string.ad_blocking_omnibar_badge_text,
         )
