@@ -23,7 +23,7 @@ import org.junit.Test
 class SearchAssistVisibilityTest {
 
     @Test
-    fun whenFromSerpCodeThenMapsEachCodeToItsOption() {
+    fun `when from serp code then maps each code to its option`() {
         assertEquals(SearchAssistVisibility.NEVER, SearchAssistVisibility.fromSerpCode("0"))
         assertEquals(SearchAssistVisibility.ON_DEMAND, SearchAssistVisibility.fromSerpCode("1"))
         assertEquals(SearchAssistVisibility.SOMETIMES, SearchAssistVisibility.fromSerpCode("2"))
@@ -31,14 +31,14 @@ class SearchAssistVisibilityTest {
     }
 
     @Test
-    fun whenFromSerpCodeUnknownOrNullThenNull() {
+    fun `when from serp code unknown or null then null`() {
         assertNull(SearchAssistVisibility.fromSerpCode("4"))
         assertNull(SearchAssistVisibility.fromSerpCode(""))
         assertNull(SearchAssistVisibility.fromSerpCode(null))
     }
 
     @Test
-    fun whenSerpCodesThenEachOptionHasUniqueExpectedCode() {
+    fun `when serp codes then each option has unique expected code`() {
         assertEquals("0", SearchAssistVisibility.NEVER.serpCode)
         assertEquals("1", SearchAssistVisibility.ON_DEMAND.serpCode)
         assertEquals("2", SearchAssistVisibility.SOMETIMES.serpCode)
@@ -46,7 +46,7 @@ class SearchAssistVisibilityTest {
     }
 
     @Test
-    fun whenSerpKeyThenEveryOptionCarriesTheSameKey() {
+    fun `when serp key then every option carries the same key`() {
         SearchAssistVisibility.entries.forEach { assertEquals("kbe", it.serpKey) }
     }
 }

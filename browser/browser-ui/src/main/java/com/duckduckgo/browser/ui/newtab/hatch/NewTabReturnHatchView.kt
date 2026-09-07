@@ -133,6 +133,9 @@ class NewTabReturnHatchView @JvmOverloads constructor(
     val targetMode: BrowserMode
         get() = viewModel.viewState.value.mode
 
+    val isDuckChat: Boolean
+        get() = viewModel.viewState.value.isDuckChat
+
     fun render(state: NewTabReturnHatchViewModel.ViewState) {
         faviconJob.cancel()
         if (state.shouldShow) {

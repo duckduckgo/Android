@@ -50,7 +50,6 @@ dependencies {
     implementation project(path: ':user-agent-api')
     implementation project(path: ':subscriptions-api')
     implementation project(path: ':settings-api')
-    implementation project(path: ':autofill-api')
     implementation project(path: ':network-protection-api')
     implementation project(path: ':internal-features-api')
     implementation project(path: ':macos-api')

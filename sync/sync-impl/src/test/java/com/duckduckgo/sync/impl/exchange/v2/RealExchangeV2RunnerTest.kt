@@ -18,14 +18,27 @@ package com.duckduckgo.sync.impl.exchange.v2
 
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncDeviceIds
+import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.crypto.RsaKeyPair
 import com.duckduckgo.sync.impl.crypto.SyncJweCrypto
+import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.Bye
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.Hello
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeAvailable
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeAwaitingConfirmation
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeConfirmed
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeDone
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeRequest
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeResponse
+import com.duckduckgo.sync.impl.pixels.SyncPixels.TimeoutStage
 import com.duckduckgo.sync.store.SyncStore
+import com.google.testing.junit.testparameterinjector.TestParameter
+import com.google.testing.junit.testparameterinjector.TestParameterInjector
+import com.google.testing.junit.testparameterinjector.TestParameters
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filterIsInstance
@@ -42,19 +55,28 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argThat
+import org.mockito.kotlin.atLeastOnce
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.util.Base64
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
+@RunWith(TestParameterInjector::class)
 class RealExchangeV2RunnerTest {
 
     @get:Rule val coroutineTestRule = CoroutineTestRule()
 
     private val clock = ExchangeV2Clock { 42L }
-    private val parser = JsonExchangeV2MessageParser()
     private val factory = ExchangeV2StateMachineFactory(clock)
     private val syncStore: SyncStore = mock()
     private val jweCrypto: SyncJweCrypto = mock()
@@ -62,11 +84,12 @@ class RealExchangeV2RunnerTest {
     private val qrCode: ExchangeV2QrCode = mock()
     private val recoveryCodeProvider: RecoveryCodeProvider = mock()
     private val syncDeviceIds: SyncDeviceIds = mock()
+    private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
+    private val advertisedVersion: AdvertisedExchangeV2Version = mock()
 
     private fun newRunner(): RealExchangeV2Runner =
         RealExchangeV2Runner(
             smFactory = factory,
-            messageParser = parser,
             clock = clock,
             syncStore = syncStore,
             jweCrypto = jweCrypto,
@@ -74,20 +97,22 @@ class RealExchangeV2RunnerTest {
             qrCode = qrCode,
             recoveryCodeProvider = recoveryCodeProvider,
             syncDeviceIds = syncDeviceIds,
+            advertisedExchangeV2Version = advertisedVersion,
+            syncFeature = syncFeature,
             appScope = coroutineTestRule.testScope,
             dispatchers = coroutineTestRule.testDispatcherProvider,
         )
 
     @Before fun stubWireDeps() {
-        whenever(qrCode.parse(any())).thenReturn(
-            ExchangeV2CodeParseResult.LinkingV2(channelId = "peer-channel", publicKey = "peer-pubkey", version = "2"),
-        )
+        givenOurVersion(ExchangeProtocolVersion.V2_0)
+        givenLinkingCodeVersion(ExchangeProtocolVersion.V2_0)
         whenever(qrCode.buildLinkingCode(any(), any(), any())).thenReturn("https://duckduckgo.com/sync/pairing/#&code2=fake")
         whenever(jweCrypto.generateRsaKeyPair(any())).thenReturn(RsaKeyPair(publicKeyBase64 = "own-pub", privateKeyBase64 = "own-priv"))
-        whenever(channel.createChannel(any())).thenReturn(Result.Success(Unit))
-        whenever(channel.poll(any(), any())).thenReturn(emptyFlow())
-        whenever(channel.sendMessage(any(), any(), any(), any())).thenReturn(Result.Success(Unit))
-        whenever(channel.deleteChannel(any())).thenReturn(Result.Success(Unit))
+        whenever(jweCrypto.generateSecureBytes(any())).thenReturn("channel-secret".toByteArray())
+        whenever(channel.createChannel(any(), anyOrNull())).thenReturn(Result.Success(Unit))
+        whenever(channel.poll(any(), any(), anyOrNull())).thenReturn(emptyFlow())
+        whenever(channel.sendMessage(any(), any(), any(), any(), anyOrNull())).thenReturn(Result.Success(Unit))
+        whenever(channel.deleteChannel(any(), anyOrNull())).thenReturn(Result.Success(Unit))
         whenever(syncDeviceIds.deviceName()).thenReturn("This Device")
     }
 
@@ -117,7 +142,7 @@ class RealExchangeV2RunnerTest {
         val runner = newRunner()
         runner.startScan("")
         runner.deliverIncomingMessage(
-            ExchangeV2Message.RecoveryCodeAvailable(rawJson = "{}", userId = "peer", name = "Peer", kind = "3party"),
+            RecoveryCodeAvailable.create(userId = "peer", name = "Peer", kind = "3party"),
         )
 
         runner.startScan("")
@@ -132,7 +157,7 @@ class RealExchangeV2RunnerTest {
         runner.startPresent()
 
         runner.events.filterIsInstance<ExchangeV2Event.Transition>().test {
-            runner.deliverIncomingMessage(Hello("""{"type":"hello"}"""))
+            runner.deliverIncomingMessage(Hello.fromJson("""{"type":"hello"}"""))
             val event = awaitItem()
             assertSame(ExchangeV2State.Bootstrapped, event.from)
             assertSame(ExchangeV2State.Negotiating, event.to)
@@ -142,7 +167,7 @@ class RealExchangeV2RunnerTest {
     @Test fun `deliverIncomingMessage without a session emits PairingSessionNotReady`() = runTest {
         val runner = newRunner()
         runner.events.filterIsInstance<ExchangeV2Event.SessionError>().test {
-            runner.deliverIncomingMessage(Hello("{}"))
+            runner.deliverIncomingMessage(Hello.fromJson("{}"))
             val event = awaitItem()
             assertEquals(SessionErrorKind.PairingSessionNotReady, event.kind)
         }
@@ -154,7 +179,7 @@ class RealExchangeV2RunnerTest {
         runner.startPresent()
 
         runner.events.filterIsInstance<ExchangeV2Event.Transition>().test {
-            runner.deliverIncomingMessageJson("""{"type":"hello"}""")
+            runner.deliverHello(ExchangeProtocolVersion.V2_0)
             val event = awaitItem()
             assertSame(ExchangeV2State.Negotiating, event.to)
             assertTrue(event.trigger is Hello)
@@ -167,7 +192,7 @@ class RealExchangeV2RunnerTest {
         runner.startPresent()
 
         runner.events.filterIsInstance<ExchangeV2Event.MessageRejected>().test {
-            runner.deliverIncomingMessageJson("""{"type":"future_msg"}""")
+            runner.deliverIncomingMessage(ExchangeV2Message.Unknown.fromJson("{}", "future_msg"))
             val event = awaitItem()
             assertSame(RejectReason.UnknownMessageDropped, event.reason)
         }
@@ -175,7 +200,7 @@ class RealExchangeV2RunnerTest {
 
     @Test fun `recordSentMessage emits MessageSent with given message`() = runTest {
         val runner = newRunner()
-        val sent = RecoveryCodeRequest(rawJson = "{}", name = "me", kind = "3party")
+        val sent = RecoveryCodeRequest.create(name = "me", kind = "3party")
 
         runner.events.test {
             runner.recordSentMessage(sent)
@@ -188,7 +213,7 @@ class RealExchangeV2RunnerTest {
         whenever(syncStore.userId).thenReturn("my-user")
         val runner = newRunner()
         runner.startPresent()
-        runner.deliverIncomingMessage(Hello("{}"))
+        runner.deliverIncomingMessage(Hello.fromJson("{}"))
 
         runner.events.filterIsInstance<ExchangeV2Event.Transition>().test {
             awaitItem()
@@ -202,10 +227,10 @@ class RealExchangeV2RunnerTest {
         whenever(syncStore.userId).thenReturn(null)
         val runner = newRunner()
         runner.startScan("")
-        runner.deliverIncomingMessage(ExchangeV2Message.RecoveryCodeAvailable(rawJson = "{}", userId = "other", name = "Peer", kind = "3party"))
+        runner.deliverIncomingMessage(RecoveryCodeAvailable.create(userId = "other", name = "Peer", kind = "3party"))
         runner.localTrigger(LocalTrigger.RoleElected(Role.Joiner))
         runner.localTrigger(LocalTrigger.UserConfirmedJoiner)
-        runner.deliverIncomingMessage(RecoveryCodeResponse("{}"))
+        runner.deliverIncomingMessage(RecoveryCodeResponse.fromJson("{}"))
 
         assertNull(runner.currentState)
     }
@@ -217,7 +242,7 @@ class RealExchangeV2RunnerTest {
 
         runner.events.filterIsInstance<ExchangeV2Event.Transition>().test {
             runner.deliverIncomingMessage(
-                ExchangeV2Message.RecoveryCodeAvailable(rawJson = "{}", userId = "shared-user", name = "Peer", kind = "3party"),
+                RecoveryCodeAvailable.create(userId = "shared-user", name = "Peer", kind = "3party"),
             )
             val event = awaitItem()
             assertSame(ExchangeV2State.SameAccountAbort, event.to)
@@ -234,10 +259,11 @@ class RealExchangeV2RunnerTest {
         // The peer shows this name on its security-confirmation screen, so it must be the real
         // device name (e.g. "google Pixel 7"), never a generic "Android".
         verify(channel).sendMessage(
-            argThat { contains("recovery_code_request") && contains("\"name\":\"google Pixel 7\"") },
+            argThat { this is RecoveryCodeRequest && this.name == "google Pixel 7" },
             any(),
             any(),
             any(),
+            anyOrNull(),
         )
     }
 
@@ -249,11 +275,158 @@ class RealExchangeV2RunnerTest {
         runner.startScan("")
 
         verify(channel).sendMessage(
-            argThat { contains("recovery_code_available") && contains("\"name\":\"google Pixel 7\"") },
+            argThat { this is RecoveryCodeAvailable && this.name == "google Pixel 7" },
             any(),
             any(),
             any(),
+            anyOrNull(),
         )
+    }
+
+    // ---- Protocol version negotiation ----
+
+    @Test fun `linking code advertises the version this device speaks`(
+        @TestParameter("2.0", "2.1") ourVersion: String,
+    ) {
+        val version = ourVersion.toV2ProtocolVersion()
+        givenOurVersion(version)
+
+        val runner = newRunner()
+        runner.startPresent()
+
+        verify(qrCode).buildLinkingCode(any(), any(), eq(version))
+    }
+
+    @Test fun `hello advertises the version this device speaks`(
+        @TestParameter("2.0", "2.1") ourVersion: String,
+    ) = runTest {
+        val version = ourVersion.toV2ProtocolVersion()
+        givenOurVersion(version)
+
+        val runner = newRunner()
+        runner.startScan("")
+
+        verify(channel).sendMessage(
+            argThat { this is Hello && this.version == version },
+            any(),
+            any(),
+            any(),
+            anyOrNull(),
+        )
+    }
+
+    @Test fun `each session re-resolves the advertised version rather than reusing the previous session's`() = runTest {
+        val runner = newRunner()
+
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        runner.startPresent()
+        verify(qrCode).buildLinkingCode(any(), any(), eq(ExchangeProtocolVersion.V2_1))
+
+        runner.cancel()
+
+        givenOurVersion(ExchangeProtocolVersion.V2_0)
+        runner.startPresent()
+        verify(qrCode).buildLinkingCode(any(), any(), eq(ExchangeProtocolVersion.V2_0))
+    }
+
+    @Test
+    @TestParameters(
+        "{ourVersion: '2.1', peerVersion: '2.1', negotiated: '2.1'}",
+        "{ourVersion: '2.1', peerVersion: '2.9', negotiated: '2.1'}",
+        "{ourVersion: '2.1', peerVersion: '2.0', negotiated: '2.0'}",
+        "{ourVersion: '2.0', peerVersion: '2.1', negotiated: '2.0'}",
+        "{ourVersion: '2.0', peerVersion: '2.0', negotiated: '2.0'}",
+    )
+    fun `Scanner negotiates the lower of our version and the scanned code's`(
+        ourVersion: String,
+        peerVersion: String,
+        negotiated: String,
+    ) = runTest {
+        givenOurVersion(ourVersion.toV2ProtocolVersion())
+        givenLinkingCodeVersion(peerVersion.toV2ProtocolVersion())
+
+        val runner = newRunner()
+        runner.startScan("")
+
+        val negotiation = runner.events.replayCache.filterIsInstance<ExchangeV2Event.VersionNegotiated>().single()
+        assertEquals(negotiated.toProtocolVersion(), negotiation.negotiatedVersion)
+    }
+
+    @Test
+    @TestParameters(
+        "{ourVersion: '2.1', peerVersion: '2.1', negotiated: '2.1'}",
+        "{ourVersion: '2.1', peerVersion: '2.9', negotiated: '2.1'}",
+        "{ourVersion: '2.1', peerVersion: '2.0', negotiated: '2.0'}",
+        "{ourVersion: '2.0', peerVersion: '2.1', negotiated: '2.0'}",
+        "{ourVersion: '2.0', peerVersion: '2.0', negotiated: '2.0'}",
+        "{ourVersion: '2.1', peerVersion: '1.0', negotiated: '2.0'}",
+        "{ourVersion: '2.1', peerVersion: '3.4', negotiated: '2.0'}",
+    )
+    fun `Presenter negotiates the lower of our version and the peer hello's`(
+        ourVersion: String,
+        peerVersion: String,
+        negotiated: String,
+    ) = runTest {
+        givenOurVersion(ourVersion.toV2ProtocolVersion())
+        whenever(syncStore.userId).thenReturn("my-user")
+
+        val runner = newRunner()
+        runner.startPresent()
+        runner.deliverHello(peerVersion.toProtocolVersion())
+
+        val negotiation = runner.events.replayCache.filterIsInstance<ExchangeV2Event.VersionNegotiated>().single()
+        assertEquals(negotiated.toProtocolVersion(), negotiation.negotiatedVersion)
+    }
+
+    @Test fun `Scanner reports the scanned code as the source of the peer version`() = runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenLinkingCodeVersion(ExchangeProtocolVersion.V2_0)
+
+        val runner = newRunner()
+        runner.startScan("")
+
+        val negotiation = runner.events.replayCache.filterIsInstance<ExchangeV2Event.VersionNegotiated>().single()
+        assertEquals(PeerVersionSource.LinkingCode, negotiation.peerSource)
+        assertEquals(ExchangeProtocolVersion.V2_1, negotiation.ourVersion)
+        assertEquals(ExchangeProtocolVersion.V2_0, negotiation.peerVersion)
+        assertEquals(ExchangeProtocolVersion.V2_0, negotiation.negotiatedVersion)
+    }
+
+    @Test fun `Presenter reports the peer hello as the source of the peer version`() = runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_0)
+        whenever(syncStore.userId).thenReturn("my-user")
+
+        val runner = newRunner()
+        runner.startPresent()
+        runner.deliverHello(ExchangeProtocolVersion.V2_1)
+
+        val negotiation = runner.events.replayCache.filterIsInstance<ExchangeV2Event.VersionNegotiated>().single()
+        assertEquals(PeerVersionSource.HelloMessage, negotiation.peerSource)
+        assertEquals(ExchangeProtocolVersion.V2_0, negotiation.ourVersion)
+        assertEquals(ExchangeProtocolVersion.V2_1, negotiation.peerVersion)
+        assertEquals(ExchangeProtocolVersion.V2_0, negotiation.negotiatedVersion)
+    }
+
+    @Test fun `a peer version we cannot speak falls back to the baseline but is reported as advertised`() = runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        whenever(syncStore.userId).thenReturn("my-user")
+
+        val runner = newRunner()
+        runner.startPresent()
+        runner.deliverHello("3.4".toProtocolVersion())
+
+        val negotiation = runner.events.replayCache.filterIsInstance<ExchangeV2Event.VersionNegotiated>().single()
+        assertEquals("3.4".toProtocolVersion(), negotiation.peerVersion)
+        assertEquals(ExchangeProtocolVersion.V2_0, negotiation.negotiatedVersion)
+    }
+
+    @Test fun `a peer that never advertises a version produces no negotiation event`() = runTest {
+        whenever(syncStore.userId).thenReturn("my-user")
+
+        val runner = newRunner()
+        runner.startPresent()
+
+        assertTrue(runner.events.replayCache.filterIsInstance<ExchangeV2Event.VersionNegotiated>().isEmpty())
     }
 
     // ---- Auto role election ----
@@ -305,20 +478,36 @@ class RealExchangeV2RunnerTest {
         runner.startScan("")
 
         runner.deliverIncomingMessage(
-            ExchangeV2Message.RecoveryCodeAvailable(rawJson = "{}", userId = "host-user", name = "Host", kind = "ddg"),
+            RecoveryCodeAvailable.create(userId = "host-user", name = "Host", kind = "ddg"),
         )
 
         assertSame(ExchangeV2State.Joiner.Confirming, runner.currentState)
+    }
+
+    @Test fun `a message buffered during Joiner_Confirming emits MessageReceived only once`() = runTest {
+        whenever(syncStore.userId).thenReturn(null)
+        val runner = newRunner()
+        runner.startScan("")
+        runner.deliverIncomingMessage(RecoveryCodeAvailable.create(userId = "host-user", name = "Host", kind = "ddg"))
+        assertSame(ExchangeV2State.Joiner.Confirming, runner.currentState)
+
+        runner.deliverIncomingMessage(RecoveryCodeResponse.create(recoveryCode = "the-code"))
+        runner.localTrigger(LocalTrigger.UserConfirmedJoiner)
+
+        val received = runner.events.replayCache
+            .filterIsInstance<ExchangeV2Event.MessageReceived>()
+            .filter { it.message is RecoveryCodeResponse }
+        assertEquals("replaying a buffered message must not log it as received again", 1, received.size)
     }
 
     @Test fun `Presenter with account auto-elects Host when peer has no account`() = runTest {
         whenever(syncStore.userId).thenReturn("my-user")
         val runner = newRunner()
         runner.startPresent()
-        runner.deliverIncomingMessage(Hello("{}"))
+        runner.deliverIncomingMessage(Hello.fromJson("{}"))
 
         runner.deliverIncomingMessage(
-            ExchangeV2Message.RecoveryCodeRequest(rawJson = "{}", name = "Joiner", kind = "ddg"),
+            RecoveryCodeRequest.create(name = "Joiner", kind = "ddg"),
         )
 
         assertSame(ExchangeV2State.Host.Confirming, runner.currentState)
@@ -328,25 +517,101 @@ class RealExchangeV2RunnerTest {
         whenever(syncStore.userId).thenReturn("my-user")
         val runner = newRunner()
         runner.startPresent()
-        runner.deliverIncomingMessage(Hello("{}"))
+        runner.deliverIncomingMessage(Hello.fromJson("{}"))
 
         runner.deliverIncomingMessage(
-            ExchangeV2Message.RecoveryCodeRequest(rawJson = "{}", name = "Joiner", kind = "ddg"),
+            RecoveryCodeRequest.create(name = "Joiner", kind = "ddg"),
         )
 
         // Spec §"Exchange Confirmations → Host": awaiting_confirmation is sent on entry to
         // Confirming, before the user is prompted.
         verify(channel).sendMessage(
-            argThat { contains("recovery_code_awaiting_confirmation") },
+            argThat { this is RecoveryCodeAwaitingConfirmation },
             any(),
             any(),
             any(),
+            anyOrNull(),
         )
         verify(channel, never()).sendMessage(
-            argThat { contains("recovery_code_confirmed") },
+            argThat { this is RecoveryCodeConfirmed },
             any(),
             any(),
             any(),
+            anyOrNull(),
+        )
+    }
+
+    @Test fun `Host with a v2_1 peer stays in Host_AwaitingStatus after sending the recovery code`() = runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenHostCanProduceRecoveryCode()
+
+        val runner = newRunner()
+        runner.startPresent()
+        runner.deliverHello(ExchangeProtocolVersion.V2_1)
+        runner.deliverIncomingMessage(RecoveryCodeRequest.create(name = "Joiner", kind = "ddg"))
+
+        runner.localTrigger(LocalTrigger.UserConfirmedHost)
+
+        assertSame(ExchangeV2State.Host.AwaitingStatus, runner.currentState)
+        verify(channel, never()).deleteChannel(any(), anyOrNull())
+    }
+
+    @Test fun `Host with a v2_0 peer abandons the session after sending the recovery code`() = runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenHostCanProduceRecoveryCode()
+
+        val runner = newRunner()
+        runner.startPresent()
+        runner.deliverHello(ExchangeProtocolVersion.V2_0)
+        runner.deliverIncomingMessage(RecoveryCodeRequest.create(name = "Joiner", kind = "ddg"))
+
+        runner.localTrigger(LocalTrigger.UserConfirmedHost)
+
+        assertNull(runner.currentState)
+        verify(channel).deleteChannel(any(), anyOrNull())
+    }
+
+    @Test fun `Joiner with a v2_1 peer sends recovery_code_done when the join completes`() = runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenLinkingCodeVersion(ExchangeProtocolVersion.V2_1)
+        whenever(syncStore.userId).thenReturn(null)
+
+        val runner = newRunner()
+        runner.startScan("")
+        runner.deliverIncomingMessage(RecoveryCodeAvailable.create(userId = "host-user", name = "Host", kind = "ddg"))
+        runner.localTrigger(LocalTrigger.UserConfirmedJoiner)
+        runner.deliverIncomingMessage(RecoveryCodeResponse.create(recoveryCode = "the-code"))
+
+        runner.localTrigger(LocalTrigger.JoinerJoinComplete(RecoveryCodeDone.Reason.Success))
+
+        verify(channel).sendMessage(
+            argThat { this is RecoveryCodeDone && reason == RecoveryCodeDone.Reason.Success },
+            any(),
+            any(),
+            any(),
+            anyOrNull(),
+        )
+    }
+
+    @Test fun `Joiner with a v2_0 peer does not send recovery_code_done`() = runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenLinkingCodeVersion(ExchangeProtocolVersion.V2_0)
+        whenever(syncStore.userId).thenReturn(null)
+
+        val runner = newRunner()
+        runner.startScan("")
+        runner.deliverIncomingMessage(RecoveryCodeAvailable.create(userId = "host-user", name = "Host", kind = "ddg"))
+        runner.localTrigger(LocalTrigger.UserConfirmedJoiner)
+        runner.deliverIncomingMessage(RecoveryCodeResponse.create(recoveryCode = "the-code"))
+
+        runner.localTrigger(LocalTrigger.JoinerJoinComplete(RecoveryCodeDone.Reason.Success))
+
+        verify(channel, never()).sendMessage(
+            argThat { this is RecoveryCodeDone },
+            any(),
+            any(),
+            any(),
+            anyOrNull(),
         )
     }
 
@@ -355,23 +620,25 @@ class RealExchangeV2RunnerTest {
         whenever(recoveryCodeProvider.getDdgRecoveryCode()).thenReturn(com.duckduckgo.sync.impl.Result.Success("the-code"))
         val runner = newRunner()
         runner.startPresent()
-        runner.deliverIncomingMessage(Hello("{}"))
+        runner.deliverIncomingMessage(Hello.fromJson("{}"))
         runner.deliverIncomingMessage(
-            ExchangeV2Message.RecoveryCodeRequest(rawJson = "{}", name = "Joiner", kind = "ddg"),
+            RecoveryCodeRequest.create(name = "Joiner", kind = "ddg"),
         )
         runner.localTrigger(LocalTrigger.UserConfirmedHost)
 
         verify(channel).sendMessage(
-            argThat { contains("recovery_code_confirmed") && !contains("recovery_code_awaiting_confirmation") },
+            argThat { this is RecoveryCodeConfirmed },
             any(),
             any(),
             any(),
+            anyOrNull(),
         )
         verify(channel, org.mockito.kotlin.times(1)).sendMessage(
-            argThat { contains("recovery_code_awaiting_confirmation") },
+            argThat { this is RecoveryCodeAwaitingConfirmation },
             any(),
             any(),
             any(),
+            anyOrNull(),
         )
     }
 
@@ -380,13 +647,13 @@ class RealExchangeV2RunnerTest {
         whenever(recoveryCodeProvider.createDdgAccountIfNeeded()).thenReturn(Result.Success(Unit))
         whenever(recoveryCodeProvider.getDdgRecoveryCode()).thenReturn(Result.Success("the-code"))
         whenever(
-            channel.sendMessage(argThat { contains("recovery_code_response") }, any(), any(), any()),
+            channel.sendMessage(any<RecoveryCodeResponse>(), any(), any(), any(), anyOrNull()),
         ).thenReturn(Result.Error(reason = "relay unreachable"))
 
         val runner = newRunner()
         runner.startPresent()
-        runner.deliverIncomingMessage(Hello("{}"))
-        runner.deliverIncomingMessage(RecoveryCodeRequest(rawJson = "{}", name = "Joiner", kind = "ddg"))
+        runner.deliverIncomingMessage(Hello.fromJson("{}"))
+        runner.deliverIncomingMessage(RecoveryCodeRequest.create(name = "Joiner", kind = "ddg"))
         runner.localTrigger(LocalTrigger.UserConfirmedHost)
 
         val lastTransition = runner.events.replayCache.filterIsInstance<ExchangeV2Event.Transition>().last()
@@ -399,7 +666,7 @@ class RealExchangeV2RunnerTest {
         runner.startScan("")
 
         runner.deliverIncomingMessage(
-            ExchangeV2Message.RecoveryCodeAvailable(rawJson = "{}", userId = "peer-user", name = "Peer", kind = "3party"),
+            RecoveryCodeAvailable.create(userId = "peer-user", name = "Peer", kind = "3party"),
         )
 
         assertSame(ExchangeV2State.Host.Confirming, runner.currentState)
@@ -411,7 +678,7 @@ class RealExchangeV2RunnerTest {
         runner.startScan("")
 
         runner.events.filterIsInstance<ExchangeV2Event.SessionError>().test {
-            runner.deliverIncomingMessage(Hello("{}"))
+            runner.deliverIncomingMessage(Hello.fromJson("{}"))
             val event = awaitItem()
             assertSame(SessionErrorKind.UnexpectedSecondHello, event.kind)
         }
@@ -425,7 +692,7 @@ class RealExchangeV2RunnerTest {
 
         runner.events.filterIsInstance<ExchangeV2Event.Transition>().test {
             runner.deliverIncomingMessage(
-                ExchangeV2Message.RecoveryCodeAvailable(rawJson = "{}", userId = "shared-user", name = "Peer", kind = "ddg"),
+                RecoveryCodeAvailable.create(userId = "shared-user", name = "Peer", kind = "ddg"),
             )
             val event = awaitItem()
             assertSame(ExchangeV2State.SameAccountAbort, event.to)
@@ -437,10 +704,10 @@ class RealExchangeV2RunnerTest {
         whenever(syncStore.userId).thenReturn("my-user")
         val runner = newRunner()
         runner.startPresent()
-        runner.deliverIncomingMessage(Hello("{}"))
+        runner.deliverIncomingMessage(Hello.fromJson("{}"))
 
         runner.deliverIncomingMessage(
-            ExchangeV2Message.RecoveryCodeAvailable(rawJson = "{}", userId = "peer-user", name = "Peer", kind = "ddg"),
+            RecoveryCodeAvailable.create(userId = "peer-user", name = "Peer", kind = "ddg"),
         )
 
         assertSame(ExchangeV2State.Host.Confirming, runner.currentState)
@@ -452,7 +719,7 @@ class RealExchangeV2RunnerTest {
         runner.startScan("")
 
         runner.deliverIncomingMessage(
-            ExchangeV2Message.RecoveryCodeAvailable(rawJson = "{}", userId = "peer-user", name = "Peer", kind = "ddg"),
+            RecoveryCodeAvailable.create(userId = "peer-user", name = "Peer", kind = "ddg"),
         )
 
         assertSame(ExchangeV2State.Joiner.Confirming, runner.currentState)
@@ -466,7 +733,7 @@ class RealExchangeV2RunnerTest {
         runner.startPresent()
         assertSame(ExchangeV2State.Bootstrapped, runner.currentState)
 
-        advanceTimeBy(6 * 60 * 1000L) // past the 5-min session deadline
+        advanceTimeBy(6.minutes) // past the 5-min session deadline
 
         val sessionErrors = runner.events.replayCache.filterIsInstance<ExchangeV2Event.SessionError>()
         val timedOut = sessionErrors.singleOrNull { it.message.contains("timed out", ignoreCase = true) }
@@ -484,13 +751,14 @@ class RealExchangeV2RunnerTest {
         val runner = newRunner()
         runner.startScan("")
         runner.deliverIncomingMessage(
-            ExchangeV2Message.RecoveryCodeAvailable(rawJson = "{}", userId = "other", name = "Peer", kind = "3party"),
+            RecoveryCodeAvailable.create(userId = "other", name = "Peer", kind = "3party"),
         )
         runner.localTrigger(LocalTrigger.UserConfirmedJoiner)
-        runner.deliverIncomingMessage(RecoveryCodeResponse("{}"))
+        runner.deliverIncomingMessage(RecoveryCodeResponse.fromJson("{}"))
+        runner.localTrigger(LocalTrigger.JoinerJoinComplete(RecoveryCodeDone.Reason.Success))
         assertNull(runner.currentState)
 
-        advanceTimeBy(6 * 60 * 1000L)
+        advanceTimeBy(6.minutes)
 
         val timedOut = runner.events.replayCache
             .filterIsInstance<ExchangeV2Event.SessionError>()
@@ -498,11 +766,106 @@ class RealExchangeV2RunnerTest {
         assertFalse("a completed session must not later emit a timeout", timedOut)
     }
 
+    // ---- Late joiner deadline ----
+
+    @Test fun `Host moves to Host_Unknown when the join status deadline elapses without a report`() = coroutineTestRule.testScope.runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenHostCanProduceRecoveryCode()
+        val runner = newRunner()
+        runner.reachHostAwaitingStatus()
+        assertSame(ExchangeV2State.Host.AwaitingStatus, runner.currentState)
+
+        advanceTimeBy(31.seconds)
+
+        assertSame(ExchangeV2State.Host.Unknown, runner.currentState)
+        verify(channel, never()).deleteChannel(any(), anyOrNull())
+    }
+
+    @Test fun `a late recovery_code_done still lands the Host on the real outcome after the deadline`() = coroutineTestRule.testScope.runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenHostCanProduceRecoveryCode()
+        val runner = newRunner()
+        runner.reachHostAwaitingStatus()
+        advanceTimeBy(31.seconds)
+        assertSame(ExchangeV2State.Host.Unknown, runner.currentState)
+
+        runner.deliverIncomingMessage(RecoveryCodeDone.create(RecoveryCodeDone.Reason.Success))
+
+        val lastTransition = runner.events.replayCache.filterIsInstance<ExchangeV2Event.Transition>().last()
+        assertSame(ExchangeV2State.Host.Done, lastTransition.to)
+        assertNull(runner.currentState)
+    }
+
+    @Test fun `a report arriving before the deadline means Host_Unknown is never entered`() = coroutineTestRule.testScope.runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenHostCanProduceRecoveryCode()
+        val runner = newRunner()
+        runner.reachHostAwaitingStatus()
+
+        runner.deliverIncomingMessage(RecoveryCodeDone.create(RecoveryCodeDone.Reason.Success))
+        advanceTimeBy(31.seconds)
+
+        val enteredUnknown = runner.events.replayCache
+            .filterIsInstance<ExchangeV2Event.Transition>()
+            .any { it.to == ExchangeV2State.Host.Unknown }
+        assertFalse("a reported outcome must not later degrade to Unknown", enteredUnknown)
+    }
+
+    @Test fun `the join status deadline is read from the sync feature settings`() = coroutineTestRule.testScope.runTest {
+        syncFeature.self().setRawStoredState(State(settings = """{"joinStatusDeadlineMs": 60000}"""))
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenHostCanProduceRecoveryCode()
+        val runner = newRunner()
+        runner.reachHostAwaitingStatus()
+
+        advanceTimeBy(31.seconds)
+        assertSame(ExchangeV2State.Host.AwaitingStatus, runner.currentState)
+
+        advanceTimeBy(30.seconds)
+        assertSame(ExchangeV2State.Host.Unknown, runner.currentState)
+    }
+
+    @Test
+    @TestParameters(
+        "{configuredMs: 1000, clampedMs: 5000}",
+        "{configuredMs: 1000000, clampedMs: 120000}",
+    )
+    fun `an out-of-bounds remote deadline is clamped`(configuredMs: Long, clampedMs: Long) = coroutineTestRule.testScope.runTest {
+        syncFeature.self().setRawStoredState(State(settings = """{"joinStatusDeadlineMs": $configuredMs}"""))
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenHostCanProduceRecoveryCode()
+        val runner = newRunner()
+        runner.reachHostAwaitingStatus()
+
+        advanceTimeBy(clampedMs.milliseconds - 100.milliseconds)
+        assertSame(ExchangeV2State.Host.AwaitingStatus, runner.currentState)
+
+        advanceTimeBy(200.milliseconds)
+        assertSame(ExchangeV2State.Host.Unknown, runner.currentState)
+    }
+
+    @Test fun `the session deadline tears down a Host left in Host_Unknown`() = coroutineTestRule.testScope.runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenHostCanProduceRecoveryCode()
+        val runner = newRunner()
+        runner.reachHostAwaitingStatus()
+        advanceTimeBy(31.seconds)
+        assertSame(ExchangeV2State.Host.Unknown, runner.currentState)
+
+        advanceTimeBy(5.minutes)
+
+        assertNull(runner.currentState)
+        val timedOut = runner.events.replayCache
+            .filterIsInstance<ExchangeV2Event.SessionError>()
+            .single { it.kind == SessionErrorKind.SessionTimeout }
+        assertEquals(TimeoutStage.LOGGING_IN, timedOut.timeoutStage)
+    }
+
     // ---- Poll-loop error handling ----
 
     @Test fun `an unexpected poll error tears down the session with a SessionError`() = runTest {
         whenever(syncStore.userId).thenReturn("my-user")
-        whenever(channel.poll(any(), any())).thenReturn(flow<ExchangeV2Message> { throw RuntimeException("boom") })
+        whenever(channel.poll(any(), any(), anyOrNull())).thenReturn(flow<ExchangeV2Message> { throw RuntimeException("boom") })
         val runner = newRunner()
         runner.startPresent()
 
@@ -520,10 +883,10 @@ class RealExchangeV2RunnerTest {
 
     @Test fun `polled messages are processed in wire order (hello before request reaches Host_Confirming)`() = runTest {
         whenever(syncStore.userId).thenReturn("my-user")
-        whenever(channel.poll(any(), any())).thenReturn(
+        whenever(channel.poll(any(), any(), anyOrNull())).thenReturn(
             flowOf(
-                Hello("""{"type":"hello"}"""),
-                RecoveryCodeRequest(rawJson = "{}", name = "Joiner", kind = "ddg"),
+                Hello.fromJson("""{"type":"hello"}"""),
+                RecoveryCodeRequest.create(name = "Joiner", kind = "ddg"),
             ),
         )
 
@@ -535,9 +898,9 @@ class RealExchangeV2RunnerTest {
 
     @Test fun `a polled message that reaches a terminal state tears down without a spurious error`() = runTest {
         whenever(syncStore.userId).thenReturn("shared")
-        whenever(channel.poll(any(), any())).thenReturn(
+        whenever(channel.poll(any(), any(), anyOrNull())).thenReturn(
             flowOf(
-                ExchangeV2Message.RecoveryCodeAvailable(rawJson = "{}", userId = "shared", name = "Peer", kind = "ddg"),
+                RecoveryCodeAvailable.create(userId = "shared", name = "Peer", kind = "ddg"),
             ),
         )
 
@@ -553,7 +916,7 @@ class RealExchangeV2RunnerTest {
 
     @Test fun `cancel during an open poll does not surface a spurious error`() = runTest {
         whenever(syncStore.userId).thenReturn("my-user")
-        whenever(channel.poll(any(), any())).thenReturn(flow<ExchangeV2Message> { awaitCancellation() })
+        whenever(channel.poll(any(), any(), anyOrNull())).thenReturn(flow<ExchangeV2Message> { awaitCancellation() })
         val runner = newRunner()
         runner.startPresent()
 
@@ -566,7 +929,7 @@ class RealExchangeV2RunnerTest {
     }
 
     @Test fun `startScan with a failed channel bootstrap aborts cleanly without the misleading reach-Presenter error`() = runTest {
-        whenever(channel.createChannel(any())).thenReturn(Result.Error(reason = "relay 500"))
+        whenever(channel.createChannel(any(), anyOrNull())).thenReturn(Result.Error(reason = "relay 500"))
         val runner = newRunner()
         runner.startScan("")
 
@@ -576,11 +939,530 @@ class RealExchangeV2RunnerTest {
     }
 
     @Test fun `a failed bootstrap clears the pairing role so no half-started session lingers`() = runTest {
-        whenever(channel.createChannel(any())).thenReturn(Result.Error(reason = "relay 500"))
+        whenever(channel.createChannel(any(), anyOrNull())).thenReturn(Result.Error(reason = "relay 500"))
         val runner = newRunner()
 
         runner.startScan("")
 
         assertNull("pairingRole must be cleared after a failed bootstrap", runner.pairingRole)
+    }
+
+    // ---- Channel authentication ----
+
+    @Test fun `the channel is claimed, polled and written to with a secret only when a flag calls for it`(
+        @TestParameter case: ExchangeAuthCase,
+    ) = runTest {
+        configure(case)
+        val utf8Secret = "channel-secret"
+        val expectedSecret = utf8Secret.toBase64Url().takeIf { case.isAuthenticated }
+        whenever(jweCrypto.generateSecureBytes(any())).thenReturn(utf8Secret.toByteArray())
+
+        val runner = newRunner()
+        runner.startScan("")
+
+        verify(jweCrypto, times(if (case.isAuthenticated) 1 else 0)).generateSecureBytes(any())
+        verify(channel).createChannel(any(), eq(expectedSecret))
+        verify(channel).poll(any(), any(), eq(expectedSecret))
+        verify(channel, atLeastOnce()).sendMessage(any(), any(), any(), any(), eq(expectedSecret))
+    }
+
+    @Test fun `cancel deletes the channel with whatever secret it was created with`(
+        @TestParameter case: ExchangeAuthCase,
+    ) = runTest {
+        configure(case)
+        val utf8Secret = "channel-secret"
+        val expectedSecret = utf8Secret.toBase64Url().takeIf { case.isAuthenticated }
+        whenever(jweCrypto.generateSecureBytes(any())).thenReturn(utf8Secret.toByteArray())
+
+        val runner = newRunner()
+        runner.startScan("")
+        runner.cancel()
+
+        verify(channel).deleteChannel(any(), eq(expectedSecret))
+    }
+
+    @Test fun `a channel_id collision retries with a fresh secret and keeps the one that was accepted`() = runTest {
+        val utf8Secrets = listOf("first-secret", "second-secret")
+        val base64UrlSecrets = utf8Secrets.map { it.toBase64Url() }
+        whenever(jweCrypto.generateSecureBytes(any())).thenReturn(
+            utf8Secrets[0].toByteArray(),
+            utf8Secrets[1].toByteArray(),
+        )
+        whenever(channel.createChannel(any(), anyOrNull())).thenReturn(
+            Result.Error(code = 409, reason = "channel_id taken"),
+            Result.Success(Unit),
+        )
+        val runner = newRunner()
+
+        runner.startScan("")
+
+        verify(channel).createChannel(any(), eq(base64UrlSecrets[0]))
+        verify(channel).createChannel(any(), eq(base64UrlSecrets[1]))
+        verify(channel).poll(any(), any(), eq(base64UrlSecrets[1]))
+    }
+
+    @Test fun `a new session claims its channel with a fresh secret`() = runTest {
+        val utf8Secrets = listOf("first-secret", "second-secret")
+        val base64UrlSecrets = utf8Secrets.map { it.toBase64Url() }
+        whenever(jweCrypto.generateSecureBytes(any())).thenReturn(
+            utf8Secrets[0].toByteArray(),
+            utf8Secrets[1].toByteArray(),
+        )
+        val runner = newRunner()
+
+        runner.startScan("")
+        runner.cancel()
+        runner.startScan("")
+
+        verify(channel).createChannel(any(), eq(base64UrlSecrets[0]))
+        verify(channel).createChannel(any(), eq(base64UrlSecrets[1]))
+    }
+
+    @Test fun `the channel secret is url-safe and unpadded so it survives an Authorization header`() = runTest {
+        // Standard base64 of these bytes is "fn4/Pz4+c2VjcmV0IQ==" — the '+', '/' and padding must all be gone.
+        whenever(jweCrypto.generateSecureBytes(any())).thenReturn("~~??>>secret!".toByteArray())
+        val runner = newRunner()
+
+        runner.startScan("")
+
+        verify(channel).createChannel(any(), eq("fn4_Pz4-c2VjcmV0IQ"))
+    }
+
+    // ---- Bye on teardown ----
+
+    @Test fun `teardown says bye to a v2_1 peer`() = runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenLinkingCodeVersion(ExchangeProtocolVersion.V2_1)
+        val runner = newRunner()
+        runner.startScan("")
+
+        runner.cancel()
+
+        verify(channel).sendMessage(
+            argThat { this is Bye && reason == Bye.Reason.Cancelled },
+            any(),
+            any(),
+            any(),
+            anyOrNull(),
+        )
+    }
+
+    @Test fun `teardown after a v2_0 session sends no bye`() = runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenLinkingCodeVersion(ExchangeProtocolVersion.V2_0)
+        val runner = newRunner()
+        runner.startScan("")
+
+        runner.cancel()
+
+        verify(channel, never()).sendMessage(argThat { this is Bye }, any(), any(), any(), anyOrNull())
+    }
+
+    @Test fun `a completed Host session says bye with reason done`() = runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenHostCanProduceRecoveryCode()
+        val runner = newRunner()
+        runner.reachHostAwaitingStatus()
+
+        runner.deliverIncomingMessage(RecoveryCodeDone.create(RecoveryCodeDone.Reason.Success))
+
+        verify(channel).sendMessage(
+            argThat { this is Bye && reason == Bye.Reason.Done },
+            any(),
+            any(),
+            any(),
+            anyOrNull(),
+        )
+    }
+
+    @Test fun `a denied Joiner prompt says bye with reason cancelled`() = runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenLinkingCodeVersion(ExchangeProtocolVersion.V2_1)
+        whenever(syncStore.userId).thenReturn(null)
+        val runner = newRunner()
+        runner.startScan("")
+        runner.deliverIncomingMessage(RecoveryCodeAvailable.create(userId = "host-user", name = "Host", kind = "ddg"))
+
+        runner.localTrigger(LocalTrigger.UserDeniedJoiner)
+
+        verify(channel).sendMessage(
+            argThat { this is Bye && reason == Bye.Reason.Cancelled },
+            any(),
+            any(),
+            any(),
+            anyOrNull(),
+        )
+    }
+
+    @Test fun `a Host that cannot send the recovery code says bye with reason error`() = runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenHostCanProduceRecoveryCode()
+        whenever(
+            channel.sendMessage(any<RecoveryCodeResponse>(), any(), any(), any(), anyOrNull()),
+        ).thenReturn(Result.Error(reason = "relay unreachable"))
+
+        val runner = newRunner()
+        runner.startPresent()
+        runner.deliverHello(ExchangeProtocolVersion.V2_1)
+        runner.deliverIncomingMessage(RecoveryCodeRequest.create(name = "Joiner", kind = "ddg"))
+        runner.localTrigger(LocalTrigger.UserConfirmedHost)
+
+        verify(channel).sendMessage(
+            argThat { this is Bye && reason == Bye.Reason.Error },
+            any(),
+            any(),
+            any(),
+            anyOrNull(),
+        )
+    }
+
+    @Test fun `an undeliverable bye emits MessageNotSent but no session error`() = runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenLinkingCodeVersion(ExchangeProtocolVersion.V2_1)
+        whenever(channel.sendMessage(any<Bye>(), any(), any(), any(), anyOrNull()))
+            .thenReturn(Result.Error(code = 404, reason = "channel gone"))
+        val runner = newRunner()
+        runner.startScan("")
+
+        runner.cancel()
+
+        assertTrue(runner.events.replayCache.filterIsInstance<ExchangeV2Event.SessionError>().isEmpty())
+        val notSent = runner.events.replayCache.filterIsInstance<ExchangeV2Event.MessageNotSent>().single()
+        assertEquals(NotSentReason.HttpError(404), notSent.reason)
+        assertEquals(Bye.TYPE, notSent.messageType)
+        assertTrue(notSent.message is Bye)
+    }
+
+    @Test fun `a bye skipped on a v2_0 session emits MessageNotSent with TooHighProtocol`() = runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenLinkingCodeVersion(ExchangeProtocolVersion.V2_0)
+        val runner = newRunner()
+        runner.startScan("")
+
+        runner.cancel()
+
+        val notSent = runner.events.replayCache.filterIsInstance<ExchangeV2Event.MessageNotSent>().single()
+        assertEquals(NotSentReason.TooHighProtocol(ExchangeProtocolVersion.V2_0), notSent.reason)
+        assertEquals(Bye.TYPE, notSent.messageType)
+    }
+
+    @Test fun `a 2_1 message received on a v2_0 session is dropped with TooHighProtocolDropped`() = runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenLinkingCodeVersion(ExchangeProtocolVersion.V2_0)
+        val runner = newRunner()
+        runner.startScan("")
+
+        runner.deliverIncomingMessage(RecoveryCodeDone.create(RecoveryCodeDone.Reason.Success))
+
+        val rejected = runner.events.replayCache.filterIsInstance<ExchangeV2Event.MessageRejected>().single()
+        assertEquals(RejectReason.TooHighProtocolDropped, rejected.reason)
+        assertTrue(rejected.message is RecoveryCodeDone)
+        assertSame(ExchangeV2State.Negotiating, runner.currentState)
+    }
+
+    @Test fun `a bye received on a v2_0 session is dropped rather than ending the session`() = runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenLinkingCodeVersion(ExchangeProtocolVersion.V2_0)
+        val runner = newRunner()
+        runner.startScan("")
+
+        runner.deliverIncomingMessage(Bye.create(Bye.Reason.Cancelled))
+
+        val rejected = runner.events.replayCache.filterIsInstance<ExchangeV2Event.MessageRejected>().single()
+        assertEquals(RejectReason.TooHighProtocolDropped, rejected.reason)
+        assertSame(ExchangeV2State.Negotiating, runner.currentState)
+    }
+
+    @Test fun `a failed send emits MessageNotSent alongside the session error`() = runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenLinkingCodeVersion(ExchangeProtocolVersion.V2_1)
+        whenever(channel.sendMessage(any<Hello>(), any(), any(), any(), anyOrNull()))
+            .thenReturn(Result.Error(code = 500, reason = "relay unavailable"))
+        val runner = newRunner()
+
+        runner.startScan("")
+
+        val notSent = runner.events.replayCache.filterIsInstance<ExchangeV2Event.MessageNotSent>().single()
+        assertEquals(NotSentReason.HttpError(500), notSent.reason)
+        assertEquals(Hello.TYPE, notSent.messageType)
+        assertTrue(runner.events.replayCache.filterIsInstance<ExchangeV2Event.SessionError>().isNotEmpty())
+    }
+
+    @Test fun `a received bye still gets our own farewell on teardown, and it says done rather than error`() = runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenLinkingCodeVersion(ExchangeProtocolVersion.V2_1)
+        val runner = newRunner()
+        runner.startScan("")
+
+        runner.deliverIncomingMessage(Bye.create(Bye.Reason.Cancelled))
+
+        assertNull(runner.currentState)
+        verify(channel).sendMessage(
+            argThat { this is Bye && reason == Bye.Reason.Done },
+            any(),
+            any(),
+            any(),
+            anyOrNull(),
+        )
+    }
+
+    @Test fun `a failed hello send says bye with reason error`() = runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenLinkingCodeVersion(ExchangeProtocolVersion.V2_1)
+        whenever(channel.sendMessage(any<Hello>(), any(), any(), any(), anyOrNull()))
+            .thenReturn(Result.Error(reason = "relay unreachable"))
+        val runner = newRunner()
+
+        runner.startScan("")
+
+        assertNull(runner.currentState)
+        verify(channel).sendMessage(
+            argThat { this is Bye && reason == Bye.Reason.Error },
+            any(),
+            any(),
+            any(),
+            anyOrNull(),
+        )
+    }
+
+    // ---- Bye on receipt ----
+
+    @Test fun `a bye with reason done received in Host AwaitingStatus moves the session to Host Unknown, not a failure`() = runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenHostCanProduceRecoveryCode()
+        val runner = newRunner()
+        runner.reachHostAwaitingStatus()
+
+        runner.deliverIncomingMessage(Bye.create(Bye.Reason.Done))
+
+        assertSame(ExchangeV2State.Host.Unknown, runner.currentState)
+        assertTrue(runner.events.replayCache.filterIsInstance<ExchangeV2Event.SessionError>().isEmpty())
+        verify(channel, never()).sendMessage(argThat { this is Bye }, any(), any(), any(), anyOrNull())
+    }
+
+    @Test fun `a bye with reason cancelled received in Host AwaitingStatus ends the session with a done farewell`() = runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenHostCanProduceRecoveryCode()
+        val runner = newRunner()
+        runner.reachHostAwaitingStatus()
+
+        runner.deliverIncomingMessage(Bye.create(Bye.Reason.Cancelled))
+
+        assertNull(runner.currentState)
+        verify(channel).sendMessage(
+            argThat { this is Bye && reason == Bye.Reason.Done },
+            any(),
+            any(),
+            any(),
+            anyOrNull(),
+        )
+    }
+
+    @Test fun `a bye received while the Joiner is joining does not end the session`() = runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenLinkingCodeVersion(ExchangeProtocolVersion.V2_1)
+        whenever(syncStore.userId).thenReturn(null)
+        val runner = newRunner()
+        runner.reachJoinerJoining()
+
+        runner.deliverIncomingMessage(Bye.create(Bye.Reason.Done))
+
+        assertSame(ExchangeV2State.Joiner.Joining, runner.currentState)
+    }
+
+    @Test fun `a Joiner that got a bye mid-join still reports recovery_code_done before its own farewell`() = runTest {
+        givenOurVersion(ExchangeProtocolVersion.V2_1)
+        givenLinkingCodeVersion(ExchangeProtocolVersion.V2_1)
+        whenever(syncStore.userId).thenReturn(null)
+        val runner = newRunner()
+        runner.reachJoinerJoining()
+        runner.deliverIncomingMessage(Bye.create(Bye.Reason.Done))
+
+        runner.localTrigger(LocalTrigger.JoinerJoinComplete(RecoveryCodeDone.Reason.Success))
+
+        assertNull(runner.currentState)
+        verify(channel).sendMessage(
+            argThat { this is RecoveryCodeDone && reason == RecoveryCodeDone.Reason.Success },
+            any(),
+            any(),
+            any(),
+            anyOrNull(),
+        )
+        verify(channel).sendMessage(
+            argThat { this is Bye && reason == Bye.Reason.Done },
+            any(),
+            any(),
+            any(),
+            anyOrNull(),
+        )
+    }
+
+    // ---- SessionEnded + RoleElected events ----
+
+    @Test fun `cancel emits SessionEnded with bye reason Cancelled`() = runTest {
+        val runner = newRunner()
+        runner.startScan("")
+
+        runner.cancel()
+
+        val ended = runner.events.replayCache.filterIsInstance<ExchangeV2Event.SessionEnded>().single()
+        assertSame(ExchangeV2State.Negotiating, ended.lastState)
+        assertEquals(Bye.Reason.Cancelled, ended.byeReason)
+    }
+
+    @Test fun `a terminal state emits SessionEnded`() = runTest {
+        whenever(syncStore.userId).thenReturn(null)
+        val runner = newRunner()
+        runner.startScan("")
+        runner.deliverIncomingMessage(RecoveryCodeAvailable.create(userId = "other", name = "Peer", kind = "3party"))
+        runner.localTrigger(LocalTrigger.UserConfirmedJoiner)
+        runner.deliverIncomingMessage(RecoveryCodeResponse.fromJson("{}"))
+
+        runner.localTrigger(LocalTrigger.JoinerJoinComplete(RecoveryCodeDone.Reason.Success))
+
+        assertNull(runner.currentState)
+        val ended = runner.events.replayCache.filterIsInstance<ExchangeV2Event.SessionEnded>().single()
+        assertSame(ExchangeV2State.Joiner.Done, ended.lastState)
+    }
+
+    @Test fun `starting a new session emits SessionEnded for the abandoned one`() = runTest {
+        val runner = newRunner()
+        runner.startScan("")
+
+        runner.startScan("")
+
+        val ended = runner.events.replayCache.filterIsInstance<ExchangeV2Event.SessionEnded>().single()
+        assertEquals(Bye.Reason.Cancelled, ended.byeReason)
+    }
+
+    @Test fun `tearing down nothing emits no SessionEnded`() = runTest {
+        val runner = newRunner()
+
+        runner.cancel()
+
+        assertTrue(runner.events.replayCache.filterIsInstance<ExchangeV2Event.SessionEnded>().isEmpty())
+    }
+
+    @Test fun `auto-election emits RoleElected carrying the inputs that drove it, before the transition`() = runTest {
+        whenever(syncStore.userId).thenReturn(null)
+        val runner = newRunner()
+        runner.startScan("")
+
+        runner.deliverIncomingMessage(RecoveryCodeAvailable.create(userId = "peer-user", name = "Peer", kind = "3party"))
+
+        val events = runner.events.replayCache
+        val elected = events.filterIsInstance<ExchangeV2Event.RoleElected>().single()
+        assertSame(Role.Joiner, elected.role)
+        assertSame(PairingRole.Scanner, elected.ownPairingRole)
+        assertFalse(elected.ownSignedIn)
+        assertEquals("ddg", elected.ownKind)
+        assertEquals("3party", elected.peerKind)
+        assertTrue(elected.peerSignedIn)
+        val electedIndex = events.indexOfFirst { it is ExchangeV2Event.RoleElected }
+        val transitionIndex = events.indexOfFirst { it is ExchangeV2Event.Transition && it.to == ExchangeV2State.Joiner.Confirming }
+        assertTrue("RoleElected must precede the transition it explains", electedIndex in 0 until transitionIndex)
+    }
+
+    @Test fun `a poll decrypt failure emits a MessageDecryptionFailed SessionError and SessionEnded`() = runTest {
+        whenever(syncStore.userId).thenReturn("my-user")
+        whenever(channel.poll(any(), any(), anyOrNull())).thenReturn(
+            flow<ExchangeV2Message> { throw EnvelopeDecryptFailure(seq = 3, cause = RuntimeException("bad key")) },
+        )
+        val runner = newRunner()
+
+        runner.startPresent()
+
+        val error = runner.events.replayCache.filterIsInstance<ExchangeV2Event.SessionError>().single()
+        assertEquals(SessionErrorKind.MessageDecryptionFailed, error.kind)
+        val ended = runner.events.replayCache.filterIsInstance<ExchangeV2Event.SessionEnded>().single()
+        assertEquals(Bye.Reason.Error, ended.byeReason)
+    }
+
+    @Test fun `a poll envelope requiring a newer protocol emits a PeerProtocolTooNew SessionError`() = runTest {
+        whenever(syncStore.userId).thenReturn("my-user")
+        whenever(channel.poll(any(), any(), anyOrNull())).thenReturn(
+            flow<ExchangeV2Message> { throw EnvelopeVersionTooNew(ExchangeProtocolVersion.V2_1) },
+        )
+        val runner = newRunner()
+
+        runner.startPresent()
+
+        val error = runner.events.replayCache.filterIsInstance<ExchangeV2Event.SessionError>().single()
+        assertEquals(SessionErrorKind.PeerProtocolTooNew, error.kind)
+    }
+
+    // ---- Helpers ----
+
+    private fun givenOurVersion(version: ExchangeProtocolVersion.V2) {
+        whenever(advertisedVersion.resolve()).thenReturn(version)
+    }
+
+    private fun givenLinkingCodeVersion(version: ExchangeProtocolVersion.V2) {
+        whenever(qrCode.parse(any())).thenReturn(
+            ExchangeV2CodeParseResult.LinkingV2(channelId = "peer-channel", publicKey = "peer-pubkey", version = version),
+        )
+    }
+
+    private fun givenHostCanProduceRecoveryCode() {
+        whenever(recoveryCodeProvider.createDdgAccountIfNeeded()).thenReturn(Result.Success(Unit))
+        whenever(recoveryCodeProvider.getDdgRecoveryCode()).thenReturn(Result.Success("the-code"))
+        whenever(syncStore.userId).thenReturn("my-user")
+    }
+
+    private suspend fun RealExchangeV2Runner.deliverHello(version: ExchangeProtocolVersion) {
+        deliverIncomingMessage(Hello.create(channelId = "peer-channel", publicKey = "peer-pubkey", version = version))
+    }
+
+    private suspend fun RealExchangeV2Runner.reachHostAwaitingStatus() {
+        startPresent()
+        deliverHello(ExchangeProtocolVersion.V2_1)
+        deliverIncomingMessage(RecoveryCodeRequest.create(name = "Joiner", kind = "ddg"))
+        localTrigger(LocalTrigger.UserConfirmedHost)
+    }
+
+    // Caller must stub a null [SyncStore.userId] first so role election picks Joiner.
+    private suspend fun RealExchangeV2Runner.reachJoinerJoining() {
+        startScan("")
+        deliverIncomingMessage(RecoveryCodeAvailable.create(userId = "host-user", name = "Host", kind = "ddg"))
+        localTrigger(LocalTrigger.UserConfirmedJoiner)
+        deliverIncomingMessage(RecoveryCodeResponse.create("the-code"))
+    }
+
+    private fun String.toProtocolVersion() = ExchangeProtocolVersion.parse(this).getOrThrow()
+
+    private fun String.toV2ProtocolVersion() = toProtocolVersion() as ExchangeProtocolVersion.V2
+
+    private fun String.toBase64Url(): String = Base64.getUrlEncoder().withoutPadding().encodeToString(toByteArray())
+
+    enum class ExchangeAuthCase(
+        val advertisedVersion: ExchangeProtocolVersion.V2,
+        val canSendExchangeChannelSecret: Boolean,
+        val isAuthenticated: Boolean,
+    ) {
+        V20WithoutSecretFlag(
+            advertisedVersion = ExchangeProtocolVersion.V2_0,
+            canSendExchangeChannelSecret = false,
+            isAuthenticated = false,
+        ),
+        V20WithSecretFlag(
+            advertisedVersion = ExchangeProtocolVersion.V2_0,
+            canSendExchangeChannelSecret = true,
+            isAuthenticated = true,
+        ),
+        V21WithoutSecretFlag(
+            advertisedVersion = ExchangeProtocolVersion.V2_1,
+            canSendExchangeChannelSecret = false,
+            isAuthenticated = true,
+        ),
+        V21WithSecretFlag(
+            advertisedVersion = ExchangeProtocolVersion.V2_1,
+            canSendExchangeChannelSecret = true,
+            isAuthenticated = true,
+        ),
+    }
+
+    private fun configure(case: ExchangeAuthCase) {
+        givenOurVersion(case.advertisedVersion)
+        syncFeature.canSendExchangeChannelSecret().setRawStoredState(State(case.canSendExchangeChannelSecret))
     }
 }

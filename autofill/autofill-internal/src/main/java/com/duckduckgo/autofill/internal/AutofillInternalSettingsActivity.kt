@@ -31,7 +31,9 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.autofill.api.AutofillFeature
+import com.duckduckgo.autofill.api.AutofillImportLaunchSource.Unknown
 import com.duckduckgo.autofill.api.AutofillScreenLaunchSource.InternalDevSettings
+import com.duckduckgo.autofill.api.AutofillScreens.AutofillImportPasswordsScreen
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillPasswordsManagementScreen
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
@@ -46,7 +48,6 @@ import com.duckduckgo.autofill.impl.importing.CsvCredentialConverter.CsvCredenti
 import com.duckduckgo.autofill.impl.importing.InternalInBrowserPromoStore
 import com.duckduckgo.autofill.impl.importing.capability.ImportGooglePasswordsCapabilityChecker
 import com.duckduckgo.autofill.impl.importing.gpm.feature.AutofillImportPasswordConfigStore
-import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePassword.AutofillImportViaGooglePasswordManagerScreen
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordResult
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordResult.Companion.RESULT_KEY_DETAILS
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordResult.Error
@@ -309,7 +310,10 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
             lifecycleScope.launch {
                 if (importGooglePasswordsCapabilityChecker.webViewCapableOfImporting()) {
                     val intent =
-                        globalActivityStarter.startIntent(this@AutofillInternalSettingsActivity, AutofillImportViaGooglePasswordManagerScreen)
+                        globalActivityStarter.startIntent(
+                            this@AutofillInternalSettingsActivity,
+                            AutofillImportPasswordsScreen(Unknown),
+                        )
                     importGooglePasswordsFlowLauncher.launch(intent)
                 } else {
                     Toast.makeText(this@AutofillInternalSettingsActivity, "WebView version not supported", Toast.LENGTH_SHORT).show()

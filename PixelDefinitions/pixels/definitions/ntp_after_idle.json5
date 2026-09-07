@@ -455,7 +455,7 @@
                 "description": "What triggered this foreground transition",
                 "enum": ["standard", "url", "shortcut", "widget", "other"]
             },
-            "petal_randomize"
+            "petal"
         ]
     }
 }

@@ -30,7 +30,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/onboarding_input_type_background" />
+        app:srcCompat="@drawable/onboarding_background_shoreline" />
 
     <ImageView
         android:id="@+id/duckAiLogo"

@@ -111,4 +111,19 @@ sealed class ComparisonChartConfig(
             Row(CommonR.drawable.ads_blocked_color_24, R.string.preOnboardingComparisonChartAdAndCookiePopupBlocker),
         ),
     )
+
+    data object SegmentedBlockAdsPath : ComparisonChartConfig(
+        titleRes = R.string.blockAdsPathComparisonChartTitle,
+        primaryCtaTextRes = R.string.preOnboardingDaxDialog2Button,
+        headerLeftIconRes = CommonR.drawable.ic_chrome,
+        headerLeftIconSizeDp = 32f, // the target size is 31.5dp but the icon already has some padding
+        headerLeftLabelRes = null,
+        rows = listOf(
+            Row(CommonR.drawable.ads_blocked_color_24, R.string.preOnboardingComparisonChartAdAndCookiePopupBlocker),
+            Row(CommonR.drawable.ic_video_player_color_24, R.string.preOnboardingComparisonChartYoutubeAdBlocker),
+            Row(CommonR.drawable.search_find_color_24, R.string.preOnboardingComparisonChartItem1),
+            Row(CommonR.drawable.ai_chat_color_24, R.string.preOnboardingComparisonChartDuckAi),
+            Row(CommonR.drawable.shield_color_24, R.string.preOnboardingComparisonChartItem2),
+        ),
+    )
 }

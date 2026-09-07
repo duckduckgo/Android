@@ -63,7 +63,7 @@ class OnboardingBackgroundAnimatorTest {
 
     @Test
     fun whenSnapToCalledThenEnteringViewIsVisibleWithFullAlpha() {
-        animator.snapTo(OnboardingBackgroundStep.Welcome)
+        animator.snapTo(OnboardingBackground.Pond)
 
         // Secondary becomes the entering view (active was primary initially)
         assertTrue(secondary.isVisible)
@@ -73,7 +73,7 @@ class OnboardingBackgroundAnimatorTest {
 
     @Test
     fun whenSnapToCalledThenExitingViewIsHidden() {
-        animator.snapTo(OnboardingBackgroundStep.Welcome)
+        animator.snapTo(OnboardingBackground.Pond)
 
         // Primary was active, so it becomes the exiting view
         assertEquals(0f, primary.alpha)
@@ -82,10 +82,10 @@ class OnboardingBackgroundAnimatorTest {
 
     @Test
     fun whenSnapToCalledThenMaxHeightIsSetOnEnteringView() {
-        animator.snapTo(OnboardingBackgroundStep.Welcome)
+        animator.snapTo(OnboardingBackground.Pond)
 
         val params = secondary.layoutParams as ConstraintLayout.LayoutParams
-        val expectedHeight = (OnboardingBackgroundStep.Welcome.maxHeightDp * context.resources.displayMetrics.density).toInt()
+        val expectedHeight = (OnboardingBackground.Pond.maxHeightDp * context.resources.displayMetrics.density).toInt()
         assertEquals(expectedHeight, params.matchConstraintMaxHeight)
     }
 
@@ -97,13 +97,13 @@ class OnboardingBackgroundAnimatorTest {
 
     @Test
     fun whenSnapToCalledTwiceThenViewsPingPong() {
-        animator.snapTo(OnboardingBackgroundStep.Welcome)
+        animator.snapTo(OnboardingBackground.Pond)
 
         // After first snap: secondary is active
         assertTrue(secondary.isVisible)
         assertFalse(primary.isVisible)
 
-        animator.snapTo(OnboardingBackgroundStep.Welcome)
+        animator.snapTo(OnboardingBackground.Pond)
 
         // After second snap: primary is active again
         assertTrue(primary.isVisible)

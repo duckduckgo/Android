@@ -17,9 +17,20 @@
 package com.duckduckgo.sync.impl.exchange.v2
 
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.Bye
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.Hello
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeAvailable
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeAwaitingConfirmation
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeConfirmed
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeDenied
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeDone
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeRequest
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeResponse
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeUnavailable
 import com.squareup.anvil.annotations.ContributesBinding
 import org.json.JSONObject
 import javax.inject.Inject
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.Unknown as UnknownMessage
 
 interface ExchangeV2MessageParser {
     fun parse(rawJson: String): ExchangeV2Message
@@ -29,52 +40,22 @@ interface ExchangeV2MessageParser {
 class JsonExchangeV2MessageParser @Inject constructor() : ExchangeV2MessageParser {
 
     override fun parse(rawJson: String): ExchangeV2Message {
-        val json = runCatching { JSONObject(rawJson) }.getOrNull()
-            ?: return ExchangeV2Message.Unknown(rawJson = rawJson, messageType = "")
-        return when (val type = json.optString(FIELD_TYPE, "")) {
-            ExchangeV2Message.Hello.TYPE -> ExchangeV2Message.Hello(
-                rawJson = rawJson,
-                channelId = json.optString(FIELD_CHANNEL_ID, ""),
-                publicKey = json.optString(FIELD_PUBLIC_KEY, ""),
-                version = json.optString(FIELD_VERSION, DEFAULT_VERSION),
-            )
-            // NOTE: a recovery_code_available semantically must carry a user_id (the sender has
-            // an account), but we currently accept a missing/blank one as userId="" rather than
-            // rejecting it — downstream this affects same-account detection and role election.
-            // Hardening (reject or drop as malformed) is tracked separately in Asana
-            // 1215414930715623; left lenient here for forward-compat.
-            ExchangeV2Message.RecoveryCodeAvailable.TYPE -> ExchangeV2Message.RecoveryCodeAvailable(
-                rawJson = rawJson,
-                userId = json.optString(FIELD_USER_ID, ""),
-                name = json.optString(FIELD_NAME, ""),
-                kind = json.optString(FIELD_KIND, ""),
-            )
-            ExchangeV2Message.RecoveryCodeRequest.TYPE -> ExchangeV2Message.RecoveryCodeRequest(
-                rawJson = rawJson,
-                name = json.optString(FIELD_NAME, ""),
-                kind = json.optString(FIELD_KIND, ""),
-            )
-            ExchangeV2Message.RecoveryCodeAwaitingConfirmation.TYPE -> ExchangeV2Message.RecoveryCodeAwaitingConfirmation(rawJson)
-            ExchangeV2Message.RecoveryCodeConfirmed.TYPE -> ExchangeV2Message.RecoveryCodeConfirmed(rawJson)
-            ExchangeV2Message.RecoveryCodeDenied.TYPE -> ExchangeV2Message.RecoveryCodeDenied(rawJson)
-            ExchangeV2Message.RecoveryCodeUnavailable.TYPE -> ExchangeV2Message.RecoveryCodeUnavailable(rawJson)
-            ExchangeV2Message.RecoveryCodeResponse.TYPE -> ExchangeV2Message.RecoveryCodeResponse(
-                rawJson = rawJson,
-                recoveryCode = json.optString(FIELD_RECOVERY_CODE, ""),
-            )
-            else -> ExchangeV2Message.Unknown(rawJson = rawJson, messageType = type)
-        }
-    }
-
-    companion object {
-        private const val FIELD_TYPE = "type"
-        private const val FIELD_USER_ID = "user_id"
-        private const val FIELD_NAME = "name"
-        private const val FIELD_KIND = "kind"
-        private const val FIELD_CHANNEL_ID = "channel_id"
-        private const val FIELD_PUBLIC_KEY = "public_key"
-        private const val FIELD_VERSION = "version"
-        private const val FIELD_RECOVERY_CODE = "recovery_code"
-        private const val DEFAULT_VERSION = "2"
+        val type = runCatching { JSONObject(rawJson).optString(ExchangeV2Message.FIELD_TYPE, "") }
+            .getOrElse { return UnknownMessage.fromJson(rawJson, messageType = "") }
+        return runCatching {
+            when (type) {
+                Hello.TYPE -> Hello.fromJson(rawJson)
+                RecoveryCodeAvailable.TYPE -> RecoveryCodeAvailable.fromJson(rawJson)
+                RecoveryCodeRequest.TYPE -> RecoveryCodeRequest.fromJson(rawJson)
+                RecoveryCodeAwaitingConfirmation.TYPE -> RecoveryCodeAwaitingConfirmation.fromJson(rawJson)
+                RecoveryCodeConfirmed.TYPE -> RecoveryCodeConfirmed.fromJson(rawJson)
+                RecoveryCodeDenied.TYPE -> RecoveryCodeDenied.fromJson(rawJson)
+                RecoveryCodeUnavailable.TYPE -> RecoveryCodeUnavailable.fromJson(rawJson)
+                RecoveryCodeResponse.TYPE -> RecoveryCodeResponse.fromJson(rawJson)
+                RecoveryCodeDone.TYPE -> RecoveryCodeDone.fromJson(rawJson)
+                Bye.TYPE -> Bye.fromJson(rawJson)
+                else -> UnknownMessage.fromJson(rawJson, messageType = type)
+            }
+        }.getOrElse { UnknownMessage.fromJson(rawJson, messageType = type) }
     }
 }

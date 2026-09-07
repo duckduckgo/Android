@@ -20,6 +20,7 @@ import com.duckduckgo.app.onboarding.OnboardingPasswordImportExperimentManager.O
 import com.duckduckgo.app.onboarding.OnboardingPasswordImportToggles.OnboardingPasswordImportCohorts
 import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.autofill.api.ImportPasswordsFromGoogle
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -42,6 +43,7 @@ interface OnboardingPasswordImportExperimentManager {
 class OnboardingPasswordImportExperimentManagerImpl @Inject constructor(
     private val toggles: OnboardingPasswordImportToggles,
     private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
+    private val importPasswordsFromGoogle: ImportPasswordsFromGoogle,
     private val appBuildConfig: AppBuildConfig,
     private val dispatcherProvider: DispatcherProvider,
     private val onboardingPrivacyConfigPersistedGate: OnboardingPrivacyConfigPersistedGate,
@@ -63,10 +65,11 @@ class OnboardingPasswordImportExperimentManagerImpl @Inject constructor(
 
     /**
      * Checked before enrolling, so users who could never reach the step are kept out of the experiment: it exists
-     * only in the config-driven onboarding, and only for new installs.
+     * only in the config-driven onboarding, only for new installs, and only where the import flow is supported.
      */
     private suspend fun checkPrerequisites() =
         toggles.self().isEnabled() &&
             onboardingBrandDesignUpdateToggles.configDrivenDialogs().isEnabled() &&
-            !appBuildConfig.isAppReinstall()
+            !appBuildConfig.isAppReinstall() &&
+            importPasswordsFromGoogle.isSupported()
 }

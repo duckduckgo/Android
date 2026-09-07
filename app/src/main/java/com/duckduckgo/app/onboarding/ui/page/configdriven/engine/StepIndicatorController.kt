@@ -60,7 +60,7 @@ class StepIndicatorControllerImpl(private val indicator: OnboardingStepIndicator
                 indicator.alpha = 1f
                 indicator.isVisible = false
             }
-            !animate || previous == null -> {
+            !animate || previous == null || previous == next -> {
                 indicator.alpha = 1f
                 indicator.isVisible = true
                 indicator.setSteps(totalSteps = next.total, currentStep = next.current)

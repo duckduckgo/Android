@@ -514,6 +514,13 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                 setCurrentDialog(INITIAL_REINSTALL_USER)
             }
             NewUserOnboardingActivityDialog.Initial -> setCurrentDialog(INITIAL)
+            NewUserOnboardingActivityDialog.DownloadReason,
+            NewUserOnboardingActivityDialog.ImportPasswords,
+            is NewUserOnboardingActivityDialog.ImportComplete,
+            NewUserOnboardingActivityDialog.ImportPasswordsLaunch,
+            -> {
+                // no-op in this VM
+            }
             NewUserOnboardingActivityDialog.ComparisonChart ->
                 setCurrentDialog(COMPARISON_CHART, stepIndicator = progress)
             NewUserOnboardingActivityDialog.AiComparisonChart ->
@@ -531,7 +538,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                 _viewState.update { it.copy(showSplitOption = dialog.showSplitOption) }
                 setCurrentDialog(ADDRESS_BAR_POSITION, stepIndicator = progress)
             }
-            NewUserOnboardingActivityDialog.InputScreen ->
+            is NewUserOnboardingActivityDialog.InputScreen ->
                 setCurrentDialog(INPUT_SCREEN, stepIndicator = progress)
             is NewUserOnboardingActivityDialog.InputScreenPreview ->
                 setInputScreenPreviewDialog(isSearchDefault = dialog.isSearchDefault, stepIndicator = progress)

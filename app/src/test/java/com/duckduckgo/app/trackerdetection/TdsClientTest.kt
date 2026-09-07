@@ -28,14 +28,12 @@ import com.duckduckgo.app.trackerdetection.model.Rule
 import com.duckduckgo.app.trackerdetection.model.RuleExceptions
 import com.duckduckgo.app.trackerdetection.model.TdsTracker
 import org.junit.Assert.assertEquals
-import org.junit.Assert.fail
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyMap
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import java.util.regex.PatternSyntaxException
 
 @RunWith(AndroidJUnit4::class)
 class TdsClientTest {
@@ -364,24 +362,14 @@ class TdsClientTest {
         }
 
         for (useUri in listOf(false, true)) {
-            for (useV3 in listOf(true, false)) {
-                for (precompile in listOf(false, true)) {
-                    val tdsTracker = TdsTracker(trackerDomain, action, OWNER, CATEGORY, rule?.let { listOf(it) } ?: emptyList())
-                    val testee = TdsClient(
-                        TDS,
-                        listOf(tdsTracker),
-                        mockUrlToTypeMapper,
-                        optimizeTrackerEvaluationV3 = useV3,
-                        precompileRegex = precompile,
-                    )
-                    val result = if (useUri) {
-                        testee.matches(url.toUri(), DOCUMENT_URL, mapOf())
-                    } else {
-                        testee.matches(url, DOCUMENT_URL, mapOf())
-                    }
-                    assertEquals(expected, result.matches)
-                }
+            val tdsTracker = TdsTracker(trackerDomain, action, OWNER, CATEGORY, rule?.let { listOf(it) } ?: emptyList())
+            val testee = TdsClient(TDS, listOf(tdsTracker), mockUrlToTypeMapper)
+            val result = if (useUri) {
+                testee.matches(url.toUri(), DOCUMENT_URL, mapOf())
+            } else {
+                testee.matches(url, DOCUMENT_URL, mapOf())
             }
+            assertEquals(expected, result.matches)
         }
     }
 
@@ -389,33 +377,26 @@ class TdsClientTest {
     fun whenUrlMatchesRuleWithSurrogateThenSurrogateScriptIdReturned() {
         val rule = Rule("api\\.tracker\\.com\\/auth", BLOCK, null, "script.js", null)
 
-        for (precompile in listOf(false, true)) {
-            val testee = TdsClient(
-                TDS,
-                listOf(TdsTracker(Domain("tracker.com"), BLOCK, OWNER, CATEGORY, listOf(rule))),
-                mockUrlToTypeMapper,
-                optimizeTrackerEvaluationV3 = false,
-                precompileRegex = precompile,
-            )
+        val testee = TdsClient(
+            TDS,
+            listOf(TdsTracker(Domain("tracker.com"), BLOCK, OWNER, CATEGORY, listOf(rule))),
+            mockUrlToTypeMapper,
+        )
 
-            assertEquals("script.js", testee.matches("http://api.tracker.com/auth/script.js", DOCUMENT_URL, mapOf()).surrogate)
-            assertEquals("script.js", testee.matches("http://api.tracker.com/auth/script.js".toUri(), DOCUMENT_URL, mapOf()).surrogate)
-        }
+        assertEquals("script.js", testee.matches("http://api.tracker.com/auth/script.js", DOCUMENT_URL, mapOf()).surrogate)
+        assertEquals("script.js", testee.matches("http://api.tracker.com/auth/script.js".toUri(), DOCUMENT_URL, mapOf()).surrogate)
     }
 
     @Test
-    fun whenPrecompileEnabledAndRuleHasInvalidRegexThenConstructionSucceedsAndRuleIsSkipped() {
-        // Unbalanced "(" — fails to compile. With precompile=true, construction must not crash
-        // and the rule must be treated as non-matching, falling through to the tracker's defaultAction.
-        // Precompile is gated on V3, so V3 must be enabled for the precompile path to run.
+    fun whenRuleHasInvalidRegexThenConstructionSucceedsAndRuleIsSkipped() {
+        // Unbalanced "(" — fails to compile. Construction must not crash and the rule must be
+        // treated as non-matching, falling through to the tracker's defaultAction.
         val invalidRule = Rule("api\\.tracker\\.com\\/auth(", BLOCK, null, null, null)
 
         val testee = TdsClient(
             TDS,
             listOf(TdsTracker(trackerDomain, IGNORE, OWNER, CATEGORY, listOf(invalidRule))),
             mockUrlToTypeMapper,
-            optimizeTrackerEvaluationV3 = true,
-            precompileRegex = true,
         )
 
         assertEquals(false, testee.matches(url, DOCUMENT_URL, mapOf()).matches)
@@ -423,58 +404,28 @@ class TdsClientTest {
     }
 
     @Test
-    fun whenV3DisabledAndPrecompileRequestedAndRuleHasInvalidRegexThenGateDisablesPrecompileAndLegacyPathThrows() {
-        // Sanity test for the V3 gate on precompile: with V3 off, precompile must NOT take effect.
-        // The precompile path skips invalid rules at construction; the legacy per-call path does not.
-        // So an invalid regex with V3=false + precompile=true must surface as a per-call exception,
-        // proving the gate prevented precompile from running.
-        val invalidRule = Rule("api\\.tracker\\.com\\/auth(", BLOCK, null, null, null)
-
-        val testee = TdsClient(
-            TDS,
-            listOf(TdsTracker(trackerDomain, IGNORE, OWNER, CATEGORY, listOf(invalidRule))),
-            mockUrlToTypeMapper,
-            optimizeTrackerEvaluationV3 = false,
-            precompileRegex = true,
-        )
-
-        try {
-            testee.matches(url, DOCUMENT_URL, mapOf())
-            fail("Expected legacy per-call regex compilation to throw — gate did not disable precompile")
-        } catch (_: PatternSyntaxException) {
-            // expected — legacy path compiles the invalid regex per-call and throws
-        }
-        try {
-            testee.matches(url.toUri(), DOCUMENT_URL, mapOf())
-            fail("Expected legacy per-call regex compilation to throw — gate did not disable precompile")
-        } catch (_: PatternSyntaxException) {
-            // expected — legacy path compiles the invalid regex per-call and throws
-        }
-    }
-
-    @Test
-    fun whenV3EnabledAndUrlHasExactHostMatchThenTrackerIsFound() {
+    fun whenUrlHasExactHostMatchThenTrackerIsFound() {
         val tracker = TdsTracker(Domain("tracker.com"), BLOCK, OWNER, CATEGORY, emptyList())
-        val testee = TdsClient(TDS, listOf(tracker), mockUrlToTypeMapper, optimizeTrackerEvaluationV3 = true)
+        val testee = TdsClient(TDS, listOf(tracker), mockUrlToTypeMapper)
 
         assertEquals(true, testee.matches("http://tracker.com/script.js", DOCUMENT_URL, mapOf()).matches)
         assertEquals(true, testee.matches("http://tracker.com/script.js".toUri(), DOCUMENT_URL, mapOf()).matches)
     }
 
     @Test
-    fun whenV3EnabledAndUrlIsSubdomainOfTrackerThenTrackerIsFound() {
+    fun whenUrlIsSubdomainOfTrackerThenTrackerIsFound() {
         val tracker = TdsTracker(Domain("tracker.com"), BLOCK, OWNER, CATEGORY, emptyList())
-        val testee = TdsClient(TDS, listOf(tracker), mockUrlToTypeMapper, optimizeTrackerEvaluationV3 = true)
+        val testee = TdsClient(TDS, listOf(tracker), mockUrlToTypeMapper)
 
         assertEquals(true, testee.matches("http://a.b.tracker.com/script.js", DOCUMENT_URL, mapOf()).matches)
         assertEquals(true, testee.matches("http://a.b.tracker.com/script.js".toUri(), DOCUMENT_URL, mapOf()).matches)
     }
 
     @Test
-    fun whenV3EnabledAndOverlappingDomainsExistThenLongestSuffixWins() {
+    fun whenOverlappingDomainsExistThenLongestSuffixWins() {
         val parent = TdsTracker(Domain("tracker.com"), IGNORE, OWNER, CATEGORY, emptyList())
         val child = TdsTracker(Domain("sub.tracker.com"), BLOCK, "ChildOwner", CATEGORY, emptyList())
-        val testee = TdsClient(TDS, listOf(parent, child), mockUrlToTypeMapper, optimizeTrackerEvaluationV3 = true)
+        val testee = TdsClient(TDS, listOf(parent, child), mockUrlToTypeMapper)
 
         // api.sub.tracker.com matches both entries; longest-suffix-wins selects sub.tracker.com (BLOCK).
         val result = testee.matches("http://api.sub.tracker.com/script.js", DOCUMENT_URL, mapOf())
@@ -483,9 +434,9 @@ class TdsClientTest {
     }
 
     @Test
-    fun whenV3EnabledAndUrlHostHasNoMatchThenResultIsNoMatch() {
+    fun whenUrlHostHasNoMatchThenResultIsNoMatch() {
         val tracker = TdsTracker(Domain("tracker.com"), BLOCK, OWNER, CATEGORY, emptyList())
-        val testee = TdsClient(TDS, listOf(tracker), mockUrlToTypeMapper, optimizeTrackerEvaluationV3 = true)
+        val testee = TdsClient(TDS, listOf(tracker), mockUrlToTypeMapper)
 
         val result = testee.matches("http://nontracker.com/script.js", DOCUMENT_URL, mapOf())
         assertEquals(false, result.matches)
@@ -493,9 +444,9 @@ class TdsClientTest {
     }
 
     @Test
-    fun whenV3EnabledAndUrlHasNoHostThenResultIsNoMatch() {
+    fun whenUrlHasNoHostThenResultIsNoMatch() {
         val tracker = TdsTracker(Domain("tracker.com"), BLOCK, OWNER, CATEGORY, emptyList())
-        val testee = TdsClient(TDS, listOf(tracker), mockUrlToTypeMapper, optimizeTrackerEvaluationV3 = true)
+        val testee = TdsClient(TDS, listOf(tracker), mockUrlToTypeMapper)
 
         val result = testee.matches("not-a-url", DOCUMENT_URL, mapOf())
         assertEquals(false, result.matches)
@@ -503,9 +454,9 @@ class TdsClientTest {
     }
 
     @Test
-    fun whenV3EnabledAndUrlIsSingleLabelHostThenResultIsNoMatch() {
+    fun whenUrlIsSingleLabelHostThenResultIsNoMatch() {
         val tracker = TdsTracker(Domain("tracker.com"), BLOCK, OWNER, CATEGORY, emptyList())
-        val testee = TdsClient(TDS, listOf(tracker), mockUrlToTypeMapper, optimizeTrackerEvaluationV3 = true)
+        val testee = TdsClient(TDS, listOf(tracker), mockUrlToTypeMapper)
 
         val result = testee.matches("http://localhost/script.js", DOCUMENT_URL, mapOf())
         assertEquals(false, result.matches)
@@ -513,11 +464,11 @@ class TdsClientTest {
     }
 
     @Test
-    fun whenV3EnabledAndHostHasNonLabelAlignedSuffixThenNoMatch() {
+    fun whenHostHasNonLabelAlignedSuffixThenNoMatch() {
         // tracker domain is "com.example" — request to "evilcom.example" must NOT match
         // because label-walk only follows whole labels, not suffix substrings.
         val tracker = TdsTracker(Domain("com.example"), BLOCK, OWNER, CATEGORY, emptyList())
-        val testee = TdsClient(TDS, listOf(tracker), mockUrlToTypeMapper, optimizeTrackerEvaluationV3 = true)
+        val testee = TdsClient(TDS, listOf(tracker), mockUrlToTypeMapper)
 
         val result = testee.matches("http://evilcom.example/script.js", DOCUMENT_URL, mapOf())
         assertEquals(false, result.matches)
@@ -525,17 +476,17 @@ class TdsClientTest {
     }
 
     @Test
-    fun whenV3EnabledAndUrlIsSubdomainOfTrackerWithMultiLabelSuffixThenTrackerIsFound() {
+    fun whenUrlIsSubdomainOfTrackerWithMultiLabelSuffixThenTrackerIsFound() {
         val tracker = TdsTracker(Domain("tracker.co.uk"), BLOCK, OWNER, CATEGORY, emptyList())
-        val testee = TdsClient(TDS, listOf(tracker), mockUrlToTypeMapper, optimizeTrackerEvaluationV3 = true)
+        val testee = TdsClient(TDS, listOf(tracker), mockUrlToTypeMapper)
 
         assertEquals(true, testee.matches("http://static.tracker.co.uk/script.js", DOCUMENT_URL, mapOf()).matches)
     }
 
     @Test
-    fun whenV3EnabledAndHostIsExactlyETldPlusOneThenTrackerIsFound() {
+    fun whenHostIsExactlyETldPlusOneThenTrackerIsFound() {
         val tracker = TdsTracker(Domain("tracker.co.uk"), BLOCK, OWNER, CATEGORY, emptyList())
-        val testee = TdsClient(TDS, listOf(tracker), mockUrlToTypeMapper, optimizeTrackerEvaluationV3 = true)
+        val testee = TdsClient(TDS, listOf(tracker), mockUrlToTypeMapper)
 
         assertEquals(true, testee.matches("http://tracker.co.uk/script.js", DOCUMENT_URL, mapOf()).matches)
     }

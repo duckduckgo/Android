@@ -19,7 +19,7 @@
                 "description": "Policy rule that produced the automatic grant",
                 "enum": ["allow_list", "protections_off"]
             },
-            "petal_randomize"
+            "petal"
         ]
     }
 }

@@ -54,7 +54,7 @@ class AdBlockingStateReporter @Inject constructor(
                 AD_BLOCKING_STATE_DAILY,
                 parameters = mapOf(
                     PARAM_IS_ENABLED to isActive.toString(),
-                    PARAM_USER_OPTED_IN to (userState is AdBlockingState.Enabled.UserEnabled).toString(),
+                    PARAM_USER_OPTED_IN to (userState is AdBlockingState.Enabled.WithPixelConsent).toString(),
                 ),
                 type = Pixel.PixelType.Daily(),
             )

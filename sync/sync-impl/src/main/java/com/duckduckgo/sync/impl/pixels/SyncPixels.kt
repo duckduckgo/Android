@@ -36,6 +36,8 @@ import com.duckduckgo.sync.impl.pixels.SyncPixelName.SYNC_DAILY_SUCCESS_RATE_PIX
 import com.duckduckgo.sync.impl.pixels.SyncPixelName.SYNC_OBJECT_LIMIT_EXCEEDED_DAILY
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.CONNECTED_DEVICES_WHEN_DELETING
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_FEATURE_PROMOTION_SOURCE
+import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SCANNER_CAMERA_PERMISSION_AFTER_REQUESTING
+import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SCANNER_CAMERA_PERMISSION_BEFORE_REQUESTING
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_CODE_TYPE
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_CODE_VERSION
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_FLOW_VERSION
@@ -125,6 +127,7 @@ interface SyncPixels {
     fun fireTimeoutOnDeepLinkSetup()
     fun fireScanCodeScreenShown(screenType: ScreenType)
     fun fireSyncBarcodeScreenShown(screenType: ScreenType)
+    fun fireScannerCameraPermissionState(beforeRequesting: Boolean, afterRequesting: Boolean)
     fun fireSyncSetupFinishedSuccessfully(
         screenType: ScreenType,
         path: SetupPath? = null,
@@ -283,8 +286,8 @@ class RealSyncPixels @Inject constructor(
      * - [SYNC_SETUP_FLOW_VERSION]: "v2" when the device is on the v2 connect/exchange stack
      *   ([SyncFeature.canUseV2ConnectFlow]), "v1" otherwise. Independent of which code version is
      *   actually displayed (that is gated separately by [SyncFeature.canShowV2ConnectCode]).
-     * - [SYNC_SETUP_UI_VERSION]: "v2" when the simplified sync UI is enabled ([SyncFeature.useSimplifiedSync])
-     *   and "v1" on the legacy setup screens.
+     * - [SYNC_SETUP_UI_VERSION]: always "v2"; the simplified sync UI is the only setup UI, so "v1"
+     *   is reported only by older app versions.
      * - [SYNC_SETUP_MY_KIND]: always "ddg" — this is the native DuckDuckGo client.
      */
     private fun setupFlowMetadata(): Map<String, String> = buildMap {
@@ -294,13 +297,10 @@ class RealSyncPixels @Inject constructor(
     }
 
     /**
-     * Which sync setup UI the user is looking at: [SYNC_SETUP_UI_VERSION] is "v2" when the simplified
-     * sync UI is enabled ([SyncFeature.useSimplifiedSync]) and "v1" on the legacy setup screens.
+     * Which sync setup UI the user is looking at: [SYNC_SETUP_UI_VERSION] is always "v2", the simplified
+     * sync UI being the only setup UI. Older app versions can still report "v1".
      */
-    private fun setupUiMetadata(): Map<String, String> = buildMap {
-        val version = if (syncFeature.useSimplifiedSync().isEnabled()) UI_VERSION_V2 else UI_VERSION_V1
-        put(SYNC_SETUP_UI_VERSION, version)
-    }
+    private fun setupUiMetadata(): Map<String, String> = mapOf(SYNC_SETUP_UI_VERSION to UI_VERSION_V2)
 
     /**
      * Params for the "Code recognized" pixels (scanner/manual-entry success): the screen [source],
@@ -671,6 +671,16 @@ class RealSyncPixels @Inject constructor(
         )
     }
 
+    override fun fireScannerCameraPermissionState(beforeRequesting: Boolean, afterRequesting: Boolean) {
+        pixel.fire(
+            SyncPixelName.SYNC_SCANNER_CAMERA_PERMISSION_STATE,
+            parameters = mapOf(
+                SYNC_SCANNER_CAMERA_PERMISSION_BEFORE_REQUESTING to beforeRequesting.toString(),
+                SYNC_SCANNER_CAMERA_PERMISSION_AFTER_REQUESTING to afterRequesting.toString(),
+            ),
+        )
+    }
+
     override fun fireSyncSetupAbandoned(screenType: ScreenType, reason: CancellationReason?) {
         pixel.fire(
             SyncPixelName.SYNC_SETUP_ENDED_ABANDONED,
@@ -941,7 +951,6 @@ class RealSyncPixels @Inject constructor(
         private const val SYNC_PIXELS_PREF_FILE = "com.duckduckgo.sync.pixels.v1"
         private const val FLOW_VERSION_V1 = "v1"
         private const val FLOW_VERSION_V2 = "v2"
-        const val UI_VERSION_V1 = "v1"
         const val UI_VERSION_V2 = "v2"
         private const val MY_KIND_DDG = "ddg"
         private const val CODE_TYPE_RECOVERY = "recovery"
@@ -1009,6 +1018,7 @@ enum class SyncPixelName(override val pixelName: String) : Pixel.PixelName {
     SYNC_SETTINGS_RECOVER_SYNC_DATA_TAPPED("m_settings_sync_recover_synced_data_tapped"),
     SYNC_SETTINGS_RECOVER_SYNC_DATA_CONFIRMED("m_settings_sync_recovery_confirmed_tapped"),
     SYNC_SETUP_SCAN_QR_SCREEN_SHOWN("sync_setup_scan_qr_screen_shown"),
+    SYNC_SCANNER_CAMERA_PERMISSION_STATE("sync_scanner_camera_permission_state"),
     SYNC_SETUP_BARCODE_SCREEN_SHOWN("sync_setup_barcode_screen_shown"),
     SYNC_SETUP_BARCODE_SCANNER_SUCCESS("sync_setup_barcode_scanner_success"),
     SYNC_SETUP_BARCODE_SCANNER_FAILED("sync_setup_barcode_scanner_failed"),
@@ -1084,6 +1094,8 @@ object SyncPixelParameters {
     const val SYNC_FEATURE_PROMOTION_DISMISS_REASON = "reason"
     const val GET_OTHER_DEVICES_SCREEN_LAUNCH_SOURCE = "source"
     const val SYNC_SETUP_SCREEN_TYPE = "source"
+    const val SYNC_SCANNER_CAMERA_PERMISSION_BEFORE_REQUESTING = "before_requesting"
+    const val SYNC_SCANNER_CAMERA_PERMISSION_AFTER_REQUESTING = "after_requesting"
     const val SYNC_SETUP_FLOW_VERSION = "flow_version"
     const val SYNC_SETUP_UI_VERSION = "ui_version"
     const val SYNC_SETUP_MY_KIND = "my_kind"

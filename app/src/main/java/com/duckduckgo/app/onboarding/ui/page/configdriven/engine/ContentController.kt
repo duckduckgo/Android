@@ -29,6 +29,8 @@ import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.AddressBarBind
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.ComparisonChartBinder
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.DownloadReasonBinder
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.DuckAiStateBinder
+import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.ImportCompleteBinder
+import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.ImportPasswordsBinder
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.InputScreenBinder
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.InputScreenPreviewBinder
 import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.PreferenceSelectorBinder
@@ -54,17 +56,21 @@ interface ContentController {
 class ContentControllerImpl(
     private val binding: PreOnboardingDaxDialogCtaBrandDesignUpdateBinding,
     private val contentValues: ContentValueStore,
+    private val onContentBound: (LinearOnboardingStepId, ContentConfig) -> Unit,
     isLightMode: () -> Boolean,
+    isAddressBarRebrandEnabled: () -> Boolean,
 ) : ContentController {
 
     private val comparisonChart = ComparisonChartBinder(binding.comparisonChartContent)
     private val addressBar = AddressBarBinder(binding.addressBarContent, isLightMode)
     private val inputScreen = InputScreenBinder(binding.inputScreenContent, isLightMode)
-    private val inputScreenPreview = InputScreenPreviewBinder(binding.inputScreenPreviewContent)
+    private val inputScreenPreview = InputScreenPreviewBinder(binding.inputScreenPreviewContent, isAddressBarRebrandEnabled)
     private val quickSetup = QuickSetupBinder(binding.reinstallerQuickSetupContent)
     private val welcome = WelcomeBinder(binding.welcomeContent)
     private val addToDock = AddToDockBinder(binding.addToDockContent)
     private val widgetPrompt = WidgetPromptBinder(binding.widgetPromptContent)
+    private val importPasswords = ImportPasswordsBinder(binding.importPasswordsContent)
+    private val importComplete = ImportCompleteBinder(binding.importCompleteContent)
     private val downloadReason = DownloadReasonBinder(binding.downloadReasonContent)
     private val preferenceSelector = PreferenceSelectorBinder(binding.preferenceSelectorContent)
     private val singleChoice = SingleChoiceBinder(binding.singleChoiceContent)
@@ -89,6 +95,7 @@ class ContentControllerImpl(
         content: ContentConfig,
         scope: BindScope,
     ): ContentHandle {
+        onContentBound(stepId, content)
         val handle = when (content) {
             is ContentConfig.Welcome -> {
                 boundView = welcome.view
@@ -121,6 +128,14 @@ class ContentControllerImpl(
             is ContentConfig.WidgetPrompt -> {
                 boundView = widgetPrompt.view
                 widgetPrompt.bind(content, scope)
+            }
+            is ContentConfig.ImportPasswords -> {
+                boundView = importPasswords.view
+                importPasswords.bind(content, scope)
+            }
+            is ContentConfig.ImportComplete -> {
+                boundView = importComplete.view
+                importComplete.bind(content, contentValues.contentState(stepId, content), scope)
             }
             is ContentConfig.DownloadReason -> {
                 boundView = downloadReason.view

@@ -31,7 +31,6 @@ import android.graphics.Typeface
 import android.graphics.drawable.AnimatedVectorDrawable
 import android.media.MediaPlayer
 import android.os.Bundle
-import android.text.InputType
 import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
@@ -92,6 +91,10 @@ import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.QUICK_SETUP
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SKIP_ONBOARDING_OPTION
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SYNC_RESTORE
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.WIDGET_PROMPT
+import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.applyInputScreenPreviewInsets
+import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.applyInputScreenPreviewShape
+import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.applyInputTextMode
+import com.duckduckgo.app.onboarding.ui.page.configdriven.binders.updateInputModePreservingSelection
 import com.duckduckgo.app.onboarding.ui.view.OnboardingStepIndicatorView
 import com.duckduckgo.app.onboardingquicksetup.ui.BrandDesignInputScreenPicker
 import com.duckduckgo.app.onboardingquicksetup.ui.QuickSetupAddressBarPositionBottomSheet
@@ -100,6 +103,7 @@ import com.duckduckgo.app.onboardingquicksetup.ui.RemoveWidgetInstructionsBottom
 import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.app.widget.AddWidgetSource
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.addBottomShadow
 import com.duckduckgo.common.ui.view.text.DaxTextView
@@ -140,6 +144,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
     @Inject
     lateinit var appTheme: AppTheme
+
+    @Inject
+    lateinit var appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles
 
     @Inject
     lateinit var addWidgetLauncher: AddWidgetLauncher
@@ -484,7 +491,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     }
 
     private fun playOutroAnimation(
-        nextStep: OnboardingBackgroundStep,
+        nextBackground: OnboardingBackground,
         onAnimationStart: () -> Unit,
         onAnimationEnd: () -> Unit,
     ) {
@@ -497,7 +504,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         }
 
         backgroundAnimator?.transitionTo(
-            step = nextStep,
+            background = nextBackground,
             enterStartX = enterStartX,
             onAnimationStarted = onAnimationStart,
             onAnimationEnd = onAnimationEnd,
@@ -934,7 +941,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     binding.daxDialogCta.cardView.setArrowDepthFraction(if (showWalkingDax) 1f else 0f)
 
                     playOutroAnimation(
-                        nextStep = OnboardingBackgroundStep.Welcome,
+                        nextBackground = OnboardingBackground.Pond,
                         onAnimationStart = {
                             if (showWalkingDax) playWalkingDaxAnimation()
                         },
@@ -977,7 +984,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                 QUICK_SETUP -> {
                     binding.welcomeScreenWalkingDax.isVisible = false
-                    backgroundAnimator?.transitionTo(step = OnboardingBackgroundStep.QuickSetup)
+                    backgroundAnimator?.transitionTo(background = OnboardingBackground.Horizon)
 
                     // Swap content before measuring so the next layout pass reflects the quick-setup size,
                     // and ChangeBounds animates the card expanding into it. The include root stays fully
@@ -1130,7 +1137,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                     binding.daxDialogCta.cardView.setArrowDepthFraction(0f)
 
-                    backgroundAnimator?.transitionTo(step = OnboardingBackgroundStep.AddToDock)
+                    backgroundAnimator?.transitionTo(background = OnboardingBackground.Horizon)
 
                     binding.daxDialogCta.stepIndicator.animateToStep(stepIndicator)
 
@@ -1211,7 +1218,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     binding.daxDialogCta.cardView.setArrowAnimationFraction(1f)
                     binding.daxDialogCta.cardView.setArrowDepthFraction(1f)
 
-                    backgroundAnimator?.transitionTo(step = OnboardingBackgroundStep.AddWidget)
+                    backgroundAnimator?.transitionTo(background = OnboardingBackground.Horizon)
 
                     binding.daxDialogCta.stepIndicator.animateToStep(stepIndicator)
 
@@ -1297,7 +1304,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                         }
                     }
                     backgroundAnimator?.transitionTo(
-                        step = OnboardingBackgroundStep.AddressBar,
+                        background = OnboardingBackground.Island,
                     )
 
                     if (showBobbingDax) {
@@ -1359,7 +1366,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                 INPUT_SCREEN -> {
                     backgroundAnimator?.transitionTo(
-                        step = OnboardingBackgroundStep.InputType,
+                        background = OnboardingBackground.Shoreline,
                     )
 
                     animateBobbingDaxOut()
@@ -1607,9 +1614,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             binding.logoAnimation.alpha = 0f
             binding.welcomeTitle.alpha = 0f
             binding.duckAiIntroAnimation.alpha = 0f
-            backgroundAnimator?.snapTo(OnboardingBackgroundStep.ComparisonChart)
+            backgroundAnimator?.snapTo(OnboardingBackground.Horizon)
         } else {
-            backgroundAnimator?.transitionTo(step = OnboardingBackgroundStep.ComparisonChart)
+            backgroundAnimator?.transitionTo(background = OnboardingBackground.Horizon)
         }
 
         // Swap content before measuring so the dialog height reflects the comparison chart
@@ -1712,7 +1719,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.welcomeTitle.alpha = 0f
                 binding.duckAiIntroAnimation.alpha = 0f
 
-                backgroundAnimator?.snapTo(OnboardingBackgroundStep.Welcome)
+                backgroundAnimator?.snapTo(OnboardingBackground.Pond)
 
                 binding.daxDialogCta.secondaryCta.visibility = if (showSecondaryCta) View.INVISIBLE else View.GONE
 
@@ -1771,7 +1778,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.welcomeTitle.alpha = 0f
                 binding.duckAiIntroAnimation.alpha = 0f
 
-                backgroundAnimator?.snapTo(OnboardingBackgroundStep.ComparisonChart)
+                backgroundAnimator?.snapTo(OnboardingBackground.Horizon)
 
                 binding.welcomeScreenWalkingDax.isVisible = false
                 val cardView = binding.daxDialogCta.cardView
@@ -1832,7 +1839,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.welcomeTitle.alpha = 0f
                 binding.duckAiIntroAnimation.alpha = 0f
 
-                backgroundAnimator?.snapTo(OnboardingBackgroundStep.AddToDock)
+                backgroundAnimator?.snapTo(OnboardingBackground.Horizon)
 
                 binding.welcomeScreenWalkingDax.isVisible = false
                 binding.bottomWingAnimation.isVisible = false
@@ -1883,7 +1890,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.welcomeTitle.alpha = 0f
                 binding.duckAiIntroAnimation.alpha = 0f
 
-                backgroundAnimator?.snapTo(OnboardingBackgroundStep.ComparisonChart)
+                backgroundAnimator?.snapTo(OnboardingBackground.Horizon)
 
                 binding.welcomeScreenWalkingDax.isVisible = false
                 binding.bottomWingAnimation.isVisible = false
@@ -1971,7 +1978,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.leftWingAnimation.isVisible = false
                 binding.bottomWingAnimation.isVisible = false
 
-                backgroundAnimator?.snapTo(OnboardingBackgroundStep.AddressBar)
+                backgroundAnimator?.snapTo(OnboardingBackground.Island)
 
                 binding.welcomeScreenWalkingDax.isVisible = false
                 binding.daxDialogCta.welcomeContent.root.isVisible = false
@@ -2080,7 +2087,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.welcomeTitle.alpha = 0f
                 binding.duckAiIntroAnimation.alpha = 0f
 
-                backgroundAnimator?.snapTo(OnboardingBackgroundStep.InputType)
+                backgroundAnimator?.snapTo(OnboardingBackground.Shoreline)
 
                 (binding.daxDialogCta.root.layoutParams as ConstraintLayout.LayoutParams).apply {
                     if (showLeftWing && deviceInfo.isTablet()) {
@@ -2133,7 +2140,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 }
 
                 binding.welcomeScreenWalkingDax.isVisible = false
-                backgroundAnimator?.snapTo(OnboardingBackgroundStep.QuickSetup)
+                backgroundAnimator?.snapTo(OnboardingBackground.Horizon)
 
                 // Apply the final visibility of every include + cta BEFORE measuring, so the dialog's
                 // measured height reflects what will actually be on screen.
@@ -2202,7 +2209,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.bottomWingAnimation.isVisible = false
                 decorationFitCorrector?.clear()
 
-                backgroundAnimator?.snapTo(OnboardingBackgroundStep.InputType)
+                backgroundAnimator?.snapTo(OnboardingBackground.Shoreline)
 
                 binding.welcomeScreenWalkingDax.isVisible = false
                 binding.daxDialogCta.root.updateLayoutParams<ConstraintLayout.LayoutParams> {
@@ -2832,6 +2839,14 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     ) {
         currentInputMode = inputMode
         val previewContent = binding.daxDialogCta.inputScreenPreviewContent
+        val isAddressBarRebrandEnabled = appBrandDesignUpdateToggles.addressBar().isEnabled()
+        previewContent.inputModeDemoCard.applyInputScreenPreviewShape(
+            isAddressBarRebrandEnabled = isAddressBarRebrandEnabled,
+        )
+        previewContent.inputText.applyInputScreenPreviewInsets(
+            isAddressBarRebrandEnabled = isAddressBarRebrandEnabled,
+            actionIcon = previewContent.inputModeDemoActionIcon,
+        )
 
         listOf(previewContent.suggestion1, previewContent.suggestion2, previewContent.suggestion3)
             .forEachIndexed { index, button ->
@@ -2859,30 +2874,27 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             }
         }
 
-        when (inputMode) {
-            InputMode.SEARCH -> {
-                previewContent.inputText.minLines = 1
-                previewContent.inputText.maxLines = 1
-                previewContent.inputText.inputType = InputType.TYPE_CLASS_TEXT
-                previewContent.inputText.imeOptions = EditorInfo.IME_ACTION_SEARCH
-                previewContent.inputText.setHint(R.string.preOnboardingInputModeDemoSearchHint)
-                previewContent.inputModeDemoActionIcon.setImageResource(CommonR.drawable.ic_find_search_24)
+        previewContent.inputText.updateInputModePreservingSelection {
+            applyInputTextMode(inputMode == InputMode.SEARCH)
+            when (inputMode) {
+                InputMode.SEARCH -> {
+                    imeOptions = EditorInfo.IME_ACTION_SEARCH
+                    setHint(R.string.preOnboardingInputModeDemoSearchHint)
+                    previewContent.inputModeDemoActionIcon.setImageResource(CommonR.drawable.ic_find_search_24)
+                }
+                InputMode.CHAT -> {
+                    imeOptions = EditorInfo.IME_ACTION_UNSPECIFIED
+                    setHint(R.string.preOnboardingInputModeDemoChatHint)
+                    previewContent.inputModeDemoActionIcon.setImageResource(CommonR.drawable.ic_arrow_right_24)
+                }
             }
-            InputMode.CHAT -> {
-                previewContent.inputText.minLines = 3
-                previewContent.inputText.maxLines = 3
-                previewContent.inputText.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
-                previewContent.inputText.imeOptions = EditorInfo.IME_ACTION_UNSPECIFIED
-                previewContent.inputText.setHint(R.string.preOnboardingInputModeDemoChatHint)
-                previewContent.inputModeDemoActionIcon.setImageResource(CommonR.drawable.ic_arrow_right_24)
-            }
-        }
 
-        // Toggling modes changes inputType/imeOptions while the EditText may be focused with the keyboard shown;
-        // restart input so the IME picks up the new action/Enter behavior immediately.
-        if (previewContent.inputText.hasFocus()) {
-            context?.let { ctx ->
-                ContextCompat.getSystemService(ctx, InputMethodManager::class.java)?.restartInput(previewContent.inputText)
+            // Toggling modes changes inputType/imeOptions while the EditText may be focused with the keyboard shown;
+            // restart input so the IME picks up the new action/Enter behavior immediately.
+            if (hasFocus()) {
+                this@BrandDesignUpdateWelcomePage.context?.let { ctx ->
+                    ContextCompat.getSystemService(ctx, InputMethodManager::class.java)?.restartInput(this)
+                }
             }
         }
     }

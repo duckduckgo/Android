@@ -17,7 +17,6 @@
 package com.duckduckgo.app.browser.pageload
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.pixels.remoteconfig.OptimizeTrackerEvaluationRCWrapper
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
@@ -51,7 +50,6 @@ class PageLoadWideEventTest {
     private val wideEventClient: WideEventClient = mock()
     private val webViewVersionProvider: WebViewVersionProvider = mock()
     private val autoconsent: Autoconsent = mock()
-    private val optimizeTrackerEvaluationRCWrapper: OptimizeTrackerEvaluationRCWrapper = mock()
     private val currentTimeProvider: CurrentTimeProvider = mock()
     private val androidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
     private val contentScopeOptimizations = FakeContentScopeOptimizations()
@@ -62,7 +60,6 @@ class PageLoadWideEventTest {
     fun setup() = runTest {
         whenever(webViewVersionProvider.getMajorVersion()).thenReturn("120")
         whenever(autoconsent.isAutoconsentEnabled()).thenReturn(true)
-        whenever(optimizeTrackerEvaluationRCWrapper.enabled).thenReturn(true)
         whenever(currentTimeProvider.currentTimeMillis()).thenReturn(1000L)
 
         // Enable feature toggle by default
@@ -79,7 +76,6 @@ class PageLoadWideEventTest {
             wideEventClient = wideEventClient,
             webViewVersionProvider = webViewVersionProvider,
             autoconsent = autoconsent,
-            optimizeTrackerEvaluationRCWrapper = optimizeTrackerEvaluationRCWrapper,
             contentScopeOptimizations = contentScopeOptimizations,
             androidBrowserConfigFeature = { androidBrowserConfigFeature },
             currentTimeProvider = currentTimeProvider,
@@ -389,7 +385,6 @@ class PageLoadWideEventTest {
             metadata = mapOf(
                 "webview_version" to "120",
                 "cpm_enabled" to "true",
-                "tracker_optimization_enabled_v3" to "true",
                 "is_tab_in_foreground_on_finish" to "true",
                 "active_requests_on_load_start" to "5",
                 "concurrent_requests_on_finish" to "2",
@@ -432,7 +427,6 @@ class PageLoadWideEventTest {
             metadata = mapOf(
                 "webview_version" to "120",
                 "cpm_enabled" to "true",
-                "tracker_optimization_enabled_v3" to "true",
                 "is_tab_in_foreground_on_finish" to "false",
                 "active_requests_on_load_start" to "3",
                 "concurrent_requests_on_finish" to "0",
@@ -597,7 +591,6 @@ class PageLoadWideEventTest {
             metadata = mapOf(
                 "webview_version" to "120",
                 "cpm_enabled" to "true",
-                "tracker_optimization_enabled_v3" to "true",
                 "content_scope_injection_optimized" to "true",
                 "content_scope_messaging_optimized" to "true",
                 "content_scope_experiments_cached" to "true",

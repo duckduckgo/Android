@@ -39,8 +39,8 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.sync.impl.ui.SyncActivity
-import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivity
+import com.duckduckgo.sync.impl.ui.recoverycode.RecoveryCodeActivity
 import com.duckduckgo.sync.internal.databinding.ActivityInternalSyncSettingsBinding
 import com.duckduckgo.sync.internal.databinding.DialogRenameDeviceBinding
 import com.duckduckgo.sync.internal.databinding.ItemConnectedDeviceBinding
@@ -64,7 +64,6 @@ import kotlinx.coroutines.withContext
 import logcat.LogPriority
 import logcat.logcat
 import javax.inject.Inject
-import com.duckduckgo.sync.impl.ui.v2.SyncActivity as SyncActivityV2
 
 @InjectWith(ActivityScope::class)
 class SyncInternalSettingsActivity : DuckDuckGoActivity() {
@@ -124,9 +123,6 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         binding.launchSyncSettingsButton.setOnClickListener {
             startActivity(Intent(this, SyncActivity::class.java))
         }
-        binding.launchSimplifiedSyncSettingsButton.setOnClickListener {
-            startActivity(Intent(this, SyncActivityV2::class.java))
-        }
         binding.openV2PairingDebugButton.setOnClickListener {
             startActivity(Intent(this, SyncV2PairingDebugActivity::class.java))
         }
@@ -158,6 +154,7 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         binding.syncFaviconsPromptCta.setOnClickListener {
             viewModel.resetFaviconsPrompt()
         }
+        binding.checkLinkingCodeCta.setOnClickListener { viewModel.onCheckLinkingCodeClicked() }
         binding.testSyncWarningToggle.setOnCheckedChangeListener(testSyncWarningListener)
         binding.clearHistoryBookmarkAddedDialogPromo.setOnClickListener { viewModel.onClearHistoryBookmarkAddedDialogPromoClicked() }
         binding.clearHistoryBookmarkScreenPromo.setOnClickListener { viewModel.onClearHistoryBookmarkScreenPromoClicked() }
@@ -257,11 +254,7 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
             }
 
             Command.LaunchRecoverDataScreen -> {
-                startActivity(
-                    Intent(this, SetupAccountActivity::class.java).apply {
-                        putExtra(SetupAccountActivity.SETUP_ACCOUNT_SCREEN_EXTRA, SetupAccountActivity.Companion.Screen.RECOVERY_CODE)
-                    },
-                )
+                startActivity(RecoveryCodeActivity.intent(this, binding.deviceNameTextView.text.toString()))
             }
 
             is Command.ShowRenameDeviceDialog -> showRenameDeviceDialog(command)
@@ -348,6 +341,7 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         binding.recoveryCodeDecodedTextView.text = decodeStandardBase64(viewState.recoveryCode, emptyPlaceholder = "(not signed in)")
         binding.thirdPartyRecoveryCodeTextView.text = viewState.thirdPartyRecoveryCode.ifEmpty { "(no 3party credential yet)" }
         binding.thirdPartyRecoveryCodeDecodedTextView.text = decodeThirdPartyRecoveryCode(viewState.thirdPartyRecoveryCode)
+        binding.checkLinkingCodeResultTextView.text = viewState.checkLinkingCodeResult
         binding.connectedDevicesList.removeAllViews()
         binding.blockStoreFeatureFlag.text = viewState.blockStoreFeatureFlagText
         binding.blockStoreAvailability.text = viewState.blockStoreAvailabilityText
@@ -367,6 +361,9 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         }
         binding.canShowV2ConnectCodeToggle.quietlySetIsChecked(viewState.canShowV2ConnectCodeEnabled) { _, enabled ->
             viewModel.onCanShowV2ConnectCodeFlagChanged(enabled)
+        }
+        binding.canUseExchangeV2Point1Toggle.quietlySetIsChecked(viewState.canUseExchangeV2Point1Enabled) { _, enabled ->
+            viewModel.onCanUseExchangeV2Point1FlagChanged(enabled)
         }
         binding.accessCredentialsTextView.text = viewState.accessCredentialsText
         binding.scopedTokenResultTextView.text = viewState.scopedTokenResult

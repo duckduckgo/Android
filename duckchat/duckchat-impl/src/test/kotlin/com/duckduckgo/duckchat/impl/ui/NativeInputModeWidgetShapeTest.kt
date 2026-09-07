@@ -27,7 +27,10 @@ import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputModeWidget
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.google.android.material.card.MaterialCardView
+import com.google.android.material.shape.RelativeCornerSize
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RuntimeEnvironment
@@ -53,24 +56,69 @@ class NativeInputModeWidgetShapeTest {
 
         subject.render(rebrandEnabled = true)
 
+        assertTrue(subject.card.shapeAppearanceModel.topLeftCornerSize is RelativeCornerSize)
         assertEquals(32f, subject.cornerSize())
     }
 
     @Test
-    fun `enabling address bar rebrand does not change top browser search-only card height`() {
+    fun `when address bar rebrand is enabled bottom browser search-only state uses rebrand radius`() {
+        val subject = createSubject(inputPosition = NativeInputState.InputPosition.BOTTOM)
+
+        subject.render(rebrandEnabled = true)
+
+        assertEquals(
+            subject.context.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.rebrandInputRadius),
+            subject.card.radius,
+        )
+        assertFalse(subject.card.useCompatPadding)
+    }
+
+    @Test
+    fun `when address bar rebrand is disabled bottom browser search-only state uses legacy radius`() {
+        val subject = createSubject(inputPosition = NativeInputState.InputPosition.BOTTOM)
+
+        subject.render(rebrandEnabled = false)
+
+        assertEquals(
+            subject.context.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.largeShapeCornerRadius),
+            subject.cornerSize(),
+        )
+    }
+
+    @Test
+    fun `enabling address bar rebrand preserves top browser search-only geometry`() {
         val subject = createSubject()
 
         subject.render(rebrandEnabled = false)
         val legacyHeight = subject.measureHeight()
+        val legacyPaddingTop = subject.card.paddingTop
+        val legacyTop = subject.visibleTop()
+        assertTrue(legacyPaddingTop > 0)
 
         subject.render(rebrandEnabled = true)
 
+        assertTrue(subject.card.useCompatPadding)
         assertEquals(legacyHeight, subject.measureHeight())
+        assertEquals(legacyPaddingTop, subject.card.paddingTop)
+        assertEquals(legacyTop, subject.visibleTop())
     }
 
     @Test
     fun `when top browser search-only transitions to bottom Duck AI it restores the fixed corner radius`() {
         val subject = createSubject()
+
+        subject.render(rebrandEnabled = true)
+        subject.renderDuckAi()
+
+        assertEquals(
+            subject.context.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.largeShapeCornerRadius),
+            subject.cornerSize(),
+        )
+    }
+
+    @Test
+    fun `when bottom browser search-only transitions to bottom Duck AI it restores the fixed corner radius`() {
+        val subject = createSubject(inputPosition = NativeInputState.InputPosition.BOTTOM)
 
         subject.render(rebrandEnabled = true)
         subject.renderDuckAi()
@@ -94,14 +142,18 @@ class NativeInputModeWidgetShapeTest {
         )
     }
 
-    private fun createSubject(): Subject {
+    private fun createSubject(inputPosition: NativeInputState.InputPosition = NativeInputState.InputPosition.TOP): Subject {
         val context = ContextThemeWrapper(
             RuntimeEnvironment.getApplication(),
             com.duckduckgo.mobile.android.R.style.Theme_DuckDuckGo_Light,
         )
+        val isBottom = inputPosition == NativeInputState.InputPosition.BOTTOM
+        val elevation = (if (isBottom) 3f else 6f) * context.resources.displayMetrics.density
         val card = MaterialCardView(context).apply {
             layoutParams = ViewGroup.MarginLayoutParams(200, ViewGroup.LayoutParams.WRAP_CONTENT)
-            useCompatPadding = true
+            useCompatPadding = !isBottom
+            maxCardElevation = elevation
+            cardElevation = elevation
             radius = context.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.largeShapeCornerRadius)
         }
         val widget = NativeInputModeWidget(context)
@@ -115,7 +167,7 @@ class NativeInputModeWidgetShapeTest {
                 NativeInputState(
                     inputMode = NativeInputState.InputMode.SEARCH_ONLY,
                     inputContext = NativeInputState.InputContext.BROWSER,
-                    inputPosition = NativeInputState.InputPosition.TOP,
+                    inputPosition = inputPosition,
                 ),
             )
         }
@@ -165,6 +217,11 @@ class NativeInputModeWidgetShapeTest {
         fun measureHeight(): Int {
             card.measure(widthSpec, heightSpec)
             return card.measuredHeight
+        }
+
+        fun visibleTop(): Int {
+            val params = card.layoutParams as ViewGroup.MarginLayoutParams
+            return params.topMargin + card.paddingTop
         }
     }
 }

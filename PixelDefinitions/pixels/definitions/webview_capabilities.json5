@@ -1,0 +1,27 @@
+{
+    "webview_capabilities": {
+        "description": "Fired at most once daily on app start, when the reportWebViewCapabilities feature flag is enabled, reporting which APIs the installed WebView supports. Stripped of appVersion and ATB at send time via WebViewCapabilityPixelParamRemovalPlugin.",
+        "owners": ["LukasPaczos"],
+        "triggers": ["startup"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            {
+                "key": "version",
+                "type": "string",
+                "description": "Full version of the installed WebView package",
+                "examples": ["126.0.6478.40"]
+            },
+            {
+                "key": "multi_profile",
+                "type": "boolean",
+                "description": "Whether the installed WebView supports multiple profiles"
+            },
+            {
+                "key": "delete_browsing_data",
+                "type": "boolean",
+                "description": "Whether the installed WebView supports the delete browsing data API"
+            },
+            "petal"
+        ]
+    }
+}

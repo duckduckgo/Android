@@ -16,10 +16,17 @@
 
 package com.duckduckgo.sync.impl.exchange.v2
 
+import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.Bye
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeDone
+import com.google.testing.junit.testparameterinjector.TestParameter
+import com.google.testing.junit.testparameterinjector.TestParameterInjector
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.junit.runner.RunWith
 
+@RunWith(TestParameterInjector::class)
 class JsonExchangeV2MessageParserTest {
 
     private val parser = JsonExchangeV2MessageParser()
@@ -31,13 +38,13 @@ class JsonExchangeV2MessageParserTest {
 
         assertEquals("abc", parsed.channelId)
         assertEquals("key", parsed.publicKey)
-        assertEquals("2.1", parsed.version)
+        assertEquals(ExchangeProtocolVersion.V2(minor = 1), parsed.version)
         assertEquals(json, parsed.rawJson)
     }
 
     @Test fun `hello defaults version to 2 when omitted`() {
         val parsed = parser.parse("""{"type":"hello"}""") as ExchangeV2Message.Hello
-        assertEquals("2", parsed.version)
+        assertEquals(ExchangeProtocolVersion.V2(minor = 0), parsed.version)
     }
 
     @Test fun `parses recovery_code_available with user_id+name+kind`() {
@@ -65,6 +72,79 @@ class JsonExchangeV2MessageParserTest {
         val parsed = parser.parse(json) as ExchangeV2Message.RecoveryCodeResponse
 
         assertEquals("the-code", parsed.recoveryCode)
+    }
+
+    enum class RecoverCodeCase(
+        val rawReason: String,
+        val expectedReason: RecoveryCodeDone.Reason,
+    ) {
+        Success(
+            rawReason = "success",
+            expectedReason = RecoveryCodeDone.Reason.Success,
+        ),
+        LoginFailed(
+            rawReason = "login_failed",
+            expectedReason = RecoveryCodeDone.Reason.LoginFailed,
+        ),
+        ScopeRejected(
+            rawReason = "scope_rejected",
+            expectedReason = RecoveryCodeDone.Reason.ScopeRejected,
+        ),
+        Unknown(
+            rawReason = "future_reason",
+            expectedReason = RecoveryCodeDone.Reason.Unknown("future_reason"),
+        ),
+    }
+
+    @Test
+    fun `parses recovery_code_done with reason`(
+        @TestParameter case: RecoverCodeCase,
+    ) {
+        val json = """{"type":"recovery_code_done","reason":"${case.rawReason}"}"""
+
+        val parsed = parser.parse(json) as RecoveryCodeDone
+
+        assertEquals(case.expectedReason, parsed.reason)
+    }
+
+    enum class ByeCase(
+        val rawReason: String,
+        val expectedReason: Bye.Reason,
+    ) {
+        Done(
+            rawReason = "done",
+            expectedReason = Bye.Reason.Done,
+        ),
+        Cancelled(
+            rawReason = "cancelled",
+            expectedReason = Bye.Reason.Cancelled,
+        ),
+        Error(
+            rawReason = "error",
+            expectedReason = Bye.Reason.Error,
+        ),
+        Unknown(
+            rawReason = "future_reason",
+            expectedReason = Bye.Reason.Unknown("future_reason"),
+        ),
+    }
+
+    @Test
+    fun `parses bye with reason`(
+        @TestParameter case: ByeCase,
+    ) {
+        val json = """{"type":"bye","reason":"${case.rawReason}"}"""
+
+        val parsed = parser.parse(json) as Bye
+
+        assertEquals(case.expectedReason, parsed.reason)
+        assertEquals(json, parsed.rawJson)
+    }
+
+    @Test fun `bye without a reason still parses as Bye`() {
+        // An unrecognised or absent reason must not abort the parse (spec 1216906886019334 §Unknown reason values).
+        val parsed = parser.parse("""{"type":"bye"}""") as Bye
+        assertEquals(Bye.Reason.Unknown(""), parsed.reason)
     }
 
     @Test fun `parses bodyless types awaiting_confirmation confirmed denied unavailable`() {

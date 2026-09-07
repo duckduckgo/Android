@@ -25,7 +25,7 @@ import androidx.annotation.WorkerThread
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.checkMainThread
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.sync.impl.databinding.ViewRecoveryCodeBinding
+import com.duckduckgo.sync.impl.databinding.ViewRecoveryCodePdfBinding
 import com.squareup.anvil.annotations.ContributesBinding
 import java.io.File
 import java.io.FileOutputStream
@@ -54,7 +54,7 @@ class RecoveryCodePDFImpl @Inject constructor(
         val pdfDocument = PdfDocument()
         val inflater = LayoutInflater.from(viewContext)
         val page = pdfDocument.startPage(Builder(a4PageWidth.toPx(), a4PageHeight.toPx(), 1).create())
-        ViewRecoveryCodeBinding.inflate(inflater, null, false).apply {
+        ViewRecoveryCodePdfBinding.inflate(inflater, null, false).apply {
             this.qrCodeImageView.setImageBitmap(bitmapQR)
             this.recoveryCodeText.text = recoveryCodeB64
             val measureWidth: Int = View.MeasureSpec.makeMeasureSpec(page.canvas.width, View.MeasureSpec.EXACTLY)

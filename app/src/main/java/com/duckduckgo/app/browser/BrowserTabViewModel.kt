@@ -64,8 +64,10 @@ import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.NonHttpAppLink
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.ShouldLaunchDuckChatLink
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.ShouldLaunchSubscriptionLink
 import com.duckduckgo.app.browser.WebViewErrorResponse.BAD_URL
+import com.duckduckgo.app.browser.WebViewErrorResponse.CONNECTION
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
+import com.duckduckgo.app.browser.WebViewErrorResponse.SSL_PROTOCOL_ERROR
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
 import com.duckduckgo.app.browser.api.OmnibarRepository
@@ -184,6 +186,7 @@ import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrows
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_PAGE_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DuckPlayerJSHelper
+import com.duckduckgo.app.browser.errorpage.BadUrlErrorPageWideEvent
 import com.duckduckgo.app.browser.favicon.FaviconFetchingFixFeature
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource.ImageFavicon
@@ -381,6 +384,8 @@ import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadStatus
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
+import com.duckduckgo.duckchat.api.DuckAiSessionCallback
+import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
@@ -609,6 +614,8 @@ class BrowserTabViewModel @Inject constructor(
     private val newTabPageModalTrigger: NewTabPageModalTrigger,
     private val suggestRedirectOnUnresolvedErrorFeature: SuggestRedirectOnUnresolvedErrorFeature,
     private val suggestRedirectEvaluator: SuggestRedirectEvaluator,
+    private val badUrlErrorPageWideEvent: BadUrlErrorPageWideEvent,
+    private val duckAiSessionCallback: DuckAiSessionCallback,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -1633,6 +1640,14 @@ class BrowserTabViewModel @Inject constructor(
                 forceExpand = true,
             )
         suggestRedirectJob.cancel()
+        // We compare the newly submitted URL and the current URL, stripping the ending slash from both. before comparing them.
+        // This lets us classify re-submission of a same URL as a refresh instead of a user exiting from the BAD_URL error page.
+        // This also covers session restoration or crash recovery.
+        if (urlToNavigate.trimEnd('/') != url?.trimEnd('/')) {
+            badUrlErrorPageWideEvent.onBadUrlErrorPageExited(tabId)
+        } else {
+            badUrlErrorPageWideEvent.onErrorPageRefreshed(tabId)
+        }
         browserViewState.value =
             currentBrowserViewState().copy(
                 browserShowing = true,
@@ -1865,6 +1880,7 @@ class BrowserTabViewModel @Inject constructor(
             browserViewState.value = browserStateModifier.copyForBrowserShowing(currentBrowserViewState())
             command.value = NavigationCommand.Refresh
         } else {
+            badUrlErrorPageWideEvent.onBadUrlErrorPageExited(tabId)
             command.value = NavigationCommand.NavigateForward
         }
     }
@@ -1963,13 +1979,17 @@ class BrowserTabViewModel @Inject constructor(
         val hasSourceTab = tabRepository.liveSelectedTab.value?.sourceTabId != null
 
         if (isNavigationToEmptyUrlFromParent(hasSourceTab, isCustomTab)) {
+            recordPendingDuckAiBackExit()
             viewModelScope.launch {
                 removeCurrentTabFromRepository()
             }
             return true
         }
 
-        val navigation = webNavigationState ?: return false
+        val navigation = webNavigationState ?: run {
+            recordPendingDuckAiBackExit()
+            return false
+        }
 
         if (currentFindInPageViewState().visible) {
             dismissFindInView()
@@ -1987,18 +2007,23 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         if (!currentBrowserViewState().browserShowing) {
+            recordPendingDuckAiBackExit()
             return false
         }
 
         if (navigation.canGoBack) {
+            badUrlErrorPageWideEvent.onBadUrlErrorPageExited(tabId)
+            recordPendingDuckAiBackExit()
             command.value = NavigationCommand.NavigateBack(navigation.stepsToPreviousPage)
             return true
         } else if (hasSourceTab && !isCustomTab) {
+            recordPendingDuckAiBackExit()
             viewModelScope.launch {
                 removeCurrentTabFromRepository()
             }
             return true
         } else if (!skipHome && !isCustomTab) {
+            recordPendingDuckAiBackExit()
             navigateHome()
             return true
         }
@@ -2007,7 +2032,20 @@ class BrowserTabViewModel @Inject constructor(
             logcat { "User pressed back and tab is set to skip home; need to generate WebView preview now" }
             command.value = GenerateWebViewPreviewImage
         }
+        recordPendingDuckAiBackExit()
         return false
+    }
+
+    private fun recordPendingDuckAiBackExit() {
+        duckAiSessionCallback.onExitIntent(tabId, DuckAiSessionExitTrigger.BACK_OR_CLOSE)
+    }
+
+    fun recordPendingNewTabOpenedExit() {
+        duckAiSessionCallback.onExitIntent(tabId, DuckAiSessionExitTrigger.NEW_TAB_OPENED)
+    }
+
+    fun recordPendingFireTabOpenedExit() {
+        duckAiSessionCallback.onExitIntent(tabId, DuckAiSessionExitTrigger.FIRE_TAB_OPENED)
     }
 
     private fun isNavigationToEmptyUrlFromParent(
@@ -2024,6 +2062,7 @@ class BrowserTabViewModel @Inject constructor(
         }
         pdfDownloadJob.cancel()
         suggestRedirectJob.cancel()
+        badUrlErrorPageWideEvent.onBadUrlErrorPageExited(tabId)
         site = null
         onSiteChanged()
         webNavigationState = null
@@ -2637,6 +2676,10 @@ class BrowserTabViewModel @Inject constructor(
         webViewNavigationState: WebViewNavigationState,
         url: String?,
     ) {
+        when (currentBrowserViewState().browserError) {
+            OMITTED, LOADING -> badUrlErrorPageWideEvent.onPageLoadFinished(tabId)
+            BAD_URL, CONNECTION, SSL_PROTOCOL_ERROR -> Unit
+        }
         if (!currentBrowserViewState().maliciousSiteBlocked && site != null) {
             navigationStateChanged(webViewNavigationState)
             url?.let { prefetchFavicon(url) }
@@ -2679,6 +2722,9 @@ class BrowserTabViewModel @Inject constructor(
         url?.let {
             if (duckChat.isDuckChatUrl(Uri.parse(it))) {
                 command.value = Command.EnableDuckAIFullScreen(currentBrowserViewState())
+                if (isActiveTab()) {
+                    duckAiSessionCallback.onDuckAiPageVisible(tabId, it)
+                }
             } else {
                 command.value = Command.DuckAIFullScreenDisabled(url)
             }
@@ -2811,7 +2857,7 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun updateNetworkLeaderboard(event: TrackingEvent) {
         val networkName = event.entity?.name ?: return
-        networkLeaderboardDao.incrementNetworkCount(networkName)
+        appCoroutineScope.launch(dispatchers.io()) { networkLeaderboardDao.incrementNetworkCount(networkName) }
     }
 
     override fun pageHasHttpResources(page: String) {
@@ -2942,6 +2988,7 @@ class BrowserTabViewModel @Inject constructor(
                 logcat { "SSLError: received ssl error for a page we are not loading, cancelling request" }
                 handler.cancel()
             } else {
+                badUrlErrorPageWideEvent.onOtherErrorPageDisplayed(tabId)
                 browserViewState.value =
                     currentBrowserViewState().copy(
                         browserShowing = false,
@@ -3432,6 +3479,7 @@ class BrowserTabViewModel @Inject constructor(
                     command.value = LaunchSubscription(requiredAction.url.toUri())
                     return true
                 }
+                duckAiSessionCallback.onExitIntent(tabId, DuckAiSessionExitTrigger.NEW_TAB_OPENED)
                 command.value = GenerateWebViewPreviewImage
                 command.value = OpenInNewTab(query = requiredAction.url, sourceTabId = tabId)
                 true
@@ -3442,6 +3490,7 @@ class BrowserTabViewModel @Inject constructor(
                     command.value = LaunchSubscription(requiredAction.url.toUri())
                     return true
                 }
+                duckAiSessionCallback.onExitIntent(tabId, DuckAiSessionExitTrigger.FIRE_TAB_OPENED)
                 command.value = GenerateWebViewPreviewImage
                 command.value = OpenInFireTab(
                     query = requiredAction.url,
@@ -3560,6 +3609,7 @@ class BrowserTabViewModel @Inject constructor(
 
         val targetUrl = if (desktop && uri.isMobileSite) uri.toDesktopUri().toString() else uri.toString()
         logcat(INFO) { "Reloading $targetUrl in ${if (desktop) "desktop" else "mobile"} mode" }
+        badUrlErrorPageWideEvent.onBadUrlErrorPageExited(tabId)
         command.value = NavigationCommand.Navigate(targetUrl, getUrlHeaders(targetUrl))
     }
 
@@ -3628,6 +3678,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun historicalPageSelected(stackIndex: Int) {
+        badUrlErrorPageWideEvent.onBadUrlErrorPageExited(tabId)
         command.value = NavigationCommand.NavigateToHistory(stackIndex)
     }
 
@@ -3900,7 +3951,7 @@ class BrowserTabViewModel @Inject constructor(
     fun onUserClickCtaSecondaryButton(cta: Cta) {
         releaseAddWidgetModalSlot(cta)
         viewModelScope.launch {
-            ctaViewModel.onUserDismissedCta(cta)
+            ctaViewModel.onUserDismissedCta(cta, viaSkipBtn = true)
             if (cta is BrokenSitePromptDialogCta) {
                 onBrokenSiteCtaDismissButtonClicked(cta)
             }
@@ -4568,6 +4619,7 @@ class BrowserTabViewModel @Inject constructor(
     fun refreshBrowserError() {
         suggestRedirectJob.cancel()
         if (currentBrowserViewState().browserError != OMITTED && currentBrowserViewState().browserError != LOADING) {
+            badUrlErrorPageWideEvent.onErrorPageRefreshed(tabId)
             browserViewState.value = currentBrowserViewState().copy(browserError = LOADING, redirectSuggestion = null)
         }
         if (currentBrowserViewState().sslError != NONE) {
@@ -4667,12 +4719,20 @@ class BrowserTabViewModel @Inject constructor(
             command.value = WebViewError(errorType, url)
             suggestRedirectJob.cancel() // Cancel previous in-flight job as the new errorType might not be BAD_URL
         }
+        when (errorType) {
+            BAD_URL -> badUrlErrorPageWideEvent.onBadUrlErrorPageDisplayed(tabId)
+            CONNECTION -> badUrlErrorPageWideEvent.onConnectionErrorPageDisplayed(tabId)
+            SSL_PROTOCOL_ERROR -> badUrlErrorPageWideEvent.onOtherErrorPageDisplayed(tabId)
+            OMITTED -> badUrlErrorPageWideEvent.onOmittedErrorReceived(tabId)
+            LOADING -> Unit
+        }
         if (errorType == BAD_URL &&
             suggestRedirectOnUnresolvedErrorFeature.self().isEnabled() &&
             suggestRedirectOnUnresolvedErrorFeature.suggestRedirect().isEnabled()
         ) {
             suggestRedirectJob += viewModelScope.launch {
                 suggestRedirectEvaluator.suggestRedirect(url)?.let { suggestion ->
+                    badUrlErrorPageWideEvent.onRedirectSuggested(tabId)
                     browserViewState.value = currentBrowserViewState().copy(redirectSuggestion = suggestion)
                 }
             }
@@ -4707,6 +4767,7 @@ class BrowserTabViewModel @Inject constructor(
         )
 
         if (!exempted) {
+            badUrlErrorPageWideEvent.onOtherErrorPageDisplayed(tabId)
             if (currentBrowserViewState().maliciousSiteBlocked && previousSite?.url == url.toString()) {
                 logcat { "maliciousSiteBlocked already shown for $url, previousSite: ${previousSite.url}" }
             } else {
@@ -5492,7 +5553,7 @@ class BrowserTabViewModel @Inject constructor(
                 refresh()
             }
             is DaxEndBrandDesignUpdateBubbleCta -> {
-                if (cta.segmentedPath == SegmentedOnboardingPath.SEARCH) {
+                if (cta.segmentedPathWithAiInput == SegmentedOnboardingPath.SEARCH) {
                     viewModelScope.launch {
                         ctaViewState.value = currentCtaViewState().copy(cta = null)
                         command.value = HideOnboardingDaxBubbleCta(cta)
@@ -5732,6 +5793,7 @@ class BrowserTabViewModel @Inject constructor(
         // onInputSubmitted() too: an in-chat follow-up is still "the bar was used" for the old
         // post-idle-session event, which only listens for that generic signal.
         browserInteractionsPlugins.getPlugins().forEach { it.onInputSubmitted() }
+        duckAiSessionCallback.onPromptSubmitted(tabId)
         viewModelScope.launch(dispatchers.io()) {
             // The chat was already open, so its entry point was recorded when it was first navigated to.
             val source = duckAiTabSessionRepository.getEntryPointSource(tabId)
@@ -5756,6 +5818,7 @@ class BrowserTabViewModel @Inject constructor(
     fun openNewDuckChat(viewMode: ViewMode) {
         if (viewMode == ViewMode.DuckAI) {
             pixel.fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_NEW_CHAT_TAPPED)
+            duckAiSessionCallback.onNewChatCreated(tabId)
             viewModelScope.launch {
                 val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT)
                 _subscriptionEventDataChannel.send(subscriptionEvent)
@@ -5845,7 +5908,7 @@ class BrowserTabViewModel @Inject constructor(
             // unfocused omnibar. Once the omnibar is focused (composing), fall through to full-screen
             // Duck.ai.
             duckAiFeatureState.showContextualMode.value && !isNtp && !hasFocus -> {
-                command.value = Command.ShowDuckAIContextualMode(tabId)
+                command.value = Command.ShowDuckAIContextualMode(tabId, url)
             }
 
             else -> {
@@ -5988,6 +6051,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onRedirectSuggestionClicked(url: String) {
+        badUrlErrorPageWideEvent.onRedirectClicked(tabId)
         resetBrowserError()
         command.value = NavigationCommand.Navigate(url, getUrlHeaders(url))
     }

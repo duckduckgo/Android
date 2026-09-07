@@ -162,7 +162,7 @@ class SubscriptionPixelSenderImpl @Inject constructor(
             SUBSCRIPTION_ACTIVE,
             mapOf(
                 SubscriptionPixelParameter.OS_VERSION to appBuildConfig.sdkInt.toString(),
-                SubscriptionPixelParameter.PETAL to "true",
+                Pixel.PixelParameter.PETAL to Pixel.PixelValues.PETAL_KANON,
             ),
         )
 

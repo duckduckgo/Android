@@ -20,10 +20,12 @@ import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.autoconsent.impl.databinding.ActivityCookiePopupOptInBinding
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RuntimeEnvironment
+import kotlin.math.roundToInt
 import com.duckduckgo.mobile.android.R as CommonR
 
 /**
@@ -52,4 +54,17 @@ class CookiePopupOptInLayoutTest {
         assertNotNull(binding.cookiePopupOptInAcceptButton.background)
         assertNotNull(binding.cookiePopupOptInDeclineButton.background)
     }
+
+    @Test
+    fun whenInflatedThenCloseButtonHasLargerTouchTargetThanItsVisual() {
+        val binding = ActivityCookiePopupOptInBinding.inflate(LayoutInflater.from(context))
+
+        assertEquals(48.dp, binding.cookiePopupOptInCloseButton.layoutParams.width)
+        assertEquals(48.dp, binding.cookiePopupOptInCloseButton.layoutParams.height)
+        assertEquals(32.dp, binding.cookiePopupOptInCloseIcon.layoutParams.width)
+        assertEquals(32.dp, binding.cookiePopupOptInCloseIcon.layoutParams.height)
+    }
+
+    private val Int.dp: Int
+        get() = (this * context.resources.displayMetrics.density).roundToInt()
 }

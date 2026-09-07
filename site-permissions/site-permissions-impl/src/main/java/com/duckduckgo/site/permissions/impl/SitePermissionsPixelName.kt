@@ -28,7 +28,6 @@ object SitePermissionsPixelParameters {
     const val PERMISSION_TYPE = "type"
     const val PERMISSION_SELECTION = "selection"
     const val REASON = "reason"
-    const val PETAL = "petal"
 }
 
 object SitePermissionsPixelValues {
@@ -43,8 +42,4 @@ object SitePermissionsPixelValues {
     const val DENY_ONCE = "deny_once"
     const val ALLOW_LIST = "allow_list"
     const val PROTECTIONS_OFF = "protections_off"
-}
-
-object SitePermissionsPetalValues {
-    const val RANDOMIZE = "randomize"
 }

@@ -344,10 +344,12 @@
     <string name="duckAiSettingsTitle">Настройки Duck.ai</string>
 
     <!-- File/image attachment menu options -->
-    <string name="duckChatContextualAskAboutPage">Задать вопрос о странице</string>
 
     <!-- Editing a message already sent to Duck.ai -->
     <string name="duck_ai_edit_prompt_title" instruction="Screen title: the user is editing a message they already sent to Duck.ai">Редактирование сообщения</string>
     <string name="duck_ai_edit_prompt_lose_responses_warning" instruction="Warning shown while editing a sent message: the answer Duck.ai already gave will be discarded and answered again">После редактирования текущий ответ будет заменен новым.</string>
 
+    <string name="duckChatContextualAskAboutPage">Задать вопрос о странице</string>
+    <string name="duckChatContextualAskAboutSearch">Продолжить в Duck.ai</string>
+    <string name="duckChatContextualOpenDuckAi">Открыть Duck.ai</string>
 </resources>

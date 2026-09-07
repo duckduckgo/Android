@@ -20,7 +20,6 @@ import android.annotation.SuppressLint
 import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedSites
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.pixels.remoteconfig.OptimizeTrackerEvaluationRCWrapper
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
@@ -123,7 +122,6 @@ class RealPageLoadWideEvent @Inject constructor(
     private val wideEventClient: WideEventClient,
     private val webViewVersionProvider: WebViewVersionProvider,
     private val autoconsent: Autoconsent,
-    private val optimizeTrackerEvaluationRCWrapper: OptimizeTrackerEvaluationRCWrapper,
     private val contentScopeOptimizations: ContentScopeOptimizations,
     private val androidBrowserConfigFeature: Lazy<AndroidBrowserConfigFeature>,
     private val currentTimeProvider: CurrentTimeProvider,
@@ -310,7 +308,6 @@ class RealPageLoadWideEvent @Inject constructor(
         return mapOf(
             KEY_WEBVIEW_VERSION to webViewVersionProvider.getMajorVersion(),
             KEY_CPM_ENABLED to autoconsent.isAutoconsentEnabled().toString(),
-            KEY_TRACKER_OPTIMIZATION_ENABLED to optimizeTrackerEvaluationRCWrapper.enabled.toString(),
             KEY_CONTENT_SCOPE_INJECTION_OPTIMIZED to optimizations.injectionOptimized.toString(),
             KEY_CONTENT_SCOPE_MESSAGING_OPTIMIZED to optimizations.messagingOptimized.toString(),
             KEY_CONTENT_SCOPE_EXPERIMENTS_CACHED to optimizations.experimentsCached.toString(),
@@ -436,7 +433,6 @@ class RealPageLoadWideEvent @Inject constructor(
         const val KEY_ERROR_CODE = "error_code"
         const val KEY_WEBVIEW_VERSION = "webview_version"
         const val KEY_CPM_ENABLED = "cpm_enabled"
-        const val KEY_TRACKER_OPTIMIZATION_ENABLED = "tracker_optimization_enabled_v3"
         const val KEY_IS_TAB_IN_FOREGROUND_ON_FINISH = "is_tab_in_foreground_on_finish"
         const val KEY_ACTIVE_REQUESTS_ON_LOAD_START = "active_requests_on_load_start"
         const val KEY_CONCURRENT_REQUESTS_ON_FINISH = "concurrent_requests_on_finish"

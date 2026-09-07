@@ -121,7 +121,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/backgroundGuideline"
         app:layout_constraintVertical_bias="1"
-        tools:src="@drawable/onboarding_welcome_screen_background"
+        tools:src="@drawable/onboarding_background_pond"
         tools:visibility="visible" />
 
     <include
@@ -208,6 +208,21 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:lottie_rawRes="@raw/onboarding_wing_left"
+        tools:alpha="1"
+        tools:lottie_progress="0.5"
+        tools:visibility="visible" />
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/rightWingAnimation"
+        android:layout_width="wrap_content"
+        android:layout_height="196dp"
+        android:layout_marginBottom="52dp"
+        android:adjustViewBounds="true"
+        android:alpha="0"
+        android:visibility="gone"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:lottie_rawRes="@raw/onboarding_wing_right"
         tools:alpha="1"
         tools:lottie_progress="0.5"
         tools:visibility="visible" />

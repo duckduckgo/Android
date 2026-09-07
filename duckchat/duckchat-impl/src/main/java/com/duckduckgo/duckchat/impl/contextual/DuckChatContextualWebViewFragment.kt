@@ -228,7 +228,8 @@ class DuckChatContextualWebViewFragment :
                 if (newState == BottomSheetBehavior.STATE_HIDDEN) {
                     viewModel.onSheetClosed()
                 }
-                backPressedCallback.isEnabled = newState != BottomSheetBehavior.STATE_HIDDEN
+                backPressedCallback.isEnabled =
+                    newState == BottomSheetBehavior.STATE_EXPANDED || newState == BottomSheetBehavior.STATE_HALF_EXPANDED
             }
 
             override fun onSlide(
@@ -512,7 +513,10 @@ class DuckChatContextualWebViewFragment :
 
     private fun setupBackPressHandling() {
         backPressedCallback =
-            object : OnBackPressedCallback(bottomSheetBehavior.state != BottomSheetBehavior.STATE_HIDDEN) {
+            object : OnBackPressedCallback(
+                bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED ||
+                    bottomSheetBehavior.state == BottomSheetBehavior.STATE_HALF_EXPANDED,
+            ) {
                 override fun handleOnBackPressed() {
                     viewModel.onContextualClose()
                 }
@@ -688,6 +692,9 @@ class DuckChatContextualWebViewFragment :
         newChatRow.visibility = View.VISIBLE
         headerDivider.visibility = View.VISIBLE
         popup.onMenuItemClicked(newChatRow) { viewModel.onNewChatRequestedFromPopup() }
+
+        val openDuckAiRow = content.findViewById<PopupMenuItemView>(R.id.contextualChatsPopupOpenDuckAi)
+        popup.onMenuItemClicked(openDuckAiRow) { viewModel.onOpenDuckAiFromPopup() }
 
         val recentContainer = content.findViewById<LinearLayout>(R.id.contextualChatsPopupRecentContainer)
         recentContainer.removeAllViews()

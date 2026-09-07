@@ -836,9 +836,11 @@ class BrowserTabFragment :
                 duckChat.openVoiceDuckChat(DuckChatEntryPoint.VOICE)
             }
             onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewTab)) {
+                viewModel.recordPendingNewTabOpenedExit()
                 browserActivity?.launchNewTab(browserMode = BrowserMode.REGULAR)
             }
             onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewFireTab)) {
+                viewModel.recordPendingFireTabOpenedExit()
                 browserActivity?.launchNewTab(browserMode = BrowserMode.FIRE)
             }
         }
@@ -3102,10 +3104,11 @@ class BrowserTabFragment :
 
             is Command.ShowDuckAIContextualMode -> {
                 val tabId = it.tabId
+                val sourceUrl = it.sourceUrl
                 val anchor = duckChatButtonAnchor
                 duckChatButtonAnchor = null
                 viewLifecycleOwner.lifecycleScope.launch(dispatchers.main()) {
-                    duckChatContextual.launch(tabId, anchor) { showDuckChatContextualSheet(tabId) }
+                    duckChatContextual.launch(tabId, sourceUrl, anchor) { showDuckChatContextualSheet(tabId) }
                 }
             }
             is Command.StartAddressBarTrackersAnimation -> {
@@ -3848,6 +3851,9 @@ class BrowserTabFragment :
                 override fun onHatchPressed() {
                     hideKeyboard()
                     ntpAfterIdleManager.onReturnToPageTapped()
+                    if (newTabReturnHatchView.isDuckChat) {
+                        duckChat.reportDuckChatEntry(DuckChatEntryPoint.RETURN_TO_CHAT_CARD, opensNewTab = false, hasPrompt = false)
+                    }
                     browserActivity?.openExistingTabInMode(
                         newTabReturnHatchView.targetMode,
                         newTabReturnHatchView.tabId,

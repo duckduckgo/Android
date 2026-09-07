@@ -77,6 +77,7 @@ import com.duckduckgo.app.browser.WebViewErrorResponse.BAD_URL
 import com.duckduckgo.app.browser.WebViewErrorResponse.CONNECTION
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
+import com.duckduckgo.app.browser.WebViewErrorResponse.SSL_PROTOCOL_ERROR
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
 import com.duckduckgo.app.browser.api.OmnibarRepository
@@ -112,6 +113,7 @@ import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrows
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_PAGE_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DuckPlayerJSHelper
+import com.duckduckgo.app.browser.errorpage.BadUrlErrorPageWideEvent
 import com.duckduckgo.app.browser.favicon.FaviconFetchingFixFeature
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource
@@ -314,6 +316,8 @@ import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadStatus
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
+import com.duckduckgo.duckchat.api.DuckAiSessionCallback
+import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
@@ -744,6 +748,8 @@ class BrowserTabViewModelTest {
     private val fakeRememberDesktopModeFeature = FakeFeatureToggleFactory.create(RememberDesktopModeFeature::class.java)
     private val fakeSuggestRedirectFeature = FakeFeatureToggleFactory.create(SuggestRedirectOnUnresolvedErrorFeature::class.java)
     private val mockSuggestRedirectEvaluator: SuggestRedirectEvaluator = mock()
+    private val mockBadUrlErrorPageWideEvent: BadUrlErrorPageWideEvent = mock()
+    private val mockDuckAiSessionCallback: DuckAiSessionCallback = mock()
     private val mockInlinePdfHandler: InlinePdfHandler = mock()
     private val mockPdfDownloadTooltipDataStore: PdfDownloadTooltipDataStore = mock()
     private val mockCachedFileDownloader: CachedFileDownloader = mock()
@@ -1093,6 +1099,8 @@ class BrowserTabViewModelTest {
                 newTabPageModalTrigger = mockNewTabPageModalTrigger,
                 suggestRedirectOnUnresolvedErrorFeature = fakeSuggestRedirectFeature,
                 suggestRedirectEvaluator = mockSuggestRedirectEvaluator,
+                badUrlErrorPageWideEvent = mockBadUrlErrorPageWideEvent,
+                duckAiSessionCallback = mockDuckAiSessionCallback,
             )
 
         testee.loadData("abc", null, false, false)
@@ -3055,6 +3063,34 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenOnLongPressRequiredActionWithOpenInNewTabThenPendingNewTabOpenedExitRecorded() = runTest {
+        val target = LongPressTarget(url = "https://example.com", type = WebView.HitTestResult.SRC_ANCHOR_TYPE)
+
+        testee.onLongPressRequiredAction(target, RequiredAction.OpenInNewTab("https://example.com"))
+
+        verify(mockDuckAiSessionCallback).onExitIntent("abc", DuckAiSessionExitTrigger.NEW_TAB_OPENED)
+    }
+
+    @Test
+    fun whenOnLongPressRequiredActionWithOpenInFireTabThenPendingFireTabOpenedExitRecorded() = runTest {
+        val target = LongPressTarget(url = "https://example.com", type = WebView.HitTestResult.SRC_ANCHOR_TYPE)
+
+        testee.onLongPressRequiredAction(target, RequiredAction.OpenInFireTab("https://example.com"))
+
+        verify(mockDuckAiSessionCallback).onExitIntent("abc", DuckAiSessionExitTrigger.FIRE_TAB_OPENED)
+    }
+
+    @Test
+    fun whenOnLongPressRequiredActionWithOpenInFireTabAndSubscriptionUrlThenNoPendingExitRecorded() = runTest {
+        whenever(subscriptions.shouldLaunchSubscriptionForUrl(any())).thenReturn(true)
+        val target = LongPressTarget(url = "https://example.com", type = WebView.HitTestResult.SRC_ANCHOR_TYPE)
+
+        testee.onLongPressRequiredAction(target, RequiredAction.OpenInFireTab("https://example.com"))
+
+        verify(mockDuckAiSessionCallback, never()).onExitIntent(any(), any())
+    }
+
+    @Test
     fun whenSiteLoadedAndUserSelectsToAddBookmarkThenAddBookmarkCommandSentWithUrlAndTitle() =
         runTest {
             val url = "http://foo.com"
@@ -4169,7 +4205,7 @@ class BrowserTabViewModelTest {
         onboardingImprovementsEnabled = true,
         onboardingImprovementsV2Enabled = true,
         isOmnibarBottom = false,
-        segmentedPath = segmentedPath,
+        segmentedPathWithAiInput = segmentedPath,
     )
 
     @Test
@@ -9082,6 +9118,346 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenBadUrlErrorReceivedAndNoRedirectSuggestionFoundThenWideEventErrorPageDisplayedWithoutSuggestion() = runTest {
+        fakeSuggestRedirectFeature.apply {
+            self().setRawStoredState(State(enable = true))
+            suggestRedirect().setRawStoredState(State(enable = true))
+        }
+        whenever(mockSuggestRedirectEvaluator.suggestRedirect(any()))
+            .thenReturn(null)
+
+        testee.onReceivedError(BAD_URL, "http://example.com", "ERROR_HOST_LOOKUP")
+
+        // redirect_suggested must mean a suggestion was shown to the user, not that the check ran
+        verify(mockBadUrlErrorPageWideEvent).onBadUrlErrorPageDisplayed("abc")
+        verify(mockBadUrlErrorPageWideEvent, never()).onRedirectSuggested(any())
+    }
+
+    @Test
+    fun whenBadUrlErrorReceivedAndSuggestRedirectDisabledThenWideEventErrorPageDisplayedStillReported() = runTest {
+        fakeSuggestRedirectFeature.suggestRedirect().setRawStoredState(State(enable = false))
+
+        testee.onReceivedError(BAD_URL, "http://example.com", "ERROR_HOST_LOOKUP")
+
+        // The hook reports every BAD_URL error page, whether to record is gated centrally in the wide event implementation, not here.
+        verify(mockBadUrlErrorPageWideEvent).onBadUrlErrorPageDisplayed("abc")
+        verify(mockBadUrlErrorPageWideEvent, never()).onRedirectSuggested(any())
+    }
+
+    @Test
+    fun whenBadUrlErrorReceivedAndRedirectSuggestionFoundThenWideEventRedirectSuggested() = runTest {
+        fakeSuggestRedirectFeature.apply {
+            self().setRawStoredState(State(enable = true))
+            suggestRedirect().setRawStoredState(State(enable = true))
+        }
+        whenever(mockSuggestRedirectEvaluator.suggestRedirect(any()))
+            .thenReturn(RedirectSuggestion(domain = "www.example.com", url = "http://www.example.com"))
+
+        testee.onReceivedError(BAD_URL, "http://example.com", "ERROR_HOST_LOOKUP")
+
+        verify(mockBadUrlErrorPageWideEvent).onRedirectSuggested("abc")
+    }
+
+    @Test
+    fun whenRedirectSuggestionClickedThenWideEventRedirectClickedAndNoExitReported() = runTest {
+        testee.onRedirectSuggestionClicked("http://www.example.com")
+
+        // The flow must stay open awaiting the redirect outcome, so no exit is reported here.
+        verify(mockBadUrlErrorPageWideEvent).onRedirectClicked("abc")
+        verify(mockBadUrlErrorPageWideEvent, never()).onBadUrlErrorPageExited(any())
+    }
+
+    @Test
+    fun whenPageFinishedThenWideEventPageLoadFinished() = runTest {
+        loadUrl("http://www.example.com")
+
+        testee.pageFinished(mockWebView, WebViewNavigationState(mockStack, 100), "http://www.example.com")
+
+        verify(mockBadUrlErrorPageWideEvent).onPageLoadFinished("abc")
+    }
+
+    @Test
+    fun whenPageFinishedWhileErrorPageShowingThenWideEventPageLoadFinishedNotCalled() = runTest {
+        loadUrl("http://example.com")
+        testee.onReceivedError(BAD_URL, "http://example.com", "ERROR_HOST_LOOKUP")
+
+        testee.pageFinished(mockWebView, WebViewNavigationState(mockStack, 100), "http://example.com")
+
+        verify(mockBadUrlErrorPageWideEvent, never()).onPageLoadFinished(any())
+    }
+
+    @Test
+    fun whenProgressReaches100ThenWideEventPageLoadFinishedNotCalled() = runTest {
+        loadUrl("http://www.example.com")
+
+        testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
+
+        verify(mockBadUrlErrorPageWideEvent, never()).onPageLoadFinished(any())
+    }
+
+    @Test
+    fun whenWebViewRefreshedWhileErrorPageShowingThenWideEventErrorPageRefreshed() = runTest {
+        testee.onReceivedError(BAD_URL, "http://example.com", "ERROR_HOST_LOOKUP")
+
+        testee.onWebViewRefreshed()
+
+        verify(mockBadUrlErrorPageWideEvent).onErrorPageRefreshed("abc")
+    }
+
+    @Test
+    fun whenWebViewRefreshedWithoutErrorPageThenWideEventErrorPageRefreshedNotCalled() = runTest {
+        testee.onWebViewRefreshed()
+
+        verify(mockBadUrlErrorPageWideEvent, never()).onErrorPageRefreshed(any())
+    }
+
+    @Test
+    fun whenOmittedErrorReceivedThenWideEventOmittedErrorReceived() = runTest {
+        testee.onReceivedError(OMITTED, "http://example.com", "ERROR_CONNECT")
+
+        verify(mockBadUrlErrorPageWideEvent).onOmittedErrorReceived("abc")
+    }
+
+    @Test
+    fun whenPageFinishedWhileErrorPageRefreshingThenWideEventPageLoadFinished() = runTest {
+        loadUrl("http://example.com")
+        testee.onReceivedError(BAD_URL, "http://example.com", "ERROR_HOST_LOOKUP")
+        testee.onWebViewRefreshed()
+
+        testee.pageFinished(mockWebView, WebViewNavigationState(mockStack, 100), "http://example.com")
+
+        verify(mockBadUrlErrorPageWideEvent).onPageLoadFinished("abc")
+    }
+
+    @Test
+    fun whenTransientErrorPrecedesBadUrlErrorThenWideEventPageLoadFinishedNotCalled() = runTest {
+        loadUrl("http://example.com")
+        testee.onReceivedError(OMITTED, "http://www.example.com", "ERROR_UNKNOWN")
+        testee.onReceivedError(BAD_URL, "http://www.example.com", "ERROR_HOST_LOOKUP")
+
+        testee.pageFinished(mockWebView, WebViewNavigationState(mockStack, 100), "http://www.example.com")
+
+        verify(mockBadUrlErrorPageWideEvent).onBadUrlErrorPageDisplayed("abc")
+        verify(mockBadUrlErrorPageWideEvent, never()).onPageLoadFinished(any())
+    }
+
+    @Test
+    fun whenProgressReaches100BeforeRepeatBadUrlErrorDuringRefreshThenWideEventPageLoadFinishedNotCalled() = runTest {
+        // Reproduces the reload race: Chromium can report full progress before dispatching the
+        // main-frame error, which must not settle the refresh as recovered.
+        loadUrl("http://example.com")
+        testee.onReceivedError(BAD_URL, "http://example.com", "ERROR_HOST_LOOKUP")
+        testee.onWebViewRefreshed()
+
+        testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
+        testee.onReceivedError(BAD_URL, "http://example.com", "ERROR_HOST_LOOKUP")
+        testee.pageFinished(mockWebView, WebViewNavigationState(mockStack, 100), "http://example.com")
+
+        verify(mockBadUrlErrorPageWideEvent, never()).onPageLoadFinished(any())
+        verify(mockBadUrlErrorPageWideEvent, times(2)).onBadUrlErrorPageDisplayed("abc")
+        verify(mockBadUrlErrorPageWideEvent).onErrorPageRefreshed("abc")
+    }
+
+    @Test
+    fun whenUserSubmittedQueryWithNewUrlThenWideEventBadUrlErrorPageExited() = runTest {
+        loadUrl("http://example.com")
+        whenever(mockOmnibarConverter.convertQueryToUrl("http://another-site.com", null))
+            .thenReturn("http://another-site.com")
+
+        testee.onUserSubmittedQuery("http://another-site.com")
+
+        verify(mockBadUrlErrorPageWideEvent).onBadUrlErrorPageExited("abc")
+        verify(mockBadUrlErrorPageWideEvent, never()).onErrorPageRefreshed(any())
+    }
+
+    @Test
+    fun whenUserSubmittedQueryWithCurrentUrlThenWideEventErrorPageRefreshedAndNoExitReported() = runTest {
+        loadUrl("http://example.com")
+        whenever(mockOmnibarConverter.convertQueryToUrl("http://example.com", null))
+            .thenReturn("http://example.com")
+
+        testee.onUserSubmittedQuery("http://example.com")
+
+        // Re-submitting the failing URL is a retry of the same journey, not an exit.
+        verify(mockBadUrlErrorPageWideEvent).onErrorPageRefreshed("abc")
+        verify(mockBadUrlErrorPageWideEvent, never()).onBadUrlErrorPageExited(any())
+    }
+
+    @Test
+    fun whenUserSubmittedQueryRetypesFailedHostnameThenWideEventErrorPageRefreshedAndNoExitReported() = runTest {
+        loadUrl("http://example.com")
+        whenever(mockOmnibarConverter.convertQueryToUrl("example.com", null))
+            .thenReturn("http://example.com")
+
+        testee.onUserSubmittedQuery("example.com")
+
+        // The raw input differs from the tab's URL only by normalization, so it's a retry, not an exit.
+        verify(mockBadUrlErrorPageWideEvent).onErrorPageRefreshed("abc")
+        verify(mockBadUrlErrorPageWideEvent, never()).onBadUrlErrorPageExited(any())
+    }
+
+    @Test
+    fun whenConnectionErrorReceivedThenWideEventConnectionErrorPageDisplayed() = runTest {
+        testee.onReceivedError(CONNECTION, "http://example.com", "ERROR_CONNECT")
+
+        verify(mockBadUrlErrorPageWideEvent).onConnectionErrorPageDisplayed("abc")
+        verify(mockBadUrlErrorPageWideEvent, never()).onOtherErrorPageDisplayed(any())
+    }
+
+    @Test
+    fun whenSslProtocolErrorReceivedThenWideEventOtherErrorPageDisplayed() = runTest {
+        testee.onReceivedError(SSL_PROTOCOL_ERROR, "http://example.com", "ERROR_FAILED_SSL_HANDSHAKE")
+
+        verify(mockBadUrlErrorPageWideEvent).onOtherErrorPageDisplayed("abc")
+        verify(mockBadUrlErrorPageWideEvent, never()).onConnectionErrorPageDisplayed(any())
+    }
+
+    @Test
+    fun whenSslWarningShownThenWideEventOtherErrorPageDisplayed() {
+        whenever(mockEnabledToggle.isEnabled())
+            .thenReturn(true)
+        val url = exampleUrl
+        givenCurrentSite(url)
+        val certificate = aRSASslCertificate()
+        val sslErrorResponse = SslErrorResponse(SslError(SslError.SSL_EXPIRED, certificate, url), EXPIRED, url)
+
+        testee.onReceivedSslError(aHandler(), sslErrorResponse)
+
+        // givenCurrentSite reloads the ViewModel under the "TAB_ID" tab
+        verify(mockBadUrlErrorPageWideEvent).onOtherErrorPageDisplayed("TAB_ID")
+    }
+
+    @Test
+    fun whenMaliciousSiteWarningShownThenWideEventOtherErrorPageDisplayed() = runTest {
+        testee.onReceivedMaliciousSiteWarning(
+            "https://www.malicious.com".toUri(),
+            Feed.PHISHING,
+            exempted = false,
+            clientSideHit = false,
+            isMainframe = true,
+        )
+
+        verify(mockBadUrlErrorPageWideEvent).onOtherErrorPageDisplayed("abc")
+    }
+
+    @Test
+    fun whenMaliciousSiteWarningExemptedThenWideEventOtherErrorPageDisplayedNotCalled() = runTest {
+        testee.onReceivedMaliciousSiteWarning(
+            "https://www.malicious.com".toUri(),
+            Feed.PHISHING,
+            exempted = true,
+            clientSideHit = false,
+            isMainframe = true,
+        )
+
+        verify(mockBadUrlErrorPageWideEvent, never()).onOtherErrorPageDisplayed(any())
+    }
+
+    @Test
+    fun whenUserPressedBackAndCanGoBackThenWideEventBadUrlErrorPageExited() = runTest {
+        setupNavigation(isBrowsing = true, canGoBack = true)
+
+        testee.onUserPressedBack()
+
+        verify(mockBadUrlErrorPageWideEvent).onBadUrlErrorPageExited("abc")
+    }
+
+    @Test
+    fun whenUserPressedBackAndNavigatesHomeThenWideEventBadUrlErrorPageExited() = runTest {
+        setupNavigation(isBrowsing = true, canGoBack = false)
+
+        testee.onUserPressedBack()
+
+        verify(mockBadUrlErrorPageWideEvent).onBadUrlErrorPageExited("abc")
+    }
+
+    @Test
+    fun whenUserPressedBackAndCanGoBackThenPendingBackOrCloseExitRecorded() = runTest {
+        setupNavigation(isBrowsing = true, canGoBack = true)
+
+        testee.onUserPressedBack()
+
+        verify(mockDuckAiSessionCallback).onExitIntent("abc", DuckAiSessionExitTrigger.BACK_OR_CLOSE)
+    }
+
+    @Test
+    fun whenUserPressedBackWithSourceTabThenPendingBackOrCloseExitRecorded() = runTest {
+        selectedTabLiveData.value = TabEntity(tabId = "abc", sourceTabId = "source-tab")
+        setupNavigation(isBrowsing = true, canGoBack = false)
+
+        testee.onUserPressedBack()
+
+        verify(mockDuckAiSessionCallback).onExitIntent("abc", DuckAiSessionExitTrigger.BACK_OR_CLOSE)
+    }
+
+    @Test
+    fun whenUserPressedBackNavigatesHomeThenPendingBackOrCloseExitRecorded() = runTest {
+        setupNavigation(isBrowsing = true, canGoBack = false, skipHome = false)
+
+        testee.onUserPressedBack()
+
+        verify(mockDuckAiSessionCallback).onExitIntent("abc", DuckAiSessionExitTrigger.BACK_OR_CLOSE)
+    }
+
+    @Test
+    fun whenUserPressedBackWithNothingLeftToHandleThenPendingBackOrCloseExitRecorded() = runTest {
+        setupNavigation(isBrowsing = true, canGoBack = false, skipHome = true)
+
+        testee.onUserPressedBack()
+
+        verify(mockDuckAiSessionCallback).onExitIntent("abc", DuckAiSessionExitTrigger.BACK_OR_CLOSE)
+    }
+
+    @Test
+    fun whenRecordPendingNewTabOpenedExitCalledThenPendingNewTabOpenedExitRecorded() = runTest {
+        testee.recordPendingNewTabOpenedExit()
+
+        verify(mockDuckAiSessionCallback).onExitIntent("abc", DuckAiSessionExitTrigger.NEW_TAB_OPENED)
+    }
+
+    @Test
+    fun whenRecordPendingFireTabOpenedExitCalledThenPendingFireTabOpenedExitRecorded() = runTest {
+        testee.recordPendingFireTabOpenedExit()
+
+        verify(mockDuckAiSessionCallback).onExitIntent("abc", DuckAiSessionExitTrigger.FIRE_TAB_OPENED)
+    }
+
+    @Test
+    fun whenUserPressedForwardThenWideEventBadUrlErrorPageExited() = runTest {
+        setBrowserShowing(true)
+
+        testee.onUserPressedForward()
+
+        verify(mockBadUrlErrorPageWideEvent).onBadUrlErrorPageExited("abc")
+    }
+
+    @Test
+    fun whenUserOnErrorPagePressesForwardThenWideEventExitNotReported() = runTest {
+        // Forward from an error page reloads the failing page rather than navigating away
+        setBrowserShowing(false)
+
+        testee.onUserPressedForward()
+
+        verify(mockBadUrlErrorPageWideEvent, never()).onBadUrlErrorPageExited(any())
+    }
+
+    @Test
+    fun whenHistoricalPageSelectedThenWideEventBadUrlErrorPageExited() = runTest {
+        testee.historicalPageSelected(stackIndex = 1)
+
+        verify(mockBadUrlErrorPageWideEvent).onBadUrlErrorPageExited("abc")
+    }
+
+    @Test
+    fun whenBrowserModeChangedThenWideEventBadUrlErrorPageExited() = runTest {
+        loadUrl("http://example.com")
+
+        testee.onChangeBrowserModeClicked()
+
+        verify(mockBadUrlErrorPageWideEvent).onBadUrlErrorPageExited("abc")
+    }
+
+    @Test
     fun whenUserSelectedAutocompleteWithAutoCompleteSwitchToTabSuggestionThenSwitchToTabCommandSentWithTabId() =
         runTest {
             val tabId = "tabId"
@@ -11480,6 +11856,34 @@ class BrowserTabViewModelTest {
         val commands = commandCaptor.allValues
         assertFalse(commands.any { it is Command.DuckAIFullScreenDisabled })
         assertTrue(commands.any { it is Command.EnableDuckAIFullScreen })
+    }
+
+    @Test
+    fun whenDuckAiPageFinishedOnTheActiveTabThenFullTabVisibleReported() = runTest {
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+        // givenCurrentSite reloads the ViewModel for tabId "TAB_ID"; matching it here is what makes
+        // isActiveTab() true.
+        val url = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5&chatID=chat-a"
+        givenCurrentSite(url)
+        selectedTabLiveData.value = TabEntity(tabId = "TAB_ID", url = url)
+        val webViewNavState = WebViewNavigationState(mockStack, 100)
+
+        testee.pageFinished(mockWebView, webViewNavState, url)
+
+        verify(mockDuckAiSessionCallback).onDuckAiPageVisible("TAB_ID", url)
+    }
+
+    @Test
+    fun whenDuckAiPageFinishedOnABackgroundTabThenFullTabVisibleNotReported() = runTest {
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+        givenCurrentSite("https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5")
+        // A different tab is selected: this ViewModel's tab ("TAB_ID") is not the one on screen.
+        selectedTabLiveData.value = TabEntity(tabId = "some-other-tab", url = "https://example.com")
+        val webViewNavState = WebViewNavigationState(mockStack, 100)
+
+        testee.pageFinished(mockWebView, webViewNavState, "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5")
+
+        verify(mockDuckAiSessionCallback, never()).onDuckAiPageVisible(any(), any())
     }
 
     @Test

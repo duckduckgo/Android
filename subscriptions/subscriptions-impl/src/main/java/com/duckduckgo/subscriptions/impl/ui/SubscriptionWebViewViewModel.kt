@@ -718,14 +718,12 @@ class SubscriptionWebViewViewModel @Inject constructor(
 
     private fun backToSettingsActiveSuccess() {
         viewModelScope.launch {
-            subscriptionsManager.fetchAndStoreAllData()
             command.send(BackToSettingsActivateSuccess)
         }
     }
 
     private fun backToSettings() {
         viewModelScope.launch {
-            subscriptionsManager.fetchAndStoreAllData()
             command.send(BackToSettings)
         }
     }

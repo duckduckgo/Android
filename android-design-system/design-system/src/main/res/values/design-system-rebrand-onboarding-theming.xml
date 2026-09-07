@@ -36,6 +36,7 @@
     <attr name="onboardingIconsPrimary" format="color" />
     <attr name="onboardingIconsSecondary" format="color" />
     <attr name="onboardingIconsTertiary" format="color" />
+    <attr name="onboardingIconsSuccess" format="color" />
     <attr name="onboardingControlFillTertiary" format="color" />
     <attr name="onboardingShadowPurple" format="color" />
     <attr name="onboardingShadowBlue" format="color" />
@@ -43,6 +44,7 @@
     <color name="onboardingTextSecondarySmallLight">#99242323</color> <!--60%-->
     <color name="onboardingTextSecondarySmallDark">#D1CECB</color>
     <attr name="onboardingBorderPrimary" format="color" />
+    <attr name="onboardingTileStroke" format="color" />
     <attr name="onboardingBorderTertiary" format="color" />
 
     <!-- Quick setup -->
@@ -74,6 +76,7 @@
         <item name="onboardingShadowPurple">#0F3E228C</item> <!--6% Alpha-->
         <item name="onboardingShadowBlue">#171E42A4</item> <!--9% Alpha-->
         <item name="onboardingBorderPrimary">@color/black20</item>
+        <item name="onboardingTileStroke">@color/black16</item>
         <item name="onboardingBorderTertiary">#1F242323</item>
 
         <!--Quick setup-->
@@ -83,6 +86,7 @@
         <item name="onboardingIconsPrimary">#D6242323</item> <!--84% Alpha-->
         <item name="onboardingIconsSecondary">#99383838</item> <!--60% Alpha-->
         <item name="onboardingIconsTertiary">#66242323</item> <!--40% Alpha-->
+        <item name="onboardingIconsSuccess">@color/lilypad60</item>
 
         <!--Surface-->
         <item name="daxColorBackground">?attr/onboardingSurfaceBackdrop</item>
@@ -139,6 +143,7 @@
         <item name="onboardingShadowPurple">#0F070019</item> <!--6% Alpha-->
         <item name="onboardingShadowBlue">#17051133</item> <!--9% Alpha-->
         <item name="onboardingBorderPrimary">@color/white36</item>
+        <item name="onboardingTileStroke">@color/white12</item>
         <item name="onboardingBorderTertiary">@color/white18</item>
 
         <!--Quick setup-->
@@ -148,6 +153,7 @@
         <item name="onboardingIconsPrimary">#D6FBFAF9</item> <!--84% Alpha-->
         <item name="onboardingIconsSecondary">#7AFBFAF9</item> <!--48% Alpha-->
         <item name="onboardingIconsTertiary">#7AFBFAF9</item> <!--48% Alpha-->
+        <item name="onboardingIconsSuccess">@color/lilypad30</item>
 
         <!--Surface-->
         <item name="daxColorBackground">?attr/onboardingSurfaceBackdrop</item>
