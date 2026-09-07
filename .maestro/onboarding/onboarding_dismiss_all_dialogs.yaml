@@ -52,12 +52,22 @@ tags:
           text: ".*Remember: every time you browse with me a creepy ad loses its.wings..*"
       - runFlow: ../shared/browser_screen/click_on_tabs_button.yaml
       - tapOn: "New Tab"
-      # In the widget cohorts of addToDockAndWidgetExperimentJul25 the linear plan already showed
-      # the widget page, so AddWidgetModalEvaluator suppresses this sheet (unit-tested). Assert it
-      # appears only in the cohorts that didn't get that page.
       - runFlow:
           when:
             true: ${!output.linearWidgetPromptShown}
           commands:
             - assertVisible:
+                text: ".*Try our Home screen widget!.*"
+      - runFlow:
+          when:
+            true: ${output.linearWidgetPromptShown}
+          commands:
+            # Optional so the wait itself can't fail: it exists to give the sheet the ~450ms
+            # window it would have had, so the assertion below can't pass by running too early.
+            - extendedWaitUntil:
+                visible:
+                  text: ".*Try our Home screen widget!.*"
+                timeout: 3000
+                optional: true
+            - assertNotVisible:
                 text: ".*Try our Home screen widget!.*"
