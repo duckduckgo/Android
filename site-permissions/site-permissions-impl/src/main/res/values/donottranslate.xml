@@ -29,4 +29,21 @@
     <string name="sitePermissionsTieredMicDialogTitle" instruction="Placeholder is a website">\"%1$s\" website wants to access your microphone</string>
     <string name="sitePermissionsTieredMicAndCameraDialogTitle" instruction="Placeholder is a website">\"%1$s\" website wants to access your camera and microphone</string>
     <string name="sitePermissionsTieredDrmDialogSubtitle">If you don\'t allow, videos on the site may become unplayable, but this site will not have access to device identifiers provided by DRM software.</string>
+
+    <!-- Reminder dialog -->
+    <string name="sitePermissionsDialogChangePermissionsButton">Change Permissions</string>
+    <string name="sitePermissionsTieredSystemDeniedLocationTitle">DuckDuckGo needs to access your location</string>
+    <string name="sitePermissionsTieredSystemDeniedLocationContent">Location permissions are needed if you want to use location features on this site.</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraTitle">DuckDuckGo needs to access your camera</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraContent">Camera permissions are needed if you want to use camera features on this site.</string>
+    <string name="sitePermissionsTieredSystemDeniedMicTitle">DuckDuckGo needs to access your microphone</string>
+    <string name="sitePermissionsTieredSystemDeniedMicContent">Microphone permissions are needed if you want to use microphone features on this site.</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraAndMicTitle">DuckDuckGo needs to access your camera and microphone</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraAndMicContent">Camera and microphone permissions are needed if you want to use camera and microphone features on this site.</string>
+
+    <!-- Denial snackbar -->
+    <string name="sitePermissionsTieredLocationDeniedSnackBarMessage">DuckDuckGo couldn\'t share location with this site</string>
+    <string name="sitePermissionsTieredCameraDeniedSnackBarMessage">DuckDuckGo couldn\'t give camera access to this site</string>
+    <string name="sitePermissionsTieredMicDeniedSnackBarMessage">DuckDuckGo couldn\'t give microphone access to this site</string>
+    <string name="sitePermissionsTieredCameraAndMicDeniedSnackBarMessage">DuckDuckGo couldn\'t give camera and microphone access to this site</string>
 </resources>
