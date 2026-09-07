@@ -323,4 +323,11 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun contextualEntryDismissOnTabChange(): Toggle
+
+    /**
+     * @return `true` when the "Ask Duck.ai" text selection menu item is enabled.
+     * If the remote feature is not present defaults to `INTERNAL`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun askDuckAi(): Toggle
 }
