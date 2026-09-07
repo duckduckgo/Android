@@ -212,7 +212,7 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
         binding.postflow.appIcon.setImageDrawable(
             ContextCompat.getDrawable(
                 binding.root.context,
-                R.drawable.ic_success_128,
+                R.drawable.success_128,
             ),
         )
         binding.postflow.dialogTitle.text = getString(R.string.importPasswordsProcessingResultDialogTitleUponSuccess)
@@ -242,7 +242,7 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
         binding.postflow.appIcon.setImageDrawable(
             ContextCompat.getDrawable(
                 binding.root.context,
-                R.drawable.ic_passwords_import_128,
+                R.drawable.passwords_import_128,
             ),
         )
 

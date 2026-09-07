@@ -42,7 +42,6 @@ import com.airbnb.lottie.LottieDrawable.INFINITE
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
-import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.addClickableSpan
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
@@ -72,9 +71,6 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
-
-    @Inject
-    lateinit var appTheme: AppTheme
 
     private val binding: FragmentSubscriptionOnboardingVpnBinding by viewBinding()
 
@@ -218,7 +214,7 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
     }
 
     private fun configureHeaderAnimation() {
-        val animation = if (appTheme.isLightModeEnabled()) R.raw.vpn_header else R.raw.vpn_header_dark
+        val animation = R.raw.vpn_header
         binding.subscriptionOnboardingVpnHeaderAnimation.setAnimation(animation)
     }
 

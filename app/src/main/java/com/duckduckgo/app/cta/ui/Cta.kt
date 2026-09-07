@@ -2101,7 +2101,7 @@ sealed class DaxBubbleCta(
         ctaId = CtaId.DAX_INTRO_PRIVACY_PRO,
         title = R.string.onboardingPrivacyProDaxDialogTitle,
         description = R.string.onboardingPrivacyProDaxDialogDescription,
-        placeholder = DesignSystemR.drawable.ic_privacy_pro_128,
+        placeholder = DesignSystemR.drawable.subscription_128,
         primaryCta = if (isFreeTrialCopy) {
             R.string.onboardingPrivacyProDaxDialogFreeTrialOkButton
         } else {

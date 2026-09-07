@@ -100,10 +100,10 @@ fun RemoteMessage.asMessage(
 
 fun Placeholder.drawable(isLightModeEnabled: Boolean): Int {
     return when (this) {
-        ANNOUNCE -> R.drawable.ic_announce
-        DDG_ANNOUNCE -> R.drawable.ic_ddg_announce
-        CRITICAL_UPDATE -> R.drawable.ic_critical_update
-        APP_UPDATE -> R.drawable.ic_app_update
+        ANNOUNCE -> R.drawable.announcement_96
+        DDG_ANNOUNCE -> R.drawable.duckduckgo_96
+        CRITICAL_UPDATE -> R.drawable.critical_update_96
+        APP_UPDATE -> R.drawable.update_96
         MAC_AND_WINDOWS_NEW -> R.drawable.desktop_promo_artwork
         MAC_AND_WINDOWS -> R.drawable.laptop_ddginstall_96
         PRIVACY_SHIELD -> R.drawable.subscription_96
@@ -115,10 +115,10 @@ fun Placeholder.drawable(isLightModeEnabled: Boolean): Int {
             R.drawable.ic_visual_design_update_artwork_dark
         }
 
-        IMAGE_AI -> R.drawable.ic_image_ai
-        RADAR -> R.drawable.ic_radar
-        KEY_IMPORT -> R.drawable.ic_key_import
-        SPLIT_BAR_SETTINGS -> R.drawable.ic_split_bar_mobile_settings
+        IMAGE_AI -> R.drawable.image_sweep_96
+        RADAR -> R.drawable.radar_check_96
+        KEY_IMPORT -> R.drawable.passwords_import_96
+        SPLIT_BAR_SETTINGS -> R.drawable.mobile_split_bar_settings_96
         BOOKMARKS_IMPORT -> R.drawable.bookmarks_import_96
         NEW_TAB_OPTIONS -> R.drawable.newtab_options_96
     }

@@ -37,7 +37,7 @@
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/ic_apptp_default"
+            android:src="@drawable/shield_check_recolorable_24"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"

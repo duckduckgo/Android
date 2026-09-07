@@ -113,7 +113,7 @@ class ItrSettingView @JvmOverloads constructor(
                     isClickable = false
                     setStatus(isOn = false)
                     setClickListener(null)
-                    setLeadingIconResource(R.drawable.ic_identity_theft_restoration_grayscale_color_24)
+                    setLeadingIconResource(R.drawable.identity_theft_restoration_grayscale_color_24)
                 }
                 ItrState.Hidden -> isGone = true
             }

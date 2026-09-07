@@ -48,8 +48,8 @@ sealed class ComparisonChartConfig(
             Row(CommonR.drawable.vpn_color_24, R.string.preOnboardingComparisonChartItem1),
             Row(CommonR.drawable.ai_chat_color_24, R.string.preOnboardingComparisonChartDuckAi),
             Row(CommonR.drawable.shield_color_24, R.string.preOnboardingComparisonChartItem2),
-            Row(CommonR.drawable.ic_profile_blocker_color_24_rebrand, R.string.preOnboardingComparisonChartAdAndCookiePopupBlocker),
-            Row(R.drawable.ic_video_player_color_24, R.string.preOnboardingComparisonChartYoutubeAdBlocker),
+            Row(CommonR.drawable.identity_blocked_pir_color_24, R.string.preOnboardingComparisonChartAdAndCookiePopupBlocker),
+            Row(R.drawable.video_player_color_24, R.string.preOnboardingComparisonChartYoutubeAdBlocker),
         ),
     )
 

@@ -123,7 +123,7 @@ class AppTrackingProtectionStateView @JvmOverloads constructor(
             renderTrackersBlockedWhenEnabled(viewState.trackersBlocked)
         } else {
             binding.deviceShieldCtaHeader.setText(R.string.atp_NewTabEnabled)
-            binding.deviceShieldCtaImage.setImageResource(R.drawable.ic_apptp_default)
+            binding.deviceShieldCtaImage.setImageResource(R.drawable.shield_check_recolorable_24)
         }
     }
 
@@ -194,7 +194,7 @@ class AppTrackingProtectionStateView @JvmOverloads constructor(
             }
 
         binding.deviceShieldCtaHeader.text = HtmlCompat.fromHtml(textToStyle, HtmlCompat.FROM_HTML_MODE_LEGACY)
-        binding.deviceShieldCtaImage.setImageResource(R.drawable.ic_apptp_default)
+        binding.deviceShieldCtaImage.setImageResource(R.drawable.shield_check_recolorable_24)
     }
 }
 

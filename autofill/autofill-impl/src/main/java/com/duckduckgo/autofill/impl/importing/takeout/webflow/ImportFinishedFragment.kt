@@ -76,7 +76,7 @@ class ImportFinishedFragment : DuckDuckGoFragment() {
 
         binding?.run {
             bookmarksImportResult.setPrimaryText(getString(R.string.importBookmarksFromGoogleSuccessBookmarksCount, bookmarkCount))
-            bookmarksImportResult.setLeadingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_check_green_24)
+            bookmarksImportResult.setLeadingIconResource(com.duckduckgo.mobile.android.R.drawable.check_recolorable_24)
             importResultTitle.text = getString(R.string.importBookmarksSuccessTitle)
             secondaryErrorInfo.gone()
         }

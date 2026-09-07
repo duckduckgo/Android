@@ -124,7 +124,7 @@ class DeviceShieldFragment : DuckDuckGoFragment() {
             renderTrackersBlockedWhenEnabled(viewState.trackersBlocked)
         } else {
             deviceShieldCtaHeaderTextView.setText(R.string.atp_NewTabEnabled)
-            deviceShieldCtaImageView.setImageResource(R.drawable.ic_apptp_default)
+            deviceShieldCtaImageView.setImageResource(R.drawable.shield_check_recolorable_24)
         }
     }
 
@@ -191,6 +191,6 @@ class DeviceShieldFragment : DuckDuckGoFragment() {
             }
 
         deviceShieldCtaHeaderTextView.text = HtmlCompat.fromHtml(textToStyle, HtmlCompat.FROM_HTML_MODE_LEGACY)
-        deviceShieldCtaImageView.setImageResource(R.drawable.ic_apptp_default)
+        deviceShieldCtaImageView.setImageResource(R.drawable.shield_check_recolorable_24)
     }
 }

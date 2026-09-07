@@ -35,7 +35,7 @@
             android:layout_width="96dp"
             android:layout_height="96dp"
             android:importantForAccessibility="no"
-            android:src="@drawable/duckai_chat_hero"
+            android:src="@drawable/duckai_144"
             app:layout_constraintBottom_toTopOf="@id/chatHistoryEmptyTitle"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

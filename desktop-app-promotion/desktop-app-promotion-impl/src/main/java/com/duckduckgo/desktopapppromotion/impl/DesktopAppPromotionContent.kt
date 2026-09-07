@@ -44,7 +44,7 @@ fun DesktopAppPromotionParams.resolveContent(context: Context): DesktopAppPromot
         toolbarTitle = toolbarTitle ?: context.getString(R.string.desktopAppPromotionToolbarTitle),
         title = title ?: context.getString(R.string.desktopAppPromotionTitle),
         body = body ?: context.getString(R.string.desktopAppPromotionBody),
-        illustration = illustration ?: R.drawable.image_get_desktop_browser,
+        illustration = illustration ?: R.drawable.laptop_ddginstall_96,
         downloadUrlDisplay = link.downloadUrlDisplay ?: context.getString(R.string.desktopAppPromotionUrl),
         downloadUrl = link.downloadUrl ?: DEFAULT_DOWNLOAD_URL,
         shareButtonLabel = share.shareButtonLabel ?: context.getString(R.string.desktopAppPromotionShareDownloadLink),

@@ -34,7 +34,7 @@
             android:layout_marginEnd="24dp"
             android:layout_marginBottom="100dp"
             android:importantForAccessibility="no"
-            android:src="@drawable/ic_yeti_light"
+            android:src="@drawable/dax_accident_light"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

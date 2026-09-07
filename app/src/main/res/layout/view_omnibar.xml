@@ -189,7 +189,7 @@
                                     android:padding="@dimen/keyline_1"
                                     android:scaleType="center"
                                     android:visibility="gone"
-                                    app:srcCompat="@drawable/ic_video_player_color_24" />
+                                    app:srcCompat="@drawable/video_player_color_24" />
 
                                 <ImageView
                                     android:id="@+id/searchIcon"

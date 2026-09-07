@@ -63,7 +63,7 @@
         android:padding="8dp"
         android:scaleX="0"
         android:scaleY="0"
-        app:srcCompat="@drawable/avd_check_green_24"
+        app:srcCompat="@drawable/avd_check_recolorable_24"
         tools:alpha="1"
         tools:scaleX="1"
         tools:scaleY="1" />

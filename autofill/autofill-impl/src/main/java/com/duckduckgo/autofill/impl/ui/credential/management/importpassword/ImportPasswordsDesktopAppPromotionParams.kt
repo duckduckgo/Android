@@ -29,7 +29,7 @@ object ImportPasswordsDesktopAppPromotionParams {
         toolbarTitle = context.getString(R.string.autofillManagementImportPasswordsGetDesktopAppTitle),
         title = context.getString(R.string.autofillManagementImportPasswordsGetDesktopAppSubtitle),
         body = context.getString(R.string.autofillManagementImportPasswordsGetDesktopAppInstruction),
-        illustration = CommonR.drawable.ic_app_download_128,
+        illustration = CommonR.drawable.ddg_app_download_128,
         link = DownloadLinkConfig(downloadUrl = DESKTOP_APP_URL),
         share = ShareConfig(
             shareIntentTitle = context.getString(R.string.autofillManagementImportPasswordsGetDesktopBrowserIntentTitle),

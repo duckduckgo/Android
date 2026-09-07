@@ -149,7 +149,7 @@ internal class ChatSyncPromoViewHolder(
         binding.syncPromotion.apply {
             setMessage(
                 MessageCta.Message(
-                    topIllustration = drawable.ic_chat_sync_72,
+                    topIllustration = drawable.sync_ai_96,
                     title = context.getString(string.sync_chat_promo_banner_title),
                     action = context.getString(string.sync_chat_promo_banner_cta_title),
                 ),

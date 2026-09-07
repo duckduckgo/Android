@@ -58,7 +58,7 @@
         app:layout_constraintEnd_toEndOf="@id/ddgLogo"
         app:layout_constraintStart_toStartOf="@id/ddgLogo"
         app:layout_constraintTop_toTopOf="@id/feature1"
-        app:srcCompat="@drawable/ic_check_green_24" />
+        app:srcCompat="@drawable/check_recolorable_24" />
 
     <ImageView
         android:id="@+id/cross1"
@@ -108,7 +108,7 @@
         app:layout_constraintEnd_toEndOf="@id/ddgLogo"
         app:layout_constraintStart_toStartOf="@id/ddgLogo"
         app:layout_constraintTop_toTopOf="@id/feature2"
-        app:srcCompat="@drawable/ic_check_green_24" />
+        app:srcCompat="@drawable/check_recolorable_24" />
 
     <ImageView
         android:id="@+id/cross2"
@@ -158,7 +158,7 @@
         app:layout_constraintEnd_toEndOf="@id/ddgLogo"
         app:layout_constraintStart_toStartOf="@id/ddgLogo"
         app:layout_constraintTop_toTopOf="@id/feature3"
-        app:srcCompat="@drawable/ic_check_green_24" />
+        app:srcCompat="@drawable/check_recolorable_24" />
 
     <ImageView
         android:id="@+id/cross3"
@@ -208,7 +208,7 @@
         app:layout_constraintEnd_toEndOf="@id/ddgLogo"
         app:layout_constraintStart_toStartOf="@id/ddgLogo"
         app:layout_constraintTop_toTopOf="@id/feature4"
-        app:srcCompat="@drawable/ic_check_green_24" />
+        app:srcCompat="@drawable/check_recolorable_24" />
 
     <ImageView
         android:id="@+id/cross4"
@@ -229,7 +229,7 @@
         app:layout_constraintEnd_toStartOf="@id/feature4"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/feature4"
-        app:srcCompat="@drawable/ic_cookie_blocked_color_24" />
+        app:srcCompat="@drawable/cookie_blocked_color_24" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/feature4"
@@ -258,7 +258,7 @@
         app:layout_constraintEnd_toEndOf="@id/ddgLogo"
         app:layout_constraintStart_toStartOf="@id/ddgLogo"
         app:layout_constraintTop_toTopOf="@id/feature5"
-        app:srcCompat="@drawable/ic_check_green_24" />
+        app:srcCompat="@drawable/check_recolorable_24" />
 
     <ImageView
         android:id="@+id/cross5"

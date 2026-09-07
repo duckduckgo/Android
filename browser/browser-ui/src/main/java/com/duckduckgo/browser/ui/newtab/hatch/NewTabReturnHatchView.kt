@@ -142,7 +142,7 @@ class NewTabReturnHatchView @JvmOverloads constructor(
             when (state.mode) {
                 BrowserMode.FIRE -> {
                     binding.returnHatchSiteTitle.text = context.getString(R.string.newTabReturnHatchFireTabTitle)
-                    binding.returnHatchFavicon.setImageResource(CommonR.drawable.ic_fire_tab_placeholder_96)
+                    binding.returnHatchFavicon.setImageResource(CommonR.drawable.fire_window_light_phone_96)
                 }
                 BrowserMode.REGULAR -> {
                     binding.returnHatchSiteTitle.text = state.titleOrPlaceholder()

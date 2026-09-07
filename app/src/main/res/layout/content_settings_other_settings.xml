@@ -36,7 +36,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:primaryText="@string/settingsGeneral"
-        app:leadingIcon="@drawable/ic_settings_color_24" />
+        app:leadingIcon="@drawable/settings_color_24" />
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/syncSetting"
@@ -50,21 +50,21 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:primaryText="@string/settingsHeadingAppearance"
-        app:leadingIcon="@drawable/ic_appearance_color_24"/>
+        app:leadingIcon="@drawable/appearance_color_24"/>
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/autofillLoginsSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:primaryText="@string/settingsPasswordsAndAutofillLoginsSetting"
-        app:leadingIcon="@drawable/ic_key_color_24"/>
+        app:leadingIcon="@drawable/key_color_24"/>
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/accessibilitySetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:primaryText="@string/settingsAccessibility"
-        app:leadingIcon="@drawable/ic_accessibility_color_24"/>
+        app:leadingIcon="@drawable/accessibility_color_24"/>
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/permissionsSetting"

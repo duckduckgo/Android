@@ -335,13 +335,13 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
         override fun bind(component: Component) {
             val smallMessage = Message(title = "Small Message", subtitle = "Body text goes here. This component doesn't have buttons")
             val bigSingleMessage = Message(
-                topIllustration = CommonR.drawable.ic_announce,
+                topIllustration = CommonR.drawable.announcement_96,
                 title = "Big Single Message",
                 subtitle = "Body text goes here. This component has one button",
                 action = "Primary",
             )
             val bigTwoActionsMessage = Message(
-                topIllustration = CommonR.drawable.ic_ddg_announce,
+                topIllustration = CommonR.drawable.duckduckgo_96,
                 title = "Big Two Actions Message",
                 subtitle = "Body text goes here. This component has two buttons",
                 action = "Primary",
@@ -349,7 +349,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             )
 
             val bigTwoActionsUpdateMessage = Message(
-                topIllustration = CommonR.drawable.ic_app_update,
+                topIllustration = CommonR.drawable.update_96,
                 title = "Big Two Actions Message",
                 subtitle = "Body text goes here. This component has two buttons an showcases and app update",
                 action = "Primary",
@@ -357,7 +357,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             )
 
             val mediumMessage = Message(
-                topIllustration = CommonR.drawable.ic_critical_update,
+                topIllustration = CommonR.drawable.critical_update_96,
                 title = "Medium Message",
                 subtitle = "Body text goes here. This component doesn't have buttons",
             )
@@ -427,7 +427,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 DaxMediumMessage(
                     title = "Compose Medium Message",
                     body = "Body text goes here. This component doesn't have buttons",
-                    topIllustration = painterResource(CommonR.drawable.ic_critical_update),
+                    topIllustration = painterResource(CommonR.drawable.critical_update_96),
                     onDismissed = {
                         view.findViewById<ComposeView>(R.id.medium_remote_message_compose).gone()
                     },
@@ -437,7 +437,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
             view.setupThemedComposeView(R.id.big_single_remote_message_compose, isDarkTheme = isDarkTheme) {
                 DaxBigSingleActionMessage(
-                    topIllustration = painterResource(CommonR.drawable.ic_announce),
+                    topIllustration = painterResource(CommonR.drawable.announcement_96),
                     title = "Compose Big Single Message",
                     body = "Body text goes here. This component has one button",
                     action = DaxAction(text = "Primary", onClick = {}),
@@ -475,7 +475,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
             view.setupThemedComposeView(R.id.big_two_actions_remote_message_compose, isDarkTheme = isDarkTheme) {
                 DaxBigTwoActionsMessage(
-                    topIllustration = painterResource(CommonR.drawable.ic_ddg_announce),
+                    topIllustration = painterResource(CommonR.drawable.duckduckgo_96),
                     title = "Compose Big Two Actions",
                     body = "Body text goes here. This component has two buttons",
                     primaryAction = DaxAction(text = "Primary", onClick = {}),
@@ -489,7 +489,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
             view.setupThemedComposeView(R.id.big_two_actions_update_remote_message_compose, isDarkTheme = isDarkTheme) {
                 DaxBigTwoActionsMessage(
-                    topIllustration = painterResource(CommonR.drawable.ic_app_update),
+                    topIllustration = painterResource(CommonR.drawable.update_96),
                     title = "Compose Big Two Actions",
                     body = "Body text goes here. This component has two buttons an showcases and app update",
                     primaryAction = DaxAction(text = "Primary", onClick = {}),
@@ -505,8 +505,8 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 DaxBigTwoActionsMessage(
                     topIllustration = rememberAsyncImagePainter(
                         model = "https://staticcdn.duckduckgo.com/remotemessaging/illustrations/image2.png",
-                        error = painterResource(CommonR.drawable.ic_app_update),
-                        fallback = painterResource(CommonR.drawable.ic_app_update),
+                        error = painterResource(CommonR.drawable.update_96),
+                        fallback = painterResource(CommonR.drawable.update_96),
                     ),
                     title = "Compose Remote Image",
                     body = "Body text goes here. This component has two buttons an showcases and app update",

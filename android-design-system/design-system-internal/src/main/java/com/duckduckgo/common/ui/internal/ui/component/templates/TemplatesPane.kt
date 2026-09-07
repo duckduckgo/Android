@@ -76,14 +76,14 @@ fun TemplatesPane(modifier: Modifier = Modifier) {
             DaxPageHeader(
                 title = "Private Search",
                 status = Status.On,
-                iconHeader = painterResource(CommonR.drawable.ic_privacy_pro_128),
+                iconHeader = painterResource(CommonR.drawable.subscription_128),
             )
         }
         item {
             DaxPageHeader(
                 title = "Private Search",
                 status = Status.AlwaysOn,
-                iconHeader = painterResource(CommonR.drawable.ic_privacy_pro_128),
+                iconHeader = painterResource(CommonR.drawable.subscription_128),
                 body = "DuckDuckGo Private Search is your default search engine, so you can search the web without being tracked.",
             )
         }
@@ -92,7 +92,7 @@ fun TemplatesPane(modifier: Modifier = Modifier) {
                 title = "Private Search",
                 subtitle = "Lorem impsum dolor sit amet",
                 status = Status.AlwaysOn,
-                iconHeader = painterResource(CommonR.drawable.ic_privacy_pro_128),
+                iconHeader = painterResource(CommonR.drawable.subscription_128),
                 body = "DuckDuckGo Private Search is your default search engine, so you can search the web without being tracked.",
                 learnMoreClick = {
                     Toast.makeText(context, "Learn more clicked", Toast.LENGTH_SHORT).show()

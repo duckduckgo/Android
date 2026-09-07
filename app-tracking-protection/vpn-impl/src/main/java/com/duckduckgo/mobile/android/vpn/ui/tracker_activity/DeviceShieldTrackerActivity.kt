@@ -610,11 +610,11 @@ class DeviceShieldTrackerActivity :
         if (runningState.state == VpnRunningState.ENABLED) {
             binding.deviceShieldTrackerBlockingTrackersDescription.text =
                 resources.getString(R.string.atp_ActivityBlockingTrackersEnabledDescription)
-            binding.deviceShieldTrackerShieldImage.setImageResource(R.drawable.apptp_shield_enabled)
+            binding.deviceShieldTrackerShieldImage.setImageResource(R.drawable.mobile_device_protected_128)
         } else {
             binding.deviceShieldTrackerBlockingTrackersDescription.text =
                 resources.getString(R.string.atp_ActivityBlockingTrackersDisabledDescription)
-            binding.deviceShieldTrackerShieldImage.setImageResource(R.drawable.apptp_shield_disabled)
+            binding.deviceShieldTrackerShieldImage.setImageResource(R.drawable.mobile_device_unprotected_128)
         }
     }
 

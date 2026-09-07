@@ -30,7 +30,7 @@
         <item name="daxColorInputModeIndicatorShadow">?attr/daxColorBlack</item>
 
         <item name="daxIconTabSwitcher">@drawable/ic_tab_fire_mode_24</item>
-        <item name="daxDrawableTabPlaceholderPreview">@drawable/ic_fire_tab_placeholder_96</item>
+        <item name="daxDrawableTabPlaceholderPreview">@drawable/fire_window_light_phone_96</item>
 
         <item name="daxInputModeCardThemeOverlay">@style/ThemeOverlay.DuckDuckGo.InputModeCard.DarkFire</item>
         <item name="daxOmnibarThemeOverlay">@style/ThemeOverlay.DuckDuckGo.Omnibar.FireLight</item>
@@ -50,7 +50,7 @@
         <item name="daxColorSnackbarAction">?attr/daxColorFireModeAccentDark</item>
 
         <item name="daxIconTabSwitcher">@drawable/ic_tab_fire_mode_24</item>
-        <item name="daxDrawableTabPlaceholderPreview">@drawable/ic_fire_tab_placeholder_96</item>
+        <item name="daxDrawableTabPlaceholderPreview">@drawable/fire_window_light_phone_96</item>
 
         <item name="daxOmnibarThemeOverlay">@style/ThemeOverlay.DuckDuckGo.Omnibar.FireDark</item>
         <item name="daxInputModeCardThemeOverlay">@style/ThemeOverlay.DuckDuckGo.InputModeCard.FireDark</item>

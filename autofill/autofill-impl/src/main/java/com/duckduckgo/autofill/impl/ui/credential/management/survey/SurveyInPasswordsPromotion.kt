@@ -131,7 +131,7 @@ class SurveyInPasswordsPromotionView @JvmOverloads constructor(
         with(binding.autofillSurvey) {
             setMessage(
                 Message(
-                    topIllustration = R.drawable.ic_passwords_ddg_96,
+                    topIllustration = R.drawable.passwords_ddg_96,
                     title = context.getString(R.string.autofillManagementSurveyPromptTitle),
                     subtitle = context.getString(R.string.autofillManagementSurveyPromptMessage),
                     action = context.getString(R.string.autofillManagementSurveyPromptAcceptButtonText),
