@@ -43,7 +43,7 @@
 
     <!-- Subscription onboarding - VPN step, "what to know" info page -->
     <string name="subscriptionOnboardingVpnInfoTitle">What to know about using your VPN</string>
-    <string name="subscriptionOnboardingVpnInfoGotIt">Got it</string>
+    <string name="subscriptionOnboardingVpnInfoGotIt">Got It</string>
     <string name="subscriptionOnboardingVpnInfoNoCapsTitle">No data or speed caps</string>
     <string name="subscriptionOnboardingVpnInfoNoCapsText">Stream, download, game, use as much data as you want. Unlike other VPNs, we only throttle connections to prevent abuse or network errors.</string>
     <string name="subscriptionOnboardingVpnInfoSpeedsTitle">All VPNs affect internet speeds</string>
