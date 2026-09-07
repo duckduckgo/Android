@@ -19,12 +19,13 @@ package com.duckduckgo.site.permissions.impl.feature
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 
 @ContributesRemoteFeature(
     scope = AppScope::class,
-    featureName = "microphoneSitePermissionsDomainRecovery",
+    featureName = "sitePermissionsSystemRecovery",
 )
-interface MicrophoneSitePermissionsDomainRecoveryFeature {
-    @Toggle.DefaultValue(Toggle.DefaultFeatureValue.TRUE)
+interface SitePermissionsSystemRecoveryFeature {
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun self(): Toggle
 }
