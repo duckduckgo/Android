@@ -22,9 +22,11 @@ import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelPageType
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
-import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionTarget
+import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.RealTextSelectionPayloadBuilder
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.RealTextSelectionStore
+import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionPayloadBuilder
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionStore
+import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionTarget
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -53,7 +55,7 @@ class DuckChatContextualEntryViewModelTest {
         duckChatPixels,
         modelManager,
         textSelectionStore,
-        RealContextualTextSelectionPayloadBuilder(RuntimeEnvironment.getApplication()),
+        RealTextSelectionPayloadBuilder(RuntimeEnvironment.getApplication()),
     )
 
     private val validContext = """{"title":"Example","url":"https://example.com","content":"some page content"}"""
@@ -363,7 +365,7 @@ class DuckChatContextualEntryViewModelTest {
         verify(store).store(captor.capture())
         val selection = captor.firstValue.selectionsJson!!.getJSONObject(0)
         assertTrue(selection.getBoolean("truncated"))
-        assertEquals(ContextualTextSelectionPayloadBuilder.MAX_CONTENT_LENGTH, selection.getString("content").length)
+        assertEquals(TextSelectionPayloadBuilder.MAX_CONTENT_LENGTH, selection.getString("content").length)
         assertEquals(long.trim().length, selection.getInt("fullContentLength"))
         assertEquals(3000, selection.getInt("wordCount"))
     }
