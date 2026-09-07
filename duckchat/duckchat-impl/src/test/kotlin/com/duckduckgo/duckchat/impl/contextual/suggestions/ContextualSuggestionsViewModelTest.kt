@@ -442,4 +442,29 @@ class ContextualSuggestionsViewModelTest {
 
         assertEquals(SuggestionsPageType.RECIPE, viewModel.currentPageType())
     }
+
+    @Test
+    fun whenSingleTextSelectionAttachedThenSelectionSuggestionsShown() = runTest {
+        val selectionSuggestions = listOf(
+            ContextualSuggestedPrompt("summarize-selection", "Summarize this selection", "Summarize this selection.", "summary"),
+            ContextualSuggestedPrompt("translate-selection", "Translate this selection", "Translate this selection into English.", "translate"),
+        )
+        whenever(suggestedPromptsProvider.resolveTextSelectionSuggestions(any())).thenReturn(selectionSuggestions)
+
+        viewModel.onTextSelectionCountChanged(1)
+
+        assertEquals(selectionSuggestions, viewModel.viewState.value.suggestions)
+    }
+
+    @Test
+    fun whenMoreThanOneTextSelectionAttachedThenNoSuggestionsShown() = runTest {
+        whenever(suggestedPromptsProvider.resolveTextSelectionSuggestions(any())).thenReturn(
+            listOf(ContextualSuggestedPrompt("summarize-selection", "Summarize this selection", "Summarize this selection.", "summary")),
+        )
+        viewModel.onTextSelectionCountChanged(1)
+
+        viewModel.onTextSelectionCountChanged(2)
+
+        assertTrue(viewModel.viewState.value.suggestions.isEmpty())
+    }
 }
