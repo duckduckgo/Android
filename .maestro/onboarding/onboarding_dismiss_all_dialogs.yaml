@@ -62,8 +62,6 @@ tags:
           when:
             true: ${output.linearWidgetPromptShown}
           commands:
-            # Optional so the wait itself can't fail: it exists to give the sheet the ~450ms
-            # window it would have had, so the assertion below can't pass by running too early.
             - extendedWaitUntil:
                 visible:
                   text: ".*Try our Home screen widget!.*"
