@@ -138,7 +138,7 @@
 
     <!-- Pre-onboarding: import passwords -->
     <string name="preOnboardingImportPasswordsTitle">Import passwords from Google</string>
-    <string name="preOnboardingImportPasswordsBody">Google may ask you to sign in or enter your password to confirm</string>
+    <string name="preOnboardingImportPasswordsBody">Google may ask you to sign in or enter your password to confirm.</string>
     <string name="preOnboardingImportPasswordsPrimaryCta">Import From Google</string>
     <string name="preOnboardingImportPasswordsSecondaryCta">Skip</string>
     <string name="preOnboardingImportCompleteTitle">Import complete</string>
@@ -147,8 +147,8 @@
     <string name="preOnboardingImportCompleteParsingBody">This will only take a moment.</string>
     <string name="preOnboardingImportCompleteFailedTitle">Import failed</string>
     <string name="preOnboardingImportCompleteFailed">Password import failed</string>
-    <string name="preOnboardingImportCompleteImported" instruction="%1$d is the number of passwords that were imported.">Passwords imported: %1$d</string>
-    <string name="preOnboardingImportCompleteSkipped" instruction="%1$d is the number of passwords that were not imported.">Skipped (duplicate or invalid): %1$d</string>
+    <string name="preOnboardingImportCompleteImported" instruction="%1$s is the number of passwords that were imported.">Passwords imported: %1$s</string>
+    <string name="preOnboardingImportCompleteSkipped" instruction="%1$s is the number of passwords that were not imported.">Skipped (duplicate or invalid): %1$s</string>
     <string name="preOnboardingImportErrorTitle">Something went wrong</string>
     <string name="preOnboardingImportErrorBody">Please try again.</string>
     <string name="preOnboardingImportErrorRetry">Try again</string>
