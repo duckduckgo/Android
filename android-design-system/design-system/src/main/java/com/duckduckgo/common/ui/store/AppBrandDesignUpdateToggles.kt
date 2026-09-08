@@ -31,33 +31,33 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 )
 interface AppBrandDesignUpdateToggles {
 
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun self(): Toggle
 
     /**
      * Off leaves Change app icon below the theme and night mode settings on the Appearance screen.
      * */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun appIcon(): Toggle
 
     /**
      * Gates theme-level design changes. This currently includes the rebrand button styling and
      * theme-specific accent blue; future theme-controlled changes should use this sub-toggle.
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun theme(): Toggle
 
     /**
      * Gates the address bar radius, Lotties: shield, cookies, ad-blocking and Duck Player
      * assets, the 40dp shield icon box, and the home screen widget search bar, previews, and promo artwork.
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun addressBar(): Toggle
 
     /**
      * Gates pictogram swaps that change drawable type or call-site behaviour. The remaining
      * pictogram swaps are flavour-gated.
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun pictograms(): Toggle
 }
