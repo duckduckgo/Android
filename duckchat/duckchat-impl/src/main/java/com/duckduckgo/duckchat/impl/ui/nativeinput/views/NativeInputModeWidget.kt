@@ -91,8 +91,6 @@ import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.TextSelectionAttac
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.EditPromptScreenParams
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedFile
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedImage
-import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionPayloadBuilder
-import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionStore
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.shape.ShapeAppearanceModel
@@ -271,12 +269,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
     lateinit var pixel: Pixel
 
     @Inject
-    lateinit var textSelectionStore: TextSelectionStore
-
-    @Inject
-    lateinit var selectionPayloadBuilder: TextSelectionPayloadBuilder
-
-    @Inject
     lateinit var duckChatInternal: DuckChatInternal
 
     @Inject
@@ -407,8 +399,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var pendingOnPageContextRemoved: (() -> Unit)? = null
     private var pendingPageContext: PageContextAttachment? = null
     private var pendingTextSelections: List<TextSelectionAttachment> = emptyList()
-    private var boundTextSelectionsTabId: String? = null
-    private var textSelectionsJob: Job? = null
+    private var pendingTextSelectionsTabId: String? = null
     private var pendingOnTextSelectionRemoved: ((String) -> Unit)? = null
 
     // adoptEditAttachments() can be called (from EditPromptActivity.onCreate) before the widget is
@@ -810,6 +801,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
             pluginView.bind(scope, viewModelFactory, nativeInputStateProvider, faviconManager)
             pendingPageContext?.let { pluginView.setPageContext(it) }
             pluginView.setTextSelections(pendingTextSelections)
+            pendingTextSelectionsTabId?.let { pluginView.bindTextSelections(it, textSelection = null) }
             if (hasPendingAdoptedAttachments(pendingAdoptedImages, pendingAdoptedFiles)) {
                 pluginView.adoptAttachments(pendingAdoptedImages, pendingAdoptedFiles)
             }
@@ -1678,21 +1670,11 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     override fun bindTextSelections(tabId: String, textSelection: String?) {
-        boundTextSelectionsTabId = tabId
-        textSelection?.let { textSelectionStore.add(tabId, it) }
-        setTextSelectionRemovedAction { id -> textSelectionStore.remove(tabId, id) }
-        textSelectionsJob?.cancel()
-        textSelectionsJob = findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
-            textSelectionStore.selections(tabId).collect { selections ->
-                setTextSelections(selections.map { TextSelectionAttachment(id = it.id, text = it.text) })
-            }
-        }
+        pendingTextSelectionsTabId = tabId
+        attachmentView?.bindTextSelections(tabId, textSelection)
     }
 
-    override fun getTextSelectionsJson(): JSONArray? {
-        val tabId = boundTextSelectionsTabId ?: return null
-        return selectionPayloadBuilder.toJson(selections = textSelectionStore.consume(tabId), url = "")
-    }
+    override fun getTextSelectionsJson(): JSONArray? = attachmentView?.getTextSelectionsJson()
 
     override fun setContextualAttachmentActions(
         onAskAboutPage: () -> Unit,
