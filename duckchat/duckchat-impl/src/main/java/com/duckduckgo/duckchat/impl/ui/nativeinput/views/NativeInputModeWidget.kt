@@ -399,6 +399,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var pendingPageContext: PageContextAttachment? = null
     private var pendingTextSelections: List<TextSelectionAttachment> = emptyList()
     private var pendingTextSelectionsTabId: String? = null
+    private var pendingTextSelection: String? = null
     private var pendingOnTextSelectionRemoved: ((String) -> Unit)? = null
 
     // adoptEditAttachments() can be called (from EditPromptActivity.onCreate) before the widget is
@@ -1627,7 +1628,11 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun bindTextSelections(tabId: String, textSelection: String?) {
         pendingTextSelectionsTabId = tabId
-        attachmentViewModel?.bindTextSelections(tabId, textSelection)
+        pendingTextSelection = textSelection
+        attachmentViewModel?.let { vm ->
+            vm.bindTextSelections(tabId, textSelection)
+            pendingTextSelection = null
+        }
     }
 
     override fun getTextSelectionsJson(): JSONArray? = attachmentViewModel?.getTextSelectionsJson()
@@ -1697,6 +1702,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private fun applyPendingAttachmentState() {
         val viewModel = attachmentViewModel ?: return
         pendingPageContext?.let { viewModel.setPageContext(it) }
+        pendingTextSelectionsTabId?.let { bindTextSelections(it, pendingTextSelection) }
         if (hasPendingAdoptedAttachments(pendingAdoptedImages, pendingAdoptedFiles)) {
             viewModel.adopt(pendingAdoptedImages, pendingAdoptedFiles)
         }
