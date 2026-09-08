@@ -966,6 +966,22 @@
     <string name="preOnboardingWidgetPromptPrimaryCta">Añadir widget</string>
     <string name="preOnboardingWidgetPromptSecondaryCta">Omitir</string>
 
+    <!-- Pre-onboarding: import passwords -->
+    <string name="preOnboardingImportPasswordsTitle">Importar contraseñas de Google</string>
+    <string name="preOnboardingImportPasswordsBody">Google puede pedirte que inicies sesión o introduzcas tu contraseña para confirmar.</string>
+    <string name="preOnboardingImportPasswordsPrimaryCta">Importar desde Google</string>
+    <string name="preOnboardingImportCompleteTitle">Importación completada</string>
+    <string name="preOnboardingImportCompleteCta">Continuar</string>
+    <string name="preOnboardingImportCompleteParsingTitle">Importar contraseñas</string>
+    <string name="preOnboardingImportCompleteParsingBody">Esto solo tardará un momento.</string>
+    <string name="preOnboardingImportCompleteFailedTitle">Error en la importación</string>
+    <string name="preOnboardingImportCompleteFailed">Se ha producido un error al importar tu contraseña</string>
+    <string name="preOnboardingImportCompleteImported" instruction="Placeholder is the number of passwords that were imported.">Contraseñas importadas: %1$s</string>
+    <string name="preOnboardingImportCompleteSkipped" instruction="Placeholder is the number of passwords that were not imported.">Omitido (duplicado o no válido): %1$s</string>
+    <string name="preOnboardingImportErrorTitle">Se ha producido un error</string>
+    <string name="preOnboardingImportErrorBody">Inténtalo de nuevo.</string>
+    <string name="preOnboardingImportErrorRetry">Intentar de nuevo</string>
+
     <!-- Pre-onboarding: add to home screen -->
     <string name="preOnboardingDockStepTitle">¡Añádeme a tu fila de favoritos!</string>
     <string name="preOnboardingAddToDockBody">Busca el icono de DuckDuckGo en tu pantalla de inicio. A continuación, selecciónalo y arrástralo a su ubicación. ¡Eso es todo!</string>
