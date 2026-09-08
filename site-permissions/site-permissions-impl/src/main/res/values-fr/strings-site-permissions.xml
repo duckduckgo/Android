@@ -60,7 +60,6 @@
     <string name="duckAiMicPermissionDeniedSnackBarMessage">Autorisation d’accès au micro requise pour les fonctionnalités vocales</string>
     <string name="duckAiMicPermissionDeniedDialogTitle">DuckDuckGo a besoin d’accéder à votre micro</string>
     <string name="duckAiMicPermissionDeniedDialogContent">Les autorisations d’accès au micro sont nécessaires si vous souhaitez utiliser le chat vocal dans Duck.ai</string>
-    <string name="sitePermissionsDialogChangePermissionsButton">Modifier les autorisations</string>
 
     <string name="sitePermissionsSettingsDescription">Les sites que vous visitez sont susceptibles de demander l\'accès à la localisation, à l\'appareil photo, au micro ou au logiciel DRM (gestion des droits numériques) de votre appareil. Ils ne pourront y accéder que si vous leur en donnez explicitement la permission.</string>
     <string name="sitePermissionsSettingsEnablePermissionTitle">Autoriser tous les sites à demander :</string>
@@ -76,5 +75,34 @@
     <string name="permissionsPerWebsiteAllowSetting">Autoriser</string>
     <string name="permissionsPerWebsiteAskDisabledSetting">Désactivé pour tous les sites</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">Autorisation de %1$s pour %2$s</string>
+
+    <!-- Tiered permission dialog -->
+    <string name="sitePermissionsDialogAllowWhileUsingSiteButton" instruction="Button granting a website a permission for every visit, until the user changes it">Autoriser pendant l\'utilisation du site</string>
+    <string name="sitePermissionsDialogAllowThisTimeButton" instruction="Button granting a website a permission for the current visit only">Autoriser cette fois</string>
+    <string name="sitePermissionsDialogNeverAllowButton" instruction="Button refusing a website a permission for every visit, until the user changes it">Ne jamais autoriser</string>
+    <string name="sitePermissionsTieredLocationDialogTitle" instruction="Placeholder is a website">Le site Web « %1$s » souhaite accéder à votre position</string>
+    <string name="sitePermissionsTieredDdgLocationDialogTitle" instruction="Placeholder is a website">« %1$s » souhaite accéder à votre position</string>
+    <string name="sitePermissionsTieredDdgLocationDialogSubtitle">Nous anonymiserons ta localisation et l’utiliserons pour te fournir de meilleurs résultats, plus proches de toi.</string>
+    <string name="sitePermissionsTieredCameraDialogTitle" instruction="Placeholder is a website">Le site Web \"%1$s\" souhaite accéder à ton appareil photo</string>
+    <string name="sitePermissionsTieredMicDialogTitle" instruction="Placeholder is a website">Le site Web « %1$s » souhaite accéder à votre micro</string>
+    <string name="sitePermissionsTieredMicAndCameraDialogTitle" instruction="Placeholder is a website">Le site Web « %1$s » souhaite accéder à votre appareil photo et à votre micro</string>
+    <string name="sitePermissionsTieredDrmDialogSubtitle">Si tu n’autorises pas, les vidéos sur le site pourraient ne pas être lues, mais ce site n’aura pas accès aux identifiants d’appareil fournis par le logiciel DRM.</string>
+
+    <!-- Reminder dialog -->
+    <string name="sitePermissionsDialogChangePermissionsButton" instruction="Button opening the DuckDuckGo permission settings in the Android system settings app">Modifier les autorisations</string>
+    <string name="sitePermissionsTieredSystemDeniedLocationTitle">DuckDuckGo a besoin d’accéder à votre position</string>
+    <string name="sitePermissionsTieredSystemDeniedLocationContent">Les autorisations de localisation sont nécessaires si tu souhaites utiliser les fonctionnalités de localisation sur ce site.</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraTitle">DuckDuckGo a besoin d\'accéder à votre appareil photo</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraContent">Les autorisations d\'accès à l\'appareil photo sont nécessaires si tu souhaites utiliser les fonctionnalités de l\'appareil photo sur ce site.</string>
+    <string name="sitePermissionsTieredSystemDeniedMicTitle">DuckDuckGo a besoin d\'accéder à votre micro</string>
+    <string name="sitePermissionsTieredSystemDeniedMicContent">Les autorisations d’accès au micro sont nécessaires si tu souhaites utiliser les fonctionnalités du micro sur ce site.</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraAndMicTitle">DuckDuckGo a besoin d’accéder à votre appareil photo et à votre micro</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraAndMicContent">Les autorisations d’accès à l’appareil photo et au micro sont nécessaires si tu souhaites utiliser les fonctionnalités de l’appareil photo et du micro sur ce site.</string>
+
+    <!-- Denial snackbar -->
+    <string name="sitePermissionsTieredLocationDeniedSnackBarMessage">Impossible pour DuckDuckGo de partager ta position avec ce site</string>
+    <string name="sitePermissionsTieredCameraDeniedSnackBarMessage">DuckDuckGo n’a pas pu donner l’accès à l’appareil photo à ce site</string>
+    <string name="sitePermissionsTieredMicDeniedSnackBarMessage">DuckDuckGo n’a pas pu donner l’accès au micro à ce site</string>
+    <string name="sitePermissionsTieredCameraAndMicDeniedSnackBarMessage">DuckDuckGo n’a pas pu donner l’accès à l’appareil photo et au micro à ce site</string>
 
 </resources>
