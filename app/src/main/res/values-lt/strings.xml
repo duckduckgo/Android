@@ -1002,6 +1002,22 @@
     <string name="preOnboardingWidgetPromptPrimaryCta">Pridėti valdiklį</string>
     <string name="preOnboardingWidgetPromptSecondaryCta">Praleisti</string>
 
+    <!-- Pre-onboarding: import passwords -->
+    <string name="preOnboardingImportPasswordsTitle">Importuokite slaptažodžius iš „Google“</string>
+    <string name="preOnboardingImportPasswordsBody">„Google“ gali paprašyti prisijungti arba įvesti slaptažodį patvirtinimui.</string>
+    <string name="preOnboardingImportPasswordsPrimaryCta">Importuokite iš „Google“</string>
+    <string name="preOnboardingImportCompleteTitle">Importavimas baigtas</string>
+    <string name="preOnboardingImportCompleteCta">Tęsti</string>
+    <string name="preOnboardingImportCompleteParsingTitle">Importuojami slaptažodžiai</string>
+    <string name="preOnboardingImportCompleteParsingBody">Tai užtruks tik akimirką.</string>
+    <string name="preOnboardingImportCompleteFailedTitle">Nepavyko importuoti</string>
+    <string name="preOnboardingImportCompleteFailed">Nepavyko importuoti slaptažodžių</string>
+    <string name="preOnboardingImportCompleteImported" instruction="Placeholder is the number of passwords that were imported.">Importuoti slaptažodžiai: %1$s</string>
+    <string name="preOnboardingImportCompleteSkipped" instruction="Placeholder is the number of passwords that were not imported.">Praleista (dublikatas arba netinkamas): %1$s</string>
+    <string name="preOnboardingImportErrorTitle">Įvyko klaida</string>
+    <string name="preOnboardingImportErrorBody">Bandykite dar kartą.</string>
+    <string name="preOnboardingImportErrorRetry">Bandykite dar kartą</string>
+
     <!-- Pre-onboarding: add to home screen -->
     <string name="preOnboardingDockStepTitle">Įtraukite mane į mėgstamiausiųjų eilutę.</string>
     <string name="preOnboardingAddToDockBody">Pagrindiniame ekrane raskite „DuckDuckGo“ piktogramą. Tada paspauskite ir vilkite į vietą. Štai ir viskas!</string>
