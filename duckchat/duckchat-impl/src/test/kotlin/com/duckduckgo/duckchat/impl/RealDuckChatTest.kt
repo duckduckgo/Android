@@ -1570,6 +1570,9 @@ class RealDuckChatTest {
         duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
         duckChatFeature.contextualSheetRedesign().setRawStoredState(State(enable = true))
         duckChatFeature.duckAiTextSelectionAction().setRawStoredState(State(enable = true))
+        duckChatFeature.nativeInputField().setRawStoredState(State(enable = true))
+        duckChatFeature.nativeChatInput().setRawStoredState(State(enable = true))
+        duckChatFeature.contextualNativeInput().setRawStoredState(State(enable = true))
         testee.onPrivacyConfigDownloaded()
 
         assertTrue(testee.showTextSelectionAction.value)
@@ -1590,6 +1593,17 @@ class RealDuckChatTest {
         duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
         duckChatFeature.contextualSheetRedesign().setRawStoredState(State(enable = false))
         duckChatFeature.duckAiTextSelectionAction().setRawStoredState(State(enable = true))
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.showTextSelectionAction.value)
+    }
+
+    @Test
+    fun `when contextual native input disabled, then showTextSelectionAction emits false`() = runTest {
+        duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
+        duckChatFeature.contextualSheetRedesign().setRawStoredState(State(enable = true))
+        duckChatFeature.duckAiTextSelectionAction().setRawStoredState(State(enable = true))
+        duckChatFeature.contextualNativeInput().setRawStoredState(State(enable = false))
         testee.onPrivacyConfigDownloaded()
 
         assertFalse(testee.showTextSelectionAction.value)
