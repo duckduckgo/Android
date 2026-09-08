@@ -42,16 +42,33 @@ class TextSelectionAttachmentsContainerView @JvmOverloads constructor(
 
     fun current(): List<TextSelectionAttachment> = attachments
 
+    private fun displayTitle(text: String): String {
+        val words = text.split(WHITESPACE).filter { it.isNotEmpty() }
+        val collapsed = words.joinToString(" ")
+        val snippet = if (collapsed.length > MAX_DISPLAY_TITLE_LENGTH) {
+            collapsed.take(MAX_DISPLAY_TITLE_LENGTH).trimEnd() + "…"
+        } else {
+            collapsed
+        }
+        val wordCount = resources.getQuantityString(R.plurals.duckAiTextSelectionWordCount, words.size, words.size)
+        return "$wordCount · $snippet"
+    }
+
     fun render(attachments: List<TextSelectionAttachment>) {
         this.attachments = attachments
         removeAllViews()
         attachments.forEach { attachment ->
             val itemView = LayoutInflater.from(context).inflate(R.layout.view_page_context_attachment_item, this, false)
-            itemView.findViewById<DaxTextView>(R.id.pageContextTitle).text = attachment.text
+            itemView.findViewById<DaxTextView>(R.id.pageContextTitle).text = displayTitle(attachment.text)
             itemView.findViewById<ImageView>(R.id.pageContextRemove).setOnClickListener {
                 onAttachmentRemoved?.invoke(attachment.id)
             }
             addView(itemView)
         }
+    }
+
+    private companion object {
+        private const val MAX_DISPLAY_TITLE_LENGTH = 120
+        private val WHITESPACE = Regex("\\s+")
     }
 }
