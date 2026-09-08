@@ -219,6 +219,7 @@ class RealContextualNativeInputManager @Inject constructor(
         onVoiceSearchRequested: () -> Unit,
     ) {
         widget.configureContextual(tabId)
+        widget.bindTextSelections(tabId, textSelection = null)
         widget.bindChatIdSource(chatIdFlow)
         widget.bindModelPickerEnabledSource(modelPickerEnabled)
         widget.hideMainButtons()

@@ -378,7 +378,6 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
             },
         )
         contextualNativeInputManager.onInputMode()
-        binding.entryNativeInputWidget.bindTextSelections(tabId, textSelection = null)
         contextualNativeInputManager.onContextualReopened(tabId)
     }
 
