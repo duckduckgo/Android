@@ -285,6 +285,76 @@ class AttachmentViewModelTest {
     }
 
     @Test
+    fun whenOnlyTextSelectionsAttachedThenHasNoStandaloneAttachments() = runTest {
+        viewModel.bindTextSelections("tab-1", "selected words")
+
+        assertTrue(viewModel.attachmentState.value.hasAttachments)
+        assertFalse(viewModel.attachmentState.value.hasStandaloneAttachments)
+    }
+
+    @Test
+    fun whenImagesAddedThenHasStandaloneAttachments() = runTest {
+        addImages(1)
+
+        assertTrue(viewModel.attachmentState.value.hasStandaloneAttachments)
+    }
+
+    @Test
+    fun whenFilesAddedThenHasStandaloneAttachments() = runTest {
+        addFiles(aFileAttachment())
+
+        assertTrue(viewModel.attachmentState.value.hasStandaloneAttachments)
+    }
+
+    @Test
+    fun whenBoundWithTextSelectionThenItIsAttachedToThatTab() = runTest {
+        viewModel.bindTextSelections("tab-1", "selected words")
+
+        assertEquals(listOf("selected words"), viewModel.attachmentState.value.textSelections.map { it.text })
+    }
+
+    @Test
+    fun whenBoundWithoutTextSelectionThenNothingIsAttached() = runTest {
+        viewModel.bindTextSelections("tab-1", textSelection = null)
+
+        assertTrue(viewModel.attachmentState.value.textSelections.isEmpty())
+    }
+
+    @Test
+    fun whenBoundToADifferentTabThenOtherTabsSelectionsAreNotShown() = runTest {
+        textSelectionStore.add("tab-other", "not mine")
+
+        viewModel.bindTextSelections("tab-1", textSelection = null)
+
+        assertTrue(viewModel.attachmentState.value.textSelections.isEmpty())
+    }
+
+    @Test
+    fun whenTextSelectionRemovedThenItIsDroppedFromState() = runTest {
+        viewModel.bindTextSelections("tab-1", "keep me")
+        viewModel.bindTextSelections("tab-1", "remove me")
+        val idToRemove = viewModel.attachmentState.value.textSelections.last().id
+
+        viewModel.removeTextSelection(idToRemove)
+
+        assertEquals(listOf("keep me"), viewModel.attachmentState.value.textSelections.map { it.text })
+    }
+
+    @Test
+    fun whenTextSelectionsConsumedThenTheyAreClearedFromState() = runTest {
+        viewModel.bindTextSelections("tab-1", "selected words")
+
+        viewModel.getTextSelectionsJson()
+
+        assertTrue(viewModel.attachmentState.value.textSelections.isEmpty())
+    }
+
+    @Test
+    fun whenNotBoundThenTextSelectionsJsonIsNull() = runTest {
+        assertNull(viewModel.getTextSelectionsJson())
+    }
+
+    @Test
     fun whenImageRemovedByIdThenItIsNoLongerInState() = runTest {
         addImages(2)
         val idToRemove = viewModel.attachmentState.value.images[0].id
