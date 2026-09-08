@@ -60,7 +60,6 @@
     <string name="duckAiMicPermissionDeniedSnackBarMessage">A beszédhangfunkciókhoz mikrofonengedély szükséges</string>
     <string name="duckAiMicPermissionDeniedDialogTitle">A DuckDuckGónak hozzá kell férnie a mikrofonhoz</string>
     <string name="duckAiMicPermissionDeniedDialogContent">Mikrofonengedélyre van szükség, ha a Duck.ai-ban szeretnél hangcsevegést használni</string>
-    <string name="sitePermissionsDialogChangePermissionsButton">Engedélyek módosítása</string>
 
     <string name="sitePermissionsSettingsDescription">A meglátogatott webhelyek hozzáférést kérhetnek az eszköz helyéhez, kamerájához, mikrofonjához vagy a digitális jogosultságokat kezelő (DRM) szoftveréhez. Ezekhez nem férhetnek hozzá, hacsak nem adsz rá kifejezett engedélyt.</string>
     <string name="sitePermissionsSettingsEnablePermissionTitle">Minden webhely kérheti a következőket:</string>
@@ -76,5 +75,34 @@
     <string name="permissionsPerWebsiteAllowSetting">Engedélyezés</string>
     <string name="permissionsPerWebsiteAskDisabledSetting">Letiltva minden webhely számára</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s engedély a(z) %2$s számára</string>
+
+    <!-- Tiered permission dialog -->
+    <string name="sitePermissionsDialogAllowWhileUsingSiteButton" instruction="Button granting a website a permission for every visit, until the user changes it">Engedélyezés a webhely használata közben</string>
+    <string name="sitePermissionsDialogAllowThisTimeButton" instruction="Button granting a website a permission for the current visit only">Engedélyezés csak most</string>
+    <string name="sitePermissionsDialogNeverAllowButton" instruction="Button refusing a website a permission for every visit, until the user changes it">Soha ne engedélyezd</string>
+    <string name="sitePermissionsTieredLocationDialogTitle" instruction="Placeholder is a website">A(z) „%1$s” webhely hozzá akar férni a tartózkodási helyedhez</string>
+    <string name="sitePermissionsTieredDdgLocationDialogTitle" instruction="Placeholder is a website">A(z) „%1$s” hozzá akar férni a tartózkodási helyedhez</string>
+    <string name="sitePermissionsTieredDdgLocationDialogSubtitle">Anonimizáljuk a tartózkodási helyedet, és arra használjuk, hogy jobb, hozzád közelebbi találatokat nyújtsunk.</string>
+    <string name="sitePermissionsTieredCameraDialogTitle" instruction="Placeholder is a website">A(z) „%1$s” webhely hozzá akar férni a kamerádhoz</string>
+    <string name="sitePermissionsTieredMicDialogTitle" instruction="Placeholder is a website">A(z) „%1$s” webhely hozzá akar férni a mikrofonodhoz</string>
+    <string name="sitePermissionsTieredMicAndCameraDialogTitle" instruction="Placeholder is a website">A(z) „%1$s” webhely hozzá akar férni a kamerádhoz és a mikrofonodhoz</string>
+    <string name="sitePermissionsTieredDrmDialogSubtitle">Ha nem engedélyezed, előfordulhat, hogy a webhelyen lévő videók nem lesznek lejátszhatók, de ez a webhely nem fog hozzáférni a DRM-szoftver által biztosított eszközazonosítókhoz.</string>
+
+    <!-- Reminder dialog -->
+    <string name="sitePermissionsDialogChangePermissionsButton" instruction="Button opening the DuckDuckGo permission settings in the Android system settings app">Engedélyek módosítása</string>
+    <string name="sitePermissionsTieredSystemDeniedLocationTitle">A DuckDuckGónak hozzá kell férnie a tartózkodási helyedhez</string>
+    <string name="sitePermissionsTieredSystemDeniedLocationContent">Helyhozzáférési engedélyre van szükség, ha helyfunkciókat szeretnél használni ezen a webhelyen.</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraTitle">A DuckDuckGónak hozzá kell férnie a kamerádhoz</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraContent">Kameraengedélyre van szükség, ha kamerafunkciókat szeretnél használni ezen a webhelyen.</string>
+    <string name="sitePermissionsTieredSystemDeniedMicTitle">A DuckDuckGónak hozzá kell férnie a mikrofonodhoz</string>
+    <string name="sitePermissionsTieredSystemDeniedMicContent">Mikrofonengedélyre van szükség, ha mikrofonfunkciókat szeretnél használni ezen a webhelyen.</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraAndMicTitle">A DuckDuckGónak hozzá kell férnie a kamerádhoz és a mikrofonodhoz</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraAndMicContent">Kamera- és mikrofonengedélyre van szükség, ha kamera- és mikrofonfunkciókat szeretnél használni ezen a webhelyen.</string>
+
+    <!-- Denial snackbar -->
+    <string name="sitePermissionsTieredLocationDeniedSnackBarMessage">A DuckDuckGo nem tudta megosztani a tartózkodási helyet ezzel a webhellyel</string>
+    <string name="sitePermissionsTieredCameraDeniedSnackBarMessage">A DuckDuckGo nem tudott kamera-hozzáférést adni a webhelynek</string>
+    <string name="sitePermissionsTieredMicDeniedSnackBarMessage">A DuckDuckGo nem tudott mikrofon-hozzáférést adni a webhelynek</string>
+    <string name="sitePermissionsTieredCameraAndMicDeniedSnackBarMessage">A DuckDuckGo nem tudott kamera- és mikrofon-hozzáférést adni a webhelynek</string>
 
 </resources>
