@@ -46,6 +46,7 @@ import javax.inject.Inject
 class ImportPasswordsResultPixelObserver @Inject constructor(
     private val credentialImporter: CredentialImporter,
     private val importPasswordsPixelSender: ImportPasswordsPixelSender,
+    private val passwordImportExperimentMetrics: PasswordImportExperimentMetrics,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
 ) : MainProcessLifecycleObserver {
@@ -62,6 +63,7 @@ class ImportPasswordsResultPixelObserver @Inject constructor(
                         numberSkipped = it.numberSkipped,
                         source = it.source,
                     )
+                    passwordImportExperimentMetrics.fireImportSuccessMetric()
                 }
         }
     }
