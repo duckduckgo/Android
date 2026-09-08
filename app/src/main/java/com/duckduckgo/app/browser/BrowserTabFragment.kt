@@ -69,12 +69,10 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.annotation.AnyThread
 import androidx.annotation.AttrRes
-import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getColor
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
@@ -213,8 +211,6 @@ import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.cta.ui.DaxDuckAiFireButtonContextualCta
-import com.duckduckgo.app.cta.ui.DaxSiteSuggestionsContextualCta
-import com.duckduckgo.app.cta.ui.DaxTrackersBlockedContextualCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetAutoOnboarding
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
@@ -3074,8 +3070,6 @@ class BrowserTabFragment :
                 }
             }
 
-            is Command.SetOnboardingDialogBackground -> setOnboardingDialogBackgroundRes(it.backgroundRes)
-            is Command.SetOnboardingDialogBackgroundColor -> setOnboardingDialogBackgroundColor(it.colorRes)
             is Command.ReinflateBrandDesignContextualDialog -> renderer.reinflateContextualBrandDesignDialog()
             is Command.LaunchFireDialogFromOnboardingDialog -> {
                 hideOnboardingDaxDialog(it.onboardingCta)
@@ -3248,16 +3242,6 @@ class BrowserTabFragment :
             com.duckduckgo.mobile.android.R.style.Theme_DuckDuckGo_Dark_Onboarding
         }
         return ContextThemeWrapper(context, themeRes)
-    }
-
-    private fun setOnboardingDialogBackgroundRes(backgroundRes: Int) {
-        daxDialogInContextBrandDesign.contextualBrandDesignBackground.setImageResource(backgroundRes)
-    }
-
-    private fun setOnboardingDialogBackgroundColor(
-        @ColorRes colorRes: Int,
-    ) {
-        daxDialogInContextBrandDesign.root.setBackgroundColor(getColor(requireContext(), colorRes))
     }
 
     private fun showRemoveSearchSuggestionDialog(suggestion: AutoCompleteSuggestion) {
@@ -6375,26 +6359,20 @@ class BrowserTabFragment :
             when (configuration) {
                 is HomePanelCta -> showBottomSheetCta(configuration)
                 is SubscriptionPromoModalCta -> showPrivacyProSkippedOnboardingBottomSheet(configuration)
-                is DaxBubbleCta -> showDaxOnboardingBubbleCta(configuration)
+                is DaxBubbleCta.BrandDesignUpdateBubbleCta -> showDaxOnboardingBubbleCta(configuration)
                 is OnboardingDaxDialogCta.ContextualDaxDialogCta ->
                     showOnboardingDialogCta(configuration, instantShow = instantShow)
-
-                is OnboardingDaxDialogCta -> showOnboardingDialogCta(configuration)
                 is BrokenSitePromptDialogCta -> showBrokenSitePromptCta(configuration)
             }
         }
 
-        private fun showDaxOnboardingBubbleCta(configuration: DaxBubbleCta) {
-            val brandDesignConfiguration = configuration as? DaxBubbleCta.BrandDesignUpdateBubbleCta ?: return
+        private fun showDaxOnboardingBubbleCta(configuration: DaxBubbleCta.BrandDesignUpdateBubbleCta) {
             hideNewTab()
             brandDesignDialogScrollView.show()
             val container = daxDialogIntroBubbleBrandDesign.daxCtaContainer
             configuration.apply {
                 showCta(container) {
-                    setOnOptionClicked(
-                        onboardingExperimentEnabled = false,
-                        configuration = brandDesignConfiguration,
-                    ) { option, index ->
+                    setOnOptionClicked { option, index ->
                         submitQuery(option.link)
                         viewModel.onUserSelectedOnboardingDialogOption(configuration, index)
                     }
@@ -6413,14 +6391,14 @@ class BrowserTabFragment :
             }
 
             setBrowserBackgroundRes(
-                brandDesignConfiguration.backgroundRes,
+                configuration.backgroundRes,
                 useRebrandBackground = true,
-                fillHeightDp = brandDesignConfiguration.backgroundFillSpec?.heightDpFor(brandDesignConfiguration.deviceInfo.isTablet()) ?: 0f,
-                fillMaxHeightFraction = brandDesignConfiguration.backgroundFillSpec?.maxHeightFraction ?: 1f,
+                fillHeightDp = configuration.backgroundFillSpec?.heightDpFor(configuration.deviceInfo.isTablet()) ?: 0f,
+                fillMaxHeightFraction = configuration.backgroundFillSpec?.maxHeightFraction ?: 1f,
             )
             setNewTabBackgroundColor(com.duckduckgo.mobile.android.R.attr.onboardingSurfaceBackdrop)
             configureBrandDesignFitListener()
-            brandDesignDialogScrollView.post { brandDesignConfiguration.applyFit() }
+            brandDesignDialogScrollView.post { configuration.applyFit() }
             viewModel.onCtaShown()
         }
 
@@ -6477,43 +6455,6 @@ class BrowserTabFragment :
                 }
                 dialog.show()
             }
-        }
-
-        @SuppressLint("ClickableViewAccessibility")
-        private fun showOnboardingDialogCta(configuration: OnboardingDaxDialogCta) {
-            hideNewTab()
-            // Brand-design path disables APPEARING/DISAPPEARING on this container; the legacy
-            // path expects them enabled, so restore here in case the previous CTA was brand-design.
-            binding.daxDialogOnboardingCtaContent.layoutTransition.apply {
-                enableTransitionType(LayoutTransition.APPEARING)
-                enableTransitionType(LayoutTransition.DISAPPEARING)
-            }
-            // Both layouts live in the tree; only one should be visible at a time.
-            daxDialogInContextBrandDesign.root.gone()
-            val onTypingAnimationFinished =
-                if (configuration is DaxTrackersBlockedContextualCta) {
-                    { viewModel.onOnboardingDaxTypingAnimationFinished() }
-                } else {
-                    {}
-                }
-            val onSuggestedOptionsSelected: ((DaxDialogIntroOption) -> Unit)? =
-                if (configuration is DaxSiteSuggestionsContextualCta) {
-                    { option: DaxDialogIntroOption -> submitQuery(option.link) }
-                } else {
-                    null
-                }
-            configuration.showOnboardingCta(
-                binding,
-                { viewModel.onUserClickCtaOkButton(configuration) },
-                { viewModel.onUserClickCtaSecondaryButton(configuration) },
-                onTypingAnimationFinished,
-                onSuggestedOptionsSelected,
-                {
-                    viewModel.onUserClickCtaDismissButton(configuration)
-                },
-            )
-            viewModel.setOnboardingDialogBackground(appTheme.isLightModeEnabled())
-            viewModel.onCtaShown()
         }
 
         @SuppressLint("ClickableViewAccessibility")

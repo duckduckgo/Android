@@ -152,7 +152,7 @@ class CtaTest {
                 isLightTheme = true,
                 deviceInfo = mock(),
                 isOmnibarBottom = false,
-                segmentedPath = null,
+                segmentedPathWithAiInput = null,
             )
         val value = testee.addCtaToHistory("test")
         assertEquals("test:0", value)
@@ -170,7 +170,7 @@ class CtaTest {
                 isLightTheme = true,
                 deviceInfo = mock(),
                 isOmnibarBottom = false,
-                segmentedPath = null,
+                segmentedPathWithAiInput = null,
             )
         val value = testee.addCtaToHistory("test")
         assertEquals("test:3", value)
@@ -188,7 +188,7 @@ class CtaTest {
                 isLightTheme = true,
                 deviceInfo = mock(),
                 isOmnibarBottom = false,
-                segmentedPath = null,
+                segmentedPathWithAiInput = null,
             )
         val value = testee.addCtaToHistory("test")
         assertEquals("test:3", value)
@@ -207,7 +207,7 @@ class CtaTest {
                 isLightTheme = true,
                 deviceInfo = mock(),
                 isOmnibarBottom = false,
-                segmentedPath = null,
+                segmentedPathWithAiInput = null,
             )
         val value = testee.addCtaToHistory("test")
         val expectedValue = "$ctaHistory-test:1"
@@ -227,7 +227,7 @@ class CtaTest {
                 isLightTheme = true,
                 deviceInfo = mock(),
                 isOmnibarBottom = false,
-                segmentedPath = null,
+                segmentedPathWithAiInput = null,
             )
         val expectedValue = "$existingJourney-${testee.ctaPixelParam}:1"
 
@@ -245,7 +245,7 @@ class CtaTest {
                 isLightTheme = true,
                 deviceInfo = mock(),
                 isOmnibarBottom = false,
-                segmentedPath = null,
+                segmentedPathWithAiInput = null,
             )
         assertTrue(testee.canSendShownPixel())
     }
@@ -273,7 +273,7 @@ class CtaTest {
                 isLightTheme = true,
                 deviceInfo = mock(),
                 isOmnibarBottom = false,
-                segmentedPath = null,
+                segmentedPathWithAiInput = null,
             )
         assertTrue(testee.canSendShownPixel())
     }
@@ -289,7 +289,7 @@ class CtaTest {
                 isLightTheme = true,
                 deviceInfo = mock(),
                 isOmnibarBottom = false,
-                segmentedPath = null,
+                segmentedPathWithAiInput = null,
             )
         assertFalse(testee.canSendShownPixel())
     }

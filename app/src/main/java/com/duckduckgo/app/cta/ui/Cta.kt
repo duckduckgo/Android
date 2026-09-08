@@ -112,19 +112,6 @@ interface Cta {
     fun shouldDropAddressBarFocusWhenShown(): Boolean = false
 }
 
-interface OnboardingDaxCta {
-    fun showOnboardingCta(
-        binding: FragmentBrowserTabBinding,
-        onPrimaryCtaClicked: () -> Unit,
-        onSecondaryCtaClicked: () -> Unit,
-        onTypingAnimationFinished: () -> Unit,
-        onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)? = null,
-        onDismissCtaClicked: () -> Unit,
-    )
-
-    fun hideOnboardingCta(binding: FragmentBrowserTabBinding)
-}
-
 sealed class OnboardingDaxDialogCta(
     override val ctaId: CtaId,
     @StringRes open val description: Int?,
@@ -137,15 +124,14 @@ sealed class OnboardingDaxDialogCta(
     override val onboardingStore: OnboardingStore,
     override val appInstallStore: AppInstallStore,
 ) : Cta,
-    DaxCta,
-    OnboardingDaxCta {
+    DaxCta {
     override fun pixelCancelParameters(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
 
     override fun pixelOkParameters(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
 
     override fun pixelShownParameters(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to addCtaToHistory(ctaPixelParam))
 
-    abstract override fun hideOnboardingCta(binding: FragmentBrowserTabBinding)
+    abstract fun hideOnboardingCta(binding: FragmentBrowserTabBinding)
 
     /**
      * Base class for the brand-design rebrand of [OnboardingDaxDialogCta]. Owns the render
@@ -268,25 +254,6 @@ sealed class OnboardingDaxDialogCta(
             ctaView?.let { bannerFor(it)?.cancel() }
             ctaView?.findViewById<DaxTypeAnimationTextView>(R.id.contextualBrandDesignTitle)
                 ?.cancelAnimation()
-        }
-
-        override fun showOnboardingCta(
-            binding: FragmentBrowserTabBinding,
-            onPrimaryCtaClicked: () -> Unit,
-            onSecondaryCtaClicked: () -> Unit,
-            onTypingAnimationFinished: () -> Unit,
-            onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
-            onDismissCtaClicked: () -> Unit,
-        ) {
-            showOnboardingCta(
-                binding = binding,
-                onPrimaryCtaClicked = onPrimaryCtaClicked,
-                onSecondaryCtaClicked = onSecondaryCtaClicked,
-                onTypingAnimationFinished = onTypingAnimationFinished,
-                onSuggestedOptionClicked = onSuggestedOptionClicked,
-                onDismissCtaClicked = onDismissCtaClicked,
-                instantShow = false,
-            )
         }
 
         fun showOnboardingCta(
@@ -928,8 +895,6 @@ sealed class DaxBubbleCta(
     }
 
     open fun setOnOptionClicked(
-        onboardingExperimentEnabled: Boolean,
-        configuration: DaxBubbleCta?,
         onOptionClicked: (DaxDialogIntroOption, index: Int?) -> Unit,
     ) {
         // No-op by default. Brand-design subclasses with option buttons override this.
@@ -1389,8 +1354,6 @@ sealed class DaxBubbleCta(
         }
 
         override fun setOnOptionClicked(
-            onboardingExperimentEnabled: Boolean,
-            configuration: DaxBubbleCta?,
             onOptionClicked: (DaxDialogIntroOption, index: Int?) -> Unit,
         ) {
             // No-op by default. Subclasses with option buttons override this.

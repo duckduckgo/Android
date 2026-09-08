@@ -25,7 +25,6 @@ import android.webkit.PermissionRequest
 import android.webkit.SslErrorHandler
 import android.webkit.ValueCallback
 import androidx.annotation.AttrRes
-import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.duckduckgo.app.browser.BrowserTabViewModel.FileChooserRequestedParams
@@ -468,14 +467,6 @@ sealed class Command {
         @AttrRes val backgroundColorAttr: Int = 0,
         val fillHeightDp: Float = 0f,
         val fillMaxHeightFraction: Float = 1f,
-    ) : Command()
-
-    class SetOnboardingDialogBackground(
-        @DrawableRes val backgroundRes: Int,
-    ) : Command()
-
-    class SetOnboardingDialogBackgroundColor(
-        @ColorRes val colorRes: Int,
     ) : Command()
 
     data object ReinflateBrandDesignContextualDialog : Command()

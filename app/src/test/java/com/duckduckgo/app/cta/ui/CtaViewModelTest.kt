@@ -286,7 +286,7 @@ class CtaViewModelTest {
                 isLightTheme = true,
                 deviceInfo = mockDeviceInfo,
                 isOmnibarBottom = false,
-                segmentedPath = null,
+                segmentedPathWithAiInput = null,
             ),
         )
         verify(mockPixel, never()).fire(eq(SURVEY_CTA_SHOWN), any(), any(), eq(Count))
@@ -345,7 +345,7 @@ class CtaViewModelTest {
                 isLightTheme = true,
                 deviceInfo = mockDeviceInfo,
                 isOmnibarBottom = false,
-                segmentedPath = null,
+                segmentedPathWithAiInput = null,
             ),
         )
         verify(mockUserStageStore, times(0)).stageCompleted(any())
@@ -387,7 +387,7 @@ class CtaViewModelTest {
                 isLightTheme = true,
                 deviceInfo = mockDeviceInfo,
                 isOmnibarBottom = false,
-                segmentedPath = null,
+                segmentedPathWithAiInput = null,
             ),
         )
         verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_END))
@@ -404,7 +404,7 @@ class CtaViewModelTest {
                 isLightTheme = true,
                 deviceInfo = mockDeviceInfo,
                 isOmnibarBottom = false,
-                segmentedPath = null,
+                segmentedPathWithAiInput = null,
             ),
         )
         verify(mockUserStageStore, times(0)).stageCompleted(any())
@@ -421,7 +421,7 @@ class CtaViewModelTest {
                 isLightTheme = true,
                 deviceInfo = mockDeviceInfo,
                 isOmnibarBottom = false,
-                segmentedPath = null,
+                segmentedPathWithAiInput = null,
             ),
         )
         verify(mockUserStageStore).stageCompleted(AppStage.DAX_ONBOARDING)
@@ -1991,10 +1991,10 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenLegacyCtaShownThenNoOnboardingPixelFired() = runTest {
+    fun whenTryASearchBubbleCtaShownThenOnboardingShownPixelFired() = runTest {
         testee.onCtaShown(DaxTryASearchBubbleCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo))
 
-        verifyNoInteractions(mockOnboardingPixelSender)
+        verify(mockOnboardingPixelSender).fireContextual(ONBOARDING_SEARCH, OnboardingPixelAction.Shown)
     }
 
     @Test
@@ -2331,7 +2331,7 @@ class CtaViewModelTest {
 
     @Test
     fun whenSegmentedSearchPathEndBubbleShownThenBothEndAndTryDuckAiShownPixelsFired() = runTest {
-        val cta = daxEndBrandDesignUpdateBubbleCta(segmentedPath = DownloadReasonSelection.SEARCH)
+        val cta = daxEndBrandDesignUpdateBubbleCta(segmentedPathWithAiInput = DownloadReasonSelection.SEARCH)
 
         testee.onCtaShown(cta)
 
@@ -2341,7 +2341,7 @@ class CtaViewModelTest {
 
     @Test
     fun whenSegmentedSearchPathEndBubbleOkClickedThenBothEndAndTryDuckAiClickedEngageFired() = runTest {
-        val cta = daxEndBrandDesignUpdateBubbleCta(segmentedPath = DownloadReasonSelection.SEARCH)
+        val cta = daxEndBrandDesignUpdateBubbleCta(segmentedPathWithAiInput = DownloadReasonSelection.SEARCH)
 
         testee.onUserClickCtaOkButton(cta)
 
@@ -2351,7 +2351,7 @@ class CtaViewModelTest {
 
     @Test
     fun whenSegmentedSearchPathEndBubbleSkippedThenBothEndAndTryDuckAiClickedDismissFired() = runTest {
-        val cta = daxEndBrandDesignUpdateBubbleCta(segmentedPath = DownloadReasonSelection.SEARCH)
+        val cta = daxEndBrandDesignUpdateBubbleCta(segmentedPathWithAiInput = DownloadReasonSelection.SEARCH)
 
         testee.onUserDismissedCta(cta, viaSkipBtn = true)
 
@@ -2361,7 +2361,7 @@ class CtaViewModelTest {
 
     @Test
     fun whenSegmentedAiPathEndBubbleShownThenTryDuckAiPixelNotFired() = runTest {
-        val cta = daxEndBrandDesignUpdateBubbleCta(segmentedPath = DownloadReasonSelection.AI_CHAT)
+        val cta = daxEndBrandDesignUpdateBubbleCta(segmentedPathWithAiInput = DownloadReasonSelection.AI_CHAT)
 
         testee.onCtaShown(cta)
 
@@ -2470,13 +2470,13 @@ class CtaViewModelTest {
         segmentedPath = null,
     )
 
-    private fun daxEndBrandDesignUpdateBubbleCta(segmentedPath: DownloadReasonSelection? = null) = DaxEndBubbleCta(
+    private fun daxEndBrandDesignUpdateBubbleCta(segmentedPathWithAiInput: DownloadReasonSelection? = null) = DaxEndBubbleCta(
         mockOnboardingStore,
         mockAppInstallStore,
         isLightTheme = true,
         deviceInfo = mockDeviceInfo,
         isOmnibarBottom = false,
-        segmentedPathWithAiInput = segmentedPath,
+        segmentedPathWithAiInput = segmentedPathWithAiInput,
     )
 
     private fun daxEndContextualCta() = DaxEndContextualCta(

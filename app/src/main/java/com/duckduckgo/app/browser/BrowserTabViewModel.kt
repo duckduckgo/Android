@@ -146,7 +146,6 @@ import com.duckduckgo.app.browser.commands.Command.SendResponseToJs
 import com.duckduckgo.app.browser.commands.Command.SendSms
 import com.duckduckgo.app.browser.commands.Command.SetBrowserBackground
 import com.duckduckgo.app.browser.commands.Command.SetContentAllowsSwipeToRefresh
-import com.duckduckgo.app.browser.commands.Command.SetOnboardingDialogBackground
 import com.duckduckgo.app.browser.commands.Command.ShareLink
 import com.duckduckgo.app.browser.commands.Command.ShowAppLinkPrompt
 import com.duckduckgo.app.browser.commands.Command.ShowAutoconsentAnimation
@@ -5752,10 +5751,6 @@ class BrowserTabViewModel @Inject constructor(
         } else {
             command.value = SetBrowserBackground(getBackgroundResource(lightModeEnabled))
         }
-    }
-
-    fun setOnboardingDialogBackground(lightModeEnabled: Boolean) {
-        command.value = SetOnboardingDialogBackground(getBackgroundResource(lightModeEnabled))
     }
 
     private fun getBackgroundResource(lightModeEnabled: Boolean): Int =

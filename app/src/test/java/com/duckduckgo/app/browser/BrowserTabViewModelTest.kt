@@ -10702,7 +10702,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserClicksDaxIntroSearchOptionsCtaDismissButtonThenHideOnboardingDaxBubbleCtaCommandIssuedAndPixelFired() =
+    fun whenUserClicksDaxTryASearchBubbleCtaDismissButtonThenHideOnboardingDaxBubbleCtaCommandIssuedAndPixelFired() =
         runTest {
             val cta = DaxTryASearchBubbleCta(
                 mockOnboardingStore,
@@ -10879,24 +10879,6 @@ class BrowserTabViewModelTest {
         testee.setBrowserBackground(lightModeEnabled = false)
 
         assertCommandIssued<Command.SetBrowserBackground> {
-            assertEquals(CommonR.drawable.onboarding_background_bitmap_dark, this.backgroundRes)
-        }
-    }
-
-    @Test
-    fun whenSetOnboardingDialogBackgroundAndLightModeEnabledThenSetBrowserBackgroundCommandIssuedWithCorrectColor() {
-        testee.setOnboardingDialogBackground(lightModeEnabled = true)
-
-        assertCommandIssued<Command.SetOnboardingDialogBackground> {
-            assertEquals(CommonR.drawable.onboarding_background_bitmap_light, this.backgroundRes)
-        }
-    }
-
-    @Test
-    fun whenSetOnboardingDialogBackgroundAndDarkModeEnabledThenSetBrowserBackgroundCommandIssuedWithCorrectColor() {
-        testee.setOnboardingDialogBackground(lightModeEnabled = false)
-
-        assertCommandIssued<Command.SetOnboardingDialogBackground> {
             assertEquals(CommonR.drawable.onboarding_background_bitmap_dark, this.backgroundRes)
         }
     }

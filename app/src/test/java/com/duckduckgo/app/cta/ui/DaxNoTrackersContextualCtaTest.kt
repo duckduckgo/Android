@@ -189,7 +189,7 @@ class DaxNoTrackersContextualCtaTest {
     }
 
     @Test
-    fun whenNoTrackersSiteThenReturnBrandDesignUpdateCta() = runTest {
+    fun whenNoTrackersSiteThenReturnDaxNoTrackersContextualCta() = runTest {
         givenDaxOnboardingActive()
 
         val value = testee.refreshCta(
