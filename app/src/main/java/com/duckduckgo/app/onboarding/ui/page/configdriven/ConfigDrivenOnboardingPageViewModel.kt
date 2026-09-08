@@ -214,7 +214,7 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
         }
     }
 
-    fun onContentBound(
+    fun onBeforeContentBound(
         stepId: LinearOnboardingStepId,
         content: ContentConfig,
     ) {

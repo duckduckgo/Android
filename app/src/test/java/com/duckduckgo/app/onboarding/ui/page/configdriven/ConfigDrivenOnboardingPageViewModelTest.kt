@@ -182,7 +182,7 @@ class ConfigDrivenOnboardingPageViewModelTest {
 
     private fun bindContent(testee: ConfigDrivenOnboardingPageViewModel) {
         val dialog = testee.viewState.value.screen as Screen.Dialog
-        testee.onContentBound(dialog.stepId, dialog.config.content)
+        testee.onBeforeContentBound(dialog.stepId, dialog.config.content)
     }
 
     private fun importCompleteState(testee: ConfigDrivenOnboardingPageViewModel): MutableStateFlow<ImportCompleteContentState> {
