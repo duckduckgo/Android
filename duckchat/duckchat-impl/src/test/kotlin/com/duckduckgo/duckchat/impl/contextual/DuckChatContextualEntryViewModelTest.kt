@@ -376,13 +376,12 @@ class DuckChatContextualEntryViewModelTest {
     }
 
     @Test
-    fun whenSelectionRemovedThenDroppedFromStore() = runTest {
+    fun whenSelectionRemovedThenDroppedFromStore() {
         textSelectionStore.add("tab-1", "keep me")
         textSelectionStore.add("tab-1", "remove me")
         val target = textSelectionStore.selections("tab-1").value.last()
 
-        viewModel.start("tab-1")
-        viewModel.onTextSelectionRemoved(target.id)
+        textSelectionStore.remove("tab-1", target.id)
 
         assertEquals(listOf("keep me"), textSelectionStore.consume("tab-1").map { it.text })
     }

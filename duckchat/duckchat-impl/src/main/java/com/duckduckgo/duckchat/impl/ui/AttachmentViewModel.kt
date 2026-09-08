@@ -358,10 +358,6 @@ class AttachmentViewModel @Inject constructor(
         val textSelections: List<TextSelectionAttachment>,
     )
 
-    fun setTextSelections(selections: List<TextSelectionAttachment>) {
-        _textSelections.value = selections
-    }
-
     fun bindTextSelections(tabId: String, textSelection: String?) {
         textSelectionsTabId = tabId
         textSelection?.let { textSelectionStore.add(tabId, it) }
