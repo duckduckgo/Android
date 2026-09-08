@@ -332,7 +332,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var chatSuggestionsUserEnabled: Boolean = true
     private var isStreaming: Boolean = false
     private var attachmentLimitExceeded: Boolean = false
-    private var hasAttachments: Boolean = false
+    private var hasStandaloneAttachments: Boolean = false
 
     // Set by the manager; the toggle-row back arrow is the inverse of this (fills in while the nav bar is hidden).
     private var navBarVisible: Boolean = false
@@ -1096,7 +1096,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     private fun updateVoiceButtonVisibility() {
-        val isBlank = inputField.text.isNullOrBlank() && !hasAttachments
+        val isBlank = inputField.text.isNullOrBlank() && !hasStandaloneAttachments
         setVoiceButtonVisible(!isEditWidget && voiceSearchAvailable && isBlank)
         val host = voiceHostButtons()
         host?.setVoiceSearchVisible(false)
@@ -1104,7 +1104,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     private fun updateSendButtonVisibility() {
-        val hasContent = isStreaming || inputField.text.isNotBlank() || hasAttachments
+        val hasContent = isStreaming || inputField.text.isNotBlank() || hasStandaloneAttachments
         val visible = isChatTabSelected() && hasContent
         submitButtons?.setSendButtonVisible(visible)
         if (!isStreaming) {
@@ -1370,7 +1370,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
         // Capture text presence before any clearFocus / submission mutates the field.
         val hasText = !(message ?: inputField.text?.toString()).isNullOrBlank()
-        if (message == null && inputField.text.isNullOrBlank() && hasAttachments && isChatTabSelected()) {
+        if (message == null && inputField.text.isNullOrBlank() && hasStandaloneAttachments && isChatTabSelected()) {
             fireSubmissionPixels(hasText = hasText)
             onChatSent?.invoke("")
             inputField.clearFocus()
@@ -2101,13 +2101,13 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     override fun attachmentChanged(
-        allowsBlankSubmit: Boolean,
+        hasStandaloneAttachments: Boolean,
         limitExceeded: Boolean,
         supportsUpload: Boolean,
     ) {
         val hadLimitError = attachmentLimitExceeded
         attachmentLimitExceeded = limitExceeded
-        this.hasAttachments = allowsBlankSubmit
+        this.hasStandaloneAttachments = hasStandaloneAttachments
         if (hadLimitError != attachmentLimitExceeded && !isStreaming) {
             floatingSubmitContainer?.visibility = if (attachmentLimitExceeded) GONE else VISIBLE
         }
