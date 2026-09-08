@@ -118,11 +118,7 @@ class ContextualSuggestionsViewModel @Inject constructor(
             hideSuggestions()
             return
         }
-        when (textSelectionCount) {
-            0 -> resolvePageSuggestions()
-            1 -> resolveTextSelectionSuggestions()
-            else -> hideSuggestions()
-        }
+        if (textSelectionCount > 0) resolveTextSelectionSuggestions() else resolvePageSuggestions()
     }
 
     private suspend fun resolvePageSuggestions() {
@@ -149,8 +145,7 @@ class ContextualSuggestionsViewModel @Inject constructor(
     }
 
     private fun visibleSuggestions(): List<ContextualSuggestedPrompt> {
-        if (textSelectionCount == 1) return resolvedSuggestions.take(MAX_TEXT_SELECTION_SUGGESTIONS)
-        if (textSelectionCount > 1) return emptyList()
+        if (textSelectionCount > 0) return resolvedSuggestions.take(MAX_TEXT_SELECTION_SUGGESTIONS)
         val capacity = (maxSuggestedPrompts - reservedQuickActionSlots).coerceAtLeast(0)
         if (resolvedSuggestions.size <= capacity) return resolvedSuggestions
         val prioritySuggestions = resolvedSuggestions.filter { it.id in prioritySuggestionIds }
@@ -173,7 +168,7 @@ class ContextualSuggestionsViewModel @Inject constructor(
             uiLocale = Locale.getDefault().toLanguageTag(),
         )
         if (textSelectionCount > 0) {
-            if (textSelectionCount == 1) resolveTextSelectionSuggestions() else hideSuggestions()
+            resolveTextSelectionSuggestions()
             return
         }
         fetchSuggestions(url, pageTypeSignals)
