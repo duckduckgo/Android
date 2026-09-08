@@ -82,6 +82,7 @@ class AttachmentView(
     private var fileAttachmentsContainer: FileAttachmentsContainerView? = null
     private var pageContextContainer: PageContextAttachmentView? = null
     private var textSelectionsContainer: TextSelectionAttachmentsContainerView? = null
+    private var attachmentsScroll: HorizontalScrollView? = null
     private var limitErrorView: TextView? = null
 
     init {
@@ -190,6 +191,7 @@ class AttachmentView(
             isHorizontalScrollBarEnabled = false
         }
         parent.addView(scroll)
+        attachmentsScroll = scroll
 
         val row = LinearLayout(context).apply {
             orientation = LinearLayout.HORIZONTAL
@@ -277,7 +279,9 @@ class AttachmentView(
     private fun syncTextSelections(state: AttachmentViewModel.AttachmentState) {
         val view = textSelectionsContainer ?: return
         if (view.current() != state.textSelections) {
+            val isNewAttachment = state.textSelections.size > view.current().size
             view.render(state.textSelections)
+            if (isNewAttachment) attachmentsScroll?.post { attachmentsScroll?.fullScroll(FOCUS_RIGHT) }
         }
     }
 
