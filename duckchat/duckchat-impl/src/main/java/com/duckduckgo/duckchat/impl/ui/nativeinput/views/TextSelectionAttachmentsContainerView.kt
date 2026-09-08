@@ -58,9 +58,9 @@ class TextSelectionAttachmentsContainerView @JvmOverloads constructor(
         this.attachments = attachments
         removeAllViews()
         attachments.forEach { attachment ->
-            val itemView = LayoutInflater.from(context).inflate(R.layout.view_page_context_attachment_item, this, false)
-            itemView.findViewById<DaxTextView>(R.id.pageContextTitle).text = displayTitle(attachment.text)
-            itemView.findViewById<ImageView>(R.id.pageContextRemove).setOnClickListener {
+            val itemView = LayoutInflater.from(context).inflate(R.layout.view_text_selection_attachment_item, this, false)
+            itemView.findViewById<DaxTextView>(R.id.textSelectionTitle).text = displayTitle(attachment.text)
+            itemView.findViewById<ImageView>(R.id.textSelectionRemove).setOnClickListener {
                 onAttachmentRemoved?.invoke(attachment.id)
             }
             addView(itemView)
