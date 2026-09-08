@@ -18,6 +18,7 @@ package com.duckduckgo.duckchat.impl.ui.nativeinput.views
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Rect
 import android.graphics.Typeface
 import android.net.Uri
 import android.view.Gravity
@@ -86,7 +87,6 @@ class AttachmentView(
     private var fileAttachmentsContainer: FileAttachmentsContainerView? = null
     private var pageContextContainer: PageContextAttachmentView? = null
     private var textSelectionsContainer: TextSelectionAttachmentsContainerView? = null
-    private var attachmentsScroll: HorizontalScrollView? = null
     private var limitErrorView: TextView? = null
 
     init {
@@ -163,7 +163,6 @@ class AttachmentView(
             isHorizontalScrollBarEnabled = false
         }
         parent.addView(scroll)
-        attachmentsScroll = scroll
 
         val row = LinearLayout(context).apply {
             orientation = LinearLayout.HORIZONTAL
@@ -253,7 +252,15 @@ class AttachmentView(
         if (view.current() != state.textSelections) {
             val isNewAttachment = state.textSelections.size > view.current().size
             view.render(state.textSelections)
-            if (isNewAttachment) attachmentsScroll?.post { attachmentsScroll?.fullScroll(FOCUS_RIGHT) }
+            if (isNewAttachment) showLastTextSelection()
+        }
+    }
+
+    private fun showLastTextSelection() {
+        val container = textSelectionsContainer ?: return
+        container.post {
+            val chip = container.getChildAt(container.childCount - 1) ?: return@post
+            chip.requestRectangleOnScreen(Rect(0, 0, chip.width, chip.height), true)
         }
     }
 
