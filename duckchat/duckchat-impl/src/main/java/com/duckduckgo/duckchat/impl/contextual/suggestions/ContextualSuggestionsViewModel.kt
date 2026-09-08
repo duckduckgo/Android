@@ -110,20 +110,24 @@ class ContextualSuggestionsViewModel @Inject constructor(
         if (textSelectionCount == count) return
         textSelectionCount = count
         loadJob?.cancel()
-        loadJob = viewModelScope.launch {
-            if (!suggestionsEnabled()) {
-                hideSuggestions()
-                return@launch
-            }
-            when (count) {
-                0 -> {
-                    fetchSuggestions(lastInput?.url, lastInput?.pageTypeSignals)
-                    showSuggestions()
-                }
-                1 -> resolveTextSelectionSuggestions()
-                else -> hideSuggestions()
-            }
+        loadJob = viewModelScope.launch { loadSuggestions(count) }
+    }
+
+    private suspend fun loadSuggestions(textSelectionCount: Int) {
+        if (!suggestionsEnabled()) {
+            hideSuggestions()
+            return
         }
+        when (textSelectionCount) {
+            0 -> resolvePageSuggestions()
+            1 -> resolveTextSelectionSuggestions()
+            else -> hideSuggestions()
+        }
+    }
+
+    private suspend fun resolvePageSuggestions() {
+        fetchSuggestions(lastInput?.url, lastInput?.pageTypeSignals)
+        showSuggestions()
     }
 
     private suspend fun resolveTextSelectionSuggestions() {
