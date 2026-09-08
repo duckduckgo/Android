@@ -43,6 +43,7 @@ import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
 import com.duckduckgo.app.onboarding.ui.page.OnboardingBackground
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
+import com.duckduckgo.app.onboarding.ui.page.PasswordImportErrorAction
 import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection
 import com.duckduckgo.app.onboarding.ui.page.configdriven.Embellishment
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_AICHAT_SELECTED
@@ -951,6 +952,25 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                         Advance
                     }
 
+                    // The retry alert is raised over this step, so its actions land here rather than on the
+                    // launch step that triggered them, and belong to the error pixel, not this card's CTAs.
+                    is NewUserOnboardingEvent.PasswordImportErrorRetryRequested -> {
+                        onboardingPixelSender.fire(
+                            OnboardingPixelName.ONBOARDING_PASSWORD_IMPORT_ERROR,
+                            OnboardingPixelAction.PasswordImportErrorClicked(PasswordImportErrorAction.RETRY),
+                        )
+                        Advance
+                    }
+
+                    is NewUserOnboardingEvent.PasswordImportErrorCancelled -> {
+                        ctx.skipPasswordsImport = true
+                        onboardingPixelSender.fire(
+                            OnboardingPixelName.ONBOARDING_PASSWORD_IMPORT_ERROR,
+                            OnboardingPixelAction.PasswordImportErrorClicked(PasswordImportErrorAction.CANCEL),
+                        )
+                        Advance
+                    }
+
                     else -> Stay
                 }
             },
@@ -958,7 +978,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     }
 
     private fun passwordImportLaunchStep(ctx: NewUserOnboardingPlanContext): NewUserOnboardingActivityStep {
-        val pixelName = OnboardingPixelName.ONBOARDING_PASSWORD_IMPORT
         return NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.PASSWORD_IMPORT_LAUNCH,
             pixelName = null,
@@ -972,21 +991,21 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                             Advance
                         }
 
-                        PasswordImportOutcome.CANCELLED -> {
-                            onboardingPixelSender.fire(pixelName, OnboardingPixelAction.PasswordImportConfirmed(event.outcome))
-                            GoBack
-                        }
+                        // The web flow is self-contained and reports its own abandonment; nothing to add here.
+                        PasswordImportOutcome.CANCELLED -> GoBack
 
                         // Back to the import card so its Import/Skip actions stay live: the retry alert is
                         // dropped on configuration change and would otherwise be the only way forward.
                         PasswordImportOutcome.TRANSIENT_ERROR -> {
-                            onboardingPixelSender.fire(pixelName, OnboardingPixelAction.PasswordImportConfirmed(event.outcome))
+                            onboardingPixelSender.fire(
+                                OnboardingPixelName.ONBOARDING_PASSWORD_IMPORT_ERROR,
+                                OnboardingPixelAction.PasswordImportErrorShown(transient = true),
+                            )
                             GoBack
                         }
 
                         PasswordImportOutcome.PERMANENT_ERROR -> {
                             ctx.passwordImportResult = PasswordImportResult.Terminal.Failed
-                            onboardingPixelSender.fire(pixelName, OnboardingPixelAction.PasswordImportConfirmed(event.outcome))
                             Advance
                         }
                     }
@@ -1003,7 +1022,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     }
 
     private fun passwordImportCompleteStep(ctx: NewUserOnboardingPlanContext): NewUserOnboardingActivityStep {
-        val pixelName = OnboardingPixelName.ONBOARDING_PASSWORD_IMPORT
         return NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.PASSWORD_IMPORT_COMPLETE,
             pixelName = null,
@@ -1012,24 +1030,55 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             resolveDialog = { NewUserOnboardingActivityDialog.ImportComplete(result = ctx.passwordImportResult) },
             transition = { event ->
                 when (event) {
+                    // No shown pixel of its own: which of the two outcome pixels this screen reports is only
+                    // known once the outcome is, which is either already the case on presentation or arrives
+                    // with the parsed result while the screen sits in its parsing state.
+                    is NewUserOnboardingEvent.Presented -> {
+                        (ctx.passwordImportResult as? PasswordImportResult.Terminal)?.let { fireImportOutcomeShown(it) }
+                        Stay
+                    }
+
                     is NewUserOnboardingEvent.PasswordImportParsed -> {
                         if (ctx.passwordImportResult !is PasswordImportResult.Terminal) {
-                            onboardingPixelSender.fire(pixelName, OnboardingPixelAction.PasswordImportConfirmed(event.result.toOutcome()))
+                            fireImportOutcomeShown(event.result)
                         }
                         ctx.passwordImportResult = event.result
                         Stay
                     }
 
-                    is NewUserOnboardingEvent.ContinueClicked -> Advance
+                    is NewUserOnboardingEvent.ContinueClicked -> {
+                        when (ctx.passwordImportResult) {
+                            is PasswordImportResult.Terminal.Imported -> onboardingPixelSender.fire(
+                                OnboardingPixelName.ONBOARDING_PASSWORD_IMPORT_COMPLETE,
+                                OnboardingPixelAction.Clicked(engaged = true),
+                            )
+
+                            PasswordImportResult.Terminal.Failed -> onboardingPixelSender.fire(
+                                OnboardingPixelName.ONBOARDING_PASSWORD_IMPORT_ERROR,
+                                OnboardingPixelAction.PasswordImportErrorClicked(PasswordImportErrorAction.CONTINUE),
+                            )
+
+                            PasswordImportResult.InProgress, null -> Unit
+                        }
+                        Advance
+                    }
+
                     else -> Stay
                 }
             },
         )
     }
 
-    private fun PasswordImportResult.Terminal.toOutcome(): PasswordImportOutcome = when (this) {
-        is PasswordImportResult.Terminal.Imported -> PasswordImportOutcome.SUCCESS
-        PasswordImportResult.Terminal.Failed -> PasswordImportOutcome.PERMANENT_ERROR
+    private fun fireImportOutcomeShown(result: PasswordImportResult.Terminal) = when (result) {
+        is PasswordImportResult.Terminal.Imported -> onboardingPixelSender.fire(
+            OnboardingPixelName.ONBOARDING_PASSWORD_IMPORT_COMPLETE,
+            OnboardingPixelAction.Shown,
+        )
+
+        PasswordImportResult.Terminal.Failed -> onboardingPixelSender.fire(
+            OnboardingPixelName.ONBOARDING_PASSWORD_IMPORT_ERROR,
+            OnboardingPixelAction.PasswordImportErrorShown(transient = false),
+        )
     }
 
     private fun addressBarPositionStep(): NewUserOnboardingActivityStep {

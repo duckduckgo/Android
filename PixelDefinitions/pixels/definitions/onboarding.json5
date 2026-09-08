@@ -415,13 +415,13 @@
         ]
     },
     "onboarding_password-import": {
-        "description": "Password-import-from-Google onboarding step. shown when the page is displayed; clicked engage/dismiss on the Import / Skip CTAs; confirmed carries the import outcome. Unique once per user per (event, value).",
+        "description": "Password-import-from-Google onboarding step, initial prompt. shown when the prompt is displayed; clicked engage/dismiss on the Import / Skip CTAs. The outcome of the import is reported by onboarding_password-import-complete and onboarding_password-import-error, and the export web flow by its own pixels. Unique once per user per (event, value).",
         "owners": ["catalinradoiu"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
-            "onboardingEventWithConfirmed",
+            "onboardingEvent",
             "onboardingInstallType",
             "onboardingDaysSinceInstall",
             "onboardingFlow",
@@ -429,8 +429,48 @@
             {
                 "key": "value",
                 "type": "string",
-                "description": "For event=clicked: engage|dismiss. For event=confirmed: the import outcome. No count is sent.",
-                "enum": ["engage", "dismiss", "success", "cancelled", "error"]
+                "description": "Only set when event=clicked. No count is sent.",
+                "enum": ["engage", "dismiss"]
+            }
+        ]
+    },
+    "onboarding_password-import-complete": {
+        "description": "Password-import-from-Google onboarding step, import-complete screen. shown when the screen resolves to the imported state; clicked engage on its Continue CTA. Carries no count of imported passwords. Unique once per user per (event, value).",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            "onboardingEvent",
+            "onboardingInstallType",
+            "onboardingDaysSinceInstall",
+            "onboardingFlow",
+            "onboardingPixelSource",
+            {
+                "key": "value",
+                "type": "string",
+                "description": "Only set when event=clicked. No count is sent.",
+                "enum": ["engage"]
+            }
+        ]
+    },
+    "onboarding_password-import-error": {
+        "description": "Password-import-from-Google onboarding step, import failure. shown transient when the retry alert is raised because the export flow did not deliver a file, permanent when the import-complete screen resolves to the failed state; clicked retry/dismiss on the retry alert's Retry / Cancel buttons, engage on the failed screen's Continue CTA. Unique once per user per (event, value).",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            "onboardingEvent",
+            "onboardingInstallType",
+            "onboardingDaysSinceInstall",
+            "onboardingFlow",
+            "onboardingPixelSource",
+            {
+                "key": "value",
+                "type": "string",
+                "description": "For event=shown: which failure raised the surface. For event=clicked: which action the user took on it. No count is sent.",
+                "enum": ["transient", "permanent", "engage", "retry", "dismiss"]
             }
         ]
     },

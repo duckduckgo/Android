@@ -380,7 +380,7 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
                     }
 
                     override fun onNegativeButtonClicked() {
-                        viewModel.onPasswordImportErrorSkipped()
+                        viewModel.onPasswordImportErrorCancelled()
                     }
 
                     override fun onDialogCancelled() {
