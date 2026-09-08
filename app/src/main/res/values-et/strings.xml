@@ -966,6 +966,22 @@
     <string name="preOnboardingWidgetPromptPrimaryCta">Lisa vidin</string>
     <string name="preOnboardingWidgetPromptSecondaryCta">Jäta vahele</string>
 
+    <!-- Pre-onboarding: import passwords -->
+    <string name="preOnboardingImportPasswordsTitle">Impordi paroolid Google\'ist</string>
+    <string name="preOnboardingImportPasswordsBody">Google võib paluda sul sisse logida või sisestada kinnitamiseks parooli.</string>
+    <string name="preOnboardingImportPasswordsPrimaryCta">Impordi Google\'ist</string>
+    <string name="preOnboardingImportCompleteTitle">Import on lõpetatud</string>
+    <string name="preOnboardingImportCompleteCta">Jätka</string>
+    <string name="preOnboardingImportCompleteParsingTitle">Paroolide importimine</string>
+    <string name="preOnboardingImportCompleteParsingBody">See võtab vaid hetke.</string>
+    <string name="preOnboardingImportCompleteFailedTitle">Import ebaõnnestus</string>
+    <string name="preOnboardingImportCompleteFailed">Parooli import ebaõnnestus</string>
+    <string name="preOnboardingImportCompleteImported" instruction="Placeholder is the number of passwords that were imported.">Imporditud paroolid: %1$s</string>
+    <string name="preOnboardingImportCompleteSkipped" instruction="Placeholder is the number of passwords that were not imported.">Vahele jäetud (duplikaat või kehtetu): %1$s</string>
+    <string name="preOnboardingImportErrorTitle">Midagi läks valesti</string>
+    <string name="preOnboardingImportErrorBody">Proovi uuesti.</string>
+    <string name="preOnboardingImportErrorRetry">Proovi uuesti</string>
+
     <!-- Pre-onboarding: add to home screen -->
     <string name="preOnboardingDockStepTitle">Lisa mind oma lemmikute reale.</string>
     <string name="preOnboardingAddToDockBody">Leia oma avakuvalt DuckDuckGo ikoon. Seejärel vajuta ja lohista see oma kohale. See ongi kõik!</string>
