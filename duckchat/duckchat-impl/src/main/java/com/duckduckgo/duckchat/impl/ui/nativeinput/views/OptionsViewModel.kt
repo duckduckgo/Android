@@ -23,6 +23,7 @@ import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.Tool
+import com.duckduckgo.duckchat.impl.nativeinput.EffectiveModel
 import com.duckduckgo.duckchat.impl.nativeinput.EffectiveModelProvider
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
@@ -57,8 +58,9 @@ class OptionsViewModel @Inject constructor(
      */
     val visibleTools: StateFlow<Set<Tool>> = combine(
         modelManager.modelState,
-        effectiveModelProvider.effectiveModelId,
-    ) { modelState, modelId ->
+        effectiveModelProvider.effectiveModel,
+    ) { modelState, effective ->
+        val modelId = (effective as? EffectiveModel.Resolved)?.modelId
         modelState.models.firstOrNull { it.id == modelId }
             ?.let { model -> Tool.entries.filterTo(mutableSetOf()) { model.supportsTool(it) } }
             ?: Tool.entries.toSet()
@@ -70,8 +72,14 @@ class OptionsViewModel @Inject constructor(
      * Emits when the selected tool is no longer supported by the effective model. Deliberately not a
      * pixel: the user did not deselect it, the model change did.
      */
-    val toolSelectionCleared: Flow<Unit> = combine(selectedTool, visibleTools) { selected, visible ->
-        selected != null && selected !in visible
+    val toolSelectionCleared: Flow<Unit> = combine(
+        selectedTool,
+        visibleTools,
+        effectiveModelProvider.effectiveModel,
+    ) { selected, visible, effective ->
+        // Only once the active tab's model is known: mid-switch the visible set is still the previous
+        // tab's, and clearing against it would drop a selection this tab's model does support.
+        effective is EffectiveModel.Resolved && selected != null && selected !in visible
     }.filter { it }.map { }
 
     fun onToolSelectedByUser(tool: Tool) {
