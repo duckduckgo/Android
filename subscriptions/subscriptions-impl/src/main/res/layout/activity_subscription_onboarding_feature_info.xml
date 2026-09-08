@@ -43,7 +43,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="@dimen/keyline_5"
+                android:layout_marginTop="@dimen/keyline_3"
                 android:src="@drawable/vpn_feature_128"
                 tools:ignore="ContentDescription" />
 

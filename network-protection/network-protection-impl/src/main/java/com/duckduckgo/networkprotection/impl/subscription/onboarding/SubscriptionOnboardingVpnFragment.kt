@@ -208,7 +208,9 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
     private fun showInfoPage() = with(binding) {
         showingInfo = true
         transition?.cancel()
-        renderHeaderImage(connected = true, error = false, animate = false)
+        subscriptionOnboardingVpnHeaderAnimation.pauseAnimation()
+        subscriptionOnboardingVpnHeaderAnimation.gone()
+        subscriptionOnboardingVpnHeaderErrorIcon.gone()
         subscriptionOnboardingVpnHeaderTitle.setText(R.string.subscriptionOnboardingVpnInfoTitle)
         subscriptionOnboardingVpnStatusContent.gone()
         subscriptionOnboardingVpnInfoContent.show()
@@ -316,11 +318,11 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
         if (vpnOn) {
             subscriptionOnboardingVpnIpAddressTitle.setText(R.string.subscriptionOnboardingVpnIpAddressTitleOn)
             subscriptionOnboardingVpnNewIpAddressContainer.show()
-            subscriptionOnboardingVpnIpAddressInfo.gone()
+            subscriptionOnboardingVpnIpAddressInfo.setText(R.string.subscriptionOnboardingVpnOnIpAddressInfo)
         } else {
             subscriptionOnboardingVpnIpAddressTitle.setText(R.string.subscriptionOnboardingVpnIpAddressTitle)
             subscriptionOnboardingVpnNewIpAddressContainer.gone()
-            subscriptionOnboardingVpnIpAddressInfo.show()
+            subscriptionOnboardingVpnIpAddressInfo.setText(R.string.subscriptionOnboardingVpnOffIpAddressInfo)
         }
 
         val benefitIcon = if (vpnOn) R.drawable.check_circle_color_24 else R.drawable.alert_recolorable_24
