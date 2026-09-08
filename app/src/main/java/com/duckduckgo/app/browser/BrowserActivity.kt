@@ -823,7 +823,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
 
         if (intent.getBooleanExtra(OPEN_DUCK_CHAT, false)) {
-            pendingDuckChatTextSelection = intent.getStringExtra(DUCK_CHAT_TEXT_SELECTION)
+            val textSelection = intent.getStringExtra(DUCK_CHAT_TEXT_SELECTION)
+            if (intent.getBooleanExtra(DUCK_CHAT_CONTEXTUAL, false)) {
+                currentTab?.launchContextualDuckAi(textSelection)
+                return
+            }
+            pendingDuckChatTextSelection = textSelection
             val sourceTabId = intent.getStringExtra(SOURCE_TAB_ID_EXTRA)
             intent.getStringExtra(DUCK_CHAT_ENTRY_POINT_EXTRA)?.let { source ->
                 runCatching { DuckChatEntryPoint.valueOf(source) }
@@ -831,11 +836,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     ?.let { duckChat.reportDuckChatEntry(it, opensNewTab = true, hasPrompt = false) }
             }
             launchDuckAi(url = intent.getStringExtra(DUCK_CHAT_URL), sourceTabId = sourceTabId)
-            return
-        }
-
-        if (intent.getBooleanExtra(OPEN_DUCK_CHAT_CONTEXTUAL, false)) {
-            currentTab?.launchContextualDuckAi(intent.getStringExtra(DUCK_CHAT_TEXT_SELECTION))
             return
         }
 
@@ -1293,7 +1293,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             interstitialScreen: Boolean = false,
             openExistingTabId: String? = null,
             openDuckChat: Boolean = false,
-            openDuckChatContextual: Boolean = false,
+            duckChatContextual: Boolean = false,
             duckChatTextSelection: String? = null,
             closeDuckChat: Boolean = false,
             duckChatUrl: String? = null,
@@ -1311,7 +1311,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             intent.putExtra(LAUNCH_FROM_INTERSTITIAL_EXTRA, interstitialScreen)
             intent.putExtra(OPEN_EXISTING_TAB_ID_EXTRA, openExistingTabId)
             intent.putExtra(OPEN_DUCK_CHAT, openDuckChat)
-            intent.putExtra(OPEN_DUCK_CHAT_CONTEXTUAL, openDuckChatContextual)
+            intent.putExtra(DUCK_CHAT_CONTEXTUAL, duckChatContextual)
             intent.putExtra(DUCK_CHAT_TEXT_SELECTION, duckChatTextSelection)
             intent.putExtra(DUCK_CHAT_ENTRY_POINT_EXTRA, launchSource.toDuckChatEntryPoint()?.name)
             intent.putExtra(CLOSE_DUCK_CHAT, closeDuckChat)
@@ -1349,7 +1349,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         const val LAUNCH_SOURCE_PIXEL_VALUE = "LAUNCH_SOURCE_PIXEL_VALUE"
 
         private const val OPEN_DUCK_CHAT = "OPEN_DUCK_CHAT_EXTRA"
-        private const val OPEN_DUCK_CHAT_CONTEXTUAL = "OPEN_DUCK_CHAT_CONTEXTUAL_EXTRA"
+        private const val DUCK_CHAT_CONTEXTUAL = "DUCK_CHAT_CONTEXTUAL_EXTRA"
         private const val DUCK_CHAT_TEXT_SELECTION = "DUCK_CHAT_TEXT_SELECTION_EXTRA"
         private const val DUCK_CHAT_ENTRY_POINT_EXTRA = "DUCK_CHAT_ENTRY_POINT_EXTRA"
         private const val CLOSE_DUCK_CHAT = "CLOSE_DUCK_CHAT_EXTRA"
