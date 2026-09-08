@@ -966,6 +966,22 @@
     <string name="preOnboardingWidgetPromptPrimaryCta">Lisää widget</string>
     <string name="preOnboardingWidgetPromptSecondaryCta">Ohita</string>
 
+    <!-- Pre-onboarding: import passwords -->
+    <string name="preOnboardingImportPasswordsTitle">Tuo salasanat Googlesta</string>
+    <string name="preOnboardingImportPasswordsBody">Google saattaa pyytää sinua kirjautumaan sisään tai antamaan salasanasi vahvistusta varten.</string>
+    <string name="preOnboardingImportPasswordsPrimaryCta">Tuo Googlesta</string>
+    <string name="preOnboardingImportCompleteTitle">Tuonti on valmis</string>
+    <string name="preOnboardingImportCompleteCta">Jatka</string>
+    <string name="preOnboardingImportCompleteParsingTitle">Tuodaan salasanoja</string>
+    <string name="preOnboardingImportCompleteParsingBody">Tämä kestää vain hetken.</string>
+    <string name="preOnboardingImportCompleteFailedTitle">Tuonti epäonnistui</string>
+    <string name="preOnboardingImportCompleteFailed">Salasanojen tuonti epäonnistui</string>
+    <string name="preOnboardingImportCompleteImported" instruction="Placeholder is the number of passwords that were imported.">Tuodut salasanat: %1$s</string>
+    <string name="preOnboardingImportCompleteSkipped" instruction="Placeholder is the number of passwords that were not imported.">Ohitettu (kaksoiskappale tai virheellinen): %1$s</string>
+    <string name="preOnboardingImportErrorTitle">Jokin meni pieleen</string>
+    <string name="preOnboardingImportErrorBody">Yritä uudelleen.</string>
+    <string name="preOnboardingImportErrorRetry">Yritä uudelleen</string>
+
     <!-- Pre-onboarding: add to home screen -->
     <string name="preOnboardingDockStepTitle">Lisää minut suosikkirivillesi.</string>
     <string name="preOnboardingAddToDockBody">Etsi DuckDuckGo-kuvake aloitusnäytöltäsi. Paina ja vedä se sitten paikalleen. Siinä kaikki!</string>
