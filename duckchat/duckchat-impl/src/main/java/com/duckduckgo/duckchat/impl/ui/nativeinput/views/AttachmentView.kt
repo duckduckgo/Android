@@ -48,7 +48,6 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.ui.AttachmentViewModel
-import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.TextSelectionAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachmentsContainerView
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.Job
@@ -125,8 +124,6 @@ class AttachmentView(
         isVisible = show
         (parent as? View)?.isVisible = show
     }
-
-    fun setTextSelections(selections: List<TextSelectionAttachment>) = viewModel?.setTextSelections(selections)
 
     private fun buildAttachButton(): ImageView {
         val iconSize = context.resources.getDimensionPixelSize(R.dimen.nativeInputButtonSize)
