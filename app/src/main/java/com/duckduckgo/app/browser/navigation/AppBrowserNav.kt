@@ -58,9 +58,10 @@ class AppBrowserNav @Inject constructor() : BrowserNav {
         isContextual: Boolean,
         textSelection: String?,
     ): Intent {
+        val isExternal = textSelection != null && !isContextual
         return BrowserActivity.intent(
             context = context,
-            launchSource = if (isContextual) SelectedTextSearch else InAppNavigation,
+            launchSource = if (isExternal) SelectedTextSearch else InAppNavigation,
             openDuckChat = !isContextual,
             openDuckChatContextual = isContextual,
             duckChatUrl = duckChatUrl,
