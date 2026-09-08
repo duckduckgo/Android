@@ -54,4 +54,10 @@
 
     <!-- Duck.ai text selection menu action -->
     <string name="duckAiTextSelectionMenuItem">Ask Duck.ai</string>
+
+    <!-- Prefix on the Duck.ai attachment chip for a text selection -->
+    <plurals name="duckAiTextSelectionWordCount">
+        <item quantity="one" instruction="%1$d is the number of words in the selection.">%1$d word</item>
+        <item quantity="other" instruction="%1$d is the number of words in the selection.">%1$d words</item>
+    </plurals>
 </resources>
