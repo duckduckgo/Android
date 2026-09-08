@@ -132,6 +132,15 @@ class AttachmentView(
 
     fun getFileAttachmentsJson(): JSONArray? = viewModel?.getFileAttachmentsJson()
 
+    fun setTextSelections(selections: List<TextSelectionAttachment>) = viewModel?.setTextSelections(selections)
+
+    fun getTextSelectionsJson(): JSONArray? = viewModel?.getTextSelectionsJson()
+
+    fun bindTextSelections(tabId: String, textSelection: String?) {
+        viewModel?.bindTextSelections(tabId, textSelection)
+        onTextSelectionRemoved = { id -> viewModel?.removeTextSelection(id) }
+    }
+
     fun clearAttachments() = viewModel?.clearAttachments()
 
     fun adoptAttachments(
@@ -140,8 +149,6 @@ class AttachmentView(
     ) = viewModel?.adopt(images, files)
 
     fun clearAttachmentsForNewChat() = viewModel?.clearAttachmentsForNewChat()
-
-    fun setTextSelections(selections: List<TextSelectionAttachment>) = viewModel?.setTextSelections(selections)
 
     fun setPageContext(attachment: PageContextAttachment) = viewModel?.setPageContext(attachment)
 

@@ -46,6 +46,9 @@ import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedFile
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedImage
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachmentProcessor
+import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionPayloadBuilder
+import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionStore
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -74,7 +77,12 @@ class AttachmentViewModel @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     nativeInputStateProvider: NativeInputStateProvider,
     private val duckChatPixels: DuckChatPixels,
+    private val textSelectionStore: TextSelectionStore,
+    private val textSelectionPayloadBuilder: TextSelectionPayloadBuilder,
 ) : ViewModel() {
+
+    private var textSelectionsTabId: String? = null
+    private var textSelectionsJob: Job? = null
 
     enum class ImageSource(val pixelValue: String) {
         CAMERA("camera"),
@@ -352,6 +360,26 @@ class AttachmentViewModel @Inject constructor(
 
     fun setTextSelections(selections: List<TextSelectionAttachment>) {
         _textSelections.value = selections
+    }
+
+    fun bindTextSelections(tabId: String, textSelection: String?) {
+        textSelectionsTabId = tabId
+        textSelection?.let { textSelectionStore.add(tabId, it) }
+        textSelectionsJob?.cancel()
+        textSelectionsJob = viewModelScope.launch {
+            textSelectionStore.selections(tabId).collect { selections ->
+                _textSelections.value = selections.map { TextSelectionAttachment(id = it.id, text = it.text) }
+            }
+        }
+    }
+
+    fun removeTextSelection(id: String) {
+        textSelectionsTabId?.let { textSelectionStore.remove(it, id) }
+    }
+
+    fun getTextSelectionsJson(): JSONArray? {
+        val tabId = textSelectionsTabId ?: return null
+        return textSelectionPayloadBuilder.toJson(selections = textSelectionStore.consume(tabId), url = "")
     }
 
     fun setPageContext(attachment: PageContextAttachment) {
