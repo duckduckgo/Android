@@ -1002,6 +1002,22 @@
     <string name="preOnboardingWidgetPromptPrimaryCta">Dodaj pripomoček</string>
     <string name="preOnboardingWidgetPromptSecondaryCta">Preskoči</string>
 
+    <!-- Pre-onboarding: import passwords -->
+    <string name="preOnboardingImportPasswordsTitle">Uvozi gesla iz Googla</string>
+    <string name="preOnboardingImportPasswordsBody">Google vas bo morda prosil, da se prijavite ali vnesete geslo za potrditev.</string>
+    <string name="preOnboardingImportPasswordsPrimaryCta">Uvozi iz Googla</string>
+    <string name="preOnboardingImportCompleteTitle">Uvoz je dokončan</string>
+    <string name="preOnboardingImportCompleteCta">Nadaljuj</string>
+    <string name="preOnboardingImportCompleteParsingTitle">Uvažanje gesel</string>
+    <string name="preOnboardingImportCompleteParsingBody">To bo trajalo le trenutek.</string>
+    <string name="preOnboardingImportCompleteFailedTitle">Uvoz ni uspel</string>
+    <string name="preOnboardingImportCompleteFailed">Uvoz gesel ni uspel</string>
+    <string name="preOnboardingImportCompleteImported" instruction="Placeholder is the number of passwords that were imported.">Uvožena gesla: %1$s</string>
+    <string name="preOnboardingImportCompleteSkipped" instruction="Placeholder is the number of passwords that were not imported.">Preskočeno (podvojeno ali neveljavno): %1$s</string>
+    <string name="preOnboardingImportErrorTitle">Nekaj je šlo narobe</string>
+    <string name="preOnboardingImportErrorBody">Poskusite znova.</string>
+    <string name="preOnboardingImportErrorRetry">Poskusi znova</string>
+
     <!-- Pre-onboarding: add to home screen -->
     <string name="preOnboardingDockStepTitle">Dodajte me v vrstico priljubljenih.</string>
     <string name="preOnboardingAddToDockBody">Poiščite ikono DuckDuckGo na domačem zaslonu. Nato jo pritisnite in povlecite na želeno mesto. To je to!</string>
