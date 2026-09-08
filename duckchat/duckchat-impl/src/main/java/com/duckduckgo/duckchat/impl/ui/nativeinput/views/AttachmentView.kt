@@ -46,7 +46,6 @@ import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.ui.AttachmentViewModel
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ImageAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.PageContextAttachment
-import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.TextSelectionAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedFile
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedImage
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachment
@@ -131,8 +130,6 @@ class AttachmentView(
     fun getImageAttachmentsJson(): JSONArray? = viewModel?.getImageAttachmentsJson()
 
     fun getFileAttachmentsJson(): JSONArray? = viewModel?.getFileAttachmentsJson()
-
-    fun setTextSelections(selections: List<TextSelectionAttachment>) = viewModel?.setTextSelections(selections)
 
     fun getTextSelectionsJson(): JSONArray? = viewModel?.getTextSelectionsJson()
 
