@@ -18,15 +18,15 @@ package com.duckduckgo.common.ui.compose.skeleton
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.takeOrElse
+import com.duckduckgo.common.ui.compose.listitem.DaxListItemDefaults
+import com.duckduckgo.common.ui.compose.listitem.DaxListItemLayout
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
 
 /**
@@ -48,43 +48,30 @@ fun DaxSkeletonListItem(
     hasTwoLines: Boolean = false,
     animated: Boolean = true,
 ) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(
-                start = DaxSkeletonListItemDefaults.PaddingStart,
-                end = DaxSkeletonListItemDefaults.PaddingEnd,
-                top = DaxSkeletonListItemDefaults.PaddingVertical,
-                bottom = DaxSkeletonListItemDefaults.PaddingVertical,
-            ),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(DaxSkeletonListItemDefaults.LeadingToLineGap),
+    val rowMinHeight = when {
+        hasTwoLines -> DaxListItemDefaults.TwoLineMinHeight
+        hasLeadingIcon -> DaxListItemDefaults.OneLineWithIconMinHeight
+        else -> DaxListItemDefaults.OneLineMinHeight
+    }
+    DaxListItemLayout(
+        minHeight = rowMinHeight,
+        modifier = modifier,
+        contentSpacing = DaxSkeletonListItemDefaults.LineGap,
+        leadingContent = if (hasLeadingIcon) { { DaxSkeletonCircle(animated = animated) } } else null,
+        trailingSpacerWidth = DaxSkeletonListItemDefaults.PaddingEnd,
     ) {
-        if (hasLeadingIcon) {
-            DaxSkeletonCircle(animated = animated)
-        }
+        DaxSkeletonLine(modifier = Modifier.fillMaxWidth(), animated = animated)
         if (hasTwoLines) {
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(DaxSkeletonListItemDefaults.LineGap),
-            ) {
-                DaxSkeletonLine(modifier = Modifier.fillMaxWidth(), animated = animated)
-                DaxSkeletonLine(
-                    modifier = Modifier.fillMaxWidth(DaxSkeletonListItemDefaults.SecondaryLineWidthFraction),
-                    animated = animated,
-                )
-            }
-        } else {
-            DaxSkeletonLine(modifier = Modifier.weight(1f), animated = animated)
+            DaxSkeletonLine(
+                modifier = Modifier.fillMaxWidth(DaxSkeletonListItemDefaults.SecondaryLineWidthFraction),
+                animated = animated,
+            )
         }
     }
 }
 
 internal object DaxSkeletonListItemDefaults {
-    val PaddingStart: Dp = 16.dp
     val PaddingEnd: Dp = 64.dp
-    val PaddingVertical: Dp = 8.dp
-    val LeadingToLineGap: Dp = 16.dp
     val LineGap: Dp = 4.dp
     const val SecondaryLineWidthFraction: Float = 0.5f
 }
