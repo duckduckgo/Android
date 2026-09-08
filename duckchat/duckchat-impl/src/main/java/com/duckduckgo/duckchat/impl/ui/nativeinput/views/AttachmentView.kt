@@ -71,7 +71,6 @@ class AttachmentView(
 
     var host: NativeInputHost? = null
     var isEditMode: Boolean = false
-    var onTextSelectionRemoved: ((String) -> Unit)? = null
 
     private var viewModel: AttachmentViewModel? = null
 
@@ -181,7 +180,7 @@ class AttachmentView(
         pageContextContainer = pageContext
 
         val selections = TextSelectionAttachmentsContainerView(context).also {
-            it.onAttachmentRemoved = { id -> onTextSelectionRemoved?.invoke(id) }
+            it.onAttachmentRemoved = { id -> vm.removeTextSelection(id) }
         }
         row.addView(selections)
         textSelectionsContainer = selections

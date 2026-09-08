@@ -46,6 +46,8 @@ import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedFile
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedImage
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachmentProcessor
+import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.RealTextSelectionStore
+import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionPayloadBuilder
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -124,6 +126,9 @@ class AttachmentViewModelTest {
 
     private lateinit var viewModel: AttachmentViewModel
 
+    private val textSelectionStore = RealTextSelectionStore()
+    private val textSelectionPayloadBuilder: TextSelectionPayloadBuilder = mock()
+
     @Before
     fun setUp() {
         viewModel = AttachmentViewModel(
@@ -136,6 +141,8 @@ class AttachmentViewModelTest {
             appBuildConfig = appBuildConfig,
             nativeInputStateProvider = nativeInputStateStore,
             duckChatPixels = duckChatPixels,
+            textSelectionStore = textSelectionStore,
+            textSelectionPayloadBuilder = textSelectionPayloadBuilder,
         )
     }
 
