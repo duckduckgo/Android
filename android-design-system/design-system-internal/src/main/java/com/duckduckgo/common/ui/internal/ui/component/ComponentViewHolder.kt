@@ -369,6 +369,22 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 promoAction = "Promo Link",
                 messageType = REMOTE_PROMO_MESSAGE,
             )
+            val wideDesktopPromoMessage = Message(
+                middleIllustration = CommonR.drawable.desktop_promo_artwork,
+                title = "DuckDuckGo on desktop",
+                subtitle = "Get the DuckDuckGo browser for Mac or Windows.",
+                promoAction = "Learn More",
+                messageType = REMOTE_PROMO_MESSAGE,
+            )
+            val wideTopIllustrationStressMessage = Message(
+                topIllustration = if (isDarkTheme) {
+                    CommonR.drawable.ic_visual_design_update_artwork_dark
+                } else {
+                    CommonR.drawable.ic_visual_design_update_artwork_light
+                },
+                title = "A fresh new look",
+                subtitle = "DuckDuckGo has a refreshed design, with the same privacy protections.",
+            )
 
             view.findViewById<MessageCta>(R.id.small_remote_message).apply {
                 setMessage(smallMessage)
@@ -392,6 +408,14 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
             view.findViewById<MessageCta>(R.id.promo_single_remote_message).apply {
                 setMessage(promoSingleMessage)
+            }
+
+            view.findViewById<MessageCta>(R.id.wide_desktop_promo_message).apply {
+                setMessage(wideDesktopPromoMessage)
+            }
+
+            view.findViewById<MessageCta>(R.id.wide_top_illustration_remote_message).apply {
+                setMessage(wideTopIllustrationStressMessage)
             }
 
             view.setupThemedComposeView(R.id.promo_single_remote_message_compose, isDarkTheme = isDarkTheme) {
