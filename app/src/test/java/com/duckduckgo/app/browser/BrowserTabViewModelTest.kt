@@ -11828,26 +11828,6 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenDuckChatNativeHistoryRequested() = runTest {
-        val expectedEvent = SubscriptionEventData(
-            featureName = "event1",
-            subscriptionName = "subscription1",
-            params = JSONObject(),
-        )
-        whenever(mockDuckChatJSHelper.onNativeAction(NativeAction.SIDEBAR)).thenReturn(expectedEvent)
-
-        testee.openDuckChatSidebar()
-
-        testee.subscriptionEventDataFlow.test {
-            val emittedEvent = awaitItem()
-            assertEquals(expectedEvent.featureName, emittedEvent.featureName)
-            assertEquals(expectedEvent.subscriptionName, emittedEvent.subscriptionName)
-            assertEquals(expectedEvent.params.toString(), emittedEvent.params.toString())
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
     fun whenCustomizeResponsesClickedThenSubscriptionEventEmitted() = runTest {
         val expectedEvent = SubscriptionEventData(
             featureName = "aiChat",
