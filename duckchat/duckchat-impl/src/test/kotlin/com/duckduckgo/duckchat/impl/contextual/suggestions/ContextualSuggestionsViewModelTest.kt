@@ -457,14 +457,15 @@ class ContextualSuggestionsViewModelTest {
     }
 
     @Test
-    fun whenMoreThanOneTextSelectionAttachedThenNoSuggestionsShown() = runTest {
-        whenever(suggestedPromptsProvider.resolveTextSelectionSuggestions(any())).thenReturn(
-            listOf(ContextualSuggestedPrompt("summarize-selection", "Summarize this selection", "Summarize this selection.", "summary")),
+    fun whenMoreThanOneTextSelectionAttachedThenSelectionSuggestionsStillShown() = runTest {
+        val selectionSuggestions = listOf(
+            ContextualSuggestedPrompt("summarize-selection", "Summarize this selection", "Summarize this selection.", "summary"),
         )
+        whenever(suggestedPromptsProvider.resolveTextSelectionSuggestions(any())).thenReturn(selectionSuggestions)
         viewModel.onTextSelectionCountChanged(1)
 
         viewModel.onTextSelectionCountChanged(2)
 
-        assertTrue(viewModel.viewState.value.suggestions.isEmpty())
+        assertEquals(selectionSuggestions, viewModel.viewState.value.suggestions)
     }
 }
