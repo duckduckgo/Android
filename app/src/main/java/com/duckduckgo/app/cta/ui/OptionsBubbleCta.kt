@@ -86,8 +86,6 @@ abstract class OptionsBubbleCta(
     }
 
     override fun setOnOptionClicked(
-        onboardingExperimentEnabled: Boolean,
-        configuration: DaxBubbleCta?,
         onOptionClicked: (DaxDialogIntroOption, index: Int?) -> Unit,
     ) {
         options?.forEachIndexed { index, option ->

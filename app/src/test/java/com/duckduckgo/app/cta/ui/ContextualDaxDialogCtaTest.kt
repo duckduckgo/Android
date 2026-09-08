@@ -22,6 +22,7 @@ import android.content.res.Resources
 import android.view.View
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.isVisible
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.R
@@ -66,7 +67,7 @@ class ContextualDaxDialogCtaTest {
     private val activeInclude: View = mock()
     private val primaryInclude: View = mock()
     private val optionsInclude: View = mock()
-    private val browserTabBinding: FragmentBrowserTabBinding = mock()
+    private lateinit var browserTabBinding: FragmentBrowserTabBinding
     private val brandDesignBinding: IncludeOnboardingInContextDaxDialogBinding = mock()
     private val settingsDataStore: SettingsDataStore = mock()
 
@@ -96,8 +97,19 @@ class ContextualDaxDialogCtaTest {
             .thenReturn(backgroundView)
         whenever(container.findViewById<DaxOnboardingBubbleBrandDesignUpdateCardView>(R.id.contextualBrandDesignCardView))
             .thenReturn(cardView)
-        whenever(browserTabBinding.includeOnboardingInContextDaxDialogBrandDesign)
-            .thenReturn(brandDesignBinding)
+        // View binding includes are generated as final fields, so Mockito cannot stub the field
+        // access used by the production hideContainer() path. Construct the binding with just the
+        // fields exercised here populated; all other generated fields are irrelevant to these tests.
+        val root = mock<CoordinatorLayout>()
+        val constructor = FragmentBrowserTabBinding::class.java.declaredConstructors.single().apply {
+            isAccessible = true
+        }
+        val constructorArgs = arrayOfNulls<Any>(21).apply {
+            this[0] = root
+            this[11] = brandDesignBinding
+            this[15] = root
+        }
+        browserTabBinding = constructor.newInstance(*constructorArgs) as FragmentBrowserTabBinding
         whenever(brandDesignBinding.root).thenReturn(container)
 
         testee = TestableContextualDaxDialogCta(onboardingStore, appInstallStore, mockDeviceInfo)
