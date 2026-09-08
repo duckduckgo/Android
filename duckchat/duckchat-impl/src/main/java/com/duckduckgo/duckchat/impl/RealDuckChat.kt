@@ -1119,7 +1119,11 @@ class RealDuckChat @Inject constructor(
 
             contextualMenuAllChatsEnabled = contextualSheetRedesignEnabled && duckChatFeature.contextualMenuAllChats().isEnabled()
 
-            _showTextSelectionAction.emit(contextualSheetRedesignEnabled && duckChatFeature.duckAiTextSelectionAction().isEnabled())
+            _showTextSelectionAction.emit(
+                contextualSheetRedesignEnabled &&
+                    isContextualNativeInputEnabled &&
+                    duckChatFeature.duckAiTextSelectionAction().isEnabled(),
+            )
 
             isAutomaticContextAttachmentEnabled = isContextualModeEnabled &&
                 duckChatFeature.automaticContextAttachment()
