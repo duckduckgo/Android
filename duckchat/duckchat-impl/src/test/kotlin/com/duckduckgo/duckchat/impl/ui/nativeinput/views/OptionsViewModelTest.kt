@@ -27,18 +27,26 @@ import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.models.Tool
+import com.duckduckgo.duckchat.impl.nativeinput.EffectiveModel
 import com.duckduckgo.duckchat.impl.nativeinput.EffectiveModelProvider
+import com.duckduckgo.duckchat.impl.nativeinput.RealEffectiveModelProvider
 import com.duckduckgo.duckchat.impl.nativeinput.RealNativeInputStateStore
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
+import com.duckduckgo.duckchat.store.impl.DuckAiChat
+import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -75,7 +83,8 @@ class OptionsViewModelTest {
     }
     private val effectiveModelId = MutableStateFlow<String?>(null)
     private val effectiveModelProvider = object : EffectiveModelProvider {
-        override val effectiveModelId: Flow<String?> = this@OptionsViewModelTest.effectiveModelId
+        override val effectiveModel: Flow<EffectiveModel> =
+            this@OptionsViewModelTest.effectiveModelId.map { EffectiveModel.Resolved(it) }
         override fun onRecoveryModelPicked(chatId: String?, modelId: String) = Unit
         override fun clearRecoveryModelPick(chatId: String?) = Unit
     }
@@ -223,6 +232,69 @@ class OptionsViewModelTest {
         isAccessible = true,
         supportedTools = supportedTools,
     )
+
+    @Test
+    fun whenReturningToATabWhoseToolTheNewModelDoesNotSupportThenVisibleToolsDropIt() = runTest {
+        val duckAiChatStore: DuckAiChatStore = mock<DuckAiChatStore>().also {
+            whenever(it.getChatsFlow()).thenReturn(MutableStateFlow(emptyList()))
+        }
+        val provider = RealEffectiveModelProvider(modelManager, store, duckAiChatStore)
+        val testee = OptionsViewModel(store, duckChatPixels, modelManager, provider)
+        givenModels(
+            model("with-web-search", supportedTools = listOf(Tool.WEB_SEARCH)),
+            model("no-web-search", supportedTools = listOf(Tool.IMAGE_GENERATION)),
+        )
+        modelStateFlow.value = modelStateFlow.value.copy(selectedModelId = "with-web-search")
+
+        // tab A: new chat, web search selected
+        store.publish("tab-A", NativeInputState.zero().copy(selectedTool = Tool.WEB_SEARCH.rawValue))
+        selectedTabFlow.value = tabEntity("tab-A")
+        advanceUntilIdle()
+        assertEquals(setOf(Tool.WEB_SEARCH), testee.visibleTools.value)
+
+        // tab B: pick a model that does not support web search (global selection)
+        store.publish("tab-B", NativeInputState.zero())
+        selectedTabFlow.value = tabEntity("tab-B")
+        modelStateFlow.value = modelStateFlow.value.copy(selectedModelId = "no-web-search")
+        advanceUntilIdle()
+
+        // back to tab A
+        selectedTabFlow.value = tabEntity("tab-A")
+        advanceUntilIdle()
+
+        assertEquals(Tool.WEB_SEARCH, testee.selectedTool.value)
+        assertEquals(setOf(Tool.IMAGE_GENERATION), testee.visibleTools.value)
+        assertEquals(Unit, testee.toolSelectionCleared.first())
+    }
+
+    @Test
+    fun whenTabIsSwitchedThenTheClearDoesNotFireAgainstTheOtherTabsModel() = runTest {
+        val chatA = DuckAiChat(chatId = "chat-A", title = "t", model = "with-web-search", lastEdit = "now", pinned = false)
+        val duckAiChatStore: DuckAiChatStore = mock<DuckAiChatStore>().also {
+            whenever(it.getChatsFlow()).thenReturn(MutableStateFlow(listOf(chatA)))
+        }
+        val provider = RealEffectiveModelProvider(modelManager, store, duckAiChatStore)
+        val testee = OptionsViewModel(store, duckChatPixels, modelManager, provider)
+        givenModels(
+            model("with-web-search", supportedTools = listOf(Tool.WEB_SEARCH)),
+            model("no-web-search", supportedTools = listOf(Tool.IMAGE_GENERATION)),
+        )
+        modelStateFlow.value = modelStateFlow.value.copy(selectedModelId = "no-web-search")
+        // tab A's chat supports web search, so its selection is legitimate
+        store.publish("tab-A", NativeInputState.zero().copy(chatId = "chat-A", selectedTool = Tool.WEB_SEARCH.rawValue))
+        store.publish("tab-B", NativeInputState.zero())
+        selectedTabFlow.value = tabEntity("tab-B")
+        advanceUntilIdle()
+
+        val cleared = mutableListOf<Unit>()
+        val job = launch { testee.toolSelectionCleared.collect { cleared += it } }
+        selectedTabFlow.value = tabEntity("tab-A")
+        runCurrent()
+        job.cancel()
+
+        // Tab A's own chat supports web search, so nothing may clear it while its model resolves.
+        assertTrue(cleared.isEmpty())
+    }
 
     private fun tabEntity(tabId: String): TabEntity = TabEntity(tabId = tabId, position = 0)
 }

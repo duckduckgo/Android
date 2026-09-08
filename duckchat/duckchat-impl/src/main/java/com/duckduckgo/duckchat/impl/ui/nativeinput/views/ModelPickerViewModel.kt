@@ -29,6 +29,7 @@ import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ModelProvider
 import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.models.UserTier
+import com.duckduckgo.duckchat.impl.nativeinput.EffectiveModel
 import com.duckduckgo.duckchat.impl.nativeinput.EffectiveModelProvider
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
@@ -108,8 +109,13 @@ class ModelPickerViewModel @Inject constructor(
         }
     }
 
-    /** Mirrors [EffectiveModelProvider.effectiveModelId] for this view: the model the chip displays. */
-    val effectiveModelId: StateFlow<String?> = effectiveModelProvider.effectiveModelId.stateIn(
+    /** Mirrors the provider for this view: the model the chip displays. */
+    val effectiveModelId: StateFlow<String?> = effectiveModelProvider.effectiveModel.map { effective ->
+        when (effective) {
+            is EffectiveModel.Resolved -> effective.modelId
+            EffectiveModel.Unresolved -> modelManager.modelState.value.selectedModelId
+        }
+    }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Eagerly,
         initialValue = modelManager.modelState.value.selectedModelId,

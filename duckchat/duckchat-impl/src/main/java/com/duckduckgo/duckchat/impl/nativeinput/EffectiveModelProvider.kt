@@ -19,16 +19,16 @@ package com.duckduckgo.duckchat.impl.nativeinput
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
+import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
@@ -36,9 +36,20 @@ import javax.inject.Inject
  * The model whose capabilities the native input controls should reflect for the active tab. Shared so
  * the model picker and the options menu resolve it identically instead of one asking the other.
  */
+sealed interface EffectiveModel {
+
+    /**
+     * The active tab's chat has not been read back yet, so no model can be attributed to it. Controls
+     * must not act on a model during this window: it would be the previously selected tab's.
+     */
+    data object Unresolved : EffectiveModel
+
+    data class Resolved(val modelId: String?) : EffectiveModel
+}
+
 interface EffectiveModelProvider {
 
-    val effectiveModelId: Flow<String?>
+    val effectiveModel: Flow<EffectiveModel>
 
     /**
      * Records the model picked during [chatId]'s FE model-change window. It wins over that chat's stored
@@ -46,14 +57,10 @@ interface EffectiveModelProvider {
      */
     fun onRecoveryModelPicked(chatId: String?, modelId: String)
 
-    /**
-     * Drops the pick when [chatId]'s window closes. Keyed by chat for two reasons: the next window on the
-     * same chat must not reapply the old pick, and closing one tab's window must not wipe another tab's.
-     */
+    /** Drops [chatId]'s pick when its window closes, leaving any other chat's window untouched. */
     fun clearRecoveryModelPick(chatId: String?)
 }
 
-@OptIn(ExperimentalCoroutinesApi::class)
 // ActivityScope, not AppScope: the unqualified DuckAiChatStore is bound per activity so it can resolve
 // the browser mode. One instance per activity is what the plugins sharing a widget need anyway.
 @SingleInstanceIn(ActivityScope::class)
@@ -68,43 +75,46 @@ class RealEffectiveModelProvider @Inject constructor(
         val chatId: String?,
         val modelChangeMode: Boolean,
         val chatModel: String?,
+        val resolved: Boolean,
     )
 
-    private data class RecoveryPick(val chatId: String?, val modelId: String)
+    // Keyed by chat: two tabs can sit in a model-change window at once, and each keeps its own pick.
+    private val recoveryPicks = MutableStateFlow<Map<String?, String>>(emptyMap())
 
-    private val recoveryPick = MutableStateFlow<RecoveryPick?>(null)
+    // Observed rather than read once per chatId, so a model the FE writes back later still lands.
+    private val chats: Flow<List<DuckAiChat>?> = duckAiChatStore.getChatsFlow()
+        .map<List<DuckAiChat>, List<DuckAiChat>?> { it }
+        .onStart { emit(null) }
 
-    // mapLatest: a chatId flip cancels an in-flight lookup, so a slow read can't resolve into a stale chat.
-    private val activeChat: Flow<ActiveChat> = nativeInputStateProvider.state
-        .map { it.chatId to it.modelChangeMode }
-        .distinctUntilChanged()
-        .mapLatest { (chatId, modelChangeMode) ->
-            ActiveChat(
-                chatId = chatId,
-                modelChangeMode = modelChangeMode,
-                chatModel = chatId?.let { duckAiChatStore.getChatById(it)?.model },
-            )
+    private val activeChat: Flow<ActiveChat> = combine(
+        nativeInputStateProvider.state.map { it.chatId to it.modelChangeMode }.distinctUntilChanged(),
+        chats,
+    ) { (chatId, modelChangeMode), chats ->
+        when {
+            chatId == null -> ActiveChat(null, modelChangeMode, null, resolved = true)
+            chats == null -> ActiveChat(chatId, modelChangeMode, null, resolved = false)
+            else -> ActiveChat(chatId, modelChangeMode, chats.firstOrNull { it.chatId == chatId }?.model, resolved = true)
         }
+    }
 
-    override val effectiveModelId: Flow<String?> = combine(
+    override val effectiveModel: Flow<EffectiveModel> = combine(
         modelManager.modelState,
         activeChat,
-        recoveryPick,
-    ) { modelState, chat, recovery ->
+        recoveryPicks,
+    ) { modelState, chat, picks ->
+        if (!chat.resolved) return@combine EffectiveModel.Unresolved
         val modelIds = modelState.models.mapTo(HashSet()) { it.id }
-        // Honoured only for the chat whose window is open, so a pick cannot leak across tabs.
-        val recovered = recovery
-            ?.takeIf { chat.modelChangeMode && it.chatId == chat.chatId }
-            ?.modelId
+        val recovered = picks[chat.chatId]
+            ?.takeIf { chat.modelChangeMode }
             ?.takeIf { it in modelIds }
-        recovered ?: chat.chatModel?.takeIf { it in modelIds } ?: modelState.selectedModelId
+        EffectiveModel.Resolved(recovered ?: chat.chatModel?.takeIf { it in modelIds } ?: modelState.selectedModelId)
     }.distinctUntilChanged()
 
     override fun onRecoveryModelPicked(chatId: String?, modelId: String) {
-        recoveryPick.value = RecoveryPick(chatId, modelId)
+        recoveryPicks.update { it + (chatId to modelId) }
     }
 
     override fun clearRecoveryModelPick(chatId: String?) {
-        recoveryPick.update { current -> current?.takeIf { it.chatId != chatId } }
+        recoveryPicks.update { it - chatId }
     }
 }

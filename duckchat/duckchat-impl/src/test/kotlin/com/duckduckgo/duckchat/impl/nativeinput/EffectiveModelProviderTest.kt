@@ -29,6 +29,7 @@ import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.TestScope
@@ -71,7 +72,10 @@ class EffectiveModelProviderTest {
     private val modelManager: DuckAiModelManager = mock<DuckAiModelManager>().also {
         whenever(it.modelState).thenReturn(modelStateFlow)
     }
-    private val duckAiChatStore: DuckAiChatStore = mock()
+    private val chatsFlow = MutableStateFlow<List<DuckAiChat>>(emptyList())
+    private val duckAiChatStore: DuckAiChatStore = mock<DuckAiChatStore>().also {
+        whenever(it.getChatsFlow()).thenReturn(chatsFlow)
+    }
 
     private lateinit var testee: RealEffectiveModelProvider
 
@@ -84,51 +88,51 @@ class EffectiveModelProviderTest {
     fun whenTabHasNoChatThenGlobalSelectionIsEffective() = runTest {
         publish(NativeInputState.zero())
 
-        assertEquals("global-model", testee.effectiveModelId.first())
+        assertEquals("global-model", testee.resolvedModelId())
     }
 
     @Test
     fun whenActiveChatHasModelThenChatModelIsEffective() = runTest {
-        whenever(duckAiChatStore.getChatById("chat-1")).thenReturn(chat("chat-1", "chat-model"))
+        chatsFlow.value = chatsFlow.value + chat("chat-1", "chat-model")
         publish(NativeInputState.zero().copy(chatId = "chat-1"))
 
-        assertEquals("chat-model", testee.effectiveModelId.first())
+        assertEquals("chat-model", testee.resolvedModelId())
     }
 
     @Test
     fun whenChatModelIsNotInTheModelListThenGlobalSelectionIsEffective() = runTest {
-        whenever(duckAiChatStore.getChatById("chat-1")).thenReturn(chat("chat-1", "model-we-lost-access-to"))
+        chatsFlow.value = chatsFlow.value + chat("chat-1", "model-we-lost-access-to")
         publish(NativeInputState.zero().copy(chatId = "chat-1"))
 
-        assertEquals("global-model", testee.effectiveModelId.first())
+        assertEquals("global-model", testee.resolvedModelId())
     }
 
     @Test
     fun whenRecoveryModelPickedDuringModelChangeModeThenRecoveryModelIsEffective() = runTest {
-        whenever(duckAiChatStore.getChatById("chat-1")).thenReturn(chat("chat-1", "chat-model"))
+        chatsFlow.value = chatsFlow.value + chat("chat-1", "chat-model")
         publish(NativeInputState.zero().copy(chatId = "chat-1", modelChangeMode = true))
 
         testee.onRecoveryModelPicked(chatId = "chat-1", modelId = "recovery-model")
         advanceUntilIdle()
 
-        assertEquals("recovery-model", testee.effectiveModelId.first())
+        assertEquals("recovery-model", testee.resolvedModelId())
     }
 
     @Test
     fun whenModelChangeModeEndsThenRecoveryModelIsIgnored() = runTest {
-        whenever(duckAiChatStore.getChatById("chat-1")).thenReturn(chat("chat-1", "chat-model"))
+        chatsFlow.value = chatsFlow.value + chat("chat-1", "chat-model")
         publish(NativeInputState.zero().copy(chatId = "chat-1", modelChangeMode = true))
         testee.onRecoveryModelPicked(chatId = "chat-1", modelId = "recovery-model")
         advanceUntilIdle()
 
         publish(NativeInputState.zero().copy(chatId = "chat-1", modelChangeMode = false))
 
-        assertEquals("chat-model", testee.effectiveModelId.first())
+        assertEquals("chat-model", testee.resolvedModelId())
     }
 
     @Test
     fun whenANewModelChangeWindowOpensThenThePreviousRecoveryPickIsNotReused() = runTest {
-        whenever(duckAiChatStore.getChatById("chat-1")).thenReturn(chat("chat-1", "chat-model"))
+        chatsFlow.value = chatsFlow.value + chat("chat-1", "chat-model")
         publish(NativeInputState.zero().copy(chatId = "chat-1", modelChangeMode = true))
         testee.onRecoveryModelPicked(chatId = "chat-1", modelId = "recovery-model")
         advanceUntilIdle()
@@ -138,13 +142,13 @@ class EffectiveModelProviderTest {
 
         publish(NativeInputState.zero().copy(chatId = "chat-1", modelChangeMode = true))
 
-        assertEquals("chat-model", testee.effectiveModelId.first())
+        assertEquals("chat-model", testee.resolvedModelId())
     }
 
     @Test
     fun whenAnotherTabWithoutAnOpenWindowIsSelectedThenThePickSurvives() = runTest {
-        whenever(duckAiChatStore.getChatById("chat-1")).thenReturn(chat("chat-1", "chat-model"))
-        whenever(duckAiChatStore.getChatById("chat-2")).thenReturn(chat("chat-2", "global-model"))
+        chatsFlow.value = chatsFlow.value + chat("chat-1", "chat-model")
+        chatsFlow.value = chatsFlow.value + chat("chat-2", "global-model")
         publish(NativeInputState.zero().copy(chatId = "chat-1", modelChangeMode = true))
         testee.onRecoveryModelPicked(chatId = "chat-1", modelId = "recovery-model")
         advanceUntilIdle()
@@ -155,21 +159,63 @@ class EffectiveModelProviderTest {
         advanceUntilIdle()
         publish(NativeInputState.zero().copy(chatId = "chat-1", modelChangeMode = true))
 
-        assertEquals("recovery-model", testee.effectiveModelId.first())
+        assertEquals("recovery-model", testee.resolvedModelId())
     }
 
     @Test
     fun whenTheWindowBelongsToAnotherChatThenThePickIsNotApplied() = runTest {
-        whenever(duckAiChatStore.getChatById("chat-1")).thenReturn(chat("chat-1", "chat-model"))
-        whenever(duckAiChatStore.getChatById("chat-2")).thenReturn(chat("chat-2", "chat-model"))
+        chatsFlow.value = chatsFlow.value + chat("chat-1", "chat-model")
+        chatsFlow.value = chatsFlow.value + chat("chat-2", "chat-model")
         publish(NativeInputState.zero().copy(chatId = "chat-1", modelChangeMode = true))
         testee.onRecoveryModelPicked(chatId = "chat-1", modelId = "recovery-model")
         advanceUntilIdle()
 
         publish(NativeInputState.zero().copy(chatId = "chat-2", modelChangeMode = true))
 
-        assertEquals("chat-model", testee.effectiveModelId.first())
+        assertEquals("chat-model", testee.resolvedModelId())
     }
+
+    @Test
+    fun whenTwoChatsAreInRecoveryThenEachKeepsItsOwnPick() = runTest {
+        chatsFlow.value = listOf(chat("chat-1", "chat-model"), chat("chat-2", "chat-model"))
+        publish(NativeInputState.zero().copy(chatId = "chat-1", modelChangeMode = true))
+        testee.onRecoveryModelPicked(chatId = "chat-1", modelId = "recovery-model")
+        testee.onRecoveryModelPicked(chatId = "chat-2", modelId = "global-model")
+        advanceUntilIdle()
+
+        assertEquals("recovery-model", testee.resolvedModelId())
+
+        publish(NativeInputState.zero().copy(chatId = "chat-2", modelChangeMode = true))
+
+        assertEquals("global-model", testee.resolvedModelId())
+    }
+
+    @Test
+    fun whenTheChatsFlowReportsANewModelThenTheEffectiveModelFollowsIt() = runTest {
+        chatsFlow.value = listOf(chat("chat-1", "chat-model"))
+        publish(NativeInputState.zero().copy(chatId = "chat-1"))
+        assertEquals("chat-model", testee.resolvedModelId())
+
+        // The FE writes the chat's new model back after the window closes; no chatId change to trigger a re-read.
+        chatsFlow.value = listOf(chat("chat-1", "recovery-model"))
+        advanceUntilIdle()
+
+        assertEquals("recovery-model", testee.resolvedModelId())
+    }
+
+    @Test
+    fun whenTheChatListHasNotArrivedThenTheModelIsUnresolved() = runTest {
+        val pending = MutableSharedFlow<List<DuckAiChat>>()
+        val store: DuckAiChatStore = mock<DuckAiChatStore>().also { whenever(it.getChatsFlow()).thenReturn(pending) }
+        val provider = RealEffectiveModelProvider(modelManager, this@EffectiveModelProviderTest.store, store)
+        publish(NativeInputState.zero().copy(chatId = "chat-1"))
+
+        assertEquals(EffectiveModel.Unresolved, provider.effectiveModel.first())
+    }
+
+    /** The provider reports Unresolved until the chat list arrives, so tests wait for the resolved value. */
+    private suspend fun RealEffectiveModelProvider.resolvedModelId(): String? =
+        (effectiveModel.first { it is EffectiveModel.Resolved } as EffectiveModel.Resolved).modelId
 
     private fun TestScope.publish(state: NativeInputState) {
         store.publish(TAB_ID, state)

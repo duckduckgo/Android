@@ -68,7 +68,10 @@ class ModelPickerViewModelTest {
     private val nativeInputStateProvider: NativeInputStateProvider = mock<NativeInputStateProvider>().also {
         whenever(it.state).thenReturn(nativeInputState)
     }
-    private val duckAiChatStore: DuckAiChatStore = mock()
+    private val chatsFlow = MutableStateFlow<List<DuckAiChat>>(emptyList())
+    private val duckAiChatStore: DuckAiChatStore = mock<DuckAiChatStore>().also {
+        whenever(it.getChatsFlow()).thenReturn(chatsFlow)
+    }
 
     private lateinit var testee: ModelPickerViewModel
 
@@ -586,6 +589,7 @@ class ModelPickerViewModelTest {
         whenever(duckAiChatStore.getChatById("c1")).thenReturn(
             DuckAiChat(chatId = "c1", title = "t", model = "chat-model", lastEdit = "now", pinned = false),
         )
+        chatsFlow.value = listOf(DuckAiChat(chatId = "c1", title = "t", model = "chat-model", lastEdit = "now", pinned = false))
         nativeInputState.value = nativeInputState.value.copy(chatId = "c1")
         advanceUntilIdle()
 
@@ -602,6 +606,7 @@ class ModelPickerViewModelTest {
         whenever(duckAiChatStore.getChatById("c1")).thenReturn(
             DuckAiChat(chatId = "c1", title = "t", model = "chat-model", lastEdit = "now", pinned = false),
         )
+        chatsFlow.value = listOf(DuckAiChat(chatId = "c1", title = "t", model = "chat-model", lastEdit = "now", pinned = false))
         nativeInputState.value = nativeInputState.value.copy(chatId = "c1")
         advanceUntilIdle()
 
@@ -631,6 +636,7 @@ class ModelPickerViewModelTest {
         whenever(duckAiChatStore.getChatById("c1")).thenReturn(
             DuckAiChat(chatId = "c1", title = "t", model = "lost-access-model", lastEdit = "now", pinned = false),
         )
+        chatsFlow.value = listOf(DuckAiChat(chatId = "c1", title = "t", model = "lost-access-model", lastEdit = "now", pinned = false))
         nativeInputState.value = nativeInputState.value.copy(chatId = "c1")
         advanceUntilIdle()
 
@@ -743,6 +749,7 @@ class ModelPickerViewModelTest {
         whenever(duckAiChatStore.getChatById("c1")).thenReturn(
             DuckAiChat(chatId = "c1", title = "t", model = "lost-access-model", lastEdit = "now", pinned = false),
         )
+        chatsFlow.value = listOf(DuckAiChat(chatId = "c1", title = "t", model = "lost-access-model", lastEdit = "now", pinned = false))
         nativeInputState.value = nativeInputState.value.copy(chatId = "c1", modelChangeMode = true)
         advanceUntilIdle()
 
