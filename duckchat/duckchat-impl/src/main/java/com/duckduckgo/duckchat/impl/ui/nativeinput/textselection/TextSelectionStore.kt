@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.getAndUpdate
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.updateAndGet
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
@@ -34,7 +35,7 @@ data class TextSelection(
 
 interface TextSelectionStore {
     fun selections(tabId: String): StateFlow<List<TextSelection>>
-    fun add(tabId: String, text: String)
+    fun add(tabId: String, text: String): Boolean
     fun consume(tabId: String): List<TextSelection>
     fun remove(tabId: String, id: String)
 
@@ -49,23 +50,27 @@ class RealTextSelectionStore @Inject constructor() : TextSelectionStore {
 
     private val selections = ConcurrentHashMap<String, MutableStateFlow<List<TextSelection>>>()
 
-    override fun selections(tabId: String): StateFlow<List<TextSelection>> = flowFor(tabId)
+    override fun selections(tabId: String): StateFlow<List<TextSelection>> = getFlow(tabId)
 
-    override fun add(tabId: String, text: String) {
-        val selection = selectionOf(text) ?: return
-        flowFor(tabId).update { (it + selection).take(TextSelectionStore.MAX_SELECTIONS) }
+    override fun add(tabId: String, text: String): Boolean {
+        val selection = getTextSelection(text) ?: return false
+        val selections = getFlow(tabId).updateAndGet { existing ->
+            val isDuplicate = existing.any { it.text == selection.text }
+            if (isDuplicate || existing.size >= TextSelectionStore.MAX_SELECTIONS) existing else existing + selection
+        }
+        return selections.any { it.text == selection.text }
     }
 
-    override fun consume(tabId: String): List<TextSelection> = flowFor(tabId).getAndUpdate { emptyList() }
+    override fun consume(tabId: String): List<TextSelection> = getFlow(tabId).getAndUpdate { emptyList() }
 
     override fun remove(tabId: String, id: String) {
-        flowFor(tabId).update { current -> current.filterNot { it.id == id } }
+        getFlow(tabId).update { current -> current.filterNot { it.id == id } }
     }
 
-    private fun flowFor(tabId: String): MutableStateFlow<List<TextSelection>> =
+    private fun getFlow(tabId: String): MutableStateFlow<List<TextSelection>> =
         selections.computeIfAbsent(tabId) { MutableStateFlow(emptyList()) }
 
-    private fun selectionOf(text: String): TextSelection? {
+    private fun getTextSelection(text: String): TextSelection? {
         val trimmed = text.trim()
         if (trimmed.isEmpty()) return null
         return TextSelection(UUID.randomUUID().toString(), trimmed)
