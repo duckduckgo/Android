@@ -131,6 +131,7 @@ class RealDuckChatContextual @Inject constructor(
         }
         if (duckChatInternal.isContextualMenuAllChatsEnabled()) {
             popup.onMenuItemClicked(content.findViewById(R.id.contextualChatMenuAllChats)) {
+                duckChatPixels.reportContextualAddressBarMenuAllChatsSelected()
                 globalActivityStarter.start(activity, DuckChatHistoryNoParams)
             }
         } else {
