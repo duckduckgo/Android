@@ -304,7 +304,7 @@ class AttachmentView(
         supportsUpload = state.supportsUpload
         updateButtonVisibility()
         host?.attachmentChanged(
-            hasAttachments = state.hasAttachments,
+            allowsBlankSubmit = state.allowsBlankSubmit,
             limitExceeded = !isEditMode && (
                 state.imageLimitError != null ||
                     state.fileLimitError != null ||

@@ -37,8 +37,7 @@ interface NativeInputHost {
     fun showAttachmentChooser(showing: Boolean)
     fun showModelPicker(showing: Boolean)
     fun showReasoningPicker(showing: Boolean)
-
-    fun attachmentChanged(hasAttachments: Boolean, limitExceeded: Boolean, supportsUpload: Boolean)
+    fun attachmentChanged(allowsBlankSubmit: Boolean, limitExceeded: Boolean, supportsUpload: Boolean)
 
     /**
      * Plugins call this whenever the user's tool selection changes. The widget routes this into

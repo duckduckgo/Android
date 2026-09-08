@@ -2131,13 +2131,13 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     override fun attachmentChanged(
-        hasAttachments: Boolean,
+        allowsBlankSubmit: Boolean,
         limitExceeded: Boolean,
         supportsUpload: Boolean,
     ) {
         val hadLimitError = attachmentLimitExceeded
         attachmentLimitExceeded = limitExceeded
-        this.hasAttachments = hasAttachments
+        this.hasAttachments = allowsBlankSubmit
         if (hadLimitError != attachmentLimitExceeded && !isStreaming) {
             floatingSubmitContainer?.visibility = if (attachmentLimitExceeded) GONE else VISIBLE
         }
