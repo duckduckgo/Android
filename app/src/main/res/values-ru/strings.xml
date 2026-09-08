@@ -1002,6 +1002,22 @@
     <string name="preOnboardingWidgetPromptPrimaryCta">Добавить виджет</string>
     <string name="preOnboardingWidgetPromptSecondaryCta">Пропустить</string>
 
+    <!-- Pre-onboarding: import passwords -->
+    <string name="preOnboardingImportPasswordsTitle">Импортировать пароли из Google</string>
+    <string name="preOnboardingImportPasswordsBody">Google может попросить вас войти в систему или ввести пароль для подтверждения.</string>
+    <string name="preOnboardingImportPasswordsPrimaryCta">Импортировать из Google</string>
+    <string name="preOnboardingImportCompleteTitle">Импортирование завершено</string>
+    <string name="preOnboardingImportCompleteCta">Продолжить</string>
+    <string name="preOnboardingImportCompleteParsingTitle">Импорт паролей</string>
+    <string name="preOnboardingImportCompleteParsingBody">Это займет совсем немного времени.</string>
+    <string name="preOnboardingImportCompleteFailedTitle">Не удалось импортировать</string>
+    <string name="preOnboardingImportCompleteFailed">Не удалось импортировать пароли</string>
+    <string name="preOnboardingImportCompleteImported" instruction="Placeholder is the number of passwords that were imported.">Импортировано паролей: %1$s</string>
+    <string name="preOnboardingImportCompleteSkipped" instruction="Placeholder is the number of passwords that were not imported.">Пропущено (дубликаты и недействительные): %1$s</string>
+    <string name="preOnboardingImportErrorTitle">Что-то пошло не так</string>
+    <string name="preOnboardingImportErrorBody">Повторите попытку.</string>
+    <string name="preOnboardingImportErrorRetry">Повторить попытку</string>
+
     <!-- Pre-onboarding: add to home screen -->
     <string name="preOnboardingDockStepTitle">Добавьте меня в строку избранного.</string>
     <string name="preOnboardingAddToDockBody">Найдите значок DuckDuckGo на главном экране. Затем нажмите и перетащите виджет на нужное место. Готово!</string>
