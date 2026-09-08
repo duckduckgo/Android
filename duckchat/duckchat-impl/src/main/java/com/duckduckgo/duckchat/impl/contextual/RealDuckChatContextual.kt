@@ -67,20 +67,20 @@ class RealDuckChatContextual @Inject constructor(
             return
         }
         textSelection?.let { textSelectionStore.add(sourceTabId, it) }
+        if (hasChatInProgress(sourceTabId)) {
+            // The sheet would reopen the existing chat for this tab, so skip the entry menu and open it directly.
+            showChatSurface()
+            return
+        }
         if (textSelectionStore.selections(sourceTabId).value.isNotEmpty()) {
             showEntryDialog(anchor, sourceTabId, showChatSurface)
             return
         }
-        if (hasChatInProgress(sourceTabId)) {
-            // The sheet would reopen the existing chat for this tab, so skip the entry menu and open it directly.
-            showChatSurface()
-        } else {
-            val serpQuery = sourceUrl
-                ?.takeIf { duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(it) }
-                ?.let { duckDuckGoUrlDetector.extractQuery(it) }
-                ?.takeIf { it.isNotBlank() }
-            showMenu(sourceTabId, anchor, serpQuery, showChatSurface)
-        }
+        val serpQuery = sourceUrl
+            ?.takeIf { duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(it) }
+            ?.let { duckDuckGoUrlDetector.extractQuery(it) }
+            ?.takeIf { it.isNotBlank() }
+        showMenu(sourceTabId, anchor, serpQuery, showChatSurface)
     }
 
     private suspend fun hasChatInProgress(tabId: String): Boolean {
