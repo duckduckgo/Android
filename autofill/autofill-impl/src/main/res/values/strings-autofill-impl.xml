@@ -198,7 +198,6 @@
     <string name="autofillManagementHowToSyncDesktopPasswordsTitle">How to Sync Desktop Passwords</string>
     <string name="autofillManagementImportPasswordsHowToInstruction">Import passwords in the desktop version of the DuckDuckGo browser, then sync across devices.</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Get Desktop Browser</string>
-    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Link copied</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Get DuckDuckGo Browser for Mac or Windows</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Search privately and block trackers with the DuckDuckGo desktop browser. Visit this link on your computer to download today.\n\n%1$s</string>
     <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Sync With Desktop</string>
@@ -211,8 +210,6 @@
     <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Get Desktop App</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">Get DuckDuckGo for Mac or Windows</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">On your computer, go to:</string>
-    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
-    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Share Download Link</string>
 
     <string name="autofillManagementReportBreakagePromptTitle">Report a problem with autofill</string>
     <string name="autofillManagementReportBreakagePromptSubtitle">Anonymously report autofill not working on this site. Passwords are never shared.</string>

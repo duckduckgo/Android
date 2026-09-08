@@ -221,7 +221,6 @@
     <!-- Get Desktop Browser -->
     <string name="getDesktopBrowserSettingItemTitle">Hanki pöytäkoneselain</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo Mac- ja Windows-laitteeseen</string>
-    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
 
     <!-- Sync Settings Recovery Section -->
     <string name="sync_settings_recovery_section_header">Palautus</string>

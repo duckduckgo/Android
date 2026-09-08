@@ -221,7 +221,6 @@
     <!-- Get Desktop Browser -->
     <string name="getDesktopBrowserSettingItemTitle">Iegūsti galddatora pārlūku</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo operētājsistēmām Mac un Windows</string>
-    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
 
     <!-- Sync Settings Recovery Section -->
     <string name="sync_settings_recovery_section_header">Atgūšana</string>
