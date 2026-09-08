@@ -60,7 +60,6 @@
     <string name="duckAiMicPermissionDeniedSnackBarMessage">Za glasovne funkcije je potrebno dovoljenje za mikrofon</string>
     <string name="duckAiMicPermissionDeniedDialogTitle">DuckDuckGo potrebuje dostop do mikrofona</string>
     <string name="duckAiMicPermissionDeniedDialogContent">Dovoljenja za mikrofon so potrebna, če želite uporabljati glasovni klepet v Duck.ai</string>
-    <string name="sitePermissionsDialogChangePermissionsButton">Sprememba dovoljenj</string>
 
     <string name="sitePermissionsSettingsDescription">Spletna mesta, ki jih obiščete, lahko zahtevajo dostop do lokacije, kamere, mikrofona ali programske opreme DRM (Digital Rights Management) vaše naprave. Do njih ne bodo mogla dostopati, razen če jim to izrecno dovolite.</string>
     <string name="sitePermissionsSettingsEnablePermissionTitle">Dovoli vsem mestom, da zahtevajo:</string>
@@ -76,5 +75,34 @@
     <string name="permissionsPerWebsiteAllowSetting">Dovoli</string>
     <string name="permissionsPerWebsiteAskDisabledSetting">Onemogočeno za vsa spletna mesta</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s dovoljenje za %2$s</string>
+
+    <!-- Tiered permission dialog -->
+    <string name="sitePermissionsDialogAllowWhileUsingSiteButton" instruction="Button granting a website a permission for every visit, until the user changes it">Dovoli med uporabo spletnega mesta</string>
+    <string name="sitePermissionsDialogAllowThisTimeButton" instruction="Button granting a website a permission for the current visit only">Dovoli tokrat</string>
+    <string name="sitePermissionsDialogNeverAllowButton" instruction="Button refusing a website a permission for every visit, until the user changes it">Nikoli ne dovoli</string>
+    <string name="sitePermissionsTieredLocationDialogTitle" instruction="Placeholder is a website">Spletno mesto »%1$s« želi dostopati do vaše lokacije</string>
+    <string name="sitePermissionsTieredDdgLocationDialogTitle" instruction="Placeholder is a website">»%1$s« želi dostopati do vaše lokacije</string>
+    <string name="sitePermissionsTieredDdgLocationDialogSubtitle">Vašo lokacijo bomo anonimizirali in jo uporabili za zagotavljanje boljših rezultatov v vaši bližini.</string>
+    <string name="sitePermissionsTieredCameraDialogTitle" instruction="Placeholder is a website">Spletno mesto »%1$s« želi dostopati do vašega fotoaparata</string>
+    <string name="sitePermissionsTieredMicDialogTitle" instruction="Placeholder is a website">Spletno mesto »%1$s« želi dostopati do vašega mikrofona</string>
+    <string name="sitePermissionsTieredMicAndCameraDialogTitle" instruction="Placeholder is a website">Spletno mesto »%1$s« želi dostopati do vašega fotoaparata in mikrofona</string>
+    <string name="sitePermissionsTieredDrmDialogSubtitle">Če ne dovolite, videoposnetkov na spletnem mestu morda ne bo mogoče predvajati, vendar to spletno mesto ne bo imelo dostopa do identifikatorjev naprav, ki jih zagotavlja programska oprema DRM.</string>
+
+    <!-- Reminder dialog -->
+    <string name="sitePermissionsDialogChangePermissionsButton" instruction="Button opening the DuckDuckGo permission settings in the Android system settings app">Sprememba dovoljenj</string>
+    <string name="sitePermissionsTieredSystemDeniedLocationTitle">DuckDuckGo potrebuje dostop do lokacije</string>
+    <string name="sitePermissionsTieredSystemDeniedLocationContent">Če želite uporabljati lokacijske funkcije na tem spletnem mestu, so potrebna dovoljenja za lokacijo.</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraTitle">DuckDuckGo potrebuje dostop do fotoaparata</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraContent">Če želite uporabljati funkcije fotoaparata na tem spletnem mestu, so potrebna dovoljenja za fotoaparat.</string>
+    <string name="sitePermissionsTieredSystemDeniedMicTitle">DuckDuckGo potrebuje dostop do mikrofona</string>
+    <string name="sitePermissionsTieredSystemDeniedMicContent">Dovoljenja za mikrofon so potrebna, če želite uporabljati funkcije mikrofona na tem spletnem mestu.</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraAndMicTitle">DuckDuckGo potrebuje dostop do kamere in mikrofona</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraAndMicContent">Dovoljenja za fotoaparat in mikrofon so potrebna, če želite uporabljati funkcije fotoaparata in mikrofona na tem spletnem mestu.</string>
+
+    <!-- Denial snackbar -->
+    <string name="sitePermissionsTieredLocationDeniedSnackBarMessage">DuckDuckGo ni mogel deliti lokacije s tem spletnim mestom</string>
+    <string name="sitePermissionsTieredCameraDeniedSnackBarMessage">DuckDuckGo temu spletnemu mestu ni mogel omogočiti dostopa do fotoaparata</string>
+    <string name="sitePermissionsTieredMicDeniedSnackBarMessage">DuckDuckGo temu spletnemu mestu ni mogel omogočiti dostopa do mikrofona</string>
+    <string name="sitePermissionsTieredCameraAndMicDeniedSnackBarMessage">DuckDuckGo temu spletnemu mestu ni mogel omogočiti dostopa do kamere in mikrofona</string>
 
 </resources>
