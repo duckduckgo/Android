@@ -87,7 +87,6 @@ import com.duckduckgo.duckchat.impl.pixel.inputScreenPixelsModeParam
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.duckduckgo.duckchat.impl.ui.NativeInputModeWidgetViewModel
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.PageContextAttachment
-import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.TextSelectionAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.EditPromptScreenParams
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedFile
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedImage
@@ -194,8 +193,6 @@ interface NativeInputWidget {
     fun setWidgetPosition(isBottom: Boolean)
     fun setWidgetRootView(view: View)
 
-    fun setTextSelections(selections: List<TextSelectionAttachment>)
-    fun setTextSelectionRemovedAction(onTextSelectionRemoved: (String) -> Unit)
     fun bindTextSelections(tabId: String, textSelection: String?)
     fun getTextSelectionsJson(): JSONArray?
 
@@ -398,10 +395,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var pendingAskAboutPage: (() -> Unit)? = null
     private var pendingOnPageContextRemoved: (() -> Unit)? = null
     private var pendingPageContext: PageContextAttachment? = null
-    private var pendingTextSelections: List<TextSelectionAttachment> = emptyList()
     private var pendingTextSelectionsTabId: String? = null
     private var pendingTextSelection: String? = null
-    private var pendingOnTextSelectionRemoved: ((String) -> Unit)? = null
 
     // adoptEditAttachments() can be called (from EditPromptActivity.onCreate) before the widget is
     // attached and the AttachmentView plugin exists, so the values are held here and applied once
@@ -798,10 +793,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
             pluginView.isEditMode = isEditWidget
             pluginView.onAskAboutPage = pendingAskAboutPage
             pluginView.onPageContextRemoved = pendingOnPageContextRemoved
-            pluginView.onTextSelectionRemoved = pendingOnTextSelectionRemoved
             pluginView.bind(scope, viewModelFactory, nativeInputStateProvider, faviconManager)
             pendingPageContext?.let { pluginView.setPageContext(it) }
-            pluginView.setTextSelections(pendingTextSelections)
             pendingTextSelectionsTabId?.let { bindTextSelections(it, pendingTextSelection) }
             if (hasPendingAdoptedAttachments(pendingAdoptedImages, pendingAdoptedFiles)) {
                 pluginView.adoptAttachments(pendingAdoptedImages, pendingAdoptedFiles)
@@ -1659,16 +1652,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     override fun getPageContext(): PageContextAttachment? = attachmentView?.getPageContext()
-
-    override fun setTextSelections(selections: List<TextSelectionAttachment>) {
-        pendingTextSelections = selections
-        attachmentView?.setTextSelections(selections)
-    }
-
-    override fun setTextSelectionRemovedAction(onTextSelectionRemoved: (String) -> Unit) {
-        pendingOnTextSelectionRemoved = onTextSelectionRemoved
-        attachmentView?.onTextSelectionRemoved = onTextSelectionRemoved
-    }
 
     override fun bindTextSelections(tabId: String, textSelection: String?) {
         pendingTextSelectionsTabId = tabId

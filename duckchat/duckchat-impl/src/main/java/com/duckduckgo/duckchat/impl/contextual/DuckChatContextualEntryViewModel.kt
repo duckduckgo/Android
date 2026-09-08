@@ -24,7 +24,6 @@ import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelPageType
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
-import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelection
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionPayloadBuilder
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionStore
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -56,7 +55,7 @@ class DuckChatContextualEntryViewModel @Inject constructor(
     data class ViewState(
         val attachedContext: AttachedPageContext? = null,
         val latestPageContext: String? = null,
-        val textSelections: List<TextSelection> = emptyList(),
+        val textSelectionCount: Int = 0,
     )
 
     data class AttachedPageContext(
@@ -88,12 +87,8 @@ class DuckChatContextualEntryViewModel @Inject constructor(
         this.tabId = tabId
         duckChatPixels.reportContextualFloatingInputShown()
         textSelectionStore.selections(tabId)
-            .onEach { selections -> _viewState.update { it.copy(textSelections = selections) } }
+            .onEach { selections -> _viewState.update { it.copy(textSelectionCount = selections.size) } }
             .launchIn(viewModelScope)
-    }
-
-    fun onTextSelectionRemoved(id: String) {
-        textSelectionStore.remove(tabId, id)
     }
 
     fun onPageContextReceived(serializedPageContext: String) {
