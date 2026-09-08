@@ -984,6 +984,22 @@
     <string name="preOnboardingWidgetPromptPrimaryCta">Adaugă widget</string>
     <string name="preOnboardingWidgetPromptSecondaryCta">Omite</string>
 
+    <!-- Pre-onboarding: import passwords -->
+    <string name="preOnboardingImportPasswordsTitle">Importă parole din Google</string>
+    <string name="preOnboardingImportPasswordsBody">Google îți poate solicita să te conectezi sau să completezi parola pentru a confirma.</string>
+    <string name="preOnboardingImportPasswordsPrimaryCta">Importă din Google</string>
+    <string name="preOnboardingImportCompleteTitle">Import finalizat</string>
+    <string name="preOnboardingImportCompleteCta">Continuă</string>
+    <string name="preOnboardingImportCompleteParsingTitle">Se importă parolele</string>
+    <string name="preOnboardingImportCompleteParsingBody">Acest lucru va dura doar un moment.</string>
+    <string name="preOnboardingImportCompleteFailedTitle">Importul nu a reușit</string>
+    <string name="preOnboardingImportCompleteFailed">Importarea parolelor nu a reușit</string>
+    <string name="preOnboardingImportCompleteImported" instruction="Placeholder is the number of passwords that were imported.">Parole importate: %1$s</string>
+    <string name="preOnboardingImportCompleteSkipped" instruction="Placeholder is the number of passwords that were not imported.">Omise (duplicate sau nevalide): %1$s</string>
+    <string name="preOnboardingImportErrorTitle">Ceva nu a funcționat corect</string>
+    <string name="preOnboardingImportErrorBody">Încearcă din nou.</string>
+    <string name="preOnboardingImportErrorRetry">Încearcă din nou</string>
+
     <!-- Pre-onboarding: add to home screen -->
     <string name="preOnboardingDockStepTitle">Adaugă-mă în șirul tău de preferințe.</string>
     <string name="preOnboardingAddToDockBody">Găsește pictograma DuckDuckGo pe ecranul de pornire. Apoi apasă și trage în poziție. Gata!</string>
