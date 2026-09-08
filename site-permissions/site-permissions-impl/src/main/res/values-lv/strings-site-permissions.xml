@@ -60,7 +60,6 @@
     <string name="duckAiMicPermissionDeniedSnackBarMessage">Balss funkcijām nepieciešama mikrofona atļauja</string>
     <string name="duckAiMicPermissionDeniedDialogTitle">DuckDuckGo ir nepieciešama piekļuve tavam mikrofonam</string>
     <string name="duckAiMicPermissionDeniedDialogContent">Ja vēlies izmantot balss tērzēšanu vietnē Duck.ai, ir nepieciešamas mikrofona atļaujas</string>
-    <string name="sitePermissionsDialogChangePermissionsButton">Mainīt atļaujas</string>
 
     <string name="sitePermissionsSettingsDescription">Apmeklētās vietnes var pieprasīt piekļuvi tavas ierīces atrašanās vietai, kamerai, mikrofonam vai DRM (digitālā satura tiesību pārvaldības) programmatūrai. Tās nevarēs tiem piekļūt, ja vien īpaši nedosi attiecīgo atļauju.</string>
     <string name="sitePermissionsSettingsEnablePermissionTitle">Ļaut visām vietnēm prasīt:</string>
@@ -76,5 +75,34 @@
     <string name="permissionsPerWebsiteAllowSetting">Atļaut</string>
     <string name="permissionsPerWebsiteAskDisabledSetting">Atspējots visām vietnēm</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s – atļauja vietnei %2$s</string>
+
+    <!-- Tiered permission dialog -->
+    <string name="sitePermissionsDialogAllowWhileUsingSiteButton" instruction="Button granting a website a permission for every visit, until the user changes it">Atļaut vietnes lietošanas laikā</string>
+    <string name="sitePermissionsDialogAllowThisTimeButton" instruction="Button granting a website a permission for the current visit only">Atļaut šoreiz</string>
+    <string name="sitePermissionsDialogNeverAllowButton" instruction="Button refusing a website a permission for every visit, until the user changes it">Nekad neatļaut</string>
+    <string name="sitePermissionsTieredLocationDialogTitle" instruction="Placeholder is a website">Vietne \"%1$s\" vēlas piekļūt tavai atrašanās vietai</string>
+    <string name="sitePermissionsTieredDdgLocationDialogTitle" instruction="Placeholder is a website">\"%1$s\" grib piekļūt tavai atrašanās vietai</string>
+    <string name="sitePermissionsTieredDdgLocationDialogSubtitle">Mēs anonimizēsim tavu atrašanās vietu un izmantosim to, lai sniegtu labākus rezultātus tuvāk tev.</string>
+    <string name="sitePermissionsTieredCameraDialogTitle" instruction="Placeholder is a website">Vietne \"%1$s\" vēlas piekļūt tavai kamerai</string>
+    <string name="sitePermissionsTieredMicDialogTitle" instruction="Placeholder is a website">Vietne \"%1$s\" vēlas piekļūt tavam mikrofonam</string>
+    <string name="sitePermissionsTieredMicAndCameraDialogTitle" instruction="Placeholder is a website">Vietne \"%1$s\" vēlas piekļūt tavai kamerai un mikrofonam</string>
+    <string name="sitePermissionsTieredDrmDialogSubtitle">Ja neatļausi, vietnē esošos videoklipus, iespējams, nevarēs atskaņot, taču šai vietnei nebūs piekļuves DRM programmatūras nodrošinātajiem ierīču identifikatoriem.</string>
+
+    <!-- Reminder dialog -->
+    <string name="sitePermissionsDialogChangePermissionsButton" instruction="Button opening the DuckDuckGo permission settings in the Android system settings app">Mainīt atļaujas</string>
+    <string name="sitePermissionsTieredSystemDeniedLocationTitle">DuckDuckGo ir nepieciešama piekļuve tavai atrašanās vietai</string>
+    <string name="sitePermissionsTieredSystemDeniedLocationContent">Ja vēlies izmantot atrašanās vietas funkcijas šajā vietnē, ir nepieciešamas atrašanās vietas atļaujas.</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraTitle">DuckDuckGo ir nepieciešama piekļuve tavai kamerai</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraContent">Ja vēlies izmantot kameras funkcijas šajā vietnē, ir nepieciešamas kameras atļaujas.</string>
+    <string name="sitePermissionsTieredSystemDeniedMicTitle">DuckDuckGo ir nepieciešama piekļuve mikrofonam</string>
+    <string name="sitePermissionsTieredSystemDeniedMicContent">Ja vēlies izmantot mikrofona funkcijas šajā vietnē, ir nepieciešamas mikrofona atļaujas.</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraAndMicTitle">DuckDuckGo ir nepieciešama piekļuve tavai kamerai un mikrofonam</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraAndMicContent">Ja šajā vietnē vēlies izmantot kameras un mikrofona funkcijas, ir nepieciešamas kameras un mikrofona atļaujas.</string>
+
+    <!-- Denial snackbar -->
+    <string name="sitePermissionsTieredLocationDeniedSnackBarMessage">DuckDuckGo nevarēja kopīgot atrašanās vietu ar šo vietni</string>
+    <string name="sitePermissionsTieredCameraDeniedSnackBarMessage">DuckDuckGo nevarēja piešķirt šai vietnei piekļuvi kamerai</string>
+    <string name="sitePermissionsTieredMicDeniedSnackBarMessage">DuckDuckGo nevarēja piešķirt šai vietnei piekļuvi mikrofonam</string>
+    <string name="sitePermissionsTieredCameraAndMicDeniedSnackBarMessage">DuckDuckGo nevarēja piešķirt šai vietnei piekļuvi kamerai un mikrofonam</string>
 
 </resources>
