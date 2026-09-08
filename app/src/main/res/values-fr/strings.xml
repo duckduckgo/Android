@@ -966,6 +966,22 @@
     <string name="preOnboardingWidgetPromptPrimaryCta">Ajouter un widget</string>
     <string name="preOnboardingWidgetPromptSecondaryCta">Ignorer</string>
 
+    <!-- Pre-onboarding: import passwords -->
+    <string name="preOnboardingImportPasswordsTitle">Importer des mots de passe depuis Google</string>
+    <string name="preOnboardingImportPasswordsBody">Google peut vous demander de vous connecter ou de saisir votre mot de passe pour confirmer.</string>
+    <string name="preOnboardingImportPasswordsPrimaryCta">Importer depuis Google</string>
+    <string name="preOnboardingImportCompleteTitle">Importation terminée</string>
+    <string name="preOnboardingImportCompleteCta">Continuer</string>
+    <string name="preOnboardingImportCompleteParsingTitle">Importation des mots de passe</string>
+    <string name="preOnboardingImportCompleteParsingBody">Cela ne prendra qu\'un instant.</string>
+    <string name="preOnboardingImportCompleteFailedTitle">Échec de l\'importation</string>
+    <string name="preOnboardingImportCompleteFailed">Échec de l\'importation des mots de passe</string>
+    <string name="preOnboardingImportCompleteImported" instruction="Placeholder is the number of passwords that were imported.">Mots de passe importés : %1$s</string>
+    <string name="preOnboardingImportCompleteSkipped" instruction="Placeholder is the number of passwords that were not imported.">Ignorés (doublons ou non valides) : %1$s</string>
+    <string name="preOnboardingImportErrorTitle">Une erreur s\'est produite</string>
+    <string name="preOnboardingImportErrorBody">Veuillez réessayer.</string>
+    <string name="preOnboardingImportErrorRetry">Réessayer</string>
+
     <!-- Pre-onboarding: add to home screen -->
     <string name="preOnboardingDockStepTitle">Ajoutez-moi à votre ligne de favoris.</string>
     <string name="preOnboardingAddToDockBody">Trouvez l\'icône DuckDuckGo sur votre écran d\'accueil. Appuyez ensuite dessus pour la faire glisser au bon endroit. Voilà !</string>

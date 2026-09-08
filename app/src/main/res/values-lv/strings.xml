@@ -984,6 +984,22 @@
     <string name="preOnboardingWidgetPromptPrimaryCta">Pievienot logrīku</string>
     <string name="preOnboardingWidgetPromptSecondaryCta">Izlaist</string>
 
+    <!-- Pre-onboarding: import passwords -->
+    <string name="preOnboardingImportPasswordsTitle">Importēt paroles no Google</string>
+    <string name="preOnboardingImportPasswordsBody">Lai apstiprinātu, Google var lūgt tevi pierakstīties vai ievadīt paroli.</string>
+    <string name="preOnboardingImportPasswordsPrimaryCta">Importēt no Google</string>
+    <string name="preOnboardingImportCompleteTitle">Importēšana pabeigta</string>
+    <string name="preOnboardingImportCompleteCta">Turpināt</string>
+    <string name="preOnboardingImportCompleteParsingTitle">Paroļu importēšana</string>
+    <string name="preOnboardingImportCompleteParsingBody">Tas aizņems tikai mirkli.</string>
+    <string name="preOnboardingImportCompleteFailedTitle">Importēšana neizdevās</string>
+    <string name="preOnboardingImportCompleteFailed">Neizdevās importēt paroles</string>
+    <string name="preOnboardingImportCompleteImported" instruction="Placeholder is the number of passwords that were imported.">Importētās paroles: %1$s</string>
+    <string name="preOnboardingImportCompleteSkipped" instruction="Placeholder is the number of passwords that were not imported.">Izlaists (dublikāts vai nederīgs): %1$s</string>
+    <string name="preOnboardingImportErrorTitle">Radās kāda problēma</string>
+    <string name="preOnboardingImportErrorBody">Lūdzu, mēģini vēlreiz.</string>
+    <string name="preOnboardingImportErrorRetry">Mēģināt vēlreiz</string>
+
     <!-- Pre-onboarding: add to home screen -->
     <string name="preOnboardingDockStepTitle">Pievieno mani izlases joslai.</string>
     <string name="preOnboardingAddToDockBody">Atrodi DuckDuckGo ikonu sākuma ekrānā. Pēc tam piespied un ievelc vietā. Tik vienkārši!</string>
