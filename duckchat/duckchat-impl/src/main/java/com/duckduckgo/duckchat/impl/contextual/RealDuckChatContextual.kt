@@ -27,13 +27,16 @@ import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.PopupMenuItemView
+import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChatContextual
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
+import com.duckduckgo.duckchat.api.DuckChatHistoryNoParams
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
@@ -47,6 +50,7 @@ class RealDuckChatContextual @Inject constructor(
     private val duckChatPixels: DuckChatPixels,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val contextualEntryPromptStore: ContextualEntryPromptStore,
+    private val globalActivityStarter: GlobalActivityStarter,
 ) : DuckChatContextual {
 
     override suspend fun launch(
@@ -124,6 +128,14 @@ class RealDuckChatContextual @Inject constructor(
                 duckChatPixels.reportContextualAddressBarMenuAskAboutPageSelected()
                 showEntryDialog(anchor, sourceTabId, onAskAboutPage)
             }
+        }
+        if (duckChatInternal.isContextualMenuAllChatsEnabled()) {
+            popup.onMenuItemClicked(content.findViewById(R.id.contextualChatMenuAllChats)) {
+                globalActivityStarter.start(activity, DuckChatHistoryNoParams)
+            }
+        } else {
+            content.findViewById<View>(R.id.contextualChatMenuAllChats).gone()
+            content.findViewById<View>(R.id.contextualChatMenuAllChatsDivider).gone()
         }
         popup.showAnchoredView(activity, anchor.rootView, anchor)
         duckChatPixels.reportContextualAddressBarMenuShown()
