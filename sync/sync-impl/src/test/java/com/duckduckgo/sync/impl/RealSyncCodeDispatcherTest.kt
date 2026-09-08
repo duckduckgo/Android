@@ -86,6 +86,7 @@ class RealSyncCodeDispatcherTest {
             runnerEventsFlow.filter { event -> event.timestampMs >= sinceMs }
         }
         whenever(it.localTrigger(any())).thenAnswer { Job().apply { complete() } }
+        whenever(it.protocolVersion).thenReturn(ExchangeProtocolVersion.V2_0)
     }
 
     private val dispatcher = RealSyncCodeDispatcher(
@@ -643,7 +644,10 @@ class RealSyncCodeDispatcherTest {
         whenever(runner.peerName).thenReturn("Peer Phone")
         dispatcher.presentV2().test {
             runnerEventsFlow.emit(transition(from = ExchangeV2State.Negotiating, to = ExchangeV2State.Host.Confirming))
-            assertEquals(DispatchOutcome.HostConfirmationRequested(peerName = "Peer Phone"), awaitItem())
+            assertEquals(
+                DispatchOutcome.HostConfirmationRequested(peerName = "Peer Phone", protocolVersion = ExchangeProtocolVersion.V2_0),
+                awaitItem(),
+            )
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -654,7 +658,11 @@ class RealSyncCodeDispatcherTest {
         dispatcher.presentV2().test {
             runnerEventsFlow.emit(transition(from = ExchangeV2State.Negotiating, to = ExchangeV2State.Host.Confirming))
             assertEquals(
-                DispatchOutcome.HostConfirmationRequested(peerName = "Peer Phone", peerKind = PeerKind.THIRD_PARTY),
+                DispatchOutcome.HostConfirmationRequested(
+                    peerName = "Peer Phone",
+                    protocolVersion = ExchangeProtocolVersion.V2_0,
+                    peerKind = PeerKind.THIRD_PARTY,
+                ),
                 awaitItem(),
             )
             cancelAndIgnoreRemainingEvents()
@@ -667,7 +675,37 @@ class RealSyncCodeDispatcherTest {
         dispatcher.presentV2().test {
             runnerEventsFlow.emit(transition(from = ExchangeV2State.Negotiating, to = ExchangeV2State.Joiner.Confirming))
             assertEquals(
-                DispatchOutcome.JoinerConfirmationRequested(peerName = "Peer Phone", peerKind = PeerKind.DDG),
+                DispatchOutcome.JoinerConfirmationRequested(
+                    peerName = "Peer Phone",
+                    protocolVersion = ExchangeProtocolVersion.V2_0,
+                    peerKind = PeerKind.DDG,
+                ),
+                awaitItem(),
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test fun `Presenter carries the negotiated protocol version on HostConfirmationRequested`() = runTest {
+        whenever(runner.peerName).thenReturn("Peer Phone")
+        whenever(runner.protocolVersion).thenReturn(ExchangeProtocolVersion.V2_1)
+        dispatcher.presentV2().test {
+            runnerEventsFlow.emit(transition(from = ExchangeV2State.Negotiating, to = ExchangeV2State.Host.Confirming))
+            assertEquals(
+                DispatchOutcome.HostConfirmationRequested(peerName = "Peer Phone", protocolVersion = ExchangeProtocolVersion.V2_1),
+                awaitItem(),
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test fun `Presenter carries the negotiated protocol version on JoinerConfirmationRequested`() = runTest {
+        whenever(runner.peerName).thenReturn("Peer Phone")
+        whenever(runner.protocolVersion).thenReturn(ExchangeProtocolVersion.V2_1)
+        dispatcher.presentV2().test {
+            runnerEventsFlow.emit(transition(from = ExchangeV2State.Negotiating, to = ExchangeV2State.Joiner.Confirming))
+            assertEquals(
+                DispatchOutcome.JoinerConfirmationRequested(peerName = "Peer Phone", protocolVersion = ExchangeProtocolVersion.V2_1),
                 awaitItem(),
             )
             cancelAndIgnoreRemainingEvents()

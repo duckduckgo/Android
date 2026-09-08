@@ -40,6 +40,7 @@ import com.duckduckgo.sync.impl.SyncCodeType
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.autorestore.RestorePayload
 import com.duckduckgo.sync.impl.autorestore.SyncAutoRestoreManager
+import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.pixels.SyncPixels.CodeVersion
@@ -437,7 +438,7 @@ class ProcessSyncCodeViewModelTest {
 
     @Test
     fun `when the host confirmation is requested then the host confirmation dialog is shown`() = runTest {
-        givenV2Outcomes(DispatchOutcome.HostConfirmationRequested(peerName = "Other Device"))
+        givenV2Outcomes(DispatchOutcome.HostConfirmationRequested(peerName = "Other Device", protocolVersion = ExchangeProtocolVersion.V2_0))
 
         val testee = createTestee()
         advanceUntilIdle()
@@ -447,7 +448,7 @@ class ProcessSyncCodeViewModelTest {
 
     @Test
     fun `when the joiner confirmation is requested then the joiner confirmation dialog is shown`() = runTest {
-        givenV2Outcomes(DispatchOutcome.JoinerConfirmationRequested(peerName = "Other Device"))
+        givenV2Outcomes(DispatchOutcome.JoinerConfirmationRequested(peerName = "Other Device", protocolVersion = ExchangeProtocolVersion.V2_0))
 
         val testee = createTestee()
         advanceUntilIdle()
@@ -612,13 +613,31 @@ class ProcessSyncCodeViewModelTest {
     }
 
     @Test
-    fun `when the host is confirmed then the dispatcher is notified and the acknowledgment dialog is shown`() = runTest {
-        givenV2Outcomes()
+    fun `when the host is confirmed on a v2_0 session then the dispatcher is notified and the acknowledgment dialog is shown`() = runTest {
+        givenV2Outcomes(DispatchOutcome.HostConfirmationRequested(peerName = "Other Device", protocolVersion = ExchangeProtocolVersion.V2_0))
 
         val testee = createTestee()
+        advanceUntilIdle()
         testee.onHostConfirmed()
 
         assertEquals(DialogType.PairingAcknowledgment, testee.viewState.value.dialog)
+        verify(codeDispatcher).confirmHost()
+    }
+
+    @Test
+    fun `when the host is confirmed on a v2_1 session then the animation runs instead of the acknowledgment dialog`() = runTest {
+        givenV2Outcomes(DispatchOutcome.HostConfirmationRequested(peerName = "Other Device", protocolVersion = ExchangeProtocolVersion.V2_1))
+
+        val testee = createTestee()
+        advanceUntilIdle()
+
+        testee.commands.test {
+            testee.onHostConfirmed()
+            assertIs<RunAcknowledgmentAnimation>(awaitItem())
+
+            cancel()
+        }
+        assertEquals(null, testee.viewState.value.dialog)
         verify(codeDispatcher).confirmHost()
     }
 
@@ -634,13 +653,31 @@ class ProcessSyncCodeViewModelTest {
     }
 
     @Test
-    fun `when the joiner is confirmed then the dispatcher is notified and the acknowledgment dialog is shown`() = runTest {
-        givenV2Outcomes()
+    fun `when the joiner is confirmed on a v2_0 session then the dispatcher is notified and the acknowledgment dialog is shown`() = runTest {
+        givenV2Outcomes(DispatchOutcome.JoinerConfirmationRequested(peerName = "Other Device", protocolVersion = ExchangeProtocolVersion.V2_0))
 
         val testee = createTestee()
+        advanceUntilIdle()
         testee.onJoinerConfirmed()
 
         assertEquals(DialogType.PairingAcknowledgment, testee.viewState.value.dialog)
+        verify(codeDispatcher).confirmJoiner()
+    }
+
+    @Test
+    fun `when the joiner is confirmed on a v2_1 session then the animation runs instead of the acknowledgment dialog`() = runTest {
+        givenV2Outcomes(DispatchOutcome.JoinerConfirmationRequested(peerName = "Other Device", protocolVersion = ExchangeProtocolVersion.V2_1))
+
+        val testee = createTestee()
+        advanceUntilIdle()
+
+        testee.commands.test {
+            testee.onJoinerConfirmed()
+            assertIs<RunAcknowledgmentAnimation>(awaitItem())
+
+            cancel()
+        }
+        assertEquals(null, testee.viewState.value.dialog)
         verify(codeDispatcher).confirmJoiner()
     }
 
@@ -680,7 +717,7 @@ class ProcessSyncCodeViewModelTest {
         val testee = createTestee()
         advanceUntilIdle()
 
-        outcomes.emit(DispatchOutcome.JoinerConfirmationRequested(peerName = "Other Device"))
+        outcomes.emit(DispatchOutcome.JoinerConfirmationRequested(peerName = "Other Device", protocolVersion = ExchangeProtocolVersion.V2_0))
         advanceUntilIdle()
         testee.onJoinerConfirmed()
         outcomes.emit(DispatchOutcome.LoggedIn(path = SetupPath.PAIRING))
@@ -698,6 +735,32 @@ class ProcessSyncCodeViewModelTest {
     }
 
     @Test
+    fun `when the login completes after a v2_1 confirmation then the success result is set after the animation completes`() = runTest {
+        val outcomes = MutableSharedFlow<DispatchOutcome>(extraBufferCapacity = 8)
+        whenever(codeDispatcher.route(any())).thenReturn(RouteDecision.V2InProgress(SyncCodeType.LINKING, outcomes))
+        givenThisConnectedDevice()
+
+        val testee = createTestee()
+        advanceUntilIdle()
+
+        outcomes.emit(DispatchOutcome.JoinerConfirmationRequested(peerName = "Other Device", protocolVersion = ExchangeProtocolVersion.V2_1))
+        advanceUntilIdle()
+
+        testee.commands.test {
+            testee.onJoinerConfirmed()
+            assertIs<RunAcknowledgmentAnimation>(awaitItem())
+            assertEquals(null, testee.viewState.value.dialog)
+
+            outcomes.emit(DispatchOutcome.LoggedIn(path = SetupPath.PAIRING))
+            testee.onAnimationComplete()
+            assertIs<SetPairingResult>(awaitItem())
+            assertIs<Close>(awaitItem())
+
+            cancel()
+        }
+    }
+
+    @Test
     fun `when the join outcome is unknown then the waiting screen replaces the acknowledgment dialog`() = runTest {
         val outcomes = MutableSharedFlow<DispatchOutcome>(extraBufferCapacity = 8)
         whenever(codeDispatcher.route(any())).thenReturn(RouteDecision.V2InProgress(SyncCodeType.LINKING, outcomes))
@@ -705,7 +768,7 @@ class ProcessSyncCodeViewModelTest {
         val testee = createTestee()
         advanceUntilIdle()
 
-        outcomes.emit(DispatchOutcome.JoinerConfirmationRequested(peerName = "Other Device"))
+        outcomes.emit(DispatchOutcome.JoinerConfirmationRequested(peerName = "Other Device", protocolVersion = ExchangeProtocolVersion.V2_0))
         advanceUntilIdle()
         testee.onJoinerConfirmed()
         outcomes.emit(DispatchOutcome.JoinOutcomeUnknown())
