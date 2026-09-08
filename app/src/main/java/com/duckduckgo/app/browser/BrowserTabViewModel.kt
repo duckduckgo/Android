@@ -5829,13 +5829,6 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun openDuckChatSidebar() {
-        viewModelScope.launch {
-            val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.SIDEBAR)
-            _subscriptionEventDataChannel.send(subscriptionEvent)
-        }
-    }
-
     fun onCustomizeResponsesClicked() {
         viewModelScope.launch {
             val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.CUSTOMIZE_RESPONSES)
