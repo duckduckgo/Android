@@ -46,6 +46,12 @@
     <attr name="daxColorStatusIndicatorOff" format="color" />
     <attr name="daxColorRebrandStatusIndicatorOff" format="color" />
     <attr name="daxColorStatusRed" format="color" />
+    <attr name="daxContainerRadius" format="dimension" />
+    <attr name="daxDialogRadius" format="dimension" />
+    <attr name="daxSheetRadius" format="dimension" />
+    <attr name="daxLargeSheetRadius" format="dimension" />
+    <attr name="daxInfoPanelRadius" format="dimension" />
+    <attr name="daxPillRadius" format="dimension" />
 
     <dimen name="rebrandButtonSmallHeight">48dp</dimen>
     <dimen name="rebrandButtonLargeHeight">56dp</dimen>
@@ -54,6 +60,8 @@
     <dimen name="rebrandButtonSmallVerticalInset">4dp</dimen>
     <dimen name="rebrandButtonLargeVerticalInset">6dp</dimen>
     <dimen name="rebrandInputRadius">48dp</dimen>
+    <dimen name="rebrandContainerRadius">28dp</dimen>
+    <dimen name="daxYellowPillCornerRadius">2dp</dimen>
 
     <style name="Typography.DuckDuckGo.Rebrand.Button" parent="Typography.DuckDuckGo">
         <item name="android:textSize">15sp</item>
@@ -165,6 +173,15 @@
 
     <style name="ThemeOverlay.Rebrand.AddressBarAnimation" parent="">
         <item name="cookiesAnimationRadius">@dimen/rebrandInputRadius</item>
+    </style>
+
+    <style name="ThemeOverlay.Rebrand.Radius" parent="">
+        <item name="daxContainerRadius">@dimen/rebrandContainerRadius</item>
+        <item name="daxDialogRadius">@dimen/rebrandContainerRadius</item>
+        <item name="daxSheetRadius">@dimen/rebrandContainerRadius</item>
+        <item name="daxLargeSheetRadius">@dimen/rebrandContainerRadius</item>
+        <item name="daxInfoPanelRadius">@dimen/rebrandContainerRadius</item>
+        <item name="daxPillRadius">@dimen/pillShapeCornerRadius</item>
     </style>
 
 </resources>
