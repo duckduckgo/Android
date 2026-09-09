@@ -630,6 +630,135 @@ class SitePermissionsDialogActivityLauncherTest {
         verify(sitePermissionsRepository, never()).sitePermissionGranted(any(), any(), any())
     }
 
+    private fun showDrmDialog(
+        launcher: SitePermissionsDialogActivityLauncher = testee,
+        redesignEnabled: Boolean = true,
+    ): AlertDialog {
+        sitePermissionsDialogRedesignFeature.self().setRawStoredState(Toggle.State(redesignEnabled))
+        whenever(sitePermissionsRepository.getDrmForSession("tabId", "example.com")).thenReturn(null)
+        whenever(sitePermissionsRepository.isDrmBlockedForUrlByConfig(any())).thenReturn(false)
+
+        val activity = Robolectric.buildActivity(ThemedActivity::class.java).setup().get()
+        val request: PermissionRequest = mock()
+        whenever(request.resources).thenReturn(arrayOf(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID))
+        whenever(request.origin).thenReturn(Uri.parse("https://example.com"))
+
+        launcher.askForSitePermission(
+            activity = activity,
+            url = "https://example.com",
+            tabId = "tabId",
+            permissionsRequested = SitePermissions(
+                autoAccept = emptyList(),
+                userHandled = listOf(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID),
+            ),
+            request = request,
+            permissionsGrantedListener = permissionsGrantedListener,
+        )
+        this.request = request
+        return ShadowDialog.getLatestDialog() as AlertDialog
+    }
+
+    @Test
+    fun whenRedesignEnabledThenDrmDialogOffersThreeTiersWithoutLearnMoreLink() {
+        val dialog = showDrmDialog()
+
+        assertEquals(3, dialog.tieredButtons().childCount)
+        val message = dialog.findViewById<TextView>(CommonR.id.stackedlertDialogMessage)!!
+        assertEquals(
+            dialog.context.getString(R.string.sitePermissionsTieredDrmDialogSubtitle),
+            message.text.toString(),
+        )
+    }
+
+    @Test
+    fun whenRedesignDisabledThenLegacyDrmDialogShown() {
+        val dialog = showDrmDialog(redesignEnabled = false)
+
+        assertNotNull(dialog.findViewById<TextView>(CommonR.id.textAlertDialogMessage))
+        assertNull(dialog.findViewById<LinearLayout>(CommonR.id.stackedAlertDialogButtonLayout))
+    }
+
+    @Test
+    fun whenDrmAllowWhileUsingSiteClickedThenPersistedWithoutReplacingOtherSitePermissions() = runTest {
+        val dialog = showDrmDialog()
+
+        dialog.tieredButtons().getChildAt(0).performClick()
+        shadowOf(Looper.getMainLooper()).idle()
+
+        verify(request).grant(any())
+        verify(sitePermissionsRepository).sitePermissionPermanentlySaved(
+            "https://example.com",
+            PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID,
+            ALLOW_ALWAYS,
+        )
+        verify(sitePermissionsRepository, never()).savePermission(any())
+        verify(sitePermissionsRepository, never()).saveDrmForSession(any(), any(), any())
+    }
+
+    @Test
+    fun whenDrmAllowThisTimeClickedThenGrantIsSessionOnly() {
+        val dialog = showDrmDialog()
+
+        dialog.tieredButtons().getChildAt(1).performClick()
+        shadowOf(Looper.getMainLooper()).idle()
+
+        verify(request).grant(any())
+        verify(sitePermissionsRepository).saveDrmForSession("tabId", "example.com", true)
+        verify(sitePermissionsRepository, never()).sitePermissionPermanentlySaved(any(), any(), any())
+    }
+
+    @Test
+    fun whenDrmNeverAllowClickedThenPersistedWithoutReplacingOtherSitePermissions() = runTest {
+        val dialog = showDrmDialog()
+
+        dialog.tieredButtons().getChildAt(2).performClick()
+        shadowOf(Looper.getMainLooper()).idle()
+
+        verify(request).deny()
+        verify(sitePermissionsRepository).sitePermissionPermanentlySaved(
+            "https://example.com",
+            PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID,
+            DENY_ALWAYS,
+        )
+        verify(sitePermissionsRepository, never()).savePermission(any())
+        verify(sitePermissionsRepository, never()).saveDrmForSession(any(), any(), any())
+    }
+
+    @Test
+    fun whenDrmDialogDismissedThenDeniedForTheTabSession() {
+        val dialog = showDrmDialog()
+
+        dialog.cancel()
+        shadowOf(Looper.getMainLooper()).idle()
+
+        verify(request).deny()
+        verify(sitePermissionsRepository).saveDrmForSession("tabId", "example.com", false)
+        verify(sitePermissionsRepository, never()).sitePermissionPermanentlySaved(any(), any(), any())
+    }
+
+    @Test
+    fun whenFireModeAndDrmDialogDismissedThenDeniedButNoSessionChoiceStored() {
+        val dialog = showDrmDialog(createLauncher(BrowserMode.FIRE))
+
+        dialog.cancel()
+        shadowOf(Looper.getMainLooper()).idle()
+
+        verify(request).deny()
+        verify(sitePermissionsRepository, never()).saveDrmForSession(any(), any(), any())
+    }
+
+    @Test
+    fun whenFireModeAndDrmAllowClickedThenGrantedButNothingPersisted() {
+        val dialog = showDrmDialog(createLauncher(BrowserMode.FIRE))
+
+        dialog.tieredButtons().getChildAt(0).performClick()
+        shadowOf(Looper.getMainLooper()).idle()
+
+        verify(request).grant(any())
+        verify(sitePermissionsRepository, never()).sitePermissionPermanentlySaved(any(), any(), any())
+        verify(sitePermissionsRepository, never()).saveDrmForSession(any(), any(), any())
+    }
+
     class ThemedActivity : AppCompatActivity() {
         override fun onCreate(savedInstanceState: Bundle?) {
             setTheme(CommonR.style.Theme_DuckDuckGo_Light)
