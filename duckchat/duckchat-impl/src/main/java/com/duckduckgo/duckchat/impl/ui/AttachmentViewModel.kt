@@ -358,9 +358,9 @@ class AttachmentViewModel @Inject constructor(
         val textSelections: List<TextSelectionAttachment>,
     )
 
-    fun bindTextSelections(tabId: String, textSelection: String?, url: String) {
+    fun bindTextSelections(tabId: String, textSelection: String?) {
         textSelectionsTabId = tabId
-        textSelection?.let { textSelectionStore.add(tabId, it, url) }
+        textSelection?.let { textSelectionStore.add(tabId, it, url = "") }
         textSelectionsJob?.cancel()
         textSelectionsJob = viewModelScope.launch {
             textSelectionStore.selections(tabId).collect { selections ->
