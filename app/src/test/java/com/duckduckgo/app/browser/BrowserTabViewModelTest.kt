@@ -320,6 +320,7 @@ import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.api.DuckAiSessionCallback
 import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
@@ -689,6 +690,7 @@ class BrowserTabViewModelTest {
     private val mockDuckChat: DuckChat = mock {
         on { observeTriggerVoiceChatSessionEnd() } doReturn voiceSessionEndTriggerFlow
     }
+    private val mockDuckChatInternal: DuckChatInternal = mock()
     private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
     private val mockSyncStatusChangedObserver: SyncStatusChangedObserver = mock()
     private val syncStatusChangedEventsFlow = MutableSharedFlow<JSONObject>()
@@ -1035,6 +1037,7 @@ class BrowserTabViewModelTest {
                 httpErrorPixels = { mockHttpErrorPixels },
                 duckPlayer = mockDuckPlayer,
                 duckChat = mockDuckChat,
+                duckChatInternal = mockDuckChatInternal,
                 duckAiHostProvider = mockDuckAiHostProvider,
                 duckAiFeatureState = mockDuckAiFeatureState,
                 duckChatInputModeState = mockDuckChatInputModeState,
@@ -10140,6 +10143,43 @@ class BrowserTabViewModelTest {
 
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.allValues.any { it is Command.ShowDuckAIContextualMode })
+    }
+
+    @Test
+    fun whenOnDuckChatOmnibarButtonClickedOnNtpWithBlankQueryAndAllChatsMenuEnabledThenShowsContextualMenu() {
+        mockDuckAiContextualModeFlow.value = true
+        whenever(mockDuckChatInternal.isContextualMenuAllChatsEnabled()).thenReturn(true)
+
+        testee.onDuckChatOmnibarButtonClicked(query = null, hasFocus = true, isNtp = true)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.allValues.any { it is Command.ShowDuckAIContextualMode })
+    }
+
+    @Test
+    fun whenOnDuckChatOmnibarButtonClickedOnNtpWithAllChatsMenuDisabledThenOpensDuckChat() {
+        mockDuckAiContextualModeFlow.value = true
+        whenever(mockDuckChatInternal.isContextualMenuAllChatsEnabled()).thenReturn(false)
+        whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
+
+        testee.onDuckChatOmnibarButtonClicked(query = null, hasFocus = false, isNtp = true)
+
+        verify(mockDuckChat).getDuckChatUrl(eq(""), eq(false), any())
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertFalse(commandCaptor.allValues.any { it is Command.ShowDuckAIContextualMode })
+    }
+
+    @Test
+    fun whenOnDuckChatOmnibarButtonClickedOnNtpWithTypedQueryThenOpensDuckChatNotMenu() {
+        mockDuckAiContextualModeFlow.value = true
+        whenever(mockDuckChatInternal.isContextualMenuAllChatsEnabled()).thenReturn(true)
+        whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
+
+        testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = true, isNtp = true)
+
+        verify(mockDuckChat).getDuckChatUrl(eq("example"), eq(true), any())
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertFalse(commandCaptor.allValues.any { it is Command.ShowDuckAIContextualMode })
     }
 
     @Test

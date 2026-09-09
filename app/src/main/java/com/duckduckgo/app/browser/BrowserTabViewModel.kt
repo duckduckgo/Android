@@ -391,6 +391,7 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
+import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.contextual.PageContextJSHelper
 import com.duckduckgo.duckchat.impl.contextual.RealPageContextJSHelper.Companion.PAGE_CONTEXT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
@@ -552,6 +553,7 @@ class BrowserTabViewModel @Inject constructor(
     private val httpErrorPixels: Lazy<HttpErrorPixels>,
     private val duckPlayer: DuckPlayer,
     private val duckChat: DuckChat,
+    private val duckChatInternal: DuckChatInternal,
     private val duckAiHostProvider: DuckAiHostProvider,
     private val duckAiFeatureState: DuckAiFeatureState,
     private val duckChatInputModeState: DuckChatInputModeState,
@@ -5897,10 +5899,16 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         when {
-            // Contextual chat is about the page you're viewing, so it's only offered from the
-            // unfocused omnibar. Once the omnibar is focused (composing), fall through to full-screen
-            // Duck.ai.
-            duckAiFeatureState.showContextualMode.value && !isNtp && !hasFocus -> {
+            // Contextual chat is about the page you're viewing, so on a page it's only offered from
+            // the unfocused omnibar: once focused (composing), fall through to full-screen Duck.ai.
+            // The NTP omnibar is focused from the start, so there the menu hangs off an empty query
+            // instead, and only when it carries the Chats entry alongside New Chat.
+            duckAiFeatureState.showContextualMode.value &&
+                if (isNtp) {
+                    duckChatInternal.isContextualMenuAllChatsEnabled() && query.isNullOrBlank()
+                } else {
+                    !hasFocus
+                } -> {
                 command.value = Command.ShowDuckAIContextualMode(tabId, url)
             }
 
