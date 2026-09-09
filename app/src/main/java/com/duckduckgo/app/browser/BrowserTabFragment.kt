@@ -1408,7 +1408,6 @@ class BrowserTabFragment :
                 null
             },
             textSelection = textSelection,
-            textSelectionUrl = webView?.url,
             callbacks = NativeInputCallbacks(
                 onSearchTextChanged = { text -> onUserEnteredText(text) },
                 onClearAutocomplete = {
