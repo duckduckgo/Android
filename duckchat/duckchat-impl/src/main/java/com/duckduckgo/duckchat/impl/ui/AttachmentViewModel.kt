@@ -119,6 +119,7 @@ class AttachmentViewModel @Inject constructor(
     private val _fileAttachments = MutableStateFlow<List<FileAttachment>>(emptyList())
     private val _pageContextAttachment = MutableStateFlow<PageContextAttachment?>(null)
     private val _textSelections = MutableStateFlow<List<TextSelectionAttachment>>(emptyList())
+    private val _textSelectionLimitReached = MutableStateFlow(false)
 
     private val isDuckAiModeFlow: StateFlow<Boolean> = nativeInputStateProvider.state
         .map { it.inputContext != NativeInputState.InputContext.BROWSER }
@@ -129,13 +130,19 @@ class AttachmentViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.Eagerly, DuckChatPixelSurface.ADDRESS_BAR)
 
     val attachmentState: StateFlow<AttachmentState> = combine(
-        combine(imageAttachments, _fileAttachments, _pageContextAttachment, _textSelections) { images, files, pageContext, selections ->
-            AttachmentLists(images, files, pageContext, selections)
+        combine(
+            imageAttachments,
+            _fileAttachments,
+            _pageContextAttachment,
+            _textSelections,
+            _textSelectionLimitReached,
+        ) { images, files, pageContext, selections, limitReached ->
+            AttachmentLists(images, files, pageContext, selections, limitReached)
         },
         modelManager.modelState,
         combine(limitsHandler.conversationImagesSent, limitsHandler.conversationFilesUsed) { imgSent, filesUsed -> Pair(imgSent, filesUsed) },
         isDuckAiModeFlow,
-    ) { (images, files, pageContext, selections), modelState, (conversationImagesSent, conversationFilesUsed), isDuckAiMode ->
+    ) { (images, files, pageContext, selections, selectionLimitReached), modelState, (conversationImagesSent, conversationFilesUsed), isDuckAiMode ->
         val conversationFilesSent = conversationFilesUsed.count
         val conversationFileSizeSentBytes = conversationFilesUsed.sizeBytes
         val model = modelState.models.find { it.id == modelState.selectedModelId }
@@ -153,7 +160,7 @@ class AttachmentViewModel @Inject constructor(
             files = files,
             pageContext = pageContext,
             textSelections = selections,
-            textSelectionLimitError = computeTextSelectionLimitError(selections.size),
+            textSelectionLimitError = computeTextSelectionLimitError(selectionLimitReached),
             imageLimitError = computeImageLimitError(currentImageCount, totalImages, imageLimits),
             fileLimitError = computeFileLimitError(totalFiles, fileLimits.maxPerConversation),
             fileSizeError = computeFileSizeError(files, fileLimits.maxFileSizeBytes),
@@ -358,6 +365,7 @@ class AttachmentViewModel @Inject constructor(
         val files: List<FileAttachment>,
         val pageContext: PageContextAttachment?,
         val textSelections: List<TextSelectionAttachment>,
+        val textSelectionLimitReached: Boolean,
     )
 
     fun bindTextSelections(tabId: String, textSelection: String?) {
@@ -365,6 +373,7 @@ class AttachmentViewModel @Inject constructor(
         textSelection?.let { textSelectionStore.add(tabId, it, url = "") }
         textSelectionsJob?.cancel()
         textSelectionsJob = viewModelScope.launch {
+            launch { textSelectionStore.limitReached(tabId).collect { _textSelectionLimitReached.value = it } }
             textSelectionStore.selections(tabId).collect { selections ->
                 _textSelections.value = selections.map { TextSelectionAttachment(id = it.id, text = it.text) }
             }
@@ -440,8 +449,8 @@ class AttachmentViewModel @Inject constructor(
         }
     }
 
-    private fun computeTextSelectionLimitError(count: Int): String? =
-        if (count >= TextSelectionStore.MAX_SELECTIONS) {
+    private fun computeTextSelectionLimitError(limitReached: Boolean): String? =
+        if (limitReached) {
             context.getString(R.string.duckAiTextSelectionLimitReached, TextSelectionStore.MAX_SELECTIONS)
         } else {
             null
