@@ -246,6 +246,17 @@ enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName 
     AUTOFILL_HARMONY_PREFERENCES_GET_KEY_DECODE_FAILED("autofill_harmony_preferences_get_key_decode_failed"),
     AUTOFILL_DECRYPT_DATA_FAILED("autofill_decrypt_failed"),
     AUTOFILL_ENCRYPT_DATA_FAILED("autofill_encrypt_failed"),
+
+    AUTOFILL_PASSKEY_USE_SUCCESS_COUNT("autofill_passkey_use_success_count"),
+    AUTOFILL_PASSKEY_USE_SUCCESS_DAILY("autofill_passkey_use_success_daily"),
+    AUTOFILL_PASSKEY_USE_FAILURE_COUNT("autofill_passkey_use_failure_count"),
+    AUTOFILL_PASSKEY_USE_FAILURE_DAILY("autofill_passkey_use_failure_daily"),
+    AUTOFILL_PASSKEY_CREATE_SUCCESS_COUNT("autofill_passkey_create_success_count"),
+    AUTOFILL_PASSKEY_CREATE_SUCCESS_DAILY("autofill_passkey_create_success_daily"),
+    AUTOFILL_PASSKEY_CREATE_FAILURE_COUNT("autofill_passkey_create_failure_count"),
+    AUTOFILL_PASSKEY_CREATE_FAILURE_DAILY("autofill_passkey_create_failure_daily"),
+    AUTOFILL_PASSKEY_UNKNOWN_EVENT_COUNT("autofill_passkey_unknown_event_count"),
+    AUTOFILL_PASSKEY_UNKNOWN_EVENT_DAILY("autofill_passkey_unknown_event_daily"),
 }
 
 object AutofillPixelParameters {
