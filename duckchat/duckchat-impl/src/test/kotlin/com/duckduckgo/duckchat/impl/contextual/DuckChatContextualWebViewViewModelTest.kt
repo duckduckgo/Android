@@ -613,6 +613,7 @@ class DuckChatContextualWebViewViewModelTest {
         sessionTimeoutProvider = sessionTimeoutProvider,
         timeProvider = timeProvider,
         duckChatPixels = duckChatPixels,
+        selectionJourney = mock(),
         duckChatFeature = duckChatFeature,
         modelManager = modelManager,
         chatHistoryRepository = chatHistoryRepository,
