@@ -36,6 +36,42 @@
         "suffixes": ["form_factor"],
         "parameters": ["appVersion", "browserMode"]
     },
+    "m_aichat_contextual_selection_attached": {
+        "description": "User attached a text selection to Duck.ai via the \"Ask Duck.ai\" text selection action. Not sent when the same text is selected again, or when the attachment is refused at the limit.",
+        "owners": ["joshliebe"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_selection_limit_reached": {
+        "description": "User tried to attach a text selection to Duck.ai but had already attached the maximum number of selections, so it was refused.",
+        "owners": ["joshliebe"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_selection_removed": {
+        "description": "User removed an attached text selection from the Duck.ai composer.",
+        "owners": ["joshliebe"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_prompt_submitted_with_selections": {
+        "description": "User submitted a Duck.ai contextual prompt that carried one or more attached text selections.",
+        "owners": ["joshliebe"],
+        "triggers": ["user_submitted"],
+        "suffixes": ["first_daily_count"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "selection_count",
+                "type": "string",
+                "description": "Bucketed number of text selections attached to the submitted prompt.",
+                "enum": ["1", "2", "3-5"]
+            }
+        ]
+    },
     "m_aichat_contextual_sheet_opened_count": {
         "description": "User opened the Contextual sheet via the Duck.ai button in the Omnibar.",
         "owners": ["malmstein"],
