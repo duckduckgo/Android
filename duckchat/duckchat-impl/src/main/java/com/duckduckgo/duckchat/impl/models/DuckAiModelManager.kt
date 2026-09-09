@@ -20,16 +20,19 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.duckchat.impl.store.SelectedModel
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.Lazy
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
@@ -86,6 +89,7 @@ class RealDuckAiModelManager @Inject constructor(
     private val dataStore: DuckChatDataStore,
     private val subscriptions: Subscriptions,
     private val duckAiHostProvider: DuckAiHostProvider,
+    private val duckChatFeature: Lazy<DuckChatFeature>,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : DuckAiModelManager {
@@ -113,10 +117,15 @@ class RealDuckAiModelManager @Inject constructor(
             } catch (e: Exception) {
                 logcat { "Duck.ai Model Manager: failed to restore cached selection: ${e.message}" }
             }
-            subscriptions.getEntitlements()
+            // Status as well as entitlements: signing in or out changes whether the response carries
+            // model labels, and entitlements stay empty either way when there is no subscription.
+            combine(
+                subscriptions.getEntitlements(),
+                subscriptions.getSubscriptionStatusFlow(),
+            ) { entitlements, status -> entitlements to status }
                 .distinctUntilChanged()
                 .collect {
-                    logcat { "Duck.ai Model Manager: entitlements changed, re-fetching models" }
+                    logcat { "Duck.ai Model Manager: subscription state changed, re-fetching models" }
                     fetchModels()
                 }
         }
@@ -205,7 +214,19 @@ class RealDuckAiModelManager @Inject constructor(
 
     private suspend fun fetchModelsResponse(): AIChatModelsResponse {
         val url = DuckAiModelsService.modelsUrl(duckAiHostProvider.getHost())
-        return modelsService.getModels(url)
+        return modelsService.getModels(url, authorizationHeader())
+    }
+
+    // The picker sublines (model `label`) are only returned on an authenticated request, so the
+    // token rides along only while the updated pickers are the ones consuming it.
+    private suspend fun authorizationHeader(): String? {
+        if (!duckChatFeature.get().updatedPickers().isEnabled()) return null
+        return runCatching {
+            subscriptions.getAccessToken()?.takeUnless { it.isBlank() }?.let { "Bearer $it" }
+        }.getOrElse {
+            logcat { "Duck.ai Model Manager: failed to resolve access token, fetching models unauthenticated: ${it.message}" }
+            null
+        }
     }
 
     /**
