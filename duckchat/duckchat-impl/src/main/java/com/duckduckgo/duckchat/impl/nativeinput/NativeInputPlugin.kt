@@ -31,6 +31,12 @@ interface NativeInputHost {
     /** Submit the current input as a chat message; opens a new chat session if the input is empty. */
     fun submit()
 
+    /** `true` when the input carries nothing submittable, i.e. [submit] would start an empty chat. */
+    fun isInputEmpty(): Boolean
+
+    /** The tab the widget is currently configured for, or null before it has been configured. */
+    fun tabId(): String?
+
     /** Stop the active chat stream. Delegates to the host's [NativeInputWidget.onStopTapped] callback. */
     fun stop()
 
