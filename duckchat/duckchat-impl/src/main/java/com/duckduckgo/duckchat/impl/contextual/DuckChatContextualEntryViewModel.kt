@@ -148,13 +148,13 @@ class DuckChatContextualEntryViewModel @Inject constructor(
     }
 
     private fun submit(prompt: NativeInputPrompt) {
-        val selections = textSelectionStore.consume(tabId)
+        val selectionsJson = prompt.selectionsJson ?: selectionPayloadBuilder.toJson(textSelectionStore.consume(tabId))
         contextualEntryPromptStore.store(
             ContextualEntryPrompt(
                 tabId = tabId,
                 prompt = prompt,
                 serializedPageContext = _viewState.value.attachedContext?.serialized,
-                selectionsJson = selectionPayloadBuilder.toJson(selections),
+                selectionsJson = selectionsJson,
             ),
         )
         duckChatPixels.reportContextualFloatingInputPromotedToSheet()
