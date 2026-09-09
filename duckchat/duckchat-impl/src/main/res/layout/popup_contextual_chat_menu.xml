@@ -30,7 +30,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:leadingIcon="@drawable/ic_compose_24"
-        app:primaryText="@string/chatMenuPopupNewChat" />
+        app:primaryText="@string/browserMenuNewChat" />
 
     <com.duckduckgo.common.ui.view.PopupMenuItemView
         android:id="@+id/contextualChatMenuAskAboutPage"
@@ -38,5 +38,18 @@
         android:layout_height="wrap_content"
         app:leadingIcon="@drawable/ic_chevron_circle_down_24"
         app:primaryText="@string/duckChatContextualAskAboutPage" />
+
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+        android:id="@+id/contextualChatMenuAllChatsDivider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:defaultPadding="false" />
+
+    <com.duckduckgo.common.ui.view.PopupMenuItemView
+        android:id="@+id/contextualChatMenuAllChats"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:leadingIcon="@drawable/ic_chats_24"
+        app:primaryText="@string/duckChatContextualAllChats" />
 
 </LinearLayout>

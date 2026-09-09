@@ -278,6 +278,12 @@ interface DuckChatInternal : DuckChat {
     fun isContextualSheetRedesignEnabled(): Boolean
 
     /**
+     * Returns whether the All Chats entry is shown in the Duck.ai address bar menu. Only
+     * meaningful when the redesigned contextual entry is also enabled.
+     */
+    fun isContextualMenuAllChatsEnabled(): Boolean
+
+    /**
      * Returns the side the Search/Duck.ai toggle is defaulted to.
      */
     fun resolvedTogglePosition(): NativeInputState.ToggleSelection
@@ -520,6 +526,7 @@ class RealDuckChat @Inject constructor(
     private var clearChatHistory: Boolean = true
     private var isContextualModeEnabled: Boolean = false
     private var contextualSheetRedesignEnabled: Boolean = false
+    private var contextualMenuAllChatsEnabled: Boolean = false
     private var isAutomaticContextAttachmentEnabled: Boolean = false
     private var duckAiNativeStorage: Boolean = false
     private var areMultipleContentAttachmentsEnabled: Boolean = false
@@ -600,6 +607,8 @@ class RealDuckChat @Inject constructor(
     override fun isDuckChatContextualModeEnabled(): Boolean = isContextualModeEnabled
 
     override fun isContextualSheetRedesignEnabled(): Boolean = contextualSheetRedesignEnabled
+
+    override fun isContextualMenuAllChatsEnabled(): Boolean = contextualMenuAllChatsEnabled
 
     override fun isAutomaticContextAttachmentEnabled(): Boolean = isAutomaticContextAttachmentEnabled
     override fun isNativeStorageEnabled(): Boolean = duckAiNativeStorage
@@ -1104,6 +1113,8 @@ class RealDuckChat @Inject constructor(
             _showContextualMode.emit(isContextualModeEnabled)
 
             contextualSheetRedesignEnabled = isContextualModeEnabled && duckChatFeature.contextualSheetRedesign().isEnabled()
+
+            contextualMenuAllChatsEnabled = contextualSheetRedesignEnabled && duckChatFeature.contextualMenuAllChats().isEnabled()
 
             isAutomaticContextAttachmentEnabled = isContextualModeEnabled &&
                 duckChatFeature.automaticContextAttachment()

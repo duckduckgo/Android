@@ -1604,6 +1604,36 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun `when all chats menu item enabled and sheet redesign enabled, isContextualMenuAllChatsEnabled returns true`() = runTest {
+        duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
+        duckChatFeature.contextualSheetRedesign().setRawStoredState(State(enable = true))
+        duckChatFeature.contextualMenuAllChats().setRawStoredState(State(enable = true))
+        testee.onPrivacyConfigDownloaded()
+
+        assertTrue(testee.isContextualMenuAllChatsEnabled())
+    }
+
+    @Test
+    fun `when all chats menu item disabled, isContextualMenuAllChatsEnabled returns false`() = runTest {
+        duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
+        duckChatFeature.contextualSheetRedesign().setRawStoredState(State(enable = true))
+        duckChatFeature.contextualMenuAllChats().setRawStoredState(State(enable = false))
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.isContextualMenuAllChatsEnabled())
+    }
+
+    @Test
+    fun `when all chats menu item enabled and sheet redesign disabled, isContextualMenuAllChatsEnabled returns false`() = runTest {
+        duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
+        duckChatFeature.contextualSheetRedesign().setRawStoredState(State(enable = false))
+        duckChatFeature.contextualMenuAllChats().setRawStoredState(State(enable = true))
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.isContextualMenuAllChatsEnabled())
+    }
+
+    @Test
     fun `when duckAiNativeStorage enabled, isNativeStorageEnabled returns true`() = runTest {
         duckChatFeature.duckAiNativeStorage().setRawStoredState(State(enable = true))
         testee.onPrivacyConfigDownloaded()
