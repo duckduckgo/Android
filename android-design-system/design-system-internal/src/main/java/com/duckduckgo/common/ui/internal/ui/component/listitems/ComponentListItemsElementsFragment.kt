@@ -17,6 +17,7 @@
 package com.duckduckgo.common.ui.internal.ui.component.listitems
 
 import com.duckduckgo.common.ui.internal.ui.component.Component
+import com.duckduckgo.common.ui.internal.ui.component.Component.CONTEXT_MENU
 import com.duckduckgo.common.ui.internal.ui.component.Component.MENU_ITEM
 import com.duckduckgo.common.ui.internal.ui.component.Component.POPUP_MENU_ITEM
 import com.duckduckgo.common.ui.internal.ui.component.Component.SECTION_HEADER_LIST_ITEM
@@ -27,6 +28,14 @@ import com.duckduckgo.common.ui.internal.ui.component.ComponentFragment
 
 class ComponentListItemsElementsFragment : ComponentFragment() {
     override fun getComponents(): List<Component> {
-        return listOf(SECTION_HEADER_LIST_ITEM, SINGLE_LINE_LIST_ITEM, TWO_LINE_LIST_ITEM, SETTINGS_LIST_ITEM, MENU_ITEM, POPUP_MENU_ITEM)
+        return listOf(
+            SECTION_HEADER_LIST_ITEM,
+            SINGLE_LINE_LIST_ITEM,
+            TWO_LINE_LIST_ITEM,
+            SETTINGS_LIST_ITEM,
+            MENU_ITEM,
+            POPUP_MENU_ITEM,
+            CONTEXT_MENU,
+        )
     }
 }

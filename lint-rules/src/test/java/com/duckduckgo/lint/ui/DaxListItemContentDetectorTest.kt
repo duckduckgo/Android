@@ -49,10 +49,19 @@ class DaxListItemContentDetectorTest {
         """,
     ).indented()
 
+    private val contextMenuStub = kotlin(
+        "src/com/duckduckgo/common/ui/compose/contextmenu/DaxContextMenu.kt",
+        """
+        package com.duckduckgo.common.ui.compose.contextmenu
+        fun DaxContextMenu(anchor: () -> Unit, expanded: Boolean, onDismissRequest: () -> Unit) {}
+        """,
+    ).indented()
+
     private fun caller(body: String) = kotlin(
         """
         package com.test
         import com.duckduckgo.common.ui.compose.listitem.*
+        import com.duckduckgo.common.ui.compose.contextmenu.DaxContextMenu
         fun BadSwitch() {}
         fun BadIcon() {}
         fun BadPill() {}
@@ -62,7 +71,7 @@ class DaxListItemContentDetectorTest {
     ).indented()
 
     private fun run(body: String) = lint()
-        .files(scopeStubs, caller(body))
+        .files(scopeStubs, contextMenuStub, caller(body))
         .issues(DaxListItemContentDetector.INVALID_DAX_LIST_ITEM_CONTENT_USAGE)
         .run()
 
@@ -129,5 +138,17 @@ class DaxListItemContentDetectorTest {
     @Test
     fun whenSlotWrapsScopeMemberInLayoutThenWarning() {
         run("""DaxOneLineListItem(text = "x", trailingContent = { Column { Icon() } })""").expectWarningCount(1)
+    }
+
+    @Test
+    fun whenTrailingContentUsesDaxContextMenuThenNoWarning() {
+        run(
+            """DaxOneLineListItem(text = "x", trailingContent = { DaxContextMenu(anchor = {}, expanded = false, onDismissRequest = {}) })""",
+        ).expectClean()
+    }
+
+    @Test
+    fun whenTrailingContentUsesNonScopeComposableOtherThanDaxContextMenuThenWarning() {
+        run("""DaxOneLineListItem(text = "x", trailingContent = { BadSwitch() })""").expectWarningCount(1)
     }
 }
