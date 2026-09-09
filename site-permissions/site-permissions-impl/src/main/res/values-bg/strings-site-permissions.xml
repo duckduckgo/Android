@@ -60,7 +60,6 @@
     <string name="duckAiMicPermissionDeniedSnackBarMessage">За гласовите функции е необходимо разрешение за достъп до микрофона</string>
     <string name="duckAiMicPermissionDeniedDialogTitle">DuckDuckGo има нужда от достъп до микрофона</string>
     <string name="duckAiMicPermissionDeniedDialogContent">Ако искате да използвате гласов чат в Duck.ai, трябва да разрешите достъп до микрофона.</string>
-    <string name="duckAiMicPermissionDeniedDialogPositiveButton">Промяна на разрешенията</string>
 
     <string name="sitePermissionsSettingsDescription">Сайтовете, които посещавате, може да поискат достъп до местоположението, камерата, микрофона или софтуера за управление на цифровите права (DRM) на устройството. Те няма да имат достъп до тях, освен ако не им дадете изрично разрешение.</string>
     <string name="sitePermissionsSettingsEnablePermissionTitle">Разрешаване на всички сайтове да искат:</string>
@@ -76,5 +75,34 @@
     <string name="permissionsPerWebsiteAllowSetting">Разрешавам</string>
     <string name="permissionsPerWebsiteAskDisabledSetting">Деактивирано за всички сайтове</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s разрешение за %2$s</string>
+
+    <!-- Tiered permission dialog -->
+    <string name="sitePermissionsDialogAllowWhileUsingSiteButton" instruction="Button granting a website a permission for every visit, until the user changes it">Разрешаване при използване на сайта</string>
+    <string name="sitePermissionsDialogAllowThisTimeButton" instruction="Button granting a website a permission for the current visit only">Разрешаване само този път</string>
+    <string name="sitePermissionsDialogNeverAllowButton" instruction="Button refusing a website a permission for every visit, until the user changes it">Никога не разрешавай</string>
+    <string name="sitePermissionsTieredLocationDialogTitle" instruction="Placeholder is a website">Уебсайтът „%1$s“ иска достъп до местоположението</string>
+    <string name="sitePermissionsTieredDdgLocationDialogTitle" instruction="Placeholder is a website">„%1$s“ иска достъп до местоположението</string>
+    <string name="sitePermissionsTieredDdgLocationDialogSubtitle">Ще анонимизираме местоположението и ще го използваме, за да осигурим по-добри резултати близо до мястото, на което се намирате.</string>
+    <string name="sitePermissionsTieredCameraDialogTitle" instruction="Placeholder is a website">Уебсайтът „%1$s“ иска достъп до камерата</string>
+    <string name="sitePermissionsTieredMicDialogTitle" instruction="Placeholder is a website">Уебсайтът „%1$s“ иска достъп до микрофона</string>
+    <string name="sitePermissionsTieredMicAndCameraDialogTitle" instruction="Placeholder is a website">Уебсайтът „%1$s“ иска достъп до камерата и микрофона</string>
+    <string name="sitePermissionsTieredDrmDialogSubtitle">Ако не разрешите достъп, има вероятност видеоклиповете на сайта да не могат да бъдат възпроизвеждани, но този сайт няма да има достъп до идентификатори на устройства, предоставени от софтуера за DRM.</string>
+
+    <!-- Reminder dialog -->
+    <string name="sitePermissionsDialogChangePermissionsButton" instruction="Button opening the DuckDuckGo permission settings in the Android system settings app">Промяна на разрешенията</string>
+    <string name="sitePermissionsTieredSystemDeniedLocationTitle">DuckDuckGo има нужда от достъп до местоположението ти</string>
+    <string name="sitePermissionsTieredSystemDeniedLocationContent">Необходими са разрешения за местоположение, ако искаш да използваш функциите за местоположение на този сайт.</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraTitle">DuckDuckGo има нужда от достъп до камерата</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraContent">Ако искаш да използваш функциите за камерата на този сайт, са необходими разрешения за камерата.</string>
+    <string name="sitePermissionsTieredSystemDeniedMicTitle">DuckDuckGo има нужда от достъп до микрофона</string>
+    <string name="sitePermissionsTieredSystemDeniedMicContent">Ако искаш да използваш функциите за микрофон на този сайт, трябва да разрешиш достъп до микрофона.</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraAndMicTitle">DuckDuckGo има нужда от достъп до камерата и микрофона</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraAndMicContent">Ако искаш да използваш функциите за камера и микрофон на този сайт, трябва да разрешиш достъп до камерата и микрофона.</string>
+
+    <!-- Denial snackbar -->
+    <string name="sitePermissionsTieredLocationDeniedSnackBarMessage">DuckDuckGo не успя да сподели местоположението с този сайт</string>
+    <string name="sitePermissionsTieredCameraDeniedSnackBarMessage">DuckDuckGo не можа да предостави достъп до камерата на този сайт</string>
+    <string name="sitePermissionsTieredMicDeniedSnackBarMessage">DuckDuckGo не можа да даде достъп до микрофона на този сайт</string>
+    <string name="sitePermissionsTieredCameraAndMicDeniedSnackBarMessage">DuckDuckGo не можа да предостави достъп до камерата и микрофона на този сайт</string>
 
 </resources>

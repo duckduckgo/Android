@@ -60,7 +60,6 @@
     <string name="duckAiMicPermissionDeniedSnackBarMessage">Ses özellikleri için mikrofon izni gerekiyor</string>
     <string name="duckAiMicPermissionDeniedDialogTitle">DuckDuckGo\'nun mikrofonunuza erişmesi gerekiyor</string>
     <string name="duckAiMicPermissionDeniedDialogContent">Duck.ai\'da Sesli Sohbet özelliğini kullanmak istiyorsanız mikrofon izinleri gereklidir</string>
-    <string name="duckAiMicPermissionDeniedDialogPositiveButton">İzinleri Değiştir</string>
 
     <string name="sitePermissionsSettingsDescription">Ziyaret ettiğiniz siteler cihazınızın konumuna, kamerasına, mikrofonuna veya DRM (Dijital Haklar Yönetimi) yazılımına erişim isteyebilir. Siz açıkça izin vermediğiniz sürece bunlara erişemezler.</string>
     <string name="sitePermissionsSettingsEnablePermissionTitle">Tüm sitelerin şunları istemesine izin ver:</string>
@@ -76,5 +75,34 @@
     <string name="permissionsPerWebsiteAllowSetting">İzin ver</string>
     <string name="permissionsPerWebsiteAskDisabledSetting">Tüm siteler için devre dışı</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%2$s için %1$s izni</string>
+
+    <!-- Tiered permission dialog -->
+    <string name="sitePermissionsDialogAllowWhileUsingSiteButton" instruction="Button granting a website a permission for every visit, until the user changes it">Siteyi kullanırken izin ver</string>
+    <string name="sitePermissionsDialogAllowThisTimeButton" instruction="Button granting a website a permission for the current visit only">Bu seferlik izin ver</string>
+    <string name="sitePermissionsDialogNeverAllowButton" instruction="Button refusing a website a permission for every visit, until the user changes it">Hiçbir Zaman İzin Verme</string>
+    <string name="sitePermissionsTieredLocationDialogTitle" instruction="Placeholder is a website">\"%1$s\" web sitesi konumunuza erişmek istiyor</string>
+    <string name="sitePermissionsTieredDdgLocationDialogTitle" instruction="Placeholder is a website">\"%1$s\" konumunuza erişmek istiyor</string>
+    <string name="sitePermissionsTieredDdgLocationDialogSubtitle">Konumunu anonimleştirip sana daha yakın, daha iyi sonuçlar sunmak için kullanacağız.</string>
+    <string name="sitePermissionsTieredCameraDialogTitle" instruction="Placeholder is a website">\"%1$s\" web sitesi kamerana erişmek istiyor</string>
+    <string name="sitePermissionsTieredMicDialogTitle" instruction="Placeholder is a website">\"%1$s\" web sitesi mikrofonuna erişmek istiyor</string>
+    <string name="sitePermissionsTieredMicAndCameraDialogTitle" instruction="Placeholder is a website">\"%1$s\" web sitesi kamerana ve mikrofonuna erişmek istiyor</string>
+    <string name="sitePermissionsTieredDrmDialogSubtitle">İzin vermezsen sitedeki videolar oynatılamaz duruma gelebilir ancak bu site, DRM yazılımı tarafından sağlanan cihaz tanımlayıcılarına erişemez.</string>
+
+    <!-- Reminder dialog -->
+    <string name="sitePermissionsDialogChangePermissionsButton" instruction="Button opening the DuckDuckGo permission settings in the Android system settings app">İzinleri Değiştir</string>
+    <string name="sitePermissionsTieredSystemDeniedLocationTitle">DuckDuckGo\'nun konumunuza erişmesi gerekiyor</string>
+    <string name="sitePermissionsTieredSystemDeniedLocationContent">Bu sitedeki konum özelliklerini kullanmak istiyorsan konum izinleri gereklidir.</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraTitle">DuckDuckGo\'nun kameranıza erişmesi gerekiyor</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraContent">Bu sitedeki kamera özelliklerini kullanmak istiyorsan kamera izinleri gereklidir.</string>
+    <string name="sitePermissionsTieredSystemDeniedMicTitle">DuckDuckGo\'nun mikrofonunuza erişmesi gerekiyor</string>
+    <string name="sitePermissionsTieredSystemDeniedMicContent">Bu sitedeki mikrofon özelliklerini kullanmak istiyorsan mikrofon izinleri gereklidir.</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraAndMicTitle">DuckDuckGo\'nun kamera ve mikrofonunuza erişmesi gerekiyor</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraAndMicContent">Bu sitede kamera ve mikrofon özelliklerini kullanmak istiyorsan kamera ve mikrofon izinleri gereklidir.</string>
+
+    <!-- Denial snackbar -->
+    <string name="sitePermissionsTieredLocationDeniedSnackBarMessage">DuckDuckGo bu siteyle konum paylaşamadı</string>
+    <string name="sitePermissionsTieredCameraDeniedSnackBarMessage">DuckDuckGo bu siteye kamera erişimi veremedi</string>
+    <string name="sitePermissionsTieredMicDeniedSnackBarMessage">DuckDuckGo bu siteye mikrofon erişimi veremedi</string>
+    <string name="sitePermissionsTieredCameraAndMicDeniedSnackBarMessage">DuckDuckGo bu siteye kamera ve mikrofon erişimi veremedi</string>
 
 </resources>

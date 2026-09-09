@@ -812,7 +812,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                 iconRes = CommonR.drawable.ic_microphone_24,
                 titleRes = R.string.duckAiMicPermissionDeniedDialogTitle,
                 contentRes = R.string.duckAiMicPermissionDeniedDialogContent,
-                buttonRes = R.string.duckAiMicPermissionDeniedDialogPositiveButton,
+                buttonRes = R.string.sitePermissionsDialogChangePermissionsButton,
                 openAppSettings = openAppSettings,
             )
         } else if (sitePermissionsDialogRedesignFeature.self().isEnabled()) {

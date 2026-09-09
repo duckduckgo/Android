@@ -60,7 +60,6 @@
     <string name="duckAiMicPermissionDeniedSnackBarMessage">Mikrofonbehörighet krävs för röstfunktioner</string>
     <string name="duckAiMicPermissionDeniedDialogTitle">DuckDuckGo behöver komma åt din mikrofon</string>
     <string name="duckAiMicPermissionDeniedDialogContent">Mikrofonbehörighet behövs om du vill använda röstchatt i Duck.ai</string>
-    <string name="duckAiMicPermissionDeniedDialogPositiveButton">Ändra behörigheter</string>
 
     <string name="sitePermissionsSettingsDescription">Webbplatser som du besöker kan begära åtkomst till din enhets plats, kamera, mikrofon eller DRM-programvara (Digital Rights Management). De kan inte komma åt dessa om du inte uttryckligen tillåter det.</string>
     <string name="sitePermissionsSettingsEnablePermissionTitle">Tillåt alla webbplatser att be om:</string>
@@ -76,5 +75,34 @@
     <string name="permissionsPerWebsiteAllowSetting">Tillåt</string>
     <string name="permissionsPerWebsiteAskDisabledSetting">Inaktiverat för alla webbplatser</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s-behörighet för %2$s</string>
+
+    <!-- Tiered permission dialog -->
+    <string name="sitePermissionsDialogAllowWhileUsingSiteButton" instruction="Button granting a website a permission for every visit, until the user changes it">Tillåt medan webbplatsen används</string>
+    <string name="sitePermissionsDialogAllowThisTimeButton" instruction="Button granting a website a permission for the current visit only">Tillåt den här gången</string>
+    <string name="sitePermissionsDialogNeverAllowButton" instruction="Button refusing a website a permission for every visit, until the user changes it">Tillåt aldrig</string>
+    <string name="sitePermissionsTieredLocationDialogTitle" instruction="Placeholder is a website">Webbplatsen ”%1$s” vill få åtkomst till din plats</string>
+    <string name="sitePermissionsTieredDdgLocationDialogTitle" instruction="Placeholder is a website">”%1$s” vill få åtkomst till din plats</string>
+    <string name="sitePermissionsTieredDdgLocationDialogSubtitle">Vi anonymiserar din plats och använder den för att ge dig bättre resultat, närmare dig.</string>
+    <string name="sitePermissionsTieredCameraDialogTitle" instruction="Placeholder is a website">Webbplatsen ”%1$s” vill få åtkomst till din kamera</string>
+    <string name="sitePermissionsTieredMicDialogTitle" instruction="Placeholder is a website">Webbplatsen ”%1$s” vill få åtkomst till din mikrofon</string>
+    <string name="sitePermissionsTieredMicAndCameraDialogTitle" instruction="Placeholder is a website">Webbplatsen ”%1$s” vill få åtkomst till din kamera och mikrofon</string>
+    <string name="sitePermissionsTieredDrmDialogSubtitle">Om du inte tillåter kan videor på webbplatsen bli ospelbara, men denna webbplats kommer inte att ha åtkomst till enhetsidentifierare som tillhandahålls av DRM-programvara.</string>
+
+    <!-- Reminder dialog -->
+    <string name="sitePermissionsDialogChangePermissionsButton" instruction="Button opening the DuckDuckGo permission settings in the Android system settings app">Ändra behörigheter</string>
+    <string name="sitePermissionsTieredSystemDeniedLocationTitle">DuckDuckGo behöver komma åt din plats</string>
+    <string name="sitePermissionsTieredSystemDeniedLocationContent">Platsbehörighet behövs om du vill använda platsfunktioner på den här webbplatsen.</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraTitle">DuckDuckGo behöver komma åt din kamera</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraContent">Kamerabehörighet behövs om du vill använda kamerafunktioner på den här webbplatsen.</string>
+    <string name="sitePermissionsTieredSystemDeniedMicTitle">DuckDuckGo behöver få åtkomst till din mikrofon</string>
+    <string name="sitePermissionsTieredSystemDeniedMicContent">Mikrofonbehörighet behövs om du vill använda mikrofonfunktioner på den här webbplatsen.</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraAndMicTitle">DuckDuckGo behöver komma åt din kamera och mikrofon</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraAndMicContent">Kamera- och mikrofonbehörighet behövs om du vill använda kamera- och mikrofonfunktioner på den här webbplatsen.</string>
+
+    <!-- Denial snackbar -->
+    <string name="sitePermissionsTieredLocationDeniedSnackBarMessage">DuckDuckGo kunde inte dela plats med den här webbplatsen</string>
+    <string name="sitePermissionsTieredCameraDeniedSnackBarMessage">DuckDuckGo kunde inte ge den här webbplatsen kameraåtkomst</string>
+    <string name="sitePermissionsTieredMicDeniedSnackBarMessage">DuckDuckGo kunde inte ge mikrofonåtkomst till den här webbplatsen</string>
+    <string name="sitePermissionsTieredCameraAndMicDeniedSnackBarMessage">DuckDuckGo kunde inte ge den här webbplatsen kamera- och mikrofonåtkomst</string>
 
 </resources>
