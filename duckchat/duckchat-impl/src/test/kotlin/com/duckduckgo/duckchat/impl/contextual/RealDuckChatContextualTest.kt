@@ -22,8 +22,8 @@ import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
-import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.RealTextSelectionStore
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
