@@ -21,7 +21,10 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
+import com.duckduckgo.pir.impl.models.Address
+import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction
+import com.duckduckgo.pir.impl.scripts.models.ExtractedProfileParams
 import com.duckduckgo.pir.impl.scripts.models.PirError
 import com.duckduckgo.pir.impl.scripts.models.PirError.ActionError.JsActionFailed
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData
@@ -239,6 +242,34 @@ class RealBrokerActionProcessorTest {
             assertEquals("li", profileMatch.getString("selector"))
             assertEquals(".name", profileMatch.getJSONObject("profile").getJSONObject("name").getString("selector"))
         }
+    fun whenPushSolveCaptchaActionThenPushedJsonCarriesTokenAndProfiles() = runTest {
+        val action = BrokerAction.SolveCaptcha(id = "action-captcha", selector = "#captcha")
+        val requestData = SolveCaptcha(
+            token = "captcha-token",
+            userProfile = ProfileQuery(
+                id = 1L,
+                firstName = "John",
+                lastName = "Doe",
+                city = "TestCity",
+                state = "TS",
+                addresses = listOf(Address(city = "TestCity", state = "TS")),
+                birthYear = 1990,
+                fullName = "John Doe",
+                age = 34,
+                deprecated = false,
+            ),
+            extractedProfile = ExtractedProfileParams(name = "John Doe", profileUrl = "https://example.com/john"),
+        )
+
+        testee.pushAction(action, requestData)
+
+        val eventCaptor = argumentCaptor<SubscriptionEventData>()
+        verify(mockJsMessaging).sendSubscriptionEvent(eventCaptor.capture())
+
+        val pushedData = eventCaptor.firstValue.params.getJSONObject("state").getJSONObject("data")
+        assertEquals("captcha-token", pushedData.getString("token"))
+        assertEquals("John", pushedData.getJSONObject("userProfile").getString("firstName"))
+        assertEquals("John Doe", pushedData.getJSONObject("extractedProfile").getString("name"))
     }
 
     @Test
