@@ -59,9 +59,7 @@ internal fun DaxSkeletonLine(
     modifier: Modifier = Modifier,
 ) {
     DaxSkeletonShape(
-        modifier = Modifier
-            .height(DaxSkeletonDefaults.LineHeight)
-            .then(modifier),
+        modifier = modifier.height(DaxSkeletonDefaults.LineHeight),
         shape = DuckDuckGoTheme.shapes.medium,
     )
 }
@@ -72,9 +70,7 @@ internal fun DaxSkeletonCircle(
     size: Dp = DaxSkeletonDefaults.CircleSize,
 ) {
     DaxSkeletonShape(
-        modifier = Modifier
-            .size(size)
-            .then(modifier),
+        modifier = modifier.size(size),
         shape = CircleShape,
     )
 }
