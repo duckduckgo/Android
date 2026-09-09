@@ -350,4 +350,23 @@
     <string name="duckChatContextualAskAboutPage">Kysy sivusta</string>
     <string name="duckChatContextualAskAboutSearch">Jatka Duck.ai:ssa</string>
     <string name="duckChatContextualOpenDuckAi">Avaa Duck.ai</string>
+
+    <!-- Suggested prompts for text selection -->
+    <string name="duckAiSuggestionSummarizeSelectionLabel">Tee yhteenveto tästä valinnasta</string>
+    <string name="duckAiSuggestionSummarizeSelectionPrompt">Tee yhteenveto tästä valinnasta.</string>
+    <string name="duckAiSuggestionTranslateSelectionLabel">Käännä tämä valinta</string>
+    <string name="duckAiSuggestionTranslateSelectionPrompt" instruction="%1$s is replaced with the name of the user&apos;s language.">Käännä tämä valinta kielelle %1$s.</string>
+
+    <!-- Name shown for an attached text selection in the Duck.ai -->
+    <string name="duckAiTextSelectionAttachmentTitle">Tekstivalinta</string>
+    <string name="duckAiTextSelectionLimitReached" instruction="%1$d is replaced with the maximum number of text selections.">Voit lisätä enintään %1$d tekstivalintaa. Poista yksi lisätäksesi toisen.</string>
+
+    <!-- Duck.ai text selection menu action -->
+    <string name="duckAiTextSelectionMenuItem">Kysy Duck.ai:lta</string>
+
+    <!-- Prefix on the Duck.ai attachment chip for a text selection -->
+    <plurals name="duckAiTextSelectionWordCount">
+        <item quantity="one">%1$d sana</item>
+        <item quantity="other">%1$d sanaa</item>
+    </plurals>
 </resources>
