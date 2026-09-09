@@ -73,23 +73,23 @@ fun DaxSlider(
     valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
     steps: Int = 0,
     onValueChangeFinished: (() -> Unit)? = null,
-    interactionSource: MutableInteractionSource? = null,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
-    val colors = DaxSliderDefaults.colors
+    val colors = DaxSliderDefaults.colors()
     Slider(
         value = value,
         onValueChange = onValueChange,
-        modifier = modifier.alpha(if (enabled) 1f else DaxSliderDefaults.disabledAlpha),
+        modifier = modifier.alpha(if (enabled) 1f else DaxSliderDefaults.DisabledAlpha),
         enabled = enabled,
         valueRange = valueRange,
         steps = steps,
         onValueChangeFinished = onValueChangeFinished,
-        interactionSource = interactionSource ?: remember { MutableInteractionSource() },
+        interactionSource = interactionSource,
         colors = colors,
         thumb = {
             Box(
                 modifier = Modifier
-                    .size(DaxSliderDefaults.thumbSize)
+                    .size(DaxSliderDefaults.ThumbSize)
                     .clip(CircleShape)
                     .background(DuckDuckGoTheme.colors.brand.accentBlue),
             )
@@ -97,7 +97,7 @@ fun DaxSlider(
         track = { sliderState ->
             SliderDefaults.Track(
                 sliderState = sliderState,
-                modifier = Modifier.height(DaxSliderDefaults.trackHeight),
+                modifier = Modifier.height(DaxSliderDefaults.TrackHeight),
                 enabled = enabled,
                 colors = colors,
                 drawStopIndicator = null,
@@ -110,24 +110,23 @@ fun DaxSlider(
 
 private object DaxSliderDefaults {
 
-    const val disabledAlpha = 0.4f
+    const val DisabledAlpha = 0.4f
 
-    val thumbSize = 20.dp
+    val ThumbSize = 20.dp
 
-    val trackHeight: Dp
+    val TrackHeight: Dp
         @Composable
         get() = dimensionResource(R.dimen.sliderTrackHeight)
 
-    val colors: SliderColors
-        @Composable
-        get() = SliderDefaults.colors(
-            thumbColor = DuckDuckGoTheme.colors.brand.accentBlue,
-            activeTrackColor = DuckDuckGoTheme.colors.brand.accentBlue,
-            inactiveTrackColor = DuckDuckGoTheme.colors.system.sliderTrackInactive,
-            disabledThumbColor = DuckDuckGoTheme.colors.brand.accentBlue,
-            disabledActiveTrackColor = DuckDuckGoTheme.colors.brand.accentBlue,
-            disabledInactiveTrackColor = DuckDuckGoTheme.colors.system.sliderTrackInactive,
-        )
+    @Composable
+    fun colors(): SliderColors = SliderDefaults.colors(
+        thumbColor = DuckDuckGoTheme.colors.brand.accentBlue,
+        activeTrackColor = DuckDuckGoTheme.colors.brand.accentBlue,
+        inactiveTrackColor = DuckDuckGoTheme.colors.system.sliderTrackInactive,
+        disabledThumbColor = DuckDuckGoTheme.colors.brand.accentBlue,
+        disabledActiveTrackColor = DuckDuckGoTheme.colors.brand.accentBlue,
+        disabledInactiveTrackColor = DuckDuckGoTheme.colors.system.sliderTrackInactive,
+    )
 }
 
 @PreviewLightDark
