@@ -286,7 +286,7 @@ class AttachmentViewModelTest {
 
     @Test
     fun whenOnlyTextSelectionsAttachedThenHasNoStandaloneAttachments() = runTest {
-        viewModel.bindTextSelections("tab-1", "selected words", "https://example.com")
+        viewModel.bindTextSelections("tab-1", "selected words")
 
         assertTrue(viewModel.attachmentState.value.hasAttachments)
         assertFalse(viewModel.attachmentState.value.hasStandaloneAttachments)
@@ -308,14 +308,14 @@ class AttachmentViewModelTest {
 
     @Test
     fun whenBoundWithTextSelectionThenItIsAttachedToThatTab() = runTest {
-        viewModel.bindTextSelections("tab-1", "selected words", "https://example.com")
+        viewModel.bindTextSelections("tab-1", "selected words")
 
         assertEquals(listOf("selected words"), viewModel.attachmentState.value.textSelections.map { it.text })
     }
 
     @Test
     fun whenBoundWithoutTextSelectionThenNothingIsAttached() = runTest {
-        viewModel.bindTextSelections("tab-1", textSelection = null, url = "")
+        viewModel.bindTextSelections("tab-1", textSelection = null)
 
         assertTrue(viewModel.attachmentState.value.textSelections.isEmpty())
     }
@@ -324,15 +324,15 @@ class AttachmentViewModelTest {
     fun whenBoundToADifferentTabThenOtherTabsSelectionsAreNotShown() = runTest {
         textSelectionStore.add("tab-other", "not mine", "https://example.com")
 
-        viewModel.bindTextSelections("tab-1", textSelection = null, url = "")
+        viewModel.bindTextSelections("tab-1", textSelection = null)
 
         assertTrue(viewModel.attachmentState.value.textSelections.isEmpty())
     }
 
     @Test
     fun whenTextSelectionRemovedThenItIsDroppedFromState() = runTest {
-        viewModel.bindTextSelections("tab-1", "keep me", "https://example.com")
-        viewModel.bindTextSelections("tab-1", "remove me", "https://example.com")
+        viewModel.bindTextSelections("tab-1", "keep me")
+        viewModel.bindTextSelections("tab-1", "remove me")
         val idToRemove = viewModel.attachmentState.value.textSelections.last().id
 
         viewModel.removeTextSelection(idToRemove)
@@ -342,7 +342,7 @@ class AttachmentViewModelTest {
 
     @Test
     fun whenTextSelectionsConsumedThenTheyAreClearedFromState() = runTest {
-        viewModel.bindTextSelections("tab-1", "selected words", "https://example.com")
+        viewModel.bindTextSelections("tab-1", "selected words")
 
         viewModel.getTextSelectionsJson()
 
