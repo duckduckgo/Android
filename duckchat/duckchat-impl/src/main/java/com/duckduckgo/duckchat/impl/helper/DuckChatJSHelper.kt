@@ -458,6 +458,10 @@ class RealDuckChatJSHelper @Inject constructor(
                 mode == Mode.CONTEXTUAL &&
                 duckChatFeature.contextualSuggestedPrompts().isEnabled()
         }
+        val supportsPageContext = withContext(dispatcherProvider.io()) {
+            duckChat.isDuckChatContextualModeEnabled() &&
+                (mode == Mode.CONTEXTUAL || duckChatFeature.duckAiTextSelectionAction().isEnabled())
+        }
         val jsonPayload =
             JSONObject().apply {
                 put(PLATFORM, ANDROID)
@@ -473,7 +477,7 @@ class RealDuckChatJSHelper @Inject constructor(
                 put(SUPPORTS_CHAT_FULLSCREEN_MODE, duckChat.isDuckChatFullScreenModeEnabled() && mode == Mode.FULL)
                 put(SUPPORTS_CHAT_CONTEXTUAL_MODE, duckChat.isDuckChatContextualModeEnabled() && mode == Mode.CONTEXTUAL)
                 put(SUPPORTS_CHAT_SYNC, duckChat.isChatSyncFeatureEnabled() && browserMode.isSyncable)
-                put(SUPPORTS_PAGE_CONTEXT, duckChat.isDuckChatContextualModeEnabled() && mode == Mode.CONTEXTUAL)
+                put(SUPPORTS_PAGE_CONTEXT, supportsPageContext)
                 put(SUPPORTS_NATIVE_STORAGE, duckChat.isNativeStorageEnabled())
                 put(
                     SUPPORTS_MULTIPLE_PAGE_CONTEXT,
