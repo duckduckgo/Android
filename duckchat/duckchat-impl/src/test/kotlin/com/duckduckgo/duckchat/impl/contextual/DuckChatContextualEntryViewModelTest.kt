@@ -24,9 +24,9 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelPageType
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.RealTextSelectionPayloadBuilder
-import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.RealTextSelectionStore
+import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.RealTextSelectionRepository
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionPayloadBuilder
-import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionStore
+import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionRepository
 import kotlinx.coroutines.test.runTest
 import org.json.JSONArray
 import org.json.JSONObject
@@ -51,12 +51,12 @@ class DuckChatContextualEntryViewModelTest {
     private val store: ContextualEntryPromptStore = mock()
     private val duckChatPixels: DuckChatPixels = mock()
     private val modelManager: DuckAiModelManager = mock()
-    private val textSelectionStore = RealTextSelectionStore()
+    private val textSelectionRepository = RealTextSelectionRepository()
     private val viewModel = DuckChatContextualEntryViewModel(
         store,
         duckChatPixels,
         modelManager,
-        textSelectionStore,
+        textSelectionRepository,
         RealTextSelectionPayloadBuilder(RuntimeEnvironment.getApplication(), object : DuckAiHostProvider {}),
     )
 
@@ -301,7 +301,7 @@ class DuckChatContextualEntryViewModelTest {
     @Test
     fun whenTextSelectionAttachedThenPageContextNotAttached() = runTest {
         viewModel.start("tab-1")
-        textSelectionStore.add("tab-1", "selected words", "https://example.com")
+        textSelectionRepository.add("tab-1", "selected words", "https://example.com")
 
         viewModel.onPageContextReceived(validContext)
 
@@ -312,8 +312,8 @@ class DuckChatContextualEntryViewModelTest {
     fun whenPromptSubmittedWithTextSelectionsThenSelectionsSentOnOwnKeyAndCleared() = runTest {
         viewModel.start("tab-1")
         viewModel.onPageContextReceived(validContext)
-        textSelectionStore.add("tab-1", "first selection", "https://example.com")
-        textSelectionStore.add("tab-1", "second selection", "https://example.com")
+        textSelectionRepository.add("tab-1", "first selection", "https://example.com")
+        textSelectionRepository.add("tab-1", "second selection", "https://example.com")
 
         viewModel.commands.test {
             viewModel.onPromptSubmitted(samplePrompt)
@@ -330,7 +330,7 @@ class DuckChatContextualEntryViewModelTest {
         assertEquals(2, first.getInt("wordCount"))
         assertEquals(15, first.getInt("fullContentLength"))
         assertFalse(first.getBoolean("truncated"))
-        assertTrue(textSelectionStore.selections("tab-1").value.isEmpty())
+        assertTrue(textSelectionRepository.selections("tab-1").value.isEmpty())
     }
 
     @Test
@@ -367,7 +367,7 @@ class DuckChatContextualEntryViewModelTest {
     @Test
     fun whenSelectionHasNoSourcePageThenPayloadReportsDuckAi() = runTest {
         viewModel.start("tab-1")
-        textSelectionStore.add("tab-1", "from another app", "")
+        textSelectionRepository.add("tab-1", "from another app", "")
 
         viewModel.commands.test {
             viewModel.onPromptSubmitted(samplePrompt)
@@ -382,8 +382,8 @@ class DuckChatContextualEntryViewModelTest {
     @Test
     fun whenSelectionsComeFromDifferentPagesThenEachCarriesItsOwnUrl() = runTest {
         viewModel.start("tab-1")
-        textSelectionStore.add("tab-1", "from imdb", "https://imdb.com")
-        textSelectionStore.add("tab-1", "from wikipedia", "https://wikipedia.org")
+        textSelectionRepository.add("tab-1", "from imdb", "https://imdb.com")
+        textSelectionRepository.add("tab-1", "from wikipedia", "https://wikipedia.org")
 
         viewModel.commands.test {
             viewModel.onPromptSubmitted(samplePrompt)
@@ -401,7 +401,7 @@ class DuckChatContextualEntryViewModelTest {
     fun whenSelectionExceedsMaxContentLengthThenTruncatedButSizeReported() = runTest {
         val long = "word ".repeat(3000)
         viewModel.start("tab-1")
-        textSelectionStore.add("tab-1", long, "https://example.com")
+        textSelectionRepository.add("tab-1", long, "https://example.com")
 
         viewModel.commands.test {
             viewModel.onPromptSubmitted(samplePrompt)
@@ -420,20 +420,20 @@ class DuckChatContextualEntryViewModelTest {
     @Test
     fun whenSelectionsExceedMaxThenExtrasDropped() {
         repeat(
-            TextSelectionStore.MAX_SELECTIONS + 2,
-        ) { index -> textSelectionStore.add("tab-1", "selection $index", "https://example.com") }
+            TextSelectionRepository.MAX_SELECTIONS + 2,
+        ) { index -> textSelectionRepository.add("tab-1", "selection $index", "https://example.com") }
 
-        assertEquals(TextSelectionStore.MAX_SELECTIONS, textSelectionStore.consume("tab-1").size)
+        assertEquals(TextSelectionRepository.MAX_SELECTIONS, textSelectionRepository.consume("tab-1").size)
     }
 
     @Test
     fun whenSelectionRemovedThenDroppedFromStore() {
-        textSelectionStore.add("tab-1", "keep me", "https://example.com")
-        textSelectionStore.add("tab-1", "remove me", "https://example.com")
-        val target = textSelectionStore.selections("tab-1").value.last()
+        textSelectionRepository.add("tab-1", "keep me", "https://example.com")
+        textSelectionRepository.add("tab-1", "remove me", "https://example.com")
+        val target = textSelectionRepository.selections("tab-1").value.last()
 
-        textSelectionStore.remove("tab-1", target.id)
+        textSelectionRepository.remove("tab-1", target.id)
 
-        assertEquals(listOf("keep me"), textSelectionStore.consume("tab-1").map { it.text })
+        assertEquals(listOf("keep me"), textSelectionRepository.consume("tab-1").map { it.text })
     }
 }

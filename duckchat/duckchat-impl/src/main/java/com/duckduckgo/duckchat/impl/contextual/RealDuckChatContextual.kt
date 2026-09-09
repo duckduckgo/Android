@@ -36,7 +36,7 @@ import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
-import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionStore
+import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionRepository
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -52,7 +52,7 @@ class RealDuckChatContextual @Inject constructor(
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val contextualEntryPromptStore: ContextualEntryPromptStore,
     private val globalActivityStarter: GlobalActivityStarter,
-    private val textSelectionStore: TextSelectionStore,
+    private val textSelectionRepository: TextSelectionRepository,
 ) : DuckChatContextual {
 
     override suspend fun launch(
@@ -66,13 +66,13 @@ class RealDuckChatContextual @Inject constructor(
             showChatSurface()
             return
         }
-        textSelection?.let { textSelectionStore.add(sourceTabId, it, sourceUrl.orEmpty()) }
+        textSelection?.let { textSelectionRepository.add(sourceTabId, it, sourceUrl.orEmpty()) }
         if (hasChatInProgress(sourceTabId)) {
             // The sheet would reopen the existing chat for this tab, so skip the entry menu and open it directly.
             showChatSurface()
             return
         }
-        if (textSelectionStore.selections(sourceTabId).value.isNotEmpty()) {
+        if (textSelectionRepository.selections(sourceTabId).value.isNotEmpty()) {
             showEntryDialog(anchor, sourceTabId, showChatSurface)
             return
         }
@@ -134,7 +134,7 @@ class RealDuckChatContextual @Inject constructor(
         } else {
             popup.onMenuItemClicked(askItem) {
                 duckChatPixels.reportContextualAddressBarMenuAskAboutPageSelected()
-                textSelectionStore.consume(sourceTabId)
+                textSelectionRepository.consume(sourceTabId)
                 showEntryDialog(anchor, sourceTabId, onAskAboutPage)
             }
         }

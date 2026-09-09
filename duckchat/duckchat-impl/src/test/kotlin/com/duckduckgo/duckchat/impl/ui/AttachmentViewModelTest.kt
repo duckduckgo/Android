@@ -46,9 +46,9 @@ import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedFile
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedImage
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachmentProcessor
-import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.RealTextSelectionStore
+import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.RealTextSelectionRepository
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionPayloadBuilder
-import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionStore
+import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -90,7 +90,7 @@ class AttachmentViewModelTest {
     private val context: Context = mock<Context>().also {
         whenever(it.getString(com.duckduckgo.duckchat.impl.R.string.duckChatImageAttachmentLimitPerConversation, 5))
             .thenReturn("Conversation limit reached")
-        whenever(it.getString(com.duckduckgo.duckchat.impl.R.string.duckAiTextSelectionLimitReached, TextSelectionStore.MAX_SELECTIONS))
+        whenever(it.getString(com.duckduckgo.duckchat.impl.R.string.duckAiTextSelectionLimitReached, TextSelectionRepository.MAX_SELECTIONS))
             .thenReturn("Selection limit reached")
         whenever(it.getString(com.duckduckgo.duckchat.impl.R.string.duckChatImageAttachmentLimitPerMessage, 3))
             .thenReturn("Per-message limit reached")
@@ -129,7 +129,7 @@ class AttachmentViewModelTest {
 
     private lateinit var viewModel: AttachmentViewModel
 
-    private val textSelectionStore = RealTextSelectionStore()
+    private val textSelectionRepository = RealTextSelectionRepository()
     private val textSelectionPayloadBuilder: TextSelectionPayloadBuilder = mock()
 
     @Before
@@ -144,7 +144,7 @@ class AttachmentViewModelTest {
             appBuildConfig = appBuildConfig,
             nativeInputStateProvider = nativeInputStateStore,
             duckChatPixels = duckChatPixels,
-            textSelectionStore = textSelectionStore,
+            textSelectionRepository = textSelectionRepository,
             textSelectionPayloadBuilder = textSelectionPayloadBuilder,
         )
     }
@@ -290,7 +290,7 @@ class AttachmentViewModelTest {
     @Test
     fun whenAtSelectionLimitThenNoLimitErrorUntilAnotherIsAttempted() = runTest {
         viewModel.bindTextSelections("tab-1", textSelection = null)
-        repeat(TextSelectionStore.MAX_SELECTIONS) { textSelectionStore.add("tab-1", "selection $it", "https://example.com") }
+        repeat(TextSelectionRepository.MAX_SELECTIONS) { textSelectionRepository.add("tab-1", "selection $it", "https://example.com") }
 
         assertNull(viewModel.attachmentState.value.textSelectionLimitError)
     }
@@ -298,9 +298,9 @@ class AttachmentViewModelTest {
     @Test
     fun whenSelectionRefusedAtLimitThenLimitErrorShown() = runTest {
         viewModel.bindTextSelections("tab-1", textSelection = null)
-        repeat(TextSelectionStore.MAX_SELECTIONS) { textSelectionStore.add("tab-1", "selection $it", "https://example.com") }
+        repeat(TextSelectionRepository.MAX_SELECTIONS) { textSelectionRepository.add("tab-1", "selection $it", "https://example.com") }
 
-        textSelectionStore.add("tab-1", "one too many", "https://example.com")
+        textSelectionRepository.add("tab-1", "one too many", "https://example.com")
 
         assertEquals("Selection limit reached", viewModel.attachmentState.value.textSelectionLimitError)
     }
@@ -308,9 +308,9 @@ class AttachmentViewModelTest {
     @Test
     fun whenSelectionRemovedAfterLimitThenLimitErrorCleared() = runTest {
         viewModel.bindTextSelections("tab-1", textSelection = null)
-        repeat(TextSelectionStore.MAX_SELECTIONS) { textSelectionStore.add("tab-1", "selection $it", "https://example.com") }
-        textSelectionStore.add("tab-1", "one too many", "https://example.com")
-        val target = textSelectionStore.selections("tab-1").value.first()
+        repeat(TextSelectionRepository.MAX_SELECTIONS) { textSelectionRepository.add("tab-1", "selection $it", "https://example.com") }
+        textSelectionRepository.add("tab-1", "one too many", "https://example.com")
+        val target = textSelectionRepository.selections("tab-1").value.first()
 
         viewModel.removeTextSelection(target.id)
 
@@ -355,7 +355,7 @@ class AttachmentViewModelTest {
 
     @Test
     fun whenBoundToADifferentTabThenOtherTabsSelectionsAreNotShown() = runTest {
-        textSelectionStore.add("tab-other", "not mine", "https://example.com")
+        textSelectionRepository.add("tab-other", "not mine", "https://example.com")
 
         viewModel.bindTextSelections("tab-1", textSelection = null)
 

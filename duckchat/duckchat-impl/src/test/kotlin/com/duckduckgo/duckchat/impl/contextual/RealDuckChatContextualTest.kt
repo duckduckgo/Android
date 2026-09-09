@@ -22,7 +22,7 @@ import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
-import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.RealTextSelectionStore
+import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.RealTextSelectionRepository
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -42,7 +42,7 @@ class RealDuckChatContextualTest {
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
     private val contextualEntryPromptStore = RealContextualEntryPromptStore()
     private val globalActivityStarter: GlobalActivityStarter = mock()
-    private val textSelectionStore = RealTextSelectionStore()
+    private val textSelectionRepository = RealTextSelectionRepository()
     private val anchor: View = mock()
 
     private val testee = RealDuckChatContextual(
@@ -55,7 +55,7 @@ class RealDuckChatContextualTest {
         duckDuckGoUrlDetector,
         contextualEntryPromptStore,
         globalActivityStarter,
-        textSelectionStore,
+        textSelectionRepository,
     )
 
     @Test

@@ -25,7 +25,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelPageType
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionPayloadBuilder
-import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionStore
+import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionRepository
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -48,7 +48,7 @@ class DuckChatContextualEntryViewModel @Inject constructor(
     private val contextualEntryPromptStore: ContextualEntryPromptStore,
     private val duckChatPixels: DuckChatPixels,
     private val modelManager: DuckAiModelManager,
-    private val textSelectionStore: TextSelectionStore,
+    private val textSelectionRepository: TextSelectionRepository,
     private val selectionPayloadBuilder: TextSelectionPayloadBuilder,
 ) : ViewModel() {
 
@@ -86,7 +86,7 @@ class DuckChatContextualEntryViewModel @Inject constructor(
     fun start(tabId: String) {
         this.tabId = tabId
         duckChatPixels.reportContextualFloatingInputShown()
-        textSelectionStore.selections(tabId)
+        textSelectionRepository.selections(tabId)
             .onEach { selections -> _viewState.update { it.copy(textSelectionCount = selections.size) } }
             .launchIn(viewModelScope)
     }
@@ -148,7 +148,7 @@ class DuckChatContextualEntryViewModel @Inject constructor(
     }
 
     private fun submit(prompt: NativeInputPrompt) {
-        val selectionsJson = prompt.selectionsJson ?: selectionPayloadBuilder.toJson(textSelectionStore.consume(tabId))
+        val selectionsJson = prompt.selectionsJson ?: selectionPayloadBuilder.toJson(textSelectionRepository.consume(tabId))
         contextualEntryPromptStore.store(
             ContextualEntryPrompt(
                 tabId = tabId,
@@ -161,7 +161,7 @@ class DuckChatContextualEntryViewModel @Inject constructor(
         commandChannel.trySend(Command.HandOffToSheet)
     }
 
-    private fun hasTextSelections(): Boolean = textSelectionStore.selections(tabId).value.isNotEmpty()
+    private fun hasTextSelections(): Boolean = textSelectionRepository.selections(tabId).value.isNotEmpty()
 
     private fun attach(serializedPageContext: String) {
         val json = runCatching { JSONObject(serializedPageContext) }.getOrNull() ?: return
