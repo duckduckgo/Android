@@ -3982,7 +3982,7 @@ class BrowserTabFragment :
 
                 override fun onDuckAISidebarButtonPressed() {
                     pixel.fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_SIDEBAR_TAPPED)
-                    viewModel.openDuckChatHistory()
+                    viewModel.onDuckChatSidebarButtonPressed()
                 }
 
                 override fun onDuckAIBackButtonPressed() {

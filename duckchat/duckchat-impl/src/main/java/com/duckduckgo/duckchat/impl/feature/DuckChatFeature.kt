@@ -290,4 +290,12 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun sendDuckAiSessionWideEvent(): Toggle
+
+    /**
+     * @return `true` when the Duck.ai sidebar button should open the native chat history screen
+     * instead of the legacy web sidebar.
+     * If the remote feature is not present defaults to `internal`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun nativeDuckAiSidebar(): Toggle
 }
