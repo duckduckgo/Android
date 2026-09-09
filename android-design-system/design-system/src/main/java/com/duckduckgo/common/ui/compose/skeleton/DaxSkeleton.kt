@@ -21,6 +21,7 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,32 +36,33 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
-import kotlin.math.max
+import kotlin.math.cos
+import kotlin.math.sin
 import kotlin.math.tan
 
 @Composable
 internal fun DaxSkeletonLine(
     modifier: Modifier = Modifier,
-    animated: Boolean = true,
 ) {
     DaxSkeletonShape(
         modifier = Modifier
             .height(DaxSkeletonDefaults.LineHeight)
             .then(modifier),
         shape = DuckDuckGoTheme.shapes.medium,
-        animated = animated,
     )
 }
 
@@ -68,26 +70,30 @@ internal fun DaxSkeletonLine(
 internal fun DaxSkeletonCircle(
     modifier: Modifier = Modifier,
     size: Dp = DaxSkeletonDefaults.CircleSize,
-    animated: Boolean = true,
 ) {
     DaxSkeletonShape(
         modifier = Modifier
             .size(size)
             .then(modifier),
         shape = CircleShape,
-        animated = animated,
     )
 }
 
 @Composable
 private fun DaxSkeletonShape(
     shape: Shape,
-    animated: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    val baseColor = DaxSkeletonDefaults.color
-    val restingColor = baseColor.copy(alpha = baseColor.alpha * DaxSkeletonDefaults.RestingAlpha)
+    Box(
+        modifier = modifier
+            .background(color = DaxSkeletonDefaults.color, shape = shape)
+            .clearAndSetSemantics { },
+    )
+}
 
+/** Applies one shimmer phase and coordinate system to every skeleton shape in this subtree. */
+@Composable
+internal fun Modifier.daxSkeletonShimmer(animated: Boolean): Modifier {
     val progress = if (animated) {
         val transition = rememberInfiniteTransition(label = "DaxSkeletonShimmer")
         val animatedProgress by transition.animateFloat(
@@ -107,41 +113,53 @@ private fun DaxSkeletonShape(
         DaxSkeletonDefaults.RestingProgress
     }
 
-    Box(
-        modifier = modifier
-            .clip(shape)
-            .drawWithCache {
-                val sweepWidth = max(size.width, DaxSkeletonDefaults.MinSweepWidth.toPx())
-                val clearance = size.height * tan(DaxSkeletonDefaults.SweepTiltRadians)
-                val bandTiltDy = sweepWidth * tan(DaxSkeletonDefaults.SweepTiltRadians)
-                val travel = size.width + sweepWidth + clearance
-                onDrawBehind {
-                    val sweepStart = -sweepWidth + travel * progress
-                    val brush = Brush.linearGradient(
-                        colorStops = arrayOf(
-                            0f to restingColor,
-                            0.5f to baseColor,
-                            1f to restingColor,
-                        ),
-                        start = Offset(sweepStart, 0f),
-                        end = Offset(sweepStart + sweepWidth, bandTiltDy),
-                    )
-                    drawRect(brush)
-                }
-            }
-            .clearAndSetSemantics { },
-    )
+    return graphicsLayer {
+        compositingStrategy = CompositingStrategy.Offscreen
+    }.drawWithContent {
+        drawContent()
+
+        val tilt = DaxSkeletonDefaults.SweepTiltRadians
+        val tiltCos = cos(tilt)
+        val tiltSin = sin(tilt)
+        val centerX = size.width / 2f
+        val centerY = size.height / 2f
+        val travel = size.width + tan(tilt) * size.height
+        val translationX = -travel + 2f * travel * progress
+        val gradientStart = Offset(
+            x = centerX * (1f - tiltCos) + centerY * tiltSin + translationX,
+            y = centerY * (1f - tiltCos) - centerX * tiltSin,
+        )
+        val gradientEnd = Offset(
+            x = centerX * (1f + tiltCos) + centerY * tiltSin + translationX,
+            y = centerY * (1f - tiltCos) + centerX * tiltSin,
+        )
+        val restingMask = Color.White.copy(alpha = DaxSkeletonDefaults.RestingAlpha)
+        val brush = Brush.linearGradient(
+            colorStops = arrayOf(
+                DaxSkeletonDefaults.BaseMaskStart to restingMask,
+                DaxSkeletonDefaults.HighlightMaskStart to Color.White,
+                DaxSkeletonDefaults.HighlightMaskEnd to Color.White,
+                DaxSkeletonDefaults.BaseMaskEnd to restingMask,
+            ),
+            start = gradientStart,
+            end = gradientEnd,
+        )
+        drawRect(brush = brush, blendMode = BlendMode.DstIn)
+    }
 }
 
 internal object DaxSkeletonDefaults {
     val LineHeight: Dp = 16.dp
     val CircleSize: Dp = 40.dp
-    const val SweepDurationMillis: Int = 500
-    const val SweepDelayMillis: Int = 500
+    const val SweepDurationMillis: Int = 1000
+    const val SweepDelayMillis: Int = 0
     const val RestingAlpha: Float = 0.3f
     const val RestingProgress: Float = 0.5f
+    const val BaseMaskStart: Float = 0.25f
+    const val HighlightMaskStart: Float = 0.4995f
+    const val HighlightMaskEnd: Float = 0.5005f
+    const val BaseMaskEnd: Float = 0.75f
     val SweepTiltRadians: Float = Math.toRadians(20.0).toFloat()
-    val MinSweepWidth: Dp = 160.dp
 
     val color: Color
         @Composable
@@ -153,7 +171,10 @@ internal object DaxSkeletonDefaults {
 @Composable
 private fun DaxSkeletonPreview() {
     PreviewBox {
-        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        Column(
+            modifier = Modifier.daxSkeletonShimmer(animated = true),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically,

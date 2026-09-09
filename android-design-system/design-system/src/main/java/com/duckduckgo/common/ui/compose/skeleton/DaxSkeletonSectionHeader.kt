@@ -59,14 +59,15 @@ fun DaxSkeletonSectionHeader(
 
     Row(
         modifier = modifier
+            .daxSkeletonShimmer(animated)
             .fillMaxWidth()
             .padding(horizontal = DaxSkeletonSectionHeaderDefaults.PaddingHorizontal, vertical = verticalPadding),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        DaxSkeletonLine(modifier = Modifier.fillMaxWidth(lineWidthFraction), animated = animated)
+        DaxSkeletonLine(modifier = Modifier.fillMaxWidth(lineWidthFraction))
         if (hasTrailingIcon) {
-            DaxSkeletonCircle(size = DaxSkeletonSectionHeaderDefaults.TrailingIconSize, animated = animated)
+            DaxSkeletonCircle(size = DaxSkeletonSectionHeaderDefaults.TrailingIconSize)
         }
     }
 }

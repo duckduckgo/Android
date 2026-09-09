@@ -24,7 +24,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.takeOrElse
 import com.duckduckgo.common.ui.compose.listitem.DaxListItemDefaults
 import com.duckduckgo.common.ui.compose.listitem.DaxListItemLayout
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
@@ -55,16 +54,15 @@ fun DaxSkeletonListItem(
     }
     DaxListItemLayout(
         minHeight = rowMinHeight,
-        modifier = modifier,
+        modifier = modifier.daxSkeletonShimmer(animated),
         contentSpacing = DaxSkeletonListItemDefaults.LineGap,
-        leadingContent = if (hasLeadingIcon) { { DaxSkeletonCircle(animated = animated) } } else null,
+        leadingContent = if (hasLeadingIcon) { { DaxSkeletonCircle() } } else null,
         trailingSpacerWidth = DaxSkeletonListItemDefaults.PaddingEnd,
     ) {
-        DaxSkeletonLine(modifier = Modifier.fillMaxWidth(), animated = animated)
+        DaxSkeletonLine(modifier = Modifier.fillMaxWidth())
         if (hasTwoLines) {
             DaxSkeletonLine(
                 modifier = Modifier.fillMaxWidth(DaxSkeletonListItemDefaults.SecondaryLineWidthFraction),
-                animated = animated,
             )
         }
     }
