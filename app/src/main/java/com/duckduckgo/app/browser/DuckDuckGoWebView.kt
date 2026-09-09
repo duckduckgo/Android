@@ -105,10 +105,13 @@ class DuckDuckGoWebView :
     }
 
     override fun startActionMode(callback: ActionMode.Callback?): ActionMode? =
-        super.startActionMode(duckAiTextSelectionDecorator.decorate(callback))
+        super.startActionMode(decorate(callback))
 
     override fun startActionMode(callback: ActionMode.Callback?, type: Int): ActionMode? =
-        super.startActionMode(duckAiTextSelectionDecorator.decorate(callback), type)
+        super.startActionMode(decorate(callback), type)
+
+    private fun decorate(callback: ActionMode.Callback?): ActionMode.Callback? =
+        if (::duckAiTextSelectionDecorator.isInitialized) duckAiTextSelectionDecorator.decorate(callback) else callback
 
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
