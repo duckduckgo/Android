@@ -18,6 +18,7 @@ package com.duckduckgo.duckchat.impl.contextual
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelPageType
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
@@ -27,6 +28,8 @@ import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.RealTextSelecti
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionPayloadBuilder
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionStore
 import kotlinx.coroutines.test.runTest
+import org.json.JSONArray
+import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -54,7 +57,7 @@ class DuckChatContextualEntryViewModelTest {
         duckChatPixels,
         modelManager,
         textSelectionStore,
-        RealTextSelectionPayloadBuilder(RuntimeEnvironment.getApplication()),
+        RealTextSelectionPayloadBuilder(RuntimeEnvironment.getApplication(), object : DuckAiHostProvider {}),
     )
 
     private val validContext = """{"title":"Example","url":"https://example.com","content":"some page content"}"""
@@ -344,6 +347,36 @@ class DuckChatContextualEntryViewModelTest {
         verify(store).store(captor.capture())
         assertNull(captor.firstValue.selectionsJson)
         assertEquals(validContext, captor.firstValue.serializedPageContext)
+    }
+
+    @Test
+    fun whenComposerAlreadyBuiltSelectionsThenTheyAreNotDroppedByTheStoreRead() = runTest {
+        val composerSelections = JSONArray().apply { put(JSONObject().apply { put("content", "typed prompt selection") }) }
+        viewModel.start("tab-1")
+
+        viewModel.commands.test {
+            viewModel.onPromptSubmitted(samplePrompt.copy(selectionsJson = composerSelections))
+            assertEquals(DuckChatContextualEntryViewModel.Command.HandOffToSheet, awaitItem())
+        }
+
+        val captor = argumentCaptor<ContextualEntryPrompt>()
+        verify(store).store(captor.capture())
+        assertEquals(composerSelections, captor.firstValue.selectionsJson)
+    }
+
+    @Test
+    fun whenSelectionHasNoSourcePageThenPayloadReportsDuckAi() = runTest {
+        viewModel.start("tab-1")
+        textSelectionStore.add("tab-1", "from another app", "")
+
+        viewModel.commands.test {
+            viewModel.onPromptSubmitted(samplePrompt)
+            assertEquals(DuckChatContextualEntryViewModel.Command.HandOffToSheet, awaitItem())
+        }
+
+        val captor = argumentCaptor<ContextualEntryPrompt>()
+        verify(store).store(captor.capture())
+        assertEquals("https://duck.ai", captor.firstValue.selectionsJson!!.getJSONObject(0).getString("url"))
     }
 
     @Test

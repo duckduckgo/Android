@@ -18,6 +18,7 @@ package com.duckduckgo.duckchat.impl.ui.nativeinput.textselection
 
 import android.content.Context
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.impl.R
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -37,7 +38,11 @@ interface TextSelectionPayloadBuilder {
 @ContributesBinding(AppScope::class)
 class RealTextSelectionPayloadBuilder @Inject constructor(
     private val context: Context,
+    duckAiHostProvider: DuckAiHostProvider,
 ) : TextSelectionPayloadBuilder {
+
+    // Default to duck.ai if no url is provided
+    private val duckAiUrl = "https://${duckAiHostProvider.getHost()}"
 
     override fun toJson(selections: List<TextSelection>): JSONArray? {
         val title = context.getString(R.string.duckAiTextSelectionAttachmentTitle)
@@ -56,7 +61,7 @@ class RealTextSelectionPayloadBuilder @Inject constructor(
             put("id", selection.id)
             put("title", title)
             put("favicon", JSONArray())
-            put("url", selection.url)
+            put("url", selection.url.ifBlank { duckAiUrl })
             put("content", if (truncated) selection.text.take(TextSelectionPayloadBuilder.MAX_CONTENT_LENGTH) else selection.text)
             put("truncated", truncated)
             put("fullContentLength", selection.text.length)
