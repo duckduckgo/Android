@@ -24,4 +24,7 @@
     <!-- The fire icon ImageView inside inputFieldFireIconMenu (same host layout). Declared here so the
          widget can pulse it during the Duck.ai onboarding fire CTA. -->
     <item name="inputFieldFireIconImageview" type="id"/>
+    <!-- The promoted copy of the "Ask Duck.ai" PROCESS_TEXT item, so the in-app selection is a primary
+         action rather than an entry in the text selection overflow. -->
+    <item name="askDuckAi" type="id"/>
 </resources>
