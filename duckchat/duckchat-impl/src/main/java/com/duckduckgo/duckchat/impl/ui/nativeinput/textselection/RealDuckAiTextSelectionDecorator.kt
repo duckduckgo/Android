@@ -42,7 +42,11 @@ class RealDuckAiTextSelectionDecorator @Inject constructor() : DuckAiTextSelecti
                 return isPrepared
             }
 
-            override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean = callback.onActionItemClicked(mode, item)
+            override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
+                val isHandled = callback.onActionItemClicked(mode, item)
+                if (item?.itemId == R.id.askDuckAi) mode?.finish()
+                return isHandled
+            }
 
             override fun onDestroyActionMode(mode: ActionMode?) = callback.onDestroyActionMode(mode)
 
