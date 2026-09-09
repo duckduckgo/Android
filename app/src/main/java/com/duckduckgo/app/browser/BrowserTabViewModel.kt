@@ -481,7 +481,6 @@ import logcat.LogPriority.VERBOSE
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
-import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
@@ -2786,30 +2785,9 @@ class BrowserTabViewModel @Inject constructor(
         request: PermissionRequest,
         sitePermissionsAllowedToAsk: SitePermissions,
     ) {
-        if (request is LocationPermissionRequest) {
-            if (!sameEffectiveTldPlusOne(site, request.origin)) {
-                logcat { "Permissions: sameEffectiveTldPlusOne false" }
-                request.deny()
-                return
-            }
-        }
-
         viewModelScope.launch(dispatchers.main()) {
             command.value = ShowSitePermissionsDialog(sitePermissionsAllowedToAsk, request)
         }
-    }
-
-    private fun sameEffectiveTldPlusOne(
-        site: Site?,
-        origin: String,
-    ): Boolean {
-        val siteDomain = site?.url?.toHttpUrlOrNull() ?: return false
-        val originDomain = origin.toUri().toString().toHttpUrlOrNull() ?: return false
-
-        val siteETldPlusOne = siteDomain.topPrivateDomain()
-        val originETldPlusOne = originDomain.topPrivateDomain()
-
-        return siteETldPlusOne == originETldPlusOne
     }
 
     private fun registerSiteVisit() {

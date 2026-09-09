@@ -23,15 +23,20 @@ import android.os.Looper
 import android.text.Spanned
 import android.text.style.ClickableSpan
 import android.view.View
+import android.webkit.GeolocationPermissions
 import android.webkit.PermissionRequest
+import android.widget.Button
 import android.widget.CheckBox
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.MutableLiveData
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
@@ -81,6 +86,12 @@ class SitePermissionsDialogActivityLauncherTest {
         whenever(it.getHost()).thenReturn("duck.ai")
     }
 
+    // Unless a test says otherwise the request comes from the page the tab is on, so it is first party.
+    private val tabRepository: TabRepository = mock<TabRepository>().also { repo ->
+        val site: Site = mock<Site>().also { whenever(it.url).thenReturn("https://example.com") }
+        whenever(repo.retrieveSiteData(any())).thenReturn(MutableLiveData(site))
+    }
+
     private val drmPolicyFeature = FakeFeatureToggleFactory.create(DrmPolicyFeature::class.java)
     private val sitePermissionsDialogRedesignFeature = FakeFeatureToggleFactory.create(SitePermissionsDialogRedesignFeature::class.java)
 
@@ -97,7 +108,13 @@ class SitePermissionsDialogActivityLauncherTest {
         browserMode = browserMode,
         drmPolicyFeature = drmPolicyFeature,
         sitePermissionsDialogRedesignFeature = sitePermissionsDialogRedesignFeature,
+        tabRepository = tabRepository,
     )
+
+    private fun onPage(url: String) {
+        val site: Site = mock<Site>().also { whenever(it.url).thenReturn(url) }
+        whenever(tabRepository.retrieveSiteData(any())).thenReturn(MutableLiveData(site))
+    }
 
     @Test
     fun whenCentralPolicyEnabledThenLauncherDoesNotRecheckSessionOrBlockList() {
@@ -321,18 +338,23 @@ class SitePermissionsDialogActivityLauncherTest {
         verify(request).deny()
     }
 
-    private fun showTieredCameraDialog(): AlertDialog {
-        sitePermissionsDialogRedesignFeature.self().setRawStoredState(Toggle.State(true))
+    private fun showCameraDialog(
+        pageUrl: String = "https://example.com",
+        requestUrl: String = "https://example.com",
+        redesignEnabled: Boolean = true,
+    ): AlertDialog {
+        onPage(pageUrl)
+        sitePermissionsDialogRedesignFeature.self().setRawStoredState(Toggle.State(redesignEnabled))
         whenever(systemPermissionsHelper.hasCameraPermissionsGranted()).thenReturn(true)
 
         val activity = Robolectric.buildActivity(ThemedActivity::class.java).setup().get()
         val request: PermissionRequest = mock()
         whenever(request.resources).thenReturn(arrayOf(PermissionRequest.RESOURCE_VIDEO_CAPTURE))
-        whenever(request.origin).thenReturn(Uri.parse("https://example.com"))
+        whenever(request.origin).thenReturn(Uri.parse(requestUrl))
 
         testee.askForSitePermission(
             activity = activity,
-            url = "https://example.com",
+            url = requestUrl,
             tabId = "tabId",
             permissionsRequested = SitePermissions(
                 autoAccept = emptyList(),
@@ -352,7 +374,7 @@ class SitePermissionsDialogActivityLauncherTest {
 
     @Test
     fun whenRedesignEnabledThenDialogOffersThreeTiersAndNoRememberChoiceCheckbox() {
-        val dialog = showTieredCameraDialog()
+        val dialog = showCameraDialog()
 
         assertEquals(3, dialog.tieredButtons().childCount)
         assertNull(dialog.findViewById<CheckBox>(CommonR.id.textAlertDialogCheckBox))
@@ -385,7 +407,7 @@ class SitePermissionsDialogActivityLauncherTest {
 
     @Test
     fun whenAllowWhileUsingSiteClickedThenPermissionPersistedAsAlwaysAllow() {
-        val dialog = showTieredCameraDialog()
+        val dialog = showCameraDialog()
 
         dialog.tieredButtons().getChildAt(0).performClick()
         shadowOf(Looper.getMainLooper()).idle()
@@ -401,7 +423,7 @@ class SitePermissionsDialogActivityLauncherTest {
 
     @Test
     fun whenAllowThisTimeClickedThenGrantIsSessionOnly() {
-        val dialog = showTieredCameraDialog()
+        val dialog = showCameraDialog()
 
         dialog.tieredButtons().getChildAt(1).performClick()
         shadowOf(Looper.getMainLooper()).idle()
@@ -418,7 +440,7 @@ class SitePermissionsDialogActivityLauncherTest {
 
     @Test
     fun whenNeverAllowClickedThenDeniedAndPersistedAsDenyAlways() {
-        val dialog = showTieredCameraDialog()
+        val dialog = showCameraDialog()
 
         dialog.tieredButtons().getChildAt(2).performClick()
         shadowOf(Looper.getMainLooper()).idle()
@@ -434,7 +456,7 @@ class SitePermissionsDialogActivityLauncherTest {
 
     @Test
     fun whenDialogDismissedThenDeniedForThisRequestOnlyAndReportedAsDenyOnce() {
-        val dialog = showTieredCameraDialog()
+        val dialog = showCameraDialog()
 
         dialog.cancel()
         // Dialog.cancel() dispatches onCancel through a Handler message, which Robolectric's
@@ -529,6 +551,7 @@ class SitePermissionsDialogActivityLauncherTest {
     }
 
     private fun showTieredLocationDialog(origin: String): AlertDialog {
+        onPage(origin)
         sitePermissionsDialogRedesignFeature.self().setRawStoredState(Toggle.State(true))
 
         val activity = Robolectric.buildActivity(ThemedActivity::class.java).setup().get()
@@ -757,6 +780,111 @@ class SitePermissionsDialogActivityLauncherTest {
         verify(request).grant(any())
         verify(sitePermissionsRepository, never()).sitePermissionPermanentlySaved(any(), any(), any())
         verify(sitePermissionsRepository, never()).saveDrmForSession(any(), any(), any())
+    }
+
+    @Test
+    fun whenPageEmbedsASiblingSubdomainThenRequestIsFirstParty() {
+        val dialog = showCameraDialog(pageUrl = "https://www.example.com/watch")
+
+        assertEquals(3, dialog.tieredButtons().childCount)
+    }
+
+    @Test
+    fun whenPageAndRequestHostsHaveNoRegistrableDomainThenComparedAsThemselves() {
+        val sameHost = showCameraDialog(
+            pageUrl = "http://localhost:8000/index.html",
+            requestUrl = "http://localhost:8000",
+        )
+        assertEquals(3, sameHost.tieredButtons().childCount)
+
+        val differentHost = showCameraDialog(
+            pageUrl = "http://localhost:8000/index.html",
+            requestUrl = "http://127.0.0.1:8000",
+        )
+        assertEquals(2, differentHost.tieredButtons().childCount)
+    }
+
+    @Test
+    fun whenRequestIsThirdPartyThenStandingGrantIsNotOffered() {
+        val dialog = showCameraDialog(pageUrl = THIRD_PARTY_PAGE)
+
+        val buttons = dialog.tieredButtons()
+        assertEquals(2, buttons.childCount)
+        assertEquals(
+            dialog.context.getString(R.string.sitePermissionsDialogAllowThisTimeButton),
+            (buttons.getChildAt(0) as Button).text,
+        )
+        assertEquals(
+            dialog.context.getString(R.string.sitePermissionsDialogNeverAllowButton),
+            (buttons.getChildAt(1) as Button).text,
+        )
+    }
+
+    @Test
+    fun whenThirdPartyAllowThisTimeClickedThenGrantIsSessionOnly() {
+        val dialog = showCameraDialog(pageUrl = THIRD_PARTY_PAGE)
+
+        dialog.tieredButtons().getChildAt(0).performClick()
+        shadowOf(Looper.getMainLooper()).idle()
+
+        verify(request).grant(any())
+        verify(sitePermissionsRepository).sitePermissionGranted(
+            "https://example.com",
+            "tabId",
+            PermissionRequest.RESOURCE_VIDEO_CAPTURE,
+        )
+        verify(sitePermissionsRepository, never()).sitePermissionPermanentlySaved(any(), any(), any())
+    }
+
+    @Test
+    fun whenThirdPartyNeverAllowClickedThenDeniedAndPersistedAsDenyAlways() {
+        val dialog = showCameraDialog(pageUrl = THIRD_PARTY_PAGE)
+
+        dialog.tieredButtons().getChildAt(1).performClick()
+        shadowOf(Looper.getMainLooper()).idle()
+
+        verify(request).deny()
+        verify(sitePermissionsRepository).sitePermissionPermanentlySaved(
+            "https://example.com",
+            PermissionRequest.RESOURCE_VIDEO_CAPTURE,
+            DENY_ALWAYS,
+        )
+    }
+
+    @Test
+    fun whenRedesignDisabledThenThirdPartyLocationIsDeniedWithoutADialog() {
+        sitePermissionsDialogRedesignFeature.self().setRawStoredState(Toggle.State(false))
+
+        val activity = Robolectric.buildActivity(ThemedActivity::class.java).setup().get()
+        onPage("https://publisher.example")
+        val callback: GeolocationPermissions.Callback = mock()
+        val request = LocationPermissionRequest("https://tracker.example", callback)
+
+        testee.askForSitePermission(
+            activity = activity,
+            url = "https://tracker.example",
+            tabId = "tabId",
+            permissionsRequested = SitePermissions(
+                autoAccept = emptyList(),
+                userHandled = listOf(LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION),
+            ),
+            request = request,
+            permissionsGrantedListener = permissionsGrantedListener,
+        )
+
+        verify(callback).invoke("https://tracker.example", false, false)
+        assertNull(ShadowDialog.getLatestDialog())
+    }
+
+    @Test
+    fun whenRedesignDisabledThenThirdPartyCameraStillShowsTheLegacyDialog() {
+        val dialog = showCameraDialog(pageUrl = THIRD_PARTY_PAGE, redesignEnabled = false)
+
+        assertNotNull(dialog.findViewById<TextView>(CommonR.id.textAlertDialogMessage))
+    }
+
+    companion object {
+        private const val THIRD_PARTY_PAGE = "https://publisher.example"
     }
 
     class ThemedActivity : AppCompatActivity() {
