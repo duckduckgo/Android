@@ -74,7 +74,7 @@ class RealSyncDesktopAppPromotionLauncher @Inject constructor(
             toolbarTitle = context.getString(R.string.syncGetAppsOnOtherPlatformsActivityTitle),
             title = context.getString(R.string.syncGetAppsOnOtherPlatformsTitle),
             body = context.getString(R.string.syncGetAppsOnOtherPlatformInstruction),
-            illustration = CommonR.drawable.ddg_app_download_128,
+            illustration = CommonR.drawable.ddg_app_download_96,
             link = DownloadLinkConfig(downloadUrl = DESKTOP_BROWSER_URL),
             share = ShareConfig(shareIntentTitle = context.getString(R.string.syncGetAppsOnOtherPlatforms)),
             showDismissButton = false,
