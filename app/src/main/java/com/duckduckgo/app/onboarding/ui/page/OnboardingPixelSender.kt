@@ -80,8 +80,7 @@ sealed interface OnboardingPixelAction {
 }
 
 /**
- * What the user did on an import-error surface: Continue on the terminal failure screen, or Retry /
- * Cancel on the retry alert raised by a transient failure.
+ * What the user did on an import-error surface
  */
 enum class PasswordImportErrorAction {
     CONTINUE,

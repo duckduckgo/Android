@@ -952,8 +952,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                         Advance
                     }
 
-                    // The retry alert is raised over this step, so its actions land here rather than on the
-                    // launch step that triggered them, and belong to the error pixel, not this card's CTAs.
                     is NewUserOnboardingEvent.PasswordImportErrorRetryRequested -> {
                         onboardingPixelSender.fire(
                             OnboardingPixelName.ONBOARDING_PASSWORD_IMPORT_ERROR,
@@ -991,7 +989,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                             Advance
                         }
 
-                        // The web flow is self-contained and reports its own abandonment; nothing to add here.
                         PasswordImportOutcome.CANCELLED -> GoBack
 
                         // Back to the import card so its Import/Skip actions stay live: the retry alert is
@@ -1030,9 +1027,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             resolveDialog = { NewUserOnboardingActivityDialog.ImportComplete(result = ctx.passwordImportResult) },
             transition = { event ->
                 when (event) {
-                    // No shown pixel of its own: which of the two outcome pixels this screen reports is only
-                    // known once the outcome is, which is either already the case on presentation or arrives
-                    // with the parsed result while the screen sits in its parsing state.
                     is NewUserOnboardingEvent.Presented -> {
                         (ctx.passwordImportResult as? PasswordImportResult.Terminal)?.let { fireImportOutcomeShown(it) }
                         Stay
