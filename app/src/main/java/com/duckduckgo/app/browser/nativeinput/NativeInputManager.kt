@@ -1277,7 +1277,7 @@ class RealNativeInputManager @Inject constructor(
                 isBottom = isBottom,
                 forceImageGeneration = forceImageGeneration,
             )
-            bindTextSelections(tabId, textSelection)
+            textSelection?.let { bindTextSelections(tabId, it) }
         }
 
         applyWindowChrome(widgetView, isBottom)
