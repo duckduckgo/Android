@@ -8324,6 +8324,39 @@
     return { result };
   }
 
+  // src/features/broker-protection/actions/execute-script.js
+  init_define_import_meta_trackerLookup();
+  async function executeScript(action, userProfile, root) {
+    if (typeof action.script !== "string" || !action.script.trim()) {
+      return new ErrorResponse({
+        actionID: action.id,
+        message: "executeScript failed: Error: No script provided to executeScript action"
+      });
+    }
+    try {
+      const fn = new Function("userProfile", "root", action.script);
+      await fn(userProfile, root);
+      return new SuccessResponse({ actionID: action.id, actionType: action.actionType, response: null });
+    } catch (e) {
+      return new ErrorResponse({ actionID: action.id, message: formatScriptError(e) });
+    }
+  }
+  function formatScriptError(error) {
+    let name = "Error";
+    let message = "Unknown error";
+    try {
+      if (error !== null && typeof error === "object" && "message" in error) {
+        const errorName = "name" in error ? error.name : void 0;
+        if (typeof errorName === "string" && errorName) name = errorName;
+        message = String(error.message);
+      } else {
+        message = String(error);
+      }
+    } catch {
+    }
+    return `executeScript failed: ${name}: ${message}`.replace(/[\u0000-\u001f\u007f-\u009f\u2028\u2029]/g, "").slice(0, 500);
+  }
+
   // src/features/broker-protection/actions/expectation.js
   init_define_import_meta_trackerLookup();
 
@@ -9361,6 +9394,8 @@
           return condition(action, root);
         case "scroll":
           return scroll(action, root);
+        case "executeScript":
+          return await executeScript(action, data(action, inputData, "userProfile"), root);
         default: {
           return new ErrorResponse({
             actionID: action.id,
