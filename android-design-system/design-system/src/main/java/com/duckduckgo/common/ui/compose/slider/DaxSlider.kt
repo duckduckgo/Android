@@ -61,7 +61,7 @@ import com.duckduckgo.mobile.android.R
  * @param onValueChangeFinished callback invoked when the drag gesture ends, for committing the settled value
  * @param interactionSource the [MutableInteractionSource] representing the stream of interactions for this slider
  *
- * Asana Task: https://app.asana.com/1/137249556945/project/1207418217763355/task/1211670072079719?focus=true
+ * Asana Task: https://app.asana.com/1/137249556945/project/1202857801505092/task/1218311474562583?focus=true
  * Figma reference: https://www.figma.com/design/BOHDESHODUXK7wSRNBOHdu/%F0%9F%A4%96-Android-Components?node-id=3116-4290&m=dev
  */
 @Composable
