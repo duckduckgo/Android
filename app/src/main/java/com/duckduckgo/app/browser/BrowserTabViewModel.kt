@@ -5836,6 +5836,21 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    fun onDuckChatSidebarButtonPressed() {
+        if (duckAiFeatureState.nativeDuckAiSidebar.value) {
+            openDuckChatHistory()
+        } else {
+            openDuckChatSidebar()
+        }
+    }
+
+    fun openDuckChatSidebar() {
+        viewModelScope.launch {
+            val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.SIDEBAR)
+            _subscriptionEventDataChannel.send(subscriptionEvent)
+        }
+    }
+
     fun openDuckChatHistory() {
         if (currentBrowserViewState().showDuckChatHistoryOption) {
             command.value = Command.LaunchDuckChatHistory
