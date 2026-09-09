@@ -111,7 +111,7 @@ class DuckDuckGoWebView :
         super.startActionMode(decorate(callback), type)
 
     private fun decorate(callback: ActionMode.Callback?): ActionMode.Callback? =
-        if (::duckAiTextSelectionDecorator.isInitialized) duckAiTextSelectionDecorator.decorate(callback) else callback
+        if (::duckAiTextSelectionDecorator.isInitialized) duckAiTextSelectionDecorator.decorate(callback, pageUrl = url) else callback
 
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)

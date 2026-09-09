@@ -21,24 +21,29 @@ import android.view.ActionMode
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import androidx.core.net.toUri
 import androidx.core.view.children
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiTextSelectionDecorator
+import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
-class RealDuckAiTextSelectionDecorator @Inject constructor() : DuckAiTextSelectionDecorator {
+class RealDuckAiTextSelectionDecorator @Inject constructor(
+    private val duckChatInternal: DuckChatInternal,
+) : DuckAiTextSelectionDecorator {
 
-    override fun decorate(callback: ActionMode.Callback?): ActionMode.Callback? {
+    override fun decorate(callback: ActionMode.Callback?, pageUrl: String?): ActionMode.Callback? {
         if (callback == null) return null
+        val hideAskDuckAi = pageUrl != null && duckChatInternal.isDuckChatUrl(pageUrl.toUri())
         return object : ActionMode.Callback2() {
             override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean = callback.onCreateActionMode(mode, menu)
 
             override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
                 val isPrepared = callback.onPrepareActionMode(mode, menu)
-                menu?.promoteAskDuckAi()
+                menu?.decorateWithDuckAi(isHidden = hideAskDuckAi)
                 return isPrepared
             }
 
@@ -60,10 +65,11 @@ class RealDuckAiTextSelectionDecorator @Inject constructor() : DuckAiTextSelecti
         }
     }
 
-    private fun Menu.promoteAskDuckAi() {
+    private fun Menu.decorateWithDuckAi(isHidden: Boolean) {
         if (findItem(R.id.askDuckAi) != null) return
         val processText = children.firstOrNull { it.intent?.component?.className == SELECTED_TEXT_ACTIVITY } ?: return
         processText.isVisible = false
+        if (isHidden) return
         add(processText.groupId, R.id.askDuckAi, FIRST_ITEM, processText.title)
             .setIntent(processText.intent)
             .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
