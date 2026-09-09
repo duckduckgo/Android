@@ -23,6 +23,7 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import com.duckduckgo.mobile.android.R as CommonR
 
 class ImportPasswordsDesktopAppPromotionParamsTest {
 
@@ -50,6 +51,13 @@ class ImportPasswordsDesktopAppPromotionParamsTest {
         val params = ImportPasswordsDesktopAppPromotionParams.create(contextMock)
 
         assertFalse(params.showDismissButton)
+    }
+
+    @Test
+    fun whenLaunchedThenUsesThe96DpAppDownloadIllustration() {
+        val params = ImportPasswordsDesktopAppPromotionParams.create(contextMock)
+
+        assertEquals(CommonR.drawable.laptop_ddginstall_96, params.illustration)
     }
 
     @Test
