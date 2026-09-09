@@ -295,7 +295,6 @@ import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
-import com.duckduckgo.app.onboarding.OnboardingInputScreenLaunchTarget
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.SegmentedOnboardingPath
 import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
@@ -390,6 +389,7 @@ import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
+import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.contextual.PageContextJSHelper
 import com.duckduckgo.duckchat.impl.contextual.RealPageContextJSHelper.Companion.PAGE_CONTEXT_FEATURE_NAME
@@ -606,7 +606,7 @@ class BrowserTabViewModel @Inject constructor(
     private val onboardingStore: OnboardingStore,
     private val autocompleteHistoryDeleteFeature: AutocompleteHistoryDeleteFeature,
     private val customAiOnboardingStore: CustomAiOnboardingStore,
-    private val onboardingInputScreenLaunchTarget: OnboardingInputScreenLaunchTarget,
+    private val inputScreenLaunchTarget: InputScreenLaunchTarget,
     private val browserMode: BrowserMode,
     private val desktopModeSettings: DesktopModeSettings,
     private val rememberDesktopModeFeature: RememberDesktopModeFeature,
@@ -3915,10 +3915,16 @@ class BrowserTabViewModel @Inject constructor(
         currentGlobalLayoutState() is Browser && !currentBrowserViewState().maliciousSiteBlocked
 
     private fun showOrHideKeyboard(cta: Cta?, reportLandingFocus: Boolean = true) {
-        val shouldHideKeyboard = cta?.shouldDropAddressBarFocusWhenShown() == true ||
-            duckAiFeatureState.showInputScreen.value ||
-            currentBrowserViewState().lastQueryOrigin == QueryOrigin.FromBookmark ||
-            (settingsDataStore.omnibarType == OmnibarType.SPLIT && alreadyShownKeyboard)
+        // A pending launch target (e.g. the "New Search" menu action) wants this tab to land with its
+        // input screen already surfaced, so force focus regardless of the usual drop rules. Peek only —
+        // the target is consumed when the input screen actually opens.
+        val forceInputScreen = inputScreenLaunchTarget.peekInitialInputMode() != null
+        val shouldHideKeyboard = !forceInputScreen && (
+            cta?.shouldDropAddressBarFocusWhenShown() == true ||
+                duckAiFeatureState.showInputScreen.value ||
+                currentBrowserViewState().lastQueryOrigin == QueryOrigin.FromBookmark ||
+                (settingsDataStore.omnibarType == OmnibarType.SPLIT && alreadyShownKeyboard)
+            )
 
         logcat { "shouldHideKeyboard: $shouldHideKeyboard" }
 
@@ -5572,7 +5578,7 @@ class BrowserTabViewModel @Inject constructor(
                     viewModelScope.launch {
                         ctaViewState.value = currentCtaViewState().copy(cta = null)
                         command.value = HideOnboardingDaxBubbleCta(cta)
-                        onboardingInputScreenLaunchTarget.setOpenOnDuckAi()
+                        inputScreenLaunchTarget.setInitialInputMode(InputMode.DUCK_AI)
                         command.value = ShowKeyboard
                     }
                 } else {
