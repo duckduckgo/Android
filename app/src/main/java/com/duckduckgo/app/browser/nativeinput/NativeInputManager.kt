@@ -150,6 +150,7 @@ interface NativeInputManager {
         initialInputMode: InputMode? = null,
         forceImageGeneration: Boolean = false,
         textSelection: String? = null,
+        textSelectionUrl: String? = null,
     )
 
     fun hideNativeInput(animate: Boolean = true, isNavigation: Boolean = false): Boolean
@@ -591,6 +592,7 @@ class RealNativeInputManager @Inject constructor(
         initialInputMode: InputMode?,
         forceImageGeneration: Boolean,
         textSelection: String?,
+        textSelectionUrl: String?,
     ) {
         if (!isNativeInputFieldEnabled) return
 
@@ -660,7 +662,7 @@ class RealNativeInputManager @Inject constructor(
             }
         }
         bindUrlCaching(widgetView)
-        attachWidget(widgetView, navBarView, isBottom, tabId, forceImageGeneration, textSelection)
+        attachWidget(widgetView, navBarView, isBottom, tabId, forceImageGeneration, textSelection, textSelectionUrl)
         // Bottom omnibar: slide the nav bar in with open. Top omnibar: snap the bar so the enter
         // morph can run from the omnibar while the buttons appear without animating — a concurrent
         // top slide fights that morph (and was only needed for bottom chrome).
@@ -1243,6 +1245,7 @@ class RealNativeInputManager @Inject constructor(
         tabId: String,
         forceImageGeneration: Boolean,
         textSelection: String?,
+        textSelectionUrl: String?,
     ) {
         // Inflated from a ?attr/actionBarSize height, so layoutParams carries the resolved nav bar height.
         val navBarHeightPx = navBarView?.layoutParams?.height?.takeIf { it > 0 } ?: 0
@@ -1277,7 +1280,7 @@ class RealNativeInputManager @Inject constructor(
                 isBottom = isBottom,
                 forceImageGeneration = forceImageGeneration,
             )
-            bindTextSelections(tabId, textSelection)
+            bindTextSelections(tabId, textSelection, textSelectionUrl.orEmpty())
         }
 
         applyWindowChrome(widgetView, isBottom)

@@ -26,7 +26,7 @@ import org.json.JSONObject
 import javax.inject.Inject
 
 interface TextSelectionPayloadBuilder {
-    fun toJson(selections: List<TextSelection>, url: String): JSONArray?
+    fun toJson(selections: List<TextSelection>): JSONArray?
 
     companion object {
         const val MAX_CONTENT_LENGTH = 9500
@@ -39,28 +39,24 @@ class RealTextSelectionPayloadBuilder @Inject constructor(
     private val context: Context,
 ) : TextSelectionPayloadBuilder {
 
-    override fun toJson(
-        selections: List<TextSelection>,
-        url: String,
-    ): JSONArray? {
+    override fun toJson(selections: List<TextSelection>): JSONArray? {
         val title = context.getString(R.string.duckAiTextSelectionAttachmentTitle)
         if (selections.isEmpty()) return null
         return JSONArray().apply {
-            selections.forEach { selection -> put(toJson(selection, title, url)) }
+            selections.forEach { selection -> put(toJson(selection, title)) }
         }
     }
 
     private fun toJson(
         selection: TextSelection,
         title: String,
-        url: String,
     ): JSONObject {
         val truncated = selection.text.length > TextSelectionPayloadBuilder.MAX_CONTENT_LENGTH
         return JSONObject().apply {
             put("id", selection.id)
             put("title", title)
             put("favicon", JSONArray())
-            put("url", url)
+            put("url", selection.url)
             put("content", if (truncated) selection.text.take(TextSelectionPayloadBuilder.MAX_CONTENT_LENGTH) else selection.text)
             put("truncated", truncated)
             put("fullContentLength", selection.text.length)
