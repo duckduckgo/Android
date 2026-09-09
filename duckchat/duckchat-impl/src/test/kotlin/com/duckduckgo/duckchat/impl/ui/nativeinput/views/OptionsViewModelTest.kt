@@ -38,8 +38,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -81,12 +81,15 @@ class OptionsViewModelTest {
     private val modelManager: DuckAiModelManager = mock<DuckAiModelManager>().also {
         whenever(it.modelState).thenReturn(modelStateFlow)
     }
-    private val effectiveModelId = MutableStateFlow<String?>(null)
+    private val effectiveModel = MutableStateFlow<EffectiveModel>(EffectiveModel.Unresolved)
     private val effectiveModelProvider = object : EffectiveModelProvider {
-        override val effectiveModel: Flow<EffectiveModel> =
-            this@OptionsViewModelTest.effectiveModelId.map { EffectiveModel.Resolved(it) }
+        override val effectiveModel: Flow<EffectiveModel> = this@OptionsViewModelTest.effectiveModel
         override fun onRecoveryModelPicked(chatId: String?, modelId: String) = Unit
         override fun clearRecoveryModelPick(chatId: String?) = Unit
+    }
+
+    private fun givenEffectiveModel(modelId: String?, chatId: String? = null) {
+        effectiveModel.value = EffectiveModel.Resolved(chatId = chatId, modelId = modelId)
     }
     private lateinit var testee: OptionsViewModel
 
@@ -174,7 +177,7 @@ class OptionsViewModelTest {
         store.publish(tabId, NativeInputState.zero().copy(selectedTool = Tool.WEB_SEARCH.rawValue))
         selectedTabFlow.value = tabEntity(tabId)
         givenModels(model("m1", supportedTools = listOf(Tool.WEB_SEARCH)))
-        effectiveModelId.value = "m1"
+        givenEffectiveModel("m1")
         advanceUntilIdle()
         assertEquals(Tool.WEB_SEARCH, testee.selectedTool.value)
 
@@ -187,8 +190,9 @@ class OptionsViewModelTest {
 
     @Test
     fun whenEffectiveModelSupportsOneToolThenOnlyThatToolIsVisible() = runTest {
+        givenSelectedTab()
         givenModels(model("m1", supportedTools = listOf(Tool.WEB_SEARCH)))
-        effectiveModelId.value = "m1"
+        givenEffectiveModel("m1")
         advanceUntilIdle()
 
         assertEquals(setOf(Tool.WEB_SEARCH), testee.visibleTools.value)
@@ -196,8 +200,9 @@ class OptionsViewModelTest {
 
     @Test
     fun whenEffectiveModelIsUnknownThenAllToolsAreVisible() = runTest {
+        givenSelectedTab()
         givenModels(model("m1", supportedTools = listOf(Tool.WEB_SEARCH)))
-        effectiveModelId.value = "not-in-the-list"
+        givenEffectiveModel("not-in-the-list")
         advanceUntilIdle()
 
         assertEquals(Tool.entries.toSet(), testee.visibleTools.value)
@@ -205,15 +210,16 @@ class OptionsViewModelTest {
 
     @Test
     fun whenEffectiveModelChangesThenVisibleToolsFollowIt() = runTest {
+        givenSelectedTab()
         givenModels(
             model("m1", supportedTools = listOf(Tool.WEB_SEARCH)),
             model("m2", supportedTools = Tool.entries),
         )
-        effectiveModelId.value = "m1"
+        givenEffectiveModel("m1")
         advanceUntilIdle()
         assertEquals(setOf(Tool.WEB_SEARCH), testee.visibleTools.value)
 
-        effectiveModelId.value = "m2"
+        givenEffectiveModel("m2")
         advanceUntilIdle()
 
         assertEquals(Tool.entries.toSet(), testee.visibleTools.value)
@@ -294,6 +300,44 @@ class OptionsViewModelTest {
 
         // Tab A's own chat supports web search, so nothing may clear it while its model resolves.
         assertTrue(cleared.isEmpty())
+    }
+
+    @Test
+    fun whenTheModelWasResolvedForAnotherChatThenNothingIsClearedAndEveryToolStaysVisible() = runTest {
+        givenModels(
+            model("with-web-search", supportedTools = listOf(Tool.WEB_SEARCH)),
+            model("no-web-search", supportedTools = listOf(Tool.IMAGE_GENERATION)),
+        )
+        store.publish("tab-A", NativeInputState.zero().copy(chatId = "chat-A", selectedTool = Tool.WEB_SEARCH.rawValue))
+        selectedTabFlow.value = tabEntity("tab-A")
+        // The previous tab's answer, still in flight when this tab's state arrives.
+        givenEffectiveModel(modelId = "no-web-search", chatId = "chat-B")
+        advanceUntilIdle()
+
+        val cleared = mutableListOf<Unit>()
+        val job = launch { testee.toolSelectionCleared.collect { cleared += it } }
+        advanceUntilIdle()
+        job.cancel()
+
+        assertTrue(cleared.isEmpty())
+        assertEquals(Tool.entries.toSet(), testee.visibleTools.value)
+    }
+
+    @Test
+    fun whenTheTabsOwnModelDropsTheSelectedToolThenItIsCleared() = runTest {
+        givenModels(model("no-web-search", supportedTools = listOf(Tool.IMAGE_GENERATION)))
+        store.publish("tab-A", NativeInputState.zero().copy(chatId = "chat-A", selectedTool = Tool.WEB_SEARCH.rawValue))
+        selectedTabFlow.value = tabEntity("tab-A")
+        givenEffectiveModel(modelId = "no-web-search", chatId = "chat-A")
+        advanceUntilIdle()
+
+        assertEquals(Unit, testee.toolSelectionCleared.first())
+    }
+
+    private fun TestScope.givenSelectedTab(tabId: String = "tab-X", state: NativeInputState = NativeInputState.zero()) {
+        store.publish(tabId, state)
+        selectedTabFlow.value = tabEntity(tabId)
+        advanceUntilIdle()
     }
 
     private fun tabEntity(tabId: String): TabEntity = TabEntity(tabId = tabId, position = 0)
