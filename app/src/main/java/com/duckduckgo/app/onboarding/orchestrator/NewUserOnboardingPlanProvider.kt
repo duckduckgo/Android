@@ -17,6 +17,7 @@
 package com.duckduckgo.app.onboarding.orchestrator
 
 import androidx.annotation.StringRes
+import com.duckduckgo.app.browser.InputScreenLaunchTarget
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.omnibar.OmnibarType
@@ -29,7 +30,6 @@ import com.duckduckgo.app.onboarding.CustomAiOnboardingPixelName
 import com.duckduckgo.app.onboarding.CustomAiOnboardingResolver
 import com.duckduckgo.app.onboarding.DuckAiOnboardingAvailability
 import com.duckduckgo.app.onboarding.DuckAiOnboardingDemo
-import com.duckduckgo.app.onboarding.OnboardingInputScreenLaunchTarget
 import com.duckduckgo.app.onboarding.OnboardingPasswordImportExperimentManager
 import com.duckduckgo.app.onboarding.OnboardingPasswordImportExperimentManager.OnboardingPasswordImportVariant
 import com.duckduckgo.app.onboarding.OnboardingPreference
@@ -66,6 +66,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.impl.wideevents.InputScreenOnboardingWideEvent
 import com.duckduckgo.onboarding.api.LinearOnboardingEvent
 import com.duckduckgo.onboarding.api.LinearOnboardingPlan
@@ -112,7 +113,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     private val pixel: Pixel,
     private val dispatchers: DispatcherProvider,
     private val dismissedCtaDao: DismissedCtaDao,
-    private val onboardingInputScreenLaunchTarget: OnboardingInputScreenLaunchTarget,
+    private val inputScreenLaunchTarget: InputScreenLaunchTarget,
     private val customAiOnboardingResolver: CustomAiOnboardingResolver,
     private val duckAiOnboardingDemo: DuckAiOnboardingDemo,
     private val onboardingPromptsExperimentManager: OnboardingPromptsExperimentManager,
@@ -243,7 +244,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         }
         val markInputToLaunchOnChat = {
             // The custom-AI flow always finishes on the Duck.ai (chat) tab
-            onboardingInputScreenLaunchTarget.setOpenOnDuckAi()
+            inputScreenLaunchTarget.setInitialInputMode(InputMode.DUCK_AI)
         }
         val onCompleted = suspend {
             dismissDuckAiFireCta()
@@ -612,7 +613,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         togglePositionChoice: OnboardingSingleChoiceDataPlugin?,
     ): LinearOnboardingPlan {
         applyInputModeSelection(ctx, withAi = true, fireTelemetry = false)
-        ctx.onFinish { onboardingInputScreenLaunchTarget.setOpenOnDuckAi() }
+        ctx.onFinish { inputScreenLaunchTarget.setInitialInputMode(InputMode.DUCK_AI) }
         return sidePlan(
             id = SEGMENTED_AI_PLAN_ID,
             steps = listOf(

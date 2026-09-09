@@ -227,7 +227,6 @@ import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.global.view.NonDismissibleBehavior
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.renderIfChanged
-import com.duckduckgo.app.onboarding.OnboardingInputScreenLaunchTarget
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.BrowserModeSwitchSource
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -713,7 +712,7 @@ class BrowserTabFragment :
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     @Inject
-    lateinit var onboardingInputScreenLaunchTarget: OnboardingInputScreenLaunchTarget
+    lateinit var inputScreenLaunchTarget: InputScreenLaunchTarget
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -844,6 +843,11 @@ class BrowserTabFragment :
                 // TODO wire up "New Image" action; entry only shown when nativeDuckAiSidebar is enabled.
             }
             onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewTab)) {
+                // With the native sidebar this entry is relabelled "New Search": open the new tab
+                // with its input screen surfaced on the Search tab.
+                if (duckAiFeatureState.nativeDuckAiSidebar.value) {
+                    inputScreenLaunchTarget.setInitialInputMode(InputMode.SEARCH)
+                }
                 viewModel.recordPendingNewTabOpenedExit()
                 browserActivity?.launchNewTab(browserMode = BrowserMode.REGULAR)
             }
@@ -1410,11 +1414,7 @@ class BrowserTabFragment :
             tabs = viewModel.tabs,
             currentTabUrl = viewModel.siteLiveData.asFlow().map { it?.url },
             query = query,
-            initialInputMode = if (onboardingInputScreenLaunchTarget.consumeOpenOnDuckAi()) {
-                InputMode.DUCK_AI
-            } else {
-                null
-            },
+            initialInputMode = inputScreenLaunchTarget.consumeInitialInputMode(),
             callbacks = NativeInputCallbacks(
                 onSearchTextChanged = { text -> onUserEnteredText(text) },
                 onClearAutocomplete = {
