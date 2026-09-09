@@ -63,6 +63,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -70,6 +71,7 @@ import org.robolectric.Robolectric
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.shadows.ShadowDialog
 import com.duckduckgo.mobile.android.R as CommonR
+import com.google.android.material.R as MaterialR
 
 @RunWith(AndroidJUnit4::class)
 class SitePermissionsDialogActivityLauncherTest {
@@ -347,7 +349,8 @@ class SitePermissionsDialogActivityLauncherTest {
         sitePermissionsDialogRedesignFeature.self().setRawStoredState(Toggle.State(redesignEnabled))
         whenever(systemPermissionsHelper.hasCameraPermissionsGranted()).thenReturn(true)
 
-        val activity = Robolectric.buildActivity(ThemedActivity::class.java).setup().get()
+        activity = Robolectric.buildActivity(ThemedActivity::class.java).setup().get()
+        testee.registerPermissionLauncher(activity)
         val request: PermissionRequest = mock()
         whenever(request.resources).thenReturn(arrayOf(PermissionRequest.RESOURCE_VIDEO_CAPTURE))
         whenever(request.origin).thenReturn(Uri.parse(requestUrl))
@@ -368,6 +371,7 @@ class SitePermissionsDialogActivityLauncherTest {
     }
 
     private lateinit var request: PermissionRequest
+    private lateinit var activity: ThemedActivity
 
     private fun AlertDialog.tieredButtons() =
         findViewById<LinearLayout>(CommonR.id.stackedAlertDialogButtonLayout)!!
@@ -881,6 +885,72 @@ class SitePermissionsDialogActivityLauncherTest {
         val dialog = showCameraDialog(pageUrl = THIRD_PARTY_PAGE, redesignEnabled = false)
 
         assertNotNull(dialog.findViewById<TextView>(CommonR.id.textAlertDialogMessage))
+    }
+
+    private fun denyOsPermissionAfter(
+        tier: Int,
+        rejectedForever: Boolean,
+    ): AlertDialog? {
+        val dialog = showCameraDialog()
+
+        // showCameraDialog leaves the OS permission granted, so revoke it only once the prompt is up.
+        whenever(systemPermissionsHelper.hasCameraPermissionsGranted()).thenReturn(false)
+        whenever(systemPermissionsHelper.isPermissionsRejectedForever(any())).thenReturn(rejectedForever)
+        dialog.tieredButtons().getChildAt(tier).performClick()
+        shadowOf(Looper.getMainLooper()).idle()
+
+        val captor = argumentCaptor<(Boolean) -> Unit>()
+        verify(systemPermissionsHelper).registerPermissionLaunchers(any(), captor.capture(), any())
+        captor.firstValue.invoke(false)
+        shadowOf(Looper.getMainLooper()).idle()
+
+        return ShadowDialog.getLatestDialog() as? AlertDialog
+    }
+
+    @Test
+    fun whenSystemPermissionRejectedForeverThenReminderDialogUsesTheStackedComponent() {
+        val dialog = denyOsPermissionAfter(tier = 0, rejectedForever = true)!!
+
+        val buttons = dialog.findViewById<LinearLayout>(CommonR.id.stackedAlertDialogButtonLayout)!!
+        assertEquals(2, buttons.childCount)
+        assertEquals(
+            dialog.context.getString(R.string.sitePermissionsDialogChangePermissionsButton),
+            (buttons.getChildAt(0) as Button).text,
+        )
+        assertEquals(
+            dialog.context.getString(R.string.sitePermissionsTieredSystemDeniedCameraTitle),
+            dialog.findViewById<TextView>(CommonR.id.stackedAlertDialogTitle)!!.text,
+        )
+    }
+
+    @Test
+    fun whenReminderDialogIsDismissedThenRequestStaysDeniedWithoutPersisting() {
+        val dialog = denyOsPermissionAfter(tier = 1, rejectedForever = true)!!
+
+        dialog.cancel()
+        shadowOf(Looper.getMainLooper()).idle()
+
+        assertTrue(shadowOf(dialog).isCancelable)
+        verify(request).deny()
+        verify(sitePermissionsRepository, never()).sitePermissionPermanentlySaved(any(), any(), any())
+    }
+
+    @Test
+    fun whenSystemPermissionDeniedOnceThenAllowingFromSnackbarKeepsTheStandingGrant() {
+        denyOsPermissionAfter(tier = 0, rejectedForever = false)
+
+        whenever(systemPermissionsHelper.hasCameraPermissionsGranted()).thenReturn(true)
+        val action = activity.window.decorView.findViewById<Button>(MaterialR.id.snackbar_action)
+        assertNotNull(action)
+        action.performClick()
+        shadowOf(Looper.getMainLooper()).idle()
+
+        verify(sitePermissionsRepository).sitePermissionPermanentlySaved(
+            "https://example.com",
+            PermissionRequest.RESOURCE_VIDEO_CAPTURE,
+            ALLOW_ALWAYS,
+        )
+        verify(sitePermissionsRepository, never()).sitePermissionGranted(any(), any(), any())
     }
 
     companion object {
