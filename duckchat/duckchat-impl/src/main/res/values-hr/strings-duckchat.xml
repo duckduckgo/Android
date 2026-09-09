@@ -352,4 +352,25 @@
     <string name="duckChatContextualAskAboutPage">Pitaj o stranici</string>
     <string name="duckChatContextualAskAboutSearch">Nastavi u Duck.ai</string>
     <string name="duckChatContextualOpenDuckAi">Otvori Duck.ai</string>
+
+    <!-- Suggested prompts for text selection -->
+    <string name="duckAiSuggestionSummarizeSelectionLabel">Sažmi ovaj odabir</string>
+    <string name="duckAiSuggestionSummarizeSelectionPrompt">Sažmi ovaj odabir.</string>
+    <string name="duckAiSuggestionTranslateSelectionLabel">Prevedi ovaj odabir</string>
+    <string name="duckAiSuggestionTranslateSelectionPrompt" instruction="%1$s is replaced with the name of the user&apos;s language.">Prevedi ovaj odabir na %1$s.</string>
+
+    <!-- Name shown for an attached text selection in the Duck.ai -->
+    <string name="duckAiTextSelectionAttachmentTitle">Odabir teksta</string>
+    <string name="duckAiTextSelectionLimitReached" instruction="%1$d is replaced with the maximum number of text selections.">Možeš dodati do %1$d odabira teksta. Ukloni jedan da dodaš drugi.</string>
+
+    <!-- Duck.ai text selection menu action -->
+    <string name="duckAiTextSelectionMenuItem">Pitaj Duck.ai</string>
+
+    <!-- Prefix on the Duck.ai attachment chip for a text selection -->
+    <plurals name="duckAiTextSelectionWordCount">
+        <item quantity="one">%1$d riječ</item>
+        <item quantity="few">%1$d riječi</item>
+        <item quantity="many">%1$d riječi</item>
+        <item quantity="other">%1$d riječi</item>
+    </plurals>
 </resources>
