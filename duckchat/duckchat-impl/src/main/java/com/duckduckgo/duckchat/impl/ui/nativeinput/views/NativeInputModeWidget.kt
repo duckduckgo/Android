@@ -194,7 +194,7 @@ interface NativeInputWidget {
     fun setWidgetPosition(isBottom: Boolean)
     fun setWidgetRootView(view: View)
 
-    fun bindTextSelections(tabId: String, textSelection: String?)
+    fun bindTextSelections(tabId: String, textSelection: String?, url: String = "")
     fun getTextSelectionsJson(): JSONArray?
 
     /**
@@ -396,6 +396,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var pendingPageContext: PageContextAttachment? = null
     private var pendingTextSelectionsTabId: String? = null
     private var pendingTextSelection: String? = null
+    private var pendingTextSelectionUrl: String = ""
 
     // adoptEditAttachments() can be called (from EditPromptActivity.onCreate) before the widget is
     // attached, when the attachment ViewModel cannot be resolved yet, so the values are held here and
@@ -1612,11 +1613,12 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun getPageContext(): PageContextAttachment? = attachmentViewModel?.getPageContext()
 
-    override fun bindTextSelections(tabId: String, textSelection: String?) {
+    override fun bindTextSelections(tabId: String, textSelection: String?, url: String) {
         pendingTextSelectionsTabId = tabId
         pendingTextSelection = textSelection
+        pendingTextSelectionUrl = url
         attachmentViewModel?.let { vm ->
-            vm.bindTextSelections(tabId, textSelection)
+            vm.bindTextSelections(tabId, textSelection, url)
             pendingTextSelection = null
         }
     }
@@ -1688,7 +1690,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private fun applyPendingAttachmentState() {
         val viewModel = attachmentViewModel ?: return
         pendingPageContext?.let { viewModel.setPageContext(it) }
-        pendingTextSelectionsTabId?.let { bindTextSelections(it, pendingTextSelection) }
+        pendingTextSelectionsTabId?.let { bindTextSelections(it, pendingTextSelection, pendingTextSelectionUrl) }
         if (hasPendingAdoptedAttachments(pendingAdoptedImages, pendingAdoptedFiles)) {
             viewModel.adopt(pendingAdoptedImages, pendingAdoptedFiles)
         }

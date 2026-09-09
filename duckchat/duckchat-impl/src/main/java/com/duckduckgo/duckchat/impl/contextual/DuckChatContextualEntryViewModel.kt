@@ -154,18 +154,12 @@ class DuckChatContextualEntryViewModel @Inject constructor(
                 tabId = tabId,
                 prompt = prompt,
                 serializedPageContext = _viewState.value.attachedContext?.serialized,
-                selectionsJson = selectionPayloadBuilder.toJson(selections = selections, url = pageUrl()),
+                selectionsJson = selectionPayloadBuilder.toJson(selections),
             ),
         )
         duckChatPixels.reportContextualFloatingInputPromotedToSheet()
         commandChannel.trySend(Command.HandOffToSheet)
     }
-
-    private fun pageUrl(): String =
-        latestValidPageContext
-            ?.let { runCatching { JSONObject(it) }.getOrNull() }
-            ?.optString("url")
-            .orEmpty()
 
     private fun hasTextSelections(): Boolean = textSelectionStore.selections(tabId).value.isNotEmpty()
 
