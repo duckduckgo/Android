@@ -1420,6 +1420,7 @@ class BrowserTabFragment :
             initialInputMode = viewModel.consumeInitialInputMode(),
             forceImageGeneration = forceImageGeneration,
             textSelection = textSelection,
+            textSelectionUrl = webView?.url,
             callbacks = NativeInputCallbacks(
                 onSearchTextChanged = { text -> onUserEnteredText(text) },
                 onClearAutocomplete = {

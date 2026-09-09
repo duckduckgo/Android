@@ -298,7 +298,7 @@ class DuckChatContextualEntryViewModelTest {
     @Test
     fun whenTextSelectionAttachedThenPageContextNotAttached() = runTest {
         viewModel.start("tab-1")
-        textSelectionStore.add("tab-1", "selected words")
+        textSelectionStore.add("tab-1", "selected words", "https://example.com")
 
         viewModel.onPageContextReceived(validContext)
 
@@ -309,8 +309,8 @@ class DuckChatContextualEntryViewModelTest {
     fun whenPromptSubmittedWithTextSelectionsThenSelectionsSentOnOwnKeyAndCleared() = runTest {
         viewModel.start("tab-1")
         viewModel.onPageContextReceived(validContext)
-        textSelectionStore.add("tab-1", "first selection")
-        textSelectionStore.add("tab-1", "second selection")
+        textSelectionStore.add("tab-1", "first selection", "https://example.com")
+        textSelectionStore.add("tab-1", "second selection", "https://example.com")
 
         viewModel.commands.test {
             viewModel.onPromptSubmitted(samplePrompt)
@@ -347,10 +347,28 @@ class DuckChatContextualEntryViewModelTest {
     }
 
     @Test
+    fun whenSelectionsComeFromDifferentPagesThenEachCarriesItsOwnUrl() = runTest {
+        viewModel.start("tab-1")
+        textSelectionStore.add("tab-1", "from imdb", "https://imdb.com")
+        textSelectionStore.add("tab-1", "from wikipedia", "https://wikipedia.org")
+
+        viewModel.commands.test {
+            viewModel.onPromptSubmitted(samplePrompt)
+            assertEquals(DuckChatContextualEntryViewModel.Command.HandOffToSheet, awaitItem())
+        }
+
+        val captor = argumentCaptor<ContextualEntryPrompt>()
+        verify(store).store(captor.capture())
+        val selections = captor.firstValue.selectionsJson!!
+        assertEquals("https://imdb.com", selections.getJSONObject(0).getString("url"))
+        assertEquals("https://wikipedia.org", selections.getJSONObject(1).getString("url"))
+    }
+
+    @Test
     fun whenSelectionExceedsMaxContentLengthThenTruncatedButSizeReported() = runTest {
         val long = "word ".repeat(3000)
         viewModel.start("tab-1")
-        textSelectionStore.add("tab-1", long)
+        textSelectionStore.add("tab-1", long, "https://example.com")
 
         viewModel.commands.test {
             viewModel.onPromptSubmitted(samplePrompt)
@@ -370,15 +388,15 @@ class DuckChatContextualEntryViewModelTest {
     fun whenSelectionsExceedMaxThenExtrasDropped() {
         repeat(
             TextSelectionStore.MAX_SELECTIONS + 2,
-        ) { index -> textSelectionStore.add("tab-1", "selection $index") }
+        ) { index -> textSelectionStore.add("tab-1", "selection $index", "https://example.com") }
 
         assertEquals(TextSelectionStore.MAX_SELECTIONS, textSelectionStore.consume("tab-1").size)
     }
 
     @Test
     fun whenSelectionRemovedThenDroppedFromStore() {
-        textSelectionStore.add("tab-1", "keep me")
-        textSelectionStore.add("tab-1", "remove me")
+        textSelectionStore.add("tab-1", "keep me", "https://example.com")
+        textSelectionStore.add("tab-1", "remove me", "https://example.com")
         val target = textSelectionStore.selections("tab-1").value.last()
 
         textSelectionStore.remove("tab-1", target.id)

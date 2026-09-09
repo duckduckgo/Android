@@ -193,7 +193,7 @@ interface NativeInputWidget {
     fun setWidgetPosition(isBottom: Boolean)
     fun setWidgetRootView(view: View)
 
-    fun bindTextSelections(tabId: String, textSelection: String?)
+    fun bindTextSelections(tabId: String, textSelection: String?, url: String = "")
     fun getTextSelectionsJson(): JSONArray?
 
     /**
@@ -397,6 +397,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var pendingPageContext: PageContextAttachment? = null
     private var pendingTextSelectionsTabId: String? = null
     private var pendingTextSelection: String? = null
+    private var pendingTextSelectionUrl: String = ""
 
     // adoptEditAttachments() can be called (from EditPromptActivity.onCreate) before the widget is
     // attached and the AttachmentView plugin exists, so the values are held here and applied once
@@ -795,7 +796,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
             pluginView.onPageContextRemoved = pendingOnPageContextRemoved
             pluginView.bind(scope, viewModelFactory, nativeInputStateProvider, faviconManager)
             pendingPageContext?.let { pluginView.setPageContext(it) }
-            pendingTextSelectionsTabId?.let { bindTextSelections(it, pendingTextSelection) }
+            pendingTextSelectionsTabId?.let { bindTextSelections(it, pendingTextSelection, pendingTextSelectionUrl) }
             if (hasPendingAdoptedAttachments(pendingAdoptedImages, pendingAdoptedFiles)) {
                 pluginView.adoptAttachments(pendingAdoptedImages, pendingAdoptedFiles)
             }
@@ -1653,11 +1654,12 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun getPageContext(): PageContextAttachment? = attachmentView?.getPageContext()
 
-    override fun bindTextSelections(tabId: String, textSelection: String?) {
+    override fun bindTextSelections(tabId: String, textSelection: String?, url: String) {
         pendingTextSelectionsTabId = tabId
         pendingTextSelection = textSelection
+        pendingTextSelectionUrl = url
         attachmentView?.let { view ->
-            view.bindTextSelections(tabId, textSelection)
+            view.bindTextSelections(tabId, textSelection, url)
             pendingTextSelection = null
         }
     }
