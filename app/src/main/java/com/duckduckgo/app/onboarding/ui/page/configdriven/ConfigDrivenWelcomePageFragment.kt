@@ -372,7 +372,7 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
             .setTitle(R.string.preOnboardingImportErrorTitle)
             .setMessage(R.string.preOnboardingImportErrorBody)
             .setPositiveButton(R.string.preOnboardingImportErrorRetry)
-            .setNegativeButton(R.string.preOnboardingImportErrorCancel)
+            .setNegativeButton(CommonR.string.cancel)
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {

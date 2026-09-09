@@ -996,6 +996,22 @@
     <string name="preOnboardingWidgetPromptPrimaryCta">Pridať miniaplikáciu</string>
     <string name="preOnboardingWidgetPromptSecondaryCta">Preskočiť</string>
 
+    <!-- Pre-onboarding: import passwords -->
+    <string name="preOnboardingImportPasswordsTitle">Importovanie hesiel z Google</string>
+    <string name="preOnboardingImportPasswordsBody">Google ťa môže požiadať, aby si sa prihlásil/-a alebo zadal/-a svoje heslo na potvrdenie.</string>
+    <string name="preOnboardingImportPasswordsPrimaryCta">Importovať z Google</string>
+    <string name="preOnboardingImportCompleteTitle">Import bol dokončený</string>
+    <string name="preOnboardingImportCompleteCta">Pokračovať</string>
+    <string name="preOnboardingImportCompleteParsingTitle">Importovanie hesiel</string>
+    <string name="preOnboardingImportCompleteParsingBody">Bude to trvať len chvíľu.</string>
+    <string name="preOnboardingImportCompleteFailedTitle">Import zlyhal</string>
+    <string name="preOnboardingImportCompleteFailed">Importovanie hesiel zlyhalo</string>
+    <string name="preOnboardingImportCompleteImported" instruction="Placeholder is the number of passwords that were imported.">Počet importovaných hesiel: %1$s</string>
+    <string name="preOnboardingImportCompleteSkipped" instruction="Placeholder is the number of passwords that were not imported.">Preskočené (duplicitné alebo neplatné): %1$s</string>
+    <string name="preOnboardingImportErrorTitle">Vyskytla sa chyba</string>
+    <string name="preOnboardingImportErrorBody">Skús to znova.</string>
+    <string name="preOnboardingImportErrorRetry">Skús to znova</string>
+
     <!-- Pre-onboarding: add to home screen -->
     <string name="preOnboardingDockStepTitle">Pridaj ma do svojho riadku s obľúbenými položkami.</string>
     <string name="preOnboardingAddToDockBody">Nájdi ikonu DuckDuckGo na svojej úvodnej obrazovke. Potom stlač a potiahni na miesto. To je všetko!</string>
