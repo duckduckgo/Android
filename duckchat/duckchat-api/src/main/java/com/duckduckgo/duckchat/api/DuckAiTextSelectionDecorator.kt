@@ -25,8 +25,9 @@ interface DuckAiTextSelectionDecorator {
 
     /**
      * Returns [callback] with "Ask Duck.ai" shown as a primary action rather than an overflow entry.
+     * The action is hidden for Duck.ai tabs.
      *
-     * @param pageUrl the page the text was selected on. The action is hidden for Duck.ai tabs.
+     * @param pageUrl the page the text was selected on.
      */
     fun decorate(callback: ActionMode.Callback?, pageUrl: String?): ActionMode.Callback?
 }
