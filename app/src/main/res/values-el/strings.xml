@@ -960,6 +960,22 @@
     <string name="preOnboardingWidgetPromptPrimaryCta">Προσθήκη μικροεφαρμογής</string>
     <string name="preOnboardingWidgetPromptSecondaryCta">Παράλειψη</string>
 
+    <!-- Pre-onboarding: import passwords -->
+    <string name="preOnboardingImportPasswordsTitle">Εισαγωγή κωδικών πρόσβασης από το Google</string>
+    <string name="preOnboardingImportPasswordsBody">Η Google μπορεί να σου ζητήσει να συνδεθείς ή να εισαγάγεις τον κωδικό πρόσβασής σου για επιβεβαίωση.</string>
+    <string name="preOnboardingImportPasswordsPrimaryCta">Εισαγωγή από το Google</string>
+    <string name="preOnboardingImportCompleteTitle">Η εισαγωγή ολοκληρώθηκε</string>
+    <string name="preOnboardingImportCompleteCta">Συνέχεια</string>
+    <string name="preOnboardingImportCompleteParsingTitle">Γίνεται εισαγωγή κωδικών πρόσβασης</string>
+    <string name="preOnboardingImportCompleteParsingBody">Αυτό θα διαρκέσει ελάχιστο χρόνο.</string>
+    <string name="preOnboardingImportCompleteFailedTitle">Η εισαγωγή απέτυχε</string>
+    <string name="preOnboardingImportCompleteFailed">Η εισαγωγή κωδικού πρόσβασης απέτυχε</string>
+    <string name="preOnboardingImportCompleteImported" instruction="Placeholder is the number of passwords that were imported.">Κωδικοί πρόσβασης που εισήχθησαν: %1$s</string>
+    <string name="preOnboardingImportCompleteSkipped" instruction="Placeholder is the number of passwords that were not imported.">Παραλείφθηκε (διπλότυπο ή μη έγκυρο): %1$s</string>
+    <string name="preOnboardingImportErrorTitle">Κάτι πήγε στραβά</string>
+    <string name="preOnboardingImportErrorBody">Προσπάθησε ξανά.</string>
+    <string name="preOnboardingImportErrorRetry">Προσπάθησε ξανά</string>
+
     <!-- Pre-onboarding: add to home screen -->
     <string name="preOnboardingDockStepTitle">Πρόσθεσέ με στη σειρά των αγαπημένων σου.</string>
     <string name="preOnboardingAddToDockBody">Βρείτε το εικονίδιο DuckDuckGo στην Αρχική οθόνη σας. Στη συνέχεια, πατήστε και μεταφέρετέ το στη θέση του. Αυτό ήταν!</string>

@@ -285,6 +285,13 @@ interface DuckChatFeature {
     fun contextualSheetRedesign(): Toggle
 
     /**
+     * @return `true` when the All Chats entry (and its divider) is shown in the Duck.ai address bar menu.
+     * If the remote feature is not present defaults to `INTERNAL`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun contextualMenuAllChats(): Toggle
+
+    /**
      * @return `true` when the Duck.ai session wide event should be sent
      * If the remote feature is not present defaults to `internal`
      */

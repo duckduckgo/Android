@@ -6726,6 +6726,7 @@ class BrowserTabFragment :
         val activeTabId = viewModel.liveSelectedTab.value?.tabId
         if (!isActiveCustomTab() && tabId != activeTabId) {
             logcat(INFO) { "Will not launch a dialog for an inactive tab" }
+            request.deny()
             return
         }
 

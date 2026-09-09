@@ -6910,6 +6910,20 @@ class BrowserTabViewModelTest {
         }
 
     @Test
+    fun whenLocationRequestedByEmbeddedOriginThenDialogCommandIsStillIssued() =
+        runTest {
+            loadUrl("https://example.com/page", isBrowserShowing = true)
+            val request = LocationPermissionRequest("https://embedded.other.com", mock())
+
+            testee.onSitePermissionRequested(
+                request,
+                SitePermissions(emptyList(), listOf(LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION)),
+            )
+
+            assertCommandIssued<Command.ShowSitePermissionsDialog>()
+        }
+
+    @Test
     fun whenBasicAuthCredentialsInUrlThenStrippedSafely() {
         val testUrls =
             listOf(

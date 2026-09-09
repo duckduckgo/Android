@@ -24,7 +24,6 @@
     <string name="duck_ai_tab_icon_content_description">Duck.ai icon</string>
     <string name="browserMenuChats">Chats</string>
 
-    <string name="chatMenuPopupNewChat">New Chat</string>
     <string name="chatMenuPopupNewVoiceChat">New Voice Chat</string>
     <string name="chatMenuPopupNewTab">New Tab</string>
     <string name="chatMenuPopupNewFireTab">New Fire Tab</string>

@@ -960,6 +960,22 @@
     <string name="preOnboardingWidgetPromptPrimaryCta">Добавяне на приспособлението</string>
     <string name="preOnboardingWidgetPromptSecondaryCta">Пропускане</string>
 
+    <!-- Pre-onboarding: import passwords -->
+    <string name="preOnboardingImportPasswordsTitle">Импортиране на пароли от Google</string>
+    <string name="preOnboardingImportPasswordsBody">Google може да Ви помоли да влезете или да въведете паролата си, за да потвърдите.</string>
+    <string name="preOnboardingImportPasswordsPrimaryCta">Импортиране от Google</string>
+    <string name="preOnboardingImportCompleteTitle">Импортирането е завършено</string>
+    <string name="preOnboardingImportCompleteCta">Продължаване</string>
+    <string name="preOnboardingImportCompleteParsingTitle">Импортиране на пароли</string>
+    <string name="preOnboardingImportCompleteParsingBody">Това ще отнеме само няколко секунди.</string>
+    <string name="preOnboardingImportCompleteFailedTitle">Импортирането е неуспешно</string>
+    <string name="preOnboardingImportCompleteFailed">Импортирането на паролата е неуспешно</string>
+    <string name="preOnboardingImportCompleteImported" instruction="Placeholder is the number of passwords that were imported.">Импортирани пароли: %1$s</string>
+    <string name="preOnboardingImportCompleteSkipped" instruction="Placeholder is the number of passwords that were not imported.">Пропуснати (дублирани или невалидни): %1$s</string>
+    <string name="preOnboardingImportErrorTitle">Възникна някаква грешка</string>
+    <string name="preOnboardingImportErrorBody">Моля, опитайте отново.</string>
+    <string name="preOnboardingImportErrorRetry">Нов опит</string>
+
     <!-- Pre-onboarding: add to home screen -->
     <string name="preOnboardingDockStepTitle">Добавете ме към реда с любими.</string>
     <string name="preOnboardingAddToDockBody">Намерете иконата на DuckDuckGo на началния екран. След това натиснете и плъзнете на място. Това е всичко!</string>
