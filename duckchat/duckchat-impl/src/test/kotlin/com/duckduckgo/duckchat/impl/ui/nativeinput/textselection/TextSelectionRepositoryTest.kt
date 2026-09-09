@@ -21,9 +21,9 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-class TextSelectionStoreTest {
+class TextSelectionRepositoryTest {
 
-    private val testee = RealTextSelectionStore()
+    private val testee = RealTextSelectionRepository()
 
     @Test
     fun whenSelectionAddedThenItIsStoredAgainstThatTab() {
@@ -81,7 +81,7 @@ class TextSelectionStoreTest {
         assertFalse(testee.add(TAB, "one too many", URL))
 
         assertTrue(testee.limitReached(TAB).value)
-        assertEquals(TextSelectionStore.MAX_SELECTIONS, testee.selections(TAB).value.size)
+        assertEquals(TextSelectionRepository.MAX_SELECTIONS, testee.selections(TAB).value.size)
     }
 
     @Test
@@ -125,7 +125,7 @@ class TextSelectionStoreTest {
     }
 
     private fun fillToLimit() {
-        repeat(TextSelectionStore.MAX_SELECTIONS) { testee.add(TAB, "selection $it", URL) }
+        repeat(TextSelectionRepository.MAX_SELECTIONS) { testee.add(TAB, "selection $it", URL) }
     }
 
     private companion object {

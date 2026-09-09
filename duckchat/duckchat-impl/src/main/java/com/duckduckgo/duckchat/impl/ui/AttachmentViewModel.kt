@@ -47,7 +47,7 @@ import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedImage
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachmentProcessor
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionPayloadBuilder
-import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionStore
+import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -77,7 +77,7 @@ class AttachmentViewModel @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     nativeInputStateProvider: NativeInputStateProvider,
     private val duckChatPixels: DuckChatPixels,
-    private val textSelectionStore: TextSelectionStore,
+    private val textSelectionRepository: TextSelectionRepository,
     private val textSelectionPayloadBuilder: TextSelectionPayloadBuilder,
 ) : ViewModel() {
 
@@ -370,23 +370,23 @@ class AttachmentViewModel @Inject constructor(
 
     fun bindTextSelections(tabId: String, textSelection: String?) {
         textSelectionsTabId = tabId
-        textSelection?.let { textSelectionStore.add(tabId, it, url = "") }
+        textSelection?.let { textSelectionRepository.add(tabId, it, url = "") }
         textSelectionsJob?.cancel()
         textSelectionsJob = viewModelScope.launch {
-            launch { textSelectionStore.limitReached(tabId).collect { _textSelectionLimitReached.value = it } }
-            textSelectionStore.selections(tabId).collect { selections ->
+            launch { textSelectionRepository.limitReached(tabId).collect { _textSelectionLimitReached.value = it } }
+            textSelectionRepository.selections(tabId).collect { selections ->
                 _textSelections.value = selections.map { TextSelectionAttachment(id = it.id, text = it.text) }
             }
         }
     }
 
     fun removeTextSelection(id: String) {
-        textSelectionsTabId?.let { textSelectionStore.remove(it, id) }
+        textSelectionsTabId?.let { textSelectionRepository.remove(it, id) }
     }
 
     fun getTextSelectionsJson(): JSONArray? {
         val tabId = textSelectionsTabId ?: return null
-        return textSelectionPayloadBuilder.toJson(textSelectionStore.consume(tabId))
+        return textSelectionPayloadBuilder.toJson(textSelectionRepository.consume(tabId))
     }
 
     fun setPageContext(attachment: PageContextAttachment) {
@@ -451,7 +451,7 @@ class AttachmentViewModel @Inject constructor(
 
     private fun computeTextSelectionLimitError(limitReached: Boolean): String? =
         if (limitReached) {
-            context.getString(R.string.duckAiTextSelectionLimitReached, TextSelectionStore.MAX_SELECTIONS)
+            context.getString(R.string.duckAiTextSelectionLimitReached, TextSelectionRepository.MAX_SELECTIONS)
         } else {
             null
         }
