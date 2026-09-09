@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
   ~ Copyright (c) 2026 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,15 +14,14 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="desktopAppPromotionToolbarTitle">Hangi töölaua brauser</string>
+    <string name="desktopAppPromotionToolbarTitle" instruction="Toolbar title of the screen promoting the DuckDuckGo desktop browser">Hangi töölaua brauser</string>
     <string name="desktopAppPromotionTitle">Kaitse oma isikuandmeid nii Macis kui ka Windowsis!</string>
     <string name="desktopAppPromotionBody">DuckDuckGo allalaadimiseks Macile või Windowsile külasta:</string>
-    <string name="desktopAppPromotionUrl">duckduckgo.com/browser</string>
+    <string name="desktopAppPromotionUrl" instruction="The download URL shown on screen; not a full link">duckduckgo.com/browser</string>
     <string name="desktopAppPromotionShareDownloadLink">Jaga allalaadimise linki</string>
     <string name="desktopAppPromotionNoThanks">Ei, aitäh</string>
-    <string name="desktopAppPromotionLinkCopied">Link kopeeritud</string>
+    <string name="desktopAppPromotionLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Link kopeeritud</string>
 </resources>
