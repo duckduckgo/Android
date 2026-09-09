@@ -1,0 +1,112 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "description": "Captures a set of text selections from the moment the first is attached to Duck.ai until the user submits them or abandons them, so drop-off between attaching text and asking about it can be measured.",
+    "$comment": "{\"owners\":[\"joshliebe\"]}",
+    "type": "object",
+    "required": ["meta", "global", "feature", "app"],
+    "additionalProperties": false,
+    "properties": {
+        "meta": {
+            "type": "object",
+            "required": ["type", "version"],
+            "additionalProperties": false,
+            "properties": { "type": { "const": "android-duckai-selection-journey" }, "version": { "const": "1.0.0" } }
+        },
+        "app": {
+            "type": "object",
+            "required": ["name", "version"],
+            "additionalProperties": false,
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "The name of the application sending the event",
+                    "enum": ["DuckDuckGo Android"]
+                },
+                "version": {
+                    "type": "string",
+                    "description": "The version of the app sending the event. Release builds are X.Y.Z; internal and nightly builds append the build number and channel suffix.",
+                    "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(\\.[0-9]+(-[a-z]+)?)?$"
+                },
+                "form_factor": { "type": "string", "description": "The form factor of the current device", "enum": ["phone", "tablet"] },
+                "dev_mode": { "type": "boolean", "description": "Whether the app is a debug build" }
+            }
+        },
+        "global": {
+            "type": "object",
+            "required": ["platform", "type", "sample_rate"],
+            "additionalProperties": false,
+            "properties": {
+                "platform": { "type": "string", "description": "The platform the app is running on", "enum": ["Android"] },
+                "type": { "type": "string", "description": "The type of software sending the event", "enum": ["app"] },
+                "sample_rate": {
+                    "type": "number",
+                    "description": "Sample rate for this event, between 0 and 1",
+                    "minimum": 0,
+                    "maximum": 1
+                },
+                "is_first_daily_occurrence": {
+                    "type": "boolean",
+                    "description": "Whether this is the first event completed with this feature name and status in the current UTC calendar day"
+                }
+            }
+        },
+        "feature": {
+            "type": "object",
+            "required": ["name", "status", "data"],
+            "additionalProperties": false,
+            "properties": {
+                "name": { "type": "string", "description": "The feature name for this event", "enum": ["duckai-selection-journey"] },
+                "status": {
+                    "type": "string",
+                    "description": "The terminal status of the flow",
+                    "enum": ["SUCCESS", "CANCELLED", "UNKNOWN"]
+                },
+                "data": {
+                    "type": "object",
+                    "required": ["ext"],
+                    "additionalProperties": false,
+                    "properties": {
+                        "ext": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                                "outcome.terminal_reason": {
+                                    "type": "string",
+                                    "description": "Why the journey ended",
+                                    "enum": ["submitted", "selections_removed", "new_chat", "chat_cleared", "session_expired"]
+                                },
+                                "submission.action": {
+                                    "type": "string",
+                                    "description": "What the user asked for. 'prompt' when they typed their own question rather than picking a suggestion",
+                                    "enum": ["prompt", "summarize", "translate"]
+                                },
+                                "selection.max_count_bucketed": {
+                                    "type": "string",
+                                    "description": "Bucketed high-water mark of selections attached during the journey",
+                                    "enum": ["1", "2", "3-5"]
+                                },
+                                "interaction.dismissal_count_bucketed": {
+                                    "type": "string",
+                                    "description": "Bucketed number of times the user dismissed the Duck.ai surface before the journey ended",
+                                    "enum": ["0", "1", "2+"]
+                                },
+                                "interaction.dismissed_before_submission": {
+                                    "type": "boolean",
+                                    "description": "Whether the user dismissed the Duck.ai surface at least once during the journey"
+                                },
+                                "interaction.saw_selection_suggestions": {
+                                    "type": "boolean",
+                                    "description": "Whether suggested prompts for the attached selections were shown"
+                                },
+                                "latency.journey_duration_ms_bucketed": {
+                                    "type": "string",
+                                    "description": "Bucketed time from the first selection being attached to the journey ending"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
