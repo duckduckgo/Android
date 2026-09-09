@@ -71,7 +71,7 @@ class RealDuckChatContextual @Inject constructor(
                 ?.takeIf { duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(it) }
                 ?.let { duckDuckGoUrlDetector.extractQuery(it) }
                 ?.takeIf { it.isNotBlank() }
-            showMenu(sourceTabId, anchor, serpQuery, showChatSurface)
+            showMenu(sourceTabId, anchor, sourceUrl, serpQuery, showChatSurface)
         }
     }
 
@@ -106,6 +106,7 @@ class RealDuckChatContextual @Inject constructor(
     private fun showMenu(
         sourceTabId: String,
         anchor: View,
+        sourceUrl: String?,
         serpQuery: String?,
         onAskAboutPage: () -> Unit,
     ) {
@@ -117,7 +118,10 @@ class RealDuckChatContextual @Inject constructor(
             openNewChatTab(activity, sourceTabId)
         }
         val askItem = content.findViewById<PopupMenuItemView>(R.id.contextualChatMenuAskAboutPage)
-        if (serpQuery != null) {
+        if (sourceUrl == null) {
+            // No page open (NTP or a blank tab), so there is nothing to ask about.
+            askItem.gone()
+        } else if (serpQuery != null) {
             askItem.setPrimaryText(activity.getString(R.string.duckChatContextualAskAboutSearch))
             popup.onMenuItemClicked(askItem) {
                 duckChatPixels.reportContextualAddressBarMenuAskAboutSearchSelected()
