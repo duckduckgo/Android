@@ -36,6 +36,7 @@ data class TextSelection(
 
 interface TextSelectionStore {
     fun selections(tabId: String): StateFlow<List<TextSelection>>
+    fun limitReached(tabId: String): StateFlow<Boolean>
     fun add(tabId: String, text: String, url: String): Boolean
     fun consume(tabId: String): List<TextSelection>
     fun remove(tabId: String, id: String)
@@ -50,8 +51,11 @@ interface TextSelectionStore {
 class RealTextSelectionStore @Inject constructor() : TextSelectionStore {
 
     private val selections = ConcurrentHashMap<String, MutableStateFlow<List<TextSelection>>>()
+    private val limitReached = ConcurrentHashMap<String, MutableStateFlow<Boolean>>()
 
     override fun selections(tabId: String): StateFlow<List<TextSelection>> = getFlow(tabId)
+
+    override fun limitReached(tabId: String): StateFlow<Boolean> = getLimitFlow(tabId)
 
     override fun add(tabId: String, text: String, url: String): Boolean {
         val selection = getTextSelection(text, url) ?: return false
@@ -59,17 +63,26 @@ class RealTextSelectionStore @Inject constructor() : TextSelectionStore {
             val isDuplicate = existing.any { it.text == selection.text }
             if (isDuplicate || existing.size >= TextSelectionStore.MAX_SELECTIONS) existing else existing + selection
         }
-        return selections.any { it.text == selection.text }
+        val isAttached = selections.any { it.text == selection.text }
+        if (!isAttached) getLimitFlow(tabId).value = true
+        return isAttached
     }
 
-    override fun consume(tabId: String): List<TextSelection> = getFlow(tabId).getAndUpdate { emptyList() }
+    override fun consume(tabId: String): List<TextSelection> {
+        getLimitFlow(tabId).value = false
+        return getFlow(tabId).getAndUpdate { emptyList() }
+    }
 
     override fun remove(tabId: String, id: String) {
+        getLimitFlow(tabId).value = false
         getFlow(tabId).update { current -> current.filterNot { it.id == id } }
     }
 
     private fun getFlow(tabId: String): MutableStateFlow<List<TextSelection>> =
         selections.computeIfAbsent(tabId) { MutableStateFlow(emptyList()) }
+
+    private fun getLimitFlow(tabId: String): MutableStateFlow<Boolean> =
+        limitReached.computeIfAbsent(tabId) { MutableStateFlow(false) }
 
     private fun getTextSelection(text: String, url: String): TextSelection? {
         val trimmed = text.trim()
