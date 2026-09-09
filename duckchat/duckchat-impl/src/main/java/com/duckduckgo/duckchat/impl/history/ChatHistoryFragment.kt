@@ -92,6 +92,8 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
         ViewModelProvider(this, viewModelFactory)[ChatHistoryViewModel::class.java]
     }
 
+    private var overflowMenuEnabled = false
+
     private val adapter = ChatHistoryAdapter(
         onChatClicked = { item -> viewModel.onChatRowClicked(item.chatId) },
         onChatMoreClicked = { item, anchor -> showRowPopup(item, anchor) },
@@ -132,6 +134,13 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
         binding.toolbar.setTitle(R.string.duck_ai_chat_history_title)
         binding.toolbar.inflateMenu(R.menu.menu_chat_history_default)
         binding.toolbar.setOnMenuItemClickListener(::onMenuItemClicked)
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            overflowMenuEnabled = withContext(dispatchers.io()) { duckChatFeature.nativeDuckAiSidebar().isEnabled() }
+            if (!viewModel.isSelectMode() && !binding.searchBar.isVisible) {
+                binding.toolbar.menu.findItem(R.id.chat_history_action_overflow)?.isVisible = overflowMenuEnabled
+            }
+        }
 
         binding.chatHistoryList.layoutManager = LinearLayoutManager(requireContext())
         binding.chatHistoryList.adapter = adapter
@@ -287,6 +296,7 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
         binding.toolbar.menu.findItem(R.id.chat_history_action_new)?.isVisible = true
         binding.toolbar.menu.findItem(R.id.chat_history_action_search)?.isVisible = true
         binding.toolbar.menu.findItem(R.id.chat_history_action_download_selected)?.isVisible = false
+        binding.toolbar.menu.findItem(R.id.chat_history_action_overflow)?.isVisible = overflowMenuEnabled
     }
 
     private fun applySelectModeToolbar(count: Int) {
@@ -298,6 +308,7 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
         binding.toolbar.menu.findItem(R.id.chat_history_action_new)?.isVisible = false
         binding.toolbar.menu.findItem(R.id.chat_history_action_search)?.isVisible = false
         binding.toolbar.menu.findItem(R.id.chat_history_action_download_selected)?.isVisible = true
+        binding.toolbar.menu.findItem(R.id.chat_history_action_overflow)?.isVisible = false
     }
 
     private fun buildEntries(
@@ -360,6 +371,10 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
             viewModel.onDownloadSelectedRequested()
             true
         }
+        R.id.chat_history_action_overflow -> {
+            binding.toolbar.findViewById<View>(R.id.chat_history_action_overflow)?.let { showOverflowPopup(it) }
+            true
+        }
         else -> false
     }
 
@@ -376,6 +391,14 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
         binding.toolbar.show()
         viewModel.onSearchClosed()
         // onBackPressedCallback.isEnabled is reset by render() — select mode may still be active.
+    }
+
+    private fun showOverflowPopup(anchor: View) {
+        val popup = PopupMenu(layoutInflater, R.layout.popup_chat_history_overflow)
+        val view = popup.contentView
+        popup.onMenuItemClicked(view.findViewById(R.id.selectChats)) { viewModel.onEnterSelectMode() }
+        popup.onMenuItemClicked(view.findViewById(R.id.chatsProtection)) { }
+        popup.show(binding.root, anchor)
     }
 
     private fun showRowPopup(item: ChatHistoryItem, anchor: View) {
