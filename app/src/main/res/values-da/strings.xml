@@ -966,6 +966,22 @@
     <string name="preOnboardingWidgetPromptPrimaryCta">Tilføj widget</string>
     <string name="preOnboardingWidgetPromptSecondaryCta">Spring over</string>
 
+    <!-- Pre-onboarding: import passwords -->
+    <string name="preOnboardingImportPasswordsTitle">Importer adgangskoder fra Google</string>
+    <string name="preOnboardingImportPasswordsBody">Google kan bede dig om at logge ind eller indtaste din adgangskode for at bekræfte.</string>
+    <string name="preOnboardingImportPasswordsPrimaryCta">Importer fra Google</string>
+    <string name="preOnboardingImportCompleteTitle">Import er fuldført</string>
+    <string name="preOnboardingImportCompleteCta">Forsæt</string>
+    <string name="preOnboardingImportCompleteParsingTitle">Importerer adgangskoder</string>
+    <string name="preOnboardingImportCompleteParsingBody">Det tager kun et øjeblik.</string>
+    <string name="preOnboardingImportCompleteFailedTitle">Import mislykkedes</string>
+    <string name="preOnboardingImportCompleteFailed">Import af adgangskode mislykkedes</string>
+    <string name="preOnboardingImportCompleteImported" instruction="Placeholder is the number of passwords that were imported.">Adgangskoder importeret: %1$s</string>
+    <string name="preOnboardingImportCompleteSkipped" instruction="Placeholder is the number of passwords that were not imported.">Sprunget over (duplikerede eller ugyldige): %1$s</string>
+    <string name="preOnboardingImportErrorTitle">Noget gik galt</string>
+    <string name="preOnboardingImportErrorBody">Prøv igen.</string>
+    <string name="preOnboardingImportErrorRetry">Prøv igen</string>
+
     <!-- Pre-onboarding: add to home screen -->
     <string name="preOnboardingDockStepTitle">Tilføj mig til din favoritrække.</string>
     <string name="preOnboardingAddToDockBody">Find DuckDuckGo-ikonet på din startskærm. Tryk og træk den derefter på plads. Det er det!</string>
