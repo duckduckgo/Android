@@ -117,7 +117,7 @@ class RealDuckAiSelectionJourneyWideEvent @Inject constructor(
             is Action.Ended -> finish(action.reason)
         }
     }
-    
+
     private suspend fun expireIfStale() {
         val current = journey ?: return
         if (timeProvider.currentTimeMillis() - current.startedAt > MAX_JOURNEY_DURATION_MS) {
