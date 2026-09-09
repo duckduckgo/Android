@@ -80,6 +80,8 @@ import com.duckduckgo.common.ui.compose.listitem.DaxListItemTrailingIconSize
 import com.duckduckgo.common.ui.compose.listitem.DaxOneLineListItem
 import com.duckduckgo.common.ui.compose.listitem.DaxSettingsListItem
 import com.duckduckgo.common.ui.compose.listitem.DaxTwoLineListItem
+import com.duckduckgo.common.ui.compose.message.DaxAppTPBanner
+import com.duckduckgo.common.ui.compose.message.DaxAppTPBannerState
 import com.duckduckgo.common.ui.compose.message.remote.DaxBigSingleActionMessage
 import com.duckduckgo.common.ui.compose.message.remote.DaxBigTwoActionsMessage
 import com.duckduckgo.common.ui.compose.message.remote.DaxMediumMessage
@@ -542,6 +544,60 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                         view.findViewById<ComposeView>(R.id.big_two_actions_server_image_remote_message_compose).gone()
                     },
                     modifier = Modifier.padding(dimensionResource(CommonR.dimen.keyline_4)),
+                )
+            }
+        }
+    }
+
+    class AppTPBannerComponentViewHolder(
+        parent: ViewGroup,
+        private val isDarkTheme: Boolean,
+    ) : ComponentViewHolder(inflate(parent, R.layout.component_apptp_banner)) {
+        override fun bind(component: Component) {
+            val onClick = { Snackbar.make(view, component.name, Snackbar.LENGTH_SHORT).show() }
+
+            view.setupThemedComposeView(R.id.apptp_banner_enabled_compose, isDarkTheme = isDarkTheme) {
+                DaxAppTPBanner(
+                    text = buildAnnotatedString {
+                        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append("App Tracking Protection is enabled") }
+                        append(" and blocking tracking attempts across your apps.")
+                    },
+                    state = DaxAppTPBannerState.Protected,
+                    onClick = onClick,
+                )
+            }
+
+            view.setupThemedComposeView(R.id.apptp_banner_trackers_blocked_compose, isDarkTheme = isDarkTheme) {
+                DaxAppTPBanner(
+                    text = buildAnnotatedString {
+                        append("App Tracking Protection blocked 1,235 tracking attempts in ")
+                        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append("Yelp and 14 other apps") }
+                        append(" (past hour).")
+                    },
+                    state = DaxAppTPBannerState.Protected,
+                    onClick = onClick,
+                )
+            }
+
+            view.setupThemedComposeView(R.id.apptp_banner_disabled_compose, isDarkTheme = isDarkTheme) {
+                DaxAppTPBanner(
+                    text = buildAnnotatedString {
+                        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append("App Tracking Protection disabled.") }
+                        append("\nTap to continue blocking tracking attempts across your apps.")
+                    },
+                    state = DaxAppTPBannerState.Warning,
+                    onClick = onClick,
+                )
+            }
+
+            view.setupThemedComposeView(R.id.apptp_banner_revoked_compose, isDarkTheme = isDarkTheme) {
+                DaxAppTPBanner(
+                    text = buildAnnotatedString {
+                        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append("A VPN app on your device disabled App Tracking Protection.") }
+                        append("\nTap to re-enable.")
+                    },
+                    state = DaxAppTPBannerState.Warning,
+                    onClick = onClick,
                 )
             }
         }
@@ -1077,6 +1133,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 Component.CARD -> CardComponentViewHolder(parent, isDarkTheme)
                 Component.SCAFFOLD -> ScaffoldComponentViewHolder(parent, isDarkTheme)
                 Component.SETTINGS_LIST_ITEM -> SettingsListItemComponentViewHolder(parent, isDarkTheme)
+                Component.APP_TRACKING_PROTECTION_BANNER -> AppTPBannerComponentViewHolder(parent, isDarkTheme)
                 else -> {
                     TODO()
                 }
