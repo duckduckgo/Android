@@ -297,4 +297,13 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun sendDuckAiSessionWideEvent(): Toggle
+
+    /**
+     * @return `true` when the updated Duck.ai model and reasoning pickers are enabled: models grouped
+     * by availability, backend-driven ordering and sublines, and a gated section header that follows the
+     * user's tier.
+     * If the remote feature is not present defaults to `false`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun updatedPickers(): Toggle
 }
