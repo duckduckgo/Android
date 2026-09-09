@@ -25,12 +25,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserTabFragment
 import com.duckduckgo.app.browser.tabs.TabManager.TabModel
+import com.duckduckgo.app.browser.tabs.TabReuseDistanceReporter
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class TabPagerAdapter(
     private val activity: BrowserActivity,
+    private val tabReuseDistanceReporter: TabReuseDistanceReporter,
 ) : FragmentStateAdapter(activity) {
     private val tabs = mutableListOf<TabModel>()
 
@@ -86,6 +88,11 @@ class TabPagerAdapter(
         return currentTabIndex != -1 || position != 0
     }
 
+    override fun onItemPlaced(itemId: Long) {
+        val tab = tabs.firstOrNull { it.tabId.hashCode().toLong() == itemId } ?: return
+        tabReuseDistanceReporter.onTabActivated(tab.tabId)
+    }
+
     fun restore(state: Bundle) {
         // state is only useful when there are fragments to restore (also avoids a crash)
         if (activity.supportFragmentManager.fragments.isNotEmpty()) {
@@ -112,14 +119,16 @@ class TabPagerAdapter(
 
     @SuppressLint("NotifyDataSetChanged")
     fun onTabsUpdated(newTabs: List<TabModel>) {
+        tabReuseDistanceReporter.onTabCountChanged(newTabs.size)
         if (tabs.map { it.tabId } != newTabs.map { it.tabId }) {
             val newIds = newTabs.map { it.tabId }.toSet()
-            val hadRemovals = tabs.any { it.tabId !in newIds }
+            val removedIds = tabs.map { it.tabId }.filter { it !in newIds }
             tabs.clear()
             tabs.addAll(newTabs)
             notifyDataSetChanged()
-            if (hadRemovals) {
+            if (removedIds.isNotEmpty()) {
                 cleanupRemovedItems()
+                tabReuseDistanceReporter.onTabsRemoved(removedIds)
             }
         } else {
             // the state of tabs is managed separately, so we don't need to notify the adapter, but we need URL and skipHome to create new fragments

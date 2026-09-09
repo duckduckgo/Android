@@ -1,0 +1,25 @@
+// Tab manager pixels
+// Fired by the browser tab pager, covering how tabs are retained and revisited.
+{
+    "tab_max_reuse_distance": {
+        "description": "Fires when the browser is paused, reporting the furthest a user went back in the tab activation order during the session. Distance is the number of distinct other tabs activated since the revisited tab was last active, bucketed. Fires again in the same session only when a further distance is reached. Sizes the user impact of lowering the number of retained tab fragments.",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "distance_bucket",
+                "type": "string",
+                "description": "How far back in the tab activation order the revisited tab was, as a range of distinct other tabs activated since",
+                "enum": ["1_3", "4_6", "7_9", "10_12", "13_15", "16_plus"]
+            },
+            {
+                "key": "tab_count_bucket",
+                "type": "string",
+                "description": "How many tabs were open when the distance was reported, as a range",
+                "enum": ["1_3", "4_6", "7_9", "10_12", "13_15", "16_25", "26_50", "51_plus"]
+            }
+        ],
+        "expires": "2027-03-31"
+    }
+}
