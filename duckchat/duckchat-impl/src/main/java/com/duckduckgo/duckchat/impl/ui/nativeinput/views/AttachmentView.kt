@@ -134,8 +134,8 @@ class AttachmentView(
 
     fun getTextSelectionsJson(): JSONArray? = viewModel?.getTextSelectionsJson()
 
-    fun bindTextSelections(tabId: String, textSelection: String?) {
-        viewModel?.bindTextSelections(tabId, textSelection)
+    fun bindTextSelections(tabId: String, textSelection: String?, url: String) {
+        viewModel?.bindTextSelections(tabId, textSelection, url)
         onTextSelectionRemoved = { id -> viewModel?.removeTextSelection(id) }
     }
 

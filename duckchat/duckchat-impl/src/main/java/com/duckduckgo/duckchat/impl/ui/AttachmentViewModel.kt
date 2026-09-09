@@ -358,9 +358,9 @@ class AttachmentViewModel @Inject constructor(
         val textSelections: List<TextSelectionAttachment>,
     )
 
-    fun bindTextSelections(tabId: String, textSelection: String?) {
+    fun bindTextSelections(tabId: String, textSelection: String?, url: String) {
         textSelectionsTabId = tabId
-        textSelection?.let { textSelectionStore.add(tabId, it) }
+        textSelection?.let { textSelectionStore.add(tabId, it, url) }
         textSelectionsJob?.cancel()
         textSelectionsJob = viewModelScope.launch {
             textSelectionStore.selections(tabId).collect { selections ->
@@ -375,7 +375,7 @@ class AttachmentViewModel @Inject constructor(
 
     fun getTextSelectionsJson(): JSONArray? {
         val tabId = textSelectionsTabId ?: return null
-        return textSelectionPayloadBuilder.toJson(selections = textSelectionStore.consume(tabId), url = "")
+        return textSelectionPayloadBuilder.toJson(textSelectionStore.consume(tabId))
     }
 
     fun setPageContext(attachment: PageContextAttachment) {

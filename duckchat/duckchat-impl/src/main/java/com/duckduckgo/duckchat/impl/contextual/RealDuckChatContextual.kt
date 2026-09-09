@@ -66,7 +66,7 @@ class RealDuckChatContextual @Inject constructor(
             showChatSurface()
             return
         }
-        textSelection?.let { textSelectionStore.add(sourceTabId, it) }
+        textSelection?.let { textSelectionStore.add(sourceTabId, it, sourceUrl.orEmpty()) }
         if (hasChatInProgress(sourceTabId)) {
             // The sheet would reopen the existing chat for this tab, so skip the entry menu and open it directly.
             showChatSurface()

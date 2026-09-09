@@ -31,11 +31,12 @@ import javax.inject.Inject
 data class TextSelection(
     val id: String,
     val text: String,
+    val url: String,
 )
 
 interface TextSelectionStore {
     fun selections(tabId: String): StateFlow<List<TextSelection>>
-    fun add(tabId: String, text: String): Boolean
+    fun add(tabId: String, text: String, url: String): Boolean
     fun consume(tabId: String): List<TextSelection>
     fun remove(tabId: String, id: String)
 
@@ -52,8 +53,8 @@ class RealTextSelectionStore @Inject constructor() : TextSelectionStore {
 
     override fun selections(tabId: String): StateFlow<List<TextSelection>> = getFlow(tabId)
 
-    override fun add(tabId: String, text: String): Boolean {
-        val selection = getTextSelection(text) ?: return false
+    override fun add(tabId: String, text: String, url: String): Boolean {
+        val selection = getTextSelection(text, url) ?: return false
         val selections = getFlow(tabId).updateAndGet { existing ->
             val isDuplicate = existing.any { it.text == selection.text }
             if (isDuplicate || existing.size >= TextSelectionStore.MAX_SELECTIONS) existing else existing + selection
@@ -70,9 +71,9 @@ class RealTextSelectionStore @Inject constructor() : TextSelectionStore {
     private fun getFlow(tabId: String): MutableStateFlow<List<TextSelection>> =
         selections.computeIfAbsent(tabId) { MutableStateFlow(emptyList()) }
 
-    private fun getTextSelection(text: String): TextSelection? {
+    private fun getTextSelection(text: String, url: String): TextSelection? {
         val trimmed = text.trim()
         if (trimmed.isEmpty()) return null
-        return TextSelection(UUID.randomUUID().toString(), trimmed)
+        return TextSelection(UUID.randomUUID().toString(), trimmed, url)
     }
 }
