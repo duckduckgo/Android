@@ -65,5 +65,8 @@ class SelectedTextDuckAiActivity : DuckDuckGoActivity() {
         return null
     }
 
-    private fun isExternalSelection(): Boolean = callingPackage != packageName
+    private fun isExternalSelection(): Boolean {
+        val sender = callingPackage ?: referrer?.host
+        return sender != null && sender != packageName
+    }
 }
