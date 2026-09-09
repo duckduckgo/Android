@@ -49,8 +49,8 @@ import com.duckduckgo.mobile.android.R
 /**
  * DuckDuckGo design system composable slider component.
  *
- * Wraps Material3 [Slider] with DuckDuckGo theme colors matching the XML `Widget.DuckDuckGo.Slider`
- * style. Value labels, tick marks and stop indicators are not drawn.
+ * Wraps Material3 [Slider] with DuckDuckGo theme colors. Value labels, tick marks, stop indicators
+ * and the thumb press halo are not drawn.
  *
  * @param value the current value of the slider, coerced into [valueRange]
  * @param onValueChange callback invoked continuously as the slider is dragged
@@ -59,6 +59,7 @@ import com.duckduckgo.mobile.android.R
  * @param valueRange the inclusive range of values this slider can take
  * @param steps the number of discrete values between the ends of [valueRange], or 0 for a continuous slider
  * @param onValueChangeFinished callback invoked when the drag gesture ends, for committing the settled value
+ * @param interactionSource the [MutableInteractionSource] representing the stream of interactions for this slider
  *
  * Asana Task: https://app.asana.com/1/137249556945/project/1207418217763355/task/1211670072079719?focus=true
  * Figma reference: https://www.figma.com/design/BOHDESHODUXK7wSRNBOHdu/%F0%9F%A4%96-Android-Components?node-id=3116-4290&m=dev
@@ -72,9 +73,9 @@ fun DaxSlider(
     valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
     steps: Int = 0,
     onValueChangeFinished: (() -> Unit)? = null,
+    interactionSource: MutableInteractionSource? = null,
 ) {
     val colors = DaxSliderDefaults.colors
-    val interactionSource = remember { MutableInteractionSource() }
     Slider(
         value = value,
         onValueChange = onValueChange,
@@ -83,7 +84,7 @@ fun DaxSlider(
         valueRange = valueRange,
         steps = steps,
         onValueChangeFinished = onValueChangeFinished,
-        interactionSource = interactionSource,
+        interactionSource = interactionSource ?: remember { MutableInteractionSource() },
         colors = colors,
         thumb = {
             Box(
@@ -97,6 +98,7 @@ fun DaxSlider(
             SliderDefaults.Track(
                 sliderState = sliderState,
                 modifier = Modifier.height(DaxSliderDefaults.trackHeight),
+                enabled = enabled,
                 colors = colors,
                 drawStopIndicator = null,
                 drawTick = { _, _ -> },
