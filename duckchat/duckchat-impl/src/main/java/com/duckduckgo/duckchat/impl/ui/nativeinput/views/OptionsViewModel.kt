@@ -53,34 +53,39 @@ class OptionsViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.Eagerly, DuckChatPixelSurface.ADDRESS_BAR)
 
     /**
-     * Tools the effective model supports. An unknown model means every tool is offered, which is the
-     * behaviour the pre-plugin code fell back to when it could not resolve a model.
+     * Tools the active tab's model supports. Every tool while that model is unknown, which is what the
+     * pre-plugin code fell back to, and what keeps a switch from briefly hiding a supported tool.
      */
     val visibleTools: StateFlow<Set<Tool>> = combine(
+        nativeInputStateProvider.state,
         modelManager.modelState,
         effectiveModelProvider.effectiveModel,
-    ) { modelState, effective ->
-        val modelId = (effective as? EffectiveModel.Resolved)?.modelId
-        modelState.models.firstOrNull { it.id == modelId }
-            ?.let { model -> Tool.entries.filterTo(mutableSetOf()) { model.supportsTool(it) } }
-            ?: Tool.entries.toSet()
+    ) { state, modelState, effective ->
+        val model = effective.modelFor(state.chatId)?.let { id -> modelState.models.firstOrNull { it.id == id } }
+        model?.let { Tool.entries.filterTo(mutableSetOf()) { tool -> it.supportsTool(tool) } } ?: Tool.entries.toSet()
     }.stateIn(viewModelScope, SharingStarted.Eagerly, Tool.entries.toSet())
 
     val shouldShowPickers: Boolean get() = selectedTool.value != Tool.IMAGE_GENERATION
 
     /**
-     * Emits when the selected tool is no longer supported by the effective model. Deliberately not a
-     * pixel: the user did not deselect it, the model change did.
+     * Emits when the tab's own model does not support its selected tool. Deliberately not a pixel: the
+     * user did not deselect it, the model change did.
      */
     val toolSelectionCleared: Flow<Unit> = combine(
-        selectedTool,
-        visibleTools,
+        nativeInputStateProvider.state,
+        modelManager.modelState,
         effectiveModelProvider.effectiveModel,
-    ) { selected, visible, effective ->
-        // Only once the active tab's model is known: mid-switch the visible set is still the previous
-        // tab's, and clearing against it would drop a selection this tab's model does support.
-        effective is EffectiveModel.Resolved && selected != null && selected !in visible
+    ) { state, modelState, effective ->
+        val selected = state.selectedTool?.let { Tool.from(it) }
+        val modelId = effective.modelFor(state.chatId)
+        // Both read from the same state emission, so the selection and the chat it belongs to always agree.
+        selected != null && modelId != null &&
+            modelState.models.firstOrNull { it.id == modelId }?.supportsTool(selected) == false
     }.filter { it }.map { }
+
+    /** The model id only when it was resolved for [chatId]; a model resolved for another chat is stale here. */
+    private fun EffectiveModel.modelFor(chatId: String?): String? =
+        (this as? EffectiveModel.Resolved)?.takeIf { it.chatId == chatId }?.modelId
 
     fun onToolSelectedByUser(tool: Tool) {
         when (tool) {

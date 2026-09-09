@@ -44,7 +44,12 @@ sealed interface EffectiveModel {
      */
     data object Unresolved : EffectiveModel
 
-    data class Resolved(val modelId: String?) : EffectiveModel
+    /**
+     * [chatId] is the chat this answer was computed for. Consumers must check it against the state they
+     * are evaluating: the two arrive on separate flows, so a tab switch can pair a new tab's state with
+     * the previous tab's model.
+     */
+    data class Resolved(val chatId: String?, val modelId: String?) : EffectiveModel
 }
 
 interface EffectiveModelProvider {
@@ -107,7 +112,10 @@ class RealEffectiveModelProvider @Inject constructor(
         val recovered = picks[chat.chatId]
             ?.takeIf { chat.modelChangeMode }
             ?.takeIf { it in modelIds }
-        EffectiveModel.Resolved(recovered ?: chat.chatModel?.takeIf { it in modelIds } ?: modelState.selectedModelId)
+        EffectiveModel.Resolved(
+            chatId = chat.chatId,
+            modelId = recovered ?: chat.chatModel?.takeIf { it in modelIds } ?: modelState.selectedModelId,
+        )
     }.distinctUntilChanged()
 
     override fun onRecoveryModelPicked(chatId: String?, modelId: String) {
