@@ -1263,7 +1263,7 @@ class RealNativeInputManager @Inject constructor(
         widgetFrom(widgetView)?.apply {
             setWidgetRootView(widgetView)
             configure(tabId = tabId, isDuckAiMode = omnibarController.isDuckAiMode(), isBottom = isBottom)
-            bindTextSelections(tabId, textSelection)
+            textSelection?.let { bindTextSelections(tabId, it) }
         }
 
         applyWindowChrome(widgetView, isBottom)
