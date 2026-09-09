@@ -34,7 +34,7 @@ data class TextSelection(
     val url: String,
 )
 
-interface TextSelectionStore {
+interface TextSelectionRepository {
     fun selections(tabId: String): StateFlow<List<TextSelection>>
     fun limitReached(tabId: String): StateFlow<Boolean>
     fun add(tabId: String, text: String, url: String): Boolean
@@ -48,7 +48,7 @@ interface TextSelectionStore {
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
-class RealTextSelectionStore @Inject constructor() : TextSelectionStore {
+class RealTextSelectionRepository @Inject constructor() : TextSelectionRepository {
 
     private val selections = ConcurrentHashMap<String, MutableStateFlow<List<TextSelection>>>()
     private val limitReached = ConcurrentHashMap<String, MutableStateFlow<Boolean>>()
@@ -61,7 +61,7 @@ class RealTextSelectionStore @Inject constructor() : TextSelectionStore {
         val selection = getTextSelection(text, url) ?: return false
         val selections = getFlow(tabId).updateAndGet { existing ->
             val isDuplicate = existing.any { it.text == selection.text }
-            if (isDuplicate || existing.size >= TextSelectionStore.MAX_SELECTIONS) existing else existing + selection
+            if (isDuplicate || existing.size >= TextSelectionRepository.MAX_SELECTIONS) existing else existing + selection
         }
         val isAttached = selections.any { it.text == selection.text }
         if (!isAttached) getLimitFlow(tabId).value = true
