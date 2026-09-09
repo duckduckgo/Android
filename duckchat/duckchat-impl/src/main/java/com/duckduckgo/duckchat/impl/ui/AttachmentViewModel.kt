@@ -94,6 +94,7 @@ class AttachmentViewModel @Inject constructor(
         val files: List<FileAttachment> = emptyList(),
         val pageContext: PageContextAttachment? = null,
         val textSelections: List<TextSelectionAttachment> = emptyList(),
+        val textSelectionLimitError: String? = null,
         val imageLimitError: String? = null,
         val fileLimitError: String? = null,
         val fileSizeError: String? = null,
@@ -152,6 +153,7 @@ class AttachmentViewModel @Inject constructor(
             files = files,
             pageContext = pageContext,
             textSelections = selections,
+            textSelectionLimitError = computeTextSelectionLimitError(selections.size),
             imageLimitError = computeImageLimitError(currentImageCount, totalImages, imageLimits),
             fileLimitError = computeFileLimitError(totalFiles, fileLimits.maxPerConversation),
             fileSizeError = computeFileSizeError(files, fileLimits.maxFileSizeBytes),
@@ -437,6 +439,13 @@ class AttachmentViewModel @Inject constructor(
             }
         }
     }
+
+    private fun computeTextSelectionLimitError(count: Int): String? =
+        if (count >= TextSelectionStore.MAX_SELECTIONS) {
+            context.getString(R.string.duckAiTextSelectionLimitReached, TextSelectionStore.MAX_SELECTIONS)
+        } else {
+            null
+        }
 
     private fun computeImageLimitError(
         currentCount: Int,

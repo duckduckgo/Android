@@ -51,6 +51,7 @@
 
     <!-- Name shown for an attached text selection in the Duck.ai -->
     <string name="duckAiTextSelectionAttachmentTitle">Text selection</string>
+    <string name="duckAiTextSelectionLimitReached" instruction="%1$d is replaced with the maximum number of text selections.">You can add up to %1$d text selections. Remove one to add another.</string>
 
     <!-- Duck.ai text selection menu action -->
     <string name="duckAiTextSelectionMenuItem">Ask Duck.ai</string>
