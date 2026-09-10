@@ -1,0 +1,62 @@
+plugins {
+    id 'com.android.test'
+    id 'kotlin-android'
+}
+
+apply from: "$rootDir/code-formatting.gradle"
+
+android {
+    namespace 'com.duckduckgo.macrobenchmark'
+    compileSdk compile_sdk
+
+    defaultConfig {
+        minSdk 26
+        targetSdk target_sdk
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunnerArguments["androidx.benchmark.suppressErrors"] = "EMULATOR"
+        missingDimensionStrategy "store", "internal"
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    signingConfigs {
+        // LOCAL-ONLY: debug keystore so the release test APK is installable on a device.
+        debugKey {
+            storeFile = new File("${System.getProperty('user.home')}/.android/debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.debugKey
+        }
+    }
+
+    targetProjectPath = ":app"
+    experimentalProperties["android.experimental.self-instrumenting"] = true
+}
+
+kotlin {
+    jvmToolchain(21)
+}
+
+// Only build/keep the `release` variant (targets :app internalRelease); disable the rest.
+androidComponents {
+    beforeVariants(selector().all()) { variant ->
+        variant.enable = variant.buildType == "release"
+    }
+}
+
+dependencies {
+    implementation AndroidX.test.ext.junit
+    implementation AndroidX.test.espresso.core
+    implementation AndroidX.test.uiAutomator
+    implementation AndroidX.benchmark.macroJunit4
+    implementation Square.okHttp3.mockWebServer
+}
