@@ -27,7 +27,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
-import com.duckduckgo.common.ui.compose.buttons.LargePrimaryButton
+import com.duckduckgo.common.ui.compose.button.DaxButtonSize
+import com.duckduckgo.common.ui.compose.button.DaxPrimaryButton
 import com.duckduckgo.common.ui.compose.dialogs.dismiss.DaxDismissIconButton
 import com.duckduckgo.common.ui.compose.dialogs.progress.DaxDialogProgressScope
 import com.duckduckgo.common.ui.compose.dialogs.wave.WaveEdge
@@ -142,10 +143,11 @@ private fun DaxDialogPreview() {
                 DaxProgressBarOf5(current = 2)
             },
             buttons = {
-                LargePrimaryButton(
+                DaxPrimaryButton(
                     text = "Let's do it!",
                     onClick = {},
                     modifier = Modifier.fillMaxWidth(),
+                    size = DaxButtonSize.Large,
                 )
             }
         )

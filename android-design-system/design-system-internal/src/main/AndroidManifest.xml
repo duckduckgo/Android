@@ -23,6 +23,11 @@
             android:name="com.duckduckgo.common.ui.internal.ui.AppComponentsActivity"
             android:exported="true" />
 
+        <activity
+            android:theme="@style/Theme.DuckDuckGo.Light"
+            android:name="com.duckduckgo.common.ui.internal.ui.compose.InteractiveComponentActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>

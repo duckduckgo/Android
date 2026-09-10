@@ -589,6 +589,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
+        <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+            app:daxButtonSize="large"
+            android:id="@+id/dax_dialog_onboarding"
+            android:text="Dax Dialog onboarding"
+            android:layout_marginTop="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
     </LinearLayout>
 
 </androidx.core.widget.NestedScrollView>

@@ -57,6 +57,8 @@ import com.duckduckgo.common.ui.compose.sheets.DaxPromoBottomSheetDialog
 import com.duckduckgo.common.ui.compose.text.DaxText
 import com.duckduckgo.common.ui.internal.R
 import com.duckduckgo.common.ui.internal.ui.appComponentsViewModel
+import com.duckduckgo.common.ui.internal.ui.compose.InteractiveComponentActivity
+import com.duckduckgo.common.ui.internal.ui.compose.InteractiveComponentScreen
 import com.duckduckgo.common.ui.internal.ui.setupThemedComposeView
 import com.duckduckgo.common.ui.view.LottieDaxDialog
 import com.duckduckgo.common.ui.view.TypewriterDaxDialog
@@ -1022,6 +1024,16 @@ class DialogsFragment : Fragment() {
                     ).show(fragmentManager, "dialog")
                 }
             }
+        }
+
+        view.findViewById<Button>(R.id.dax_dialog_onboarding)?.setOnClickListener {
+            startActivity(
+                InteractiveComponentActivity.intent(
+                    context = requireContext(),
+                    screen = InteractiveComponentScreen.DAX_DIALOG,
+                    isDarkTheme = isDarkTheme,
+                ),
+            )
         }
     }
 

@@ -37,6 +37,7 @@ fun DaxOneLineListItem(
     text: String,
     modifier: Modifier = Modifier,
     leadingIcon: @Composable (DaxListItemTrailingIconScope.() -> Unit)? = null,
+    trailingIcon: @Composable (DaxListItemTrailingIconScope.() -> Unit)? = null,
     containerColor: Color = DuckDuckGoTheme.colors.backgrounds.surface,
     contentColor: Color = DuckDuckGoTheme.colors.text.primary,
 ) {
@@ -51,6 +52,13 @@ fun DaxOneLineListItem(
         leadingContent = if (leadingIcon != null) {
             {
                 DaxListItemTrailingIconScope.leadingIcon()
+            }
+        } else {
+            null
+        },
+        trailingContent = if (trailingIcon != null) {
+            {
+                DaxListItemTrailingIconScope.trailingIcon()
             }
         } else {
             null
