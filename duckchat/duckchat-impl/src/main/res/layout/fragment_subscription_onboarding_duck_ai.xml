@@ -35,7 +35,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingHorizontal="@dimen/keyline_4"
-            android:paddingTop="@dimen/keyline_4"
+            android:paddingTop="@dimen/keyline_3"
             android:paddingBottom="@dimen/keyline_4">
 
             <ImageView
