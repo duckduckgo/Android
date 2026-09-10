@@ -350,4 +350,23 @@
     <string name="duckChatContextualAskAboutPage">Küsi lehe kohta</string>
     <string name="duckChatContextualAskAboutSearch">Jätka Duck.ai-s</string>
     <string name="duckChatContextualOpenDuckAi">Ava Duck.ai</string>
+
+    <!-- Suggested prompts for text selection -->
+    <string name="duckAiSuggestionSummarizeSelectionLabel">Tee sellest valikust kokkuvõte</string>
+    <string name="duckAiSuggestionSummarizeSelectionPrompt">Tee sellest valikust kokkuvõte.</string>
+    <string name="duckAiSuggestionTranslateSelectionLabel">Tõlgi see valik</string>
+    <string name="duckAiSuggestionTranslateSelectionPrompt" instruction="%1$s is replaced with the name of the user&apos;s language.">Tõlgi see valik keelde %1$s.</string>
+
+    <!-- Name shown for an attached text selection in the Duck.ai -->
+    <string name="duckAiTextSelectionAttachmentTitle">Tekstivalik</string>
+    <string name="duckAiTextSelectionLimitReached" instruction="%1$d is replaced with the maximum number of text selections.">Saad lisada kuni %1$d tekstivalikut. Eemalda üks, et teist lisada.</string>
+
+    <!-- Duck.ai text selection menu action -->
+    <string name="duckAiTextSelectionMenuItem">Küsi Duck.ai käest</string>
+
+    <!-- Prefix on the Duck.ai attachment chip for a text selection -->
+    <plurals name="duckAiTextSelectionWordCount">
+        <item quantity="one">%1$d sõna</item>
+        <item quantity="other">%1$d sõna</item>
+    </plurals>
 </resources>
