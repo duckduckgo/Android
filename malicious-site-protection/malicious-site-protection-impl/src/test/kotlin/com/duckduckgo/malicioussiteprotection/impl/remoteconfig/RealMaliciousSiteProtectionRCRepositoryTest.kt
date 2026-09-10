@@ -4,21 +4,29 @@ import android.annotation.SuppressLint
 import com.duckduckgo.app.browser.Domain
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.fakeDaxDomainResolver
 import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.malicioussiteprotection.impl.MaliciousSiteProtectionFeature
+import com.duckduckgo.url.DaxDomain
+import com.duckduckgo.url.DaxScheme
+import com.duckduckgo.url.DaxUrl
+import com.duckduckgo.url.DaxUrlProvider
+import androidx.lifecycle.LifecycleOwner
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.mock
 
 @SuppressLint("DenyListedApi") // setRawStoredState
 class RealMaliciousSiteProtectionRCRepositoryTest {
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
+    private val daxUrlProvider = FakeDaxUrlProvider()
     private val feature = FakeFeatureToggleFactory.create(MaliciousSiteProtectionFeature::class.java)
 
     @Before
@@ -100,7 +108,16 @@ class RealMaliciousSiteProtectionRCRepositoryTest {
         coroutineRule.testScope,
         coroutineRule.testDispatcherProvider,
         true,
-    )
+        daxUrlProvider,
+    ).apply { onCreate(mock<LifecycleOwner>()) }
+
+    // Only getDomain is exercised; the URL-level members aren't reachable from this repository.
+    private class FakeDaxUrlProvider : DaxUrlProvider {
+        override fun getDomain(host: String): DaxDomain? = fakeDaxDomainResolver(host)
+        override fun getUrl(url: String): DaxUrl = throw UnsupportedOperationException()
+        override fun withScheme(url: DaxUrl, scheme: DaxScheme): DaxUrl = throw UnsupportedOperationException()
+        override fun withScheme(url: String, scheme: DaxScheme): DaxUrl = throw UnsupportedOperationException()
+    }
 
     companion object {
         val exceptions = listOf(FeatureException("example.com", "reason"))

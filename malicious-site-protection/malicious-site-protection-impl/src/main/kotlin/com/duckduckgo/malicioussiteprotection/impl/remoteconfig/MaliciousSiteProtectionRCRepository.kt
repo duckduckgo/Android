@@ -18,7 +18,6 @@ package com.duckduckgo.malicioussiteprotection.impl.remoteconfig
 
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.browser.Domain
-import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
@@ -26,6 +25,8 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.malicioussiteprotection.impl.MaliciousSiteProtectionFeature
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
+import com.duckduckgo.url.DaxDomain
+import com.duckduckgo.url.DaxUrlProvider
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.ContributesIntoSet
 import dev.zacsweers.metro.SingleIn
@@ -53,10 +54,11 @@ class RealMaliciousSiteProtectionRCRepository @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     @IsMainProcess private val isMainProcess: Boolean,
+    private val daxUrlProvider: DaxUrlProvider,
 ) : MaliciousSiteProtectionRCRepository, PrivacyConfigCallbackPlugin, MainProcessLifecycleObserver {
 
     @Volatile
-    private var exceptionDomains = emptyList<Domain>()
+    private var exceptionDomains = emptyList<DaxDomain>()
 
     override fun onCreate(owner: LifecycleOwner) {
         loadToMemory()
@@ -67,15 +69,16 @@ class RealMaliciousSiteProtectionRCRepository @Inject constructor(
     }
 
     override fun isExempted(domain: Domain): Boolean {
-        return exceptionDomains.any { UriString.sameOrSubdomain(domain, it) }
+        val child = daxUrlProvider.getDomain(domain.value) ?: return false
+        return exceptionDomains.any { it.sameOrSubdomain(child) }
     }
 
     private fun loadToMemory() {
         coroutineScope.launch(dispatcherProvider.io()) {
             if (isMainProcess) {
-                exceptionDomains = feature.self().getExceptions().also {
-                    logcat("Cris") { "MSP size=${it.size} domain=${it.firstOrNull()?.domain} daxDomain=${it.firstOrNull()?.daxDomain}" }
-                }.map { Domain(it.domain) }
+                exceptionDomains = feature.self().getExceptionDomains().also {
+                    logcat("Cris") { "MSP load size=${it.size} domains=${it.joinToString()}" }
+                }
             }
         }
     }

@@ -90,6 +90,9 @@ class ContributesRemoteFeatureProcessor(
         // Variant manager
         private val VARIANT_MANAGER = ClassName("com.duckduckgo.experiments.api", "VariantManager")
 
+        // Unified URL model
+        private val DAX_URL_PROVIDER = ClassName("com.duckduckgo.url", "DaxUrlProvider")
+
         // Kotlin and javax.inject
         private val LAZY = ClassName("kotlin", "Lazy")
         private val INJECT = ClassName("javax.inject", "Inject")
@@ -748,9 +751,10 @@ class ContributesRemoteFeatureProcessor(
                     .addParameter("callback", FEATURE_TOGGLES_CALLBACK)
                     .addParameter("appBuildConfig", APP_BUILD_CONFIG)
                     .addParameter("variantManager", VARIANT_MANAGER)
+                    .addParameter("daxUrlProvider", DAX_URL_PROVIDER)
                     .addCode(
                         """
-                            return %T.Builder()
+                            return %T.Builder(daxDomainResolver = daxUrlProvider::getDomain)
                                 .store(toggleStore)
                                 .appVersionProvider({ appBuildConfig.versionCode })
                                 .flavorNameProvider({ appBuildConfig.flavor.name })

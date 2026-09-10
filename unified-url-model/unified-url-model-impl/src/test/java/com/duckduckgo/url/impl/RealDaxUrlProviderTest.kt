@@ -17,12 +17,9 @@
 package com.duckduckgo.url.impl
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.url.DaxDomainType
 import com.duckduckgo.url.DaxScheme
-import com.duckduckgo.url.DaxUrlResolver
-import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotSame
@@ -45,12 +42,7 @@ class RealDaxUrlProviderTest {
     @Before
     fun setup() {
         whenever(feature.useUnifiedUrl()).thenReturn(toggle)
-        provider = RealDaxUrlProvider(feature)
-    }
-
-    @After
-    fun tearDown() {
-        DaxUrlResolver.reset()
+        provider = RealDaxUrlProvider({ feature })
     }
 
     @Test
@@ -81,22 +73,6 @@ class RealDaxUrlProviderTest {
         assertFalse(provider.getUrl("https://notexample.com").matches(exception))
     }
 
-    @Test
-    fun whenProviderInstalledThenFeatureExceptionResolvesDaxDomain() {
-        whenever(toggle.isEnabled()).thenReturn(false)
-        DaxUrlResolver.install(provider)
-
-        val exception = FeatureException(domain = "example.com", reason = null)
-        val child = provider.getUrl("https://sub.example.com").domain!!
-
-        assertTrue(exception.daxDomain!!.sameOrSubdomain(child))
-    }
-
-    @Test
-    fun whenProviderNotInstalledThenFeatureExceptionDaxDomainIsNull() {
-        DaxUrlResolver.reset()
-        assertNull(FeatureException(domain = "example.com", reason = null).daxDomain)
-    }
 
     @Test
     fun whenDomainExtractedThenNormalizedWwwStripped() {
