@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser.newaddressbaroption
 
 import android.content.Context
+import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -35,6 +36,7 @@ interface NewAddressBarPickerBottomSheetDialogFactory {
 @ContributesBinding(AppScope::class)
 class RealNewAddressBarPickerBottomSheetDialogFactory @Inject constructor(
     private val edgeToEdgeProvider: EdgeToEdgeProvider,
+    private val appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles,
 ) : NewAddressBarPickerBottomSheetDialogFactory {
     override fun create(
         context: Context,
@@ -46,5 +48,6 @@ class RealNewAddressBarPickerBottomSheetDialogFactory @Inject constructor(
             isLightMode = isLightMode,
             callback = callback,
             edgeToEdgeEnabled = edgeToEdgeProvider.isEnabled(EdgeToEdgeBucket.BOTTOM_SHEETS),
+            radiusOverlayEnabled = appBrandDesignUpdateToggles.radius().isEnabled(),
         )
 }
