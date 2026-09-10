@@ -33,7 +33,7 @@ import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelectio
 import com.duckduckgo.app.onboarding.ui.view.DaxTypeAnimationTextView
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleBrandDesignUpdateCardView
+import com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleCardView
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.device.DeviceInfo.FormFactor
@@ -50,7 +50,7 @@ class BrandDesignUpdateBubbleCtaTest {
 
     private val container: View = mock()
     private val dax: LottieAnimationView = mock()
-    private val cardView: DaxOnboardingBubbleBrandDesignUpdateCardView = mock()
+    private val cardView: DaxOnboardingBubbleCardView = mock()
     private val titleView: DaxTypeAnimationTextView = mock()
     private val descriptionView: DaxTextView = mock()
     private val dismissButton: ImageView = mock()
@@ -142,7 +142,7 @@ class BrandDesignUpdateBubbleCtaTest {
     @Test
     fun onOrientationChanged_phoneLandscape_hidesWavingDax() {
         configureContainerForPhoneLandscape()
-        whenever(container.findViewById<DaxOnboardingBubbleBrandDesignUpdateCardView>(R.id.brandDesignCardView)).thenReturn(cardView)
+        whenever(container.findViewById<DaxOnboardingBubbleCardView>(R.id.brandDesignCardView)).thenReturn(cardView)
         val cta = WavingDaxBubbleCta().apply { attachCtaView(container) }
 
         cta.onOrientationChanged()
@@ -153,7 +153,7 @@ class BrandDesignUpdateBubbleCtaTest {
     @Test
     fun onOrientationChanged_phoneLandscape_retractsFin() {
         configureContainerForPhoneLandscape()
-        whenever(container.findViewById<DaxOnboardingBubbleBrandDesignUpdateCardView>(R.id.brandDesignCardView)).thenReturn(cardView)
+        whenever(container.findViewById<DaxOnboardingBubbleCardView>(R.id.brandDesignCardView)).thenReturn(cardView)
         val cta = WavingDaxBubbleCta().apply { attachCtaView(container) }
 
         cta.onOrientationChanged()

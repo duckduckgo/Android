@@ -37,7 +37,7 @@ import com.duckduckgo.app.onboarding.ui.view.TouchInterceptingLinearLayout
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleBrandDesignUpdateCardView
+import com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleCardView
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.device.DeviceInfo.FormFactor
@@ -71,7 +71,7 @@ class ContextualDaxDialogCtaTest {
     private val brandDesignBinding: IncludeOnboardingInContextDaxDialogBinding = mock()
     private val settingsDataStore: SettingsDataStore = mock()
 
-    private val cardView: DaxOnboardingBubbleBrandDesignUpdateCardView = mock()
+    private val cardView: DaxOnboardingBubbleCardView = mock()
 
     private val onboardingStore: OnboardingStore = mock()
     private val appInstallStore: AppInstallStore = mock()
@@ -95,7 +95,7 @@ class ContextualDaxDialogCtaTest {
             .thenReturn(optionsInclude)
         whenever(container.findViewById<OnboardingFillImageView>(R.id.contextualBrandDesignBackground))
             .thenReturn(backgroundView)
-        whenever(container.findViewById<DaxOnboardingBubbleBrandDesignUpdateCardView>(R.id.contextualBrandDesignCardView))
+        whenever(container.findViewById<DaxOnboardingBubbleCardView>(R.id.contextualBrandDesignCardView))
             .thenReturn(cardView)
         // View binding includes are generated as final fields, so Mockito cannot stub the field
         // access used by the production hideContainer() path. Construct the binding with just the

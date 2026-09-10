@@ -63,7 +63,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.view.button.DaxButton
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
-import com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleBrandDesignUpdateCardView
+import com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleCardView
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.view.toPx
@@ -287,7 +287,7 @@ sealed class OnboardingDaxDialogCta(
             val descriptionView = container.findViewById<DaxTextView>(R.id.contextualBrandDesignDescription)
             val dismissButton = container.findViewById<ImageView>(R.id.contextualBrandDesignDismissButton)
             val cardContainer = container.findViewById<TouchInterceptingLinearLayout>(R.id.contextualBrandDesignCardContainer)
-            val cardView = container.findViewById<DaxOnboardingBubbleBrandDesignUpdateCardView>(R.id.contextualBrandDesignCardView)
+            val cardView = container.findViewById<DaxOnboardingBubbleCardView>(R.id.contextualBrandDesignCardView)
             val targetDepth = if (showArrow && !container.isPhoneLandscape()) 1f else 0f
             this.cardContainer = cardContainer
             isAnimating = true
@@ -396,8 +396,8 @@ sealed class OnboardingDaxDialogCta(
             }
 
             // Tap-to-skip: any tap on the dialog area (card or surrounding backdrop) ends running
-            // animations and snaps all content visible — matches the legacy onboarding behaviour
-            // where the whole screen is the skip surface, not just the card.
+            // animations and snaps all content visible — the whole screen is the skip surface,
+            // not just the card.
             container.setOnClickListener {
                 snapToFinished(
                     container = container,
@@ -626,7 +626,7 @@ sealed class OnboardingDaxDialogCta(
             container.alpha = 1f
             bannerFor(container)?.snapToFinalPosition()
             contentFadeInAnimator?.let { if (it.isRunning) it.end() }
-            container.findViewById<DaxOnboardingBubbleBrandDesignUpdateCardView>(R.id.contextualBrandDesignCardView)
+            container.findViewById<DaxOnboardingBubbleCardView>(R.id.contextualBrandDesignCardView)
                 ?.setArrowDepthFraction(if (showArrow && !container.isPhoneLandscape()) 1f else 0f)
             snapWingBottomToResting(container)
             if (!alreadySettled) {
@@ -764,7 +764,7 @@ sealed class OnboardingDaxDialogCta(
             }
             if (!isContentTransition) {
                 container.findViewById<View>(R.id.contextualBrandDesignDismissButton)?.alpha = 0f
-                container.findViewById<DaxOnboardingBubbleBrandDesignUpdateCardView>(R.id.contextualBrandDesignCardView)
+                container.findViewById<DaxOnboardingBubbleCardView>(R.id.contextualBrandDesignCardView)
                     ?.setArrowDepthFraction(0f)
             }
             container.findViewById<View>(R.id.wavingDax)?.visibility = View.GONE
@@ -1076,7 +1076,7 @@ sealed class DaxBubbleCta(
 
         fun onOrientationChanged() {
             val container = ctaView ?: return
-            val cardView = container.findViewById<DaxOnboardingBubbleBrandDesignUpdateCardView>(R.id.brandDesignCardView) ?: return
+            val cardView = container.findViewById<DaxOnboardingBubbleCardView>(R.id.brandDesignCardView) ?: return
 
             applyWavingDaxState(container, this as? ShowsWavingDax)
             cardView.setArrowDepthFraction(showCtaFinTarget(container) ?: 0f)
@@ -1105,7 +1105,7 @@ sealed class DaxBubbleCta(
             wavingDaxController?.reset()
             val isContentTransition = container.alpha > 0f && container.isVisible // card already visible from previous CTA
 
-            val cardView = container.findViewById<DaxOnboardingBubbleBrandDesignUpdateCardView>(R.id.brandDesignCardView)
+            val cardView = container.findViewById<DaxOnboardingBubbleCardView>(R.id.brandDesignCardView)
 
             val daxTitle = container.context.getString(title)
             val daxDescription = container.context.getString(description).preventWidows()
@@ -1391,8 +1391,8 @@ sealed class HomePanelCta(
         view: View,
         onTypingAnimationFinished: () -> Unit,
     ) {
-        // no-op. We are now using a Bottom Sheet to display this
-        // but we want to keep the same classes for pixels, etc
+        // No-op: Home Panel CTAs render through the bottom-sheet flow.
+        // Keep this type to preserve CTA identity and pixel metadata.
     }
 
     override fun pixelCancelParameters(): Map<String, String> = emptyMap()

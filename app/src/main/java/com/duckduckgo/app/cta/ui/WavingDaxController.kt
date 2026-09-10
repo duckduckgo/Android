@@ -26,7 +26,7 @@ import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.onboarding.ui.page.OnboardingDecorationSizing
-import com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleBrandDesignUpdateCardView
+import com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleCardView
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.device.isTablet
 
@@ -67,7 +67,7 @@ internal class WavingDaxController(
     }
 
     /**
-     * Height for a bottom-anchored waving Dax (V2 on). Pure so it can be unit-tested without a device.
+     * Height for a bottom-anchored waving Dax based on available room. Pure so it can be unit-tested without a device.
      */
     internal fun daxFitHeight(
         usableBottom: Int,
@@ -111,7 +111,7 @@ internal class WavingDaxController(
     private fun computeDaxFitHeight(container: View): Int? {
         if (!container.isShown || container.isPhoneLandscape()) return null
 
-        val cardView = container.findViewById<DaxOnboardingBubbleBrandDesignUpdateCardView>(R.id.brandDesignCardView) ?: return null
+        val cardView = container.findViewById<DaxOnboardingBubbleCardView>(R.id.brandDesignCardView) ?: return null
 
         val density = container.resources.displayMetrics.density
         val marginPx = (DAX_FIT_MARGIN_DP * density).toInt()
@@ -140,7 +140,7 @@ internal class WavingDaxController(
         lastDaxFits = fits
 
         val dax = container.findViewById<LottieAnimationView>(R.id.wavingDax) ?: return
-        val cardView = container.findViewById<DaxOnboardingBubbleBrandDesignUpdateCardView>(R.id.brandDesignCardView) ?: return
+        val cardView = container.findViewById<DaxOnboardingBubbleCardView>(R.id.brandDesignCardView) ?: return
 
         if (fits) {
             if (!dax.isVisible) {
@@ -165,7 +165,7 @@ internal class WavingDaxController(
     }
 
     private fun buildArrowDepthAnimator(
-        cardView: DaxOnboardingBubbleBrandDesignUpdateCardView,
+        cardView: DaxOnboardingBubbleCardView,
         from: Float,
         to: Float,
     ): ValueAnimator =

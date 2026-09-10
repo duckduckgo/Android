@@ -39,7 +39,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.databinding.ContentOnboardingWelcomePageUpdateBinding
+import com.duckduckgo.app.browser.databinding.ContentOnboardingWelcomePageBinding
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserSystemSettings
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
@@ -82,7 +82,7 @@ import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(FragmentScope::class)
-class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_onboarding_welcome_page_update) {
+class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_onboarding_welcome_page) {
 
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
@@ -105,7 +105,7 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
-    private val binding: ContentOnboardingWelcomePageUpdateBinding by viewBinding()
+    private val binding: ContentOnboardingWelcomePageBinding by viewBinding()
     private val viewModel by lazy {
         ViewModelProvider(this, viewModelFactory)[ConfigDrivenOnboardingPageViewModel::class.java]
     }

@@ -19,8 +19,8 @@ package com.duckduckgo.app.onboarding.ui
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint
-import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint.BrandDesignUpdateDefaultBrowserPageBlueprint
 import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint.ConfigDrivenWelcomePageBlueprint
+import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint.DefaultBrowserBlueprint
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
 import com.duckduckgo.app.onboarding.ui.page.configdriven.ConfigDrivenWelcomePageFragment
@@ -45,14 +45,14 @@ class OnboardingPageManagerWithTrackerBlocking(
         pages.clear()
         pages += ConfigDrivenWelcomePageBlueprint
         if (shouldShowDefaultBrowserPage()) {
-            pages += BrandDesignUpdateDefaultBrowserPageBlueprint
+            pages += DefaultBrowserBlueprint
         }
     }
 
     override fun buildPage(position: Int): OnboardingPageFragment? {
         return when (pages.getOrNull(position)) {
             is ConfigDrivenWelcomePageBlueprint -> buildConfigDrivenWelcomePage()
-            is BrandDesignUpdateDefaultBrowserPageBlueprint -> buildBrandDesignUpdateDefaultBrowserPage()
+            is DefaultBrowserBlueprint -> buildDefaultBrowserPage()
             else -> null
         }
     }
@@ -67,7 +67,7 @@ class OnboardingPageManagerWithTrackerBlocking(
         return onboardingPageBuilder.buildConfigDrivenWelcomePage()
     }
 
-    private fun buildBrandDesignUpdateDefaultBrowserPage(): DefaultBrowserPage {
-        return onboardingPageBuilder.buildBrandDesignUpdateDefaultBrowserPage()
+    private fun buildDefaultBrowserPage(): DefaultBrowserPage {
+        return onboardingPageBuilder.buildDefaultBrowserPage()
     }
 }

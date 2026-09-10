@@ -804,8 +804,8 @@ class BrowserTabFragment :
     private val sslErrorView
         get() = binding.sslErrorWarningLayout
 
-    private val daxDialogIntroBubbleBrandDesign
-        get() = binding.includeNewBrowserTab.includeOnboardingDaxDialogBubbleBrandDesignUpdate
+    private val daxDialogIntroBubble
+        get() = binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble
 
     private val brandDesignDialogScrollView
         get() = binding.includeNewBrowserTab.brandDesignDialogScrollView
@@ -1285,18 +1285,17 @@ class BrowserTabFragment :
 
                 newBrowserTab.newTabContainerScrollView.isSaveEnabled = false
 
-                daxDialogIntroBubbleBrandDesign.brandDesignTitle.isSaveEnabled = false
-                daxDialogIntroBubbleBrandDesign.brandDesignHiddenTitle.isSaveEnabled = false
-                daxDialogIntroBubbleBrandDesign.brandDesignDescription.isSaveEnabled = false
-                daxDialogIntroBubbleBrandDesign.brandDesignDismissButton.isSaveEnabled = false
-                daxDialogIntroBubbleBrandDesign.optionsContent.brandDesignOption1.isSaveEnabled = false
-                daxDialogIntroBubbleBrandDesign.optionsContent.brandDesignOption2.isSaveEnabled = false
-                daxDialogIntroBubbleBrandDesign.optionsContent.brandDesignOption3.isSaveEnabled = false
-                daxDialogIntroBubbleBrandDesign.optionsContent.brandDesignOption4.isSaveEnabled = false
-                daxDialogIntroBubbleBrandDesign.primaryCta.isSaveEnabled = false
+                daxDialogIntroBubble.brandDesignTitle.isSaveEnabled = false
+                daxDialogIntroBubble.brandDesignHiddenTitle.isSaveEnabled = false
+                daxDialogIntroBubble.brandDesignDescription.isSaveEnabled = false
+                daxDialogIntroBubble.brandDesignDismissButton.isSaveEnabled = false
+                daxDialogIntroBubble.optionsContent.brandDesignOption1.isSaveEnabled = false
+                daxDialogIntroBubble.optionsContent.brandDesignOption2.isSaveEnabled = false
+                daxDialogIntroBubble.optionsContent.brandDesignOption3.isSaveEnabled = false
+                daxDialogIntroBubble.optionsContent.brandDesignOption4.isSaveEnabled = false
+                daxDialogIntroBubble.primaryCta.isSaveEnabled = false
 
-                daxDialogIntroBubbleBrandDesign.brandDesignHeaderImage.isSaveEnabled = false
-
+                daxDialogIntroBubble.brandDesignHeaderImage.isSaveEnabled = false
 
                 binding.autoCompleteSuggestionsList.isSaveEnabled = false
                 binding.daxDialogOnboardingCtaContent.isSaveEnabled = false
@@ -4430,7 +4429,7 @@ class BrowserTabFragment :
         if (wasBrandDesign) {
             newBrowserTab.newTabLayout.setBackgroundColor(0)
         }
-        daxDialogIntroBubbleBrandDesign.root.gone()
+        daxDialogIntroBubble.root.gone()
         brandDesignDialogScrollView.gone()
     }
 
@@ -6353,7 +6352,7 @@ class BrowserTabFragment :
         private fun showDaxOnboardingBubbleCta(configuration: DaxBubbleCta.BrandDesignUpdateBubbleCta) {
             hideNewTab()
             brandDesignDialogScrollView.show()
-            val container = daxDialogIntroBubbleBrandDesign.daxCtaContainer
+            val container = daxDialogIntroBubble.daxCtaContainer
             configuration.apply {
                 showCta(container) {
                     setOnOptionClicked { option, _ ->

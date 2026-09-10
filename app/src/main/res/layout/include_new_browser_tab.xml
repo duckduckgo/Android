@@ -110,7 +110,7 @@
             app:layout_constraintEnd_toEndOf="parent">
 
             <include
-                android:id="@+id/includeOnboardingDaxDialogBubbleBrandDesignUpdate"
+                android:id="@+id/includeOnboardingDaxDialogBubble"
                 layout="@layout/include_onboarding_bubble_dax_dialog"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

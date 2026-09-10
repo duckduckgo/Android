@@ -10,7 +10,7 @@
     android:clipToPadding="false"
     tools:alpha="1">
 
-    <com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleBrandDesignUpdateCardView
+    <com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleCardView
         android:id="@+id/brandDesignCardView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -81,7 +81,6 @@
                 tools:alpha="1"
                 tools:text="@string/onboardingSearchDaxDialogDescription" />
 
-            <!-- Content include slots — only one visible at a time -->
             <include
                 android:id="@+id/optionsContent"
                 layout="@layout/include_brand_design_dialog_options"
@@ -117,9 +116,8 @@
 
         </com.duckduckgo.app.onboarding.ui.view.TouchInterceptingLinearLayout>
 
-    </com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleBrandDesignUpdateCardView>
+    </com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleCardView>
 
-    <!-- Dismiss button: bordered circular button overlapping card corner. -->
     <ImageView
         android:id="@+id/brandDesignDismissButton"
         android:layout_width="32dp"

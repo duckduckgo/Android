@@ -52,7 +52,7 @@
         tools:src="@drawable/bg_onboarding_serp"
         tools:visibility="visible" />
 
-    <com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleBrandDesignUpdateCardView
+    <com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleCardView
         android:id="@+id/contextualBrandDesignCardView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -156,7 +156,7 @@
 
         </com.duckduckgo.app.onboarding.ui.view.TouchInterceptingLinearLayout>
 
-    </com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleBrandDesignUpdateCardView>
+    </com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleCardView>
 
     <ImageView
         android:id="@+id/contextualBrandDesignDismissButton"

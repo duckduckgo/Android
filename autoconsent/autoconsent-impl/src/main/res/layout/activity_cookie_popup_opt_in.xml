@@ -69,7 +69,7 @@
                 app:layout_constraintTop_toBottomOf="@id/cookiePopupOptInLogo"
                 app:typography="onboarding_small_text" />
 
-            <com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleBrandDesignUpdateCardView
+            <com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleCardView
                 android:id="@+id/cookiePopupOptInBubble"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -160,7 +160,7 @@
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
-            </com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleBrandDesignUpdateCardView>
+            </com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleCardView>
 
             <FrameLayout
                 android:id="@+id/cookiePopupOptInCloseButton"

@@ -19,7 +19,7 @@ package com.duckduckgo.app.onboarding.ui.page.configdriven.engine
 import android.animation.ValueAnimator
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.duckduckgo.app.onboarding.ui.page.configdriven.CardArrowConfig
-import com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleBrandDesignUpdateCardView
+import com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleCardView
 import com.duckduckgo.common.ui.view.toPx
 
 interface CardArrowController {
@@ -35,7 +35,7 @@ interface CardArrowController {
  * gesture instead of the reflection popping before the slide.
  */
 class CardArrowControllerImpl(
-    private val cardView: DaxOnboardingBubbleBrandDesignUpdateCardView,
+    private val cardView: DaxOnboardingBubbleCardView,
 ) : CardArrowController {
 
     private var transition: ValueAnimator? = null

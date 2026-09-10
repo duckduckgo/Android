@@ -137,7 +137,7 @@
 
             <include
                 android:id="@+id/daxDialogCta"
-                layout="@layout/pre_onboarding_dax_dialog_cta_brand_design_update"
+                layout="@layout/pre_onboarding_dax_dialog_cta"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="32dp"

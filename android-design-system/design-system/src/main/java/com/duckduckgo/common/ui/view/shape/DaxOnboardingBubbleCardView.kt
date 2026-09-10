@@ -34,7 +34,7 @@ import com.google.android.material.card.MaterialCardView
 import com.google.android.material.shape.EdgeTreatment
 import com.google.android.material.shape.ShapeAppearanceModel
 
-class DaxOnboardingBubbleBrandDesignUpdateCardView
+class DaxOnboardingBubbleCardView
 @JvmOverloads
 constructor(
     context: Context,
@@ -57,20 +57,20 @@ constructor(
     init {
         val attr = context.theme.obtainStyledAttributes(
             attrs,
-            R.styleable.DaxOnboardingBubbleBrandDesignUpdateCardView,
+            R.styleable.DaxOnboardingBubbleCardView,
             defStyleAttr,
             0,
         )
         val offsetStart = attr.getDimensionPixelSize(
-            R.styleable.DaxOnboardingBubbleBrandDesignUpdateCardView_arrowOffsetStart,
+            R.styleable.DaxOnboardingBubbleCardView_arrowOffsetStart,
             0,
         )
         val offsetEnd = attr.getDimensionPixelSize(
-            R.styleable.DaxOnboardingBubbleBrandDesignUpdateCardView_arrowOffsetEnd,
+            R.styleable.DaxOnboardingBubbleCardView_arrowOffsetEnd,
             0,
         )
         showArrow = attr.getBoolean(
-            R.styleable.DaxOnboardingBubbleBrandDesignUpdateCardView_showArrow,
+            R.styleable.DaxOnboardingBubbleCardView_showArrow,
             true,
         )
         attr.recycle()

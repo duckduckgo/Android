@@ -26,7 +26,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleBrandDesignUpdateCardView
+import com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleCardView
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.device.DeviceInfo.FormFactor
 import org.junit.Assert.assertEquals
@@ -82,9 +82,9 @@ class WavingDaxControllerTest {
     }
 
     @Test
-    fun applyFit_thenSettle_usesV2EnabledSizing() {
+    fun applyFit_thenSettle_usesAvailableRoomSizing() {
         val container: View = mock()
-        val cardView: DaxOnboardingBubbleBrandDesignUpdateCardView = mock()
+        val cardView: DaxOnboardingBubbleCardView = mock()
         val dax: LottieAnimationView = mock()
         val resources: Resources = mock()
         val context: Context = mock()
@@ -109,7 +109,7 @@ class WavingDaxControllerTest {
         whenever(resources.configuration).thenReturn(configuration)
         whenever(resources.displayMetrics).thenReturn(displayMetrics)
         whenever(container.findViewById<LottieAnimationView>(R.id.wavingDax)).thenReturn(dax)
-        whenever(container.findViewById<DaxOnboardingBubbleBrandDesignUpdateCardView>(R.id.brandDesignCardView)).thenReturn(cardView)
+        whenever(container.findViewById<DaxOnboardingBubbleCardView>(R.id.brandDesignCardView)).thenReturn(cardView)
         whenever(cardView.height).thenReturn(500)
         whenever(cardView.arrowDepthFraction).thenReturn(0f)
         whenever(dax.resources).thenReturn(resources)
@@ -129,7 +129,7 @@ class WavingDaxControllerTest {
         controller.applyFit(container)
         settleRunnable.firstValue.run()
 
-        // Former improvementsV2Enabled=true behavior: 500px available height and proportional -25px peek.
+        // Room-based sizing: 500px available height and proportional -25px peek.
         assertEquals(500, layoutParams.height)
         verify(dax, times(2)).translationX = -25f
         verify(dax).setMinFrame(17)

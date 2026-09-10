@@ -76,7 +76,7 @@ class OnboardingDecorationFitCorrector(
 
         if (deco == null) return !syncCardClamp()
         if (deco.isGone) return true
-        if (BrandDesignUpdateOnboardingLayoutHelper.isInScrollableContainer(dialog, root)) return true
+        if (OnboardingLayoutHelper.isInScrollableContainer(dialog, root)) return true
         if (syncCardClamp()) return false
 
         val viewport = cardContainer.parent as? View ?: return true
@@ -99,7 +99,7 @@ class OnboardingDecorationFitCorrector(
         val dialogSpace = dialogHeight + overflow + dialogParams.topMargin
         val decorationParams = deco.layoutParams as ViewGroup.MarginLayoutParams
 
-        val target = BrandDesignUpdateOnboardingLayoutHelper.computeDecorationHeight(
+        val target = OnboardingLayoutHelper.computeDecorationHeight(
             availableContentHeight = available,
             dialogSpace = dialogSpace,
             decorationBottomMargin = decorationParams.bottomMargin,

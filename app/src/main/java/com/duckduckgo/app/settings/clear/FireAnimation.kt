@@ -32,8 +32,10 @@ sealed class FireAnimation(
 ) : Serializable {
     data object Inferno : FireAnimation(R.raw.inferno, R.string.settingsHeroFireAnimation)
 
-    // Displayed as "Inferno Classic"; storage key, pixel value, and asset filename are
-    // intentionally preserved for blast-radius reasons.
+    /**
+     * The selector displays "Inferno Classic" as a presentation-only label. The storage key, pixel value, and asset
+     * filename remain intentionally preserved.
+     */
     data object HeroFire : FireAnimation(R.raw.hero_fire_inferno, R.string.settingsHeroFireAnimation)
     data object HeroWater : FireAnimation(R.raw.hero_water_whirlpool, R.string.settingsHeroWaterAnimation)
     data object HeroAbstract : FireAnimation(R.raw.hero_abstract_airstream, R.string.settingsHeroAbstractAnimation)
