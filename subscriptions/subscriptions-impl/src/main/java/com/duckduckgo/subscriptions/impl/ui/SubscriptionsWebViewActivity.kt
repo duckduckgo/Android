@@ -90,6 +90,7 @@ import com.duckduckgo.subscriptions.impl.R.string
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.FEATURE_PAGE_QUERY_PARAM_KEY
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ITR_URL
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
+import com.duckduckgo.subscriptions.impl.appendFunnelOriginParam
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionsWebviewBinding
 import com.duckduckgo.subscriptions.impl.internal.SubscriptionsUrlProvider
 import com.duckduckgo.subscriptions.impl.pir.PirActivity.Companion.PirScreenWithEmptyParams
@@ -398,19 +399,24 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
                 } else {
                     webViewActivityWithParams
                 }
-            }
+            }.appendFunnelOriginToUrl()
         }
 
         intent.getActivityParams(SubscriptionUpgrade::class.java)?.let { params ->
             return SubscriptionsWebViewActivityWithParams(
                 url = subscriptionsUrlProvider.upgradeToProUrl,
                 origin = params.origin,
-            )
+            ).appendFunnelOriginToUrl()
         }
 
-        return intent.getActivityParams(SubscriptionsWebViewActivityWithParams::class.java)
-            ?: SubscriptionsWebViewActivityWithParams(subscriptionsUrlProvider.buyUrl)
+        return (
+            intent.getActivityParams(SubscriptionsWebViewActivityWithParams::class.java)
+                ?: SubscriptionsWebViewActivityWithParams(subscriptionsUrlProvider.buyUrl)
+            ).appendFunnelOriginToUrl()
     }
+
+    private fun SubscriptionsWebViewActivityWithParams.appendFunnelOriginToUrl(): SubscriptionsWebViewActivityWithParams =
+        copy(url = url.appendFunnelOriginParam(origin))
 
     private fun launchDownloadMessagesJob() {
         downloadMessagesJob += lifecycleScope.launch {
