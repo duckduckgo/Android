@@ -61,7 +61,6 @@ class DataClearingSettingsViewModel @Inject constructor(
 
     data class ViewState(
         val selectedFireAnimation: FireAnimation = FireAnimation.HeroFire,
-        val isFireAnimationUpdateEnabled: Boolean = true,
         val clearDuckAiData: Boolean = false,
         val showClearDuckAiDataSetting: Boolean = false,
         val fireproofWebsitesCount: Int = 0,
@@ -72,7 +71,6 @@ class DataClearingSettingsViewModel @Inject constructor(
         data object LaunchFireproofWebsites : Command()
         data class LaunchFireAnimationSettings(
             val animation: FireAnimation,
-            val isFireAnimationUpdateEnabled: Boolean,
         ) : Command()
         data object LaunchFireDialog : Command()
         data object LaunchAutomaticDataClearingSettings : Command()
@@ -134,7 +132,6 @@ class DataClearingSettingsViewModel @Inject constructor(
             _commands.send(
                 Command.LaunchFireAnimationSettings(
                     animation = state.selectedFireAnimation,
-                    isFireAnimationUpdateEnabled = state.isFireAnimationUpdateEnabled,
                 ),
             )
         }
