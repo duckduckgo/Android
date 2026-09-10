@@ -352,4 +352,25 @@
     <string name="duckChatContextualAskAboutPage">Задать вопрос о странице</string>
     <string name="duckChatContextualAskAboutSearch">Продолжить в Duck.ai</string>
     <string name="duckChatContextualOpenDuckAi">Открыть Duck.ai</string>
+
+    <!-- Suggested prompts for text selection -->
+    <string name="duckAiSuggestionSummarizeSelectionLabel">Кратко изложи выделенный фрагмент</string>
+    <string name="duckAiSuggestionSummarizeSelectionPrompt">Кратко изложи выделенный фрагмент.</string>
+    <string name="duckAiSuggestionTranslateSelectionLabel">Переведи выделенный текст</string>
+    <string name="duckAiSuggestionTranslateSelectionPrompt" instruction="%1$s is replaced with the name of the user&apos;s language.">Переведи выделенный текст на %1$s.</string>
+
+    <!-- Name shown for an attached text selection in the Duck.ai -->
+    <string name="duckAiTextSelectionAttachmentTitle">Выделенный текст</string>
+    <string name="duckAiTextSelectionLimitReached" instruction="%1$d is replaced with the maximum number of text selections.">Можно добавить максимум %1$d выделенных фрагментов текста. Чтобы добавить фрагмент, удали один из ранее добавленных.</string>
+
+    <!-- Duck.ai text selection menu action -->
+    <string name="duckAiTextSelectionMenuItem">Спросить у Duck.ai</string>
+
+    <!-- Prefix on the Duck.ai attachment chip for a text selection -->
+    <plurals name="duckAiTextSelectionWordCount">
+        <item quantity="one">%1$d слово</item>
+        <item quantity="few">%1$d слова</item>
+        <item quantity="many">%1$d слов</item>
+        <item quantity="other">%1$d сл.</item>
+    </plurals>
 </resources>
