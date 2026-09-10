@@ -191,6 +191,14 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
         when (event) {
             is ChatHistoryViewModel.NavigationEvent.OpenChat ->
                 startActivity(browserNav.openInNewTab(requireContext(), event.url, event.sourceTabId))
+            is ChatHistoryViewModel.NavigationEvent.OpenChatProtection ->
+                startActivity(
+                    if (event.inNewTab) {
+                        browserNav.openInNewTab(requireContext(), event.url, event.sourceTabId)
+                    } else {
+                        browserNav.openInCurrentTab(requireContext(), event.url)
+                    },
+                )
             is ChatHistoryViewModel.NavigationEvent.OpenRename -> openRenameScreen(event.chatId, event.currentTitle)
             is ChatHistoryViewModel.NavigationEvent.ShowDownloadComplete -> showDownloadCompleteSnackbar(event.fileName)
             is ChatHistoryViewModel.NavigationEvent.ShowBulkDownloadComplete -> showBulkDownloadCompleteSnackbar(event.count)
@@ -397,7 +405,7 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
         val popup = PopupMenu(layoutInflater, R.layout.popup_chat_history_overflow)
         val view = popup.contentView
         popup.onMenuItemClicked(view.findViewById(R.id.selectChats)) { viewModel.onEnterSelectMode() }
-        popup.onMenuItemClicked(view.findViewById(R.id.chatsProtection)) { }
+        popup.onMenuItemClicked(view.findViewById(R.id.chatsProtection)) { viewModel.onChatsProtectionClicked() }
         popup.show(binding.root, anchor)
     }
 
