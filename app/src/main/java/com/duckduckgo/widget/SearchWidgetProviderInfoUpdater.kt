@@ -55,10 +55,14 @@ class SearchWidgetProviderInfoUpdater internal constructor(
             LEGACY_PROVIDER_INFO_METADATA_KEY
         }
 
-        appWidgetManager.updateAppWidgetProviderInfo(ComponentName(context, SearchWidget::class.java), metadataKey)
-        appWidgetManager.updateAppWidgetProviderInfo(ComponentName(context, SearchWidgetLight::class.java), metadataKey)
-        appWidgetManager.updateAppWidgetProviderInfo(ComponentName(context, SearchOnlyWidget::class.java), metadataKey)
-        appWidgetManager.updateAppWidgetProviderInfo(ComponentName(context, SearchAndFavoritesWidget::class.java), metadataKey)
+        val registeredProviders = appWidgetManager
+            .getInstalledProvidersForPackage(context.packageName, null)
+            .map { it.provider }
+
+        SEARCH_WIDGET_PROVIDERS
+            .map { ComponentName(context, it) }
+            .filter { it in registeredProviders }
+            .forEach { appWidgetManager.updateAppWidgetProviderInfo(it, metadataKey) }
     }
 
     fun syncAndRequestPinAppWidget(
@@ -71,5 +75,12 @@ class SearchWidgetProviderInfoUpdater internal constructor(
 
     private companion object {
         const val LEGACY_PROVIDER_INFO_METADATA_KEY = "com.duckduckgo.widget.legacy_provider_info"
+
+        val SEARCH_WIDGET_PROVIDERS = listOf(
+            SearchWidget::class.java,
+            SearchWidgetLight::class.java,
+            SearchOnlyWidget::class.java,
+            SearchAndFavoritesWidget::class.java,
+        )
     }
 }
