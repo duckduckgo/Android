@@ -139,6 +139,17 @@ android {
                 keyPassword = props['key.alias.password']
             }
         }
+
+        // -PmacrobenchLocalSigning opt-in: local debug keystore so a non-debuggable internalRelease
+        // is installable for macrobenchmark runs; default release signing is untouched otherwise.
+        if (project.hasProperty('macrobenchLocalSigning')) {
+            macrobenchDebug {
+                storeFile = new File("${System.getProperty('user.home')}/.android/debug.keystore")
+                storePassword = "android"
+                keyAlias = "androiddebugkey"
+                keyPassword = "android"
+            }
+        }
     }
     buildTypes {
         debug {
@@ -161,6 +172,8 @@ android {
                 signingConfig = signingConfigs.upload
             } else if (isValidSigningConfig(signingConfigs.release)) {
                 signingConfig = signingConfigs.release
+            } else if (project.hasProperty('macrobenchLocalSigning')) {
+                signingConfig = signingConfigs.macrobenchDebug
             } else {
                 println "Signing properties not found, release artifacts will not be signed."
                 signingConfig = null
@@ -562,6 +575,8 @@ dependencies {
     implementation AndroidX.recyclerView
     implementation AndroidX.swipeRefreshLayout
     implementation AndroidX.webkit
+    // Backs the internal-flavor PageLoadTracer (src/internal); other flavors bind a no-op instead.
+    internalImplementation AndroidX.tracing
     implementation Square.okHttp3.okHttp
     implementation "com.squareup.okhttp3:okhttp-tls:_"
     implementation Square.retrofit2.retrofit
