@@ -41,6 +41,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.tabs.BrowserNav
+import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.ui.DuckDuckGoBottomSheetDialogFragment
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.hideKeyboard
@@ -49,6 +50,7 @@ import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.DialogContextualDuckAiEntryBinding
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.ui.filechooser.FileChooserIntentBuilder
 import com.duckduckgo.duckchat.impl.ui.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher
 import com.duckduckgo.js.messaging.api.JsMessaging
@@ -60,6 +62,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -83,6 +86,12 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
 
     @Inject
     lateinit var contextualNativeInputManager: ContextualNativeInputManager
+
+    @Inject
+    lateinit var tabRepository: TabRepository
+
+    @Inject
+    lateinit var duckChatFeature: DuckChatFeature
 
     @Inject
     @Named("ContentScopeScripts")
@@ -196,6 +205,15 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
         viewModel.commands
             .onEach { handleCommand(it) }
             .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        if (duckChatFeature.contextualEntryDismissOnTabChange().isEnabled()) {
+            tabRepository.flowSelectedTab
+                .filterNotNull()
+                .distinctUntilChanged()
+                .filter { it.tabId != tabId }
+                .onEach { dismissAllowingStateLoss() }
+                .launchIn(viewLifecycleOwner.lifecycleScope)
+        }
     }
 
     private fun renderViewState(state: DuckChatContextualEntryViewModel.ViewState) {
