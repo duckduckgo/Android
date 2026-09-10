@@ -129,7 +129,7 @@ class AttachmentViewModelTest {
 
     private lateinit var viewModel: AttachmentViewModel
 
-    private val textSelectionRepository = RealTextSelectionRepository()
+    private val textSelectionRepository = RealTextSelectionRepository(duckChatPixels, mock())
     private val textSelectionPayloadBuilder: TextSelectionPayloadBuilder = mock()
 
     @Before

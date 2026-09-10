@@ -27,6 +27,7 @@ import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.RealTextSelecti
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.RealTextSelectionRepository
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionPayloadBuilder
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionRepository
+import com.duckduckgo.duckchat.impl.wideevents.DuckAiSelectionJourneyWideEvent
 import kotlinx.coroutines.test.runTest
 import org.json.JSONArray
 import org.json.JSONObject
@@ -51,7 +52,8 @@ class DuckChatContextualEntryViewModelTest {
     private val store: ContextualEntryPromptStore = mock()
     private val duckChatPixels: DuckChatPixels = mock()
     private val modelManager: DuckAiModelManager = mock()
-    private val textSelectionRepository = RealTextSelectionRepository()
+    private val selectionJourney: DuckAiSelectionJourneyWideEvent = mock()
+    private val textSelectionRepository = RealTextSelectionRepository(duckChatPixels, selectionJourney)
     private val viewModel = DuckChatContextualEntryViewModel(
         store,
         duckChatPixels,
@@ -415,6 +417,59 @@ class DuckChatContextualEntryViewModelTest {
         assertEquals(TextSelectionPayloadBuilder.MAX_CONTENT_LENGTH, selection.getString("content").length)
         assertEquals(long.trim().length, selection.getInt("fullContentLength"))
         assertEquals(3000, selection.getInt("wordCount"))
+    }
+
+    @Test
+    fun whenFirstSelectionAttachedThenJourneyRecordsIt() {
+        textSelectionRepository.add("tab-1", "selected words", "https://example.com")
+
+        verify(selectionJourney).onSelectionAttached(1)
+    }
+
+    @Test
+    fun whenLastSelectionRemovedThenJourneyRecordsEmptyState() {
+        textSelectionRepository.add("tab-1", "selected words", "https://example.com")
+        val target = textSelectionRepository.selections("tab-1").value.first()
+
+        textSelectionRepository.remove("tab-1", target.id)
+
+        verify(selectionJourney).onSelectionRemoved(0)
+    }
+
+    @Test
+    fun whenSelectionAttachedThenPixelSent() {
+        textSelectionRepository.add("tab-1", "selected words", "https://example.com")
+
+        verify(duckChatPixels).reportContextualSelectionAttached()
+        verify(duckChatPixels, never()).reportContextualSelectionLimitReached()
+    }
+
+    @Test
+    fun whenSameSelectionAttachedTwiceThenOnlyOneAttachedPixelSent() {
+        textSelectionRepository.add("tab-1", "selected words", "https://example.com")
+        textSelectionRepository.add("tab-1", "selected words", "https://example.com")
+
+        verify(duckChatPixels).reportContextualSelectionAttached()
+        verify(duckChatPixels, never()).reportContextualSelectionLimitReached()
+    }
+
+    @Test
+    fun whenSelectionRefusedAtLimitThenLimitReachedPixelSent() {
+        repeat(TextSelectionRepository.MAX_SELECTIONS) { textSelectionRepository.add("tab-1", "selection $it", "https://example.com") }
+
+        textSelectionRepository.add("tab-1", "one too many", "https://example.com")
+
+        verify(duckChatPixels).reportContextualSelectionLimitReached()
+    }
+
+    @Test
+    fun whenSelectionRemovedThenPixelSent() {
+        textSelectionRepository.add("tab-1", "selected words", "https://example.com")
+        val target = textSelectionRepository.selections("tab-1").value.first()
+
+        textSelectionRepository.remove("tab-1", target.id)
+
+        verify(duckChatPixels).reportContextualSelectionRemoved()
     }
 
     @Test

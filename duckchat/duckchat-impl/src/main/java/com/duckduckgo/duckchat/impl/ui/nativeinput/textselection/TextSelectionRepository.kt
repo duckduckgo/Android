@@ -17,12 +17,13 @@
 package com.duckduckgo.duckchat.impl.ui.nativeinput.textselection
 
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
+import com.duckduckgo.duckchat.impl.wideevents.DuckAiSelectionJourneyWideEvent
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.getAndUpdate
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.updateAndGet
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
@@ -48,7 +49,10 @@ interface TextSelectionRepository {
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
-class RealTextSelectionRepository @Inject constructor() : TextSelectionRepository {
+class RealTextSelectionRepository @Inject constructor(
+    private val duckChatPixels: DuckChatPixels,
+    private val selectionJourney: DuckAiSelectionJourneyWideEvent,
+) : TextSelectionRepository {
 
     private val selections = ConcurrentHashMap<String, MutableStateFlow<List<TextSelection>>>()
     private val limitReached = ConcurrentHashMap<String, MutableStateFlow<Boolean>>()
@@ -59,12 +63,23 @@ class RealTextSelectionRepository @Inject constructor() : TextSelectionRepositor
 
     override fun add(tabId: String, text: String, url: String): Boolean {
         val selection = getTextSelection(text, url) ?: return false
-        val selections = getFlow(tabId).updateAndGet { existing ->
+        val flow = getFlow(tabId)
+        val countBefore = flow.value.size
+        val selections = flow.updateAndGet { existing ->
             val isDuplicate = existing.any { it.text == selection.text }
             if (isDuplicate || existing.size >= TextSelectionRepository.MAX_SELECTIONS) existing else existing + selection
         }
         val isAttached = selections.any { it.text == selection.text }
-        if (!isAttached) getLimitFlow(tabId).value = true
+        when {
+            selections.size > countBefore -> {
+                duckChatPixels.reportContextualSelectionAttached()
+                selectionJourney.onSelectionAttached(selections.size)
+            }
+            !isAttached -> {
+                duckChatPixels.reportContextualSelectionLimitReached()
+                getLimitFlow(tabId).value = true
+            }
+        }
         return isAttached
     }
 
@@ -74,8 +89,14 @@ class RealTextSelectionRepository @Inject constructor() : TextSelectionRepositor
     }
 
     override fun remove(tabId: String, id: String) {
-        getLimitFlow(tabId).value = false
-        getFlow(tabId).update { current -> current.filterNot { it.id == id } }
+        val flow = getFlow(tabId)
+        val countBefore = flow.value.size
+        val selections = flow.updateAndGet { current -> current.filterNot { it.id == id } }
+        if (selections.size < countBefore) {
+            getLimitFlow(tabId).value = false
+            duckChatPixels.reportContextualSelectionRemoved()
+            selectionJourney.onSelectionRemoved(selections.size)
+        }
     }
 
     private fun getFlow(tabId: String): MutableStateFlow<List<TextSelection>> =
