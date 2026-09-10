@@ -3938,6 +3938,13 @@ class BrowserTabViewModel @Inject constructor(
         if (reportLandingFocus) {
             returnSessionLandingListener.onLandingFocusCaptured(focused)
         }
+
+        // The native input path consumes the target itself when it reads the mode. When that path is
+        // inactive it never runs, so consume here to keep the force-focus one-shot — otherwise the
+        // signal stays armed for the whole process and overrides the drop-focus rules on every call.
+        if (forceInputScreen && !duckAiFeatureState.nativeInputFieldEnabled.value) {
+            inputScreenLaunchTarget.consumeInitialInputMode()
+        }
     }
 
     fun onUserClickCtaOkButton(cta: Cta) {

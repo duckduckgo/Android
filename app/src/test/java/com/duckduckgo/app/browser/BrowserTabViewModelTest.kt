@@ -871,6 +871,7 @@ class BrowserTabViewModelTest {
             whenever(mockDuckAiFeatureState.showInputScreen).thenReturn(mockDuckAiFeatureStateInputScreenFlow)
             whenever(mockDuckAiFeatureState.showContextualMode).thenReturn(mockDuckAiContextualModeFlow)
             whenever(mockDuckAiFeatureState.nativeDuckAiSidebar).thenReturn(MutableStateFlow(false))
+            whenever(mockDuckAiFeatureState.nativeInputFieldEnabled).thenReturn(MutableStateFlow(false))
             whenever(mockDuckChatInputModeState.inputModeCapability).thenReturn(mockInputModeCapability)
             whenever(mockVpnMenuStateProvider.getVpnMenuState()).thenReturn(flowOf(VpnMenuState.Hidden))
             whenever(nonHttpAppLinkChecker.isPermitted(anyOrNull())).thenReturn(true)
@@ -1245,6 +1246,41 @@ class BrowserTabViewModelTest {
             testee.onViewVisible()
 
             assertCommandIssued<ShowKeyboard>()
+        }
+
+    @Test
+    fun whenViewBecomesVisibleAndInputScreenLaunchTargetArmedAndNativeInputDisabledThenTargetConsumed() =
+        runTest {
+            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
+            whenever(mockDuckAiFeatureState.nativeInputFieldEnabled).thenReturn(MutableStateFlow(false))
+            whenever(mockInputScreenLaunchTarget.peekInitialInputMode()).thenReturn(InputMode.SEARCH)
+
+            testee.onViewVisible()
+
+            verify(mockInputScreenLaunchTarget).consumeInitialInputMode()
+        }
+
+    @Test
+    fun whenViewBecomesVisibleAndInputScreenLaunchTargetArmedAndNativeInputEnabledThenTargetNotConsumed() =
+        runTest {
+            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
+            whenever(mockDuckAiFeatureState.nativeInputFieldEnabled).thenReturn(MutableStateFlow(true))
+            whenever(mockInputScreenLaunchTarget.peekInitialInputMode()).thenReturn(InputMode.SEARCH)
+
+            testee.onViewVisible()
+
+            verify(mockInputScreenLaunchTarget, never()).consumeInitialInputMode()
+        }
+
+    @Test
+    fun whenViewBecomesVisibleAndInputScreenLaunchTargetNotArmedThenTargetNotConsumed() =
+        runTest {
+            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
+            whenever(mockInputScreenLaunchTarget.peekInitialInputMode()).thenReturn(null)
+
+            testee.onViewVisible()
+
+            verify(mockInputScreenLaunchTarget, never()).consumeInitialInputMode()
         }
 
     @Test
