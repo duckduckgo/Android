@@ -145,6 +145,7 @@ class ContextualSuggestionsViewModel @Inject constructor(
     }
 
     private fun visibleSuggestions(): List<ContextualSuggestedPrompt> {
+        if (textSelectionCount > 1) return emptyList()
         if (textSelectionCount > 0) return resolvedSuggestions.take(MAX_TEXT_SELECTION_SUGGESTIONS)
         val capacity = (maxSuggestedPrompts - reservedQuickActionSlots).coerceAtLeast(0)
         if (resolvedSuggestions.size <= capacity) return resolvedSuggestions
