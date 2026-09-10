@@ -350,4 +350,23 @@
     <string name="duckChatContextualAskAboutPage">Stel een vraag over de pagina</string>
     <string name="duckChatContextualAskAboutSearch">Doorgaan in Duck.ai</string>
     <string name="duckChatContextualOpenDuckAi">Duck.ai openen</string>
+
+    <!-- Suggested prompts for text selection -->
+    <string name="duckAiSuggestionSummarizeSelectionLabel">Deze selectie samenvatten</string>
+    <string name="duckAiSuggestionSummarizeSelectionPrompt">Vat deze selectie samen.</string>
+    <string name="duckAiSuggestionTranslateSelectionLabel">Vertaal deze selectie</string>
+    <string name="duckAiSuggestionTranslateSelectionPrompt" instruction="%1$s is replaced with the name of the user&apos;s language.">Vertaal deze selectie naar %1$s.</string>
+
+    <!-- Name shown for an attached text selection in the Duck.ai -->
+    <string name="duckAiTextSelectionAttachmentTitle">Tekstselectie</string>
+    <string name="duckAiTextSelectionLimitReached" instruction="%1$d is replaced with the maximum number of text selections.">Je kunt tot %1$d tekstselecties toevoegen. Verwijder er een om een andere toe te voegen.</string>
+
+    <!-- Duck.ai text selection menu action -->
+    <string name="duckAiTextSelectionMenuItem">Vraag stellen aan Duck.ai</string>
+
+    <!-- Prefix on the Duck.ai attachment chip for a text selection -->
+    <plurals name="duckAiTextSelectionWordCount">
+        <item quantity="one">%1$d woord</item>
+        <item quantity="other">%1$d woorden</item>
+    </plurals>
 </resources>
