@@ -351,4 +351,24 @@
     <string name="duckChatContextualAskAboutPage">Jautā par lapu</string>
     <string name="duckChatContextualAskAboutSearch">Turpināt Duck.ai</string>
     <string name="duckChatContextualOpenDuckAi">Atvērt Duck.ai</string>
+
+    <!-- Suggested prompts for text selection -->
+    <string name="duckAiSuggestionSummarizeSelectionLabel">Apkopot šo fragmentu</string>
+    <string name="duckAiSuggestionSummarizeSelectionPrompt">Apkopo šo fragmentu.</string>
+    <string name="duckAiSuggestionTranslateSelectionLabel">Tulkot šo fragmentu</string>
+    <string name="duckAiSuggestionTranslateSelectionPrompt" instruction="%1$s is replaced with the name of the user&apos;s language.">Iztulko šo fragmentu %1$s valodā.</string>
+
+    <!-- Name shown for an attached text selection in the Duck.ai -->
+    <string name="duckAiTextSelectionAttachmentTitle">Teksta fragments</string>
+    <string name="duckAiTextSelectionLimitReached" instruction="%1$d is replaced with the maximum number of text selections.">Vari pievienot līdz %1$d teksta fragmentiem. Noņem vienu, lai pievienotu citu.</string>
+
+    <!-- Duck.ai text selection menu action -->
+    <string name="duckAiTextSelectionMenuItem">Pajautā Duck.ai</string>
+
+    <!-- Prefix on the Duck.ai attachment chip for a text selection -->
+    <plurals name="duckAiTextSelectionWordCount">
+        <item quantity="zero">%1$d vārdu</item>
+        <item quantity="one">%1$d vārds</item>
+        <item quantity="other">%1$d vārdi</item>
+    </plurals>
 </resources>
