@@ -314,4 +314,13 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun nativeDuckAiSidebar(): Toggle
+
+    /**
+     * Kill switch for dismissing the contextual Duck.ai entry dialog when its tab stops being the
+     * selected one, so it can't float over another tab.
+     * @return `true` when the dialog should be dismissed on a tab change.
+     * If the remote feature is not present defaults to `true`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun contextualEntryDismissOnTabChange(): Toggle
 }
