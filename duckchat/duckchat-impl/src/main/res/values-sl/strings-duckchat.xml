@@ -352,4 +352,25 @@
     <string name="duckChatContextualAskAboutPage">Vprašajte o strani</string>
     <string name="duckChatContextualAskAboutSearch">Nadaljuj v Duck.ai</string>
     <string name="duckChatContextualOpenDuckAi">Odpri Duck.ai</string>
+
+    <!-- Suggested prompts for text selection -->
+    <string name="duckAiSuggestionSummarizeSelectionLabel">Povzemi ta izbor</string>
+    <string name="duckAiSuggestionSummarizeSelectionPrompt">Povzemi ta izbor.</string>
+    <string name="duckAiSuggestionTranslateSelectionLabel">Prevedi ta izbor</string>
+    <string name="duckAiSuggestionTranslateSelectionPrompt" instruction="%1$s is replaced with the name of the user&apos;s language.">Prevedi ta izbor v jezik %1$s.</string>
+
+    <!-- Name shown for an attached text selection in the Duck.ai -->
+    <string name="duckAiTextSelectionAttachmentTitle">Izbor besedila</string>
+    <string name="duckAiTextSelectionLimitReached" instruction="%1$d is replaced with the maximum number of text selections.">Dodate lahko največ toliko izborov besedila: %1$d. Odstranite enega, da dodate drugega.</string>
+
+    <!-- Duck.ai text selection menu action -->
+    <string name="duckAiTextSelectionMenuItem">Vprašajte Duck.ai</string>
+
+    <!-- Prefix on the Duck.ai attachment chip for a text selection -->
+    <plurals name="duckAiTextSelectionWordCount">
+        <item quantity="one">%1$d beseda</item>
+        <item quantity="two">%1$d besedi</item>
+        <item quantity="few">%1$d besede</item>
+        <item quantity="other">%1$d besed</item>
+    </plurals>
 </resources>
