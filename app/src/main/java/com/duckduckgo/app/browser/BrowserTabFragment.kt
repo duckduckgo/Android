@@ -3108,7 +3108,13 @@ class BrowserTabFragment :
                 val anchor = duckChatButtonAnchor
                 duckChatButtonAnchor = null
                 viewLifecycleOwner.lifecycleScope.launch(dispatchers.main()) {
-                    duckChatContextual.launch(tabId, sourceUrl, anchor) { showDuckChatContextualSheet(tabId) }
+                    duckChatContextual.launch(tabId, sourceUrl, anchor) {
+                        if (sourceUrl == null) {
+                            viewModel.openDuckChatFromOmnibar(query = null, hasFocus = false, isNtp = true)
+                        } else {
+                            showDuckChatContextualSheet(tabId)
+                        }
+                    }
                 }
             }
             is Command.StartAddressBarTrackersAnimation -> {

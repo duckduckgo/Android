@@ -63,6 +63,12 @@ class RealDuckChatContextual @Inject constructor(
             showChatSurface()
             return
         }
+        if (sourceUrl == null && !duckChatInternal.isContextualMenuAllChatsEnabled()) {
+            // Nothing to ask about and no Chats entry, so a one-item menu would be worse than the
+            // caller's own fallback (opening Duck.ai).
+            showChatSurface()
+            return
+        }
         if (hasChatInProgress(sourceTabId)) {
             // The sheet would reopen the existing chat for this tab, so skip the entry menu and open it directly.
             showChatSurface()

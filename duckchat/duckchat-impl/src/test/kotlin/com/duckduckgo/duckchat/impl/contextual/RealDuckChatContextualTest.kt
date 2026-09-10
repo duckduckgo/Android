@@ -78,6 +78,18 @@ class RealDuckChatContextualTest {
     }
 
     @Test
+    fun whenNoPageAndChatsEntryDisabledThenChatSurfaceShownInsteadOfMenu() = runTest {
+        whenever(duckChatInternal.isContextualSheetRedesignEnabled()).thenReturn(true)
+        whenever(duckChatInternal.isContextualMenuAllChatsEnabled()).thenReturn(false)
+        var askAboutPageCount = 0
+
+        testee.launch("tabId", sourceUrl = null, anchor = anchor) { askAboutPageCount++ }
+
+        // A menu of just New Chat is worse than the caller's own fallback.
+        assertEquals(1, askAboutPageCount)
+    }
+
+    @Test
     fun whenChatInProgressThenAskAboutPageInvokedWithoutShowingMenu() = runTest {
         whenever(duckChatInternal.isContextualSheetRedesignEnabled()).thenReturn(true)
         whenever(contextualDataStore.getTabChatUrl("tabId")).thenReturn("https://duckduckgo.com/?chatId=123")
@@ -92,6 +104,7 @@ class RealDuckChatContextualTest {
     @Test
     fun whenStoredChatSessionExpiredThenTreatedAsNoChatInProgress() = runTest {
         whenever(duckChatInternal.isContextualSheetRedesignEnabled()).thenReturn(true)
+        whenever(duckChatInternal.isContextualMenuAllChatsEnabled()).thenReturn(true)
         whenever(contextualDataStore.getTabChatUrl("tabId")).thenReturn("https://duckduckgo.com/?chatId=123")
         whenever(contextualDataStore.getTabClosedTimestamp("tabId")).thenReturn(0L)
         whenever(sessionTimeoutProvider.sessionTimeoutMillis()).thenReturn(1L)

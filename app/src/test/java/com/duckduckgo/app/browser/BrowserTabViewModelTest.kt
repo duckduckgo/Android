@@ -323,7 +323,6 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
-import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.contextual.PageContextJSHelper
 import com.duckduckgo.duckchat.impl.contextual.RealPageContextJSHelper.Companion.PAGE_CONTEXT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
@@ -690,7 +689,6 @@ class BrowserTabViewModelTest {
     private val mockDuckChat: DuckChat = mock {
         on { observeTriggerVoiceChatSessionEnd() } doReturn voiceSessionEndTriggerFlow
     }
-    private val mockDuckChatInternal: DuckChatInternal = mock()
     private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
     private val mockSyncStatusChangedObserver: SyncStatusChangedObserver = mock()
     private val syncStatusChangedEventsFlow = MutableSharedFlow<JSONObject>()
@@ -1037,7 +1035,6 @@ class BrowserTabViewModelTest {
                 httpErrorPixels = { mockHttpErrorPixels },
                 duckPlayer = mockDuckPlayer,
                 duckChat = mockDuckChat,
-                duckChatInternal = mockDuckChatInternal,
                 duckAiHostProvider = mockDuckAiHostProvider,
                 duckAiFeatureState = mockDuckAiFeatureState,
                 duckChatInputModeState = mockDuckChatInputModeState,
@@ -10146,9 +10143,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnDuckChatOmnibarButtonClickedOnNtpWithBlankQueryAndAllChatsMenuEnabledThenShowsContextualMenu() {
+    fun whenOnDuckChatOmnibarButtonClickedOnNtpWithBlankQueryThenShowsContextualMenu() {
         mockDuckAiContextualModeFlow.value = true
-        whenever(mockDuckChatInternal.isContextualMenuAllChatsEnabled()).thenReturn(true)
 
         testee.onDuckChatOmnibarButtonClicked(query = null, hasFocus = true, isNtp = true)
 
@@ -10157,22 +10153,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnDuckChatOmnibarButtonClickedOnNtpWithAllChatsMenuDisabledThenOpensDuckChat() {
-        mockDuckAiContextualModeFlow.value = true
-        whenever(mockDuckChatInternal.isContextualMenuAllChatsEnabled()).thenReturn(false)
-        whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
-
-        testee.onDuckChatOmnibarButtonClicked(query = null, hasFocus = false, isNtp = true)
-
-        verify(mockDuckChat).getDuckChatUrl(eq(""), eq(false), any())
-        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        assertFalse(commandCaptor.allValues.any { it is Command.ShowDuckAIContextualMode })
-    }
-
-    @Test
     fun whenOnDuckChatOmnibarButtonClickedOnNtpWithTypedQueryThenOpensDuckChatNotMenu() {
         mockDuckAiContextualModeFlow.value = true
-        whenever(mockDuckChatInternal.isContextualMenuAllChatsEnabled()).thenReturn(true)
         whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
 
         testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = true, isNtp = true)
@@ -10180,6 +10162,15 @@ class BrowserTabViewModelTest {
         verify(mockDuckChat).getDuckChatUrl(eq("example"), eq(true), any())
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertFalse(commandCaptor.allValues.any { it is Command.ShowDuckAIContextualMode })
+    }
+
+    @Test
+    fun whenOpenDuckChatFromOmnibarOnNtpThenOpensDuckChatWithoutPrompt() {
+        whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
+
+        testee.openDuckChatFromOmnibar(query = null, hasFocus = false, isNtp = true)
+
+        verify(mockDuckChat).getDuckChatUrl(eq(""), eq(false), any())
     }
 
     @Test
