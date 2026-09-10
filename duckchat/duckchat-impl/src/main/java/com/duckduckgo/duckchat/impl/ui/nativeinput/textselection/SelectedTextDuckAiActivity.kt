@@ -47,7 +47,7 @@ class SelectedTextDuckAiActivity : DuckDuckGoActivity() {
                 browserNav.openDuckChat(
                     this,
                     duckChatUrl = duckChatInternal.getDuckChatUrl(query = "", autoPrompt = false),
-                    isContextual = !isExternalSelection(),
+                    forceLaunchContextual = !isExternalSelection(),
                     textSelection = selection,
                 ),
             )

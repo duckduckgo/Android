@@ -36,7 +36,7 @@ interface BrowserNav {
         context: Context,
         hasSessionActive: Boolean = false,
         duckChatUrl: String,
-        isContextual: Boolean = false,
+        forceLaunchContextual: Boolean = false,
         textSelection: String? = null,
     ): Intent
     fun closeDuckChat(context: Context): Intent
