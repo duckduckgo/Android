@@ -37,10 +37,12 @@ import com.duckduckgo.subscriptions.api.Product.DuckAiPlus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.api.model.Entitlement
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.FEATURE_PAGE_QUERY_PARAM_KEY
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ORIGIN_QUERY_PARAM_KEY
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PRIVACY_SUBSCRIPTIONS_PATH
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.SUBSCRIPTIONS_ETLD
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.SUBSCRIPTIONS_PATH
+import com.duckduckgo.subscriptions.impl.internal.PaywallPathProvider
 import com.duckduckgo.subscriptions.impl.internal.SubscriptionsUrlProvider
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.isActiveOrWaiting
@@ -67,6 +69,7 @@ class RealSubscriptions @Inject constructor(
     private val subscriptionsFeature: Lazy<SubscriptionsFeature>,
     private val dispatcherProvider: DispatcherProvider,
     private val subscriptionsUrlProvider: SubscriptionsUrlProvider,
+    private val paywallPathProvider: Lazy<PaywallPathProvider>,
 ) : Subscriptions {
     override suspend fun isSignedIn(): Boolean =
         subscriptionsManager.isSignedIn()
@@ -153,9 +156,16 @@ class RealSubscriptions @Inject constructor(
 
     override fun isSubscriptionUrl(uri: Uri): Boolean {
         val eTld = uri.host?.toTldPlusOne() ?: return false
-        val size = uri.pathSegments.size
+        if (eTld != SUBSCRIPTIONS_ETLD) return false
         val path = uri.pathSegments.firstOrNull()
-        return eTld == SUBSCRIPTIONS_ETLD && size == 1 && (path == SUBSCRIPTIONS_PATH || path == PRIVACY_SUBSCRIPTIONS_PATH)
+        if (uri.pathSegments.size == 1 && (path == SUBSCRIPTIONS_PATH || path == PRIVACY_SUBSCRIPTIONS_PATH)) return true
+        return optimizedPaywallFeaturePage(uri) != null
+    }
+
+    private fun optimizedPaywallFeaturePage(uri: Uri): String? {
+        if (!subscriptionsFeature.get().performanceOptimizedPaywalls().isEnabled()) return null
+        val path = uri.path ?: return null
+        return paywallPathProvider.get().getFeaturePage(path)
     }
 
     override suspend fun isFreeTrialEligible(): Boolean {
@@ -167,12 +177,34 @@ class RealSubscriptions @Inject constructor(
     }
 
     private fun buildSubscriptionUrl(uri: Uri?): String {
-        val queryParams = uri?.query
-        return if (!queryParams.isNullOrBlank()) {
-            "${subscriptionsUrlProvider.buyUrl}?$queryParams"
-        } else {
-            subscriptionsUrlProvider.buyUrl
-        }
+        val buyUrl = subscriptionsUrlProvider.buyUrl
+        if (uri == null) return buyUrl
+
+        val buyUri = buyUrl.toUri()
+        val builder = buyUri.buildUpon()
+
+        val query = mergeQueries(buyUri.encodedQuery, uri.encodedQuery)
+        if (!query.isNullOrBlank()) builder.encodedQuery(query)
+
+        val featurePage = featurePageFromPath(uri)
+        if (featurePage != null) builder.appendQueryParameter(FEATURE_PAGE_QUERY_PARAM_KEY, featurePage)
+
+        return builder.build().toString()
+    }
+
+    private fun mergeQueries(
+        buyUrlQuery: String?,
+        incomingQuery: String?,
+    ): String? = when {
+        buyUrlQuery.isNullOrBlank() -> incomingQuery
+        incomingQuery.isNullOrBlank() -> buyUrlQuery
+        else -> "$buyUrlQuery&$incomingQuery"
+    }
+
+    private fun featurePageFromPath(uri: Uri): String? {
+        val explicitPage = uri.getQueryParameter(FEATURE_PAGE_QUERY_PARAM_KEY)
+        if (!explicitPage.isNullOrBlank()) return null
+        return optimizedPaywallFeaturePage(uri)
     }
 }
 
