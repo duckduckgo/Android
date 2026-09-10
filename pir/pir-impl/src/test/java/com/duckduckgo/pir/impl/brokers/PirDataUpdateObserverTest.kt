@@ -23,6 +23,7 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.pir.impl.PirFeatureDataCleaner
 import com.duckduckgo.pir.impl.checker.DisabledReason
 import com.duckduckgo.pir.impl.checker.PirEligibility
+import com.duckduckgo.pir.impl.checker.PirRunMode
 import com.duckduckgo.pir.impl.checker.PirWorkHandler
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.scan.PirScanScheduler
@@ -95,7 +96,7 @@ class PirDataUpdateObserverTest {
         // First call (enabled): 0L so featureReceivedMs gets set; second call (disabled): non-zero to trigger cleanup
         whenever(pirRepository.getFeatureReceivedMs()).thenReturn(0L, 1000L)
 
-        canRunPirFlow.value = PirEligibility.Enabled
+        canRunPirFlow.value = PirEligibility.Enabled(PirRunMode.SCAN_AND_OPT_OUT)
         pirDataUpdateObserver.onCreate(lifecycleOwner)
         verify(brokerJsonUpdater).update()
 
@@ -116,21 +117,21 @@ class PirDataUpdateObserverTest {
         verify(pirFeatureDataCleaner, never()).removeAllData()
 
         // Then enable PIR
-        canRunPirFlow.value = PirEligibility.Enabled
+        canRunPirFlow.value = PirEligibility.Enabled(PirRunMode.SCAN_AND_OPT_OUT)
         verify(brokerJsonUpdater).update()
     }
 
     @Test
     fun whenOnCreateCalledMultipleTimesAndPIREnabledThenUpdatesBrokerOnce() = runTest {
         whenever(brokerJsonUpdater.update()).thenReturn(true)
-        canRunPirFlow.value = PirEligibility.Enabled
+        canRunPirFlow.value = PirEligibility.Enabled(PirRunMode.SCAN_AND_OPT_OUT)
 
         pirDataUpdateObserver.onCreate(lifecycleOwner)
 
         // MutableStateFlow deduplicates same values, so no additional emissions
-        canRunPirFlow.value = PirEligibility.Enabled
-        canRunPirFlow.value = PirEligibility.Enabled
-        canRunPirFlow.value = PirEligibility.Enabled
+        canRunPirFlow.value = PirEligibility.Enabled(PirRunMode.SCAN_AND_OPT_OUT)
+        canRunPirFlow.value = PirEligibility.Enabled(PirRunMode.SCAN_AND_OPT_OUT)
+        canRunPirFlow.value = PirEligibility.Enabled(PirRunMode.SCAN_AND_OPT_OUT)
 
         verify(brokerJsonUpdater, times(1)).update()
         verifyNoInteractions(pirFeatureDataCleaner)
@@ -148,7 +149,7 @@ class PirDataUpdateObserverTest {
     @Test
     fun whenOnCreateWithPIREnabledThenUpdatesBrokers() = runTest {
         whenever(brokerJsonUpdater.update()).thenReturn(true)
-        canRunPirFlow.value = PirEligibility.Enabled
+        canRunPirFlow.value = PirEligibility.Enabled(PirRunMode.SCAN_AND_OPT_OUT)
 
         pirDataUpdateObserver.onCreate(lifecycleOwner)
 
@@ -161,7 +162,7 @@ class PirDataUpdateObserverTest {
     fun whenPirEnabledAndValidProfileExistsThenReschedulesScans() = runTest {
         whenever(brokerJsonUpdater.update()).thenReturn(true)
         whenever(pirRepository.getValidUserProfileQueries()).thenReturn(listOf(mock()))
-        canRunPirFlow.value = PirEligibility.Enabled
+        canRunPirFlow.value = PirEligibility.Enabled(PirRunMode.SCAN_AND_OPT_OUT)
 
         pirDataUpdateObserver.onCreate(lifecycleOwner)
 
@@ -172,7 +173,7 @@ class PirDataUpdateObserverTest {
     fun whenPirEnabledButNoValidProfileThenDoesNotRescheduleScans() = runTest {
         whenever(brokerJsonUpdater.update()).thenReturn(true)
         whenever(pirRepository.getValidUserProfileQueries()).thenReturn(emptyList())
-        canRunPirFlow.value = PirEligibility.Enabled
+        canRunPirFlow.value = PirEligibility.Enabled(PirRunMode.SCAN_AND_OPT_OUT)
 
         pirDataUpdateObserver.onCreate(lifecycleOwner)
 
@@ -195,7 +196,7 @@ class PirDataUpdateObserverTest {
         whenever(pirRepository.getFeatureReceivedMs()).thenReturn(0L)
         whenever(currentTimeProvider.currentTimeMillis()).thenReturn(12345L)
 
-        canRunPirFlow.value = PirEligibility.Enabled
+        canRunPirFlow.value = PirEligibility.Enabled(PirRunMode.SCAN_AND_OPT_OUT)
         pirDataUpdateObserver.onCreate(lifecycleOwner)
 
         verify(pirRepository).setFeatureReceivedMs(12345L)
@@ -207,7 +208,7 @@ class PirDataUpdateObserverTest {
         // featureReceivedMs already set from a previous session
         whenever(pirRepository.getFeatureReceivedMs()).thenReturn(5000L)
 
-        canRunPirFlow.value = PirEligibility.Enabled
+        canRunPirFlow.value = PirEligibility.Enabled(PirRunMode.SCAN_AND_OPT_OUT)
         pirDataUpdateObserver.onCreate(lifecycleOwner)
 
         verify(pirRepository, never()).setFeatureReceivedMs(any())

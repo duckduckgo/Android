@@ -68,6 +68,13 @@ interface PirRemoteFeatures {
      */
     @DefaultValue(DefaultFeatureValue.TRUE)
     fun workQueueScheduling(): Toggle
+
+    /**
+     * Enables Freemium PIR: an activated, unauthenticated user may run scans, but never
+     * opt-outs or maintenance scans.
+     */
+    @DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun freemium(): Toggle
 }
 
 @SingleInstanceIn(AppScope::class)
