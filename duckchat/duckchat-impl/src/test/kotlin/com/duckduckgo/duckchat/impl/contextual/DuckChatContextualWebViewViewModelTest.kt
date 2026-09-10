@@ -665,6 +665,7 @@ class DuckChatContextualWebViewViewModelTest {
         override suspend fun hasUserEnabledChatHistory(): Boolean = false
         override fun observeHasChatSuggestions(): Flow<Boolean> = emptyFlow()
         override suspend fun onAddressBarPickerDuckAiSelected() = Unit
+        override fun openDuckChatImageGeneration(entryPoint: DuckChatEntryPoint) = Unit
     }
 
     private class FakeDuckChatContextualDataStore : DuckChatContextualDataStore {
