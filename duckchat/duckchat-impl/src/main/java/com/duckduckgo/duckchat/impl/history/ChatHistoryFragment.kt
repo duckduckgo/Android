@@ -404,7 +404,13 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
     private fun showOverflowPopup(anchor: View) {
         val popup = PopupMenu(layoutInflater, R.layout.popup_chat_history_overflow)
         val view = popup.contentView
-        popup.onMenuItemClicked(view.findViewById(R.id.selectChats)) { viewModel.onEnterSelectMode() }
+        val selectChats = view.findViewById<PopupMenuItemView>(R.id.selectChats)
+        if (viewModel.uiState.value is ChatHistoryUiState.Loaded) {
+            selectChats.show()
+            popup.onMenuItemClicked(selectChats) { viewModel.onEnterSelectMode() }
+        } else {
+            selectChats.gone()
+        }
         popup.onMenuItemClicked(view.findViewById(R.id.chatsProtection)) { viewModel.onChatsProtectionClicked() }
         popup.show(binding.root, anchor)
     }
