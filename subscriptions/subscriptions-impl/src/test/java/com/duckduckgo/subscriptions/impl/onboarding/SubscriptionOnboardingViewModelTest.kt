@@ -37,10 +37,12 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 class SubscriptionOnboardingViewModelTest {
 
@@ -77,7 +79,49 @@ class SubscriptionOnboardingViewModelTest {
             command as SubscriptionOnboardingViewModel.Command.ShowStep
             assertEquals(stepPlugin, command.stepPlugin)
             assertTrue(command.canGoBack)
+            assertNull(command.stepNumber)
         }
+    }
+
+    @Test
+    fun whenStepIsNumberedThenShowStepCarriesItsPositionAmongNumberedSteps() = runTest {
+        val vpn = numberedPlugin()
+        val itr = numberedPlugin()
+        // An unnumbered step sits between them and must not be counted.
+        val plan = planOf(numbered = listOf(vpn, itr), unnumbered = mock())
+        orchestrator.stateFlow.value = InProgress(
+            rootPlanId = SUBSCRIPTION_ONBOARDING_PLAN_ID,
+            currentPlan = plan,
+            currentStepIndex = plan.steps.indexOfFirst { (it as SubscriptionOnboardingActivityStep).stepPlugin == itr },
+        )
+        val testee = createViewModel()
+        testee.start()
+
+        testee.commands.test {
+            val command = awaitItem() as SubscriptionOnboardingViewModel.Command.ShowStep
+            assertEquals(SubscriptionOnboardingViewModel.StepNumber(position = 2, total = 2), command.stepNumber)
+        }
+    }
+
+    private fun numberedPlugin(): SubscriptionOnboardingStepPlugin = mock<SubscriptionOnboardingStepPlugin>().apply {
+        whenever(isNumberedStep).thenReturn(true)
+    }
+
+    private fun planOf(
+        numbered: List<SubscriptionOnboardingStepPlugin>,
+        unnumbered: SubscriptionOnboardingStepPlugin,
+    ): LinearOnboardingPlan {
+        val plugins = listOf(unnumbered) + numbered
+        return LinearOnboardingPlan(
+            id = SUBSCRIPTION_ONBOARDING_PLAN_ID,
+            steps = plugins.mapIndexed { index, plugin ->
+                SubscriptionOnboardingActivityStep(
+                    id = "step$index",
+                    transition = { LinearOnboardingTransition.Stay },
+                    stepPlugin = plugin,
+                )
+            },
+        )
     }
 
     @Test

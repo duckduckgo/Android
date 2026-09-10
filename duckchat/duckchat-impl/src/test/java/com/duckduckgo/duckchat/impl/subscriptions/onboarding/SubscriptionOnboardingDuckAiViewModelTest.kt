@@ -48,16 +48,6 @@ class SubscriptionOnboardingDuckAiViewModelTest {
     private val modelManager: DuckAiModelManager = mock()
 
     @Test
-    fun whenAiFeaturesDisabledThenAiEnabledIsFalse() = runTest {
-        val testee = createViewModel(aiEnabled = false)
-
-        testee.viewState().test {
-            assertEquals(false, awaitItem().aiEnabled)
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
     fun whenModelsLoadedThenPaidModelsFirstAndFirstIsPreselected() = runTest {
         val testee = createViewModel(
             models = listOf(
@@ -68,7 +58,6 @@ class SubscriptionOnboardingDuckAiViewModelTest {
 
         testee.viewState().test {
             val state = awaitItem()
-            assertEquals(true, state.aiEnabled)
             assertEquals(listOf("plus1", "free1"), state.models.map { it.id })
             assertEquals(UserTier.PLUS, state.models.first().tier)
             assertEquals("plus1", state.selectedModelId)
@@ -190,11 +179,9 @@ class SubscriptionOnboardingDuckAiViewModelTest {
     }
 
     private fun createViewModel(
-        aiEnabled: Boolean = true,
         models: List<AIChatModel> = emptyList(),
         userTier: UserTier = UserTier.PLUS,
     ): SubscriptionOnboardingDuckAiViewModel {
-        whenever(duckChat.isEnabled()).thenReturn(aiEnabled)
         whenever(modelManager.modelState).thenReturn(MutableStateFlow(ModelState(models = models, userTier = userTier)))
         return SubscriptionOnboardingDuckAiViewModel(
             controller,

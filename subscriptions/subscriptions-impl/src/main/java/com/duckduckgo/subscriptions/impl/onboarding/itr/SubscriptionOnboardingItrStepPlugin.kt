@@ -20,7 +20,6 @@ import androidx.fragment.app.Fragment
 import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
-import com.duckduckgo.subscriptions.impl.R
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
@@ -30,7 +29,7 @@ class SubscriptionOnboardingItrStepPlugin @Inject constructor() : SubscriptionOn
 
     override val stepId: String = ITR_STEP_ID
 
-    override val titleResId: Int = R.string.subscriptionOnboardingItrTitle
+    override val isNumberedStep: Boolean = true
 
     override suspend fun shouldShow(): Boolean = true
 

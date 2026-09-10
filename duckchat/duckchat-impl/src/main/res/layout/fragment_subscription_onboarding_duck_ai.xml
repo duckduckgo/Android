@@ -73,16 +73,6 @@
                 android:background="@drawable/subscription_onboarding_duck_ai_list_background"
                 android:orientation="vertical" />
 
-            <com.duckduckgo.common.ui.view.text.DaxTextView
-                android:id="@+id/subscriptionOnboardingDuckAiPlaceholder"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/keyline_5"
-                android:gravity="center"
-                android:text="@string/subscriptionOnboardingDuckAiText"
-                android:visibility="gone"
-                app:typography="body1" />
-
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>

@@ -19,7 +19,7 @@ package com.duckduckgo.duckchat.impl.subscriptiononboarding
 import androidx.fragment.app.Fragment
 import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
@@ -27,13 +27,15 @@ import javax.inject.Inject
 /** Duck.ai step of the subscription onboarding, contributed from `duckchat-impl`. */
 @ContributesMultibinding(AppScope::class)
 @PriorityKey(300)
-class SubscriptionOnboardingDuckAiStepPlugin @Inject constructor() : SubscriptionOnboardingStepPlugin {
+class SubscriptionOnboardingDuckAiStepPlugin @Inject constructor(
+    private val duckChat: DuckChat,
+) : SubscriptionOnboardingStepPlugin {
 
     override val stepId: String = DUCK_AI_STEP_ID
 
-    override val titleResId: Int = R.string.subscriptionOnboardingDuckAiTitle
+    override val isNumberedStep: Boolean = true
 
-    override suspend fun shouldShow(): Boolean = true
+    override suspend fun shouldShow(): Boolean = duckChat.isEnabled()
 
     override fun createFragment(): Fragment = SubscriptionOnboardingDuckAiFragment()
 

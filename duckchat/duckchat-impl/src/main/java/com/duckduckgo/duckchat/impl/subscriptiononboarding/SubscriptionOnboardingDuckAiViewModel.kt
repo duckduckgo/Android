@@ -31,7 +31,6 @@ import com.duckduckgo.duckchat.impl.models.ModelProvider
 import com.duckduckgo.duckchat.impl.models.UserTier
 import com.duckduckgo.duckchat.impl.subscriptiononboarding.SubscriptionOnboardingDuckAiStepPlugin.Companion.DUCK_AI_STEP_ID
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController
-import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.COMPLETED
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.SKIPPED
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -55,24 +54,19 @@ class SubscriptionOnboardingDuckAiViewModel @Inject constructor(
     fun viewState(): Flow<ViewState> = viewState.asStateFlow()
 
     init {
-        if (!duckChat.isEnabled()) {
-            viewState.update { it.copy(aiEnabled = false) }
-        } else {
-            viewState.update { it.copy(aiEnabled = true) }
-            viewModelScope.launch(dispatcherProvider.io()) { duckAiModelManager.fetchModels() }
-            duckAiModelManager.modelState
-                .onEach { modelState ->
-                    val models = modelState.models
-                        .filter { it.isAvailableTo(modelState.userTier) }
-                        .map { it.toItem() }
-                        .sortedByDescending { it.tier.rank }
-                    val selectedId = viewState.value.selectedModelId?.takeIf { id -> models.any { it.id == id } }
-                        ?: models.firstOrNull()?.id
-                    viewState.update { it.copy(models = models, selectedModelId = selectedId) }
-                }
-                .flowOn(dispatcherProvider.io())
-                .launchIn(viewModelScope)
-        }
+        viewModelScope.launch(dispatcherProvider.io()) { duckAiModelManager.fetchModels() }
+        duckAiModelManager.modelState
+            .onEach { modelState ->
+                val models = modelState.models
+                    .filter { it.isAvailableTo(modelState.userTier) }
+                    .map { it.toItem() }
+                    .sortedByDescending { it.tier.rank }
+                val selectedId = viewState.value.selectedModelId?.takeIf { id -> models.any { it.id == id } }
+                    ?: models.firstOrNull()?.id
+                viewState.update { it.copy(models = models, selectedModelId = selectedId) }
+            }
+            .flowOn(dispatcherProvider.io())
+            .launchIn(viewModelScope)
     }
 
     fun onModelSelected(modelId: String) {
@@ -94,10 +88,6 @@ class SubscriptionOnboardingDuckAiViewModel @Inject constructor(
         controller.onStepFinished(DUCK_AI_STEP_ID, SKIPPED)
     }
 
-    fun onPlaceholderPrimaryClicked() {
-        controller.onStepFinished(DUCK_AI_STEP_ID, COMPLETED)
-    }
-
     private fun AIChatModel.toItem(): ModelItem = ModelItem(
         id = id,
         displayName = displayName,
@@ -106,8 +96,6 @@ class SubscriptionOnboardingDuckAiViewModel @Inject constructor(
     )
 
     data class ViewState(
-        // null until the AI-features availability is known, so the UI does not flash the wrong screen.
-        val aiEnabled: Boolean? = null,
         val models: List<ModelItem> = emptyList(),
         val selectedModelId: String? = null,
     )

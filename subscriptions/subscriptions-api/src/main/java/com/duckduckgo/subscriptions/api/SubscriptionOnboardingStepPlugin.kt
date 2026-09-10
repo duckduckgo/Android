@@ -16,7 +16,6 @@
 
 package com.duckduckgo.subscriptions.api
 
-import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import kotlinx.coroutines.flow.Flow
 
@@ -33,9 +32,12 @@ interface SubscriptionOnboardingStepPlugin {
     /** Stable id for this step. Also the key used to persist completion. */
     val stepId: String
 
-    /** Title shown in the host's toolbar while this step is on screen, or null for no toolbar title. */
-    @get:StringRes
-    val titleResId: Int? get() = null
+    /**
+     * Whether the host numbers this step in the toolbar ("Step N of M"). The count comes from the plan that
+     * was actually built, so it follows whatever [shouldShow] leaves in. Steps that frame the flow rather
+     * than form part of it — the welcome and summary screens — leave this false and show no title.
+     */
+    val isNumberedStep: Boolean get() = false
 
     /** Whether this step should be shown to the current user (e.g. gated by feature flag / entitlement). Skipped when false. */
     suspend fun shouldShow(): Boolean

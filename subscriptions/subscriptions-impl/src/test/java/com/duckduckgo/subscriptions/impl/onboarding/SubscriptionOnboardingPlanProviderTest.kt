@@ -52,6 +52,14 @@ class SubscriptionOnboardingPlanProviderTest {
     }
 
     @Test
+    fun whenPluginShouldNotShowThenItIsRecordedAsCompleted() = runTest {
+        providerWith(stubPlugin("welcome"), stubPlugin("duck_ai", shouldShow = false)).buildPlan()
+
+        assertTrue(stepStore.isCompleted("duck_ai"))
+        assertFalse(stepStore.isCompleted("welcome"))
+    }
+
+    @Test
     fun whenStepFinishedForCurrentStepThenAdvancesOtherwiseStays() = runTest {
         val step = providerWith(stubPlugin("welcome")).buildPlan().steps.single()
 
@@ -85,10 +93,10 @@ class SubscriptionOnboardingPlanProviderTest {
             override fun getPlugins(): Collection<SubscriptionOnboardingStepPlugin> = stepPlugins
         }
 
-    private fun stubPlugin(id: String, shouldShow: Boolean = true) =
+    private fun stubPlugin(id: String, shouldShow: Boolean = true, isNumbered: Boolean = false) =
         object : SubscriptionOnboardingStepPlugin {
             override val stepId: String = id
-            override val titleResId: Int = 0
+            override val isNumberedStep: Boolean = isNumbered
             override suspend fun shouldShow(): Boolean = shouldShow
             override fun createFragment(): Fragment = Fragment()
         }

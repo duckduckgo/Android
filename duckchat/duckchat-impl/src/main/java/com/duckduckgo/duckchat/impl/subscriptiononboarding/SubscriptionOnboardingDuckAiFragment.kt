@@ -64,17 +64,12 @@ class SubscriptionOnboardingDuckAiFragment : DuckDuckGoFragment(R.layout.fragmen
         ViewModelProvider(this, viewModelFactory)[SubscriptionOnboardingDuckAiViewModel::class.java]
     }
 
-    private var aiEnabled: Boolean? = null
     private var renderedModelIds: List<String>? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.subscriptionOnboardingDuckAiStartButton.setOnClickListener {
-            when (aiEnabled) {
-                true -> viewModel.onStartClicked()
-                false -> viewModel.onPlaceholderPrimaryClicked()
-                null -> {} // wait until AI availability is known
-            }
+            viewModel.onStartClicked()
         }
         binding.subscriptionOnboardingDuckAiNotNowButton.setOnClickListener {
             viewModel.onNotNowClicked()
@@ -113,22 +108,7 @@ class SubscriptionOnboardingDuckAiFragment : DuckDuckGoFragment(R.layout.fragmen
             .launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
-    private fun render(state: SubscriptionOnboardingDuckAiViewModel.ViewState) = with(binding) {
-        val enabled = state.aiEnabled ?: return@with
-        aiEnabled = enabled
-        if (!enabled) {
-            subscriptionOnboardingDuckAiHeaderText.gone()
-            subscriptionOnboardingDuckAiModelList.gone()
-            subscriptionOnboardingDuckAiPlaceholder.show()
-            subscriptionOnboardingDuckAiNotNowButton.gone()
-            subscriptionOnboardingDuckAiStartButton.setText(R.string.subscriptionOnboardingDuckAiNext)
-            return@with
-        }
-        subscriptionOnboardingDuckAiPlaceholder.gone()
-        subscriptionOnboardingDuckAiHeaderText.show()
-        subscriptionOnboardingDuckAiModelList.show()
-        subscriptionOnboardingDuckAiNotNowButton.show()
-        subscriptionOnboardingDuckAiStartButton.setText(R.string.subscriptionOnboardingDuckAiStart)
+    private fun render(state: SubscriptionOnboardingDuckAiViewModel.ViewState) {
         setHeaderTextWithLearnMore()
         renderModels(state.models, state.selectedModelId)
     }

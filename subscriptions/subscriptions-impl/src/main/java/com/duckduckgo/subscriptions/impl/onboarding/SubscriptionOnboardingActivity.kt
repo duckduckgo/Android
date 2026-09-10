@@ -38,6 +38,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionOnboardingScreenWithEmptyParams
+import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionOnboardingBinding
 import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingViewModel.Command
 import kotlinx.coroutines.flow.launchIn
@@ -131,7 +132,9 @@ class SubscriptionOnboardingActivity : DuckDuckGoActivity() {
             com.duckduckgo.mobile.android.R.drawable.ic_close_24
         }
         binding.includeToolbar.toolbar.setNavigationIcon(navIcon)
-        supportActionBar?.title = command.stepPlugin.titleResId?.let { getString(it) } ?: ""
+        supportActionBar?.title = command.stepNumber
+            ?.let { getString(R.string.subscriptionOnboardingStepTitle, it.position, it.total) }
+            ?: ""
         supportFragmentManager.commit {
             replace(binding.subscriptionOnboardingContainer.id, command.stepPlugin.createFragment(), command.stepPlugin.stepId)
         }

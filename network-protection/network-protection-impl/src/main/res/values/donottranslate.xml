@@ -17,7 +17,6 @@
 <resources>
 
     <!-- Subscription onboarding - VPN step (placeholder copy) -->
-    <string name="subscriptionOnboardingVpnTitle">Step 1 of 3</string>
     <string name="subscriptionOnboardingVpnHeaderTitle">DuckDuckGo VPN is Off</string>
     <string name="subscriptionOnboardingVpnHeaderText">Connect to secure all of your device\'s internet traffic. <annotation type="learn_more_link">Learn More</annotation></string>
     <string name="subscriptionOnboardingVpnIpAddressTitle">Your IP Address is Visible</string>
