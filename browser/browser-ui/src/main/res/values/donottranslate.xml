@@ -26,6 +26,8 @@
 
     <string name="chatMenuPopupNewChat">New Chat</string>
     <string name="chatMenuPopupNewVoiceChat">New Voice Chat</string>
+    <string name="chatMenuPopupNewImage">New Image</string>
     <string name="chatMenuPopupNewTab">New Tab</string>
+    <string name="chatMenuPopupNewSearch">New Search</string>
     <string name="chatMenuPopupNewFireTab">New Fire Tab</string>
 </resources>

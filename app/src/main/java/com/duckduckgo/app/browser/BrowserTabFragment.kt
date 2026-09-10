@@ -227,7 +227,6 @@ import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.global.view.NonDismissibleBehavior
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.renderIfChanged
-import com.duckduckgo.app.onboarding.OnboardingInputScreenLaunchTarget
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.BrowserModeSwitchSource
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -297,6 +296,7 @@ import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.store.BrowserAppTheme
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.ui.view.DaxDialog
+import com.duckduckgo.common.ui.view.PopupMenuItemView
 import com.duckduckgo.common.ui.view.addClickableLink
 import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
 import com.duckduckgo.common.ui.view.dialog.CustomAlertDialogBuilder
@@ -341,6 +341,7 @@ import com.duckduckgo.downloads.api.DownloadConfirmationDialogListener
 import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatContextual
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
@@ -663,6 +664,9 @@ class BrowserTabFragment :
     lateinit var duckChatContextual: DuckChatContextual
 
     @Inject
+    lateinit var duckAiFeatureState: DuckAiFeatureState
+
+    @Inject
     lateinit var newAddressBarPickerManager: NewAddressBarPickerManager
 
     @Inject
@@ -708,7 +712,7 @@ class BrowserTabFragment :
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     @Inject
-    lateinit var onboardingInputScreenLaunchTarget: OnboardingInputScreenLaunchTarget
+    lateinit var inputScreenLaunchTarget: InputScreenLaunchTarget
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -835,7 +839,15 @@ class BrowserTabFragment :
             onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewVoiceChat)) {
                 duckChat.openVoiceDuckChat(DuckChatEntryPoint.VOICE)
             }
+            onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewImage)) {
+                // TODO wire up "New Image" action; entry only shown when nativeDuckAiSidebar is enabled.
+            }
             onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewTab)) {
+                // With the native sidebar this entry is relabelled "New Search": open the new tab
+                // with its input screen surfaced on the Search tab.
+                if (duckAiFeatureState.nativeDuckAiSidebar.value) {
+                    inputScreenLaunchTarget.setInitialInputMode(InputMode.SEARCH)
+                }
                 viewModel.recordPendingNewTabOpenedExit()
                 browserActivity?.launchNewTab(browserMode = BrowserMode.REGULAR)
             }
@@ -1402,11 +1414,7 @@ class BrowserTabFragment :
             tabs = viewModel.tabs,
             currentTabUrl = viewModel.siteLiveData.asFlow().map { it?.url },
             query = query,
-            initialInputMode = if (onboardingInputScreenLaunchTarget.consumeOpenOnDuckAi()) {
-                InputMode.DUCK_AI
-            } else {
-                null
-            },
+            initialInputMode = inputScreenLaunchTarget.consumeInitialInputMode(),
             callbacks = NativeInputCallbacks(
                 onSearchTextChanged = { text -> onUserEnteredText(text) },
                 onClearAutocomplete = {
@@ -3946,6 +3954,21 @@ class BrowserTabFragment :
                     chatMenuPopup.contentView
                         .findViewById<View>(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewFireTab)
                         .isVisible = fireModeAvailability.isAvailable()
+                    val nativeSidebarEnabled = duckAiFeatureState.nativeDuckAiSidebar.value
+                    chatMenuPopup.contentView
+                        .findViewById<View>(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewImage)
+                        .isVisible = nativeSidebarEnabled
+                    chatMenuPopup.contentView
+                        .findViewById<PopupMenuItemView>(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewTab)
+                        .setPrimaryText(
+                            getString(
+                                if (nativeSidebarEnabled) {
+                                    com.duckduckgo.browser.ui.R.string.chatMenuPopupNewSearch
+                                } else {
+                                    com.duckduckgo.browser.ui.R.string.chatMenuPopupNewTab
+                                },
+                            ),
+                        )
                     chatMenuPopup.showAnchoredView(activity, binding.rootView, anchor)
                 }
 
