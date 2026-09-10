@@ -75,7 +75,7 @@
         app:layout_constraintTop_toBottomOf="@id/eyebrow"
         app:layout_constraintWidth_max="600dp">
 
-        <com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleBrandDesignUpdateCardView
+        <com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleCardView
             android:id="@+id/daxBubble"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -114,7 +114,7 @@
 
             </ScrollView>
 
-        </com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleBrandDesignUpdateCardView>
+        </com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleCardView>
 
     </FrameLayout>
 

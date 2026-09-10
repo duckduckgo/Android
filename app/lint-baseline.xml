@@ -8990,7 +8990,7 @@
         errorLine1="    android:background=&quot;?attr/onboardingSurfaceBackdrop&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/res/layout-land/content_onboarding_welcome_page_update.xml"
+            file="src/main/res/layout-land/content_onboarding_welcome_page.xml"
             line="23"
             column="5"/>
     </issue>
@@ -9001,7 +9001,7 @@
         errorLine1="    android:background=&quot;?attr/onboardingSurfaceBackdrop&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/res/layout-sw600dp/content_onboarding_welcome_page_update.xml"
+            file="src/main/res/layout-sw600dp/content_onboarding_welcome_page.xml"
             line="23"
             column="5"/>
     </issue>
@@ -9012,7 +9012,7 @@
         errorLine1="    android:background=&quot;?attr/onboardingSurfaceBackdrop&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/res/layout/content_onboarding_welcome_page_update.xml"
+            file="src/main/res/layout/content_onboarding_welcome_page.xml"
             line="23"
             column="5"/>
     </issue>

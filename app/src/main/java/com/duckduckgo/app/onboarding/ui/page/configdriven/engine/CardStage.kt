@@ -28,7 +28,7 @@ import androidx.transition.ChangeBounds
 import androidx.transition.Transition
 import androidx.transition.TransitionListenerAdapter
 import androidx.transition.TransitionManager
-import com.duckduckgo.app.browser.databinding.ContentOnboardingWelcomePageUpdateBinding
+import com.duckduckgo.app.browser.databinding.ContentOnboardingWelcomePageBinding
 import com.duckduckgo.app.onboarding.ui.page.configdriven.CtaConfig
 import com.duckduckgo.common.ui.view.button.DaxButton
 
@@ -64,7 +64,7 @@ interface CardStage {
     fun release()
 }
 
-class CardStageImpl(private val binding: ContentOnboardingWelcomePageUpdateBinding) : CardStage {
+class CardStageImpl(private val binding: ContentOnboardingWelcomePageBinding) : CardStage {
 
     private val runningAnimators = mutableListOf<Animator>()
 

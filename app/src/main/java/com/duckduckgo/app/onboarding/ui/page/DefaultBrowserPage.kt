@@ -188,7 +188,7 @@ class DefaultBrowserPage :
     }
 
     private fun setUiForDialog() {
-        // Brand-design variant uses a single placeholder illustration for both states; only copy varies.
+        // Both states share a single placeholder illustration; only the copy varies.
         subtitle.text = getString(R.string.defaultBrowserDescriptionNoDefault).preventWidows()
         title.setText(R.string.onboardingDefaultBrowserTitle)
         primaryButton.setText(R.string.setAsDefaultBrowser)

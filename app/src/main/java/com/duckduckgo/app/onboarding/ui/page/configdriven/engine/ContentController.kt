@@ -19,7 +19,7 @@ package com.duckduckgo.app.onboarding.ui.page.configdriven.engine
 import android.view.View
 import androidx.core.view.children
 import androidx.core.view.isVisible
-import com.duckduckgo.app.browser.databinding.PreOnboardingDaxDialogCtaBrandDesignUpdateBinding
+import com.duckduckgo.app.browser.databinding.PreOnboardingDaxDialogCtaBinding
 import com.duckduckgo.app.onboarding.ui.page.configdriven.BindScope
 import com.duckduckgo.app.onboarding.ui.page.configdriven.ContentConfig
 import com.duckduckgo.app.onboarding.ui.page.configdriven.ContentHandle
@@ -53,7 +53,7 @@ interface ContentController {
  * Routes a [ContentConfig] to the one binder that renders it, and owns which content include is on show.
  */
 class ContentControllerImpl(
-    private val binding: PreOnboardingDaxDialogCtaBrandDesignUpdateBinding,
+    private val binding: PreOnboardingDaxDialogCtaBinding,
     private val contentValues: ContentValueStore,
     private val onBeforeContentBound: (LinearOnboardingStepId, ContentConfig) -> Unit,
     isLightMode: () -> Boolean,

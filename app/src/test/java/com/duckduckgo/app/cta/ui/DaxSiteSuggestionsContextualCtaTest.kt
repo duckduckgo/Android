@@ -88,7 +88,7 @@ import java.util.concurrent.TimeUnit
 /**
  * Unit tests for [DaxSiteSuggestionsContextualCta].
  *
- * Verifies the CTA construction and that the pixel parameters the legacy CTA carried (`shownPixel`, `okPixel`, `closePixel` with the
+ * Verifies the CTA construction and that its pixel parameters (`shownPixel`, `okPixel`, `closePixel` with the
  * `DAX_INITIAL_VISIT_SITE_CTA` param) still fire via `CtaViewModel`. Telemetry parity
  * is the regression-surface a stale stub would break, so it's exercised explicitly.
  */

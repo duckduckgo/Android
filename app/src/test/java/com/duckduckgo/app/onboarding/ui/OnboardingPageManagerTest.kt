@@ -53,7 +53,7 @@ class OnboardingPageManagerTest {
         whenever(defaultRoleBrowserDialog.shouldShowDialog()).thenReturn(false)
         whenever(onboardingPageBuilder.buildConfigDrivenWelcomePage())
             .thenReturn(configDrivenWelcomePage)
-        whenever(onboardingPageBuilder.buildBrandDesignUpdateDefaultBrowserPage())
+        whenever(onboardingPageBuilder.buildDefaultBrowserPage())
             .thenReturn(brandDesignDefaultBrowserPage)
 
         testee.buildConfigDrivenPageBlueprints()

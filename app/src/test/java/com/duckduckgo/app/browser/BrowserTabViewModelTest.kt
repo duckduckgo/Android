@@ -4220,7 +4220,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserClickedDaxDuckAiEndBrandDesignUpdateBubbleCtaOkButtonThenCtaIsRefreshedAway() = runTest {
+    fun whenUserClickedDaxDuckAiEndBubbleCtaOkButtonThenCtaIsRefreshedAway() = runTest {
         val cta = DaxDuckAiEndBubbleCta(
             mockOnboardingStore,
             mockAppInstallStore,

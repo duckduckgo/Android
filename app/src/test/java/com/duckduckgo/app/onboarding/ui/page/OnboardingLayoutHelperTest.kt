@@ -30,7 +30,7 @@ import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
 @Config(manifest = Config.NONE)
-class BrandDesignUpdateOnboardingLayoutHelperTest {
+class OnboardingLayoutHelperTest {
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
@@ -43,7 +43,7 @@ class BrandDesignUpdateOnboardingLayoutHelperTest {
         root.addView(dialog)
         root.addView(dax)
 
-        assertNull(BrandDesignUpdateOnboardingLayoutHelper.calculateDecorationHeight(root, dialog, dax, maxHeightPx = 274, minHeightPx = 174))
+        assertNull(OnboardingLayoutHelper.calculateDecorationHeight(root, dialog, dax, maxHeightPx = 274, minHeightPx = 174))
     }
 
     @Test
@@ -57,7 +57,7 @@ class BrandDesignUpdateOnboardingLayoutHelperTest {
         root.addView(scrollView)
         root.addView(dax)
 
-        assertEquals(274, BrandDesignUpdateOnboardingLayoutHelper.calculateDecorationHeight(root, dialog, dax, maxHeightPx = 274, minHeightPx = 174))
+        assertEquals(274, OnboardingLayoutHelper.calculateDecorationHeight(root, dialog, dax, maxHeightPx = 274, minHeightPx = 174))
     }
 
     @Test
@@ -70,7 +70,7 @@ class BrandDesignUpdateOnboardingLayoutHelperTest {
         root.addView(dialog)
         root.addView(dax)
 
-        assertEquals(274, BrandDesignUpdateOnboardingLayoutHelper.calculateDecorationHeight(root, dialog, dax, maxHeightPx = 274, minHeightPx = 174))
+        assertEquals(274, OnboardingLayoutHelper.calculateDecorationHeight(root, dialog, dax, maxHeightPx = 274, minHeightPx = 174))
     }
 
     @Test
@@ -85,7 +85,7 @@ class BrandDesignUpdateOnboardingLayoutHelperTest {
         // Set margin after addView to avoid FrameLayout replacing the LayoutParams
         (dax.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin = 200
 
-        assertEquals(200, BrandDesignUpdateOnboardingLayoutHelper.calculateDecorationHeight(root, dialog, dax, maxHeightPx = 274, minHeightPx = 174))
+        assertEquals(200, OnboardingLayoutHelper.calculateDecorationHeight(root, dialog, dax, maxHeightPx = 274, minHeightPx = 174))
     }
 
     @Test
@@ -100,7 +100,7 @@ class BrandDesignUpdateOnboardingLayoutHelperTest {
         // Set margin after addView to avoid FrameLayout replacing the LayoutParams
         (dax.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin = 100
 
-        assertNull(BrandDesignUpdateOnboardingLayoutHelper.calculateDecorationHeight(root, dialog, dax, maxHeightPx = 274, minHeightPx = 174))
+        assertNull(OnboardingLayoutHelper.calculateDecorationHeight(root, dialog, dax, maxHeightPx = 274, minHeightPx = 174))
     }
 
     @Test
@@ -115,7 +115,7 @@ class BrandDesignUpdateOnboardingLayoutHelperTest {
         // Set margin after addView to avoid FrameLayout replacing the LayoutParams
         (dax.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin = 176
 
-        assertEquals(174, BrandDesignUpdateOnboardingLayoutHelper.calculateDecorationHeight(root, dialog, dax, maxHeightPx = 274, minHeightPx = 174))
+        assertEquals(174, OnboardingLayoutHelper.calculateDecorationHeight(root, dialog, dax, maxHeightPx = 274, minHeightPx = 174))
     }
 
     @Test
@@ -130,7 +130,7 @@ class BrandDesignUpdateOnboardingLayoutHelperTest {
 
         assertEquals(
             200,
-            BrandDesignUpdateOnboardingLayoutHelper.calculateDecorationHeight(
+            OnboardingLayoutHelper.calculateDecorationHeight(
                 root,
                 dialog,
                 deco,
@@ -155,7 +155,7 @@ class BrandDesignUpdateOnboardingLayoutHelperTest {
 
         assertEquals(
             247,
-            BrandDesignUpdateOnboardingLayoutHelper.calculateDecorationHeight(
+            OnboardingLayoutHelper.calculateDecorationHeight(
                 root,
                 dialog,
                 deco,
@@ -172,7 +172,7 @@ class BrandDesignUpdateOnboardingLayoutHelperTest {
         // availableContent 1000 - dialogSpace 400 - decoMargin 100 = 500 ≥ max 274 → 274
         assertEquals(
             274,
-            BrandDesignUpdateOnboardingLayoutHelper.computeDecorationHeight(
+            OnboardingLayoutHelper.computeDecorationHeight(
                 availableContentHeight = 1000,
                 dialogSpace = 400,
                 decorationBottomMargin = 100,
@@ -187,7 +187,7 @@ class BrandDesignUpdateOnboardingLayoutHelperTest {
         // 800 - 400 - 200 = 200, between 174 and 274 → 200
         assertEquals(
             200,
-            BrandDesignUpdateOnboardingLayoutHelper.computeDecorationHeight(
+            OnboardingLayoutHelper.computeDecorationHeight(
                 availableContentHeight = 800,
                 dialogSpace = 400,
                 decorationBottomMargin = 200,
@@ -201,7 +201,7 @@ class BrandDesignUpdateOnboardingLayoutHelperTest {
     fun whenAvailableBelowMinThenComputeReturnsNull() {
         // 600 - 400 - 100 = 100 < min 174 → null
         assertNull(
-            BrandDesignUpdateOnboardingLayoutHelper.computeDecorationHeight(
+            OnboardingLayoutHelper.computeDecorationHeight(
                 availableContentHeight = 600,
                 dialogSpace = 400,
                 decorationBottomMargin = 100,
@@ -218,7 +218,7 @@ class BrandDesignUpdateOnboardingLayoutHelperTest {
         // available = 1116 − 869 − 0 = 247 → clamp to [247, 299] → 247
         assertEquals(
             247,
-            BrandDesignUpdateOnboardingLayoutHelper.computeDecorationHeight(
+            OnboardingLayoutHelper.computeDecorationHeight(
                 availableContentHeight = 1116,
                 dialogSpace = 869,
                 decorationBottomMargin = 0,

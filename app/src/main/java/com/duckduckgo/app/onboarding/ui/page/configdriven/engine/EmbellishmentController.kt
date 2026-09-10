@@ -27,10 +27,10 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import com.airbnb.lottie.LottieAnimationView
-import com.duckduckgo.app.browser.databinding.ContentOnboardingWelcomePageUpdateBinding
-import com.duckduckgo.app.onboarding.ui.page.BrandDesignUpdateOnboardingLayoutHelper
+import com.duckduckgo.app.browser.databinding.ContentOnboardingWelcomePageBinding
 import com.duckduckgo.app.onboarding.ui.page.OnboardingBackgroundAnimator
 import com.duckduckgo.app.onboarding.ui.page.OnboardingDecorationFitCorrector
+import com.duckduckgo.app.onboarding.ui.page.OnboardingLayoutHelper
 import com.duckduckgo.app.onboarding.ui.page.configdriven.Embellishment
 import com.duckduckgo.common.ui.view.toPx
 
@@ -59,7 +59,7 @@ interface EmbellishmentController {
  * @param onDecorationHidden callback to the host that a decoration that used to fit no longer does
  */
 class EmbellishmentControllerImpl(
-    private val binding: ContentOnboardingWelcomePageUpdateBinding,
+    private val binding: ContentOnboardingWelcomePageBinding,
     private val onDecorationHidden: () -> Unit,
     private val cardBottomInsetPx: () -> Int,
 ) : EmbellishmentController {
@@ -195,7 +195,7 @@ class EmbellishmentControllerImpl(
         if (decoration == null) return null
 
         releaseCardBottomInset()
-        val fitHeightPx = BrandDesignUpdateOnboardingLayoutHelper.calculateDecorationHeight(
+        val fitHeightPx = OnboardingLayoutHelper.calculateDecorationHeight(
             rootView = binding.root,
             dialogView = binding.daxDialogCta.root,
             decorationView = decoration.view,

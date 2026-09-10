@@ -67,6 +67,7 @@
         android:alpha="0"
         android:gravity="center"
         android:text="@string/onboardingWelcomeTitle"
+        android:textColor="?attr/onboardingTextPrimary"
         app:layout_constraintBottom_toTopOf="@id/textGuideline"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -111,32 +112,32 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:importantForAccessibility="no"
-        android:scaleType="centerCrop"
+        android:scaleType="fitCenter"
         android:visibility="invisible"
+        app:layout_constrainedHeight="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_max="404dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/backgroundGuideline"
         app:layout_constraintVertical_bias="1"
-        tools:layout_constraintHeight_max="404dp"
         tools:src="@drawable/onboarding_background_pond"
         tools:visibility="visible" />
 
     <include
         android:id="@+id/daxDialogCta"
-        layout="@layout/pre_onboarding_dax_dialog_cta_brand_design_update"
+        layout="@layout/pre_onboarding_dax_dialog_cta"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="32dp"
         android:alpha="0"
         android:visibility="invisible"
+        app:layout_constrainedWidth="true"
         app:layout_constraintBottom_toTopOf="@+id/welcomeScreenWalkingDax"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1"
         app:layout_constraintWidth_max="600dp"
-        tools:alpha="1"
         tools:visibility="visible" />
 
     <com.airbnb.lottie.LottieAnimationView
@@ -146,12 +147,19 @@
         android:layout_height="274dp"
         android:layout_marginBottom="104dp"
         android:alpha="0"
-        android:translationX="-16dp"
+        android:translationX="-24dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="@id/daxDialogCta"
         app:lottie_rawRes="@raw/onboarding_welcome_screen_dax_walking"
         tools:alpha="1"
         tools:lottie_progress="1" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/welcomeScreenWalkingDaxBottomGuideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.92" />
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/bottomWingAnimation"
@@ -173,19 +181,20 @@
         android:id="@+id/bobbingDaxAnimation"
         android:layout_width="wrap_content"
         android:layout_height="156dp"
-        android:layout_marginBottom="52dp"
         android:adjustViewBounds="true"
         android:alpha="0"
         android:visibility="gone"
+        android:layout_marginBottom="32dp"
+        android:layout_marginStart="32dp"
         app:layout_constrainedWidth="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:lottie_loop="true"
         app:lottie_rawRes="@raw/onboarding_address_bar_bobbing_dax"
         tools:alpha="1"
+        app:lottie_loop="true"
         tools:lottie_progress="0.5"
-        tools:visibility="visible" />
+        tools:visibility="gone" />
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/leftWingAnimation"
@@ -202,7 +211,6 @@
         tools:alpha="1"
         tools:lottie_progress="0.5"
         tools:visibility="visible" />
-
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/rightWingAnimation"
         android:layout_width="wrap_content"

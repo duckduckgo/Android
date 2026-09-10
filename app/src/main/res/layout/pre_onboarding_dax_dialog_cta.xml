@@ -27,7 +27,7 @@
     tools:alpha="1"
     tools:visibility="visible">
 
-    <com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleBrandDesignUpdateCardView
+    <com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleCardView
         android:id="@+id/cardView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -207,7 +207,7 @@
 
         </ScrollView>
 
-    </com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleBrandDesignUpdateCardView>
+    </com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleCardView>
 
     <com.duckduckgo.app.onboarding.ui.view.OnboardingStepIndicatorView
         android:id="@+id/stepIndicator"

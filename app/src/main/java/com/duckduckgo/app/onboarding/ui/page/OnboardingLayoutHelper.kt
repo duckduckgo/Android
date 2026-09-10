@@ -21,7 +21,7 @@ import android.view.ViewGroup
 import android.widget.ScrollView
 import androidx.core.widget.NestedScrollView
 
-object BrandDesignUpdateOnboardingLayoutHelper {
+object OnboardingLayoutHelper {
 
     fun computeDecorationHeight(
         availableContentHeight: Int,

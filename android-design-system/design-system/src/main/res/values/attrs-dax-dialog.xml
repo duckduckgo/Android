@@ -30,8 +30,8 @@
         <attr name="edgePosition"/>
     </declare-styleable>
 
-    <!-- DaxOnboardingBubbleBrandDesignUpdateCardView -->
-    <declare-styleable name="DaxOnboardingBubbleBrandDesignUpdateCardView">
+    <!-- DaxOnboardingBubbleCardView -->
+    <declare-styleable name="DaxOnboardingBubbleCardView">
         <attr name="arrowOffsetStart" />
         <attr name="arrowOffsetEnd" />
         <attr name="showArrow" format="boolean" />

@@ -46,7 +46,7 @@
         tools:src="@drawable/bg_onboarding_serp"
         tools:visibility="visible" />
 
-    <com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleBrandDesignUpdateCardView
+    <com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleCardView
         android:id="@+id/contextualBrandDesignCardView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -108,7 +108,6 @@
                 tools:alpha="1"
                 tools:text="@string/onboardingEndDaxDialogDescription" />
 
-            <!-- Content include slots — only one visible at a time. Unique IDs across both includes. -->
             <include
                 android:id="@+id/contextualBrandDesignPrimaryCtaContent"
                 layout="@layout/include_brand_design_contextual_dialog_primary_cta"
@@ -129,13 +128,6 @@
                 android:visibility="gone"
                 tools:visibility="gone" />
 
-            <!--
-              ~ Padding compensator for CTAs that have no in-card content slot. The card container
-              ~ uses paddingTop=keyline_6 vs paddingBottom=20dp; other slots' button mass masks the
-              ~ 12dp asymmetry, but no-content CTAs have no button to compensate, so this Space
-              ~ adds the missing keyline_3 when it's the active slot. Portrait only — landscape's
-              ~ container padding is already symmetric.
-              -->
             <Space
                 android:id="@+id/contextualBrandDesignNoCtaContent"
                 android:layout_width="match_parent"
@@ -145,9 +137,8 @@
 
         </com.duckduckgo.app.onboarding.ui.view.TouchInterceptingLinearLayout>
 
-    </com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleBrandDesignUpdateCardView>
+    </com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleCardView>
 
-    <!-- Dismiss button: bordered circular button overlapping card corner. -->
     <ImageView
         android:id="@+id/contextualBrandDesignDismissButton"
         android:layout_width="32dp"
