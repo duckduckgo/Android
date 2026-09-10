@@ -4,6 +4,9 @@
     package="com.duckduckgo.app.browser">
 
     <application>
+        <!-- Allows shell tools (Perfetto, macrobenchmark) to profile internal builds without
+             making the app debuggable, so timing stays realistic. Internal flavor only. -->
+        <profileable android:shell="true" />
         <activity
             android:name=".webview.WebViewDevSettingsActivity"
             android:exported="true"
