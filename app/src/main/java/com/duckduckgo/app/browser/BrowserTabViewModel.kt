@@ -5843,6 +5843,15 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    fun openNewImageDuckChat(viewMode: ViewMode) {
+        val entryPoint = if (viewMode == ViewMode.NewTab) {
+            DuckChatEntryPoint.BROWSING_MENU_NTP
+        } else {
+            DuckChatEntryPoint.BROWSING_MENU_WEBPAGE
+        }
+        duckChat.openDuckChatImageGeneration(entryPoint)
+    }
+
     fun openNewDuckChat(viewMode: ViewMode) {
         if (viewMode == ViewMode.DuckAI) {
             pixel.fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_NEW_CHAT_TAPPED)
