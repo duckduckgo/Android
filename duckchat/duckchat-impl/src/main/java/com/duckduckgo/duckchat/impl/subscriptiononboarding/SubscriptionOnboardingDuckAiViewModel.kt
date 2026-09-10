@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.subscriptions.onboarding
+package com.duckduckgo.duckchat.impl.subscriptiononboarding
 
 import androidx.annotation.DrawableRes
 import androidx.lifecycle.ViewModel
@@ -29,7 +29,7 @@ import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ModelProvider
 import com.duckduckgo.duckchat.impl.models.UserTier
-import com.duckduckgo.duckchat.impl.subscriptions.onboarding.SubscriptionOnboardingDuckAiStepPlugin.Companion.DUCK_AI_STEP_ID
+import com.duckduckgo.duckchat.impl.subscriptiononboarding.SubscriptionOnboardingDuckAiStepPlugin.Companion.DUCK_AI_STEP_ID
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.COMPLETED
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.SKIPPED
@@ -62,11 +62,10 @@ class SubscriptionOnboardingDuckAiViewModel @Inject constructor(
             viewModelScope.launch(dispatcherProvider.io()) { duckAiModelManager.fetchModels() }
             duckAiModelManager.modelState
                 .onEach { modelState ->
-                    // Public models only; paid models first to match the design's preselection of a premium model.
                     val models = modelState.models
-                        .filter { it.requiredTier != null }
-                        .sortedBy { if (it.requiredTier == UserTier.FREE) 1 else 0 }
+                        .filter { it.isAvailableTo(modelState.userTier) }
                         .map { it.toItem() }
+                        .sortedByDescending { it.tier.rank }
                     val selectedId = viewState.value.selectedModelId?.takeIf { id -> models.any { it.id == id } }
                         ?: models.firstOrNull()?.id
                     viewState.update { it.copy(models = models, selectedModelId = selectedId) }
@@ -80,7 +79,6 @@ class SubscriptionOnboardingDuckAiViewModel @Inject constructor(
         viewState.update { it.copy(selectedModelId = modelId) }
     }
 
-    /** Persists the chosen model and opens Duck.ai, then leaves the onboarding flow. */
     fun onStartClicked() {
         val selectedId = viewState.value.selectedModelId ?: return
         viewModelScope.launch {
@@ -96,7 +94,6 @@ class SubscriptionOnboardingDuckAiViewModel @Inject constructor(
         controller.onStepFinished(DUCK_AI_STEP_ID, SKIPPED)
     }
 
-    /** Primary action for the AI-features-disabled placeholder. */
     fun onPlaceholderPrimaryClicked() {
         controller.onStepFinished(DUCK_AI_STEP_ID, COMPLETED)
     }
@@ -122,6 +119,18 @@ class SubscriptionOnboardingDuckAiViewModel @Inject constructor(
         val tier: UserTier,
     )
 }
+
+private fun AIChatModel.isAvailableTo(userTier: UserTier): Boolean {
+    val required = requiredTier ?: return false
+    return required.rank <= userTier.rank
+}
+
+private val UserTier.rank: Int
+    get() = when (this) {
+        UserTier.FREE -> 0
+        UserTier.PLUS -> 1
+        UserTier.PRO -> 2
+    }
 
 @DrawableRes
 private fun iconForProvider(provider: ModelProvider): Int = when (provider) {

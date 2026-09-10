@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.subscriptions.onboarding
+package com.duckduckgo.duckchat.impl.subscriptiononboarding
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -37,8 +37,6 @@ import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.FragmentSubscriptionOnboardingDuckAiBinding
 import com.duckduckgo.duckchat.impl.databinding.ViewSubscriptionOnboardingDuckAiModelBinding
 import com.duckduckgo.duckchat.impl.models.UserTier
-import com.duckduckgo.duckchat.impl.subscriptions.onboarding.SubscriptionOnboardingDuckAiViewModel.ModelItem
-import com.duckduckgo.duckchat.impl.subscriptions.onboarding.SubscriptionOnboardingDuckAiViewModel.ViewState
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingFeature
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionOnboardingFeatureInfoScreen
@@ -46,11 +44,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
-/**
- * Duck.ai step of the native subscription onboarding. Shows the available Duck.ai models with their tier, lets
- * the user pick one, and either starts Duck.ai with that model or skips the step. When AI features are not
- * available it falls back to a placeholder screen (to be designed later).
- */
 @InjectWith(FragmentScope::class)
 class SubscriptionOnboardingDuckAiFragment : DuckDuckGoFragment(R.layout.fragment_subscription_onboarding_duck_ai) {
 
@@ -91,7 +84,7 @@ class SubscriptionOnboardingDuckAiFragment : DuckDuckGoFragment(R.layout.fragmen
             .launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
-    private fun render(state: ViewState) = with(binding) {
+    private fun render(state: SubscriptionOnboardingDuckAiViewModel.ViewState) = with(binding) {
         val enabled = state.aiEnabled ?: return@with
         aiEnabled = enabled
         if (!enabled) {
@@ -111,7 +104,6 @@ class SubscriptionOnboardingDuckAiFragment : DuckDuckGoFragment(R.layout.fragmen
         renderModels(state.models, state.selectedModelId)
     }
 
-    /** Sets the header copy and wires its "Learn More" annotation to open the Duck.ai feature info screen. */
     private fun setHeaderTextWithLearnMore() {
         binding.subscriptionOnboardingDuckAiHeaderText.addClickableSpan(
             getText(R.string.subscriptionOnboardingDuckAiHeaderText),
@@ -128,7 +120,7 @@ class SubscriptionOnboardingDuckAiFragment : DuckDuckGoFragment(R.layout.fragmen
         )
     }
 
-    private fun renderModels(models: List<ModelItem>, selectedId: String?) {
+    private fun renderModels(models: List<SubscriptionOnboardingDuckAiViewModel.ModelItem>, selectedId: String?) {
         val container = binding.subscriptionOnboardingDuckAiModelList
         val ids = models.map { it.id }
         if (ids != renderedModelIds) {

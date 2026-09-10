@@ -25,7 +25,8 @@ import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ModelProvider
 import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.models.UserTier
-import com.duckduckgo.duckchat.impl.subscriptions.onboarding.SubscriptionOnboardingDuckAiStepPlugin.Companion.DUCK_AI_STEP_ID
+import com.duckduckgo.duckchat.impl.subscriptiononboarding.SubscriptionOnboardingDuckAiStepPlugin.Companion.DUCK_AI_STEP_ID
+import com.duckduckgo.duckchat.impl.subscriptiononboarding.SubscriptionOnboardingDuckAiViewModel
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.SKIPPED
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -76,6 +77,81 @@ class SubscriptionOnboardingDuckAiViewModelTest {
     }
 
     @Test
+    fun whenUserIsPlusThenProModelsAreHidden() = runTest {
+        val testee = createViewModel(
+            userTier = UserTier.PLUS,
+            models = listOf(
+                model(id = "free1", name = "GPT-5.4 nano", tiers = listOf("free")),
+                model(id = "plus1", name = "GPT-5.4", tiers = listOf("plus")),
+                model(id = "pro1", name = "Claude Opus", tiers = listOf("pro")),
+            ),
+        )
+
+        testee.viewState().test {
+            val state = awaitItem()
+            assertEquals(listOf("plus1", "free1"), state.models.map { it.id })
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenUserIsProThenAllModelsAreVisibleOrderedProThenPlusThenFree() = runTest {
+        val testee = createViewModel(
+            userTier = UserTier.PRO,
+            models = listOf(
+                model(id = "free1", name = "GPT-5.4 nano", tiers = listOf("free")),
+                model(id = "pro1", name = "Claude Opus", tiers = listOf("pro")),
+                model(id = "plus1", name = "GPT-5.4", tiers = listOf("plus")),
+                model(id = "pro2", name = "GPT-5.4 Pro", tiers = listOf("pro")),
+            ),
+        )
+
+        testee.viewState().test {
+            val state = awaitItem()
+            assertEquals(listOf("pro1", "pro2", "plus1", "free1"), state.models.map { it.id })
+            assertEquals(UserTier.PRO, state.models.first().tier)
+            assertEquals("pro1", state.selectedModelId)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenUserIsFreeThenOnlyFreeModelsAreVisible() = runTest {
+        val testee = createViewModel(
+            userTier = UserTier.FREE,
+            models = listOf(
+                model(id = "plus1", name = "GPT-5.4", tiers = listOf("plus")),
+                model(id = "free1", name = "GPT-5.4 nano", tiers = listOf("free")),
+                model(id = "pro1", name = "Claude Opus", tiers = listOf("pro")),
+            ),
+        )
+
+        testee.viewState().test {
+            val state = awaitItem()
+            assertEquals(listOf("free1"), state.models.map { it.id })
+            assertEquals("free1", state.selectedModelId)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenModelHasNoPublicTierThenItIsHidden() = runTest {
+        val testee = createViewModel(
+            userTier = UserTier.PRO,
+            models = listOf(
+                model(id = "internal1", name = "Internal", tiers = listOf("internal")),
+                model(id = "free1", name = "GPT-5.4 nano", tiers = listOf("free")),
+            ),
+        )
+
+        testee.viewState().test {
+            val state = awaitItem()
+            assertEquals(listOf("free1"), state.models.map { it.id })
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenModelSelectedThenSelectionUpdated() = runTest {
         val testee = createViewModel(
             models = listOf(
@@ -116,9 +192,10 @@ class SubscriptionOnboardingDuckAiViewModelTest {
     private fun createViewModel(
         aiEnabled: Boolean = true,
         models: List<AIChatModel> = emptyList(),
+        userTier: UserTier = UserTier.PLUS,
     ): SubscriptionOnboardingDuckAiViewModel {
         whenever(duckChat.isEnabled()).thenReturn(aiEnabled)
-        whenever(modelManager.modelState).thenReturn(MutableStateFlow(ModelState(models = models)))
+        whenever(modelManager.modelState).thenReturn(MutableStateFlow(ModelState(models = models, userTier = userTier)))
         return SubscriptionOnboardingDuckAiViewModel(
             controller,
             duckChat,

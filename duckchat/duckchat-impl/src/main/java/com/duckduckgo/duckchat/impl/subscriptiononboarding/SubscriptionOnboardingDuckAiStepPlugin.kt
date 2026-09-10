@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.subscriptions.onboarding
+package com.duckduckgo.duckchat.impl.subscriptiononboarding
 
 import androidx.fragment.app.Fragment
 import com.duckduckgo.anvil.annotations.PriorityKey
