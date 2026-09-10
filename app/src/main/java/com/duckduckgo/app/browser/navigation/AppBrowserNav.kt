@@ -56,15 +56,15 @@ class AppBrowserNav @Inject constructor() : BrowserNav {
         hasSessionActive: Boolean,
         duckChatUrl: String,
         forceImageGeneration: Boolean,
-        isContextual: Boolean,
+        forceLaunchContextual: Boolean,
         textSelection: String?,
     ): Intent {
-        val isExternal = textSelection != null && !isContextual
+        val isExternal = textSelection != null && !forceLaunchContextual
         return BrowserActivity.intent(
             context = context,
             launchSource = if (isExternal) SelectedTextSearch else InAppNavigation,
             openDuckChat = true,
-            duckChatContextual = isContextual,
+            duckChatContextual = forceLaunchContextual,
             duckChatUrl = duckChatUrl,
             duckChatSessionActive = hasSessionActive,
             duckChatForceImageGeneration = forceImageGeneration,
