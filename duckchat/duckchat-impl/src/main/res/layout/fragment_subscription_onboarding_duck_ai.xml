@@ -87,6 +87,15 @@
 
     </androidx.core.widget.NestedScrollView>
 
+    <View
+        android:id="@+id/subscriptionOnboardingDuckAiScrollFade"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:importantForAccessibility="no"
+        app:layout_constraintBottom_toBottomOf="@id/subscriptionOnboardingDuckAiScrollView"
+        app:layout_constraintEnd_toEndOf="@id/subscriptionOnboardingDuckAiScrollView"
+        app:layout_constraintStart_toStartOf="@id/subscriptionOnboardingDuckAiScrollView" />
+
     <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
         android:id="@+id/subscriptionOnboardingDuckAiStartButton"
         android:layout_width="match_parent"
