@@ -1297,22 +1297,6 @@ class BrowserTabFragment :
 
                 daxDialogIntroBubbleBrandDesign.brandDesignHeaderImage.isSaveEnabled = false
 
-                daxDialogInContextBrandDesign.contextualBrandDesignBackground.isSaveEnabled = false
-                daxDialogInContextBrandDesign.contextualBrandDesignCardContainer.isSaveEnabled = false
-                daxDialogInContextBrandDesign.contextualBrandDesignCardView.isSaveEnabled = false
-                daxDialogInContextBrandDesign.contextualBrandDesignDescription.isSaveEnabled = false
-                daxDialogInContextBrandDesign.contextualBrandDesignDismissButton.isSaveEnabled = false
-                daxDialogInContextBrandDesign.contextualBrandDesignHiddenTitle.isSaveEnabled = false
-                daxDialogInContextBrandDesign.contextualBrandDesignNoCtaContent?.isSaveEnabled = false
-                daxDialogInContextBrandDesign.contextualBrandDesignOptionsContent.contextualBrandDesignSiteOption1.isSaveEnabled = false
-                daxDialogInContextBrandDesign.contextualBrandDesignOptionsContent.contextualBrandDesignSiteOption2.isSaveEnabled = false
-                daxDialogInContextBrandDesign.contextualBrandDesignOptionsContent.contextualBrandDesignSiteOption3.isSaveEnabled = false
-                daxDialogInContextBrandDesign.contextualBrandDesignOptionsContent.contextualBrandDesignSiteOption4.isSaveEnabled = false
-                daxDialogInContextBrandDesign.contextualBrandDesignPrimaryCtaContent.contextualBrandDesignPrimaryCta.isSaveEnabled = false
-                daxDialogInContextBrandDesign.contextualBrandDesignTitle.isSaveEnabled = false
-                daxDialogInContextBrandDesign.contextualBrandDesignTitleSlot.isSaveEnabled = false
-                daxDialogInContextBrandDesign.wavingDax.isSaveEnabled = false
-                daxDialogInContextBrandDesign.wingBottom.isSaveEnabled = false
 
                 binding.autoCompleteSuggestionsList.isSaveEnabled = false
                 binding.daxDialogOnboardingCtaContent.isSaveEnabled = false
@@ -6372,9 +6356,8 @@ class BrowserTabFragment :
             val container = daxDialogIntroBubbleBrandDesign.daxCtaContainer
             configuration.apply {
                 showCta(container) {
-                    setOnOptionClicked { option, index ->
+                    setOnOptionClicked { option, _ ->
                         submitQuery(option.link)
-                        viewModel.onUserSelectedOnboardingDialogOption(configuration, index)
                     }
                 }
 
@@ -6625,8 +6608,6 @@ class BrowserTabFragment :
         }
 
         private fun hideDaxCta() {
-            daxDialogInContextBrandDesign.contextualBrandDesignTitle.cancelAnimation()
-            daxDialogInContextBrandDesign.root.gone()
             val cta = lastSeenCtaViewState?.cta as? OnboardingDaxDialogCta.ContextualDaxDialogCta
             if (cta != null) {
                 cta.hideOnboardingCta(binding)

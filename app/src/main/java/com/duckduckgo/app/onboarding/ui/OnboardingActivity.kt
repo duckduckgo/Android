@@ -88,7 +88,6 @@ class OnboardingActivity : DuckDuckGoActivity() {
     }
 
     fun onSkipClicked() {
-        viewModel.onOnboardingSkipped()
         startActivity(BrowserActivity.intent(this@OnboardingActivity, launchSource = Onboarding, newSearch = true))
         finish()
     }

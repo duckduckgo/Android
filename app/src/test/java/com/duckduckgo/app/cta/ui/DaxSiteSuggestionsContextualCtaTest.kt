@@ -204,7 +204,7 @@ class DaxSiteSuggestionsContextualCtaTest {
     fun whenGetSiteSuggestionsCtaReturnsBrandDesignClass() = runTest {
         givenSiteSuggestionsCtaPreconditions()
 
-        val value = testee.getSiteSuggestionsDialogCta(onSiteSuggestionOptionClicked = {})
+        val value = testee.getSiteSuggestionsDialogCta()
 
         assertTrue(value is DaxSiteSuggestionsContextualCta)
     }
