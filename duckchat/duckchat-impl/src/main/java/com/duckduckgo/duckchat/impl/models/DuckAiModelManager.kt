@@ -185,7 +185,10 @@ class RealDuckAiModelManager @Inject constructor(
                     }
                 val attachmentLimits = resolveAttachmentLimits(response.attachmentLimits, userTier)
                 stateMutex.withLock {
+                    // Selection is resolved before sorting so the derived default keeps following
+                    // endpoint order, and only the picker's display order changes.
                     val selectedModelId = resolveSelection(models)
+                    val displayModels = models.sortLabelledFirst()
                     val selectedModel = models.find { it.id == selectedModelId }
                     val available = ReasoningResolver.availableModes(
                         supported = selectedModel?.supportedReasoningEfforts.orEmpty(),
@@ -195,7 +198,7 @@ class RealDuckAiModelManager @Inject constructor(
                     val nextReasoningMode = validateAndPersistReasoningMode(_modelState.value.selectedReasoningMode, available)
 
                     _modelState.value = _modelState.value.copy(
-                        models = models,
+                        models = displayModels,
                         selectedModelId = selectedModelId,
                         selectedModelShortName = selectedModel?.shortName,
                         userTier = userTier,
@@ -204,7 +207,7 @@ class RealDuckAiModelManager @Inject constructor(
                         selectedReasoningMode = nextReasoningMode,
                         availableReasoningModes = available,
                     )
-                    logcat { "Duck.ai Model Manager: fetched ${models.size} models, tier=$userTier, selected=$selectedModelId" }
+                    logcat { "Duck.ai Model Manager: fetched ${displayModels.size} models, tier=$userTier, selected=$selectedModelId" }
                 }
             } catch (e: Exception) {
                 logcat { "Duck.ai Model Manager: failed to fetch models: ${e.message}" }
@@ -384,6 +387,12 @@ class RealDuckAiModelManager @Inject constructor(
         )
     }
 
+    /** Labelled models lead the list, as the backend marks them as the ones to recommend. */
+    private suspend fun List<AIChatModel>.sortLabelledFirst(): List<AIChatModel> {
+        if (!duckChatFeature.get().updatedPickers().isEnabled()) return this
+        return sortedBy { if (it.label != null) 0 else 1 }
+    }
+
     private fun resolveModel(
         remote: RemoteAIChatModel,
         userTier: UserTier,
@@ -413,6 +422,7 @@ class RealDuckAiModelManager @Inject constructor(
                 ReasoningEffortAccess(effort = effort, accessTier = tiers, isAccessible = accessible)
             },
             supportedTools = remote.supportedTools.orEmpty().mapNotNull(Tool::from),
+            label = ModelLabel.from(remote.label),
         )
     }
 }
