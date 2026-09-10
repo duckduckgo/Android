@@ -303,6 +303,7 @@ import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeature
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
@@ -377,6 +378,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import dagger.Lazy
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
@@ -421,6 +423,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.atLeastOnce
+import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
@@ -951,7 +954,7 @@ class BrowserTabViewModelTest {
             whenever(mockStack.getItemAtIndex(any())).thenReturn(mockWebHistoryItem)
         }
 
-    private fun initialiseViewModel() {
+    private fun initialiseViewModel(viewModelDispatchers: DispatcherProvider = coroutineRule.testDispatcherProvider) {
         // Detach the previous instance's command observer before creating a new VM, so tests that
         // call initialiseViewModel() more than once (e.g. to swap browserMode mid-test) don't leave
         // a stale VM attached to mockCommandObserver and emitting unexpected commands.
@@ -999,7 +1002,7 @@ class BrowserTabViewModelTest {
                 ctaViewModel = ctaViewModel,
                 searchCountDao = mockSearchCountDao,
                 pixel = mockPixel,
-                dispatchers = coroutineRule.testDispatcherProvider,
+                dispatchers = viewModelDispatchers,
                 fireproofWebsiteRepository = fireproofWebsiteRepositoryImpl,
                 savedSitesRepository = mockSavedSitesRepository,
                 navigationAwareLoginDetector = mockNavigationAwareLoginDetector,
@@ -6590,11 +6593,22 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenOnConfigurationChangedAndOrientationChangedThenReinflateCommandIsEmitted() = runTest {
-        testee.onConfigurationChanged(orientationChanged = true)
-        advanceUntilIdle()
+        val mainDispatcher = StandardTestDispatcher()
+        val dispatchers =
+            object : DispatcherProvider by coroutineRule.testDispatcherProvider {
+                override fun main(): CoroutineDispatcher = mainDispatcher
+            }
+        resetChannels()
+        initialiseViewModel(viewModelDispatchers = dispatchers)
+        clearInvocations(mockCommandObserver)
 
-        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        assertTrue(commandCaptor.allValues.any { it is Command.ReinflateBrandDesignContextualDialog })
+        testee.onConfigurationChanged(orientationChanged = true)
+
+        verify(mockCommandObserver, never()).onChanged(Command.ReinflateBrandDesignContextualDialog)
+
+        mainDispatcher.scheduler.runCurrent()
+
+        verify(mockCommandObserver, times(1)).onChanged(Command.ReinflateBrandDesignContextualDialog)
     }
 
     @Test

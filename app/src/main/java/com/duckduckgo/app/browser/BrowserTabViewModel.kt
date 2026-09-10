@@ -4697,10 +4697,8 @@ class BrowserTabViewModel @Inject constructor(
                 forceRenderingTicker = System.currentTimeMillis(),
             )
         if (!orientationChanged) return
-        viewModelScope.launch(dispatchers.io()) {
-            withContext(dispatchers.main()) {
-                command.value = Command.ReinflateBrandDesignContextualDialog
-            }
+        viewModelScope.launch(dispatchers.main()) {
+            command.value = Command.ReinflateBrandDesignContextualDialog
         }
     }
 
@@ -5494,11 +5492,7 @@ class BrowserTabViewModel @Inject constructor(
                 viewModelScope.launch {
                     val cta =
                         withContext(dispatchers.io()) {
-                            ctaViewModel.getSiteSuggestionsDialogCta(
-                                onSiteSuggestionOptionClicked = { index ->
-                                    onUserSelectedOnboardingSiteSuggestionOption(index)
-                                },
-                            )
+                            ctaViewModel.getSiteSuggestionsDialogCta()
                         }
                     ctaViewState.value = currentCtaViewState().copy(cta = cta)
                     if (cta == null) {
@@ -6059,17 +6053,6 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onOmnibarPrivacyShieldButtonPressed() {
-        // No-op: experiment pixel tracking removed
-    }
-
-    fun onUserSelectedOnboardingDialogOption(
-        cta: Cta,
-        index: Int?,
-    ) {
-        // No-op: experiment pixel tracking removed
-    }
-
-    fun onUserSelectedOnboardingSiteSuggestionOption(index: Int) {
         // No-op: experiment pixel tracking removed
     }
 

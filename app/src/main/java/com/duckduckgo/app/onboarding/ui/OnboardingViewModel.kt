@@ -83,8 +83,6 @@ class OnboardingViewModel @Inject constructor(
         }
     }
 
-    fun onOnboardingSkipped() = Unit
-
     fun initializeOnboardingSkipper() {
         if (!appBuildConfig.canSkipOnboarding) return
 
