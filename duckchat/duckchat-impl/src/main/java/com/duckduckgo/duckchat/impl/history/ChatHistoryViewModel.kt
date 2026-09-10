@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.history
 
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
@@ -287,6 +288,20 @@ class ChatHistoryViewModel @Inject constructor(
         controls.update { it.copy(mode = Mode.Selecting(emptySet())) }
     }
 
+    fun onChatsProtectionClicked() {
+        viewModelScope.launch {
+            val sourceTab = tabRepository.getSelectedTab()
+            val fromChatTab = sourceTab?.url?.let { duckChat.isDuckChatUrl(it.toUri()) } == true
+            navigationChannel.trySend(
+                NavigationEvent.OpenChatProtection(
+                    url = duckChat.getChatProtectionUrl(),
+                    sourceTabId = sourceTab?.tabId,
+                    inNewTab = !fromChatTab,
+                ),
+            )
+        }
+    }
+
     fun onSelectionToggled(chatId: String) {
         controls.update { c ->
             val mode = c.mode as? Mode.Selecting ?: return@update c
@@ -408,6 +423,7 @@ class ChatHistoryViewModel @Inject constructor(
 
     sealed interface NavigationEvent {
         data class OpenChat(val url: String, val sourceTabId: String?) : NavigationEvent
+        data class OpenChatProtection(val url: String, val sourceTabId: String?, val inNewTab: Boolean) : NavigationEvent
         data class OpenRename(val chatId: String, val currentTitle: String) : NavigationEvent
         data class ShowDownloadComplete(val fileName: String) : NavigationEvent
         data class ShowBulkDownloadComplete(val count: Int) : NavigationEvent

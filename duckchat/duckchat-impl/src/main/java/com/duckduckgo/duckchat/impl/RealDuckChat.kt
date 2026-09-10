@@ -188,6 +188,9 @@ interface DuckChatInternal : DuckChat {
     /** Single source of truth for the Duck.ai chat URL shape. */
     fun buildChatUrl(chatId: String): String
 
+    /** Returns the Duck.ai URL that opens with the chat protections panel open (e.g. https://duck.ai/chat?chatProtection=open). */
+    fun getChatProtectionUrl(): String
+
     /**
      * Calls onClose when a close event is emitted.
      */
@@ -760,6 +763,9 @@ class RealDuckChat @Inject constructor(
 
     override fun getDuckChatSettingsUrl(): String = resolveDuckAiUrl(DUCK_CHAT_SETTINGS_WEB_LINK)
 
+    override fun getChatProtectionUrl(): String =
+        appendParameters(mapOf(CHAT_PROTECTION_QUERY_NAME to CHAT_PROTECTION_QUERY_VALUE), getDuckChatLink())
+
     private fun addChatParameters(
         query: String,
         autoPrompt: Boolean,
@@ -1132,6 +1138,8 @@ class RealDuckChat @Inject constructor(
         private const val PROMPT_QUERY_VALUE = "1"
         private const val PLACEMENT_QUERY_NAME = "placement"
         private const val PLACEMENT_QUERY_VALUE = "sidebar"
+        private const val CHAT_PROTECTION_QUERY_NAME = "chatProtection"
+        private const val CHAT_PROTECTION_QUERY_VALUE = "open"
         private const val BANG_QUERY_NAME = "bang"
         private const val BANG_QUERY_VALUE = "true"
         private const val MODE_QUERY_NAME = "mode"
