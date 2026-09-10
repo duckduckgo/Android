@@ -39,4 +39,8 @@
     <!-- Duck.ai on/off, shown in the onboarding Duck.ai state choice -->
     <string name="duckChatOnboardingDuckAiStateOn">Turn Duck.ai On</string>
     <string name="duckChatOnboardingDuckAiStateOff">Keep Duck.ai Off</string>
+
+    <!-- Chat history overflow (three-dot) menu -->
+    <string name="duck_ai_chat_history_overflow_select_chats">Select Chats</string>
+    <string name="duck_ai_chat_history_overflow_chats_protection">Chat Protection</string>
 </resources>
