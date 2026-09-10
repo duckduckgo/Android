@@ -44,7 +44,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:importantForAccessibility="no"
-                android:src="@drawable/duckai_128" />
+                android:src="@drawable/duckai_ddg_feature_128" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/subscriptionOnboardingDuckAiHeaderTitle"
