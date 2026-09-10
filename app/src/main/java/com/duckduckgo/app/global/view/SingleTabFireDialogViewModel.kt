@@ -422,7 +422,6 @@ class SingleTabFireDialogViewModel @Inject constructor(
                 isSiteDataSubtitleEligible = isTabAware && shownCount < DIALOG_WARNING_MESSAGE_SHOWN_LIMIT,
                 isDownloadsSubtitleEligible = downloads.any { download -> download.downloadStatus == DownloadStatus.STARTED },
                 isFirePictogramVisible = settingsDataStore.fireAnimationEnabled,
-                isFireAnimationUpdateEnabled = true,
                 titleSource = titleSource,
             ),
             origin = dialogOrigin,
@@ -505,7 +504,6 @@ class SingleTabFireDialogViewModel @Inject constructor(
                 val isSiteDataSubtitleEligible: Boolean = false,
                 val isDownloadsSubtitleEligible: Boolean = false,
                 val isFirePictogramVisible: Boolean = true,
-                val isFireAnimationUpdateEnabled: Boolean = true,
                 val titleSource: TitleSource = TitleSource.Static(R.string.singleTabFireDialogTitle),
             )
         }

@@ -99,7 +99,6 @@ internal class DataClearingSettingsViewModelTest {
             val value = awaitItem()
 
             assertEquals(FireAnimation.HeroFire, value.selectedFireAnimation)
-            assertTrue(value.isFireAnimationUpdateEnabled)
             assertFalse(value.clearDuckAiData)
             assertFalse(value.showClearDuckAiDataSetting)
             assertEquals(0, value.fireproofWebsitesCount)
@@ -235,7 +234,6 @@ internal class DataClearingSettingsViewModelTest {
             assertEquals(
                 Command.LaunchFireAnimationSettings(
                     animation = FireAnimation.HeroFire,
-                    isFireAnimationUpdateEnabled = true,
                 ),
                 awaitItem(),
             )
@@ -384,14 +382,5 @@ internal class DataClearingSettingsViewModelTest {
 
         verify(mockPixel).fire(AppPixelName.FORGET_ALL_PRESSED_SETTINGS)
         verify(mockPixel).fire(AppPixelName.FORGET_ALL_PRESSED_SETTINGS_DAILY, type = Daily())
-    }
-
-    @Test
-    fun whenInitialisedThenViewStateMarksFireAnimationUpdateEnabled() = runTest {
-        testee.viewState.test {
-            assertTrue(awaitItem().isFireAnimationUpdateEnabled)
-
-            cancelAndConsumeRemainingEvents()
-        }
     }
 }

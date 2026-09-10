@@ -32,44 +32,18 @@ sealed class FireAnimation(
 ) : Serializable {
     data object Inferno : FireAnimation(R.raw.inferno, R.string.settingsHeroFireAnimation)
 
-    // Displayed as "Inferno Classic" when fireAnimationUpdate toggle is on; storage key,
-    // pixel value, and asset filename are intentionally preserved for blast-radius reasons.
+    // Displayed as "Inferno Classic"; storage key, pixel value, and asset filename are
+    // intentionally preserved for blast-radius reasons.
     data object HeroFire : FireAnimation(R.raw.hero_fire_inferno, R.string.settingsHeroFireAnimation)
     data object HeroWater : FireAnimation(R.raw.hero_water_whirlpool, R.string.settingsHeroWaterAnimation)
     data object HeroAbstract : FireAnimation(R.raw.hero_abstract_airstream, R.string.settingsHeroAbstractAnimation)
     data object None : FireAnimation(-1, R.string.settingsNoneAnimation)
-
-    fun getOptionIndex(): Int {
-        return when (this) {
-            Inferno -> 0
-            HeroFire -> 1
-            HeroWater -> 2
-            HeroAbstract -> 3
-            None -> 4
-        }
-    }
-
-    fun Int.getAnimationForIndex(): FireAnimation {
-        return when (this) {
-            0 -> Inferno
-            1 -> HeroFire
-            2 -> HeroWater
-            3 -> HeroAbstract
-            4 -> None
-            else -> HeroFire
-        }
-    }
 }
 
-fun availableFireAnimations(includesInferno: Boolean): List<FireAnimation> = if (includesInferno) {
-    listOf(Inferno, HeroFire, HeroWater, HeroAbstract, None)
-} else {
-    listOf(HeroFire, HeroWater, HeroAbstract, None)
-}
+fun availableFireAnimations(): List<FireAnimation> = listOf(Inferno, HeroFire, HeroWater, HeroAbstract, None)
 
 @StringRes
-fun FireAnimation.displayLabelResId(includesInferno: Boolean): Int =
-    if (this == HeroFire && includesInferno) R.string.settingsHeroFireAnimationClassic else nameResId
+fun FireAnimation.displayLabelResId(): Int = if (this == HeroFire) R.string.settingsHeroFireAnimationClassic else nameResId
 
 fun FireAnimation.getPixelValue() = when (this) {
     Inferno -> Pixel.PixelValues.FIRE_ANIMATION_INFERNO_NEW

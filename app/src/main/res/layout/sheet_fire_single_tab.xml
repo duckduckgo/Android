@@ -67,7 +67,7 @@
                     android:importantForAccessibility="no"
                     app:lottie_autoPlay="false"
                     app:lottie_loop="false"
-                    app:lottie_rawRes="@raw/fire_dialog_animation" />
+                    app:lottie_rawRes="@raw/fire_dialog_animation_brand_design" />
 
                 <com.duckduckgo.common.ui.view.text.DaxTextView
                     android:id="@+id/dialogTitle"
