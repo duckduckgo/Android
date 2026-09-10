@@ -98,7 +98,7 @@
                     android:layout_height="31.5dp"
                     android:layout_gravity="center"
                     android:importantForAccessibility="no"
-                    app:srcCompat="@drawable/ic_ddg_logo_full_bleed" />
+                    app:srcCompat="@drawable/ddg_logo_full_bleed" />
 
             </com.google.android.material.card.MaterialCardView>
 
