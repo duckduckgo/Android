@@ -764,7 +764,7 @@ class RealDuckChat @Inject constructor(
     override fun getDuckChatSettingsUrl(): String = resolveDuckAiUrl(DUCK_CHAT_SETTINGS_WEB_LINK)
 
     override fun getChatProtectionUrl(): String =
-        appendParameters(mapOf(CHAT_PROTECTION_QUERY_NAME to CHAT_PROTECTION_QUERY_VALUE), getDuckChatLink())
+        appendParameters(mapOf(CHAT_PROTECTION_QUERY_NAME to CHAT_PROTECTION_QUERY_VALUE) + nativeChatInputParameters(), getDuckChatLink())
 
     private fun addChatParameters(
         query: String,
