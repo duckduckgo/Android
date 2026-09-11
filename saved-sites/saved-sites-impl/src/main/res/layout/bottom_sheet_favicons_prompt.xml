@@ -58,7 +58,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 android:importantForAccessibility="no"
-                app:srcCompat="@drawable/ic_icons_download_128" />
+                app:srcCompat="@drawable/webpage_download_128" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:layout_width="0dp"

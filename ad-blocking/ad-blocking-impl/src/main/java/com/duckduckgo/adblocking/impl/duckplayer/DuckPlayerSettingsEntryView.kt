@@ -59,7 +59,7 @@ class DuckPlayerSettingsEntryView @JvmOverloads constructor(
 
     private val listItem: OneLineListItem by lazy {
         OneLineListItem(context).apply {
-            setLeadingIconResource(CommonR.drawable.ic_video_player_color_24)
+            setLeadingIconResource(CommonR.drawable.video_player_color_24)
             setPrimaryText(context.getString(R.string.duck_player_setting_title))
         }
     }

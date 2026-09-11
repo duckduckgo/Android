@@ -149,7 +149,7 @@ private fun DaxPromoBottomSheetDialogPreview() {
             DaxPromoBottomSheetDialog(
                 title = "Title",
                 description = "Add our search widget to your home screen for quick access.",
-                promoIcon = painterResource(R.drawable.ic_announce),
+                promoIcon = painterResource(R.drawable.announcement_96),
                 buttons = {
                     DaxGhostButton(text = "Button", onClick = {})
                     DaxPrimaryButton(text = "Button", onClick = {})
@@ -221,7 +221,7 @@ private fun DaxPromoBottomSheetDialogNoButtonsPreview() {
             DaxPromoBottomSheetDialog(
                 title = "Title",
                 description = "Add our search widget to your home screen for quick access.",
-                promoIcon = painterResource(R.drawable.ic_announce),
+                promoIcon = painterResource(R.drawable.announcement_96),
                 buttons = null,
                 onDismissRequest = {},
             )

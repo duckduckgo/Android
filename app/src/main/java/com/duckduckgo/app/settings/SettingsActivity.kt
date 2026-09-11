@@ -615,4 +615,4 @@ class SettingsActivity : DuckDuckGoActivity() {
 }
 
 internal fun resolveAppTpSettingsIcon(isPictogramsEnabled: Boolean): Int =
-    if (isPictogramsEnabled) CommonR.drawable.ic_homescreen_lock_color_24 else CommonR.drawable.ic_lock_color_24
+    if (isPictogramsEnabled) CommonR.drawable.homescreen_lock_color_24 else CommonR.drawable.lock_color_24

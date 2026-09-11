@@ -122,7 +122,7 @@ private fun DaxBigSingleActionMessagePreview() {
         DaxBigSingleActionMessage(
             title = "Big Single Message",
             body = "Body text goes here. This component has one button",
-            topIllustration = painterResource(R.drawable.ic_ddg_announce),
+            topIllustration = painterResource(R.drawable.duckduckgo_96),
             action = DaxAction(text = "Action", onClick = {}),
             onDismissed = {},
             modifier = Modifier.padding(dimensionResource(R.dimen.keyline_4)),

@@ -123,18 +123,18 @@ class AppTrackingProtectionStateView @JvmOverloads constructor(
             renderTrackersBlockedWhenEnabled(viewState.trackersBlocked)
         } else {
             binding.deviceShieldCtaHeader.setText(R.string.atp_NewTabEnabled)
-            binding.deviceShieldCtaImage.setImageResource(R.drawable.ic_apptp_default)
+            binding.deviceShieldCtaImage.setImageResource(R.drawable.shield_check_recolorable_24)
         }
     }
 
     private fun renderStateDisabled() {
         binding.deviceShieldCtaHeader.setText(R.string.atp_NewTabDisabled)
-        binding.deviceShieldCtaImage.setImageResource(R.drawable.ic_apptp_warning)
+        binding.deviceShieldCtaImage.setImageResource(R.drawable.exclamation_recolorable_24)
     }
 
     private fun renderStateRevoked() {
         binding.deviceShieldCtaHeader.setText(R.string.atp_NewTabRevoked)
-        binding.deviceShieldCtaImage.setImageResource(R.drawable.ic_apptp_warning)
+        binding.deviceShieldCtaImage.setImageResource(R.drawable.exclamation_recolorable_24)
     }
 
     private fun renderTrackersBlockedWhenEnabled(trackerBlocked: TrackersBlocked) {
@@ -194,7 +194,7 @@ class AppTrackingProtectionStateView @JvmOverloads constructor(
             }
 
         binding.deviceShieldCtaHeader.text = HtmlCompat.fromHtml(textToStyle, HtmlCompat.FROM_HTML_MODE_LEGACY)
-        binding.deviceShieldCtaImage.setImageResource(R.drawable.ic_apptp_default)
+        binding.deviceShieldCtaImage.setImageResource(R.drawable.shield_check_recolorable_24)
     }
 }
 

@@ -37,6 +37,7 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import com.duckduckgo.mobile.android.R as CommonR
 
 @SuppressLint("DenyListedApi")
 class RealSyncDesktopAppPromotionLauncherTest {
@@ -83,6 +84,15 @@ class RealSyncDesktopAppPromotionLauncherTest {
         testee.launch(contextMock, SOURCE_SYNC_ENABLED)
 
         assertEquals(SyncDesktopAppPromotionInteractionHandler.handlerId(SOURCE_SYNC_ENABLED), capturedParams().handlerId)
+    }
+
+    @Test
+    fun whenDesktopBrowserPromoEnabledThenSharedPromoUses96dpIllustration() = runTest {
+        givenPromoEnabled()
+
+        testee.launch(contextMock, SOURCE_SYNC_ENABLED)
+
+        assertEquals(CommonR.drawable.ddg_app_download_96, capturedParams().illustration)
     }
 
     @Test
