@@ -36,9 +36,9 @@ import com.duckduckgo.app.onboarding.OnboardingPreferenceCatalog
 import com.duckduckgo.app.onboarding.OnboardingPromptsExperimentManager
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager.SegmentedOnboardingExperimentVariant
+import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentMetrics
 import com.duckduckgo.app.onboarding.TestOption
 import com.duckduckgo.app.onboarding.store.OnboardingStore
-import com.duckduckgo.app.onboarding.store.SegmentedOnboardingPath
 import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
@@ -96,6 +96,7 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -128,6 +129,7 @@ class NewUserOnboardingPlanProviderTest {
     private val duckAiOnboardingDemo: DuckAiOnboardingDemo = mock()
     private val homeScreenPromptsExperiment: OnboardingPromptsExperimentManager = mock()
     private val segmentedOnboardingExperiment: SegmentedOnboardingExperimentManager = mock()
+    private val segmentedOnboardingMetrics: SegmentedOnboardingExperimentMetrics = mock()
     private val onboardingPreferenceCatalog: OnboardingPreferenceCatalog = mock {
         onBlocking { offer(any()) } doReturn emptyList()
     }
@@ -194,6 +196,7 @@ class NewUserOnboardingPlanProviderTest {
             duckAiOnboardingDemo = duckAiOnboardingDemo,
             onboardingPromptsExperimentManager = homeScreenPromptsExperiment,
             segmentedOnboardingExperimentManager = segmentedOnboardingExperiment,
+            segmentedOnboardingExperimentMetrics = segmentedOnboardingMetrics,
             onboardingPasswordImportExperimentManager = passwordImportExperiment,
             onboardingPreferenceCatalog = onboardingPreferenceCatalog,
             singleChoiceDataPlugins = singleChoiceDataPlugins,
@@ -262,7 +265,32 @@ class NewUserOnboardingPlanProviderTest {
 
         orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.AI_CHAT))
 
-        verify(onboardingStore).setSegmentedOnboardingPath(SegmentedOnboardingPath.AI)
+        verify(onboardingStore).setDownloadReason(DownloadReasonSelection.AI_CHAT)
+    }
+
+    @Test
+    fun `when a run starts then a download reason left by an abandoned run is cleared`() = runTest {
+        startSegmentedAtDownloadReason()
+
+        verify(onboardingStore).setDownloadReason(null)
+    }
+
+    @Test
+    fun `when a download reason is picked then the selection metric is fired for it`() = runTest {
+        startSegmentedAtDownloadReason()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.AI_CHAT))
+
+        verify(segmentedOnboardingMetrics).fireDownloadReasonSelectedMetric(DownloadReasonSelection.AI_CHAT)
+    }
+
+    @Test
+    fun `when the download reason is missing then the fallback selection metric is fired`() = runTest {
+        startSegmentedAtDownloadReason()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(selection = null))
+
+        verify(segmentedOnboardingMetrics).fireDownloadReasonSelectedMetric(DownloadReasonSelection.SEARCH)
     }
 
     private suspend fun startSegmentedAtAiProviderChoice() {
@@ -499,23 +527,23 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
-    fun `when the no ai download reason is confirmed then it clears an input screen selection left by an abandoned run`() = runTest {
+    fun `when the no ai download reason is confirmed then it is persisted and clears an input screen selection left by an abandoned run`() = runTest {
         startSegmentedAtDownloadReason()
 
         orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.NO_AI))
 
-        verify(onboardingStore).setSegmentedOnboardingPath(null)
+        verify(onboardingStore).setDownloadReason(DownloadReasonSelection.NO_AI)
         verify(duckChat).setCosmeticInputScreenUserSetting(false)
         verify(onboardingStore).storeInputScreenSelection(false)
     }
 
     @Test
-    fun `when the block ads download reason is confirmed then it clears a segmented path left by an abandoned run`() = runTest {
+    fun `when the block ads download reason is confirmed then it is persisted`() = runTest {
         startSegmentedAtDownloadReason()
 
         orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.BLOCK_ADS))
 
-        verify(onboardingStore).setSegmentedOnboardingPath(null)
+        verify(onboardingStore).setDownloadReason(DownloadReasonSelection.BLOCK_ADS)
     }
 
     @Test
@@ -721,7 +749,7 @@ class NewUserOnboardingPlanProviderTest {
         verify(onboardingPreferenceCatalog, never()).apply(any())
         assertStep(NewUserOnboardingStepIds.INPUT_SCREEN)
         orchestrator.onEvent(NewUserOnboardingEvent.InputModeConfirmed(withAi = false))
-        verify(onboardingStore).setSegmentedOnboardingPath(SegmentedOnboardingPath.SEARCH)
+        verify(onboardingStore).setDownloadReason(DownloadReasonSelection.SEARCH)
         assertStep(NewUserOnboardingStepIds.ADDRESS_BAR_POSITION)
         orchestrator.onEvent(NewUserOnboardingEvent.AddressBarConfirmed(OmnibarType.SINGLE_TOP))
         assertStep(NewUserOnboardingStepIds.INPUT_SCREEN_PREVIEW)
@@ -757,7 +785,7 @@ class NewUserOnboardingPlanProviderTest {
         assertStep(NewUserOnboardingStepIds.INPUT_SCREEN)
         orchestrator.onEvent(NewUserOnboardingEvent.InputModeConfirmed(withAi = true))
 
-        verify(onboardingStore).setSegmentedOnboardingPath(SegmentedOnboardingPath.SEARCH)
+        verify(onboardingStore).setDownloadReason(DownloadReasonSelection.SEARCH)
         assertStep(NewUserOnboardingStepIds.ADDRESS_BAR_POSITION)
     }
 
@@ -1870,16 +1898,20 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
-    fun `when a download reason is confirmed then the clicked pixel fires and the variant is established`() = runTest {
+    fun `when a download reason is confirmed then it is persisted before the clicked pixel fires`() = runTest {
         startSegmentedAtDownloadReason()
 
         orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.BLOCK_ADS))
 
-        verify(onboardingPixelSender).fire(
-            ONBOARDING_DOWNLOAD_CHOICE,
-            OnboardingPixelAction.DownloadReasonClicked(DownloadReasonSelection.BLOCK_ADS),
-        )
-        verify(onboardingPixelSender).downloadReasonSelected(DownloadReasonSelection.BLOCK_ADS)
+        // The pixel sender reads the reason back off the store, so the step's own clicked pixel only
+        // carries the variant param if the write happens first.
+        inOrder(onboardingStore, onboardingPixelSender) {
+            verify(onboardingStore).setDownloadReason(DownloadReasonSelection.BLOCK_ADS)
+            verify(onboardingPixelSender).fire(
+                ONBOARDING_DOWNLOAD_CHOICE,
+                OnboardingPixelAction.DownloadReasonClicked(DownloadReasonSelection.BLOCK_ADS),
+            )
+        }
     }
 
     @Test

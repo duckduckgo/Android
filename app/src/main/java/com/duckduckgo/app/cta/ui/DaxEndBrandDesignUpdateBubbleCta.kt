@@ -25,9 +25,11 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
-import com.duckduckgo.app.onboarding.store.SegmentedOnboardingPath
-import com.duckduckgo.app.onboarding.store.SegmentedOnboardingPath.AI
-import com.duckduckgo.app.onboarding.store.SegmentedOnboardingPath.SEARCH
+import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection
+import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection.AI_CHAT
+import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection.BLOCK_ADS
+import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection.NO_AI
+import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection.SEARCH
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.device.DeviceInfo
@@ -42,16 +44,16 @@ data class DaxEndBrandDesignUpdateBubbleCta constructor(
     override val onboardingImprovementsEnabled: Boolean,
     override val onboardingImprovementsV2Enabled: Boolean,
     val isOmnibarBottom: Boolean,
-    val segmentedPathWithAiInput: SegmentedOnboardingPath?,
+    val segmentedPathWithAiInput: DownloadReasonSelection?,
 ) : DaxBubbleCta.BrandDesignUpdateBubbleCta(
     ctaId = CtaId.DAX_END,
     title = when (segmentedPathWithAiInput) {
         SEARCH -> R.string.searchPathWithToggleEnabledContextualEndTitle
-        AI, null -> R.string.onboardingEndDaxDialogTitle
+        AI_CHAT, NO_AI, BLOCK_ADS, null -> R.string.onboardingEndDaxDialogTitle
     },
     description = when (segmentedPathWithAiInput) {
         SEARCH -> R.string.searchPathWithToggleEnabledContextualEndDescription
-        AI, null -> R.string.onboardingEndDaxDialogDescription
+        AI_CHAT, NO_AI, BLOCK_ADS, null -> R.string.onboardingEndDaxDialogDescription
     },
     backgroundRes = CommonR.drawable.bg_onboarding_end,
     shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,

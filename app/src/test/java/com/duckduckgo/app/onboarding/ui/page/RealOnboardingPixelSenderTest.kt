@@ -22,6 +22,7 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.onboarding.OnboardingPreference
 import com.duckduckgo.app.onboarding.orchestrator.PasswordImportOutcome
+import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_ADDRESS_BAR_POSITION
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_AI_INTRO
@@ -80,6 +81,7 @@ class RealOnboardingPixelSenderTest {
         on { formFactor() } doReturn DeviceInfo.FormFactor.PHONE
     }
     private val mockAppBuildConfig: AppBuildConfig = mock { onBlocking { isAppReinstall() } doReturn false }
+    private val mockOnboardingStore: OnboardingStore = mock()
 
     private val testee = RealOnboardingPixelSender(
         appCoroutineScope = coroutineRule.testScope,
@@ -92,6 +94,7 @@ class RealOnboardingPixelSenderTest {
         widgetCapabilities = mockWidgetCapabilities,
         deviceInfo = mockDeviceInfo,
         appBuildConfig = mockAppBuildConfig,
+        onboardingStore = mockOnboardingStore,
     )
 
     @Test
@@ -123,6 +126,7 @@ class RealOnboardingPixelSenderTest {
             widgetCapabilities = mockWidgetCapabilities,
             deviceInfo = mockDeviceInfo,
             appBuildConfig = mockReinstallBuildConfig,
+            onboardingStore = mockOnboardingStore,
         )
         reinstallTestee.fire(ONBOARDING_WELCOME, OnboardingPixelAction.Clicked(engaged = true))
 
@@ -317,6 +321,7 @@ class RealOnboardingPixelSenderTest {
             widgetCapabilities = mockWidgetCapabilities,
             deviceInfo = mockDeviceInfo,
             appBuildConfig = mockReinstallBuildConfig,
+            onboardingStore = mockOnboardingStore,
         )
         reinstallTestee.fire(ONBOARDING_QUICK_SETUP, OnboardingPixelAction.Shown)
 
@@ -345,6 +350,7 @@ class RealOnboardingPixelSenderTest {
             widgetCapabilities = mockWidgetCapabilities,
             deviceInfo = mockDeviceInfo,
             appBuildConfig = mockReinstallBuildConfig,
+            onboardingStore = mockOnboardingStore,
         )
         reinstallTestee.fire(
             ONBOARDING_QUICK_SETUP,
@@ -389,6 +395,7 @@ class RealOnboardingPixelSenderTest {
             widgetCapabilities = mockWidgetCapabilities,
             deviceInfo = mockDeviceInfo,
             appBuildConfig = mockReinstallBuildConfig,
+            onboardingStore = mockOnboardingStore,
         )
         reinstallTestee.fire(
             ONBOARDING_QUICK_SETUP,
@@ -433,6 +440,7 @@ class RealOnboardingPixelSenderTest {
             widgetCapabilities = mockWidgetCapabilities,
             deviceInfo = mockDeviceInfo,
             appBuildConfig = mockReinstallBuildConfig,
+            onboardingStore = mockOnboardingStore,
         )
         reinstallTestee.fire(
             ONBOARDING_QUICK_SETUP,
@@ -489,6 +497,7 @@ class RealOnboardingPixelSenderTest {
             widgetCapabilities = mockWidgetCapabilities,
             deviceInfo = mockDeviceInfo,
             appBuildConfig = mockAppBuildConfig,
+            onboardingStore = mockOnboardingStore,
         )
         variantTestee.chatBranchSelected()
 
@@ -523,6 +532,7 @@ class RealOnboardingPixelSenderTest {
             widgetCapabilities = mockWidgetCapabilities,
             deviceInfo = mockDeviceInfo,
             appBuildConfig = mockAppBuildConfig,
+            onboardingStore = mockOnboardingStore,
         )
         variantTestee.searchBranchSelected()
 
@@ -558,6 +568,7 @@ class RealOnboardingPixelSenderTest {
             widgetCapabilities = mockWidgetCapabilities,
             deviceInfo = mockDeviceInfo,
             appBuildConfig = mockAppBuildConfig,
+            onboardingStore = mockOnboardingStore,
         )
         variantTestee.chatBranchSelected()
 
@@ -986,10 +997,10 @@ class RealOnboardingPixelSenderTest {
     }
 
     @Test
-    fun whenDownloadReasonSelectedThenSegmentedVariantParamIsThatReason() = runTest {
+    fun whenDownloadReasonSelectedThenDownloadReasonVariantParamIsThatReason() = runTest {
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
 
-        testee.downloadReasonSelected(DownloadReasonSelection.AI_CHAT)
+        whenever(mockOnboardingStore.getDownloadReason()).thenReturn(DownloadReasonSelection.AI_CHAT)
         testee.fire(ONBOARDING_SET_DEFAULT, OnboardingPixelAction.Shown)
 
         verify(mockPixel).fire(
@@ -997,7 +1008,7 @@ class RealOnboardingPixelSenderTest {
             mapOf(
                 "installType" to "new",
                 "flow" to "default",
-                "variant_segmented" to "download_reason_ai-chat",
+                "variant_download_reason" to "download_reason_ai-chat",
                 "pixelSource" to "phone",
                 "daysSinceInstall" to "0",
                 "event" to "shown",
@@ -1010,7 +1021,7 @@ class RealOnboardingPixelSenderTest {
     fun whenBothDownloadReasonAndBranchSelectedThenEachGetsItsOwnParam() = runTest {
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
 
-        testee.downloadReasonSelected(DownloadReasonSelection.BLOCK_ADS)
+        whenever(mockOnboardingStore.getDownloadReason()).thenReturn(DownloadReasonSelection.BLOCK_ADS)
         testee.chatBranchSelected()
         testee.fire(ONBOARDING_END, OnboardingPixelAction.Shown)
 
@@ -1020,7 +1031,7 @@ class RealOnboardingPixelSenderTest {
                 "installType" to "new",
                 "flow" to "default",
                 "variant" to "search_plus_duckai-chat",
-                "variant_segmented" to "download_reason_ad-blocking",
+                "variant_download_reason" to "download_reason_ad-blocking",
                 "pixelSource" to "phone",
                 "daysSinceInstall" to "0",
                 "event" to "shown",
@@ -1030,7 +1041,7 @@ class RealOnboardingPixelSenderTest {
     }
 
     @Test
-    fun whenOnlyTheBranchIsSelectedThenSegmentedVariantIsAbsent() = runTest {
+    fun whenOnlyTheBranchIsSelectedThenDownloadReasonVariantIsAbsent() = runTest {
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
 
         testee.searchBranchSelected()
@@ -1051,11 +1062,11 @@ class RealOnboardingPixelSenderTest {
     }
 
     @Test
-    fun whenFlowAttributionClearedThenSegmentedFlowAndReasonAreBothDropped() = runTest {
+    fun whenFlowAttributionClearedThenSegmentedFlowAndBranchAreBothDropped() = runTest {
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
 
         testee.segmentedFlowStarted()
-        testee.downloadReasonSelected(DownloadReasonSelection.SEARCH)
+        testee.chatBranchSelected()
         testee.clearFlowAttribution()
         testee.fire(ONBOARDING_WELCOME, OnboardingPixelAction.Shown)
 
@@ -1088,10 +1099,10 @@ class RealOnboardingPixelSenderTest {
 
     /** The reason is persisted as the choice is confirmed, so the step's own clicked pixel already carries it. */
     @Test
-    fun whenFireDownloadReasonClickedAfterTheReasonIsPersistedThenTheSegmentedVariantIsAlsoSent() = runTest {
+    fun whenFireDownloadReasonClickedAfterTheReasonIsPersistedThenTheDownloadReasonVariantIsAlsoSent() = runTest {
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
 
-        testee.downloadReasonSelected(DownloadReasonSelection.NO_AI)
+        whenever(mockOnboardingStore.getDownloadReason()).thenReturn(DownloadReasonSelection.NO_AI)
         testee.fire(ONBOARDING_DOWNLOAD_CHOICE, OnboardingPixelAction.DownloadReasonClicked(DownloadReasonSelection.NO_AI))
 
         verify(mockPixel).fire(
@@ -1099,7 +1110,7 @@ class RealOnboardingPixelSenderTest {
             mapOf(
                 "installType" to "new",
                 "flow" to "default",
-                "variant_segmented" to "download_reason_no-ai",
+                "variant_download_reason" to "download_reason_no-ai",
                 "pixelSource" to "phone",
                 "daysSinceInstall" to "0",
                 "event" to "clicked",
