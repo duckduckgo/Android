@@ -139,6 +139,7 @@ class AppSyncAccountRepositoryTest {
     private val signupAccountInfoBuilder: SignupAccountInfoBuilder = mock()
     private val deviceInfoUpdater: DeviceInfoUpdater = mock()
     private val publishTracker = DeviceInfoPublishWatcher()
+    private val accountInfoDdgWrapRepairer: AccountInfoDdgWrapRepairer = mock()
 
     @get:Rule
     val coroutineTestRule = CoroutineTestRule()
@@ -166,11 +167,13 @@ class AppSyncAccountRepositoryTest {
             signupAccountInfoBuilder = signupAccountInfoBuilder,
             deviceInfoUpdater = deviceInfoUpdater,
             deviceInfoPublishWatcher = publishTracker,
+            accountInfoDdgWrapRepairer = accountInfoDdgWrapRepairer,
         )
         (syncRepo as AppSyncAccountRepository).upgradeRetryDelayMillis = 0L // keep retry-path tests instant
 
         // passthrough by default (no modifications)
         whenever(syncCodeUrlWrapper.wrapCodeInUrl(any())).thenAnswer { it.arguments[0] as String }
+        whenever(accountInfoDdgWrapRepairer.repair(any(), anyOrNull())).thenReturn(Success(Unit))
     }
 
     @Test
@@ -806,6 +809,37 @@ class AppSyncAccountRepositoryTest {
         verify(syncPixels).fireUnifiedDeviceListPixel(
             UnifiedDeviceListPixel.AccountInfoKeyUnavailable(AccountInfoKeyUnavailableReason.RATE_LIMITED),
         )
+        verifyNoInteractions(accountInfoDdgWrapRepairer)
+    }
+
+    @Test
+    fun whenDdgWrapIsUnavailableThenRepairsCachedAccountInfoKey() = runTest {
+        givenAccountInfoDdgWrapUnavailable()
+
+        syncRepo.getConnectedDevices()
+
+        verify(accountInfoDdgWrapRepairer).repair("account-info-kid")
+    }
+
+    @Test
+    fun whenDdgWrapRepairSucceedsThenDoesNotRepairAgainForSameAccount() = runTest {
+        givenAccountInfoDdgWrapUnavailable()
+
+        syncRepo.getConnectedDevices()
+        syncRepo.getConnectedDevices()
+
+        verify(accountInfoDdgWrapRepairer, times(1)).repair("account-info-kid")
+    }
+
+    @Test
+    fun whenDdgWrapRepairFailsThenRetriesOnNextDeviceListRead() = runTest {
+        givenAccountInfoDdgWrapUnavailable()
+        whenever(accountInfoDdgWrapRepairer.repair("account-info-kid")).thenReturn(Error(reason = "repair failed"))
+
+        syncRepo.getConnectedDevices()
+        syncRepo.getConnectedDevices()
+
+        verify(accountInfoDdgWrapRepairer, times(2)).repair("account-info-kid")
     }
 
     @Test
@@ -1018,6 +1052,27 @@ class AppSyncAccountRepositoryTest {
                 decrypted = listOf(DecryptedDevice(deviceId = deviceId, name = deviceName, type = "phone")),
                 undecryptable = emptyList(),
                 thisDeviceInfoNeedsRepair = unresolved,
+            ),
+        )
+    }
+
+    private fun givenAccountInfoDdgWrapUnavailable() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+        syncFeature.canReadUnifiedDeviceList().setRawStoredState(State(true))
+        whenever(syncStore.token).thenReturn(token)
+        whenever(syncStore.primaryKey).thenReturn(primaryKey)
+        whenever(syncStore.deviceId).thenReturn(deviceId)
+        whenever(syncStore.userId).thenReturn(userId)
+        whenever(syncStore.accountInfoPublicKey).thenReturn(
+            AccountInfoPublicKey(keyId = "account-info-kid", modulus = "modulus", exponent = "AQAB"),
+        )
+        val own = DeviceV2(deviceId = deviceId, credentialId = CREDENTIAL_ID_DDG)
+        whenever(syncApi.getDevices(token)).thenReturn(Success(DeviceEntries(emptyList(), listOf(own))))
+        whenever(thirdPartyDeviceListDecryptor.decryptAll(listOf(own), deviceId, 0)).thenReturn(
+            DecryptAllResult(
+                decrypted = listOf(DecryptedDevice(deviceId, deviceName, "phone")),
+                undecryptable = emptyList(),
+                keyUnavailableReason = AccountInfoKeyUnavailableReason.NO_WRAP_FOR_OUR_CREDENTIAL,
             ),
         )
     }
