@@ -98,6 +98,93 @@ class RealPaywallPathProviderTest {
         assertNull(testee.getPath("vpn"))
     }
 
+    @Test
+    fun whenPathIsConfiguredThenFeaturePageIsReturned() {
+        givenSettings(ENTRY_POINTS_SETTINGS)
+
+        assertEquals("vpn", testee.getFeaturePage("/subscriptions/new/mobile/vpn"))
+        assertEquals("duckai", testee.getFeaturePage("/subscriptions/new/mobile/duckai"))
+        assertEquals("pir", testee.getFeaturePage("/subscriptions/new/mobile/pir"))
+    }
+
+    @Test
+    fun whenPathHasTrailingSlashThenFeaturePageIsReturned() {
+        givenSettings(ENTRY_POINTS_SETTINGS)
+
+        assertEquals("vpn", testee.getFeaturePage("/subscriptions/new/mobile/vpn/"))
+    }
+
+    @Test
+    fun whenConfiguredPathHasTrailingSlashThenItIsNormalized() {
+        givenSettings("""{"entryPoints":{"vpn":{"path":"/subscriptions/new/mobile/vpn/"}}}""")
+
+        assertEquals("/subscriptions/new/mobile/vpn", testee.getPath("vpn"))
+        assertEquals("vpn", testee.getFeaturePage("/subscriptions/new/mobile/vpn"))
+        assertEquals("vpn", testee.getFeaturePage("/subscriptions/new/mobile/vpn/"))
+    }
+
+    @Test
+    fun whenConfiguredPathIsOnlyASlashThenItIsIgnored() {
+        givenSettings("""{"entryPoints":{"vpn":{"path":"/"}}}""")
+
+        assertNull(testee.getPath("vpn"))
+        assertNull(testee.getFeaturePage("/"))
+        assertNull(testee.getFeaturePage(""))
+    }
+
+    @Test
+    fun whenPathIsNotConfiguredThenNoFeaturePage() {
+        givenSettings(ENTRY_POINTS_SETTINGS)
+
+        assertNull(testee.getFeaturePage("/subscriptions/new/mobile/itr"))
+        assertNull(testee.getFeaturePage("/subscriptions"))
+        assertNull(testee.getFeaturePage(""))
+    }
+
+    @Test
+    fun whenFeatureDisabledThenFeaturePageIsStillReturned() {
+        subscriptionsFeature.performanceOptimizedPaywalls().setRawStoredState(
+            State(remoteEnableState = false, settings = ENTRY_POINTS_SETTINGS),
+        )
+
+        assertEquals("vpn", testee.getFeaturePage("/subscriptions/new/mobile/vpn"))
+    }
+
+    @Test
+    fun whenNoSettingsThenNoFeaturePage() {
+        subscriptionsFeature.performanceOptimizedPaywalls().setRawStoredState(State(remoteEnableState = true))
+
+        assertNull(testee.getFeaturePage("/subscriptions/new/mobile/vpn"))
+    }
+
+    @Test
+    fun whenSettingsMalformedThenNoFeaturePage() {
+        givenSettings("not json")
+
+        assertNull(testee.getFeaturePage("/subscriptions/new/mobile/vpn"))
+    }
+
+    @Test
+    fun whenPathBlankThenNoFeaturePage() {
+        givenSettings("""{"entryPoints":{"vpn":{"path":"  "}}}""")
+
+        assertNull(testee.getFeaturePage("  "))
+    }
+
+    @Test
+    fun whenSettingsChangeThenTheNewEntryPointsAreUsed() {
+        givenSettings(ENTRY_POINTS_SETTINGS)
+        assertEquals("/subscriptions/new/mobile/vpn", testee.getPath("vpn"))
+        assertEquals("vpn", testee.getFeaturePage("/subscriptions/new/mobile/vpn"))
+
+        givenSettings("""{"entryPoints":{"vpn":{"path":"/subscriptions/new/mobile/vpn-v2"}}}""")
+
+        assertEquals("/subscriptions/new/mobile/vpn-v2", testee.getPath("vpn"))
+        assertEquals("vpn", testee.getFeaturePage("/subscriptions/new/mobile/vpn-v2"))
+        assertNull(testee.getFeaturePage("/subscriptions/new/mobile/vpn"))
+        assertNull(testee.getPath("duckai"))
+    }
+
     private fun givenSettings(settings: String) {
         subscriptionsFeature.performanceOptimizedPaywalls().setRawStoredState(
             State(remoteEnableState = true, settings = settings),

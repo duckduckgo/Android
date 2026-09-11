@@ -22,12 +22,16 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import dagger.SingleInstanceIn
 import javax.inject.Inject
 
 interface PaywallPathProvider {
     fun getPath(featurePage: String): String?
+
+    fun getFeaturePage(path: String): String?
 }
 
+@SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealPaywallPathProvider @Inject constructor(
     private val subscriptionsFeature: SubscriptionsFeature,
@@ -38,16 +42,49 @@ class RealPaywallPathProvider @Inject constructor(
         moshi.newBuilder().add(KotlinJsonAdapterFactory()).build().adapter(PaywallsSettings::class.java)
     }
 
-    override fun getPath(featurePage: String): String? {
-        val entryPoints = parseSettings()?.entryPoints ?: return null
-        val path = entryPoints[featurePage]?.path ?: return null
-        return path.takeIf { it.isNotBlank() }
+    @Volatile
+    private var cache: CachedPaths? = null
+
+    override fun getPath(featurePage: String): String? = entryPoints()?.pathByFeaturePage?.get(featurePage)
+
+    override fun getFeaturePage(path: String): String? = entryPoints()?.featurePageByPath?.get(path.trimEnd('/'))
+
+    private fun entryPoints(): CachedPaths? {
+        val settings = subscriptionsFeature.performanceOptimizedPaywalls().getSettings() ?: return null
+
+        val cached = cache
+        if (cached != null && cached.settings == settings) return cached
+
+        val parsed = parse(settings)
+        cache = parsed
+        return parsed
     }
 
-    private fun parseSettings(): PaywallsSettings? =
-        subscriptionsFeature.performanceOptimizedPaywalls().getSettings()?.let {
-            runCatching { jsonAdapter.fromJson(it) }.getOrNull()
+    private fun parse(settings: String): CachedPaths {
+        val entryPoints = runCatching { jsonAdapter.fromJson(settings) }.getOrNull()?.entryPoints
+        val pathByFeaturePage = pathsByFeaturePage(entryPoints)
+        val featurePageByPath = pathByFeaturePage.entries.associate { (featurePage, path) -> path to featurePage }
+        return CachedPaths(
+            settings = settings,
+            pathByFeaturePage = pathByFeaturePage,
+            featurePageByPath = featurePageByPath,
+        )
+    }
+
+    private fun pathsByFeaturePage(entryPoints: Map<String, EntryPoint>?): Map<String, String> = buildMap {
+        entryPoints?.forEach { (featurePage, entryPoint) ->
+            val path = entryPoint.path?.trimEnd('/')
+            if (!path.isNullOrBlank()) {
+                put(featurePage, path)
+            }
         }
+    }
+
+    private class CachedPaths(
+        val settings: String,
+        val pathByFeaturePage: Map<String, String>,
+        val featurePageByPath: Map<String, String>,
+    )
 
     private class PaywallsSettings(
         val entryPoints: Map<String, EntryPoint>?,
