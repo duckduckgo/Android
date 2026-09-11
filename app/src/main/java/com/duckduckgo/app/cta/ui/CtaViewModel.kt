@@ -74,7 +74,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
@@ -767,7 +767,7 @@ class CtaViewModel @Inject constructor(
         }
 
     private suspend fun tooManyTabsOpenForFireEducation(): Boolean =
-        aggregateTabProvider.observe().first().size >= MAX_TABS_OPEN_FIRE_EDUCATION
+        (aggregateTabProvider.observe().firstOrNull()?.size ?: 0) >= MAX_TABS_OPEN_FIRE_EDUCATION
 
     @ExperimentalCoroutinesApi
     private fun getShowFireButtonPulseAnimationFlow(): Flow<Boolean> = dismissedCtaDao.dismissedCtas()
