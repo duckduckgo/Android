@@ -73,6 +73,7 @@ import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.state.ModeSwitchRecreateSignal
 import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.browser.tabs.TabManager.TabModel
+import com.duckduckgo.app.browser.tabs.TabReuseDistanceReporter
 import com.duckduckgo.app.browser.tabs.adapter.TabPagerAdapter
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.AppShortcutDataClearer
@@ -216,6 +217,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
     lateinit var tabManager: TabManager
 
     @Inject
+    lateinit var tabReuseDistanceReporter: TabReuseDistanceReporter
+
+    @Inject
     lateinit var duckChat: DuckChat
 
     @Inject
@@ -300,7 +304,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private val tabPagerAdapter by lazy {
-        TabPagerAdapter(this)
+        TabPagerAdapter(this, tabReuseDistanceReporter)
     }
 
     private lateinit var omnibarToolbarMockupBinding: IncludeOmnibarToolbarMockupBinding
@@ -612,6 +616,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
         super.onResume()
         appReturnPixelSender.fireIfNeeded(pendingLaunchSource ?: LaunchSourceValues.STANDARD)
         pendingLaunchSource = null
+    }
+
+    override fun onPause() {
+        tabReuseDistanceReporter.onBrowserPaused()
+
+        super.onPause()
     }
 
     override fun onStop() {

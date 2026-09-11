@@ -32,4 +32,12 @@ interface TabManagerFeatureFlags {
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun tabInsertionFixes(): Toggle
+
+    /**
+     * Reports the furthest a user went back in the tab activation order, so that the effect of
+     * lowering the retained fragment limit can be sized before it is changed.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.InternalAlwaysEnabled
+    fun tabMaxReuseDistancePixel(): Toggle
 }
