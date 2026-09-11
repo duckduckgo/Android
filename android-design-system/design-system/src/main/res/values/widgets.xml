@@ -361,7 +361,7 @@
 
     <style name="Widget.DuckDuckGo.DialogCorners">
         <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">@dimen/dialogBorderRadius</item>
+        <item name="cornerSize">?attr/daxDialogRadius</item>
     </style>
 
     <style name="Widget.DuckDuckGo.DialogCorners.Rebrand">
