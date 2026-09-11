@@ -23,7 +23,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckchat.api.DuckChatEntryPoint.ONBOARDING
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint.SUBSCRIPTION_ONBOARDING
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
@@ -79,7 +79,7 @@ class SubscriptionOnboardingDuckAiViewModel @Inject constructor(
             duckAiModelManager.modelState.value.models.firstOrNull { it.id == selectedId }?.let {
                 duckAiModelManager.selectModel(it)
             }
-            duckChat.openDuckChat(ONBOARDING)
+            duckChat.openDuckChat(SUBSCRIPTION_ONBOARDING)
             controller.exitOnboarding()
         }
     }

@@ -19,7 +19,7 @@ package com.duckduckgo.duckchat.impl.subscriptions.onboarding
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckchat.api.DuckChatEntryPoint.ONBOARDING
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint.SUBSCRIPTION_ONBOARDING
 import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ModelProvider
@@ -174,7 +174,7 @@ class SubscriptionOnboardingDuckAiViewModelTest {
         testee.onStartClicked()
 
         verify(modelManager).selectModel(plus)
-        verify(duckChat).openDuckChat(ONBOARDING)
+        verify(duckChat).openDuckChat(SUBSCRIPTION_ONBOARDING)
         verify(controller).exitOnboarding()
     }
 

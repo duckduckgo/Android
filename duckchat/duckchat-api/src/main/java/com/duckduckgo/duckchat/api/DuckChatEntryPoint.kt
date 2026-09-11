@@ -31,6 +31,7 @@ enum class DuckChatEntryPoint {
     CHAT_HISTORY_OPEN_CHAT,
     VOICE,
     ONBOARDING,
+    SUBSCRIPTION_ONBOARDING,
     DIRECT_URL,
     SERP,
     DDG_HOMEPAGE,
