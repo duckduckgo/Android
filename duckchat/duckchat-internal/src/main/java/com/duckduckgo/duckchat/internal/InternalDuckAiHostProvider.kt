@@ -32,6 +32,8 @@ class InternalDuckAiHostProvider @Inject constructor(
 
     override fun getHost(): String = cachedHost ?: super.getHost()
 
+    override fun isCustomHost(): Boolean = cachedHost != null
+
     fun getCustomUrl(): String? = dataStore.customUrl
 
     fun setCustomUrl(url: String?) {

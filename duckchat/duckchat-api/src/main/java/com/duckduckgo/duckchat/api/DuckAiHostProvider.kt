@@ -21,6 +21,9 @@ interface DuckAiHostProvider {
     /** Returns either a custom override or `duck.ai`. */
     fun getHost(): String = DEFAULT_HOST
 
+    /** Returns true when [getHost] is a custom override rather than the default host. */
+    fun isCustomHost(): Boolean = false
+
     companion object {
         private const val DEFAULT_HOST = "duck.ai"
     }
