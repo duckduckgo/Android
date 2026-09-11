@@ -867,6 +867,7 @@
     objectEntries: () => objectEntries,
     objectFromEntries: () => objectFromEntries,
     objectKeys: () => objectKeys,
+    performanceNow: () => performanceNow,
     randomUUID: () => randomUUID,
     removeEventListener: () => removeEventListener,
     toString: () => toString
@@ -890,6 +891,7 @@
   var Symbol2 = globalThis.Symbol;
   var hasOwnProperty = Object.prototype.hasOwnProperty;
   var dispatchEvent = globalThis.dispatchEvent?.bind(globalThis);
+  var performanceNow = globalThis.performance?.now?.bind(globalThis.performance) ?? Date.now;
   var addEventListener = globalThis.addEventListener?.bind(globalThis);
   var removeEventListener = globalThis.removeEventListener?.bind(globalThis);
   var CustomEvent2 = globalThis.CustomEvent;
@@ -1417,6 +1419,7 @@
     "webInterferenceDetection",
     "webDetection",
     "webEvents",
+    "detectorPerf",
     "pageObserver",
     "hover",
     "trackerProtection",
@@ -1492,6 +1495,7 @@
       "webDetection",
       "webEvents",
       "webInterferenceDetection",
+      "detectorPerf",
       "windowsPermissionUsage",
       "uaChBrands",
       "brokerProtection",
@@ -1527,6 +1531,7 @@
       "webDetection",
       "webEvents",
       "webInterferenceDetection",
+      "detectorPerf",
       "webTelemetry",
       "pageObserver",
       "hover",
@@ -1541,6 +1546,7 @@
       "webDetection",
       "webEvents",
       "webInterferenceDetection",
+      "detectorPerf",
       "breakageReporting",
       "duckPlayer",
       "messageBridge",
@@ -1570,6 +1576,7 @@
       "webDetection",
       "webEvents",
       "webInterferenceDetection",
+      "detectorPerf",
       "webTelemetry",
       "windowsPermissionUsage",
       "uaChBrands",
@@ -8273,6 +8280,372 @@
   // src/features/web-detection.js
   init_define_import_meta_trackerLookup();
 
+  // src/features/detector-perf.js
+  init_define_import_meta_trackerLookup();
+  var DEFAULT_SINGLE_RUN_THRESHOLDS_MS = [8, 16, 50, 150];
+  var DEFAULT_TOTAL_PER_PAGE_THRESHOLDS_MS = [50, 100, 250];
+  var DEFAULT_COMBINED_THRESHOLDS_MS = [100, 250, 500];
+  var DEFAULT_MAX_SEVERE_PER_PAGE = 10;
+  var NAME_PATTERN = /^[a-zA-Z0-9]+(?:[._-][a-zA-Z0-9]+)*$/;
+  var EVENT_PREFIX = "detectorPerf";
+  var SEVERE_EVENT_TYPE = `${EVENT_PREFIX}_severe`;
+  var DEBUG_STATS_EVENT_TYPE = `${EVENT_PREFIX}DebugStats`;
+  function parseThresholds(value, fallback) {
+    if (!Array.isArray(value)) return fallback;
+    const edges = value.filter((edge) => typeof edge === "number" && Number.isFinite(edge) && edge > 0);
+    if (edges.length === 0) return fallback;
+    return [...new Set2(edges)].sort((a2, b2) => a2 - b2);
+  }
+  function roundMs(ms) {
+    return Math.round(ms * 10) / 10;
+  }
+  var _active, _detectors, _detectorsDetailed, _combinedTotalMs, _emitted, _singleRunThresholdsMs, _totalPerPageThresholdsMs, _combinedThresholdsMs, _singleRunSevereThresholdMs, _totalPerPageSevereThresholdMs, _combinedSevereThresholdMs, _detectorOverrides, _severeCount, _maxSeverePerPage, _severeDebugLog;
+  var DetectorPerf = class extends ContentFeature {
+    constructor() {
+      super(...arguments);
+      __publicField(this, "_exposedMethods", this._declareExposedMethods(["record", "getStats"]));
+      /**
+       * `detectorPerf` is bundled as a platform-specific dependency so it remains
+       * available when protections are disabled, but loading it must not bypass
+       * remote-config gating. Enabled feature settings are copied into
+       * `featureSettings`; an absent/disabled feature has no own entry.
+       */
+      __privateAdd(this, _active, false);
+      /** @type {Map<string, DetectorStats>} */
+      __privateAdd(this, _detectors, new Map2());
+      /**
+       * Per-page stats keyed by exact attribution (the `detail` config ID when
+       * present, the group otherwise). Never feeds periodic events — only the
+       * breakage-report payload, where exact IDs are wanted.
+       * @type {Map<string, DetectorStats>}
+       */
+      __privateAdd(this, _detectorsDetailed, new Map2());
+      /** Total ms across all recorded detectors in this frame. */
+      __privateAdd(this, _combinedTotalMs, 0);
+      /** Event types already emitted in this frame (at-most-once guard). */
+      /** @type {Set<string>} */
+      __privateAdd(this, _emitted, new Set2());
+      /** @type {number[]} */
+      __privateAdd(this, _singleRunThresholdsMs, DEFAULT_SINGLE_RUN_THRESHOLDS_MS);
+      /** @type {number[]} */
+      __privateAdd(this, _totalPerPageThresholdsMs, DEFAULT_TOTAL_PER_PAGE_THRESHOLDS_MS);
+      /** @type {number[]} */
+      __privateAdd(this, _combinedThresholdsMs, DEFAULT_COMBINED_THRESHOLDS_MS);
+      /** @type {number | undefined} */
+      __privateAdd(this, _singleRunSevereThresholdMs);
+      /** @type {number | undefined} */
+      __privateAdd(this, _totalPerPageSevereThresholdMs);
+      /** @type {number | undefined} */
+      __privateAdd(this, _combinedSevereThresholdMs);
+      /** @type {Record<string, Partial<DetectorThresholds>>} */
+      __privateAdd(this, _detectorOverrides, {});
+      /** Severe emissions so far in this frame. */
+      __privateAdd(this, _severeCount, 0);
+      /** @type {number} */
+      __privateAdd(this, _maxSeverePerPage, DEFAULT_MAX_SEVERE_PER_PAGE);
+      /**
+       * Severe emissions in this frame, kept only under the debug flag for the
+       * debug stats broadcast. Empty in production.
+       * @type {Array<{ kind: SevereKind, detector: string, thresholdMs: number }>}
+       */
+      __privateAdd(this, _severeDebugLog, []);
+    }
+    init() {
+      if (!hasOwnProperty.call(this.featureSettings ?? {}, this.name)) return;
+      __privateSet(this, _active, true);
+      this._readThresholdSettings();
+      if (window.self === window.top) {
+        this._emit(`${EVENT_PREFIX}_measured`);
+      }
+      this._debugBroadcast(null);
+    }
+    _readThresholdSettings() {
+      const defaults = this.getFeatureSetting("defaults");
+      if (defaults && typeof defaults === "object") {
+        const defaultSettings = (
+          /** @type {Record<string, unknown>} */
+          defaults
+        );
+        __privateSet(this, _singleRunThresholdsMs, parseThresholds(defaultSettings.singleRunThresholdsMs, DEFAULT_SINGLE_RUN_THRESHOLDS_MS));
+        __privateSet(this, _totalPerPageThresholdsMs, parseThresholds(
+          defaultSettings.totalPerPageThresholdsMs,
+          DEFAULT_TOTAL_PER_PAGE_THRESHOLDS_MS
+        ));
+      }
+      __privateSet(this, _combinedThresholdsMs, parseThresholds(this.getFeatureSetting("combinedThresholdsMs"), DEFAULT_COMBINED_THRESHOLDS_MS));
+      const singleRunSevereThresholdMs = this.getFeatureSetting("singleRunSevereThresholdMs");
+      if (typeof singleRunSevereThresholdMs === "number" && Number.isFinite(singleRunSevereThresholdMs) && singleRunSevereThresholdMs > 0) {
+        __privateSet(this, _singleRunSevereThresholdMs, singleRunSevereThresholdMs);
+      }
+      const totalPerPageSevereThresholdMs = this.getFeatureSetting("totalPerPageSevereThresholdMs");
+      if (typeof totalPerPageSevereThresholdMs === "number" && Number.isFinite(totalPerPageSevereThresholdMs) && totalPerPageSevereThresholdMs > 0) {
+        __privateSet(this, _totalPerPageSevereThresholdMs, totalPerPageSevereThresholdMs);
+      }
+      const combinedSevereThresholdMs = this.getFeatureSetting("combinedSevereThresholdMs");
+      if (typeof combinedSevereThresholdMs === "number" && Number.isFinite(combinedSevereThresholdMs) && combinedSevereThresholdMs > 0) {
+        __privateSet(this, _combinedSevereThresholdMs, combinedSevereThresholdMs);
+      }
+      const overrides = this.getFeatureSetting("detectorOverrides");
+      if (overrides && typeof overrides === "object" && !Array.isArray(overrides)) {
+        __privateSet(
+          this,
+          _detectorOverrides,
+          /** @type {Record<string, Partial<DetectorThresholds>>} */
+          overrides
+        );
+      }
+      const maxSevere = this.getFeatureSetting("maxSeverePerPage");
+      if (typeof maxSevere === "number" && Number.isFinite(maxSevere) && maxSevere > 0) {
+        __privateSet(this, _maxSeverePerPage, Math.floor(maxSevere));
+      }
+    }
+    /**
+     * Threshold edges for a detector group, applying per-group overrides.
+     *
+     * @param {string} name
+     * @returns {DetectorThresholds}
+     */
+    _thresholdsFor(name) {
+      const override = hasOwnProperty.call(__privateGet(this, _detectorOverrides), name) ? __privateGet(this, _detectorOverrides)[name] : void 0;
+      return {
+        singleRunThresholdsMs: parseThresholds(override?.singleRunThresholdsMs, __privateGet(this, _singleRunThresholdsMs)),
+        totalPerPageThresholdsMs: parseThresholds(override?.totalPerPageThresholdsMs, __privateGet(this, _totalPerPageThresholdsMs))
+      };
+    }
+    /**
+     * Add one detector run's duration to the frame accumulators.
+     *
+     * Called (fire-and-forget) by the `timeDetector` wrapper around detector
+     * invocations. Invalid input is ignored — recording must never throw
+     * back into a detector call site.
+     *
+     * @param {string} name - detector group
+     * @param {number} durationMs
+     * @param {string} [detail] - exact detector identity for single-run severe
+     *   attribution, e.g. `adwalls.generic_en` within the `adwalls` group.
+     *   Never appears in periodic event-type names.
+     * @param {boolean} [failed] - whether the detector invocation threw
+     */
+    record(name, durationMs, detail, failed = false) {
+      if (!__privateGet(this, _active)) return;
+      if (typeof name !== "string" || !NAME_PATTERN.test(name)) return;
+      if (typeof durationMs !== "number" || !Number.isFinite(durationMs) || durationMs < 0) return;
+      const stats = __privateGet(this, _detectors).get(name) ?? { runs: 0, totalMs: 0, worstMs: 0 };
+      stats.runs += 1;
+      stats.totalMs += durationMs;
+      stats.worstMs = Math.max(stats.worstMs, durationMs);
+      __privateGet(this, _detectors).set(name, stats);
+      __privateSet(this, _combinedTotalMs, __privateGet(this, _combinedTotalMs) + durationMs);
+      const attributed = typeof detail === "string" && NAME_PATTERN.test(detail) ? detail : name;
+      const detailed = __privateGet(this, _detectorsDetailed).get(attributed) ?? { runs: 0, totalMs: 0, worstMs: 0 };
+      detailed.runs += 1;
+      detailed.totalMs += durationMs;
+      detailed.worstMs = Math.max(detailed.worstMs, durationMs);
+      __privateGet(this, _detectorsDetailed).set(attributed, detailed);
+      const thresholds = this._thresholdsFor(name);
+      this._emitCrossings(name, durationMs, stats, thresholds);
+      if (failed === true) {
+        this._emit(`${EVENT_PREFIX}_${name}_failed`);
+      }
+      this._checkSevere(name, durationMs, stats, attributed, thresholds);
+      this._debugBroadcast({ name, attributed, durationMs: roundMs(durationMs), failed: failed === true });
+    }
+    /**
+     * Emit `ran` and every newly crossed threshold edge for this run. All
+     * counters are monotonic, so checking at each run is equivalent to
+     * checking accumulated worst/total values — the at-most-once guard makes
+     * each event fire exactly at its first crossing.
+     *
+     * @param {string} name
+     * @param {number} durationMs
+     * @param {DetectorStats} stats
+     * @param {DetectorThresholds} thresholds
+     */
+    _emitCrossings(name, durationMs, stats, thresholds) {
+      this._emit(`${EVENT_PREFIX}_${name}_ran`);
+      for (const edge of thresholds.singleRunThresholdsMs) {
+        if (durationMs > edge) this._emit(`${EVENT_PREFIX}_${name}_over${edge}ms`);
+      }
+      for (const edge of thresholds.totalPerPageThresholdsMs) {
+        if (stats.totalMs > edge) this._emit(`${EVENT_PREFIX}_${name}_total_over${edge}ms`);
+      }
+      for (const edge of __privateGet(this, _combinedThresholdsMs)) {
+        if (__privateGet(this, _combinedTotalMs) > edge) this._emit(`${EVENT_PREFIX}_combined_over${edge}ms`);
+      }
+    }
+    /**
+     * Snapshot of the exact per-detector accumulators for this frame, for
+     * attachment to user-initiated breakage reports. Unlike the bucketed
+     * events, values are exact and keyed by exact attribution (config IDs
+     * such as `adwalls.generic_en` rather than the `adwalls` group).
+     * Durations are rounded to 0.1ms to keep the payload compact —
+     * finer precision is below timer granularity anyway.
+     *
+     * @returns {{ combinedTotalMs: number, detectors: Record<string, DetectorStats> } | undefined}
+     */
+    getStats() {
+      if (!__privateGet(this, _active)) return void 0;
+      const detectors = {};
+      for (const [name, stats] of __privateGet(this, _detectorsDetailed)) {
+        detectors[name] = {
+          runs: stats.runs,
+          totalMs: roundMs(stats.totalMs),
+          worstMs: roundMs(stats.worstMs)
+        };
+      }
+      return { combinedTotalMs: roundMs(__privateGet(this, _combinedTotalMs)), detectors };
+    }
+    /**
+     * Fire immediate severe events for crossed edges at or above the
+     * configured cutoff. Edges are emitted highest-first so the per-frame cap
+     * preserves the strongest signals. Totals are checked against the
+     * accumulated group and therefore attribute to that group, e.g. `adwalls`.
+     * Without an explicit cutoff, the previous highest-edge behavior applies.
+     *
+     * @param {string} name
+     * @param {number} durationMs
+     * @param {DetectorStats} stats
+     * @param {string} attributed - exact detector identity for severe attribution
+     * @param {DetectorThresholds} thresholds
+     */
+    _checkSevere(name, durationMs, stats, attributed, thresholds) {
+      const singleEdges = thresholds.singleRunThresholdsMs;
+      const singleCutoff = __privateGet(this, _singleRunSevereThresholdMs) ?? singleEdges[singleEdges.length - 1];
+      for (let i = singleEdges.length - 1; i >= 0; i--) {
+        const edge = singleEdges[i];
+        if (edge !== void 0 && singleCutoff !== void 0 && edge >= singleCutoff && durationMs > edge) {
+          this._emitSevere("single", attributed, edge);
+        }
+      }
+      const totalEdges = thresholds.totalPerPageThresholdsMs;
+      const totalCutoff = __privateGet(this, _totalPerPageSevereThresholdMs) ?? totalEdges[totalEdges.length - 1];
+      for (let i = totalEdges.length - 1; i >= 0; i--) {
+        const edge = totalEdges[i];
+        if (edge !== void 0 && totalCutoff !== void 0 && edge >= totalCutoff && stats.totalMs > edge) {
+          this._emitSevere("total", name, edge);
+        }
+      }
+      const combinedCutoff = __privateGet(this, _combinedSevereThresholdMs) ?? __privateGet(this, _combinedThresholdsMs)[__privateGet(this, _combinedThresholdsMs).length - 1];
+      for (let i = __privateGet(this, _combinedThresholdsMs).length - 1; i >= 0; i--) {
+        const edge = __privateGet(this, _combinedThresholdsMs)[i];
+        if (edge !== void 0 && combinedCutoff !== void 0 && edge >= combinedCutoff && __privateGet(this, _combinedTotalMs) > edge) {
+          this._emitSevere("combined", "combined", edge);
+        }
+      }
+    }
+    /**
+     * Fire `detectorPerf_severe` immediately, at most once per frame per
+     * detector, family and threshold, and at most `maxSeverePerPage` per frame
+     * in total (blast-radius cap for a misconfigured threshold push).
+     *
+     * @param {SevereKind} kind
+     * @param {string} detector
+     * @param {number} thresholdMs
+     */
+    _emitSevere(kind, detector, thresholdMs) {
+      if (__privateGet(this, _severeCount) >= __privateGet(this, _maxSeverePerPage)) return;
+      const guardKey = `${SEVERE_EVENT_TYPE}:${kind}:${detector}:${thresholdMs}`;
+      if (__privateGet(this, _emitted).has(guardKey)) return;
+      __privateGet(this, _emitted).add(guardKey);
+      __privateSet(this, _severeCount, __privateGet(this, _severeCount) + 1);
+      if (this.isDebug) {
+        __privateGet(this, _severeDebugLog).push({ kind, detector, thresholdMs });
+      }
+      void this._dispatch(SEVERE_EVENT_TYPE, { kind, detector, thresholdMs });
+    }
+    /**
+     * Debug-only broadcast of the current stats snapshot to the page, for
+     * test-page overlays during human testing. No-op unless the platform
+     * set the debug flag, so production behaviour is unchanged. Failures
+     * are swallowed: a page with a broken/removed EventTarget must not
+     * break recording.
+     *
+     * INVARIANT: native release builds must never set the debug flag
+     * (`args.debug`) on user pages — this event is page-observable and
+     * exposes detector timing and severe-crossing attribution to any page
+     * script with a listener. The debug flag is the sole gate.
+     *
+     * @param {{ name: string, attributed: string, durationMs: number, failed: boolean } | null} lastRun
+     *   the run that triggered this broadcast, or null for the init broadcast
+     */
+    _debugBroadcast(lastRun) {
+      if (!this.isDebug) return;
+      try {
+        const stats = this.getStats();
+        if (!stats) return;
+        const payload = {
+          ...stats,
+          severe: __privateGet(this, _severeDebugLog),
+          lastRun
+        };
+        dispatchEvent?.(new CustomEvent2(DEBUG_STATS_EVENT_TYPE, { detail: JSON.stringify(payload) }));
+      } catch {
+      }
+    }
+    /**
+     * Fire an event through webEvents, at most once per frame per event type.
+     *
+     * The at-most-once guard runs synchronously (before any await), so
+     * repeated crossings cannot double-emit. Dispatch is fire-and-forget: the
+     * call site does not await, and failures (e.g. webEvents not bundled on
+     * this platform) are silently swallowed.
+     *
+     * @param {string} type
+     */
+    _emit(type) {
+      if (__privateGet(this, _emitted).has(type)) return;
+      __privateGet(this, _emitted).add(type);
+      void this._dispatch(type);
+    }
+    /**
+     * @param {string} type
+     * @param {Record<string, unknown>} [data]
+     */
+    async _dispatch(type, data) {
+      try {
+        if (data === void 0) {
+          await this.callFeatureMethod("webEvents", "fireEvent", { type });
+        } else {
+          await this.callFeatureMethod("webEvents", "fireEvent", { type, data });
+        }
+      } catch {
+      }
+    }
+  };
+  _active = new WeakMap();
+  _detectors = new WeakMap();
+  _detectorsDetailed = new WeakMap();
+  _combinedTotalMs = new WeakMap();
+  _emitted = new WeakMap();
+  _singleRunThresholdsMs = new WeakMap();
+  _totalPerPageThresholdsMs = new WeakMap();
+  _combinedThresholdsMs = new WeakMap();
+  _singleRunSevereThresholdMs = new WeakMap();
+  _totalPerPageSevereThresholdMs = new WeakMap();
+  _combinedSevereThresholdMs = new WeakMap();
+  _detectorOverrides = new WeakMap();
+  _severeCount = new WeakMap();
+  _maxSeverePerPage = new WeakMap();
+  _severeDebugLog = new WeakMap();
+  function timeDetector(feature, name, fn, detail) {
+    const t0 = performanceNow();
+    let failed = true;
+    try {
+      const result = fn();
+      failed = false;
+      return result;
+    } finally {
+      const durationMs = performanceNow() - t0;
+      void reportDuration(feature, name, durationMs, detail, failed);
+    }
+  }
+  async function reportDuration(feature, name, durationMs, detail, failed) {
+    try {
+      await feature.callFeatureMethod("detectorPerf", "record", name, durationMs, detail, failed);
+    } catch {
+    }
+  }
+
   // src/features/web-detection/parse.js
   init_define_import_meta_trackerLookup();
   var DEFAULT_RUN_CONDITIONS = (
@@ -8514,32 +8887,40 @@
   }
 
   // src/features/web-detection.js
-  var _detectors, _matchedDetectors;
+  var _detectors2, _matchedDetectors, _detectorPerfEnabled;
   var WebDetection = class extends ContentFeature {
     constructor() {
       super(...arguments);
       /** @type {Record<string, Record<string, DetectorConfig>>} */
-      __privateAdd(this, _detectors, {});
+      __privateAdd(this, _detectors2, {});
       /** @type {Map<string, boolean>} */
       __privateAdd(this, _matchedDetectors, /* @__PURE__ */ new Map());
+      __privateAdd(this, _detectorPerfEnabled, false);
       __publicField(this, "_exposedMethods", this._declareExposedMethods(["runDetectors"]));
     }
     /**
      * Initialize the feature by loading detector configurations
      */
     init() {
+      __privateSet(this, _detectorPerfEnabled, hasOwnProperty.call(this.featureSettings ?? {}, "detectorPerf"));
       const detectorsConfig = this.getFeatureSetting("detectors");
-      __privateSet(this, _detectors, parseDetectors(detectorsConfig));
+      __privateSet(this, _detectors2, parseDetectors(detectorsConfig));
       this._scheduleAutoRunDetectors();
     }
     /**
+     * Evaluate one configured detector and record its execution time.
      *
      * @param {DetectorConfig} detectorConfig
+     * @param {string} groupName - detector group, e.g. `adwalls`
+     * @param {string} fullDetectorId - `groupName.detectorId`, e.g. `adwalls.generic_en`
      * @returns {DetectorMatchResult}
      */
-    _evaluateMatch(detectorConfig) {
+    _evaluateMatch(detectorConfig, groupName, fullDetectorId) {
       try {
-        return evaluateMatch(detectorConfig.match);
+        if (!__privateGet(this, _detectorPerfEnabled)) {
+          return evaluateMatch(detectorConfig.match);
+        }
+        return timeDetector(this, groupName, () => evaluateMatch(detectorConfig.match), fullDetectorId);
       } catch {
         return "error";
       }
@@ -8549,7 +8930,7 @@
      */
     _scheduleAutoRunDetectors() {
       const detectorsByInterval = /* @__PURE__ */ new Map();
-      for (const [groupName, groupDetectors] of Object.entries(__privateGet(this, _detectors))) {
+      for (const [groupName, groupDetectors] of Object.entries(__privateGet(this, _detectors2))) {
         for (const [detectorId, detectorConfig] of Object.entries(groupDetectors)) {
           if (!this._shouldRunDetector(detectorConfig, { trigger: "auto" })) continue;
           const autoTrigger = detectorConfig.triggers.auto;
@@ -8557,6 +8938,7 @@
           for (const interval of autoTrigger.when.intervalMs) {
             const atInterval = detectorsByInterval.get(interval) ?? [];
             atInterval.push({
+              groupName,
               detectorId: fullDetectorId,
               config: detectorConfig
             });
@@ -8566,23 +8948,24 @@
       }
       for (const [interval, detectors] of detectorsByInterval.entries()) {
         setTimeout(() => {
-          for (const { detectorId, config } of detectors) {
-            this._runAutoDetector(detectorId, config);
+          for (const { groupName, detectorId, config } of detectors) {
+            this._runAutoDetector(groupName, detectorId, config);
           }
         }, interval);
       }
     }
     /**
      * Run a single detector with the auto trigger
+     * @param {string} groupName - The detector group
      * @param {string} fullDetectorId - The full detector ID (groupName.detectorId)
      * @param {DetectorConfig} detectorConfig - The detector configuration
      */
-    _runAutoDetector(fullDetectorId, detectorConfig) {
+    _runAutoDetector(groupName, fullDetectorId, detectorConfig) {
       try {
         if (__privateGet(this, _matchedDetectors).get(fullDetectorId)) {
           return;
         }
-        const detected = this._evaluateMatch(detectorConfig);
+        const detected = this._evaluateMatch(detectorConfig, groupName, fullDetectorId);
         if (detected === true) {
           __privateGet(this, _matchedDetectors).set(fullDetectorId, true);
         }
@@ -8641,14 +9024,15 @@
      */
     runDetectors(options) {
       const results = [];
-      for (const [groupName, groupDetectors] of Object.entries(__privateGet(this, _detectors))) {
+      for (const [groupName, groupDetectors] of Object.entries(__privateGet(this, _detectors2))) {
         for (const [detectorId, detectorConfig] of Object.entries(groupDetectors)) {
           if (!this._shouldRunDetector(detectorConfig, options)) continue;
-          const detected = this._evaluateMatch(detectorConfig);
+          const fullDetectorId = `${groupName}.${detectorId}`;
+          const detected = this._evaluateMatch(detectorConfig, groupName, fullDetectorId);
           if (options.trigger === "breakageReport" && this._isStateEnabled(detectorConfig.actions.breakageReportData.state)) {
             if (detected !== false) {
               results.push({
-                detectorId: `${groupName}.${detectorId}`,
+                detectorId: fullDetectorId,
                 detected
               });
             }
@@ -8659,8 +9043,9 @@
       return results;
     }
   };
-  _detectors = new WeakMap();
+  _detectors2 = new WeakMap();
   _matchedDetectors = new WeakMap();
+  _detectorPerfEnabled = new WeakMap();
 
   // src/features/web-events.js
   init_define_import_meta_trackerLookup();
@@ -9655,6 +10040,8 @@
           result.detectorData = {
             botDetection: runBotDetection(detectorSettings.botDetection),
             fraudDetection: runFraudDetection(detectorSettings.fraudDetection),
+            // youtubeAds is intentionally not timed: the YouTube detector is
+            // excluded from detectorPerf and keeps its own internal metrics.
             youtubeAds: runYoutubeAdDetection(detectorSettings.youtubeAds)
           };
         }
@@ -9666,6 +10053,10 @@
         }
         if (result.detectorData) {
           breakageDataPayload.detectorData = result.detectorData;
+        }
+        const detectorPerfStats = await this.callFeatureMethod("detectorPerf", "getStats");
+        if (!(detectorPerfStats instanceof CallFeatureMethodError) && detectorPerfStats != null) {
+          breakageDataPayload.detectorPerf = detectorPerfStats;
         }
         if (Object.keys(breakageDataPayload).length > 0) {
           try {
@@ -13208,6 +13599,7 @@ ${iframeContent}
     ddg_feature_webDetection: WebDetection,
     ddg_feature_webEvents: web_events_default,
     ddg_feature_webInterferenceDetection: WebInterferenceDetection,
+    ddg_feature_detectorPerf: DetectorPerf,
     ddg_feature_breakageReporting: BreakageReporting,
     ddg_feature_duckPlayer: DuckPlayerFeature,
     ddg_feature_messageBridge: message_bridge_default,
