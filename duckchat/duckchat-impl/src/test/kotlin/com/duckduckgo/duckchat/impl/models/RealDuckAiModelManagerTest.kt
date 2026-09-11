@@ -774,6 +774,106 @@ class RealDuckAiModelManagerTest {
     }
 
     @Test
+    fun whenModelHasKnownLabelThenLabelParsed() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any(), anyOrNull())).thenReturn(
+            AIChatModelsResponse(
+                listOf(
+                    remoteModel("everyday", label = "EVERYDAY_USE"),
+                    remoteModel("hungry", label = "USES_LIMITS_FASTER"),
+                    remoteModel("plain", label = null),
+                ),
+            ),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        val models = testee.modelState.value.models
+        assertEquals(ModelLabel.EVERYDAY_USE, models.first { it.id == "everyday" }.label)
+        assertEquals(ModelLabel.USES_LIMITS_FASTER, models.first { it.id == "hungry" }.label)
+        assertNull(models.first { it.id == "plain" }.label)
+    }
+
+    @Test
+    fun whenModelHasUnrecognisedLabelThenLabelIsUnknown() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any(), anyOrNull())).thenReturn(
+            AIChatModelsResponse(listOf(remoteModel("id", label = "BRAND_NEW_LABEL"))),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        assertEquals(ModelLabel.UNKNOWN, testee.modelState.value.models[0].label)
+    }
+
+    @Test
+    fun whenUpdatedPickersEnabledThenLabelledModelsSortFirstKeepingEndpointOrder() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        duckChatFeature.updatedPickers().setRawStoredState(Toggle.State(enable = true))
+        whenever(modelsService.getModels(any(), anyOrNull())).thenReturn(
+            AIChatModelsResponse(
+                listOf(
+                    remoteModel("plain1"),
+                    remoteModel("labelled1", label = "EVERYDAY_USE"),
+                    remoteModel("plain2"),
+                    remoteModel("labelled2", label = "USES_LIMITS_FASTER"),
+                ),
+            ),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        assertEquals(
+            listOf("labelled1", "labelled2", "plain1", "plain2"),
+            testee.modelState.value.models.map { it.id },
+        )
+    }
+
+    @Test
+    fun whenUpdatedPickersDisabledThenEndpointOrderKept() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        duckChatFeature.updatedPickers().setRawStoredState(Toggle.State(enable = false))
+        whenever(modelsService.getModels(any(), anyOrNull())).thenReturn(
+            AIChatModelsResponse(
+                listOf(remoteModel("plain"), remoteModel("labelled", label = "EVERYDAY_USE")),
+            ),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        assertEquals(listOf("plain", "labelled"), testee.modelState.value.models.map { it.id })
+    }
+
+    @Test
+    fun whenLabelledModelSortsFirstThenDerivedDefaultStillFollowsEndpointOrder() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        duckChatFeature.updatedPickers().setRawStoredState(Toggle.State(enable = true))
+        whenever(modelsService.getModels(any(), anyOrNull())).thenReturn(
+            AIChatModelsResponse(
+                listOf(
+                    remoteModel("first-in-response"),
+                    remoteModel("labelled", label = "EVERYDAY_USE"),
+                ),
+            ),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        assertEquals("first-in-response", testee.modelState.value.selectedModelId)
+        assertEquals("labelled", testee.modelState.value.models[0].id)
+    }
+
+    @Test
     fun whenEntitlementsChangeThenModelsFetched() = runTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
@@ -963,6 +1063,7 @@ class RealDuckAiModelManagerTest {
         supportedFileTypes: List<String>? = null,
         supportedReasoningEffort: List<String>? = null,
         reasoningEffortAccess: List<RemoteReasoningEffortAccess>? = null,
+        label: String? = null,
     ) = RemoteAIChatModel(
         id = id,
         name = id,
@@ -975,6 +1076,7 @@ class RealDuckAiModelManagerTest {
         supportedFileTypes = supportedFileTypes,
         supportedReasoningEffort = supportedReasoningEffort,
         reasoningEffortAccess = reasoningEffortAccess,
+        label = label,
     )
 
     @Test
