@@ -19,21 +19,18 @@ package com.duckduckgo.duckchat.impl.ui.nativeinput.views
 import android.content.Context
 import android.util.AttributeSet
 import android.view.Gravity
-import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.PopupWindow
 import android.widget.ScrollView
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
@@ -190,16 +187,13 @@ class ReasoningModePickerView @JvmOverloads constructor(
 
     private fun populate(container: LinearLayout, popup: PopupWindow, state: ReasoningModePickerState) {
         state.rows.forEach { row ->
-            val item = LayoutInflater.from(context)
-                .inflate(R.layout.view_reasoning_mode_picker_item, container, false)
-            item.findViewById<ImageView>(R.id.reasoningModeItemLeadingIcon)
-                .setImageDrawable(AppCompatResources.getDrawable(context, row.iconRes))
-            item.findViewById<DaxTextView>(R.id.reasoningModeItemTitle).setText(row.titleRes)
-            item.findViewById<DaxTextView>(R.id.reasoningModeItemSubtitle).setText(row.subtitleRes)
-            val trailingIcon = item.findViewById<ImageView>(R.id.reasoningModeItemTrailingIcon)
-            trailingIcon.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_check_24)
-            trailingIcon.visibility = if (row.selected) VISIBLE else INVISIBLE
-            item.setOnClickListener {
+            val item = pickerMenuItem(
+                parent = container,
+                title = context.getString(row.titleRes),
+                leadingIconRes = row.iconRes,
+                subtitle = context.getString(row.subtitleRes),
+                selected = row.selected,
+            ) {
                 viewModel.onModeTapped(row.mode, currentSurface())
                 popup.dismiss()
             }

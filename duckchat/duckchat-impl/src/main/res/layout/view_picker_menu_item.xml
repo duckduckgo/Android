@@ -28,7 +28,7 @@
     android:paddingBottom="@dimen/keyline_2">
 
     <ImageView
-        android:id="@+id/reasoningModeItemLeadingIcon"
+        android:id="@+id/pickerMenuItemLeadingIcon"
         android:layout_width="@dimen/keyline_5"
         android:layout_height="@dimen/keyline_5"
         android:importantForAccessibility="no"
@@ -43,7 +43,7 @@
         android:orientation="vertical">
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
-            android:id="@+id/reasoningModeItemTitle"
+            android:id="@+id/pickerMenuItemTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:lineSpacingExtra="0sp"
@@ -52,7 +52,7 @@
             tools:text="Fast" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
-            android:id="@+id/reasoningModeItemSubtitle"
+            android:id="@+id/pickerMenuItemSubtitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:lineSpacingExtra="0sp"
@@ -63,7 +63,7 @@
     </LinearLayout>
 
     <ImageView
-        android:id="@+id/reasoningModeItemTrailingIcon"
+        android:id="@+id/pickerMenuItemTrailingIcon"
         android:layout_width="@dimen/keyline_5"
         android:layout_height="@dimen/keyline_5"
         android:layout_marginStart="@dimen/keyline_2"
