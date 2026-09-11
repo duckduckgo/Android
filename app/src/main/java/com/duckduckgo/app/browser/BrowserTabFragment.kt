@@ -2438,7 +2438,9 @@ class BrowserTabFragment :
         renderBrowserMenu(viewState = browserViewState, omnibarViewMode = ViewMode.DuckAI)
         omnibar.setViewMode(ViewMode.DuckAI)
         browserNavigationBarIntegration.configureDuckAIViewMode()
-        showNativeInput(forceImageGeneration = browserActivity?.consumeDuckChatForceImageGeneration() ?: false)
+        val forceImageGeneration = !nativeInputManager.isNativeInputShown() &&
+            (browserActivity?.consumeDuckChatForceImageGeneration() ?: false)
+        showNativeInput(forceImageGeneration = forceImageGeneration)
     }
 
     private fun showMaliciousWarning(
