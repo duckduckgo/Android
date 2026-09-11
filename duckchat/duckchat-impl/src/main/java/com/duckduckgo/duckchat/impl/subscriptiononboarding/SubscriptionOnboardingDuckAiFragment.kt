@@ -16,14 +16,10 @@
 
 package com.duckduckgo.duckchat.impl.subscriptiononboarding
 
-import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
-import androidx.core.graphics.ColorUtils
-import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
-import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
@@ -32,7 +28,6 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
 import com.duckduckgo.common.ui.view.addClickableSpan
-import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -74,37 +69,13 @@ class SubscriptionOnboardingDuckAiFragment : DuckDuckGoFragment(R.layout.fragmen
         binding.subscriptionOnboardingDuckAiNotNowButton.setOnClickListener {
             viewModel.onNotNowClicked()
         }
-        setupScrollFade()
         observeViewState()
-    }
-
-    private fun setupScrollFade() {
-        val surfaceColor = requireContext().getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorSurface)
-        binding.subscriptionOnboardingDuckAiScrollFade.background = GradientDrawable(
-            GradientDrawable.Orientation.TOP_BOTTOM,
-            intArrayOf(ColorUtils.setAlphaComponent(surfaceColor, 0), surfaceColor),
-        )
-
-        binding.subscriptionOnboardingDuckAiScrollView.setOnScrollChangeListener(
-            NestedScrollView.OnScrollChangeListener { _, _, _, _, _ -> updateScrollFade() },
-        )
-
-        binding.subscriptionOnboardingDuckAiScrollView.doOnLayout { updateScrollFade() }
-    }
-
-    private fun updateScrollFade() {
-        binding.subscriptionOnboardingDuckAiScrollFade.isVisible =
-            binding.subscriptionOnboardingDuckAiScrollView.canScrollVertically(1)
     }
 
     private fun observeViewState() {
         viewModel.viewState()
             .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-            .onEach {
-                render(it)
-                // Models load after the first layout, so re-check once the new rows have been measured.
-                binding.subscriptionOnboardingDuckAiScrollView.post { updateScrollFade() }
-            }
+            .onEach { render(it) }
             .launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
