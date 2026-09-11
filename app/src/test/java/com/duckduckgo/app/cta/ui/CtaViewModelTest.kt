@@ -899,6 +899,38 @@ class CtaViewModelTest {
     }
 
     @Test
+    fun whenEnoughTabsOpenToStopFirePulseThenFireDialogCtaIsNull() = runTest {
+        givenDaxOnboardingActive()
+        db.tabsDao().insertTab(TabEntity(tabId = "0", position = 0))
+        db.tabsDao().insertTab(TabEntity(tabId = "1", position = 1))
+
+        val fireDialogCta = testee.getFireDialogCta()
+
+        assertNull(fireDialogCta)
+    }
+
+    @Test
+    fun whenOnlyOneTabOpenThenFireDialogCtaShown() = runTest {
+        givenDaxOnboardingActive()
+        db.tabsDao().insertTab(TabEntity(tabId = "0", position = 0))
+
+        val fireDialogCta = testee.getFireDialogCta()
+
+        assertNotNull(fireDialogCta)
+    }
+
+    @Test
+    fun whenHideTipsEnabledThenFireDialogCtaIsNull() = runTest {
+        givenDaxOnboardingActive()
+        db.tabsDao().insertTab(TabEntity(tabId = "0", position = 0))
+        whenever(mockSettingsDataStore.hideTips).thenReturn(true)
+
+        val fireDialogCta = testee.getFireDialogCta()
+
+        assertNull(fireDialogCta)
+    }
+
+    @Test
     fun whenRefreshCtaOnHomeTabAndIntroCtaWasNotPreviouslyShownThenSearchSuggestionsCtaShown() = runTest {
         givenDaxOnboardingActive()
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(false)

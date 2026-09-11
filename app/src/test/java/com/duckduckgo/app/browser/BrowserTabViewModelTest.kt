@@ -11413,9 +11413,9 @@ class BrowserTabViewModelTest {
         fakeCustomHeadersPlugin.headers = mapOf(X_DUCKDUCKGO_ANDROID_HEADER to "TEST_VALUE")
     }
 
-    private suspend fun givenFireButtonPulsing() {
+    private suspend fun givenFireButtonPulsing(dismissedCta: CtaId = DAX_DIALOG_TRACKERS_FOUND) {
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
-        dismissedCtaDaoChannel.send(listOf(DismissedCta(DAX_DIALOG_TRACKERS_FOUND)))
+        dismissedCtaDaoChannel.send(listOf(DismissedCta(dismissedCta)))
     }
 
     private inline fun <reified T : Command> assertCommandIssued(instanceAssertions: T.() -> Unit = {}) {
@@ -11616,6 +11616,22 @@ class BrowserTabViewModelTest {
     private fun brandDesignDuckAiFireButtonCta() = DaxDuckAiFireButtonBrandDesignUpdateContextualCta(
         onboardingStore = mockOnboardingStore,
         appInstallStore = mockAppInstallStore,
+        isLightTheme = true,
+        deviceInfo = mockDeviceInfo,
+    )
+
+    private fun trackersBlockedCta() = DaxTrackersBlockedCta(
+        onboardingStore = mockOnboardingStore,
+        appInstallStore = mockAppInstallStore,
+        trackers = emptyList(),
+        settingsDataStore = mockSettingsDataStore,
+    )
+
+    private fun brandDesignTrackersBlockedCta() = DaxTrackersBlockedBrandDesignUpdateContextualCta(
+        onboardingStore = mockOnboardingStore,
+        appInstallStore = mockAppInstallStore,
+        trackers = emptyList(),
+        settingsDataStore = mockSettingsDataStore,
         isLightTheme = true,
         deviceInfo = mockDeviceInfo,
     )
@@ -13376,6 +13392,46 @@ class BrowserTabViewModelTest {
         advanceUntilIdle()
 
         assertFalse((browserViewState().fireButton as HighlightableButton.Visible).highlighted)
+    }
+
+    @Test
+    fun whenTrackersBlockedCtaShownAndPulseActiveThenFireButtonNotHighlighted() = runTest {
+        val observer = ValueCaptorObserver<BrowserViewState>(false)
+        testee.browserViewState.observeForever(observer)
+        givenFireButtonPulsing(DAX_DIALOG_NETWORK)
+
+        testee.ctaViewState.value = ctaViewState().copy(cta = trackersBlockedCta())
+        advanceUntilIdle()
+
+        assertFalse((browserViewState().fireButton as HighlightableButton.Visible).highlighted)
+    }
+
+    @Test
+    fun whenBrandDesignTrackersBlockedCtaShownAndPulseActiveThenFireButtonNotHighlighted() = runTest {
+        val observer = ValueCaptorObserver<BrowserViewState>(false)
+        testee.browserViewState.observeForever(observer)
+        givenFireButtonPulsing(DAX_DIALOG_NETWORK)
+
+        testee.ctaViewState.value = ctaViewState().copy(cta = brandDesignTrackersBlockedCta())
+        advanceUntilIdle()
+
+        assertFalse((browserViewState().fireButton as HighlightableButton.Visible).highlighted)
+    }
+
+    @Test
+    fun whenTrackersBlockedCtaDismissedAndPulseActiveThenFireButtonHighlightRestored() = runTest {
+        val observer = ValueCaptorObserver<BrowserViewState>(false)
+        testee.browserViewState.observeForever(observer)
+        givenFireButtonPulsing(DAX_DIALOG_NETWORK)
+
+        testee.ctaViewState.value = ctaViewState().copy(cta = trackersBlockedCta())
+        advanceUntilIdle()
+        assertFalse((browserViewState().fireButton as HighlightableButton.Visible).highlighted)
+
+        testee.ctaViewState.value = ctaViewState().copy(cta = null)
+        advanceUntilIdle()
+
+        assertTrue((browserViewState().fireButton as HighlightableButton.Visible).highlighted)
     }
 
     @Test
