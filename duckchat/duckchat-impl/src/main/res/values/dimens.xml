@@ -30,6 +30,9 @@
     <dimen name="nativeInputMenuWidth">260dp</dimen>
     <dimen name="nativeInputButtonSize">36dp</dimen>
 
+    <!-- Added to keyline_0 so the input text aligns with the bottom row icon glyphs -->
+    <dimen name="nativeInputFieldStartMargin">6dp</dimen>
+
     <!-- Width of the contextual sheet "recent chats" popup menu. Wider than the default popupMenuWidth (200dp) to fit chat titles. -->
     <dimen name="contextualChatsPopupMenuWidth">280dp</dimen>
 
