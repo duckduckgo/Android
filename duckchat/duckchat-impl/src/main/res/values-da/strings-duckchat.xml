@@ -350,4 +350,23 @@
     <string name="duckChatContextualAskAboutPage">Spørg om siden</string>
     <string name="duckChatContextualAskAboutSearch">Fortsæt i Duck.ai</string>
     <string name="duckChatContextualOpenDuckAi">Åbn Duck.ai</string>
+
+    <!-- Suggested prompts for text selection -->
+    <string name="duckAiSuggestionSummarizeSelectionLabel">Sammenfat denne markering</string>
+    <string name="duckAiSuggestionSummarizeSelectionPrompt">Sammenfat denne markering.</string>
+    <string name="duckAiSuggestionTranslateSelectionLabel">Oversæt denne markering</string>
+    <string name="duckAiSuggestionTranslateSelectionPrompt" instruction="%1$s is replaced with the name of the user&apos;s language.">Oversæt denne markering til %1$s.</string>
+
+    <!-- Name shown for an attached text selection in the Duck.ai -->
+    <string name="duckAiTextSelectionAttachmentTitle">Tekstmarkering</string>
+    <string name="duckAiTextSelectionLimitReached" instruction="%1$d is replaced with the maximum number of text selections.">Du kan tilføje op til %1$d tekstmarkeringer. Fjern en for at tilføje en mere.</string>
+
+    <!-- Duck.ai text selection menu action -->
+    <string name="duckAiTextSelectionMenuItem">Spørg Duck.ai</string>
+
+    <!-- Prefix on the Duck.ai attachment chip for a text selection -->
+    <plurals name="duckAiTextSelectionWordCount">
+        <item quantity="one">%1$d ord</item>
+        <item quantity="other">%1$d ord</item>
+    </plurals>
 </resources>
