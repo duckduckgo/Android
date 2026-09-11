@@ -1240,8 +1240,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     private fun removeMargins() {
+        // Keeps the text aligned with the bottom row icon glyphs
         inputField.updateLayoutParams<MarginLayoutParams> {
-            marginStart = 0
+            marginStart = resources.getDimensionPixelSize(R.dimen.nativeInputFieldStartMargin)
         }
         inputScreenButtonsContainer.updateLayoutParams<MarginLayoutParams> {
             marginEnd = 0
