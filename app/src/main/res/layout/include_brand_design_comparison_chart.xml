@@ -71,8 +71,8 @@
 
                 <ImageView
                     android:id="@+id/comparisonChartHeaderLeftIcon"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
+                    android:layout_width="31.5dp"
+                    android:layout_height="31.5dp"
                     android:layout_gravity="center"
                     android:importantForAccessibility="no"
                     app:srcCompat="@drawable/ic_chrome" />
@@ -93,11 +93,12 @@
                 tools:ignore="InvalidColorAttribute">
 
                 <ImageView
+                    android:id="@+id/comparisonChartHeaderRightIcon"
                     android:layout_width="31.5dp"
                     android:layout_height="31.5dp"
                     android:layout_gravity="center"
                     android:importantForAccessibility="no"
-                    app:srcCompat="@drawable/logo_medium" />
+                    app:srcCompat="@drawable/ddg_logo_full_bleed" />
 
             </com.google.android.material.card.MaterialCardView>
 

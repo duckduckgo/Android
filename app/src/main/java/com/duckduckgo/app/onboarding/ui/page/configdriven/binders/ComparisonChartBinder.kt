@@ -59,6 +59,10 @@ class ComparisonChartBinder(
             width = config.headerLeftIconSizeDp.toPx(context).toInt()
             height = config.headerLeftIconSizeDp.toPx(context).toInt()
         }
+        binding.comparisonChartHeaderRightIcon.updateLayoutParams {
+            width = 31.5f.toPx(context).toInt()
+            height = 31.5f.toPx(context).toInt()
+        }
         if (Build.VERSION.SDK_INT >= 28) {
             binding.comparisonChartHeaderLeftIconCard.addBottomShadow()
             binding.comparisonChartHeaderRightIconCard.addBottomShadow()

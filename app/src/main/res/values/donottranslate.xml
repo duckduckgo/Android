@@ -52,10 +52,10 @@
 
     <string name="downloadReasonTitle">Set things up your way</string>
     <string name="downloadReasonBody">Choose one option that interests you most, and we’ll set you up quickly.</string>
-    <string name="downloadReasonOptionSearch">Search and browse privately</string>
-    <string name="downloadReasonOptionAiChat">Chat with AI privately</string>
-    <string name="downloadReasonOptionNoAi">Remove AI from search results</string>
-    <string name="downloadReasonOptionBlockAds">Block ads and pop-ups</string>
+    <string name="downloadReasonOptionSearch">Search and\nbrowse privately</string>
+    <string name="downloadReasonOptionAiChat">Chat with AI\nprivately</string>
+    <string name="downloadReasonOptionNoAi">Disable AI\nfeatures</string>
+    <string name="downloadReasonOptionBlockAds">Block ads\nand pop-ups</string>
     <string name="downloadReasonPrimaryCta">Next</string>
 
     <string name="searchPathComparisonChartTitle"><![CDATA[You\'re in the right place!<br/>Protections activated.]]></string>
@@ -76,7 +76,7 @@
     <string name="aiPathComparisonChartTitle"><![CDATA[You\'re in the right place!<br/>Protections activated.]]></string>
     <string name="aiPathComparisonChartItem5">Search the web privately with trackers blocked</string>
     <string name="aiPathModelChoiceTitle">Your chats, your way.</string>
-    <string name="aiPathModelChoiceBody">Change your default AI now, or anytime during chat.</string>
+    <string name="aiPathModelChoiceBody">Change your default AI provider now, or anytime during chat.</string>
     <string name="aiPathTogglePositionTitle">Want new tabs to open with AI chat?</string>
     <string name="aiPathTogglePositionPictogramCaption">You can switch to Search with one tap</string>
     <string name="aiPathWithToggleEnabledContextualEndDescription">Start a private AI chat with Duck.ai or toggle to Search for protected browsing.</string>
