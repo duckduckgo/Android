@@ -29,7 +29,8 @@ SCENARIO_BY_BENCHMARK_NAME = {
     "manyTrackersBlocked": "many-trackers-blocked",
     "firstPartyTrackers": "first-party-trackers",
     "cpm": "cpm",
-    "allScenarios": "all",
+    "allScenariosProtectionsOn": "all-protections-on",
+    "allScenariosProtectionsOff": "all-protections-off",
 }
 EXPECTED_SCENARIOS = frozenset(SCENARIO_BY_BENCHMARK_NAME.values())
 
@@ -353,7 +354,7 @@ def main(argv: Optional[list[str]] = None) -> int:
         print("ERROR: --trace requires --scenario so the result cannot be misattributed", file=sys.stderr)
         return 1
     if args.trace and args.report_pixel:
-        print("ERROR: --report-pixel requires --results-dir so all five scenarios are validated atomically", file=sys.stderr)
+        print("ERROR: --report-pixel requires --results-dir so all scenarios are validated atomically", file=sys.stderr)
         return 1
 
     try:
