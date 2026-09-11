@@ -18,6 +18,7 @@ package com.duckduckgo.pir.impl.dashboard.messaging.model
 
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebConstants
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse.GetDataBrokersResponse.DataBroker
+import com.squareup.moshi.Json
 
 /**
  * Represents the response body sent by the client back to the JS layer in Pir Web UI.
@@ -36,7 +37,7 @@ sealed interface PirWebMessageResponse {
 
     data class HandshakeResponse(
         val success: Boolean,
-        val userData: UserData,
+        @Json(name = "userdata") val userData: UserData,
         val version: Int = PirDashboardWebConstants.SCRIPT_API_VERSION,
     ) : PirWebMessageResponse {
 
