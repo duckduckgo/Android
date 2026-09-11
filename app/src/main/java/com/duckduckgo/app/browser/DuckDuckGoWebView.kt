@@ -22,6 +22,7 @@ import android.os.Message
 import android.print.PrintDocumentAdapter
 import android.util.AttributeSet
 import android.util.SparseArray
+import android.view.ActionMode
 import android.view.MotionEvent
 import android.view.WindowInsets
 import android.view.autofill.AutofillValue
@@ -47,6 +48,7 @@ import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.browser.uilock.BrowserUiLockFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.duckchat.api.DuckAiTextSelectionDecorator
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
@@ -91,6 +93,9 @@ class DuckDuckGoWebView :
     @Inject
     lateinit var browserUiLockFeature: BrowserUiLockFeature
 
+    @Inject
+    lateinit var duckAiTextSelectionDecorator: DuckAiTextSelectionDecorator
+
     constructor(context: Context) : this(context, null)
     constructor(
         context: Context,
@@ -98,6 +103,15 @@ class DuckDuckGoWebView :
     ) : super(context, attrs) {
         isNestedScrollingEnabled = true
     }
+
+    override fun startActionMode(callback: ActionMode.Callback?): ActionMode? =
+        super.startActionMode(decorate(callback))
+
+    override fun startActionMode(callback: ActionMode.Callback?, type: Int): ActionMode? =
+        super.startActionMode(decorate(callback), type)
+
+    private fun decorate(callback: ActionMode.Callback?): ActionMode.Callback? =
+        if (::duckAiTextSelectionDecorator.isInitialized) duckAiTextSelectionDecorator.decorate(callback, pageUrl = url) else callback
 
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)

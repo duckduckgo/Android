@@ -32,7 +32,13 @@ interface BrowserNav {
      */
     fun openInNewTab(context: Context, url: String, sourceTabId: String? = null): Intent
     fun openInCurrentTab(context: Context, url: String): Intent
-    fun openDuckChat(context: Context, hasSessionActive: Boolean = false, duckChatUrl: String): Intent
+    fun openDuckChat(
+        context: Context,
+        hasSessionActive: Boolean = false,
+        duckChatUrl: String,
+        forceLaunchContextual: Boolean = false,
+        textSelection: String? = null,
+    ): Intent
     fun closeDuckChat(context: Context): Intent
 
     /**

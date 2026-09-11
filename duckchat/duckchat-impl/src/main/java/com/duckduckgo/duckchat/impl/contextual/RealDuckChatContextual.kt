@@ -36,6 +36,7 @@ import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
+import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionRepository
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -51,28 +52,35 @@ class RealDuckChatContextual @Inject constructor(
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val contextualEntryPromptStore: ContextualEntryPromptStore,
     private val globalActivityStarter: GlobalActivityStarter,
+    private val textSelectionRepository: TextSelectionRepository,
 ) : DuckChatContextual {
 
     override suspend fun launch(
         sourceTabId: String,
         sourceUrl: String?,
         anchor: View?,
+        textSelection: String?,
         showChatSurface: () -> Unit,
     ) {
         if (anchor == null || !duckChatInternal.isContextualSheetRedesignEnabled()) {
             showChatSurface()
             return
         }
+        textSelection?.let { textSelectionRepository.add(sourceTabId, it, sourceUrl.orEmpty()) }
         if (hasChatInProgress(sourceTabId)) {
             // The sheet would reopen the existing chat for this tab, so skip the entry menu and open it directly.
             showChatSurface()
-        } else {
-            val serpQuery = sourceUrl
-                ?.takeIf { duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(it) }
-                ?.let { duckDuckGoUrlDetector.extractQuery(it) }
-                ?.takeIf { it.isNotBlank() }
-            showMenu(sourceTabId, anchor, serpQuery, showChatSurface)
+            return
         }
+        if (textSelectionRepository.selections(sourceTabId).value.isNotEmpty()) {
+            showEntryDialog(anchor, sourceTabId, showChatSurface)
+            return
+        }
+        val serpQuery = sourceUrl
+            ?.takeIf { duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(it) }
+            ?.let { duckDuckGoUrlDetector.extractQuery(it) }
+            ?.takeIf { it.isNotBlank() }
+        showMenu(sourceTabId, anchor, serpQuery, showChatSurface)
     }
 
     private suspend fun hasChatInProgress(tabId: String): Boolean {
@@ -126,6 +134,7 @@ class RealDuckChatContextual @Inject constructor(
         } else {
             popup.onMenuItemClicked(askItem) {
                 duckChatPixels.reportContextualAddressBarMenuAskAboutPageSelected()
+                textSelectionRepository.consume(sourceTabId)
                 showEntryDialog(anchor, sourceTabId, onAskAboutPage)
             }
         }
