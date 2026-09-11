@@ -51,9 +51,9 @@ class RealPaywallUrlResolver @Inject constructor(
     }
 
     private suspend fun optimizedUrl(url: String): String? {
-        if (!subscriptionsFeature.performanceOptimizedPaywalls().isEnabled()) return null
         val uri = url.toUri()
         if (!isPaywallUrl(uri)) return null
+        if (!subscriptionsFeature.performanceOptimizedPaywalls().isEnabled()) return null
         return rewrite(uri)
     }
 
