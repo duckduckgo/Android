@@ -22,7 +22,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.testseeder.api.TestSeederKey
 import com.duckduckgo.testseeder.api.TestSeederPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
 
 // Ships in every internal build, but RealTestScenarioSeeder only invokes plugins when the launch
@@ -45,7 +45,8 @@ class UserAllowListSeederPlugin @Inject constructor(
         requested.forEach { userAllowListRepository.addDomainToUserAllowList(it) }
 
         val requestedSet = requested.toSet()
-        val observed = userAllowListRepository.domainsInUserAllowListFlow().first { it.toSet() == requestedSet }
+        val observed = userAllowListRepository.domainsInUserAllowListFlow().firstOrNull { it.toSet() == requestedSet }
+            ?: error("userAllowList never settled on \"$requestedSet\"")
         Log.i("DdgTestSeeder", "userAllowList=" + observed.sorted().joinToString(","))
     }
 }
