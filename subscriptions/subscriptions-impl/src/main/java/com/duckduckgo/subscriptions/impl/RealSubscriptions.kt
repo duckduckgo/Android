@@ -25,6 +25,7 @@ import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.toTldPlusOne
+import com.duckduckgo.common.utils.replaceQueryParameters
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed
@@ -183,10 +184,17 @@ class RealSubscriptions @Inject constructor(
         val buyUri = buyUrl.toUri()
         val builder = buyUri.buildUpon()
 
-        val query = mergeQueries(buyUri.encodedQuery, uri.encodedQuery)
+        val featurePage = featurePageFromPath(uri)
+
+        val incomingQuery = if (featurePage != null) {
+            uri.withoutParam(FEATURE_PAGE_QUERY_PARAM_KEY)
+        } else {
+            uri.encodedQuery
+        }
+
+        val query = mergeQueries(buyUri.encodedQuery, incomingQuery)
         if (!query.isNullOrBlank()) builder.encodedQuery(query)
 
-        val featurePage = featurePageFromPath(uri)
         if (featurePage != null) builder.appendQueryParameter(FEATURE_PAGE_QUERY_PARAM_KEY, featurePage)
 
         return builder.build().toString()
@@ -202,9 +210,14 @@ class RealSubscriptions @Inject constructor(
     }
 
     private fun featurePageFromPath(uri: Uri): String? {
-        val explicitPage = uri.getQueryParameter(FEATURE_PAGE_QUERY_PARAM_KEY)
-        if (!explicitPage.isNullOrBlank()) return null
+        val explicitPage = uri.getQueryParameters(FEATURE_PAGE_QUERY_PARAM_KEY).firstOrNull { it.isNotBlank() }
+        if (explicitPage != null) return null
         return optimizedPaywallFeaturePage(uri)
+    }
+
+    private fun Uri.withoutParam(key: String): String? {
+        val keysToKeep = queryParameterNames.filterNot { it == key }
+        return replaceQueryParameters(keysToKeep).encodedQuery
     }
 }
 

@@ -529,7 +529,22 @@ class RealSubscriptionsTest {
 
         verify(globalActivityStarter, times(1)).startIntent(eq(context), captor.capture())
         assertEquals(
-            subscriptionsUrlProvider.buyUrl.appendQueryParams("featurePage=&featurePage=duckai"),
+            subscriptionsUrlProvider.buyUrl.appendQueryParams("featurePage=duckai"),
+            (captor.lastValue as SubscriptionsWebViewActivityWithParams).url,
+        )
+    }
+
+    @Test
+    fun whenFeaturePageInQueryIsBlankThenOtherParamsAreKept() = runTest {
+        givenPerformanceOptimizedPaywalls(enabled = true)
+        whenever(globalActivityStarter.startIntent(any(), any<SubscriptionsWebViewActivityWithParams>())).thenReturn(fakeIntent())
+
+        val captor = argumentCaptor<ActivityParams>()
+        subscriptions.launchSubscription(context, "https://duckduckgo.com/subscriptions/new/mobile/duckai?featurePage=&origin=test".toUri())
+
+        verify(globalActivityStarter, times(1)).startIntent(eq(context), captor.capture())
+        assertEquals(
+            subscriptionsUrlProvider.buyUrl.appendQueryParams("origin=test&featurePage=duckai"),
             (captor.lastValue as SubscriptionsWebViewActivityWithParams).url,
         )
     }
