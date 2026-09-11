@@ -20,6 +20,7 @@
     <string name="duck_chat_remove_chat_suggestion_content_description">Delete chat</string>
 
     <!-- Subscription onboarding - Duck.ai step (placeholder copy) -->
+    <string name="subscriptionOnboardingDuckAiTitle">Step 3 of 3</string>
     <string name="subscriptionOnboardingDuckAiHeaderTitle">Duck.ai Private Chat</string>
     <string name="subscriptionOnboardingDuckAiHeaderText">Your subscription unlocks premium models. Chats are anonymized by us and never used to train AI. <annotation type="learn_more_link">Learn More</annotation></string>
     <string name="subscriptionOnboardingDuckAiStart">Start Duck.ai Chat</string>

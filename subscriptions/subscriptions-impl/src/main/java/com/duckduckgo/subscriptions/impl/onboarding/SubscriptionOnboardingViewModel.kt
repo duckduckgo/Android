@@ -54,16 +54,10 @@ class SubscriptionOnboardingViewModel @Inject constructor(
 ) : ViewModel() {
 
     sealed interface Command {
-        data class ShowStep(
-            val stepPlugin: SubscriptionOnboardingStepPlugin,
-            val canGoBack: Boolean,
-            val stepNumber: StepNumber?,
-        ) : Command
+        data class ShowStep(val stepPlugin: SubscriptionOnboardingStepPlugin, val canGoBack: Boolean) : Command
         data object FinishToSettings : Command
         data object Finish : Command
     }
-
-    data class StepNumber(val position: Int, val total: Int)
 
     private val _commands = Channel<Command>(1, DROP_OLDEST)
     val commands: Flow<Command> = _commands.receiveAsFlow()
@@ -95,20 +89,12 @@ class SubscriptionOnboardingViewModel @Inject constructor(
                 val step = state.currentStep
                 if (step is SubscriptionOnboardingActivityStep) {
                     canGoBack = state.canGoBack
-                    _commands.send(Command.ShowStep(step.stepPlugin, state.canGoBack, state.stepNumber(step)))
+                    _commands.send(Command.ShowStep(step.stepPlugin, state.canGoBack))
                 }
             }
             is LinearOnboardingState.Completed -> _commands.send(Command.FinishToSettings)
             is LinearOnboardingState.Skipped -> _commands.send(Command.FinishToSettings)
         }
-    }
-
-    private fun LinearOnboardingState.InProgress.stepNumber(current: SubscriptionOnboardingActivityStep): StepNumber? {
-        val numbered = currentPlan.steps
-            .filterIsInstance<SubscriptionOnboardingActivityStep>()
-            .filter { it.stepPlugin.isNumberedStep }
-        val index = numbered.indexOf(current)
-        return if (index == -1) null else StepNumber(position = index + 1, total = numbered.size)
     }
 
     private suspend fun handleControllerEvent(event: SubscriptionOnboardingController.Event) {

@@ -43,9 +43,4 @@ class SubscriptionOnboardingDuckAiStepPluginTest {
 
         assertFalse(testee.shouldShow())
     }
-
-    @Test
-    fun whenStepIsBuiltThenItIsNumbered() {
-        assertTrue(testee.isNumberedStep)
-    }
 }

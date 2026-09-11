@@ -93,10 +93,10 @@ class SubscriptionOnboardingPlanProviderTest {
             override fun getPlugins(): Collection<SubscriptionOnboardingStepPlugin> = stepPlugins
         }
 
-    private fun stubPlugin(id: String, shouldShow: Boolean = true, isNumbered: Boolean = false) =
+    private fun stubPlugin(id: String, shouldShow: Boolean = true) =
         object : SubscriptionOnboardingStepPlugin {
             override val stepId: String = id
-            override val isNumberedStep: Boolean = isNumbered
+            override val titleResId: Int = 0
             override suspend fun shouldShow(): Boolean = shouldShow
             override fun createFragment(): Fragment = Fragment()
         }
