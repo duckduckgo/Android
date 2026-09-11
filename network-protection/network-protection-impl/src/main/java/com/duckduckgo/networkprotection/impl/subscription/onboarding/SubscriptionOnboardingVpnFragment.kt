@@ -42,7 +42,6 @@ import com.airbnb.lottie.LottieDrawable.INFINITE
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
-import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.addClickableSpan
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
@@ -72,9 +71,6 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
-
-    @Inject
-    lateinit var appTheme: AppTheme
 
     private val binding: FragmentSubscriptionOnboardingVpnBinding by viewBinding()
 
@@ -208,7 +204,9 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
     private fun showInfoPage() = with(binding) {
         showingInfo = true
         transition?.cancel()
-        renderHeaderImage(connected = true, error = false, animate = false)
+        subscriptionOnboardingVpnHeaderAnimation.pauseAnimation()
+        subscriptionOnboardingVpnHeaderAnimation.gone()
+        subscriptionOnboardingVpnHeaderErrorIcon.gone()
         subscriptionOnboardingVpnHeaderTitle.setText(R.string.subscriptionOnboardingVpnInfoTitle)
         subscriptionOnboardingVpnStatusContent.gone()
         subscriptionOnboardingVpnInfoContent.show()
@@ -218,7 +216,7 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
     }
 
     private fun configureHeaderAnimation() {
-        val animation = if (appTheme.isLightModeEnabled()) R.raw.vpn_header else R.raw.vpn_header_dark
+        val animation = R.raw.vpn_header
         binding.subscriptionOnboardingVpnHeaderAnimation.setAnimation(animation)
     }
 
@@ -316,11 +314,11 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
         if (vpnOn) {
             subscriptionOnboardingVpnIpAddressTitle.setText(R.string.subscriptionOnboardingVpnIpAddressTitleOn)
             subscriptionOnboardingVpnNewIpAddressContainer.show()
-            subscriptionOnboardingVpnIpAddressInfo.gone()
+            subscriptionOnboardingVpnIpAddressInfo.setText(R.string.subscriptionOnboardingVpnOnIpAddressInfo)
         } else {
             subscriptionOnboardingVpnIpAddressTitle.setText(R.string.subscriptionOnboardingVpnIpAddressTitle)
             subscriptionOnboardingVpnNewIpAddressContainer.gone()
-            subscriptionOnboardingVpnIpAddressInfo.show()
+            subscriptionOnboardingVpnIpAddressInfo.setText(R.string.subscriptionOnboardingVpnOffIpAddressInfo)
         }
 
         val benefitIcon = if (vpnOn) R.drawable.check_circle_color_24 else R.drawable.alert_recolorable_24

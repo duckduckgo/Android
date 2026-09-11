@@ -2401,9 +2401,9 @@ class BrowserTabFragment :
         webView?.hide()
         errorView.errorMessage.text = getString(errorType.errorId, url).html(requireContext())
         if (appTheme.isLightModeEnabled()) {
-            errorView.yetiIcon.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_yeti_light)
+            errorView.yetiIcon.setImageResource(com.duckduckgo.mobile.android.R.drawable.dax_accident_light)
         } else {
-            errorView.yetiIcon.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_yeti_dark)
+            errorView.yetiIcon.setImageResource(com.duckduckgo.mobile.android.R.drawable.dax_accident_dark)
         }
         errorView.errorLayout.show()
 
@@ -6726,6 +6726,7 @@ class BrowserTabFragment :
         val activeTabId = viewModel.liveSelectedTab.value?.tabId
         if (!isActiveCustomTab() && tabId != activeTabId) {
             logcat(INFO) { "Will not launch a dialog for an inactive tab" }
+            request.deny()
             return
         }
 

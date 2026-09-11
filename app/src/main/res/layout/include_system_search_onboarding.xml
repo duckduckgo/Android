@@ -39,7 +39,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:src="@drawable/system_search_onboarding_high_five"
+        android:src="@drawable/team_128"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -104,7 +104,7 @@
             android:layout_marginTop="6dp"
             android:layout_marginBottom="6dp"
             app:typography="body2"
-            android:drawableStart="@drawable/ilustration_success"
+            android:drawableStart="@drawable/success_96"
             android:drawablePadding="12dp"
             android:text="@string/systemSearchOnboardingFeatureOneText"/>
 
@@ -114,7 +114,7 @@
             android:layout_marginTop="6dp"
             android:layout_marginBottom="6dp"
             app:typography="body2"
-            android:drawableStart="@drawable/ilustration_success"
+            android:drawableStart="@drawable/success_96"
             android:drawablePadding="12dp"
             android:text="@string/systemSearchOnboardingFeatureTwoText"/>
 
@@ -123,7 +123,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
             android:layout_marginBottom="6dp"
-            android:drawableStart="@drawable/ilustration_success"
+            android:drawableStart="@drawable/success_96"
             app:typography="body2"
             android:drawablePadding="12dp"
             android:text="@string/systemSearchOnboardingFeatureThreeText"/>

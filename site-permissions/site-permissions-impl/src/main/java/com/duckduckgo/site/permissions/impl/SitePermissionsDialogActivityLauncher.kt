@@ -23,11 +23,13 @@ import android.content.res.Configuration
 import android.view.ViewGroup
 import android.webkit.PermissionRequest
 import androidx.activity.result.ActivityResultCaller
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.ui.view.button.ButtonType.GHOST
 import com.duckduckgo.common.ui.view.button.ButtonType.PRIMARY
@@ -39,6 +41,7 @@ import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.formatWithSpans
 import com.duckduckgo.common.utils.extensions.launchApplicationInfoSettings
+import com.duckduckgo.common.utils.extensions.toTldPlusOneOrSelf
 import com.duckduckgo.common.utils.extensions.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.FragmentScope
@@ -48,6 +51,7 @@ import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.duckduckgo.site.permissions.impl.feature.DrmPolicyFeature
+import com.duckduckgo.site.permissions.impl.feature.SitePermissionsDialogRedesignFeature
 import com.duckduckgo.site.permissions.impl.feature.isCentralPolicyEnabled
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType.ALLOW_ALWAYS
@@ -64,6 +68,12 @@ import java.lang.IllegalStateException
 import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 
+private enum class PermissionTier(@StringRes val textId: Int) {
+    ALLOW_WHILE_USING_SITE(R.string.sitePermissionsDialogAllowWhileUsingSiteButton),
+    ALLOW_THIS_TIME(R.string.sitePermissionsDialogAllowThisTimeButton),
+    NEVER_ALLOW(R.string.sitePermissionsDialogNeverAllowButton),
+}
+
 @ContributesBinding(FragmentScope::class)
 class SitePermissionsDialogActivityLauncher @Inject constructor(
     private val systemPermissionsHelper: SystemPermissionsHelper,
@@ -75,6 +85,8 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
     private val duckAiHostProvider: DuckAiHostProvider,
     private val browserMode: BrowserMode,
     private val drmPolicyFeature: DrmPolicyFeature,
+    private val sitePermissionsDialogRedesignFeature: SitePermissionsDialogRedesignFeature,
+    private val tabRepository: TabRepository,
 ) : SitePermissionsDialogLauncher {
 
     private lateinit var sitePermissionRequest: PermissionRequest
@@ -87,6 +99,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
     private var siteURL: String = ""
     private var tabId: String = ""
     private var isDuckAiAudioCapture: Boolean = false
+    private var isThirdParty: Boolean = false
 
     override fun registerPermissionLauncher(caller: ActivityResultCaller) {
         systemPermissionsHelper.registerPermissionLaunchers(
@@ -113,6 +126,14 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         permissionsHandledByUser = permissionsRequested.userHandled
         permissionsHandledAutomatically = permissionsRequested.autoAccept
         isDuckAiAudioCapture = false
+        isThirdParty = isThirdPartyOrigin(url)
+
+        if (isThirdParty && !sitePermissionsDialogRedesignFeature.self().isEnabled() &&
+            permissionsHandledByUser.contains(LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION)
+        ) {
+            denyPermissions()
+            return
+        }
 
         when {
             permissionsHandledByUser.contains(PermissionRequest.RESOURCE_VIDEO_CAPTURE) && permissionsHandledByUser.contains(
@@ -121,6 +142,8 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                 showSitePermissionsRationaleDialog(
                     R.string.sitePermissionsMicAndCameraDialogTitle,
                     R.string.sitePermissionsMicAndCameraDialogSubtitle,
+                    R.string.sitePermissionsTieredMicAndCameraDialogTitle,
+                    CommonR.drawable.ic_video_24,
                     url,
                     SitePermissionsPixelValues.CAMERA_AND_MICROPHONE,
                     { rememberChoice ->
@@ -136,6 +159,8 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                     showSitePermissionsRationaleDialog(
                         R.string.sitePermissionsMicDialogTitle,
                         R.string.sitePermissionsMicDialogSubtitle,
+                        R.string.sitePermissionsTieredMicDialogTitle,
+                        CommonR.drawable.ic_microphone_24,
                         url,
                         SitePermissionsPixelValues.MICROPHONE,
                         { rememberChoice ->
@@ -149,6 +174,8 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                 showSitePermissionsRationaleDialog(
                     R.string.sitePermissionsCameraDialogTitle,
                     R.string.sitePermissionsCameraDialogSubtitle,
+                    R.string.sitePermissionsTieredCameraDialogTitle,
+                    CommonR.drawable.ic_video_24,
                     url,
                     SitePermissionsPixelValues.CAMERA,
                     { rememberChoice ->
@@ -177,8 +204,26 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         this.activity = activity
 
         val domain = locationPermissionRequest.origin.websiteFromGeoLocationsApiOrigin()
+        val isDdgSite = domain == "duckduckgo.com"
 
-        val subtitle = if (domain == "duckduckgo.com") {
+        if (sitePermissionsDialogRedesignFeature.self().isEnabled()) {
+            val titleRes = if (isDdgSite) {
+                R.string.sitePermissionsTieredDdgLocationDialogTitle
+            } else {
+                R.string.sitePermissionsTieredLocationDialogTitle
+            }
+            showTieredSitePermissionsDialog(
+                iconRes = CommonR.drawable.ic_location_24,
+                title = String.format(activity.getString(titleRes), domain),
+                messageRes = R.string.sitePermissionsTieredDdgLocationDialogSubtitle.takeIf { isDdgSite },
+                pixelType = SitePermissionsPixelValues.LOCATION,
+                faviconUrl = locationPermissionRequest.origin,
+                onPermissionAllowed = ::askForLocationPermissions,
+            )
+            return
+        }
+
+        val subtitle = if (isDdgSite) {
             R.string.preciseLocationDDGDialogSubtitle
         } else {
             R.string.preciseLocationSiteDialogSubtitle
@@ -222,11 +267,26 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
     private fun showSitePermissionsRationaleDialog(
         @StringRes titleRes: Int,
         @StringRes messageRes: Int,
+        @StringRes tieredTitleRes: Int,
+        @DrawableRes tieredIconRes: Int,
         url: String,
         pixelType: String,
         onPermissionAllowed: (Boolean) -> Unit,
     ) {
         sendDialogImpressionPixel(pixelType)
+
+        if (sitePermissionsDialogRedesignFeature.self().isEnabled()) {
+            showTieredSitePermissionsDialog(
+                iconRes = tieredIconRes,
+                title = String.format(activity.getString(tieredTitleRes), url.websiteFromGeoLocationsApiOrigin()),
+                messageRes = null,
+                pixelType = pixelType,
+                faviconUrl = null,
+                onPermissionAllowed = onPermissionAllowed,
+            )
+            return
+        }
+
         TextAlertDialogBuilder(activity)
             .setTitle(String.format(activity.getString(titleRes), url.websiteFromGeoLocationsApiOrigin()))
             .setMessage(messageRes)
@@ -249,6 +309,61 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
 
                     override fun onCheckedChanged(checked: Boolean) {
                         rememberChoice = checked
+                    }
+                },
+            )
+            .show()
+    }
+
+    private fun showTieredSitePermissionsDialog(
+        @DrawableRes iconRes: Int,
+        title: CharSequence,
+        @StringRes messageRes: Int?,
+        pixelType: String,
+        faviconUrl: String?,
+        onPermissionAllowed: (Boolean) -> Unit,
+        onPermissionDenied: (Boolean) -> Unit = ::denyPermissions,
+    ) {
+        val tiers = if (isThirdParty) {
+            listOf(PermissionTier.ALLOW_THIS_TIME, PermissionTier.NEVER_ALLOW)
+        } else {
+            listOf(PermissionTier.ALLOW_WHILE_USING_SITE, PermissionTier.ALLOW_THIS_TIME, PermissionTier.NEVER_ALLOW)
+        }
+
+        StackedAlertDialogBuilder(activity)
+            .setRebrandUpdate(true)
+            .setCancellable(true)
+            .setHeaderImageResource(iconRes)
+            .setTitle(title)
+            .setMessage(messageRes?.let { activity.getText(it) } ?: "")
+            .setStackedButtons(tiers.map { StackedButton(it.textId, SECONDARY) })
+            .addEventListener(
+                object : StackedAlertDialogBuilder.EventListener() {
+                    override fun onButtonClicked(position: Int) {
+                        when (tiers[position]) {
+                            PermissionTier.ALLOW_WHILE_USING_SITE -> {
+                                faviconUrl?.let { storeFavicon(it) }
+                                sendPositiveDialogClickPixel(pixelType, rememberChoice = true)
+                                onPermissionAllowed(true)
+                            }
+
+                            PermissionTier.ALLOW_THIS_TIME -> {
+                                sendPositiveDialogClickPixel(pixelType, rememberChoice = false)
+                                onPermissionAllowed(false)
+                            }
+
+                            PermissionTier.NEVER_ALLOW -> {
+                                faviconUrl?.let { storeFavicon(it) }
+                                sendNegativeDialogClickPixel(pixelType, rememberChoice = true)
+                                onPermissionDenied(true)
+                            }
+                        }
+                    }
+
+                    // The tiered dialog has no explicit deny-once button; dismissing it is that choice.
+                    override fun onDialogCancelled() {
+                        sendNegativeDialogClickPixel(pixelType, rememberChoice = false)
+                        onPermissionDenied(false)
                     }
                 },
             )
@@ -285,6 +400,21 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
 
         // No session-based setting and no config --> proceed to show dialog
         val title = url.websiteFromGeoLocationsApiOrigin()
+
+        if (sitePermissionsDialogRedesignFeature.self().isEnabled()) {
+            sendDialogImpressionPixel(SitePermissionsPixelValues.DRM)
+            showTieredSitePermissionsDialog(
+                iconRes = CommonR.drawable.ic_video_player_24,
+                title = String.format(activity.getString(R.string.drmSitePermissionDialogTitle), title),
+                messageRes = R.string.sitePermissionsTieredDrmDialogSubtitle,
+                pixelType = SitePermissionsPixelValues.DRM,
+                faviconUrl = url,
+                onPermissionAllowed = { rememberChoice -> allowDrmPermissions(domain, rememberChoice) },
+                onPermissionDenied = { rememberChoice -> denyDrmPermissions(domain, rememberChoice) },
+            )
+            return
+        }
+
         val dialog = TextAlertDialogBuilder(activity)
         dialog
             .setTitle(
@@ -321,8 +451,6 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                             onSiteDrmPermissionSave(domain, SitePermissionAskSettingType.ALLOW_ALWAYS)
                             storeFavicon(url)
                         } else {
-                            // Fire mode grants the in-session WebView permission below but must not write the
-                            // choice into the shared (app-wide, in-memory) DRM session map that regular tabs read.
                             if (browserMode != BrowserMode.FIRE) {
                                 sitePermissionsRepository.saveDrmForSession(tabId, domain, true)
                             }
@@ -337,8 +465,6 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                             onSiteDrmPermissionSave(domain, SitePermissionAskSettingType.DENY_ALWAYS)
                             storeFavicon(url)
                         } else if (browserMode != BrowserMode.FIRE) {
-                            // Fire mode denied the in-session permission above but must not write the
-                            // choice into the shared (app-wide, in-memory) DRM session map that regular tabs read.
                             sitePermissionsRepository.saveDrmForSession(tabId, domain, false)
                         }
                         sendNegativeDialogClickPixel(SitePermissionsPixelValues.DRM, rememberChoice)
@@ -352,11 +478,41 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
             .show()
     }
 
+    private fun allowDrmPermissions(
+        domain: String,
+        rememberChoice: Boolean,
+    ) {
+        if (browserMode != BrowserMode.FIRE) {
+            if (rememberChoice) {
+                sitePermissionsRepository.sitePermissionPermanentlySaved(siteURL, PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID, ALLOW_ALWAYS)
+            } else {
+                sitePermissionsRepository.saveDrmForSession(tabId, domain, true)
+            }
+        }
+        grantPermissions()
+    }
+
+    private fun isThirdPartyOrigin(requestOrigin: String): Boolean {
+        val pageDomain = tabRepository.retrieveSiteData(tabId).value?.url?.extractDomain() ?: return true
+        val originDomain = requestOrigin.extractDomain() ?: return true
+
+        return pageDomain.toTldPlusOneOrSelf() != originDomain.toTldPlusOneOrSelf()
+    }
+
+    private fun denyDrmPermissions(
+        domain: String,
+        rememberChoice: Boolean,
+    ) {
+        if (!rememberChoice && browserMode != BrowserMode.FIRE) {
+            sitePermissionsRepository.saveDrmForSession(tabId, domain, false)
+        }
+        denyPermissions(rememberChoice)
+    }
+
     private fun onSiteDrmPermissionSave(
         domain: String,
         drmPermission: SitePermissionAskSettingType,
     ) {
-        // Fire mode must not persist a per-site DRM choice into the shared store.
         if (browserMode == BrowserMode.FIRE) return
 
         val sitePermissionsEntity = SitePermissionsEntity(
@@ -540,11 +696,12 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
     private fun systemPermissionDenied() {
         when (systemPermissionsHelper.isPermissionsRejectedForever(activity)) {
             true -> showSystemPermissionsDeniedDialog()
-            false -> showPermissionsDeniedSnackBar()
+            false -> showPermissionsDeniedSnackBar(permissionPermanent)
         }
     }
 
     private fun showPermissionsDeniedSnackBar(rememberChoice: Boolean = false) {
+        val redesigned = sitePermissionsDialogRedesignFeature.self().isEnabled()
         val onPermissionAllowed: () -> Unit
         val message =
             when (permissionRequested) {
@@ -552,17 +709,21 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                     onPermissionAllowed = {
                         askForCameraPermissions(rememberChoice)
                     }
-                    R.string.sitePermissionsCameraDeniedSnackBarMessage
+                    if (redesigned) {
+                        R.string.sitePermissionsTieredCameraDeniedSnackBarMessage
+                    } else {
+                        R.string.sitePermissionsCameraDeniedSnackBarMessage
+                    }
                 }
 
                 SitePermissionsRequestedType.AUDIO -> {
                     onPermissionAllowed = {
                         askForMicPermissions(rememberChoice)
                     }
-                    if (isDuckAiAudioCapture) {
-                        R.string.duckAiMicPermissionDeniedSnackBarMessage
-                    } else {
-                        R.string.sitePermissionsMicDeniedSnackBarMessage
+                    when {
+                        isDuckAiAudioCapture -> R.string.duckAiMicPermissionDeniedSnackBarMessage
+                        redesigned -> R.string.sitePermissionsTieredMicDeniedSnackBarMessage
+                        else -> R.string.sitePermissionsMicDeniedSnackBarMessage
                     }
                 }
 
@@ -570,14 +731,22 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                     onPermissionAllowed = {
                         askForMicAndCameraPermissions(rememberChoice)
                     }
-                    R.string.sitePermissionsCameraAndMicDeniedSnackBarMessage
+                    if (redesigned) {
+                        R.string.sitePermissionsTieredCameraAndMicDeniedSnackBarMessage
+                    } else {
+                        R.string.sitePermissionsCameraAndMicDeniedSnackBarMessage
+                    }
                 }
 
                 SitePermissionsRequestedType.LOCATION -> {
                     onPermissionAllowed = {
                         askForLocationPermissions(rememberChoice)
                     }
-                    R.string.sitePermissionsLocationDeniedSnackBarMessage
+                    if (redesigned) {
+                        R.string.sitePermissionsTieredLocationDeniedSnackBarMessage
+                    } else {
+                        R.string.sitePermissionsLocationDeniedSnackBarMessage
+                    }
                 }
             }
 
@@ -613,16 +782,17 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                 sitePermissionRequest.grant(permissionsHandledAutomatically.toTypedArray())
             } else {
                 sitePermissionRequest.deny()
+            }
 
-                // Fire mode denies the in-session permission above but must not persist the choice.
-                if (rememberChoice && browserMode != BrowserMode.FIRE) {
-                    sitePermissionRequest.resources.forEach { permission ->
-                        sitePermissionsRepository.sitePermissionPermanentlySaved(
-                            siteURL,
-                            permission,
-                            DENY_ALWAYS,
-                        )
-                    }
+            // Only the permissions the dialog offered: a request can also carry auto-accepted ones.
+            // Fire mode answers the request in-session but must not persist the choice.
+            if (rememberChoice && browserMode != BrowserMode.FIRE) {
+                permissionsHandledByUser.forEach { permission ->
+                    sitePermissionsRepository.sitePermissionPermanentlySaved(
+                        siteURL,
+                        permission,
+                        DENY_ALWAYS,
+                    )
                 }
             }
         } catch (e: IllegalStateException) {
@@ -632,31 +802,41 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
     }
 
     private fun showSystemPermissionsDeniedDialog() {
-        denyPermissions(permissionPermanent)
-        val openAppSettings = { activity.launchApplicationInfoSettings() }
+        // OS-level denial is not a site-level Never Allow, so no site choice is persisted here
+        denyPermissions()
+
+        val openAppSettings: () -> Unit = { activity.launchApplicationInfoSettings() }
 
         if (isDuckAiAudioCapture) {
-            StackedAlertDialogBuilder(activity)
-                .setRebrandUpdate(true)
-                .setHeaderImageResource(CommonR.drawable.ic_microphone_24)
-                .setTitle(R.string.duckAiMicPermissionDeniedDialogTitle)
-                .setMessage(R.string.duckAiMicPermissionDeniedDialogContent)
-                .setStackedButtons(
-                    listOf(
-                        StackedButton(R.string.duckAiMicPermissionDeniedDialogPositiveButton, PRIMARY, CommonR.drawable.ic_open_in_16),
-                        StackedButton(R.string.systemPermissionsDeniedDialogNegativeButton, SECONDARY),
-                    ),
-                )
-                .addEventListener(
-                    object : StackedAlertDialogBuilder.EventListener() {
-                        override fun onButtonClicked(position: Int) {
-                            if (position == CHANGE_PERMISSIONS_BUTTON) {
-                                openAppSettings()
-                            }
-                        }
-                    },
-                )
-                .show()
+            showChangePermissionsDialog(
+                iconRes = CommonR.drawable.ic_microphone_24,
+                titleRes = R.string.duckAiMicPermissionDeniedDialogTitle,
+                contentRes = R.string.duckAiMicPermissionDeniedDialogContent,
+                buttonRes = R.string.sitePermissionsDialogChangePermissionsButton,
+                openAppSettings = openAppSettings,
+            )
+        } else if (sitePermissionsDialogRedesignFeature.self().isEnabled()) {
+            showChangePermissionsDialog(
+                iconRes = when (permissionRequested) {
+                    SitePermissionsRequestedType.CAMERA, SitePermissionsRequestedType.CAMERA_AND_AUDIO -> CommonR.drawable.ic_video_24
+                    SitePermissionsRequestedType.AUDIO -> CommonR.drawable.ic_microphone_24
+                    SitePermissionsRequestedType.LOCATION -> CommonR.drawable.ic_location_24
+                },
+                titleRes = when (permissionRequested) {
+                    SitePermissionsRequestedType.CAMERA -> R.string.sitePermissionsTieredSystemDeniedCameraTitle
+                    SitePermissionsRequestedType.AUDIO -> R.string.sitePermissionsTieredSystemDeniedMicTitle
+                    SitePermissionsRequestedType.CAMERA_AND_AUDIO -> R.string.sitePermissionsTieredSystemDeniedCameraAndMicTitle
+                    SitePermissionsRequestedType.LOCATION -> R.string.sitePermissionsTieredSystemDeniedLocationTitle
+                },
+                contentRes = when (permissionRequested) {
+                    SitePermissionsRequestedType.CAMERA -> R.string.sitePermissionsTieredSystemDeniedCameraContent
+                    SitePermissionsRequestedType.AUDIO -> R.string.sitePermissionsTieredSystemDeniedMicContent
+                    SitePermissionsRequestedType.CAMERA_AND_AUDIO -> R.string.sitePermissionsTieredSystemDeniedCameraAndMicContent
+                    SitePermissionsRequestedType.LOCATION -> R.string.sitePermissionsTieredSystemDeniedLocationContent
+                },
+                buttonRes = R.string.sitePermissionsDialogChangePermissionsButton,
+                openAppSettings = openAppSettings,
+            )
         } else {
             val titleRes = when (permissionRequested) {
                 SitePermissionsRequestedType.CAMERA -> R.string.systemPermissionDialogCameraDeniedTitle
@@ -684,6 +864,37 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                 )
                 .show()
         }
+    }
+
+    private fun showChangePermissionsDialog(
+        @DrawableRes iconRes: Int,
+        @StringRes titleRes: Int,
+        @StringRes contentRes: Int,
+        @StringRes buttonRes: Int,
+        openAppSettings: () -> Unit,
+    ) {
+        StackedAlertDialogBuilder(activity)
+            .setRebrandUpdate(true)
+            .setCancellable(true)
+            .setHeaderImageResource(iconRes)
+            .setTitle(titleRes)
+            .setMessage(contentRes)
+            .setStackedButtons(
+                listOf(
+                    StackedButton(buttonRes, PRIMARY, CommonR.drawable.ic_open_in_16),
+                    StackedButton(R.string.systemPermissionsDeniedDialogNegativeButton, SECONDARY),
+                ),
+            )
+            .addEventListener(
+                object : StackedAlertDialogBuilder.EventListener() {
+                    override fun onButtonClicked(position: Int) {
+                        if (position == CHANGE_PERMISSIONS_BUTTON) {
+                            openAppSettings()
+                        }
+                    }
+                },
+            )
+            .show()
     }
 
     private fun storeFavicon(url: String) {

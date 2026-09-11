@@ -222,10 +222,10 @@ import com.duckduckgo.app.onboarding.OnboardingInputScreenLaunchTarget
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.AppStage.ESTABLISHED
 import com.duckduckgo.app.onboarding.store.OnboardingStore
-import com.duckduckgo.app.onboarding.store.SegmentedOnboardingPath
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
+import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
 import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.AppPixelName
@@ -4168,7 +4168,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserClickedSegmentedSearchEndCtaOkButtonThenBubbleHiddenAndInputOpensOnDuckAiTab() = runTest {
-        val cta = daxEndBrandDesignUpdateBubbleCta(segmentedPath = SegmentedOnboardingPath.SEARCH)
+        val cta = daxEndBrandDesignUpdateBubbleCta(segmentedPath = DownloadReasonSelection.SEARCH)
         setCta(cta)
 
         testee.onUserClickCtaOkButton(cta)
@@ -4194,7 +4194,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserClickedSegmentedSearchEndCtaSecondaryButtonThenCtaIsRefreshedAway() = runTest {
-        val cta = daxEndBrandDesignUpdateBubbleCta(segmentedPath = SegmentedOnboardingPath.SEARCH)
+        val cta = daxEndBrandDesignUpdateBubbleCta(segmentedPath = DownloadReasonSelection.SEARCH)
         setCta(cta)
 
         testee.onUserClickCtaSecondaryButton(cta)
@@ -4204,7 +4204,7 @@ class BrowserTabViewModelTest {
         verify(mockOnboardingInputScreenLaunchTarget, never()).setOpenOnDuckAi()
     }
 
-    private fun daxEndBrandDesignUpdateBubbleCta(segmentedPath: SegmentedOnboardingPath?) = DaxEndBrandDesignUpdateBubbleCta(
+    private fun daxEndBrandDesignUpdateBubbleCta(segmentedPath: DownloadReasonSelection?) = DaxEndBrandDesignUpdateBubbleCta(
         onboardingStore = mockOnboardingStore,
         appInstallStore = mockAppInstallStore,
         isLightTheme = true,
@@ -4277,7 +4277,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserClickedDaxSubscriptionCtaOnSegmentedAiPathThenLaunchSubscriptionWithFeaturePageDuckAi() = runTest {
-        whenever(mockOnboardingStore.getSegmentedPathWithAiInput()).thenReturn(SegmentedOnboardingPath.AI)
+        whenever(mockOnboardingStore.getSegmentedPathWithAiInput()).thenReturn(DownloadReasonSelection.AI_CHAT)
         val cta = DaxBubbleCta.DaxSubscriptionCta(
             mockOnboardingStore,
             mockAppInstallStore,
@@ -4293,7 +4293,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserClickedSegmentedAiEndCtaOkButtonThenCtaIsRefreshedAway() = runTest {
-        val cta = daxEndBrandDesignUpdateBubbleCta(segmentedPath = SegmentedOnboardingPath.AI)
+        val cta = daxEndBrandDesignUpdateBubbleCta(segmentedPath = DownloadReasonSelection.AI_CHAT)
         setCta(cta)
 
         testee.onUserClickCtaOkButton(cta)
@@ -6907,6 +6907,20 @@ class BrowserTabViewModelTest {
                 assertEquals(request, this.request)
                 assertEquals(sitePermissions, this.permissionsToRequest)
             }
+        }
+
+    @Test
+    fun whenLocationRequestedByEmbeddedOriginThenDialogCommandIsStillIssued() =
+        runTest {
+            loadUrl("https://example.com/page", isBrowserShowing = true)
+            val request = LocationPermissionRequest("https://embedded.other.com", mock())
+
+            testee.onSitePermissionRequested(
+                request,
+                SitePermissions(emptyList(), listOf(LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION)),
+            )
+
+            assertCommandIssued<Command.ShowSitePermissionsDialog>()
         }
 
     @Test

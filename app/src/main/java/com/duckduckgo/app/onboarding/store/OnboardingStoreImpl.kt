@@ -21,6 +21,7 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
+import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection
 import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -230,14 +231,18 @@ class OnboardingStoreImpl @Inject constructor(
         return preferences.getBoolean(KEY_DUCK_AI_ONBOARDING_FLOW, false)
     }
 
-    override fun setSegmentedOnboardingPath(path: SegmentedOnboardingPath?) {
-        preferences.edit { putString(KEY_SEGMENTED_ONBOARDING_PATH, path?.name) }
+    override fun setDownloadReason(reason: DownloadReasonSelection?) {
+        preferences.edit { putString(KEY_DOWNLOAD_REASON, reason?.name) }
     }
 
-    override fun getSegmentedPathWithAiInput(): SegmentedOnboardingPath? {
+    override fun getDownloadReason(): DownloadReasonSelection? {
+        val stored = preferences.getString(KEY_DOWNLOAD_REASON, null) ?: return null
+        return DownloadReasonSelection.entries.firstOrNull { it.name == stored }
+    }
+
+    override fun getSegmentedPathWithAiInput(): DownloadReasonSelection? {
         if (getInputScreenSelection() != true) return null
-        val stored = preferences.getString(KEY_SEGMENTED_ONBOARDING_PATH, null) ?: return null
-        return SegmentedOnboardingPath.entries.firstOrNull { it.name == stored }
+        return getDownloadReason()?.takeIf { it == DownloadReasonSelection.SEARCH || it == DownloadReasonSelection.AI_CHAT }
     }
 
     companion object {
@@ -247,6 +252,6 @@ class OnboardingStoreImpl @Inject constructor(
         private const val KEY_INPUT_SCREEN_SELECTION_OVERRIDDEN_BY_USER = "inputScreenSelectionOverriddenByUser"
         private const val KEY_DUCK_AI_ONBOARDING_FLOW = "duckAiOnboardingFlow"
         private const val KEY_LINEAR_PLAN_WIDGET_PROMPT_SHOWN = "linearPlanWidgetPromptShown"
-        private const val KEY_SEGMENTED_ONBOARDING_PATH = "segmentedOnboardingPath"
+        private const val KEY_DOWNLOAD_REASON = "downloadReason"
     }
 }

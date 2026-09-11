@@ -350,6 +350,7 @@ class RealExchangeV2RunnerTest {
 
         val negotiation = runner.events.replayCache.filterIsInstance<ExchangeV2Event.VersionNegotiated>().single()
         assertEquals(negotiated.toProtocolVersion(), negotiation.negotiatedVersion)
+        assertEquals(negotiated.toProtocolVersion(), runner.protocolVersion)
     }
 
     @Test
@@ -376,6 +377,7 @@ class RealExchangeV2RunnerTest {
 
         val negotiation = runner.events.replayCache.filterIsInstance<ExchangeV2Event.VersionNegotiated>().single()
         assertEquals(negotiated.toProtocolVersion(), negotiation.negotiatedVersion)
+        assertEquals(negotiated.toProtocolVersion(), runner.protocolVersion)
     }
 
     @Test fun `Scanner reports the scanned code as the source of the peer version`() = runTest {

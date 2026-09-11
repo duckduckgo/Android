@@ -37,8 +37,8 @@ import com.duckduckgo.app.onboarding.OnboardingPreferenceCatalog
 import com.duckduckgo.app.onboarding.OnboardingPromptsExperimentManager
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager.SegmentedOnboardingExperimentVariant
+import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentMetrics
 import com.duckduckgo.app.onboarding.store.OnboardingStore
-import com.duckduckgo.app.onboarding.store.SegmentedOnboardingPath
 import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
 import com.duckduckgo.app.onboarding.ui.page.OnboardingBackground
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
@@ -117,6 +117,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     private val duckAiOnboardingDemo: DuckAiOnboardingDemo,
     private val onboardingPromptsExperimentManager: OnboardingPromptsExperimentManager,
     private val segmentedOnboardingExperimentManager: SegmentedOnboardingExperimentManager,
+    private val segmentedOnboardingExperimentMetrics: SegmentedOnboardingExperimentMetrics,
     private val onboardingPasswordImportExperimentManager: OnboardingPasswordImportExperimentManager,
     private val onboardingPreferenceCatalog: OnboardingPreferenceCatalog,
     private val singleChoiceDataPlugins: ActivePluginPoint<OnboardingSingleChoiceDataPlugin>,
@@ -132,8 +133,10 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         ctx.isReinstall = appBuildConfig.isAppReinstall()
 
         // A restarted run replays from before the branching step, so a branch persisted by a previous
-        // run must not label this run's pre-branch pixels as branched.
+        // run must not label this run's pre-branch pixels as branched, nor keep driving the contextual
+        // CTAs and the segment retention metrics of a branch this run may never reach.
         onboardingPixelSender.clearFlowAttribution()
+        onboardingStore.setDownloadReason(null)
 
         return if (customAiOnboardingResolver.resolve()) {
             // in custom AI onboarding path, the input toggle is enabled by default
@@ -553,8 +556,11 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                             DownloadReasonSelection.SEARCH
                         }
 
+                        // Persisted before the pixel is fired, so this step's own clicked pixel already
+                        // carries the reason as its `variant_download_reason` param.
+                        onboardingStore.setDownloadReason(selection)
                         onboardingPixelSender.fire(pixelName, OnboardingPixelAction.DownloadReasonClicked(selection))
-                        onboardingPixelSender.downloadReasonSelected(selection)
+                        segmentedOnboardingExperimentMetrics.fireDownloadReasonSelectedMetric(selection)
 
                         when (selection) {
                             DownloadReasonSelection.SEARCH -> SwitchTo(segmentedSearchPlan(ctx))
@@ -571,7 +577,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
     private fun segmentedSearchPlan(ctx: NewUserOnboardingPlanContext): LinearOnboardingPlan {
         val duckAiEnabled = SuspendMemo { duckAiOnboardingAvailability.isDuckAiOnboardingEnabled() }
-        onboardingStore.setSegmentedOnboardingPath(SegmentedOnboardingPath.SEARCH)
         return sidePlan(
             id = SEGMENTED_SEARCH_PLAN_ID,
             steps = listOf(
@@ -606,7 +611,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         modelProviderChoice: OnboardingSingleChoiceDataPlugin?,
         togglePositionChoice: OnboardingSingleChoiceDataPlugin?,
     ): LinearOnboardingPlan {
-        onboardingStore.setSegmentedOnboardingPath(SegmentedOnboardingPath.AI)
         applyInputModeSelection(ctx, withAi = true, fireTelemetry = false)
         ctx.onFinish { onboardingInputScreenLaunchTarget.setOpenOnDuckAi() }
         return sidePlan(
@@ -626,7 +630,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         ctx: NewUserOnboardingPlanContext,
         duckAiStateChoice: OnboardingSingleChoiceDataPlugin?,
     ): LinearOnboardingPlan {
-        onboardingStore.setSegmentedOnboardingPath(null)
         applyInputModeSelection(ctx, withAi = false, fireTelemetry = false)
         return sidePlan(
             id = SEGMENTED_NO_AI_PLAN_ID,
@@ -651,7 +654,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
     private fun segmentedBlockAdsPlan(ctx: NewUserOnboardingPlanContext): LinearOnboardingPlan {
         val duckAiEnabled = SuspendMemo { duckAiOnboardingAvailability.isDuckAiOnboardingEnabled() }
-        onboardingStore.setSegmentedOnboardingPath(null)
         return sidePlan(
             id = SEGMENTED_BLOCK_ADS_PLAN_ID,
             steps = listOf(

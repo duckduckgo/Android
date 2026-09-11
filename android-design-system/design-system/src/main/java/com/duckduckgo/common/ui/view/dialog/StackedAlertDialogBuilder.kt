@@ -81,6 +81,7 @@ class StackedAlertDialogBuilder(val context: Context) : DaxAlertDialog {
     private var stackedButtonList: MutableList<StackedButtonSpec> = mutableListOf()
     private var isDestructiveVersion: Boolean = false
     private var isRebrandUpdate: Boolean = false
+    private var isCancellable: Boolean = false
     private var componentCallbacks: ComponentCallbacks? = null
 
     fun setHeaderImageResource(@DrawableRes drawableId: Int): StackedAlertDialogBuilder {
@@ -153,6 +154,15 @@ class StackedAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         return this
     }
 
+    /**
+     * Allows the dialog to be dismissed by tapping outside it or pressing back. Off by default.
+     * [EventListener.onDialogCancelled] only fires when this is enabled.
+     */
+    fun setCancellable(cancellable: Boolean): StackedAlertDialogBuilder {
+        isCancellable = cancellable
+        return this
+    }
+
     fun addEventListener(eventListener: EventListener): StackedAlertDialogBuilder {
         listener = eventListener
         return this
@@ -171,7 +181,7 @@ class StackedAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         val dialogBuilder = MaterialAlertDialogBuilder(context, dialogTheme)
             .setView(dialogContent(binding))
             .apply {
-                setCancelable(false)
+                setCancelable(isCancellable)
                 setOnDismissListener {
                     unregisterConfigurationCallback()
                     listener.onDialogDismissed()
@@ -237,8 +247,9 @@ class StackedAlertDialogBuilder(val context: Context) : DaxAlertDialog {
     }
 
     /**
-     * Rebuilds the dialog against the new configuration. The dialog is not cancellable, so dropping
-     * it on rotation would strand the caller's flow with no way back to it.
+     * Rebuilds the dialog against the new configuration. Dropping it on rotation would strand the
+     * caller's flow: a non-cancellable dialog leaves no way back to it, and a cancellable one would
+     * report a cancellation the user never made.
      */
     private fun registerConfigurationCallback() {
         if (componentCallbacks != null) return

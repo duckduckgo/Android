@@ -58,12 +58,15 @@
 
         <ImageView
             android:id="@+id/topIllustration"
-            android:layout_width="@dimen/messageCtaIllustrationSize"
-            android:layout_height="@dimen/messageCtaIllustrationSize"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_2"
+            android:adjustViewBounds="true"
             android:importantForAccessibility="no"
-            android:scaleType="center"
+            android:maxHeight="@dimen/messageCtaIllustrationSize"
+            android:scaleType="fitCenter"
             android:visibility="gone"
+            app:layout_constrainedWidth="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

@@ -80,6 +80,7 @@ class RealAccountInfoKeyManager @Inject constructor(
     private val thirdPartyCredentialManager: ThirdPartyCredentialManager,
     private val dispatchers: DispatcherProvider,
     private val syncPixels: SyncPixels,
+    private val accountInfoDdgWrapRepairer: AccountInfoDdgWrapRepairer,
 ) : AccountInfoKeyManager {
 
     override suspend fun ensureKeyRegistered(): Result<AccountInfoKeyResult> = withContext(dispatchers.io()) {
@@ -183,30 +184,35 @@ class RealAccountInfoKeyManager @Inject constructor(
                 )
             }
             is SetKeysIfAbsentResult.Existing -> {
+                val publicKeyToAdopt = outcome.publicKey
+                    ?: return adoptExistingFromServer(token, wrapsSent, outcome.kid)
                 logcat { "Sync-UnifiedDevices: another device's key won (kid=${outcome.kid}); adopting from response" }
-                syncPixels.fireUnifiedDeviceListPixel(UnifiedDeviceListPixel.AccountInfoKeyAdoptSuccess)
-                Success(
-                    AccountInfoKeyResult(kid = outcome.kid, publicKey = outcome.publicKey, created = false, wrapsSent = wrapsSent),
-                )
+                finishAdopt(kid = outcome.kid, publicKey = publicKeyToAdopt, wrapsSent = wrapsSent)
             }
             SetKeysIfAbsentResult.ExistsFetchRequired -> adoptExistingFromServer(token, wrapsSent)
         }
     }
 
     /** The server has a key for this purpose but didn't return it (409, or a 200 shim); fetch and adopt it. */
-    private fun adoptExistingFromServer(token: String, wrapsSent: Int): Result<AccountInfoKeyResult> {
+    private fun adoptExistingFromServer(
+        token: String,
+        wrapsSent: Int,
+        expectedKid: String? = null,
+    ): Result<AccountInfoKeyResult> {
         logcat { "Sync-UnifiedDevices: key already exists on server; fetching to adopt" }
         return when (val result = syncApi.getProtectedKeys(token)) {
             is Success -> {
-                val existing = result.data.firstOrNull { it.purpose == SYNC_PURPOSE_ACCOUNT_INFO }
+                val keyToAdopt = result.data.firstOrNull { entry ->
+                    entry.purpose == SYNC_PURPOSE_ACCOUNT_INFO &&
+                        entry.publicKey != null &&
+                        (expectedKid == null || entry.kid == expectedKid)
+                }
+                val publicKeyToAdopt = keyToAdopt?.publicKey
                     ?: return Error(reason = "CreateAccountInfoKey: server reported an existing key but none was found on fetch").also {
                         fireAdoptFailed(it)
                     }
-                logcat { "Sync-UnifiedDevices: adopted existing key (kid=${existing.kid})" }
-                syncPixels.fireUnifiedDeviceListPixel(UnifiedDeviceListPixel.AccountInfoKeyAdoptSuccess)
-                Success(
-                    AccountInfoKeyResult(kid = existing.kid, publicKey = existing.publicKey, created = false, wrapsSent = wrapsSent),
-                )
+                logcat { "Sync-UnifiedDevices: adopted existing key (kid=${keyToAdopt.kid})" }
+                finishAdopt(kid = keyToAdopt.kid, publicKey = publicKeyToAdopt, wrapsSent = wrapsSent, entries = result.data)
             }
             is Error -> {
                 logcat(ERROR) { "Sync-UnifiedDevices: failed to fetch keys to adopt existing: ${result.reason}" }
@@ -214,6 +220,20 @@ class RealAccountInfoKeyManager @Inject constructor(
                 result
             }
         }
+    }
+
+    /** Wrap repair is best-effort: a missing ddg wrap must not fail public-key adoption. */
+    private fun finishAdopt(
+        kid: String,
+        publicKey: RsaJwk,
+        wrapsSent: Int,
+        entries: List<ProtectedKeyEntry>? = null,
+    ): Result<AccountInfoKeyResult> {
+        accountInfoDdgWrapRepairer.repair(kid, entries)
+        syncPixels.fireUnifiedDeviceListPixel(UnifiedDeviceListPixel.AccountInfoKeyAdoptSuccess)
+        return Success(
+            AccountInfoKeyResult(kid = kid, publicKey = publicKey, created = false, wrapsSent = wrapsSent),
+        )
     }
 
     private fun fireAdoptFailed(error: Error) {

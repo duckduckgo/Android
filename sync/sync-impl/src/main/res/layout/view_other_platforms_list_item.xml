@@ -35,7 +35,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        app:leadingIcon="@drawable/ic_device_laptop_install_color_24"
+        app:leadingIcon="@drawable/device_laptop_install_color_24"
         app:leadingIconBackground="circular"
         app:primaryText="@string/sync_simplified_settings_get_desktop_browser_item" />
 </merge>

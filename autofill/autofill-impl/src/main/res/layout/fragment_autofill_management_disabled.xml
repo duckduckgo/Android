@@ -29,7 +29,7 @@ xmlns:tools="http://schemas.android.com/tools"
         <ImageView
             android:id="@+id/disabled_icon"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="170dp"
             android:layout_marginTop="80dp"
             android:contentDescription="@string/managementDisabledModeTitle"
             android:src="@drawable/ic_autofill_keychain"

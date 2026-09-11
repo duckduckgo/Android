@@ -18,6 +18,7 @@ package com.duckduckgo.widget
 
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
+import android.appwidget.AppWidgetProviderInfo
 import android.content.ComponentName
 import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -26,10 +27,12 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.isNull
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.annotation.Config
@@ -50,7 +53,20 @@ class SearchWidgetProviderInfoUpdaterTest {
     fun setUp() {
         whenever(context.packageName).thenReturn(PACKAGE_NAME)
         whenever(toggles.addressBar()).thenReturn(addressBarToggle)
+        givenRegisteredProviders(
+            SearchWidget::class.java.name,
+            SearchWidgetLight::class.java.name,
+            SearchOnlyWidget::class.java.name,
+            SearchAndFavoritesWidget::class.java.name,
+        )
         testee = SearchWidgetProviderInfoUpdater(context, appWidgetManager, toggles)
+    }
+
+    private fun givenRegisteredProviders(vararg classNames: String) {
+        val providers = classNames.map { className ->
+            AppWidgetProviderInfo().apply { provider = ComponentName(PACKAGE_NAME, className) }
+        }
+        whenever(appWidgetManager.getInstalledProvidersForPackage(eq(PACKAGE_NAME), isNull())).thenReturn(providers)
     }
 
     @Test
@@ -127,6 +143,41 @@ class SearchWidgetProviderInfoUpdaterTest {
             )
             verify(appWidgetManager).requestPinAppWidget(provider, null, pendingIntent)
         }
+    }
+
+    @Test
+    fun whenProviderIsNotRegisteredThenItsProviderInfoIsNotUpdated() {
+        whenever(addressBarToggle.isEnabled()).thenReturn(false)
+        givenRegisteredProviders(SearchWidget::class.java.name)
+
+        testee.sync()
+
+        verify(appWidgetManager).updateAppWidgetProviderInfo(
+            eq(ComponentName(PACKAGE_NAME, SearchWidget::class.java.name)),
+            eq(LEGACY_PROVIDER_INFO_METADATA_KEY),
+        )
+        verify(appWidgetManager, never()).updateAppWidgetProviderInfo(
+            eq(ComponentName(PACKAGE_NAME, SearchWidgetLight::class.java.name)),
+            anyOrNull(),
+        )
+        verify(appWidgetManager, never()).updateAppWidgetProviderInfo(
+            eq(ComponentName(PACKAGE_NAME, SearchOnlyWidget::class.java.name)),
+            anyOrNull(),
+        )
+        verify(appWidgetManager, never()).updateAppWidgetProviderInfo(
+            eq(ComponentName(PACKAGE_NAME, SearchAndFavoritesWidget::class.java.name)),
+            anyOrNull(),
+        )
+    }
+
+    @Test
+    fun whenNoProvidersAreRegisteredThenNoProviderInfoIsUpdated() {
+        whenever(addressBarToggle.isEnabled()).thenReturn(false)
+        givenRegisteredProviders()
+
+        testee.sync()
+
+        verify(appWidgetManager, never()).updateAppWidgetProviderInfo(anyOrNull(), anyOrNull())
     }
 
     companion object {

@@ -113,7 +113,8 @@
                     "solveCaptcha",
                     "condition",
                     "getEmailData",
-                    "generateEmail"
+                    "generateEmail",
+                    "executeScript"
                 ]
             },
             {
@@ -463,7 +464,8 @@
                     "solveCaptcha",
                     "condition",
                     "getEmailData",
-                    "generateEmail"
+                    "generateEmail",
+                    "executeScript"
                 ]
             }
         ]
@@ -623,7 +625,8 @@
                     "solveCaptcha",
                     "condition",
                     "getEmailData",
-                    "generateEmail"
+                    "generateEmail",
+                    "executeScript"
                 ]
             },
             {
@@ -708,7 +711,8 @@
                     "solveCaptcha",
                     "condition",
                     "getEmailData",
-                    "generateEmail"
+                    "generateEmail",
+                    "executeScript"
                 ]
             },
             {

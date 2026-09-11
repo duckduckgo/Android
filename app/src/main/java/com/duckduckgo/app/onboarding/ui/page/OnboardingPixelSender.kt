@@ -23,6 +23,7 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.onboarding.OnboardingPreference
+import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection
 import com.duckduckgo.app.pixels.OnboardingPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -119,12 +120,6 @@ interface OnboardingPixelSender {
     fun segmentedFlowStarted()
 
     /**
-     * Records the download reason the user picked. Persisted so it can be attached as the
-     * `variant_segmented` param to every subsequent onboarding pixel.
-     */
-    fun downloadReasonSelected(reason: DownloadReasonSelection)
-
-    /**
      * Clears the persisted flow and variant attribution. Called when a new linear onboarding run
      * starts: a run restarted after an app kill replays from before the branching step, so
      * attribution persisted by a previous run must not label this run's pre-branch pixels.
@@ -145,6 +140,7 @@ class RealOnboardingPixelSender @Inject constructor(
     private val widgetCapabilities: WidgetCapabilities,
     private val deviceInfo: DeviceInfo,
     private val appBuildConfig: AppBuildConfig,
+    private val onboardingStore: OnboardingStore,
 ) : OnboardingPixelSender {
 
     private val variantPrefs by lazy { sharedPreferencesProvider.getSharedPreferences(PREFS_VARIANT_FILENAME) }
@@ -165,14 +161,9 @@ class RealOnboardingPixelSender @Inject constructor(
         variantPrefs.edit().putBoolean(PREFS_KEY_SEGMENTED_FLOW, true).apply()
     }
 
-    override fun downloadReasonSelected(reason: DownloadReasonSelection) {
-        variantPrefs.edit().putString(PREFS_KEY_DOWNLOAD_REASON, downloadReasonToken(reason)).apply()
-    }
-
     override fun clearFlowAttribution() {
         variantPrefs.edit()
             .remove(PREFS_KEY_VARIANT)
-            .remove(PREFS_KEY_DOWNLOAD_REASON)
             .remove(PREFS_KEY_SEGMENTED_FLOW)
             .apply()
     }
@@ -216,7 +207,7 @@ class RealOnboardingPixelSender @Inject constructor(
                 fireStep(pixelName, PIXEL_EVENT_CLICKED, importErrorValue(action.action))
 
             is OnboardingPixelAction.DownloadReasonClicked ->
-                fireStep(pixelName, PIXEL_EVENT_CLICKED, downloadReasonToken(action.reason))
+                fireStep(pixelName, PIXEL_EVENT_CLICKED, action.reason.pixelToken)
 
             is OnboardingPixelAction.PreferencesClicked ->
                 fireStep(pixelName, PIXEL_EVENT_CLICKED, extraParams = preferenceParams(action.selections))
@@ -310,7 +301,7 @@ class RealOnboardingPixelSender @Inject constructor(
             PIXEL_PARAM_PIXEL_SOURCE to deviceInfo.formFactor().description,
         )
         attribution.branchVariant?.let { params[PIXEL_PARAM_VARIANT] = it }
-        attribution.segmentedVariant?.let { params[PIXEL_PARAM_VARIANT_SEGMENTED] = it }
+        attribution.downloadReasonVariant?.let { params[PIXEL_PARAM_VARIANT_DOWNLOAD_REASON] = it }
         params[PIXEL_PARAM_DAYS_SINCE_INSTALL] = daysSinceInstallBucket(days)
         return params
     }
@@ -330,8 +321,8 @@ class RealOnboardingPixelSender @Inject constructor(
             PREFS_VARIANT_CHAT -> VARIANT_CHAT
             else -> null
         },
-        segmentedVariant = variantPrefs.getString(PREFS_KEY_DOWNLOAD_REASON, null)
-            ?.let { "$VARIANT_DOWNLOAD_REASON_PREFIX$it" },
+        downloadReasonVariant = onboardingStore.getDownloadReason()
+            ?.let { "$VARIANT_DOWNLOAD_REASON_PREFIX${it.pixelToken}" },
     )
 
     /**
@@ -342,15 +333,8 @@ class RealOnboardingPixelSender @Inject constructor(
     private data class FlowAttribution(
         val isSegmentedFlow: Boolean,
         val branchVariant: String?,
-        val segmentedVariant: String?,
+        val downloadReasonVariant: String?,
     )
-
-    private fun downloadReasonToken(reason: DownloadReasonSelection): String = when (reason) {
-        DownloadReasonSelection.SEARCH -> DOWNLOAD_REASON_SEARCH
-        DownloadReasonSelection.AI_CHAT -> DOWNLOAD_REASON_AI_CHAT
-        DownloadReasonSelection.NO_AI -> DOWNLOAD_REASON_NO_AI
-        DownloadReasonSelection.BLOCK_ADS -> DOWNLOAD_REASON_AD_BLOCKING
-    }
 
     private fun preferenceParams(selections: Map<OnboardingPreference, Boolean>): Map<String, String> =
         selections.entries.associate { (preference, enabled) ->
@@ -399,7 +383,7 @@ class RealOnboardingPixelSender @Inject constructor(
         private const val PIXEL_PARAM_DAYS_SINCE_INSTALL = "daysSinceInstall"
         private const val PIXEL_PARAM_FLOW = "flow"
         private const val PIXEL_PARAM_VARIANT = "variant"
-        private const val PIXEL_PARAM_VARIANT_SEGMENTED = "variant_segmented"
+        private const val PIXEL_PARAM_VARIANT_DOWNLOAD_REASON = "variant_download_reason"
         private const val PIXEL_PARAM_PIXEL_SOURCE = "pixelSource"
 
         private const val PIXEL_EVENT_SHOWN = "shown"
@@ -419,15 +403,9 @@ class RealOnboardingPixelSender @Inject constructor(
 
         private const val PREFS_VARIANT_FILENAME = "com.duckduckgo.app.onboarding.variant"
         private const val PREFS_KEY_VARIANT = "variant"
-        private const val PREFS_KEY_DOWNLOAD_REASON = "downloadReason"
         private const val PREFS_KEY_SEGMENTED_FLOW = "segmentedFlow"
         private const val PREFS_VARIANT_SEARCH = "search"
         private const val PREFS_VARIANT_CHAT = "chat"
-
-        private const val DOWNLOAD_REASON_SEARCH = "search"
-        private const val DOWNLOAD_REASON_AI_CHAT = "ai-chat"
-        private const val DOWNLOAD_REASON_NO_AI = "no-ai"
-        private const val DOWNLOAD_REASON_AD_BLOCKING = "ad-blocking"
 
         private const val PARAM_RECENTLY_VISITED_SITES_ENABLED = "recently_visited_sites_enabled"
         private const val PARAM_SAFE_SEARCH_ENABLED = "safe_search_enabled"

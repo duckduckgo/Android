@@ -297,7 +297,7 @@ import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.onboarding.OnboardingInputScreenLaunchTarget
 import com.duckduckgo.app.onboarding.store.OnboardingStore
-import com.duckduckgo.app.onboarding.store.SegmentedOnboardingPath
+import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection
 import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_RESULT_DELETED
@@ -481,7 +481,6 @@ import logcat.LogPriority.VERBOSE
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
-import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
@@ -2786,30 +2785,9 @@ class BrowserTabViewModel @Inject constructor(
         request: PermissionRequest,
         sitePermissionsAllowedToAsk: SitePermissions,
     ) {
-        if (request is LocationPermissionRequest) {
-            if (!sameEffectiveTldPlusOne(site, request.origin)) {
-                logcat { "Permissions: sameEffectiveTldPlusOne false" }
-                request.deny()
-                return
-            }
-        }
-
         viewModelScope.launch(dispatchers.main()) {
             command.value = ShowSitePermissionsDialog(sitePermissionsAllowedToAsk, request)
         }
-    }
-
-    private fun sameEffectiveTldPlusOne(
-        site: Site?,
-        origin: String,
-    ): Boolean {
-        val siteDomain = site?.url?.toHttpUrlOrNull() ?: return false
-        val originDomain = origin.toUri().toString().toHttpUrlOrNull() ?: return false
-
-        val siteETldPlusOne = siteDomain.topPrivateDomain()
-        val originETldPlusOne = originDomain.topPrivateDomain()
-
-        return siteETldPlusOne == originETldPlusOne
     }
 
     private fun registerSiteVisit() {
@@ -5552,7 +5530,7 @@ class BrowserTabViewModel @Inject constructor(
                     val uri = "https://duckduckgo.com/pro".toUri().buildUpon()
                         .appendQueryParameter("origin", "funnel_onboarding_android")
                         .apply {
-                            val isSegmentedAiPath = onboardingStore.getSegmentedPathWithAiInput() == SegmentedOnboardingPath.AI
+                            val isSegmentedAiPath = onboardingStore.getSegmentedPathWithAiInput() == DownloadReasonSelection.AI_CHAT
                             if (customAiOnboardingStore.isEnabled() || isSegmentedAiPath) {
                                 appendQueryParameter("featurePage", "duckai")
                             }
@@ -5568,7 +5546,7 @@ class BrowserTabViewModel @Inject constructor(
                 refresh()
             }
             is DaxEndBrandDesignUpdateBubbleCta -> {
-                if (cta.segmentedPathWithAiInput == SegmentedOnboardingPath.SEARCH) {
+                if (cta.segmentedPathWithAiInput == DownloadReasonSelection.SEARCH) {
                     viewModelScope.launch {
                         ctaViewState.value = currentCtaViewState().copy(cta = null)
                         command.value = HideOnboardingDaxBubbleCta(cta)

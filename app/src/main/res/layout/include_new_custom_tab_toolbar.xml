@@ -99,7 +99,7 @@
         android:padding="@dimen/keyline_2"
         android:layout_marginStart="@dimen/keyline_0"
         android:importantForAccessibility="no"
-        android:src="@drawable/ic_video_player_color_24"
+        android:src="@drawable/video_player_color_24"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@id/animatedIconBackgroundView"

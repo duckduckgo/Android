@@ -33,6 +33,7 @@
   var Symbol2 = globalThis.Symbol;
   var hasOwnProperty = Object.prototype.hasOwnProperty;
   var dispatchEvent = globalThis.dispatchEvent?.bind(globalThis);
+  var performanceNow = globalThis.performance?.now?.bind(globalThis.performance) ?? Date.now;
   var addEventListener = globalThis.addEventListener?.bind(globalThis);
   var removeEventListener = globalThis.removeEventListener?.bind(globalThis);
   var CustomEvent2 = globalThis.CustomEvent;
@@ -546,6 +547,7 @@
     "webInterferenceDetection",
     "webDetection",
     "webEvents",
+    "detectorPerf",
     "pageObserver",
     "hover",
     "trackerProtection",
@@ -611,6 +613,7 @@
       "webDetection",
       "webEvents",
       "webInterferenceDetection",
+      "detectorPerf",
       "windowsPermissionUsage",
       "uaChBrands",
       "brokerProtection",
@@ -646,6 +649,7 @@
       "webDetection",
       "webEvents",
       "webInterferenceDetection",
+      "detectorPerf",
       "webTelemetry",
       "pageObserver",
       "hover",
@@ -660,6 +664,7 @@
       "webDetection",
       "webEvents",
       "webInterferenceDetection",
+      "detectorPerf",
       "breakageReporting",
       "duckPlayer",
       "messageBridge",
@@ -689,6 +694,7 @@
       "webDetection",
       "webEvents",
       "webInterferenceDetection",
+      "detectorPerf",
       "webTelemetry",
       "windowsPermissionUsage",
       "uaChBrands",
@@ -6261,6 +6267,29 @@
     }
   };
 
+  // src/features/detector-perf.js
+  var EVENT_PREFIX = "detectorPerf";
+  var SEVERE_EVENT_TYPE = `${EVENT_PREFIX}_severe`;
+  var DEBUG_STATS_EVENT_TYPE = `${EVENT_PREFIX}DebugStats`;
+  function timeDetector(feature, name, fn, detail) {
+    const t0 = performanceNow();
+    let failed = true;
+    try {
+      const result = fn();
+      failed = false;
+      return result;
+    } finally {
+      const durationMs = performanceNow() - t0;
+      void reportDuration(feature, name, durationMs, detail, failed);
+    }
+  }
+  async function reportDuration(feature, name, durationMs, detail, failed) {
+    try {
+      await feature.callFeatureMethod("detectorPerf", "record", name, durationMs, detail, failed);
+    } catch {
+    }
+  }
+
   // src/features/web-detection/parse.js
   var DEFAULT_RUN_CONDITIONS = (
     /** @type {import('../../config-feature.js').ConditionBlock[]} */
@@ -6500,7 +6529,7 @@
   }
 
   // src/features/web-detection.js
-  var _detectors, _matchedDetectors;
+  var _detectors, _matchedDetectors, _detectorPerfEnabled;
   var WebDetection = class extends ContentFeature {
     constructor() {
       super(...arguments);
@@ -6508,24 +6537,32 @@
       __privateAdd(this, _detectors, {});
       /** @type {Map<string, boolean>} */
       __privateAdd(this, _matchedDetectors, /* @__PURE__ */ new Map());
+      __privateAdd(this, _detectorPerfEnabled, false);
       __publicField(this, "_exposedMethods", this._declareExposedMethods(["runDetectors"]));
     }
     /**
      * Initialize the feature by loading detector configurations
      */
     init() {
+      __privateSet(this, _detectorPerfEnabled, hasOwnProperty.call(this.featureSettings ?? {}, "detectorPerf"));
       const detectorsConfig = this.getFeatureSetting("detectors");
       __privateSet(this, _detectors, parseDetectors(detectorsConfig));
       this._scheduleAutoRunDetectors();
     }
     /**
+     * Evaluate one configured detector and record its execution time.
      *
      * @param {DetectorConfig} detectorConfig
+     * @param {string} groupName - detector group, e.g. `adwalls`
+     * @param {string} fullDetectorId - `groupName.detectorId`, e.g. `adwalls.generic_en`
      * @returns {DetectorMatchResult}
      */
-    _evaluateMatch(detectorConfig) {
+    _evaluateMatch(detectorConfig, groupName, fullDetectorId) {
       try {
-        return evaluateMatch(detectorConfig.match);
+        if (!__privateGet(this, _detectorPerfEnabled)) {
+          return evaluateMatch(detectorConfig.match);
+        }
+        return timeDetector(this, groupName, () => evaluateMatch(detectorConfig.match), fullDetectorId);
       } catch {
         return "error";
       }
@@ -6543,6 +6580,7 @@
           for (const interval of autoTrigger.when.intervalMs) {
             const atInterval = detectorsByInterval.get(interval) ?? [];
             atInterval.push({
+              groupName,
               detectorId: fullDetectorId,
               config: detectorConfig
             });
@@ -6552,23 +6590,24 @@
       }
       for (const [interval, detectors] of detectorsByInterval.entries()) {
         setTimeout(() => {
-          for (const { detectorId, config } of detectors) {
-            this._runAutoDetector(detectorId, config);
+          for (const { groupName, detectorId, config } of detectors) {
+            this._runAutoDetector(groupName, detectorId, config);
           }
         }, interval);
       }
     }
     /**
      * Run a single detector with the auto trigger
+     * @param {string} groupName - The detector group
      * @param {string} fullDetectorId - The full detector ID (groupName.detectorId)
      * @param {DetectorConfig} detectorConfig - The detector configuration
      */
-    _runAutoDetector(fullDetectorId, detectorConfig) {
+    _runAutoDetector(groupName, fullDetectorId, detectorConfig) {
       try {
         if (__privateGet(this, _matchedDetectors).get(fullDetectorId)) {
           return;
         }
-        const detected = this._evaluateMatch(detectorConfig);
+        const detected = this._evaluateMatch(detectorConfig, groupName, fullDetectorId);
         if (detected === true) {
           __privateGet(this, _matchedDetectors).set(fullDetectorId, true);
         }
@@ -6630,11 +6669,12 @@
       for (const [groupName, groupDetectors] of Object.entries(__privateGet(this, _detectors))) {
         for (const [detectorId, detectorConfig] of Object.entries(groupDetectors)) {
           if (!this._shouldRunDetector(detectorConfig, options)) continue;
-          const detected = this._evaluateMatch(detectorConfig);
+          const fullDetectorId = `${groupName}.${detectorId}`;
+          const detected = this._evaluateMatch(detectorConfig, groupName, fullDetectorId);
           if (options.trigger === "breakageReport" && this._isStateEnabled(detectorConfig.actions.breakageReportData.state)) {
             if (detected !== false) {
               results.push({
-                detectorId: `${groupName}.${detectorId}`,
+                detectorId: fullDetectorId,
                 detected
               });
             }
@@ -6647,6 +6687,7 @@
   };
   _detectors = new WeakMap();
   _matchedDetectors = new WeakMap();
+  _detectorPerfEnabled = new WeakMap();
 
   // src/features/web-events.js
   var MSG_WEB_EVENT = "webEvent";
@@ -7596,6 +7637,8 @@
           result.detectorData = {
             botDetection: runBotDetection(detectorSettings.botDetection),
             fraudDetection: runFraudDetection(detectorSettings.fraudDetection),
+            // youtubeAds is intentionally not timed: the YouTube detector is
+            // excluded from detectorPerf and keeps its own internal metrics.
             youtubeAds: runYoutubeAdDetection(detectorSettings.youtubeAds)
           };
         }
@@ -7607,6 +7650,10 @@
         }
         if (result.detectorData) {
           breakageDataPayload.detectorData = result.detectorData;
+        }
+        const detectorPerfStats = await this.callFeatureMethod("detectorPerf", "getStats");
+        if (!(detectorPerfStats instanceof CallFeatureMethodError) && detectorPerfStats != null) {
+          breakageDataPayload.detectorPerf = detectorPerfStats;
         }
         if (Object.keys(breakageDataPayload).length > 0) {
           try {

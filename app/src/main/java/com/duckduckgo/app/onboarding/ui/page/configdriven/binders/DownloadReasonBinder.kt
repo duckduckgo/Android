@@ -144,6 +144,6 @@ class DownloadReasonBinder(
     }
 
     companion object {
-        private val SELECTION_ANIMATION_DELAY = 300.milliseconds
+        private val SELECTION_ANIMATION_DELAY = 100.milliseconds
     }
 }

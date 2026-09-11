@@ -60,7 +60,6 @@
     <string name="duckAiMicPermissionDeniedSnackBarMessage">Pro hlasové funkce je potřeba povolit přístup k mikrofonu</string>
     <string name="duckAiMicPermissionDeniedDialogTitle">DuckDuckGo potřebuje přístup k mikrofonu</string>
     <string name="duckAiMicPermissionDeniedDialogContent">Pokud chceš v Duck.ai používat hlasový chat, je potřeba povolit přístup k mikrofonu.</string>
-    <string name="duckAiMicPermissionDeniedDialogPositiveButton">Změnit oprávnění</string>
 
     <string name="sitePermissionsSettingsDescription">Stránky, které navštívíš, můžou žádat o přístup k fotoaparátu, mikrofonu, softwaru DRM (Digital Rights Management) nebo k poloze tvého zařízení. Přístup mít nebudou, pokud jim ho výslovně nepovolíš.</string>
     <string name="sitePermissionsSettingsEnablePermissionTitle">Povolit všem webům, aby žádaly o:</string>
@@ -76,5 +75,34 @@
     <string name="permissionsPerWebsiteAllowSetting">Povolit</string>
     <string name="permissionsPerWebsiteAskDisabledSetting">Zakázáno pro všechny weby</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s – povolení pro web %2$s</string>
+
+    <!-- Tiered permission dialog -->
+    <string name="sitePermissionsDialogAllowWhileUsingSiteButton" instruction="Button granting a website a permission for every visit, until the user changes it">Povolit při používání webu</string>
+    <string name="sitePermissionsDialogAllowThisTimeButton" instruction="Button granting a website a permission for the current visit only">Povolit tentokrát</string>
+    <string name="sitePermissionsDialogNeverAllowButton" instruction="Button refusing a website a permission for every visit, until the user changes it">Nikdy nepovolit</string>
+    <string name="sitePermissionsTieredLocationDialogTitle" instruction="Placeholder is a website">Webová stránka \"%1$s\" chce získat přístup ke tvé poloze</string>
+    <string name="sitePermissionsTieredDdgLocationDialogTitle" instruction="Placeholder is a website">„%1$s“ chce získat přístup ke tvé poloze</string>
+    <string name="sitePermissionsTieredDdgLocationDialogSubtitle">Tvoji polohu anonymizujeme a použijeme ji k tomu, abychom ti poskytovali lepší výsledky ve tvé blízkosti.</string>
+    <string name="sitePermissionsTieredCameraDialogTitle" instruction="Placeholder is a website">Webová stránka \"%1$s\" chce získat přístup k tvému fotoaparátu</string>
+    <string name="sitePermissionsTieredMicDialogTitle" instruction="Placeholder is a website">Webová stránka \"%1$s\" chce získat přístup k tvému mikrofonu</string>
+    <string name="sitePermissionsTieredMicAndCameraDialogTitle" instruction="Placeholder is a website">Webová stránka \"%1$s\" chce získat přístup k tvému fotoaparátu a mikrofonu</string>
+    <string name="sitePermissionsTieredDrmDialogSubtitle">Pokud to nepovolíš, může se stát, že nepůjdou přehrát videa na stránce, ale tento web nebude mít přístup k identifikátorům zařízení poskytovaným softwarem DRM.</string>
+
+    <!-- Reminder dialog -->
+    <string name="sitePermissionsDialogChangePermissionsButton" instruction="Button opening the DuckDuckGo permission settings in the Android system settings app">Změnit oprávnění</string>
+    <string name="sitePermissionsTieredSystemDeniedLocationTitle">DuckDuckGo potřebuje přístup k poloze</string>
+    <string name="sitePermissionsTieredSystemDeniedLocationContent">Pokud chceš na tomto webu používat funkce polohy, je potřeba povolit přístup k poloze.</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraTitle">DuckDuckGo potřebuje přístup k fotoaparátu</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraContent">Pokud chceš na tomto webu používat funkce fotoaparátu, je potřeba povolit přístup k fotoaparátu.</string>
+    <string name="sitePermissionsTieredSystemDeniedMicTitle">DuckDuckGo potřebuje přístup k mikrofonu</string>
+    <string name="sitePermissionsTieredSystemDeniedMicContent">Pokud chceš na tomto webu používat funkce mikrofonu, je potřeba povolit přístup k mikrofonu.</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraAndMicTitle">DuckDuckGo potřebuje přístup k fotoaparátu a mikrofonu</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraAndMicContent">Pokud chceš na tomto webu používat funkce fotoaparátu a mikrofonu, je potřeba povolit přístup k fotoaparátu a mikrofonu.</string>
+
+    <!-- Denial snackbar -->
+    <string name="sitePermissionsTieredLocationDeniedSnackBarMessage">DuckDuckGo nemohl sdílet polohu s tímto webem</string>
+    <string name="sitePermissionsTieredCameraDeniedSnackBarMessage">DuckDuckGo nemohl tomuto webu udělit přístup k fotoaparátu</string>
+    <string name="sitePermissionsTieredMicDeniedSnackBarMessage">DuckDuckGo nemohl tomuto webu udělit přístup k mikrofonu</string>
+    <string name="sitePermissionsTieredCameraAndMicDeniedSnackBarMessage">DuckDuckGo nemohlo tomuto webu udělit přístup k fotoaparátu a mikrofonu</string>
 
 </resources>

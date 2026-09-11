@@ -136,7 +136,7 @@ private fun DaxRemoteMessageWithIllustrationPreview() {
         DaxRemoteMessageWithIllustration(
             title = "Remote Message With Illustration",
             body = "Body text goes here.",
-            topIllustration = painterResource(R.drawable.ic_critical_update),
+            topIllustration = painterResource(R.drawable.critical_update_96),
             onDismissClicked = {},
             modifier = Modifier.padding(dimensionResource(R.dimen.keyline_4)),
         )

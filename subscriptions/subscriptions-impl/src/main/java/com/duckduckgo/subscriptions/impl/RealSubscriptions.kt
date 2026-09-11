@@ -37,6 +37,7 @@ import com.duckduckgo.subscriptions.api.Product.DuckAiPlus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.api.model.Entitlement
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ORIGIN_QUERY_PARAM_KEY
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PRIVACY_SUBSCRIPTIONS_PATH
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.SUBSCRIPTIONS_ETLD
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.SUBSCRIPTIONS_PATH
@@ -124,7 +125,7 @@ class RealSubscriptions @Inject constructor(
     }
 
     override fun launchSubscription(context: Context, uri: Uri?) {
-        val origin = uri?.getQueryParameter("origin")
+        val origin = uri?.getQueryParameter(ORIGIN_QUERY_PARAM_KEY)
         // Launch the subscription web view on top of the caller's task, with no Settings screen
         // pre-stacked beneath it. The user returns to wherever they came from on a plain back; the
         // subscription screen navigates to Settings itself only on completion (see
@@ -259,6 +260,12 @@ interface SubscriptionsFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun allowProTierPurchase(): Toggle
+
+    /**
+     * When enabled, the paywall opens a faster-rendering page
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun performanceOptimizedPaywalls(): Toggle
 
     /**
      * When enabled, pending plan hint is displayed to users.

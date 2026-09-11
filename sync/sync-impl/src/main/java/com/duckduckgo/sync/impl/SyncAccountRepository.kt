@@ -180,6 +180,7 @@ class AppSyncAccountRepository @Inject constructor(
     private val signupAccountInfoBuilder: SignupAccountInfoBuilder,
     private val deviceInfoUpdater: DeviceInfoUpdater,
     private val deviceInfoPublishWatcher: DeviceInfoPublishWatcher,
+    private val accountInfoDdgWrapRepairer: AccountInfoDdgWrapRepairer,
 ) : SyncAccountRepository {
 
     // Bounded backoff for the 3party→ddg upgrade network calls.
@@ -187,6 +188,9 @@ class AppSyncAccountRepository @Inject constructor(
 
     // The user id we've already re-published device_info for. Stops us repairing again every time the device list is shown.
     private val republishedDeviceInfoForUserId = AtomicReference<String?>(null)
+
+    // Same latch shape for a missing ddg account_info wrap. Released on failure so the next list load can retry.
+    private val repairedAccountInfoDdgWrapForUserId = AtomicReference<String?>(null)
 
     /**
      * If there is a key-exchange flow in progress, we need to keep a reference to them
@@ -995,6 +999,9 @@ class AppSyncAccountRepository @Inject constructor(
                     val decryptResult = thirdPartyDeviceListDecryptor.decryptAll(entriesV2, syncStore.deviceId, publishSnapshot)
                     logoutFailedV2Devices(decryptResult.undecryptable)
                     fireUnifiedDeviceListReadPixels(decryptResult)
+                    if (decryptResult.keyUnavailableReason == AccountInfoKeyUnavailableReason.NO_WRAP_FOR_OUR_CREDENTIAL) {
+                        repairAccountInfoDdgWrap()
+                    }
                     if (decryptResult.thisDeviceInfoNeedsRepair) republishThisDeviceInfo()
                     decryptResult.decrypted.map { it.toConnectedDevice() }
                 } else {
@@ -1067,6 +1074,29 @@ class AppSyncAccountRepository @Inject constructor(
                     logcat(WARN) { "Sync-UnifiedDevices: device_info re-publish failed: ${result.reason}" }
                     // release the slot so the next device list load can try again, without clobbering a claim another account has since made
                     republishedDeviceInfoForUserId.compareAndSet(userId, null)
+                }
+            }
+        }
+    }
+
+    /**
+     * Best-effort add of a missing ddg wrap after a list read that could not unwrap account_info for this credential.
+     * Native (ddg) devices only: a 3party device already holds the wrap it needs. Failure never changes the list
+     * being built; the per-account latch is released so the next load can retry without clobbering another account.
+     */
+    private fun repairAccountInfoDdgWrap() {
+        if ((syncStore.credentialId ?: CREDENTIAL_ID_DDG) != CREDENTIAL_ID_DDG) return
+        val userId = syncStore.userId ?: return
+        val kid = syncStore.accountInfoPublicKey?.keyId ?: return
+        if (repairedAccountInfoDdgWrapForUserId.getAndSet(userId) == userId) return
+
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            logcat { "Sync-UnifiedDevices: ddg account_info wrap unavailable on read; repairing it" }
+            when (val result = accountInfoDdgWrapRepairer.repair(kid)) {
+                is Success -> logcat { "Sync-UnifiedDevices: ddg account_info wrap repaired" }
+                is Error -> {
+                    logcat(WARN) { "Sync-UnifiedDevices: ddg account_info wrap repair failed: ${result.reason}" }
+                    repairedAccountInfoDdgWrapForUserId.compareAndSet(userId, null)
                 }
             }
         }

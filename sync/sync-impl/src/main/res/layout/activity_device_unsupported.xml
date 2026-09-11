@@ -37,7 +37,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="80dp"
             android:importantForAccessibility="no"
-            android:src="@drawable/device_not_supported_android_128"
+            android:src="@drawable/mobile_device_not_supported_android_128"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

@@ -960,6 +960,22 @@
     <string name="preOnboardingWidgetPromptPrimaryCta">Minialkalmazás hozzáadása</string>
     <string name="preOnboardingWidgetPromptSecondaryCta">Kihagyás</string>
 
+    <!-- Pre-onboarding: import passwords -->
+    <string name="preOnboardingImportPasswordsTitle">Jelszavak importálása a Google-ból</string>
+    <string name="preOnboardingImportPasswordsBody">A Google megkérhet, hogy jelentkezz be, vagy a megerősítéshez add meg a jelszavad.</string>
+    <string name="preOnboardingImportPasswordsPrimaryCta">Importálás a Google-ból</string>
+    <string name="preOnboardingImportCompleteTitle">Importálás kész</string>
+    <string name="preOnboardingImportCompleteCta">Folytatás</string>
+    <string name="preOnboardingImportCompleteParsingTitle">Jelszavak importálása</string>
+    <string name="preOnboardingImportCompleteParsingBody">Ez csak egy pillanatig tart.</string>
+    <string name="preOnboardingImportCompleteFailedTitle">Az importálás nem sikerült</string>
+    <string name="preOnboardingImportCompleteFailed">A jelszó importálása nem sikerült</string>
+    <string name="preOnboardingImportCompleteImported" instruction="Placeholder is the number of passwords that were imported.">Importált jelszó: %1$s</string>
+    <string name="preOnboardingImportCompleteSkipped" instruction="Placeholder is the number of passwords that were not imported.">Kihagyott (ismétlődő vagy érvénytelen): %1$s</string>
+    <string name="preOnboardingImportErrorTitle">Hiba történt</string>
+    <string name="preOnboardingImportErrorBody">Próbálkozz újra.</string>
+    <string name="preOnboardingImportErrorRetry">Próbálkozz újra</string>
+
     <!-- Pre-onboarding: add to home screen -->
     <string name="preOnboardingDockStepTitle">Adj hozzá a kedvencek sorához.</string>
     <string name="preOnboardingAddToDockBody">Keresd meg a DuckDuckGo ikont a kezdőképernyőn. Ezután az ikont nyomva tartva húzd a helyére. Ennyi az egész!</string>
