@@ -28,6 +28,7 @@ import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
+import com.duckduckgo.pir.api.dashboard.PirDashboardWebViewScreen
 import com.duckduckgo.pir.impl.checker.PirWorkHandler
 import com.duckduckgo.pir.impl.checker.isEnabled
 import com.duckduckgo.pir.impl.dashboard.PirDashboardUrlProvider
@@ -88,6 +89,12 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun setupViews() {
+        // intentionally not gated on canRunPir(): this exists so a non-subscriber can reach the
+        // dashboard while the subscription-gated entry point is hidden for them
+        binding.pirOpenDashboard.setOnClickListener {
+            globalActivityStarter.start(this, PirDashboardWebViewScreen)
+        }
+
         binding.pirDebugScan.setOnClickListener {
             globalActivityStarter.start(this, PirDevScanScreenNoParams)
         }
