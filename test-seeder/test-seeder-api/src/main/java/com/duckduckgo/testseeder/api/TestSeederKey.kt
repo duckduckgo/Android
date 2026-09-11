@@ -22,7 +22,11 @@ package com.duckduckgo.testseeder.api
  * E2E tests rely on.
  */
 enum class TestSeederKey(val key: String, val description: String) {
-    IS_MAESTRO("isMaestro", "Required gate. Must be \"true\" for any seeding to run."),
+    IS_MAESTRO("isMaestro", "Gate for Maestro E2E flows. Must be \"true\" for seeding to run from a Maestro test."),
+    IS_MACROBENCHMARK(
+        "isMacrobenchmark",
+        "Gate for macrobenchmark runs. Must be \"true\" for seeding to run from a macrobenchmark test.",
+    ),
     OMNIBAR_POSITION("omnibarPosition", "Sets omnibar position. Values: top | bottom | split"),
     NATIVE_INPUT_TOGGLE("nativeInputToggle", "Enables unified native input. Values: true | false"),
     INPUT_WITH_AI_TOGGLE("inputWithAiToggle", "Enables AI in input screen. Values: true | false"),
@@ -44,5 +48,9 @@ enum class TestSeederKey(val key: String, val description: String) {
             |This is the referrer part of a Play Store link such as:
             |https://play.google.com/store/apps/details?id=com.duckduckgo.mobile.android&referrer=origin%3Dfunnel_appnosupport_website%26onboarding%3Dai
         """.trimMargin(),
+    ),
+    USER_ALLOW_LIST(
+        "userAllowList",
+        "Comma-separated domains to replace the user allow list with (protections off). Empty value clears the list.",
     ),
 }
