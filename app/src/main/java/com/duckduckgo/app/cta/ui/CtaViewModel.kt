@@ -74,6 +74,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
@@ -359,7 +360,8 @@ class CtaViewModel @Inject constructor(
 
     suspend fun getFireDialogCta(): OnboardingDaxDialogCta? {
         return withContext(dispatchers.io()) {
-            if (!daxOnboardingActive() || daxDialogFireEducationShown()) return@withContext null
+            if (!daxOnboardingActive() || daxDialogFireEducationShown() || hideTips()) return@withContext null
+            if (tooManyTabsOpenForFireEducation()) return@withContext null
             if (isBrandDesignUpdateEnabled()) {
                 return@withContext DaxFireButtonBrandDesignUpdateContextualCta(
                     onboardingStore = onboardingStore,
@@ -763,6 +765,9 @@ class CtaViewModel @Inject constructor(
             if (tabs.size >= MAX_TABS_OPEN_FIRE_EDUCATION) return@map true
             return@map false
         }
+
+    private suspend fun tooManyTabsOpenForFireEducation(): Boolean =
+        aggregateTabProvider.observe().first().size >= MAX_TABS_OPEN_FIRE_EDUCATION
 
     @ExperimentalCoroutinesApi
     private fun getShowFireButtonPulseAnimationFlow(): Flow<Boolean> = dismissedCtaDao.dismissedCtas()
