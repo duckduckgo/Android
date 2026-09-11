@@ -231,6 +231,8 @@ class FakeDuckChatInternal(
 
     override suspend fun onAddressBarPickerDuckAiSelected() { }
 
+    override fun openDuckChatImageGeneration(entryPoint: DuckChatEntryPoint) { }
+
     override fun buildChatUrl(chatId: String): String = "https://duck.ai?chatID=$chatId"
 
     override fun getChatProtectionUrl(): String = "https://duck.ai/chat?chatProtection=open"

@@ -840,7 +840,7 @@ class BrowserTabFragment :
                 duckChat.openVoiceDuckChat(DuckChatEntryPoint.VOICE)
             }
             onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewImage)) {
-                // TODO wire up "New Image" action; entry only shown when nativeDuckAiSidebar is enabled.
+                viewModel.openNewImageDuckChat(omnibar.viewMode)
             }
             onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewTab)) {
                 // With the native sidebar this entry is relabelled "New Search": open the new tab
@@ -1406,7 +1406,7 @@ class BrowserTabFragment :
         }
     }
 
-    private fun showNativeInput(query: String = "") {
+    private fun showNativeInput(query: String = "", forceImageGeneration: Boolean = false) {
         nativeInputManager.showNativeInput(
             tabId = tabId,
             layoutInflater = layoutInflater,
@@ -1415,6 +1415,7 @@ class BrowserTabFragment :
             currentTabUrl = viewModel.siteLiveData.asFlow().map { it?.url },
             query = query,
             initialInputMode = inputScreenLaunchTarget.consumeInitialInputMode(),
+            forceImageGeneration = forceImageGeneration,
             callbacks = NativeInputCallbacks(
                 onSearchTextChanged = { text -> onUserEnteredText(text) },
                 onClearAutocomplete = {
@@ -2437,7 +2438,9 @@ class BrowserTabFragment :
         renderBrowserMenu(viewState = browserViewState, omnibarViewMode = ViewMode.DuckAI)
         omnibar.setViewMode(ViewMode.DuckAI)
         browserNavigationBarIntegration.configureDuckAIViewMode()
-        showNativeInput()
+        val forceImageGeneration = !nativeInputManager.isNativeInputShown() &&
+            (browserActivity?.consumeDuckChatForceImageGeneration() ?: false)
+        showNativeInput(forceImageGeneration = forceImageGeneration)
     }
 
     private fun showMaliciousWarning(

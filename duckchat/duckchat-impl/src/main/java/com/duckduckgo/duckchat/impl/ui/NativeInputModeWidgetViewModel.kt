@@ -541,12 +541,17 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         }
     }
 
-    fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean) {
+    fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean, forceImageGeneration: Boolean = false) {
         activeTabId.value = tabId
         val context = if (isDuckAiMode) NativeInputState.InputContext.DUCK_AI else NativeInputState.InputContext.BROWSER
         val position = if (isBottom) NativeInputState.InputPosition.BOTTOM else NativeInputState.InputPosition.TOP
         widgetConfig.value = WidgetConfig(inputContext = context, inputPosition = position)
         replayPendingState(tabId)
+        // An "open Duck.ai for image generation" launch preselects image generation on the new tab.
+        // The image-capable model was already selected when the launch was requested.
+        if (isDuckAiMode && forceImageGeneration) {
+            nativeInputStatePublisher.update(tabId) { it.copy(selectedTool = Tool.IMAGE_GENERATION.rawValue) }
+        }
     }
 
     private fun replayPendingState(tabId: String) {

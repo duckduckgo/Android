@@ -430,6 +430,7 @@ class RealNativeInputManagerTest {
                 onClearAutocomplete = {},
                 onStopTapped = {},
             ),
+            forceImageGeneration = false,
         )
         return widget
     }
@@ -443,6 +444,7 @@ class RealNativeInputManagerTest {
             currentTabUrl = emptyFlow(),
             query = "",
             callbacks = mock<NativeInputCallbacks>(),
+            forceImageGeneration = false,
         )
     }
 

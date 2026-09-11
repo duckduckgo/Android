@@ -11860,6 +11860,20 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenOpenNewImageDuckChatFromDuckAiThenOpensImageGenerationWithWebpageEntryPoint() = runTest {
+        testee.openNewImageDuckChat(ViewMode.DuckAI)
+
+        verify(mockDuckChat).openDuckChatImageGeneration(DuckChatEntryPoint.BROWSING_MENU_WEBPAGE)
+    }
+
+    @Test
+    fun whenOpenNewImageDuckChatFromNewTabThenOpensImageGenerationWithNtpEntryPoint() = runTest {
+        testee.openNewImageDuckChat(ViewMode.NewTab)
+
+        verify(mockDuckChat).openDuckChatImageGeneration(DuckChatEntryPoint.BROWSING_MENU_NTP)
+    }
+
+    @Test
     fun whenDuckChatMenuItemClickedThenOpenNewDuckChatTab() =
         runTest {
             whenever(mockDuckChat.wasOpenedBefore()).thenReturn(false)

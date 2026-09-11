@@ -438,6 +438,30 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
+    fun whenConfigureDuckAiModeAndForceImageGenerationThenImageToolSelectedForTab() = runTest {
+        testee.configure(tabId = "tab-1", isDuckAiMode = true, isBottom = false, forceImageGeneration = true)
+
+        assertEquals(
+            Tool.IMAGE_GENERATION.rawValue,
+            nativeInputStateProvider.stateForTab("tab-1").value.selectedTool,
+        )
+    }
+
+    @Test
+    fun whenConfigureDuckAiModeAndNotForceImageGenerationThenNoToolSelected() = runTest {
+        testee.configure(tabId = "tab-1", isDuckAiMode = true, isBottom = false, forceImageGeneration = false)
+
+        assertNull(nativeInputStateProvider.stateForTab("tab-1").value.selectedTool)
+    }
+
+    @Test
+    fun whenConfigureBrowserModeAndForceImageGenerationThenNoToolSelected() = runTest {
+        testee.configure(tabId = "tab-1", isDuckAiMode = false, isBottom = false, forceImageGeneration = true)
+
+        assertNull(nativeInputStateProvider.stateForTab("tab-1").value.selectedTool)
+    }
+
+    @Test
     fun whenEditRequestTargetsThisTabThenItIsEmitted() = runTest {
         testee.configure(tabId = "tab-1", isDuckAiMode = true, isBottom = false)
 

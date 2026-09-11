@@ -347,6 +347,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
     var isDataClearingInProgress: Boolean = false
     var isDuckChatVisible: Boolean = false
 
+    // One-shot carried from an "open Duck.ai for image generation" launch. The Duck.ai tab this
+    // launch creates doesn't exist yet, so the flag is held here and consumed by that tab's fragment
+    // the first time it shows the native input (see BrowserTabFragment.consumeDuckAiForceImageGeneration).
+    private var pendingDuckChatForceImageGeneration: Boolean = false
+
     private val startBookmarksActivityForResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
             if (result.resultCode == RESULT_OK) {
@@ -824,6 +829,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         if (intent.getBooleanExtra(OPEN_DUCK_CHAT, false)) {
             val sourceTabId = intent.getStringExtra(SOURCE_TAB_ID_EXTRA)
+            pendingDuckChatForceImageGeneration = intent.getBooleanExtra(DUCK_CHAT_FORCE_IMAGE_GENERATION, false)
             intent.getStringExtra(DUCK_CHAT_ENTRY_POINT_EXTRA)?.let { source ->
                 runCatching { DuckChatEntryPoint.valueOf(source) }
                     .getOrNull()
@@ -1101,6 +1107,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
         uri.getQueryParameter("prompt") == "1" && !uri.getQueryParameter("q").isNullOrBlank()
     }.getOrDefault(false)
 
+    /**
+     * Returns whether the Duck.ai tab being opened should preselect image generation, clearing the
+     * one-shot so later native-input shows behave normally. Consumed by the Duck.ai tab's fragment.
+     */
+    fun consumeDuckChatForceImageGeneration(): Boolean =
+        pendingDuckChatForceImageGeneration.also { pendingDuckChatForceImageGeneration = false }
+
     fun closeDuckChatFullScreen() {
         isDuckChatVisible = false
         currentTab?.closeCurrentTab()
@@ -1287,6 +1300,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             closeDuckChat: Boolean = false,
             duckChatUrl: String? = null,
             duckChatSessionActive: Boolean = false,
+            duckChatForceImageGeneration: Boolean = false,
             deletedTabCount: Int = 0,
         ): Intent {
             val intent = Intent(context, BrowserActivity::class.java)
@@ -1304,6 +1318,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             intent.putExtra(CLOSE_DUCK_CHAT, closeDuckChat)
             intent.putExtra(DUCK_CHAT_URL, duckChatUrl)
             intent.putExtra(DUCK_CHAT_SESSION_ACTIVE, duckChatSessionActive)
+            intent.putExtra(DUCK_CHAT_FORCE_IMAGE_GENERATION, duckChatForceImageGeneration)
             intent.putExtra(DELETED_TAB_COUNT_EXTRA, deletedTabCount)
             intent.putExtra(LAUNCH_REQUIRES_REGULAR_MODE, launchSource.requiresRegularMode)
             intent.putExtra(LAUNCH_SOURCE_PIXEL_VALUE, launchSource.toPixelLaunchSourceValue())
@@ -1340,6 +1355,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         private const val CLOSE_DUCK_CHAT = "CLOSE_DUCK_CHAT_EXTRA"
         private const val DUCK_CHAT_URL = "DUCK_CHAT_URL"
         private const val DUCK_CHAT_SESSION_ACTIVE = "DUCK_CHAT_SESSION_ACTIVE"
+        private const val DUCK_CHAT_FORCE_IMAGE_GENERATION = "DUCK_CHAT_FORCE_IMAGE_GENERATION"
 
         private const val MAX_ACTIVE_TABS = 40
         private const val KEY_TAB_PAGER_STATE = "tabPagerState"
