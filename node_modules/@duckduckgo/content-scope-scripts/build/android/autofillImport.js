@@ -1565,6 +1565,7 @@
   var TypeError2 = globalThis.TypeError;
   var Symbol2 = globalThis.Symbol;
   var dispatchEvent = globalThis.dispatchEvent?.bind(globalThis);
+  var performanceNow = globalThis.performance?.now?.bind(globalThis.performance) ?? Date.now;
   var addEventListener = globalThis.addEventListener?.bind(globalThis);
   var removeEventListener = globalThis.removeEventListener?.bind(globalThis);
   var CustomEvent2 = globalThis.CustomEvent;
@@ -2061,6 +2062,7 @@
     "webInterferenceDetection",
     "webDetection",
     "webEvents",
+    "detectorPerf",
     "pageObserver",
     "hover",
     "trackerProtection",
@@ -2155,6 +2157,7 @@
       "webDetection",
       "webEvents",
       "webInterferenceDetection",
+      "detectorPerf",
       "windowsPermissionUsage",
       "uaChBrands",
       "brokerProtection",
@@ -2190,6 +2193,7 @@
       "webDetection",
       "webEvents",
       "webInterferenceDetection",
+      "detectorPerf",
       "webTelemetry",
       "pageObserver",
       "hover",
@@ -2204,6 +2208,7 @@
       "webDetection",
       "webEvents",
       "webInterferenceDetection",
+      "detectorPerf",
       "breakageReporting",
       "duckPlayer",
       "messageBridge",
@@ -2233,6 +2238,7 @@
       "webDetection",
       "webEvents",
       "webInterferenceDetection",
+      "detectorPerf",
       "webTelemetry",
       "windowsPermissionUsage",
       "uaChBrands",
