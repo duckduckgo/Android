@@ -515,5 +515,40 @@
         "triggers": ["exception"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion", "error"]
+    },
+    "autofill_passkey_use_success": {
+        "description": "A WebAuthn get ceremony resolved with a public-key credential.",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "autofill_passkey_use_failure": {
+        "description": "A WebAuthn get ceremony rejected. error is the sanitized DOMException name; UnknownError also covers CSS Other and unrecognized names.",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion", "passkeyError"]
+    },
+    "autofill_passkey_create_success": {
+        "description": "A WebAuthn create ceremony resolved with a public-key credential.",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "autofill_passkey_create_failure": {
+        "description": "A WebAuthn create ceremony rejected. InvalidStateError is the closest bounded proxy for an already-registered credential after consent, but is not unique to that case. error is the sanitized DOMException name; UnknownError also covers CSS Other and unrecognized names.",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion", "passkeyError"]
+    },
+    "autofill_passkey_unknown_event": {
+        "description": "A passkeyUsed or passkeyFailed CSS notify arrived with a type or method the app could not parse.",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
     }
 }
