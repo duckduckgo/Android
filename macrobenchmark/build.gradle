@@ -59,4 +59,5 @@ dependencies {
     implementation AndroidX.test.uiAutomator
     implementation AndroidX.benchmark.macroJunit4
     implementation Square.okHttp3.mockWebServer
+    implementation project(":test-seeder-api")
 }
