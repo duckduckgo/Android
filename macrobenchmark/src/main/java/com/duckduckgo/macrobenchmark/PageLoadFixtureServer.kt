@@ -21,6 +21,7 @@ import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
+import java.net.InetAddress
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -33,17 +34,22 @@ internal class PageLoadFixtureServer(fixture: PageLoadFixture) {
     private val server = MockWebServer()
     private val dispatcher = FixtureDispatcher(fixture)
 
-    val baseUrl: String get() = server.url("/").toString()
-    val traceSentinelUrl: String get() = server.url(TRACE_SENTINEL_PATH).toString()
+    private val origin: String get() = "http://$HOST:${server.port}"
+    val baseUrl: String get() = "$origin/"
+    val traceSentinelUrl: String get() = "$origin$TRACE_SENTINEL_PATH"
 
     fun start() {
         server.dispatcher = dispatcher
-        server.start()
+        server.start(InetAddress.getByName(HOST), 0)
     }
 
     fun shutdown() {
         dispatcher.logSummary()
         server.shutdown()
+    }
+
+    companion object {
+        const val HOST = "127.0.0.1"
     }
 }
 

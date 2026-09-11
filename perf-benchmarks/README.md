@@ -19,17 +19,20 @@ sudo mv ./trace_processor /usr/local/bin/trace_processor_shell
 
 1. **Discover** — given an FTL/Flank results directory, find every
    `PageLoadBenchmark` entry across all `*benchmarkData.json` files and match
-   each one to its `.perfetto-trace` by filename. Requires exactly the five
+   each one to its `.perfetto-trace` by filename. Requires exactly the six
    scenarios in `SCENARIO_BY_BENCHMARK_NAME` (`no-trackers`,
-   `many-trackers-blocked`, `first-party-trackers`, `cpm`, `all`) — missing,
-   duplicate, or unexpected scenarios abort the whole run.
+   `many-trackers-blocked`, `first-party-trackers`, `cpm`,
+   `all-protections-on`, `all-protections-off`) — missing, duplicate, or
+   unexpected scenarios abort the whole run. The two `all-protections-*`
+   scenarios run the same fixture with DuckDuckGo protections enabled and
+   disabled respectively, so they're directly comparable to each other.
 2. **Extract** — query each trace for `ddg.pageLoad` slice durations via
    `trace_processor_shell` (must be on `PATH`; see below).
 3. **Compute stats** — drop the leading warmup sample and the trailing
    sentinel sample by position, then report `count`, `median`, `mean`,
    `std_dev`, `min`, `max`, `p90` over the remaining samples.
 4. **Report** — with `--report-pixel`, build one pixel URL per scenario and
-   send it. Refuses to send anything unless all five scenarios validated
+   send it. Refuses to send anything unless all six scenarios validated
    successfully (no partial reporting).
 
 ## Usage
@@ -47,5 +50,5 @@ python3 pageload_benchmark.py --trace some.perfetto-trace --scenario cpm
 ```
 
 `--trace` mode requires `--scenario` and cannot be combined with
-`--report-pixel` (only `--results-dir` validates all five scenarios
+`--report-pixel` (only `--results-dir` validates all six scenarios
 atomically, so it's the only mode allowed to send pixels).

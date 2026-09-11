@@ -27,6 +27,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
+import com.duckduckgo.testseeder.api.TestSeederKey
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -75,10 +76,14 @@ class PageLoadBenchmark {
     fun cpm() = measurePageLoad(CpmFixture)
 
     @Test
-    fun allScenarios() = measurePageLoad(AllScenariosFixture)
+    fun allScenariosProtectionsOn() = measurePageLoad(AllScenariosFixture, protectionsEnabled = true)
 
-    private fun measurePageLoad(fixture: PageLoadFixture) {
-        completeOnboarding()
+    @Test
+    fun allScenariosProtectionsOff() = measurePageLoad(AllScenariosFixture, protectionsEnabled = false)
+
+    private fun measurePageLoad(fixture: PageLoadFixture, protectionsEnabled: Boolean = true) {
+        val pageSettleMs = if (protectionsEnabled) PAGE_SETTLE_MS_PROTECTED else PAGE_SETTLE_MS_UNPROTECTED
+        launchAndVerifyProtectionState(protectionsEnabled)
         val fixtureServer = if (explicitPageUrl == null) PageLoadFixtureServer(fixture).also { it.start() } else null
         val pageUrl = explicitPageUrl ?: fixtureServer!!.baseUrl
         try {
@@ -90,18 +95,18 @@ class PageLoadBenchmark {
                 // +1: leading warmup navigation, discarded by position in post-processing.
                 // ?i=$i forces a fresh main-frame load each time.
                 repeat(NAV_COUNT + 1) { i ->
-                    navigateTo("$pageUrl?i=$i")
+                    navigateTo("$pageUrl?i=$i", pageSettleMs)
                 }
                 // Closes the last measured navigation's slice; its own slice is the trailing sample,
                 // also discarded by position.
-                fixtureServer?.let { navigateTo(it.traceSentinelUrl) }
+                fixtureServer?.let { navigateTo(it.traceSentinelUrl, pageSettleMs) }
             }
         } finally {
             fixtureServer?.shutdown()
         }
     }
 
-    private fun navigateTo(url: String) {
+    private fun navigateTo(url: String, pageSettleMs: Long) {
         val intent = Intent().apply {
             component = ComponentName(TARGET_PACKAGE, BROWSER_ACTIVITY)
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -111,25 +116,49 @@ class PageLoadBenchmark {
         instrumentation.context.startActivity(intent)
         // Just needs to reliably span the load so the next navigation doesn't start before
         // onPageFinished fires; a stuck load costs at most one lost sample.
-        SystemClock.sleep(PAGE_SETTLE_MS)
+        SystemClock.sleep(pageSettleMs)
     }
 
-    private fun completeOnboarding() {
+    private fun launchAndVerifyProtectionState(protectionsEnabled: Boolean) {
+        val userAllowListValue = if (protectionsEnabled) "" else PageLoadFixtureServer.HOST
+        // Seeding only runs from the intent that creates LaunchBridgeActivity, so a warm process
+        // resumes the existing task and skips seeding; force-stop also makes the app's allow-list
+        // repository re-read its cache-at-init.
+        device.executeShellCommand("am force-stop $TARGET_PACKAGE")
+        device.executeShellCommand("logcat -c")
         device.executeShellCommand("pm grant $TARGET_PACKAGE android.permission.POST_NOTIFICATIONS")
         val launch = instrumentation.context.packageManager
             .getLaunchIntentForPackage(TARGET_PACKAGE)
             ?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            ?.putExtra(TestSeederKey.IS_MACROBENCHMARK.key, "true")
+            ?.putExtra(TestSeederKey.USER_ALLOW_LIST.key, userAllowListValue)
         instrumentation.context.startActivity(launch)
         val skipButton = By.res(TARGET_PACKAGE, "skipOnboardingButton")
         if (device.wait(Until.hasObject(skipButton), 20_000L)) {
             device.findObject(skipButton)?.click()
             device.waitForIdle()
         }
+        verifyProtectionState(userAllowListValue)
+    }
+
+    // Seeding suspends until confirmed (UserAllowListSeederPlugin awaits the repository's Flow) and runs before
+    // onboarding is shown, so by the time we're past the skip button the DdgTestSeeder line is already final.
+    private fun verifyProtectionState(expectedUserAllowList: String) {
+        val log = device.executeShellCommand("logcat -d -s DdgTestSeeder")
+        val observed = log.lineSequence().lastOrNull { it.contains("userAllowList=") }
+            ?.substringAfter("userAllowList=")?.trim()
+        check(observed == expectedUserAllowList) {
+            "userAllowList seeding did not settle on \"$expectedUserAllowList\"; observed: ${observed ?: "<none>"}"
+        }
     }
 
     companion object {
         private const val NAV_COUNT = 10
-        private const val PAGE_SETTLE_MS = 8_000L
+        private const val PAGE_SETTLE_MS_PROTECTED = 8_000L
+
+        // Trackers only hit the real network when protections are off, so the ~25 third-party
+        // subresources take longer than the protected-page settle time.
+        private const val PAGE_SETTLE_MS_UNPROTECTED = 20_000L
         private const val BROWSER_ACTIVITY = "com.duckduckgo.app.browser.BrowserActivity"
         private const val OPEN_IN_CURRENT_TAB_EXTRA = "OPEN_IN_CURRENT_TAB_EXTRA"
     }
