@@ -10143,6 +10143,37 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenOnDuckChatOmnibarButtonClickedOnNtpWithBlankQueryThenShowsContextualMenu() {
+        mockDuckAiContextualModeFlow.value = true
+
+        testee.onDuckChatOmnibarButtonClicked(query = null, hasFocus = true, isNtp = true)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.allValues.any { it is Command.ShowDuckAIContextualMode })
+    }
+
+    @Test
+    fun whenOnDuckChatOmnibarButtonClickedOnNtpWithTypedQueryThenOpensDuckChatNotMenu() {
+        mockDuckAiContextualModeFlow.value = true
+        whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
+
+        testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = true, isNtp = true)
+
+        verify(mockDuckChat).getDuckChatUrl(eq("example"), eq(true), any())
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertFalse(commandCaptor.allValues.any { it is Command.ShowDuckAIContextualMode })
+    }
+
+    @Test
+    fun whenOpenDuckChatFromOmnibarOnNtpThenOpensDuckChatWithoutPrompt() {
+        whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
+
+        testee.openDuckChatFromOmnibar(query = null, hasFocus = false, isNtp = true)
+
+        verify(mockDuckChat).getDuckChatUrl(eq(""), eq(false), any())
+    }
+
+    @Test
     fun whenOnDuckChatOmnibarButtonClickedFocusedWithContextualModeThenOpensDuckChatNotContextualSheet() {
         mockDuckAiContextualModeFlow.value = true
         whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)

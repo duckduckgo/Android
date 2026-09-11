@@ -2072,6 +2072,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
     }
 
+    override fun isInputEmpty(): Boolean = inputField.text.getTextToSubmit() == null
+
+    override fun tabId(): String? = activeTabId
+
     override fun stop() {
         // Single chokepoint for every stop affordance (the streaming-plugin button routes here via
         // host.stop(), and the input-screen stop button calls stop() too), so the pixel fires once.

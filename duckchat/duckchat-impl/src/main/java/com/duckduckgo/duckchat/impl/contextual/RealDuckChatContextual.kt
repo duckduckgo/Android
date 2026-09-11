@@ -63,6 +63,12 @@ class RealDuckChatContextual @Inject constructor(
             showChatSurface()
             return
         }
+        if (sourceUrl == null && !duckChatInternal.isContextualMenuAllChatsEnabled()) {
+            // Nothing to ask about and no Chats entry, so a one-item menu would be worse than the
+            // caller's own fallback (opening Duck.ai).
+            showChatSurface()
+            return
+        }
         if (hasChatInProgress(sourceTabId)) {
             // The sheet would reopen the existing chat for this tab, so skip the entry menu and open it directly.
             showChatSurface()
@@ -71,7 +77,7 @@ class RealDuckChatContextual @Inject constructor(
                 ?.takeIf { duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(it) }
                 ?.let { duckDuckGoUrlDetector.extractQuery(it) }
                 ?.takeIf { it.isNotBlank() }
-            showMenu(sourceTabId, anchor, serpQuery, showChatSurface)
+            showMenu(sourceTabId, anchor, sourceUrl, serpQuery, showChatSurface)
         }
     }
 
@@ -106,6 +112,7 @@ class RealDuckChatContextual @Inject constructor(
     private fun showMenu(
         sourceTabId: String,
         anchor: View,
+        sourceUrl: String?,
         serpQuery: String?,
         onAskAboutPage: () -> Unit,
     ) {
@@ -117,7 +124,10 @@ class RealDuckChatContextual @Inject constructor(
             openNewChatTab(activity, sourceTabId)
         }
         val askItem = content.findViewById<PopupMenuItemView>(R.id.contextualChatMenuAskAboutPage)
-        if (serpQuery != null) {
+        if (sourceUrl == null) {
+            // No page open (NTP or a blank tab), so there is nothing to ask about.
+            askItem.gone()
+        } else if (serpQuery != null) {
             askItem.setPrimaryText(activity.getString(R.string.duckChatContextualAskAboutSearch))
             popup.onMenuItemClicked(askItem) {
                 duckChatPixels.reportContextualAddressBarMenuAskAboutSearchSelected()

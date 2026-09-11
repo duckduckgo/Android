@@ -5897,37 +5897,49 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         when {
-            // Contextual chat is about the page you're viewing, so it's only offered from the
-            // unfocused omnibar. Once the omnibar is focused (composing), fall through to full-screen
-            // Duck.ai.
-            duckAiFeatureState.showContextualMode.value && !isNtp && !hasFocus -> {
+            // Contextual chat is about the page you're viewing, so on a page it's only offered from
+            // the unfocused omnibar: once focused (composing), fall through to full-screen Duck.ai.
+            // The NTP omnibar is focused from the start, so there the menu hangs off an empty query
+            // instead, and only when it carries the Chats entry alongside New Chat.
+            duckAiFeatureState.showContextualMode.value &&
+                if (isNtp) query.isNullOrBlank() else !hasFocus -> {
                 command.value = Command.ShowDuckAIContextualMode(tabId, url)
             }
 
-            else -> {
-                val (url, submittedAiPrompt) = when {
-                    hasFocus && isNtp && query.isNullOrBlank() -> duckChat.getDuckChatUrl(query ?: "", false) to false
-                    hasFocus && queryUrlPredictor.isUrl(query ?: "") -> (query ?: "") to false
-                    hasFocus -> duckChat.getDuckChatUrl(query ?: "", true) to !query.isNullOrBlank()
-                    else -> duckChat.getDuckChatUrl(query ?: "", false) to false
-                }
-                if (duckChat.isDuckChatUrl(url.toUri())) {
-                    if (submittedAiPrompt) {
-                        browserInteractionsPlugins.getPlugins().forEach {
-                            it.onAiPromptSubmitted(source = DuckChatEntryPoint.ADDRESS_BAR_ICON.name.lowercase())
-                        }
-                    }
-                    duckChat.reportDuckChatEntry(
-                        DuckChatEntryPoint.ADDRESS_BAR_ICON,
-                        opensNewTab = false,
-                        hasPrompt = submittedAiPrompt,
-                    )
-                    submitQuery(url, QueryOrigin.FromUser, QuerySubmissionSource.INTERNAL_NAVIGATION)
-                } else {
-                    // The typed-URL branch above: genuinely a URL submission, not a Duck.ai one.
-                    onUserSubmittedQuery(url)
+            else -> openDuckChatFromOmnibar(query, hasFocus, isNtp)
+        }
+    }
+
+    /**
+     * Opens Duck.ai straight from the address bar icon. Also the fallback when the NTP menu declines
+     * to show, so that path keeps behaving exactly as it did before the menu existed.
+     */
+    fun openDuckChatFromOmnibar(
+        query: String?,
+        hasFocus: Boolean,
+        isNtp: Boolean,
+    ) {
+        val (url, submittedAiPrompt) = when {
+            hasFocus && isNtp && query.isNullOrBlank() -> duckChat.getDuckChatUrl(query ?: "", false) to false
+            hasFocus && queryUrlPredictor.isUrl(query ?: "") -> (query ?: "") to false
+            hasFocus -> duckChat.getDuckChatUrl(query ?: "", true) to !query.isNullOrBlank()
+            else -> duckChat.getDuckChatUrl(query ?: "", false) to false
+        }
+        if (duckChat.isDuckChatUrl(url.toUri())) {
+            if (submittedAiPrompt) {
+                browserInteractionsPlugins.getPlugins().forEach {
+                    it.onAiPromptSubmitted(source = DuckChatEntryPoint.ADDRESS_BAR_ICON.name.lowercase())
                 }
             }
+            duckChat.reportDuckChatEntry(
+                DuckChatEntryPoint.ADDRESS_BAR_ICON,
+                opensNewTab = false,
+                hasPrompt = submittedAiPrompt,
+            )
+            submitQuery(url, QueryOrigin.FromUser, QuerySubmissionSource.INTERNAL_NAVIGATION)
+        } else {
+            // The typed-URL branch above: genuinely a URL submission, not a Duck.ai one.
+            onUserSubmittedQuery(url)
         }
     }
 
