@@ -37,6 +37,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -91,6 +92,7 @@ import com.duckduckgo.common.ui.compose.progress.DaxProgressSpinner
 import com.duckduckgo.common.ui.compose.radiobutton.DaxRadioButton
 import com.duckduckgo.common.ui.compose.skeleton.DaxSkeletonListItem
 import com.duckduckgo.common.ui.compose.skeleton.DaxSkeletonSectionHeader
+import com.duckduckgo.common.ui.compose.slider.DaxSlider
 import com.duckduckgo.common.ui.compose.snackbar.DaxSnackbar
 import com.duckduckgo.common.ui.compose.switch.DaxSwitch
 import com.duckduckgo.common.ui.compose.text.DaxText
@@ -295,8 +297,36 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
         }
     }
 
-    class SliderComponentViewHolder(parent: ViewGroup) :
-        ComponentViewHolder(inflate(parent, R.layout.component_slider))
+    class SliderComponentViewHolder(
+        parent: ViewGroup,
+        private val isDarkTheme: Boolean,
+    ) : ComponentViewHolder(inflate(parent, R.layout.component_slider)) {
+
+        init {
+            view.setupThemedComposeView(R.id.composeDaxSlider, isDarkTheme) {
+                var continuousValue by remember { mutableFloatStateOf(0.3f) }
+                var steppedValue by remember { mutableFloatStateOf(100f) }
+                var disabledValue by remember { mutableFloatStateOf(0.3f) }
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    DaxSlider(
+                        value = continuousValue,
+                        onValueChange = { continuousValue = it },
+                    )
+                    DaxSlider(
+                        value = steppedValue,
+                        onValueChange = { steppedValue = it },
+                        valueRange = 70f..170f,
+                        steps = 9,
+                    )
+                    DaxSlider(
+                        value = disabledValue,
+                        onValueChange = { disabledValue = it },
+                        enabled = false,
+                    )
+                }
+            }
+        }
+    }
 
     class InfoPanelComponentViewHolder(
         parent: ViewGroup,
@@ -1061,7 +1091,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 Component.SWITCH -> SwitchComponentViewHolder(parent, isDarkTheme)
                 Component.RADIO_BUTTON -> RadioButtonComponentViewHolder(parent, isDarkTheme)
                 Component.CHECKBOX -> CheckboxComponentViewHolder(parent, isDarkTheme)
-                Component.SLIDER -> SliderComponentViewHolder(parent)
+                Component.SLIDER -> SliderComponentViewHolder(parent, isDarkTheme)
                 Component.SNACKBAR -> SnackbarComponentViewHolder(parent, isDarkTheme)
                 Component.INFO_PANEL -> InfoPanelComponentViewHolder(parent, isDarkTheme)
                 Component.REMOTE_MESSAGE -> RemoteMessageComponentViewHolder(parent, isDarkTheme)
