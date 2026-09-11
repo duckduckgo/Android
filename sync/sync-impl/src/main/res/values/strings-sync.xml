@@ -376,7 +376,7 @@
 
     <!-- Pairing screen -->
     <string name="sync_simplified_pairing_headline">Sync&#160;&amp;&#160;Backup is end-to-end encrypted on all your devices.</string>
-    <string name="sync_simplified_pairing_headline_check_other_device">Check your other device</string>
+    <string name="sync_simplified_pairing_headline_check_other_device">Check your other device.</string>
     <string name="sync_simplified_pairing_headline_recovery">Recovering data</string>
     <string name="sync_simplified_pairing_body">Connecting…</string>
 
