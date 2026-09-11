@@ -64,6 +64,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -109,17 +110,37 @@ class SubscriptionWebViewViewModelTest {
     }
 
     @Test
-    fun whenLoadInitialUrlThenLoadsResolvedUrl() = runTest {
+    fun whenResolveInitialUrlThenInitialUrlHoldsResolvedUrl() = runTest {
         val buyUrl = "https://duckduckgo.com/subscriptions"
         val resolvedUrl = "https://duckduckgo.com/subscriptions/new/mobile/vpn?trial=false"
         whenever(paywallUrlResolver.resolve(buyUrl)).thenReturn(resolvedUrl)
 
-        viewModel.commands().test {
-            viewModel.loadInitialUrl(buyUrl)
+        viewModel.resolveInitialUrl(buyUrl)
 
-            val result = awaitItem()
-            assertTrue(result is Command.LoadUrl)
-            assertEquals(resolvedUrl, (result as Command.LoadUrl).url)
+        assertEquals(resolvedUrl, viewModel.initialUrl.value)
+    }
+
+    @Test
+    fun whenResolveInitialUrlCalledAgainThenUrlIsResolvedOnlyOnce() = runTest {
+        val buyUrl = "https://duckduckgo.com/subscriptions"
+        val resolvedUrl = "https://duckduckgo.com/subscriptions/new/mobile/vpn?trial=false"
+        whenever(paywallUrlResolver.resolve(buyUrl)).thenReturn(resolvedUrl)
+
+        viewModel.resolveInitialUrl(buyUrl)
+        viewModel.resolveInitialUrl(buyUrl)
+
+        verify(paywallUrlResolver, times(1)).resolve(buyUrl)
+    }
+
+    @Test
+    fun whenCollectedAfterResolvingThenResolvedUrlIsStillReplayed() = runTest {
+        val buyUrl = "https://duckduckgo.com/subscriptions"
+        val resolvedUrl = "https://duckduckgo.com/subscriptions/new/mobile/vpn?trial=false"
+        whenever(paywallUrlResolver.resolve(buyUrl)).thenReturn(resolvedUrl)
+        viewModel.resolveInitialUrl(buyUrl)
+
+        viewModel.initialUrl.test {
+            assertEquals(resolvedUrl, awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
     }

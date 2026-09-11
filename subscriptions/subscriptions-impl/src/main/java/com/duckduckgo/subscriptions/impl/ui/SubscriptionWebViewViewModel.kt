@@ -120,6 +120,9 @@ class SubscriptionWebViewViewModel @Inject constructor(
     private val _currentPurchaseViewState = MutableStateFlow(CurrentPurchaseViewState())
     val currentPurchaseViewState = _currentPurchaseViewState.asStateFlow()
 
+    private val _initialUrl = MutableStateFlow<String?>(null)
+    val initialUrl = _initialUrl.asStateFlow()
+
     private lateinit var subscriptionStatus: SubscriptionStatus
 
     private var pendingScheduleNotificationDaysBeforeCancel: Int? = null
@@ -174,9 +177,10 @@ class SubscriptionWebViewViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
-    fun loadInitialUrl(url: String) {
+    fun resolveInitialUrl(url: String) {
+        if (_initialUrl.value != null) return
         viewModelScope.launch {
-            command.send(LoadUrl(paywallUrlResolver.resolve(url)))
+            _initialUrl.value = paywallUrlResolver.resolve(url)
         }
     }
 
@@ -807,7 +811,6 @@ class SubscriptionWebViewViewModel @Inject constructor(
     }
 
     sealed class Command {
-        data class LoadUrl(val url: String) : Command()
         data object BackToSettings : Command()
         data object BackToSettingsActivateSuccess : Command()
         data class SendJsEvent(val event: SubscriptionEventData) : Command()
