@@ -5829,16 +5829,24 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun openDuckChatSidebar() {
+    fun onCustomizeResponsesClicked() {
         viewModelScope.launch {
-            val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.SIDEBAR)
+            val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.CUSTOMIZE_RESPONSES)
             _subscriptionEventDataChannel.send(subscriptionEvent)
         }
     }
 
-    fun onCustomizeResponsesClicked() {
+    fun onDuckChatSidebarButtonPressed() {
+        if (duckAiFeatureState.nativeDuckAiSidebar.value) {
+            openDuckChatHistory()
+        } else {
+            openDuckChatSidebar()
+        }
+    }
+
+    fun openDuckChatSidebar() {
         viewModelScope.launch {
-            val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.CUSTOMIZE_RESPONSES)
+            val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.SIDEBAR)
             _subscriptionEventDataChannel.send(subscriptionEvent)
         }
     }
