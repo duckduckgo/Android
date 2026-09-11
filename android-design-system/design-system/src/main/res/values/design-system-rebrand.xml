@@ -52,6 +52,9 @@
     <attr name="daxLargeSheetRadius" format="dimension" />
     <attr name="daxOnboardingSheetRadius" format="dimension" />
     <attr name="daxInfoPanelRadius" format="dimension" />
+    <attr name="daxMessageCtaCloseButtonSize" format="dimension" />
+    <attr name="daxMessageCtaCloseButtonBackground" format="reference" />
+    <attr name="daxMessageCtaClipToPadding" format="boolean" />
     <attr name="daxPillRadius" format="dimension" />
 
     <dimen name="rebrandButtonSmallHeight">48dp</dimen>
@@ -62,6 +65,7 @@
     <dimen name="rebrandButtonLargeVerticalInset">6dp</dimen>
     <dimen name="rebrandInputRadius">48dp</dimen>
     <dimen name="rebrandContainerRadius">28dp</dimen>
+    <dimen name="rebrandMessageCtaCloseButtonSize">48dp</dimen>
     <dimen name="daxYellowPillCornerRadius">2dp</dimen>
 
     <style name="Typography.DuckDuckGo.Rebrand.Button" parent="Typography.DuckDuckGo">
@@ -183,6 +187,9 @@
         <item name="daxLargeSheetRadius">@dimen/rebrandContainerRadius</item>
         <item name="daxOnboardingSheetRadius">@dimen/rebrandContainerRadius</item>
         <item name="daxInfoPanelRadius">@dimen/rebrandContainerRadius</item>
+        <item name="daxMessageCtaCloseButtonSize">@dimen/rebrandMessageCtaCloseButtonSize</item>
+        <item name="daxMessageCtaCloseButtonBackground">@drawable/selectable_message_cta_close_button_ripple</item>
+        <item name="daxMessageCtaClipToPadding">false</item>
         <item name="daxPillRadius">@dimen/pillShapeCornerRadius</item>
     </style>
 

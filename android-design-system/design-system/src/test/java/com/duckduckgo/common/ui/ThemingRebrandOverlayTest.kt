@@ -180,6 +180,15 @@ class ThemingRebrandOverlayTest {
         }
     }
 
+    private fun resolveResourceId(
+        activity: AppCompatActivity,
+        attr: Int,
+    ): Int {
+        val value = TypedValue()
+        assertTrue(activity.theme.resolveAttribute(attr, value, true))
+        return value.resourceId
+    }
+
     @Test
     fun whenFixedThemeActivityWithBrandDesignUpdateThenRebrandStyleResolves() {
         val activity = fixedThemeActivity(applyBrandDesignUpdate = true)
@@ -232,6 +241,12 @@ class ThemingRebrandOverlayTest {
         assertEquals(28f, resolveDimension(activity, R.attr.daxLargeSheetRadius), 0f)
         assertEquals(28f, resolveDimension(activity, R.attr.daxOnboardingSheetRadius), 0f)
         assertEquals(28f, resolveDimension(activity, R.attr.daxInfoPanelRadius), 0f)
+        assertEquals(48f, resolveDimension(activity, R.attr.daxMessageCtaCloseButtonSize), 0f)
+        assertEquals(
+            R.drawable.selectable_message_cta_close_button_ripple,
+            resolveResourceId(activity, R.attr.daxMessageCtaCloseButtonBackground),
+        )
+        assertFalse(resolveBoolean(activity, R.attr.daxMessageCtaClipToPadding))
         assertEquals(1000f, resolveDimension(activity, R.attr.daxPillRadius), 0f)
     }
 
@@ -245,6 +260,12 @@ class ThemingRebrandOverlayTest {
         assertEquals(16f, resolveDimension(activity, R.attr.daxLargeSheetRadius), 0f)
         assertEquals(36f, resolveDimension(activity, R.attr.daxOnboardingSheetRadius), 0f)
         assertEquals(8f, resolveDimension(activity, R.attr.daxInfoPanelRadius), 0f)
+        assertEquals(40f, resolveDimension(activity, R.attr.daxMessageCtaCloseButtonSize), 0f)
+        assertEquals(
+            resolveResourceId(activity, android.R.attr.selectableItemBackground),
+            resolveResourceId(activity, R.attr.daxMessageCtaCloseButtonBackground),
+        )
+        assertTrue(resolveBoolean(activity, R.attr.daxMessageCtaClipToPadding))
         assertEquals(2f, resolveDimension(activity, R.attr.daxPillRadius), 0f)
     }
 
@@ -263,6 +284,9 @@ class ThemingRebrandOverlayTest {
             R.attr.daxLargeSheetRadius,
             R.attr.daxOnboardingSheetRadius,
             R.attr.daxInfoPanelRadius,
+            R.attr.daxMessageCtaCloseButtonSize,
+            R.attr.daxMessageCtaCloseButtonBackground,
+            R.attr.daxMessageCtaClipToPadding,
             R.attr.daxPillRadius,
         ).forEach { attr ->
             assertFalse(activity.theme.resolveAttribute(attr, TypedValue(), true))
@@ -283,6 +307,12 @@ class ThemingRebrandOverlayTest {
             assertEquals(28f, resolveDimension(activity, R.attr.daxLargeSheetRadius), 0f)
             assertEquals(28f, resolveDimension(activity, R.attr.daxOnboardingSheetRadius), 0f)
             assertEquals(28f, resolveDimension(activity, R.attr.daxInfoPanelRadius), 0f)
+            assertEquals(48f, resolveDimension(activity, R.attr.daxMessageCtaCloseButtonSize), 0f)
+            assertEquals(
+                R.drawable.selectable_message_cta_close_button_ripple,
+                resolveResourceId(activity, R.attr.daxMessageCtaCloseButtonBackground),
+            )
+            assertFalse(resolveBoolean(activity, R.attr.daxMessageCtaClipToPadding))
             assertEquals(1000f, resolveDimension(activity, R.attr.daxPillRadius), 0f)
         }
     }
@@ -312,6 +342,12 @@ class ThemingRebrandOverlayTest {
         assertEquals(28f, resolveDimension(activity, R.attr.daxLargeSheetRadius), 0f)
         assertEquals(28f, resolveDimension(activity, R.attr.daxOnboardingSheetRadius), 0f)
         assertEquals(28f, resolveDimension(activity, R.attr.daxInfoPanelRadius), 0f)
+        assertEquals(48f, resolveDimension(activity, R.attr.daxMessageCtaCloseButtonSize), 0f)
+        assertEquals(
+            R.drawable.selectable_message_cta_close_button_ripple,
+            resolveResourceId(activity, R.attr.daxMessageCtaCloseButtonBackground),
+        )
+        assertFalse(resolveBoolean(activity, R.attr.daxMessageCtaClipToPadding))
         assertEquals(1000f, resolveDimension(activity, R.attr.daxPillRadius), 0f)
     }
 

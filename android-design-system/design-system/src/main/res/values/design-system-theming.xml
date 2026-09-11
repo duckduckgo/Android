@@ -351,6 +351,9 @@
         <item name="daxLargeSheetRadius">@dimen/largeShapeCornerRadius</item>
         <item name="daxOnboardingSheetRadius">@dimen/onboardingBottomSheetCornerRadius</item>
         <item name="daxInfoPanelRadius">@dimen/smallShapeCornerRadius</item>
+        <item name="daxMessageCtaCloseButtonSize">@dimen/messageCtaCloseButtonSize</item>
+        <item name="daxMessageCtaCloseButtonBackground">?attr/selectableItemBackground</item>
+        <item name="daxMessageCtaClipToPadding">true</item>
         <item name="daxPillRadius">@dimen/daxYellowPillCornerRadius</item>
     </style>
 
@@ -524,6 +527,9 @@
         <item name="daxLargeSheetRadius">@dimen/largeShapeCornerRadius</item>
         <item name="daxOnboardingSheetRadius">@dimen/onboardingBottomSheetCornerRadius</item>
         <item name="daxInfoPanelRadius">@dimen/smallShapeCornerRadius</item>
+        <item name="daxMessageCtaCloseButtonSize">@dimen/messageCtaCloseButtonSize</item>
+        <item name="daxMessageCtaCloseButtonBackground">?attr/selectableItemBackground</item>
+        <item name="daxMessageCtaClipToPadding">true</item>
         <item name="daxPillRadius">@dimen/daxYellowPillCornerRadius</item>
     </style>
 
