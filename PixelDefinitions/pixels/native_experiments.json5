@@ -44,29 +44,29 @@
             }
         },
         "passwordImportExperimentAug25": {
-          "cohorts": ["control", "treatment"],
-          "metrics": {
-            "onboarding_completed": {
-              "description": "User saw every onboarding dialog (onboarding completed)",
-              "enum": ["1"]
-            },
-            "password_import_started": {
-              "description": "User entered the Google password import web flow, from the onboarding step or any other entry point",
-              "enum": ["1"]
-            },
-            "password_import_success": {
-              "description": "A Google password import finished, from the onboarding step or any other entry point",
-              "enum": ["1"]
-            },
-            "password_import_failed": {
-              "description": "A Google password import failed with a CSV parsing error or a WebView crash",
-              "enum": ["1"]
-            },
-            "password_import_cancelled": {
-              "description": "User closed or backed out of the Google password import web flow",
-              "enum": ["1"]
+            "cohorts": ["control", "treatment"],
+            "metrics": {
+                "onboarding_completed": {
+                    "description": "User saw every onboarding dialog (onboarding completed)",
+                    "enum": ["1"]
+                },
+                "password_import_started": {
+                    "description": "User entered the Google password import web flow, from the onboarding step or any other entry point",
+                    "enum": ["1"]
+                },
+                "password_import_success": {
+                    "description": "A Google password import finished, from the onboarding step or any other entry point",
+                    "enum": ["1"]
+                },
+                "password_import_failed": {
+                    "description": "A Google password import failed with a CSV parsing error or a WebView crash",
+                    "enum": ["1"]
+                },
+                "password_import_cancelled": {
+                    "description": "User closed or backed out of the Google password import web flow",
+                    "enum": ["1"]
+                }
             }
-          }
         }
     }
 }
