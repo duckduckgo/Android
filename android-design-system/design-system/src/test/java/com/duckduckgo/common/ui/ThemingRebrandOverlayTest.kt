@@ -230,6 +230,7 @@ class ThemingRebrandOverlayTest {
         assertEquals(28f, resolveDimension(activity, R.attr.daxDialogRadius), 0f)
         assertEquals(28f, resolveDimension(activity, R.attr.daxSheetRadius), 0f)
         assertEquals(28f, resolveDimension(activity, R.attr.daxLargeSheetRadius), 0f)
+        assertEquals(28f, resolveDimension(activity, R.attr.daxOnboardingSheetRadius), 0f)
         assertEquals(28f, resolveDimension(activity, R.attr.daxInfoPanelRadius), 0f)
         assertEquals(1000f, resolveDimension(activity, R.attr.daxPillRadius), 0f)
     }
@@ -242,6 +243,7 @@ class ThemingRebrandOverlayTest {
         assertEquals(12f, resolveDimension(activity, R.attr.daxDialogRadius), 0f)
         assertEquals(12f, resolveDimension(activity, R.attr.daxSheetRadius), 0f)
         assertEquals(16f, resolveDimension(activity, R.attr.daxLargeSheetRadius), 0f)
+        assertEquals(36f, resolveDimension(activity, R.attr.daxOnboardingSheetRadius), 0f)
         assertEquals(8f, resolveDimension(activity, R.attr.daxInfoPanelRadius), 0f)
         assertEquals(2f, resolveDimension(activity, R.attr.daxPillRadius), 0f)
     }
@@ -259,6 +261,7 @@ class ThemingRebrandOverlayTest {
             R.attr.daxDialogRadius,
             R.attr.daxSheetRadius,
             R.attr.daxLargeSheetRadius,
+            R.attr.daxOnboardingSheetRadius,
             R.attr.daxInfoPanelRadius,
             R.attr.daxPillRadius,
         ).forEach { attr ->
@@ -278,6 +281,7 @@ class ThemingRebrandOverlayTest {
             assertEquals(28f, resolveDimension(activity, R.attr.daxDialogRadius), 0f)
             assertEquals(28f, resolveDimension(activity, R.attr.daxSheetRadius), 0f)
             assertEquals(28f, resolveDimension(activity, R.attr.daxLargeSheetRadius), 0f)
+            assertEquals(28f, resolveDimension(activity, R.attr.daxOnboardingSheetRadius), 0f)
             assertEquals(28f, resolveDimension(activity, R.attr.daxInfoPanelRadius), 0f)
             assertEquals(1000f, resolveDimension(activity, R.attr.daxPillRadius), 0f)
         }
@@ -306,6 +310,7 @@ class ThemingRebrandOverlayTest {
         assertEquals(28f, resolveDimension(activity, R.attr.daxDialogRadius), 0f)
         assertEquals(28f, resolveDimension(activity, R.attr.daxSheetRadius), 0f)
         assertEquals(28f, resolveDimension(activity, R.attr.daxLargeSheetRadius), 0f)
+        assertEquals(28f, resolveDimension(activity, R.attr.daxOnboardingSheetRadius), 0f)
         assertEquals(28f, resolveDimension(activity, R.attr.daxInfoPanelRadius), 0f)
         assertEquals(1000f, resolveDimension(activity, R.attr.daxPillRadius), 0f)
     }

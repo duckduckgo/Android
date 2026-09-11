@@ -35,6 +35,7 @@ class BottomSheetDialogExtensionsTest {
     @Test
     fun whenRadiusOverlayIsAbsentThenSetRoundCornersUsesTheLegacy12DpRadius() {
         val dialog = themedDialog(radiusOverlayEnabled = false)
+        dialog.setRoundCorners()
 
         assertTopCornerRadius(
             dialog,
@@ -45,6 +46,29 @@ class BottomSheetDialogExtensionsTest {
     @Test
     fun whenRadiusOverlayIsAppliedThenSetRoundCornersUsesTheRebrand28DpRadius() {
         val dialog = themedDialog(radiusOverlayEnabled = true)
+        dialog.setRoundCorners()
+
+        assertTopCornerRadius(
+            dialog,
+            RuntimeEnvironment.getApplication().resources.getDimension(R.dimen.rebrandContainerRadius),
+        )
+    }
+
+    @Test
+    fun whenRadiusOverlayIsAbsentThenSetRoundCornersUsesTheQuickSetup36DpRadius() {
+        val dialog = themedDialog(radiusOverlayEnabled = false)
+        dialog.setRoundCorners(R.attr.daxOnboardingSheetRadius, R.dimen.onboardingBottomSheetCornerRadius)
+
+        assertTopCornerRadius(
+            dialog,
+            RuntimeEnvironment.getApplication().resources.getDimension(R.dimen.onboardingBottomSheetCornerRadius),
+        )
+    }
+
+    @Test
+    fun whenRadiusOverlayIsAppliedThenSetRoundCornersUsesTheQuickSetup28DpRadius() {
+        val dialog = themedDialog(radiusOverlayEnabled = true)
+        dialog.setRoundCorners(R.attr.daxOnboardingSheetRadius, R.dimen.onboardingBottomSheetCornerRadius)
 
         assertTopCornerRadius(
             dialog,
@@ -59,7 +83,6 @@ class BottomSheetDialogExtensionsTest {
         }
         return BottomSheetDialog(context, R.style.Widget_DuckDuckGo_BottomSheetDialog).apply {
             setContentView(FrameLayout(context))
-            setRoundCorners()
         }
     }
 

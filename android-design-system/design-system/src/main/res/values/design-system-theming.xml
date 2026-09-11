@@ -349,6 +349,7 @@
         <item name="daxDialogRadius">@dimen/dialogBorderRadius</item>
         <item name="daxSheetRadius">@dimen/dialogBorderRadius</item>
         <item name="daxLargeSheetRadius">@dimen/largeShapeCornerRadius</item>
+        <item name="daxOnboardingSheetRadius">@dimen/onboardingBottomSheetCornerRadius</item>
         <item name="daxInfoPanelRadius">@dimen/smallShapeCornerRadius</item>
         <item name="daxPillRadius">@dimen/daxYellowPillCornerRadius</item>
     </style>
@@ -521,6 +522,7 @@
         <item name="daxDialogRadius">@dimen/dialogBorderRadius</item>
         <item name="daxSheetRadius">@dimen/dialogBorderRadius</item>
         <item name="daxLargeSheetRadius">@dimen/largeShapeCornerRadius</item>
+        <item name="daxOnboardingSheetRadius">@dimen/onboardingBottomSheetCornerRadius</item>
         <item name="daxInfoPanelRadius">@dimen/smallShapeCornerRadius</item>
         <item name="daxPillRadius">@dimen/daxYellowPillCornerRadius</item>
     </style>

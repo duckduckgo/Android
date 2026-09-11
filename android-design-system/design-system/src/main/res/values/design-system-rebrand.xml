@@ -50,6 +50,7 @@
     <attr name="daxDialogRadius" format="dimension" />
     <attr name="daxSheetRadius" format="dimension" />
     <attr name="daxLargeSheetRadius" format="dimension" />
+    <attr name="daxOnboardingSheetRadius" format="dimension" />
     <attr name="daxInfoPanelRadius" format="dimension" />
     <attr name="daxPillRadius" format="dimension" />
 
@@ -180,6 +181,7 @@
         <item name="daxDialogRadius">@dimen/rebrandContainerRadius</item>
         <item name="daxSheetRadius">@dimen/rebrandContainerRadius</item>
         <item name="daxLargeSheetRadius">@dimen/rebrandContainerRadius</item>
+        <item name="daxOnboardingSheetRadius">@dimen/rebrandContainerRadius</item>
         <item name="daxInfoPanelRadius">@dimen/rebrandContainerRadius</item>
         <item name="daxPillRadius">@dimen/pillShapeCornerRadius</item>
     </style>
