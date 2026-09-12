@@ -23,7 +23,6 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.onboarding.OnboardingPreference
-import com.duckduckgo.app.onboarding.orchestrator.PasswordImportOutcome
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection
 import com.duckduckgo.app.pixels.OnboardingPixelName
@@ -70,13 +69,24 @@ sealed interface OnboardingPixelAction {
         val inputScreenSelected: Boolean,
     ) : OnboardingPixelAction
 
-    data class PasswordImportConfirmed(val outcome: PasswordImportOutcome) : OnboardingPixelAction
+    data class PasswordImportErrorShown(val transient: Boolean) : OnboardingPixelAction
+
+    data class PasswordImportErrorClicked(val action: PasswordImportErrorAction) : OnboardingPixelAction
 
     data class DownloadReasonClicked(val reason: DownloadReasonSelection) : OnboardingPixelAction
 
     data class PreferencesClicked(val selections: Map<OnboardingPreference, Boolean>) : OnboardingPixelAction
 
     data class SingleChoiceClicked(val optionId: String) : OnboardingPixelAction
+}
+
+/**
+ * What the user did on an import-error surface
+ */
+enum class PasswordImportErrorAction {
+    CONTINUE,
+    RETRY,
+    CANCEL,
 }
 
 interface OnboardingPixelSender {
@@ -190,8 +200,11 @@ class RealOnboardingPixelSender @Inject constructor(
             is OnboardingPixelAction.QuickSetupClicked ->
                 fireQuickSetupClicked(pixelName, action.addressBarPosition, action.inputScreenSelected)
 
-            is OnboardingPixelAction.PasswordImportConfirmed ->
-                fireStep(pixelName, PIXEL_EVENT_CONFIRMED, action.outcome.value)
+            is OnboardingPixelAction.PasswordImportErrorShown ->
+                fireStep(pixelName, PIXEL_EVENT_SHOWN, if (action.transient) VALUE_TRANSIENT else VALUE_PERMANENT)
+
+            is OnboardingPixelAction.PasswordImportErrorClicked ->
+                fireStep(pixelName, PIXEL_EVENT_CLICKED, importErrorValue(action.action))
 
             is OnboardingPixelAction.DownloadReasonClicked ->
                 fireStep(pixelName, PIXEL_EVENT_CLICKED, action.reason.pixelToken)
@@ -343,6 +356,12 @@ class RealOnboardingPixelSender @Inject constructor(
 
     private fun engageOrDismiss(engaged: Boolean): String = if (engaged) VALUE_ENGAGE else VALUE_DISMISS
 
+    private fun importErrorValue(action: PasswordImportErrorAction): String = when (action) {
+        PasswordImportErrorAction.CONTINUE -> VALUE_ENGAGE
+        PasswordImportErrorAction.RETRY -> VALUE_RETRY
+        PasswordImportErrorAction.CANCEL -> VALUE_DISMISS
+    }
+
     private fun tryInputValue(fromSuggestion: Boolean, isChat: Boolean): String {
         val source = if (fromSuggestion) VALUE_SUGGESTED else VALUE_CUSTOM
         val mode = if (isChat) VALUE_CHAT else VALUE_SEARCH
@@ -398,6 +417,9 @@ class RealOnboardingPixelSender @Inject constructor(
 
         private const val VALUE_ENGAGE = "engage"
         private const val VALUE_DISMISS = "dismiss"
+        private const val VALUE_RETRY = "retry"
+        private const val VALUE_TRANSIENT = "transient"
+        private const val VALUE_PERMANENT = "permanent"
         private const val VALUE_DDG = "ddg"
         private const val VALUE_OTHER = "other"
         private const val VALUE_ADDED = "added"
