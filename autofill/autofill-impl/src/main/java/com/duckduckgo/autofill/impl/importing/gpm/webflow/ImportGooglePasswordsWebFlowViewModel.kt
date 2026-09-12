@@ -27,6 +27,7 @@ import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.impl.importing.CredentialImporter
 import com.duckduckgo.autofill.impl.importing.CsvCredentialConverter
 import com.duckduckgo.autofill.impl.importing.CsvCredentialConverter.CsvCredentialImportResult
+import com.duckduckgo.autofill.impl.importing.PasswordImportExperimentMetrics
 import com.duckduckgo.autofill.impl.importing.gpm.feature.AutofillImportPasswordConfigStore
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.Command.InjectCredentialsFromReauth
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.Command.NoCredentialsAvailable
@@ -63,6 +64,7 @@ class ImportGooglePasswordsWebFlowViewModel @AssistedInject constructor(
     private val reauthenticationHandler: ReauthenticationHandler,
     private val autofillFeature: AutofillFeature,
     private val importPasswordsPixelSender: ImportPasswordsPixelSender,
+    private val passwordImportExperimentMetrics: PasswordImportExperimentMetrics,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow<ViewState>(Initializing)
@@ -74,6 +76,7 @@ class ImportGooglePasswordsWebFlowViewModel @AssistedInject constructor(
     fun onViewCreated() {
         viewModelScope.launch(dispatchers.io()) {
             _viewState.value = ViewState.LoadStartPage(autofillImportConfigStore.getConfig().launchUrlGooglePasswords)
+            passwordImportExperimentMetrics.fireImportStartedMetric()
         }
     }
 
@@ -93,12 +96,14 @@ class ImportGooglePasswordsWebFlowViewModel @AssistedInject constructor(
         logcat(WARN) { "Error decoding CSV" }
         importPasswordsPixelSender.onImportFailed(ErrorParsingCsv, launchSource)
         _viewState.value = ViewState.UserFinishedCannotImport(ErrorParsingCsv)
+        viewModelScope.launch { passwordImportExperimentMetrics.fireImportFailedMetric() }
     }
 
     fun onWebViewCrash() {
         logcat(WARN) { "WebView has crashed during password import flow" }
         importPasswordsPixelSender.onImportFailed(WebViewCrash, launchSource)
         _viewState.value = ViewState.UserFinishedCannotImport(WebViewCrash)
+        viewModelScope.launch { passwordImportExperimentMetrics.fireImportFailedMetric() }
     }
 
     fun onCloseButtonPressed(url: String?) {
@@ -123,6 +128,7 @@ class ImportGooglePasswordsWebFlowViewModel @AssistedInject constructor(
             val stage = urlToStageMapper.getStage(url)
             importPasswordsPixelSender.onUserCancelledImportWebFlow(stage, launchSource)
             _viewState.value = UserCancelledImportFlow(stage)
+            passwordImportExperimentMetrics.fireImportCancelledMetric()
         }
     }
 

@@ -23,11 +23,13 @@ class ImportPasswordsResultPixelObserverTest {
 
     private val credentialImporter: CredentialImporter = mock()
     private val importPasswordsPixelSender: ImportPasswordsPixelSender = mock()
+    private val passwordImportExperimentMetrics: PasswordImportExperimentMetrics = mock()
     private val lifecycleOwner: LifecycleOwner = mock()
 
     private val testee = ImportPasswordsResultPixelObserver(
         credentialImporter = credentialImporter,
         importPasswordsPixelSender = importPasswordsPixelSender,
+        passwordImportExperimentMetrics = passwordImportExperimentMetrics,
         appCoroutineScope = coroutineTestRule.testScope,
         dispatchers = coroutineTestRule.testDispatcherProvider,
     )
@@ -44,6 +46,35 @@ class ImportPasswordsResultPixelObserverTest {
         whenever(credentialImporter.getImportStatus()).thenReturn(listOf(InProgress).asFlow())
         testee.onCreate(lifecycleOwner)
         verifyNoInteractions(importPasswordsPixelSender)
+    }
+
+    @Test
+    fun whenImportStillInProgressThenNoExperimentMetricFired() = runTest {
+        whenever(credentialImporter.getImportStatus()).thenReturn(listOf(InProgress).asFlow())
+        testee.onCreate(lifecycleOwner)
+        verifyNoInteractions(passwordImportExperimentMetrics)
+    }
+
+    @Test
+    fun whenImportFinishedThenImportSuccessMetricFired() = runTest {
+        whenever(credentialImporter.getImportStatus()).thenReturn(
+            listOf(InProgress, Finished(savedCredentials = 10, numberSkipped = 2, source = Onboarding)).asFlow(),
+        )
+
+        testee.onCreate(lifecycleOwner)
+
+        verify(passwordImportExperimentMetrics).fireImportSuccessMetric()
+    }
+
+    @Test
+    fun whenImportFinishedWithNoCredentialsSavedThenImportSuccessMetricStillFired() = runTest {
+        whenever(credentialImporter.getImportStatus()).thenReturn(
+            listOf(Finished(savedCredentials = 0, numberSkipped = 3, source = Onboarding)).asFlow(),
+        )
+
+        testee.onCreate(lifecycleOwner)
+
+        verify(passwordImportExperimentMetrics).fireImportSuccessMetric()
     }
 
     @Test

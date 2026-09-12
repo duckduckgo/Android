@@ -38,6 +38,7 @@ class OnboardingCompletedMetricObserverTest {
     private val userStageStore: UserStageStore = mock { on { userAppStageFlow() } doReturn appStageFlow }
     private val metrics: OnboardingPromptsExperimentMetrics = mock()
     private val segmentedMetrics: SegmentedOnboardingExperimentMetrics = mock()
+    private val passwordImportMetrics: OnboardingPasswordImportExperimentMetrics = mock()
     private val lifecycleOwner: LifecycleOwner = mock()
 
     private val testee = OnboardingCompletedMetricObserver(
@@ -45,6 +46,7 @@ class OnboardingCompletedMetricObserverTest {
         userStageStore = userStageStore,
         onboardingPromptsExperimentMetrics = metrics,
         segmentedOnboardingExperimentMetrics = segmentedMetrics,
+        onboardingPasswordImportExperimentMetrics = passwordImportMetrics,
     )
 
     @Test
@@ -54,6 +56,7 @@ class OnboardingCompletedMetricObserverTest {
         appStageFlow.emit(AppStage.ESTABLISHED)
 
         verify(metrics).fireOnboardingCompletedMetric()
+        verify(passwordImportMetrics).fireOnboardingCompletedMetric()
     }
 
     @Test
@@ -64,6 +67,7 @@ class OnboardingCompletedMetricObserverTest {
         appStageFlow.emit(AppStage.DAX_ONBOARDING)
 
         verify(metrics, never()).fireOnboardingCompletedMetric()
+        verify(passwordImportMetrics, never()).fireOnboardingCompletedMetric()
     }
 
     @Test

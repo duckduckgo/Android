@@ -11,6 +11,7 @@ import com.duckduckgo.autofill.impl.importing.CredentialImporter
 import com.duckduckgo.autofill.impl.importing.CsvCredentialConverter
 import com.duckduckgo.autofill.impl.importing.CsvCredentialConverter.CsvCredentialImportResult.Error
 import com.duckduckgo.autofill.impl.importing.CsvCredentialConverter.CsvCredentialImportResult.Success
+import com.duckduckgo.autofill.impl.importing.PasswordImportExperimentMetrics
 import com.duckduckgo.autofill.impl.importing.gpm.feature.AutofillImportPasswordConfigStore
 import com.duckduckgo.autofill.impl.importing.gpm.feature.AutofillImportPasswordSettings
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.Command.InjectCredentialsFromReauth
@@ -53,6 +54,7 @@ class ImportGooglePasswordsWebFlowViewModelTest {
     private val reauthenticationHandler: ReauthenticationHandler = mock()
     private val autofillFeature: AutofillFeature = mock()
     private val importPasswordsPixelSender: ImportPasswordsPixelSender = mock()
+    private val passwordImportExperimentMetrics: PasswordImportExperimentMetrics = mock()
 
     private val testee = ImportGooglePasswordsWebFlowViewModel(
         launchSource = Onboarding,
@@ -64,6 +66,7 @@ class ImportGooglePasswordsWebFlowViewModelTest {
         reauthenticationHandler = reauthenticationHandler,
         autofillFeature = autofillFeature,
         importPasswordsPixelSender = importPasswordsPixelSender,
+        passwordImportExperimentMetrics = passwordImportExperimentMetrics,
     )
 
     @Test
@@ -381,6 +384,45 @@ class ImportGooglePasswordsWebFlowViewModelTest {
         configureCsvSuccess(loginCredentialsToImport = credentials)
 
         verify(credentialImporter).import(credentials, credentials.size, Onboarding)
+    }
+
+    @Test
+    fun whenOnViewCreatedThenImportStartedMetricFired() = runTest {
+        configureFeature()
+        testee.onViewCreated()
+        verify(passwordImportExperimentMetrics).fireImportStartedMetric()
+    }
+
+    @Test
+    fun whenCsvParseErrorThenImportFailedMetricFired() = runTest {
+        configureCsvParseError()
+        verify(passwordImportExperimentMetrics).fireImportFailedMetric()
+    }
+
+    @Test
+    fun whenWebViewCrashesThenImportFailedMetricFired() = runTest {
+        testee.onWebViewCrash()
+        verify(passwordImportExperimentMetrics).fireImportFailedMetric()
+    }
+
+    @Test
+    fun whenCloseButtonPressedThenImportCancelledMetricFired() = runTest {
+        whenever(urlToStageMapper.getStage(any())).thenReturn("stage")
+        testee.onCloseButtonPressed("https://example.com")
+        verify(passwordImportExperimentMetrics).fireImportCancelledMetric()
+    }
+
+    @Test
+    fun whenBackButtonPressedAndCannotGoBackThenImportCancelledMetricFired() = runTest {
+        whenever(urlToStageMapper.getStage(any())).thenReturn("stage")
+        testee.onBackButtonPressed(url = "https://example.com", canGoBack = false)
+        verify(passwordImportExperimentMetrics).fireImportCancelledMetric()
+    }
+
+    @Test
+    fun whenBackButtonPressedAndCanGoBackThenImportCancelledMetricNotFired() = runTest {
+        testee.onBackButtonPressed(url = "https://example.com", canGoBack = true)
+        verify(passwordImportExperimentMetrics, never()).fireImportCancelledMetric()
     }
 
     private fun configureReAuthenticationFeatureFlagEnabled() {
