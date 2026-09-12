@@ -41,10 +41,12 @@ interface ModalEvaluator {
         get() = ModalTrigger.APP_RESUME
 
     /**
-     * Evaluates whether this modal should be shown.
-     * Called by coordinator only if not blocked by 24-hour window (cooldown period).
+     * Evaluates whether this modal should be shown. Must be side-effect free with respect to
+     * showing: an eligible evaluator returns [EvaluationResult.WantsToShow] and defers the actual
+     * showing to the returned action, which the coordinator invokes only once the shared prompt
+     * surface has been claimed. Never show a modal directly from this method.
      *
-     * @return EvaluationResult indicating whether evaluation was completed and modal was shown/triggered or skipped
+     * @return EvaluationResult indicating whether this evaluator wants to show a modal or skipped
      */
     suspend fun evaluate(): EvaluationResult
 
@@ -53,10 +55,18 @@ interface ModalEvaluator {
      */
     sealed class EvaluationResult {
 
-        /** Evaluation completed and modal was shown/triggered */
-        object ModalShown : EvaluationResult()
+        /**
+         * Evaluation completed and this evaluator wants to show its modal.
+         *
+         * @param show shows the modal when invoked; returns true when the modal was actually
+         * shown/triggered, false when showing fell through (e.g. no visible host to render into).
+         * Invoked at most once, only after the coordinator has secured the prompt surface. State
+         * that must only be persisted when the modal really shows (e.g. "prompt consumed" flags)
+         * belongs inside this action, not in [evaluate].
+         */
+        class WantsToShow(val show: suspend () -> Boolean) : EvaluationResult()
 
-        /** Evaluation was skipped due to internal conditions. No modal was shown/triggered */
+        /** Evaluation was skipped due to internal conditions. No modal will be shown/triggered */
         object Skipped : EvaluationResult()
     }
 }

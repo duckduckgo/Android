@@ -20,10 +20,14 @@ package com.duckduckgo.promptscoordinator.api
  * Arbitrates the shared New Tab Page prompt surface between the Modal Coordinator and the Remote
  * Messaging Framework (RMF) inline card, enforcing:
  *
- * 1. No overlap: the surface is claimed ([tryClaim]) until the prompt is shown ([onClaimDone]) or
- *    turns out not to materialize ([onClaimCancelled]).
- * 2. Quiet gaps between prompts, sized by the type about to show.
- * 3. Fair access: a claimant finding the surface busy waits briefly rather than giving up.
+ * 1. No overlap: two app-originated prompts are never on screen together. The surface is acquired
+ *    with a claim ([tryClaim]) held until the prompt is done ([onClaimDone]) or the claim turns out
+ *    not to materialize ([onClaimCancelled]).
+ * 2. Quiet gaps between prompts, measured from when the previous prompt was shown or dismissed,
+ *    sized by the type of the prompt about to show.
+ *
+ * Claims must never be speculative: claim only when the prompt is definitely about to show, so a
+ * busy surface always means another prompt is genuinely showing and refusal is a final answer.
  *
  * All gating sits behind the `promptsCoordinator` kill-switch: when disabled, [tryClaim] always
  * returns true and the reports are no-ops (see [isEnabled]).
@@ -37,16 +41,12 @@ interface PromptsCoordinator {
     suspend fun isEnabled(): Boolean
 
     /**
-     * Claims the shared prompt surface for [type].
+     * Claims the shared prompt surface for [type]. Call it only when the prompt is definitely about
+     * to show — never to reserve the surface while still deciding.
      *
-     * A busy surface is waited out for up to a second: a claim that never becomes a prompt is
-     * released within milliseconds, so the wait turns most collisions into a granted claim. The gap
-     * cannot clear in that window, so it refuses immediately. Do not block latency-sensitive UI on
-     * the result.
-     *
-     * @return false when the surface is still held after the wait, or the gap for [type] has not
-     * elapsed. Callers must not show their prompt, and must release an unused claim with
-     * [onClaimCancelled].
+     * @return false when the surface is held by another prompt or the gap for [type] has not
+     * elapsed. Callers must not show their prompt and should re-evaluate on their next natural
+     * trigger. A claim whose prompt then fails to show must be released with [onClaimCancelled].
      */
     suspend fun tryClaim(type: PromptType): Boolean
 

@@ -25,7 +25,6 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.promptscoordinator.api.PromptType
-import kotlinx.coroutines.async
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertFalse
@@ -191,56 +190,15 @@ class RealPromptsCoordinatorTest {
     }
 
     @Test
-    fun whenSurfaceIsFreedWhileAClaimIsWaitingThenThatClaimIsGranted() = runTest {
+    fun whenSurfaceIsBusyThenRefusalIsImmediateAndANewClaimSucceedsAfterRelease() = runTest {
         assertTrue(testee.tryClaim(PromptType.MODAL))
 
-        val waiting = async { testee.tryClaim(PromptType.NTP_CARD) }
-        // Let the claim reach the wait before the surface frees, so the wait is what grants it.
-        coroutinesTestRule.testScope.testScheduler.runCurrent()
+        // Claims are never speculative, so a busy surface is a final answer: no waiting.
+        assertFalse(testee.tryClaim(PromptType.NTP_CARD))
+
         testee.onClaimCancelled(PromptType.MODAL)
-
-        assertTrue(waiting.await())
-    }
-
-    @Test
-    fun whenTwoTypesWaitOnTheSameSurfaceThenExactlyOneIsGranted() = runTest {
-        assertTrue(testee.tryClaim(PromptType.MODAL))
-
-        val waitingCard = async { testee.tryClaim(PromptType.NTP_CARD) }
-        val waitingModal = async { testee.tryClaim(PromptType.MODAL) }
-        coroutinesTestRule.testScope.testScheduler.runCurrent()
-        testee.onClaimCancelled(PromptType.MODAL)
-
-        // Waiters are not a queue, so which one wins is undefined; what holds is that the released
-        // surface goes to exactly one of them.
-        assertTrue(waitingCard.await() != waitingModal.await())
-    }
-
-    @Test
-    fun whenSeveralNtpCardClaimsWaitThenAllOfThemAreGranted() = runTest {
-        assertTrue(testee.tryClaim(PromptType.MODAL))
-
-        val firstCard = async { testee.tryClaim(PromptType.NTP_CARD) }
-        val secondCard = async { testee.tryClaim(PromptType.NTP_CARD) }
-        coroutinesTestRule.testScope.testScheduler.runCurrent()
-        testee.onClaimCancelled(PromptType.MODAL)
-
-        // Concurrent NTP renders never compete: whichever lands second takes the re-claim path.
-        assertTrue(firstCard.await())
-        assertTrue(secondCard.await())
-    }
-
-    @Test
-    fun whenAShownPromptReleasesTheSurfaceWhileAClaimIsWaitingThenTheGapRefusesIt() = runTest {
-        assertTrue(testee.tryClaim(PromptType.MODAL))
-
-        val waiting = async { testee.tryClaim(PromptType.NTP_CARD) }
-        coroutinesTestRule.testScope.testScheduler.runCurrent()
-        testee.onClaimDone(PromptType.MODAL)
-
-        // Waking up is not the same as winning: a modal that was actually shown stamps the quiet
-        // gap as it releases, so the waiting card is refused by the gap that release just started.
-        assertFalse(waiting.await())
+        coroutinesTestRule.testScope.testScheduler.advanceUntilIdle()
+        assertTrue(testee.tryClaim(PromptType.NTP_CARD))
     }
 
     @Test

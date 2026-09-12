@@ -116,34 +116,38 @@ class DefaultBrowserChangedSurveyEvaluatorImplTest {
     }
 
     @Test
-    fun whenSurveyShouldTriggerAndInSampleThenEvaluationReturnsModalShown() = runTest {
+    fun whenSurveyShouldTriggerAndInSampleThenEvaluationWantsToShow() = runTest {
         whenever(surveyManager.shouldTriggerSurvey()).thenReturn(true)
         whenever(sampler.isInSample()).thenReturn(true)
         whenever(surveyManager.buildSurveyUrl("in-app")).thenReturn("https://example.com/survey")
 
         val result = testee.evaluate()
 
-        assertEquals(ModalEvaluator.EvaluationResult.ModalShown, result)
+        assertTrue(result is ModalEvaluator.EvaluationResult.WantsToShow)
+        // Deciding alone commits nothing: the survey is only consumed once the show action runs.
+        verify(surveyManager, never()).markSurveyShown()
     }
 
     @Test
-    fun whenSurveyShouldTriggerAndInSampleThenSurveyIsMarkedShown() = runTest {
+    fun whenSurveyShowActionRunsThenSurveyIsMarkedShown() = runTest {
         whenever(surveyManager.shouldTriggerSurvey()).thenReturn(true)
         whenever(sampler.isInSample()).thenReturn(true)
         whenever(surveyManager.buildSurveyUrl("in-app")).thenReturn("https://example.com/survey")
 
-        testee.evaluate()
+        val result = testee.evaluate() as ModalEvaluator.EvaluationResult.WantsToShow
+        assertTrue(result.show())
 
         verify(surveyManager).markSurveyShown()
     }
 
     @Test
-    fun whenSurveyShouldTriggerAndInSampleThenSurveyActivityIsStartedWithExpectedFlags() = runTest {
+    fun whenSurveyShowActionRunsThenSurveyActivityIsStartedWithExpectedFlags() = runTest {
         whenever(surveyManager.shouldTriggerSurvey()).thenReturn(true)
         whenever(sampler.isInSample()).thenReturn(true)
         whenever(surveyManager.buildSurveyUrl("in-app")).thenReturn("https://example.com/survey")
 
-        testee.evaluate()
+        val result = testee.evaluate() as ModalEvaluator.EvaluationResult.WantsToShow
+        assertTrue(result.show())
         coroutinesTestRule.testScope.testScheduler.advanceUntilIdle()
 
         val startedIntent = shadowOf(applicationContext).nextStartedActivity

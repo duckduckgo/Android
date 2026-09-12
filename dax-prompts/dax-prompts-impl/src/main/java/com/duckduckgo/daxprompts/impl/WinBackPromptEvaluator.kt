@@ -72,14 +72,16 @@ class WinBackPromptEvaluatorImpl @Inject constructor(
                 .startIntent(applicationContext, DaxPromptBrowserComparisonParams(LaunchSource.WIN_BACK))
                 ?: return@withContext ModalEvaluator.EvaluationResult.Skipped
 
-            delay(MODAL_DISPLAY_DELAY)
-            appCoroutineScope.launch(dispatchers.main()) {
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
-                val options = ActivityOptions.makeCustomAnimation(applicationContext, R.anim.slide_from_bottom, 0).toBundle()
-                applicationContext.startActivity(intent, options)
-            }
+            return@withContext ModalEvaluator.EvaluationResult.WantsToShow {
+                delay(MODAL_DISPLAY_DELAY)
+                appCoroutineScope.launch(dispatchers.main()) {
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                    val options = ActivityOptions.makeCustomAnimation(applicationContext, R.anim.slide_from_bottom, 0).toBundle()
+                    applicationContext.startActivity(intent, options)
+                }
 
-            return@withContext ModalEvaluator.EvaluationResult.ModalShown
+                true
+            }
         } else {
             return@withContext ModalEvaluator.EvaluationResult.Skipped
         }
