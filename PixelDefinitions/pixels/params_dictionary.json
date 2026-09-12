@@ -126,7 +126,8 @@
             "deep_link_other",
             "paid_settings",
             "return_to_chat_card",
-            "tab_switcher_existing_chat"
+            "tab_switcher_existing_chat",
+            "subscription_onboarding"
         ]
     },
     "osVersion": {

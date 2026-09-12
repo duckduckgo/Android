@@ -52,6 +52,14 @@ class SubscriptionOnboardingPlanProviderTest {
     }
 
     @Test
+    fun whenPluginShouldNotShowThenItIsRecordedAsCompleted() = runTest {
+        providerWith(stubPlugin("welcome"), stubPlugin("duck_ai", shouldShow = false)).buildPlan()
+
+        assertTrue(stepStore.isCompleted("duck_ai"))
+        assertFalse(stepStore.isCompleted("welcome"))
+    }
+
+    @Test
     fun whenStepFinishedForCurrentStepThenAdvancesOtherwiseStays() = runTest {
         val step = providerWith(stubPlugin("welcome")).buildPlan().steps.single()
 
