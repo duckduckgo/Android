@@ -349,6 +349,32 @@ fladle {
             // including the failed attempt + passed rerun of a flaky test.
             fullJunitResult.set(true)
         }
+        perfTests {
+            serviceAccountCredentials.set(project.layout.projectDirectory.file("flank.json"))
+            flankVersion.set("21.+")
+            useOrchestrator.set(false)
+            recordVideo.set(false)
+            debugApk.set(project.provider {
+                def dir = rootProject.file("app/build/outputs/apk/internal/release")
+                def apks = dir.exists() ? (dir.listFiles() ?: []).findAll { it.name.endsWith("-internal-release.apk") } : []
+                if (apks.isEmpty()) {
+                    throw new GradleException("No internalRelease APK in $dir — run :app:assembleInternalRelease first")
+                }
+                apks.first().absolutePath
+            })
+            instrumentationApk.set(rootProject.file("macrobenchmark/build/outputs/apk/release/macrobenchmark-release.apk").absolutePath)
+            additionalTestApks.set([])
+            testTargets.set(["class com.duckduckgo.macrobenchmark.PageLoadBenchmark"])
+            devices.set([["model": "MediumPhone.arm", "version": "31"]])
+            environmentVariables.set([
+                    "additionalTestOutputDir"        : "/sdcard/Download",
+                    "no-isolated-storage"            : "true",
+                    "androidx.benchmark.suppressErrors": "EMULATOR",
+            ])
+            directoriesToPull.set(["/sdcard/Download"])
+            localResultsDir.set("perfResults")
+            flakyTestAttempts.set(0)
+        }
     }
 }
 

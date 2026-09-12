@@ -562,6 +562,8 @@ dependencies {
     implementation AndroidX.recyclerView
     implementation AndroidX.swipeRefreshLayout
     implementation AndroidX.webkit
+    // Backs the internal-flavor PageLoadTracer (src/internal); other flavors bind a no-op instead.
+    internalImplementation AndroidX.tracing
     implementation Square.okHttp3.okHttp
     implementation "com.squareup.okhttp3:okhttp-tls:_"
     implementation Square.retrofit2.retrofit
