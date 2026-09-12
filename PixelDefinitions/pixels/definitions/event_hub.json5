@@ -34,5 +34,185 @@
                 "description": "Unix timestamp (UTC) denoting the start of the measurement period"
             }
         ]
+    },
+    "webTelemetry_captcha_recaptcha_day": {
+        "description": "Daily bucketed count of reCAPTCHA detections across all pages. Fired by the eventHub feature at the end of each 1-day period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "parameters": [
+            {
+                "key": "count",
+                "type": "string",
+                "description": "Bucketed reCAPTCHA detection count for the period",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "attributionPeriod",
+                "type": "integer",
+                "description": "Unix timestamp (UTC) denoting the start of the measurement period"
+            }
+        ]
+    },
+    "webTelemetry_captcha_recaptcha_week": {
+        "description": "Weekly bucketed count of reCAPTCHA detections across all pages. Fired by the eventHub feature at the end of each 7-day period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "parameters": [
+            {
+                "key": "count",
+                "type": "string",
+                "description": "Bucketed reCAPTCHA detection count for the period",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "attributionPeriod",
+                "type": "integer",
+                "description": "Unix timestamp (UTC) denoting the start of the measurement period"
+            }
+        ]
+    },
+    "webTelemetry_captcha_hcaptcha_day": {
+        "description": "Daily bucketed count of hCaptcha detections across all pages. Fired by the eventHub feature at the end of each 1-day period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "parameters": [
+            {
+                "key": "count",
+                "type": "string",
+                "description": "Bucketed hCaptcha detection count for the period",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "attributionPeriod",
+                "type": "integer",
+                "description": "Unix timestamp (UTC) denoting the start of the measurement period"
+            }
+        ]
+    },
+    "webTelemetry_captcha_hcaptcha_week": {
+        "description": "Weekly bucketed count of hCaptcha detections across all pages. Fired by the eventHub feature at the end of each 7-day period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "parameters": [
+            {
+                "key": "count",
+                "type": "string",
+                "description": "Bucketed hCaptcha detection count for the period",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "attributionPeriod",
+                "type": "integer",
+                "description": "Unix timestamp (UTC) denoting the start of the measurement period"
+            }
+        ]
+    },
+    "webTelemetry_captcha_turnstile_day": {
+        "description": "Daily bucketed count of Cloudflare Turnstile CAPTCHA detections across all pages. Fired by the eventHub feature at the end of each 1-day period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "parameters": [
+            {
+                "key": "count",
+                "type": "string",
+                "description": "Bucketed Cloudflare Turnstile detection count for the period",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "attributionPeriod",
+                "type": "integer",
+                "description": "Unix timestamp (UTC) denoting the start of the measurement period"
+            }
+        ]
+    },
+    "webTelemetry_captcha_turnstile_week": {
+        "description": "Weekly bucketed count of Cloudflare Turnstile CAPTCHA detections across all pages. Fired by the eventHub feature at the end of each 7-day period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "parameters": [
+            {
+                "key": "count",
+                "type": "string",
+                "description": "Bucketed Cloudflare Turnstile detection count for the period",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "attributionPeriod",
+                "type": "integer",
+                "description": "Unix timestamp (UTC) denoting the start of the measurement period"
+            }
+        ]
+    },
+    "webTelemetry_captcha_cloudflare_day": {
+        "description": "Daily bucketed count of Cloudflare challenge-page detections across all pages. Fired by the eventHub feature at the end of each 1-day period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "parameters": [
+            {
+                "key": "count",
+                "type": "string",
+                "description": "Bucketed Cloudflare challenge-page detection count for the period",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "attributionPeriod",
+                "type": "integer",
+                "description": "Unix timestamp (UTC) denoting the start of the measurement period"
+            }
+        ]
+    },
+    "webTelemetry_captcha_cloudflare_week": {
+        "description": "Weekly bucketed count of Cloudflare challenge-page detections across all pages. Fired by the eventHub feature at the end of each 7-day period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "parameters": [
+            {
+                "key": "count",
+                "type": "string",
+                "description": "Bucketed Cloudflare challenge-page detection count for the period",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "attributionPeriod",
+                "type": "integer",
+                "description": "Unix timestamp (UTC) denoting the start of the measurement period"
+            }
+        ]
+    },
+    "webTelemetry_captcha_other_day": {
+        "description": "Daily bucketed count of other/generic CAPTCHA detections across all pages. Fired by the eventHub feature at the end of each 1-day period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "parameters": [
+            {
+                "key": "count",
+                "type": "string",
+                "description": "Bucketed other/generic CAPTCHA detection count for the period",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "attributionPeriod",
+                "type": "integer",
+                "description": "Unix timestamp (UTC) denoting the start of the measurement period"
+            }
+        ]
+    },
+    "webTelemetry_captcha_other_week": {
+        "description": "Weekly bucketed count of other/generic CAPTCHA detections across all pages. Fired by the eventHub feature at the end of each 7-day period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "parameters": [
+            {
+                "key": "count",
+                "type": "string",
+                "description": "Bucketed other/generic CAPTCHA detection count for the period",
+                "pattern": "^\\d+(-\\d+|\\+)?$"
+            },
+            {
+                "key": "attributionPeriod",
+                "type": "integer",
+                "description": "Unix timestamp (UTC) denoting the start of the measurement period"
+            }
+        ]
     }
 }
