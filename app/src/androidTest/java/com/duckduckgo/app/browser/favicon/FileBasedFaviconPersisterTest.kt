@@ -28,6 +28,9 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.sha256
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -90,7 +93,162 @@ class FileBasedFaviconPersisterTest {
 
         assertNotNull(file)
         verifyDirectoryUse(file!!.absolutePath, testDirectory)
-        verifyCacheDirectoryUsed(file.absolutePath)
+        verifyExpectedBaseDirectoryUsed(file.absolutePath, testDirectory)
+    }
+
+    @Test
+    fun whenFaviconFileIsForTempDirectoryThenCacheDirUsed() = runTest {
+        createNewFile(FileBasedFaviconPersister.FAVICON_TEMP_DIR)
+        val file = testee.faviconFile(FileBasedFaviconPersister.FAVICON_TEMP_DIR, subFolder, domain)
+
+        assertNotNull(file)
+        assertTrue(file!!.absolutePath.startsWith(context.cacheDir.absolutePath))
+    }
+
+    @Test
+    fun whenFaviconFileIsForPersistedDirectoryThenNonCacheDirUsed() = runTest {
+        createNewFile(FileBasedFaviconPersister.FAVICON_PERSISTED_DIR)
+        val file = testee.faviconFile(FileBasedFaviconPersister.FAVICON_PERSISTED_DIR, subFolder, domain)
+
+        assertNotNull(file)
+        assertTrue(file!!.absolutePath.startsWith(context.filesDir.absolutePath))
+        assertFalse(file.absolutePath.startsWith(context.cacheDir.absolutePath))
+    }
+
+    @Test
+    fun whenLegacyCacheFaviconExistsThenItIsMovedToFilesDirOnFirstAccess() = runTest {
+        val legacyFile = createLegacyCacheFile(FileBasedFaviconPersister.FAVICON_PERSISTED_DIR, content = "legacy")
+
+        val file = testee.faviconFile(FileBasedFaviconPersister.FAVICON_PERSISTED_DIR, subFolder, domain)
+
+        assertNotNull(file)
+        assertTrue(file!!.absolutePath.startsWith(context.filesDir.absolutePath))
+        assertEquals("legacy", file.readText())
+        assertFalse(legacyFile.exists())
+        assertFalse(File(context.cacheDir, FileBasedFaviconPersister.FAVICON_PERSISTED_DIR).exists())
+    }
+
+    @Test
+    fun whenLegacyCacheFaviconAndNewFaviconBothExistThenNewOneIsKept() = runTest {
+        createLegacyCacheFile(FileBasedFaviconPersister.FAVICON_PERSISTED_DIR, content = "legacy")
+        createNewFile(FileBasedFaviconPersister.FAVICON_PERSISTED_DIR, content = "new")
+
+        val file = testee.faviconFile(FileBasedFaviconPersister.FAVICON_PERSISTED_DIR, subFolder, domain)
+
+        assertNotNull(file)
+        assertEquals("new", file!!.readText())
+        assertFalse(File(context.cacheDir, FileBasedFaviconPersister.FAVICON_PERSISTED_DIR).exists())
+    }
+
+    @Test
+    fun whenLegacyCacheWidgetPlaceholderExistsThenItIsMovedToFilesDirOnFirstAccess() = runTest {
+        createLegacyCacheFile(FileBasedFaviconPersister.FAVICON_WIDGET_PLACEHOLDERS_DIR, content = "legacy")
+
+        val file = testee.faviconFile(FileBasedFaviconPersister.FAVICON_WIDGET_PLACEHOLDERS_DIR, subFolder, domain)
+
+        assertNotNull(file)
+        assertTrue(file!!.absolutePath.startsWith(context.filesDir.absolutePath))
+        assertFalse(File(context.cacheDir, FileBasedFaviconPersister.FAVICON_WIDGET_PLACEHOLDERS_DIR).exists())
+    }
+
+    @Test
+    fun whenNoLegacyCacheDirectoryExistsThenNothingIsCreatedInCache() = runTest {
+        createNewFile(FileBasedFaviconPersister.FAVICON_PERSISTED_DIR)
+
+        val file = testee.faviconFile(FileBasedFaviconPersister.FAVICON_PERSISTED_DIR, subFolder, domain)
+
+        assertNotNull(file)
+        assertFalse(File(context.cacheDir, FileBasedFaviconPersister.FAVICON_PERSISTED_DIR).exists())
+    }
+
+    @Test
+    fun whenLegacyCacheDirectoryIsEmptyThenItIsRemoved() = runTest {
+        val legacyDirectory = File(context.cacheDir, FileBasedFaviconPersister.FAVICON_PERSISTED_DIR)
+        legacyDirectory.mkdirs()
+
+        testee.faviconFile(FileBasedFaviconPersister.FAVICON_PERSISTED_DIR, subFolder, domain)
+
+        assertFalse(legacyDirectory.exists())
+    }
+
+    @Test
+    fun whenLegacyCacheContainsNestedFilesThenStructureIsPreserved() = runTest {
+        createLegacyCacheFile(FileBasedFaviconPersister.FAVICON_PERSISTED_DIR, content = "legacy")
+        val nested = File(File(File(context.cacheDir, FileBasedFaviconPersister.FAVICON_PERSISTED_DIR), "nested"), "inner.png")
+        nested.parentFile!!.mkdirs()
+        writeBytesToFile(nested, "nested")
+
+        testee.faviconFile(FileBasedFaviconPersister.FAVICON_PERSISTED_DIR, subFolder, domain)
+
+        val migratedNested = File(File(File(context.filesDir, FileBasedFaviconPersister.FAVICON_PERSISTED_DIR), "nested"), "inner.png")
+        assertEquals("nested", migratedNested.readText())
+        assertFalse(File(context.cacheDir, FileBasedFaviconPersister.FAVICON_PERSISTED_DIR).exists())
+    }
+
+    @Test
+    fun whenLegacyCacheContainsTmpFileThenItIsNotMigrated() = runTest {
+        createLegacyCacheFile(FileBasedFaviconPersister.FAVICON_PERSISTED_DIR, content = "legacy")
+        val legacyDirectory = File(File(context.cacheDir, FileBasedFaviconPersister.FAVICON_PERSISTED_DIR), subFolder)
+        writeBytesToFile(File(legacyDirectory, "${filename(domain)}.tmp"), "partial")
+
+        testee.faviconFile(FileBasedFaviconPersister.FAVICON_PERSISTED_DIR, subFolder, domain)
+
+        val migratedDirectory = File(File(context.filesDir, FileBasedFaviconPersister.FAVICON_PERSISTED_DIR), subFolder)
+        assertTrue(File(migratedDirectory, filename(domain)).exists())
+        assertFalse(File(migratedDirectory, "${filename(domain)}.tmp").exists())
+        assertFalse(File(context.cacheDir, FileBasedFaviconPersister.FAVICON_PERSISTED_DIR).exists())
+    }
+
+    @Test
+    fun whenLegacyCacheIsAccessedConcurrentlyThenMigrationHappensOnceWithoutErrors() = runTest {
+        createLegacyCacheFile(FileBasedFaviconPersister.FAVICON_PERSISTED_DIR, content = "legacy")
+
+        val results = (1..20).map {
+            async(Dispatchers.IO) {
+                testee.faviconFile(FileBasedFaviconPersister.FAVICON_PERSISTED_DIR, subFolder, domain)
+            }
+        }.awaitAll()
+
+        assertTrue(results.all { it != null && it.absolutePath.startsWith(context.filesDir.absolutePath) })
+        assertEquals("legacy", results.first()!!.readText())
+        assertFalse(File(context.cacheDir, FileBasedFaviconPersister.FAVICON_PERSISTED_DIR).exists())
+    }
+
+    @Test
+    fun whenOneLegacyFileCannotBeMovedThenOthersMigrateAndLegacyDirectoryIsKeptForRetry() = runTest {
+        createLegacyCacheFile(FileBasedFaviconPersister.FAVICON_PERSISTED_DIR, content = "legacy")
+        val legacyRoot = File(context.cacheDir, FileBasedFaviconPersister.FAVICON_PERSISTED_DIR)
+        val blockedLegacyFile = File(File(legacyRoot, "blocked"), "inner.png")
+        blockedLegacyFile.parentFile!!.mkdirs()
+        writeBytesToFile(blockedLegacyFile, "blocked")
+        // A regular file where the destination sub-directory should be makes that one move fail.
+        val destinationRoot = File(context.filesDir, FileBasedFaviconPersister.FAVICON_PERSISTED_DIR)
+        destinationRoot.mkdirs()
+        val blocker = File(destinationRoot, "blocked")
+        writeBytesToFile(blocker, "not a directory")
+
+        val file = testee.faviconFile(FileBasedFaviconPersister.FAVICON_PERSISTED_DIR, subFolder, domain)
+
+        assertNotNull(file)
+        assertEquals("legacy", file!!.readText())
+        assertTrue(legacyRoot.exists())
+        assertTrue(blockedLegacyFile.exists())
+        assertFalse(File(File(legacyRoot, subFolder), filename(domain)).exists())
+
+        blocker.delete()
+        testee.faviconFile(FileBasedFaviconPersister.FAVICON_PERSISTED_DIR, subFolder, domain)
+
+        assertEquals("blocked", File(File(destinationRoot, "blocked"), "inner.png").readText())
+        assertFalse(legacyRoot.exists())
+    }
+
+    @Test
+    fun whenTempDirectoryIsAccessedThenNothingIsMigrated() = runTest {
+        val legacyFile = createLegacyCacheFile(FileBasedFaviconPersister.FAVICON_PERSISTED_DIR, content = "legacy")
+
+        testee.faviconFile(FileBasedFaviconPersister.FAVICON_TEMP_DIR, subFolder, domain)
+
+        assertTrue(legacyFile.exists())
     }
 
     @Test
@@ -213,8 +371,11 @@ class FileBasedFaviconPersisterTest {
         assertTrue(path.parent!!.endsWith(subFolder))
     }
 
-    private fun verifyCacheDirectoryUsed(path: String) {
-        assertTrue(path.startsWith(context.cacheDir.absolutePath))
+    private fun verifyExpectedBaseDirectoryUsed(
+        path: String,
+        directory: String,
+    ) {
+        assertTrue(path.startsWith(expectedBaseDir(directory).absolutePath))
     }
 
     private fun verifyDirectoryUse(
@@ -224,21 +385,42 @@ class FileBasedFaviconPersisterTest {
         assertTrue(path.contains("/$directory"))
     }
 
-    private fun createNewFile() {
-        val previewFileDestination = File(File(context.cacheDir, testDirectory), subFolder)
+    // Mirrors FileBasedFaviconPersister's private faviconDirectory() base-dir decision.
+    private fun expectedBaseDir(directory: String): File {
+        return if (directory == FileBasedFaviconPersister.FAVICON_TEMP_DIR) context.cacheDir else context.filesDir
+    }
+
+    private fun createNewFile(
+        directory: String = testDirectory,
+        content: String = "1",
+    ) {
+        val previewFileDestination = File(File(expectedBaseDir(directory), directory), subFolder)
         previewFileDestination.mkdirs()
         val file = File(previewFileDestination, filename(domain))
-        writeBytesToFile(file)
+        writeBytesToFile(file, content)
+    }
+
+    // Where FileBasedFaviconPersister stored persisted favicons before they moved out of cacheDir.
+    private fun createLegacyCacheFile(
+        directory: String,
+        content: String,
+    ): File {
+        val legacyDirectory = File(File(context.cacheDir, directory), subFolder)
+        legacyDirectory.mkdirs()
+        return File(legacyDirectory, filename(domain)).also { writeBytesToFile(it, content) }
     }
 
     private fun getTestFile(): File {
-        val previewFileDestination = File(File(context.cacheDir, testDirectory), subFolder)
+        val previewFileDestination = File(File(expectedBaseDir(testDirectory), testDirectory), subFolder)
         return File(previewFileDestination, filename(domain))
     }
 
-    private fun writeBytesToFile(previewFile: File) {
+    private fun writeBytesToFile(
+        previewFile: File,
+        content: String = "1",
+    ) {
         FileOutputStream(previewFile).use { outputStream ->
-            outputStream.write("1".toByteArray())
+            outputStream.write(content.toByteArray())
             outputStream.flush()
         }
     }
@@ -246,9 +428,15 @@ class FileBasedFaviconPersisterTest {
     private fun filename(name: String): String = "${name.sha256}.png"
 
     private fun deleteTestFolders() {
-        val dirToDelete = File(File(context.cacheDir, testDirectory), "")
-        dirToDelete.deleteRecursively()
-        val secondaryDirToDelete = File(File(context.cacheDir, secondaryTestDirectory), "")
-        secondaryDirToDelete.deleteRecursively()
+        listOf(
+            testDirectory,
+            secondaryTestDirectory,
+            FileBasedFaviconPersister.FAVICON_TEMP_DIR,
+            FileBasedFaviconPersister.FAVICON_PERSISTED_DIR,
+            FileBasedFaviconPersister.FAVICON_WIDGET_PLACEHOLDERS_DIR,
+        ).forEach {
+            File(expectedBaseDir(it), it).deleteRecursively()
+            File(context.cacheDir, it).deleteRecursively()
+        }
     }
 }
