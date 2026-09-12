@@ -189,7 +189,7 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
             content = ContentControllerImpl(
                 binding = binding.daxDialogCta,
                 contentValues = viewModel.contentValues,
-                onContentBound = viewModel::onContentBound,
+                onBeforeContentBound = viewModel::onBeforeContentBound,
                 isLightMode = { appTheme.isLightModeEnabled() },
                 isAddressBarRebrandEnabled = { appBrandDesignUpdateToggles.addressBar().isEnabled() },
             ),

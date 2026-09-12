@@ -23,7 +23,6 @@ import com.duckduckgo.autofill.api.AutofillImportLaunchSource
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource.InBrowserPromo
 import com.duckduckgo.autofill.impl.importing.CredentialImporter
 import com.duckduckgo.autofill.impl.importing.CredentialImporter.ImportResult
-import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.UserCannotImportReason
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.ImportPasswordsPixelSender
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.BrowserPromoPreImport
@@ -46,13 +45,13 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
     private val autofillStore: InternalAutofillStore,
 ) : ViewModel() {
 
-    fun onImportFlowFinishedSuccessfully(importSource: AutofillImportLaunchSource) {
+    fun onImportFlowFinishedSuccessfully() {
         viewModelScope.launch(dispatchers.main()) {
-            observeImportJob(importSource)
+            observeImportJob()
         }
     }
 
-    private suspend fun observeImportJob(importSource: AutofillImportLaunchSource) {
+    private suspend fun observeImportJob() {
         credentialImporter.getImportStatus().collect {
             when (it) {
                 is ImportResult.InProgress -> {
@@ -62,36 +61,20 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
 
                 is ImportResult.Finished -> {
                     logcat { "Import finished: ${it.savedCredentials} imported. ${it.numberSkipped} skipped." }
-                    fireImportSuccessPixel(savedCredentials = it.savedCredentials, numberSkipped = it.numberSkipped, importSource = importSource)
                     _viewState.value = ViewState(viewMode = ViewMode.ImportSuccess(it))
                 }
             }
         }
     }
 
-    fun onImportFlowFinishedWithError(reason: UserCannotImportReason, importSource: AutofillImportLaunchSource) {
-        fireImportFailedPixel(reason, importSource)
+    fun onImportFlowFinishedWithError() {
         _viewState.value = ViewState(viewMode = ViewMode.ImportError)
     }
 
-    fun onImportFlowCancelledByUser(stage: String, canShowPreImportDialog: Boolean, importSource: AutofillImportLaunchSource) {
-        importPasswordsPixelSender.onUserCancelledImportWebFlow(stage, importSource)
-
+    fun onImportFlowCancelledByUser(canShowPreImportDialog: Boolean) {
         if (!canShowPreImportDialog) {
             _viewState.value = ViewState(viewMode = ViewMode.FlowTerminated)
         }
-    }
-
-    private fun fireImportSuccessPixel(savedCredentials: Int, numberSkipped: Int, importSource: AutofillImportLaunchSource) {
-        importPasswordsPixelSender.onImportSuccessful(
-            savedCredentials = savedCredentials,
-            numberSkipped = numberSkipped,
-            source = importSource,
-        )
-    }
-
-    private fun fireImportFailedPixel(reason: UserCannotImportReason, importSource: AutofillImportLaunchSource) {
-        importPasswordsPixelSender.onImportFailed(reason, importSource)
     }
 
     fun shouldShowInitialInstructionalPrompt(importSource: AutofillImportLaunchSource) {
