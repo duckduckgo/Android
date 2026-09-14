@@ -24,7 +24,6 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
@@ -35,10 +34,9 @@ class WidgetPrivacyConfigUpdateListenerTest {
 
     private val context: Context = mock()
     private val widgetUpdater: WidgetUpdater = mock()
-    private val providerInfoUpdater: SearchWidgetProviderInfoUpdater = mock()
     private val toggles: AppBrandDesignUpdateToggles = mock()
     private val addressBarToggle: Toggle = mock()
-    private val testee = WidgetPrivacyConfigUpdateListener(context, widgetUpdater, providerInfoUpdater, toggles)
+    private val testee = WidgetPrivacyConfigUpdateListener(context, widgetUpdater, toggles)
 
     @Before
     fun setUp() {
@@ -46,15 +44,12 @@ class WidgetPrivacyConfigUpdateListenerTest {
     }
 
     @Test
-    fun whenProcessEntersForegroundThenProviderInfoIsSynchronizedBeforeWidgets() {
+    fun whenProcessEntersForegroundThenWidgetsAreRefreshed() {
         whenever(addressBarToggle.isEnabled()).thenReturn(false)
 
         testee.onStart(mock<LifecycleOwner>())
 
-        inOrder(providerInfoUpdater, widgetUpdater) {
-            verify(providerInfoUpdater).sync()
-            verify(widgetUpdater).updateWidgets(context)
-        }
+        verify(widgetUpdater).updateWidgets(context)
     }
 
     @Test
@@ -64,7 +59,6 @@ class WidgetPrivacyConfigUpdateListenerTest {
         testee.onStart(mock<LifecycleOwner>())
         testee.onStart(mock<LifecycleOwner>())
 
-        verify(providerInfoUpdater).sync()
         verify(widgetUpdater).updateWidgets(context)
     }
 
@@ -75,7 +69,6 @@ class WidgetPrivacyConfigUpdateListenerTest {
         testee.onStart(mock<LifecycleOwner>())
         testee.onStart(mock<LifecycleOwner>())
 
-        verify(providerInfoUpdater, times(2)).sync()
         verify(widgetUpdater, times(2)).updateWidgets(context)
     }
 
@@ -86,11 +79,6 @@ class WidgetPrivacyConfigUpdateListenerTest {
         testee.onStart(mock<LifecycleOwner>())
         testee.onPrivacyConfigDownloaded()
 
-        inOrder(providerInfoUpdater, widgetUpdater) {
-            verify(providerInfoUpdater).sync()
-            verify(widgetUpdater).updateWidgets(context)
-            verify(providerInfoUpdater).sync()
-            verify(widgetUpdater).updateWidgets(context)
-        }
+        verify(widgetUpdater, times(2)).updateWidgets(context)
     }
 }
