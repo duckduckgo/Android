@@ -555,9 +555,6 @@
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/search_widget_info" />
-            <meta-data
-                android:name="com.duckduckgo.widget.legacy_provider_info"
-                android:resource="@xml/search_widget_info_legacy" />
         </receiver>
 
         <receiver
@@ -570,9 +567,6 @@
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/search_widget_info_light" />
-            <meta-data
-                android:name="com.duckduckgo.widget.legacy_provider_info"
-                android:resource="@xml/search_widget_info_legacy_light" />
         </receiver>
 
         <receiver
@@ -585,9 +579,6 @@
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/search_only_widget_info" />
-            <meta-data
-                android:name="com.duckduckgo.widget.legacy_provider_info"
-                android:resource="@xml/search_only_widget_info_legacy" />
         </receiver>
 
         <receiver
@@ -600,9 +591,6 @@
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/search_favorites_widget_info" />
-            <meta-data
-                android:name="com.duckduckgo.widget.legacy_provider_info"
-                android:resource="@xml/search_favorites_widget_info_legacy" />
         </receiver>
 
         <receiver
