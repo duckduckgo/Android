@@ -753,16 +753,32 @@ class BrowserTabViewModel @Inject constructor(
 
     private val fireproofWebsiteState: LiveData<List<FireproofWebsiteEntity>> = fireproofWebsiteRepository.getFireproofWebsites()
 
+    private enum class PulseCtaEffect { FORCES, SUPPRESSES, NEUTRAL }
+
     @ExperimentalCoroutinesApi
     @FlowPreview
     private val showPulseAnimation: LiveData<Boolean> =
         combine(
-            ctaViewState.asFlow().map {
-                it.cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta || it.cta is DaxDuckAiFireButtonBrandDesignUpdateContextualCta
+            ctaViewState.asFlow().map { state ->
+                when {
+                    // The trackers dialog points at the privacy shield; a fire pulse would compete.
+                    state.cta is OnboardingDaxDialogCta.DaxTrackersBlockedCta ||
+                        state.cta is DaxTrackersBlockedBrandDesignUpdateContextualCta -> PulseCtaEffect.SUPPRESSES
+
+                    state.cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta ||
+                        state.cta is DaxDuckAiFireButtonBrandDesignUpdateContextualCta -> PulseCtaEffect.FORCES
+
+                    else -> PulseCtaEffect.NEUTRAL
+                }
             }.distinctUntilChanged(),
             ctaViewModel.showFireButtonPulseAnimation,
-        ) { isShowingDuckAiFireButtonCta, showPulseAnimation -> isShowingDuckAiFireButtonCta || showPulseAnimation }
-            .asLiveData(context = viewModelScope.coroutineContext)
+        ) { ctaEffect, showPulseAnimation ->
+            when (ctaEffect) {
+                PulseCtaEffect.SUPPRESSES -> false
+                PulseCtaEffect.FORCES -> true
+                PulseCtaEffect.NEUTRAL -> showPulseAnimation
+            }
+        }.asLiveData(context = viewModelScope.coroutineContext)
 
     private var autoCompleteJob = ConflatedJob()
     private var serpLogoJob = ConflatedJob()
