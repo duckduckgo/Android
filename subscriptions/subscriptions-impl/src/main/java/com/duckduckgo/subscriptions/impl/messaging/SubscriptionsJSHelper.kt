@@ -27,6 +27,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionUpgrade
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionsSettingsScreenWithEmptyParams
 import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
 import com.duckduckgo.subscriptions.impl.AccessTokenResult
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.DUCK_AI_FEATURE_PAGE
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.squareup.anvil.annotations.ContributesBinding
@@ -228,7 +229,6 @@ class RealSubscriptionsJSHelper @Inject constructor(
         private const val METHOD_OPEN_SUBSCRIPTION_PURCHASE = "openSubscriptionPurchase"
         private const val METHOD_OPEN_SUBSCRIPTION_UPGRADE = "openSubscriptionUpgrade"
         private const val MESSAGE_PARAM_ORIGIN_KEY = "origin"
-        private const val DUCK_AI_FEATURE_PAGE = "duckai"
         private const val USE_PRO_TIER = "useProTier"
         private const val OPEN_SUBSCRIPTION_UPGRADE = "openSubscriptionUpgrade"
     }
