@@ -1,0 +1,215 @@
+{
+  "name": "Nuwber",
+  "url": "nuwber.com",
+  "version": "0.1.0",
+  "optOutUrl": "https://nuwber.com/removal/link",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://nuwber.com/search?name=${firstName}%20${lastName}&location=${city}%2C%20${state}",
+          "id": "4aef3faf-c080-4087-907a-5e5a5b1a84c7"
+        },
+        {
+          "actionType": "expectation",
+          "_comment": "wait for cloudflare check to pass - we are using a negative xpath selector to ensure the challenge is not being displayed",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//script[contains(@src, '/cdn-cgi/challenge-platform/')]) and not(.//script[contains(., '_cf_chl_opt')])]"
+            }
+          ],
+          "id": "cfc-cf3a317f-64b6-4b4f-b7d4-b978d54aee6a"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#search-page"
+            }
+          ],
+          "id": "db899d28-e1a5-4386-b924-e0c895c2f47a"
+        },
+        {
+          "actionType": "condition",
+          "_comment": "Close the disclaimer modal",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".fog-block"
+            }
+          ],
+          "actions": [
+            {
+              "actionType": "click",
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": ".fog-block #fcra-check"
+                },
+                {
+                  "type": "button",
+                  "selector": ".fog-block button"
+                }
+              ],
+              "id": "3444b833-1c17-4ac1-9e7d-ab270fed69db"
+            }
+          ],
+          "id": "25acad4f-f9f3-4afd-b0f6-62245c78e69f"
+        },
+        {
+          "actionType": "extract",
+          "selector": "//div[@class='result-block']",
+          "noResultsSelector": "//h2[contains(text(), 'No results found')] | //*[not(//div[@class='result-block'])]",
+          "profile": {
+            "name": {
+              "selector": ".result-block-head h2 a"
+            },
+            "addressCityState": {
+              "selector": ".result-block-head p"
+            },
+            "age": {
+              "selector": ".result-block-head span",
+              "beforeText": "AGE"
+            },
+            "addressCityStateList": {
+              "selector": ".//div[@class='result-block-content-column'][.//span[text()='Previous Locations']]/p/span",
+              "findElements": true
+            },
+            "relativesList": {
+              "selector": ".//div[@class='result-block-content-column'][.//span[text()='Relatives']]/p/span",
+              "findElements": true
+            },
+            "profileUrl": {
+              "selector": ".result-block-head h2 a"
+            }
+          },
+          "id": "41a0a5c2-c16f-4288-bcf2-620cce1ed9f4"
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://nuwber.com/removal/link",
+          "id": "350ca107-ec27-41cf-aef5-ed01ac5d6b2a"
+        },
+        {
+          "actionType": "expectation",
+          "_comment": "wait for cloudflare check to pass - we are using a negative xpath selector to ensure the challenge is not being displayed",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//script[contains(@src, '/cdn-cgi/challenge-platform/')]) and not(.//script[contains(., '_cf_chl_opt')])]"
+            }
+          ],
+          "id": "cfc-36f018c0-280c-4607-8e4a-d9cc9568a5ec"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".opt-out-form form",
+          "elements": [
+            {
+              "type": "profileUrl",
+              "selector": "#removebylink-link"
+            }
+          ],
+          "id": "2c58273b-6f18-4751-9798-79d415da5668"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".opt-out-form input[type='submit']"
+            }
+          ],
+          "id": "c06f50e0-533f-425f-838f-3d831b236fb8"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//h3[contains(text(), 'want to remove')]"
+            }
+          ],
+          "id": "6832a5f1-5328-4be3-8dae-ef16bcff8aa5"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".opt-out-grid form",
+          "elements": [
+            {
+              "type": "email",
+              "selector": "#removebylink-email"
+            }
+          ],
+          "id": "3431ec12-d959-4ae0-901c-59f4281745eb"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".opt-out-grid form button[type='submit']"
+            }
+          ],
+          "id": "180b3c8a-e60e-420f-80cc-ce4b28807d70"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//button[@type='submit'][contains(text(), 'Resend confirmation')]"
+            }
+          ],
+          "id": "2d13ac9d-ba4a-4205-978b-dfd2cb366064"
+        },
+        {
+          "actionType": "emailConfirmation",
+          "pollingTime": 30,
+          "id": "2df4eba9-5e1e-4b77-b779-1a8c2c305355"
+        },
+        {
+          "actionType": "expectation",
+          "_comment": "wait for cloudflare check to pass - we are using a negative xpath selector to ensure the challenge is not being displayed",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//script[contains(@src, '/cdn-cgi/challenge-platform/')]) and not(.//script[contains(., '_cf_chl_opt')])]"
+            }
+          ],
+          "id": "cfc-bb68f1be-73cc-4671-8a9f-f25187841d0d"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "WE'LL NOW REMOVE YOUR RECORDS"
+            }
+          ],
+          "id": "c6930584-0130-442c-8bcd-cb7956954dba"
+        }
+      ]
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": null,
+  "addedDatetime": 1785513051781
+}
