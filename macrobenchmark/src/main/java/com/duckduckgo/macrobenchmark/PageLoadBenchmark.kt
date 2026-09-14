@@ -19,6 +19,7 @@ package com.duckduckgo.macrobenchmark
 import android.content.ComponentName
 import android.content.Intent
 import android.os.SystemClock
+import androidx.benchmark.macro.CompilationMode
 import androidx.benchmark.macro.ExperimentalMetricApi
 import androidx.benchmark.macro.TraceSectionMetric
 import androidx.benchmark.macro.junit4.MacrobenchmarkRule
@@ -28,9 +29,11 @@ import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
 import com.duckduckgo.testseeder.api.TestSeederKey
+import org.junit.FixMethodOrder
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.junit.runners.MethodSorters
 
 internal const val TARGET_PACKAGE = "com.duckduckgo.mobile.android"
 
@@ -54,6 +57,7 @@ internal const val TARGET_PACKAGE = "com.duckduckgo.mobile.android"
  */
 @OptIn(ExperimentalMetricApi::class)
 @RunWith(AndroidJUnit4::class)
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 class PageLoadBenchmark {
 
     @get:Rule
@@ -91,6 +95,7 @@ class PageLoadBenchmark {
                 packageName = TARGET_PACKAGE,
                 metrics = listOf(TraceSectionMetric("ddg.pageLoad", TraceSectionMetric.Mode.Sum)),
                 iterations = 1,
+                compilationMode = CompilationMode.Full(),
             ) {
                 // +1: leading warmup navigation, discarded by position in post-processing.
                 // ?i=$i forces a fresh main-frame load each time.
@@ -125,6 +130,7 @@ class PageLoadBenchmark {
         // resumes the existing task and skips seeding; force-stop also makes the app's allow-list
         // repository re-read its cache-at-init.
         device.executeShellCommand("am force-stop $TARGET_PACKAGE")
+        device.executeShellCommand("pm clear $TARGET_PACKAGE")
         device.executeShellCommand("logcat -c")
         device.executeShellCommand("pm grant $TARGET_PACKAGE android.permission.POST_NOTIFICATIONS")
         val launch = instrumentation.context.packageManager
