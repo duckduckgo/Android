@@ -229,6 +229,24 @@ def single_trace_artifact(
     )
 
 
+def merge_reload_interrupted_slices(durations: list[float], expected_total: int) -> list[float]:
+    """Fold extra ddg.pageLoad slices caused by an autoconsent reload back into one per navigation.
+
+    PageLoadTraceMarker.onPageStarted closes any still-open section before opening a new one, so a
+    reload mid-load (e.g. autoconsent clicking a cookie-consent-bar's reject button) splits one
+    navigation into two chronological slices: a short interrupted one, then the completed reload.
+    Repeatedly merge the shortest slice into the one that follows it (summing durations, so the
+    reported time still reflects the full wall-clock cost of that navigation) until the count
+    matches the number of navigations actually performed.
+    """
+    merged = list(durations)
+    while len(merged) > expected_total:
+        shortest = min(range(len(merged) - 1), key=lambda i: merged[i])
+        merged[shortest + 1] += merged[shortest]
+        del merged[shortest]
+    return merged
+
+
 def collect_results(artifacts: list[Artifact], expected_samples: int = DEFAULT_EXPECTED_SAMPLES) -> dict:
     """Process every trace and reject the whole collection if any scenario is partial."""
     if expected_samples <= 0:
@@ -240,6 +258,8 @@ def collect_results(artifacts: list[Artifact], expected_samples: int = DEFAULT_E
             raise ValueError(f"duplicate page-load scenario: {scenario}")
         durations = query_durations_ms(artifact.trace)
         expected_total = expected_samples + DEFAULT_WARMUP_SAMPLES + DEFAULT_TRAILING_SAMPLES
+        if len(durations) > expected_total:
+            durations = merge_reload_interrupted_slices(durations, expected_total)
         if len(durations) != expected_total:
             raise ValueError(
                 f"scenario {scenario} has {len(durations)} positive slices; expected {expected_total} "
