@@ -28,20 +28,27 @@ tags:
 
         - tapOn:
             id: "username"
-
         - inputText: "user"
+        - pressKey: Back
+
         - tapOn:
             id: "password"
         - inputText: "password1"
+        - pressKey: Back
+
         - tapOn:
             text: "Login"
         - assertVisible: "Save Password"
         - tapOn: "Save Password"
+
         - pressKey: back
         - tapOn: "Close Autofill Dialog"
+
         - tapOn:
             id: "password"
         - inputText: "password2"
+        - pressKey: Back
+
         - tapOn:
             text: "Login"
         - assertVisible: "Update Password"

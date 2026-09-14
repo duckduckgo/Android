@@ -36,7 +36,6 @@ import javax.inject.Inject
 class WidgetPrivacyConfigUpdateListener @Inject constructor(
     private val context: Context,
     private val widgetUpdater: WidgetUpdater,
-    private val searchWidgetProviderInfoUpdater: SearchWidgetProviderInfoUpdater,
     private val appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles,
 ) : PrivacyConfigCallbackPlugin, MainProcessLifecycleObserver {
 
@@ -54,7 +53,6 @@ class WidgetPrivacyConfigUpdateListener @Inject constructor(
     }
 
     private fun refreshWidgets(isAddressBarEnabled: Boolean) {
-        searchWidgetProviderInfoUpdater.sync()
         widgetUpdater.updateWidgets(context)
         lastAppliedAddressBarEnabled = isAddressBarEnabled
     }
