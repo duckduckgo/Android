@@ -16,7 +16,7 @@ on:
         required: true
         type: string
       test_name:
-        description: 'Display name for this test suite (used in Asana failure task)'
+        description: 'Maestro Cloud run name'
         required: true
         type: string
       app_flavour:
@@ -29,6 +29,11 @@ on:
         required: false
         type: string
         default: '35'
+      commit:
+        description: 'Specific ref or commit SHA to build and test (optional, defaults to the dispatched ref)'
+        required: false
+        type: string
+        default: ''
   workflow_dispatch:
     inputs:
       tags:
@@ -36,7 +41,7 @@ on:
         required: true
         type: string
       test_name:
-        description: 'Display name for this test suite (used in Asana failure task)'
+        description: 'Maestro Cloud run name'
         required: true
         type: string
       app_flavour:
@@ -49,6 +54,11 @@ on:
         required: false
         type: string
         default: '35'
+      commit:
+        description: 'Specific ref or commit SHA to build and test (optional, defaults to the dispatched ref)'
+        required: false
+        type: string
+        default: ''
 
 concurrency:
   group: ${{ github.workflow_ref }}-${{ github.ref }}
@@ -69,6 +79,7 @@ jobs:
         id: assemble
         uses: ./.github/actions/checkout-and-assemble
         with:
+          commit: ${{ inputs.commit }}
           flavours: ${{ inputs.app_flavour }}
           release_properties: ${{ secrets.FAKE_RELEASE_PROPERTIES }}
           release_key: ${{ secrets.FAKE_RELEASE_KEY }}
