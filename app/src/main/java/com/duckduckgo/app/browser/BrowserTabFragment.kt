@@ -711,9 +711,6 @@ class BrowserTabFragment :
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
-    @Inject
-    lateinit var inputScreenLaunchTarget: InputScreenLaunchTarget
-
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
      * This is needed because the activity stack will be cleared if an external link is opened in our browser
@@ -724,6 +721,11 @@ class BrowserTabFragment :
     private var urlExtractingWebView: UrlExtractingWebView? = null
 
     var messageFromPreviousTab: Message? = null
+
+    // One-shot input-screen mode this tab should land on (e.g. "New Search" → Search), set by whoever
+    // opened the tab and handed to the viewmodel in loadData. Not persisted: only meaningful for the
+    // tab's initial launch within this process.
+    var inputModeTarget: InputMode? = null
 
     private val initialUrl get() = requireArguments().getString(URL_EXTRA_ARG)
 
@@ -775,7 +777,7 @@ class BrowserTabFragment :
 
     private val viewModel: BrowserTabViewModel by lazy {
         val viewModel = ViewModelProvider(this, viewModelFactory)[BrowserTabViewModel::class.java]
-        viewModel.loadData(tabId, initialUrl, skipHome, isLaunchedFromExternalApp)
+        viewModel.loadData(tabId, initialUrl, skipHome, isLaunchedFromExternalApp, inputModeTarget)
         viewModel
     }
 
@@ -843,13 +845,14 @@ class BrowserTabFragment :
                 // TODO wire up "New Image" action; entry only shown when nativeDuckAiSidebar is enabled.
             }
             onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewTab)) {
-                // With the native sidebar this entry is relabelled "New Search": open the new tab
-                // with its input screen surfaced on the Search tab.
-                if (duckAiFeatureState.nativeDuckAiSidebar.value) {
-                    inputScreenLaunchTarget.setInitialInputMode(InputMode.SEARCH)
-                }
+                // With the native sidebar this entry is relabelled "New Search": open the new tab with
+                // its input screen surfaced on the Search tab. The target is threaded to the new tab
+                // itself rather than armed globally, so it can't be consumed by another tab.
                 viewModel.recordPendingNewTabOpenedExit()
-                browserActivity?.launchNewTab(browserMode = BrowserMode.REGULAR)
+                browserActivity?.launchNewTab(
+                    browserMode = BrowserMode.REGULAR,
+                    inputModeTarget = if (duckAiFeatureState.nativeDuckAiSidebar.value) InputMode.SEARCH else null,
+                )
             }
             onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewFireTab)) {
                 viewModel.recordPendingFireTabOpenedExit()
@@ -1414,7 +1417,7 @@ class BrowserTabFragment :
             tabs = viewModel.tabs,
             currentTabUrl = viewModel.siteLiveData.asFlow().map { it?.url },
             query = query,
-            initialInputMode = inputScreenLaunchTarget.consumeInitialInputMode(),
+            initialInputMode = viewModel.consumeInitialInputMode(),
             callbacks = NativeInputCallbacks(
                 onSearchTextChanged = { text -> onUserEnteredText(text) },
                 onClearAutocomplete = {

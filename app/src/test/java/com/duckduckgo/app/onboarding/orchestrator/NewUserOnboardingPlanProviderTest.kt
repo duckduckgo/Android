@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.onboarding.orchestrator
 
-import com.duckduckgo.app.browser.InputScreenLaunchTarget
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.omnibar.OmnibarType
@@ -29,6 +28,7 @@ import com.duckduckgo.app.onboarding.CustomAiOnboardingResolver
 import com.duckduckgo.app.onboarding.DuckAiOnboardingAvailability
 import com.duckduckgo.app.onboarding.DuckAiOnboardingDemo
 import com.duckduckgo.app.onboarding.FakeOnboardingSingleChoiceDataPlugin
+import com.duckduckgo.app.onboarding.OnboardingInputScreenLaunchTarget
 import com.duckduckgo.app.onboarding.OnboardingPasswordImportExperimentManager
 import com.duckduckgo.app.onboarding.OnboardingPasswordImportExperimentManager.OnboardingPasswordImportVariant
 import com.duckduckgo.app.onboarding.OnboardingPreference
@@ -80,7 +80,6 @@ import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.impl.wideevents.InputScreenOnboardingWideEvent
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.onboarding.api.LinearOnboardingState.Completed
@@ -129,7 +128,7 @@ class NewUserOnboardingPlanProviderTest {
     private val splitOmnibarToggle: Toggle = mock()
     private val splitOmnibarWelcomeToggle: Toggle = mock()
     private val dismissedCtaDao: DismissedCtaDao = mock()
-    private val inputScreenLaunchTarget: InputScreenLaunchTarget = mock()
+    private val onboardingInputScreenLaunchTarget: OnboardingInputScreenLaunchTarget = mock()
     private val customAiOnboardingResolver: CustomAiOnboardingResolver = mock()
     private val duckAiOnboardingDemo: DuckAiOnboardingDemo = mock()
     private val homeScreenPromptsExperiment: OnboardingPromptsExperimentManager = mock()
@@ -196,7 +195,7 @@ class NewUserOnboardingPlanProviderTest {
             pixel = pixel,
             dispatchers = coroutineRule.testDispatcherProvider,
             dismissedCtaDao = dismissedCtaDao,
-            inputScreenLaunchTarget = inputScreenLaunchTarget,
+            onboardingInputScreenLaunchTarget = onboardingInputScreenLaunchTarget,
             customAiOnboardingResolver = customAiOnboardingResolver,
             duckAiOnboardingDemo = duckAiOnboardingDemo,
             onboardingPromptsExperimentManager = homeScreenPromptsExperiment,
@@ -361,7 +360,7 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.AI_CHAT))
 
         // Registered as a finalizer when the plan is built, so it only lands once the run ends.
-        verify(inputScreenLaunchTarget, never()).setInitialInputMode(InputMode.DUCK_AI)
+        verify(onboardingInputScreenLaunchTarget, never()).setOpenOnDuckAi()
     }
 
     @Test
@@ -371,14 +370,14 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.SkipNewUserOnboardingDevOptionClicked)
 
         assertEquals(Skipped(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID), orchestrator.state.value)
-        verify(inputScreenLaunchTarget).setInitialInputMode(InputMode.DUCK_AI)
+        verify(onboardingInputScreenLaunchTarget).setOpenOnDuckAi()
     }
 
     @Test
     fun `when on the segmented download reason step then does not arm open input on duck ai tab yet`() = runTest {
         startSegmentedAtDownloadReason()
 
-        verify(inputScreenLaunchTarget, never()).setInitialInputMode(InputMode.DUCK_AI)
+        verify(onboardingInputScreenLaunchTarget, never()).setOpenOnDuckAi()
     }
 
     @Test
@@ -387,7 +386,7 @@ class NewUserOnboardingPlanProviderTest {
 
         orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.SEARCH))
 
-        verify(inputScreenLaunchTarget, never()).setInitialInputMode(InputMode.DUCK_AI)
+        verify(onboardingInputScreenLaunchTarget, never()).setOpenOnDuckAi()
     }
 
     @Test
@@ -409,7 +408,7 @@ class NewUserOnboardingPlanProviderTest {
             ),
             orchestrator.state.value,
         )
-        verify(inputScreenLaunchTarget, times(1)).setInitialInputMode(InputMode.DUCK_AI)
+        verify(onboardingInputScreenLaunchTarget, times(1)).setOpenOnDuckAi()
     }
 
     @Test
@@ -1238,7 +1237,7 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.AddressBarConfirmed(OmnibarType.SINGLE_TOP))
 
         assertEquals(Completed(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID), orchestrator.state.value)
-        verify(inputScreenLaunchTarget).setInitialInputMode(InputMode.DUCK_AI)
+        verify(onboardingInputScreenLaunchTarget).setOpenOnDuckAi()
     }
 
     @Test
@@ -1254,7 +1253,7 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.QuickSetupConfirmed(OmnibarType.SINGLE_TOP, withAi = true))
 
         assertEquals(Skipped(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID), orchestrator.state.value)
-        verify(inputScreenLaunchTarget).setInitialInputMode(InputMode.DUCK_AI)
+        verify(onboardingInputScreenLaunchTarget).setOpenOnDuckAi()
     }
 
     @Test
@@ -1269,7 +1268,7 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.InputModeConfirmed(withAi = false))
 
         assertEquals(Completed(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID), orchestrator.state.value)
-        verify(inputScreenLaunchTarget, never()).setInitialInputMode(InputMode.DUCK_AI)
+        verify(onboardingInputScreenLaunchTarget, never()).setOpenOnDuckAi()
         verify(duckAiOnboardingDemo, never()).arm()
     }
 

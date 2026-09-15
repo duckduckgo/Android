@@ -295,6 +295,7 @@ import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
+import com.duckduckgo.app.onboarding.OnboardingInputScreenLaunchTarget
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection
 import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
@@ -605,7 +606,7 @@ class BrowserTabViewModel @Inject constructor(
     private val onboardingStore: OnboardingStore,
     private val autocompleteHistoryDeleteFeature: AutocompleteHistoryDeleteFeature,
     private val customAiOnboardingStore: CustomAiOnboardingStore,
-    private val inputScreenLaunchTarget: InputScreenLaunchTarget,
+    private val onboardingInputScreenLaunchTarget: OnboardingInputScreenLaunchTarget,
     private val browserMode: BrowserMode,
     private val desktopModeSettings: DesktopModeSettings,
     private val rememberDesktopModeFeature: RememberDesktopModeFeature,
@@ -781,6 +782,8 @@ class BrowserTabViewModel @Inject constructor(
     @VisibleForTesting
     internal var previousUrl: String? = null
     private lateinit var tabId: String
+
+    private var inputModeTarget: InputMode? = null
     private var webNavigationState: WebNavigationState? = null
     private var httpsUpgraded = false
     private var adBlockingAnimationClaimed = false
@@ -1012,9 +1015,11 @@ class BrowserTabViewModel @Inject constructor(
         initialUrl: String?,
         skipHome: Boolean,
         isExternal: Boolean,
+        inputModeTarget: InputMode? = null,
     ) {
         this.tabId = tabId
         this.skipHome = skipHome
+        this.inputModeTarget = inputModeTarget
         siteLiveData = tabRepository.retrieveSiteData(tabId)
         site = siteLiveData.value
 
@@ -3893,16 +3898,10 @@ class BrowserTabViewModel @Inject constructor(
         currentGlobalLayoutState() is Browser && !currentBrowserViewState().maliciousSiteBlocked
 
     private fun showOrHideKeyboard(cta: Cta?, reportLandingFocus: Boolean = true) {
-        // A pending launch target (e.g. the "New Search" menu action) wants this tab to land with its
-        // input screen already surfaced, so force focus regardless of the usual drop rules. Peek only —
-        // the target is consumed when the input screen actually opens.
-        val forceInputScreen = inputScreenLaunchTarget.peekInitialInputMode() != null
-        val shouldHideKeyboard = !forceInputScreen && (
-            cta?.shouldDropAddressBarFocusWhenShown() == true ||
-                duckAiFeatureState.showInputScreen.value ||
-                currentBrowserViewState().lastQueryOrigin == QueryOrigin.FromBookmark ||
-                (settingsDataStore.omnibarType == OmnibarType.SPLIT && alreadyShownKeyboard)
-            )
+        val shouldHideKeyboard = cta?.shouldDropAddressBarFocusWhenShown() == true ||
+            duckAiFeatureState.showInputScreen.value ||
+            currentBrowserViewState().lastQueryOrigin == QueryOrigin.FromBookmark ||
+            (settingsDataStore.omnibarType == OmnibarType.SPLIT && alreadyShownKeyboard)
 
         logcat { "shouldHideKeyboard: $shouldHideKeyboard" }
 
@@ -3916,14 +3915,16 @@ class BrowserTabViewModel @Inject constructor(
         if (reportLandingFocus) {
             returnSessionLandingListener.onLandingFocusCaptured(focused)
         }
-
-        // The native input path consumes the target itself when it reads the mode. When that path is
-        // inactive it never runs, so consume here to keep the force-focus one-shot — otherwise the
-        // signal stays armed for the whole process and overrides the drop-focus rules on every call.
-        if (forceInputScreen && !duckAiFeatureState.nativeInputFieldEnabled.value) {
-            inputScreenLaunchTarget.consumeInitialInputMode()
-        }
     }
+
+    /**
+     * The input-screen mode the next auto-launched input screen on this tab should open in, cleared as
+     * it is read. Prefers this tab's own launch target (e.g. "New Search" → Search) and falls back to
+     * the post-onboarding signal (→ Duck.ai). Returns `null` when neither is armed.
+     */
+    fun consumeInitialInputMode(): InputMode? =
+        inputModeTarget?.also { inputModeTarget = null }
+            ?: if (onboardingInputScreenLaunchTarget.consumeOpenOnDuckAi()) InputMode.DUCK_AI else null
 
     fun onUserClickCtaOkButton(cta: Cta) {
         releaseAddWidgetModalSlot(cta)
@@ -5563,7 +5564,7 @@ class BrowserTabViewModel @Inject constructor(
                     viewModelScope.launch {
                         ctaViewState.value = currentCtaViewState().copy(cta = null)
                         command.value = HideOnboardingDaxBubbleCta(cta)
-                        inputScreenLaunchTarget.setInitialInputMode(InputMode.DUCK_AI)
+                        onboardingInputScreenLaunchTarget.setOpenOnDuckAi()
                         command.value = ShowKeyboard
                     }
                 } else {
