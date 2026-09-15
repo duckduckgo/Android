@@ -17,12 +17,12 @@
 package com.duckduckgo.app.launch.seeder
 
 import android.util.Log
+import com.duckduckgo.app.privacy.db.UserAllowListDao
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.testseeder.api.TestSeederKey
 import com.duckduckgo.testseeder.api.TestSeederPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
 
@@ -31,14 +31,13 @@ import javax.inject.Inject
 @ContributesMultibinding(AppScope::class)
 class UserAllowListSeederPlugin @Inject constructor(
     private val userAllowListRepository: UserAllowListRepository,
+    private val userAllowListDao: UserAllowListDao,
 ) : TestSeederPlugin {
 
     override val handledKeys = setOf(TestSeederKey.USER_ALLOW_LIST.key)
 
     override suspend fun apply(key: String, value: String) {
-        userAllowListRepository.domainsInUserAllowList().forEach {
-            userAllowListRepository.removeDomainFromUserAllowList(it)
-        }
+        persistedDomains().forEach { userAllowListRepository.removeDomainFromUserAllowList(it) }
 
         val requested = value.split(",")
             .map { it.trim() }
@@ -46,8 +45,15 @@ class UserAllowListSeederPlugin @Inject constructor(
         requested.forEach { userAllowListRepository.addDomainToUserAllowList(it) }
 
         val requestedSet = requested.toSet()
-        val observed = userAllowListRepository.domainsInUserAllowListFlow().drop(1).firstOrNull { it.toSet() == requestedSet }
+        val persisted = persistedDomains()
+        check(persisted.toSet() == requestedSet) { "userAllowList persisted as \"$persisted\", expected \"$requestedSet\"" }
+
+        val observed = userAllowListRepository.domainsInUserAllowListFlow().firstOrNull { it.toSet() == requestedSet }
             ?: error("userAllowList never settled on \"$requestedSet\"")
         Log.i("DdgTestSeeder", "userAllowList=" + observed.sorted().joinToString(","))
+    }
+
+    private suspend fun persistedDomains(): List<String> {
+        return userAllowListDao.allDomainsFlow().firstOrNull() ?: error("user_whitelist never emitted")
     }
 }
