@@ -63,27 +63,21 @@ jobs:
 
       - name: Run Design System Maestro Tests
         id: maestro-run
-        uses: mobile-dev-inc/action-maestro-cloud@v3.0.1
+        uses: ./.github/actions/maestro-cloud-asana-reporter
         timeout-minutes: 30
         with:
-          api-key: ${{ secrets.ROBIN_API_KEY }}
-          project-id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          name: design_system_pr_${{ github.event.pull_request.number }}_${{ github.sha }}
-          timeout: 15
-          app-file: apk/internal.apk
-          device-os: android-30
-          workspace: .maestro
-          include-tags: androidDesignSystemTest
-
-      - name: Analyze Maestro Flow Results
-        if: always()
-        id: analyze-maestro
-        uses: ./.github/actions/maestro-flow-analyzer
-        with:
-          flow_results_json: ${{ steps.maestro-run.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}
-          console_url: ${{ steps.maestro-run.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
-          upload_status: ${{ steps.maestro-run.outputs.MAESTRO_CLOUD_UPLOAD_STATUS }}
-          app_binary_id: ${{ steps.maestro-run.outputs.MAESTRO_CLOUD_APP_BINARY_ID }}
+          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
+          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
+          maestro_test_name: design_system_pr_${{ github.event.pull_request.number }}_${{ github.sha }}
+          maestro_timeout: 15
+          maestro_app_file: apk/internal.apk
+          maestro_api_level: '30'
+          maestro_include_tags: androidDesignSystemTest
+          test_suite_name: Design System PR Tests
+          create_asana_error_task: false
+          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
+          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
 
       - name: Comment on PR
         if: failure()
