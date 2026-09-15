@@ -86,14 +86,16 @@ class DefaultBrowserChangedSurveyEvaluatorImpl @Inject constructor(
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
         }
 
-        surveyManager.markSurveyShown()
+        return@withContext ModalEvaluator.EvaluationResult.WantsToShow {
+            surveyManager.markSurveyShown()
 
-        delay(MODAL_DISPLAY_DELAY)
-        appCoroutineScope.launch(dispatchers.main()) {
-            applicationContext.startActivity(intent)
+            delay(MODAL_DISPLAY_DELAY)
+            appCoroutineScope.launch(dispatchers.main()) {
+                applicationContext.startActivity(intent)
+            }
+
+            true
         }
-
-        return@withContext ModalEvaluator.EvaluationResult.ModalShown
     }
 
     companion object {
