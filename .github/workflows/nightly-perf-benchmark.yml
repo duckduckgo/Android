@@ -1,0 +1,136 @@
+name: Perf Benchmark - Nightly
+
+on:
+  # TEMPORARY (remove before PR): smoke-test the workflow and pixel reporting on this branch.
+  # Restore schedule-only pixel reporting after testing.
+  push:
+    branches: [feature/gerard/macrobenchmark-page-load-workflow]
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  page-load-benchmark:
+    name: Page-load benchmark
+    runs-on: android-large-runner
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'schedule' && 'develop' || github.ref_name }}
+          submodules: recursive
+
+      - name: Set up JDK version
+        uses: actions/setup-java@v4
+        with:
+          java-version-file: .github/.java-version
+          distribution: 'adopt'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+        with:
+          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+          cache-read-only: true
+
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r perf-benchmarks/requirements.txt
+
+      - name: Install Perfetto trace_processor
+        run: |
+          curl -LO https://get.perfetto.dev/trace_processor
+          chmod +x trace_processor
+          sudo mv trace_processor /usr/local/bin/trace_processor_shell
+
+      - name: Decode release properties
+        uses: davidSchuppa/base64Secret-toFile-action@v2
+        with:
+          secret: ${{ secrets.FAKE_RELEASE_PROPERTIES }}
+          fileName: ddg_android_build.properties
+          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
+
+      - name: Decode release key
+        uses: davidSchuppa/base64Secret-toFile-action@v2
+        with:
+          secret: ${{ secrets.FAKE_RELEASE_KEY }}
+          fileName: android
+          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
+
+      - name: Write Flank credentials
+        env:
+          FLANK: ${{ secrets.FLANK }}
+        run: echo "$FLANK" > flank.json
+
+      - name: Ensure debug keystore exists
+        run: |
+          # macrobenchmark/build.gradle signs its release build type with the AGP-standard debug
+          # keystore (self-instrumenting=true means it need not match :app's signature, just exist).
+          # A release build won't auto-create it the way a local debug-variant build would, so
+          # generate one if missing.
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            mkdir -p "$HOME/.android"
+            keytool -genkeypair -v -keystore "$HOME/.android/debug.keystore" \
+              -storepass android -keypass android -alias androiddebugkey \
+              -keyalg RSA -keysize 2048 -validity 10000 \
+              -dname "CN=Android Debug,O=Android,C=US"
+          fi
+
+      - name: Build APKs
+        env:
+          DUCKSANS_PACKAGE_AUTH_USER: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION_USER }}
+          DUCKSANS_PACKAGE_AUTH_TOKEN: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION }}
+        run: ./gradlew -q :app:assembleInternalRelease :macrobenchmark:assembleRelease
+
+      - name: Run page-load benchmark on FTL
+        run: ./gradlew -q runFlankPerfTests --no-configuration-cache
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.FLANK }}
+
+      - name: Download benchmark artifacts from the FTL results bucket
+        run: |
+          set -euo pipefail
+          GCS_PATH=$(jq -r '.[].gcsPath' build/fladle/perfResults/matrix_ids.json | head -1)
+          GCS_PATH="${GCS_PATH%/}"   # gcsPath ends with '/'; strip it to avoid a '//' in the URL
+          if [ -z "$GCS_PATH" ] || [ "$GCS_PATH" = "null" ]; then
+            echo "ERROR: could not read gcsPath from matrix_ids.json:" >&2
+            cat build/fladle/perfResults/matrix_ids.json >&2
+            exit 1
+          fi
+          echo "FTL results bucket path: gs://${GCS_PATH}"
+          # Whole matrix directory, so nothing depends on server-side globbing.
+          mkdir -p pageload-artifacts
+          gcloud storage cp -r "gs://${GCS_PATH}/*" pageload-artifacts/
+          find pageload-artifacts -type f | sort
+
+      - name: Post-process traces and report
+        run: |
+          # TEMPORARY: allow push smoke tests to report pixels. Restore the schedule-only
+          # condition after testing.
+          python3 perf-benchmarks/pageload_benchmark.py \
+            --results-dir pageload-artifacts \
+            --device ftl-mediumphone-api31 \
+            --github-action-run-id "${{ github.run_id }}" \
+            --git-commit-sha "${{ github.sha }}" \
+            ${{ (github.event_name == 'schedule' || github.event_name == 'push') && '--report-pixel' || '' }}
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pageload-benchmark-${{ github.run_number }}
+          path: |
+            pageload-results.json
+            pageload-artifacts/**
+          retention-days: 30

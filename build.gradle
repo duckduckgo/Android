@@ -354,6 +354,7 @@ fladle {
             flankVersion.set("21.+")
             useOrchestrator.set(false)
             recordVideo.set(false)
+            testTimeout.set("45m")
             debugApk.set(project.provider {
                 def dir = rootProject.file("app/build/outputs/apk/internal/release")
                 def apks = dir.exists() ? (dir.listFiles() ?: []).findAll { it.name.endsWith("-internal-release.apk") } : []
