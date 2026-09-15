@@ -42,12 +42,11 @@ class SubscriptionOnboardingPlanProvider @Inject constructor(
 ) {
 
     suspend fun buildPlan(): LinearOnboardingPlan {
-        val steps = stepPlugins.getPlugins()
-            .filter { it.shouldShow() }
-            .map { stepPlugin -> activityStep(stepPlugin) }
+        val (available, unavailable) = stepPlugins.getPlugins().partition { it.shouldShow() }
+        unavailable.forEach { stepStore.setCompleted(it.stepId) }
         return LinearOnboardingPlan(
             id = SUBSCRIPTION_ONBOARDING_PLAN_ID,
-            steps = steps,
+            steps = available.map { stepPlugin -> activityStep(stepPlugin) },
         )
     }
 
