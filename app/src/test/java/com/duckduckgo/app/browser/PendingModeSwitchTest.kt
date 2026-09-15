@@ -20,6 +20,7 @@ import android.content.Intent
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.pixels.BrowserModeSwitchSource
 import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.duckchat.api.InputMode
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -53,6 +54,7 @@ class PendingModeSwitchTest {
                 sourceTabId = "tab-123",
                 skipHome = true,
                 isExternal = true,
+                inputModeTarget = InputMode.SEARCH,
             ),
             source = BrowserModeSwitchSource.NEW_TAB,
         )

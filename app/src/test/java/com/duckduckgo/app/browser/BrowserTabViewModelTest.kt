@@ -322,6 +322,7 @@ import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
+import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.contextual.PageContextJSHelper
 import com.duckduckgo.duckchat.impl.contextual.RealPageContextJSHelper.Companion.PAGE_CONTEXT_FEATURE_NAME
@@ -871,6 +872,7 @@ class BrowserTabViewModelTest {
             whenever(mockDuckAiFeatureState.showInputScreen).thenReturn(mockDuckAiFeatureStateInputScreenFlow)
             whenever(mockDuckAiFeatureState.showContextualMode).thenReturn(mockDuckAiContextualModeFlow)
             whenever(mockDuckAiFeatureState.nativeDuckAiSidebar).thenReturn(MutableStateFlow(false))
+            whenever(mockDuckAiFeatureState.nativeInputFieldEnabled).thenReturn(MutableStateFlow(false))
             whenever(mockDuckChatInputModeState.inputModeCapability).thenReturn(mockInputModeCapability)
             whenever(mockVpnMenuStateProvider.getVpnMenuState()).thenReturn(flowOf(VpnMenuState.Hidden))
             whenever(nonHttpAppLinkChecker.isPermitted(anyOrNull())).thenReturn(true)
@@ -1233,6 +1235,40 @@ class BrowserTabViewModelTest {
             testee.onViewVisible()
 
             assertCommandNotIssued<ShowKeyboard>()
+        }
+
+    @Test
+    fun whenViewBecomesVisibleAndInputModeTargetArmedThenTargetDoesNotForceKeyboardOverInputScreen() =
+        runTest {
+            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
+            whenever(mockDuckAiFeatureState.showInputScreen).thenReturn(MutableStateFlow(true))
+            testee.loadData("abc", null, false, false, InputMode.SEARCH)
+
+            testee.onViewVisible()
+
+            // The launch target does not override the input-screen focus-drop rule.
+            assertCommandNotIssued<ShowKeyboard>()
+        }
+
+    @Test
+    fun whenInputModeTargetArmedThenConsumeInitialInputModeReturnsItThenClears() =
+        runTest {
+            testee.loadData("abc", null, false, false, InputMode.SEARCH)
+
+            assertEquals(InputMode.SEARCH, testee.consumeInitialInputMode())
+            // One-shot: a second read no longer returns it.
+            assertNull(testee.consumeInitialInputMode())
+        }
+
+    @Test
+    fun whenViewBecomesVisibleAndInputModeTargetNotArmedThenConsumeReturnsNull() =
+        runTest {
+            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
+            testee.loadData("abc", null, false, false)
+
+            testee.onViewVisible()
+
+            assertNull(testee.consumeInitialInputMode())
         }
 
     @Test
