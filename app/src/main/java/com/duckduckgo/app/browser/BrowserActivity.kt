@@ -133,6 +133,7 @@ import com.duckduckgo.downloads.api.DownloadsScreens.DownloadsScreenNoParams
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
+import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.viewmodel.DuckChatSharedViewModel
 import com.duckduckgo.feedback.api.FeedbackScreenNoParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -294,6 +295,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     // we don't store isExternal in the tab model, as it's only meant for the first time the tab is loaded.
     private val externalLaunchTabIds = mutableSetOf<String>()
+
+    private val pendingInputModeTargets = mutableMapOf<String, InputMode>()
 
     private lateinit var renderer: BrowserStateRenderer
 
@@ -687,6 +690,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     ): BrowserTabFragment {
         logcat(INFO) { "Opening new tab, url: $url, tabId: $tabId" }
         val fragment = BrowserTabFragment.newInstance(tabId, url, skipHome, isExternal)
+        fragment.inputModeTarget = consumeInputModeTargetForTab(tabId)
         addOrReplaceNewTab(fragment, tabId)
         currentTab = fragment
         return fragment
@@ -712,6 +716,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     fun consumeExternalLaunchForTab(tabId: String): Boolean {
         return externalLaunchTabIds.remove(tabId)
+    }
+
+    fun consumeInputModeTargetForTab(tabId: String): InputMode? {
+        return pendingInputModeTargets.remove(tabId)
     }
 
     private fun selectTab(tab: TabEntity?) {
@@ -1625,8 +1633,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
         skipHome: Boolean = false,
         isExternal: Boolean = false,
         browserMode: BrowserMode = currentBrowserMode,
+        inputModeTarget: InputMode? = null,
     ) {
-        switchModeThen(browserMode, PendingAction.OpenNewTab(query, sourceTabId, skipHome, isExternal), BrowserModeSwitchSource.NEW_TAB)
+        switchModeThen(
+            browserMode,
+            PendingAction.OpenNewTab(query, sourceTabId, skipHome, isExternal, inputModeTarget),
+            BrowserModeSwitchSource.NEW_TAB,
+        )
     }
 
     /**
@@ -1668,6 +1681,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 action.sourceTabId,
                 action.skipHome,
                 action.isExternal,
+                action.inputModeTarget,
             )
             is PendingAction.OpenExistingTab -> openExistingTab(action.tabId)
         }
@@ -1678,6 +1692,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         sourceTabId: String?,
         skipHome: Boolean,
         isExternal: Boolean,
+        inputModeTarget: InputMode? = null,
     ) {
         lifecycleScope.launch {
             if (swipingTabsFeature.isEnabled) {
@@ -1685,8 +1700,16 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 if (isExternal) {
                     externalLaunchTabIds.add(tabId)
                 }
+                // Stash before the tab-list observer fires and TabPagerAdapter builds the fragment, so
+                // the target is available at createFragment (mirrors externalLaunchTabIds above).
+                if (inputModeTarget != null) {
+                    pendingInputModeTargets[tabId] = inputModeTarget
+                }
             } else {
-                viewModel.onNewTabRequested()
+                val tabId = viewModel.onNewTabRequested()
+                if (inputModeTarget != null) {
+                    pendingInputModeTargets[tabId] = inputModeTarget
+                }
             }
         }
     }
