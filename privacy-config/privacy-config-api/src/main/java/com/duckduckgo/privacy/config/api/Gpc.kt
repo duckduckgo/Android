@@ -23,7 +23,7 @@ interface Gpc {
      * 1. If the user enabled or not the GPC feature
      * 2. If the remote configuration has enabled or not the GPC feature. When disabled, the remote
      * configuration value prevails over the user choice.
-     * @return `true` if the feature is enabled and `false` is is not.
+     * @return `true` if the feature is enabled and `false` if not.
      */
     fun isEnabled(): Boolean
 
