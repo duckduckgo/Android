@@ -12,11 +12,7 @@ on:
   workflow_call:
     inputs:
       tags:
-        description: 'Comma-separated Maestro tags to include (e.g. customTabsTest)'
-        required: true
-        type: string
-      test_name:
-        description: 'Maestro Cloud run name'
+        description: 'Comma-separated Maestro tags to include (e.g. customTabsTest, binaryUpload)'
         required: true
         type: string
       app_flavour:
@@ -31,17 +27,18 @@ on:
         default: '35'
       commit:
         description: 'Specific ref or commit SHA to build and test (optional, defaults to the dispatched ref)'
+        required: false
+        type: string
+        default: ''
+      test_name:
+        description: 'Maestro Cloud run name (optional, defaults to the tags being run)'
         required: false
         type: string
         default: ''
   workflow_dispatch:
     inputs:
       tags:
-        description: 'Comma-separated Maestro tags to include (e.g. customTabsTest)'
-        required: true
-        type: string
-      test_name:
-        description: 'Maestro Cloud run name'
+        description: 'Comma-separated Maestro tags to include (e.g. customTabsTest, binaryUpload)'
         required: true
         type: string
       app_flavour:
@@ -59,9 +56,14 @@ on:
         required: false
         type: string
         default: ''
+      test_name:
+        description: 'Maestro Cloud run name (optional, defaults to the tags being run)'
+        required: false
+        type: string
+        default: ''
 
 concurrency:
-  group: ${{ github.workflow_ref }}-${{ github.ref }}
+  group: ${{ github.workflow_ref }}-${{ github.ref }}-${{ inputs.commit }}-${{ inputs.tags }}
   cancel-in-progress: true
 
 jobs:
@@ -95,12 +97,12 @@ jobs:
         with:
           maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
           maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          maestro_test_name: ${{ inputs.test_name }}_${{ github.sha }}
+          maestro_test_name: ${{ (inputs.test_name != '' && inputs.test_name || inputs.tags) }}_${{ github.sha }}
           maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
           maestro_app_file: ${{ inputs.app_flavour == 'internal' && steps.assemble.outputs.internal_apk_path || steps.assemble.outputs.play_apk_path }}
           maestro_api_level: ${{ inputs.maestro_api_level }}
           maestro_include_tags: ${{ inputs.tags }}
-          test_suite_name: ${{ inputs.test_name }}
+          test_suite_name: ${{ inputs.test_name != '' && inputs.test_name || inputs.tags }}
           is_release_blocker: false
           create_asana_error_task: false
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
