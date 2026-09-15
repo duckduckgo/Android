@@ -80,7 +80,7 @@ class FakeDuckChatInternal(
 
     override fun getDuckChatSettingsUrl(): String = "https://duck.ai?settings=open"
 
-    override fun isDuckChatUrl(uri: Uri): Boolean = false
+    override fun isDuckChatUrl(uri: Uri): Boolean = uri.host == "duck.ai"
 
     override suspend fun wasOpenedBefore(): Boolean = false
 
