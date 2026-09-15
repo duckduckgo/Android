@@ -94,7 +94,7 @@ class PageLoadBenchmark {
                 }
                 // Closes the last measured navigation's slice; its own slice is the trailing sample,
                 // also discarded by position.
-                fixtureServer?.let { navigateTo(it.traceSentinelUrl) }
+                navigateTo(fixtureServer?.traceSentinelUrl ?: "$pageUrl?i=${NAV_COUNT + 1}")
             }
         } finally {
             fixtureServer?.shutdown()
