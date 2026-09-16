@@ -45,6 +45,8 @@ import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
+import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.pixel.toPixelValue
 import com.duckduckgo.duckchat.impl.repository.AddressBarPickerAttributionRepository
@@ -187,6 +189,9 @@ interface DuckChatInternal : DuckChat {
 
     /** Single source of truth for the Duck.ai chat URL shape. */
     fun buildChatUrl(chatId: String): String
+
+    /** Returns the Duck.ai URL that opens with the chat protections panel open (e.g. https://duck.ai/chat?chatProtection=open). */
+    fun getChatProtectionUrl(): String
 
     /**
      * Calls onClose when a close event is emitted.
@@ -479,6 +484,7 @@ class RealDuckChat @Inject constructor(
     private val voiceSessionStateManager: VoiceSessionStateManager,
     private val chatSuggestionsStore: ChatSuggestionsStore,
     private val duckAiTabSessionRepository: DuckAiTabSessionRepository,
+    private val duckAiModelManager: DuckAiModelManager,
 ) : DuckChatInternal,
     DuckAiFeatureState,
     DuckChatInputModeState,
@@ -496,6 +502,7 @@ class RealDuckChat @Inject constructor(
     private val _showModelPickerEvents = MutableSharedFlow<String>(extraBufferCapacity = 1)
     private val _editPromptRequests = MutableSharedFlow<EditPromptRequest>(extraBufferCapacity = 1)
     private val _nativeInputFieldEnabled = MutableStateFlow(false)
+    private val _nativeDuckAiSidebar = MutableStateFlow(false)
     private val _nativeChatInputEnabled = MutableStateFlow(false)
     private val _nativeInputNavBarEnabled = MutableStateFlow(false)
     private val _showVoiceSearchToggle = MutableStateFlow(false)
@@ -723,6 +730,8 @@ class RealDuckChat @Inject constructor(
 
     override val nativeInputFieldEnabled: StateFlow<Boolean> = _nativeInputFieldEnabled.asStateFlow()
 
+    override val nativeDuckAiSidebar: StateFlow<Boolean> = _nativeDuckAiSidebar.asStateFlow()
+
     override val chatState: StateFlow<ChatState> = _chatState.asStateFlow()
 
     override fun isImageUploadEnabled(): Boolean = isImageUploadEnabled
@@ -748,6 +757,30 @@ class RealDuckChat @Inject constructor(
         addressBarPickerAttributionRepository.onPickerDuckAiSelected()
     }
 
+    override fun openDuckChatImageGeneration(entryPoint: DuckChatEntryPoint) {
+        logcat { "Duck.ai: openDuckChatImageGeneration" }
+        appCoroutineScope.launch(dispatchers.io()) {
+            // Only force image generation once an image-capable model is selected, otherwise the tool
+            // would be unavailable. The new tab this opens consumes the flag when its input configures.
+            val forceImageGeneration = ensureImageCapableModelSelected()
+            withContext(dispatchers.main()) {
+                reportDuckChatEntry(entryPoint, opensNewTab = true, hasPrompt = false)
+                openDuckChat(emptyMap(), forceNewSession = true, forceImageGeneration = forceImageGeneration)
+            }
+        }
+    }
+
+    private suspend fun ensureImageCapableModelSelected(): Boolean {
+        val state = duckAiModelManager.modelState.value
+        val selectedModel = state.models.firstOrNull { it.id == state.selectedModelId }
+        if (selectedModel?.supportsTool(Tool.IMAGE_GENERATION) == true) return true
+        val imageCapableModel = state.models.firstOrNull {
+            it.isAccessible && it.supportsTool(Tool.IMAGE_GENERATION)
+        } ?: return false
+        duckAiModelManager.selectModel(imageCapableModel)
+        return true
+    }
+
     override fun openDuckChatWithPrefill(query: String, entryPoint: DuckChatEntryPoint) {
         logcat { "Duck.ai: openDuckChatWithPrefill query $query" }
         reportDuckChatEntry(entryPoint, opensNewTab = true, hasPrompt = false)
@@ -765,6 +798,9 @@ class RealDuckChat @Inject constructor(
     }
 
     override fun getDuckChatSettingsUrl(): String = resolveDuckAiUrl(DUCK_CHAT_SETTINGS_WEB_LINK)
+
+    override fun getChatProtectionUrl(): String =
+        appendParameters(mapOf(CHAT_PROTECTION_QUERY_NAME to CHAT_PROTECTION_QUERY_VALUE) + nativeChatInputParameters(), getDuckChatLink())
 
     private fun addChatParameters(
         query: String,
@@ -826,6 +862,7 @@ class RealDuckChat @Inject constructor(
     private fun openDuckChat(
         parameters: Map<String, String>,
         forceNewSession: Boolean = false,
+        forceImageGeneration: Boolean = false,
     ) {
         val url = appendParameters(parameters + nativeChatInputParameters(), getDuckChatLink())
         appCoroutineScope.launch(dispatchers.io()) {
@@ -837,7 +874,7 @@ class RealDuckChat @Inject constructor(
 
             withContext(dispatchers.main()) {
                 logcat { "Duck.ai: restoring Duck.ai session $url hasSessionActive $hasSessionActive" }
-                openDuckChatSession(url, hasSessionActive)
+                openDuckChatSession(url, hasSessionActive, forceImageGeneration)
             }
         }
     }
@@ -845,11 +882,12 @@ class RealDuckChat @Inject constructor(
     private fun openDuckChatSession(
         url: String,
         hasSessionActive: Boolean,
+        forceImageGeneration: Boolean = false,
     ) {
         // if a new query was submitted we force a new session
         // we want to lose the context of the previous one if the user wanted a new query from outside Duck.ai
         browserNav
-            .openDuckChat(context, duckChatUrl = url, hasSessionActive = hasSessionActive)
+            .openDuckChat(context, duckChatUrl = url, hasSessionActive = hasSessionActive, forceImageGeneration = forceImageGeneration)
             .apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 context.startActivity(this)
@@ -1040,6 +1078,7 @@ class RealDuckChat @Inject constructor(
             isImageUploadEnabled = imageUploadFeature.self().isEnabled()
             isStandaloneMigrationEnabled = duckChatFeature.standaloneMigration().isEnabled()
             _nativeInputFieldEnabled.value = duckChatFeature.nativeInputField().isEnabled()
+            _nativeDuckAiSidebar.value = duckChatFeature.nativeDuckAiSidebar().isEnabled()
 
             keepSessionAliveInMinutes = settingsJson?.sessionTimeoutMinutes ?: DEFAULT_SESSION_ALIVE
 
@@ -1139,6 +1178,8 @@ class RealDuckChat @Inject constructor(
         private const val PROMPT_QUERY_VALUE = "1"
         private const val PLACEMENT_QUERY_NAME = "placement"
         private const val PLACEMENT_QUERY_VALUE = "sidebar"
+        private const val CHAT_PROTECTION_QUERY_NAME = "chatProtection"
+        private const val CHAT_PROTECTION_QUERY_VALUE = "open"
         private const val BANG_QUERY_NAME = "bang"
         private const val BANG_QUERY_VALUE = "true"
         private const val MODE_QUERY_NAME = "mode"

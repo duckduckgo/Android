@@ -135,6 +135,8 @@ class FakeDuckChat(
 
     override suspend fun onAddressBarPickerDuckAiSelected() { }
 
+    override fun openDuckChatImageGeneration(entryPoint: DuckChatEntryPoint) { }
+
     fun setEnabled(enabled: Boolean) {
         this.enabled = enabled
     }

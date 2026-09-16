@@ -80,4 +80,10 @@ interface DuckAiFeatureState {
      * [showInputScreen] (which is computed with `&& !isNativeInputFieldEnabled`).
      */
     val nativeInputFieldEnabled: StateFlow<Boolean>
+
+    /**
+     * Indicates whether the Duck.ai sidebar button should open the native chat history screen
+     * instead of the legacy web sidebar.
+     */
+    val nativeDuckAiSidebar: StateFlow<Boolean>
 }

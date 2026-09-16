@@ -322,6 +322,7 @@ import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
+import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.contextual.PageContextJSHelper
 import com.duckduckgo.duckchat.impl.contextual.RealPageContextJSHelper.Companion.PAGE_CONTEXT_FEATURE_NAME
@@ -870,6 +871,8 @@ class BrowserTabViewModelTest {
             whenever(mockDuckAiFeatureState.showPopupMenuShortcut).thenReturn(MutableStateFlow(false))
             whenever(mockDuckAiFeatureState.showInputScreen).thenReturn(mockDuckAiFeatureStateInputScreenFlow)
             whenever(mockDuckAiFeatureState.showContextualMode).thenReturn(mockDuckAiContextualModeFlow)
+            whenever(mockDuckAiFeatureState.nativeDuckAiSidebar).thenReturn(MutableStateFlow(false))
+            whenever(mockDuckAiFeatureState.nativeInputFieldEnabled).thenReturn(MutableStateFlow(false))
             whenever(mockDuckChatInputModeState.inputModeCapability).thenReturn(mockInputModeCapability)
             whenever(mockVpnMenuStateProvider.getVpnMenuState()).thenReturn(flowOf(VpnMenuState.Hidden))
             whenever(nonHttpAppLinkChecker.isPermitted(anyOrNull())).thenReturn(true)
@@ -1232,6 +1235,40 @@ class BrowserTabViewModelTest {
             testee.onViewVisible()
 
             assertCommandNotIssued<ShowKeyboard>()
+        }
+
+    @Test
+    fun whenViewBecomesVisibleAndInputModeTargetArmedThenTargetDoesNotForceKeyboardOverInputScreen() =
+        runTest {
+            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
+            whenever(mockDuckAiFeatureState.showInputScreen).thenReturn(MutableStateFlow(true))
+            testee.loadData("abc", null, false, false, InputMode.SEARCH)
+
+            testee.onViewVisible()
+
+            // The launch target does not override the input-screen focus-drop rule.
+            assertCommandNotIssued<ShowKeyboard>()
+        }
+
+    @Test
+    fun whenInputModeTargetArmedThenConsumeInitialInputModeReturnsItThenClears() =
+        runTest {
+            testee.loadData("abc", null, false, false, InputMode.SEARCH)
+
+            assertEquals(InputMode.SEARCH, testee.consumeInitialInputMode())
+            // One-shot: a second read no longer returns it.
+            assertNull(testee.consumeInitialInputMode())
+        }
+
+    @Test
+    fun whenViewBecomesVisibleAndInputModeTargetNotArmedThenConsumeReturnsNull() =
+        runTest {
+            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
+            testee.loadData("abc", null, false, false)
+
+            testee.onViewVisible()
+
+            assertNull(testee.consumeInitialInputMode())
         }
 
     @Test
@@ -11856,6 +11893,20 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenOpenNewImageDuckChatFromDuckAiThenOpensImageGenerationWithWebpageEntryPoint() = runTest {
+        testee.openNewImageDuckChat(ViewMode.DuckAI)
+
+        verify(mockDuckChat).openDuckChatImageGeneration(DuckChatEntryPoint.BROWSING_MENU_WEBPAGE)
+    }
+
+    @Test
+    fun whenOpenNewImageDuckChatFromNewTabThenOpensImageGenerationWithNtpEntryPoint() = runTest {
+        testee.openNewImageDuckChat(ViewMode.NewTab)
+
+        verify(mockDuckChat).openDuckChatImageGeneration(DuckChatEntryPoint.BROWSING_MENU_NTP)
+    }
+
+    @Test
     fun whenDuckChatMenuItemClickedThenOpenNewDuckChatTab() =
         runTest {
             whenever(mockDuckChat.wasOpenedBefore()).thenReturn(false)
@@ -11871,26 +11922,6 @@ class BrowserTabViewModelTest {
             verify(mockDuckChat, never()).openDuckChat(any())
             verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_NEW_CHAT_TAB_TAPPED)
         }
-
-    @Test
-    fun whenDuckChatNativeHistoryRequested() = runTest {
-        val expectedEvent = SubscriptionEventData(
-            featureName = "event1",
-            subscriptionName = "subscription1",
-            params = JSONObject(),
-        )
-        whenever(mockDuckChatJSHelper.onNativeAction(NativeAction.SIDEBAR)).thenReturn(expectedEvent)
-
-        testee.openDuckChatSidebar()
-
-        testee.subscriptionEventDataFlow.test {
-            val emittedEvent = awaitItem()
-            assertEquals(expectedEvent.featureName, emittedEvent.featureName)
-            assertEquals(expectedEvent.subscriptionName, emittedEvent.subscriptionName)
-            assertEquals(expectedEvent.params.toString(), emittedEvent.params.toString())
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
 
     @Test
     fun whenCustomizeResponsesClickedThenSubscriptionEventEmitted() = runTest {
@@ -11939,6 +11970,58 @@ class BrowserTabViewModelTest {
             val emittedEvent = awaitItem()
             assertEquals(expectedEvent.featureName, emittedEvent.featureName)
             assertEquals(expectedEvent.subscriptionName, emittedEvent.subscriptionName)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDuckChatSidebarButtonPressedAndNativeSidebarEnabledThenHistoryLaunched() = runTest {
+        whenever(mockDuckAiFeatureState.nativeDuckAiSidebar).thenReturn(MutableStateFlow(true))
+        testee.browserViewState.value = browserViewState().copy(showDuckChatHistoryOption = true)
+
+        testee.onDuckChatSidebarButtonPressed()
+
+        assertCommandIssued<Command.LaunchDuckChatHistory>()
+        verify(mockDuckChatJSHelper, never()).onNativeAction(NativeAction.SIDEBAR)
+    }
+
+    @Test
+    fun whenDuckChatSidebarButtonPressedAndNativeSidebarDisabledThenLegacySidebarEventEmitted() = runTest {
+        val expectedEvent = SubscriptionEventData(
+            featureName = "event1",
+            subscriptionName = "subscription1",
+            params = JSONObject(),
+        )
+        whenever(mockDuckAiFeatureState.nativeDuckAiSidebar).thenReturn(MutableStateFlow(false))
+        whenever(mockDuckChatJSHelper.onNativeAction(NativeAction.SIDEBAR)).thenReturn(expectedEvent)
+
+        testee.onDuckChatSidebarButtonPressed()
+
+        assertCommandNotIssued<Command.LaunchDuckChatHistory>()
+        testee.subscriptionEventDataFlow.test {
+            val emittedEvent = awaitItem()
+            assertEquals(expectedEvent.featureName, emittedEvent.featureName)
+            assertEquals(expectedEvent.subscriptionName, emittedEvent.subscriptionName)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOpenDuckChatSidebarThenSidebarSubscriptionEventEmitted() = runTest {
+        val expectedEvent = SubscriptionEventData(
+            featureName = "event1",
+            subscriptionName = "subscription1",
+            params = JSONObject(),
+        )
+        whenever(mockDuckChatJSHelper.onNativeAction(NativeAction.SIDEBAR)).thenReturn(expectedEvent)
+
+        testee.openDuckChatSidebar()
+
+        testee.subscriptionEventDataFlow.test {
+            val emittedEvent = awaitItem()
+            assertEquals(expectedEvent.featureName, emittedEvent.featureName)
+            assertEquals(expectedEvent.subscriptionName, emittedEvent.subscriptionName)
+            assertEquals(expectedEvent.params.toString(), emittedEvent.params.toString())
             cancelAndIgnoreRemainingEvents()
         }
     }

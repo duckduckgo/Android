@@ -73,13 +73,17 @@ class TabPagerAdapter(
         // Check if there's a message specifically for this tab's source tab ID
         val pendingMessage = pendingMessages.remove(tab.sourceTabId)
         pendingMessage?.cleanupJob?.cancel()
+        val inputModeTarget = activity.consumeInputModeTargetForTab(tab.tabId)
 
         return if (pendingMessage != null) {
             BrowserTabFragment.newInstance(tab.tabId, null, false, isExternal).apply {
                 this.messageFromPreviousTab = pendingMessage.message
+                this.inputModeTarget = inputModeTarget
             }
         } else {
-            BrowserTabFragment.newInstance(tab.tabId, tab.url, tab.skipHome, isExternal)
+            BrowserTabFragment.newInstance(tab.tabId, tab.url, tab.skipHome, isExternal).apply {
+                this.inputModeTarget = inputModeTarget
+            }
         }
     }
 
