@@ -185,7 +185,7 @@ interface NativeInputWidget {
         onPageContextRemoved: () -> Unit,
     )
     fun storePendingPrompt(query: String)
-    fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean)
+    fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean, forceImageGeneration: Boolean = false)
     fun configureContextual(tabId: String)
     fun configureForEdit(sessionId: String)
     fun adoptEditAttachments(images: List<SubmittedImage>, files: List<SubmittedFile>)
@@ -1677,10 +1677,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
         optionsView?.clearSelection()
     }
 
-    override fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean) {
+    override fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean, forceImageGeneration: Boolean) {
         activeTabId = tabId
         doOnAttach {
-            viewModel.configure(tabId, isDuckAiMode, isBottom)
+            viewModel.configure(tabId, isDuckAiMode, isBottom, forceImageGeneration)
             if (isDuckAiMode) selectChatTab()
         }
     }
