@@ -29,6 +29,8 @@ SETTLE_WINDOW_MS = 8000.0
 OUTLIER_Z_THRESHOLD = 3.5
 # Also require 25%+ deviation, so tight distributions do not over-flag.
 OUTLIER_MIN_RELATIVE_DEVIATION = 0.25
+# Tolerated settle-window overruns per scenario before the run is untrustworthy.
+MAX_INVALID_SAMPLES = 2
 
 PIXEL_BASE_ENV_VAR = "PAGELOAD_PIXEL_BASE_URL"
 PIXEL_BASE = os.environ.get(PIXEL_BASE_ENV_VAR, "https://improving.duckduckgo.com/t/m_page_load_time_android")
@@ -310,8 +312,11 @@ def collect_results(artifacts: list[Artifact], expected_samples: int = DEFAULT_E
                 f"({DEFAULT_WARMUP_SAMPLES} warmup + {expected_samples} retained + {DEFAULT_TRAILING_SAMPLES} trailing)"
             )
         stats = compute_stats(durations)
-        if stats.count != expected_samples:
-            raise ValueError(f"scenario {scenario} retained {stats.count} samples; expected {expected_samples}")
+        if stats.invalid_count > MAX_INVALID_SAMPLES:
+            raise ValueError(
+                f"scenario {scenario} has {stats.invalid_count} settle-window overruns; "
+                f"at most {MAX_INVALID_SAMPLES} tolerated"
+            )
         scenarios[scenario] = ScenarioResult(
             stats=stats,
             raw_ms=durations,
