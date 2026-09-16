@@ -32,7 +32,18 @@ interface BrowserNav {
      */
     fun openInNewTab(context: Context, url: String, sourceTabId: String? = null): Intent
     fun openInCurrentTab(context: Context, url: String): Intent
-    fun openDuckChat(context: Context, hasSessionActive: Boolean = false, duckChatUrl: String): Intent
+
+    /**
+     * Returns an Intent that opens Duck.ai full screen in a new tab.
+     *
+     * @param forceImageGeneration when true, the new tab's native input preselects the image-generation tool.
+     */
+    fun openDuckChat(
+        context: Context,
+        hasSessionActive: Boolean = false,
+        duckChatUrl: String,
+        forceImageGeneration: Boolean = false,
+    ): Intent
     fun closeDuckChat(context: Context): Intent
 
     /**

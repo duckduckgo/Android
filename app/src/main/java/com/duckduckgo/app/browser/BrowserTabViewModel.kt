@@ -390,6 +390,7 @@ import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
+import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.contextual.PageContextJSHelper
 import com.duckduckgo.duckchat.impl.contextual.RealPageContextJSHelper.Companion.PAGE_CONTEXT_FEATURE_NAME
@@ -781,6 +782,8 @@ class BrowserTabViewModel @Inject constructor(
     @VisibleForTesting
     internal var previousUrl: String? = null
     private lateinit var tabId: String
+
+    private var inputModeTarget: InputMode? = null
     private var webNavigationState: WebNavigationState? = null
     private var httpsUpgraded = false
     private var adBlockingAnimationClaimed = false
@@ -1012,9 +1015,11 @@ class BrowserTabViewModel @Inject constructor(
         initialUrl: String?,
         skipHome: Boolean,
         isExternal: Boolean,
+        inputModeTarget: InputMode? = null,
     ) {
         this.tabId = tabId
         this.skipHome = skipHome
+        this.inputModeTarget = inputModeTarget
         siteLiveData = tabRepository.retrieveSiteData(tabId)
         site = siteLiveData.value
 
@@ -3912,6 +3917,15 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    /**
+     * The input-screen mode the next auto-launched input screen on this tab should open in, cleared as
+     * it is read. Prefers this tab's own launch target (e.g. "New Search" → Search) and falls back to
+     * the post-onboarding signal (→ Duck.ai). Returns `null` when neither is armed.
+     */
+    fun consumeInitialInputMode(): InputMode? =
+        inputModeTarget?.also { inputModeTarget = null }
+            ?: if (onboardingInputScreenLaunchTarget.consumeOpenOnDuckAi()) InputMode.DUCK_AI else null
+
     fun onUserClickCtaOkButton(cta: Cta) {
         releaseAddWidgetModalSlot(cta)
         viewModelScope.launch {
@@ -5806,6 +5820,15 @@ class BrowserTabViewModel @Inject constructor(
         } else {
             command.value = OpenInNewTab(query = url, sourceTabId = tabId)
         }
+    }
+
+    fun openNewImageDuckChat(viewMode: ViewMode) {
+        val entryPoint = if (viewMode == ViewMode.NewTab) {
+            DuckChatEntryPoint.BROWSING_MENU_NTP
+        } else {
+            DuckChatEntryPoint.BROWSING_MENU_WEBPAGE
+        }
+        duckChat.openDuckChatImageGeneration(entryPoint)
     }
 
     fun openNewDuckChat(viewMode: ViewMode) {
