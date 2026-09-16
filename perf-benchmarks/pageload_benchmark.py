@@ -15,10 +15,20 @@ from urllib.parse import urlencode
 
 import requests
 
+# Name of the async trace section PageLoadTraceMarker emits per navigation.
 SECTION = "ddg.pageLoad"
+# Navigations measured per scenario, excluding warmup and trailing.
 DEFAULT_EXPECTED_SAMPLES = 10
+# Leading navigation discarded, not a measured sample.
 DEFAULT_WARMUP_SAMPLES = 1
+# Trailing navigation discarded, closes the last measured slice.
 DEFAULT_TRAILING_SAMPLES = 1
+# Must track PageLoadBenchmark.PAGE_SETTLE_MS; past it a slice never closed properly.
+SETTLE_WINDOW_MS = 8000.0
+# Modified z-score cutoff; 3.5 is the standard threshold.
+OUTLIER_Z_THRESHOLD = 3.5
+# Also require 25%+ deviation, so tight distributions do not over-flag.
+OUTLIER_MIN_RELATIVE_DEVIATION = 0.25
 
 PIXEL_BASE_ENV_VAR = "PAGELOAD_PIXEL_BASE_URL"
 PIXEL_BASE = os.environ.get(PIXEL_BASE_ENV_VAR, "https://improving.duckduckgo.com/t/m_page_load_time_android")
@@ -42,7 +52,11 @@ class Stats:
     std_dev: float = 0.0
     min: float = 0.0
     max: float = 0.0
+    p25: float = 0.0
+    p75: float = 0.0
     p90: float = 0.0
+    outlier_count: int = 0
+    invalid_count: int = 0
 
 
 @dataclass
@@ -99,11 +113,12 @@ def compute_stats(
     trailing: int = DEFAULT_TRAILING_SAMPLES,
 ) -> Stats:
     end = len(durations_ms) - trailing if trailing else None
-    data = [duration for duration in durations_ms[warmup:end] if duration > 0]
+    measured = [duration for duration in durations_ms[warmup:end] if duration > 0]
+    data = [duration for duration in measured if duration < SETTLE_WINDOW_MS]
+    invalid_count = len(measured) - len(data)
     if not data:
-        return Stats()
+        return Stats(invalid_count=invalid_count)
     ordered = sorted(data)
-    p90 = ordered[min(len(ordered) - 1, max(0, round(0.9 * len(ordered)) - 1))]
     return Stats(
         count=len(data),
         median=statistics.median(data),
@@ -111,8 +126,37 @@ def compute_stats(
         std_dev=statistics.stdev(data) if len(data) > 1 else 0.0,
         min=min(data),
         max=max(data),
-        p90=float(p90),
+        p25=_percentile(ordered, 0.25),
+        p75=_percentile(ordered, 0.75),
+        p90=_percentile(ordered, 0.90),
+        outlier_count=len(_outliers(data)),
+        invalid_count=invalid_count,
     )
+
+
+def _percentile(ordered: list[float], quantile: float) -> float:
+    position = (len(ordered) - 1) * quantile
+    lower = int(position)
+    upper = min(lower + 1, len(ordered) - 1)
+    return ordered[lower] + (ordered[upper] - ordered[lower]) * (position - lower)
+
+
+def _outliers(data: list[float]) -> list[float]:
+    """Samples far enough from the median, in both MAD and absolute terms, to be measurement noise.
+
+    The absolute floor matters because these distributions are tight (MAD is often ~50ms), so a
+    z-score alone flags samples only a few tens of ms out as anomalous.
+    """
+    median = statistics.median(data)
+    mad = statistics.median([abs(value - median) for value in data])
+    if not mad:
+        return []
+    return [
+        value
+        for value in data
+        if abs(value - median) / (1.4826 * mad) > OUTLIER_Z_THRESHOLD
+        and abs(value - median) > OUTLIER_MIN_RELATIVE_DEVIATION * median
+    ]
 
 
 def _device_metadata(context: dict, device: str) -> DeviceMetadata:
