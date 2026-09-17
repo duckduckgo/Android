@@ -2046,7 +2046,7 @@ class RealDuckChatTest {
         coroutineRule.testScope.advanceUntilIdle()
 
         verify(mockDuckAiModelManager, never()).selectModel(any())
-        verify(mockBrowserNav).openDuckChat(any(), any(), any(), forceImageGeneration = eq(true))
+        verify(mockBrowserNav).openDuckChat(any(), any(), any(), eq(true), any(), anyOrNull())
         verify(mockContext).startActivity(mockIntent)
     }
 
@@ -2062,7 +2062,7 @@ class RealDuckChatTest {
         coroutineRule.testScope.advanceUntilIdle()
 
         verify(mockDuckAiModelManager).selectModel(capable)
-        verify(mockBrowserNav).openDuckChat(any(), any(), any(), forceImageGeneration = eq(true))
+        verify(mockBrowserNav).openDuckChat(any(), any(), any(), eq(true), any(), anyOrNull())
         verify(mockContext).startActivity(mockIntent)
     }
 
@@ -2078,7 +2078,7 @@ class RealDuckChatTest {
         coroutineRule.testScope.advanceUntilIdle()
 
         verify(mockDuckAiModelManager, never()).selectModel(any())
-        verify(mockBrowserNav).openDuckChat(any(), any(), any(), forceImageGeneration = eq(false))
+        verify(mockBrowserNav).openDuckChat(any(), any(), any(), eq(false), any(), anyOrNull())
         verify(mockContext).startActivity(mockIntent)
     }
 
