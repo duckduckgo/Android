@@ -265,6 +265,23 @@
         "type": "string",
         "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data"
     },
+    "passkeyError": {
+        "key": "error",
+        "type": "string",
+        "description": "Sanitized WebAuthn DOMException name. UnknownError also covers CSS Other and unrecognized names.",
+        "enum": [
+            "AbortError",
+            "ConstraintError",
+            "EncodingError",
+            "InvalidStateError",
+            "NotAllowedError",
+            "NotReadableError",
+            "NotSupportedError",
+            "SecurityError",
+            "TypeError",
+            "UnknownError"
+        ]
+    },
     "freeTrial": {
         "key": "free_trial",
         "type": "boolean",
