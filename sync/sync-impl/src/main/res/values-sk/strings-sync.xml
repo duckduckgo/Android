@@ -376,7 +376,7 @@
 
     <!-- Pairing screen -->
     <string name="sync_simplified_pairing_headline">Služba Sync &amp; Backup je na všetkých tvojich zariadeniach šifrovaná spôsobom end-to-end.</string>
-    <string name="sync_simplified_pairing_headline_check_other_device">Skontroluj svoje druhé zariadenie</string>
+    <string name="sync_simplified_pairing_headline_check_other_device">Skontroluj svoje druhé zariadenie.</string>
     <string name="sync_simplified_pairing_headline_recovery">Obnovenie údajov</string>
     <string name="sync_simplified_pairing_body">Pripája sa...</string>
 
