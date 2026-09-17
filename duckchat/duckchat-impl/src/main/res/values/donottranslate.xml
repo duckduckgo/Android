@@ -48,9 +48,6 @@
     <string name="duck_ai_chat_history_overflow_select_chats">Select Chats</string>
     <string name="duck_ai_chat_history_overflow_chats_protection">Chat Protection</string>
 
-    <!-- Duck.ai address bar menu -->
-    <string name="duckChatContextualAllChats">All Chats</string>
-
     <!-- Suggested prompts for text selection -->
     <string name="duckAiSuggestionSummarizeSelectionLabel">Summarize this selection</string>
     <string name="duckAiSuggestionSummarizeSelectionPrompt">Summarize this selection.</string>
