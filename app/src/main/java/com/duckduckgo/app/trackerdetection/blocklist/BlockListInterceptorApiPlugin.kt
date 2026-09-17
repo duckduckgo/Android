@@ -17,10 +17,11 @@
 package com.duckduckgo.app.trackerdetection.blocklist
 
 import com.duckduckgo.app.global.api.ApiInterceptorPlugin
-import com.duckduckgo.app.pixels.AppPixelName.BLOCKLIST_TDS_FAILURE
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.trackerdetection.TrackerDetectionPixelName.BLOCKLIST_TDS_FAILURE
 import com.duckduckgo.app.trackerdetection.api.TDS_BASE_URL
 import com.duckduckgo.app.trackerdetection.api.TdsRequired
+import com.duckduckgo.app.trackerdetection.api.TrackerDetectionMoshi
 import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Cohorts.CONTROL
 import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Cohorts.TREATMENT
 import com.duckduckgo.di.scopes.AppScope
@@ -42,7 +43,7 @@ import javax.inject.Inject
 )
 class BlockListInterceptorApiPlugin @Inject constructor(
     private val inventory: FeatureTogglesInventory,
-    private val moshi: Moshi,
+    @TrackerDetectionMoshi private val moshi: Moshi,
     private val pixel: Pixel,
 ) : Interceptor, ApiInterceptorPlugin {
 
