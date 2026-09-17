@@ -35,6 +35,8 @@ import com.duckduckgo.duckchat.impl.history.ChatHistoryRepository
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
+import com.duckduckgo.duckchat.impl.wideevents.DuckAiSelectionJourneyWideEvent
+import com.duckduckgo.duckchat.impl.wideevents.SelectionTerminalReason
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -73,6 +75,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
     private val sessionTimeoutProvider: DuckChatContextualSessionTimeoutProvider,
     private val timeProvider: DuckChatContextualTimeProvider,
     private val duckChatPixels: DuckChatPixels,
+    private val selectionJourney: DuckAiSelectionJourneyWideEvent,
     private val duckChatFeature: DuckChatFeature,
     private val modelManager: DuckAiModelManager,
     private val chatHistoryRepository: ChatHistoryRepository,
@@ -379,6 +382,10 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
         pageContextSerialized: String?,
         selectionsJson: JSONArray? = null,
     ) {
+        selectionsJson?.length()?.takeIf { it > 0 }?.let {
+            duckChatPixels.reportContextualPromptSubmittedWithSelections(it)
+            selectionJourney.onPromptSubmitted()
+        }
         viewModelScope.launch(dispatchers.io()) {
             val contextPrompt =
                 generateContextPrompt(prompt, modelId, reasoningEffort, selectedTool, imagesJson, filesJson, pageContextSerialized, selectionsJson)
@@ -561,6 +568,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
             return
         }
         duckChatPixels.reportContextualSheetDismissed()
+        selectionJourney.onSurfaceDismissed()
         persistTabClosed()
         commandChannel.trySend(Command.ApplyContextualClosed(_viewState.value.tabId))
     }
@@ -717,6 +725,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
         // so it isn't resumed, then let the dialog command hide the sheet. Mark the impending hide as a
         // handoff so onSheetClosed doesn't revert the tab's contextual input state.
         duckChatPixels.reportContextualSheetNewChatFromPopup()
+        selectionJourney.onJourneyEnded(SelectionTerminalReason.NEW_CHAT)
         hidingSheetForNewChat = true
         resetToNewChat()
         commandChannel.trySend(Command.ShowNewChatEntryDialog(_viewState.value.tabId))
@@ -765,6 +774,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
 
     fun onContextualFireConfirmed() {
         duckChatPixels.reportContextualFireButtonConfirmed()
+        selectionJourney.onJourneyEnded(SelectionTerminalReason.CHAT_CLEARED)
         resetToNewChat()
         commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_HIDDEN))
     }

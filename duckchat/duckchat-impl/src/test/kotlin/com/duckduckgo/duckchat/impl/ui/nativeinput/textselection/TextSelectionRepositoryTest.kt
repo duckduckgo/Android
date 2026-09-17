@@ -16,14 +16,23 @@
 
 package com.duckduckgo.duckchat.impl.ui.nativeinput.textselection
 
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
+import com.duckduckgo.duckchat.impl.wideevents.DuckAiSelectionJourneyWideEvent
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 
 class TextSelectionRepositoryTest {
 
-    private val testee = RealTextSelectionRepository()
+    private val duckChatPixels: DuckChatPixels = mock()
+    private val selectionJourney: DuckAiSelectionJourneyWideEvent = mock()
+
+    private val testee = RealTextSelectionRepository(duckChatPixels, selectionJourney)
 
     @Test
     fun whenSelectionAddedThenItIsStoredAgainstThatTab() {
@@ -56,6 +65,7 @@ class TextSelectionRepositoryTest {
         assertTrue(testee.add(TAB, "selected words", URL))
 
         assertEquals(1, testee.selections(TAB).value.size)
+        verify(duckChatPixels).reportContextualSelectionAttached()
     }
 
     @Test
@@ -82,6 +92,7 @@ class TextSelectionRepositoryTest {
 
         assertTrue(testee.limitReached(TAB).value)
         assertEquals(TextSelectionRepository.MAX_SELECTIONS, testee.selections(TAB).value.size)
+        verify(duckChatPixels).reportContextualSelectionLimitReached()
     }
 
     @Test
@@ -122,6 +133,27 @@ class TextSelectionRepositoryTest {
         testee.remove(TAB, "not-a-real-id")
 
         assertEquals(1, testee.selections(TAB).value.size)
+        verify(duckChatPixels, never()).reportContextualSelectionRemoved()
+        verify(selectionJourney, never()).onSelectionRemoved(any())
+    }
+
+    @Test
+    fun whenSelectionAttachedThenJourneyToldTheRunningCount() {
+        testee.add(TAB, "first", URL)
+        testee.add(TAB, "second", URL)
+
+        verify(selectionJourney).onSelectionAttached(1)
+        verify(selectionJourney).onSelectionAttached(2)
+    }
+
+    @Test
+    fun whenLastSelectionRemovedThenJourneyToldNoneRemain() {
+        testee.add(TAB, "selected words", URL)
+
+        testee.remove(TAB, testee.selections(TAB).value.first().id)
+
+        verify(duckChatPixels).reportContextualSelectionRemoved()
+        verify(selectionJourney).onSelectionRemoved(0)
     }
 
     private fun fillToLimit() {

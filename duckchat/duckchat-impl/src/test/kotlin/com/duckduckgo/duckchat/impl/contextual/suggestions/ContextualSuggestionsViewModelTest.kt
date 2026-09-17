@@ -55,6 +55,7 @@ class ContextualSuggestionsViewModelTest {
         duckChatFeature = duckChatFeature,
         dispatchers = coroutineRule.testDispatcherProvider,
         duckChatPixels = duckChatPixels,
+        selectionJourney = mock(),
     )
 
     @Before

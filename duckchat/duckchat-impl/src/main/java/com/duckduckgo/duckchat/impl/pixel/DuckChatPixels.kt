@@ -173,6 +173,10 @@ interface DuckChatPixels {
     fun reportContextualPageContextRemovedNative()
     fun reportContextualPageContextRemovedFrontend()
     fun reportContextualPageContextAutoAttached()
+    fun reportContextualSelectionAttached()
+    fun reportContextualSelectionLimitReached()
+    fun reportContextualSelectionRemoved()
+    fun reportContextualPromptSubmittedWithSelections(count: Int)
     fun reportContextualPromptSubmittedWithContextNative()
     fun reportContextualPromptSubmittedWithoutContextNative()
     fun reportContextualPageContextCollectionEmpty()
@@ -812,6 +816,41 @@ class RealDuckChatPixels @Inject constructor(
         }
     }
 
+    override fun reportContextualSelectionAttached() {
+        fireCountAndDaily(
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SELECTION_ATTACHED_COUNT,
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SELECTION_ATTACHED_DAILY,
+        )
+    }
+
+    override fun reportContextualSelectionLimitReached() {
+        fireCountAndDaily(
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SELECTION_LIMIT_REACHED_COUNT,
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SELECTION_LIMIT_REACHED_DAILY,
+        )
+    }
+
+    override fun reportContextualSelectionRemoved() {
+        fireCountAndDaily(
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SELECTION_REMOVED_COUNT,
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SELECTION_REMOVED_DAILY,
+        )
+    }
+
+    override fun reportContextualPromptSubmittedWithSelections(count: Int) {
+        val bucket = when (count) {
+            1 -> "1"
+            2 -> "2"
+            in 3..5 -> "3-5"
+            else -> return
+        }
+        fireCountAndDaily(
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PROMPT_SUBMITTED_WITH_SELECTIONS_COUNT,
+            DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PROMPT_SUBMITTED_WITH_SELECTIONS_DAILY,
+            mapOf(DuckChatPixelParameters.SELECTION_COUNT to bucket),
+        )
+    }
+
     override fun reportContextualFloatingInputPromotedToSheet() {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_FLOATING_INPUT_PROMOTED_TO_SHEET_COUNT)
@@ -1342,6 +1381,14 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN_DAILY("m_product_telemetry_surface_usage_duck_ai_daily"),
     PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE("m_product_telemetry_surface_usage_keyboard_active"),
     PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE_DAILY("m_product_telemetry_surface_usage_keyboard_active_daily"),
+    DUCK_CHAT_CONTEXTUAL_SELECTION_ATTACHED_COUNT("m_aichat_contextual_selection_attached_count"),
+    DUCK_CHAT_CONTEXTUAL_SELECTION_ATTACHED_DAILY("m_aichat_contextual_selection_attached_daily"),
+    DUCK_CHAT_CONTEXTUAL_SELECTION_LIMIT_REACHED_COUNT("m_aichat_contextual_selection_limit_reached_count"),
+    DUCK_CHAT_CONTEXTUAL_SELECTION_LIMIT_REACHED_DAILY("m_aichat_contextual_selection_limit_reached_daily"),
+    DUCK_CHAT_CONTEXTUAL_SELECTION_REMOVED_COUNT("m_aichat_contextual_selection_removed_count"),
+    DUCK_CHAT_CONTEXTUAL_SELECTION_REMOVED_DAILY("m_aichat_contextual_selection_removed_daily"),
+    DUCK_CHAT_CONTEXTUAL_PROMPT_SUBMITTED_WITH_SELECTIONS_COUNT("m_aichat_contextual_prompt_submitted_with_selections_count"),
+    DUCK_CHAT_CONTEXTUAL_PROMPT_SUBMITTED_WITH_SELECTIONS_DAILY("m_aichat_contextual_prompt_submitted_with_selections_daily"),
     DUCK_CHAT_CONTEXTUAL_SHEET_OPENED_COUNT("m_aichat_contextual_sheet_opened_count"),
     DUCK_CHAT_CONTEXTUAL_SHEET_OPENED_DAILY("m_aichat_contextual_sheet_opened_daily"),
     DUCK_CHAT_CONTEXTUAL_SHEET_DISMISSED_COUNT("m_aichat_contextual_sheet_dismissed_count"),
@@ -1562,6 +1609,7 @@ object DuckChatPixelParameters {
     const val HAS_PROMPT = "has_prompt"
     const val WAS_USED_BEFORE = "was_used_before"
     const val SUGGESTION_ID = "suggestionId"
+    const val SELECTION_COUNT = "selection_count"
     const val PAGE_TYPE = "pageType"
 
     /** What the user was looking at when a prompt was submitted. Distinct from [PAGE_TYPE], which classifies contextual suggestions. */

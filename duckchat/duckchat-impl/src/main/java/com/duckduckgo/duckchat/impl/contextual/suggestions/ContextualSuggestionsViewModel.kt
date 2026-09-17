@@ -23,6 +23,8 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
+import com.duckduckgo.duckchat.impl.wideevents.DuckAiSelectionJourneyWideEvent
+import com.duckduckgo.duckchat.impl.wideevents.SelectionSubmissionAction
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -41,6 +43,7 @@ class ContextualSuggestionsViewModel @Inject constructor(
     private val duckChatFeature: DuckChatFeature,
     private val dispatchers: DispatcherProvider,
     private val duckChatPixels: DuckChatPixels,
+    private val selectionJourney: DuckAiSelectionJourneyWideEvent,
 ) : ViewModel() {
 
     data class ViewState(
@@ -81,6 +84,10 @@ class ContextualSuggestionsViewModel @Inject constructor(
 
     fun onSuggestionSelected(suggestionId: String) {
         duckChatPixels.reportContextualSuggestionSelected(suggestionId, pageType.pixelValue)
+        when (suggestionId) {
+            "summarize-selection" -> selectionJourney.onSuggestionSelected(SelectionSubmissionAction.SUMMARIZE)
+            "translate-selection" -> selectionJourney.onSuggestionSelected(SelectionSubmissionAction.TRANSLATE)
+        }
     }
 
     fun currentPageType(): SuggestionsPageType = pageType
@@ -128,6 +135,7 @@ class ContextualSuggestionsViewModel @Inject constructor(
 
     private suspend fun resolveTextSelectionSuggestions() {
         resolvedSuggestions = suggestedPromptsProvider.resolveTextSelectionSuggestions(currentInput())
+        if (resolvedSuggestions.isNotEmpty()) selectionJourney.onSuggestionsViewed()
         showSuggestions()
     }
 
