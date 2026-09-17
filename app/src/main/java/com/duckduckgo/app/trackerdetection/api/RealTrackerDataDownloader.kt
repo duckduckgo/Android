@@ -24,6 +24,7 @@ import com.duckduckgo.common.utils.extensions.extractETag
 import com.duckduckgo.common.utils.store.BinaryDataStore
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.moshi.Moshi
 import io.reactivex.Completable
 import logcat.logcat
 import okhttp3.Headers
@@ -37,7 +38,10 @@ class RealTrackerDataDownloader @Inject constructor(
     private val trackerDataLoader: TrackerDataLoader,
     private val appDatabase: AppDatabase,
     private val metadataDao: TdsMetadataDao,
+    @TrackerDetectionMoshi moshi: Moshi,
 ) : TrackerDataDownloader {
+
+    private val tdsAdapter = moshi.adapter(TdsJson::class.java)
 
     override fun downloadTds(): Completable {
         return Completable.fromAction {
@@ -50,13 +54,14 @@ class RealTrackerDataDownloader @Inject constructor(
                 throw IOException("Status: ${response.code()} - ${response.errorBody()?.string()}")
             }
 
-            val body = response.body()!!
+            val tdsJson = response.body()!!.use { tdsAdapter.fromJson(it.source()) }
+                ?: throw IOException("Empty tds.json body")
             val eTag = response.headers().extractETag()
             val oldEtag = metadataDao.eTag()
             if (eTag != oldEtag) {
                 logcat { "Updating tds data from server" }
                 appDatabase.runInTransaction {
-                    trackerDataLoader.persistTds(eTag, body)
+                    trackerDataLoader.persistTds(eTag, tdsJson)
                     trackerDataLoader.loadTrackers()
                 }
             }
