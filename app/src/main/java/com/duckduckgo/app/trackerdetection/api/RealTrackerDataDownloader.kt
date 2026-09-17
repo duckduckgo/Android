@@ -22,21 +22,24 @@ import com.duckduckgo.app.trackerdetection.TrackerDataLoader
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.common.utils.extensions.extractETag
 import com.duckduckgo.common.utils.store.BinaryDataStore
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
 import io.reactivex.Completable
 import logcat.logcat
 import okhttp3.Headers
 import java.io.IOException
 import javax.inject.Inject
 
-class TrackerDataDownloader @Inject constructor(
+@ContributesBinding(AppScope::class)
+class RealTrackerDataDownloader @Inject constructor(
     private val trackerListService: TrackerListService,
     private val binaryDataStore: BinaryDataStore,
     private val trackerDataLoader: TrackerDataLoader,
     private val appDatabase: AppDatabase,
     private val metadataDao: TdsMetadataDao,
-) {
+) : TrackerDataDownloader {
 
-    fun downloadTds(): Completable {
+    override fun downloadTds(): Completable {
         return Completable.fromAction {
             logcat { "Downloading tds.json" }
 
@@ -60,7 +63,7 @@ class TrackerDataDownloader @Inject constructor(
         }
     }
 
-    fun clearLegacyLists(): Completable {
+    override fun clearLegacyLists(): Completable {
         return Completable.fromAction {
             listOf(EASYLIST, EASYPRIVACY, TRACKERSALLOWLIST).forEach {
                 if (binaryDataStore.hasData(it.name)) {
