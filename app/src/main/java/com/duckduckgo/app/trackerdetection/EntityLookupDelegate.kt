@@ -17,7 +17,7 @@
 package com.duckduckgo.app.trackerdetection
 
 import android.net.Uri
-import com.duckduckgo.app.pixels.remoteconfig.CachedEntityLookupRCWrapper
+import com.duckduckgo.app.trackerdetection.flags.CachedEntityLookupRCWrapper
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
