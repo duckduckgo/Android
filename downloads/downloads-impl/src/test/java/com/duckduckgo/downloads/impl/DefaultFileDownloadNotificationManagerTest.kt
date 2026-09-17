@@ -16,20 +16,25 @@
 
 package com.duckduckgo.downloads.impl
 
+import android.Manifest.permission.POST_NOTIFICATIONS
+import android.app.Application
+import android.app.Notification
 import androidx.core.app.NotificationManagerCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.*
+import org.robolectric.Shadows.shadowOf
+import java.io.File
 
 @RunWith(AndroidJUnit4::class)
 class DefaultFileDownloadNotificationManagerTest {
 
     private val mockNotificationManager: NotificationManagerCompat = mock()
-    private val mockAppBuildConfig: AppBuildConfig = mock()
 
     private lateinit var notificationManager: DefaultFileDownloadNotificationManager
 
@@ -42,7 +47,6 @@ class DefaultFileDownloadNotificationManagerTest {
         notificationManager = DefaultFileDownloadNotificationManager(
             notificationManager = mockNotificationManager,
             applicationContext = context,
-            appBuildConfig = mockAppBuildConfig,
         )
     }
 
@@ -53,5 +57,41 @@ class DefaultFileDownloadNotificationManagerTest {
         notificationManager.cancelDownloadFileNotification(downloadId)
 
         verify(mockNotificationManager).cancel(downloadId.toInt())
+    }
+
+    @Test
+    fun whenDownloadFinishedNotificationShownThenDeleteIntentIsDownloadSeenIntent() {
+        val downloadId = 1L
+        val application = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as Application
+        shadowOf(application).grantPermissions(POST_NOTIFICATIONS)
+
+        notificationManager.showDownloadFinishedNotification(downloadId, File("test.txt"), null)
+
+        val captor = argumentCaptor<Notification>()
+        verify(mockNotificationManager).notify(eq(downloadId.toInt()), captor.capture())
+        val savedIntent = shadowOf(captor.firstValue.deleteIntent).savedIntent
+        assertEquals(downloadId, savedIntent.getLongExtra("downloadId", -1))
+        assertEquals("EXTRA_DOWNLOAD_SEEN", savedIntent.getStringExtra("CTA"))
+    }
+
+    @Test
+    fun whenDownloadFinishedNotificationShownThenDeleteIntentRequestCodeDiffersFromFailedNotificationDeleteIntent() {
+        val downloadId = 0L
+        val application = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as Application
+        shadowOf(application).grantPermissions(POST_NOTIFICATIONS)
+
+        notificationManager.showDownloadFinishedNotification(downloadId, File("test.txt"), null)
+        val finishedCaptor = argumentCaptor<Notification>()
+        verify(mockNotificationManager).notify(eq(downloadId.toInt()), finishedCaptor.capture())
+        val finishedDeleteRequestCode = shadowOf(finishedCaptor.firstValue.deleteIntent).requestCode
+
+        notificationManager.showDownloadFailedNotification(downloadId, null)
+        val failedCaptor = argumentCaptor<Notification>()
+        verify(mockNotificationManager, times(2)).notify(eq(downloadId.toInt()), failedCaptor.capture())
+        val failedDeleteRequestCode = shadowOf(failedCaptor.lastValue.deleteIntent).requestCode
+
+        assertNotEquals(downloadId.toInt(), finishedDeleteRequestCode)
+        assertNotEquals(downloadId.toInt().inv(), finishedDeleteRequestCode)
+        assertNotEquals(failedDeleteRequestCode, finishedDeleteRequestCode)
     }
 }

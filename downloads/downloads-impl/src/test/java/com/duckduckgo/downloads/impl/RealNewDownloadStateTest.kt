@@ -40,15 +40,6 @@ class RealNewDownloadStateTest {
     }
 
     @Test
-    fun whenOnDownloadsScreenViewedAfterDownloadCompleteThenHasNewDownloadIsFalse() {
-        newDownloadState.onDownloadComplete()
-
-        newDownloadState.onDownloadsScreenViewed()
-
-        assertFalse(newDownloadState.hasNewDownload())
-    }
-
-    @Test
     fun whenOnDownloadCompleteThenFlowEmitsTrue() = runTest {
         newDownloadState.hasNewDownloadFlow.test {
             assertFalse(awaitItem())
@@ -60,13 +51,22 @@ class RealNewDownloadStateTest {
     }
 
     @Test
-    fun whenOnDownloadsScreenViewedThenFlowEmitsFalse() = runTest {
+    fun whenOnNewDownloadAcknowledgedThenHasNewDownloadIsFalse() {
+        newDownloadState.onDownloadComplete()
+
+        newDownloadState.onNewDownloadAcknowledged()
+
+        assertFalse(newDownloadState.hasNewDownload())
+    }
+
+    @Test
+    fun whenOnNewDownloadAcknowledgedThenFlowEmitsFalse() = runTest {
         newDownloadState.onDownloadComplete()
 
         newDownloadState.hasNewDownloadFlow.test {
             assertTrue(awaitItem())
 
-            newDownloadState.onDownloadsScreenViewed()
+            newDownloadState.onNewDownloadAcknowledged()
 
             assertFalse(awaitItem())
         }
