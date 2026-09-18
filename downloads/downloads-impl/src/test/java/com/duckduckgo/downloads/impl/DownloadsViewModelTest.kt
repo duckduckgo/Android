@@ -405,7 +405,7 @@ class DownloadsViewModelTest {
 
         testee.syncDownloads()
 
-        verify(mockNewDownloadState).onDownloadsScreenViewed()
+        verify(mockNewDownloadState).onNewDownloadAcknowledged()
     }
 
     private fun oneItem() =

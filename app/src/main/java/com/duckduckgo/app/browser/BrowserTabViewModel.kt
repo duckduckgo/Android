@@ -202,6 +202,7 @@ import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler.Ev
 import com.duckduckgo.app.browser.logindetection.LoginDetected
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
 import com.duckduckgo.app.browser.logindetection.NavigationEvent
+import com.duckduckgo.app.browser.menu.BrowserMenuAcknowledgement
 import com.duckduckgo.app.browser.menu.VpnMenuStateProvider
 import com.duckduckgo.app.browser.modals.NewTabPageModalPresenter
 import com.duckduckgo.app.browser.modals.NewTabPageModalPresenterRegistry
@@ -216,6 +217,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromAutocomplete
 import com.duckduckgo.app.browser.omnibar.QueryUrlPredictor
+import com.duckduckgo.app.browser.omnibar.toBrowserViewMode
 import com.duckduckgo.app.browser.pageload.PageLoadWideEvent
 import com.duckduckgo.app.browser.pdf.CachedFileDownloader
 import com.duckduckgo.app.browser.pdf.InlinePdfHandler
@@ -618,6 +620,7 @@ class BrowserTabViewModel @Inject constructor(
     private val badUrlErrorPageWideEvent: BadUrlErrorPageWideEvent,
     private val customErrorPagesFeature: CustomErrorPagesFeature,
     private val duckAiSessionCallback: DuckAiSessionCallback,
+    private val browserMenuAcknowledgement: BrowserMenuAcknowledgement,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -3767,6 +3770,7 @@ class BrowserTabViewModel @Inject constructor(
         if (viewMode is ViewMode.Browser) {
             additionalDefaultBrowserPrompts.onBrowserMenuLaunched()
         }
+        browserMenuAcknowledgement.onBrowserMenuViewed(viewMode.toBrowserViewMode())
     }
 
     fun onNewTabMenuItemClicked(longPress: Boolean = false): Boolean {
