@@ -3,70 +3,89 @@ appId: com.duckduckgo.mobile.android
 # Consumers need to know whether the linear widget step was shown: it and the end-of-onboarding widget
 # bottom sheet are mutually exclusive (see AddWidgetModalEvaluator).
 - evalScript: ${output.linearWidgetPromptShown = false}
+- evalScript: ${output.segmentedOnboardingShown = false}
 - assertVisible:
     text: ".*(Ready for a faster browser that protects you and lets you decide when and how to use.AI|Ready for a faster browser that puts you in.control).*"
 - tapOn:
     text: "(let's get started!|Let's do it!)"
-- assertVisible:
-    text: "Protections.activated!"
-- scrollUntilVisible:
-    element:
-      text: "choose your browser"
-    direction: DOWN
-- tapOn: "choose your browser"
+# Cohorts of the segmented onboarding experiment see a "Set things up your way" download-reason screen
+# instead of the classic path (see NewUserOnboardingPlanProvider). The check is optional so this flow
+# stays deterministic regardless of which cohort a run gets enrolled into.
+- extendedWaitUntil:
+    visible:
+      id: "downloadReasonTitle"
+    timeout: 3000
+    optional: true
 - runFlow:
     when:
-      true: ${SET_AS_DEFAULT == 'true'}
+      visible:
+        id: "downloadReasonTitle"
     commands:
+      - runFlow: pre_onboarding_segmented_block_ads.yaml
+- runFlow:
+    when:
+      true: ${output.segmentedOnboardingShown == false}
+    commands:
+      - assertVisible:
+          text: "Protections.activated!"
+      - scrollUntilVisible:
+          element:
+            text: "choose your browser"
+          direction: DOWN
+      - tapOn: "choose your browser"
       - runFlow:
           when:
-            visible: "set as default"
+            true: ${SET_AS_DEFAULT == 'true'}
           commands:
-            - tapOn: "duckduckgo"
-            - tapOn: "set as default"
-- runFlow:
-    when:
-      true: ${SET_AS_DEFAULT != 'true'}
-    commands:
-      - tapOn: "cancel"
-# The "Add to Dock" / "Widget prompt" onboarding pages only show for some cohorts of the
-# addToDockAndWidgetExperimentJul25 experiment (see OnboardingPromptsToggles); both are optional so
-# this flow stays deterministic regardless of which cohort a run gets enrolled into.
-- extendedWaitUntil:
-    visible:
-      id: "addToDockTitle"
-    timeout: 3000
-    optional: true
-- runFlow:
-    when:
-      visible:
-        id: "addToDockTitle"
-    commands:
-      - tapOn: "Got it!"
-- extendedWaitUntil:
-    visible:
-      id: "widgetPromptTitle"
-    timeout: 3000
-    optional: true
-- runFlow:
-    when:
-      visible:
-        id: "widgetPromptTitle"
-    commands:
-      - tapOn: "Not Now"
-      - evalScript: ${output.linearWidgetPromptShown = true}
-- assertVisible:
-    text: ".*where should I put your address.bar?.*"
-- tapOn: "next"
-- assertVisible:
-    text: ".*want easy access to private AI chat?.*"
-# Tapping next opens the new Duck.ai onboarding preview. Search is the default mode, so tap a
-# search suggestion to run a demo search — this completes onboarding and lands in the browser
-# on the in-context "That's DuckDuckGo Search!" CTA.
-- tapOn: "next"
-- assertVisible:
-    id: "suggestion1"
-- tapOn:
-    id: "suggestion1"
-- assertVisible:
-    text: ".*That's DuckDuckGo Search!.*"
+            - runFlow:
+                when:
+                  visible: "set as default"
+                commands:
+                  - tapOn: "duckduckgo"
+                  - tapOn: "set as default"
+      - runFlow:
+          when:
+            true: ${SET_AS_DEFAULT != 'true'}
+          commands:
+            - tapOn: "cancel"
+      # The "Add to Dock" / "Widget prompt" onboarding pages only show for some cohorts of the
+      # addToDockAndWidgetExperimentJul25 experiment (see OnboardingPromptsToggles); both are optional so
+      # this flow stays deterministic regardless of which cohort a run gets enrolled into.
+      - extendedWaitUntil:
+          visible:
+            id: "addToDockTitle"
+          timeout: 3000
+          optional: true
+      - runFlow:
+          when:
+            visible:
+              id: "addToDockTitle"
+          commands:
+            - tapOn: "Got it!"
+      - extendedWaitUntil:
+          visible:
+            id: "widgetPromptTitle"
+          timeout: 3000
+          optional: true
+      - runFlow:
+          when:
+            visible:
+              id: "widgetPromptTitle"
+          commands:
+            - tapOn: "Not Now"
+            - evalScript: ${output.linearWidgetPromptShown = true}
+      - assertVisible:
+          text: ".*where should I put your address.bar?.*"
+      - tapOn: "next"
+      - assertVisible:
+          text: ".*want easy access to private AI chat?.*"
+      # Tapping next opens the new Duck.ai onboarding preview. Search is the default mode, so tap a
+      # search suggestion to run a demo search — this completes onboarding and lands in the browser
+      # on the in-context "That's DuckDuckGo Search!" CTA.
+      - tapOn: "next"
+      - assertVisible:
+          id: "suggestion1"
+      - tapOn:
+          id: "suggestion1"
+      - assertVisible:
+          text: ".*That's DuckDuckGo Search!.*"

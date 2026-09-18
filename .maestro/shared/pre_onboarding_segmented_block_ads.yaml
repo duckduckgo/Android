@@ -1,0 +1,41 @@
+appId: com.duckduckgo.mobile.android
+---
+# Segmented onboarding experiment, "Block ads" path (see NewUserOnboardingPlanProvider.segmentedBlockAdsPlan).
+# Entered from pre_onboarding.yaml once the "Set things up your way" download-reason screen is visible;
+# inherits SET_AS_DEFAULT from the caller.
+- evalScript: ${output.segmentedOnboardingShown = true}
+# "Block ads and pop-ups" option; matched by id because the label wraps onto two lines.
+- tapOn:
+    id: "downloadReasonOptionBlockAds"
+- tapOn: "next"
+- assertVisible:
+    id: "comparisonChartTitle"
+- tapOn: "choose your browser"
+- runFlow:
+    when:
+      true: ${SET_AS_DEFAULT == 'true'}
+    commands:
+      - runFlow:
+          when:
+            visible: "set as default"
+          commands:
+            - tapOn: "duckduckgo"
+            - tapOn: "set as default"
+- runFlow:
+    when:
+      true: ${SET_AS_DEFAULT != 'true'}
+    commands:
+      - tapOn: "cancel"
+- assertVisible:
+    id: "preferenceSelectorTitle"
+- tapOn: "next"
+- assertVisible:
+    id: "inputScreenTitle"
+- tapOn: "next"
+- assertVisible:
+    id: "addressBarTitle"
+- tapOn: "next"
+- assertVisible:
+    id: "suggestion1"
+- tapOn:
+    id: "suggestion1"
