@@ -109,12 +109,18 @@ class ModelPickerViewModel @Inject constructor(
         }
     }
 
-    /** Mirrors the provider for this view: the model the chip displays. */
-    val effectiveModelId: StateFlow<String?> = effectiveModelProvider.effectiveModel.map { effective ->
-        when (effective) {
-            is EffectiveModel.Resolved -> effective.modelId
-            EffectiveModel.Unresolved -> modelManager.modelState.value.selectedModelId
-        }
+    /**
+     * The model the chip displays. An answer resolved for a different chat is ignored: state and the
+     * provider arrive on separate flows, so a tab switch can pair this tab's state with the previous
+     * tab's model, and the chip would name a model this chat is not using.
+     */
+    val effectiveModelId: StateFlow<String?> = combine(
+        nativeInputStateProvider.state,
+        effectiveModelProvider.effectiveModel,
+        modelManager.modelState,
+    ) { state, effective, modelState ->
+        (effective as? EffectiveModel.Resolved)?.takeIf { it.chatId == state.chatId }?.modelId
+            ?: modelState.selectedModelId
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Eagerly,

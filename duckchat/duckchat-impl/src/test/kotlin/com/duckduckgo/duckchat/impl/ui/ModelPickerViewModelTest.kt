@@ -27,6 +27,8 @@ import com.duckduckgo.duckchat.impl.models.ModelProvider
 import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.models.UserTier
+import com.duckduckgo.duckchat.impl.nativeinput.EffectiveModel
+import com.duckduckgo.duckchat.impl.nativeinput.EffectiveModelProvider
 import com.duckduckgo.duckchat.impl.nativeinput.RealEffectiveModelProvider
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.ModelPickerViewModel
@@ -36,6 +38,7 @@ import com.duckduckgo.duckchat.impl.ui.nativeinput.views.UpsellCommand
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runCurrent
@@ -693,6 +696,36 @@ class ModelPickerViewModelTest {
         advanceUntilIdle()
 
         assertEquals("Global Model", testee.chipLabel.value)
+    }
+
+    @Test
+    fun whenTheModelWasResolvedForAnotherChatThenTheChipFallsBackToTheGlobalSelection() = runTest {
+        stateFlow.value = ModelState(
+            models = listOf(
+                freeModel(id = "global-model", shortName = "Global"),
+                freeModel(id = "other-chat-model", shortName = "Other"),
+            ),
+            selectedModelId = "global-model",
+            selectedModelShortName = "Global",
+        )
+        // The previous tab's answer, still in flight when this tab's state arrives.
+        val stale = MutableStateFlow<EffectiveModel>(EffectiveModel.Resolved(chatId = "chat-B", modelId = "other-chat-model"))
+        val viewModel = ModelPickerViewModel(
+            modelManager = modelManager,
+            duckChatPixels = duckChatPixels,
+            nativeInputStateProvider = nativeInputStateProvider,
+            duckAiChatStore = duckAiChatStore,
+            effectiveModelProvider = object : EffectiveModelProvider {
+                override val effectiveModel: Flow<EffectiveModel> = stale
+                override fun onRecoveryModelPicked(chatId: String?, modelId: String) = Unit
+                override fun clearRecoveryModelPick(chatId: String?) = Unit
+            },
+        )
+        nativeInputState.value = nativeInputState.value.copy(chatId = "chat-A")
+        advanceUntilIdle()
+
+        assertEquals("global-model", viewModel.effectiveModelId.value)
+        assertEquals("Global", viewModel.chipLabel.value)
     }
 
     @Test
