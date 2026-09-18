@@ -376,7 +376,7 @@
 
     <!-- Pairing screen -->
     <string name="sync_simplified_pairing_headline">Sync &amp; Backup er end-to-end-krypteret på alle dine enheder.</string>
-    <string name="sync_simplified_pairing_headline_check_other_device">Tjek din anden enhed</string>
+    <string name="sync_simplified_pairing_headline_check_other_device">Tjek din anden enhed.</string>
     <string name="sync_simplified_pairing_headline_recovery">Gendanner data</string>
     <string name="sync_simplified_pairing_body">Forbinder ...</string>
 
