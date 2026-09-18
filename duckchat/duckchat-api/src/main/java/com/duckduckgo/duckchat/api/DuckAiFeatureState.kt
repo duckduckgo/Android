@@ -71,6 +71,11 @@ interface DuckAiFeatureState {
     val showContextualMode: StateFlow<Boolean>
 
     /**
+     * Indicates whether the "Ask Duck.ai" text selection menu item should be shown.
+     */
+    val showTextSelectionAction: StateFlow<Boolean>
+
+    /**
      * Indicates whether Duck.ai should be used as digital assistant
      */
     val allowDuckAiAsDigitalAssistant: StateFlow<Boolean>

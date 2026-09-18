@@ -55,6 +55,7 @@ data class NativeInputPrompt(
     val selectedTool: String?,
     val imagesJson: JSONArray?,
     val filesJson: JSONArray?,
+    val selectionsJson: JSONArray? = null,
 )
 
 interface ContextualNativeInputManager {
@@ -219,6 +220,7 @@ class RealContextualNativeInputManager @Inject constructor(
         onVoiceSearchRequested: () -> Unit,
     ) {
         widget.configureContextual(tabId)
+        widget.bindTextSelections(tabId, textSelection = null)
         widget.bindChatIdSource(chatIdFlow)
         widget.bindModelPickerEnabledSource(modelPickerEnabled)
         widget.hideMainButtons()
@@ -241,6 +243,7 @@ class RealContextualNativeInputManager @Inject constructor(
             onChatSubmitted = { prompt ->
                 val imagesJson = widget.getImageAttachmentsJson()
                 val filesJson = widget.getFileAttachmentsJson()
+                val selectionsJson = widget.getTextSelectionsJson()
                 val modelId = widget.getSelectedModelId()
                 val reasoningEffort = widget.getResolvedReasoningEffort()
                 val selectedTool = widget.getSelectedTool()
@@ -252,7 +255,7 @@ class RealContextualNativeInputManager @Inject constructor(
                 // new chat from INPUT and appends to the active chat from WEBVIEW — the web page decides
                 // which, based on its own state, not on the native caller.
                 onPromptSubmitted(
-                    NativeInputPrompt(prompt, modelId, reasoningEffort, selectedTool, imagesJson, filesJson),
+                    NativeInputPrompt(prompt, modelId, reasoningEffort, selectedTool, imagesJson, filesJson, selectionsJson),
                 )
                 widget.clearSelectedTool()
                 widget.text = ""

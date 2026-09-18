@@ -79,6 +79,7 @@ import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.spy
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.eq
@@ -163,7 +164,7 @@ class RealDuckChatTest {
         )
         coroutineRule.testScope.advanceUntilIdle()
 
-        whenever(mockBrowserNav.openDuckChat(any(), any(), any(), any())).thenReturn(mockIntent)
+        whenever(mockBrowserNav.openDuckChat(any(), any(), any(), any(), any(), anyOrNull())).thenReturn(mockIntent)
         whenever(mockBrowserNav.closeDuckChat(any())).thenReturn(mockIntent)
     }
 
@@ -1565,6 +1566,60 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun `when contextual mode, redesign and text selection action enabled, then showTextSelectionAction emits true`() = runTest {
+        duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
+        duckChatFeature.contextualSheetRedesign().setRawStoredState(State(enable = true))
+        duckChatFeature.duckAiTextSelectionAction().setRawStoredState(State(enable = true))
+        duckChatFeature.nativeInputField().setRawStoredState(State(enable = true))
+        duckChatFeature.nativeChatInput().setRawStoredState(State(enable = true))
+        duckChatFeature.contextualNativeInput().setRawStoredState(State(enable = true))
+        testee.onPrivacyConfigDownloaded()
+
+        assertTrue(testee.showTextSelectionAction.value)
+    }
+
+    @Test
+    fun `when text selection action disabled, then showTextSelectionAction emits false`() = runTest {
+        duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
+        duckChatFeature.contextualSheetRedesign().setRawStoredState(State(enable = true))
+        duckChatFeature.duckAiTextSelectionAction().setRawStoredState(State(enable = false))
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.showTextSelectionAction.value)
+    }
+
+    @Test
+    fun `when contextual sheet redesign disabled, then showTextSelectionAction emits false`() = runTest {
+        duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
+        duckChatFeature.contextualSheetRedesign().setRawStoredState(State(enable = false))
+        duckChatFeature.duckAiTextSelectionAction().setRawStoredState(State(enable = true))
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.showTextSelectionAction.value)
+    }
+
+    @Test
+    fun `when contextual native input disabled, then showTextSelectionAction emits false`() = runTest {
+        duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
+        duckChatFeature.contextualSheetRedesign().setRawStoredState(State(enable = true))
+        duckChatFeature.duckAiTextSelectionAction().setRawStoredState(State(enable = true))
+        duckChatFeature.contextualNativeInput().setRawStoredState(State(enable = false))
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.showTextSelectionAction.value)
+    }
+
+    @Test
+    fun `when contextual mode disabled, then showTextSelectionAction emits false`() = runTest {
+        duckChatFeature.contextualMode().setRawStoredState(State(enable = false))
+        duckChatFeature.contextualSheetRedesign().setRawStoredState(State(enable = true))
+        duckChatFeature.duckAiTextSelectionAction().setRawStoredState(State(enable = true))
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.showTextSelectionAction.value)
+    }
+
+    @Test
     fun `when contextual mode enabled, isDuckChatContextualModeEnabled returns true`() = runTest {
         duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
         duckChatFeature.contextualModeKillSwitch().setRawStoredState(State(enable = true))
@@ -1991,7 +2046,7 @@ class RealDuckChatTest {
         coroutineRule.testScope.advanceUntilIdle()
 
         verify(mockDuckAiModelManager, never()).selectModel(any())
-        verify(mockBrowserNav).openDuckChat(any(), any(), any(), forceImageGeneration = eq(true))
+        verify(mockBrowserNav).openDuckChat(any(), any(), any(), eq(true), any(), anyOrNull())
         verify(mockContext).startActivity(mockIntent)
     }
 
@@ -2007,7 +2062,7 @@ class RealDuckChatTest {
         coroutineRule.testScope.advanceUntilIdle()
 
         verify(mockDuckAiModelManager).selectModel(capable)
-        verify(mockBrowserNav).openDuckChat(any(), any(), any(), forceImageGeneration = eq(true))
+        verify(mockBrowserNav).openDuckChat(any(), any(), any(), eq(true), any(), anyOrNull())
         verify(mockContext).startActivity(mockIntent)
     }
 
@@ -2023,7 +2078,7 @@ class RealDuckChatTest {
         coroutineRule.testScope.advanceUntilIdle()
 
         verify(mockDuckAiModelManager, never()).selectModel(any())
-        verify(mockBrowserNav).openDuckChat(any(), any(), any(), forceImageGeneration = eq(false))
+        verify(mockBrowserNav).openDuckChat(any(), any(), any(), eq(false), any(), anyOrNull())
         verify(mockContext).startActivity(mockIntent)
     }
 

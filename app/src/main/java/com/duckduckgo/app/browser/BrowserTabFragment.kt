@@ -1409,7 +1409,7 @@ class BrowserTabFragment :
         }
     }
 
-    private fun showNativeInput(query: String = "", forceImageGeneration: Boolean = false) {
+    private fun showNativeInput(query: String = "", forceImageGeneration: Boolean = false, textSelection: String? = null) {
         nativeInputManager.showNativeInput(
             tabId = tabId,
             layoutInflater = layoutInflater,
@@ -1419,6 +1419,7 @@ class BrowserTabFragment :
             query = query,
             initialInputMode = viewModel.consumeInitialInputMode(),
             forceImageGeneration = forceImageGeneration,
+            textSelection = textSelection,
             callbacks = NativeInputCallbacks(
                 onSearchTextChanged = { text -> onUserEnteredText(text) },
                 onClearAutocomplete = {
@@ -1434,7 +1435,7 @@ class BrowserTabFragment :
                     }
                 },
                 onSearchSubmitted = { query -> onUserSubmittedText(query) },
-                onDuckAiChatSubmitted = { query, modelId, reasoningEffort, selectedTool, imagesJson, filesJson ->
+                onDuckAiChatSubmitted = { query, modelId, reasoningEffort, selectedTool, imagesJson, filesJson, selectionsJson ->
                     viewModel.onDuckAiChatPromptSubmitted()
                     contentScopeScripts.sendSubscriptionEvent(
                         SubscriptionEventData(
@@ -1465,6 +1466,9 @@ class BrowserTabFragment :
                                         }
                                     },
                                 )
+                                if (selectionsJson != null) {
+                                    put("selections", selectionsJson)
+                                }
                             },
                         ),
                     )
@@ -2443,7 +2447,7 @@ class BrowserTabFragment :
         browserNavigationBarIntegration.configureDuckAIViewMode()
         val forceImageGeneration = !nativeInputManager.isNativeInputShown() &&
             (browserActivity?.consumeDuckChatForceImageGeneration() ?: false)
-        showNativeInput(forceImageGeneration = forceImageGeneration)
+        showNativeInput(forceImageGeneration = forceImageGeneration, textSelection = browserActivity?.consumePendingDuckChatTextSelection())
     }
 
     private fun showMaliciousWarning(
@@ -4025,6 +4029,12 @@ class BrowserTabFragment :
                 }
             },
         )
+    }
+
+    fun launchContextualDuckAi(textSelection: String? = null) {
+        viewLifecycleOwner.lifecycleScope.launch(dispatchers.main()) {
+            duckChatContextual.launch(tabId, webView?.url, webView, textSelection) { showDuckChatContextualSheet(tabId) }
+        }
     }
 
     private fun showDuckChatContextualSheet(tabId: String) {
