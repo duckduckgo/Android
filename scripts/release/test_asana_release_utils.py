@@ -14,6 +14,8 @@ from asana_release_utils import (
     resolve_task_id,
     _build_flexible_prefix_pattern,
     build_release_includes_html,
+    build_grafana_dashboard_url,
+    try_populate_grafana_link,
     AsanaTaskLink,
 )
 
@@ -577,6 +579,36 @@ class TestBuildReleaseIncludesHtml:
         cherry = [AsanaTaskLink(url="https://app.asana.com/1/x/task/111", commit_hash="c1")]
         html = build_release_includes_html(cherry, [], "Includes from 5.287.1:")
         assert "Includes from" not in html
+
+
+FAKE_GRAFANA_BASE_URL = "https://grafana.example.com/d/exampleuid/app-health?orgId=1&var-Default="
+
+
+class TestBuildGrafanaDashboardUrl:
+    def test_appends_release_tag_to_base_url(self):
+        url = build_grafana_dashboard_url(FAKE_GRAFANA_BASE_URL, "5.295.2")
+        assert url == f"{FAKE_GRAFANA_BASE_URL}5.295.2"
+
+
+class TestTryPopulateGrafanaLink:
+    def test_replaces_placeholder_when_base_url_given(self):
+        notes = "<td>&lt;Grafana Link&gt;</td>"
+        updated = try_populate_grafana_link(notes, FAKE_GRAFANA_BASE_URL, "5.295.2")
+        assert updated == f'<td><a href="{FAKE_GRAFANA_BASE_URL}5.295.2">Grafana</a></td>'
+
+    def test_leaves_placeholder_when_base_url_missing(self):
+        notes = "<td>&lt;Grafana Link&gt;</td>"
+        assert try_populate_grafana_link(notes, None, "5.295.2") == notes
+        assert try_populate_grafana_link(notes, "", "5.295.2") == notes
+
+    def test_leaves_notes_unchanged_when_placeholder_absent(self):
+        notes = "<td>no placeholder here</td>"
+        assert try_populate_grafana_link(notes, FAKE_GRAFANA_BASE_URL, "5.295.2") == notes
+
+    def test_never_raises_on_unexpected_failure(self):
+        notes = "<td>&lt;Grafana Link&gt;</td>"
+        with patch("asana_release_utils.build_grafana_dashboard_url", side_effect=RuntimeError("boom")):
+            assert try_populate_grafana_link(notes, FAKE_GRAFANA_BASE_URL, "5.295.2") == notes
 
 
 class TestDryRun:
