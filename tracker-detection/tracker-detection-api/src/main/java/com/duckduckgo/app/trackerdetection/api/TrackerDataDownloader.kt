@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-}
+package com.duckduckgo.app.trackerdetection.api
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+import io.reactivex.Completable
 
-dependencies {
-    implementation AndroidX.annotation
-    implementation "io.reactivex.rxjava2:rxjava:_"
-}
+interface TrackerDataDownloader {
+    /**
+     * Downloads the tracker blocklist and persists it, skipping the write when the server's eTag
+     * matches the stored one.
+     */
+    fun downloadTds(): Completable
 
-android {
-    namespace 'com.duckduckgo.tracker.detection.api'
+    /**
+     * Clears the binary blocklists the app no longer uses.
+     */
+    fun clearLegacyLists(): Completable
 }
