@@ -17,6 +17,7 @@
 <resources>
     <string name="pirDevSettings">Pir Dev Settings</string>
     <string name="pirDevSettingsScan">PIR Scan</string>
+    <string name="pirDevOpenDashboard">Open PIR Dashboard</string>
     <string name="pirDevScanTitle">PIR Dev Scan</string>
     <string name="pirDevOptOutTitle">PIR Dev Opt-out</string>
     <string name="pirDevDebugOptOutTitle">PIR Dev Debug Opt-out</string>

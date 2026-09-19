@@ -33,6 +33,7 @@ dependencies {
     implementation project(':di')
     implementation project(':internal-features-api')
     implementation project(':navigation-api')
+    implementation project(':pir-api')
     implementation project(':pir-impl')
     implementation "com.squareup.logcat:logcat:_"
 
