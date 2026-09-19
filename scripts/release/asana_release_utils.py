@@ -111,6 +111,35 @@ def is_ancestor(repo_path: str, ancestor: str, descendant: str) -> bool:
     return result.returncode == 0
 
 
+def collect_shipped_task_ids(repo_path: str, start_tag: str, url_prefix: str) -> set[str]:
+    """
+    Return Asana task IDs that already shipped in a public release tag at or
+    after the release immediately before `start_tag`.
+
+    Matches by task ID, not commit SHA, so a hotfix cherry-pick (which gets a
+    new SHA when merged back to develop) still counts as shipped once its
+    hotfix tag exists — even though the identical fix also reaches develop.
+    """
+    tags = get_public_release_tags(repo_path)
+
+    if start_tag not in tags:
+        # Unknown tag (e.g. a bad manual --start-tag) — bail rather than scan the whole repo.
+        return set()
+
+    prior_tag = get_public_release_tag_before(repo_path, start_tag)
+    candidate_tags = tags[tags.index(prior_tag):] if prior_tag else tags
+
+    shipped_task_ids: set[str] = set()
+    for previous_tag, tag in zip(candidate_tags, candidate_tags[1:]):
+        commits = get_commits_between(repo_path, previous_tag, tag)
+        links = extract_asana_task_links(commits, url_prefix)
+        shipped_task_ids.update(
+            extract_task_id_from_url(link.url) for link in links if link.url
+        )
+
+    return shipped_task_ids
+
+
 def get_public_release_tag_before(repo_path: str, current_tag: str) -> str | None:
     """
     Return the public release tag immediately before `current_tag` by semantic version.
