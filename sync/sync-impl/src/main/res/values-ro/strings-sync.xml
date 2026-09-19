@@ -376,7 +376,7 @@
 
     <!-- Pairing screen -->
     <string name="sync_simplified_pairing_headline">Sync &amp; Backup este criptat de la un capăt la altul pe toate dispozitivele tale.</string>
-    <string name="sync_simplified_pairing_headline_check_other_device">Verifică-ți celălalt dispozitiv.</string>
+    <string name="sync_simplified_pairing_headline_check_other_device">Verifică-ți celălalt dispozitiv</string>
     <string name="sync_simplified_pairing_headline_recovery">Se recuperează datele</string>
     <string name="sync_simplified_pairing_body">Se conectează…</string>
 

@@ -376,7 +376,7 @@
 
     <!-- Pairing screen -->
     <string name="sync_simplified_pairing_headline">Funkcijai „Sync &amp; Backup“ visuose jūsų įrenginiuose naudojamas ištisinis šifravimas.</string>
-    <string name="sync_simplified_pairing_headline_check_other_device">Patikrinkite kitą savo įrenginį.</string>
+    <string name="sync_simplified_pairing_headline_check_other_device">Patikrink kitą savo įrenginį</string>
     <string name="sync_simplified_pairing_headline_recovery">Duomenų atkūrimas</string>
     <string name="sync_simplified_pairing_body">Jungiamasi...</string>
 

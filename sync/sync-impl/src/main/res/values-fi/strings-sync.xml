@@ -376,7 +376,7 @@
 
     <!-- Pairing screen -->
     <string name="sync_simplified_pairing_headline">Sync &amp; Backup on päästä päähän salattu kaikilla laitteillasi.</string>
-    <string name="sync_simplified_pairing_headline_check_other_device">Tarkista toinen laitteesi.</string>
+    <string name="sync_simplified_pairing_headline_check_other_device">Tarkista toinen laitteesi</string>
     <string name="sync_simplified_pairing_headline_recovery">Palautetaan tietoja</string>
     <string name="sync_simplified_pairing_body">Yhdistetään…</string>
 

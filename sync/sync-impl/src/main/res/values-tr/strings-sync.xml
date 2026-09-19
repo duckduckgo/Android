@@ -376,7 +376,7 @@
 
     <!-- Pairing screen -->
     <string name="sync_simplified_pairing_headline">Sync &amp; Backup tüm cihazlarınızda uçtan uca şifrelenmiştir.</string>
-    <string name="sync_simplified_pairing_headline_check_other_device">Diğer cihazı kontrol edin.</string>
+    <string name="sync_simplified_pairing_headline_check_other_device">Diğer cihazı kontrol edin</string>
     <string name="sync_simplified_pairing_headline_recovery">Veriler kurtarılıyor</string>
     <string name="sync_simplified_pairing_body">Bağlantı kuruluyor...</string>
 

@@ -376,7 +376,7 @@
 
     <!-- Pairing screen -->
     <string name="sync_simplified_pairing_headline">Sync &amp; Backup ir pilnībā šifrēta visās tavās ierīcēs.</string>
-    <string name="sync_simplified_pairing_headline_check_other_device">Pārbaudi otru ierīci.</string>
+    <string name="sync_simplified_pairing_headline_check_other_device">Pārbaudi otru ierīci</string>
     <string name="sync_simplified_pairing_headline_recovery">Datu atgūšana</string>
     <string name="sync_simplified_pairing_body">Notiek savienojuma izveide…</string>
 

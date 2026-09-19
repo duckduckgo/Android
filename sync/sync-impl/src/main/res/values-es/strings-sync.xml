@@ -376,7 +376,7 @@
 
     <!-- Pairing screen -->
     <string name="sync_simplified_pairing_headline">Sync &amp; Backup está cifrado de extremo a extremo en todos tus dispositivos.</string>
-    <string name="sync_simplified_pairing_headline_check_other_device">Comprueba tu otro dispositivo.</string>
+    <string name="sync_simplified_pairing_headline_check_other_device">Comprueba tu otro dispositivo</string>
     <string name="sync_simplified_pairing_headline_recovery">Recuperación de datos</string>
     <string name="sync_simplified_pairing_body">Conectando...</string>
 

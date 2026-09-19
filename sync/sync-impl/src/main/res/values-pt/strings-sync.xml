@@ -376,7 +376,7 @@
 
     <!-- Pairing screen -->
     <string name="sync_simplified_pairing_headline">O Sync &amp; Backup é encriptado ponto a ponto em todos os teus dispositivos.</string>
-    <string name="sync_simplified_pairing_headline_check_other_device">Verifica o teu outro dispositivo.</string>
+    <string name="sync_simplified_pairing_headline_check_other_device">Verifica o teu outro dispositivo</string>
     <string name="sync_simplified_pairing_headline_recovery">Recuperar dados</string>
     <string name="sync_simplified_pairing_body">A ligar…</string>
 

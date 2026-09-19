@@ -376,7 +376,7 @@
 
     <!-- Pairing screen -->
     <string name="sync_simplified_pairing_headline">Sync &amp; Backup is end-to-end versleuteld op al je apparaten.</string>
-    <string name="sync_simplified_pairing_headline_check_other_device">Controleer je andere apparaat.</string>
+    <string name="sync_simplified_pairing_headline_check_other_device">Controleer je andere apparaat</string>
     <string name="sync_simplified_pairing_headline_recovery">Gegevens herstellen</string>
     <string name="sync_simplified_pairing_body">Er wordt verbinding gemaakt ...</string>
 
