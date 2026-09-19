@@ -25,6 +25,7 @@ import com.duckduckgo.pir.impl.notifications.PirNotificationManager
 import com.duckduckgo.pir.impl.optout.PirForegroundOptOutService
 import com.duckduckgo.pir.impl.scan.PirForegroundScanService
 import com.duckduckgo.pir.impl.scan.PirScanScheduler
+import com.duckduckgo.pir.impl.store.PirFreemiumDataStore
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent.CancellationReason
@@ -46,11 +47,12 @@ import javax.inject.Inject
  */
 interface PirWorkHandler {
     /**
-     * Checks if PIR can run based on remote features, subscription status, entitlement and
-     * repository availability.
+     * Checks if PIR can run based on remote features, subscription status, entitlement, freemium
+     * activation and repository availability.
      *
-     * @return Flow that emits [PirEligibility.Enabled] when PIR can run, or
-     * [PirEligibility.Disabled] (carrying the failing [DisabledReason]) otherwise.
+     * @return Flow that emits [PirEligibility.Enabled] (carrying the [PirRunMode] the user is
+     * allowed to run) when PIR can run, or [PirEligibility.Disabled] (carrying the failing
+     * [DisabledReason]) otherwise.
      */
     suspend fun canRunPir(): Flow<PirEligibility>
 
@@ -77,6 +79,7 @@ class RealPirWorkHandler @Inject constructor(
     private val pirRepository: PirRepository,
     private val pirNotificationManager: PirNotificationManager,
     private val pirScanWideEvent: PirScanWideEvent,
+    private val pirFreemiumDataStore: PirFreemiumDataStore,
 ) : PirWorkHandler {
 
     override suspend fun canRunPir(): Flow<PirEligibility> {
@@ -129,11 +132,26 @@ class RealPirWorkHandler @Inject constructor(
             -> true
         }
 
-        return when {
-            !subscriptionActive -> PirEligibility.Disabled(DisabledReason.SUBSCRIPTION_EXPIRED)
-            !hasValidEntitlement -> PirEligibility.Disabled(DisabledReason.ENTITLEMENT_LOST)
-            !pirRepository.isRepositoryAvailable() -> PirEligibility.Disabled(DisabledReason.REPOSITORY_UNAVAILABLE)
-            else -> PirEligibility.Enabled
+        // The paid path resolves first so a subscriber is never routed onto the scan-only path.
+        val runMode = when {
+            subscriptionActive && hasValidEntitlement -> PirRunMode.SCAN_AND_OPT_OUT
+            canRunFreemiumScans() -> PirRunMode.SCAN_ONLY
+            else -> null
         }
+
+        return when {
+            runMode == null -> if (subscriptionActive) {
+                PirEligibility.Disabled(DisabledReason.ENTITLEMENT_LOST)
+            } else {
+                PirEligibility.Disabled(DisabledReason.SUBSCRIPTION_EXPIRED)
+            }
+
+            !pirRepository.isRepositoryAvailable() -> PirEligibility.Disabled(DisabledReason.REPOSITORY_UNAVAILABLE)
+            else -> PirEligibility.Enabled(runMode)
+        }
+    }
+
+    private suspend fun canRunFreemiumScans(): Boolean = withContext(dispatcherProvider.io()) {
+        pirRemoteFeatures.freemium().isEnabled() && pirFreemiumDataStore.didActivate
     }
 }

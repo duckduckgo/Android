@@ -51,8 +51,10 @@ import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.NavigateRespons
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.SolveCaptchaResponse
 import com.duckduckgo.pir.impl.service.DbpService
 import com.duckduckgo.pir.impl.store.PirDataStore
+import com.duckduckgo.pir.impl.store.PirFreemiumDataStore
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.RealPirDataStore
+import com.duckduckgo.pir.impl.store.RealPirFreemiumDataStore
 import com.duckduckgo.pir.impl.store.RealPirRepository
 import com.duckduckgo.pir.impl.store.secure.PirSecureStorageDatabaseFactory
 import com.squareup.anvil.annotations.ContributesTo
@@ -74,6 +76,12 @@ class PirModule {
     fun providePirDataStore(
         sharedPreferencesProvider: SharedPreferencesProvider,
     ): PirDataStore = RealPirDataStore(sharedPreferencesProvider)
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun providePirFreemiumDataStore(
+        sharedPreferencesProvider: SharedPreferencesProvider,
+    ): PirFreemiumDataStore = RealPirFreemiumDataStore(sharedPreferencesProvider)
 
     @Provides
     @SingleInstanceIn(AppScope::class)
