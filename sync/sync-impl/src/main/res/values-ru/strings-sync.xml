@@ -376,7 +376,7 @@
 
     <!-- Pairing screen -->
     <string name="sync_simplified_pairing_headline">Функция Sync &amp; Backup защищена сквозным шифрованием на всех ваших устройствах.</string>
-    <string name="sync_simplified_pairing_headline_check_other_device">Проверьте другое устройство</string>
+    <string name="sync_simplified_pairing_headline_check_other_device">Проверьте другое устройство.</string>
     <string name="sync_simplified_pairing_headline_recovery">Восстановление данных</string>
     <string name="sync_simplified_pairing_body">Выполняется подключение…</string>
 

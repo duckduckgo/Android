@@ -352,4 +352,25 @@
     <string name="duckChatContextualAskAboutPage">Opýtaj sa na stránku</string>
     <string name="duckChatContextualAskAboutSearch">Pokračovať v Duck.ai</string>
     <string name="duckChatContextualOpenDuckAi">Otvoriť Duck.ai</string>
+
+    <!-- Suggested prompts for text selection -->
+    <string name="duckAiSuggestionSummarizeSelectionLabel">Zhrň tento výber</string>
+    <string name="duckAiSuggestionSummarizeSelectionPrompt">Zhrň tento výber.</string>
+    <string name="duckAiSuggestionTranslateSelectionLabel">Prelož tento výber</string>
+    <string name="duckAiSuggestionTranslateSelectionPrompt" instruction="%1$s is replaced with the name of the user&apos;s language.">Prelož tento výber do jazyka %1$s.</string>
+
+    <!-- Name shown for an attached text selection in the Duck.ai -->
+    <string name="duckAiTextSelectionAttachmentTitle">Výber textu</string>
+    <string name="duckAiTextSelectionLimitReached" instruction="%1$d is replaced with the maximum number of text selections.">Môžeš pridať až %1$d výberov textu. Ak chceš pridať ďalší, jeden odstráň.</string>
+
+    <!-- Duck.ai text selection menu action -->
+    <string name="duckAiTextSelectionMenuItem">Spýtaj sa Duck.ai</string>
+
+    <!-- Prefix on the Duck.ai attachment chip for a text selection -->
+    <plurals name="duckAiTextSelectionWordCount">
+        <item quantity="one">%1$d slovo</item>
+        <item quantity="few">%1$d slová</item>
+        <item quantity="many">%1$d slov</item>
+        <item quantity="other">%1$d slov</item>
+    </plurals>
 </resources>

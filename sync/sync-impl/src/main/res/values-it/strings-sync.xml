@@ -376,7 +376,7 @@
 
     <!-- Pairing screen -->
     <string name="sync_simplified_pairing_headline">Sync &amp; Backup è crittografato end-to-end su tutti i tuoi dispositivi.</string>
-    <string name="sync_simplified_pairing_headline_check_other_device">Controlla l\'altro dispositivo</string>
+    <string name="sync_simplified_pairing_headline_check_other_device">Controlla l\'altro dispositivo.</string>
     <string name="sync_simplified_pairing_headline_recovery">Recupero dei dati</string>
     <string name="sync_simplified_pairing_body">Connessione…</string>
 

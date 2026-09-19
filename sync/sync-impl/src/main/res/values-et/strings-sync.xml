@@ -376,7 +376,7 @@
 
     <!-- Pairing screen -->
     <string name="sync_simplified_pairing_headline">Sync &amp; Backup on kõigis sinu seadmetes otspunktkrüpeeritud.</string>
-    <string name="sync_simplified_pairing_headline_check_other_device">Kontrolli oma teist seadet</string>
+    <string name="sync_simplified_pairing_headline_check_other_device">Kontrolli oma teist seadet.</string>
     <string name="sync_simplified_pairing_headline_recovery">Andmete taastamine</string>
     <string name="sync_simplified_pairing_body">Ühendamine...</string>
 
