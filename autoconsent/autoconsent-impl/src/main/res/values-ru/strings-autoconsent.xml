@@ -29,6 +29,7 @@
     <string name="autoconsentPromptFootnote">Эту настройку всегда можно изменить позже в настройках.</string>
     <string name="autoconsentPromptCpmOnMessage">От некоторых файлов cookie нельзя отказаться. Мы можем принять их за вас.</string>
     <string name="autoconsentPromptCpmOnPrimaryButton">Принимать файлы cookie за меня</string>
+    <string name="autoconsentPromptCpmOnPrimaryButtonV2">Отклонять, если это возможно, или принимать за меня</string>
     <string name="autoconsentPromptCpmOnSecondaryButton">Я буду принимать их самостоятельно</string>
     <string name="autoconsentPromptCpmOffMessage">Мы разберёмся с ними за вас. По возможности мы будем отклонять файлы cookie и принимать те, которые нельзя отклонить.</string>
     <string name="autoconsentPromptCpmOffPrimaryButton">Отклонять, если это возможно, или принимать за меня</string>

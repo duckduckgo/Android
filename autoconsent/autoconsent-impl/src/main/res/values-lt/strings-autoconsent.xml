@@ -29,6 +29,7 @@
     <string name="autoconsentPromptFootnote">Vėliau visada galėsi tai pakeisti nuostatose.</string>
     <string name="autoconsentPromptCpmOnMessage">Kai kurių slapukų atmesti negalima. Galime juos priimti už jūs.</string>
     <string name="autoconsentPromptCpmOnPrimaryButton">Priimti slapukus už mane</string>
+    <string name="autoconsentPromptCpmOnPrimaryButtonV2">Atmesti, jei įmanoma, arba priimti už mane</string>
     <string name="autoconsentPromptCpmOnSecondaryButton">Priimsiu savarankiškai</string>
     <string name="autoconsentPromptCpmOffMessage">Leiskite mums tuo pasirūpinti už jus. Atmesime slapukus, kai tai įmanoma, ir priimsime tuos, kurių atmesti negalima.</string>
     <string name="autoconsentPromptCpmOffPrimaryButton">Atmesti, jei įmanoma, arba priimti už mane</string>
