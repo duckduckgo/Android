@@ -453,6 +453,7 @@ class RealNativeInputManager @Inject constructor(
             // otherwise it animates on the transition's own clock and the reset-to-base races, leaving
             // stale top padding.
             layoutCoordinator.suspendContentReflow()
+            widgetFrom(widgetView)?.setFooterSuppressed(true)
             animator.animateExit(
                 widgetCard = card,
                 widgetView = widgetView,
@@ -460,6 +461,7 @@ class RealNativeInputManager @Inject constructor(
                 isBottom = isBottom,
                 onUpdate = { layoutCoordinator.onWidgetAnimationFrame(card) },
                 onCancel = {
+                    widgetFrom(widgetView)?.setFooterSuppressed(false)
                     layoutCoordinator.setWidgetAnimating(false)
                     layoutCoordinator.resumeContentReflow()
                 },

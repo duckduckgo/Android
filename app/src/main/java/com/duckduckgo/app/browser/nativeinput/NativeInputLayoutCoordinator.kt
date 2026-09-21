@@ -219,6 +219,7 @@ class NativeInputLayoutCoordinator(
             ).map { Target(it, it.snapshotPadding()) }
         if (targets.isEmpty()) return
         val anchor = widgetView.findViewById(R.id.inputModeWidgetCard) ?: widgetView
+        val footer = widgetView.findViewById<View?>(R.id.nativeInputFooter)
 
         // Cached once: isLogoOnlyContent runs on every layout pass and findViewById walks the tree.
         // Safe to cache (they inflate with newTabContent); live visibility/height are read each pass.
@@ -307,6 +308,12 @@ class NativeInputLayoutCoordinator(
             }
         }
 
+        fun visibleFooterExtent(anchorBottomInWindow: Int): Int {
+            val visibleFooter = footer?.takeIf { it.isVisible } ?: return 0
+            val footerLocation = IntArray(2).also { visibleFooter.getLocationInWindow(it) }
+            return maxOf(0, footerLocation[1] + visibleFooter.height - anchorBottomInWindow)
+        }
+
         fun applyOffset() {
             if (!widgetView.isShown) {
                 targets.forEach { applyPadding(it.view, it.basePadding, deltaTop = 0, deltaBottom = 0) }
@@ -314,7 +321,12 @@ class NativeInputLayoutCoordinator(
                 return
             }
             val anchorLocation = IntArray(2).also { anchor.getLocationInWindow(it) }
-            val anchorBottomInWindow = anchorLocation[1] + anchor.height
+            val widgetBottomInWindow = anchorLocation[1] + anchor.height
+            val anchorBottomInWindow = contentAnchorBottom(
+                isBottom = isBottom,
+                widgetBottomInWindow = widgetBottomInWindow,
+                visibleFooterExtent = visibleFooterExtent(widgetBottomInWindow),
+            )
             applyOffsetWithBottom(anchorTopInWindow = anchorLocation[1], anchorBottomInWindow = anchorBottomInWindow)
         }
 
@@ -333,7 +345,11 @@ class NativeInputLayoutCoordinator(
             }
             val parentLocation = IntArray(2).also { parent.getLocationInWindow(it) }
             val cardVisualTopInWindow = parentLocation[1] + params.topMargin + card.translationY.toInt()
-            val cardVisualBottomInWindow = cardVisualTopInWindow + params.height
+            val cardVisualBottomInWindow = contentAnchorBottom(
+                isBottom = isBottom,
+                widgetBottomInWindow = cardVisualTopInWindow + params.height,
+                visibleFooterExtent = visibleFooterExtent(cardVisualTopInWindow + params.height),
+            )
             applyOffsetWithBottom(anchorTopInWindow = cardVisualTopInWindow, anchorBottomInWindow = cardVisualBottomInWindow)
         }
 
@@ -547,6 +563,9 @@ internal fun contentTopInset(isBottom: Boolean, isLogoOnly: Boolean, navBarInset
         isBottom -> navBarInsetPx
         else -> maxOf(0, widgetTopOffsetPx)
     }
+
+internal fun contentAnchorBottom(isBottom: Boolean, widgetBottomInWindow: Int, visibleFooterExtent: Int): Int =
+    if (isBottom) widgetBottomInWindow else widgetBottomInWindow + visibleFooterExtent
 
 /**
  * Top padding the autocomplete list needs to clear the top chrome.
