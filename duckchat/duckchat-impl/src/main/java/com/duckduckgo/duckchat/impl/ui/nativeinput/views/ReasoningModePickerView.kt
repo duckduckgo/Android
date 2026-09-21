@@ -175,7 +175,7 @@ class ReasoningModePickerView @JvmOverloads constructor(
                 addView(container)
                 isVerticalScrollBarEnabled = false
             },
-            resources.getDimensionPixelSize(R.dimen.reasoningModePickerMenuWidth),
+            resources.getDimensionPixelSize(R.dimen.nativeInputMenuWidth),
             LayoutParams.WRAP_CONTENT,
             false,
         ).apply {

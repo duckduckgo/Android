@@ -26,7 +26,7 @@
     <dimen name="modelPickerChipTextSize">13sp</dimen>
     <dimen name="modelPickerMenuElevation">6dp</dimen>
 
-    <!-- Shared width for the native input widget popup menus (options, model picker, attachment) -->
+    <!-- Shared width for the native input widget popup menus (options, model picker, reasoning picker, attachment) -->
     <dimen name="nativeInputMenuWidth">260dp</dimen>
     <dimen name="nativeInputButtonSize">36dp</dimen>
 
@@ -36,8 +36,6 @@
     <!-- Width of the contextual sheet "recent chats" popup menu. Wider than the default popupMenuWidth (200dp) to fit chat titles. -->
     <dimen name="contextualChatsPopupMenuWidth">280dp</dimen>
 
-    <!-- Reasoning Mode Picker -->
-    <dimen name="reasoningModePickerMenuWidth">220dp</dimen>
 
     <!-- Chip-->
     <dimen name="chipCornerRadius">20dp</dimen>
