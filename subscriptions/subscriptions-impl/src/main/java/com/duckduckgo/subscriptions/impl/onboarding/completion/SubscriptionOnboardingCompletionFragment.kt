@@ -1,0 +1,146 @@
+/*
+ * Copyright (c) 2026 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.duckduckgo.subscriptions.impl.onboarding.completion
+
+import android.animation.ValueAnimator
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.animation.DecelerateInterpolator
+import androidx.core.view.doOnLayout
+import androidx.core.view.updateLayoutParams
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.common.ui.DuckDuckGoFragment
+import com.duckduckgo.common.ui.view.button.ButtonType.GHOST
+import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
+import com.duckduckgo.common.ui.view.listitem.OneLineListItem
+import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.FragmentViewModelFactory
+import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.pir.api.dashboard.PirDashboardWebViewScreen
+import com.duckduckgo.subscriptions.impl.R
+import com.duckduckgo.subscriptions.impl.databinding.FragmentSubscriptionOnboardingCompletionBinding
+import com.duckduckgo.subscriptions.impl.onboarding.completion.SubscriptionOnboardingCompletionViewModel.Command
+import com.duckduckgo.subscriptions.impl.onboarding.completion.SubscriptionOnboardingCompletionViewModel.SummaryRow
+import com.duckduckgo.subscriptions.impl.onboarding.completion.SubscriptionOnboardingCompletionViewModel.ViewState
+import com.duckduckgo.subscriptions.impl.pir.PirActivity.Companion.PirScreenWithEmptyParams
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
+
+@InjectWith(FragmentScope::class)
+class SubscriptionOnboardingCompletionFragment : DuckDuckGoFragment(R.layout.fragment_subscription_onboarding_completion) {
+
+    @Inject
+    lateinit var viewModelFactory: FragmentViewModelFactory
+
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
+
+    private val binding: FragmentSubscriptionOnboardingCompletionBinding by viewBinding()
+    private val viewModel: SubscriptionOnboardingCompletionViewModel by lazy {
+        ViewModelProvider(this, viewModelFactory)[SubscriptionOnboardingCompletionViewModel::class.java]
+    }
+
+    // The bar fills once per appearance. Without this a later emission (or a rotation) would replay it.
+    private var progressAnimated = false
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        binding.subscriptionOnboardingCompletionPrimaryButton.setOnClickListener {
+            viewModel.onDoneClicked()
+        }
+
+        viewModel.viewState()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { render(it) }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        viewModel.commands
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { processCommand(it) }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+    }
+
+    private fun processCommand(command: Command) {
+        when (command) {
+            Command.OpenPirDashboard -> globalActivityStarter.start(requireContext(), PirDashboardWebViewScreen)
+            Command.OpenPirDesktop -> globalActivityStarter.start(requireContext(), PirScreenWithEmptyParams)
+            Command.ShowPirUnavailableDialog -> TextAlertDialogBuilder(requireContext())
+                .setTitle(R.string.pirStorageUnavailableDialogTitle)
+                .setMessage(R.string.pirStorageUnavailableDialogMessage)
+                .setPositiveButton(R.string.pirStorageUnavailableDialogButton, GHOST)
+                .show()
+        }
+    }
+
+    private fun render(viewState: ViewState) {
+        if (viewState.rows.isEmpty()) return
+
+        binding.subscriptionOnboardingCompletionPercentage.text =
+            getString(R.string.subscriptionOnboardingCompletionPercentage, viewState.completionPercentage)
+
+        renderRows(viewState.rows)
+        animateProgress(viewState.completionPercentage)
+    }
+
+    private fun renderRows(rows: List<SummaryRow>) {
+        val container = binding.subscriptionOnboardingCompletionRows
+        container.removeAllViews()
+        rows.forEach { row ->
+            val rowView = LayoutInflater.from(container.context)
+                .inflate(R.layout.view_subscription_onboarding_completion_row, container, false) as OneLineListItem
+            rowView.setPrimaryTextResource(row.labelResId)
+            rowView.setLeadingIconResource(
+                if (row.completed) R.drawable.check_circle_color_24 else row.pendingIconResId,
+            )
+            if (row.clickable) {
+                rowView.setClickListener { viewModel.onPirRowClicked() }
+            }
+            container.addView(rowView)
+        }
+    }
+
+    private fun animateProgress(percentage: Int) {
+        if (progressAnimated) return
+        progressAnimated = true
+
+        val track = binding.subscriptionOnboardingCompletionProgressTrack
+        val fill = binding.subscriptionOnboardingCompletionProgressFill
+        track.doOnLayout {
+            val targetWidth = (it.width * percentage / 100f).toInt()
+            ValueAnimator.ofInt(0, targetWidth).apply {
+                duration = PROGRESS_ANIMATION_DURATION_MS
+                interpolator = DecelerateInterpolator()
+                addUpdateListener { animator ->
+                    fill.updateLayoutParams { width = animator.animatedValue as Int }
+                }
+                start()
+            }
+        }
+    }
+
+    companion object {
+        private const val PROGRESS_ANIMATION_DURATION_MS = 1000L
+    }
+}

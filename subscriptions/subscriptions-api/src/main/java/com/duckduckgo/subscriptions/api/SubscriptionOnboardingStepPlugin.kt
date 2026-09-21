@@ -16,6 +16,7 @@
 
 package com.duckduckgo.subscriptions.api
 
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import kotlinx.coroutines.flow.Flow
@@ -37,12 +38,34 @@ interface SubscriptionOnboardingStepPlugin {
     @get:StringRes
     val titleResId: Int? get() = null
 
+    /**
+     * The row this step contributes to the onboarding completion summary, or null for a step that isn't a
+     * feature the user sets up (the welcome and summary screens). Steps with an entry make up the completion
+     * percentage; steps without one are invisible to it.
+     */
+    val summaryEntry: SubscriptionOnboardingSummaryEntry? get() = null
+
+    /**
+     * Whether this step offers a way back to the one before it. When false the host shows a close icon instead
+     * of the up arrow, and back leaves onboarding rather than navigating. Terminal steps set this to false.
+     */
+    val allowsBackNavigation: Boolean get() = true
+
     /** Whether this step should be shown to the current user (e.g. gated by feature flag / entitlement). Skipped when false. */
     suspend fun shouldShow(): Boolean
 
     /** Creates the full-screen Fragment for this step. Dagger injection happens when it attaches to the host. */
     fun createFragment(): Fragment
 }
+
+/**
+ * How a step presents itself in the completion summary. [pendingIconResId] is shown while the step is
+ * outstanding; a completed row renders the host's shared tick instead, so no completed icon is needed here.
+ */
+data class SubscriptionOnboardingSummaryEntry(
+    @get:StringRes val labelResId: Int,
+    @get:DrawableRes val pendingIconResId: Int,
+)
 
 /** How a step ended. Only [COMPLETED] is persisted as a completed step. */
 enum class SubscriptionOnboardingStepOutcome {
@@ -58,8 +81,16 @@ interface SubscriptionOnboardingController {
     /** Events for the host to react to. */
     val events: Flow<Event>
 
-    /** The current step finished with [outcome]. */
-    fun onStepFinished(stepId: String, outcome: SubscriptionOnboardingStepOutcome)
+    /**
+     * The current step finished with [outcome]. A step that wants the user handed straight to its own feature
+     * once onboarding ends passes [handoff]: the host shows the completion summary briefly, then runs it while
+     * finishing. The lambda outlives the step's Fragment, so it must not capture one.
+     */
+    fun onStepFinished(
+        stepId: String,
+        outcome: SubscriptionOnboardingStepOutcome,
+        handoff: (() -> Unit)? = null,
+    )
 
     /** Go back to the previous step. */
     fun onBack()
@@ -68,7 +99,11 @@ interface SubscriptionOnboardingController {
     fun exitOnboarding()
 
     sealed interface Event {
-        data class StepFinished(val stepId: String, val outcome: SubscriptionOnboardingStepOutcome) : Event
+        data class StepFinished(
+            val stepId: String,
+            val outcome: SubscriptionOnboardingStepOutcome,
+            val handoff: (() -> Unit)? = null,
+        ) : Event
         data object Back : Event
         data object Exit : Event
     }

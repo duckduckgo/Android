@@ -51,4 +51,7 @@
     <string name="subscriptionOnboardingVpnInfoBlockTitle">Some sites &amp; apps block VPNs outright</string>
     <string name="subscriptionOnboardingVpnInfoBlockText">No matter which VPN you use, you\'ll need to turn it off to use certain sites and apps. For example, banking apps may block VPNs to help prevent fraudulent activity.</string>
 
+    <!-- Subscription onboarding completion summary -->
+    <string name="subscriptionOnboardingCompletionVpnTitle">DuckDuckGo VPN</string>
+
 </resources>

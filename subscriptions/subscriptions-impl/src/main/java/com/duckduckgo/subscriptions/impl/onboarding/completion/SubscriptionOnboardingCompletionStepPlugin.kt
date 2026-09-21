@@ -14,36 +14,32 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.networkprotection.impl.subscription.onboarding
+package com.duckduckgo.subscriptions.impl.onboarding.completion
 
 import androidx.fragment.app.Fragment
 import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
-import com.duckduckgo.subscriptions.api.SubscriptionOnboardingSummaryEntry
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
-/** VPN step of the subscription onboarding, contributed from `network-protection-impl`. */
+/**
+ * Terminal step of the subscription onboarding: a summary of how much of the setup the user got through.
+ * It is never persisted as completed, so it shows again at the end of every run with an updated percentage.
+ */
 @ContributesMultibinding(AppScope::class)
-@PriorityKey(200)
-class SubscriptionOnboardingVpnStepPlugin @Inject constructor() : SubscriptionOnboardingStepPlugin {
+@PriorityKey(400)
+class SubscriptionOnboardingCompletionStepPlugin @Inject constructor() : SubscriptionOnboardingStepPlugin {
 
-    override val stepId: String = VPN_STEP_ID
+    override val stepId: String = COMPLETION_STEP_ID
 
-    override val titleResId: Int = R.string.subscriptionOnboardingVpnTitle
-
-    override val summaryEntry = SubscriptionOnboardingSummaryEntry(
-        labelResId = R.string.subscriptionOnboardingCompletionVpnTitle,
-        pendingIconResId = R.drawable.vpn_grayscale_color_24,
-    )
+    override val allowsBackNavigation: Boolean = false
 
     override suspend fun shouldShow(): Boolean = true
 
-    override fun createFragment(): Fragment = SubscriptionOnboardingVpnFragment()
+    override fun createFragment(): Fragment = SubscriptionOnboardingCompletionFragment()
 
     companion object {
-        const val VPN_STEP_ID = "vpn"
+        const val COMPLETION_STEP_ID = "completion"
     }
 }
