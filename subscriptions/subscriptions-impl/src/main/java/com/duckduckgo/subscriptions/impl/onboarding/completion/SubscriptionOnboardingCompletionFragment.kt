@@ -27,6 +27,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.airbnb.lottie.LottieCompositionFactory
+import com.airbnb.lottie.LottieDrawable
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.view.button.ButtonType.GHOST
@@ -111,14 +113,26 @@ class SubscriptionOnboardingCompletionFragment : DuckDuckGoFragment(R.layout.fra
             val rowView = LayoutInflater.from(container.context)
                 .inflate(R.layout.view_subscription_onboarding_completion_row, container, false) as OneLineListItem
             rowView.setPrimaryTextResource(row.labelResId)
-            rowView.setLeadingIconResource(
-                if (row.completed) R.drawable.check_circle_color_24 else row.pendingIconResId,
-            )
+            if (row.completed) {
+                rowView.setAnimatedCheck()
+            } else {
+                rowView.setLeadingIconResource(row.pendingIconResId)
+            }
             if (row.clickable) {
                 rowView.setClickListener { viewModel.onPirRowClicked() }
             }
             container.addView(rowView)
         }
+    }
+
+    private fun OneLineListItem.setAnimatedCheck() {
+        val lottieDrawable = LottieDrawable()
+        setLeadingIconDrawable(lottieDrawable)
+        LottieCompositionFactory.fromRawRes(context, R.raw.check_color)
+            .addListener { composition ->
+                lottieDrawable.composition = composition
+                lottieDrawable.playAnimation()
+            }
     }
 
     private fun animateProgress(percentage: Int) {
