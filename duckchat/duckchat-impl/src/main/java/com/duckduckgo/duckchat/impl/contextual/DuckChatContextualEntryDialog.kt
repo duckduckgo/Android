@@ -355,6 +355,7 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
             tabId = tabId,
             card = binding.entryNativeInputCard,
             widget = binding.entryNativeInputWidget,
+            footer = binding.entryNativeInputFooter,
             jsMessaging = contentScopeScripts,
             lifecycleOwner = viewLifecycleOwner,
             chatIdFlow = chatIdFlow,
