@@ -295,9 +295,33 @@ class ModelPickerView @JvmOverloads constructor(
             if (index > 0) addDivider()
             section.headerRes?.let { addSectionHeader(context.getString(it)) }
             for (model in section.models) {
-                addModelItem(model, selected = model.id == selectedId, popup)
+                if (viewModel.updatedPickersEnabled()) {
+                    addPickerRow(model, selected = model.id == selectedId, gated = section.gated, popup)
+                } else {
+                    addModelItem(model, selected = model.id == selectedId, popup)
+                }
             }
         }
+    }
+
+    private fun LinearLayout.addPickerRow(
+        model: AIChatModel,
+        selected: Boolean,
+        gated: Boolean,
+        popup: PopupWindow,
+    ) {
+        val item = pickerMenuItem(
+            parent = this,
+            title = model.displayName,
+            leadingIconRes = viewModel.getIconResForModel(model),
+            subtitle = viewModel.subtitleResFor(model)?.let { context.getString(it) },
+            selected = selected,
+            opensFollowUp = gated,
+        ) {
+            viewModel.onModelTapped(model, currentSurface())
+            popup.dismiss()
+        }
+        addView(item)
     }
 
     private fun LinearLayout.addModelItem(model: AIChatModel, selected: Boolean, popup: PopupWindow) {

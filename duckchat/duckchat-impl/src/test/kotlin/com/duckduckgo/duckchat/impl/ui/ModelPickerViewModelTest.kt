@@ -21,8 +21,10 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
+import com.duckduckgo.duckchat.impl.models.ModelLabel
 import com.duckduckgo.duckchat.impl.models.ModelProvider
 import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.models.Tool
@@ -37,6 +39,8 @@ import com.duckduckgo.duckchat.impl.ui.nativeinput.views.PickerSurface
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.UpsellCommand
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -76,6 +80,8 @@ class ModelPickerViewModelTest {
         whenever(it.getChatsFlow()).thenReturn(chatsFlow)
     }
 
+    private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
+
     private lateinit var testee: ModelPickerViewModel
 
     @Before
@@ -87,6 +93,7 @@ class ModelPickerViewModelTest {
             nativeInputStateProvider = nativeInputStateProvider,
             duckAiChatStore = duckAiChatStore,
             effectiveModelProvider = RealEffectiveModelProvider(modelManager, nativeInputStateProvider, duckAiChatStore),
+            duckChatFeature = duckChatFeature,
         )
     }
 
@@ -95,6 +102,129 @@ class ModelPickerViewModelTest {
         testee.fetchModels()
 
         verify(modelManager).fetchModels()
+    }
+
+    @Test
+    fun whenUpdatedPickersEnabledThenSectionsSplitByAvailability() = runTest {
+        duckChatFeature.updatedPickers().setRawStoredState(Toggle.State(enable = true))
+        val state = ModelState(
+            models = listOf(freeModel("f1"), plusModel("p"), freeModel("f2"), proModel("pr")),
+            userTier = UserTier.FREE,
+            isFreeTrialEligible = true,
+        )
+
+        val sections = testee.buildSections(state)
+
+        assertEquals(2, sections.size)
+        assertNull(sections[0].headerRes)
+        assertEquals(listOf("f1", "f2"), sections[0].models.map { it.id })
+        assertFalse(sections[0].gated)
+        assertEquals(listOf("p", "pr"), sections[1].models.map { it.id })
+        assertTrue(sections[1].gated)
+    }
+
+    @Test
+    fun whenFreeTrialEligibleThenGatedHeaderOffersTheTrial() = runTest {
+        duckChatFeature.updatedPickers().setRawStoredState(Toggle.State(enable = true))
+        val state = ModelState(
+            models = listOf(freeModel("f"), plusModel("p"), proModel("pr")),
+            userTier = UserTier.FREE,
+            isFreeTrialEligible = true,
+        )
+
+        val sections = testee.buildSections(state)
+
+        assertEquals(R.string.duckAiModelPickerTryFreeTrial, sections[1].headerRes)
+    }
+
+    @Test
+    fun whenTrialAlreadyUsedThenGatedHeaderIsSubscriberExclusive() = runTest {
+        duckChatFeature.updatedPickers().setRawStoredState(Toggle.State(enable = true))
+        val state = ModelState(
+            models = listOf(freeModel("f"), plusModel("p"), proModel("pr")),
+            userTier = UserTier.FREE,
+            isFreeTrialEligible = false,
+        )
+
+        val sections = testee.buildSections(state)
+
+        assertEquals(R.string.duckAiModelPickerSubscriberExclusive, sections[1].headerRes)
+    }
+
+    @Test
+    fun whenEveryGatedModelNeedsProThenGatedHeaderIsProExclusive() = runTest {
+        duckChatFeature.updatedPickers().setRawStoredState(Toggle.State(enable = true))
+        val state = ModelState(
+            models = listOf(freeModel("f"), plusModel("p", accessible = true), proModel("pr")),
+            userTier = UserTier.PLUS,
+            isFreeTrialEligible = false,
+        )
+
+        val sections = testee.buildSections(state)
+
+        assertEquals(R.string.duckAiModelPickerProExclusive, sections[1].headerRes)
+    }
+
+    @Test
+    fun whenTrialEligibleButEveryGatedModelNeedsProThenProWins() = runTest {
+        duckChatFeature.updatedPickers().setRawStoredState(Toggle.State(enable = true))
+        val state = ModelState(
+            models = listOf(freeModel("f"), proModel("pr")),
+            userTier = UserTier.FREE,
+            isFreeTrialEligible = true,
+        )
+
+        val sections = testee.buildSections(state)
+
+        assertEquals(R.string.duckAiModelPickerProExclusive, sections[1].headerRes)
+    }
+
+    @Test
+    fun whenNothingIsGatedThenOnlyTheAvailableSectionIsBuilt() = runTest {
+        duckChatFeature.updatedPickers().setRawStoredState(Toggle.State(enable = true))
+        val state = ModelState(
+            models = listOf(freeModel("f"), plusModel("p", accessible = true), proModel("pr", accessible = true)),
+            userTier = UserTier.PRO,
+        )
+
+        val sections = testee.buildSections(state)
+
+        assertEquals(1, sections.size)
+        assertNull(sections[0].headerRes)
+        assertFalse(sections[0].gated)
+    }
+
+    @Test
+    fun whenModelHasNoPublicTierThenItStaysOutOfBothSections() = runTest {
+        duckChatFeature.updatedPickers().setRawStoredState(Toggle.State(enable = true))
+        val internalOnly = AIChatModel(
+            id = "internal",
+            name = "internal",
+            displayName = "internal",
+            shortName = "internal",
+            accessTier = listOf("internal"),
+            isAccessible = false,
+        )
+        val state = ModelState(models = listOf(freeModel("f"), internalOnly), userTier = UserTier.FREE)
+
+        val sections = testee.buildSections(state)
+
+        assertEquals(1, sections.size)
+        assertEquals(listOf("f"), sections[0].models.map { it.id })
+    }
+
+    @Test
+    fun whenModelCarriesALabelThenItMapsToTheMatchingSubline() = runTest {
+        assertEquals(
+            R.string.duckAiModelPickerLabelEverydayUse,
+            testee.subtitleResFor(freeModel("f").copy(label = ModelLabel.EVERYDAY_USE)),
+        )
+        assertEquals(
+            R.string.duckAiModelPickerLabelUsesLimitsFaster,
+            testee.subtitleResFor(freeModel("f").copy(label = ModelLabel.USES_LIMITS_FASTER)),
+        )
+        assertNull(testee.subtitleResFor(freeModel("f").copy(label = ModelLabel.UNKNOWN)))
+        assertNull(testee.subtitleResFor(freeModel("f")))
     }
 
     @Test
@@ -720,6 +850,7 @@ class ModelPickerViewModelTest {
                 override fun onRecoveryModelPicked(chatId: String?, modelId: String) = Unit
                 override fun clearRecoveryModelPick(chatId: String?) = Unit
             },
+            duckChatFeature = duckChatFeature,
         )
         nativeInputState.value = nativeInputState.value.copy(chatId = "chat-A")
         advanceUntilIdle()

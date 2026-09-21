@@ -48,6 +48,8 @@ data class ModelState(
     val selectedModelShortName: String? = null,
     val userTier: UserTier = UserTier.FREE,
     val isSubscriptionEligible: Boolean = false,
+    /** Whether the user can still start a free trial, which changes the gated section's header. */
+    val isFreeTrialEligible: Boolean = false,
     val attachmentLimits: AttachmentLimits = AttachmentLimits(),
     /** User's persisted global reasoning mode. Used for new chats. */
     val selectedReasoningMode: ReasoningMode? = null,
@@ -177,6 +179,12 @@ class RealDuckAiModelManager @Inject constructor(
                     logcat { "Duck.ai Model Manager: failed to resolve purchase eligibility, defaulting to not eligible: ${it.message}" }
                     false
                 }
+                val isFreeTrialEligible = runCatching {
+                    subscriptions.isFreeTrialEligible()
+                }.getOrElse {
+                    logcat { "Duck.ai Model Manager: failed to resolve free trial eligibility, defaulting to not eligible: ${it.message}" }
+                    false
+                }
                 val models = response.models
                     .map { resolveModel(it, userTier) }
                     .filterNot { it.accessTier.isEmpty() && !it.isAccessible }
@@ -203,6 +211,7 @@ class RealDuckAiModelManager @Inject constructor(
                         selectedModelShortName = selectedModel?.shortName,
                         userTier = userTier,
                         isSubscriptionEligible = isSubscriptionEligible,
+                        isFreeTrialEligible = isFreeTrialEligible,
                         attachmentLimits = attachmentLimits,
                         selectedReasoningMode = nextReasoningMode,
                         availableReasoningModes = available,
