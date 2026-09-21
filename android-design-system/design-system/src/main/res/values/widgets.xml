@@ -391,7 +391,7 @@
     <style name="Widget.DuckDuckGo.DaxDialog"/>
 
     <style name="Widget.DuckDuckGo.DaxDialog.Outline">
-        <item name="cardCornerRadius">@dimen/largeShapeCornerRadius</item>
+        <item name="cardCornerRadius">?attr/daxContainerRadius</item>
         <item name="android:backgroundTint">?attr/daxColorSurface</item>
         <item name="android:layout_marginStart">@dimen/keyline_4</item>
         <item name="android:layout_marginEnd">@dimen/keyline_4</item>

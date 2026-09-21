@@ -59,6 +59,35 @@ class DialogRadiusStyleTest {
         }
     }
 
+    @Test
+    fun whenRadiusOverlayIsAbsentThenLottieLandscapeOutlineUses16Dp() {
+        listOf(
+            R.style.Theme_DuckDuckGo_Light,
+            R.style.Theme_DuckDuckGo_Dark,
+        ).forEach { themeRes ->
+            assertEquals(
+                RuntimeEnvironment.getApplication().resources.getDimension(R.dimen.largeShapeCornerRadius),
+                resolvedDaxDialogOutlineCorner(themeRes, overlayEnabled = false),
+                0f,
+            )
+        }
+    }
+
+    @Test
+    @Config(qualifiers = "xhdpi")
+    fun whenRadiusOverlayIsAppliedThenLottieLandscapeOutlineUses28Dp() {
+        listOf(
+            R.style.Theme_DuckDuckGo_Light,
+            R.style.Theme_DuckDuckGo_Dark,
+        ).forEach { themeRes ->
+            assertEquals(
+                RuntimeEnvironment.getApplication().resources.getDimension(R.dimen.rebrandContainerRadius),
+                resolvedDaxDialogOutlineCorner(themeRes, overlayEnabled = true),
+                0f,
+            )
+        }
+    }
+
     private fun resolvedDialogCorner(
         @StyleRes themeRes: Int,
         overlayEnabled: Boolean,
@@ -70,6 +99,25 @@ class DialogRadiusStyleTest {
         val values = context.obtainStyledAttributes(
             R.style.Widget_DuckDuckGo_DialogCorners,
             intArrayOf(MaterialR.attr.cornerSize),
+        )
+        return try {
+            values.getDimension(0, -1f)
+        } finally {
+            values.recycle()
+        }
+    }
+
+    private fun resolvedDaxDialogOutlineCorner(
+        @StyleRes themeRes: Int,
+        overlayEnabled: Boolean,
+    ): Float {
+        val context = ContextThemeWrapper(RuntimeEnvironment.getApplication(), themeRes)
+        if (overlayEnabled) {
+            context.theme.applyStyle(R.style.ThemeOverlay_Rebrand_Radius, true)
+        }
+        val values = context.obtainStyledAttributes(
+            R.style.Widget_DuckDuckGo_DaxDialog_Outline,
+            intArrayOf(MaterialR.attr.cardCornerRadius),
         )
         return try {
             values.getDimension(0, -1f)
