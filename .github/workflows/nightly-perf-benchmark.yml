@@ -1,10 +1,6 @@
 name: Perf Benchmark - Nightly
 
 on:
-  # TEMPORARY (remove before PR): smoke-test the workflow and pixel reporting on this branch.
-  # Restore schedule-only pixel reporting after testing.
-  push:
-    branches: [feature/gerard/macrobenchmark-page-load-workflow]
   schedule:
     - cron: '0 3 * * *'
   workflow_dispatch:
@@ -116,14 +112,12 @@ jobs:
 
       - name: Post-process traces and report
         run: |
-          # TEMPORARY: allow push smoke tests to report pixels. Restore the schedule-only
-          # condition after testing.
           python3 perf-benchmarks/pageload_benchmark.py \
             --results-dir pageload-artifacts \
             --device ftl-mediumphone-api31 \
             --github-action-run-id "${{ github.run_id }}" \
             --git-commit-sha "${{ github.sha }}" \
-            ${{ (github.event_name == 'schedule' || github.event_name == 'push') && '--report-pixel' || '' }}
+            ${{ github.event_name == 'schedule' && '--report-pixel' || '' }}
 
       - name: Upload results
         if: always()
