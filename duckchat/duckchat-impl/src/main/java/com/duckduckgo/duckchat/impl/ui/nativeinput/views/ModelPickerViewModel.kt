@@ -246,19 +246,11 @@ class ModelPickerViewModel @Inject constructor(
         val (available, gated) = public.partition { it.isAccessible }
         return listOfNotNull(
             available.toSectionOrNull(headerRes = null),
-            gated.toSectionOrNull(headerRes = gatedHeaderRes(gated, state), gated = true),
+            gated.toSectionOrNull(
+                headerRes = gatedSectionHeaderRes(gated.map { it.requiredTier }, state.isFreeTrialEligible),
+                gated = true,
+            ),
         )
-    }
-
-    /**
-     * What the user has to do to reach the gated models: start a trial, subscribe, or move up to Pro.
-     * Pro wins when every gated model needs Pro, since a trial or a Plus plan would not unlock them.
-     */
-    @StringRes
-    private fun gatedHeaderRes(gated: List<AIChatModel>, state: ModelState): Int = when {
-        gated.all { it.requiredTier == UserTier.PRO } -> R.string.duckAiModelPickerProExclusive
-        state.isFreeTrialEligible -> R.string.duckAiModelPickerTryFreeTrial
-        else -> R.string.duckAiModelPickerSubscriberExclusive
     }
 
     @StringRes

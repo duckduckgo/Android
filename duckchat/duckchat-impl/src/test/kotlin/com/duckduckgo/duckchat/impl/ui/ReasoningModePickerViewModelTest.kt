@@ -20,6 +20,8 @@ import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
+import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.AvailableReasoningMode
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
@@ -34,6 +36,8 @@ import com.duckduckgo.duckchat.impl.ui.nativeinput.views.ReasoningModePickerView
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.UpsellCommand
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -73,6 +77,8 @@ class ReasoningModePickerViewModelTest {
     private val duckAiChatStore: DuckAiChatStore = mock()
     private val duckChatPixels: DuckChatPixels = mock()
 
+    private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
+
     private lateinit var testee: ReasoningModePickerViewModel
 
     @Before
@@ -82,6 +88,7 @@ class ReasoningModePickerViewModelTest {
             nativeInputStateProvider = nativeInputStateProvider,
             duckAiChatStore = duckAiChatStore,
             duckChatPixels = duckChatPixels,
+            duckChatFeature = duckChatFeature,
         )
     }
 
@@ -91,6 +98,90 @@ class ReasoningModePickerViewModelTest {
         runCurrent()
         assertNull(testee.state.value.displayedMode)
         assertFalse(testee.state.value.visible)
+    }
+
+    @Test
+    fun whenUpdatedPickersDisabledThenAllModesStayInOneSection() = runTest {
+        duckChatFeature.updatedPickers().setRawStoredState(Toggle.State(enable = false))
+        modelState.value = ModelState(
+            availableReasoningModes = listOf(
+                AvailableReasoningMode(ReasoningMode.FAST, ReasoningEffort.NONE),
+                AvailableReasoningMode(ReasoningMode.REASONING, ReasoningEffort.LOW),
+                gatedMode(ReasoningMode.EXTENDED_REASONING, ReasoningEffort.HIGH, listOf("pro")),
+            ),
+        )
+        runCurrent()
+
+        val sections = testee.state.value.sections
+        assertEquals(1, sections.size)
+        assertNull(sections[0].headerRes)
+        assertEquals(3, sections[0].rows.size)
+    }
+
+    @Test
+    fun whenUpdatedPickersEnabledThenGatedModesMoveToTheirOwnSection() = runTest {
+        duckChatFeature.updatedPickers().setRawStoredState(Toggle.State(enable = true))
+        modelState.value = ModelState(
+            availableReasoningModes = listOf(
+                AvailableReasoningMode(ReasoningMode.FAST, ReasoningEffort.NONE),
+                AvailableReasoningMode(ReasoningMode.REASONING, ReasoningEffort.LOW),
+                gatedMode(ReasoningMode.EXTENDED_REASONING, ReasoningEffort.HIGH, listOf("pro")),
+            ),
+        )
+        runCurrent()
+
+        val sections = testee.state.value.sections
+        assertEquals(2, sections.size)
+        assertNull(sections[0].headerRes)
+        assertEquals(listOf(ReasoningMode.FAST, ReasoningMode.REASONING), sections[0].rows.map { it.mode })
+        assertEquals(R.string.duckAiModelPickerProExclusive, sections[1].headerRes)
+        assertEquals(listOf(ReasoningMode.EXTENDED_REASONING), sections[1].rows.map { it.mode })
+    }
+
+    @Test
+    fun whenTrialEligibleAndGatedModeNeedsPlusThenHeaderOffersTheTrial() = runTest {
+        duckChatFeature.updatedPickers().setRawStoredState(Toggle.State(enable = true))
+        modelState.value = ModelState(
+            isFreeTrialEligible = true,
+            availableReasoningModes = listOf(
+                AvailableReasoningMode(ReasoningMode.FAST, ReasoningEffort.NONE),
+                gatedMode(ReasoningMode.EXTENDED_REASONING, ReasoningEffort.HIGH, listOf("plus", "pro")),
+            ),
+        )
+        runCurrent()
+
+        assertEquals(R.string.duckAiModelPickerTryFreeTrial, testee.state.value.sections[1].headerRes)
+    }
+
+    @Test
+    fun whenTrialUsedAndGatedModeNeedsPlusThenHeaderIsSubscriberExclusive() = runTest {
+        duckChatFeature.updatedPickers().setRawStoredState(Toggle.State(enable = true))
+        modelState.value = ModelState(
+            isFreeTrialEligible = false,
+            availableReasoningModes = listOf(
+                AvailableReasoningMode(ReasoningMode.FAST, ReasoningEffort.NONE),
+                gatedMode(ReasoningMode.EXTENDED_REASONING, ReasoningEffort.HIGH, listOf("plus", "pro")),
+            ),
+        )
+        runCurrent()
+
+        assertEquals(R.string.duckAiModelPickerSubscriberExclusive, testee.state.value.sections[1].headerRes)
+    }
+
+    @Test
+    fun whenNothingIsGatedThenOnlyOneSectionIsBuilt() = runTest {
+        duckChatFeature.updatedPickers().setRawStoredState(Toggle.State(enable = true))
+        modelState.value = ModelState(
+            availableReasoningModes = listOf(
+                AvailableReasoningMode(ReasoningMode.FAST, ReasoningEffort.NONE),
+                AvailableReasoningMode(ReasoningMode.REASONING, ReasoningEffort.LOW),
+            ),
+        )
+        runCurrent()
+
+        val sections = testee.state.value.sections
+        assertEquals(1, sections.size)
+        assertNull(sections[0].headerRes)
     }
 
     @Test
@@ -690,5 +781,15 @@ class ReasoningModePickerViewModelTest {
         isAccessible = true,
         supportedReasoningEfforts = supported,
         reasoningEffortAccess = access,
+    )
+
+    private fun gatedMode(
+        mode: ReasoningMode,
+        effort: ReasoningEffort,
+        accessTier: List<String>,
+    ) = AvailableReasoningMode(
+        mode = mode,
+        effort = effort,
+        access = ReasoningEffortAccess(effort = effort, accessTier = accessTier, isAccessible = false),
     )
 }

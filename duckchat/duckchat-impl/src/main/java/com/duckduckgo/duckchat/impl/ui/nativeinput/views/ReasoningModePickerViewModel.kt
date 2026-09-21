@@ -25,6 +25,7 @@ import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.models.AvailableReasoningMode
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ModelState
@@ -58,12 +59,19 @@ data class ReasoningModeRow(
     val selected: Boolean,
 )
 
+data class ReasoningSection(
+    @StringRes val headerRes: Int?,
+    val rows: List<ReasoningModeRow>,
+)
+
 /** Resolved snapshot the picker view renders from. */
 data class ReasoningModePickerState(
     val visible: Boolean,
-    val rows: List<ReasoningModeRow>,
+    val sections: List<ReasoningSection>,
     val displayedMode: ReasoningMode?,
-)
+) {
+    val rows: List<ReasoningModeRow> get() = sections.flatMap { it.rows }
+}
 
 @ContributesViewModel(ViewScope::class)
 class ReasoningModePickerViewModel @Inject constructor(
@@ -71,6 +79,7 @@ class ReasoningModePickerViewModel @Inject constructor(
     private val nativeInputStateProvider: NativeInputStateProvider,
     private val duckAiChatStore: DuckAiChatStore,
     private val duckChatPixels: DuckChatPixels,
+    private val duckChatFeature: DuckChatFeature,
 ) : ViewModel() {
 
     private val currentChat = MutableStateFlow<DuckAiChat?>(null)
@@ -104,7 +113,7 @@ class ReasoningModePickerViewModel @Inject constructor(
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Eagerly,
-        initialValue = ReasoningModePickerState(visible = false, rows = emptyList(), displayedMode = null),
+        initialValue = ReasoningModePickerState(visible = false, sections = emptyList(), displayedMode = null),
     )
 
     private fun resolveState(
@@ -115,14 +124,35 @@ class ReasoningModePickerViewModel @Inject constructor(
         val activeChat = chat?.takeIf { it.chatId == nativeState.chatId }
         val chatResolution = activeChat?.let { ReasoningResolver.forChat(it, modelState) }
         if (nativeState.chatId != null && chatResolution == null) {
-            return ReasoningModePickerState(visible = false, rows = emptyList(), displayedMode = null)
+            return ReasoningModePickerState(visible = false, sections = emptyList(), displayedMode = null)
         }
         val available = chatResolution?.available ?: modelState.availableReasoningModes
         val persistedMode = chatResolution?.mode ?: modelState.selectedReasoningMode
         val displayedMode = ReasoningResolver.resolveMode(persistedMode, available)
         val visible = available.size > 1 && available.any { it.isAccessible }
-        val rows = available.map { it.toRow(selected = it.mode == displayedMode) }
-        return ReasoningModePickerState(visible = visible, rows = rows, displayedMode = displayedMode)
+        val sections = buildSections(available, displayedMode, modelState)
+        return ReasoningModePickerState(visible = visible, sections = sections, displayedMode = displayedMode)
+    }
+
+    private fun buildSections(
+        available: List<AvailableReasoningMode>,
+        displayedMode: ReasoningMode?,
+        modelState: ModelState,
+    ): List<ReasoningSection> {
+        fun List<AvailableReasoningMode>.toRows() = map { it.toRow(selected = it.mode == displayedMode) }
+        if (!duckChatFeature.updatedPickers().isEnabled()) {
+            return listOf(ReasoningSection(headerRes = null, rows = available.toRows()))
+        }
+        val (accessible, gated) = available.partition { it.isAccessible }
+        return listOfNotNull(
+            accessible.takeIf { it.isNotEmpty() }?.let { ReasoningSection(headerRes = null, rows = it.toRows()) },
+            gated.takeIf { it.isNotEmpty() }?.let {
+                ReasoningSection(
+                    headerRes = gatedSectionHeaderRes(it.map { mode -> mode.access?.requiredTier }, modelState.isFreeTrialEligible),
+                    rows = it.toRows(),
+                )
+            },
+        )
     }
 
     private val command = Channel<UpsellCommand>(capacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
