@@ -171,6 +171,8 @@ android {
     productFlavors {
         internal {
             dimension "store"
+            // use a separate proguard file for internal
+            proguardFiles 'proguard-rules-internal.pro'
         }
         fdroid {
             dimension "store"
@@ -219,6 +221,15 @@ android {
             } else {
                 java.srcDirs += 'src/anvilDagger/java'
             }
+        }
+    }
+}
+
+androidComponents {
+    // only minify (enable R8) for internal release builds
+    beforeVariants(selector().withBuildType("release")) { variantBuilder ->
+        if (variantBuilder.productFlavors.any { it.second == "internal" }) {
+            variantBuilder.minifyEnabled = true
         }
     }
 }
