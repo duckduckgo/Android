@@ -125,6 +125,7 @@ class AttachmentViewModelTest {
     private val nativeInputStateStore = RealNativeInputStateStore(
         dagger.Lazy { tabRepositoryProvider },
         browserModeStateHolder,
+        RealTextSelectionRepository(),
     )
 
     private lateinit var viewModel: AttachmentViewModel

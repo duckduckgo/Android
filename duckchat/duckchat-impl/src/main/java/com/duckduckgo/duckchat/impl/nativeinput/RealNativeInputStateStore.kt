@@ -23,6 +23,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
+import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
 import dagger.SingleInstanceIn
@@ -49,6 +50,7 @@ class RealNativeInputStateStore @Inject constructor(
     // lazy is only dereferenced when `state` is collected for the first time.
     private val tabRepositoryProvider: Lazy<BrowserModeDataProvider<TabRepository>>,
     private val browserModeStateHolder: BrowserModeStateHolder,
+    private val textSelectionRepository: TextSelectionRepository,
 ) :
     NativeInputStateProvider,
     NativeInputStatePublisher {
@@ -78,10 +80,12 @@ class RealNativeInputStateStore @Inject constructor(
 
     override fun clearTab(tabId: String) {
         flows.remove(tabId)
+        textSelectionRepository.clear(tabId)
     }
 
     override fun clearAll() {
         flows.clear()
+        textSelectionRepository.clearAll()
     }
 
     // Seed unpublished tabs with [NativeInputState.zero] only because StateFlow requires an initial
