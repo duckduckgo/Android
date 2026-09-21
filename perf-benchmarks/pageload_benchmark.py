@@ -23,7 +23,7 @@ DEFAULT_EXPECTED_SAMPLES = 10
 DEFAULT_WARMUP_SAMPLES = 1
 # Trailing navigation discarded, closes the last measured slice.
 DEFAULT_TRAILING_SAMPLES = 1
-# Must track PageLoadBenchmark.PAGE_SETTLE_MS; past it a slice never closed properly.
+# Must track PageLoadBenchmark.PAGE_SETTLE_MS_PROTECTED; the default settle budget.
 SETTLE_WINDOW_MS = 8000.0
 # Modified z-score cutoff; 3.5 is the standard threshold.
 OUTLIER_Z_THRESHOLD = 3.5
@@ -41,9 +41,17 @@ SCENARIO_BY_BENCHMARK_NAME = {
     "manyTrackersBlocked": "many-trackers-blocked",
     "firstPartyTrackers": "first-party-trackers",
     "cpm": "cpm",
-    "allScenarios": "all",
+    "allScenariosProtectionsOn": "all-protections-on",
+    "allScenariosProtectionsOff": "all-protections-off",
 }
 EXPECTED_SCENARIOS = frozenset(SCENARIO_BY_BENCHMARK_NAME.values())
+
+# Must track PageLoadBenchmark.PAGE_SETTLE_MS_UNPROTECTED; unprotected loads hit the real network.
+SETTLE_WINDOW_MS_OVERRIDES = {"all-protections-off": 20000.0}
+
+
+def settle_window_ms_for(scenario: str) -> float:
+    return SETTLE_WINDOW_MS_OVERRIDES.get(scenario, SETTLE_WINDOW_MS)
 
 
 @dataclass
@@ -113,10 +121,11 @@ def compute_stats(
     durations_ms: list[float],
     warmup: int = DEFAULT_WARMUP_SAMPLES,
     trailing: int = DEFAULT_TRAILING_SAMPLES,
+    settle_window_ms: float = SETTLE_WINDOW_MS,
 ) -> Stats:
     end = len(durations_ms) - trailing if trailing else None
     measured = [duration for duration in durations_ms[warmup:end] if duration > 0]
-    data = [duration for duration in measured if duration < SETTLE_WINDOW_MS]
+    data = [duration for duration in measured if duration < settle_window_ms]
     invalid_count = len(measured) - len(data)
     if not data:
         return Stats(invalid_count=invalid_count)
@@ -311,7 +320,7 @@ def collect_results(artifacts: list[Artifact], expected_samples: int = DEFAULT_E
                 f"scenario {scenario} has {len(durations)} positive slices; expected {expected_total} "
                 f"({DEFAULT_WARMUP_SAMPLES} warmup + {expected_samples} retained + {DEFAULT_TRAILING_SAMPLES} trailing)"
             )
-        stats = compute_stats(durations)
+        stats = compute_stats(durations, settle_window_ms=settle_window_ms_for(scenario))
         if stats.invalid_count > MAX_INVALID_SAMPLES:
             raise ValueError(
                 f"scenario {scenario} has {stats.invalid_count} settle-window overruns; "
@@ -422,7 +431,7 @@ def main(argv: Optional[list[str]] = None) -> int:
         print("ERROR: --trace requires --scenario so the result cannot be misattributed", file=sys.stderr)
         return 1
     if args.trace and args.report_pixel:
-        print("ERROR: --report-pixel requires --results-dir so all five scenarios are validated atomically", file=sys.stderr)
+        print("ERROR: --report-pixel requires --results-dir so all scenarios are validated atomically", file=sys.stderr)
         return 1
 
     try:
