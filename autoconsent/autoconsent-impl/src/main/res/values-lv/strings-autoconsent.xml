@@ -29,6 +29,7 @@
     <string name="autoconsentPromptFootnote">Vēlāk to vienmēr vari mainīt sadaļā Iestatījumi.</string>
     <string name="autoconsentPromptCpmOnMessage">No dažiem sīkfailiem nevar atteikties. Mēs tos varam pieņemt tavā vietā.</string>
     <string name="autoconsentPromptCpmOnPrimaryButton">Pieņemt sīkfailus manā vietā</string>
+    <string name="autoconsentPromptCpmOnPrimaryButtonV2">Noraidīt, ja iespējams, vai pieņemt manā vietā</string>
     <string name="autoconsentPromptCpmOnSecondaryButton">Es tos pieņemšu pats</string>
     <string name="autoconsentPromptCpmOffMessage">Ļauj mums tos pārvaldīt tavā vietā. Mēs noraidīsim sīkfailus, ja iespējams, un pieņemsim tos, no kuriem nevar atteikties.</string>
     <string name="autoconsentPromptCpmOffPrimaryButton">Noraidīt, ja iespējams, vai pieņemt manā vietā</string>

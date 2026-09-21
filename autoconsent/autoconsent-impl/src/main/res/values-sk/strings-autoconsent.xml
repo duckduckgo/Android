@@ -29,6 +29,7 @@
     <string name="autoconsentPromptFootnote">Toto môžeš kedykoľvek neskôr upraviť v Nastaveniach.</string>
     <string name="autoconsentPromptCpmOnMessage">Niektoré súbory cookie nemožno odmietnuť. Tie môžeme prijať za teba.</string>
     <string name="autoconsentPromptCpmOnPrimaryButton">Prijmi súbory cookie za mňa</string>
+    <string name="autoconsentPromptCpmOnPrimaryButtonV2">Odmietni, ak je to možné, alebo prijmi za mňa</string>
     <string name="autoconsentPromptCpmOnSecondaryButton">Prijmem ich sám/sama</string>
     <string name="autoconsentPromptCpmOffMessage">Dovoľ nám vyriešiť ich za teba. Súbory cookie odmietneme, keď to bude možné, a prijmeme tie, ktoré nemožno odmietnuť.</string>
     <string name="autoconsentPromptCpmOffPrimaryButton">Odmietni, ak je to možné, alebo prijmi za mňa</string>
