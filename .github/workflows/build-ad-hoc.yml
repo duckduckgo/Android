@@ -39,10 +39,10 @@ jobs:
           token: ${{ secrets.GT_DAXMOBILE }}
           ref: ${{ github.event.inputs.ref }}
       - name: Set up JDK version
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           java-version-file: .github/.java-version
-          distribution: 'adopt'
+          distribution: 'temurin'
 
       - name: Create folder
         if: always()
