@@ -120,8 +120,10 @@ import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import logcat.logcat
 import org.json.JSONObject
@@ -324,17 +326,21 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             }
         }
 
-        logcat {
-            "SubscriptionsWebViewActivity: Loading subscriptions webview with URL: ${params.url}"
-        }
-        binding.webview.loadUrl(params.url)
-
         viewModel.start()
 
         viewModel.commands()
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
+
+        viewModel.initialUrl
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .filterNotNull()
+            .take(1)
+            .onEach { loadUrl(it) }
+            .launchIn(lifecycleScope)
+
+        viewModel.resolveInitialUrl(params.url)
 
         viewModel.currentPurchaseViewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).distinctUntilChanged().onEach {
             renderPurchaseState(it.purchaseState)
@@ -585,6 +591,13 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             is RequestNotificationsPermission -> launchNotificationsPermission(command.id)
             Reload -> binding.webview.reload()
         }
+    }
+
+    private fun loadUrl(url: String) {
+        logcat {
+            "SubscriptionsWebViewActivity: Loading subscriptions webview with URL: $url"
+        }
+        binding.webview.loadUrl(url)
     }
 
     private fun goToPIRDashboard() {

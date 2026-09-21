@@ -66,6 +66,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PRO_PLAN_
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.billing.SubscriptionReplacementMode
+import com.duckduckgo.subscriptions.impl.internal.PaywallUrlResolver
 import com.duckduckgo.subscriptions.impl.notification.SubscriptionExpirationReminderScheduler
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionFailureErrorType
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
@@ -104,6 +105,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
     private val subscriptionsFeature: SubscriptionsFeature,
     private val pirFeature: PirFeature,
     private val subscriptionExpirationReminderScheduler: SubscriptionExpirationReminderScheduler,
+    private val paywallUrlResolver: PaywallUrlResolver,
 ) : ViewModel() {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -117,6 +119,9 @@ class SubscriptionWebViewViewModel @Inject constructor(
 
     private val _currentPurchaseViewState = MutableStateFlow(CurrentPurchaseViewState())
     val currentPurchaseViewState = _currentPurchaseViewState.asStateFlow()
+
+    private val _initialUrl = MutableStateFlow<String?>(null)
+    val initialUrl = _initialUrl.asStateFlow()
 
     private lateinit var subscriptionStatus: SubscriptionStatus
 
@@ -170,6 +175,13 @@ class SubscriptionWebViewViewModel @Inject constructor(
         subscriptionsManager.subscriptionStatus
             .onEach { subscriptionStatus = it }
             .launchIn(viewModelScope)
+    }
+
+    fun resolveInitialUrl(url: String) {
+        if (_initialUrl.value != null) return
+        viewModelScope.launch {
+            _initialUrl.value = paywallUrlResolver.resolve(url)
+        }
     }
 
     fun processJsCallbackMessage(featureName: String, method: String, id: String?, data: JSONObject?) {

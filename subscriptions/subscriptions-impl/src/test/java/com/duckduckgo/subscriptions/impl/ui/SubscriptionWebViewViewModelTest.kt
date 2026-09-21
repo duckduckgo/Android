@@ -35,6 +35,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PRO_PLAN_
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PRO_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
+import com.duckduckgo.subscriptions.impl.internal.PaywallUrlResolver
 import com.duckduckgo.subscriptions.impl.notification.SubscriptionExpirationReminderScheduler
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.Subscription
@@ -63,6 +64,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -85,6 +87,7 @@ class SubscriptionWebViewViewModelTest {
     private val subscriptionsFeature = FakeFeatureToggleFactory.create(SubscriptionsFeature::class.java, FakeToggleStore())
     private val pirFeature: PirFeature = mock()
     private val subscriptionExpirationReminderScheduler: SubscriptionExpirationReminderScheduler = mock()
+    private val paywallUrlResolver: PaywallUrlResolver = mock()
 
     private lateinit var viewModel: SubscriptionWebViewViewModel
 
@@ -93,16 +96,53 @@ class SubscriptionWebViewViewModelTest {
         whenever(networkProtectionAccessState.getScreenForCurrentState()).thenReturn(NetworkProtectionManagementScreenNoParams)
         whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.DISABLED)
         viewModel = SubscriptionWebViewViewModel(
-            coroutineTestRule.testDispatcherProvider,
-            subscriptionsManager,
-            subscriptionsChecker,
-            networkProtectionAccessState,
-            pixelSender,
-            subscriptionsFeature,
-            pirFeature,
-            subscriptionExpirationReminderScheduler,
+            dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+            subscriptionsManager = subscriptionsManager,
+            subscriptionsChecker = subscriptionsChecker,
+            networkProtectionAccessState = networkProtectionAccessState,
+            pixelSender = pixelSender,
+            subscriptionsFeature = subscriptionsFeature,
+            pirFeature = pirFeature,
+            subscriptionExpirationReminderScheduler = subscriptionExpirationReminderScheduler,
+            paywallUrlResolver = paywallUrlResolver,
         )
         givenSubscriptionStatus(UNKNOWN)
+    }
+
+    @Test
+    fun whenResolveInitialUrlThenInitialUrlHoldsResolvedUrl() = runTest {
+        val buyUrl = "https://duckduckgo.com/subscriptions"
+        val resolvedUrl = "https://duckduckgo.com/subscriptions/new/mobile/vpn?trial=false"
+        whenever(paywallUrlResolver.resolve(buyUrl)).thenReturn(resolvedUrl)
+
+        viewModel.resolveInitialUrl(buyUrl)
+
+        assertEquals(resolvedUrl, viewModel.initialUrl.value)
+    }
+
+    @Test
+    fun whenResolveInitialUrlCalledAgainThenUrlIsResolvedOnlyOnce() = runTest {
+        val buyUrl = "https://duckduckgo.com/subscriptions"
+        val resolvedUrl = "https://duckduckgo.com/subscriptions/new/mobile/vpn?trial=false"
+        whenever(paywallUrlResolver.resolve(buyUrl)).thenReturn(resolvedUrl)
+
+        viewModel.resolveInitialUrl(buyUrl)
+        viewModel.resolveInitialUrl(buyUrl)
+
+        verify(paywallUrlResolver, times(1)).resolve(buyUrl)
+    }
+
+    @Test
+    fun whenCollectedAfterResolvingThenResolvedUrlIsStillReplayed() = runTest {
+        val buyUrl = "https://duckduckgo.com/subscriptions"
+        val resolvedUrl = "https://duckduckgo.com/subscriptions/new/mobile/vpn?trial=false"
+        whenever(paywallUrlResolver.resolve(buyUrl)).thenReturn(resolvedUrl)
+        viewModel.resolveInitialUrl(buyUrl)
+
+        viewModel.initialUrl.test {
+            assertEquals(resolvedUrl, awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
