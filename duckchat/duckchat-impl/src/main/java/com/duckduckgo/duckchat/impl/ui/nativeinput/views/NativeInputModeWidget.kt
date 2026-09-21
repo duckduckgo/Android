@@ -418,8 +418,12 @@ class NativeInputModeWidget @JvmOverloads constructor(
     // needs the staged attachments, and reading them from the ViewModel keeps the widget out of the
     // plugin's view.
     private val attachmentViewModel: AttachmentViewModel?
-        get() = findViewTreeViewModelStoreOwner()?.let { owner ->
-            ViewModelProvider(owner, viewModelFactory)[AttachmentViewModel::class.java]
+        get() = if (::viewModelFactory.isInitialized) {
+            findViewTreeViewModelStoreOwner()?.let { owner ->
+                ViewModelProvider(owner, viewModelFactory)[AttachmentViewModel::class.java]
+            }
+        } else {
+            null
         }
 
     val inputField: EditText
