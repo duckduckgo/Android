@@ -26,8 +26,8 @@ import com.duckduckgo.promptscoordinator.api.ModalEvaluator
 import com.duckduckgo.promptscoordinator.api.ModalTrigger
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -83,10 +83,10 @@ class AppRatingPromptEvaluatorTest {
     }
 
     @Test
-    fun featureDefaultsToEnabled() {
+    fun featureIsDisabledByDefaultOnNonInternalBuilds() {
         val unsetFeature = FakeFeatureToggleFactory.create(AppRatingPromptModalFeature::class.java)
 
-        assertTrue(unsetFeature.self().isEnabled())
+        assertFalse(unsetFeature.self().isEnabled())
     }
 
     @Test

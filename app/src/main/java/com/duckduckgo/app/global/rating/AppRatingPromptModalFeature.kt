@@ -25,9 +25,10 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
  * Routes the app enjoyment / rating prompt through the prompts coordinator instead of firing it
  * directly on app start.
  *
- * When enabled (the default), [AppRatingPromptEvaluator] owns the decision and the prompt competes
- * with the other modals at priority 6. Disabling it reverts to [AppEnjoymentAppCreationObserver]
- * deciding the prompt type on every app start, unarbitrated.
+ * When enabled, [AppRatingPromptEvaluator] owns the decision and the prompt competes with the other
+ * modals at priority 6. Otherwise [AppEnjoymentAppCreationObserver] keeps deciding the prompt type on
+ * every app start, unarbitrated. Defaults to internal builds only, so release builds stay on the
+ * observer until the flag is turned on remotely.
  *
  * Exactly one of the two paths runs, so the prompt can never be evaluated twice in a single start.
  */
@@ -36,6 +37,6 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
     featureName = "appRatingPromptModal",
 )
 interface AppRatingPromptModalFeature {
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun self(): Toggle
 }
