@@ -21,6 +21,7 @@
     android:layout_height="wrap_content"
     android:background="?attr/selectableItemBackground"
     android:gravity="center_vertical"
+    android:minHeight="@dimen/keyline_7"
     android:orientation="horizontal"
     android:paddingStart="@dimen/keyline_4"
     android:paddingTop="@dimen/keyline_2"
