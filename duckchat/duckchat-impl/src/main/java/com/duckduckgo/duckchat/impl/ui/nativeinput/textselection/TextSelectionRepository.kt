@@ -40,6 +40,8 @@ interface TextSelectionRepository {
     fun add(tabId: String, text: String, url: String): Boolean
     fun consume(tabId: String): List<TextSelection>
     fun remove(tabId: String, id: String)
+    fun clear(tabId: String)
+    fun clearAll()
 
     companion object {
         const val MAX_SELECTIONS = 5
@@ -76,6 +78,15 @@ class RealTextSelectionRepository @Inject constructor() : TextSelectionRepositor
     override fun remove(tabId: String, id: String) {
         getLimitFlow(tabId).value = false
         getFlow(tabId).update { current -> current.filterNot { it.id == id } }
+    }
+
+    override fun clear(tabId: String) {
+        selections.remove(tabId)?.value = emptyList()
+        limitReached.remove(tabId)?.value = false
+    }
+
+    override fun clearAll() {
+        (selections.keys + limitReached.keys).forEach(::clear)
     }
 
     private fun getFlow(tabId: String): MutableStateFlow<List<TextSelection>> =

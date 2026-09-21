@@ -32,6 +32,7 @@ import com.duckduckgo.duckchat.impl.nativeinput.EffectiveModelProvider
 import com.duckduckgo.duckchat.impl.nativeinput.RealEffectiveModelProvider
 import com.duckduckgo.duckchat.impl.nativeinput.RealNativeInputStateStore
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
+import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.RealTextSelectionRepository
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -75,6 +76,7 @@ class OptionsViewModelTest {
     private val store = RealNativeInputStateStore(
         dagger.Lazy { tabRepositoryProvider },
         browserModeStateHolder,
+        RealTextSelectionRepository(),
     )
     private val duckChatPixels: DuckChatPixels = mock()
     private val modelStateFlow = MutableStateFlow(ModelState())

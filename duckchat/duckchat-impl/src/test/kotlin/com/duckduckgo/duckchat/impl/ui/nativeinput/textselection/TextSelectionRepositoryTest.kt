@@ -124,6 +124,43 @@ class TextSelectionRepositoryTest {
         assertEquals(1, testee.selections(TAB).value.size)
     }
 
+    @Test
+    fun whenTabClearedThenOnlyThatTabIsEmptied() {
+        fillToLimit()
+        testee.add(TAB, "one more", URL)
+        testee.add("tab-2", "other", URL)
+
+        testee.clear(TAB)
+
+        assertTrue(testee.selections(TAB).value.isEmpty())
+        assertFalse(testee.limitReached(TAB).value)
+        assertEquals(1, testee.selections("tab-2").value.size)
+    }
+
+    @Test
+    fun whenTabClearedThenExistingCollectorsSeeEmptyState() {
+        val selections = testee.selections(TAB)
+        val limit = testee.limitReached(TAB)
+        fillToLimit()
+        testee.add(TAB, "one more", URL)
+
+        testee.clear(TAB)
+
+        assertTrue(selections.value.isEmpty())
+        assertFalse(limit.value)
+    }
+
+    @Test
+    fun whenAllClearedThenEveryTabIsEmptied() {
+        testee.add(TAB, "selected words", URL)
+        testee.add("tab-2", "other", URL)
+
+        testee.clearAll()
+
+        assertTrue(testee.selections(TAB).value.isEmpty())
+        assertTrue(testee.selections("tab-2").value.isEmpty())
+    }
+
     private fun fillToLimit() {
         repeat(TextSelectionRepository.MAX_SELECTIONS) { testee.add(TAB, "selection $it", URL) }
     }
