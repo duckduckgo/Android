@@ -1871,6 +1871,56 @@ class AppSyncAccountRepositoryTest {
     }
 
     @Test
+    fun whenAccountAlreadyHasDdgCredentialThenTemporaryThirdPartyDeviceIsLoggedOut() = runTest {
+        val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode(accountAlreadyHasDdg = true)
+
+        syncRepo.joinAccountFromThirdPartyRecoveryCode(pastedCode)
+
+        verify(syncApi).logout("scoped_token_step2", deviceId)
+        verify(syncStore, never()).clearAll()
+    }
+
+    @Test
+    fun whenTemporaryThirdPartyDeviceLogoutFailsThenErrorIsUnchanged() = runTest {
+        val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode(accountAlreadyHasDdg = true)
+        whenever(syncApi.logout(anyString(), anyString())).thenReturn(Error(reason = "network"))
+
+        val result = syncRepo.joinAccountFromThirdPartyRecoveryCode(pastedCode)
+
+        assertEquals(AccountErrorCodes.THIRD_PARTY_ALREADY_UPGRADED.code, (result as Error).code)
+    }
+
+    @Test
+    fun whenPostUpgradeDdgLoginFailsThenTemporaryThirdPartyDeviceIsLoggedOut() = runTest {
+        val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode(step7aResult = step7aLoginUnauthorized)
+
+        syncRepo.joinAccountFromThirdPartyRecoveryCode(pastedCode)
+
+        verify(syncApi).logout("scoped_token_step2", deviceId)
+    }
+
+    @Test
+    fun whenUpgradeSucceedsThenTemporaryThirdPartyDeviceIsNotLoggedOut() = runTest {
+        val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode()
+
+        val result = syncRepo.joinAccountFromThirdPartyRecoveryCode(pastedCode)
+
+        assertEquals(Success(true), result)
+        verify(syncApi, never()).logout(anyString(), anyString())
+    }
+
+    @Test
+    fun whenStep7Post409AlreadyExistsThenTemporaryThirdPartyDeviceIsLoggedOut() = runTest {
+        val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode()
+        whenever(syncApi.createAccessCredential(anyString(), eq("ddg"), any()))
+            .thenReturn(Error(code = API_CODE.COUNT_LIMIT.code, reason = "already exists"))
+
+        syncRepo.joinAccountFromThirdPartyRecoveryCode(pastedCode)
+
+        verify(syncApi).logout("scoped_token_step2", deviceId)
+    }
+
+    @Test
     fun whenStep7PostRateLimitedThenRetriesAndSucceeds() = runTest {
         val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode()
         whenever(syncApi.createAccessCredential(anyString(), eq("ddg"), any()))
@@ -2069,6 +2119,7 @@ class AppSyncAccountRepositoryTest {
         }
 
         whenever(syncApi.createAccessCredential(anyString(), eq("ddg"), any())).thenReturn(Success(true))
+        whenever(syncApi.logout(anyString(), anyString())).thenReturn(logoutSuccess)
 
         return pastedCode
     }

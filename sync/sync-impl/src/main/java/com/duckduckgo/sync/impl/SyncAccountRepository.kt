@@ -818,6 +818,20 @@ class AppSyncAccountRepository @Inject constructor(
             is Success -> loginResult.data
         }
 
+        // The login above registered this device. If the upgrade then fails, the device stays on an account it never joined, so remove it again.
+        val upgradeResult = upgradeThirdPartyAccount(parsed, loginResponse, deviceId, deviceName)
+        if (upgradeResult is Error) {
+            logoutTemporaryThirdPartyDevice(loginResponse.token, deviceId)
+        }
+        return upgradeResult
+    }
+
+    private suspend fun upgradeThirdPartyAccount(
+        parsed: ThirdPartyRecoveryCode,
+        loginResponse: LoginResponse,
+        deviceId: String,
+        deviceName: String,
+    ): Result<Boolean> {
         // Step 2a — "Does it need an upgrade?" check per Unified Algorithm (Asana 1214739740392701,
         // "Native only - Upgrading 3party account"). The /sync/login response includes the account's
         // current access_credentials, so we can detect a pre-existing ddg credential without a
@@ -1361,6 +1375,17 @@ class AppSyncAccountRepository @Inject constructor(
             deviceType = encryptedDeviceType,
             scope = SYNC_SCOPE_AI_CHATS,
         )
+    }
+
+    // This does not use the logout(deviceId) function above. That one takes the token from the store, and this flow never puts a token there.
+    private fun logoutTemporaryThirdPartyDevice(
+        token: String,
+        deviceId: String,
+    ) {
+        when (val result = syncApi.logout(token, deviceId)) {
+            is Error -> logcat(WARN) { "Sync-ScopedToken: best-effort 3party device logout failed: ${result.reason}" }
+            is Success -> logcat { "Sync-ScopedToken: temporary 3party device logged out" }
+        }
     }
 
     private fun performLogin(
