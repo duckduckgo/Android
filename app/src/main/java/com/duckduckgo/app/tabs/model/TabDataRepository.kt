@@ -42,6 +42,7 @@ import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import io.reactivex.Scheduler
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -49,12 +50,15 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.INFO
 import logcat.LogPriority.WARN
 import logcat.logcat
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 class TabDataRepository(
     private val tabsDao: TabsDao,
@@ -374,6 +378,20 @@ class TabDataRepository(
         nativeInputStatePublisher.clearTab(tabId)
     }
 
+    override suspend fun deleteSelectedBlankTabAndSelectTarget(
+        currentTabId: String,
+        targetTabId: String,
+    ): Boolean = withContext(dispatchers.io() + NonCancellable) {
+        val didDelete = try {
+            awaitDatabaseOperation { tabsDao.deleteSelectedBlankTabAndSelectTarget(currentTabId, targetTabId) }
+        } catch (_: Exception) {
+            false
+        }
+        if (!didDelete) return@withContext false
+        clearAllSiteData(listOf(currentTabId))
+        true
+    }
+
     private fun clearAllSiteData(tabIds: List<String>) {
         tabIds.forEach { tabId ->
             webViewSessionStorage.deleteSession(tabId)
@@ -548,6 +566,18 @@ class TabDataRepository(
     private fun databaseExecutor(): Scheduler {
         return Schedulers.single()
     }
+
+    private suspend fun <T> awaitDatabaseOperation(operation: () -> T): T =
+        suspendCancellableCoroutine { continuation ->
+            val disposable = Schedulers.single().scheduleDirect {
+                try {
+                    continuation.resume(operation())
+                } catch (error: Exception) {
+                    continuation.resumeWithException(error)
+                }
+            }
+            continuation.invokeOnCancellation { disposable.dispose() }
+        }
 }
 
 private data class TabUpdateState(

@@ -226,6 +226,22 @@ abstract class TabsDao {
         }
     }
 
+    @Transaction
+    open fun deleteSelectedBlankTabAndSelectTarget(
+        currentTabId: String,
+        targetTabId: String,
+    ): Boolean {
+        if (currentTabId == targetTabId) return false
+        val currentTab = tab(currentTabId) ?: return false
+        val targetTab = tab(targetTabId) ?: return false
+        if (selectedTab()?.tabId != currentTabId) return false
+        if (!currentTab.url.isNullOrBlank()) return false
+        if (targetTab.deletable) return false
+        deleteTab(currentTab)
+        insertTabSelection(TabSelectionEntity(tabId = targetTab.tabId))
+        return true
+    }
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun insertTabSelection(tabSelectionEntity: TabSelectionEntity)
 

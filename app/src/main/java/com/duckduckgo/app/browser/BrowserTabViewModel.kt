@@ -319,6 +319,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.tabs.model.DuckAiTabSessionRepository
+import com.duckduckgo.app.tabs.model.TabAtomicOperations
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabPageContextRepository
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -356,6 +357,7 @@ import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.browser.ui.autocomplete.AutocompleteHistoryDeleteFeature
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
+import com.duckduckgo.browser.ui.newtab.hatch.NewTabReturnHatchFeature
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.AppUrl
@@ -504,6 +506,8 @@ class BrowserTabViewModel @Inject constructor(
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val siteFactory: SiteFactory,
     private val tabRepository: TabRepository,
+    private val tabAtomicOperations: TabAtomicOperations,
+    private val newTabReturnHatchFeature: NewTabReturnHatchFeature,
     private val userAllowListRepository: UserAllowListRepository,
     private val contentBlocking: ContentBlocking,
     private val networkLeaderboardDao: NetworkLeaderboardDao,
@@ -3529,6 +3533,22 @@ class BrowserTabViewModel @Inject constructor(
     suspend fun openInNewBackgroundTab(url: String) {
         tabRepository.addNewTabAfterExistingTab(url, tabId)
         command.value = OpenInNewBackgroundTab(url)
+    }
+
+    suspend fun returnToHatch(
+        currentTabId: String,
+        targetMode: BrowserMode,
+        targetTabId: String,
+        navigateFallback: (BrowserMode, String) -> Unit,
+    ) {
+        val selectedTargetAtomically =
+            targetMode == BrowserMode.REGULAR &&
+                newTabReturnHatchFeature.closeNewTabOnReturn().isEnabled() &&
+                tabAtomicOperations.deleteSelectedBlankTabAndSelectTarget(currentTabId, targetTabId)
+
+        if (!selectedTargetAtomically) {
+            navigateFallback(targetMode, targetTabId)
+        }
     }
 
     fun onFindInPageSelected() {

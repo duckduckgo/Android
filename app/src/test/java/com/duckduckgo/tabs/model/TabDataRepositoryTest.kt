@@ -62,6 +62,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNotSame
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -72,6 +73,7 @@ import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.isNull
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -408,6 +410,62 @@ class TabDataRepositoryTest {
         verify(mockDao).deleteTabAndUpdateSelection(any())
         assertNotSame(siteData, testee.retrieveSiteData(addedTabId))
         verify(mockTabVisitedSitesRepository).clearTab(addedTabId)
+    }
+
+    @Test
+    fun whenSelectedBlankTabIsDeletedAndTargetSelectedThenCachedStateIsCleared() = runTest {
+        whenever(mockDao.deleteSelectedBlankTabAndSelectTarget("current", "target")).thenReturn(true)
+        val testee = tabDataRepository(
+            webViewPreviewPersister = mockWebViewPreviewPersister,
+            faviconManager = mockFaviconManager,
+        )
+        val siteData = testee.retrieveSiteData("current")
+        val site = site("https://example.com", "Example")
+        testee.update("current", site)
+
+        assertTrue(testee.deleteSelectedBlankTabAndSelectTarget("current", "target"))
+
+        verify(mockDao).deleteSelectedBlankTabAndSelectTarget("current", "target")
+        verify(mockWebViewSessionStorage).deleteSession("current")
+        verify(mockAdClickManager).clearTabId("current")
+        verify(mockWebViewPreviewPersister).deletePreviewsForTab("current", null)
+        verify(mockFaviconManager).deleteOldTempFavicon("current", null)
+        verify(mockDuckChatContextualDataStore).clearTabChatUrl("current")
+        assertNotSame(siteData, testee.retrieveSiteData("current"))
+        testee.update("current", site)
+        verify(mockDao, times(2)).updateUrlAndTitle("current", "https://example.com", "Example", true)
+    }
+
+    @Test
+    fun whenSelectedBlankTabDeletionIsRejectedThenStateIsNotCleared() = runTest {
+        whenever(mockDao.deleteSelectedBlankTabAndSelectTarget("current", "target")).thenReturn(false)
+        val testee = tabDataRepository(
+            webViewPreviewPersister = mockWebViewPreviewPersister,
+            faviconManager = mockFaviconManager,
+        )
+        val siteData = testee.retrieveSiteData("current")
+        val site = site("https://example.com", "Example")
+        testee.update("current", site)
+
+        assertFalse(testee.deleteSelectedBlankTabAndSelectTarget("current", "target"))
+
+        verifyNoDeletedTabCleanup("current")
+        assertSame(siteData, testee.retrieveSiteData("current"))
+        testee.update("current", site)
+        verify(mockDao, times(1)).updateUrlAndTitle("current", "https://example.com", "Example", true)
+    }
+
+    @Test
+    fun whenSelectedBlankTabDeletionThrowsThenStateIsNotCleared() = runTest {
+        whenever(mockDao.deleteSelectedBlankTabAndSelectTarget("current", "target")).thenThrow(IllegalStateException())
+        val testee = tabDataRepository(
+            webViewPreviewPersister = mockWebViewPreviewPersister,
+            faviconManager = mockFaviconManager,
+        )
+
+        assertFalse(testee.deleteSelectedBlankTabAndSelectTarget("current", "target"))
+
+        verifyNoDeletedTabCleanup("current")
     }
 
     @Test
@@ -1027,6 +1085,16 @@ class TabDataRepositoryTest {
             .thenReturn(MutableLiveData())
 
         return mockDao
+    }
+
+    private suspend fun verifyNoDeletedTabCleanup(tabId: String) {
+        verify(mockWebViewSessionStorage, never()).deleteSession(tabId)
+        verify(mockAdClickManager, never()).clearTabId(tabId)
+        verify(mockWebViewPreviewPersister, never()).deletePreviewsForTab(tabId, null)
+        verify(mockFaviconManager, never()).deleteOldTempFavicon(tabId, null)
+        verify(mockDuckChatContextualDataStore, never()).clearTabChatUrl(tabId)
+        verify(mockTabVisitedSitesRepository, never()).clearTab(tabId)
+        verify(mockNativeInputStatePublisher, never()).clearTab(tabId)
     }
 
     private fun now(): LocalDateTime {

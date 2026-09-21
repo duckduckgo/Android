@@ -3874,11 +3874,19 @@ class BrowserTabFragment :
                     if (newTabReturnHatchView.isDuckChat) {
                         duckChat.reportDuckChatEntry(DuckChatEntryPoint.RETURN_TO_CHAT_CARD, opensNewTab = false, hasPrompt = false)
                     }
-                    browserActivity?.openExistingTabInMode(
-                        newTabReturnHatchView.targetMode,
-                        newTabReturnHatchView.tabId,
-                        BrowserModeSwitchSource.ESCAPE_HATCH,
-                    )
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        viewModel.returnToHatch(
+                            tabId,
+                            newTabReturnHatchView.targetMode,
+                            newTabReturnHatchView.tabId,
+                        ) { targetMode, targetTabId ->
+                            browserActivity?.openExistingTabInMode(
+                                targetMode,
+                                targetTabId,
+                                BrowserModeSwitchSource.ESCAPE_HATCH,
+                            )
+                        }
+                    }
                 }
 
                 override fun onHatchRendered(visible: Boolean) {
