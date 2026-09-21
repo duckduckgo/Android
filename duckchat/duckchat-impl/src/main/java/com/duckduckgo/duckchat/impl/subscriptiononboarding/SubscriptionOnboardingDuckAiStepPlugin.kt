@@ -22,6 +22,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
+import com.duckduckgo.subscriptions.api.SubscriptionOnboardingSummaryEntry
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
@@ -35,6 +36,11 @@ class SubscriptionOnboardingDuckAiStepPlugin @Inject constructor(
     override val stepId: String = DUCK_AI_STEP_ID
 
     override val titleResId: Int = R.string.subscriptionOnboardingDuckAiTitle
+
+    override val summaryEntry = SubscriptionOnboardingSummaryEntry(
+        labelResId = R.string.subscriptionOnboardingCompletionDuckAiTitle,
+        pendingIconResId = R.drawable.duckduckgo_ai_grayscale_color_24,
+    )
 
     override suspend fun shouldShow(): Boolean = duckChat.isEnabled()
 

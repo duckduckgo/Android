@@ -28,14 +28,19 @@ import com.duckduckgo.duckchat.impl.models.UserTier
 import com.duckduckgo.duckchat.impl.subscriptiononboarding.SubscriptionOnboardingDuckAiStepPlugin.Companion.DUCK_AI_STEP_ID
 import com.duckduckgo.duckchat.impl.subscriptiononboarding.SubscriptionOnboardingDuckAiViewModel
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController
+import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.COMPLETED
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.SKIPPED
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 class SubscriptionOnboardingDuckAiViewModelTest {
@@ -167,15 +172,30 @@ class SubscriptionOnboardingDuckAiViewModelTest {
     }
 
     @Test
-    fun whenStartClickedThenSelectedModelPersistedDuckChatOpenedAndOnboardingExited() = runTest {
+    fun whenStartClickedThenSelectedModelPersistedAndStepCompletedWithHandoff() = runTest {
         val plus = model(id = "plus1", name = "GPT-5.4", tiers = listOf("plus"))
         val testee = createViewModel(models = listOf(plus))
 
         testee.onStartClicked()
 
         verify(modelManager).selectModel(plus)
+        verify(controller).onStepFinished(eq(DUCK_AI_STEP_ID), eq(COMPLETED), any())
+        // Duck.ai only opens once the host runs the hand-off, after the completion summary has been shown.
+        verifyNoInteractions(duckChat)
+    }
+
+    @Test
+    fun whenStartClickedThenHandoffOpensDuckChatFromSubscriptionOnboarding() = runTest {
+        val plus = model(id = "plus1", name = "GPT-5.4", tiers = listOf("plus"))
+        val testee = createViewModel(models = listOf(plus))
+
+        testee.onStartClicked()
+
+        val handoff = argumentCaptor<() -> Unit>()
+        verify(controller).onStepFinished(eq(DUCK_AI_STEP_ID), eq(COMPLETED), handoff.capture())
+        handoff.firstValue.invoke()
+
         verify(duckChat).openDuckChat(SUBSCRIPTION_ONBOARDING)
-        verify(controller).exitOnboarding()
     }
 
     private fun createViewModel(

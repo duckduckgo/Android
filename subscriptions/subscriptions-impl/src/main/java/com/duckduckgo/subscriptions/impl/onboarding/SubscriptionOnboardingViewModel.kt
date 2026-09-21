@@ -19,6 +19,7 @@ package com.duckduckgo.subscriptions.impl.onboarding
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
 import com.duckduckgo.onboarding.api.LinearOnboardingState
@@ -32,12 +33,14 @@ import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingPlanPr
 import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStepStore
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Drives the native subscription onboarding: starts the plugin-built plan on the shared
@@ -67,6 +70,11 @@ class SubscriptionOnboardingViewModel @Inject constructor(
     // Mirrors the current step's InProgress.canGoBack; decides back vs exit on a Back event.
     private var canGoBack = false
 
+    // Set by a step that asked to hand the user to its feature. Held until the following step has been on
+    // screen long enough to be read, then run as onboarding finishes.
+    private var pendingHandoff: (() -> Unit)? = null
+    private val handoffJob = ConflatedJob()
+
     fun start() {
         if (started) return
         started = true
@@ -88,8 +96,9 @@ class SubscriptionOnboardingViewModel @Inject constructor(
             is LinearOnboardingState.InProgress -> {
                 val step = state.currentStep
                 if (step is SubscriptionOnboardingActivityStep) {
-                    canGoBack = state.canGoBack
-                    _commands.send(Command.ShowStep(step.stepPlugin, state.canGoBack))
+                    canGoBack = state.canGoBack && step.stepPlugin.allowsBackNavigation
+                    _commands.send(Command.ShowStep(step.stepPlugin, canGoBack))
+                    scheduleHandoffIfPending()
                 }
             }
             is LinearOnboardingState.Completed -> _commands.send(Command.FinishToSettings)
@@ -103,18 +112,44 @@ class SubscriptionOnboardingViewModel @Inject constructor(
                 if (event.outcome == SubscriptionOnboardingStepOutcome.COMPLETED) {
                     stepStore.setCompleted(event.stepId)
                 }
+                event.handoff?.let { pendingHandoff = it }
                 orchestrator.onEvent(StepFinished(event.stepId, event.outcome))
             }
             SubscriptionOnboardingController.Event.Back -> {
+                // An explicit tap wins over the pending hand-off: the user chose to leave.
+                cancelHandoff()
                 if (canGoBack) {
                     orchestrator.onEvent(BackPressed)
                 } else {
-                    // First step: nothing to go back to, so exit to app settings.
+                    // Either the first step, with nothing behind it, or a terminal one that refuses back.
                     // TODO: return to the launch source once a subscription-settings entry point exists.
                     _commands.send(Command.FinishToSettings)
                 }
             }
-            SubscriptionOnboardingController.Event.Exit -> _commands.send(Command.Finish)
+            SubscriptionOnboardingController.Event.Exit -> {
+                cancelHandoff()
+                _commands.send(Command.Finish)
+            }
         }
+    }
+
+    private fun scheduleHandoffIfPending() {
+        val handoff = pendingHandoff ?: return
+        pendingHandoff = null
+        handoffJob += viewModelScope.launch {
+            delay(HANDOFF_DELAY)
+            handoff()
+            _commands.send(Command.Finish)
+        }
+    }
+
+    private fun cancelHandoff() {
+        pendingHandoff = null
+        handoffJob.cancel()
+    }
+
+    companion object {
+        // Long enough to read the completion summary before the hand-off takes over.
+        private val HANDOFF_DELAY = 3.seconds
     }
 }
