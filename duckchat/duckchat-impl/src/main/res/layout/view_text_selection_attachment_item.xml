@@ -27,16 +27,15 @@
     android:orientation="horizontal"
     android:paddingStart="@dimen/keyline_2"
     android:paddingEnd="@dimen/keyline_3"
-    android:paddingTop="@dimen/keyline_2"
-    android:paddingBottom="@dimen/keyline_2">
+    android:paddingTop="@dimen/keyline_1"
+    android:paddingBottom="@dimen/keyline_1">
 
     <ImageView
         android:id="@+id/textSelectionIcon"
-        android:layout_width="@dimen/keyline_5"
-        android:layout_height="@dimen/keyline_5"
+        android:layout_width="@dimen/keyline_6"
+        android:layout_height="@dimen/keyline_6"
         android:importantForAccessibility="no"
-        android:scaleType="fitCenter"
-        app:srcCompat="@drawable/ic_text_select_16" />
+        app:srcCompat="@drawable/ic_text_select_color_24" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/textSelectionTitle"
