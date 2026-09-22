@@ -355,18 +355,12 @@
     "eventHubAttributionPeriod": {
         "key": "attributionPeriod",
         "type": "integer",
-        "description": "Unix timestamp (UTC) denoting the start of the measurement period"
+        "description": "Unix timestamp (UTC seconds) denoting the start of the measurement period"
     },
     "eventHubBucketedCount": {
         "key": "count",
         "type": "string",
-        "description": "Bucketed count for the period",
-        "pattern": "^\\d+(-\\d+|\\+)?$"
-    },
-    "eventHubAdwallDetectionCount": {
-        "key": "count",
-        "type": "string",
-        "description": "Bucketed adwall detection count for the period",
+        "description": "Bucketed count for the period. Bucket boundaries are set by the eventHub remote config",
         "pattern": "^\\d+(-\\d+|\\+)?$"
     }
 }
