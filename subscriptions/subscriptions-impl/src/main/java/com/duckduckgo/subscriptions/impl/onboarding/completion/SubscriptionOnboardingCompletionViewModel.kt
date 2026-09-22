@@ -61,9 +61,8 @@ class SubscriptionOnboardingCompletionViewModel @Inject constructor(
     data class ViewState(
         val rows: List<SummaryRow> = emptyList(),
         val completionPercentage: Int = 0,
-        // When true this summary is a brief hand-off before a feature opens (e.g. Duck.ai): the view keeps
-        // that feature's header and hides the action button, rather than showing the terminal summary.
         val handoff: Boolean = false,
+        val celebratory: Boolean = false,
     )
 
     data class SummaryRow(
@@ -129,11 +128,13 @@ class SubscriptionOnboardingCompletionViewModel @Inject constructor(
             }
 
         val rows = if (pirEntitled) stepRows + pirRow() else stepRows
+        val percentage = rows.completionPercentage()
 
         return ViewState(
             rows = rows,
-            completionPercentage = rows.completionPercentage(),
+            completionPercentage = percentage,
             handoff = handoffState.isHandoff,
+            celebratory = !handoffState.isHandoff && percentage == 100,
         )
     }
 
