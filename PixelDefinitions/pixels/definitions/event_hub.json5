@@ -1,15 +1,17 @@
 {
-    "webTelemetry_adwallDetection_day": {
+    "webTelemetry_adwalls_day": {
         "description": "Daily bucketed count of adwall detections across all pages. Fired by the eventHub feature at the end of each 1-day measurement period.",
         "owners": ["GuiltyDolphin"],
         "triggers": ["other"],
-        "parameters": ["eventHubBucketedCount", "eventHubAttributionPeriod"]
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubAdwallCount", "eventHubAttributionPeriod"]
     },
-    "webTelemetry_adwallDetection_week": {
+    "webTelemetry_adwalls_week": {
         "description": "Weekly bucketed count of adwall detections across all pages. Fired by the eventHub feature at the end of each 7-day measurement period.",
         "owners": ["GuiltyDolphin"],
         "triggers": ["other"],
-        "parameters": ["eventHubBucketedCount", "eventHubAttributionPeriod"]
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubAdwallCount", "eventHubAttributionPeriod"]
     },
     "webTelemetry_captcha_recaptcha_day": {
         "description": "Daily bucketed count of page loads where a Google reCAPTCHA challenge was detected. Fired by the eventHub feature at the end of each 1-day measurement period.",
@@ -164,5 +166,64 @@
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "eventHub_baseline_day": {
+        "description": "Daily bucketed count of periods in which EventHub ran at all. Serves as the denominator for the other eventHub telemetry — it counts nothing beyond the period itself. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBaseline", "eventHubAttributionPeriod"]
+    },
+    "eventHub_baseline_week": {
+        "description": "Weekly bucketed count of periods in which EventHub ran at all. Serves as the denominator for the other eventHub telemetry — it counts nothing beyond the period itself. Fired by the eventHub feature at the end of each 7-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBaseline", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_admiralAdwalls_day": {
+        "description": "Daily bucketed count of Admiral-served adwall detections across all pages. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubAdmiralAdwallCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_admiralAdwalls_week": {
+        "description": "Weekly bucketed count of Admiral-served adwall detections across all pages. Fired by the eventHub feature at the end of each 7-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubAdmiralAdwallCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_video_unavailable_day": {
+        "description": "Daily bucketed count of page loads where a video was unavailable. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    "webTelemetry_video_unavailable_week": {
+        "description": "Weekly bucketed count of page loads where a video was unavailable. Fired by the eventHub feature at the end of each 7-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
+    },
+    // Android aggregates every YouTube interference signal into one pixel, one parameter per
+    // signal, where iOS, macOS and Windows fire five separate `webTelemetry_youtube_*_day` pixels.
+    "webTelemetry_youtubeInterference_day": {
+        "description": "Daily bucketed counts of YouTube interference detections, one parameter per signal. Fired by the eventHub feature at the end of each 1-day measurement period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            "eventHubYoutubeVideoAdCount",
+            "eventHubYoutubeStaticAdCount",
+            "eventHubYoutubePlayabilityErrorCount",
+            "eventHubYoutubeAdBlockerCount",
+            "eventHubYoutubeBufferingCount",
+            "eventHubAttributionPeriod"
+        ]
     }
 }
