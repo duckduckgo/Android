@@ -209,8 +209,7 @@
         "suffixes": ["form_factor"],
         "parameters": ["appVersion", "eventHubBucketedCount", "eventHubAttributionPeriod"]
     },
-    // Android aggregates every YouTube interference signal into one pixel, one parameter per
-    // signal, where iOS, macOS and Windows fire five separate `webTelemetry_youtube_*_day` pixels.
+    // One pixel carries every YouTube interference signal, one parameter per signal.
     "webTelemetry_youtubeInterference_day": {
         "description": "Daily bucketed counts of YouTube interference detections, one parameter per signal. Fired by the eventHub feature at the end of each 1-day measurement period.",
         "owners": ["GuiltyDolphin"],
