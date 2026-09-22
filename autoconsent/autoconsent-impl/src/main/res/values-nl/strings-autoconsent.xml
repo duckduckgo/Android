@@ -29,7 +29,7 @@
     <string name="autoconsentPromptFootnote">Je kunt dit altijd later aanpassen in Instellingen.</string>
     <string name="autoconsentPromptCpmOnMessage">Sommige cookies kunnen niet worden afgewezen. We kunnen deze voor je accepteren.</string>
     <string name="autoconsentPromptCpmOnPrimaryButton">Accepteer cookies voor me</string>
-    <string name="autoconsentPromptCpmOnPrimaryButtonV2">Wijs af waar mogelijk of accepteer voor mij</string>
+    <string name="autoconsentPromptCpmOnPrimaryButtonV2">Wijs zo mogelijk af of accepteer voor mij</string>
     <string name="autoconsentPromptCpmOnSecondaryButton">Ik accepteer ze zelf</string>
     <string name="autoconsentPromptCpmOffMessage">Wij regelen het voor je. We wijzen cookies af waar mogelijk en accepteren cookies die niet kunnen worden afgewezen.</string>
     <string name="autoconsentPromptCpmOffPrimaryButton">Wijs af waar mogelijk of accepteer voor mij</string>
