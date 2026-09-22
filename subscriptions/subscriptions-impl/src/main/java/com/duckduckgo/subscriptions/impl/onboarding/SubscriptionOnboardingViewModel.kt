@@ -58,7 +58,11 @@ class SubscriptionOnboardingViewModel @Inject constructor(
 ) : ViewModel() {
 
     sealed interface Command {
-        data class ShowStep(val stepPlugin: SubscriptionOnboardingStepPlugin, val canGoBack: Boolean) : Command
+        data class ShowStep(
+            val stepPlugin: SubscriptionOnboardingStepPlugin,
+            val canGoBack: Boolean,
+            val showNavigationIcon: Boolean = true,
+        ) : Command
         data object FinishToSettings : Command
         data object Finish : Command
     }
@@ -98,7 +102,8 @@ class SubscriptionOnboardingViewModel @Inject constructor(
                 val step = state.currentStep
                 if (step is SubscriptionOnboardingActivityStep) {
                     canGoBack = state.canGoBack && step.stepPlugin.allowsBackNavigation
-                    _commands.send(Command.ShowStep(step.stepPlugin, canGoBack))
+                    // The hand-off summary auto-advances, so it shows no toolbar icon to dismiss it.
+                    _commands.send(Command.ShowStep(step.stepPlugin, canGoBack, showNavigationIcon = !handoffState.isHandoff))
                     scheduleHandoffIfPending()
                 }
             }
@@ -154,6 +159,6 @@ class SubscriptionOnboardingViewModel @Inject constructor(
 
     companion object {
         // Long enough to read the completion summary before the hand-off takes over.
-        private val HANDOFF_DELAY = 3.seconds
+        private val HANDOFF_DELAY = 2.5.seconds
     }
 }

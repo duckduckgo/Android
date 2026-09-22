@@ -83,6 +83,20 @@ class SubscriptionOnboardingViewModelTest {
     }
 
     @Test
+    fun whenHandoffThenStepShownWithoutNavigationIcon() = runTest {
+        handoffState.isHandoff = true
+        orchestrator.stateFlow.value = inProgressState(canGoBack = false, stepPlugin = stepPluginMock())
+        val testee = createViewModel()
+        testee.start()
+
+        testee.commands.test {
+            val command = awaitItem() as SubscriptionOnboardingViewModel.Command.ShowStep
+            assertFalse(command.showNavigationIcon)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenCompletedThenFinishesToSettings() = runTest {
         orchestrator.stateFlow.value = LinearOnboardingState.Completed(rootPlanId = SUBSCRIPTION_ONBOARDING_PLAN_ID)
         val testee = createViewModel()
