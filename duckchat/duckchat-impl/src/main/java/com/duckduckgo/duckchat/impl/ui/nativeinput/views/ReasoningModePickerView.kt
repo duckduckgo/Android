@@ -32,6 +32,7 @@ import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.common.ui.menu.applyMenuRadiusClipping
 import com.duckduckgo.common.ui.view.divider.HorizontalDivider
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.ViewViewModelFactory
@@ -169,6 +170,7 @@ class ReasoningModePickerView @JvmOverloads constructor(
         val container = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
             setBackgroundResource(com.duckduckgo.mobile.android.R.drawable.popup_menu_bg)
+            applyMenuRadiusClipping()
         }
         val popup = PopupWindow(
             ScrollView(context).apply {

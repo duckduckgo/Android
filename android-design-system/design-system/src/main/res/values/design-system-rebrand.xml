@@ -50,6 +50,8 @@
     <attr name="daxDialogRadius" format="dimension" />
     <attr name="daxSheetRadius" format="dimension" />
     <attr name="daxLargeSheetRadius" format="dimension" />
+    <attr name="daxMenuRadius" format="dimension" />
+    <attr name="daxMenuClipToOutline" format="boolean" />
     <attr name="daxOnboardingSheetRadius" format="dimension" />
     <attr name="daxInfoPanelRadius" format="dimension" />
     <attr name="daxMessageCtaCloseButtonSize" format="dimension" />
@@ -185,6 +187,8 @@
         <item name="daxDialogRadius">@dimen/rebrandContainerRadius</item>
         <item name="daxSheetRadius">@dimen/rebrandContainerRadius</item>
         <item name="daxLargeSheetRadius">@dimen/rebrandContainerRadius</item>
+        <item name="daxMenuRadius">@dimen/largeShapeCornerRadius</item>
+        <item name="daxMenuClipToOutline">true</item>
         <item name="daxOnboardingSheetRadius">@dimen/rebrandContainerRadius</item>
         <item name="daxInfoPanelRadius">@dimen/rebrandContainerRadius</item>
         <item name="daxMessageCtaCloseButtonSize">@dimen/rebrandMessageCtaCloseButtonSize</item>

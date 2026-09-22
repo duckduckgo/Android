@@ -239,6 +239,8 @@ class ThemingRebrandOverlayTest {
         assertEquals(28f, resolveDimension(activity, R.attr.daxDialogRadius), 0f)
         assertEquals(28f, resolveDimension(activity, R.attr.daxSheetRadius), 0f)
         assertEquals(28f, resolveDimension(activity, R.attr.daxLargeSheetRadius), 0f)
+        assertEquals(16f, resolveDimension(activity, R.attr.daxMenuRadius), 0f)
+        assertTrue(resolveBoolean(activity, R.attr.daxMenuClipToOutline))
         assertEquals(28f, resolveDimension(activity, R.attr.daxOnboardingSheetRadius), 0f)
         assertEquals(28f, resolveDimension(activity, R.attr.daxInfoPanelRadius), 0f)
         assertEquals(48f, resolveDimension(activity, R.attr.daxMessageCtaCloseButtonSize), 0f)
@@ -258,6 +260,8 @@ class ThemingRebrandOverlayTest {
         assertEquals(12f, resolveDimension(activity, R.attr.daxDialogRadius), 0f)
         assertEquals(12f, resolveDimension(activity, R.attr.daxSheetRadius), 0f)
         assertEquals(16f, resolveDimension(activity, R.attr.daxLargeSheetRadius), 0f)
+        assertEquals(8f, resolveDimension(activity, R.attr.daxMenuRadius), 0f)
+        assertFalse(resolveBoolean(activity, R.attr.daxMenuClipToOutline))
         assertEquals(36f, resolveDimension(activity, R.attr.daxOnboardingSheetRadius), 0f)
         assertEquals(8f, resolveDimension(activity, R.attr.daxInfoPanelRadius), 0f)
         assertEquals(40f, resolveDimension(activity, R.attr.daxMessageCtaCloseButtonSize), 0f)
@@ -282,6 +286,8 @@ class ThemingRebrandOverlayTest {
             R.attr.daxDialogRadius,
             R.attr.daxSheetRadius,
             R.attr.daxLargeSheetRadius,
+            R.attr.daxMenuRadius,
+            R.attr.daxMenuClipToOutline,
             R.attr.daxOnboardingSheetRadius,
             R.attr.daxInfoPanelRadius,
             R.attr.daxMessageCtaCloseButtonSize,
@@ -305,6 +311,8 @@ class ThemingRebrandOverlayTest {
             assertEquals(28f, resolveDimension(activity, R.attr.daxDialogRadius), 0f)
             assertEquals(28f, resolveDimension(activity, R.attr.daxSheetRadius), 0f)
             assertEquals(28f, resolveDimension(activity, R.attr.daxLargeSheetRadius), 0f)
+            assertEquals(16f, resolveDimension(activity, R.attr.daxMenuRadius), 0f)
+            assertTrue(resolveBoolean(activity, R.attr.daxMenuClipToOutline))
             assertEquals(28f, resolveDimension(activity, R.attr.daxOnboardingSheetRadius), 0f)
             assertEquals(28f, resolveDimension(activity, R.attr.daxInfoPanelRadius), 0f)
             assertEquals(48f, resolveDimension(activity, R.attr.daxMessageCtaCloseButtonSize), 0f)
@@ -340,6 +348,8 @@ class ThemingRebrandOverlayTest {
         assertEquals(28f, resolveDimension(activity, R.attr.daxDialogRadius), 0f)
         assertEquals(28f, resolveDimension(activity, R.attr.daxSheetRadius), 0f)
         assertEquals(28f, resolveDimension(activity, R.attr.daxLargeSheetRadius), 0f)
+        assertEquals(16f, resolveDimension(activity, R.attr.daxMenuRadius), 0f)
+        assertTrue(resolveBoolean(activity, R.attr.daxMenuClipToOutline))
         assertEquals(28f, resolveDimension(activity, R.attr.daxOnboardingSheetRadius), 0f)
         assertEquals(28f, resolveDimension(activity, R.attr.daxInfoPanelRadius), 0f)
         assertEquals(48f, resolveDimension(activity, R.attr.daxMessageCtaCloseButtonSize), 0f)
