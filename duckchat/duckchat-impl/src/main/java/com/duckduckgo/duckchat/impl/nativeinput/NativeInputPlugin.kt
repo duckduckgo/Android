@@ -45,6 +45,10 @@ interface NativeInputHost {
     fun showAttachmentChooser(showing: Boolean)
     fun showModelPicker(showing: Boolean)
     fun showReasoningPicker(showing: Boolean)
+
+    /** Focus the input field, expanding the bottom row so a plugin popup (e.g. the model picker) can anchor to it. */
+    fun requestInputFocus()
+
     fun attachmentChanged(hasStandaloneAttachments: Boolean, limitExceeded: Boolean, supportsUpload: Boolean)
 
     /**

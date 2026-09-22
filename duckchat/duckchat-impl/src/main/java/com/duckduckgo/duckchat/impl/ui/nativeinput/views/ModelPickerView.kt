@@ -62,11 +62,7 @@ import javax.inject.Inject
 
 interface ModelPicker {
 
-    fun setPickerEnabled(enabled: Boolean)
     fun setHost(host: NativeInputHost)
-
-    /** Programmatically open the selection list (FE recovery: showModelPicker). */
-    fun openPicker()
 
     /** True if a model was picked during the current recovery window (set synchronously on tap). */
     fun hasPendingRecoverySelection(): Boolean
@@ -94,6 +90,7 @@ class ModelPickerView @JvmOverloads constructor(
     private var inputContextJob: Job? = null
     private var commandJob: Job? = null
     private var modelChangeJob: Job? = null
+    private var showPickerJob: Job? = null
     private var popupWindow: PopupWindow? = null
     private var lastNativeInputState: NativeInputState? = null
 
@@ -106,23 +103,17 @@ class ModelPickerView @JvmOverloads constructor(
         inflate(context, R.layout.view_model_picker, this)
     }
 
-    private var pickerEnabled = false
-
     var isEditMode: Boolean = false
-
-    override fun setPickerEnabled(enabled: Boolean) {
-        this.pickerEnabled = enabled
-        if (isAttachedToWindow) updateVisibility()
-    }
 
     override fun setHost(host: NativeInputHost) {
         this.host = host
     }
 
     private fun updateVisibility() {
+        val enabled = lastNativeInputState?.let { it.modelPickerEnabled || it.modelChangeMode } ?: false
         val show = shouldShowModelPicker(
             nativeInputState = lastNativeInputState,
-            pickerEnabled = pickerEnabled,
+            pickerEnabled = enabled,
             hasModels = viewModel.state.value.models.isNotEmpty(),
             isEditMode = isEditMode,
         )
@@ -182,11 +173,26 @@ class ModelPickerView @JvmOverloads constructor(
                 }
             }
             .launchIn(scope)
+
+        // FE recovery: open on every event (not on a modelChangeMode transition) so a repeated tap
+        // re-opens after a dismissal. Filter to this widget's tab; the event carries the tabId.
+        showPickerJob?.cancel()
+        showPickerJob = viewModel.showPickerEvents
+            .onEach { tabId ->
+                if (tabId == host.tabId()) {
+                    host.requestInputFocus()
+                    openPicker()
+                }
+            }
+            .launchIn(scope)
     }
 
     override fun hasPendingRecoverySelection(): Boolean = viewModel.hasPendingRecoverySelection()
 
-    override fun openPicker() {
+    // FE recovery "Switch Model": the picker chip lives in the bottom row, only laid out while the input
+    // is focused. On an ongoing chat opened from history the input is unfocused so the chip is GONE and
+    // doOnLayout would never fire, so the host is asked to focus first (see observeShowPickerEvents).
+    private fun openPicker() {
         if (!isAttachedToWindow) return
         chip.doOnLayout { if (isAttachedToWindow) showMenu() }
     }
@@ -276,6 +282,8 @@ class ModelPickerView @JvmOverloads constructor(
         commandJob = null
         modelChangeJob?.cancel()
         modelChangeJob = null
+        showPickerJob?.cancel()
+        showPickerJob = null
         lastNativeInputState = null
         dismissPopup()
     }
