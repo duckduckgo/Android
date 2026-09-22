@@ -121,7 +121,7 @@ class RealDuckChatContextual @Inject constructor(
         val content = popup.contentView
         popup.onMenuItemClicked(content.findViewById(R.id.contextualChatMenuNewChat)) {
             duckChatPixels.reportContextualAddressBarMenuNewChatSelected()
-            openNewChatTab(activity, sourceTabId)
+            openNewChatTab(activity, sourceTabId, sourceUrl)
         }
         val askItem = content.findViewById<PopupMenuItemView>(R.id.contextualChatMenuAskAboutPage)
         if (sourceUrl == null) {
@@ -170,9 +170,9 @@ class RealDuckChatContextual @Inject constructor(
             .show(fragmentManager, DuckChatContextualEntryDialog.TAG)
     }
 
-    private fun openNewChatTab(activity: Activity, sourceTabId: String) {
+    private fun openNewChatTab(activity: Activity, sourceTabId: String, sourceUrl: String?) {
         val url = duckChatInternal.getDuckChatUrl(query = "", autoPrompt = false)
-        duckChatInternal.reportDuckChatEntry(DuckChatEntryPoint.CONTEXTUAL_CHAT, opensNewTab = true, hasPrompt = false)
+        duckChatInternal.reportDuckChatEntry(DuckChatEntryPoint.ADDRESS_BAR_ICON, opensNewTab = sourceUrl != null, hasPrompt = false)
         browserNav.openInNewTab(activity, url, sourceTabId).also { activity.startActivity(it) }
     }
 
@@ -190,7 +190,6 @@ class RealDuckChatContextual @Inject constructor(
                 serializedPageContext = null,
             ),
         )
-        duckChatInternal.reportDuckChatEntry(DuckChatEntryPoint.CONTEXTUAL_CHAT, opensNewTab = false, hasPrompt = true)
         showChatSurface()
     }
 
