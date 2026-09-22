@@ -21,10 +21,6 @@ plugins {
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
-dependencies {
-    implementation project(path: ':browser-api')
-}
-
 android {
     namespace 'com.duckduckgo.tracker.detection.api'
 }

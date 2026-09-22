@@ -178,6 +178,7 @@ subprojects {
                                 && dependencyPath != ":js-messaging-api"
                                 && dependencyPath != ":browser-api"
                                 && dependencyPath != ":browser-mode-api"
+                                && dependencyPath != ":tracker-detection-api"
                         ) {
                             if (projectPath.endsWith(":feature-toggles-api") &&
                                     (dependencyPath == ":experiments-api"
