@@ -14,9 +14,22 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.tabs.model
+package com.duckduckgo.browser.ui.newtab.hatch
 
-interface TabAtomicOperations {
-    suspend fun replaceTabWithNewTab(tabId: String, url: String? = null)
-    suspend fun deleteSelectedBlankTabAndSelectTarget(currentTabId: String, targetTabId: String): Boolean
+import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
+
+@ContributesRemoteFeature(
+    scope = AppScope::class,
+    featureName = "newTabReturnHatch",
+)
+interface NewTabReturnHatchFeature {
+
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun self(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun closeNewTabOnReturn(): Toggle
 }

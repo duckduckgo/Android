@@ -255,6 +255,7 @@ import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.systemsearch.DeviceAppLookup
 import com.duckduckgo.app.tabs.model.AggregateTabProvider
 import com.duckduckgo.app.tabs.model.DuckAiTabSessionRepository
+import com.duckduckgo.app.tabs.model.TabAtomicOperations
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabPageContextRepository
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -294,6 +295,7 @@ import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.browser.ui.autocomplete.AutocompleteHistoryDeleteFeature
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
+import com.duckduckgo.browser.ui.newtab.hatch.NewTabReturnHatchFeature
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -473,6 +475,8 @@ class BrowserTabViewModelTest {
     private val mockOmnibarConverter: OmnibarEntryConverter = mock()
 
     private val mockTabRepository: TabRepository = mock()
+
+    private val mockTabAtomicOperations: TabAtomicOperations = mock()
 
     private val mockAggregateTabProvider: AggregateTabProvider = mock()
 
@@ -746,6 +750,7 @@ class BrowserTabViewModelTest {
     private var fakeFaviconFetchingFixFeature = FakeFeatureToggleFactory.create(FaviconFetchingFixFeature::class.java)
     private var fakeProgressBarUpgradeFeature = FakeFeatureToggleFactory.create(ProgressBarUpgradeFeature::class.java)
     private val fakeAutocompleteHistoryDeleteFeature = FakeFeatureToggleFactory.create(AutocompleteHistoryDeleteFeature::class.java)
+    private val fakeNewTabReturnHatchFeature = FakeFeatureToggleFactory.create(NewTabReturnHatchFeature::class.java)
     private val mockDesktopModeSettings: DesktopModeSettings = mock()
     private val fakeRememberDesktopModeFeature = FakeFeatureToggleFactory.create(RememberDesktopModeFeature::class.java)
     private val fakeSuggestRedirectFeature = FakeFeatureToggleFactory.create(SuggestRedirectOnUnresolvedErrorFeature::class.java)
@@ -990,6 +995,8 @@ class BrowserTabViewModelTest {
                 duckDuckGoUrlDetector = DuckDuckGoUrlDetectorImpl(),
                 siteFactory = siteFactory,
                 tabRepository = mockTabRepository,
+                tabAtomicOperations = mockTabAtomicOperations,
+                newTabReturnHatchFeature = fakeNewTabReturnHatchFeature,
                 userAllowListRepository = mockUserAllowListRepository,
                 networkLeaderboardDao = mockNetworkLeaderboardDao,
                 autoComplete = mockAutoCompleteApi,
@@ -1168,6 +1175,48 @@ class BrowserTabViewModelTest {
 
             verify(mockTabRepository).addNewTabAfterExistingTab(url, "abc")
         }
+
+    @Test
+    fun whenReturningToRegularHatchAndDefaultOnFeatureAndAtomicOperationSucceedsThenFallbackNavigationIsSuppressed() = runTest {
+        whenever(mockTabAtomicOperations.deleteSelectedBlankTabAndSelectTarget("current", "target")).thenReturn(true)
+        val navigations = mutableListOf<Pair<BrowserMode, String>>()
+
+        testee.returnToHatch("current", BrowserMode.REGULAR, "target") { mode, id -> navigations += mode to id }
+
+        verify(mockTabAtomicOperations).deleteSelectedBlankTabAndSelectTarget("current", "target")
+        assertTrue(navigations.isEmpty())
+    }
+
+    @Test
+    fun whenReturningToRegularHatchAndAtomicOperationIsRejectedThenFallbackNavigationUsesExactTarget() = runTest {
+        whenever(mockTabAtomicOperations.deleteSelectedBlankTabAndSelectTarget("current", "target")).thenReturn(false)
+        val navigations = mutableListOf<Pair<BrowserMode, String>>()
+
+        testee.returnToHatch("current", BrowserMode.REGULAR, "target") { mode, id -> navigations += mode to id }
+
+        assertEquals(listOf(BrowserMode.REGULAR to "target"), navigations)
+    }
+
+    @Test
+    fun whenReturningToRegularHatchAndFeatureIsDisabledThenFallbackUsesExactTargetWithoutAtomicDeletion() = runTest {
+        fakeNewTabReturnHatchFeature.closeNewTabOnReturn().setRawStoredState(State(enable = false))
+        val navigations = mutableListOf<Pair<BrowserMode, String>>()
+
+        testee.returnToHatch("current", BrowserMode.REGULAR, "target") { mode, id -> navigations += mode to id }
+
+        verifyNoInteractions(mockTabAtomicOperations)
+        assertEquals(listOf(BrowserMode.REGULAR to "target"), navigations)
+    }
+
+    @Test
+    fun whenReturningToFireHatchThenCleanupIsBypassedAndFallbackNavigationUsesExactTarget() = runTest {
+        val navigations = mutableListOf<Pair<BrowserMode, String>>()
+
+        testee.returnToHatch("current", BrowserMode.FIRE, "fire-target") { mode, id -> navigations += mode to id }
+
+        verifyNoInteractions(mockTabAtomicOperations)
+        assertEquals(listOf(BrowserMode.FIRE to "fire-target"), navigations)
+    }
 
     @Test
     fun whenViewBecomesVisibleAndHomeShowingThenKeyboardShown() =
