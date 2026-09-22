@@ -16,6 +16,8 @@
 
 package com.duckduckgo.app.anr.ndk
 
+import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.anr.CrashPixel.APPLICATION_CRASH_NATIVE
 import com.duckduckgo.app.anr.CrashPixel.APPLICATION_CRASH_NATIVE_HANDLER_REGISTERED
@@ -26,9 +28,13 @@ import com.duckduckgo.app.lifecycle.PirProcessLifecycleObserver
 import com.duckduckgo.app.lifecycle.VpnProcessLifecycleObserver
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.browser.api.WebViewVersionProvider
+import com.duckduckgo.common.utils.checkMainThread
 import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.library.loader.LibraryLoader
+import com.duckduckgo.library.loader.LibraryLoader.LibraryLoaderListener
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import logcat.LogPriority.ERROR
@@ -50,15 +56,16 @@ import javax.inject.Inject
 )
 @SingleInstanceIn(AppScope::class)
 class NativeCrashInit @Inject constructor(
+    private val context: Context,
     @param:IsMainProcess private val isMainProcess: Boolean,
     private val customTabDetector: CustomTabDetector,
     private val appBuildConfig: AppBuildConfig,
     private val nativeCrashFeature: NativeCrashFeature,
     private val webViewVersionProvider: WebViewVersionProvider,
-    private val pixel: Pixel,
     @param:ProcessName private val processName: String,
     private val crashpadInitializer: CrashpadInitializer,
-) : MainProcessLifecycleObserver, VpnProcessLifecycleObserver, PirProcessLifecycleObserver {
+    private val pixel: Pixel,
+) : MainProcessLifecycleObserver, VpnProcessLifecycleObserver, LibraryLoaderListener, PirProcessLifecycleObserver {
 
     private val isCustomTab: Boolean by lazy { customTabDetector.isCustomTab() }
 
@@ -72,9 +79,18 @@ class NativeCrashInit @Inject constructor(
 
     private val webViewPackage: String by lazy { webViewVersionProvider.getPackageName() }
 
+    private external fun jni_register_sighandler(
+        logLevel: Int,
+        appVersion: String,
+        processName: String,
+        isCustomTab: Boolean,
+        webViewPackage: String,
+        webViewVersion: String,
+    )
+
     override fun onCreate(owner: LifecycleOwner) {
         if (isMainProcess) {
-            initCrashpad()
+            initNativeCrashHandler()
         } else {
             logcat(ERROR) { "ndk-crash: onCreate wrongly called in a secondary process" }
         }
@@ -82,7 +98,7 @@ class NativeCrashInit @Inject constructor(
 
     override fun onVpnProcessCreated() {
         if (!isMainProcess) {
-            initCrashpad()
+            initNativeCrashHandler()
         } else {
             logcat(ERROR) { "ndk-crash: onVpnProcessCreated wrongly called in the main process" }
         }
@@ -90,16 +106,44 @@ class NativeCrashInit @Inject constructor(
 
     override fun onPirProcessCreated() {
         if (!isMainProcess) {
-            initCrashpad()
+            initNativeCrashHandler()
         } else {
             logcat(ERROR) { "ndk-crash: onPirProcessCreated wrongly called in the main process" }
         }
     }
 
-    private fun initCrashpad() {
+    private fun initNativeCrashHandler() {
         if (isMainProcess && !nativeCrashFeature.nativeCrashHandling().isEnabled()) return
         if (!isMainProcess && !nativeCrashFeature.nativeCrashHandlingSecondaryProcess().isEnabled()) return
 
+        if (nativeCrashFeature.useCrashpad().isEnabled()) {
+            initCrashpad()
+        } else {
+            LibraryLoader.loadLibrary(context, "crash-ndk", this)
+        }
+    }
+
+    override fun success() {
+        checkMainThread()
+
+        runCatching {
+            logcat(ERROR) { "ndk-crash: Library loaded in process $processName" }
+            val logLevel = if (appBuildConfig.isDebug || appBuildConfig.isInternalBuild()) {
+                Log.VERBOSE
+            } else {
+                Log.ASSERT
+            }
+            jni_register_sighandler(logLevel, appBuildConfig.versionName, processName, isCustomTab, webViewPackage, webViewVersion)
+        }.onFailure {
+            logcat(ERROR) { "ndk-crash: Error calling jni_register_sighandler: ${it.asLog()}" }
+        }
+    }
+
+    override fun failure(t: Throwable) {
+        logcat(ERROR) { "ndk-crash: error loading library in process $processName: ${t.asLog()}" }
+    }
+
+    private fun initCrashpad() {
         val initialized = runCatching {
             crashpadInitializer.initialize(
                 extraAnnotations = mapOf(
