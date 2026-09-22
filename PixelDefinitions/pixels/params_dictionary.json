@@ -351,5 +351,22 @@
         "type": "string",
         "description": "Version of the prompt exposure pixels, bumped whenever the meaning of a parameter or the session sampling rate changes.",
         "enum": ["1"]
+    },
+    "eventHubAttributionPeriod": {
+        "key": "attributionPeriod",
+        "type": "integer",
+        "description": "Unix timestamp (UTC) denoting the start of the measurement period"
+    },
+    "eventHubBucketedCount": {
+        "key": "count",
+        "type": "string",
+        "description": "Bucketed count for the period",
+        "pattern": "^\\d+(-\\d+|\\+)?$"
+    },
+    "eventHubAdwallDetectionCount": {
+        "key": "count",
+        "type": "string",
+        "description": "Bucketed adwall detection count for the period",
+        "pattern": "^\\d+(-\\d+|\\+)?$"
     }
 }
