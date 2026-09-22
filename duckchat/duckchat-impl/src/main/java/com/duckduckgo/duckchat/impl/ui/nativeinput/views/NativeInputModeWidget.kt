@@ -865,6 +865,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         hookClearButtonPixel()
         hookEditorActionPixels()
         inputField.doOnTextChanged { _, _, _, _ ->
+            viewModel.setHasText(inputField.text?.isNotBlank() == true)
             updateSendButtonVisibility()
             updateVoiceButtonVisibility()
             updateNewLineButtonVisibility()
@@ -1019,11 +1020,13 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun setVoiceSearchAvailable(available: Boolean) {
         voiceSearchAvailable = available
+        viewModel.setVoiceSearchAvailable(available)
         updateVoiceButtonVisibility()
     }
 
     override fun setVoiceChatAvailable(available: Boolean) {
         voiceChatAvailable = available
+        viewModel.setVoiceChatAvailable(available)
         updateVoiceButtonVisibility()
     }
 
@@ -1610,10 +1613,21 @@ class NativeInputModeWidget @JvmOverloads constructor(
         viewModel.setSelectedTool(null)
     }
 
+    // Re-push the widget-held gating values after configure() has set the active tab, so values known
+    // before configuration are not lost and a stale hasText cannot leak into the next tab (the widget
+    // instance is shared across tabs).
+    private fun publishGatingSnapshot() {
+        viewModel.setHasText(inputField.text?.isNotBlank() == true)
+        viewModel.setAttachmentState(hasAttachments = hasAttachments, limitExceeded = attachmentLimitExceeded)
+        viewModel.setVoiceSearchAvailable(voiceSearchAvailable)
+        viewModel.setVoiceChatAvailable(voiceChatAvailable)
+    }
+
     override fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean, forceImageGeneration: Boolean) {
         activeTabId = tabId
         doOnAttach {
             viewModel.configure(tabId, isDuckAiMode, isBottom, forceImageGeneration)
+            publishGatingSnapshot()
             if (isDuckAiMode) selectChatTab()
         }
     }
@@ -1623,6 +1637,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         isContextualWidget = true
         doOnAttach {
             viewModel.configureContextual(tabId)
+            publishGatingSnapshot()
             selectChatTab()
         }
     }
@@ -1631,6 +1646,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         isEditWidget = true
         doOnAttach {
             viewModel.configureForEdit(sessionId)
+            publishGatingSnapshot()
             selectChatTab()
         }
     }
@@ -2021,6 +2037,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val hadLimitError = attachmentLimitExceeded
         attachmentLimitExceeded = limitExceeded
         this.hasAttachments = hasAttachments
+        viewModel.setAttachmentState(hasAttachments = hasAttachments, limitExceeded = limitExceeded)
         if (hadLimitError != attachmentLimitExceeded && !isStreaming) {
             floatingSubmitContainer?.visibility = if (attachmentLimitExceeded) GONE else VISIBLE
         }

@@ -40,6 +40,21 @@ data class NativeInputState(
     /** Whether the model picker chip is enabled for this tab. */
     val modelPickerEnabled: Boolean = true,
 
+    /** True while the input field holds non-blank text. A boolean rather than the text, so it only flips on the blank boundary. */
+    val hasText: Boolean = false,
+
+    /** True while at least one attachment is staged for the next prompt. */
+    val hasAttachments: Boolean = false,
+
+    /** True when the staged attachments exceed the allowed limit, which blocks submission. */
+    val attachmentLimitExceeded: Boolean = false,
+
+    /** Whether the voice search entry point should be offered for this tab. */
+    val voiceSearchAvailable: Boolean = false,
+
+    /** Whether the voice chat entry point should be offered for this tab. */
+    val voiceChatAvailable: Boolean = false,
+
     /**  How much of the input field is locked (non-interactive + dimmed).*/
     val interactionLock: InteractionLock = InteractionLock.Unlocked,
 

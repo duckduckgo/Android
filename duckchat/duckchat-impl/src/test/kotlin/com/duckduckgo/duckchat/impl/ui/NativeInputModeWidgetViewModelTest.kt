@@ -1006,6 +1006,50 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
+    fun whenSetHasTextThenPublishedToActiveTabState() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+
+        viewModel.setHasText(true)
+        advanceUntilIdle()
+        assertTrue(nativeInputStateProvider.stateForTab("tab-A").value.hasText)
+
+        viewModel.setHasText(false)
+        advanceUntilIdle()
+        assertFalse(nativeInputStateProvider.stateForTab("tab-A").value.hasText)
+    }
+
+    @Test
+    fun whenSetAttachmentStateThenPublishedToActiveTabState() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+
+        viewModel.setAttachmentState(hasAttachments = true, limitExceeded = true)
+        advanceUntilIdle()
+
+        val state = nativeInputStateProvider.stateForTab("tab-A").value
+        assertTrue(state.hasAttachments)
+        assertTrue(state.attachmentLimitExceeded)
+    }
+
+    @Test
+    fun whenSetVoiceAvailabilityThenPublishedToActiveTabState() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+
+        viewModel.setVoiceSearchAvailable(true)
+        viewModel.setVoiceChatAvailable(true)
+        advanceUntilIdle()
+
+        val state = nativeInputStateProvider.stateForTab("tab-A").value
+        assertTrue(state.voiceSearchAvailable)
+        assertTrue(state.voiceChatAvailable)
+    }
+
+    @Test
     fun whenPromptSubmittedThenModelChangeModeClearedOnActiveTab() = runTest {
         val viewModel = createViewModel()
         viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
