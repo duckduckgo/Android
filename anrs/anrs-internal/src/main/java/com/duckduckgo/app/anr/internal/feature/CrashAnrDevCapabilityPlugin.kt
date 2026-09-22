@@ -14,19 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.anr
+package com.duckduckgo.app.anr.internal.feature
 
-import com.duckduckgo.common.utils.plugins.pixel.PixelRequiringAtbPlugin
+import android.content.Context
+import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
-class AnrCrashPixelsRequiringAtb @Inject constructor() : PixelRequiringAtbPlugin {
-    override fun names(): List<String> = listOf(
-        AnrPixelName.ANR_PIXEL.pixelName,
-        CrashPixel.APPLICATION_CRASH_GLOBAL.pixelName,
-        CrashPixel.APPLICATION_CRASH_GLOBAL_VERIFIED_INSTALL.pixelName,
-        CrashPixel.APPLICATION_CRASH_NATIVE.pixelName,
-    )
+@ContributesPluginPoint(AppScope::class)
+interface CrashAnrDevCapabilityPlugin {
+    fun title(): String
+    fun subtitle(): String
+    fun onCapabilityClicked(activityContext: Context)
 }
