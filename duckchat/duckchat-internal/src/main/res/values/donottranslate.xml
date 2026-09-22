@@ -7,4 +7,12 @@
     <string name="devSettingsDuckAiUrlSet">Custom Duck.ai URL set</string>
     <string name="devSettingsDuckAiUrlCleared">Duck.ai URL reset to default</string>
     <string name="devSettingsDuckAiUrlEmpty">Enter a URL</string>
+
+    <string name="devSettingsDuckAiUsageWarningsCapabilityTitle">Usage Warnings</string>
+    <string name="devSettingsDuckAiUsageWarningsCapabilitySubtitle">Inspect and reset native usage warning state</string>
+    <string name="devSettingsDuckAiUsageWarningsTitle">Duck.ai Usage Warnings</string>
+    <string name="devSettingsDuckAiUsageWarningsHighUsageDismissals">Dismissed high-usage models</string>
+    <string name="devSettingsDuckAiUsageWarningsNoDismissals">None</string>
+    <string name="devSettingsDuckAiUsageWarningsResetHighUsageDismissals">Reset high-usage dismissals</string>
+    <string name="devSettingsDuckAiUsageWarningsDismissalsReset">High-usage dismissals reset</string>
 </resources>
