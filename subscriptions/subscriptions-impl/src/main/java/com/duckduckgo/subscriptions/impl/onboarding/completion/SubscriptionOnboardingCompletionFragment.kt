@@ -33,6 +33,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.view.button.ButtonType.GHOST
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
+import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.listitem.OneLineListItem
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
@@ -84,6 +85,13 @@ class SubscriptionOnboardingCompletionFragment : DuckDuckGoFragment(R.layout.fra
             .launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
+    private fun applyHandoffHeader() = with(binding) {
+        subscriptionOnboardingCompletionIcon.setImageResource(R.drawable.duckai_ddg_feature_128)
+        subscriptionOnboardingCompletionTitle.setText(R.string.subscriptionOnboardingCompletionDuckAiTitle)
+        subscriptionOnboardingCompletionDescription.setText(R.string.subscriptionOnboardingCompletionDuckAiDescription)
+        subscriptionOnboardingCompletionPrimaryButton.gone()
+    }
+
     private fun processCommand(command: Command) {
         when (command) {
             Command.OpenPirDashboard -> globalActivityStarter.start(requireContext(), PirDashboardWebViewScreen)
@@ -97,6 +105,8 @@ class SubscriptionOnboardingCompletionFragment : DuckDuckGoFragment(R.layout.fra
     }
 
     private fun render(viewState: ViewState) {
+        if (viewState.handoff) applyHandoffHeader()
+
         if (viewState.rows.isEmpty()) return
 
         binding.subscriptionOnboardingCompletionPercentage.text =

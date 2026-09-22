@@ -28,6 +28,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingSummaryEntry
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.impl.R
+import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingHandoffState
 import com.duckduckgo.subscriptions.impl.onboarding.completion.SubscriptionOnboardingCompletionViewModel.Command
 import com.duckduckgo.subscriptions.impl.onboarding.completion.SubscriptionOnboardingCompletionViewModel.Companion.PIR_ROW_ID
 import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStepStore
@@ -139,6 +140,26 @@ class SubscriptionOnboardingCompletionViewModelTest {
     }
 
     @Test
+    fun whenHandoffThenViewStateIsHandoff() = runTest {
+        val testee = createViewModel(plugins = listOf(fakePlugin("vpn")), handoff = true)
+
+        testee.viewState().test {
+            assertTrue(awaitItem().handoff)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenNotHandoffThenViewStateIsNotHandoff() = runTest {
+        val testee = createViewModel(plugins = listOf(fakePlugin("vpn")))
+
+        testee.viewState().test {
+            assertFalse(awaitItem().handoff)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenDoneClickedThenOnboardingExited() = runTest {
         createViewModel().onDoneClicked()
 
@@ -187,6 +208,7 @@ class SubscriptionOnboardingCompletionViewModelTest {
     private fun createViewModel(
         plugins: List<SubscriptionOnboardingStepPlugin> = emptyList(),
         entitlements: List<Product> = emptyList(),
+        handoff: Boolean = false,
     ): SubscriptionOnboardingCompletionViewModel {
         whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(entitlements))
         return SubscriptionOnboardingCompletionViewModel(
@@ -197,6 +219,7 @@ class SubscriptionOnboardingCompletionViewModelTest {
             stepStore = stepStore,
             subscriptions = subscriptions,
             pirFeature = pirFeature,
+            handoffState = SubscriptionOnboardingHandoffState().apply { isHandoff = handoff },
         )
     }
 
