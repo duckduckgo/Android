@@ -26,7 +26,7 @@ package com.duckduckgo.dataclearing.api.toggles
  * Temporary: removed together with the legacy path once every source has shipped at 100%.
  */
 interface DataClearingModularization {
-    fun isPluginEnabled(source: DataClearingSource): Boolean
+    suspend fun isPluginEnabled(source: DataClearingSource): Boolean
 }
 
 enum class DataClearingSource {

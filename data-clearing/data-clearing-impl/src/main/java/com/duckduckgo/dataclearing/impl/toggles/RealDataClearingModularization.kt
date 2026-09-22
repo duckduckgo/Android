@@ -16,6 +16,7 @@
 
 package com.duckduckgo.dataclearing.impl.toggles
 
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.dataclearing.api.toggles.DataClearingModularization
 import com.duckduckgo.dataclearing.api.toggles.DataClearingSource
 import com.duckduckgo.dataclearing.api.toggles.DataClearingSource.APP_CACHE
@@ -32,16 +33,16 @@ import com.duckduckgo.dataclearing.api.toggles.DataClearingSource.WEB_STORAGE
 import com.duckduckgo.dataclearing.api.toggles.DataClearingSource.WEB_STORAGE_SINGLE_TAB
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 class RealDataClearingModularization @Inject constructor(
     private val feature: DataClearingModularizationFeature,
+    private val dispatcherProvider: DispatcherProvider,
 ) : DataClearingModularization {
-
-    override fun isPluginEnabled(source: DataClearingSource): Boolean {
-        if (!feature.self().isEnabled()) return false
-        return when (source) {
+    override suspend fun isPluginEnabled(source: DataClearingSource): Boolean = withContext(dispatcherProvider.io()) {
+        feature.self().isEnabled() && when (source) {
             NAVIGATION_HISTORY -> feature.navigationHistory()
             SAVED_SITES_PRUNE -> feature.savedSitesPrune()
             APP_CACHE -> feature.appCache()
