@@ -51,6 +51,7 @@
     <attr name="daxSheetRadius" format="dimension" />
     <attr name="daxLargeSheetRadius" format="dimension" />
     <attr name="daxMenuRadius" format="dimension" />
+    <attr name="daxSearchBarRadius" format="dimension" />
     <attr name="daxMenuClipToOutline" format="boolean" />
     <attr name="daxOnboardingSheetRadius" format="dimension" />
     <attr name="daxInfoPanelRadius" format="dimension" />
@@ -188,6 +189,7 @@
         <item name="daxSheetRadius">@dimen/rebrandContainerRadius</item>
         <item name="daxLargeSheetRadius">@dimen/rebrandContainerRadius</item>
         <item name="daxMenuRadius">@dimen/largeShapeCornerRadius</item>
+        <item name="daxSearchBarRadius">@dimen/rebrandInputRadius</item>
         <item name="daxMenuClipToOutline">true</item>
         <item name="daxOnboardingSheetRadius">@dimen/rebrandContainerRadius</item>
         <item name="daxInfoPanelRadius">@dimen/rebrandContainerRadius</item>
