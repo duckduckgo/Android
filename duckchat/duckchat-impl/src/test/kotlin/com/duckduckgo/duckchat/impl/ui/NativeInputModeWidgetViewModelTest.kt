@@ -977,6 +977,35 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
+    fun whenSetModelPickerEnabledThenPublishedToActiveTabState() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+
+        viewModel.setModelPickerEnabled(false)
+        advanceUntilIdle()
+        assertFalse(nativeInputStateProvider.stateForTab("tab-A").value.modelPickerEnabled)
+
+        viewModel.setModelPickerEnabled(true)
+        advanceUntilIdle()
+        assertTrue(nativeInputStateProvider.stateForTab("tab-A").value.modelPickerEnabled)
+    }
+
+    @Test
+    fun whenSetModelPickerEnabledBeforeConfigureThenReplayedOnConfigure() = runTest {
+        val viewModel = createViewModel()
+
+        // The enable source (distinctUntilChanged) emits its value before configure sets the active
+        // tab. Without buffering, this false is dropped and never re-emitted, leaving the picker
+        // enabled for an existing chat.
+        viewModel.setModelPickerEnabled(false)
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+
+        assertFalse(nativeInputStateProvider.stateForTab("tab-A").value.modelPickerEnabled)
+    }
+
+    @Test
     fun whenPromptSubmittedThenModelChangeModeClearedOnActiveTab() = runTest {
         val viewModel = createViewModel()
         viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)

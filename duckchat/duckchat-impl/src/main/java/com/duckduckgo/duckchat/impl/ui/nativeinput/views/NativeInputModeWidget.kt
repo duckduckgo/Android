@@ -322,10 +322,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var duckAiFireButtonHighlightSource: Flow<Boolean>? = null
     private var pulseAnimation: PulseAnimation? = null
     private var submitEnabledJob: Job? = null
-    private var openModelPickerJob: Job? = null
     private var editPromptJob: Job? = null
     private var submitAllowed: Boolean = true
-    private var modelPickerView: ModelPicker? = null
     private var chatSuggestionsUserEnabled: Boolean = true
     private var isStreaming: Boolean = false
     private var attachmentLimitExceeded: Boolean = false
@@ -714,7 +712,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         observeChatSuggestionsEnabled()
         observeNativeInputState()
         observeSubmitEnabled()
-        observeOpenModelPicker()
         observeEditPromptRequests()
         bindLeadingFireButtonClick()
         if (onPaidTierChanged != null) observeTier()
@@ -762,23 +759,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
                         if (plugin.containerId != R.id.startChatContainer) {
                             container.isVisible = isChatTabSelected() && !isEditWidget
                         }
-                        if (pluginView is ModelPicker) {
-                            modelPickerView = pluginView
-                            // Apply the current enabled state. The host may have set it
-                            // before plugins were created.
-                            pluginView.setPickerEnabled(viewModel.modelPickerEnabled.value)
-                        }
                     }
                 }
-            }
-            launch {
-                // Chip is enabled when new chat OR during the FE recovery flow (changing models).
-                combine(
-                    viewModel.modelPickerEnabled,
-                    viewModel.modelChangeMode,
-                ) { base, inRecovery -> base || inRecovery }
-                    .distinctUntilChanged()
-                    .collect { enabled -> modelPickerView?.setPickerEnabled(enabled) }
             }
         }
     }
@@ -825,11 +807,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
         pulseAnimation?.stop()
         submitEnabledJob?.cancel()
         submitEnabledJob = null
-        openModelPickerJob?.cancel()
-        openModelPickerJob = null
         editPromptJob?.cancel()
         editPromptJob = null
-        modelPickerView = null
         widgetRoot = null
         tearDownChatSuggestions()
     }
@@ -1908,24 +1887,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
                 updateSendButtonVisibility()
             }
             .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope ?: return)
-    }
-
-    // FE recovery "Switch Model": open the picker on every event (not on the modelChangeMode flag
-    // transition), so a repeated tap re-opens the picker after it was dismissed. The chip is shown
-    // via the modelChangeMode combine in setupPlugins; openPicker() waits for that layout pass.
-    private fun observeOpenModelPicker() {
-        openModelPickerJob?.cancel()
-        val scope = findViewTreeLifecycleOwner()?.lifecycleScope
-        openModelPickerJob = viewModel.showModelPickerEvents
-            .onEach {
-                // The picker chip lives in the bottom row, which is only laid out while the input is
-                // focused (updateBottomRowVisibility). On an ongoing chat opened from history the
-                // input is unfocused, so the chip is GONE and openPicker()'s doOnLayout would never
-                // fire. Request focus first to expand the row, then open the picker.
-                requestInputFocus()
-                modelPickerView?.openPicker()
-            }
-            .launchIn(scope ?: return)
     }
 
     // The edit screen hosts its own instance of this widget (see configureForEdit); that instance
