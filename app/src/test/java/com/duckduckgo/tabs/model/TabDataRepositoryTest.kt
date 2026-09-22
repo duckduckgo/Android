@@ -431,6 +431,8 @@ class TabDataRepositoryTest {
         verify(mockWebViewPreviewPersister).deletePreviewsForTab("current", null)
         verify(mockFaviconManager).deleteOldTempFavicon("current", null)
         verify(mockDuckChatContextualDataStore).clearTabChatUrl("current")
+        verify(mockTabVisitedSitesRepository).clearTab("current")
+        verify(mockNativeInputStatePublisher).clearTab("current")
         assertNotSame(siteData, testee.retrieveSiteData("current"))
         testee.update("current", site)
         verify(mockDao, times(2)).updateUrlAndTitle("current", "https://example.com", "Example", true)

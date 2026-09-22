@@ -389,6 +389,8 @@ class TabDataRepository(
         }
         if (!didDelete) return@withContext false
         clearAllSiteData(listOf(currentTabId))
+        tabVisitedSitesRepository.clearTab(currentTabId)
+        nativeInputStatePublisher.clearTab(currentTabId)
         true
     }
 
@@ -569,7 +571,7 @@ class TabDataRepository(
 
     private suspend fun <T> awaitDatabaseOperation(operation: () -> T): T =
         suspendCancellableCoroutine { continuation ->
-            val disposable = Schedulers.single().scheduleDirect {
+            val disposable = databaseExecutor().scheduleDirect {
                 try {
                     continuation.resume(operation())
                 } catch (error: Exception) {
