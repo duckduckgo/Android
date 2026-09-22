@@ -303,7 +303,6 @@ dependencies {
 	internalImplementation project(":test-seeder-internal")
 	implementation project(":data-clearing-api")
 	implementation project(":data-clearing-impl")
-	implementation project(":data-clearing-feature-toggles")
 	internalImplementation project(":duckchat-internal")
 	implementation project(":malicious-site-protection-impl")
 	implementation project(":malicious-site-protection-api")
