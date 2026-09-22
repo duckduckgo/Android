@@ -54,6 +54,7 @@ class SubscriptionOnboardingViewModel @Inject constructor(
     private val planProvider: SubscriptionOnboardingPlanProvider,
     private val stepStore: SubscriptionOnboardingStepStore,
     private val controller: SubscriptionOnboardingController,
+    private val handoffState: SubscriptionOnboardingHandoffState,
 ) : ViewModel() {
 
     sealed interface Command {
@@ -112,7 +113,10 @@ class SubscriptionOnboardingViewModel @Inject constructor(
                 if (event.outcome == SubscriptionOnboardingStepOutcome.COMPLETED) {
                     stepStore.setCompleted(event.stepId)
                 }
-                event.handoff?.let { pendingHandoff = it }
+                event.handoff?.let {
+                    pendingHandoff = it
+                    handoffState.isHandoff = true
+                }
                 orchestrator.onEvent(StepFinished(event.stepId, event.outcome))
             }
             SubscriptionOnboardingController.Event.Back -> {

@@ -30,6 +30,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.impl.R
+import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingHandoffState
 import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStepStore
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -54,11 +55,15 @@ class SubscriptionOnboardingCompletionViewModel @Inject constructor(
     private val stepStore: SubscriptionOnboardingStepStore,
     private val subscriptions: Subscriptions,
     private val pirFeature: PirFeature,
+    private val handoffState: SubscriptionOnboardingHandoffState,
 ) : ViewModel() {
 
     data class ViewState(
         val rows: List<SummaryRow> = emptyList(),
         val completionPercentage: Int = 0,
+        // When true this summary is a brief hand-off before a feature opens (e.g. Duck.ai): the view keeps
+        // that feature's header and hides the action button, rather than showing the terminal summary.
+        val handoff: Boolean = false,
     )
 
     data class SummaryRow(
@@ -75,7 +80,7 @@ class SubscriptionOnboardingCompletionViewModel @Inject constructor(
         data object ShowPirUnavailableDialog : Command
     }
 
-    private val viewState = MutableStateFlow(ViewState())
+    private val viewState = MutableStateFlow(ViewState(handoff = handoffState.isHandoff))
     fun viewState(): Flow<ViewState> = viewState.asStateFlow()
 
     private val _commands = Channel<Command>(1, DROP_OLDEST)
@@ -128,6 +133,7 @@ class SubscriptionOnboardingCompletionViewModel @Inject constructor(
         return ViewState(
             rows = rows,
             completionPercentage = rows.completionPercentage(),
+            handoff = handoffState.isHandoff,
         )
     }
 
