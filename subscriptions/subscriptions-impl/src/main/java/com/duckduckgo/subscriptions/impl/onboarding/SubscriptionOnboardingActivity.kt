@@ -125,12 +125,16 @@ class SubscriptionOnboardingActivity : DuckDuckGoActivity() {
     }
 
     private fun showStep(command: Command.ShowStep) {
-        val navIcon = if (command.canGoBack) {
-            com.duckduckgo.mobile.android.R.drawable.ic_arrow_left_24
+        if (command.showNavigationIcon) {
+            val navIcon = if (command.canGoBack) {
+                com.duckduckgo.mobile.android.R.drawable.ic_arrow_left_24
+            } else {
+                com.duckduckgo.mobile.android.R.drawable.ic_close_24
+            }
+            binding.includeToolbar.toolbar.setNavigationIcon(navIcon)
         } else {
-            com.duckduckgo.mobile.android.R.drawable.ic_close_24
+            binding.includeToolbar.toolbar.navigationIcon = null
         }
-        binding.includeToolbar.toolbar.setNavigationIcon(navIcon)
         supportActionBar?.title = command.stepPlugin.titleResId?.let { getString(it) } ?: ""
         supportFragmentManager.commit {
             replace(binding.subscriptionOnboardingContainer.id, command.stepPlugin.createFragment(), command.stepPlugin.stepId)
