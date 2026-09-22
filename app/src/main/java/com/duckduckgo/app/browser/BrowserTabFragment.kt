@@ -2437,6 +2437,11 @@ class BrowserTabFragment :
         }
     }
 
+    // Pinch and double-tap zoom distort the Duck.ai chat layout, so zoom is only supported off Duck.ai.
+    private fun setWebViewZoomSupported(supported: Boolean) {
+        webView?.settings?.setSupportZoom(supported)
+    }
+
     private fun showDuckAI(browserViewState: BrowserViewState) {
         renderBrowserMenu(viewState = browserViewState, omnibarViewMode = ViewMode.DuckAI)
         omnibar.setViewMode(ViewMode.DuckAI)
@@ -3107,8 +3112,13 @@ class BrowserTabFragment :
 
             is Command.EnqueueCookiesAnimation -> enqueueCookiesAnimation(it.isCosmetic)
             is Command.PageStarted -> onPageStarted()
-            is Command.EnableDuckAIFullScreen -> showDuckAI(it.browserViewState)
+            is Command.EnableDuckAIFullScreen -> {
+                setWebViewZoomSupported(false)
+                showDuckAI(it.browserViewState)
+            }
+
             is Command.DuckAIFullScreenDisabled -> {
+                setWebViewZoomSupported(true)
                 if (omnibar.viewMode == DuckAI) {
                     nativeInputManager.hideNativeInput()
                 }
