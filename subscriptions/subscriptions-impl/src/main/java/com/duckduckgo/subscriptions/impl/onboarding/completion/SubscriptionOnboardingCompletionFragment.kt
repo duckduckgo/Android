@@ -21,6 +21,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.animation.DecelerateInterpolator
+import androidx.core.animation.doOnEnd
 import androidx.core.view.doOnLayout
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.Lifecycle
@@ -45,6 +46,7 @@ import com.duckduckgo.subscriptions.impl.databinding.FragmentSubscriptionOnboard
 import com.duckduckgo.subscriptions.impl.onboarding.completion.SubscriptionOnboardingCompletionViewModel.Command
 import com.duckduckgo.subscriptions.impl.onboarding.completion.SubscriptionOnboardingCompletionViewModel.SummaryRow
 import com.duckduckgo.subscriptions.impl.onboarding.completion.SubscriptionOnboardingCompletionViewModel.ViewState
+import com.duckduckgo.subscriptions.impl.onboarding.welcome.launchOnboardingConfetti
 import com.duckduckgo.subscriptions.impl.pir.PirActivity.Companion.PirScreenWithEmptyParams
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -66,6 +68,9 @@ class SubscriptionOnboardingCompletionFragment : DuckDuckGoFragment(R.layout.fra
 
     // The bar fills once per appearance. Without this a later emission (or a rotation) would replay it.
     private var progressAnimated = false
+
+    // The celebratory hero animation must start only once, not on every state emission.
+    private var celebratoryConfigured = false
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -92,6 +97,19 @@ class SubscriptionOnboardingCompletionFragment : DuckDuckGoFragment(R.layout.fra
         subscriptionOnboardingCompletionPrimaryButton.gone()
     }
 
+    /** Everything is set up: play the animated hero, drop the "continue in settings" hint, and celebrate. */
+    private fun applyCelebratoryHeader() {
+        if (celebratoryConfigured) return
+        celebratoryConfigured = true
+        with(binding) {
+            subscriptionOnboardingCompletionIcon.setAnimation(R.raw.subscription_hero_animation_badge)
+            subscriptionOnboardingCompletionIcon.playAnimation()
+            subscriptionOnboardingCompletionTitle.setText(R.string.subscriptionOnboardingCompletionCompleteTitle)
+            subscriptionOnboardingCompletionDescription.gone()
+            subscriptionOnboardingCompletionPrimaryButton.setText(R.string.subscriptionOnboardingCompletionCompletePrimaryButton)
+        }
+    }
+
     private fun processCommand(command: Command) {
         when (command) {
             Command.OpenPirDashboard -> globalActivityStarter.start(requireContext(), PirDashboardWebViewScreen)
@@ -105,7 +123,10 @@ class SubscriptionOnboardingCompletionFragment : DuckDuckGoFragment(R.layout.fra
     }
 
     private fun render(viewState: ViewState) {
-        if (viewState.handoff) applyHandoffHeader()
+        when {
+            viewState.handoff -> applyHandoffHeader()
+            viewState.celebratory -> applyCelebratoryHeader()
+        }
 
         if (viewState.rows.isEmpty()) return
 
@@ -113,7 +134,7 @@ class SubscriptionOnboardingCompletionFragment : DuckDuckGoFragment(R.layout.fra
             getString(R.string.subscriptionOnboardingCompletionPercentage, viewState.completionPercentage)
 
         renderRows(viewState.rows)
-        animateProgress(viewState.completionPercentage)
+        animateProgress(viewState.completionPercentage, celebrate = viewState.celebratory)
     }
 
     private fun renderRows(rows: List<SummaryRow>) {
@@ -145,7 +166,7 @@ class SubscriptionOnboardingCompletionFragment : DuckDuckGoFragment(R.layout.fra
             }
     }
 
-    private fun animateProgress(percentage: Int) {
+    private fun animateProgress(percentage: Int, celebrate: Boolean) {
         if (progressAnimated) return
         progressAnimated = true
 
@@ -159,6 +180,7 @@ class SubscriptionOnboardingCompletionFragment : DuckDuckGoFragment(R.layout.fra
                 addUpdateListener { animator ->
                     fill.updateLayoutParams { width = animator.animatedValue as Int }
                 }
+                if (celebrate) doOnEnd { binding.subscriptionOnboardingCompletionKonfetti.launchOnboardingConfetti() }
                 start()
             }
         }

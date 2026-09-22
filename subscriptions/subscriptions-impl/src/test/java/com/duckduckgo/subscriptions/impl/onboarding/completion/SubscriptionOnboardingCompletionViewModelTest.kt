@@ -160,6 +160,41 @@ class SubscriptionOnboardingCompletionViewModelTest {
     }
 
     @Test
+    fun whenHundredPercentAndNotHandoffThenCelebratory() = runTest {
+        whenever(stepStore.isCompleted("vpn")).thenReturn(true)
+        whenever(stepStore.isCompleted("itr")).thenReturn(true)
+        val testee = createViewModel(plugins = listOf(fakePlugin("vpn"), fakePlugin("itr")))
+
+        testee.viewState().test {
+            assertTrue(awaitItem().celebratory)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenHundredPercentButHandoffThenNotCelebratory() = runTest {
+        whenever(stepStore.isCompleted("vpn")).thenReturn(true)
+        whenever(stepStore.isCompleted("itr")).thenReturn(true)
+        val testee = createViewModel(plugins = listOf(fakePlugin("vpn"), fakePlugin("itr")), handoff = true)
+
+        testee.viewState().test {
+            assertFalse(awaitItem().celebratory)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenLessThanHundredPercentThenNotCelebratory() = runTest {
+        whenever(stepStore.isCompleted("vpn")).thenReturn(true)
+        val testee = createViewModel(plugins = listOf(fakePlugin("vpn"), fakePlugin("itr")))
+
+        testee.viewState().test {
+            assertFalse(awaitItem().celebratory)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenDoneClickedThenOnboardingExited() = runTest {
         createViewModel().onDoneClicked()
 

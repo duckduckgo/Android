@@ -151,5 +151,7 @@
     <string name="subscriptionOnboardingCompletionPrimaryButton">Done</string>
     <string name="subscriptionOnboardingCompletionDuckAiTitle">Duck.ai Private Chat</string>
     <string name="subscriptionOnboardingCompletionDuckAiDescription">Once you finish chatting, you can continue setting up your new premium protections in Settings &gt; Subscriptions Settings.</string>
+    <string name="subscriptionOnboardingCompletionCompleteTitle">You are all set up and ready to go!</string>
+    <string name="subscriptionOnboardingCompletionCompletePrimaryButton">Got It</string>
 
 </resources>
