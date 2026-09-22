@@ -353,6 +353,7 @@
         <item name="daxSearchBarRadius">@dimen/smallShapeCornerRadius</item>
         <item name="daxChipRadius">@dimen/keyline_2</item>
         <item name="daxDuckAiPromptRadius">@dimen/mediumShapeCornerRadius</item>
+        <item name="daxWhatsNewCardRadius">@dimen/mediumShapeCornerRadius</item>
         <item name="daxMenuClipToOutline">false</item>
         <item name="daxOnboardingSheetRadius">@dimen/onboardingBottomSheetCornerRadius</item>
         <item name="daxInfoPanelRadius">@dimen/smallShapeCornerRadius</item>
@@ -534,6 +535,7 @@
         <item name="daxSearchBarRadius">@dimen/smallShapeCornerRadius</item>
         <item name="daxChipRadius">@dimen/keyline_2</item>
         <item name="daxDuckAiPromptRadius">@dimen/mediumShapeCornerRadius</item>
+        <item name="daxWhatsNewCardRadius">@dimen/mediumShapeCornerRadius</item>
         <item name="daxMenuClipToOutline">false</item>
         <item name="daxOnboardingSheetRadius">@dimen/onboardingBottomSheetCornerRadius</item>
         <item name="daxInfoPanelRadius">@dimen/smallShapeCornerRadius</item>
