@@ -46,15 +46,21 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/importPasswordsViaCredentialExchange"
+        android:title="@string/autofillImportPasswordsViaCredentialExchangeMenuTitle"
+        android:orderInCategory="5"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/syncDesktopPasswords"
         android:title="@string/autofillSyncDesktopPasswordsMenuTitle"
-        android:orderInCategory="5"
+        android:orderInCategory="6"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/deleteAllPasswords"
         android:title="@string/credentialManagementDeleteAllPasswordsMenu"
-        android:orderInCategory="6"
+        android:orderInCategory="7"
         app:showAsAction="never" />
 
 </menu>

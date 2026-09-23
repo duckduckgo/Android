@@ -26,6 +26,7 @@ import androidx.lifecycle.Lifecycle.State
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.withResumed
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.autofill.api.AutofillFeature
@@ -37,9 +38,13 @@ import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.promotion.PasswordsScreenPromotionPlugin
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.FragmentAutofillManagementListModeBinding
+import com.duckduckgo.autofill.impl.deviceauth.AutofillAuthorizationGracePeriod
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthConfiguration
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthResult.Success
+import com.duckduckgo.autofill.impl.importing.CredentialImporter
+import com.duckduckgo.autofill.impl.importing.credentialtransfer.CredentialExchangeImportResult
+import com.duckduckgo.autofill.impl.importing.credentialtransfer.CredentialExchangePasswordImporter
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementActivity
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.AutofillToggleState
@@ -78,11 +83,14 @@ import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.credentialexchange.api.CredentialExchangeFailure
+import com.duckduckgo.credentialexchange.api.CredentialExchangeLauncher
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import logcat.LogPriority.ERROR
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import javax.inject.Inject
@@ -138,6 +146,18 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
+    @Inject
+    lateinit var credentialExchangePasswordImporter: CredentialExchangePasswordImporter
+
+    @Inject
+    lateinit var credentialExchangeLauncher: CredentialExchangeLauncher
+
+    @Inject
+    lateinit var credentialImporter: CredentialImporter
+
+    @Inject
+    lateinit var authorizationGracePeriod: AutofillAuthorizationGracePeriod
+
     val viewModel by lazy {
         ViewModelProvider(requireActivity(), viewModelFactory)[AutofillPasswordsManagementViewModel::class.java]
     }
@@ -150,6 +170,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
     private var deleteAllPasswordsMenuItem: MenuItem? = null
     private var syncDesktopPasswordsMenuItem: MenuItem? = null
     private var importGooglePasswordsMenuItem: MenuItem? = null
+    private var importPasswordsViaCredentialExchangeMenuItem: MenuItem? = null
 
     private fun launchHelpPage() {
         activity?.let {
@@ -217,6 +238,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
                     deleteAllPasswordsMenuItem = menu.findItem(R.id.deleteAllPasswords)
                     syncDesktopPasswordsMenuItem = menu.findItem(R.id.syncDesktopPasswords)
                     importGooglePasswordsMenuItem = menu.findItem(R.id.importGooglePasswords)
+                    importPasswordsViaCredentialExchangeMenuItem = menu.findItem(R.id.importPasswordsViaCredentialExchange)
 
                     initializeSearchBar()
                 }
@@ -228,6 +250,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
                     resetNeverSavedSitesMenuItem?.isVisible = viewModel.neverSavedSitesViewState.value.showOptionToReset
                     syncDesktopPasswordsMenuItem?.isVisible = loginsSaved
                     importGooglePasswordsMenuItem?.isVisible = loginsSaved && viewModel.viewState.value.canImportFromGooglePasswords
+                    importPasswordsViaCredentialExchangeMenuItem?.isVisible = viewModel.viewState.value.canImportViaCredentialExchange
                 }
 
                 override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
@@ -250,6 +273,11 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
                         R.id.importGooglePasswords -> {
                             viewModel.onImportPasswordsFromGooglePasswordManager(importSource = PasswordManagementOverflow)
                             importPasswordsPixelSender.onImportPasswordsOverflowMenuTapped()
+                            true
+                        }
+
+                        R.id.importPasswordsViaCredentialExchange -> {
+                            startCredentialExchangeImport()
                             true
                         }
 
@@ -370,6 +398,17 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
         }
     }
 
+    private fun showCredentialExchangeFailure(reason: CredentialExchangeFailure) {
+        val message = when (reason) {
+            CredentialExchangeFailure.NOT_SUPPORTED,
+            CredentialExchangeFailure.NO_EXPORTER_AVAILABLE,
+            -> R.string.autofillCredentialExchangeNoExporter
+            CredentialExchangeFailure.MALFORMED_PAYLOAD -> R.string.autofillCredentialExchangeBadData
+            CredentialExchangeFailure.UNKNOWN -> R.string.autofillCredentialExchangeUnknownError
+        }
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
+    }
+
     private fun showUserReportSentMessage() {
         Snackbar.make(binding.root, R.string.autofillManagementReportBreakageSuccessMessage, Snackbar.LENGTH_LONG).show()
     }
@@ -378,6 +417,32 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
         context?.let {
             val dialog = ImportFromGooglePasswordsDialog.instance(importSource = importSource)
             dialog.show(parentFragmentManager, IMPORT_FROM_GPM_DIALOG_TAG)
+        }
+    }
+
+    private fun startCredentialExchangeImport() {
+        lifecycleScope.launch {
+            authorizationGracePeriod.requestExtendedGracePeriod()
+            val exchangeResult = try {
+                credentialExchangeLauncher.launchImportFlow()
+            } finally {
+                authorizationGracePeriod.removeRequestForExtendedGracePeriod()
+            }
+            when (val result = credentialExchangePasswordImporter.convertAndDeduplicate(exchangeResult)) {
+                is CredentialExchangeImportResult.Success -> {
+                    credentialImporter.import(result.credentials, result.originalCount, PasswordManagementOverflow)
+
+                    lifecycle.withResumed {
+                        ImportFromGooglePasswordsDialog.resultOnlyInstance(PasswordManagementOverflow)
+                            .show(parentFragmentManager, IMPORT_FROM_GPM_DIALOG_TAG)
+                    }
+                }
+                is CredentialExchangeImportResult.Cancelled -> Unit
+                is CredentialExchangeImportResult.Failure -> {
+                    logcat(ERROR) { "Credential exchange import failed: ${result.reason}" }
+                    showCredentialExchangeFailure(result.reason)
+                }
+            }
         }
     }
 

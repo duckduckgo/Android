@@ -46,12 +46,16 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
 ) : ViewModel() {
 
     fun onImportFlowFinishedSuccessfully() {
+        observeImportJob()
+    }
+
+    fun observeImportJob() {
         viewModelScope.launch(dispatchers.main()) {
-            observeImportJob()
+            collectImportStatus()
         }
     }
 
-    private suspend fun observeImportJob() {
+    private suspend fun collectImportStatus() {
         credentialImporter.getImportStatus().collect {
             when (it) {
                 is ImportResult.InProgress -> {

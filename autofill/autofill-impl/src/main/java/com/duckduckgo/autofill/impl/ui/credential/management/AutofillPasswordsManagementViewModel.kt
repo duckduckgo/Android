@@ -33,6 +33,7 @@ import com.duckduckgo.autofill.impl.asString
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthConfiguration
 import com.duckduckgo.autofill.impl.importing.capability.ImportGooglePasswordsCapabilityChecker
+import com.duckduckgo.autofill.impl.importing.credentialtransfer.CredentialExchangePasswordImporter
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_DELETE_LOGIN
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED
@@ -138,6 +139,7 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
     private val autofillBreakageReportDataStore: AutofillSiteBreakageReportingDataStore,
     private val autofillBreakageReportCanShowRules: AutofillBreakageReportCanShowRules,
     private val autofillFeature: AutofillFeature,
+    private val credentialExchangePasswordImporter: CredentialExchangePasswordImporter,
     private val importGooglePasswordsCapabilityChecker: ImportGooglePasswordsCapabilityChecker,
     private val autofillEffectDispatcher: AutofillEffectDispatcher,
 ) : ViewModel() {
@@ -468,6 +470,7 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
             logcat(VERBOSE) { "Can import from Google Password Manager: $canImport" }
             _viewState.value = _viewState.value.copy(
                 canImportFromGooglePasswords = canImport,
+                canImportViaCredentialExchange = credentialExchangePasswordImporter.isSupported(),
                 showAutofillEnabledToggle = autofillFeature.settingsScreen().isEnabled().not(),
             )
         }
@@ -825,6 +828,7 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
         val reportBreakageState: ReportBreakageState = ReportBreakageState(),
         val canShowPromo: Boolean = false,
         val canImportFromGooglePasswords: Boolean = false,
+        val canImportViaCredentialExchange: Boolean = false,
         val prioritizeDomainMatchesOnSearch: Boolean = false,
     )
 

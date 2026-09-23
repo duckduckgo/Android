@@ -266,6 +266,12 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
             return
         }
 
+        if (showResultOnly()) {
+            ignoreCancellationEvents = true
+            viewModel.observeImportJob()
+            return
+        }
+
         // check if we should show the initial instructional prompt, and if so, which variant of it. if not, start the import flow directly
         val launchSource = getLaunchSource()
         if (canShowPreImportDialog(launchSource)) {
@@ -407,11 +413,14 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
 
     private fun getOriginalUrl() = arguments?.getString(KEY_URL)
 
+    private fun showResultOnly() = arguments?.getBoolean(KEY_SHOW_RESULT_ONLY) == true
+
     private inline fun <reified V : ViewModel> bindViewModel() = lazy { ViewModelProvider(this, viewModelFactory)[V::class.java] }
 
     companion object {
 
         private const val KEY_LAUNCH_SOURCE = "launchSource"
+        private const val KEY_SHOW_RESULT_ONLY = "showResultOnly"
 
         fun instance(importSource: AutofillImportLaunchSource, tabId: String? = null, originalUrl: String? = null): ImportFromGooglePasswordsDialog {
             val fragment = ImportFromGooglePasswordsDialog()
@@ -419,6 +428,19 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
                 putParcelable(KEY_LAUNCH_SOURCE, importSource)
                 putString(KEY_TAB_ID, tabId)
                 putString(KEY_URL, originalUrl)
+            }
+            return fragment
+        }
+
+        /**
+         * Shows only the progress and result screens, for an import already started elsewhere. The
+         * import status flow replays its last value, so the result is not missed.
+         */
+        fun resultOnlyInstance(importSource: AutofillImportLaunchSource): ImportFromGooglePasswordsDialog {
+            val fragment = ImportFromGooglePasswordsDialog()
+            fragment.arguments = Bundle().apply {
+                putParcelable(KEY_LAUNCH_SOURCE, importSource)
+                putBoolean(KEY_SHOW_RESULT_ONLY, true)
             }
             return fragment
         }
