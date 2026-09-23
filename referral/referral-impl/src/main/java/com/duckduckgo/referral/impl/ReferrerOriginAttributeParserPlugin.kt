@@ -41,6 +41,11 @@ class ReferrerOriginAttributeParserPlugin @Inject constructor(
                 origin = DEFAULT_ATTRIBUTION_FOR_PLAY_STORE_INSTALLS
             }
 
+            if (origin == null && appReferrerDataStore.utmOriginAttributeCampaign != null) {
+                logcat(VERBOSE) { "No origin attribute referrer data available; keeping the persisted origin" }
+                return@runCatching
+            }
+
             logcat(INFO) { "Persisting referrer origin attribute value: $origin" }
             appReferrerDataStore.utmOriginAttributeCampaign = origin
         }
