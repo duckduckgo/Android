@@ -50,6 +50,18 @@ interface NativeInputHost {
     /** Focus the input field, expanding the bottom row so a plugin popup (e.g. the model picker) can anchor to it. */
     fun requestInputFocus()
 
+    /** Clear the input field text (clear-text control). */
+    fun clearInput()
+
+    /** The send button was tapped. */
+    fun onSubmitClicked()
+
+    /** The in-field voice search microphone was tapped. */
+    fun onVoiceSearchClicked()
+
+    /** The voice chat button was tapped. */
+    fun onVoiceChatClicked()
+
     fun attachmentChanged(hasAttachments: Boolean, limitExceeded: Boolean, supportsUpload: Boolean)
 
     /**
