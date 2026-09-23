@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.ui
 import android.content.Context
 import android.view.ContextThemeWrapper
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
@@ -141,6 +142,45 @@ class NativeInputFooterIntegrationTest {
     }
 
     @Test
+    fun whenFooterBlocksComposerThenTypingIsRejectedAndReleasedWhenUnblocked() = runTest {
+        val widget = NativeInputModeWidget(widgetContext)
+
+        widget.setFooterInputBlocked(true)
+        widget.inputField.text.append("hello")
+        assertEquals("", widget.inputField.text.toString())
+
+        widget.setFooterInputBlocked(false)
+        widget.inputField.text.append("hello")
+        assertEquals("hello", widget.inputField.text.toString())
+    }
+
+    @Test
+    fun whenFooterBlocksComposerThenProgrammaticTextStillLandsAndTypingStaysRejected() = runTest {
+        val widget = NativeInputModeWidget(widgetContext)
+        widget.setFooterInputBlocked(true)
+
+        widget.text = "https://example.com"
+
+        assertEquals("https://example.com", widget.text)
+        assertEquals("https://example.com".length, widget.inputField.selectionEnd)
+
+        widget.inputField.text.append("x")
+        assertEquals("https://example.com", widget.text)
+    }
+
+    @Test
+    fun whenFooterBlocksComposerThenKeyboardGoActionIsSwallowed() = runTest {
+        val widget = NativeInputModeWidget(widgetContext)
+        widget.inputField.setText("carried over from search")
+
+        widget.setFooterInputBlocked(true)
+
+        // Without the guard this reaches submitMessage and the uninjected ViewModel, which throws.
+        widget.inputField.onEditorAction(EditorInfo.IME_ACTION_GO)
+        assertEquals("carried over from search", widget.inputField.text.toString())
+    }
+
+    @Test
     fun whenSelectedFooterBlocksComposerThenWidgetLocksWithoutAffectingFooter() = runTest {
         val widget = NativeInputModeWidget(widgetContext)
         val host = TestNativeInputFooterView(context)
@@ -151,11 +191,14 @@ class NativeInputFooterIntegrationTest {
             ),
         )
 
-        host.bind(this, state, onBlocksComposerChanged = widget::setFooterComposerBlocked)
+        host.bind(this, state, onBlocksComposerChanged = widget::setFooterInputBlocked)
         host.attach()
         advanceUntilIdle()
 
-        assertEquals(0.4f, widget.alpha)
+        assertEquals(1f, widget.alpha)
+        assertEquals(0.4f, widget.findViewById<View>(com.duckduckgo.duckchat.impl.R.id.inputModeWidgetCardContent).alpha)
+        assertEquals(0.4f, widget.findViewById<View>(com.duckduckgo.duckchat.impl.R.id.inputModeWidgetBottomRow).alpha)
+        assertEquals(1f, widget.findViewById<View>(com.duckduckgo.duckchat.impl.R.id.inputModeSwitchRow).alpha)
         assertTrue(widget.onInterceptTouchEvent(null))
         assertEquals(1f, host.alpha)
         assertTrue(host.isEnabled)
@@ -173,7 +216,7 @@ class NativeInputFooterIntegrationTest {
                 blocksComposer = true,
             ),
         )
-        host.bind(this, state, onBlocksComposerChanged = widget::setFooterComposerBlocked)
+        host.bind(this, state, onBlocksComposerChanged = widget::setFooterInputBlocked)
         host.attach()
         advanceUntilIdle()
 
@@ -196,18 +239,20 @@ class NativeInputFooterIntegrationTest {
             ),
         )
         widget.setInteractionLocked(true)
-        host.bind(this, state, onBlocksComposerChanged = widget::setFooterComposerBlocked)
+        host.bind(this, state, onBlocksComposerChanged = widget::setFooterInputBlocked)
         host.attach()
         advanceUntilIdle()
 
         widget.setInteractionLocked(false)
-        assertEquals(0.4f, widget.alpha)
+        assertEquals(1f, widget.alpha)
+        assertEquals(0.4f, widget.findViewById<View>(com.duckduckgo.duckchat.impl.R.id.inputModeWidgetCardContent).alpha)
         assertTrue(widget.onInterceptTouchEvent(null))
 
         widget.setInteractionLocked(true)
         state.value = NativeInputFooterCoordinator.State(view = View(context), blocksComposer = false)
         advanceUntilIdle()
         assertEquals(0.4f, widget.alpha)
+        assertEquals(1f, widget.findViewById<View>(com.duckduckgo.duckchat.impl.R.id.inputModeWidgetCardContent).alpha)
         assertTrue(widget.onInterceptTouchEvent(null))
 
         widget.setInteractionLocked(false)
@@ -226,7 +271,7 @@ class NativeInputFooterIntegrationTest {
                 blocksComposer = true,
             ),
         )
-        host.bind(this, blockingState, onBlocksComposerChanged = widget::setFooterComposerBlocked)
+        host.bind(this, blockingState, onBlocksComposerChanged = widget::setFooterInputBlocked)
         host.attach()
         advanceUntilIdle()
 
@@ -234,7 +279,7 @@ class NativeInputFooterIntegrationTest {
         assertEquals(1f, widget.alpha)
 
         widget.setInteractionLocked(true)
-        host.bind(this, blockingState, onBlocksComposerChanged = widget::setFooterComposerBlocked)
+        host.bind(this, blockingState, onBlocksComposerChanged = widget::setFooterInputBlocked)
         advanceUntilIdle()
         host.detach()
 

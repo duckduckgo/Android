@@ -19,6 +19,10 @@ package com.duckduckgo.duckchat.internal
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.nativeinput.footer.highusage.HighUsageModelNoticeDismissalStore
+import com.duckduckgo.duckchat.impl.nativeinput.footer.usagelimits.UsageNoticeDismissal
+import com.duckduckgo.duckchat.impl.nativeinput.footer.usagelimits.UsageNoticeDismissalStore
+import com.duckduckgo.duckchat.impl.nativeinput.footer.usagelimits.UsageNoticeId
+import com.duckduckgo.duckchat.impl.nativeinput.footer.usagelimits.UsageWindow
 import com.duckduckgo.duckchat.internal.DuckAiUsageWarningsDevViewModel.Command
 import com.duckduckgo.duckchat.internal.DuckAiUsageWarningsDevViewModel.ViewState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,7 +44,12 @@ class DuckAiUsageWarningsDevViewModelTest {
         whenever(it.dismissedModelIds).thenReturn(dismissedModelIds)
     }
 
-    private val testee by lazy { DuckAiUsageWarningsDevViewModel(dismissalStore) }
+    private val usageDismissal = MutableStateFlow<UsageNoticeDismissal?>(null)
+    private val usageNoticeDismissalStore: UsageNoticeDismissalStore = mock<UsageNoticeDismissalStore>().also {
+        whenever(it.dismissal).thenReturn(usageDismissal)
+    }
+
+    private val testee by lazy { DuckAiUsageWarningsDevViewModel(dismissalStore, usageNoticeDismissalStore) }
 
     @Test
     fun whenModelsWereDismissedThenStateListsThem() = runTest {
@@ -59,6 +68,27 @@ class DuckAiUsageWarningsDevViewModelTest {
             dismissedModelIds.value = setOf("claude-opus-4-8")
 
             assertEquals(setOf("claude-opus-4-8"), awaitItem().dismissedModelIds)
+        }
+    }
+
+    @Test
+    fun whenUsageNoticeWasDismissedThenStateCarriesIt() = runTest {
+        val dismissal = UsageNoticeDismissal(UsageNoticeId.APPROACHING, UsageWindow.WEEKLY, 1L, 75)
+        usageDismissal.value = dismissal
+
+        testee.viewState.test {
+            assertEquals(dismissal, expectMostRecentItem().usageNoticeDismissal)
+        }
+    }
+
+    @Test
+    fun whenResetUsageDismissalIsClickedThenStoreIsClearedAndMessageIsShown() = runTest {
+        testee.commands.test {
+            testee.onResetUsageNoticeDismissalClicked()
+
+            verify(usageNoticeDismissalStore).clear()
+            assertEquals(Command.ShowMessage(R.string.devSettingsDuckAiUsageWarningsUsageDismissalReset), awaitItem())
+            cancelAndIgnoreRemainingEvents()
         }
     }
 

@@ -216,7 +216,7 @@ class HighUsageModelFooterPluginTest {
         assertTrue(footer.state.first().visible)
 
         assertEquals(
-            "Opus uses limits up to 2-5x faster than basic models.",
+            "Opus uses limits up to 2–5x faster than basic models.",
             footer.view.findViewById<DaxTextView>(R.id.highUsageModelFooterMessage).text.toString(),
         )
     }

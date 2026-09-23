@@ -15,4 +15,8 @@
     <string name="devSettingsDuckAiUsageWarningsNoDismissals">None</string>
     <string name="devSettingsDuckAiUsageWarningsResetHighUsageDismissals">Reset high-usage dismissals</string>
     <string name="devSettingsDuckAiUsageWarningsDismissalsReset">High-usage dismissals reset</string>
+    <string name="devSettingsDuckAiUsageWarningsUsageDismissal">Dismissed usage notice</string>
+    <string name="devSettingsDuckAiUsageWarningsUsageDismissalValue" instruction="%1$s is the notice id, %2$s the window (daily or weekly), %3$d the percent band it was dismissed at">%1$s, %2$s window, dismissed at %3$d%% band</string>
+    <string name="devSettingsDuckAiUsageWarningsResetUsageDismissal">Reset usage notice dismissal</string>
+    <string name="devSettingsDuckAiUsageWarningsUsageDismissalReset">Usage notice dismissal reset</string>
 </resources>
