@@ -59,12 +59,30 @@ interface PirScanScheduler {
     fun scheduleScans()
 
     /**
+     * The periodic work a scan-only user gets: the scan and stats workers, never the email-confirmation
+     * worker, which exists to finish opt-outs.
+     */
+    fun scheduleScanOnlyWork()
+
+    /**
      * Re-applies the scheduled scan work spec (interval / constraints) to the already-enqueued
      * periodic scan so that changes are picked up by already-enrolled users after an app update.
      */
     fun reschedulePirScans()
 
     fun cancelScheduledScans(context: Context)
+
+    /**
+     * Cancels only the periodic scan worker. Used to retire a free user's background scans once their
+     * initial scan no longer needs resuming, leaving the stats workers running.
+     */
+    fun cancelScheduledScanWorker()
+
+    /**
+     * Cancels only the email-confirmation unique work. Used to retire a lapsed subscriber's opt-out
+     * work — already enqueued from when they were paying — once they fall back to scan-only.
+     */
+    fun cancelScheduledEmailConfirmation()
 
     /**
      * @return true if the periodic scheduled-scan worker ([PirScheduledScanRemoteWorker]) is currently
@@ -87,6 +105,14 @@ class RealPirScanScheduler @Inject constructor(
 
         schedulePirScans()
         scheduleEmailConfirmation()
+        scheduleRecurringPixelStats()
+        scheduleBackgroundScanStats()
+    }
+
+    override fun scheduleScanOnlyWork() {
+        logcat { "PIR-SCHEDULED: Scheduling scan-only periodic work appId: ${appBuildConfig.applicationId}" }
+
+        schedulePirScans()
         scheduleRecurringPixelStats()
         scheduleBackgroundScanStats()
     }
@@ -204,6 +230,14 @@ class RealPirScanScheduler @Inject constructor(
         workManager.cancelUniqueWork(TAG_PIR_RECURRING_CUSTOM_STATS)
         workManager.cancelUniqueWork(TAG_PIR_BACKGROUND_STATS_DAILY)
         context.stopService(Intent(context, PirRemoteWorkerService::class.java))
+    }
+
+    override fun cancelScheduledScanWorker() {
+        workManager.cancelUniqueWork(TAG_SCHEDULED_SCAN)
+    }
+
+    override fun cancelScheduledEmailConfirmation() {
+        workManager.cancelUniqueWork(TAG_EMAIL_CONFIRMATION)
     }
 
     private fun PeriodicWorkRequest.Builder.boundToPirProcess(applicationId: String): PeriodicWorkRequest.Builder {

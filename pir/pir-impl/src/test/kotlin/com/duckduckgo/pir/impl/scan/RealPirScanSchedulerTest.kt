@@ -408,6 +408,43 @@ class RealPirScanSchedulerTest {
         assertFalse(testee.isScheduledScanRunning())
     }
 
+    @Test
+    fun whenScheduleScanOnlyWorkThenEmailConfirmationWorkerIsNotEnqueued() {
+        testee.scheduleScanOnlyWork()
+
+        argumentCaptor<String>().apply {
+            verify(mockWorkManager, times(3)).enqueueUniquePeriodicWork(capture(), any(), any<PeriodicWorkRequest>())
+            assertEquals(
+                listOf(
+                    PirScheduledScanRemoteWorker.TAG_SCHEDULED_SCAN,
+                    PirCustomStatsWorker.TAG_PIR_RECURRING_CUSTOM_STATS,
+                    PirBackgroundScanStatsWorker.TAG_PIR_BACKGROUND_STATS_DAILY,
+                ),
+                allValues,
+            )
+        }
+    }
+
+    @Test
+    fun whenCancelScheduledScanWorkerThenOnlyTheScanWorkIsCancelled() {
+        testee.cancelScheduledScanWorker()
+
+        verify(mockWorkManager).cancelUniqueWork(PirScheduledScanRemoteWorker.TAG_SCHEDULED_SCAN)
+        verify(mockWorkManager, never()).cancelUniqueWork(PirEmailConfirmationRemoteWorker.TAG_EMAIL_CONFIRMATION)
+        verify(mockWorkManager, never()).cancelUniqueWork(PirCustomStatsWorker.TAG_PIR_RECURRING_CUSTOM_STATS)
+        verify(mockWorkManager, never()).cancelUniqueWork(PirBackgroundScanStatsWorker.TAG_PIR_BACKGROUND_STATS_DAILY)
+    }
+
+    @Test
+    fun whenCancelScheduledEmailConfirmationThenOnlyTheEmailConfirmationWorkIsCancelled() {
+        testee.cancelScheduledEmailConfirmation()
+
+        verify(mockWorkManager).cancelUniqueWork(PirEmailConfirmationRemoteWorker.TAG_EMAIL_CONFIRMATION)
+        verify(mockWorkManager, never()).cancelUniqueWork(PirScheduledScanRemoteWorker.TAG_SCHEDULED_SCAN)
+        verify(mockWorkManager, never()).cancelUniqueWork(PirCustomStatsWorker.TAG_PIR_RECURRING_CUSTOM_STATS)
+        verify(mockWorkManager, never()).cancelUniqueWork(PirBackgroundScanStatsWorker.TAG_PIR_BACKGROUND_STATS_DAILY)
+    }
+
     private fun capturePeriodicWorkRequests(): Map<String, PeriodicWorkRequest> {
         val tagCaptor = argumentCaptor<String>()
         val requestCaptor = argumentCaptor<PeriodicWorkRequest>()

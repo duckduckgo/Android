@@ -40,3 +40,6 @@ enum class DisabledReason {
 
 val PirEligibility.isEnabled: Boolean
     get() = this is PirEligibility.Enabled
+
+val PirEligibility?.runModeOrNull: PirRunMode?
+    get() = (this as? PirEligibility.Enabled)?.runMode

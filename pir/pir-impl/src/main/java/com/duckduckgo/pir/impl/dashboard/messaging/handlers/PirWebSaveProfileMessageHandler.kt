@@ -28,6 +28,7 @@ import com.duckduckgo.pir.impl.PirRemoteFeatures
 import com.duckduckgo.pir.impl.checker.DisabledReason
 import com.duckduckgo.pir.impl.checker.PirEligibility
 import com.duckduckgo.pir.impl.checker.PirWorkHandler
+import com.duckduckgo.pir.impl.checker.runModeOrNull
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse
 import com.duckduckgo.pir.impl.dashboard.state.PirWebProfileStateHolder
@@ -115,8 +116,11 @@ class PirWebSaveProfileMessageHandler @Inject constructor(
             // and a free user is only allowed to scan once activated
             storeFreemiumActivation()
 
+            // re-resolved after activation, which is what turns a non-subscriber into a scan-only user
+            val runMode = pirWorkHandler.canRunPir().firstOrNull().runModeOrNull
+
             // start the initial scan at this point as startScanAndOptOut message is not reliable
-            startAndScheduleInitialScan(executionType)
+            startAndScheduleInitialScan(executionType, runMode)
 
             pirWebProfileStateHolder.clear()
         }
@@ -204,14 +208,22 @@ class PirWebSaveProfileMessageHandler @Inject constructor(
         val eligibility = pirWorkHandler.canRunPir().firstOrNull()
         val isUnsubscribed = (eligibility as? PirEligibility.Disabled)?.reason == DisabledReason.SUBSCRIPTION_EXPIRED
 
-        if (isUnsubscribed) {
+        if (isUnsubscribed && !pirFreemiumDataStore.didActivate) {
             logcat { "PIR-WEB: PirWebSaveProfileMessageHandler: activating freemium" }
-            pirFreemiumDataStore.didActivate = true
+            pirFreemiumDataStore.activate(currentTimeProvider.currentTimeMillis())
         }
     }
 
-    private fun startAndScheduleInitialScan(executionType: PirExecutionType) {
+    private fun startAndScheduleInitialScan(
+        executionType: PirExecutionType,
+        runMode: PirRunMode?,
+    ) {
         context.startForegroundService(PirForegroundScanService.intentFor(context, executionType))
-        scanScheduler.scheduleScans()
+        when (runMode) {
+            PirRunMode.SCAN_AND_OPT_OUT -> scanScheduler.scheduleScans()
+            PirRunMode.SCAN_ONLY -> scanScheduler.scheduleScanOnlyWork()
+            // PIR is not enabled for this user at all; the scan service stops and cancels work itself
+            null -> Unit
+        }
     }
 }

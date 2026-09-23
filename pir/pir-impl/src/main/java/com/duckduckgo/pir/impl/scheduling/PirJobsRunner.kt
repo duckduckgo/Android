@@ -26,15 +26,19 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.pir.impl.PirRemoteFeatures
 import com.duckduckgo.pir.impl.brokers.BrokerJsonUpdater
+import com.duckduckgo.pir.impl.checker.PirRunMode
 import com.duckduckgo.pir.impl.common.PirJob.RunType
 import com.duckduckgo.pir.impl.common.PirRendererGoneException
 import com.duckduckgo.pir.impl.common.PirWebViewCountProvider
+import com.duckduckgo.pir.impl.freemium.PirFreeScanBrokerFilter
+import com.duckduckgo.pir.impl.freemium.PirFreeScanWorkWindow
 import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord
 import com.duckduckgo.pir.impl.optout.PirOptOut
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.scan.PirScan
+import com.duckduckgo.pir.impl.scan.PirScanScheduler
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEvent
@@ -54,10 +58,13 @@ interface PirJobsRunner {
      * eligible to be run at the current time.
      *
      * Note that any new [ScanJobRecord] and [OptOutJobRecord] are also created as part of the execution path.
+     *
+     * [PirRunMode.SCAN_ONLY] restricts the run to brokers whose scan is not subscription-gated.
      */
     suspend fun runEligibleJobs(
         context: Context,
         executionType: PirExecutionType,
+        runMode: PirRunMode,
     ): Result<Unit>
 
     /**
@@ -84,10 +91,14 @@ class RealPirJobsRunner @Inject constructor(
     private val pirInitialScanCompletionWideEvent: PirInitialScanCompletionWideEvent,
     private val networkProtectionState: NetworkProtectionState,
     private val pirWebViewCountProvider: PirWebViewCountProvider,
+    private val pirFreeScanBrokerFilter: PirFreeScanBrokerFilter,
+    private val pirFreeScanWorkWindow: PirFreeScanWorkWindow,
+    private val pirScanScheduler: PirScanScheduler,
 ) : PirJobsRunner {
     override suspend fun runEligibleJobs(
         context: Context,
         executionType: PirExecutionType,
+        runMode: PirRunMode,
     ): Result<Unit> = withContext(dispatcherProvider.io()) {
         val startTimeInMillis = currentTimeProvider.currentTimeMillis()
 
@@ -134,6 +145,16 @@ class RealPirJobsRunner @Inject constructor(
             } catch (_: Exception) {
                 logcat { "PIR-JOB-RUNNER: Failed to update broker data." }
             }
+        }
+
+        var allActiveBrokersAreGated = false
+        if (runMode == PirRunMode.SCAN_ONLY) {
+            val ungatedBrokerNames = pirFreeScanBrokerFilter
+                .excludingGatedBrokers(pirRepository.getAllActiveBrokerObjects())
+                .mapTo(hashSetOf()) { it.name }
+            val ungatedActiveBrokers = activeBrokers.intersect(ungatedBrokerNames).toHashSet()
+            allActiveBrokersAreGated = activeBrokers.isNotEmpty() && ungatedActiveBrokers.isEmpty()
+            activeBrokers = ungatedActiveBrokers
         }
 
         emitStartPixel(context, executionType, profileQueries.size, activeBrokers.size)
@@ -187,8 +208,16 @@ class RealPirJobsRunner @Inject constructor(
         )
 
         if (activeBrokers.isEmpty()) {
-            logcat { "PIR-JOB-RUNNER: No active brokers available. Completing run." }
-            pirScanWideEvent.onRunFailed(executionType = executionType, reason = FailureReason.NO_ACTIVE_BROKERS)
+            if (allActiveBrokersAreGated) {
+                // Every broker this user has is behind the subscription: a product exclusion, not a failed run.
+                // onScanCompleted closes the scan interval that onRunStarted opened; onOptOutSkipped only closes the flow interval.
+                logcat { "PIR-JOB-RUNNER: All active brokers are subscription-gated. Completing run." }
+                pirScanWideEvent.onScanCompleted(executionType)
+                pirScanWideEvent.onOptOutSkipped(executionType)
+            } else {
+                logcat { "PIR-JOB-RUNNER: No active brokers available. Completing run." }
+                pirScanWideEvent.onRunFailed(executionType = executionType, reason = FailureReason.NO_ACTIVE_BROKERS)
+            }
             emitCompletedPixel(
                 context = context,
                 executionType = executionType,
@@ -220,6 +249,11 @@ class RealPirJobsRunner @Inject constructor(
 
             pirScanWideEvent.onScanCompleted(executionType)
             pirInitialScanCompletionWideEvent.onScanCompleted()
+
+            // A scheduled run IS the scheduled scan worker; cancelling its own unique work here would cancel this coroutine.
+            if (runMode == PirRunMode.SCAN_ONLY && executionType != PirExecutionType.SCHEDULED) {
+                retireScanWorkerIfInitialScanIsDone()
+            }
 
             if (executionType.isManual) {
                 val batteryOptimizationsEnabled = !context.isIgnoringBatteryOptimizations()
@@ -363,6 +397,14 @@ class RealPirJobsRunner @Inject constructor(
 
     private suspend fun obtainProfiles(): List<ProfileQuery> {
         return pirRepository.getAllUserProfileQueries()
+    }
+
+    /** The worker exists only to resume an interrupted initial scan, so it goes once there is nothing left to resume. */
+    private suspend fun retireScanWorkerIfInitialScanIsDone() {
+        if (!pirFreeScanWorkWindow.isOpen()) {
+            logcat { "PIR-JOB-RUNNER: Free scan window closed. Retiring the scheduled scan worker." }
+            pirScanScheduler.cancelScheduledScanWorker()
+        }
     }
 
     private suspend fun attemptCreateScanJobs(

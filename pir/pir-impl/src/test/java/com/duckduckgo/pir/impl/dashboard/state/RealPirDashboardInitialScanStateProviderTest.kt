@@ -18,10 +18,14 @@ package com.duckduckgo.pir.impl.dashboard.state
 
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.pir.impl.checker.PirEligibility
+import com.duckduckgo.pir.impl.checker.PirRunMode
+import com.duckduckgo.pir.impl.checker.PirWorkHandler
 import com.duckduckgo.pir.impl.common.BrokerStepsParser
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.ScanStep
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions.ScanStepActions
 import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvider.DashboardBrokerWithStatus.Status
+import com.duckduckgo.pir.impl.freemium.PirFreeScanBrokerFilter
 import com.duckduckgo.pir.impl.models.AddressCityState
 import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.models.ExtractedProfile
@@ -35,7 +39,7 @@ import com.duckduckgo.pir.impl.scan.PirForegroundScanServiceMonitor
 import com.duckduckgo.pir.impl.scan.PirScanScheduler
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -48,6 +52,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 class RealPirDashboardInitialScanStateProviderTest {
@@ -63,11 +68,13 @@ class RealPirDashboardInitialScanStateProviderTest {
     private val mockBrokerStepsParser: BrokerStepsParser = mock()
     private val mockForegroundScanServiceMonitor: PirForegroundScanServiceMonitor = mock()
     private val mockPirScanScheduler: PirScanScheduler = mock()
+    private val mockPirWorkHandler: PirWorkHandler = mock()
+    private val mockPirFreeScanBrokerFilter: PirFreeScanBrokerFilter = mock()
 
     private val currentTime = 1640995200000L
 
     @Before
-    fun setUp() {
+    fun setUp() = runTest {
         testee = RealPirDashboardInitialScanStateProvider(
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             currentTimeProvider = mockCurrentTimeProvider,
@@ -76,10 +83,13 @@ class RealPirDashboardInitialScanStateProviderTest {
             brokerStepsParser = mockBrokerStepsParser,
             pirForegroundScanServiceMonitor = mockForegroundScanServiceMonitor,
             pirScanScheduler = mockPirScanScheduler,
+            pirWorkHandler = mockPirWorkHandler,
+            pirFreeScanBrokerFilter = mockPirFreeScanBrokerFilter,
         )
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(currentTime)
         whenever(mockForegroundScanServiceMonitor.isRunning()).thenReturn(false)
-        runBlocking { whenever(mockPirScanScheduler.isScheduledScanRunning()).thenReturn(false) }
+        whenever(mockPirScanScheduler.isScheduledScanRunning()).thenReturn(false)
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(flowOf(PirEligibility.Enabled(PirRunMode.SCAN_AND_OPT_OUT)))
     }
 
     private suspend fun setupBrokersWithScannableSteps(brokers: List<Broker>) {
@@ -122,6 +132,7 @@ class RealPirDashboardInitialScanStateProviderTest {
 
         // Then
         assertEquals(3, result)
+        verifyNoInteractions(mockPirFreeScanBrokerFilter)
     }
 
     @Test
@@ -237,6 +248,35 @@ class RealPirDashboardInitialScanStateProviderTest {
     }
 
     @Test
+    fun whenScanOnlyThenTotalCountsOnlyFreeScannableBrokersAndTheirMirrors() = runTest {
+        // Given
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(flowOf(PirEligibility.Enabled(PirRunMode.SCAN_ONLY)))
+        whenever(mockPirFreeScanBrokerFilter.freeScannableBrokerNames()).thenReturn(setOf("broker1"))
+        whenever(mockPirRepository.getAllMirrorSites()).thenReturn(
+            listOf(
+                createMirrorSite(
+                    name = "mirror1",
+                    parentSite = "broker1",
+                    addedAt = currentTime - 10000,
+                    removedAt = 0L,
+                ),
+                createMirrorSite(
+                    name = "mirror2",
+                    parentSite = "broker2",
+                    addedAt = currentTime - 10000,
+                    removedAt = 0L,
+                ),
+            ),
+        )
+
+        // When
+        val result = testee.getActiveBrokersAndMirrorSitesTotal()
+
+        // Then
+        assertEquals(2, result)
+    }
+
+    @Test
     fun whenNoCompletedBrokersThenGetFullyCompletedBrokersTotalReturnsZero() = runTest {
         // Given
         setupForEmptyBrokersAndJobs()
@@ -342,6 +382,37 @@ class RealPirDashboardInitialScanStateProviderTest {
 
         // Then
         assertEquals(2, result) // broker1 with it's only mirror site is completed
+    }
+
+    @Test
+    fun whenScanOnlyUserHasTerminalRecordForGatedBrokerThenFullyCompletedNeverExceedsTotal() = runTest {
+        // Given - a lapsed subscriber: gated brokers still hold terminal records from paid scans, but only
+        // FreeBroker is part of what this user can scan now.
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(flowOf(PirEligibility.Enabled(PirRunMode.SCAN_ONLY)))
+        whenever(mockPirFreeScanBrokerFilter.freeScannableBrokerNames()).thenReturn(setOf("FreeBroker"))
+        val activeBrokers = listOf(
+            createBroker("FreeBroker"),
+            createBroker("GatedBroker1"),
+            createBroker("GatedBroker2"),
+        )
+        val scanJobs = listOf(
+            createScanJobRecord("GatedBroker1", 1L, ScanJobStatus.MATCHES_FOUND, currentTime - 1000),
+            createScanJobRecord("GatedBroker2", 1L, ScanJobStatus.NO_MATCH_FOUND, currentTime - 2000),
+        )
+        whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(activeBrokers)
+        whenever(mockPirRepository.getAllBrokerOptOutUrls()).thenReturn(emptyMap())
+        whenever(mockPirSchedulingRepository.getAllValidScanJobRecords()).thenReturn(scanJobs)
+        whenever(mockPirRepository.getAllMirrorSites()).thenReturn(emptyList())
+
+        // When
+        val totalScans = testee.getActiveBrokersAndMirrorSitesTotal()
+        val currentScans = testee.getFullyCompletedBrokersTotal()
+
+        // Then
+        assertEquals(1, totalScans)
+        assertEquals(0, currentScans)
+        assertTrue(currentScans <= totalScans)
+        assertTrue(testee.getAllScannedBrokersStatus().isEmpty())
     }
 
     @Test
@@ -937,6 +1008,18 @@ class RealPirDashboardInitialScanStateProviderTest {
         whenever(mockPirSchedulingRepository.getAllValidScanJobRecords())
             .thenReturn(listOf(createScanJobRecord("Broker1", 1L, ScanJobStatus.NOT_EXECUTED, 0L)))
         whenever(mockPirScanScheduler.isScheduledScanRunning()).thenReturn(true)
+
+        // When / Then
+        assertFalse(testee.shouldRestartInitialScan())
+    }
+
+    @Test
+    fun whenScanOnlyUserHasUnexecutedJobOnlyForGatedBrokerThenShouldNotRestartScan() = runTest {
+        // Given - a lapsed subscriber: the only unscanned job is for a broker they can no longer scan
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(flowOf(PirEligibility.Enabled(PirRunMode.SCAN_ONLY)))
+        whenever(mockPirFreeScanBrokerFilter.freeScannableBrokerNames()).thenReturn(setOf("FreeBroker"))
+        whenever(mockPirSchedulingRepository.getAllValidScanJobRecords())
+            .thenReturn(listOf(createScanJobRecord("GatedBroker", 1L, ScanJobStatus.NOT_EXECUTED, 0L)))
 
         // When / Then
         assertFalse(testee.shouldRestartInitialScan())

@@ -24,9 +24,13 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.pir.impl.PirRemoteFeatures
 import com.duckduckgo.pir.impl.brokers.BrokerJsonUpdater
+import com.duckduckgo.pir.impl.checker.PirRunMode
 import com.duckduckgo.pir.impl.common.PirJob.RunType
 import com.duckduckgo.pir.impl.common.PirRendererGoneException
 import com.duckduckgo.pir.impl.common.PirWebViewCountProvider
+import com.duckduckgo.pir.impl.freemium.PirFreeScanBrokerFilter
+import com.duckduckgo.pir.impl.freemium.PirFreeScanWorkWindow
+import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord
@@ -36,6 +40,7 @@ import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord.ScanJob
 import com.duckduckgo.pir.impl.optout.PirOptOut
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.scan.PirScan
+import com.duckduckgo.pir.impl.scan.PirScanScheduler
 import com.duckduckgo.pir.impl.scheduling.PirExecutionType.MANUAL_EDIT_PROFILE
 import com.duckduckgo.pir.impl.scheduling.PirExecutionType.MANUAL_INITIAL
 import com.duckduckgo.pir.impl.scheduling.PirExecutionType.MANUAL_INITIAL_RESUME
@@ -56,7 +61,9 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -89,6 +96,9 @@ class RealPirJobsRunnerTest {
     private val mockPirInitialScanCompletionWideEvent: PirInitialScanCompletionWideEvent = mock()
     private val mockNetworkProtectionState: NetworkProtectionState = mock()
     private val mockPirWebViewCountProvider: PirWebViewCountProvider = mock()
+    private val mockPirFreeScanBrokerFilter: PirFreeScanBrokerFilter = mock()
+    private val mockPirFreeScanWorkWindow: PirFreeScanWorkWindow = mock()
+    private val mockPirScanScheduler: PirScanScheduler = mock()
 
     @Before
     fun setUp() = kotlinx.coroutines.runBlocking {
@@ -102,6 +112,7 @@ class RealPirJobsRunnerTest {
         whenever(mockTrackerBlockingToggle.isEnabled()).thenReturn(false)
         whenever(mockNetworkProtectionState.isRunning()).thenReturn(false)
         whenever(mockPirWebViewCountProvider.getMaxWebViewCount()).thenReturn(20)
+        whenever(mockPirFreeScanWorkWindow.isOpen()).thenReturn(true)
 
         testee = RealPirJobsRunner(
             dispatcherProvider = coroutineRule.testDispatcherProvider,
@@ -119,6 +130,9 @@ class RealPirJobsRunnerTest {
             pirInitialScanCompletionWideEvent = mockPirInitialScanCompletionWideEvent,
             networkProtectionState = mockNetworkProtectionState,
             pirWebViewCountProvider = mockPirWebViewCountProvider,
+            pirFreeScanBrokerFilter = mockPirFreeScanBrokerFilter,
+            pirFreeScanWorkWindow = mockPirFreeScanWorkWindow,
+            pirScanScheduler = mockPirScanScheduler,
         )
     }
 
@@ -188,6 +202,16 @@ class RealPirJobsRunnerTest {
         optOutRemovedDateInMillis = 0L,
     )
 
+    private fun brokerObject(name: String) = Broker(
+        name = name,
+        fileName = "$name.json",
+        url = "$name.com",
+        version = "1.0.0",
+        parent = null,
+        addedDatetime = 0L,
+        removedAt = 0L,
+    )
+
     @Test
     fun whenEmptyActiveBrokersAndEmptyProfileQueriesThenCompleteQuick() = runTest {
         // Given
@@ -195,7 +219,7 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(emptyList())
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
 
         // Then
         verify(mockPirRepository, never()).setLatestBackgroundScanRunInMs(any())
@@ -216,7 +240,7 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(emptyList())
 
         // When
-        val result = testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
+        val result = testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
 
         // Then
         assertTrue(result.isSuccess)
@@ -236,7 +260,7 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(testUserProfileQueries)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
 
         // Then
         verify(mockPirRepository, never()).setLatestBackgroundScanRunInMs(any())
@@ -291,7 +315,7 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
 
         // Then
         verify(mockPixelSender).reportManualScanStarted(any(), any(), any(), eq(MANUAL_INITIAL), any())
@@ -347,7 +371,7 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
 
         // Then
         verify(mockPixelSender).reportManualScanStarted(any(), any(), any(), eq(MANUAL_INITIAL), any())
@@ -388,7 +412,7 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL_EDIT_PROFILE)
+        testee.runEligibleJobs(mockContext, MANUAL_EDIT_PROFILE, PirRunMode.SCAN_AND_OPT_OUT)
 
         // Then
         verify(mockPixelSender).reportManualScanStarted(any(), any(), any(), eq(MANUAL_EDIT_PROFILE), any())
@@ -420,7 +444,7 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL_INITIAL_RESUME)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL_RESUME, PirRunMode.SCAN_AND_OPT_OUT)
 
         // Then - a resume is a manual run (forwards the resume trigger to pixels and both wide events)
         // but must NOT re-fire the once-per-install first-scan pixel.
@@ -492,7 +516,7 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
 
         // When
-        testee.runEligibleJobs(mockContext, SCHEDULED)
+        testee.runEligibleJobs(mockContext, SCHEDULED, PirRunMode.SCAN_AND_OPT_OUT)
 
         // Then
         verify(mockPixelSender).reportScheduledScanStarted(any(), any())
@@ -531,7 +555,7 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
 
         // Then
         verify(mockPirSchedulingRepository, never()).saveScanJobRecords(any())
@@ -560,7 +584,7 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
 
         // Then
         verify(mockPirSchedulingRepository).saveScanJobRecords(
@@ -589,7 +613,7 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
 
         // Then
         verify(mockPirSchedulingRepository, never()).saveScanJobRecords(any())
@@ -621,7 +645,7 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
 
         // Then
         verify(mockPirScan).stop()
@@ -664,7 +688,7 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
 
         // Then
         verify(mockPirSchedulingRepository).saveOptOutJobRecords(
@@ -704,7 +728,7 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
 
         // Then
         verify(mockPirSchedulingRepository, never()).saveOptOutJobRecords(any())
@@ -739,7 +763,7 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
 
         // Then
         verify(mockPirSchedulingRepository, never()).saveOptOutJobRecords(any())
@@ -774,7 +798,7 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
 
         // Then
         verify(mockPixelSender).reportManualScanStarted(any(), any(), any(), eq(MANUAL_INITIAL), any())
@@ -811,7 +835,7 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
 
         // Then
         verify(mockPirOptOut).executeOptOutForJobs(listOf(testOptOutJobRecord), mockContext)
@@ -841,7 +865,7 @@ class RealPirJobsRunnerTest {
             whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
 
             // When
-            testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
+            testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
 
             // Then
             verify(mockPirOptOut, never()).executeOptOutForJobs(
@@ -892,7 +916,7 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
 
         // Then
         // Verify all major operations are called
@@ -938,7 +962,7 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
 
         // Then
         verify(mockPirScan).stop()
@@ -971,7 +995,7 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
 
         // Then
         // Should create opt-out job even for deprecated profile if it has extracted profiles
@@ -1017,7 +1041,7 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
 
         // Then
         // Should not create new opt-out job if one already exists
@@ -1065,7 +1089,7 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
 
         // Then
         // Should create scan job only for non-deprecated profile
@@ -1121,7 +1145,7 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(0L)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
 
         // Then
         verify(mockPirRepository).setLatestBackgroundScanRunInMs(any())
@@ -1150,7 +1174,7 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(0L)
 
         // When
-        testee.runEligibleJobs(mockContext, SCHEDULED)
+        testee.runEligibleJobs(mockContext, SCHEDULED, PirRunMode.SCAN_AND_OPT_OUT)
 
         // Then
         verify(mockPirRepository).setLatestBackgroundScanRunInMs(any())
@@ -1179,7 +1203,7 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
 
         // When
-        testee.runEligibleJobs(mockContext, SCHEDULED)
+        testee.runEligibleJobs(mockContext, SCHEDULED, PirRunMode.SCAN_AND_OPT_OUT)
 
         // Then
         verify(mockPirRepository).setLatestBackgroundScanRunInMs(testCurrentTime)
@@ -1208,7 +1232,7 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
 
         // Then
         verify(mockPirRepository, never()).setLatestBackgroundScanRunInMs(any())
@@ -1222,7 +1246,7 @@ class RealPirJobsRunnerTest {
         whenever(mockBrokerJsonUpdater.update()).thenReturn(true)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
 
         // Then
         verify(mockBrokerJsonUpdater).update()
@@ -1260,7 +1284,7 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
 
         // Then - scan should proceed (scan jobs attempted, not just completing with empty brokers)
         verify(mockBrokerJsonUpdater).update()
@@ -1275,7 +1299,7 @@ class RealPirJobsRunnerTest {
         whenever(mockBrokerJsonUpdater.update()).thenReturn(false)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
 
         // Then
         verify(mockBrokerJsonUpdater).update()
@@ -1316,7 +1340,7 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
 
         // Then
         verifyNoInteractions(mockBrokerJsonUpdater)
@@ -1330,7 +1354,7 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(testUserProfileQueries)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
 
         // Then
         verifyNoInteractions(mockBrokerJsonUpdater)
@@ -1369,7 +1393,7 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
 
         // Then
         verify(mockPirScanWideEvent).onRunStarted(
@@ -1409,7 +1433,7 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL_EDIT_PROFILE)
+        testee.runEligibleJobs(mockContext, MANUAL_EDIT_PROFILE, PirRunMode.SCAN_AND_OPT_OUT)
 
         // Then
         verify(mockPirScanWideEvent).onRunStarted(
@@ -1456,7 +1480,7 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
 
         // When
-        testee.runEligibleJobs(mockContext, SCHEDULED)
+        testee.runEligibleJobs(mockContext, SCHEDULED, PirRunMode.SCAN_AND_OPT_OUT)
 
         // Then - scheduled runs now also drive the wide-event lifecycle (sampling is handled
         // inside the wide-event impl, not at the call site).
@@ -1487,7 +1511,7 @@ class RealPirJobsRunnerTest {
             .thenReturn(emptyList())
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
 
         // Then
         verify(mockPirScanWideEvent).onRunStarted(
@@ -1532,7 +1556,7 @@ class RealPirJobsRunnerTest {
 
         // When
         try {
-            testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
+            testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
             fail("Expected CancellationException to propagate")
         } catch (e: CancellationException) {
             assertEquals("cancelled", e.message)
@@ -1580,7 +1604,7 @@ class RealPirJobsRunnerTest {
 
         // When
         try {
-            testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
+            testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
             fail("Expected IllegalStateException to propagate")
         } catch (e: IllegalStateException) {
             assertEquals("boom", e.message)
@@ -1624,7 +1648,7 @@ class RealPirJobsRunnerTest {
 
         // When - runEligibleJobs must NOT rethrow; it must convert renderer-gone into a failure Result
         // so the foreground service's launch{} coroutine does not crash the :pir process.
-        val result = testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
+        val result = testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
 
         // Then
         assertTrue(result.isFailure)
@@ -1670,7 +1694,7 @@ class RealPirJobsRunnerTest {
 
         // When
         try {
-            testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
+            testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
             fail("Expected TimeoutCancellationException to propagate")
         } catch (_: TimeoutCancellationException) {
             // expected
@@ -1705,7 +1729,7 @@ class RealPirJobsRunnerTest {
 
         // When
         try {
-            testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
+            testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
             fail("Expected IllegalStateException to propagate")
         } catch (e: IllegalStateException) {
             assertEquals("opt-out boom", e.message)
@@ -1717,5 +1741,139 @@ class RealPirJobsRunnerTest {
         verify(mockPirScanWideEvent).onRunFailed(any(), eq(FailureReason.ILLEGAL_STATE_EXCEPTION), anyOrNull())
         verify(mockPirScanWideEvent, never()).onOptOutCompleted(any(), any())
         verify(mockPirScanWideEvent, never()).onRunCancelled(any(), any())
+    }
+
+    @Test
+    fun whenScanOnlyThenGatedBrokersAreExcludedFromTheRun() = runTest {
+        val ungated = brokerObject("Ungated")
+        val gated = brokerObject("Gated")
+        whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(listOf(testProfileQuery))
+        whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(listOf("Ungated", "Gated"))
+        whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(listOf(ungated, gated))
+        whenever(mockPirFreeScanBrokerFilter.excludingGatedBrokers(listOf(ungated, gated))).thenReturn(listOf(ungated))
+        whenever(mockEligibleScanJobProvider.getAllEligibleScanJobs(any())).thenReturn(
+            listOf(
+                ScanJobRecord(brokerName = "Ungated", userProfileId = 1L),
+                ScanJobRecord(brokerName = "Gated", userProfileId = 1L),
+            ),
+        )
+        whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
+        whenever(mockPirRepository.getBrokersForOptOut(true)).thenReturn(emptyList())
+
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
+
+        argumentCaptor<List<ScanJobRecord>>().apply {
+            verify(mockPirScan).executeScanForJobs(capture(), any(), any(), any(), any())
+            assertEquals(listOf("Ungated"), firstValue.map { it.brokerName })
+        }
+    }
+
+    @Test
+    fun whenScanAndOptOutThenGatedBrokersAreNotExcluded() = runTest {
+        val ungated = brokerObject("Ungated")
+        val gated = brokerObject("Gated")
+        whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(listOf(testProfileQuery))
+        whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(listOf("Ungated", "Gated"))
+        whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(listOf(ungated, gated))
+        whenever(mockEligibleScanJobProvider.getAllEligibleScanJobs(any())).thenReturn(
+            listOf(
+                ScanJobRecord(brokerName = "Ungated", userProfileId = 1L),
+                ScanJobRecord(brokerName = "Gated", userProfileId = 1L),
+            ),
+        )
+        whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
+        whenever(mockPirRepository.getBrokersForOptOut(true)).thenReturn(emptyList())
+
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
+
+        verifyNoInteractions(mockPirFreeScanBrokerFilter)
+        argumentCaptor<List<ScanJobRecord>>().apply {
+            verify(mockPirScan).executeScanForJobs(capture(), any(), any(), any(), any())
+            assertEquals(setOf("Ungated", "Gated"), firstValue.map { it.brokerName }.toSet())
+        }
+    }
+
+    @Test
+    fun whenEveryActiveBrokerIsGatedThenRunIsNotReportedAsFailed() = runTest {
+        val gated = brokerObject("Gated")
+        whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(listOf(testProfileQuery))
+        whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(listOf("Gated"))
+        whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(listOf(gated))
+        whenever(mockPirFreeScanBrokerFilter.excludingGatedBrokers(listOf(gated))).thenReturn(emptyList())
+
+        val result = testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
+
+        assertTrue(result.isSuccess)
+        verify(mockPirScanWideEvent, never()).onRunFailed(eq(MANUAL_INITIAL), eq(FailureReason.NO_ACTIVE_BROKERS), anyOrNull())
+        val inOrder = inOrder(mockPirScanWideEvent)
+        inOrder.verify(mockPirScanWideEvent).onScanCompleted(MANUAL_INITIAL)
+        inOrder.verify(mockPirScanWideEvent).onOptOutSkipped(MANUAL_INITIAL)
+    }
+
+    @Test
+    fun whenScanOnlyAndNoActiveBrokersAtAllThenWideEventOnRunFailed() = runTest {
+        whenever(mockEnsureBrokerDataToggle.isEnabled()).thenReturn(false)
+        whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(listOf(testProfileQuery))
+        whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(emptyList())
+        whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(emptyList())
+        whenever(mockPirFreeScanBrokerFilter.excludingGatedBrokers(emptyList())).thenReturn(emptyList())
+
+        val result = testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
+
+        assertTrue(result.isSuccess)
+        verify(mockPirScanWideEvent).onRunFailed(eq(MANUAL_INITIAL), eq(FailureReason.NO_ACTIVE_BROKERS), anyOrNull())
+        verify(mockPirScanWideEvent, never()).onOptOutSkipped(any())
+    }
+
+    @Test
+    fun whenScanOnlyRunFinishesAndWindowIsClosedThenScanWorkerIsCancelled() = runTest {
+        givenAScanOnlyRunWithOneUngatedBroker()
+        whenever(mockPirFreeScanWorkWindow.isOpen()).thenReturn(false)
+
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
+
+        verify(mockPirScanScheduler).cancelScheduledScanWorker()
+    }
+
+    @Test
+    fun whenScanOnlyRunFinishesAndWindowIsOpenThenScanWorkerIsKept() = runTest {
+        givenAScanOnlyRunWithOneUngatedBroker()
+        whenever(mockPirFreeScanWorkWindow.isOpen()).thenReturn(true)
+
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
+
+        verify(mockPirScanScheduler, never()).cancelScheduledScanWorker()
+    }
+
+    @Test
+    fun whenScanAndOptOutRunFinishesThenWindowIsNotConsulted() = runTest {
+        givenAScanOnlyRunWithOneUngatedBroker()
+
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
+
+        verifyNoInteractions(mockPirFreeScanWorkWindow)
+        verify(mockPirScanScheduler, never()).cancelScheduledScanWorker()
+    }
+
+    @Test
+    fun whenScanOnlyScheduledRunFinishesAndWindowIsClosedThenScanWorkerIsNotCancelled() = runTest {
+        givenAScanOnlyRunWithOneUngatedBroker()
+        whenever(mockPirFreeScanWorkWindow.isOpen()).thenReturn(false)
+
+        testee.runEligibleJobs(mockContext, SCHEDULED, PirRunMode.SCAN_ONLY)
+
+        verify(mockPirScanScheduler, never()).cancelScheduledScanWorker()
+    }
+
+    private suspend fun givenAScanOnlyRunWithOneUngatedBroker() {
+        val ungated = brokerObject("Ungated")
+        whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(listOf(testProfileQuery))
+        whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(listOf("Ungated"))
+        whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(listOf(ungated))
+        whenever(mockPirRepository.getBrokersForOptOut(true)).thenReturn(emptyList())
+        whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
+        whenever(mockPirFreeScanBrokerFilter.excludingGatedBrokers(listOf(ungated))).thenReturn(listOf(ungated))
+        whenever(mockEligibleScanJobProvider.getAllEligibleScanJobs(any()))
+            .thenReturn(listOf(ScanJobRecord(brokerName = "Ungated", userProfileId = 1L)))
     }
 }
