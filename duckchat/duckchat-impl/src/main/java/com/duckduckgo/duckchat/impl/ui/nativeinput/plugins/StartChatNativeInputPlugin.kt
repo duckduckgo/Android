@@ -20,6 +20,7 @@ import android.content.Context
 import android.view.View
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InputContext
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
@@ -35,6 +36,9 @@ import javax.inject.Inject
 class StartChatNativeInputPlugin @Inject constructor() : NativeInputPlugin {
 
     override val containerId: Int = R.id.startChatContainer
+
+    // Search-only address-bar affordance; it has no place in the contextual sheet's Duck.ai composer.
+    override val supportedContexts: Set<InputContext> = setOf(InputContext.BROWSER, InputContext.DUCK_AI)
 
     override fun createView(context: Context, host: NativeInputHost): View = StartChatView(context).apply {
         this.host = host

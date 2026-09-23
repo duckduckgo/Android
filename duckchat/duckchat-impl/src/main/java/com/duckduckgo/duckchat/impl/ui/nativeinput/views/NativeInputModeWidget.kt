@@ -741,17 +741,25 @@ class NativeInputModeWidget @JvmOverloads constructor(
         return null
     }
 
+    private fun currentPluginContext(): NativeInputState.InputContext =
+        if (isContextualWidget) {
+            NativeInputState.InputContext.DUCK_AI_CONTEXTUAL
+        } else {
+            nativeInputState?.inputContext ?: NativeInputState.InputContext.BROWSER
+        }
+
     private fun setupPlugins() {
         pluginsJob?.cancel()
         val scope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
         pluginsJob = scope.launch {
             launch {
                 viewModel.plugins.collect { plugins ->
+                    val pluginContext = currentPluginContext()
                     for (plugin in plugins) {
-                        // The start-chat shortcut is a search-only address-bar affordance; it has no place
-                        // in the contextual sheet's Duck.ai composer (and reads the shared per-tab state,
-                        // which can be search-only), so skip it there.
-                        if ((isContextualWidget || isEditWidget) && plugin.containerId == R.id.startChatContainer) continue
+                        // A plugin declares which input contexts it renders in; skip it on the others. This
+                        // replaces the old per-container skip (e.g. start-chat has no place in the contextual
+                        // sheet). Edit-surface suppression stays per-view via NativeInputHost.isEditSurface().
+                        if (pluginContext !in plugin.supportedContexts) continue
                         val container = findViewById<FrameLayout?>(plugin.containerId) ?: continue
                         val pluginView = plugin.createView(context, this@NativeInputModeWidget)
                         container.removeAllViews()
