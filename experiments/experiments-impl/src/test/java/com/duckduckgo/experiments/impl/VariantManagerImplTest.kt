@@ -185,6 +185,17 @@ class VariantManagerImplTest {
         assertEquals("xx", newVariant)
     }
 
+    @Test
+    fun givenReferrerVariantWhenVariantsConfigUpdatedWithoutThatKeyThenVariantNotReset() {
+        mockUpdateScenario("sg")
+        val variantsConfig = listOf(VariantConfig("variant1", 1.0), VariantConfig("variant2", 1.0))
+
+        testee.updateVariants(variantsConfig)
+
+        verify(mockExperimentVariantRepository, never()).updateVariant(any())
+        verify(mockRandomizer, never()).random(any())
+    }
+
     private fun mockUpdateScenario(key: String) {
         testee.updateAppReferrerVariant(key)
         whenever(mockExperimentVariantRepository.getAppReferrerVariant()).thenReturn(key)
