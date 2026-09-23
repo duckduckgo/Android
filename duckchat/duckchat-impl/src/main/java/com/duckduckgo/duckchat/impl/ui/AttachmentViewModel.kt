@@ -105,7 +105,7 @@ class AttachmentViewModel @Inject constructor(
         val supportedFileTypes: List<String> = emptyList(),
     ) {
         val hasAttachments: Boolean get() = images.isNotEmpty() || files.isNotEmpty() || pageContext != null || textSelections.isNotEmpty()
-        val hasStandaloneAttachments: Boolean get() = images.isNotEmpty() || files.isNotEmpty() || pageContext != null
+        val hasStandaloneAttachments: Boolean get() = images.isNotEmpty() || files.isNotEmpty()
         val acceptedMimeTypes: List<String> get() {
             val types = mutableListOf<String>()
             if (supportedFileTypes.isNotEmpty()) types.addAll(supportedFileTypes)

@@ -309,6 +309,17 @@ class DuckChatContextualEntryViewModelTest {
     }
 
     @Test
+    fun whenContextManuallyAttachedWithTextSelectionThenPageContextAttached() = runTest {
+        viewModel.start("tab-1")
+        textSelectionRepository.add("tab-1", "selected words", "https://example.com")
+        viewModel.onPageContextReceived(validContext)
+
+        viewModel.onAttachContextRequested()
+
+        assertEquals(validContext, viewModel.viewState.value.attachedContext?.serialized)
+    }
+
+    @Test
     fun whenPromptSubmittedWithTextSelectionsThenSelectionsSentOnOwnKeyAndCleared() = runTest {
         viewModel.start("tab-1")
         viewModel.onPageContextReceived(validContext)

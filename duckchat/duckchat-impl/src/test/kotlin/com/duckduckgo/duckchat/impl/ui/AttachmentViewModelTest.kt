@@ -327,6 +327,14 @@ class AttachmentViewModelTest {
     }
 
     @Test
+    fun whenOnlyPageContextAttachedThenHasNoStandaloneAttachments() = runTest {
+        viewModel.setPageContext(PageContextAttachment(title = "Title", url = "https://example.com", tabId = "tab-1"))
+
+        assertTrue(viewModel.attachmentState.value.hasAttachments)
+        assertFalse(viewModel.attachmentState.value.hasStandaloneAttachments)
+    }
+
+    @Test
     fun whenImagesAddedThenHasStandaloneAttachments() = runTest {
         addImages(1)
 
