@@ -494,6 +494,12 @@ dependencies {
 
     implementation project(':event-hub-impl')
 
+    implementation project(':credential-exchange-api')
+
+    internalImplementation project(':credential-exchange-impl')
+    playImplementation project(':credential-exchange-impl')
+    fdroidImplementation project(':credential-exchange-dummy-impl')
+
     implementation project(':subscriptions-api')
 
     internalImplementation project(':subscriptions-impl')
