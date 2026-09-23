@@ -169,6 +169,17 @@ class NativeInputFooterIntegrationTest {
     }
 
     @Test
+    fun whenFooterBlocksComposerThenNewLineButtonInsertsNothing() = runTest {
+        val widget = NativeInputModeWidget(widgetContext)
+        widget.inputField.setText("draft")
+        widget.setFooterInputBlocked(true)
+
+        widget.printNewLine()
+
+        assertEquals("draft", widget.inputField.text.toString())
+    }
+
+    @Test
     fun whenFooterBlocksComposerThenKeyboardGoActionIsSwallowed() = runTest {
         val widget = NativeInputModeWidget(widgetContext)
         widget.inputField.setText("carried over from search")
