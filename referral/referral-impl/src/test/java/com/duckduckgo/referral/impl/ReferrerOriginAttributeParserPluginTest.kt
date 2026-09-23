@@ -21,7 +21,9 @@ import com.duckduckgo.referral.impl.ReferrerOriginAttributeParserPlugin.Companio
 import com.duckduckgo.verifiedinstallation.installsource.VerificationCheckPlayStoreInstall
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -80,6 +82,35 @@ class ReferrerOriginAttributeParserPluginTest {
         // an explicit `origin=` (present but empty) is persisted as-is, not replaced by the default
         testee.process(mapOf(ORIGIN_ATTRIBUTE_KEY to ""))
         verifyOriginAttributeProcessed("")
+    }
+
+    @Test
+    fun `when no origin and not installed from Play Store and origin already persisted then existing origin kept`() {
+        whenever(playStoreInstallChecker.installedFromPlayStore()).thenReturn(false)
+        whenever(appReferrerDataStore.utmOriginAttributeCampaign).thenReturn("funnel_app_samsung_android")
+
+        testee.process(emptyMap())
+
+        verify(appReferrerDataStore, never()).utmOriginAttributeCampaign = anyOrNull()
+    }
+
+    @Test
+    fun `when params contain origin key and origin already persisted then param value overwrites`() {
+        whenever(appReferrerDataStore.utmOriginAttributeCampaign).thenReturn("previous_origin")
+
+        testee.process(mapOf(ORIGIN_ATTRIBUTE_KEY to "campaign_foo_bar"))
+
+        verifyOriginAttributeProcessed("campaign_foo_bar")
+    }
+
+    @Test
+    fun `when no origin and installed from Play Store and origin already persisted then default overwrites`() {
+        whenever(playStoreInstallChecker.installedFromPlayStore()).thenReturn(true)
+        whenever(appReferrerDataStore.utmOriginAttributeCampaign).thenReturn("previous_origin")
+
+        testee.process(emptyMap())
+
+        verifyOriginAttributeProcessed(DEFAULT_ATTRIBUTION_FOR_PLAY_STORE_INSTALLS)
     }
 
     private fun verifyOriginAttributeProcessed(campaign: String?) {
