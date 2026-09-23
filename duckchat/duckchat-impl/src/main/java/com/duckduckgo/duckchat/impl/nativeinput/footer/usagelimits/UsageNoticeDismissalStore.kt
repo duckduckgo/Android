@@ -37,33 +37,40 @@ import javax.inject.Inject
 class UsageNoticeDismissalStore @Inject constructor(
     @DuckChat private val store: DataStore<Preferences>,
 ) {
-    val dismissal: Flow<UsageNoticeDismissal?> = store.data
+    /** One dismissal per window, so closing the daily card does not forget the weekly one. */
+    val dismissals: Flow<Map<UsageWindow, UsageNoticeDismissal>> = store.data
         .catch { error -> if (error is IOException) emit(emptyPreferences()) else throw error }
         .map { preferences ->
-            val noticeId = UsageNoticeId.fromJsonId(preferences[NOTICE_ID]) ?: return@map null
-            val window = UsageWindow.fromJsonId(preferences[WINDOW]) ?: return@map null
-            val resetsAt = preferences[RESETS_AT] ?: return@map null
-            val band = preferences[BAND] ?: return@map null
-            UsageNoticeDismissal(noticeId = noticeId, window = window, resetsAtMillis = resetsAt, band = band)
+            UsageWindow.entries.mapNotNull { window -> preferences.dismissal(window)?.let { window to it } }.toMap()
         }
         .distinctUntilChanged()
 
     suspend fun dismiss(notice: UsageNotice) {
+        val keys = Keys(notice.window)
         editIgnoringIoFailure { preferences ->
-            preferences[NOTICE_ID] = notice.id.jsonId
-            preferences[WINDOW] = notice.window.jsonId
-            preferences[RESETS_AT] = notice.resetsAtMillis
-            preferences[BAND] = UsageNoticeBand.of(notice.percentUsed)
+            preferences[keys.noticeId] = notice.id.jsonId
+            preferences[keys.resetsAt] = notice.resetsAtMillis
+            preferences[keys.band] = UsageNoticeBand.of(notice.percentUsed)
         }
     }
 
     suspend fun clear() {
         editIgnoringIoFailure { preferences ->
-            preferences.remove(NOTICE_ID)
-            preferences.remove(WINDOW)
-            preferences.remove(RESETS_AT)
-            preferences.remove(BAND)
+            UsageWindow.entries.forEach { window ->
+                val keys = Keys(window)
+                preferences.remove(keys.noticeId)
+                preferences.remove(keys.resetsAt)
+                preferences.remove(keys.band)
+            }
         }
+    }
+
+    private fun Preferences.dismissal(window: UsageWindow): UsageNoticeDismissal? {
+        val keys = Keys(window)
+        val noticeId = UsageNoticeId.fromJsonId(this[keys.noticeId]) ?: return null
+        val resetsAt = this[keys.resetsAt] ?: return null
+        val band = this[keys.band] ?: return null
+        return UsageNoticeDismissal(noticeId = noticeId, window = window, resetsAtMillis = resetsAt, band = band)
     }
 
     // A failed write must not take the app down for a footer dismissal; the read side already tolerates IO errors.
@@ -75,10 +82,10 @@ class UsageNoticeDismissalStore @Inject constructor(
         }
     }
 
-    private companion object {
-        val NOTICE_ID = stringPreferencesKey("DUCK_AI_USAGE_NOTICE_DISMISSED_ID")
-        val WINDOW = stringPreferencesKey("DUCK_AI_USAGE_NOTICE_DISMISSED_WINDOW")
-        val RESETS_AT = longPreferencesKey("DUCK_AI_USAGE_NOTICE_DISMISSED_RESETS_AT")
-        val BAND = intPreferencesKey("DUCK_AI_USAGE_NOTICE_DISMISSED_BAND")
+    private class Keys(window: UsageWindow) {
+        private val prefix = "DUCK_AI_USAGE_NOTICE_DISMISSED_${window.name}"
+        val noticeId = stringPreferencesKey("${prefix}_ID")
+        val resetsAt = longPreferencesKey("${prefix}_RESETS_AT")
+        val band = intPreferencesKey("${prefix}_BAND")
     }
 }

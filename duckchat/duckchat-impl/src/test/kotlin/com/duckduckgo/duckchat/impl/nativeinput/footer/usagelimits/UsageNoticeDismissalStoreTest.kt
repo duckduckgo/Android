@@ -29,7 +29,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -59,8 +58,8 @@ class UsageNoticeDismissalStoreTest {
     }
 
     @Test
-    fun whenNothingWasDismissedThenDismissalIsNull() = runTest {
-        assertNull(testee.dismissal.first())
+    fun whenNothingWasDismissedThenThereAreNoDismissals() = runTest {
+        assertEquals(emptyMap<UsageWindow, UsageNoticeDismissal>(), testee.dismissals.first())
     }
 
     @Test
@@ -69,28 +68,40 @@ class UsageNoticeDismissalStoreTest {
 
         assertEquals(
             UsageNoticeDismissal(UsageNoticeId.APPROACHING, UsageWindow.WEEKLY, RESETS_AT, 75),
-            testee.dismissal.first(),
+            testee.dismissals.first()[UsageWindow.WEEKLY],
         )
     }
 
     @Test
-    fun whenAnotherNoticeIsDismissedThenItReplacesThePreviousOne() = runTest {
+    fun whenNoticesInBothWindowsAreDismissedThenBothAreRemembered() = runTest {
         testee.dismiss(approaching(55))
         testee.dismiss(approaching(92).copy(window = UsageWindow.DAILY))
 
         assertEquals(
-            UsageNoticeDismissal(UsageNoticeId.APPROACHING, UsageWindow.DAILY, RESETS_AT, 90),
-            testee.dismissal.first(),
+            mapOf(
+                UsageWindow.WEEKLY to UsageNoticeDismissal(UsageNoticeId.APPROACHING, UsageWindow.WEEKLY, RESETS_AT, 50),
+                UsageWindow.DAILY to UsageNoticeDismissal(UsageNoticeId.APPROACHING, UsageWindow.DAILY, RESETS_AT, 90),
+            ),
+            testee.dismissals.first(),
         )
     }
 
     @Test
-    fun whenClearedThenDismissalIsNull() = runTest {
+    fun whenTheSameWindowIsDismissedAgainThenTheNewerRecordWins() = runTest {
         testee.dismiss(approaching(55))
+        testee.dismiss(approaching(80))
+
+        assertEquals(75, testee.dismissals.first().getValue(UsageWindow.WEEKLY).band)
+    }
+
+    @Test
+    fun whenClearedThenAllWindowsAreForgotten() = runTest {
+        testee.dismiss(approaching(55))
+        testee.dismiss(approaching(55).copy(window = UsageWindow.DAILY))
 
         testee.clear()
 
-        assertNull(testee.dismissal.first())
+        assertEquals(emptyMap<UsageWindow, UsageNoticeDismissal>(), testee.dismissals.first())
     }
 
     @Test
@@ -102,11 +113,11 @@ class UsageNoticeDismissalStoreTest {
     }
 
     @Test
-    fun whenDataStoreReadFailsThenDismissalIsNull() = runTest {
+    fun whenDataStoreReadFailsThenThereAreNoDismissals() = runTest {
         val failingStore: DataStore<Preferences> = mock()
         whenever(failingStore.data).thenReturn(flow { throw IOException("corrupt") })
 
-        assertNull(UsageNoticeDismissalStore(failingStore).dismissal.first())
+        assertEquals(emptyMap<UsageWindow, UsageNoticeDismissal>(), UsageNoticeDismissalStore(failingStore).dismissals.first())
     }
 
     private fun approaching(percent: Int) = UsageNotice(

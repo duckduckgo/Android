@@ -79,12 +79,13 @@ class DuckAiUsageWarningsDevActivity : DuckDuckGoActivity() {
         )
         binding.resetHighUsageDismissals.isEnabled = viewState.dismissedModelIds.isNotEmpty()
         binding.usageNoticeDismissal.setSecondaryText(
-            viewState.usageNoticeDismissal?.let {
-                getString(R.string.devSettingsDuckAiUsageWarningsUsageDismissalValue, it.noticeId.jsonId, it.window.jsonId, it.band)
-            }
+            viewState.usageNoticeDismissals
+                .map { getString(R.string.devSettingsDuckAiUsageWarningsUsageDismissalValue, it.noticeId.jsonId, it.window.jsonId, it.band) }
+                .takeIf { it.isNotEmpty() }
+                ?.joinToString(separator = "\n")
                 ?: getString(R.string.devSettingsDuckAiUsageWarningsNoDismissals),
         )
-        binding.resetUsageNoticeDismissal.isEnabled = viewState.usageNoticeDismissal != null
+        binding.resetUsageNoticeDismissal.isEnabled = viewState.usageNoticeDismissals.isNotEmpty()
     }
 
     private fun processCommand(command: Command) {

@@ -57,7 +57,7 @@ class UsageLimitFooterPluginTest {
         com.duckduckgo.mobile.android.R.style.Theme_DuckDuckGo_Light,
     )
     private val snapshot = MutableStateFlow<UsageLimitsSnapshot?>(null)
-    private val dismissal = MutableStateFlow<UsageNoticeDismissal?>(null)
+    private val dismissals = MutableStateFlow<Map<UsageWindow, UsageNoticeDismissal>>(emptyMap())
     private val repository: DuckAiUsageLimitsRepository = mock()
     private val dismissalStore: UsageNoticeDismissalStore = mock()
     private val currentTimeProvider: CurrentTimeProvider = mock()
@@ -69,7 +69,7 @@ class UsageLimitFooterPluginTest {
     @Before
     fun setUp() {
         whenever(repository.usageLimits(BrowserMode.REGULAR)).thenReturn(snapshot)
-        whenever(dismissalStore.dismissal).thenReturn(dismissal)
+        whenever(dismissalStore.dismissals).thenReturn(dismissals)
         whenever(currentTimeProvider.currentTimeMillis()).thenReturn(NOW)
         feature.duckAiUsageWarnings().setRawStoredState(Toggle.State(enable = true))
         testee = UsageLimitFooterPlugin(
@@ -173,7 +173,7 @@ class UsageLimitFooterPluginTest {
 
             footer.view.findViewById<ImageView>(R.id.usageLimitFooterDismiss).performClick()
             verify(dismissalStore).dismiss(approaching(55)!!.notice)
-            dismissal.value = UsageNoticeDismissal(UsageNoticeId.APPROACHING, UsageWindow.WEEKLY, RESETS_AT, 50)
+            dismissals.value = mapOf(UsageWindow.WEEKLY to UsageNoticeDismissal(UsageNoticeId.APPROACHING, UsageWindow.WEEKLY, RESETS_AT, 50))
 
             assertFalse(awaitItem().visible)
 
