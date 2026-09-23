@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-}
+package com.duckduckgo.app.trackerdetection
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
+import javax.inject.Inject
 
-dependencies {
-    api project(':feature-toggles-api')
-    implementation AndroidX.annotation
-    implementation "io.reactivex.rxjava2:rxjava:_"
-}
+@ContributesBinding(AppScope::class)
+class RealTdsMetadataProvider @Inject constructor(
+    private val tdsMetadataDao: TdsMetadataDao,
+) : TdsMetadataProvider {
 
-android {
-    namespace 'com.duckduckgo.tracker.detection.api'
+    override fun eTag(): String? = tdsMetadataDao.eTag()
 }

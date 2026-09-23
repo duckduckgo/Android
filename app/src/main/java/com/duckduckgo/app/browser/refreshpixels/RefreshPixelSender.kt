@@ -21,9 +21,9 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
-import com.duckduckgo.app.trackerdetection.blocklist.BlockListPixelsPlugin
-import com.duckduckgo.app.trackerdetection.blocklist.get2XRefresh
-import com.duckduckgo.app.trackerdetection.blocklist.get3XRefresh
+import com.duckduckgo.app.trackerdetection.blocklist.BlockListExperiment
+import com.duckduckgo.app.trackerdetection.blocklist.BlockListExperiment.Metric.THREE_X_REFRESH
+import com.duckduckgo.app.trackerdetection.blocklist.BlockListExperiment.Metric.TWO_X_REFRESH
 import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -47,7 +47,7 @@ interface RefreshPixelSender {
 @SingleInstanceIn(AppScope::class)
 class DuckDuckGoRefreshPixelSender @Inject constructor(
     private val pixel: Pixel,
-    private val blockListPixelsPlugin: BlockListPixelsPlugin,
+    private val blockListExperiment: BlockListExperiment,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
 ) : RefreshPixelSender {
@@ -71,13 +71,13 @@ class DuckDuckGoRefreshPixelSender @Inject constructor(
             patternsDetected.forEach { detectedPattern ->
                 when (detectedPattern) {
                     RefreshPattern.TWICE_IN_12_SECONDS -> {
-                        blockListPixelsPlugin.get2XRefresh()?.send()
+                        blockListExperiment.metric(TWO_X_REFRESH)?.send()
                         pixel.fire(AppPixelName.RELOAD_TWICE_WITHIN_12_SECONDS)
                     }
 
                     RefreshPattern.THRICE_IN_20_SECONDS -> {
                         pixel.fire(AppPixelName.RELOAD_THREE_TIMES_WITHIN_20_SECONDS)
-                        blockListPixelsPlugin.get3XRefresh()?.send()
+                        blockListExperiment.metric(THREE_X_REFRESH)?.send()
                     }
                     else -> logcat(WARN) { "Unknown refresh pattern: $detectedPattern, no pixels fired" }
                 }

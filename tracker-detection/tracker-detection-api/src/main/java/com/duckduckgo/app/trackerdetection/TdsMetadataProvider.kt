@@ -14,19 +14,15 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-}
+package com.duckduckgo.app.trackerdetection
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+import androidx.annotation.WorkerThread
 
-dependencies {
-    api project(':feature-toggles-api')
-    implementation AndroidX.annotation
-    implementation "io.reactivex.rxjava2:rxjava:_"
-}
-
-android {
-    namespace 'com.duckduckgo.tracker.detection.api'
+interface TdsMetadataProvider {
+    /**
+     * The eTag of the tracker blocklist currently stored on the device, or null when no blocklist
+     * has been downloaded yet.
+     */
+    @WorkerThread
+    fun eTag(): String?
 }
