@@ -50,7 +50,7 @@ class HighUsageModelFooterViewTest {
 
         val message = testee.findViewById<DaxTextView>(R.id.highUsageModelFooterMessage)
         assertEquals(
-            "Opus uses limits up to 2-5x faster than basic models.",
+            "Opus uses limits up to 2–5x faster than basic models.",
             message.text.toString(),
         )
         assertEquals(12f, message.textSize / context.resources.displayMetrics.scaledDensity, 0.1f)

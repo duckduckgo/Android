@@ -467,8 +467,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
     override var text: String
         get() = inputField.text.toString()
         set(value) {
-            inputField.setText(value)
-            inputField.setSelection(value.length)
+            // URL restore when the Search tab is picked should work even while the composer is blocked.
+            nativeInputBlock.runUnblocked { inputField.setText(value) }
+            inputField.setSelection(inputField.length())
         }
 
     // Installed in onAttachedToWindow (after DI) and removed in onDetachedFromWindow, so we
@@ -925,6 +926,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
      */
     private fun hookEditorActionPixels() {
         inputField.setOnEditorActionListener { _, actionId, keyEvent ->
+            if (nativeInputBlock.isBlocked) return@setOnEditorActionListener true
             val isHardwareEnter =
                 (keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER || keyEvent?.keyCode == KeyEvent.KEYCODE_NUMPAD_ENTER) &&
                     keyEvent.action == KeyEvent.ACTION_DOWN
@@ -1672,7 +1674,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private fun bindFooter() {
         val scope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
         footerHost = findFooterHost()
-        footerHost?.bind(scope, viewModel.footerState(context), ::setFooterComposerBlocked)
+        footerHost?.bind(scope, viewModel.footerState(context), ::setFooterInputBlocked)
     }
 
     /** The footer host is a sibling of this widget's card inside the nearest [NativeInputFooterDockLayout]. */
@@ -2194,7 +2196,14 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     private var interactionLocked = false
     private var existingInteractionLocked = false
-    private var footerComposerBlocked = false
+    private var lockDimsWholeWidget = false
+    private val nativeInputBlock = NativeInputBlock(
+        widget = this,
+        inputField = inputField,
+        dimmedRowIds = listOf(R.id.inputModeWidgetCardContent, R.id.inputModeWidgetBottomRow),
+        toggleRowId = R.id.inputModeSwitchRow,
+        dimAlpha = LOCKED_ALPHA,
+    )
 
     // Dims only this (transparent) widget, never the parent card surface, so the bar stays
     // colour-uniform with the page. Touch interception covers the plugin containers too.
@@ -2203,22 +2212,29 @@ class NativeInputModeWidget @JvmOverloads constructor(
         updateInteractionLock()
     }
 
-    internal fun setFooterComposerBlocked(blocked: Boolean) {
-        footerComposerBlocked = blocked
+    internal fun setFooterInputBlocked(blocked: Boolean) {
+        nativeInputBlock.set(blocked)
         updateInteractionLock()
     }
 
     private fun updateInteractionLock() {
-        val locked = existingInteractionLocked || footerComposerBlocked
-        if (interactionLocked == locked) return
+        val locked = existingInteractionLocked || nativeInputBlock.isBlocked
+        val wholeWidget = existingInteractionLocked
+        if (interactionLocked == locked && lockDimsWholeWidget == wholeWidget) return
         interactionLocked = locked
-        alpha = if (locked) LOCKED_ALPHA else 1f
-        if (locked) {
+        lockDimsWholeWidget = wholeWidget
+        alpha = if (locked && wholeWidget) LOCKED_ALPHA else 1f
+        nativeInputBlock.setRowsDimmed(locked && !wholeWidget)
+        if (locked && wholeWidget) {
             clearInputFocus()
         }
     }
 
-    override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean = interactionLocked || super.onInterceptTouchEvent(ev)
+    override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
+        if (!interactionLocked) return super.onInterceptTouchEvent(ev)
+        if (!lockDimsWholeWidget && ev != null && nativeInputBlock.allowsTouch(ev)) return super.onInterceptTouchEvent(ev)
+        return true
+    }
 
     companion object {
         private const val MAX_LINES = 5
