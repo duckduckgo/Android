@@ -243,7 +243,7 @@ class SubscriptionOnboardingViewModelTest {
     }
 
     @Test
-    fun whenUserLeavesBeforeHandoffFiresThenHandoffIsDropped() = runTest {
+    fun whenBackTappedDuringHandoffThenBackIsIgnoredAndHandoffStillRuns() = runTest {
         orchestrator.stateFlow.value = inProgressState()
         val testee = createViewModel()
         testee.start()
@@ -255,15 +255,15 @@ class SubscriptionOnboardingViewModelTest {
 
             controller.onStepFinished("duck_ai", COMPLETED) { handoffRan = true }
             advanceUntilIdle()
-            orchestrator.stateFlow.value = inProgressState(canGoBack = true, stepPlugin = stepPluginMock(false))
-            awaitItem()
+            // Advancing re-emits InProgress for the next step, which is what arms the hand-off.
+            orchestrator.stateFlow.value = inProgressState(canGoBack = true)
+            assertTrue(awaitItem() is SubscriptionOnboardingViewModel.Command.ShowStep)
 
+            // Back is ignored while the hand-off is in flight, so it emits nothing and the hand-off still runs.
             controller.onBack()
-            assertEquals(SubscriptionOnboardingViewModel.Command.FinishToSettings, awaitItem())
-
             advanceUntilIdle()
-            assertFalse(handoffRan)
-            cancelAndConsumeRemainingEvents()
+            assertEquals(SubscriptionOnboardingViewModel.Command.Finish, awaitItem())
+            assertTrue(handoffRan)
         }
     }
 

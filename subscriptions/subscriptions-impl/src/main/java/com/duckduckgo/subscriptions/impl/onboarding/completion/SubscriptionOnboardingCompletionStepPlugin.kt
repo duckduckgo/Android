@@ -23,10 +23,6 @@ import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
-/**
- * Terminal step of the subscription onboarding: a summary of how much of the setup the user got through.
- * It is never persisted as completed, so it shows again at the end of every run with an updated percentage.
- */
 @ContributesMultibinding(AppScope::class)
 @PriorityKey(400)
 class SubscriptionOnboardingCompletionStepPlugin @Inject constructor() : SubscriptionOnboardingStepPlugin {

@@ -71,12 +71,7 @@ class SubscriptionOnboardingViewModel @Inject constructor(
     val commands: Flow<Command> = _commands.receiveAsFlow()
 
     private var started = false
-
-    // Mirrors the current step's InProgress.canGoBack; decides back vs exit on a Back event.
     private var canGoBack = false
-
-    // Set by a step that asked to hand the user to its feature. Held until the following step has been on
-    // screen long enough to be read, then run as onboarding finishes.
     private var pendingHandoff: (() -> Unit)? = null
     private val handoffJob = ConflatedJob()
 
@@ -102,7 +97,6 @@ class SubscriptionOnboardingViewModel @Inject constructor(
                 val step = state.currentStep
                 if (step is SubscriptionOnboardingActivityStep) {
                     canGoBack = state.canGoBack && step.stepPlugin.allowsBackNavigation
-                    // The hand-off summary auto-advances, so it shows no toolbar icon to dismiss it.
                     _commands.send(Command.ShowStep(step.stepPlugin, canGoBack, showNavigationIcon = !handoffState.isHandoff))
                     scheduleHandoffIfPending()
                 }
@@ -125,13 +119,10 @@ class SubscriptionOnboardingViewModel @Inject constructor(
                 orchestrator.onEvent(StepFinished(event.stepId, event.outcome))
             }
             SubscriptionOnboardingController.Event.Back -> {
-                // An explicit tap wins over the pending hand-off: the user chose to leave.
-                cancelHandoff()
+                if (handoffState.isHandoff) return
                 if (canGoBack) {
                     orchestrator.onEvent(BackPressed)
                 } else {
-                    // Either the first step, with nothing behind it, or a terminal one that refuses back.
-                    // TODO: return to the launch source once a subscription-settings entry point exists.
                     _commands.send(Command.FinishToSettings)
                 }
             }
