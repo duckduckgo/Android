@@ -23,6 +23,7 @@ import android.webkit.ValueCallback
 import com.duckduckgo.anvil.annotations.ContributesActivePluginPoint
 import com.duckduckgo.common.utils.plugins.ActivePlugin
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InputContext
 
 /**
  * Communication surface from a plugin back to the host widget. Plugins use it to act on the host
@@ -97,6 +98,10 @@ interface NativeInputHost {
 interface NativeInputPlugin : ActivePlugin {
 
     val containerId: Int
+
+    /** The input contexts this plugin renders in. Defaults to all; narrow it to skip a plugin on a surface (e.g. start-chat is not shown in the contextual sheet). */
+    val supportedContexts: Set<InputContext>
+        get() = InputContext.entries.toSet()
 
     fun createView(context: Context, host: NativeInputHost): View
 }
