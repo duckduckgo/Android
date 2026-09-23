@@ -60,7 +60,7 @@ class ContextualSuggestionsViewModel @Inject constructor(
     private var isSmart: Boolean = false
     private var suggestionsVisible = false
     private var textSelectionCount: Int = 0
-    private var attachmentCount: Int = 0
+    private var otherAttachmentCount: Int = 0
     private var lastInput: ResolvePageSuggestionsInput? = null
 
     fun load() {
@@ -104,17 +104,17 @@ class ContextualSuggestionsViewModel @Inject constructor(
         loadJob?.cancel()
         resolvedSuggestions = emptyList()
         textSelectionCount = 0
-        attachmentCount = 0
+        otherAttachmentCount = 0
         hideSuggestions()
     }
 
     fun onAttachmentsChanged(
         textSelections: Int,
-        total: Int,
+        otherAttachments: Int,
     ) {
         val modeChanged = (textSelectionCount > 0) != (textSelections > 0)
         textSelectionCount = textSelections
-        attachmentCount = total
+        otherAttachmentCount = otherAttachments
         if (!modeChanged) {
             _viewState.update { it.copy(suggestions = visibleSuggestions()) }
             return
@@ -155,7 +155,7 @@ class ContextualSuggestionsViewModel @Inject constructor(
     }
 
     private fun visibleSuggestions(): List<ContextualSuggestedPrompt> {
-        if (attachmentCount > 1) return emptyList()
+        if (textSelectionCount + otherAttachmentCount > 1) return emptyList()
         if (textSelectionCount > 0) return resolvedSuggestions.take(MAX_TEXT_SELECTION_SUGGESTIONS)
         val capacity = (maxSuggestedPrompts - reservedQuickActionSlots).coerceAtLeast(0)
         if (resolvedSuggestions.size <= capacity) return resolvedSuggestions

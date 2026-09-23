@@ -97,7 +97,7 @@ class ContextualSuggestionsView @JvmOverloads constructor(
             .onEach { render(it) }
             .launchIn(scope)
         attachmentsJob += attachmentViewModel.attachmentState
-            .onEach { viewModel.onAttachmentsChanged(it.textSelections.size, it.textSelections.size + it.images.size + it.files.size) }
+            .onEach { viewModel.onAttachmentsChanged(it.textSelections.size, it.images.size + it.files.size) }
             .launchIn(scope)
     }
 
