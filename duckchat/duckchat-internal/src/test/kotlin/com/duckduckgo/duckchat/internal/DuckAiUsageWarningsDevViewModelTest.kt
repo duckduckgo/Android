@@ -44,9 +44,9 @@ class DuckAiUsageWarningsDevViewModelTest {
         whenever(it.dismissedModelIds).thenReturn(dismissedModelIds)
     }
 
-    private val usageDismissal = MutableStateFlow<UsageNoticeDismissal?>(null)
+    private val usageDismissals = MutableStateFlow<Map<UsageWindow, UsageNoticeDismissal>>(emptyMap())
     private val usageNoticeDismissalStore: UsageNoticeDismissalStore = mock<UsageNoticeDismissalStore>().also {
-        whenever(it.dismissal).thenReturn(usageDismissal)
+        whenever(it.dismissals).thenReturn(usageDismissals)
     }
 
     private val testee by lazy { DuckAiUsageWarningsDevViewModel(dismissalStore, usageNoticeDismissalStore) }
@@ -74,10 +74,10 @@ class DuckAiUsageWarningsDevViewModelTest {
     @Test
     fun whenUsageNoticeWasDismissedThenStateCarriesIt() = runTest {
         val dismissal = UsageNoticeDismissal(UsageNoticeId.APPROACHING, UsageWindow.WEEKLY, 1L, 75)
-        usageDismissal.value = dismissal
+        usageDismissals.value = mapOf(UsageWindow.WEEKLY to dismissal)
 
         testee.viewState.test {
-            assertEquals(dismissal, expectMostRecentItem().usageNoticeDismissal)
+            assertEquals(dismissal, expectMostRecentItem().usageNoticeDismissals.single())
         }
     }
 

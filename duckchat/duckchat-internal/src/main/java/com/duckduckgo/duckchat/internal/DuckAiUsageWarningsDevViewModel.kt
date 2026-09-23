@@ -42,7 +42,7 @@ class DuckAiUsageWarningsDevViewModel @Inject constructor(
 
     data class ViewState(
         val dismissedModelIds: Set<String> = emptySet(),
-        val usageNoticeDismissal: UsageNoticeDismissal? = null,
+        val usageNoticeDismissals: List<UsageNoticeDismissal> = emptyList(),
     )
 
     sealed class Command {
@@ -51,9 +51,9 @@ class DuckAiUsageWarningsDevViewModel @Inject constructor(
 
     val viewState: StateFlow<ViewState> = combine(
         dismissalStore.dismissedModelIds,
-        usageNoticeDismissalStore.dismissal,
-    ) { dismissedModelIds, usageNoticeDismissal ->
-        ViewState(dismissedModelIds = dismissedModelIds, usageNoticeDismissal = usageNoticeDismissal)
+        usageNoticeDismissalStore.dismissals,
+    ) { dismissedModelIds, usageNoticeDismissals ->
+        ViewState(dismissedModelIds = dismissedModelIds, usageNoticeDismissals = usageNoticeDismissals.values.toList())
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 
     private val _commands = Channel<Command>(1, DROP_OLDEST)

@@ -68,7 +68,7 @@ class UsageLimitFooterPlugin @Inject constructor(
 
         val snapshotAndDismissal = surfaceActive.flatMapLatest { active ->
             if (active) {
-                combine(repository.usageLimits(BrowserMode.REGULAR), dismissalStore.dismissal) { snapshot, dismissal -> snapshot to dismissal }
+                combine(repository.usageLimits(BrowserMode.REGULAR), dismissalStore.dismissals) { snapshot, dismissals -> snapshot to dismissals }
             } else {
                 flowOf(null)
             }
@@ -76,7 +76,7 @@ class UsageLimitFooterPlugin @Inject constructor(
 
         val state = combine(snapshotAndDismissal, hostContext) { pair, footerContext ->
             val notice = pair?.first?.notice ?: return@combine NativeInputFooterState(visible = false)
-            if (UsageNoticeDismissalPolicy.isSuppressed(notice, pair.second)) return@combine NativeInputFooterState(visible = false)
+            if (UsageNoticeDismissalPolicy.isSuppressed(notice, pair.second[notice.window])) return@combine NativeInputFooterState(visible = false)
             if (!footerContext.isInputFocused) return@combine NativeInputFooterState(visible = false)
 
             footerView.render(messageMapper.map(notice, currentTimeProvider.currentTimeMillis(), context.resources)) {
