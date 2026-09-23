@@ -24,7 +24,15 @@ interface PirFreemiumDataStore {
     /**
      * Whether the user has activated freemium PIR by saving a profile through the dashboard.
      */
-    var didActivate: Boolean
+    val didActivate: Boolean
+
+    /** First-write-wins. Anchors the bounded window during which a free user still gets background scans. */
+    val firstProfileSavedTimestamp: Long
+
+    /** No-op once [didActivate] is already true, so the timestamp it is paired with can never be re-anchored. */
+    fun activate(timestampMillis: Long)
+
+    fun reset()
 }
 
 internal class RealPirFreemiumDataStore(
@@ -38,17 +46,32 @@ internal class RealPirFreemiumDataStore(
         )
     }
 
-    override var didActivate: Boolean
+    override val didActivate: Boolean
         get() = preferences.getBoolean(KEY_DID_ACTIVATE, false)
-        set(value) {
-            // committed synchronously as both dashboard (:main) and scan (:pir) read it one after another
-            preferences.edit(commit = true) {
-                putBoolean(KEY_DID_ACTIVATE, value)
-            }
+
+    override val firstProfileSavedTimestamp: Long
+        get() = preferences.getLong(KEY_FIRST_PROFILE_SAVED_TIMESTAMP, 0L)
+
+    override fun activate(timestampMillis: Long) {
+        if (didActivate) return
+
+        // both keys committed in one write as both dashboard (:main) and scan (:pir) read them one after another
+        preferences.edit(commit = true) {
+            putBoolean(KEY_DID_ACTIVATE, true)
+            putLong(KEY_FIRST_PROFILE_SAVED_TIMESTAMP, timestampMillis)
         }
+    }
+
+    override fun reset() {
+        preferences.edit(commit = true) {
+            putBoolean(KEY_DID_ACTIVATE, false)
+            putLong(KEY_FIRST_PROFILE_SAVED_TIMESTAMP, 0L)
+        }
+    }
 
     companion object {
         private const val FILENAME = "com.duckduckgo.pir.freemium.v1"
         private const val KEY_DID_ACTIVATE = "KEY_DID_ACTIVATE"
+        private const val KEY_FIRST_PROFILE_SAVED_TIMESTAMP = "KEY_FIRST_PROFILE_SAVED_TIMESTAMP"
     }
 }
