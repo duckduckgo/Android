@@ -451,7 +451,7 @@ class ContextualSuggestionsViewModelTest {
         )
         whenever(suggestedPromptsProvider.resolveTextSelectionSuggestions(any())).thenReturn(selectionSuggestions)
 
-        viewModel.onTextSelectionCountChanged(1)
+        viewModel.onAttachmentsChanged(textSelections = 1, total = 1)
 
         assertEquals(selectionSuggestions, viewModel.viewState.value.suggestions)
     }
@@ -462,10 +462,39 @@ class ContextualSuggestionsViewModelTest {
             ContextualSuggestedPrompt("summarize-selection", "Summarize this selection", "Summarize this selection.", "summary"),
         )
         whenever(suggestedPromptsProvider.resolveTextSelectionSuggestions(any())).thenReturn(selectionSuggestions)
-        viewModel.onTextSelectionCountChanged(1)
+        viewModel.onAttachmentsChanged(textSelections = 1, total = 1)
 
-        viewModel.onTextSelectionCountChanged(2)
+        viewModel.onAttachmentsChanged(textSelections = 2, total = 2)
 
         assertTrue(viewModel.viewState.value.suggestions.isEmpty())
+    }
+
+    @Test
+    fun whenTextSelectionAttachedAlongsideOtherAttachmentThenSelectionSuggestionsHidden() = runTest {
+        val selectionSuggestions = listOf(
+            ContextualSuggestedPrompt("summarize-selection", "Summarize this selection", "Summarize this selection.", "summary"),
+        )
+        whenever(suggestedPromptsProvider.resolveTextSelectionSuggestions(any())).thenReturn(selectionSuggestions)
+        viewModel.onAttachmentsChanged(textSelections = 1, total = 1)
+
+        viewModel.onAttachmentsChanged(textSelections = 1, total = 2)
+
+        assertTrue(viewModel.viewState.value.suggestions.isEmpty())
+    }
+
+    @Test
+    fun whenExtraSelectionRemovedThenAllSelectionSuggestionsRestoredWithoutReresolving() = runTest {
+        val selectionSuggestions = listOf(
+            ContextualSuggestedPrompt("summarize-selection", "Summarize this selection", "Summarize this selection.", "summary"),
+            ContextualSuggestedPrompt("translate-selection", "Translate this selection", "Translate this selection into English.", "translate"),
+        )
+        whenever(suggestedPromptsProvider.resolveTextSelectionSuggestions(any())).thenReturn(selectionSuggestions)
+        viewModel.onAttachmentsChanged(textSelections = 1, total = 1)
+
+        viewModel.onAttachmentsChanged(textSelections = 2, total = 2)
+        viewModel.onAttachmentsChanged(textSelections = 1, total = 1)
+
+        assertEquals(selectionSuggestions, viewModel.viewState.value.suggestions)
+        verify(suggestedPromptsProvider, times(1)).resolveTextSelectionSuggestions(any())
     }
 }

@@ -17,7 +17,6 @@
 package com.duckduckgo.duckchat.impl.contextual
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
@@ -31,8 +30,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import org.json.JSONObject
@@ -55,7 +52,6 @@ class DuckChatContextualEntryViewModel @Inject constructor(
     data class ViewState(
         val attachedContext: AttachedPageContext? = null,
         val latestPageContext: String? = null,
-        val textSelectionCount: Int = 0,
     )
 
     data class AttachedPageContext(
@@ -86,9 +82,6 @@ class DuckChatContextualEntryViewModel @Inject constructor(
     fun start(tabId: String) {
         this.tabId = tabId
         duckChatPixels.reportContextualFloatingInputShown()
-        textSelectionRepository.selections(tabId)
-            .onEach { selections -> _viewState.update { it.copy(textSelectionCount = selections.size) } }
-            .launchIn(viewModelScope)
     }
 
     fun onPageContextReceived(serializedPageContext: String) {

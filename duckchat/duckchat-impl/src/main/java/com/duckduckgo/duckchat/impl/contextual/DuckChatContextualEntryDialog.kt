@@ -223,7 +223,6 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
         } else {
             binding.entryNativeInputWidget.clearPageContext()
         }
-        binding.entrySuggestionsView.onTextSelectionCountChanged(state.textSelectionCount)
         updateQuickActionVisibility()
     }
 
