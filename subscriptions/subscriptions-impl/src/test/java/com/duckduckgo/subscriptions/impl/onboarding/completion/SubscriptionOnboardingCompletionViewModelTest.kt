@@ -23,13 +23,12 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.pir.api.PirFeature
 import com.duckduckgo.pir.api.dashboard.PirFeatureState
 import com.duckduckgo.subscriptions.api.Product
+import com.duckduckgo.subscriptions.api.SubscriptionOnboardingCompletionSummaryRow
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
-import com.duckduckgo.subscriptions.api.SubscriptionOnboardingCompletionSummaryRow
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingHandoffState
-import com.duckduckgo.subscriptions.impl.onboarding.completion.SubscriptionOnboardingCompletionViewModel.Command
 import com.duckduckgo.subscriptions.impl.onboarding.completion.SubscriptionOnboardingCompletionViewModel.Companion.PIR_ROW_ID
 import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStepStore
 import kotlinx.coroutines.flow.flowOf
@@ -41,7 +40,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 class SubscriptionOnboardingCompletionViewModelTest {
@@ -99,29 +97,27 @@ class SubscriptionOnboardingCompletionViewModelTest {
     }
 
     @Test
-    fun whenPirEntitledThenPirRowIsAppendedIncompleteAndCountsTowardsPercentage() = runTest {
+    fun whenPirEnabledThenPirRowIsAppendedIncompleteAndCountsTowardsPercentage() = runTest {
         whenever(stepStore.isCompleted("vpn")).thenReturn(true)
         whenever(stepStore.isCompleted("itr")).thenReturn(true)
         whenever(stepStore.isCompleted("duck_ai")).thenReturn(true)
-        val testee = createViewModel(
-            plugins = listOf(fakePlugin("vpn"), fakePlugin("itr"), fakePlugin("duck_ai")),
-            entitlements = listOf(Product.PIR),
-        )
+        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.ENABLED)
+        val testee = createViewModel(plugins = listOf(fakePlugin("vpn"), fakePlugin("itr"), fakePlugin("duck_ai")))
 
         testee.viewState().test {
             val state = awaitItem()
             assertEquals(listOf("vpn", "itr", "duck_ai", PIR_ROW_ID), state.rows.map { it.id })
             val pirRow = state.rows.last()
             assertFalse(pirRow.completed)
-            assertTrue(pirRow.clickable)
             assertEquals(75, state.completionPercentage)
             cancelAndConsumeRemainingEvents()
         }
     }
 
     @Test
-    fun whenNotEntitledToPirThenNoPirRow() = runTest {
-        val testee = createViewModel(plugins = listOf(fakePlugin("vpn")), entitlements = listOf(Product.NetP))
+    fun whenPirNotEnabledThenNoPirRow() = runTest {
+        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.DISABLED)
+        val testee = createViewModel(plugins = listOf(fakePlugin("vpn")))
 
         testee.viewState().test {
             assertEquals(listOf("vpn"), awaitItem().rows.map { it.id })
@@ -199,45 +195,6 @@ class SubscriptionOnboardingCompletionViewModelTest {
         createViewModel().onDoneClicked()
 
         verify(controller).exitOnboarding()
-    }
-
-    @Test
-    fun whenPirRowClickedAndPirEnabledThenDashboardOpenedAndOnboardingExited() = runTest {
-        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.ENABLED)
-        val testee = createViewModel()
-
-        testee.commands.test {
-            testee.onPirRowClicked()
-            assertEquals(Command.OpenPirDashboard, awaitItem())
-            cancelAndConsumeRemainingEvents()
-        }
-        verify(controller).exitOnboarding()
-    }
-
-    @Test
-    fun whenPirRowClickedAndPirDisabledThenDesktopScreenOpenedAndOnboardingExited() = runTest {
-        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.DISABLED)
-        val testee = createViewModel()
-
-        testee.commands.test {
-            testee.onPirRowClicked()
-            assertEquals(Command.OpenPirDesktop, awaitItem())
-            cancelAndConsumeRemainingEvents()
-        }
-        verify(controller).exitOnboarding()
-    }
-
-    @Test
-    fun whenPirRowClickedAndPirNotAvailableThenDialogShownAndOnboardingNotExited() = runTest {
-        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.NOT_AVAILABLE)
-        val testee = createViewModel()
-
-        testee.commands.test {
-            testee.onPirRowClicked()
-            assertEquals(Command.ShowPirUnavailableDialog, awaitItem())
-            cancelAndConsumeRemainingEvents()
-        }
-        verifyNoInteractions(controller)
     }
 
     private fun createViewModel(
