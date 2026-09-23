@@ -870,7 +870,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
         hookClearButtonPixel()
         hookEditorActionPixels()
         inputField.doOnTextChanged { _, _, _, _ ->
-            viewModel.setHasText(inputField.text?.isNotBlank() == true)
+            // Only publish once attached: the ViewModel is resolved from the view tree, and the host
+            // can set text before the widget is added (e.g. omnibar prefill). configure() re-pushes a
+            // snapshot on attach, so the pre-attach value is not lost.
+            if (isAttachedToWindow) viewModel.setHasText(inputField.text?.isNotBlank() == true)
             updateSendButtonVisibility()
             updateVoiceButtonVisibility()
             updateNewLineButtonVisibility()
@@ -1025,13 +1028,15 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun setVoiceSearchAvailable(available: Boolean) {
         voiceSearchAvailable = available
-        viewModel.setVoiceSearchAvailable(available)
+        // The host binds voice availability before the widget is attached; publish only once attached
+        // (configure() re-pushes a snapshot on attach). The ViewModel is resolved from the view tree.
+        if (isAttachedToWindow) viewModel.setVoiceSearchAvailable(available)
         updateVoiceButtonVisibility()
     }
 
     override fun setVoiceChatAvailable(available: Boolean) {
         voiceChatAvailable = available
-        viewModel.setVoiceChatAvailable(available)
+        if (isAttachedToWindow) viewModel.setVoiceChatAvailable(available)
         updateVoiceButtonVisibility()
     }
 
@@ -2056,7 +2061,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val hadLimitError = attachmentLimitExceeded
         attachmentLimitExceeded = limitExceeded
         this.hasStandaloneAttachments = hasStandaloneAttachments
-        viewModel.setAttachmentState(hasAttachments = hasStandaloneAttachments, limitExceeded = limitExceeded)
+        if (isAttachedToWindow) viewModel.setAttachmentState(hasAttachments = hasStandaloneAttachments, limitExceeded = limitExceeded)
         if (hadLimitError != attachmentLimitExceeded && !isStreaming) {
             floatingSubmitContainer?.visibility = if (attachmentLimitExceeded) GONE else VISIBLE
         }
