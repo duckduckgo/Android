@@ -213,12 +213,12 @@ class AttachmentView(
         syncPageContext(state)
         syncTextSelections(state)
         val errorMessage = effectiveLimitError(
-            imageLimitError = state.textSelectionLimitError
-                ?: state.imageLimitError
+            imageLimitError = state.imageLimitError
                 ?: state.fileLimitError
                 ?: state.fileSizeError
                 ?: state.filePageCountError
-                ?: state.fileTotalSizeError,
+                ?: state.fileTotalSizeError
+                ?: state.textSelectionLimitError,
             isEditMode = isEditMode,
         )
         val notStreaming = lastNativeInputState?.isChatStreaming != true
