@@ -95,7 +95,6 @@ class DuckChatContextualEntryViewModel @Inject constructor(
 
     /** The composer's "attach page context" affordance (shown when nothing is attached). */
     fun onAttachContextRequested() {
-        if (hasTextSelections()) return
         latestValidPageContext?.let {
             duckChatPixels.reportContextualPageContextManuallyAttachedNative()
             attach(it)
