@@ -32,22 +32,16 @@ import com.airbnb.lottie.LottieCompositionFactory
 import com.airbnb.lottie.LottieDrawable
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
-import com.duckduckgo.common.ui.view.button.ButtonType.GHOST
-import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.listitem.OneLineListItem
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.pir.api.dashboard.PirDashboardWebViewScreen
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.databinding.FragmentSubscriptionOnboardingCompletionBinding
-import com.duckduckgo.subscriptions.impl.onboarding.completion.SubscriptionOnboardingCompletionViewModel.Command
 import com.duckduckgo.subscriptions.impl.onboarding.completion.SubscriptionOnboardingCompletionViewModel.SummaryRow
 import com.duckduckgo.subscriptions.impl.onboarding.completion.SubscriptionOnboardingCompletionViewModel.ViewState
 import com.duckduckgo.subscriptions.impl.onboarding.welcome.launchOnboardingConfetti
-import com.duckduckgo.subscriptions.impl.pir.PirActivity.Companion.PirScreenWithEmptyParams
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
@@ -57,9 +51,6 @@ class SubscriptionOnboardingCompletionFragment : DuckDuckGoFragment(R.layout.fra
 
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
-
-    @Inject
-    lateinit var globalActivityStarter: GlobalActivityStarter
 
     private val binding: FragmentSubscriptionOnboardingCompletionBinding by viewBinding()
     private val viewModel: SubscriptionOnboardingCompletionViewModel by lazy {
@@ -80,11 +71,6 @@ class SubscriptionOnboardingCompletionFragment : DuckDuckGoFragment(R.layout.fra
             .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
             .onEach { render(it) }
             .launchIn(viewLifecycleOwner.lifecycleScope)
-
-        viewModel.commands
-            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-            .onEach { processCommand(it) }
-            .launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
     private fun applyHandoffHeader() = with(binding) {
@@ -103,18 +89,6 @@ class SubscriptionOnboardingCompletionFragment : DuckDuckGoFragment(R.layout.fra
             subscriptionOnboardingCompletionTitle.setText(R.string.subscriptionOnboardingCompletionCompleteTitle)
             subscriptionOnboardingCompletionDescription.gone()
             subscriptionOnboardingCompletionPrimaryButton.setText(R.string.subscriptionOnboardingCompletionCompletePrimaryButton)
-        }
-    }
-
-    private fun processCommand(command: Command) {
-        when (command) {
-            Command.OpenPirDashboard -> globalActivityStarter.start(requireContext(), PirDashboardWebViewScreen)
-            Command.OpenPirDesktop -> globalActivityStarter.start(requireContext(), PirScreenWithEmptyParams)
-            Command.ShowPirUnavailableDialog -> TextAlertDialogBuilder(requireContext())
-                .setTitle(R.string.pirStorageUnavailableDialogTitle)
-                .setMessage(R.string.pirStorageUnavailableDialogMessage)
-                .setPositiveButton(R.string.pirStorageUnavailableDialogButton, GHOST)
-                .show()
         }
     }
 
@@ -144,9 +118,6 @@ class SubscriptionOnboardingCompletionFragment : DuckDuckGoFragment(R.layout.fra
                 rowView.setAnimatedCheck()
             } else {
                 rowView.setLeadingIconResource(row.pendingIconResId)
-            }
-            if (row.clickable) {
-                rowView.setClickListener { viewModel.onPirRowClicked() }
             }
             container.addView(rowView)
         }
