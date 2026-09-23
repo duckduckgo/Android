@@ -286,6 +286,40 @@ def build_release_includes_html(task_links: List[AsanaTaskLink],
     return html
 
 
+def build_grafana_dashboard_url(base_url: str, release_tag: str) -> str:
+    """
+    Append a release tag to the Grafana dashboard base URL (its `var-Default` value),
+    deep-linking the dashboard to that release.
+    """
+    return f"{base_url}{release_tag}"
+
+
+def try_populate_grafana_link(notes: str, grafana_dashboard_base_url: str | None, release_tag: str) -> str:
+    """
+    Best-effort fill-in of the Grafana Release Dashboard placeholder with a deep link.
+
+    This must never block release task creation: if the base URL is missing, the
+    placeholder isn't found, or anything else goes wrong, the original placeholder
+    is left in place for the release DRI to fill in by hand.
+    """
+    if not grafana_dashboard_base_url:
+        log("No Grafana dashboard base URL provided; leaving placeholder for manual entry")
+        return notes
+
+    try:
+        grafana_url = build_grafana_dashboard_url(grafana_dashboard_base_url, release_tag)
+        updated_notes = notes.replace(
+            "&lt;Grafana Link&gt;",
+            f'<a href="{grafana_url}">Grafana</a>'
+        )
+        if updated_notes == notes:
+            log("Grafana Link placeholder not found in task notes; leaving as-is for manual entry")
+        return updated_notes
+    except Exception as e:
+        log(f"Failed to populate Grafana dashboard link, leaving placeholder for manual entry: {e}")
+        return notes
+
+
 def create_asana_release_task(client: asana.ApiClient,
                               workspace_id: str,
                               release_tag: str,
@@ -293,6 +327,7 @@ def create_asana_release_task(client: asana.ApiClient,
                               section_id: str,
                               project_id: str,
                               task_links: List[AsanaTaskLink],
+                              grafana_dashboard_base_url: str | None = None,
                               previous_release_links: List[AsanaTaskLink] = None,
                               previous_release_label: str = None) -> str:
     """
@@ -336,6 +371,9 @@ def create_asana_release_task(client: asana.ApiClient,
     if updated_notes == current_notes:
         # Fallback if pattern not found
         updated_notes = current_notes + replacement
+
+    # Fill in the Grafana Release Dashboard table cell (best-effort; see try_populate_grafana_link)
+    updated_notes = try_populate_grafana_link(updated_notes, grafana_dashboard_base_url, release_tag)
 
     # Update the task with the new notes
     log(f"Updating task with notes: {updated_notes}")
