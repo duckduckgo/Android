@@ -128,6 +128,8 @@ import com.duckduckgo.app.browser.logindetection.LoginDetected
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
 import com.duckduckgo.app.browser.logindetection.NavigationEvent
 import com.duckduckgo.app.browser.logindetection.NavigationEvent.LoginAttempt
+import com.duckduckgo.app.browser.menu.BrowserMenuAcknowledgement
+import com.duckduckgo.app.browser.menu.BrowserViewMode
 import com.duckduckgo.app.browser.menu.VpnMenuStateProvider
 import com.duckduckgo.app.browser.modals.NewTabPageModalPresenterRegistry
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
@@ -758,6 +760,7 @@ class BrowserTabViewModelTest {
     private val mockSuggestRedirectEvaluator: SuggestRedirectEvaluator = mock()
     private val mockBadUrlErrorPageWideEvent: BadUrlErrorPageWideEvent = mock()
     private val mockDuckAiSessionCallback: DuckAiSessionCallback = mock()
+    private val mockBrowserMenuAcknowledgement: BrowserMenuAcknowledgement = mock()
     private val mockInlinePdfHandler: InlinePdfHandler = mock()
     private val mockPdfDownloadTooltipDataStore: PdfDownloadTooltipDataStore = mock()
     private val mockCachedFileDownloader: CachedFileDownloader = mock()
@@ -1118,6 +1121,7 @@ class BrowserTabViewModelTest {
                 badUrlErrorPageWideEvent = mockBadUrlErrorPageWideEvent,
                 customErrorPagesFeature = fakeCustomErrorPagesFeature,
                 duckAiSessionCallback = mockDuckAiSessionCallback,
+                browserMenuAcknowledgement = mockBrowserMenuAcknowledgement,
             )
 
         testee.loadData("abc", null, false, false)
@@ -10016,6 +10020,20 @@ class BrowserTabViewModelTest {
         runTest {
             testee.onBrowserMenuLaunched(ViewMode.Browser("https://example.com"))
             verify(mockAdditionalDefaultBrowserPrompts).onBrowserMenuLaunched()
+        }
+
+    @Test
+    fun whenBrowserMenuLaunchedThenBrowserMenuAcknowledgementIsNotified() =
+        runTest {
+            testee.onBrowserMenuLaunched(ViewMode.Browser("https://example.com"))
+            verify(mockBrowserMenuAcknowledgement).onBrowserMenuViewed(BrowserViewMode.Browser)
+        }
+
+    @Test
+    fun whenBrowserMenuLaunchedInCustomTabThenBrowserMenuAcknowledgementStillReceivesTheMode() =
+        runTest {
+            testee.onBrowserMenuLaunched(ViewMode.CustomTab(0, "example.com", null))
+            verify(mockBrowserMenuAcknowledgement).onBrowserMenuViewed(BrowserViewMode.CustomTab)
         }
 
     @Test

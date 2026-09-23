@@ -33,9 +33,9 @@ import javax.inject.Inject
  */
 interface InternalNewDownloadState : NewDownloadState {
     /**
-     * Indicates that the user has viewed the downloads screen, and any new download notifications can be cleared.
+     * Indicates that the user has acted on the completed download, so the new-download indicator can be cleared.
      */
-    fun onDownloadsScreenViewed()
+    fun onNewDownloadAcknowledged()
 }
 
 @ContributesBinding(AppScope::class, boundType = NewDownloadState::class)
@@ -49,6 +49,7 @@ class RealNewDownloadState @Inject constructor(
         sharedPreferencesProvider.getSharedPreferences(FILENAME, multiprocess = false)
 
     private val _hasNewDownloadFlow = MutableStateFlow(preferences.getBoolean(KEY_HAS_NEW_DOWNLOAD, false))
+
     override val hasNewDownloadFlow: Flow<Boolean> = _hasNewDownloadFlow.asStateFlow()
 
     override fun hasNewDownload(): Boolean = _hasNewDownloadFlow.value
@@ -57,7 +58,7 @@ class RealNewDownloadState @Inject constructor(
         setHasNewDownload(true)
     }
 
-    override fun onDownloadsScreenViewed() {
+    override fun onNewDownloadAcknowledged() {
         setHasNewDownload(false)
     }
 
