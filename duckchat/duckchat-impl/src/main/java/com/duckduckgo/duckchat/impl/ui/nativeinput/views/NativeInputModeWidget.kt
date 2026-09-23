@@ -637,6 +637,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     fun printNewLine() {
+        if (nativeInputBlock.isBlocked) return
         val currentText = inputField.text.toString()
         val selectionStart = inputField.selectionStart
         val selectionEnd = inputField.selectionEnd

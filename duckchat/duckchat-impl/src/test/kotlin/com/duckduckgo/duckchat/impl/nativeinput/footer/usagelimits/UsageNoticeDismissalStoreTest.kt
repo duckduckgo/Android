@@ -24,6 +24,7 @@ import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.impl.nativeinput.footer.FailingPreferencesDataStore
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
@@ -90,6 +91,14 @@ class UsageNoticeDismissalStoreTest {
         testee.clear()
 
         assertNull(testee.dismissal.first())
+    }
+
+    @Test
+    fun whenDataStoreWriteFailsThenDismissAndClearDoNotThrow() = runTest {
+        val broken = UsageNoticeDismissalStore(FailingPreferencesDataStore())
+
+        broken.dismiss(approaching(55))
+        broken.clear()
     }
 
     @Test

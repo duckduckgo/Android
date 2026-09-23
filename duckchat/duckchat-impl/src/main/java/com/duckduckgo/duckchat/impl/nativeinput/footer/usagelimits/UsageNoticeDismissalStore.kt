@@ -17,6 +17,7 @@
 package com.duckduckgo.duckchat.impl.nativeinput.footer.usagelimits
 
 import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
@@ -28,6 +29,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import logcat.LogPriority.WARN
+import logcat.logcat
 import java.io.IOException
 import javax.inject.Inject
 
@@ -46,7 +49,7 @@ class UsageNoticeDismissalStore @Inject constructor(
         .distinctUntilChanged()
 
     suspend fun dismiss(notice: UsageNotice) {
-        store.edit { preferences ->
+        editIgnoringIoFailure { preferences ->
             preferences[NOTICE_ID] = notice.id.jsonId
             preferences[WINDOW] = notice.window.jsonId
             preferences[RESETS_AT] = notice.resetsAtMillis
@@ -55,11 +58,20 @@ class UsageNoticeDismissalStore @Inject constructor(
     }
 
     suspend fun clear() {
-        store.edit { preferences ->
+        editIgnoringIoFailure { preferences ->
             preferences.remove(NOTICE_ID)
             preferences.remove(WINDOW)
             preferences.remove(RESETS_AT)
             preferences.remove(BAND)
+        }
+    }
+
+    // A failed write must not take the app down for a footer dismissal; the read side already tolerates IO errors.
+    private suspend fun editIgnoringIoFailure(transform: (MutablePreferences) -> Unit) {
+        try {
+            store.edit(transform)
+        } catch (e: IOException) {
+            logcat(WARN) { "Duck.ai usage warnings: dismissal write failed: ${e.message}" }
         }
     }
 
