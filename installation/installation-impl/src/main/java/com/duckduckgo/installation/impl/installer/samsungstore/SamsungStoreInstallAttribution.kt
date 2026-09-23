@@ -59,8 +59,6 @@ class SamsungStoreInstallAttribution @Inject constructor(
 
         appReferrer.setOriginAttributeCampaign(ORIGIN)
 
-        // Returning users keep the generic `ru` cohort: install reports filter it out regardless of store, so the origin
-        // alone carries the Samsung signal for them.
         if (appBuildConfig.isAppReinstall()) {
             logcat(INFO) { "Galaxy Store returning user; origin set, variant left as ru" }
             return@withContext
