@@ -33,21 +33,27 @@ import com.duckduckgo.app.anr.internal.databinding.ActivityMinidumpListBinding
 import com.duckduckgo.app.anr.internal.databinding.ItemMinidumpBinding
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.di.scopes.ActivityScope
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class MinidumpListActivity : DuckDuckGoActivity() {
+
+    @Inject lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     private val binding: ActivityMinidumpListBinding by viewBinding()
     private lateinit var adapter: MinidumpAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableTransparentEdgeToEdge()
         setContentView(binding.root)
+        configureEdgeToEdgeInsets()
         setupToolbar(binding.toolbar)
 
         adapter = MinidumpAdapter(
@@ -56,6 +62,12 @@ class MinidumpListActivity : DuckDuckGoActivity() {
             onDelete = { entry -> deleteMinidump(entry) },
         )
         refreshList()
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.appBar)
+        edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.minidumpList)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
