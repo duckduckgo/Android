@@ -22,69 +22,53 @@ import androidx.fragment.app.Fragment
 import kotlinx.coroutines.flow.Flow
 
 /**
- * A single step in the native subscription onboarding flow, contributed from the feature module that owns
- * the step (e.g. the VPN step lives in the VPN module, the Duck.ai step in the Duck.ai module). Each feature
- * module contributes one implementation as a multibinding; the host in `subscriptions-impl` collects them,
- * orders them (by `@PriorityKey`), and turns them into linear-onboarding steps.
- *
- * Keeping this contract framework-agnostic (just a [Fragment] factory + an id) is what lets a step live in
- * a different `-impl` module: the host never names the concrete Fragment class.
+ * A single step in the native subscription onboarding flow, contributed from the
+ * feature module that owns the step
  */
 interface SubscriptionOnboardingStepPlugin {
-    /** Stable id for this step. Also the key used to persist completion. */
+    /** Stable id for this step */
     val stepId: String
 
     /** Title shown in the host's toolbar while this step is on screen, or null for no toolbar title. */
     @get:StringRes
     val titleResId: Int? get() = null
 
-    /**
-     * The row this step contributes to the onboarding completion summary, or null for a step that isn't a
-     * feature the user sets up (the welcome and summary screens). Steps with an entry make up the completion
-     * percentage; steps without one are invisible to it.
-     */
-    val summaryEntry: SubscriptionOnboardingSummaryEntry? get() = null
+    /** The row this step contributes to the onboarding completion summary list */
+    val completionSummaryRow: SubscriptionOnboardingCompletionSummaryRow? get() = null
 
-    /**
-     * Whether this step offers a way back to the one before it. When false the host shows a close icon instead
-     * of the up arrow, and back leaves onboarding rather than navigating. Terminal steps set this to false.
-     */
     val allowsBackNavigation: Boolean get() = true
 
-    /** Whether this step should be shown to the current user (e.g. gated by feature flag / entitlement). Skipped when false. */
+    /** Whether this step should be shown. Skipped when false. */
     suspend fun shouldShow(): Boolean
 
-    /** Creates the full-screen Fragment for this step. Dagger injection happens when it attaches to the host. */
+    /** Creates the full-screen Fragment for this step. */
     fun createFragment(): Fragment
 }
 
 /**
- * How a step presents itself in the completion summary. [pendingIconResId] is shown while the step is
- * outstanding; a completed row renders the host's shared tick instead, so no completed icon is needed here.
+ * How a step presents itself in the completion summary list [icon + label]
  */
-data class SubscriptionOnboardingSummaryEntry(
+data class SubscriptionOnboardingCompletionSummaryRow(
     @get:StringRes val labelResId: Int,
     @get:DrawableRes val pendingIconResId: Int,
 )
 
-/** How a step ended. Only [COMPLETED] is persisted as a completed step. */
+/** How a step ended */
 enum class SubscriptionOnboardingStepOutcome {
     COMPLETED,
     SKIPPED,
 }
 
-/**
- * Injected into each step so it can talk to its host without knowing what renders it: steps call the methods,
- * the host observes [events].
- */
 interface SubscriptionOnboardingController {
     /** Events for the host to react to. */
     val events: Flow<Event>
 
     /**
-     * The current step finished with [outcome]. A step that wants the user handed straight to its own feature
-     * once onboarding ends passes [handoff]: the host shows the completion summary briefly, then runs it while
-     * finishing. The lambda outlives the step's Fragment, so it must not capture one.
+     * Call this when the current step is done, so the host can move on.
+     *
+     * @param stepId id of the step that finished.
+     * @param outcome whether the step was completed, skipped, etc.
+     * @param handoff optional action that sends the user to a feature right after onboarding ends.
      */
     fun onStepFinished(
         stepId: String,

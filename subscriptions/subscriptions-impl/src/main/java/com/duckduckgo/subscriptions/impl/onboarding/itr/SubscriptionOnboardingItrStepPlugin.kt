@@ -20,7 +20,7 @@ import androidx.fragment.app.Fragment
 import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
-import com.duckduckgo.subscriptions.api.SubscriptionOnboardingSummaryEntry
+import com.duckduckgo.subscriptions.api.SubscriptionOnboardingCompletionSummaryRow
 import com.duckduckgo.subscriptions.impl.R
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
@@ -33,7 +33,7 @@ class SubscriptionOnboardingItrStepPlugin @Inject constructor() : SubscriptionOn
 
     override val titleResId: Int = R.string.subscriptionOnboardingItrTitle
 
-    override val summaryEntry = SubscriptionOnboardingSummaryEntry(
+    override val completionSummaryRow = SubscriptionOnboardingCompletionSummaryRow(
         labelResId = R.string.subscriptionOnboardingFeature2Title,
         pendingIconResId = R.drawable.identity_theft_restoration_grayscale_color_24,
     )

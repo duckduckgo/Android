@@ -25,7 +25,7 @@ import com.duckduckgo.pir.api.dashboard.PirFeatureState
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
-import com.duckduckgo.subscriptions.api.SubscriptionOnboardingSummaryEntry
+import com.duckduckgo.subscriptions.api.SubscriptionOnboardingCompletionSummaryRow
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingHandoffState
@@ -261,13 +261,13 @@ class SubscriptionOnboardingCompletionViewModelTest {
     private fun fakePlugin(
         id: String,
         shouldShow: Boolean = true,
-        summaryEntry: SubscriptionOnboardingSummaryEntry? = SubscriptionOnboardingSummaryEntry(
+        summaryEntry: SubscriptionOnboardingCompletionSummaryRow? = SubscriptionOnboardingCompletionSummaryRow(
             labelResId = R.string.subscriptionOnboardingFeature2Title,
             pendingIconResId = R.drawable.identity_theft_restoration_grayscale_color_24,
         ),
     ): SubscriptionOnboardingStepPlugin = object : SubscriptionOnboardingStepPlugin {
         override val stepId: String = id
-        override val summaryEntry: SubscriptionOnboardingSummaryEntry? = summaryEntry
+        override val completionSummaryRow: SubscriptionOnboardingCompletionSummaryRow? = summaryEntry
         override suspend fun shouldShow(): Boolean = shouldShow
         override fun createFragment(): Fragment = Fragment()
     }

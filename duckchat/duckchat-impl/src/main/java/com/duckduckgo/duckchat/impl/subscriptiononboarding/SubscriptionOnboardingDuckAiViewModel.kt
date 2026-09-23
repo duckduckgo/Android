@@ -80,8 +80,6 @@ class SubscriptionOnboardingDuckAiViewModel @Inject constructor(
             duckAiModelManager.modelState.value.models.firstOrNull { it.id == selectedId }?.let {
                 duckAiModelManager.selectModel(it)
             }
-            // Held by the host for the few seconds the completion summary is on screen, so it must not
-            // capture this ViewModel.
             val duckAi = duckChat
             controller.onStepFinished(DUCK_AI_STEP_ID, COMPLETED) { duckAi.openDuckChat(SUBSCRIPTION_ONBOARDING) }
         }

@@ -106,7 +106,6 @@ class SubscriptionOnboardingCompletionViewModel @Inject constructor(
                     _commands.send(Command.OpenPirDesktop)
                     controller.exitOnboarding()
                 }
-                // Staying put: there is nothing to hand the user off to, so onboarding shouldn't end here.
                 PirFeatureState.NOT_AVAILABLE -> _commands.send(Command.ShowPirUnavailableDialog)
             }
         }
@@ -116,7 +115,7 @@ class SubscriptionOnboardingCompletionViewModel @Inject constructor(
         val stepRows = stepPlugins.getPlugins()
             .filter { it.shouldShow() }
             .mapNotNull { plugin ->
-                plugin.summaryEntry?.let { entry ->
+                plugin.completionSummaryRow?.let { entry ->
                     SummaryRow(
                         id = plugin.stepId,
                         labelResId = entry.labelResId,

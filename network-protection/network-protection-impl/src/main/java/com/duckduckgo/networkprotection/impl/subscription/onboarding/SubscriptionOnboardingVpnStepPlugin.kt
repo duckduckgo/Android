@@ -21,7 +21,7 @@ import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
-import com.duckduckgo.subscriptions.api.SubscriptionOnboardingSummaryEntry
+import com.duckduckgo.subscriptions.api.SubscriptionOnboardingCompletionSummaryRow
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
@@ -34,7 +34,7 @@ class SubscriptionOnboardingVpnStepPlugin @Inject constructor() : SubscriptionOn
 
     override val titleResId: Int = R.string.subscriptionOnboardingVpnTitle
 
-    override val summaryEntry = SubscriptionOnboardingSummaryEntry(
+    override val completionSummaryRow = SubscriptionOnboardingCompletionSummaryRow(
         labelResId = R.string.subscriptionOnboardingCompletionVpnTitle,
         pendingIconResId = R.drawable.vpn_grayscale_color_24,
     )

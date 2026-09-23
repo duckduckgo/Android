@@ -66,10 +66,7 @@ class SubscriptionOnboardingCompletionFragment : DuckDuckGoFragment(R.layout.fra
         ViewModelProvider(this, viewModelFactory)[SubscriptionOnboardingCompletionViewModel::class.java]
     }
 
-    // The bar fills once per appearance. Without this a later emission (or a rotation) would replay it.
     private var progressAnimated = false
-
-    // The celebratory hero animation must start only once, not on every state emission.
     private var celebratoryConfigured = false
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -97,7 +94,6 @@ class SubscriptionOnboardingCompletionFragment : DuckDuckGoFragment(R.layout.fra
         subscriptionOnboardingCompletionPrimaryButton.gone()
     }
 
-    /** Everything is set up: play the animated hero, drop the "continue in settings" hint, and celebrate. */
     private fun applyCelebratoryHeader() {
         if (celebratoryConfigured) return
         celebratoryConfigured = true
