@@ -14,6 +14,7 @@ from asana_release_utils import (
     resolve_task_id,
     _build_flexible_prefix_pattern,
     build_release_includes_html,
+    collect_shipped_task_ids,
     AsanaTaskLink,
 )
 
@@ -336,7 +337,121 @@ class TestBuildFlexiblePrefixPattern:
         assert r"\s*/\s*" in pattern
 
 
-# --- collect-lgc-asana-tasks main(): filtering tasks already in prior release ---
+# --- collect_shipped_task_ids ---
+
+
+def _commits_by_range(ranges: dict[tuple[str, str], list]):
+    """Build a `get_commits_between` fake keyed by (start, end) tag pairs."""
+    def fake(_repo, start, end):
+        return ranges.get((start, end), [])
+    return fake
+
+
+class TestCollectShippedTaskIds:
+    @patch("asana_release_utils.get_commits_between")
+    @patch("asana_release_utils.get_public_release_tag_before")
+    @patch("asana_release_utils.get_public_release_tags")
+    def test_excludes_task_shipped_in_hotfix_tag_merged_back_to_develop(
+        self, mock_tags, mock_prior, mock_commits
+    ):
+        """5.295.1 is a hotfix tag cut after 5.295.0 (start_tag). Its cherry-picked
+        fix later lands on develop with a different SHA — the task must still be
+        excluded because it already shipped, under the hotfix tag."""
+        mock_tags.return_value = ["5.294.0", "5.295.0", "5.295.1"]
+        mock_prior.return_value = "5.294.0"
+        mock_commits.side_effect = _commits_by_range({
+            ("5.294.0", "5.295.0"): [],
+            ("5.295.0", "5.295.1"): [
+                _fake_commit("h1", "Task/Issue URL: https://app.asana.com/0/p/999"),
+            ],
+        })
+
+        result = collect_shipped_task_ids(".", "5.295.0", STANDARD_PREFIX)
+
+        assert result == {"999"}
+
+    @patch("asana_release_utils.get_commits_between")
+    @patch("asana_release_utils.get_public_release_tag_before")
+    @patch("asana_release_utils.get_public_release_tags")
+    def test_no_shipped_tags_yields_empty_set(
+        self, mock_tags, mock_prior, mock_commits
+    ):
+        mock_tags.return_value = ["5.294.0", "5.295.0"]
+        mock_prior.return_value = "5.294.0"
+        mock_commits.side_effect = _commits_by_range({
+            ("5.294.0", "5.295.0"): [],
+        })
+
+        result = collect_shipped_task_ids(".", "5.295.0", STANDARD_PREFIX)
+
+        assert result == set()
+
+    @patch("asana_release_utils.get_commits_between")
+    @patch("asana_release_utils.get_public_release_tag_before")
+    @patch("asana_release_utils.get_public_release_tags")
+    def test_task_shipped_in_prior_release_is_excluded(
+        self, mock_tags, mock_prior, mock_commits
+    ):
+        mock_tags.return_value = ["5.293.0", "5.294.0", "5.295.0"]
+        mock_prior.return_value = "5.294.0"
+        mock_commits.side_effect = _commits_by_range({
+            ("5.294.0", "5.295.0"): [],
+        })
+
+        # 5.293.0 is before prior_tag, so its range is never walked.
+        result = collect_shipped_task_ids(".", "5.295.0", STANDARD_PREFIX)
+
+        mock_commits.assert_called_once_with(".", "5.294.0", "5.295.0")
+        assert result == set()
+
+    @patch("asana_release_utils.get_commits_between")
+    @patch("asana_release_utils.get_public_release_tag_before")
+    @patch("asana_release_utils.get_public_release_tags")
+    def test_no_prior_tag_still_walks_forward_from_earliest(
+        self, mock_tags, mock_prior, mock_commits
+    ):
+        mock_tags.return_value = ["5.283.0", "5.284.0"]
+        mock_prior.return_value = None
+        mock_commits.side_effect = _commits_by_range({
+            ("5.283.0", "5.284.0"): [
+                _fake_commit("h1", "Task/Issue URL: https://app.asana.com/0/p/555"),
+            ],
+        })
+
+        result = collect_shipped_task_ids(".", "5.283.0", STANDARD_PREFIX)
+
+        assert result == {"555"}
+
+    @patch("asana_release_utils.get_commits_between")
+    @patch("asana_release_utils.get_public_release_tag_before")
+    @patch("asana_release_utils.get_public_release_tags")
+    def test_unrecognized_start_tag_fails_safe_without_walking_history(
+        self, mock_tags, mock_prior, mock_commits
+    ):
+        """An unrecognized --start-tag override (not a real public release tag)
+        must not fall back to walking the entire tag history."""
+        mock_tags.return_value = ["5.283.0", "5.284.0", "5.285.0"]
+
+        result = collect_shipped_task_ids(".", "not-a-real-tag", STANDARD_PREFIX)
+
+        assert result == set()
+        mock_prior.assert_not_called()
+        mock_commits.assert_not_called()
+
+    @patch("asana_release_utils.get_commits_between")
+    @patch("asana_release_utils.get_public_release_tag_before")
+    @patch("asana_release_utils.get_public_release_tags")
+    def test_single_tag_returns_empty(self, mock_tags, mock_prior, mock_commits):
+        mock_tags.return_value = ["5.283.0"]
+        mock_prior.return_value = None
+
+        result = collect_shipped_task_ids(".", "5.283.0", STANDARD_PREFIX)
+
+        assert result == set()
+        mock_commits.assert_not_called()
+
+
+# --- collect-lgc-asana-tasks main(): excluding already-shipped tasks ---
 
 
 import importlib.util
@@ -356,26 +471,19 @@ def _load_collect_lgc_module():
     return module
 
 
-def _run_main(module, argv, *, new_commits, prior_release_commits, prior_tag,
-              start_is_ancestor=False):
+def _run_main(module, argv, *, new_commits, shipped_task_ids):
     """Invoke main() with mocked git lookups and capture stdout."""
-
-    def fake_commits_between(_repo, start, _end):
-        # `start` disambiguates the two ranges: prior_tag..start_tag vs start_tag..end.
-        return prior_release_commits if start == prior_tag else new_commits
-
     captured = StringIO()
     with patch.object(module, "get_latest_public_release_tag", return_value="5.283.1"), \
-         patch.object(module, "get_public_release_tag_before", return_value=prior_tag), \
-         patch.object(module, "is_ancestor", return_value=start_is_ancestor), \
-         patch.object(module, "get_commits_between", side_effect=fake_commits_between), \
+         patch.object(module, "get_commits_between", return_value=new_commits), \
+         patch.object(module, "collect_shipped_task_ids", return_value=shipped_task_ids), \
          patch.object(sys, "argv", argv), \
          patch.object(sys, "stdout", captured):
         rc = module.main()
     return rc, captured.getvalue()
 
 
-class TestCollectLgcMainPriorReleaseFilter:
+class TestCollectLgcMainShippedFilter:
     BASE_ARGV = [
         "collect-lgc-asana-tasks.py",
         "--end-commit", "HEAD",
@@ -383,43 +491,22 @@ class TestCollectLgcMainPriorReleaseFilter:
         "--trigger-phrase", "Task/Issue URL:",
     ]
 
-    def test_filters_out_task_already_in_prior_release(self):
+    def test_filters_out_already_shipped_task(self):
         module = _load_collect_lgc_module()
         new_commits = [
             _fake_commit("n1", "Task/Issue URL: https://app.asana.com/0/p/111"),
             _fake_commit("n2", "Task/Issue URL: https://app.asana.com/0/p/222"),
             _fake_commit("n3", "Task/Issue URL: https://app.asana.com/0/p/333"),
         ]
-        prior_release_commits = [
-            _fake_commit("p1", "Task/Issue URL: https://app.asana.com/0/p/222"),
-        ]
 
         rc, stdout = _run_main(
             module, self.BASE_ARGV,
             new_commits=new_commits,
-            prior_release_commits=prior_release_commits,
-            prior_tag="5.283.0",
+            shipped_task_ids={"222"},
         )
 
         assert rc == 0
         assert json.loads(stdout.strip()) == ["111", "333"]
-
-    def test_no_prior_tag_skips_filter(self):
-        module = _load_collect_lgc_module()
-        new_commits = [
-            _fake_commit("n1", "Task/Issue URL: https://app.asana.com/0/p/111"),
-            _fake_commit("n2", "Task/Issue URL: https://app.asana.com/0/p/222"),
-        ]
-
-        rc, stdout = _run_main(
-            module, self.BASE_ARGV,
-            new_commits=new_commits,
-            prior_release_commits=[],
-            prior_tag=None,
-        )
-
-        assert rc == 0
-        assert json.loads(stdout.strip()) == ["111", "222"]
 
     def test_no_overlap_keeps_all_new_tasks(self):
         module = _load_collect_lgc_module()
@@ -427,15 +514,11 @@ class TestCollectLgcMainPriorReleaseFilter:
             _fake_commit("n1", "Task/Issue URL: https://app.asana.com/0/p/111"),
             _fake_commit("n2", "Task/Issue URL: https://app.asana.com/0/p/222"),
         ]
-        prior_release_commits = [
-            _fake_commit("p1", "Task/Issue URL: https://app.asana.com/0/p/999"),
-        ]
 
         rc, stdout = _run_main(
             module, self.BASE_ARGV,
             new_commits=new_commits,
-            prior_release_commits=prior_release_commits,
-            prior_tag="5.283.0",
+            shipped_task_ids=set(),
         )
 
         assert rc == 0
@@ -448,9 +531,8 @@ class TestCollectLgcMainPriorReleaseFilter:
         ]
 
         with patch.object(module, "get_latest_public_release_tag") as mock_latest, \
-             patch.object(module, "get_public_release_tag_before", return_value=None), \
-             patch.object(module, "is_ancestor", return_value=True), \
              patch.object(module, "get_commits_between", return_value=new_commits), \
+             patch.object(module, "collect_shipped_task_ids", return_value=set()) as mock_shipped, \
              patch.object(sys, "argv", self.BASE_ARGV + ["--start-tag", "5.283.1"]), \
              patch.object(sys, "stdout", StringIO()):
             rc = module.main()
@@ -458,30 +540,27 @@ class TestCollectLgcMainPriorReleaseFilter:
         assert rc == 0
         # When --start-tag is provided, the latest-tag lookup should be skipped.
         mock_latest.assert_not_called()
+        mock_shipped.assert_called_once_with(".", "5.283.1", "Task/Issue URL:")
 
-    def test_filter_skipped_when_start_tag_is_ancestor(self):
-        """For a normal release, start_tag is an ancestor of end_commit, so
-        `start_tag..end` already excludes prior-release commits — the explicit
-        filter is unnecessary and should be skipped."""
+    def test_hotfix_task_excluded_even_though_merged_back_to_develop(self):
+        """Regression test for the bug this change fixes: a task that shipped in
+        a hotfix (and was cherry-picked back to develop under a different SHA)
+        must not reappear as "new" once collect_shipped_task_ids reports it."""
         module = _load_collect_lgc_module()
         new_commits = [
-            _fake_commit("n1", "Task/Issue URL: https://app.asana.com/0/p/111"),
-            _fake_commit("n2", "Task/Issue URL: https://app.asana.com/0/p/222"),
+            # Same task as the hotfix, different SHA (merge-back to develop).
+            _fake_commit("n1", "Task/Issue URL: https://app.asana.com/0/p/999"),
+            _fake_commit("n2", "Task/Issue URL: https://app.asana.com/0/p/111"),
         ]
 
-        captured = StringIO()
-        with patch.object(module, "get_latest_public_release_tag", return_value="5.283.0"), \
-             patch.object(module, "get_public_release_tag_before") as mock_prior, \
-             patch.object(module, "is_ancestor", return_value=True), \
-             patch.object(module, "get_commits_between", return_value=new_commits), \
-             patch.object(sys, "argv", self.BASE_ARGV), \
-             patch.object(sys, "stdout", captured):
-            rc = module.main()
+        rc, stdout = _run_main(
+            module, self.BASE_ARGV,
+            new_commits=new_commits,
+            shipped_task_ids={"999"},
+        )
 
         assert rc == 0
-        assert json.loads(captured.getvalue().strip()) == ["111", "222"]
-        # When start_tag IS an ancestor, we don't need to look up the prior tag.
-        mock_prior.assert_not_called()
+        assert json.loads(stdout.strip()) == ["111"]
 
 
 # --- is_ancestor ---
