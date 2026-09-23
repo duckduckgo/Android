@@ -38,6 +38,7 @@ import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.ItemContextualSuggestionBinding
+import com.duckduckgo.duckchat.impl.ui.AttachmentViewModel
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -58,6 +59,10 @@ class ContextualSuggestionsView @JvmOverloads constructor(
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[ContextualSuggestionsViewModel::class.java]
     }
 
+    private val attachmentViewModel: AttachmentViewModel by lazy {
+        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[AttachmentViewModel::class.java]
+    }
+
     var onSuggestionSelected: ((ContextualSuggestedPrompt) -> Unit)? = null
 
     var onContentChanged: (() -> Unit)? = null
@@ -66,6 +71,7 @@ class ContextualSuggestionsView @JvmOverloads constructor(
     private val cardsContainer = LinearLayout(context).apply { orientation = VERTICAL }
 
     private val viewStateJob = ConflatedJob()
+    private val attachmentsJob = ConflatedJob()
 
     @DrawableRes
     private val suggestionBackgroundRes: Int = context.obtainStyledAttributes(attrs, R.styleable.ContextualSuggestionsView).use {
@@ -90,10 +96,14 @@ class ContextualSuggestionsView @JvmOverloads constructor(
         viewStateJob += viewModel.viewState
             .onEach { render(it) }
             .launchIn(scope)
+        attachmentsJob += attachmentViewModel.attachmentState
+            .onEach { viewModel.onAttachmentsChanged(it.textSelections.size, it.textSelections.size + it.images.size + it.files.size) }
+            .launchIn(scope)
     }
 
     override fun onDetachedFromWindow() {
         viewStateJob.cancel()
+        attachmentsJob.cancel()
         super.onDetachedFromWindow()
     }
 
@@ -112,12 +122,6 @@ class ContextualSuggestionsView @JvmOverloads constructor(
     fun clear() {
         doOnAttach {
             viewModel.clear()
-        }
-    }
-
-    fun onTextSelectionCountChanged(count: Int) {
-        doOnAttach {
-            viewModel.onTextSelectionCountChanged(count)
         }
     }
 
