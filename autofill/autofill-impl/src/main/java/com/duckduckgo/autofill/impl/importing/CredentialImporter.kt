@@ -73,6 +73,10 @@ class CredentialImporterImpl @Inject constructor(
         originalImportListSize: Int,
         source: AutofillImportLaunchSource,
     ) {
+        // emitted before the work starts so the replay buffer cannot hand a late subscriber the
+        // result of the previous import
+        _importStatus.emit(InProgress)
+
         appCoroutineScope.launch(dispatchers.io()) {
             doImportCredentials(importList, originalImportListSize, source)
         }
@@ -84,8 +88,6 @@ class CredentialImporterImpl @Inject constructor(
         source: AutofillImportLaunchSource,
     ) {
         var skippedCredentials = originalImportListSize - importList.size
-
-        _importStatus.emit(InProgress)
 
         val insertedIds = autofillStore.bulkInsert(importList)
 
