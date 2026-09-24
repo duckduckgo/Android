@@ -1080,7 +1080,8 @@ class PirEndToEndTest {
     private object NoOpPirScanScheduler : PirScanScheduler {
         override fun scheduleScans() = Unit
         override fun scheduleScanOnlyWork() = Unit
-        override fun reschedulePirScans() = Unit
+        override fun rescheduleScanWork() = Unit
+        override fun rescheduleAllWork() = Unit
         override fun cancelScheduledScans(context: Context) = Unit
         override fun cancelScheduledScanWorker() = Unit
         override fun cancelScheduledEmailConfirmation() = Unit

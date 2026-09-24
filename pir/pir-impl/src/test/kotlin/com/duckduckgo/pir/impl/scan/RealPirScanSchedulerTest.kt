@@ -333,8 +333,8 @@ class RealPirScanSchedulerTest {
     }
 
     @Test
-    fun whenReschedulePirScansThenSchedulesScheduledScanWorkerWithUpdatePolicy() {
-        testee.reschedulePirScans()
+    fun whenRescheduleScanWorkThenSchedulesScheduledScanWorkerWithUpdatePolicy() {
+        testee.rescheduleScanWork()
 
         verify(mockWorkManager).enqueueUniquePeriodicWork(
             eq(PirScheduledScanRemoteWorker.TAG_SCHEDULED_SCAN),
@@ -344,8 +344,8 @@ class RealPirScanSchedulerTest {
     }
 
     @Test
-    fun whenReschedulePirScansThenOnlySchedulesScheduledScanWorker() {
-        testee.reschedulePirScans()
+    fun whenRescheduleScanWorkThenOnlySchedulesScheduledScanWorker() {
+        testee.rescheduleScanWork()
 
         verify(mockWorkManager, times(1)).enqueueUniquePeriodicWork(
             any(),
@@ -355,15 +355,53 @@ class RealPirScanSchedulerTest {
     }
 
     @Test
-    fun whenReschedulePirScansThenDoesNotReportScheduledScanPixel() {
-        testee.reschedulePirScans()
+    fun whenRescheduleScanWorkThenDoesNotReportScheduledScanPixel() {
+        testee.rescheduleScanWork()
 
         verify(mockPirPixelSender, never()).reportScheduledScanScheduled()
     }
 
     @Test
-    fun whenReschedulePirScansThenDoesNotSaveEventLog() = runTest {
-        testee.reschedulePirScans()
+    fun whenRescheduleScanWorkThenDoesNotSaveEventLog() = runTest {
+        testee.rescheduleScanWork()
+
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(mockEventsRepository, never()).saveEventLog(any())
+    }
+
+    @Test
+    fun whenRescheduleAllWorkThenSchedulesEveryWorkerWithUpdatePolicy() {
+        testee.rescheduleAllWork()
+
+        argumentCaptor<String>().apply {
+            verify(mockWorkManager, times(4)).enqueueUniquePeriodicWork(
+                capture(),
+                eq(ExistingPeriodicWorkPolicy.UPDATE),
+                any<PeriodicWorkRequest>(),
+            )
+            assertEquals(
+                setOf(
+                    PirScheduledScanRemoteWorker.TAG_SCHEDULED_SCAN,
+                    PirEmailConfirmationRemoteWorker.TAG_EMAIL_CONFIRMATION,
+                    PirCustomStatsWorker.TAG_PIR_RECURRING_CUSTOM_STATS,
+                    PirBackgroundScanStatsWorker.TAG_PIR_BACKGROUND_STATS_DAILY,
+                ),
+                allValues.toSet(),
+            )
+        }
+    }
+
+    @Test
+    fun whenRescheduleAllWorkThenDoesNotReportScheduledScanPixel() {
+        testee.rescheduleAllWork()
+
+        verify(mockPirPixelSender, never()).reportScheduledScanScheduled()
+    }
+
+    @Test
+    fun whenRescheduleAllWorkThenDoesNotSaveEventLog() = runTest {
+        testee.rescheduleAllWork()
 
         testDispatcher.scheduler.advanceUntilIdle()
 

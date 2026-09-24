@@ -268,6 +268,23 @@ class RealPirJobsRunner @Inject constructor(
                 )
             }
 
+            // Removing data requires a subscription, so a scan-only run ends here. Opt-out jobs are never
+            // created, leaving nothing for a later run to pick up.
+            if (runMode == PirRunMode.SCAN_ONLY) {
+                logcat { "PIR-JOB-RUNNER: Scan-only run. Skipping the opt-out phase." }
+                pirScanWideEvent.onOptOutSkipped(executionType)
+                emitCompletedPixel(
+                    context = context,
+                    executionType = executionType,
+                    startTimeInMillis = startTimeInMillis,
+                    totalScanJobs = totalScanJobs,
+                    totalOptOutJobs = 0,
+                    profileQueryCount = profileQueries.size,
+                    brokerCount = activeBrokers.size,
+                )
+                return@withContext Result.success(Unit)
+            }
+
             val formOptOutBrokers = pirRepository.getBrokersForOptOut(true).toSet()
             val activeFormOptOutBrokers = formOptOutBrokers.intersect(activeBrokers)
 
