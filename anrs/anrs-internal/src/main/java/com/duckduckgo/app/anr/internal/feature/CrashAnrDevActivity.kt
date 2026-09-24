@@ -23,6 +23,7 @@ import com.duckduckgo.app.anr.internal.databinding.ActivityCrasnAnrDevBinding
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.listitem.TwoLineListItem
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -35,12 +36,16 @@ class CrashAnrDevActivity : DuckDuckGoActivity() {
 
     @Inject lateinit var plugins: PluginPoint<CrashAnrDevCapabilityPlugin>
 
+    @Inject lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
     private val binding: ActivityCrasnAnrDevBinding by viewBinding()
     private val pluginItems = mutableListOf<Pair<CrashAnrDevCapabilityPlugin, TwoLineListItem>>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableTransparentEdgeToEdge()
         setContentView(binding.root)
+        configureEdgeToEdgeInsets()
         setupToolbar(binding.toolbar)
 
         plugins.getPlugins().forEach { plugin ->
@@ -54,6 +59,12 @@ class CrashAnrDevActivity : DuckDuckGoActivity() {
             binding.capabilitiesContainer.addView(item)
             pluginItems += plugin to item
         }
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.appBar)
+        edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.contentScrollView)
     }
 
     override fun onResume() {
