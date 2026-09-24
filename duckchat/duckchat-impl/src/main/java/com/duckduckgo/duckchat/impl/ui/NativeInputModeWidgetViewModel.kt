@@ -217,6 +217,26 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         nativeInputStatePublisher.update(tabId) { it.copy(modelPickerEnabled = enabled) }
     }
 
+    fun setHasText(hasText: Boolean) {
+        val tabId = activeTabId.value ?: return
+        nativeInputStatePublisher.update(tabId) { it.copy(hasText = hasText) }
+    }
+
+    fun setAttachmentState(hasAttachments: Boolean, limitExceeded: Boolean) {
+        val tabId = activeTabId.value ?: return
+        nativeInputStatePublisher.update(tabId) { it.copy(hasAttachments = hasAttachments, attachmentLimitExceeded = limitExceeded) }
+    }
+
+    fun setVoiceSearchAvailable(available: Boolean) {
+        val tabId = activeTabId.value ?: return
+        nativeInputStatePublisher.update(tabId) { it.copy(voiceSearchAvailable = available) }
+    }
+
+    fun setVoiceChatAvailable(available: Boolean) {
+        val tabId = activeTabId.value ?: return
+        nativeInputStatePublisher.update(tabId) { it.copy(voiceChatAvailable = available) }
+    }
+
     // currentChat can briefly hold the previous chat while a getChatById lookup is in flight.
     // Returns it only when it matches the active tab's published chatId.
     private fun validChat(): DuckAiChat? {
