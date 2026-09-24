@@ -34,6 +34,7 @@ import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
+import com.duckduckgo.promptscoordinator.api.PromptExposureReporter
 import com.duckduckgo.promptscoordinator.api.PromptType
 import com.duckduckgo.promptscoordinator.api.PromptsCoordinator
 import com.duckduckgo.remote.messaging.api.Action
@@ -84,6 +85,7 @@ class NewTabPageViewModel @AssistedInject constructor(
     private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
     private val ctaViewModel: CtaViewModel,
     private val promptsCoordinator: PromptsCoordinator,
+    private val promptExposureReporter: PromptExposureReporter,
     browserMode: BrowserMode,
 ) : ViewModel(), DefaultLifecycleObserver {
 
@@ -137,6 +139,7 @@ class NewTabPageViewModel @AssistedInject constructor(
     }
 
     private var lastRemoteMessageSeen: RemoteMessage? = null
+    private var lastRemoteMessageReportedId: String? = null
     private val _viewState = MutableStateFlow(
         ViewState(showDaxLogo = showDaxLogo, isFireMode = browserMode == BrowserMode.FIRE),
     )
@@ -185,13 +188,15 @@ class NewTabPageViewModel @AssistedInject constructor(
 
                     withContext(dispatchers.io()) {
                         val messageImageFilePath = remoteMessagingModel.getRemoteMessageImageFile(Surface.NEW_TAB_PAGE)
+                        val onboardingComplete = isHomeOnboardingComplete()
+                        reportRemoteMessageCardExposure(message, onboardingComplete)
                         _viewState.emit(
                             viewState.value.copy(
                                 message = message,
                                 messageImageFilePath = messageImageFilePath,
                                 newMessage = newMessage,
                                 favourites = snapshot.favourites,
-                                onboardingComplete = isHomeOnboardingComplete(),
+                                onboardingComplete = onboardingComplete,
                                 lowPriorityMessage = if (!newMessage && !awaitingSurface) lowPriorityMessagingModel.getMessage() else null,
                             ),
                         )
@@ -206,6 +211,17 @@ class NewTabPageViewModel @AssistedInject constructor(
                 it.copy(appTpEnabled = appTrackingProtection.isEnabled())
             }
         }
+    }
+
+    /**
+     * Reported on the state that renders the card, not from [onMessageShown], which fires on every
+     * render. The reporter also dedups per message and week, since this ViewModel is per NTP view and
+     * does not survive tabs or process death.
+     */
+    private fun reportRemoteMessageCardExposure(message: RemoteMessage?, onboardingComplete: Boolean) {
+        if (message == null || !onboardingComplete || message.id == lastRemoteMessageReportedId) return
+        lastRemoteMessageReportedId = message.id
+        promptExposureReporter.reportNewTabPageCardShown(message.id)
     }
 
     // We only want to show New Tab when the Home CTAs from Onboarding has finished

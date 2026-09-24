@@ -20,11 +20,14 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.browser.api.install.AppInstall
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.promptscoordinator.api.PromptType
+import com.duckduckgo.promptscoordinator.impl.exposure.PromptExposurePixelName
 import kotlinx.coroutines.async
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -34,10 +37,15 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.io.File
 import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.days
 
 @RunWith(AndroidJUnit4::class)
 class RealPromptsCoordinatorTest {
@@ -47,6 +55,8 @@ class RealPromptsCoordinatorTest {
 
     private val feature = FakeFeatureToggleFactory.create(PromptsCoordinatorFeature::class.java)
     private val currentTimeProvider: CurrentTimeProvider = mock()
+    private val pixel: Pixel = mock()
+    private val appInstall: AppInstall = mock()
 
     private lateinit var testDataStoreFile: File
     private lateinit var testDataStore: DataStore<Preferences>
@@ -55,8 +65,9 @@ class RealPromptsCoordinatorTest {
     private var now: Long = START_TIME
 
     @Before
-    fun setUp() {
+    fun setUp() = runTest {
         feature.self().setRawStoredState(State(true))
+        whenever(appInstall.getInstallAge()).thenReturn(3.days)
         whenever(currentTimeProvider.currentTimeMillis()).thenAnswer { now }
 
         testDataStoreFile = File.createTempFile("prompts_coordinator_test", ".preferences_pb")
@@ -77,6 +88,8 @@ class RealPromptsCoordinatorTest {
         store = testDataStore,
         currentTimeProvider = currentTimeProvider,
         dispatchers = coroutinesTestRule.testDispatcherProvider,
+        pixel = pixel,
+        appInstall = appInstall,
     )
 
     @Test
@@ -276,6 +289,83 @@ class RealPromptsCoordinatorTest {
         val recreated = createTestee()
 
         assertTrue(recreated.tryClaim(PromptType.NTP_CARD))
+    }
+
+    @Test
+    fun whenFirstPromptDoneThenGapPixelFiresAsFirst() = runTest {
+        assertTrue(testee.tryClaim(PromptType.MODAL))
+        testee.onClaimDone(PromptType.MODAL)
+
+        verifyGapPixel(gap = "first", type = "MODAL")
+    }
+
+    @Test
+    fun whenPromptDoneAfterAPreviousOneThenGapPixelCarriesTheElapsedBucketAndType() = runTest {
+        assertTrue(testee.tryClaim(PromptType.MODAL))
+        testee.onClaimDone(PromptType.MODAL)
+
+        now += TimeUnit.HOURS.toMillis(30)
+        assertTrue(testee.tryClaim(PromptType.NTP_CARD))
+        testee.onClaimDone(PromptType.NTP_CARD)
+
+        verifyGapPixel(gap = "24_48h", type = "NTP_CARD")
+    }
+
+    @Test
+    fun whenStampSurvivesARestartThenTheGapIsMeasuredFromThePersistedStamp() = runTest {
+        assertTrue(testee.tryClaim(PromptType.MODAL))
+        testee.onClaimDone(PromptType.MODAL)
+        coroutinesTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        val recreated = createTestee()
+        now += TimeUnit.MINUTES.toMillis(15)
+        assertTrue(recreated.tryClaim(PromptType.NTP_CARD))
+        recreated.onClaimDone(PromptType.NTP_CARD)
+
+        verifyGapPixel(gap = "10_30m", type = "NTP_CARD")
+    }
+
+    @Test
+    fun whenClockMovedBackThenNoGapPixelFiresButThePromptIsStillStamped() = runTest {
+        assertTrue(testee.tryClaim(PromptType.NTP_CARD))
+        testee.onClaimDone(PromptType.NTP_CARD)
+
+        now += TimeUnit.MINUTES.toMillis(11)
+        assertTrue(testee.tryClaim(PromptType.NTP_CARD))
+        // The card is still displayed when the clock is set back past the previous stamp.
+        now -= TimeUnit.MINUTES.toMillis(20)
+        testee.onClaimDone(PromptType.NTP_CARD)
+
+        // Only the first prompt's pixel: the second, negative gap is dropped.
+        verify(pixel).fire(eq(PromptExposurePixelName.PROMPT_GAP), any(), any(), any())
+        // Stamped at the moved-back time, so the modal cooldown runs from there.
+        now += TimeUnit.HOURS.toMillis(24) - 1
+        assertFalse(testee.tryClaim(PromptType.MODAL))
+    }
+
+    @Test
+    fun whenClaimCancelledThenNoGapPixelFires() = runTest {
+        assertTrue(testee.tryClaim(PromptType.MODAL))
+        testee.onClaimCancelled(PromptType.MODAL)
+
+        verify(pixel, never()).fire(any<Pixel.PixelName>(), any(), any(), any())
+    }
+
+    @Test
+    fun whenInstallAgeUnknownThenNoGapPixelFires() = runTest {
+        whenever(appInstall.getInstallAge()).thenReturn(null)
+
+        assertTrue(testee.tryClaim(PromptType.MODAL))
+        testee.onClaimDone(PromptType.MODAL)
+
+        verify(pixel, never()).fire(any<Pixel.PixelName>(), any(), any(), any())
+    }
+
+    private fun verifyGapPixel(gap: String, type: String) {
+        verify(pixel).fire(
+            PromptExposurePixelName.PROMPT_GAP,
+            mapOf("days_since_install" to "d0_6", "gap_bucket" to gap, "prompt_type" to type),
+        )
     }
 
     companion object {

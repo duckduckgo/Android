@@ -34,6 +34,7 @@ import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
+import com.duckduckgo.promptscoordinator.api.PromptExposureReporter
 import com.duckduckgo.promptscoordinator.api.PromptType
 import com.duckduckgo.promptscoordinator.api.PromptsCoordinator
 import com.duckduckgo.remote.messaging.api.Action
@@ -61,6 +62,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 
 class NewTabPageViewModelTest {
@@ -83,6 +85,7 @@ class NewTabPageViewModelTest {
     private val mockOnboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = mock()
     private val mockCtaViewModel: CtaViewModel = mock()
     private val mockPromptsCoordinator: PromptsCoordinator = mock()
+    private val mockPromptExposureReporter: PromptExposureReporter = mock()
 
     private lateinit var testee: NewTabPageViewModel
 
@@ -121,6 +124,7 @@ class NewTabPageViewModelTest {
             onboardingBrandDesignUpdateToggles = mockOnboardingBrandDesignUpdateToggles,
             ctaViewModel = mockCtaViewModel,
             promptsCoordinator = mockPromptsCoordinator,
+            promptExposureReporter = mockPromptExposureReporter,
             browserMode = browserMode,
         )
     }
@@ -218,6 +222,53 @@ class NewTabPageViewModelTest {
                 assertFalse(it.newMessage)
             }
         }
+    }
+
+    @Test
+    fun whenCardIsShownRepeatedlyThenItsExposureIsReportedOnce() = runTest {
+        whenever(mockSettingsDataStore.hideTips).thenReturn(true)
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
+        val messages = MutableSharedFlow<RemoteMessage?>(replay = 1)
+        whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(messages)
+
+        testee.onStart(mockLifecycleOwner)
+        messages.emit(remoteMessage)
+        messages.emit(remoteMessage)
+        testee.viewState.test { expectMostRecentItem() }
+
+        verify(mockPromptExposureReporter).reportNewTabPageCardShown("id1")
+    }
+
+    @Test
+    fun whenCardLeavesTheScreenThenNoExposureIsReportedForTheTransition() = runTest {
+        whenever(mockSettingsDataStore.hideTips).thenReturn(true)
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
+        val messages = MutableSharedFlow<RemoteMessage?>(replay = 1)
+        whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(messages)
+
+        testee.onStart(mockLifecycleOwner)
+        messages.emit(remoteMessage)
+        messages.emit(null)
+        testee.viewState.test { assertNull(expectMostRecentItem().message) }
+
+        verify(mockPromptExposureReporter).reportNewTabPageCardShown("id1")
+        verifyNoMoreInteractions(mockPromptExposureReporter)
+    }
+
+    @Test
+    fun whenCardIsNotRenderedThenNoExposureIsReported() = runTest {
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
+        whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
+
+        // Home onboarding is incomplete by default, which keeps the card off the page.
+        testee.onStart(mockLifecycleOwner)
+        testee.viewState.test { expectMostRecentItem() }
+        whenever(mockSettingsDataStore.hideTips).thenReturn(true)
+        whenever(mockPromptsCoordinator.tryClaim(PromptType.NTP_CARD)).thenReturn(false)
+        createTestee().onStart(mockLifecycleOwner)
+        testee.viewState.test { expectMostRecentItem() }
+
+        verify(mockPromptExposureReporter, never()).reportNewTabPageCardShown(any())
     }
 
     @Test

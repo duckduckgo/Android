@@ -337,5 +337,17 @@
             "funnel_duckai_android__disclaimerbanner",
             "funnel_duckai_android__unknown"
         ]
+    },
+    "promptDaysSinceInstall": {
+        "key": "days_since_install",
+        "type": "string",
+        "description": "Days since install, bucketed by install-week (lower bound inclusive).",
+        "enum": ["d0_6", "d7_13", "d14_20", "d21_27", "d28_plus"]
+    },
+    "promptOpensPrevWeek": {
+        "key": "opens_prev_week",
+        "type": "string",
+        "description": "Number of times the app was brought to the foreground in the previous install-week, bucketed. 0 when that week had no opens or no history exists yet.",
+        "enum": ["0", "1_2", "3_5", "6_10", "11_20", "21_50", "51_plus"]
     }
 }

@@ -20,12 +20,18 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.browser.api.install.AppInstall
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.promptscoordinator.api.PromptType
 import com.duckduckgo.promptscoordinator.api.PromptsCoordinator
 import com.duckduckgo.promptscoordinator.impl.di.PromptsCoordinatorStore
+import com.duckduckgo.promptscoordinator.impl.exposure.PromptExposurePixelName
+import com.duckduckgo.promptscoordinator.impl.exposure.PromptExposurePixelParams
+import com.duckduckgo.promptscoordinator.impl.exposure.daysSinceInstallBucket
+import com.duckduckgo.promptscoordinator.impl.exposure.gapBucket
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -47,6 +53,8 @@ class RealPromptsCoordinator @Inject constructor(
     @PromptsCoordinatorStore private val store: DataStore<Preferences>,
     private val currentTimeProvider: CurrentTimeProvider,
     private val dispatchers: DispatcherProvider,
+    private val pixel: Pixel,
+    private val appInstall: AppInstall,
 ) : PromptsCoordinator {
 
     /**
@@ -144,7 +152,7 @@ class RealPromptsCoordinator @Inject constructor(
         claimMutex.withLock {
             if (owner.value == type) {
                 owner.value = null
-                stampLastPromptDone()
+                stampLastPromptDone(type)
                 logcat { "PromptsCoordinator: $type claim done, gap timestamp stamped" }
             }
         }
@@ -178,10 +186,30 @@ class RealPromptsCoordinator @Inject constructor(
         return if (lastPromptAt.compareAndSet(UNINITIALIZED, persisted)) persisted else lastPromptAt.get()
     }
 
-    private suspend fun stampLastPromptDone() {
+    private suspend fun stampLastPromptDone(type: PromptType) {
         val now = currentTimeProvider.currentTimeMillis()
+        // Read before overwriting: the gap is measured from the previous stamp.
+        val previous = lastPromptDoneTimestamp()
         lastPromptAt.set(now)
         store.edit { it[LAST_PROMPT_AT_KEY] = now }
+        fireGapPixel(type, previous, now)
+    }
+
+    /**
+     * MODAL stamps when the modal appears, while NTP_CARD stamps when the card goes away, so the
+     * NTP_CARD series measures release-to-next-prompt rather than show-to-show.
+     */
+    private suspend fun fireGapPixel(type: PromptType, previous: Long, now: Long) {
+        val gap = gapBucket(previous, now) ?: return
+        val daysSinceInstall = appInstall.getInstallAge()?.inWholeDays ?: return
+        pixel.fire(
+            PromptExposurePixelName.PROMPT_GAP,
+            mapOf(
+                PromptExposurePixelParams.DAYS_SINCE_INSTALL to daysSinceInstallBucket(daysSinceInstall),
+                PromptExposurePixelParams.GAP_BUCKET to gap,
+                PromptExposurePixelParams.PROMPT_TYPE to type.name,
+            ),
+        )
     }
 
     companion object {

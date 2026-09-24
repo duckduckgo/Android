@@ -1,0 +1,76 @@
+// Prompts Coordinator exposure pixels: how often app-originated prompts reach the user.
+{
+    "m_prompt_exposure": {
+        "description": "Fires each time an app-originated prompt is shown: modal evaluators, the remote message card on the New Tab Page (once per message per install-week), the new address bar picker, and the in-browser import passwords promo. nth_in_week is this prompt's ordinal within the install-week.",
+        "owners": ["aibrahim-"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "promptDaysSinceInstall",
+            {
+                "key": "nth_in_week",
+                "type": "string",
+                "description": "Ordinal of this prompt within the current install-week, exact up to 10 and bucketed above.",
+                "enum": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11_15", "16_20", "21_plus"]
+            },
+            "promptOpensPrevWeek"
+        ]
+    },
+    "m_prompt_shown": {
+        "description": "Fires alongside m_prompt_exposure, identifying which prompt was shown.",
+        "owners": ["aibrahim-"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "promptDaysSinceInstall",
+            {
+                "key": "prompt_id",
+                "type": "string",
+                "description": "The prompt that was shown. 'other' is a prompt not yet registered in this list.",
+                "enum": [
+                    "default_browser_changed_survey_evaluator",
+                    "win_back_prompt",
+                    "re_engagement_prompt",
+                    "remote_message_modal",
+                    "additional_default_browser_prompts",
+                    "subscription_promo_modal",
+                    "add_widget_modal",
+                    "app_rating_prompt",
+                    "cookie_popup_opt_in",
+                    "remote_message_card",
+                    "new_address_bar_picker",
+                    "import_passwords_google",
+                    "other"
+                ]
+            }
+        ]
+    },
+    "m_prompt_user_week": {
+        "description": "Denominator for the prompt exposure pixels. Fires once per install-week, on the first app foreground of that week once onboarding is complete.",
+        "owners": ["aibrahim-"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["promptDaysSinceInstall", "promptOpensPrevWeek"]
+    },
+    "m_prompt_gap": {
+        "description": "Fires when a prompt arbitrated by the Prompts Coordinator finishes, measuring the time since the previous one finished. Modals finish when they appear; the New Tab Page card finishes when it goes away. Only fires while the coordinator is enabled.",
+        "owners": ["aibrahim-"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "promptDaysSinceInstall",
+            {
+                "key": "gap_bucket",
+                "type": "string",
+                "description": "Time since the previous coordinated prompt finished, bucketed (lower bound inclusive). 'first' when no previous prompt was recorded.",
+                "enum": ["first", "lt_1m", "1_5m", "5_10m", "10_30m", "30_60m", "1_4h", "4_12h", "12_24h", "24_48h", "gt_48h"]
+            },
+            {
+                "key": "prompt_type",
+                "type": "string",
+                "description": "The kind of prompt that just finished.",
+                "enum": ["MODAL", "NTP_CARD"]
+            }
+        ]
+    }
+}

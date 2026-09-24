@@ -25,6 +25,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.promptscoordinator.api.ModalEvaluator
 import com.duckduckgo.promptscoordinator.api.ModalTrigger
 import com.duckduckgo.promptscoordinator.api.NewTabPageModalTrigger
+import com.duckduckgo.promptscoordinator.api.PromptExposureReporter
 import com.duckduckgo.promptscoordinator.api.PromptType
 import com.duckduckgo.promptscoordinator.api.PromptsCoordinator
 import com.duckduckgo.promptscoordinator.impl.store.ModalEvaluatorCompletionStore
@@ -63,6 +64,7 @@ class ModalEvaluatorCoordinator @Inject constructor(
     private val completionStore: ModalEvaluatorCompletionStore,
     private val promptsCoordinator: PromptsCoordinator,
     private val dispatchers: DispatcherProvider,
+    private val promptExposureReporter: PromptExposureReporter,
 ) : MainProcessLifecycleObserver, NewTabPageModalTrigger {
 
     private val evaluationMutex = Mutex()
@@ -117,6 +119,8 @@ class ModalEvaluatorCoordinator @Inject constructor(
                         }
                         // Recorded either way so kill-switch flips stay seamless.
                         completionStore.recordCompletion()
+                        // Exposure is counted whether or not the coordinator arbitrated this pass.
+                        promptExposureReporter.reportPromptShown(evaluator.evaluatorId)
                         promptsCoordinator.onClaimDone(PromptType.MODAL)
                         claimHeld = false
                         return@withLock
