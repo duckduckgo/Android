@@ -35,11 +35,6 @@ import com.duckduckgo.pir.impl.databinding.ActivitySubscriptionOnboardingPirStep
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-/**
- * PIR step of the native subscription onboarding, launched from the completion screen. Shows the PIR feature
- * info and an Activate button that opens the PIR dashboard. The step reports itself completed once the user
- * has started a scan; closing (X or back) returns to the completion screen.
- */
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(PirOnboardingStepScreen::class)
 class SubscriptionOnboardingPirStepActivity : DuckDuckGoActivity() {

@@ -45,11 +45,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-/**
- * Summarises how far the user got through onboarding. The rows come from the step plugins themselves, so a
- * feature module owning a step also owns its label and icon here; PIR is appended separately because it has
- * no onboarding step of its own and is set up from this screen rather than in the linear flow.
- */
 @ContributesViewModel(FragmentScope::class)
 class SubscriptionOnboardingCompletionViewModel @Inject constructor(
     private val controller: SubscriptionOnboardingController,
@@ -85,11 +80,7 @@ class SubscriptionOnboardingCompletionViewModel @Inject constructor(
     private val _commands = Channel<Command>(1, DROP_OLDEST)
     val commands: Flow<Command> = _commands.receiveAsFlow()
 
-    // Cached so the summary can be rebuilt without waiting for a fresh entitlements emission.
     private var pirEntitled = false
-
-    // PIR is completed from its own screen while this one is in the background. We learn it from the
-    // controller event directly (not the step store) so we don't race the host writing that store.
     private var pirCompleted = false
 
     init {
@@ -137,8 +128,6 @@ class SubscriptionOnboardingCompletionViewModel @Inject constructor(
                 }
             }
 
-        // Only show the PIR row when the user both is entitled to it and is eligible (the feature is enabled
-        // and available for them).
         val showPir = pirEntitled && pirFeature.getPirFeatureState() == PirFeatureState.ENABLED
         val rows = if (showPir) stepRows + pirRow() else stepRows
         val percentage = rows.completionPercentage()
@@ -151,8 +140,7 @@ class SubscriptionOnboardingCompletionViewModel @Inject constructor(
         )
     }
 
-    // PIR is set up from this screen (Activate → PIR flow), not in the linear onboarding. Its row is
-    // completed once the user has started a scan, and stays tappable until then.
+    // PIR is set up from this screen, not in the linear onboarding.
     private fun pirRow(): SummaryRow {
         val completed = pirCompleted || stepStore.isCompleted(PIR_ROW_ID)
         return SummaryRow(

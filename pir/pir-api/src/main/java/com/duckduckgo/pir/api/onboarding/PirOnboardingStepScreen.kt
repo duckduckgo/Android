@@ -18,5 +18,4 @@ package com.duckduckgo.pir.api.onboarding
 
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 
-/** Launches the PIR onboarding step (feature info + Activate) shown from the subscription onboarding completion screen. */
 data object PirOnboardingStepScreen : GlobalActivityStarter.ActivityParams

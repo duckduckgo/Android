@@ -63,7 +63,6 @@ class SubscriptionOnboardingCompletionFragment : DuckDuckGoFragment(R.layout.fra
         ViewModelProvider(this, viewModelFactory)[SubscriptionOnboardingCompletionViewModel::class.java]
     }
 
-    // The current fill, so returning to the screen at a higher percentage sweeps from here rather than resetting.
     private var lastAnimatedPercentage = 0
     private var celebratoryConfigured = false
 
