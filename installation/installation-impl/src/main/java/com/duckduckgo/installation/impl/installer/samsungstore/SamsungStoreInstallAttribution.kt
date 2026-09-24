@@ -31,15 +31,10 @@ import logcat.LogPriority.INFO
 import logcat.logcat
 import javax.inject.Inject
 
-// Runs after Aura: its remote installer list has included the Galaxy Store package, and its direct variant write
-// would otherwise replace this tag. The reinstall listener (10) is not a dependency; returning users are detected directly.
+// Must run after Aura (20): its remote installer list includes the Galaxy Store package, and its direct variant write
+// would otherwise replace this tag.
 internal const val PRIORITY_SAMSUNG_STORE_INSTALL_ATTRIBUTION = 30
 
-/**
- * Tags a first-run install that came through the Samsung Galaxy Store with a reserved ATB variant and an origin,
- * so the server-side install and retention counts for that store can be split out of the totals. Returning users get
- * their own variant so the store's new installs and reinstalls stay separable.
- */
 @ContributesMultibinding(AppScope::class)
 @PriorityKey(PRIORITY_SAMSUNG_STORE_INSTALL_ATTRIBUTION)
 @SingleInstanceIn(AppScope::class)
@@ -64,12 +59,8 @@ class SamsungStoreInstallAttribution @Inject constructor(
         val source = runCatching { installSourceExtractor.extract() }.getOrNull()
         if (source != SAMSUNG_STORE_PACKAGE) return@withContext
 
-        // Asking the build config directly, rather than checking for the `ru` variant, keeps this independent of
-        // whatever other listeners wrote before us.
         val variant = if (appBuildConfig.isAppReinstall()) REINSTALL_VARIANT else VARIANT
 
-        // The referrer-variant path also records the key as protected, so later remote variant updates cannot
-        // reset it. A direct write to StatisticsDataStore.variant would not be protected.
         variantManager.updateAppReferrerVariant(variant)
         appReferrer.setOriginAttributeCampaign(ORIGIN)
         logcat(INFO) { "Galaxy Store install tagged with variant $variant" }

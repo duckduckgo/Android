@@ -21,10 +21,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 
-/**
- * Kill switch for tagging Galaxy Store installs. Enabled by default so the tag is live on the release that ships
- * it, without a remote config change; disable remotely to stop tagging new installs.
- */
 @ContributesRemoteFeature(
     scope = AppScope::class,
     featureName = "samsungStoreInstallAttribution",
