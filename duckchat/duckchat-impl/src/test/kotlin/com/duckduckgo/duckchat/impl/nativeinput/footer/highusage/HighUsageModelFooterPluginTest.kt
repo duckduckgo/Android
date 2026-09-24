@@ -65,7 +65,7 @@ class HighUsageModelFooterPluginTest {
     )
     private val modelState = MutableStateFlow(ModelState())
     private val modelManager: DuckAiModelManager = mock()
-    private val feature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
+    private val feature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java, ioDispatcher = coroutineRule.testDispatcher)
     private val hostContext = MutableStateFlow(duckAiContext())
     private lateinit var dataStore: DataStore<Preferences>
     private lateinit var testee: HighUsageModelFooterPlugin

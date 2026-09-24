@@ -61,7 +61,7 @@ class UsageLimitFooterPluginTest {
     private val repository: DuckAiUsageLimitsRepository = mock()
     private val dismissalStore: UsageNoticeDismissalStore = mock()
     private val currentTimeProvider: CurrentTimeProvider = mock()
-    private val feature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
+    private val feature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java, ioDispatcher = coroutineRule.testDispatcher)
     private val hostContext = MutableStateFlow(duckAiContext())
 
     private lateinit var testee: UsageLimitFooterPlugin
