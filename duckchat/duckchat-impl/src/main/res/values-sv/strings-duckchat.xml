@@ -350,4 +350,23 @@
     <string name="duckChatContextualAskAboutPage">Fråga om sidan</string>
     <string name="duckChatContextualAskAboutSearch">Fortsätt i Duck.ai</string>
     <string name="duckChatContextualOpenDuckAi">Öppna Duck.ai</string>
+
+    <!-- Suggested prompts for text selection -->
+    <string name="duckAiSuggestionSummarizeSelectionLabel">Sammanfatta detta urval</string>
+    <string name="duckAiSuggestionSummarizeSelectionPrompt">Sammanfatta detta urval.</string>
+    <string name="duckAiSuggestionTranslateSelectionLabel">Översätt detta urval</string>
+    <string name="duckAiSuggestionTranslateSelectionPrompt" instruction="%1$s is replaced with the name of the user&apos;s language.">Översätt detta urval till %1$s.</string>
+
+    <!-- Name shown for an attached text selection in the Duck.ai -->
+    <string name="duckAiTextSelectionAttachmentTitle">Texturval</string>
+    <string name="duckAiTextSelectionLimitReached" instruction="%1$d is replaced with the maximum number of text selections.">Du kan lägga till upp till %1$d textmarkeringar. Ta bort en för att lägga till en annan.</string>
+
+    <!-- Duck.ai text selection menu action -->
+    <string name="duckAiTextSelectionMenuItem">Fråga Duck.ai</string>
+
+    <!-- Prefix on the Duck.ai attachment chip for a text selection -->
+    <plurals name="duckAiTextSelectionWordCount">
+        <item quantity="one">%1$d ord</item>
+        <item quantity="other">%1$d ord</item>
+    </plurals>
 </resources>
