@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.ui
 
+import android.content.Context
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -57,6 +58,8 @@ import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ReasoningResolver
 import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
+import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterContext
+import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterCoordinator
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelPageType
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
@@ -88,6 +91,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -107,6 +111,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     private val pendingNativePromptStore: PendingNativePromptStore,
     private val chatSuggestionsReader: ChatSuggestionsReader,
     private val nativeInputPlugins: ActivePluginPoint<NativeInputPlugin>,
+    private val footerCoordinator: NativeInputFooterCoordinator,
     autoCompleteFactory: AutoCompleteFactory,
     private val browserMode: BrowserMode,
     private val autoCompleteSettings: AutoCompleteSettings,
@@ -327,6 +332,33 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     private val widgetConfig = MutableStateFlow(WidgetConfig())
 
     private val activeTabId = MutableStateFlow<String?>(null)
+    private val footerInputFocused = MutableStateFlow(false)
+
+    val footerContext: StateFlow<NativeInputFooterContext> = combine(widgetConfig, activeTabId, footerInputFocused) { config, tabId, inputFocused ->
+        val selection = config.toggleSelection ?: NativeInputState.defaultToggleFor(config.inputContext)
+        NativeInputFooterContext(
+            isDuckAiSelected = selection == NativeInputState.ToggleSelection.DUCK_AI,
+            isEditing = tabId?.startsWith(EDIT_STATE_KEY_PREFIX) == true,
+            isFireMode = browserMode == BrowserMode.FIRE,
+            isInputFocused = inputFocused,
+        )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Eagerly,
+        initialValue = NativeInputFooterContext(
+            isDuckAiSelected = false,
+            isEditing = false,
+            isFireMode = browserMode == BrowserMode.FIRE,
+            isInputFocused = false,
+        ),
+    )
+
+    fun setFooterInputFocused(focused: Boolean) {
+        footerInputFocused.value = focused
+    }
+
+    fun footerState(context: Context): Flow<NativeInputFooterCoordinator.State> =
+        footerCoordinator.state(context, footerContext)
 
     private val baseState: Flow<NativeInputState> = combine(
         duckAiFeatureState.showSettings,

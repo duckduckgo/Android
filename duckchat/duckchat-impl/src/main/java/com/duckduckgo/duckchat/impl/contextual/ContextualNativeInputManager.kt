@@ -28,6 +28,7 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
+import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterView
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputModeWidget
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
@@ -62,6 +63,7 @@ interface ContextualNativeInputManager {
         tabId: String,
         card: MaterialCardView,
         widget: NativeInputModeWidget,
+        footer: NativeInputFooterView? = null,
         jsMessaging: JsMessaging,
         lifecycleOwner: LifecycleOwner,
         chatIdFlow: Flow<String?>,
@@ -108,6 +110,7 @@ class RealContextualNativeInputManager @Inject constructor(
     private var isNativeInputEnabled = false
     private var isContextualNativeInputEnabled = false
     private var card: MaterialCardView? = null
+    private var footer: NativeInputFooterView? = null
     private var jsMessaging: JsMessaging? = null
     private var widget: NativeInputModeWidget? = null
     private var lastMode: Mode? = null
@@ -119,6 +122,7 @@ class RealContextualNativeInputManager @Inject constructor(
         tabId: String,
         card: MaterialCardView,
         widget: NativeInputModeWidget,
+        footer: NativeInputFooterView?,
         jsMessaging: JsMessaging,
         lifecycleOwner: LifecycleOwner,
         chatIdFlow: Flow<String?>,
@@ -132,6 +136,7 @@ class RealContextualNativeInputManager @Inject constructor(
         onVoiceSearchRequested: () -> Unit,
     ) {
         this.card = card
+        this.footer = footer
         this.jsMessaging = jsMessaging
         this.widget = widget
 
@@ -172,12 +177,12 @@ class RealContextualNativeInputManager @Inject constructor(
     override fun onWebViewMode() {
         lastMode = Mode.WEBVIEW
         if (isNativeInputEnabled) {
-            card?.show()
+            setInputVisible(true)
             // WEBVIEW mode means a chat is in progress.
             // Hide the picker so the user can't change models mid-chat.
             modelPickerEnabled.value = false
         } else {
-            card?.gone()
+            setInputVisible(false)
         }
     }
 
@@ -185,13 +190,22 @@ class RealContextualNativeInputManager @Inject constructor(
         lastMode = Mode.INPUT
         if (isContextualNativeInputEnabled) {
             // The unified input widget is the composer for the initial sheet.
-            card?.show()
+            setInputVisible(true)
             // INPUT mode is a new chat: restore the picker so the user can pick a model before starting.
             modelPickerEnabled.value = true
         } else {
             // contextualNativeInput off: the legacy EditText composer is shown instead, so keep the card hidden.
+            setInputVisible(false)
+        }
+    }
+
+    private fun setInputVisible(visible: Boolean) {
+        if (visible) {
+            card?.show()
+        } else {
             card?.gone()
         }
+        footer?.setSurfaceVisible(visible)
     }
 
     private fun applyCardShape(card: MaterialCardView) {

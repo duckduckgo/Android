@@ -46,8 +46,34 @@ class ContentTopInsetTest {
         assertEquals(0, contentTopInset(isBottom = false, isLogoOnly = false, navBarInsetPx = NAV_BAR, widgetTopOffsetPx = -20))
     }
 
+    @Test
+    fun `top mode content anchor includes visible footer height`() {
+        assertEquals(
+            WIDGET_BOTTOM + FOOTER_HEIGHT,
+            contentAnchorBottom(
+                isBottom = false,
+                widgetBottomInWindow = WIDGET_BOTTOM,
+                visibleFooterExtent = FOOTER_HEIGHT,
+            ),
+        )
+    }
+
+    @Test
+    fun `bottom mode content anchor excludes footer height`() {
+        assertEquals(
+            WIDGET_BOTTOM,
+            contentAnchorBottom(
+                isBottom = true,
+                widgetBottomInWindow = WIDGET_BOTTOM,
+                visibleFooterExtent = FOOTER_HEIGHT,
+            ),
+        )
+    }
+
     private companion object {
         private const val NAV_BAR = 56
         private const val WIDGET_OFFSET = 120
+        private const val WIDGET_BOTTOM = 300
+        private const val FOOTER_HEIGHT = 50
     }
 }

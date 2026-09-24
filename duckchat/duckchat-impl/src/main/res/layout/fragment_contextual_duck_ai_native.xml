@@ -180,26 +180,42 @@
         android:layout_height="wrap_content"
         android:background="?attr/daxColorDuckAiBackground">
 
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/contextualNativeInputCard"
-            android:theme="?attr/daxInputModeCardThemeOverlay"
+        <com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterDockLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:layout_marginHorizontal="@dimen/keyline_2"
-            android:layout_marginBottom="@dimen/keyline_2"
-            app:cardBackgroundColor="?attr/daxColorWindow"
-            app:cardElevation="4dp"
-            app:cardUseCompatPadding="false">
+            android:orientation="vertical">
 
-            <com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputModeWidget
-                android:id="@+id/contextualNativeInputWidget"
-                android:paddingHorizontal="8dp"
-                android:paddingVertical="4dp"
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/contextualNativeInputCard"
+                android:theme="?attr/daxInputModeCardThemeOverlay"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_marginHorizontal="@dimen/keyline_2"
+                android:layout_marginBottom="@dimen/keyline_2"
+                app:cardBackgroundColor="?attr/daxColorWindow"
+                app:cardElevation="4dp"
+                app:cardUseCompatPadding="false">
 
-        </com.google.android.material.card.MaterialCardView>
+                <com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputModeWidget
+                    android:id="@+id/contextualNativeInputWidget"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="4dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterView
+                android:id="@+id/contextualNativeInputFooter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/keyline_2"
+                android:clipChildren="false"
+                android:clipToPadding="false" />
+
+        </com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterDockLayout>
 
         <LinearLayout
             android:id="@+id/contextualModeNativeContent"

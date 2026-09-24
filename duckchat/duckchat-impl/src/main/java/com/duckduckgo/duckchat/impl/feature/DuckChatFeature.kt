@@ -315,4 +315,11 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun contextualEntryDismissOnTabChange(): Toggle
+
+    /**
+     * @return `true` when native Duck.ai usage-limit and high-usage model notices may be shown.
+     * If the remote feature is not present defaults to `false`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun duckAiUsageWarnings(): Toggle
 }

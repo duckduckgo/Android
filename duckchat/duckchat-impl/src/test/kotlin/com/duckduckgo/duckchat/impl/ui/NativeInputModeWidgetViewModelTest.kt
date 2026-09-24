@@ -18,6 +18,7 @@ package com.duckduckgo.duckchat.impl.ui
 
 import android.content.Context
 import android.view.View
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -59,6 +60,11 @@ import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.RealNativeInputStateStore
+import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooter
+import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterContext
+import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterCoordinator
+import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterPlugin
+import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterState
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelPageType
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
@@ -73,8 +79,10 @@ import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOf
@@ -160,6 +168,10 @@ class NativeInputModeWidgetViewModelTest {
     private val fakePluginPoint = object : ActivePluginPoint<NativeInputPlugin> {
         override suspend fun getPlugins(): Collection<NativeInputPlugin> = fakePlugins
     }
+    private var fakeFooterPlugins: List<NativeInputFooterPlugin> = emptyList()
+    private val fakeFooterPluginPoint = object : ActivePluginPoint<NativeInputFooterPlugin> {
+        override suspend fun getPlugins(): Collection<NativeInputFooterPlugin> = fakeFooterPlugins
+    }
 
     private lateinit var testee: NativeInputModeWidgetViewModel
 
@@ -181,8 +193,13 @@ class NativeInputModeWidgetViewModelTest {
         testee.configure(tabId = "test-tab", isDuckAiMode = false, isBottom = false)
     }
 
-    private fun createViewModel(plugins: List<NativeInputPlugin> = emptyList()): NativeInputModeWidgetViewModel {
+    private fun createViewModel(
+        plugins: List<NativeInputPlugin> = emptyList(),
+        footerPlugins: List<NativeInputFooterPlugin> = emptyList(),
+        browserMode: BrowserMode = BrowserMode.REGULAR,
+    ): NativeInputModeWidgetViewModel {
         fakePlugins = plugins
+        fakeFooterPlugins = footerPlugins
         return NativeInputModeWidgetViewModel(
             duckChatInternal = duckChatInternal,
             duckDuckGoUrlDetector = duckDuckGoUrlDetector,
@@ -191,8 +208,9 @@ class NativeInputModeWidgetViewModelTest {
             pendingNativePromptStore = pendingNativePromptStore,
             chatSuggestionsReader = chatSuggestionsReader,
             nativeInputPlugins = fakePluginPoint,
+            footerCoordinator = NativeInputFooterCoordinator(fakeFooterPluginPoint),
             autoCompleteFactory = autoCompleteFactory,
-            browserMode = BrowserMode.REGULAR,
+            browserMode = browserMode,
             autoCompleteSettings = autoCompleteSettings,
             duckAiChatHistoryFeature = duckAiChatHistoryFeature,
             duckChatFeature = duckChatFeature,
@@ -760,6 +778,48 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
+    fun whenFooterPluginsExistThenFooterStateLoadsAndSelectsThem() = runTest {
+        val footerView = View(ApplicationProvider.getApplicationContext())
+        val viewModel = createViewModel(
+            footerPlugins = listOf(fakeFooterPlugin(view = footerView)),
+        )
+
+        val state = viewModel.footerState(ApplicationProvider.getApplicationContext()).first()
+
+        assertEquals(footerView, state.view)
+    }
+
+    @Test
+    fun whenDuckAiIsSelectedThenFooterContextReportsDuckAi() = runTest {
+        testee.setToggleSelection(NativeInputState.ToggleSelection.DUCK_AI)
+
+        assertTrue(testee.footerContext.first { it.isDuckAiSelected }.isDuckAiSelected)
+    }
+
+    @Test
+    fun whenConfiguredForEditThenFooterContextReportsEditing() = runTest {
+        testee.configureForEdit(sessionId = "session-1")
+
+        assertTrue(testee.footerContext.first { it.isEditing }.isEditing)
+    }
+
+    @Test
+    fun whenBrowserModeIsFireThenFooterContextReportsFireMode() = runTest {
+        val viewModel = createViewModel(browserMode = BrowserMode.FIRE)
+
+        assertTrue(viewModel.footerContext.value.isFireMode)
+    }
+
+    @Test
+    fun whenInputFocusChangesThenFooterContextReportsFocus() = runTest {
+        testee.setFooterInputFocused(true)
+        assertTrue(testee.footerContext.value.isInputFocused)
+
+        testee.setFooterInputFocused(false)
+        assertFalse(testee.footerContext.value.isInputFocused)
+    }
+
+    @Test
     fun whenModelManagerHasNoSelectedModelThenGetSelectedModelIdReturnsNull() = runTest {
         whenever(modelManager.getSelectedModelId()).thenReturn(null)
         val viewModel = createViewModel()
@@ -1306,6 +1366,20 @@ class NativeInputModeWidgetViewModelTest {
         return object : NativeInputPlugin {
             override val containerId: Int = containerId
             override fun createView(context: Context, host: NativeInputHost): View = View(context)
+        }
+    }
+
+    private fun fakeFooterPlugin(view: View): NativeInputFooterPlugin {
+        return object : NativeInputFooterPlugin {
+            override val priority: Int = 1
+
+            override fun createFooter(
+                context: Context,
+                hostContext: StateFlow<NativeInputFooterContext>,
+            ): NativeInputFooter = object : NativeInputFooter {
+                override val view: View = view
+                override val state: Flow<NativeInputFooterState> = flowOf(NativeInputFooterState(visible = true))
+            }
         }
     }
 

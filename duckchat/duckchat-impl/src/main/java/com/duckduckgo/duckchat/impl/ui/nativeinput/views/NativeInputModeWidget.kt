@@ -82,6 +82,8 @@ import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.helper.PendingNativeFile
 import com.duckduckgo.duckchat.impl.helper.PendingNativeImage
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
+import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterDockLayout
+import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterView
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.inputScreenPixelsModeParam
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
@@ -189,6 +191,7 @@ interface NativeInputWidget {
     fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean, forceImageGeneration: Boolean = false)
     fun configureContextual(tabId: String)
     fun configureForEdit(sessionId: String)
+    fun setFooterSuppressed(suppressed: Boolean)
     fun adoptEditAttachments(images: List<SubmittedImage>, files: List<SubmittedFile>)
     fun isWidgetBottom(): Boolean
     fun setWidgetPosition(isBottom: Boolean)
@@ -347,6 +350,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var voiceSearchAvailable: Boolean = false
     private var voiceChatAvailable: Boolean = false
     private var widgetRoot: View? = null
+    private var footerHost: NativeInputFooterView? = null
     override var onStopTapped: (() -> Unit)? = null
     override var onChangeModelSubmitted: ((modelId: String) -> Unit)? = null
     override var onCustomizeResponsesClicked: (() -> Unit)? = null
@@ -703,6 +707,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
             duckChatInternal.setInputQuery(currentInputQuery())
         }
         setupPlugins()
+        viewModel.setFooterInputFocused(inputField.hasFocus())
+        bindFooter()
         applyPendingAttachmentState()
         observeModelPickerEnabledSource()
         observeChatIdSource()
@@ -799,6 +805,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
             duckChatInternal.setSelectedMode(InputMode.SEARCH)
             duckChatInternal.setInputQuery("")
         }
+        viewModel.setFooterInputFocused(false)
+        footerHost?.unbind()
         super.onDetachedFromWindow()
         chatStateJob?.cancel()
         chatStateJob = null
@@ -935,6 +943,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         updateBottomRowVisibility()
         applyVerticalPaddingForFocus()
         inputField.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
+            viewModel.setFooterInputFocused(hasFocus)
             // Toggle visibility is intentionally NOT updated here: it's owned by applyState
             // (state-driven) and by NativeInputManager.setToggleVisible (keyboard-visibility
             // driven on duck.ai). Re-evaluating it from the focus listener would race with
@@ -1656,6 +1665,29 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
     }
 
+    override fun setFooterSuppressed(suppressed: Boolean) {
+        footerHost?.setExitAnimationRunning(suppressed)
+    }
+
+    private fun bindFooter() {
+        val scope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
+        footerHost = findFooterHost()
+        footerHost?.bind(scope, viewModel.footerState(context), ::setFooterComposerBlocked)
+    }
+
+    /** The footer host is a sibling of this widget's card inside the nearest [NativeInputFooterDockLayout]. */
+    private fun findFooterHost(): NativeInputFooterView? {
+        var ancestor = parent
+        while (ancestor != null && ancestor !is NativeInputFooterDockLayout) {
+            ancestor = ancestor.parent
+        }
+        val dock = ancestor as? NativeInputFooterDockLayout ?: return null
+        return (0 until dock.childCount)
+            .map(dock::getChildAt)
+            .filterIsInstance<NativeInputFooterView>()
+            .firstOrNull()
+    }
+
     override fun adoptEditAttachments(
         images: List<SubmittedImage>,
         files: List<SubmittedFile>,
@@ -2161,10 +2193,23 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private fun voiceHostButtons(): InputScreenButtons? = submitButtons
 
     private var interactionLocked = false
+    private var existingInteractionLocked = false
+    private var footerComposerBlocked = false
 
     // Dims only this (transparent) widget, never the parent card surface, so the bar stays
     // colour-uniform with the page. Touch interception covers the plugin containers too.
     override fun setInteractionLocked(locked: Boolean) {
+        existingInteractionLocked = locked
+        updateInteractionLock()
+    }
+
+    internal fun setFooterComposerBlocked(blocked: Boolean) {
+        footerComposerBlocked = blocked
+        updateInteractionLock()
+    }
+
+    private fun updateInteractionLock() {
+        val locked = existingInteractionLocked || footerComposerBlocked
         if (interactionLocked == locked) return
         interactionLocked = locked
         alpha = if (locked) LOCKED_ALPHA else 1f

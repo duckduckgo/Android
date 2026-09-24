@@ -27,6 +27,7 @@ import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterView
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputModeWidget
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.voice.api.VoiceSearchAvailability
@@ -201,11 +202,13 @@ class RealContextualNativeInputManagerTest {
         val enabled = MutableStateFlow(false)
         whenever(duckChatInternal.observeNativeChatInputEnabled()).thenReturn(enabled)
         val card = mockCard()
+        val footer = mock<NativeInputFooterView>()
         val widget = mock<NativeInputModeWidget>()
         testee.init(
             tabId = "tab",
             card = card,
             widget = widget,
+            footer = footer,
             jsMessaging = mock<JsMessaging>(),
             lifecycleOwner = lifecycleOwner(),
             chatIdFlow = emptyFlow(),
@@ -215,6 +218,7 @@ class RealContextualNativeInputManagerTest {
         testee.onInputMode()
 
         verify(card).visibility = View.GONE
+        verify(footer).setSurfaceVisible(false)
     }
 
     @Test

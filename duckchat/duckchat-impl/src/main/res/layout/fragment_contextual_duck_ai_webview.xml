@@ -136,11 +136,12 @@
 
     </FrameLayout>
 
-    <FrameLayout
+    <com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterDockLayout
         android:id="@+id/contextualInputContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/daxColorDuckAiBackground">
+        android:background="?attr/daxColorDuckAiBackground"
+        android:orientation="vertical">
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/contextualNativeInputCard"
@@ -163,6 +164,14 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-    </FrameLayout>
+        <com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterView
+            android:id="@+id/contextualNativeInputFooter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/keyline_2"
+            android:clipChildren="false"
+            android:clipToPadding="false" />
+
+    </com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterDockLayout>
 
 </LinearLayout>

@@ -47,4 +47,8 @@
     <!-- Chat history overflow (three-dot) menu -->
     <string name="duck_ai_chat_history_overflow_select_chats">Select Chats</string>
     <string name="duck_ai_chat_history_overflow_chats_protection">Chat Protection</string>
+
+    <!-- Duck.ai high-usage model footer -->
+    <string name="duckChatHighUsageModelFooterMessage" instruction="Placeholder is the selected model's short name">%1$s uses limits up to 2-5x faster than basic models.</string>
+    <string name="duckChatHighUsageModelFooterDismissContentDescription">Dismiss</string>
 </resources>
