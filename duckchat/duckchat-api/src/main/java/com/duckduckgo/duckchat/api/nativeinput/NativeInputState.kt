@@ -37,6 +37,9 @@ data class NativeInputState(
      */
     val submitEnabled: Boolean = true,
 
+    /** Whether the model picker chip is enabled for this tab. */
+    val modelPickerEnabled: Boolean = true,
+
     /**  How much of the input field is locked (non-interactive + dimmed).*/
     val interactionLock: InteractionLock = InteractionLock.Unlocked,
 

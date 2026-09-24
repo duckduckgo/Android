@@ -20,6 +20,7 @@ import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
+import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
@@ -40,6 +41,7 @@ import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -75,6 +77,9 @@ class ModelPickerViewModelTest {
     private val duckAiChatStore: DuckAiChatStore = mock<DuckAiChatStore>().also {
         whenever(it.getChatsFlow()).thenReturn(chatsFlow)
     }
+    private val duckChatInternal: DuckChatInternal = mock<DuckChatInternal>().also {
+        whenever(it.showModelPickerEvents).thenReturn(emptyFlow())
+    }
 
     private lateinit var testee: ModelPickerViewModel
 
@@ -87,6 +92,7 @@ class ModelPickerViewModelTest {
             nativeInputStateProvider = nativeInputStateProvider,
             duckAiChatStore = duckAiChatStore,
             effectiveModelProvider = RealEffectiveModelProvider(modelManager, nativeInputStateProvider, duckAiChatStore),
+            duckChatInternal = duckChatInternal,
         )
     }
 
@@ -720,6 +726,7 @@ class ModelPickerViewModelTest {
                 override fun onRecoveryModelPicked(chatId: String?, modelId: String) = Unit
                 override fun clearRecoveryModelPick(chatId: String?) = Unit
             },
+            duckChatInternal = duckChatInternal,
         )
         nativeInputState.value = nativeInputState.value.copy(chatId = "chat-A")
         advanceUntilIdle()
