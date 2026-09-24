@@ -1691,7 +1691,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
         // shared per-tab state store can briefly emit a BROWSER state with toggleVisible=false
         // (e.g. SEARCH_ONLY users when the main widget publishes first), which would otherwise
         // fall through and reset card.radius to largeShapeCornerRadius on all four corners.
-        if (isContextualWidget) return
+        // The edit widget's card is fixed by its layout; before configureForEdit lands, SEARCH_ONLY
+        // users briefly emit a BROWSER state that would otherwise leave it pill shaped.
+        if (isContextualWidget || isEditWidget) return
         val state = nativeInputState ?: return
         val card = parent as? MaterialCardView ?: return
         val lp = card.layoutParams as? MarginLayoutParams ?: return
