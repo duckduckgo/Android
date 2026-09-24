@@ -221,9 +221,11 @@ class RealSubscriptions @Inject constructor(
     }
 }
 
+const val PRIVACY_PRO_FEATURE_NAME = "privacyPro"
+
 @ContributesRemoteFeature(
     scope = AppScope::class,
-    featureName = "privacyPro",
+    featureName = PRIVACY_PRO_FEATURE_NAME,
     toggleStore = SubscriptionsFeatureStore::class,
 )
 interface SubscriptionsFeature {
@@ -368,6 +370,14 @@ interface SubscriptionsFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun onboardingSubscriptionExperiment(): Toggle
+
+    /**
+     * Controls the experiment attribution sent with purchase confirmation.
+     * When enabled, sends every active subscription experiment enrollment.
+     * When disabled, sends only the single legacy assignment.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun subscriptionConcurrentExperiments(): Toggle
 }
 
 @ContributesBinding(AppScope::class)

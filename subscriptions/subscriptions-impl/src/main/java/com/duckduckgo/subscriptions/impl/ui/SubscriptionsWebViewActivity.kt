@@ -86,6 +86,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionOnboardi
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionUpgrade
 import com.duckduckgo.subscriptions.api.Subscriptions
+import com.duckduckgo.subscriptions.impl.PurchaseExperiments
 import com.duckduckgo.subscriptions.impl.R.string
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.FEATURE_PAGE_QUERY_PARAM_KEY
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ITR_URL
@@ -579,7 +580,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             is BackToSettings, BackToSettingsActivateSuccess -> finishToSettings()
             is SendJsEvent -> sendJsEvent(command.event)
             is SendResponseToJs -> sendResponseToJs(command.data)
-            is SubscriptionSelected -> selectSubscription(command.id, command.offerId, command.experimentName, command.experimentCohort)
+            is SubscriptionSelected -> selectSubscription(command.id, command.offerId, command.experiments)
             is SubscriptionChangeSelected -> changeSubscriptionPlan(command.planId, command.offerId, command.replacementMode)
             is RestoreSubscription -> restoreSubscription()
             is GoToITR -> goToITR()
@@ -736,10 +737,9 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     private fun selectSubscription(
         id: String,
         offerId: String?,
-        experimentName: String?,
-        experimentCohort: String?,
+        experiments: PurchaseExperiments,
     ) {
-        viewModel.purchaseSubscription(this, id, offerId, experimentName, experimentCohort, params.origin)
+        viewModel.purchaseSubscription(this, id, offerId, experiments, params.origin)
     }
 
     private fun changeSubscriptionPlan(

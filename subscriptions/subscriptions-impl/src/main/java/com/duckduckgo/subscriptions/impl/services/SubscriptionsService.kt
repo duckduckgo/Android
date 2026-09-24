@@ -72,8 +72,14 @@ data class ActiveOfferResponse(
 data class ConfirmationBody(
     val packageName: String,
     val purchaseToken: String,
-    val experimentName: String?,
-    val experimentCohort: String?,
+    val experiments: List<ExperimentData>? = null,
+    val experimentName: String? = null,
+    val experimentCohort: String? = null,
+)
+
+data class ExperimentData(
+    val experimentName: String,
+    val experimentCohort: String,
 )
 
 data class ConfirmationResponse(

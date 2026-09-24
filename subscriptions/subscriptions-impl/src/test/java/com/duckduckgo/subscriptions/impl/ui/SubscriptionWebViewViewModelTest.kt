@@ -1,6 +1,7 @@
 package com.duckduckgo.subscriptions.impl.ui
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -18,8 +19,10 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.model.Entitlement
 import com.duckduckgo.subscriptions.impl.CurrentPurchase
+import com.duckduckgo.subscriptions.impl.Experiment
 import com.duckduckgo.subscriptions.impl.JSONObjectAdapter
 import com.duckduckgo.subscriptions.impl.PricingPhase
+import com.duckduckgo.subscriptions.impl.PurchaseExperiments
 import com.duckduckgo.subscriptions.impl.SubscriptionOffer
 import com.duckduckgo.subscriptions.impl.SubscriptionsChecker
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
@@ -246,6 +249,201 @@ class SubscriptionWebViewViewModelTest {
             val result = awaitItem()
             assertTrue(result is Command.SubscriptionSelected)
             assertEquals("myId", (result as Command.SubscriptionSelected).id)
+        }
+    }
+
+    @Test
+    fun whenSubscriptionSelectedWithMultipleExperimentsThenAllAreSentInOrder() = runTest {
+        val json = """
+            {"id":"myId","experiments":[{"name":"experimentOne","cohort":"control"},{"name":"experimentTwo","cohort":"treatment"}]}
+        """.trimIndent()
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "subscriptionSelected", "id", JSONObject(json))
+            val result = awaitItem()
+            assertEquals(
+                listOf(
+                    Experiment(name = "experimentOne", cohort = "control"),
+                    Experiment(name = "experimentTwo", cohort = "treatment"),
+                ),
+                (result as Command.SubscriptionSelected).experiments.experiments,
+            )
+        }
+    }
+
+    @Test
+    fun whenSubscriptionSelectedWithDuplicateExperimentNamesThenOnlyFirstIsKept() = runTest {
+        val json = """
+            {"id":"myId","experiments":[{"name":"experimentOne","cohort":"control"},{"name":"experimentOne","cohort":"treatment"}]}
+        """.trimIndent()
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "subscriptionSelected", "id", JSONObject(json))
+            val result = awaitItem()
+            assertEquals(
+                listOf(Experiment(name = "experimentOne", cohort = "control")),
+                (result as Command.SubscriptionSelected).experiments.experiments,
+            )
+        }
+    }
+
+    @Test
+    fun whenSubscriptionSelectedWithIncompleteExperimentThenItIsDropped() = runTest {
+        val json = """
+            {"id":"myId","experiments":[{"name":"experimentOne"},{"name":"experimentTwo","cohort":"treatment"}]}
+        """.trimIndent()
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "subscriptionSelected", "id", JSONObject(json))
+            val result = awaitItem()
+            assertEquals(
+                listOf(Experiment(name = "experimentTwo", cohort = "treatment")),
+                (result as Command.SubscriptionSelected).experiments.experiments,
+            )
+        }
+    }
+
+    @Test
+    fun whenSubscriptionSelectedWithLegacySingleExperimentThenItIsStillSent() = runTest {
+        val json = """
+            {"id":"myId","experiment":{"name":"experimentOne","cohort":"control"}}
+        """.trimIndent()
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "subscriptionSelected", "id", JSONObject(json))
+            val result = awaitItem()
+            assertEquals(
+                PurchaseExperiments(legacyExperiment = Experiment(name = "experimentOne", cohort = "control")),
+                (result as Command.SubscriptionSelected).experiments,
+            )
+        }
+    }
+
+    @Test
+    fun whenSubscriptionSelectedWithoutExperimentsThenNoneAreSent() = runTest {
+        val json = """
+            {"id":"myId"}
+        """.trimIndent()
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "subscriptionSelected", "id", JSONObject(json))
+            val result = awaitItem()
+            assertEquals(PurchaseExperiments(), (result as Command.SubscriptionSelected).experiments)
+        }
+    }
+
+    @Test
+    fun whenBothExperimentPayloadsArePresentThenBothArePreservedRegardlessOfFlag() = runTest {
+        val json = """
+            {
+                "id":"myId",
+                "experiments":[{"name":"arrayExperiment","cohort":"control"}],
+                "experiment":{"name":"legacyExperiment","cohort":"treatment"}
+            }
+        """.trimIndent()
+        val expected = PurchaseExperiments(
+            experiments = listOf(Experiment("arrayExperiment", "control")),
+            legacyExperiment = Experiment("legacyExperiment", "treatment"),
+        )
+
+        for (enabled in listOf(false, true)) {
+            subscriptionsFeature.subscriptionConcurrentExperiments().setRawStoredState(Toggle.State(remoteEnableState = enabled))
+            assertPurchaseExperiments(json, expected)
+        }
+    }
+
+    @Test
+    fun whenExperimentArrayIsUnusableThenLegacyIsPreservedSeparately() = runTest {
+        val unusableArrays = listOf(
+            "null",
+            "{}",
+            "[]",
+            """[null, 42, "invalid", {}, {"name":"missingCohort"}]""",
+        )
+        for (array in unusableArrays) {
+            val json = """
+                {"id":"myId","experiments":$array,"experiment":{"name":"legacyExperiment","cohort":"control"}}
+            """.trimIndent()
+            assertPurchaseExperiments(json, PurchaseExperiments(legacyExperiment = Experiment("legacyExperiment", "control")))
+        }
+    }
+
+    @Test
+    fun whenExperimentArrayHasInvalidEntriesThenOnlyValidEntriesArePreserved() = runTest {
+        val json = """
+            {
+                "id":"myId",
+                "experiments":[
+                    null, 42, "invalid", {},
+                    {"name":"missingCohort"},
+                    {"cohort":"missingName"},
+                    {"name":"","cohort":"control"},
+                    {"name":"emptyCohort","cohort":""},
+                    {"name":null,"cohort":"control"},
+                    {"name":"nullCohort","cohort":null},
+                    {"name":42,"cohort":"control"},
+                    {"name":"validExperiment","cohort":"treatment"}
+                ]
+            }
+        """.trimIndent()
+        assertPurchaseExperiments(json, PurchaseExperiments(experiments = listOf(Experiment("validExperiment", "treatment"))))
+    }
+
+    @Test
+    fun whenLegacyExperimentIsInvalidThenItIsIgnored() = runTest {
+        val invalidExperiments = listOf(
+            "null",
+            "42",
+            "{}",
+            """{"name":"missingCohort"}""",
+            """{"cohort":"missingName"}""",
+            """{"name":"","cohort":"control"}""",
+            """{"name":"nullCohort","cohort":null}""",
+        )
+        for (legacy in invalidExperiments) {
+            assertPurchaseExperiments("""{"id":"myId","experiment":$legacy}""", PurchaseExperiments())
+        }
+    }
+
+    @Test
+    fun whenPurchaseSubscriptionThenBothExperimentPayloadsArePassedToManager() = runTest {
+        val activity: Activity = mock()
+        val experiments = PurchaseExperiments(
+            experiments = listOf(Experiment("arrayExperiment", "control")),
+            legacyExperiment = Experiment("legacyExperiment", "treatment"),
+        )
+
+        viewModel.purchaseSubscription(activity, "planId", "offerId", experiments, "origin")
+
+        verify(subscriptionsManager).purchase(activity, "planId", "offerId", experiments, "origin")
+    }
+
+    @Test
+    fun whenSubscriptionChangeStartsNewPurchaseThenBothExperimentPayloadsArePreserved() = runTest {
+        subscriptionsFeature.handleExpiredStateWhenSubscriptionChangeSelected().setRawStoredState(Toggle.State(remoteEnableState = true))
+        whenever(subscriptionsManager.getSubscription()).thenReturn(null)
+        val json = """
+            {
+                "id":"targetPlanId",
+                "experiments":[{"name":"arrayExperiment","cohort":"control"}],
+                "experiment":{"name":"legacyExperiment","cohort":"treatment"}
+            }
+        """.trimIndent()
+
+        assertPurchaseExperiments(
+            json,
+            PurchaseExperiments(
+                experiments = listOf(Experiment("arrayExperiment", "control")),
+                legacyExperiment = Experiment("legacyExperiment", "treatment"),
+            ),
+            method = "subscriptionChangeSelected",
+        )
+    }
+
+    private suspend fun assertPurchaseExperiments(
+        json: String,
+        expected: PurchaseExperiments,
+        method: String = "subscriptionSelected",
+    ) {
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", method, "id", JSONObject(json))
+            val result = awaitItem() as Command.SubscriptionSelected
+            assertEquals(expected, result.experiments)
         }
     }
 
