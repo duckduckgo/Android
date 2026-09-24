@@ -27,8 +27,11 @@ import com.duckduckgo.autofill.impl.importing.capability.ImportGooglePasswordsCa
 import com.duckduckgo.autofill.impl.importing.credentialtransfer.CredentialExchangeImportResult
 import com.duckduckgo.autofill.impl.importing.credentialtransfer.CredentialExchangeImportResult.Failure
 import com.duckduckgo.autofill.impl.importing.credentialtransfer.CredentialExchangePasswordImporter
+import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.UserCannotImportReason
+import com.duckduckgo.autofill.impl.importing.wideevents.CredentialImportWideEvent
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.ImportPasswordsPixelSender
+import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.Command.StartCredentialExchange
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.Command.StartWebFlow
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.BrowserPromoPreImport
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.DeterminingFirstView
@@ -58,6 +61,7 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
     private val promptExposureReporter: PromptExposureReporter,
     private val credentialExchangePasswordImporter: CredentialExchangePasswordImporter,
     private val webViewCapabilityChecker: ImportGooglePasswordsCapabilityChecker,
+    private val credentialImportWideEvent: CredentialImportWideEvent,
 ) : ViewModel() {
 
     fun onImportFlowFinishedSuccessfully() {
@@ -82,28 +86,38 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
         }
     }
 
-    fun onImportFlowFinishedWithError() {
+    fun onWebFlowFinishedSuccessfully() {
+        credentialImportWideEvent.onWebFlowSucceeded()
+        onImportFlowFinishedSuccessfully()
+    }
+
+    fun onWebFlowFinishedWithError(reason: UserCannotImportReason) {
+        credentialImportWideEvent.onWebFlowFailed(reason)
         _viewState.value = viewState.value.copy(viewMode = ViewMode.ImportError)
     }
 
-    fun onImportButtonClicked() {
-        sendStartImportCommand(viewState.value.usesCredentialExchange)
+    fun onWebFlowCancelled(canShowPreImportDialog: Boolean) {
+        credentialImportWideEvent.onWebFlowCancelled()
+        onImportFlowCancelledByUser(canShowPreImportDialog)
     }
 
-    fun onDirectImportRequested() {
+    fun onImportButtonClicked(importSource: AutofillImportLaunchSource) {
+        sendStartImportCommand(viewState.value.usesCredentialExchange, importSource)
+    }
+
+    fun onDirectImportRequested(importSource: AutofillImportLaunchSource) {
         viewModelScope.launch {
-            sendStartImportCommand(credentialExchangePasswordImporter.isSupported())
+            sendStartImportCommand(credentialExchangePasswordImporter.isSupported(), importSource)
         }
     }
 
-    private fun sendStartImportCommand(useCredentialExchange: Boolean) {
-        if (!useCredentialExchange) {
-            command.trySend(Command.StartWebFlow)
-            return
+    private fun sendStartImportCommand(useCredentialExchange: Boolean, importSource: AutofillImportLaunchSource) {
+        if (useCredentialExchange) {
+            if (credentialExchangeInProgress) return
+            credentialExchangeInProgress = true
         }
-        if (credentialExchangeInProgress) return
-        credentialExchangeInProgress = true
-        command.trySend(Command.StartCredentialExchange)
+        credentialImportWideEvent.onImportStarted(importSource, useCredentialExchange)
+        command.trySend(if (useCredentialExchange) StartCredentialExchange else StartWebFlow)
     }
 
     fun onCredentialExchangeFinished(
@@ -116,9 +130,13 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
             when (val converted = credentialExchangePasswordImporter.convertAndDeduplicate(result)) {
                 is CredentialExchangeImportResult.Success -> {
                     credentialImporter.import(converted.credentials, converted.originalCount, importSource)
+                    credentialImportWideEvent.onCredentialExchangeSucceeded(converted.exporterPackageName)
                     onImportFlowFinishedSuccessfully()
                 }
-                is CredentialExchangeImportResult.Cancelled -> onImportFlowCancelledByUser(canShowPreImportDialog)
+                is CredentialExchangeImportResult.Cancelled -> {
+                    credentialImportWideEvent.onCredentialExchangeCancelled()
+                    onImportFlowCancelledByUser(canShowPreImportDialog)
+                }
                 is Failure -> onExchangeCredentialsFailure(converted)
             }
         }
@@ -130,10 +148,12 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
     private suspend fun onExchangeCredentialsFailure(failure: Failure) {
         if (webViewCapabilityChecker.webViewCapableOfImporting()) {
             logcat(WARN) { "Credential exchange failed (${failure.reason}), falling back to web flow" }
+            credentialImportWideEvent.onCredentialExchangeFellBackToWebFlow(failure.reason, failure.exporterPackageName)
             command.trySend(StartWebFlow)
         } else {
             logcat(WARN) { "Credential exchange failed (${failure.reason}), web flow not supported" }
-            onImportFlowFinishedWithError()
+            credentialImportWideEvent.onCredentialExchangeFailed(failure.reason, failure.exporterPackageName)
+            _viewState.value = viewState.value.copy(viewMode = ViewMode.ImportError)
         }
     }
 

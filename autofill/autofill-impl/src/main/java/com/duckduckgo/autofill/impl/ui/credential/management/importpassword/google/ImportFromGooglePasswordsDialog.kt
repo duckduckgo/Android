@@ -143,9 +143,9 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
     private fun ImportFromGooglePasswordsDialog.processImportFlowResult(data: Intent) {
         (IntentCompat.getParcelableExtra(data, ImportGooglePasswordResult.RESULT_KEY_DETAILS, ImportGooglePasswordResult::class.java)).let {
             when (it) {
-                is ImportGooglePasswordResult.Success -> viewModel.onImportFlowFinishedSuccessfully()
-                is ImportGooglePasswordResult.Error -> viewModel.onImportFlowFinishedWithError()
-                is ImportGooglePasswordResult.UserCancelled -> viewModel.onImportFlowCancelledByUser(canShowPreImportDialog(getLaunchSource()))
+                is ImportGooglePasswordResult.Success -> viewModel.onWebFlowFinishedSuccessfully()
+                is ImportGooglePasswordResult.Error -> viewModel.onWebFlowFinishedWithError(it.reason)
+                is ImportGooglePasswordResult.UserCancelled -> viewModel.onWebFlowCancelled(canShowPreImportDialog(getLaunchSource()))
                 else -> {}
             }
         }
@@ -289,7 +289,7 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
         if (canShowPreImportDialog(launchSource)) {
             viewModel.shouldShowInitialInstructionalPrompt(launchSource)
         } else {
-            viewModel.onDirectImportRequested()
+            viewModel.onDirectImportRequested(launchSource)
         }
     }
 
@@ -396,7 +396,7 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
     }
 
     private fun onImportGcmButtonClicked() {
-        viewModel.onImportButtonClicked()
+        viewModel.onImportButtonClicked(getLaunchSource())
         importPasswordsPixelSender.onImportPasswordsDialogImportButtonClicked(getLaunchSource())
     }
 
