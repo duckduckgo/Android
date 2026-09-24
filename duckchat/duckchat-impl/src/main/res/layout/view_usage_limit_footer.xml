@@ -37,7 +37,7 @@
         android:layout_height="@dimen/keyline_4"
         android:importantForAccessibility="no"
         android:visibility="gone"
-        app:srcCompat="@drawable/ic_exclamation_recolorable_16" />
+        app:srcCompat="@drawable/alert_red_24" />
 
     <LinearLayout
         android:layout_width="0dp"
