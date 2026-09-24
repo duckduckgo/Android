@@ -37,9 +37,10 @@ class NativeInputFooterCoordinator @Inject constructor(
     fun state(
         context: Context,
         hostContext: StateFlow<NativeInputFooterContext>,
+        host: NativeInputFooterHost,
     ): Flow<State> = flow {
         val footers = plugins.getPlugins()
-            .map { plugin -> plugin.priority to plugin.createFooter(context, hostContext) }
+            .map { plugin -> plugin.priority to plugin.createFooter(context, hostContext, host) }
 
         if (footers.isEmpty()) {
             emit(State())

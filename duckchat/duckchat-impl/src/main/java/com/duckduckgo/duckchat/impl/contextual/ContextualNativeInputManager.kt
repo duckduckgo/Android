@@ -233,6 +233,7 @@ class RealContextualNativeInputManager @Inject constructor(
         onVoiceSearchRequested: () -> Unit,
     ) {
         widget.configureContextual(tabId)
+        widget.onStartUsingWeeklyLimit = { sendStartUsingWeeklyLimitEvent() }
         widget.bindChatIdSource(chatIdFlow)
         widget.bindModelPickerEnabledSource(modelPickerEnabled)
         widget.hideMainButtons()
@@ -309,6 +310,16 @@ class RealContextualNativeInputManager @Inject constructor(
         }
             .onEach { widget.setVoiceSearchAvailable(it) }
             .launchIn(lifecycleOwner.lifecycleScope)
+    }
+
+    private fun sendStartUsingWeeklyLimitEvent() {
+        jsMessaging?.sendSubscriptionEvent(
+            SubscriptionEventData(
+                featureName = RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME,
+                subscriptionName = "submitStartUsingWeeklyLimitAction",
+                params = JSONObject().put("platform", "android"),
+            ),
+        )
     }
 
     private fun sendStopEvent() {

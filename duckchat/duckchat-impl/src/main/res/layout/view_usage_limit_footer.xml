@@ -37,7 +37,7 @@
         android:layout_height="@dimen/keyline_4"
         android:importantForAccessibility="no"
         android:visibility="gone"
-        app:srcCompat="@drawable/ic_exclamation_recolorable_16" />
+        app:srcCompat="@drawable/alert_red_24" />
 
     <LinearLayout
         android:layout_width="0dp"
@@ -50,6 +50,7 @@
             android:id="@+id/usageLimitFooterTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:maxLines="2"
             app:textType="primary"
             app:typography="caption" />
 
@@ -62,6 +63,14 @@
             app:typography="caption" />
 
     </LinearLayout>
+
+    <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+        android:id="@+id/usageLimitFooterCta"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_2"
+        android:visibility="gone"
+        app:daxButtonSize="small" />
 
     <ImageView
         android:id="@+id/usageLimitFooterDismiss"

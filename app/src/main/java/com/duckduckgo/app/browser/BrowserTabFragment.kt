@@ -1500,6 +1500,15 @@ class BrowserTabFragment :
                         ),
                     )
                 },
+                onStartUsingWeeklyLimit = {
+                    contentScopeScripts.sendSubscriptionEvent(
+                        SubscriptionEventData(
+                            featureName = "aiChat",
+                            subscriptionName = "submitStartUsingWeeklyLimitAction",
+                            params = JSONObject().apply { put("platform", "android") },
+                        ),
+                    )
+                },
                 onCustomizeResponsesClicked = { viewModel.onCustomizeResponsesClicked() },
                 onFireButtonPressed = { onFireButtonPressed() },
                 onTabSwitcherPressed = { onTabsButtonPressed() },

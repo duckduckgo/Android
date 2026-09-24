@@ -19,10 +19,12 @@ package com.duckduckgo.duckchat.impl.nativeinput.footer.usagelimits
 import android.content.res.Resources
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.nativeinput.footer.usagelimits.UsageLimitFooterMessage.Icon
 import com.duckduckgo.duckchat.impl.nativeinput.footer.usagelimits.UsageLimitFooterMessage.Severity
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -88,6 +90,18 @@ class UsageLimitFooterMessageMapperTest {
     fun whenAlmostNoTimeRemainsThenResetTextFloorsAtOneHour() {
         assertEquals("Resets in 1 hour", map(notice(resetsIn = 1)).resetText)
         assertEquals("Resets in 1 hour", map(notice(resetsIn = 0)).resetText)
+    }
+
+    @Test
+    fun whenCtaIsResolvedThenLabelFollowsItsKind() {
+        val notice = notice()
+        val model = AIChatModel(id = "m", name = "m", displayName = "m", shortName = "m", accessTier = emptyList(), isAccessible = true)
+
+        assertEquals("Switch Model", testee.map(notice, NOW, resources, ResolvedUsageCta.SwitchModel(model, listOf("m"))).ctaLabel)
+        assertEquals("Start using weekly limit", testee.map(notice, NOW, resources, ResolvedUsageCta.StartUsingWeeklyLimit(emptyList())).ctaLabel)
+        assertEquals("Try for Free", testee.map(notice, NOW, resources, ResolvedUsageCta.Subscribe(freeTrialEligible = true)).ctaLabel)
+        assertEquals("Subscribe", testee.map(notice, NOW, resources, ResolvedUsageCta.Subscribe(freeTrialEligible = false)).ctaLabel)
+        assertNull(testee.map(notice, NOW, resources, null).ctaLabel)
     }
 
     private fun map(notice: UsageNotice) = testee.map(notice, NOW, resources)

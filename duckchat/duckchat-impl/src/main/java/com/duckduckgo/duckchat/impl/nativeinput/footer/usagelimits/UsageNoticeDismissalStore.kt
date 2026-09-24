@@ -45,6 +45,35 @@ class UsageNoticeDismissalStore @Inject constructor(
         }
         .distinctUntilChanged()
 
+    val actedOn: Flow<UsageNoticeActedOn?> = store.data
+        .catch { error -> if (error is IOException) emit(emptyPreferences()) else throw error }
+        .map { preferences ->
+            val noticeId = UsageNoticeId.fromJsonId(preferences[ACTED_ON_ID]) ?: return@map null
+            val window = UsageWindow.fromJsonId(preferences[ACTED_ON_WINDOW]) ?: return@map null
+            val resetsAt = preferences[ACTED_ON_RESETS_AT] ?: return@map null
+            val percent = preferences[ACTED_ON_PERCENT] ?: return@map null
+            UsageNoticeActedOn(noticeId = noticeId, window = window, resetsAtMillis = resetsAt, percentUsed = percent)
+        }
+        .distinctUntilChanged()
+
+    suspend fun markActedOn(notice: UsageNotice) {
+        editIgnoringIoFailure { preferences ->
+            preferences[ACTED_ON_ID] = notice.id.jsonId
+            preferences[ACTED_ON_WINDOW] = notice.window.jsonId
+            preferences[ACTED_ON_RESETS_AT] = notice.resetsAtMillis
+            preferences[ACTED_ON_PERCENT] = notice.percentUsed
+        }
+    }
+
+    suspend fun clearActedOn() {
+        editIgnoringIoFailure { preferences ->
+            preferences.remove(ACTED_ON_ID)
+            preferences.remove(ACTED_ON_WINDOW)
+            preferences.remove(ACTED_ON_RESETS_AT)
+            preferences.remove(ACTED_ON_PERCENT)
+        }
+    }
+
     suspend fun dismiss(notice: UsageNotice) {
         val keys = Keys(notice.window)
         editIgnoringIoFailure { preferences ->
@@ -87,5 +116,12 @@ class UsageNoticeDismissalStore @Inject constructor(
         val noticeId = stringPreferencesKey("${prefix}_ID")
         val resetsAt = longPreferencesKey("${prefix}_RESETS_AT")
         val band = intPreferencesKey("${prefix}_BAND")
+    }
+
+    private companion object {
+        val ACTED_ON_ID = stringPreferencesKey("DUCK_AI_USAGE_NOTICE_ACTED_ON_ID")
+        val ACTED_ON_WINDOW = stringPreferencesKey("DUCK_AI_USAGE_NOTICE_ACTED_ON_WINDOW")
+        val ACTED_ON_RESETS_AT = longPreferencesKey("DUCK_AI_USAGE_NOTICE_ACTED_ON_RESETS_AT")
+        val ACTED_ON_PERCENT = intPreferencesKey("DUCK_AI_USAGE_NOTICE_ACTED_ON_PERCENT")
     }
 }
