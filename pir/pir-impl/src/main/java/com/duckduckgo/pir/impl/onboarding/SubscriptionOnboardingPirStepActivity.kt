@@ -28,7 +28,7 @@ import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.pir.api.onboarding.PirOnboardingStepScreen
+import com.duckduckgo.pir.api.PirScreens.PirOnboardingStepScreen
 import com.duckduckgo.pir.impl.R
 import com.duckduckgo.pir.impl.dashboard.PirDashboardWebViewActivity
 import com.duckduckgo.pir.impl.databinding.ActivitySubscriptionOnboardingPirStepBinding
