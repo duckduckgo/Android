@@ -99,6 +99,7 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
+import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.isNull
 import org.mockito.kotlin.mock
@@ -115,6 +116,7 @@ import java.io.IOException
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDateTime
+import kotlin.coroutines.cancellation.CancellationException
 
 class RealSubscriptionsManagerTest {
 
@@ -749,6 +751,40 @@ class RealSubscriptionsManagerTest {
         )
     }
 
+    @Test
+    fun whenNativeExperimentLookupFailsThenPurchaseIsConfirmedWithoutAttribution() = runTest {
+        nativeToggles = listOf(failingNativeExperiment(IllegalStateException("Toggle store failure")))
+
+        assertExperimentConfirmation(
+            enabled = true,
+            experiments = listOf(Experiment("paywallExperiment", "control")),
+            expected = ConfirmationBody("packageName", "purchaseToken"),
+        )
+    }
+
+    @Test
+    fun whenCancelledWhileBuildingAttributionThenPurchaseIsNotConfirmed() = runTest {
+        nativeToggles = listOf(failingNativeExperiment(CancellationException("Purchase collector cancelled")))
+        givenSubscriptionConcurrentExperimentsEnabled(true)
+        givenUserIsSignedIn()
+        givenSubscriptionSucceedsWithoutEntitlements(status = "Expired")
+        val purchaseStateFlow = MutableSharedFlow<PurchaseState>()
+        whenever(playBillingManager.purchaseState).thenReturn(purchaseStateFlow)
+
+        subscriptionsManager.currentPurchaseState.test {
+            purchase()
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowFinished)
+
+            purchaseStateFlow.emit(Purchased(purchaseToken = "purchaseToken", packageName = "packageName"))
+            assertTrue(awaitItem() is CurrentPurchase.InProgress)
+
+            expectNoEvents()
+            verify(subscriptionsService, never()).confirm(any())
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
     private fun nativeExperiment(
         name: String,
         cohort: String,
@@ -757,6 +793,11 @@ class RealSubscriptionsManagerTest {
         on { featureName() } doReturn Toggle.FeatureName(parentName = parent, name = name)
         on { isEnabled() } doReturn true
         onBlocking { getCohort() } doReturn State.Cohort(name = cohort, weight = 1)
+    }
+
+    private fun failingNativeExperiment(error: Throwable): Toggle = mock {
+        on { featureName() } doReturn Toggle.FeatureName(parentName = PRIVACY_PRO_FEATURE_NAME, name = "failingExperiment")
+        onBlocking { getCohort() } doThrow error
     }
 
     private suspend fun assertExperimentConfirmation(

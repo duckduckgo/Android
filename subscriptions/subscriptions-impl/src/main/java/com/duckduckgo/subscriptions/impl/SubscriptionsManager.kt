@@ -111,6 +111,7 @@ import java.time.Period
 import java.time.format.DateTimeParseException
 import java.util.Currency
 import javax.inject.Inject
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration.Companion.milliseconds
 
 interface SubscriptionsManager {
@@ -634,20 +635,22 @@ class RealSubscriptionsManager @Inject constructor(
         packageName: String,
         purchaseToken: String,
     ): ConfirmationBody {
-        if (!subscriptionsFeature.get().subscriptionConcurrentExperiments().isEnabled()) {
-            return ConfirmationBody(
-                packageName = packageName,
-                purchaseToken = purchaseToken,
-                experimentName = experimentsAssigned.legacyExperiment?.name,
-                experimentCohort = experimentsAssigned.legacyExperiment?.cohort,
-            )
+        val body = ConfirmationBody(packageName = packageName, purchaseToken = purchaseToken)
+        return try {
+            if (subscriptionsFeature.get().subscriptionConcurrentExperiments().isEnabled()) {
+                body.copy(experiments = buildExperimentsToReport())
+            } else {
+                body.copy(
+                    experimentName = experimentsAssigned.legacyExperiment?.name,
+                    experimentCohort = experimentsAssigned.legacyExperiment?.cohort,
+                )
+            }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            logcat(ERROR) { "Subs: failed to build experiment attribution: ${e.asLog()}" }
+            body
         }
-
-        return ConfirmationBody(
-            packageName = packageName,
-            purchaseToken = purchaseToken,
-            experiments = buildExperimentsToReport(),
-        )
     }
 
     private suspend fun buildExperimentsToReport(): List<ExperimentData>? {
