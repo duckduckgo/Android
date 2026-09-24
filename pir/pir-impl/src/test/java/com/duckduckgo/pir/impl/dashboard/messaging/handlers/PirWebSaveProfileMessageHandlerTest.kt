@@ -42,6 +42,7 @@ import com.duckduckgo.pir.impl.scheduling.JobRecordUpdater
 import com.duckduckgo.pir.impl.scheduling.PirExecutionType
 import com.duckduckgo.pir.impl.store.PirFreemiumDataStore
 import com.duckduckgo.pir.impl.store.PirRepository
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -713,6 +714,72 @@ class PirWebSaveProfileMessageHandlerTest {
         whenever(mockPirWorkHandler.canRunPir()).thenReturn(
             flowOf(PirEligibility.Disabled(DisabledReason.SUBSCRIPTION_EXPIRED)),
         )
+        whenever(mockFreemiumToggle.isEnabled()).thenReturn(true)
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
+
+        // Then
+        verify(mockPirFreemiumDataStore, never()).didActivate = any()
+    }
+
+    @Test
+    fun whenSaveSucceedsAndRepositoryUnavailableThenDoesNotStoreActivation() = runTest {
+        // Given a subscriber resolves to REPOSITORY_UNAVAILABLE, which must not be read as a free user
+        val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+        givenSuccessfulProfileSave()
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(
+            flowOf(PirEligibility.Disabled(DisabledReason.REPOSITORY_UNAVAILABLE)),
+        )
+        whenever(mockFreemiumToggle.isEnabled()).thenReturn(true)
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
+
+        // Then
+        verify(mockPirFreemiumDataStore, never()).didActivate = any()
+    }
+
+    @Test
+    fun whenSaveSucceedsAndEntitlementLostThenDoesNotStoreActivation() = runTest {
+        // Given a subscriber whose plan does not include PIR
+        val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+        givenSuccessfulProfileSave()
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(
+            flowOf(PirEligibility.Disabled(DisabledReason.ENTITLEMENT_LOST)),
+        )
+        whenever(mockFreemiumToggle.isEnabled()).thenReturn(true)
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
+
+        // Then
+        verify(mockPirFreemiumDataStore, never()).didActivate = any()
+    }
+
+    @Test
+    fun whenSaveSucceedsAndPirFeatureDisabledThenDoesNotStoreActivation() = runTest {
+        // Given
+        val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+        givenSuccessfulProfileSave()
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(
+            flowOf(PirEligibility.Disabled(DisabledReason.FEATURE_DISABLED)),
+        )
+        whenever(mockFreemiumToggle.isEnabled()).thenReturn(true)
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
+
+        // Then
+        verify(mockPirFreemiumDataStore, never()).didActivate = any()
+    }
+
+    @Test
+    fun whenSaveSucceedsAndEligibilityNotEmittedThenDoesNotStoreActivation() = runTest {
+        // Given
+        val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+        givenSuccessfulProfileSave()
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(emptyFlow())
         whenever(mockFreemiumToggle.isEnabled()).thenReturn(true)
 
         // When

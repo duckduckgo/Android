@@ -25,8 +25,8 @@ import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.pir.impl.PirRemoteFeatures
+import com.duckduckgo.pir.impl.checker.DisabledReason
 import com.duckduckgo.pir.impl.checker.PirEligibility
-import com.duckduckgo.pir.impl.checker.PirRunMode
 import com.duckduckgo.pir.impl.checker.PirWorkHandler
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse
@@ -194,14 +194,17 @@ class PirWebSaveProfileMessageHandler @Inject constructor(
     }
 
     /**
-     * A user who saves a profile while unable to run opt-outs is activating freemium PIR, which is
-     * what later grants them scan-only runs.
+     * A user without a subscription who saves a profile is activating freemium PIR, which is what
+     * later grants them scan-only runs. Any other disabled reason (e.g. an unavailable repository)
+     * says nothing about the subscription, so it must not activate.
      */
     private suspend fun storeFreemiumActivation() {
-        val eligibility = pirWorkHandler.canRunPir().firstOrNull()
-        val canAlreadyRunOptOuts = (eligibility as? PirEligibility.Enabled)?.runMode == PirRunMode.SCAN_AND_OPT_OUT
+        if (!pirRemoteFeatures.freemium().isEnabled()) return
 
-        if (!canAlreadyRunOptOuts && pirRemoteFeatures.freemium().isEnabled()) {
+        val eligibility = pirWorkHandler.canRunPir().firstOrNull()
+        val isUnsubscribed = (eligibility as? PirEligibility.Disabled)?.reason == DisabledReason.SUBSCRIPTION_EXPIRED
+
+        if (isUnsubscribed) {
             logcat { "PIR-WEB: PirWebSaveProfileMessageHandler: activating freemium" }
             pirFreemiumDataStore.didActivate = true
         }
