@@ -18,6 +18,7 @@ package com.duckduckgo.duckchat.impl.ui
 
 import android.content.Context
 import android.view.ContextThemeWrapper
+import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import androidx.test.core.app.ApplicationProvider
@@ -177,6 +178,20 @@ class NativeInputFooterIntegrationTest {
         widget.printNewLine()
 
         assertEquals("draft", widget.inputField.text.toString())
+    }
+
+    @Test
+    fun whenFooterBlocksComposerThenInterceptedTapsAreConsumedNotPassedBehind() = runTest {
+        val widget = NativeInputModeWidget(widgetContext)
+        val tap = MotionEvent.obtain(0L, 0L, MotionEvent.ACTION_DOWN, 10f, 10f, 0)
+
+        assertFalse(widget.onTouchEvent(tap))
+
+        widget.setFooterInputBlocked(true)
+
+        assertTrue(widget.onInterceptTouchEvent(tap))
+        assertTrue(widget.onTouchEvent(tap))
+        tap.recycle()
     }
 
     @Test
