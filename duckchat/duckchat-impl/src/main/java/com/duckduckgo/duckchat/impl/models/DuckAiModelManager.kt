@@ -108,10 +108,6 @@ class RealDuckAiModelManager @Inject constructor(
     // consistent view of the previous state.
     private val stateMutex = Mutex()
 
-    // Models are re-fetched whenever a picker attaches, so report each unrecognised label once per
-    // process rather than on every refresh.
-    private val reportedUnknownLabels = mutableSetOf<String>()
-
     init {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             try {
@@ -404,18 +400,16 @@ class RealDuckAiModelManager @Inject constructor(
         )
     }
 
-    /** Flags labels added after this version shipped, so we notice copy we cannot render. */
+    /** Flags labels added after this version shipped, so we notice copy we cannot render. Models are
+     * re-fetched on every picker attach; the pixel's daily tag keeps that down to one report per label
+     * per day. */
     private fun reportUnknownLabels(remote: List<RemoteAIChatModel>) {
         remote.asSequence()
             .mapNotNull { it.label }
             .filter { ModelLabel.from(it) == ModelLabel.UNKNOWN }
             .map { it.sanitisedLabel() }
             .distinct()
-            .forEach { label ->
-                if (reportedUnknownLabels.add(label)) {
-                    duckChatPixels.get().fireUnknownModelLabel(label)
-                }
-            }
+            .forEach { duckChatPixels.get().fireUnknownModelLabel(it) }
     }
 
     // The label is a backend-authored id, so keep the pixel to that shape rather than passing

@@ -1046,10 +1046,13 @@ class RealDuckChatPixels @Inject constructor(
 
     override fun fireUnknownModelLabel(label: String) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
+            val name = DuckChatPixelName.DUCK_CHAT_MODEL_LABEL_UNKNOWN_DAILY
             pixel.fire(
-                DuckChatPixelName.DUCK_CHAT_MODEL_LABEL_UNKNOWN_DAILY,
+                name,
                 parameters = mapOf(DuckChatPixelParameters.MODEL_LABEL to label),
-                type = Pixel.PixelType.Daily(),
+                // Daily dedupes on the tag, ignoring parameters, so key it by label: otherwise the
+                // first unknown label of the day would hide every other one.
+                type = Pixel.PixelType.Daily(tag = "${name.pixelName}_$label"),
             )
         }
     }

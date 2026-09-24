@@ -877,7 +877,7 @@ class RealDuckAiModelManagerTest {
     }
 
     @Test
-    fun whenLabelIsUnrecognisedThenDebugPixelFiresOncePerValue() = runTest {
+    fun whenLabelIsUnrecognisedThenDebugPixelReportsIt() = runTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
         whenever(modelsService.getModels(any(), anyOrNull())).thenReturn(
@@ -886,9 +886,29 @@ class RealDuckAiModelManagerTest {
 
         testee = createManager()
         testee.fetchModels()
+
+        verify(duckChatPixels).fireUnknownModelLabel("EXTRA_PRIVACY")
+    }
+
+    @Test
+    fun whenSeveralLabelsAreUnrecognisedThenEachIsReportedOncePerResponse() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any(), anyOrNull())).thenReturn(
+            AIChatModelsResponse(
+                listOf(
+                    remoteModel("a", label = "EXTRA_PRIVACY"),
+                    remoteModel("b", label = "EXTRA_PRIVACY"),
+                    remoteModel("c", label = "FASTEST_YET"),
+                ),
+            ),
+        )
+
+        testee = createManager()
         testee.fetchModels()
 
         verify(duckChatPixels).fireUnknownModelLabel("EXTRA_PRIVACY")
+        verify(duckChatPixels).fireUnknownModelLabel("FASTEST_YET")
     }
 
     @Test
