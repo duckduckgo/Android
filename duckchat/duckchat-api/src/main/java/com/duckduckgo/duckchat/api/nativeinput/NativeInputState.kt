@@ -40,7 +40,7 @@ data class NativeInputState(
     /** Whether the model picker chip is enabled for this tab. */
     val modelPickerEnabled: Boolean = true,
 
-    /** True while the input field holds non-blank text. A boolean rather than the text, so it only flips on the blank boundary. */
+    /** True while the input field is not empty (including whitespace-only text). A boolean rather than the text, so it only flips on the empty boundary. */
     val hasText: Boolean = false,
 
     /** True while at least one attachment is staged for the next prompt. */
