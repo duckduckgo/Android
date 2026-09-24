@@ -28,6 +28,11 @@
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
             android:label="@string/activityPirDashboard" />
 
+        <activity
+            android:name=".onboarding.SubscriptionOnboardingPirStepActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
         <service
             android:name="com.duckduckgo.pir.impl.scan.PirForegroundScanService"
             android:enabled="true"

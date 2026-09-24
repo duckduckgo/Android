@@ -37,8 +37,11 @@ import com.duckduckgo.common.ui.view.listitem.OneLineListItem
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.pir.api.PirScreens.PirOnboardingStepScreen
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.databinding.FragmentSubscriptionOnboardingCompletionBinding
+import com.duckduckgo.subscriptions.impl.onboarding.completion.SubscriptionOnboardingCompletionViewModel.Command
 import com.duckduckgo.subscriptions.impl.onboarding.completion.SubscriptionOnboardingCompletionViewModel.SummaryRow
 import com.duckduckgo.subscriptions.impl.onboarding.completion.SubscriptionOnboardingCompletionViewModel.ViewState
 import com.duckduckgo.subscriptions.impl.onboarding.welcome.launchOnboardingConfetti
@@ -52,12 +55,15 @@ class SubscriptionOnboardingCompletionFragment : DuckDuckGoFragment(R.layout.fra
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
 
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
+
     private val binding: FragmentSubscriptionOnboardingCompletionBinding by viewBinding()
     private val viewModel: SubscriptionOnboardingCompletionViewModel by lazy {
         ViewModelProvider(this, viewModelFactory)[SubscriptionOnboardingCompletionViewModel::class.java]
     }
 
-    private var progressAnimated = false
+    private var lastAnimatedPercentage = 0
     private var celebratoryConfigured = false
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -71,6 +77,17 @@ class SubscriptionOnboardingCompletionFragment : DuckDuckGoFragment(R.layout.fra
             .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
             .onEach { render(it) }
             .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        viewModel.commands
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { processCommand(it) }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+    }
+
+    private fun processCommand(command: Command) {
+        when (command) {
+            Command.LaunchPirStep -> globalActivityStarter.start(requireContext(), PirOnboardingStepScreen)
+        }
     }
 
     private fun applyHandoffHeader() = with(binding) {
@@ -119,6 +136,9 @@ class SubscriptionOnboardingCompletionFragment : DuckDuckGoFragment(R.layout.fra
             } else {
                 rowView.setLeadingIconResource(row.pendingIconResId)
             }
+            if (row.clickable) {
+                rowView.setClickListener { viewModel.onPirRowClicked() }
+            }
             container.addView(rowView)
         }
     }
@@ -134,14 +154,16 @@ class SubscriptionOnboardingCompletionFragment : DuckDuckGoFragment(R.layout.fra
     }
 
     private fun animateProgress(percentage: Int, celebrate: Boolean) {
-        if (progressAnimated) return
-        progressAnimated = true
+        if (percentage == lastAnimatedPercentage) return
+        val fromPercentage = lastAnimatedPercentage
+        lastAnimatedPercentage = percentage
 
         val track = binding.subscriptionOnboardingCompletionProgressTrack
         val fill = binding.subscriptionOnboardingCompletionProgressFill
         track.doOnLayout {
+            val fromWidth = (it.width * fromPercentage / 100f).toInt()
             val targetWidth = (it.width * percentage / 100f).toInt()
-            ValueAnimator.ofInt(0, targetWidth).apply {
+            ValueAnimator.ofInt(fromWidth, targetWidth).apply {
                 duration = PROGRESS_ANIMATION_DURATION_MS
                 interpolator = DecelerateInterpolator()
                 addUpdateListener { animator ->
