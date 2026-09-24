@@ -38,7 +38,7 @@ import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
-import com.duckduckgo.pir.api.dashboard.PirDashboardWebViewScreen
+import com.duckduckgo.pir.api.PirScreens.PirDashboardWebViewScreen
 import com.duckduckgo.pir.impl.dashboard.PirDashboardWebViewViewModel.Command
 import com.duckduckgo.pir.impl.dashboard.PirDashboardWebViewViewModel.Command.SendJsEvent
 import com.duckduckgo.pir.impl.dashboard.PirDashboardWebViewViewModel.Command.SendResponseToJs

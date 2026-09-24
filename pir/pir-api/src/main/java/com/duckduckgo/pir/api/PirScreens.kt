@@ -14,8 +14,19 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.pir.api.onboarding
+package com.duckduckgo.pir.api
 
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 
-data object PirOnboardingStepScreen : GlobalActivityStarter.ActivityParams
+sealed class PirScreens {
+
+    /**
+     * Use this model to launch the PIR Dashboard WebView screen.
+     */
+    data object PirDashboardWebViewScreen : GlobalActivityStarter.ActivityParams
+
+    /**
+     * Use this model to launch the PIR subscription onboarding step.
+     */
+    data object PirOnboardingStepScreen : GlobalActivityStarter.ActivityParams
+}

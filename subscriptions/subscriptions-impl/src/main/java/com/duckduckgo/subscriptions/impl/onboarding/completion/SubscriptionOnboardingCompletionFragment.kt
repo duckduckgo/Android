@@ -38,7 +38,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.pir.api.onboarding.PirOnboardingStepScreen
+import com.duckduckgo.pir.api.PirScreens.PirOnboardingStepScreen
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.databinding.FragmentSubscriptionOnboardingCompletionBinding
 import com.duckduckgo.subscriptions.impl.onboarding.completion.SubscriptionOnboardingCompletionViewModel.Command
