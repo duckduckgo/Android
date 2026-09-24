@@ -25,12 +25,15 @@ import com.duckduckgo.pir.api.dashboard.PirFeatureState
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingCompletionSummaryRow
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController
+import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController.Event.StepFinished
+import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.COMPLETED
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingHandoffState
 import com.duckduckgo.subscriptions.impl.onboarding.completion.SubscriptionOnboardingCompletionViewModel.Companion.PIR_ROW_ID
 import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStepStore
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -38,6 +41,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -47,7 +51,8 @@ class SubscriptionOnboardingCompletionViewModelTest {
     @get:Rule
     val coroutineRule = CoroutineTestRule()
 
-    private val controller: SubscriptionOnboardingController = mock()
+    private val controllerEvents = MutableSharedFlow<SubscriptionOnboardingController.Event>(extraBufferCapacity = 10)
+    private val controller: SubscriptionOnboardingController = mock { on { events } doReturn controllerEvents }
     private val stepStore: SubscriptionOnboardingStepStore = mock()
     private val subscriptions: Subscriptions = mock()
     private val pirFeature: PirFeature = mock()
@@ -112,7 +117,48 @@ class SubscriptionOnboardingCompletionViewModelTest {
             assertEquals(listOf("vpn", "itr", "duck_ai", PIR_ROW_ID), state.rows.map { it.id })
             val pirRow = state.rows.last()
             assertFalse(pirRow.completed)
+            assertTrue(pirRow.clickable)
             assertEquals(75, state.completionPercentage)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPirCompletedThenRowCompletedAndNotClickable() = runTest {
+        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.ENABLED)
+        whenever(stepStore.isCompleted(PIR_ROW_ID)).thenReturn(true)
+        val testee = createViewModel(plugins = listOf(fakePlugin("vpn")), entitlements = listOf(Product.PIR))
+
+        testee.viewState().test {
+            val pirRow = awaitItem().rows.single { it.id == PIR_ROW_ID }
+            assertTrue(pirRow.completed)
+            assertFalse(pirRow.clickable)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPirStepFinishedEventReceivedThenPirRowBecomesCompleted() = runTest {
+        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.ENABLED)
+        val testee = createViewModel(plugins = listOf(fakePlugin("vpn")), entitlements = listOf(Product.PIR))
+
+        testee.viewState().test {
+            assertFalse(awaitItem().rows.single { it.id == PIR_ROW_ID }.completed)
+
+            controllerEvents.emit(StepFinished(PIR_ROW_ID, COMPLETED))
+
+            assertTrue(awaitItem().rows.single { it.id == PIR_ROW_ID }.completed)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPirRowClickedThenLaunchPirStepEmitted() = runTest {
+        val testee = createViewModel()
+
+        testee.commands.test {
+            testee.onPirRowClicked()
+            assertEquals(SubscriptionOnboardingCompletionViewModel.Command.LaunchPirStep, awaitItem())
             cancelAndConsumeRemainingEvents()
         }
     }
