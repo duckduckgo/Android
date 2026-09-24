@@ -16,11 +16,9 @@
 
 package com.duckduckgo.app.trackerdetection
 
-import java.time.LocalDateTime
-
 /**
- * A rolling log of the trackers blocked on this device, kept for seven days so the tab switcher can
- * show how many were blocked recently.
+ * A rolling log of the trackers blocked on this device, kept for a limited retention window so the
+ * tab switcher can show how many were blocked recently.
  */
 interface WebTrackersBlockedHistory {
     /**
@@ -29,9 +27,9 @@ interface WebTrackersBlockedHistory {
     suspend fun onTrackerBlocked(trackerUrl: String, trackerCompany: String)
 
     /**
-     * How many trackers were blocked in the last seven days.
+     * How many trackers were blocked in the last 7 days.
      */
-    suspend fun trackerCountForLastWeek(): Int
+    suspend fun trackerCountForLast7Days(): Int
 
     /**
      * Erases the whole log, for example when the user clears their browsing data.
@@ -39,7 +37,7 @@ interface WebTrackersBlockedHistory {
     suspend fun deleteAll()
 
     /**
-     * Drops the entries recorded before [dateTime], keeping the log within its retention window.
+     * Drops the entries that have fallen outside the retention window.
      */
-    suspend fun deleteEntriesOlderThan(dateTime: LocalDateTime)
+    suspend fun deleteExpiredEntries()
 }

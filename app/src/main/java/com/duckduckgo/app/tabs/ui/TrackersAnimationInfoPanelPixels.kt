@@ -53,7 +53,7 @@ class TrackersAnimationInfoPanelPixelsImpl @Inject constructor(
 
     override suspend fun fireInfoPanelDismissed() {
         withContext(dispatcherProvider.io()) {
-            val trackerCount = webTrackersBlockedHistory.trackerCountForLastWeek()
+            val trackerCount = webTrackersBlockedHistory.trackerCountForLast7Days()
             val bucketSize: Int = when (trackerCount) {
                 0 -> BUCKET_SIZE_0
                 in 1..9 -> BUCKET_SIZE_1

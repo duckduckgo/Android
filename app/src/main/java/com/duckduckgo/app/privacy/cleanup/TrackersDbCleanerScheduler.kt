@@ -86,7 +86,7 @@ class TrackersDbCleanerWorker(
 
     @WorkerThread
     override suspend fun doWork(): Result {
-        webTrackersBlockedHistory.deleteEntriesOlderThan(dateOfLastWeek())
+        webTrackersBlockedHistory.deleteExpiredEntries()
         appTrackerBlockingStatsRepository.deleteTrackersUntil(DatabaseDateFormatter.timestamp(dateOfLastWeek()))
 
         logcat(INFO) { "Clear trackers dao job finished; returning SUCCESS" }

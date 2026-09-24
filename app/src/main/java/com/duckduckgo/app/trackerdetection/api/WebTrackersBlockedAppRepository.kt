@@ -34,8 +34,8 @@ class WebTrackersBlockedAppRepository @Inject constructor(appDatabase: AppDataba
         dao.insert(WebTrackerBlocked(trackerUrl = trackerUrl, trackerCompany = trackerCompany))
     }
 
-    override suspend fun trackerCountForLastWeek(): Int = dao.getTrackersCountBetween(
-        startTime = DatabaseDateFormatter.timestamp(LocalDateTime.now().minusDays(7)),
+    override suspend fun trackerCountForLast7Days(): Int = dao.getTrackersCountBetween(
+        startTime = DatabaseDateFormatter.timestamp(retentionCutoff()),
         endTime = DatabaseDateFormatter.timestamp(LocalDateTime.now()),
     )
 
@@ -43,7 +43,15 @@ class WebTrackersBlockedAppRepository @Inject constructor(appDatabase: AppDataba
         dao.deleteAll()
     }
 
-    override suspend fun deleteEntriesOlderThan(dateTime: LocalDateTime) {
-        dao.deleteOldDataUntil(DatabaseDateFormatter.timestamp(dateTime))
+    override suspend fun deleteExpiredEntries() {
+        dao.deleteOldDataUntil(DatabaseDateFormatter.timestamp(retentionCutoff()))
     }
 }
+
+/**
+ * The count the tab switcher shows and the rows the cleaner keeps have to agree on where the
+ * retention window starts, so both read it from here.
+ */
+private const val RETENTION_DAYS = 7L
+
+private fun retentionCutoff(): LocalDateTime = LocalDateTime.now().minusDays(RETENTION_DAYS)

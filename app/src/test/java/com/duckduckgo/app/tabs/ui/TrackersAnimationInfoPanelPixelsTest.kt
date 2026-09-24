@@ -78,7 +78,7 @@ class TrackersAnimationInfoPanelPixelsTest {
 
     @Test
     fun whenFireInfoPanelDismissedWithZeroTrackerCountThenPixelFiredWithCorrectBucket() = runTest {
-        whenever(mockWebTrackersBlockedHistory.trackerCountForLastWeek()).thenReturn(0)
+        whenever(mockWebTrackersBlockedHistory.trackerCountForLast7Days()).thenReturn(0)
 
         testee.fireInfoPanelDismissed()
 
@@ -90,7 +90,7 @@ class TrackersAnimationInfoPanelPixelsTest {
 
     @Test
     fun whenFireInfoPanelDismissedWithSingleDigitTrackerCountThenPixelFiredWithCorrectBucket() = runTest {
-        whenever(mockWebTrackersBlockedHistory.trackerCountForLastWeek()).thenReturn(5)
+        whenever(mockWebTrackersBlockedHistory.trackerCountForLast7Days()).thenReturn(5)
 
         testee.fireInfoPanelDismissed()
 
@@ -102,7 +102,7 @@ class TrackersAnimationInfoPanelPixelsTest {
 
     @Test
     fun whenFireInfoPanelDismissedWithTrackerCountAtLowerBoundaryThenPixelFiredWithCorrectBucket() = runTest {
-        whenever(mockWebTrackersBlockedHistory.trackerCountForLastWeek()).thenReturn(1)
+        whenever(mockWebTrackersBlockedHistory.trackerCountForLast7Days()).thenReturn(1)
 
         testee.fireInfoPanelDismissed()
 
@@ -114,7 +114,7 @@ class TrackersAnimationInfoPanelPixelsTest {
 
     @Test
     fun whenFireInfoPanelDismissedWithTrackerCountAtUpperBoundaryThenPixelFiredWithCorrectBucket() = runTest {
-        whenever(mockWebTrackersBlockedHistory.trackerCountForLastWeek()).thenReturn(9)
+        whenever(mockWebTrackersBlockedHistory.trackerCountForLast7Days()).thenReturn(9)
 
         testee.fireInfoPanelDismissed()
 
@@ -126,7 +126,7 @@ class TrackersAnimationInfoPanelPixelsTest {
 
     @Test
     fun whenFireInfoPanelDismissedWithTrackerCount10ThenPixelFiredWithCorrectBucket() = runTest {
-        whenever(mockWebTrackersBlockedHistory.trackerCountForLastWeek()).thenReturn(10)
+        whenever(mockWebTrackersBlockedHistory.trackerCountForLast7Days()).thenReturn(10)
 
         testee.fireInfoPanelDismissed()
 
@@ -138,7 +138,7 @@ class TrackersAnimationInfoPanelPixelsTest {
 
     @Test
     fun whenFireInfoPanelDismissedWithTrackerCount24ThenPixelFiredWithCorrectBucket() = runTest {
-        whenever(mockWebTrackersBlockedHistory.trackerCountForLastWeek()).thenReturn(24)
+        whenever(mockWebTrackersBlockedHistory.trackerCountForLast7Days()).thenReturn(24)
 
         testee.fireInfoPanelDismissed()
 
@@ -150,7 +150,7 @@ class TrackersAnimationInfoPanelPixelsTest {
 
     @Test
     fun whenFireInfoPanelDismissedWithTrackerCount25ThenPixelFiredWithCorrectBucket() = runTest {
-        whenever(mockWebTrackersBlockedHistory.trackerCountForLastWeek()).thenReturn(25)
+        whenever(mockWebTrackersBlockedHistory.trackerCountForLast7Days()).thenReturn(25)
 
         testee.fireInfoPanelDismissed()
 
@@ -162,7 +162,7 @@ class TrackersAnimationInfoPanelPixelsTest {
 
     @Test
     fun whenFireInfoPanelDismissedWithTrackerCount49ThenPixelFiredWithCorrectBucket() = runTest {
-        whenever(mockWebTrackersBlockedHistory.trackerCountForLastWeek()).thenReturn(49)
+        whenever(mockWebTrackersBlockedHistory.trackerCountForLast7Days()).thenReturn(49)
 
         testee.fireInfoPanelDismissed()
 
@@ -174,7 +174,7 @@ class TrackersAnimationInfoPanelPixelsTest {
 
     @Test
     fun whenFireInfoPanelDismissedWithTrackerCount50ThenPixelFiredWithCorrectBucket() = runTest {
-        whenever(mockWebTrackersBlockedHistory.trackerCountForLastWeek()).thenReturn(50)
+        whenever(mockWebTrackersBlockedHistory.trackerCountForLast7Days()).thenReturn(50)
 
         testee.fireInfoPanelDismissed()
 
@@ -186,7 +186,7 @@ class TrackersAnimationInfoPanelPixelsTest {
 
     @Test
     fun whenFireInfoPanelDismissedWithTrackerCount74ThenPixelFiredWithCorrectBucket() = runTest {
-        whenever(mockWebTrackersBlockedHistory.trackerCountForLastWeek()).thenReturn(74)
+        whenever(mockWebTrackersBlockedHistory.trackerCountForLast7Days()).thenReturn(74)
 
         testee.fireInfoPanelDismissed()
 
@@ -198,7 +198,7 @@ class TrackersAnimationInfoPanelPixelsTest {
 
     @Test
     fun whenFireInfoPanelDismissedWithTrackerCount75ThenPixelFiredWithCorrectBucket() = runTest {
-        whenever(mockWebTrackersBlockedHistory.trackerCountForLastWeek()).thenReturn(75)
+        whenever(mockWebTrackersBlockedHistory.trackerCountForLast7Days()).thenReturn(75)
 
         testee.fireInfoPanelDismissed()
 
@@ -210,7 +210,7 @@ class TrackersAnimationInfoPanelPixelsTest {
 
     @Test
     fun whenFireInfoPanelDismissedWithTrackerCount99ThenPixelFiredWithCorrectBucket() = runTest {
-        whenever(mockWebTrackersBlockedHistory.trackerCountForLastWeek()).thenReturn(99)
+        whenever(mockWebTrackersBlockedHistory.trackerCountForLast7Days()).thenReturn(99)
 
         testee.fireInfoPanelDismissed()
 
@@ -222,7 +222,7 @@ class TrackersAnimationInfoPanelPixelsTest {
 
     @Test
     fun whenFireInfoPanelDismissedWithTrackerCount100ThenPixelFiredWithCorrectBucket() = runTest {
-        whenever(mockWebTrackersBlockedHistory.trackerCountForLastWeek()).thenReturn(100)
+        whenever(mockWebTrackersBlockedHistory.trackerCountForLast7Days()).thenReturn(100)
 
         testee.fireInfoPanelDismissed()
 
@@ -234,7 +234,7 @@ class TrackersAnimationInfoPanelPixelsTest {
 
     @Test
     fun whenFireInfoPanelDismissedWithTrackerCount149ThenPixelFiredWithCorrectBucket() = runTest {
-        whenever(mockWebTrackersBlockedHistory.trackerCountForLastWeek()).thenReturn(149)
+        whenever(mockWebTrackersBlockedHistory.trackerCountForLast7Days()).thenReturn(149)
 
         testee.fireInfoPanelDismissed()
 
@@ -246,7 +246,7 @@ class TrackersAnimationInfoPanelPixelsTest {
 
     @Test
     fun whenFireInfoPanelDismissedWithTrackerCount150ThenPixelFiredWithCorrectBucket() = runTest {
-        whenever(mockWebTrackersBlockedHistory.trackerCountForLastWeek()).thenReturn(150)
+        whenever(mockWebTrackersBlockedHistory.trackerCountForLast7Days()).thenReturn(150)
 
         testee.fireInfoPanelDismissed()
 
@@ -258,7 +258,7 @@ class TrackersAnimationInfoPanelPixelsTest {
 
     @Test
     fun whenFireInfoPanelDismissedWithTrackerCount199ThenPixelFiredWithCorrectBucket() = runTest {
-        whenever(mockWebTrackersBlockedHistory.trackerCountForLastWeek()).thenReturn(199)
+        whenever(mockWebTrackersBlockedHistory.trackerCountForLast7Days()).thenReturn(199)
 
         testee.fireInfoPanelDismissed()
 
@@ -270,7 +270,7 @@ class TrackersAnimationInfoPanelPixelsTest {
 
     @Test
     fun whenFireInfoPanelDismissedWithTrackerCount200ThenPixelFiredWithCorrectBucket() = runTest {
-        whenever(mockWebTrackersBlockedHistory.trackerCountForLastWeek()).thenReturn(200)
+        whenever(mockWebTrackersBlockedHistory.trackerCountForLast7Days()).thenReturn(200)
 
         testee.fireInfoPanelDismissed()
 
@@ -282,7 +282,7 @@ class TrackersAnimationInfoPanelPixelsTest {
 
     @Test
     fun whenFireInfoPanelDismissedWithTrackerCount499ThenPixelFiredWithCorrectBucket() = runTest {
-        whenever(mockWebTrackersBlockedHistory.trackerCountForLastWeek()).thenReturn(499)
+        whenever(mockWebTrackersBlockedHistory.trackerCountForLast7Days()).thenReturn(499)
 
         testee.fireInfoPanelDismissed()
 
@@ -294,7 +294,7 @@ class TrackersAnimationInfoPanelPixelsTest {
 
     @Test
     fun whenFireInfoPanelDismissedWithTrackerCount500ThenPixelFiredWithCorrectBucket() = runTest {
-        whenever(mockWebTrackersBlockedHistory.trackerCountForLastWeek()).thenReturn(500)
+        whenever(mockWebTrackersBlockedHistory.trackerCountForLast7Days()).thenReturn(500)
 
         testee.fireInfoPanelDismissed()
 
@@ -306,7 +306,7 @@ class TrackersAnimationInfoPanelPixelsTest {
 
     @Test
     fun whenFireInfoPanelDismissedWithTrackerCount1000ThenPixelFiredWithCorrectBucket() = runTest {
-        whenever(mockWebTrackersBlockedHistory.trackerCountForLastWeek()).thenReturn(1000)
+        whenever(mockWebTrackersBlockedHistory.trackerCountForLast7Days()).thenReturn(1000)
 
         testee.fireInfoPanelDismissed()
 
@@ -318,7 +318,7 @@ class TrackersAnimationInfoPanelPixelsTest {
 
     @Test
     fun whenFireInfoPanelDismissedWithVeryHighTrackerCountThenPixelFiredWithCorrectBucket() = runTest {
-        whenever(mockWebTrackersBlockedHistory.trackerCountForLastWeek()).thenReturn(Int.MAX_VALUE)
+        whenever(mockWebTrackersBlockedHistory.trackerCountForLast7Days()).thenReturn(Int.MAX_VALUE)
 
         testee.fireInfoPanelDismissed()
 

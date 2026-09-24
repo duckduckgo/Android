@@ -204,7 +204,7 @@ class TabSwitcherViewModelTest {
         whenever(mockTabRepository.flowDeletableTabs).thenReturn(repoDeletableTabs.consumeAsFlow())
         runBlocking {
             whenever(mockTabRepository.add()).thenReturn("TAB_ID")
-            whenever(mockWebTrackersBlockedHistory.trackerCountForLastWeek()).thenReturn(0)
+            whenever(mockWebTrackersBlockedHistory.trackerCountForLast7Days()).thenReturn(0)
         }
         whenever(mockTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData))
 
@@ -1684,7 +1684,7 @@ class TabSwitcherViewModelTest {
         val tab2 = TabEntity("2", position = 2)
         tabList = listOf(tab1, tab2)
 
-        whenever(mockWebTrackersBlockedHistory.trackerCountForLastWeek()).thenReturn(15)
+        whenever(mockWebTrackersBlockedHistory.trackerCountForLast7Days()).thenReturn(15)
 
         initializeMockTabEntitesData()
         initializeViewModel(fakeTabSwitcherDataStore)
@@ -1731,7 +1731,7 @@ class TabSwitcherViewModelTest {
         whenever(mockFireTabRepository.flowSelectedTab).thenReturn(flowOf(fireTab1))
         whenever(mockFireTabRepository.flowDeletableTabs).thenReturn(flowOf(emptyList()))
         whenever(mockFireTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData))
-        whenever(mockWebTrackersBlockedHistory.trackerCountForLastWeek()).thenReturn(15)
+        whenever(mockWebTrackersBlockedHistory.trackerCountForLast7Days()).thenReturn(15)
         currentModeFlow.value = BrowserMode.FIRE
 
         val testee = createViewModel(fakeTabSwitcherDataStore)
@@ -1780,7 +1780,7 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun `when animated info panel visible then impressions pixel fired`() = runTest {
-        whenever(mockWebTrackersBlockedHistory.trackerCountForLastWeek()).thenReturn(15)
+        whenever(mockWebTrackersBlockedHistory.trackerCountForLast7Days()).thenReturn(15)
         initializeViewModel(FakeTabSwitcherDataStore())
 
         testee.onTrackerAnimationInfoPanelVisible()
@@ -1790,7 +1790,7 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun `when animated info panel clicked then tapped pixel fired`() = runTest {
-        whenever(mockWebTrackersBlockedHistory.trackerCountForLastWeek()).thenReturn(15)
+        whenever(mockWebTrackersBlockedHistory.trackerCountForLast7Days()).thenReturn(15)
 
         initializeViewModel()
 
@@ -1801,7 +1801,7 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun `when animated info panel positive button clicked then dismiss pixel fired`() = runTest {
-        whenever(mockWebTrackersBlockedHistory.trackerCountForLastWeek()).thenReturn(15)
+        whenever(mockWebTrackersBlockedHistory.trackerCountForLast7Days()).thenReturn(15)
         initializeViewModel()
 
         testee.onTrackerAnimationTilePositiveButtonClicked()
