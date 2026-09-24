@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.ui.nativeinput.views
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.graphics.Color
@@ -2236,6 +2237,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
         if (!lockDimsWholeWidget && ev != null && nativeInputBlock.allowsTouch(ev)) return super.onInterceptTouchEvent(ev)
         return true
     }
+
+    // An intercepted tap must also be consumed here, otherwise it would pass to whatever sits behind the widget
+    @SuppressLint("ClickableViewAccessibility")
+    override fun onTouchEvent(event: MotionEvent?): Boolean = interactionLocked || super.onTouchEvent(event)
 
     companion object {
         private const val MAX_LINES = 5
