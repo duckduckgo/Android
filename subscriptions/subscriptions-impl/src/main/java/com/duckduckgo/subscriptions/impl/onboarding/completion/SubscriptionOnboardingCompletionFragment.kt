@@ -75,8 +75,8 @@ class SubscriptionOnboardingCompletionFragment : DuckDuckGoFragment(R.layout.fra
 
     private fun applyHandoffHeader() = with(binding) {
         subscriptionOnboardingCompletionIcon.setImageResource(R.drawable.duckai_ddg_feature_128)
-        subscriptionOnboardingCompletionTitle.setText(R.string.subscriptionOnboardingCompletionDuckAiTitle)
-        subscriptionOnboardingCompletionDescription.setText(R.string.subscriptionOnboardingCompletionDuckAiDescription)
+        subscriptionOnboardingCompletionTitle.setText(R.string.subscriptionOnboardingCompletionHandoffTitle)
+        subscriptionOnboardingCompletionDescription.setText(R.string.subscriptionOnboardingCompletionHandoffDescription)
         subscriptionOnboardingCompletionPrimaryButton.gone()
     }
 

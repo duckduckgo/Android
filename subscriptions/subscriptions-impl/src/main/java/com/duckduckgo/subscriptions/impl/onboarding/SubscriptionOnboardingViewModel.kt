@@ -63,6 +63,7 @@ class SubscriptionOnboardingViewModel @Inject constructor(
             val canGoBack: Boolean,
             val showNavigationIcon: Boolean = true,
         ) : Command
+        data class RunHandoff(val action: () -> Unit) : Command
         data object FinishToSettings : Command
         data object Finish : Command
     }
@@ -138,8 +139,7 @@ class SubscriptionOnboardingViewModel @Inject constructor(
         pendingHandoff = null
         handoffJob += viewModelScope.launch {
             delay(HANDOFF_DELAY)
-            handoff()
-            _commands.send(Command.Finish)
+            _commands.send(Command.RunHandoff(handoff))
         }
     }
 

@@ -56,7 +56,7 @@ class SubscriptionOnboardingCompletionViewModelTest {
     fun whenStepsHaveSummaryEntriesThenOnlyThoseBecomeRows() = runTest {
         val testee = createViewModel(
             plugins = listOf(
-                fakePlugin("welcome", summaryEntry = null),
+                fakePlugin("welcome", summaryRow = null),
                 fakePlugin("vpn"),
                 fakePlugin("itr"),
             ),
@@ -218,13 +218,13 @@ class SubscriptionOnboardingCompletionViewModelTest {
     private fun fakePlugin(
         id: String,
         shouldShow: Boolean = true,
-        summaryEntry: SubscriptionOnboardingCompletionSummaryRow? = SubscriptionOnboardingCompletionSummaryRow(
+        summaryRow: SubscriptionOnboardingCompletionSummaryRow? = SubscriptionOnboardingCompletionSummaryRow(
             labelResId = R.string.subscriptionOnboardingFeature2Title,
             pendingIconResId = R.drawable.identity_theft_restoration_grayscale_color_24,
         ),
     ): SubscriptionOnboardingStepPlugin = object : SubscriptionOnboardingStepPlugin {
         override val stepId: String = id
-        override val completionSummaryRow: SubscriptionOnboardingCompletionSummaryRow? = summaryEntry
+        override val completionSummaryRow: SubscriptionOnboardingCompletionSummaryRow? = summaryRow
         override suspend fun shouldShow(): Boolean = shouldShow
         override fun createFragment(): Fragment = Fragment()
     }
