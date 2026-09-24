@@ -19,7 +19,7 @@
     <!-- Remove chat history suggestion -->
     <string name="duck_chat_remove_chat_suggestion_content_description">Delete chat</string>
 
-    <!-- Subscription onboarding - Duck.ai step (placeholder copy) -->
+    <!-- Subscription onboarding -->
     <string name="subscriptionOnboardingDuckAiTitle">Step 3 of 3</string>
     <string name="subscriptionOnboardingDuckAiHeaderTitle">Duck.ai Private Chat</string>
     <string name="subscriptionOnboardingDuckAiHeaderText">Your subscription unlocks premium models. Chats are anonymized by us and never used to train AI. <annotation type="learn_more_link">Learn More</annotation></string>
@@ -27,6 +27,7 @@
     <string name="subscriptionOnboardingDuckAiNotNow">Not Now</string>
     <string name="subscriptionOnboardingDuckAiTierPlus">PLUS</string>
     <string name="subscriptionOnboardingDuckAiTierPro">PRO</string>
+    <string name="subscriptionOnboardingCompletionDuckAiTitle">Advanced Models in Duck.ai</string>
 
     <!-- Page context attachment -->
     <string name="duckChatPageContextRemoveContentDescription">Remove page context</string>
@@ -47,4 +48,5 @@
     <!-- Chat history overflow (three-dot) menu -->
     <string name="duck_ai_chat_history_overflow_select_chats">Select Chats</string>
     <string name="duck_ai_chat_history_overflow_chats_protection">Chat Protection</string>
+
 </resources>

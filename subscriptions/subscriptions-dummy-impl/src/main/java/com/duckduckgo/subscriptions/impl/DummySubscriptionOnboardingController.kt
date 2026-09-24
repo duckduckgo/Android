@@ -30,7 +30,11 @@ class DummySubscriptionOnboardingController @Inject constructor() : Subscription
 
     override val events: Flow<Event> = emptyFlow()
 
-    override fun onStepFinished(stepId: String, outcome: SubscriptionOnboardingStepOutcome) {
+    override fun onStepFinished(
+        stepId: String,
+        outcome: SubscriptionOnboardingStepOutcome,
+        handoff: (() -> Unit)?,
+    ) {
         // no-op
     }
 

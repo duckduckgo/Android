@@ -38,8 +38,12 @@ class RealSubscriptionOnboardingController @Inject constructor() : SubscriptionO
     private val _events = MutableSharedFlow<Event>(extraBufferCapacity = 10)
     override val events: Flow<Event> = _events.asSharedFlow()
 
-    override fun onStepFinished(stepId: String, outcome: SubscriptionOnboardingStepOutcome) {
-        _events.tryEmit(Event.StepFinished(stepId, outcome))
+    override fun onStepFinished(
+        stepId: String,
+        outcome: SubscriptionOnboardingStepOutcome,
+        handoff: (() -> Unit)?,
+    ) {
+        _events.tryEmit(Event.StepFinished(stepId, outcome, handoff))
     }
 
     override fun onBack() {
