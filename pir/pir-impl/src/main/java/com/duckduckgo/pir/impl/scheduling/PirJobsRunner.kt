@@ -165,6 +165,8 @@ class RealPirJobsRunner @Inject constructor(
             attemptCreateScanJobs(activeBrokers, profileQueries)
             eligibleScanJobProvider.getAllEligibleScanJobs(currentTimeProvider.currentTimeMillis())
                 .filter { it.brokerName in activeBrokers }
+                // Repeat scans only serve removals, so a scan-only user gets one successful scan per broker.
+                .filter { runMode == PirRunMode.SCAN_AND_OPT_OUT || !it.hasTerminalResult }
         } else {
             emptyList()
         }
