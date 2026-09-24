@@ -49,6 +49,23 @@
     <string name="duck_ai_chat_history_overflow_chats_protection">Chat Protection</string>
 
     <!-- Duck.ai high-usage model footer -->
-    <string name="duckChatHighUsageModelFooterMessage" instruction="Placeholder is the selected model's short name">%1$s uses limits up to 2-5x faster than basic models.</string>
+    <string name="duckChatHighUsageModelFooterMessage" instruction="Placeholder is the selected model's short name">%1$s uses limits up to 2–5x faster than basic models.</string>
     <string name="duckChatHighUsageModelFooterDismissContentDescription">Dismiss</string>
+
+    <!-- Duck.ai usage-limit footer -->
+    <string name="duckChatUsageLimitFooterApproachingDaily" instruction="Placeholder is the percentage of the daily allowance already used">%1$d%% of daily limit</string>
+    <string name="duckChatUsageLimitFooterApproachingWeekly" instruction="Placeholder is the percentage of the weekly allowance already used">%1$d%% of weekly limit</string>
+    <string name="duckChatUsageLimitFooterDailyReached">Daily limit reached</string>
+    <string name="duckChatUsageLimitFooterWeeklyReachedFree">Weekly limit reached</string>
+    <string name="duckChatUsageLimitFooterWeeklyReached">Weekly usage limit reached</string>
+    <string name="duckChatUsageLimitFooterAdvancedModelsReached">Advanced AI models limit reached</string>
+    <string name="duckChatUsageLimitFooterResetsIn" instruction="Placeholder is a duration such as '2 days' or '5 hours'">Resets in %1$s</string>
+    <plurals name="duckChatUsageLimitFooterDays">
+        <item quantity="one" instruction="%1$d is the number of whole days until the usage limit resets">%1$d day</item>
+        <item quantity="other" instruction="%1$d is the number of whole days until the usage limit resets">%1$d days</item>
+    </plurals>
+    <plurals name="duckChatUsageLimitFooterHours">
+        <item quantity="one" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d hour</item>
+        <item quantity="other" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d hours</item>
+    </plurals>
 </resources>

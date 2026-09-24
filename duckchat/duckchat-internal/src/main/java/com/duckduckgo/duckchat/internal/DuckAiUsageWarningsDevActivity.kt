@@ -53,6 +53,7 @@ class DuckAiUsageWarningsDevActivity : DuckDuckGoActivity() {
         title = getString(R.string.devSettingsDuckAiUsageWarningsTitle)
 
         binding.resetHighUsageDismissals.setOnClickListener { viewModel.onResetDismissalsClicked() }
+        binding.resetUsageNoticeDismissal.setOnClickListener { viewModel.onResetUsageNoticeDismissalClicked() }
 
         viewModel.viewState
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
@@ -77,6 +78,14 @@ class DuckAiUsageWarningsDevActivity : DuckDuckGoActivity() {
                 ?: getString(R.string.devSettingsDuckAiUsageWarningsNoDismissals),
         )
         binding.resetHighUsageDismissals.isEnabled = viewState.dismissedModelIds.isNotEmpty()
+        binding.usageNoticeDismissal.setSecondaryText(
+            viewState.usageNoticeDismissals
+                .map { getString(R.string.devSettingsDuckAiUsageWarningsUsageDismissalValue, it.noticeId.jsonId, it.window.jsonId, it.band) }
+                .takeIf { it.isNotEmpty() }
+                ?.joinToString(separator = "\n")
+                ?: getString(R.string.devSettingsDuckAiUsageWarningsNoDismissals),
+        )
+        binding.resetUsageNoticeDismissal.isEnabled = viewState.usageNoticeDismissals.isNotEmpty()
     }
 
     private fun processCommand(command: Command) {
