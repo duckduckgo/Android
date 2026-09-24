@@ -119,6 +119,10 @@ class SubscriptionOnboardingActivity : DuckDuckGoActivity() {
     private fun processCommand(command: Command) {
         when (command) {
             is Command.ShowStep -> showStep(command)
+            is Command.RunHandoff -> {
+                command.action()
+                finish()
+            }
             is Command.FinishToSettings -> finishToSettings()
             is Command.Finish -> finish()
         }

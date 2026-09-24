@@ -237,7 +237,10 @@ class SubscriptionOnboardingViewModelTest {
             assertFalse(handoffRan)
 
             advanceUntilIdle()
-            assertEquals(SubscriptionOnboardingViewModel.Command.Finish, awaitItem())
+            val command = awaitItem()
+            assertTrue(command is SubscriptionOnboardingViewModel.Command.RunHandoff)
+            assertFalse(handoffRan)
+            (command as SubscriptionOnboardingViewModel.Command.RunHandoff).action()
             assertTrue(handoffRan)
         }
     }
@@ -262,7 +265,9 @@ class SubscriptionOnboardingViewModelTest {
             // Back is ignored while the hand-off is in flight, so it emits nothing and the hand-off still runs.
             controller.onBack()
             advanceUntilIdle()
-            assertEquals(SubscriptionOnboardingViewModel.Command.Finish, awaitItem())
+            val command = awaitItem()
+            assertTrue(command is SubscriptionOnboardingViewModel.Command.RunHandoff)
+            (command as SubscriptionOnboardingViewModel.Command.RunHandoff).action()
             assertTrue(handoffRan)
         }
     }
