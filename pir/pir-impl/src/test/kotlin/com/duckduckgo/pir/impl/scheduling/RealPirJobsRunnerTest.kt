@@ -1910,6 +1910,147 @@ class RealPirJobsRunnerTest {
         verify(mockPixelSender).reportInitialScanDuration(any(), any(), any(), any(), any(), eq(MANUAL_INITIAL), any())
     }
 
+    @Test
+    fun whenScanOnlyThenJobsThatAlreadyFoundMatchesAreSkipped() = runTest {
+        givenAScanRunWithUngatedBrokers("Scanned", "Fresh")
+        whenever(mockEligibleScanJobProvider.getAllEligibleScanJobs(any())).thenReturn(
+            listOf(
+                ScanJobRecord(
+                    brokerName = "Scanned",
+                    userProfileId = testProfileQuery.id,
+                    status = ScanJobStatus.MATCHES_FOUND,
+                    lastScanDateInMillis = 500L,
+                ),
+                ScanJobRecord(brokerName = "Fresh", userProfileId = testProfileQuery.id),
+            ),
+        )
+
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
+
+        argumentCaptor<List<ScanJobRecord>>().apply {
+            verify(mockPirScan).executeScanForJobs(capture(), any(), any(), any(), any())
+            assertEquals(listOf("Fresh"), firstValue.map { it.brokerName })
+        }
+    }
+
+    @Test
+    fun whenScanOnlyThenJobsThatCompletedWithNoMatchAreSkipped() = runTest {
+        givenAScanRunWithUngatedBrokers("Scanned", "Fresh")
+        whenever(mockEligibleScanJobProvider.getAllEligibleScanJobs(any())).thenReturn(
+            listOf(
+                ScanJobRecord(
+                    brokerName = "Scanned",
+                    userProfileId = testProfileQuery.id,
+                    status = ScanJobStatus.NO_MATCH_FOUND,
+                    lastScanDateInMillis = 500L,
+                ),
+                ScanJobRecord(brokerName = "Fresh", userProfileId = testProfileQuery.id),
+            ),
+        )
+
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
+
+        argumentCaptor<List<ScanJobRecord>>().apply {
+            verify(mockPirScan).executeScanForJobs(capture(), any(), any(), any(), any())
+            assertEquals(listOf("Fresh"), firstValue.map { it.brokerName })
+        }
+    }
+
+    @Test
+    fun whenScanOnlyThenJobsThatEndedInErrorAreStillRetried() = runTest {
+        givenAScanRunWithUngatedBrokers("Errored")
+        whenever(mockEligibleScanJobProvider.getAllEligibleScanJobs(any())).thenReturn(
+            listOf(
+                ScanJobRecord(
+                    brokerName = "Errored",
+                    userProfileId = testProfileQuery.id,
+                    status = ScanJobStatus.ERROR,
+                    lastScanDateInMillis = 500L,
+                ),
+            ),
+        )
+
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
+
+        argumentCaptor<List<ScanJobRecord>>().apply {
+            verify(mockPirScan).executeScanForJobs(capture(), any(), any(), any(), any())
+            assertEquals(listOf("Errored"), firstValue.map { it.brokerName })
+        }
+    }
+
+    @Test
+    fun whenScanAndOptOutThenJobsWithATerminalResultStillRun() = runTest {
+        givenAScanRunWithUngatedBrokers("Matched", "NoMatch")
+        whenever(mockEligibleScanJobProvider.getAllEligibleScanJobs(any())).thenReturn(
+            listOf(
+                ScanJobRecord(
+                    brokerName = "Matched",
+                    userProfileId = testProfileQuery.id,
+                    status = ScanJobStatus.MATCHES_FOUND,
+                    lastScanDateInMillis = 500L,
+                ),
+                ScanJobRecord(
+                    brokerName = "NoMatch",
+                    userProfileId = testProfileQuery.id,
+                    status = ScanJobStatus.NO_MATCH_FOUND,
+                    lastScanDateInMillis = 500L,
+                ),
+            ),
+        )
+
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
+
+        argumentCaptor<List<ScanJobRecord>>().apply {
+            verify(mockPirScan).executeScanForJobs(capture(), any(), any(), any(), any())
+            assertEquals(setOf("Matched", "NoMatch"), firstValue.map { it.brokerName }.toSet())
+        }
+    }
+
+    @Test
+    fun whenScanOnlyAndEveryEligibleJobIsMaintenanceThenRunCompletesWithoutScanning() = runTest {
+        givenAScanRunWithUngatedBrokers("Scanned")
+        whenever(mockEligibleScanJobProvider.getAllEligibleScanJobs(any())).thenReturn(
+            listOf(
+                ScanJobRecord(
+                    brokerName = "Scanned",
+                    userProfileId = testProfileQuery.id,
+                    status = ScanJobStatus.MATCHES_FOUND,
+                    lastScanDateInMillis = 500L,
+                ),
+            ),
+        )
+
+        val result = testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
+
+        assertTrue(result.isSuccess)
+        verify(mockPirScan, never()).executeScanForJobs(any(), any(), any(), any(), any())
+        verify(mockPirScanWideEvent).onRunStarted(
+            executionType = eq(MANUAL_INITIAL),
+            profileQueriesCount = any(),
+            brokerCount = any(),
+            totalScanJobs = eq(0),
+            webViewCount = any(),
+            isPowerSavingEnabled = any(),
+            isVpnConnected = any(),
+            batteryOptimizationsEnabled = any(),
+            notificationsPermissionGranted = any(),
+            isTrackerBlockingEnabled = any(),
+        )
+        verify(mockPirScanWideEvent).onOptOutSkipped(MANUAL_INITIAL)
+    }
+
+    private suspend fun givenAScanRunWithUngatedBrokers(vararg brokerNames: String) {
+        val brokers = brokerNames.map { brokerObject(it) }
+        whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(listOf(testProfileQuery))
+        whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(brokerNames.toList())
+        whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(brokers)
+        whenever(mockPirFreeScanBrokerFilter.excludingGatedBrokers(brokers)).thenReturn(brokers)
+        whenever(mockPirRepository.getBrokersForOptOut(true)).thenReturn(emptyList())
+        whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
+        whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(emptyList())
+        whenever(mockEligibleOptOutJobProvider.getAllEligibleOptOutJobs(any())).thenReturn(emptyList())
+    }
+
     private suspend fun givenAScanOnlyRunWithOneUngatedBroker() {
         val ungated = brokerObject("Ungated")
         whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(listOf(testProfileQuery))
