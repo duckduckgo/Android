@@ -199,6 +199,8 @@ class ReasoningModePickerView @JvmOverloads constructor(
                     leadingIconRes = row.iconRes,
                     subtitle = context.getString(row.subtitleRes),
                     selected = row.selected,
+                    // Only the gated section carries a header, and its rows open an upsell.
+                    showsFollowUpEllipsis = section.headerRes != null,
                 ) {
                     viewModel.onModeTapped(row.mode, currentSurface())
                     popup.dismiss()
