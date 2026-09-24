@@ -149,7 +149,6 @@ class SubscriptionOnboardingViewModel @Inject constructor(
     }
 
     companion object {
-        // Long enough to read the completion summary before the hand-off takes over.
         private val HANDOFF_DELAY = 2.5.seconds
     }
 }

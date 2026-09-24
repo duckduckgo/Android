@@ -97,12 +97,15 @@ class SubscriptionOnboardingCompletionViewModelTest {
     }
 
     @Test
-    fun whenPirEnabledThenPirRowIsAppendedIncompleteAndCountsTowardsPercentage() = runTest {
+    fun whenPirEntitledAndEligibleThenPirRowIsAppendedIncompleteAndCountsTowardsPercentage() = runTest {
         whenever(stepStore.isCompleted("vpn")).thenReturn(true)
         whenever(stepStore.isCompleted("itr")).thenReturn(true)
         whenever(stepStore.isCompleted("duck_ai")).thenReturn(true)
         whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.ENABLED)
-        val testee = createViewModel(plugins = listOf(fakePlugin("vpn"), fakePlugin("itr"), fakePlugin("duck_ai")))
+        val testee = createViewModel(
+            plugins = listOf(fakePlugin("vpn"), fakePlugin("itr"), fakePlugin("duck_ai")),
+            entitlements = listOf(Product.PIR),
+        )
 
         testee.viewState().test {
             val state = awaitItem()
@@ -115,8 +118,19 @@ class SubscriptionOnboardingCompletionViewModelTest {
     }
 
     @Test
-    fun whenPirNotEnabledThenNoPirRow() = runTest {
+    fun whenPirEntitledButNotEligibleThenNoPirRow() = runTest {
         whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.DISABLED)
+        val testee = createViewModel(plugins = listOf(fakePlugin("vpn")), entitlements = listOf(Product.PIR))
+
+        testee.viewState().test {
+            assertEquals(listOf("vpn"), awaitItem().rows.map { it.id })
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPirEligibleButNotEntitledThenNoPirRow() = runTest {
+        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.ENABLED)
         val testee = createViewModel(plugins = listOf(fakePlugin("vpn")))
 
         testee.viewState().test {

@@ -25,6 +25,7 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.pir.api.PirFeature
 import com.duckduckgo.pir.api.dashboard.PirFeatureState
+import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -72,7 +73,7 @@ class SubscriptionOnboardingCompletionViewModel @Inject constructor(
 
     init {
         subscriptions.getEntitlementStatus()
-            .onEach { viewState.value = buildViewState() }
+            .onEach { products -> viewState.value = buildViewState(pirEntitled = Product.PIR in products) }
             .launchIn(viewModelScope)
     }
 
@@ -80,7 +81,7 @@ class SubscriptionOnboardingCompletionViewModel @Inject constructor(
         controller.exitOnboarding()
     }
 
-    private suspend fun buildViewState(): ViewState {
+    private suspend fun buildViewState(pirEntitled: Boolean): ViewState {
         val stepRows = stepPlugins.getPlugins()
             .filter { it.shouldShow() }
             .mapNotNull { plugin ->
@@ -94,7 +95,7 @@ class SubscriptionOnboardingCompletionViewModel @Inject constructor(
                 }
             }
 
-        val showPir = pirFeature.getPirFeatureState() == PirFeatureState.ENABLED
+        val showPir = pirEntitled && pirFeature.getPirFeatureState() == PirFeatureState.ENABLED
         val rows = if (showPir) stepRows + pirRow() else stepRows
         val percentage = rows.completionPercentage()
 
