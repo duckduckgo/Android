@@ -20,7 +20,7 @@ import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_INFO_PANEL_DISMISSED
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_INFO_PANEL_IMPRESSIONS
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_INFO_PANEL_TAPPED
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedAppRepository
+import com.duckduckgo.app.trackerdetection.WebTrackersBlockedHistory
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -39,7 +39,7 @@ interface TrackersAnimationInfoPanelPixels {
 @ContributesBinding(ActivityScope::class)
 class TrackersAnimationInfoPanelPixelsImpl @Inject constructor(
     private val pixel: Pixel,
-    private val webTrackersBlockedAppRepository: WebTrackersBlockedAppRepository,
+    private val webTrackersBlockedHistory: WebTrackersBlockedHistory,
     private val dispatcherProvider: DispatcherProvider,
 ) : TrackersAnimationInfoPanelPixels {
 
@@ -53,7 +53,7 @@ class TrackersAnimationInfoPanelPixelsImpl @Inject constructor(
 
     override suspend fun fireInfoPanelDismissed() {
         withContext(dispatcherProvider.io()) {
-            val trackerCount = webTrackersBlockedAppRepository.getTrackerCountForLast7Days()
+            val trackerCount = webTrackersBlockedHistory.trackerCountForLast7Days()
             val bucketSize: Int = when (trackerCount) {
                 0 -> BUCKET_SIZE_0
                 in 1..9 -> BUCKET_SIZE_1
