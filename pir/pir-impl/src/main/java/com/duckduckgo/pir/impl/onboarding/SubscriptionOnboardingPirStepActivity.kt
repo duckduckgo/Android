@@ -17,7 +17,12 @@
 package com.duckduckgo.pir.impl.onboarding
 
 import android.content.Intent
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
+import androidx.core.graphics.ColorUtils
+import androidx.core.view.doOnLayout
+import androidx.core.view.isVisible
+import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
@@ -81,6 +86,8 @@ class SubscriptionOnboardingPirStepActivity : DuckDuckGoActivity() {
             )
         }
 
+        setupScrollFade(surfaceColor)
+
         if (edgeToEdgeEnabled) {
             edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
             edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout, installScrim = false)
@@ -97,5 +104,23 @@ class SubscriptionOnboardingPirStepActivity : DuckDuckGoActivity() {
             viewModel.completeIfScanStarted()
             finish()
         }
+    }
+
+    private fun setupScrollFade(surfaceColor: Int) {
+        binding.pirOnboardingStepScrollFade.background = GradientDrawable(
+            GradientDrawable.Orientation.TOP_BOTTOM,
+            intArrayOf(ColorUtils.setAlphaComponent(surfaceColor, 0), surfaceColor),
+        )
+
+        binding.pirOnboardingStepScrollView.setOnScrollChangeListener(
+            NestedScrollView.OnScrollChangeListener { _, _, _, _, _ -> updateScrollFade() },
+        )
+
+        binding.pirOnboardingStepScrollView.doOnLayout { updateScrollFade() }
+    }
+
+    private fun updateScrollFade() {
+        binding.pirOnboardingStepScrollFade.isVisible =
+            binding.pirOnboardingStepScrollView.canScrollVertically(1)
     }
 }

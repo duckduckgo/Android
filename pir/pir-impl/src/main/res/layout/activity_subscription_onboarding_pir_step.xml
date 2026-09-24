@@ -84,6 +84,15 @@
 
         </androidx.core.widget.NestedScrollView>
 
+        <View
+            android:id="@+id/pirOnboardingStepScrollFade"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:importantForAccessibility="no"
+            app:layout_constraintBottom_toBottomOf="@id/pirOnboardingStepScrollView"
+            app:layout_constraintEnd_toEndOf="@id/pirOnboardingStepScrollView"
+            app:layout_constraintStart_toStartOf="@id/pirOnboardingStepScrollView" />
+
         <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
             android:id="@+id/pirOnboardingStepActivateButton"
             android:layout_width="match_parent"
