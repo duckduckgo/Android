@@ -458,6 +458,12 @@ class RealDuckChatJSHelper @Inject constructor(
                 mode == Mode.CONTEXTUAL &&
                 duckChatFeature.contextualSuggestedPrompts().isEnabled()
         }
+        val supportsNativeUsageWarnings = withContext(dispatcherProvider.io()) {
+            browserMode != BrowserMode.FIRE &&
+                duckChat.isNativeChatInputEnabled() &&
+                duckChat.isNativeStorageEnabled() &&
+                duckChatFeature.duckAiUsageWarnings().isEnabled()
+        }
         val jsonPayload =
             JSONObject().apply {
                 put(PLATFORM, ANDROID)
@@ -475,6 +481,7 @@ class RealDuckChatJSHelper @Inject constructor(
                 put(SUPPORTS_CHAT_SYNC, duckChat.isChatSyncFeatureEnabled() && browserMode.isSyncable)
                 put(SUPPORTS_PAGE_CONTEXT, duckChat.isDuckChatContextualModeEnabled() && mode == Mode.CONTEXTUAL)
                 put(SUPPORTS_NATIVE_STORAGE, duckChat.isNativeStorageEnabled())
+                put(SUPPORTS_NATIVE_USAGE_WARNINGS, supportsNativeUsageWarnings)
                 put(
                     SUPPORTS_MULTIPLE_PAGE_CONTEXT,
                     duckChat.isDuckChatContextualModeEnabled() &&
@@ -769,6 +776,7 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val SUPPORTS_SUGGESTIONS = "supportsSuggestions"
         private const val SUPPORTS_MULTIPLE_PAGE_CONTEXT = "supportsMultipleContexts"
         private const val SUPPORTS_NATIVE_STORAGE = "supportsNativeStorage"
+        private const val SUPPORTS_NATIVE_USAGE_WARNINGS = "supportsNativeUsageWarnings"
         private const val SUPPORTS_SUBSCRIPTION = "supportsSubscription"
         private const val INSTALL_TYPE = "installType"
         private const val INSTALL_TYPE_NEW = "new"
