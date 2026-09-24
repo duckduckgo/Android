@@ -341,7 +341,7 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
             }
             .launchIn(viewLifecycleOwner.lifecycleScope)
         viewModel.viewState
-            .map { it.attachedContext?.serialized }
+            .map { it.latestPageContext }
             .filterNotNull()
             .distinctUntilChanged()
             .onEach { binding.entrySuggestionsView.onPageContextUpdated(it) }

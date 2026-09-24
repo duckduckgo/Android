@@ -18,6 +18,7 @@ package com.duckduckgo.duckchat.impl.ui.nativeinput.views
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Rect
 import android.graphics.Typeface
 import android.net.Uri
 import android.view.Gravity
@@ -85,6 +86,7 @@ class AttachmentView(
     private var imageAttachmentsContainer: ImageAttachmentsContainerView? = null
     private var fileAttachmentsContainer: FileAttachmentsContainerView? = null
     private var pageContextContainer: PageContextAttachmentView? = null
+    private var textSelectionsContainer: TextSelectionAttachmentsContainerView? = null
     private var limitErrorView: TextView? = null
 
     init {
@@ -175,6 +177,12 @@ class AttachmentView(
         row.addView(pageContext)
         pageContextContainer = pageContext
 
+        val selections = TextSelectionAttachmentsContainerView(context).also {
+            it.onAttachmentRemoved = { id -> vm.removeTextSelection(id) }
+        }
+        row.addView(selections)
+        textSelectionsContainer = selections
+
         val imagesContainer = ImageAttachmentsContainerView(context).also {
             it.onAttachmentRemoved = { id -> vm.removeImageAttachment(id, isEditMode) }
         }
@@ -203,12 +211,14 @@ class AttachmentView(
         syncImages(imagesView, state)
         syncFiles(state)
         syncPageContext(state)
+        syncTextSelections(state)
         val errorMessage = effectiveLimitError(
             imageLimitError = state.imageLimitError
                 ?: state.fileLimitError
                 ?: state.fileSizeError
                 ?: state.filePageCountError
-                ?: state.fileTotalSizeError,
+                ?: state.fileTotalSizeError
+                ?: state.textSelectionLimitError,
             isEditMode = isEditMode,
         )
         val notStreaming = lastNativeInputState?.isChatStreaming != true
@@ -235,6 +245,23 @@ class AttachmentView(
         }
         (stateFileIds - containerFileIds).forEach { id ->
             state.files.find { it.id == id }?.let { filesView.addAttachment(it) }
+        }
+    }
+
+    private fun syncTextSelections(state: AttachmentViewModel.AttachmentState) {
+        val view = textSelectionsContainer ?: return
+        if (view.current() != state.textSelections) {
+            val isNewAttachment = state.textSelections.size > view.current().size
+            view.render(state.textSelections)
+            if (isNewAttachment) showLastTextSelection()
+        }
+    }
+
+    private fun showLastTextSelection() {
+        val container = textSelectionsContainer ?: return
+        container.post {
+            val chip = container.getChildAt(container.childCount - 1) ?: return@post
+            chip.requestRectangleOnScreen(Rect(0, 0, chip.width, chip.height), true)
         }
     }
 
@@ -265,7 +292,7 @@ class AttachmentView(
         supportsUpload = state.supportsUpload
         updateButtonVisibility()
         host?.attachmentChanged(
-            hasAttachments = state.hasAttachments,
+            hasStandaloneAttachments = state.hasStandaloneAttachments,
             limitExceeded = !isEditMode && (
                 state.imageLimitError != null ||
                     state.fileLimitError != null ||

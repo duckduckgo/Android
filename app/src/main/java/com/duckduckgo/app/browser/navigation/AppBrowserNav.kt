@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.Intent
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.mode.InAppNavigation
+import com.duckduckgo.app.browser.mode.SelectedTextSearch
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -55,14 +56,19 @@ class AppBrowserNav @Inject constructor() : BrowserNav {
         hasSessionActive: Boolean,
         duckChatUrl: String,
         forceImageGeneration: Boolean,
+        forceLaunchContextual: Boolean,
+        textSelection: String?,
     ): Intent {
+        val isExternal = textSelection != null && !forceLaunchContextual
         return BrowserActivity.intent(
             context = context,
-            launchSource = InAppNavigation,
+            launchSource = if (isExternal) SelectedTextSearch else InAppNavigation,
             openDuckChat = true,
+            duckChatContextual = forceLaunchContextual,
             duckChatUrl = duckChatUrl,
             duckChatSessionActive = hasSessionActive,
             duckChatForceImageGeneration = forceImageGeneration,
+            duckChatTextSelection = textSelection,
         )
     }
 

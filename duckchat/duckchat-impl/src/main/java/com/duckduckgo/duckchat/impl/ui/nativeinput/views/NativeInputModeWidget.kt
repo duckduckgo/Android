@@ -194,6 +194,9 @@ interface NativeInputWidget {
     fun setWidgetPosition(isBottom: Boolean)
     fun setWidgetRootView(view: View)
 
+    fun bindTextSelections(tabId: String, textSelection: String?)
+    fun getTextSelectionsJson(): JSONArray?
+
     /**
      * Binds a reactive source of the active chat id for this tab.
      * The widget forwards changes into the [NativeInputState] so observers can react.
@@ -329,7 +332,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var chatSuggestionsUserEnabled: Boolean = true
     private var isStreaming: Boolean = false
     private var attachmentLimitExceeded: Boolean = false
-    private var hasAttachments: Boolean = false
+    private var hasStandaloneAttachments: Boolean = false
 
     // Set by the manager; the toggle-row back arrow is the inverse of this (fills in while the nav bar is hidden).
     private var navBarVisible: Boolean = false
@@ -391,6 +394,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var askAboutPageAction: (() -> Unit)? = null
     private var pageContextRemovedAction: (() -> Unit)? = null
     private var pendingPageContext: PageContextAttachment? = null
+    private var pendingTextSelectionsTabId: String? = null
+    private var pendingTextSelection: String? = null
 
     // adoptEditAttachments() can be called (from EditPromptActivity.onCreate) before the widget is
     // attached, when the attachment ViewModel cannot be resolved yet, so the values are held here and
@@ -1049,7 +1054,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     private fun updateVoiceButtonVisibility() {
-        val isBlank = inputField.text.isNullOrBlank() && !hasAttachments
+        val isBlank = inputField.text.isNullOrBlank() && !hasStandaloneAttachments
         setVoiceButtonVisible(!isEditWidget && voiceSearchAvailable && isBlank)
         val host = voiceHostButtons()
         host?.setVoiceSearchVisible(false)
@@ -1057,7 +1062,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     private fun updateSendButtonVisibility() {
-        val hasContent = isStreaming || inputField.text.isNotBlank() || hasAttachments
+        val hasContent = isStreaming || inputField.text.isNotBlank() || hasStandaloneAttachments
         val visible = isChatTabSelected() && hasContent
         submitButtons?.setSendButtonVisible(visible)
         if (!isStreaming) {
@@ -1324,7 +1329,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
         // Capture text presence before any clearFocus / submission mutates the field.
         val hasText = !(message ?: inputField.text?.toString()).isNullOrBlank()
-        if (message == null && inputField.text.isNullOrBlank() && hasAttachments && isChatTabSelected()) {
+        if (message == null && inputField.text.isNullOrBlank() && hasStandaloneAttachments && isChatTabSelected()) {
             fireSubmissionPixels(hasText = hasText)
             onChatSent?.invoke("")
             inputField.clearFocus()
@@ -1607,6 +1612,17 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun getPageContext(): PageContextAttachment? = attachmentViewModel?.getPageContext()
 
+    override fun bindTextSelections(tabId: String, textSelection: String?) {
+        pendingTextSelectionsTabId = tabId
+        pendingTextSelection = textSelection
+        attachmentViewModel?.let { vm ->
+            vm.bindTextSelections(tabId, textSelection)
+            pendingTextSelection = null
+        }
+    }
+
+    override fun getTextSelectionsJson(): JSONArray? = attachmentViewModel?.getTextSelectionsJson()
+
     override fun setContextualAttachmentActions(
         onAskAboutPage: () -> Unit,
         onPageContextRemoved: () -> Unit,
@@ -1672,6 +1688,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private fun applyPendingAttachmentState() {
         val viewModel = attachmentViewModel ?: return
         pendingPageContext?.let { viewModel.setPageContext(it) }
+        pendingTextSelectionsTabId?.let { bindTextSelections(it, pendingTextSelection) }
         if (hasPendingAdoptedAttachments(pendingAdoptedImages, pendingAdoptedFiles)) {
             viewModel.adopt(pendingAdoptedImages, pendingAdoptedFiles)
         }
@@ -2055,13 +2072,13 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     override fun attachmentChanged(
-        hasAttachments: Boolean,
+        hasStandaloneAttachments: Boolean,
         limitExceeded: Boolean,
         supportsUpload: Boolean,
     ) {
         val hadLimitError = attachmentLimitExceeded
         attachmentLimitExceeded = limitExceeded
-        this.hasAttachments = hasAttachments
+        this.hasStandaloneAttachments = hasStandaloneAttachments
         if (hadLimitError != attachmentLimitExceeded && !isStreaming) {
             floatingSubmitContainer?.visibility = if (attachmentLimitExceeded) GONE else VISIBLE
         }

@@ -6,6 +6,9 @@
     "summarize-page":      { "label": "Summarize this page", "icon": "summary", "prompt": "Summarize this page." },
     "translate-page":      { "label": "Translate this page", "icon": "translate", "prompt": "Translate this page into {language}.", "condition": "differentLanguage" },
 
+    "summarize-selection": { "label": "Summarize this selection", "icon": "summary", "prompt": "Summarize this selection." },
+    "translate-selection": { "label": "Translate this selection", "icon": "translate", "prompt": "Translate this selection into {language}.", "condition": "differentLanguage" },
+
     "key-takeaways":       { "label": "What are the key takeaways?", "icon": "summary", "prompt": "What are the key takeaways from this article?" },
     "explain-simply":      { "label": "Explain this simply", "prompt": "Explain this in simple, plain language." },
     "counterarguments":    { "label": "What are the counterarguments?", "prompt": "What are the main counterarguments or criticisms of this?" },

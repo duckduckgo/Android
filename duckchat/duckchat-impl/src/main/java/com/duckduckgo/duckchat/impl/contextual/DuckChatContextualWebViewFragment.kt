@@ -475,6 +475,7 @@ class DuckChatContextualWebViewFragment :
                     selectedTool = submitted.selectedTool,
                     imagesJson = submitted.imagesJson,
                     filesJson = submitted.filesJson,
+                    selectionsJson = submitted.selectionsJson,
                 )
             },
             onAskAboutPage = { viewModel.onAskAboutPageClicked() },

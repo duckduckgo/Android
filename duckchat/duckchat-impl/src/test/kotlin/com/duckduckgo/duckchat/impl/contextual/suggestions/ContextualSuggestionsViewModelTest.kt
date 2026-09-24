@@ -442,4 +442,59 @@ class ContextualSuggestionsViewModelTest {
 
         assertEquals(SuggestionsPageType.RECIPE, viewModel.currentPageType())
     }
+
+    @Test
+    fun whenSingleTextSelectionAttachedThenSelectionSuggestionsShown() = runTest {
+        val selectionSuggestions = listOf(
+            ContextualSuggestedPrompt("summarize-selection", "Summarize this selection", "Summarize this selection.", "summary"),
+            ContextualSuggestedPrompt("translate-selection", "Translate this selection", "Translate this selection into English.", "translate"),
+        )
+        whenever(suggestedPromptsProvider.resolveTextSelectionSuggestions(any())).thenReturn(selectionSuggestions)
+
+        viewModel.onAttachmentsChanged(textSelections = 1, otherAttachments = 0)
+
+        assertEquals(selectionSuggestions, viewModel.viewState.value.suggestions)
+    }
+
+    @Test
+    fun whenMoreThanOneTextSelectionAttachedThenSelectionSuggestionsHidden() = runTest {
+        val selectionSuggestions = listOf(
+            ContextualSuggestedPrompt("summarize-selection", "Summarize this selection", "Summarize this selection.", "summary"),
+        )
+        whenever(suggestedPromptsProvider.resolveTextSelectionSuggestions(any())).thenReturn(selectionSuggestions)
+        viewModel.onAttachmentsChanged(textSelections = 1, otherAttachments = 0)
+
+        viewModel.onAttachmentsChanged(textSelections = 2, otherAttachments = 0)
+
+        assertTrue(viewModel.viewState.value.suggestions.isEmpty())
+    }
+
+    @Test
+    fun whenTextSelectionAttachedAlongsideOtherAttachmentThenSelectionSuggestionsHidden() = runTest {
+        val selectionSuggestions = listOf(
+            ContextualSuggestedPrompt("summarize-selection", "Summarize this selection", "Summarize this selection.", "summary"),
+        )
+        whenever(suggestedPromptsProvider.resolveTextSelectionSuggestions(any())).thenReturn(selectionSuggestions)
+        viewModel.onAttachmentsChanged(textSelections = 1, otherAttachments = 0)
+
+        viewModel.onAttachmentsChanged(textSelections = 1, otherAttachments = 1)
+
+        assertTrue(viewModel.viewState.value.suggestions.isEmpty())
+    }
+
+    @Test
+    fun whenExtraSelectionRemovedThenAllSelectionSuggestionsRestoredWithoutReresolving() = runTest {
+        val selectionSuggestions = listOf(
+            ContextualSuggestedPrompt("summarize-selection", "Summarize this selection", "Summarize this selection.", "summary"),
+            ContextualSuggestedPrompt("translate-selection", "Translate this selection", "Translate this selection into English.", "translate"),
+        )
+        whenever(suggestedPromptsProvider.resolveTextSelectionSuggestions(any())).thenReturn(selectionSuggestions)
+        viewModel.onAttachmentsChanged(textSelections = 1, otherAttachments = 0)
+
+        viewModel.onAttachmentsChanged(textSelections = 2, otherAttachments = 0)
+        viewModel.onAttachmentsChanged(textSelections = 1, otherAttachments = 0)
+
+        assertEquals(selectionSuggestions, viewModel.viewState.value.suggestions)
+        verify(suggestedPromptsProvider, times(1)).resolveTextSelectionSuggestions(any())
+    }
 }

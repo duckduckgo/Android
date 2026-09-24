@@ -350,4 +350,23 @@
     <string name="duckChatContextualAskAboutPage">Ρώτα για τη σελίδα</string>
     <string name="duckChatContextualAskAboutSearch">Συνέχεια στο Duck.ai</string>
     <string name="duckChatContextualOpenDuckAi">Άνοιξε το Duck.ai</string>
+
+    <!-- Suggested prompts for text selection -->
+    <string name="duckAiSuggestionSummarizeSelectionLabel">Συνόψιση αυτής την επιλογής</string>
+    <string name="duckAiSuggestionSummarizeSelectionPrompt">Συνοψίστε αυτήν την επιλογή.</string>
+    <string name="duckAiSuggestionTranslateSelectionLabel">Μετάφραση αυτής της επιλογής</string>
+    <string name="duckAiSuggestionTranslateSelectionPrompt" instruction="%1$s is replaced with the name of the user&apos;s language.">Μετάφρασε αυτή την επιλογή στα %1$s.</string>
+
+    <!-- Name shown for an attached text selection in the Duck.ai -->
+    <string name="duckAiTextSelectionAttachmentTitle">Επιλογή κειμένου</string>
+    <string name="duckAiTextSelectionLimitReached" instruction="%1$d is replaced with the maximum number of text selections.">Μπορείς να προσθέσεις έως και %1$d επιλογές κειμένου. Αφαίρεσε μία για να προσθέσεις άλλη.</string>
+
+    <!-- Duck.ai text selection menu action -->
+    <string name="duckAiTextSelectionMenuItem">Ρωτήστε το Duck.ai</string>
+
+    <!-- Prefix on the Duck.ai attachment chip for a text selection -->
+    <plurals name="duckAiTextSelectionWordCount">
+        <item quantity="one">%1$d λέξη</item>
+        <item quantity="other">%1$d λέξεις</item>
+    </plurals>
 </resources>

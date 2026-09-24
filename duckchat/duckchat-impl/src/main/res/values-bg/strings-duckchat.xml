@@ -350,4 +350,23 @@
     <string name="duckChatContextualAskAboutPage">Попитайте за страницата</string>
     <string name="duckChatContextualAskAboutSearch">Продължаване в Duck.ai</string>
     <string name="duckChatContextualOpenDuckAi">Отваряне на Duck.ai</string>
+
+    <!-- Suggested prompts for text selection -->
+    <string name="duckAiSuggestionSummarizeSelectionLabel">Обобщи този избран текст</string>
+    <string name="duckAiSuggestionSummarizeSelectionPrompt">Обобщи този избран текст.</string>
+    <string name="duckAiSuggestionTranslateSelectionLabel">Преведи този избран текст</string>
+    <string name="duckAiSuggestionTranslateSelectionPrompt" instruction="%1$s is replaced with the name of the user&apos;s language.">Преведи този избран текст на %1$s.</string>
+
+    <!-- Name shown for an attached text selection in the Duck.ai -->
+    <string name="duckAiTextSelectionAttachmentTitle">Избран текст</string>
+    <string name="duckAiTextSelectionLimitReached" instruction="%1$d is replaced with the maximum number of text selections.">Можеш да добавиш до %1$d избрани текста. Премахни един, за да добавиш друг.</string>
+
+    <!-- Duck.ai text selection menu action -->
+    <string name="duckAiTextSelectionMenuItem">Попитайте Duck.ai</string>
+
+    <!-- Prefix on the Duck.ai attachment chip for a text selection -->
+    <plurals name="duckAiTextSelectionWordCount">
+        <item quantity="one">%1$d дума</item>
+        <item quantity="other">%1$d думи</item>
+    </plurals>
 </resources>

@@ -59,6 +59,9 @@ class ContextualSuggestionsViewModel @Inject constructor(
     private var pageType: SuggestionsPageType = SuggestionsPageType.NONE
     private var isSmart: Boolean = false
     private var suggestionsVisible = false
+    private var textSelectionCount: Int = 0
+    private var otherAttachmentCount: Int = 0
+    private var lastInput: ResolvePageSuggestionsInput? = null
 
     fun load() {
         loadJob?.cancel()
@@ -100,8 +103,50 @@ class ContextualSuggestionsViewModel @Inject constructor(
     fun clear() {
         loadJob?.cancel()
         resolvedSuggestions = emptyList()
+        textSelectionCount = 0
+        otherAttachmentCount = 0
         hideSuggestions()
     }
+
+    fun onAttachmentsChanged(
+        textSelections: Int,
+        otherAttachments: Int,
+    ) {
+        val modeChanged = (textSelectionCount > 0) != (textSelections > 0)
+        textSelectionCount = textSelections
+        otherAttachmentCount = otherAttachments
+        if (!modeChanged) {
+            _viewState.update { it.copy(suggestions = visibleSuggestions()) }
+            return
+        }
+        loadJob?.cancel()
+        loadJob = viewModelScope.launch { loadSuggestions() }
+    }
+
+    private suspend fun loadSuggestions() {
+        if (!suggestionsEnabled()) {
+            hideSuggestions()
+            return
+        }
+        if (textSelectionCount > 0) resolveTextSelectionSuggestions() else resolvePageSuggestions()
+    }
+
+    private suspend fun resolvePageSuggestions() {
+        fetchSuggestions(lastInput?.url, lastInput?.pageTypeSignals)
+        showSuggestions()
+    }
+
+    private suspend fun resolveTextSelectionSuggestions() {
+        resolvedSuggestions = suggestedPromptsProvider.resolveTextSelectionSuggestions(currentInput())
+        showSuggestions()
+    }
+
+    private fun currentInput(): ResolvePageSuggestionsInput =
+        lastInput ?: ResolvePageSuggestionsInput(
+            pageTypeSignals = null,
+            url = null,
+            uiLocale = Locale.getDefault().toLanguageTag(),
+        )
 
     fun onReservedQuickActionSlotsChanged(count: Int) {
         if (reservedQuickActionSlots == count) return
@@ -110,6 +155,8 @@ class ContextualSuggestionsViewModel @Inject constructor(
     }
 
     private fun visibleSuggestions(): List<ContextualSuggestedPrompt> {
+        if (textSelectionCount + otherAttachmentCount > 1) return emptyList()
+        if (textSelectionCount > 0) return resolvedSuggestions.take(MAX_TEXT_SELECTION_SUGGESTIONS)
         val capacity = (maxSuggestedPrompts - reservedQuickActionSlots).coerceAtLeast(0)
         if (resolvedSuggestions.size <= capacity) return resolvedSuggestions
         val prioritySuggestions = resolvedSuggestions.filter { it.id in prioritySuggestionIds }
@@ -124,6 +171,15 @@ class ContextualSuggestionsViewModel @Inject constructor(
     ) {
         if (!suggestionsEnabled()) {
             hideSuggestions()
+            return
+        }
+        lastInput = ResolvePageSuggestionsInput(
+            pageTypeSignals = pageTypeSignals,
+            url = url,
+            uiLocale = Locale.getDefault().toLanguageTag(),
+        )
+        if (textSelectionCount > 0) {
+            resolveTextSelectionSuggestions()
             return
         }
         fetchSuggestions(url, pageTypeSignals)
@@ -142,6 +198,7 @@ class ContextualSuggestionsViewModel @Inject constructor(
             url = url,
             uiLocale = Locale.getDefault().toLanguageTag(),
         )
+        lastInput = input
         val resolved = suggestedPromptsProvider.resolveSuggestions(input)
         maxSuggestedPrompts = suggestedPromptsProvider.maxSuggestedPrompts()
         prioritySuggestionIds = suggestedPromptsProvider.prioritySuggestionIds()
@@ -191,5 +248,6 @@ class ContextualSuggestionsViewModel @Inject constructor(
 
     companion object {
         private const val TIMEOUT_MS = 5_000L
+        private const val MAX_TEXT_SELECTION_SUGGESTIONS = 2
     }
 }
