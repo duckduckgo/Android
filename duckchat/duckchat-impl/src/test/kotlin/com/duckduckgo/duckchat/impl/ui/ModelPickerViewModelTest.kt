@@ -214,7 +214,7 @@ class ModelPickerViewModelTest {
     }
 
     @Test
-    fun whenModelCarriesALabelThenItMapsToTheMatchingSubline() = runTest {
+    fun whenModelCarriesALabelThenItMapsToTheMatchingSubline() {
         assertEquals(
             R.string.duckAiModelPickerLabelEverydayUse,
             testee.subtitleResFor(freeModel("f").copy(label = ModelLabel.EVERYDAY_USE)),

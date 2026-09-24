@@ -291,11 +291,12 @@ class ModelPickerView @JvmOverloads constructor(
 
     private fun LinearLayout.populateMenu(state: ModelState, popup: PopupWindow) {
         val selectedId = viewModel.selectedModelIdForMenu()
+        val updatedPickers = viewModel.updatedPickersEnabled()
         viewModel.buildSections(state).forEachIndexed { index, section ->
             if (index > 0) addDivider()
             section.headerRes?.let { addSectionHeader(context.getString(it)) }
             for (model in section.models) {
-                if (viewModel.updatedPickersEnabled()) {
+                if (updatedPickers) {
                     addPickerRow(model, selected = model.id == selectedId, gated = section.gated, popup)
                 } else {
                     addModelItem(model, selected = model.id == selectedId, popup)
@@ -316,7 +317,7 @@ class ModelPickerView @JvmOverloads constructor(
             leadingIconRes = viewModel.getIconResForModel(model),
             subtitle = viewModel.subtitleResFor(model)?.let { context.getString(it) },
             selected = selected,
-            opensFollowUp = gated,
+            showsFollowUpEllipsis = gated,
         ) {
             viewModel.onModelTapped(model, currentSurface())
             popup.dismiss()
