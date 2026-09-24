@@ -868,7 +868,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
             // Only publish once attached: the ViewModel is resolved from the view tree, and the host
             // can set text before the widget is added (e.g. omnibar prefill). configure() re-pushes a
             // snapshot on attach, so the pre-attach value is not lost.
-            if (isAttachedToWindow) viewModel.setHasText(inputField.text?.isNotBlank() == true)
+            if (isAttachedToWindow) viewModel.setHasText(inputField.text?.isNotEmpty() == true)
             updateSendButtonVisibility()
             updateVoiceButtonVisibility()
             updateNewLineButtonVisibility()
@@ -1622,7 +1622,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     // before configuration are not lost and a stale hasText cannot leak into the next tab (the widget
     // instance is shared across tabs).
     private fun publishGatingSnapshot() {
-        viewModel.setHasText(inputField.text?.isNotBlank() == true)
+        viewModel.setHasText(inputField.text?.isNotEmpty() == true)
         viewModel.setAttachmentState(hasAttachments = hasAttachments, limitExceeded = attachmentLimitExceeded)
         viewModel.setVoiceSearchAvailable(voiceSearchAvailable)
         viewModel.setVoiceChatAvailable(voiceChatAvailable)
