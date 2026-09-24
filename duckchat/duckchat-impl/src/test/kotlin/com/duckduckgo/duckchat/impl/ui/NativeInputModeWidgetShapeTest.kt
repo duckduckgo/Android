@@ -30,6 +30,7 @@ import com.google.android.material.card.MaterialCardView
 import com.google.android.material.shape.RelativeCornerSize
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -140,6 +141,20 @@ class NativeInputModeWidgetShapeTest {
             subject.context.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.largeShapeCornerRadius),
             subject.cornerSize(),
         )
+    }
+
+    @Test
+    fun `when edit widget receives a top browser search-only state it keeps its card shape`() {
+        val subject = createSubject()
+        NativeInputModeWidget::class.java.getDeclaredField("isEditWidget").apply {
+            isAccessible = true
+            setBoolean(subject.widget, true)
+        }
+        val originalShape = subject.card.shapeAppearanceModel
+
+        subject.render(rebrandEnabled = true)
+
+        assertSame(originalShape, subject.card.shapeAppearanceModel)
     }
 
     private fun createSubject(inputPosition: NativeInputState.InputPosition = NativeInputState.InputPosition.TOP): Subject {
