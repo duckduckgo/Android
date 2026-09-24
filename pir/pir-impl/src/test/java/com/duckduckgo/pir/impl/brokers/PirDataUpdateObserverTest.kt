@@ -163,35 +163,37 @@ class PirDataUpdateObserverTest {
     }
 
     @Test
-    fun whenPirEnabledAndValidProfileExistsThenReschedulesScans() = runTest {
+    fun whenPirEnabledAndValidProfileExistsThenReschedulesAllWork() = runTest {
         whenever(brokerJsonUpdater.update()).thenReturn(true)
         whenever(pirRepository.getValidUserProfileQueries()).thenReturn(listOf(mock()))
         canRunPirFlow.value = PirEligibility.Enabled(PirRunMode.SCAN_AND_OPT_OUT)
 
         pirDataUpdateObserver.onCreate(lifecycleOwner)
 
-        verify(pirScanScheduler).reschedulePirScans()
+        verify(pirScanScheduler).rescheduleAllWork()
     }
 
     @Test
-    fun whenPirEnabledButNoValidProfileThenDoesNotRescheduleScans() = runTest {
+    fun whenPirEnabledButNoValidProfileThenDoesNotRescheduleWork() = runTest {
         whenever(brokerJsonUpdater.update()).thenReturn(true)
         whenever(pirRepository.getValidUserProfileQueries()).thenReturn(emptyList())
         canRunPirFlow.value = PirEligibility.Enabled(PirRunMode.SCAN_AND_OPT_OUT)
 
         pirDataUpdateObserver.onCreate(lifecycleOwner)
 
-        verify(pirScanScheduler, never()).reschedulePirScans()
+        verify(pirScanScheduler, never()).rescheduleAllWork()
+        verify(pirScanScheduler, never()).rescheduleScanWork()
     }
 
     @Test
-    fun whenPirDisabledThenDoesNotRescheduleScans() = runTest {
+    fun whenPirDisabledThenDoesNotRescheduleWork() = runTest {
         whenever(pirRepository.getValidUserProfileQueries()).thenReturn(listOf(mock()))
 
         pirDataUpdateObserver.onCreate(lifecycleOwner)
         canRunPirFlow.value = PirEligibility.Disabled(DisabledReason.FEATURE_DISABLED)
 
-        verify(pirScanScheduler, never()).reschedulePirScans()
+        verify(pirScanScheduler, never()).rescheduleAllWork()
+        verify(pirScanScheduler, never()).rescheduleScanWork()
     }
 
     @Test
@@ -244,7 +246,7 @@ class PirDataUpdateObserverTest {
     }
 
     @Test
-    fun whenScanOnlyAndWindowIsOpenThenScheduledScansAreReapplied() = runTest {
+    fun whenScanOnlyAndWindowIsOpenThenOnlyTheScanWorkIsReapplied() = runTest {
         whenever(brokerJsonUpdater.update()).thenReturn(true)
         whenever(pirRepository.getValidUserProfileQueries()).thenReturn(listOf(mock()))
         whenever(pirFreeScanWorkWindow.isOpen()).thenReturn(true)
@@ -252,7 +254,8 @@ class PirDataUpdateObserverTest {
         pirDataUpdateObserver.onCreate(lifecycleOwner)
         canRunPirFlow.value = PirEligibility.Enabled(PirRunMode.SCAN_ONLY)
 
-        verify(pirScanScheduler).reschedulePirScans()
+        verify(pirScanScheduler).rescheduleScanWork()
+        verify(pirScanScheduler, never()).rescheduleAllWork()
         verify(pirScanScheduler, never()).cancelScheduledScanWorker()
     }
 
@@ -266,7 +269,8 @@ class PirDataUpdateObserverTest {
         canRunPirFlow.value = PirEligibility.Enabled(PirRunMode.SCAN_ONLY)
 
         verify(pirScanScheduler).cancelScheduledScanWorker()
-        verify(pirScanScheduler, never()).reschedulePirScans()
+        verify(pirScanScheduler, never()).rescheduleScanWork()
+        verify(pirScanScheduler, never()).rescheduleAllWork()
     }
 
     @Test
@@ -277,7 +281,20 @@ class PirDataUpdateObserverTest {
         pirDataUpdateObserver.onCreate(lifecycleOwner)
         canRunPirFlow.value = PirEligibility.Enabled(PirRunMode.SCAN_AND_OPT_OUT)
 
-        verify(pirScanScheduler).reschedulePirScans()
+        verify(pirScanScheduler).rescheduleAllWork()
         verifyNoInteractions(pirFreeScanWorkWindow)
+    }
+
+    @Test
+    fun whenScanOnlyUserSubscribesThenAllRecurringWorkIsReEnqueued() = runTest {
+        whenever(brokerJsonUpdater.update()).thenReturn(true)
+        whenever(pirRepository.getValidUserProfileQueries()).thenReturn(listOf(mock()))
+        whenever(pirFreeScanWorkWindow.isOpen()).thenReturn(false)
+
+        pirDataUpdateObserver.onCreate(lifecycleOwner)
+        canRunPirFlow.value = PirEligibility.Enabled(PirRunMode.SCAN_ONLY)
+        canRunPirFlow.value = PirEligibility.Enabled(PirRunMode.SCAN_AND_OPT_OUT)
+
+        verify(pirScanScheduler).rescheduleAllWork()
     }
 }

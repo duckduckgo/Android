@@ -1865,15 +1865,69 @@ class RealPirJobsRunnerTest {
         verify(mockPirScanScheduler, never()).cancelScheduledScanWorker()
     }
 
+    @Test
+    fun whenScanOnlyRunCompletesThenOptOutJobsAreNeitherCreatedNorExecuted() = runTest {
+        givenAScanOnlyRunWithOneUngatedBroker()
+        givenTheUngatedBrokerHasAnOptOutableMatch()
+
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
+
+        verify(mockPirSchedulingRepository, never()).saveOptOutJobRecords(any())
+        verifyNoInteractions(mockPirOptOut)
+    }
+
+    @Test
+    fun whenScanOnlyRunCompletesThenWideEventOptOutPhaseIsSkipped() = runTest {
+        givenAScanOnlyRunWithOneUngatedBroker()
+        givenTheUngatedBrokerHasAnOptOutableMatch()
+
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
+
+        val inOrder = inOrder(mockPirScanWideEvent)
+        inOrder.verify(mockPirScanWideEvent).onScanCompleted(MANUAL_INITIAL)
+        inOrder.verify(mockPirScanWideEvent).onOptOutSkipped(MANUAL_INITIAL)
+        verify(mockPirScanWideEvent, never()).onOptOutStarted(any())
+        verify(mockPirScanWideEvent, never()).onOptOutCompleted(any(), any())
+    }
+
+    @Test
+    fun whenScanOnlyRunCompletesThenCompletedPixelReportsNoOptOutJobs() = runTest {
+        givenAScanOnlyRunWithOneUngatedBroker()
+        givenTheUngatedBrokerHasAnOptOutableMatch()
+
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
+
+        verify(mockPixelSender).reportManualScanCompleted(any(), any(), eq(1), eq(0), any(), any(), any(), eq(MANUAL_INITIAL), any())
+    }
+
+    @Test
+    fun whenScanOnlyRunCompletesThenInitialScanDurationIsStillReported() = runTest {
+        givenAScanOnlyRunWithOneUngatedBroker()
+        givenTheUngatedBrokerHasAnOptOutableMatch()
+
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
+
+        verify(mockPixelSender).reportInitialScanDuration(any(), any(), any(), any(), any(), eq(MANUAL_INITIAL), any())
+    }
+
     private suspend fun givenAScanOnlyRunWithOneUngatedBroker() {
         val ungated = brokerObject("Ungated")
         whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(listOf(testProfileQuery))
         whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(listOf("Ungated"))
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(listOf(ungated))
-        whenever(mockPirRepository.getBrokersForOptOut(true)).thenReturn(emptyList())
+        whenever(mockPirRepository.getBrokersForOptOut(true)).thenReturn(listOf("Ungated"))
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
         whenever(mockPirFreeScanBrokerFilter.excludingGatedBrokers(listOf(ungated))).thenReturn(listOf(ungated))
         whenever(mockEligibleScanJobProvider.getAllEligibleScanJobs(any()))
             .thenReturn(listOf(ScanJobRecord(brokerName = "Ungated", userProfileId = 1L)))
+        whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(emptyList())
+        whenever(mockEligibleOptOutJobProvider.getAllEligibleOptOutJobs(any())).thenReturn(emptyList())
+    }
+
+    private suspend fun givenTheUngatedBrokerHasAnOptOutableMatch() {
+        whenever(mockPirRepository.getAllExtractedProfiles())
+            .thenReturn(listOf(testExtractedProfile.copy(brokerName = "Ungated")))
+        whenever(mockEligibleOptOutJobProvider.getAllEligibleOptOutJobs(any()))
+            .thenReturn(listOf(testOptOutJobRecord.copy(brokerName = "Ungated")))
     }
 }
