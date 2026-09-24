@@ -17,13 +17,13 @@
 <resources>
 
     <declare-styleable name="PirFeatureInfoListItemView">
-        <attr name="featureInfoIcon" format="reference" />
-        <attr name="featureInfoTitle" format="reference|string" />
-        <attr name="featureInfoDescription" format="reference|string" />
+        <attr name="pirFeatureInfoIcon" format="reference" />
+        <attr name="pirFeatureInfoTitle" format="reference|string" />
+        <attr name="pirFeatureInfoDescription" format="reference|string" />
     </declare-styleable>
 
     <declare-styleable name="PirPlatformIconsView">
-        <attr name="platformsVisible">
+        <attr name="pirPlatformsVisible">
             <flag name="ios" value="1" />
             <flag name="android" value="2" />
             <flag name="mac" value="4" />

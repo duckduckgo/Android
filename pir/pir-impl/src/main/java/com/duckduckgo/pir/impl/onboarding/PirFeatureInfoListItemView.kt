@@ -41,9 +41,9 @@ class PirFeatureInfoListItemView @JvmOverloads constructor(
         setPadding(padding, padding, padding, padding)
 
         context.withStyledAttributes(attrs, R.styleable.PirFeatureInfoListItemView) {
-            getResourceId(R.styleable.PirFeatureInfoListItemView_featureInfoIcon, 0).takeIf { it != 0 }?.let(::setIcon)
-            getText(R.styleable.PirFeatureInfoListItemView_featureInfoTitle)?.let(binding.featureInfoItemTitle::setText)
-            getText(R.styleable.PirFeatureInfoListItemView_featureInfoDescription)?.let(binding.featureInfoItemDescription::setText)
+            getResourceId(R.styleable.PirFeatureInfoListItemView_pirFeatureInfoIcon, 0).takeIf { it != 0 }?.let(::setIcon)
+            getText(R.styleable.PirFeatureInfoListItemView_pirFeatureInfoTitle)?.let(binding.featureInfoItemTitle::setText)
+            getText(R.styleable.PirFeatureInfoListItemView_pirFeatureInfoDescription)?.let(binding.featureInfoItemDescription::setText)
         }
     }
 

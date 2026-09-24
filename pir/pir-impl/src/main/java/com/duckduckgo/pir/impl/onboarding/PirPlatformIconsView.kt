@@ -48,7 +48,7 @@ class PirPlatformIconsView @JvmOverloads constructor(
         columnCount = COLUMN_COUNT
         var visible = 0
         context.withStyledAttributes(attrs, R.styleable.PirPlatformIconsView) {
-            visible = getInt(R.styleable.PirPlatformIconsView_platformsVisible, 0)
+            visible = getInt(R.styleable.PirPlatformIconsView_pirPlatformsVisible, 0)
         }
         render(visible)
     }
