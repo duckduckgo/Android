@@ -119,7 +119,7 @@ class UsageLimitFooterPlugin @Inject constructor(
             if (!footerContext.isInputFocused) return@combine NativeInputFooterState(visible = false)
 
             val freeTrialEligible = snapshot.cta?.id == UsageCtaId.SUBSCRIBE &&
-                runCatching { subscriptions.isFreeTrialEligible() }.getOrDefault(false)
+                withContext(dispatchers.io()) { runCatching { subscriptions.isFreeTrialEligible() }.getOrDefault(false) }
             val resolvedCta = ctaResolver.resolve(snapshot.cta, modelManager.modelState.value, host.draft(), freeTrialEligible)
             retireIfManuallySwitched(snapshot, selectedModelId = input.selectedModelId, previousModelId = previousModelId)
 
