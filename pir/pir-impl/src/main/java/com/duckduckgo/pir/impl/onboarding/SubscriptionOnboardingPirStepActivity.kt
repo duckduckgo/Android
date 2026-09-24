@@ -32,8 +32,6 @@ import com.duckduckgo.pir.api.onboarding.PirOnboardingStepScreen
 import com.duckduckgo.pir.impl.R
 import com.duckduckgo.pir.impl.dashboard.PirDashboardWebViewActivity
 import com.duckduckgo.pir.impl.databinding.ActivitySubscriptionOnboardingPirStepBinding
-import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController
-import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.COMPLETED
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -51,9 +49,6 @@ class SubscriptionOnboardingPirStepActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
-
-    @Inject
-    lateinit var subscriptionOnboardingController: SubscriptionOnboardingController
 
     private val binding: ActivitySubscriptionOnboardingPirStepBinding by viewBinding()
 
@@ -104,14 +99,8 @@ class SubscriptionOnboardingPirStepActivity : DuckDuckGoActivity() {
         // only if the user actually started a scan.
         if (!activateLaunched || isFinishing) return
         lifecycleScope.launch {
-            if (viewModel.hasStartedScan()) {
-                subscriptionOnboardingController.onStepFinished(PIR_STEP_ID, COMPLETED)
-            }
+            viewModel.completeIfScanStarted()
             finish()
         }
-    }
-
-    companion object {
-        const val PIR_STEP_ID = "pir"
     }
 }

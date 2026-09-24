@@ -18,14 +18,17 @@ package com.duckduckgo.pir.impl.onboarding
 
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.pir.impl.models.ProfileQuery
+import com.duckduckgo.pir.impl.onboarding.SubscriptionOnboardingPirStepViewModel.Companion.PIR_STEP_ID
 import com.duckduckgo.pir.impl.store.PirRepository
+import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController
+import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.COMPLETED
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 class SubscriptionOnboardingPirStepViewModelTest {
@@ -34,6 +37,7 @@ class SubscriptionOnboardingPirStepViewModelTest {
     var coroutineRule = CoroutineTestRule()
 
     private val mockPirRepository: PirRepository = mock()
+    private val mockController: SubscriptionOnboardingController = mock()
 
     private lateinit var testee: SubscriptionOnboardingPirStepViewModel
 
@@ -54,21 +58,26 @@ class SubscriptionOnboardingPirStepViewModelTest {
     fun setUp() {
         testee = SubscriptionOnboardingPirStepViewModel(
             pirRepository = mockPirRepository,
+            controller = mockController,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
     }
 
     @Test
-    fun whenNoUserProfileQueriesThenHasStartedScanReturnsFalse() = runTest {
+    fun whenNoUserProfileQueriesThenStepIsNotCompleted() = runTest {
         whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(emptyList())
 
-        assertFalse(testee.hasStartedScan())
+        testee.completeIfScanStarted()
+
+        verifyNoInteractions(mockController)
     }
 
     @Test
-    fun whenAtLeastOneUserProfileQueryThenHasStartedScanReturnsTrue() = runTest {
+    fun whenAtLeastOneUserProfileQueryThenStepIsCompleted() = runTest {
         whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(listOf(testProfileQuery))
 
-        assertTrue(testee.hasStartedScan())
+        testee.completeIfScanStarted()
+
+        verify(mockController).onStepFinished(PIR_STEP_ID, COMPLETED)
     }
 }

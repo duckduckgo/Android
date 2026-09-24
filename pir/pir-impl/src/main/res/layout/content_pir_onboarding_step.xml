@@ -25,15 +25,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_5"
-        app:featureInfoDescription="@string/pirOnboardingStepItem1Description"
-        app:featureInfoIcon="@drawable/device_all_24"
-        app:featureInfoTitle="@string/pirOnboardingStepItem1Title">
+        app:pirFeatureInfoDescription="@string/pirOnboardingStepItem1Description"
+        app:pirFeatureInfoIcon="@drawable/device_all_24"
+        app:pirFeatureInfoTitle="@string/pirOnboardingStepItem1Title">
 
         <com.duckduckgo.pir.impl.onboarding.PirPlatformIconsView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_2"
-            app:platformsVisible="mac|windows" />
+            app:pirPlatformsVisible="mac|windows" />
 
     </com.duckduckgo.pir.impl.onboarding.PirFeatureInfoListItemView>
 
@@ -41,32 +41,32 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_4"
-        app:featureInfoDescription="@string/pirOnboardingStepItem2Description"
-        app:featureInfoIcon="@drawable/reload_16"
-        app:featureInfoTitle="@string/pirOnboardingStepItem2Title" />
+        app:pirFeatureInfoDescription="@string/pirOnboardingStepItem2Description"
+        app:pirFeatureInfoIcon="@drawable/reload_16"
+        app:pirFeatureInfoTitle="@string/pirOnboardingStepItem2Title" />
 
     <com.duckduckgo.pir.impl.onboarding.PirFeatureInfoListItemView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_4"
-        app:featureInfoDescription="@string/pirOnboardingStepItem3Description"
-        app:featureInfoIcon="@drawable/device_laptop_lock_16"
-        app:featureInfoTitle="@string/pirOnboardingStepItem3Title" />
+        app:pirFeatureInfoDescription="@string/pirOnboardingStepItem3Description"
+        app:pirFeatureInfoIcon="@drawable/device_laptop_lock_16"
+        app:pirFeatureInfoTitle="@string/pirOnboardingStepItem3Title" />
 
     <com.duckduckgo.pir.impl.onboarding.PirFeatureInfoListItemView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_4"
-        app:featureInfoDescription="@string/pirOnboardingStepItem4Description"
-        app:featureInfoIcon="@drawable/form_autofill_16"
-        app:featureInfoTitle="@string/pirOnboardingStepItem4Title" />
+        app:pirFeatureInfoDescription="@string/pirOnboardingStepItem4Description"
+        app:pirFeatureInfoIcon="@drawable/form_autofill_16"
+        app:pirFeatureInfoTitle="@string/pirOnboardingStepItem4Title" />
 
     <com.duckduckgo.pir.impl.onboarding.PirFeatureInfoListItemView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_4"
-        app:featureInfoDescription="@string/pirOnboardingStepItem5Description"
-        app:featureInfoIcon="@drawable/support_16"
-        app:featureInfoTitle="@string/pirOnboardingStepItem5Title" />
+        app:pirFeatureInfoDescription="@string/pirOnboardingStepItem5Description"
+        app:pirFeatureInfoIcon="@drawable/support_16"
+        app:pirFeatureInfoTitle="@string/pirOnboardingStepItem5Title" />
 
 </merge>

@@ -21,17 +21,32 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.pir.impl.store.PirRepository
+import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController
+import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.COMPLETED
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class SubscriptionOnboardingPirStepViewModel @Inject constructor(
     private val pirRepository: PirRepository,
+    private val controller: SubscriptionOnboardingController,
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 
-    /** A scan is considered started once the user has stored at least one profile query. */
-    suspend fun hasStartedScan(): Boolean = withContext(dispatcherProvider.io()) {
-        pirRepository.getAllUserProfileQueries().isNotEmpty()
+    /**
+     * Called when the user comes back from the PIR flow: reports the step completed if they started a scan
+     * (they stored at least one profile query). A no-op otherwise, so the step stays available.
+     */
+    suspend fun completeIfScanStarted() {
+        val scanStarted = withContext(dispatcherProvider.io()) {
+            pirRepository.getAllUserProfileQueries().isNotEmpty()
+        }
+        if (scanStarted) {
+            controller.onStepFinished(PIR_STEP_ID, COMPLETED)
+        }
+    }
+
+    companion object {
+        const val PIR_STEP_ID = "pir"
     }
 }
