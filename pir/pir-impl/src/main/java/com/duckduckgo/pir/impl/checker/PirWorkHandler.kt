@@ -132,10 +132,10 @@ class RealPirWorkHandler @Inject constructor(
             -> true
         }
 
-        // The paid path resolves first so a subscriber is never routed onto the scan-only path.
+        // Freemium is only for users without a subscription: a subscriber whose plan lacks PIR is not a free user.
         val runMode = when {
             subscriptionActive && hasValidEntitlement -> PirRunMode.SCAN_AND_OPT_OUT
-            canRunFreemiumScans() -> PirRunMode.SCAN_ONLY
+            !subscriptionActive && canRunFreemiumScans() -> PirRunMode.SCAN_ONLY
             else -> null
         }
 
