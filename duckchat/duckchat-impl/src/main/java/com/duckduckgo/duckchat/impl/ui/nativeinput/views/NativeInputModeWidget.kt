@@ -300,8 +300,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     private var tabCountLiveData: LiveData<Int>? = null
     private var tabCountObserver: Observer<Int>? = null
-    private var submitButtons: InputScreenButtons? = null
-    private var floatingButtons: InputScreenButtons? = null
+    private var newLineButton: NewLineButtonView? = null
     private var floatingSubmitContainer: ViewGroup? = null
     private var chatStateJob: Job? = null
     private var chatSuggestionsSettingJob: Job? = null
@@ -321,9 +320,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var duckAiFireButtonHighlightJob: Job? = null
     private var duckAiFireButtonHighlightSource: Flow<Boolean>? = null
     private var pulseAnimation: PulseAnimation? = null
-    private var submitEnabledJob: Job? = null
     private var editPromptJob: Job? = null
-    private var submitAllowed: Boolean = true
     private var chatSuggestionsUserEnabled: Boolean = true
     private var isStreaming: Boolean = false
     private var attachmentLimitExceeded: Boolean = false
@@ -350,16 +347,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     override var onCustomizeResponsesClicked: (() -> Unit)? = null
     override var onImageClick: (() -> Unit)? = null
     override var onVoiceSearchClick: (() -> Unit)? = null
-        set(value) {
-            field = value
-            voiceHostButtons()?.onVoiceSearchClick = voiceSearchClickWithPixel
-            onVoiceClick = voiceSearchClickWithPixel
-        }
     override var onVoiceChatClick: (() -> Unit)? = null
-        set(value) {
-            field = value
-            voiceHostButtons()?.onVoiceChatClick = voiceChatClickWithPixel
-        }
 
     // Wrapper installed on the host buttons so the unified-input voice pixel fires exactly once per
     // tap, before delegating to whatever external [onVoiceChatClick] is currently set. Reads the
@@ -425,17 +413,14 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
 
     val inputField: EditText
-    private val inputFieldClearText: View
     private val inputModeWidgetBack: View
     private val inputModeWidgetUnifiedBack: View
     private val inputModeSwitch: TabLayout
     private val inputModeWidgetCard: MaterialCardView
-    private val inputScreenButtonsContainer: FrameLayout
     private val inputModeMainButtonsContainer: View
     private val inputModeWidgetLayout: View
     val tabSwitcherButton: TabSwitcherButton
     private val fireButton: View
-    private val voiceInputButton: View
 
     private val inputModeCardExtendedEndMargin: Int by lazy {
         resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_2)
@@ -454,7 +439,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
     var onSearchTextChanged: ((String) -> Unit)? = null
     var onChatTextChanged: ((String) -> Unit)? = null
     var onInputTextEmptyChanged: ((isEmpty: Boolean) -> Unit)? = null
-    var onVoiceClick: (() -> Unit)? = null
     override var onFireButtonTapped: (() -> Unit)? = null
     override var onClearTextTapped: (() -> Unit)? = null
 
@@ -492,15 +476,12 @@ class NativeInputModeWidget @JvmOverloads constructor(
         LayoutInflater.from(context).inflate(R.layout.view_native_input_mode_switch_widget, this, true)
 
         inputField = findViewById(R.id.inputField)
-        inputFieldClearText = findViewById(R.id.inputFieldClearText)
         inputModeWidgetBack = findViewById(R.id.inputModeWidgetBack)
         inputModeWidgetUnifiedBack = findViewById(R.id.inputModeUnifiedBack)
         inputModeSwitch = findViewById(R.id.inputModeSwitch)
         inputModeWidgetCard = findViewById(R.id.inputModeWidgetCard)
         fireButton = findViewById(R.id.inputFieldFireButton)
         tabSwitcherButton = findViewById(R.id.inputFieldTabsMenu)
-        voiceInputButton = findViewById(R.id.inputFieldVoiceInputButton)
-        inputScreenButtonsContainer = findViewById(R.id.inputScreenButtonsContainer)
         inputModeMainButtonsContainer = findViewById(R.id.inputModeMainButtonsContainer)
         inputModeWidgetLayout = findViewById(R.id.inputModeWidgetLayout)
 
@@ -515,7 +496,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         inputModeWidgetBack.setOnClickListener { onBackPressed() }
         inputModeWidgetUnifiedBack.setOnClickListener { onBackPressed() }
         fireButton.setOnClickListener { onFireButtonTapped?.invoke() }
-        voiceInputButton.setOnClickListener { onVoiceClick?.invoke() }
     }
 
     private fun configureInputBehavior() =
@@ -539,7 +519,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
                 }
 
                 val isNullOrEmpty = text.isNullOrEmpty()
-                inputFieldClearText.isVisible = !isNullOrEmpty
                 onInputTextEmptyChanged?.invoke(isNullOrEmpty)
             }
 
@@ -656,10 +635,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         inputField.setSelection(selectionStart + 1)
     }
 
-    private fun setVoiceButtonVisible(visible: Boolean) {
-        voiceInputButton.isVisible = visible
-    }
-
     private fun setMainButtonsVisible(mainButtonsVisible: Boolean) {
         fade(inputModeMainButtonsContainer, mainButtonsVisible)
 
@@ -711,7 +686,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         observeChatState()
         observeChatSuggestionsEnabled()
         observeNativeInputState()
-        observeSubmitEnabled()
         observeEditPromptRequests()
         bindLeadingFireButtonClick()
         if (onPaidTierChanged != null) observeTier()
@@ -741,17 +715,25 @@ class NativeInputModeWidget @JvmOverloads constructor(
         return null
     }
 
+    private fun currentPluginContext(): NativeInputState.InputContext =
+        if (isContextualWidget) {
+            NativeInputState.InputContext.DUCK_AI_CONTEXTUAL
+        } else {
+            nativeInputState?.inputContext ?: NativeInputState.InputContext.BROWSER
+        }
+
     private fun setupPlugins() {
         pluginsJob?.cancel()
         val scope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
         pluginsJob = scope.launch {
             launch {
                 viewModel.plugins.collect { plugins ->
+                    val pluginContext = currentPluginContext()
                     for (plugin in plugins) {
-                        // The start-chat shortcut is a search-only address-bar affordance; it has no place
-                        // in the contextual sheet's Duck.ai composer (and reads the shared per-tab state,
-                        // which can be search-only), so skip it there.
-                        if ((isContextualWidget || isEditWidget) && plugin.containerId == R.id.startChatContainer) continue
+                        // A plugin declares which input contexts it renders in; skip it on the others. This
+                        // replaces the old per-container skip (e.g. start-chat has no place in the contextual
+                        // sheet). Edit-surface suppression stays per-view via NativeInputHost.isEditSurface().
+                        if (pluginContext !in plugin.supportedContexts) continue
                         val container = findViewById<FrameLayout?>(plugin.containerId) ?: continue
                         val pluginView = plugin.createView(context, this@NativeInputModeWidget)
                         container.removeAllViews()
@@ -805,11 +787,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
         duckAiFireButtonHighlightJob?.cancel()
         duckAiFireButtonHighlightJob = null
         pulseAnimation?.stop()
-        submitEnabledJob?.cancel()
-        submitEnabledJob = null
         editPromptJob?.cancel()
         editPromptJob = null
         widgetRoot = null
+        newLineButton = null
         tearDownChatSuggestions()
     }
 
@@ -859,34 +840,15 @@ class NativeInputModeWidget @JvmOverloads constructor(
         hideInputFieldBackground()
         removeMargins()
         applyTrailingButtonMargin()
-        prepareSubmitButtons()
         configureMainButtonsVisibility()
         configureBottomRowFocusVisibility()
-        hookClearButtonPixel()
         hookEditorActionPixels()
         inputField.doOnTextChanged { _, _, _, _ ->
             // Only publish once attached: the ViewModel is resolved from the view tree, and the host
             // can set text before the widget is added (e.g. omnibar prefill). configure() re-pushes a
             // snapshot on attach, so the pre-attach value is not lost.
             if (isAttachedToWindow) viewModel.setHasText(inputField.text?.isNotEmpty() == true)
-            updateSendButtonVisibility()
-            updateVoiceButtonVisibility()
             updateNewLineButtonVisibility()
-        }
-    }
-
-    /**
-     * Re-wraps the clear-button click listener (originally set by the base class in init) to also
-     * fire the omnibar clear pixel. We replace rather than stack because [View.setOnClickListener]
-     * replaces existing listeners; preserving base-class behaviour manually keeps the contract clear.
-     */
-    private fun hookClearButtonPixel() {
-        inputFieldClearText.setOnClickListener {
-            inputField.text.clear()
-            inputField.setSelection(0)
-            inputField.scrollTo(0, 0)
-            onClearTextTapped?.invoke()
-            viewModel.fireClearPressed(isSearchMode())
         }
     }
 
@@ -896,7 +858,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
      * return true exactly when the base class would (IME_ACTION_GO, or a hardware Enter when the
      * widget submits on hardware Enter), so downstream behaviour is not affected. keyboard_go fires
      * for both submit triggers, matching the base. (floating_return is the new-line button, wired in
-     * configureSubmitButtons, not a keyboard event.)
+     * setFloatingSubmitContainer, not a keyboard event.)
      */
     private fun hookEditorActionPixels() {
         inputField.setOnEditorActionListener { _, actionId, keyEvent ->
@@ -1026,40 +988,11 @@ class NativeInputModeWidget @JvmOverloads constructor(
         // The host binds voice availability before the widget is attached; publish only once attached
         // (configure() re-pushes a snapshot on attach). The ViewModel is resolved from the view tree.
         if (isAttachedToWindow) viewModel.setVoiceSearchAvailable(available)
-        updateVoiceButtonVisibility()
     }
 
     override fun setVoiceChatAvailable(available: Boolean) {
         voiceChatAvailable = available
         if (isAttachedToWindow) viewModel.setVoiceChatAvailable(available)
-        updateVoiceButtonVisibility()
-    }
-
-    private fun updateVoiceButtonVisibility() {
-        val isBlank = inputField.text.isNullOrBlank() && !hasAttachments
-        setVoiceButtonVisible(!isEditWidget && voiceSearchAvailable && isBlank)
-        val host = voiceHostButtons()
-        host?.setVoiceSearchVisible(false)
-        host?.setVoiceChatVisible(!isEditWidget && voiceChatAvailable && isBlank && !isStreaming)
-    }
-
-    private fun updateSendButtonVisibility() {
-        val hasContent = isStreaming || inputField.text.isNotBlank() || hasAttachments
-        val visible = isChatTabSelected() && hasContent
-        submitButtons?.setSendButtonVisible(visible)
-        if (!isStreaming) {
-            submitButtons?.setSendButtonEnabled(submitAllowed && hasContent && !attachmentLimitExceeded)
-        }
-    }
-
-    private fun updateSendButtonIcon() {
-        if (isStreaming) return
-        val iconResId = if (isDuckAiPageContext()) {
-            R.drawable.ic_arrow_up_24
-        } else {
-            com.duckduckgo.mobile.android.R.drawable.ic_arrow_right_24
-        }
-        submitButtons?.setSendButtonIcon(iconResId)
     }
 
     private fun updateNewLineButtonVisibility() {
@@ -1069,7 +1002,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         // Only the top-bar floating row hosts the new-line button. Bottom-bar mode has no
         // on-screen new-line; carriage return there is the IME enter key while on a Duck.ai
         // page (see `applyChatInputType`: IME_ACTION_NONE + TYPE_TEXT_FLAG_MULTI_LINE).
-        floatingButtons?.setNewLineButtonVisible(visible)
+        newLineButton?.setNewLineVisible(visible)
     }
 
     private fun applyState(incomingState: NativeInputState) {
@@ -1102,7 +1035,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         updateBottomRowVisibility()
         applyVerticalPaddingForFocus()
         updateNewLineButtonVisibility()
-        updateSendButtonIcon()
         applyOmnibarShape()
         if (!isChatTabSelected()) {
             val searchOnly = state.inputMode == NativeInputState.InputMode.SEARCH_ONLY &&
@@ -1190,9 +1122,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         inputField.updateLayoutParams<MarginLayoutParams> {
             marginStart = resources.getDimensionPixelSize(R.dimen.nativeInputFieldStartMargin)
         }
-        inputScreenButtonsContainer.updateLayoutParams<MarginLayoutParams> {
-            marginEnd = 0
-        }
         findViewById<FrameLayout?>(R.id.attachButtonContainer)?.updateLayoutParams<MarginLayoutParams> {
             marginStart = 0
         }
@@ -1202,12 +1131,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         inputModeWidgetLayout.updateLayoutParams<MarginLayoutParams> {
             marginEnd = resources.getDimensionPixelSize(R.dimen.nativeInputModeWidgetMarginHorizontal)
         }
-    }
-
-    private fun prepareSubmitButtons() {
-        configureSubmitButtons()
-        submitButtons?.setSendButtonVisible(false)
-        inputScreenButtonsContainer.visibility = VISIBLE
     }
 
     private fun hideInputFieldBackground() {
@@ -1260,7 +1183,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
     // `setVoice*Available`), but send and new-line have no such external trigger, so without
     // this their visibility stays stale across tab switches.
     private fun refreshTabDependentButtons() {
-        updateSendButtonVisibility()
         updateNewLineButtonVisibility()
     }
 
@@ -1649,6 +1571,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun configureForEdit(sessionId: String) {
         isEditWidget = true
+        // The edit widget publishes to a synthetic session-scoped key (not the browser tab id) so it
+        // never clobbers the omnibar's per-tab state. tabId() must return that same key so the control
+        // plugins read the edit session's state via stateForTab.
+        activeTabId = NativeInputModeWidgetViewModel.editStateKey(sessionId)
         doOnAttach {
             viewModel.configureForEdit(sessionId)
             publishGatingSnapshot()
@@ -1899,17 +1825,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
             .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope ?: return)
     }
 
-    // FE recovery: force-disable the submit button while the active chat's model is unavailable.
-    private fun observeSubmitEnabled() {
-        submitEnabledJob?.cancel()
-        submitEnabledJob = viewModel.submitEnabled
-            .onEach { enabled ->
-                submitAllowed = enabled
-                updateSendButtonVisibility()
-            }
-            .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope ?: return)
-    }
-
     // The edit screen hosts its own instance of this widget (see configureForEdit); that instance
     // must not re-open itself when the FE asks the original tab's widget to launch the edit screen.
     private fun observeEditPromptRequests() {
@@ -1979,32 +1894,37 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     private fun setChatStreaming(streaming: Boolean) {
         isStreaming = streaming
-        configureSubmitButtons()
         if (!streaming) {
-            submitButtons?.showSendButton()
             applyTabUi()
-            floatingSubmitContainer?.visibility = if (attachmentLimitExceeded) GONE else VISIBLE
         }
         updateBottomRowVisibility()
-        updateSendButtonVisibility()
-        updateVoiceButtonVisibility()
         updateNewLineButtonVisibility()
     }
 
     private fun applyTabUi() {
         val isChatTab = inputModeSwitch.selectedTabPosition == 1
-        updateSendButtonIcon()
         if (isChatTab) {
             inputField.minLines = 1
             inputField.maxLines = MAX_LINES
         }
-        updateSendButtonVisibility()
         updateNewLineButtonVisibility()
         updateBottomRowVisibility()
     }
 
     override fun setFloatingSubmitContainer(container: ViewGroup) {
         floatingSubmitContainer = container
+        if (newLineButton == null) {
+            val view = NewLineButtonView(context).apply {
+                onNewLineClicked = {
+                    printNewLine()
+                    viewModel.fireFloatingReturnPressed()
+                }
+                setNewLineVisible(false)
+            }
+            container.addView(view)
+            newLineButton = view
+        }
+        updateNewLineButtonVisibility()
     }
 
     override fun submit() {
@@ -2030,6 +1950,27 @@ class NativeInputModeWidget @JvmOverloads constructor(
         onStopTapped?.invoke()
     }
 
+    override fun clearInput() {
+        inputField.text.clear()
+        inputField.setSelection(0)
+        inputField.scrollTo(0, 0)
+        onClearTextTapped?.invoke()
+        viewModel.fireClearPressed(isSearchMode())
+    }
+
+    override fun onSubmitClicked() {
+        submitMessage(message = null)
+        viewModel.fireFloatingSubmitPressed(isSearchMode())
+    }
+
+    override fun onVoiceSearchClicked() {
+        voiceSearchClickWithPixel()
+    }
+
+    override fun onVoiceChatClicked() {
+        voiceChatClickWithPixel()
+    }
+
     override fun showAttachmentChooser(showing: Boolean) {
         onAttachmentChooserStateChanged?.invoke(showing)
     }
@@ -2039,15 +1980,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
         limitExceeded: Boolean,
         supportsUpload: Boolean,
     ) {
-        val hadLimitError = attachmentLimitExceeded
         attachmentLimitExceeded = limitExceeded
         this.hasAttachments = hasAttachments
         if (isAttachedToWindow) viewModel.setAttachmentState(hasAttachments = hasAttachments, limitExceeded = limitExceeded)
-        if (hadLimitError != attachmentLimitExceeded && !isStreaming) {
-            floatingSubmitContainer?.visibility = if (attachmentLimitExceeded) GONE else VISIBLE
-        }
-        updateSendButtonVisibility()
-        updateVoiceButtonVisibility()
     }
 
     override fun modelMenuShown() {
@@ -2100,48 +2035,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
     override fun showReasoningPicker(showing: Boolean) {
         findViewById<FrameLayout?>(R.id.reasoningModePickerContainer)?.isVisible = showing
     }
-
-    private fun configureSubmitButtons() {
-        if (submitButtons == null) {
-            val buttons = InputScreenButtons(
-                context = context,
-                useTopBar = false,
-                layoutResId = R.layout.view_native_input_screen_buttons,
-            ).apply {
-                onSendClick = {
-                    submitMessage(message = null)
-                    viewModel.fireFloatingSubmitPressed(isSearchMode())
-                }
-                onStopClick = { this@NativeInputModeWidget.stop() }
-                onVoiceChatClick = voiceChatClickWithPixel
-                setSendButtonVisible(false)
-                setNewLineButtonVisible(false)
-            }
-            inputScreenButtonsContainer.addView(buttons)
-            submitButtons = buttons
-        }
-
-        val floating = floatingSubmitContainer
-        if (floating != null && floatingButtons == null) {
-            val buttons = InputScreenButtons(
-                context = context,
-                useTopBar = true,
-                layoutResId = R.layout.view_native_input_screen_floating_buttons,
-            ).apply {
-                onNewLineClick = {
-                    printNewLine()
-                    viewModel.fireFloatingReturnPressed()
-                }
-                setSendButtonVisible(false)
-                setNewLineButtonVisible(false)
-            }
-            floating.addView(buttons)
-            floatingButtons = buttons
-        }
-        updateVoiceButtonVisibility()
-    }
-
-    private fun voiceHostButtons(): InputScreenButtons? = submitButtons
 
     private var interactionLocked = false
 

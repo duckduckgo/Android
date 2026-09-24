@@ -20,27 +20,24 @@ import android.content.Context
 import android.view.View
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InputContext
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
-import com.duckduckgo.duckchat.impl.ui.nativeinput.views.StartChatView
+import com.duckduckgo.duckchat.impl.ui.nativeinput.views.VoiceChatView
 import javax.inject.Inject
 
 @ContributesActivePlugin(
     scope = AppScope::class,
     boundType = NativeInputPlugin::class,
-    featureName = "pluginStartChatNativeInput",
+    featureName = "pluginVoiceChatNativeInput",
     parentFeatureName = "pluginPointNativeInput",
 )
-class StartChatNativeInputPlugin @Inject constructor() : NativeInputPlugin {
+class VoiceChatNativeInputPlugin @Inject constructor() : NativeInputPlugin {
 
-    override val containerId: Int = R.id.startChatContainer
+    override val containerId: Int = R.id.voiceChatContainer
 
-    // Search-only address-bar affordance; it has no place in the contextual sheet's Duck.ai composer.
-    override val supportedContexts: Set<InputContext> = setOf(InputContext.BROWSER, InputContext.DUCK_AI)
-
-    override fun createView(context: Context, host: NativeInputHost): View = StartChatView(context).apply {
+    override fun createView(context: Context, host: NativeInputHost): View = VoiceChatView(context).apply {
         this.host = host
+        isEditMode = host.isEditSurface()
     }
 }

@@ -23,6 +23,7 @@ import android.webkit.ValueCallback
 import com.duckduckgo.anvil.annotations.ContributesActivePluginPoint
 import com.duckduckgo.common.utils.plugins.ActivePlugin
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InputContext
 
 /**
  * Communication surface from a plugin back to the host widget. Plugins use it to act on the host
@@ -48,6 +49,18 @@ interface NativeInputHost {
 
     /** Focus the input field, expanding the bottom row so a plugin popup (e.g. the model picker) can anchor to it. */
     fun requestInputFocus()
+
+    /** Clear the input field text (clear-text control). */
+    fun clearInput()
+
+    /** The send button was tapped. */
+    fun onSubmitClicked()
+
+    /** The in-field voice search microphone was tapped. */
+    fun onVoiceSearchClicked()
+
+    /** The voice chat button was tapped. */
+    fun onVoiceChatClicked()
 
     fun attachmentChanged(hasAttachments: Boolean, limitExceeded: Boolean, supportsUpload: Boolean)
 
@@ -97,6 +110,10 @@ interface NativeInputHost {
 interface NativeInputPlugin : ActivePlugin {
 
     val containerId: Int
+
+    /** The input contexts this plugin renders in. Defaults to all; narrow it to skip a plugin on a surface (e.g. start-chat is not shown in the contextual sheet). */
+    val supportedContexts: Set<InputContext>
+        get() = InputContext.entries.toSet()
 
     fun createView(context: Context, host: NativeInputHost): View
 }
