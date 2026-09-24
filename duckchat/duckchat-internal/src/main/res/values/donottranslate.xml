@@ -17,6 +17,8 @@
     <string name="devSettingsDuckAiUsageWarningsDismissalsReset">High-usage dismissals reset</string>
     <string name="devSettingsDuckAiUsageWarningsUsageDismissal">Dismissed usage notice</string>
     <string name="devSettingsDuckAiUsageWarningsUsageDismissalValue" instruction="%1$s is the notice id, %2$s the window (daily or weekly), %3$d the percent band it was dismissed at">%1$s, %2$s window, dismissed at %3$d%% band</string>
-    <string name="devSettingsDuckAiUsageWarningsResetUsageDismissal">Reset usage notice dismissal</string>
-    <string name="devSettingsDuckAiUsageWarningsUsageDismissalReset">Usage notice dismissal reset</string>
+    <string name="devSettingsDuckAiUsageWarningsUsageActedOn">Acted-on usage snapshot</string>
+    <string name="devSettingsDuckAiUsageWarningsUsageActedOnRecorded">Recorded. Card hidden until the snapshot changes</string>
+    <string name="devSettingsDuckAiUsageWarningsResetUsageDismissal">Reset usage notice state</string>
+    <string name="devSettingsDuckAiUsageWarningsUsageDismissalReset">Usage notice dismissal and acted-on state reset</string>
 </resources>

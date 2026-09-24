@@ -60,6 +60,7 @@ import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterContext
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterCoordinator
+import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterHost
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelPageType
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
@@ -357,8 +358,17 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         footerInputFocused.value = focused
     }
 
-    fun footerState(context: Context): Flow<NativeInputFooterCoordinator.State> =
-        footerCoordinator.state(context, footerContext)
+    fun footerState(
+        context: Context,
+        host: NativeInputFooterHost,
+    ): Flow<NativeInputFooterCoordinator.State> = footerCoordinator.state(context, footerContext, host)
+
+    fun selectModelById(modelId: String) {
+        val model = modelManager.modelState.value.models.firstOrNull { it.id == modelId } ?: return
+        viewModelScope.launch { modelManager.selectModel(model) }
+    }
+
+    fun hasActiveChat(): Boolean = currentInputState()?.chatId != null
 
     private val baseState: Flow<NativeInputState> = combine(
         duckAiFeatureState.showSettings,

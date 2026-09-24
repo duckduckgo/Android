@@ -23,6 +23,20 @@ data class UsageNoticeDismissal(
     val band: Int,
 )
 
+data class UsageNoticeActedOn(
+    val noticeId: UsageNoticeId,
+    val window: UsageWindow,
+    val resetsAtMillis: Long,
+    val percentUsed: Int,
+) {
+    fun applies(notice: UsageNotice): Boolean =
+        noticeId == notice.id && window == notice.window && resetsAtMillis == notice.resetsAtMillis && percentUsed == notice.percentUsed
+
+    companion object {
+        fun of(notice: UsageNotice) = UsageNoticeActedOn(notice.id, notice.window, notice.resetsAtMillis, notice.percentUsed)
+    }
+}
+
 object UsageNoticeBand {
     private val THRESHOLDS = listOf(90, 75, 50)
 

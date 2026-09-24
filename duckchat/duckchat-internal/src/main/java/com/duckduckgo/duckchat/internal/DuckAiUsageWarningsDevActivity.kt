@@ -85,7 +85,16 @@ class DuckAiUsageWarningsDevActivity : DuckDuckGoActivity() {
                 ?.joinToString(separator = "\n")
                 ?: getString(R.string.devSettingsDuckAiUsageWarningsNoDismissals),
         )
-        binding.resetUsageNoticeDismissal.isEnabled = viewState.usageNoticeDismissals.isNotEmpty()
+        binding.usageNoticeActedOn.setSecondaryText(
+            getString(
+                if (viewState.usageNoticeActedOn != null) {
+                    R.string.devSettingsDuckAiUsageWarningsUsageActedOnRecorded
+                } else {
+                    R.string.devSettingsDuckAiUsageWarningsNoDismissals
+                },
+            ),
+        )
+        binding.resetUsageNoticeDismissal.isEnabled = viewState.usageNoticeDismissals.isNotEmpty() || viewState.usageNoticeActedOn != null
     }
 
     private fun processCommand(command: Command) {

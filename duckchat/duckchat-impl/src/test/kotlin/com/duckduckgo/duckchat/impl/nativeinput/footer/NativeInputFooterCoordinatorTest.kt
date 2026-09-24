@@ -52,7 +52,7 @@ class NativeInputFooterCoordinatorTest {
             plugin(priority = 10, footer = footer(view = higherPriorityView, visible = true)),
         )
 
-        testee.state(context, hostContext).test {
+        testee.state(context, hostContext, FakeNativeInputFooterHost()).test {
             assertSame(higherPriorityView, awaitItem().view)
             cancelAndIgnoreRemainingEvents()
         }
@@ -68,7 +68,7 @@ class NativeInputFooterCoordinatorTest {
             plugin(priority = 20, footer = footer(view = fallbackView, visible = true)),
         )
 
-        testee.state(context, hostContext).test {
+        testee.state(context, hostContext, FakeNativeInputFooterHost()).test {
             assertSame(selectedView, awaitItem().view)
 
             selectedState.value = NativeInputFooterState(visible = false)
@@ -85,7 +85,7 @@ class NativeInputFooterCoordinatorTest {
             plugin(priority = 20, footer = footer(view = mock(), visible = false)),
         )
 
-        testee.state(context, hostContext).test {
+        testee.state(context, hostContext, FakeNativeInputFooterHost()).test {
             val state = awaitItem()
 
             assertNull(state.view)
@@ -107,7 +107,7 @@ class NativeInputFooterCoordinatorTest {
             plugin(priority = 20, footer = footer(view = mock(), state = selectedState)),
         )
 
-        testee.state(context, hostContext).test {
+        testee.state(context, hostContext, FakeNativeInputFooterHost()).test {
             assertTrue(awaitItem().blocksComposer)
 
             selectedState.value = NativeInputFooterState(
@@ -136,7 +136,7 @@ class NativeInputFooterCoordinatorTest {
             plugin(priority = 20, footer = unselectedFooter),
         )
 
-        testee.state(context, hostContext).test {
+        testee.state(context, hostContext, FakeNativeInputFooterHost()).test {
             assertSame(selectedView, awaitItem().view)
             assertFalse(unselectedViewAccessed)
             cancelAndIgnoreRemainingEvents()
@@ -156,6 +156,7 @@ class NativeInputFooterCoordinatorTest {
         override fun createFooter(
             context: Context,
             hostContext: StateFlow<NativeInputFooterContext>,
+            host: NativeInputFooterHost,
         ): NativeInputFooter = footer
     }
 

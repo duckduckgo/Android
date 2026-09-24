@@ -95,6 +95,8 @@ class NativeInputCallbacks(
     val onDuckAiQuerySubmitted: (query: String, entryPoint: DuckChatEntryPoint) -> Unit = { _, _ -> },
     /** User picked a model in the native picker (→ submitChangeModelAction). */
     val onChangeModelSubmitted: (modelId: String) -> Unit = {},
+    /** User tapped "Start using weekly limit" on the usage card (→ submitStartUsingWeeklyLimitAction). */
+    val onStartUsingWeeklyLimit: () -> Unit = {},
     val onCustomizeResponsesClicked: () -> Unit = {},
     val onChatUrlSuggestionClicked: (AutoCompleteSuggestion) -> Unit = {},
     val onChatHistoryShortcutClicked: () -> Unit = {},
@@ -763,6 +765,7 @@ class RealNativeInputManager @Inject constructor(
             },
         )
         widget.onChangeModelSubmitted = { modelId -> callbacks.onChangeModelSubmitted(modelId) }
+        widget.onStartUsingWeeklyLimit = { callbacks.onStartUsingWeeklyLimit() }
         widget.onBack = {
             hideNativeInput()
         }

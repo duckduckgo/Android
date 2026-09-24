@@ -59,6 +59,10 @@
     <string name="duckChatUsageLimitFooterWeeklyReachedFree">Weekly limit reached</string>
     <string name="duckChatUsageLimitFooterWeeklyReached">Weekly usage limit reached</string>
     <string name="duckChatUsageLimitFooterAdvancedModelsReached">Advanced AI models limit reached</string>
+    <string name="duckChatUsageLimitFooterCtaSwitchModel">Switch Model</string>
+    <string name="duckChatUsageLimitFooterCtaStartUsingWeeklyLimit">Start using weekly limit</string>
+    <string name="duckChatUsageLimitFooterCtaTryForFree">Try for Free</string>
+    <string name="duckChatUsageLimitFooterCtaSubscribe">Subscribe</string>
     <string name="duckChatUsageLimitFooterResetsIn" instruction="Placeholder is a duration such as '2 days' or '5 hours'">Resets in %1$s</string>
     <plurals name="duckChatUsageLimitFooterDays">
         <item quantity="one" instruction="%1$d is the number of whole days until the usage limit resets">%1$d day</item>
