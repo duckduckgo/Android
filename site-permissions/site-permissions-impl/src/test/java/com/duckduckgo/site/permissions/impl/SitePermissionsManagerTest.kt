@@ -368,6 +368,25 @@ class SitePermissionsManagerTest {
     }
 
     @Test
+    fun whenClearForDomainsButFireproofThenDeleteOnlyNonFireproofHostsUnderThoseDomains() = runTest {
+        whenever(mockSitePermissionsRepository.sitePermissionsForAllWebsites()).thenReturn(
+            listOf(
+                SitePermissionsEntity("maps.example.com"),
+                SitePermissionsEntity("www.example.com"),
+                SitePermissionsEntity("other.com"),
+                SitePermissionsEntity("192.168.1.1"),
+            ),
+        )
+
+        testee.clearForDomainsButFireproof(setOf("example.com", "192.168.1.1"), listOf("www.example.com"))
+
+        verify(mockSitePermissionsRepository).deletePermissionsForSite("maps.example.com")
+        verify(mockSitePermissionsRepository).deletePermissionsForSite("192.168.1.1")
+        verify(mockSitePermissionsRepository, never()).deletePermissionsForSite("www.example.com")
+        verify(mockSitePermissionsRepository, never()).deletePermissionsForSite("other.com")
+    }
+
+    @Test
     fun whenClearAllButFireproofThenDrmSessionChoicesAreCleared() = runTest {
         drmSessionStore.save(tabId, "domain.com", true)
         whenever(mockSitePermissionsRepository.sitePermissionsForAllWebsites()).thenReturn(emptyList())

@@ -25,6 +25,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.location.LocationManagerCompat
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.toTldPlusOneOrSelf
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
@@ -144,6 +145,14 @@ class SitePermissionsManagerImpl @Inject constructor(
         drmSessionStore.clear()
         sitePermissionsRepository.sitePermissionsForAllWebsites().forEach { permission ->
             if (!fireproofDomains.contains(permission.domain)) {
+                sitePermissionsRepository.deletePermissionsForSite(permission.domain)
+            }
+        }
+    }
+
+    override suspend fun clearForDomainsButFireproof(domains: Set<String>, fireproofDomains: List<String>) {
+        sitePermissionsRepository.sitePermissionsForAllWebsites().forEach { permission ->
+            if (permission.domain.toTldPlusOneOrSelf() in domains && permission.domain !in fireproofDomains) {
                 sitePermissionsRepository.deletePermissionsForSite(permission.domain)
             }
         }

@@ -186,12 +186,11 @@ class ClearPersonalDataAction(
         }
 
         return try {
-            // Keep fireproofed sites out of the burn; host-fallback key so IPs/localhost are retained too.
-            val fireproofDomains = withContext(dispatchers.io()) {
-                fireproofWebsiteRepository.fireproofWebsitesSync()
-                    .map { it.domain.toTldPlusOneOrSelf() }
-                    .toSet()
+            // Keep fireproofed sites out of the burn; host-fallback key so IPs/localhost are retained too
+            val fireproofHosts = withContext(dispatchers.io()) {
+                fireproofWebsiteRepository.fireproofWebsitesSync().map { it.domain }
             }
+            val fireproofDomains = fireproofHosts.map { it.toTldPlusOneOrSelf() }.toSet()
 
             val domainsToClear = domains
                 .filter { !duckDuckGoDomains.contains(it) && !fireproofDomains.contains(it) }
@@ -205,6 +204,8 @@ class ClearPersonalDataAction(
                 logcat(INFO) { "Cleared site data for ${domains.size} domains" }
             }
 
+            // Raw fireproof hosts (not eTLD+1) to match full fire (only the exact fireproofed host keeps its permissions)
+            sitePermissionsManager.clearForDomainsButFireproof(domains, fireproofHosts)
             sitePreferencesDataClearer.clear(domainsToClear)
 
             ClearDataResult.Success
