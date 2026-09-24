@@ -421,6 +421,24 @@ class UsageLimitFooterPluginTest {
         }
     }
 
+    @Test
+    fun whenWeeklyHandoffWriteFailsThenNothingCrashesAndCardIsNotActedOn() = runTest {
+        whenever(settingsDao.upsert(any())).thenThrow(RuntimeException("disk full"))
+        val entries = listOf(UsageCtaPutEntry("k", "v"))
+        snapshot.value = reached().copy(cta = UsageCta(UsageCtaId.BYPASS_WEEKLY, null, emptyList(), emptyMap(), entries))
+        val footer = testee.createFooter(context, hostContext, host)
+
+        footer.state.test {
+            assertTrue(awaitItem().visible)
+
+            footer.view.findViewById<DaxButtonSecondary>(R.id.usageLimitFooterCta).performClick()
+
+            verify(dismissalStore, never()).markActedOn(any())
+            assertEquals(0, host.startUsingWeeklyLimitCalls)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
     private fun switchCta(vararg modelIds: String) =
         UsageCta(UsageCtaId.SWITCH_TO_CHEAPER, modelId = null, modelIds = modelIds.toList(), byModelId = emptyMap(), putEntries = emptyList())
 

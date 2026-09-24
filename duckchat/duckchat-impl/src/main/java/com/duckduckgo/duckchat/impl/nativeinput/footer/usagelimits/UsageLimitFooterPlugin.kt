@@ -44,6 +44,8 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import logcat.LogPriority.WARN
+import logcat.logcat
 import javax.inject.Inject
 
 @ContributesActivePlugin(
@@ -147,9 +149,16 @@ class UsageLimitFooterPlugin @Inject constructor(
             }
             is ResolvedUsageCta.StartUsingWeeklyLimit -> appCoroutineScope.launch {
                 // The page hydrates these entries before its next request; they are written as supplied.
-                withContext(dispatchers.io()) {
-                    val settings = storageProvider.forMode(BrowserMode.REGULAR).settings
-                    cta.putEntries.forEach { entry -> settings.upsert(DuckAiBridgeSettingEntity(key = entry.key, value = entry.value)) }
+                val written = runCatching {
+                    withContext(dispatchers.io()) {
+                        val settings = storageProvider.forMode(BrowserMode.REGULAR).settings
+                        cta.putEntries.forEach { entry -> settings.upsert(DuckAiBridgeSettingEntity(key = entry.key, value = entry.value)) }
+                    }
+                }
+                // Without the entries the handoff would not take; leave the card up so the user can retry.
+                if (written.isFailure) {
+                    logcat(WARN) { "Duck.ai usage limits: weekly handoff write failed: ${written.exceptionOrNull()?.message}" }
+                    return@launch
                 }
                 dismissalStore.markActedOn(snapshot.notice)
                 withContext(dispatchers.main()) { host.startUsingWeeklyLimit() }
