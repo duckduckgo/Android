@@ -33,10 +33,6 @@ class SubscriptionOnboardingPirStepViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 
-    /**
-     * Called when the user comes back from the PIR flow: reports the step completed if they started a scan
-     * (they stored at least one profile query). A no-op otherwise, so the step stays available.
-     */
     suspend fun completeIfScanStarted() {
         val scanStarted = withContext(dispatcherProvider.io()) {
             pirRepository.getAllUserProfileQueries().isNotEmpty()
