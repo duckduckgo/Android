@@ -21,6 +21,7 @@ import android.graphics.Typeface
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.ImageView
+import com.duckduckgo.common.ui.view.button.DaxButtonSecondary
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.duckchat.impl.R
@@ -38,6 +39,7 @@ class UsageLimitFooterView @JvmOverloads constructor(
     private val alert: ImageView
     private val title: DaxTextView
     private val resetText: DaxTextView
+    private val cta: DaxButtonSecondary
     private val dismiss: ImageView
 
     init {
@@ -61,15 +63,20 @@ class UsageLimitFooterView @JvmOverloads constructor(
             setTypeface(typeface, Typeface.BOLD)
         }
         resetText = findViewById(R.id.usageLimitFooterResetText)
+        cta = findViewById(R.id.usageLimitFooterCta)
         dismiss = findViewById(R.id.usageLimitFooterDismiss)
     }
 
     fun render(
         message: UsageLimitFooterMessage,
         onDismiss: () -> Unit,
+        onCta: () -> Unit = {},
     ) {
         title.text = message.title
         resetText.text = message.resetText
+        cta.visibility = if (message.ctaLabel != null) VISIBLE else GONE
+        cta.text = message.ctaLabel
+        cta.setOnClickListener { onCta() }
         when (val icon = message.icon) {
             is Icon.Ring -> {
                 ring.visibility = VISIBLE

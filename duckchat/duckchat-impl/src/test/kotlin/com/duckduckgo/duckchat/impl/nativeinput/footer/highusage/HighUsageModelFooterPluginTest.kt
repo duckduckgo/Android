@@ -32,6 +32,7 @@ import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ModelState
+import com.duckduckgo.duckchat.impl.nativeinput.footer.FakeNativeInputFooterHost
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterContext
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -67,6 +68,7 @@ class HighUsageModelFooterPluginTest {
     private val modelManager: DuckAiModelManager = mock()
     private val feature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java, ioDispatcher = coroutineRule.testDispatcher)
     private val hostContext = MutableStateFlow(duckAiContext())
+    private val host = FakeNativeInputFooterHost()
     private lateinit var dataStore: DataStore<Preferences>
     private lateinit var testee: HighUsageModelFooterPlugin
 
@@ -83,7 +85,7 @@ class HighUsageModelFooterPluginTest {
 
     @Test
     fun whenSelectedModelChangesThenFooterVisibilityUpdates() = runTest {
-        val footer = testee.createFooter(context, hostContext)
+        val footer = testee.createFooter(context, hostContext, host)
 
         footer.state.test {
             assertFalse(awaitItem().visible)
@@ -98,7 +100,7 @@ class HighUsageModelFooterPluginTest {
     @Test
     fun whenHostContextChangesThenFooterVisibilityUpdates() = runTest {
         modelState.value = highUsageModel()
-        val footer = testee.createFooter(context, hostContext)
+        val footer = testee.createFooter(context, hostContext, host)
 
         footer.state.test {
             assertTrue(awaitItem().visible)
@@ -113,7 +115,7 @@ class HighUsageModelFooterPluginTest {
     @Test
     fun whenInputFocusChangesThenFooterVisibilityUpdates() = runTest {
         modelState.value = highUsageModel()
-        val footer = testee.createFooter(context, hostContext)
+        val footer = testee.createFooter(context, hostContext, host)
 
         footer.state.test {
             assertTrue(awaitItem().visible)
@@ -128,7 +130,7 @@ class HighUsageModelFooterPluginTest {
     @Test
     fun whenUsageWarningsFeatureIsDisabledThenVisibleFooterHidesWithoutOtherStateChanging() = runTest {
         modelState.value = highUsageModel()
-        val footer = testee.createFooter(context, hostContext)
+        val footer = testee.createFooter(context, hostContext, host)
 
         footer.state.test {
             assertTrue(awaitItem().visible)
@@ -144,7 +146,7 @@ class HighUsageModelFooterPluginTest {
     fun whenUsageWarningsFeatureIsEnabledThenHiddenFooterShowsWithoutOtherStateChanging() = runTest {
         feature.duckAiUsageWarnings().setRawStoredState(Toggle.State(enable = false))
         modelState.value = highUsageModel()
-        val footer = testee.createFooter(context, hostContext)
+        val footer = testee.createFooter(context, hostContext, host)
 
         footer.state.test {
             assertFalse(awaitItem().visible)
@@ -170,7 +172,7 @@ class HighUsageModelFooterPluginTest {
         val testee = plugin(dismissalStore)
         modelState.value = highUsageModel()
         hostContext.value = duckAiContext(isFireMode = true)
-        val footer = testee.createFooter(context, hostContext)
+        val footer = testee.createFooter(context, hostContext, host)
 
         footer.state.test {
             assertFalse(awaitItem().visible)
@@ -194,7 +196,7 @@ class HighUsageModelFooterPluginTest {
         )
         val testee = plugin(dismissalStore)
         modelState.value = highUsageModel()
-        val footer = testee.createFooter(context, hostContext)
+        val footer = testee.createFooter(context, hostContext, host)
 
         footer.state.test {
             assertFalse(awaitItem().visible)
@@ -211,7 +213,7 @@ class HighUsageModelFooterPluginTest {
     @Test
     fun whenHighUsageModelIsVisibleThenMessageUsesSelectedModelShortName() = runTest {
         modelState.value = highUsageModel(shortName = "Opus")
-        val footer = testee.createFooter(context, hostContext)
+        val footer = testee.createFooter(context, hostContext, host)
 
         assertTrue(footer.state.first().visible)
 
@@ -224,7 +226,7 @@ class HighUsageModelFooterPluginTest {
     @Test
     fun whenNoticeIsDismissedThenCurrentAndFutureFootersAreHidden() = runTest {
         modelState.value = highUsageModel()
-        val footer = testee.createFooter(context, hostContext)
+        val footer = testee.createFooter(context, hostContext, host)
 
         footer.state.test {
             assertTrue(awaitItem().visible)
@@ -235,7 +237,7 @@ class HighUsageModelFooterPluginTest {
             cancelAndIgnoreRemainingEvents()
         }
 
-        assertFalse(testee.createFooter(context, hostContext).state.first().visible)
+        assertFalse(testee.createFooter(context, hostContext, host).state.first().visible)
     }
 
     @Test
@@ -244,7 +246,7 @@ class HighUsageModelFooterPluginTest {
         whenever(dismissalStore.dismissedModelIds).thenReturn(MutableStateFlow(emptySet()))
         val testee = plugin(dismissalStore)
         modelState.value = highUsageModel()
-        val footer = testee.createFooter(context, hostContext)
+        val footer = testee.createFooter(context, hostContext, host)
 
         footer.state.test {
             assertTrue(awaitItem().visible)

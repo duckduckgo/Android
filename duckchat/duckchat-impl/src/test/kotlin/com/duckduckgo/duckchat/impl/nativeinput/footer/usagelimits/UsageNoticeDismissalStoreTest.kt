@@ -29,6 +29,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -110,6 +111,17 @@ class UsageNoticeDismissalStoreTest {
 
         broken.dismiss(approaching(55))
         broken.clear()
+    }
+
+    @Test
+    fun whenNoticeIsMarkedActedOnThenItIsPersistedUntilCleared() = runTest {
+        val notice = approaching(100).copy(reached = true, dismissible = false)
+
+        testee.markActedOn(notice)
+        assertEquals(UsageNoticeActedOn(UsageNoticeId.APPROACHING, UsageWindow.WEEKLY, RESETS_AT, 100), testee.actedOn.first())
+
+        testee.clearActedOn()
+        assertNull(testee.actedOn.first())
     }
 
     @Test

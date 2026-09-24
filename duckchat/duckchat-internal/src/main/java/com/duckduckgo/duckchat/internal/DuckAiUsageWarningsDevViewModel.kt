@@ -21,6 +21,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.impl.nativeinput.footer.highusage.HighUsageModelNoticeDismissalStore
+import com.duckduckgo.duckchat.impl.nativeinput.footer.usagelimits.UsageNoticeActedOn
 import com.duckduckgo.duckchat.impl.nativeinput.footer.usagelimits.UsageNoticeDismissal
 import com.duckduckgo.duckchat.impl.nativeinput.footer.usagelimits.UsageNoticeDismissalStore
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -43,6 +44,7 @@ class DuckAiUsageWarningsDevViewModel @Inject constructor(
     data class ViewState(
         val dismissedModelIds: Set<String> = emptySet(),
         val usageNoticeDismissals: List<UsageNoticeDismissal> = emptyList(),
+        val usageNoticeActedOn: UsageNoticeActedOn? = null,
     )
 
     sealed class Command {
@@ -52,8 +54,13 @@ class DuckAiUsageWarningsDevViewModel @Inject constructor(
     val viewState: StateFlow<ViewState> = combine(
         dismissalStore.dismissedModelIds,
         usageNoticeDismissalStore.dismissals,
-    ) { dismissedModelIds, usageNoticeDismissals ->
-        ViewState(dismissedModelIds = dismissedModelIds, usageNoticeDismissals = usageNoticeDismissals.values.toList())
+        usageNoticeDismissalStore.actedOn,
+    ) { dismissedModelIds, usageNoticeDismissals, usageNoticeActedOn ->
+        ViewState(
+            dismissedModelIds = dismissedModelIds,
+            usageNoticeDismissals = usageNoticeDismissals.values.toList(),
+            usageNoticeActedOn = usageNoticeActedOn,
+        )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 
     private val _commands = Channel<Command>(1, DROP_OLDEST)
@@ -69,6 +76,7 @@ class DuckAiUsageWarningsDevViewModel @Inject constructor(
     fun onResetUsageNoticeDismissalClicked() {
         viewModelScope.launch {
             usageNoticeDismissalStore.clear()
+            usageNoticeDismissalStore.clearActedOn()
             _commands.send(Command.ShowMessage(R.string.devSettingsDuckAiUsageWarningsUsageDismissalReset))
         }
     }

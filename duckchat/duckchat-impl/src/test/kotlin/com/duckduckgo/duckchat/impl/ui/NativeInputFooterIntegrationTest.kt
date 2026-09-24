@@ -24,9 +24,11 @@ import android.view.inputmethod.EditorInfo
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
+import com.duckduckgo.duckchat.impl.nativeinput.footer.FakeNativeInputFooterHost
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooter
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterContext
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterCoordinator
+import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterHost
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterState
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterView
@@ -65,7 +67,7 @@ class NativeInputFooterIntegrationTest {
             plugin(priority = 20, view = fallbackView, state = MutableStateFlow(NativeInputFooterState(visible = true))),
         )
 
-        host.bind(this, coordinator.state(context, hostContext))
+        host.bind(this, coordinator.state(context, hostContext, FakeNativeInputFooterHost()))
         host.attach()
         advanceUntilIdle()
 
@@ -86,7 +88,7 @@ class NativeInputFooterIntegrationTest {
         val footerState = MutableStateFlow(NativeInputFooterState(visible = true))
         val coordinator = coordinator(plugin(priority = 10, view = View(context), state = footerState))
 
-        host.bind(this, coordinator.state(context, MutableStateFlow(duckAiContext())))
+        host.bind(this, coordinator.state(context, MutableStateFlow(duckAiContext()), FakeNativeInputFooterHost()))
         host.attach()
         advanceUntilIdle()
         assertEquals(View.VISIBLE, host.visibility)
@@ -105,7 +107,7 @@ class NativeInputFooterIntegrationTest {
         val host = TestNativeInputFooterView(context)
         val coordinator = coordinator(plugin(priority = 10, view = View(context), state = MutableStateFlow(NativeInputFooterState(visible = true))))
 
-        host.bind(this, coordinator.state(context, MutableStateFlow(duckAiContext())))
+        host.bind(this, coordinator.state(context, MutableStateFlow(duckAiContext()), FakeNativeInputFooterHost()))
         host.attach()
         advanceUntilIdle()
         assertEquals(View.VISIBLE, host.visibility)
@@ -335,6 +337,7 @@ class NativeInputFooterIntegrationTest {
         override fun createFooter(
             context: Context,
             hostContext: StateFlow<NativeInputFooterContext>,
+            host: NativeInputFooterHost,
         ): NativeInputFooter = object : NativeInputFooter {
             override val view: View = view
             override val state: Flow<NativeInputFooterState> = state

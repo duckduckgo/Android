@@ -26,6 +26,7 @@ data class UsageLimitFooterMessage(
     val resetText: String,
     val icon: Icon,
     val dismissible: Boolean,
+    val ctaLabel: String? = null,
 ) {
     sealed class Icon {
         data class Ring(
@@ -45,12 +46,28 @@ class UsageLimitFooterMessageMapper @Inject constructor() {
         notice: UsageNotice,
         nowMillis: Long,
         resources: Resources,
+        resolvedCta: ResolvedUsageCta? = null,
     ): UsageLimitFooterMessage = UsageLimitFooterMessage(
         title = title(notice, resources),
         resetText = resources.getString(R.string.duckChatUsageLimitFooterResetsIn, remaining(notice.resetsAtMillis - nowMillis, resources)),
         icon = if (notice.reached) UsageLimitFooterMessage.Icon.Alert else ring(notice.percentUsed),
         dismissible = notice.dismissible && !notice.reached,
+        ctaLabel = resolvedCta?.let { ctaLabel(it, resources) },
     )
+
+    private fun ctaLabel(
+        cta: ResolvedUsageCta,
+        resources: Resources,
+    ): String = when (cta) {
+        is ResolvedUsageCta.SwitchModel -> resources.getString(R.string.duckChatUsageLimitFooterCtaSwitchModel)
+        is ResolvedUsageCta.StartUsingWeeklyLimit -> resources.getString(R.string.duckChatUsageLimitFooterCtaStartUsingWeeklyLimit)
+        is ResolvedUsageCta.Subscribe ->
+            if (cta.freeTrialEligible) {
+                resources.getString(R.string.duckChatUsageLimitFooterCtaTryForFree)
+            } else {
+                resources.getString(R.string.duckChatUsageLimitFooterCtaSubscribe)
+            }
+    }
 
     private fun title(
         notice: UsageNotice,

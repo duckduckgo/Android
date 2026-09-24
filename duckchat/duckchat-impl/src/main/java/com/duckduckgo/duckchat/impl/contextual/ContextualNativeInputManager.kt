@@ -314,6 +314,16 @@ class RealContextualNativeInputManager @Inject constructor(
             .launchIn(lifecycleOwner.lifecycleScope)
     }
 
+    private fun sendStartUsingWeeklyLimitEvent() {
+        jsMessaging?.sendSubscriptionEvent(
+            SubscriptionEventData(
+                featureName = RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME,
+                subscriptionName = "submitStartUsingWeeklyLimitAction",
+                params = JSONObject().put("platform", "android"),
+            ),
+        )
+    }
+
     private fun sendStopEvent() {
         jsMessaging?.sendSubscriptionEvent(
             SubscriptionEventData(

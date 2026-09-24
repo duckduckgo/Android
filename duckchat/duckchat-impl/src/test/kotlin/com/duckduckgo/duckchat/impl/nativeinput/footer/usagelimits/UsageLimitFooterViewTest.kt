@@ -22,6 +22,7 @@ import android.view.View
 import android.widget.ImageView
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.common.ui.view.button.DaxButtonSecondary
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.nativeinput.footer.usagelimits.UsageLimitFooterMessage.Icon
@@ -62,6 +63,26 @@ class UsageLimitFooterViewTest {
         assertEquals(View.GONE, testee.findViewById<UsageRingView>(R.id.usageLimitFooterRing).visibility)
         assertEquals(View.VISIBLE, testee.findViewById<ImageView>(R.id.usageLimitFooterAlert).visibility)
         assertEquals(View.GONE, testee.findViewById<ImageView>(R.id.usageLimitFooterDismiss).visibility)
+    }
+
+    @Test
+    fun whenMessageHasACtaLabelThenButtonShowsItAndClickInvokesCallback() {
+        var clicked = false
+        testee.render(approaching().copy(ctaLabel = "Switch Model"), onDismiss = {}, onCta = { clicked = true })
+
+        val button = testee.findViewById<DaxButtonSecondary>(R.id.usageLimitFooterCta)
+        assertEquals(View.VISIBLE, button.visibility)
+        assertEquals("Switch Model", button.text.toString())
+
+        button.performClick()
+        assertTrue(clicked)
+    }
+
+    @Test
+    fun whenMessageHasNoCtaThenButtonIsHidden() {
+        testee.render(approaching(), onDismiss = {})
+
+        assertEquals(View.GONE, testee.findViewById<DaxButtonSecondary>(R.id.usageLimitFooterCta).visibility)
     }
 
     @Test
