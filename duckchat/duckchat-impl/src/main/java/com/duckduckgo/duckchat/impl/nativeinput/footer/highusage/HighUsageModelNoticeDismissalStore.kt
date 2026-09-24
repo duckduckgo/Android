@@ -44,6 +44,10 @@ class HighUsageModelNoticeDismissalStore @Inject constructor(
         }
     }
 
+    suspend fun clear() {
+        store.edit { preferences -> preferences.remove(DUCK_AI_HIGH_USAGE_NOTICE_DISMISSED_MODELS) }
+    }
+
     private companion object {
         val DUCK_AI_HIGH_USAGE_NOTICE_DISMISSED_MODELS =
             stringSetPreferencesKey("DUCK_AI_HIGH_USAGE_NOTICE_DISMISSED_MODELS")
