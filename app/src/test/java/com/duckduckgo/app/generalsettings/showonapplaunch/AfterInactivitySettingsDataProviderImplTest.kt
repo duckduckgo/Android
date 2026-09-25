@@ -25,10 +25,6 @@ import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchO
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.SpecificPage
 import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchOptionDataStore
 import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchOptionPrefsDataStore
-import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_AFTER_INACTIVITY_TIMEOUT_CHANGED
-import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -50,7 +46,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 
 class AfterInactivitySettingsDataProviderImplTest {
 
@@ -69,7 +64,6 @@ class AfterInactivitySettingsDataProviderImplTest {
     private val ntpAfterIdleManager: NtpAfterIdleManager = mock {
         on { returnToLastTabEnabled }.thenReturn(shortcutEnabled)
     }
-    private val pixel: Pixel = mock()
     private val urlConverter: UrlConverter = mock {
         on { convertUrl(any()) }.thenAnswer { invocation -> "https://${invocation.arguments[0]}/" }
     }
@@ -86,7 +80,6 @@ class AfterInactivitySettingsDataProviderImplTest {
         RealIdleThresholdResolver(browserConfigFeature),
         urlConverter,
         ntpAfterIdleManager,
-        pixel,
     )
 
     @Test
@@ -114,7 +107,7 @@ class AfterInactivitySettingsDataProviderImplTest {
                 awaitItem(),
             )
 
-            settingsDataStore.userSelectedIdleThresholdSeconds = 60L
+            testee.setDestination(AfterInactivityReturnDestination.NewTabPage(selectedTimeoutSeconds = 60L))
             assertEquals(
                 AfterInactivitySettings.NewTabPage(
                     effectiveTimeoutSeconds = 60L,
@@ -154,95 +147,36 @@ class AfterInactivitySettingsDataProviderImplTest {
     }
 
     @Test
-    fun whenNewTabPageCommandContainsTimeoutThenItPersistsOnlyThatFieldWithoutOptionPixels() = coroutineTestRule.testScope.runTest {
-        whenever(optionDataStore.hasOptionSelected()).thenReturn(true)
+    fun whenNewTabPageCommandContainsTimeoutThenItPersistsOnlyThatField() = coroutineTestRule.testScope.runTest {
+        optionFlow.value = NewTabPage
 
         testee.setDestination(AfterInactivityReturnDestination.NewTabPage(selectedTimeoutSeconds = 60L))
 
         verify(optionDataStore).setShowOnAppLaunchOption(NewTabPage)
         assertEquals(60L, settingsDataStore.userSelectedIdleThresholdSeconds)
         verify(ntpAfterIdleManager).onIdleTimeoutSelected(60L)
-        verify(pixel).fire(
-            SETTINGS_AFTER_INACTIVITY_TIMEOUT_CHANGED,
-            mapOf("selectedSeconds" to "60"),
-        )
-        verify(pixel, never()).fire(ShowOnAppLaunchPixelName.LAUNCH_OPTION_NEW_TAB_PAGE, type = Count)
-        verify(pixel, never()).fire(ShowOnAppLaunchPixelName.LAUNCH_OPTION_NEW_TAB_PAGE_DAILY, type = Daily())
     }
 
     @Test
-    fun whenNewTabPageCommandContainsShortcutThenItPersistsOnlyThatFieldAndItsPixels() = coroutineTestRule.testScope.runTest {
-        whenever(optionDataStore.hasOptionSelected()).thenReturn(true)
+    fun whenNewTabPageCommandContainsShortcutThenItPersistsOnlyThatField() = coroutineTestRule.testScope.runTest {
+        optionFlow.value = NewTabPage
 
         testee.setDestination(AfterInactivityReturnDestination.NewTabPage(returnToLastTabShortcutEnabled = false))
 
         verify(ntpAfterIdleManager).setReturnToLastTabEnabled(false)
         verify(ntpAfterIdleManager, never()).onIdleTimeoutSelected(any())
         assertNull(settingsDataStore.userSelectedIdleThresholdSeconds)
-        verify(pixel).fire(ShowOnAppLaunchPixelName.LAST_TAB_SHORTCUT_SETTING_DISABLED, type = Count)
-        verify(pixel).fire(ShowOnAppLaunchPixelName.LAST_TAB_SHORTCUT_SETTING_DISABLED_DAILY, type = Daily())
-        verify(pixel, never()).fire(ShowOnAppLaunchPixelName.LAUNCH_OPTION_NEW_TAB_PAGE, type = Count)
     }
 
     @Test
     fun whenSpecificPageCommandContainsTimeoutThenItPersistsTimeoutAndNotifiesIdleManager() = coroutineTestRule.testScope.runTest {
-        whenever(optionDataStore.hasOptionSelected()).thenReturn(true)
+        optionFlow.value = SpecificPage("https://example.com/", null)
 
         testee.setDestination(AfterInactivityReturnDestination.SpecificPage("example.com", selectedTimeoutSeconds = 600L))
 
         verify(optionDataStore).setShowOnAppLaunchOption(SpecificPage("https://example.com/"))
         assertEquals(600L, settingsDataStore.userSelectedIdleThresholdSeconds)
         verify(ntpAfterIdleManager).onIdleTimeoutSelected(600L)
-        verify(pixel).fire(
-            SETTINGS_AFTER_INACTIVITY_TIMEOUT_CHANGED,
-            mapOf("selectedSeconds" to "600"),
-        )
-    }
-
-    @Test
-    fun whenSpecificPageUrlChangesWithoutChangingDiscriminatorThenItDoesNotFireOptionPixels() = coroutineTestRule.testScope.runTest {
-        optionFlow.value = SpecificPage("https://old.example/", null)
-        whenever(optionDataStore.hasOptionSelected()).thenReturn(true)
-
-        testee.setDestination(AfterInactivityReturnDestination.SpecificPage("new.example"))
-
-        verify(optionDataStore).setShowOnAppLaunchOption(SpecificPage("https://new.example/"))
-        verify(pixel, never()).fire(ShowOnAppLaunchPixelName.LAUNCH_OPTION_SPECIFIC_PAGE, type = Count)
-        verify(pixel, never()).fire(ShowOnAppLaunchPixelName.LAUNCH_OPTION_SPECIFIC_PAGE_DAILY, type = Daily())
-    }
-
-    @Test
-    fun whenSpecificPageUrlIsUnchangedThenItDoesNotFireOptionPixels() = coroutineTestRule.testScope.runTest {
-        optionFlow.value = SpecificPage("https://example.com/", null)
-        whenever(optionDataStore.hasOptionSelected()).thenReturn(true)
-
-        testee.setDestination(AfterInactivityReturnDestination.SpecificPage("example.com"))
-
-        verify(optionDataStore).setShowOnAppLaunchOption(SpecificPage("https://example.com/"))
-        verify(pixel, never()).fire(ShowOnAppLaunchPixelName.LAUNCH_OPTION_SPECIFIC_PAGE, type = Count)
-        verify(pixel, never()).fire(ShowOnAppLaunchPixelName.LAUNCH_OPTION_SPECIFIC_PAGE_DAILY, type = Daily())
-    }
-
-    @Test
-    fun whenExplicitDestinationDiscriminatorChangesThenItFiresOnlyTheDestinationPixelPair() = coroutineTestRule.testScope.runTest {
-        whenever(optionDataStore.hasOptionSelected()).thenReturn(true)
-
-        testee.setDestination(AfterInactivityReturnDestination.LastUsedTab)
-
-        verify(optionDataStore).setShowOnAppLaunchOption(LastOpenedTab)
-        verify(pixel).fire(ShowOnAppLaunchPixelName.LAUNCH_OPTION_LAST_OPENED_TAB, type = Count)
-        verify(pixel).fire(ShowOnAppLaunchPixelName.LAUNCH_OPTION_LAST_OPENED_TAB_DAILY, type = Daily())
-    }
-
-    @Test
-    fun whenImplicitNewTabPageIsPersistedThenItDoesNotFireDestinationPixels() = coroutineTestRule.testScope.runTest {
-        whenever(optionDataStore.hasOptionSelected()).thenReturn(false)
-
-        testee.setDestination(AfterInactivityReturnDestination.NewTabPage())
-
-        verify(optionDataStore).setShowOnAppLaunchOption(NewTabPage)
-        verify(pixel, never()).fire(ShowOnAppLaunchPixelName.LAUNCH_OPTION_NEW_TAB_PAGE, type = Count)
-        verify(pixel, never()).fire(ShowOnAppLaunchPixelName.LAUNCH_OPTION_NEW_TAB_PAGE_DAILY, type = Daily())
     }
 
     private fun setRemoteDefault(seconds: Long) {
@@ -258,19 +192,16 @@ class AfterInactivitySettingsDataProviderImplTest {
         browserConfigFeature.ntpAsDefaultAfterIdleReturn().setRawStoredState(Toggle.State(enable = true))
         browserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(enable = false))
 
-        provider.settings.test {
-            assertEquals(AfterInactivitySettings.LastUsedTab, awaitItem())
-            setRemoteDefault(600L)
-            coroutineTestRule.testScope.testScheduler.runCurrent()
-            assertEquals(NewTabPage, store.optionFlow.first())
-            assertEquals(AfterInactivitySettings.NewTabPage(600L, true), expectMostRecentItem())
+        assertEquals(AfterInactivitySettings.LastUsedTab, provider.settings.first())
 
-            browserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(enable = false))
-            coroutineTestRule.testScope.testScheduler.runCurrent()
-            assertEquals(LastOpenedTab, store.optionFlow.first())
-            assertEquals(AfterInactivitySettings.LastUsedTab, expectMostRecentItem())
-            assertEquals(false, store.hasOptionSelected())
-        }
+        setRemoteDefault(600L)
+        assertEquals(NewTabPage, store.optionFlow.first())
+        assertEquals(AfterInactivitySettings.NewTabPage(600L, true), provider.settings.first())
+
+        browserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(enable = false))
+        assertEquals(LastOpenedTab, store.optionFlow.first())
+        assertEquals(AfterInactivitySettings.LastUsedTab, provider.settings.first())
+        assertEquals(false, store.hasOptionSelected())
     }
 
     private fun realOptionStore(): ShowOnAppLaunchOptionPrefsDataStore {
@@ -290,6 +221,5 @@ class AfterInactivitySettingsDataProviderImplTest {
             override fun convertUrl(url: String?) = requireNotNull(url)
         },
         ntpAfterIdleManager,
-        pixel,
     )
 }

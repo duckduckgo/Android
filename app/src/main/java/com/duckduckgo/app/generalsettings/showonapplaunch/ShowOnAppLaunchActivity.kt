@@ -148,13 +148,13 @@ class ShowOnAppLaunchActivity : DuckDuckGoActivity() {
                     }
                 }
 
-                if (viewState.showNTPAfterIdleReturn) {
-                    setTitle(R.string.afterInactivityOptionTitle)
+                setTitle(if (viewState.showNTPAfterIdleReturn) R.string.afterInactivityOptionTitle else R.string.showOnAppLaunchOptionTitle)
+
+                if (viewState.showAfterInactivityTimeout) {
                     binding.afterInactivityTimeoutRow.setSecondaryText(viewState.selectedIdleThresholdSeconds.toTimeoutLabel())
                     binding.afterInactivityTimeoutRow.visibility = View.VISIBLE
                     binding.afterInactivityTimeoutDivider.visibility = View.VISIBLE
                 } else {
-                    setTitle(R.string.showOnAppLaunchOptionTitle)
                     binding.afterInactivityTimeoutRow.visibility = View.GONE
                     binding.afterInactivityTimeoutDivider.visibility = View.GONE
                 }

@@ -20,16 +20,19 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption
-import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchOptionDataStore
+import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.LastOpenedTab
+import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
+import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.SpecificPage
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_AFTER_INACTIVITY_TIMEOUT_CHANGED
-import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
+import com.duckduckgo.settings.api.AfterInactivityReturnDestination
+import com.duckduckgo.settings.api.AfterInactivitySettings
+import com.duckduckgo.settings.api.AfterInactivitySettingsDataProvider
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -44,13 +47,9 @@ import javax.inject.Inject
 @ContributesViewModel(ActivityScope::class)
 class ShowOnAppLaunchViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
-    private val showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore,
-    private val urlConverter: UrlConverter,
+    private val afterInactivitySettingsDataProvider: AfterInactivitySettingsDataProvider,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
-    private val settingsDataStore: SettingsDataStore,
     private val pixel: Pixel,
-    private val ntpAfterIdleManager: NtpAfterIdleManager,
-    private val idleThresholdResolver: IdleThresholdResolver,
 ) : ViewModel() {
 
     data class ViewState(
@@ -60,6 +59,7 @@ class ShowOnAppLaunchViewModel @Inject constructor(
         val selectedIdleThresholdSeconds: Long = FirstScreenHandlerImpl.DEFAULT_IDLE_THRESHOLD_SECONDS,
         val idleThresholdOptions: List<Long> = FirstScreenHandlerImpl.DEFAULT_IDLE_THRESHOLD_OPTIONS,
         val returnToLastTabEnabled: Boolean = true,
+        val showAfterInactivityTimeout: Boolean = false,
     )
 
     sealed class Command {
@@ -72,40 +72,53 @@ class ShowOnAppLaunchViewModel @Inject constructor(
     private val _commands = Channel<Command>(Channel.BUFFERED)
     val commands = _commands.receiveAsFlow()
 
-    private val userSelectedThreshold = MutableStateFlow(settingsDataStore.userSelectedIdleThresholdSeconds)
-
     init {
-        observeShowOnAppLaunchOptionChanges()
+        observeSettings()
     }
 
-    private fun observeShowOnAppLaunchOptionChanges() {
+    private fun observeSettings() {
         combine(
-            showOnAppLaunchOptionDataStore.optionFlow,
-            showOnAppLaunchOptionDataStore.specificPageUrlFlow,
+            afterInactivitySettingsDataProvider.settings,
             androidBrowserConfigFeature.showNTPAfterIdleReturn().enabled(),
-            userSelectedThreshold,
-            ntpAfterIdleManager.returnToLastTabEnabled,
-        ) { option, specificPageUrl, showNTPAfterIdleReturn, userThreshold, returnToLastTabEnabled ->
-            _viewState.value = ViewState(
-                selectedOption = option,
-                specificPageUrl = specificPageUrl,
-                showNTPAfterIdleReturn = showNTPAfterIdleReturn,
-                selectedIdleThresholdSeconds = idleThresholdResolver.effectiveThresholdSeconds(userThreshold),
-                returnToLastTabEnabled = returnToLastTabEnabled,
-            )
+        ) { settings, showNTPAfterIdleReturn ->
+            _viewState.value = settings.toViewState(showNTPAfterIdleReturn)
         }.flowOn(dispatcherProvider.io())
             .launchIn(viewModelScope)
     }
 
+    private fun AfterInactivitySettings.toViewState(showNTPAfterIdleReturn: Boolean): ViewState {
+        val effectiveTimeoutSeconds = when (this) {
+            AfterInactivitySettings.LastUsedTab -> FirstScreenHandlerImpl.DEFAULT_IDLE_THRESHOLD_SECONDS
+            is AfterInactivitySettings.NewTabPage -> effectiveTimeoutSeconds
+            is AfterInactivitySettings.SpecificPage -> effectiveTimeoutSeconds
+        }
+        val specificPageUrl = (this as? AfterInactivitySettings.SpecificPage)?.url
+            ?: AfterInactivityReturnDestination.SpecificPage().url
+        return ViewState(
+            selectedOption = toShowOnAppLaunchOption(),
+            specificPageUrl = specificPageUrl,
+            showNTPAfterIdleReturn = showNTPAfterIdleReturn,
+            selectedIdleThresholdSeconds = effectiveTimeoutSeconds,
+            returnToLastTabEnabled = (this as? AfterInactivitySettings.NewTabPage)?.returnToLastTabShortcutEnabled ?: true,
+            showAfterInactivityTimeout = showNTPAfterIdleReturn && this !is AfterInactivitySettings.LastUsedTab,
+        )
+    }
+
+    private fun AfterInactivitySettings.toShowOnAppLaunchOption(): ShowOnAppLaunchOption = when (this) {
+        AfterInactivitySettings.LastUsedTab -> LastOpenedTab
+        is AfterInactivitySettings.NewTabPage -> NewTabPage
+        is AfterInactivitySettings.SpecificPage -> SpecificPage(url)
+    }
+
     fun onShowOnAppLaunchOptionChanged(option: ShowOnAppLaunchOption) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            showOnAppLaunchOptionDataStore.setShowOnAppLaunchOption(option)
+            afterInactivitySettingsDataProvider.setDestination(option.toDestination())
             val (countPixel, dailyPixel) = when (option) {
-                ShowOnAppLaunchOption.LastOpenedTab ->
+                LastOpenedTab ->
                     ShowOnAppLaunchPixelName.LAUNCH_OPTION_LAST_OPENED_TAB to ShowOnAppLaunchPixelName.LAUNCH_OPTION_LAST_OPENED_TAB_DAILY
-                ShowOnAppLaunchOption.NewTabPage ->
+                NewTabPage ->
                     ShowOnAppLaunchPixelName.LAUNCH_OPTION_NEW_TAB_PAGE to ShowOnAppLaunchPixelName.LAUNCH_OPTION_NEW_TAB_PAGE_DAILY
-                is ShowOnAppLaunchOption.SpecificPage ->
+                is SpecificPage ->
                     ShowOnAppLaunchPixelName.LAUNCH_OPTION_SPECIFIC_PAGE to ShowOnAppLaunchPixelName.LAUNCH_OPTION_SPECIFIC_PAGE_DAILY
             }
             pixel.fire(countPixel, type = Count)
@@ -113,10 +126,16 @@ class ShowOnAppLaunchViewModel @Inject constructor(
         }
     }
 
+    private fun ShowOnAppLaunchOption.toDestination(): AfterInactivityReturnDestination = when (this) {
+        LastOpenedTab -> AfterInactivityReturnDestination.LastUsedTab
+        NewTabPage -> AfterInactivityReturnDestination.NewTabPage()
+        is SpecificPage -> AfterInactivityReturnDestination.SpecificPage(url = url)
+    }
+
     fun setSpecificPageUrl(url: String) {
+        if (_viewState.value?.selectedOption !is SpecificPage) return
         viewModelScope.launch(dispatcherProvider.io()) {
-            val convertedUrl = urlConverter.convertUrl(url)
-            showOnAppLaunchOptionDataStore.setSpecificPageUrl(convertedUrl)
+            afterInactivitySettingsDataProvider.setDestination(AfterInactivityReturnDestination.SpecificPage(url = url))
         }
     }
 
@@ -129,16 +148,25 @@ class ShowOnAppLaunchViewModel @Inject constructor(
 
     fun onTimeoutSelected(seconds: Long) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            settingsDataStore.userSelectedIdleThresholdSeconds = seconds
-            userSelectedThreshold.value = seconds
+            when (val selectedOption = _viewState.value?.selectedOption) {
+                is SpecificPage -> afterInactivitySettingsDataProvider.setDestination(
+                    AfterInactivityReturnDestination.SpecificPage(url = selectedOption.url, selectedTimeoutSeconds = seconds),
+                )
+                NewTabPage -> afterInactivitySettingsDataProvider.setDestination(
+                    AfterInactivityReturnDestination.NewTabPage(selectedTimeoutSeconds = seconds),
+                )
+                LastOpenedTab, null -> return@launch
+            }
             pixel.fire(SETTINGS_AFTER_INACTIVITY_TIMEOUT_CHANGED, mapOf("selectedSeconds" to seconds.toString()))
-            ntpAfterIdleManager.onIdleTimeoutSelected(seconds)
         }
     }
 
     fun onReturnToLastTabToggled(enabled: Boolean) {
+        if (_viewState.value?.selectedOption != NewTabPage) return
         viewModelScope.launch(dispatcherProvider.io()) {
-            ntpAfterIdleManager.setReturnToLastTabEnabled(enabled)
+            afterInactivitySettingsDataProvider.setDestination(
+                AfterInactivityReturnDestination.NewTabPage(returnToLastTabShortcutEnabled = enabled),
+            )
             if (enabled) {
                 pixel.fire(ShowOnAppLaunchPixelName.LAST_TAB_SHORTCUT_SETTING_ENABLED, type = Count)
                 pixel.fire(ShowOnAppLaunchPixelName.LAST_TAB_SHORTCUT_SETTING_ENABLED_DAILY, type = Daily())

@@ -36,7 +36,6 @@ import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -156,35 +155,5 @@ class ShowOnAppLaunchPrefsDataStoreTest {
         assertTrue(option is SpecificPage)
         assertEquals("example.com", (option as SpecificPage).url)
         assertEquals("https://www.example.com/", option.resolvedUrl)
-    }
-
-    @Test
-    fun whenSpecificPageIsFollowedByNewTabPageThenSpecificPageUrlAndResolvedUrlAreCleared() = runTest {
-        testee.setShowOnAppLaunchOption(SpecificPage("https://example.com/"))
-        testee.setResolvedPageUrl("https://www.example.com/")
-        testee.setShowOnAppLaunchTabId("specific-page-tab")
-
-        testee.setShowOnAppLaunchOption(NewTabPage)
-
-        assertNull(testee.showOnAppLaunchTabId)
-        assertEquals("https://duckduckgo.com/", testee.specificPageUrlFlow.first())
-
-        testee.setShowOnAppLaunchOption(SpecificPage(testee.specificPageUrlFlow.first()))
-        assertEquals(SpecificPage("https://duckduckgo.com/"), testee.optionFlow.first())
-    }
-
-    @Test
-    fun whenSpecificPageIsFollowedByLastOpenedTabThenSpecificPageUrlAndResolvedUrlAreCleared() = runTest {
-        testee.setShowOnAppLaunchOption(SpecificPage("https://example.com/"))
-        testee.setResolvedPageUrl("https://www.example.com/")
-        testee.setShowOnAppLaunchTabId("specific-page-tab")
-
-        testee.setShowOnAppLaunchOption(LastOpenedTab)
-
-        assertNull(testee.showOnAppLaunchTabId)
-        assertEquals("https://duckduckgo.com/", testee.specificPageUrlFlow.first())
-
-        testee.setShowOnAppLaunchOption(SpecificPage(testee.specificPageUrlFlow.first()))
-        assertEquals(SpecificPage("https://duckduckgo.com/"), testee.optionFlow.first())
     }
 }

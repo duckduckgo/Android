@@ -21,11 +21,7 @@ import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchO
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.SpecificPage
 import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchOptionDataStore
-import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_AFTER_INACTIVITY_TIMEOUT_CHANGED
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
@@ -35,9 +31,9 @@ import com.duckduckgo.settings.api.AfterInactivitySettingsDataProvider
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class, boundType = AfterInactivitySettingsDataProvider::class)
@@ -49,12 +45,13 @@ class AfterInactivitySettingsDataProviderImpl @Inject constructor(
     private val idleThresholdResolver: IdleThresholdResolver,
     private val urlConverter: UrlConverter,
     private val ntpAfterIdleManager: NtpAfterIdleManager,
-    private val pixel: Pixel,
 ) : AfterInactivitySettingsDataProvider {
+
+    private val userSelectedIdleThresholdSecondsFlow = MutableStateFlow(settingsDataStore.userSelectedIdleThresholdSeconds)
 
     override val settings: Flow<AfterInactivitySettings> = combine(
         showOnAppLaunchOptionDataStore.optionFlow,
-        settingsDataStore.userSelectedIdleThresholdSecondsFlow,
+        userSelectedIdleThresholdSecondsFlow,
         ntpAfterIdleManager.returnToLastTabEnabled,
         androidBrowserConfigFeature.showNTPAfterIdleReturn().enabled(),
     ) { option, selectedSeconds, shortcutEnabled, _ ->
@@ -63,15 +60,9 @@ class AfterInactivitySettingsDataProviderImpl @Inject constructor(
     }.distinctUntilChanged()
 
     override suspend fun setDestination(destination: AfterInactivityReturnDestination) {
-        val currentOption = showOnAppLaunchOptionDataStore.optionFlow.first()
-        val optionWasExplicitlySelected = showOnAppLaunchOptionDataStore.hasOptionSelected()
         val requestedOption = destination.toShowOnAppLaunchOption()
 
         showOnAppLaunchOptionDataStore.setShowOnAppLaunchOption(requestedOption)
-        if (optionWasExplicitlySelected && currentOption.discriminator() != requestedOption.discriminator()) {
-            pixel.fire(destination.countPixel(), type = Count)
-            pixel.fire(destination.dailyPixel(), type = Daily())
-        }
 
         when (destination) {
             AfterInactivityReturnDestination.LastUsedTab -> Unit
@@ -96,19 +87,12 @@ class AfterInactivitySettingsDataProviderImpl @Inject constructor(
 
     private suspend fun saveSelectedTimeout(seconds: Long) {
         settingsDataStore.userSelectedIdleThresholdSeconds = seconds
-        pixel.fire(SETTINGS_AFTER_INACTIVITY_TIMEOUT_CHANGED, mapOf("selectedSeconds" to seconds.toString()))
+        userSelectedIdleThresholdSecondsFlow.value = seconds
         ntpAfterIdleManager.onIdleTimeoutSelected(seconds)
     }
 
     private suspend fun saveReturnToLastTabShortcut(enabled: Boolean) {
         ntpAfterIdleManager.setReturnToLastTabEnabled(enabled)
-        if (enabled) {
-            pixel.fire(ShowOnAppLaunchPixelName.LAST_TAB_SHORTCUT_SETTING_ENABLED, type = Count)
-            pixel.fire(ShowOnAppLaunchPixelName.LAST_TAB_SHORTCUT_SETTING_ENABLED_DAILY, type = Daily())
-        } else {
-            pixel.fire(ShowOnAppLaunchPixelName.LAST_TAB_SHORTCUT_SETTING_DISABLED, type = Count)
-            pixel.fire(ShowOnAppLaunchPixelName.LAST_TAB_SHORTCUT_SETTING_DISABLED_DAILY, type = Daily())
-        }
     }
 
     private fun ShowOnAppLaunchOption.toSettings(
@@ -124,19 +108,5 @@ class AfterInactivitySettingsDataProviderImpl @Inject constructor(
         AfterInactivityReturnDestination.LastUsedTab -> LastOpenedTab
         is AfterInactivityReturnDestination.NewTabPage -> NewTabPage
         is AfterInactivityReturnDestination.SpecificPage -> SpecificPage(urlConverter.convertUrl(url))
-    }
-
-    private fun ShowOnAppLaunchOption.discriminator(): Int = id
-
-    private fun AfterInactivityReturnDestination.countPixel(): ShowOnAppLaunchPixelName = when (this) {
-        AfterInactivityReturnDestination.LastUsedTab -> ShowOnAppLaunchPixelName.LAUNCH_OPTION_LAST_OPENED_TAB
-        is AfterInactivityReturnDestination.NewTabPage -> ShowOnAppLaunchPixelName.LAUNCH_OPTION_NEW_TAB_PAGE
-        is AfterInactivityReturnDestination.SpecificPage -> ShowOnAppLaunchPixelName.LAUNCH_OPTION_SPECIFIC_PAGE
-    }
-
-    private fun AfterInactivityReturnDestination.dailyPixel(): ShowOnAppLaunchPixelName = when (this) {
-        AfterInactivityReturnDestination.LastUsedTab -> ShowOnAppLaunchPixelName.LAUNCH_OPTION_LAST_OPENED_TAB_DAILY
-        is AfterInactivityReturnDestination.NewTabPage -> ShowOnAppLaunchPixelName.LAUNCH_OPTION_NEW_TAB_PAGE_DAILY
-        is AfterInactivityReturnDestination.SpecificPage -> ShowOnAppLaunchPixelName.LAUNCH_OPTION_SPECIFIC_PAGE_DAILY
     }
 }
