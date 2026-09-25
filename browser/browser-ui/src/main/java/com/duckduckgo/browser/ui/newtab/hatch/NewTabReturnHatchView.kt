@@ -20,6 +20,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.FrameLayout
 import androidx.annotation.AttrRes
 import androidx.annotation.DrawableRes
@@ -36,6 +37,7 @@ import com.duckduckgo.browser.ui.databinding.ViewNewTabHatchBinding
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.listitem.TwoLineListItem
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
@@ -65,7 +67,11 @@ class NewTabReturnHatchView @JvmOverloads constructor(
         // The host shows the "tab closed" snackbar so it can parent it to the activity content
         // (above the floating native input) and anchor it to the omnibar, matching the burn-tab
         // snackbar. onUndo restores the tab; onCommit commits the deletion.
-        fun onTabClosed(tabId: String, onUndo: () -> Unit, onCommit: () -> Unit)
+        fun onTabClosed(
+            tabId: String,
+            onUndo: () -> Unit,
+            onCommit: () -> Unit,
+        )
     }
 
     @Inject
@@ -79,7 +85,7 @@ class NewTabReturnHatchView @JvmOverloads constructor(
 
     private val binding: ViewNewTabHatchBinding by viewBinding()
 
-    private val conflatedJob = ConflatedJob()
+    private val viewStateJob = ConflatedJob()
     private val faviconJob = ConflatedJob()
 
     private var hatchHatchListener: HatchListener? = null
@@ -98,7 +104,7 @@ class NewTabReturnHatchView @JvmOverloads constructor(
 
         findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
 
-        conflatedJob += viewModel.viewState
+        viewStateJob += viewModel.viewState
             .onEach { render(it) }
             .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
 
@@ -113,6 +119,7 @@ class NewTabReturnHatchView @JvmOverloads constructor(
         when (command) {
             NewTabReturnHatchViewModel.Command.LaunchTabSwitcher ->
                 globalActivityStarter.start(context, TabSwitcherScreenNoParams)
+
             is NewTabReturnHatchViewModel.Command.ShowTabClosedSnackbar ->
                 hatchHatchListener?.onTabClosed(
                     command.tabId,
@@ -126,7 +133,7 @@ class NewTabReturnHatchView @JvmOverloads constructor(
         super.onDetachedFromWindow()
 
         findViewTreeLifecycleOwner()?.lifecycle?.removeObserver(viewModel)
-        conflatedJob.cancel()
+        viewStateJob.cancel()
         faviconJob.cancel()
     }
 
@@ -147,6 +154,7 @@ class NewTabReturnHatchView @JvmOverloads constructor(
                     binding.returnHatchSiteTitle.text = context.getString(R.string.newTabReturnHatchFireTabTitle)
                     binding.returnHatchFavicon.setImageResource(resolveThemedDrawableAttr(CommonR.attr.daxDrawableFireWindowPhone))
                 }
+
                 BrowserMode.REGULAR -> {
                     binding.returnHatchSiteTitle.text = state.titleOrPlaceholder()
                     if (state.isDuckChat) {
@@ -165,6 +173,7 @@ class NewTabReturnHatchView @JvmOverloads constructor(
             } else {
                 binding.returnHatchTabsMenu.gone()
             }
+            state.afterInactivityEntry()
             binding.returnHatchRoot.show()
         } else {
             binding.returnHatchRoot.gone()
@@ -194,6 +203,26 @@ class NewTabReturnHatchView @JvmOverloads constructor(
         if (isDuckChat) return context.getString(R.string.newTabReturnHatchDuckChatPlaceholderTitle)
         if (isSerp) return context.getString(R.string.newTabReturnHatchSerpPlaceholderTitle)
         return tabTitle
+    }
+
+    private fun NewTabReturnHatchViewModel.ViewState.afterInactivityEntry() {
+        val visibility = if (this.showAfterInactivityEntry) VISIBLE else GONE
+        popupMenu.contentView.findViewById<View>(R.id.hatchMenuAfterInactivity).visibility = visibility
+        popupMenu.contentView.findViewById<View>(R.id.hatchMenuAfterInactivityTopDivider).visibility = visibility
+        popupMenu.contentView.findViewById<View>(R.id.hatchMenuAfterInactivityBottomDivider).visibility = visibility
+        if (!this.showAfterInactivityEntry) return
+
+        val summaryText = when (this.afterInactivityDestinationSummary) {
+            is NewTabReturnHatchViewModel.AfterInactivityDestinationSummary.TextRes -> context.getString(this.afterInactivityDestinationSummary.resId)
+            is NewTabReturnHatchViewModel.AfterInactivityDestinationSummary.Url -> this.afterInactivityDestinationSummary.url
+        }
+        val hatchMenuAfterInactivity = popupMenu.contentView.findViewById<TwoLineListItem>(R.id.hatchMenuAfterInactivity)
+        hatchMenuAfterInactivity.setSecondaryText(summaryText)
+        hatchMenuAfterInactivity.contentDescription = context.getString(
+            R.string.hatchMenuAfterInactivityContentDescription,
+            context.getString(R.string.hatchMenuAfterInactivitySettings),
+            summaryText,
+        )
     }
 
     fun setHatchListener(hatchListener: HatchListener) {

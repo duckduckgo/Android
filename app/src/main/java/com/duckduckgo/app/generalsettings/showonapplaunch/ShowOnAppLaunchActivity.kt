@@ -143,6 +143,7 @@ class ShowOnAppLaunchActivity : DuckDuckGoActivity() {
                         with(binding) {
                             specificPageCheckListItem.setChecked(true)
                             specificPageUrlInput.isEnabled = true
+                            specificPageUrlInput.visibility = View.VISIBLE
                         }
                     }
                 }
@@ -152,14 +153,11 @@ class ShowOnAppLaunchActivity : DuckDuckGoActivity() {
                 if (viewState.showAfterInactivityTimeout) {
                     binding.afterInactivityTimeoutRow.setSecondaryText(viewState.selectedIdleThresholdSeconds.toTimeoutLabel())
                     binding.afterInactivityTimeoutRow.visibility = View.VISIBLE
-                    binding.afterInactivityTimeoutDivider.visibility = View.VISIBLE
                 } else {
                     binding.afterInactivityTimeoutRow.visibility = View.GONE
-                    binding.afterInactivityTimeoutDivider.visibility = View.GONE
                 }
 
                 val showReturnToLastTabToggle = viewState.showNTPAfterIdleReturn && viewState.selectedOption is AfterInactivitySettings.NewTabPage
-                binding.returnToLastTabDivider.visibility = if (showReturnToLastTabToggle) View.VISIBLE else View.GONE
                 binding.returnToLastTabToggle.visibility = if (showReturnToLastTabToggle) View.VISIBLE else View.GONE
                 binding.returnToLastTabToggle.quietlySetIsChecked(viewState.returnToLastTabEnabled) { _, isChecked ->
                     viewModel.onReturnToLastTabToggled(isChecked)
@@ -231,5 +229,6 @@ class ShowOnAppLaunchActivity : DuckDuckGoActivity() {
     private fun uncheckSpecificPageCheckListItem() {
         binding.specificPageCheckListItem.setChecked(false)
         binding.specificPageUrlInput.isEnabled = false
+        binding.specificPageUrlInput.visibility = View.GONE
     }
 }
