@@ -284,4 +284,6 @@ private class FakeSubscriptions(
     override suspend fun isFreeTrialEligible(): Boolean = false
 
     override fun getEntitlements(): Flow<Set<Entitlement>> = flowOf(emptySet())
+
+    override suspend fun getCurrentEntitlements(): Set<Entitlement> = emptySet()
 }
