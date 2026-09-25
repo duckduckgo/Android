@@ -1013,9 +1013,6 @@
     <string name="preOnboardingImportErrorRetry">Poskusi znova</string>
 
     <!-- Pre-onboarding: add to home screen -->
-    <string name="preOnboardingDockStepTitle">Dodajte me v vrstico priljubljenih.</string>
-    <string name="preOnboardingAddToDockBody">Poiščite ikono DuckDuckGo na domačem zaslonu. Nato jo pritisnite in povlecite na želeno mesto. To je to!</string>
-    <string name="preOnboardingAddToDockPrimaryCta">Razumem!</string>
 
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Začnite zasebni klepet z umetno inteligenco z Duck.ai ali preklopite na iskanje za zaščiteno brskanje.<br/><br/>Duck.ai lahko uporabljate kjer koli, kjer vidite ikono klepeta]]></string>
