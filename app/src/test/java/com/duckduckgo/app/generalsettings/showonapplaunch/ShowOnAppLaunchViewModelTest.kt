@@ -80,7 +80,7 @@ class ShowOnAppLaunchViewModelTest {
         testee.viewState.test {
             val initialState = awaitItem()
             assertEquals(LastOpenedTab, initialState.selectedOption)
-            assertEquals("https://duckduckgo.com", initialState.specificPageUrl)
+            assertEquals("https://duckduckgo.com/", initialState.specificPageUrl)
         }
     }
 

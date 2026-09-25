@@ -18,6 +18,7 @@ package com.duckduckgo.app.generalsettings.showonapplaunch.store
 
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.LastOpenedTab
+import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.SpecificPage
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -29,11 +30,14 @@ class FakeShowOnAppLaunchOptionDataStore(defaultOption: ShowOnAppLaunchOption? =
 
     private var optionSelected = defaultOption != null
 
-    private var currentOptionStateFlow = MutableStateFlow(defaultOption ?: LastOpenedTab)
+    private val initialOption =
+        (defaultOption as? SpecificPage)?.let { SpecificPage(it.url) } ?: defaultOption ?: LastOpenedTab
+    private val currentOption = MutableStateFlow(initialOption)
+    private val currentSpecificPageUrl = MutableStateFlow(
+        (initialOption as? SpecificPage)?.url ?: ShowOnAppLaunchOptionDataStore.DEFAULT_SPECIFIC_PAGE_URL,
+    )
 
-    private var currentSpecificPageUrl = MutableStateFlow("https://duckduckgo.com")
-
-    override val optionFlow: Flow<ShowOnAppLaunchOption> = currentOptionStateFlow.asStateFlow()
+    override val optionFlow: Flow<ShowOnAppLaunchOption> = currentOption.asStateFlow()
 
     override val specificPageUrlFlow: Flow<String> = currentSpecificPageUrl.asStateFlow()
 
@@ -41,11 +45,24 @@ class FakeShowOnAppLaunchOptionDataStore(defaultOption: ShowOnAppLaunchOption? =
 
     override suspend fun setShowOnAppLaunchOption(showOnAppLaunchOption: ShowOnAppLaunchOption) {
         optionSelected = true
-        currentOptionStateFlow.value = showOnAppLaunchOption
+        if (showOnAppLaunchOption is SpecificPage) {
+            currentSpecificPageUrl.value = showOnAppLaunchOption.url
+            resolvedPageUrl = null
+            showOnAppLaunchTabId = null
+            currentOption.value = SpecificPage(showOnAppLaunchOption.url)
+        } else {
+            currentSpecificPageUrl.value = ShowOnAppLaunchOptionDataStore.DEFAULT_SPECIFIC_PAGE_URL
+            resolvedPageUrl = null
+            showOnAppLaunchTabId = null
+            currentOption.value = showOnAppLaunchOption
+        }
     }
 
     override suspend fun setSpecificPageUrl(url: String) {
         currentSpecificPageUrl.value = url
+        (currentOption.value as? SpecificPage)?.let { option ->
+            currentOption.value = option.copy(url = url)
+        }
     }
 
     var resolvedPageUrl: String? = null
@@ -53,6 +70,9 @@ class FakeShowOnAppLaunchOptionDataStore(defaultOption: ShowOnAppLaunchOption? =
 
     override suspend fun setResolvedPageUrl(url: String) {
         resolvedPageUrl = url
+        (currentOption.value as? SpecificPage)?.let { option ->
+            currentOption.value = option.copy(resolvedUrl = url)
+        }
     }
 
     override fun setShowOnAppLaunchTabId(tabId: String) {

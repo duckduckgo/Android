@@ -34,6 +34,10 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import javax.inject.Inject
 
 interface SettingsDataStore {
@@ -85,6 +89,7 @@ interface SettingsDataStore {
     var appBackgroundedTimestamp: Long
     var lastSessionBackgroundTimestamp: Long
     var userSelectedIdleThresholdSeconds: Long?
+    val userSelectedIdleThresholdSecondsFlow: Flow<Long?>
     var appNotificationsEnabled: Boolean
     var notifyMeInDownloadsDismissed: Boolean
     var experimentalWebsiteDarkMode: Boolean
@@ -245,6 +250,17 @@ class SettingsSharedPreferences @Inject constructor(
                 putLong(KEY_USER_SELECTED_IDLE_THRESHOLD_SECONDS, value)
             }
         }
+
+    override val userSelectedIdleThresholdSecondsFlow: Flow<Long?> = callbackFlow {
+        val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+            if (key == KEY_USER_SELECTED_IDLE_THRESHOLD_SECONDS) {
+                trySend(userSelectedIdleThresholdSeconds)
+            }
+        }
+        preferences.registerOnSharedPreferenceChangeListener(listener)
+        trySend(userSelectedIdleThresholdSeconds)
+        awaitClose { preferences.unregisterOnSharedPreferenceChangeListener(listener) }
+    }.distinctUntilChanged()
 
     override var appNotificationsEnabled: Boolean
         get() = preferences.getBoolean(KEY_APP_NOTIFICATIONS_ENABLED, true)

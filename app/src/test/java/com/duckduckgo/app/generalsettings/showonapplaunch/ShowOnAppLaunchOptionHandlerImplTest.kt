@@ -688,7 +688,8 @@ class ShowOnAppLaunchOptionHandlerImplTest {
         val url = "https://www.example.com/"
         val resolvedUrl = "https://www.example.co.uk/"
 
-        fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url, resolvedUrl))
+        fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url))
+        fakeDataStore.setResolvedPageUrl(resolvedUrl)
 
         testee.handleAppLaunchOption(BrowserMode.REGULAR)
 
@@ -707,7 +708,8 @@ class ShowOnAppLaunchOptionHandlerImplTest {
             val url = "https://example.com/"
             val resolvedUrl = "https://www.example.co.uk/"
 
-            fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url, resolvedUrl))
+            fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url))
+            fakeDataStore.setResolvedPageUrl(resolvedUrl)
             fakeTabRepository.add(resolvedUrl)
 
             testee.handleAppLaunchOption(BrowserMode.REGULAR)
@@ -726,7 +728,8 @@ class ShowOnAppLaunchOptionHandlerImplTest {
         val url = "https://www.example.co.uk/"
         val resolvedUrl = "https://www.example.co.uk/"
 
-        fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url, resolvedUrl))
+        fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url))
+        fakeDataStore.setResolvedPageUrl(resolvedUrl)
         fakeTabRepository.add(resolvedUrl)
 
         testee.handleAppLaunchOption(BrowserMode.REGULAR)
@@ -1122,6 +1125,22 @@ class ShowOnAppLaunchOptionHandlerImplTest {
             currentUrl = "https://www.example.com/",
             isRootOfTab = true,
             tabId = "wrong-tab-id",
+        )
+
+        assertNull(fakeDataStore.resolvedPageUrl)
+    }
+
+    @Test
+    fun whenNewTabPageIsSelectedAfterSpecificPageThenLaterRootNavigationCannotStoreResolvedUrl() = runTest {
+        fakeDataStore.setShowOnAppLaunchOption(SpecificPage("https://example.com/"))
+        testee.handleAppLaunchOption(BrowserMode.REGULAR)
+        val specificPageTabId = fakeDataStore.showOnAppLaunchTabId!!
+
+        fakeDataStore.setShowOnAppLaunchOption(NewTabPage)
+        testee.handleResolvedUrlStorage(
+            currentUrl = "https://resolved.example.com/",
+            isRootOfTab = true,
+            tabId = specificPageTabId,
         )
 
         assertNull(fakeDataStore.resolvedPageUrl)

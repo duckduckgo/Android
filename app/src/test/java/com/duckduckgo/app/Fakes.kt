@@ -25,11 +25,14 @@ import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 
 class FakeSettingsDataStore :
     SettingsDataStore,
     AutoCompleteSettings {
     private val store = mutableMapOf<String, Any?>()
+    private val userSelectedIdleThresholdSecondsState = MutableStateFlow<Long?>(null)
 
     override var lastExecutedJobId: String?
         get() = store["lastExecutedJobId"] as String?
@@ -139,14 +142,12 @@ class FakeSettingsDataStore :
         }
 
     override var userSelectedIdleThresholdSeconds: Long?
-        get() = store["userSelectedIdleThresholdSeconds"] as Long?
+        get() = userSelectedIdleThresholdSecondsState.value
         set(value) {
-            if (value == null) {
-                store.remove("userSelectedIdleThresholdSeconds")
-            } else {
-                store["userSelectedIdleThresholdSeconds"] = value
-            }
+            userSelectedIdleThresholdSecondsState.value = value
         }
+
+    override val userSelectedIdleThresholdSecondsFlow: Flow<Long?> = userSelectedIdleThresholdSecondsState
 
     override var appNotificationsEnabled: Boolean
         get() = store["appNotificationsEnabled"] as Boolean? ?: true

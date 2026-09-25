@@ -32,6 +32,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -65,7 +66,11 @@ class ShowOnAppLaunchOptionPrefsDataStore @Inject constructor(
     override suspend fun hasOptionSelected(): Boolean =
         store.data.firstOrNull()?.get(intPreferencesKey(KEY_SHOW_ON_APP_LAUNCH_OPTION)) != null
 
-    override val optionFlow: Flow<ShowOnAppLaunchOption> = store.data.map { preferences ->
+    override val optionFlow: Flow<ShowOnAppLaunchOption> = combine(
+        store.data,
+        androidBrowserConfigFeature.showNTPAfterIdleReturn().enabled(),
+        androidBrowserConfigFeature.ntpAsDefaultAfterIdleReturn().enabled(),
+    ) { preferences, showNtpAfterIdleReturn, ntpAsDefaultAfterIdleReturn ->
         preferences[intPreferencesKey(KEY_SHOW_ON_APP_LAUNCH_OPTION)]?.let { optionId ->
             when (val option = ShowOnAppLaunchOption.mapToOption(optionId)) {
                 LastOpenedTab,
@@ -77,11 +82,8 @@ class ShowOnAppLaunchOptionPrefsDataStore @Inject constructor(
                     SpecificPage(url, resolvedUrl)
                 }
             }
-        } ?: defaultShowOnAppLaunchOption()
+        } ?: if (showNtpAfterIdleReturn && ntpAsDefaultAfterIdleReturn) NewTabPage else LastOpenedTab
     }
-
-    private fun defaultShowOnAppLaunchOption(): ShowOnAppLaunchOption =
-        if (androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled()) NewTabPage else LastOpenedTab
 
     override val specificPageUrlFlow: Flow<String> = store.data.map { preferences ->
         preferences[stringPreferencesKey(KEY_SHOW_ON_APP_LAUNCH_SPECIFIC_PAGE_URL)] ?: DEFAULT_SPECIFIC_PAGE_URL
@@ -93,6 +95,10 @@ class ShowOnAppLaunchOptionPrefsDataStore @Inject constructor(
 
             if (showOnAppLaunchOption is SpecificPage) {
                 preferences.setShowOnAppLaunch(showOnAppLaunchOption.url)
+                preferences.remove(stringPreferencesKey(KEY_SHOW_ON_APP_LAUNCH_SPECIFIC_PAGE_RESOLVED_URL))
+                showOnAppLaunchTabId = null
+            } else {
+                preferences.remove(stringPreferencesKey(KEY_SHOW_ON_APP_LAUNCH_SPECIFIC_PAGE_URL))
                 preferences.remove(stringPreferencesKey(KEY_SHOW_ON_APP_LAUNCH_SPECIFIC_PAGE_RESOLVED_URL))
                 showOnAppLaunchTabId = null
             }
