@@ -16,4 +16,10 @@
 
 <resources>
 
+    <string name="autofillImportPasswordsViaCredentialExchangeMenuTitle">Import Passwords (FIDO exchange)</string>
+
+    <string name="autofillCredentialExchangeNoExporter">No app on this device offered passwords to import</string>
+    <string name="autofillCredentialExchangeBadData">The other app sent passwords we could not read</string>
+    <string name="autofillCredentialExchangeUnknownError">Import failed</string>
+
 </resources>

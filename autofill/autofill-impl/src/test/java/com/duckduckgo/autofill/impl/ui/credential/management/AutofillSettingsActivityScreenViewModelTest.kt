@@ -102,6 +102,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -156,6 +157,7 @@ class AutofillSettingsActivityScreenViewModelTest {
         autofillBreakageReportCanShowRules = autofillBreakageReportCanShowRules,
         importGooglePasswordsCapabilityChecker = importGooglePasswordsCapabilityChecker,
         autofillFeature = autofillFeature,
+        credentialExchangePasswordImporter = mock { onBlocking { isSupported() } doReturn false },
         autofillEffectDispatcher = autofillEffectDispatcher,
     )
 
