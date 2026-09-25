@@ -16,6 +16,8 @@
 
 package com.duckduckgo.duckchat.impl.ui.nativeinput.views
 
+import androidx.annotation.StringRes
+import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.models.UserTier
 import logcat.logcat
 
@@ -68,4 +70,18 @@ internal fun routeUpsell(
         }
         null
     }
+}
+
+/**
+ * Header for a picker's gated section: what the user has to do to reach those rows. Pro wins when
+ * every gated row needs Pro, since neither a trial nor a Plus plan would unlock them.
+ */
+@StringRes
+internal fun gatedSectionHeaderRes(
+    requiredTiers: List<UserTier?>,
+    isFreeTrialEligible: Boolean,
+): Int = when {
+    requiredTiers.all { it == UserTier.PRO } -> R.string.duckAiModelPickerProExclusive
+    isFreeTrialEligible -> R.string.duckAiModelPickerTryFreeTrial
+    else -> R.string.duckAiModelPickerSubscriberExclusive
 }

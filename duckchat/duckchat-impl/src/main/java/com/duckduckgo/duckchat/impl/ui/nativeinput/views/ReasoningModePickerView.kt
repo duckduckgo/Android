@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.ui.nativeinput.views
 import android.content.Context
 import android.util.AttributeSet
 import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -31,6 +32,8 @@ import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.common.ui.view.divider.HorizontalDivider
+import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
@@ -172,7 +175,7 @@ class ReasoningModePickerView @JvmOverloads constructor(
                 addView(container)
                 isVerticalScrollBarEnabled = false
             },
-            resources.getDimensionPixelSize(R.dimen.reasoningModePickerMenuWidth),
+            resources.getDimensionPixelSize(R.dimen.nativeInputMenuWidth),
             LayoutParams.WRAP_CONTENT,
             false,
         ).apply {
@@ -186,19 +189,31 @@ class ReasoningModePickerView @JvmOverloads constructor(
     }
 
     private fun populate(container: LinearLayout, popup: PopupWindow, state: ReasoningModePickerState) {
-        state.rows.forEach { row ->
-            val item = pickerMenuItem(
-                parent = container,
-                title = context.getString(row.titleRes),
-                leadingIconRes = row.iconRes,
-                subtitle = context.getString(row.subtitleRes),
-                selected = row.selected,
-            ) {
-                viewModel.onModeTapped(row.mode, currentSurface())
-                popup.dismiss()
+        state.sections.forEachIndexed { index, section ->
+            if (index > 0) container.addView(HorizontalDivider(context))
+            section.headerRes?.let { container.addSectionHeader(context.getString(it)) }
+            section.rows.forEach { row ->
+                val item = pickerMenuItem(
+                    parent = container,
+                    title = context.getString(row.titleRes),
+                    leadingIconRes = row.iconRes,
+                    subtitle = context.getString(row.subtitleRes),
+                    selected = row.selected,
+                    // Only the gated section carries a header, and its rows open an upsell.
+                    showsFollowUpEllipsis = section.headerRes != null,
+                ) {
+                    viewModel.onModeTapped(row.mode, currentSurface())
+                    popup.dismiss()
+                }
+                container.addView(item)
             }
-            container.addView(item)
         }
+    }
+
+    private fun LinearLayout.addSectionHeader(title: String) {
+        val header = LayoutInflater.from(context).inflate(R.layout.view_model_picker_section_header, this, false) as DaxTextView
+        header.text = title
+        addView(header)
     }
 
     private fun showAtPosition(popup: PopupWindow) {
