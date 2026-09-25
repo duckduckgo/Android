@@ -977,9 +977,6 @@
     <string name="preOnboardingImportErrorRetry">Próbálkozz újra</string>
 
     <!-- Pre-onboarding: add to home screen -->
-    <string name="preOnboardingDockStepTitle">Adj hozzá a kedvencek sorához.</string>
-    <string name="preOnboardingAddToDockBody">Keresd meg a DuckDuckGo ikont a kezdőképernyőn. Ezután az ikont nyomva tartva húzd a helyére. Ennyi az egész!</string>
-    <string name="preOnboardingAddToDockPrimaryCta">Rendben!</string>
 
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Indíts privát MI-beszélgetést a Duck.ai-jal, vagy válts a Keresésre a védett böngészéshez.<br/><br/>A Duck.ai-t bárhol használhatod, ahol látod a beszélgetés ikonját]]></string>

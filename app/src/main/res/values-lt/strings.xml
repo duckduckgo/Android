@@ -1013,9 +1013,6 @@
     <string name="preOnboardingImportErrorRetry">Bandykite dar kartą</string>
 
     <!-- Pre-onboarding: add to home screen -->
-    <string name="preOnboardingDockStepTitle">Įtraukite mane į mėgstamiausiųjų eilutę.</string>
-    <string name="preOnboardingAddToDockBody">Pagrindiniame ekrane raskite „DuckDuckGo“ piktogramą. Tada paspauskite ir vilkite į vietą. Štai ir viskas!</string>
-    <string name="preOnboardingAddToDockPrimaryCta">Supratau!</string>
 
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Pradėk privatų DI pokalbį su „Duck.ai“ arba perjunk į Paiešką, kad naršytum saugiai.<br/><br/>„Duck.ai“ gali naudoti visur, kur tik matai pokalbio piktogramą.]]></string>
