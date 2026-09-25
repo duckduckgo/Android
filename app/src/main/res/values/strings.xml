@@ -976,9 +976,6 @@
     <string name="preOnboardingImportErrorRetry">Try again</string>
 
     <!-- Pre-onboarding: add to home screen -->
-    <string name="preOnboardingDockStepTitle">Add me to your favorites row.</string>
-    <string name="preOnboardingAddToDockBody">Find the DuckDuckGo icon on your Home Screen. Then press and drag into place. That’s it!</string>
-    <string name="preOnboardingAddToDockPrimaryCta">Got it!</string>
 
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Start a private AI chat with Duck.ai or toggle to Search for protected browsing.<br/><br/>You can use Duck.ai from anywhere you see the chat icon]]></string>

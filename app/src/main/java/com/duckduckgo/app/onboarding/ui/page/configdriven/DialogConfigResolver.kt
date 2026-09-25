@@ -108,20 +108,6 @@ class DialogConfigResolver @Inject constructor(
             ),
         )
 
-        NewUserOnboardingActivityDialog.AddToDock -> DialogConfig(
-            background = OnboardingBackground.Horizon,
-            embellishment = Embellishment.None,
-            cardArrow = CardArrowConfig.Hidden,
-            content = ContentConfig.AddToDock(
-                title = TextConfig.Resource(R.string.preOnboardingDockStepTitle),
-                body = TextConfig.Resource(R.string.preOnboardingAddToDockBody),
-            ),
-            primaryCta = CtaConfig(
-                text = TextConfig.Resource(R.string.preOnboardingAddToDockPrimaryCta),
-                action = CtaAction.Emit(NewUserOnboardingEvent.ContinueClicked),
-            ),
-        )
-
         NewUserOnboardingActivityDialog.WidgetPrompt -> DialogConfig(
             background = OnboardingBackground.Horizon,
             embellishment = Embellishment.LeftWing,

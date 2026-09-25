@@ -556,7 +556,6 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
             NewUserOnboardingActivityDialog.AiComparisonChart,
             is NewUserOnboardingActivityDialog.SegmentedComparisonChart,
             NewUserOnboardingActivityDialog.DownloadReason,
-            NewUserOnboardingActivityDialog.AddToDock,
             NewUserOnboardingActivityDialog.WidgetPrompt,
             NewUserOnboardingActivityDialog.ImportPasswords,
             is NewUserOnboardingActivityDialog.ImportComplete,
