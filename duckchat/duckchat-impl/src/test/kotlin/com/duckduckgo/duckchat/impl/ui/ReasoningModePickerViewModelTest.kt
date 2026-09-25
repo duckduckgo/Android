@@ -101,6 +101,46 @@ class ReasoningModePickerViewModelTest {
     }
 
     @Test
+    fun whenPickerShownWithGatedModeThenUpsellImpressionFiresWithTheHeaderTheUserSaw() = runTest {
+        duckChatFeature.updatedPickers().setRawStoredState(Toggle.State(enable = true))
+        modelState.value = ModelState(
+            userTier = UserTier.PLUS,
+            availableReasoningModes = listOf(
+                AvailableReasoningMode(ReasoningMode.FAST, ReasoningEffort.NONE),
+                gatedMode(ReasoningMode.EXTENDED_REASONING, ReasoningEffort.HIGH, listOf("pro")),
+            ),
+        )
+        runCurrent()
+
+        testee.onPickerShown(PickerSurface.REASONING_PICKER_DUCK_AI_TAB)
+        runCurrent()
+
+        verify(duckChatPixels).firePickerUpsellShown(
+            source = "reasoning_picker",
+            header = "pro_exclusive",
+            currentTier = "plus",
+            origin = "funnel_duckai_android__reasoningdropdown",
+        )
+    }
+
+    @Test
+    fun whenPickerShownWithNothingGatedThenNoUpsellImpression() = runTest {
+        duckChatFeature.updatedPickers().setRawStoredState(Toggle.State(enable = true))
+        modelState.value = ModelState(
+            availableReasoningModes = listOf(
+                AvailableReasoningMode(ReasoningMode.FAST, ReasoningEffort.NONE),
+                AvailableReasoningMode(ReasoningMode.REASONING, ReasoningEffort.LOW),
+            ),
+        )
+        runCurrent()
+
+        testee.onPickerShown(PickerSurface.REASONING_PICKER_DUCK_AI_TAB)
+        runCurrent()
+
+        verify(duckChatPixels, never()).firePickerUpsellShown(any(), any(), any(), any())
+    }
+
+    @Test
     fun whenUpdatedPickersDisabledThenAllModesStayInOneSection() = runTest {
         duckChatFeature.updatedPickers().setRawStoredState(Toggle.State(enable = false))
         modelState.value = ModelState(

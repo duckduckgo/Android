@@ -28,6 +28,10 @@ enum class PickerSurface(val origin: String) {
     REASONING_PICKER_DUCK_AI_TAB("funnel_duckai_android__reasoningdropdown"),
 }
 
+/** Pixel `source` values for the two pickers that can trigger an upsell. */
+internal const val UPSELL_SOURCE_MODEL_PICKER = "model_picker"
+internal const val UPSELL_SOURCE_REASONING_PICKER = "reasoning_picker"
+
 /** Subscription origin for the FE model-recovery ("switch model") flow */
 const val SWITCH_MODEL_ORIGIN = "funnel_duckai_android__switchmodel"
 
@@ -72,16 +76,22 @@ internal fun routeUpsell(
     }
 }
 
+/** The gated section's header, paired with the value reported in the upsell impression pixel. */
+enum class GatedHeader(@StringRes val titleRes: Int, val pixelValue: String) {
+    TRY_FREE_TRIAL(R.string.duckAiModelPickerTryFreeTrial, "try_free_trial"),
+    SUBSCRIBER_EXCLUSIVE(R.string.duckAiModelPickerSubscriberExclusive, "subscriber_exclusive"),
+    PRO_EXCLUSIVE(R.string.duckAiModelPickerProExclusive, "pro_exclusive"),
+}
+
 /**
- * Header for a picker's gated section: what the user has to do to reach those rows. Pro wins when
- * every gated row needs Pro, since neither a trial nor a Plus plan would unlock them.
+ * What the user has to do to reach a picker's gated rows. Pro wins when every gated row needs Pro,
+ * since neither a trial nor a Plus plan would unlock them.
  */
-@StringRes
-internal fun gatedSectionHeaderRes(
+internal fun gatedSectionHeader(
     requiredTiers: List<UserTier?>,
     isFreeTrialEligible: Boolean,
-): Int = when {
-    requiredTiers.all { it == UserTier.PRO } -> R.string.duckAiModelPickerProExclusive
-    isFreeTrialEligible -> R.string.duckAiModelPickerTryFreeTrial
-    else -> R.string.duckAiModelPickerSubscriberExclusive
+): GatedHeader = when {
+    requiredTiers.all { it == UserTier.PRO } -> GatedHeader.PRO_EXCLUSIVE
+    isFreeTrialEligible -> GatedHeader.TRY_FREE_TRIAL
+    else -> GatedHeader.SUBSCRIBER_EXCLUSIVE
 }

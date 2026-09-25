@@ -401,6 +401,40 @@ class ModelPickerViewModelTest {
     }
 
     @Test
+    fun whenPickerShownWithGatedModelsThenUpsellImpressionFiresWithTheHeaderTheUserSaw() = runTest {
+        duckChatFeature.updatedPickers().setRawStoredState(Toggle.State(enable = true))
+        stateFlow.value = ModelState(
+            models = listOf(freeModel("f"), plusModel("p"), proModel("pr")),
+            userTier = UserTier.FREE,
+            isFreeTrialEligible = true,
+        )
+
+        testee.onPickerShown(PickerSurface.MODEL_PICKER_ADDRESS_BAR)
+        runCurrent()
+
+        verify(duckChatPixels).firePickerUpsellShown(
+            source = "model_picker",
+            header = "try_free_trial",
+            currentTier = "free",
+            origin = "funnel_addressbar_android__modelpicker",
+        )
+    }
+
+    @Test
+    fun whenPickerShownWithNothingGatedThenNoUpsellImpression() = runTest {
+        duckChatFeature.updatedPickers().setRawStoredState(Toggle.State(enable = true))
+        stateFlow.value = ModelState(
+            models = listOf(freeModel("f")),
+            userTier = UserTier.FREE,
+        )
+
+        testee.onPickerShown(PickerSurface.MODEL_PICKER_ADDRESS_BAR)
+        runCurrent()
+
+        verify(duckChatPixels, never()).firePickerUpsellShown(any(), any(), any(), any())
+    }
+
+    @Test
     fun whenPickerShownFromAddressBarThenModelPickerShownFiredWithAddressBarOrigin() = runTest {
         testee.onPickerShown(PickerSurface.MODEL_PICKER_ADDRESS_BAR)
         runCurrent()

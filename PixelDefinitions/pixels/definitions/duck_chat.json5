@@ -1492,6 +1492,61 @@
             }
         ]
     },
+    "m_aichat_unified_input_picker_upsell_shown": {
+        "description": "Subscription-funnel impression: a Unified Input picker was shown with a gated section, so the user saw the upsell. The matching click is m_aichat_unified_input_subscription_upsell_triggered.",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "source",
+                "type": "string",
+                "description": "Which picker showed the gated section",
+                "enum": ["model_picker", "reasoning_picker"]
+            },
+            {
+                "key": "header",
+                "type": "string",
+                "description": "Which gated section header the user saw, i.e. what the copy told them unlocks those rows",
+                "enum": ["try_free_trial", "subscriber_exclusive", "pro_exclusive"]
+            },
+            {
+                "key": "current_tier",
+                "type": "string",
+                "description": "The user's current subscription tier",
+                "enum": ["free", "plus", "pro"]
+            },
+            {
+                "key": "origin",
+                "type": "string",
+                "description": "Subscription-funnel entry point of the picker that showed the upsell",
+                "enum": [
+                    "funnel_addressbar_android__modelpicker",
+                    "funnel_addressbar_android__reasoningdropdown",
+                    "funnel_duckai_android__modelpicker",
+                    "funnel_duckai_android__reasoningdropdown",
+                    "funnel_duckai_android__switchmodel"
+                ]
+            }
+        ]
+    },
+    "m_aichat_model_label_unknown_daily": {
+        "description": "Debug: the models endpoint returned an editorial label this app version does not recognise, so the model sorts as recommended but renders no subline. Signals that new label copy needs adding.",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "label",
+                "type": "string",
+                "description": "The unrecognised label id as returned by the backend, uppercased and stripped to letters, digits and underscores",
+                "pattern": "^[A-Z0-9_]{1,40}$",
+                "examples": ["EXTRA_PRIVACY"]
+            }
+        ]
+    },
     "m_aichat_unified_input_reasoning_effort_picker_shown": {
         "description": "Subscription-funnel impression: the Unified Input reasoning effort picker was shown to the user",
         "owners": ["YoussefKeyrouz"],

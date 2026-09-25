@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.models
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.duckchat.impl.store.SelectedModel
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -63,6 +64,7 @@ class RealDuckAiModelManagerTest {
     private val entitlementFlow = MutableSharedFlow<Set<Entitlement>>()
     private val subscriptionStatusFlow = MutableStateFlow(SubscriptionStatus.UNKNOWN)
     private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
+    private val duckChatPixels: DuckChatPixels = mock()
 
     private lateinit var testee: RealDuckAiModelManager
 
@@ -82,6 +84,7 @@ class RealDuckAiModelManagerTest {
             subscriptions = subscriptions,
             duckAiHostProvider = duckAiHostProvider,
             duckChatFeature = { duckChatFeature },
+            duckChatPixels = { duckChatPixels },
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             appCoroutineScope = coroutineRule.testScope,
         )
@@ -871,6 +874,69 @@ class RealDuckAiModelManagerTest {
 
         assertEquals("first-in-response", testee.modelState.value.selectedModelId)
         assertEquals("labelled", testee.modelState.value.models[0].id)
+    }
+
+    @Test
+    fun whenLabelIsUnrecognisedThenDebugPixelReportsIt() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any(), anyOrNull())).thenReturn(
+            AIChatModelsResponse(listOf(remoteModel("id", label = "EXTRA_PRIVACY"))),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        verify(duckChatPixels).fireUnknownModelLabel("EXTRA_PRIVACY")
+    }
+
+    @Test
+    fun whenSeveralLabelsAreUnrecognisedThenEachIsReportedOncePerResponse() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any(), anyOrNull())).thenReturn(
+            AIChatModelsResponse(
+                listOf(
+                    remoteModel("a", label = "EXTRA_PRIVACY"),
+                    remoteModel("b", label = "EXTRA_PRIVACY"),
+                    remoteModel("c", label = "FASTEST_YET"),
+                ),
+            ),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        verify(duckChatPixels).fireUnknownModelLabel("EXTRA_PRIVACY")
+        verify(duckChatPixels).fireUnknownModelLabel("FASTEST_YET")
+    }
+
+    @Test
+    fun whenLabelIsRecognisedThenNoDebugPixel() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any(), anyOrNull())).thenReturn(
+            AIChatModelsResponse(listOf(remoteModel("id", label = "EVERYDAY_USE"))),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        verify(duckChatPixels, never()).fireUnknownModelLabel(any())
+    }
+
+    @Test
+    fun whenUnrecognisedLabelHasUnexpectedShapeThenItIsSanitisedBeforeReporting() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any(), anyOrNull())).thenReturn(
+            AIChatModelsResponse(listOf(remoteModel("id", label = "new label (beta)!"))),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        verify(duckChatPixels).fireUnknownModelLabel("NEWLABELBETA")
     }
 
     @Test

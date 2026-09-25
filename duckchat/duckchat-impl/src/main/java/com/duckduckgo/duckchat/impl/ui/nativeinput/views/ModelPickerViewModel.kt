@@ -58,6 +58,8 @@ data class ModelSection(
     val models: List<AIChatModel>,
     /** Rows in a gated section open an upsell instead of selecting, so they render the follow-up ellipsis. */
     val gated: Boolean = false,
+    /** Set on the gated section, for the upsell impression pixel. */
+    val gatedHeader: GatedHeader? = null,
 )
 
 /** Emitted when the user picks a model during the FE recovery model-change flow. */
@@ -178,7 +180,17 @@ class ModelPickerViewModel @Inject constructor(
 
     /** Subscription-funnel impression: the model picker was shown to the user. */
     fun onPickerShown(surface: PickerSurface) {
-        duckChatPixels.fireModelPickerShown(effectiveOrigin(surface))
+        val origin = effectiveOrigin(surface)
+        duckChatPixels.fireModelPickerShown(origin)
+        val state = modelManager.modelState.value
+        buildSections(state).firstOrNull { it.gated }?.gatedHeader?.let { header ->
+            duckChatPixels.firePickerUpsellShown(
+                source = UPSELL_SOURCE_MODEL_PICKER,
+                header = header.pixelValue,
+                currentTier = state.userTier.toParam(),
+                origin = origin,
+            )
+        }
     }
 
     /**
@@ -219,7 +231,7 @@ class ModelPickerViewModel @Inject constructor(
         val origin = effectiveOrigin(surface)
         routeUpsell(userTier, requiredTier, origin, modelState.isSubscriptionEligible)?.let { upsell ->
             duckChatPixels.fireSubscriptionUpsellTriggered(
-                source = "model_picker",
+                source = UPSELL_SOURCE_MODEL_PICKER,
                 currentTier = userTier.toParam(),
                 requiredTier = requiredTier.toParam(),
                 flowType = upsell.toFlowTypeParam(),
@@ -244,12 +256,10 @@ class ModelPickerViewModel @Inject constructor(
             )
         }
         val (available, gated) = public.partition { it.isAccessible }
+        val gatedHeader = gatedSectionHeader(gated.map { it.requiredTier }, state.isFreeTrialEligible)
         return listOfNotNull(
             available.toSectionOrNull(headerRes = null),
-            gated.toSectionOrNull(
-                headerRes = gatedSectionHeaderRes(gated.map { it.requiredTier }, state.isFreeTrialEligible),
-                gated = true,
-            ),
+            gated.toSectionOrNull(headerRes = gatedHeader.titleRes, gated = true, gatedHeader = gatedHeader),
         )
     }
 
@@ -274,5 +284,6 @@ class ModelPickerViewModel @Inject constructor(
     private fun List<AIChatModel>.toSectionOrNull(
         @StringRes headerRes: Int?,
         gated: Boolean = false,
-    ): ModelSection? = takeIf { it.isNotEmpty() }?.let { ModelSection(headerRes, it, gated) }
+        gatedHeader: GatedHeader? = null,
+    ): ModelSection? = takeIf { it.isNotEmpty() }?.let { ModelSection(headerRes, it, gated, gatedHeader) }
 }

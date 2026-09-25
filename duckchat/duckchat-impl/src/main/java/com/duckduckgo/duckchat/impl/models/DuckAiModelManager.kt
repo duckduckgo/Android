@@ -21,6 +21,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.duckchat.impl.store.SelectedModel
 import com.duckduckgo.subscriptions.api.Product
@@ -92,6 +93,7 @@ class RealDuckAiModelManager @Inject constructor(
     private val subscriptions: Subscriptions,
     private val duckAiHostProvider: DuckAiHostProvider,
     private val duckChatFeature: Lazy<DuckChatFeature>,
+    private val duckChatPixels: Lazy<DuckChatPixels>,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : DuckAiModelManager {
@@ -185,6 +187,7 @@ class RealDuckAiModelManager @Inject constructor(
                     logcat { "Duck.ai Model Manager: failed to resolve free trial eligibility, defaulting to not eligible: ${it.message}" }
                     false
                 }
+                reportUnknownLabels(response.models)
                 val models = response.models
                     .map { resolveModel(it, userTier) }
                     .filterNot { it.accessTier.isEmpty() && !it.isAccessible }
@@ -267,6 +270,7 @@ class RealDuckAiModelManager @Inject constructor(
     }
 
     private companion object {
+        const val MAX_LABEL_LENGTH = 40
         const val PINNED_DEFAULT_MODEL_ID = "gpt-5.4-mini"
     }
 
@@ -395,6 +399,25 @@ class RealDuckAiModelManager @Inject constructor(
             } ?: ImageLimits(),
         )
     }
+
+    /** Flags labels added after this version shipped, so we notice copy we cannot render. Models are
+     * re-fetched on every picker attach; the pixel's daily tag keeps that down to one report per label
+     * per day. */
+    private fun reportUnknownLabels(remote: List<RemoteAIChatModel>) {
+        remote.asSequence()
+            .mapNotNull { it.label }
+            .filter { ModelLabel.from(it) == ModelLabel.UNKNOWN }
+            .map { it.sanitisedLabel() }
+            .distinct()
+            .forEach { duckChatPixels.get().fireUnknownModelLabel(it) }
+    }
+
+    // The label is a backend-authored id, so keep the pixel to that shape rather than passing
+    // whatever arrives through verbatim.
+    private fun String.sanitisedLabel(): String = uppercase()
+        .filter { it.isLetterOrDigit() || it == '_' }
+        .take(MAX_LABEL_LENGTH)
+        .ifEmpty { "UNPARSEABLE" }
 
     /** Labelled models lead the list, as the backend marks them as the ones to recommend. */
     private suspend fun List<AIChatModel>.sortLabelledFirst(): List<AIChatModel> {

@@ -62,6 +62,8 @@ data class ReasoningModeRow(
 data class ReasoningSection(
     @StringRes val headerRes: Int?,
     val rows: List<ReasoningModeRow>,
+    /** Set on the gated section, for the upsell impression pixel. */
+    val gatedHeader: GatedHeader? = null,
 )
 
 /** Resolved snapshot the picker view renders from. */
@@ -147,10 +149,8 @@ class ReasoningModePickerViewModel @Inject constructor(
         return listOfNotNull(
             accessible.takeIf { it.isNotEmpty() }?.let { ReasoningSection(headerRes = null, rows = it.toRows()) },
             gated.takeIf { it.isNotEmpty() }?.let {
-                ReasoningSection(
-                    headerRes = gatedSectionHeaderRes(it.map { mode -> mode.access?.requiredTier }, modelState.isFreeTrialEligible),
-                    rows = it.toRows(),
-                )
+                val header = gatedSectionHeader(it.map { mode -> mode.access?.requiredTier }, modelState.isFreeTrialEligible)
+                ReasoningSection(headerRes = header.titleRes, rows = it.toRows(), gatedHeader = header)
             },
         )
     }
@@ -160,6 +160,14 @@ class ReasoningModePickerViewModel @Inject constructor(
 
     fun onPickerShown(surface: PickerSurface) {
         duckChatPixels.fireReasoningEffortPickerShown(surface.origin)
+        state.value.sections.firstNotNullOfOrNull { it.gatedHeader }?.let { header ->
+            duckChatPixels.firePickerUpsellShown(
+                source = UPSELL_SOURCE_REASONING_PICKER,
+                header = header.pixelValue,
+                currentTier = modelManager.modelState.value.userTier.toParam(),
+                origin = surface.origin,
+            )
+        }
     }
 
     fun onModeTapped(mode: ReasoningMode, surface: PickerSurface) {
@@ -195,7 +203,7 @@ class ReasoningModePickerViewModel @Inject constructor(
         }
         routeUpsell(userTier, requiredTier, surface.origin, modelState.isSubscriptionEligible)?.let { upsell ->
             duckChatPixels.fireSubscriptionUpsellTriggered(
-                source = "reasoning_picker",
+                source = UPSELL_SOURCE_REASONING_PICKER,
                 currentTier = userTier.toParam(),
                 requiredTier = requiredTier.toParam(),
                 flowType = upsell.toFlowTypeParam(),
