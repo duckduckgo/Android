@@ -998,7 +998,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private fun updateNewLineButtonVisibility() {
         val isBrowserContext = nativeInputState?.inputContext == NativeInputState.InputContext.BROWSER
         val hasText = inputField.text.isNotBlank()
-        val visible = (isBrowserContext || isEditWidget) && isChatTabSelected() && hasText && !isStreaming
+        val visible = (isBrowserContext || isEditWidget) && isChatTabSelected() && hasText && !isStreaming && !attachmentLimitExceeded
         // Only the top-bar floating row hosts the new-line button. Bottom-bar mode has no
         // on-screen new-line; carriage return there is the IME enter key while on a Duck.ai
         // page (see `applyChatInputType`: IME_ACTION_NONE + TYPE_TEXT_FLAG_MULTI_LINE).
@@ -1983,6 +1983,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         attachmentLimitExceeded = limitExceeded
         this.hasAttachments = hasAttachments
         if (isAttachedToWindow) viewModel.setAttachmentState(hasAttachments = hasAttachments, limitExceeded = limitExceeded)
+        updateNewLineButtonVisibility()
     }
 
     override fun modelMenuShown() {
