@@ -237,8 +237,6 @@ class FakeDuckChatInternal(
 
     override fun buildChatUrl(chatId: String): String = "https://duck.ai?chatID=$chatId"
 
-    override fun getChatProtectionUrl(): String = "https://duck.ai/chat?chatProtection=open"
-
     private val _defaultTogglePosition = MutableStateFlow<String?>(null)
 
     override suspend fun setDefaultTogglePosition(position: DefaultTogglePosition) {
