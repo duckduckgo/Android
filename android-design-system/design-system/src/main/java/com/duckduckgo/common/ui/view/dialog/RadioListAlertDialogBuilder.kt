@@ -28,15 +28,19 @@ import android.text.style.UnderlineSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.FrameLayout
 import android.widget.RadioGroup
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.updateLayoutParams
 import com.duckduckgo.common.ui.view.button.ButtonType
 import com.duckduckgo.common.ui.view.button.DaxButton
 import com.duckduckgo.common.ui.view.button.RadioButton
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.DialogSingleChoiceAlertBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -58,6 +62,7 @@ class RadioListAlertDialogBuilder(val context: Context) : DaxAlertDialog {
 
     private var listener: EventListener = DefaultEventListener()
     private var titleText: CharSequence = ""
+    private var headerImageDrawableId = 0
     private var messageText: CharSequence = ""
     private var messageClickable: Boolean = false
     private var positiveButtonText: CharSequence = ""
@@ -67,6 +72,12 @@ class RadioListAlertDialogBuilder(val context: Context) : DaxAlertDialog {
     private var optionList: MutableList<CharSequence> = mutableListOf()
     private var selectedOption: Int? = null
     private var isCancelable: Boolean = false
+    private var isRebrandUpdate: Boolean = false
+
+    fun setHeaderImageResource(@DrawableRes drawableId: Int): RadioListAlertDialogBuilder {
+        headerImageDrawableId = drawableId
+        return this
+    }
 
     fun setTitle(@StringRes textId: Int): RadioListAlertDialogBuilder {
         titleText = context.getText(textId)
@@ -171,6 +182,17 @@ class RadioListAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         return this
     }
 
+    /**
+     * Opts this dialog into the rebranded look: a fixed-width card with larger rounded corners and the header
+     * image inside a circular container.
+     *
+     * Figma: https://www.figma.com/design/aMaDTBcE9Fsfu40NbjzcrH/Permission--iOS-Android-?node-id=1496-34794
+     */
+    fun setRebrandUpdate(isRebrandUpdate: Boolean): RadioListAlertDialogBuilder {
+        this.isRebrandUpdate = isRebrandUpdate
+        return this
+    }
+
     fun addEventListener(eventListener: EventListener): RadioListAlertDialogBuilder {
         listener = eventListener
         return this
@@ -180,12 +202,22 @@ class RadioListAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         checkRequiredFieldsSet()
         val binding: DialogSingleChoiceAlertBinding = DialogSingleChoiceAlertBinding.inflate(LayoutInflater.from(context))
 
-        val dialogBuilder = MaterialAlertDialogBuilder(context, com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_Dialog)
+        val dialogTheme = if (isRebrandUpdate) {
+            R.style.Widget_DuckDuckGo_Dialog_Rebrand
+        } else {
+            R.style.Widget_DuckDuckGo_Dialog
+        }
+
+        val dialogBuilder = MaterialAlertDialogBuilder(context, dialogTheme)
             .setView(binding.root)
             .apply {
                 setCancelable(isCancelable)
                 setOnDismissListener { listener.onDialogDismissed() }
                 setOnCancelListener { listener.onDialogCancelled() }
+                if (isRebrandUpdate) {
+                    setBackgroundInsetStart(0)
+                    setBackgroundInsetEnd(0)
+                }
             }
 
         dialog = dialogBuilder.create()
@@ -199,6 +231,9 @@ class RadioListAlertDialogBuilder(val context: Context) : DaxAlertDialog {
             build()
         }
         dialog?.show()
+        if (isRebrandUpdate) {
+            dialog?.window?.setLayout(context.rebrandDialogCardWidth(), WindowManager.LayoutParams.WRAP_CONTENT)
+        }
         listener.onDialogShown()
     }
 
@@ -216,6 +251,14 @@ class RadioListAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         binding: DialogSingleChoiceAlertBinding,
         dialog: AlertDialog,
     ) {
+        if (headerImageDrawableId > 0) {
+            binding.radioListDialogImage.setImageResource(headerImageDrawableId)
+            binding.radioListDialogImage.show()
+            if (isRebrandUpdate) {
+                binding.radioListDialogImage.applyRebrandHeaderIconStyle()
+            }
+        }
+
         binding.radioListDialogTitle.text = titleText
 
         if (messageText.isEmpty()) {
@@ -232,8 +275,18 @@ class RadioListAlertDialogBuilder(val context: Context) : DaxAlertDialog {
             radioButton.id = index + 1
             radioButton.text = option
             val params = RadioGroup.LayoutParams(RadioGroup.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT)
+            if (isRebrandUpdate) {
+                // The Material radio drawable insets its circle 6dp; pulling it in lines the circle up with the title.
+                params.marginStart = -context.resources.getDimensionPixelSize(R.dimen.keyline_1)
+            }
             radioButton.layoutParams = params
             binding.radioListDialogRadioGroup.addView(radioButton)
+        }
+
+        if (isRebrandUpdate) {
+            binding.radioListDialogContent.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                bottomMargin = context.resources.getDimensionPixelSize(R.dimen.keyline_0)
+            }
         }
 
         with(binding.radioListDialogRadioGroup) {
