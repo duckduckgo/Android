@@ -168,6 +168,11 @@ interface SubscriptionsManager {
     suspend fun subscriptionStatus(): SubscriptionStatus
 
     /**
+     * Returns the entitlements of the current active subscription from internal storage, or an empty set if there is none
+     */
+    suspend fun getCurrentEntitlements(): Set<Entitlement>
+
+    /**
      * Returns a [Set<String>] of available features for the subscription or an empty set if subscription is not available
      */
     suspend fun getFeatures(): Set<String>
@@ -329,11 +334,15 @@ class RealSubscriptionsManager @Inject constructor(
 
     private fun emitEntitlementsValues() {
         coroutineScope.launch(dispatcherProvider.io()) {
-            val active = authRepository.getSubscription()?.status?.isActiveOrWaiting() == true
-            val rawEntitlements = if (active) authRepository.getEntitlements() else emptyList()
+            val rawEntitlements = getActiveEntitlements()
             _entitlements.emit(rawEntitlements.toProductList())
             _entitlementSet.emit(rawEntitlements.toSet())
         }
+    }
+
+    private suspend fun getActiveEntitlements(): List<Entitlement> {
+        val active = authRepository.getSubscription()?.status?.isActiveOrWaiting() == true
+        return if (active) authRepository.getEntitlements() else emptyList()
     }
 
     private fun emitIsSignedInValues() {
@@ -650,6 +659,8 @@ class RealSubscriptionsManager @Inject constructor(
             UNKNOWN
         }
     }
+
+    override suspend fun getCurrentEntitlements(): Set<Entitlement> = getActiveEntitlements().toSet()
 
     override suspend fun getFeatures(): Set<String> {
         val subscription = authRepository.getSubscription()

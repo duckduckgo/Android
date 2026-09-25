@@ -11,6 +11,7 @@ import com.android.billingclient.api.Purchase
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.FixedLocaleRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.subscriptions.api.Product.NetP
@@ -68,6 +69,7 @@ import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionPurchaseWideEven
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionRestoreWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionSwitchWideEvent
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -76,6 +78,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -1670,6 +1673,64 @@ class RealSubscriptionsManagerTest {
                 expectMostRecentItem(),
             )
         }
+    }
+
+    @Test
+    fun whenSubscriptionIsActiveThenGetCurrentEntitlementsReturnsStoredEntitlements() = runTest {
+        givenSubscriptionExists()
+
+        assertEquals(
+            setOf(Entitlement(name = "subscriber", product = NetP.value)),
+            subscriptionsManager.getCurrentEntitlements(),
+        )
+    }
+
+    @Test
+    fun whenSubscriptionIsInactiveThenGetCurrentEntitlementsReturnsEmpty() = runTest {
+        givenSubscriptionExists(status = INACTIVE)
+
+        assertTrue(subscriptionsManager.getCurrentEntitlements().isEmpty())
+    }
+
+    @Test
+    fun whenStoreChangesWithoutManagerEmittingThenGetCurrentEntitlementsReturnsStoredEntitlements() = runTest {
+        // A queued io dispatcher keeps the flow's background refresh from running before its cached value is
+        // served, which is what a process other than the one that wrote the store experiences.
+        val queuedIoDispatcherProvider = object : DispatcherProvider by coroutineRule.testDispatcherProvider {
+            private val io = StandardTestDispatcher(testScheduler)
+            override fun io(): CoroutineDispatcher = io
+        }
+        val manager = RealSubscriptionsManager(
+            subscriptionsService,
+            authRepository,
+            playBillingManager,
+            context,
+            TestScope(),
+            queuedIoDispatcherProvider,
+            pixelSender,
+            { subscriptionsFeature },
+            authClient,
+            authJwtValidator,
+            pkceGenerator,
+            timeProvider,
+            backgroundTokenRefresh,
+            crossProcessLock,
+            subscriptionPurchaseWideEvent,
+            tokenRefreshWideEvent,
+            subscriptionSwitchWideEvent,
+            freeTrialConversionWideEvent,
+            subscriptionRestoreWideEvent,
+            vpnReminderNotificationScheduler,
+        )
+        givenSubscriptionExists(status = INACTIVE)
+        assertTrue(manager.entitlementSet.first().isEmpty())
+
+        authDataStore.status = AUTO_RENEWABLE.statusName
+
+        assertEquals(
+            setOf(Entitlement(name = "subscriber", product = NetP.value)),
+            manager.getCurrentEntitlements(),
+        )
     }
 
     @Test
