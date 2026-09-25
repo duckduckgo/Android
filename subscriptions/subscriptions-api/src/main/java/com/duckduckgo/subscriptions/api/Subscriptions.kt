@@ -91,6 +91,19 @@ interface Subscriptions {
      * Emits an empty set when there is no active subscription.
      */
     fun getEntitlements(): Flow<Set<Entitlement>>
+
+    /**
+     * Returns the [Entitlement]s granted by the current active subscription, read from storage at call
+     * time, so the result is current in every app process.
+     *
+     * Prefer this over `getEntitlements().first()` for a one-off check: the flow can first return a value
+     * cached earlier in the same process, which outside the main process may be out of date.
+     *
+     * You DO NOT need to set any dispatcher to call this suspend function.
+     *
+     * @return the granted entitlements, or an empty set when there is no active subscription
+     */
+    suspend fun getCurrentEntitlements(): Set<Entitlement>
 }
 
 enum class Product(val value: String) {
