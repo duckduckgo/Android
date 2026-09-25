@@ -47,4 +47,9 @@
     <!-- Chat history overflow (three-dot) menu -->
     <string name="duck_ai_chat_history_overflow_select_chats">Select Chats</string>
     <string name="duck_ai_chat_history_overflow_chats_protection">Chat Protection</string>
+    <string name="duckAiModelPickerLabelEverydayUse">Best for everyday use</string>
+    <string name="duckAiModelPickerLabelUsesLimitsFaster">Solid but hits limits sooner</string>
+    <string name="duckAiModelPickerTryFreeTrial">Try for Free</string>
+    <string name="duckAiModelPickerSubscriberExclusive">Subscriber Exclusive</string>
+    <string name="duckAiModelPickerProExclusive">Pro Plan Exclusive</string>
 </resources>

@@ -24,8 +24,10 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
+import com.duckduckgo.duckchat.impl.models.ModelLabel
 import com.duckduckgo.duckchat.impl.models.ModelProvider
 import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.models.UserTier
@@ -51,7 +53,12 @@ import kotlinx.coroutines.launch
 import logcat.logcat
 import javax.inject.Inject
 
-data class ModelSection(@StringRes val headerRes: Int?, val models: List<AIChatModel>)
+data class ModelSection(
+    @StringRes val headerRes: Int?,
+    val models: List<AIChatModel>,
+    /** Rows in a gated section open an upsell instead of selecting, so they render the follow-up ellipsis. */
+    val gated: Boolean = false,
+)
 
 /** Emitted when the user picks a model during the FE recovery model-change flow. */
 sealed class PickerModelChange {
@@ -65,6 +72,7 @@ class ModelPickerViewModel @Inject constructor(
     private val nativeInputStateProvider: NativeInputStateProvider,
     private val duckAiChatStore: DuckAiChatStore,
     private val effectiveModelProvider: EffectiveModelProvider,
+    private val duckChatFeature: DuckChatFeature,
 ) : ViewModel() {
 
     val state: StateFlow<ModelState> = modelManager.modelState
@@ -221,15 +229,44 @@ class ModelPickerViewModel @Inject constructor(
         }
     }
 
+    fun updatedPickersEnabled(): Boolean = duckChatFeature.updatedPickers().isEnabled()
+
     fun buildSections(state: ModelState): List<ModelSection> {
-        val byTier = state.models.groupBy { it.requiredTier }
         // Models with a null requiredTier (non-public access tiers only, e.g. "internal") have no
         // section to land in and are intentionally hidden from the picker.
+        val public = state.models.filter { it.requiredTier != null }
+        if (!updatedPickersEnabled()) {
+            val byTier = public.groupBy { it.requiredTier }
+            return listOfNotNull(
+                byTier[UserTier.FREE].orEmpty().toSectionOrNull(headerRes = null),
+                byTier[UserTier.PLUS].orEmpty().toSectionOrNull(R.string.duckAiModelPickerPlusModels),
+                byTier[UserTier.PRO].orEmpty().toSectionOrNull(R.string.duckAiModelPickerProModels),
+            )
+        }
+        val (available, gated) = public.partition { it.isAccessible }
         return listOfNotNull(
-            byTier[UserTier.FREE].orEmpty().toSectionOrNull(headerRes = null),
-            byTier[UserTier.PLUS].orEmpty().toSectionOrNull(R.string.duckAiModelPickerPlusModels),
-            byTier[UserTier.PRO].orEmpty().toSectionOrNull(R.string.duckAiModelPickerProModels),
+            available.toSectionOrNull(headerRes = null),
+            gated.toSectionOrNull(headerRes = gatedHeaderRes(gated, state), gated = true),
         )
+    }
+
+    /**
+     * What the user has to do to reach the gated models: start a trial, subscribe, or move up to Pro.
+     * Pro wins when every gated model needs Pro, since a trial or a Plus plan would not unlock them.
+     */
+    @StringRes
+    private fun gatedHeaderRes(gated: List<AIChatModel>, state: ModelState): Int = when {
+        gated.all { it.requiredTier == UserTier.PRO } -> R.string.duckAiModelPickerProExclusive
+        state.isFreeTrialEligible -> R.string.duckAiModelPickerTryFreeTrial
+        else -> R.string.duckAiModelPickerSubscriberExclusive
+    }
+
+    @StringRes
+    fun subtitleResFor(model: AIChatModel): Int? = when (model.label) {
+        ModelLabel.EVERYDAY_USE -> R.string.duckAiModelPickerLabelEverydayUse
+        ModelLabel.USES_LIMITS_FASTER -> R.string.duckAiModelPickerLabelUsesLimitsFaster
+        // A label this version does not know still promotes the model, but we have no copy for it.
+        ModelLabel.UNKNOWN, null -> null
     }
 
     @DrawableRes
@@ -242,6 +279,8 @@ class ModelPickerViewModel @Inject constructor(
         ModelProvider.OSS, ModelProvider.UNKNOWN -> R.drawable.ic_ai_model_oss_16
     }
 
-    private fun List<AIChatModel>.toSectionOrNull(@StringRes headerRes: Int?): ModelSection? =
-        takeIf { it.isNotEmpty() }?.let { ModelSection(headerRes, it) }
+    private fun List<AIChatModel>.toSectionOrNull(
+        @StringRes headerRes: Int?,
+        gated: Boolean = false,
+    ): ModelSection? = takeIf { it.isNotEmpty() }?.let { ModelSection(headerRes, it, gated) }
 }
