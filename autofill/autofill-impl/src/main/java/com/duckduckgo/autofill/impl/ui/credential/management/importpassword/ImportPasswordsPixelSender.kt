@@ -22,6 +22,10 @@ import com.duckduckgo.autofill.impl.engagement.store.AutofillEngagementBucketing
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.UserCannotImportReason
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.UserCannotImportReason.ErrorParsingCsv
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.UserCannotImportReason.WebViewCrash
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_CREDENTIAL_EXCHANGE_CANCELLED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_CREDENTIAL_EXCHANGE_FAILED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_CREDENTIAL_EXCHANGE_STARTED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_CREDENTIAL_EXCHANGE_SUCCEEDED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_TAPPED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_GOOGLE_PASSWORDS_OVERFLOW_MENU
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_GOOGLE_PASSWORDS_PREIMPORT_PROMPT_CONFIRMED
@@ -32,6 +36,7 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_GOO
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_GOOGLE_PASSWORDS_RESULT_SUCCESS
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SYNC_DESKTOP_PASSWORDS_CTA_BUTTON
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SYNC_DESKTOP_PASSWORDS_OVERFLOW_MENU
+import com.duckduckgo.credentialexchange.api.CredentialExchangeFailure
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -47,6 +52,10 @@ interface ImportPasswordsPixelSender {
     fun onImportPasswordsOverflowMenuTapped()
     fun onImportPasswordsViaDesktopSyncButtonTapped()
     fun onImportPasswordsViaDesktopSyncOverflowMenuTapped()
+    fun onCredentialExchangeImportStarted()
+    fun onCredentialExchangeImportSucceeded(savedCredentials: Int, numberSkipped: Int)
+    fun onCredentialExchangeImportCancelled()
+    fun onCredentialExchangeImportFailed(reason: CredentialExchangeFailure)
 }
 
 @ContributesBinding(AppScope::class)
@@ -119,9 +128,34 @@ class ImportPasswordsPixelSenderImpl @Inject constructor(
         pixel.fire(AUTOFILL_SYNC_DESKTOP_PASSWORDS_OVERFLOW_MENU)
     }
 
+    override fun onCredentialExchangeImportStarted() {
+        pixel.fire(AUTOFILL_IMPORT_CREDENTIAL_EXCHANGE_STARTED)
+    }
+
+    override fun onCredentialExchangeImportSucceeded(
+        savedCredentials: Int,
+        numberSkipped: Int,
+    ) {
+        val params = mapOf(
+            "saved_credentials" to engagementBucketing.bucketNumberOfCredentials(savedCredentials),
+            "skipped_credentials" to engagementBucketing.bucketNumberOfCredentials(numberSkipped),
+        )
+        pixel.fire(AUTOFILL_IMPORT_CREDENTIAL_EXCHANGE_SUCCEEDED, params)
+    }
+
+    override fun onCredentialExchangeImportCancelled() {
+        pixel.fire(AUTOFILL_IMPORT_CREDENTIAL_EXCHANGE_CANCELLED)
+    }
+
+    override fun onCredentialExchangeImportFailed(reason: CredentialExchangeFailure) {
+        val params = mapOf(FAILURE_REASON_KEY to reason.name.lowercase())
+        pixel.fire(AUTOFILL_IMPORT_CREDENTIAL_EXCHANGE_FAILED, params)
+    }
+
     companion object {
         private const val CANCELLATION_STAGE_KEY = "stage"
         private const val SOURCE_KEY = "source"
+        private const val FAILURE_REASON_KEY = "reason"
         private const val PRE_IMPORT_DIALOG_STAGE = "pre-import-dialog"
     }
 }

@@ -594,6 +594,60 @@
             }
         ]
     },
+    "autofill_import_credential_exchange_started": {
+        "description": "The user chose to import passwords from another app using the Android credential transfer (FIDO CXF) flow. Fires when the system picker is launched.",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "parameters": ["appVersion"],
+        "expires": "2027-03-31"
+    },
+
+    "autofill_import_credential_exchange_succeeded": {
+        "description": "An Android credential transfer (FIDO CXF) import completed and the credentials were handed to the password store.",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "saved_credentials",
+                "type": "string",
+                "description": "Number of credentials imported, bucketed.",
+                "enum": ["none", "few", "some", "many", "lots"]
+            },
+            {
+                "key": "skipped_credentials",
+                "type": "string",
+                "description": "Number of credentials skipped because they were already saved or repeated, bucketed.",
+                "enum": ["none", "few", "some", "many", "lots"]
+            }
+        ],
+        "expires": "2027-03-31"
+    },
+
+    "autofill_import_credential_exchange_cancelled": {
+        "description": "The user backed out of the Android credential transfer (FIDO CXF) flow before any passwords were transferred.",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "parameters": ["appVersion"],
+        "expires": "2027-03-31"
+    },
+
+    "autofill_import_credential_exchange_failed": {
+        "description": "An Android credential transfer (FIDO CXF) import did not complete. Used to tell apart a device with no exporting app, unreadable data, and everything else.",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "reason",
+                "type": "string",
+                "description": "Why the import did not complete.",
+                "enum": ["no_exporter_available", "malformed_payload", "unknown"]
+            }
+        ],
+        "expires": "2027-03-31"
+    },
+
     "autofill_import_google_passwords_result_success": {
         "description": "The Google Password Manager import completed and the credentials were written to the password store.",
         "owners": ["catalinradoiu"],
