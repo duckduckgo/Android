@@ -947,32 +947,6 @@
                     "reason": "Site breakage"
                 }
             ]
-        },
-        "onboardingPrompts": {
-            "state": "enabled",
-            "features": {
-                "addToDockAndWidgetExperimentJul25": {
-                    "state": "enabled",
-                    "cohorts": [
-                        {
-                            "name": "control",
-                            "weight": 1
-                        },
-                        {
-                            "name": "treatmentDockOnly",
-                            "weight": 0
-                        },
-                        {
-                            "name": "treatmentWidgetOnly",
-                            "weight": 1
-                        },
-                        {
-                            "name": "treatmentDockAndWidget",
-                            "weight": 1
-                        }
-                    ]
-                }
-            }
         }
     },
     "unprotectedTemporary": []
