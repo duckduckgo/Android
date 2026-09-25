@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.reader
 import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.feature.maxHistoryCount
+import com.duckduckgo.duckchat.impl.feature.recentDaysCutoff
 import com.duckduckgo.duckchat.impl.models.ChatType
 import com.duckduckgo.duckchat.impl.models.toChatType
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.ChatSuggestion
@@ -38,7 +39,12 @@ class ChatSuggestionsNativeReader @Inject constructor(
 
     override suspend fun fetchSuggestions(query: String): List<ChatSuggestion> {
         val maxSuggestions = feature.maxHistoryCount()
-        val recentCutoff = LocalDateTime.now().minusDays(RECENT_DAYS_CUTOFF).toLocalDate().atStartOfDay()
+        val cutoffDays = feature.recentDaysCutoff()
+        val recentCutoff = if (cutoffDays > 0) {
+            LocalDateTime.now().minusDays(cutoffDays.toLong()).toLocalDate().atStartOfDay()
+        } else {
+            LocalDateTime.MIN
+        }
         val typeIconEnabled = duckChatFeature.chatSuggestionTypeIcon().isEnabled()
 
         return store.getChats()
@@ -71,9 +77,5 @@ class ChatSuggestionsNativeReader @Inject constructor(
         } catch (_: DateTimeParseException) {
             LocalDateTime.MIN
         }
-    }
-
-    companion object {
-        private const val RECENT_DAYS_CUTOFF = 7L
     }
 }
