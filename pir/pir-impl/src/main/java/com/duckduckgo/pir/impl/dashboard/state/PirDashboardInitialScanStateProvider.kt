@@ -19,11 +19,15 @@ package com.duckduckgo.pir.impl.dashboard.state
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.pir.impl.checker.PirRunMode
+import com.duckduckgo.pir.impl.checker.PirWorkHandler
+import com.duckduckgo.pir.impl.checker.runModeOrNull
 import com.duckduckgo.pir.impl.common.BrokerStepsParser
 import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvider.DashboardBrokerWithStatus
 import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvider.DashboardBrokerWithStatus.Status.COMPLETED
 import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvider.DashboardBrokerWithStatus.Status.IN_PROGRESS
 import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvider.DashboardBrokerWithStatus.Status.NOT_STARTED
+import com.duckduckgo.pir.impl.freemium.PirFreeScanBrokerFilter
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord.ScanJobStatus
 import com.duckduckgo.pir.impl.scan.PirForegroundScanServiceMonitor
 import com.duckduckgo.pir.impl.scan.PirScanScheduler
@@ -31,6 +35,7 @@ import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject
@@ -101,6 +106,8 @@ class RealPirDashboardInitialScanStateProvider @Inject constructor(
     private val brokerStepsParser: BrokerStepsParser,
     private val pirForegroundScanServiceMonitor: PirForegroundScanServiceMonitor,
     private val pirScanScheduler: PirScanScheduler,
+    private val pirWorkHandler: PirWorkHandler,
+    private val pirFreeScanBrokerFilter: PirFreeScanBrokerFilter,
 ) : PirDashboardStateProvider(currentTimeProvider, pirRepository, pirSchedulingRepository),
     PirDashboardInitialScanStateProvider {
     override suspend fun getActiveBrokersAndMirrorSitesTotal(): Int = withContext(dispatcherProvider.io()) {
@@ -115,6 +122,10 @@ class RealPirDashboardInitialScanStateProvider @Inject constructor(
     }
 
     private suspend fun getScannableActiveBrokerNames(): Set<String> {
+        if (pirWorkHandler.canRunPir().firstOrNull().runModeOrNull == PirRunMode.SCAN_ONLY) {
+            return pirFreeScanBrokerFilter.freeScannableBrokerNames()
+        }
+
         return pirRepository.getAllActiveBrokerObjects().mapNotNullTo(hashSetOf()) { broker ->
             // Only count brokers whose scan step can actually be parsed and executed. Brokers with unknown
             // actions in their scan step are silently skipped at scan time, so including them in the total
@@ -131,7 +142,11 @@ class RealPirDashboardInitialScanStateProvider @Inject constructor(
     }
 
     override suspend fun getAllScannedBrokersStatus(): List<DashboardBrokerWithStatus> {
-        return getBrokersAndMirrorSitesWithProgressStatus()
+        // A scan-only user's terminal records for now-gated brokers (e.g. a lapsed subscriber) must not
+        // count here, or progress can exceed the scannable total this same set drives.
+        val runMode = pirWorkHandler.canRunPir().firstOrNull().runModeOrNull
+        val scannableBrokerNames = if (runMode == PirRunMode.SCAN_ONLY) getScannableActiveBrokerNames() else null
+        return getBrokersAndMirrorSitesWithProgressStatus(scannableBrokerNames)
     }
 
     override suspend fun getScanResults(): List<DashboardExtractedProfileResult> {
@@ -151,8 +166,15 @@ class RealPirDashboardInitialScanStateProvider @Inject constructor(
             return false
         }
 
+        // A gated broker's NOT_EXECUTED record can never run for a scan-only user (e.g. a lapsed subscriber),
+        // so it must not count here or this would report an incomplete scan forever.
+        val runMode = pirWorkHandler.canRunPir().firstOrNull().runModeOrNull
+        val scannableBrokerNames = if (runMode == PirRunMode.SCAN_ONLY) getScannableActiveBrokerNames() else null
+
         val notExecutedJobs = pirSchedulingRepository.getAllValidScanJobRecords().filter { record ->
-            record.status == ScanJobStatus.NOT_EXECUTED && record.lastScanDateInMillis == 0L
+            record.status == ScanJobStatus.NOT_EXECUTED &&
+                record.lastScanDateInMillis == 0L &&
+                (scannableBrokerNames == null || record.brokerName in scannableBrokerNames)
         }
 
         if (notExecutedJobs.isEmpty()) {

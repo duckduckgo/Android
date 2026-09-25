@@ -665,7 +665,7 @@ class PirWebSaveProfileMessageHandlerTest {
 
         // Then the scan service resolves eligibility again, so activation has to be stored first
         inOrder(mockPirFreemiumDataStore, mockContext) {
-            verify(mockPirFreemiumDataStore).didActivate = true
+            verify(mockPirFreemiumDataStore).activate(any())
             verify(mockContext).startForegroundService(any())
         }
     }
@@ -684,7 +684,7 @@ class PirWebSaveProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirFreemiumDataStore, never()).didActivate = any()
+        verify(mockPirFreemiumDataStore, never()).activate(any())
         verifyStartAndScheduleInitialScan(PirExecutionType.MANUAL_INITIAL)
     }
 
@@ -702,7 +702,7 @@ class PirWebSaveProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirFreemiumDataStore, never()).didActivate = any()
+        verify(mockPirFreemiumDataStore, never()).activate(any())
     }
 
     @Test
@@ -720,7 +720,74 @@ class PirWebSaveProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirFreemiumDataStore, never()).didActivate = any()
+        verify(mockPirFreemiumDataStore, never()).activate(any())
+    }
+
+    @Test
+    fun whenFreemiumActivatesThenFirstProfileSavedTimestampIsStored() = runTest {
+        // Given
+        val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+        givenSuccessfulProfileSave()
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(flowOf(PirEligibility.Disabled(DisabledReason.SUBSCRIPTION_EXPIRED)))
+        whenever(mockFreemiumToggle.isEnabled()).thenReturn(true)
+        whenever(mockPirFreemiumDataStore.didActivate).thenReturn(false)
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(1_700_000_000_000L)
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, null)
+
+        // Then
+        verify(mockPirFreemiumDataStore).activate(1_700_000_000_000L)
+    }
+
+    @Test
+    fun whenAlreadyActivatedThenFirstProfileSavedTimestampIsNotOverwritten() = runTest {
+        // Given
+        val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+        givenSuccessfulProfileSave()
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(flowOf(PirEligibility.Disabled(DisabledReason.SUBSCRIPTION_EXPIRED)))
+        whenever(mockFreemiumToggle.isEnabled()).thenReturn(true)
+        whenever(mockPirFreemiumDataStore.didActivate).thenReturn(true)
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, null)
+
+        // Then
+        verify(mockPirFreemiumDataStore, never()).activate(any())
+    }
+
+    @Test
+    fun whenSavingProfileAsFreeUserThenScanOnlyWorkIsScheduled() = runTest {
+        // Given
+        val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+        givenSuccessfulProfileSave()
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(
+            flowOf(PirEligibility.Disabled(DisabledReason.SUBSCRIPTION_EXPIRED)),
+            flowOf(PirEligibility.Enabled(PirRunMode.SCAN_ONLY)),
+        )
+        whenever(mockFreemiumToggle.isEnabled()).thenReturn(true)
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, null)
+
+        // Then
+        verify(mockScanScheduler).scheduleScanOnlyWork()
+        verify(mockScanScheduler, never()).scheduleScans()
+    }
+
+    @Test
+    fun whenSavingProfileAsSubscriberThenFullWorkIsScheduled() = runTest {
+        // Given
+        val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+        givenSuccessfulProfileSave()
+        whenever(mockPirWorkHandler.canRunPir()).thenReturn(flowOf(PirEligibility.Enabled(PirRunMode.SCAN_AND_OPT_OUT)))
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, null)
+
+        // Then
+        verify(mockScanScheduler).scheduleScans()
+        verify(mockScanScheduler, never()).scheduleScanOnlyWork()
     }
 
     @Test
