@@ -37,8 +37,9 @@ class StartChatNativeInputPlugin @Inject constructor() : NativeInputPlugin {
 
     override val containerId: Int = R.id.startChatContainer
 
-    // Search-only address-bar affordance; it has no place in the contextual sheet's Duck.ai composer.
-    override val supportedContexts: Set<InputContext> = setOf(InputContext.BROWSER, InputContext.DUCK_AI)
+    // Search-only browser omnibar affordance. Never a Duck.ai surface: its own visibility gate needs the
+    // SEARCH toggle, which no Duck.ai context has, so BROWSER-only also keeps it off the edit screen.
+    override val supportedContexts: Set<InputContext> = setOf(InputContext.BROWSER)
 
     override fun createView(context: Context, host: NativeInputHost): View = StartChatView(context).apply {
         this.host = host
