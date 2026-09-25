@@ -177,6 +177,10 @@ class RealSubscriptions @Inject constructor(
         return subscriptionsManager.entitlementSet
     }
 
+    override suspend fun getCurrentEntitlements(): Set<Entitlement> {
+        return subscriptionsManager.getCurrentEntitlements()
+    }
+
     private fun buildSubscriptionUrl(uri: Uri?): String {
         val buyUrl = subscriptionsUrlProvider.buyUrl
         if (uri == null) return buyUrl
