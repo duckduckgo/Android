@@ -17,6 +17,7 @@
 <com.duckduckgo.duckchat.impl.ui.nativeinput.views.NonCollapsingFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/inputModeTopRoot"
+    android:background="?attr/daxColorToolbar"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="top"
@@ -31,18 +32,21 @@
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
-        <!-- Negative top margin pulls the card up to account for the shadow -->
+        <!-- Compat padding would reserve 16dp below the card for the shadow, and the new tab page
+        content is offset by the card's bounds, so that padding reads as a gap between the input and
+        the content scrolling under it. The shadow draws outside the bounds instead (the parents don't
+        clip), and the horizontal margin replaces the side inset compat padding used to provide. -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/inputModeWidgetCard"
             android:theme="?attr/daxInputModeCardThemeOverlay"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="-9dp"
+            android:layout_marginHorizontal="13dp"
             android:layout_weight="1"
             app:cardBackgroundColor="?attr/daxColorSurface"
             app:cardCornerRadius="24dp"
             app:cardElevation="6dp"
-            app:cardUseCompatPadding="true">
+            app:cardUseCompatPadding="false">
 
             <com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputModeWidget
                 android:id="@+id/inputModeWidget"
