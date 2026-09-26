@@ -596,7 +596,7 @@ class SitePermissionsDialogActivityLauncherTest {
     }
 
     @Test
-    fun whenFireModeAndNeverAllowClickedThenDeniedButNothingPersisted() {
+    fun whenFireModeAndDenyClickedThenDeniedButNothingPersisted() {
         val fireLauncher = createLauncher(BrowserMode.FIRE)
         sitePermissionsDialogRedesignFeature.self().setRawStoredState(Toggle.State(true))
 
@@ -618,7 +618,17 @@ class SitePermissionsDialogActivityLauncherTest {
         )
 
         val dialog = ShadowDialog.getLatestDialog() as AlertDialog
-        dialog.findViewById<LinearLayout>(CommonR.id.stackedAlertDialogButtonLayout)!!.getChildAt(2).performClick()
+        val buttons = dialog.tieredButtons()
+        assertEquals(2, buttons.childCount)
+        assertEquals(
+            dialog.context.getString(R.string.sitePermissionsDialogAllowThisTimeButton),
+            (buttons.getChildAt(0) as Button).text,
+        )
+        assertEquals(
+            dialog.context.getString(R.string.sitePermissionsDialogDenyButton),
+            (buttons.getChildAt(1) as Button).text,
+        )
+        buttons.getChildAt(1).performClick()
         shadowOf(Looper.getMainLooper()).idle()
 
         verify(request).deny()
@@ -626,7 +636,7 @@ class SitePermissionsDialogActivityLauncherTest {
     }
 
     @Test
-    fun whenFireModeAndAllowWhileUsingSiteClickedThenGrantedButNothingPersisted() {
+    fun whenFireModeAndAllowThisTimeClickedThenGrantedButNothingPersisted() {
         val fireLauncher = createLauncher(BrowserMode.FIRE)
         sitePermissionsDialogRedesignFeature.self().setRawStoredState(Toggle.State(true))
         whenever(systemPermissionsHelper.hasCameraPermissionsGranted()).thenReturn(true)

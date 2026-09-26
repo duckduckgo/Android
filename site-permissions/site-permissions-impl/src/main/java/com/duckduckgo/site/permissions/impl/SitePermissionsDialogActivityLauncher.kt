@@ -72,6 +72,7 @@ private enum class PermissionTier(@StringRes val textId: Int) {
     ALLOW_WHILE_USING_SITE(R.string.sitePermissionsDialogAllowWhileUsingSiteButton),
     ALLOW_THIS_TIME(R.string.sitePermissionsDialogAllowThisTimeButton),
     NEVER_ALLOW(R.string.sitePermissionsDialogNeverAllowButton),
+    DENY(R.string.sitePermissionsDialogDenyButton),
 }
 
 @ContributesBinding(FragmentScope::class)
@@ -324,10 +325,10 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         onPermissionAllowed: (Boolean) -> Unit,
         onPermissionDenied: (Boolean) -> Unit = ::denyPermissions,
     ) {
-        val tiers = if (isThirdParty) {
-            listOf(PermissionTier.ALLOW_THIS_TIME, PermissionTier.NEVER_ALLOW)
-        } else {
-            listOf(PermissionTier.ALLOW_WHILE_USING_SITE, PermissionTier.ALLOW_THIS_TIME, PermissionTier.NEVER_ALLOW)
+        val tiers = when {
+            browserMode == BrowserMode.FIRE -> listOf(PermissionTier.ALLOW_THIS_TIME, PermissionTier.DENY)
+            isThirdParty -> listOf(PermissionTier.ALLOW_THIS_TIME, PermissionTier.NEVER_ALLOW)
+            else -> listOf(PermissionTier.ALLOW_WHILE_USING_SITE, PermissionTier.ALLOW_THIS_TIME, PermissionTier.NEVER_ALLOW)
         }
 
         StackedAlertDialogBuilder(activity)
@@ -357,11 +358,14 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                                 sendNegativeDialogClickPixel(pixelType, rememberChoice = true)
                                 onPermissionDenied(true)
                             }
+
+                            PermissionTier.DENY -> denyOnce()
                         }
                     }
 
-                    // The tiered dialog has no explicit deny-once button; dismissing it is that choice.
-                    override fun onDialogCancelled() {
+                    override fun onDialogCancelled() = denyOnce()
+
+                    private fun denyOnce() {
                         sendNegativeDialogClickPixel(pixelType, rememberChoice = false)
                         onPermissionDenied(false)
                     }
