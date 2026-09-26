@@ -263,6 +263,19 @@ class ClearPersonalDataActionTest {
     }
 
     @Test
+    fun whenClearDataForSpecificDomainsCalledThenSitePermissionsClearedForDomainsButFireproofHosts() = runTest {
+        whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
+        whenever(mockFireproofWebsiteRepository.fireproofWebsitesSync()).thenReturn(
+            listOf(FireproofWebsiteEntity("www.fireproof.com")),
+        )
+        testee.clearDataForSpecificDomains(domains = setOf("fireproof.com", "duckduckgo.com", "example.com"))
+        verify(mockSitePermissionsManager).clearForDomainsButFireproof(
+            setOf("fireproof.com", "duckduckgo.com", "example.com"),
+            listOf("www.fireproof.com"),
+        )
+    }
+
+    @Test
     fun whenClearDataForSpecificDomainsCalledWithFireproofDomainsOnlyThenReturnsSuccess() = runTest {
         whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
         whenever(mockFireproofWebsiteRepository.fireproofWebsitesSync()).thenReturn(
