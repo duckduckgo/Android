@@ -34,5 +34,445 @@
                 "description": "Unix timestamp (UTC) denoting the start of the measurement period"
             }
         ]
+    },
+    "webTelemetry_captcha_recaptcha_day": {
+        "description": "Daily bucketed count of page loads where a Google reCAPTCHA challenge was detected. Fired by the eventHub feature at the end of each 1-day period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "count",
+                "type": "string",
+                "description": "Bucketed count for the period",
+                "enum": ["0", "1", "2-3", "4-7", "8-14", "15-20", "21-39", "40+"]
+            },
+            {
+                "key": "attributionPeriod",
+                "type": "integer",
+                "description": "Unix timestamp (UTC) denoting the start of the measurement period"
+            }
+        ]
+    },
+    "webTelemetry_captcha_recaptcha_week": {
+        "description": "Weekly bucketed count of page loads where a Google reCAPTCHA challenge was detected. Fired by the eventHub feature at the end of each 7-day period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "count",
+                "type": "string",
+                "description": "Bucketed count for the period",
+                "enum": ["0", "1", "2-3", "4-7", "8-14", "15-20", "21-39", "40+"]
+            },
+            {
+                "key": "attributionPeriod",
+                "type": "integer",
+                "description": "Unix timestamp (UTC) denoting the start of the measurement period"
+            }
+        ]
+    },
+    "webTelemetry_captcha_hcaptcha_day": {
+        "description": "Daily bucketed count of page loads where an hCaptcha challenge was detected. Fired by the eventHub feature at the end of each 1-day period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "count",
+                "type": "string",
+                "description": "Bucketed count for the period",
+                "enum": ["0", "1", "2-3", "4-7", "8-14", "15-20", "21-39", "40+"]
+            },
+            {
+                "key": "attributionPeriod",
+                "type": "integer",
+                "description": "Unix timestamp (UTC) denoting the start of the measurement period"
+            }
+        ]
+    },
+    "webTelemetry_captcha_hcaptcha_week": {
+        "description": "Weekly bucketed count of page loads where an hCaptcha challenge was detected. Fired by the eventHub feature at the end of each 7-day period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "count",
+                "type": "string",
+                "description": "Bucketed count for the period",
+                "enum": ["0", "1", "2-3", "4-7", "8-14", "15-20", "21-39", "40+"]
+            },
+            {
+                "key": "attributionPeriod",
+                "type": "integer",
+                "description": "Unix timestamp (UTC) denoting the start of the measurement period"
+            }
+        ]
+    },
+    "webTelemetry_captcha_turnstile_day": {
+        "description": "Daily bucketed count of page loads where a Cloudflare Turnstile challenge was detected. Fired by the eventHub feature at the end of each 1-day period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "count",
+                "type": "string",
+                "description": "Bucketed count for the period",
+                "enum": ["0", "1", "2-3", "4-7", "8-14", "15-20", "21-39", "40+"]
+            },
+            {
+                "key": "attributionPeriod",
+                "type": "integer",
+                "description": "Unix timestamp (UTC) denoting the start of the measurement period"
+            }
+        ]
+    },
+    "webTelemetry_captcha_turnstile_week": {
+        "description": "Weekly bucketed count of page loads where a Cloudflare Turnstile challenge was detected. Fired by the eventHub feature at the end of each 7-day period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "count",
+                "type": "string",
+                "description": "Bucketed count for the period",
+                "enum": ["0", "1", "2-3", "4-7", "8-14", "15-20", "21-39", "40+"]
+            },
+            {
+                "key": "attributionPeriod",
+                "type": "integer",
+                "description": "Unix timestamp (UTC) denoting the start of the measurement period"
+            }
+        ]
+    },
+    "webTelemetry_captcha_cloudflare_day": {
+        "description": "Daily bucketed count of page loads where a Cloudflare interstitial challenge was detected. Fired by the eventHub feature at the end of each 1-day period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "count",
+                "type": "string",
+                "description": "Bucketed count for the period",
+                "enum": ["0", "1", "2-3", "4-7", "8-14", "15-20", "21-39", "40+"]
+            },
+            {
+                "key": "attributionPeriod",
+                "type": "integer",
+                "description": "Unix timestamp (UTC) denoting the start of the measurement period"
+            }
+        ]
+    },
+    "webTelemetry_captcha_cloudflare_week": {
+        "description": "Weekly bucketed count of page loads where a Cloudflare interstitial challenge was detected. Fired by the eventHub feature at the end of each 7-day period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "count",
+                "type": "string",
+                "description": "Bucketed count for the period",
+                "enum": ["0", "1", "2-3", "4-7", "8-14", "15-20", "21-39", "40+"]
+            },
+            {
+                "key": "attributionPeriod",
+                "type": "integer",
+                "description": "Unix timestamp (UTC) denoting the start of the measurement period"
+            }
+        ]
+    },
+    "webTelemetry_captcha_datadome_day": {
+        "description": "Daily bucketed count of page loads where a DataDome challenge was detected. Fired by the eventHub feature at the end of each 1-day period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "count",
+                "type": "string",
+                "description": "Bucketed count for the period",
+                "enum": ["0", "1", "2-3", "4-7", "8-14", "15-20", "21-39", "40+"]
+            },
+            {
+                "key": "attributionPeriod",
+                "type": "integer",
+                "description": "Unix timestamp (UTC) denoting the start of the measurement period"
+            }
+        ]
+    },
+    "webTelemetry_captcha_datadome_week": {
+        "description": "Weekly bucketed count of page loads where a DataDome challenge was detected. Fired by the eventHub feature at the end of each 7-day period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "count",
+                "type": "string",
+                "description": "Bucketed count for the period",
+                "enum": ["0", "1", "2-3", "4-7", "8-14", "15-20", "21-39", "40+"]
+            },
+            {
+                "key": "attributionPeriod",
+                "type": "integer",
+                "description": "Unix timestamp (UTC) denoting the start of the measurement period"
+            }
+        ]
+    },
+    "webTelemetry_captcha_imperva_day": {
+        "description": "Daily bucketed count of page loads where an Imperva challenge was detected. Fired by the eventHub feature at the end of each 1-day period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "count",
+                "type": "string",
+                "description": "Bucketed count for the period",
+                "enum": ["0", "1", "2-3", "4-7", "8-14", "15-20", "21-39", "40+"]
+            },
+            {
+                "key": "attributionPeriod",
+                "type": "integer",
+                "description": "Unix timestamp (UTC) denoting the start of the measurement period"
+            }
+        ]
+    },
+    "webTelemetry_captcha_imperva_week": {
+        "description": "Weekly bucketed count of page loads where an Imperva challenge was detected. Fired by the eventHub feature at the end of each 7-day period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "count",
+                "type": "string",
+                "description": "Bucketed count for the period",
+                "enum": ["0", "1", "2-3", "4-7", "8-14", "15-20", "21-39", "40+"]
+            },
+            {
+                "key": "attributionPeriod",
+                "type": "integer",
+                "description": "Unix timestamp (UTC) denoting the start of the measurement period"
+            }
+        ]
+    },
+    "webTelemetry_captcha_arkose_day": {
+        "description": "Daily bucketed count of page loads where an Arkose Labs (FunCaptcha) challenge was detected. Fired by the eventHub feature at the end of each 1-day period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "count",
+                "type": "string",
+                "description": "Bucketed count for the period",
+                "enum": ["0", "1", "2-3", "4-7", "8-14", "15-20", "21-39", "40+"]
+            },
+            {
+                "key": "attributionPeriod",
+                "type": "integer",
+                "description": "Unix timestamp (UTC) denoting the start of the measurement period"
+            }
+        ]
+    },
+    "webTelemetry_captcha_arkose_week": {
+        "description": "Weekly bucketed count of page loads where an Arkose Labs (FunCaptcha) challenge was detected. Fired by the eventHub feature at the end of each 7-day period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "count",
+                "type": "string",
+                "description": "Bucketed count for the period",
+                "enum": ["0", "1", "2-3", "4-7", "8-14", "15-20", "21-39", "40+"]
+            },
+            {
+                "key": "attributionPeriod",
+                "type": "integer",
+                "description": "Unix timestamp (UTC) denoting the start of the measurement period"
+            }
+        ]
+    },
+    "webTelemetry_captcha_geetest_day": {
+        "description": "Daily bucketed count of page loads where a GeeTest challenge was detected. Fired by the eventHub feature at the end of each 1-day period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "count",
+                "type": "string",
+                "description": "Bucketed count for the period",
+                "enum": ["0", "1", "2-3", "4-7", "8-14", "15-20", "21-39", "40+"]
+            },
+            {
+                "key": "attributionPeriod",
+                "type": "integer",
+                "description": "Unix timestamp (UTC) denoting the start of the measurement period"
+            }
+        ]
+    },
+    "webTelemetry_captcha_geetest_week": {
+        "description": "Weekly bucketed count of page loads where a GeeTest challenge was detected. Fired by the eventHub feature at the end of each 7-day period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "count",
+                "type": "string",
+                "description": "Bucketed count for the period",
+                "enum": ["0", "1", "2-3", "4-7", "8-14", "15-20", "21-39", "40+"]
+            },
+            {
+                "key": "attributionPeriod",
+                "type": "integer",
+                "description": "Unix timestamp (UTC) denoting the start of the measurement period"
+            }
+        ]
+    },
+    "webTelemetry_captcha_awswaf_day": {
+        "description": "Daily bucketed count of page loads where an AWS WAF challenge was detected. Fired by the eventHub feature at the end of each 1-day period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "count",
+                "type": "string",
+                "description": "Bucketed count for the period",
+                "enum": ["0", "1", "2-3", "4-7", "8-14", "15-20", "21-39", "40+"]
+            },
+            {
+                "key": "attributionPeriod",
+                "type": "integer",
+                "description": "Unix timestamp (UTC) denoting the start of the measurement period"
+            }
+        ]
+    },
+    "webTelemetry_captcha_awswaf_week": {
+        "description": "Weekly bucketed count of page loads where an AWS WAF challenge was detected. Fired by the eventHub feature at the end of each 7-day period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "count",
+                "type": "string",
+                "description": "Bucketed count for the period",
+                "enum": ["0", "1", "2-3", "4-7", "8-14", "15-20", "21-39", "40+"]
+            },
+            {
+                "key": "attributionPeriod",
+                "type": "integer",
+                "description": "Unix timestamp (UTC) denoting the start of the measurement period"
+            }
+        ]
+    },
+    "webTelemetry_captcha_perimeterx_day": {
+        "description": "Daily bucketed count of page loads where a PerimeterX challenge was detected. Fired by the eventHub feature at the end of each 1-day period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "count",
+                "type": "string",
+                "description": "Bucketed count for the period",
+                "enum": ["0", "1", "2-3", "4-7", "8-14", "15-20", "21-39", "40+"]
+            },
+            {
+                "key": "attributionPeriod",
+                "type": "integer",
+                "description": "Unix timestamp (UTC) denoting the start of the measurement period"
+            }
+        ]
+    },
+    "webTelemetry_captcha_perimeterx_week": {
+        "description": "Weekly bucketed count of page loads where a PerimeterX challenge was detected. Fired by the eventHub feature at the end of each 7-day period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "count",
+                "type": "string",
+                "description": "Bucketed count for the period",
+                "enum": ["0", "1", "2-3", "4-7", "8-14", "15-20", "21-39", "40+"]
+            },
+            {
+                "key": "attributionPeriod",
+                "type": "integer",
+                "description": "Unix timestamp (UTC) denoting the start of the measurement period"
+            }
+        ]
+    },
+    "webTelemetry_captcha_other_day": {
+        "description": "Daily bucketed count of page loads where a captcha challenge that matches no known provider was detected. Fired by the eventHub feature at the end of each 1-day period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "count",
+                "type": "string",
+                "description": "Bucketed count for the period",
+                "enum": ["0", "1", "2-3", "4-7", "8-14", "15-20", "21-39", "40+"]
+            },
+            {
+                "key": "attributionPeriod",
+                "type": "integer",
+                "description": "Unix timestamp (UTC) denoting the start of the measurement period"
+            }
+        ]
+    },
+    "webTelemetry_captcha_other_week": {
+        "description": "Weekly bucketed count of page loads where a captcha challenge that matches no known provider was detected. Fired by the eventHub feature at the end of each 7-day period.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "count",
+                "type": "string",
+                "description": "Bucketed count for the period",
+                "enum": ["0", "1", "2-3", "4-7", "8-14", "15-20", "21-39", "40+"]
+            },
+            {
+                "key": "attributionPeriod",
+                "type": "integer",
+                "description": "Unix timestamp (UTC) denoting the start of the measurement period"
+            }
+        ]
     }
 }
