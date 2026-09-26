@@ -25,6 +25,7 @@ import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.lifecycle.PirProcessLifecycleObserver
 import com.duckduckgo.app.trackerdetection.api.TdsJson
+import com.duckduckgo.app.trackerdetection.api.TrackerDetectionMoshi
 import com.duckduckgo.app.trackerdetection.db.TdsCnameEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
@@ -61,7 +62,7 @@ class TrackerDataLoader @Inject constructor(
     private val tdsMetadataDao: TdsMetadataDao,
     private val context: Context,
     private val appDatabase: AppDatabase,
-    private val moshi: Moshi,
+    @TrackerDetectionMoshi private val moshi: Moshi,
     private val urlToTypeMapper: UrlToTypeMapper,
     private val entityLookupRefresher: EntityLookupRefresher,
     private val cloakedCnameRefresher: CloakedCnameRefresher,

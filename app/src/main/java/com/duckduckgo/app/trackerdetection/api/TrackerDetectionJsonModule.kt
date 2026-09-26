@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2026 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,26 +14,33 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.di
+package com.duckduckgo.app.trackerdetection.api
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.httpsupgrade.impl.HttpsFalsePositivesJsonAdapter
-import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
+import javax.inject.Qualifier
+
+@Qualifier
+annotation class TrackerDetectionMoshi
 
 @Module
 @ContributesTo(AppScope::class)
-object JsonModule {
+object TrackerDetectionJsonModule {
+
+    /**
+     * Room instantiates type converters itself, so the tracker-detection adapters have to be
+     * reachable without going through the Dagger graph as well as through it.
+     */
+    val moshi: Moshi = Moshi.Builder()
+        .add(ActionJsonAdapter())
+        .build()
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun moshi(): Moshi = Moshi.Builder()
-        // FIXME we should not access HttpsFalsePositivesJsonAdapter directly here because it's in impl module
-        .add(HttpsFalsePositivesJsonAdapter())
-        .add(JSONObjectAdapter())
-        .build()
+    @TrackerDetectionMoshi
+    fun trackerDetectionMoshi(): Moshi = moshi
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.global.uri
+package com.duckduckgo.common.utils
 
 import android.net.Uri
 
