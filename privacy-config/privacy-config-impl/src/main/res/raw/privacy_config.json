@@ -973,6 +973,32 @@
                     ]
                 }
             }
+        },
+        "segmentedOnboarding": {
+            "state": "enabled",
+            "features": {
+                "onboardingFlowByDownloadReasonExperiment": {
+                    "state": "enabled",
+                    "minSupportedVersion": 52960000,
+                    "targets": [
+                        {
+                            "localeCountry": "us",
+                            "localeLanguage": "en",
+                            "isReturningUser": false
+                        }
+                    ],
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "treatment",
+                            "weight": 1
+                        }
+                    ]
+                }
+            }
         }
     },
     "unprotectedTemporary": []
