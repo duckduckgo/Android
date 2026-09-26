@@ -125,12 +125,12 @@ class AttachmentViewModelTest {
     private val nativeInputStateStore = RealNativeInputStateStore(
         dagger.Lazy { tabRepositoryProvider },
         browserModeStateHolder,
-        RealTextSelectionRepository(),
+        RealTextSelectionRepository(mock(), mock()),
     )
 
     private lateinit var viewModel: AttachmentViewModel
 
-    private val textSelectionRepository = RealTextSelectionRepository()
+    private val textSelectionRepository = RealTextSelectionRepository(duckChatPixels, mock())
     private val textSelectionPayloadBuilder: TextSelectionPayloadBuilder = mock()
 
     @Before
