@@ -133,7 +133,10 @@ class SavedSitesSyncDataProvider @Inject constructor(
     private fun getRequestEntriesFor(
         folderId: String,
         requestEntries: MutableList<SyncSavedSitesRequestEntry>,
+        visitedFolderIds: MutableSet<String> = mutableSetOf(),
     ): List<SyncSavedSitesRequestEntry> {
+        // folder relations can form a loop, so a folder already on this branch is never descended into again
+        if (!visitedFolderIds.add(folderId)) return requestEntries
         val invalidItems = mutableListOf<String>()
         syncSavedSitesRepository.getAllFolderContentSync(folderId).apply {
             val folder = repository.getFolder(folderId)
@@ -156,7 +159,7 @@ class SavedSitesSyncDataProvider @Inject constructor(
                     if (eachFolder.deleted != null) {
                         requestEntries.add(deletedEntry(eachFolder.id))
                     } else {
-                        getRequestEntriesFor(eachFolder.id, requestEntries)
+                        getRequestEntriesFor(eachFolder.id, requestEntries, visitedFolderIds)
                     }
                 }
                 requestEntries.add(encryptedFolder(fixFolderIfNecessary(folder)))

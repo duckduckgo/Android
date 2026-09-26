@@ -648,6 +648,23 @@ class SyncSavedSitesRepositoryTest {
     }
 
     @Test
+    fun whenFolderRelationsContainCycleThenSetLocalEntitiesForNextSyncTerminates() {
+        val twoHoursAgo = DatabaseDateFormatter.iso8601(OffsetDateTime.now(ZoneOffset.UTC).minusHours(2))
+        val folderA = BookmarkFolder(id = "folderA", name = "Folder A", parentId = bookmarksRootFolder.id, lastModified = twoHoursAgo)
+        val folderB = BookmarkFolder(id = "folderB", name = "Folder B", parentId = folderA.id, lastModified = twoHoursAgo)
+        savedSitesRepository.insert(folderA)
+        savedSitesRepository.insert(folderB)
+        // folderB now also contains folderA, forming a loop in the relations table
+        savedSitesRelationsDao.insert(Relation(folderId = folderB.id, entityId = folderA.id))
+
+        val oneHourAhead = DatabaseDateFormatter.iso8601(OffsetDateTime.now(ZoneOffset.UTC).plusHours(1))
+        repository.setLocalEntitiesForNextSync(oneHourAhead)
+
+        assertTrue(savedSitesEntitiesDao.entityById(folderA.id) != null)
+        assertTrue(savedSitesEntitiesDao.entityById(folderB.id) != null)
+    }
+
+    @Test
     fun whenDeduplicatingBookmarkThenRemoteBookmarkReplacesLocal() {
         // given a local bookmark
         repository.insert(bookmark1, favouritesRoot.entityId)
