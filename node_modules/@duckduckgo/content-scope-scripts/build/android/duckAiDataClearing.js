@@ -4040,9 +4040,38 @@
       this.withLocalStorages((key) => this.clearSavedAIChats(key), errors);
       await this.withAllIndexedDBs((objectStore, _transaction, dbName, storeName) => {
         this.log.info(`Clearing '${dbName}/${storeName}'`);
-        objectStore.clear();
+        this.clearObjectStore(objectStore);
       }, errors);
       this.notifyCompletionResult(errors);
+    }
+    /**
+     * WebKit's `objectStore.clear()` leaves the records' Blob files (e.g. chat images) orphaned on disk,
+     * so Apple platforms delete records one by one instead; `deleteRecordsIndividually` can remotely revert to `clear()`.
+     * @param {IDBObjectStore} objectStore
+     */
+    clearObjectStore(objectStore) {
+      if (this.shouldDeleteRecordsIndividually) {
+        this.deleteAllRecords(objectStore);
+      } else {
+        objectStore.clear();
+      }
+    }
+    get shouldDeleteRecordsIndividually() {
+      const isWebKitPlatform = this.platform.name === "ios" || this.platform.name === "macos";
+      return isWebKitPlatform && this.getFeatureSettingEnabled("deleteRecordsIndividually", "enabled");
+    }
+    /**
+     * @param {IDBObjectStore} objectStore
+     */
+    deleteAllRecords(objectStore) {
+      const cursorRequest = objectStore.openCursor();
+      cursorRequest.onsuccess = () => {
+        const cursor = cursorRequest.result;
+        if (cursor) {
+          cursor.delete();
+          cursor.continue();
+        }
+      };
     }
     /**
      * Deletes a single chat from localStorage and its associated images from IndexedDB.
