@@ -26,16 +26,12 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Intent
-import android.graphics.SurfaceTexture
 import android.graphics.Typeface
 import android.graphics.drawable.AnimatedVectorDrawable
-import android.media.MediaPlayer
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
-import android.view.Surface
-import android.view.TextureView
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.OvershootInterpolator
@@ -80,7 +76,6 @@ import com.duckduckgo.app.onboarding.orchestrator.StepProgress
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.app.onboarding.ui.page.BrandDesignUpdateWelcomePage.Companion.LEFT_WING_CARD_GAP_DP
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR_POSITION
-import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADD_TO_DOCK
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.AI_COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
@@ -179,7 +174,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     private var bobbingDaxAnimator: ValueAnimator? = null
     private var backgroundAnimator: OnboardingBackgroundAnimator? = null
     private var decorationFitCorrector: OnboardingDecorationFitCorrector? = null
-    private var addToDockVideoPlayer: MediaPlayer? = null
     private var changeBoundsTransition: androidx.transition.Transition? = null
     private var changeBoundsTransitionListener: TransitionListenerAdapter? = null
     private var textIntroScale = 1f
@@ -710,58 +704,11 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             .launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
-    private fun setupAddToDockVideo() {
-        binding.daxDialogCta.addToDockContent.addToDockPreviewVideo.setVideoSize(ADD_TO_DOCK_VIDEO_WIDTH, ADD_TO_DOCK_VIDEO_HEIGHT)
-        binding.daxDialogCta.addToDockContent.addToDockPreviewVideo.surfaceTextureListener = object : TextureView.SurfaceTextureListener {
-            override fun onSurfaceTextureAvailable(
-                surface: SurfaceTexture,
-                width: Int,
-                height: Int,
-            ) {
-                playAddToDockVideo(surface)
-            }
-
-            override fun onSurfaceTextureSizeChanged(
-                surface: SurfaceTexture,
-                width: Int,
-                height: Int,
-            ) = Unit
-
-            override fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean {
-                releaseAddToDockVideo()
-                return true
-            }
-
-            override fun onSurfaceTextureUpdated(surface: SurfaceTexture) = Unit
-        }
-    }
-
-    private fun playAddToDockVideo(surfaceTexture: SurfaceTexture) {
-        releaseAddToDockVideo()
-        addToDockVideoPlayer = MediaPlayer().apply {
-            setSurface(Surface(surfaceTexture))
-            resources.openRawResourceFd(R.raw.onboarding_add_to_home_screen_tutorial).use { setDataSource(it) }
-            isLooping = true
-            setVolume(0f, 0f)
-            setOnVideoSizeChangedListener { _, width, height ->
-                binding.daxDialogCta.addToDockContent.addToDockPreviewVideo.setVideoSize(width, height)
-            }
-            setOnPreparedListener { it.start() }
-            prepareAsync()
-        }
-    }
-
-    private fun releaseAddToDockVideo() {
-        addToDockVideoPlayer?.release()
-        addToDockVideoPlayer = null
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
 
         decorationFitCorrector?.detach()
         decorationFitCorrector = null
-        releaseAddToDockVideo()
 
         introAnimatorSet?.cancel()
         introInProgress.value = false
@@ -796,7 +743,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         addressBarFadeInAnimatorSet = null
         homeScreenPromptFadeInAnimatorSet?.cancel()
         homeScreenPromptFadeInAnimatorSet = null
-        binding.daxDialogCta.addToDockContent.addToDockTitle.cancelAnimation()
         binding.daxDialogCta.widgetPromptContent.widgetPromptTitle.cancelAnimation()
         inputScreenFadeInAnimatorSet?.removeAllListeners()
         inputScreenFadeInAnimatorSet?.cancel()
@@ -1097,91 +1043,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                         revealComparisonChart(comparisonChartConfig, stepIndicator, freshEntry = false)
                     }
                 }
-
-                ADD_TO_DOCK -> {
-                    setupAddToDockVideo()
-
-                    val keepBottomWingAnchor = binding.bottomWingAnimation.isVisible
-                    dismissBottomWingAnimation()
-                    binding.daxDialogCta.welcomeContent.root.isVisible = false
-                    binding.daxDialogCta.comparisonChartContent.root.isVisible = false
-                    binding.daxDialogCta.addToDockContent.root.isVisible = true
-                    binding.daxDialogCta.widgetPromptContent.root.isVisible = false
-
-                    binding.daxDialogCta.root.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                        if (keepBottomWingAnchor) {
-                            verticalBias = if (deviceInfo.isTablet()) 0.5f else 0f
-                            bottomToTop = binding.bottomWingAnimation.id
-                            bottomToBottom = ConstraintLayout.LayoutParams.UNSET
-                        } else {
-                            verticalBias = if (deviceInfo.isTablet()) 0.5f else 0f
-                            bottomToTop = ConstraintLayout.LayoutParams.UNSET
-                            bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
-                        }
-                    }
-
-                    binding.daxDialogCta.secondaryCta.visibility = View.GONE
-
-                    val titleView = binding.daxDialogCta.addToDockContent.addToDockTitle
-                    val bodyView = binding.daxDialogCta.addToDockContent.addToDockBody
-                    val mediaView = binding.daxDialogCta.addToDockContent.addToDockMedia
-                    bodyView.text = getString(R.string.preOnboardingAddToDockBody).preventWidows()
-                    bodyView.alpha = 0f
-                    mediaView.alpha = 0f
-
-                    binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingAddToDockPrimaryCta)
-                    binding.daxDialogCta.primaryCta.alpha = 0f
-
-                    titleView.setTitle(getString(R.string.preOnboardingDockStepTitle))
-                    titleView.alpha = 1f
-
-                    binding.daxDialogCta.cardView.setArrowDepthFraction(0f)
-
-                    backgroundAnimator?.transitionTo(background = OnboardingBackground.Horizon)
-
-                    binding.daxDialogCta.stepIndicator.animateToStep(stepIndicator)
-
-                    val transition = ChangeBounds().apply {
-                        duration = DIALOG_TRANSITION_DURATION
-                    }
-                    changeBoundsTransition = transition
-                    val listener = object : TransitionListenerAdapter() {
-                        override fun onTransitionEnd(transition: androidx.transition.Transition) {
-                            if (view == null) return
-                            titleView.typeTitle {
-                                homeScreenPromptFadeInAnimatorSet = AnimatorSet().apply {
-                                    playTogether(
-                                        ObjectAnimator.ofFloat(bodyView, View.ALPHA, 1f)
-                                            .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
-                                        ObjectAnimator.ofFloat(mediaView, View.ALPHA, 1f)
-                                            .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
-                                        ObjectAnimator.ofFloat(binding.daxDialogCta.primaryCta, View.ALPHA, 1f)
-                                            .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
-                                    )
-                                    addListener(
-                                        object : AnimatorListenerAdapter() {
-                                            override fun onAnimationEnd(animation: Animator) {
-                                                isAnimating = false
-                                                binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
-                                            }
-                                        },
-                                    )
-                                    start()
-                                }
-                            }
-                        }
-                    }
-                    changeBoundsTransitionListener = listener
-                    transition.addListener(listener)
-                    binding.daxDialogCta.root.translationZ = 1f.toPx()
-                    TransitionManager.beginDelayedTransition(binding.daxDialogCta.root as ViewGroup, transition)
-                }
-
                 WIDGET_PROMPT -> {
-                    releaseAddToDockVideo()
                     dismissBottomWingAnimation()
                     binding.daxDialogCta.comparisonChartContent.root.isVisible = false
-                    binding.daxDialogCta.addToDockContent.root.isVisible = false
                     binding.daxDialogCta.widgetPromptContent.root.isVisible = true
 
                     binding.daxDialogCta.secondaryCta.visibility = View.INVISIBLE
@@ -1277,11 +1141,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 SKIP_ONBOARDING_OPTION -> Unit
 
                 ADDRESS_BAR_POSITION -> {
-                    releaseAddToDockVideo()
                     dismissBottomWingAnimation()
                     dismissLeftWingAnimation()
                     binding.daxDialogCta.comparisonChartContent.root.isVisible = false
-                    binding.daxDialogCta.addToDockContent.root.isVisible = false
                     binding.daxDialogCta.widgetPromptContent.root.isVisible = false
                     binding.daxDialogCta.secondaryCta.isVisible = false
                     binding.daxDialogCta.addressBarContent.root.isVisible = true
@@ -1831,61 +1693,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.root.isVisible = true
                 binding.daxDialogCta.daxCtaContainer.alpha = 1f
             }
-
-            ADD_TO_DOCK -> {
-                setupAddToDockVideo()
-
-                binding.logoAnimation.alpha = 0f
-                binding.welcomeTitle.alpha = 0f
-                binding.duckAiIntroAnimation.alpha = 0f
-
-                backgroundAnimator?.snapTo(OnboardingBackground.Horizon)
-
-                binding.welcomeScreenWalkingDax.isVisible = false
-                binding.bottomWingAnimation.isVisible = false
-                binding.daxDialogCta.welcomeContent.root.isVisible = false
-                binding.daxDialogCta.comparisonChartContent.root.isVisible = false
-                binding.daxDialogCta.addressBarContent.root.isVisible = false
-                binding.daxDialogCta.inputScreenContent.root.isVisible = false
-                binding.daxDialogCta.inputScreenPreviewContent.root.isVisible = false
-                binding.daxDialogCta.reinstallerQuickSetupContent.root.isVisible = false
-
-                binding.daxDialogCta.addToDockContent.root.isVisible = true
-                binding.daxDialogCta.widgetPromptContent.root.isVisible = false
-
-                binding.daxDialogCta.root.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                    verticalBias = if (deviceInfo.isTablet()) 0.5f else 0f
-                    bottomToTop = ConstraintLayout.LayoutParams.UNSET
-                    bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
-                }
-
-                val titleView = binding.daxDialogCta.addToDockContent.addToDockTitle
-                titleView.setTitle(getString(R.string.preOnboardingDockStepTitle))
-                titleView.snapTitle()
-                titleView.alpha = 1f
-                binding.daxDialogCta.addToDockContent.addToDockBody.text =
-                    getString(R.string.preOnboardingAddToDockBody).preventWidows()
-                binding.daxDialogCta.addToDockContent.addToDockBody.alpha = 1f
-                binding.daxDialogCta.addToDockContent.addToDockMedia.alpha = 1f
-
-                binding.daxDialogCta.cardView.setArrowDepthFraction(0f)
-
-                binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingAddToDockPrimaryCta)
-                binding.daxDialogCta.primaryCta.alpha = 1f
-                binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
-
-                binding.daxDialogCta.secondaryCta.visibility = View.GONE
-
-                binding.daxDialogCta.stepIndicator.alpha = 1f
-                binding.daxDialogCta.stepIndicator.showStep(stepIndicator)
-
-                binding.daxDialogCta.root.isVisible = true
-                binding.daxDialogCta.daxCtaContainer.alpha = 1f
-            }
-
             WIDGET_PROMPT -> {
-                releaseAddToDockVideo()
-
                 binding.logoAnimation.alpha = 0f
                 binding.welcomeTitle.alpha = 0f
                 binding.duckAiIntroAnimation.alpha = 0f
@@ -1901,7 +1709,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.inputScreenPreviewContent.root.isVisible = false
                 binding.daxDialogCta.reinstallerQuickSetupContent.root.isVisible = false
 
-                binding.daxDialogCta.addToDockContent.root.isVisible = false
                 binding.daxDialogCta.widgetPromptContent.root.isVisible = true
 
                 binding.daxDialogCta.secondaryCta.visibility = View.VISIBLE
@@ -1984,9 +1791,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.welcomeContent.root.isVisible = false
                 binding.daxDialogCta.secondaryCta.isVisible = false
                 binding.daxDialogCta.comparisonChartContent.root.isVisible = false
-                binding.daxDialogCta.addToDockContent.root.isVisible = false
                 binding.daxDialogCta.widgetPromptContent.root.isVisible = false
-                releaseAddToDockVideo()
 
                 binding.daxDialogCta.addressBarContent.root.isVisible = true
                 updateAddressBarPositionOptions(selectedAddressBarPosition, showSplitOption, animate = false)
@@ -2692,7 +2497,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 inputScreenContent.inputScreenTitle,
                 inputScreenPreviewContent.inputScreenPreviewTitle,
                 reinstallerQuickSetupContent.quickSetupTitle,
-                addToDockContent.addToDockTitle,
                 widgetPromptContent.widgetPromptTitle,
             ).forEach { it.finishTyping() }
         }
@@ -3089,13 +2893,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
         private const val DEFAULT_BROWSER_ROLE_MANAGER_DIALOG = 101
         private const val QUICK_SETUP_DEFAULT_BROWSER_ROLE_MANAGER_DIALOG = 102
-
-        // Seeds AspectRatioTextureView's initial measurement before the real size arrives from
-        // MediaPlayer's onVideoSizeChanged — otherwise wrap_content measures to 0 height on the
-        // first layout pass (no video size yet) and the TextureView's surface never becomes
-        // available, since it depends on a non-zero size to be created.
-        private const val ADD_TO_DOCK_VIDEO_WIDTH = 1080
-        private const val ADD_TO_DOCK_VIDEO_HEIGHT = 944
 
         private val WELCOME_DAX_INTERPOLATOR = PathInterpolator(0.33f, 0f, 0.67f, 1f)
     }

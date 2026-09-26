@@ -263,7 +263,6 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             shadowColor = ContextCompat.getColor(this, CommonR.color.background_omnibar_shadow),
         )
 
-        viewModel.setLaunchedFromWidget(launchedFromAnyWidget(intent))
         viewModel.setLaunchedFromSearchOnlyWidget(launchedFromSearchOnlyWidget(intent))
 
         showKeyboard(omnibarTextInput)
@@ -290,7 +289,6 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         dataClearerForegroundAppRestartPixel.registerIntent(intent)
         viewModel.resetViewState()
         viewModel.setLaunchedFromSearchOnlyWidget(launchedFromSearchOnlyWidget(intent))
-        viewModel.setLaunchedFromWidget(launchedFromAnyWidget(intent))
         sendLaunchPixels(intent)
         if (launchedFromAssist(intent)) {
             handleDigitalAssistIntent()

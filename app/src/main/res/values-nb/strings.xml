@@ -977,9 +977,6 @@
     <string name="preOnboardingImportErrorRetry">Prøv igjen</string>
 
     <!-- Pre-onboarding: add to home screen -->
-    <string name="preOnboardingDockStepTitle">Legg meg til i favorittraden din.</string>
-    <string name="preOnboardingAddToDockBody">Finn DuckDuckGo-ikonet på startskjermen. Trykk på det og dra det dit du vil ha det. Det er det hele!</string>
-    <string name="preOnboardingAddToDockPrimaryCta">Skjønner!</string>
 
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Start en privat AI-chat med Duck.ai eller bytt til Søk for beskyttet surfing.<br/><br/>Du kan bruke Duck.ai overalt der du ser chat-ikonet]]></string>

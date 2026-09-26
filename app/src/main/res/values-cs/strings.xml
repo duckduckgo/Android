@@ -1013,9 +1013,6 @@
     <string name="preOnboardingImportErrorRetry">Zkus to znovu</string>
 
     <!-- Pre-onboarding: add to home screen -->
-    <string name="preOnboardingDockStepTitle">Přidej si mě do řádku oblíbených.</string>
-    <string name="preOnboardingAddToDockBody">Najdi ikonu DuckDuckGo na ploše. Pak ji podrž a přetáhni na místo. A je to!</string>
-    <string name="preOnboardingAddToDockPrimaryCta">Chápu!</string>
 
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Začni soukromý chat s AI Duck.ai, nebo přepni na Vyhledávání a začni s chráněným prohlížením.<br/><br/>Duck.ai můžeš používat odkudkoli, kde vidíš ikonu chatu.]]></string>

@@ -44,8 +44,6 @@ class SegmentedOnboardingExperimentManagerTest {
         FakeFeatureToggleFactory.create(OnboardingBrandDesignUpdateToggles::class.java)
     private val passwordImportToggles: OnboardingPasswordImportToggles =
         FakeFeatureToggleFactory.create(OnboardingPasswordImportToggles::class.java)
-    private val promptsToggles: OnboardingPromptsToggles =
-        FakeFeatureToggleFactory.create(OnboardingPromptsToggles::class.java)
     private val privacyConfigPersistedGate = OnboardingPrivacyConfigPersistedGateImpl()
     private val appBuildConfig: AppBuildConfig = mock()
 
@@ -53,7 +51,6 @@ class SegmentedOnboardingExperimentManagerTest {
         onboardingBrandDesignUpdateToggles = brandDesignToggles,
         segmentedOnboardingFeatureToggles = segmentedToggles,
         onboardingPasswordImportToggles = passwordImportToggles,
-        onboardingPromptsToggles = promptsToggles,
         appBuildConfig = appBuildConfig,
         dispatcherProvider = coroutineRule.testDispatcherProvider,
         onboardingPrivacyConfigPersistedGate = privacyConfigPersistedGate,
@@ -141,17 +138,6 @@ class SegmentedOnboardingExperimentManagerTest {
     }
 
     @Test
-    fun `when add to dock and widget experiment enabled then enroll returns null`() = runTest {
-        givenPrerequisitesMet()
-        promptsToggles.addToDockAndWidgetExperimentJul25().setRawStoredState(Toggle.State(enable = true))
-        givenCohortEnabled(Cohorts.TREATMENT)
-
-        privacyConfigPersistedGate.onPrivacyConfigPersisted()
-
-        assertNull(testee.enroll())
-    }
-
-    @Test
     fun `when password import experiment enabled then enroll returns null`() = runTest {
         givenPrerequisitesMet()
         passwordImportToggles.passwordImportExperimentAug25().setRawStoredState(Toggle.State(enable = true))
@@ -166,7 +152,6 @@ class SegmentedOnboardingExperimentManagerTest {
         brandDesignToggles.brandDesignUpdate().setRawStoredState(Toggle.State(enable = true))
         brandDesignToggles.configDrivenDialogs().setRawStoredState(Toggle.State(enable = true))
         whenever(appBuildConfig.isAppReinstall()).thenReturn(false)
-        promptsToggles.addToDockAndWidgetExperimentJul25().setRawStoredState(Toggle.State(enable = false))
         passwordImportToggles.passwordImportExperimentAug25().setRawStoredState(Toggle.State(enable = false))
     }
 

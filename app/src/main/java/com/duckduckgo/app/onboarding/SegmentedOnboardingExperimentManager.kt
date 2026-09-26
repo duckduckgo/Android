@@ -42,7 +42,6 @@ class SegmentedOnboardingExperimentManagerImpl @Inject constructor(
     private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
     private val segmentedOnboardingFeatureToggles: SegmentedOnboardingFeatureToggles,
     private val onboardingPasswordImportToggles: OnboardingPasswordImportToggles,
-    private val onboardingPromptsToggles: OnboardingPromptsToggles,
     private val appBuildConfig: AppBuildConfig,
     private val dispatcherProvider: DispatcherProvider,
     private val onboardingPrivacyConfigPersistedGate: OnboardingPrivacyConfigPersistedGate,
@@ -65,7 +64,6 @@ class SegmentedOnboardingExperimentManagerImpl @Inject constructor(
     private suspend fun checkPrerequisites() =
         onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled() &&
             onboardingBrandDesignUpdateToggles.configDrivenDialogs().isEnabled() &&
-            !onboardingPromptsToggles.addToDockAndWidgetExperimentJul25().isEnabled() &&
             !onboardingPasswordImportToggles.passwordImportExperimentAug25().isEnabled() &&
             !appBuildConfig.isAppReinstall()
 }
