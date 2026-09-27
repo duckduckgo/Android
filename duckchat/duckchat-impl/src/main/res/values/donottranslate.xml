@@ -63,8 +63,8 @@
     <string name="duckChatUsageLimitFooterWeeklyReached">Weekly usage limit reached</string>
     <string name="duckChatUsageLimitFooterAdvancedModelsReached">Advanced AI models limit reached</string>
     <string name="duckChatUsageLimitFooterCtaSwitchModel">Switch Model</string>
-    <string name="duckChatUsageLimitFooterCtaStartUsingWeeklyLimit">Start using weekly limit</string>
-    <string name="duckChatUsageLimitFooterCtaTryForFree">Try for Free</string>
+    <string name="duckChatUsageLimitFooterCtaStartUsingWeeklyLimit">Start Using Weekly Limit</string>
+    <string name="duckChatUsageLimitFooterCtaTryForFree">Try Subscription for Free</string>
     <string name="duckChatUsageLimitFooterCtaSubscribe">Subscribe</string>
     <string name="duckChatUsageLimitFooterResetsIn" instruction="Placeholder is a duration such as '2 days' or '5 hours'">Resets in %1$s</string>
     <plurals name="duckChatUsageLimitFooterDays">

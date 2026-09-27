@@ -331,7 +331,7 @@ class UsageLimitFooterPluginTest {
         footer.state.test {
             assertTrue(awaitItem().visible)
             val button = footer.view.findViewById<DaxButtonSecondary>(R.id.usageLimitFooterCta)
-            assertEquals("Start using weekly limit", button.text.toString())
+            assertEquals("Start Using Weekly Limit", button.text.toString())
 
             button.performClick()
 
@@ -352,7 +352,7 @@ class UsageLimitFooterPluginTest {
         footer.state.test {
             assertTrue(awaitItem().visible)
             val button = footer.view.findViewById<DaxButtonSecondary>(R.id.usageLimitFooterCta)
-            assertEquals("Try for Free", button.text.toString())
+            assertEquals("Try Subscription for Free", button.text.toString())
 
             button.performClick()
 
