@@ -30,6 +30,7 @@ jobs:
                   ${{ runner.os }}-node-
 
             - name: Checkout internal-github-asana-utils repo
+              if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
               uses: actions/checkout@v4
               with:
                   token: ${{ secrets.DAXMOBILE_ANDROID_AUTOMATION }}
@@ -45,7 +46,13 @@ jobs:
               working-directory: PixelDefinitions
 
             - name: Run pixel validation
-              run: npm run validate-defs-without-formatting -- -g ../internal-github-asana-utils/user_map.yml
+              run: |
+                if [ -f "../internal-github-asana-utils/user_map.yml" ]; then
+                  npm run validate-defs-without-formatting -- -g ../internal-github-asana-utils/user_map.yml
+                else
+                  echo "Internal utilities not available; running validation without user_map.yml"
+                  npm run validate-defs-without-formatting
+                fi
               working-directory: PixelDefinitions
 
             # Validation regenerates generated_schemas/ in place and exits 0 either way.
@@ -64,4 +71,3 @@ jobs:
                   echo 'Run "npm run validate-defs-without-formatting" in PixelDefinitions and commit the result.'
                   exit 1
                 fi
-
