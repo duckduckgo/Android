@@ -43,6 +43,7 @@ import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData.UserProfile
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ClickResponse
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ConditionResponse
+import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ExecuteScriptResponse
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ExpectationResponse
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ExtractedResponse
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.FillFormResponse
@@ -137,7 +138,7 @@ class JsActionSuccessEventHandler @Inject constructor(
                 )
             }
 
-            is FillFormResponse, is ClickResponse, is ExpectationResponse, is ExtractedResponse -> {
+            is FillFormResponse, is ClickResponse, is ExpectationResponse, is ExtractedResponse, is ExecuteScriptResponse -> {
                 Next(
                     nextState = baseSuccessState.copy(
                         currentActionIndex = baseSuccessState.currentActionIndex + 1,

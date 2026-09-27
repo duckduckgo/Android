@@ -1,0 +1,301 @@
+{
+    "android-pir-initial-scan": {
+        "description": "Wide event tracking the lifecycle of a manually-triggered PIR run (initial scan or post-profile-edit), covering scan progress in 10% increments, scan completion, and the follow-on opt-out scheduling phase. Used to measure end-to-end success rate, drop-off, and per-phase latency.",
+        "owners": ["karlenDimla", "landomen"],
+        "meta": {
+            "type": "android-pir-initial-scan",
+            "version": "0.0"
+        },
+        "feature": {
+            "name": "pir-initial-scan",
+            "status": ["SUCCESS", "FAILURE", "CANCELLED", "UNKNOWN"],
+            "data": {
+                "ext": {
+                    "execution_type": {
+                        "type": "string",
+                        "description": "Distinguishes the user's first manual scan after onboarding (manual_initial), a dashboard-triggered resume of an interrupted initial scan (manual_initial_resume), and a re-scan triggered by editing a saved profile (manual_edit_profile)",
+                        "enum": ["manual_initial", "manual_edit_profile", "manual_initial_resume"]
+                    },
+                    "profile_queries_count": {
+                        "type": "string",
+                        "description": "Number of user profile queries used in the run",
+                        "pattern": "^[0-9]+$"
+                    },
+                    "broker_count": {
+                        "type": "string",
+                        "description": "Number of active brokers at the start of the run",
+                        "pattern": "^[0-9]+$"
+                    },
+                    "total_scan_jobs": {
+                        "type": "string",
+                        "description": "Total number of (broker x profile) scan jobs eligible for execution at the start of the run",
+                        "pattern": "^[0-9]+$"
+                    },
+                    "web_view_count": {
+                        "type": "string",
+                        "description": "Number of parallel WebView runners used during the scan portion. Equals min(total_scan_jobs, MAX_DETACHED_WEBVIEW_COUNT=20). 0 when there are no eligible scan jobs.",
+                        "pattern": "^[0-9]+$"
+                    },
+                    "scheduling": {
+                        "type": "string",
+                        "description": "How scan/opt-out steps were distributed across the WebView runners for this run, as resolved from the workQueueScheduling remote toggle at run start: a shared cost-ordered work queue (queue) or contiguous equal-count chunks per runner (static).",
+                        "enum": ["queue", "static"]
+                    },
+                    "total_opt_out_jobs": {
+                        "type": "string",
+                        "description": "Total number of opt-out jobs executed during the run. 0 when opt-out was skipped (no eligible form-opt-out brokers). Only populated on terminal events.",
+                        "pattern": "^[0-9]+$"
+                    },
+                    "power_saving": {
+                        "type": "string",
+                        "description": "Whether the device was in power saving mode at the start of the run",
+                        "enum": ["true", "false"]
+                    },
+                    "battery_optimizations": {
+                        "type": "string",
+                        "description": "Whether battery optimizations were enabled for the app at the start of the run",
+                        "enum": ["true", "false"]
+                    },
+                    "vpn_connection_state": {
+                        "type": "string",
+                        "description": "Reported VPN connection state at the start of the run",
+                        "enum": ["connected", "disconnected"]
+                    },
+                    "notifications_permission_granted": {
+                        "type": "string",
+                        "description": "Whether the user had granted the POST_NOTIFICATIONS runtime permission at the start of the run",
+                        "enum": ["true", "false"]
+                    },
+                    "tracker_blocking_state": {
+                        "type": "string",
+                        "description": "Whether tracker blocking was enabled or disabled during the run",
+                        "enum": ["enabled", "disabled"]
+                    },
+                    "last_step": {
+                        "type": "string",
+                        "description": "The last recorded step name when the flow terminated. Useful for understanding where flows drop off when status is FAILURE, CANCELLED, or UNKNOWN.",
+                        "enum": [
+                            "started",
+                            "progress_10",
+                            "progress_20",
+                            "progress_30",
+                            "progress_40",
+                            "progress_50",
+                            "progress_60",
+                            "progress_70",
+                            "progress_80",
+                            "progress_90",
+                            "scan_completed",
+                            "opt_out_started",
+                            "opt_out_completed",
+                            "opt_out_skipped"
+                        ]
+                    },
+                    "last_step_elapsed_ms_bucketed": {
+                        "type": "string",
+                        "description": "Time from run start to when last_step was reached, bucketed using the lower bucket boundary. Recorded on every step after 'started'. On UNKNOWN/killed runs this is the only signal for how long the run had been going before termination, since the total_*_duration intervals are never recorded when a run is killed.",
+                        "enum": [
+                            "0",
+                            "10000",
+                            "30000",
+                            "60000",
+                            "120000",
+                            "300000",
+                            "600000",
+                            "900000",
+                            "1800000",
+                            "3600000",
+                            "7200000",
+                            "14400000",
+                            "28800000"
+                        ]
+                    },
+                    "failure_reason": {
+                        "type": "string",
+                        "description": "Reason a run failed. Only present on FAILURE events. Specific exception types are mapped to bounded values; anything not in the known set falls back to unknown_error. The phase the run was in when it failed is recoverable from last_step.",
+                        "enum": [
+                            "no_active_brokers",
+                            "illegal_state_exception",
+                            "illegal_argument_exception",
+                            "null_pointer_exception",
+                            "io_exception",
+                            "sqlite_exception",
+                            "timeout_cancellation_exception",
+                            "renderer_gone",
+                            "unknown_error"
+                        ]
+                    },
+                    "did_crash": {
+                        "type": "string",
+                        "description": "Only present on renderer_gone failures. true = the WebView renderer actually crashed; false = the system reclaimed it (e.g. low memory).",
+                        "enum": ["true", "false"]
+                    },
+                    "cancellation_reason": "pirCancellationReason",
+                    "step.started": {
+                        "type": "string",
+                        "description": "Parameter present when the run body actually begins (after the no-profiles early return)",
+                        "enum": ["true"]
+                    },
+                    "step.progress_10": {
+                        "type": "string",
+                        "description": "Parameter present when the rolling completed-scan-jobs count first crosses 10%",
+                        "enum": ["true"]
+                    },
+                    "step.progress_20": {
+                        "type": "string",
+                        "description": "Parameter present when the rolling completed-scan-jobs count first crosses 20%",
+                        "enum": ["true"]
+                    },
+                    "step.progress_30": {
+                        "type": "string",
+                        "description": "Parameter present when the rolling completed-scan-jobs count first crosses 30%",
+                        "enum": ["true"]
+                    },
+                    "step.progress_40": {
+                        "type": "string",
+                        "description": "Parameter present when the rolling completed-scan-jobs count first crosses 40%",
+                        "enum": ["true"]
+                    },
+                    "step.progress_50": {
+                        "type": "string",
+                        "description": "Parameter present when the rolling completed-scan-jobs count first crosses 50%",
+                        "enum": ["true"]
+                    },
+                    "step.progress_60": {
+                        "type": "string",
+                        "description": "Parameter present when the rolling completed-scan-jobs count first crosses 60%",
+                        "enum": ["true"]
+                    },
+                    "step.progress_70": {
+                        "type": "string",
+                        "description": "Parameter present when the rolling completed-scan-jobs count first crosses 70%",
+                        "enum": ["true"]
+                    },
+                    "step.progress_80": {
+                        "type": "string",
+                        "description": "Parameter present when the rolling completed-scan-jobs count first crosses 80%",
+                        "enum": ["true"]
+                    },
+                    "step.progress_90": {
+                        "type": "string",
+                        "description": "Parameter present when the rolling completed-scan-jobs count first crosses 90%",
+                        "enum": ["true"]
+                    },
+                    "step.scan_completed": {
+                        "type": "string",
+                        "description": "Parameter present when all scan jobs finish (signals the end of the scan portion; replaces a hypothetical progress_100)",
+                        "enum": ["true"]
+                    },
+                    "step.opt_out_started": {
+                        "type": "string",
+                        "description": "Parameter present when the opt-out scheduling phase begins (only when there is at least one eligible form-opt-out broker)",
+                        "enum": ["true"]
+                    },
+                    "step.opt_out_completed": {
+                        "type": "string",
+                        "description": "Parameter present when the opt-out scheduling phase finishes successfully",
+                        "enum": ["true"]
+                    },
+                    "step.opt_out_skipped": {
+                        "type": "string",
+                        "description": "Parameter present when the opt-out scheduling phase is skipped because there are no eligible form-opt-out brokers",
+                        "enum": ["true"]
+                    },
+                    "decile_0_10_duration_ms_bucketed": {
+                        "type": "string",
+                        "description": "Time from run start to crossing 10% of scan jobs, bucketed using the lower bucket boundary. A value of -1 means the device clock moved backwards during the interval, so the duration could not be measured",
+                        "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                    },
+                    "decile_10_20_duration_ms_bucketed": {
+                        "type": "string",
+                        "description": "Time from crossing 10% to crossing 20% of scan jobs, bucketed using the lower bucket boundary. A value of -1 means the device clock moved backwards during the interval, so the duration could not be measured",
+                        "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                    },
+                    "decile_20_30_duration_ms_bucketed": {
+                        "type": "string",
+                        "description": "Time from crossing 20% to crossing 30% of scan jobs, bucketed using the lower bucket boundary. A value of -1 means the device clock moved backwards during the interval, so the duration could not be measured",
+                        "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                    },
+                    "decile_30_40_duration_ms_bucketed": {
+                        "type": "string",
+                        "description": "Time from crossing 30% to crossing 40% of scan jobs, bucketed using the lower bucket boundary. A value of -1 means the device clock moved backwards during the interval, so the duration could not be measured",
+                        "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                    },
+                    "decile_40_50_duration_ms_bucketed": {
+                        "type": "string",
+                        "description": "Time from crossing 40% to crossing 50% of scan jobs, bucketed using the lower bucket boundary. A value of -1 means the device clock moved backwards during the interval, so the duration could not be measured",
+                        "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                    },
+                    "decile_50_60_duration_ms_bucketed": {
+                        "type": "string",
+                        "description": "Time from crossing 50% to crossing 60% of scan jobs, bucketed using the lower bucket boundary. A value of -1 means the device clock moved backwards during the interval, so the duration could not be measured",
+                        "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                    },
+                    "decile_60_70_duration_ms_bucketed": {
+                        "type": "string",
+                        "description": "Time from crossing 60% to crossing 70% of scan jobs, bucketed using the lower bucket boundary. A value of -1 means the device clock moved backwards during the interval, so the duration could not be measured",
+                        "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                    },
+                    "decile_70_80_duration_ms_bucketed": {
+                        "type": "string",
+                        "description": "Time from crossing 70% to crossing 80% of scan jobs, bucketed using the lower bucket boundary. A value of -1 means the device clock moved backwards during the interval, so the duration could not be measured",
+                        "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                    },
+                    "decile_80_90_duration_ms_bucketed": {
+                        "type": "string",
+                        "description": "Time from crossing 80% to crossing 90% of scan jobs, bucketed using the lower bucket boundary. A value of -1 means the device clock moved backwards during the interval, so the duration could not be measured",
+                        "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                    },
+                    "opt_out_duration_ms_bucketed": {
+                        "type": "string",
+                        "description": "Time spent in the opt-out scheduling phase from opt_out_started to opt_out_completed, bucketed using the lower bucket boundary. A value of -1 means the device clock moved backwards during the interval, so the duration could not be measured",
+                        "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+                    },
+                    "total_scan_duration_ms_bucketed": {
+                        "type": "string",
+                        "description": "Time from run start to scan_completed — the full scan phase, including the final 90-100% band that the per-decile intervals don't cover — bucketed using the lower bucket boundary. Absent on runs that never reach scan_completed (e.g. UNKNOWN/killed runs). A value of -1 means the device clock moved backwards during the interval, so the duration could not be measured.",
+                        "enum": [
+                            "-1",
+                            "0",
+                            "10000",
+                            "30000",
+                            "60000",
+                            "120000",
+                            "300000",
+                            "600000",
+                            "900000",
+                            "1800000",
+                            "3600000",
+                            "7200000",
+                            "14400000",
+                            "28800000"
+                        ]
+                    },
+                    "total_flow_duration_ms_bucketed": {
+                        "type": "string",
+                        "description": "Time from run start to flow finish — end-to-end, including the opt-out scheduling phase — bucketed using the lower bucket boundary. Absent on runs finalized by the cleanup timeout (e.g. UNKNOWN/killed runs). A value of -1 means the device clock moved backwards during the interval, so the duration could not be measured.",
+                        "enum": [
+                            "-1",
+                            "0",
+                            "10000",
+                            "30000",
+                            "60000",
+                            "120000",
+                            "300000",
+                            "600000",
+                            "900000",
+                            "1800000",
+                            "3600000",
+                            "7200000",
+                            "14400000",
+                            "28800000"
+                        ]
+                    }
+                }
+            }
+        },
+        "context": {
+            "name": ["funnel_pir_initial_android", "funnel_pir_edit_profile_android", "funnel_pir_initial_resume_android"]
+        }
+    }
+}

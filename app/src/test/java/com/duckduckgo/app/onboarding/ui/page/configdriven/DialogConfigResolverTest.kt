@@ -20,17 +20,20 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.onboarding.OnboardingPreference
+import com.duckduckgo.app.onboarding.TestOption
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingActivityDialog
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingEvent
+import com.duckduckgo.app.onboarding.orchestrator.PasswordImportResult
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
-import com.duckduckgo.app.onboarding.ui.page.OnboardingBackgroundStep
+import com.duckduckgo.app.onboarding.ui.page.OnboardingBackground
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import com.duckduckgo.mobile.android.R as CommonR
 
 class DialogConfigResolverTest {
 
@@ -47,7 +50,7 @@ class DialogConfigResolverTest {
     fun `resolves the comparison chart with the browser chart config`() {
         val config = testee.resolve(NewUserOnboardingActivityDialog.ComparisonChart, isCustomAiFlow = false)!!
 
-        assertEquals(OnboardingBackgroundStep.ComparisonChart, config.background)
+        assertEquals(OnboardingBackground.Horizon, config.background)
         assertEquals(Embellishment.BottomWing, config.embellishment)
         assertEquals(CardArrowConfig.AtEnd, config.cardArrow)
         val expectedChart = ComparisonChartConfig.Browser(isCustomAiCopy = false)
@@ -84,7 +87,7 @@ class DialogConfigResolverTest {
             isCustomAiFlow = false,
         )!!
 
-        assertEquals(OnboardingBackgroundStep.ComparisonChart, config.background)
+        assertEquals(OnboardingBackground.Horizon, config.background)
         assertEquals(Embellishment.None, config.embellishment)
         assertEquals(CardArrowConfig.Hidden, config.cardArrow)
         val expectedChart = ComparisonChartConfig.SegmentedSearchPath
@@ -96,29 +99,27 @@ class DialogConfigResolverTest {
     }
 
     @Test
-    fun `resolves the preference selector with a row per offered preference and a submitting cta`() {
+    fun `resolves the preference selector by passing its rows through against a submitting cta`() {
+        val rows = listOf(
+            row(OnboardingPreference.SEARCH_HISTORY, initiallyEnabled = true),
+            row(OnboardingPreference.SAFE_SEARCH, initiallyEnabled = false),
+        )
+
         val config = testee.resolve(
             NewUserOnboardingActivityDialog.PreferenceSelector(
-                mapOf(
-                    OnboardingPreference.SEARCH_HISTORY to true,
-                    OnboardingPreference.SAFE_SEARCH to false,
-                ),
+                titleRes = R.string.noAiPathPreferenceSelectorTitle,
+                rows = rows,
             ),
             isCustomAiFlow = false,
         )!!
 
-        assertEquals(OnboardingBackgroundStep.PreferenceSelector, config.background)
+        assertEquals(OnboardingBackground.Clouds, config.background)
         assertEquals(Embellishment.LeftWing, config.embellishment)
-        assertEquals(CardArrowConfig.AtEnd, config.cardArrow)
+        assertEquals(CardArrowConfig.AtStart, config.cardArrow)
         val content = config.content as ContentConfig.PreferenceSelector
-        assertEquals(TextConfig.Resource(R.string.searchPathPreferenceSelectorTitle), content.title)
-        assertEquals(
-            listOf(
-                OnboardingPreference.SEARCH_HISTORY to true,
-                OnboardingPreference.SAFE_SEARCH to false,
-            ),
-            content.rows.map { it.preference to it.initiallyEnabled },
-        )
+        assertEquals(TextConfig.Resource(R.string.noAiPathPreferenceSelectorTitle), content.title)
+        assertEquals(rows, content.rows)
+        assertNull(content.caption)
         assertEquals(
             PreferenceSelectorContentState(
                 mapOf(
@@ -132,10 +133,27 @@ class DialogConfigResolverTest {
     }
 
     @Test
+    fun `resolves the preference selector caption when one is given`() {
+        val config = testee.resolve(
+            NewUserOnboardingActivityDialog.PreferenceSelector(
+                titleRes = R.string.blockAdsPathPreferenceSelectorTitle,
+                rows = listOf(row(OnboardingPreference.BLOCK_ADS, initiallyEnabled = true)),
+                caption = R.string.preferenceChangeInSettingsCaption,
+            ),
+            isCustomAiFlow = false,
+        )!!
+
+        assertEquals(
+            TextConfig.Resource(R.string.preferenceChangeInSettingsCaption),
+            (config.content as ContentConfig.PreferenceSelector).caption,
+        )
+    }
+
+    @Test
     fun `resolves the address bar position with a submitting cta`() {
         val config = testee.resolve(NewUserOnboardingActivityDialog.AddressBarPosition(showSplitOption = true), isCustomAiFlow = false)!!
 
-        assertEquals(OnboardingBackgroundStep.AddressBar, config.background)
+        assertEquals(OnboardingBackground.Island, config.background)
         assertEquals(Embellishment.BobbingDax, config.embellishment)
         assertEquals(
             ContentConfig.AddressBar(
@@ -152,7 +170,7 @@ class DialogConfigResolverTest {
     fun `resolves the download reason with a submitting cta`() {
         val config = testee.resolve(NewUserOnboardingActivityDialog.DownloadReason, isCustomAiFlow = false)!!
 
-        assertEquals(OnboardingBackgroundStep.ComparisonChart, config.background)
+        assertEquals(OnboardingBackground.Horizon, config.background)
         assertEquals(Embellishment.BottomWing, config.embellishment)
         assertEquals(CardArrowConfig.AtEnd, config.cardArrow)
         assertEquals(
@@ -178,7 +196,7 @@ class DialogConfigResolverTest {
     fun `resolves the add to dock dialog with no decoration and no arrow`() {
         val config = testee.resolve(NewUserOnboardingActivityDialog.AddToDock, isCustomAiFlow = false)!!
 
-        assertEquals(OnboardingBackgroundStep.AddToDock, config.background)
+        assertEquals(OnboardingBackground.Horizon, config.background)
         assertEquals(Embellishment.None, config.embellishment)
         assertEquals(CardArrowConfig.Hidden, config.cardArrow)
         assertEquals(
@@ -230,7 +248,7 @@ class DialogConfigResolverTest {
     fun `resolves the initial welcome dialog with a continue cta`() {
         val config = testee.resolve(NewUserOnboardingActivityDialog.Initial, isCustomAiFlow = false)!!
 
-        assertEquals(OnboardingBackgroundStep.Welcome, config.background)
+        assertEquals(OnboardingBackground.Pond, config.background)
         assertEquals(Embellishment.WalkingDax, config.embellishment)
         assertEquals(CardArrowConfig.AtStart, config.cardArrow)
         assertEquals(
@@ -290,7 +308,7 @@ class DialogConfigResolverTest {
     fun `resolves the sync restore dialog with its own copy and restore cta`() {
         val config = testee.resolve(NewUserOnboardingActivityDialog.SyncRestore, isCustomAiFlow = true)!!
 
-        assertEquals(OnboardingBackgroundStep.Welcome, config.background)
+        assertEquals(OnboardingBackground.Pond, config.background)
         assertEquals(
             ContentConfig.Welcome(
                 title = TextConfig.Resource(R.string.syncRestoreDialogBrandDesignTitle),
@@ -317,9 +335,9 @@ class DialogConfigResolverTest {
 
     @Test
     fun `resolves the input screen with a submitting cta and ai preselected`() {
-        val config = testee.resolve(NewUserOnboardingActivityDialog.InputScreen, isCustomAiFlow = false)!!
+        val config = testee.resolve(NewUserOnboardingActivityDialog.InputScreen(), isCustomAiFlow = false)!!
 
-        assertEquals(OnboardingBackgroundStep.InputType, config.background)
+        assertEquals(OnboardingBackground.Shoreline, config.background)
         assertEquals(Embellishment.LeftWing, config.embellishment)
         assertEquals(CardArrowConfig.AtEnd, config.cardArrow)
         val content = config.content as ContentConfig.InputScreen
@@ -344,7 +362,7 @@ class DialogConfigResolverTest {
             isCustomAiFlow = false,
         )!!
 
-        assertEquals(OnboardingBackgroundStep.InputType, config.background)
+        assertEquals(OnboardingBackground.Shoreline, config.background)
         assertEquals(Embellishment.None, config.embellishment)
         assertEquals(CardArrowConfig.Hidden, config.cardArrow)
         assertEquals(
@@ -382,7 +400,7 @@ class DialogConfigResolverTest {
     fun `resolves the widget prompt dialog with add and skip ctas`() {
         val config = testee.resolve(NewUserOnboardingActivityDialog.WidgetPrompt, isCustomAiFlow = false)!!
 
-        assertEquals(OnboardingBackgroundStep.AddWidget, config.background)
+        assertEquals(OnboardingBackground.Horizon, config.background)
         assertEquals(Embellishment.LeftWing, config.embellishment)
         assertEquals(CardArrowConfig.AtEnd, config.cardArrow)
         assertEquals(
@@ -420,7 +438,7 @@ class DialogConfigResolverTest {
 
         val config = testee.resolve(dialog, isCustomAiFlow = false)!!
 
-        assertEquals(OnboardingBackgroundStep.QuickSetup, config.background)
+        assertEquals(OnboardingBackground.Horizon, config.background)
         assertEquals(Embellishment.BottomWing, config.embellishment)
         assertEquals(CardArrowConfig.AtEnd, config.cardArrow)
         assertEquals(
@@ -458,4 +476,51 @@ class DialogConfigResolverTest {
             config.primaryCta,
         )
     }
+
+    @Test
+    fun `resolves the toggle position dialog with the plan's options and no ctas`() {
+        val options = listOf(TestOption("duckAI", label = "Open tabs with AI chat"), TestOption("lastUsed", label = "Not Now"))
+
+        val config = testee.resolve(NewUserOnboardingActivityDialog.TogglePosition(options), isCustomAiFlow = true)!!
+
+        assertEquals(
+            ContentConfig.TogglePosition(
+                title = TextConfig.Resource(R.string.aiPathTogglePositionTitle),
+                pictogramLightRes = CommonR.drawable.toggle_ai_chat_default_lighttheme,
+                pictogramDarkRes = CommonR.drawable.toggle_ai_chat_default_darktheme,
+                pictogramCaption = TextConfig.Resource(R.string.aiPathTogglePositionPictogramCaption),
+                options = options,
+            ),
+            config.content,
+        )
+        assertNull(config.primaryCta)
+        assertNull(config.secondaryCta)
+    }
+
+    @Test
+    fun `resolves the import passwords dialog with a right wing and a mirrored arrow`() {
+        val config = testee.resolve(NewUserOnboardingActivityDialog.ImportPasswords, isCustomAiFlow = false)!!
+
+        assertEquals(Embellishment.RightWing, config.embellishment)
+        assertEquals(CardArrowConfig.AtStartMirrored, config.cardArrow)
+    }
+
+    @Test
+    fun `resolves the import complete dialog with a right wing and a mirrored arrow`() {
+        val config = testee.resolve(NewUserOnboardingActivityDialog.ImportComplete(PasswordImportResult.InProgress), isCustomAiFlow = false)!!
+
+        assertEquals(Embellishment.RightWing, config.embellishment)
+        assertEquals(CardArrowConfig.AtStartMirrored, config.cardArrow)
+    }
+
+    private fun row(
+        preference: OnboardingPreference,
+        initiallyEnabled: Boolean,
+    ) = ContentConfig.PreferenceSelector.Row(
+        preference = preference,
+        iconRes = null,
+        primaryText = TextConfig.Literal(preference.name),
+        secondaryText = null,
+        initiallyEnabled = initiallyEnabled,
+    )
 }

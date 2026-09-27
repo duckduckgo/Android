@@ -95,7 +95,7 @@ class IndonesiaNewTabSectionView @JvmOverloads constructor(
         with(binding.newTabIndonesiaMessage) {
             setMessage(
                 Message(
-                    topIllustration = com.duckduckgo.mobile.android.R.drawable.ic_announce,
+                    topIllustration = com.duckduckgo.mobile.android.R.drawable.announcement_96,
                     title = context.getString(R.string.newTabPageIndonesiaMessageHeading),
                     subtitle = context.getString(R.string.newTabPageIndonesiaMessageBody),
                     action = context.getString(R.string.newTabPageIndonesiaMessageCta),

@@ -50,6 +50,9 @@ abstract class TabsDao {
     @Query("select * from tabs where deletable is 1 order by position")
     abstract fun flowDeletableTabs(): Flow<List<TabEntity>>
 
+    @Query("select count(*) from tabs")
+    abstract fun flowTabCount(): Flow<Int>
+
     @Query("select * from tabs where tabId = :tabId")
     abstract fun tab(tabId: String): TabEntity?
 
@@ -221,6 +224,22 @@ abstract class TabsDao {
         firstTab()?.let {
             insertTabSelection(TabSelectionEntity(tabId = it.tabId))
         }
+    }
+
+    @Transaction
+    open fun deleteSelectedBlankTabAndSelectTarget(
+        currentTabId: String,
+        targetTabId: String,
+    ): Boolean {
+        if (currentTabId == targetTabId) return false
+        val currentTab = tab(currentTabId) ?: return false
+        val targetTab = tab(targetTabId) ?: return false
+        if (selectedTab()?.tabId != currentTabId) return false
+        if (!currentTab.url.isNullOrBlank()) return false
+        if (targetTab.deletable) return false
+        deleteTab(currentTab)
+        insertTabSelection(TabSelectionEntity(tabId = targetTab.tabId))
+        return true
     }
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

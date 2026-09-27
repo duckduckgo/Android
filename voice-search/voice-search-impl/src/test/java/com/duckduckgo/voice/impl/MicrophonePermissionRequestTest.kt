@@ -17,7 +17,7 @@
 package com.duckduckgo.voice.impl
 
 import android.app.Activity
-import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.voice.api.VoiceSearchLauncher.VoiceSearchMode
 import com.duckduckgo.voice.impl.ActivityResultLauncherWrapper.Action.LaunchPermissionRequest
 import com.duckduckgo.voice.impl.fakes.FakeActivityResultLauncherWrapper
 import com.duckduckgo.voice.impl.fakes.FakeVoiceSearchPermissionDialogsLauncher
@@ -33,13 +33,9 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 class MicrophonePermissionRequestTest {
-    @Mock
-    private lateinit var pixel: Pixel
-
     @Mock
     private lateinit var voiceSearchRepository: VoiceSearchRepository
 
@@ -58,7 +54,6 @@ class MicrophonePermissionRequestTest {
         voiceSearchPermissionDialogsLauncher = FakeVoiceSearchPermissionDialogsLauncher()
         activityResultLauncherWrapper = FakeActivityResultLauncherWrapper()
         testee = MicrophonePermissionRequest(
-            pixel,
             voiceSearchRepository,
             voiceSearchPermissionDialogsLauncher,
             activityResultLauncherWrapper,
@@ -67,14 +62,12 @@ class MicrophonePermissionRequestTest {
     }
 
     @Test
-    fun whenPermissionRequestResultIsTrueThenInvokeOnPermissionsGranted() {
+    fun whenPermissionGrantedThenInvokeOnPermissionsGranted() {
         var permissionGranted = false
         testee.registerResultsCallback(
             mock(),
             mock(),
-            onPermissionsGranted = {
-                permissionGranted = true
-            },
+            onPermissionsGranted = { permissionGranted = true },
             mock(),
         )
 
@@ -85,151 +78,137 @@ class MicrophonePermissionRequestTest {
     }
 
     @Test
-    fun whenPermissionRequestResultIsFalseAndRationaleShouldNotShowThenShowNoMicAccessDialog() {
-        whenever(permissionRationale.shouldShow(any())).thenReturn(false)
-        var permissionGranted = false
-        testee.registerResultsCallback(mock(), mock(), mock()) {
-            permissionGranted = true
-        }
+    fun whenLaunchThenGoStraightToSystemPrompt() {
+        testee.registerResultsCallback(mock(), mock(), mock()) { }
+        testee.launch(mock(), VoiceSearchMode.SEARCH)
 
-        val lastKnownRequest = activityResultLauncherWrapper.lastKnownRequest as ActivityResultLauncherWrapper.Request.Permission
-        lastKnownRequest.onResult(false)
-
-        assertFalse(permissionGranted)
-        assertTrue(voiceSearchPermissionDialogsLauncher.noMicAccessDialogShown)
+        assertEquals(LaunchPermissionRequest, activityResultLauncherWrapper.lastKnownAction)
     }
 
     @Test
-    fun whenPermissionResultIsFalseAndRationaleShouldNotShowButActivityIsGoneThenDoNotShowNoMicAccessDialog() {
-        // The permission result callback can be delivered after the host Activity window is gone
-        // (fast auto-denial racing a finish/recreation). Showing a dialog on a dead Activity would
-        // throw WindowManager.BadTokenException, so we must skip it. The next launch() re-derives state.
+    fun whenFirstDenialThenShowSnackbarRatherThanDialog() {
+        whenever(permissionRationale.shouldShow(any())).thenReturn(true)
+
+        testee.registerResultsCallback(mock(), mock(), mock()) { }
+        val lastKnownRequest = activityResultLauncherWrapper.lastKnownRequest as ActivityResultLauncherWrapper.Request.Permission
+        lastKnownRequest.onResult(false)
+
+        assertTrue(voiceSearchPermissionDialogsLauncher.micPermissionDeniedSnackbarShown)
+        assertFalse(voiceSearchPermissionDialogsLauncher.micAccessDeniedDialogShown)
+    }
+
+    @Test
+    fun whenSnackbarAllowSelectedThenRequestPermissionAgain() {
+        whenever(permissionRationale.shouldShow(any())).thenReturn(true)
+
+        testee.registerResultsCallback(mock(), mock(), mock()) { }
+        val lastKnownRequest = activityResultLauncherWrapper.lastKnownRequest as ActivityResultLauncherWrapper.Request.Permission
+        lastKnownRequest.onResult(false)
+        voiceSearchPermissionDialogsLauncher.boundSnackbarAllowSelected.invoke()
+
+        assertEquals(LaunchPermissionRequest, activityResultLauncherWrapper.lastKnownAction)
+    }
+
+    @Test
+    fun whenFirstDenialThenRequestReportedAsAborted() {
+        // The caller pauses the WebView before launching, so it needs to hear that nothing will open.
+        whenever(permissionRationale.shouldShow(any())).thenReturn(true)
+        var aborted = false
+
+        testee.registerResultsCallback(mock(), mock(), mock(), onRequestAborted = { aborted = true })
+        val lastKnownRequest = activityResultLauncherWrapper.lastKnownRequest as ActivityResultLauncherWrapper.Request.Permission
+        lastKnownRequest.onResult(false)
+
+        assertTrue(aborted)
+    }
+
+    @Test
+    fun whenDeniedForeverThenShowMicAccessDeniedDialog() {
+        whenever(permissionRationale.shouldShow(any())).thenReturn(false)
+
+        testee.registerResultsCallback(mock(), mock(), mock()) { }
+        val lastKnownRequest = activityResultLauncherWrapper.lastKnownRequest as ActivityResultLauncherWrapper.Request.Permission
+        lastKnownRequest.onResult(false)
+
+        assertTrue(voiceSearchPermissionDialogsLauncher.micAccessDeniedDialogShown)
+        assertFalse(voiceSearchPermissionDialogsLauncher.micPermissionDeniedSnackbarShown)
+    }
+
+    @Test
+    fun whenDeniedForeverAndHideVoiceSearchSelectedThenDisableVoiceSearch() {
+        whenever(permissionRationale.shouldShow(any())).thenReturn(false)
+        var disableVoiceSearch = false
+
+        testee.registerResultsCallback(mock(), mock(), mock()) { disableVoiceSearch = true }
+        val lastKnownRequest = activityResultLauncherWrapper.lastKnownRequest as ActivityResultLauncherWrapper.Request.Permission
+        lastKnownRequest.onResult(false)
+        voiceSearchPermissionDialogsLauncher.boundHideVoiceSearchSelected.invoke()
+
+        verify(voiceSearchRepository).setVoiceSearchUserEnabled(eq(false))
+        assertTrue(disableVoiceSearch)
+    }
+
+    @Test
+    fun whenDeniedForeverAndActivityIsGoneThenDoNotShowMicAccessDeniedDialog() {
         whenever(permissionRationale.shouldShow(any())).thenReturn(false)
         val goneActivity = mock<Activity>()
         whenever(goneActivity.isDestroyed).thenReturn(true)
+
         testee.registerResultsCallback(mock(), goneActivity, mock()) { }
-
         val lastKnownRequest = activityResultLauncherWrapper.lastKnownRequest as ActivityResultLauncherWrapper.Request.Permission
         lastKnownRequest.onResult(false)
 
-        assertFalse(voiceSearchPermissionDialogsLauncher.noMicAccessDialogShown)
+        assertFalse(voiceSearchPermissionDialogsLauncher.micAccessDeniedDialogShown)
     }
 
     @Test
-    fun whenPermissionRequestResultIsFalseThenOnPermissionsGrantedNotInvoked() {
-        whenever(permissionRationale.shouldShow(any())).thenReturn(true)
-        var permissionGranted = false
-        testee.registerResultsCallback(mock(), mock(), mock()) {
-            permissionGranted = true
-        }
-
-        val lastKnownRequest = activityResultLauncherWrapper.lastKnownRequest as ActivityResultLauncherWrapper.Request.Permission
-        lastKnownRequest.onResult(false)
-
-        assertFalse(permissionGranted)
-        verifyNoInteractions(voiceSearchRepository)
-    }
-
-    @Test
-    fun whenLaunchAndRationaleAlreadyAcceptedThenRequestPermissionRatherThanShowNoMicAccessDialog() {
-        // Regression test: previously a persisted "declined forever" flag could trap the user on the
-        // no-mic-access dialog forever, even after they re-granted the permission from system settings.
-        // launch() must now always re-request so the OS can surface its prompt (or auto-deny), and the
-        // no-mic-access dialog is driven solely from the permission-result callback.
-        whenever(voiceSearchRepository.getHasAcceptedRationaleDialog()).thenReturn(true)
-
-        testee.registerResultsCallback(mock(), mock(), mock()) { }
-        testee.launch(mock())
-
-        assertFalse(voiceSearchPermissionDialogsLauncher.noMicAccessDialogShown)
-        assertEquals(LaunchPermissionRequest, activityResultLauncherWrapper.lastKnownAction)
-    }
-
-    @Test
-    fun whenNoMicAccessDialogDeclinedThenShowRemoveVoiceSearchDialog() {
+    fun whenDeniedForeverInDuckAiModeThenDialogDoesNotOfferToHideVoiceSearch() {
         whenever(permissionRationale.shouldShow(any())).thenReturn(false)
 
         testee.registerResultsCallback(mock(), mock(), mock()) { }
+        testee.launch(mock(), VoiceSearchMode.DUCK_AI)
         val lastKnownRequest = activityResultLauncherWrapper.lastKnownRequest as ActivityResultLauncherWrapper.Request.Permission
         lastKnownRequest.onResult(false)
-        voiceSearchPermissionDialogsLauncher.boundNoMicAccessDialogDeclined.invoke()
 
-        assertTrue(voiceSearchPermissionDialogsLauncher.removeVoiceSearchDialogShown)
+        assertTrue(voiceSearchPermissionDialogsLauncher.micAccessDeniedDialogShown)
+        assertFalse(voiceSearchPermissionDialogsLauncher.micAccessDeniedDialogOfferedHideVoiceSearch)
     }
 
     @Test
-    fun whenRationalDialogNotYetAcceptedThenLaunchRationalDialog() {
-        whenever(voiceSearchRepository.getHasAcceptedRationaleDialog()).thenReturn(false)
+    fun whenDeniedForeverInSearchModeThenDialogOffersToHideVoiceSearch() {
+        whenever(permissionRationale.shouldShow(any())).thenReturn(false)
 
         testee.registerResultsCallback(mock(), mock(), mock()) { }
-        testee.launch(mock())
+        testee.launch(mock(), VoiceSearchMode.SEARCH)
+        val lastKnownRequest = activityResultLauncherWrapper.lastKnownRequest as ActivityResultLauncherWrapper.Request.Permission
+        lastKnownRequest.onResult(false)
 
-        assertTrue(voiceSearchPermissionDialogsLauncher.rationaleDialogShown)
-        assertFalse(voiceSearchPermissionDialogsLauncher.noMicAccessDialogShown)
+        assertTrue(voiceSearchPermissionDialogsLauncher.micAccessDeniedDialogOfferedHideVoiceSearch)
     }
 
     @Test
-    fun whenRationalDialogAcceptedThenLaunchPermisionRequestFlow() {
-        whenever(voiceSearchRepository.getHasAcceptedRationaleDialog()).thenReturn(true)
+    fun whenDeniedForeverDialogCancelledThenRequestReportedAsAborted() {
+        whenever(permissionRationale.shouldShow(any())).thenReturn(false)
+        var aborted = false
 
-        testee.registerResultsCallback(mock(), mock(), mock()) { }
-        testee.launch(mock())
+        testee.registerResultsCallback(mock(), mock(), mock(), onRequestAborted = { aborted = true })
+        val lastKnownRequest = activityResultLauncherWrapper.lastKnownRequest as ActivityResultLauncherWrapper.Request.Permission
+        lastKnownRequest.onResult(false)
+        assertFalse(aborted)
 
-        assertFalse(voiceSearchPermissionDialogsLauncher.rationaleDialogShown)
-        assertFalse(voiceSearchPermissionDialogsLauncher.noMicAccessDialogShown)
-        assertEquals(LaunchPermissionRequest, activityResultLauncherWrapper.lastKnownAction)
+        voiceSearchPermissionDialogsLauncher.boundMicAccessDeniedCancelled.invoke()
+
+        assertTrue(aborted)
     }
 
     @Test
-    fun whenRationalDialogShownThenRationalAcceptedInvokedThenFilePixelAndLaunchPermission() {
-        whenever(voiceSearchRepository.getHasAcceptedRationaleDialog()).thenReturn(false)
-        testee.registerResultsCallback(mock(), mock(), mock()) { }
-        testee.launch(mock())
+    fun whenPermissionGrantedThenRequestNotReportedAsAborted() {
+        var aborted = false
 
-        voiceSearchPermissionDialogsLauncher.boundOnRationaleAccepted.invoke()
+        testee.registerResultsCallback(mock(), mock(), mock(), onRequestAborted = { aborted = true })
+        val lastKnownRequest = activityResultLauncherWrapper.lastKnownRequest as ActivityResultLauncherWrapper.Request.Permission
+        lastKnownRequest.onResult(true)
 
-        verify(pixel).fire(VoiceSearchPixelNames.VOICE_SEARCH_PRIVACY_DIALOG_ACCEPTED)
-        verify(voiceSearchRepository).acceptRationaleDialog()
-        assertEquals(LaunchPermissionRequest, activityResultLauncherWrapper.lastKnownAction)
-    }
-
-    @Test
-    fun whenRationalDialogShownThenRationalCancelledInvokedThenFilePixelAndLaunchPermission() {
-        whenever(voiceSearchRepository.getHasAcceptedRationaleDialog()).thenReturn(false)
-        testee.registerResultsCallback(mock(), mock(), mock()) { }
-        testee.launch(mock())
-
-        voiceSearchPermissionDialogsLauncher.boundOnRationaleDeclined.invoke()
-
-        verify(pixel).fire(VoiceSearchPixelNames.VOICE_SEARCH_PRIVACY_DIALOG_REJECTED)
-    }
-
-    @Test
-    fun whenRationalDialogShownThenRationalCancelledThenShowRemoveVoiceSearchDialog() {
-        whenever(voiceSearchRepository.getHasAcceptedRationaleDialog()).thenReturn(false)
-        testee.registerResultsCallback(mock(), mock(), mock()) { }
-        testee.launch(mock())
-
-        voiceSearchPermissionDialogsLauncher.boundOnRationaleDeclined.invoke()
-
-        assertTrue(voiceSearchPermissionDialogsLauncher.removeVoiceSearchDialogShown)
-    }
-
-    @Test
-    fun whenNoMicAccessDialogAcceptedThenDisableVoiceSearch() {
-        var disableVoiceSearch = false
-        whenever(voiceSearchRepository.getHasAcceptedRationaleDialog()).thenReturn(false)
-        testee.registerResultsCallback(mock(), mock(), mock()) {
-            disableVoiceSearch = true
-        }
-        testee.launch(mock())
-
-        voiceSearchPermissionDialogsLauncher.boundOnRationaleDeclined.invoke()
-        voiceSearchPermissionDialogsLauncher.boundRemoveVoiceSearchAccepted.invoke()
-
-        verify(voiceSearchRepository).setVoiceSearchUserEnabled(eq(false))
-
-        assertTrue(voiceSearchPermissionDialogsLauncher.removeVoiceSearchDialogShown)
-        assertTrue(disableVoiceSearch)
+        assertFalse(aborted)
     }
 }

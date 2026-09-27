@@ -19,14 +19,17 @@ package com.duckduckgo.feedback.impl.ui.negative.mainreason
 import android.os.Bundle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.feedback.impl.R
 import com.duckduckgo.feedback.impl.databinding.ContentFeedbackNegativeDisambiguationMainReasonBinding
 import com.duckduckgo.feedback.impl.ui.common.FeedbackFragment
+import com.duckduckgo.feedback.impl.ui.common.resolveFeedbackFaceAsset
 import com.duckduckgo.feedback.impl.ui.negative.FeedbackType.MainReason
 import com.duckduckgo.feedback.impl.ui.negative.FeedbackTypeDisplay
 import com.duckduckgo.feedback.impl.ui.negative.FeedbackTypeDisplay.FeedbackTypeMainReasonDisplay
+import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
 class MainReasonNegativeFeedbackFragment : FeedbackFragment(R.layout.content_feedback_negative_disambiguation_main_reason) {
@@ -42,8 +45,17 @@ class MainReasonNegativeFeedbackFragment : FeedbackFragment(R.layout.content_fee
     private val listener: MainReasonNegativeFeedbackListener?
         get() = activity as MainReasonNegativeFeedbackListener
 
+    @Inject
+    lateinit var appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles
+
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+
+        if (appBrandDesignUpdateToggles.pictograms().isEnabled()) {
+            binding.emoticonImage.setImageResource(
+                resolveFeedbackFaceAsset(isPositive = false, isPictogramsEnabled = true),
+            )
+        }
 
         recyclerAdapter = MainReasonAdapter(
             object : (FeedbackTypeMainReasonDisplay) -> Unit {

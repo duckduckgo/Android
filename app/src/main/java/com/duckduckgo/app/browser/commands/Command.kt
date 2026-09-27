@@ -229,6 +229,7 @@ sealed class Command {
 
     class OpenAppLink(
         val appLink: AppLink,
+        val finishCustomTabOnLaunch: Boolean = false,
     ) : Command()
 
     class ExtractUrlFromCloakedAmpLink(
@@ -526,7 +527,7 @@ sealed class Command {
     data class EnableDuckAIFullScreen(val browserViewState: BrowserViewState) : Command()
     data class DuckAIFullScreenDisabled(val url: String) : Command()
 
-    data class ShowDuckAIContextualMode(val tabId: String) : Command()
+    data class ShowDuckAIContextualMode(val tabId: String, val sourceUrl: String?) : Command()
 
     data class StartAddressBarTrackersAnimation(val trackerEntities: List<Entity>?) : Command()
 

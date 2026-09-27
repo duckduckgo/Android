@@ -83,6 +83,18 @@ class BrokerActionFailedEventHandler @Inject constructor(
             return handleConditionNotMet(state)
         }
 
+        // Silenced script failures still need diagnostics, but must not stop the broker step.
+        if (currentAction is BrokerAction.ExecuteScript && currentAction.failSilently && error is PirError.ActionError.JsActionFailed) {
+            emitBrokerActionFailedPixel(state, error)
+            return Next(
+                nextState = state.copy(
+                    currentActionIndex = state.currentActionIndex + 1,
+                    actionRetryCount = 0,
+                ),
+                nextEvent = ExecuteBrokerStepAction(UserProfile(userProfile = state.profileQuery)),
+            )
+        }
+
         // If failure is on Any captcha action, we proceed to next action
         return if (shouldRetryFailedAction(state, event, currentAction)) {
             Next(
@@ -159,7 +171,8 @@ class BrokerActionFailedEventHandler @Inject constructor(
         event: BrokerActionFailed,
         currentAction: BrokerAction,
     ): Boolean {
-        if (!event.allowRetry) {
+        // Scripts can have non-idempotent side effects, so never retry them.
+        if (!event.allowRetry || currentAction is BrokerAction.ExecuteScript) {
             return false
         }
 

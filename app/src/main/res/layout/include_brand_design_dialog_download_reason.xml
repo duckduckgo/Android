@@ -76,7 +76,7 @@
                 app:contentPadding="0dp"
                 app:rippleColor="@android:color/transparent"
                 app:strokeColor="@color/brand_design_tab_tile_stroke"
-                app:strokeWidth="1dp"
+                app:strokeWidth="@dimen/brandDesignTabTileStrokeWidth"
                 tools:ignore="InvalidColorAttribute">
 
                 <LinearLayout
@@ -128,7 +128,7 @@
                 app:contentPadding="0dp"
                 app:rippleColor="@android:color/transparent"
                 app:strokeColor="@color/brand_design_tab_tile_stroke"
-                app:strokeWidth="1dp"
+                app:strokeWidth="@dimen/brandDesignTabTileStrokeWidth"
                 tools:ignore="InvalidColorAttribute">
 
                 <LinearLayout
@@ -186,7 +186,7 @@
                 app:contentPadding="0dp"
                 app:rippleColor="@android:color/transparent"
                 app:strokeColor="@color/brand_design_tab_tile_stroke"
-                app:strokeWidth="1dp"
+                app:strokeWidth="@dimen/brandDesignTabTileStrokeWidth"
                 tools:ignore="InvalidColorAttribute">
 
                 <LinearLayout
@@ -234,7 +234,7 @@
                 app:contentPadding="0dp"
                 app:rippleColor="@android:color/transparent"
                 app:strokeColor="@color/brand_design_tab_tile_stroke"
-                app:strokeWidth="1dp"
+                app:strokeWidth="@dimen/brandDesignTabTileStrokeWidth"
                 tools:ignore="InvalidColorAttribute">
 
                 <LinearLayout

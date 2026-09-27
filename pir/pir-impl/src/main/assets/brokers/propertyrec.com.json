@@ -1,7 +1,7 @@
 {
   "name": "PropertyRec",
   "url": "propertyrec.com",
-  "version": "0.3.0",
+  "version": "0.6.0",
   "parent": "propertyrecord.com",
   "addedDatetime": 1775829600000,
   "optOutUrl": "https://dashboard.propertyrec.com/opt-out",
@@ -12,53 +12,48 @@
       "actions": [
         {
           "actionType": "navigate",
-          "_comment": "All other child sites go to the homepage first and click the opt-out link, but this one pops the page up in a new window, so we'll go to the opt-out page directly instead",
-          "id": "3591978e-66c7-4bc8-864c-4a0c4741d182",
-          "url": "https://dashboard.propertyrec.com/opt-out/"
+          "_comment": "Forwarding page source: https://github.com/duckduckgo/privacy-test-pages/blob/main/pir/opt-out/index.html",
+          "url": "https://privacy-test-pages.site/pir/opt-out/?name=${firstName}%20${lastName}&city=${city|downcase}&state=${state|upcase}&cityState=${city},%20${state|upcase}&to=https%3A%2F%2Fdashboard.propertyrec.com%2Fopt-out%2Frecords",
+          "id": "5d160b1d-d825-4b7a-aaa2-d43972edb7ca"
         },
         {
           "actionType": "expectation",
           "expectations": [
             {
               "type": "element",
-              "selector": "//h1[contains(text(), 'Remove My Information')]"
+              "selector": "#forward"
             }
           ],
-          "id": "3e44df56-fc5d-49d3-a408-0bc059c5d2c8"
-        },
-        {
-          "actionType": "fillForm",
-          "selector": "form#backgroundCheckForm",
-          "dataSource": "userProfile",
-          "elements": [
-            {
-              "type": "fullName",
-              "selector": ".//input[@name='name']"
-            },
-            {
-              "type": "cityState",
-              "selector": ".//input[@name='cityState']"
-            }
-          ],
-          "id": "790f6a0e-2236-4502-8627-726c214094bd"
+          "id": "4edbc6b7-c114-4fb4-bdbd-c2aa4662a452"
         },
         {
           "actionType": "click",
           "elements": [
             {
               "type": "button",
-              "selector": "button[type='submit']"
+              "selector": "#forward"
             }
           ],
-          "id": "5d160b1d-d825-4b7a-aaa2-d43972edb7ca"
+          "id": "7a62b3ac-8b18-4ff5-a4b2-1af852a8f04e"
         },
         {
-          "actionType": "condition",
-          "_comment": "Occasionally the site pops ups a spelling correction, and we need to press the 'Use Original' button",
+          "actionType": "expectation",
           "expectations": [
             {
               "type": "element",
-              "selector": "#spellcheck-original"
+              "selector": "//div[contains(text(), 'Search Results')]"
+            }
+          ],
+          "id": "3e9357ec-536b-48d6-a1a2-8ebfac5693b2"
+        },
+        {
+          "actionType": "condition",
+          "_comment": "Click Use Original when the site offers a spelling correction.",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#spellcheck-original",
+              "failSilently": true
             }
           ],
           "actions": [
@@ -92,7 +87,7 @@
           "noResultsSelector": "//h3[contains(text(), 'No results found')]",
           "profile": {
             "name": {
-              "selector": ".//div[contains(@class,'grid')]/div[contains(@class,'flex-col')][1]/div[contains(@class,'!text-[#222]')]"
+              "selector": ".//div[contains(@class,'grid')]/div[contains(@class,'flex-col')][1]/div[contains(concat(' ', normalize-space(@class), ' '), ' !text-black-900 ') and contains(concat(' ', normalize-space(@class), ' '), ' text-lg ')]"
             },
             "addressCityState": {
               "selector": ".//div[contains(@class,'grid')]/div[contains(@class,'flex-col')][1]/div[contains(@class,'!leading-tight')]"

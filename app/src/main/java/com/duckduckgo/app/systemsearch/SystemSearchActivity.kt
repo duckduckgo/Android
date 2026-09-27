@@ -51,6 +51,7 @@ import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.Companion.QUICK_ACCESS_GRID_MAX_COLUMNS
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.Companion.QUICK_ACCESS_ITEM_MAX_SIZE_DP
 import com.duckduckgo.app.browser.newtab.QuickAccessDragTouchItemListener
+import com.duckduckgo.app.browser.omnibar.applyAddressBarRebrandRadius
 import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppReturnPixelSender
@@ -90,6 +91,7 @@ import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.common.utils.text.TextChangedWatcher
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment
 import com.duckduckgo.voice.api.VoiceSearchAvailability
@@ -161,6 +163,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     private lateinit var voiceSearch: ImageView
     private lateinit var clearTextButton: ImageView
     private lateinit var shadowContainer: MaterialCardView
+    private lateinit var inputContainer: MaterialCardView
     private lateinit var logo: ImageView
     private lateinit var duckAi: ImageView
     private lateinit var omnibarDivider: View
@@ -183,6 +186,14 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         voiceSearch = if (isOmnibarAtTop) binding.voiceSearchButton else binding.voiceSearchButtonBottom
         clearTextButton = if (isOmnibarAtTop) binding.clearTextButton else binding.clearTextButtonBottom
         shadowContainer = if (isOmnibarAtTop) binding.omniBarContainerShadow else binding.omniBarContainerShadowBottom
+        inputContainer = if (isOmnibarAtTop) binding.omniBarContainer else binding.omniBarContainerBottom
+        applyAddressBarRebrandRadius(
+            isEnabled = appBrandDesignUpdateToggles.addressBar().isEnabled(),
+            rebrandRadius = resources.getDimension(CommonR.dimen.rebrandInputRadius),
+            legacyRadius = resources.getDimension(CommonR.dimen.largeShapeCornerRadius),
+            shadowContainer,
+            inputContainer,
+        )
         logo = if (isOmnibarAtTop) binding.logo else binding.logoBottom
         duckAi = if (isOmnibarAtTop) binding.aiChatIconMenu else binding.aiChatIconMenuBottom
         omnibarDivider = if (isOmnibarAtTop) binding.verticalDivider else binding.verticalDividerBottom
@@ -436,7 +447,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
                     }
 
                     is VoiceSearchLauncher.VoiceRecognitionResult.DuckAiResult -> {
-                        viewModel.onDuckAiRequested(result.query)
+                        viewModel.onDuckAiRequested(result.query, DuckChatEntryPoint.VOICE)
                     }
                 }
             } else if (it is VoiceSearchLauncher.Event.VoiceSearchDisabled) {
@@ -451,7 +462,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     fun configureDuckAi() {
         duckAi.setOnClickListener {
-            viewModel.onDuckAiRequested(omnibarTextInput.text.toString())
+            viewModel.onDuckAiRequested(omnibarTextInput.text.toString(), DuckChatEntryPoint.SYSTEM_SEARCH)
         }
     }
 
@@ -572,7 +583,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             SystemSearchViewModel.Command.ExitSearch -> finish()
 
             LaunchDuckAiVoiceChat -> {
-                duckChat.openVoiceDuckChat()
+                duckChat.openVoiceDuckChat(DuckChatEntryPoint.DIGITAL_ASSISTANT)
                 finish()
             }
         }

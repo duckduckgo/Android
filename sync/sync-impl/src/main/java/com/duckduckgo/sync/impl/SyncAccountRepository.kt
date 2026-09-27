@@ -179,6 +179,8 @@ class AppSyncAccountRepository @Inject constructor(
     private val loginDeviceInfoWriter: LoginDeviceInfoWriter,
     private val signupAccountInfoBuilder: SignupAccountInfoBuilder,
     private val deviceInfoUpdater: DeviceInfoUpdater,
+    private val deviceInfoPublishWatcher: DeviceInfoPublishWatcher,
+    private val accountInfoDdgWrapRepairer: AccountInfoDdgWrapRepairer,
 ) : SyncAccountRepository {
 
     // Bounded backoff for the 3party→ddg upgrade network calls.
@@ -186,6 +188,9 @@ class AppSyncAccountRepository @Inject constructor(
 
     // The user id we've already re-published device_info for. Stops us repairing again every time the device list is shown.
     private val republishedDeviceInfoForUserId = AtomicReference<String?>(null)
+
+    // Same latch shape for a missing ddg account_info wrap. Released on failure so the next list load can retry.
+    private val repairedAccountInfoDdgWrapForUserId = AtomicReference<String?>(null)
 
     /**
      * If there is a key-exchange flow in progress, we need to keep a reference to them
@@ -426,7 +431,12 @@ class AppSyncAccountRepository @Inject constructor(
         val canPatchDevice = withDeviceInfo || syncFeature.canUsePatchEndpointForLegacyDeviceRename().isEnabled()
         logcat { "Sync-UnifiedDevices: rename via ${if (canPatchDevice) "PATCH" else "login"}, withDeviceInfo=$withDeviceInfo" }
         if (canPatchDevice) {
-            return@withContext when (val result = deviceInfoUpdater.setThisDeviceName(device.deviceName)) {
+            return@withContext when (
+                val result = deviceInfoUpdater.setThisDeviceName(
+                    name = device.deviceName,
+                    source = DeviceInfoUpdateSource.UPDATE,
+                )
+            ) {
                 is Success -> Success(true)
                 is Error -> result.alsoFireUpdateDeviceErrorPixel()
             }
@@ -808,6 +818,20 @@ class AppSyncAccountRepository @Inject constructor(
             is Success -> loginResult.data
         }
 
+        // The login above registered this device. If the upgrade then fails, the device stays on an account it never joined, so remove it again.
+        val upgradeResult = upgradeThirdPartyAccount(parsed, loginResponse, deviceId, deviceName)
+        if (upgradeResult is Error) {
+            logoutTemporaryThirdPartyDevice(loginResponse.token, deviceId)
+        }
+        return upgradeResult
+    }
+
+    private suspend fun upgradeThirdPartyAccount(
+        parsed: ThirdPartyRecoveryCode,
+        loginResponse: LoginResponse,
+        deviceId: String,
+        deviceName: String,
+    ): Result<Boolean> {
         // Step 2a — "Does it need an upgrade?" check per Unified Algorithm (Asana 1214739740392701,
         // "Native only - Upgrading 3party account"). The /sync/login response includes the account's
         // current access_credentials, so we can detect a pre-existing ddg credential without a
@@ -976,23 +1000,64 @@ class AppSyncAccountRepository @Inject constructor(
     private fun getConnectedDevicesV2(
         token: String,
         primaryKey: String,
-    ): Result<List<ConnectedDevice>> = when (val result = syncApi.getDevices(token)) {
-        is Error -> {
-            connectedDevicesCached.clear()
-            result.alsoFireAccountErrorPixel().copy(code = GENERIC_ERROR.code)
-        }
-        is Success -> {
-            val entriesV2 = result.data.entriesV2
-            val devices = if (entriesV2 != null) {
-                val decryptResult = thirdPartyDeviceListDecryptor.decryptAll(entriesV2, syncStore.deviceId)
-                logoutFailedV2Devices(decryptResult.undecryptable)
-                if (decryptResult.thisDeviceInfoUnresolved) republishThisDeviceInfo()
-                decryptResult.decrypted.map { it.toConnectedDevice() }
-            } else {
-                // entries_v2 missing
-                decryptLegacyEntries(result.data.entries, primaryKey)
+    ): Result<List<ConnectedDevice>> {
+        val publishSnapshot = deviceInfoPublishWatcher.snapshot()
+        return when (val result = syncApi.getDevices(token)) {
+            is Error -> {
+                connectedDevicesCached.clear()
+                result.alsoFireAccountErrorPixel().copy(code = GENERIC_ERROR.code)
             }
-            finishWith(devices)
+            is Success -> {
+                val entriesV2 = result.data.entriesV2
+                val devices = if (entriesV2 != null) {
+                    val decryptResult = thirdPartyDeviceListDecryptor.decryptAll(entriesV2, syncStore.deviceId, publishSnapshot)
+                    logoutFailedV2Devices(decryptResult.undecryptable)
+                    fireUnifiedDeviceListReadPixels(decryptResult)
+                    if (decryptResult.keyUnavailableReason == AccountInfoKeyUnavailableReason.NO_WRAP_FOR_OUR_CREDENTIAL) {
+                        repairAccountInfoDdgWrap()
+                    }
+                    if (decryptResult.thisDeviceInfoNeedsRepair) republishThisDeviceInfo()
+                    decryptResult.decrypted.map { it.toConnectedDevice() }
+                } else {
+                    // entries_v2 missing
+                    decryptLegacyEntries(result.data.entries, primaryKey)
+                }
+                finishWith(devices)
+            }
+        }
+    }
+
+    private fun fireUnifiedDeviceListReadPixels(result: DecryptAllResult) {
+        if (!syncFeature.canReadUnifiedDeviceList().isEnabled()) return
+
+        result.keyUnavailableReason?.let {
+            syncPixels.fireUnifiedDeviceListPixel(UnifiedDeviceListPixel.AccountInfoKeyUnavailable(it))
+            return
+        }
+
+        when (val outcome = result.ownDeviceReadOutcome) {
+            OwnDeviceReadOutcome.ResolvedDeviceInfo ->
+                syncPixels.fireUnifiedDeviceListPixel(UnifiedDeviceListPixel.OwnRowResolvedDeviceInfo)
+            is OwnDeviceReadOutcome.ResolvedLegacy -> fireOwnRowFallbackIfWritable(
+                UnifiedDeviceListPixel.OwnRowResolvedLegacy(outcome.reason),
+            )
+            is OwnDeviceReadOutcome.ResolvedPlaceholder -> fireOwnRowFallbackIfWritable(
+                UnifiedDeviceListPixel.OwnRowResolvedPlaceholder(outcome.reason),
+            )
+            null -> {}
+        }
+
+        result.otherRowFailedDecryptionCredentials.forEach {
+            syncPixels.fireUnifiedDeviceListPixel(UnifiedDeviceListPixel.OtherRowDeviceInfoFailedDecryption(it))
+        }
+        result.otherRowPlaceholderCredentials.forEach {
+            syncPixels.fireUnifiedDeviceListPixel(UnifiedDeviceListPixel.OtherRowResolvedPlaceholder(it))
+        }
+    }
+
+    private fun fireOwnRowFallbackIfWritable(event: UnifiedDeviceListPixel) {
+        if (syncFeature.canWriteUnifiedDeviceList().isEnabled()) {
+            syncPixels.fireUnifiedDeviceListPixel(event)
         }
     }
 
@@ -1012,12 +1077,40 @@ class AppSyncAccountRepository @Inject constructor(
 
         appCoroutineScope.launch(dispatcherProvider.io()) {
             logcat { "Sync-UnifiedDevices: this device's device_info did not resolve on read; re-publishing it" }
-            when (val result = deviceInfoUpdater.setThisDeviceName(syncDeviceIds.deviceName())) {
+            when (
+                val result = deviceInfoUpdater.setThisDeviceName(
+                    name = syncDeviceIds.deviceName(),
+                    source = DeviceInfoUpdateSource.REPAIR,
+                )
+            ) {
                 is Success -> logcat { "Sync-UnifiedDevices: device_info re-published" }
                 is Error -> {
                     logcat(WARN) { "Sync-UnifiedDevices: device_info re-publish failed: ${result.reason}" }
                     // release the slot so the next device list load can try again, without clobbering a claim another account has since made
                     republishedDeviceInfoForUserId.compareAndSet(userId, null)
+                }
+            }
+        }
+    }
+
+    /**
+     * Best-effort add of a missing ddg wrap after a list read that could not unwrap account_info for this credential.
+     * Native (ddg) devices only: a 3party device already holds the wrap it needs. Failure never changes the list
+     * being built; the per-account latch is released so the next load can retry without clobbering another account.
+     */
+    private fun repairAccountInfoDdgWrap() {
+        if ((syncStore.credentialId ?: CREDENTIAL_ID_DDG) != CREDENTIAL_ID_DDG) return
+        val userId = syncStore.userId ?: return
+        val kid = syncStore.accountInfoPublicKey?.keyId ?: return
+        if (repairedAccountInfoDdgWrapForUserId.getAndSet(userId) == userId) return
+
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            logcat { "Sync-UnifiedDevices: ddg account_info wrap unavailable on read; repairing it" }
+            when (val result = accountInfoDdgWrapRepairer.repair(kid)) {
+                is Success -> logcat { "Sync-UnifiedDevices: ddg account_info wrap repaired" }
+                is Error -> {
+                    logcat(WARN) { "Sync-UnifiedDevices: ddg account_info wrap repair failed: ${result.reason}" }
+                    repairedAccountInfoDdgWrapForUserId.compareAndSet(userId, null)
                 }
             }
         }
@@ -1195,6 +1288,11 @@ class AppSyncAccountRepository @Inject constructor(
 
         return when (result) {
             is Error -> {
+                if (unifiedDeviceInfo != null) {
+                    syncPixels.fireUnifiedDeviceListPixel(
+                        UnifiedDeviceListPixel.AccountInfoKeyCreateFailed(result.toAccountInfoKeyCreateFailureReason()),
+                    )
+                }
                 result
             }
 
@@ -1205,6 +1303,8 @@ class AppSyncAccountRepository @Inject constructor(
                     syncStore.credentialId = CREDENTIAL_ID_DDG
                 }
                 unifiedDeviceInfo?.let {
+                    syncPixels.fireUnifiedDeviceListPixel(UnifiedDeviceListPixel.AccountInfoKeyCreateSuccess)
+                    syncPixels.fireUnifiedDeviceListPixel(UnifiedDeviceListPixel.OwnRowDeviceInfoFirstWriteSuccess)
                     // cache the pubkey and mark migration done
                     syncStore.accountInfoPublicKey = it.publicKey
                     syncStore.unifiedDeviceListMigratedForUserId = account.userId
@@ -1275,6 +1375,17 @@ class AppSyncAccountRepository @Inject constructor(
             deviceType = encryptedDeviceType,
             scope = SYNC_SCOPE_AI_CHATS,
         )
+    }
+
+    // This does not use the logout(deviceId) function above. That one takes the token from the store, and this flow never puts a token there.
+    private fun logoutTemporaryThirdPartyDevice(
+        token: String,
+        deviceId: String,
+    ) {
+        when (val result = syncApi.logout(token, deviceId)) {
+            is Error -> logcat(WARN) { "Sync-ScopedToken: best-effort 3party device logout failed: ${result.reason}" }
+            is Success -> logcat { "Sync-ScopedToken: temporary 3party device logged out" }
+        }
     }
 
     private fun performLogin(
@@ -1594,6 +1705,7 @@ enum class AccountErrorCodes(val code: Int) {
     UNEXPECTED_SECOND_HELLO(76),
     PAIRING_SESSION_NOT_READY(77),
     RELAY_CHANNEL_UNAVAILABLE(78),
+    UNSUPPORTED_CREDENTIAL_TYPE(79),
 }
 
 sealed interface SyncAuthCode {

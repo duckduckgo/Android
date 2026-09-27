@@ -22,4 +22,9 @@ package com.duckduckgo.app.onboarding
 enum class OnboardingPreference {
     SEARCH_HISTORY,
     SAFE_SEARCH,
+    SEARCH_ASSIST,
+    HIDE_AI_GENERATED_IMAGES,
+    BLOCK_ADS,
+    REJECT_OPTIONAL_COOKIES,
+    ACCEPT_NON_OPT_OUT_COOKIES,
 }

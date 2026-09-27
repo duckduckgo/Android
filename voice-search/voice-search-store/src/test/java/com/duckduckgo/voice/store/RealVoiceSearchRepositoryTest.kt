@@ -72,15 +72,6 @@ class RealVoiceSearchRepositoryTest {
     }
 
     @Test
-    fun whenDismissVoiceSearchThenCountVoiceSearchDismissedValueShouldIncrease() {
-        assertEquals(0, testee.countVoiceSearchDismissed())
-
-        testee.dismissVoiceSearch()
-
-        assertEquals(1, testee.countVoiceSearchDismissed())
-    }
-
-    @Test
     fun whenSetLastSelectedModeThenGetLastSelectedModeReturnsLastSelectedMode() {
         assertEquals(VoiceSearchMode.SEARCH, testee.getLastSelectedMode())
 
@@ -93,7 +84,6 @@ class RealVoiceSearchRepositoryTest {
 class FakeVoiceSearchDataStore : VoiceSearchDataStore {
     override var userAcceptedRationaleDialog: Boolean = false
     override var availabilityLogged: Boolean = false
-    override var countVoiceSearchDismissed: Int = 0
     override var lastSelectedMode: VoiceSearchMode = VoiceSearchMode.SEARCH
 
     private val _voiceSearchEnabled = MutableStateFlow(false)

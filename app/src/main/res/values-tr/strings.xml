@@ -213,13 +213,7 @@
     <!-- Get Desktop Browser -->
     <string name="getDesktopBrowserSettingItemTitle">Masaüstü Tarayıcısını Edinin</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">Mac ve Windows için DuckDuckGo</string>
-    <string name="getDesktopBrowserTitle">Mac ve Windows\'ta da kişisel bilgilerinizi koruyun!</string>
-    <string name="getDesktopBrowserBody">DuckDuckGo\'yu Mac veya Windows\'ta indirmek için şu adresi ziyaret edin:</string>
-    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
-    <string name="getDesktopBrowserShareDownloadLink">İndirme Bağlantısını Paylaş</string>
-    <string name="getDesktopBrowserNoThanks">Hayır Teşekkürler</string>
     <string name="getDesktopBrowserHideItem">Gizle</string>
-    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Bağlantı kopyalandı</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Çerez Açılır Pencere Engelleyici</string>
@@ -966,6 +960,22 @@
     <string name="preOnboardingWidgetPromptPrimaryCta">Widget Ekle</string>
     <string name="preOnboardingWidgetPromptSecondaryCta">Atla</string>
 
+    <!-- Pre-onboarding: import passwords -->
+    <string name="preOnboardingImportPasswordsTitle">Google\'dan şifreleri içe aktar</string>
+    <string name="preOnboardingImportPasswordsBody">Google, onaylamak için oturum açmanızı veya şifre girmenizi isteyebilir.</string>
+    <string name="preOnboardingImportPasswordsPrimaryCta">Google\'dan İçe Aktar</string>
+    <string name="preOnboardingImportCompleteTitle">İçe aktarma tamamlandı</string>
+    <string name="preOnboardingImportCompleteCta">Devam et</string>
+    <string name="preOnboardingImportCompleteParsingTitle">Şifreler içe aktarılıyor</string>
+    <string name="preOnboardingImportCompleteParsingBody">Bu sadece bir an sürecek.</string>
+    <string name="preOnboardingImportCompleteFailedTitle">İçe aktarma başarısız</string>
+    <string name="preOnboardingImportCompleteFailed">Şifre içe aktarma başarısız</string>
+    <string name="preOnboardingImportCompleteImported" instruction="Placeholder is the number of passwords that were imported.">İçe aktarılan şifreler: %1$s</string>
+    <string name="preOnboardingImportCompleteSkipped" instruction="Placeholder is the number of passwords that were not imported.">Atlandı (yinelenen veya geçersiz): %1$s</string>
+    <string name="preOnboardingImportErrorTitle">Bir hata oluştu</string>
+    <string name="preOnboardingImportErrorBody">Lütfen tekrar deneyin.</string>
+    <string name="preOnboardingImportErrorRetry">Tekrar dene</string>
+
     <!-- Pre-onboarding: add to home screen -->
     <string name="preOnboardingDockStepTitle">Beni favoriler satırına ekle.</string>
     <string name="preOnboardingAddToDockBody">Ana Ekranınızda DuckDuckGo simgesini bulun. Daha sonra simgeye basıp sürükleyerek yerine sabitleyin. Hepsi bu kadar!</string>
@@ -1003,4 +1013,11 @@
     <string name="singleTabFireDialogTitleFireMode">Fire Sekmeleri ve verileri silinsin mi?</string>
 
     <string name="downloadsCannotOpenFileErrorMessage">Dosya açılamıyor. Uyumlu uygulama arayın.</string>
+
+    <!-- Error pages -->
+    <string name="webViewErrorTitle" instruction="Title shown on the error pages">DuckDuckGo bu sayfayı yükleyemiyor</string>
+    <string name="webViewErrorNoConnection" instruction="Message shown when the page fails to load because the device has no internet connection">Görünüşe göre internet bağlantısı yok.</string>
+    <string name="webViewErrorBadUrl" instruction="Message shown when the hostname of the website could not be resolved">Belirtilen ana bilgisayar adına sahip sunucu bulunamadı.</string>
+    <string name="webViewErrorSslProtocol" instruction="Message shown when the website&apos;s SSL certificate is invalid. Placeholder is the website&apos;s address"><![CDATA[Bu sunucunun sertifikası geçersiz. <b>%1$s</b> gibi görünen ve gizli bilgilerinizi riske atabilecek bir sunucuya bağlanıyor olabilirsiniz.]]></string>
+    <string name="webViewErrorRedirectSuggestionMessage" instruction="Shown when a domain fails to load, offering a link to the www. version of the address. Placeholder is a tappable link to the suggested address."><annotation type="redirect_link">^1</annotation> demek istemiş olabilir misiniz?</string>
 </resources>

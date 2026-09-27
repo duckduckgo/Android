@@ -15,7 +15,7 @@ tags:
 
 # verify that autocomplete suggestions are shown when typing
 - tapOn:
-    id: "omnibarTextInput"
+    id: "omnibarTextInput|inputField"
     optional: true
 - inputText: "reddit"
 - assertVisible:
@@ -50,7 +50,7 @@ tags:
 
 # verify that clearing the text and submitting a URL opens the web page
 - tapOn:
-    id: "omnibarTextInput"
+    id: "omnibarTextInput|inputField"
 - tapOn:
     id: "inputFieldClearText"
 - inputText: "eff.org"
@@ -59,13 +59,13 @@ tags:
     id: "browserLayout"
 - extendedWaitUntil:
     visible:
-      id: "omnibarTextInput"
+      id: "omnibarTextInput|inputField"
       text: ".*eff.org.*"
     timeout: 10000
 
 # verify that tapping on a favorite opens the web page (SERP in this case)
 - tapOn:
-    id: "omnibarTextInput"
+    id: "omnibarTextInput|inputField"
 - tapOn:
     id: "inputFieldClearText"
 - tapOn:
@@ -75,7 +75,7 @@ tags:
 - assertVisible:
     id: "browserLayout"
 - assertVisible:
-    id: "omnibarTextInput"
+    id: "omnibarTextInput|inputField"
     text: "reddit"
 - assertVisible:
     text: "reddit"
@@ -94,7 +94,7 @@ tags:
 - tapOn:
     id: "cardContentsContainer"
 - assertVisible:
-    id: "omnibarTextInput"
+    id: "omnibarTextInput|inputField"
     text: "reddit"
 
 # verify that tapping on a new tab button opens a new tab
@@ -112,7 +112,7 @@ tags:
 - tapOn:
     id: "quickAccessFaviconCard"
 - assertVisible:
-    id: "omnibarTextInput"
+    id: "omnibarTextInput|inputField"
     text: "reddit"
 - assertVisible:
     id: "newTabButton"

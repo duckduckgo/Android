@@ -1,5 +1,8 @@
 appId: com.duckduckgo.mobile.android
 ---
+# Consumers need to know whether the linear widget step was shown: it and the end-of-onboarding widget
+# bottom sheet are mutually exclusive (see AddWidgetModalEvaluator).
+- evalScript: ${output.linearWidgetPromptShown = false}
 - assertVisible:
     text: ".*(Ready for a faster browser that protects you and lets you decide when and how to use.AI|Ready for a faster browser that puts you in.control).*"
 - tapOn:
@@ -51,6 +54,7 @@ appId: com.duckduckgo.mobile.android
         id: "widgetPromptTitle"
     commands:
       - tapOn: "Not Now"
+      - evalScript: ${output.linearWidgetPromptShown = true}
 - assertVisible:
     text: ".*where should I put your address.bar?.*"
 - tapOn: "next"

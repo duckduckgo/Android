@@ -40,6 +40,7 @@ import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.impl.R.string
 import com.duckduckgo.duckchat.impl.databinding.ActivityDuckAiPaidSettingsBinding
@@ -52,7 +53,6 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
-import com.duckduckgo.duckchat.impl.R as DuckChatR
 import com.duckduckgo.mobile.android.R as CommonR
 
 object DuckAiPaidSettingsNoParams : GlobalActivityStarter.ActivityParams
@@ -138,8 +138,6 @@ class DuckAiPaidSettingsActivity : DuckDuckGoActivity() {
 
     private fun renderViewState(viewState: ViewState) {
         with(binding) {
-            duckAiPaidSettingsIcon.setImageResource(DuckChatR.drawable.duckai_128)
-
             statusIndicator.setStatus(viewState.isDuckAIEnabled)
             duckAiPaidSettingsOpenDuckAi.isVisible = viewState.isDuckAIEnabled
             duckAiPaidSettingsEnableInSettings.isVisible = true
@@ -168,7 +166,7 @@ class DuckAiPaidSettingsActivity : DuckDuckGoActivity() {
             }
 
             OpenDuckAi -> {
-                duckChat.openDuckChat()
+                duckChat.openDuckChat(DuckChatEntryPoint.PAID_SETTINGS)
             }
 
             OpenDuckChatSettings -> {

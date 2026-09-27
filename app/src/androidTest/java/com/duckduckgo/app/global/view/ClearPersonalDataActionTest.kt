@@ -32,7 +32,7 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
-import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedRepository
+import com.duckduckgo.app.trackerdetection.WebTrackersBlockedHistory
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
@@ -68,7 +68,7 @@ class ClearPersonalDataActionTest {
     private val mockSavedSitesRepository: SavedSitesRepository = mock()
     private val mockSitePermissionsManager: SitePermissionsManager = mock()
     private val mockNavigationHistory: NavigationHistory = mock()
-    private val mockWebTrackersBlockedRepository: WebTrackersBlockedRepository = mock()
+    private val mockWebTrackersBlockedHistory: WebTrackersBlockedHistory = mock()
     private val mockTabVisitedSitesRepository: TabVisitedSitesRepository = mock()
     private val mockWebViewCapabilityChecker: WebViewCapabilityChecker = mock()
     private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
@@ -105,7 +105,7 @@ class ClearPersonalDataActionTest {
         savedSitesRepository = mockSavedSitesRepository,
         sitePermissionsManager = mockSitePermissionsManager,
         navigationHistory = mockNavigationHistory,
-        webTrackersBlockedRepository = mockWebTrackersBlockedRepository,
+        webTrackersBlockedHistory = mockWebTrackersBlockedHistory,
         tabVisitedSitesRepository = mockTabVisitedSitesRepository,
         webViewCapabilityChecker = mockWebViewCapabilityChecker,
         duckAiHostProvider = mockDuckAiHostProvider,
@@ -135,7 +135,7 @@ class ClearPersonalDataActionTest {
         verifyNoInteractions(mockThirdPartyCookieManager)
         verifyNoInteractions(mockSitePermissionsManager)
         verifyNoInteractions(mockNavigationHistory)
-        verifyNoInteractions(mockWebTrackersBlockedRepository)
+        verifyNoInteractions(mockWebTrackersBlockedHistory)
         verifyNoInteractions(mockTabVisitedSitesRepository)
         verifyNoInteractions(mockClearingUnsentForgetAllPixelStore)
     }
@@ -192,7 +192,7 @@ class ClearPersonalDataActionTest {
     @Test
     fun whenClearBrowserDataOnlyCalledThenWebTrackersAreCleared() = runTest {
         testee.clearBrowserDataOnly(shouldFireDataClearPixel = false)
-        verify(mockWebTrackersBlockedRepository).deleteAll()
+        verify(mockWebTrackersBlockedHistory).deleteAll()
     }
 
     @Test
@@ -229,7 +229,7 @@ class ClearPersonalDataActionTest {
         verifyNoInteractions(mockThirdPartyCookieManager)
         verifyNoInteractions(mockSitePermissionsManager)
         verifyNoInteractions(mockNavigationHistory)
-        verifyNoInteractions(mockWebTrackersBlockedRepository)
+        verifyNoInteractions(mockWebTrackersBlockedHistory)
         verifyNoInteractions(mockTabVisitedSitesRepository)
         verifyNoInteractions(mockClearingUnsentForgetAllPixelStore)
     }

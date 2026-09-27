@@ -1,7 +1,7 @@
 {
   "name": "VehicleHistory",
   "url": "vehiclehistory.us",
-  "version": "0.3.0",
+  "version": "0.6.0",
   "parent": "propertyrecord.com",
   "addedDatetime": 1775829600000,
   "optOutUrl": "https://dashboard.vehiclehistory.us/opt-out",
@@ -12,72 +12,48 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "b5e5aedd-72ff-497d-baa9-3fd3bb4715e1",
-          "url": "https://www.vehiclehistory.us/"
-        },
-        {
-          "actionType": "expectation",
-          "expectations": [
-            {
-              "type": "element",
-              "selector": "//a[@title='Remove My Info']"
-            }
-          ],
-          "id": "44e75eae-a288-472b-b392-f664a3e44e5b"
-        },
-        {
-          "actionType": "click",
-          "elements": [
-            {
-              "type": "button",
-              "selector": "//a[@title='Remove My Info']"
-            }
-          ],
-          "id": "24f92a0c-cb34-432c-9d84-ec6069f83406"
-        },
-        {
-          "actionType": "expectation",
-          "expectations": [
-            {
-              "type": "element",
-              "selector": "//h1[contains(text(), 'Remove My Information')]"
-            }
-          ],
-          "id": "44fe39d2-88c9-4119-b915-172d752d1e2a"
-        },
-        {
-          "actionType": "fillForm",
-          "selector": "form#backgroundCheckForm",
-          "dataSource": "userProfile",
-          "elements": [
-            {
-              "type": "fullName",
-              "selector": ".//input[@name='name']"
-            },
-            {
-              "type": "cityState",
-              "selector": ".//input[@name='cityState']"
-            }
-          ],
-          "id": "85072b72-6a48-4635-a29b-158b85040051"
-        },
-        {
-          "actionType": "click",
-          "elements": [
-            {
-              "type": "button",
-              "selector": "button[type='submit']"
-            }
-          ],
+          "_comment": "Forwarding page source: https://github.com/duckduckgo/privacy-test-pages/blob/main/pir/opt-out/index.html",
+          "url": "https://privacy-test-pages.site/pir/opt-out/?name=${firstName}%20${lastName}&city=${city|downcase}&state=${state|upcase}&cityState=${city},%20${state|upcase}&to=https%3A%2F%2Fdashboard.vehiclehistory.us%2Fopt-out%2Frecords",
           "id": "227207ce-699d-46ee-8693-0f42015c602c"
         },
         {
-          "actionType": "condition",
-          "_comment": "Occasionally the site pops ups a spelling correction, and we need to press the 'Use Original' button",
+          "actionType": "expectation",
           "expectations": [
             {
               "type": "element",
-              "selector": "#spellcheck-original"
+              "selector": "#forward"
+            }
+          ],
+          "id": "85b6a83b-4a92-4f96-a56b-37ac873a1978"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "#forward"
+            }
+          ],
+          "id": "9fece957-82ee-4692-8ff1-f4c22f19767a"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//div[contains(text(), 'Search Results')]"
+            }
+          ],
+          "id": "40869691-c488-4091-b524-47264ebdbcaf"
+        },
+        {
+          "actionType": "condition",
+          "_comment": "Click Use Original when the site offers a spelling correction.",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#spellcheck-original",
+              "failSilently": true
             }
           ],
           "actions": [
@@ -111,7 +87,7 @@
           "noResultsSelector": "//h3[contains(text(), 'No results found')]",
           "profile": {
             "name": {
-              "selector": ".//div[contains(@class,'grid')]/div[contains(@class,'flex-col')][1]/div[contains(@class,'!text-[#222]')]"
+              "selector": ".//div[contains(@class,'grid')]/div[contains(@class,'flex-col')][1]/div[contains(concat(' ', normalize-space(@class), ' '), ' !text-black-900 ') and contains(concat(' ', normalize-space(@class), ' '), ' text-lg ')]"
             },
             "addressCityState": {
               "selector": ".//div[contains(@class,'grid')]/div[contains(@class,'flex-col')][1]/div[contains(@class,'!leading-tight')]"

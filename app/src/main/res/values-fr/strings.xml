@@ -213,13 +213,7 @@
     <!-- Get Desktop Browser -->
     <string name="getDesktopBrowserSettingItemTitle">Télécharger le navigateur de bureau</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo pour Mac et Windows</string>
-    <string name="getDesktopBrowserTitle">Protégez aussi vos informations personnelles sur Mac et Windows !</string>
-    <string name="getDesktopBrowserBody">Pour télécharger DuckDuckGo sur Mac ou Windows, visitez :</string>
-    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
-    <string name="getDesktopBrowserShareDownloadLink">Partager le lien de téléchargement</string>
-    <string name="getDesktopBrowserNoThanks">Non merci</string>
     <string name="getDesktopBrowserHideItem">Masquer</string>
-    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Lien copié</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Protection contre les fenêtres contextuelles des cookies</string>
@@ -966,6 +960,22 @@
     <string name="preOnboardingWidgetPromptPrimaryCta">Ajouter un widget</string>
     <string name="preOnboardingWidgetPromptSecondaryCta">Ignorer</string>
 
+    <!-- Pre-onboarding: import passwords -->
+    <string name="preOnboardingImportPasswordsTitle">Importer des mots de passe depuis Google</string>
+    <string name="preOnboardingImportPasswordsBody">Google peut vous demander de vous connecter ou de saisir votre mot de passe pour confirmer.</string>
+    <string name="preOnboardingImportPasswordsPrimaryCta">Importer depuis Google</string>
+    <string name="preOnboardingImportCompleteTitle">Importation terminée</string>
+    <string name="preOnboardingImportCompleteCta">Continuer</string>
+    <string name="preOnboardingImportCompleteParsingTitle">Importation des mots de passe</string>
+    <string name="preOnboardingImportCompleteParsingBody">Cela ne prendra qu\'un instant.</string>
+    <string name="preOnboardingImportCompleteFailedTitle">Échec de l\'importation</string>
+    <string name="preOnboardingImportCompleteFailed">Échec de l\'importation des mots de passe</string>
+    <string name="preOnboardingImportCompleteImported" instruction="Placeholder is the number of passwords that were imported.">Mots de passe importés : %1$s</string>
+    <string name="preOnboardingImportCompleteSkipped" instruction="Placeholder is the number of passwords that were not imported.">Ignorés (doublons ou non valides) : %1$s</string>
+    <string name="preOnboardingImportErrorTitle">Une erreur s\'est produite</string>
+    <string name="preOnboardingImportErrorBody">Veuillez réessayer.</string>
+    <string name="preOnboardingImportErrorRetry">Réessayer</string>
+
     <!-- Pre-onboarding: add to home screen -->
     <string name="preOnboardingDockStepTitle">Ajoutez-moi à votre ligne de favoris.</string>
     <string name="preOnboardingAddToDockBody">Trouvez l\'icône DuckDuckGo sur votre écran d\'accueil. Appuyez ensuite dessus pour la faire glisser au bon endroit. Voilà !</string>
@@ -1003,4 +1013,11 @@
     <string name="singleTabFireDialogTitleFireMode">Supprimer les onglets Fire et leurs données ?</string>
 
     <string name="downloadsCannotOpenFileErrorMessage">Impossible d\'ouvrir le fichier. Vérifiez la compatibilité de l\'application.</string>
+
+    <!-- Error pages -->
+    <string name="webViewErrorTitle" instruction="Title shown on the error pages">DuckDuckGo ne peut pas charger cette page</string>
+    <string name="webViewErrorNoConnection" instruction="Message shown when the page fails to load because the device has no internet connection">La connexion Internet semble être hors ligne.</string>
+    <string name="webViewErrorBadUrl" instruction="Message shown when the hostname of the website could not be resolved">Impossible de trouver un serveur avec le nom d\'hôte spécifié.</string>
+    <string name="webViewErrorSslProtocol" instruction="Message shown when the website&apos;s SSL certificate is invalid. Placeholder is the website&apos;s address"><![CDATA[Le certificat de ce serveur n’est pas valide. Tu te connectes peut-être à un serveur qui se fait passer pour <b>%1$s</b>, ce qui pourrait mettre tes informations confidentielles en danger.]]></string>
+    <string name="webViewErrorRedirectSuggestionMessage" instruction="Shown when a domain fails to load, offering a link to the www. version of the address. Placeholder is a tappable link to the suggested address.">Vouliez-tu dire <annotation type="redirect_link">^1</annotation>?</string>
 </resources>

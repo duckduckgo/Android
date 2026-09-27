@@ -22,14 +22,12 @@
     <string name="voiceSearchListening">Говорете сега</string>
     <string name="voiceSearchListeningFooter">Аудиото се обработва на устройството. То не се съхранява или споделя с никого, включително DuckDuckGo.</string>
     <string name="voiceSearchNegativeAction">Отмени</string>
-    <string name="voiceSearchPermissionRationaleDescription">DuckDuckGo никога не слуша какво казвате. Аудиото се обработва на устройството. То не се съхранява или споделя с никого.</string>
-    <string name="voiceSearchPermissionRationaleTitle">За поверително гласово търсене се изисква достъп до микрофона</string>
-    <string name="voiceSearchPermissionRationalePositiveAction">ОК</string>
-    <string name="voiceSearchPermissionRejectedDialogMessage">За да използвате гласовото търсене в DuckDuckGo, трябва да разрешите достъпа до микрофона в системните настройки.</string>
-    <string name="voiceSearchPermissionRejectedDialogPositiveAction">Настройки</string>
-    <string name="voiceSearchPermissionRejectedDialogTitle">Изисква се достъп до микрофона</string>
-    <string name="voiceSearchRemovePositiveButton">Премахване</string>
-    <string name="voiceSearchRemoveTitle">Премахване на опцията за поверително гласово търсене от адресната лента?</string>
-    <string name="voiceSearchRemoveSubtitle">Винаги можете да управлявате тези и други предпочитания за достъпност в „Настройки“.</string>
+    <string name="voiceSearchMicAccessDeniedDialogTitle">DuckDuckGo има нужда от достъп до микрофона</string>
+    <string name="voiceSearchMicAccessDeniedDialogMessage">Ако искате да използвате нашето поверително гласово търсене, трябва да разрешите достъп до микрофона.</string>
+    <string name="voiceSearchMicAccessDeniedDialogMessageDuckAi">Ако искате да използвате нашите поверителни гласови функции, трябва да разрешите достъп до микрофона.</string>
+    <string name="voiceSearchMicAccessDeniedDialogChangePermissions">Промяна на разрешенията</string>
+    <string name="voiceSearchMicAccessDeniedDialogHideVoiceSearch">Скриване на гласово търсене</string>
+    <string name="voiceSearchMicPermissionDeniedSnackbarMessage">За гласовите функции е необходимо разрешение за достъп до микрофона</string>
+    <string name="voiceSearchMicPermissionDeniedSnackbarAction">Разрешавам</string>
     <string name="voiceSearchTitle">Гласово търсене</string>
 </resources>

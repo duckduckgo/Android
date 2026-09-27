@@ -24,6 +24,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
 import com.duckduckgo.di.scopes.AppScope
 import com.google.android.material.snackbar.BaseTransientBottomBar
@@ -52,6 +53,7 @@ class DuckDuckGoAppLinksSnackBarConfigurator @Inject constructor(
             it.makeSnackbarWithNoBottomInset(message, Snackbar.LENGTH_LONG).apply {
                 setAction(action) {
                     pixel.fire(AppPixelName.APP_LINKS_SNACKBAR_OPEN_ACTION_PRESSED)
+                    pixel.fire(AppPixelName.APP_LINKS_SNACKBAR_OPEN_ACTION_PRESSED_DAILY, type = Daily())
                     appLinksLauncher.openAppLink(context, appLink, viewModel)
                 }
                 addCallback(
@@ -59,6 +61,7 @@ class DuckDuckGoAppLinksSnackBarConfigurator @Inject constructor(
                         override fun onShown(transientBottomBar: Snackbar?) {
                             super.onShown(transientBottomBar)
                             pixel.fire(AppPixelName.APP_LINKS_SNACKBAR_SHOWN)
+                            pixel.fire(AppPixelName.APP_LINKS_SNACKBAR_SHOWN_DAILY, type = Daily())
                         }
                     },
                 )

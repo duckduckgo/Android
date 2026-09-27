@@ -213,13 +213,7 @@
     <!-- Get Desktop Browser -->
     <string name="getDesktopBrowserSettingItemTitle">Asztali böngésző letöltése</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo Mac és Windows rendszerre</string>
-    <string name="getDesktopBrowserTitle">Védd a személyes adataidat Mac és Windows rendszeren is!</string>
-    <string name="getDesktopBrowserBody">A DuckDuckGo Mac vagy Windows rendszerre történő letöltéséhez látogass el ide:</string>
-    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
-    <string name="getDesktopBrowserShareDownloadLink">Letöltési link megosztása</string>
-    <string name="getDesktopBrowserNoThanks">Nem, köszönöm</string>
     <string name="getDesktopBrowserHideItem">Elrejtés</string>
-    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Link másolva</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Felugró sütiablak elleni védelem</string>
@@ -966,6 +960,22 @@
     <string name="preOnboardingWidgetPromptPrimaryCta">Minialkalmazás hozzáadása</string>
     <string name="preOnboardingWidgetPromptSecondaryCta">Kihagyás</string>
 
+    <!-- Pre-onboarding: import passwords -->
+    <string name="preOnboardingImportPasswordsTitle">Jelszavak importálása a Google-ból</string>
+    <string name="preOnboardingImportPasswordsBody">A Google megkérhet, hogy jelentkezz be, vagy a megerősítéshez add meg a jelszavad.</string>
+    <string name="preOnboardingImportPasswordsPrimaryCta">Importálás a Google-ból</string>
+    <string name="preOnboardingImportCompleteTitle">Importálás kész</string>
+    <string name="preOnboardingImportCompleteCta">Folytatás</string>
+    <string name="preOnboardingImportCompleteParsingTitle">Jelszavak importálása</string>
+    <string name="preOnboardingImportCompleteParsingBody">Ez csak egy pillanatig tart.</string>
+    <string name="preOnboardingImportCompleteFailedTitle">Az importálás nem sikerült</string>
+    <string name="preOnboardingImportCompleteFailed">A jelszó importálása nem sikerült</string>
+    <string name="preOnboardingImportCompleteImported" instruction="Placeholder is the number of passwords that were imported.">Importált jelszó: %1$s</string>
+    <string name="preOnboardingImportCompleteSkipped" instruction="Placeholder is the number of passwords that were not imported.">Kihagyott (ismétlődő vagy érvénytelen): %1$s</string>
+    <string name="preOnboardingImportErrorTitle">Hiba történt</string>
+    <string name="preOnboardingImportErrorBody">Próbálkozz újra.</string>
+    <string name="preOnboardingImportErrorRetry">Próbálkozz újra</string>
+
     <!-- Pre-onboarding: add to home screen -->
     <string name="preOnboardingDockStepTitle">Adj hozzá a kedvencek sorához.</string>
     <string name="preOnboardingAddToDockBody">Keresd meg a DuckDuckGo ikont a kezdőképernyőn. Ezután az ikont nyomva tartva húzd a helyére. Ennyi az egész!</string>
@@ -1003,4 +1013,11 @@
     <string name="singleTabFireDialogTitleFireMode">Törlöd a Fire-lapokat és az adataikat?</string>
 
     <string name="downloadsCannotOpenFileErrorMessage">A fájl nem nyitható meg. Keress kompatibilis alkalmazást.</string>
+
+    <!-- Error pages -->
+    <string name="webViewErrorTitle" instruction="Title shown on the error pages">A DuckDuckGo nem tudja betölteni ezt az oldalt</string>
+    <string name="webViewErrorNoConnection" instruction="Message shown when the page fails to load because the device has no internet connection">Úgy tűnik, nincs internetkapcsolat.</string>
+    <string name="webViewErrorBadUrl" instruction="Message shown when the hostname of the website could not be resolved">A megadott állomásnevű szerver nem található.</string>
+    <string name="webViewErrorSslProtocol" instruction="Message shown when the website&apos;s SSL certificate is invalid. Placeholder is the website&apos;s address"><![CDATA[A szerver tanúsítványa érvénytelen. Előfordulhat, hogy olyan szerverhez csatlakozol, amely megpróbál <b>%1$s</b> címűként viselkedni, veszélybe sodorva ezzel bizalmas adataidat.]]></string>
+    <string name="webViewErrorRedirectSuggestionMessage" instruction="Shown when a domain fails to load, offering a link to the www. version of the address. Placeholder is a tappable link to the suggested address.">Úgy érted, <annotation type="redirect_link">^1</annotation>?</string>
 </resources>

@@ -40,6 +40,7 @@ class ModelPickerNativeInputPlugin @Inject constructor() : NativeInputPlugin {
         return ModelPickerView(context).also { picker ->
             picker.setHost(host)
             picker.setPickerEnabled(true)
+            picker.isEditMode = host.isEditSurface()
         }
     }
 }

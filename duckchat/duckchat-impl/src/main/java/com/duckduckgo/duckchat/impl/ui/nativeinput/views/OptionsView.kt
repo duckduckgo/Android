@@ -37,13 +37,13 @@ import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.R
-import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @InjectWith(ViewScope::class)
@@ -53,8 +53,6 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
     @Inject lateinit var viewModelFactory: ViewViewModelFactory
 
     @Inject lateinit var nativeInputStateProvider: NativeInputStateProvider
-
-    @Inject lateinit var duckChatFeature: DuckChatFeature
 
     private val viewModel by lazy {
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[OptionsViewModel::class.java]
@@ -91,6 +89,7 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
     private var optionsButton: ImageView
     private var selectedToolJob: Job? = null
     private var nativeInputStateJob: Job? = null
+    private var visibleToolsJob: Job? = null
     private var lastNativeInputState: NativeInputState? = null
 
     init {
@@ -105,6 +104,7 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
         super.onAttachedToWindow()
         observeSelectedTool()
         observeNativeInputState()
+        observeVisibleTools()
     }
 
     override fun onDetachedFromWindow() {
@@ -113,6 +113,8 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
         selectedToolJob = null
         nativeInputStateJob?.cancel()
         nativeInputStateJob = null
+        visibleToolsJob?.cancel()
+        visibleToolsJob = null
         lastNativeInputState = null
         dismissPopup()
     }
@@ -123,6 +125,16 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
         selectedToolJob = viewModel.selectedTool
             .onEach { tool -> renderSelection(tool) }
             .launchIn(lifecycleOwner.lifecycleScope)
+    }
+
+    private fun observeVisibleTools() {
+        val scope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
+        visibleToolsJob?.cancel()
+        visibleToolsJob = scope.launch {
+            launch { viewModel.visibleTools.collect { tools -> refreshOptionsButtonVisibility(tools) } }
+            // The model stopped supporting the selected tool, so drop it. The host owns the write.
+            launch { viewModel.toolSelectionCleared.collect { host.toolSelected(null) } }
+        }
     }
 
     private fun observeNativeInputState() {
@@ -144,8 +156,7 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
     }
 
     private fun isCustomizeResponsesAvailable(): Boolean =
-        duckChatFeature.customizeResponses().isEnabled() &&
-            lastNativeInputState?.inputContext == NativeInputState.InputContext.DUCK_AI
+        lastNativeInputState?.inputContext == NativeInputState.InputContext.DUCK_AI
 
     private fun refreshOptionsButtonVisibility(visibleTools: Set<Tool> = viewModel.visibleTools.value) {
         optionsButton.isVisible = visibleTools.isNotEmpty() || isCustomizeResponsesAvailable()
@@ -160,11 +171,6 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
         host.showReasoningPicker(show)
     }
 
-    fun clearSelection() {
-        if (!isAttachedToWindow) return
-        host.toolSelected(null)
-    }
-
     override fun onVisibilityChanged(changedView: View, visibility: Int) {
         super.onVisibilityChanged(changedView, visibility)
         if (!isAttachedToWindow) return
@@ -174,20 +180,6 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
                 host.showReasoningPicker(false)
             }
         }
-    }
-
-    fun updateCapabilitiesFrom(picker: ModelPicker?) {
-        val visibleTools = buildSet {
-            if (picker?.isImageGenerationSupported() ?: true) add(Tool.IMAGE_GENERATION)
-            if (picker?.isWebSearchSupported() ?: true) add(Tool.WEB_SEARCH)
-        }
-
-        if (isAttachedToWindow) {
-            val selectionCleared = viewModel.updateVisibleTools(visibleTools)
-            if (selectionCleared) host.toolSelected(null)
-        }
-
-        refreshOptionsButtonVisibility(visibleTools)
     }
 
     private fun buildOptionsButton(): ImageView {

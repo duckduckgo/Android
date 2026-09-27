@@ -22,6 +22,7 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
+    api project(path: ':tracker-detection-api')
     implementation project(path: ':navigation-api')
     api project(path: ':browser-mode-api')
     implementation project(path: ':design-system')

@@ -24,6 +24,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.browser.customtabs.CustomTabsIntent
+import androidx.core.view.ViewCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -35,6 +36,7 @@ import com.duckduckgo.app.browser.databinding.ActivityCustomTabBinding
 import com.duckduckgo.app.global.intentText
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.getColorFromAttr
+import com.duckduckgo.common.ui.view.isFullScreen
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
@@ -73,7 +75,11 @@ class CustomTabActivity : DuckDuckGoActivity() {
                 SystemBarStyle.light(toolbarColor, toolbarColor)
             }
             enableEdgeToEdge(statusBarStyle = barStyle, navigationBarStyle = barStyle)
-            edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.root, installScrim = false)
+            edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(
+                binding.root,
+                installScrim = false,
+                isFullScreen = { isFullScreen() },
+            )
             applyDisplayCutoutMode(resources.configuration.orientation)
         }
 
@@ -102,13 +108,21 @@ class CustomTabActivity : DuckDuckGoActivity() {
     ) {
         val tabId = "${CustomTabViewModel.CUSTOM_TAB_NAME_PREFIX}${UUID.randomUUID()}"
         val clientPackage = intent.getStringExtra(CLIENT_PACKAGE_EXTRA)
-        val newFragment = BrowserTabFragment.newInstanceForCustomTab(tabId, null, true, toolbarColor, isExternal, clientPackage)
+        val referrerPackage = intent.getStringExtra(REFERRER_PACKAGE_EXTRA)
+        val newFragment = BrowserTabFragment.newInstanceForCustomTab(tabId, null, true, toolbarColor, isExternal, clientPackage, referrerPackage)
         val transaction = supportFragmentManager.beginTransaction()
         transaction.hide(currentFragment)
         transaction.add(R.id.fragmentTabContainer, newFragment, tabId)
         transaction.addToBackStack(tabId)
         transaction.commit()
         newFragment.messageFromPreviousTab = message
+    }
+
+    override fun toggleFullScreen() {
+        super.toggleFullScreen()
+
+        // Fullscreen state is owned here, so re-apply insets to pick up the new state.
+        ViewCompat.requestApplyInsets(binding.root)
     }
 
     override fun onStart() {
@@ -129,6 +143,7 @@ class CustomTabActivity : DuckDuckGoActivity() {
             toolbarColor = viewState.toolbarColor,
             isExternal = intent.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false),
             clientPackage = intent.getStringExtra(CLIENT_PACKAGE_EXTRA),
+            referrerPackage = intent.getStringExtra(REFERRER_PACKAGE_EXTRA),
         )
         val transaction = supportFragmentManager.beginTransaction()
         transaction.replace(R.id.fragmentTabContainer, fragment, viewState.tabId)
@@ -143,6 +158,7 @@ class CustomTabActivity : DuckDuckGoActivity() {
             toolbarColor: Int?,
             isExternal: Boolean,
             clientPackage: String? = null,
+            referrerPackage: String? = null,
         ): Intent {
             return Intent(context, CustomTabActivity::class.java).apply {
                 addFlags(flags)
@@ -154,10 +170,14 @@ class CustomTabActivity : DuckDuckGoActivity() {
                 if (clientPackage != null) {
                     putExtra(CLIENT_PACKAGE_EXTRA, clientPackage)
                 }
+                if (referrerPackage != null) {
+                    putExtra(REFERRER_PACKAGE_EXTRA, referrerPackage)
+                }
             }
         }
         private const val LAUNCH_FROM_EXTERNAL_EXTRA = "LAUNCH_FROM_EXTERNAL_EXTRA"
         private const val CLIENT_PACKAGE_EXTRA = "CLIENT_PACKAGE_EXTRA"
+        private const val REFERRER_PACKAGE_EXTRA = "REFERRER_PACKAGE_EXTRA"
     }
 
     private fun configureOnBackPressedListener() {

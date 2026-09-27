@@ -38,7 +38,7 @@ class RealAdBlockingMenuStateProviderTest {
     private val killSwitchFlow = MutableStateFlow(true)
     private val phase2Flow = MutableStateFlow(true)
     private val contingencyFlow = MutableStateFlow(false)
-    private val stateFlow = MutableStateFlow<AdBlockingState>(AdBlockingState.Enabled.UserEnabled)
+    private val stateFlow = MutableStateFlow<AdBlockingState>(AdBlockingState.Enabled.WithPixelConsent)
 
     private val selfToggle: Toggle = mock { on { enabled() } doReturn killSwitchFlow }
     private val phase2Toggle: Toggle = mock { on { enabled() } doReturn phase2Flow }
@@ -90,7 +90,7 @@ class RealAdBlockingMenuStateProviderTest {
 
     @Test
     fun whenYoutubeAndUserEnabledThenEnabled() = runTest {
-        stateFlow.value = AdBlockingState.Enabled.UserEnabled
+        stateFlow.value = AdBlockingState.Enabled.WithPixelConsent
 
         assertEquals(AdBlockingMenuState.Enabled, provider.observe(youtubeUrl).first())
     }

@@ -18,6 +18,7 @@ package com.duckduckgo.duckchat.impl.messaging.fakes
 
 import android.net.Uri
 import androidx.lifecycle.LifecycleOwner
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
@@ -63,13 +64,15 @@ class FakeDuckChatInternal(
     var openDuckChatCalls: Int = 0
         private set
 
-    override fun openDuckChat() {
+    override fun openDuckChat(entryPoint: DuckChatEntryPoint) {
         openDuckChatCalls += 1
     }
 
-    override fun openDuckChatWithAutoPrompt(query: String) { }
+    override fun openDuckChatWithAutoPrompt(query: String, entryPoint: DuckChatEntryPoint) { }
 
-    override fun openDuckChatWithPrefill(query: String) { }
+    override fun openDuckChatWithPrefill(query: String, entryPoint: DuckChatEntryPoint) { }
+
+    override fun reportDuckChatEntry(entryPoint: DuckChatEntryPoint, opensNewTab: Boolean, hasPrompt: Boolean) { }
 
     override fun getDuckChatUrl(query: String, autoPrompt: Boolean, sidebar: Boolean): String {
         return "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
@@ -77,7 +80,7 @@ class FakeDuckChatInternal(
 
     override fun getDuckChatSettingsUrl(): String = "https://duck.ai?settings=open"
 
-    override fun isDuckChatUrl(uri: Uri): Boolean = false
+    override fun isDuckChatUrl(uri: Uri): Boolean = uri.host == "duck.ai"
 
     override suspend fun wasOpenedBefore(): Boolean = false
 
@@ -148,7 +151,7 @@ class FakeDuckChatInternal(
 
     override fun closeDuckChat() { }
 
-    override fun openNewDuckChatSession() { }
+    override fun openNewDuckChatSession(entryPoint: DuckChatEntryPoint) { }
 
     override fun observeCloseEvent(lifecycleOwner: LifecycleOwner, onClose: () -> Unit) { }
 
@@ -200,6 +203,8 @@ class FakeDuckChatInternal(
 
     override fun isContextualSheetRedesignEnabled(): Boolean = false
 
+    override fun isContextualMenuAllChatsEnabled(): Boolean = false
+
     override fun resolvedTogglePosition(): NativeInputState.ToggleSelection = NativeInputState.ToggleSelection.SEARCH
 
     override fun isDuckChatFeatureEnabled(): Boolean = true
@@ -214,7 +219,7 @@ class FakeDuckChatInternal(
 
     override fun observeChatSuggestionsUserSettingEnabled(): Flow<Boolean> = chatSuggestionsUserSettingEnabled
 
-    override fun openVoiceDuckChat() { }
+    override fun openVoiceDuckChat(entryPoint: DuckChatEntryPoint) { }
     override fun isVoiceChatSessionActive(tabId: String): Boolean = false
     override val activeVoiceChatSessions: Flow<Set<String>> = MutableStateFlow(emptySet())
     override fun observeTriggerVoiceChatSessionEnd(): Flow<String> = emptyFlow()
@@ -228,7 +233,11 @@ class FakeDuckChatInternal(
 
     override suspend fun onAddressBarPickerDuckAiSelected() { }
 
+    override fun openDuckChatImageGeneration(entryPoint: DuckChatEntryPoint) { }
+
     override fun buildChatUrl(chatId: String): String = "https://duck.ai?chatID=$chatId"
+
+    override fun getChatProtectionUrl(): String = "https://duck.ai/chat?chatProtection=open"
 
     private val _defaultTogglePosition = MutableStateFlow<String?>(null)
 

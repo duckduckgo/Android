@@ -31,7 +31,7 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
-import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedRepository
+import com.duckduckgo.app.trackerdetection.WebTrackersBlockedHistory
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -117,7 +117,7 @@ class ClearPersonalDataAction(
     private val savedSitesRepository: SavedSitesRepository,
     private val navigationHistory: NavigationHistory,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
-    private val webTrackersBlockedRepository: WebTrackersBlockedRepository,
+    private val webTrackersBlockedHistory: WebTrackersBlockedHistory,
     private val tabVisitedSitesRepository: TabVisitedSitesRepository,
     private val webViewCapabilityChecker: WebViewCapabilityChecker,
     duckAiHostProvider: DuckAiHostProvider,
@@ -151,7 +151,7 @@ class ClearPersonalDataAction(
                 savedSitesRepository.pruneDeleted()
             }
 
-            webTrackersBlockedRepository.deleteAll()
+            webTrackersBlockedHistory.deleteAll()
 
             navigationHistory.clearHistory()
             tabVisitedSitesRepository.clearAll()

@@ -215,13 +215,7 @@
     <!-- Get Desktop Browser -->
     <string name="getDesktopBrowserSettingItemTitle">Скачать настольный браузер</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo для Mac и Windows</string>
-    <string name="getDesktopBrowserTitle">Защитите личную информацию на Mac и Windows!</string>
-    <string name="getDesktopBrowserBody">Скачивайте DuckDuckGo:</string>
-    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
-    <string name="getDesktopBrowserShareDownloadLink">Поделиться ссылкой для загрузки</string>
-    <string name="getDesktopBrowserNoThanks">Нет, спасибо</string>
     <string name="getDesktopBrowserHideItem">Скрыть</string>
-    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Ссылка скопирована</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Защита от всплывающих окон куки</string>
@@ -1002,6 +996,22 @@
     <string name="preOnboardingWidgetPromptPrimaryCta">Добавить виджет</string>
     <string name="preOnboardingWidgetPromptSecondaryCta">Пропустить</string>
 
+    <!-- Pre-onboarding: import passwords -->
+    <string name="preOnboardingImportPasswordsTitle">Импортировать пароли из Google</string>
+    <string name="preOnboardingImportPasswordsBody">Google может попросить вас войти в систему или ввести пароль для подтверждения.</string>
+    <string name="preOnboardingImportPasswordsPrimaryCta">Импортировать из Google</string>
+    <string name="preOnboardingImportCompleteTitle">Импортирование завершено</string>
+    <string name="preOnboardingImportCompleteCta">Продолжить</string>
+    <string name="preOnboardingImportCompleteParsingTitle">Импорт паролей</string>
+    <string name="preOnboardingImportCompleteParsingBody">Это займет совсем немного времени.</string>
+    <string name="preOnboardingImportCompleteFailedTitle">Не удалось импортировать</string>
+    <string name="preOnboardingImportCompleteFailed">Не удалось импортировать пароли</string>
+    <string name="preOnboardingImportCompleteImported" instruction="Placeholder is the number of passwords that were imported.">Импортировано паролей: %1$s</string>
+    <string name="preOnboardingImportCompleteSkipped" instruction="Placeholder is the number of passwords that were not imported.">Пропущено (дубликаты и недействительные): %1$s</string>
+    <string name="preOnboardingImportErrorTitle">Что-то пошло не так</string>
+    <string name="preOnboardingImportErrorBody">Повторите попытку.</string>
+    <string name="preOnboardingImportErrorRetry">Повторить попытку</string>
+
     <!-- Pre-onboarding: add to home screen -->
     <string name="preOnboardingDockStepTitle">Добавьте меня в строку избранного.</string>
     <string name="preOnboardingAddToDockBody">Найдите значок DuckDuckGo на главном экране. Затем нажмите и перетащите виджет на нужное место. Готово!</string>
@@ -1039,4 +1049,11 @@
     <string name="singleTabFireDialogTitleFireMode">Удалить Fire-вкладки и их данные?</string>
 
     <string name="downloadsCannotOpenFileErrorMessage">Не удается открыть файл. Попробуйте найти совместимое приложение.</string>
+
+    <!-- Error pages -->
+    <string name="webViewErrorTitle" instruction="Title shown on the error pages">DuckDuckGo не удалось загрузить эту страницу</string>
+    <string name="webViewErrorNoConnection" instruction="Message shown when the page fails to load because the device has no internet connection">Похоже, нет подключения к интернету.</string>
+    <string name="webViewErrorBadUrl" instruction="Message shown when the hostname of the website could not be resolved">Сервер с указанным именем хоста не найден.</string>
+    <string name="webViewErrorSslProtocol" instruction="Message shown when the website&apos;s SSL certificate is invalid. Placeholder is the website&apos;s address"><![CDATA[Сертификат этого сервера недействителен. Возможно, вы пытаетесь подключиться к серверу, который выдает себя за <b>%1$s</b>, что ставит под угрозу вашу конфиденциальную информацию.]]></string>
+    <string name="webViewErrorRedirectSuggestionMessage" instruction="Shown when a domain fails to load, offering a link to the www. version of the address. Placeholder is a tappable link to the suggested address.">Возможно, вы искали: <annotation type="redirect_link">^1</annotation>?</string>
 </resources>

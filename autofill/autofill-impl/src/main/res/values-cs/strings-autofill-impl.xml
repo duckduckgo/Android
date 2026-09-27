@@ -214,7 +214,6 @@
     <string name="autofillManagementHowToSyncDesktopPasswordsTitle">Jak synchronizovat hesla na počítači</string>
     <string name="autofillManagementImportPasswordsHowToInstruction">Importuj hesla do desktopové verze prohlížeče DuckDuckGo a potom je synchronizuj mezi zařízeními.</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Nainstalovat prohlížeč pro počítač</string>
-    <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Odkaz se zkopíroval</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentTitle">Nainstaluj si prohlížeč DuckDuckGo pro Mac nebo Windows</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserIntentMessage" instruction="Placeholder is a URL">Vyhledávej soukromě a blokuj trackery pomocí prohlížeče DuckDuckGo pro počítače. Stáhneš si ho z tohohle odkazu.\n\n%1$s</string>
     <string name="autofillManagementImportPasswordsSyncWithDesktopButtonText">Synchronizovat s počítačem</string>
@@ -227,8 +226,6 @@
     <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Získat aplikaci pro počítač</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppSubtitle">Nainstaluj si DuckDuckGo pro Mac nebo Windows</string>
     <string name="autofillManagementImportPasswordsGetDesktopAppInstruction">V počítači přejdi na:</string>
-    <string name="autofillManagementImportPasswordsGetDesktopAppUrl" translatable="false">duckduckgo.com/browser</string>
-    <string name="autofillManagementImportPasswordsGetDesktopAppShareDownloadButtonText">Sdílet odkaz ke stažení</string>
 
     <string name="autofillManagementReportBreakagePromptTitle">Nahlásit problém s automatickým vyplňováním</string>
     <string name="autofillManagementReportBreakagePromptSubtitle">Anonymně můžeš nahlásit, že automatické vyplňování na tomhle webu nefunguje. Hesla nikdy nesdílíme.</string>

@@ -72,7 +72,7 @@ import com.duckduckgo.mobile.android.R
  * @param buttons Composable slot for dialog buttons (pinned, won't scroll)
  *
  * Asana Task: https://app.asana.com/1/137249556945/project/1202857801505092/task/1214735717450949
- * Figma reference: https://www.figma.com/design/BOHDESHODUXK7wSRNBOHdu/%F0%9F%A4%96-Android-Components?node-id=685-956&t=DvV3Fi7Mi45nLle2-4
+ * Figma reference: https://www.figma.com/design/BOHDESHODUXK7wSRNBOHdu/%F0%9F%A4%96-Android-Components?node-id=685-956
  */
 @Composable
 fun DaxAlertDialog(

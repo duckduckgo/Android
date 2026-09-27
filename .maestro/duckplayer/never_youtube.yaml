@@ -18,11 +18,11 @@ tags:
       - runFlow:
           when:
             notVisible:
-              id: "omnibarTextInput"
+              id: "omnibarTextInput|inputField"
           commands:
             - scrollUntilVisible:
                 element:
-                  id: "omnibarTextInput"
+                  id: "omnibarTextInput|inputField"
                 direction: UP
 
       # Core assertion: Verify we're still on regular YouTube (not Duck Player)

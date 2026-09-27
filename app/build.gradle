@@ -221,6 +221,12 @@ android {
             }
         }
     }
+    packagingOptions {
+        jniLibs {
+            // this is required so the handler exists as a real file on disk
+            useLegacyPackaging = true
+        }
+    }
 }
 
 if (!rootProject.ext.proprietaryFontAvailable && !rootProject.ext.proprietaryFontOptOut) {
@@ -327,6 +333,7 @@ dependencies {
 
 	implementation project(":prompts-coordinator-impl")
 	implementation project(":prompts-coordinator-api")
+	internalImplementation project(":prompts-coordinator-internal")
 
     implementation project(':navigation-api')
     implementation project(':navigation-impl')
@@ -511,6 +518,9 @@ dependencies {
     implementation project(':settings-api')
     implementation project(':settings-impl')
 
+    implementation project(':desktop-app-promotion-api')
+    implementation project(':desktop-app-promotion-impl')
+
     implementation project(':broken-site-api')
     implementation project(':broken-site-impl')
     implementation project(':broken-site-store')
@@ -558,6 +568,8 @@ dependencies {
     implementation AndroidX.recyclerView
     implementation AndroidX.swipeRefreshLayout
     implementation AndroidX.webkit
+    // Backs the internal-flavor PageLoadTracer (src/internal); other flavors bind a no-op instead.
+    internalImplementation AndroidX.tracing
     implementation Square.okHttp3.okHttp
     implementation "com.squareup.okhttp3:okhttp-tls:_"
     implementation Square.retrofit2.retrofit
@@ -569,6 +581,7 @@ dependencies {
     implementation "io.reactivex.rxjava2:rxjava:_"
     implementation "io.reactivex.rxjava2:rxandroid:_"
     implementation "com.squareup.logcat:logcat:_"
+    implementation "com.facebook.shimmer:shimmer:_"
     implementation 'nl.dionsegijn:konfetti:1.2.5'
     implementation("io.github.pcmind:leveldb:_") {
         exclude group: 'com.google.guava', module: 'guava'

@@ -42,7 +42,7 @@ import com.duckduckgo.sync.impl.promotion.SyncPromotions
 import com.duckduckgo.sync.impl.promotion.bookmarks.SyncBookmarksPromotionViewModel.Command
 import com.duckduckgo.sync.impl.promotion.bookmarks.SyncBookmarksPromotionViewModel.Command.LaunchSyncSettings
 import com.duckduckgo.sync.impl.promotion.bookmarks.SyncBookmarksPromotionViewModel.Command.ReevalutePromo
-import com.duckduckgo.sync.impl.ui.SyncActivityWithSourceParams
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityWithSourceParams
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.cancel
@@ -128,7 +128,7 @@ class SyncBookmarksPromotionView @JvmOverloads constructor(
         with(binding.syncPromotion) {
             setMessage(
                 Message(
-                    topIllustration = R.drawable.ic_sync_ok_48,
+                    topIllustration = R.drawable.sync_check_56,
                     title = context.getString(R.string.syncPromoTitleBookmarks),
                     subtitle = context.getString(R.string.syncPromoSubtitleBookmarks),
                     action = context.getString(R.string.syncPromoPrimaryButton),

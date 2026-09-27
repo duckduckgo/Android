@@ -6,7 +6,7 @@ appId: com.duckduckgo.mobile.android
 # Now, we add a couple bookmarks
 - runFlow: ../../shared/dismiss_native_input.yaml
 - tapOn:
-    id: "omnibarTextInput"
+    id: "omnibarTextInput|inputField"
 - inputText: "${output.bookmarks.domains[0]}"
 # We need this because Dax Dialogs sometimes appears before pressing Enter
 - runFlow:
@@ -27,7 +27,7 @@ appId: com.duckduckgo.mobile.android
 - runFlow: ../../shared/browser_screen/click_on_menu_button.yaml
 - tapOn: "Add Bookmark"
 - tapOn:
-    id: "omnibarTextInput"
+    id: "omnibarTextInput|inputField"
 # Now, we add a favourite
 - inputText: "${output.bookmarks.domains[1]}"
 - pressKey: Enter

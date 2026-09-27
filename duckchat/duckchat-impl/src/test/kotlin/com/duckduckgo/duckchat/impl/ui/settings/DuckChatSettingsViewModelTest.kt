@@ -29,8 +29,6 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
-import com.duckduckgo.duckchat.impl.store.HideAiGeneratedImages
-import com.duckduckgo.duckchat.impl.store.SearchAssistVisibility
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.LaunchFeedback
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenDuckAiWebSettings
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenLink
@@ -41,6 +39,8 @@ import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Comman
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.ShowSearchAssistDialog
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.settings.api.HideAiGeneratedImages
+import com.duckduckgo.settings.api.SearchAssistVisibility
 import com.duckduckgo.settings.api.SerpSettingsDataProvider
 import com.duckduckgo.settings.api.SettingsPageFeature
 import junit.framework.TestCase.assertEquals
@@ -1045,10 +1045,8 @@ class DuckChatSettingsViewModelTest {
         }
 
     @Test
-    fun `when duckAiSettings toggle enabled and duck chat enabled then isDuckAiWebSettingsVisible is true`() =
+    fun `when duck chat enabled then isDuckAiWebSettingsVisible is true`() =
         runTest {
-            @Suppress("DenyListedApi")
-            duckChatFeature.duckAiSettings().setRawStoredState(State(enable = true))
             whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(true))
             testee = DuckChatSettingsViewModel(
                 duckChatActivityParams = DuckChatSettingsNoParams,
@@ -1068,33 +1066,8 @@ class DuckChatSettingsViewModelTest {
         }
 
     @Test
-    fun `when duckAiSettings toggle disabled then isDuckAiWebSettingsVisible is false`() =
+    fun `when duck chat disabled then isDuckAiWebSettingsVisible is false`() =
         runTest {
-            @Suppress("DenyListedApi")
-            duckChatFeature.duckAiSettings().setRawStoredState(State(enable = false))
-            whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(true))
-            testee = DuckChatSettingsViewModel(
-                duckChatActivityParams = DuckChatSettingsNoParams,
-                duckChat = duckChat,
-                pixel = mockPixel,
-                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
-                settingsPageFeature = settingsPageFeature,
-                duckChatPixels = mockDuckChatPixels,
-                dispatcherProvider = coroutineRule.testDispatcherProvider,
-                duckChatFeature = duckChatFeature,
-                serpSettingsDataProvider = serpSettingsDataProvider,
-            )
-
-            testee.viewState.test {
-                assertFalse(awaitItem().isDuckAiWebSettingsVisible)
-            }
-        }
-
-    @Test
-    fun `when duckAiSettings toggle enabled and duck chat disabled then isDuckAiWebSettingsVisible is false`() =
-        runTest {
-            @Suppress("DenyListedApi")
-            duckChatFeature.duckAiSettings().setRawStoredState(State(enable = true))
             whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(false))
             testee = DuckChatSettingsViewModel(
                 duckChatActivityParams = DuckChatSettingsNoParams,

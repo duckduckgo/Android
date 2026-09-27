@@ -249,7 +249,9 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     APP_FEEDBACK_DIALOG_USER_CANCELLED("mrp_f_d%d_c"),
 
     APP_LINKS_SNACKBAR_SHOWN("m_app_links_snackbar_shown"),
+    APP_LINKS_SNACKBAR_SHOWN_DAILY("app_links_snackbar_shown_daily"),
     APP_LINKS_SNACKBAR_OPEN_ACTION_PRESSED("m_app_links_snackbar_open_action_pressed"),
+    APP_LINKS_SNACKBAR_OPEN_ACTION_PRESSED_DAILY("app_links_snackbar_open_action_pressed_daily"),
 
     AUTOCOMPLETE_TOGGLED_OFF("m_autocomplete_recent_sites_toggled_off"),
     AUTOCOMPLETE_TOGGLED_ON("m_autocomplete_recent_sites_toggled_on"),
@@ -455,6 +457,8 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     SWIPE_TABS_USED("m_swipe_tabs_used"),
     SWIPE_TABS_USED_DAILY("m_swipe_tabs_used_daily"),
 
+    TAB_MAX_REUSE_DISTANCE("tab_max_reuse_distance"),
+
     DUCK_PLAYER_SETTING_ALWAYS_OVERLAY_YOUTUBE("duckplayer_setting_always_overlay_youtube"),
     DUCK_PLAYER_SETTING_ALWAYS_SERP("duckplayer_setting_always_overlay_serp"),
     DUCK_PLAYER_SETTING_NEVER_SERP("duckplayer_setting_never_overlay_serp"),
@@ -546,8 +550,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     GET_DESKTOP_BROWSER_COMPLETE_SETUP_IMPRESSION("m_get_desktop_browser_complete_setup_impression"),
     GET_DESKTOP_BROWSER_CLICKED("m_get_desktop_browser_clicked"),
     GET_DESKTOP_BROWSER_DISMISSED("m_get_desktop_browser_dismissed"),
-    GET_DESKTOP_BROWSER_SHARE_DOWNLOAD_LINK_CLICK("m_get_desktop_browser_share_download_link_click"),
-    GET_DESKTOP_BROWSER_LINK_CLICK("m_get_desktop_browser_link_click"),
 
     AICHAT_VOICE_SESSION_DIGITAL_ASSISTANT_STARTED("m_aichat_voice_session_digital-assistant_started"),
 

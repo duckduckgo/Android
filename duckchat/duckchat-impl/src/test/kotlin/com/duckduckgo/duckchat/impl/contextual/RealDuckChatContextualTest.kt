@@ -17,9 +17,13 @@
 package com.duckduckgo.duckchat.impl.contextual
 
 import android.view.View
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
+import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.RealTextSelectionRepository
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -34,6 +38,11 @@ class RealDuckChatContextualTest {
     private val contextualDataStore: DuckChatContextualDataStore = mock()
     private val sessionTimeoutProvider: DuckChatContextualSessionTimeoutProvider = mock()
     private val timeProvider: DuckChatContextualTimeProvider = mock()
+    private val duckChatPixels: DuckChatPixels = mock()
+    private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
+    private val contextualEntryPromptStore = RealContextualEntryPromptStore()
+    private val globalActivityStarter: GlobalActivityStarter = mock()
+    private val textSelectionRepository = RealTextSelectionRepository()
     private val anchor: View = mock()
 
     private val testee = RealDuckChatContextual(
@@ -42,6 +51,11 @@ class RealDuckChatContextualTest {
         contextualDataStore,
         sessionTimeoutProvider,
         timeProvider,
+        duckChatPixels,
+        duckDuckGoUrlDetector,
+        contextualEntryPromptStore,
+        globalActivityStarter,
+        textSelectionRepository,
     )
 
     @Test
@@ -49,7 +63,7 @@ class RealDuckChatContextualTest {
         whenever(duckChatInternal.isContextualSheetRedesignEnabled()).thenReturn(false)
         var askAboutPageCount = 0
 
-        testee.launch("tabId", anchor) { askAboutPageCount++ }
+        testee.launch("tabId", sourceUrl = null, anchor = anchor) { askAboutPageCount++ }
 
         assertEquals(1, askAboutPageCount)
         verifyNoInteractions(browserNav)
@@ -60,10 +74,22 @@ class RealDuckChatContextualTest {
         whenever(duckChatInternal.isContextualSheetRedesignEnabled()).thenReturn(true)
         var askAboutPageCount = 0
 
-        testee.launch("tabId", anchor = null) { askAboutPageCount++ }
+        testee.launch("tabId", sourceUrl = null, anchor = null) { askAboutPageCount++ }
 
         assertEquals(1, askAboutPageCount)
         verifyNoInteractions(browserNav)
+    }
+
+    @Test
+    fun whenNoPageAndChatsEntryDisabledThenChatSurfaceShownInsteadOfMenu() = runTest {
+        whenever(duckChatInternal.isContextualSheetRedesignEnabled()).thenReturn(true)
+        whenever(duckChatInternal.isContextualMenuAllChatsEnabled()).thenReturn(false)
+        var askAboutPageCount = 0
+
+        testee.launch("tabId", sourceUrl = null, anchor = anchor) { askAboutPageCount++ }
+
+        // A menu of just New Chat is worse than the caller's own fallback.
+        assertEquals(1, askAboutPageCount)
     }
 
     @Test
@@ -73,7 +99,7 @@ class RealDuckChatContextualTest {
         whenever(contextualDataStore.getTabClosedTimestamp("tabId")).thenReturn(null)
         var askAboutPageCount = 0
 
-        testee.launch("tabId", anchor) { askAboutPageCount++ }
+        testee.launch("tabId", sourceUrl = null, anchor = anchor) { askAboutPageCount++ }
 
         assertEquals(1, askAboutPageCount)
     }
@@ -81,13 +107,14 @@ class RealDuckChatContextualTest {
     @Test
     fun whenStoredChatSessionExpiredThenTreatedAsNoChatInProgress() = runTest {
         whenever(duckChatInternal.isContextualSheetRedesignEnabled()).thenReturn(true)
+        whenever(duckChatInternal.isContextualMenuAllChatsEnabled()).thenReturn(true)
         whenever(contextualDataStore.getTabChatUrl("tabId")).thenReturn("https://duckduckgo.com/?chatId=123")
         whenever(contextualDataStore.getTabClosedTimestamp("tabId")).thenReturn(0L)
         whenever(sessionTimeoutProvider.sessionTimeoutMillis()).thenReturn(1L)
         whenever(timeProvider.currentTimeMillis()).thenReturn(1_000L)
         var askAboutPageCount = 0
 
-        testee.launch("tabId", anchor) { askAboutPageCount++ }
+        testee.launch("tabId", sourceUrl = null, anchor = anchor) { askAboutPageCount++ }
 
         // Session expired: the menu path is taken instead of opening the chat directly.
         assertEquals(0, askAboutPageCount)

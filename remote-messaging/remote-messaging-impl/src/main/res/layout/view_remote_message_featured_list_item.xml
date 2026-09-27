@@ -53,7 +53,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:src="@drawable/ic_image_ai" />
+                tools:src="@drawable/image_sweep_96" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/title"

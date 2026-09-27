@@ -17,7 +17,6 @@
 package com.duckduckgo.app.trackerdetection
 
 import android.net.Uri
-import com.duckduckgo.app.browser.Domain
 import com.duckduckgo.app.browser.UriString.Companion.host
 import com.duckduckgo.app.browser.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.app.trackerdetection.model.Action.BLOCK
@@ -30,30 +29,18 @@ class TdsClient(
     override val name: Client.ClientName,
     trackers: List<TdsTracker>,
     private val urlToTypeMapper: UrlToTypeMapper,
-    private val optimizeTrackerEvaluationV3: Boolean,
-    precompileRegex: Boolean = false,
 ) : Client {
 
-    private val precompileRegex: Boolean = precompileRegex && optimizeTrackerEvaluationV3
-
-    private val compiledTrackers: List<CompiledTracker> = trackers.map { tracker ->
-        CompiledTracker(
+    private val compiledTrackerByDomain: Map<String, CompiledTracker> = trackers.associate { tracker ->
+        tracker.domain.value to CompiledTracker(
             tracker = tracker,
-            rules = tracker.rules.map { rule ->
-                val regex = if (precompileRegex) {
-                    runCatching { ".*${rule.rule}.*".toRegex() }
-                        .onFailure { logcat { "TDS rule failed to compile, skipping: ${rule.rule} (${it.message})" } }
-                        .getOrNull()
-                } else {
-                    null
-                }
-                CompiledRule(rule = rule, regex = regex)
+            rules = tracker.rules.mapNotNull { rule ->
+                runCatching { ".*${rule.rule}.*".toRegex() }
+                    .onFailure { logcat { "TDS rule failed to compile, skipping: ${rule.rule} (${it.message})" } }
+                    .getOrNull()
+                    ?.let { regex -> CompiledRule(rule = rule, regex = regex) }
             },
         )
-    }
-
-    private val compiledTrackerByDomain: Map<String, CompiledTracker> by lazy {
-        compiledTrackers.associateBy { it.tracker.domain.value }
     }
 
     override fun matches(
@@ -90,15 +77,6 @@ class TdsClient(
 
     private fun findCompiledTracker(host: String?): CompiledTracker? {
         if (host.isNullOrEmpty()) return null
-        return if (optimizeTrackerEvaluationV3) {
-            findCompiledTrackerByLabelWalk(host)
-        } else {
-            val domain = Domain(host)
-            compiledTrackers.firstOrNull { sameOrSubdomain(domain, it.tracker.domain) }
-        }
-    }
-
-    private fun findCompiledTrackerByLabelWalk(host: String): CompiledTracker? {
         var candidate: String = host
         while (true) {
             compiledTrackerByDomain[candidate]?.let { return it }
@@ -119,12 +97,7 @@ class TdsClient(
         var typeResolved = false
         compiled.rules.forEach { compiledRule ->
             val rule = compiledRule.rule
-            val regex = if (precompileRegex) {
-                compiledRule.regex ?: return@forEach
-            } else {
-                ".*${rule.rule}.*".toRegex()
-            }
-            if (url.matches(regex)) {
+            if (url.matches(compiledRule.regex)) {
                 if (!typeResolved) {
                     type = urlToTypeMapper.map(url, requestHeaders)
                     typeResolved = true
@@ -185,7 +158,7 @@ class TdsClient(
 
     private data class CompiledRule(
         val rule: Rule,
-        val regex: Regex?,
+        val regex: Regex,
     )
 
     private data class CompiledTracker(

@@ -19,6 +19,6 @@
     android:id="@+id/netpPSetting"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:leadingIcon="@drawable/ic_vpn_color_24"
+    app:leadingIcon="@drawable/vpn_color_24"
     app:indicatorStatus="off"
     app:primaryText="@string/netpSubscriptionSettingsTitle" />

@@ -35,6 +35,7 @@
             <enum name="caption_allCaps" value="13"/>
             <enum name="onboarding_title" value="14"/>
             <enum name="onboarding_body" value="15"/>
+            <enum name="onboarding_small_text" value="16"/>
         </attr>
         <attr name="textType" format="enum" >
             <enum name="primary" value="0"/>

@@ -133,7 +133,12 @@ class SitePermissionsActivity : DuckDuckGoActivity() {
     }
 
     private fun setupRecyclerView() {
-        adapter = SitePermissionsAdapter(viewModel, this, faviconManager)
+        adapter = SitePermissionsAdapter(
+            viewModel = viewModel,
+            lifecycleOwner = this,
+            faviconManager = faviconManager,
+            appBrandDesignUpdateToggles = appBrandDesignUpdateToggles,
+        )
         binding.recycler.adapter = adapter
     }
 

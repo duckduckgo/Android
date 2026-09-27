@@ -22,14 +22,12 @@
     <string name="voiceSearchListening">Snakk nå</string>
     <string name="voiceSearchListeningFooter">Lyd behandles på enheten. Den lagres ikke og deles ikke med noen, heller ikke med DuckDuckGo.</string>
     <string name="voiceSearchNegativeAction">Avbryt</string>
-    <string name="voiceSearchPermissionRationaleDescription">DuckDuckGo lytter aldri til det du sier. Lyd behandles på enheten. Den blir ikke lagret eller delt med noen.</string>
-    <string name="voiceSearchPermissionRationaleTitle">Mikrofontilgang kreves for Privat talesøk</string>
-    <string name="voiceSearchPermissionRationalePositiveAction">OK</string>
-    <string name="voiceSearchPermissionRejectedDialogMessage">For å bruke talesøk i DuckDuckGo må du aktivere mikrofontilgang i systeminnstillingene.</string>
-    <string name="voiceSearchPermissionRejectedDialogPositiveAction">Innstillinger</string>
-    <string name="voiceSearchPermissionRejectedDialogTitle">Mikrofontilgang kreves</string>
-    <string name="voiceSearchRemovePositiveButton">Fjern</string>
-    <string name="voiceSearchRemoveTitle">Vil du fjerne alternativet privat talesøk fra adressefeltet?</string>
-    <string name="voiceSearchRemoveSubtitle">Du kan alltid administrere dette og andre tilgjengelighetsinnstillinger i Innstillinger.</string>
+    <string name="voiceSearchMicAccessDeniedDialogTitle">DuckDuckGo trenger tilgang til mikrofonen</string>
+    <string name="voiceSearchMicAccessDeniedDialogMessage">Mikrofontillatelser er nødvendig hvis du vil bruke privat talesøk.</string>
+    <string name="voiceSearchMicAccessDeniedDialogMessageDuckAi">Mikrofontillatelser er nødvendig hvis du vil bruke private talefunksjoner.</string>
+    <string name="voiceSearchMicAccessDeniedDialogChangePermissions">Endre tillatelser</string>
+    <string name="voiceSearchMicAccessDeniedDialogHideVoiceSearch">Skjul talesøk</string>
+    <string name="voiceSearchMicPermissionDeniedSnackbarMessage">Mikrofontillatelse er nødvendig for talefunksjoner</string>
+    <string name="voiceSearchMicPermissionDeniedSnackbarAction">Tillat</string>
     <string name="voiceSearchTitle">Talesøk</string>
 </resources>

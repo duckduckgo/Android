@@ -213,13 +213,7 @@
     <!-- Get Desktop Browser -->
     <string name="getDesktopBrowserSettingItemTitle">Αποκτήστε το πρόγραμμα περιήγησης για υπολογιστές</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo για Mac και Windows</string>
-    <string name="getDesktopBrowserTitle">Προστατέψτε τα προσωπικά στοιχεία σας τόσο σε Mac όσο και σε Windows!</string>
-    <string name="getDesktopBrowserBody">Για να κάνετ ελήψη του DuckDuckGo σε Mac ή Windows, επισκεφθείτε τη διεύθυνση:</string>
-    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
-    <string name="getDesktopBrowserShareDownloadLink">Κοινή χρήση συνδέσμου λήψης</string>
-    <string name="getDesktopBrowserNoThanks">Όχι, ευχαριστώ</string>
     <string name="getDesktopBrowserHideItem">Αποκρυψη</string>
-    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Ο σύνδεσμος αντιγράφηκε</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Προστασία αναδυόμενων παραθύρων για cookies</string>
@@ -966,6 +960,22 @@
     <string name="preOnboardingWidgetPromptPrimaryCta">Προσθήκη μικροεφαρμογής</string>
     <string name="preOnboardingWidgetPromptSecondaryCta">Παράλειψη</string>
 
+    <!-- Pre-onboarding: import passwords -->
+    <string name="preOnboardingImportPasswordsTitle">Εισαγωγή κωδικών πρόσβασης από το Google</string>
+    <string name="preOnboardingImportPasswordsBody">Η Google μπορεί να σου ζητήσει να συνδεθείς ή να εισαγάγεις τον κωδικό πρόσβασής σου για επιβεβαίωση.</string>
+    <string name="preOnboardingImportPasswordsPrimaryCta">Εισαγωγή από το Google</string>
+    <string name="preOnboardingImportCompleteTitle">Η εισαγωγή ολοκληρώθηκε</string>
+    <string name="preOnboardingImportCompleteCta">Συνέχεια</string>
+    <string name="preOnboardingImportCompleteParsingTitle">Γίνεται εισαγωγή κωδικών πρόσβασης</string>
+    <string name="preOnboardingImportCompleteParsingBody">Αυτό θα διαρκέσει ελάχιστο χρόνο.</string>
+    <string name="preOnboardingImportCompleteFailedTitle">Η εισαγωγή απέτυχε</string>
+    <string name="preOnboardingImportCompleteFailed">Η εισαγωγή κωδικού πρόσβασης απέτυχε</string>
+    <string name="preOnboardingImportCompleteImported" instruction="Placeholder is the number of passwords that were imported.">Κωδικοί πρόσβασης που εισήχθησαν: %1$s</string>
+    <string name="preOnboardingImportCompleteSkipped" instruction="Placeholder is the number of passwords that were not imported.">Παραλείφθηκε (διπλότυπο ή μη έγκυρο): %1$s</string>
+    <string name="preOnboardingImportErrorTitle">Κάτι πήγε στραβά</string>
+    <string name="preOnboardingImportErrorBody">Προσπάθησε ξανά.</string>
+    <string name="preOnboardingImportErrorRetry">Προσπάθησε ξανά</string>
+
     <!-- Pre-onboarding: add to home screen -->
     <string name="preOnboardingDockStepTitle">Πρόσθεσέ με στη σειρά των αγαπημένων σου.</string>
     <string name="preOnboardingAddToDockBody">Βρείτε το εικονίδιο DuckDuckGo στην Αρχική οθόνη σας. Στη συνέχεια, πατήστε και μεταφέρετέ το στη θέση του. Αυτό ήταν!</string>
@@ -1003,4 +1013,11 @@
     <string name="singleTabFireDialogTitleFireMode">Να διαγραφούν οι καρτέλες Fire και τα δεδομένα τους;</string>
 
     <string name="downloadsCannotOpenFileErrorMessage">Δεν ήταν δυνατό το άνοιγμα του αρχείου. Ελέγξτε για μια συμβατή εφαρμογή.</string>
+
+    <!-- Error pages -->
+    <string name="webViewErrorTitle" instruction="Title shown on the error pages">Το DuckDuckGo δεν μπορεί να φορτώσει αυτή τη σελίδα</string>
+    <string name="webViewErrorNoConnection" instruction="Message shown when the page fails to load because the device has no internet connection">Φαίνεται να μην υπάρχει ενεργή σύνδεση στο διαδίκτυο.</string>
+    <string name="webViewErrorBadUrl" instruction="Message shown when the hostname of the website could not be resolved">Δεν ήταν δυνατή η εύρεση διακομιστή με το καθορισμένο όνομα κεντρικού υπολογιστή.</string>
+    <string name="webViewErrorSslProtocol" instruction="Message shown when the website&apos;s SSL certificate is invalid. Placeholder is the website&apos;s address"><![CDATA[Το πιστοποιητικό για αυτόν τον διακομιστή δεν είναι έγκυρο. Ίσως συνδέεσαι σε διακομιστή που προσποιείται ότι είναι ο τομέας <b>%1$s</b>, γεγονός που θα μπορούσε να θέσει σε κίνδυνο τις εμπιστευτικές πληροφορίες σου.]]></string>
+    <string name="webViewErrorRedirectSuggestionMessage" instruction="Shown when a domain fails to load, offering a link to the www. version of the address. Placeholder is a tappable link to the suggested address.">Μήπως εννοείς <annotation type="redirect_link">^1</annotation>;</string>
 </resources>

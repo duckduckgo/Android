@@ -213,13 +213,7 @@
     <!-- Get Desktop Browser -->
     <string name="getDesktopBrowserSettingItemTitle">Hämta webbläsare för dator</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo för Mac och Windows</string>
-    <string name="getDesktopBrowserTitle">Skydda din personliga information på Mac och Windows också!</string>
-    <string name="getDesktopBrowserBody">För att ladda ner DuckDuckGo på Mac eller Windows, besök:</string>
-    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
-    <string name="getDesktopBrowserShareDownloadLink">Dela nedladdningslänk</string>
-    <string name="getDesktopBrowserNoThanks">Nej tack</string>
     <string name="getDesktopBrowserHideItem">Dölj</string>
-    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Länken har kopierats</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Skydd mot popup-fönster för cookies</string>
@@ -966,6 +960,22 @@
     <string name="preOnboardingWidgetPromptPrimaryCta">Lägg till widget</string>
     <string name="preOnboardingWidgetPromptSecondaryCta">Hoppa över</string>
 
+    <!-- Pre-onboarding: import passwords -->
+    <string name="preOnboardingImportPasswordsTitle">Importera lösenord från Google</string>
+    <string name="preOnboardingImportPasswordsBody">Google kan be dig att logga in eller ange ditt lösenord för att bekräfta åtgärden.</string>
+    <string name="preOnboardingImportPasswordsPrimaryCta">Importera från Google</string>
+    <string name="preOnboardingImportCompleteTitle">Importen är klar</string>
+    <string name="preOnboardingImportCompleteCta">Fortsätt</string>
+    <string name="preOnboardingImportCompleteParsingTitle">Importerar lösenord</string>
+    <string name="preOnboardingImportCompleteParsingBody">Detta tar bara ett ögonblick.</string>
+    <string name="preOnboardingImportCompleteFailedTitle">Importen misslyckades</string>
+    <string name="preOnboardingImportCompleteFailed">Lösenordsimporten misslyckades</string>
+    <string name="preOnboardingImportCompleteImported" instruction="Placeholder is the number of passwords that were imported.">Importerade lösenord: %1$s</string>
+    <string name="preOnboardingImportCompleteSkipped" instruction="Placeholder is the number of passwords that were not imported.">Hoppade över (dubblett eller ogiltig): %1$s</string>
+    <string name="preOnboardingImportErrorTitle">Något gick fel</string>
+    <string name="preOnboardingImportErrorBody">Försök igen.</string>
+    <string name="preOnboardingImportErrorRetry">Försök igen</string>
+
     <!-- Pre-onboarding: add to home screen -->
     <string name="preOnboardingDockStepTitle">Lägg till mig i din favoritrad.</string>
     <string name="preOnboardingAddToDockBody">Leta upp DuckDuckGo-ikonen på startskärmen. Tryck och dra den därefter på plats. Sedan är det klart!</string>
@@ -1003,4 +1013,11 @@
     <string name="singleTabFireDialogTitleFireMode">Ta bort Fire Tabs och deras data?</string>
 
     <string name="downloadsCannotOpenFileErrorMessage">Det går inte att öppna filen. Sök efter en kompatibel app.</string>
+
+    <!-- Error pages -->
+    <string name="webViewErrorTitle" instruction="Title shown on the error pages">DuckDuckGo kan inte läsa in den här sidan</string>
+    <string name="webViewErrorNoConnection" instruction="Message shown when the page fails to load because the device has no internet connection">Internetanslutningen verkar vara offline.</string>
+    <string name="webViewErrorBadUrl" instruction="Message shown when the hostname of the website could not be resolved">En server med det angivna värdnamnet kunde inte hittas.</string>
+    <string name="webViewErrorSslProtocol" instruction="Message shown when the website&apos;s SSL certificate is invalid. Placeholder is the website&apos;s address"><![CDATA[Certifikatet för denna server är ogiltigt. Du kanske ansluter till en server som låtsas vara <b>%1$s</b>. Detta kan utgöra en risk för din konfidentiella information.]]></string>
+    <string name="webViewErrorRedirectSuggestionMessage" instruction="Shown when a domain fails to load, offering a link to the www. version of the address. Placeholder is a tappable link to the suggested address.">Menade du <annotation type="redirect_link">^1</annotation>?</string>
 </resources>

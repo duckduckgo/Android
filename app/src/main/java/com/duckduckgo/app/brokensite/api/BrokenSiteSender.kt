@@ -23,8 +23,8 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
-import com.duckduckgo.app.trackerdetection.blocklist.activeTdsFlag
-import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
+import com.duckduckgo.app.trackerdetection.TdsMetadataProvider
+import com.duckduckgo.app.trackerdetection.blocklist.BlockListExperiment
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.brokensite.api.BrokenSite
 import com.duckduckgo.brokensite.api.BrokenSiteLastSentReport
@@ -44,8 +44,6 @@ import com.duckduckgo.common.utils.extensions.toSanitizedLanguageTag
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.feature.toggles.api.FeatureToggle
-import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
-import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.ContentBlocking
@@ -68,7 +66,7 @@ import javax.inject.Inject
 class BrokenSiteSubmitter @Inject constructor(
     private val statisticsStore: StatisticsDataStore,
     private val variantManager: VariantManager,
-    private val tdsMetadataDao: TdsMetadataDao,
+    private val tdsMetadataProvider: TdsMetadataProvider,
     private val gpc: Gpc,
     private val featureToggle: FeatureToggle,
     private val pixel: Pixel,
@@ -83,7 +81,7 @@ class BrokenSiteSubmitter @Inject constructor(
     private val networkProtectionState: NetworkProtectionState,
     private val webViewVersionProvider: WebViewVersionProvider,
     private val ampLinks: AmpLinks,
-    private val inventory: FeatureTogglesInventory,
+    private val blockListExperiment: BlockListExperiment,
     private val sitePermissionsRepository: SitePermissionsRepository,
 ) : BrokenSiteSender {
 
@@ -107,7 +105,7 @@ class BrokenSiteSubmitter @Inject constructor(
             val vpnOn = runCatching { networkProtectionState.isRunning() }.getOrNull()
             val locale = appBuildConfig.deviceLocale.toSanitizedLanguageTag()
 
-            val blockListToggle: Toggle? = inventory.activeTdsFlag()
+            val blockListExperimentCohort = blockListExperiment.activeExperimentCohort()
             val drmEnabled = sitePermissionsRepository.isDrmEnabledForSite(siteUrl).toString()
 
             val params = mutableMapOf(
@@ -115,7 +113,7 @@ class BrokenSiteSubmitter @Inject constructor(
                 DESCRIPTION_KEY to brokenSite.description.orEmpty(),
                 SITE_URL_KEY to absoluteUrl,
                 UPGRADED_HTTPS_KEY to brokenSite.upgradeHttps.toString(),
-                TDS_ETAG_KEY to tdsMetadataDao.eTag().orEmpty(),
+                TDS_ETAG_KEY to tdsMetadataProvider.eTag().orEmpty(),
                 APP_VERSION_KEY to appBuildConfig.versionName,
                 ATB_KEY to atbWithVariant(),
                 OS_KEY to appBuildConfig.sdkInt.toString(),
@@ -147,10 +145,8 @@ class BrokenSiteSubmitter @Inject constructor(
                 params[REPORT_FLOW] = reportFlow.toStringValue()
             }
 
-            blockListToggle?.let { toggle ->
-                toggle.getCohort()?.let { cohort ->
-                    params[BLOCKLIST_EXPERIMENT] = "${toggle.featureName().name}_${cohort.name}"
-                }
+            blockListExperimentCohort?.let { cohort ->
+                params[BLOCKLIST_EXPERIMENT] = cohort
             }
 
             brokenSite.contentScopeExperiments

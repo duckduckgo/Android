@@ -57,6 +57,7 @@ import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.NativeInputEventListener
@@ -89,9 +90,10 @@ class NativeInputCallbacks(
         selectedTool: String?,
         imagesJson: JSONArray?,
         filesJson: JSONArray?,
+        selectionsJson: JSONArray?,
     ) -> Unit,
     val onChatSuggestionSelected: (String) -> Unit,
-    val onDuckAiQuerySubmitted: (query: String) -> Unit = {},
+    val onDuckAiQuerySubmitted: (query: String, entryPoint: DuckChatEntryPoint) -> Unit = { _, _ -> },
     /** User picked a model in the native picker (→ submitChangeModelAction). */
     val onChangeModelSubmitted: (modelId: String) -> Unit = {},
     val onCustomizeResponsesClicked: () -> Unit = {},
@@ -146,6 +148,8 @@ interface NativeInputManager {
         query: String = "",
         callbacks: NativeInputCallbacks,
         initialInputMode: InputMode? = null,
+        forceImageGeneration: Boolean = false,
+        textSelection: String? = null,
     )
 
     fun hideNativeInput(animate: Boolean = true, isNavigation: Boolean = false): Boolean
@@ -294,6 +298,9 @@ class RealNativeInputManager @Inject constructor(
                 refreshNavBarVisibility()
             }
             .launchIn(lifecycleOwner.lifecycleScope)
+        voiceSearchAvailability.observeVoiceSearchAvailability()
+            .onEach { widgetFrom(rootView)?.let { widget -> updateVoiceButtons(widget) } }
+            .launchIn(lifecycleOwner.lifecycleScope)
     }
 
     override fun isNativeInputEnabled(): Boolean = isNativeInputFieldEnabled
@@ -355,12 +362,17 @@ class RealNativeInputManager @Inject constructor(
     override fun handleDuckAiVoiceResult(query: String) {
         val widget = widgetFrom(rootView)
         if (widget != null) {
-            if (!widget.isChatTabSelected()) {
-                widget.selectChatTab()
+            widget.nextDuckAiEntryPoint = DuckChatEntryPoint.VOICE
+            try {
+                if (!widget.isChatTabSelected()) {
+                    widget.selectChatTab()
+                }
+                widget.submitMessage(query)
+            } finally {
+                widget.nextDuckAiEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT
             }
-            widget.submitMessage(query)
         } else {
-            duckChat.openDuckChatWithAutoPrompt(query)
+            duckChat.openDuckChatWithAutoPrompt(query, DuckChatEntryPoint.VOICE)
         }
     }
 
@@ -577,6 +589,8 @@ class RealNativeInputManager @Inject constructor(
         query: String,
         callbacks: NativeInputCallbacks,
         initialInputMode: InputMode?,
+        forceImageGeneration: Boolean,
+        textSelection: String?,
     ) {
         if (!isNativeInputFieldEnabled) return
 
@@ -646,7 +660,7 @@ class RealNativeInputManager @Inject constructor(
             }
         }
         bindUrlCaching(widgetView)
-        attachWidget(widgetView, navBarView, isBottom, tabId)
+        attachWidget(widgetView, navBarView, isBottom, tabId, forceImageGeneration, textSelection)
         // Bottom omnibar: slide the nav bar in with open. Top omnibar: snap the bar so the enter
         // morph can run from the omnibar while the buttons appear without animating — a concurrent
         // top slide fights that morph (and was only needed for bottom chrome).
@@ -704,6 +718,7 @@ class RealNativeInputManager @Inject constructor(
                     widget.saveLastUsedTogglePosition(isChat = true)
                     val imagesJson = widget.getImageAttachmentsJson()
                     val filesJson = widget.getFileAttachmentsJson()
+                    val selectionsJson = widget.getTextSelectionsJson()
                     widget.text = ""
                     widget.clearAttachments()
                     callbacks.onDuckAiChatSubmitted(
@@ -713,6 +728,7 @@ class RealNativeInputManager @Inject constructor(
                         widget.getSelectedTool(),
                         imagesJson,
                         filesJson,
+                        selectionsJson,
                     )
                     widget.clearSelectedTool()
                     widget.onPromptSubmitted()
@@ -743,7 +759,9 @@ class RealNativeInputManager @Inject constructor(
                     }
                     isExiting = false
                     nativeInputEventListener.onChatPromptSubmitted()
-                    callbacks.onDuckAiQuerySubmitted(query)
+                    val entryPoint = widget.nextDuckAiEntryPoint
+                    widget.nextDuckAiEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT
+                    callbacks.onDuckAiQuerySubmitted(query, entryPoint)
                 }
             },
         )
@@ -911,6 +929,7 @@ class RealNativeInputManager @Inject constructor(
             // Picker tied to whether the current tab is a Duck.ai page that already has a chatId (existing chat) or new chat.
             bindModelPickerEnabledSource(chatIdFlow.map { it == null })
             bindChatIdSource(chatIdFlow)
+            bindCurrentUrlSource(currentTabUrl)
             bindInteractionLockSource(interactionLockSource)
             bindDuckAiFireButtonHighlightSource(duckAiFireButtonHighlightSource)
         }
@@ -943,7 +962,7 @@ class RealNativeInputManager @Inject constructor(
         }
         widget.onVoiceChatClick = {
             hideNativeInput(animate = false)
-            duckChat.openVoiceDuckChat()
+            duckChat.openVoiceDuckChat(DuckChatEntryPoint.VOICE)
         }
     }
 
@@ -1217,7 +1236,14 @@ class RealNativeInputManager @Inject constructor(
         )
     }
 
-    private fun attachWidget(widgetView: View, navBarView: View?, isBottom: Boolean, tabId: String) {
+    private fun attachWidget(
+        widgetView: View,
+        navBarView: View?,
+        isBottom: Boolean,
+        tabId: String,
+        forceImageGeneration: Boolean,
+        textSelection: String?,
+    ) {
         // Inflated from a ?attr/actionBarSize height, so layoutParams carries the resolved nav bar height.
         val navBarHeightPx = navBarView?.layoutParams?.height?.takeIf { it > 0 } ?: 0
         this.navBarHeightPx = navBarHeightPx
@@ -1245,7 +1271,13 @@ class RealNativeInputManager @Inject constructor(
 
         widgetFrom(widgetView)?.apply {
             setWidgetRootView(widgetView)
-            configure(tabId = tabId, isDuckAiMode = omnibarController.isDuckAiMode(), isBottom = isBottom)
+            configure(
+                tabId = tabId,
+                isDuckAiMode = omnibarController.isDuckAiMode(),
+                isBottom = isBottom,
+                forceImageGeneration = forceImageGeneration,
+            )
+            textSelection?.let { bindTextSelections(tabId, it) }
         }
 
         applyWindowChrome(widgetView, isBottom)
@@ -1258,6 +1290,14 @@ class RealNativeInputManager @Inject constructor(
         // Stash so showNativeInput can avoid clearing isWidgetAnimating when the open slide
         // finishes before the enter morph.
         pendingEnterOwnsAnimating = enterStarted
+
+        if (forceImageGeneration) {
+            widgetView.doOnAttach {
+                if (widgetRoot === widgetView) {
+                    widgetFrom(widgetView)?.focusInput(rootView.context as? Activity)
+                }
+            }
+        }
     }
 
     override fun setInteractionLock(lock: InteractionLock) {

@@ -23,9 +23,13 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator
-import com.duckduckgo.sync.impl.pixels.RealSyncPixels.Companion.UI_VERSION_V1
+import com.duckduckgo.sync.impl.pixels.RealSyncPixels.Companion.FLOW_VERSION_V1
+import com.duckduckgo.sync.impl.pixels.RealSyncPixels.Companion.FLOW_VERSION_V2
+import com.duckduckgo.sync.impl.pixels.RealSyncPixels.Companion.FLOW_VERSION_V2_1
 import com.duckduckgo.sync.impl.pixels.RealSyncPixels.Companion.UI_VERSION_V2
+import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_FLOW_VERSION
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_UI_VERSION
+import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEventImpl.Companion.STEP_DEVICE_AUTH_NOT_ENROLLED
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
 import dagger.SingleInstanceIn
@@ -94,6 +98,7 @@ class SyncSetupWideEventImpl @Inject constructor(
             metadata = buildMap {
                 put(KEY_USER_AUTH_REQUIRED, deviceAuthenticator.isAuthenticationRequired().toString())
                 putAll(uiMetadata())
+                putAll(flowMetadata())
             },
             cleanupPolicy = OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
         ).getOrNull()
@@ -243,11 +248,20 @@ class SyncSetupWideEventImpl @Inject constructor(
         cachedFlowId = null
     }
 
-    private suspend fun uiMetadata(): Map<String, String> = withContext(dispatchers.io()) {
-        buildMap {
-            val version = if (syncFeature.get().useSimplifiedSync().isEnabled()) UI_VERSION_V2 else UI_VERSION_V1
-            put(SYNC_SETUP_UI_VERSION, version)
+    private fun uiMetadata(): Map<String, String> = mapOf(SYNC_SETUP_UI_VERSION to UI_VERSION_V2)
+
+    private fun flowMetadata(): Map<String, String> = buildMap {
+        val feature = syncFeature.get()
+        val flowVersion = if (feature.canUseV2ConnectFlow().isEnabled()) {
+            if (feature.canUseExchangeV2Point1().isEnabled()) {
+                FLOW_VERSION_V2_1
+            } else {
+                FLOW_VERSION_V2
+            }
+        } else {
+            FLOW_VERSION_V1
         }
+        put(SYNC_SETUP_FLOW_VERSION, flowVersion)
     }
 
     private companion object {

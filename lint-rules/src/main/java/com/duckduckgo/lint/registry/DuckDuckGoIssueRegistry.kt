@@ -24,6 +24,7 @@ import com.duckduckgo.lint.DenyListedApiDetector
 import com.duckduckgo.lint.NoDispatcherComputation.Companion.ISSUE_AVOID_COMPUTATION
 import com.duckduckgo.lint.NoFragmentDetector.Companion.NO_FRAGMENT_ISSUE
 import com.duckduckgo.lint.NoHardcodedCoroutineDispatcherDetector.Companion.NO_HARCODED_COROUTINE_DISPATCHER
+import com.duckduckgo.lint.NoHardcodedPetalPixelParamDetector.Companion.NO_HARDCODED_PETAL_PIXEL_PARAM
 import com.duckduckgo.lint.NoImplImportsInAppModuleDetector.Companion.NO_IMPL_IMPORTS_IN_APP_MODULE_ISSUE
 import com.duckduckgo.lint.MetricsPixelNumericValueDetector.Companion.NUMERIC_VALUE_REQUIRED
 import com.duckduckgo.lint.MissingContributesToOnModuleDetector.Companion.MISSING_CONTRIBUTES_TO_ON_MODULE
@@ -49,9 +50,12 @@ import com.duckduckgo.lint.ui.ColorAttributeInXmlDetector.Companion.INVALID_COLO
 import com.duckduckgo.lint.ui.DaxButtonStylingDetector.Companion.INVALID_DAX_BUTTON_DUCK_SANS
 import com.duckduckgo.lint.ui.DaxButtonStylingDetector.Companion.INVALID_DAX_BUTTON_PROPERTY
 import com.duckduckgo.lint.ui.DaxDividerColorUsageDetector.Companion.INVALID_DAX_DIVIDER_COLOR_USAGE
+import com.duckduckgo.lint.ui.DaxListItemColorUsageDetector.Companion.INVALID_DAX_LIST_ITEM_COLOR_USAGE
+import com.duckduckgo.lint.ui.DaxListItemContentDetector.Companion.INVALID_DAX_LIST_ITEM_CONTENT_USAGE
 import com.duckduckgo.lint.ui.DaxTextColorUsageDetector.Companion.INVALID_DAX_TEXT_COLOR_USAGE
 import com.duckduckgo.lint.ui.NoRawM3AlertDialogUsageDetector.Companion.NO_RAW_M3_ALERT_DIALOG_USAGE
 import com.duckduckgo.lint.ui.NoRawM3ButtonUsageDetector.Companion.NO_RAW_M3_BUTTON_USAGE
+import com.duckduckgo.lint.ui.NoRawM3SliderUsageDetector.Companion.NO_RAW_M3_SLIDER_USAGE
 import com.duckduckgo.lint.ui.NoRawM3SnackbarUsageDetector.Companion.NO_RAW_M3_SNACKBAR_USAGE
 import com.duckduckgo.lint.ui.NoRawM3SurfaceUsageDetector.Companion.NO_RAW_M3_SURFACE_USAGE
 import com.duckduckgo.lint.ui.DaxTextFieldTrailingIconDetector.Companion.INVALID_DAX_TEXT_FIELD_TRAILING_ICON_USAGE
@@ -89,6 +93,7 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
             NO_FRAGMENT_ISSUE,
             NO_SYSTEM_LOAD_LIBRARY,
             NO_HARCODED_COROUTINE_DISPATCHER,
+            NO_HARDCODED_PETAL_PIXEL_PARAM,
             NO_IMPL_IMPORTS_IN_APP_MODULE_ISSUE,
             NO_METRICS_PIXEL_EXTENSION_USAGE,
             NUMERIC_VALUE_REQUIRED,
@@ -126,6 +131,8 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
             INVALID_DAX_DIVIDER_COLOR_USAGE,
             INVALID_DAX_TEXT_FIELD_TRAILING_ICON_USAGE,
             INVALID_DAX_SECURE_TEXT_FIELD_TRAILING_ICON_USAGE,
+            INVALID_DAX_LIST_ITEM_CONTENT_USAGE,
+            INVALID_DAX_LIST_ITEM_COLOR_USAGE,
             NO_MATERIAL3_SWITCH_USAGE,
             NO_MATERIAL3_TOP_APP_BAR_USAGE,
             NO_MATERIAL3_RADIO_BUTTON_USAGE,
@@ -138,6 +145,7 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
             NO_RAW_M3_ALERT_DIALOG_USAGE,
             NO_RAW_M3_SURFACE_USAGE,
             NO_RAW_M3_SNACKBAR_USAGE,
+            NO_RAW_M3_SLIDER_USAGE,
 
         ).plus(WebViewCompatApisUsageDetector.issues)
 

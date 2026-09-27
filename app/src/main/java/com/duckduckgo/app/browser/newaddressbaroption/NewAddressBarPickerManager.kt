@@ -27,7 +27,6 @@ import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.squareup.anvil.annotations.ContributesBinding
@@ -48,7 +47,6 @@ interface NewAddressBarPickerManager {
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealNewAddressBarPickerManager @Inject constructor(
-    private val duckAiFeatureState: DuckAiFeatureState,
     private val duckChat: DuckChat,
     private val userStageStore: UserStageStore,
     private val newAddressBarPickerDataStore: NewAddressBarPickerDataStore,
@@ -77,17 +75,11 @@ class RealNewAddressBarPickerManager @Inject constructor(
     }
 
     private suspend fun validate(activity: Activity): Boolean =
-        isPickerEnabled() &&
-            isDuckAiEnabled() &&
+        isDuckAiEnabled() &&
             isOnboardingCompleted() &&
             isInputScreenNeverEnabled() &&
             hasNotShownBefore() &&
             isActivityValid(activity)
-
-    private fun isPickerEnabled(): Boolean =
-        duckAiFeatureState.showAIChatAddressBarOptionChoiceScreen.value.also {
-            logcat(DEBUG) { "NewAddressBarPickerManager: $it isPickerEnabled" }
-        }
 
     private fun isDuckAiEnabled(): Boolean =
         duckChat.isEnabled().also {

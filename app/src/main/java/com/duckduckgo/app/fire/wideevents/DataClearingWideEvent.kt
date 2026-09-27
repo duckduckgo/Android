@@ -20,6 +20,8 @@ import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy.OnProcessStart
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
+import com.duckduckgo.app.statistics.wideevents.WideEventDefinition
+import com.duckduckgo.app.statistics.wideevents.WideEventDefinition.Version
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -28,6 +30,8 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 interface DataClearingWideEvent {
     /**
@@ -36,7 +40,7 @@ interface DataClearingWideEvent {
      * that's the mode context it always runs in.
      * @param tabType The type of the active tab when the burn was confirmed. Only meaningful for
      * dialog-driven flows; omit where there is no active-tab context (app shortcut, auto clears,
-     * fire tabs emptied).
+     * fire tabs emptied, chat deletions).
      * @param tabCount The number of open tabs when the burn was confirmed (bucketed before sending).
      */
     suspend fun start(
@@ -55,8 +59,12 @@ interface DataClearingWideEvent {
 
     suspend fun finishFailure(error: Throwable)
 
+    suspend fun finishFailure(reason: String)
+
     enum class EntryPoint(val value: String) {
-        SINGLE_TAB_FIRE_DIALOG("single_tab_fire_dialog"),
+        ALL_TABS_BURN("single_tab_fire_dialog"),
+        SINGLE_TAB_BURN("single_tab_burn"),
+        DUCKAI_CHAT_DELETION("duckai_chat_deletion"),
         APP_SHORTCUT("app_shortcut"),
         FIRE_TABS_EMPTIED("fire_tabs_emptied"),
         AUTO_FOREGROUND("auto_foreground"),
@@ -111,12 +119,14 @@ class DataClearingWideEventImpl @Inject constructor(
             metadata = metadata,
             cleanupPolicy = OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
             samplingProbability = SAMPLING_PROBABILITY,
+            definition = WideEventDefinition(version = Version(minor = 1, patch = 0)),
         ).getOrNull()
 
         cachedFlowId?.let { flowId ->
             wideEventClient.intervalStart(
                 wideEventId = flowId,
                 key = KEY_TOTAL_DURATION_MS_BUCKETED,
+                buckets = DURATION_BUCKETS,
             )
         }
     }
@@ -162,10 +172,11 @@ class DataClearingWideEventImpl @Inject constructor(
         cachedFlowId = null
     }
 
-    override suspend fun finishFailure(error: Throwable) {
+    override suspend fun finishFailure(error: Throwable) = finishFailure(error.toErrorClass())
+
+    override suspend fun finishFailure(reason: String) {
         if (!isFeatureEnabled()) return
         val flowId = getCurrentFlowId() ?: return
-        val errorClass = error.toErrorClass()
 
         wideEventClient.intervalEnd(
             wideEventId = flowId,
@@ -174,7 +185,7 @@ class DataClearingWideEventImpl @Inject constructor(
 
         wideEventClient.flowFinish(
             wideEventId = flowId,
-            status = FlowStatus.Failure(reason = errorClass),
+            status = FlowStatus.Failure(reason = reason),
         )
 
         cachedFlowId = null
@@ -230,6 +241,18 @@ class DataClearingWideEventImpl @Inject constructor(
     }
 
     private companion object {
+        val DURATION_BUCKETS = setOf(
+            1.seconds,
+            2.seconds,
+            3.seconds,
+            4.seconds,
+            5.seconds,
+            10.seconds,
+            30.seconds,
+            1.minutes,
+            5.minutes,
+            10.minutes,
+        )
         const val FLOW_NAME = "data-clearing"
         const val SAMPLING_PROBABILITY = 0.05f
         const val KEY_CLEAR_OPTIONS = "clear_options"

@@ -26,19 +26,25 @@ import androidx.lifecycle.Lifecycle.State.CREATED
 import androidx.lifecycle.testing.TestLifecycleOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
+import com.duckduckgo.app.tabs.model.DuckAiTabSessionRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.models.AIChatModel
+import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
+import com.duckduckgo.duckchat.impl.models.ModelState
+import com.duckduckgo.duckchat.impl.models.Tool
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.repository.AddressBarPickerAttributionRepository
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
@@ -50,6 +56,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.sync.api.DeviceSyncState
 import com.squareup.moshi.Moshi
+import dagger.Lazy
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -72,9 +79,12 @@ import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.spy
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.clearInvocations
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -93,7 +103,7 @@ class RealDuckChatTest {
     private val dispatcherProvider = coroutineRule.testDispatcherProvider
     private val mockGlobalActivityStarter: GlobalActivityStarter = mock()
     private val mockContext: Context = mock()
-    private val mockPixel: Pixel = mock()
+    private val mockDuckChatPixels: DuckChatPixels = mock()
     private val mockIntent: Intent = mock()
     private val mockBrowserNav: BrowserNav = mock()
     private val imageUploadFeature: AIChatImageUploadFeature = FakeFeatureToggleFactory.create(AIChatImageUploadFeature::class.java)
@@ -103,6 +113,8 @@ class RealDuckChatTest {
     private val mockAppBuildConfig: AppBuildConfig = mock()
     private val mockVoiceSessionStateManager: VoiceSessionStateManager = mock()
     private val chatSuggestionsStore: ChatSuggestionsStore = mock()
+    private val mockDuckAiTabSessionRepository: DuckAiTabSessionRepository = mock()
+    private val mockDuckAiModelManager: DuckAiModelManager = mock()
 
     private lateinit var testee: RealDuckChat
 
@@ -137,7 +149,7 @@ class RealDuckChatTest {
                 mockContext,
                 true,
                 coroutineRule.testScope,
-                mockPixel,
+                Lazy { mockDuckChatPixels },
                 imageUploadFeature,
                 mockBrowserNav,
                 mockDeviceSyncState,
@@ -146,11 +158,13 @@ class RealDuckChatTest {
                 mockAppBuildConfig,
                 mockVoiceSessionStateManager,
                 chatSuggestionsStore,
+                mockDuckAiTabSessionRepository,
+                mockDuckAiModelManager,
             ),
         )
         coroutineRule.testScope.advanceUntilIdle()
 
-        whenever(mockBrowserNav.openDuckChat(any(), any(), any())).thenReturn(mockIntent)
+        whenever(mockBrowserNav.openDuckChat(any(), any(), any(), any(), any(), anyOrNull())).thenReturn(mockIntent)
         whenever(mockBrowserNav.closeDuckChat(any())).thenReturn(mockIntent)
     }
 
@@ -610,7 +624,7 @@ class RealDuckChatTest {
 
     @Test
     fun whenOpenDuckChatCalledThenOpenDuckChat() = runTest {
-        testee.openDuckChat()
+        testee.openDuckChat(DuckChatEntryPoint.PAID_SETTINGS)
 
         verify(mockBrowserNav).openDuckChat(
             mockContext,
@@ -621,10 +635,75 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun whenDuckChatEntryReportedThenDelegatesBoundedContextToDuckChatPixels() = runTest {
+        testee.reportDuckChatEntry(
+            entryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
+            opensNewTab = false,
+            hasPrompt = true,
+        )
+
+        verify(mockDuckChatPixels).sendDuckChatEntryPixel(
+            entryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
+            opensNewTab = false,
+            hasPrompt = true,
+            duckAiEnabled = true,
+            inputScreenEnabled = true,
+        )
+    }
+
+    @Test
+    fun whenContextualPromptOpensFullscreenThenContextualEntryIsReportedExactlyOnce() = runTest {
+        testee.openDuckChatWithAutoPrompt("contextual prompt", DuckChatEntryPoint.CONTEXTUAL_CHAT)
+
+        verify(mockDuckChatPixels, times(1)).sendDuckChatEntryPixel(
+            entryPoint = DuckChatEntryPoint.CONTEXTUAL_CHAT,
+            opensNewTab = true,
+            hasPrompt = true,
+            duckAiEnabled = true,
+            inputScreenEnabled = true,
+        )
+    }
+
+    @Test
+    fun publicOpenMethodsReportTheirNavigationAndPromptTruthTable() = runTest {
+        testee.openDuckChat(DuckChatEntryPoint.CHAT_HISTORY_NEW_CHAT)
+        testee.openDuckChatWithAutoPrompt("prompt", DuckChatEntryPoint.SUGGESTION_ASK_AI)
+        testee.openDuckChatWithAutoPrompt("", DuckChatEntryPoint.SYSTEM_SEARCH)
+        testee.openDuckChatWithAutoPrompt("  ", DuckChatEntryPoint.DIGITAL_ASSISTANT)
+        testee.openDuckChatWithAutoPrompt("!ai", DuckChatEntryPoint.DIRECT_URL)
+        testee.openDuckChatWithAutoPrompt("!ai prompt", DuckChatEntryPoint.ADDRESS_BAR_PROMPT)
+        testee.openDuckChatWithPrefill("prefill", DuckChatEntryPoint.DIRECT_URL)
+        testee.openVoiceDuckChat(DuckChatEntryPoint.VOICE)
+
+        val entryPoints = argumentCaptor<DuckChatEntryPoint>()
+        val hasPrompts = argumentCaptor<Boolean>()
+        verify(mockDuckChatPixels, times(8)).sendDuckChatEntryPixel(
+            entryPoint = entryPoints.capture(),
+            opensNewTab = eq(true),
+            hasPrompt = hasPrompts.capture(),
+            duckAiEnabled = eq(true),
+            inputScreenEnabled = eq(true),
+        )
+        assertEquals(
+            listOf(
+                DuckChatEntryPoint.CHAT_HISTORY_NEW_CHAT to false,
+                DuckChatEntryPoint.SUGGESTION_ASK_AI to true,
+                DuckChatEntryPoint.SYSTEM_SEARCH to false,
+                DuckChatEntryPoint.DIGITAL_ASSISTANT to false,
+                DuckChatEntryPoint.DIRECT_URL to false,
+                DuckChatEntryPoint.ADDRESS_BAR_PROMPT to true,
+                DuckChatEntryPoint.DIRECT_URL to false,
+                DuckChatEntryPoint.VOICE to false,
+            ),
+            entryPoints.allValues.zip(hasPrompts.allValues),
+        )
+    }
+
+    @Test
     fun whenOpenDuckChatCalledWithCustomHostThenUrlUsesCustomHost() = runTest {
         whenever(mockDuckAiHostProvider.getHost()).thenReturn("staging.duck.ai")
 
-        testee.openDuckChat()
+        testee.openDuckChat(DuckChatEntryPoint.PAID_SETTINGS)
 
         verify(mockBrowserNav).openDuckChat(
             mockContext,
@@ -639,7 +718,7 @@ class RealDuckChatTest {
         val thirtyMinutesAgo = System.currentTimeMillis() - (30 * 60 * 1000L)
         whenever(mockDuckChatFeatureRepository.lastSessionTimestamp()).thenReturn(thirtyMinutesAgo)
 
-        testee.openDuckChat()
+        testee.openDuckChat(DuckChatEntryPoint.PAID_SETTINGS)
 
         verify(mockBrowserNav).openDuckChat(
             mockContext,
@@ -651,7 +730,7 @@ class RealDuckChatTest {
 
     @Test
     fun whenOpenVoiceDuckChatCalledThenOpenDuckChatWithVoiceModeUrl() = runTest {
-        testee.openVoiceDuckChat()
+        testee.openVoiceDuckChat(DuckChatEntryPoint.VOICE)
 
         verify(mockBrowserNav).openDuckChat(
             mockContext,
@@ -666,7 +745,7 @@ class RealDuckChatTest {
         val thirtyMinutesAgo = System.currentTimeMillis() - (30 * 60 * 1000L)
         whenever(mockDuckChatFeatureRepository.lastSessionTimestamp()).thenReturn(thirtyMinutesAgo)
 
-        testee.openVoiceDuckChat()
+        testee.openVoiceDuckChat(DuckChatEntryPoint.VOICE)
 
         verify(mockBrowserNav).openDuckChat(
             mockContext,
@@ -678,7 +757,7 @@ class RealDuckChatTest {
 
     @Test
     fun whenOpenDuckChatCalledWithQueryThenDuckChatOpenedWithQuery() = runTest {
-        testee.openDuckChatWithPrefill(query = "example")
+        testee.openDuckChatWithPrefill(query = "example", entryPoint = DuckChatEntryPoint.DIRECT_URL)
 
         verify(mockBrowserNav).openDuckChat(
             mockContext,
@@ -694,7 +773,7 @@ class RealDuckChatTest {
         duckChatFeature.keepSession().setRawStoredState(State(enable = false))
         testee.onPrivacyConfigDownloaded()
 
-        testee.openDuckChatWithPrefill(query = "example !ai")
+        testee.openDuckChatWithPrefill(query = "example !ai", entryPoint = DuckChatEntryPoint.DIRECT_URL)
 
         verify(mockBrowserNav).openDuckChat(
             mockContext,
@@ -710,7 +789,7 @@ class RealDuckChatTest {
         duckChatFeature.keepSession().setRawStoredState(State(enable = false))
         testee.onPrivacyConfigDownloaded()
 
-        testee.openDuckChatWithPrefill(query = "example !g")
+        testee.openDuckChatWithPrefill(query = "example !g", entryPoint = DuckChatEntryPoint.DIRECT_URL)
 
         verify(mockBrowserNav).openDuckChat(
             mockContext,
@@ -725,7 +804,7 @@ class RealDuckChatTest {
         duckChatFeature.self().setRawStoredState(State(enable = true, settings = SETTINGS_JSON))
         testee.onPrivacyConfigDownloaded()
 
-        testee.openDuckChatWithPrefill(query = "!ai !image")
+        testee.openDuckChatWithPrefill(query = "!ai !image", entryPoint = DuckChatEntryPoint.DIRECT_URL)
 
         verify(mockBrowserNav).openDuckChat(
             mockContext,
@@ -769,7 +848,7 @@ class RealDuckChatTest {
 
     @Test
     fun whenOpenDuckChatCalledWithQueryAndAutoPromptThenDuckChatOpenedWithQueryAndAutoPrompt() = runTest {
-        testee.openDuckChatWithAutoPrompt(query = "example")
+        testee.openDuckChatWithAutoPrompt(query = "example", entryPoint = DuckChatEntryPoint.SUGGESTION_ASK_AI)
 
         verify(mockBrowserNav).openDuckChat(
             mockContext,
@@ -857,7 +936,7 @@ class RealDuckChatTest {
         testee.onPrivacyConfigDownloaded()
         coroutineRule.testScope.advanceUntilIdle()
 
-        testee.openDuckChat()
+        testee.openDuckChat(DuckChatEntryPoint.PAID_SETTINGS)
 
         verify(mockBrowserNav).openDuckChat(
             mockContext,
@@ -873,7 +952,7 @@ class RealDuckChatTest {
         testee.onPrivacyConfigDownloaded()
         coroutineRule.testScope.advanceUntilIdle()
 
-        testee.openDuckChatWithPrefill(query = "example")
+        testee.openDuckChatWithPrefill(query = "example", entryPoint = DuckChatEntryPoint.DIRECT_URL)
 
         verify(mockBrowserNav).openDuckChat(
             mockContext,
@@ -889,7 +968,7 @@ class RealDuckChatTest {
         testee.onPrivacyConfigDownloaded()
         coroutineRule.testScope.advanceUntilIdle()
 
-        testee.openVoiceDuckChat()
+        testee.openVoiceDuckChat(DuckChatEntryPoint.VOICE)
 
         verify(mockBrowserNav).openDuckChat(
             mockContext,
@@ -1487,6 +1566,60 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun `when contextual mode, redesign and text selection action enabled, then showTextSelectionAction emits true`() = runTest {
+        duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
+        duckChatFeature.contextualSheetRedesign().setRawStoredState(State(enable = true))
+        duckChatFeature.duckAiTextSelectionAction().setRawStoredState(State(enable = true))
+        duckChatFeature.nativeInputField().setRawStoredState(State(enable = true))
+        duckChatFeature.nativeChatInput().setRawStoredState(State(enable = true))
+        duckChatFeature.contextualNativeInput().setRawStoredState(State(enable = true))
+        testee.onPrivacyConfigDownloaded()
+
+        assertTrue(testee.showTextSelectionAction.value)
+    }
+
+    @Test
+    fun `when text selection action disabled, then showTextSelectionAction emits false`() = runTest {
+        duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
+        duckChatFeature.contextualSheetRedesign().setRawStoredState(State(enable = true))
+        duckChatFeature.duckAiTextSelectionAction().setRawStoredState(State(enable = false))
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.showTextSelectionAction.value)
+    }
+
+    @Test
+    fun `when contextual sheet redesign disabled, then showTextSelectionAction emits false`() = runTest {
+        duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
+        duckChatFeature.contextualSheetRedesign().setRawStoredState(State(enable = false))
+        duckChatFeature.duckAiTextSelectionAction().setRawStoredState(State(enable = true))
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.showTextSelectionAction.value)
+    }
+
+    @Test
+    fun `when contextual native input disabled, then showTextSelectionAction emits false`() = runTest {
+        duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
+        duckChatFeature.contextualSheetRedesign().setRawStoredState(State(enable = true))
+        duckChatFeature.duckAiTextSelectionAction().setRawStoredState(State(enable = true))
+        duckChatFeature.contextualNativeInput().setRawStoredState(State(enable = false))
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.showTextSelectionAction.value)
+    }
+
+    @Test
+    fun `when contextual mode disabled, then showTextSelectionAction emits false`() = runTest {
+        duckChatFeature.contextualMode().setRawStoredState(State(enable = false))
+        duckChatFeature.contextualSheetRedesign().setRawStoredState(State(enable = true))
+        duckChatFeature.duckAiTextSelectionAction().setRawStoredState(State(enable = true))
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.showTextSelectionAction.value)
+    }
+
+    @Test
     fun `when contextual mode enabled, isDuckChatContextualModeEnabled returns true`() = runTest {
         duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
         duckChatFeature.contextualModeKillSwitch().setRawStoredState(State(enable = true))
@@ -1529,6 +1662,36 @@ class RealDuckChatTest {
         testee.onPrivacyConfigDownloaded()
 
         assertFalse(testee.areMultipleContentAttachmentsEnabled())
+    }
+
+    @Test
+    fun `when all chats menu item enabled and sheet redesign enabled, isContextualMenuAllChatsEnabled returns true`() = runTest {
+        duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
+        duckChatFeature.contextualSheetRedesign().setRawStoredState(State(enable = true))
+        duckChatFeature.contextualMenuAllChats().setRawStoredState(State(enable = true))
+        testee.onPrivacyConfigDownloaded()
+
+        assertTrue(testee.isContextualMenuAllChatsEnabled())
+    }
+
+    @Test
+    fun `when all chats menu item disabled, isContextualMenuAllChatsEnabled returns false`() = runTest {
+        duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
+        duckChatFeature.contextualSheetRedesign().setRawStoredState(State(enable = true))
+        duckChatFeature.contextualMenuAllChats().setRawStoredState(State(enable = false))
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.isContextualMenuAllChatsEnabled())
+    }
+
+    @Test
+    fun `when all chats menu item enabled and sheet redesign disabled, isContextualMenuAllChatsEnabled returns false`() = runTest {
+        duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
+        duckChatFeature.contextualSheetRedesign().setRawStoredState(State(enable = false))
+        duckChatFeature.contextualMenuAllChats().setRawStoredState(State(enable = true))
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.isContextualMenuAllChatsEnabled())
     }
 
     @Test
@@ -1871,6 +2034,67 @@ class RealDuckChatTest {
         assertTrue(results[0])
         assertFalse(results[1])
     }
+
+    @Test
+    fun whenOpenDuckChatImageGenerationAndCurrentModelSupportsItThenModelNotSwitchedAndOpensWithImageGenerationForced() = runTest {
+        val current = aiModel("m1", tools = listOf(Tool.IMAGE_GENERATION))
+        whenever(mockDuckAiModelManager.modelState).thenReturn(
+            MutableStateFlow(ModelState(models = listOf(current), selectedModelId = "m1")),
+        )
+
+        testee.openDuckChatImageGeneration(DuckChatEntryPoint.BROWSING_MENU_WEBPAGE)
+        coroutineRule.testScope.advanceUntilIdle()
+
+        verify(mockDuckAiModelManager, never()).selectModel(any())
+        verify(mockBrowserNav).openDuckChat(any(), any(), any(), eq(true), any(), anyOrNull())
+        verify(mockContext).startActivity(mockIntent)
+    }
+
+    @Test
+    fun whenOpenDuckChatImageGenerationAndCurrentModelUnsupportedThenSwitchesToCapableModelAndForcesImageGeneration() = runTest {
+        val current = aiModel("m1")
+        val capable = aiModel("m2", tools = listOf(Tool.IMAGE_GENERATION))
+        whenever(mockDuckAiModelManager.modelState).thenReturn(
+            MutableStateFlow(ModelState(models = listOf(current, capable), selectedModelId = "m1")),
+        )
+
+        testee.openDuckChatImageGeneration(DuckChatEntryPoint.BROWSING_MENU_WEBPAGE)
+        coroutineRule.testScope.advanceUntilIdle()
+
+        verify(mockDuckAiModelManager).selectModel(capable)
+        verify(mockBrowserNav).openDuckChat(any(), any(), any(), eq(true), any(), anyOrNull())
+        verify(mockContext).startActivity(mockIntent)
+    }
+
+    @Test
+    fun whenOpenDuckChatImageGenerationAndNoAccessibleImageCapableModelThenDoesNotForceImageGenerationButStillOpens() = runTest {
+        val current = aiModel("m1")
+        val inaccessible = aiModel("m2", isAccessible = false, tools = listOf(Tool.IMAGE_GENERATION))
+        whenever(mockDuckAiModelManager.modelState).thenReturn(
+            MutableStateFlow(ModelState(models = listOf(current, inaccessible), selectedModelId = "m1")),
+        )
+
+        testee.openDuckChatImageGeneration(DuckChatEntryPoint.BROWSING_MENU_WEBPAGE)
+        coroutineRule.testScope.advanceUntilIdle()
+
+        verify(mockDuckAiModelManager, never()).selectModel(any())
+        verify(mockBrowserNav).openDuckChat(any(), any(), any(), eq(false), any(), anyOrNull())
+        verify(mockContext).startActivity(mockIntent)
+    }
+
+    private fun aiModel(
+        id: String,
+        isAccessible: Boolean = true,
+        tools: List<Tool> = emptyList(),
+    ) = AIChatModel(
+        id = id,
+        name = id,
+        displayName = id,
+        shortName = id,
+        accessTier = emptyList(),
+        isAccessible = isAccessible,
+        supportedTools = tools,
+    )
 
     private suspend fun enableChatHistoryFlags() {
         duckChatFeature.self().setRawStoredState(State(enable = true))

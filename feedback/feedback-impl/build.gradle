@@ -33,6 +33,7 @@ dependencies {
     implementation project(':di')
     implementation project(':common-utils')
     implementation project(':design-system')
+    implementation project(path: ':feature-toggles-api')
     implementation project(':feedback-api')
     implementation project(':navigation-api')
     implementation project(':statistics-api')

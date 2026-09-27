@@ -60,8 +60,13 @@ class DaxTextColorUsageDetectorTest {
             val tertiary: Color
         )
 
+        data class DuckDuckGoBrandColors(
+            val accentBlue: Color
+        )
+
         data class DuckDuckGoColors(
-            val text: DuckDuckGoTextColors
+            val text: DuckDuckGoTextColors,
+            val brand: DuckDuckGoBrandColors
         )
 
         object DuckDuckGoTheme {
@@ -80,7 +85,8 @@ class DaxTextColorUsageDetectorTest {
                         primary = Color(0xFF000000),
                         secondary = Color(0xFF666666),
                         tertiary = Color(0xFF999999)
-                    )
+                    ),
+                    brand = DuckDuckGoBrandColors(accentBlue = Color(0xFF3969EF))
                 )
         }
 
@@ -583,6 +589,105 @@ class DaxTextColorUsageDetectorTest {
             )
             .allowCompilationErrors()
             .issues(INVALID_DAX_TEXT_COLOR_USAGE)
+            .run()
+            .expectClean()
+    }
+
+    @Test
+    fun whenColorIsParameterWithThemeDefaultThenNoWarning() {
+        lint()
+            .files(
+                composeStubs,
+                themeStubs,
+                daxTextStub,
+                TestFiles.kotlin(
+                    """
+                    package com.duckduckgo.test
+
+                    import androidx.compose.runtime.Composable
+                    import androidx.compose.ui.graphics.Color
+                    import com.duckduckgo.common.ui.compose.component.core.text.DaxText
+                    import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
+
+                    @Composable
+                    fun Row(textColor: Color = DuckDuckGoTheme.textColors.primary) {
+                        DaxText(text = "x", color = textColor)
+                    }
+                    """.trimIndent()
+                ).indented()
+            )
+            .allowCompilationErrors()
+            .issues(INVALID_DAX_TEXT_COLOR_USAGE)
+            .skipTestModes(TestMode.WHITESPACE)
+            .run()
+            .expectClean()
+    }
+
+    @Test
+    fun whenColorIsParameterWithoutDefaultThenNoWarning() {
+        lint()
+            .files(
+                composeStubs,
+                themeStubs,
+                daxTextStub,
+                TestFiles.kotlin(
+                    """
+                    package com.duckduckgo.test
+
+                    import androidx.compose.runtime.Composable
+                    import androidx.compose.ui.graphics.Color
+                    import com.duckduckgo.common.ui.compose.component.core.text.DaxText
+                    import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
+
+                    @Composable
+                    fun Row(textColor: Color) {
+                        DaxText(text = "x", color = textColor)
+                    }
+                    """.trimIndent()
+                ).indented()
+            )
+            .allowCompilationErrors()
+            .issues(INVALID_DAX_TEXT_COLOR_USAGE)
+            .skipTestModes(TestMode.WHITESPACE)
+            .run()
+            .expectClean()
+    }
+
+    @Test
+    fun whenColorFromDefaultsObjectUsingNonTextThemeColorThenNoWarning() {
+        lint()
+            .files(
+                TestFiles.kt(
+                    """
+                    package com.example.test
+
+                    import androidx.compose.runtime.Composable
+                    import androidx.compose.ui.graphics.Color
+                    import com.duckduckgo.common.ui.compose.component.core.text.DaxText
+                    import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
+
+                    object ExampleDefaults {
+                        val learnMoreColor: Color
+                            @Composable
+                            get() = DuckDuckGoTheme.colors.brand.accentBlue
+                    }
+
+                    @Composable
+                    fun TestScreen() {
+                        DaxText(
+                            text = "Hello",
+                            color = ExampleDefaults.learnMoreColor
+                        )
+                    }
+                    """.trimIndent()
+                ).indented(),
+                composeStubs,
+                themeStubs,
+                daxTextStub
+            )
+            .allowCompilationErrors()
+            .issues(INVALID_DAX_TEXT_COLOR_USAGE)
+            .skipTestModes(TestMode.WHITESPACE)
             .run()
             .expectClean()
     }

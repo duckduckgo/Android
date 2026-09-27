@@ -18,80 +18,64 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:paddingTop="@dimen/keyline_4"
-    android:paddingBottom="@dimen/keyline_4">
+    android:orientation="vertical">
 
-    <com.duckduckgo.sync.impl.ui.SyncDisabledView
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/keyline_4"
+        android:background="@drawable/background_large_rounded_surface"
+        android:paddingVertical="@dimen/keyline_2">
+
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/syncThisDeviceToggle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/sync_simplified_settings_sync_this_device_item"
+            app:showSwitch="true" />
+    </FrameLayout>
+
+    <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+        android:id="@+id/syncWithAnotherDeviceButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginHorizontal="@dimen/keyline_4"
+        android:layout_marginVertical="@dimen/keyline_5"
+        android:text="@string/sync_simplified_settings_sync_with_another_device_button"
+        app:daxButtonSize="large"
+        app:icon="@drawable/ic_qr2_24"
+        app:iconGravity="textStart" />
+
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="@dimen/keyline_4" />
+
+    <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/sync_simplified_settings_recover_section_header" />
+
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+        android:id="@+id/recoverDataItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/sync_simplified_settings_recover_data_item" />
+
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="@dimen/keyline_4" />
+
+    <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/sync_simplified_settings_download_section_header" />
+
+    <com.duckduckgo.sync.impl.ui.dashboard.GetOnOtherPlatformsListItem
+        android:id="@+id/get_on_other_platforms_item"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
-
-    <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/sync_setup_begin_syncing" />
-
-    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-        android:id="@+id/sync_setup_with_another_device"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:leadingIcon="@drawable/ic_device_all_24"
-        app:leadingIconBackground="circular"
-        app:primaryText="@string/sync_setup_with_another_device_cta_title"
-        app:secondaryText="@string/sync_setup_with_another_device_cta_subtitle" />
-
-    <com.duckduckgo.common.ui.view.text.DaxTextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="@dimen/keyline_4"
-        android:text="@string/sync_off_hint"
-        app:textType="secondary"
-        app:typography="body2" />
-
-    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginVertical="@dimen/keyline_2" />
-
-    <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
-        android:id="@+id/otherOptionsHeader"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/sync_setup_single_device_title" />
-
-    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-        android:id="@+id/sync_setup_sync_this_device"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/sync_setup_single_sync_this_device_cta_title" />
-
-    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-        android:id="@+id/sync_setup_recover_data"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/sync_setup_single_recover_data_cta_title" />
-
-    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginVertical="@dimen/keyline_2" />
-
-    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-        android:id="@+id/syncSetupOtherPlatforms"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:leadingIcon="@drawable/ic_downloads_24"
-        app:leadingIconBackground="circular"
-        app:primaryText="@string/syncGetAppsOnOtherPlatforms" />
-
-    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-        android:id="@+id/getDesktopBrowser"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:leadingIcon="@drawable/ic_device_laptop_install_color_24"
-        app:leadingIconBackground="circular"
-        app:primaryText="@string/getDesktopBrowserSettingItemTitle"
-        app:secondaryText="@string/getDesktopBrowserSettingItemSubtitleTitle" />
 
 </LinearLayout>

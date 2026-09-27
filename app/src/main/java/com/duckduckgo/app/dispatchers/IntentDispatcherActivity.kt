@@ -100,6 +100,10 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
         // apply the trusted-caller carve-out in handleAppLink.
         val clientPackage = CustomTabsSessionToken.getSessionTokenFromIntent(intent)
             ?.let { customTabsSessionRegistry.lookupClientPackage(it) }
+        // Best-effort caller identity from the android-app:// referrer, available even when the launcher never
+        // bound the service (e.g. apps that open a login Custom Tab without a session). The launcher can set the
+        // referrer, so this is used only for the low-stakes prompt-skip decision, never the launch carve-out.
+        val referrerPackage = referrer?.takeIf { it.scheme == "android-app" }?.host
 
         // As customizations we only support the toolbar color at the moment.
         startActivity(
@@ -110,6 +114,7 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
                 toolbarColor = toolbarColor,
                 isExternal = isExternal,
                 clientPackage = clientPackage,
+                referrerPackage = referrerPackage,
             ),
         )
 

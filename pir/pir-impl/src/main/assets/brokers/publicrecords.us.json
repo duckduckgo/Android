@@ -1,7 +1,7 @@
 {
   "name": "PublicRecordsUs",
   "url": "publicrecords.us",
-  "version": "0.3.0",
+  "version": "0.6.0",
   "parent": "propertyrecord.com",
   "addedDatetime": 1775829600000,
   "optOutUrl": "https://dashboard.publicrecords.us/opt-out",
@@ -12,72 +12,48 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "695fb2f0-b2e4-4127-ab75-252a4b8430c0",
-          "url": "https://www.publicrecords.us/"
-        },
-        {
-          "actionType": "expectation",
-          "expectations": [
-            {
-              "type": "element",
-              "selector": "//a[@title='Remove My Info']"
-            }
-          ],
-          "id": "7c5df98e-3636-470d-b397-c1c7f52fe788"
-        },
-        {
-          "actionType": "click",
-          "elements": [
-            {
-              "type": "button",
-              "selector": "//a[@title='Remove My Info']"
-            }
-          ],
-          "id": "41fea052-1cfe-4cd0-ae37-fb90fef82949"
-        },
-        {
-          "actionType": "expectation",
-          "expectations": [
-            {
-              "type": "element",
-              "selector": "//h1[contains(text(), 'Remove My Information')]"
-            }
-          ],
-          "id": "61914e4e-4587-46e7-8682-73c82642af21"
-        },
-        {
-          "actionType": "fillForm",
-          "selector": "form#backgroundCheckForm",
-          "dataSource": "userProfile",
-          "elements": [
-            {
-              "type": "fullName",
-              "selector": ".//input[@name='name']"
-            },
-            {
-              "type": "cityState",
-              "selector": ".//input[@name='cityState']"
-            }
-          ],
-          "id": "9d03c424-e97a-4ee6-9b17-114afe7dc41a"
-        },
-        {
-          "actionType": "click",
-          "elements": [
-            {
-              "type": "button",
-              "selector": "button[type='submit']"
-            }
-          ],
+          "_comment": "Forwarding page source: https://github.com/duckduckgo/privacy-test-pages/blob/main/pir/opt-out/index.html",
+          "url": "https://privacy-test-pages.site/pir/opt-out/?name=${firstName}%20${lastName}&city=${city|downcase}&state=${state|upcase}&cityState=${city},%20${state|upcase}&to=https%3A%2F%2Fdashboard.publicrecords.us%2Fopt-out%2Frecords",
           "id": "492b18f5-23a0-45ae-b215-75b03dbc9a2e"
         },
         {
-          "actionType": "condition",
-          "_comment": "Occasionally the site pops ups a spelling correction, and we need to press the 'Use Original' button",
+          "actionType": "expectation",
           "expectations": [
             {
               "type": "element",
-              "selector": "#spellcheck-original"
+              "selector": "#forward"
+            }
+          ],
+          "id": "203d00e8-e089-4c08-9f91-baf8e08b83fe"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "#forward"
+            }
+          ],
+          "id": "69e6018f-0cb2-4cc9-81d0-548bff5ce716"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//div[contains(text(), 'Search Results')]"
+            }
+          ],
+          "id": "eb08bbc0-dd52-41e4-8802-ba535b002678"
+        },
+        {
+          "actionType": "condition",
+          "_comment": "Click Use Original when the site offers a spelling correction.",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#spellcheck-original",
+              "failSilently": true
             }
           ],
           "actions": [
@@ -111,7 +87,7 @@
           "noResultsSelector": "//h3[contains(text(), 'No results found')]",
           "profile": {
             "name": {
-              "selector": ".//div[contains(@class,'grid')]/div[contains(@class,'flex-col')][1]/div[contains(@class,'!text-[#222]')]"
+              "selector": ".//div[contains(@class,'grid')]/div[contains(@class,'flex-col')][1]/div[contains(concat(' ', normalize-space(@class), ' '), ' !text-black-900 ') and contains(concat(' ', normalize-space(@class), ' '), ' text-lg ')]"
             },
             "addressCityState": {
               "selector": ".//div[contains(@class,'grid')]/div[contains(@class,'flex-col')][1]/div[contains(@class,'!leading-tight')]"

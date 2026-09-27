@@ -213,13 +213,7 @@
     <!-- Get Desktop Browser -->
     <string name="getDesktopBrowserSettingItemTitle">Вземете браузъра за работен плот</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo за Mac и Windows</string>
-    <string name="getDesktopBrowserTitle">Защитете личната си информация и на Mac, и на Windows!</string>
-    <string name="getDesktopBrowserBody">За да изтеглите DuckDuckGo за Mac или Windows, посетете:</string>
-    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
-    <string name="getDesktopBrowserShareDownloadLink">Споделяне на връзка за изтегляне</string>
-    <string name="getDesktopBrowserNoThanks">Не, благодаря</string>
     <string name="getDesktopBrowserHideItem">Скрий</string>
-    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Връзката е копирана</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Защита от изскачащи прозорци за бисквитки</string>
@@ -966,6 +960,22 @@
     <string name="preOnboardingWidgetPromptPrimaryCta">Добавяне на приспособлението</string>
     <string name="preOnboardingWidgetPromptSecondaryCta">Пропускане</string>
 
+    <!-- Pre-onboarding: import passwords -->
+    <string name="preOnboardingImportPasswordsTitle">Импортиране на пароли от Google</string>
+    <string name="preOnboardingImportPasswordsBody">Google може да Ви помоли да влезете или да въведете паролата си, за да потвърдите.</string>
+    <string name="preOnboardingImportPasswordsPrimaryCta">Импортиране от Google</string>
+    <string name="preOnboardingImportCompleteTitle">Импортирането е завършено</string>
+    <string name="preOnboardingImportCompleteCta">Продължаване</string>
+    <string name="preOnboardingImportCompleteParsingTitle">Импортиране на пароли</string>
+    <string name="preOnboardingImportCompleteParsingBody">Това ще отнеме само няколко секунди.</string>
+    <string name="preOnboardingImportCompleteFailedTitle">Импортирането е неуспешно</string>
+    <string name="preOnboardingImportCompleteFailed">Импортирането на паролата е неуспешно</string>
+    <string name="preOnboardingImportCompleteImported" instruction="Placeholder is the number of passwords that were imported.">Импортирани пароли: %1$s</string>
+    <string name="preOnboardingImportCompleteSkipped" instruction="Placeholder is the number of passwords that were not imported.">Пропуснати (дублирани или невалидни): %1$s</string>
+    <string name="preOnboardingImportErrorTitle">Възникна някаква грешка</string>
+    <string name="preOnboardingImportErrorBody">Моля, опитайте отново.</string>
+    <string name="preOnboardingImportErrorRetry">Нов опит</string>
+
     <!-- Pre-onboarding: add to home screen -->
     <string name="preOnboardingDockStepTitle">Добавете ме към реда с любими.</string>
     <string name="preOnboardingAddToDockBody">Намерете иконата на DuckDuckGo на началния екран. След това натиснете и плъзнете на място. Това е всичко!</string>
@@ -1003,4 +1013,11 @@
     <string name="singleTabFireDialogTitleFireMode">Изтриване на разделите Fire и данните в тях?</string>
 
     <string name="downloadsCannotOpenFileErrorMessage">Файлът не може да се отвори. Проверете за съвместимо приложение.</string>
+
+    <!-- Error pages -->
+    <string name="webViewErrorTitle" instruction="Title shown on the error pages">DuckDuckGo не може да зареди тази страница</string>
+    <string name="webViewErrorNoConnection" instruction="Message shown when the page fails to load because the device has no internet connection">Изглежда, че няма връзка с интернет.</string>
+    <string name="webViewErrorBadUrl" instruction="Message shown when the hostname of the website could not be resolved">Не може да бъде намерен сървър с посоченото име на хост.</string>
+    <string name="webViewErrorSslProtocol" instruction="Message shown when the website&apos;s SSL certificate is invalid. Placeholder is the website&apos;s address"><![CDATA[Сертификатът за този сървър е невалиден. Възможно е да се свързвате със сървър, който се представя за <b>%1$s</b>, което може да изложи поверителната Ви информация на риск.]]></string>
+    <string name="webViewErrorRedirectSuggestionMessage" instruction="Shown when a domain fails to load, offering a link to the www. version of the address. Placeholder is a tappable link to the suggested address.">Може би имахте предвид <annotation type="redirect_link">^1</annotation>?</string>
 </resources>

@@ -27,4 +27,6 @@ android {
 
 dependencies {
     implementation KotlinX.coroutines.core
+    implementation project(':common-utils')
+    implementation AndroidX.core.ktx
 }

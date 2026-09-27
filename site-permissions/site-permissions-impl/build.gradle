@@ -65,6 +65,12 @@ dependencies {
 }
 
 android {
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
+
     anvil {
         generateDaggerFactories = true // default is false
     }

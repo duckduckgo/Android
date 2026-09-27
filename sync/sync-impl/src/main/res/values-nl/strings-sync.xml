@@ -221,7 +221,6 @@
     <!-- Get Desktop Browser -->
     <string name="getDesktopBrowserSettingItemTitle">Download de desktopbrowser</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo voor Mac en Windows</string>
-    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
 
     <!-- Sync Settings Recovery Section -->
     <string name="sync_settings_recovery_section_header">Herstellen</string>
@@ -377,6 +376,7 @@
 
     <!-- Pairing screen -->
     <string name="sync_simplified_pairing_headline">Sync &amp; Backup is end-to-end versleuteld op al je apparaten.</string>
+    <string name="sync_simplified_pairing_headline_check_other_device">Controleer je andere apparaat</string>
     <string name="sync_simplified_pairing_headline_recovery">Gegevens herstellen</string>
     <string name="sync_simplified_pairing_body">Er wordt verbinding gemaakt ...</string>
 
@@ -389,6 +389,9 @@
     <string name="sync_simplified_pairing_dialog_joiner_secondary_button">Annuleren</string>
     <string name="sync_simplified_pairing_dialog_acknowledgment_title">Bevestig op je andere apparaat …</string>
     <string name="sync_simplified_pairing_dialog_acknowledgment_primary_button">Ik snap het</string>
+    <string name="sync_simplified_pairing_dialog_check_other_device_title">Controleer je andere apparaat</string>
+    <string name="sync_simplified_pairing_dialog_connecting_title">Synchronisatie wordt uitgevoerd</string>
+    <string name="sync_simplified_pairing_dialog_connecting_body">Er wordt verbinding gemaakt...</string>
 
     <!-- Recovery Code screen -->
     <string name="sync_simplified_recovery_code_headline" instruction="Placeholder is a device name. e.g., Samsung S23">%1$s is toegevoegd aan Sync &amp; Backup.</string>

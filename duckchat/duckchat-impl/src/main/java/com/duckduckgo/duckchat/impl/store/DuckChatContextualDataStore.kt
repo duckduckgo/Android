@@ -23,6 +23,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.impl.contextual.ContextualEntryPromptStore
 import com.duckduckgo.duckchat.impl.di.DuckChat
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
@@ -52,6 +53,7 @@ class RealDuckChatContextualDataStore @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
     moshi: Moshi,
+    private val contextualEntryPromptStore: ContextualEntryPromptStore,
 ) : DuckChatContextualDataStore {
 
     private object Keys {
@@ -116,6 +118,9 @@ class RealDuckChatContextualDataStore @Inject constructor(
     }
 
     override fun clearTabChatUrl(tabId: String) {
+        // A tab's contextual chat state includes any pending entry-dialog prompt parked for it, so drop
+        // that too (covers tab deletion and fire, which both route through here).
+        contextualEntryPromptStore.clear(tabId)
         coroutineScope.launch(dispatchers.io()) {
             store.edit { prefs ->
                 val updated =
@@ -140,6 +145,7 @@ class RealDuckChatContextualDataStore @Inject constructor(
     }
 
     override fun clearAll() {
+        contextualEntryPromptStore.clearAll()
         coroutineScope.launch(dispatchers.io()) {
             store.edit { prefs ->
                 prefs.remove(Keys.TAB_CHAT_URLS)

@@ -27,6 +27,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.toChatIdOrNull
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
@@ -39,6 +40,8 @@ import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
 import com.duckduckgo.duckchat.impl.history.ChatHistoryItem
 import com.duckduckgo.duckchat.impl.history.ChatHistoryRepository
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelPageType
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
@@ -710,6 +713,7 @@ class DuckChatContextualViewModel @Inject constructor(
                     return
                 }
                 duckChatPixels.reportContextualSummarizePromptSelected()
+                fireUnifiedInputPromptSubmitted()
                 onPromptSent(
                     prompt = context.getString(R.string.duckAIContextualPromptSummarize),
                     followUpPrefill = currentInput.takeIf { it.isNotEmpty() },
@@ -723,9 +727,26 @@ class DuckChatContextualViewModel @Inject constructor(
         currentInput: String,
     ) {
         attachPageContextForSuggestion()
+        fireUnifiedInputPromptSubmitted()
         onPromptSent(
             prompt = suggestion.prompt,
             followUpPrefill = currentInput.takeIf { it.isNotEmpty() },
+        )
+    }
+
+    private fun fireUnifiedInputPromptSubmitted() {
+        duckChatPixels.firePromptSubmitted(
+            selectedTool = "none",
+            modelId = modelManager.getSelectedModelId(),
+            reasoningEffort = modelManager.getResolvedReasoningEffort(),
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            hasText = true,
+            surface = DuckChatPixelSurface.CONTEXTUAL_CHAT,
+            defaultMode = null,
+            tabId = _viewState.value.tabId,
+            pageType = DuckChatPixelPageType.CONTEXTUAL,
+            addressBarEntryPoint = null,
         )
     }
 
@@ -748,6 +769,7 @@ class DuckChatContextualViewModel @Inject constructor(
     fun onFullModeRequested() {
         logcat { "Duck.ai: request fullmode url $fullModeUrl" }
         val currentState = _viewState.value
+        val hasPrompt = currentState.sheetMode != SheetMode.INPUT
         val chatUrl = if (currentState.sheetMode == SheetMode.INPUT) {
             duckChat.getDuckChatUrl("", false, sidebar = false)
         } else {
@@ -758,6 +780,7 @@ class DuckChatContextualViewModel @Inject constructor(
         viewModelScope.launch {
             commandChannel.trySend(Command.OpenFullscreenMode(chatUrl))
         }
+        duckChatInternal.reportDuckChatEntry(DuckChatEntryPoint.CONTEXTUAL_CHAT, opensNewTab = true, hasPrompt = hasPrompt)
         duckChatPixels.reportContextualSheetExpanded()
     }
 
@@ -903,6 +926,7 @@ class DuckChatContextualViewModel @Inject constructor(
         duckChatPixels.reportContextualRecentChatSelected()
         val url = duckChatInternal.buildChatUrl(chatId)
         val sourceTabId = _viewState.value.tabId
+        duckChatInternal.reportDuckChatEntry(DuckChatEntryPoint.CHAT_HISTORY_OPEN_CHAT, opensNewTab = true, hasPrompt = false)
         commandChannel.trySend(Command.OpenChatUrl(url = url, sourceTabId = sourceTabId))
     }
 
