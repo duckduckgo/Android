@@ -2704,7 +2704,12 @@ class BrowserTabFragment :
                     viewModel.autoCompleteSuggestionsGone()
                 }
                 binding.autoCompleteSuggestionsList.gone()
-                nativeInputManager.hideNativeInput(animate = false, isNavigation = true)
+                // Skip Duck.ai for the same reason launchTabSwitcher does: the widget is that tab's
+                // persistent chat input, and tearing it down restores the default omnibar, so the
+                // chat would be sitting behind an address bar when the user comes back to it.
+                if (omnibar.viewMode != DuckAI) {
+                    nativeInputManager.hideNativeInput(animate = false, isNavigation = true)
+                }
 
                 if (swipingTabsFeature.isEnabled) {
                     browserActivity?.launchNewTab(it.query, it.sourceTabId)

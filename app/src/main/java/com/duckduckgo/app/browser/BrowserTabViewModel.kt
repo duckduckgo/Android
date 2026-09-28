@@ -5856,15 +5856,21 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun openNewDuckChat(viewMode: ViewMode) {
+        val url = duckChat.getDuckChatUrl("", false)
         if (viewMode == ViewMode.DuckAI) {
             pixel.fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_NEW_CHAT_TAPPED)
             duckAiSessionCallback.onNewChatCreated(tabId)
-            viewModelScope.launch {
-                val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT)
-                _subscriptionEventDataChannel.send(subscriptionEvent)
+            viewModelScope.launch(dispatchers.io()) {
+                // The new chat continues the same journey, so the tab it lands in inherits this tab's
+                // entry point; without it the new tab would claim a stale pending one, or none at all.
+                duckAiTabSessionRepository.getEntryPointSource(tabId)?.let {
+                    duckAiTabSessionRepository.setPendingEntryPointSource(it)
+                }
+                withContext(dispatchers.main()) {
+                    command.value = OpenInNewTab(url, tabId)
+                }
             }
         } else {
-            val url = duckChat.getDuckChatUrl("", false)
             val entryPoint = if (viewMode == ViewMode.NewTab) {
                 DuckChatEntryPoint.BROWSING_MENU_NTP
             } else {

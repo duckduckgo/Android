@@ -11939,24 +11939,39 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenDuckChatNativeNewChatRequested() = runTest {
-        val expectedEvent = SubscriptionEventData(
-            featureName = "event1",
-            subscriptionName = "subscription1",
-            params = JSONObject(),
-        )
-        whenever(mockDuckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT)).thenReturn(expectedEvent)
+    fun whenNewChatRequestedFromDuckAiTabThenOpensNewTabWithEmptyChat() = runTest {
+        whenever(mockDuckAiTabSessionRepository.getEntryPointSource("abc")).thenReturn(null)
 
         testee.openNewDuckChat(ViewMode.DuckAI)
+        advanceUntilIdle()
 
-        testee.subscriptionEventDataFlow.test {
-            val emittedEvent = awaitItem()
-            assertEquals(expectedEvent.featureName, emittedEvent.featureName)
-            assertEquals(expectedEvent.subscriptionName, emittedEvent.subscriptionName)
-            assertEquals(expectedEvent.params.toString(), emittedEvent.params.toString())
-            cancelAndIgnoreRemainingEvents()
+        assertCommandIssued<Command.OpenInNewTab> {
+            assertEquals(duckChatURL, query)
+            assertEquals("abc", sourceTabId)
         }
+        verify(mockDuckChatJSHelper, never()).onNativeAction(NativeAction.NEW_CHAT)
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_NEW_CHAT_TAPPED)
+        verify(mockDuckAiSessionCallback).onNewChatCreated("abc")
+    }
+
+    @Test
+    fun whenNewChatRequestedFromDuckAiTabThenNewTabInheritsThisTabsEntryPoint() = runTest {
+        whenever(mockDuckAiTabSessionRepository.getEntryPointSource("abc")).thenReturn("address_bar_prompt")
+
+        testee.openNewDuckChat(ViewMode.DuckAI)
+        advanceUntilIdle()
+
+        verify(mockDuckAiTabSessionRepository).setPendingEntryPointSource("address_bar_prompt")
+    }
+
+    @Test
+    fun whenNewChatRequestedFromDuckAiTabWithNoRecordedEntryPointThenNothingIsPended() = runTest {
+        whenever(mockDuckAiTabSessionRepository.getEntryPointSource("abc")).thenReturn(null)
+
+        testee.openNewDuckChat(ViewMode.DuckAI)
+        advanceUntilIdle()
+
+        verify(mockDuckAiTabSessionRepository, never()).setPendingEntryPointSource(any())
     }
 
     @Test
