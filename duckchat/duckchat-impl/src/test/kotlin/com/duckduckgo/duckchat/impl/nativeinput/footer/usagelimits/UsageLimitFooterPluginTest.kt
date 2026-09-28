@@ -132,6 +132,24 @@ class UsageLimitFooterPluginTest {
     }
 
     @Test
+    fun whenResetTimeHasPassedSinceParsingThenFooterHidesOnNextEvaluation() = runTest {
+        snapshot.value = reached()
+        val footer = testee.createFooter(context, hostContext, host)
+
+        footer.state.test {
+            assertTrue(awaitItem().visible)
+
+            whenever(currentTimeProvider.currentTimeMillis()).thenReturn(RESETS_AT)
+            hostContext.value = duckAiContext(isInputFocused = false)
+            assertFalse(awaitItem().visible)
+            hostContext.value = duckAiContext(isInputFocused = true)
+
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenLimitIsReachedAndInputIsFocusedThenComposerIsBlocked() = runTest {
         snapshot.value = reached()
         val footer = testee.createFooter(context, hostContext, host)

@@ -91,7 +91,8 @@ class UsageLimitsSnapshotParser @Inject constructor(
         return (0 until json.length()).mapNotNull { index ->
             val entry = json.optJSONObject(index) ?: return@mapNotNull null
             val key = entry.optNonBlankString(KEY) ?: return@mapNotNull null
-            val value = entry.opt(VALUE) ?: return@mapNotNull null
+            if (entry.isNull(VALUE)) return@mapNotNull null
+            val value = entry.get(VALUE)
             UsageCtaPutEntry(key = key, value = value as? String ?: value.toString())
         }
     }

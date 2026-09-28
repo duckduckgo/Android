@@ -108,6 +108,7 @@ class UsageLimitFooterPlugin @Inject constructor(
             lastSelectedModelId = input?.selectedModelId ?: previousModelId
             val snapshot = input?.snapshot ?: return@combine NativeInputFooterState(visible = false)
             val notice = snapshot.notice
+            if (notice.resetsAtMillis <= currentTimeProvider.currentTimeMillis()) return@combine NativeInputFooterState(visible = false)
             if (UsageNoticeDismissalPolicy.isSuppressed(
                     notice,
                     input.dismissals[notice.window],
