@@ -359,7 +359,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         NativeInputFooterContext(
             isDuckAiSelected = selection == NativeInputState.ToggleSelection.DUCK_AI,
             isEditing = tabId?.startsWith(EDIT_STATE_KEY_PREFIX) == true,
-            isFireMode = browserMode == BrowserMode.FIRE,
+            browserMode = browserMode,
             isInputFocused = inputFocused,
         )
     }.stateIn(
@@ -368,7 +368,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         initialValue = NativeInputFooterContext(
             isDuckAiSelected = false,
             isEditing = false,
-            isFireMode = browserMode == BrowserMode.FIRE,
+            browserMode = browserMode,
             isInputFocused = false,
         ),
     )

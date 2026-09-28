@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.nativeinput.footer
 import android.content.Context
 import android.view.View
 import app.cash.turbine.test
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,7 +39,7 @@ class NativeInputFooterCoordinatorTest {
         NativeInputFooterContext(
             isDuckAiSelected = true,
             isEditing = false,
-            isFireMode = false,
+            browserMode = BrowserMode.REGULAR,
             isInputFocused = true,
         ),
     )

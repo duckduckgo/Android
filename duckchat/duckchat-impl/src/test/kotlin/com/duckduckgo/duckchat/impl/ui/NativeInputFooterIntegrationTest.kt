@@ -23,6 +23,7 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.duckchat.impl.nativeinput.footer.FakeNativeInputFooterHost
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooter
@@ -348,7 +349,7 @@ class NativeInputFooterIntegrationTest {
     private fun duckAiContext() = NativeInputFooterContext(
         isDuckAiSelected = true,
         isEditing = false,
-        isFireMode = false,
+        browserMode = BrowserMode.REGULAR,
         isInputFocused = true,
     )
 

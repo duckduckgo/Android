@@ -86,14 +86,16 @@ class UsageLimitFooterPlugin @Inject constructor(
         val footerView = UsageLimitFooterView(context)
         var lastSelectedModelId: String? = null
 
-        val surfaceActive = combine(hostContext, duckChatFeature.duckAiUsageWarnings().enabled()) { footerContext, enabled ->
-            enabled && footerContext.isDuckAiSelected && !footerContext.isEditing && !footerContext.isFireMode
+        val activeBrowserMode = combine(hostContext, duckChatFeature.duckAiUsageWarnings().enabled()) { footerContext, enabled ->
+            footerContext.browserMode.takeIf {
+                enabled && footerContext.isDuckAiSelected && !footerContext.isEditing && it != BrowserMode.FIRE
+            }
         }.distinctUntilChanged()
 
-        val inputs = surfaceActive.flatMapLatest { active ->
-            if (active) {
+        val inputs = activeBrowserMode.flatMapLatest { browserMode ->
+            if (browserMode != null) {
                 combine(
-                    repository.usageLimits(BrowserMode.REGULAR),
+                    repository.usageLimits(browserMode),
                     dismissalStore.dismissals,
                     dismissalStore.actedOn,
                     modelManager.modelState,

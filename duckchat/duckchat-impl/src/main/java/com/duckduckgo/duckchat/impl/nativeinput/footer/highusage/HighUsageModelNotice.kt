@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.nativeinput.footer.highusage
 
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterContext
 import javax.inject.Inject
@@ -31,7 +32,11 @@ class HighUsageModelNoticeResolver @Inject constructor() {
         footerContext: NativeInputFooterContext,
         dismissedModelIds: Set<String>,
     ): HighUsageModelNotice? {
-        if (!footerContext.isDuckAiSelected || footerContext.isEditing || footerContext.isFireMode || !footerContext.isInputFocused) return null
+        val surfaceActive = footerContext.isDuckAiSelected &&
+            !footerContext.isEditing &&
+            footerContext.browserMode != BrowserMode.FIRE &&
+            footerContext.isInputFocused
+        if (!surfaceActive) return null
         val modelId = modelState.selectedModelId?.takeIf { it in HIGH_USAGE_MODEL_IDS } ?: return null
         if (modelId in dismissedModelIds) return null
 

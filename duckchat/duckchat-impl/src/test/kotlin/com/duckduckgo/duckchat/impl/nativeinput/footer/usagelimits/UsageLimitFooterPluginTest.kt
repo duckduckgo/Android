@@ -248,7 +248,7 @@ class UsageLimitFooterPluginTest {
 
     @Test
     fun whenFireModeThenRepositoryIsNeverRead() = runTest {
-        hostContext.value = duckAiContext(isFireMode = true)
+        hostContext.value = duckAiContext(browserMode = BrowserMode.FIRE)
         val footer = testee.createFooter(context, hostContext, host)
 
         footer.state.test {
@@ -488,12 +488,12 @@ class UsageLimitFooterPluginTest {
 
     private fun duckAiContext(
         isEditing: Boolean = false,
-        isFireMode: Boolean = false,
+        browserMode: BrowserMode = BrowserMode.REGULAR,
         isInputFocused: Boolean = true,
     ) = NativeInputFooterContext(
         isDuckAiSelected = true,
         isEditing = isEditing,
-        isFireMode = isFireMode,
+        browserMode = browserMode,
         isInputFocused = isInputFocused,
     )
 

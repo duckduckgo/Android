@@ -782,7 +782,7 @@ class NativeInputModeWidgetViewModelTest {
     fun whenBrowserModeIsFireThenFooterContextReportsFireMode() = runTest {
         val viewModel = createViewModel(browserMode = BrowserMode.FIRE)
 
-        assertTrue(viewModel.footerContext.value.isFireMode)
+        assertEquals(BrowserMode.FIRE, viewModel.footerContext.value.browserMode)
     }
 
     @Test
