@@ -1711,6 +1711,53 @@ class NewUserOnboardingPlanProviderTest {
         assertFalse(ids.contains(NewUserOnboardingStepIds.ADD_WIDGET))
     }
 
+    private suspend fun segmentedPlanStepIds(reason: DownloadReasonSelection): List<String> {
+        whenever(widgetCapabilities.hasInstalledWidgets).thenReturn(false)
+        startSegmentedAtDownloadReason()
+        orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(reason))
+        return (orchestrator.state.value as InProgress).currentPlan.steps.map { it.id }
+    }
+
+    private fun assertWidgetStepsBetween(ids: List<String>, before: String, after: String) {
+        val prompt = ids.indexOf(NewUserOnboardingStepIds.WIDGET_PROMPT)
+        assertEquals(ids.indexOf(before) + 1, prompt)
+        assertEquals(prompt + 1, ids.indexOf(NewUserOnboardingStepIds.ADD_WIDGET))
+        assertEquals(prompt + 2, ids.indexOf(after))
+    }
+
+    @Test
+    fun whenSegmentedSearchPlanAndNoWidgetThenWidgetStepsBetweenPreferencesAndInputScreen() = runTest {
+        val ids = segmentedPlanStepIds(DownloadReasonSelection.SEARCH)
+        assertWidgetStepsBetween(ids, NewUserOnboardingStepIds.PREFERENCE_SELECTOR, NewUserOnboardingStepIds.INPUT_SCREEN)
+    }
+
+    @Test
+    fun whenSegmentedAiPlanAndNoWidgetThenWidgetStepsBetweenTogglePositionAndAddressBar() = runTest {
+        val ids = segmentedPlanStepIds(DownloadReasonSelection.AI_CHAT)
+        assertWidgetStepsBetween(ids, NewUserOnboardingStepIds.TOGGLE_POSITION, NewUserOnboardingStepIds.ADDRESS_BAR_POSITION)
+    }
+
+    @Test
+    fun whenSegmentedNoAiPlanAndNoWidgetThenWidgetStepsBetweenPreferencesAndDuckAiState() = runTest {
+        val ids = segmentedPlanStepIds(DownloadReasonSelection.NO_AI)
+        assertWidgetStepsBetween(ids, NewUserOnboardingStepIds.PREFERENCE_SELECTOR, NewUserOnboardingStepIds.DUCK_AI_STATE)
+    }
+
+    @Test
+    fun whenSegmentedBlockAdsPlanAndNoWidgetThenWidgetStepsBetweenPreferencesAndInputScreen() = runTest {
+        val ids = segmentedPlanStepIds(DownloadReasonSelection.BLOCK_ADS)
+        assertWidgetStepsBetween(ids, NewUserOnboardingStepIds.PREFERENCE_SELECTOR, NewUserOnboardingStepIds.INPUT_SCREEN)
+    }
+
+    @Test
+    fun whenSegmentedPlanAndUserAlreadyHasWidgetThenWidgetStepsNotInserted() = runTest {
+        startSegmentedAtDownloadReason()
+        orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.SEARCH))
+        val ids = (orchestrator.state.value as InProgress).currentPlan.steps.map { it.id }
+        assertFalse(ids.contains(NewUserOnboardingStepIds.WIDGET_PROMPT))
+        assertFalse(ids.contains(NewUserOnboardingStepIds.ADD_WIDGET))
+    }
+
     @Test
     fun whenUserAlreadyHasWidgetThenWidgetStepsNotInserted() = runTest {
         whenever(widgetCapabilities.hasInstalledWidgets).thenReturn(true)
