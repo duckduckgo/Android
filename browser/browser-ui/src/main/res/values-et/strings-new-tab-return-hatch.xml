@@ -23,6 +23,9 @@
     <string name="newTabReturnHatchUndo">Võta tagasi</string>
     <string name="hatchMenuReturnTab">Tagasi vahelehele</string>
     <string name="hatchMenuAfterInactivitySettings">Pärast tegevusetust</string>
+    <string name="hatchMenuAfterInactivityOpenLastUsedTab">Ava viimati kasutatud vahekaart</string>
+    <string name="hatchMenuAfterInactivityOpenNewTab">Ava uuel vahekaardil</string>
+    <string name="hatchMenuAfterInactivityOpenSpecificPage">Ava konkreetne leht</string>
     <string name="hatchMenuCloseTab">Sulge vaheleht</string>
     <string name="hatchMenuBurnTab">Kustuta vahekaart</string>
     <string name="hatchMenuHideShortcut">Peida otsetee</string>
