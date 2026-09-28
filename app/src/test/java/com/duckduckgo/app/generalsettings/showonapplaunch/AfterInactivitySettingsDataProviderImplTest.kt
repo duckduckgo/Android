@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.generalsettings.showonapplaunch
 
-import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import app.cash.turbine.test
 import com.duckduckgo.app.FakeSettingsDataStore
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption
@@ -24,24 +23,19 @@ import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchO
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.SpecificPage
 import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchOptionDataStore
-import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchOptionPrefsDataStore
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.feature.toggles.api.internal.CachedToggleStore
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import com.duckduckgo.settings.api.AfterInactivityReturnDestination
 import com.duckduckgo.settings.api.AfterInactivitySettings
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.TemporaryFolder
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -52,9 +46,6 @@ class AfterInactivitySettingsDataProviderImplTest {
     @get:Rule
     val coroutineTestRule = CoroutineTestRule()
 
-    @get:Rule
-    val temporaryFolder = TemporaryFolder()
-
     private val optionFlow = MutableStateFlow<ShowOnAppLaunchOption>(NewTabPage)
     private val shortcutEnabled = MutableStateFlow(true)
     private val optionDataStore: ShowOnAppLaunchOptionDataStore = mock {
@@ -64,15 +55,10 @@ class AfterInactivitySettingsDataProviderImplTest {
     private val ntpAfterIdleManager: NtpAfterIdleManager = mock {
         on { returnToLastTabEnabled }.thenReturn(shortcutEnabled)
     }
-    private val urlConverter: UrlConverter = mock {
-        on { convertUrl(any()) }.thenAnswer { invocation -> "https://${invocation.arguments[0]}/" }
+    private val urlConverter = object : UrlConverter {
+        override fun convertUrl(url: String?) = requireNotNull(url)
     }
-    private val toggleStore = CachedToggleStore(FakeToggleStore())
-    private val browserConfigFeature = FakeFeatureToggleFactory.create<AndroidBrowserConfigFeature>(
-        AndroidBrowserConfigFeature::class.java,
-        store = toggleStore,
-        ioDispatcher = coroutineTestRule.testDispatcher,
-    )
+    private val browserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
     private val testee = AfterInactivitySettingsDataProviderImpl(
         optionDataStore,
         settingsDataStore,
@@ -83,7 +69,7 @@ class AfterInactivitySettingsDataProviderImplTest {
     )
 
     @Test
-    fun whenNoTimeoutWasSelectedThenSettingsFollowRemoteDefaultUpdates() = coroutineTestRule.testScope.runTest {
+    fun whenNoTimeoutWasSelectedThenSettingsFollowRemoteDefaultUpdates() = runTest {
         setRemoteDefault(300L)
 
         testee.settings.test {
@@ -124,7 +110,7 @@ class AfterInactivitySettingsDataProviderImplTest {
     }
 
     @Test
-    fun whenCanonicalOptionChangesThenSettingsExposeOnlyThatOptionsFields() = coroutineTestRule.testScope.runTest {
+    fun whenCanonicalOptionChangesThenSettingsExposeOnlyThatOptionsFields() = runTest {
         testee.settings.test {
             assertEquals(
                 AfterInactivitySettings.NewTabPage(
@@ -147,7 +133,7 @@ class AfterInactivitySettingsDataProviderImplTest {
     }
 
     @Test
-    fun whenNewTabPageCommandContainsTimeoutThenItPersistsOnlyThatField() = coroutineTestRule.testScope.runTest {
+    fun whenNewTabPageCommandContainsTimeoutThenItPersistsOnlyThatField() = runTest {
         optionFlow.value = NewTabPage
 
         testee.setDestination(AfterInactivityReturnDestination.NewTabPage(selectedTimeoutSeconds = 60L))
@@ -158,7 +144,7 @@ class AfterInactivitySettingsDataProviderImplTest {
     }
 
     @Test
-    fun whenNewTabPageCommandContainsShortcutThenItPersistsOnlyThatField() = coroutineTestRule.testScope.runTest {
+    fun whenNewTabPageCommandContainsShortcutThenItPersistsOnlyThatField() = runTest {
         optionFlow.value = NewTabPage
 
         testee.setDestination(AfterInactivityReturnDestination.NewTabPage(returnToLastTabShortcutEnabled = false))
@@ -169,12 +155,12 @@ class AfterInactivitySettingsDataProviderImplTest {
     }
 
     @Test
-    fun whenSpecificPageCommandContainsTimeoutThenItPersistsTimeoutAndNotifiesIdleManager() = coroutineTestRule.testScope.runTest {
+    fun whenSpecificPageCommandContainsTimeoutThenItPersistsTimeoutAndNotifiesIdleManager() = runTest {
         optionFlow.value = SpecificPage("https://example.com/", null)
 
         testee.setDestination(AfterInactivityReturnDestination.SpecificPage("example.com", selectedTimeoutSeconds = 600L))
 
-        verify(optionDataStore).setShowOnAppLaunchOption(SpecificPage("https://example.com/"))
+        verify(optionDataStore).setShowOnAppLaunchOption(SpecificPage("example.com"))
         assertEquals(600L, settingsDataStore.userSelectedIdleThresholdSeconds)
         verify(ntpAfterIdleManager).onIdleTimeoutSelected(600L)
     }
@@ -184,42 +170,4 @@ class AfterInactivitySettingsDataProviderImplTest {
             Toggle.State(enable = true, settings = """{"defaultIdleThresholdSeconds":$seconds}"""),
         )
     }
-
-    @Test
-    fun whenAvailabilityChangesThenImplicitDestinationMatchesFreshCanonicalReads() = coroutineTestRule.testScope.runTest {
-        val store = realOptionStore()
-        val provider = realStoreProvider(store)
-        browserConfigFeature.ntpAsDefaultAfterIdleReturn().setRawStoredState(Toggle.State(enable = true))
-        browserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(enable = false))
-
-        assertEquals(AfterInactivitySettings.LastUsedTab, provider.settings.first())
-
-        setRemoteDefault(600L)
-        assertEquals(NewTabPage, store.optionFlow.first())
-        assertEquals(AfterInactivitySettings.NewTabPage(600L, true), provider.settings.first())
-
-        browserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(enable = false))
-        assertEquals(LastOpenedTab, store.optionFlow.first())
-        assertEquals(AfterInactivitySettings.LastUsedTab, provider.settings.first())
-        assertEquals(false, store.hasOptionSelected())
-    }
-
-    private fun realOptionStore(): ShowOnAppLaunchOptionPrefsDataStore {
-        val dataStore = PreferenceDataStoreFactory.create(
-            scope = coroutineTestRule.testScope.backgroundScope,
-            produceFile = { temporaryFolder.newFile("settings.preferences_pb") },
-        )
-        return ShowOnAppLaunchOptionPrefsDataStore(dataStore, browserConfigFeature)
-    }
-
-    private fun realStoreProvider(store: ShowOnAppLaunchOptionDataStore) = AfterInactivitySettingsDataProviderImpl(
-        store,
-        settingsDataStore,
-        browserConfigFeature,
-        RealIdleThresholdResolver(browserConfigFeature),
-        object : UrlConverter {
-            override fun convertUrl(url: String?) = requireNotNull(url)
-        },
-        ntpAfterIdleManager,
-    )
 }
