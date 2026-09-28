@@ -27,7 +27,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
@@ -38,7 +37,7 @@ import com.duckduckgo.site.permissions.impl.drm.DrmPolicyManager
 import com.duckduckgo.site.permissions.impl.drm.DrmPolicyReason
 import com.duckduckgo.site.permissions.impl.drm.DrmSessionStore
 import com.duckduckgo.site.permissions.impl.feature.DrmPolicyFeature
-import com.duckduckgo.site.permissions.impl.feature.MicrophoneSitePermissionsDomainRecoveryFeature
+import com.duckduckgo.site.permissions.impl.feature.SitePermissionsSystemRecoveryFeature
 import com.duckduckgo.site.permissions.impl.feature.isCentralPolicyEnabled
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.withContext
@@ -53,12 +52,11 @@ class SitePermissionsManagerImpl @Inject constructor(
     private val sitePermissionsRepository: SitePermissionsRepository,
     private val dispatcherProvider: DispatcherProvider,
     private val context: Context,
-    private val microphoneSitePermissionsDomainRecoveryFeature: MicrophoneSitePermissionsDomainRecoveryFeature,
+    private val sitePermissionsSystemRecoveryFeature: SitePermissionsSystemRecoveryFeature,
     private val drmPolicyFeature: DrmPolicyFeature,
     private val drmPolicyManager: DrmPolicyManager,
     private val drmSessionStore: DrmSessionStore,
     private val pixel: Pixel,
-    duckAiHostProvider: DuckAiHostProvider,
 ) : SitePermissionsManager {
 
     private suspend fun getSitePermissionsGranted(
@@ -97,17 +95,13 @@ class SitePermissionsManagerImpl @Inject constructor(
 
         logcat { "Permissions: sitePermissionsAllowedToAsk in $url ${sitePermissionsAllowedToAsk.asList()}" }
 
-        val filteredPermissionsGranted = if (microphoneSitePermissionsDomainRecoveryFeature.self().isEnabled()) {
-            getSitePermissionsGranted(url, tabId, sitePermissionsAllowedToAsk).filter { permission ->
-                if (permission == PermissionRequest.RESOURCE_AUDIO_CAPTURE && audioCapturePermissionDomains.contains(url.extractDomain())) {
-                    ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED &&
-                        ContextCompat.checkSelfPermission(context, Manifest.permission.MODIFY_AUDIO_SETTINGS) == PackageManager.PERMISSION_GRANTED
-                } else {
-                    true
-                }
-            }.toTypedArray()
+        val permissionsGranted = getSitePermissionsGranted(url, tabId, sitePermissionsAllowedToAsk)
+
+        // Drop saved grants the app can no longer honor, so the dialog can ask for the OS permission back
+        val filteredPermissionsGranted = if (sitePermissionsSystemRecoveryFeature.self().isEnabled()) {
+            permissionsGranted.filter { hasSystemPermission(it) }.toTypedArray()
         } else {
-            getSitePermissionsGranted(url, tabId, sitePermissionsAllowedToAsk)
+            permissionsGranted
         }
 
         val sitePermissionsGranted = if (drmDecision?.action == DrmPolicyAction.GRANT) {
@@ -202,6 +196,18 @@ class SitePermissionsManagerImpl @Inject constructor(
         )
     }
 
+    private fun hasSystemPermission(sitePermission: String): Boolean = when (sitePermission) {
+        PermissionRequest.RESOURCE_AUDIO_CAPTURE ->
+            isSystemPermissionGranted(Manifest.permission.RECORD_AUDIO) &&
+                isSystemPermissionGranted(Manifest.permission.MODIFY_AUDIO_SETTINGS)
+        PermissionRequest.RESOURCE_VIDEO_CAPTURE -> isSystemPermissionGranted(Manifest.permission.CAMERA)
+        LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION -> isSystemPermissionGranted(Manifest.permission.ACCESS_COARSE_LOCATION)
+        else -> true
+    }
+
+    private fun isSystemPermissionGranted(androidPermission: String): Boolean =
+        ContextCompat.checkSelfPermission(context, androidPermission) == PackageManager.PERMISSION_GRANTED
+
     private fun isPermissionSupported(permission: String): Boolean =
         permission == PermissionRequest.RESOURCE_AUDIO_CAPTURE || permission == PermissionRequest.RESOURCE_VIDEO_CAPTURE ||
             permission == PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID || permission == LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION
@@ -225,6 +231,4 @@ class SitePermissionsManagerImpl @Inject constructor(
             else -> null
         }
     }
-
-    private val audioCapturePermissionDomains: List<String> = listOf(duckAiHostProvider.getHost(), "duckduckgo.com")
 }

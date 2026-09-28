@@ -36,12 +36,13 @@ import com.duckduckgo.app.onboarding.OnboardingPreferenceCatalog
 import com.duckduckgo.app.onboarding.OnboardingPromptsExperimentManager
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager.SegmentedOnboardingExperimentVariant
+import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentMetrics
 import com.duckduckgo.app.onboarding.TestOption
 import com.duckduckgo.app.onboarding.store.OnboardingStore
-import com.duckduckgo.app.onboarding.store.SegmentedOnboardingPath
 import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
+import com.duckduckgo.app.onboarding.ui.page.PasswordImportErrorAction
 import com.duckduckgo.app.onboarding.ui.page.configdriven.ContentConfig
 import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection
 import com.duckduckgo.app.onboarding.ui.page.configdriven.TextConfig
@@ -56,6 +57,8 @@ import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_DOWNLOAD_CHOICE
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_FIRE_BUTTON
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_NOTIFICATIONS
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_PASSWORD_IMPORT
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_PASSWORD_IMPORT_COMPLETE
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_PASSWORD_IMPORT_ERROR
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_PREFERENCES_AD_BLOCKING
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_PREFERENCES_AI_MODEL
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_PREFERENCES_AI_SEARCH
@@ -96,6 +99,8 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -128,6 +133,7 @@ class NewUserOnboardingPlanProviderTest {
     private val duckAiOnboardingDemo: DuckAiOnboardingDemo = mock()
     private val homeScreenPromptsExperiment: OnboardingPromptsExperimentManager = mock()
     private val segmentedOnboardingExperiment: SegmentedOnboardingExperimentManager = mock()
+    private val segmentedOnboardingMetrics: SegmentedOnboardingExperimentMetrics = mock()
     private val onboardingPreferenceCatalog: OnboardingPreferenceCatalog = mock {
         onBlocking { offer(any()) } doReturn emptyList()
     }
@@ -194,6 +200,7 @@ class NewUserOnboardingPlanProviderTest {
             duckAiOnboardingDemo = duckAiOnboardingDemo,
             onboardingPromptsExperimentManager = homeScreenPromptsExperiment,
             segmentedOnboardingExperimentManager = segmentedOnboardingExperiment,
+            segmentedOnboardingExperimentMetrics = segmentedOnboardingMetrics,
             onboardingPasswordImportExperimentManager = passwordImportExperiment,
             onboardingPreferenceCatalog = onboardingPreferenceCatalog,
             singleChoiceDataPlugins = singleChoiceDataPlugins,
@@ -262,7 +269,32 @@ class NewUserOnboardingPlanProviderTest {
 
         orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.AI_CHAT))
 
-        verify(onboardingStore).setSegmentedOnboardingPath(SegmentedOnboardingPath.AI)
+        verify(onboardingStore).setDownloadReason(DownloadReasonSelection.AI_CHAT)
+    }
+
+    @Test
+    fun `when a run starts then a download reason left by an abandoned run is cleared`() = runTest {
+        startSegmentedAtDownloadReason()
+
+        verify(onboardingStore).setDownloadReason(null)
+    }
+
+    @Test
+    fun `when a download reason is picked then the selection metric is fired for it`() = runTest {
+        startSegmentedAtDownloadReason()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.AI_CHAT))
+
+        verify(segmentedOnboardingMetrics).fireDownloadReasonSelectedMetric(DownloadReasonSelection.AI_CHAT)
+    }
+
+    @Test
+    fun `when the download reason is missing then the fallback selection metric is fired`() = runTest {
+        startSegmentedAtDownloadReason()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(selection = null))
+
+        verify(segmentedOnboardingMetrics).fireDownloadReasonSelectedMetric(DownloadReasonSelection.SEARCH)
     }
 
     private suspend fun startSegmentedAtAiProviderChoice() {
@@ -499,23 +531,23 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
-    fun `when the no ai download reason is confirmed then it clears an input screen selection left by an abandoned run`() = runTest {
+    fun `when the no ai download reason is confirmed then it is persisted and clears an input screen selection left by an abandoned run`() = runTest {
         startSegmentedAtDownloadReason()
 
         orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.NO_AI))
 
-        verify(onboardingStore).setSegmentedOnboardingPath(null)
+        verify(onboardingStore).setDownloadReason(DownloadReasonSelection.NO_AI)
         verify(duckChat).setCosmeticInputScreenUserSetting(false)
         verify(onboardingStore).storeInputScreenSelection(false)
     }
 
     @Test
-    fun `when the block ads download reason is confirmed then it clears a segmented path left by an abandoned run`() = runTest {
+    fun `when the block ads download reason is confirmed then it is persisted`() = runTest {
         startSegmentedAtDownloadReason()
 
         orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.BLOCK_ADS))
 
-        verify(onboardingStore).setSegmentedOnboardingPath(null)
+        verify(onboardingStore).setDownloadReason(DownloadReasonSelection.BLOCK_ADS)
     }
 
     @Test
@@ -721,7 +753,7 @@ class NewUserOnboardingPlanProviderTest {
         verify(onboardingPreferenceCatalog, never()).apply(any())
         assertStep(NewUserOnboardingStepIds.INPUT_SCREEN)
         orchestrator.onEvent(NewUserOnboardingEvent.InputModeConfirmed(withAi = false))
-        verify(onboardingStore).setSegmentedOnboardingPath(SegmentedOnboardingPath.SEARCH)
+        verify(onboardingStore).setDownloadReason(DownloadReasonSelection.SEARCH)
         assertStep(NewUserOnboardingStepIds.ADDRESS_BAR_POSITION)
         orchestrator.onEvent(NewUserOnboardingEvent.AddressBarConfirmed(OmnibarType.SINGLE_TOP))
         assertStep(NewUserOnboardingStepIds.INPUT_SCREEN_PREVIEW)
@@ -757,7 +789,7 @@ class NewUserOnboardingPlanProviderTest {
         assertStep(NewUserOnboardingStepIds.INPUT_SCREEN)
         orchestrator.onEvent(NewUserOnboardingEvent.InputModeConfirmed(withAi = true))
 
-        verify(onboardingStore).setSegmentedOnboardingPath(SegmentedOnboardingPath.SEARCH)
+        verify(onboardingStore).setDownloadReason(DownloadReasonSelection.SEARCH)
         assertStep(NewUserOnboardingStepIds.ADDRESS_BAR_POSITION)
     }
 
@@ -1777,6 +1809,51 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.TRANSIENT_ERROR))
 
         assertStep(NewUserOnboardingStepIds.PASSWORD_IMPORT)
+        verify(onboardingPixelSender).fire(
+            ONBOARDING_PASSWORD_IMPORT_ERROR,
+            OnboardingPixelAction.PasswordImportErrorShown(transient = true),
+        )
+    }
+
+    @Test
+    fun `when the import is cancelled from the web flow then reports nothing`() = runTest {
+        startAtPasswordImportLaunch()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.CANCELLED))
+
+        assertStep(NewUserOnboardingStepIds.PASSWORD_IMPORT)
+        verify(onboardingPixelSender, never()).fire(eq(ONBOARDING_PASSWORD_IMPORT_ERROR), any())
+    }
+
+    @Test
+    fun `when the retry alert is retried then reports it to the error pixel and returns to the launch step`() = runTest {
+        startAtPasswordImportLaunch()
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.TRANSIENT_ERROR))
+
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportErrorRetryRequested)
+
+        assertStep(NewUserOnboardingStepIds.PASSWORD_IMPORT_LAUNCH)
+        verify(onboardingPixelSender).fire(
+            ONBOARDING_PASSWORD_IMPORT_ERROR,
+            OnboardingPixelAction.PasswordImportErrorClicked(PasswordImportErrorAction.RETRY),
+        )
+        // Only the Import CTA that opened the flow in the first place, not the retry on top of it.
+        verify(onboardingPixelSender, times(1)).fire(ONBOARDING_PASSWORD_IMPORT, OnboardingPixelAction.Clicked(engaged = true))
+    }
+
+    @Test
+    fun `when the retry alert is cancelled then reports it to the error pixel and skips past the import`() = runTest {
+        startAtPasswordImportLaunch()
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.TRANSIENT_ERROR))
+
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportErrorCancelled)
+
+        assertStep(NewUserOnboardingStepIds.ADDRESS_BAR_POSITION)
+        verify(onboardingPixelSender).fire(
+            ONBOARDING_PASSWORD_IMPORT_ERROR,
+            OnboardingPixelAction.PasswordImportErrorClicked(PasswordImportErrorAction.CANCEL),
+        )
+        verify(onboardingPixelSender, never()).fire(ONBOARDING_PASSWORD_IMPORT, OnboardingPixelAction.Clicked(engaged = false))
     }
 
     @Test
@@ -1818,9 +1895,60 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportParsed(PasswordImportResult.Terminal.Imported(imported = 3, skipped = 1)))
         orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportParsed(PasswordImportResult.Terminal.Imported(imported = 3, skipped = 1)))
 
+        verify(onboardingPixelSender).fire(ONBOARDING_PASSWORD_IMPORT_COMPLETE, OnboardingPixelAction.Shown)
+    }
+
+    @Test
+    fun `when the outcome step is presented before the import is parsed then reports nothing yet`() = runTest {
+        startAtPasswordImportLaunch()
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.SUCCESS))
+
+        orchestrator.onEvent(NewUserOnboardingEvent.Presented)
+
+        verify(onboardingPixelSender, never()).fire(eq(ONBOARDING_PASSWORD_IMPORT_COMPLETE), any())
+        verify(onboardingPixelSender, never()).fire(eq(ONBOARDING_PASSWORD_IMPORT_ERROR), any())
+    }
+
+    @Test
+    fun `when the import completed screen is continued then reports the click to the complete pixel`() = runTest {
+        startAtPasswordImportLaunch()
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.SUCCESS))
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportParsed(PasswordImportResult.Terminal.Imported(imported = 3, skipped = 1)))
+
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
+
+        assertStep(NewUserOnboardingStepIds.ADDRESS_BAR_POSITION)
+        verify(onboardingPixelSender).fire(ONBOARDING_PASSWORD_IMPORT_COMPLETE, OnboardingPixelAction.Clicked(engaged = true))
+    }
+
+    @Test
+    fun `when the import is parsed as failed then reports a permanent error`() = runTest {
+        startAtPasswordImportLaunch()
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.SUCCESS))
+
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportParsed(PasswordImportResult.Terminal.Failed))
+
         verify(onboardingPixelSender).fire(
-            ONBOARDING_PASSWORD_IMPORT,
-            OnboardingPixelAction.PasswordImportConfirmed(PasswordImportOutcome.SUCCESS),
+            ONBOARDING_PASSWORD_IMPORT_ERROR,
+            OnboardingPixelAction.PasswordImportErrorShown(transient = false),
+        )
+    }
+
+    @Test
+    fun `when the failed screen is presented and continued then both are reported to the error pixel`() = runTest {
+        startAtPasswordImportLaunch()
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.PERMANENT_ERROR))
+
+        orchestrator.onEvent(NewUserOnboardingEvent.Presented)
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
+
+        verify(onboardingPixelSender).fire(
+            ONBOARDING_PASSWORD_IMPORT_ERROR,
+            OnboardingPixelAction.PasswordImportErrorShown(transient = false),
+        )
+        verify(onboardingPixelSender).fire(
+            ONBOARDING_PASSWORD_IMPORT_ERROR,
+            OnboardingPixelAction.PasswordImportErrorClicked(PasswordImportErrorAction.CONTINUE),
         )
     }
 
@@ -1870,16 +1998,20 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
-    fun `when a download reason is confirmed then the clicked pixel fires and the variant is established`() = runTest {
+    fun `when a download reason is confirmed then it is persisted before the clicked pixel fires`() = runTest {
         startSegmentedAtDownloadReason()
 
         orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.BLOCK_ADS))
 
-        verify(onboardingPixelSender).fire(
-            ONBOARDING_DOWNLOAD_CHOICE,
-            OnboardingPixelAction.DownloadReasonClicked(DownloadReasonSelection.BLOCK_ADS),
-        )
-        verify(onboardingPixelSender).downloadReasonSelected(DownloadReasonSelection.BLOCK_ADS)
+        // The pixel sender reads the reason back off the store, so the step's own clicked pixel only
+        // carries the variant param if the write happens first.
+        inOrder(onboardingStore, onboardingPixelSender) {
+            verify(onboardingStore).setDownloadReason(DownloadReasonSelection.BLOCK_ADS)
+            verify(onboardingPixelSender).fire(
+                ONBOARDING_DOWNLOAD_CHOICE,
+                OnboardingPixelAction.DownloadReasonClicked(DownloadReasonSelection.BLOCK_ADS),
+            )
+        }
     }
 
     @Test

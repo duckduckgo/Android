@@ -488,6 +488,9 @@ class NativeInputLayoutCoordinator(
             return
         }
         fun applyOffset() {
+            // Before the first layout there is no bottom to measure, and translating by the full root
+            // height would throw the host off screen.
+            if (widgetView.bottom == 0) return
             val gap = maxOf(0, rootView.height - widgetView.bottom)
             if (widgetView.translationY != gap.toFloat()) {
                 widgetView.translationY = gap.toFloat()
@@ -498,13 +501,18 @@ class NativeInputLayoutCoordinator(
             View.OnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
                 applyOffset()
             }
+        // Both views matter: the root resizes when the keyboard hides, and the host is re-laid out a
+        // frame later. Listening to the root alone measured the gap against the host's pre-resize
+        // bottom and left the input parked below the screen.
         rootView.addOnLayoutChangeListener(layoutListener)
+        widgetView.addOnLayoutChangeListener(layoutListener)
         widgetView.addOnAttachStateChangeListener(
             object : View.OnAttachStateChangeListener {
                 override fun onViewAttachedToWindow(v: View) = Unit
 
                 override fun onViewDetachedFromWindow(v: View) {
                     rootView.removeOnLayoutChangeListener(layoutListener)
+                    v.removeOnLayoutChangeListener(layoutListener)
                     v.removeOnAttachStateChangeListener(this)
                 }
             },

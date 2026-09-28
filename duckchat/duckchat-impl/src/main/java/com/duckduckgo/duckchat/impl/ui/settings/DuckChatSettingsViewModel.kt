@@ -157,7 +157,7 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
                 searchAssistVisibility = searchAssistVisibility,
                 hideAiGeneratedImages = hideAiGeneratedImages,
                 isUseWithoutAiActionEnabled = !isAlreadyWithoutAi,
-                isDuckAiWebSettingsVisible = isDuckChatUserEnabled && duckChatFeature.duckAiSettings().isEnabled(),
+                isDuckAiWebSettingsVisible = isDuckChatUserEnabled,
             )
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 

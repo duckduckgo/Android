@@ -39,6 +39,7 @@ dependencies {
     implementation project(':library-loader-api')
     implementation project(':feature-toggles-api')
     implementation project(':data-store-api')
+    implementation "com.duckduckgo.crashkit:android-crashkit:_"
 
     implementation AndroidX.core.ktx
     implementation KotlinX.coroutines.core
@@ -79,6 +80,16 @@ android {
     externalNativeBuild {
         cmake {
             path "CMakeLists.txt"
+        }
+    }
+
+    packagingOptions {
+        jniLibs {
+            // Required: crashpad_handler.so is an executable that Crashpad launches as a
+            // subprocess via exec(). It must exist as a real file on disk. Without this,
+            // AGP stores .so files uncompressed inside the APK (not extracted), so the
+            // handler path would not resolve and StartHandler() would fail silently.
+            useLegacyPackaging = true
         }
     }
 }

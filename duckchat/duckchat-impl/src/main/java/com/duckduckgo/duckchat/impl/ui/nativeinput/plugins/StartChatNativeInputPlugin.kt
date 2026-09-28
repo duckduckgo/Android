@@ -37,6 +37,6 @@ class StartChatNativeInputPlugin @Inject constructor() : NativeInputPlugin {
     override val containerId: Int = R.id.startChatContainer
 
     override fun createView(context: Context, host: NativeInputHost): View = StartChatView(context).apply {
-        onIconClicked = { host.submit() }
+        this.host = host
     }
 }

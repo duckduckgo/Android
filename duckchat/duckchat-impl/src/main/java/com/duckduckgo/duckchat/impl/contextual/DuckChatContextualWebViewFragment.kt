@@ -344,12 +344,11 @@ class DuckChatContextualWebViewFragment :
                 domStorageEnabled = true
                 loadWithOverviewMode = true
                 useWideViewPort = true
-                builtInZoomControls = true
-                displayZoomControls = false
                 mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
                 setSupportMultipleWindows(true)
                 databaseEnabled = false
-                setSupportZoom(true)
+                // Pinch and double-tap zoom distort the chat layout, so zoom stays off in the contextual sheet.
+                setSupportZoom(false)
             }
 
             it.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
@@ -476,6 +475,7 @@ class DuckChatContextualWebViewFragment :
                     selectedTool = submitted.selectedTool,
                     imagesJson = submitted.imagesJson,
                     filesJson = submitted.filesJson,
+                    selectionsJson = submitted.selectionsJson,
                 )
             },
             onAskAboutPage = { viewModel.onAskAboutPageClicked() },

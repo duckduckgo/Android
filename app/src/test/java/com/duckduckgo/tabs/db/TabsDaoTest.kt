@@ -143,6 +143,101 @@ class TabsDaoTest {
     }
 
     @Test
+    fun whenSelectedBlankTabIsReplacedWithNonDeletableTargetThenCurrentIsDeletedAndTargetSelected() {
+        val current = TabEntity("current", url = null, position = 0)
+        val target = TabEntity("target", url = "https://example.com", position = 1, deletable = false)
+        testee.insertTab(current)
+        testee.insertTab(target)
+        testee.insertTabSelection(TabSelectionEntity(tabId = current.tabId))
+
+        assertTrue(testee.deleteSelectedBlankTabAndSelectTarget(current.tabId, target.tabId))
+
+        assertNull(testee.tab(current.tabId))
+        assertEquals(target, testee.selectedTab())
+    }
+
+    @Test
+    fun whenCurrentTabIsNotSelectedThenOperationDoesNothing() {
+        val current = TabEntity("current", url = null, position = 0)
+        val selected = TabEntity("selected", url = "https://example.com", position = 1)
+        testee.insertTab(current)
+        testee.insertTab(selected)
+        testee.insertTabSelection(TabSelectionEntity(tabId = selected.tabId))
+
+        assertFalse(testee.deleteSelectedBlankTabAndSelectTarget(current.tabId, selected.tabId))
+
+        assertUnchanged(current, selected)
+        assertEquals(selected, testee.tab(selected.tabId))
+    }
+
+    @Test
+    fun whenCurrentTabHasUrlThenOperationDoesNothing() {
+        val current = TabEntity("current", url = "https://example.com", position = 0)
+        val target = TabEntity("target", url = "https://target.example.com", position = 1)
+        testee.insertTab(current)
+        testee.insertTab(target)
+        testee.insertTabSelection(TabSelectionEntity(tabId = current.tabId))
+
+        assertFalse(testee.deleteSelectedBlankTabAndSelectTarget(current.tabId, target.tabId))
+
+        assertUnchanged(current, current)
+        assertEquals(target, testee.tab(target.tabId))
+    }
+
+    @Test
+    fun whenCurrentTabIsMissingThenOperationDoesNothing() {
+        val target = TabEntity("target", url = "https://example.com", position = 0)
+        testee.insertTab(target)
+        testee.insertTabSelection(TabSelectionEntity(tabId = target.tabId))
+
+        assertFalse(testee.deleteSelectedBlankTabAndSelectTarget("current", target.tabId))
+
+        assertUnchanged(target, target)
+        assertEquals(target, testee.tab(target.tabId))
+    }
+
+    @Test
+    fun whenTargetTabIsMissingThenOperationDoesNothing() {
+        val current = TabEntity("current", url = null, position = 0)
+        testee.insertTab(current)
+        testee.insertTabSelection(TabSelectionEntity(tabId = current.tabId))
+
+        assertFalse(testee.deleteSelectedBlankTabAndSelectTarget(current.tabId, "target"))
+
+        assertUnchanged(current, current)
+    }
+
+    @Test
+    fun whenTargetIsDeletableThenOperationDoesNothing() {
+        val current = TabEntity("current", url = null, position = 0)
+        val target = TabEntity("target", url = "https://example.com", position = 1, deletable = true)
+        testee.insertTab(current)
+        testee.insertTab(target)
+        testee.insertTabSelection(TabSelectionEntity(tabId = current.tabId))
+
+        assertFalse(testee.deleteSelectedBlankTabAndSelectTarget(current.tabId, target.tabId))
+
+        assertUnchanged(current, current)
+        assertEquals(target, testee.tab(target.tabId))
+    }
+
+    @Test
+    fun whenCurrentAndTargetAreEqualThenOperationDoesNothing() {
+        val current = TabEntity("current", url = null, position = 0)
+        testee.insertTab(current)
+        testee.insertTabSelection(TabSelectionEntity(tabId = current.tabId))
+
+        assertFalse(testee.deleteSelectedBlankTabAndSelectTarget(current.tabId, current.tabId))
+
+        assertUnchanged(current, current)
+    }
+
+    private fun assertUnchanged(current: TabEntity, selected: TabEntity) {
+        assertEquals(current, testee.tab(current.tabId))
+        assertEquals(selected, testee.selectedTab())
+    }
+
+    @Test
     fun whenTabIsUpdatedThenExistingRecordIsUpdated() {
         val initial = TabEntity("TAB_ID", "http//example.com", position = 0)
         val updated = TabEntity("TAB_ID", "http//updatedexample.com", position = 1)

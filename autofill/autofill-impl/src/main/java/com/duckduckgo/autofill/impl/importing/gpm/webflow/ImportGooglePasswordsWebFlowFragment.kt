@@ -25,6 +25,7 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.widget.Toolbar
+import androidx.core.os.BundleCompat
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.Lifecycle
@@ -34,6 +35,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.webkit.WebViewCompat
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
+import com.duckduckgo.autofill.api.AutofillImportLaunchSource
+import com.duckduckgo.autofill.api.AutofillImportLaunchSource.Unknown
 import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.CredentialAutofillDialogFactory
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
@@ -50,6 +53,7 @@ import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordRe
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.Command.InjectCredentialsFromReauth
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.Command.NoCredentialsAvailable
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.Command.PromptUserToSelectFromStoredCredentials
+import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.Factory
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.UserCannotImportReason
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.ViewState.Initializing
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.ViewState.LoadStartPage
@@ -68,7 +72,6 @@ import com.duckduckgo.autofill.impl.store.ReAuthenticationDetails
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.user.agent.api.UserAgentProvider
@@ -96,7 +99,7 @@ class ImportGooglePasswordsWebFlowFragment :
     lateinit var dispatchers: DispatcherProvider
 
     @Inject
-    lateinit var viewModelFactory: FragmentViewModelFactory
+    lateinit var viewModelFactory: Factory
 
     @Inject
     lateinit var credentialAutofillDialogFactory: CredentialAutofillDialogFactory
@@ -121,8 +124,14 @@ class ImportGooglePasswordsWebFlowFragment :
 
     private var binding: FragmentImportGooglePasswordsWebflowBinding? = null
 
+    private val launchSource: AutofillImportLaunchSource
+        get() = BundleCompat.getParcelable(arguments ?: Bundle(), KEY_LAUNCH_SOURCE, AutofillImportLaunchSource::class.java) ?: Unknown
+
     private val viewModel by lazy {
-        ViewModelProvider(requireActivity(), viewModelFactory)[ImportGooglePasswordsWebFlowViewModel::class.java]
+        ViewModelProvider(
+            requireActivity(),
+            Factory.Provider(viewModelFactory, launchSource),
+        )[ImportGooglePasswordsWebFlowViewModel::class.java]
     }
 
     override fun onCreateView(
@@ -462,6 +471,13 @@ class ImportGooglePasswordsWebFlowFragment :
     }
 
     companion object {
+        fun newInstance(source: AutofillImportLaunchSource): ImportGooglePasswordsWebFlowFragment {
+            return ImportGooglePasswordsWebFlowFragment().apply {
+                arguments = Bundle().apply { putParcelable(KEY_LAUNCH_SOURCE, source) }
+            }
+        }
+
+        private const val KEY_LAUNCH_SOURCE = "launchSource"
         private const val CUSTOM_FLOW_TAB_ID = "import-passwords-webflow"
         private const val SELECT_CREDENTIALS_FRAGMENT_TAG = "autofillSelectCredentialsDialog"
     }

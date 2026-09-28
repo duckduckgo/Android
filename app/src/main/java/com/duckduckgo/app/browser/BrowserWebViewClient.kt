@@ -64,6 +64,8 @@ import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
 import com.duckduckgo.app.browser.mediaplayback.MediaPlayback
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
+import com.duckduckgo.app.browser.pageload.PageLoadTraceMarker
+import com.duckduckgo.app.browser.pageload.PageLoadTracer
 import com.duckduckgo.app.browser.pageload.PageLoadWideEvent
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedHandler
 import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedHandler
@@ -142,6 +144,7 @@ class BrowserWebViewClient @Inject constructor(
     private val contentScopeExperiments: ContentScopeExperiments,
     private val appSchemeInterceptionFeature: AppSchemeInterceptionFeature,
     private val forceWebViewRecompositeFeature: ForceWebViewRecompositeFeature,
+    private val pageLoadTracer: PageLoadTracer,
     private val browserMode: BrowserMode,
 ) : WebViewClient() {
     var webViewClientListener: WebViewClientListener? = null
@@ -163,6 +166,8 @@ class BrowserWebViewClient @Inject constructor(
     private var lastInterceptedAppSchemeUrl: String? = null
     private var pageCommitVisibleFired: Boolean = false
     private var recompositeScheduled: Boolean = false
+
+    private val pageLoadTraceMarker = PageLoadTraceMarker(pageLoadTracer)
 
     private val isAppSchemeInterceptionEnabled = AtomicBoolean(true)
     private val isForceRecompositeEnabled = AtomicBoolean(true)
@@ -589,7 +594,7 @@ class BrowserWebViewClient @Inject constructor(
 
         var wideEventNavigation: Pair<String, Long>? = null
         url?.let {
-            // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
+            pageLoadTraceMarker.onPageStarted(it)
             if (it != ABOUT_BLANK) {
                 if (start == null) {
                     start = currentTimeProvider.elapsedRealtime()
@@ -746,6 +751,7 @@ class BrowserWebViewClient @Inject constructor(
 
         // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
         if (webView.progress == 100) {
+            pageLoadTraceMarker.onPageFinished(url, webView.progress)
             // Without onPageCommitVisible a recycled WebView keeps drawing the previous
             // navigation's frame until a re-composite. Only worth doing for a foreground tab.
             // onPageFinished can fire more than once per load (redirects, subframes), so latch

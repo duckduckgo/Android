@@ -351,4 +351,24 @@
     <string name="duckChatContextualAskAboutPage">Întreabă despre pagină</string>
     <string name="duckChatContextualAskAboutSearch">Continuă în Duck.ai</string>
     <string name="duckChatContextualOpenDuckAi">Deschide Duck.ai</string>
+
+    <!-- Suggested prompts for text selection -->
+    <string name="duckAiSuggestionSummarizeSelectionLabel">Rezumă această selecție</string>
+    <string name="duckAiSuggestionSummarizeSelectionPrompt">Rezumă această selecție.</string>
+    <string name="duckAiSuggestionTranslateSelectionLabel">Tradu această selecție</string>
+    <string name="duckAiSuggestionTranslateSelectionPrompt" instruction="%1$s is replaced with the name of the user&apos;s language.">Tradu această selecție în %1$s.</string>
+
+    <!-- Name shown for an attached text selection in the Duck.ai -->
+    <string name="duckAiTextSelectionAttachmentTitle">Selecție de text</string>
+    <string name="duckAiTextSelectionLimitReached" instruction="%1$d is replaced with the maximum number of text selections.">Poți adăuga până la %1$d selecții de text. Elimină una pentru a adăuga alta.</string>
+
+    <!-- Duck.ai text selection menu action -->
+    <string name="duckAiTextSelectionMenuItem">Întreabă Duck.ai</string>
+
+    <!-- Prefix on the Duck.ai attachment chip for a text selection -->
+    <plurals name="duckAiTextSelectionWordCount">
+        <item quantity="one">%1$d cuvânt</item>
+        <item quantity="few">%1$d cuvinte</item>
+        <item quantity="other">%1$d de cuvinte</item>
+    </plurals>
 </resources>

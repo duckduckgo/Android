@@ -256,7 +256,7 @@ class DialogConfigResolver @Inject constructor(
                 action = CtaAction.Emit(NewUserOnboardingEvent.PasswordImportRequested),
             ),
             secondaryCta = CtaConfig(
-                text = TextConfig.Resource(R.string.preOnboardingImportPasswordsSecondaryCta),
+                text = TextConfig.Resource(R.string.preOnboardingWidgetPromptSecondaryCta),
                 action = CtaAction.Emit(NewUserOnboardingEvent.PasswordImportSkipped),
             ),
         )

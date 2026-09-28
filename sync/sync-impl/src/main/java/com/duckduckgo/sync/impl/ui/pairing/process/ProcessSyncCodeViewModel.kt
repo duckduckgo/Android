@@ -33,6 +33,7 @@ import com.duckduckgo.sync.impl.SyncAuthCode.Unknown
 import com.duckduckgo.sync.impl.SyncCodeDispatcher
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.autorestore.SyncAutoRestoreManager
+import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
 import com.duckduckgo.sync.impl.onFailure
 import com.duckduckgo.sync.impl.onSuccess
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters
@@ -128,15 +129,11 @@ class ProcessSyncCodeViewModel @AssistedInject constructor(
     }
 
     fun onAcknowledgmentConfirmed() {
-        _viewState.update { it.copy(dialog = null) }
-        if (viewState.value.isWaitingForOtherDevice) return
-        viewModelScope.launch {
-            _commands.send(Command.RunAcknowledgmentAnimation)
-        }
+        dismissDialogAndRunAnimation()
     }
 
     fun onHostConfirmed() {
-        _viewState.update { it.copy(dialog = DialogType.PairingAcknowledgment) }
+        handleRoleConfirmation()
         codeDispatcher.confirmHost()
     }
 
@@ -146,7 +143,7 @@ class ProcessSyncCodeViewModel @AssistedInject constructor(
     }
 
     fun onJoinerConfirmed() {
-        _viewState.update { it.copy(dialog = DialogType.PairingAcknowledgment) }
+        handleRoleConfirmation()
         codeDispatcher.confirmJoiner()
     }
 
@@ -273,19 +270,31 @@ class ProcessSyncCodeViewModel @AssistedInject constructor(
             is DispatchOutcome.LinkingCodeReady -> Unit
 
             is DispatchOutcome.HostConfirmationRequested -> {
-                _viewState.update { it.copy(dialog = DialogType.HostConfirmation(outcome.peerName, outcome.peerKind)) }
+                _viewState.update {
+                    it.copy(
+                        protocolVersion = outcome.protocolVersion,
+                        dialog = DialogType.HostConfirmation(outcome.peerName, outcome.peerKind),
+                    )
+                }
             }
 
             is DispatchOutcome.JoinerConfirmationRequested -> {
-                _viewState.update { it.copy(dialog = DialogType.JoinerConfirmation(outcome.peerName, outcome.peerKind)) }
+                _viewState.update {
+                    it.copy(
+                        protocolVersion = outcome.protocolVersion,
+                        dialog = DialogType.JoinerConfirmation(outcome.peerName, outcome.peerKind),
+                    )
+                }
             }
 
             is DispatchOutcome.LoggedIn -> {
                 val stateBeforeLogin = viewState.value
                 _viewState.update { it.copy(isLoggedIn = true, isWaitingForOtherDevice = false, dialog = null) }
-                // The animation normally starts when the user confirms the acknowledgment dialog; if the
-                // login lands while that dialog is still open, it has to be started here or the wait for
-                // the animation below would never finish.
+                // The animation normally starts on role confirmation (v2.1+) or on confirming the
+                // acknowledgment dialog (v2.0); if the login lands while that dialog is still open, or
+                // while we were waiting for the other device (where confirming skips the animation), it
+                // has to be started here or the wait below would never finish. A duplicate command is
+                // harmless: the Activity plays the animation at most once.
                 val startAnimation = outcome.path == SetupPath.RECOVERY ||
                     stateBeforeLogin.isWaitingForOtherDevice ||
                     stateBeforeLogin.dialog == DialogType.PairingAcknowledgment
@@ -340,6 +349,23 @@ class ProcessSyncCodeViewModel @AssistedInject constructor(
         fireLoginSuccessPixels(path, myRole, peerKind)
         _commands.send(Command.SetPairingResult(pairingResult()))
         _commands.send(Command.Close)
+    }
+
+    private fun handleRoleConfirmation() {
+        val protocol = _viewState.value.protocolVersion
+        if (protocol == null || protocol < ExchangeProtocolVersion.V2_1) {
+            _viewState.update { it.copy(dialog = DialogType.PairingAcknowledgment) }
+        } else {
+            dismissDialogAndRunAnimation()
+        }
+    }
+
+    private fun dismissDialogAndRunAnimation() {
+        _viewState.update { it.copy(dialog = null) }
+        if (viewState.value.isWaitingForOtherDevice) return
+        viewModelScope.launch {
+            _commands.send(Command.RunAcknowledgmentAnimation)
+        }
     }
 
     private fun fireCodeParsedPixel(decision: RouteDecision) {
@@ -411,6 +437,7 @@ class ProcessSyncCodeViewModel @AssistedInject constructor(
     internal data class ViewState(
         val isLoggedIn: Boolean = false,
         val isWaitingForOtherDevice: Boolean = false,
+        val protocolVersion: ExchangeProtocolVersion.V2? = null,
         val dialog: DialogType? = null,
     )
 

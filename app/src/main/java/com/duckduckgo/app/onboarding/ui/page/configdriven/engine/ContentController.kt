@@ -56,7 +56,7 @@ interface ContentController {
 class ContentControllerImpl(
     private val binding: PreOnboardingDaxDialogCtaBrandDesignUpdateBinding,
     private val contentValues: ContentValueStore,
-    private val onContentBound: (LinearOnboardingStepId, ContentConfig) -> Unit,
+    private val onBeforeContentBound: (LinearOnboardingStepId, ContentConfig) -> Unit,
     isLightMode: () -> Boolean,
     isAddressBarRebrandEnabled: () -> Boolean,
 ) : ContentController {
@@ -95,7 +95,7 @@ class ContentControllerImpl(
         content: ContentConfig,
         scope: BindScope,
     ): ContentHandle {
-        onContentBound(stepId, content)
+        onBeforeContentBound(stepId, content)
         val handle = when (content) {
             is ContentConfig.Welcome -> {
                 boundView = welcome.view

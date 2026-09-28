@@ -37,21 +37,21 @@
         android:id="@+id/aboutSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:leadingIcon="@drawable/ic_duckduckgo_color_24"
+        app:leadingIcon="@drawable/duckduckgo_color_24"
         app:primaryText="@string/settingsHeadingAbout" />
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/shareFeedbackSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:leadingIcon="@drawable/ic_feedback_color_24"
+        app:leadingIcon="@drawable/feedback_color_24"
         app:primaryText="@string/leaveFeedbackNew" />
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/ddgOnOtherPlatformsSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:leadingIcon="@drawable/ic_downloads_color_24"
+        app:leadingIcon="@drawable/downloads_color_24"
         app:primaryText="@string/settingsDDGOnOtherPlatforms"
         app:trailingIcon="@drawable/ic_open_in_16"
         app:trailingIconTint="?attr/daxColorSecondaryIcon" />
@@ -60,7 +60,7 @@
         android:id="@+id/getDesktopBrowserSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:leadingIcon="@drawable/ic_device_laptop_install_color_24"
+        app:leadingIcon="@drawable/device_laptop_install_color_24"
         app:primaryText="@string/getDesktopBrowserSettingItemTitle"
         app:secondaryText="@string/getDesktopBrowserSettingItemSubtitleTitle" />
 

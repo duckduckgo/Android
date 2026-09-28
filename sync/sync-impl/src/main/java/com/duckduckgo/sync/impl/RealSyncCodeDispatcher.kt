@@ -308,10 +308,18 @@ class RealSyncCodeDispatcher @Inject constructor(
         peerKind: PeerKind?,
     ): DispatchOutcome? = when (transition.to) {
         ExchangeV2State.Joiner.Confirming ->
-            DispatchOutcome.JoinerConfirmationRequested(peerName = runner.peerName, peerKind = peerKind)
+            DispatchOutcome.JoinerConfirmationRequested(
+                peerName = runner.peerName,
+                protocolVersion = runner.protocolVersion,
+                peerKind = peerKind,
+            )
 
         ExchangeV2State.Host.Confirming ->
-            DispatchOutcome.HostConfirmationRequested(peerName = runner.peerName, peerKind = peerKind)
+            DispatchOutcome.HostConfirmationRequested(
+                peerName = runner.peerName,
+                protocolVersion = runner.protocolVersion,
+                peerKind = peerKind,
+            )
 
         ExchangeV2State.Host.Done -> hostDoneToOutcome(transition.trigger, peerKind)
 

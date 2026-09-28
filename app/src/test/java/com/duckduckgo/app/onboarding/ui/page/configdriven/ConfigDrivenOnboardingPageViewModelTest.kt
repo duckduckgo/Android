@@ -182,7 +182,7 @@ class ConfigDrivenOnboardingPageViewModelTest {
 
     private fun bindContent(testee: ConfigDrivenOnboardingPageViewModel) {
         val dialog = testee.viewState.value.screen as Screen.Dialog
-        testee.onContentBound(dialog.stepId, dialog.config.content)
+        testee.onBeforeContentBound(dialog.stepId, dialog.config.content)
     }
 
     private fun importCompleteState(testee: ConfigDrivenOnboardingPageViewModel): MutableStateFlow<ImportCompleteContentState> {
@@ -731,7 +731,7 @@ class ConfigDrivenOnboardingPageViewModelTest {
         advanceUntilIdle()
 
         assertFalse(testee.viewState.value.showPasswordImportError)
-        assertTrue(recordedEvents.contains(NewUserOnboardingEvent.PasswordImportRequested))
+        assertTrue(recordedEvents.contains(NewUserOnboardingEvent.PasswordImportErrorRetryRequested))
     }
 
     @Test
@@ -742,11 +742,11 @@ class ConfigDrivenOnboardingPageViewModelTest {
         testee.onPasswordImportResult(Activity.RESULT_OK, null)
         advanceUntilIdle()
 
-        testee.onPasswordImportErrorSkipped()
+        testee.onPasswordImportErrorCancelled()
         advanceUntilIdle()
 
         assertFalse(testee.viewState.value.showPasswordImportError)
-        assertTrue(recordedEvents.contains(NewUserOnboardingEvent.PasswordImportSkipped))
+        assertTrue(recordedEvents.contains(NewUserOnboardingEvent.PasswordImportErrorCancelled))
     }
 
     @Test

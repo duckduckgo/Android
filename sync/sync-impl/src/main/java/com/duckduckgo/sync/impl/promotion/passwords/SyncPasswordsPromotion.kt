@@ -131,7 +131,7 @@ class SyncPasswordsPromotionView @JvmOverloads constructor(
         with(binding.syncPromotion) {
             setMessage(
                 Message(
-                    topIllustration = R.drawable.ic_sync_ok_48,
+                    topIllustration = R.drawable.sync_check_56,
                     title = context.getString(R.string.syncPromoTitlePasswords),
                     subtitle = context.getString(R.string.syncPromoSubtitlePasswords),
                     action = context.getString(R.string.syncPromoPrimaryButton),

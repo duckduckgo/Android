@@ -25,7 +25,7 @@ class SettingsActivityAppTpIconTest {
     @Test
     fun whenPictogramsAreEnabledThenAppTpUsesHomescreenLockIcon() {
         assertEquals(
-            CommonR.drawable.ic_homescreen_lock_color_24,
+            CommonR.drawable.homescreen_lock_color_24,
             resolveAppTpSettingsIcon(isPictogramsEnabled = true),
         )
     }
@@ -33,7 +33,7 @@ class SettingsActivityAppTpIconTest {
     @Test
     fun whenPictogramsAreDisabledThenAppTpUsesSharedLockIcon() {
         assertEquals(
-            CommonR.drawable.ic_lock_color_24,
+            CommonR.drawable.lock_color_24,
             resolveAppTpSettingsIcon(isPictogramsEnabled = false),
         )
     }

@@ -202,6 +202,7 @@ interface DuckChatPixels {
     fun reportContextualAddressBarMenuNewChatSelected()
     fun reportContextualAddressBarMenuAskAboutPageSelected()
     fun reportContextualAddressBarMenuAskAboutSearchSelected()
+    fun reportContextualAddressBarMenuAllChatsSelected()
     fun reportContextualFloatingInputShown()
     fun reportContextualFloatingInputDismissedWithoutSubmission()
     fun reportContextualFloatingInputPromotedToSheet()
@@ -252,6 +253,15 @@ interface DuckChatPixels {
 
     /** Subscription upsell triggered by tapping a gated model or reasoning option. */
     fun fireSubscriptionUpsellTriggered(source: String, currentTier: String, requiredTier: String, flowType: String, origin: String)
+
+    /**
+     * Subscription-funnel impression: a picker was shown with a gated section, so the user saw the
+     * upsell. Pairs with [fireSubscriptionUpsellTriggered], which fires when they tap a gated row.
+     */
+    fun firePickerUpsellShown(source: String, header: String, currentTier: String, origin: String)
+
+    /** Debug: the models endpoint returned a label this version does not recognise. */
+    fun fireUnknownModelLabel(label: String)
 
     /** Subscription-funnel impression: the model picker was shown. [origin] identifies the entry point. */
     fun fireModelPickerShown(origin: String)
@@ -790,6 +800,13 @@ class RealDuckChatPixels @Inject constructor(
         }
     }
 
+    override fun reportContextualAddressBarMenuAllChatsSelected() {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_ALL_CHATS_SELECTED_COUNT)
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_ALL_CHATS_SELECTED_DAILY, type = Pixel.PixelType.Daily())
+        }
+    }
+
     override fun reportContextualFloatingInputShown() {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             pixel.fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_FLOATING_INPUT_SHOWN_COUNT)
@@ -1009,6 +1026,33 @@ class RealDuckChatPixels @Inject constructor(
                     DuckChatPixelParameters.UPSELL_FLOW_TYPE to flowType,
                     DuckChatPixelParameters.ORIGIN to origin,
                 ),
+            )
+        }
+    }
+
+    override fun firePickerUpsellShown(source: String, header: String, currentTier: String, origin: String) {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            pixel.fire(
+                DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_PICKER_UPSELL_SHOWN,
+                parameters = mapOf(
+                    DuckChatPixelParameters.UPSELL_SOURCE to source,
+                    DuckChatPixelParameters.UPSELL_HEADER to header,
+                    DuckChatPixelParameters.UPSELL_CURRENT_TIER to currentTier,
+                    DuckChatPixelParameters.ORIGIN to origin,
+                ),
+            )
+        }
+    }
+
+    override fun fireUnknownModelLabel(label: String) {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            val name = DuckChatPixelName.DUCK_CHAT_MODEL_LABEL_UNKNOWN_DAILY
+            pixel.fire(
+                name,
+                parameters = mapOf(DuckChatPixelParameters.MODEL_LABEL to label),
+                // Daily dedupes on the tag, ignoring parameters, so key it by label: otherwise the
+                // first unknown label of the day would hide every other one.
+                type = Pixel.PixelType.Daily(tag = "${name.pixelName}_$label"),
             )
         }
     }
@@ -1429,6 +1473,8 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_ASK_ABOUT_PAGE_SELECTED_DAILY("aichat_contextual_address_bar_menu_ask_about_page_selected_daily"),
     DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_ASK_ABOUT_SEARCH_SELECTED_COUNT("aichat_contextual_address_bar_menu_ask_about_search_selected_count"),
     DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_ASK_ABOUT_SEARCH_SELECTED_DAILY("aichat_contextual_address_bar_menu_ask_about_search_selected_daily"),
+    DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_ALL_CHATS_SELECTED_COUNT("aichat_contextual_address_bar_menu_all_chats_selected_count"),
+    DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_ALL_CHATS_SELECTED_DAILY("aichat_contextual_address_bar_menu_all_chats_selected_daily"),
     DUCK_CHAT_CONTEXTUAL_OPEN_DUCKAI_MENU_TAPPED_COUNT("aichat_contextual_open_duckai_menu_tapped_count"),
     DUCK_CHAT_CONTEXTUAL_OPEN_DUCKAI_MENU_TAPPED_DAILY("aichat_contextual_open_duckai_menu_tapped_daily"),
     DUCK_CHAT_CONTEXTUAL_FLOATING_INPUT_SHOWN_COUNT("aichat_contextual_floating_input_opened_count"),
@@ -1541,6 +1587,8 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
 
     // Subscription-funnel impressions. The matching "click" is DUCK_CHAT_UNIFIED_INPUT_SUBSCRIPTION_UPSELL_TRIGGERED.
     DUCK_CHAT_UNIFIED_INPUT_MODEL_PICKER_SHOWN("m_aichat_unified_input_model_picker_shown"),
+    DUCK_CHAT_UNIFIED_INPUT_PICKER_UPSELL_SHOWN("m_aichat_unified_input_picker_upsell_shown"),
+    DUCK_CHAT_MODEL_LABEL_UNKNOWN_DAILY("m_aichat_model_label_unknown_daily"),
     DUCK_CHAT_UNIFIED_INPUT_REASONING_EFFORT_PICKER_SHOWN("m_aichat_unified_input_reasoning_effort_picker_shown"),
 }
 
@@ -1582,6 +1630,8 @@ object DuckChatPixelParameters {
     const val UPSELL_CURRENT_TIER = "current_tier"
     const val UPSELL_REQUIRED_TIER = "required_tier"
     const val UPSELL_FLOW_TYPE = "flow_type"
+    const val UPSELL_HEADER = "header"
+    const val MODEL_LABEL = "label"
 
     // Subscription-funnel telemetry: the entry-point origin (e.g. funnel_duckai_android__modelpicker)
     const val ORIGIN = "origin"

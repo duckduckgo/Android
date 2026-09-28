@@ -213,13 +213,7 @@
     <!-- Get Desktop Browser -->
     <string name="getDesktopBrowserSettingItemTitle">Вземете браузъра за работен плот</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo за Mac и Windows</string>
-    <string name="getDesktopBrowserTitle">Защитете личната си информация и на Mac, и на Windows!</string>
-    <string name="getDesktopBrowserBody">За да изтеглите DuckDuckGo за Mac или Windows, посетете:</string>
-    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
-    <string name="getDesktopBrowserShareDownloadLink">Споделяне на връзка за изтегляне</string>
-    <string name="getDesktopBrowserNoThanks">Не, благодаря</string>
     <string name="getDesktopBrowserHideItem">Скрий</string>
-    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Връзката е копирана</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Защита от изскачащи прозорци за бисквитки</string>
@@ -965,6 +959,22 @@
     <string name="preOnboardingWidgetPromptBody">Добавете нашето приспособление за търсене към началния екран за бърз и лесен достъп.</string>
     <string name="preOnboardingWidgetPromptPrimaryCta">Добавяне на приспособлението</string>
     <string name="preOnboardingWidgetPromptSecondaryCta">Пропускане</string>
+
+    <!-- Pre-onboarding: import passwords -->
+    <string name="preOnboardingImportPasswordsTitle">Импортиране на пароли от Google</string>
+    <string name="preOnboardingImportPasswordsBody">Google може да Ви помоли да влезете или да въведете паролата си, за да потвърдите.</string>
+    <string name="preOnboardingImportPasswordsPrimaryCta">Импортиране от Google</string>
+    <string name="preOnboardingImportCompleteTitle">Импортирането е завършено</string>
+    <string name="preOnboardingImportCompleteCta">Продължаване</string>
+    <string name="preOnboardingImportCompleteParsingTitle">Импортиране на пароли</string>
+    <string name="preOnboardingImportCompleteParsingBody">Това ще отнеме само няколко секунди.</string>
+    <string name="preOnboardingImportCompleteFailedTitle">Импортирането е неуспешно</string>
+    <string name="preOnboardingImportCompleteFailed">Импортирането на паролата е неуспешно</string>
+    <string name="preOnboardingImportCompleteImported" instruction="Placeholder is the number of passwords that were imported.">Импортирани пароли: %1$s</string>
+    <string name="preOnboardingImportCompleteSkipped" instruction="Placeholder is the number of passwords that were not imported.">Пропуснати (дублирани или невалидни): %1$s</string>
+    <string name="preOnboardingImportErrorTitle">Възникна някаква грешка</string>
+    <string name="preOnboardingImportErrorBody">Моля, опитайте отново.</string>
+    <string name="preOnboardingImportErrorRetry">Нов опит</string>
 
     <!-- Pre-onboarding: add to home screen -->
     <string name="preOnboardingDockStepTitle">Добавете ме към реда с любими.</string>

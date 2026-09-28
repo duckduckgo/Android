@@ -42,4 +42,11 @@
         android:title="@string/duck_ai_chat_history_action_fire_content_description"
         app:showAsAction="always" />
 
+    <item
+        android:id="@+id/chat_history_action_overflow"
+        android:icon="@drawable/ic_menu_vertical_24"
+        android:title="@string/duck_ai_chat_history_action_overflow_content_description"
+        android:visible="false"
+        app:showAsAction="always" />
+
 </menu>

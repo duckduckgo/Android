@@ -176,15 +176,6 @@ class OmnibarLayoutViewModel @Inject constructor(
         }
     }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.Eagerly, _viewState.value)
 
-    private fun ViewMode.toBrowserViewMode(): BrowserViewMode = when (this) {
-        is Browser -> BrowserViewMode.Browser
-        is ViewMode.Pdf -> BrowserViewMode.Browser
-        is NewTab -> BrowserViewMode.NewTab
-        is CustomTab -> BrowserViewMode.CustomTab
-        is ViewMode.DuckAI -> BrowserViewMode.DuckAi
-        is Error, is SSLWarning, is MaliciousSiteWarning -> BrowserViewMode.Error
-    }
-
     private fun getViewMode(state: ViewState): ViewMode {
         return if (state.viewMode is CustomTab) {
             val domain = if (state.url.isBlank()) state.omnibarText else state.url.extractDomain()
@@ -1347,4 +1338,13 @@ class OmnibarLayoutViewModel @Inject constructor(
     companion object {
         private const val ABOUT_BLANK = "about:blank"
     }
+}
+
+internal fun ViewMode.toBrowserViewMode(): BrowserViewMode = when (this) {
+    is Browser -> BrowserViewMode.Browser
+    is ViewMode.Pdf -> BrowserViewMode.Browser
+    is NewTab -> BrowserViewMode.NewTab
+    is CustomTab -> BrowserViewMode.CustomTab
+    is ViewMode.DuckAI -> BrowserViewMode.DuckAi
+    is Error, is SSLWarning, is MaliciousSiteWarning -> BrowserViewMode.Error
 }

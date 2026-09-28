@@ -352,4 +352,25 @@
     <string name="duckChatContextualAskAboutPage">Klausk apie puslapį</string>
     <string name="duckChatContextualAskAboutSearch">Tęsti platformoje „Duck.ai“</string>
     <string name="duckChatContextualOpenDuckAi">Atidaryti „Duck.ai“</string>
+
+    <!-- Suggested prompts for text selection -->
+    <string name="duckAiSuggestionSummarizeSelectionLabel">Pateik pasirinkto teksto santrauką</string>
+    <string name="duckAiSuggestionSummarizeSelectionPrompt">Pateik pasirinkto teksto santrauką.</string>
+    <string name="duckAiSuggestionTranslateSelectionLabel">Išversk pasirinktą tekstą</string>
+    <string name="duckAiSuggestionTranslateSelectionPrompt" instruction="%1$s is replaced with the name of the user&apos;s language.">Išversk pasirinktą tekstą į %1$s kalbą.</string>
+
+    <!-- Name shown for an attached text selection in the Duck.ai -->
+    <string name="duckAiTextSelectionAttachmentTitle">Pasirinktas tekstas</string>
+    <string name="duckAiTextSelectionLimitReached" instruction="%1$d is replaced with the maximum number of text selections.">Gali pridėti iki %1$d pažymėto teksto fragmentų. Pašalink vieną, kad pridėtum kitą.</string>
+
+    <!-- Duck.ai text selection menu action -->
+    <string name="duckAiTextSelectionMenuItem">Klauskite „Duck.ai“</string>
+
+    <!-- Prefix on the Duck.ai attachment chip for a text selection -->
+    <plurals name="duckAiTextSelectionWordCount">
+        <item quantity="one">%1$d žodis</item>
+        <item quantity="few">%1$d žodžiai</item>
+        <item quantity="many">%1$d žodžio</item>
+        <item quantity="other">%1$d žodžių</item>
+    </plurals>
 </resources>

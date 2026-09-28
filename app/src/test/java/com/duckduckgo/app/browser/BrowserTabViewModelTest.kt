@@ -128,6 +128,8 @@ import com.duckduckgo.app.browser.logindetection.LoginDetected
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
 import com.duckduckgo.app.browser.logindetection.NavigationEvent
 import com.duckduckgo.app.browser.logindetection.NavigationEvent.LoginAttempt
+import com.duckduckgo.app.browser.menu.BrowserMenuAcknowledgement
+import com.duckduckgo.app.browser.menu.BrowserViewMode
 import com.duckduckgo.app.browser.menu.VpnMenuStateProvider
 import com.duckduckgo.app.browser.modals.NewTabPageModalPresenterRegistry
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
@@ -222,10 +224,10 @@ import com.duckduckgo.app.onboarding.OnboardingInputScreenLaunchTarget
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.AppStage.ESTABLISHED
 import com.duckduckgo.app.onboarding.store.OnboardingStore
-import com.duckduckgo.app.onboarding.store.SegmentedOnboardingPath
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
+import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
 import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.AppPixelName
@@ -255,6 +257,7 @@ import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.systemsearch.DeviceAppLookup
 import com.duckduckgo.app.tabs.model.AggregateTabProvider
 import com.duckduckgo.app.tabs.model.DuckAiTabSessionRepository
+import com.duckduckgo.app.tabs.model.TabAtomicOperations
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabPageContextRepository
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -294,6 +297,7 @@ import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.browser.ui.autocomplete.AutocompleteHistoryDeleteFeature
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
+import com.duckduckgo.browser.ui.newtab.hatch.NewTabReturnHatchFeature
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -322,6 +326,7 @@ import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
+import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.contextual.PageContextJSHelper
 import com.duckduckgo.duckchat.impl.contextual.RealPageContextJSHelper.Companion.PAGE_CONTEXT_FEATURE_NAME
@@ -472,6 +477,8 @@ class BrowserTabViewModelTest {
     private val mockOmnibarConverter: OmnibarEntryConverter = mock()
 
     private val mockTabRepository: TabRepository = mock()
+
+    private val mockTabAtomicOperations: TabAtomicOperations = mock()
 
     private val mockAggregateTabProvider: AggregateTabProvider = mock()
 
@@ -745,6 +752,7 @@ class BrowserTabViewModelTest {
     private var fakeFaviconFetchingFixFeature = FakeFeatureToggleFactory.create(FaviconFetchingFixFeature::class.java)
     private var fakeProgressBarUpgradeFeature = FakeFeatureToggleFactory.create(ProgressBarUpgradeFeature::class.java)
     private val fakeAutocompleteHistoryDeleteFeature = FakeFeatureToggleFactory.create(AutocompleteHistoryDeleteFeature::class.java)
+    private val fakeNewTabReturnHatchFeature = FakeFeatureToggleFactory.create(NewTabReturnHatchFeature::class.java)
     private val mockDesktopModeSettings: DesktopModeSettings = mock()
     private val fakeRememberDesktopModeFeature = FakeFeatureToggleFactory.create(RememberDesktopModeFeature::class.java)
     private val fakeSuggestRedirectFeature = FakeFeatureToggleFactory.create(SuggestRedirectOnUnresolvedErrorFeature::class.java)
@@ -752,6 +760,7 @@ class BrowserTabViewModelTest {
     private val mockSuggestRedirectEvaluator: SuggestRedirectEvaluator = mock()
     private val mockBadUrlErrorPageWideEvent: BadUrlErrorPageWideEvent = mock()
     private val mockDuckAiSessionCallback: DuckAiSessionCallback = mock()
+    private val mockBrowserMenuAcknowledgement: BrowserMenuAcknowledgement = mock()
     private val mockInlinePdfHandler: InlinePdfHandler = mock()
     private val mockPdfDownloadTooltipDataStore: PdfDownloadTooltipDataStore = mock()
     private val mockCachedFileDownloader: CachedFileDownloader = mock()
@@ -870,6 +879,8 @@ class BrowserTabViewModelTest {
             whenever(mockDuckAiFeatureState.showPopupMenuShortcut).thenReturn(MutableStateFlow(false))
             whenever(mockDuckAiFeatureState.showInputScreen).thenReturn(mockDuckAiFeatureStateInputScreenFlow)
             whenever(mockDuckAiFeatureState.showContextualMode).thenReturn(mockDuckAiContextualModeFlow)
+            whenever(mockDuckAiFeatureState.nativeDuckAiSidebar).thenReturn(MutableStateFlow(false))
+            whenever(mockDuckAiFeatureState.nativeInputFieldEnabled).thenReturn(MutableStateFlow(false))
             whenever(mockDuckChatInputModeState.inputModeCapability).thenReturn(mockInputModeCapability)
             whenever(mockVpnMenuStateProvider.getVpnMenuState()).thenReturn(flowOf(VpnMenuState.Hidden))
             whenever(nonHttpAppLinkChecker.isPermitted(anyOrNull())).thenReturn(true)
@@ -987,6 +998,8 @@ class BrowserTabViewModelTest {
                 duckDuckGoUrlDetector = DuckDuckGoUrlDetectorImpl(),
                 siteFactory = siteFactory,
                 tabRepository = mockTabRepository,
+                tabAtomicOperations = mockTabAtomicOperations,
+                newTabReturnHatchFeature = fakeNewTabReturnHatchFeature,
                 userAllowListRepository = mockUserAllowListRepository,
                 networkLeaderboardDao = mockNetworkLeaderboardDao,
                 autoComplete = mockAutoCompleteApi,
@@ -1108,6 +1121,7 @@ class BrowserTabViewModelTest {
                 badUrlErrorPageWideEvent = mockBadUrlErrorPageWideEvent,
                 customErrorPagesFeature = fakeCustomErrorPagesFeature,
                 duckAiSessionCallback = mockDuckAiSessionCallback,
+                browserMenuAcknowledgement = mockBrowserMenuAcknowledgement,
             )
 
         testee.loadData("abc", null, false, false)
@@ -1165,6 +1179,48 @@ class BrowserTabViewModelTest {
 
             verify(mockTabRepository).addNewTabAfterExistingTab(url, "abc")
         }
+
+    @Test
+    fun whenReturningToRegularHatchAndDefaultOnFeatureAndAtomicOperationSucceedsThenFallbackNavigationIsSuppressed() = runTest {
+        whenever(mockTabAtomicOperations.deleteSelectedBlankTabAndSelectTarget("current", "target")).thenReturn(true)
+        val navigations = mutableListOf<Pair<BrowserMode, String>>()
+
+        testee.returnToHatch("current", BrowserMode.REGULAR, "target") { mode, id -> navigations += mode to id }
+
+        verify(mockTabAtomicOperations).deleteSelectedBlankTabAndSelectTarget("current", "target")
+        assertTrue(navigations.isEmpty())
+    }
+
+    @Test
+    fun whenReturningToRegularHatchAndAtomicOperationIsRejectedThenFallbackNavigationUsesExactTarget() = runTest {
+        whenever(mockTabAtomicOperations.deleteSelectedBlankTabAndSelectTarget("current", "target")).thenReturn(false)
+        val navigations = mutableListOf<Pair<BrowserMode, String>>()
+
+        testee.returnToHatch("current", BrowserMode.REGULAR, "target") { mode, id -> navigations += mode to id }
+
+        assertEquals(listOf(BrowserMode.REGULAR to "target"), navigations)
+    }
+
+    @Test
+    fun whenReturningToRegularHatchAndFeatureIsDisabledThenFallbackUsesExactTargetWithoutAtomicDeletion() = runTest {
+        fakeNewTabReturnHatchFeature.closeNewTabOnReturn().setRawStoredState(State(enable = false))
+        val navigations = mutableListOf<Pair<BrowserMode, String>>()
+
+        testee.returnToHatch("current", BrowserMode.REGULAR, "target") { mode, id -> navigations += mode to id }
+
+        verifyNoInteractions(mockTabAtomicOperations)
+        assertEquals(listOf(BrowserMode.REGULAR to "target"), navigations)
+    }
+
+    @Test
+    fun whenReturningToFireHatchThenCleanupIsBypassedAndFallbackNavigationUsesExactTarget() = runTest {
+        val navigations = mutableListOf<Pair<BrowserMode, String>>()
+
+        testee.returnToHatch("current", BrowserMode.FIRE, "fire-target") { mode, id -> navigations += mode to id }
+
+        verifyNoInteractions(mockTabAtomicOperations)
+        assertEquals(listOf(BrowserMode.FIRE to "fire-target"), navigations)
+    }
 
     @Test
     fun whenViewBecomesVisibleAndHomeShowingThenKeyboardShown() =
@@ -1232,6 +1288,40 @@ class BrowserTabViewModelTest {
             testee.onViewVisible()
 
             assertCommandNotIssued<ShowKeyboard>()
+        }
+
+    @Test
+    fun whenViewBecomesVisibleAndInputModeTargetArmedThenTargetDoesNotForceKeyboardOverInputScreen() =
+        runTest {
+            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
+            whenever(mockDuckAiFeatureState.showInputScreen).thenReturn(MutableStateFlow(true))
+            testee.loadData("abc", null, false, false, InputMode.SEARCH)
+
+            testee.onViewVisible()
+
+            // The launch target does not override the input-screen focus-drop rule.
+            assertCommandNotIssued<ShowKeyboard>()
+        }
+
+    @Test
+    fun whenInputModeTargetArmedThenConsumeInitialInputModeReturnsItThenClears() =
+        runTest {
+            testee.loadData("abc", null, false, false, InputMode.SEARCH)
+
+            assertEquals(InputMode.SEARCH, testee.consumeInitialInputMode())
+            // One-shot: a second read no longer returns it.
+            assertNull(testee.consumeInitialInputMode())
+        }
+
+    @Test
+    fun whenViewBecomesVisibleAndInputModeTargetNotArmedThenConsumeReturnsNull() =
+        runTest {
+            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
+            testee.loadData("abc", null, false, false)
+
+            testee.onViewVisible()
+
+            assertNull(testee.consumeInitialInputMode())
         }
 
     @Test
@@ -4168,7 +4258,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserClickedSegmentedSearchEndCtaOkButtonThenBubbleHiddenAndInputOpensOnDuckAiTab() = runTest {
-        val cta = daxEndBrandDesignUpdateBubbleCta(segmentedPath = SegmentedOnboardingPath.SEARCH)
+        val cta = daxEndBrandDesignUpdateBubbleCta(segmentedPath = DownloadReasonSelection.SEARCH)
         setCta(cta)
 
         testee.onUserClickCtaOkButton(cta)
@@ -4194,7 +4284,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserClickedSegmentedSearchEndCtaSecondaryButtonThenCtaIsRefreshedAway() = runTest {
-        val cta = daxEndBrandDesignUpdateBubbleCta(segmentedPath = SegmentedOnboardingPath.SEARCH)
+        val cta = daxEndBrandDesignUpdateBubbleCta(segmentedPath = DownloadReasonSelection.SEARCH)
         setCta(cta)
 
         testee.onUserClickCtaSecondaryButton(cta)
@@ -4204,7 +4294,7 @@ class BrowserTabViewModelTest {
         verify(mockOnboardingInputScreenLaunchTarget, never()).setOpenOnDuckAi()
     }
 
-    private fun daxEndBrandDesignUpdateBubbleCta(segmentedPath: SegmentedOnboardingPath?) = DaxEndBrandDesignUpdateBubbleCta(
+    private fun daxEndBrandDesignUpdateBubbleCta(segmentedPath: DownloadReasonSelection?) = DaxEndBrandDesignUpdateBubbleCta(
         onboardingStore = mockOnboardingStore,
         appInstallStore = mockAppInstallStore,
         isLightTheme = true,
@@ -4277,7 +4367,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserClickedDaxSubscriptionCtaOnSegmentedAiPathThenLaunchSubscriptionWithFeaturePageDuckAi() = runTest {
-        whenever(mockOnboardingStore.getSegmentedPathWithAiInput()).thenReturn(SegmentedOnboardingPath.AI)
+        whenever(mockOnboardingStore.getSegmentedPathWithAiInput()).thenReturn(DownloadReasonSelection.AI_CHAT)
         val cta = DaxBubbleCta.DaxSubscriptionCta(
             mockOnboardingStore,
             mockAppInstallStore,
@@ -4293,7 +4383,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserClickedSegmentedAiEndCtaOkButtonThenCtaIsRefreshedAway() = runTest {
-        val cta = daxEndBrandDesignUpdateBubbleCta(segmentedPath = SegmentedOnboardingPath.AI)
+        val cta = daxEndBrandDesignUpdateBubbleCta(segmentedPath = DownloadReasonSelection.AI_CHAT)
         setCta(cta)
 
         testee.onUserClickCtaOkButton(cta)
@@ -6907,6 +6997,20 @@ class BrowserTabViewModelTest {
                 assertEquals(request, this.request)
                 assertEquals(sitePermissions, this.permissionsToRequest)
             }
+        }
+
+    @Test
+    fun whenLocationRequestedByEmbeddedOriginThenDialogCommandIsStillIssued() =
+        runTest {
+            loadUrl("https://example.com/page", isBrowserShowing = true)
+            val request = LocationPermissionRequest("https://embedded.other.com", mock())
+
+            testee.onSitePermissionRequested(
+                request,
+                SitePermissions(emptyList(), listOf(LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION)),
+            )
+
+            assertCommandIssued<Command.ShowSitePermissionsDialog>()
         }
 
     @Test
@@ -9919,6 +10023,20 @@ class BrowserTabViewModelTest {
         }
 
     @Test
+    fun whenBrowserMenuLaunchedThenBrowserMenuAcknowledgementIsNotified() =
+        runTest {
+            testee.onBrowserMenuLaunched(ViewMode.Browser("https://example.com"))
+            verify(mockBrowserMenuAcknowledgement).onBrowserMenuViewed(BrowserViewMode.Browser)
+        }
+
+    @Test
+    fun whenBrowserMenuLaunchedInCustomTabThenBrowserMenuAcknowledgementStillReceivesTheMode() =
+        runTest {
+            testee.onBrowserMenuLaunched(ViewMode.CustomTab(0, "example.com", null))
+            verify(mockBrowserMenuAcknowledgement).onBrowserMenuViewed(BrowserViewMode.CustomTab)
+        }
+
+    @Test
     fun whenBrowserMenuLaunchedInNonBrowserModeThenDoNotClearHighlight() =
         runTest {
             testee.onBrowserMenuLaunched(ViewMode.NewTab)
@@ -10126,6 +10244,37 @@ class BrowserTabViewModelTest {
 
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.allValues.any { it is Command.ShowDuckAIContextualMode })
+    }
+
+    @Test
+    fun whenOnDuckChatOmnibarButtonClickedOnNtpWithBlankQueryThenShowsContextualMenu() {
+        mockDuckAiContextualModeFlow.value = true
+
+        testee.onDuckChatOmnibarButtonClicked(query = null, hasFocus = true, isNtp = true)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.allValues.any { it is Command.ShowDuckAIContextualMode })
+    }
+
+    @Test
+    fun whenOnDuckChatOmnibarButtonClickedOnNtpWithTypedQueryThenOpensDuckChatNotMenu() {
+        mockDuckAiContextualModeFlow.value = true
+        whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
+
+        testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = true, isNtp = true)
+
+        verify(mockDuckChat).getDuckChatUrl(eq("example"), eq(true), any())
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertFalse(commandCaptor.allValues.any { it is Command.ShowDuckAIContextualMode })
+    }
+
+    @Test
+    fun whenOpenDuckChatFromOmnibarOnNtpThenOpensDuckChatWithoutPrompt() {
+        whenever(mockOmnibarConverter.convertQueryToUrl(duckChatURL, null)).thenReturn(duckChatURL)
+
+        testee.openDuckChatFromOmnibar(query = null, hasFocus = false, isNtp = true)
+
+        verify(mockDuckChat).getDuckChatUrl(eq(""), eq(false), any())
     }
 
     @Test
@@ -11811,6 +11960,20 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenOpenNewImageDuckChatFromDuckAiThenOpensImageGenerationWithWebpageEntryPoint() = runTest {
+        testee.openNewImageDuckChat(ViewMode.DuckAI)
+
+        verify(mockDuckChat).openDuckChatImageGeneration(DuckChatEntryPoint.BROWSING_MENU_WEBPAGE)
+    }
+
+    @Test
+    fun whenOpenNewImageDuckChatFromNewTabThenOpensImageGenerationWithNtpEntryPoint() = runTest {
+        testee.openNewImageDuckChat(ViewMode.NewTab)
+
+        verify(mockDuckChat).openDuckChatImageGeneration(DuckChatEntryPoint.BROWSING_MENU_NTP)
+    }
+
+    @Test
     fun whenDuckChatMenuItemClickedThenOpenNewDuckChatTab() =
         runTest {
             whenever(mockDuckChat.wasOpenedBefore()).thenReturn(false)
@@ -11826,26 +11989,6 @@ class BrowserTabViewModelTest {
             verify(mockDuckChat, never()).openDuckChat(any())
             verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_NEW_CHAT_TAB_TAPPED)
         }
-
-    @Test
-    fun whenDuckChatNativeHistoryRequested() = runTest {
-        val expectedEvent = SubscriptionEventData(
-            featureName = "event1",
-            subscriptionName = "subscription1",
-            params = JSONObject(),
-        )
-        whenever(mockDuckChatJSHelper.onNativeAction(NativeAction.SIDEBAR)).thenReturn(expectedEvent)
-
-        testee.openDuckChatSidebar()
-
-        testee.subscriptionEventDataFlow.test {
-            val emittedEvent = awaitItem()
-            assertEquals(expectedEvent.featureName, emittedEvent.featureName)
-            assertEquals(expectedEvent.subscriptionName, emittedEvent.subscriptionName)
-            assertEquals(expectedEvent.params.toString(), emittedEvent.params.toString())
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
 
     @Test
     fun whenCustomizeResponsesClickedThenSubscriptionEventEmitted() = runTest {
@@ -11894,6 +12037,58 @@ class BrowserTabViewModelTest {
             val emittedEvent = awaitItem()
             assertEquals(expectedEvent.featureName, emittedEvent.featureName)
             assertEquals(expectedEvent.subscriptionName, emittedEvent.subscriptionName)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDuckChatSidebarButtonPressedAndNativeSidebarEnabledThenHistoryLaunched() = runTest {
+        whenever(mockDuckAiFeatureState.nativeDuckAiSidebar).thenReturn(MutableStateFlow(true))
+        testee.browserViewState.value = browserViewState().copy(showDuckChatHistoryOption = true)
+
+        testee.onDuckChatSidebarButtonPressed()
+
+        assertCommandIssued<Command.LaunchDuckChatHistory>()
+        verify(mockDuckChatJSHelper, never()).onNativeAction(NativeAction.SIDEBAR)
+    }
+
+    @Test
+    fun whenDuckChatSidebarButtonPressedAndNativeSidebarDisabledThenLegacySidebarEventEmitted() = runTest {
+        val expectedEvent = SubscriptionEventData(
+            featureName = "event1",
+            subscriptionName = "subscription1",
+            params = JSONObject(),
+        )
+        whenever(mockDuckAiFeatureState.nativeDuckAiSidebar).thenReturn(MutableStateFlow(false))
+        whenever(mockDuckChatJSHelper.onNativeAction(NativeAction.SIDEBAR)).thenReturn(expectedEvent)
+
+        testee.onDuckChatSidebarButtonPressed()
+
+        assertCommandNotIssued<Command.LaunchDuckChatHistory>()
+        testee.subscriptionEventDataFlow.test {
+            val emittedEvent = awaitItem()
+            assertEquals(expectedEvent.featureName, emittedEvent.featureName)
+            assertEquals(expectedEvent.subscriptionName, emittedEvent.subscriptionName)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOpenDuckChatSidebarThenSidebarSubscriptionEventEmitted() = runTest {
+        val expectedEvent = SubscriptionEventData(
+            featureName = "event1",
+            subscriptionName = "subscription1",
+            params = JSONObject(),
+        )
+        whenever(mockDuckChatJSHelper.onNativeAction(NativeAction.SIDEBAR)).thenReturn(expectedEvent)
+
+        testee.openDuckChatSidebar()
+
+        testee.subscriptionEventDataFlow.test {
+            val emittedEvent = awaitItem()
+            assertEquals(expectedEvent.featureName, emittedEvent.featureName)
+            assertEquals(expectedEvent.subscriptionName, emittedEvent.subscriptionName)
+            assertEquals(expectedEvent.params.toString(), emittedEvent.params.toString())
             cancelAndIgnoreRemainingEvents()
         }
     }

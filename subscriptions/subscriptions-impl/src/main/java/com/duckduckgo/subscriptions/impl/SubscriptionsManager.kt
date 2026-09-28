@@ -22,6 +22,8 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.subscriptions.api.ActiveOfferType
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
@@ -70,6 +72,7 @@ import com.duckduckgo.subscriptions.impl.repository.isActiveOrWaiting
 import com.duckduckgo.subscriptions.impl.repository.isExpired
 import com.duckduckgo.subscriptions.impl.repository.toProductList
 import com.duckduckgo.subscriptions.impl.services.ConfirmationBody
+import com.duckduckgo.subscriptions.impl.services.ExperimentData
 import com.duckduckgo.subscriptions.impl.services.SubscriptionsService
 import com.duckduckgo.subscriptions.impl.wideevents.AuthTokenRefreshWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.FreeTrialConversionWideEvent
@@ -108,6 +111,7 @@ import java.time.Period
 import java.time.format.DateTimeParseException
 import java.util.Currency
 import javax.inject.Inject
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration.Companion.milliseconds
 
 interface SubscriptionsManager {
@@ -126,8 +130,7 @@ interface SubscriptionsManager {
         activity: Activity,
         planId: String,
         offerId: String?,
-        experimentName: String?,
-        experimentCohort: String?,
+        experiments: PurchaseExperiments,
         origin: String?,
     )
 
@@ -277,6 +280,7 @@ class RealSubscriptionsManager @Inject constructor(
     private val freeTrialConversionWideEvent: FreeTrialConversionWideEvent,
     private val subscriptionRestoreWideEvent: SubscriptionRestoreWideEvent,
     private val vpnReminderNotificationScheduler: VpnReminderNotificationScheduler,
+    private val featureTogglesInventory: FeatureTogglesInventory,
 ) : SubscriptionsManager {
     private val adapter = Moshi.Builder().build().adapter(ResponseError::class.java)
 
@@ -312,8 +316,7 @@ class RealSubscriptionsManager @Inject constructor(
 
     private var removeExpiredSubscriptionOnCancelledPurchase: Boolean = false
 
-    // Indicates whether the user is part of any FE experiment at the time of purchase
-    private var experimentAssigned: Experiment? = null
+    private var experimentsAssigned = PurchaseExperiments()
 
     override suspend fun isSignedIn(): Boolean {
         return isSignedInV1() || isSignedInV2()
@@ -534,6 +537,7 @@ class RealSubscriptionsManager @Inject constructor(
     ) {
         _currentPurchaseState.emit(CurrentPurchase.InProgress)
 
+        val confirmationBody = buildConfirmationBody(packageName, purchaseToken)
         var retryCompleted = false
 
         retry(
@@ -545,7 +549,7 @@ class RealSubscriptionsManager @Inject constructor(
             ),
         ) {
             try {
-                retryCompleted = attemptConfirmPurchase(packageName, purchaseToken)
+                retryCompleted = attemptConfirmPurchase(confirmationBody)
                 logcat { "Subs: retry success: $retryCompleted" }
                 retryCompleted
             } catch (e: Throwable) {
@@ -560,20 +564,11 @@ class RealSubscriptionsManager @Inject constructor(
     }
 
     private suspend fun attemptConfirmPurchase(
-        packageName: String,
-        purchaseToken: String,
+        confirmationBody: ConfirmationBody,
     ): Boolean {
-        // FE experiment details
-        val experimentName: String? = experimentAssigned?.name
-        val cohort: String? = experimentAssigned?.cohort
         return try {
             val confirmationResponse = subscriptionsService.confirm(
-                ConfirmationBody(
-                    packageName = packageName,
-                    purchaseToken = purchaseToken,
-                    experimentName = experimentName,
-                    experimentCohort = cohort,
-                ),
+                confirmationBody = confirmationBody,
             )
 
             val pendingPlans = try {
@@ -634,6 +629,57 @@ class RealSubscriptionsManager @Inject constructor(
             logcat { "Subs: failed to confirm purchase $e" }
             false
         }
+    }
+
+    private suspend fun buildConfirmationBody(
+        packageName: String,
+        purchaseToken: String,
+    ): ConfirmationBody {
+        val body = ConfirmationBody(packageName = packageName, purchaseToken = purchaseToken)
+        return try {
+            if (subscriptionsFeature.get().subscriptionConcurrentExperiments().isEnabled()) {
+                body.copy(experiments = buildExperimentsToReport())
+            } else {
+                body.copy(
+                    experimentName = experimentsAssigned.legacyExperiment?.name,
+                    experimentCohort = experimentsAssigned.legacyExperiment?.cohort,
+                )
+            }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            logcat(ERROR) { "Subs: failed to build experiment attribution: ${e.asLog()}" }
+            body
+        }
+    }
+
+    private suspend fun buildExperimentsToReport(): List<ExperimentData>? {
+        val fromPaywall = experimentsAssigned.experiments
+            .ifEmpty { listOfNotNull(experimentsAssigned.legacyExperiment) }
+
+        val assignments = (fromPaywall + getActiveNativeExperiments()).distinctBy { it.name }
+        if (assignments.isEmpty()) return null
+
+        return assignments.map {
+            ExperimentData(
+                experimentName = it.name,
+                experimentCohort = it.cohort,
+            )
+        }
+    }
+
+    private suspend fun getActiveNativeExperiments(): List<Experiment> =
+        featureTogglesInventory.getAllTogglesForParent(PRIVACY_PRO_FEATURE_NAME)
+            .mapNotNull { toggle -> toggle.toExperiment() }
+            .sortedBy { it.name }
+
+    private suspend fun Toggle.toExperiment(): Experiment? {
+        val cohort = getCohort() ?: return null
+        if (!isEnabled()) return null
+        return Experiment(
+            name = featureName().name,
+            cohort = cohort.name,
+        )
     }
 
     private suspend fun handlePurchaseFailed() {
@@ -1043,8 +1089,7 @@ class RealSubscriptionsManager @Inject constructor(
         activity: Activity,
         planId: String,
         offerId: String?,
-        experimentName: String?,
-        experimentCohort: String?,
+        experiments: PurchaseExperiments,
         origin: String?,
     ) {
         try {
@@ -1108,11 +1153,7 @@ class RealSubscriptionsManager @Inject constructor(
                 createAccount()
             }
 
-            experimentAssigned = if (experimentCohort.isNullOrEmpty() || experimentName.isNullOrEmpty()) {
-                null
-            } else {
-                Experiment(experimentName, experimentCohort)
-            }
+            experimentsAssigned = experiments
 
             logcat { "Subs: external id is ${authRepository.getAccount()!!.externalId}" }
             _currentPurchaseState.emit(CurrentPurchase.PreFlowFinished)
@@ -1332,4 +1373,9 @@ data class ValidatedTokenPair(
 data class Experiment(
     val name: String,
     val cohort: String,
+)
+
+data class PurchaseExperiments(
+    val experiments: List<Experiment> = emptyList(),
+    val legacyExperiment: Experiment? = null,
 )

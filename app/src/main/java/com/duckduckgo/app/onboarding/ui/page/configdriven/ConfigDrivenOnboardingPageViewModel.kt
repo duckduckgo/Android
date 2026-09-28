@@ -214,7 +214,7 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
         }
     }
 
-    fun onContentBound(
+    fun onBeforeContentBound(
         stepId: LinearOnboardingStepId,
         content: ContentConfig,
     ) {
@@ -324,12 +324,12 @@ class ConfigDrivenOnboardingPageViewModel @Inject constructor(
 
     fun onPasswordImportRetry() {
         dismissPasswordImportError()
-        emit(NewUserOnboardingEvent.PasswordImportRequested)
+        emit(NewUserOnboardingEvent.PasswordImportErrorRetryRequested)
     }
 
-    fun onPasswordImportErrorSkipped() {
+    fun onPasswordImportErrorCancelled() {
         dismissPasswordImportError()
-        emit(NewUserOnboardingEvent.PasswordImportSkipped)
+        emit(NewUserOnboardingEvent.PasswordImportErrorCancelled)
     }
 
     /** The alert was cancelled without choosing: the import card underneath still offers both actions. */

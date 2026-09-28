@@ -36,11 +36,11 @@ import com.duckduckgo.app.onboarding.CustomAiOnboardingStore
 import com.duckduckgo.app.onboarding.orchestrator.NewUserOnboardingPlanProvider
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
-import com.duckduckgo.app.onboarding.store.SegmentedOnboardingPath
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.store.daxOnboardingActive
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
+import com.duckduckgo.app.onboarding.ui.page.configdriven.DownloadReasonSelection
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
 import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.AppPixelName
@@ -172,7 +172,7 @@ class CtaViewModel @Inject constructor(
 
         // Only NTP offers the End dialog with Try Duck.ai / Skip for the segmented onboarding's search path.
         // The contextual End dialog doesn't offer this.
-        is DaxEndBrandDesignUpdateBubbleCta -> if (cta.segmentedPathWithAiInput == SegmentedOnboardingPath.SEARCH) {
+        is DaxEndBrandDesignUpdateBubbleCta -> if (cta.segmentedPathWithAiInput == DownloadReasonSelection.SEARCH) {
             listOf(OnboardingPixelName.ONBOARDING_END, OnboardingPixelName.ONBOARDING_END_TRY_DUCK_AI)
         } else {
             listOf(OnboardingPixelName.ONBOARDING_END)

@@ -133,8 +133,7 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
         if (activityResult.resultCode == Activity.RESULT_OK) {
             lifecycleScope.launch {
                 activityResult.data?.let { data ->
-                    val launchSource = getLaunchSource()
-                    processImportFlowResult(data, launchSource)
+                    processImportFlowResult(data)
                 }
             }
         }
@@ -143,16 +142,12 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
     private fun getLaunchSource() =
         BundleCompat.getParcelable(arguments ?: Bundle(), KEY_LAUNCH_SOURCE, AutofillImportLaunchSource::class.java) ?: Unknown
 
-    private fun ImportFromGooglePasswordsDialog.processImportFlowResult(data: Intent, launchSource: AutofillImportLaunchSource) {
+    private fun ImportFromGooglePasswordsDialog.processImportFlowResult(data: Intent) {
         (IntentCompat.getParcelableExtra(data, ImportGooglePasswordResult.RESULT_KEY_DETAILS, ImportGooglePasswordResult::class.java)).let {
             when (it) {
-                is ImportGooglePasswordResult.Success -> viewModel.onImportFlowFinishedSuccessfully(launchSource)
-                is ImportGooglePasswordResult.Error -> viewModel.onImportFlowFinishedWithError(it.reason, launchSource)
-                is ImportGooglePasswordResult.UserCancelled -> viewModel.onImportFlowCancelledByUser(
-                    it.stage,
-                    canShowPreImportDialog(launchSource),
-                    launchSource,
-                )
+                is ImportGooglePasswordResult.Success -> viewModel.onImportFlowFinishedSuccessfully()
+                is ImportGooglePasswordResult.Error -> viewModel.onImportFlowFinishedWithError()
+                is ImportGooglePasswordResult.UserCancelled -> viewModel.onImportFlowCancelledByUser(canShowPreImportDialog(getLaunchSource()))
                 else -> {}
             }
         }
@@ -212,7 +207,7 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
         binding.postflow.appIcon.setImageDrawable(
             ContextCompat.getDrawable(
                 binding.root.context,
-                R.drawable.ic_success_128,
+                R.drawable.success_128,
             ),
         )
         binding.postflow.dialogTitle.text = getString(R.string.importPasswordsProcessingResultDialogTitleUponSuccess)
@@ -242,7 +237,7 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
         binding.postflow.appIcon.setImageDrawable(
             ContextCompat.getDrawable(
                 binding.root.context,
-                R.drawable.ic_passwords_import_128,
+                R.drawable.passwords_import_128,
             ),
         )
 

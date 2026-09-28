@@ -213,13 +213,7 @@
     <!-- Get Desktop Browser -->
     <string name="getDesktopBrowserSettingItemTitle">Masaüstü Tarayıcısını Edinin</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">Mac ve Windows için DuckDuckGo</string>
-    <string name="getDesktopBrowserTitle">Mac ve Windows\'ta da kişisel bilgilerinizi koruyun!</string>
-    <string name="getDesktopBrowserBody">DuckDuckGo\'yu Mac veya Windows\'ta indirmek için şu adresi ziyaret edin:</string>
-    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
-    <string name="getDesktopBrowserShareDownloadLink">İndirme Bağlantısını Paylaş</string>
-    <string name="getDesktopBrowserNoThanks">Hayır Teşekkürler</string>
     <string name="getDesktopBrowserHideItem">Gizle</string>
-    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Bağlantı kopyalandı</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Çerez Açılır Pencere Engelleyici</string>
@@ -965,6 +959,22 @@
     <string name="preOnboardingWidgetPromptBody">Hızlı ve kolay erişim için arama widget\'ımızı Ana Ekranınıza ekleyin.</string>
     <string name="preOnboardingWidgetPromptPrimaryCta">Widget Ekle</string>
     <string name="preOnboardingWidgetPromptSecondaryCta">Atla</string>
+
+    <!-- Pre-onboarding: import passwords -->
+    <string name="preOnboardingImportPasswordsTitle">Google\'dan şifreleri içe aktar</string>
+    <string name="preOnboardingImportPasswordsBody">Google, onaylamak için oturum açmanızı veya şifre girmenizi isteyebilir.</string>
+    <string name="preOnboardingImportPasswordsPrimaryCta">Google\'dan İçe Aktar</string>
+    <string name="preOnboardingImportCompleteTitle">İçe aktarma tamamlandı</string>
+    <string name="preOnboardingImportCompleteCta">Devam et</string>
+    <string name="preOnboardingImportCompleteParsingTitle">Şifreler içe aktarılıyor</string>
+    <string name="preOnboardingImportCompleteParsingBody">Bu sadece bir an sürecek.</string>
+    <string name="preOnboardingImportCompleteFailedTitle">İçe aktarma başarısız</string>
+    <string name="preOnboardingImportCompleteFailed">Şifre içe aktarma başarısız</string>
+    <string name="preOnboardingImportCompleteImported" instruction="Placeholder is the number of passwords that were imported.">İçe aktarılan şifreler: %1$s</string>
+    <string name="preOnboardingImportCompleteSkipped" instruction="Placeholder is the number of passwords that were not imported.">Atlandı (yinelenen veya geçersiz): %1$s</string>
+    <string name="preOnboardingImportErrorTitle">Bir hata oluştu</string>
+    <string name="preOnboardingImportErrorBody">Lütfen tekrar deneyin.</string>
+    <string name="preOnboardingImportErrorRetry">Tekrar dene</string>
 
     <!-- Pre-onboarding: add to home screen -->
     <string name="preOnboardingDockStepTitle">Beni favoriler satırına ekle.</string>

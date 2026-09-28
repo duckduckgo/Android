@@ -215,13 +215,7 @@
     <!-- Get Desktop Browser -->
     <string name="getDesktopBrowserSettingItemTitle">Nabavi preglednik za PC</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo za Mac i Windows</string>
-    <string name="getDesktopBrowserTitle">Zaštiti svoje osobne podatke na Macu i Windowsima!</string>
-    <string name="getDesktopBrowserBody">Za preuzimanje DuckDuckGo na Mac ili Windows, posjeti:</string>
-    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
-    <string name="getDesktopBrowserShareDownloadLink">Podijeli poveznicu za preuzimanje</string>
-    <string name="getDesktopBrowserNoThanks">Ne, hvala</string>
     <string name="getDesktopBrowserHideItem">Sakrij</string>
-    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Poveznica je kopirana</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Zaštita od skočnih prozora kolačića</string>
@@ -1001,6 +995,22 @@
     <string name="preOnboardingWidgetPromptBody">Dodaj naš widget za pretraživanje na početni zaslon za brz i jednostavan pristup.</string>
     <string name="preOnboardingWidgetPromptPrimaryCta">Dodaj widget</string>
     <string name="preOnboardingWidgetPromptSecondaryCta">Preskoči</string>
+
+    <!-- Pre-onboarding: import passwords -->
+    <string name="preOnboardingImportPasswordsTitle">Uvezi lozinke s Googlea</string>
+    <string name="preOnboardingImportPasswordsBody">Google te može tražiti da se prijaviš ili uneseš svoju lozinku za potvrdu.</string>
+    <string name="preOnboardingImportPasswordsPrimaryCta">Uvezi s Googlea</string>
+    <string name="preOnboardingImportCompleteTitle">Uvoz je završen</string>
+    <string name="preOnboardingImportCompleteCta">Nastavi</string>
+    <string name="preOnboardingImportCompleteParsingTitle">Uvoz lozinki</string>
+    <string name="preOnboardingImportCompleteParsingBody">Ovo će potrajati samo trenutak.</string>
+    <string name="preOnboardingImportCompleteFailedTitle">Uvoz nije uspio</string>
+    <string name="preOnboardingImportCompleteFailed">Uvoz lozinke nije uspio</string>
+    <string name="preOnboardingImportCompleteImported" instruction="Placeholder is the number of passwords that were imported.">Uvezene lozinke: %1$s</string>
+    <string name="preOnboardingImportCompleteSkipped" instruction="Placeholder is the number of passwords that were not imported.">Preskočeno (duplicirano ili nevažeće): %1$s</string>
+    <string name="preOnboardingImportErrorTitle">Nešto nije bilo kako treba</string>
+    <string name="preOnboardingImportErrorBody">Pokušaj ponovno.</string>
+    <string name="preOnboardingImportErrorRetry">Pokušaj ponovno</string>
 
     <!-- Pre-onboarding: add to home screen -->
     <string name="preOnboardingDockStepTitle">Dodaj me u red omiljenih.</string>

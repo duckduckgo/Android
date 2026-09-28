@@ -1819,7 +1819,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     checkView.alpha = 1f
                     checkView.scaleX = 1f
                     checkView.scaleY = 1f
-                    checkView.setImageResource(CommonR.drawable.ic_check_green_24)
+                    checkView.setImageResource(CommonR.drawable.check_recolorable_24)
                 }
 
                 binding.daxDialogCta.stepIndicator.alpha = 1f
@@ -2722,7 +2722,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             checkView.alpha = 1f
             checkView.scaleX = 1f
             checkView.scaleY = 1f
-            checkView.setImageResource(CommonR.drawable.ic_check_green_24)
+            checkView.setImageResource(CommonR.drawable.check_recolorable_24)
         }
     }
 

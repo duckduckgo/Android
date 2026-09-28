@@ -349,4 +349,23 @@
     <string name="duckChatContextualAskAboutPage">Ask About Page</string>
     <string name="duckChatContextualAskAboutSearch">Continue in Duck.ai</string>
     <string name="duckChatContextualOpenDuckAi">Open Duck.ai</string>
+
+    <!-- Suggested prompts for text selection -->
+    <string name="duckAiSuggestionSummarizeSelectionLabel">Summarize this selection</string>
+    <string name="duckAiSuggestionSummarizeSelectionPrompt">Summarize this selection.</string>
+    <string name="duckAiSuggestionTranslateSelectionLabel">Translate this selection</string>
+    <string name="duckAiSuggestionTranslateSelectionPrompt" instruction="%1$s is replaced with the name of the user's language.">Translate this selection into %1$s.</string>
+
+    <!-- Name shown for an attached text selection in the Duck.ai -->
+    <string name="duckAiTextSelectionAttachmentTitle">Text selection</string>
+    <string name="duckAiTextSelectionLimitReached" instruction="%1$d is replaced with the maximum number of text selections.">You can add up to %1$d text selections. Remove one to add another.</string>
+
+    <!-- Duck.ai text selection menu action -->
+    <string name="duckAiTextSelectionMenuItem">Ask Duck.ai</string>
+
+    <!-- Prefix on the Duck.ai attachment chip for a text selection -->
+    <plurals name="duckAiTextSelectionWordCount">
+        <item quantity="one" instruction="%1$d is the number of words in the selection.">%1$d word</item>
+        <item quantity="other" instruction="%1$d is the number of words in the selection.">%1$d words</item>
+    </plurals>
 </resources>

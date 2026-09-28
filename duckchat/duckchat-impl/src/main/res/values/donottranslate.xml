@@ -20,9 +20,13 @@
     <string name="duck_chat_remove_chat_suggestion_content_description">Delete chat</string>
 
     <!-- Subscription onboarding - Duck.ai step (placeholder copy) -->
-    <string name="subscriptionOnboardingDuckAiTitle">Duck.ai step</string>
-    <string name="subscriptionOnboardingDuckAiText">Duck.ai onboarding step</string>
-    <string name="subscriptionOnboardingDuckAiNext">Next</string>
+    <string name="subscriptionOnboardingDuckAiTitle">Step 3 of 3</string>
+    <string name="subscriptionOnboardingDuckAiHeaderTitle">Duck.ai Private Chat</string>
+    <string name="subscriptionOnboardingDuckAiHeaderText">Your subscription unlocks premium models. Chats are anonymized by us and never used to train AI. <annotation type="learn_more_link">Learn More</annotation></string>
+    <string name="subscriptionOnboardingDuckAiStart">Start Duck.ai Chat</string>
+    <string name="subscriptionOnboardingDuckAiNotNow">Not Now</string>
+    <string name="subscriptionOnboardingDuckAiTierPlus">PLUS</string>
+    <string name="subscriptionOnboardingDuckAiTierPro">PRO</string>
 
     <!-- Page context attachment -->
     <string name="duckChatPageContextRemoveContentDescription">Remove page context</string>
@@ -39,4 +43,13 @@
     <!-- Duck.ai on/off, shown in the onboarding Duck.ai state choice -->
     <string name="duckChatOnboardingDuckAiStateOn">Turn Duck.ai On</string>
     <string name="duckChatOnboardingDuckAiStateOff">Keep Duck.ai Off</string>
+
+    <!-- Chat history overflow (three-dot) menu -->
+    <string name="duck_ai_chat_history_overflow_select_chats">Select Chats</string>
+    <string name="duck_ai_chat_history_overflow_chats_protection">Chat Protection</string>
+    <string name="duckAiModelPickerLabelEverydayUse">Best for everyday use</string>
+    <string name="duckAiModelPickerLabelUsesLimitsFaster">Solid but hits limits sooner</string>
+    <string name="duckAiModelPickerTryFreeTrial">Try for Free</string>
+    <string name="duckAiModelPickerSubscriberExclusive">Subscriber Exclusive</string>
+    <string name="duckAiModelPickerProExclusive">Pro Plan Exclusive</string>
 </resources>

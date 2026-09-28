@@ -167,10 +167,11 @@ class CookiePopupOptInActivity : DuckDuckGoActivity() {
 
     private fun render(viewState: ViewState) {
         val text = viewState.variant.textResources()
+        val acceptButton = if (viewState.useV2PrimaryButtonCopy) R.string.autoconsentPromptCpmOnPrimaryButtonV2 else text.acceptButton
         binding.cookiePopupOptInCloseButton.isVisible = viewState.isCloseButtonVisible
         binding.cookiePopupOptInTitle.setText(text.title)
         binding.cookiePopupOptInDescription.setText(text.description)
-        binding.cookiePopupOptInAcceptButton.text = getString(text.acceptButton)
+        binding.cookiePopupOptInAcceptButton.text = getString(acceptButton)
         binding.cookiePopupOptInDeclineButton.text = getString(text.declineButton)
     }
 

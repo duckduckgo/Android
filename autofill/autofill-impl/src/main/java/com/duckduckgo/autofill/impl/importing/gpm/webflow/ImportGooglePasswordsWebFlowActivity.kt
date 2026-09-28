@@ -21,6 +21,8 @@ import android.os.Bundle
 import androidx.fragment.app.commit
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.autofill.api.AutofillImportLaunchSource
+import com.duckduckgo.autofill.api.AutofillImportLaunchSource.Unknown
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillImportPasswordsScreen
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ActivityImportGooglePasswordsWebflowBinding
@@ -33,6 +35,7 @@ import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.navigation.api.getActivityParams
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
@@ -46,6 +49,9 @@ class ImportGooglePasswordsWebFlowActivity : DuckDuckGoActivity() {
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     val binding: ActivityImportGooglePasswordsWebflowBinding by viewBinding()
+
+    private val launchSource: AutofillImportLaunchSource
+        get() = intent.getActivityParams(AutofillImportPasswordsScreen::class.java)?.source ?: Unknown
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,7 +75,7 @@ class ImportGooglePasswordsWebFlowActivity : DuckDuckGoActivity() {
 
     private fun launchImportFragment() {
         supportFragmentManager.commit {
-            replace(R.id.fragment_container, ImportGooglePasswordsWebFlowFragment())
+            replace(R.id.fragment_container, ImportGooglePasswordsWebFlowFragment.newInstance(launchSource))
         }
     }
 

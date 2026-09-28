@@ -40,6 +40,10 @@ import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.models.AIChatModel
+import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
+import com.duckduckgo.duckchat.impl.models.ModelState
+import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.repository.AddressBarPickerAttributionRepository
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
@@ -75,6 +79,7 @@ import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.spy
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.eq
@@ -109,6 +114,7 @@ class RealDuckChatTest {
     private val mockVoiceSessionStateManager: VoiceSessionStateManager = mock()
     private val chatSuggestionsStore: ChatSuggestionsStore = mock()
     private val mockDuckAiTabSessionRepository: DuckAiTabSessionRepository = mock()
+    private val mockDuckAiModelManager: DuckAiModelManager = mock()
 
     private lateinit var testee: RealDuckChat
 
@@ -153,11 +159,12 @@ class RealDuckChatTest {
                 mockVoiceSessionStateManager,
                 chatSuggestionsStore,
                 mockDuckAiTabSessionRepository,
+                mockDuckAiModelManager,
             ),
         )
         coroutineRule.testScope.advanceUntilIdle()
 
-        whenever(mockBrowserNav.openDuckChat(any(), any(), any())).thenReturn(mockIntent)
+        whenever(mockBrowserNav.openDuckChat(any(), any(), any(), any(), any(), anyOrNull())).thenReturn(mockIntent)
         whenever(mockBrowserNav.closeDuckChat(any())).thenReturn(mockIntent)
     }
 
@@ -1559,6 +1566,60 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun `when contextual mode, redesign and text selection action enabled, then showTextSelectionAction emits true`() = runTest {
+        duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
+        duckChatFeature.contextualSheetRedesign().setRawStoredState(State(enable = true))
+        duckChatFeature.duckAiTextSelectionAction().setRawStoredState(State(enable = true))
+        duckChatFeature.nativeInputField().setRawStoredState(State(enable = true))
+        duckChatFeature.nativeChatInput().setRawStoredState(State(enable = true))
+        duckChatFeature.contextualNativeInput().setRawStoredState(State(enable = true))
+        testee.onPrivacyConfigDownloaded()
+
+        assertTrue(testee.showTextSelectionAction.value)
+    }
+
+    @Test
+    fun `when text selection action disabled, then showTextSelectionAction emits false`() = runTest {
+        duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
+        duckChatFeature.contextualSheetRedesign().setRawStoredState(State(enable = true))
+        duckChatFeature.duckAiTextSelectionAction().setRawStoredState(State(enable = false))
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.showTextSelectionAction.value)
+    }
+
+    @Test
+    fun `when contextual sheet redesign disabled, then showTextSelectionAction emits false`() = runTest {
+        duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
+        duckChatFeature.contextualSheetRedesign().setRawStoredState(State(enable = false))
+        duckChatFeature.duckAiTextSelectionAction().setRawStoredState(State(enable = true))
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.showTextSelectionAction.value)
+    }
+
+    @Test
+    fun `when contextual native input disabled, then showTextSelectionAction emits false`() = runTest {
+        duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
+        duckChatFeature.contextualSheetRedesign().setRawStoredState(State(enable = true))
+        duckChatFeature.duckAiTextSelectionAction().setRawStoredState(State(enable = true))
+        duckChatFeature.contextualNativeInput().setRawStoredState(State(enable = false))
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.showTextSelectionAction.value)
+    }
+
+    @Test
+    fun `when contextual mode disabled, then showTextSelectionAction emits false`() = runTest {
+        duckChatFeature.contextualMode().setRawStoredState(State(enable = false))
+        duckChatFeature.contextualSheetRedesign().setRawStoredState(State(enable = true))
+        duckChatFeature.duckAiTextSelectionAction().setRawStoredState(State(enable = true))
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.showTextSelectionAction.value)
+    }
+
+    @Test
     fun `when contextual mode enabled, isDuckChatContextualModeEnabled returns true`() = runTest {
         duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
         duckChatFeature.contextualModeKillSwitch().setRawStoredState(State(enable = true))
@@ -1601,6 +1662,36 @@ class RealDuckChatTest {
         testee.onPrivacyConfigDownloaded()
 
         assertFalse(testee.areMultipleContentAttachmentsEnabled())
+    }
+
+    @Test
+    fun `when all chats menu item enabled and sheet redesign enabled, isContextualMenuAllChatsEnabled returns true`() = runTest {
+        duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
+        duckChatFeature.contextualSheetRedesign().setRawStoredState(State(enable = true))
+        duckChatFeature.contextualMenuAllChats().setRawStoredState(State(enable = true))
+        testee.onPrivacyConfigDownloaded()
+
+        assertTrue(testee.isContextualMenuAllChatsEnabled())
+    }
+
+    @Test
+    fun `when all chats menu item disabled, isContextualMenuAllChatsEnabled returns false`() = runTest {
+        duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
+        duckChatFeature.contextualSheetRedesign().setRawStoredState(State(enable = true))
+        duckChatFeature.contextualMenuAllChats().setRawStoredState(State(enable = false))
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.isContextualMenuAllChatsEnabled())
+    }
+
+    @Test
+    fun `when all chats menu item enabled and sheet redesign disabled, isContextualMenuAllChatsEnabled returns false`() = runTest {
+        duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
+        duckChatFeature.contextualSheetRedesign().setRawStoredState(State(enable = false))
+        duckChatFeature.contextualMenuAllChats().setRawStoredState(State(enable = true))
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.isContextualMenuAllChatsEnabled())
     }
 
     @Test
@@ -1943,6 +2034,67 @@ class RealDuckChatTest {
         assertTrue(results[0])
         assertFalse(results[1])
     }
+
+    @Test
+    fun whenOpenDuckChatImageGenerationAndCurrentModelSupportsItThenModelNotSwitchedAndOpensWithImageGenerationForced() = runTest {
+        val current = aiModel("m1", tools = listOf(Tool.IMAGE_GENERATION))
+        whenever(mockDuckAiModelManager.modelState).thenReturn(
+            MutableStateFlow(ModelState(models = listOf(current), selectedModelId = "m1")),
+        )
+
+        testee.openDuckChatImageGeneration(DuckChatEntryPoint.BROWSING_MENU_WEBPAGE)
+        coroutineRule.testScope.advanceUntilIdle()
+
+        verify(mockDuckAiModelManager, never()).selectModel(any())
+        verify(mockBrowserNav).openDuckChat(any(), any(), any(), eq(true), any(), anyOrNull())
+        verify(mockContext).startActivity(mockIntent)
+    }
+
+    @Test
+    fun whenOpenDuckChatImageGenerationAndCurrentModelUnsupportedThenSwitchesToCapableModelAndForcesImageGeneration() = runTest {
+        val current = aiModel("m1")
+        val capable = aiModel("m2", tools = listOf(Tool.IMAGE_GENERATION))
+        whenever(mockDuckAiModelManager.modelState).thenReturn(
+            MutableStateFlow(ModelState(models = listOf(current, capable), selectedModelId = "m1")),
+        )
+
+        testee.openDuckChatImageGeneration(DuckChatEntryPoint.BROWSING_MENU_WEBPAGE)
+        coroutineRule.testScope.advanceUntilIdle()
+
+        verify(mockDuckAiModelManager).selectModel(capable)
+        verify(mockBrowserNav).openDuckChat(any(), any(), any(), eq(true), any(), anyOrNull())
+        verify(mockContext).startActivity(mockIntent)
+    }
+
+    @Test
+    fun whenOpenDuckChatImageGenerationAndNoAccessibleImageCapableModelThenDoesNotForceImageGenerationButStillOpens() = runTest {
+        val current = aiModel("m1")
+        val inaccessible = aiModel("m2", isAccessible = false, tools = listOf(Tool.IMAGE_GENERATION))
+        whenever(mockDuckAiModelManager.modelState).thenReturn(
+            MutableStateFlow(ModelState(models = listOf(current, inaccessible), selectedModelId = "m1")),
+        )
+
+        testee.openDuckChatImageGeneration(DuckChatEntryPoint.BROWSING_MENU_WEBPAGE)
+        coroutineRule.testScope.advanceUntilIdle()
+
+        verify(mockDuckAiModelManager, never()).selectModel(any())
+        verify(mockBrowserNav).openDuckChat(any(), any(), any(), eq(false), any(), anyOrNull())
+        verify(mockContext).startActivity(mockIntent)
+    }
+
+    private fun aiModel(
+        id: String,
+        isAccessible: Boolean = true,
+        tools: List<Tool> = emptyList(),
+    ) = AIChatModel(
+        id = id,
+        name = id,
+        displayName = id,
+        shortName = id,
+        accessTier = emptyList(),
+        isAccessible = isAccessible,
+        supportedTools = tools,
+    )
 
     private suspend fun enableChatHistoryFlags() {
         duckChatFeature.self().setRawStoredState(State(enable = true))

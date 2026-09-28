@@ -60,7 +60,6 @@
     <string name="duckAiMicPermissionDeniedSnackBarMessage">Balso funkcijoms reikia leidimo naudoti mikrofoną</string>
     <string name="duckAiMicPermissionDeniedDialogTitle">„DuckDuckGo“ reikia prieigos prie tavo mikrofono</string>
     <string name="duckAiMicPermissionDeniedDialogContent">Jei nori naudotis „Duck.ai“ pokalbiais balsu, reikia leidimo naudoti mikrofoną</string>
-    <string name="duckAiMicPermissionDeniedDialogPositiveButton">Keisti leidimus</string>
 
     <string name="sitePermissionsSettingsDescription">Svetainėse, kuriose lankotės, gali būti prašoma prieigos prie jūsų įrenginio buvimo vietos, kameros, mikrofono arba DRM (skaitmeninių teisių valdymo) programinės įrangos. Jos negalės prie jų prisijungti, nebent aiškiai suteiksite joms leidimą.</string>
     <string name="sitePermissionsSettingsEnablePermissionTitle">Leisti visoms svetainėms prašyti:</string>
@@ -76,5 +75,34 @@
     <string name="permissionsPerWebsiteAllowSetting">Leisti</string>
     <string name="permissionsPerWebsiteAskDisabledSetting">Išjungta visose svetainėse</string>
     <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s leidimas %2$s</string>
+
+    <!-- Tiered permission dialog -->
+    <string name="sitePermissionsDialogAllowWhileUsingSiteButton" instruction="Button granting a website a permission for every visit, until the user changes it">Leisti naudojant svetainę</string>
+    <string name="sitePermissionsDialogAllowThisTimeButton" instruction="Button granting a website a permission for the current visit only">Leisti šį kartą</string>
+    <string name="sitePermissionsDialogNeverAllowButton" instruction="Button refusing a website a permission for every visit, until the user changes it">Niekada neleisti</string>
+    <string name="sitePermissionsTieredLocationDialogTitle" instruction="Placeholder is a website">Interneto svetainė „%1$s“ nori pasiekti tavo vietovę</string>
+    <string name="sitePermissionsTieredDdgLocationDialogTitle" instruction="Placeholder is a website">„%1$s“ nori pasiekti tavo vietovę</string>
+    <string name="sitePermissionsTieredDdgLocationDialogSubtitle">Anonimizuosime tavo vietą ir naudosime ją, kad pateiktume geresnius rezultatus, esančius arčiau tavęs.</string>
+    <string name="sitePermissionsTieredCameraDialogTitle" instruction="Placeholder is a website">Interneto svetainė „%1$s“ nori pasiekti tavo kamerą</string>
+    <string name="sitePermissionsTieredMicDialogTitle" instruction="Placeholder is a website">Interneto svetainė „%1$s“ nori pasiekti tavo mikrofoną</string>
+    <string name="sitePermissionsTieredMicAndCameraDialogTitle" instruction="Placeholder is a website">Interneto svetainė „%1$s“ nori pasiekti tavo kamerą ir mikrofoną</string>
+    <string name="sitePermissionsTieredDrmDialogSubtitle">Jei neleisi, vaizdo įrašai svetainėje gali nebeveikti, tačiau ši svetainė neturės prieigos prie įrenginio identifikatorių, kuriuos teikia DRM programinė įranga.</string>
+
+    <!-- Reminder dialog -->
+    <string name="sitePermissionsDialogChangePermissionsButton" instruction="Button opening the DuckDuckGo permission settings in the Android system settings app">Keisti leidimus</string>
+    <string name="sitePermissionsTieredSystemDeniedLocationTitle">„DuckDuckGo“ reikia pasiekti tavo vietovę</string>
+    <string name="sitePermissionsTieredSystemDeniedLocationContent">Norint šioje svetainėje naudotis vietos funkcijomis, reikia vietos leidimų.</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraTitle">„DuckDuckGo“ reikia pasiekti tavo kamerą</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraContent">Norint šioje svetainėje naudotis kameros funkcijomis, reikia kameros leidimų.</string>
+    <string name="sitePermissionsTieredSystemDeniedMicTitle">„DuckDuckGo“ reikia pasiekti tavo mikrofoną</string>
+    <string name="sitePermissionsTieredSystemDeniedMicContent">Jei šioje svetainėje nori naudotis mikrofono funkcijomis, reikia mikrofono leidimų.</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraAndMicTitle">„DuckDuckGo“ reikia pasiekti tavo kamerą ir mikrofoną</string>
+    <string name="sitePermissionsTieredSystemDeniedCameraAndMicContent">Jei nori šioje svetainėje naudotis kameros ir mikrofono funkcijomis, reikia leidimo naudoti kamerą ir mikrofoną.</string>
+
+    <!-- Denial snackbar -->
+    <string name="sitePermissionsTieredLocationDeniedSnackBarMessage">„DuckDuckGo“ nepavyko bendrinti vietovės su šia svetaine</string>
+    <string name="sitePermissionsTieredCameraDeniedSnackBarMessage">„DuckDuckGo“ nepavyko suteikti šiai svetainei prieigos prie kameros</string>
+    <string name="sitePermissionsTieredMicDeniedSnackBarMessage">„DuckDuckGo“ nepavyko suteikti šiai svetainei prieigos prie mikrofono</string>
+    <string name="sitePermissionsTieredCameraAndMicDeniedSnackBarMessage">„DuckDuckGo“ nepavyko suteikti šiai svetainei prieigos prie kameros ir mikrofono</string>
 
 </resources>

@@ -1881,5 +1881,5 @@ internal fun resolveDuckPlayerIcon(isAddressBarRebrandEnabled: Boolean): Int =
     if (isAddressBarRebrandEnabled) {
         R.drawable.video_player_color_24_brand_update
     } else {
-        R.drawable.ic_video_player_color_24
+        R.drawable.video_player_color_24
     }

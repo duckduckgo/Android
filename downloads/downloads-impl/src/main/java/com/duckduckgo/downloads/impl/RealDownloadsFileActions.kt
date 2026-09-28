@@ -35,14 +35,24 @@ import java.io.File
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
-class RealDownloadsFileActions @Inject constructor(private val appBuildConfig: AppBuildConfig) : DownloadsFileActions {
+class RealDownloadsFileActions @Inject constructor(
+    private val appBuildConfig: AppBuildConfig,
+    private val newDownloadState: InternalNewDownloadState,
+) : DownloadsFileActions {
 
+    /**
+     * Opening a downloaded file counts as the user acting on it, so a successful open also clears the new-download indicator.
+     */
     override fun openFile(applicationContext: Context, file: File): Boolean {
         val intent = createIntentToOpenFile(applicationContext, file)
         val packageManager = applicationContext.packageManager ?: return false
         val launchIntent = excludeOwnPackage(applicationContext, packageManager, intent)
         return if (launchIntent.resolveActivity(packageManager) != null) {
-            startActivity(applicationContext, launchIntent)
+            startActivity(applicationContext, launchIntent).also { opened ->
+                if (opened) {
+                    newDownloadState.onNewDownloadAcknowledged()
+                }
+            }
         } else {
             logcat(ERROR) { "Failed to resolve activity" }
             false

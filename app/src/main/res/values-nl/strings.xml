@@ -213,13 +213,7 @@
     <!-- Get Desktop Browser -->
     <string name="getDesktopBrowserSettingItemTitle">Download de desktopbrowser</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo voor Mac en Windows</string>
-    <string name="getDesktopBrowserTitle">Bescherm je persoonlijke informatie ook op Mac en Windows!</string>
-    <string name="getDesktopBrowserBody">Om DuckDuckGo te downloaden op Mac of Windows, bezoek:</string>
-    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
-    <string name="getDesktopBrowserShareDownloadLink">Downloadlink delen</string>
-    <string name="getDesktopBrowserNoThanks">Nee, bedankt</string>
     <string name="getDesktopBrowserHideItem">Verbergen</string>
-    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Link gekopieerd</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Bescherming tegen cookiepop-ups</string>
@@ -965,6 +959,22 @@
     <string name="preOnboardingWidgetPromptBody">Voeg onze zoekwidget toe aan je startscherm voor snelle en gemakkelijke toegang.</string>
     <string name="preOnboardingWidgetPromptPrimaryCta">Widget toevoegen</string>
     <string name="preOnboardingWidgetPromptSecondaryCta">Overslaan</string>
+
+    <!-- Pre-onboarding: import passwords -->
+    <string name="preOnboardingImportPasswordsTitle">Wachtwoorden importeren van Google</string>
+    <string name="preOnboardingImportPasswordsBody">Google kan je vragen om in te loggen of je wachtwoord in te voeren ter bevestiging.</string>
+    <string name="preOnboardingImportPasswordsPrimaryCta">Importeren van Google</string>
+    <string name="preOnboardingImportCompleteTitle">Importeren voltooid</string>
+    <string name="preOnboardingImportCompleteCta">Doorgaan</string>
+    <string name="preOnboardingImportCompleteParsingTitle">Wachtwoorden importeren...</string>
+    <string name="preOnboardingImportCompleteParsingBody">Dit duurt maar even.</string>
+    <string name="preOnboardingImportCompleteFailedTitle">Importeren mislukt</string>
+    <string name="preOnboardingImportCompleteFailed">Wachtwoord importeren mislukt</string>
+    <string name="preOnboardingImportCompleteImported" instruction="Placeholder is the number of passwords that were imported.">Wachtwoorden geïmporteerd: %1$s</string>
+    <string name="preOnboardingImportCompleteSkipped" instruction="Placeholder is the number of passwords that were not imported.">Overgeslagen (duplicaat of ongeldig): %1$s</string>
+    <string name="preOnboardingImportErrorTitle">Er is iets misgegaan</string>
+    <string name="preOnboardingImportErrorBody">Probeer het opnieuw.</string>
+    <string name="preOnboardingImportErrorRetry">Probeer het opnieuw</string>
 
     <!-- Pre-onboarding: add to home screen -->
     <string name="preOnboardingDockStepTitle">Voeg me toe aan je favorietenrij.</string>

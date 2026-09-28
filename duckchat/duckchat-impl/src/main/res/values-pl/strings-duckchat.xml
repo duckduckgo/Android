@@ -352,4 +352,25 @@
     <string name="duckChatContextualAskAboutPage">Zapytaj o stronę</string>
     <string name="duckChatContextualAskAboutSearch">Kontynuuj w Duck.ai</string>
     <string name="duckChatContextualOpenDuckAi">Otwórz Duck.ai</string>
+
+    <!-- Suggested prompts for text selection -->
+    <string name="duckAiSuggestionSummarizeSelectionLabel">Podsumuj to zaznaczenie</string>
+    <string name="duckAiSuggestionSummarizeSelectionPrompt">Podsumuj to zaznaczenie.</string>
+    <string name="duckAiSuggestionTranslateSelectionLabel">Przetłumacz to zaznaczenie</string>
+    <string name="duckAiSuggestionTranslateSelectionPrompt" instruction="%1$s is replaced with the name of the user&apos;s language.">Przetłumacz to zaznaczenie na język %1$s.</string>
+
+    <!-- Name shown for an attached text selection in the Duck.ai -->
+    <string name="duckAiTextSelectionAttachmentTitle">Zaznaczenie tekstu</string>
+    <string name="duckAiTextSelectionLimitReached" instruction="%1$d is replaced with the maximum number of text selections.">Możesz dodać do %1$d zaznaczonych tekstów. Usuń jeden z nich, aby dodać kolejny.</string>
+
+    <!-- Duck.ai text selection menu action -->
+    <string name="duckAiTextSelectionMenuItem">Zapytaj Duck.ai</string>
+
+    <!-- Prefix on the Duck.ai attachment chip for a text selection -->
+    <plurals name="duckAiTextSelectionWordCount">
+        <item quantity="one">%1$d słowo</item>
+        <item quantity="few">%1$d słowa</item>
+        <item quantity="many">%1$d słów</item>
+        <item quantity="other">%1$d słowa</item>
+    </plurals>
 </resources>

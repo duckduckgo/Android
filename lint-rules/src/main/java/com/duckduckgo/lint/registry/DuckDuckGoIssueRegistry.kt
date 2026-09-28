@@ -55,6 +55,7 @@ import com.duckduckgo.lint.ui.DaxListItemContentDetector.Companion.INVALID_DAX_L
 import com.duckduckgo.lint.ui.DaxTextColorUsageDetector.Companion.INVALID_DAX_TEXT_COLOR_USAGE
 import com.duckduckgo.lint.ui.NoRawM3AlertDialogUsageDetector.Companion.NO_RAW_M3_ALERT_DIALOG_USAGE
 import com.duckduckgo.lint.ui.NoRawM3ButtonUsageDetector.Companion.NO_RAW_M3_BUTTON_USAGE
+import com.duckduckgo.lint.ui.NoRawM3SliderUsageDetector.Companion.NO_RAW_M3_SLIDER_USAGE
 import com.duckduckgo.lint.ui.NoRawM3SnackbarUsageDetector.Companion.NO_RAW_M3_SNACKBAR_USAGE
 import com.duckduckgo.lint.ui.NoRawM3SurfaceUsageDetector.Companion.NO_RAW_M3_SURFACE_USAGE
 import com.duckduckgo.lint.ui.DaxTextFieldTrailingIconDetector.Companion.INVALID_DAX_TEXT_FIELD_TRAILING_ICON_USAGE
@@ -144,6 +145,7 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
             NO_RAW_M3_ALERT_DIALOG_USAGE,
             NO_RAW_M3_SURFACE_USAGE,
             NO_RAW_M3_SNACKBAR_USAGE,
+            NO_RAW_M3_SLIDER_USAGE,
 
         ).plus(WebViewCompatApisUsageDetector.issues)
 

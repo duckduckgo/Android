@@ -424,12 +424,13 @@ class RealNativeInputManagerTest {
             callbacks = NativeInputCallbacks(
                 onSearchTextChanged = {},
                 onSearchSubmitted = {},
-                onDuckAiChatSubmitted = { _, _, _, _, _, _ -> },
+                onDuckAiChatSubmitted = { _, _, _, _, _, _, _ -> },
                 onChatSuggestionSelected = {},
                 onDuckAiQuerySubmitted = onDuckAiQuerySubmitted,
                 onClearAutocomplete = {},
                 onStopTapped = {},
             ),
+            forceImageGeneration = false,
         )
         return widget
     }
@@ -443,6 +444,7 @@ class RealNativeInputManagerTest {
             currentTabUrl = emptyFlow(),
             query = "",
             callbacks = mock<NativeInputCallbacks>(),
+            forceImageGeneration = false,
         )
     }
 

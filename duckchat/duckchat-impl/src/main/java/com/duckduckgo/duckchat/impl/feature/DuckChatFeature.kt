@@ -62,14 +62,6 @@ interface DuckChatFeature {
     fun duckAiInputScreen(): Toggle
 
     /**
-     * @return `true` when the new address bar option choice screen should be shown.
-     * If the remote feature is not present defaults to `internal`.
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    @InternalAlwaysEnabled
-    fun showNewAddressBarPickerScreen(): Toggle
-
-    /**
      * @return `true` when the Setting for allowing Duck.ai chats to be deleted with the Fire Button is enabled
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
@@ -253,13 +245,6 @@ interface DuckChatFeature {
     fun aiFeaturesNativeControls(): Toggle
 
     /**
-     * @return `true` when the "Duck.ai Settings" link is visible in AI Features.
-     * If the remote feature is not present defaults to `internal`
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun duckAiSettings(): Toggle
-
-    /**
      * @return Toggle iseÉnabled `true` when the remove chat history feature is enabled.
      * If the remote feature is not present defaults to `true`
      */
@@ -292,9 +277,49 @@ interface DuckChatFeature {
     fun contextualSheetRedesign(): Toggle
 
     /**
+     * @return `true` when the All Chats entry (and its divider) is shown in the Duck.ai address bar menu.
+     * If the remote feature is not present defaults to `INTERNAL`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun contextualMenuAllChats(): Toggle
+
+    /**
      * @return `true` when the Duck.ai session wide event should be sent
      * If the remote feature is not present defaults to `internal`
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun sendDuckAiSessionWideEvent(): Toggle
+
+    /**
+     * @return `true` when the updated Duck.ai model and reasoning pickers are enabled: models grouped
+     * by availability, backend-driven ordering and sublines, and a gated section header that follows the
+     * user's tier.
+     * If the remote feature is not present defaults to `false`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun updatedPickers(): Toggle
+
+    /**
+     * @return `true` when the Duck.ai sidebar button should open the native chat history screen
+     * instead of the legacy web sidebar.
+     * If the remote feature is not present defaults to `internal`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun nativeDuckAiSidebar(): Toggle
+
+    /**
+     * Kill switch for dismissing the contextual Duck.ai entry dialog when its tab stops being the
+     * selected one, so it can't float over another tab.
+     * @return `true` when the dialog should be dismissed on a tab change.
+     * If the remote feature is not present defaults to `true`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun contextualEntryDismissOnTabChange(): Toggle
+
+    /**
+     * @return `true` when the "Ask Duck.ai" text selection menu item is enabled.
+     * If the remote feature is not present defaults to `INTERNAL`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun duckAiTextSelectionAction(): Toggle
 }

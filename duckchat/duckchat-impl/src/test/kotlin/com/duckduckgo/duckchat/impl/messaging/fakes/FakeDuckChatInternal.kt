@@ -80,7 +80,7 @@ class FakeDuckChatInternal(
 
     override fun getDuckChatSettingsUrl(): String = "https://duck.ai?settings=open"
 
-    override fun isDuckChatUrl(uri: Uri): Boolean = false
+    override fun isDuckChatUrl(uri: Uri): Boolean = uri.host == "duck.ai"
 
     override suspend fun wasOpenedBefore(): Boolean = false
 
@@ -203,6 +203,8 @@ class FakeDuckChatInternal(
 
     override fun isContextualSheetRedesignEnabled(): Boolean = false
 
+    override fun isContextualMenuAllChatsEnabled(): Boolean = false
+
     override fun resolvedTogglePosition(): NativeInputState.ToggleSelection = NativeInputState.ToggleSelection.SEARCH
 
     override fun isDuckChatFeatureEnabled(): Boolean = true
@@ -231,7 +233,11 @@ class FakeDuckChatInternal(
 
     override suspend fun onAddressBarPickerDuckAiSelected() { }
 
+    override fun openDuckChatImageGeneration(entryPoint: DuckChatEntryPoint) { }
+
     override fun buildChatUrl(chatId: String): String = "https://duck.ai?chatID=$chatId"
+
+    override fun getChatProtectionUrl(): String = "https://duck.ai/chat?chatProtection=open"
 
     private val _defaultTogglePosition = MutableStateFlow<String?>(null)
 

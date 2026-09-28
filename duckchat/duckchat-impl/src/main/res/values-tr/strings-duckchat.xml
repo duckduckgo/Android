@@ -350,4 +350,23 @@
     <string name="duckChatContextualAskAboutPage">Sayfa Hakkında Soru Sor</string>
     <string name="duckChatContextualAskAboutSearch">Duck.ai\'da devam et</string>
     <string name="duckChatContextualOpenDuckAi">Duck.ai\'ı aç</string>
+
+    <!-- Suggested prompts for text selection -->
+    <string name="duckAiSuggestionSummarizeSelectionLabel">Bu seçimi özetle</string>
+    <string name="duckAiSuggestionSummarizeSelectionPrompt">Bu seçimi özetle.</string>
+    <string name="duckAiSuggestionTranslateSelectionLabel">Bu seçimi çevir</string>
+    <string name="duckAiSuggestionTranslateSelectionPrompt" instruction="%1$s is replaced with the name of the user&apos;s language.">Bu seçimi %1$s diline çevir.</string>
+
+    <!-- Name shown for an attached text selection in the Duck.ai -->
+    <string name="duckAiTextSelectionAttachmentTitle">Metin seçimi</string>
+    <string name="duckAiTextSelectionLimitReached" instruction="%1$d is replaced with the maximum number of text selections.">En fazla %1$d metin seçimi ekleyebilirsin. Başka bir tane eklemek için birini kaldır.</string>
+
+    <!-- Duck.ai text selection menu action -->
+    <string name="duckAiTextSelectionMenuItem">Duck.ai\'a sor</string>
+
+    <!-- Prefix on the Duck.ai attachment chip for a text selection -->
+    <plurals name="duckAiTextSelectionWordCount">
+        <item quantity="one">%1$d kelime</item>
+        <item quantity="other">%1$d kelime</item>
+    </plurals>
 </resources>

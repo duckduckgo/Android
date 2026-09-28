@@ -61,15 +61,7 @@ import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 interface ModelPicker {
-    var onMenuShown: (() -> Unit)?
-    var onMenuDismissed: (() -> Unit)?
-    var onModelSelected: (() -> Unit)?
 
-    /** Invoked when the user picks a model during the FE recovery model-change flow. */
-    var onChangeModelSubmitted: ((modelId: String) -> Unit)?
-    fun getSelectedModelId(): String?
-    fun isImageGenerationSupported(): Boolean
-    fun isWebSearchSupported(): Boolean
     fun setPickerEnabled(enabled: Boolean)
     fun setHost(host: NativeInputHost)
 
@@ -102,7 +94,6 @@ class ModelPickerView @JvmOverloads constructor(
     private var inputContextJob: Job? = null
     private var commandJob: Job? = null
     private var modelChangeJob: Job? = null
-    private var effectiveModelJob: Job? = null
     private var popupWindow: PopupWindow? = null
     private var lastNativeInputState: NativeInputState? = null
 
@@ -110,25 +101,9 @@ class ModelPickerView @JvmOverloads constructor(
     // read synchronously from popup callbacks. Updated by observeInputContext().
     private var lastInputContext: InputContext = InputContext.BROWSER
     private lateinit var host: NativeInputHost
-    override var onMenuShown: (() -> Unit)? = null
-    override var onMenuDismissed: (() -> Unit)? = null
-    override var onModelSelected: (() -> Unit)? = null
-    override var onChangeModelSubmitted: ((modelId: String) -> Unit)? = null
 
     init {
         inflate(context, R.layout.view_model_picker, this)
-    }
-
-    override fun getSelectedModelId(): String? = viewModel.getSelectedModelId()
-
-    override fun isImageGenerationSupported(): Boolean {
-        if (!isAttachedToWindow) return true
-        return viewModel.isImageGenerationSupported()
-    }
-
-    override fun isWebSearchSupported(): Boolean {
-        if (!isAttachedToWindow) return true
-        return viewModel.isWebSearchSupported()
     }
 
     private var pickerEnabled = false
@@ -186,13 +161,6 @@ class ModelPickerView @JvmOverloads constructor(
             .onEach { updateVisibility() }
             .launchIn(scope)
 
-        // Refresh option tool-visibility whenever the effective (chat-aware / recovery) model
-        // changes, not only on global model changes — otherwise options reflect the wrong model.
-        effectiveModelJob?.cancel()
-        effectiveModelJob = viewModel.effectiveModelId
-            .onEach { onModelSelected?.invoke() }
-            .launchIn(scope)
-
         chipLabelJob?.cancel()
         chipLabelJob = viewModel.chipLabel
             .onEach { label -> label?.let { chip.text = it } }
@@ -208,7 +176,7 @@ class ModelPickerView @JvmOverloads constructor(
             .onEach { change ->
                 when (change) {
                     is PickerModelChange.ChangeModel -> {
-                        onChangeModelSubmitted?.invoke(change.modelId)
+                        host?.changeModelSubmitted(change.modelId)
                         dismissPopup()
                     }
                 }
@@ -245,7 +213,7 @@ class ModelPickerView @JvmOverloads constructor(
 
         viewModel.menuShowing = true
         viewModel.onPickerShown(currentSurface())
-        onMenuShown?.invoke()
+        host?.modelMenuShown()
         showPopupWindow(state)
     }
 
@@ -293,7 +261,7 @@ class ModelPickerView @JvmOverloads constructor(
     private fun onPopupDismissed() {
         viewModel.menuShowing = false
         popupWindow = null
-        onMenuDismissed?.invoke()
+        host?.modelMenuDismissed(viewModel.hasPendingRecoverySelection())
     }
 
     override fun onDetachedFromWindow() {
@@ -308,8 +276,6 @@ class ModelPickerView @JvmOverloads constructor(
         commandJob = null
         modelChangeJob?.cancel()
         modelChangeJob = null
-        effectiveModelJob?.cancel()
-        effectiveModelJob = null
         lastNativeInputState = null
         dismissPopup()
     }
@@ -325,13 +291,38 @@ class ModelPickerView @JvmOverloads constructor(
 
     private fun LinearLayout.populateMenu(state: ModelState, popup: PopupWindow) {
         val selectedId = viewModel.selectedModelIdForMenu()
+        val updatedPickers = viewModel.updatedPickersEnabled()
         viewModel.buildSections(state).forEachIndexed { index, section ->
             if (index > 0) addDivider()
             section.headerRes?.let { addSectionHeader(context.getString(it)) }
             for (model in section.models) {
-                addModelItem(model, selected = model.id == selectedId, popup)
+                if (updatedPickers) {
+                    addPickerRow(model, selected = model.id == selectedId, gated = section.gated, popup)
+                } else {
+                    addModelItem(model, selected = model.id == selectedId, popup)
+                }
             }
         }
+    }
+
+    private fun LinearLayout.addPickerRow(
+        model: AIChatModel,
+        selected: Boolean,
+        gated: Boolean,
+        popup: PopupWindow,
+    ) {
+        val item = pickerMenuItem(
+            parent = this,
+            title = model.displayName,
+            leadingIconRes = viewModel.getIconResForModel(model),
+            subtitle = viewModel.subtitleResFor(model)?.let { context.getString(it) },
+            selected = selected,
+            showsFollowUpEllipsis = gated,
+        ) {
+            viewModel.onModelTapped(model, currentSurface())
+            popup.dismiss()
+        }
+        addView(item)
     }
 
     private fun LinearLayout.addModelItem(model: AIChatModel, selected: Boolean, popup: PopupWindow) {

@@ -48,12 +48,12 @@ import com.duckduckgo.app.trackerdetection.TdsClient
 import com.duckduckgo.app.trackerdetection.TdsEntityLookup
 import com.duckduckgo.app.trackerdetection.TrackerDetectorClientProvider
 import com.duckduckgo.app.trackerdetection.TrackerDetectorImpl
+import com.duckduckgo.app.trackerdetection.WebTrackersBlockedHistory
 import com.duckduckgo.app.trackerdetection.api.ActionJsonAdapter
 import com.duckduckgo.app.trackerdetection.api.TdsJson
 import com.duckduckgo.app.trackerdetection.db.TdsCnameEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
-import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.FileUtilities
@@ -108,7 +108,7 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
     private val mockTrackerAllowlist: TrackerAllowlist = mock()
     private val mockRequestBlocklist: RequestBlocklist = mock()
     private val mockUserAllowListRepository: UserAllowListRepository = mock()
-    private var mockWebTrackersBlockedDao: WebTrackersBlockedDao = mock()
+    private var mockWebTrackersBlockedHistory: WebTrackersBlockedHistory = mock()
     private var mockHttpsUpgrader: HttpsUpgrader = mock()
     private var mockRequest: WebResourceRequest = mock()
     private val mockPrivacyProtectionCountDao: PrivacyProtectionCountDao = mock()
@@ -195,7 +195,7 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
             appCoroutineScope = coroutinesTestRule.testScope,
             androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,
             isMainProcess = true,
-            webTrackersBlockedDao = mockWebTrackersBlockedDao,
+            webTrackersBlockedHistory = mockWebTrackersBlockedHistory,
         )
     }
 

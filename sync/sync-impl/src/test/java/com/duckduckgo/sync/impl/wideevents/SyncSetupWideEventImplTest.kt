@@ -24,10 +24,13 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator
+import com.google.testing.junit.testparameterinjector.TestParameter
+import com.google.testing.junit.testparameterinjector.TestParameterInjector
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -35,6 +38,7 @@ import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 
+@RunWith(TestParameterInjector::class)
 class SyncSetupWideEventImplTest {
 
     @get:Rule
@@ -60,7 +64,10 @@ class SyncSetupWideEventImplTest {
     }
 
     @Test
-    fun `onFlowStarted starts a new flow with correct ui parameters`() = runTest {
+    fun `onFlowStarted starts a new flow with correct ui and flow parameters`(
+        @TestParameter protocol: ProtocolVersion,
+    ) = runTest {
+        protocol.configure(syncFeature)
         whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any()))
             .thenReturn(Result.success(1L))
 
@@ -68,13 +75,16 @@ class SyncSetupWideEventImplTest {
 
         verify(wideEventClient).flowStart(
             name = "sync-setup",
-            metadata = mapOf("user_auth_required" to "true", "ui_version" to "v2"),
+            metadata = mapOf("user_auth_required" to "true", "ui_version" to "v2", "flow_version" to protocol.value),
             cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
         )
     }
 
     @Test
-    fun `onFlowStarted passes source as flowEntryPoint`() = runTest {
+    fun `onFlowStarted passes source as flowEntryPoint`(
+        @TestParameter protocol: ProtocolVersion,
+    ) = runTest {
+        protocol.configure(syncFeature)
         whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any()))
             .thenReturn(Result.success(1L))
 
@@ -83,7 +93,7 @@ class SyncSetupWideEventImplTest {
         verify(wideEventClient).flowStart(
             name = "sync-setup",
             flowEntryPoint = "settings",
-            metadata = mapOf("user_auth_required" to "true", "ui_version" to "v2"),
+            metadata = mapOf("user_auth_required" to "true", "ui_version" to "v2", "flow_version" to protocol.value),
             cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
         )
     }
@@ -333,5 +343,21 @@ class SyncSetupWideEventImplTest {
 
         verify(wideEventClient, org.mockito.kotlin.times(2)).getFlowIds("sync-setup")
         verifyNoMoreInteractions(wideEventClient)
+    }
+
+    enum class ProtocolVersion(
+        val value: String,
+    ) {
+        ProtocolV1("v1"),
+        ProtocolV2("v2"),
+        ProtocolV2Point1("v2.1"),
+        ;
+
+        fun configure(syncFeature: SyncFeature) {
+            val v2Enabled = this != ProtocolV1
+            val v2Point1Enabled = this == ProtocolV2Point1
+            syncFeature.canUseV2ConnectFlow().setRawStoredState(State(v2Enabled))
+            syncFeature.canUseExchangeV2Point1().setRawStoredState(State(v2Point1Enabled))
+        }
     }
 }

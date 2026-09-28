@@ -26,12 +26,14 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InputContext
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InputMode
+import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.RealTextSelectionRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotSame
 import org.junit.Assert.assertSame
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -62,9 +64,12 @@ class RealNativeInputStateStoreTest {
         whenever(it.currentMode).thenReturn(currentModeFlow)
     }
 
+    private val textSelectionRepository = RealTextSelectionRepository()
+
     private val testee = RealNativeInputStateStore(
         dagger.Lazy { tabRepositoryProvider },
         browserModeStateHolder,
+        textSelectionRepository,
     )
 
     @Test
@@ -166,6 +171,28 @@ class RealNativeInputStateStoreTest {
         testee.clearTab("tab-a")
 
         assertEquals(stateB, testee.stateForTab("tab-b").value)
+    }
+
+    @Test
+    fun whenClearTabCalledThenTextSelectionsForThatTabAreCleared() {
+        textSelectionRepository.add("tab-a", "selected", "https://example.com")
+        textSelectionRepository.add("tab-b", "other", "https://example.com")
+
+        testee.clearTab("tab-a")
+
+        assertTrue(textSelectionRepository.selections("tab-a").value.isEmpty())
+        assertEquals(1, textSelectionRepository.selections("tab-b").value.size)
+    }
+
+    @Test
+    fun whenClearAllCalledThenAllTextSelectionsAreCleared() {
+        textSelectionRepository.add("tab-a", "selected", "https://example.com")
+        textSelectionRepository.add("tab-b", "other", "https://example.com")
+
+        testee.clearAll()
+
+        assertTrue(textSelectionRepository.selections("tab-a").value.isEmpty())
+        assertTrue(textSelectionRepository.selections("tab-b").value.isEmpty())
     }
 
     @Test

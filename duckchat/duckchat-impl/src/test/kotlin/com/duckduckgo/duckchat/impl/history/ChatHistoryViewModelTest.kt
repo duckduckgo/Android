@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.history
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.TurbineTestContext
 import app.cash.turbine.test
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -41,14 +42,17 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
+@RunWith(AndroidJUnit4::class)
 class ChatHistoryViewModelTest {
 
     @get:Rule
@@ -437,6 +441,38 @@ class ChatHistoryViewModelTest {
                 val event = awaitItem() as ChatHistoryViewModel.NavigationEvent.OpenChat
                 assertEquals("https://duck.ai?chatID=abc", event.url)
                 assertEquals("current-tab", event.sourceTabId)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `onChatsProtectionClicked while on a duck ai chat tab reuses that tab`() =
+        coroutineRule.testScope.runTest {
+            whenever(tabRepository.getSelectedTab()).thenReturn(TabEntity(tabId = "chat-tab", url = "https://duck.ai/chat"))
+
+            viewModel.navigationEvents.test {
+                viewModel.onChatsProtectionClicked()
+
+                val event = awaitItem() as ChatHistoryViewModel.NavigationEvent.OpenChatProtection
+                assertEquals("https://duck.ai/chat?chatProtection=open", event.url)
+                assertEquals("chat-tab", event.sourceTabId)
+                assertFalse(event.inNewTab)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `onChatsProtectionClicked from any other tab opens chat protection in a new tab`() =
+        coroutineRule.testScope.runTest {
+            whenever(tabRepository.getSelectedTab()).thenReturn(TabEntity(tabId = "web-tab", url = "https://example.com"))
+
+            viewModel.navigationEvents.test {
+                viewModel.onChatsProtectionClicked()
+
+                val event = awaitItem() as ChatHistoryViewModel.NavigationEvent.OpenChatProtection
+                assertEquals("https://duck.ai/chat?chatProtection=open", event.url)
+                assertEquals("web-tab", event.sourceTabId)
+                assertTrue(event.inNewTab)
                 cancelAndIgnoreRemainingEvents()
             }
         }

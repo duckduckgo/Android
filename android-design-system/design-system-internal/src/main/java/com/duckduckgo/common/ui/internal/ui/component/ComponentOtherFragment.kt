@@ -18,6 +18,6 @@ package com.duckduckgo.common.ui.internal.ui.component
 
 class ComponentOtherFragment : ComponentFragment() {
     override fun getComponents(): List<Component> {
-        return listOf(Component.SECTION_DIVIDER, Component.PROGRESS_SPINNER)
+        return listOf(Component.SECTION_DIVIDER, Component.PROGRESS_SPINNER, Component.SKELETON)
     }
 }

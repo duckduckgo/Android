@@ -86,10 +86,12 @@ import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionOnboardi
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionUpgrade
 import com.duckduckgo.subscriptions.api.Subscriptions
+import com.duckduckgo.subscriptions.impl.PurchaseExperiments
 import com.duckduckgo.subscriptions.impl.R.string
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.FEATURE_PAGE_QUERY_PARAM_KEY
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ITR_URL
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
+import com.duckduckgo.subscriptions.impl.appendFunnelOriginParam
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionsWebviewBinding
 import com.duckduckgo.subscriptions.impl.internal.SubscriptionsUrlProvider
 import com.duckduckgo.subscriptions.impl.pir.PirActivity.Companion.PirScreenWithEmptyParams
@@ -119,8 +121,10 @@ import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import logcat.logcat
 import org.json.JSONObject
@@ -323,17 +327,21 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             }
         }
 
-        logcat {
-            "SubscriptionsWebViewActivity: Loading subscriptions webview with URL: ${params.url}"
-        }
-        binding.webview.loadUrl(params.url)
-
         viewModel.start()
 
         viewModel.commands()
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
+
+        viewModel.initialUrl
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .filterNotNull()
+            .take(1)
+            .onEach { loadUrl(it) }
+            .launchIn(lifecycleScope)
+
+        viewModel.resolveInitialUrl(params.url)
 
         viewModel.currentPurchaseViewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).distinctUntilChanged().onEach {
             renderPurchaseState(it.purchaseState)
@@ -398,19 +406,24 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
                 } else {
                     webViewActivityWithParams
                 }
-            }
+            }.appendFunnelOriginToUrl()
         }
 
         intent.getActivityParams(SubscriptionUpgrade::class.java)?.let { params ->
             return SubscriptionsWebViewActivityWithParams(
                 url = subscriptionsUrlProvider.upgradeToProUrl,
                 origin = params.origin,
-            )
+            ).appendFunnelOriginToUrl()
         }
 
-        return intent.getActivityParams(SubscriptionsWebViewActivityWithParams::class.java)
-            ?: SubscriptionsWebViewActivityWithParams(subscriptionsUrlProvider.buyUrl)
+        return (
+            intent.getActivityParams(SubscriptionsWebViewActivityWithParams::class.java)
+                ?: SubscriptionsWebViewActivityWithParams(subscriptionsUrlProvider.buyUrl)
+            ).appendFunnelOriginToUrl()
     }
+
+    private fun SubscriptionsWebViewActivityWithParams.appendFunnelOriginToUrl(): SubscriptionsWebViewActivityWithParams =
+        copy(url = url.appendFunnelOriginParam(origin))
 
     private fun launchDownloadMessagesJob() {
         downloadMessagesJob += lifecycleScope.launch {
@@ -567,7 +580,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             is BackToSettings, BackToSettingsActivateSuccess -> finishToSettings()
             is SendJsEvent -> sendJsEvent(command.event)
             is SendResponseToJs -> sendResponseToJs(command.data)
-            is SubscriptionSelected -> selectSubscription(command.id, command.offerId, command.experimentName, command.experimentCohort)
+            is SubscriptionSelected -> selectSubscription(command.id, command.offerId, command.experiments)
             is SubscriptionChangeSelected -> changeSubscriptionPlan(command.planId, command.offerId, command.replacementMode)
             is RestoreSubscription -> restoreSubscription()
             is GoToITR -> goToITR()
@@ -579,6 +592,13 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             is RequestNotificationsPermission -> launchNotificationsPermission(command.id)
             Reload -> binding.webview.reload()
         }
+    }
+
+    private fun loadUrl(url: String) {
+        logcat {
+            "SubscriptionsWebViewActivity: Loading subscriptions webview with URL: $url"
+        }
+        binding.webview.loadUrl(url)
     }
 
     private fun goToPIRDashboard() {
@@ -717,10 +737,9 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     private fun selectSubscription(
         id: String,
         offerId: String?,
-        experimentName: String?,
-        experimentCohort: String?,
+        experiments: PurchaseExperiments,
     ) {
-        viewModel.purchaseSubscription(this, id, offerId, experimentName, experimentCohort, params.origin)
+        viewModel.purchaseSubscription(this, id, offerId, experiments, params.origin)
     }
 
     private fun changeSubscriptionPlan(

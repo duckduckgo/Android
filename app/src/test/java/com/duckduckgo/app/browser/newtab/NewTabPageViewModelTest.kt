@@ -225,7 +225,7 @@ class NewTabPageViewModelTest {
         val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
         val lowPriorityMessage = LowPriorityMessage.DefaultBrowserMessage(
             message = MessageCta.Message(
-                topIllustration = R.drawable.ic_device_mobile_default,
+                topIllustration = R.drawable.mobile_device_default_96,
                 title = "Set as default browser",
                 action = "Set as default",
                 action2 = "Do not ask again",
@@ -516,7 +516,7 @@ class NewTabPageViewModelTest {
         val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
         val lowPriorityMessage = LowPriorityMessage.DefaultBrowserMessage(
             message = MessageCta.Message(
-                topIllustration = R.drawable.ic_device_mobile_default,
+                topIllustration = R.drawable.mobile_device_default_96,
                 title = "Set as default browser",
                 action = "Set as default",
                 action2 = "Do not ask again",
@@ -546,7 +546,7 @@ class NewTabPageViewModelTest {
         val remoteMessage: RemoteMessage? = null
         val lowPriorityMessage = LowPriorityMessage.DefaultBrowserMessage(
             message = MessageCta.Message(
-                topIllustration = R.drawable.ic_device_mobile_default,
+                topIllustration = R.drawable.mobile_device_default_96,
                 title = "Set as default browser",
                 action = "Set as default",
                 action2 = "Do not ask again",
@@ -689,7 +689,7 @@ class NewTabPageViewModelTest {
     fun `when low priority message available, then show logo`() = runTest {
         val lowPriorityMessage = LowPriorityMessage.DefaultBrowserMessage(
             message = MessageCta.Message(
-                topIllustration = R.drawable.ic_device_mobile_default,
+                topIllustration = R.drawable.mobile_device_default_96,
                 title = "Set as default browser",
                 action = "Set as default",
                 action2 = "Do not ask again",
@@ -716,7 +716,7 @@ class NewTabPageViewModelTest {
         val testeeWithoutLogo = createTestee(showLogo = false)
         val lowPriorityMessage = LowPriorityMessage.DefaultBrowserMessage(
             message = MessageCta.Message(
-                topIllustration = R.drawable.ic_device_mobile_default,
+                topIllustration = R.drawable.mobile_device_default_96,
                 title = "Set as default browser",
                 action = "Set as default",
                 action2 = "Do not ask again",

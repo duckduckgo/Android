@@ -29,6 +29,7 @@
     <string name="autoconsentPromptFootnote">To uvijek možeš prilagoditi kasnije u Postavkama.</string>
     <string name="autoconsentPromptCpmOnMessage">Neki se kolačići ne mogu odbiti. Možemo ih prihvatiti umjesto tebe.</string>
     <string name="autoconsentPromptCpmOnPrimaryButton">Prihvati kolačiće umjesto mene</string>
+    <string name="autoconsentPromptCpmOnPrimaryButtonV2">Odbij ako je moguće ili prihvati umjesto mene</string>
     <string name="autoconsentPromptCpmOnSecondaryButton">Prihvatit ću ih sam</string>
     <string name="autoconsentPromptCpmOffMessage">Pobrinut ćemo se za njih umjesto tebe. Odbit ćemo kolačiće kada je to moguće, a prihvatiti one koji se ne mogu odbiti.</string>
     <string name="autoconsentPromptCpmOffPrimaryButton">Odbij ako je moguće ili prihvati umjesto mene</string>

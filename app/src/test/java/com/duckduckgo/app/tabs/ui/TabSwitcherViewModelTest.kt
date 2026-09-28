@@ -54,7 +54,7 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.DynamicInterfac
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.LayoutMode
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode.Normal
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode.Selection
-import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedAppRepository
+import com.duckduckgo.app.trackerdetection.WebTrackersBlockedHistory
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeDataProvider
@@ -166,7 +166,7 @@ class TabSwitcherViewModelTest {
 
     private val savedSitesRepository: SavedSitesRepository = mock()
 
-    private val mockWebTrackersBlockedAppRepository: WebTrackersBlockedAppRepository = mock()
+    private val mockWebTrackersBlockedHistory: WebTrackersBlockedHistory = mock()
 
     private val mockTabSwitcherPrefsDataStore: TabSwitcherPrefsDataStore = mock()
 
@@ -204,7 +204,7 @@ class TabSwitcherViewModelTest {
         whenever(mockTabRepository.flowDeletableTabs).thenReturn(repoDeletableTabs.consumeAsFlow())
         runBlocking {
             whenever(mockTabRepository.add()).thenReturn("TAB_ID")
-            whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(0)
+            whenever(mockWebTrackersBlockedHistory.trackerCountForLast7Days()).thenReturn(0)
         }
         whenever(mockTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData))
 
@@ -244,7 +244,7 @@ class TabSwitcherViewModelTest {
             swipingTabsFeatureProvider,
             duckChatMock,
             duckAiFeatureState = duckAiFeatureStateMock,
-            mockWebTrackersBlockedAppRepository,
+            mockWebTrackersBlockedHistory,
             tabSwitcherDataStore,
             faviconManager,
             savedSitesRepository,
@@ -1684,7 +1684,7 @@ class TabSwitcherViewModelTest {
         val tab2 = TabEntity("2", position = 2)
         tabList = listOf(tab1, tab2)
 
-        whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(15)
+        whenever(mockWebTrackersBlockedHistory.trackerCountForLast7Days()).thenReturn(15)
 
         initializeMockTabEntitesData()
         initializeViewModel(fakeTabSwitcherDataStore)
@@ -1731,7 +1731,7 @@ class TabSwitcherViewModelTest {
         whenever(mockFireTabRepository.flowSelectedTab).thenReturn(flowOf(fireTab1))
         whenever(mockFireTabRepository.flowDeletableTabs).thenReturn(flowOf(emptyList()))
         whenever(mockFireTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData))
-        whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(15)
+        whenever(mockWebTrackersBlockedHistory.trackerCountForLast7Days()).thenReturn(15)
         currentModeFlow.value = BrowserMode.FIRE
 
         val testee = createViewModel(fakeTabSwitcherDataStore)
@@ -1780,7 +1780,7 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun `when animated info panel visible then impressions pixel fired`() = runTest {
-        whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(15)
+        whenever(mockWebTrackersBlockedHistory.trackerCountForLast7Days()).thenReturn(15)
         initializeViewModel(FakeTabSwitcherDataStore())
 
         testee.onTrackerAnimationInfoPanelVisible()
@@ -1790,7 +1790,7 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun `when animated info panel clicked then tapped pixel fired`() = runTest {
-        whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(15)
+        whenever(mockWebTrackersBlockedHistory.trackerCountForLast7Days()).thenReturn(15)
 
         initializeViewModel()
 
@@ -1801,7 +1801,7 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun `when animated info panel positive button clicked then dismiss pixel fired`() = runTest {
-        whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(15)
+        whenever(mockWebTrackersBlockedHistory.trackerCountForLast7Days()).thenReturn(15)
         initializeViewModel()
 
         testee.onTrackerAnimationTilePositiveButtonClicked()
@@ -2237,7 +2237,7 @@ class TabSwitcherViewModelTest {
             swipingTabsFeatureProvider,
             duckChatMock,
             duckAiFeatureState = duckAiFeatureStateMock,
-            mockWebTrackersBlockedAppRepository,
+            mockWebTrackersBlockedHistory,
             mockTabSwitcherPrefsDataStore,
             faviconManager,
             savedSitesRepository,
@@ -2283,7 +2283,7 @@ class TabSwitcherViewModelTest {
             swipingTabsFeatureProvider,
             duckChatMock,
             duckAiFeatureState = duckAiFeatureStateMock,
-            mockWebTrackersBlockedAppRepository,
+            mockWebTrackersBlockedHistory,
             mockTabSwitcherPrefsDataStore,
             faviconManager,
             savedSitesRepository,
@@ -2358,7 +2358,7 @@ class TabSwitcherViewModelTest {
             swipingTabsFeatureProvider,
             duckChatMock,
             duckAiFeatureState = duckAiFeatureStateMock,
-            mockWebTrackersBlockedAppRepository,
+            mockWebTrackersBlockedHistory,
             mockTabSwitcherPrefsDataStore,
             faviconManager,
             savedSitesRepository,

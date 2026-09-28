@@ -215,13 +215,7 @@
     <!-- Get Desktop Browser -->
     <string name="getDesktopBrowserSettingItemTitle">Získajte prehliadač pre desktop PC</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo pre Mac a Windows</string>
-    <string name="getDesktopBrowserTitle">Chráň si svoje osobné údaje na Macu aj vo Windows!</string>
-    <string name="getDesktopBrowserBody">Ak si chceš stiahnuť aplikáciu DuckDuckGo v systéme Mac alebo Windows, navštív túto stránku:</string>
-    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
-    <string name="getDesktopBrowserShareDownloadLink">Zdieľať odkaz na stiahnutie</string>
-    <string name="getDesktopBrowserNoThanks">Nie, ďakujem</string>
     <string name="getDesktopBrowserHideItem">Skryť</string>
-    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Odkaz bol skopírovaný</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Ochrana proti automatickému otváraniu okien o súboroch cookie</string>
@@ -1001,6 +995,22 @@
     <string name="preOnboardingWidgetPromptBody">Na rýchly a jednoduchý prístup si pridajte miniaplikáciu vyhľadávania na úvodnú obrazovku.</string>
     <string name="preOnboardingWidgetPromptPrimaryCta">Pridať miniaplikáciu</string>
     <string name="preOnboardingWidgetPromptSecondaryCta">Preskočiť</string>
+
+    <!-- Pre-onboarding: import passwords -->
+    <string name="preOnboardingImportPasswordsTitle">Importovanie hesiel z Google</string>
+    <string name="preOnboardingImportPasswordsBody">Google ťa môže požiadať, aby si sa prihlásil/-a alebo zadal/-a svoje heslo na potvrdenie.</string>
+    <string name="preOnboardingImportPasswordsPrimaryCta">Importovať z Google</string>
+    <string name="preOnboardingImportCompleteTitle">Import bol dokončený</string>
+    <string name="preOnboardingImportCompleteCta">Pokračovať</string>
+    <string name="preOnboardingImportCompleteParsingTitle">Importovanie hesiel</string>
+    <string name="preOnboardingImportCompleteParsingBody">Bude to trvať len chvíľu.</string>
+    <string name="preOnboardingImportCompleteFailedTitle">Import zlyhal</string>
+    <string name="preOnboardingImportCompleteFailed">Importovanie hesiel zlyhalo</string>
+    <string name="preOnboardingImportCompleteImported" instruction="Placeholder is the number of passwords that were imported.">Počet importovaných hesiel: %1$s</string>
+    <string name="preOnboardingImportCompleteSkipped" instruction="Placeholder is the number of passwords that were not imported.">Preskočené (duplicitné alebo neplatné): %1$s</string>
+    <string name="preOnboardingImportErrorTitle">Vyskytla sa chyba</string>
+    <string name="preOnboardingImportErrorBody">Skús to znova.</string>
+    <string name="preOnboardingImportErrorRetry">Skús to znova</string>
 
     <!-- Pre-onboarding: add to home screen -->
     <string name="preOnboardingDockStepTitle">Pridaj ma do svojho riadku s obľúbenými položkami.</string>

@@ -22,6 +22,7 @@ import com.duckduckgo.common.utils.extensions.toSanitizedLanguageTag
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.FUNNEL_ORIGIN_ALLOWLIST
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ORIGIN_APP_SETTINGS
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ORIGIN_QUERY_PARAM_KEY
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.ACTIVATE_SUBSCRIPTION_ENTER_EMAIL_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.ACTIVATE_SUBSCRIPTION_RESTORE_PURCHASE_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_GET_SUBSCRIPTION_CLICK
@@ -183,7 +184,7 @@ class SubscriptionPixelSenderImpl @Inject constructor(
     // value so a web page cannot inject a unique per-user identifier that would follow the user downstream.
     private fun funnelOriginParams(origin: String?): Map<String, String> =
         origin?.takeIf { it in FUNNEL_ORIGIN_ALLOWLIST }
-            ?.let { mapOf("origin" to it) } ?: emptyMap()
+            ?.let { mapOf(ORIGIN_QUERY_PARAM_KEY to it) } ?: emptyMap()
 
     override fun reportPurchaseFailureOther(
         errorType: String,
@@ -221,7 +222,7 @@ class SubscriptionPixelSenderImpl @Inject constructor(
             SubscriptionPixelParameter.FREE_TRIAL to isFreeTrial.toString(),
         )
         origin?.let {
-            map.put("origin", origin)
+            map.put(ORIGIN_QUERY_PARAM_KEY, origin)
         }
         fire(PURCHASE_SUCCESS_ORIGIN, map)
     }
@@ -281,7 +282,7 @@ class SubscriptionPixelSenderImpl @Inject constructor(
         fire(APP_SETTINGS_IDTR_CLICK)
 
     override fun reportAppSettingsGetSubscriptionClick() =
-        fire(APP_SETTINGS_GET_SUBSCRIPTION_CLICK, mapOf("origin" to ORIGIN_APP_SETTINGS))
+        fire(APP_SETTINGS_GET_SUBSCRIPTION_CLICK, mapOf(ORIGIN_QUERY_PARAM_KEY to ORIGIN_APP_SETTINGS))
 
     override fun reportAppSettingsRestorePurchaseClick() =
         fire(APP_SETTINGS_RESTORE_PURCHASE_CLICK)

@@ -213,13 +213,7 @@
     <!-- Get Desktop Browser -->
     <string name="getDesktopBrowserSettingItemTitle">Hangi töölaua brauser</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo Maci ja Windowsi jaoks</string>
-    <string name="getDesktopBrowserTitle">Kaitse oma isikuandmeid nii Macis kui ka Windowsis!</string>
-    <string name="getDesktopBrowserBody">DuckDuckGo allalaadimiseks Macile või Windowsile külasta:</string>
-    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
-    <string name="getDesktopBrowserShareDownloadLink">Jaga allalaadimise linki</string>
-    <string name="getDesktopBrowserNoThanks">Ei, aitäh</string>
     <string name="getDesktopBrowserHideItem">Peida</string>
-    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Link kopeeritud</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Küpsiste hüpikakna kaitse</string>
@@ -965,6 +959,22 @@
     <string name="preOnboardingWidgetPromptBody">Kiire ja hõlpsa juurdepääsu tagamiseks lisa meie meie otsinguvidin avakuvale.</string>
     <string name="preOnboardingWidgetPromptPrimaryCta">Lisa vidin</string>
     <string name="preOnboardingWidgetPromptSecondaryCta">Jäta vahele</string>
+
+    <!-- Pre-onboarding: import passwords -->
+    <string name="preOnboardingImportPasswordsTitle">Impordi paroolid Google\'ist</string>
+    <string name="preOnboardingImportPasswordsBody">Google võib paluda sul sisse logida või sisestada kinnitamiseks parooli.</string>
+    <string name="preOnboardingImportPasswordsPrimaryCta">Impordi Google\'ist</string>
+    <string name="preOnboardingImportCompleteTitle">Import on lõpetatud</string>
+    <string name="preOnboardingImportCompleteCta">Jätka</string>
+    <string name="preOnboardingImportCompleteParsingTitle">Paroolide importimine</string>
+    <string name="preOnboardingImportCompleteParsingBody">See võtab vaid hetke.</string>
+    <string name="preOnboardingImportCompleteFailedTitle">Import ebaõnnestus</string>
+    <string name="preOnboardingImportCompleteFailed">Parooli import ebaõnnestus</string>
+    <string name="preOnboardingImportCompleteImported" instruction="Placeholder is the number of passwords that were imported.">Imporditud paroolid: %1$s</string>
+    <string name="preOnboardingImportCompleteSkipped" instruction="Placeholder is the number of passwords that were not imported.">Vahele jäetud (duplikaat või kehtetu): %1$s</string>
+    <string name="preOnboardingImportErrorTitle">Midagi läks valesti</string>
+    <string name="preOnboardingImportErrorBody">Proovi uuesti.</string>
+    <string name="preOnboardingImportErrorRetry">Proovi uuesti</string>
 
     <!-- Pre-onboarding: add to home screen -->
     <string name="preOnboardingDockStepTitle">Lisa mind oma lemmikute reale.</string>

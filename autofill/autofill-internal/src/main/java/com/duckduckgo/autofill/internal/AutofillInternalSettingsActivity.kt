@@ -168,6 +168,7 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
                                 credentialImporter.import(
                                     parseResult.loginCredentialsToImport,
                                     parseResult.numberCredentialsInSource,
+                                    Unknown,
                                 )
                                 observePasswordInputUpdates()
                             }

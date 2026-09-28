@@ -189,7 +189,7 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
             content = ContentControllerImpl(
                 binding = binding.daxDialogCta,
                 contentValues = viewModel.contentValues,
-                onContentBound = viewModel::onContentBound,
+                onBeforeContentBound = viewModel::onBeforeContentBound,
                 isLightMode = { appTheme.isLightModeEnabled() },
                 isAddressBarRebrandEnabled = { appBrandDesignUpdateToggles.addressBar().isEnabled() },
             ),
@@ -372,7 +372,7 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
             .setTitle(R.string.preOnboardingImportErrorTitle)
             .setMessage(R.string.preOnboardingImportErrorBody)
             .setPositiveButton(R.string.preOnboardingImportErrorRetry)
-            .setNegativeButton(R.string.preOnboardingImportErrorCancel)
+            .setNegativeButton(CommonR.string.cancel)
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
@@ -380,7 +380,7 @@ class ConfigDrivenWelcomePageFragment : OnboardingPageFragment(R.layout.content_
                     }
 
                     override fun onNegativeButtonClicked() {
-                        viewModel.onPasswordImportErrorSkipped()
+                        viewModel.onPasswordImportErrorCancelled()
                     }
 
                     override fun onDialogCancelled() {

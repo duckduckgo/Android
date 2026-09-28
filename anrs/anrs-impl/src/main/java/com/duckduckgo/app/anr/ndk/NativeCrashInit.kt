@@ -19,11 +19,14 @@ package com.duckduckgo.app.anr.ndk
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LifecycleOwner
+import com.duckduckgo.app.anr.CrashPixel.APPLICATION_CRASH_NATIVE
+import com.duckduckgo.app.anr.CrashPixel.APPLICATION_CRASH_NATIVE_HANDLER_REGISTERED
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.di.ProcessName
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.lifecycle.PirProcessLifecycleObserver
 import com.duckduckgo.app.lifecycle.VpnProcessLifecycleObserver
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.browser.api.WebViewVersionProvider
@@ -54,12 +57,14 @@ import javax.inject.Inject
 @SingleInstanceIn(AppScope::class)
 class NativeCrashInit @Inject constructor(
     private val context: Context,
-    @IsMainProcess private val isMainProcess: Boolean,
+    @param:IsMainProcess private val isMainProcess: Boolean,
     private val customTabDetector: CustomTabDetector,
     private val appBuildConfig: AppBuildConfig,
     private val nativeCrashFeature: NativeCrashFeature,
     private val webViewVersionProvider: WebViewVersionProvider,
-    @ProcessName private val processName: String,
+    @param:ProcessName private val processName: String,
+    private val crashpadInitializer: CrashpadInitializer,
+    private val pixel: Pixel,
 ) : MainProcessLifecycleObserver, VpnProcessLifecycleObserver, LibraryLoaderListener, PirProcessLifecycleObserver {
 
     private val isCustomTab: Boolean by lazy { customTabDetector.isCustomTab() }
@@ -85,7 +90,7 @@ class NativeCrashInit @Inject constructor(
 
     override fun onCreate(owner: LifecycleOwner) {
         if (isMainProcess) {
-            asyncLoadNativeLibrary()
+            initNativeCrashHandler()
         } else {
             logcat(ERROR) { "ndk-crash: onCreate wrongly called in a secondary process" }
         }
@@ -93,7 +98,7 @@ class NativeCrashInit @Inject constructor(
 
     override fun onVpnProcessCreated() {
         if (!isMainProcess) {
-            asyncLoadNativeLibrary()
+            initNativeCrashHandler()
         } else {
             logcat(ERROR) { "ndk-crash: onVpnProcessCreated wrongly called in the main process" }
         }
@@ -101,22 +106,28 @@ class NativeCrashInit @Inject constructor(
 
     override fun onPirProcessCreated() {
         if (!isMainProcess) {
-            asyncLoadNativeLibrary()
+            initNativeCrashHandler()
         } else {
             logcat(ERROR) { "ndk-crash: onPirProcessCreated wrongly called in the main process" }
         }
     }
 
+    private fun initNativeCrashHandler() {
+        if (isMainProcess && !nativeCrashFeature.nativeCrashHandling().isEnabled()) return
+        if (!isMainProcess && !nativeCrashFeature.nativeCrashHandlingSecondaryProcess().isEnabled()) return
+
+        if (nativeCrashFeature.useCrashpad().isEnabled()) {
+            initCrashpad()
+        } else {
+            LibraryLoader.loadLibrary(context, "crash-ndk", this)
+        }
+    }
+
     override fun success() {
-        // do not call on main thread
         checkMainThread()
 
         runCatching {
             logcat(ERROR) { "ndk-crash: Library loaded in process $processName" }
-
-            if (isMainProcess && !nativeCrashFeature.nativeCrashHandling().isEnabled()) return
-            if (!isMainProcess && !nativeCrashFeature.nativeCrashHandlingSecondaryProcess().isEnabled()) return
-
             val logLevel = if (appBuildConfig.isDebug || appBuildConfig.isInternalBuild()) {
                 Log.VERBOSE
             } else {
@@ -129,10 +140,41 @@ class NativeCrashInit @Inject constructor(
     }
 
     override fun failure(t: Throwable) {
-        logcat(ERROR) { "ndk-crash: error loading library in process $processName: ${t?.asLog()}" }
+        logcat(ERROR) { "ndk-crash: error loading library in process $processName: ${t.asLog()}" }
     }
 
-    private fun asyncLoadNativeLibrary() {
-        LibraryLoader.loadLibrary(context, "crash-ndk", this)
+    private fun initCrashpad() {
+        val initialized = runCatching {
+            crashpadInitializer.initialize(
+                extraAnnotations = mapOf(
+                    "customTab" to "$isCustomTab",
+                    "webViewPackage" to webViewPackage,
+                    "webViewVersion" to webViewVersion,
+                ),
+                onCrash = {
+                    pixel.enqueueFire(
+                        APPLICATION_CRASH_NATIVE,
+                        mapOf(
+                            "v" to "${appBuildConfig.versionName}-${appBuildConfig.flavor}",
+                            "pn" to processName,
+                            "customTab" to "$isCustomTab",
+                        ),
+                    )
+                },
+            )
+        }.onFailure {
+            logcat(ERROR) { "ndk-crash: error initializing Crashpad: ${it.asLog()}" }
+        }.getOrDefault(false)
+
+        if (initialized) {
+            pixel.fire(
+                APPLICATION_CRASH_NATIVE_HANDLER_REGISTERED,
+                mapOf(
+                    "v" to "${appBuildConfig.versionName}-${appBuildConfig.flavor}",
+                    "pn" to processName,
+                    "customTab" to "$isCustomTab",
+                ),
+            )
+        }
     }
 }

@@ -350,4 +350,23 @@
     <string name="duckChatContextualAskAboutPage">Kérdés az oldalról</string>
     <string name="duckChatContextualAskAboutSearch">Folytatás a Duck.ai-ban</string>
     <string name="duckChatContextualOpenDuckAi">Duck.ai megnyitása</string>
+
+    <!-- Suggested prompts for text selection -->
+    <string name="duckAiSuggestionSummarizeSelectionLabel">Kijelölés összefoglalása</string>
+    <string name="duckAiSuggestionSummarizeSelectionPrompt">Foglald össze ezt a kijelölést.</string>
+    <string name="duckAiSuggestionTranslateSelectionLabel">Kijelölés lefordítása</string>
+    <string name="duckAiSuggestionTranslateSelectionPrompt" instruction="%1$s is replaced with the name of the user&apos;s language.">Fordítsd le ezt a kijelölést %1$s nyelvre.</string>
+
+    <!-- Name shown for an attached text selection in the Duck.ai -->
+    <string name="duckAiTextSelectionAttachmentTitle">Szövegkijelölés</string>
+    <string name="duckAiTextSelectionLimitReached" instruction="%1$d is replaced with the maximum number of text selections.">Legfeljebb %1$d szövegkijelölést adhatsz hozzá. Távolíts el egyet, hogy újat adhass hozzá.</string>
+
+    <!-- Duck.ai text selection menu action -->
+    <string name="duckAiTextSelectionMenuItem">Duck.ai kérdezése</string>
+
+    <!-- Prefix on the Duck.ai attachment chip for a text selection -->
+    <plurals name="duckAiTextSelectionWordCount">
+        <item quantity="one">%1$d szó</item>
+        <item quantity="other">%1$d szó</item>
+    </plurals>
 </resources>

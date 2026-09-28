@@ -37,6 +37,7 @@ import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncAccountRepository.AuthCode
 import com.duckduckgo.sync.impl.SyncCodeDispatcher
 import com.duckduckgo.sync.impl.SyncFeature
+import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.pixels.SyncPixels.CancellationReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_CONNECT
@@ -358,7 +359,9 @@ class DisplayQrCodeViewModelTest {
     @Test
     fun `when the host confirmation is requested then the host confirmation dialog is shown`() = runTest {
         givenV2Enabled()
-        whenever(codeDispatcher.presentV2()).thenReturn(flowOf(DispatchOutcome.HostConfirmationRequested(peerName = "Other Device")))
+        whenever(codeDispatcher.presentV2()).thenReturn(
+            flowOf(DispatchOutcome.HostConfirmationRequested(peerName = "Other Device", protocolVersion = ExchangeProtocolVersion.V2_0)),
+        )
 
         val testee = createTestee()
 
@@ -372,7 +375,9 @@ class DisplayQrCodeViewModelTest {
     @Test
     fun `when the joiner confirmation is requested then the joiner confirmation dialog is shown`() = runTest {
         givenV2Enabled()
-        whenever(codeDispatcher.presentV2()).thenReturn(flowOf(DispatchOutcome.JoinerConfirmationRequested(peerName = "Other Device")))
+        whenever(codeDispatcher.presentV2()).thenReturn(
+            flowOf(DispatchOutcome.JoinerConfirmationRequested(peerName = "Other Device", protocolVersion = ExchangeProtocolVersion.V2_0)),
+        )
 
         val testee = createTestee()
 

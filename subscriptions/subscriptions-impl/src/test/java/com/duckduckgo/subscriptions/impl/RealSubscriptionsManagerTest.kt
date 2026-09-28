@@ -12,6 +12,8 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.FixedLocaleRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.subscriptions.api.Product.NetP
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
@@ -55,8 +57,10 @@ import com.duckduckgo.subscriptions.impl.repository.RealAuthRepository
 import com.duckduckgo.subscriptions.impl.repository.Subscription
 import com.duckduckgo.subscriptions.impl.serp_promo.FakeSerpPromo
 import com.duckduckgo.subscriptions.impl.services.ActiveOfferResponse
+import com.duckduckgo.subscriptions.impl.services.ConfirmationBody
 import com.duckduckgo.subscriptions.impl.services.ConfirmationEntitlement
 import com.duckduckgo.subscriptions.impl.services.ConfirmationResponse
+import com.duckduckgo.subscriptions.impl.services.ExperimentData
 import com.duckduckgo.subscriptions.impl.services.PendingPlanResponse
 import com.duckduckgo.subscriptions.impl.services.PortalResponse
 import com.duckduckgo.subscriptions.impl.services.SubscriptionResponse
@@ -95,10 +99,12 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
+import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.isNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
@@ -110,6 +116,7 @@ import java.io.IOException
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDateTime
+import kotlin.coroutines.cancellation.CancellationException
 
 class RealSubscriptionsManagerTest {
 
@@ -138,6 +145,13 @@ class RealSubscriptionsManagerTest {
     private val freeTrialConversionWideEvent: FreeTrialConversionWideEvent = mock()
     private val subscriptionRestoreWideEvent: SubscriptionRestoreWideEvent = mock()
     private val vpnReminderNotificationScheduler: VpnReminderNotificationScheduler = mock()
+
+    private var nativeToggles: List<Toggle> = emptyList()
+    private val featureTogglesInventory = object : FeatureTogglesInventory {
+        override suspend fun getAll(): List<Toggle> = nativeToggles
+        override suspend fun getAllTogglesForParent(name: String): List<Toggle> =
+            nativeToggles.filter { it.featureName().parentName == name }
+    }
 
     private val authClient: AuthClient = mock()
     private val pkceGenerator: PkceGenerator = PkceGeneratorImpl()
@@ -173,6 +187,7 @@ class RealSubscriptionsManagerTest {
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
+            featureTogglesInventory,
         )
     }
 
@@ -492,6 +507,328 @@ class RealSubscriptionsManagerTest {
     }
 
     @Test
+    fun whenPurchaseConfirmedThenEveryAssignedExperimentIsSentToBackend() = runTest {
+        givenSubscriptionConcurrentExperimentsEnabled(true)
+        givenUserIsSignedIn()
+        givenSubscriptionSucceedsWithoutEntitlements(status = "Expired")
+        givenConfirmPurchaseSucceeds()
+        givenV2AccessTokenRefreshSucceeds()
+
+        val purchaseStateFlow: MutableSharedFlow<PurchaseState> = MutableSharedFlow()
+        whenever(playBillingManager.purchaseState).thenReturn(purchaseStateFlow)
+
+        subscriptionsManager.currentPurchaseState.test {
+            purchase(
+                experiments = listOf(
+                    Experiment(name = "experimentOne", cohort = "control"),
+                    Experiment(name = "experimentTwo", cohort = "treatment"),
+                ),
+                legacyExperiment = Experiment(name = "legacyExperiment", cohort = "legacyCohort"),
+            )
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowFinished)
+
+            purchaseStateFlow.emit(Purchased(purchaseToken = "purchaseToken", packageName = "packageName"))
+            assertTrue(awaitItem() is CurrentPurchase.InProgress)
+            assertTrue(awaitItem() is CurrentPurchase.Success)
+
+            verify(subscriptionsService).confirm(
+                ConfirmationBody(
+                    packageName = "packageName",
+                    purchaseToken = "purchaseToken",
+                    experiments = listOf(
+                        ExperimentData(experimentName = "experimentOne", experimentCohort = "control"),
+                        ExperimentData(experimentName = "experimentTwo", experimentCohort = "treatment"),
+                    ),
+                ),
+            )
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPurchaseConfirmedWithConcurrentExperimentsDisabledThenLegacyFieldsAreSent() = runTest {
+        givenSubscriptionConcurrentExperimentsEnabled(false)
+        givenUserIsSignedIn()
+        givenSubscriptionSucceedsWithoutEntitlements(status = "Expired")
+        givenConfirmPurchaseSucceeds()
+        givenV2AccessTokenRefreshSucceeds()
+
+        val purchaseStateFlow: MutableSharedFlow<PurchaseState> = MutableSharedFlow()
+        whenever(playBillingManager.purchaseState).thenReturn(purchaseStateFlow)
+
+        subscriptionsManager.currentPurchaseState.test {
+            purchase(
+                experiments = listOf(
+                    Experiment(name = "experimentOne", cohort = "control"),
+                    Experiment(name = "experimentTwo", cohort = "treatment"),
+                ),
+                legacyExperiment = Experiment(name = "legacyExperiment", cohort = "legacyCohort"),
+            )
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowFinished)
+
+            purchaseStateFlow.emit(Purchased(purchaseToken = "purchaseToken", packageName = "packageName"))
+            assertTrue(awaitItem() is CurrentPurchase.InProgress)
+            assertTrue(awaitItem() is CurrentPurchase.Success)
+
+            verify(subscriptionsService).confirm(
+                ConfirmationBody(
+                    packageName = "packageName",
+                    purchaseToken = "purchaseToken",
+                    experiments = null,
+                    experimentName = "legacyExperiment",
+                    experimentCohort = "legacyCohort",
+                ),
+            )
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPurchaseConfirmedWithoutExperimentsThenExperimentsAreOmittedFromRequest() = runTest {
+        givenSubscriptionConcurrentExperimentsEnabled(false)
+        givenUserIsSignedIn()
+        givenSubscriptionSucceedsWithoutEntitlements(status = "Expired")
+        givenConfirmPurchaseSucceeds()
+        givenV2AccessTokenRefreshSucceeds()
+
+        val purchaseStateFlow: MutableSharedFlow<PurchaseState> = MutableSharedFlow()
+        whenever(playBillingManager.purchaseState).thenReturn(purchaseStateFlow)
+
+        subscriptionsManager.currentPurchaseState.test {
+            purchase(experiments = emptyList())
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowFinished)
+
+            purchaseStateFlow.emit(Purchased(purchaseToken = "purchaseToken", packageName = "packageName"))
+            assertTrue(awaitItem() is CurrentPurchase.InProgress)
+            assertTrue(awaitItem() is CurrentPurchase.Success)
+
+            verify(subscriptionsService).confirm(
+                ConfirmationBody(
+                    packageName = "packageName",
+                    purchaseToken = "purchaseToken",
+                    experiments = null,
+                ),
+            )
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenFlagOffWithOnlyLegacyExperimentThenLegacyFieldsAreSent() = runTest {
+        assertExperimentConfirmation(
+            enabled = false,
+            legacyExperiment = Experiment("legacyExperiment", "control"),
+            expected = ConfirmationBody("packageName", "purchaseToken", experimentName = "legacyExperiment", experimentCohort = "control"),
+        )
+    }
+
+    @Test
+    fun whenFlagOffWithOnlyArrayExperimentsThenAttributionIsOmitted() = runTest {
+        assertExperimentConfirmation(
+            enabled = false,
+            experiments = listOf(Experiment("arrayExperiment", "control")),
+            expected = ConfirmationBody("packageName", "purchaseToken"),
+        )
+    }
+
+    @Test
+    fun whenFlagOnWithOnlyArrayExperimentsThenArrayIsSent() = runTest {
+        assertExperimentConfirmation(
+            enabled = true,
+            experiments = listOf(Experiment("arrayExperiment", "control")),
+            expected = ConfirmationBody("packageName", "purchaseToken", experiments = listOf(ExperimentData("arrayExperiment", "control"))),
+        )
+    }
+
+    @Test
+    fun whenFlagOnWithOnlyLegacyExperimentThenItIsSentInArray() = runTest {
+        assertExperimentConfirmation(
+            enabled = true,
+            legacyExperiment = Experiment("legacyExperiment", "control"),
+            expected = ConfirmationBody("packageName", "purchaseToken", experiments = listOf(ExperimentData("legacyExperiment", "control"))),
+        )
+    }
+
+    @Test
+    fun whenFlagOnWithoutExperimentsThenAttributionIsOmitted() = runTest {
+        assertExperimentConfirmation(
+            enabled = true,
+            expected = ConfirmationBody("packageName", "purchaseToken"),
+        )
+    }
+
+    @Test
+    fun whenFlagChangesDuringConfirmationRetriesThenOriginalAttributionIsKept() = runTest {
+        givenSubscriptionConcurrentExperimentsEnabled(true)
+        givenUserIsSignedIn()
+        givenSubscriptionSucceedsWithoutEntitlements(status = "Expired")
+        whenever(subscriptionsService.confirm(any())).thenAnswer {
+            givenSubscriptionConcurrentExperimentsEnabled(false)
+            throw IllegalStateException("Confirmation failed")
+        }
+        val purchaseStateFlow = MutableSharedFlow<PurchaseState>()
+        whenever(playBillingManager.purchaseState).thenReturn(purchaseStateFlow)
+
+        subscriptionsManager.currentPurchaseState.test {
+            purchase(
+                experiments = listOf(Experiment("arrayExperiment", "control")),
+                legacyExperiment = Experiment("legacyExperiment", "treatment"),
+            )
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowFinished)
+
+            purchaseStateFlow.emit(Purchased(purchaseToken = "purchaseToken", packageName = "packageName"))
+            assertTrue(awaitItem() is CurrentPurchase.InProgress)
+            assertTrue(awaitItem() is CurrentPurchase.Waiting)
+
+            verify(subscriptionsService, times(3)).confirm(
+                ConfirmationBody("packageName", "purchaseToken", experiments = listOf(ExperimentData("arrayExperiment", "control"))),
+            )
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnlyNativeExperimentIsActiveThenItIsReported() = runTest {
+        nativeToggles = listOf(nativeExperiment(name = "nativeExperiment", cohort = "control"))
+
+        assertExperimentConfirmation(
+            enabled = true,
+            expected = ConfirmationBody(
+                "packageName",
+                "purchaseToken",
+                experiments = listOf(ExperimentData("nativeExperiment", "control")),
+            ),
+        )
+    }
+
+    @Test
+    fun whenPaywallAndNativeExperimentsAreActiveThenBothAreReported() = runTest {
+        nativeToggles = listOf(nativeExperiment(name = "nativeExperiment", cohort = "treatment"))
+
+        assertExperimentConfirmation(
+            enabled = true,
+            experiments = listOf(Experiment("paywallExperiment", "control")),
+            expected = ConfirmationBody(
+                "packageName",
+                "purchaseToken",
+                experiments = listOf(
+                    ExperimentData("paywallExperiment", "control"),
+                    ExperimentData("nativeExperiment", "treatment"),
+                ),
+            ),
+        )
+    }
+
+    @Test
+    fun whenPaywallAndNativeExperimentShareANameThenThePaywallCohortWins() = runTest {
+        nativeToggles = listOf(nativeExperiment(name = "sharedExperiment", cohort = "native"))
+
+        assertExperimentConfirmation(
+            enabled = true,
+            experiments = listOf(Experiment("sharedExperiment", "paywall")),
+            expected = ConfirmationBody(
+                "packageName",
+                "purchaseToken",
+                experiments = listOf(ExperimentData("sharedExperiment", "paywall")),
+            ),
+        )
+    }
+
+    @Test
+    fun whenNativeExperimentBelongsToAnotherFeatureThenItIsNotReported() = runTest {
+        nativeToggles = listOf(nativeExperiment(name = "unrelatedExperiment", cohort = "control", parent = "someOtherFeature"))
+
+        assertExperimentConfirmation(
+            enabled = true,
+            expected = ConfirmationBody("packageName", "purchaseToken"),
+        )
+    }
+
+    @Test
+    fun whenNativeExperimentLookupFailsThenPurchaseIsConfirmedWithoutAttribution() = runTest {
+        nativeToggles = listOf(failingNativeExperiment(IllegalStateException("Toggle store failure")))
+
+        assertExperimentConfirmation(
+            enabled = true,
+            experiments = listOf(Experiment("paywallExperiment", "control")),
+            expected = ConfirmationBody("packageName", "purchaseToken"),
+        )
+    }
+
+    @Test
+    fun whenCancelledWhileBuildingAttributionThenPurchaseIsNotConfirmed() = runTest {
+        nativeToggles = listOf(failingNativeExperiment(CancellationException("Purchase collector cancelled")))
+        givenSubscriptionConcurrentExperimentsEnabled(true)
+        givenUserIsSignedIn()
+        givenSubscriptionSucceedsWithoutEntitlements(status = "Expired")
+        val purchaseStateFlow = MutableSharedFlow<PurchaseState>()
+        whenever(playBillingManager.purchaseState).thenReturn(purchaseStateFlow)
+
+        subscriptionsManager.currentPurchaseState.test {
+            purchase()
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowFinished)
+
+            purchaseStateFlow.emit(Purchased(purchaseToken = "purchaseToken", packageName = "packageName"))
+            assertTrue(awaitItem() is CurrentPurchase.InProgress)
+
+            expectNoEvents()
+            verify(subscriptionsService, never()).confirm(any())
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    private fun nativeExperiment(
+        name: String,
+        cohort: String,
+        parent: String = PRIVACY_PRO_FEATURE_NAME,
+    ): Toggle = mock {
+        on { featureName() } doReturn Toggle.FeatureName(parentName = parent, name = name)
+        on { isEnabled() } doReturn true
+        onBlocking { getCohort() } doReturn State.Cohort(name = cohort, weight = 1)
+    }
+
+    private fun failingNativeExperiment(error: Throwable): Toggle = mock {
+        on { featureName() } doReturn Toggle.FeatureName(parentName = PRIVACY_PRO_FEATURE_NAME, name = "failingExperiment")
+        onBlocking { getCohort() } doThrow error
+    }
+
+    private suspend fun assertExperimentConfirmation(
+        enabled: Boolean,
+        expected: ConfirmationBody,
+        experiments: List<Experiment> = emptyList(),
+        legacyExperiment: Experiment? = null,
+    ) {
+        givenSubscriptionConcurrentExperimentsEnabled(enabled)
+        givenUserIsSignedIn()
+        givenSubscriptionSucceedsWithoutEntitlements(status = "Expired")
+        givenConfirmPurchaseSucceeds()
+        givenV2AccessTokenRefreshSucceeds()
+        val purchaseStateFlow = MutableSharedFlow<PurchaseState>()
+        whenever(playBillingManager.purchaseState).thenReturn(purchaseStateFlow)
+
+        subscriptionsManager.currentPurchaseState.test {
+            purchase(experiments = experiments, legacyExperiment = legacyExperiment)
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowFinished)
+
+            purchaseStateFlow.emit(Purchased(purchaseToken = "purchaseToken", packageName = "packageName"))
+            assertTrue(awaitItem() is CurrentPurchase.InProgress)
+            assertTrue(awaitItem() is CurrentPurchase.Success)
+
+            verify(subscriptionsService).confirm(expected)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenPurchaseFlowIfCreateAccountFailsReturnFailure() = runTest {
         givenUserIsNotSignedIn()
         givenCreateAccountFails()
@@ -589,6 +926,7 @@ class RealSubscriptionsManagerTest {
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
+            featureTogglesInventory,
         )
 
         manager.subscriptionStatus.test {
@@ -623,6 +961,7 @@ class RealSubscriptionsManagerTest {
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
+            featureTogglesInventory,
         )
 
         manager.subscriptionStatus.test {
@@ -661,6 +1000,7 @@ class RealSubscriptionsManagerTest {
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
+            featureTogglesInventory,
         )
 
         manager.currentPurchaseState.test {
@@ -713,6 +1053,7 @@ class RealSubscriptionsManagerTest {
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
+            featureTogglesInventory,
         )
 
         manager.currentPurchaseState.test {
@@ -760,6 +1101,7 @@ class RealSubscriptionsManagerTest {
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
+            featureTogglesInventory,
         )
 
         manager.currentPurchaseState.test {
@@ -802,6 +1144,7 @@ class RealSubscriptionsManagerTest {
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
+            featureTogglesInventory,
         )
 
         manager.currentPurchaseState.test {
@@ -837,6 +1180,7 @@ class RealSubscriptionsManagerTest {
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
+            featureTogglesInventory,
         )
 
         manager.currentPurchaseState.test {
@@ -1189,6 +1533,7 @@ class RealSubscriptionsManagerTest {
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
+            featureTogglesInventory,
         )
         manager.signOut()
         verify(mockRepo).setSubscription(null)
@@ -1240,6 +1585,7 @@ class RealSubscriptionsManagerTest {
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
+            featureTogglesInventory,
         )
 
         manager.subscriptionStatus.test {
@@ -1590,6 +1936,7 @@ class RealSubscriptionsManagerTest {
             freeTrialConversionWideEvent,
             subscriptionRestoreWideEvent,
             vpnReminderNotificationScheduler,
+            featureTogglesInventory,
         )
 
         assertFalse(subscriptionsManager.canSupportEncryption())
@@ -2198,6 +2545,11 @@ class RealSubscriptionsManagerTest {
         subscriptionsFeature.blackFridayOffer2025().setRawStoredState(State(remoteEnableState = value))
     }
 
+    @SuppressLint("DenyListedApi")
+    private fun givenSubscriptionConcurrentExperimentsEnabled(value: Boolean) {
+        subscriptionsFeature.subscriptionConcurrentExperiments().setRawStoredState(State(remoteEnableState = value))
+    }
+
     @Test
     fun whenRefreshSubscriptionDataWithPendingPlansThenStoresPendingPlans() = runTest {
         givenUserIsSignedIn()
@@ -2282,15 +2634,14 @@ class RealSubscriptionsManagerTest {
     private suspend fun purchase(
         planId: String = "",
         offerId: String? = null,
-        experimentName: String? = null,
-        experimentCohort: String? = null,
+        experiments: List<Experiment> = emptyList(),
+        legacyExperiment: Experiment? = null,
     ) {
         subscriptionsManager.purchase(
             mock(),
             planId = planId,
             offerId = offerId,
-            experimentCohort = experimentCohort,
-            experimentName = experimentName,
+            experiments = PurchaseExperiments(experiments = experiments, legacyExperiment = legacyExperiment),
             origin = null,
         )
     }

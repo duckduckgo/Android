@@ -22,6 +22,8 @@ import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
+import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.RealTextSelectionRepository
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -39,6 +41,8 @@ class RealDuckChatContextualTest {
     private val duckChatPixels: DuckChatPixels = mock()
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
     private val contextualEntryPromptStore = RealContextualEntryPromptStore()
+    private val globalActivityStarter: GlobalActivityStarter = mock()
+    private val textSelectionRepository = RealTextSelectionRepository()
     private val anchor: View = mock()
 
     private val testee = RealDuckChatContextual(
@@ -50,6 +54,8 @@ class RealDuckChatContextualTest {
         duckChatPixels,
         duckDuckGoUrlDetector,
         contextualEntryPromptStore,
+        globalActivityStarter,
+        textSelectionRepository,
     )
 
     @Test
@@ -75,6 +81,18 @@ class RealDuckChatContextualTest {
     }
 
     @Test
+    fun whenNoPageAndChatsEntryDisabledThenChatSurfaceShownInsteadOfMenu() = runTest {
+        whenever(duckChatInternal.isContextualSheetRedesignEnabled()).thenReturn(true)
+        whenever(duckChatInternal.isContextualMenuAllChatsEnabled()).thenReturn(false)
+        var askAboutPageCount = 0
+
+        testee.launch("tabId", sourceUrl = null, anchor = anchor) { askAboutPageCount++ }
+
+        // A menu of just New Chat is worse than the caller's own fallback.
+        assertEquals(1, askAboutPageCount)
+    }
+
+    @Test
     fun whenChatInProgressThenAskAboutPageInvokedWithoutShowingMenu() = runTest {
         whenever(duckChatInternal.isContextualSheetRedesignEnabled()).thenReturn(true)
         whenever(contextualDataStore.getTabChatUrl("tabId")).thenReturn("https://duckduckgo.com/?chatId=123")
@@ -89,6 +107,7 @@ class RealDuckChatContextualTest {
     @Test
     fun whenStoredChatSessionExpiredThenTreatedAsNoChatInProgress() = runTest {
         whenever(duckChatInternal.isContextualSheetRedesignEnabled()).thenReturn(true)
+        whenever(duckChatInternal.isContextualMenuAllChatsEnabled()).thenReturn(true)
         whenever(contextualDataStore.getTabChatUrl("tabId")).thenReturn("https://duckduckgo.com/?chatId=123")
         whenever(contextualDataStore.getTabClosedTimestamp("tabId")).thenReturn(0L)
         whenever(sessionTimeoutProvider.sessionTimeoutMillis()).thenReturn(1L)

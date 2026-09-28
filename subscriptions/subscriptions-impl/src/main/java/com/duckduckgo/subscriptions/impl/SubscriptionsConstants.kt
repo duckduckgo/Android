@@ -92,15 +92,23 @@ object SubscriptionsConstants {
     const val PARTNER_BENEFITS_URL = "https://duckduckgo.com/partner-benefits"
     const val SUBSCRIPTIONS_ETLD = "duckduckgo.com"
     const val FEATURE_PAGE_QUERY_PARAM_KEY = "featurePage"
+    const val ORIGIN_QUERY_PARAM_KEY = "origin"
     const val SUBSCRIPTIONS_PATH = "pro"
     const val PRIVACY_SUBSCRIPTIONS_PATH = "subscriptions"
+
+    const val DUCK_AI_FEATURE_PAGE = "duckai"
+    const val VPN_FEATURE_PAGE = "vpn"
+
+    const val TRIAL_QUERY_PARAM_KEY = "trial"
+    const val PIR_QUERY_PARAM_KEY = "pir"
 
     // Subscription-funnel origin for the app-settings "Get Subscription" entry point. Used both to
     // launch the buy webview (ProSettingView) and on the app-settings click pixel (SubscriptionPixelSender).
     const val ORIGIN_APP_SETTINGS = "funnel_appsettings_android"
 
-    // Allowlist of funnel entry-point origins permitted on subscription telemetry. The offer/subscribe
-    // origin can arrive from a web-supplied `?origin=` URL param, so it is bounded to this set.
+    // Allowlist of funnel entry-point origins permitted on subscription telemetry and on the `?origin=`
+    // param of the URL loaded in the subscriptions webview. The origin can arrive from a web-supplied
+    // URL param or JS message, so it is bounded to this set.
     // TODO: Consider moving this list to the remove privacy configuration if it will change regularly.
     val FUNNEL_ORIGIN_ALLOWLIST = setOf(
         "funnel_addressbar_android__aitoggle",

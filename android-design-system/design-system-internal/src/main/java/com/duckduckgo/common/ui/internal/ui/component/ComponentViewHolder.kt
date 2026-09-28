@@ -37,6 +37,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -80,6 +81,8 @@ import com.duckduckgo.common.ui.compose.listitem.DaxListItemTrailingIconSize
 import com.duckduckgo.common.ui.compose.listitem.DaxOneLineListItem
 import com.duckduckgo.common.ui.compose.listitem.DaxSettingsListItem
 import com.duckduckgo.common.ui.compose.listitem.DaxTwoLineListItem
+import com.duckduckgo.common.ui.compose.message.DaxAppTPBannerDisabled
+import com.duckduckgo.common.ui.compose.message.DaxAppTPBannerEnabled
 import com.duckduckgo.common.ui.compose.message.remote.DaxBigSingleActionMessage
 import com.duckduckgo.common.ui.compose.message.remote.DaxBigTwoActionsMessage
 import com.duckduckgo.common.ui.compose.message.remote.DaxMediumMessage
@@ -89,6 +92,9 @@ import com.duckduckgo.common.ui.compose.panel.DaxAlertPanel
 import com.duckduckgo.common.ui.compose.panel.DaxInfoPanel
 import com.duckduckgo.common.ui.compose.progress.DaxProgressSpinner
 import com.duckduckgo.common.ui.compose.radiobutton.DaxRadioButton
+import com.duckduckgo.common.ui.compose.skeleton.DaxSkeletonListItem
+import com.duckduckgo.common.ui.compose.skeleton.DaxSkeletonSectionHeader
+import com.duckduckgo.common.ui.compose.slider.DaxSlider
 import com.duckduckgo.common.ui.compose.snackbar.DaxSnackbar
 import com.duckduckgo.common.ui.compose.switch.DaxSwitch
 import com.duckduckgo.common.ui.compose.text.DaxText
@@ -293,8 +299,36 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
         }
     }
 
-    class SliderComponentViewHolder(parent: ViewGroup) :
-        ComponentViewHolder(inflate(parent, R.layout.component_slider))
+    class SliderComponentViewHolder(
+        parent: ViewGroup,
+        private val isDarkTheme: Boolean,
+    ) : ComponentViewHolder(inflate(parent, R.layout.component_slider)) {
+
+        init {
+            view.setupThemedComposeView(R.id.composeDaxSlider, isDarkTheme) {
+                var continuousValue by remember { mutableFloatStateOf(0.3f) }
+                var steppedValue by remember { mutableFloatStateOf(100f) }
+                var disabledValue by remember { mutableFloatStateOf(0.3f) }
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    DaxSlider(
+                        value = continuousValue,
+                        onValueChange = { continuousValue = it },
+                    )
+                    DaxSlider(
+                        value = steppedValue,
+                        onValueChange = { steppedValue = it },
+                        valueRange = 70f..170f,
+                        steps = 9,
+                    )
+                    DaxSlider(
+                        value = disabledValue,
+                        onValueChange = { disabledValue = it },
+                        enabled = false,
+                    )
+                }
+            }
+        }
+    }
 
     class InfoPanelComponentViewHolder(
         parent: ViewGroup,
@@ -335,13 +369,13 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
         override fun bind(component: Component) {
             val smallMessage = Message(title = "Small Message", subtitle = "Body text goes here. This component doesn't have buttons")
             val bigSingleMessage = Message(
-                topIllustration = CommonR.drawable.ic_announce,
+                topIllustration = CommonR.drawable.announcement_96,
                 title = "Big Single Message",
                 subtitle = "Body text goes here. This component has one button",
                 action = "Primary",
             )
             val bigTwoActionsMessage = Message(
-                topIllustration = CommonR.drawable.ic_ddg_announce,
+                topIllustration = CommonR.drawable.duckduckgo_96,
                 title = "Big Two Actions Message",
                 subtitle = "Body text goes here. This component has two buttons",
                 action = "Primary",
@@ -349,7 +383,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             )
 
             val bigTwoActionsUpdateMessage = Message(
-                topIllustration = CommonR.drawable.ic_app_update,
+                topIllustration = CommonR.drawable.update_96,
                 title = "Big Two Actions Message",
                 subtitle = "Body text goes here. This component has two buttons an showcases and app update",
                 action = "Primary",
@@ -357,17 +391,33 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             )
 
             val mediumMessage = Message(
-                topIllustration = CommonR.drawable.ic_critical_update,
+                topIllustration = CommonR.drawable.critical_update_96,
                 title = "Medium Message",
                 subtitle = "Body text goes here. This component doesn't have buttons",
             )
 
             val promoSingleMessage = Message(
-                middleIllustration = CommonR.drawable.promo_mac_and_windows,
+                middleIllustration = CommonR.drawable.laptop_ddginstall_96,
                 title = "Promo Single Action Message",
                 subtitle = "Body text goes here. This component has one promo button and supports <b>bold</b> text",
                 promoAction = "Promo Link",
                 messageType = REMOTE_PROMO_MESSAGE,
+            )
+            val wideDesktopPromoMessage = Message(
+                middleIllustration = CommonR.drawable.desktop_promo_artwork,
+                title = "DuckDuckGo on desktop",
+                subtitle = "Get the DuckDuckGo browser for Mac or Windows.",
+                promoAction = "Learn More",
+                messageType = REMOTE_PROMO_MESSAGE,
+            )
+            val wideTopIllustrationStressMessage = Message(
+                topIllustration = if (isDarkTheme) {
+                    CommonR.drawable.ic_visual_design_update_artwork_dark
+                } else {
+                    CommonR.drawable.ic_visual_design_update_artwork_light
+                },
+                title = "A fresh new look",
+                subtitle = "DuckDuckGo has a refreshed design, with the same privacy protections.",
             )
 
             view.findViewById<MessageCta>(R.id.small_remote_message).apply {
@@ -394,11 +444,19 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 setMessage(promoSingleMessage)
             }
 
+            view.findViewById<MessageCta>(R.id.wide_desktop_promo_message).apply {
+                setMessage(wideDesktopPromoMessage)
+            }
+
+            view.findViewById<MessageCta>(R.id.wide_top_illustration_remote_message).apply {
+                setMessage(wideTopIllustrationStressMessage)
+            }
+
             view.setupThemedComposeView(R.id.promo_single_remote_message_compose, isDarkTheme = isDarkTheme) {
                 DaxPromoSingleActionMessage(
                     title = "Promo Single Action Message",
                     body = "Body text goes here. This component has one promo button and supports <b>bold</b> text",
-                    illustration = painterResource(CommonR.drawable.promo_mac_and_windows),
+                    illustration = painterResource(CommonR.drawable.laptop_ddginstall_96),
                     illustrationContentDescription = null,
                     action = DaxAction(text = "Promo Link", onClick = {}),
                     onDismissed = {
@@ -427,7 +485,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 DaxMediumMessage(
                     title = "Compose Medium Message",
                     body = "Body text goes here. This component doesn't have buttons",
-                    topIllustration = painterResource(CommonR.drawable.ic_critical_update),
+                    topIllustration = painterResource(CommonR.drawable.critical_update_96),
                     onDismissed = {
                         view.findViewById<ComposeView>(R.id.medium_remote_message_compose).gone()
                     },
@@ -437,7 +495,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
             view.setupThemedComposeView(R.id.big_single_remote_message_compose, isDarkTheme = isDarkTheme) {
                 DaxBigSingleActionMessage(
-                    topIllustration = painterResource(CommonR.drawable.ic_announce),
+                    topIllustration = painterResource(CommonR.drawable.announcement_96),
                     title = "Compose Big Single Message",
                     body = "Body text goes here. This component has one button",
                     action = DaxAction(text = "Primary", onClick = {}),
@@ -475,7 +533,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
             view.setupThemedComposeView(R.id.big_two_actions_remote_message_compose, isDarkTheme = isDarkTheme) {
                 DaxBigTwoActionsMessage(
-                    topIllustration = painterResource(CommonR.drawable.ic_ddg_announce),
+                    topIllustration = painterResource(CommonR.drawable.duckduckgo_96),
                     title = "Compose Big Two Actions",
                     body = "Body text goes here. This component has two buttons",
                     primaryAction = DaxAction(text = "Primary", onClick = {}),
@@ -489,7 +547,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
             view.setupThemedComposeView(R.id.big_two_actions_update_remote_message_compose, isDarkTheme = isDarkTheme) {
                 DaxBigTwoActionsMessage(
-                    topIllustration = painterResource(CommonR.drawable.ic_app_update),
+                    topIllustration = painterResource(CommonR.drawable.update_96),
                     title = "Compose Big Two Actions",
                     body = "Body text goes here. This component has two buttons an showcases and app update",
                     primaryAction = DaxAction(text = "Primary", onClick = {}),
@@ -505,8 +563,8 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 DaxBigTwoActionsMessage(
                     topIllustration = rememberAsyncImagePainter(
                         model = "https://staticcdn.duckduckgo.com/remotemessaging/illustrations/image2.png",
-                        error = painterResource(CommonR.drawable.ic_app_update),
-                        fallback = painterResource(CommonR.drawable.ic_app_update),
+                        error = painterResource(CommonR.drawable.update_96),
+                        fallback = painterResource(CommonR.drawable.update_96),
                     ),
                     title = "Compose Remote Image",
                     body = "Body text goes here. This component has two buttons an showcases and app update",
@@ -516,6 +574,56 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                         view.findViewById<ComposeView>(R.id.big_two_actions_server_image_remote_message_compose).gone()
                     },
                     modifier = Modifier.padding(dimensionResource(CommonR.dimen.keyline_4)),
+                )
+            }
+        }
+    }
+
+    class AppTPBannerComponentViewHolder(
+        parent: ViewGroup,
+        private val isDarkTheme: Boolean,
+    ) : ComponentViewHolder(inflate(parent, R.layout.component_apptp_banner)) {
+        override fun bind(component: Component) {
+            val onClick = { Snackbar.make(view, component.name, Snackbar.LENGTH_SHORT).show() }
+
+            view.setupThemedComposeView(R.id.apptp_banner_enabled_compose, isDarkTheme = isDarkTheme) {
+                DaxAppTPBannerEnabled(
+                    text = buildAnnotatedString {
+                        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append("App Tracking Protection is enabled") }
+                        append(" and blocking tracking attempts across your apps.")
+                    },
+                    onClick = onClick,
+                )
+            }
+
+            view.setupThemedComposeView(R.id.apptp_banner_trackers_blocked_compose, isDarkTheme = isDarkTheme) {
+                DaxAppTPBannerEnabled(
+                    text = buildAnnotatedString {
+                        append("App Tracking Protection blocked 1,235 tracking attempts in ")
+                        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append("Yelp and 14 other apps") }
+                        append(" (past hour).")
+                    },
+                    onClick = onClick,
+                )
+            }
+
+            view.setupThemedComposeView(R.id.apptp_banner_disabled_compose, isDarkTheme = isDarkTheme) {
+                DaxAppTPBannerDisabled(
+                    text = buildAnnotatedString {
+                        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append("App Tracking Protection disabled.") }
+                        append("\nTap to continue blocking tracking attempts across your apps.")
+                    },
+                    onClick = onClick,
+                )
+            }
+
+            view.setupThemedComposeView(R.id.apptp_banner_revoked_compose, isDarkTheme = isDarkTheme) {
+                DaxAppTPBannerDisabled(
+                    text = buildAnnotatedString {
+                        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append("A VPN app on your device disabled App Tracking Protection.") }
+                        append("\nTap to re-enable.")
+                    },
+                    onClick = onClick,
                 )
             }
         }
@@ -938,6 +1046,27 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
         }
     }
 
+    class SkeletonComponentViewHolder(
+        parent: ViewGroup,
+        private val isDarkTheme: Boolean,
+    ) : ComponentViewHolder(inflate(parent, R.layout.component_skeleton)) {
+        override fun bind(component: Component) {
+            view.setupThemedComposeView(id = R.id.compose_dax_skeleton_list_item, isDarkTheme = isDarkTheme) {
+                Column {
+                    DaxSkeletonListItem()
+                    DaxSkeletonListItem(hasTwoLines = true)
+                    DaxSkeletonListItem(hasLeadingIcon = false)
+                }
+            }
+            view.setupThemedComposeView(id = R.id.compose_dax_skeleton_section_header, isDarkTheme = isDarkTheme) {
+                Column {
+                    DaxSkeletonSectionHeader()
+                    DaxSkeletonSectionHeader(hasTrailingIcon = true)
+                }
+            }
+        }
+    }
+
     class ScaffoldComponentViewHolder(
         parent: ViewGroup,
         private val isDarkTheme: Boolean,
@@ -1014,7 +1143,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 Component.SWITCH -> SwitchComponentViewHolder(parent, isDarkTheme)
                 Component.RADIO_BUTTON -> RadioButtonComponentViewHolder(parent, isDarkTheme)
                 Component.CHECKBOX -> CheckboxComponentViewHolder(parent, isDarkTheme)
-                Component.SLIDER -> SliderComponentViewHolder(parent)
+                Component.SLIDER -> SliderComponentViewHolder(parent, isDarkTheme)
                 Component.SNACKBAR -> SnackbarComponentViewHolder(parent, isDarkTheme)
                 Component.INFO_PANEL -> InfoPanelComponentViewHolder(parent, isDarkTheme)
                 Component.REMOTE_MESSAGE -> RemoteMessageComponentViewHolder(parent, isDarkTheme)
@@ -1026,9 +1155,11 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 Component.TWO_LINE_LIST_ITEM -> TwoLineItemComponentViewHolder(parent, isDarkTheme)
                 Component.SECTION_DIVIDER -> DividerComponentViewHolder(parent, isDarkTheme)
                 Component.PROGRESS_SPINNER -> ProgressSpinnerComponentViewHolder(parent, isDarkTheme)
+                Component.SKELETON -> SkeletonComponentViewHolder(parent, isDarkTheme)
                 Component.CARD -> CardComponentViewHolder(parent, isDarkTheme)
                 Component.SCAFFOLD -> ScaffoldComponentViewHolder(parent, isDarkTheme)
                 Component.SETTINGS_LIST_ITEM -> SettingsListItemComponentViewHolder(parent, isDarkTheme)
+                Component.APP_TRACKING_PROTECTION_BANNER -> AppTPBannerComponentViewHolder(parent, isDarkTheme)
                 else -> {
                     TODO()
                 }

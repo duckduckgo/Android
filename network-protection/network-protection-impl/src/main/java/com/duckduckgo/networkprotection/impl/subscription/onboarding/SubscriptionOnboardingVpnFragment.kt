@@ -42,7 +42,6 @@ import com.airbnb.lottie.LottieDrawable.INFINITE
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
-import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.addClickableSpan
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
@@ -57,8 +56,6 @@ import com.duckduckgo.networkprotection.impl.subscription.onboarding.Subscriptio
 import com.duckduckgo.networkprotection.impl.subscription.onboarding.SubscriptionOnboardingVpnViewModel.VPNActivationError
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingFeature
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionOnboardingFeatureInfoScreen
-import com.google.android.material.progressindicator.CircularProgressIndicatorSpec
-import com.google.android.material.progressindicator.IndeterminateDrawable
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
@@ -72,9 +69,6 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
-
-    @Inject
-    lateinit var appTheme: AppTheme
 
     private val binding: FragmentSubscriptionOnboardingVpnBinding by viewBinding()
 
@@ -93,21 +87,17 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
     private var vpnOn = false
     private var showingInfo = false
     private var lastRenderedState: ScreenState? = null
+
+    @StringRes
+    private var nextButtonLabel: Int = R.string.subscriptionOnboardingVpnTurnOn
     private var transition: ValueAnimator? = null
     private var headerConnected: Boolean? = null
 
-    private val buttonSpinner: IndeterminateDrawable<CircularProgressIndicatorSpec> by lazy {
-        val density = resources.displayMetrics.density
-        val spec = CircularProgressIndicatorSpec(requireContext(), null).apply {
-            indicatorSize = (BUTTON_SPINNER_SIZE_DP * density).toInt()
-            trackThickness = (BUTTON_SPINNER_THICKNESS_DP * density).toInt()
-            indicatorColors = intArrayOf(binding.subscriptionOnboardingVpnNextButton.currentTextColor)
-        }
-        IndeterminateDrawable.createCircularDrawable(requireContext(), spec)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.subscriptionOnboardingVpnNextButtonSpinner.setIndicatorColor(
+            binding.subscriptionOnboardingVpnNextButton.currentTextColor,
+        )
         lastRenderedState = null
         headerConnected = null
         configureHeaderAnimation()
@@ -185,7 +175,16 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
     }
 
     private fun renderActivating(loading: Boolean) {
-        binding.subscriptionOnboardingVpnNextButton.icon = if (loading) buttonSpinner else null
+        val label = getString(nextButtonLabel)
+        with(binding.subscriptionOnboardingVpnNextButton) {
+            text = if (loading) "" else label
+            contentDescription = label
+        }
+        if (loading) {
+            binding.subscriptionOnboardingVpnNextButtonSpinner.show()
+        } else {
+            binding.subscriptionOnboardingVpnNextButtonSpinner.gone()
+        }
     }
 
     private fun SubscriptionOnboardingVpnViewModel.ViewState.toScreenState(): ScreenState? = when {
@@ -208,17 +207,18 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
     private fun showInfoPage() = with(binding) {
         showingInfo = true
         transition?.cancel()
-        renderHeaderImage(connected = true, error = false, animate = false)
+        subscriptionOnboardingVpnHeaderAnimation.pauseAnimation()
+        subscriptionOnboardingVpnHeaderAnimation.gone()
+        subscriptionOnboardingVpnHeaderErrorIcon.gone()
         subscriptionOnboardingVpnHeaderTitle.setText(R.string.subscriptionOnboardingVpnInfoTitle)
         subscriptionOnboardingVpnStatusContent.gone()
         subscriptionOnboardingVpnInfoContent.show()
-        subscriptionOnboardingVpnNextButton.icon = null
-        subscriptionOnboardingVpnNextButton.setText(R.string.subscriptionOnboardingVpnInfoGotIt)
+        nextButtonLabel = R.string.subscriptionOnboardingVpnInfoGotIt
         subscriptionOnboardingVpnSkipButton.gone()
     }
 
     private fun configureHeaderAnimation() {
-        val animation = if (appTheme.isLightModeEnabled()) R.raw.vpn_header else R.raw.vpn_header_dark
+        val animation = R.raw.vpn_header
         binding.subscriptionOnboardingVpnHeaderAnimation.setAnimation(animation)
     }
 
@@ -282,7 +282,7 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
                 subscriptionOnboardingVpnHeaderTitle.setText(R.string.subscriptionOnboardingVpnHeaderTitleOn)
                 subscriptionOnboardingVpnHeaderText.show()
                 setHeaderTextWithLearnMore(R.string.subscriptionOnboardingVpnHeaderTextOn)
-                subscriptionOnboardingVpnNextButton.setText(R.string.subscriptionOnboardingVpnNext)
+                nextButtonLabel = R.string.subscriptionOnboardingVpnNext
                 subscriptionOnboardingVpnSkipButton.gone()
             }
 
@@ -291,7 +291,7 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
                 subscriptionOnboardingVpnHeaderTitle.setText(R.string.subscriptionOnboardingVpnHeaderTitle)
                 subscriptionOnboardingVpnHeaderText.show()
                 setHeaderTextWithLearnMore(R.string.subscriptionOnboardingVpnHeaderText)
-                subscriptionOnboardingVpnNextButton.setText(R.string.subscriptionOnboardingVpnTurnOn)
+                nextButtonLabel = R.string.subscriptionOnboardingVpnTurnOn
                 subscriptionOnboardingVpnSkipButton.gone()
             }
 
@@ -300,7 +300,7 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
                 subscriptionOnboardingVpnHeaderTitle.setText(R.string.subscriptionOnboardingVpnErrorTitle)
                 subscriptionOnboardingVpnHeaderText.show()
                 subscriptionOnboardingVpnHeaderText.setText(R.string.subscriptionOnboardingVpnErrorText)
-                subscriptionOnboardingVpnNextButton.setText(R.string.subscriptionOnboardingVpnTryAgain)
+                nextButtonLabel = R.string.subscriptionOnboardingVpnTryAgain
                 subscriptionOnboardingVpnSkipButton.show()
             }
 
@@ -308,7 +308,7 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
                 renderHeaderImage(connected = false, error = true, animate = animate)
                 subscriptionOnboardingVpnHeaderTitle.setText(R.string.subscriptionOnboardingVpnErrorTitle)
                 subscriptionOnboardingVpnHeaderText.gone()
-                subscriptionOnboardingVpnNextButton.setText(R.string.subscriptionOnboardingVpnTryAgain)
+                nextButtonLabel = R.string.subscriptionOnboardingVpnTryAgain
                 subscriptionOnboardingVpnSkipButton.show()
             }
         }
@@ -316,11 +316,11 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
         if (vpnOn) {
             subscriptionOnboardingVpnIpAddressTitle.setText(R.string.subscriptionOnboardingVpnIpAddressTitleOn)
             subscriptionOnboardingVpnNewIpAddressContainer.show()
-            subscriptionOnboardingVpnIpAddressInfo.gone()
+            subscriptionOnboardingVpnIpAddressInfo.setText(R.string.subscriptionOnboardingVpnOnIpAddressInfo)
         } else {
             subscriptionOnboardingVpnIpAddressTitle.setText(R.string.subscriptionOnboardingVpnIpAddressTitle)
             subscriptionOnboardingVpnNewIpAddressContainer.gone()
-            subscriptionOnboardingVpnIpAddressInfo.show()
+            subscriptionOnboardingVpnIpAddressInfo.setText(R.string.subscriptionOnboardingVpnOffIpAddressInfo)
         }
 
         val benefitIcon = if (vpnOn) R.drawable.check_circle_color_24 else R.drawable.alert_recolorable_24
@@ -458,8 +458,6 @@ class SubscriptionOnboardingVpnFragment : DuckDuckGoFragment(R.layout.fragment_s
     companion object {
         private const val TRANSITION_DURATION_MS = 1000L
         private const val BLUR_RADIUS = 12f
-        private const val BUTTON_SPINNER_SIZE_DP = 20
-        private const val BUTTON_SPINNER_THICKNESS_DP = 2
         private const val CONNECTED_LOOP_START = 0.35f
         private const val CROSS_SLIDE_MIDPOINT = 0.5f
     }

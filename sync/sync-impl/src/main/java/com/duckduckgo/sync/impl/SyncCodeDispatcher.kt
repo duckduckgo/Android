@@ -16,6 +16,7 @@
 
 package com.duckduckgo.sync.impl
 
+import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
@@ -118,14 +119,26 @@ sealed interface DispatchOutcome {
     /**
      * SM reached Joiner.Confirming. Caller must prompt the user ("Sync your data with [peerName]?")
      * then call [SyncCodeDispatcher.confirmJoiner] or [SyncCodeDispatcher.denyJoiner] to resume.
+     * [protocolVersion] is the session's negotiated exchange version, letting the caller pick the
+     * post-confirmation UX (v2.1+ skips the acknowledgment dialog).
      */
-    data class JoinerConfirmationRequested(val peerName: String?, val peerKind: PeerKind? = null) : DispatchOutcome
+    data class JoinerConfirmationRequested(
+        val peerName: String?,
+        val protocolVersion: ExchangeProtocolVersion.V2,
+        val peerKind: PeerKind? = null,
+    ) : DispatchOutcome
 
     /**
      * SM reached Host.Confirming. Caller must prompt the user ("Allow [peerName] to join your
      * sync & backup?") then call [SyncCodeDispatcher.confirmHost] or [SyncCodeDispatcher.denyHost].
+     * [protocolVersion] is the session's negotiated exchange version, letting the caller pick the
+     * post-confirmation UX (v2.1+ skips the acknowledgment dialog).
      */
-    data class HostConfirmationRequested(val peerName: String?, val peerKind: PeerKind? = null) : DispatchOutcome
+    data class HostConfirmationRequested(
+        val peerName: String?,
+        val protocolVersion: ExchangeProtocolVersion.V2,
+        val peerKind: PeerKind? = null,
+    ) : DispatchOutcome
 
     /**
      * Emitted once per [SyncCodeDispatcher.presentV2] session, before any confirmation or

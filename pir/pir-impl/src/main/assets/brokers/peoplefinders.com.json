@@ -1,7 +1,7 @@
 {
   "name": "PeopleFinders",
   "url": "peoplefinders.com",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "addedDatetime": 1677132000000,
   "optOutUrl": "https://www.peoplefinders.com/opt-out",
   "steps": [
@@ -167,12 +167,17 @@
           ]
         },
         {
+          "_comment": "A text-only expectation is not retried, so it reads once, right after the submit click. The body entry asserts nothing; it is what switches the action onto C-S-S's 30 x 1000ms retry.",
           "actionType": "expectation",
           "expectations": [
             {
               "type": "text",
               "selector": "body",
               "expect": "Email Sent"
+            },
+            {
+              "type": "element",
+              "selector": "body"
             }
           ],
           "id": "31e2af63-840f-4040-8f35-35d8d0156201"
@@ -183,12 +188,17 @@
           "pollingTime": 30
         },
         {
+          "_comment": "Same one-read problem, here on the document the confirmation link opens. Waiting for the record-removal form enables the retry and asserts more than the text, which is on the landing view too.",
           "actionType": "expectation",
           "expectations": [
             {
               "type": "text",
               "selector": "body",
               "expect": "Record Suppression Form"
+            },
+            {
+              "type": "element",
+              "selector": ".v-out-out-record-removal-form"
             }
           ],
           "id": "c39dbadc-e398-4068-93cb-bb3c1a2b047e"
@@ -264,6 +274,7 @@
           ]
         },
         {
+          "_comment": "Same one-read problem after the second submit click. The body entry only enables the retry.",
           "actionType": "expectation",
           "id": "bc09540c-8aeb-4d9f-b515-0ebb6f4583a5",
           "expectations": [
@@ -271,6 +282,10 @@
               "type": "text",
               "selector": "body",
               "expect": "Opt-Out Request Confirmation"
+            },
+            {
+              "type": "element",
+              "selector": "body"
             }
           ]
         }

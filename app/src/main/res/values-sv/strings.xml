@@ -213,13 +213,7 @@
     <!-- Get Desktop Browser -->
     <string name="getDesktopBrowserSettingItemTitle">Hämta webbläsare för dator</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo för Mac och Windows</string>
-    <string name="getDesktopBrowserTitle">Skydda din personliga information på Mac och Windows också!</string>
-    <string name="getDesktopBrowserBody">För att ladda ner DuckDuckGo på Mac eller Windows, besök:</string>
-    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
-    <string name="getDesktopBrowserShareDownloadLink">Dela nedladdningslänk</string>
-    <string name="getDesktopBrowserNoThanks">Nej tack</string>
     <string name="getDesktopBrowserHideItem">Dölj</string>
-    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Länken har kopierats</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Skydd mot popup-fönster för cookies</string>
@@ -965,6 +959,22 @@
     <string name="preOnboardingWidgetPromptBody">Lägg till vår sök-widget på startsidan för snabb och enkel åtkomst.</string>
     <string name="preOnboardingWidgetPromptPrimaryCta">Lägg till widget</string>
     <string name="preOnboardingWidgetPromptSecondaryCta">Hoppa över</string>
+
+    <!-- Pre-onboarding: import passwords -->
+    <string name="preOnboardingImportPasswordsTitle">Importera lösenord från Google</string>
+    <string name="preOnboardingImportPasswordsBody">Google kan be dig att logga in eller ange ditt lösenord för att bekräfta åtgärden.</string>
+    <string name="preOnboardingImportPasswordsPrimaryCta">Importera från Google</string>
+    <string name="preOnboardingImportCompleteTitle">Importen är klar</string>
+    <string name="preOnboardingImportCompleteCta">Fortsätt</string>
+    <string name="preOnboardingImportCompleteParsingTitle">Importerar lösenord</string>
+    <string name="preOnboardingImportCompleteParsingBody">Detta tar bara ett ögonblick.</string>
+    <string name="preOnboardingImportCompleteFailedTitle">Importen misslyckades</string>
+    <string name="preOnboardingImportCompleteFailed">Lösenordsimporten misslyckades</string>
+    <string name="preOnboardingImportCompleteImported" instruction="Placeholder is the number of passwords that were imported.">Importerade lösenord: %1$s</string>
+    <string name="preOnboardingImportCompleteSkipped" instruction="Placeholder is the number of passwords that were not imported.">Hoppade över (dubblett eller ogiltig): %1$s</string>
+    <string name="preOnboardingImportErrorTitle">Något gick fel</string>
+    <string name="preOnboardingImportErrorBody">Försök igen.</string>
+    <string name="preOnboardingImportErrorRetry">Försök igen</string>
 
     <!-- Pre-onboarding: add to home screen -->
     <string name="preOnboardingDockStepTitle">Lägg till mig i din favoritrad.</string>
