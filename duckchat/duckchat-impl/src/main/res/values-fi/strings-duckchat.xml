@@ -255,8 +255,8 @@
     <string name="duck_ai_chat_history_action_new">Uusi</string>
     <string name="duck_ai_chat_history_action_download_selected_content_description">Lataa keskustelut</string>
     <plurals name="duck_ai_chat_history_bulk_download_complete">
-        <item quantity="one">Lataus valmis %1$d keskustelulle</item>
-        <item quantity="other">Lataus valmis %1$d keskustelulle</item>
+        <item quantity="one" instruction="%1$d is the number of chats downloaded">Lataus valmis %1$d keskustelulle</item>
+        <item quantity="other" instruction="%1$d is the number of chats downloaded">Lataus valmis %1$d keskustelulle</item>
     </plurals>
     <string name="duck_ai_chat_history_action_overflow_content_description">Avaa ylivuotovalikko</string>
     <string name="duck_ai_chat_history_select_all">Valitse kaikki</string>
@@ -366,7 +366,7 @@
 
     <!-- Prefix on the Duck.ai attachment chip for a text selection -->
     <plurals name="duckAiTextSelectionWordCount">
-        <item quantity="one">%1$d sana</item>
-        <item quantity="other">%1$d sanaa</item>
+        <item quantity="one" instruction="%1$d is the number of words in the selection.">%1$d sana</item>
+        <item quantity="other" instruction="%1$d is the number of words in the selection.">%1$d sanaa</item>
     </plurals>
 </resources>

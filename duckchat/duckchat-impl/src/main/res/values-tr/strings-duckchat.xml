@@ -255,8 +255,8 @@
     <string name="duck_ai_chat_history_action_new">Yeni</string>
     <string name="duck_ai_chat_history_action_download_selected_content_description">Sohbetleri indir</string>
     <plurals name="duck_ai_chat_history_bulk_download_complete">
-        <item quantity="one">%1$d sohbet için indirme tamamlandı</item>
-        <item quantity="other">%1$d sohbet için indirme tamamlandı</item>
+        <item quantity="one" instruction="%1$d is the number of chats downloaded">%1$d sohbet için indirme tamamlandı</item>
+        <item quantity="other" instruction="%1$d is the number of chats downloaded">%1$d sohbet için indirme tamamlandı</item>
     </plurals>
     <string name="duck_ai_chat_history_action_overflow_content_description">Overflow menüsünü aç</string>
     <string name="duck_ai_chat_history_select_all">Tümünü seç</string>
@@ -366,7 +366,7 @@
 
     <!-- Prefix on the Duck.ai attachment chip for a text selection -->
     <plurals name="duckAiTextSelectionWordCount">
-        <item quantity="one">%1$d kelime</item>
-        <item quantity="other">%1$d kelime</item>
+        <item quantity="one" instruction="%1$d is the number of words in the selection.">%1$d kelime</item>
+        <item quantity="other" instruction="%1$d is the number of words in the selection.">%1$d kelime</item>
     </plurals>
 </resources>

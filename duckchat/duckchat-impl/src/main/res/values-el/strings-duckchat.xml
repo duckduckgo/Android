@@ -255,8 +255,8 @@
     <string name="duck_ai_chat_history_action_new">Νέο</string>
     <string name="duck_ai_chat_history_action_download_selected_content_description">Λήψη συνομιλιών</string>
     <plurals name="duck_ai_chat_history_bulk_download_complete">
-        <item quantity="one">Ολοκληρώθηκε η λήψη για %1$d συνομιλία</item>
-        <item quantity="other">Ολοκληρώθηκε η λήψη για %1$d συνομιλίες</item>
+        <item quantity="one" instruction="%1$d is the number of chats downloaded">Ολοκληρώθηκε η λήψη για %1$d συνομιλία</item>
+        <item quantity="other" instruction="%1$d is the number of chats downloaded">Ολοκληρώθηκε η λήψη για %1$d συνομιλίες</item>
     </plurals>
     <string name="duck_ai_chat_history_action_overflow_content_description">Άνοιγμα μενού υπερχείλισης</string>
     <string name="duck_ai_chat_history_select_all">Επιλογή όλων</string>
@@ -366,7 +366,7 @@
 
     <!-- Prefix on the Duck.ai attachment chip for a text selection -->
     <plurals name="duckAiTextSelectionWordCount">
-        <item quantity="one">%1$d λέξη</item>
-        <item quantity="other">%1$d λέξεις</item>
+        <item quantity="one" instruction="%1$d is the number of words in the selection.">%1$d λέξη</item>
+        <item quantity="other" instruction="%1$d is the number of words in the selection.">%1$d λέξεις</item>
     </plurals>
 </resources>

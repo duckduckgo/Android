@@ -255,9 +255,9 @@
     <string name="duck_ai_chat_history_action_new">Nou</string>
     <string name="duck_ai_chat_history_action_download_selected_content_description">Descarcă chaturile</string>
     <plurals name="duck_ai_chat_history_bulk_download_complete">
-        <item quantity="one">Descărcare finalizată pentru %1$d chat</item>
+        <item quantity="one" instruction="%1$d is the number of chats downloaded">Descărcare finalizată pentru %1$d chat</item>
         <item quantity="few">Descărcare completă pentru %1$d chaturi</item>
-        <item quantity="other">Descărcare completă pentru %1$d de chaturi</item>
+        <item quantity="other" instruction="%1$d is the number of chats downloaded">Descărcare completă pentru %1$d de chaturi</item>
     </plurals>
     <string name="duck_ai_chat_history_action_overflow_content_description">Deschide meniul suplimentar</string>
     <string name="duck_ai_chat_history_select_all">Selectează toate</string>
@@ -367,8 +367,8 @@
 
     <!-- Prefix on the Duck.ai attachment chip for a text selection -->
     <plurals name="duckAiTextSelectionWordCount">
-        <item quantity="one">%1$d cuvânt</item>
+        <item quantity="one" instruction="%1$d is the number of words in the selection.">%1$d cuvânt</item>
         <item quantity="few">%1$d cuvinte</item>
-        <item quantity="other">%1$d de cuvinte</item>
+        <item quantity="other" instruction="%1$d is the number of words in the selection.">%1$d de cuvinte</item>
     </plurals>
 </resources>

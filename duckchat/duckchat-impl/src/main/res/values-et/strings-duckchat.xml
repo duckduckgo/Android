@@ -255,8 +255,8 @@
     <string name="duck_ai_chat_history_action_new">Uus</string>
     <string name="duck_ai_chat_history_action_download_selected_content_description">Laadi alla vestlused</string>
     <plurals name="duck_ai_chat_history_bulk_download_complete">
-        <item quantity="one">Allalaadimine lõpetatud %1$d vestluse jaoks</item>
-        <item quantity="other">Allalaadimine lõpetatud %1$d vestluse jaoks</item>
+        <item quantity="one" instruction="%1$d is the number of chats downloaded">Allalaadimine lõpetatud %1$d vestluse jaoks</item>
+        <item quantity="other" instruction="%1$d is the number of chats downloaded">Allalaadimine lõpetatud %1$d vestluse jaoks</item>
     </plurals>
     <string name="duck_ai_chat_history_action_overflow_content_description">Ava ülevoolu menüü</string>
     <string name="duck_ai_chat_history_select_all">Vali kõik</string>
@@ -366,7 +366,7 @@
 
     <!-- Prefix on the Duck.ai attachment chip for a text selection -->
     <plurals name="duckAiTextSelectionWordCount">
-        <item quantity="one">%1$d sõna</item>
-        <item quantity="other">%1$d sõna</item>
+        <item quantity="one" instruction="%1$d is the number of words in the selection.">%1$d sõna</item>
+        <item quantity="other" instruction="%1$d is the number of words in the selection.">%1$d sõna</item>
     </plurals>
 </resources>

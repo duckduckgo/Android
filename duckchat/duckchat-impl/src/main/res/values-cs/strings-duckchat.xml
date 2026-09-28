@@ -255,10 +255,10 @@
     <string name="duck_ai_chat_history_action_new">Nová</string>
     <string name="duck_ai_chat_history_action_download_selected_content_description">Stáhnout chaty</string>
     <plurals name="duck_ai_chat_history_bulk_download_complete">
-        <item quantity="one">Stahování dokončeno pro %1$d chat</item>
+        <item quantity="one" instruction="%1$d is the number of chats downloaded">Stahování dokončeno pro %1$d chat</item>
         <item quantity="few">Stahování dokončeno pro %1$d chaty</item>
         <item quantity="many">Stahování dokončeno pro %1$d chatů</item>
-        <item quantity="other">Stahování dokončeno pro %1$d chatů</item>
+        <item quantity="other" instruction="%1$d is the number of chats downloaded">Stahování dokončeno pro %1$d chatů</item>
     </plurals>
     <string name="duck_ai_chat_history_action_overflow_content_description">Otevřít rozbalovací menu</string>
     <string name="duck_ai_chat_history_select_all">Vybrat vše</string>
@@ -368,9 +368,9 @@
 
     <!-- Prefix on the Duck.ai attachment chip for a text selection -->
     <plurals name="duckAiTextSelectionWordCount">
-        <item quantity="one">%1$d slovo</item>
+        <item quantity="one" instruction="%1$d is the number of words in the selection.">%1$d slovo</item>
         <item quantity="few">%1$d slova</item>
         <item quantity="many">%1$d slov</item>
-        <item quantity="other">%1$d slov</item>
+        <item quantity="other" instruction="%1$d is the number of words in the selection.">%1$d slov</item>
     </plurals>
 </resources>

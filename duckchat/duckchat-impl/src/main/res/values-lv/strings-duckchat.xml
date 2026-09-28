@@ -256,8 +256,8 @@
     <string name="duck_ai_chat_history_action_download_selected_content_description">Lejupielādēt tērzēšanas</string>
     <plurals name="duck_ai_chat_history_bulk_download_complete">
         <item quantity="zero">Pabeigta %1$d tērzēšanu lejupielāde</item>
-        <item quantity="one">Pabeigta %1$d tērzēšanas lejupielāde</item>
-        <item quantity="other">Pabeigta %1$d tērzēšanu lejupielāde</item>
+        <item quantity="one" instruction="%1$d is the number of chats downloaded">Pabeigta %1$d tērzēšanas lejupielāde</item>
+        <item quantity="other" instruction="%1$d is the number of chats downloaded">Pabeigta %1$d tērzēšanu lejupielāde</item>
     </plurals>
     <string name="duck_ai_chat_history_action_overflow_content_description">Atvērt pārpildes izvēlni</string>
     <string name="duck_ai_chat_history_select_all">Atlasīt visus</string>
@@ -368,7 +368,7 @@
     <!-- Prefix on the Duck.ai attachment chip for a text selection -->
     <plurals name="duckAiTextSelectionWordCount">
         <item quantity="zero">%1$d vārdu</item>
-        <item quantity="one">%1$d vārds</item>
-        <item quantity="other">%1$d vārdi</item>
+        <item quantity="one" instruction="%1$d is the number of words in the selection.">%1$d vārds</item>
+        <item quantity="other" instruction="%1$d is the number of words in the selection.">%1$d vārdi</item>
     </plurals>
 </resources>
