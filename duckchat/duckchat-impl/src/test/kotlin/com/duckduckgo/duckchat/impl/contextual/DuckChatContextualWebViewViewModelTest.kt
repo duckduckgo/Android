@@ -30,6 +30,7 @@ import com.duckduckgo.duckchat.impl.history.ChatHistoryRepository
 import com.duckduckgo.duckchat.impl.models.ChatType
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
+import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionRepository
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -74,6 +75,7 @@ class DuckChatContextualWebViewViewModelTest {
     private val modelManager: com.duckduckgo.duckchat.impl.models.DuckAiModelManager = mock()
     private val chatHistoryRepository: ChatHistoryRepository = mock()
     private val contextualEntryPromptStore: ContextualEntryPromptStore = mock()
+    private val textSelectionRepository: TextSelectionRepository = mock()
     private val recentChatsFlow = MutableStateFlow<List<ChatHistoryItem>>(emptyList())
 
     private val serializedPageData =
@@ -482,6 +484,24 @@ class DuckChatContextualWebViewViewModelTest {
     }
 
     @Test
+    fun `onContextualFireConfirmed clears attached text selections`() = runTest {
+        testee.onSheetOpened("tab-1")
+
+        testee.onContextualFireConfirmed()
+
+        verify(textSelectionRepository).consume("tab-1")
+    }
+
+    @Test
+    fun `onNewChatRequestedFromPopup clears attached text selections`() = runTest {
+        testee.onSheetOpened("tab-1")
+
+        testee.onNewChatRequestedFromPopup()
+
+        verify(textSelectionRepository).consume("tab-1")
+    }
+
+    @Test
     fun `onFullModeRequested opens fullscreen`() = runTest {
         (duckChat as FakeDuckChat).nextUrl = "https://duckduckgo.com/?ia=chat"
 
@@ -618,6 +638,7 @@ class DuckChatContextualWebViewViewModelTest {
         modelManager = modelManager,
         chatHistoryRepository = chatHistoryRepository,
         contextualEntryPromptStore = contextualEntryPromptStore,
+        textSelectionRepository = textSelectionRepository,
     )
 
     private class FakeDuckChat : com.duckduckgo.duckchat.api.DuckChat {

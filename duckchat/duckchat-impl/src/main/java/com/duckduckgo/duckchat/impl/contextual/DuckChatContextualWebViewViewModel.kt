@@ -35,6 +35,7 @@ import com.duckduckgo.duckchat.impl.history.ChatHistoryRepository
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
+import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionRepository
 import com.duckduckgo.duckchat.impl.wideevents.DuckAiSelectionJourneyWideEvent
 import com.duckduckgo.duckchat.impl.wideevents.SelectionTerminalReason
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
@@ -80,6 +81,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
     private val modelManager: DuckAiModelManager,
     private val chatHistoryRepository: ChatHistoryRepository,
     private val contextualEntryPromptStore: ContextualEntryPromptStore,
+    private val textSelectionRepository: TextSelectionRepository,
 ) : ViewModel() {
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
@@ -787,6 +789,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
             val currentTabId = _viewState.value.tabId
             if (currentTabId.isBlank()) return@launch
             contextualDataStore.clearTabChatUrl(currentTabId)
+            textSelectionRepository.consume(currentTabId)
             withContext(dispatchers.main()) {
                 clearSheetUrl()
                 pageContextState = pageContextState.copy(attachedPage = "")
