@@ -2872,8 +2872,8 @@ class BrowserTabFragment :
                     // Skip if the widget is already attached — Command.ShowKeyboard can fire
                     // multiple times per session (e.g. CTA refresh / tab swipe back to NTP) and
                     // showNativeInput() tears down and re-animates the widget on each call.
-                    // Must cover bottom omnibar too (inputModeBottomRoot); checking only the top
-                    // root re-opened UTI on every swipe and stacked NTP content insets.
+                    // isNativeInputShown checks the single inputModeRoot across both positions; a
+                    // top-only check re-opened UTI on every swipe and stacked NTP content insets.
                     if (!nativeInputManager.isNativeInputShown()) {
                         showNativeInput()
                     }
