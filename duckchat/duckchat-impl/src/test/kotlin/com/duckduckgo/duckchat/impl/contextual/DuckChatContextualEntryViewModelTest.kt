@@ -60,6 +60,7 @@ class DuckChatContextualEntryViewModelTest {
         modelManager,
         textSelectionRepository,
         RealTextSelectionPayloadBuilder(RuntimeEnvironment.getApplication(), object : DuckAiHostProvider {}),
+        selectionJourney,
     )
 
     private val validContext = """{"title":"Example","url":"https://example.com","content":"some page content"}"""
@@ -270,6 +271,13 @@ class DuckChatContextualEntryViewModelTest {
         viewModel.onDismiss()
 
         verify(duckChatPixels).reportContextualFloatingInputDismissedWithoutSubmission()
+    }
+
+    @Test
+    fun whenDismissedThenReportsSurfaceDismissedToSelectionJourney() {
+        viewModel.onDismiss()
+
+        verify(selectionJourney).onSurfaceDismissed()
     }
 
     @Test
