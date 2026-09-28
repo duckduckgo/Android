@@ -101,8 +101,6 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
     private var widgetCornerRadius = 0f
     private var widgetUsesRelativeCornerSize = false
     private var widgetCardElevation = 0f
-    private var widgetCompatPaddingWidth = 0
-    private var widgetCompatPaddingHeight = 0
     private var isBottomCard = false
 
     // The card is a weighted LinearLayout child (width=0dp), which ignores an
@@ -126,9 +124,8 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
         val margins = Margins(params.topMargin, params.bottomMargin)
 
         detachWeightForMorph(params)
-        shrinkCardToMatchOmnibar(params, omnibarWidth, omnibarHeight, isBottom)
-
         animateCornerRadius(widgetCard, omnibarCornerRadius)
+        shrinkCardToMatchOmnibar(widgetCard, params, omnibarWidth, omnibarHeight, isBottom)
         widgetCard.visibility = View.INVISIBLE
 
         return margins
@@ -382,18 +379,17 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
         widgetCornerRadius = materialCard?.radius ?: 0f
         omnibarCornerRadius = (omnibarCard as? MaterialCardView)?.radius ?: 0f
         widgetCardElevation = materialCard?.cardElevation ?: 0f
-        widgetCompatPaddingWidth = widgetCard.paddingLeft + widgetCard.paddingRight
-        widgetCompatPaddingHeight = widgetCard.paddingTop + widgetCard.paddingBottom
     }
 
     private fun shrinkCardToMatchOmnibar(
+        card: View,
         params: ViewGroup.MarginLayoutParams,
         omnibarWidth: Int,
         omnibarHeight: Int,
         isBottom: Boolean,
     ) {
-        params.width = omnibarWidth + widgetCompatPaddingWidth
-        params.height = omnibarHeight + widgetCompatPaddingHeight
+        params.width = omnibarWidth + card.paddingLeft + card.paddingRight
+        params.height = omnibarHeight + card.paddingTop + card.paddingBottom
         params.topMargin = 0
         params.bottomMargin = 0
         // Gravity only applies to FrameLayout children. For the LinearLayout case the
