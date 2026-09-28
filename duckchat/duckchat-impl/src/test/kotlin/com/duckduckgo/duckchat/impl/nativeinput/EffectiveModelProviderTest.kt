@@ -62,7 +62,7 @@ class EffectiveModelProviderTest {
     private val store = RealNativeInputStateStore(
         dagger.Lazy { tabRepositoryProvider },
         browserModeStateHolder,
-        RealTextSelectionRepository(),
+        RealTextSelectionRepository(mock(), mock()),
     )
     private val modelStateFlow = MutableStateFlow(
         ModelState(
