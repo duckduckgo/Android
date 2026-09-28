@@ -3995,13 +3995,7 @@ class BrowserTabFragment :
                     chatMenuPopup.contentView
                         .findViewById<PopupMenuItemView>(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewTab)
                         .setPrimaryText(
-                            getString(
-                                if (nativeSidebarEnabled) {
-                                    com.duckduckgo.browser.ui.R.string.chatMenuPopupNewSearch
-                                } else {
-                                    com.duckduckgo.browser.ui.R.string.chatMenuPopupNewTab
-                                },
-                            ),
+                            getString(com.duckduckgo.browser.ui.R.string.chatMenuPopupNewTab),
                         )
                     chatMenuPopup.showAnchoredView(activity, binding.rootView, anchor)
                 }
