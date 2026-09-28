@@ -20,6 +20,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.wideevents.DuckAiSelectionJourneyWideEvent
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.Lazy
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -52,7 +53,7 @@ interface TextSelectionRepository {
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealTextSelectionRepository @Inject constructor(
-    private val duckChatPixels: DuckChatPixels,
+    private val duckChatPixels: Lazy<DuckChatPixels>,
     private val selectionJourney: DuckAiSelectionJourneyWideEvent,
 ) : TextSelectionRepository {
 
@@ -74,11 +75,11 @@ class RealTextSelectionRepository @Inject constructor(
         val isAttached = selections.any { it.text == selection.text }
         when {
             selections.size > countBefore -> {
-                duckChatPixels.reportContextualSelectionAttached()
+                duckChatPixels.get().reportContextualSelectionAttached()
                 selectionJourney.onSelectionAttached(selections.size)
             }
             !isAttached -> {
-                duckChatPixels.reportContextualSelectionLimitReached()
+                duckChatPixels.get().reportContextualSelectionLimitReached()
                 getLimitFlow(tabId).value = true
             }
         }
@@ -96,7 +97,7 @@ class RealTextSelectionRepository @Inject constructor(
         val selections = flow.updateAndGet { current -> current.filterNot { it.id == id } }
         if (selections.size < countBefore) {
             getLimitFlow(tabId).value = false
-            duckChatPixels.reportContextualSelectionRemoved()
+            duckChatPixels.get().reportContextualSelectionRemoved()
             selectionJourney.onSelectionRemoved(selections.size)
         }
     }

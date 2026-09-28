@@ -64,7 +64,7 @@ class RealNativeInputStateStoreTest {
         whenever(it.currentMode).thenReturn(currentModeFlow)
     }
 
-    private val textSelectionRepository = RealTextSelectionRepository(mock(), mock())
+    private val textSelectionRepository = RealTextSelectionRepository(dagger.Lazy { mock() }, mock())
 
     private val testee = RealNativeInputStateStore(
         dagger.Lazy { tabRepositoryProvider },

@@ -76,7 +76,7 @@ class OptionsViewModelTest {
     private val store = RealNativeInputStateStore(
         dagger.Lazy { tabRepositoryProvider },
         browserModeStateHolder,
-        RealTextSelectionRepository(mock(), mock()),
+        RealTextSelectionRepository(dagger.Lazy { mock() }, mock()),
     )
     private val duckChatPixels: DuckChatPixels = mock()
     private val modelStateFlow = MutableStateFlow(ModelState())

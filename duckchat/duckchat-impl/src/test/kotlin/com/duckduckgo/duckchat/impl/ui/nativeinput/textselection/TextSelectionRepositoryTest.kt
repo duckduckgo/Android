@@ -32,7 +32,7 @@ class TextSelectionRepositoryTest {
     private val duckChatPixels: DuckChatPixels = mock()
     private val selectionJourney: DuckAiSelectionJourneyWideEvent = mock()
 
-    private val testee = RealTextSelectionRepository(duckChatPixels, selectionJourney)
+    private val testee = RealTextSelectionRepository(dagger.Lazy { duckChatPixels }, selectionJourney)
 
     @Test
     fun whenSelectionAddedThenItIsStoredAgainstThatTab() {

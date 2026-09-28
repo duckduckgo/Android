@@ -143,7 +143,7 @@ class NativeInputModeWidgetViewModelTest {
     private val realNativeInputStateStore = RealNativeInputStateStore(
         dagger.Lazy { tabRepositoryProvider },
         browserModeStateHolder,
-        RealTextSelectionRepository(mock(), mock()),
+        RealTextSelectionRepository(dagger.Lazy { mock() }, mock()),
     )
     private val nativeInputStatePublisher: NativeInputStatePublisher = realNativeInputStateStore
     private val nativeInputStateProvider: NativeInputStateProvider = realNativeInputStateStore
