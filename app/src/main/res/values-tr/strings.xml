@@ -63,8 +63,8 @@
     <string name="undoSnackbarAction">Geri al</string>
     <!-- Trackers blocked animation-->
     <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
-        <item quantity="one">İzleyici Engellendi</item>
-        <item quantity="other">İzleyici Engellendi</item>
+        <item quantity="one" instruction="This sentence is preceded by a number greater than zero, i.e. 1 Tracker Blocked">İzleyici Engellendi</item>
+        <item quantity="other" instruction="This sentence is preceded by a number greater than zero, i.e. 5 Trackers Blocked">İzleyici Engellendi</item>
     </plurals>
 
     <!-- Downloading files -->
@@ -223,7 +223,7 @@
     <string name="dataClearingDescription">Kişisel verilerinizi silmek, çevrimiçi gizliliğinizi korumanıza yardımcı olabilir. Verileri manuel olarak silmek için Fire Button\'ı kullanın veya otomatik silmeyi ayarlayın.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
         <item quantity="one">%1$d site temizleme işleminden hariç tutuldu.</item>
-        <item quantity="other">%1$d site temizleme işleminden hariç tutuldu.</item>
+        <item quantity="other" instruction="Placeholder is the number of sites excluded">%1$d site temizleme işleminden hariç tutuldu.</item>
     </plurals>
     <string name="dataClearingAutomaticClearingOn">Açık</string>
     <string name="dataClearingAutomaticClearingOff">Kapalı</string>
@@ -250,8 +250,8 @@
     <string name="singleTabFireDialogSubtitleSiteData">Site verilerini silmek, hesaplarınızdan çıkış yapmanıza neden olabilir.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Bu işlem devam eden indirmeleri iptal edecektir.</string>
     <plurals name="tabsClearedSnackbarMessage">
-        <item quantity="one">%1$d sekme ve verileri silindi</item>
-        <item quantity="other">%1$d sekme ve verileri silindi</item>
+        <item quantity="one" instruction="Placeholder is the number of tabs deleted, e.g. 1 tab and its data deleted">%1$d sekme ve verileri silindi</item>
+        <item quantity="other" instruction="Placeholder is the number of tabs deleted, e.g. 3 tabs and their data deleted">%1$d sekme ve verileri silindi</item>
     </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Site verileri silinemedi. Lütfen WebView\'yu güncelleyin.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Bir hata nedeniyle site verileri silinemedi.</string>
@@ -766,12 +766,12 @@
     <string name="onboardingSerpDaxDialogButton">Anladım!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Sonra, bir siteyi ziyaret etmeyi deneyin!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
-        <item quantity="one"><![CDATA[ ve <b>%1$d site daha</b> sizi burada takip etmeye çalışıyordu. Onları engelledim!<br/><br/>☝️ Daha fazla bilgi için kalkana dokunun.️]]></item>
-        <item quantity="other"><![CDATA[ ve <b>%1$d site daha</b> sizi burada takip etmeye çalışıyordu. Onları engelledim!<br/><br/>☝️ Daha fazla bilgi için kalkana dokunun.️]]></item>
+        <item quantity="one" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 1 other..."><![CDATA[ ve <b>%1$d site daha</b> sizi burada takip etmeye çalışıyordu. Onları engelledim!<br/><br/>☝️ Daha fazla bilgi için kalkana dokunun.️]]></item>
+        <item quantity="other" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 3 others..."><![CDATA[ ve <b>%1$d site daha</b> sizi burada takip etmeye çalışıyordu. Onları engelledim!<br/><br/>☝️ Daha fazla bilgi için kalkana dokunun.️]]></item>
     </plurals>
     <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ sizi burada takip etmeye çalışıyordu. Onları engelledim!<br/><br/>☝️ Daha fazla bilgi için kalkana dokunun.️]]></item>
-        <item quantity="other"><![CDATA[ sizi burada takip etmeye çalışıyordu. Onları engelledim!<br/><br/>☝️ Daha fazla bilgi için kalkana dokunun.️]]></item>
+        <item quantity="one" instruction="This sentence is preceded by the name of a company, i.e. Facebook was trying to track..."><![CDATA[ sizi burada takip etmeye çalışıyordu. Onları engelledim!<br/><br/>☝️ Daha fazla bilgi için kalkana dokunun.️]]></item>
+        <item quantity="other" instruction="This sentence is preceded by the name of several companies, i.e. Facebook and Google were trying to track..."><![CDATA[ sizi burada takip etmeye çalışıyordu. Onları engelledim!<br/><br/>☝️ Daha fazla bilgi için kalkana dokunun.️]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Anladım!</string>
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[<b>Fire Button</b> ile göz atma etkinliğinizi anında temizleyin.<br/><br/>Hemen deneyin!️ 🔥]]></string>

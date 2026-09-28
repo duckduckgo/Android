@@ -63,8 +63,8 @@
     <string name="undoSnackbarAction">Αναίρεση</string>
     <!-- Trackers blocked animation-->
     <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
-        <item quantity="one">Αποκλεισμένη εφαρμογή παρακολούθησης</item>
-        <item quantity="other">Αποκλεισμένες εφαρμογές παρακολούθησης</item>
+        <item quantity="one" instruction="This sentence is preceded by a number greater than zero, i.e. 1 Tracker Blocked">Αποκλεισμένη εφαρμογή παρακολούθησης</item>
+        <item quantity="other" instruction="This sentence is preceded by a number greater than zero, i.e. 5 Trackers Blocked">Αποκλεισμένες εφαρμογές παρακολούθησης</item>
     </plurals>
 
     <!-- Downloading files -->
@@ -223,7 +223,7 @@
     <string name="dataClearingDescription">Η διαγραφή των δεδομένων σας μπορεί να βοηθήσει στην προστασία του απορρήτου σας στο διαδίκτυο. Χρησιμοποιήστε το Fire Button για να διαγράψετε δεδομένα μη αυτόματα ή για να ρυθμίσετε την αυτόματη διαγραφή.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
         <item quantity="one">%1$d ιστότοπος εξαιρέθηκε από την εκκαθάριση</item>
-        <item quantity="other">%1$d ιστότοποι εξαιρέθηκαν από την εκκαθάριση</item>
+        <item quantity="other" instruction="Placeholder is the number of sites excluded">%1$d ιστότοποι εξαιρέθηκαν από την εκκαθάριση</item>
     </plurals>
     <string name="dataClearingAutomaticClearingOn">Ενεργό</string>
     <string name="dataClearingAutomaticClearingOff">Κλειστό</string>
@@ -250,8 +250,8 @@
     <string name="singleTabFireDialogSubtitleSiteData">Η διαγραφή δεδομένων ιστότοπου μπορεί να σας αποσυνδέσει από τους λογαριασμούς.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Αυτό θα ακυρώσει λήψεις που βρίσκονται σε εξέλιξη.</string>
     <plurals name="tabsClearedSnackbarMessage">
-        <item quantity="one">%1$d καρτέλα και τα δεδομένα τους διαγράφηκαν</item>
-        <item quantity="other">%1$d καρτέλες και τα δεδομένα τους διαγράφηκαν</item>
+        <item quantity="one" instruction="Placeholder is the number of tabs deleted, e.g. 1 tab and its data deleted">%1$d καρτέλα και τα δεδομένα τους διαγράφηκαν</item>
+        <item quantity="other" instruction="Placeholder is the number of tabs deleted, e.g. 3 tabs and their data deleted">%1$d καρτέλες και τα δεδομένα τους διαγράφηκαν</item>
     </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Δεν ήταν δυνατή η διαγραφή των δεδομένων του ιστότοπου. Ενημερώστε το WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Δεν ήταν δυνατή η διαγραφή των δεδομένων του ιστότοπου λόγω σφάλματος.</string>
@@ -766,12 +766,12 @@
     <string name="onboardingSerpDaxDialogButton">Το κατάλαβα!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Στη συνέχεια, δοκιμάστε να επισκεφτείτε έναν ιστότοπο!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
-        <item quantity="one"><![CDATA[ και <b>%1$d ακόμα</b> προσπαθούσαν να σας παρακολουθήσουν εδώ. Τους μπλόκαρα!<br/><br/>☝️ Πατήστε την ασπίδα για περισσότερες πληροφορίες.️]]></item>
-        <item quantity="other"><![CDATA[ και <b>%1$d ακόμα</b> προσπαθούσαν να σας παρακολουθήσουν εδώ. Τους μπλόκαρα!<br/><br/>☝️ Πατήστε την ασπίδα για περισσότερες πληροφορίες.️]]></item>
+        <item quantity="one" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 1 other..."><![CDATA[ και <b>%1$d ακόμα</b> προσπαθούσαν να σας παρακολουθήσουν εδώ. Τους μπλόκαρα!<br/><br/>☝️ Πατήστε την ασπίδα για περισσότερες πληροφορίες.️]]></item>
+        <item quantity="other" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 3 others..."><![CDATA[ και <b>%1$d ακόμα</b> προσπαθούσαν να σας παρακολουθήσουν εδώ. Τους μπλόκαρα!<br/><br/>☝️ Πατήστε την ασπίδα για περισσότερες πληροφορίες.️]]></item>
     </plurals>
     <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ προσπαθούσε να σας παρακολουθήσει εδώ. Τους μπλόκαρα!<br/><br/>☝️ Πατήστε την ασπίδα για περισσότερες πληροφορίες.️]]></item>
-        <item quantity="other"><![CDATA[ προσπαθούσαν να σας παρακολουθήσουν εδώ. Τους μπλόκαρα!<br/><br/>☝️ Πατήστε την ασπίδα για περισσότερες πληροφορίες.️]]></item>
+        <item quantity="one" instruction="This sentence is preceded by the name of a company, i.e. Facebook was trying to track..."><![CDATA[ προσπαθούσε να σας παρακολουθήσει εδώ. Τους μπλόκαρα!<br/><br/>☝️ Πατήστε την ασπίδα για περισσότερες πληροφορίες.️]]></item>
+        <item quantity="other" instruction="This sentence is preceded by the name of several companies, i.e. Facebook and Google were trying to track..."><![CDATA[ προσπαθούσαν να σας παρακολουθήσουν εδώ. Τους μπλόκαρα!<br/><br/>☝️ Πατήστε την ασπίδα για περισσότερες πληροφορίες.️]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Το κατάλαβα!</string>
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Διαγράψτε άμεσα τη δραστηριότητα περιήγησής σας με το <b>Fire Button</b>.<br/><br/>Δοκιμάστε το! 🔥]]></string>

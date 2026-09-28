@@ -63,8 +63,8 @@
     <string name="undoSnackbarAction">Kumoa</string>
     <!-- Trackers blocked animation-->
     <plurals name="trackersBlockedAnimationMessage" tools:ignore="ImpliedQuantity">
-        <item quantity="one">seurantatoiminto estetty</item>
-        <item quantity="other">seurantatoimintoa estetty</item>
+        <item quantity="one" instruction="This sentence is preceded by a number greater than zero, i.e. 1 Tracker Blocked">seurantatoiminto estetty</item>
+        <item quantity="other" instruction="This sentence is preceded by a number greater than zero, i.e. 5 Trackers Blocked">seurantatoimintoa estetty</item>
     </plurals>
 
     <!-- Downloading files -->
@@ -223,7 +223,7 @@
     <string name="dataClearingDescription">Tietojesi poistaminen voi auttaa suojaamaan yksityisyyttäsi verkossa. Poista tiedot manuaalisesti Fire Buttonilla tai määritä automaattinen poisto.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
         <item quantity="one">%1$d kohde jätettiin poiston ulkopuolelle</item>
-        <item quantity="other">%1$d kohdetta jätettiin poiston ulkopuolelle</item>
+        <item quantity="other" instruction="Placeholder is the number of sites excluded">%1$d kohdetta jätettiin poiston ulkopuolelle</item>
     </plurals>
     <string name="dataClearingAutomaticClearingOn">Päällä</string>
     <string name="dataClearingAutomaticClearingOff">Pois</string>
@@ -250,8 +250,8 @@
     <string name="singleTabFireDialogSubtitleSiteData">Sivustotietojen poistaminen voi kirjata sinut ulos tileiltä.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Tämä peruuttaa käynnissä olevat lataukset.</string>
     <plurals name="tabsClearedSnackbarMessage">
-        <item quantity="one">%1$d välilehti ja sen tiedot poistettu</item>
-        <item quantity="other">%1$d välilehteä ja niiden tiedot poistettu</item>
+        <item quantity="one" instruction="Placeholder is the number of tabs deleted, e.g. 1 tab and its data deleted">%1$d välilehti ja sen tiedot poistettu</item>
+        <item quantity="other" instruction="Placeholder is the number of tabs deleted, e.g. 3 tabs and their data deleted">%1$d välilehteä ja niiden tiedot poistettu</item>
     </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Sivuston tietoja ei voitu poistaa. Päivitä WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Sivuston tietoja ei voitu poistaa virheen vuoksi.</string>
@@ -766,12 +766,12 @@
     <string name="onboardingSerpDaxDialogButton">Selvä!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Siirry seuraavaksi sivustolle!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
-        <item quantity="one"><![CDATA[ ja <b>%1$d muu</b> yritti seurata sinua täällä. Estin ne!<br/><br/>☝️ Napauta kilpeä saadaksesi lisätietoja.️]]></item>
-        <item quantity="other"><![CDATA[ ja <b>%1$d muuta</b> yrittivät seurata sinua täällä. Estin ne!<br/><br/>☝️ Napauta kilpiä saadaksesi lisätietoja.️]]></item>
+        <item quantity="one" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 1 other..."><![CDATA[ ja <b>%1$d muu</b> yritti seurata sinua täällä. Estin ne!<br/><br/>☝️ Napauta kilpeä saadaksesi lisätietoja.️]]></item>
+        <item quantity="other" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 3 others..."><![CDATA[ ja <b>%1$d muuta</b> yrittivät seurata sinua täällä. Estin ne!<br/><br/>☝️ Napauta kilpiä saadaksesi lisätietoja.️]]></item>
     </plurals>
     <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ yritti seurata sinua täällä. Estin sen!<br/><br/>☝️ Napauta kilpeä saadaksesi lisätietoja.️]]></item>
-        <item quantity="other"><![CDATA[ yrittivät seurata sinua täällä. Estin ne!<br/><br/>☝️ Napauta kilpeä saadaksesi lisätietoja.️]]></item>
+        <item quantity="one" instruction="This sentence is preceded by the name of a company, i.e. Facebook was trying to track..."><![CDATA[ yritti seurata sinua täällä. Estin sen!<br/><br/>☝️ Napauta kilpeä saadaksesi lisätietoja.️]]></item>
+        <item quantity="other" instruction="This sentence is preceded by the name of several companies, i.e. Facebook and Google were trying to track..."><![CDATA[ yrittivät seurata sinua täällä. Estin ne!<br/><br/>☝️ Napauta kilpeä saadaksesi lisätietoja.️]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Selvä!</string>
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Tyhjennä selaustoimintasi välittömästi <b>Fire Button</b> -painikkeella.<br/><br/>Kokeile nyt!️ 🔥]]></string>
