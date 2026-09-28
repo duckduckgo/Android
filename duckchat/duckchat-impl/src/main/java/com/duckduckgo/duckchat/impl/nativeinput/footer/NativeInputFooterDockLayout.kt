@@ -32,13 +32,14 @@ import com.google.android.material.card.MaterialCardView
  * card's visible surface (compat shadow padding excluded), tucked under its bottom edge by more than the
  * card's corner radius, and drawn first so the card and its shadow sit on top of it.
  */
-open class NativeInputFooterDockLayout @JvmOverloads constructor(
+class NativeInputFooterDockLayout @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
     private var inputCard: MaterialCardView? = null
+    private var footerHost: NativeInputFooterView? = null
     private val footerOverlap = resources.getDimensionPixelSize(R.dimen.nativeInputFooterOverlap)
 
     // The card's elevation keeps changing (hide fade, morph animation); the footer follows it each frame
@@ -54,13 +55,19 @@ open class NativeInputFooterDockLayout @JvmOverloads constructor(
         clipToPadding = false
     }
 
-    override fun onFinishInflate() {
-        super.onFinishInflate()
-        inputCard = findInputCard()
+    override fun onViewAdded(child: View) {
+        super.onViewAdded(child)
+        if (footerHost == null && child is NativeInputFooterView) footerHost = child
+    }
+
+    override fun onViewRemoved(child: View) {
+        super.onViewRemoved(child)
+        if (child === footerHost) footerHost = null
     }
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
+        inputCard = findInputCard()
         viewTreeObserver.addOnPreDrawListener(elevationSync)
     }
 
@@ -106,7 +113,7 @@ open class NativeInputFooterDockLayout @JvmOverloads constructor(
      */
     private fun alignFooterToInputCard(): Boolean {
         val card = inputCard ?: return false
-        val footer = footerHost()?.takeIf { it.visibility != GONE } ?: return false
+        val footer = footerHost?.takeIf { it.visibility != GONE } ?: return false
         val params = footer.layoutParams as? MarginLayoutParams ?: return false
 
         val start = card.offsetWithin(this, Edge.START) + card.paddingStart
@@ -200,14 +207,8 @@ open class NativeInputFooterDockLayout @JvmOverloads constructor(
         return findCard()
     }
 
-    private fun footerHost(): NativeInputFooterView? =
-        (0 until childCount)
-            .map(::getChildAt)
-            .filterIsInstance<NativeInputFooterView>()
-            .firstOrNull()
-
     private fun footerCard(): MaterialCardView? =
-        footerHost()
+        footerHost
             ?.takeIf { it.isVisible }
             ?.getChildAt(0) as? MaterialCardView
 }

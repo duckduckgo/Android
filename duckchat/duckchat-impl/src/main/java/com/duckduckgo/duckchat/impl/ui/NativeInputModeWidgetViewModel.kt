@@ -16,7 +16,6 @@
 
 package com.duckduckgo.duckchat.impl.ui
 
-import android.content.Context
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -59,8 +58,6 @@ import com.duckduckgo.duckchat.impl.models.ReasoningResolver
 import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterContext
-import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterCoordinator
-import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterHost
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelPageType
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
@@ -112,7 +109,6 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     private val pendingNativePromptStore: PendingNativePromptStore,
     private val chatSuggestionsReader: ChatSuggestionsReader,
     private val nativeInputPlugins: ActivePluginPoint<NativeInputPlugin>,
-    private val footerCoordinator: NativeInputFooterCoordinator,
     autoCompleteFactory: AutoCompleteFactory,
     private val browserMode: BrowserMode,
     private val autoCompleteSettings: AutoCompleteSettings,
@@ -380,11 +376,6 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     fun setFooterInputFocused(focused: Boolean) {
         footerInputFocused.value = focused
     }
-
-    fun footerState(
-        context: Context,
-        host: NativeInputFooterHost,
-    ): Flow<NativeInputFooterCoordinator.State> = footerCoordinator.state(context, footerContext, host)
 
     fun selectModelById(modelId: String) {
         val model = modelManager.modelState.value.models.firstOrNull { it.id == modelId } ?: return
