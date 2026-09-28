@@ -23,6 +23,9 @@
     <string name="newTabReturnHatchUndo">Ongedaan maken</string>
     <string name="hatchMenuReturnTab">Terug naar tabblad</string>
     <string name="hatchMenuAfterInactivitySettings">Na inactiviteit</string>
+    <string name="hatchMenuAfterInactivityOpenLastUsedTab">Laatst gebruikte tabblad openen</string>
+    <string name="hatchMenuAfterInactivityOpenNewTab">Nieuw tabblad openen</string>
+    <string name="hatchMenuAfterInactivityOpenSpecificPage">Specifieke pagina openen</string>
     <string name="hatchMenuCloseTab">Tabblad sluiten</string>
     <string name="hatchMenuBurnTab">Tabblad verwijderen</string>
     <string name="hatchMenuHideShortcut">Snelkoppeling verbergen</string>
