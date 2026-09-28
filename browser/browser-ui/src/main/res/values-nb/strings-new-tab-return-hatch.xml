@@ -23,6 +23,9 @@
     <string name="newTabReturnHatchUndo">Angre</string>
     <string name="hatchMenuReturnTab">Tilbake til fanen</string>
     <string name="hatchMenuAfterInactivitySettings">Etter inaktivitet</string>
+    <string name="hatchMenuAfterInactivityOpenLastUsedTab">Åpne sist brukte fane</string>
+    <string name="hatchMenuAfterInactivityOpenNewTab">Åpne ny fane</string>
+    <string name="hatchMenuAfterInactivityOpenSpecificPage">Åpne en spesifikk side</string>
     <string name="hatchMenuCloseTab">Lukk fanen</string>
     <string name="hatchMenuBurnTab">Slett fanen</string>
     <string name="hatchMenuHideShortcut">Skjul snarvei</string>
