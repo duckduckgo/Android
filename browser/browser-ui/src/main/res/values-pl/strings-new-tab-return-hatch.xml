@@ -23,6 +23,9 @@
     <string name="newTabReturnHatchUndo">Cofnij</string>
     <string name="hatchMenuReturnTab">Powrót do karty</string>
     <string name="hatchMenuAfterInactivitySettings">Po braku aktywności</string>
+    <string name="hatchMenuAfterInactivityOpenLastUsedTab">Otwórz ostatnio używaną kartę</string>
+    <string name="hatchMenuAfterInactivityOpenNewTab">Otwórz nową kartę</string>
+    <string name="hatchMenuAfterInactivityOpenSpecificPage">Otwórz konkretną stronę</string>
     <string name="hatchMenuCloseTab">Zamknij kartę</string>
     <string name="hatchMenuBurnTab">Usuń kartę</string>
     <string name="hatchMenuHideShortcut">Ukryj skrót</string>
