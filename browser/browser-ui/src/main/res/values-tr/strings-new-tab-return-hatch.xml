@@ -23,6 +23,9 @@
     <string name="newTabReturnHatchUndo">Geri al</string>
     <string name="hatchMenuReturnTab">Sekmeye geri dön</string>
     <string name="hatchMenuAfterInactivitySettings">Hareketsizlik Sonrası</string>
+    <string name="hatchMenuAfterInactivityOpenLastUsedTab">Son kullanılan sekmeyi aç</string>
+    <string name="hatchMenuAfterInactivityOpenNewTab">Yeni sekme aç</string>
+    <string name="hatchMenuAfterInactivityOpenSpecificPage">Spesifik sayfayı aç</string>
     <string name="hatchMenuCloseTab">Sekmeyi kapat</string>
     <string name="hatchMenuBurnTab">Sekmeyi Sil</string>
     <string name="hatchMenuHideShortcut">Kısayolu gizle</string>
