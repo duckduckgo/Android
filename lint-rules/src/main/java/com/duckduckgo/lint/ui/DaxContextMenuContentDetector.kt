@@ -52,6 +52,8 @@ class DaxContextMenuContentDetector : Detector(), SourceCodeScanner {
             arg.accept(object : AbstractUastVisitor() {
                 override fun visitCallExpression(node: UCallExpression): Boolean {
                     val owner = node.resolve()?.containingClass?.qualifiedName
+                    // Descend into stdlib scaffolding (forEach, map, etc.) to check the content it builds.
+                    if (owner != null && owner.startsWith("kotlin.")) return false
                     if (owner != null && owner != scope) violation = true
                     // Judge only what the slot emits, so a call's own arguments are left unvisited.
                     return true

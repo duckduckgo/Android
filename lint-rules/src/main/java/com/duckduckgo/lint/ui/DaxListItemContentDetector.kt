@@ -44,17 +44,23 @@ class DaxListItemContentDetector : Detector(), SourceCodeScanner {
         override fun visitCallExpression(node: UCallExpression) {
             if (node.methodName !in LIST_ITEM_COMPOSABLES) return
             check(node, "leadingContent", LEADING_SCOPE)
-            check(node, "trailingContent", TRAILING_SCOPE, allowedOwners = TRAILING_CONTENT_ALLOWED_OWNERS)
+            check(node, "trailingContent", TRAILING_SCOPE)
             check(node, "inlineContent", INLINE_SCOPE)
         }
 
-        private fun check(node: UCallExpression, paramName: String, scope: String, allowedOwners: Set<String> = emptySet()) {
+        private fun check(node: UCallExpression, paramName: String, scope: String) {
             val arg = node.valueArguments.find { node.getParameterForArgument(it)?.name == paramName } ?: return
             var violation = false
             arg.accept(object : AbstractUastVisitor() {
                 override fun visitCallExpression(node: UCallExpression): Boolean {
+                    // DaxContextMenu's `anchor` renders directly in this slot, so it's still checked here.
+                    if (node.methodName in DAX_CONTEXT_MENU_COMPOSABLES) {
+                        val anchorArg = node.valueArguments.find { node.getParameterForArgument(it)?.name == "anchor" }
+                        anchorArg?.accept(this)
+                        return true
+                    }
                     val owner = node.resolve()?.containingClass?.qualifiedName
-                    if (owner != null && owner != scope && owner !in allowedOwners) violation = true
+                    if (owner != null && owner != scope) violation = true
                     // Judge only what the slot emits, so a call's own arguments are left unvisited.
                     return true
                 }
@@ -76,10 +82,7 @@ class DaxListItemContentDetector : Detector(), SourceCodeScanner {
         private const val TRAILING_SCOPE = "com.duckduckgo.common.ui.compose.listitem.DaxListItemTrailingScope"
         private const val INLINE_SCOPE = "com.duckduckgo.common.ui.compose.listitem.DaxListItemInlineScope"
         private val LIST_ITEM_COMPOSABLES = setOf("DaxOneLineListItem", "DaxTwoLineListItem", "DaxSettingsListItem")
-
-        // DaxContextMenu is itself design-system-controlled and validates its own content via
-        // DaxContextMenuContentDetector, so anchoring it on the trailing icon is allowed.
-        private val TRAILING_CONTENT_ALLOWED_OWNERS = setOf("com.duckduckgo.common.ui.compose.contextmenu.DaxContextMenuKt")
+        private val DAX_CONTEXT_MENU_COMPOSABLES = setOf("DaxContextMenu", "DaxContextMenuIconButton")
 
         val INVALID_DAX_LIST_ITEM_CONTENT_USAGE: Issue = Issue
             .create(

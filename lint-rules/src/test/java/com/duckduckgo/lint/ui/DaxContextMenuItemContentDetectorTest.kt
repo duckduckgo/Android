@@ -137,4 +137,28 @@ class DaxContextMenuItemContentDetectorTest {
     fun whenScopedItemTrailingIconUsesScopeMemberThenNoWarning() {
         run("""DaxContextMenu { DaxIconItem(text = "x", trailingIcon = { Icon() }) }""").expectClean()
     }
+
+    @Test
+    fun whenTrailingIconBuildsScopeMemberFromForEachThenNoWarning() {
+        run(
+            """DaxDefaultContextMenuItem(text = "x", trailingIcon = { listOf(1).forEach { Icon(it) } })""",
+        ).expectClean()
+    }
+
+    @Test
+    fun whenTrailingIconBuildsArbitraryComposableFromForEachThenWarning() {
+        run(
+            """DaxDefaultContextMenuItem(text = "x", trailingIcon = { listOf("a").forEach { Text(it) } })""",
+        ).expectWarningCount(1)
+    }
+
+    @Test
+    fun whenTrailingLambdaUsesScopeMemberThenNoWarning() {
+        run("""DaxDefaultContextMenuItem(text = "x") { Icon() }""").expectClean()
+    }
+
+    @Test
+    fun whenTrailingLambdaUsesArbitraryComposableThenWarning() {
+        run("""DaxDefaultContextMenuItem(text = "x") { Text("x") }""").expectWarningCount(1)
+    }
 }

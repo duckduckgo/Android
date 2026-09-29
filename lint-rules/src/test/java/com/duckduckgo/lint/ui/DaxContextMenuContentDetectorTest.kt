@@ -117,4 +117,28 @@ class DaxContextMenuContentDetectorTest {
     fun whenIconButtonContentWrapsScopeMemberInLayoutThenWarning() {
         run("""DaxContextMenuIconButton(iconPainter = 0, content = { Column { DaxIconItem("x") } })""").expectWarningCount(1)
     }
+
+    @Test
+    fun whenContextMenuContentBuildsScopeMemberFromForEachThenNoWarning() {
+        run(
+            """DaxContextMenu(expanded = true, onDismissRequest = {}, content = { listOf("a").forEach { DaxDefaultItem(it) } })""",
+        ).expectClean()
+    }
+
+    @Test
+    fun whenContextMenuContentBuildsArbitraryComposableFromForEachThenWarning() {
+        run(
+            """DaxContextMenu(expanded = true, onDismissRequest = {}, content = { listOf("a").forEach { Text(it) } })""",
+        ).expectWarningCount(1)
+    }
+
+    @Test
+    fun whenContextMenuTrailingLambdaUsesScopeMemberThenNoWarning() {
+        run("""DaxContextMenu(expanded = true, onDismissRequest = {}) { DaxDefaultItem("x") }""").expectClean()
+    }
+
+    @Test
+    fun whenContextMenuTrailingLambdaUsesArbitraryComposableThenWarning() {
+        run("""DaxContextMenu(expanded = true, onDismissRequest = {}) { Text("x") }""").expectWarningCount(1)
+    }
 }

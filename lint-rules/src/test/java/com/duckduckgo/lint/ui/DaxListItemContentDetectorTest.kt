@@ -151,4 +151,22 @@ class DaxListItemContentDetectorTest {
     fun whenTrailingContentUsesNonScopeComposableOtherThanDaxContextMenuThenWarning() {
         run("""DaxOneLineListItem(text = "x", trailingContent = { BadSwitch() })""").expectWarningCount(1)
     }
+
+    @Test
+    fun whenTrailingContentDaxContextMenuAnchorUsesArbitraryComposableThenWarning() {
+        run(
+            """DaxOneLineListItem(text = "x", trailingContent = {
+                DaxContextMenu(anchor = { BadIcon() }, expanded = false, onDismissRequest = {})
+            })""",
+        ).expectWarningCount(1)
+    }
+
+    @Test
+    fun whenTrailingContentDaxContextMenuAnchorUsesScopeMemberThenNoWarning() {
+        run(
+            """DaxOneLineListItem(text = "x", trailingContent = {
+                DaxContextMenu(anchor = { Icon() }, expanded = false, onDismissRequest = {})
+            })""",
+        ).expectClean()
+    }
 }
