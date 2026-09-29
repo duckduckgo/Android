@@ -21,12 +21,14 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.impl.nativeinput.footer.highusage.HighUsageModelNoticeDismissalStore
+import com.duckduckgo.duckchat.impl.nativeinput.footer.usagelimits.UsageNoticeDismissal
+import com.duckduckgo.duckchat.impl.nativeinput.footer.usagelimits.UsageNoticeDismissalStore
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -35,19 +37,24 @@ import javax.inject.Inject
 @ContributesViewModel(ActivityScope::class)
 class DuckAiUsageWarningsDevViewModel @Inject constructor(
     private val dismissalStore: HighUsageModelNoticeDismissalStore,
+    private val usageNoticeDismissalStore: UsageNoticeDismissalStore,
 ) : ViewModel() {
 
     data class ViewState(
         val dismissedModelIds: Set<String> = emptySet(),
+        val usageNoticeDismissals: List<UsageNoticeDismissal> = emptyList(),
     )
 
     sealed class Command {
         data class ShowMessage(val messageResId: Int) : Command()
     }
 
-    val viewState: StateFlow<ViewState> = dismissalStore.dismissedModelIds
-        .map { ViewState(dismissedModelIds = it) }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
+    val viewState: StateFlow<ViewState> = combine(
+        dismissalStore.dismissedModelIds,
+        usageNoticeDismissalStore.dismissals,
+    ) { dismissedModelIds, usageNoticeDismissals ->
+        ViewState(dismissedModelIds = dismissedModelIds, usageNoticeDismissals = usageNoticeDismissals.values.toList())
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 
     private val _commands = Channel<Command>(1, DROP_OLDEST)
     val commands: Flow<Command> = _commands.receiveAsFlow()
@@ -56,6 +63,13 @@ class DuckAiUsageWarningsDevViewModel @Inject constructor(
         viewModelScope.launch {
             dismissalStore.clear()
             _commands.send(Command.ShowMessage(R.string.devSettingsDuckAiUsageWarningsDismissalsReset))
+        }
+    }
+
+    fun onResetUsageNoticeDismissalClicked() {
+        viewModelScope.launch {
+            usageNoticeDismissalStore.clear()
+            _commands.send(Command.ShowMessage(R.string.devSettingsDuckAiUsageWarningsUsageDismissalReset))
         }
     }
 }

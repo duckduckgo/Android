@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="@dimen/keyline_4"
+    android:paddingTop="@dimen/nativeInputFooterOverlap"
+    android:paddingEnd="@dimen/keyline_2"
+    android:paddingBottom="@dimen/keyline_empty">
+
+    <com.duckduckgo.duckchat.impl.nativeinput.footer.usagelimits.UsageRingView
+        android:id="@+id/usageLimitFooterRing"
+        android:layout_width="@dimen/keyline_4"
+        android:layout_height="@dimen/keyline_4"
+        android:importantForAccessibility="no" />
+
+    <ImageView
+        android:id="@+id/usageLimitFooterAlert"
+        android:layout_width="@dimen/keyline_4"
+        android:layout_height="@dimen/keyline_4"
+        android:importantForAccessibility="no"
+        android:visibility="gone"
+        app:srcCompat="@drawable/ic_exclamation_recolorable_16" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_2"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/usageLimitFooterTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:textType="primary"
+            app:typography="caption" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/usageLimitFooterResetText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            app:textType="secondary"
+            app:typography="caption" />
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/usageLimitFooterDismiss"
+        android:layout_width="@dimen/keyline_7"
+        android:layout_height="@dimen/keyline_7"
+        android:layout_marginStart="@dimen/keyline_1"
+        android:background="@drawable/selectable_circular_ripple"
+        android:clickable="true"
+        android:contentDescription="@string/duckChatHighUsageModelFooterDismissContentDescription"
+        android:focusable="true"
+        android:padding="@dimen/keyline_2"
+        android:scaleType="center"
+        app:srcCompat="@drawable/ic_close_16"
+        app:tint="?attr/daxColorSecondaryIcon" />
+
+</LinearLayout>

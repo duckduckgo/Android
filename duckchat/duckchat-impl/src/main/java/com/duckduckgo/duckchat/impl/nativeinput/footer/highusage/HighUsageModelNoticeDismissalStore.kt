@@ -17,6 +17,7 @@
 package com.duckduckgo.duckchat.impl.nativeinput.footer.highusage
 
 import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
@@ -26,6 +27,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import logcat.LogPriority.WARN
+import logcat.logcat
 import java.io.IOException
 import javax.inject.Inject
 
@@ -38,14 +41,22 @@ class HighUsageModelNoticeDismissalStore @Inject constructor(
         .distinctUntilChanged()
 
     suspend fun dismiss(modelId: String) {
-        store.edit { preferences ->
+        editIgnoringIoFailure { preferences ->
             preferences[DUCK_AI_HIGH_USAGE_NOTICE_DISMISSED_MODELS] =
                 preferences[DUCK_AI_HIGH_USAGE_NOTICE_DISMISSED_MODELS].orEmpty() + modelId
         }
     }
 
     suspend fun clear() {
-        store.edit { preferences -> preferences.remove(DUCK_AI_HIGH_USAGE_NOTICE_DISMISSED_MODELS) }
+        editIgnoringIoFailure { preferences -> preferences.remove(DUCK_AI_HIGH_USAGE_NOTICE_DISMISSED_MODELS) }
+    }
+
+    private suspend fun editIgnoringIoFailure(transform: (MutablePreferences) -> Unit) {
+        try {
+            store.edit(transform)
+        } catch (e: IOException) {
+            logcat(WARN) { "Duck.ai usage warnings: dismissal write failed: ${e.message}" }
+        }
     }
 
     private companion object {
