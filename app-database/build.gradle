@@ -54,6 +54,7 @@ dependencies {
     implementation Square.moshi
     implementation "com.squareup.logcat:logcat:_"
     implementation Google.dagger
+    implementation "io.reactivex.rxjava2:rxjava:_"
 
     ksp AndroidX.room.compiler
     ksp project(':anvil-ksp')
