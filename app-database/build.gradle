@@ -45,6 +45,7 @@ dependencies {
     implementation project(path: ':app-store')
     implementation project(path: ':saved-sites-api')
     implementation project(path: ':saved-sites-store')
+    implementation project(path: ':tracker-detection-api')
 
     implementation AndroidX.room.runtime
     implementation AndroidX.room.rxJava2
