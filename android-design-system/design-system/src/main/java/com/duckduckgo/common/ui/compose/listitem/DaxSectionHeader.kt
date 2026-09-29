@@ -24,17 +24,22 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewFontScale
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.duckduckgo.common.ui.compose.button.DaxIconButton
 import com.duckduckgo.common.ui.compose.button.DaxIconButtonDefaults
 import com.duckduckgo.common.ui.compose.text.DaxText
+import com.duckduckgo.common.ui.compose.theme.Black48
+import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTextStyle
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
+import com.duckduckgo.common.ui.compose.theme.White48
 import com.duckduckgo.common.ui.compose.tools.PreviewSurface
 import com.duckduckgo.mobile.android.R
 
@@ -61,23 +66,23 @@ fun DaxSectionHeader(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .heightIn(min = 48.dp),
+            .heightIn(min = DaxSectionHeaderDefaults.MinHeight),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         DaxText(
             text = title,
-            style = DuckDuckGoTheme.typography.h4,
-            color = DuckDuckGoTheme.textColors.tertiary,
+            style = DaxSectionHeaderDefaults.titleStyle,
+            color = DaxSectionHeaderDefaults.titleColor,
             modifier = Modifier
                 .weight(1f)
                 .padding(
-                    start = 16.dp,
-                    top = 16.dp,
-                    bottom = 16.dp,
+                    start = DaxSectionHeaderDefaults.HorizontalPadding,
+                    top = DaxSectionHeaderDefaults.VerticalPadding,
+                    bottom = DaxSectionHeaderDefaults.VerticalPadding,
                     end = if (overflowMenuClickListener != null) {
-                        10.dp
+                        DaxSectionHeaderDefaults.TitleToOverflowMenuGap
                     } else {
-                        16.dp
+                        DaxSectionHeaderDefaults.HorizontalPadding
                     },
                 ),
         )
@@ -89,11 +94,28 @@ fun DaxSectionHeader(
                 contentDescription = overflowMenuContentDescription,
                 colors = DaxIconButtonDefaults.iconButtonColors.copy(contentColor = Color.Unspecified),
                 modifier = Modifier
-                    .padding(end = 4.dp)
-                    .size(36.dp),
+                    .padding(end = DaxSectionHeaderDefaults.OverflowMenuEndPadding)
+                    .size(DaxSectionHeaderDefaults.OverflowMenuButtonSize),
             )
         }
     }
+}
+
+internal object DaxSectionHeaderDefaults {
+    val MinHeight: Dp = 48.dp
+    val HorizontalPadding: Dp = 16.dp
+    val VerticalPadding: Dp = 16.dp
+    val TitleToOverflowMenuGap: Dp = 10.dp
+    val OverflowMenuEndPadding: Dp = 4.dp
+    val OverflowMenuButtonSize: Dp = 36.dp
+
+    val titleStyle: DuckDuckGoTextStyle
+        @Composable
+        get() = DuckDuckGoTheme.typography.h4
+
+    val titleColor: Color
+        @Composable @ReadOnlyComposable
+        get() = if (DuckDuckGoTheme.colors.isDark) White48 else Black48
 }
 
 @PreviewLightDark
