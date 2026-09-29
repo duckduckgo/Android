@@ -19,6 +19,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?attr/daxColorSurface"
     android:orientation="vertical"
     tools:context="com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsActivity">
 
@@ -146,7 +147,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/keyline_5"
                 android:layout_marginTop="@dimen/keyline_6"
-                android:background="@drawable/background_onboarding_settings_card"
+                android:background="@drawable/background_grey_rounded_corners"
                 android:orientation="vertical"
                 android:padding="@dimen/keyline_4"
                 android:visibility="gone"

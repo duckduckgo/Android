@@ -29,12 +29,6 @@ import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
 
-/**
- * Single source of "how far through subscription onboarding the user is", 0..100. Mirrors the completion
- * screen's calculation — the steps that contribute a completion-summary row, plus PIR when the user is
- * entitled and eligible — so the settings entry-point card always shows the same number the completion
- * screen did.
- */
 @SingleInstanceIn(AppScope::class)
 class SubscriptionOnboardingProgress @Inject constructor(
     private val stepPlugins: PluginPoint<SubscriptionOnboardingStepPlugin>,
