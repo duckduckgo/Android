@@ -75,6 +75,9 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 /**
  * Main application database.
  *
+ * This database is legacy and must only ever shrink — no new tables or entities may be added to it.
+ * New storage belongs in the owning feature's `-impl` module.
+ *
  * [TabEntity] and [TabSelectionEntity] are also used by
  * [com.duckduckgo.app.fire.db.FireModeDatabase]. Any schema change to these entities must be
  * accompanied by a migration in BOTH databases — forgetting one will result in a runtime crash
