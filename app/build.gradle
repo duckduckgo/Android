@@ -34,7 +34,7 @@ android {
         archivesBaseName = "duckduckgo-$versionName"
         vectorDrawables.useSupportLibrary = true
         sourceSets {
-            androidTest.assets.srcDirs += files("$projectDir/schemas")
+            androidTest.assets.srcDirs += files("$projectDir/../app-database/schemas")
             main {
                 java {
                     resources {
