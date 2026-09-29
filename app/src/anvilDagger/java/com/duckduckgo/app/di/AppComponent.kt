@@ -52,6 +52,7 @@ import javax.inject.Named
         StoreModule::class,
         DatabaseModule::class,
         DaoModule::class,
+        RoomDatabaseModule::class,
         JsonModule::class,
         SystemComponentsModule::class,
         BrowserModule::class,
