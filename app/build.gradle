@@ -31,7 +31,7 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         sourceSets {
-            androidTest.assets.srcDirs += files("$projectDir/schemas", "$projectDir/../app-database/schemas")
+            androidTest.assets.srcDirs += files("$projectDir/schemas")
             main {
                 java {
                     resources {

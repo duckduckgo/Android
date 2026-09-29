@@ -71,3 +71,7 @@ dependencies {
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
+
+tasks.register('androidTestsBuild') {
+    dependsOn 'assembleDebugAndroidTest'
+}
