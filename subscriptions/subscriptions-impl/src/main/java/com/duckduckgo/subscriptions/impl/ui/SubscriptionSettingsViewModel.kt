@@ -185,13 +185,8 @@ class SubscriptionSettingsViewModel @Inject constructor(
     }
 
     private fun completedEntryPoint(countCompletedEntryPointView: Boolean): OnboardingEntryPoint? {
-        val shownInPreviousLaunch =
-            onboardingStore.completedEntryPointViews() > 0 && !onboardingStore.wasCompletedEntryPointShownThisLaunch()
-        val underViewCap = onboardingStore.completedEntryPointViews() < MAX_COMPLETED_ENTRY_POINT_VIEWS
-        if (shownInPreviousLaunch || !underViewCap) return null
-
+        if (onboardingStore.completedEntryPointViews() >= MAX_COMPLETED_ENTRY_POINT_VIEWS) return null
         if (countCompletedEntryPointView) onboardingStore.incrementCompletedEntryPointViews()
-        onboardingStore.markCompletedEntryPointShownThisLaunch()
         return OnboardingEntryPoint(percentage = COMPLETE_PERCENTAGE)
     }
 

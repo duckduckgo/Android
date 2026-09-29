@@ -31,9 +31,6 @@ class SubscriptionOnboardingStore @Inject constructor(
         sharedPreferencesProvider.getSharedPreferences(FILENAME)
     }
 
-    @Volatile
-    private var shownCompletedEntryPointThisLaunch = false
-
     fun isStepCompleted(stepId: String): Boolean = completedSteps().contains(stepId)
 
     fun setStepCompleted(stepId: String) {
@@ -47,12 +44,6 @@ class SubscriptionOnboardingStore @Inject constructor(
 
     fun incrementCompletedEntryPointViews() {
         preferences.edit { putInt(KEY_COMPLETED_ENTRY_POINT_VIEWS, completedEntryPointViews() + 1) }
-    }
-
-    fun wasCompletedEntryPointShownThisLaunch(): Boolean = shownCompletedEntryPointThisLaunch
-
-    fun markCompletedEntryPointShownThisLaunch() {
-        shownCompletedEntryPointThisLaunch = true
     }
 
     companion object {

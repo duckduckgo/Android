@@ -751,26 +751,12 @@ class SubscriptionSettingsViewModelTest {
     }
 
     @Test
-    fun whenOnboardingCompleteAndShownInPreviousLaunchThenNoCard() = runTest {
+    fun whenOnboardingCompleteAndOneViewUsedUnderCapThenCardShown() = runTest {
         subscriptionsFeature.onboardingSubscriptionExperiment().setRawStoredState(Toggle.State(enable = true))
         stubReadySubscription()
         whenever(onboardingProgress.completionPercentage()).thenReturn(100)
+        // One view used, still under the cap → keep showing (even across app launches).
         whenever(onboardingStore.completedEntryPointViews()).thenReturn(1)
-        whenever(onboardingStore.wasCompletedEntryPointShownThisLaunch()).thenReturn(false)
-
-        viewModel.onCreate(mock())
-        viewModel.viewState.test {
-            assertEquals(null, (awaitItem() as Ready).onboardingEntryPoint)
-        }
-    }
-
-    @Test
-    fun whenOnboardingCompleteAndAlreadyShownThisLaunchUnderCapThenCardShown() = runTest {
-        subscriptionsFeature.onboardingSubscriptionExperiment().setRawStoredState(Toggle.State(enable = true))
-        stubReadySubscription()
-        whenever(onboardingProgress.completionPercentage()).thenReturn(100)
-        whenever(onboardingStore.completedEntryPointViews()).thenReturn(1)
-        whenever(onboardingStore.wasCompletedEntryPointShownThisLaunch()).thenReturn(true)
 
         viewModel.onCreate(mock())
         viewModel.viewState.test {

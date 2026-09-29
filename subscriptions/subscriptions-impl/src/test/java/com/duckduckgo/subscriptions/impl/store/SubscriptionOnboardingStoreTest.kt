@@ -58,13 +58,4 @@ class SubscriptionOnboardingStoreTest {
 
         assertEquals(2, store.completedEntryPointViews())
     }
-
-    @Test
-    fun whenCompletedEntryPointMarkedShownThisProcessThenFlagIsSet() {
-        assertFalse(store.wasCompletedEntryPointShownThisProcess())
-
-        store.markCompletedEntryPointShownThisProcess()
-
-        assertTrue(store.wasCompletedEntryPointShownThisProcess())
-    }
 }
