@@ -25,6 +25,9 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 android {
+    anvil {
+        generateDaggerFactories = true // default is false
+    }
     namespace 'com.duckduckgo.app.database'
     sourceSets {
         androidTest.assets.srcDirs += files("$projectDir/schemas")
