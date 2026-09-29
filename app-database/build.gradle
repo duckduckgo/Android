@@ -45,6 +45,7 @@ dependencies {
     implementation project(path: ':saved-sites-api')
     implementation project(path: ':saved-sites-store')
 
+    implementation AndroidX.lifecycle.liveDataKtx
     implementation AndroidX.room.runtime
     implementation AndroidX.room.rxJava2
     implementation KotlinX.coroutines.core
