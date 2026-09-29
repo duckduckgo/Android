@@ -804,7 +804,7 @@ class PirWebSaveProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirFreemiumDataStore, never()).didActivate = any()
+        verify(mockPirFreemiumDataStore, never()).activate(any())
     }
 
     @Test
@@ -821,7 +821,7 @@ class PirWebSaveProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirFreemiumDataStore, never()).didActivate = any()
+        verify(mockPirFreemiumDataStore, never()).activate(any())
     }
 
     @Test
@@ -838,7 +838,7 @@ class PirWebSaveProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirFreemiumDataStore, never()).didActivate = any()
+        verify(mockPirFreemiumDataStore, never()).activate(any())
     }
 
     @Test
@@ -853,7 +853,7 @@ class PirWebSaveProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirFreemiumDataStore, never()).didActivate = any()
+        verify(mockPirFreemiumDataStore, never()).activate(any())
     }
 
     private suspend fun givenSuccessfulProfileSave() {
