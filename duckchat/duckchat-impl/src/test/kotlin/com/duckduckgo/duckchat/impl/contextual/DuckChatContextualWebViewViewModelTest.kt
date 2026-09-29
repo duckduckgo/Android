@@ -30,6 +30,7 @@ import com.duckduckgo.duckchat.impl.history.ChatHistoryRepository
 import com.duckduckgo.duckchat.impl.models.ChatType
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
+import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelection
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionRepository
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
@@ -48,6 +49,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -95,6 +97,7 @@ class DuckChatContextualWebViewViewModelTest {
         whenever(contextualFireButtonToggle.isEnabled()).thenReturn(false)
         whenever(chatHistoryRepository.observeChats()).thenReturn(recentChatsFlow)
         whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(true)
+        whenever(textSelectionRepository.selections(any())).thenReturn(MutableStateFlow(emptyList()))
         whenever(duckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT)).thenReturn(
             SubscriptionEventData(RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME, "submitNewChatAction", JSONObject()),
         )
@@ -294,6 +297,18 @@ class DuckChatContextualWebViewViewModelTest {
         assertTrue(testee.viewState.value.showContext)
         assertEquals("Page Title", testee.viewState.value.contextTitle)
         verify(duckChatPixels).reportContextualPageContextAutoAttached()
+    }
+
+    @Test
+    fun `onPageContextReceived does not auto-attach when text selections are attached`() = runTest {
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(true)
+        whenever(textSelectionRepository.selections("tab-1"))
+            .thenReturn(MutableStateFlow(listOf(TextSelection(id = "1", text = "selected", url = "https://example.com"))))
+
+        testee.onPageContextReceived("tab-1", serializedPageData)
+
+        assertFalse(testee.viewState.value.showContext)
+        verify(duckChatPixels, never()).reportContextualPageContextAutoAttached()
     }
 
     @Test

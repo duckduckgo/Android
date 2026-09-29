@@ -678,10 +678,11 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
 
             val urlChanged = current.contextUrl.isNotEmpty() && url != current.contextUrl
             val remainsUserRemoved = current.userRemovedContext && !urlChanged
+            val hasTextSelections = textSelectionRepository.selections(tabId).value.isNotEmpty()
             val dropStaleAttachment = !allowsAutomaticContextAttachment && current.showContext && urlChanged
 
             val showContext = when {
-                allowsAutomaticContextAttachment -> !remainsUserRemoved
+                allowsAutomaticContextAttachment -> !remainsUserRemoved && !hasTextSelections
                 dropStaleAttachment -> false
                 else -> current.showContext
             }
