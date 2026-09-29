@@ -1052,10 +1052,7 @@ class OmnibarLayout @JvmOverloads constructor(
             if (!pageLoadProgressBar.isStarted) {
                 pageLoadProgressBar.start(viewState.isAnimationUpdateEnabled)
             }
-            pageLoadProgressBar.onProgressUpdate(
-                progress = viewState.loadingProgress.toFloat(),
-                animationUpdateEnabled = viewState.isAnimationUpdateEnabled,
-            )
+            pageLoadProgressBar.onProgressUpdate(progress = viewState.loadingProgress.toFloat())
         } else {
             if (pageLoadProgressBar.isStarted) {
                 pageLoadProgressBar.triggerCompletion()
