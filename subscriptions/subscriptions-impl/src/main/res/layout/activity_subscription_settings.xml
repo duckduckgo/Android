@@ -140,6 +140,61 @@
                 android:visibility="gone"
                 app:panelBackground="@drawable/info_panel_tooltip_background" />
 
+            <LinearLayout
+                android:id="@+id/onboardingProgressCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/keyline_5"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:background="@drawable/background_grey_rounded_corners"
+                android:orientation="vertical"
+                android:paddingHorizontal="@dimen/keyline_4"
+                android:paddingVertical="@dimen/keyline_4"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginEnd="@dimen/keyline_2"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/subscription_color_24" />
+
+                    <com.duckduckgo.common.ui.view.text.DaxTextView
+                        android:id="@+id/onboardingProgressTitle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        app:typography="h4"
+                        tools:text="Setup 75% complete" />
+
+                </LinearLayout>
+
+                <com.duckduckgo.common.ui.view.text.DaxTextView
+                    android:id="@+id/onboardingProgressDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/keyline_2"
+                    android:text="@string/subscriptionOnboardingSettingsCardDescription"
+                    app:textType="secondary"
+                    app:typography="body2" />
+
+                <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                    android:id="@+id/onboardingProgressButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/keyline_4"
+                    android:text="@string/subscriptionOnboardingSettingsCardButton"
+                    app:daxButtonSize="large" />
+
+            </LinearLayout>
+
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

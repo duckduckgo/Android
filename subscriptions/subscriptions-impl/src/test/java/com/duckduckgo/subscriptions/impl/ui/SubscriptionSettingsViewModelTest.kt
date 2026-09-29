@@ -4,21 +4,25 @@ import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
 import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.SubscriptionTier
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
+import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingProgress
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.Account
 import com.duckduckgo.subscriptions.impl.repository.PendingPlan
 import com.duckduckgo.subscriptions.impl.repository.Subscription
+import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingSettingsCardStore
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.FinishSignOut
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToActivationScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToEditEmailScreen
@@ -51,6 +55,9 @@ class SubscriptionSettingsViewModelTest {
     private val pixelSender: SubscriptionPixelSender = mock()
     private val subscriptionUnifiedFeedback: SubscriptionUnifiedFeedback = mock()
     private val subscriptionsFeature = FakeFeatureToggleFactory.create(SubscriptionsFeature::class.java, FakeToggleStore())
+    private val onboardingProgress: SubscriptionOnboardingProgress = mock()
+    private val onboardingCardStore: SubscriptionOnboardingSettingsCardStore = mock()
+    private val currentTimeProvider: CurrentTimeProvider = mock()
 
     private lateinit var viewModel: SubscriptionSettingsViewModel
 
@@ -61,6 +68,9 @@ class SubscriptionSettingsViewModelTest {
             pixelSender,
             subscriptionUnifiedFeedback,
             subscriptionsFeature,
+            onboardingProgress,
+            onboardingCardStore,
+            currentTimeProvider,
         )
     }
 
@@ -676,5 +686,115 @@ class SubscriptionSettingsViewModelTest {
             assertEquals(firstPendingPlan, state.pendingPlan)
             assertEquals(SubscriptionTier.PLUS, state.effectiveTier)
         }
+    }
+
+    @Test
+    fun whenOnboardingFeatureDisabledThenNoOnboardingCard() = runTest {
+        stubReadySubscription()
+
+        viewModel.onCreate(mock())
+        viewModel.viewState.test {
+            assertEquals(null, (awaitItem() as Ready).onboardingCard)
+        }
+    }
+
+    @Test
+    fun whenOnboardingIncompleteAndWithinPurchaseWindowThenCardShownWithPercentage() = runTest {
+        subscriptionsFeature.onboardingSubscriptionExperiment().setRawStoredState(Toggle.State(enable = true))
+        stubReadySubscription(startedAt = 1_000L)
+        whenever(currentTimeProvider.currentTimeMillis()).thenReturn(1_000L)
+        whenever(onboardingProgress.completionPercentage()).thenReturn(50)
+
+        viewModel.onCreate(mock())
+        viewModel.viewState.test {
+            assertEquals(50, (awaitItem() as Ready).onboardingCard?.percentage)
+        }
+    }
+
+    @Test
+    fun whenOnboardingIncompleteAndPastPurchaseWindowThenNoCard() = runTest {
+        subscriptionsFeature.onboardingSubscriptionExperiment().setRawStoredState(Toggle.State(enable = true))
+        stubReadySubscription(startedAt = 0L)
+        whenever(currentTimeProvider.currentTimeMillis()).thenReturn(FIFTEEN_DAYS_MILLIS)
+        whenever(onboardingProgress.completionPercentage()).thenReturn(50)
+
+        viewModel.onCreate(mock())
+        viewModel.viewState.test {
+            assertEquals(null, (awaitItem() as Ready).onboardingCard)
+        }
+    }
+
+    @Test
+    fun whenOnboardingCompleteAndUnderViewCapThenCardShown() = runTest {
+        subscriptionsFeature.onboardingSubscriptionExperiment().setRawStoredState(Toggle.State(enable = true))
+        stubReadySubscription()
+        whenever(onboardingProgress.completionPercentage()).thenReturn(100)
+        whenever(onboardingCardStore.completeCardViews()).thenReturn(0)
+
+        viewModel.onCreate(mock())
+        viewModel.viewState.test {
+            assertEquals(100, (awaitItem() as Ready).onboardingCard?.percentage)
+        }
+    }
+
+    @Test
+    fun whenOnboardingCompleteAndViewCapReachedThenNoCard() = runTest {
+        subscriptionsFeature.onboardingSubscriptionExperiment().setRawStoredState(Toggle.State(enable = true))
+        stubReadySubscription()
+        whenever(onboardingProgress.completionPercentage()).thenReturn(100)
+        whenever(onboardingCardStore.completeCardViews()).thenReturn(2)
+
+        viewModel.onCreate(mock())
+        viewModel.viewState.test {
+            assertEquals(null, (awaitItem() as Ready).onboardingCard)
+        }
+    }
+
+    @Test
+    fun whenSubscriptionInactiveThenNoOnboardingCard() = runTest {
+        subscriptionsFeature.onboardingSubscriptionExperiment().setRawStoredState(Toggle.State(enable = true))
+        stubReadySubscription(status = EXPIRED)
+
+        viewModel.onCreate(mock())
+        viewModel.viewState.test {
+            assertEquals(null, (awaitItem() as Ready).onboardingCard)
+        }
+    }
+
+    @Test
+    fun whenContinueSetupClickedThenLaunchOnboarding() = runTest {
+        viewModel.commands().test {
+            viewModel.onContinueSetupClicked()
+            assertTrue(awaitItem() is SubscriptionSettingsViewModel.Command.LaunchOnboarding)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    private suspend fun stubReadySubscription(
+        startedAt: Long = 1234,
+        status: SubscriptionStatus = AUTO_RENEWABLE,
+    ) {
+        whenever(subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
+        whenever(subscriptionsManager.getSubscription()).thenReturn(
+            Subscription(
+                productId = SubscriptionsConstants.MONTHLY_PLAN_US,
+                billingPeriod = "Monthly",
+                startedAt = startedAt,
+                expiresOrRenewsAt = 1701694623000,
+                status = status,
+                platform = "android",
+                activeOffers = listOf(),
+            ),
+        )
+        whenever(subscriptionsManager.getAccount()).thenReturn(
+            Account(email = null, externalId = "external_id"),
+        )
+        val flowTest: MutableSharedFlow<SubscriptionStatus> = MutableSharedFlow(replay = 1)
+        flowTest.tryEmit(status)
+        whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowTest)
+    }
+
+    private companion object {
+        private const val FIFTEEN_DAYS_MILLIS = 15L * 24 * 60 * 60 * 1000
     }
 }

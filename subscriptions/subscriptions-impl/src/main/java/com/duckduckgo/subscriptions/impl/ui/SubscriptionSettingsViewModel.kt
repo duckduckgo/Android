@@ -23,6 +23,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.subscriptions.api.ActiveOfferType
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
@@ -34,12 +35,17 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LIST_MONTHLY_PLU
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LIST_MONTHLY_PRO_PLANS
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
+import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingProgress
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.PendingPlan
+import com.duckduckgo.subscriptions.impl.repository.Subscription
+import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingSettingsCardStore
+import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingSettingsCardStore.Companion.MAX_COMPLETE_CARD_VIEWS
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.FinishSignOut
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToActivationScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToEditEmailScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToPortal
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.LaunchOnboarding
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Monthly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Yearly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.ViewState.Ready
@@ -64,6 +70,9 @@ class SubscriptionSettingsViewModel @Inject constructor(
     private val pixelSender: SubscriptionPixelSender,
     private val subscriptionUnifiedFeedback: SubscriptionUnifiedFeedback,
     private val subscriptionsFeature: SubscriptionsFeature,
+    private val onboardingProgress: SubscriptionOnboardingProgress,
+    private val onboardingCardStore: SubscriptionOnboardingSettingsCardStore,
+    private val currentTimeProvider: CurrentTimeProvider,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -83,10 +92,11 @@ class SubscriptionSettingsViewModel @Inject constructor(
     }
 
     override fun onResume(owner: LifecycleOwner) {
-        viewModelScope.launch { emitChanges() }
+        // Count a completed-card view once per screen appearance (drives the 2-view cap).
+        viewModelScope.launch { emitChanges(countCompletedCardView = true) }
     }
 
-    private suspend fun emitChanges() {
+    private suspend fun emitChanges(countCompletedCardView: Boolean = false) {
         val account = subscriptionsManager.getAccount() ?: return
         val subscription = subscriptionsManager.getSubscription() ?: return
         logcat {
@@ -153,8 +163,37 @@ class SubscriptionSettingsViewModel @Inject constructor(
                 pendingEffectiveDateShort = pendingEffectiveDateShort,
                 pendingTierNameResId = pendingTierNameResId,
                 effectiveTier = effectiveTier,
+                onboardingCard = onboardingCard(subscription, countCompletedCardView),
             ),
         )
+    }
+
+    /**
+     * The onboarding-progress card, or null when it shouldn't be shown. Requires the native onboarding flag
+     * and an active subscription. While onboarding is incomplete it shows for 14 days from purchase; once
+     * complete it shows for only [MAX_COMPLETE_CARD_VIEWS] more screen appearances, then never again.
+     */
+    private suspend fun onboardingCard(
+        subscription: Subscription,
+        countCompletedCardView: Boolean,
+    ): OnboardingCard? {
+        if (!subscriptionsFeature.onboardingSubscriptionExperiment().isEnabled()) return null
+        if (!subscription.isActive()) return null
+
+        val percentage = onboardingProgress.completionPercentage()
+        return if (percentage >= COMPLETE_PERCENTAGE) {
+            val show = onboardingCardStore.completeCardViews() < MAX_COMPLETE_CARD_VIEWS
+            if (show && countCompletedCardView) onboardingCardStore.incrementCompleteCardViews()
+            if (show) OnboardingCard(percentage = COMPLETE_PERCENTAGE) else null
+        } else {
+            val withinPurchaseWindow =
+                currentTimeProvider.currentTimeMillis() - subscription.startedAt <= INCOMPLETE_CARD_WINDOW_MILLIS
+            if (withinPurchaseWindow) OnboardingCard(percentage = percentage) else null
+        }
+    }
+
+    fun onContinueSetupClicked() {
+        viewModelScope.launch { command.send(LaunchOnboarding) }
     }
 
     fun onEditEmailButtonClicked() {
@@ -241,7 +280,10 @@ class SubscriptionSettingsViewModel @Inject constructor(
         data object GoToEditEmailScreen : Command()
         data object GoToActivationScreen : Command()
         data class GoToPortal(val url: String) : Command()
+        data object LaunchOnboarding : Command()
     }
+
+    data class OnboardingCard(val percentage: Int)
 
     sealed class ViewState {
         data object Loading : ViewState()
@@ -263,6 +305,12 @@ class SubscriptionSettingsViewModel @Inject constructor(
             val pendingEffectiveDateShort: String? = null,
             val pendingTierNameResId: Int? = null,
             val effectiveTier: SubscriptionTier,
+            val onboardingCard: OnboardingCard? = null,
         ) : ViewState()
+    }
+
+    companion object {
+        private const val COMPLETE_PERCENTAGE = 100
+        private const val INCOMPLETE_CARD_WINDOW_MILLIS = 14L * 24 * 60 * 60 * 1000
     }
 }

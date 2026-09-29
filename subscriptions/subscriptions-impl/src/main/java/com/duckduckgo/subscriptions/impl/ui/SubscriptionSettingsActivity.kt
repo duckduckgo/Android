@@ -42,6 +42,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.ActiveOfferType
 import com.duckduckgo.subscriptions.api.SubscriptionFeedbackScreens.SubscriptionFeedbackScreenWithParams
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionOnboardingScreenWithEmptyParams
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionsSettingsScreenWithEmptyParams
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
@@ -63,6 +64,8 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Comman
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToActivationScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToEditEmailScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToPortal
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.LaunchOnboarding
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.OnboardingCard
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Monthly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Yearly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.ViewState
@@ -158,6 +161,10 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             goToPrivacyPolicy()
         }
 
+        binding.onboardingProgressButton.setOnClickListener {
+            viewModel.onContinueSetupClicked()
+        }
+
         if (savedInstanceState == null) {
             pixelSender.reportSubscriptionSettingsShown()
         }
@@ -184,6 +191,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun renderView(viewState: ViewState.Ready) {
+        renderOnboardingCard(viewState.onboardingCard)
         binding.subscriptionSettingsProductName.setText(string.ddg_subscription)
         binding.activateOnOtherDevices.setText(string.activateOnOtherDevices)
         binding.faq.setPrimaryText(getString(string.privacyProFaq))
@@ -335,6 +343,15 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         }
     }
 
+    private fun renderOnboardingCard(card: OnboardingCard?) {
+        binding.onboardingProgressCard.isVisible = card != null
+        if (card == null) return
+        binding.onboardingProgressTitle.text = getString(string.subscriptionOnboardingSettingsCardTitle, card.percentage)
+        val inProgress = card.percentage < 100
+        binding.onboardingProgressDescription.isVisible = inProgress
+        binding.onboardingProgressButton.isVisible = inProgress
+    }
+
     private fun processCommand(command: Command) {
         when (command) {
             is FinishSignOut -> {
@@ -354,6 +371,8 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
                     ),
                 )
             }
+
+            LaunchOnboarding -> globalActivityStarter.start(this, SubscriptionOnboardingScreenWithEmptyParams)
         }
     }
 
