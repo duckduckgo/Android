@@ -57,6 +57,16 @@ class HighUsageModelNoticeDismissalStoreTest {
     }
 
     @Test
+    fun whenClearedThenDismissedModelIdsAreEmpty() = runTest {
+        testee.dismiss("claude-opus-4-8")
+        testee.dismiss("another-model")
+
+        testee.clear()
+
+        assertEquals(emptySet<String>(), testee.dismissedModelIds.first())
+    }
+
+    @Test
     fun whenDataStoreReadFailsThenDismissedModelIdsAreEmpty() = runTest {
         val failingStore: DataStore<Preferences> = mock()
         whenever(failingStore.data).thenReturn(flow { throw IOException("corrupt") })
