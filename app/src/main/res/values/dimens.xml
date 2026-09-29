@@ -19,7 +19,6 @@
     <dimen name="toolbar_horizontal_margin">8dp</dimen>
     <dimen name="recyclerViewOneFabBottomPadding">76dp</dimen>
     <dimen name="recyclerViewTwoFabsBottomPadding">136dp</dimen>
-    <dimen name="extraLargeShapeCornerRadius">24dp</dimen>
     <dimen name="getDesktopBrowserMaxItemWidth">600dp</dimen>
     <dimen name="onboardingBackgroundMaxHeight">126dp</dimen>
     <dimen name="preOnboardingDaxCtaPaddingTop">40dp</dimen>
