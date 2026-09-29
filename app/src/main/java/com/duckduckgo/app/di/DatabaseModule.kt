@@ -24,7 +24,9 @@ import com.duckduckgo.app.browser.DefaultWebViewDatabaseProvider
 import com.duckduckgo.app.browser.WebViewDatabaseProvider
 import com.duckduckgo.app.fire.db.FireModeDatabase
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.global.db.LegacyFireproofSettingsMigration
 import com.duckduckgo.app.global.db.MigrationsProvider
+import com.duckduckgo.app.settings.db.RealLegacyFireproofSettingsMigration
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.appbuildconfig.api.*
 import com.duckduckgo.di.scopes.AppScope
@@ -71,9 +73,16 @@ object DatabaseModule {
     @Provides
     fun provideDatabaseMigrations(
         context: Context,
-        settingsDataStore: SettingsDataStore,
+        legacyFireproofSettingsMigration: LegacyFireproofSettingsMigration,
     ): MigrationsProvider {
-        return MigrationsProvider(context, settingsDataStore)
+        return MigrationsProvider(context, legacyFireproofSettingsMigration)
+    }
+
+    @Provides
+    fun provideLegacyFireproofSettingsMigration(
+        settingsDataStore: SettingsDataStore,
+    ): LegacyFireproofSettingsMigration {
+        return RealLegacyFireproofSettingsMigration(settingsDataStore)
     }
 
     @Provides

@@ -28,6 +28,7 @@ import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.ASK_EVERY_TIME
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.NEVER
 import com.duckduckgo.app.onboarding.store.AppStage
+import com.duckduckgo.app.settings.db.RealLegacyFireproofSettingsMigration
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -54,7 +55,8 @@ class AppDatabaseTest {
 
     private val context = mock<Context>()
     private val mockSettingsDataStore: SettingsDataStore = mock()
-    private val migrationsProvider: MigrationsProvider = MigrationsProvider(context, mockSettingsDataStore)
+    private val legacyFireproofSettingsMigration = RealLegacyFireproofSettingsMigration(mockSettingsDataStore)
+    private val migrationsProvider: MigrationsProvider = MigrationsProvider(context, legacyFireproofSettingsMigration)
     private val sharedPreferences: SharedPreferences = mock()
 
     @Before

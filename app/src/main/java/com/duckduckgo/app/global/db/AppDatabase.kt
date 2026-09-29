@@ -51,8 +51,6 @@ import com.duckduckgo.app.onboarding.store.*
 import com.duckduckgo.app.privacy.db.*
 import com.duckduckgo.app.privacy.model.PrivacyProtectionCountsEntity
 import com.duckduckgo.app.privacy.model.UserAllowListedDomain
-import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper
 import com.duckduckgo.app.statistics.model.PixelEntity
 import com.duckduckgo.app.statistics.model.QueryParamsTypeConverter
 import com.duckduckgo.app.statistics.store.PendingPixelDao
@@ -184,7 +182,7 @@ abstract class AppDatabase : RoomDatabase() {
 }
 
 @Suppress("PropertyName")
-class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDataStore) {
+class MigrationsProvider(val context: Context, private val legacyFireproofSettingsMigration: LegacyFireproofSettingsMigration) {
 
     val MIGRATION_1_TO_2: Migration = object : Migration(1, 2) {
         override fun migrate(database: SupportSQLiteDatabase) {
@@ -594,10 +592,8 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
     }
 
     val MIGRATION_42_TO_43: Migration = object : Migration(42, 43) {
-        val oldSettingsDataStore = OldSettingsDataStore()
-
         override fun migrate(database: SupportSQLiteDatabase) {
-            oldSettingsDataStore.updateFireproofSettingType()
+            legacyFireproofSettingsMigration.updateFireproofSettingType()
         }
     }
 
@@ -904,16 +900,6 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
             // This was used by the 2 retuning users experiments.
             // First released in 5.103.0 and fully disabled in 5.114.0.
             return preferences.getBoolean("HIDE_TIPS_FOR_RETURNING_USER", false)
-        }
-    }
-
-    private inner class OldSettingsDataStore {
-
-        private val loginDetectorPrefsMapper = LoginDetectorPrefsMapper()
-
-        fun updateFireproofSettingType() {
-            val automaticFireproofSetting = loginDetectorPrefsMapper.mapToAutomaticFireproofSetting(settingsDataStore.appLoginDetection)
-            settingsDataStore.automaticFireproofSetting = automaticFireproofSetting
         }
     }
 }
