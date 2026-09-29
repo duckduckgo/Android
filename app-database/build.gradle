@@ -68,9 +68,12 @@ dependencies {
     testImplementation Testing.robolectric
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
 
+    androidTestImplementation AndroidX.archCore.testing
     androidTestImplementation AndroidX.room.testing
     androidTestImplementation AndroidX.test.ext.junit
     androidTestImplementation AndroidX.test.runner
+    androidTestImplementation "org.mockito:mockito-android:_"
+    androidTestImplementation "org.mockito.kotlin:mockito-kotlin:_"
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
