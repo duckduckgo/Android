@@ -29,7 +29,7 @@ import dev.zacsweers.metro.SingleIn
 @BindingContainer(includes = [DaoModule::class])
 @ContributesTo(
     scope = AppScope::class,
-    replaces = [DatabaseModule::class],
+    replaces = [DatabaseModule::class, RoomDatabaseModule::class],
 )
 class StubDatabaseModule {
 
