@@ -127,7 +127,9 @@
             "paid_settings",
             "return_to_chat_card",
             "tab_switcher_existing_chat",
-            "subscription_onboarding"
+            "subscription_onboarding",
+            "browsing_menu_duckai",
+            "duck_ai_new_chat"
         ]
     },
     "osVersion": {

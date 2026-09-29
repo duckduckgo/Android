@@ -11939,39 +11939,38 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenNewChatRequestedFromDuckAiTabThenOpensNewTabWithEmptyChat() = runTest {
-        whenever(mockDuckAiTabSessionRepository.getEntryPointSource("abc")).thenReturn(null)
-
-        testee.openNewDuckChat(ViewMode.DuckAI)
-        advanceUntilIdle()
+    fun whenNewChatRequestedFromChatMenuThenOpensNewTabWithEmptyChat() = runTest {
+        testee.openNewDuckChatFromChatMenu()
 
         assertCommandIssued<Command.OpenInNewTab> {
             assertEquals(duckChatURL, query)
             assertEquals("abc", sourceTabId)
         }
         verify(mockDuckChatJSHelper, never()).onNativeAction(NativeAction.NEW_CHAT)
+        verify(mockDuckChat).reportDuckChatEntry(DuckChatEntryPoint.DUCK_AI_NEW_CHAT, opensNewTab = true, hasPrompt = false)
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_NEW_CHAT_TAPPED)
         verify(mockDuckAiSessionCallback).onNewChatCreated("abc")
     }
 
     @Test
-    fun whenNewChatRequestedFromDuckAiTabThenNewTabInheritsThisTabsEntryPoint() = runTest {
-        whenever(mockDuckAiTabSessionRepository.getEntryPointSource("abc")).thenReturn("address_bar_prompt")
-
+    fun whenNewChatRequestedFromBrowsingMenuOnDuckAiTabThenOpensNewTabWithDuckAiEntryPoint() = runTest {
         testee.openNewDuckChat(ViewMode.DuckAI)
-        advanceUntilIdle()
 
-        verify(mockDuckAiTabSessionRepository).setPendingEntryPointSource("address_bar_prompt")
+        assertCommandIssued<Command.OpenInNewTab> {
+            assertEquals(duckChatURL, query)
+            assertEquals("abc", sourceTabId)
+        }
+        verify(mockDuckChat).reportDuckChatEntry(DuckChatEntryPoint.BROWSING_MENU_DUCKAI, opensNewTab = true, hasPrompt = false)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_NEW_CHAT_TAB_TAPPED)
+        verify(mockDuckAiSessionCallback).onNewChatCreated("abc")
     }
 
     @Test
-    fun whenNewChatRequestedFromDuckAiTabWithNoRecordedEntryPointThenNothingIsPended() = runTest {
-        whenever(mockDuckAiTabSessionRepository.getEntryPointSource("abc")).thenReturn(null)
+    fun whenNewChatRequestedFromBrowsingMenuOnWebpageThenNoNewChatRecordedForTheSession() = runTest {
+        testee.openNewDuckChat(ViewMode.Browser("https://example.com"))
 
-        testee.openNewDuckChat(ViewMode.DuckAI)
-        advanceUntilIdle()
-
-        verify(mockDuckAiTabSessionRepository, never()).setPendingEntryPointSource(any())
+        verify(mockDuckChat).reportDuckChatEntry(DuckChatEntryPoint.BROWSING_MENU_WEBPAGE, opensNewTab = true, hasPrompt = false)
+        verify(mockDuckAiSessionCallback, never()).onNewChatCreated(any())
     }
 
     @Test
@@ -12002,6 +12001,7 @@ class BrowserTabViewModelTest {
             assertTrue(command.query == duckChatURL)
 
             verify(mockDuckChat, never()).openDuckChat(any())
+            verify(mockDuckChat).reportDuckChatEntry(DuckChatEntryPoint.BROWSING_MENU_NTP, opensNewTab = true, hasPrompt = false)
             verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_NEW_CHAT_TAB_TAPPED)
         }
 
