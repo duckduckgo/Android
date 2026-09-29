@@ -26,11 +26,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewFontScale
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.duckduckgo.common.ui.compose.button.DaxIconButton
+import com.duckduckgo.common.ui.compose.button.DaxIconButtonDefaults
 import com.duckduckgo.common.ui.compose.text.DaxText
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.compose.tools.PreviewSurface
@@ -85,6 +87,7 @@ fun DaxSectionHeader(
                 onClick = overflowMenuClickListener,
                 iconPainter = painterResource(R.drawable.ic_menu_vertical_24),
                 contentDescription = overflowMenuContentDescription,
+                colors = DaxIconButtonDefaults.iconButtonColors.copy(contentColor = Color.Unspecified),
                 modifier = Modifier
                     .padding(end = 4.dp)
                     .size(36.dp),
