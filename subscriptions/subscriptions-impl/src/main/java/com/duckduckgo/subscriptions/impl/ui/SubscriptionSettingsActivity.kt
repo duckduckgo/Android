@@ -19,6 +19,7 @@ package com.duckduckgo.subscriptions.impl.ui
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.Gravity
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
@@ -350,6 +351,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         val inProgress = card.percentage < 100
         binding.onboardingProgressDescription.isVisible = inProgress
         binding.onboardingProgressButton.isVisible = inProgress
+        binding.onboardingProgressHeader.gravity = if (inProgress) Gravity.TOP else Gravity.CENTER_VERTICAL
     }
 
     private fun processCommand(command: Command) {
