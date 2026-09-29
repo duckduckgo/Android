@@ -138,6 +138,23 @@ class SubscriptionOnboardingCompletionViewModelTest {
     }
 
     @Test
+    fun whenHandoffThenPirRowShownButNotClickable() = runTest {
+        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.ENABLED)
+        val testee = createViewModel(
+            plugins = listOf(fakePlugin("vpn")),
+            entitlements = listOf(Product.PIR),
+            handoff = true,
+        )
+
+        testee.viewState().test {
+            val pirRow = awaitItem().rows.single { it.id == PIR_ROW_ID }
+            assertFalse(pirRow.completed)
+            assertFalse(pirRow.clickable)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenPirStepFinishedEventReceivedThenPirRowBecomesCompleted() = runTest {
         whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.ENABLED)
         val testee = createViewModel(plugins = listOf(fakePlugin("vpn")), entitlements = listOf(Product.PIR))

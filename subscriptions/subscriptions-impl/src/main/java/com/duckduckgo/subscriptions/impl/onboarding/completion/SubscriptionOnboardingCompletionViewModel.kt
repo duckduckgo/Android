@@ -148,7 +148,7 @@ class SubscriptionOnboardingCompletionViewModel @Inject constructor(
             labelResId = R.string.subscriptionOnboardingFeature4Title,
             pendingIconResId = R.drawable.identity_blocked_pir_grayscale_color_24,
             completed = completed,
-            clickable = !completed,
+            clickable = !completed && !handoffState.isHandoff,
         )
     }
 
