@@ -903,4 +903,86 @@ class DaxTextColorUsageDetectorTest {
             .expectWarningCount(1)
             .expectContains("color = ExampleDefaults.titleColor")
     }
+
+    @Test
+    fun whenLightDarkSwitchMixesSemanticThemeColorWithArbitraryLiteralThenWarning() {
+        lint()
+            .files(
+                TestFiles.kt(
+                    """
+                    package com.example.test
+
+                    import androidx.compose.runtime.Composable
+                    import androidx.compose.ui.graphics.Color
+                    import com.duckduckgo.common.ui.compose.component.core.text.DaxText
+                    import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
+
+                    object ExampleDefaults {
+                        val isDark: Boolean = false
+
+                        val titleColor: Color
+                            @Composable
+                            get() = if (isDark) DuckDuckGoTheme.colors.text.primary else Color.Red
+                    }
+
+                    @Composable
+                    fun TestScreen() {
+                        DaxText(
+                            text = "Hello",
+                            color = ExampleDefaults.titleColor
+                        )
+                    }
+                    """.trimIndent()
+                ).indented(),
+                composeStubs,
+                themeStubs,
+                daxTextStub
+            )
+            .allowCompilationErrors()
+            .issues(INVALID_DAX_TEXT_COLOR_USAGE)
+            .skipTestModes(TestMode.WHITESPACE, TestMode.FULLY_QUALIFIED)
+            .run()
+            .expectWarningCount(1)
+            .expectContains("color = ExampleDefaults.titleColor")
+    }
+
+    @Test
+    fun whenLightDarkSwitchInPropertyInitializerMixesSemanticThemeColorWithArbitraryLiteralThenWarning() {
+        lint()
+            .files(
+                TestFiles.kt(
+                    """
+                    package com.example.test
+
+                    import androidx.compose.runtime.Composable
+                    import androidx.compose.ui.graphics.Color
+                    import com.duckduckgo.common.ui.compose.component.core.text.DaxText
+                    import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
+
+                    object ExampleDefaults {
+                        val isDark: Boolean = false
+
+                        val titleColor: Color = if (isDark) DuckDuckGoTheme.colors.text.primary else Color.Red
+                    }
+
+                    @Composable
+                    fun TestScreen() {
+                        DaxText(
+                            text = "Hello",
+                            color = ExampleDefaults.titleColor
+                        )
+                    }
+                    """.trimIndent()
+                ).indented(),
+                composeStubs,
+                themeStubs,
+                daxTextStub
+            )
+            .allowCompilationErrors()
+            .issues(INVALID_DAX_TEXT_COLOR_USAGE)
+            .skipTestModes(TestMode.WHITESPACE, TestMode.FULLY_QUALIFIED)
+            .run()
+            .expectWarningCount(1)
+            .expectContains("color = ExampleDefaults.titleColor")
+    }
 }

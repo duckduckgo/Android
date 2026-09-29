@@ -176,25 +176,50 @@ class DaxTextColorUsageDetector : Detector(), SourceCodeScanner {
 
             val resolved = resolveExpression(expression) ?: return false
             if (!visited.add(resolved)) return false
+            try {
+                return isValidatedColorDeclaration(resolved, depth, visited)
+            } finally {
+                visited.remove(resolved)
+            }
+        }
 
+        private fun isValidatedColorDeclaration(
+            resolved: PsiElement,
+            depth: Int,
+            visited: MutableSet<PsiElement>,
+        ): Boolean {
             if (isThemePackageElement(resolved)) return true
 
             val declaration = resolved.navigationElement ?: resolved
             val declarationText = declaration.text.orEmpty()
             if (declarationText.isBlank()) return false
 
+            val body = bodyExpressionOf(resolved)
+            if (body != null && isBranchExpression(body)) return isValidColorExpression(body, depth + 1, visited)
+
             if (containsSemanticThemeColorPath(declarationText)) return true
             if (declarationText.contains(COLOR_THEME_PACKAGE)) return true
             if (containsArbitraryComposeColorLiteral(declarationText)) return false
 
-            val body = bodyExpressionOf(resolved) ?: return false
-            return isValidColorExpression(body, depth + 1, visited)
+            return isValidColorExpression(body ?: return false, depth + 1, visited)
+        }
+
+        private fun isBranchExpression(expression: UExpression): Boolean {
+            return when (expression) {
+                is UIfExpression, is USwitchExpression -> true
+                is UParenthesizedExpression -> isBranchExpression(expression.expression)
+                is UBlockExpression -> singleExpressionBody(expression)?.let(::isBranchExpression) ?: false
+                else -> false
+            }
         }
 
         private fun bodyExpressionOf(element: PsiElement): UExpression? {
             return when (val u = element.toUElement()) {
                 is UVariable -> u.uastInitializer
+                // A property reference resolves to its light getter, whose UAST body is null when the getter is
+                // implicit; the colour then lives in the property initializer.
                 is UMethod -> singleExpressionBody(u.uastBody)
+                    ?: (element.navigationElement.toUElement() as? UVariable)?.uastInitializer
                 else -> null
             }
         }
