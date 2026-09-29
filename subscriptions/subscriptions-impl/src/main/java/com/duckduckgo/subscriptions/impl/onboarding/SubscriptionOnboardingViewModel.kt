@@ -30,7 +30,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
 import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingEvent.BackPressed
 import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingEvent.StepFinished
 import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingPlanProvider.Companion.SUBSCRIPTION_ONBOARDING_PLAN_ID
-import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStepStore
+import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStore
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -52,7 +52,7 @@ import kotlin.time.Duration.Companion.seconds
 class SubscriptionOnboardingViewModel @Inject constructor(
     private val orchestrator: LinearOnboardingOrchestrator,
     private val planProvider: SubscriptionOnboardingPlanProvider,
-    private val stepStore: SubscriptionOnboardingStepStore,
+    private val onboardingStore: SubscriptionOnboardingStore,
     private val controller: SubscriptionOnboardingController,
     private val handoffState: SubscriptionOnboardingHandoffState,
 ) : ViewModel() {
@@ -111,7 +111,7 @@ class SubscriptionOnboardingViewModel @Inject constructor(
         when (event) {
             is SubscriptionOnboardingController.Event.StepFinished -> {
                 if (event.outcome == SubscriptionOnboardingStepOutcome.COMPLETED) {
-                    stepStore.setCompleted(event.stepId)
+                    onboardingStore.setStepCompleted(event.stepId)
                 }
                 event.handoff?.let {
                     pendingHandoff = it

@@ -32,7 +32,7 @@ import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingHandoffState
 import com.duckduckgo.subscriptions.impl.onboarding.completion.SubscriptionOnboardingCompletionViewModel.Companion.PIR_ROW_ID
-import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStepStore
+import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStore
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -53,7 +53,7 @@ class SubscriptionOnboardingCompletionViewModelTest {
 
     private val controllerEvents = MutableSharedFlow<SubscriptionOnboardingController.Event>(extraBufferCapacity = 10)
     private val controller: SubscriptionOnboardingController = mock { on { events } doReturn controllerEvents }
-    private val stepStore: SubscriptionOnboardingStepStore = mock()
+    private val onboardingStore: SubscriptionOnboardingStore = mock()
     private val subscriptions: Subscriptions = mock()
     private val pirFeature: PirFeature = mock()
 
@@ -91,8 +91,8 @@ class SubscriptionOnboardingCompletionViewModelTest {
 
     @Test
     fun whenAllShownStepsCompletedAndNoPirThenPercentageIsOneHundred() = runTest {
-        whenever(stepStore.isCompleted("vpn")).thenReturn(true)
-        whenever(stepStore.isCompleted("itr")).thenReturn(true)
+        whenever(onboardingStore.isStepCompleted("vpn")).thenReturn(true)
+        whenever(onboardingStore.isStepCompleted("itr")).thenReturn(true)
         val testee = createViewModel(plugins = listOf(fakePlugin("vpn"), fakePlugin("itr")))
 
         testee.viewState().test {
@@ -103,9 +103,9 @@ class SubscriptionOnboardingCompletionViewModelTest {
 
     @Test
     fun whenPirEntitledAndEligibleThenPirRowIsAppendedIncompleteAndCountsTowardsPercentage() = runTest {
-        whenever(stepStore.isCompleted("vpn")).thenReturn(true)
-        whenever(stepStore.isCompleted("itr")).thenReturn(true)
-        whenever(stepStore.isCompleted("duck_ai")).thenReturn(true)
+        whenever(onboardingStore.isStepCompleted("vpn")).thenReturn(true)
+        whenever(onboardingStore.isStepCompleted("itr")).thenReturn(true)
+        whenever(onboardingStore.isStepCompleted("duck_ai")).thenReturn(true)
         whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.ENABLED)
         val testee = createViewModel(
             plugins = listOf(fakePlugin("vpn"), fakePlugin("itr"), fakePlugin("duck_ai")),
@@ -126,7 +126,7 @@ class SubscriptionOnboardingCompletionViewModelTest {
     @Test
     fun whenPirCompletedThenRowCompletedAndNotClickable() = runTest {
         whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.ENABLED)
-        whenever(stepStore.isCompleted(PIR_ROW_ID)).thenReturn(true)
+        whenever(onboardingStore.isStepCompleted(PIR_ROW_ID)).thenReturn(true)
         val testee = createViewModel(plugins = listOf(fakePlugin("vpn")), entitlements = listOf(Product.PIR))
 
         testee.viewState().test {
@@ -234,8 +234,8 @@ class SubscriptionOnboardingCompletionViewModelTest {
 
     @Test
     fun whenHundredPercentAndNotHandoffThenCelebratory() = runTest {
-        whenever(stepStore.isCompleted("vpn")).thenReturn(true)
-        whenever(stepStore.isCompleted("itr")).thenReturn(true)
+        whenever(onboardingStore.isStepCompleted("vpn")).thenReturn(true)
+        whenever(onboardingStore.isStepCompleted("itr")).thenReturn(true)
         val testee = createViewModel(plugins = listOf(fakePlugin("vpn"), fakePlugin("itr")))
 
         testee.viewState().test {
@@ -246,8 +246,8 @@ class SubscriptionOnboardingCompletionViewModelTest {
 
     @Test
     fun whenHundredPercentButHandoffThenNotCelebratory() = runTest {
-        whenever(stepStore.isCompleted("vpn")).thenReturn(true)
-        whenever(stepStore.isCompleted("itr")).thenReturn(true)
+        whenever(onboardingStore.isStepCompleted("vpn")).thenReturn(true)
+        whenever(onboardingStore.isStepCompleted("itr")).thenReturn(true)
         val testee = createViewModel(plugins = listOf(fakePlugin("vpn"), fakePlugin("itr")), handoff = true)
 
         testee.viewState().test {
@@ -258,7 +258,7 @@ class SubscriptionOnboardingCompletionViewModelTest {
 
     @Test
     fun whenLessThanHundredPercentThenNotCelebratory() = runTest {
-        whenever(stepStore.isCompleted("vpn")).thenReturn(true)
+        whenever(onboardingStore.isStepCompleted("vpn")).thenReturn(true)
         val testee = createViewModel(plugins = listOf(fakePlugin("vpn"), fakePlugin("itr")))
 
         testee.viewState().test {
@@ -285,7 +285,7 @@ class SubscriptionOnboardingCompletionViewModelTest {
             stepPlugins = object : PluginPoint<SubscriptionOnboardingStepPlugin> {
                 override fun getPlugins(): Collection<SubscriptionOnboardingStepPlugin> = plugins
             },
-            stepStore = stepStore,
+            onboardingStore = onboardingStore,
             subscriptions = subscriptions,
             pirFeature = pirFeature,
             handoffState = SubscriptionOnboardingHandoffState().apply { isHandoff = handoff },

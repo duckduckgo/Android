@@ -22,7 +22,7 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.Account
 import com.duckduckgo.subscriptions.impl.repository.PendingPlan
 import com.duckduckgo.subscriptions.impl.repository.Subscription
-import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingSettingsCardStore
+import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStore
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.FinishSignOut
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToActivationScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToEditEmailScreen
@@ -56,7 +56,7 @@ class SubscriptionSettingsViewModelTest {
     private val subscriptionUnifiedFeedback: SubscriptionUnifiedFeedback = mock()
     private val subscriptionsFeature = FakeFeatureToggleFactory.create(SubscriptionsFeature::class.java, FakeToggleStore())
     private val onboardingProgress: SubscriptionOnboardingProgress = mock()
-    private val onboardingCardStore: SubscriptionOnboardingSettingsCardStore = mock()
+    private val onboardingStore: SubscriptionOnboardingStore = mock()
     private val currentTimeProvider: CurrentTimeProvider = mock()
 
     private lateinit var viewModel: SubscriptionSettingsViewModel
@@ -69,7 +69,7 @@ class SubscriptionSettingsViewModelTest {
             subscriptionUnifiedFeedback,
             subscriptionsFeature,
             onboardingProgress,
-            onboardingCardStore,
+            onboardingStore,
             currentTimeProvider,
         )
     }
@@ -689,12 +689,12 @@ class SubscriptionSettingsViewModelTest {
     }
 
     @Test
-    fun whenOnboardingFeatureDisabledThenNoOnboardingCard() = runTest {
+    fun whenOnboardingFeatureDisabledThenNoOnboardingEntryPoint() = runTest {
         stubReadySubscription()
 
         viewModel.onCreate(mock())
         viewModel.viewState.test {
-            assertEquals(null, (awaitItem() as Ready).onboardingCard)
+            assertEquals(null, (awaitItem() as Ready).onboardingEntryPoint)
         }
     }
 
@@ -707,7 +707,7 @@ class SubscriptionSettingsViewModelTest {
 
         viewModel.onCreate(mock())
         viewModel.viewState.test {
-            assertEquals(50, (awaitItem() as Ready).onboardingCard?.percentage)
+            assertEquals(50, (awaitItem() as Ready).onboardingEntryPoint?.percentage)
         }
     }
 
@@ -720,7 +720,7 @@ class SubscriptionSettingsViewModelTest {
 
         viewModel.onCreate(mock())
         viewModel.viewState.test {
-            assertEquals(null, (awaitItem() as Ready).onboardingCard)
+            assertEquals(null, (awaitItem() as Ready).onboardingEntryPoint)
         }
     }
 
@@ -729,11 +729,11 @@ class SubscriptionSettingsViewModelTest {
         subscriptionsFeature.onboardingSubscriptionExperiment().setRawStoredState(Toggle.State(enable = true))
         stubReadySubscription()
         whenever(onboardingProgress.completionPercentage()).thenReturn(100)
-        whenever(onboardingCardStore.completeCardViews()).thenReturn(0)
+        whenever(onboardingStore.completedEntryPointViews()).thenReturn(0)
 
         viewModel.onCreate(mock())
         viewModel.viewState.test {
-            assertEquals(100, (awaitItem() as Ready).onboardingCard?.percentage)
+            assertEquals(100, (awaitItem() as Ready).onboardingEntryPoint?.percentage)
         }
     }
 
@@ -742,11 +742,11 @@ class SubscriptionSettingsViewModelTest {
         subscriptionsFeature.onboardingSubscriptionExperiment().setRawStoredState(Toggle.State(enable = true))
         stubReadySubscription()
         whenever(onboardingProgress.completionPercentage()).thenReturn(100)
-        whenever(onboardingCardStore.completeCardViews()).thenReturn(2)
+        whenever(onboardingStore.completedEntryPointViews()).thenReturn(2)
 
         viewModel.onCreate(mock())
         viewModel.viewState.test {
-            assertEquals(null, (awaitItem() as Ready).onboardingCard)
+            assertEquals(null, (awaitItem() as Ready).onboardingEntryPoint)
         }
     }
 
@@ -755,12 +755,12 @@ class SubscriptionSettingsViewModelTest {
         subscriptionsFeature.onboardingSubscriptionExperiment().setRawStoredState(Toggle.State(enable = true))
         stubReadySubscription()
         whenever(onboardingProgress.completionPercentage()).thenReturn(100)
-        whenever(onboardingCardStore.completeCardViews()).thenReturn(1)
-        whenever(onboardingCardStore.wasCompleteCardShownThisProcess()).thenReturn(false)
+        whenever(onboardingStore.completedEntryPointViews()).thenReturn(1)
+        whenever(onboardingStore.wasCompletedEntryPointShownThisLaunch()).thenReturn(false)
 
         viewModel.onCreate(mock())
         viewModel.viewState.test {
-            assertEquals(null, (awaitItem() as Ready).onboardingCard)
+            assertEquals(null, (awaitItem() as Ready).onboardingEntryPoint)
         }
     }
 
@@ -769,23 +769,23 @@ class SubscriptionSettingsViewModelTest {
         subscriptionsFeature.onboardingSubscriptionExperiment().setRawStoredState(Toggle.State(enable = true))
         stubReadySubscription()
         whenever(onboardingProgress.completionPercentage()).thenReturn(100)
-        whenever(onboardingCardStore.completeCardViews()).thenReturn(1)
-        whenever(onboardingCardStore.wasCompleteCardShownThisProcess()).thenReturn(true)
+        whenever(onboardingStore.completedEntryPointViews()).thenReturn(1)
+        whenever(onboardingStore.wasCompletedEntryPointShownThisLaunch()).thenReturn(true)
 
         viewModel.onCreate(mock())
         viewModel.viewState.test {
-            assertEquals(100, (awaitItem() as Ready).onboardingCard?.percentage)
+            assertEquals(100, (awaitItem() as Ready).onboardingEntryPoint?.percentage)
         }
     }
 
     @Test
-    fun whenSubscriptionInactiveThenNoOnboardingCard() = runTest {
+    fun whenSubscriptionInactiveThenNoOnboardingEntryPoint() = runTest {
         subscriptionsFeature.onboardingSubscriptionExperiment().setRawStoredState(Toggle.State(enable = true))
         stubReadySubscription(status = EXPIRED)
 
         viewModel.onCreate(mock())
         viewModel.viewState.test {
-            assertEquals(null, (awaitItem() as Ready).onboardingCard)
+            assertEquals(null, (awaitItem() as Ready).onboardingEntryPoint)
         }
     }
 

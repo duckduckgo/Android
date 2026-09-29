@@ -39,8 +39,8 @@ import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingProgre
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.PendingPlan
 import com.duckduckgo.subscriptions.impl.repository.Subscription
-import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingSettingsCardStore
-import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingSettingsCardStore.Companion.MAX_COMPLETE_CARD_VIEWS
+import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStore
+import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStore.Companion.MAX_COMPLETED_ENTRY_POINT_VIEWS
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.FinishSignOut
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToActivationScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToEditEmailScreen
@@ -71,7 +71,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
     private val subscriptionUnifiedFeedback: SubscriptionUnifiedFeedback,
     private val subscriptionsFeature: SubscriptionsFeature,
     private val onboardingProgress: SubscriptionOnboardingProgress,
-    private val onboardingCardStore: SubscriptionOnboardingSettingsCardStore,
+    private val onboardingStore: SubscriptionOnboardingStore,
     private val currentTimeProvider: CurrentTimeProvider,
 ) : ViewModel(), DefaultLifecycleObserver {
 
@@ -92,10 +92,10 @@ class SubscriptionSettingsViewModel @Inject constructor(
     }
 
     override fun onResume(owner: LifecycleOwner) {
-        viewModelScope.launch { emitChanges(countCompletedCardView = true) }
+        viewModelScope.launch { emitChanges(countCompletedEntryPointView = true) }
     }
 
-    private suspend fun emitChanges(countCompletedCardView: Boolean = false) {
+    private suspend fun emitChanges(countCompletedEntryPointView: Boolean = false) {
         val account = subscriptionsManager.getAccount() ?: return
         val subscription = subscriptionsManager.getSubscription() ?: return
         logcat {
@@ -162,37 +162,37 @@ class SubscriptionSettingsViewModel @Inject constructor(
                 pendingEffectiveDateShort = pendingEffectiveDateShort,
                 pendingTierNameResId = pendingTierNameResId,
                 effectiveTier = effectiveTier,
-                onboardingCard = onboardingCard(subscription, countCompletedCardView),
+                onboardingEntryPoint = onboardingEntryPoint(subscription, countCompletedEntryPointView),
             ),
         )
     }
 
-    private suspend fun onboardingCard(
+    private suspend fun onboardingEntryPoint(
         subscription: Subscription,
-        countCompletedCardView: Boolean,
-    ): OnboardingCard? {
+        countCompletedEntryPointView: Boolean,
+    ): OnboardingEntryPoint? {
         if (!subscriptionsFeature.onboardingSubscriptionExperiment().isEnabled()) return null
         if (!subscription.isActive()) return null
 
         val percentage = onboardingProgress.completionPercentage()
         return if (percentage >= COMPLETE_PERCENTAGE) {
-            completedCard(countCompletedCardView)
+            completedEntryPoint(countCompletedEntryPointView)
         } else {
             val withinPurchaseWindow =
                 currentTimeProvider.currentTimeMillis() - subscription.startedAt <= INCOMPLETE_CARD_WINDOW_MILLIS
-            if (withinPurchaseWindow) OnboardingCard(percentage = percentage) else null
+            if (withinPurchaseWindow) OnboardingEntryPoint(percentage = percentage) else null
         }
     }
 
-    private fun completedCard(countCompletedCardView: Boolean): OnboardingCard? {
+    private fun completedEntryPoint(countCompletedEntryPointView: Boolean): OnboardingEntryPoint? {
         val shownInPreviousLaunch =
-            onboardingCardStore.completeCardViews() > 0 && !onboardingCardStore.wasCompleteCardShownThisProcess()
-        val underViewCap = onboardingCardStore.completeCardViews() < MAX_COMPLETE_CARD_VIEWS
+            onboardingStore.completedEntryPointViews() > 0 && !onboardingStore.wasCompletedEntryPointShownThisLaunch()
+        val underViewCap = onboardingStore.completedEntryPointViews() < MAX_COMPLETED_ENTRY_POINT_VIEWS
         if (shownInPreviousLaunch || !underViewCap) return null
 
-        if (countCompletedCardView) onboardingCardStore.incrementCompleteCardViews()
-        onboardingCardStore.markCompleteCardShownThisProcess()
-        return OnboardingCard(percentage = COMPLETE_PERCENTAGE)
+        if (countCompletedEntryPointView) onboardingStore.incrementCompletedEntryPointViews()
+        onboardingStore.markCompletedEntryPointShownThisLaunch()
+        return OnboardingEntryPoint(percentage = COMPLETE_PERCENTAGE)
     }
 
     fun onContinueSetupClicked() {
@@ -286,7 +286,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
         data object LaunchOnboarding : Command()
     }
 
-    data class OnboardingCard(val percentage: Int)
+    data class OnboardingEntryPoint(val percentage: Int)
 
     sealed class ViewState {
         data object Loading : ViewState()
@@ -308,7 +308,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
             val pendingEffectiveDateShort: String? = null,
             val pendingTierNameResId: Int? = null,
             val effectiveTier: SubscriptionTier,
-            val onboardingCard: OnboardingCard? = null,
+            val onboardingEntryPoint: OnboardingEntryPoint? = null,
         ) : ViewState()
     }
 

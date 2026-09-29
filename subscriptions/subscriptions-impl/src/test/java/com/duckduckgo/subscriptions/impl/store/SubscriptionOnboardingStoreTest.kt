@@ -22,30 +22,49 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-class SubscriptionOnboardingStepStoreTest {
+class SubscriptionOnboardingStoreTest {
 
-    private val store = SubscriptionOnboardingStepStore(FakeSharedPreferencesProvider())
+    private val store = SubscriptionOnboardingStore(FakeSharedPreferencesProvider())
 
     @Test
     fun whenNothingCompletedThenStoreIsEmpty() {
         assertTrue(store.completedSteps().isEmpty())
-        assertFalse(store.isCompleted("vpn"))
+        assertFalse(store.isStepCompleted("vpn"))
     }
 
     @Test
     fun whenStepMarkedCompletedThenItIsRecorded() {
-        store.setCompleted("vpn")
+        store.setStepCompleted("vpn")
 
-        assertTrue(store.isCompleted("vpn"))
-        assertFalse(store.isCompleted("welcome"))
+        assertTrue(store.isStepCompleted("vpn"))
+        assertFalse(store.isStepCompleted("welcome"))
         assertEquals(setOf("vpn"), store.completedSteps())
     }
 
     @Test
     fun whenMultipleStepsCompletedThenAllRecorded() {
-        store.setCompleted("welcome")
-        store.setCompleted("vpn")
+        store.setStepCompleted("welcome")
+        store.setStepCompleted("vpn")
 
         assertEquals(setOf("welcome", "vpn"), store.completedSteps())
+    }
+
+    @Test
+    fun whenCompletedEntryPointViewsIncrementedThenCountPersists() {
+        assertEquals(0, store.completedEntryPointViews())
+
+        store.incrementCompletedEntryPointViews()
+        store.incrementCompletedEntryPointViews()
+
+        assertEquals(2, store.completedEntryPointViews())
+    }
+
+    @Test
+    fun whenCompletedEntryPointMarkedShownThisProcessThenFlagIsSet() {
+        assertFalse(store.wasCompletedEntryPointShownThisProcess())
+
+        store.markCompletedEntryPointShownThisProcess()
+
+        assertTrue(store.wasCompletedEntryPointShownThisProcess())
     }
 }

@@ -24,7 +24,7 @@ import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.impl.onboarding.completion.SubscriptionOnboardingCompletionViewModel.Companion.PIR_ROW_ID
-import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStepStore
+import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStore
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
@@ -32,7 +32,7 @@ import javax.inject.Inject
 @SingleInstanceIn(AppScope::class)
 class SubscriptionOnboardingProgress @Inject constructor(
     private val stepPlugins: PluginPoint<SubscriptionOnboardingStepPlugin>,
-    private val stepStore: SubscriptionOnboardingStepStore,
+    private val onboardingStore: SubscriptionOnboardingStore,
     private val subscriptions: Subscriptions,
     private val pirFeature: PirFeature,
 ) {
@@ -48,6 +48,6 @@ class SubscriptionOnboardingProgress @Inject constructor(
         val allStepIds = if (showPir) stepIds + PIR_ROW_ID else stepIds
 
         if (allStepIds.isEmpty()) return 0
-        return allStepIds.count { stepStore.isCompleted(it) } * 100 / allStepIds.size
+        return allStepIds.count { onboardingStore.isStepCompleted(it) } * 100 / allStepIds.size
     }
 }

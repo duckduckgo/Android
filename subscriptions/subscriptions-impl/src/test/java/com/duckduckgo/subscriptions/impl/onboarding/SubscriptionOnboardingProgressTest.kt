@@ -27,7 +27,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.onboarding.completion.SubscriptionOnboardingCompletionViewModel.Companion.PIR_ROW_ID
-import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStepStore
+import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStore
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -41,14 +41,14 @@ class SubscriptionOnboardingProgressTest {
     @get:Rule
     val coroutineRule = CoroutineTestRule()
 
-    private val stepStore: SubscriptionOnboardingStepStore = mock()
+    private val onboardingStore: SubscriptionOnboardingStore = mock()
     private val subscriptions: Subscriptions = mock()
     private val pirFeature: PirFeature = mock()
 
     @Test
     fun whenAllShownStepsCompletedAndNoPirThenPercentageIsOneHundred() = runTest {
-        whenever(stepStore.isCompleted("vpn")).thenReturn(true)
-        whenever(stepStore.isCompleted("itr")).thenReturn(true)
+        whenever(onboardingStore.isStepCompleted("vpn")).thenReturn(true)
+        whenever(onboardingStore.isStepCompleted("itr")).thenReturn(true)
         val progress = createProgress(plugins = listOf(fakePlugin("vpn"), fakePlugin("itr")))
 
         assertEquals(100, progress.completionPercentage())
@@ -63,7 +63,7 @@ class SubscriptionOnboardingProgressTest {
 
     @Test
     fun whenStepHasNoSummaryRowThenItIsNotCounted() = runTest {
-        whenever(stepStore.isCompleted("vpn")).thenReturn(true)
+        whenever(onboardingStore.isStepCompleted("vpn")).thenReturn(true)
         val progress = createProgress(
             plugins = listOf(
                 fakePlugin("vpn"),
@@ -76,7 +76,7 @@ class SubscriptionOnboardingProgressTest {
 
     @Test
     fun whenStepShouldNotShowThenItIsNotCounted() = runTest {
-        whenever(stepStore.isCompleted("vpn")).thenReturn(true)
+        whenever(onboardingStore.isStepCompleted("vpn")).thenReturn(true)
         val progress = createProgress(
             plugins = listOf(
                 fakePlugin("vpn"),
@@ -89,10 +89,10 @@ class SubscriptionOnboardingProgressTest {
 
     @Test
     fun whenPirEntitledAndEligibleThenPirCountsTowardsPercentage() = runTest {
-        whenever(stepStore.isCompleted("vpn")).thenReturn(true)
-        whenever(stepStore.isCompleted("itr")).thenReturn(true)
-        whenever(stepStore.isCompleted("duck_ai")).thenReturn(true)
-        whenever(stepStore.isCompleted(PIR_ROW_ID)).thenReturn(false)
+        whenever(onboardingStore.isStepCompleted("vpn")).thenReturn(true)
+        whenever(onboardingStore.isStepCompleted("itr")).thenReturn(true)
+        whenever(onboardingStore.isStepCompleted("duck_ai")).thenReturn(true)
+        whenever(onboardingStore.isStepCompleted(PIR_ROW_ID)).thenReturn(false)
         whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.ENABLED)
         val progress = createProgress(
             plugins = listOf(fakePlugin("vpn"), fakePlugin("itr"), fakePlugin("duck_ai")),
@@ -104,7 +104,7 @@ class SubscriptionOnboardingProgressTest {
 
     @Test
     fun whenPirEntitledButNotEligibleThenPirNotCounted() = runTest {
-        whenever(stepStore.isCompleted("vpn")).thenReturn(true)
+        whenever(onboardingStore.isStepCompleted("vpn")).thenReturn(true)
         whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.DISABLED)
         val progress = createProgress(plugins = listOf(fakePlugin("vpn")), entitlements = listOf(Product.PIR))
 
@@ -113,7 +113,7 @@ class SubscriptionOnboardingProgressTest {
 
     @Test
     fun whenPirEligibleButNotEntitledThenPirNotCounted() = runTest {
-        whenever(stepStore.isCompleted("vpn")).thenReturn(true)
+        whenever(onboardingStore.isStepCompleted("vpn")).thenReturn(true)
         whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.ENABLED)
         val progress = createProgress(plugins = listOf(fakePlugin("vpn")))
 
@@ -136,7 +136,7 @@ class SubscriptionOnboardingProgressTest {
             stepPlugins = object : PluginPoint<SubscriptionOnboardingStepPlugin> {
                 override fun getPlugins(): Collection<SubscriptionOnboardingStepPlugin> = plugins
             },
-            stepStore = stepStore,
+            onboardingStore = onboardingStore,
             subscriptions = subscriptions,
             pirFeature = pirFeature,
         )

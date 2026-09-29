@@ -66,7 +66,7 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Comman
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToEditEmailScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToPortal
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.LaunchOnboarding
-import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.OnboardingCard
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.OnboardingEntryPoint
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Monthly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Yearly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.ViewState
@@ -192,7 +192,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun renderView(viewState: ViewState.Ready) {
-        renderOnboardingCard(viewState.onboardingCard)
+        renderOnboardingEntryPoint(viewState.onboardingEntryPoint)
         binding.subscriptionSettingsProductName.setText(string.ddg_subscription)
         binding.activateOnOtherDevices.setText(string.activateOnOtherDevices)
         binding.faq.setPrimaryText(getString(string.privacyProFaq))
@@ -344,7 +344,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun renderOnboardingCard(card: OnboardingCard?) {
+    private fun renderOnboardingEntryPoint(card: OnboardingEntryPoint?) {
         binding.onboardingProgressCard.isVisible = card != null
         if (card == null) return
         binding.onboardingProgressTitle.text = getString(string.subscriptionOnboardingSettingsCardTitle, card.percentage)
