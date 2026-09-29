@@ -599,6 +599,7 @@ class SitePermissionsDialogActivityLauncherTest {
     fun whenFireModeAndDenyClickedThenDeniedButNothingPersisted() {
         val fireLauncher = createLauncher(BrowserMode.FIRE)
         sitePermissionsDialogRedesignFeature.self().setRawStoredState(Toggle.State(true))
+        drmPolicyFeature.fireModeDenyButton().setRawStoredState(Toggle.State(true))
 
         val activity = Robolectric.buildActivity(ThemedActivity::class.java).setup().get()
         val request: PermissionRequest = mock()
@@ -633,6 +634,37 @@ class SitePermissionsDialogActivityLauncherTest {
 
         verify(request).deny()
         verify(sitePermissionsRepository, never()).sitePermissionPermanentlySaved(any(), any(), any())
+    }
+
+    @Test
+    fun whenFireModeAndDenyButtonDisabledThenStandardTiersShown() {
+        val fireLauncher = createLauncher(BrowserMode.FIRE)
+        sitePermissionsDialogRedesignFeature.self().setRawStoredState(Toggle.State(true))
+        drmPolicyFeature.fireModeDenyButton().setRawStoredState(Toggle.State(false))
+
+        val activity = Robolectric.buildActivity(ThemedActivity::class.java).setup().get()
+        val request: PermissionRequest = mock()
+        whenever(request.resources).thenReturn(arrayOf(PermissionRequest.RESOURCE_VIDEO_CAPTURE))
+        whenever(request.origin).thenReturn(Uri.parse("https://example.com"))
+
+        fireLauncher.askForSitePermission(
+            activity = activity,
+            url = "https://example.com",
+            tabId = "tabId",
+            permissionsRequested = SitePermissions(
+                autoAccept = emptyList(),
+                userHandled = listOf(PermissionRequest.RESOURCE_VIDEO_CAPTURE),
+            ),
+            request = request,
+            permissionsGrantedListener = permissionsGrantedListener,
+        )
+
+        val buttons = (ShadowDialog.getLatestDialog() as AlertDialog).tieredButtons()
+        assertEquals(3, buttons.childCount)
+        assertEquals(
+            buttons.context.getString(R.string.sitePermissionsDialogNeverAllowButton),
+            (buttons.getChildAt(2) as Button).text,
+        )
     }
 
     @Test

@@ -34,6 +34,10 @@ interface DrmPolicyFeature {
     @InternalAlwaysEnabled
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun centralPolicy(): Toggle
+
+    @InternalAlwaysEnabled
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun fireModeDenyButton(): Toggle
 }
 
 fun DrmPolicyFeature.isCentralPolicyEnabled(): Boolean = self().isEnabled() && centralPolicy().isEnabled()
