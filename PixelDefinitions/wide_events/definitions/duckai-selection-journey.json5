@@ -41,7 +41,8 @@
                     },
                     "latency.journey_duration_ms_bucketed": {
                         "type": "string",
-                        "description": "Bucketed time from the first selection being attached to the journey ending"
+                        "description": "Bucketed time from the first selection being attached to the journey ending (lower bucket boundary, in ms)",
+                        "enum": ["-1", "0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
                     }
                 }
             }
