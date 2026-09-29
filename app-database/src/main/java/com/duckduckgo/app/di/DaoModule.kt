@@ -20,6 +20,10 @@ import com.duckduckgo.app.bookmarks.db.BookmarkFoldersDao
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.db.FavoritesDao
 import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsDao
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsAppUsageDao
+import com.duckduckgo.app.browser.pageloadpixel.PageLoadedPixelDao
+import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedPixelDao
+import com.duckduckgo.app.browser.rating.db.AppEnjoymentDao
 import com.duckduckgo.app.browser.session.WebViewSessionDao
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.fire.db.FireModeDatabase
@@ -32,6 +36,7 @@ import com.duckduckgo.app.onboarding.store.UserStageDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.privacy.db.UserAllowListDao
+import com.duckduckgo.app.statistics.store.PendingPixelDao
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.tabs.db.DuckAiTabSessionDao
 import com.duckduckgo.app.tabs.db.TabPageContextDao
@@ -52,6 +57,7 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
+import dagger.SingleInstanceIn
 
 @Module
 @ContributesTo(AppScope::class)
@@ -145,4 +151,33 @@ object DaoModule {
 
     @Provides
     fun webViewSessionDao(database: AppDatabase): WebViewSessionDao = database.webViewSessionDao()
+
+    @SingleInstanceIn(AppScope::class)
+    @Provides
+    fun pixelDao(database: AppDatabase): PendingPixelDao {
+        return database.pixelDao()
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun providePageLoadedPixelDao(appDatabase: AppDatabase): PageLoadedPixelDao {
+        return appDatabase.pageLoadedPixelDao()
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun providePagePaintedPixelDao(appDatabase: AppDatabase): PagePaintedPixelDao {
+        return appDatabase.pagePaintedPixelDao()
+    }
+
+    @SingleInstanceIn(AppScope::class)
+    @Provides
+    fun appEnjoymentDao(database: AppDatabase): AppEnjoymentDao {
+        return database.appEnjoymentDao()
+    }
+
+    @Provides
+    fun providesDefaultBrowserPromptsAppUsageDao(
+        database: AppDatabase,
+    ): DefaultBrowserPromptsAppUsageDao = database.defaultBrowserPromptsAppUsageDao()
 }
