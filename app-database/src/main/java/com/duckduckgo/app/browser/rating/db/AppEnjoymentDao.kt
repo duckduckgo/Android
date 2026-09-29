@@ -17,7 +17,6 @@
 package com.duckduckgo.app.browser.rating.db
 
 import androidx.room.*
-import com.duckduckgo.app.global.rating.PromptCount
 
 private const val TYPE_PROVIDED_RATING = 1
 private const val TYPE_DECLINED_RATING = 2
@@ -54,14 +53,6 @@ interface AppEnjoymentDao {
     fun latestDateUserDeclinedRatingOrFeedback(): Long?
 }
 
-@Entity(tableName = "app_enjoyment")
-data class AppEnjoymentEntity(
-    val eventType: AppEnjoymentEventType,
-    val promptCount: PromptCount,
-    val timestamp: Long = System.currentTimeMillis(),
-    @PrimaryKey(autoGenerate = true) val primaryKey: Int = 0,
-)
-
 enum class AppEnjoymentEventType(val value: Int) {
 
     USER_PROVIDED_RATING(TYPE_PROVIDED_RATING),
@@ -75,22 +66,4 @@ enum class AppEnjoymentEventType(val value: Int) {
         private val map = values().associateBy(AppEnjoymentEventType::value)
         fun fromValue(value: Int) = map[value]
     }
-}
-
-class AppEnjoymentTypeConverter {
-
-    @TypeConverter
-    fun convertForDb(event: AppEnjoymentEventType): Int = event.value
-
-    @TypeConverter
-    fun convertFromDb(value: Int): AppEnjoymentEventType? = AppEnjoymentEventType.fromValue(value)
-}
-
-class PromptCountConverter {
-
-    @TypeConverter
-    fun convertForDb(promptCount: PromptCount): Int = promptCount.value
-
-    @TypeConverter
-    fun convertFromDb(promptCount: Int): PromptCount = PromptCount(promptCount)
 }
