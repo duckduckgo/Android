@@ -239,23 +239,19 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
 
     private fun render(state: ChatHistoryUiState) {
         logcat { "ChatHistory: render ${state::class.simpleName}" }
+        binding.chatHistoryList.isVisible = state is ChatHistoryUiState.Loaded
+        binding.chatHistoryEmptyState.isVisible = state is ChatHistoryUiState.Empty
         when (state) {
             ChatHistoryUiState.Loading -> {
-                binding.chatHistoryList.visibility = View.GONE
-                binding.chatHistoryEmptyState.visibility = View.GONE
                 applyDefaultToolbar()
                 setFireActionVisible(false)
             }
             ChatHistoryUiState.Empty -> {
-                binding.chatHistoryList.visibility = View.GONE
-                binding.chatHistoryEmptyState.visibility = View.VISIBLE
                 adapter.submitList(emptyList())
                 applyDefaultToolbar()
                 setFireActionVisible(false)
             }
             is ChatHistoryUiState.Loaded -> {
-                binding.chatHistoryList.visibility = View.VISIBLE
-                binding.chatHistoryEmptyState.visibility = View.GONE
                 val selectMode = state.mode as? ChatHistoryUiState.Mode.Selecting
                 adapter.submitList(buildEntries(state, selectMode))
                 if (selectMode != null) {
