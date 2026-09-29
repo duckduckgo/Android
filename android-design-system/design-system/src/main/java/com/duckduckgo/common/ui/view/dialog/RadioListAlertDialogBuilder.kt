@@ -45,6 +45,17 @@ import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.DialogSingleChoiceAlertBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
+/**
+ * A single radio option, optionally marked as the one checked when the dialog opens.
+ *
+ * Use with [RadioListAlertDialogBuilder.setOptions] to declare the selection alongside the options instead of
+ * passing a separate 1-based index.
+ */
+data class RadioListOption(
+    @StringRes val textId: Int,
+    val isSelected: Boolean = false,
+)
+
 class RadioListAlertDialogBuilder(val context: Context) : DaxAlertDialog {
 
     abstract class EventListener {
@@ -148,6 +159,19 @@ class RadioListAlertDialogBuilder(val context: Context) : DaxAlertDialog {
             optionList.add(context.getText(it))
         }
         selectedOption = selectedItem
+        return this
+    }
+
+    /**
+     * Adds the given options, checking the first one with [RadioListOption.isSelected] set. Listener callbacks
+     * still report the selection as a 1-based position.
+     */
+    @JvmName("setRadioListOptions")
+    fun setOptions(options: List<RadioListOption>): RadioListAlertDialogBuilder {
+        options.forEach {
+            optionList.add(context.getText(it.textId))
+        }
+        selectedOption = options.indexOfFirst { it.isSelected }.takeIf { it >= 0 }?.plus(1)
         return this
     }
 
