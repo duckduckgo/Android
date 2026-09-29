@@ -44,6 +44,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/keyline_2"
         android:layout_weight="1"
+        android:gravity="center_vertical"
+        android:minHeight="?attr/daxButtonSmallHeight"
         android:orientation="vertical">
 
         <com.duckduckgo.common.ui.view.text.DaxTextView

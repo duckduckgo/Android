@@ -40,7 +40,6 @@ import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeSettingEntity
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeSettingsDao
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -73,7 +72,6 @@ class UsageLimitFooterPluginTest {
     private val repository: DuckAiUsageLimitsRepository = mock()
     private val dismissalStore: UsageNoticeDismissalStore = mock()
     private val modelManager: DuckAiModelManager = mock()
-    private val subscriptions: Subscriptions = mock()
     private val settingsDao: DuckAiBridgeSettingsDao = mock()
     private val storage: DuckAiBridgeStorage = mock()
     private val storageProvider: BrowserModeDataProvider<DuckAiBridgeStorage> = mock()
@@ -100,7 +98,6 @@ class UsageLimitFooterPluginTest {
             messageMapper = UsageLimitFooterMessageMapper(),
             ctaResolver = UsageLimitCtaResolver(),
             modelManager = modelManager,
-            subscriptions = subscriptions,
             storageProvider = storageProvider,
             duckChatFeature = feature,
             currentTimeProvider = currentTimeProvider,
@@ -362,7 +359,7 @@ class UsageLimitFooterPluginTest {
 
     @Test
     fun whenSubscribeIsTappedThenPurchaseOpensAndCardIsNotActedOn() = runTest {
-        whenever(subscriptions.isFreeTrialEligible()).thenReturn(true)
+        modelState.value = modelState.value.copy(isFreeTrialEligible = true)
         val subscribeCta = UsageCta(UsageCtaId.SUBSCRIBE, null, emptyList(), emptyMap(), emptyList())
         snapshot.value = reached().copy(id = UsageNoticeId.FREE_REACHED).copy(cta = subscribeCta)
         val footer = testee.createFooter(context, hostContext, host)
