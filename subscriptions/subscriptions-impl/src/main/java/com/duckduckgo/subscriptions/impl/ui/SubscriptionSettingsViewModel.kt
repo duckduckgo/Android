@@ -92,7 +92,6 @@ class SubscriptionSettingsViewModel @Inject constructor(
     }
 
     override fun onResume(owner: LifecycleOwner) {
-        // Count a completed-card view once per screen appearance (drives the 2-view cap).
         viewModelScope.launch { emitChanges(countCompletedCardView = true) }
     }
 
@@ -168,11 +167,6 @@ class SubscriptionSettingsViewModel @Inject constructor(
         )
     }
 
-    /**
-     * The onboarding-progress card, or null when it shouldn't be shown. Requires the native onboarding flag
-     * and an active subscription. While onboarding is incomplete it shows for 14 days from purchase; once
-     * complete it shows for only [MAX_COMPLETE_CARD_VIEWS] more screen appearances, then never again.
-     */
     private suspend fun onboardingCard(
         subscription: Subscription,
         countCompletedCardView: Boolean,
@@ -182,14 +176,23 @@ class SubscriptionSettingsViewModel @Inject constructor(
 
         val percentage = onboardingProgress.completionPercentage()
         return if (percentage >= COMPLETE_PERCENTAGE) {
-            val show = onboardingCardStore.completeCardViews() < MAX_COMPLETE_CARD_VIEWS
-            if (show && countCompletedCardView) onboardingCardStore.incrementCompleteCardViews()
-            if (show) OnboardingCard(percentage = COMPLETE_PERCENTAGE) else null
+            completedCard(countCompletedCardView)
         } else {
             val withinPurchaseWindow =
                 currentTimeProvider.currentTimeMillis() - subscription.startedAt <= INCOMPLETE_CARD_WINDOW_MILLIS
             if (withinPurchaseWindow) OnboardingCard(percentage = percentage) else null
         }
+    }
+
+    private fun completedCard(countCompletedCardView: Boolean): OnboardingCard? {
+        val shownInPreviousLaunch =
+            onboardingCardStore.completeCardViews() > 0 && !onboardingCardStore.wasCompleteCardShownThisProcess()
+        val underViewCap = onboardingCardStore.completeCardViews() < MAX_COMPLETE_CARD_VIEWS
+        if (shownInPreviousLaunch || !underViewCap) return null
+
+        if (countCompletedCardView) onboardingCardStore.incrementCompleteCardViews()
+        onboardingCardStore.markCompleteCardShownThisProcess()
+        return OnboardingCard(percentage = COMPLETE_PERCENTAGE)
     }
 
     fun onContinueSetupClicked() {

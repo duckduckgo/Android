@@ -23,11 +23,6 @@ import com.duckduckgo.di.scopes.AppScope
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 
-/**
- * Durable count of how many times the onboarding entry-point card was shown in a completed (100%) state.
- * Once onboarding is complete the card is shown for only [MAX_COMPLETE_CARD_VIEWS] more appearances of the
- * settings screen, then never again.
- */
 @SingleInstanceIn(AppScope::class)
 class SubscriptionOnboardingSettingsCardStore @Inject constructor(
     private val sharedPreferencesProvider: SharedPreferencesProvider,
@@ -36,10 +31,19 @@ class SubscriptionOnboardingSettingsCardStore @Inject constructor(
         sharedPreferencesProvider.getSharedPreferences(FILENAME)
     }
 
+    @Volatile
+    private var shownCompleteCardThisProcess = false
+
     fun completeCardViews(): Int = preferences.getInt(KEY_COMPLETE_CARD_VIEWS, 0)
 
     fun incrementCompleteCardViews() {
         preferences.edit { putInt(KEY_COMPLETE_CARD_VIEWS, completeCardViews() + 1) }
+    }
+
+    fun wasCompleteCardShownThisProcess(): Boolean = shownCompleteCardThisProcess
+
+    fun markCompleteCardShownThisProcess() {
+        shownCompleteCardThisProcess = true
     }
 
     companion object {

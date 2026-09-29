@@ -751,6 +751,34 @@ class SubscriptionSettingsViewModelTest {
     }
 
     @Test
+    fun whenOnboardingCompleteAndShownInPreviousLaunchThenNoCard() = runTest {
+        subscriptionsFeature.onboardingSubscriptionExperiment().setRawStoredState(Toggle.State(enable = true))
+        stubReadySubscription()
+        whenever(onboardingProgress.completionPercentage()).thenReturn(100)
+        whenever(onboardingCardStore.completeCardViews()).thenReturn(1)
+        whenever(onboardingCardStore.wasCompleteCardShownThisProcess()).thenReturn(false)
+
+        viewModel.onCreate(mock())
+        viewModel.viewState.test {
+            assertEquals(null, (awaitItem() as Ready).onboardingCard)
+        }
+    }
+
+    @Test
+    fun whenOnboardingCompleteAndAlreadyShownThisLaunchUnderCapThenCardShown() = runTest {
+        subscriptionsFeature.onboardingSubscriptionExperiment().setRawStoredState(Toggle.State(enable = true))
+        stubReadySubscription()
+        whenever(onboardingProgress.completionPercentage()).thenReturn(100)
+        whenever(onboardingCardStore.completeCardViews()).thenReturn(1)
+        whenever(onboardingCardStore.wasCompleteCardShownThisProcess()).thenReturn(true)
+
+        viewModel.onCreate(mock())
+        viewModel.viewState.test {
+            assertEquals(100, (awaitItem() as Ready).onboardingCard?.percentage)
+        }
+    }
+
+    @Test
     fun whenSubscriptionInactiveThenNoOnboardingCard() = runTest {
         subscriptionsFeature.onboardingSubscriptionExperiment().setRawStoredState(Toggle.State(enable = true))
         stubReadySubscription(status = EXPIRED)
