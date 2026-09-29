@@ -32,6 +32,7 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
 import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.text.DaxTextView
@@ -111,6 +112,11 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
 
         setContentView(binding.root)
         setupToolbar(toolbar)
+
+        val surfaceColor = getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorSurface)
+        binding.includeToolbar.appBarLayout.setBackgroundColor(surfaceColor)
+        toolbar.setBackgroundColor(surfaceColor)
+
         if (edgeToEdgeEnabled) {
             configureEdgeToEdgeInsets()
         }
@@ -173,7 +179,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
 
     private fun configureEdgeToEdgeInsets() {
         edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
-        edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout, installScrim = false)
         edgeToEdgeHandler.applyNavigationBarInsets(binding.contentScrollView, drawBehindGestureNav = true)
     }
 
