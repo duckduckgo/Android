@@ -14,35 +14,28 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.subscriptions.impl.onboarding.itr
+package com.duckduckgo.subscriptions.impl.onboarding.completion
 
 import androidx.fragment.app.Fragment
 import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.subscriptions.api.SubscriptionOnboardingCompletionSummaryRow
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
-import com.duckduckgo.subscriptions.impl.R
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
-@PriorityKey(250)
-class SubscriptionOnboardingItrStepPlugin @Inject constructor() : SubscriptionOnboardingStepPlugin {
+@PriorityKey(400)
+class SubscriptionOnboardingCompletionStepPlugin @Inject constructor() : SubscriptionOnboardingStepPlugin {
 
-    override val stepId: String = ITR_STEP_ID
+    override val stepId: String = COMPLETION_STEP_ID
 
-    override val titleResId: Int = R.string.subscriptionOnboardingItrTitle
-
-    override val completionSummaryRow = SubscriptionOnboardingCompletionSummaryRow(
-        labelResId = R.string.subscriptionOnboardingFeature2Title,
-        pendingIconResId = R.drawable.identity_theft_restoration_grayscale_color_24,
-    )
+    override val allowsBackNavigation: Boolean = false
 
     override suspend fun shouldShow(): Boolean = true
 
-    override fun createFragment(): Fragment = SubscriptionOnboardingItrFragment()
+    override fun createFragment(): Fragment = SubscriptionOnboardingCompletionFragment()
 
     companion object {
-        const val ITR_STEP_ID = "itr"
+        const val COMPLETION_STEP_ID = "completion"
     }
 }

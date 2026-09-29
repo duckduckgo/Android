@@ -19,6 +19,7 @@ package com.duckduckgo.subscriptions.impl.onboarding
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
 import com.duckduckgo.onboarding.api.LinearOnboardingState
@@ -32,12 +33,14 @@ import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingPlanPr
 import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStepStore
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Drives the native subscription onboarding: starts the plugin-built plan on the shared
@@ -51,10 +54,16 @@ class SubscriptionOnboardingViewModel @Inject constructor(
     private val planProvider: SubscriptionOnboardingPlanProvider,
     private val stepStore: SubscriptionOnboardingStepStore,
     private val controller: SubscriptionOnboardingController,
+    private val handoffState: SubscriptionOnboardingHandoffState,
 ) : ViewModel() {
 
     sealed interface Command {
-        data class ShowStep(val stepPlugin: SubscriptionOnboardingStepPlugin, val canGoBack: Boolean) : Command
+        data class ShowStep(
+            val stepPlugin: SubscriptionOnboardingStepPlugin,
+            val canGoBack: Boolean,
+            val showNavigationIcon: Boolean = true,
+        ) : Command
+        data class RunHandoff(val action: () -> Unit) : Command
         data object FinishToSettings : Command
         data object Finish : Command
     }
@@ -63,9 +72,9 @@ class SubscriptionOnboardingViewModel @Inject constructor(
     val commands: Flow<Command> = _commands.receiveAsFlow()
 
     private var started = false
-
-    // Mirrors the current step's InProgress.canGoBack; decides back vs exit on a Back event.
     private var canGoBack = false
+    private var pendingHandoff: (() -> Unit)? = null
+    private val handoffJob = ConflatedJob()
 
     fun start() {
         if (started) return
@@ -88,8 +97,9 @@ class SubscriptionOnboardingViewModel @Inject constructor(
             is LinearOnboardingState.InProgress -> {
                 val step = state.currentStep
                 if (step is SubscriptionOnboardingActivityStep) {
-                    canGoBack = state.canGoBack
-                    _commands.send(Command.ShowStep(step.stepPlugin, state.canGoBack))
+                    canGoBack = state.canGoBack && step.stepPlugin.allowsBackNavigation
+                    _commands.send(Command.ShowStep(step.stepPlugin, canGoBack, showNavigationIcon = !handoffState.isHandoff))
+                    scheduleHandoffIfPending()
                 }
             }
             is LinearOnboardingState.Completed -> _commands.send(Command.FinishToSettings)
@@ -103,18 +113,42 @@ class SubscriptionOnboardingViewModel @Inject constructor(
                 if (event.outcome == SubscriptionOnboardingStepOutcome.COMPLETED) {
                     stepStore.setCompleted(event.stepId)
                 }
+                event.handoff?.let {
+                    pendingHandoff = it
+                    handoffState.isHandoff = true
+                }
                 orchestrator.onEvent(StepFinished(event.stepId, event.outcome))
             }
             SubscriptionOnboardingController.Event.Back -> {
+                if (handoffState.isHandoff) return
                 if (canGoBack) {
                     orchestrator.onEvent(BackPressed)
                 } else {
-                    // First step: nothing to go back to, so exit to app settings.
-                    // TODO: return to the launch source once a subscription-settings entry point exists.
                     _commands.send(Command.FinishToSettings)
                 }
             }
-            SubscriptionOnboardingController.Event.Exit -> _commands.send(Command.Finish)
+            SubscriptionOnboardingController.Event.Exit -> {
+                cancelHandoff()
+                _commands.send(Command.Finish)
+            }
         }
+    }
+
+    private fun scheduleHandoffIfPending() {
+        val handoff = pendingHandoff ?: return
+        pendingHandoff = null
+        handoffJob += viewModelScope.launch {
+            delay(HANDOFF_DELAY)
+            _commands.send(Command.RunHandoff(handoff))
+        }
+    }
+
+    private fun cancelHandoff() {
+        pendingHandoff = null
+        handoffJob.cancel()
+    }
+
+    companion object {
+        private val HANDOFF_DELAY = 2.5.seconds
     }
 }
