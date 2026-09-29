@@ -5878,6 +5878,7 @@ class BrowserTabViewModel @Inject constructor(
     ) {
         if (fromDuckAiChat) {
             duckAiSessionCallback.onNewChatCreated(tabId)
+            recordPendingNewTabOpenedExit()
         }
         duckChat.reportDuckChatEntry(entryPoint, opensNewTab = true, hasPrompt = false)
         command.value = OpenInNewTab(duckChat.getDuckChatUrl("", false), tabId)
