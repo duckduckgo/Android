@@ -255,8 +255,8 @@
     <string name="duck_ai_chat_history_action_new">Neu</string>
     <string name="duck_ai_chat_history_action_download_selected_content_description">Chats herunterladen</string>
     <plurals name="duck_ai_chat_history_bulk_download_complete">
-        <item quantity="one">Download für %1$d Chat abgeschlossen</item>
-        <item quantity="other">Download für %1$d Chats abgeschlossen</item>
+        <item quantity="one" instruction="%1$d is the number of chats downloaded">Download für %1$d Chat abgeschlossen</item>
+        <item quantity="other" instruction="%1$d is the number of chats downloaded">Download für %1$d Chats abgeschlossen</item>
     </plurals>
     <string name="duck_ai_chat_history_action_overflow_content_description">Überlaufmenü öffnen</string>
     <string name="duck_ai_chat_history_select_all">Alle auswählen</string>
@@ -366,7 +366,7 @@
 
     <!-- Prefix on the Duck.ai attachment chip for a text selection -->
     <plurals name="duckAiTextSelectionWordCount">
-        <item quantity="one">%1$d Wort</item>
-        <item quantity="other">%1$d Wörter</item>
+        <item quantity="one" instruction="%1$d is the number of words in the selection.">%1$d Wort</item>
+        <item quantity="other" instruction="%1$d is the number of words in the selection.">%1$d Wörter</item>
     </plurals>
 </resources>

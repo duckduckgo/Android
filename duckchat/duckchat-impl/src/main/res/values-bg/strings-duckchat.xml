@@ -255,8 +255,8 @@
     <string name="duck_ai_chat_history_action_new">Нов</string>
     <string name="duck_ai_chat_history_action_download_selected_content_description">Изтегляне на чатове</string>
     <plurals name="duck_ai_chat_history_bulk_download_complete">
-        <item quantity="one">Завършено изтегляне на %1$d чат</item>
-        <item quantity="other">Завършено изтегляне на %1$d чата</item>
+        <item quantity="one" instruction="%1$d is the number of chats downloaded">Завършено изтегляне на %1$d чат</item>
+        <item quantity="other" instruction="%1$d is the number of chats downloaded">Завършено изтегляне на %1$d чата</item>
     </plurals>
     <string name="duck_ai_chat_history_action_overflow_content_description">Отваряне на менюто с допълнителни опции</string>
     <string name="duck_ai_chat_history_select_all">Избиране на всички</string>
@@ -366,7 +366,7 @@
 
     <!-- Prefix on the Duck.ai attachment chip for a text selection -->
     <plurals name="duckAiTextSelectionWordCount">
-        <item quantity="one">%1$d дума</item>
-        <item quantity="other">%1$d думи</item>
+        <item quantity="one" instruction="%1$d is the number of words in the selection.">%1$d дума</item>
+        <item quantity="other" instruction="%1$d is the number of words in the selection.">%1$d думи</item>
     </plurals>
 </resources>

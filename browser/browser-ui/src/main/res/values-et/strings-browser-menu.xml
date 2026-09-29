@@ -58,4 +58,10 @@
     <string name="browserMenuForward">Edasi</string>
     <string name="browserMenuRefresh">Värskenda</string>
     <string name="browserMenuFireTabsData">Kustuta vahekaardid ja andmed</string>
+
+    <!-- Duck.ai tab + menu -->
+    <string name="chatMenuPopupNewVoiceChat">Uus häälvestlus</string>
+    <string name="chatMenuPopupNewImage">Uus pilt</string>
+    <string name="chatMenuPopupNewTab">Uus vaheleht</string>
+    <string name="chatMenuPopupNewFireTab">Uus Fire vahekaart</string>
 </resources>

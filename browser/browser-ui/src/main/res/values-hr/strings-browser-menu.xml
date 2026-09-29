@@ -58,4 +58,10 @@
     <string name="browserMenuForward">Naprijed</string>
     <string name="browserMenuRefresh">Osvježi</string>
     <string name="browserMenuFireTabsData">Izbriši kartice i podatke</string>
+
+    <!-- Duck.ai tab + menu -->
+    <string name="chatMenuPopupNewVoiceChat">Novo glasovno čavrljanje</string>
+    <string name="chatMenuPopupNewImage">Nova slika</string>
+    <string name="chatMenuPopupNewTab">Nova kartica</string>
+    <string name="chatMenuPopupNewFireTab">Nova Fire kartica</string>
 </resources>
