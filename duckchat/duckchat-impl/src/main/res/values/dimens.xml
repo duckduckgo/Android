@@ -18,6 +18,7 @@
     <dimen name="inputScreenUserPrefToggleSpacing">16dp</dimen>
     <dimen name="inputScreenOmnibarCardMarginHorizontal">4dp</dimen>
     <dimen name="nativeInputModeWidgetMarginHorizontal">4dp</dimen>
+    <dimen name="nativeInputFooterOverlap">32dp</dimen>
     <dimen name="contextualBottomSheetTopOffset">80dp</dimen>
     <dimen name="onboardingBackgroundMaxHeight">126dp</dimen>
 

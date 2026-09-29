@@ -454,6 +454,7 @@ class DuckChatContextualWebViewFragment :
             tabId = tabId,
             card = binding.contextualNativeInputCard,
             widget = binding.contextualNativeInputWidget,
+            footer = binding.contextualNativeInputFooter,
             jsMessaging = contentScopeScripts,
             lifecycleOwner = viewLifecycleOwner,
             chatIdFlow = viewModel.chatId,

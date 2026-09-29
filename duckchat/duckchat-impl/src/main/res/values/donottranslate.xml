@@ -50,4 +50,8 @@
     <string name="duckAiModelPickerTryFreeTrial">Try for Free</string>
     <string name="duckAiModelPickerSubscriberExclusive">Subscriber Exclusive</string>
     <string name="duckAiModelPickerProExclusive">Pro Plan Exclusive</string>
+
+    <!-- Duck.ai high-usage model footer -->
+    <string name="duckChatHighUsageModelFooterMessage" instruction="Placeholder is the selected model's short name">%1$s uses limits up to 2-5x faster than basic models.</string>
+    <string name="duckChatHighUsageModelFooterDismissContentDescription">Dismiss</string>
 </resources>
