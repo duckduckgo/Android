@@ -150,10 +150,7 @@ class PageLoadProgressBar @JvmOverloads constructor(
             isDismissing = false
         }
         engine.reset()
-        engine.start(
-            initialProgress = activeConfig.initialProgress,
-            fastStartDurationMs = activeConfig.fastStartDurationMs,
-        )
+        engine.start()
         _isStarted = true
         indeterminateSweepRenderer.stop()
 

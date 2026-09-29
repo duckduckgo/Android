@@ -128,7 +128,9 @@ class ProgressPhaseEngineTest {
 
     @Test
     fun `updated fast start begins at ten and reaches target in 300 milliseconds`() {
-        engine.start(initialProgress = 10f, fastStartDurationMs = 300L)
+        val updatedConfig = ProgressBarConfig(initialProgress = 10f, fastStartDurationMs = 300L)
+        engine = ProgressPhaseEngine(updatedConfig, time)
+        engine.start()
         assertEquals(10f, engine.displayProgress, 0.001f)
 
         time.advance(150)
@@ -143,9 +145,11 @@ class ProgressPhaseEngineTest {
     }
 
     @Test
-    fun `starting with default config after updated config restores original animation`() {
-        engine.start(initialProgress = 10f, fastStartDurationMs = 300L)
-        engine.reset()
+    fun `default config engine is unaffected by a separate updated config engine`() {
+        val updatedConfig = ProgressBarConfig(initialProgress = 10f, fastStartDurationMs = 300L)
+        val updatedEngine = ProgressPhaseEngine(updatedConfig, time)
+        updatedEngine.start()
+
         engine.start()
 
         assertEquals(0f, engine.displayProgress, 0.001f)
