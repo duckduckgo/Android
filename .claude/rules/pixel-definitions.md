@@ -20,7 +20,7 @@ or auditing.
     "pixel_name_here": {
         "description": "When and why this pixel fires",   // required
         "owners": ["githubUsername"],                     // required
-        "triggers": ["other"],                            // required
+        "triggers": ["user_interaction"],                 // required — see "Choosing triggers" below
         "suffixes": ["first_daily_count"],
         "parameters": ["appVersion", "channel"],
         "expires": "2026-06-30"                           // temporary pixels only; omit for permanent
@@ -28,9 +28,62 @@ or auditing.
 }
 ```
 
-Valid `triggers` values: `"other"`, `"scheduled"`, `"startup"`, `"page_load"`, `"new_tab"`,
-`"exception"`, `"user_submitted"`, `"search_ddg"`. Most pixels use `"other"`; `"scheduled"` for
-daily/periodic, `"startup"` for app-launch, `"page_load"` for navigation-related.
+## Choosing triggers
+
+Valid `triggers` values: `"user_interaction"`, `"user_submitted"`, `"impression"`,
+`"feature_lifecycle"`, `"scheduled"`, `"web_detection"`, `"exception"`, `"startup"`, `"page_load"`,
+`"new_tab"`, `"search_ddg"`, `"other"`. Never default to `"other"` — classify with this procedure
+(full definitions and worked examples: the
+[trigger classification guide](https://github.com/duckduckgo/pixel-schema/blob/main/docs/trigger-classification.md)):
+
+```
+Classify by the EVENT THAT CAUSES THE PIXEL TO FIRE — never by dedupe cadence
+("daily"/"unique" suffixes) or the delivery mechanism.
+
+1. Deliberate user action (tap, click, toggle, menu selection, swipe, gesture,
+   prompt/query submission)?  → user_interaction
+   • A surface shown 1:1 because of a gesture (menu on tap, dialog behind a
+     button, screen entered from an explicit flow) is user_interaction.
+   • user_submitted ONLY for consent-scoped submission of the user's own data
+     (breakage report, feedback). The opener button is user_interaction.
+2. Surface displayed WITHOUT the user asking? → impression
+   • Litmus: display code has an eligibility gate (feature flag, subscription
+     state, view-count threshold, cooldown) → impression. Only gate is "user
+     navigated here" → user_interaction.
+3. Injected scripts detected page content (captcha, adwall, CMP, ads)?
+   → web_detection
+4. Automatic feature operation runs / completes / changes state (migration,
+   sync cycle, job engine, token refresh, update detection, state observer)?
+   → feature_lifecycle
+   • Async completion of a user-initiated flow that can outlive the UI or be
+     driven by a non-user party (billing observer, remote sync peer, retrying
+     backend call) → feature_lifecycle. Synchronous completion inside the
+     user's action → user_interaction.
+5. A timer or scheduled/delayed job literally fires it (rollup, sampler,
+   watchdog, absence-of-event check)? → scheduled
+   • If the timer merely DETECTS something, classify by what was detected:
+     anomaly → exception; a user toggle noticed by a poll → user_interaction.
+6. Error/crash → exception. Launch or foreground → startup. Page loaded →
+   page_load. New tab → new_tab. DDG search → search_ddg.
+7. One pixel name covering several events (e.g. an event=shown|clicked param)?
+   → list every applicable trigger; triggers is an array.
+
+Store-and-forward: when counters are recorded at event time and transmitted
+later by a worker, classify by the RECORDED event, never the flusher.
+
+Use "other" only when nothing above fits, and say why in the description.
+```
+
+Android-specific worked examples:
+
+- `m_fire_dialog_shown` — dialog opened 1:1 by the fire-button tap → `user_interaction` (step 1).
+- `m_remote_message_shown` — RMF message displayed by config/eligibility → `impression` (step 2).
+- `m_dbp_optout_stage_*` — PIR engine stage events inside a run → `feature_lifecycle`; the
+  worker-fired `m_dbp_engagement_dau` sampler → `scheduled` (steps 4–5).
+- `adBlocking_state_daily` — `onResume` observer reporting state once per day → `startup`, not
+  `scheduled` (no timer fires it) (step 6).
+- `onboarding_<step>` pixels multiplexing `event=shown|clicked` under one name →
+  `["impression", "user_interaction"]` (step 7).
 
 `expires` dates should cover the expected analysis period without making the pixel effectively
 permanent.
@@ -102,7 +155,7 @@ Wide events are defined here as ordinary pixel definitions, carrying their paylo
     "wide_feature-name": {
         "description": "Wide event sent when the feature flow completes",
         "owners": ["githubUsername"],
-        "triggers": ["other"],
+        "triggers": ["feature_lifecycle"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
             "widePixelPlatform",
