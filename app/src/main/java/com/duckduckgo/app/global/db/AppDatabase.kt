@@ -43,6 +43,7 @@ import com.duckduckgo.app.global.events.db.UserEventEntity
 import com.duckduckgo.app.global.events.db.UserEventTypeConverter
 import com.duckduckgo.app.global.events.db.UserEventsDao
 import com.duckduckgo.app.location.data.LocationPermissionEntity
+import com.duckduckgo.app.location.data.LocationPermissionTypeConverter
 import com.duckduckgo.app.location.data.LocationPermissionsDao
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.Notification
