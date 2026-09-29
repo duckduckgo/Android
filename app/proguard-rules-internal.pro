@@ -25,3 +25,6 @@
     public static *** inflate(...);
     public static *** bind(android.view.View);
 }
+
+# required for jjwt
+-keep class io.jsonwebtoken.** { *; }
