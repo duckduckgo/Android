@@ -47,6 +47,8 @@ class ProgressPhaseEngine(
     private var phaseStartTime: Long = 0L
     private var creepProgress: Float = 0f
     private var lastForwardProgressTime: Long = 0L
+    private var fastStartInitialProgress: Float = config.initialProgress
+    private var fastStartDurationMs: Long = config.fastStartDurationMs
 
     private var completionFrom: Float = 0f
     private var pendingCompletion: Boolean = false
@@ -59,13 +61,18 @@ class ProgressPhaseEngine(
             shouldInvalidate = phase != Phase.IDLE,
         )
 
-    fun start() {
+    fun start(
+        initialProgress: Float = config.initialProgress,
+        fastStartDurationMs: Long = config.fastStartDurationMs,
+    ) {
         phase = Phase.FAST_START
-        displayProgress = 0f
+        displayProgress = initialProgress
         realProgress = 0f
         velocity = 0f
         creepProgress = 0f
         pendingCompletion = false
+        fastStartInitialProgress = initialProgress
+        this.fastStartDurationMs = fastStartDurationMs
 
         phaseStartTime = timeProvider.elapsedRealtime()
         lastForwardProgressTime = timeProvider.elapsedRealtime()
@@ -143,10 +150,10 @@ class ProgressPhaseEngine(
 
     private fun tickFastStart() {
         val elapsed = timeProvider.elapsedRealtime() - phaseStartTime
-        val t = (elapsed.toFloat() / config.fastStartDurationMs).coerceIn(0f, 1f)
+        val t = (elapsed.toFloat() / fastStartDurationMs).coerceIn(0f, 1f)
         // cubic ease-in
         val eased = t * t * t
-        displayProgress = eased * config.fastStartTarget
+        displayProgress = fastStartInitialProgress + eased * (config.fastStartTarget - fastStartInitialProgress)
 
         if (t >= 1f) {
             displayProgress = config.fastStartTarget

@@ -115,6 +115,47 @@ class ProgressPhaseEngineTest {
     }
 
     @Test
+    fun `default fast start begins at zero and uses original duration`() {
+        engine.start()
+        assertEquals(0f, engine.displayProgress, 0.001f)
+
+        time.advance(300)
+        engine.tick(0.3f)
+
+        assertEquals(2.5f, engine.displayProgress, 0.001f)
+        assertEquals(Phase.FAST_START, engine.phase)
+    }
+
+    @Test
+    fun `updated fast start begins at ten and reaches target in 300 milliseconds`() {
+        engine.start(initialProgress = 10f, fastStartDurationMs = 300L)
+        assertEquals(10f, engine.displayProgress, 0.001f)
+
+        time.advance(150)
+        engine.tick(0.15f)
+        assertEquals(11.25f, engine.displayProgress, 0.001f)
+        assertEquals(Phase.FAST_START, engine.phase)
+
+        time.advance(150)
+        engine.tick(0.15f)
+        assertEquals(20f, engine.displayProgress, 0.001f)
+        assertEquals(Phase.TRACKING, engine.phase)
+    }
+
+    @Test
+    fun `starting with default config after updated config restores original animation`() {
+        engine.start(initialProgress = 10f, fastStartDurationMs = 300L)
+        engine.reset()
+        engine.start()
+
+        assertEquals(0f, engine.displayProgress, 0.001f)
+        time.advance(300)
+        engine.tick(0.3f)
+        assertEquals(2.5f, engine.displayProgress, 0.001f)
+        assertEquals(Phase.FAST_START, engine.phase)
+    }
+
+    @Test
     fun `progress updates during fast start are stored but not applied`() {
         engine.start()
         engine.onProgressUpdate(50f)

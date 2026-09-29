@@ -34,4 +34,7 @@ interface ProgressBarUpgradeFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun indeterminateFallback(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun animationConfigUpdate(): Toggle
 }

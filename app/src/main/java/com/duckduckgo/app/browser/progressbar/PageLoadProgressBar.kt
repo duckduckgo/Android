@@ -38,6 +38,11 @@ class PageLoadProgressBar @JvmOverloads constructor(
 ) : View(context, attrs, defStyleAttr) {
 
     private val config = ProgressBarConfig()
+    private val updatedConfig = ProgressBarConfig(
+        initialProgress = 10f,
+        fastStartDurationMs = 300L,
+        fadeInDurationMs = 50L,
+    )
 
     private val timeProvider = object : TimeProvider {
         override fun elapsedRealtime(): Long = SystemClock.elapsedRealtime()
@@ -118,14 +123,21 @@ class PageLoadProgressBar @JvmOverloads constructor(
         }
     }
 
-    fun start() {
+    fun start(animationUpdateEnabled: Boolean) {
+        start(if (animationUpdateEnabled) updatedConfig else config)
+    }
+
+    private fun start(config: ProgressBarConfig) {
         val wasVisible = isDismissing || isVisible
         if (isDismissing) {
             animate().cancel()
             isDismissing = false
         }
         engine.reset()
-        engine.start()
+        engine.start(
+            initialProgress = config.initialProgress,
+            fastStartDurationMs = config.fastStartDurationMs,
+        )
         _isStarted = true
         indeterminateSweepRenderer.stop()
 
@@ -147,10 +159,10 @@ class PageLoadProgressBar @JvmOverloads constructor(
         }
     }
 
-    fun onProgressUpdate(progress: Float) {
+    fun onProgressUpdate(progress: Float, animationUpdateEnabled: Boolean) {
         if (progress < lastReportedProgress) {
             // Progress went backward — new navigation, restart fresh
-            start()
+            start(animationUpdateEnabled)
         }
         val resumedFromStall = engine.phase == Phase.INDETERMINATE && progress > lastReportedProgress
         lastReportedProgress = progress
