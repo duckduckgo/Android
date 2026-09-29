@@ -28,3 +28,10 @@
 
 # required for jjwt
 -keep class io.jsonwebtoken.** { *; }
+
+# required for netguard
+-keep class com.duckduckgo.vpn.network.impl.RealVpnNetwork { *; }
+-keep class com.duckduckgo.vpn.network.impl.models.** { *; }
+
+# required for wireguard-go
+-keep class com.wireguard.android.backend.GoBackend { *; }
