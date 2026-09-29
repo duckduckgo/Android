@@ -3943,7 +3943,7 @@ class BrowserTabViewModel @Inject constructor(
 
     /**
      * The input-screen mode the next auto-launched input screen on this tab should open in, cleared as
-     * it is read. Prefers this tab's own launch target (e.g. "New Search" → Search) and falls back to
+     * it is read. Prefers this tab's own launch target (e.g. "New Tab" → Search) and falls back to
      * the post-onboarding signal (→ Duck.ai). Returns `null` when neither is armed.
      */
     fun consumeInitialInputMode(): InputMode? =

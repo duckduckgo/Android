@@ -722,7 +722,7 @@ class BrowserTabFragment :
 
     var messageFromPreviousTab: Message? = null
 
-    // One-shot input-screen mode this tab should land on (e.g. "New Search" → Search), set by whoever
+    // One-shot input-screen mode this tab should land on (e.g. "New Tab" → Search), set by whoever
     // opened the tab and handed to the viewmodel in loadData. Not persisted: only meaningful for the
     // tab's initial launch within this process.
     var inputModeTarget: InputMode? = null
@@ -845,9 +845,9 @@ class BrowserTabFragment :
                 viewModel.openNewImageDuckChat(omnibar.viewMode)
             }
             onMenuItemClicked(contentView.findViewById(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewTab)) {
-                // With the native sidebar this entry is relabelled "New Search": open the new tab with
-                // its input screen surfaced on the Search tab. The target is threaded to the new tab
-                // itself rather than armed globally, so it can't be consumed by another tab.
+                // With the native sidebar this entry opens the new tab with its input screen surfaced on
+                // the Search tab. The target is threaded to the new tab itself rather than armed globally,
+                // so it can't be consumed by another tab.
                 viewModel.recordPendingNewTabOpenedExit()
                 browserActivity?.launchNewTab(
                     browserMode = BrowserMode.REGULAR,
