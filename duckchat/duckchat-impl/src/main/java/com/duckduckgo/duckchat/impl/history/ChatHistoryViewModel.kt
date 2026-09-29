@@ -16,7 +16,6 @@
 
 package com.duckduckgo.duckchat.impl.history
 
-import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
@@ -280,28 +279,6 @@ class ChatHistoryViewModel @Inject constructor(
         controls.update { it.copy(confirmation = null) }
     }
 
-    fun onEnterSelectMode() {
-        pixel.fireCountAndDaily(
-            DuckChatPixelName.DUCK_CHAT_HISTORY_SELECT_MODE_ENTERED_COUNT,
-            DuckChatPixelName.DUCK_CHAT_HISTORY_SELECT_MODE_ENTERED_DAILY,
-        )
-        controls.update { it.copy(mode = Mode.Selecting(emptySet())) }
-    }
-
-    fun onChatsProtectionClicked() {
-        viewModelScope.launch {
-            val sourceTab = tabRepository.getSelectedTab()
-            val fromChatTab = sourceTab?.url?.let { duckChat.isDuckChatUrl(it.toUri()) } == true
-            navigationChannel.trySend(
-                NavigationEvent.OpenChatProtection(
-                    url = duckChat.getChatProtectionUrl(),
-                    sourceTabId = sourceTab?.tabId,
-                    inNewTab = !fromChatTab,
-                ),
-            )
-        }
-    }
-
     fun onSelectionToggled(chatId: String) {
         controls.update { c ->
             val mode = c.mode as? Mode.Selecting ?: return@update c
@@ -383,7 +360,8 @@ class ChatHistoryViewModel @Inject constructor(
         if (items.isEmpty()) return ChatHistoryUiState.Empty
         val (pinned, recent) = items.partition { it.pinned }
         val effectiveMode = when (val mode = controls.mode) {
-            // Keep Selecting even when empty — collapsing here would make onEnterSelectMode emit no state change.
+            // Keep Selecting even when the reconciled selection is empty — controls is still in select
+            // mode, and collapsing only the derived mode would desync it from isSelectMode() and back handling.
             is Mode.Selecting -> Mode.Selecting(mode.selectedChatIds intersect items.mapTo(mutableSetOf()) { it.chatId })
             Mode.Default -> Mode.Default
         }
@@ -423,7 +401,6 @@ class ChatHistoryViewModel @Inject constructor(
 
     sealed interface NavigationEvent {
         data class OpenChat(val url: String, val sourceTabId: String?) : NavigationEvent
-        data class OpenChatProtection(val url: String, val sourceTabId: String?, val inNewTab: Boolean) : NavigationEvent
         data class OpenRename(val chatId: String, val currentTitle: String) : NavigationEvent
         data class ShowDownloadComplete(val fileName: String) : NavigationEvent
         data class ShowBulkDownloadComplete(val count: Int) : NavigationEvent
