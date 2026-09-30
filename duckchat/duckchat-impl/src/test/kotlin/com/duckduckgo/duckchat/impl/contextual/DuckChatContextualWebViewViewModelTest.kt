@@ -52,6 +52,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -231,6 +232,27 @@ class DuckChatContextualWebViewViewModelTest {
 
         verify(duckChatPixels).reportContextualSheetSessionRestored()
         verify(duckChatPixels).reportContextualSheetOpened()
+    }
+
+    @Test
+    fun `onSheetOpened after the session timed out ends the selection journey as expired`() = runTest {
+        contextualDataStore.persistTabChatUrl("tab-1", "https://duckduckgo.com/?ia=chat&chatID=abc")
+        contextualDataStore.persistTabClosedTimestamp("tab-1", 0L)
+        sessionTimeoutProvider.timeoutMs = 1_000L
+        timeProvider.nowMs = 5_000L
+
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(selectionJourney).onJourneyEnded("tab-1", SelectionTerminalReason.SESSION_EXPIRED)
+    }
+
+    @Test
+    fun `onSheetOpened with no prior session does not expire the selection journey`() = runTest {
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(selectionJourney, never()).onJourneyEnded(any(), eq(SelectionTerminalReason.SESSION_EXPIRED))
     }
 
     @Test

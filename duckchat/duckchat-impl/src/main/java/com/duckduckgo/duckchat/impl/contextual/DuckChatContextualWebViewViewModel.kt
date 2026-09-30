@@ -214,8 +214,9 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
             }
 
             val existingChatUrl = contextualDataStore.getTabChatUrl(tabId)
+            val isSessionValid = shouldReuseStoredChatUrl(tabId)
             val shouldReuseUrl = !existingChatUrl.isNullOrBlank() &&
-                shouldReuseStoredChatUrl(tabId) &&
+                isSessionValid &&
                 !isStoredChatMissingFromHistory(existingChatUrl)
             if (shouldReuseUrl) {
                 logcat { "Duck.ai: tab=$tabId has an existing url and don't need to restart the session" }
@@ -223,6 +224,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
                 loadWebViewUrl(tabId, existingChatUrl!!)
             } else {
                 logcat { "Duck.ai: tab=$tabId session expired or absent, starting a new chat" }
+                if (!isSessionValid) selectionJourney.onJourneyEnded(tabId, SelectionTerminalReason.SESSION_EXPIRED)
                 loadFreshChat(tabId)
             }
         }
