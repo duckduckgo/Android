@@ -54,6 +54,9 @@
     <string name="autofillDevSettingsSimulatePasswordsImportedTitle">Simulate Previous Successful Import</string>
     <string name="autofillDevSettingsSimulatePasswordsImportedInstruction">Tap to simulate having previously imported passwords from Google</string>
     <string name="autofillDevSettingsSimulatePasswordsImportedConfirmation">Recorded that passwords were imported before</string>
+    <string name="autofillDevSettingsCredentialExchangeTitle">Test OS Credential Exchange Import</string>
+    <string name="autofillDevSettingsCredentialExchangeInstruction">Tap to launch the system credential picker (CXF) and show what it returns</string>
+    <string name="autofillDevSettingsCredentialExchangeNotSupported">Credential exchange is not supported on this build</string>
 
     <string name="autofillDevSettingsOverrideMaxInstallDialogTitle">Maximum number of days since install</string>
     <string name="autofillDevSettingsOverrideMaxInstallDialogOkButtonText">OK</string>
