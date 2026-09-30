@@ -255,10 +255,10 @@
     <string name="duck_ai_chat_history_action_new">Создать</string>
     <string name="duck_ai_chat_history_action_download_selected_content_description">Скачать чаты</string>
     <plurals name="duck_ai_chat_history_bulk_download_complete">
-        <item quantity="one">Скачивание %1$d чата завершено</item>
+        <item quantity="one" instruction="%1$d is the number of chats downloaded">Скачивание %1$d чата завершено</item>
         <item quantity="few">Скачивание %1$d чатов завершено</item>
         <item quantity="many">Скачивание %1$d чатов завершено</item>
-        <item quantity="other">Скачивание %1$d чата завершено</item>
+        <item quantity="other" instruction="%1$d is the number of chats downloaded">Скачивание %1$d чата завершено</item>
     </plurals>
     <string name="duck_ai_chat_history_action_overflow_content_description">Открыть раскрывающееся меню</string>
     <string name="duck_ai_chat_history_select_all">Выбрать все</string>
@@ -368,9 +368,9 @@
 
     <!-- Prefix on the Duck.ai attachment chip for a text selection -->
     <plurals name="duckAiTextSelectionWordCount">
-        <item quantity="one">%1$d слово</item>
+        <item quantity="one" instruction="%1$d is the number of words in the selection.">%1$d слово</item>
         <item quantity="few">%1$d слова</item>
         <item quantity="many">%1$d слов</item>
-        <item quantity="other">%1$d сл.</item>
+        <item quantity="other" instruction="%1$d is the number of words in the selection.">%1$d сл.</item>
     </plurals>
 </resources>

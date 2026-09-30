@@ -1666,6 +1666,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
         browserMode: BrowserMode = currentBrowserMode,
         inputModeTarget: InputMode? = null,
     ) {
+        if (inputModeTarget == InputMode.SEARCH) {
+            isDuckChatVisible = false
+        }
         switchModeThen(
             browserMode,
             PendingAction.OpenNewTab(query, sourceTabId, skipHome, isExternal, inputModeTarget),

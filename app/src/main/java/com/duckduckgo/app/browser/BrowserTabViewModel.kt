@@ -761,16 +761,32 @@ class BrowserTabViewModel @Inject constructor(
 
     private val fireproofWebsiteState: LiveData<List<FireproofWebsiteEntity>> = fireproofWebsiteRepository.getFireproofWebsites()
 
+    private enum class PulseCtaEffect { FORCE, SUPPRESS, DEFAULT }
+
     @ExperimentalCoroutinesApi
     @FlowPreview
     private val showPulseAnimation: LiveData<Boolean> =
         combine(
-            ctaViewState.asFlow().map {
-                it.cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta || it.cta is DaxDuckAiFireButtonBrandDesignUpdateContextualCta
+            ctaViewState.asFlow().map { state ->
+                when {
+                    // The trackers dialog points at the privacy shield; a fire pulse would compete.
+                    state.cta is OnboardingDaxDialogCta.DaxTrackersBlockedCta ||
+                        state.cta is DaxTrackersBlockedBrandDesignUpdateContextualCta -> PulseCtaEffect.SUPPRESS
+
+                    state.cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta ||
+                        state.cta is DaxDuckAiFireButtonBrandDesignUpdateContextualCta -> PulseCtaEffect.FORCE
+
+                    else -> PulseCtaEffect.DEFAULT
+                }
             }.distinctUntilChanged(),
             ctaViewModel.showFireButtonPulseAnimation,
-        ) { isShowingDuckAiFireButtonCta, showPulseAnimation -> isShowingDuckAiFireButtonCta || showPulseAnimation }
-            .asLiveData(context = viewModelScope.coroutineContext)
+        ) { ctaEffect, showPulseAnimation ->
+            when (ctaEffect) {
+                PulseCtaEffect.SUPPRESS -> false
+                PulseCtaEffect.FORCE -> true
+                PulseCtaEffect.DEFAULT -> showPulseAnimation
+            }
+        }.asLiveData(context = viewModelScope.coroutineContext)
 
     private var autoCompleteJob = ConflatedJob()
     private var serpLogoJob = ConflatedJob()
@@ -3943,7 +3959,7 @@ class BrowserTabViewModel @Inject constructor(
 
     /**
      * The input-screen mode the next auto-launched input screen on this tab should open in, cleared as
-     * it is read. Prefers this tab's own launch target (e.g. "New Search" → Search) and falls back to
+     * it is read. Prefers this tab's own launch target (e.g. "New Tab" → Search) and falls back to
      * the post-onboarding signal (→ Duck.ai). Returns `null` when neither is armed.
      */
     fun consumeInitialInputMode(): InputMode? =

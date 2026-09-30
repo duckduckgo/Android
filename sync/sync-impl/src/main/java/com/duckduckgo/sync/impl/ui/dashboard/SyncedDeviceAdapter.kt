@@ -23,10 +23,10 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.R
-import com.duckduckgo.sync.impl.asDrawableRes
 import com.duckduckgo.sync.impl.databinding.ItemSyncDeviceLoadingBinding
 import com.duckduckgo.sync.impl.databinding.ItemSyncDeviceLocalBinding
 import com.duckduckgo.sync.impl.databinding.ItemSyncDeviceRemoteBinding
+import com.duckduckgo.sync.impl.iconRes
 import com.duckduckgo.sync.impl.ui.dashboard.SyncDeviceListItem.LoadingItem
 import com.duckduckgo.sync.impl.ui.dashboard.SyncDeviceListItem.SyncedDevice
 import com.duckduckgo.sync.impl.ui.dashboard.SyncedDeviceAdapter.Listener
@@ -121,7 +121,7 @@ private class LocalDeviceViewHolder(
 
     fun bind(device: ConnectedDevice) {
         this.device = device
-        binding.root.setLeadingIconResource(device.deviceType.type().asDrawableRes())
+        binding.root.setLeadingIconResource(device.deviceType.iconRes())
         binding.root.setPrimaryText(device.deviceName)
     }
 }
@@ -141,7 +141,7 @@ private class RemoteDeviceViewHolder(
     fun bind(device: ConnectedDevice) {
         this.device = device
         binding.root.setPrimaryText(device.deviceName)
-        binding.root.setLeadingIconResource(device.deviceType.type().asDrawableRes())
+        binding.root.setLeadingIconResource(device.deviceType.iconRes())
     }
 }
 

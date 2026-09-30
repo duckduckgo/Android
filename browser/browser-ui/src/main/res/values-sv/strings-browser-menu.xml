@@ -58,4 +58,10 @@
     <string name="browserMenuForward">Framåt</string>
     <string name="browserMenuRefresh">Uppdatera</string>
     <string name="browserMenuFireTabsData">Ta bort flikar och data</string>
+
+    <!-- Duck.ai tab + menu -->
+    <string name="chatMenuPopupNewVoiceChat">Ny röstchatt</string>
+    <string name="chatMenuPopupNewImage">Ny bild</string>
+    <string name="chatMenuPopupNewTab">Ny flik</string>
+    <string name="chatMenuPopupNewFireTab">Ny Fire-flik</string>
 </resources>

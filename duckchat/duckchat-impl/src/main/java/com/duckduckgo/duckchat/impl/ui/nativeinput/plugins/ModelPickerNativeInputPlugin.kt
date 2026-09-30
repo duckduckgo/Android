@@ -39,7 +39,6 @@ class ModelPickerNativeInputPlugin @Inject constructor() : NativeInputPlugin {
     override fun createView(context: Context, host: NativeInputHost): View {
         return ModelPickerView(context).also { picker ->
             picker.setHost(host)
-            picker.setPickerEnabled(true)
             picker.isEditMode = host.isEditSurface()
         }
     }

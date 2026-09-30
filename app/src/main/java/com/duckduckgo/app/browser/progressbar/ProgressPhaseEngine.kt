@@ -61,7 +61,7 @@ class ProgressPhaseEngine(
 
     fun start() {
         phase = Phase.FAST_START
-        displayProgress = 0f
+        displayProgress = config.initialProgress
         realProgress = 0f
         velocity = 0f
         creepProgress = 0f
@@ -146,7 +146,7 @@ class ProgressPhaseEngine(
         val t = (elapsed.toFloat() / config.fastStartDurationMs).coerceIn(0f, 1f)
         // cubic ease-in
         val eased = t * t * t
-        displayProgress = eased * config.fastStartTarget
+        displayProgress = config.initialProgress + eased * (config.fastStartTarget - config.initialProgress)
 
         if (t >= 1f) {
             displayProgress = config.fastStartTarget

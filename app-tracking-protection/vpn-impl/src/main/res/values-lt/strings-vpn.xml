@@ -46,10 +46,10 @@
     <string name="atp_OnInitialNotification">"Programėlės sekimo apsauga yra įjungta ir blokuoja sekimo bandymus visose jūsų programose"</string>
     <string name="atp_OnNoTrackersNotificationHeader">"Ieškoma sekimo veiklos… pypt… boop"</string>
     <plurals name="atp_OnNotification">
-        <item quantity="one"><![CDATA[ Užblokuoti bandymai sekti <b> %1$d programoje</b> (per pastarąją valandą).]]></item>
+        <item quantity="one" instruction="Placeholder is a number"><![CDATA[ Užblokuoti bandymai sekti <b> %1$d programoje</b> (per pastarąją valandą).]]></item>
         <item quantity="few"><![CDATA[ Užblokuoti bandymai sekti <b> %1$d programose</b> (per pastarąją valandą).]]></item>
         <item quantity="many"><![CDATA[ Užblokuoti bandymai sekti <b> %1$d programose</b> (per pastarąją valandą).]]></item>
-        <item quantity="other"><![CDATA[ Užblokuoti bandymai sekti <b> %1$d programų</b> (per pastarąją valandą).]]></item>
+        <item quantity="other" instruction="Placeholder is a number"><![CDATA[ Užblokuoti bandymai sekti <b> %1$d programų</b> (per pastarąją valandą).]]></item>
     </plurals>
     <string name="atp_DisabledNotification">Programėlės sekimo apsauga išjungta. Bakstelėkite, jei norite toliau blokuoti sekimo bandymus.</string>
     <string name="atp_RevokedNotification">Jūsų prietaise esanti VPN programa išjungė programėlių sekimo apsaugą. Palieskite, kad vėl įjungtumėte.</string>
@@ -61,17 +61,17 @@
     <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps" instruction="%1$d is the number of tracking attempts, %2$d is the number of apps where the tracking took place, %3$s is the name of one of the apps where it happened"><![CDATA[ Apsauga nuo programėlių sekimo užblokavo <b>%1$d sekimo bandymų %2$d programėlėse, įskaitant %3$s</b> (praėjusią dieną).]]></string>
 
     <plurals name="atp_DailyTopCompanyNotification">
-        <item quantity="one"><![CDATA[%1$s bandė jus sekti <b> %2$d programėlėje</b> (praėjusią dieną). <b>Žiūrėti daugiau</b>]]></item>
+        <item quantity="one" instruction="%1$s is the name of a company, %2$d is the number of apps the company tried to track the user"><![CDATA[%1$s bandė jus sekti <b> %2$d programėlėje</b> (praėjusią dieną). <b>Žiūrėti daugiau</b>]]></item>
         <item quantity="few"><![CDATA[%1$s bandė jus sekti <b> %2$d programėlėse</b> (praėjusią dieną). <b>Žiūrėti daugiau</b>]]></item>
         <item quantity="many"><![CDATA[%1$s bandė jus sekti <b> %2$d programėlėse</b> (praėjusią dieną). <b>Žiūrėti daugiau</b>]]></item>
-        <item quantity="other"><![CDATA[%1$s bandė jus sekti <b> %2$d programėlių</b> (praėjusią dieną). <b>Žiūrėti daugiau</b>]]></item>
+        <item quantity="other" instruction="%1$s is the name of a company, %2$d is the number of apps the company tried to track the user"><![CDATA[%1$s bandė jus sekti <b> %2$d programėlių</b> (praėjusią dieną). <b>Žiūrėti daugiau</b>]]></item>
     </plurals>
 
     <plurals name="atp_DailyCompanyBlockedNotification">
-        <item quantity="one"><![CDATA[Apsauga nuo programėlių sekimo užblokavo daugiausia sekimo bandymų <b> %1$s</b> ir <b>%2$s</b> (praėjusią dieną).]]></item>
+        <item quantity="one" instruction="Placeholder is the name of an app"><![CDATA[Apsauga nuo programėlių sekimo užblokavo daugiausia sekimo bandymų <b> %1$s</b> ir <b>%2$s</b> (praėjusią dieną).]]></item>
         <item quantity="few"><![CDATA[Apsauga nuo programėlių sekimo užblokavo daugiausia sekimo bandymų <b> %1$s</b> ir <b>%2$s</b> (praėjusią dieną).]]></item>
         <item quantity="many"><![CDATA[Apsauga nuo programėlių sekimo užblokavo daugiausia sekimo bandymų <b> %1$s</b> ir <b>%2$s</b> (praėjusią dieną).]]></item>
-        <item quantity="other"><![CDATA[Apsauga nuo programėlių sekimo užblokavo daugiausia sekimo bandymų <b> %1$s</b> ir <b>%2$s</b> (praėjusią dieną).]]></item>
+        <item quantity="other" instruction="Both placeholders are the name of an app"><![CDATA[Apsauga nuo programėlių sekimo užblokavo daugiausia sekimo bandymų <b> %1$s</b> ir <b>%2$s</b> (praėjusią dieną).]]></item>
     </plurals>
 
     <string name="atp_DailyLastCompanyBlockedNotificationOneTimeZeroOtherApps" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[Apsauga nuo programėlių sekimo užblokavo <b>%1$s %2$d kartą per %3$s</b> (praėjusią dieną).]]></string>
@@ -91,10 +91,10 @@
     <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened, %3$d is the number of other apps where this also happened"><![CDATA[Apsauga nuo programėlių sekimo užblokavo <b>%1$d sekimo bandymų %2$s</b> ir %3$d kitose programėlėse (per pastarąją savaitę).]]></string>
 
     <plurals name="atp_WeeklyCompanyTeaserNotification">
-        <item quantity="one"><![CDATA[Apsauga nuo programėlių sekimo užblokavo <b>%1$s %2$d programėlėje, įskaitant %3$s</b> (praėjusią savaitę).]]></item>
+        <item quantity="one" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of apps where blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[Apsauga nuo programėlių sekimo užblokavo <b>%1$s %2$d programėlėje, įskaitant %3$s</b> (praėjusią savaitę).]]></item>
         <item quantity="few"><![CDATA[Apsauga nuo programėlių sekimo užblokavo <b>%1$s %2$d programėlėse, įskaitant %3$s</b> (praėjusią savaitę).]]></item>
         <item quantity="many"><![CDATA[Apsauga nuo programėlių sekimo užblokavo <b>%1$s %2$d programėlėse, įskaitant %3$s</b> (praėjusią savaitę).]]></item>
-        <item quantity="other"><![CDATA[Apsauga nuo programėlių sekimo užblokavo <b>%1$s %2$d programėlių, įskaitant %3$s</b> (praėjusią savaitę).]]></item>
+        <item quantity="other" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of apps where blocked their tracking attempts. %3$s is the name of one of the apps where it happened"><![CDATA[Apsauga nuo programėlių sekimo užblokavo <b>%1$s %2$d programėlių, įskaitant %3$s</b> (praėjusią savaitę).]]></item>
     </plurals>
 
     <string name="atp_EnableCTA">Įjungti apsaugą nuo programėlių sekimo</string>
@@ -281,16 +281,16 @@
 
     <!--  App Tracking Company Details -->
     <plurals name="atp_CompanyDetailsTrackingAttempts">
-        <item quantity="one">%1$d bandymas. Žinoma, kad renka:</item>
+        <item quantity="one" instruction="Placeholder is a number">%1$d bandymas. Žinoma, kad renka:</item>
         <item quantity="few">%1$d bandymai. Žinoma, kad kolekcionuoja:</item>
         <item quantity="many">%1$d attempts. Known to collect:</item>
-        <item quantity="other">%1$d bandymų. Žinoma, kad renka:</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d bandymų. Žinoma, kad renka:</item>
     </plurals>
     <plurals name="atp_CompanyDetailsTrackingAttemptsTitle">
-        <item quantity="one">„DuckDuckGo“ užblokavo %1$d sekimo bandymą</item>
+        <item quantity="one" instruction="Placeholder is a number">„DuckDuckGo“ užblokavo %1$d sekimo bandymą</item>
         <item quantity="few">„DuckDuckGo“ užblokavo %1$d sekimo bandymus</item>
         <item quantity="many">„DuckDuckGo“ užblokavo %1$d sekimo bandymo</item>
-        <item quantity="other">„DuckDuckGo“ užblokavo %1$d sekimo bandymų</item>
+        <item quantity="other" instruction="Placeholder is a number">„DuckDuckGo“ užblokavo %1$d sekimo bandymų</item>
     </plurals>
     <string name="atp_CompanyDetailsTrackingMenuReport">Praneškite apie problemą, susijusią su šia programa</string>
     <string name="atp_CompanyDetailsTrackingShowMore" instruction="Placeholder is a number">Rodyti dar %1$d</string>

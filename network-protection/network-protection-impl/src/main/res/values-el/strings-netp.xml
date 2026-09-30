@@ -89,8 +89,8 @@
     <string name="netpManagementManageItemExclusion">Αποκλεισμένες εφαρμογές</string>
     <string name="netpManagementManageItemExclusionSubtitleEmpty">Κανένα</string>
     <plurals name="netpManagementManageItemExclusionSubtitleAppCount">
-        <item quantity="one">Εφαρμογή %1$d</item>
-        <item quantity="other">Εφαρμογές %1$d</item>
+        <item quantity="one" instruction="Placeholder is a number">Εφαρμογή %1$d</item>
+        <item quantity="other" instruction="Placeholder is a number">Εφαρμογές %1$d</item>
     </plurals>
     <string name="netpManagementVpnSettings">Ρυθμίσεις VPN</string>
 
@@ -242,14 +242,14 @@
     <string name="netpAutoExcludePromptTitle">Θα θέλατε να εξαιρέσετε εφαρμογές που δεν είναι συμβατές με VPN;</string>
     <string name="netpAutoExcludePromptMessage" instruction="Placeholder is a phrase that contains a number">Βρήκαμε %1$s ενώ το VPN είναι συνδεδεμένο.</string>
     <plurals name="netpAutoExcludeAppLabel">
-        <item quantity="one">%1$d νέας εφαρμογή που δεν είναι συμβατή με VPN. Εξαιρέστε την εφαρμογή για να τη χρησιμοποιήσετε</item>
-        <item quantity="other">%1$d νέες εφαρμογές που δεν είναι συμβατές με VPN. Εξαιρέστε αυτές τις εφαρμογές για να τις χρησιμοποιήσετε</item>
+        <item quantity="one" instruction="Placeholder is a number">%1$d νέας εφαρμογή που δεν είναι συμβατή με VPN. Εξαιρέστε την εφαρμογή για να τη χρησιμοποιήσετε</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d νέες εφαρμογές που δεν είναι συμβατές με VPN. Εξαιρέστε αυτές τις εφαρμογές για να τις χρησιμοποιήσετε</item>
     </plurals>
 
     <string name="netpAutoExcludePromptExcludeAllTitle">Θέλετε να εξαιρέσετε όλες τις εφαρμογές που δεν είναι συμβατές με VPN;</string>
     <plurals name="netpAutoExcludeAllAppLabel">
-        <item quantity="one">%1$d ακόμα εφαρμογή που δεν είναι συμβατή με VPN. Εξαιρέστε την εφαρμογή για να τη χρησιμοποιήσετε</item>
-        <item quantity="other">%1$d ακόμα εφαρμογές που δεν είναι συμβατές με VPN. Εξαιρέστε αυτές τις εφαρμογές για να τις χρησιμοποιήσετε</item>
+        <item quantity="one" instruction="Placeholder is a number">%1$d ακόμα εφαρμογή που δεν είναι συμβατή με VPN. Εξαιρέστε την εφαρμογή για να τη χρησιμοποιήσετε</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d ακόμα εφαρμογές που δεν είναι συμβατές με VPN. Εξαιρέστε αυτές τις εφαρμογές για να τις χρησιμοποιήσετε</item>
     </plurals>
     <string name="netpAutoExcludePromptOptionEnable">Αυτόματη εξαίρεση μη συμβατών εφαρμογών</string>
     <string name="netpAutoExcludePromptActionAdd">Αποκλεισμός εφαρμογών</string>

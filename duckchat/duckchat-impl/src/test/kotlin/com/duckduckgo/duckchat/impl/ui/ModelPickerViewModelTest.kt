@@ -20,6 +20,7 @@ import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
+import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.models.AIChatModel
@@ -44,6 +45,7 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -79,6 +81,9 @@ class ModelPickerViewModelTest {
     private val duckAiChatStore: DuckAiChatStore = mock<DuckAiChatStore>().also {
         whenever(it.getChatsFlow()).thenReturn(chatsFlow)
     }
+    private val duckChatInternal: DuckChatInternal = mock<DuckChatInternal>().also {
+        whenever(it.showModelPickerEvents).thenReturn(emptyFlow())
+    }
 
     private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
 
@@ -94,6 +99,7 @@ class ModelPickerViewModelTest {
             duckAiChatStore = duckAiChatStore,
             effectiveModelProvider = RealEffectiveModelProvider(modelManager, nativeInputStateProvider, duckAiChatStore),
             duckChatFeature = duckChatFeature,
+            duckChatInternal = duckChatInternal,
         )
     }
 
@@ -885,6 +891,7 @@ class ModelPickerViewModelTest {
                 override fun clearRecoveryModelPick(chatId: String?) = Unit
             },
             duckChatFeature = duckChatFeature,
+            duckChatInternal = duckChatInternal,
         )
         nativeInputState.value = nativeInputState.value.copy(chatId = "chat-A")
         advanceUntilIdle()

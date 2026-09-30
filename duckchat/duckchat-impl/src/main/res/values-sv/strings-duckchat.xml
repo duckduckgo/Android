@@ -255,8 +255,8 @@
     <string name="duck_ai_chat_history_action_new">Ny</string>
     <string name="duck_ai_chat_history_action_download_selected_content_description">Ladda ner chattar</string>
     <plurals name="duck_ai_chat_history_bulk_download_complete">
-        <item quantity="one">Nedladdning klar för %1$d chatt</item>
-        <item quantity="other">Nedladdning klar för %1$d chattar</item>
+        <item quantity="one" instruction="%1$d is the number of chats downloaded">Nedladdning klar för %1$d chatt</item>
+        <item quantity="other" instruction="%1$d is the number of chats downloaded">Nedladdning klar för %1$d chattar</item>
     </plurals>
     <string name="duck_ai_chat_history_action_overflow_content_description">Öppna överflödesmeny</string>
     <string name="duck_ai_chat_history_select_all">Välj alla</string>
@@ -366,7 +366,7 @@
 
     <!-- Prefix on the Duck.ai attachment chip for a text selection -->
     <plurals name="duckAiTextSelectionWordCount">
-        <item quantity="one">%1$d ord</item>
-        <item quantity="other">%1$d ord</item>
+        <item quantity="one" instruction="%1$d is the number of words in the selection.">%1$d ord</item>
+        <item quantity="other" instruction="%1$d is the number of words in the selection.">%1$d ord</item>
     </plurals>
 </resources>

@@ -255,10 +255,10 @@
     <string name="duck_ai_chat_history_action_new">Nowe</string>
     <string name="duck_ai_chat_history_action_download_selected_content_description">Pobierz czaty</string>
     <plurals name="duck_ai_chat_history_bulk_download_complete">
-        <item quantity="one">Pobieranie zakończone dla %1$d czatu</item>
+        <item quantity="one" instruction="%1$d is the number of chats downloaded">Pobieranie zakończone dla %1$d czatu</item>
         <item quantity="few">Pobieranie zakończone dla %1$d czatów</item>
         <item quantity="many">Pobieranie zakończone dla %1$d czatów</item>
-        <item quantity="other">Pobieranie zakończone dla %1$d czatów</item>
+        <item quantity="other" instruction="%1$d is the number of chats downloaded">Pobieranie zakończone dla %1$d czatów</item>
     </plurals>
     <string name="duck_ai_chat_history_action_overflow_content_description">Otwórz menu przepełnienia</string>
     <string name="duck_ai_chat_history_select_all">Wybierz wszystko</string>
@@ -368,9 +368,9 @@
 
     <!-- Prefix on the Duck.ai attachment chip for a text selection -->
     <plurals name="duckAiTextSelectionWordCount">
-        <item quantity="one">%1$d słowo</item>
+        <item quantity="one" instruction="%1$d is the number of words in the selection.">%1$d słowo</item>
         <item quantity="few">%1$d słowa</item>
         <item quantity="many">%1$d słów</item>
-        <item quantity="other">%1$d słowa</item>
+        <item quantity="other" instruction="%1$d is the number of words in the selection.">%1$d słowa</item>
     </plurals>
 </resources>

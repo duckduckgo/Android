@@ -40,6 +40,14 @@ interface SitePermissionsManager {
     suspend fun clearAllButFireproof(fireproofDomains: List<String>)
 
     /**
+     * Deletes site permissions for every site under [domains], except the ones that are fireproof
+     *
+     * @param domains registrable domains (eTLD+1, or the raw host when there is none) whose sites' permissions are deleted
+     * @param fireproofDomains list of domains that are fireproof
+     */
+    suspend fun clearForDomainsButFireproof(domains: Set<String>, fireproofDomains: List<String>)
+
+    /**
      * Returns the proper response for a permissions.query JavaScript API call - see
      * https://developer.mozilla.org/en-US/docs/Web/API/Permissions/query
      *

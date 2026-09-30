@@ -58,4 +58,10 @@
     <string name="browserMenuForward">Avanti</string>
     <string name="browserMenuRefresh">Aggiorna</string>
     <string name="browserMenuFireTabsData">Elimina schede e dati</string>
+
+    <!-- Duck.ai tab + menu -->
+    <string name="chatMenuPopupNewVoiceChat">Nuova chat vocale</string>
+    <string name="chatMenuPopupNewImage">Nuova immagine</string>
+    <string name="chatMenuPopupNewTab">Nuova scheda</string>
+    <string name="chatMenuPopupNewFireTab">Nuova scheda Fire</string>
 </resources>

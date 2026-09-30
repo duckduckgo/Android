@@ -89,10 +89,10 @@
     <string name="netpManagementManageItemExclusion">Neįtrauktos programėlės</string>
     <string name="netpManagementManageItemExclusionSubtitleEmpty">Jokie</string>
     <plurals name="netpManagementManageItemExclusionSubtitleAppCount">
-        <item quantity="one">%1$d programėlė</item>
+        <item quantity="one" instruction="Placeholder is a number">%1$d programėlė</item>
         <item quantity="few">%1$d programėlės</item>
         <item quantity="many">%1$d programėlės</item>
-        <item quantity="other">%1$d programėlės</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d programėlės</item>
     </plurals>
     <string name="netpManagementVpnSettings">VPN nustatymai</string>
 
@@ -244,18 +244,18 @@
     <string name="netpAutoExcludePromptTitle">Ar norėtum išskirti programas, kurios nesuderinamos su VPN?</string>
     <string name="netpAutoExcludePromptMessage" instruction="Placeholder is a phrase that contains a number">Kai VPN prijungtas, radome %1$s .</string>
     <plurals name="netpAutoExcludeAppLabel">
-        <item quantity="one">%1$d naujos programos, nesuderinamos su VPN. Pašalink šias programas, kad galėtum jas naudoti</item>
+        <item quantity="one" instruction="Placeholder is a number">%1$d naujos programos, nesuderinamos su VPN. Pašalink šias programas, kad galėtum jas naudoti</item>
         <item quantity="few">%1$d naujos programos, nesuderinamos su VPN. Pašalink šias programas, kad galėtum jas naudoti</item>
         <item quantity="many">%1$d naujos programos, nesuderinamos su VPN. Pašalink šias programas, kad galėtum jas naudoti</item>
-        <item quantity="other">%1$d naujos programos, nesuderinamos su VPN. Pašalinkite šias programas, kad galėtumėte jas naudoti</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d naujos programos, nesuderinamos su VPN. Pašalinkite šias programas, kad galėtumėte jas naudoti</item>
     </plurals>
 
     <string name="netpAutoExcludePromptExcludeAllTitle">Ar norėtum išskirti visas programas, kurios nesuderinamos su VPN?</string>
     <plurals name="netpAutoExcludeAllAppLabel">
-        <item quantity="one">%1$d kitos programos, nesuderinamos su VPN. Išskirk šias programas, kad galėtum jas naudoti</item>
+        <item quantity="one" instruction="Placeholder is a number">%1$d kitos programos, nesuderinamos su VPN. Išskirk šias programas, kad galėtum jas naudoti</item>
         <item quantity="few">%1$d kitos programos, nesuderinamos su VPN. Išskirk šias programas, kad galėtum jas naudoti</item>
         <item quantity="many">%1$d kitos programos, nesuderinamos su VPN. Išskirk šias programas, kad galėtum jas naudoti</item>
-        <item quantity="other">%1$d kitos programos, nesuderinamos su VPN. Išskirk šias programas, kad galėtum jas naudoti</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d kitos programos, nesuderinamos su VPN. Išskirk šias programas, kad galėtum jas naudoti</item>
     </plurals>
     <string name="netpAutoExcludePromptOptionEnable">Automatiškai pašalinti nesuderinamas programas</string>
     <string name="netpAutoExcludePromptActionAdd">Neįtraukti programėlių</string>

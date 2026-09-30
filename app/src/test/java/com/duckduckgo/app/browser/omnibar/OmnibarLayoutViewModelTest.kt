@@ -3232,4 +3232,37 @@ class OmnibarLayoutViewModelTest {
             assertFalse(viewState.isProgressBarIndeterminateEnabled)
         }
     }
+
+    @Test
+    fun whenUpgradeAndAnimationConfigEnabledThenAnimationUpdateFlagIsTrue() = runTest {
+        fakeProgressBarUpgradeFeature.behaviourUpdate().setRawStoredState(Toggle.State(enable = true))
+        fakeProgressBarUpgradeFeature.animationConfigUpdate().setRawStoredState(Toggle.State(enable = true))
+        initializeViewModel()
+
+        testee.viewState.test {
+            assertTrue(awaitItem().isAnimationUpdateEnabled)
+        }
+    }
+
+    @Test
+    fun whenUpgradeEnabledButAnimationConfigDisabledThenAnimationUpdateFlagIsFalse() = runTest {
+        fakeProgressBarUpgradeFeature.behaviourUpdate().setRawStoredState(Toggle.State(enable = true))
+        fakeProgressBarUpgradeFeature.animationConfigUpdate().setRawStoredState(Toggle.State(enable = false))
+        initializeViewModel()
+
+        testee.viewState.test {
+            assertFalse(awaitItem().isAnimationUpdateEnabled)
+        }
+    }
+
+    @Test
+    fun whenUpgradeDisabledButAnimationConfigEnabledThenAnimationUpdateFlagIsFalse() = runTest {
+        fakeProgressBarUpgradeFeature.behaviourUpdate().setRawStoredState(Toggle.State(enable = false))
+        fakeProgressBarUpgradeFeature.animationConfigUpdate().setRawStoredState(Toggle.State(enable = true))
+        initializeViewModel()
+
+        testee.viewState.test {
+            assertFalse(awaitItem().isAnimationUpdateEnabled)
+        }
+    }
 }

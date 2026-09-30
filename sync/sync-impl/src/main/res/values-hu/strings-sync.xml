@@ -376,7 +376,7 @@
 
     <!-- Pairing screen -->
     <string name="sync_simplified_pairing_headline">A Sync &amp; Backup végpontok közötti titkosítással működik minden eszközödön.</string>
-    <string name="sync_simplified_pairing_headline_check_other_device">Ellenőrizd a másik eszközödet</string>
+    <string name="sync_simplified_pairing_headline_check_other_device">Nézd meg a másik eszközödön.</string>
     <string name="sync_simplified_pairing_headline_recovery">Adatok helyreállítása</string>
     <string name="sync_simplified_pairing_body">Csatlakozás…</string>
 

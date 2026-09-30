@@ -58,4 +58,10 @@
     <string name="browserMenuForward">Ďalej</string>
     <string name="browserMenuRefresh">Obnoviť</string>
     <string name="browserMenuFireTabsData">Odstrániť karty a údaje</string>
+
+    <!-- Duck.ai tab + menu -->
+    <string name="chatMenuPopupNewVoiceChat">Nový hlasový čet</string>
+    <string name="chatMenuPopupNewImage">Nový obrázok</string>
+    <string name="chatMenuPopupNewTab">Nová karta</string>
+    <string name="chatMenuPopupNewFireTab">Nová karta Fire</string>
 </resources>

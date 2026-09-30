@@ -89,10 +89,10 @@
     <string name="netpManagementManageItemExclusion">Izključene aplikacije</string>
     <string name="netpManagementManageItemExclusionSubtitleEmpty">Brez</string>
     <plurals name="netpManagementManageItemExclusionSubtitleAppCount">
-        <item quantity="one">%1$d aplikacija</item>
+        <item quantity="one" instruction="Placeholder is a number">%1$d aplikacija</item>
         <item quantity="two">%1$d aplikaciji</item>
         <item quantity="few">%1$d aplikacije</item>
-        <item quantity="other">%1$d aplikacij</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d aplikacij</item>
     </plurals>
     <string name="netpManagementVpnSettings">Nastavitve VPN</string>
 
@@ -244,18 +244,18 @@
     <string name="netpAutoExcludePromptTitle">Želite izključiti aplikacije, ki niso združljive z omrežji VPN?</string>
     <string name="netpAutoExcludePromptMessage" instruction="Placeholder is a phrase that contains a number">Našli smo %1$s, medtem ko je VPN povezan.</string>
     <plurals name="netpAutoExcludeAppLabel">
-        <item quantity="one">%1$d nova aplikacija, ki ni združljiva z VPN-ji. Izključite to aplikacijo, da jo boste lahko uporabljali.</item>
+        <item quantity="one" instruction="Placeholder is a number">%1$d nova aplikacija, ki ni združljiva z VPN-ji. Izključite to aplikacijo, da jo boste lahko uporabljali.</item>
         <item quantity="two">%1$d novi aplikaciji, ki nista združljivi z VPN-ji. Izključite ti aplikaciji, da ju boste lahko uporabljali.</item>
         <item quantity="few">%1$d nove aplikacije, ki niso združljive z VPN-ji. Izključite te aplikacije, da jih boste lahko uporabljali.</item>
-        <item quantity="other">%1$d novih aplikacij, ki niso združljive z VPN-ji. Izključite te aplikacije, da jih boste lahko uporabljali.</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d novih aplikacij, ki niso združljive z VPN-ji. Izključite te aplikacije, da jih boste lahko uporabljali.</item>
     </plurals>
 
     <string name="netpAutoExcludePromptExcludeAllTitle">Želite izključiti vse aplikacije, ki niso združljive z VPN-ji?</string>
     <plurals name="netpAutoExcludeAllAppLabel">
-        <item quantity="one">%1$d druga aplikacija, ki ni združljiva z VPN-ji. Izključite to aplikacijo, da jih boste lahko uporabljali.</item>
+        <item quantity="one" instruction="Placeholder is a number">%1$d druga aplikacija, ki ni združljiva z VPN-ji. Izključite to aplikacijo, da jih boste lahko uporabljali.</item>
         <item quantity="two">%1$d drugi aplikaciji, ki nista združljivi z VPN-ji. Izključite ti aplikaciji, da ju boste lahko uporabljali.</item>
         <item quantity="few">%1$d druge aplikacije, ki niso združljive z VPN-ji. Izključite te aplikacije, da jih boste lahko uporabljali.</item>
-        <item quantity="other">%1$d drugih aplikacij, ki niso združljive z VPN-ji. Izključite te aplikacije, da jih boste lahko uporabljali.</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d drugih aplikacij, ki niso združljive z VPN-ji. Izključite te aplikacije, da jih boste lahko uporabljali.</item>
     </plurals>
     <string name="netpAutoExcludePromptOptionEnable">Samodejno izključi nezdružljive aplikacije</string>
     <string name="netpAutoExcludePromptActionAdd">Izključi aplikacije</string>

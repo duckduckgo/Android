@@ -76,6 +76,7 @@ constructor(
 
 private val mobileRegex = Regex("(phone|tablet)", RegexOption.IGNORE_CASE)
 private val desktopRegex = Regex("(desktop)", RegexOption.IGNORE_CASE)
+private val browserRegex = Regex("(browser)", RegexOption.IGNORE_CASE)
 
 data class DeviceType(val deviceFactor: String = "") {
     fun type(): Type {
@@ -88,10 +89,11 @@ data class DeviceType(val deviceFactor: String = "") {
     }
 }
 
-fun Type.asDrawableRes(): Int {
-    return when (this) {
+fun DeviceType.iconRes(): Int {
+    if (deviceFactor.contains(browserRegex)) return com.duckduckgo.mobile.android.R.drawable.ic_globe_24
+    return when (type()) {
         MOBILE -> R.drawable.ic_device_mobile_24
-        UNKNOWN -> R.drawable.ic_device_mobile_24
+        UNKNOWN -> com.duckduckgo.mobile.android.R.drawable.ic_device_all_24
         DESKTOP -> R.drawable.ic_device_desktop_24
     }
 }

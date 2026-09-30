@@ -339,6 +339,7 @@ class RealDuckChatJSHelperTest {
             put("supportsAIChatSync", false)
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
+            put("supportsNativeUsageWarnings", false)
             put("supportsMultipleContexts", false)
             put("supportsSuggestions", false)
             put("supportsSubscription", false)
@@ -352,6 +353,75 @@ class RealDuckChatJSHelperTest {
         assertEquals(expected.method, result.method)
         assertEquals(expected.featureName, result.featureName)
         assertEquals(expected.params.toString(), result.params.toString())
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndAllUsageWarningGatesPassThenSupportsNativeUsageWarningsIsTrue() = runTest {
+        mockDuckChatFeature.duckAiUsageWarnings().setRawStoredState(Toggle.State(enable = true))
+        whenever(mockDuckChat.isNativeChatInputEnabled()).thenReturn(true)
+        whenever(mockDuckChat.isNativeStorageEnabled()).thenReturn(true)
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativeConfigValues",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertTrue(result!!.params.getBoolean("supportsNativeUsageWarnings"))
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndUsageWarningsFlagDisabledThenSupportsNativeUsageWarningsIsFalse() = runTest {
+        mockDuckChatFeature.duckAiUsageWarnings().setRawStoredState(Toggle.State(enable = false))
+        whenever(mockDuckChat.isNativeChatInputEnabled()).thenReturn(true)
+        whenever(mockDuckChat.isNativeStorageEnabled()).thenReturn(true)
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativeConfigValues",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertFalse(result!!.params.getBoolean("supportsNativeUsageWarnings"))
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndNativeStorageDisabledThenSupportsNativeUsageWarningsIsFalse() = runTest {
+        mockDuckChatFeature.duckAiUsageWarnings().setRawStoredState(Toggle.State(enable = true))
+        whenever(mockDuckChat.isNativeChatInputEnabled()).thenReturn(true)
+        whenever(mockDuckChat.isNativeStorageEnabled()).thenReturn(false)
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativeConfigValues",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertFalse(result!!.params.getBoolean("supportsNativeUsageWarnings"))
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesInFireModeThenSupportsNativeUsageWarningsIsFalse() = runTest {
+        mockDuckChatFeature.duckAiUsageWarnings().setRawStoredState(Toggle.State(enable = true))
+        whenever(mockDuckChat.isNativeChatInputEnabled()).thenReturn(true)
+        whenever(mockDuckChat.isNativeStorageEnabled()).thenReturn(true)
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativeConfigValues",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+            browserMode = BrowserMode.FIRE,
+        )
+
+        assertFalse(result!!.params.getBoolean("supportsNativeUsageWarnings"))
     }
 
     @Test
@@ -712,6 +782,7 @@ class RealDuckChatJSHelperTest {
             put("supportsAIChatSync", false)
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
+            put("supportsNativeUsageWarnings", false)
             put("supportsMultipleContexts", false)
             put("supportsSuggestions", false)
             put("supportsSubscription", false)
@@ -811,6 +882,7 @@ class RealDuckChatJSHelperTest {
             put("supportsAIChatSync", false)
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
+            put("supportsNativeUsageWarnings", false)
             put("supportsMultipleContexts", false)
             put("supportsSuggestions", false)
             put("supportsSubscription", false)
@@ -972,6 +1044,7 @@ class RealDuckChatJSHelperTest {
             put("supportsAIChatSync", false)
             put("supportsPageContext", true)
             put("supportsNativeStorage", false)
+            put("supportsNativeUsageWarnings", false)
             put("supportsMultipleContexts", false)
             put("supportsSuggestions", false)
             put("supportsSubscription", false)
@@ -1076,6 +1149,7 @@ class RealDuckChatJSHelperTest {
             put("supportsAIChatSync", false)
             put("supportsPageContext", true)
             put("supportsNativeStorage", false)
+            put("supportsNativeUsageWarnings", false)
             put("supportsMultipleContexts", true)
             put("supportsSuggestions", false)
             put("supportsSubscription", false)
@@ -1123,6 +1197,7 @@ class RealDuckChatJSHelperTest {
             put("supportsAIChatSync", false)
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
+            put("supportsNativeUsageWarnings", false)
             put("supportsMultipleContexts", false)
             put("supportsSuggestions", false)
             put("supportsSubscription", false)
@@ -1170,6 +1245,7 @@ class RealDuckChatJSHelperTest {
             put("supportsAIChatSync", false)
             put("supportsPageContext", false)
             put("supportsNativeStorage", true)
+            put("supportsNativeUsageWarnings", false)
             put("supportsMultipleContexts", false)
             put("supportsSuggestions", false)
             put("supportsSubscription", false)
@@ -1711,6 +1787,7 @@ class RealDuckChatJSHelperTest {
             put("supportsAIChatSync", false)
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
+            put("supportsNativeUsageWarnings", false)
             put("supportsMultipleContexts", false)
             put("supportsSuggestions", false)
             put("supportsSubscription", false)
@@ -1755,6 +1832,7 @@ class RealDuckChatJSHelperTest {
             put("supportsAIChatSync", false)
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
+            put("supportsNativeUsageWarnings", false)
             put("supportsMultipleContexts", false)
             put("supportsSuggestions", false)
             put("supportsSubscription", false)
@@ -1799,6 +1877,7 @@ class RealDuckChatJSHelperTest {
             put("supportsAIChatSync", true)
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
+            put("supportsNativeUsageWarnings", false)
             put("supportsMultipleContexts", false)
             put("supportsSuggestions", false)
             put("supportsSubscription", false)
@@ -1844,6 +1923,7 @@ class RealDuckChatJSHelperTest {
             put("supportsAIChatSync", false)
             put("supportsPageContext", false)
             put("supportsNativeStorage", false)
+            put("supportsNativeUsageWarnings", false)
             put("supportsMultipleContexts", false)
             put("supportsSuggestions", false)
             put("supportsSubscription", false)

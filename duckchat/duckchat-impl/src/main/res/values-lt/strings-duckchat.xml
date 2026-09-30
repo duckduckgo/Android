@@ -255,10 +255,10 @@
     <string name="duck_ai_chat_history_action_new">Naujas</string>
     <string name="duck_ai_chat_history_action_download_selected_content_description">Atsisiųsk pokalbius</string>
     <plurals name="duck_ai_chat_history_bulk_download_complete">
-        <item quantity="one">%1$d pokalbio atsisiuntimas baigtas</item>
+        <item quantity="one" instruction="%1$d is the number of chats downloaded">%1$d pokalbio atsisiuntimas baigtas</item>
         <item quantity="few">%1$d pokalbių atsisiuntimas baigtas</item>
         <item quantity="many">%1$d pokalbio atsisiuntimas baigtas</item>
-        <item quantity="other">%1$d pokalbių atsisiuntimas baigtas</item>
+        <item quantity="other" instruction="%1$d is the number of chats downloaded">%1$d pokalbių atsisiuntimas baigtas</item>
     </plurals>
     <string name="duck_ai_chat_history_action_overflow_content_description">Atidaryti papildomą meniu</string>
     <string name="duck_ai_chat_history_select_all">Pasirinkti viską</string>
@@ -368,9 +368,9 @@
 
     <!-- Prefix on the Duck.ai attachment chip for a text selection -->
     <plurals name="duckAiTextSelectionWordCount">
-        <item quantity="one">%1$d žodis</item>
+        <item quantity="one" instruction="%1$d is the number of words in the selection.">%1$d žodis</item>
         <item quantity="few">%1$d žodžiai</item>
         <item quantity="many">%1$d žodžio</item>
-        <item quantity="other">%1$d žodžių</item>
+        <item quantity="other" instruction="%1$d is the number of words in the selection.">%1$d žodžių</item>
     </plurals>
 </resources>

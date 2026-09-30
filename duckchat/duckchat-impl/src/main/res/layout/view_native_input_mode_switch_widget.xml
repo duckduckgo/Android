@@ -137,30 +137,21 @@
                         android:textSize="16sp"
                         android:textStyle="normal" />
 
-                    <ImageView
-                        android:id="@+id/inputFieldVoiceInputButton"
-                        android:layout_width="@dimen/toolbarIcon"
-                        android:layout_height="@dimen/toolbarIcon"
+                    <FrameLayout
+                        android:id="@+id/voiceSearchContainer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
-                        android:background="@drawable/selectable_item_rounded_corner_background"
-                        android:gravity="center"
-                        android:importantForAccessibility="no"
-                        android:scaleType="center"
                         android:visibility="gone"
-                        app:srcCompat="@drawable/ic_microphone_24"
                         tools:visibility="visible" />
 
-                    <ImageView
-                        android:id="@+id/inputFieldClearText"
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
+                    <FrameLayout
+                        android:id="@+id/clearTextContainer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
-                        android:background="@drawable/selectable_item_rounded_corner_background"
-                        android:gravity="center"
-                        android:importantForAccessibility="no"
-                        android:scaleType="centerInside"
                         android:visibility="gone"
-                        app:srcCompat="@drawable/ic_close_circle_small_secondary_24" />
+                        tools:visibility="visible" />
 
                     <FrameLayout
                         android:id="@id/startChatContainer"
@@ -243,10 +234,20 @@
                             tools:visibility="visible" />
 
                         <FrameLayout
-                            android:id="@+id/inputScreenButtonsContainer"
+                            android:id="@+id/voiceChatContainer"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:visibility="gone" />
+                            android:layout_marginStart="@dimen/keyline_1"
+                            android:visibility="gone"
+                            tools:visibility="visible" />
+
+                        <FrameLayout
+                            android:id="@+id/submitButtonContainer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/keyline_1"
+                            android:visibility="gone"
+                            tools:visibility="visible" />
 
                     </LinearLayout>
 

@@ -255,8 +255,8 @@
     <string name="duck_ai_chat_history_action_new">Új</string>
     <string name="duck_ai_chat_history_action_download_selected_content_description">Csevegések letöltése</string>
     <plurals name="duck_ai_chat_history_bulk_download_complete">
-        <item quantity="one">%1$d csevegés letöltése befejeződött</item>
-        <item quantity="other">%1$d csevegés letöltése befejeződött</item>
+        <item quantity="one" instruction="%1$d is the number of chats downloaded">%1$d csevegés letöltése befejeződött</item>
+        <item quantity="other" instruction="%1$d is the number of chats downloaded">%1$d csevegés letöltése befejeződött</item>
     </plurals>
     <string name="duck_ai_chat_history_action_overflow_content_description">Túlfolyó menü megnyitása</string>
     <string name="duck_ai_chat_history_select_all">Összes kijelölése</string>
@@ -366,7 +366,7 @@
 
     <!-- Prefix on the Duck.ai attachment chip for a text selection -->
     <plurals name="duckAiTextSelectionWordCount">
-        <item quantity="one">%1$d szó</item>
-        <item quantity="other">%1$d szó</item>
+        <item quantity="one" instruction="%1$d is the number of words in the selection.">%1$d szó</item>
+        <item quantity="other" instruction="%1$d is the number of words in the selection.">%1$d szó</item>
     </plurals>
 </resources>

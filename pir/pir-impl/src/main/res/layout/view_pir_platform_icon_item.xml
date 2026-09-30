@@ -16,32 +16,24 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:clipToPadding="false"
+    android:gravity="center_vertical"
     android:orientation="horizontal">
 
     <ImageView
-        android:id="@+id/actionNewLine"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:layout_marginStart="8dp"
-        android:background="@drawable/selectable_item_rounded_corner_background"
-        android:importantForAccessibility="no"
-        android:scaleType="centerInside"
-        android:src="@drawable/ic_enter_24"
-        android:visibility="visible" />
+        android:id="@+id/platformIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:ignore="ContentDescription"
+        tools:src="@drawable/platform_apple_24" />
 
-    <ImageView
-        android:id="@+id/actionSend"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:layout_marginStart="8dp"
-        android:background="@drawable/background_duck_ai_send_button"
-        android:importantForAccessibility="no"
-        android:scaleType="centerInside"
-        android:src="@drawable/ic_arrow_right_24"
-        android:visibility="gone"
-        app:tint="?attr/daxColorButtonPrimaryText" />
-
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/platformName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_2"
+        app:typography="h3"
+        tools:text="iOS" />
 </LinearLayout>

@@ -143,4 +143,15 @@
     <string name="subscriptionOnboardingFeatureInfoPirItem5Title">Monitor removal progress in real time</string>
     <string name="subscriptionOnboardingFeatureInfoPirItem5Description">It can take a while for sites to update, so we made it easy to keep tabs on progress of ongoing removals and see the personal info we\'ve removed in real time on your personal dashboard.</string>
 
+    <!-- Onboarding completion summary -->
+    <string name="subscriptionOnboardingCompletionTitle">Nice work!</string>
+    <string name="subscriptionOnboardingCompletionDescription">You can continue setting up your new premium protections in Settings &gt; Subscriptions Settings.</string>
+    <string name="subscriptionOnboardingCompletionPercentage" instruction="Placeholder is the percentage of the subscription onboarding the user has completed, shown above the word 'completed'">%1$d%%</string>
+    <string name="subscriptionOnboardingCompletionPercentageLabel">completed</string>
+    <string name="subscriptionOnboardingCompletionPrimaryButton">Done</string>
+    <string name="subscriptionOnboardingCompletionHandoffTitle">Duck.ai Private Chat</string>
+    <string name="subscriptionOnboardingCompletionHandoffDescription">Once you finish chatting, you can continue setting up your new premium protections in Settings &gt; Subscriptions Settings.</string>
+    <string name="subscriptionOnboardingCompletionCompleteTitle">You are all set up and ready to go!</string>
+    <string name="subscriptionOnboardingCompletionCompletePrimaryButton">Got It</string>
+
 </resources>

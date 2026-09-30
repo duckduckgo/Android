@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 DuckDuckGo
+ * Copyright (c) 2026 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.pir.api.dashboard
+package com.duckduckgo.subscriptions.impl.onboarding
 
-import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.di.scopes.ActivityScope
+import dagger.SingleInstanceIn
+import javax.inject.Inject
 
-/**
- * Use this model to launch the PIR Dashboard WebView screen.
- */
-data object PirDashboardWebViewScreen : GlobalActivityStarter.ActivityParams
+@SingleInstanceIn(ActivityScope::class)
+class SubscriptionOnboardingHandoffState @Inject constructor() {
+    var isHandoff: Boolean = false
+}
