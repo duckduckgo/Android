@@ -26,6 +26,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
+import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
@@ -43,6 +44,9 @@ class SubscriptionOnboardingWelcomeFragment : DuckDuckGoFragment(R.layout.fragme
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
 
+    @Inject
+    lateinit var appTheme: AppTheme
+
     private val binding: FragmentSubscriptionOnboardingWelcomeBinding by viewBinding()
     private val viewModel: SubscriptionOnboardingWelcomeViewModel by lazy {
         ViewModelProvider(this, viewModelFactory)[SubscriptionOnboardingWelcomeViewModel::class.java]
@@ -50,6 +54,15 @@ class SubscriptionOnboardingWelcomeFragment : DuckDuckGoFragment(R.layout.fragme
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        binding.subscriptionOnboardingWelcomeBackground.setImageResource(
+            if (appTheme.isLightModeEnabled()) {
+                R.drawable.onboarding_welcome_background
+            } else {
+                R.drawable.onboarding_welcome_background_dark
+            },
+        )
+
         binding.subscriptionOnboardingWelcomePrimaryButton.setOnClickListener {
             viewModel.onPrimaryCtaClicked()
         }
