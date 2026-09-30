@@ -372,10 +372,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
         selectionsJson: JSONArray? = null,
     ) {
         val attachedContext = pageContextState.attachedPage.takeIf { _viewState.value.showContext }
-        selectionsJson?.length()?.takeIf { it > 0 }?.let {
-            duckChatPixels.reportContextualPromptSubmittedWithSelections(it)
-            selectionJourney.onPromptSubmitted(viewState.value.tabId)
-        }
+        selectionsJson?.length()?.takeIf { it > 0 }?.let { duckChatPixels.reportContextualPromptSubmittedWithSelections(it) }
         submitPrompt(prompt, followUpPrefill, modelId, reasoningEffort, selectedTool, imagesJson, filesJson, attachedContext, selectionsJson)
     }
 

@@ -159,7 +159,7 @@ class DuckChatContextualWebViewViewModelTest {
     }
 
     @Test
-    fun `onPromptSent with selections reports the pixel and ends the journey as submitted`() = runTest {
+    fun `onPromptSent with selections reports the pixel`() = runTest {
         testee.onSheetOpened("tab-1")
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
         val selections = JSONArray().apply {
@@ -170,7 +170,6 @@ class DuckChatContextualWebViewViewModelTest {
         testee.onPromptSent("Explain", selectionsJson = selections)
 
         verify(duckChatPixels).reportContextualPromptSubmittedWithSelections(2)
-        verify(selectionJourney).onPromptSubmitted("tab-1")
     }
 
     @Test

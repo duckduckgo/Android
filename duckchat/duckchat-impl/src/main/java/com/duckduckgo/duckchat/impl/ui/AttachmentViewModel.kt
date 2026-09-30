@@ -48,6 +48,7 @@ import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachmentProcessor
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionPayloadBuilder
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionRepository
+import com.duckduckgo.duckchat.impl.wideevents.DuckAiSelectionJourneyWideEvent
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -79,6 +80,7 @@ class AttachmentViewModel @Inject constructor(
     private val duckChatPixels: DuckChatPixels,
     private val textSelectionRepository: TextSelectionRepository,
     private val textSelectionPayloadBuilder: TextSelectionPayloadBuilder,
+    private val selectionJourney: DuckAiSelectionJourneyWideEvent,
 ) : ViewModel() {
 
     var textSelectionsTabId: String? = null
@@ -387,7 +389,9 @@ class AttachmentViewModel @Inject constructor(
 
     fun getTextSelectionsJson(): JSONArray? {
         val tabId = textSelectionsTabId ?: return null
-        return textSelectionPayloadBuilder.toJson(textSelectionRepository.consume(tabId))
+        val selections = textSelectionRepository.consume(tabId)
+        if (selections.isNotEmpty()) selectionJourney.onPromptSubmitted(tabId)
+        return textSelectionPayloadBuilder.toJson(selections)
     }
 
     fun setPageContext(attachment: PageContextAttachment) {

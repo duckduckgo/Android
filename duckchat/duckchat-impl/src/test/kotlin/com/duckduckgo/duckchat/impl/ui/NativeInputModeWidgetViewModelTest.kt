@@ -66,7 +66,6 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.reader.ChatSuggestionsReader
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.RealTextSelectionRepository
-import com.duckduckgo.duckchat.impl.wideevents.DuckAiSelectionJourneyWideEvent
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -127,7 +126,6 @@ class NativeInputModeWidgetViewModelTest {
     private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
     private val pixel: Pixel = mock()
     private val duckChatPixels: DuckChatPixels = mock()
-    private val selectionJourney: DuckAiSelectionJourneyWideEvent = mock()
     private val modelManager: DuckAiModelManager = mock()
     private val duckAiChatStore: DuckAiChatStore = mock()
     private val history: NavigationHistory = mock()
@@ -211,7 +209,6 @@ class NativeInputModeWidgetViewModelTest {
             modelManager = modelManager,
             duckAiChatStore = duckAiChatStore,
             history = history,
-            selectionJourney = selectionJourney,
             appCoroutineScope = TestScope(coroutineRule.testDispatcher),
         )
     }
@@ -1085,17 +1082,6 @@ class NativeInputModeWidgetViewModelTest {
         val state = nativeInputStateProvider.stateForTab("tab-A").value
         assertTrue(state.voiceSearchAvailable)
         assertTrue(state.voiceChatAvailable)
-    }
-
-    @Test
-    fun whenPromptSubmittedThenJourneySubmittedForActiveTab() = runTest {
-        val viewModel = createViewModel()
-        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
-        advanceUntilIdle()
-
-        viewModel.onPromptSubmitted()
-
-        verify(selectionJourney).onPromptSubmitted("tab-A")
     }
 
     @Test
