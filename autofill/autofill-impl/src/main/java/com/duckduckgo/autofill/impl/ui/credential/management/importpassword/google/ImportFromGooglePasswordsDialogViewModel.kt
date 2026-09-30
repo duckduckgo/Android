@@ -109,12 +109,20 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
         viewModelScope.launch {
             when (val converted = credentialExchangePasswordImporter.convertAndDeduplicate(result)) {
                 is CredentialExchangeImportResult.Success -> {
+                    importPasswordsPixelSender.onCredentialExchangeImportSucceeded(
+                        savedCredentials = converted.credentials.size,
+                        numberSkipped = converted.originalCount - converted.credentials.size,
+                    )
                     credentialImporter.import(converted.credentials, converted.originalCount, importSource)
                     onImportFlowFinishedSuccessfully()
                 }
-                is CredentialExchangeImportResult.Cancelled -> onImportFlowCancelledByUser(canShowPreImportDialog)
+                is CredentialExchangeImportResult.Cancelled -> {
+                    importPasswordsPixelSender.onCredentialExchangeImportCancelled()
+                    onImportFlowCancelledByUser(canShowPreImportDialog)
+                }
                 is CredentialExchangeImportResult.Failure -> {
                     logcat(WARN) { "Credential exchange failed (${converted.reason}), falling back to web flow" }
+                    importPasswordsPixelSender.onCredentialExchangeImportFailed(converted.reason)
                     command.trySend(Command.StartWebFlow)
                 }
             }

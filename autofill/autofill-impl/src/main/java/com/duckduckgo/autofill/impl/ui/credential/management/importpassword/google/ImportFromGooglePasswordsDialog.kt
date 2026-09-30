@@ -412,6 +412,7 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
     }
 
     private fun startCredentialExchangeImport() {
+        importPasswordsPixelSender.onCredentialExchangeImportStarted()
         viewLifecycleOwner.lifecycleScope.launch {
             authorizationGracePeriod.requestExtendedGracePeriod()
             val exchangeResult = try {
