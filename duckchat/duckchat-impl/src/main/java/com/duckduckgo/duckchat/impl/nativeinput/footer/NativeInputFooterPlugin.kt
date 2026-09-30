@@ -22,6 +22,7 @@ import com.duckduckgo.anvil.annotations.ContributesActivePluginPoint
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.plugins.ActivePlugin
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -30,6 +31,9 @@ data class NativeInputFooterContext(
     val isEditing: Boolean,
     val browserMode: BrowserMode,
     val isInputFocused: Boolean,
+    val inputContext: NativeInputState.InputContext,
+    /** Grows by one per Duck.ai prompt the widget submits, so footers can attribute a prompt to the message that was up. */
+    val promptSubmissions: Int = 0,
 )
 
 data class NativeInputFooterState(
@@ -40,6 +44,9 @@ data class NativeInputFooterState(
 interface NativeInputFooter {
     val view: View
     val state: Flow<NativeInputFooterState>
+
+    /** Called by the host when [view] actually enters or leaves the screen. */
+    fun onDisplayed(displayed: Boolean) {}
 }
 
 /** What the user has staged in the input right now; footers use it to offer only compatible models. */

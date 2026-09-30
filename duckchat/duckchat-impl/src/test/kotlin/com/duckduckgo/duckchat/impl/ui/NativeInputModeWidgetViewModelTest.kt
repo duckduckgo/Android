@@ -786,6 +786,15 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
+    fun whenPromptsAreSubmittedThenFooterContextCountsThemAndCarriesTheInputContext() = runTest {
+        testee.onPromptSubmitted()
+        testee.onPromptSubmitted()
+
+        assertEquals(2, testee.footerContext.value.promptSubmissions)
+        assertEquals(NativeInputState.InputContext.BROWSER, testee.footerContext.value.inputContext)
+    }
+
+    @Test
     fun whenInputFocusChangesThenFooterContextReportsFocus() = runTest {
         testee.setFooterInputFocused(true)
         assertTrue(testee.footerContext.value.isInputFocused)

@@ -28,6 +28,8 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputModeWidget
 import com.google.android.material.card.MaterialCardView
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -108,6 +110,11 @@ class NativeInputFooterDockLayoutTest {
         assertEquals(cardVisibleBottom - overlap, footer.top)
     }
 
+    private fun footerOf(view: View): NativeInputFooter = object : NativeInputFooter {
+        override val view: View = view
+        override val state: Flow<NativeInputFooterState> = emptyFlow()
+    }
+
     private class Hierarchy(
         val dock: NativeInputFooterDockLayout,
         val row: LinearLayout,
@@ -140,7 +147,7 @@ class NativeInputFooterDockLayoutTest {
         val footerCard = MaterialCardView(context).apply { minimumHeight = FOOTER_HEIGHT_PX }
         footer.bind(
             coroutineRule.testScope,
-            flowOf(NativeInputFooterCoordinator.State(view = footerCard)),
+            flowOf(NativeInputFooterCoordinator.State(footer = footerOf(footerCard))),
         )
         shadowOf(dock).callOnAttachedToWindow()
         shadowOf(footer).callOnAttachedToWindow()

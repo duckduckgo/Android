@@ -28,6 +28,9 @@ import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterContext
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterHost
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterState
+import com.duckduckgo.duckchat.impl.nativeinput.footer.usagewarnings.UsageWarningExposure
+import com.duckduckgo.duckchat.impl.nativeinput.footer.usagewarnings.UsageWarningMeasurements
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -38,6 +41,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -52,6 +56,7 @@ class HighUsageModelFooterPlugin @Inject constructor(
     private val duckChatFeature: DuckChatFeature,
     private val resolver: HighUsageModelNoticeResolver,
     private val dismissalStore: HighUsageModelNoticeDismissalStore,
+    private val measurements: UsageWarningMeasurements,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : NativeInputFooterPlugin {
 
@@ -66,9 +71,15 @@ class HighUsageModelFooterPlugin @Inject constructor(
         val footerView = HighUsageModelFooterView(context)
         val locallyDismissedModelIds = MutableStateFlow<Set<String>>(emptySet())
         val usageWarningsEnabled = duckChatFeature.duckAiUsageWarnings().enabled()
+        val measurement = measurements.forHost(host) { DuckChatPixelSurface.from(hostContext.value.inputContext) }
+        var lastContext: NativeInputFooterContext? = null
+        var lastSelectedModelId: String? = null
+        var currentExposure: UsageWarningExposure? = null
+        var isDisplayed = false
 
         fun dismissNotice(notice: HighUsageModelNotice) {
             if (notice.modelId in locallyDismissedModelIds.value) return
+            measurement.warningDismissed()
             locallyDismissedModelIds.value += notice.modelId
             appCoroutineScope.launch {
                 dismissalStore.dismiss(notice.modelId)
@@ -101,13 +112,26 @@ class HighUsageModelFooterPlugin @Inject constructor(
             locallyDismissedModelIds,
             usageWarningsEnabled,
         ) { modelState, footerContext, persistedDismissedModelIds, localDismissedModelIds, usageWarningsEnabled ->
+            val previousContext = lastContext
+            lastContext = footerContext
+            val previousModelId = lastSelectedModelId
+            lastSelectedModelId = modelState.selectedModelId ?: previousModelId
+            // A prompt is attributed before the focus loss that follows it, even when both arrive in one emission.
+            if (previousContext != null && footerContext.promptSubmissions > previousContext.promptSubmissions) measurement.promptSubmitted()
+            if (previousModelId != null && modelState.selectedModelId != null && modelState.selectedModelId != previousModelId) {
+                measurement.modelSwitched()
+            }
             if (usageWarningsEnabled && persistedDismissedModelIds != null) {
                 resolver.resolve(modelState, footerContext, persistedDismissedModelIds + localDismissedModelIds)
             } else {
+                measurement.inputSessionEnded()
                 null
             }
         }.map { notice ->
             if (notice != null) {
+                val exposure = UsageWarningExposure.ofHighUsageModel(notice.modelId)
+                if (isDisplayed && exposure != currentExposure) measurement.cardBecameVisible(exposure)
+                currentExposure = exposure
                 footerView.render(notice.modelShortName) { dismissNotice(notice) }
             }
             NativeInputFooterState(visible = notice != null)
@@ -115,7 +139,17 @@ class HighUsageModelFooterPlugin @Inject constructor(
 
         return object : NativeInputFooter {
             override val view: HighUsageModelFooterView = footerView
-            override val state: Flow<NativeInputFooterState> = state
+            override val state: Flow<NativeInputFooterState> = state.onCompletion {
+                // The widget can go away right after a prompt (the NTP hands off to a new chat), before the
+                // updated context reaches this flow, so settle that prompt before ending the session.
+                if (hostContext.value.promptSubmissions > (lastContext?.promptSubmissions ?: Int.MAX_VALUE)) measurement.promptSubmitted()
+                measurement.inputSessionEnded()
+            }
+
+            override fun onDisplayed(displayed: Boolean) {
+                isDisplayed = displayed
+                if (displayed) currentExposure?.let(measurement::cardBecameVisible)
+            }
         }
     }
 }

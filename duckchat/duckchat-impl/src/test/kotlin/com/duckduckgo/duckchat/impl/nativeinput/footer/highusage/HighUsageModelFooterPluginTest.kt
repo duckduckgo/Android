@@ -29,12 +29,18 @@ import app.cash.turbine.test
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.view.text.DaxTextView
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.nativeinput.footer.FakeNativeInputFooterHost
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterContext
+import com.duckduckgo.duckchat.impl.nativeinput.footer.usagewarnings.FakeUsageWarningPixelSender
+import com.duckduckgo.duckchat.impl.nativeinput.footer.usagewarnings.UsageWarningEvent
+import com.duckduckgo.duckchat.impl.nativeinput.footer.usagewarnings.UsageWarningExposure
+import com.duckduckgo.duckchat.impl.nativeinput.footer.usagewarnings.UsageWarningMeasurements
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.awaitCancellation
@@ -70,6 +76,7 @@ class HighUsageModelFooterPluginTest {
     private val feature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java, ioDispatcher = coroutineRule.testDispatcher)
     private val hostContext = MutableStateFlow(duckAiContext())
     private val host = FakeNativeInputFooterHost()
+    private val pixelSender = FakeUsageWarningPixelSender()
     private lateinit var dataStore: DataStore<Preferences>
     private lateinit var testee: HighUsageModelFooterPlugin
 
@@ -262,11 +269,69 @@ class HighUsageModelFooterPluginTest {
         }
     }
 
+    @Test
+    fun whenNoticeIsDisplayedThenShownReportsTheModel() = runTest {
+        modelState.value = highUsageModel()
+        val footer = testee.createFooter(context, hostContext, host)
+
+        footer.state.test {
+            assertTrue(awaitItem().visible)
+            footer.onDisplayed(true)
+
+            assertEquals(
+                listOf<UsageWarningEvent>(UsageWarningEvent.Shown(UsageWarningExposure.ofHighUsageModel("claude-opus-4-8"))),
+                pixelSender.events,
+            )
+            assertEquals(listOf(DuckChatPixelSurface.DUCK_AI), pixelSender.surfaces)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenUserSwitchesAwayThenModelSwitchedReportsTheModelTheNoticeWasAbout() = runTest {
+        modelState.value = highUsageModel()
+        val footer = testee.createFooter(context, hostContext, host)
+
+        footer.state.test {
+            assertTrue(awaitItem().visible)
+            footer.onDisplayed(true)
+
+            modelState.value = ModelState(selectedModelId = "claude-sonnet-4-6", selectedModelShortName = "Sonnet")
+
+            assertFalse(awaitItem().visible)
+            val exposure = UsageWarningExposure.ofHighUsageModel("claude-opus-4-8")
+            assertEquals(listOf(UsageWarningEvent.Shown(exposure), UsageWarningEvent.ModelSwitched(exposure)), pixelSender.events)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenNoticeIsDismissedThenDismissedIsReportedAndLeavingDuckAiAbandonsTheExposure() = runTest {
+        modelState.value = highUsageModel()
+        val footer = testee.createFooter(context, hostContext, host)
+
+        footer.state.test {
+            assertTrue(awaitItem().visible)
+            footer.onDisplayed(true)
+
+            footer.view.findViewById<ImageView>(R.id.highUsageModelFooterDismiss).performClick()
+            assertFalse(awaitItem().visible)
+            hostContext.value = duckAiContext(isInputFocused = false)
+
+            assertEquals(
+                listOf(UsageWarningEvent.Shown::class, UsageWarningEvent.Dismissed::class, UsageWarningEvent.Abandoned::class),
+                pixelSender.events.map { it::class },
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
     private fun plugin(dismissalStore: HighUsageModelNoticeDismissalStore) = HighUsageModelFooterPlugin(
         modelManager = modelManager,
         duckChatFeature = feature,
         resolver = HighUsageModelNoticeResolver(),
         dismissalStore = dismissalStore,
+        measurements = UsageWarningMeasurements(pixelSender),
         appCoroutineScope = coroutineRule.testScope,
     )
 
@@ -279,10 +344,13 @@ class HighUsageModelFooterPluginTest {
         isEditing: Boolean = false,
         browserMode: BrowserMode = BrowserMode.REGULAR,
         isInputFocused: Boolean = true,
+        promptSubmissions: Int = 0,
     ) = NativeInputFooterContext(
         isDuckAiSelected = true,
         isEditing = isEditing,
         browserMode = browserMode,
         isInputFocused = isInputFocused,
+        inputContext = NativeInputState.InputContext.DUCK_AI,
+        promptSubmissions = promptSubmissions,
     )
 }

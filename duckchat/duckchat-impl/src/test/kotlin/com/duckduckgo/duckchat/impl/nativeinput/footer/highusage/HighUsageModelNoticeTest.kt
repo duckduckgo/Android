@@ -17,6 +17,7 @@
 package com.duckduckgo.duckchat.impl.nativeinput.footer.highusage
 
 import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterContext
 import org.junit.Assert.assertEquals
@@ -139,5 +140,6 @@ class HighUsageModelNoticeTest {
         isEditing = isEditing,
         browserMode = browserMode,
         isInputFocused = isInputFocused,
+        inputContext = NativeInputState.InputContext.DUCK_AI,
     )
 }
