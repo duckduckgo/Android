@@ -65,11 +65,19 @@ class RealPirFreemiumDataStoreTest {
     }
 
     @Test
-    fun whenAResultIsAlreadyRecordedThenALaterResultIsIgnored() {
+    fun whenNoMatchesIsRecordedThenALaterMatchesFoundReplacesIt() {
         testee.recordFirstScanResult(NO_MATCHES)
         testee.recordFirstScanResult(MATCHES_FOUND)
 
-        assertEquals(NO_MATCHES, testee.firstScanResult)
+        assertEquals(MATCHES_FOUND, testee.firstScanResult)
+    }
+
+    @Test
+    fun whenMatchesFoundIsRecordedThenALaterNoMatchesIsIgnored() {
+        testee.recordFirstScanResult(MATCHES_FOUND)
+        testee.recordFirstScanResult(NO_MATCHES)
+
+        assertEquals(MATCHES_FOUND, testee.firstScanResult)
     }
 
     @Test

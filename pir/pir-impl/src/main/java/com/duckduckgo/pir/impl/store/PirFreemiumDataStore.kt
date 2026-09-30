@@ -31,13 +31,16 @@ interface PirFreemiumDataStore {
     /** First-write-wins. Anchors the bounded window during which a free user still gets background scans. */
     val firstProfileSavedTimestamp: Long
 
-    /** The outcome of the first scan that completed normally, or null if none has. */
+    /**
+     * The outcome of the first scan that completed normally, or null if none has.
+     * Moves to [PirFreemiumFirstScanResult.MATCHES_FOUND] if a later scan finds a match, e.g. on a broker that errored first time.
+     */
     val firstScanResult: PirFreemiumFirstScanResult?
 
     /** No-op once [didActivate] is already true, so the timestamp it is paired with can never be re-anchored. */
     fun activate(timestampMillis: Long)
 
-    /** First-scan-wins: a no-op once a result has been recorded. */
+    /** Only moves forward: a no-op once [PirFreemiumFirstScanResult.MATCHES_FOUND] has been recorded. */
     fun recordFirstScanResult(result: PirFreemiumFirstScanResult)
 
     fun reset()
@@ -76,7 +79,7 @@ internal class RealPirFreemiumDataStore(
     }
 
     override fun recordFirstScanResult(result: PirFreemiumFirstScanResult) {
-        if (firstScanResult != null) return
+        if (firstScanResult == PirFreemiumFirstScanResult.MATCHES_FOUND) return
 
         // committed synchronously as the scan (:pir) writes it and Settings (:main) reads it
         preferences.edit(commit = true) {
