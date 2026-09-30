@@ -10,9 +10,10 @@
 -dontwarn java.beans.ConstructorProperties
 -dontwarn java.beans.Transient
 
-# required for Moshi (keeps Kotlin's generated default-value constructors)
+# required for Moshi
 -keepclassmembers class com.duckduckgo.** {
     <init>(...);
+    <fields>;
 }
 
 # required for reflective Dagger injection (used by AndroidInjector)
