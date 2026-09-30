@@ -424,11 +424,9 @@ class RealPirJobsRunner @Inject constructor(
         return pirRepository.getAllUserProfileQueries()
     }
 
-    /** Checks the stored result first so a free user's later runs don't each decrypt every extracted profile. */
     private suspend fun recordFreemiumFirstScanResultIfNeeded(runMode: PirRunMode) {
         if (runMode != PirRunMode.SCAN_ONLY || pirFreemiumDataStore.firstScanResult != null) return
 
-        // the scan itself has already finished, so failing to record its outcome must not fail the run
         runCatching {
             val result = if (pirRepository.getAllExtractedProfiles().isEmpty()) {
                 PirFreemiumFirstScanResult.NO_MATCHES
