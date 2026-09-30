@@ -168,10 +168,13 @@ class RadioListAlertDialogBuilder(val context: Context) : DaxAlertDialog {
      */
     @JvmName("setRadioListOptions")
     fun setOptions(options: List<RadioListOption>): RadioListAlertDialogBuilder {
+        val existingOptionCount = optionList.size
         options.forEach {
             optionList.add(context.getText(it.textId))
         }
-        selectedOption = options.indexOfFirst { it.isSelected }.takeIf { it >= 0 }?.plus(1)
+        selectedOption = options.indexOfFirst { it.isSelected }
+            .takeIf { it >= 0 }
+            ?.let { existingOptionCount + it + 1 }
         return this
     }
 
