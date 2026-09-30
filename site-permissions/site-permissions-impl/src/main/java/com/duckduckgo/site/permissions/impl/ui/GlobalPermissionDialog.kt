@@ -30,30 +30,35 @@ private const val ASK_EACH_TIME_POSITION = 1
 internal enum class GlobalPermission(
     @param:StringRes val label: Int,
     @param:DrawableRes val icon: Int,
+    @param:DrawableRes val blockedIcon: Int,
     @param:StringRes val dialogTitle: Int,
     @param:StringRes val dialogMessage: Int,
 ) {
     LOCATION(
         R.string.sitePermissionsSettingsLocation,
         CommonR.drawable.ic_location_24,
+        CommonR.drawable.ic_location_blocked_24,
         R.string.permissionSettingsLocationDialogTitle,
         R.string.permissionSettingsLocationDialogMessage,
     ),
     CAMERA(
         R.string.sitePermissionsSettingsCamera,
         CommonR.drawable.ic_video_24,
+        CommonR.drawable.ic_video_blocked_24,
         R.string.permissionSettingsCameraDialogTitle,
         R.string.permissionSettingsCameraDialogMessage,
     ),
     MICROPHONE(
         R.string.sitePermissionsSettingsMicrophone,
         CommonR.drawable.ic_microphone_24,
+        CommonR.drawable.ic_microphone_blocked_24,
         R.string.permissionSettingsMicrophoneDialogTitle,
         R.string.permissionSettingsMicrophoneDialogMessage,
     ),
     DRM(
         R.string.sitePermissionsSettingsDRM,
         CommonR.drawable.ic_video_player_24,
+        CommonR.drawable.ic_video_player_blocked_24,
         R.string.permissionSettingsDrmDialogTitle,
         R.string.permissionSettingsDrmDialogMessage,
     ),
@@ -64,7 +69,7 @@ internal enum class GlobalPermission(
     }
 }
 
-internal fun showGlobalPermissionDialog(
+fun showGlobalPermissionDialog(
     context: Context,
     @StringRes permission: Int,
     askEnabled: Boolean,

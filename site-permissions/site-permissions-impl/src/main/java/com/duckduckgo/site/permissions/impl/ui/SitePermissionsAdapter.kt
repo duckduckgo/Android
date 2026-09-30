@@ -33,6 +33,7 @@ import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.view.PopupMenuItemView
 import com.duckduckgo.common.ui.view.divider.HorizontalDivider
 import com.duckduckgo.common.ui.view.setEnabledOpacity
+import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.site.permissions.impl.R
 import com.duckduckgo.site.permissions.impl.databinding.ViewSitePermissionsDescriptionBinding
 import com.duckduckgo.site.permissions.impl.databinding.ViewSitePermissionsEmptyListBinding
@@ -75,25 +76,7 @@ class SitePermissionsAdapter(
         isMicEnabled: Boolean,
         isDrmEnabled: Boolean,
     ) {
-        val listItems = mutableListOf<SitePermissionListItem>()
-        listItems.add(SitePermissionsDescription())
-        listItems.add(SitePermissionsHeader(R.string.sitePermissionsSettingsEnablePermissionTitle))
-        listOf(
-            R.string.sitePermissionsSettingsLocation to isLocationEnabled,
-            R.string.sitePermissionsSettingsCamera to isCameraEnabled,
-            R.string.sitePermissionsSettingsMicrophone to isMicEnabled,
-            R.string.sitePermissionsSettingsDRM to isDrmEnabled,
-        ).forEach { (text, enabled) ->
-            listItems.add(if (permissionSettingsRedesign) SitePermissionSetting(text, enabled) else SitePermissionToggle(text, enabled))
-        }
-        listItems.add(Divider())
-        listItems.add(SitePermissionsHeader(R.string.sitePermissionsSettingsAllowedSitesTitle))
-        if (sites.isEmpty()) {
-            listItems.add(EmptySites())
-        } else {
-            sites.forEach { listItems.add(SiteAllowedItem(it)) }
-        }
-        items = listItems
+        items = buildSitePermissionItems(sites, isLocationEnabled, isCameraEnabled, isMicEnabled, isDrmEnabled, permissionSettingsRedesign)
         sitesEmpty = sites.isEmpty()
         notifyDataSetChanged()
     }
@@ -154,6 +137,10 @@ class SitePermissionsAdapter(
             is SiteAllowedItem -> (holder as SiteViewHolder).bind(item)
             else -> {}
         }
+    }
+
+    override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
+        (holder as? SiteViewHolder)?.cancelFaviconLoad()
     }
 
     override fun getItemViewType(position: Int) = items[position].viewType.ordinal
@@ -266,7 +253,7 @@ class SitePermissionsAdapter(
                         if (item.askEnabled) R.string.permissionSettingsAskEachTime else R.string.sitePermissionsDialogNeverAllowButton,
                     ),
                 )
-                GlobalPermission.from(item.text)?.let { setLeadingIconResource(it.icon) }
+                GlobalPermission.from(item.text)?.let { setLeadingIconResource(if (item.askEnabled) it.icon else it.blockedIcon) }
                 setClickListener(onClick)
             }
         }
@@ -278,15 +265,54 @@ class SitePermissionsAdapter(
         private val lifecycleOwner: LifecycleOwner,
         private val faviconManager: FaviconManager,
     ) : RecyclerView.ViewHolder(binding.root) {
+        private val faviconJob = ConflatedJob()
+
         fun bind(item: SiteAllowedItem) {
             val oneListItem = binding.root
             oneListItem.setPrimaryText(item.domain)
-            lifecycleOwner.lifecycleScope.launch {
-                faviconManager.loadToViewFromLocalWithPlaceholder(url = item.domain, view = oneListItem.leadingIcon())
+            faviconJob += lifecycleOwner.lifecycleScope.launch {
+                faviconManager.loadToViewFromLocalWithRetry(url = item.domain, view = oneListItem.leadingIcon())
             }
             oneListItem.setClickListener {
                 viewModel.allowedSiteSelected(item.domain)
             }
+        }
+
+        fun cancelFaviconLoad() = faviconJob.cancel()
+    }
+}
+
+internal fun buildSitePermissionItems(
+    sites: List<String>,
+    isLocationEnabled: Boolean,
+    isCameraEnabled: Boolean,
+    isMicEnabled: Boolean,
+    isDrmEnabled: Boolean,
+    permissionSettingsRedesign: Boolean,
+): List<SitePermissionListItem> = buildList {
+    val permissions = listOf(
+        R.string.sitePermissionsSettingsLocation to isLocationEnabled,
+        R.string.sitePermissionsSettingsCamera to isCameraEnabled,
+        R.string.sitePermissionsSettingsMicrophone to isMicEnabled,
+        R.string.sitePermissionsSettingsDRM to isDrmEnabled,
+    )
+    if (permissionSettingsRedesign) {
+        add(SitePermissionsHeader(R.string.settingsSitePermissions))
+        permissions.forEach { (text, enabled) -> add(SitePermissionSetting(text, enabled)) }
+        if (sites.isNotEmpty()) {
+            add(SitePermissionsHeader(R.string.sitePermissionsSettingsAllowedSitesTitle))
+            sites.forEach { add(SiteAllowedItem(it)) }
+        }
+    } else {
+        add(SitePermissionsDescription())
+        add(SitePermissionsHeader(R.string.sitePermissionsSettingsEnablePermissionTitle))
+        permissions.forEach { (text, enabled) -> add(SitePermissionToggle(text, enabled)) }
+        add(Divider())
+        add(SitePermissionsHeader(R.string.sitePermissionsSettingsAllowedSitesTitle))
+        if (sites.isEmpty()) {
+            add(EmptySites())
+        } else {
+            sites.forEach { add(SiteAllowedItem(it)) }
         }
     }
 }
