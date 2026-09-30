@@ -1908,5 +1908,19 @@
         "triggers": ["other"],
         "suffixes": ["first_daily_count", "form_factor"],
         "parameters": ["appVersion"]
+    },
+    "m_aichat_omnibar_new_chat_button_tapped": {
+        "description": "User tapped New Chat in the Duck.ai omnibar, either the dedicated button or the entry in the \"+\" menu",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_omnibar_sidebar_button_tapped": {
+        "description": "User tapped the sidebar button in the Duck.ai omnibar, which opens the recent chats sidebar",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
     }
 }
