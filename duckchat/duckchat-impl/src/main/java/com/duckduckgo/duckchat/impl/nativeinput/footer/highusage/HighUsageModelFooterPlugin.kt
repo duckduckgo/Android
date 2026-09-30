@@ -24,6 +24,7 @@ import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooter
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterContext
+import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterHost
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterState
 import kotlinx.coroutines.CoroutineScope
@@ -59,6 +60,7 @@ class HighUsageModelFooterPlugin @Inject constructor(
     override fun createFooter(
         context: Context,
         hostContext: StateFlow<NativeInputFooterContext>,
+        host: NativeInputFooterHost,
     ): NativeInputFooter {
         val footerView = HighUsageModelFooterView(context)
         val locallyDismissedModelIds = MutableStateFlow<Set<String>>(emptySet())

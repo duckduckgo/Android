@@ -60,9 +60,11 @@ import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.RealNativeInputStateStore
+import com.duckduckgo.duckchat.impl.nativeinput.footer.FakeNativeInputFooterHost
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooter
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterContext
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterCoordinator
+import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterHost
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterState
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
@@ -786,7 +788,7 @@ class NativeInputModeWidgetViewModelTest {
             footerPlugins = listOf(fakeFooterPlugin(view = footerView)),
         )
 
-        val state = viewModel.footerState(ApplicationProvider.getApplicationContext()).first()
+        val state = viewModel.footerState(ApplicationProvider.getApplicationContext(), FakeNativeInputFooterHost()).first()
 
         assertEquals(footerView, state.view)
     }
@@ -1451,6 +1453,7 @@ class NativeInputModeWidgetViewModelTest {
             override fun createFooter(
                 context: Context,
                 hostContext: StateFlow<NativeInputFooterContext>,
+                host: NativeInputFooterHost,
             ): NativeInputFooter = object : NativeInputFooter {
                 override val view: View = view
                 override val state: Flow<NativeInputFooterState> = flowOf(NativeInputFooterState(visible = true))

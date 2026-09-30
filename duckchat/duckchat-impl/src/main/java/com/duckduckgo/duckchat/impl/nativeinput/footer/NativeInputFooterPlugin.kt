@@ -41,12 +41,33 @@ interface NativeInputFooter {
     val state: Flow<NativeInputFooterState>
 }
 
+/** What the user has staged in the input right now; footers use it to offer only compatible models. */
+data class NativeInputFooterDraft(
+    val hasImages: Boolean,
+    val fileMimeTypes: List<String>,
+    val selectedTool: String?,
+)
+
+/** Actions a footer can ask from the native input. Implemented by the native input widget. */
+interface NativeInputFooterHost {
+    fun draft(): NativeInputFooterDraft
+
+    /** Selects [modelId] for the next prompt and, when a chat is active, tells the page to switch too. */
+    fun selectModel(modelId: String)
+
+    /** Tells the active Duck.ai page the user opted into the weekly allowance. No-op without a page. */
+    fun startUsingWeeklyLimit()
+
+    fun openSubscriptionPurchase(origin: String)
+}
+
 interface NativeInputFooterPlugin : ActivePlugin {
     val priority: Int
 
     fun createFooter(
         context: Context,
         hostContext: StateFlow<NativeInputFooterContext>,
+        host: NativeInputFooterHost,
     ): NativeInputFooter
 }
 

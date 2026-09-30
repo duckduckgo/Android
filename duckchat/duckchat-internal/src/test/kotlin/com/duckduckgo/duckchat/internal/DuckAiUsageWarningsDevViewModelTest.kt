@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.internal
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.nativeinput.footer.highusage.HighUsageModelNoticeDismissalStore
+import com.duckduckgo.duckchat.impl.nativeinput.footer.usagelimits.UsageNoticeActedOn
 import com.duckduckgo.duckchat.impl.nativeinput.footer.usagelimits.UsageNoticeDismissal
 import com.duckduckgo.duckchat.impl.nativeinput.footer.usagelimits.UsageNoticeDismissalStore
 import com.duckduckgo.duckchat.impl.nativeinput.footer.usagelimits.UsageNoticeId
@@ -45,8 +46,10 @@ class DuckAiUsageWarningsDevViewModelTest {
     }
 
     private val usageDismissals = MutableStateFlow<Map<UsageWindow, UsageNoticeDismissal>>(emptyMap())
+    private val usageActedOn = MutableStateFlow<UsageNoticeActedOn?>(null)
     private val usageNoticeDismissalStore: UsageNoticeDismissalStore = mock<UsageNoticeDismissalStore>().also {
         whenever(it.dismissals).thenReturn(usageDismissals)
+        whenever(it.actedOn).thenReturn(usageActedOn)
     }
 
     private val testee by lazy { DuckAiUsageWarningsDevViewModel(dismissalStore, usageNoticeDismissalStore) }
@@ -82,11 +85,21 @@ class DuckAiUsageWarningsDevViewModelTest {
     }
 
     @Test
+    fun whenUsageSnapshotWasActedOnThenStateCarriesIt() = runTest {
+        usageActedOn.value = UsageNoticeActedOn(UsageNoticeId.APPROACHING, UsageWindow.WEEKLY, 1L, 75)
+
+        testee.viewState.test {
+            assertEquals(UsageNoticeActedOn(UsageNoticeId.APPROACHING, UsageWindow.WEEKLY, 1L, 75), expectMostRecentItem().usageNoticeActedOn)
+        }
+    }
+
+    @Test
     fun whenResetUsageDismissalIsClickedThenStoreIsClearedAndMessageIsShown() = runTest {
         testee.commands.test {
             testee.onResetUsageNoticeDismissalClicked()
 
             verify(usageNoticeDismissalStore).clear()
+            verify(usageNoticeDismissalStore).clearActedOn()
             assertEquals(Command.ShowMessage(R.string.devSettingsDuckAiUsageWarningsUsageDismissalReset), awaitItem())
             cancelAndIgnoreRemainingEvents()
         }

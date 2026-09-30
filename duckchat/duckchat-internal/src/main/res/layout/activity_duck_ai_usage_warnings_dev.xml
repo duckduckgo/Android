@@ -61,6 +61,12 @@
             android:layout_marginTop="@dimen/keyline_3"
             app:primaryText="@string/devSettingsDuckAiUsageWarningsUsageDismissal" />
 
+        <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+            android:id="@+id/usageNoticeActedOn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/devSettingsDuckAiUsageWarningsUsageActedOn" />
+
         <com.duckduckgo.common.ui.view.button.DaxButtonDestructive
             android:id="@+id/resetUsageNoticeDismissal"
             android:layout_width="match_parent"
