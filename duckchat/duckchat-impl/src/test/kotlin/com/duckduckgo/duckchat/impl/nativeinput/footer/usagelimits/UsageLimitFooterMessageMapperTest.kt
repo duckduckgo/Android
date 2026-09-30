@@ -98,8 +98,8 @@ class UsageLimitFooterMessageMapperTest {
         val model = AIChatModel(id = "m", name = "m", displayName = "m", shortName = "m", accessTier = emptyList(), isAccessible = true)
 
         assertEquals("Switch Model", testee.map(notice, NOW, resources, ResolvedUsageCta.SwitchModel(model, listOf("m"))).ctaLabel)
-        assertEquals("Start using weekly limit", testee.map(notice, NOW, resources, ResolvedUsageCta.StartUsingWeeklyLimit(emptyList())).ctaLabel)
-        assertEquals("Try for Free", testee.map(notice, NOW, resources, ResolvedUsageCta.Subscribe(freeTrialEligible = true)).ctaLabel)
+        assertEquals("Start Using Weekly Limit", testee.map(notice, NOW, resources, ResolvedUsageCta.StartUsingWeeklyLimit(emptyList())).ctaLabel)
+        assertEquals("Try Subscription for Free", testee.map(notice, NOW, resources, ResolvedUsageCta.Subscribe(freeTrialEligible = true)).ctaLabel)
         assertEquals("Subscribe", testee.map(notice, NOW, resources, ResolvedUsageCta.Subscribe(freeTrialEligible = false)).ctaLabel)
         assertNull(testee.map(notice, NOW, resources, null).ctaLabel)
     }
