@@ -53,7 +53,7 @@ class NextStepsCardsExperimentManagerTest {
     @Test
     fun `when privacy config never persisted then enroll returns null and does not enrol`() = runTest {
         givenKillSwitch(enabled = true)
-        givenCohortEnabled(Cohorts.TREATMENT)
+        givenCohortEnabled(Cohorts.STACKED_CARDS)
 
         assertNull(testee.enroll())
         assertFalse(toggles.nextStepsCardsExperiment().isEnrolled())
@@ -62,7 +62,7 @@ class NextStepsCardsExperimentManagerTest {
     @Test
     fun `when kill switch is off then enroll returns null and does not enrol`() = runTest {
         givenKillSwitch(enabled = false)
-        givenCohortEnabled(Cohorts.TREATMENT)
+        givenCohortEnabled(Cohorts.STACKED_CARDS)
         privacyConfigPersistedGate.onPrivacyConfigPersisted()
 
         assertNull(testee.enroll())
@@ -73,7 +73,7 @@ class NextStepsCardsExperimentManagerTest {
     fun `when reinstall user then enroll returns null and does not enrol`() = runTest {
         givenKillSwitch(enabled = true)
         whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
-        givenCohortEnabled(Cohorts.TREATMENT)
+        givenCohortEnabled(Cohorts.STACKED_CARDS)
         privacyConfigPersistedGate.onPrivacyConfigPersisted()
 
         assertNull(testee.enroll())
@@ -81,12 +81,21 @@ class NextStepsCardsExperimentManagerTest {
     }
 
     @Test
-    fun `when enrolled in treatment then enroll returns treatment`() = runTest {
+    fun `when enrolled in stacked cards then enroll returns stacked cards`() = runTest {
         givenKillSwitch(enabled = true)
-        givenCohortEnabled(Cohorts.TREATMENT)
+        givenCohortEnabled(Cohorts.STACKED_CARDS)
         privacyConfigPersistedGate.onPrivacyConfigPersisted()
 
-        assertEquals(NextStepsCardsExperimentVariant.TREATMENT, testee.enroll())
+        assertEquals(NextStepsCardsExperimentVariant.STACKED_CARDS, testee.enroll())
+    }
+
+    @Test
+    fun `when enrolled in check list then enroll returns check list`() = runTest {
+        givenKillSwitch(enabled = true)
+        givenCohortEnabled(Cohorts.CHECK_LIST)
+        privacyConfigPersistedGate.onPrivacyConfigPersisted()
+
+        assertEquals(NextStepsCardsExperimentVariant.CHECK_LIST, testee.enroll())
     }
 
     @Test

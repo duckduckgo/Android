@@ -41,6 +41,7 @@ interface NextStepsCardsExperimentToggles {
 
     enum class Cohorts(override val cohortName: String) : CohortName {
         CONTROL("control"),
-        TREATMENT("treatment"),
+        STACKED_CARDS("stacked_cards"),
+        CHECK_LIST("check_list"),
     }
 }
