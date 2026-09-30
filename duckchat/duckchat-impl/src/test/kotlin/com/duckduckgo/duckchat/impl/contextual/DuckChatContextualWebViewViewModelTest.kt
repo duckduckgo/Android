@@ -211,6 +211,38 @@ class DuckChatContextualWebViewViewModelTest {
     }
 
     @Test
+    fun `reopen after the session timed out ends the selection journey as expired`() = runTest {
+        (duckChat as FakeDuckChat).nextUrl = "https://duckduckgo.com/?ia=chat"
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        contextualDataStore.persistTabClosedTimestamp("tab-1", 0L)
+        sessionTimeoutProvider.timeoutMs = 1_000L
+        timeProvider.nowMs = 5_000L
+
+        testee.onSheetReopened()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(selectionJourney).onJourneyEnded("tab-1", SelectionTerminalReason.SESSION_EXPIRED)
+    }
+
+    @Test
+    fun `reopen with the stored chat deleted from history ends the selection journey as new chat`() = runTest {
+        (duckChat as FakeDuckChat).nextUrl = "https://duckduckgo.com/?ia=chat"
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        contextualDataStore.persistTabChatUrl("tab-1", "https://duckduckgo.com/?ia=chat&chatID=gone")
+        contextualDataStore.persistTabClosedTimestamp("tab-1", 0L)
+        sessionTimeoutProvider.timeoutMs = 10_000L
+        timeProvider.nowMs = 1_000L
+        recentChatsFlow.value = emptyList()
+
+        testee.onSheetReopened()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(selectionJourney).onJourneyEnded("tab-1", SelectionTerminalReason.NEW_CHAT)
+    }
+
+    @Test
     fun `sheet closed after reopen entry dialog handoff does not revert the contextual input state`() = runTest {
         (duckChat as FakeDuckChat).nextUrl = "https://duckduckgo.com/?ia=chat"
         testee.onSheetOpened("tab-1")

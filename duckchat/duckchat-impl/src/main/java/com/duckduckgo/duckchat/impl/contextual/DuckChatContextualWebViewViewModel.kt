@@ -260,6 +260,8 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
         val shouldReuseSession = shouldReuseStoredChatUrl(tabId)
         val existingChatUrl = contextualDataStore.getTabChatUrl(tabId)
         if (!shouldReuseSession || isStoredChatMissingFromHistory(existingChatUrl)) {
+            val reason = if (shouldReuseSession) SelectionTerminalReason.NEW_CHAT else SelectionTerminalReason.SESSION_EXPIRED
+            selectionJourney.onJourneyEnded(tabId, reason)
             resetToNewChat()
             hidingSheetForNewChat = true
             withContext(dispatchers.main()) {
