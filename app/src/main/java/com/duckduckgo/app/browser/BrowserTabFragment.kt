@@ -2220,7 +2220,11 @@ class BrowserTabFragment :
             viewModel.areFavoritesDisplayed
                 .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
                 .collectLatest { hasFavorites ->
-                    binding.includeNewBrowserTab.topNtpOutlineStroke.isVisible = hasFavorites
+                    // The native input hides this stroke while it is open, and favorites can load after
+                    // that, so honour the hide here instead of drawing a divider over the input's edge.
+                    if (!nativeInputManager.isNativeInputShown()) {
+                        binding.includeNewBrowserTab.topNtpOutlineStroke.isVisible = hasFavorites
+                    }
                     binding.includeNewBrowserTab.bottomNtpOutlineStroke.isVisible = hasFavorites && omnibarRepository.omnibarType != OmnibarType.SPLIT
                 }
         }

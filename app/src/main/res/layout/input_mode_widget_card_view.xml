@@ -39,10 +39,9 @@
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
-            <!-- Compat padding would reserve 16dp below the card for the shadow, and the new tab page
-            content is offset by the card's bounds, so that padding reads as a gap between the input and
-            the content scrolling under it. The shadow draws outside the bounds instead (the parents don't
-            clip), and the horizontal margin replaces the side inset compat padding used to provide. -->
+            <!-- No shadow: it would fall on the content scrolling under the input and read as a divider.
+            Compat padding reserved room for that shadow, and since the content is offset by the card's
+            bounds it also opened a gap above the content; the margin replaces the side inset it gave. -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/inputModeWidgetCard"
                 android:theme="?attr/daxInputModeCardThemeOverlay"
@@ -52,7 +51,7 @@
                 android:layout_weight="1"
                 app:cardBackgroundColor="?attr/daxColorSurface"
                 app:cardCornerRadius="24dp"
-                app:cardElevation="6dp"
+                app:cardElevation="0dp"
                 app:cardUseCompatPadding="false">
 
                 <com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputModeWidget

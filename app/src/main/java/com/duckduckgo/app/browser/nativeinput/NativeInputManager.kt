@@ -1328,16 +1328,21 @@ class RealNativeInputManager @Inject constructor(
 
     private fun applyWindowChrome(widgetView: View, isBottom: Boolean) {
         widgetView.translationZ = WIDGET_ELEVATION_DP.toPx()
+        // The root's opaque background gives it an outline to cast from, so its elevation draws a band
+        // along the widget's edges that reads as a divider. Keep the z-order, drop the shadow; the
+        // card inside still carries its own.
+        suppressShadow(widgetView)
+        // The stroke separates a top omnibar from the content below it. While the input is open the
+        // content scrolls under the input instead, so the stroke reads as a divider cutting it off.
+        rootView.findViewById<View?>(R.id.topNtpOutlineStroke)?.let {
+            if (savedTopNtpStrokeVisibility == null) savedTopNtpStrokeVisibility = it.visibility
+            it.gone()
+        }
         if (isBottom) {
             rootView.findViewById<View?>(R.id.navigationBar)?.gone()
             rootView.findViewById<View?>(R.id.bottomBrowserOutlineStroke)?.gone()
-            // The top outline strokes separate a top omnibar from content; with the input's nav bar at
-            // the top they just draw a hairline under the bar. Hide them, restored on close.
+            // With the input's nav bar at the top, this one just draws a hairline under the bar.
             rootView.findViewById<View?>(R.id.topBrowserOutlineStroke)?.gone()
-            rootView.findViewById<View?>(R.id.topNtpOutlineStroke)?.let {
-                if (savedTopNtpStrokeVisibility == null) savedTopNtpStrokeVisibility = it.visibility
-                it.gone()
-            }
             if (omnibarController.isBrowserMode()) {
                 widgetView.setBackgroundColor(
                     widgetView.context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorBackground),
@@ -1348,7 +1353,6 @@ class RealNativeInputManager @Inject constructor(
                         com.duckduckgo.mobile.android.R.attr.daxColorDuckAiBackground,
                     ),
                 )
-                suppressShadow(widgetView)
             }
             rootView.findViewById<View?>(R.id.browserLayout)?.let {
                 it.setPadding(it.paddingLeft, it.paddingTop, it.paddingRight, 0)
