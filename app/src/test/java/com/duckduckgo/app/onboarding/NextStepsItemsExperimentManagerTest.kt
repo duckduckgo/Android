@@ -17,13 +17,13 @@
 package com.duckduckgo.app.onboarding
 
 import android.annotation.SuppressLint
-import com.duckduckgo.app.onboarding.NextStepsCardsExperimentManager.NextStepsCardsExperimentVariant
+import com.duckduckgo.app.onboarding.NextStepsItemsExperimentManager.NextStepsItemsExperimentVariant
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.remote.messaging.impl.nextstepscards.NextStepsCardsExperimentToggles
-import com.duckduckgo.remote.messaging.impl.nextstepscards.NextStepsCardsExperimentToggles.Cohorts
+import com.duckduckgo.remote.messaging.impl.nextstepsitems.NextStepsItemsExperimentToggles
+import com.duckduckgo.remote.messaging.impl.nextstepsitems.NextStepsItemsExperimentToggles.Cohorts
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -34,17 +34,17 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 @SuppressLint("DenyListedApi")
-class NextStepsCardsExperimentManagerTest {
+class NextStepsItemsExperimentManagerTest {
 
     @get:Rule
     val coroutineRule = CoroutineTestRule()
 
-    private val toggles: NextStepsCardsExperimentToggles = FakeFeatureToggleFactory.create(NextStepsCardsExperimentToggles::class.java)
+    private val toggles: NextStepsItemsExperimentToggles = FakeFeatureToggleFactory.create(NextStepsItemsExperimentToggles::class.java)
     private val privacyConfigPersistedGate = OnboardingPrivacyConfigPersistedGateImpl()
     private val appBuildConfig: AppBuildConfig = mock()
 
-    private val testee = NextStepsCardsExperimentManagerImpl(
-        nextStepsCardsFeatureToggles = toggles,
+    private val testee = NextStepsItemsExperimentManagerImpl(
+        nextStepsItemsFeatureToggles = toggles,
         appBuildConfig = appBuildConfig,
         dispatcherProvider = coroutineRule.testDispatcherProvider,
         onboardingPrivacyConfigPersistedGate = privacyConfigPersistedGate,
@@ -56,7 +56,7 @@ class NextStepsCardsExperimentManagerTest {
         givenCohortEnabled(Cohorts.STACKED_CARDS)
 
         assertNull(testee.enroll())
-        assertFalse(toggles.nextStepsCardsExperiment().isEnrolled())
+        assertFalse(toggles.nextStepsItemsExperiment().isEnrolled())
     }
 
     @Test
@@ -66,7 +66,7 @@ class NextStepsCardsExperimentManagerTest {
         privacyConfigPersistedGate.onPrivacyConfigPersisted()
 
         assertNull(testee.enroll())
-        assertFalse(toggles.nextStepsCardsExperiment().isEnrolled())
+        assertFalse(toggles.nextStepsItemsExperiment().isEnrolled())
     }
 
     @Test
@@ -77,7 +77,7 @@ class NextStepsCardsExperimentManagerTest {
         privacyConfigPersistedGate.onPrivacyConfigPersisted()
 
         assertNull(testee.enroll())
-        assertFalse(toggles.nextStepsCardsExperiment().isEnrolled())
+        assertFalse(toggles.nextStepsItemsExperiment().isEnrolled())
     }
 
     @Test
@@ -86,7 +86,7 @@ class NextStepsCardsExperimentManagerTest {
         givenCohortEnabled(Cohorts.STACKED_CARDS)
         privacyConfigPersistedGate.onPrivacyConfigPersisted()
 
-        assertEquals(NextStepsCardsExperimentVariant.STACKED_CARDS, testee.enroll())
+        assertEquals(NextStepsItemsExperimentVariant.STACKED_CARDS, testee.enroll())
     }
 
     @Test
@@ -95,7 +95,7 @@ class NextStepsCardsExperimentManagerTest {
         givenCohortEnabled(Cohorts.CHECK_LIST)
         privacyConfigPersistedGate.onPrivacyConfigPersisted()
 
-        assertEquals(NextStepsCardsExperimentVariant.CHECK_LIST, testee.enroll())
+        assertEquals(NextStepsItemsExperimentVariant.CHECK_LIST, testee.enroll())
     }
 
     @Test
@@ -104,7 +104,7 @@ class NextStepsCardsExperimentManagerTest {
         givenCohortEnabled(Cohorts.CONTROL)
         privacyConfigPersistedGate.onPrivacyConfigPersisted()
 
-        assertEquals(NextStepsCardsExperimentVariant.CONTROL, testee.enroll())
+        assertEquals(NextStepsItemsExperimentVariant.CONTROL, testee.enroll())
     }
 
     @Test
@@ -122,7 +122,7 @@ class NextStepsCardsExperimentManagerTest {
     }
 
     private fun givenCohortEnabled(winner: Cohorts?) {
-        toggles.nextStepsCardsExperiment().setRawStoredState(
+        toggles.nextStepsItemsExperiment().setRawStoredState(
             Toggle.State(
                 remoteEnableState = true,
                 enable = winner != null,

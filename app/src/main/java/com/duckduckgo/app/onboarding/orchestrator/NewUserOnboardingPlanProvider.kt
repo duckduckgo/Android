@@ -29,7 +29,7 @@ import com.duckduckgo.app.onboarding.CustomAiOnboardingPixelName
 import com.duckduckgo.app.onboarding.CustomAiOnboardingResolver
 import com.duckduckgo.app.onboarding.DuckAiOnboardingAvailability
 import com.duckduckgo.app.onboarding.DuckAiOnboardingDemo
-import com.duckduckgo.app.onboarding.NextStepsCardsExperimentManager
+import com.duckduckgo.app.onboarding.NextStepsItemsExperimentManager
 import com.duckduckgo.app.onboarding.OnboardingInputScreenLaunchTarget
 import com.duckduckgo.app.onboarding.OnboardingPasswordImportExperimentManager
 import com.duckduckgo.app.onboarding.OnboardingPasswordImportExperimentManager.OnboardingPasswordImportVariant
@@ -119,7 +119,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     private val onboardingPromptsExperimentManager: OnboardingPromptsExperimentManager,
     private val segmentedOnboardingExperimentManager: SegmentedOnboardingExperimentManager,
     private val segmentedOnboardingExperimentMetrics: SegmentedOnboardingExperimentMetrics,
-    private val nextStepsCardsExperimentManager: NextStepsCardsExperimentManager,
+    private val nextStepsItemsExperimentManager: NextStepsItemsExperimentManager,
     private val onboardingPasswordImportExperimentManager: OnboardingPasswordImportExperimentManager,
     private val onboardingPreferenceCatalog: OnboardingPreferenceCatalog,
     private val singleChoiceDataPlugins: ActivePluginPoint<OnboardingSingleChoiceDataPlugin>,
@@ -141,7 +141,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         onboardingStore.setDownloadReason(null)
 
         if (!ctx.isReinstall) {
-            nextStepsCardsExperimentManager.enroll()
+            nextStepsItemsExperimentManager.enroll()
         }
 
         return if (customAiOnboardingResolver.resolve()) {

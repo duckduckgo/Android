@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.remote.messaging.impl.nextstepscards
+package com.duckduckgo.remote.messaging.impl.nextstepsitems
 
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
@@ -25,19 +25,19 @@ import com.duckduckgo.feature.toggles.api.Toggle.State.CohortName
 /**
  * Remote feature for the "Complete your setup" New Tab Page cards.
  *
- * [self] is the kill switch; [nextStepsCardsExperiment] carries the experiment cohorts.
+ * [self] is the kill switch; [nextStepsItemsExperiment] carries the experiment cohorts.
  */
 @ContributesRemoteFeature(
     scope = AppScope::class,
-    featureName = "nextStepsCards",
+    featureName = "nextStepsItems",
 )
-interface NextStepsCardsExperimentToggles {
+interface NextStepsItemsExperimentToggles {
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun self(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun nextStepsCardsExperiment(): Toggle
+    fun nextStepsItemsExperiment(): Toggle
 
     enum class Cohorts(override val cohortName: String) : CohortName {
         CONTROL("control"),
