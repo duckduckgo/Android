@@ -70,6 +70,7 @@ class PermissionsPerWebsiteActivity : DuckDuckGoActivity() {
     private val url: String by lazy { intent.getStringExtra(EXTRA_URL) ?: "" }
     private var permissionSettingDialog: DaxAlertDialog? = null
     private var pendingPermissionSetting: WebsitePermissionSetting? = null
+    private var restoredPermissionSetting: WebsitePermissionSetting? = null
 
     private val toolbar
         get() = binding.includeToolbar.toolbar
@@ -89,13 +90,14 @@ class PermissionsPerWebsiteActivity : DuckDuckGoActivity() {
         }
         observeViewModel()
         viewModel.websitePermissionSettings(url)
-        savedInstanceState?.let { BundleCompat.getSerializable(it, KEY_PENDING_PERMISSION_SETTING, WebsitePermissionSetting::class.java) }
-            ?.let { showRedesignedPermissionSettingSelectionDialog(it) }
+        restoredPermissionSetting = savedInstanceState?.let {
+            BundleCompat.getSerializable(it, KEY_PENDING_PERMISSION_SETTING, WebsitePermissionSetting::class.java)
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        pendingPermissionSetting?.let { outState.putSerializable(KEY_PENDING_PERMISSION_SETTING, it) }
+        (pendingPermissionSetting ?: restoredPermissionSetting)?.let { outState.putSerializable(KEY_PENDING_PERMISSION_SETTING, it) }
     }
 
     override fun onDestroy() {
@@ -140,6 +142,11 @@ class PermissionsPerWebsiteActivity : DuckDuckGoActivity() {
                 .flowWithLifecycle(lifecycle, STARTED)
                 .collectLatest { state ->
                     updatePermissionsList(state.websitePermissions)
+                    // Saving reads the loaded list, so a dialog restored after process death must wait for it
+                    if (state.websitePermissions.isNotEmpty()) {
+                        restoredPermissionSetting?.let { showPermissionSettingSelectionDialog(it) }
+                        restoredPermissionSetting = null
+                    }
                 }
         }
         lifecycleScope.launch {
