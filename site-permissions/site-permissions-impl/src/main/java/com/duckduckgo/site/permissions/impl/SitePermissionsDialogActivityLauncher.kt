@@ -326,7 +326,10 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         onPermissionDenied: (Boolean) -> Unit = ::denyPermissions,
     ) {
         val tiers = when {
-            browserMode == BrowserMode.FIRE && drmPolicyFeature.fireModeDenyButton().isEnabled() -> listOf(PermissionTier.ALLOW_THIS_TIME, PermissionTier.DENY)
+            browserMode == BrowserMode.FIRE && drmPolicyFeature.fireModeDenyButton().isEnabled() -> listOf(
+                PermissionTier.ALLOW_THIS_TIME,
+                PermissionTier.DENY,
+            )
             isThirdParty -> listOf(PermissionTier.ALLOW_THIS_TIME, PermissionTier.NEVER_ALLOW)
             else -> listOf(PermissionTier.ALLOW_WHILE_USING_SITE, PermissionTier.ALLOW_THIS_TIME, PermissionTier.NEVER_ALLOW)
         }
