@@ -562,6 +562,7 @@ class DuckChatContextualWebViewViewModelTest {
         testee.onFullModeRequested()
 
         verify(selectionJourney).onJourneyEnded("tab-1", SelectionTerminalReason.MOVED_TO_TAB)
+        verify(textSelectionRepository).consume("tab-1")
     }
 
     @Test

@@ -660,7 +660,9 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
         }
         duckChatInternal.reportDuckChatEntry(DuckChatEntryPoint.CONTEXTUAL_CHAT, opensNewTab = true, hasPrompt = hasPrompt)
         duckChatPixels.reportContextualSheetExpanded()
-        selectionJourney.onJourneyEnded(viewState.value.tabId, SelectionTerminalReason.MOVED_TO_TAB)
+        val tabId = viewState.value.tabId
+        selectionJourney.onJourneyEnded(tabId, SelectionTerminalReason.MOVED_TO_TAB)
+        textSelectionRepository.consume(tabId)
     }
 
     fun onPageContextReceived(
