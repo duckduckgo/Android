@@ -13,7 +13,8 @@
                 "description": "Ordinal of this prompt within the current install-week, exact up to 10 and bucketed above.",
                 "enum": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11_15", "16_20", "21_plus"]
             },
-            "promptOpensPrevWeek"
+            "petal",
+            "promptExposureVersion"
         ]
     },
     "m_prompt_shown": {
@@ -42,7 +43,9 @@
                     "import_passwords_google",
                     "other"
                 ]
-            }
+            },
+            "petal",
+            "promptExposureVersion"
         ]
     },
     "m_prompt_user_week": {
@@ -50,7 +53,7 @@
         "owners": ["aibrahim-"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["promptDaysSinceInstall", "promptOpensPrevWeek"]
+        "parameters": ["promptDaysSinceInstall", "promptExposureVersion"]
     },
     "m_prompt_gap": {
         "description": "Fires when a prompt arbitrated by the Prompts Coordinator finishes, measuring the time since the previous one finished. Modals finish when they appear; the New Tab Page card finishes when it goes away. Only fires while the coordinator is enabled.",
@@ -70,7 +73,25 @@
                 "type": "string",
                 "description": "The kind of prompt that just finished.",
                 "enum": ["MODAL", "NTP_CARD"]
-            }
+            },
+            "petal",
+            "promptExposureVersion"
+        ]
+    },
+    "m_prompt_session": {
+        "description": "Fires when a session ends, once the app has stayed in the background for at least 60 seconds, and only once onboarding is complete. Sampled at 5% of sessions: use the counts for ratios, and multiply by 20 for session totals.",
+        "owners": ["aibrahim-"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "promptDaysSinceInstall",
+            {
+                "key": "prompt_shown",
+                "type": "boolean",
+                "description": "Whether an app-originated prompt was shown during the session. A remote message card only counts in the session where it is first reported."
+            },
+            "petal",
+            "promptExposureVersion"
         ]
     }
 }

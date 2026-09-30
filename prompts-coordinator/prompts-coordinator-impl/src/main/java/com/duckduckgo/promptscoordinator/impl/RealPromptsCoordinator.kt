@@ -31,6 +31,7 @@ import com.duckduckgo.promptscoordinator.impl.di.PromptsCoordinatorStore
 import com.duckduckgo.promptscoordinator.impl.exposure.PromptExposurePixelName
 import com.duckduckgo.promptscoordinator.impl.exposure.PromptExposurePixelParams
 import com.duckduckgo.promptscoordinator.impl.exposure.daysSinceInstallBucket
+import com.duckduckgo.promptscoordinator.impl.exposure.firePromptExposurePixel
 import com.duckduckgo.promptscoordinator.impl.exposure.gapBucket
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -202,13 +203,11 @@ class RealPromptsCoordinator @Inject constructor(
     private suspend fun fireGapPixel(type: PromptType, previous: Long, now: Long) {
         val gap = gapBucket(previous, now) ?: return
         val daysSinceInstall = appInstall.getInstallAge()?.inWholeDays ?: return
-        pixel.fire(
+        pixel.firePromptExposurePixel(
             PromptExposurePixelName.PROMPT_GAP,
-            mapOf(
-                PromptExposurePixelParams.DAYS_SINCE_INSTALL to daysSinceInstallBucket(daysSinceInstall),
-                PromptExposurePixelParams.GAP_BUCKET to gap,
-                PromptExposurePixelParams.PROMPT_TYPE to type.name,
-            ),
+            PromptExposurePixelParams.DAYS_SINCE_INSTALL to daysSinceInstallBucket(daysSinceInstall),
+            PromptExposurePixelParams.GAP_BUCKET to gap,
+            PromptExposurePixelParams.PROMPT_TYPE to type.name,
         )
     }
 

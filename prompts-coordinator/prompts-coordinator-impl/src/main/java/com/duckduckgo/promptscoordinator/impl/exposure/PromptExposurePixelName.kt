@@ -18,20 +18,46 @@ package com.duckduckgo.promptscoordinator.impl.exposure
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 
-internal enum class PromptExposurePixelName(override val pixelName: String) : Pixel.PixelName {
-    PROMPT_EXPOSURE("m_prompt_exposure"),
-    PROMPT_SHOWN("m_prompt_shown"),
-    PROMPT_USER_WEEK("m_prompt_user_week"),
-    PROMPT_GAP("m_prompt_gap"),
+/** @property randomizeTimestamp whether the pixel is routed through PETAL timestamp randomization. */
+internal enum class PromptExposurePixelName(
+    override val pixelName: String,
+    val randomizeTimestamp: Boolean,
+) : Pixel.PixelName {
+    PROMPT_EXPOSURE("m_prompt_exposure", randomizeTimestamp = true),
+    PROMPT_SHOWN("m_prompt_shown", randomizeTimestamp = true),
+    PROMPT_USER_WEEK("m_prompt_user_week", randomizeTimestamp = false),
+    PROMPT_GAP("m_prompt_gap", randomizeTimestamp = true),
+    PROMPT_SESSION("m_prompt_session", randomizeTimestamp = true),
 }
 
 internal object PromptExposurePixelParams {
     const val DAYS_SINCE_INSTALL = "days_since_install"
     const val NTH_IN_WEEK = "nth_in_week"
-    const val OPENS_PREV_WEEK = "opens_prev_week"
     const val PROMPT_ID = "prompt_id"
     const val GAP_BUCKET = "gap_bucket"
     const val PROMPT_TYPE = "prompt_type"
+    const val PROMPT_SHOWN = "prompt_shown"
+    const val VERSION = "version"
+}
+
+/**
+ * Sent as `version` on every prompt exposure pixel. Bump it whenever the meaning of a parameter or
+ * [SESSION_SAMPLE_RATE] changes, so data from before and after can be told apart.
+ */
+internal const val PROMPT_EXPOSURE_PIXELS_VERSION = "1"
+
+/** Fires [pixel] with the parameters every prompt exposure pixel carries on top of [parameters]. */
+internal fun Pixel.firePromptExposurePixel(
+    pixel: PromptExposurePixelName,
+    vararg parameters: Pair<String, String>,
+    type: Pixel.PixelType = Pixel.PixelType.Count,
+) {
+    val allParameters = buildMap {
+        putAll(parameters)
+        put(PromptExposurePixelParams.VERSION, PROMPT_EXPOSURE_PIXELS_VERSION)
+        if (pixel.randomizeTimestamp) put(Pixel.PixelParameter.PETAL, Pixel.PixelValues.PETAL_RANDOMIZE)
+    }
+    fire(pixel, allParameters, type = type)
 }
 
 /** Every value `prompt_id` may take; anything else is sent as [OTHER_PROMPT_ID]. */

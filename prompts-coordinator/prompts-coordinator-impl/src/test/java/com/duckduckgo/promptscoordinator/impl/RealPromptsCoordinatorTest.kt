@@ -364,7 +364,13 @@ class RealPromptsCoordinatorTest {
     private fun verifyGapPixel(gap: String, type: String) {
         verify(pixel).fire(
             PromptExposurePixelName.PROMPT_GAP,
-            mapOf("days_since_install" to "d0_6", "gap_bucket" to gap, "prompt_type" to type),
+            mapOf(
+                "days_since_install" to "d0_6",
+                "gap_bucket" to gap,
+                "prompt_type" to type,
+                "version" to "1",
+                Pixel.PixelParameter.PETAL to Pixel.PixelValues.PETAL_RANDOMIZE,
+            ),
         )
     }
 

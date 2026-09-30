@@ -77,55 +77,36 @@ class PromptExposureWeekTrackerTest {
     fun whenFirstEverRunThenStateIsInitialisedAtTheCurrentWeek() = runTest {
         installAge = 10.days
 
-        val open = testee.recordAppOpen()
-
-        assertEquals(PromptExposureWeekTracker.AppOpen(weekIndex = 1, daysSinceInstall = 10, opensPrevWeek = 0), open)
+        assertEquals(PromptExposureWeekTracker.Week(weekIndex = 1, daysSinceInstall = 10), testee.rollIfNeeded())
+        assertEquals(1, testee.recordPromptShown()?.nthInWeek)
     }
 
     @Test
     fun whenSameWeekThenRolloverIsANoOp() = runTest {
-        testee.recordAppOpen()
-        testee.recordPromptShown()
+        repeat(2) { testee.recordPromptShown() }
         installAge = 6.days
 
-        testee.recordAppOpen()
-        val exposure = testee.recordPromptShown()
-
-        assertEquals(2, exposure?.nthInWeek)
-        assertEquals(0, exposure?.opensPrevWeek)
+        assertEquals(PromptExposureWeekTracker.Week(weekIndex = 0, daysSinceInstall = 6), testee.rollIfNeeded())
+        assertEquals(3, testee.recordPromptShown()?.nthInWeek)
     }
 
     @Test
-    fun whenNextWeekThenOpensAreCarriedForward() = runTest {
-        repeat(3) { testee.recordAppOpen() }
+    fun whenNewWeekThenOrdinalsAndReportedCardsReset() = runTest {
+        testee.recordPromptShown()
+        testee.recordNtpCardShown("message")
         installAge = 7.days
 
-        val open = testee.recordAppOpen()
-
-        assertEquals(1L, open?.weekIndex)
-        assertEquals(3, open?.opensPrevWeek)
+        assertEquals(PromptExposureWeekTracker.Week(weekIndex = 1, daysSinceInstall = 7), testee.rollIfNeeded())
+        assertEquals(1, testee.recordNtpCardShown("message")?.nthInWeek)
     }
 
     @Test
-    fun whenAWeekIsSkippedThenOpensPrevWeekIsZero() = runTest {
-        repeat(3) { testee.recordAppOpen() }
-        installAge = 14.days
+    fun whenWeeksAreSkippedThenStateResetsAtTheCurrentWeek() = runTest {
+        repeat(3) { testee.recordPromptShown() }
+        installAge = 22.days
 
-        val open = testee.recordAppOpen()
-
-        assertEquals(2L, open?.weekIndex)
-        assertEquals(0, open?.opensPrevWeek)
-    }
-
-    @Test
-    fun whenRollingOverThenOpensOfTheNewWeekStartFromZero() = runTest {
-        repeat(3) { testee.recordAppOpen() }
-        installAge = 7.days
-        repeat(2) { testee.recordAppOpen() }
-        installAge = 14.days
-
-        // Rollover never counts an open itself: only the two opens of week 1 carry into week 2.
-        assertEquals(2, testee.recordPromptShown()?.opensPrevWeek)
+        assertEquals(3L, testee.rollIfNeeded()?.weekIndex)
+        assertEquals(1, testee.recordPromptShown()?.nthInWeek)
     }
 
     @Test
@@ -142,14 +123,14 @@ class PromptExposureWeekTrackerTest {
         val observerFirstStore = createStore()
         val observerFirst = PromptExposureWeekTracker(observerFirstStore, appInstall)
         repeat(2) {
-            testee.recordAppOpen()
-            observerFirst.recordAppOpen()
+            testee.recordPromptShown()
+            observerFirst.recordPromptShown()
         }
         installAge = 7.days
 
         testee.recordPromptShown()
-        testee.recordAppOpen()
-        observerFirst.recordAppOpen()
+        testee.rollIfNeeded()
+        observerFirst.rollIfNeeded()
         observerFirst.recordPromptShown()
 
         assertEquals(observerFirstStore.data.first().asMap(), testDataStore.data.first().asMap())
@@ -160,14 +141,6 @@ class PromptExposureWeekTrackerTest {
         assertNotNull(testee.recordNtpCardShown("message"))
         assertNull(testee.recordNtpCardShown("message"))
         assertEquals(2, testee.recordNtpCardShown("other")?.nthInWeek)
-    }
-
-    @Test
-    fun whenNtpCardShownInTheNextWeekThenItCountsAgain() = runTest {
-        testee.recordNtpCardShown("message")
-        installAge = 7.days
-
-        assertEquals(1, testee.recordNtpCardShown("message")?.nthInWeek)
     }
 
     @Test
@@ -182,21 +155,20 @@ class PromptExposureWeekTrackerTest {
     @Test
     fun whenClockMovesBackAWeekThenTheStoredWeekIsKept() = runTest {
         installAge = 7.days
-        repeat(2) { testee.recordAppOpen() }
+        testee.recordPromptShown()
         installAge = 6.days
 
-        val exposure = testee.recordPromptShown()
-        installAge = 7.days
-
-        assertEquals(1, exposure?.nthInWeek)
+        assertEquals(1L, testee.rollIfNeeded()?.weekIndex)
         assertEquals(2, testee.recordPromptShown()?.nthInWeek)
+        installAge = 7.days
+        assertEquals(3, testee.recordPromptShown()?.nthInWeek)
     }
 
     @Test
     fun whenInstallAgeUnknownThenNothingIsRecorded() = runTest {
         installAge = null
 
-        assertNull(testee.recordAppOpen())
+        assertNull(testee.rollIfNeeded())
         assertNull(testee.recordPromptShown())
         assertNull(testee.recordNtpCardShown("message"))
         assertEquals(emptyMap<Preferences.Key<*>, Any>(), testDataStore.data.first().asMap())

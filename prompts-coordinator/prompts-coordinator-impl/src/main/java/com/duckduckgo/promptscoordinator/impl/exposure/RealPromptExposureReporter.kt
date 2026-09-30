@@ -23,7 +23,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.promptscoordinator.api.PromptExposureReporter
 import com.duckduckgo.promptscoordinator.impl.exposure.PromptExposurePixelParams.DAYS_SINCE_INSTALL
 import com.duckduckgo.promptscoordinator.impl.exposure.PromptExposurePixelParams.NTH_IN_WEEK
-import com.duckduckgo.promptscoordinator.impl.exposure.PromptExposurePixelParams.OPENS_PREV_WEEK
 import com.duckduckgo.promptscoordinator.impl.exposure.PromptExposurePixelParams.PROMPT_ID
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -37,11 +36,15 @@ import javax.inject.Inject
 class RealPromptExposureReporter @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val weekTracker: PromptExposureWeekTracker,
+    private val session: PromptExposureSession,
     private val pixel: Pixel,
     private val dispatchers: DispatcherProvider,
 ) : PromptExposureReporter {
 
     override fun reportPromptShown(promptId: String) {
+        // Before launching, so a prompt reported just as the app goes to the background still counts
+        // for the session it was shown in.
+        session.markPromptShown()
         appCoroutineScope.launch(dispatchers.io()) {
             val exposure = weekTracker.recordPromptShown() ?: return@launch
             fireExposure(promptId, exposure)
@@ -51,6 +54,8 @@ class RealPromptExposureReporter @Inject constructor(
     override fun reportNewTabPageCardShown(messageId: String) {
         appCoroutineScope.launch(dispatchers.io()) {
             val exposure = weekTracker.recordNtpCardShown(messageId) ?: return@launch
+            // The card can sit on the page for days: only the session that first counts it was prompted.
+            session.markPromptShown()
             fireExposure(REMOTE_MESSAGE_CARD_PROMPT_ID, exposure)
         }
     }
@@ -61,20 +66,15 @@ class RealPromptExposureReporter @Inject constructor(
             logcat { "PromptExposureReporter: unregistered prompt id '$promptId' sent as '$OTHER_PROMPT_ID'" }
         }
 
-        pixel.fire(
+        pixel.firePromptExposurePixel(
             PromptExposurePixelName.PROMPT_EXPOSURE,
-            mapOf(
-                DAYS_SINCE_INSTALL to daysSinceInstall,
-                NTH_IN_WEEK to nthInWeekBucket(exposure.nthInWeek),
-                OPENS_PREV_WEEK to opensPrevWeekBucket(exposure.opensPrevWeek),
-            ),
+            DAYS_SINCE_INSTALL to daysSinceInstall,
+            NTH_IN_WEEK to nthInWeekBucket(exposure.nthInWeek),
         )
-        pixel.fire(
+        pixel.firePromptExposurePixel(
             PromptExposurePixelName.PROMPT_SHOWN,
-            mapOf(
-                DAYS_SINCE_INSTALL to daysSinceInstall,
-                PROMPT_ID to boundedPromptId,
-            ),
+            DAYS_SINCE_INSTALL to daysSinceInstall,
+            PROMPT_ID to boundedPromptId,
         )
     }
 }

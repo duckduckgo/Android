@@ -60,25 +60,6 @@ class PromptExposureBucketsTest {
     }
 
     @Test
-    fun whenOpensPrevWeekAtEachBoundaryThenBucketMatches() {
-        mapOf(
-            0 to "0",
-            1 to "1_2",
-            2 to "1_2",
-            3 to "3_5",
-            5 to "3_5",
-            6 to "6_10",
-            10 to "6_10",
-            11 to "11_20",
-            20 to "11_20",
-            21 to "21_50",
-            50 to "21_50",
-            51 to "51_plus",
-            1_000 to "51_plus",
-        ).forEach { (opens, bucket) -> assertEquals("opens=$opens", bucket, opensPrevWeekBucket(opens)) }
-    }
-
-    @Test
     fun whenNoPreviousPromptThenGapIsFirstForBothSentinels() {
         assertEquals("first", gapBucket(previousPromptAt = 0L, now = NOW))
         assertEquals("first", gapBucket(previousPromptAt = -1L, now = NOW))

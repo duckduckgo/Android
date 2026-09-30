@@ -30,7 +30,7 @@ import dagger.SingleInstanceIn
 import javax.inject.Inject
 
 /**
- * Owns the per-install-week counters behind the prompt exposure pixels.
+ * Owns the per-install-week state behind the prompt exposure pixels.
  *
  * Nothing is scheduled: every operation first rolls the week over if the install has entered a new
  * one, inside the same [DataStore.edit] transaction. Transactions are serialised, so whichever caller
@@ -44,26 +44,18 @@ class PromptExposureWeekTracker @Inject constructor(
     private val appInstall: AppInstall,
 ) {
 
-    data class AppOpen(
+    data class Week(
         val weekIndex: Long,
         val daysSinceInstall: Long,
-        val opensPrevWeek: Int,
     )
 
     data class Exposure(
         val daysSinceInstall: Long,
         val nthInWeek: Int,
-        val opensPrevWeek: Int,
     )
 
-    /** Counts a foreground of the app. Only app opens feed `opens_prev_week`. */
-    suspend fun recordAppOpen(): AppOpen? = update { prefs, days ->
-        prefs[OPENS_CURRENT_WEEK_KEY] = (prefs[OPENS_CURRENT_WEEK_KEY] ?: 0) + 1
-        AppOpen(
-            weekIndex = checkNotNull(prefs[WEEK_INDEX_KEY]),
-            daysSinceInstall = days,
-            opensPrevWeek = prefs[OPENS_PREV_WEEK_KEY] ?: 0,
-        )
+    suspend fun rollIfNeeded(): Week? = update { prefs, days ->
+        Week(weekIndex = checkNotNull(prefs[WEEK_INDEX_KEY]), daysSinceInstall = days)
     }
 
     /** Counts a prompt shown this week and returns its ordinal, starting at 1. */
@@ -71,7 +63,7 @@ class PromptExposureWeekTracker @Inject constructor(
 
     /**
      * Counts the New Tab Page card for [messageId] unless it was already counted this week, in which
-     * case nothing changes and null is returned.
+     * case nothing is counted and null is returned.
      */
     suspend fun recordNtpCardShown(messageId: String): Exposure? = update { prefs, days ->
         val reported = prefs[REPORTED_NTP_CARD_IDS_KEY].orEmpty()
@@ -83,11 +75,7 @@ class PromptExposureWeekTracker @Inject constructor(
     private fun countExposure(prefs: MutablePreferences, days: Long): Exposure {
         val nth = (prefs[NTH_IN_WEEK_KEY] ?: 0) + 1
         prefs[NTH_IN_WEEK_KEY] = nth
-        return Exposure(
-            daysSinceInstall = days,
-            nthInWeek = nth,
-            opensPrevWeek = prefs[OPENS_PREV_WEEK_KEY] ?: 0,
-        )
+        return Exposure(daysSinceInstall = days, nthInWeek = nth)
     }
 
     private suspend fun <T> update(block: (MutablePreferences, Long) -> T?): T? {
@@ -105,10 +93,6 @@ class PromptExposureWeekTracker @Inject constructor(
         // Same week, or the clock moved back: stay in the stored week rather than wipe its counts.
         if (storedWeekIndex != null && currentWeekIndex <= storedWeekIndex) return
 
-        // Skipped weeks had no opens: carrying a stale count forward would misclassify returning users.
-        val isNextWeek = storedWeekIndex != null && currentWeekIndex == storedWeekIndex + 1
-        prefs[OPENS_PREV_WEEK_KEY] = if (isNextWeek) prefs[OPENS_CURRENT_WEEK_KEY] ?: 0 else 0
-        prefs[OPENS_CURRENT_WEEK_KEY] = 0
         prefs[NTH_IN_WEEK_KEY] = 0
         prefs.remove(REPORTED_NTP_CARD_IDS_KEY)
         prefs[WEEK_INDEX_KEY] = currentWeekIndex
@@ -117,8 +101,6 @@ class PromptExposureWeekTracker @Inject constructor(
     private companion object {
         val WEEK_INDEX_KEY = longPreferencesKey("week_index")
         val NTH_IN_WEEK_KEY = intPreferencesKey("nth_in_week")
-        val OPENS_CURRENT_WEEK_KEY = intPreferencesKey("opens_current_week")
-        val OPENS_PREV_WEEK_KEY = intPreferencesKey("opens_prev_week")
         val REPORTED_NTP_CARD_IDS_KEY = stringSetPreferencesKey("reported_ntp_card_ids")
     }
 }

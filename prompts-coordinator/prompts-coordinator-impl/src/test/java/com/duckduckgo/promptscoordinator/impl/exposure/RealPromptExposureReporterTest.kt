@@ -23,8 +23,14 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browser.api.install.AppInstall
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.DispatcherProvider
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.After
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -46,6 +52,7 @@ class RealPromptExposureReporterTest {
 
     private val appInstall: AppInstall = mock()
     private val pixel: Pixel = mock()
+    private val session = PromptExposureSession()
 
     private lateinit var testDataStoreFile: File
     private lateinit var testDataStore: DataStore<Preferences>
@@ -65,6 +72,7 @@ class RealPromptExposureReporterTest {
         testee = RealPromptExposureReporter(
             appCoroutineScope = coroutinesTestRule.testScope,
             weekTracker = PromptExposureWeekTracker(testDataStore, appInstall),
+            session = session,
             pixel = pixel,
             dispatchers = coroutinesTestRule.testDispatcherProvider,
         )
@@ -80,14 +88,8 @@ class RealPromptExposureReporterTest {
         testee.reportPromptShown("win_back_prompt")
         advanceUntilIdle()
 
-        verify(pixel).fire(
-            PromptExposurePixelName.PROMPT_EXPOSURE,
-            mapOf("days_since_install" to "d7_13", "nth_in_week" to "1", "opens_prev_week" to "0"),
-        )
-        verify(pixel).fire(
-            PromptExposurePixelName.PROMPT_SHOWN,
-            mapOf("days_since_install" to "d7_13", "prompt_id" to "win_back_prompt"),
-        )
+        verify(pixel).fire(PromptExposurePixelName.PROMPT_EXPOSURE, exposureParams(days = "d7_13", nth = "1"))
+        verify(pixel).fire(PromptExposurePixelName.PROMPT_SHOWN, shownParams(promptId = "win_back_prompt"))
     }
 
     @Test
@@ -108,10 +110,29 @@ class RealPromptExposureReporterTest {
         testee.reportPromptShown("brand_new_evaluator")
         advanceUntilIdle()
 
-        verify(pixel).fire(
-            PromptExposurePixelName.PROMPT_SHOWN,
-            mapOf("days_since_install" to "d7_13", "prompt_id" to "other"),
+        verify(pixel).fire(PromptExposurePixelName.PROMPT_SHOWN, shownParams(promptId = "other"))
+    }
+
+    @Test
+    fun whenPromptShownThenSessionIsMarkedWithoutWaitingForItsCoroutine() {
+        val paused = StandardTestDispatcher()
+        val reporter = RealPromptExposureReporter(
+            appCoroutineScope = TestScope(paused),
+            weekTracker = PromptExposureWeekTracker(testDataStore, appInstall),
+            session = session,
+            pixel = pixel,
+            dispatchers = object : DispatcherProvider {
+                override fun computation(): CoroutineDispatcher = paused
+                override fun io(): CoroutineDispatcher = paused
+                override fun main(): CoroutineDispatcher = paused
+                override fun unconfined(): CoroutineDispatcher = paused
+            },
         )
+
+        reporter.reportPromptShown("win_back_prompt")
+
+        assertTrue(session.consumePromptShown())
+        verifyNoInteractions(pixel)
     }
 
     @Test
@@ -121,10 +142,19 @@ class RealPromptExposureReporterTest {
 
         verify(pixel).fire(PromptExposurePixelName.PROMPT_EXPOSURE, exposureParams(days = "d7_13", nth = "1"))
         verify(pixel, never()).fire(PromptExposurePixelName.PROMPT_EXPOSURE, exposureParams(days = "d7_13", nth = "2"))
-        verify(pixel).fire(
-            PromptExposurePixelName.PROMPT_SHOWN,
-            mapOf("days_since_install" to "d7_13", "prompt_id" to "remote_message_card"),
-        )
+        verify(pixel).fire(PromptExposurePixelName.PROMPT_SHOWN, shownParams(promptId = "remote_message_card"))
+    }
+
+    @Test
+    fun whenNtpCardIsOnlyStillOnScreenThenTheSessionIsNotMarked() = runTest {
+        testee.reportNewTabPageCardShown("message")
+        advanceUntilIdle()
+        assertTrue(session.consumePromptShown())
+
+        testee.reportNewTabPageCardShown("message")
+        advanceUntilIdle()
+
+        assertFalse(session.consumePromptShown())
     }
 
     @Test
@@ -140,6 +170,17 @@ class RealPromptExposureReporterTest {
 
     private fun advanceUntilIdle() = coroutinesTestRule.testScope.testScheduler.advanceUntilIdle()
 
-    private fun exposureParams(days: String, nth: String) =
-        mapOf("days_since_install" to days, "nth_in_week" to nth, "opens_prev_week" to "0")
+    private fun exposureParams(days: String, nth: String) = mapOf(
+        "days_since_install" to days,
+        "nth_in_week" to nth,
+        "version" to "1",
+        Pixel.PixelParameter.PETAL to Pixel.PixelValues.PETAL_RANDOMIZE,
+    )
+
+    private fun shownParams(promptId: String) = mapOf(
+        "days_since_install" to "d7_13",
+        "prompt_id" to promptId,
+        "version" to "1",
+        Pixel.PixelParameter.PETAL to Pixel.PixelValues.PETAL_RANDOMIZE,
+    )
 }

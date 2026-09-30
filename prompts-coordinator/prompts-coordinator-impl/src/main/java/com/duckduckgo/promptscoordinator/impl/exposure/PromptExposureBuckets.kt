@@ -38,16 +38,6 @@ internal fun nthInWeekBucket(nth: Int): String = when {
     else -> "21_plus"
 }
 
-internal fun opensPrevWeekBucket(opens: Int): String = when {
-    opens <= 0 -> "0"
-    opens <= 2 -> "1_2"
-    opens <= 5 -> "3_5"
-    opens <= 10 -> "6_10"
-    opens <= 20 -> "11_20"
-    opens <= 50 -> "21_50"
-    else -> "51_plus"
-}
-
 /**
  * @param previousPromptAt the last stamped prompt, where any value `<= 0` means none was ever stamped.
  * @return the bucket, or null when the clock moved back and the gap is meaningless.
