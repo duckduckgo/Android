@@ -43,6 +43,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -139,6 +140,37 @@ class DuckChatContextualWebViewViewModelTest {
             assertEquals("hello", event.params.getJSONObject("query").getString("prompt"))
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun `entry prompt with selections does not re-report the submission on web app ready`() = runTest {
+        val selections = JSONArray().apply { put(JSONObject().apply { put("content", "picked text") }) }
+        val prompt = NativeInputPrompt("hello", "model-1", "high", null, null, null, selectionsJson = selections)
+        whenever(contextualEntryPromptStore.consume("tab-1")).thenReturn(ContextualEntryPrompt("tab-1", prompt, null, selectionsJson = selections))
+        (duckChat as FakeDuckChat).nextUrl = "https://duckduckgo.com/?ia=chat"
+
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        testee.onWebAppReady()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(duckChatPixels, never()).reportContextualPromptSubmittedWithSelections(any())
+        verify(selectionJourney, never()).onPromptSubmitted(any())
+    }
+
+    @Test
+    fun `onPromptSent with selections reports the pixel and ends the journey as submitted`() = runTest {
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        val selections = JSONArray().apply {
+            put(JSONObject().apply { put("content", "one") })
+            put(JSONObject().apply { put("content", "two") })
+        }
+
+        testee.onPromptSent("Explain", selectionsJson = selections)
+
+        verify(duckChatPixels).reportContextualPromptSubmittedWithSelections(2)
+        verify(selectionJourney).onPromptSubmitted("tab-1")
     }
 
     @Test

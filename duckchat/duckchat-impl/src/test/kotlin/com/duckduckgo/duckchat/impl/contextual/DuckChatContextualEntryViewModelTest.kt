@@ -354,6 +354,8 @@ class DuckChatContextualEntryViewModelTest {
         assertEquals(15, first.getInt("fullContentLength"))
         assertFalse(first.getBoolean("truncated"))
         assertTrue(textSelectionRepository.selections("tab-1").value.isEmpty())
+        verify(duckChatPixels).reportContextualPromptSubmittedWithSelections(2)
+        verify(selectionJourney).onPromptSubmitted("tab-1")
     }
 
     @Test
@@ -370,6 +372,8 @@ class DuckChatContextualEntryViewModelTest {
         verify(store).store(captor.capture())
         assertNull(captor.firstValue.selectionsJson)
         assertEquals(validContext, captor.firstValue.serializedPageContext)
+        verify(duckChatPixels, never()).reportContextualPromptSubmittedWithSelections(any())
+        verify(selectionJourney, never()).onPromptSubmitted(any())
     }
 
     @Test

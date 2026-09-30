@@ -143,6 +143,10 @@ class DuckChatContextualEntryViewModel @Inject constructor(
 
     private fun submit(prompt: NativeInputPrompt) {
         val selectionsJson = prompt.selectionsJson ?: selectionPayloadBuilder.toJson(textSelectionRepository.consume(tabId))
+        selectionsJson?.length()?.takeIf { it > 0 }?.let {
+            duckChatPixels.reportContextualPromptSubmittedWithSelections(it)
+            selectionJourney.onPromptSubmitted(tabId)
+        }
         contextualEntryPromptStore.store(
             ContextualEntryPrompt(
                 tabId = tabId,

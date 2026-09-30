@@ -372,6 +372,10 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
         selectionsJson: JSONArray? = null,
     ) {
         val attachedContext = pageContextState.attachedPage.takeIf { _viewState.value.showContext }
+        selectionsJson?.length()?.takeIf { it > 0 }?.let {
+            duckChatPixels.reportContextualPromptSubmittedWithSelections(it)
+            selectionJourney.onPromptSubmitted(viewState.value.tabId)
+        }
         submitPrompt(prompt, followUpPrefill, modelId, reasoningEffort, selectedTool, imagesJson, filesJson, attachedContext, selectionsJson)
     }
 
@@ -386,10 +390,6 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
         pageContextSerialized: String?,
         selectionsJson: JSONArray? = null,
     ) {
-        selectionsJson?.length()?.takeIf { it > 0 }?.let {
-            duckChatPixels.reportContextualPromptSubmittedWithSelections(it)
-            selectionJourney.onPromptSubmitted(viewState.value.tabId)
-        }
         viewModelScope.launch(dispatchers.io()) {
             val contextPrompt =
                 generateContextPrompt(prompt, modelId, reasoningEffort, selectedTool, imagesJson, filesJson, pageContextSerialized, selectionsJson)
