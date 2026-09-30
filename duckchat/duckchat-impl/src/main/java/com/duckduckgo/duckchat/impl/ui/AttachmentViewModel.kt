@@ -81,7 +81,8 @@ class AttachmentViewModel @Inject constructor(
     private val textSelectionPayloadBuilder: TextSelectionPayloadBuilder,
 ) : ViewModel() {
 
-    private var textSelectionsTabId: String? = null
+    var textSelectionsTabId: String? = null
+        private set
     private var textSelectionsJob: Job? = null
 
     enum class ImageSource(val pixelValue: String) {

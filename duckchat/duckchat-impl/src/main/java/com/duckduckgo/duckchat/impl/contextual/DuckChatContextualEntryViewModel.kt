@@ -178,6 +178,6 @@ class DuckChatContextualEntryViewModel @Inject constructor(
 
     fun onDismiss() {
         duckChatPixels.reportContextualFloatingInputDismissedWithoutSubmission()
-        selectionJourney.onSurfaceDismissed()
+        selectionJourney.onSurfaceDismissed(tabId)
     }
 }

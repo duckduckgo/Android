@@ -18,11 +18,13 @@ package com.duckduckgo.duckchat.impl.ui.nativeinput.textselection
 
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.wideevents.DuckAiSelectionJourneyWideEvent
+import com.duckduckgo.duckchat.impl.wideevents.SelectionTerminalReason
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -134,7 +136,7 @@ class TextSelectionRepositoryTest {
 
         assertEquals(1, testee.selections(TAB).value.size)
         verify(duckChatPixels, never()).reportContextualSelectionRemoved()
-        verify(selectionJourney, never()).onSelectionRemoved(any())
+        verify(selectionJourney, never()).onSelectionRemoved(any(), any())
     }
 
     @Test
@@ -142,8 +144,8 @@ class TextSelectionRepositoryTest {
         testee.add(TAB, "first", URL)
         testee.add(TAB, "second", URL)
 
-        verify(selectionJourney).onSelectionAttached(1)
-        verify(selectionJourney).onSelectionAttached(2)
+        verify(selectionJourney).onSelectionAttached(TAB, 1)
+        verify(selectionJourney).onSelectionAttached(TAB, 2)
     }
 
     @Test
@@ -153,7 +155,7 @@ class TextSelectionRepositoryTest {
         testee.remove(TAB, testee.selections(TAB).value.first().id)
 
         verify(duckChatPixels).reportContextualSelectionRemoved()
-        verify(selectionJourney).onSelectionRemoved(0)
+        verify(selectionJourney).onSelectionRemoved(TAB, 0)
     }
 
     @Test
@@ -166,6 +168,8 @@ class TextSelectionRepositoryTest {
 
         assertTrue(testee.selections(TAB).value.isEmpty())
         assertFalse(testee.limitReached(TAB).value)
+        verify(selectionJourney).onJourneyEnded(TAB, SelectionTerminalReason.TAB_CLOSED)
+        verify(selectionJourney, never()).onJourneyEnded(eq("tab-2"), any())
         assertEquals(1, testee.selections("tab-2").value.size)
     }
 
@@ -191,6 +195,8 @@ class TextSelectionRepositoryTest {
 
         assertTrue(testee.selections(TAB).value.isEmpty())
         assertTrue(testee.selections("tab-2").value.isEmpty())
+        verify(selectionJourney).onJourneyEnded(TAB, SelectionTerminalReason.CHAT_CLEARED)
+        verify(selectionJourney).onJourneyEnded("tab-2", SelectionTerminalReason.CHAT_CLEARED)
     }
 
     private fun fillToLimit() {

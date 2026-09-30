@@ -63,6 +63,7 @@ class ContextualSuggestionsViewModel @Inject constructor(
     private var isSmart: Boolean = false
     private var suggestionsVisible = false
     private var textSelectionCount: Int = 0
+    private var textSelectionsTabId: String? = null
     private var otherAttachmentCount: Int = 0
     private var lastInput: ResolvePageSuggestionsInput? = null
 
@@ -86,9 +87,13 @@ class ContextualSuggestionsViewModel @Inject constructor(
     fun onSuggestionSelected(suggestionId: String) {
         duckChatPixels.reportContextualSuggestionSelected(suggestionId, pageType.pixelValue)
         when (suggestionId) {
-            "summarize-selection" -> selectionJourney.onSuggestionSelected(SelectionSubmissionAction.SUMMARIZE)
-            "translate-selection" -> selectionJourney.onSuggestionSelected(SelectionSubmissionAction.TRANSLATE)
+            "summarize-selection" -> reportSuggestionSelected(SelectionSubmissionAction.SUMMARIZE)
+            "translate-selection" -> reportSuggestionSelected(SelectionSubmissionAction.TRANSLATE)
         }
+    }
+
+    private fun reportSuggestionSelected(action: SelectionSubmissionAction) {
+        textSelectionsTabId?.let { selectionJourney.onSuggestionSelected(it, action) }
     }
 
     fun currentPageType(): SuggestionsPageType = pageType
@@ -118,9 +123,11 @@ class ContextualSuggestionsViewModel @Inject constructor(
     fun onAttachmentsChanged(
         textSelections: Int,
         otherAttachments: Int,
+        textSelectionsTabId: String? = null,
     ) {
         val modeChanged = (textSelectionCount > 0) != (textSelections > 0)
         textSelectionCount = textSelections
+        this.textSelectionsTabId = textSelectionsTabId
         otherAttachmentCount = otherAttachments
         if (!modeChanged) {
             _viewState.update { it.copy(suggestions = visibleSuggestions()) }
@@ -145,7 +152,7 @@ class ContextualSuggestionsViewModel @Inject constructor(
 
     private suspend fun resolveTextSelectionSuggestions() {
         resolvedSuggestions = suggestedPromptsProvider.resolveTextSelectionSuggestions(currentInput())
-        if (resolvedSuggestions.isNotEmpty()) selectionJourney.onSuggestionsViewed()
+        if (resolvedSuggestions.isNotEmpty()) textSelectionsTabId?.let { selectionJourney.onSuggestionsViewed(it) }
         showSuggestions()
     }
 

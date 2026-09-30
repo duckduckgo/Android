@@ -275,9 +275,11 @@ class DuckChatContextualEntryViewModelTest {
 
     @Test
     fun whenDismissedThenReportsSurfaceDismissedToSelectionJourney() {
+        viewModel.start("tab-1")
+
         viewModel.onDismiss()
 
-        verify(selectionJourney).onSurfaceDismissed()
+        verify(selectionJourney).onSurfaceDismissed("tab-1")
     }
 
     @Test
@@ -442,7 +444,7 @@ class DuckChatContextualEntryViewModelTest {
     fun whenFirstSelectionAttachedThenJourneyRecordsIt() {
         textSelectionRepository.add("tab-1", "selected words", "https://example.com")
 
-        verify(selectionJourney).onSelectionAttached(1)
+        verify(selectionJourney).onSelectionAttached("tab-1", 1)
     }
 
     @Test
@@ -452,7 +454,7 @@ class DuckChatContextualEntryViewModelTest {
 
         textSelectionRepository.remove("tab-1", target.id)
 
-        verify(selectionJourney).onSelectionRemoved(0)
+        verify(selectionJourney).onSelectionRemoved("tab-1", 0)
     }
 
     @Test

@@ -386,7 +386,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
     ) {
         selectionsJson?.length()?.takeIf { it > 0 }?.let {
             duckChatPixels.reportContextualPromptSubmittedWithSelections(it)
-            selectionJourney.onPromptSubmitted()
+            selectionJourney.onPromptSubmitted(viewState.value.tabId)
         }
         viewModelScope.launch(dispatchers.io()) {
             val contextPrompt =
@@ -570,7 +570,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
             return
         }
         duckChatPixels.reportContextualSheetDismissed()
-        selectionJourney.onSurfaceDismissed()
+        selectionJourney.onSurfaceDismissed(viewState.value.tabId)
         persistTabClosed()
         commandChannel.trySend(Command.ApplyContextualClosed(_viewState.value.tabId))
     }
@@ -728,7 +728,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
         // so it isn't resumed, then let the dialog command hide the sheet. Mark the impending hide as a
         // handoff so onSheetClosed doesn't revert the tab's contextual input state.
         duckChatPixels.reportContextualSheetNewChatFromPopup()
-        selectionJourney.onJourneyEnded(SelectionTerminalReason.NEW_CHAT)
+        selectionJourney.onJourneyEnded(viewState.value.tabId, SelectionTerminalReason.NEW_CHAT)
         hidingSheetForNewChat = true
         resetToNewChat()
         commandChannel.trySend(Command.ShowNewChatEntryDialog(_viewState.value.tabId))
@@ -777,7 +777,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
 
     fun onContextualFireConfirmed() {
         duckChatPixels.reportContextualFireButtonConfirmed()
-        selectionJourney.onJourneyEnded(SelectionTerminalReason.CHAT_CLEARED)
+        selectionJourney.onJourneyEnded(viewState.value.tabId, SelectionTerminalReason.CHAT_CLEARED)
         resetToNewChat()
         commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_HIDDEN))
     }

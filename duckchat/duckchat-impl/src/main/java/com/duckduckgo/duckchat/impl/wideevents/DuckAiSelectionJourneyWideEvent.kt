@@ -43,17 +43,18 @@ enum class SelectionTerminalReason(val value: String) {
     SELECTIONS_REMOVED("selections_removed"),
     NEW_CHAT("new_chat"),
     CHAT_CLEARED("chat_cleared"),
+    TAB_CLOSED("tab_closed"),
     SESSION_EXPIRED("session_expired"),
 }
 
 interface DuckAiSelectionJourneyWideEvent {
-    fun onSelectionAttached(count: Int)
-    fun onSelectionRemoved(remaining: Int)
-    fun onSuggestionsViewed()
-    fun onSurfaceDismissed()
-    fun onSuggestionSelected(action: SelectionSubmissionAction)
-    fun onPromptSubmitted()
-    fun onJourneyEnded(reason: SelectionTerminalReason)
+    fun onSelectionAttached(tabId: String, count: Int)
+    fun onSelectionRemoved(tabId: String, remaining: Int)
+    fun onSuggestionsViewed(tabId: String)
+    fun onSurfaceDismissed(tabId: String)
+    fun onSuggestionSelected(tabId: String, action: SelectionSubmissionAction)
+    fun onPromptSubmitted(tabId: String)
+    fun onJourneyEnded(tabId: String, reason: SelectionTerminalReason)
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -68,7 +69,7 @@ class RealDuckAiSelectionJourneyWideEvent @Inject constructor(
     private val coroutineScope = CoroutineScope(appCoroutineScope.coroutineContext + dispatchers.io())
     private val channel = Channel<Action>(capacity = Channel.UNLIMITED)
 
-    private var journey: Journey? = null
+    private val journeys = mutableMapOf<String, Journey>()
 
     init {
         coroutineScope.launch {
@@ -84,59 +85,63 @@ class RealDuckAiSelectionJourneyWideEvent @Inject constructor(
         }
     }
 
-    override fun onSelectionAttached(count: Int) = send(Action.Attached(count))
-    override fun onSelectionRemoved(remaining: Int) = send(Action.Removed(remaining))
-    override fun onSuggestionsViewed() = send(Action.SuggestionsViewed)
-    override fun onSurfaceDismissed() = send(Action.Dismissed)
-    override fun onSuggestionSelected(action: SelectionSubmissionAction) = send(Action.SuggestionSelected(action))
-    override fun onPromptSubmitted() = send(Action.Submitted)
-    override fun onJourneyEnded(reason: SelectionTerminalReason) = send(Action.Ended(reason))
+    override fun onSelectionAttached(tabId: String, count: Int) = send(Action.Attached(tabId, count))
+    override fun onSelectionRemoved(tabId: String, remaining: Int) = send(Action.Removed(tabId, remaining))
+    override fun onSuggestionsViewed(tabId: String) = send(Action.SuggestionsViewed(tabId))
+    override fun onSurfaceDismissed(tabId: String) = send(Action.Dismissed(tabId))
+    override fun onSuggestionSelected(tabId: String, action: SelectionSubmissionAction) = send(Action.SuggestionSelected(tabId, action))
+    override fun onPromptSubmitted(tabId: String) = send(Action.Submitted(tabId))
+    override fun onJourneyEnded(tabId: String, reason: SelectionTerminalReason) = send(Action.Ended(tabId, reason))
 
     private fun send(action: Action) {
         channel.trySend(action)
     }
 
     private suspend fun process(action: Action) {
+        val tabId = action.tabId
         when (action) {
             is Action.Attached -> {
-                expireIfStale()
-                val current = journey ?: start() ?: return
-                journey = current.copy(maxSelectionCount = maxOf(current.maxSelectionCount, action.count))
+                expireIfStale(tabId)
+                val current = journeys[tabId] ?: start(tabId) ?: return
+                journeys[tabId] = current.copy(maxSelectionCount = maxOf(current.maxSelectionCount, action.count))
             }
 
-            is Action.Removed -> if (action.remaining == 0) finish(SelectionTerminalReason.SELECTIONS_REMOVED)
+            is Action.Removed -> if (action.remaining == 0) finish(tabId, SelectionTerminalReason.SELECTIONS_REMOVED)
 
-            Action.SuggestionsViewed -> journey = journey?.copy(sawSuggestions = true)
+            is Action.SuggestionsViewed -> update(tabId) { it.copy(sawSuggestions = true) }
 
-            Action.Dismissed -> journey = journey?.let { it.copy(dismissalCount = it.dismissalCount + 1, submissionAction = null) }
+            is Action.Dismissed -> update(tabId) { it.copy(dismissalCount = it.dismissalCount + 1, submissionAction = null) }
 
-            is Action.SuggestionSelected -> journey = journey?.copy(submissionAction = action.action)
+            is Action.SuggestionSelected -> update(tabId) { it.copy(submissionAction = action.action) }
 
-            Action.Submitted -> finish(SelectionTerminalReason.SUBMITTED)
+            is Action.Submitted -> finish(tabId, SelectionTerminalReason.SUBMITTED)
 
-            is Action.Ended -> finish(action.reason)
+            is Action.Ended -> finish(tabId, action.reason)
         }
     }
 
-    private suspend fun expireIfStale() {
-        val current = journey ?: return
+    private fun update(tabId: String, transform: (Journey) -> Journey) {
+        journeys[tabId]?.let { journeys[tabId] = transform(it) }
+    }
+
+    private suspend fun expireIfStale(tabId: String) {
+        val current = journeys[tabId] ?: return
         if (timeProvider.currentTimeMillis() - current.startedAt > MAX_JOURNEY_DURATION_MS) {
-            finish(SelectionTerminalReason.SESSION_EXPIRED)
+            finish(tabId, SelectionTerminalReason.SESSION_EXPIRED)
         }
     }
 
-    private suspend fun start(): Journey? {
+    private suspend fun start(tabId: String): Journey? {
         val id = wideEventClient.flowStart(
             name = FLOW_NAME,
             cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
         ).getOrNull() ?: return null
         wideEventClient.intervalStart(wideEventId = id, key = KEY_DURATION)
-        return Journey(id = id, startedAt = timeProvider.currentTimeMillis()).also { journey = it }
+        return Journey(id = id, startedAt = timeProvider.currentTimeMillis()).also { journeys[tabId] = it }
     }
 
-    private suspend fun finish(reason: SelectionTerminalReason) {
-        val current = journey ?: return
-        journey = null
+    private suspend fun finish(tabId: String, reason: SelectionTerminalReason) {
+        val current = journeys.remove(tabId) ?: return
         wideEventClient.intervalEnd(wideEventId = current.id, key = KEY_DURATION)
         wideEventClient.flowFinish(
             wideEventId = current.id,
@@ -174,13 +179,15 @@ class RealDuckAiSelectionJourneyWideEvent @Inject constructor(
     )
 
     private sealed interface Action {
-        data class Attached(val count: Int) : Action
-        data class Removed(val remaining: Int) : Action
-        data object SuggestionsViewed : Action
-        data object Dismissed : Action
-        data class SuggestionSelected(val action: SelectionSubmissionAction) : Action
-        data object Submitted : Action
-        data class Ended(val reason: SelectionTerminalReason) : Action
+        val tabId: String
+
+        data class Attached(override val tabId: String, val count: Int) : Action
+        data class Removed(override val tabId: String, val remaining: Int) : Action
+        data class SuggestionsViewed(override val tabId: String) : Action
+        data class Dismissed(override val tabId: String) : Action
+        data class SuggestionSelected(override val tabId: String, val action: SelectionSubmissionAction) : Action
+        data class Submitted(override val tabId: String) : Action
+        data class Ended(override val tabId: String, val reason: SelectionTerminalReason) : Action
     }
 
     private companion object {

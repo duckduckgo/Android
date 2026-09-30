@@ -14,7 +14,7 @@
                     "outcome.terminal_reason": {
                         "type": "string",
                         "description": "Why the journey ended",
-                        "enum": ["submitted", "selections_removed", "new_chat", "chat_cleared", "session_expired"]
+                        "enum": ["submitted", "selections_removed", "new_chat", "chat_cleared", "tab_closed", "session_expired"]
                     },
                     "submission.action": {
                         "type": "string",

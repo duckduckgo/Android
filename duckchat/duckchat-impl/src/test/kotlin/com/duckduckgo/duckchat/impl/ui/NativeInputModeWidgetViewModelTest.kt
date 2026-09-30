@@ -1088,12 +1088,14 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
-    fun whenPromptSubmittedThenJourneySubmitted() = runTest {
+    fun whenPromptSubmittedThenJourneySubmittedForActiveTab() = runTest {
         val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
 
         viewModel.onPromptSubmitted()
 
-        verify(selectionJourney).onPromptSubmitted()
+        verify(selectionJourney).onPromptSubmitted("tab-A")
     }
 
     @Test

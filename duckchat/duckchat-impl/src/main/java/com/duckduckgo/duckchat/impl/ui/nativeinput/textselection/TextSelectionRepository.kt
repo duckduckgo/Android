@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.ui.nativeinput.textselection
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.wideevents.DuckAiSelectionJourneyWideEvent
+import com.duckduckgo.duckchat.impl.wideevents.SelectionTerminalReason
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
 import dagger.SingleInstanceIn
@@ -76,7 +77,7 @@ class RealTextSelectionRepository @Inject constructor(
         when {
             selections.size > countBefore -> {
                 duckChatPixels.get().reportContextualSelectionAttached()
-                selectionJourney.onSelectionAttached(selections.size)
+                selectionJourney.onSelectionAttached(tabId, selections.size)
             }
             !isAttached -> {
                 duckChatPixels.get().reportContextualSelectionLimitReached()
@@ -98,17 +99,25 @@ class RealTextSelectionRepository @Inject constructor(
         if (selections.size < countBefore) {
             getLimitFlow(tabId).value = false
             duckChatPixels.get().reportContextualSelectionRemoved()
-            selectionJourney.onSelectionRemoved(selections.size)
+            selectionJourney.onSelectionRemoved(tabId, selections.size)
         }
     }
 
     override fun clear(tabId: String) {
-        selections.remove(tabId)?.value = emptyList()
-        limitReached.remove(tabId)?.value = false
+        clearTab(tabId)
+        selectionJourney.onJourneyEnded(tabId, SelectionTerminalReason.TAB_CLOSED)
     }
 
     override fun clearAll() {
-        (selections.keys + limitReached.keys).forEach(::clear)
+        (selections.keys + limitReached.keys).forEach {
+            clearTab(it)
+            selectionJourney.onJourneyEnded(it, SelectionTerminalReason.CHAT_CLEARED)
+        }
+    }
+
+    private fun clearTab(tabId: String) {
+        selections.remove(tabId)?.value = emptyList()
+        limitReached.remove(tabId)?.value = false
     }
 
     private fun getFlow(tabId: String): MutableStateFlow<List<TextSelection>> =

@@ -99,7 +99,7 @@ class ContextualSuggestionsView @JvmOverloads constructor(
         attachmentsJob += attachmentViewModel.attachmentState
             .onEach { state ->
                 val others = state.images.size + state.files.size + if (state.pageContext != null) 1 else 0
-                viewModel.onAttachmentsChanged(state.textSelections.size, others)
+                viewModel.onAttachmentsChanged(state.textSelections.size, others, attachmentViewModel.textSelectionsTabId)
             }
             .launchIn(scope)
     }
