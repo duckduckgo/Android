@@ -34,18 +34,18 @@ class RadioListAlertDialogBuilderTest {
     }
 
     @Test
-    fun whenOptionsAreAddedInMultipleCallsThenSelectionIsOffsetByPreviouslyAddedOptions() {
+    fun whenOptionsAreSetAgainThenTheyReplaceThePreviousOptions() {
         RadioListAlertDialogBuilder(context)
             .setTitle(R.string.dialogConfirmTitle)
             .setOptions(listOf(RadioListOption(R.string.dialogAddTitle), RadioListOption(R.string.dialogEditTitle)))
-            .setOptions(listOf(RadioListOption(R.string.dialogSave, isSelected = true)))
+            .setOptions(listOf(RadioListOption(R.string.dialogSave), RadioListOption(R.string.dialogSaveAction, isSelected = true)))
             .setPositiveButton(R.string.dialogSave)
             .setNegativeButton(R.string.dialogAddTitle)
             .show()
 
         val radioGroup = ShadowDialog.getLatestDialog().findViewById<RadioGroup>(R.id.radioListDialogRadioGroup)
 
-        assertEquals(3, radioGroup.childCount)
-        assertEquals(3, radioGroup.checkedRadioButtonId)
+        assertEquals(2, radioGroup.childCount)
+        assertEquals(2, radioGroup.checkedRadioButtonId)
     }
 }

@@ -80,7 +80,7 @@ class RadioListAlertDialogBuilder(val context: Context) : DaxAlertDialog {
     private var positiveButtonType: ButtonType = ButtonType.PRIMARY
     private var negativeButtonText: CharSequence = ""
     private var negativeButtonType: ButtonType? = null
-    private var optionList: MutableList<CharSequence> = mutableListOf()
+    private var optionList: List<CharSequence> = emptyList()
     private var selectedOption: Int? = null
     private var isCancelable: Boolean = false
     private var isRebrandUpdate: Boolean = false
@@ -155,26 +155,19 @@ class RadioListAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         @StringRes stackedButtonTextId: List<Int>,
         selectedItem: Int? = null,
     ): RadioListAlertDialogBuilder {
-        stackedButtonTextId.forEach {
-            optionList.add(context.getText(it))
-        }
+        optionList = stackedButtonTextId.map { context.getText(it) }
         selectedOption = selectedItem
         return this
     }
 
     /**
-     * Adds the given options, checking the first one with [RadioListOption.isSelected] set. Listener callbacks
+     * Replaces the options with the given ones, checking the first one with [RadioListOption.isSelected] set. Listener callbacks
      * still report the selection as a 1-based position.
      */
     @JvmName("setRadioListOptions")
     fun setOptions(options: List<RadioListOption>): RadioListAlertDialogBuilder {
-        val existingOptionCount = optionList.size
-        options.forEach {
-            optionList.add(context.getText(it.textId))
-        }
-        selectedOption = options.indexOfFirst { it.isSelected }
-            .takeIf { it >= 0 }
-            ?.let { existingOptionCount + it + 1 }
+        optionList = options.map { context.getText(it.textId) }
+        selectedOption = options.indexOfFirst { it.isSelected }.takeIf { it >= 0 }?.plus(1)
         return this
     }
 
@@ -184,9 +177,7 @@ class RadioListAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         stackedButtonTextId: List<String>,
         selectedItem: Int? = null,
     ): RadioListAlertDialogBuilder {
-        stackedButtonTextId.forEach {
-            optionList.add(it)
-        }
+        optionList = stackedButtonTextId
         selectedOption = selectedItem
         return this
     }
