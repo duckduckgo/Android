@@ -24,10 +24,14 @@ import com.duckduckgo.common.utils.extensions.extractETag
 import com.duckduckgo.common.utils.store.BinaryDataStore
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.moshi.JsonDataException
+import com.squareup.moshi.JsonReader
 import com.squareup.moshi.Moshi
 import io.reactivex.Completable
 import logcat.logcat
 import okhttp3.Headers
+import okio.BufferedSource
+import okio.ByteString.Companion.decodeHex
 import java.io.IOException
 import javax.inject.Inject
 
@@ -54,7 +58,7 @@ class RealTrackerDataDownloader @Inject constructor(
                 throw IOException("Status: ${response.code()} - ${response.errorBody()?.string()}")
             }
 
-            val tdsJson = response.body()!!.use { tdsAdapter.fromJson(it.source()) }
+            val tdsJson = response.body()!!.use { parseTds(it.source()) }
                 ?: throw IOException("Empty tds.json body")
             val eTag = response.headers().extractETag()
             val oldEtag = metadataDao.eTag()
@@ -77,6 +81,26 @@ class RealTrackerDataDownloader @Inject constructor(
             }
             return@fromAction
         }
+    }
+
+    /**
+     * Applies the same document-level rules as Retrofit's MoshiResponseBodyConverter (a UTF-8 BOM is
+     * skipped, trailing content is rejected), which Moshi's JsonAdapter leaves to the caller.
+     */
+    private fun parseTds(source: BufferedSource): TdsJson? {
+        if (source.rangeEquals(0, UTF8_BOM)) {
+            source.skip(UTF8_BOM.size.toLong())
+        }
+        val reader = JsonReader.of(source)
+        val tdsJson = tdsAdapter.fromJson(reader)
+        if (reader.peek() != JsonReader.Token.END_DOCUMENT) {
+            throw JsonDataException("JSON document was not fully consumed.")
+        }
+        return tdsJson
+    }
+
+    companion object {
+        private val UTF8_BOM = "EFBBBF".decodeHex()
     }
 }
 
