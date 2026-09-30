@@ -378,4 +378,33 @@
         <item quantity="many">%1$d slov</item>
         <item quantity="other" instruction="%1$d is the number of words in the selection.">%1$d slov</item>
     </plurals>
+
+    <!-- Duck.ai high-usage model footer -->
+    <string name="duckChatHighUsageModelFooterMessage" instruction="Placeholder is the selected model&apos;s short name">%1$s čerpá limity až 2–5× rýchlejšie ako základné modely.</string>
+    <string name="duckChatUsageFooterDismissContentDescription">Odmietnuť</string>
+
+    <!-- Duck.ai usage-limit footer -->
+    <string name="duckChatUsageLimitFooterApproachingDaily" instruction="Placeholder is the percentage of the daily allowance already used">%1$d%% z denného limitu</string>
+    <string name="duckChatUsageLimitFooterApproachingWeekly" instruction="Placeholder is the percentage of the weekly allowance already used">%1$d%% z týždenného limitu</string>
+    <string name="duckChatUsageLimitFooterDailyReached">Bol dosiahnutý denný limit</string>
+    <string name="duckChatUsageLimitFooterWeeklyReachedFree">Bol dosiahnutý týždenný limit</string>
+    <string name="duckChatUsageLimitFooterWeeklyReached">Bol dosiahnutý týždenný limit používania</string>
+    <string name="duckChatUsageLimitFooterAdvancedModelsReached">Bol dosiahnutý limit pre pokročilé modely umelej inteligencie</string>
+    <string name="duckChatUsageLimitFooterCtaSwitchModel">Model prepínača</string>
+    <string name="duckChatUsageLimitFooterCtaStartUsingWeeklyLimit">Začni používať týždenný limit</string>
+    <string name="duckChatUsageLimitFooterCtaTryForFree">Vyskúšaj predplatné zadarmo</string>
+    <string name="duckChatUsageLimitFooterCtaSubscribe">Prihlásiť sa na odber</string>
+    <string name="duckChatUsageLimitFooterResetsIn" instruction="Placeholder is a duration such as &apos;2 days&apos; or &apos;5 hours&apos;">Obnoví sa za %1$s</string>
+    <plurals name="duckChatUsageLimitFooterDays">
+        <item quantity="one" instruction="%1$d is the number of whole days until the usage limit resets">%1$d deň</item>
+        <item quantity="few">%1$d dni</item>
+        <item quantity="many">%1$d dní</item>
+        <item quantity="other" instruction="%1$d is the number of whole days until the usage limit resets">%1$d dní</item>
+    </plurals>
+    <plurals name="duckChatUsageLimitFooterHours">
+        <item quantity="one" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d hodinu</item>
+        <item quantity="few">%1$d hodiny</item>
+        <item quantity="many">%1$d hodín</item>
+        <item quantity="other" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d hodín</item>
+    </plurals>
 </resources>
