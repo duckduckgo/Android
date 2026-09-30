@@ -60,7 +60,6 @@ internal class RealPirFreemiumDataStore(
     override val firstProfileSavedTimestamp: Long
         get() = preferences.getLong(KEY_FIRST_PROFILE_SAVED_TIMESTAMP, 0L)
 
-    // an unknown stored value (e.g. after a downgrade) reads as no result rather than throwing
     override val firstScanResult: PirFreemiumFirstScanResult?
         get() = preferences.getString(KEY_FIRST_SCAN_RESULT, null)?.let { stored ->
             PirFreemiumFirstScanResult.entries.firstOrNull { it.name == stored }
