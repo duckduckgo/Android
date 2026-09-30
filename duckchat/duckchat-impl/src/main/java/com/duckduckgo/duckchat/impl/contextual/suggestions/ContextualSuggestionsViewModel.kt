@@ -152,7 +152,6 @@ class ContextualSuggestionsViewModel @Inject constructor(
 
     private suspend fun resolveTextSelectionSuggestions() {
         resolvedSuggestions = suggestedPromptsProvider.resolveTextSelectionSuggestions(currentInput())
-        if (resolvedSuggestions.isNotEmpty()) textSelectionsTabId?.let { selectionJourney.onSuggestionsViewed(it) }
         showSuggestions()
     }
 
@@ -230,6 +229,7 @@ class ContextualSuggestionsViewModel @Inject constructor(
         } else if (!suggestionsVisible) {
             suggestionsVisible = true
             duckChatPixels.reportContextualSuggestionsViewed(isSmart, pageType.pixelValue)
+            if (textSelectionCount > 0) textSelectionsTabId?.let { selectionJourney.onSuggestionsViewed(it) }
         }
     }
 
