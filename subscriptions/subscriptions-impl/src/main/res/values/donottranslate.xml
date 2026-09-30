@@ -154,4 +154,9 @@
     <string name="subscriptionOnboardingCompletionCompleteTitle">You are all set up and ready to go!</string>
     <string name="subscriptionOnboardingCompletionCompletePrimaryButton">Got It</string>
 
+    <!-- Onboarding settings entry-point card -->
+    <string name="subscriptionOnboardingSettingsCardTitle" instruction="Placeholder is the whole-number percentage of onboarding completed, e.g. 75">Setup %1$d%% complete</string>
+    <string name="subscriptionOnboardingSettingsCardDescription">Some premium protections aren\'t active yet</string>
+    <string name="subscriptionOnboardingSettingsCardButton">Continue Setup</string>
+
 </resources>

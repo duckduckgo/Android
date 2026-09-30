@@ -25,7 +25,7 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.COMPLETED
 import com.duckduckgo.subscriptions.impl.onboarding.welcome.SubscriptionOnboardingWelcomeStepPlugin.Companion.WELCOME_STEP_ID
-import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStepStore
+import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStore
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -41,7 +41,7 @@ import javax.inject.Inject
 class SubscriptionOnboardingWelcomeViewModel @Inject constructor(
     private val controller: SubscriptionOnboardingController,
     private val currentTimeProvider: CurrentTimeProvider,
-    private val stepStore: SubscriptionOnboardingStepStore,
+    private val onboardingStore: SubscriptionOnboardingStore,
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 
@@ -75,7 +75,7 @@ class SubscriptionOnboardingWelcomeViewModel @Inject constructor(
         confettiRequested = true
 
         viewModelScope.launch(dispatcherProvider.io()) {
-            if (!stepStore.isCompleted(WELCOME_STEP_ID)) {
+            if (!onboardingStore.isStepCompleted(WELCOME_STEP_ID)) {
                 _commands.send(Command.LaunchConfetti)
             }
         }

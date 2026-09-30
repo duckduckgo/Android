@@ -33,7 +33,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingHandoffState
-import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStepStore
+import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStore
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -49,7 +49,7 @@ import javax.inject.Inject
 class SubscriptionOnboardingCompletionViewModel @Inject constructor(
     private val controller: SubscriptionOnboardingController,
     private val stepPlugins: PluginPoint<SubscriptionOnboardingStepPlugin>,
-    private val stepStore: SubscriptionOnboardingStepStore,
+    private val onboardingStore: SubscriptionOnboardingStore,
     private val subscriptions: Subscriptions,
     private val pirFeature: PirFeature,
     private val handoffState: SubscriptionOnboardingHandoffState,
@@ -122,7 +122,7 @@ class SubscriptionOnboardingCompletionViewModel @Inject constructor(
                         id = plugin.stepId,
                         labelResId = entry.labelResId,
                         pendingIconResId = entry.pendingIconResId,
-                        completed = stepStore.isCompleted(plugin.stepId),
+                        completed = onboardingStore.isStepCompleted(plugin.stepId),
                         clickable = false,
                     )
                 }
@@ -142,7 +142,7 @@ class SubscriptionOnboardingCompletionViewModel @Inject constructor(
 
     // PIR is set up from this screen, not in the linear onboarding.
     private fun pirRow(): SummaryRow {
-        val completed = pirCompleted || stepStore.isCompleted(PIR_ROW_ID)
+        val completed = pirCompleted || onboardingStore.isStepCompleted(PIR_ROW_ID)
         return SummaryRow(
             id = PIR_ROW_ID,
             labelResId = R.string.subscriptionOnboardingFeature4Title,

@@ -30,7 +30,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.COMPLE
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.SKIPPED
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
 import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingPlanProvider.Companion.SUBSCRIPTION_ONBOARDING_PLAN_ID
-import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStepStore
+import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -49,9 +49,9 @@ class SubscriptionOnboardingViewModelTest {
     val coroutineRule = CoroutineTestRule()
 
     private val orchestrator = FakeOrchestrator()
-    private val stepStore = SubscriptionOnboardingStepStore(FakeSharedPreferencesProvider())
+    private val onboardingStore = SubscriptionOnboardingStore(FakeSharedPreferencesProvider())
     private val controller = RealSubscriptionOnboardingController()
-    private val planProvider = SubscriptionOnboardingPlanProvider(emptyPluginPoint(), stepStore)
+    private val planProvider = SubscriptionOnboardingPlanProvider(emptyPluginPoint(), onboardingStore)
     private val handoffState = SubscriptionOnboardingHandoffState()
 
     private class FakeOrchestrator : LinearOnboardingOrchestrator {
@@ -64,7 +64,7 @@ class SubscriptionOnboardingViewModelTest {
         }
     }
 
-    private fun createViewModel() = SubscriptionOnboardingViewModel(orchestrator, planProvider, stepStore, controller, handoffState)
+    private fun createViewModel() = SubscriptionOnboardingViewModel(orchestrator, planProvider, onboardingStore, controller, handoffState)
 
     @Test
     fun whenInProgressOnActivityStepThenShowsStepWithCanGoBack() = runTest {
@@ -128,7 +128,7 @@ class SubscriptionOnboardingViewModelTest {
         controller.onStepFinished("welcome", COMPLETED)
         advanceUntilIdle()
 
-        assertTrue(stepStore.isCompleted("welcome"))
+        assertTrue(onboardingStore.isStepCompleted("welcome"))
         assertTrue(orchestrator.events.contains(SubscriptionOnboardingEvent.StepFinished("welcome", COMPLETED)))
     }
 
@@ -142,7 +142,7 @@ class SubscriptionOnboardingViewModelTest {
         controller.onStepFinished("welcome", SKIPPED)
         advanceUntilIdle()
 
-        assertFalse(stepStore.isCompleted("welcome"))
+        assertFalse(onboardingStore.isStepCompleted("welcome"))
         assertTrue(orchestrator.events.contains(SubscriptionOnboardingEvent.StepFinished("welcome", SKIPPED)))
     }
 
