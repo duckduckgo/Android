@@ -32,6 +32,8 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelection
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionRepository
+import com.duckduckgo.duckchat.impl.wideevents.DuckAiSelectionJourneyWideEvent
+import com.duckduckgo.duckchat.impl.wideevents.SelectionTerminalReason
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -72,6 +74,7 @@ class DuckChatContextualWebViewViewModelTest {
     private val timeProvider = FakeDuckChatContextualTimeProvider()
     private val sessionTimeoutProvider = FakeDuckChatContextualSessionTimeoutProvider()
     private val duckChatPixels: DuckChatPixels = mock()
+    private val selectionJourney: DuckAiSelectionJourneyWideEvent = mock()
     private val duckChatFeature: DuckChatFeature = mock()
     private val contextualFireButtonToggle: Toggle = mock()
     private val modelManager: com.duckduckgo.duckchat.impl.models.DuckAiModelManager = mock()
@@ -530,6 +533,16 @@ class DuckChatContextualWebViewViewModelTest {
     }
 
     @Test
+    fun `onFullModeRequested ends the selection journey as moved to tab`() = runTest {
+        (duckChat as FakeDuckChat).nextUrl = "https://duckduckgo.com/?ia=chat"
+        testee.onSheetOpened("tab-1")
+
+        testee.onFullModeRequested()
+
+        verify(selectionJourney).onJourneyEnded("tab-1", SelectionTerminalReason.MOVED_TO_TAB)
+    }
+
+    @Test
     fun `onFullModeRequested with no existing chat reports entry without a prompt`() = runTest {
         (duckChat as FakeDuckChat).nextUrl = "https://duckduckgo.com/?ia=chat"
 
@@ -648,7 +661,7 @@ class DuckChatContextualWebViewViewModelTest {
         sessionTimeoutProvider = sessionTimeoutProvider,
         timeProvider = timeProvider,
         duckChatPixels = duckChatPixels,
-        selectionJourney = mock(),
+        selectionJourney = selectionJourney,
         duckChatFeature = duckChatFeature,
         modelManager = modelManager,
         chatHistoryRepository = chatHistoryRepository,

@@ -44,6 +44,7 @@ enum class SelectionTerminalReason(val value: String) {
     NEW_CHAT("new_chat"),
     CHAT_CLEARED("chat_cleared"),
     TAB_CLOSED("tab_closed"),
+    MOVED_TO_TAB("moved_to_tab"),
     SESSION_EXPIRED("session_expired"),
 }
 
