@@ -19,6 +19,7 @@ package com.duckduckgo.subscriptions.impl.onboarding.welcome
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.doOnLayout
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
@@ -74,6 +75,9 @@ class SubscriptionOnboardingWelcomeFragment : DuckDuckGoFragment(R.layout.fragme
     }
 
     private fun render(viewState: ViewState) {
+        binding.subscriptionOnboardingWelcomeBanner.isVisible = viewState.isFreeTrial
+        if (!viewState.isFreeTrial) return
+
         binding.subscriptionOnboardingWelcomeBannerDescription.text =
             getString(R.string.subscriptionOnboardingWelcomeBannerDescription, viewState.formattedBillingDate)
 
