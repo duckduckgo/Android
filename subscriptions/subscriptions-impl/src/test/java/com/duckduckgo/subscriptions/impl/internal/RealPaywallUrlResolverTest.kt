@@ -27,7 +27,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionOffer
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.DUCK_AI_FEATURE_PAGE
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.VPN_FEATURE_PAGE
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
-import com.duckduckgo.subscriptions.impl.SubscriptionsFeature.PerformanceOptimizedPaywallsCohort
+import com.duckduckgo.subscriptions.impl.SubscriptionsFeature.PerformanceOptimizedPaywallsCohorts
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -61,7 +61,7 @@ class RealPaywallUrlResolverTest {
 
     @Before
     fun before() = runTest {
-        givenCohort(PerformanceOptimizedPaywallsCohort.TREATMENT)
+        givenCohort(PerformanceOptimizedPaywallsCohorts.TREATMENT)
         givenEntryPointPath(featurePage = VPN_FEATURE_PAGE, path = "/subscriptions/new/mobile/vpn")
         givenEntryPointPath(featurePage = DUCK_AI_FEATURE_PAGE, path = "/subscriptions/new/mobile/duckai")
         givenOfferedProducts(Product.NetP.value)
@@ -226,18 +226,33 @@ class RealPaywallUrlResolverTest {
 
     @Test
     fun whenControlCohortThenLegacyUrlCarriesTheCohort() = runTest {
-        givenCohort(PerformanceOptimizedPaywallsCohort.CONTROL)
+        givenCohort(PerformanceOptimizedPaywallsCohorts.CONTROL)
 
         assertEquals("$BUY_URL?experiment_perfpaywall=control", testee.resolve(BUY_URL))
     }
 
     @Test
     fun whenControlCohortThenLegacyUrlKeepsItsParams() = runTest {
-        givenCohort(PerformanceOptimizedPaywallsCohort.CONTROL)
+        givenCohort(PerformanceOptimizedPaywallsCohorts.CONTROL)
 
         assertEquals(
             "$BUY_URL?featurePage=duckai&origin=funnel_appsettings_android&experiment_perfpaywall=control",
             testee.resolve("$BUY_URL?featurePage=duckai&origin=funnel_appsettings_android"),
+        )
+    }
+
+    @Test
+    fun whenUrlAlreadyStatesACohortThenOurCohortReplacesIt() = runTest {
+        assertEquals(
+            "$BUY_URL/new/mobile/vpn?trial=false&pir=false&experiment_perfpaywall=treatment",
+            testee.resolve("$BUY_URL?experiment_perfpaywall=control"),
+        )
+
+        givenCohort(PerformanceOptimizedPaywallsCohorts.CONTROL)
+
+        assertEquals(
+            "$BUY_URL?origin=funnel_appsettings_android&experiment_perfpaywall=control",
+            testee.resolve("$BUY_URL?experiment_perfpaywall=treatment&origin=funnel_appsettings_android"),
         )
     }
 
@@ -264,12 +279,12 @@ class RealPaywallUrlResolverTest {
         assertNull(subscriptionsFeature.performanceOptimizedPaywalls().getCohort())
     }
 
-    private fun givenCohort(cohort: PerformanceOptimizedPaywallsCohort) {
+    private fun givenCohort(cohort: PerformanceOptimizedPaywallsCohorts) {
         subscriptionsFeature.performanceOptimizedPaywalls().setRawStoredState(
             State(
                 remoteEnableState = true,
                 enable = true,
-                cohorts = PerformanceOptimizedPaywallsCohort.entries.map {
+                cohorts = PerformanceOptimizedPaywallsCohorts.entries.map {
                     State.Cohort(name = it.cohortName, weight = if (it == cohort) 1 else 0)
                 },
             ),

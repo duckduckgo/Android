@@ -303,8 +303,8 @@ interface SubscriptionsFeature {
     fun allowProTierPurchase(): Toggle
 
     /**
-     * A control/treatment experiment: [PerformanceOptimizedPaywallsCohort.TREATMENT] opens a faster-rendering
-     * page, [PerformanceOptimizedPaywallsCohort.CONTROL] the legacy paywall.
+     * A control/treatment experiment: [PerformanceOptimizedPaywallsCohorts.TREATMENT] opens a faster-rendering
+     * page, [PerformanceOptimizedPaywallsCohorts.CONTROL] the legacy paywall.
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun performanceOptimizedPaywalls(): Toggle
@@ -374,7 +374,7 @@ interface SubscriptionsFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun subscriptionConcurrentExperiments(): Toggle
 
-    enum class PerformanceOptimizedPaywallsCohort(override val cohortName: String) : CohortName {
+    enum class PerformanceOptimizedPaywallsCohorts(override val cohortName: String) : CohortName {
         CONTROL("control"),
         TREATMENT("treatment"),
     }

@@ -27,7 +27,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PIR_QUERY_PARAM_
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.TRIAL_QUERY_PARAM_KEY
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.VPN_FEATURE_PAGE
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
-import com.duckduckgo.subscriptions.impl.SubscriptionsFeature.PerformanceOptimizedPaywallsCohort
+import com.duckduckgo.subscriptions.impl.SubscriptionsFeature.PerformanceOptimizedPaywallsCohorts
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.withContext
@@ -57,21 +57,26 @@ class RealPaywallUrlResolver @Inject constructor(
         if (!isPaywallUrl(uri)) return null
         val toggle = subscriptionsFeature.performanceOptimizedPaywalls()
         if (!toggle.isEnabled()) return null
-        // Entry points without a faster page, or with no offers, keep the legacy paywall and are never enrolled.
-        val fasterPaywallUrl = rewrite(uri) ?: return null
+        // Entry points without a faster page, or with no offers, return before enrolling, so both cohorts only
+        // contain users who could be shown either paywall.
+        val fasterPaywallUri = rewrite(uri)?.toUri() ?: return null
 
-        // Enrolling only here keeps both cohorts to users who could be shown either paywall.
         toggle.enroll()
-        val cohort = PerformanceOptimizedPaywallsCohort.entries.firstOrNull { toggle.isEnrolledAndEnabled(it) } ?: return null
+        return when {
+            toggle.isEnrolledAndEnabled(PerformanceOptimizedPaywallsCohorts.TREATMENT) ->
+                fasterPaywallUri.withCohort(PerformanceOptimizedPaywallsCohorts.TREATMENT)
+            toggle.isEnrolledAndEnabled(PerformanceOptimizedPaywallsCohorts.CONTROL) -> uri.withCohort(PerformanceOptimizedPaywallsCohorts.CONTROL)
+            else -> null
+        }
+    }
 
-        val paywallUrl = if (cohort == PerformanceOptimizedPaywallsCohort.TREATMENT) fasterPaywallUrl else url
-        return paywallUrl
-            .toUri()
-            .buildUpon()
+    private fun Uri.withCohort(cohort: PerformanceOptimizedPaywallsCohorts): String =
+        buildUpon()
+            .clearQuery()
+            .appendQueryParametersOf(this, excluding = setOf(PERFORMANCE_OPTIMIZED_PAYWALLS_COHORT_QUERY_PARAM_KEY))
             .appendQueryParameter(PERFORMANCE_OPTIMIZED_PAYWALLS_COHORT_QUERY_PARAM_KEY, cohort.cohortName)
             .build()
             .toString()
-    }
 
     private fun isPaywallUrl(uri: Uri): Boolean {
         val buyUri = subscriptionsUrlProvider.buyUrl.toUri()
@@ -99,19 +104,21 @@ class RealPaywallUrlResolver @Inject constructor(
         isFreeTrialEligible: Boolean,
         isPirOnOffer: Boolean,
     ): String {
-        val builder = uri.buildUpon().encodedPath(path).clearQuery()
-
-        uri.queryParameterNames
-            .filterNot { it in REWRITTEN_QUERY_PARAM_KEYS }
-            .forEach { name ->
-                uri.getQueryParameters(name).forEach { value -> builder.appendQueryParameter(name, value) }
-            }
+        val builder = uri.buildUpon().encodedPath(path).clearQuery().appendQueryParametersOf(uri, excluding = REWRITTEN_QUERY_PARAM_KEYS)
 
         builder.appendQueryParameter(TRIAL_QUERY_PARAM_KEY, isFreeTrialEligible.toString())
         if (!isPirOnOffer) {
             builder.appendQueryParameter(PIR_QUERY_PARAM_KEY, "false")
         }
         return builder.build().toString()
+    }
+
+    private fun Uri.Builder.appendQueryParametersOf(uri: Uri, excluding: Set<String>): Uri.Builder = apply {
+        uri.queryParameterNames
+            .filterNot { it in excluding }
+            .forEach { name ->
+                uri.getQueryParameters(name).forEach { value -> appendQueryParameter(name, value) }
+            }
     }
 
     private companion object {
