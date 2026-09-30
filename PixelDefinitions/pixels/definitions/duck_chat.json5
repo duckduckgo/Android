@@ -1880,5 +1880,33 @@
         "triggers": ["other"],
         "suffixes": ["first_daily_count", "form_factor"],
         "parameters": ["appVersion"]
+    },
+    "m_aichat_omnibar_menu_new_voice_chat_tapped": {
+        "description": "User tapped New Voice Chat in the Duck.ai plus menu in the omnibar",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_omnibar_menu_new_image_tapped": {
+        "description": "User tapped New Image in the Duck.ai plus menu in the omnibar",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_omnibar_menu_new_tab_tapped": {
+        "description": "User tapped New Tab in the Duck.ai plus menu in the omnibar",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_omnibar_menu_new_fire_tab_tapped": {
+        "description": "User tapped New Fire Tab in the Duck.ai plus menu in the omnibar",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
     }
 }
