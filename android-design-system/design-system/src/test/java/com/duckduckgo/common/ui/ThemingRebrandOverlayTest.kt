@@ -16,6 +16,7 @@
 
 package com.duckduckgo.common.ui
 
+import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.content.res.Resources
@@ -77,7 +78,7 @@ class ThemingRebrandOverlayTest {
         ContextThemeWrapper(RuntimeEnvironment.getApplication(), styleResId).theme
 
     private fun resolveBoolean(
-        activity: AppCompatActivity,
+        activity: Context,
         attr: Int,
     ): Boolean {
         val value = TypedValue()
@@ -168,7 +169,7 @@ class ThemingRebrandOverlayTest {
     }
 
     private fun resolveDimension(
-        activity: AppCompatActivity,
+        activity: Context,
         attr: Int,
     ): Float {
         val value = TypedValue()
@@ -181,7 +182,7 @@ class ThemingRebrandOverlayTest {
     }
 
     private fun resolveResourceId(
-        activity: AppCompatActivity,
+        activity: Context,
         attr: Int,
     ): Int {
         val value = TypedValue()
@@ -379,6 +380,29 @@ class ThemingRebrandOverlayTest {
         )
         assertFalse(resolveBoolean(activity, R.attr.daxMessageCtaClipToPadding))
         assertEquals(1000f, resolveDimension(activity, R.attr.daxPillRadius), 0f)
+    }
+
+    @Test
+    fun whenLightFireInputModeCardWithRadiusOverlayThenMenuRadiusSurvivesCardTheme() {
+        val activity = fixedThemeActivity(
+            themeResId = R.style.Theme_DuckDuckGo_Light_Fire,
+            overlayStyleIds = listOf(R.style.ThemeOverlay_Rebrand_Radius),
+        )
+        val card = ContextThemeWrapper(activity, resolveResourceId(activity, R.attr.daxInputModeCardThemeOverlay))
+
+        assertEquals(16f, resolveDimension(card, R.attr.daxMenuRadius), 0f)
+        assertTrue(resolveBoolean(card, R.attr.daxMenuClipToOutline))
+    }
+
+    @Test
+    fun whenLightFireInputModeCardWithoutRadiusOverlayThenMenuRadiusIsBaseValue() {
+        val activity = fixedThemeActivity(themeResId = R.style.Theme_DuckDuckGo_Light_Fire)
+        val cardOverlay = resolveResourceId(activity, R.attr.daxInputModeCardThemeOverlay)
+        val card = ContextThemeWrapper(activity, cardOverlay)
+
+        assertEquals(R.style.ThemeOverlay_DuckDuckGo_InputModeCard_DarkFire, cardOverlay)
+        assertEquals(8f, resolveDimension(card, R.attr.daxMenuRadius), 0f)
+        assertFalse(resolveBoolean(card, R.attr.daxMenuClipToOutline))
     }
 
     @Test

@@ -203,6 +203,12 @@
         <item name="daxMessageCtaCloseButtonBackground">@drawable/selectable_message_cta_close_button_ripple</item>
         <item name="daxMessageCtaClipToPadding">false</item>
         <item name="daxPillRadius">@dimen/pillShapeCornerRadius</item>
+        <item name="daxInputModeCardDarkFireThemeOverlay">@style/ThemeOverlay.DuckDuckGo.InputModeCard.DarkFire.Radius</item>
+    </style>
+
+    <style name="ThemeOverlay.DuckDuckGo.InputModeCard.DarkFire.Radius" parent="ThemeOverlay.DuckDuckGo.InputModeCard.DarkFire">
+        <item name="daxMenuRadius">@dimen/largeShapeCornerRadius</item>
+        <item name="daxMenuClipToOutline">true</item>
     </style>
 
 </resources>
