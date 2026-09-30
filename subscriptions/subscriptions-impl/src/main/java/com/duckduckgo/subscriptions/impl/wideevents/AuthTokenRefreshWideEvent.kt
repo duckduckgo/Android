@@ -36,10 +36,7 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 interface AuthTokenRefreshWideEvent {
-    suspend fun onStart(
-        subscriptionStatus: SubscriptionStatus,
-        serializationEnabled: Boolean,
-    )
+    suspend fun onStart(subscriptionStatus: SubscriptionStatus)
 
     suspend fun onCrossProcessLockAcquired(result: Result<Closeable>)
     suspend fun onTokenRead()
@@ -71,10 +68,7 @@ class AuthTokenRefreshWideEventImpl @Inject constructor(
 
     private var ongoingTokenRefreshWideEventId: Long? = null
 
-    override suspend fun onStart(
-        subscriptionStatus: SubscriptionStatus,
-        serializationEnabled: Boolean,
-    ) {
+    override suspend fun onStart(subscriptionStatus: SubscriptionStatus) {
         if (!isFeatureEnabled()) return
 
         ongoingTokenRefreshWideEventId?.let { wideEventId ->
@@ -90,15 +84,13 @@ class AuthTokenRefreshWideEventImpl @Inject constructor(
                     KEY_NETP_IS_ENABLED to runCatching { networkProtectionState.get().isEnabled().toString() }.getOrDefault(""),
                     KEY_NETP_IS_RUNNING to runCatching { networkProtectionState.get().isRunning().toString() }.getOrDefault(""),
                     KEY_PROCESS_NAME to processName,
-                    KEY_SERIALIZATION_ENABLED to serializationEnabled.toString(),
+                    KEY_SERIALIZATION_ENABLED to "true",
                 ),
             )
             .getOrNull()
             ?.also { wideEventId ->
                 wideEventClient.intervalStart(wideEventId = wideEventId, key = INTERVAL_TOTAL_DURATION)
-                if (serializationEnabled) {
-                    wideEventClient.intervalStart(wideEventId = wideEventId, key = INTERVAL_LOCK_WAIT, buckets = LOCK_WAIT_BUCKETS)
-                }
+                wideEventClient.intervalStart(wideEventId = wideEventId, key = INTERVAL_LOCK_WAIT, buckets = LOCK_WAIT_BUCKETS)
             }
     }
 
