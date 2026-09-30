@@ -2119,14 +2119,48 @@ class RealPirJobsRunnerTest {
     }
 
     @Test
-    fun whenFirstScanResultIsAlreadyRecordedThenExtractedProfilesAreNotReadForIt() = runTest {
+    fun whenMatchesFoundIsAlreadyRecordedThenExtractedProfilesAreNotRead() = runTest {
         givenAScanOnlyRunWithOneUngatedBroker()
-        whenever(mockPirFreemiumDataStore.firstScanResult).thenReturn(NO_MATCHES)
+        whenever(mockPirFreemiumDataStore.firstScanResult).thenReturn(MATCHES_FOUND)
 
         testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
 
         verify(mockPirRepository, never()).getAllExtractedProfiles()
         verify(mockPirFreemiumDataStore, never()).recordFirstScanResult(any())
+    }
+
+    @Test
+    fun whenNoMatchesIsRecordedAndALaterScanFindsMatchesThenFirstScanResultIsMatchesFound() = runTest {
+        givenAScanOnlyRunWithOneUngatedBroker()
+        whenever(mockPirFreemiumDataStore.firstScanResult).thenReturn(NO_MATCHES)
+        whenever(mockPirRepository.getAllExtractedProfiles())
+            .thenReturn(listOf(testExtractedProfile.copy(brokerName = "Ungated")))
+
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
+
+        verify(mockPirFreemiumDataStore).recordFirstScanResult(MATCHES_FOUND)
+    }
+
+    @Test
+    fun whenNoMatchesIsRecordedAndThereAreStillNoMatchesThenNothingIsRecordedAgain() = runTest {
+        givenAScanOnlyRunWithOneUngatedBroker()
+        whenever(mockPirFreemiumDataStore.firstScanResult).thenReturn(NO_MATCHES)
+
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_ONLY)
+
+        verify(mockPirFreemiumDataStore, never()).recordFirstScanResult(any())
+    }
+
+    @Test
+    fun whenSubscribedRunFindsMatchesAfterNoMatchesWasRecordedThenFreemiumStateIsUntouched() = runTest {
+        givenAScanOnlyRunWithOneUngatedBroker()
+        whenever(mockPirFreemiumDataStore.firstScanResult).thenReturn(NO_MATCHES)
+        whenever(mockPirRepository.getAllExtractedProfiles())
+            .thenReturn(listOf(testExtractedProfile.copy(brokerName = "Ungated")))
+
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL, PirRunMode.SCAN_AND_OPT_OUT)
+
+        verifyNoInteractions(mockPirFreemiumDataStore)
     }
 
     @Test

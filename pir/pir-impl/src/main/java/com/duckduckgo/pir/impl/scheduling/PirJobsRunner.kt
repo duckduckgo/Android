@@ -425,7 +425,9 @@ class RealPirJobsRunner @Inject constructor(
     }
 
     private suspend fun recordFreemiumFirstScanResultIfNeeded(runMode: PirRunMode) {
-        if (runMode != PirRunMode.SCAN_ONLY || pirFreemiumDataStore.firstScanResult != null) return
+        if (runMode != PirRunMode.SCAN_ONLY) return
+        val storedResult = pirFreemiumDataStore.firstScanResult
+        if (storedResult == PirFreemiumFirstScanResult.MATCHES_FOUND) return
 
         runCatching {
             val result = if (pirRepository.getAllExtractedProfiles().isEmpty()) {
@@ -433,8 +435,10 @@ class RealPirJobsRunner @Inject constructor(
             } else {
                 PirFreemiumFirstScanResult.MATCHES_FOUND
             }
-            pirFreemiumDataStore.recordFirstScanResult(result)
-            logcat { "PIR-JOB-RUNNER: Recorded freemium first scan result: $result" }
+            if (result != storedResult) {
+                pirFreemiumDataStore.recordFirstScanResult(result)
+                logcat { "PIR-JOB-RUNNER: Recorded freemium first scan result: $result" }
+            }
         }.onFailure {
             if (it is CancellationException) throw it
             logcat(ERROR) { "PIR-JOB-RUNNER: Failed to record freemium first scan result: $it" }
