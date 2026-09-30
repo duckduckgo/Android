@@ -16,50 +16,50 @@
 
 package com.duckduckgo.app.onboarding
 
-import com.duckduckgo.app.onboarding.NextStepsCardsExperimentManager.NextStepsCardsExperimentVariant
+import com.duckduckgo.app.onboarding.NextStepsItemsExperimentManager.NextStepsItemsExperimentVariant
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.remote.messaging.impl.nextstepscards.NextStepsCardsExperimentToggles
-import com.duckduckgo.remote.messaging.impl.nextstepscards.NextStepsCardsExperimentToggles.Cohorts
+import com.duckduckgo.remote.messaging.impl.nextstepsitems.NextStepsItemsExperimentToggles
+import com.duckduckgo.remote.messaging.impl.nextstepsitems.NextStepsItemsExperimentToggles.Cohorts
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-interface NextStepsCardsExperimentManager {
-    suspend fun enroll(): NextStepsCardsExperimentVariant?
+interface NextStepsItemsExperimentManager {
+    suspend fun enroll(): NextStepsItemsExperimentVariant?
 
-    enum class NextStepsCardsExperimentVariant {
+    enum class NextStepsItemsExperimentVariant {
         CONTROL,
         STACKED_CARDS,
         CHECK_LIST,
     }
 }
 
-@ContributesBinding(AppScope::class, boundType = NextStepsCardsExperimentManager::class)
+@ContributesBinding(AppScope::class, boundType = NextStepsItemsExperimentManager::class)
 @SingleInstanceIn(AppScope::class)
-class NextStepsCardsExperimentManagerImpl @Inject constructor(
-    private val nextStepsCardsFeatureToggles: NextStepsCardsExperimentToggles,
+class NextStepsItemsExperimentManagerImpl @Inject constructor(
+    private val nextStepsItemsFeatureToggles: NextStepsItemsExperimentToggles,
     private val appBuildConfig: AppBuildConfig,
     private val dispatcherProvider: DispatcherProvider,
     private val onboardingPrivacyConfigPersistedGate: OnboardingPrivacyConfigPersistedGate,
-) : NextStepsCardsExperimentManager {
+) : NextStepsItemsExperimentManager {
 
-    override suspend fun enroll(): NextStepsCardsExperimentVariant? = withContext(dispatcherProvider.io()) {
+    override suspend fun enroll(): NextStepsItemsExperimentVariant? = withContext(dispatcherProvider.io()) {
         if (!onboardingPrivacyConfigPersistedGate.awaitPersisted()) {
             return@withContext null
         }
-        if (!nextStepsCardsFeatureToggles.self().isEnabled() || appBuildConfig.isAppReinstall()) {
+        if (!nextStepsItemsFeatureToggles.self().isEnabled() || appBuildConfig.isAppReinstall()) {
             return@withContext null
         }
 
-        val toggle = nextStepsCardsFeatureToggles.nextStepsCardsExperiment()
+        val toggle = nextStepsItemsFeatureToggles.nextStepsItemsExperiment()
         toggle.enroll()
         when {
-            toggle.isEnrolledAndEnabled(Cohorts.STACKED_CARDS) -> NextStepsCardsExperimentVariant.STACKED_CARDS
-            toggle.isEnrolledAndEnabled(Cohorts.CHECK_LIST) -> NextStepsCardsExperimentVariant.CHECK_LIST
-            toggle.isEnrolledAndEnabled(Cohorts.CONTROL) -> NextStepsCardsExperimentVariant.CONTROL
+            toggle.isEnrolledAndEnabled(Cohorts.STACKED_CARDS) -> NextStepsItemsExperimentVariant.STACKED_CARDS
+            toggle.isEnrolledAndEnabled(Cohorts.CHECK_LIST) -> NextStepsItemsExperimentVariant.CHECK_LIST
+            toggle.isEnrolledAndEnabled(Cohorts.CONTROL) -> NextStepsItemsExperimentVariant.CONTROL
             else -> null
         }
     }

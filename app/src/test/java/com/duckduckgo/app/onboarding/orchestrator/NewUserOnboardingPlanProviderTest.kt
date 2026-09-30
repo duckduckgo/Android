@@ -28,7 +28,7 @@ import com.duckduckgo.app.onboarding.CustomAiOnboardingResolver
 import com.duckduckgo.app.onboarding.DuckAiOnboardingAvailability
 import com.duckduckgo.app.onboarding.DuckAiOnboardingDemo
 import com.duckduckgo.app.onboarding.FakeOnboardingSingleChoiceDataPlugin
-import com.duckduckgo.app.onboarding.NextStepsCardsExperimentManager
+import com.duckduckgo.app.onboarding.NextStepsItemsExperimentManager
 import com.duckduckgo.app.onboarding.OnboardingInputScreenLaunchTarget
 import com.duckduckgo.app.onboarding.OnboardingPasswordImportExperimentManager
 import com.duckduckgo.app.onboarding.OnboardingPasswordImportExperimentManager.OnboardingPasswordImportVariant
@@ -133,7 +133,7 @@ class NewUserOnboardingPlanProviderTest {
     private val duckAiOnboardingDemo: DuckAiOnboardingDemo = mock()
     private val segmentedOnboardingExperiment: SegmentedOnboardingExperimentManager = mock()
     private val segmentedOnboardingMetrics: SegmentedOnboardingExperimentMetrics = mock()
-    private val nextStepsCardsExperiment: NextStepsCardsExperimentManager = mock()
+    private val nextStepsItemsExperiment: NextStepsItemsExperimentManager = mock()
     private val onboardingPreferenceCatalog: OnboardingPreferenceCatalog = mock {
         onBlocking { offer(any()) } doReturn emptyList()
     }
@@ -177,7 +177,7 @@ class NewUserOnboardingPlanProviderTest {
             whenever(customAiOnboardingResolver.resolve()).thenReturn(false)
             whenever(segmentedOnboardingExperiment.enroll()).thenReturn(null)
             whenever(passwordImportExperiment.enroll()).thenReturn(null)
-            whenever(nextStepsCardsExperiment.enroll()).thenReturn(null)
+            whenever(nextStepsItemsExperiment.enroll()).thenReturn(null)
         }
         provider = NewUserOnboardingPlanProvider(
             syncAutoRestore = syncAutoRestore,
@@ -200,7 +200,7 @@ class NewUserOnboardingPlanProviderTest {
             duckAiOnboardingDemo = duckAiOnboardingDemo,
             segmentedOnboardingExperimentManager = segmentedOnboardingExperiment,
             segmentedOnboardingExperimentMetrics = segmentedOnboardingMetrics,
-            nextStepsCardsExperimentManager = nextStepsCardsExperiment,
+            nextStepsItemsExperimentManager = nextStepsItemsExperiment,
             onboardingPasswordImportExperimentManager = passwordImportExperiment,
             onboardingPreferenceCatalog = onboardingPreferenceCatalog,
             singleChoiceDataPlugins = singleChoiceDataPlugins,
@@ -2134,26 +2134,26 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
-    fun `when new user then the next steps cards experiment is enrolled once`() = runTest {
+    fun `when new user then the next steps items experiment is enrolled once`() = runTest {
         start()
 
-        verify(nextStepsCardsExperiment, times(1)).enroll()
+        verify(nextStepsItemsExperiment, times(1)).enroll()
     }
 
     @Test
-    fun `when reinstall user then the next steps cards experiment is never enrolled`() = runTest {
+    fun `when reinstall user then the next steps items experiment is never enrolled`() = runTest {
         whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
         start()
 
-        verify(nextStepsCardsExperiment, never()).enroll()
+        verify(nextStepsItemsExperiment, never()).enroll()
     }
 
     @Test
-    fun `when custom ai path and new user then the next steps cards experiment is enrolled once`() = runTest {
+    fun `when custom ai path and new user then the next steps items experiment is enrolled once`() = runTest {
         whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
         start()
 
-        verify(nextStepsCardsExperiment, times(1)).enroll()
+        verify(nextStepsItemsExperiment, times(1)).enroll()
     }
 
     // endregion
