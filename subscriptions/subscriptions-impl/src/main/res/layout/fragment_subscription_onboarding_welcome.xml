@@ -37,11 +37,13 @@
     <androidx.core.widget.NestedScrollView
         android:id="@+id/subscriptionOnboardingWelcomeContent"
         android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@id/subscriptionOnboardingWelcomeDax"
+        android:layout_height="wrap_content"
+        app:layout_constrainedHeight="true"
+        app:layout_constraintBottom_toTopOf="@id/subscriptionOnboardingWelcomePrimaryButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -215,11 +217,16 @@
     <ImageView
         android:id="@+id/subscriptionOnboardingWelcomeDax"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_marginBottom="@dimen/keyline_2"
+        android:adjustViewBounds="true"
+        android:scaleType="fitCenter"
         android:src="@drawable/onboarding_dax_thumbs_up"
         app:layout_constraintBottom_toTopOf="@id/subscriptionOnboardingWelcomePrimaryButton"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintHeight_max="wrap"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/subscriptionOnboardingWelcomeContent"
+        app:layout_constraintVertical_bias="1" />
 
     <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
         android:id="@+id/subscriptionOnboardingWelcomePrimaryButton"
