@@ -1796,7 +1796,9 @@
         "description": "User submitted a follow-up prompt in an existing Duck.ai chat, reported by the Duck.ai frontend via the reportMetric JS bridge.",
         "owners": ["YoussefKeyrouz"],
         "triggers": ["other"],
+        "suffixes": ["form_factor"],
         "parameters": [
+            "appVersion",
             {
                 "key": "delta-timestamp-minutes",
                 "type": "integer",
@@ -1809,13 +1811,29 @@
         "description": "User submitted the first prompt of a new Duck.ai chat, reported by the Duck.ai frontend via the reportMetric JS bridge.",
         "owners": ["YoussefKeyrouz"],
         "triggers": ["other"],
+        "suffixes": ["form_factor"],
         "parameters": [
+            "appVersion",
             {
                 "key": "delta-timestamp-minutes",
                 "type": "integer",
                 "description": "Minutes since the previous Duck.ai session interaction"
             },
             "firstPromptNewInstall"
+        ]
+    },
+    "aichat_start_new_conversation_button_clicked": {
+        "description": "User tapped the New Chat button in the Duck.ai frontend, reported via the reportMetric JS bridge.",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "delta-timestamp-minutes",
+                "type": "integer",
+                "description": "Minutes since the previous Duck.ai session interaction"
+            }
         ]
     },
     "aichat_contextual_address_bar_menu_shown": {
