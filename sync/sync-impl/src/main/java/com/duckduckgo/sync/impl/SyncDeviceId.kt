@@ -97,3 +97,11 @@ fun DeviceType.iconRes(): Int {
         DESKTOP -> R.drawable.ic_device_desktop_24
     }
 }
+
+fun DeviceType.headerImageRes(): Int {
+    if (deviceFactor.contains(browserRegex)) return R.drawable.browser_v2_synced_feature_128
+    return when (type()) {
+        MOBILE, UNKNOWN -> R.drawable.ic_header_synced_device_mobile
+        DESKTOP -> R.drawable.ic_header_synced_device_desktop
+    }
+}
