@@ -40,7 +40,6 @@ import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeSettingEntity
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeSettingsDao
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -73,7 +72,6 @@ class UsageLimitFooterPluginTest {
     private val repository: DuckAiUsageLimitsRepository = mock()
     private val dismissalStore: UsageNoticeDismissalStore = mock()
     private val modelManager: DuckAiModelManager = mock()
-    private val subscriptions: Subscriptions = mock()
     private val settingsDao: DuckAiBridgeSettingsDao = mock()
     private val storage: DuckAiBridgeStorage = mock()
     private val storageProvider: BrowserModeDataProvider<DuckAiBridgeStorage> = mock()
@@ -100,7 +98,6 @@ class UsageLimitFooterPluginTest {
             messageMapper = UsageLimitFooterMessageMapper(),
             ctaResolver = UsageLimitCtaResolver(),
             modelManager = modelManager,
-            subscriptions = subscriptions,
             storageProvider = storageProvider,
             duckChatFeature = feature,
             currentTimeProvider = currentTimeProvider,
@@ -127,6 +124,24 @@ class UsageLimitFooterPluginTest {
             assertTrue(state.visible)
             assertFalse(state.blocksComposer)
             assertEquals("75% of weekly limit", footer.view.findViewById<DaxTextView>(R.id.usageLimitFooterTitle).text.toString())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenResetTimeHasPassedSinceParsingThenFooterHidesOnNextEvaluation() = runTest {
+        snapshot.value = reached()
+        val footer = testee.createFooter(context, hostContext, host)
+
+        footer.state.test {
+            assertTrue(awaitItem().visible)
+
+            whenever(currentTimeProvider.currentTimeMillis()).thenReturn(RESETS_AT)
+            hostContext.value = duckAiContext(isInputFocused = false)
+            assertFalse(awaitItem().visible)
+            hostContext.value = duckAiContext(isInputFocused = true)
+
+            expectNoEvents()
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -230,7 +245,7 @@ class UsageLimitFooterPluginTest {
 
     @Test
     fun whenFireModeThenRepositoryIsNeverRead() = runTest {
-        hostContext.value = duckAiContext(isFireMode = true)
+        hostContext.value = duckAiContext(browserMode = BrowserMode.FIRE)
         val footer = testee.createFooter(context, hostContext, host)
 
         footer.state.test {
@@ -344,7 +359,7 @@ class UsageLimitFooterPluginTest {
 
     @Test
     fun whenSubscribeIsTappedThenPurchaseOpensAndCardIsNotActedOn() = runTest {
-        whenever(subscriptions.isFreeTrialEligible()).thenReturn(true)
+        modelState.value = modelState.value.copy(isFreeTrialEligible = true)
         val subscribeCta = UsageCta(UsageCtaId.SUBSCRIBE, null, emptyList(), emptyMap(), emptyList())
         snapshot.value = reached().copy(id = UsageNoticeId.FREE_REACHED).copy(cta = subscribeCta)
         val footer = testee.createFooter(context, hostContext, host)
@@ -470,12 +485,12 @@ class UsageLimitFooterPluginTest {
 
     private fun duckAiContext(
         isEditing: Boolean = false,
-        isFireMode: Boolean = false,
+        browserMode: BrowserMode = BrowserMode.REGULAR,
         isInputFocused: Boolean = true,
     ) = NativeInputFooterContext(
         isDuckAiSelected = true,
         isEditing = isEditing,
-        isFireMode = isFireMode,
+        browserMode = browserMode,
         isInputFocused = isInputFocused,
     )
 

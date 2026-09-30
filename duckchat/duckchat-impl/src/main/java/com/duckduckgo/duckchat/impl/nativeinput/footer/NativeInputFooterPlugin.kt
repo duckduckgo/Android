@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.nativeinput.footer
 import android.content.Context
 import android.view.View
 import com.duckduckgo.anvil.annotations.ContributesActivePluginPoint
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.plugins.ActivePlugin
 import com.duckduckgo.di.scopes.AppScope
 import kotlinx.coroutines.flow.Flow
@@ -27,7 +28,7 @@ import kotlinx.coroutines.flow.StateFlow
 data class NativeInputFooterContext(
     val isDuckAiSelected: Boolean,
     val isEditing: Boolean,
-    val isFireMode: Boolean,
+    val browserMode: BrowserMode,
     val isInputFocused: Boolean,
 )
 

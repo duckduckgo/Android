@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.nativeinput.footer.highusage
 import android.content.Context
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
@@ -81,7 +82,7 @@ class HighUsageModelFooterPlugin @Inject constructor(
             enabled &&
                 footerContext.isDuckAiSelected &&
                 !footerContext.isEditing &&
-                !footerContext.isFireMode &&
+                footerContext.browserMode != BrowserMode.FIRE &&
                 footerContext.isInputFocused
         }
             .distinctUntilChanged()

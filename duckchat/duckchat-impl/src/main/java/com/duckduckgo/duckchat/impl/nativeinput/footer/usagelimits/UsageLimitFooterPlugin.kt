@@ -33,7 +33,6 @@ import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterState
 import com.duckduckgo.duckchat.store.impl.DuckAiBridgeStorage
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeSettingEntity
-import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -60,7 +59,6 @@ class UsageLimitFooterPlugin @Inject constructor(
     private val messageMapper: UsageLimitFooterMessageMapper,
     private val ctaResolver: UsageLimitCtaResolver,
     private val modelManager: DuckAiModelManager,
-    private val subscriptions: Subscriptions,
     private val storageProvider: BrowserModeDataProvider<DuckAiBridgeStorage>,
     private val duckChatFeature: DuckChatFeature,
     private val currentTimeProvider: CurrentTimeProvider,
@@ -75,6 +73,7 @@ class UsageLimitFooterPlugin @Inject constructor(
         val dismissals: Map<UsageWindow, UsageNoticeDismissal>,
         val actedOn: UsageNoticeActedOn?,
         val selectedModelId: String?,
+        val isFreeTrialEligible: Boolean,
     )
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -86,18 +85,22 @@ class UsageLimitFooterPlugin @Inject constructor(
         val footerView = UsageLimitFooterView(context)
         var lastSelectedModelId: String? = null
 
-        val surfaceActive = combine(hostContext, duckChatFeature.duckAiUsageWarnings().enabled()) { footerContext, enabled ->
-            enabled && footerContext.isDuckAiSelected && !footerContext.isEditing && !footerContext.isFireMode
+        val activeBrowserMode = combine(hostContext, duckChatFeature.duckAiUsageWarnings().enabled()) { footerContext, enabled ->
+            footerContext.browserMode.takeIf {
+                enabled && footerContext.isDuckAiSelected && !footerContext.isEditing && it != BrowserMode.FIRE
+            }
         }.distinctUntilChanged()
 
-        val inputs = surfaceActive.flatMapLatest { active ->
-            if (active) {
+        val inputs = activeBrowserMode.flatMapLatest { browserMode ->
+            if (browserMode != null) {
                 combine(
-                    repository.usageLimits(BrowserMode.REGULAR),
+                    repository.usageLimits(browserMode),
                     dismissalStore.dismissals,
                     dismissalStore.actedOn,
                     modelManager.modelState,
-                ) { snapshot, dismissals, actedOn, modelState -> Inputs(snapshot, dismissals, actedOn, modelState.selectedModelId) }
+                ) { snapshot, dismissals, actedOn, modelState ->
+                    Inputs(snapshot, dismissals, actedOn, modelState.selectedModelId, modelState.isFreeTrialEligible)
+                }
             } else {
                 flowOf(null)
             }
@@ -108,6 +111,7 @@ class UsageLimitFooterPlugin @Inject constructor(
             lastSelectedModelId = input?.selectedModelId ?: previousModelId
             val snapshot = input?.snapshot ?: return@combine NativeInputFooterState(visible = false)
             val notice = snapshot.notice
+            if (notice.resetsAtMillis <= currentTimeProvider.currentTimeMillis()) return@combine NativeInputFooterState(visible = false)
             if (UsageNoticeDismissalPolicy.isSuppressed(
                     notice,
                     input.dismissals[notice.window],
@@ -118,15 +122,13 @@ class UsageLimitFooterPlugin @Inject constructor(
             if (input.actedOn?.applies(notice) == true) return@combine NativeInputFooterState(visible = false)
             if (!footerContext.isInputFocused) return@combine NativeInputFooterState(visible = false)
 
-            val freeTrialEligible = snapshot.cta?.id == UsageCtaId.SUBSCRIBE &&
-                withContext(dispatchers.io()) { runCatching { subscriptions.isFreeTrialEligible() }.getOrDefault(false) }
-            val resolvedCta = ctaResolver.resolve(snapshot.cta, modelManager.modelState.value, host.draft(), freeTrialEligible)
+            val resolvedCta = ctaResolver.resolve(snapshot.cta, modelManager.modelState.value, host.draft(), input.isFreeTrialEligible)
             retireIfManuallySwitched(snapshot, selectedModelId = input.selectedModelId, previousModelId = previousModelId)
 
             footerView.render(
                 message = messageMapper.map(notice, currentTimeProvider.currentTimeMillis(), context.resources, resolvedCta),
                 onDismiss = { appCoroutineScope.launch { dismissalStore.dismiss(notice) } },
-                onCta = { resolvedCta?.let { runCta(it, snapshot, host) } },
+                onCta = { resolvedCta?.let { runCta(it, snapshot, host, footerContext.browserMode) } },
             )
             NativeInputFooterState(visible = true, blocksComposer = notice.reached)
         }.distinctUntilChanged()
@@ -141,6 +143,7 @@ class UsageLimitFooterPlugin @Inject constructor(
         cta: ResolvedUsageCta,
         snapshot: UsageLimitsSnapshot,
         host: NativeInputFooterHost,
+        browserMode: BrowserMode,
     ) {
         when (cta) {
             is ResolvedUsageCta.SwitchModel -> {
@@ -151,7 +154,7 @@ class UsageLimitFooterPlugin @Inject constructor(
                 // The page hydrates these entries before its next request; they are written as supplied.
                 val written = runCatching {
                     withContext(dispatchers.io()) {
-                        val settings = storageProvider.forMode(BrowserMode.REGULAR).settings
+                        val settings = storageProvider.forMode(browserMode).settings
                         cta.putEntries.forEach { entry -> settings.upsert(DuckAiBridgeSettingEntity(key = entry.key, value = entry.value)) }
                     }
                 }

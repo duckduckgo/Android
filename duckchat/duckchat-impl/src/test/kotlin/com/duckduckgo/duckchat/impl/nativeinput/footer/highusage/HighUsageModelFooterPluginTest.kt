@@ -26,6 +26,7 @@ import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.duckchat.impl.R
@@ -171,7 +172,7 @@ class HighUsageModelFooterPluginTest {
         )
         val testee = plugin(dismissalStore)
         modelState.value = highUsageModel()
-        hostContext.value = duckAiContext(isFireMode = true)
+        hostContext.value = duckAiContext(browserMode = BrowserMode.FIRE)
         val footer = testee.createFooter(context, hostContext, host)
 
         footer.state.test {
@@ -276,12 +277,12 @@ class HighUsageModelFooterPluginTest {
 
     private fun duckAiContext(
         isEditing: Boolean = false,
-        isFireMode: Boolean = false,
+        browserMode: BrowserMode = BrowserMode.REGULAR,
         isInputFocused: Boolean = true,
     ) = NativeInputFooterContext(
         isDuckAiSelected = true,
         isEditing = isEditing,
-        isFireMode = isFireMode,
+        browserMode = browserMode,
         isInputFocused = isInputFocused,
     )
 }

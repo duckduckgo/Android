@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.nativeinput.footer.highusage
 
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterContext
 import org.junit.Assert.assertEquals
@@ -80,7 +81,7 @@ class HighUsageModelNoticeTest {
     fun whenFireModeIsActiveThenNoticeIsNotReturned() {
         val notice = testee.resolve(
             modelState = selectedModel(id = "claude-opus-4-8", shortName = "Claude Opus 4.8"),
-            footerContext = duckAiContext(isFireMode = true),
+            footerContext = duckAiContext(browserMode = BrowserMode.FIRE),
             dismissedModelIds = emptySet(),
         )
 
@@ -131,12 +132,12 @@ class HighUsageModelNoticeTest {
     private fun duckAiContext(
         isDuckAiSelected: Boolean = true,
         isEditing: Boolean = false,
-        isFireMode: Boolean = false,
+        browserMode: BrowserMode = BrowserMode.REGULAR,
         isInputFocused: Boolean = true,
     ) = NativeInputFooterContext(
         isDuckAiSelected = isDuckAiSelected,
         isEditing = isEditing,
-        isFireMode = isFireMode,
+        browserMode = browserMode,
         isInputFocused = isInputFocused,
     )
 }

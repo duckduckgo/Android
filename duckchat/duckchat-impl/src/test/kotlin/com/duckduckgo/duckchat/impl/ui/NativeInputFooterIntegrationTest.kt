@@ -23,6 +23,7 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.duckchat.impl.nativeinput.footer.FakeNativeInputFooterHost
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooter
@@ -47,6 +48,7 @@ import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.Shadows.shadowOf
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
@@ -57,7 +59,7 @@ class NativeInputFooterIntegrationTest {
 
     @Test
     fun whenSelectedFooterChangesThenHostOwnsOnlyTheSelectedView() = runTest {
-        val host = TestNativeInputFooterView(context)
+        val host = NativeInputFooterView(context)
         val hostContext = MutableStateFlow(duckAiContext())
         val primaryState = MutableStateFlow(NativeInputFooterState(visible = true))
         val primaryView = View(context)
@@ -84,7 +86,7 @@ class NativeInputFooterIntegrationTest {
 
     @Test
     fun whenContextualSurfaceIsHiddenThenLaterFooterEmissionsCannotReshowHost() = runTest {
-        val host = TestNativeInputFooterView(context)
+        val host = NativeInputFooterView(context)
         val footerState = MutableStateFlow(NativeInputFooterState(visible = true))
         val coordinator = coordinator(plugin(priority = 10, view = View(context), state = footerState))
 
@@ -104,7 +106,7 @@ class NativeInputFooterIntegrationTest {
 
     @Test
     fun whenExitAnimationRunsThenHostHidesAndReturnsWhenItStops() = runTest {
-        val host = TestNativeInputFooterView(context)
+        val host = NativeInputFooterView(context)
         val coordinator = coordinator(plugin(priority = 10, view = View(context), state = MutableStateFlow(NativeInputFooterState(visible = true))))
 
         host.bind(this, coordinator.state(context, MutableStateFlow(duckAiContext()), FakeNativeInputFooterHost()))
@@ -122,7 +124,7 @@ class NativeInputFooterIntegrationTest {
 
     @Test
     fun whenFooterHostDetachesThenItsStateCollectionIsCancelled() = runTest {
-        val host = TestNativeInputFooterView(context)
+        val host = NativeInputFooterView(context)
         var collectionCancelled = false
         val state = flow {
             emit(NativeInputFooterCoordinator.State(view = View(context)))
@@ -211,7 +213,7 @@ class NativeInputFooterIntegrationTest {
     @Test
     fun whenSelectedFooterBlocksComposerThenWidgetLocksWithoutAffectingFooter() = runTest {
         val widget = NativeInputModeWidget(widgetContext)
-        val host = TestNativeInputFooterView(context)
+        val host = NativeInputFooterView(context)
         val state = MutableStateFlow(
             NativeInputFooterCoordinator.State(
                 view = View(context),
@@ -237,7 +239,7 @@ class NativeInputFooterIntegrationTest {
     @Test
     fun whenNoFooterIsSelectedThenFooterOwnedWidgetLockClears() = runTest {
         val widget = NativeInputModeWidget(widgetContext)
-        val host = TestNativeInputFooterView(context)
+        val host = NativeInputFooterView(context)
         val state = MutableStateFlow(
             NativeInputFooterCoordinator.State(
                 view = View(context),
@@ -259,7 +261,7 @@ class NativeInputFooterIntegrationTest {
     @Test
     fun whenExistingAndFooterLocksCoexistThenClearingEitherOneKeepsTheOther() = runTest {
         val widget = NativeInputModeWidget(widgetContext)
-        val host = TestNativeInputFooterView(context)
+        val host = NativeInputFooterView(context)
         val state = MutableStateFlow(
             NativeInputFooterCoordinator.State(
                 view = View(context),
@@ -292,7 +294,7 @@ class NativeInputFooterIntegrationTest {
     @Test
     fun whenFooterHostUnbindsOrDetachesThenOnlyItsWidgetLockClears() = runTest {
         val widget = NativeInputModeWidget(widgetContext)
-        val host = TestNativeInputFooterView(context)
+        val host = NativeInputFooterView(context)
         val blockingState = MutableStateFlow(
             NativeInputFooterCoordinator.State(
                 view = View(context),
@@ -347,12 +349,11 @@ class NativeInputFooterIntegrationTest {
     private fun duckAiContext() = NativeInputFooterContext(
         isDuckAiSelected = true,
         isEditing = false,
-        isFireMode = false,
+        browserMode = BrowserMode.REGULAR,
         isInputFocused = true,
     )
 
-    private class TestNativeInputFooterView(context: Context) : NativeInputFooterView(context) {
-        fun attach() = onAttachedToWindow()
-        fun detach() = onDetachedFromWindow()
-    }
+    private fun View.attach() = shadowOf(this).callOnAttachedToWindow()
+
+    private fun View.detach() = shadowOf(this).callOnDetachedFromWindow()
 }

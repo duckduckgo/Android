@@ -34,6 +34,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.Shadows.shadowOf
 
 @RunWith(AndroidJUnit4::class)
 class NativeInputFooterDockLayoutTest {
@@ -107,14 +108,6 @@ class NativeInputFooterDockLayoutTest {
         assertEquals(cardVisibleBottom - overlap, footer.top)
     }
 
-    private class TestDockLayout(context: Context) : NativeInputFooterDockLayout(context) {
-        fun finishInflate() = onFinishInflate()
-    }
-
-    private class TestFooterView(context: Context) : NativeInputFooterView(context) {
-        fun attach() = onAttachedToWindow()
-    }
-
     private class Hierarchy(
         val dock: NativeInputFooterDockLayout,
         val row: LinearLayout,
@@ -128,7 +121,7 @@ class NativeInputFooterDockLayoutTest {
         useCompatPadding: Boolean,
         siblingVisibility: Int = View.GONE,
     ): Hierarchy {
-        val dock = TestDockLayout(context).apply { orientation = LinearLayout.VERTICAL }
+        val dock = NativeInputFooterDockLayout(context).apply { orientation = LinearLayout.VERTICAL }
         val row = LinearLayout(context).apply {
             orientation = LinearLayout.HORIZONTAL
             setPadding(PADDING_PX, 0, PADDING_PX, 0)
@@ -142,15 +135,15 @@ class NativeInputFooterDockLayoutTest {
         }
         row.addView(card, LinearLayout.LayoutParams(0, WRAP_CONTENT, 1f).apply { bottomMargin = PADDING_PX })
         dock.addView(row, LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT))
-        val footer = TestFooterView(context)
+        val footer = NativeInputFooterView(context)
         dock.addView(footer, LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT))
         val footerCard = MaterialCardView(context).apply { minimumHeight = FOOTER_HEIGHT_PX }
         footer.bind(
             coroutineRule.testScope,
             flowOf(NativeInputFooterCoordinator.State(view = footerCard)),
         )
-        dock.finishInflate()
-        footer.attach()
+        shadowOf(dock).callOnAttachedToWindow()
+        shadowOf(footer).callOnAttachedToWindow()
         return Hierarchy(dock, row, sibling, card, footer, footerCard)
     }
 

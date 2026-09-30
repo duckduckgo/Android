@@ -44,6 +44,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/keyline_2"
         android:layout_weight="1"
+        android:gravity="center_vertical"
+        android:minHeight="?attr/daxButtonSmallHeight"
         android:orientation="vertical">
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
@@ -79,7 +81,7 @@
         android:layout_marginStart="@dimen/keyline_1"
         android:background="@drawable/selectable_circular_ripple"
         android:clickable="true"
-        android:contentDescription="@string/duckChatHighUsageModelFooterDismissContentDescription"
+        android:contentDescription="@string/duckChatUsageFooterDismissContentDescription"
         android:focusable="true"
         android:padding="@dimen/keyline_2"
         android:scaleType="center"

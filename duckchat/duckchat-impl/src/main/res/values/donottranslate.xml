@@ -53,7 +53,7 @@
 
     <!-- Duck.ai high-usage model footer -->
     <string name="duckChatHighUsageModelFooterMessage" instruction="Placeholder is the selected model's short name">%1$s uses limits up to 2–5x faster than basic models.</string>
-    <string name="duckChatHighUsageModelFooterDismissContentDescription">Dismiss</string>
+    <string name="duckChatUsageFooterDismissContentDescription">Dismiss</string>
 
     <!-- Duck.ai usage-limit footer -->
     <string name="duckChatUsageLimitFooterApproachingDaily" instruction="Placeholder is the percentage of the daily allowance already used">%1$d%% of daily limit</string>

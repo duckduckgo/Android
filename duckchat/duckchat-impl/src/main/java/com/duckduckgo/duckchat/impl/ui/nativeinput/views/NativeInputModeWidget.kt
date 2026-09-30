@@ -84,6 +84,7 @@ import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.helper.PendingNativeFile
 import com.duckduckgo.duckchat.impl.helper.PendingNativeImage
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
+import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterCoordinator
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterDockLayout
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterDraft
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterHost
@@ -292,6 +293,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     @Inject
     lateinit var chatSuggestionsBinder: NativeInputChatSuggestionsBinder
+
+    @Inject
+    lateinit var footerCoordinator: NativeInputFooterCoordinator
 
     @Inject
     lateinit var nativeInputStateProvider: NativeInputStateProvider
@@ -1626,7 +1630,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private fun bindFooter() {
         val scope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
         footerHost = findFooterHost()
-        footerHost?.bind(scope, viewModel.footerState(context, this), ::setFooterInputBlocked)
+        footerHost?.bind(scope, footerCoordinator.state(context, viewModel.footerContext, this), ::setFooterInputBlocked)
     }
 
     /** The footer host is a sibling of this widget's card inside the nearest [NativeInputFooterDockLayout]. */

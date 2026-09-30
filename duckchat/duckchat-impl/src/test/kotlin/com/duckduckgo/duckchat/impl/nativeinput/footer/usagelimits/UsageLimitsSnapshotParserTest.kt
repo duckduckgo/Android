@@ -169,6 +169,7 @@ class UsageLimitsSnapshotParserTest {
                 """{"id":"bypassWeekly","putEntries":[
                     {"key":"duckai.fixedCostWindowBypassResetAtById","value":"{\"day\":\"$FUTURE\"}"},
                     {"key":"objectValue","value":{"a":1}},
+                    {"key":"nullValue","value":null},
                     {"key":"","value":"dropped"},
                     "not an object"
                 ]}""",
