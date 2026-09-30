@@ -246,14 +246,15 @@ class SitePermissionsAdapter(
             item: SitePermissionSetting,
             onClick: () -> Unit,
         ) {
+            val permission = GlobalPermission.from(item.text)
             with(binding.sitePermissionSetting) {
-                setPrimaryText(context.getString(item.text))
+                setPrimaryText(context.getString(permission?.settingTitle ?: item.text))
                 setSecondaryText(
                     context.getString(
                         if (item.askEnabled) R.string.permissionSettingsAskEachTime else R.string.sitePermissionsDialogNeverAllowButton,
                     ),
                 )
-                GlobalPermission.from(item.text)?.let { setLeadingIconResource(if (item.askEnabled) it.icon else it.blockedIcon) }
+                permission?.let { setLeadingIconResource(if (item.askEnabled) it.icon else it.blockedIcon) }
                 setClickListener(onClick)
             }
         }

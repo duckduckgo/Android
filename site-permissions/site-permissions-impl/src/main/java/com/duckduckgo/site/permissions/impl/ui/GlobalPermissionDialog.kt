@@ -33,6 +33,7 @@ internal enum class GlobalPermission(
     @param:DrawableRes val blockedIcon: Int,
     @param:StringRes val dialogTitle: Int,
     @param:StringRes val dialogMessage: Int,
+    @param:StringRes val settingTitle: Int = label,
 ) {
     LOCATION(
         R.string.sitePermissionsSettingsLocation,
@@ -61,6 +62,7 @@ internal enum class GlobalPermission(
         CommonR.drawable.ic_video_player_blocked_24,
         R.string.permissionSettingsDrmDialogTitle,
         R.string.permissionSettingsDrmDialogMessage,
+        R.string.permissionSettingsDrmTitle,
     ),
     ;
 
