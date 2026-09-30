@@ -20,6 +20,8 @@ import com.duckduckgo.app.di.ProcessName
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy.OnProcessStart
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
+import com.duckduckgo.app.statistics.wideevents.WideEventDefinition
+import com.duckduckgo.app.statistics.wideevents.WideEventDefinition.Version
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
@@ -84,8 +86,8 @@ class AuthTokenRefreshWideEventImpl @Inject constructor(
                     KEY_NETP_IS_ENABLED to runCatching { networkProtectionState.get().isEnabled().toString() }.getOrDefault(""),
                     KEY_NETP_IS_RUNNING to runCatching { networkProtectionState.get().isRunning().toString() }.getOrDefault(""),
                     KEY_PROCESS_NAME to processName,
-                    KEY_SERIALIZATION_ENABLED to "true",
                 ),
+                definition = WideEventDefinition(version = Version(minor = 1, patch = 0)),
             )
             .getOrNull()
             ?.also { wideEventId ->
@@ -236,7 +238,6 @@ class AuthTokenRefreshWideEventImpl @Inject constructor(
         val LOCK_WAIT_BUCKETS = setOf(100.milliseconds, 500.milliseconds, 1.seconds, 3.seconds, 10.seconds, 30.seconds, 60.seconds)
 
         const val KEY_LOCK_OUTCOME = "lock_outcome"
-        const val KEY_SERIALIZATION_ENABLED = "serialization_enabled"
         const val KEY_SUBSCRIPTION_STATUS = "subscription_status"
         const val KEY_BACKEND_ERROR_RESPONSE = "backend_error_response"
         const val KEY_PLAY_LOGIN_ERROR = "play_login_error"

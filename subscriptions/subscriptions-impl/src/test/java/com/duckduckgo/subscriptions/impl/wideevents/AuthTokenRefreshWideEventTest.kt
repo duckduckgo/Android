@@ -20,6 +20,8 @@ import android.annotation.SuppressLint
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
+import com.duckduckgo.app.statistics.wideevents.WideEventDefinition
+import com.duckduckgo.app.statistics.wideevents.WideEventDefinition.Version
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -83,9 +85,9 @@ class AuthTokenRefreshWideEventTest {
                 "netp_is_enabled" to "false",
                 "netp_is_running" to "false",
                 "process_name" to "main",
-                "serialization_enabled" to "true",
             ),
             cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
+            definition = WideEventDefinition(version = Version(minor = 1, patch = 0)),
         )
 
         verify(wideEventClient).intervalStart(123L, "total_duration_ms_bucketed", null)
