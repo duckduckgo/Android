@@ -32,6 +32,7 @@ import com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.feature.toggles.api.Toggle.State.CohortName
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.Product.DuckAiPlus
@@ -302,7 +303,8 @@ interface SubscriptionsFeature {
     fun allowProTierPurchase(): Toggle
 
     /**
-     * When enabled, the paywall opens a faster-rendering page
+     * A control/treatment experiment: [PerformanceOptimizedPaywallsCohort.TREATMENT] opens a faster-rendering
+     * page, [PerformanceOptimizedPaywallsCohort.CONTROL] the legacy paywall.
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun performanceOptimizedPaywalls(): Toggle
@@ -371,6 +373,11 @@ interface SubscriptionsFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun subscriptionConcurrentExperiments(): Toggle
+
+    enum class PerformanceOptimizedPaywallsCohort(override val cohortName: String) : CohortName {
+        CONTROL("control"),
+        TREATMENT("treatment"),
+    }
 }
 
 @ContributesBinding(AppScope::class)

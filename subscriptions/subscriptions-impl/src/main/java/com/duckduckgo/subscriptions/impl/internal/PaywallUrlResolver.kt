@@ -22,10 +22,12 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.FEATURE_PAGE_QUERY_PARAM_KEY
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PERFORMANCE_OPTIMIZED_PAYWALLS_COHORT_QUERY_PARAM_KEY
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PIR_QUERY_PARAM_KEY
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.TRIAL_QUERY_PARAM_KEY
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.VPN_FEATURE_PAGE
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
+import com.duckduckgo.subscriptions.impl.SubscriptionsFeature.PerformanceOptimizedPaywallsCohort
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.withContext
@@ -53,8 +55,22 @@ class RealPaywallUrlResolver @Inject constructor(
     private suspend fun optimizedUrl(url: String): String? {
         val uri = url.toUri()
         if (!isPaywallUrl(uri)) return null
-        if (!subscriptionsFeature.performanceOptimizedPaywalls().isEnabled()) return null
-        return rewrite(uri)
+        val toggle = subscriptionsFeature.performanceOptimizedPaywalls()
+        if (!toggle.isEnabled()) return null
+        // Entry points without a faster page, or with no offers, keep the legacy paywall and are never enrolled.
+        val fasterPaywallUrl = rewrite(uri) ?: return null
+
+        // Enrolling only here keeps both cohorts to users who could be shown either paywall.
+        toggle.enroll()
+        val cohort = PerformanceOptimizedPaywallsCohort.entries.firstOrNull { toggle.isEnrolledAndEnabled(it) } ?: return null
+
+        val paywallUrl = if (cohort == PerformanceOptimizedPaywallsCohort.TREATMENT) fasterPaywallUrl else url
+        return paywallUrl
+            .toUri()
+            .buildUpon()
+            .appendQueryParameter(PERFORMANCE_OPTIMIZED_PAYWALLS_COHORT_QUERY_PARAM_KEY, cohort.cohortName)
+            .build()
+            .toString()
     }
 
     private fun isPaywallUrl(uri: Uri): Boolean {

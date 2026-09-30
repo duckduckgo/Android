@@ -102,6 +102,10 @@ object SubscriptionsConstants {
     const val TRIAL_QUERY_PARAM_KEY = "trial"
     const val PIR_QUERY_PARAM_KEY = "pir"
 
+    // Names the performanceOptimizedPaywalls cohort on whichever paywall the user is sent to, so the
+    // frontend can label both cohorts. Its absence means the user isn't in the experiment.
+    const val PERFORMANCE_OPTIMIZED_PAYWALLS_COHORT_QUERY_PARAM_KEY = "experiment_perfpaywall"
+
     // Subscription-funnel origin for the app-settings "Get Subscription" entry point. Used both to
     // launch the buy webview (ProSettingView) and on the app-settings click pixel (SubscriptionPixelSender).
     const val ORIGIN_APP_SETTINGS = "funnel_appsettings_android"
