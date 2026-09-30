@@ -92,10 +92,10 @@ class SubscriptionSettingsViewModel @Inject constructor(
     }
 
     override fun onResume(owner: LifecycleOwner) {
-        viewModelScope.launch { emitChanges(countCompletedEntryPointView = true) }
+        viewModelScope.launch { emitChanges() }
     }
 
-    private suspend fun emitChanges(countCompletedEntryPointView: Boolean = false) {
+    private suspend fun emitChanges() {
         val account = subscriptionsManager.getAccount() ?: return
         val subscription = subscriptionsManager.getSubscription() ?: return
         logcat {
@@ -162,32 +162,29 @@ class SubscriptionSettingsViewModel @Inject constructor(
                 pendingEffectiveDateShort = pendingEffectiveDateShort,
                 pendingTierNameResId = pendingTierNameResId,
                 effectiveTier = effectiveTier,
-                onboardingEntryPoint = onboardingEntryPoint(subscription, countCompletedEntryPointView),
+                onboardingEntryPoint = onboardingEntryPoint(subscription),
             ),
         )
     }
 
-    private suspend fun onboardingEntryPoint(
-        subscription: Subscription,
-        countCompletedEntryPointView: Boolean,
-    ): OnboardingEntryPoint? {
+    private val completedEntryPointAllowed: Boolean by lazy {
+        val allowed = onboardingStore.completedEntryPointViews() < MAX_COMPLETED_ENTRY_POINT_VIEWS
+        if (allowed) onboardingStore.incrementCompletedEntryPointViews()
+        allowed
+    }
+
+    private suspend fun onboardingEntryPoint(subscription: Subscription): OnboardingEntryPoint? {
         if (!subscriptionsFeature.onboardingSubscriptionExperiment().isEnabled()) return null
         if (!subscription.isActive()) return null
 
         val percentage = onboardingProgress.completionPercentage()
         return if (percentage >= COMPLETE_PERCENTAGE) {
-            completedEntryPoint(countCompletedEntryPointView)
+            if (completedEntryPointAllowed) OnboardingEntryPoint(percentage = COMPLETE_PERCENTAGE) else null
         } else {
             val withinPurchaseWindow =
                 currentTimeProvider.currentTimeMillis() - subscription.startedAt <= INCOMPLETE_CARD_WINDOW_MILLIS
             if (withinPurchaseWindow) OnboardingEntryPoint(percentage = percentage) else null
         }
-    }
-
-    private fun completedEntryPoint(countCompletedEntryPointView: Boolean): OnboardingEntryPoint? {
-        if (onboardingStore.completedEntryPointViews() >= MAX_COMPLETED_ENTRY_POINT_VIEWS) return null
-        if (countCompletedEntryPointView) onboardingStore.incrementCompletedEntryPointViews()
-        return OnboardingEntryPoint(percentage = COMPLETE_PERCENTAGE)
     }
 
     fun onContinueSetupClicked() {

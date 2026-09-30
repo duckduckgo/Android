@@ -765,6 +765,32 @@ class SubscriptionSettingsViewModelTest {
     }
 
     @Test
+    fun whenCompletedCardShownThenViewIsCountedOnceAcrossResumeAndStatusEmission() = runTest {
+        subscriptionsFeature.onboardingSubscriptionExperiment().setRawStoredState(Toggle.State(enable = true))
+        stubReadySubscription()
+        whenever(onboardingProgress.completionPercentage()).thenReturn(100)
+
+        var views = 1
+        whenever(onboardingStore.completedEntryPointViews()).thenAnswer { views }
+        whenever(onboardingStore.incrementCompletedEntryPointViews()).thenAnswer {
+            views++
+            Unit
+        }
+
+        val status = MutableSharedFlow<SubscriptionStatus>()
+        whenever(subscriptionsManager.subscriptionStatus).thenReturn(status)
+
+        viewModel.onCreate(mock())
+        viewModel.onResume(mock())
+        assertEquals(100, (viewModel.viewState.value as Ready).onboardingEntryPoint?.percentage)
+
+        status.emit(AUTO_RENEWABLE)
+
+        assertEquals(100, (viewModel.viewState.value as Ready).onboardingEntryPoint?.percentage)
+        assertEquals(2, views)
+    }
+
+    @Test
     fun whenSubscriptionInactiveThenNoOnboardingEntryPoint() = runTest {
         subscriptionsFeature.onboardingSubscriptionExperiment().setRawStoredState(Toggle.State(enable = true))
         stubReadySubscription(status = EXPIRED)
