@@ -144,12 +144,13 @@ class RealDuckAiSelectionJourneyWideEvent @Inject constructor(
     private suspend fun finish(tabId: String, reason: SelectionTerminalReason) {
         val current = journeys.remove(tabId) ?: return
         wideEventClient.intervalEnd(wideEventId = current.id, key = KEY_DURATION)
+        val submitted = reason == SelectionTerminalReason.SUBMITTED
         wideEventClient.flowFinish(
             wideEventId = current.id,
-            status = if (reason == SelectionTerminalReason.SUBMITTED) FlowStatus.Success else FlowStatus.Cancelled,
+            status = if (submitted) FlowStatus.Success else FlowStatus.Cancelled,
             metadata = buildMap {
                 put(KEY_TERMINAL_REASON, reason.value)
-                put(KEY_SUBMISSION_ACTION, (current.submissionAction ?: SelectionSubmissionAction.PROMPT).value)
+                if (submitted) put(KEY_SUBMISSION_ACTION, (current.submissionAction ?: SelectionSubmissionAction.PROMPT).value)
                 put(KEY_MAX_COUNT, selectionCountBucket(current.maxSelectionCount))
                 put(KEY_DISMISSAL_COUNT, dismissalCountBucket(current.dismissalCount))
                 put(KEY_DISMISSED_BEFORE_SUBMISSION, (current.dismissalCount > 0).toString())

@@ -217,4 +217,15 @@ class DuckAiSelectionJourneyWideEventTest {
 
         verify(wideEventClient).flowFinish(eq(1L), eq(FlowStatus.Cancelled), argThat { this["outcome.terminal_reason"] == "tab_closed" })
     }
+
+    @Test
+    fun whenJourneyCancelledThenSubmissionActionIsOmitted() = runTest {
+        attach("tab-A", flowId = 1L)
+        testee.onSuggestionSelected("tab-A", SelectionSubmissionAction.SUMMARIZE)
+
+        testee.onSelectionRemoved("tab-A", 0)
+        idle()
+
+        verify(wideEventClient).flowFinish(eq(1L), eq(FlowStatus.Cancelled), argThat { "submission.action" !in this })
+    }
 }

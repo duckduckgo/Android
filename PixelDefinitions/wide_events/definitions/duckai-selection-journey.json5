@@ -26,7 +26,7 @@
                     },
                     "submission.action": {
                         "type": "string",
-                        "description": "What the user asked for. 'prompt' when they typed their own question rather than picking a suggestion",
+                        "description": "What the user asked for. 'prompt' when they typed their own question rather than picking a suggestion. Only present when the journey was submitted",
                         "enum": ["prompt", "summarize", "translate"]
                     },
                     "selection.max_count_bucketed": {
