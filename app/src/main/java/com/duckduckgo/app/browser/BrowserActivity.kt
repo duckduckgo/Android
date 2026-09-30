@@ -90,6 +90,7 @@ import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.onboarding.orchestrator.NewUserBrowserOnboardingViewModel
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
+import com.duckduckgo.app.permissions.PermissionsScreenNoParams
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CANCEL
 import com.duckduckgo.app.pixels.AppReturnPixelSender
@@ -138,6 +139,7 @@ import com.duckduckgo.duckchat.api.viewmodel.DuckChatSharedViewModel
 import com.duckduckgo.feedback.api.FeedbackScreenNoParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity.Companion.SAVED_SITE_URL_EXTRA
+import com.duckduckgo.site.permissions.impl.feature.SitePermissionsDialogRedesignFeature
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionScreenNoParams
 import com.duckduckgo.sync.api.SyncActivityFromSetupUrl
 import com.duckduckgo.sync.api.setup.SyncUrlIdentifier
@@ -202,6 +204,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject
+    lateinit var sitePermissionsDialogRedesignFeature: SitePermissionsDialogRedesignFeature
 
     @Inject
     @AppCoroutineScope
@@ -1099,7 +1104,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     fun launchSitePermissionsSettings() {
-        globalActivityStarter.start(this, SitePermissionScreenNoParams)
+        val screen = if (sitePermissionsDialogRedesignFeature.permissionSettingsRedesign().isEnabled()) {
+            PermissionsScreenNoParams
+        } else {
+            SitePermissionScreenNoParams
+        }
+        globalActivityStarter.start(this, screen)
     }
 
     fun launchBookmarks() {

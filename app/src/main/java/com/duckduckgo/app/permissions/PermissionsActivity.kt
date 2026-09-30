@@ -22,13 +22,18 @@ import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.text.HtmlCompat
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.ConcatAdapter
+import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityPermissionsBinding
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.permissions.PermissionsViewModel.Command
 import com.duckduckgo.app.settings.clear.AppLinkSettingType
 import com.duckduckgo.app.settings.clear.getAppLinkSettingForIndex
@@ -45,7 +50,13 @@ import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.site.permissions.impl.feature.SitePermissionsDialogRedesignFeature
+import com.duckduckgo.site.permissions.impl.ui.SitePermissionListItem.SitePermissionSetting
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionScreenNoParams
+import com.duckduckgo.site.permissions.impl.ui.SitePermissionsAdapter
+import com.duckduckgo.site.permissions.impl.ui.SitePermissionsViewModel
+import com.duckduckgo.site.permissions.impl.ui.permissionsperwebsite.PermissionsPerWebsiteActivity
+import com.duckduckgo.site.permissions.impl.ui.showGlobalPermissionDialog
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
@@ -72,10 +83,20 @@ class PermissionsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var sitePermissionsDialogRedesignFeature: SitePermissionsDialogRedesignFeature
 
+    @Inject
+    lateinit var faviconManager: FaviconManager
+
     private val viewModel: PermissionsViewModel by bindViewModel()
+    private val sitePermissionsViewModel: SitePermissionsViewModel by bindViewModel()
     private val binding: ActivityPermissionsBinding by viewBinding()
     private var appLinksDialog: DaxAlertDialog? = null
     private var pendingAppLinkSetting: AppLinkSettingType? = null
+    private var sitePermissionDialog: DaxAlertDialog? = null
+    private var pendingSitePermissionSetting: SitePermissionSetting? = null
+    private var generalPermissionsAdapter: GeneralPermissionsAdapter? = null
+    private var sitePermissionsAdapter: SitePermissionsAdapter? = null
+
+    private val permissionSettingsRedesign by lazy { sitePermissionsDialogRedesignFeature.permissionSettingsRedesign().isEnabled() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -91,26 +112,117 @@ class PermissionsActivity : DuckDuckGoActivity() {
             configureEdgeToEdgeInsets()
         }
 
-        configureUiEventHandlers()
+        if (permissionSettingsRedesign) {
+            setupRedesignedList()
+            observeSitePermissionsViewModel()
+        } else {
+            configureUiEventHandlers()
+        }
         observeViewModel()
         savedInstanceState?.getString(KEY_PENDING_APP_LINK_SETTING)
             ?.let { launchRedesignedAppLinksSettingSelector(AppLinkSettingType.valueOf(it)) }
+        savedInstanceState?.takeIf { it.containsKey(KEY_PENDING_SITE_PERMISSION) }?.let {
+            showSitePermissionDialog(SitePermissionSetting(it.getInt(KEY_PENDING_SITE_PERMISSION), it.getBoolean(KEY_PENDING_SITE_ASK_ENABLED)))
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         pendingAppLinkSetting?.let { outState.putString(KEY_PENDING_APP_LINK_SETTING, it.name) }
+        pendingSitePermissionSetting?.let {
+            outState.putInt(KEY_PENDING_SITE_PERMISSION, it.text)
+            outState.putBoolean(KEY_PENDING_SITE_ASK_ENABLED, it.askEnabled)
+        }
     }
 
     override fun onDestroy() {
         appLinksDialog?.dismiss()
+        sitePermissionDialog?.dismiss()
         super.onDestroy()
+    }
+
+    private fun setupRedesignedList() {
+        binding.includePermissions.root.isVisible = false
+        binding.redesignRecycler.isVisible = true
+        val general = GeneralPermissionsAdapter(
+            onNotificationsClicked = { viewModel.userRequestedToChangeNotificationsSetting() },
+            onAppLinksClicked = { viewModel.userRequestedToChangeAppLinkSetting() },
+        )
+        val sitePermissions = SitePermissionsAdapter(
+            viewModel = sitePermissionsViewModel,
+            lifecycleOwner = this,
+            faviconManager = faviconManager,
+            appBrandDesignUpdateToggles = appBrandDesignUpdateToggles,
+            permissionSettingsRedesign = true,
+            onPermissionSettingClicked = { showSitePermissionDialog(it) },
+        )
+        // Hold the saved scroll position until the sites have loaded, otherwise a position inside Manage Sites is dropped.
+        sitePermissions.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT
+        generalPermissionsAdapter = general
+        sitePermissionsAdapter = sitePermissions
+        binding.redesignRecycler.adapter = ConcatAdapter(general, sitePermissions)
+    }
+
+    private fun observeSitePermissionsViewModel() {
+        sitePermissionsViewModel.allowedSites()
+        sitePermissionsViewModel.viewState
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { state ->
+                sitePermissionsAdapter?.updateItems(
+                    state.sitesPermissionsAllowed.map { it.domain },
+                    state.askLocationEnabled,
+                    state.askCameraEnabled,
+                    state.askMicEnabled,
+                    state.askDrmEnabled,
+                )
+                if (state.sitesLoaded) {
+                    sitePermissionsAdapter?.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.ALLOW
+                }
+            }.launchIn(lifecycleScope)
+
+        sitePermissionsViewModel.commands
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { command ->
+                when (command) {
+                    is SitePermissionsViewModel.Command.ShowRemovedAllConfirmationSnackbar -> showRemovedAllSitesSnackbar {
+                        sitePermissionsViewModel.onSnackBarUndoRemoveAllWebsites(command.removedSitePermissions)
+                    }
+                    is SitePermissionsViewModel.Command.LaunchWebsiteAllowed ->
+                        startActivity(PermissionsPerWebsiteActivity.intent(this, command.domain))
+                }
+            }.launchIn(lifecycleScope)
+    }
+
+    private fun showSitePermissionDialog(setting: SitePermissionSetting) {
+        pendingSitePermissionSetting = setting
+        sitePermissionDialog = showGlobalPermissionDialog(
+            context = this,
+            permission = setting.text,
+            askEnabled = setting.askEnabled,
+            onSelectionChanged = { pendingSitePermissionSetting = setting.copy(askEnabled = it) },
+            onDismissed = {
+                pendingSitePermissionSetting = null
+                sitePermissionDialog = null
+            },
+            onSave = { sitePermissionsViewModel.permissionToggleSelected(it, setting.text) },
+        )
+    }
+
+    private fun showRemovedAllSitesSnackbar(onUndo: () -> Unit) {
+        val message = HtmlCompat.fromHtml(
+            getString(com.duckduckgo.site.permissions.impl.R.string.sitePermissionsRemoveAllWebsitesSnackbarText),
+            HtmlCompat.FROM_HTML_MODE_LEGACY,
+        )
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG)
+            .setAction(com.duckduckgo.mobile.android.R.string.undo) { onUndo() }
+            .show()
     }
 
     private fun configureEdgeToEdgeInsets() {
         edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
         edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
         edgeToEdgeHandler.applyNavigationBarInsets(binding.includePermissions.root, drawBehindGestureNav = true)
+        edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.redesignRecycler)
     }
 
     override fun onStart() {
@@ -130,9 +242,11 @@ class PermissionsActivity : DuckDuckGoActivity() {
         viewModel.viewState()
             .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
             .onEach { viewState ->
-                viewState.let {
-                    updateAppLinkBehavior(it.appLinksSettingType)
-                    binding.includePermissions.notificationsSetting.setSecondaryText(getString(it.notificationsSettingSubtitleId))
+                val appLinksSubtitle = getAppLinksSubtitle(viewState.appLinksSettingType)
+                val notificationsSubtitle = getString(viewState.notificationsSettingSubtitleId)
+                generalPermissionsAdapter?.update(notificationsSubtitle, appLinksSubtitle) ?: run {
+                    binding.includePermissions.appLinksSetting.setSecondaryText(appLinksSubtitle)
+                    binding.includePermissions.notificationsSetting.setSecondaryText(notificationsSubtitle)
                 }
             }.launchIn(lifecycleScope)
 
@@ -142,16 +256,21 @@ class PermissionsActivity : DuckDuckGoActivity() {
             .launchIn(lifecycleScope)
     }
 
-    private fun updateAppLinkBehavior(appLinkSettingType: AppLinkSettingType) {
-        val subtitle = getString(
+    private fun getAppLinksSubtitle(appLinkSettingType: AppLinkSettingType): String = getString(
+        if (permissionSettingsRedesign) {
+            when (appLinkSettingType) {
+                AppLinkSettingType.ASK_EVERYTIME -> com.duckduckgo.site.permissions.impl.R.string.permissionSettingsAskEachTime
+                AppLinkSettingType.ALWAYS -> com.duckduckgo.site.permissions.impl.R.string.permissionSettingsAlwaysAllow
+                AppLinkSettingType.NEVER -> com.duckduckgo.site.permissions.impl.R.string.sitePermissionsDialogNeverAllowButton
+            }
+        } else {
             when (appLinkSettingType) {
                 AppLinkSettingType.ASK_EVERYTIME -> R.string.settingsAppLinksAskEveryTime
                 AppLinkSettingType.ALWAYS -> R.string.settingsAppLinksAlways
                 AppLinkSettingType.NEVER -> R.string.settingsAppLinksNever
-            },
-        )
-        binding.includePermissions.appLinksSetting.setSecondaryText(subtitle)
-    }
+            }
+        },
+    )
 
     private fun processCommand(it: Command) {
         when (it) {
@@ -167,7 +286,7 @@ class PermissionsActivity : DuckDuckGoActivity() {
     }
 
     private fun launchAppLinksSettingSelector(appLinkSettingType: AppLinkSettingType) {
-        if (sitePermissionsDialogRedesignFeature.permissionSettingsRedesign().isEnabled()) {
+        if (permissionSettingsRedesign) {
             launchRedesignedAppLinksSettingSelector(appLinkSettingType)
             return
         }
@@ -240,5 +359,7 @@ class PermissionsActivity : DuckDuckGoActivity() {
 
     companion object {
         private const val KEY_PENDING_APP_LINK_SETTING = "pendingAppLinkSetting"
+        private const val KEY_PENDING_SITE_PERMISSION = "pendingSitePermission"
+        private const val KEY_PENDING_SITE_ASK_ENABLED = "pendingSiteAskEnabled"
     }
 }

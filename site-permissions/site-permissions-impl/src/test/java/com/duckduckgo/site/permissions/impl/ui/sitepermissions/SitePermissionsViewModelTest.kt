@@ -25,8 +25,10 @@ import com.duckduckgo.site.permissions.impl.ui.SitePermissionsViewModel.Command.
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionsViewModel.Command.ShowRemovedAllConfirmationSnackbar
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -61,6 +63,23 @@ class SitePermissionsViewModelTest {
             val sitePermissions = awaitItem().sitesPermissionsAllowed
             assertEquals(2, sitePermissions.size)
         }
+    }
+
+    @Test
+    fun whenAllowedSitesLoadedThenViewStateMarkedAsLoaded() = runTest {
+        viewModel.viewState.test {
+            assertTrue(awaitItem().sitesLoaded)
+        }
+    }
+
+    @Test
+    fun whenAllowedSitesCalledAgainWhileCollectingThenDoesNotStartAnotherCollector() = runTest {
+        whenever(mockSitePermissionsRepository.sitePermissionsWebsitesFlow()).thenReturn(MutableStateFlow(emptyList()))
+
+        viewModel.allowedSites()
+        viewModel.allowedSites()
+
+        verify(mockSitePermissionsRepository, times(2)).sitePermissionsWebsitesFlow()
     }
 
     @Test
