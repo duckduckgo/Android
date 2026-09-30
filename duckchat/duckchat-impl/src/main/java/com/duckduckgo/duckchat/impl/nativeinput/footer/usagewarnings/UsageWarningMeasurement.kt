@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.nativeinput.footer.usagewarnings
 
+import androidx.annotation.MainThread
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterHost
 import com.duckduckgo.duckchat.impl.nativeinput.footer.usagelimits.UsageNotice
@@ -82,6 +83,7 @@ class UsageWarningMeasurements @Inject constructor(
 ) {
     private val byHost = WeakHashMap<NativeInputFooterHost, UsageWarningMeasurement>()
 
+    @MainThread
     fun forHost(
         host: NativeInputFooterHost,
         surface: () -> DuckChatPixelSurface,

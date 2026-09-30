@@ -68,7 +68,7 @@
         ]
     },
     "m_aichat_usage_warning_approaching_abandoned": {
-        "description": "Fires when the input session ends after an approaching-limit card with no follow-through: no prompt, no model change and no CTA taken.",
+        "description": "Fires when an approaching-limit card's exposure ends with no follow-through (no prompt, no model change, no CTA taken): the input session ends, or a different card replaces it on screen, for example the rung moving from 50 to 75 because of a prompt sent elsewhere.",
         "owners": ["YoussefKeyrouz"],
         "triggers": ["other"],
         "suffixes": ["first_daily_count", "form_factor"],
@@ -118,7 +118,7 @@
         ]
     },
     "m_aichat_usage_warning_limit_reached_abandoned": {
-        "description": "Fires when the input session ends after a limit-reached card with no follow-through: no prompt, no model change and no CTA taken.",
+        "description": "Fires when a limit-reached card's exposure ends with no follow-through (no prompt, no model change, no CTA taken): the input session ends, or a different card replaces it on screen.",
         "owners": ["YoussefKeyrouz"],
         "triggers": ["other"],
         "suffixes": ["first_daily_count", "form_factor"],
@@ -212,7 +212,7 @@
         ]
     },
     "m_aichat_high_usage_model_notice_abandoned": {
-        "description": "Fires when the input session ends after a high-usage model notice with no follow-through: no prompt and no model change.",
+        "description": "Fires when a high-usage model notice's exposure ends with no follow-through (no prompt, no model change): the input session ends, or a different card replaces it on screen.",
         "owners": ["YoussefKeyrouz"],
         "triggers": ["other"],
         "suffixes": ["first_daily_count", "form_factor"],
