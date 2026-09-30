@@ -32,7 +32,8 @@ interface NextStepsCardsExperimentManager {
 
     enum class NextStepsCardsExperimentVariant {
         CONTROL,
-        TREATMENT,
+        STACKED_CARDS,
+        CHECK_LIST,
     }
 }
 
@@ -56,7 +57,8 @@ class NextStepsCardsExperimentManagerImpl @Inject constructor(
         val toggle = nextStepsCardsFeatureToggles.nextStepsCardsExperiment()
         toggle.enroll()
         when {
-            toggle.isEnrolledAndEnabled(Cohorts.TREATMENT) -> NextStepsCardsExperimentVariant.TREATMENT
+            toggle.isEnrolledAndEnabled(Cohorts.STACKED_CARDS) -> NextStepsCardsExperimentVariant.STACKED_CARDS
+            toggle.isEnrolledAndEnabled(Cohorts.CHECK_LIST) -> NextStepsCardsExperimentVariant.CHECK_LIST
             toggle.isEnrolledAndEnabled(Cohorts.CONTROL) -> NextStepsCardsExperimentVariant.CONTROL
             else -> null
         }
