@@ -11955,24 +11955,41 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenDuckChatNativeNewChatRequested() = runTest {
-        val expectedEvent = SubscriptionEventData(
-            featureName = "event1",
-            subscriptionName = "subscription1",
-            params = JSONObject(),
-        )
-        whenever(mockDuckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT)).thenReturn(expectedEvent)
+    fun whenNewChatRequestedFromChatMenuThenOpensNewTabWithEmptyChat() = runTest {
+        testee.openNewDuckChatFromChatMenu()
 
+        assertCommandIssued<Command.OpenInNewTab> {
+            assertEquals(duckChatURL, query)
+            assertEquals("abc", sourceTabId)
+        }
+        verify(mockDuckChatJSHelper, never()).onNativeAction(NativeAction.NEW_CHAT)
+        verify(mockDuckChat).reportDuckChatEntry(DuckChatEntryPoint.DUCK_AI_NEW_CHAT, opensNewTab = true, hasPrompt = false)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_NEW_CHAT_TAPPED)
+        verify(mockDuckAiSessionCallback).onNewChatCreated("abc")
+        verify(mockDuckAiSessionCallback).onExitIntent("abc", DuckAiSessionExitTrigger.NEW_TAB_OPENED)
+    }
+
+    @Test
+    fun whenNewChatRequestedFromBrowsingMenuOnDuckAiTabThenOpensNewTabWithDuckAiEntryPoint() = runTest {
         testee.openNewDuckChat(ViewMode.DuckAI)
 
-        testee.subscriptionEventDataFlow.test {
-            val emittedEvent = awaitItem()
-            assertEquals(expectedEvent.featureName, emittedEvent.featureName)
-            assertEquals(expectedEvent.subscriptionName, emittedEvent.subscriptionName)
-            assertEquals(expectedEvent.params.toString(), emittedEvent.params.toString())
-            cancelAndIgnoreRemainingEvents()
+        assertCommandIssued<Command.OpenInNewTab> {
+            assertEquals(duckChatURL, query)
+            assertEquals("abc", sourceTabId)
         }
-        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_NEW_CHAT_TAPPED)
+        verify(mockDuckChat).reportDuckChatEntry(DuckChatEntryPoint.BROWSING_MENU_DUCKAI, opensNewTab = true, hasPrompt = false)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_NEW_CHAT_TAB_TAPPED)
+        verify(mockDuckAiSessionCallback).onNewChatCreated("abc")
+        verify(mockDuckAiSessionCallback).onExitIntent("abc", DuckAiSessionExitTrigger.NEW_TAB_OPENED)
+    }
+
+    @Test
+    fun whenNewChatRequestedFromBrowsingMenuOnWebpageThenNoNewChatRecordedForTheSession() = runTest {
+        testee.openNewDuckChat(ViewMode.Browser("https://example.com"))
+
+        verify(mockDuckChat).reportDuckChatEntry(DuckChatEntryPoint.BROWSING_MENU_WEBPAGE, opensNewTab = true, hasPrompt = false)
+        verify(mockDuckAiSessionCallback, never()).onNewChatCreated(any())
+        verify(mockDuckAiSessionCallback, never()).onExitIntent(any(), any())
     }
 
     @Test
@@ -12003,6 +12020,7 @@ class BrowserTabViewModelTest {
             assertTrue(command.query == duckChatURL)
 
             verify(mockDuckChat, never()).openDuckChat(any())
+            verify(mockDuckChat).reportDuckChatEntry(DuckChatEntryPoint.BROWSING_MENU_NTP, opensNewTab = true, hasPrompt = false)
             verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_NEW_CHAT_TAB_TAPPED)
         }
 
