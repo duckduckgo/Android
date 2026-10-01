@@ -16,6 +16,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.goog
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.PreImport
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewState
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.promptscoordinator.api.PromptExposureReporter
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.emptyFlow
@@ -28,6 +29,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -40,16 +42,34 @@ class ImportFromGooglePasswordsDialogViewModelTest {
 
     private val credentialImporter: CredentialImporter = mock()
     private val autofillStore: InternalAutofillStore = mock()
+    private val promptExposureReporter: PromptExposureReporter = mock()
     private val testee = ImportFromGooglePasswordsDialogViewModel(
         credentialImporter = credentialImporter,
         dispatchers = coroutineTestRule.testDispatcherProvider,
         importPasswordsPixelSender = importPasswordsPixelSender,
         autofillStore = autofillStore,
+        promptExposureReporter = promptExposureReporter,
     )
 
     @Before
     fun setup() = runTest {
         whenever(credentialImporter.getImportStatus()).thenReturn(emptyFlow())
+    }
+
+    @Test
+    fun whenInBrowserPromoShownThenPromptExposureIsReported() {
+        testee.shouldShowInitialInstructionalPrompt(importSource = AutofillImportLaunchSource.InBrowserPromo)
+
+        verify(promptExposureReporter).reportPromptShown("import_passwords_google")
+    }
+
+    @Test
+    fun whenImportDialogOpenedFromAnyOtherSourceThenPromptExposureIsNotReported() {
+        AutofillImportLaunchSource.entries
+            .filter { it != AutofillImportLaunchSource.InBrowserPromo }
+            .forEach { testee.shouldShowInitialInstructionalPrompt(importSource = it) }
+
+        verifyNoInteractions(promptExposureReporter)
     }
 
     @Test

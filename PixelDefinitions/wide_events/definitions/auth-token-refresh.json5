@@ -4,7 +4,7 @@
         "owners": ["lmac012"],
         "meta": {
             "type": "android-auth-token-refresh",
-            "version": "0.0"
+            "version": "1.0"
         },
         "feature": {
             "name": "auth-token-refresh",
@@ -30,11 +30,6 @@
                         "type": "string",
                         "description": "Whether the VPN was running when the refresh started. Empty string if the value could not be read.",
                         "enum": ["true", "false", ""]
-                    },
-                    "serialization_enabled": {
-                        "type": "string",
-                        "description": "Whether refreshes were being serialized across processes with a cross-process lock, i.e. the value of the serializeTokenRefresh flag when the refresh started.",
-                        "enum": ["true", "false"]
                     },
                     "lock_outcome": {
                         "type": "string",

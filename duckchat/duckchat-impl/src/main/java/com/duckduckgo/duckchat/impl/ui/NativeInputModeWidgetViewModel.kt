@@ -353,14 +353,22 @@ class NativeInputModeWidgetViewModel @Inject constructor(
 
     private val activeTabId = MutableStateFlow<String?>(null)
     private val footerInputFocused = MutableStateFlow(false)
+    private val footerPromptSubmissions = MutableStateFlow(0)
 
-    val footerContext: StateFlow<NativeInputFooterContext> = combine(widgetConfig, activeTabId, footerInputFocused) { config, tabId, inputFocused ->
+    val footerContext: StateFlow<NativeInputFooterContext> = combine(
+        widgetConfig,
+        activeTabId,
+        footerInputFocused,
+        footerPromptSubmissions,
+    ) { config, tabId, inputFocused, promptSubmissions ->
         val selection = config.toggleSelection ?: NativeInputState.defaultToggleFor(config.inputContext)
         NativeInputFooterContext(
             isDuckAiSelected = selection == NativeInputState.ToggleSelection.DUCK_AI,
             isEditing = tabId?.startsWith(EDIT_STATE_KEY_PREFIX) == true,
             browserMode = browserMode,
             isInputFocused = inputFocused,
+            inputContext = config.inputContext,
+            promptSubmissions = promptSubmissions,
         )
     }.stateIn(
         scope = viewModelScope,
@@ -370,6 +378,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
             isEditing = false,
             browserMode = browserMode,
             isInputFocused = false,
+            inputContext = NativeInputState.InputContext.BROWSER,
         ),
     )
 
@@ -543,6 +552,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
      * Called when a prompt is submitted
      * */
     fun onPromptSubmitted() {
+        footerPromptSubmissions.value += 1
         // A prompt submitted while still in the recovery window means the user sent a prompt after
         // recovering the chat's model — report it before the window is cleared below.
         val tabId = activeTabId.value

@@ -14,20 +14,24 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.pixels.remoteconfig
+package com.duckduckgo.credentialexchange.impl
 
-import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.credentialexchange.api.CredentialExchange
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-interface CachedEntityLookupRCWrapper {
-    val enabled: Boolean
-}
-
 @ContributesBinding(AppScope::class)
-class RealCachedEntityLookupRCWrapper @Inject constructor(
-    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
-) : CachedEntityLookupRCWrapper {
-    override val enabled by lazy { androidBrowserConfigFeature.cachedEntityLookup().isEnabled() }
+class RealCredentialExchange @Inject constructor(
+    private val exporterAppDetector: ExporterAppDetector,
+    private val credentialExchangeFeature: CredentialExchangeFeature,
+    private val dispatchers: DispatcherProvider,
+) : CredentialExchange {
+
+    override suspend fun isImportSupported(): Boolean {
+        val enabled = withContext(dispatchers.io()) { credentialExchangeFeature.self().isEnabled() }
+        return enabled && exporterAppDetector.exporterApps().isNotEmpty()
+    }
 }

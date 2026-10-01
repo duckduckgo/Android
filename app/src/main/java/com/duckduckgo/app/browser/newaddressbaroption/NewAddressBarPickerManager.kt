@@ -28,6 +28,7 @@ import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.promptscoordinator.api.PromptExposureReporter
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -53,6 +54,7 @@ class RealNewAddressBarPickerManager @Inject constructor(
     private val newAddressBarPickerBottomSheetDialogFactory: NewAddressBarPickerBottomSheetDialogFactory,
     private val pixel: Pixel,
     private val appTheme: AppTheme,
+    private val promptExposureReporter: PromptExposureReporter,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
 ) : NewAddressBarPickerManager {
@@ -115,6 +117,7 @@ class RealNewAddressBarPickerManager @Inject constructor(
                 override fun onDisplayed() {
                     pixel.fire(AppPixelName.NEW_ADDRESS_BAR_PICKER_V2_DISPLAYED_COUNT)
                     pixel.fire(AppPixelName.NEW_ADDRESS_BAR_PICKER_V2_DISPLAYED_DAILY, type = Pixel.PixelType.Daily())
+                    promptExposureReporter.reportPromptShown(NEW_ADDRESS_BAR_PICKER_PROMPT_ID)
                     appCoroutineScope.launch {
                         // After being shown MAX_DISPLAY_COUNT times without a choice, stop offering it.
                         if (newAddressBarPickerDataStore.incrementDisplayCount() >= MAX_DISPLAY_COUNT) {
@@ -147,5 +150,6 @@ class RealNewAddressBarPickerManager @Inject constructor(
         private const val SELECTION_PARAM = "selection"
         private const val SELECTION_SEARCH_AND_AI = "search_and_ai"
         private const val SELECTION_SEARCH_ONLY = "search_only"
+        private const val NEW_ADDRESS_BAR_PICKER_PROMPT_ID = "new_address_bar_picker"
     }
 }

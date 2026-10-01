@@ -35,13 +35,16 @@ import com.duckduckgo.app.settings.clear.getAppLinkSettingForIndex
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.dialog.DaxAlertDialog
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
+import com.duckduckgo.common.ui.view.dialog.RadioListOption
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeBucket
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.site.permissions.impl.feature.SitePermissionsDialogRedesignFeature
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionScreenNoParams
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -66,8 +69,13 @@ class PermissionsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
+    @Inject
+    lateinit var sitePermissionsDialogRedesignFeature: SitePermissionsDialogRedesignFeature
+
     private val viewModel: PermissionsViewModel by bindViewModel()
     private val binding: ActivityPermissionsBinding by viewBinding()
+    private var appLinksDialog: DaxAlertDialog? = null
+    private var pendingAppLinkSetting: AppLinkSettingType? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -85,6 +93,18 @@ class PermissionsActivity : DuckDuckGoActivity() {
 
         configureUiEventHandlers()
         observeViewModel()
+        savedInstanceState?.getString(KEY_PENDING_APP_LINK_SETTING)
+            ?.let { launchRedesignedAppLinksSettingSelector(AppLinkSettingType.valueOf(it)) }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        pendingAppLinkSetting?.let { outState.putString(KEY_PENDING_APP_LINK_SETTING, it.name) }
+    }
+
+    override fun onDestroy() {
+        appLinksDialog?.dismiss()
+        super.onDestroy()
     }
 
     private fun configureEdgeToEdgeInsets() {
@@ -147,6 +167,10 @@ class PermissionsActivity : DuckDuckGoActivity() {
     }
 
     private fun launchAppLinksSettingSelector(appLinkSettingType: AppLinkSettingType) {
+        if (sitePermissionsDialogRedesignFeature.permissionSettingsRedesign().isEnabled()) {
+            launchRedesignedAppLinksSettingSelector(appLinkSettingType)
+            return
+        }
         val currentAppLinkSetting = appLinkSettingType.getOptionIndex()
         RadioListAlertDialogBuilder(this)
             .setTitle(R.string.settingsTitleAppLinksDialog)
@@ -171,6 +195,40 @@ class PermissionsActivity : DuckDuckGoActivity() {
             .show()
     }
 
+    private fun launchRedesignedAppLinksSettingSelector(appLinkSettingType: AppLinkSettingType) {
+        val options = listOf(
+            AppLinkSettingType.ALWAYS to com.duckduckgo.site.permissions.impl.R.string.permissionSettingsAlwaysAllow,
+            AppLinkSettingType.ASK_EVERYTIME to com.duckduckgo.site.permissions.impl.R.string.permissionSettingsAskEachTime,
+            AppLinkSettingType.NEVER to com.duckduckgo.site.permissions.impl.R.string.sitePermissionsDialogNeverAllowButton,
+        )
+        pendingAppLinkSetting = appLinkSettingType
+        appLinksDialog = RadioListAlertDialogBuilder(this)
+            .setRebrandUpdate(true)
+            .setCancelable(true)
+            .setTitle(R.string.settingsTitleAppLinksDialog)
+            .setOptions(options.map { (setting, text) -> RadioListOption(text, isSelected = setting == appLinkSettingType) })
+            .setPositiveButton(com.duckduckgo.mobile.android.R.string.dialogSave)
+            .setNegativeButton(R.string.cancel)
+            .addEventListener(
+                object : RadioListAlertDialogBuilder.EventListener() {
+                    override fun onRadioItemSelected(selectedItem: Int) {
+                        pendingAppLinkSetting = options[selectedItem - 1].first
+                    }
+
+                    override fun onDialogDismissed() {
+                        pendingAppLinkSetting = null
+                        appLinksDialog = null
+                    }
+
+                    override fun onPositiveButtonClicked(selectedItem: Int) {
+                        viewModel.onAppLinksSettingChanged(options[selectedItem - 1].first)
+                    }
+                },
+            )
+            .build()
+            .also { it.show() }
+    }
+
     @SuppressLint("InlinedApi")
     private fun launchNotificationsSettings() {
         val settingsIntent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
@@ -178,5 +236,9 @@ class PermissionsActivity : DuckDuckGoActivity() {
             .putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
 
         startActivity(settingsIntent, null)
+    }
+
+    companion object {
+        private const val KEY_PENDING_APP_LINK_SETTING = "pendingAppLinkSetting"
     }
 }

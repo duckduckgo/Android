@@ -5871,25 +5871,33 @@ class BrowserTabViewModel @Inject constructor(
         duckChat.openDuckChatImageGeneration(entryPoint)
     }
 
+    /** New Chat from the Duck.ai omnibar "+" menu, which is only ever shown in a Duck.ai chat. */
+    fun openNewDuckChatFromChatMenu() {
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_NEW_CHAT_TAPPED)
+        openNewDuckChatTab(DuckChatEntryPoint.DUCK_AI_NEW_CHAT, fromDuckAiChat = true)
+    }
+
+    /** New Chat from the browsing menu, which is reachable from any view mode. */
     fun openNewDuckChat(viewMode: ViewMode) {
-        if (viewMode == ViewMode.DuckAI) {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_NEW_CHAT_TAPPED)
-            duckAiSessionCallback.onNewChatCreated(tabId)
-            viewModelScope.launch {
-                val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT)
-                _subscriptionEventDataChannel.send(subscriptionEvent)
-            }
-        } else {
-            val url = duckChat.getDuckChatUrl("", false)
-            val entryPoint = if (viewMode == ViewMode.NewTab) {
-                DuckChatEntryPoint.BROWSING_MENU_NTP
-            } else {
-                DuckChatEntryPoint.BROWSING_MENU_WEBPAGE
-            }
-            duckChat.reportDuckChatEntry(entryPoint, opensNewTab = true, hasPrompt = false)
-            command.value = OpenInNewTab(url, tabId)
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_NEW_CHAT_TAB_TAPPED)
+        val entryPoint = when (viewMode) {
+            ViewMode.NewTab -> DuckChatEntryPoint.BROWSING_MENU_NTP
+            ViewMode.DuckAI -> DuckChatEntryPoint.BROWSING_MENU_DUCKAI
+            else -> DuckChatEntryPoint.BROWSING_MENU_WEBPAGE
         }
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_NEW_CHAT_TAB_TAPPED)
+        openNewDuckChatTab(entryPoint, fromDuckAiChat = viewMode == ViewMode.DuckAI)
+    }
+
+    private fun openNewDuckChatTab(
+        entryPoint: DuckChatEntryPoint,
+        fromDuckAiChat: Boolean,
+    ) {
+        if (fromDuckAiChat) {
+            duckAiSessionCallback.onNewChatCreated(tabId)
+            recordPendingNewTabOpenedExit()
+        }
+        duckChat.reportDuckChatEntry(entryPoint, opensNewTab = true, hasPrompt = false)
+        command.value = OpenInNewTab(duckChat.getDuckChatUrl("", false), tabId)
     }
 
     fun onCustomizeResponsesClicked() {

@@ -54,6 +54,28 @@
         </FrameLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
+    <include
+        android:id="@+id/chatHistorySelectAll"
+        layout="@layout/view_chat_history_select_all"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/appBarLayout"
+        tools:visibility="visible" />
+
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+        android:id="@+id/chatHistorySelectAllDivider"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:defaultPadding="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/chatHistorySelectAll"
+        tools:visibility="visible" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/chatHistoryList"
         android:layout_width="match_parent"
@@ -62,7 +84,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/appBarLayout" />
+        app:layout_constraintTop_toBottomOf="@id/chatHistorySelectAllDivider" />
 
     <com.duckduckgo.duckchat.impl.history.ChatHistoryEmptyStateView
         android:id="@+id/chatHistoryEmptyState"
@@ -72,6 +94,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/appBarLayout" />
+        app:layout_constraintTop_toBottomOf="@id/chatHistorySelectAllDivider" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

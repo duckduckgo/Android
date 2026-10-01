@@ -23,30 +23,33 @@ import com.duckduckgo.di.scopes.AppScope
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 
-/**
- * Durable record of which subscription-onboarding steps a user has completed, keyed by step id. Lives
- * outside the (in-memory) onboarding orchestrator so completion survives app kills and can be read by the
- * summary step and by step preconditions (to skip already-completed steps on re-entry).
- */
 @SingleInstanceIn(AppScope::class)
-class SubscriptionOnboardingStepStore @Inject constructor(
+class SubscriptionOnboardingStore @Inject constructor(
     private val sharedPreferencesProvider: SharedPreferencesProvider,
 ) {
     private val preferences: SharedPreferences by lazy {
         sharedPreferencesProvider.getSharedPreferences(FILENAME)
     }
 
-    fun isCompleted(stepId: String): Boolean = completedSteps().contains(stepId)
+    fun isStepCompleted(stepId: String): Boolean = completedSteps().contains(stepId)
 
-    fun setCompleted(stepId: String) {
+    fun setStepCompleted(stepId: String) {
         preferences.edit { putStringSet(KEY_COMPLETED_STEPS, completedSteps() + stepId) }
     }
 
     fun completedSteps(): Set<String> =
         preferences.getStringSet(KEY_COMPLETED_STEPS, emptySet()) ?: emptySet()
 
+    fun completedEntryPointViews(): Int = preferences.getInt(KEY_COMPLETED_ENTRY_POINT_VIEWS, 0)
+
+    fun incrementCompletedEntryPointViews() {
+        preferences.edit { putInt(KEY_COMPLETED_ENTRY_POINT_VIEWS, completedEntryPointViews() + 1) }
+    }
+
     companion object {
         const val FILENAME = "com.duckduckgo.subscriptions.onboarding.steps"
         const val KEY_COMPLETED_STEPS = "KEY_COMPLETED_STEPS"
+        const val KEY_COMPLETED_ENTRY_POINT_VIEWS = "KEY_COMPLETED_ENTRY_POINT_VIEWS"
+        const val MAX_COMPLETED_ENTRY_POINT_VIEWS = 2
     }
 }

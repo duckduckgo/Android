@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.nativeinput
 import android.app.Activity
 import android.content.res.Configuration
 import android.graphics.Outline
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.transition.ChangeBounds
 import android.transition.Fade
@@ -233,6 +234,7 @@ class RealNativeInputManager @Inject constructor(
     // The NTP top stroke is driven by hasFavorites, so we save its visibility on attach and restore it
     // on detach rather than re-showing unconditionally (which would show it with no favorites present).
     private var savedTopNtpStrokeVisibility: Int? = null
+    private var deferredRootBackground: Drawable? = null
 
     private var cachedUrl: String? = null
 
@@ -447,6 +449,10 @@ class RealNativeInputManager @Inject constructor(
 
         val isBottom = widgetFrom(widgetView)?.isWidgetBottom() ?: false
         isExiting = true
+        // The root keeps its height until removeWidget, so its opaque background would mask the content
+        // the exit has already reflowed back up, leaving it cut until the fade ends.
+        val rootBackground = widgetView.background
+        widgetView.background = null
         if (!omnibarController.isDuckAiMode() && card != null && omnibarCard != null && omnibarCard.width > 0) {
             layoutCoordinator.setWidgetAnimating(true)
             // Bottom: nav bar may already be sliding out on its own timeline. Top: bar stays put —
@@ -463,6 +469,7 @@ class RealNativeInputManager @Inject constructor(
                 isBottom = isBottom,
                 onUpdate = { layoutCoordinator.onWidgetAnimationFrame(card) },
                 onCancel = {
+                    widgetView.background = rootBackground
                     widgetFrom(widgetView)?.setFooterSuppressed(false)
                     layoutCoordinator.setWidgetAnimating(false)
                     layoutCoordinator.resumeContentReflow()
@@ -746,6 +753,8 @@ class RealNativeInputManager @Inject constructor(
                 } else {
                     widget.saveLastUsedTogglePosition(isChat = true)
                     widget.storePendingPrompt(query)
+                    // Before the widget is removed below, so the footer can attribute the prompt to the card that was up.
+                    widget.onPromptSubmitted()
                     animator.cancelAnimation()
                     rootView.findViewById<View?>(R.id.autoCompleteSuggestionsList)?.gone()
                     rootView.findViewById<View?>(R.id.focusedView)?.gone()
@@ -823,6 +832,7 @@ class RealNativeInputManager @Inject constructor(
             floatingSubmitContainer = null
         }
         if (removed) widgetRoot = null
+        deferredRootBackground = null
         savedTopNtpStrokeVisibility?.let { vis ->
             rootView.findViewById<View?>(R.id.topNtpOutlineStroke)?.visibility = vis
             savedTopNtpStrokeVisibility = null
@@ -1328,16 +1338,21 @@ class RealNativeInputManager @Inject constructor(
 
     private fun applyWindowChrome(widgetView: View, isBottom: Boolean) {
         widgetView.translationZ = WIDGET_ELEVATION_DP.toPx()
+        // The root's opaque background gives it an outline to cast from, so its elevation draws a band
+        // along the widget's edges that reads as a divider. Keep the z-order, drop the shadow; the
+        // card inside still carries its own.
+        suppressShadow(widgetView)
+        // The stroke separates a top omnibar from the content below it. While the input is open the
+        // content scrolls under the input instead, so the stroke reads as a divider cutting it off.
+        rootView.findViewById<View?>(R.id.topNtpOutlineStroke)?.let {
+            if (savedTopNtpStrokeVisibility == null) savedTopNtpStrokeVisibility = it.visibility
+            it.gone()
+        }
         if (isBottom) {
             rootView.findViewById<View?>(R.id.navigationBar)?.gone()
             rootView.findViewById<View?>(R.id.bottomBrowserOutlineStroke)?.gone()
-            // The top outline strokes separate a top omnibar from content; with the input's nav bar at
-            // the top they just draw a hairline under the bar. Hide them, restored on close.
+            // With the input's nav bar at the top, this one just draws a hairline under the bar.
             rootView.findViewById<View?>(R.id.topBrowserOutlineStroke)?.gone()
-            rootView.findViewById<View?>(R.id.topNtpOutlineStroke)?.let {
-                if (savedTopNtpStrokeVisibility == null) savedTopNtpStrokeVisibility = it.visibility
-                it.gone()
-            }
             if (omnibarController.isBrowserMode()) {
                 widgetView.setBackgroundColor(
                     widgetView.context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorBackground),
@@ -1348,12 +1363,15 @@ class RealNativeInputManager @Inject constructor(
                         com.duckduckgo.mobile.android.R.attr.daxColorDuckAiBackground,
                     ),
                 )
-                suppressShadow(widgetView)
             }
             rootView.findViewById<View?>(R.id.browserLayout)?.let {
                 it.setPadding(it.paddingLeft, it.paddingTop, it.paddingRight, 0)
             }
         }
+        // The root is at full height from the moment it attaches, so painting it now would mask the
+        // content while the card is still morphing out of the omnibar. Hold it until the morph lands.
+        deferredRootBackground = widgetView.background
+        widgetView.background = null
         layoutCoordinator.configureAutocompleteLayout(widgetView, isBottom)
         layoutCoordinator.configureContentOffset(widgetView, isBottom)
         widgetView.post { layoutCoordinator.applyForcedBottomTranslation(widgetView, isBottom) }
@@ -1386,6 +1404,7 @@ class RealNativeInputManager @Inject constructor(
                 }
             },
             onCancel = {
+                applyDeferredRootBackground(widgetView)
                 pendingEnterOwnsAnimating = false
                 layoutCoordinator.setWidgetAnimating(false)
                 widgetFrom(widgetView)?.let { widget ->
@@ -1404,7 +1423,15 @@ class RealNativeInputManager @Inject constructor(
         return true
     }
 
+    private fun applyDeferredRootBackground(widgetView: View) {
+        deferredRootBackground?.let {
+            widgetView.background = it
+            deferredRootBackground = null
+        }
+    }
+
     private fun onEnterComplete(widgetView: View) {
+        applyDeferredRootBackground(widgetView)
         layoutCoordinator.enableContentLayoutTransition()
         if (omnibarController.isDuckAiMode()) return
         if (widgetView.isAttachedToWindow) {

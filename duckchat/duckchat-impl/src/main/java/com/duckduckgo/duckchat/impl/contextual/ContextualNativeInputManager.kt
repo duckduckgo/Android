@@ -268,6 +268,7 @@ class RealContextualNativeInputManager @Inject constructor(
                 // shortcut built its own JS event and silently dropped that context. onPromptSent starts a
                 // new chat from INPUT and appends to the active chat from WEBVIEW — the web page decides
                 // which, based on its own state, not on the native caller.
+                widget.onPromptSubmitted()
                 onPromptSubmitted(
                     NativeInputPrompt(prompt, modelId, reasoningEffort, selectedTool, imagesJson, filesJson, selectionsJson),
                 )

@@ -152,6 +152,8 @@
                                         "browsing_menu_ntp",
                                         "browsing_menu_webpage",
                                         "tab_switcher",
+                                        "tab_switcher_existing_chat",
+                                        "return_to_chat_card",
                                         "chat_history_new_chat",
                                         "chat_history_open_chat",
                                         "voice",
