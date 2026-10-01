@@ -40,6 +40,7 @@ import dagger.SingleInstanceIn
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
+import org.json.JSONObject
 import javax.inject.Inject
 
 @ContributesMultibinding(
@@ -143,6 +144,20 @@ class NativeCrashInit @Inject constructor(
         logcat(ERROR) { "ndk-crash: error loading library in process $processName: ${t.asLog()}" }
     }
 
+    internal fun crashMetadata(): String = JSONObject()
+        .put("ExceptionType", "AndroidNativeCrash")
+        .put("AppVersion", "${appBuildConfig.versionName}-${appBuildConfig.flavor}")
+        .put("OsVersion", "Android SDK ${appBuildConfig.sdkInt}")
+        .put(
+            "tags",
+            JSONObject()
+                .put("pn", processName)
+                .put("customTab", isCustomTab)
+                .put("webViewPackage", webViewPackage)
+                .put("webViewVersion", webViewVersion),
+        )
+        .toString()
+
     private fun initCrashpad() {
         val initialized = runCatching {
             crashpadInitializer.initialize(
@@ -150,6 +165,7 @@ class NativeCrashInit @Inject constructor(
                     "customTab" to "$isCustomTab",
                     "webViewPackage" to webViewPackage,
                     "webViewVersion" to webViewVersion,
+                    "crash_metadata" to crashMetadata(),
                 ),
                 onCrash = {
                     pixel.enqueueFire(
