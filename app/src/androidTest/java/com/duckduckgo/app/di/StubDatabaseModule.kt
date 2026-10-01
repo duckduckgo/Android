@@ -26,10 +26,10 @@ import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
 
-@Module(includes = [DaoModule::class])
+@Module
 @ContributesTo(
     scope = AppScope::class,
-    replaces = [DatabaseModule::class, RoomDatabaseModule::class],
+    replaces = [RoomDatabaseModule::class],
 )
 class StubDatabaseModule {
 

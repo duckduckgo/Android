@@ -24,13 +24,15 @@ import java.io.File
 
 /**
  * `@Database(entities = ...)` uses CLASS retention, so it isn't visible via reflection at runtime.
- * The exported schema is the actual contract, so this asserts against it instead.
+ * The newest exported schema is the actual contract, so this asserts against it instead.
  */
 class AppDatabaseContractTest {
 
     @Test
     fun whenEntityCountChangesThenThisTestMustBeUpdatedDeliberately() {
-        val schemaFile = File("schemas/com.duckduckgo.app.global.db.AppDatabase/64.json")
+        val schemaFile = File("schemas/com.duckduckgo.app.global.db.AppDatabase")
+            .listFiles { file -> file.extension == "json" }!!
+            .maxBy { it.nameWithoutExtension.toInt() }
         val moshi = Moshi.Builder().build()
         val type = Types.newParameterizedType(Map::class.java, String::class.java, Any::class.java)
         val schema = moshi.adapter<Map<String, Any>>(type).fromJson(schemaFile.readText())!!

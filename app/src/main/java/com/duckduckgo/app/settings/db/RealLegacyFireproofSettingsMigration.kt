@@ -18,8 +18,11 @@ package com.duckduckgo.app.settings.db
 
 import com.duckduckgo.app.global.db.LegacyFireproofSettingsMigration
 import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
+@ContributesBinding(AppScope::class)
 class RealLegacyFireproofSettingsMigration @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
 ) : LegacyFireproofSettingsMigration {
