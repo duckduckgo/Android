@@ -33,7 +33,6 @@ import com.duckduckgo.app.onboarding.OnboardingPasswordImportExperimentManager
 import com.duckduckgo.app.onboarding.OnboardingPasswordImportExperimentManager.OnboardingPasswordImportVariant
 import com.duckduckgo.app.onboarding.OnboardingPreference
 import com.duckduckgo.app.onboarding.OnboardingPreferenceCatalog
-import com.duckduckgo.app.onboarding.OnboardingPromptsExperimentManager
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager.SegmentedOnboardingExperimentVariant
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentMetrics
@@ -131,7 +130,6 @@ class NewUserOnboardingPlanProviderTest {
     private val onboardingInputScreenLaunchTarget: OnboardingInputScreenLaunchTarget = mock()
     private val customAiOnboardingResolver: CustomAiOnboardingResolver = mock()
     private val duckAiOnboardingDemo: DuckAiOnboardingDemo = mock()
-    private val homeScreenPromptsExperiment: OnboardingPromptsExperimentManager = mock()
     private val segmentedOnboardingExperiment: SegmentedOnboardingExperimentManager = mock()
     private val segmentedOnboardingMetrics: SegmentedOnboardingExperimentMetrics = mock()
     private val onboardingPreferenceCatalog: OnboardingPreferenceCatalog = mock {
@@ -168,14 +166,13 @@ class NewUserOnboardingPlanProviderTest {
         whenever(splitOmnibarWelcomeToggle.isEnabled()).thenReturn(false)
         whenever(defaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
         whenever(defaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
-        whenever(widgetCapabilities.hasInstalledWidgets).thenReturn(false)
+        // Most flows are exercised without the widget prompt; widget tests opt in by clearing this.
+        whenever(widgetCapabilities.hasInstalledWidgets).thenReturn(true)
         runBlocking {
             whenever(syncAutoRestore.canRestore()).thenReturn(false)
             whenever(appBuildConfig.isAppReinstall()).thenReturn(false)
             whenever(duckAiAvailability.isDuckAiOnboardingEnabled()).thenReturn(false)
             whenever(customAiOnboardingResolver.resolve()).thenReturn(false)
-            whenever(homeScreenPromptsExperiment.enroll())
-                .thenReturn(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.CONTROL)
             whenever(segmentedOnboardingExperiment.enroll()).thenReturn(null)
             whenever(passwordImportExperiment.enroll()).thenReturn(null)
         }
@@ -198,7 +195,6 @@ class NewUserOnboardingPlanProviderTest {
             onboardingInputScreenLaunchTarget = onboardingInputScreenLaunchTarget,
             customAiOnboardingResolver = customAiOnboardingResolver,
             duckAiOnboardingDemo = duckAiOnboardingDemo,
-            onboardingPromptsExperimentManager = homeScreenPromptsExperiment,
             segmentedOnboardingExperimentManager = segmentedOnboardingExperiment,
             segmentedOnboardingExperimentMetrics = segmentedOnboardingMetrics,
             onboardingPasswordImportExperimentManager = passwordImportExperiment,
@@ -251,7 +247,6 @@ class NewUserOnboardingPlanProviderTest {
 
     @Test
     fun `when enrolled in the segmented treatment then reaches the download reason step`() = runTest {
-        whenever(homeScreenPromptsExperiment.enroll()).thenReturn(null)
         whenever(segmentedOnboardingExperiment.enroll()).thenReturn(SegmentedOnboardingExperimentVariant.TREATMENT)
         start()
         assertStep(NewUserOnboardingStepIds.INTRO_ANIMATION)
@@ -311,7 +306,6 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     private suspend fun startSegmentedAtDownloadReason() {
-        whenever(homeScreenPromptsExperiment.enroll()).thenReturn(null)
         whenever(segmentedOnboardingExperiment.enroll()).thenReturn(SegmentedOnboardingExperimentVariant.TREATMENT)
         start()
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
@@ -413,7 +407,6 @@ class NewUserOnboardingPlanProviderTest {
 
     @Test
     fun `when the segmented plan is built then the single choice options are prefetched`() = runTest {
-        whenever(homeScreenPromptsExperiment.enroll()).thenReturn(null)
         whenever(segmentedOnboardingExperiment.enroll()).thenReturn(SegmentedOnboardingExperimentVariant.TREATMENT)
 
         start()
@@ -869,7 +862,6 @@ class NewUserOnboardingPlanProviderTest {
 
     @Test
     fun `when the segmented control variant then builds the default plan`() = runTest {
-        whenever(homeScreenPromptsExperiment.enroll()).thenReturn(null)
         whenever(segmentedOnboardingExperiment.enroll()).thenReturn(SegmentedOnboardingExperimentVariant.CONTROL)
         start()
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
@@ -883,20 +875,6 @@ class NewUserOnboardingPlanProviderTest {
         whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
         start()
 
-        verify(segmentedOnboardingExperiment, never()).enroll()
-    }
-
-    @Test
-    fun `when enrolled in the home screen prompts experiment then the segmented experiment is never enrolled`() = runTest {
-        whenever(homeScreenPromptsExperiment.enroll())
-            .thenReturn(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.CONTROL)
-        whenever(segmentedOnboardingExperiment.enroll()).thenReturn(SegmentedOnboardingExperimentVariant.TREATMENT)
-        start()
-        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
-        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
-        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
-
-        assertStep(NewUserOnboardingStepIds.COMPARISON_CHART)
         verify(segmentedOnboardingExperiment, never()).enroll()
     }
 
@@ -1666,39 +1644,15 @@ class NewUserOnboardingPlanProviderTest {
 
     // endregion
 
-    // region Home-screen prompts experiment composition
+    // region Widget prompt composition
 
-    private suspend fun stepIdsFor(
-        onboardingPromptExperimentVariant: OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant,
-    ): List<String> {
-        whenever(homeScreenPromptsExperiment.enroll()).thenReturn(onboardingPromptExperimentVariant)
-        return provider.buildRootPlan(onCompleted = {}, onSkipped = {}).steps.map { it.id }
-    }
+    private suspend fun stepIds(): List<String> =
+        provider.buildRootPlan(onCompleted = {}, onSkipped = {}).steps.map { it.id }
 
     @Test
-    fun whenControlThenNoNewPagesInPlan() = runTest {
-        val ids = stepIdsFor(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.CONTROL)
-        assertFalse(ids.contains(NewUserOnboardingStepIds.ADD_TO_DOCK))
-        assertFalse(ids.contains(NewUserOnboardingStepIds.WIDGET_PROMPT))
-        assertFalse(ids.contains(NewUserOnboardingStepIds.ADD_WIDGET))
-    }
-
-    @Test
-    fun whenDockOnlyThenOnlyAddToDockInsertedAfterDefaultBrowser() = runTest {
-        val ids = stepIdsFor(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_DOCK_ONLY)
-        assertTrue(ids.contains(NewUserOnboardingStepIds.ADD_TO_DOCK))
-        assertFalse(ids.contains(NewUserOnboardingStepIds.WIDGET_PROMPT))
-        assertFalse(ids.contains(NewUserOnboardingStepIds.ADD_WIDGET))
-        assertEquals(
-            ids.indexOf(NewUserOnboardingStepIds.DEFAULT_BROWSER_PROMPT) + 1,
-            ids.indexOf(NewUserOnboardingStepIds.ADD_TO_DOCK),
-        )
-    }
-
-    @Test
-    fun whenWidgetOnlyThenWidgetPromptAndAddWidgetInserted() = runTest {
-        val ids = stepIdsFor(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_WIDGET_ONLY)
-        assertFalse(ids.contains(NewUserOnboardingStepIds.ADD_TO_DOCK))
+    fun whenNoWidgetInstalledThenWidgetPromptAndAddWidgetInsertedAfterDefaultBrowser() = runTest {
+        whenever(widgetCapabilities.hasInstalledWidgets).thenReturn(false)
+        val ids = stepIds()
         assertTrue(ids.contains(NewUserOnboardingStepIds.WIDGET_PROMPT))
         assertTrue(ids.contains(NewUserOnboardingStepIds.ADD_WIDGET))
         assertEquals(
@@ -1713,8 +1667,7 @@ class NewUserOnboardingPlanProviderTest {
 
     @Test
     fun whenWidgetPromptStepPresentedThenLinearPlanWidgetPromptShownStored() = runTest {
-        whenever(homeScreenPromptsExperiment.enroll())
-            .thenReturn(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_WIDGET_ONLY)
+        whenever(widgetCapabilities.hasInstalledWidgets).thenReturn(false)
         start()
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
         orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
@@ -1731,60 +1684,36 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
-    fun whenWidgetVariantButUserAlreadyHasWidgetThenWidgetStepsNotInserted() = runTest {
+    fun whenUserAlreadyHasWidgetThenWidgetStepsNotInserted() = runTest {
         whenever(widgetCapabilities.hasInstalledWidgets).thenReturn(true)
-        val ids = stepIdsFor(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_WIDGET_ONLY)
+        val ids = stepIds()
         assertFalse(ids.contains(NewUserOnboardingStepIds.WIDGET_PROMPT))
         assertFalse(ids.contains(NewUserOnboardingStepIds.ADD_WIDGET))
     }
 
     @Test
-    fun whenBothThenDockThenWidgetPromptThenAddWidget() = runTest {
-        val ids = stepIdsFor(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_DOCK_AND_WIDGET)
-        val dock = ids.indexOf(NewUserOnboardingStepIds.ADD_TO_DOCK)
-        val prompt = ids.indexOf(NewUserOnboardingStepIds.WIDGET_PROMPT)
-        val add = ids.indexOf(NewUserOnboardingStepIds.ADD_WIDGET)
-        assertTrue(dock < prompt && prompt < add)
-        assertEquals(ids.indexOf(NewUserOnboardingStepIds.DEFAULT_BROWSER_PROMPT) + 1, dock)
-    }
-
-    @Test
-    fun whenNotEnrolledThenNoNewPagesInPlan() = runTest {
-        whenever(homeScreenPromptsExperiment.enroll()).thenReturn(null)
-        val ids = provider.buildRootPlan(onCompleted = {}, onSkipped = {}).steps.map { it.id }
-        assertFalse(ids.contains(NewUserOnboardingStepIds.ADD_TO_DOCK))
-        assertFalse(ids.contains(NewUserOnboardingStepIds.WIDGET_PROMPT))
-    }
-
-    @Test
-    fun whenReinstallThenNotEnrolledInHomeScreenPromptsExperiment() = runTest {
+    fun whenReinstallWithoutWidgetThenWidgetStepsInserted() = runTest {
         whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
-        whenever(homeScreenPromptsExperiment.enroll())
-            .thenReturn(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_WIDGET_ONLY)
-        val ids = provider.buildRootPlan(onCompleted = {}, onSkipped = {}).steps.map { it.id }
-        verify(homeScreenPromptsExperiment, never()).enroll()
-        assertFalse(ids.contains(NewUserOnboardingStepIds.WIDGET_PROMPT))
-        assertFalse(ids.contains(NewUserOnboardingStepIds.ADD_WIDGET))
+        whenever(widgetCapabilities.hasInstalledWidgets).thenReturn(false)
+        val ids = stepIds()
+        assertTrue(ids.contains(NewUserOnboardingStepIds.WIDGET_PROMPT))
+        assertTrue(ids.contains(NewUserOnboardingStepIds.ADD_WIDGET))
     }
 
     // endregion
 
     // region Step-indicator regression guard
 
-    private suspend fun indicatorCountFor(
-        onboardingPromptExperimentVariant: OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant,
-    ): Int {
-        whenever(homeScreenPromptsExperiment.enroll()).thenReturn(onboardingPromptExperimentVariant)
-        return provider.buildRootPlan(onCompleted = {}, onSkipped = {}).steps
+    private suspend fun indicatorCount(): Int =
+        provider.buildRootPlan(onCompleted = {}, onSkipped = {}).steps
             .count { (it as? NewUserOnboardingActivityStep)?.indicator == StepIndicatorMode.COUNTED }
-    }
 
     @Test
-    fun stepIndicatorTotalsMatchCohort() = runTest {
-        val control = indicatorCountFor(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.CONTROL)
-        assertEquals(control + 1, indicatorCountFor(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_DOCK_ONLY))
-        assertEquals(control + 1, indicatorCountFor(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_WIDGET_ONLY))
-        assertEquals(control + 2, indicatorCountFor(OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_DOCK_AND_WIDGET))
+    fun widgetPromptAddsExactlyOneCountedStep() = runTest {
+        whenever(widgetCapabilities.hasInstalledWidgets).thenReturn(true)
+        val withoutWidget = indicatorCount()
+        whenever(widgetCapabilities.hasInstalledWidgets).thenReturn(false)
+        assertEquals(withoutWidget + 1, indicatorCount())
     }
 
     // endregion

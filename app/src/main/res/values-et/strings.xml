@@ -977,9 +977,6 @@
     <string name="preOnboardingImportErrorRetry">Proovi uuesti</string>
 
     <!-- Pre-onboarding: add to home screen -->
-    <string name="preOnboardingDockStepTitle">Lisa mind oma lemmikute reale.</string>
-    <string name="preOnboardingAddToDockBody">Leia oma avakuvalt DuckDuckGo ikoon. Seejärel vajuta ja lohista see oma kohale. See ongi kõik!</string>
-    <string name="preOnboardingAddToDockPrimaryCta">Sain aru!</string>
 
     <!-- In-context onboarding. -->
     <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Alusta privaatset AI-vestlust Duck.ai-ga või lülita sisse, et otsida kaitstud sirvimist.<br/><br/>Saad Duck.ai\'t kasutada kõikjal, kus näed vestluse ikooni]]></string>

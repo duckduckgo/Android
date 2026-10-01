@@ -34,7 +34,6 @@ import com.duckduckgo.app.onboarding.OnboardingPasswordImportExperimentManager
 import com.duckduckgo.app.onboarding.OnboardingPasswordImportExperimentManager.OnboardingPasswordImportVariant
 import com.duckduckgo.app.onboarding.OnboardingPreference
 import com.duckduckgo.app.onboarding.OnboardingPreferenceCatalog
-import com.duckduckgo.app.onboarding.OnboardingPromptsExperimentManager
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager.SegmentedOnboardingExperimentVariant
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentMetrics
@@ -115,7 +114,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     private val onboardingInputScreenLaunchTarget: OnboardingInputScreenLaunchTarget,
     private val customAiOnboardingResolver: CustomAiOnboardingResolver,
     private val duckAiOnboardingDemo: DuckAiOnboardingDemo,
-    private val onboardingPromptsExperimentManager: OnboardingPromptsExperimentManager,
     private val segmentedOnboardingExperimentManager: SegmentedOnboardingExperimentManager,
     private val segmentedOnboardingExperimentMetrics: SegmentedOnboardingExperimentMetrics,
     private val onboardingPasswordImportExperimentManager: OnboardingPasswordImportExperimentManager,
@@ -150,17 +148,10 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
             buildCustomAiPlan(ctx, onCompleted, onSkipped)
         } else {
-            val onboardingPromptExperimentVariant = if (ctx.isReinstall) {
-                null
+            if (segmentedOnboardingExperimentManager.enroll() == SegmentedOnboardingExperimentVariant.TREATMENT) {
+                buildSegmentedPlan(ctx, onCompleted, onSkipped)
             } else {
-                onboardingPromptsExperimentManager.enroll()
-            }
-            when {
-                onboardingPromptExperimentVariant != null -> buildDefaultPlan(ctx, onCompleted, onSkipped, onboardingPromptExperimentVariant)
-                segmentedOnboardingExperimentManager.enroll() == SegmentedOnboardingExperimentVariant.TREATMENT ->
-                    buildSegmentedPlan(ctx, onCompleted, onSkipped)
-
-                else -> buildDefaultPlan(ctx, onCompleted, onSkipped)
+                buildDefaultPlan(ctx, onCompleted, onSkipped)
             }
         }
     }
@@ -169,7 +160,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         ctx: NewUserOnboardingPlanContext,
         onCompleted: suspend () -> Unit,
         onSkipped: suspend () -> Unit,
-        onboardingPromptExperimentVariant: OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant? = null,
     ): LinearOnboardingPlan {
         // SuspendMemos evaluate the inner lambda lazily, on first access, and store the result in-memory for subsequent access
         val firstDialog = SuspendMemo { resolveFirstDialog(ctx.isReinstall) }
@@ -177,13 +167,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
         val quickSetupPlan = quickSetupPlan(ctx)
 
-        val showDock = onboardingPromptExperimentVariant ==
-            OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_DOCK_ONLY ||
-            onboardingPromptExperimentVariant == OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_DOCK_AND_WIDGET
-        val variantAllowsWidget = onboardingPromptExperimentVariant ==
-            OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_WIDGET_ONLY ||
-            onboardingPromptExperimentVariant == OnboardingPromptsExperimentManager.OnboardingPromptExperimentVariant.TREATMENT_DOCK_AND_WIDGET
-        val showWidget = variantAllowsWidget && withContext(dispatchers.io()) { !widgetCapabilities.hasInstalledWidgets }
+        val showWidget = withContext(dispatchers.io()) { !widgetCapabilities.hasInstalledWidgets }
 
         val showPasswordImport = onboardingPasswordImportExperimentManager.enroll() == OnboardingPasswordImportVariant.TREATMENT
 
@@ -199,9 +183,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 add(initialStep(firstDialog))
                 add(comparisonChartStep())
                 add(defaultBrowserPromptStep())
-                if (showDock) {
-                    add(addToDockStep())
-                }
                 if (showWidget) {
                     add(widgetPromptStep(ctx))
                     add(addWidgetStep(ctx))
@@ -856,26 +837,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             }
         },
     )
-
-    private fun addToDockStep(): NewUserOnboardingActivityStep {
-        val pixelName = OnboardingPixelName.ONBOARDING_ADD_TO_DOCK
-        return NewUserOnboardingActivityStep(
-            id = NewUserOnboardingStepIds.ADD_TO_DOCK,
-            pixelName = pixelName,
-            indicator = StepIndicatorMode.COUNTED,
-            resolveDialog = { NewUserOnboardingActivityDialog.AddToDock },
-            transition = { event ->
-                when {
-                    event is NewUserOnboardingEvent.ContinueClicked -> {
-                        onboardingPixelSender.fire(pixelName, OnboardingPixelAction.Clicked(engaged = true))
-                        Advance
-                    }
-
-                    else -> Stay
-                }
-            },
-        )
-    }
 
     private fun widgetPromptStep(ctx: NewUserOnboardingPlanContext): NewUserOnboardingActivityStep {
         val pixelName = OnboardingPixelName.ONBOARDING_WIDGET_PROMPT
