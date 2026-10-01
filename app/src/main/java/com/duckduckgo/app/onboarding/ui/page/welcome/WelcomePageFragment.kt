@@ -42,17 +42,7 @@ import com.duckduckgo.app.browser.databinding.ContentOnboardingWelcomePageBindin
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserSystemSettings
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
-import com.duckduckgo.app.onboarding.ui.page.OnboardingBackgroundAnimator
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
-import com.duckduckgo.app.onboarding.ui.page.welcome.engine.BackgroundControllerImpl
-import com.duckduckgo.app.onboarding.ui.page.welcome.engine.CardAnchorControllerImpl
-import com.duckduckgo.app.onboarding.ui.page.welcome.engine.CardAnchorResolver
-import com.duckduckgo.app.onboarding.ui.page.welcome.engine.CardArrowControllerImpl
-import com.duckduckgo.app.onboarding.ui.page.welcome.engine.CardStageImpl
-import com.duckduckgo.app.onboarding.ui.page.welcome.engine.ContentControllerImpl
-import com.duckduckgo.app.onboarding.ui.page.welcome.engine.DialogRenderEngine
-import com.duckduckgo.app.onboarding.ui.page.welcome.engine.EmbellishmentControllerImpl
-import com.duckduckgo.app.onboarding.ui.page.welcome.engine.StepIndicatorControllerImpl
 import com.duckduckgo.app.onboardingquicksetup.ui.QuickSetupAddressBarPositionBottomSheet
 import com.duckduckgo.app.onboardingquicksetup.ui.QuickSetupSearchOptionsBottomSheet
 import com.duckduckgo.app.onboardingquicksetup.ui.RemoveWidgetInstructionsBottomSheet
@@ -109,7 +99,7 @@ class WelcomePageFragment : OnboardingPageFragment(R.layout.content_onboarding_w
         ViewModelProvider(this, viewModelFactory)[WelcomePageViewModel::class.java]
     }
 
-    private var engine: DialogRenderEngine? = null
+    private var engine: ComposeOnboardingDialogRenderer? = null
     private var intro: OnboardingIntroChoreographer? = null
     private var passwordImportErrorDialog: DaxAlertDialog? = null
 
@@ -176,44 +166,22 @@ class WelcomePageFragment : OnboardingPageFragment(R.layout.content_onboarding_w
             windowInsets
         }
 
-        val cardAnchor = CardAnchorControllerImpl(binding, CardAnchorResolver(deviceInfo.isTablet()))
-
         intro = OnboardingIntroChoreographer(binding)
 
-        engine = DialogRenderEngine(
-            content = ContentControllerImpl(
-                binding = binding.daxDialogCta,
-                contentValues = viewModel.contentValues,
-                onBeforeContentBound = viewModel::onBeforeContentBound,
-                isLightMode = { appTheme.isLightModeEnabled() },
-                isAddressBarRebrandEnabled = { appBrandDesignUpdateToggles.addressBar().isEnabled() },
-            ),
-            cardStage = CardStageImpl(binding),
-            background = BackgroundControllerImpl(
-                OnboardingBackgroundAnimator(
-                    backgroundPrimary = binding.backgroundPrimary,
-                    backgroundSecondary = binding.backgroundSecondary,
-                ),
-            ),
-            embellishments = EmbellishmentControllerImpl(
-                binding = binding,
-                // A decoration that stops fitting leaves the card anchored to a hidden view, so re-run the same
-                // anchor rule the render applies, which drops the arrow's depth along with it.
-                onDecorationHidden = { cardAnchor.apply(null) },
-                cardBottomInsetPx = { cardBottomInsetPx },
-            ),
-            cardAnchor = cardAnchor,
-            cardArrow = CardArrowControllerImpl(binding.daxDialogCta.cardView),
-            stepIndicator = StepIndicatorControllerImpl(binding.daxDialogCta.stepIndicator),
+        engine = ComposeOnboardingDialogRenderer(
+            binding = binding,
+            contentValues = viewModel.contentValues,
+            onBeforeContentBound = viewModel::onBeforeContentBound,
+            isLightMode = { appTheme.isLightModeEnabled() },
+            isAddressBarRebrandEnabled = { appBrandDesignUpdateToggles.addressBar().isEnabled() },
+            isTablet = deviceInfo.isTablet(),
+            cardBottomInsetPx = { cardBottomInsetPx },
             emit = viewModel::onEvent,
             execute = viewModel::onContentInteraction,
-            // While an entrance runs the card container swallows its children's touches, so a tap anywhere on the
-            // card lands on the tap-to-skip listener below instead of a picker consuming it.
-            onAnimatingChanged = { animating -> binding.daxDialogCta.cardContainer.interceptChildTouches = animating },
+            coroutineScope = viewLifecycleOwner.lifecycleScope,
         )
 
         binding.root.setOnClickListener { engine?.skipRunningAnimations() }
-        binding.daxDialogCta.cardContainer.setOnClickListener { engine?.skipRunningAnimations() }
 
         viewModel.viewState
             .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
@@ -289,7 +257,7 @@ class WelcomePageFragment : OnboardingPageFragment(R.layout.content_onboarding_w
     }
 
     private fun render(
-        engine: DialogRenderEngine,
+        engine: ComposeOnboardingDialogRenderer,
         screen: WelcomePageViewModel.Screen.Dialog,
     ) {
         // Not gated on animateEntry: a render that does not animate must still take the background over

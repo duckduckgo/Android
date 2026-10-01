@@ -15,6 +15,7 @@
   -->
 
 <resources>
+    <string name="appName" translatable="false">Dax Onboarding</string>
     <!-- Developer settings -->
     <string name="devSettingsTitle">Developer Settings</string>
     <string name="devSettingsSubtitle">Features useful for devs and debugging</string>
@@ -129,6 +130,8 @@
 
     <!-- Onboarding Dev Settings -->
     <string name="onboardingDevSettingsTitle">Onboarding Dev Settings</string>
+    <string name="onboardingDevSettingsReplayTitle">Replay pre-browser onboarding</string>
+    <string name="onboardingDevSettingsReplaySubtitle">Restart the welcome flow without clearing app data</string>
     <string name="onboardingDevSettingsStateSection">Onboarding state</string>
     <string name="onboardingDevSettingsCompletedTitle">Onboarding completed</string>
     <string name="onboardingDevSettingsSkippedTitle">Onboarding skipped</string>

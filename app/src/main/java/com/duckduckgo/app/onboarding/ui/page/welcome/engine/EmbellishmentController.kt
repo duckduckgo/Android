@@ -62,6 +62,7 @@ class EmbellishmentControllerImpl(
     private val binding: ContentOnboardingWelcomePageBinding,
     private val onDecorationHidden: () -> Unit,
     private val cardBottomInsetPx: () -> Int,
+    cardContent: View = binding.daxDialogCta.cardContainer,
 ) : EmbellishmentController {
 
     /**
@@ -83,7 +84,7 @@ class EmbellishmentControllerImpl(
     private val fitCorrector = OnboardingDecorationFitCorrector(
         root = binding.root,
         dialog = binding.daxDialogCta.root,
-        cardContainer = binding.daxDialogCta.cardContainer,
+        cardContainer = cardContent,
         onDecorationHidden = onDecorationHidden,
         cardBottomInsetPx = cardBottomInsetPx,
     )

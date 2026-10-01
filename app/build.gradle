@@ -137,7 +137,8 @@ android {
     }
     buildTypes {
         debug {
-            applicationIdSuffix ".debug"
+            // Local onboarding experiment: coexist with the installed debug app without replacing its data.
+            applicationIdSuffix ".debug.daxonboarding"
             pseudoLocalesEnabled false
             manifestPlaceholders = [
                     appIcon     : "@mipmap/ic_launcher_blue",
@@ -188,6 +189,7 @@ android {
         abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
     }
     testOptions {
+        unitTests.includeAndroidResources = true
         unitTests.returnDefaultValues = true
         animationsDisabled = true
         unitTests.all {

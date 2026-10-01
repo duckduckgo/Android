@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.dev.settings.onboarding
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.lifecycle.Lifecycle
@@ -104,17 +105,33 @@ class OnboardingDevSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun configureUiEventHandlers() {
+        binding.replayPreBrowserOnboarding.setOnClickListener { viewModel.replayPreBrowserOnboarding() }
         binding.onboardingCompletedToggle.setOnCheckedChangeListener(completedToggleListener)
         binding.onboardingSkippedToggle.setOnCheckedChangeListener(skippedToggleListener)
     }
 
     private fun observeViewModel() {
+        viewModel.commands
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { command ->
+                when (command) {
+                    OnboardingDevSettingsViewModel.Command.ReplayPreBrowserOnboarding -> {
+                        val launchIntent = requireNotNull(packageManager.getLaunchIntentForPackage(packageName))
+                        launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                        startActivity(launchIntent)
+                    }
+                }
+            }
+            .launchIn(lifecycleScope)
+
         viewModel.viewState
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .onEach { state ->
                 if (state.visibleCtaIds.isNotEmpty() && ctaRowsById.isEmpty()) {
                     buildCtaList(state.visibleCtaIds)
                 }
+                binding.replayPreBrowserOnboarding.isEnabled = !state.replaying
+                binding.onboardingCompletedToggle.isEnabled = !state.replaying
                 binding.onboardingCompletedToggle.quietlySetIsChecked(
                     state.onboardingCompleted,
                     completedToggleListener,
@@ -125,7 +142,7 @@ class OnboardingDevSettingsActivity : DuckDuckGoActivity() {
                 )
                 // Skip is allowed when not completed (user can skip), or when completed via skip (user can turn skip off).
                 // Skip is disabled when completed via dialogs (cannot skip once already completed).
-                binding.onboardingSkippedToggle.isEnabled = !state.onboardingCompleted || state.onboardingSkipped
+                binding.onboardingSkippedToggle.isEnabled = !state.replaying && (!state.onboardingCompleted || state.onboardingSkipped)
 
                 state.visibleCtaIds.forEach { ctaId ->
                     val isDismissed = state.ctaDismissedStates[ctaId] ?: false
