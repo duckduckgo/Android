@@ -303,8 +303,7 @@ interface SubscriptionsFeature {
     fun allowProTierPurchase(): Toggle
 
     /**
-     * A control/treatment experiment: [PerformanceOptimizedPaywallsCohorts.TREATMENT] opens a faster-rendering
-     * page, [PerformanceOptimizedPaywallsCohorts.CONTROL] the legacy paywall.
+     * When enabled, the paywall opens a faster-rendering page
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun performanceOptimizedPaywalls(): Toggle
