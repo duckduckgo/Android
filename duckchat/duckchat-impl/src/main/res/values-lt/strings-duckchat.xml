@@ -378,4 +378,33 @@
         <item quantity="many">%1$d žodžio</item>
         <item quantity="other" instruction="%1$d is the number of words in the selection.">%1$d žodžių</item>
     </plurals>
+
+    <!-- Duck.ai high-usage model footer -->
+    <string name="duckChatHighUsageModelFooterMessage" instruction="Placeholder is the selected model&apos;s short name">%1$s limitus išnaudoja iki 2–5 kartų greičiau nei baziniai modeliai.</string>
+    <string name="duckChatUsageFooterDismissContentDescription">Atmesti</string>
+
+    <!-- Duck.ai usage-limit footer -->
+    <string name="duckChatUsageLimitFooterApproachingDaily" instruction="Placeholder is the percentage of the daily allowance already used">%1$d %% dienos limito</string>
+    <string name="duckChatUsageLimitFooterApproachingWeekly" instruction="Placeholder is the percentage of the weekly allowance already used">%1$d %% savaitės limito</string>
+    <string name="duckChatUsageLimitFooterDailyReached">Pasiektas dienos limitas</string>
+    <string name="duckChatUsageLimitFooterWeeklyReachedFree">Pasiektas savaitės limitas</string>
+    <string name="duckChatUsageLimitFooterWeeklyReached">Pasiektas savaitės naudojimo limitas</string>
+    <string name="duckChatUsageLimitFooterAdvancedModelsReached">Pasiektas pažangių DI modelių limitas</string>
+    <string name="duckChatUsageLimitFooterCtaSwitchModel">Pakeisti modelį</string>
+    <string name="duckChatUsageLimitFooterCtaStartUsingWeeklyLimit">Pradėti naudoti savaitės limitą</string>
+    <string name="duckChatUsageLimitFooterCtaTryForFree">Išbandyti prenumeratą nemokamai</string>
+    <string name="duckChatUsageLimitFooterCtaSubscribe">Prenumeruoti</string>
+    <string name="duckChatUsageLimitFooterResetsIn" instruction="Placeholder is a duration such as &apos;2 days&apos; or &apos;5 hours&apos;">Atsinaujins po %1$s</string>
+    <plurals name="duckChatUsageLimitFooterDays">
+        <item quantity="one" instruction="%1$d is the number of whole days until the usage limit resets">%1$d diena</item>
+        <item quantity="few">%1$d dienos</item>
+        <item quantity="many">%1$d dienos</item>
+        <item quantity="other" instruction="%1$d is the number of whole days until the usage limit resets">%1$d dienų</item>
+    </plurals>
+    <plurals name="duckChatUsageLimitFooterHours">
+        <item quantity="one" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d valanda</item>
+        <item quantity="few">%1$d valandos</item>
+        <item quantity="many">%1$d valandos</item>
+        <item quantity="other" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d valandų</item>
+    </plurals>
 </resources>
