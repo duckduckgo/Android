@@ -374,4 +374,29 @@
         <item quantity="one" instruction="%1$d is the number of words in the selection.">%1$d λέξη</item>
         <item quantity="other" instruction="%1$d is the number of words in the selection.">%1$d λέξεις</item>
     </plurals>
+
+    <!-- Duck.ai high-usage model footer -->
+    <string name="duckChatHighUsageModelFooterMessage" instruction="Placeholder is the selected model&apos;s short name">Το %1$s χρησιμοποιεί τα όρια έως και 2–5x ταχύτερα από τα βασικά μοντέλα.</string>
+    <string name="duckChatUsageFooterDismissContentDescription">Απόρριψη</string>
+
+    <!-- Duck.ai usage-limit footer -->
+    <string name="duckChatUsageLimitFooterApproachingDaily" instruction="Placeholder is the percentage of the daily allowance already used">%1$d%% του ημερήσιου ορίου</string>
+    <string name="duckChatUsageLimitFooterApproachingWeekly" instruction="Placeholder is the percentage of the weekly allowance already used">%1$d%% του εβδομαδιαίου ορίου</string>
+    <string name="duckChatUsageLimitFooterDailyReached">Συμπληρώθηκε το ημερήσιο όριο</string>
+    <string name="duckChatUsageLimitFooterWeeklyReachedFree">Συμπληρώθηκε το εβδομαδιαίο όριο</string>
+    <string name="duckChatUsageLimitFooterWeeklyReached">Συμπληρώθηκε το εβδομαδιαίο όριο χρήσης</string>
+    <string name="duckChatUsageLimitFooterAdvancedModelsReached">Συμπληρώθηκε το όριο για τα προηγμένα μοντέλα τεχνητής νοημοσύνης</string>
+    <string name="duckChatUsageLimitFooterCtaSwitchModel">Αλλαγή μοντέλου</string>
+    <string name="duckChatUsageLimitFooterCtaStartUsingWeeklyLimit">Έναρξη χρήσης εβδομαδιαίου ορίου</string>
+    <string name="duckChatUsageLimitFooterCtaTryForFree">Δοκιμάστε τη συνδρομή δωρεάν</string>
+    <string name="duckChatUsageLimitFooterCtaSubscribe">Εγγραφείτε</string>
+    <string name="duckChatUsageLimitFooterResetsIn" instruction="Placeholder is a duration such as &apos;2 days&apos; or &apos;5 hours&apos;">Επαναφορά σε %1$s</string>
+    <plurals name="duckChatUsageLimitFooterDays">
+        <item quantity="one" instruction="%1$d is the number of whole days until the usage limit resets">%1$d ημέρα</item>
+        <item quantity="other" instruction="%1$d is the number of whole days until the usage limit resets">%1$d ημέρες</item>
+    </plurals>
+    <plurals name="duckChatUsageLimitFooterHours">
+        <item quantity="one" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d ώρα</item>
+        <item quantity="other" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d ώρες</item>
+    </plurals>
 </resources>
