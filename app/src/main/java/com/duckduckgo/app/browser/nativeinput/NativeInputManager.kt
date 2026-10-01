@@ -447,6 +447,10 @@ class RealNativeInputManager @Inject constructor(
 
         val isBottom = widgetFrom(widgetView)?.isWidgetBottom() ?: false
         isExiting = true
+        // The root keeps its height until removeWidget, so its opaque background would mask the content
+        // the exit has already reflowed back up, leaving it cut until the fade ends.
+        val rootBackground = widgetView.background
+        widgetView.background = null
         if (!omnibarController.isDuckAiMode() && card != null && omnibarCard != null && omnibarCard.width > 0) {
             layoutCoordinator.setWidgetAnimating(true)
             // Bottom: nav bar may already be sliding out on its own timeline. Top: bar stays put —
@@ -463,6 +467,7 @@ class RealNativeInputManager @Inject constructor(
                 isBottom = isBottom,
                 onUpdate = { layoutCoordinator.onWidgetAnimationFrame(card) },
                 onCancel = {
+                    widgetView.background = rootBackground
                     widgetFrom(widgetView)?.setFooterSuppressed(false)
                     layoutCoordinator.setWidgetAnimating(false)
                     layoutCoordinator.resumeContentReflow()
