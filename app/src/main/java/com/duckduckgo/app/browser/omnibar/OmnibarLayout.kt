@@ -131,7 +131,6 @@ import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.serp.logos.api.SerpEasterEggLogoAnimator
-import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.api.SerpLogos
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.card.MaterialCardView
@@ -203,9 +202,6 @@ class OmnibarLayout @JvmOverloads constructor(
 
     @Inject
     lateinit var serpLogos: SerpLogos
-
-    @Inject
-    lateinit var serpEasterEggLogosToggles: SerpEasterEggLogosToggles
 
     @Inject
     lateinit var appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles
@@ -1803,15 +1799,13 @@ class OmnibarLayout @JvmOverloads constructor(
             isFirstResource: Boolean,
         ): Boolean {
             if (!leadingIconState.isFavourite && logoUrl != lastAnimatedLogoUrl) {
-                if (serpEasterEggLogosToggles.setFavourite().isEnabled()) {
-                    lastAnimatedLogoUrl = logoUrl
-                    daxIcon.postDelayed(
-                        {
-                            easterEggLogoAnimator = SerpEasterEggLogoAnimator.playWiggle(daxIcon)
-                        },
-                        EASTER_EGG_ANIMATION_DELAY_MS,
-                    )
-                }
+                lastAnimatedLogoUrl = logoUrl
+                daxIcon.postDelayed(
+                    {
+                        easterEggLogoAnimator = SerpEasterEggLogoAnimator.playWiggle(daxIcon)
+                    },
+                    EASTER_EGG_ANIMATION_DELAY_MS,
+                )
             }
             return false
         }
