@@ -708,27 +708,11 @@ class RealSubscriptionsManager @Inject constructor(
     }
 
     override suspend fun refreshAccessToken() {
-        val serializeRefresh = withContext(dispatcherProvider.io()) {
-            subscriptionsFeature.get().serializeTokenRefresh().isEnabled()
-        }
-
-        if (!serializeRefresh) {
-            try {
-                tokenRefreshWideEvent.onStart(subscriptionStatus(), serializationEnabled = false)
-                doRefreshAccessToken()
-                tokenRefreshWideEvent.onSuccess()
-            } catch (e: Exception) {
-                tokenRefreshWideEvent.onFailure(e)
-                throw e
-            }
-            return
-        }
-
         // Moving token refresh to app-scoped coroutine to ensure it's not interrupted by caller cancellation.
         coroutineScope.async {
             tokenRefreshMutex.withLock {
                 try {
-                    tokenRefreshWideEvent.onStart(subscriptionStatus(), serializationEnabled = true)
+                    tokenRefreshWideEvent.onStart(subscriptionStatus())
 
                     val lockResult = crossProcessLock.acquire(TOKEN_REFRESH_LOCK_KEY)
                     tokenRefreshWideEvent.onCrossProcessLockAcquired(lockResult)
