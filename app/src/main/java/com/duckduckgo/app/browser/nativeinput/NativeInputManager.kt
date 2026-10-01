@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.nativeinput
 import android.app.Activity
 import android.content.res.Configuration
 import android.graphics.Outline
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.transition.ChangeBounds
 import android.transition.Fade
@@ -233,6 +234,7 @@ class RealNativeInputManager @Inject constructor(
     // The NTP top stroke is driven by hasFavorites, so we save its visibility on attach and restore it
     // on detach rather than re-showing unconditionally (which would show it with no favorites present).
     private var savedTopNtpStrokeVisibility: Int? = null
+    private var deferredRootBackground: Drawable? = null
 
     private var cachedUrl: String? = null
 
@@ -828,6 +830,7 @@ class RealNativeInputManager @Inject constructor(
             floatingSubmitContainer = null
         }
         if (removed) widgetRoot = null
+        deferredRootBackground = null
         savedTopNtpStrokeVisibility?.let { vis ->
             rootView.findViewById<View?>(R.id.topNtpOutlineStroke)?.visibility = vis
             savedTopNtpStrokeVisibility = null
@@ -1363,6 +1366,10 @@ class RealNativeInputManager @Inject constructor(
                 it.setPadding(it.paddingLeft, it.paddingTop, it.paddingRight, 0)
             }
         }
+        // The root is at full height from the moment it attaches, so painting it now would mask the
+        // content while the card is still morphing out of the omnibar. Hold it until the morph lands.
+        deferredRootBackground = widgetView.background
+        widgetView.background = null
         layoutCoordinator.configureAutocompleteLayout(widgetView, isBottom)
         layoutCoordinator.configureContentOffset(widgetView, isBottom)
         widgetView.post { layoutCoordinator.applyForcedBottomTranslation(widgetView, isBottom) }
@@ -1395,6 +1402,7 @@ class RealNativeInputManager @Inject constructor(
                 }
             },
             onCancel = {
+                applyDeferredRootBackground(widgetView)
                 pendingEnterOwnsAnimating = false
                 layoutCoordinator.setWidgetAnimating(false)
                 widgetFrom(widgetView)?.let { widget ->
@@ -1413,7 +1421,15 @@ class RealNativeInputManager @Inject constructor(
         return true
     }
 
+    private fun applyDeferredRootBackground(widgetView: View) {
+        deferredRootBackground?.let {
+            widgetView.background = it
+            deferredRootBackground = null
+        }
+    }
+
     private fun onEnterComplete(widgetView: View) {
+        applyDeferredRootBackground(widgetView)
         layoutCoordinator.enableContentLayoutTransition()
         if (omnibarController.isDuckAiMode()) return
         if (widgetView.isAttachedToWindow) {
