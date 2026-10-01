@@ -45,6 +45,7 @@ import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_C
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.METHOD_GET_PAGE_CONTEXT
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
+import com.duckduckgo.duckchat.impl.terms.DuckAiTermsRepository
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.LimitsHandler
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedFile
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedImage
@@ -121,6 +122,7 @@ class RealDuckChatJSHelperTest {
     private val mockBrowserInteractionsPlugin: BrowserInteractionsPlugin = mock()
     private val mockBrowserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin> = mock()
     private val mockDuckAiSessionCallback: DuckAiSessionCallback = mock()
+    private val mockTermsRepository: DuckAiTermsRepository = mock()
     private val testee = RealDuckChatJSHelper(
         duckChat = mockDuckChat,
         duckChatPixels = mockDuckChatPixels,
@@ -141,6 +143,7 @@ class RealDuckChatJSHelperTest {
         editPromptSessionStore = mockEditPromptSessionStore,
         browserInteractionsPlugins = mockBrowserInteractionsPlugins,
         duckAiSessionCallback = mockDuckAiSessionCallback,
+        termsRepository = mockTermsRepository,
     )
 
     init {
@@ -2488,6 +2491,39 @@ class RealDuckChatJSHelperTest {
         assertTrue(query.getBoolean("autoSubmit"))
         assertEquals("model", query.getString("modelId"))
         assertFalse(query.has("reasoningEffort"))
+    }
+
+    @Test
+    fun whenGetAIChatNativePromptWithPendingPromptAndToSFlagOnThenTermsAcceptedAndStored() = runTest {
+        mockDuckChatFeature.nativeToSConsent().setRawStoredState(Toggle.State(enable = true))
+        whenever(mockPendingNativePromptStore.consume()).thenReturn(PendingNativePrompt("test prompt", null, null))
+
+        val result = testee.processJsCallbackMessage("aiChat", "getAIChatNativePrompt", "123", null, pageContext = viewModel.updatedPageContext)
+
+        assertTrue(result!!.params.getBoolean("termsAccepted"))
+        verify(mockTermsRepository).markTermsAccepted(any())
+    }
+
+    @Test
+    fun whenGetAIChatNativePromptWithPendingPromptAndToSFlagOffThenTermsAcceptedOmitted() = runTest {
+        mockDuckChatFeature.nativeToSConsent().setRawStoredState(Toggle.State(enable = false))
+        whenever(mockPendingNativePromptStore.consume()).thenReturn(PendingNativePrompt("test prompt", null, null))
+
+        val result = testee.processJsCallbackMessage("aiChat", "getAIChatNativePrompt", "123", null, pageContext = viewModel.updatedPageContext)
+
+        assertFalse(result!!.params.has("termsAccepted"))
+        verify(mockTermsRepository, never()).markTermsAccepted(any())
+    }
+
+    @Test
+    fun whenGetAIChatNativePromptWithNoPendingPromptAndToSFlagOnThenTermsAcceptedOmitted() = runTest {
+        mockDuckChatFeature.nativeToSConsent().setRawStoredState(Toggle.State(enable = true))
+        whenever(mockPendingNativePromptStore.consume()).thenReturn(null)
+
+        val result = testee.processJsCallbackMessage("aiChat", "getAIChatNativePrompt", "123", null, pageContext = viewModel.updatedPageContext)
+
+        assertFalse(result!!.params.has("termsAccepted"))
+        verify(mockTermsRepository, never()).markTermsAccepted(any())
     }
 
     @Test
