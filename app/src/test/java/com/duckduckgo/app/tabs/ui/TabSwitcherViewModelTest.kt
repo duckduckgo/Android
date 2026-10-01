@@ -888,31 +888,43 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun `when Duck Chat menu item clicked and it wasn't used before then send a pixel`() = runTest {
+    fun `when Duck Chat menu chat selected then chat opened in new tab and screen closed`() = runTest {
+        val chatUrl = "https://duck.ai/?chatID=chat-1"
+
+        testee.onDuckAiChatSelected(chatUrl)
+
+        verify(duckChatMock).reportDuckChatEntry(DuckChatEntryPoint.RECENT_CHAT_TAB_SWITCHER, opensNewTab = true, hasPrompt = false)
+        verify(mockTabRepository).add(chatUrl, true)
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.Close, commandCaptor.lastValue)
+    }
+
+    @Test
+    fun `when Duck Chat menu new chat selected and it wasn't used before then send a pixel`() = runTest {
         whenever(duckChatMock.wasOpenedBefore()).thenReturn(false)
 
-        testee.onDuckAIButtonClicked()
+        testee.onDuckAiNewChatSelected()
 
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_TAB_SWITCHER_FAB, mapOf("was_used_before" to "0"))
     }
 
     @Test
-    fun `when Duck Chat menu item clicked and it was used before then send a pixel`() = runTest {
+    fun `when Duck Chat menu new chat selected and it was used before then send a pixel`() = runTest {
         whenever(duckChatMock.wasOpenedBefore()).thenReturn(true)
 
-        testee.onDuckAIButtonClicked()
+        testee.onDuckAiNewChatSelected()
 
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_TAB_SWITCHER_FAB, mapOf("was_used_before" to "1"))
     }
 
     @Test
-    fun `when Duck Chat menu item clicked then new tab created and screen closed`() = runTest {
+    fun `when Duck Chat menu new chat selected then new tab created and screen closed`() = runTest {
         whenever(duckChatMock.wasOpenedBefore()).thenReturn(false)
 
         val duckChatURL = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
         whenever(duckChatMock.getDuckChatUrl(any(), any(), any())).thenReturn(duckChatURL)
 
-        testee.onDuckAIButtonClicked()
+        testee.onDuckAiNewChatSelected()
 
         verify(mockTabRepository).add(duckChatURL, true)
 

@@ -26,7 +26,6 @@ import android.os.Bundle
 import android.os.Environment
 import android.os.Message
 import android.provider.MediaStore
-import android.text.TextUtils
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
@@ -36,7 +35,6 @@ import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
-import android.widget.LinearLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.AnyThread
 import androidx.core.content.ContextCompat
@@ -52,7 +50,6 @@ import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.WebViewModeInitializer
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.menu.PopupMenu
-import com.duckduckgo.common.ui.view.PopupMenuItemView
 import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
@@ -83,7 +80,7 @@ import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.Mode
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
 import com.duckduckgo.duckchat.impl.history.ChatHistoryItem
-import com.duckduckgo.duckchat.impl.models.iconRes
+import com.duckduckgo.duckchat.impl.history.DuckAiChatsPopupMenu
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewClient
 import com.duckduckgo.duckchat.impl.ui.filechooser.FileChooserIntentBuilder
 import com.duckduckgo.duckchat.impl.ui.filechooser.capture.camera.CameraHardwareChecker
@@ -680,52 +677,17 @@ class DuckChatContextualWebViewFragment :
 
     private fun showChatsPopup(recentChats: List<ChatHistoryItem>) {
         logcat { "Duck.ai Contextual: showChatsPopup chats=${recentChats.size}" }
-        val popup = PopupMenu(
-            layoutInflater = layoutInflater,
-            resourceId = R.layout.popup_contextual_chats_menu,
-            width = resources.getDimensionPixelSize(R.dimen.contextualChatsPopupMenuWidth),
-        )
-        val content = popup.contentView
-
         // The webview surface always exposes New Chat (there is always a chat in progress to replace).
-        val newChatRow = content.findViewById<PopupMenuItemView>(R.id.contextualChatsPopupNewChat)
-        val headerDivider = content.findViewById<View>(R.id.contextualChatsPopupHeaderDivider)
-        newChatRow.visibility = View.VISIBLE
-        headerDivider.visibility = View.VISIBLE
-        popup.onMenuItemClicked(newChatRow) { viewModel.onNewChatRequestedFromPopup() }
-
-        val openDuckAiRow = content.findViewById<PopupMenuItemView>(R.id.contextualChatsPopupOpenDuckAi)
-        popup.onMenuItemClicked(openDuckAiRow) { viewModel.onOpenDuckAiFromPopup() }
-
-        val recentContainer = content.findViewById<LinearLayout>(R.id.contextualChatsPopupRecentContainer)
-        recentContainer.removeAllViews()
-        recentChats.forEach { chat ->
-            val row = PopupMenuItemView(requireContext()).apply {
-                layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                )
-                setPrimaryText(chat.displayTitle)
-                setLeadingIconResource(chat.type.iconRes(chat.pinned))
-                setPrimaryTextMaxLines(MAX_CHAT_TITLE_LINES)
-                setPrimaryTextEllipsize(TextUtils.TruncateAt.END)
-            }
-            popup.onMenuItemClicked(row) { viewModel.onRecentChatClicked(chat.chatId) }
-            recentContainer.addView(row)
-        }
-
-        val viewAllRow = content.findViewById<PopupMenuItemView>(R.id.contextualChatsPopupViewAll)
-        val footerDivider = content.findViewById<View>(R.id.contextualChatsPopupFooterDivider)
-        val showFooter = recentChats.isNotEmpty()
-        viewAllRow.visibility = if (showFooter) View.VISIBLE else View.GONE
-        footerDivider.visibility = if (showFooter) View.VISIBLE else View.GONE
-        if (showFooter) {
-            popup.onMenuItemClicked(viewAllRow) { viewModel.onViewAllChatsClicked() }
-        }
-
+        val popup = DuckAiChatsPopupMenu(
+            layoutInflater = layoutInflater,
+            recentChats = recentChats,
+            onNewChat = viewModel::onNewChatRequestedFromPopup,
+            onOpenDuckAi = viewModel::onOpenDuckAiFromPopup,
+            onRecentChat = viewModel::onRecentChatClicked,
+            onViewAllChats = viewModel::onViewAllChatsClicked,
+        ).show(requireActivity(), binding.root, binding.contextualNewChat)
         popup.setOnDismissListener { chatsPopup = null }
         chatsPopup = popup
-        popup.showAnchoredView(requireActivity(), binding.root, binding.contextualNewChat)
     }
 
     private fun observeSubscriptionEventDataChannel() {
@@ -1026,7 +988,6 @@ class DuckChatContextualWebViewFragment :
 
     companion object {
         private const val HALF_EXPANDED_RATIO = 0.5f
-        private const val MAX_CHAT_TITLE_LINES = 1
         private const val PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 200
         private const val CUSTOM_UA =
             "Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/124.0.0.0 Mobile DuckDuckGo/5 Safari/537.36"
