@@ -20,6 +20,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.content.res.Resources
+import android.graphics.RectF
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.util.TypedValue
@@ -31,6 +33,8 @@ import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.store.ThemingDataStore
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.mobile.android.R
+import com.google.android.material.shape.MaterialShapeDrawable
+import com.google.android.material.snackbar.Snackbar
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
@@ -41,6 +45,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.robolectric.Robolectric
 import org.robolectric.RuntimeEnvironment
+import org.robolectric.annotation.Config
 
 private const val EXTRA_THEME = "theme"
 private const val EXTRA_THEME_RES_ID = "themeResId"
@@ -49,6 +54,7 @@ private const val EXTRA_OVERLAYS = "overlays"
 private const val EXTRA_FIXED_LOCAL_CLASS_NAME = "fixedLocalClassName"
 private const val EXTRA_ENABLED_TOGGLE = "enabledToggle"
 private const val TOGGLE_RADIUS = "radius"
+private const val EXTRA_FIRE_THEME = "fireTheme"
 
 private class TestThemingDataStore(override var theme: DuckDuckGoTheme = DuckDuckGoTheme.LIGHT) : ThemingDataStore {
     override fun isCurrentlySelected(theme: DuckDuckGoTheme): Boolean = this.theme == theme
@@ -103,9 +109,14 @@ class ThemingRebrandOverlayTest {
     }
 
     class ToggleAwareActivity : DuckDuckGoActivity() {
+        override val applyFireTheme: Boolean
+            get() = intent.getBooleanExtra(EXTRA_FIRE_THEME, false)
+
         override fun onCreate(savedInstanceState: Bundle?) {
             setTheme(R.style.Theme_DuckDuckGo_Light)
-            themingDataStore = TestThemingDataStore()
+            themingDataStore = TestThemingDataStore(
+                DuckDuckGoTheme.valueOf(intent.getStringExtra(EXTRA_THEME) ?: DuckDuckGoTheme.LIGHT.name),
+            )
             appBrandDesignUpdateToggles = configuredToggles(setOfNotNull(intent.getStringExtra(EXTRA_ENABLED_TOGGLE)))
             onCreate(savedInstanceState, daggerInject = false)
         }
@@ -163,8 +174,15 @@ class ThemingRebrandOverlayTest {
         return Robolectric.buildActivity(ThemedActivity::class.java, intent).setup().get()
     }
 
-    private fun toggleAwareActivity(enabledToggle: String): AppCompatActivity {
-        val intent = Intent().putExtra(EXTRA_ENABLED_TOGGLE, enabledToggle)
+    private fun toggleAwareActivity(
+        enabledToggle: String?,
+        theme: DuckDuckGoTheme = DuckDuckGoTheme.LIGHT,
+        fireTheme: Boolean = false,
+    ): AppCompatActivity {
+        val intent = Intent()
+            .putExtra(EXTRA_ENABLED_TOGGLE, enabledToggle)
+            .putExtra(EXTRA_THEME, theme.name)
+            .putExtra(EXTRA_FIRE_THEME, fireTheme)
         return Robolectric.buildActivity(ToggleAwareActivity::class.java, intent).setup().get()
     }
 
@@ -380,6 +398,37 @@ class ThemingRebrandOverlayTest {
         )
         assertFalse(resolveBoolean(activity, R.attr.daxMessageCtaClipToPadding))
         assertEquals(1000f, resolveDimension(activity, R.attr.daxPillRadius), 0f)
+    }
+
+    @Test
+    @Config(qualifiers = "xhdpi")
+    fun whenRadiusToggleIsEnabledThenSnackbarCornersAre16DpInRegularAndFireThemes() {
+        listOf(DuckDuckGoTheme.LIGHT, DuckDuckGoTheme.DARK).forEach { theme ->
+            listOf(false, true).forEach { fireTheme ->
+                val activity = toggleAwareActivity(TOGGLE_RADIUS, theme, fireTheme)
+                val background = Snackbar.make(activity.findViewById(android.R.id.content), "Message", Snackbar.LENGTH_SHORT)
+                    .view.background as MaterialShapeDrawable
+                val shape = background.shapeAppearanceModel
+                val expectedRadius = 16f * activity.resources.displayMetrics.density
+
+                listOf(shape.topLeftCornerSize, shape.topRightCornerSize, shape.bottomLeftCornerSize, shape.bottomRightCornerSize)
+                    .forEach { corner -> assertEquals(expectedRadius, corner.getCornerSize(RectF(0f, 0f, 100f, 100f)), 0f) }
+            }
+        }
+    }
+
+    @Test
+    @Config(qualifiers = "xhdpi")
+    fun whenRadiusToggleIsDisabledThenSnackbarCornersRemain4DpInRegularAndFireThemes() {
+        listOf(DuckDuckGoTheme.LIGHT, DuckDuckGoTheme.DARK).forEach { theme ->
+            listOf(false, true).forEach { fireTheme ->
+                val activity = toggleAwareActivity(null, theme, fireTheme)
+                val background = Snackbar.make(activity.findViewById(android.R.id.content), "Message", Snackbar.LENGTH_SHORT)
+                    .view.background as GradientDrawable
+
+                assertEquals(4f * activity.resources.displayMetrics.density, background.cornerRadius, 0f)
+            }
+        }
     }
 
     @Test

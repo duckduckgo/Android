@@ -187,6 +187,7 @@
     </style>
 
     <style name="ThemeOverlay.Rebrand.Radius" parent="">
+        <item name="snackbarStyle">@style/Widget.DuckDuckGo.Snackbar.Rebrand</item>
         <item name="daxContainerRadius">@dimen/rebrandContainerRadius</item>
         <item name="daxDialogRadius">@dimen/rebrandContainerRadius</item>
         <item name="daxSheetRadius">@dimen/rebrandContainerRadius</item>
