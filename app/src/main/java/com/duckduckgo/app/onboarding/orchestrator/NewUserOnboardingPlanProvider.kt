@@ -854,7 +854,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         },
     )
 
-    /** The widget prompt and the add-widget hand-off, or nothing when the device already has a DuckDuckGo widget. */
     private suspend fun widgetSteps(ctx: NewUserOnboardingPlanContext): List<LinearOnboardingStep> =
         if (withContext(dispatchers.io()) { widgetCapabilities.hasInstalledWidgets }) {
             emptyList()
