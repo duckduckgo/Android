@@ -213,11 +213,6 @@ class NewTabPageViewModel @AssistedInject constructor(
         }
     }
 
-    /**
-     * Reported on the state that renders the card, not from [onMessageShown], which fires on every
-     * render. The reporter also dedups per message and week, since this ViewModel is per NTP view and
-     * does not survive tabs or process death.
-     */
     private fun reportRemoteMessageCardExposure(message: RemoteMessage?, onboardingComplete: Boolean) {
         if (message == null || !onboardingComplete || message.id == lastRemoteMessageReportedId) return
         lastRemoteMessageReportedId = message.id

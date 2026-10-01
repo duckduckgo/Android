@@ -77,7 +77,7 @@ class PromptExposureWeekTrackerTest {
     fun whenFirstEverRunThenStateIsInitialisedAtTheCurrentWeek() = runTest {
         installAge = 10.days
 
-        assertEquals(PromptExposureWeekTracker.Week(weekIndex = 1, daysSinceInstall = 10), testee.rollIfNeeded())
+        assertEquals(PromptExposureWeekTracker.Week(weekIndex = 1, daysSinceInstall = 10), testee.currentWeek())
         assertEquals(1, testee.recordPromptShown()?.nthInWeek)
     }
 
@@ -86,7 +86,7 @@ class PromptExposureWeekTrackerTest {
         repeat(2) { testee.recordPromptShown() }
         installAge = 6.days
 
-        assertEquals(PromptExposureWeekTracker.Week(weekIndex = 0, daysSinceInstall = 6), testee.rollIfNeeded())
+        assertEquals(PromptExposureWeekTracker.Week(weekIndex = 0, daysSinceInstall = 6), testee.currentWeek())
         assertEquals(3, testee.recordPromptShown()?.nthInWeek)
     }
 
@@ -96,7 +96,7 @@ class PromptExposureWeekTrackerTest {
         testee.recordNtpCardShown("message")
         installAge = 7.days
 
-        assertEquals(PromptExposureWeekTracker.Week(weekIndex = 1, daysSinceInstall = 7), testee.rollIfNeeded())
+        assertEquals(PromptExposureWeekTracker.Week(weekIndex = 1, daysSinceInstall = 7), testee.currentWeek())
         assertEquals(1, testee.recordNtpCardShown("message")?.nthInWeek)
     }
 
@@ -105,7 +105,7 @@ class PromptExposureWeekTrackerTest {
         repeat(3) { testee.recordPromptShown() }
         installAge = 22.days
 
-        assertEquals(3L, testee.rollIfNeeded()?.weekIndex)
+        assertEquals(3L, testee.currentWeek()?.weekIndex)
         assertEquals(1, testee.recordPromptShown()?.nthInWeek)
     }
 
@@ -129,8 +129,8 @@ class PromptExposureWeekTrackerTest {
         installAge = 7.days
 
         testee.recordPromptShown()
-        testee.rollIfNeeded()
-        observerFirst.rollIfNeeded()
+        testee.currentWeek()
+        observerFirst.currentWeek()
         observerFirst.recordPromptShown()
 
         assertEquals(observerFirstStore.data.first().asMap(), testDataStore.data.first().asMap())
@@ -158,7 +158,7 @@ class PromptExposureWeekTrackerTest {
         testee.recordPromptShown()
         installAge = 6.days
 
-        assertEquals(1L, testee.rollIfNeeded()?.weekIndex)
+        assertEquals(1L, testee.currentWeek()?.weekIndex)
         assertEquals(2, testee.recordPromptShown()?.nthInWeek)
         installAge = 7.days
         assertEquals(3, testee.recordPromptShown()?.nthInWeek)
@@ -168,7 +168,7 @@ class PromptExposureWeekTrackerTest {
     fun whenInstallAgeUnknownThenNothingIsRecorded() = runTest {
         installAge = null
 
-        assertNull(testee.rollIfNeeded())
+        assertNull(testee.currentWeek())
         assertNull(testee.recordPromptShown())
         assertNull(testee.recordNtpCardShown("message"))
         assertEquals(emptyMap<Preferences.Key<*>, Any>(), testDataStore.data.first().asMap())

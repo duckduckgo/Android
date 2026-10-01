@@ -119,7 +119,6 @@ class ModalEvaluatorCoordinator @Inject constructor(
                         }
                         // Recorded either way so kill-switch flips stay seamless.
                         completionStore.recordCompletion()
-                        // Exposure is counted whether or not the coordinator arbitrated this pass.
                         promptExposureReporter.reportPromptShown(evaluator.evaluatorId)
                         promptsCoordinator.onClaimDone(PromptType.MODAL)
                         claimHeld = false

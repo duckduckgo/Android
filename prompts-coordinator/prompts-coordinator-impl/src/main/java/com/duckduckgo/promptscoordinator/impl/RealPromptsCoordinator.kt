@@ -189,17 +189,12 @@ class RealPromptsCoordinator @Inject constructor(
 
     private suspend fun stampLastPromptDone(type: PromptType) {
         val now = currentTimeProvider.currentTimeMillis()
-        // Read before overwriting: the gap is measured from the previous stamp.
         val previous = lastPromptDoneTimestamp()
         lastPromptAt.set(now)
         store.edit { it[LAST_PROMPT_AT_KEY] = now }
         fireGapPixel(type, previous, now)
     }
 
-    /**
-     * MODAL stamps when the modal appears, while NTP_CARD stamps when the card goes away, so the
-     * NTP_CARD series measures release-to-next-prompt rather than show-to-show.
-     */
     private suspend fun fireGapPixel(type: PromptType, previous: Long, now: Long) {
         val gap = gapBucket(previous, now) ?: return
         val daysSinceInstall = appInstall.getInstallAge()?.inWholeDays ?: return

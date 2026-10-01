@@ -30,13 +30,8 @@ import dagger.SingleInstanceIn
 import javax.inject.Inject
 
 /**
- * Owns the per-install-week state behind the prompt exposure pixels.
- *
- * Nothing is scheduled: every operation first rolls the week over if the install has entered a new
- * one, inside the same [DataStore.edit] transaction. Transactions are serialised, so whichever caller
- * runs first in a new week does the rollover and the others see it done; ordering never matters.
- *
- * Every operation returns null, and changes nothing, when the install age is unknown.
+ * Owns the per-install-week state behind the prompt exposure pixels. Nothing is scheduled: every operation
+ * first rolls the week over if needed, inside the same [DataStore.edit] transaction, so callers never race.
  */
 @SingleInstanceIn(AppScope::class)
 class PromptExposureWeekTracker @Inject constructor(
@@ -54,17 +49,12 @@ class PromptExposureWeekTracker @Inject constructor(
         val nthInWeek: Int,
     )
 
-    suspend fun rollIfNeeded(): Week? = update { prefs, days ->
+    suspend fun currentWeek(): Week? = update { prefs, days ->
         Week(weekIndex = checkNotNull(prefs[WEEK_INDEX_KEY]), daysSinceInstall = days)
     }
 
-    /** Counts a prompt shown this week and returns its ordinal, starting at 1. */
     suspend fun recordPromptShown(): Exposure? = update { prefs, days -> countExposure(prefs, days) }
 
-    /**
-     * Counts the New Tab Page card for [messageId] unless it was already counted this week, in which
-     * case nothing is counted and null is returned.
-     */
     suspend fun recordNtpCardShown(messageId: String): Exposure? = update { prefs, days ->
         val reported = prefs[REPORTED_NTP_CARD_IDS_KEY].orEmpty()
         if (messageId in reported) return@update null

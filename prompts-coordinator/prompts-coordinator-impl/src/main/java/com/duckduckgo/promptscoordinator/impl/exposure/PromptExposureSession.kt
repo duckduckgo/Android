@@ -31,6 +31,5 @@ class PromptExposureSession @Inject constructor() {
         promptShownThisSession.set(true)
     }
 
-    /** Ends the session: returns whether it showed a prompt, and starts the next one without. */
     fun consumePromptShown(): Boolean = promptShownThisSession.getAndSet(false)
 }

@@ -18,9 +18,6 @@ package com.duckduckgo.promptscoordinator.impl.exposure
 
 import java.util.concurrent.TimeUnit
 
-// Every bound is lower-inclusive, upper-exclusive.
-
-/** Lines up with [daysSinceInstallBucket]: each week index maps to exactly one bucket until d28_plus. */
 internal fun weekIndexOf(daysSinceInstall: Long): Long = daysSinceInstall / DAYS_PER_WEEK
 
 internal fun daysSinceInstallBucket(daysSinceInstall: Long): String = when {
@@ -38,12 +35,7 @@ internal fun nthInWeekBucket(nth: Int): String = when {
     else -> "21_plus"
 }
 
-/**
- * @param previousPromptAt the last stamped prompt, where any value `<= 0` means none was ever stamped.
- * @return the bucket, or null when the clock moved back and the gap is meaningless.
- */
 internal fun gapBucket(previousPromptAt: Long, now: Long): String? {
-    // Selected on the previous stamp, never on the elapsed value: both "unset" sentinels are <= 0.
     if (previousPromptAt <= 0L) return "first"
 
     val elapsed = now - previousPromptAt

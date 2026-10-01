@@ -18,7 +18,6 @@ package com.duckduckgo.promptscoordinator.impl.exposure
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 
-/** @property randomizeTimestamp whether the pixel is routed through PETAL timestamp randomization. */
 internal enum class PromptExposurePixelName(
     override val pixelName: String,
     val randomizeTimestamp: Boolean,
@@ -40,13 +39,9 @@ internal object PromptExposurePixelParams {
     const val VERSION = "version"
 }
 
-/**
- * Sent as `version` on every prompt exposure pixel. Bump it whenever the meaning of a parameter or
- * [SESSION_SAMPLE_RATE] changes, so data from before and after can be told apart.
- */
+/** Bump whenever the meaning of a parameter or [SESSION_SAMPLE_RATE] changes, so data from before and after can be told apart. */
 internal const val PROMPT_EXPOSURE_PIXELS_VERSION = "1"
 
-/** Fires [pixel] with the parameters every prompt exposure pixel carries on top of [parameters]. */
 internal fun Pixel.firePromptExposurePixel(
     pixel: PromptExposurePixelName,
     vararg parameters: Pair<String, String>,
@@ -60,7 +55,7 @@ internal fun Pixel.firePromptExposurePixel(
     fire(pixel, allParameters, type = type)
 }
 
-/** Every value `prompt_id` may take; anything else is sent as [OTHER_PROMPT_ID]. */
+/** Mirrors the `prompt_id` enum in prompts_coordinator.json5. */
 internal val KNOWN_PROMPT_IDS = setOf(
     "default_browser_changed_survey_evaluator",
     "win_back_prompt",
@@ -76,7 +71,6 @@ internal val KNOWN_PROMPT_IDS = setOf(
     "import_passwords_google",
 )
 
-/** Keeps `prompt_id` bounded when a new evaluator ships before it is registered here. */
 internal const val OTHER_PROMPT_ID = "other"
 
 internal const val REMOTE_MESSAGE_CARD_PROMPT_ID = "remote_message_card"

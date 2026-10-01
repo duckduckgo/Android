@@ -42,8 +42,6 @@ class RealPromptExposureReporter @Inject constructor(
 ) : PromptExposureReporter {
 
     override fun reportPromptShown(promptId: String) {
-        // Before launching, so a prompt reported just as the app goes to the background still counts
-        // for the session it was shown in.
         session.markPromptShown()
         appCoroutineScope.launch(dispatchers.io()) {
             val exposure = weekTracker.recordPromptShown() ?: return@launch

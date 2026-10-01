@@ -29,9 +29,8 @@ interface PromptExposureReporter {
     /**
      * Records that a prompt has just been shown to the user.
      *
-     * @param promptId a bounded constant identifying the prompt, such as a [ModalEvaluator.evaluatorId]
-     * or one of the ids registered in the `m_prompt_shown` pixel definition. Never a message,
-     * notification or any other dynamic id.
+     * @param promptId a constant identifying the prompt, such as a [ModalEvaluator.evaluatorId]. Never a
+     * message, notification or any other dynamic id.
      */
     fun reportPromptShown(promptId: String)
 
