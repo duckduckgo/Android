@@ -21,7 +21,6 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.impl.store.FavouriteSerpLogoDataStore
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -29,7 +28,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -37,7 +36,6 @@ import javax.inject.Inject
 @ContributesViewModel(ActivityScope::class)
 class SerpEasterEggLogoViewModel @Inject constructor(
     private val favouriteSerpLogoDataStore: FavouriteSerpLogoDataStore,
-    private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles,
 ) : ViewModel() {
 
     private var setLogoConflatedJob = ConflatedJob()
@@ -45,7 +43,6 @@ class SerpEasterEggLogoViewModel @Inject constructor(
     data class ViewState(
         val logoUrl: String = "",
         val isFavourite: Boolean = false,
-        val isSetFavouriteEnabled: Boolean = false,
     )
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -63,14 +60,10 @@ class SerpEasterEggLogoViewModel @Inject constructor(
     fun setLogoUrl(logoUrl: String) {
         currentLogoUrl = logoUrl
         setLogoConflatedJob += viewModelScope.launch {
-            combine(
-                serpEasterEggLogosToggles.setFavourite().enabled(),
-                favouriteSerpLogoDataStore.favouriteSerpEasterEggLogoUrlFlow,
-            ) { isEnabled, storedFavourite ->
+            favouriteSerpLogoDataStore.favouriteSerpEasterEggLogoUrlFlow.map { storedFavourite ->
                 ViewState(
                     logoUrl = logoUrl,
                     isFavourite = storedFavourite == logoUrl,
-                    isSetFavouriteEnabled = isEnabled,
                 )
             }.collect { viewState ->
                 _viewState.value = viewState
