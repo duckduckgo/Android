@@ -121,6 +121,7 @@ class ComposeOnboardingDialogRenderer(
         onDecorationHidden = { applyAnchor(null) },
         cardBottomInsetPx = cardBottomInsetPx,
         cardContent = composeView,
+        canCorrectDecoration = { !dialogState.isAnimating },
     )
 
     init {

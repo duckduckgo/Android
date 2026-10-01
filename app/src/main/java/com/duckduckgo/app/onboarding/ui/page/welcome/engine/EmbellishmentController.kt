@@ -63,6 +63,7 @@ class EmbellishmentControllerImpl(
     private val onDecorationHidden: () -> Unit,
     private val cardBottomInsetPx: () -> Int,
     cardContent: View = binding.daxDialogCta.cardContainer,
+    canCorrectDecoration: () -> Boolean = { true },
 ) : EmbellishmentController {
 
     /**
@@ -87,6 +88,7 @@ class EmbellishmentControllerImpl(
         cardContainer = cardContent,
         onDecorationHidden = onDecorationHidden,
         cardBottomInsetPx = cardBottomInsetPx,
+        canCorrectDecoration = canCorrectDecoration,
     )
 
     private val decorations: Map<Embellishment, Decoration> = mapOf(

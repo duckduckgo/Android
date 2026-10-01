@@ -95,9 +95,7 @@ class OnboardingDecorationFitCorrectorTest {
                 verticalBias = 0f
             },
         )
-        val corrector = OnboardingDecorationFitCorrector(root, dialog, content, cardBottomInsetPx = { 220 }).apply {
-            enabled = true
-        }
+        val corrector = OnboardingDecorationFitCorrector(root, dialog, content, cardBottomInsetPx = { 220 })
         return BoundedHarness(root, dialog, content, body, corrector)
     }
 
@@ -162,6 +160,7 @@ class OnboardingDecorationFitCorrectorTest {
         cardBottomInsetPx: Int = 0,
         cardBottomInsetPxProvider: () -> Int = { cardBottomInsetPx },
         onDecorationHidden: () -> Unit = {},
+        canCorrectDecoration: () -> Boolean = { true },
     ): Harness {
         val root = ConstraintLayout(context)
         root.setPadding(0, 0, 0, rootPaddingBottom)
@@ -205,7 +204,14 @@ class OnboardingDecorationFitCorrectorTest {
         }
         decoration.layout(0, 0, 200, decorationHeight)
 
-        val corrector = OnboardingDecorationFitCorrector(root, dialog, cardContainer, onDecorationHidden, cardBottomInsetPxProvider)
+        val corrector = OnboardingDecorationFitCorrector(
+            root,
+            dialog,
+            cardContainer,
+            onDecorationHidden,
+            cardBottomInsetPxProvider,
+            canCorrectDecoration,
+        )
         corrector.track(decoration, minHeightPx = minHeightPx, maxHeightPx = maxHeightPx, bottomOverlapPx = bottomOverlapPx)
         return Harness(corrector, dialog, decoration)
     }
@@ -435,6 +441,90 @@ class OnboardingDecorationFitCorrectorTest {
         assertTrue(h.corrector.correctOnce())
         assertFalse(h.decoration.isGone)
         assertEquals(468, h.decoration.layoutParams.height)
+    }
+
+    @Test
+    fun whenIncomingCardKeepsPreviousMeasuredBoundsThenDecorationWaitsForSettledFit() {
+        var canCorrect = false
+        val h = harness(
+            rootHeight = 2340,
+            dialogHeight = 2100,
+            dialogTopMargin = 128,
+            contentHeight = 1885,
+            viewportHeight = 1885,
+            decorationHeight = 468,
+            decorationBottomMargin = 156,
+            minHeightPx = 390,
+            maxHeightPx = 468,
+            canCorrectDecoration = { canCorrect },
+        )
+
+        assertTrue(h.corrector.correctOnce())
+        assertFalse(h.decoration.isGone)
+        assertEquals(468, h.decoration.layoutParams.height)
+
+        h.dialog.measure(
+            View.MeasureSpec.makeMeasureSpec(1920, View.MeasureSpec.EXACTLY),
+            View.MeasureSpec.makeMeasureSpec(1410, View.MeasureSpec.EXACTLY),
+        )
+        canCorrect = true
+
+        assertTrue(h.corrector.correctOnce())
+        assertFalse(h.decoration.isGone)
+        assertEquals(468, h.decoration.layoutParams.height)
+    }
+
+    @Test
+    fun whenDecorationFitIsDeferredThenBottomInsetAndOverflowClampStillApply() {
+        val h = harness(
+            rootHeight = 1200,
+            dialogHeight = 1000,
+            contentHeight = 1000,
+            viewportHeight = 1000,
+            decorationHeight = 422,
+            minHeightPx = 390,
+            maxHeightPx = 468,
+            cardBottomInsetPx = 300,
+            canCorrectDecoration = { false },
+        )
+        h.dialog.layoutParams = (h.dialog.layoutParams as ConstraintLayout.LayoutParams).apply {
+            bottomToTop = ConstraintLayout.LayoutParams.UNSET
+            bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+            constrainedHeight = false
+        }
+
+        assertFalse(h.corrector.correctOnce())
+        assertEquals(300, (h.dialog.layoutParams as ConstraintLayout.LayoutParams).bottomMargin)
+        assertFalse(h.corrector.correctOnce())
+        assertTrue((h.dialog.layoutParams as ConstraintLayout.LayoutParams).constrainedHeight)
+        assertTrue(h.corrector.correctOnce())
+        assertFalse(h.decoration.isGone)
+        assertEquals(422, h.decoration.layoutParams.height)
+    }
+
+    @Test
+    fun whenDeferredCardSettlesTooTallThenDecorationIsStillHidden() {
+        var canCorrect = false
+        val h = harness(
+            rootHeight = 2340,
+            dialogHeight = 2100,
+            dialogTopMargin = 128,
+            contentHeight = 1885,
+            viewportHeight = 1885,
+            decorationHeight = 468,
+            decorationBottomMargin = 156,
+            minHeightPx = 390,
+            maxHeightPx = 468,
+            canCorrectDecoration = { canCorrect },
+        )
+
+        assertTrue(h.corrector.correctOnce())
+        assertFalse(h.decoration.isGone)
+
+        canCorrect = true
+
+        assertFalse(h.corrector.correctOnce())
+        assertTrue(h.decoration.isGone)
     }
 
     @Test

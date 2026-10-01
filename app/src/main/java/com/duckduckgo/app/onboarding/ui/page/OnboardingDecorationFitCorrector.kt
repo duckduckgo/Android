@@ -30,6 +30,7 @@ class OnboardingDecorationFitCorrector(
     private val cardContainer: View,
     private val onDecorationHidden: () -> Unit = {},
     private val cardBottomInsetPx: () -> Int = { 0 },
+    private val canCorrectDecoration: () -> Boolean = { true },
 ) {
 
     private var decoration: View? = null
@@ -78,6 +79,8 @@ class OnboardingDecorationFitCorrector(
         if (deco.isGone) return true
         if (OnboardingLayoutHelper.isInScrollableContainer(dialog, root)) return true
         if (syncCardClamp()) return false
+        // Compose card morphs report intermediate measured bounds; their initial fit already used the incoming content.
+        if (!canCorrectDecoration()) return true
 
         val viewport = cardContainer.parent as? View ?: return true
 
